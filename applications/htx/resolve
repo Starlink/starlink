@@ -1,0 +1,313 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     resolve
+
+#  Purpose:
+#     Turn cross-reference information into link-edits.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script accepts the name of a document containing cross-references
+#     and a list of the local documents it references. It then resolves the
+#     cross-references and generates a set of link-edits that can be applied to
+#     the main document to insert the URLs required to establish the
+#     cross-links. The link-edits are substitution ("s") commands for
+#     interpretation by the "sed" utility and are written to standard output,
+#     one per line.
+
+#  Invocation:
+#     resolve maindoc refs
+
+#  Parameters:
+#     maindoc
+#        The name of the document containing the references.
+#     refs
+#        A space-separated list of the names of the local documents that are
+#        referenced. Any documents that are referenced but do not appear in
+#        this list are regarded as "remote" and the URLs that refer to them
+#        will include a document server address.
+
+#  Environment Variables Used:
+#     HTX_SERVER
+#        The URL of the document server to be used for serving remote
+#        documents. This will be used as a prefix in all URLs that refer to
+#        remote documents. If this environment variable is not set, the value
+#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+
+#  Prior Requirements:
+#     All documents must have up to date index files associated with them
+#     before invoking this script.
+
+#  Notes:
+#     -  Directory information (which may be relative to the current directory)
+#     should be included for all the document names supplied, but the ".htx"
+#     file extension should be omitted.
+#     -  Although the output from this script is valid "sed" commands, it
+#     cannot simply be used with "sed" because of the limit of 99 lines
+#     which will often be exceeded. In addition, the hypertext to be edited
+#     must be processed to concatenate anchor expressions which may be broken
+#     across several lines of text. A final step must also be performed in
+#     which relative file prefixes are added into URLs that require them (the
+#     edits generated here leave these out). All these steps can be carried
+#     out by the "multised" script when passed the edits generated here.
+
+#  Implementation Deficiencies:
+#     - The regular expressions generated here may be more general than
+#     necessary, in that they may match HTML anchor expressions that would not
+#     be accepted as valid by a WWW browser. This may not be a problem in
+#     practice, since (in theory) invalid HTML should rarely be encountered.
+#     -  Running "diff" on the output from this script on different platforms
+#     sometimes shows differences that are not apparent to the eye (and seem
+#     not to affect the result). This should be looked into.
+#     -  The tab characters in the REs generated here seem not to be making it
+#     through to the actual editing (in sed), although they seem to be output
+#     from this script OK. There is something strange going on here (perhaps
+#     an escape character problem) and it needs checking out. This is only
+#     a problem if tabs have been used instead of blanks in the HTML (and it's
+#     not clear if that is allowed anyway).
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1995 (RFWS):
+#        Original version.
+#     1-MAY-1995 (RFWS):
+#        Allow "?xref_label" as well as "#xref_label" on input and generate
+#        the former on output when referring to a remote document. This is
+#        so that "htxserver" can obtain the label field as a query string.
+#     24-OCT-1995 (RFWS):
+#        Check if index files for referenced documents exist and output a
+#        warning message for any that do not.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the name of the document to be link-edited and the directory it
+#  resides in.
+      maindoc="${1}"
+      docdir="`dirname "${maindoc}"`"
+
+#  Obtain the list of local documents that are referenced.
+      shift
+      refs="${*}"
+
+#  Generate a list of all the index files associated with referenced documents,
+#  checking that each one exists and is readable. Output an error message for
+#  any which are not.
+      indexlist=`for ref in ${refs}; do
+         ifile="${ref}.htx/htx.index"
+         if test -f "${ifile}" -a -r "${ifile}"; then
+            echo "${ifile}"
+         else
+            echo >&2 "${HTX_SCRIPT}: cannot link against document ${ref} with no index file"
+         fi
+      done`
+
+#  Set up the URL for the remote document server. This will be used as a
+#  prefix for the URLs of remote documents (i.e. those not known locally) so
+#  that the specified server will be sent any requests to view them. (Normally,
+#  this will be the URL of a CGI script written to address a more complete
+#  remote document set via its own index files.)
+      if test ! -n "${HTX_SERVER}"; then
+         server='http://star-www.rl.ac.uk/cgi-bin/htxserver'
+      else
+         server="${HTX_SERVER}"
+      fi
+
+#  Invent a name for a temporary file to contain error messages ("awk" cannot
+#  write to standard error, so we must go via a file). Remove any pre-existing
+#  error file.
+      tempfile="/tmp/htx-$$.error"
+      if test -f "${tempfile}"; then rm -f "${tempfile}"; fi
+
+#  Use "sed" to select lines from the index file of the document to be
+#  linked that describe cross-references to other documents. Pipe the
+#  resulting list of references into "awk" (having removed the ">" prefix
+#  from each line).
+      sed -n 's%^> *%%p' "${maindoc}.htx/htx.index" | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Ensure that "awk" recognises the necessary variables as arrays.
+         BEGIN{
+            doc[ "" ] = ""
+            ref[ "" ] = ""
+            reffound[ "" ] = ""
+         }
+
+#  While reading lines from standard input (i.e. the contents of the main
+#  document index file), set the "ref" array to record the set of references
+#  that occur (each being a combination of the target document name and the
+#  associated label). Also use the values of "ref" elements to translate each
+#  distinct reference into a space-separated list of those files in the main
+#  document which contain that reference.
+         {
+            if ( FILENAME == "-" ) {
+                ref[ $2":"$3 ] = ref[ $2":"$3 ] $1 " "
+
+#  Use the "doc" array to record the set of documents which have been
+#  referenced.
+                doc[ $2 ] = 1
+
+#  While reading the index files of all the local referenced documents, select
+#  those lines that identify potential incoming cross-references.
+            } else if ( $1 == "<" ) {
+
+#  If the input file (i.e. the index file) name differs from the last one
+#  processed, split it into a directory and a file name. Supply a default
+#  directory name of "." if necessary.
+               if ( FILENAME != last ) {
+                  np = split( FILENAME, path, "/" )
+                  ldir = length( FILENAME ) - length( path [ np ] ) - length( path[ np - 1 ] ) - 2
+                  dir = ""
+                  if ( ldir >= 0 ) dir = substr( FILENAME, 1, ldir )
+                  if ( dir == "" ) dir = "."
+
+#  Extract the referenced document name by stripping off the ".htx" from the
+#  end of the document directory name.
+                  name = substr( path[ np - 1 ], 1, length( path[ np - 1 ] ) - 4 )
+
+#  Generate a prefix that will identify the location of the referenced file in
+#  any URLs that refer to it. First check if the referenced document resides
+#  in the same directory as the main document. If so, then leave the prefix
+#  blank. This will cause a relative URL to be used.
+                  if ( dir == docdir ) {
+                     prefix = ""
+
+#  Otherwise, start with the directory name of the referenced document.
+                  } else {
+                     prefix = dir
+
+#  If it is not an absolute directory name, turn it into one by replacing "."
+#  with the default directory name or adding the default directory name as a
+#  prefix if necessary.
+                     if ( substr( dir, 1, 1 ) != "/" ) {
+                        if ( dir == "." ) {
+                           prefix = pwd
+                        } else {
+                           prefix = pwd "/" dir
+                        }
+                     }
+
+#  Ensure that file directory prefix ends with a "/".
+                     prefix = prefix "/"
+                  }
+
+#  In the "docfound" array, record the set of local documents we know about.
+#  Also record the associated prefix to be used in referring to them in the
+#  "docpre" array.
+                  docfound[ name ] = 1
+                  docpre[ name ] = prefix
+
+#  Record that this index file has been processed.
+                  last = FILENAME
+               }
+
+#  Now interpret the incoming reference entry in the referenced document index
+#  file. Test if the label it describes has been referenced. If so, record
+#  that this reference has been resolved (in the "reffound" array).
+               if ( ref[ name":"$3 ] ) {
+                  reffound[ name":"$3 ] = 1
+
+#  For each resolved reference, record the referenced document name, label,
+#  location prefix and the name of the ".html" file that contains the
+#  referenced label. This is the information that will be needed to construct
+#  the URL for this cross-reference.
+                  refdoc[ name":"$3 ] = name
+                  reflab[ name":"$3 ] = $3
+                  refpre[ name":"$3 ] = prefix
+                  reffil[ name":"$3 ] = $2
+               }
+            }
+         }
+
+#  After parsing the input, generate the output.
+#  --------------------------------------------
+         END {
+
+#  Loop through all documents that were referenced and select those that were
+#  successfully found.
+            for ( i in doc ) if ( i ) {
+               if ( docfound[ i ] ) {
+
+#  Output an edit that converts a reference to this document with a blank
+#  label field (e.g. HREF="xxx/doc.htx/xxx#xref_") into a reference to the
+#  top-level file in the document, assumed to be named after the document
+#  itself (i.e. HREF="xxx/doc.htx/doc.html#xref_"). This acts as a default
+#  for any references to this document that have blank labels. It may be
+#  over-ridden by later edits that identify a different target file that
+#  explicitly contains a blank label (i.e. NAME="xref_") in an anchor.
+                  print( "s%\\(<\\n*[ 	]*[aA][ 	]\\n*[^>]*[hH][rR][eE][fF]\\n*[ 	]*=\\n*[ 	]*\"\\)[^ 	\"]*/"i"\\.htx/[^ 	\"]*[#?]\\(xref_\"[^>]*>\\)%\\1"docpre[ i ]i".htx/"i".html#\\2%g" )
+               }
+            }
+
+#  Loop through all documents that were referenced and select those that were
+#  not found. These are regarded as "remote" document references.
+            for ( i in doc ) if ( i ) {
+               if ( ! docfound[ i ] ) {
+
+#  Output an edit that converts all references to this document, regardless of
+#  the label used (i.e. HREF="xxx/doc.htx/xxx#xref_xxx") into a reference to
+#  the remote document server with the same document name and label fields
+#  still present in the appended document name (e.g.
+#  HREF="http://star-www.rl.ac.uk/cgi-bin/htxserver/doc.htx/xxx?xref_xxx").
+                  print( "s%\\(<\\n*[ 	]*[aA][ 	]\\n*[^>]*[hH][rR][eE][fF]\\n*[ 	]*=\\n*[ 	]*\"\\)[^ 	\"]*\\(/"i"\\.htx/[^ 	\"]*\\)[#?]\\(xref_[^  \"]*\"[^>]*>\\)%\\1"server"\\2?\\3%g" )
+               }
+            }
+
+#  Now loop through all the specific references to labels within documents
+#  that were found (i.e. cross-references that were explicitly resolved).
+#  Output an edit that converts the document and label reference into a
+#  reference to the target file in the referenced document.
+            for ( i in reffound ) if ( i ) {
+               print( "s%\\(<\\n*[ 	]*[aA][ 	]\\n*[^>]*[hH][rR][eE][fF]\\n*[ 	]*=\\n*[ 	]*\"\\)[^ 	\"]*/\\("refdoc[ i ]"\\.htx/\\)[^ 	\"]*[#?]\\(xref_"reflab[ i ]"\"[^>]*>\\)%\\1"refpre[ i ]"\\2"reffil[ i ]"#\\3%g" )
+            }
+
+#  Finally, loop through each cross-reference that was made.
+            for ( i in ref ) if ( i ) {
+
+#  If the reference was not resolved, then obtain the document name and label.
+               if ( ref[ i ] && ! reffound[ i ] ) {
+                  split( i, field, ":" )
+
+#  If the document was found and the label was not blank, then we have detected
+#  a reference to an invalid label. Output a warning message.
+                  if ( docfound[ field[ 1 ] ] && field[ 2 ] ) {
+                     print( "!! WARNING - reference to label \""field[ 2 ]"\" in document "field[ 1 ]" is invalid." ) >tempfile
+
+#  Also show which file(s) in the main document contained the offending
+#  reference.
+                     print( "!            reference occurs in file(s): "ref[ i ] ) >tempfile
+                  }
+               }
+            }
+         }
+
+#  End of "awk" script.
+#  -------------------
+#  Set the values of variables used in the script above. Make "awk" read from
+#  standard input and then from the index files of all the referenced
+#  documents.
+         ' docdir="${docdir}" pwd="`pwd`" server="${server}" \
+           tempfile="${tempfile}" - ${indexlist}
+
+#  Check whether an error file has been created. If so, copy its contents to
+#  standard error and delete it.
+         if test -f "${tempfile}"; then
+            cat "${tempfile}" >&2
+            rm -f "${tempfile}"
+         fi
+
+#  End of script.

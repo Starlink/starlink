@@ -1,0 +1,177 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     multised
+
+#  Purpose:
+#     Generate the "sed" commands needed to implement link-edits.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script reads a series of link-edits in the form of "sed"
+#     substitution ("s") commands from standard input (one per line) and
+#     generates the shell command required to invoke "sed" in order to
+#     implement these edits. The resulting shell command is written to
+#     standard output as a single line.
+
+#  Invocation:
+#     cat editlist | multised
+
+#  Parameters:
+#     editlist
+#        The list of "sed" editing commands (one per line) to be performed in
+#        order to link-edit a set of hypertext files. These commands are
+#        assumed to be independent, so that they can be implemented in
+#        different invocations of "sed" in a pipe if necessary.
+
+#  Notes:
+#     This script exists (a) to overcome the limitation of 99 lines and
+#     possibly a certain number of characters on the length of a "sed" 
+#     script and (b) to invoke "head" and "tail" editing functions on 
+#     the text stream before and after the link-edits themselves
+#     are performed. These latter functions implement such things as
+#     concatenation of broken lines so that the link-edit commands have a
+#     stream of ideal text to work on.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     MBT: Mark Taylor (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-APR-1995 (RFWS):
+#        Original version.
+#     7-DEC-1995 (RFWS):
+#        Changed to include the "head" and "tail" script contents explicitly
+#        instead of just referencing their files. This avoids problems with
+#        some versions of "sed" that object to unbalanced parentheses within
+#        these files.
+#     22-MAR-2001 (MBT):
+#        Added the "maxchar" limit alongside the "maxcmd" one.  This appears
+#        to be required for Solaris only.  Unclear whether the, apparently
+#        new, requirement for this limit is a consequence of recent 
+#        changes in the operating system (SunOS 2.8) or changing needs of
+#        the USSC document set.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Identify the "head" and "tail" scripts that "sed" should invoke around each
+#  batch of link-editing commands.
+      head="${HTX_DIR}/edhead.sed"
+      tail="${HTX_DIR}/edtail.sed"
+
+#  Initialise "maxcmd" to the maximum number of commands that a "sed" script
+#  may contain, and "maxchar" to the maximum number of characters.  Note 
+#  that these limits must be large enough to accomodate both the "head"
+#  and "tail" scripts plus at least one line (and preferably rather more) 
+#  of the code which is fed to "multised".
+#
+#  The 99-line limit is apparently a standard "sed" limit; the limit of
+#  (roughly) 5000 characters seems to exist only on Solaris.
+      maxcmd=99
+      if test "`uname -s`" = 'SunOS'; then 
+         maxchar=5000
+      else 
+         maxchar=999999
+      fi
+
+#  Run "awk" to generate a command that runs possible multiple invocations
+#  of "sed" as a pipe.
+      awk '
+
+#  Start of "awk" script.
+#  ---------------------
+
+#  Read the "head" and "tail" files.
+#  --------------------------------
+#  Detect input lines read from either the "head" or "tail" script files and
+#  filter out any lines which are blank or start with a comment character.
+           {
+               if ( FILENAME != "-" ) {
+                  if ( ( $0 != "" ) && ( substr( $0, 1, 1 ) != "#" ) ) {
+
+#  Count and save the lines read from each script file.
+                     if ( FILENAME == head ) {
+                        headline[ ++nh ] = $0
+                     } else if ( FILENAME == tail ) {
+                        tailline[ ++nt ] = $0
+                     }
+
+#  For every line saved, decrement the maximum script length by one.
+                     maxcmd--
+                     maxchar -= length()
+                  }
+
+#  Read the main editing commands.
+#  ------------------------------
+#  These are read from standard input.
+               } else {
+
+#  If we have not yet written out any editing commands, we must first generate
+#  a "sed" command which will use them.
+                  if ( !cmd++ ) {
+
+#  If this is not the first "sed" command in a pipe, then add a "|" symbol
+#  in front of it.
+                     if ( pipe++ ) printf( " | " )
+
+#  Generate the "sed" command followed by the lines of the "head" script (with
+#  an opening quote).
+                     printf( "sed -n '\''" )
+                     for ( i = 1; i <= nh; i++ ) print( headline[ i ] )
+                  }
+
+#  Follow the "head" script contents by each editing command in turn.
+                  print( $0 )
+
+#  Update the number of characters written.
+                  char += length()
+
+#  If we have supplied as many lines of script as "sed" will allow (counting
+#  those in the "head" and "tail" scripts as well), then reset the "cmd" count,
+#  so that a new "sed" will be used (in a pipe) to handle any further editing
+#  commands.
+                  if( cmd >= maxcmd || char >= maxchar ) {
+                     cmd = 0
+                     char = 0
+
+#  Follow the list of editing commands in each "sed" command with the contents
+#  of the "tail" script and a closing quote.
+                     for ( i = 1; i <= nt - 1; i++ ) {
+                        print( tailline[ i ] )
+                     }
+                     printf ( "%s'\''", tailline[ nt ] )
+                  }
+               }
+            }
+
+#  At end of the list of editing commands, ensure that the final invocation of
+#  the contents of the "tail" script has been appended.
+            END{
+               if ( cmd ) {
+                  for ( i = 1; i <= nt - 1; i++ ) {
+                     print( tailline[ i ] )
+                  }
+                  printf ( "%s'\''", tailline[ nt ] )
+               }
+            }
+
+#  End of "awk" script.
+#  -------------------
+#  Supply "awk" with parameters (used in the script above) which give the
+#  names of the files containing the "head" and "tail" scripts, then make it
+#  read these scripts followed by standard input.
+            ' maxcmd=${maxcmd} maxchar=${maxchar} \
+              head="${head}" tail="${tail}" "${head}" "${tail}" -
+
+#  End of script.

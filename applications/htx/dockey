@@ -1,0 +1,1218 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     dockey
+
+#  Purpose:
+#     Perform keyword searching for local documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command searches for keywords in local documents and returns a
+#     summary of those documents found, in HTML format, with links to the
+#     relevant parts of each document.
+
+#  Invocation:
+#     dockey keyword [doclist]
+
+#  Parameters:
+#     keyword
+#        The keyword to be used in the search. If a null (zero length) value
+#        is given, then all documents will be matched. Pattern matching
+#        characters, as used in "sed" or "grep" regular expressions, may be
+#        included.
+#     doclist
+#        An optional space-separated list of the documents to be searched. If
+#        this is omitted, then the complete set of hypertext documents
+#        found on the HTX_PATH search path (or its default) will be searched,
+#        together with any documents described in "catalogue files" found in
+#        any of the directories on this path.
+#
+#        If one or more document names are given, then the search will be
+#        restricted to the specified documents only. Any ".htx" file extension
+#        on document names will be ignored.
+
+#  Environment Variables Used:
+#     HTX_BRIEF
+#        If this has the value '1', then the output from this script will be
+#        in "brief" format. This means that only document names and titles
+#        will appear and reference to individual page headings will be omitted.
+#        Otherwise, individual pages will be listed if they match the search
+#        criteria.
+#     HTX_CASE
+#        If this has the value '1', then upper/lower case is significant when
+#        searching for the keyword. Otherwise, case is ignored.
+#     HTX_DIR
+#        The directory in which related HTX scripts reside.
+#     HTX_PATH
+#        An optional colon-separated list of directories in which to search for
+#        hypertext documents. If this environment variable is not defined, a
+#        default is used instead (see the htxpath script).
+#     HTX_QUIET
+#        If this has the value '1', then no messages about the progress of the
+#        search will be produced. Otherwise, progress messages will be written
+#        to /dev/tty.
+#     HTX_SCRIPT
+#        The name of the script invoked by the user. This is used only in the
+#        generation of error messages.
+#     HTX_SEARCH_HEADINGS
+#        If this has the value '1', then keyword searching will be applied to
+#        the page headings (i.e. the HTML "title"), where available, of every
+#        page of each document searched, with the exception of the "top" page
+#        of each document.
+#     HTX_SEARCH_LINES
+#        If this has the value '1', then keyword searching will be applied to
+#        the lines (i.e. textual content) of every page of each document
+#        searched. This may take some time.
+#     HTX_SEARCH_NAMES
+#        If this has the value '1', then keyword searching will be applied to
+#        the names (after removal of any directory information and ".htx" file
+#        extension) of each document being searched.
+#     HTX_SEARCH_TITLES
+#        If this has the value '1', then keyword searching will be applied to
+#        the title (i.e. the HTML "title" of the "top" page, or the title(s)
+#        given in a "catalogue file"), where available, of each document
+#        being searched.
+#     HTX_SERVER
+#        The URL of the remote document server to be used. Links to documents
+#        in the output HTML from this script will use this URL (or its default)
+#        to refer to any documents that appear in "catalogue files" but cannot
+#        be found in readable form in the local file system.
+#     HTX_SHOWMATCH
+#        If this has the value '1', then the HTML output from this script will
+#        contain user-readable information about the search criteria that were
+#        satisfied for each document (or page) and the number of keyword
+#        matches found. Otherwise, this information is omitted.
+#     HTX_SORT
+#        If this has the value '1', then the HTML output from this script will
+#        be sorted into descending order of importance, according to the number
+#        of keyword matches found. Matches to the document name are given the
+#        highest significance, then title, page heading and finally lines of
+#        textual content. An alphabetical sort on title/heading is used to
+#        resolve any remaining ambiguity over output order. Otherwise, a plain
+#        alphabetical sort on title/heading is used.
+#     HTX_WORD
+#        If this has the value '1', then the keyword supplied must match an
+#        entire word (i.e. a string delimited by characters which are not
+#        underscores or alphanumerics, or delimited by the beginning or end of
+#        the text, or by a newline). Otherwise, the specified string of
+#        characters is matched wherever it occurs.
+
+#  Exit Status:
+#     The exit status from this script is set to the number of documents that
+#     were matched. Thus (unusually), zero exit statua implies failure to find
+#     a document.
+
+#  Specifying Documents:
+#     -  If document names are supplied with explicit directory information,
+#     then they are used to identify hypertext documents. These should reside
+#     where specified.
+#     -  If document names are given without directory information, then they
+#     will be searched for on the HTX_PATH search path (or its default), along
+#     with any "catalogue files" found in any of the directories on this path.
+#     -  If documents with the same name are found in both hypertext form and
+#     in non-hypertext form (in one or more catalogue files), then the
+#     hypertext version takes precedence.
+#     -  If hypertext documents with the same name are found in more than one
+#     directory, then the one found first takes precedence.
+#     -  If a document with the same name appears more than once in "doclist",
+#     then the first occurrence takes precedence, except that the first
+#     occurrence of a name with explicit directory information always takes
+#     precedence over the same document specified without directory
+#     information.
+#     -  If the same non-hypertext document is found in more than one catalogue
+#     file, or occurs more than once in any of these files, then all
+#     occurrences are used. This allows alternative document titles to be
+#     provided to enhance the chance of a keyword match. However, the
+#     behaviour is undefined if these entries refer to different document
+#     files.
+#     -  If any document that is matched appears in a catalogue file, but the
+#     file containing the document cannot be found on the local file system,
+#     then a reference to a remote document server will be generated as a
+#     link to that document. This reference will take the standard form (i.e.
+#     it will refer to the document by name and not by the file it resides in).
+#     This allows catalogue files to be used as local indices for documents
+#     stored remotely.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-OCT-1995 (RFWS):
+#        Original version.
+#     24-OCT-1995 (RFWS):
+#        Added HTX_QUIET option.
+#     13-NOV-1995 (RFWS):
+#        Changed to store search data in a file instead of memory (running out
+#        of memory with increasing size of document sets).
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Initialisation.
+#  ==============
+#  Obtain the keyword being searched for.
+      key="${1}"
+
+#  Obtain the list of documents to search.
+      if test "${#}" -gt '0'; then shift; fi
+      docspec="${*}"
+
+#  Determine the current directory name.
+      pwd="`pwd`"
+
+#  Obtain the URL of the remote document server from the HTX_SERVER environment
+#  variable, supplying a suitable default if necessary.
+      HTX_SERVER="${HTX_SERVER-http://star-www.rl.ac.uk/cgi-bin/htxserver}"
+
+#  Obtain the value of the HTX_PATH document search path, generating a suitable
+#  default if necessary.
+      path="${HTX_PATH-`${HTX_DIR}/htxpath`}"
+
+#  Include the definition of the "settrap" function which is used to define
+#  traps for clearing up scratch files if the script is aborted.
+      . ${HTX_DIR}/settrap
+
+#  Generate the names of temporary files to hold:
+#    o  Data from catalogue files with details of non-hypertext documents.
+#    o  Temporary index file data for any documents which lack it.
+#    o  The raw document data to be searched.
+#    o  Error messages.
+#    o  A list of the files containing any non-hypertext documents found.
+#    o  A record of the number of documents matched.
+#    o  Details of matches found during a line search of a document.
+      catfile="/tmp/htx-dockey-$$.catfile"
+      indexdata="/tmp/htx-dockey-$$.indexdata"
+      datafile="/tmp/htx-dockey-$$.datafile"
+      errfile="/tmp/htx-dockey-$$.errfile"
+      resfile="/tmp/htx-dockey-$$.resfile"
+      nfile="/tmp/htx-dockey-$$.nfile"
+      linefile="/tmp/htx-dockey-$$.linefile"
+
+#  Ensure that none of these files exists.
+      rm -f "${catfile}" "${datafile}" "${errfile}" "${resfile}" "${nfile}" \
+            "${linefile}"
+
+#  Set up a trap to remove these files if this script is aborted.
+      settrap 'rm -f "${catfile}" "${datafile}" "${errfile}" "${resfile}" "${nfile}" "${linefile}"'
+
+#  Identify the documents to be searched.
+#  =====================================
+#  If required, output an informational message, saving its length.
+      if test ! "${HTX_QUIET}" = '1'; then
+         nblank0="`${HTX_DIR}/msgover '0' 'gathering document data...'`"
+      fi
+
+#  Extract any document names supplied without directory information. These
+#  will have to be searched for using the HTX_PATH search path.
+      search="`for doc in ${docspec}; do echo "${doc}"; done | sed '\?/?d'`"
+
+#  If any document names given need to be searched for, or if no names were
+#  given (meaning use all documents), then obtain a complete list of all
+#  available hypertext documents.
+      if test -n "${search}" -o ! -n "${docspec}"; then
+         alldocs="`${HTX_DIR}/allfind`"
+      fi
+
+#  Extract any document names supplied with directory information (i.e.
+#  containing a "/"). If such documents were specified, then they must exist
+#  as hypertext documents in the specified location and will not be searched
+#  for using the HTX_PATH search path.
+      explicit="`for doc in ${docspec}; do echo "${doc}"; done \
+                 | sed '/^[^/]*$/d'`"
+
+#  Check that each explicitly given document directory exists (use "cd" because
+#  this works with links) and form a new list containing only those which do.
+      found="`for doc in ${explicit}; do
+         if ( cd "${doc}.htx" 1>/dev/null 2>/dev/null ); then echo "${doc}"; fi
+      done`"
+
+#  The list of hypertext documents to be searched will be stored in the
+#  "doclist" variable and is generated by the "awk" script below.
+      doclist=`{
+
+#  Pass each group of document names identified above to "awk", separating the
+#  groups by blank lines.
+         for doc in ${search} '' ${explicit} '' ${found} '' ${alldocs} ''; do
+            echo "${doc}"
+         done
+
+#  Pass the HTX_PATH search path string through "sed" to append "htx.catalogue"
+#  to the name of each directory that appears. Then run "grep" on this list of
+#  files to concatenate their contents. Ignore any missing files and include
+#  /dev/null so that the file name is prefixed to each line even if only a
+#  single file is searched. The resulting concatenated list of the contents of
+#  the catalogue files found in this way is appended to the document name
+#  lists above.
+         grep -s 2>/dev/null '^' /dev/null \
+                     \`echo "${path}:" | sed 's%\([^:]\):%\1/htx.catalogue %g
+                                              s%:%%g'\`
+
+#  Pipe all this information into "awk".
+      } | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Initialise variables used as arrays.
+      BEGIN{
+         expl[ "" ] = ""
+         search[ "" ] = ""
+      }{
+
+#  Count blank input lines, so that we know which section of input data we are
+#  currently looking at.
+         if ( ! $0 ) {
+            s++
+
+#  When a name from the "search" list is read, note that a name has been given
+#  (as a command argument) and add it to the set of documents to be searched
+#  for. There will be no directory information present.
+         } else if ( ! s ) {
+            given++
+            search[ $0 ]++
+
+#  When a name from the "explicit" list is read, note that a name has been
+#  given (as a command argument) and add it to the set of explicitly specified
+#  documents required. There will be directory information present.
+         } else if ( s == 1 ) {
+            given++
+            expl[ $0 ]++
+
+#  When a name from the "found" list is read, it will contain the name of an
+#  explicitly-specified document that is known to actually exist. Note this
+#  fact by adding it to the set of "found" documents.
+         } else if ( s == 2 ) {
+            found[ $0 ]++
+
+#  There will be directory information present, so split the name up and
+#  extract the document name (the last field). If we have not already output
+#  a record for a document with this name, then output this name and note we
+#  have now processsed this document.
+            nf = split( $0, f, "/" )
+            doc = f[ nf ]
+            if ( ! done[ doc ]++ ) print
+
+#  When a name from the "alldocs" list is read, split it up and extract the
+#  document name (the last field).
+         } else if ( s == 3 ) {
+            nf = split( $0, f, "/" )
+            doc = f[ nf ]
+
+#  If no documents were given as command arguments, or if this document appears
+#  as one of the command argument documents that must be searched for, then we
+#  must output a record for it. Check whether we have already output a record
+#  for a document with this name. If not, then output this name and note we
+#  have now processed this document.
+            if ( ! given || search[ doc ] ) {
+               if ( ! done[ doc ]++ ) print
+            }
+
+#  When a line from one of the catalogue files is read, split up the first
+#  field and extract the document name that the record describes (after the
+#  ":" introduced by "grep").
+         } else if ( s == 4 ) {
+            split( $1, f, ":" )
+            doc = f[ 2 ]
+
+#  If no documents were given as command arguments, or if this document appears
+#  as one of the command argument documents that must be searched for, then we
+#  must output a record for it. Check whether we have already output a record
+#  for a document with this name (if it was found as a hypertext document, then
+#  we will already have done so). If not, then output this record to the
+#  catalogue data file (which forms a separate output stream from the hypertext
+#  document names). Do not note that we have now processed this document - this
+#  is to allow duplicate catalogue file entries for any document so that
+#  alternative titles can be provided that contain better keywords for
+#  searching than the true title (the true title should normally appear first).
+            if ( ! given || search[ doc ] ) {
+               if ( ! done[ doc ] ) {
+                   print >"'"${catfile}"'"
+               }
+            }
+         }
+      }
+
+#  When all the input data have been processed, loop through all the documents
+#  that were given explicitly with directory information.
+      END{
+         for ( doc in expl ) if ( doc ) {
+
+#  If any were not found, then write an error message to the error file.
+            if ( expl[ doc ] && ! found[ doc ] ) {
+               print( "'"${HTX_SCRIPT}"': warning - document \""doc"\" not found" ) >"'"${errfile}"'"
+            }
+         }
+
+#  Similarly, write an error message for any document names that had to be
+#  searched for but which were not found.
+         for ( doc in search ) if ( doc ) {
+            if ( search [ doc ] && ! done[ doc ] ) {
+               print( "'"${HTX_SCRIPT}"': warning - document \""doc"\" not found" ) >"'"${errfile}"'"
+            }
+         }
+
+#  End of "awk" script.
+#  -------------------
+#  The list of hypertext documents to be searched is now stored in the
+#  "doclist" variable.
+      }'`
+
+#  Test for the existence of an error file written by the "awk" script above.
+#  If one exists, then write its contents to standard error and then remove it.
+#  Carry on processing anyway.
+      if test -f "${errfile}"; then
+         cat "${errfile}" >&2
+         rm -f "${errfile}"
+      fi
+
+#  Loop to generate the name of the index file associated with each of the
+#  hypertext documents to be searched.
+      indexlist=''
+      missing=''
+      for doc in ${doclist}; do
+         ifile="${doc}.htx/htx.index"
+
+#  Test if each index file exists and is readable. Add the names of those that
+#  are to the "indexlist" list and the document names for those that are not
+#  to the "missing" list.
+         if test -f "${ifile}" -a -r "${ifile}"; then
+            indexlist="${indexlist}${ifile} "
+         else
+            missing="${missing}${doc} "
+         fi
+      done
+
+#  If necessary, we now generate new index file contents for any index files
+#  that are inaccessible and store the results in the "indexdata" file. This
+#  is done here because it may take some time and will be repeated on each
+#  search iteration if done later. Write a warning message to standard error
+#  for each document whose index file is missing.
+      if test -n "${missing}"; then
+         for doc in $missing; do
+            echo >&2 "${HTX_SCRIPT}: warning - document ${doc} has no index file"
+
+#  Create the index file contents for each document and use "sed" to edit the
+#  result into the same form as would result if "grep" had been run on an
+#  accessible index file (these results will be merged with data obtained using
+#  "grep" later on).
+            ${HTX_DIR}/creindex "${doc}" \
+            | sed -n 's%^\([Tt] \)%'"${doc}"'.htx/htx.index:\1%p'
+         done >"${indexdata}"
+      fi
+
+#  Control search iterations.
+#  =========================
+#  Set the "search_default" variable if no other search options have been
+#  given.
+      if test ! -n "${HTX_SEARCH_NAMES}" -a \
+              ! -n "${HTX_SEARCH_TITLES}" -a \
+              ! -n "${HTX_SEARCH_HEADINGS}" -a \
+              ! -n "${HTX_SEARCH_LINES}"; then
+         search_default='1'
+      else
+         search_default=''
+      fi
+
+#  Loop for up to 3 times, applying progressively more detailed (and
+#  time-consuming) searches until a match is found.
+      for nloop in 1 2 3; do
+
+#  If using the default search mode, we will allow all 3 iterations to occur
+#  if necessary to find a match.
+         if test "${search_default}" = '1'; then
+
+#  On the first iteration, search document titles only and output an
+#  appropriate informational message.
+            case "${nloop}" in
+            1) HTX_SEARCH_TITLES='1'
+               if test ! "${HTX_QUIET}" = '1'; then
+                  ${HTX_DIR}/msgover >/dev/null "${nblank0}" \
+                                                'searching document titles... '
+                  nblank0='19'
+                  nblank1='10'
+               fi
+               ;;
+
+#  On the second iteration, search page headings only.
+            2) unset HTX_SEARCH_TITLES
+               HTX_SEARCH_HEADINGS='1'
+               if test ! "${HTX_QUIET}" = '1'; then
+                  nblank1=`${HTX_DIR}/msgover "${nblank1}" 'headings... '`
+               fi
+               ;;
+
+#  On the third (final) iteration, search document lines.
+            3) unset HTX_SEARCH_HEADINGS
+               HTX_SEARCH_LINES='1'
+               if test ! "${HTX_QUIET}" = '1'; then
+                  nblank1=`${HTX_DIR}/msgover "${nblank1}" 'lines... '`
+               fi
+               ;;
+            esac
+
+#  Calculate the total length of the informational message displayed.
+            if test ! "${HTX_QUIET}" = '1'; then
+               nblank="`expr "${nblank0}" '+' "${nblank1}"`"
+            fi
+
+#  If default searching is not being used, then only a single iteration will
+#  be performed. In this case, generate a message describing the search
+#  method(s) to be used.
+         elif test ! "${HTX_QUIET}" = '1'; then
+            txt='searching document '
+            sep=''
+            if test "${HTX_SEARCH_NAMES}" = '1'; then
+               txt="${txt}names"; sep=', '
+            fi
+            if test "${HTX_SEARCH_TITLES}" = '1'; then
+               txt="${txt}${sep}titles"; sep=', '
+            fi
+            if test "${HTX_SEARCH_HEADINGS}" = '1'; then
+               txt="${txt}${sep}headings"; sep=', '
+            fi
+            if test "${HTX_SEARCH_LINES}" = '1'; then
+               txt="${txt}${sep}lines"; sep=', '
+            fi
+            txt="${txt}... "
+
+#  Output the search method(s) as an informational message.
+            nblank="`${HTX_DIR}/msgover "${nblank0}" "${txt}"`"
+         fi
+
+#  Assemble the search data.
+#  ========================
+#  We now assemble the information to be searched in one place, selecting
+#  whichever subset is needed for the search method(s) being used. The results
+#  from this stage will be stored in the "datafile" file.
+
+#  Set up a string to be used in regular expressions to match records from
+#  document index files. Select those starting with "T" (document title
+#  records) and "t" (page heading records) as required.
+         sflag='T'
+         if test "${HTX_SEARCH_HEADINGS}" = '1' -o \
+                 "${HTX_SEARCH_LINES}" = '1'; then sflag='[Tt]'; fi
+
+#  Set up an edit script for use by "sed". This selects lines containing
+#  index file data (recognised by the ".htx/htx.index" part of the index file
+#  name, as added by "grep") and the required [Tt] flag characters and edits
+#  them into the standard form:
+#
+#     h [Tt] docname filename title_text
+#
+#  (where the "h" prefix indicates data from a hypertext document) before
+#  outputting the line. Directory information is removed from the document
+#  name if necessary.
+         edit1='\?^[^ :][^ :]*\.htx/htx\.index:'"${sflag}"'  *[^ ][^ ]*? {
+                   s%^\([^ :][^ :]*\)\.htx/htx\.index:\([Tt]\)  *\([^ ][^ ]*\)%\2 \1 \1.htx/\3%
+                   s%^\([Tt]\) [^ ]*/%\1 %
+                   s%^%h %
+                   p
+                }'
+
+#  Set up a second "sed" script to select lines originating in catalogue files
+#  (identified by the "htx.catalogue" file name) and edit the information into
+#  the same form as above, but with an "n" prefix to indicate a non-hypertext
+#  document.
+         edit2='\?^[^ :][^ :]*htx\.catalogue:? {
+                   s%^\([^:]*\)/[^:/]*:\([^ ]*\)  *\([^ ][^ ]*\)%n T \2 \1/\3%
+                   p
+                }'
+
+#  If any document index files were inaccessible, then output the alternative
+#  index file data generated earlier.
+         {
+            if test -f "${indexdata}"; then cat "${indexdata}"; fi
+
+#  Follow this with the contents of the index files that are accessible,
+#  selecting only those records starting with the correct flag character(s).
+            grep '^'"${sflag}"' ' ${indexlist} /dev/null
+
+#  Finally, append any relevant contents of catalogue files, as assembled
+#  earlier.
+            if test -f "${catfile}"; then cat "${catfile}"; fi
+
+#  Pipe all of the above information into "sed" to perform the edits defined
+#  above. This results in a uniformly-formatted set of data for the documents
+#  to be searched, which is now stored in the "datafile" file.
+         } | sed -n -e "${edit1}" -e "${edit2}" >"${datafile}"
+
+#  Initialise for performing the keyword search.
+#  ============================================
+#  We have now assembled the raw data for the keyword searches we want to
+#  perform. We next initialise in preparation for selecting those records that
+#  match our search criteria.
+
+#  Set up a string to be used in regular expressions to match records from
+#  document index files. Select those starting with "T" (document title
+#  records) and "t" (page heading records) as required.
+         sflag=''
+         if test "${HTX_SEARCH_TITLES}" = '1'; then sflag='T'; fi
+         if test "${HTX_SEARCH_HEADINGS}" = '1'; then sflag="${sflag}t"; fi
+
+#  If keyword searching is to be case insensitive, then convert the keyword to
+#  upper case. Also define a "sed" command to be used to convert the data
+#  being matched to upper case and store this in the "ucase" variable for later
+#  use.
+         ucase=''
+         if test "${HTX_CASE}" = '1'; then
+            mkey="${key}"
+         else
+            mkey="`echo "${key}" | tr '[a-z]' '[A-Z]'`"
+            ucase='y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'
+         fi
+
+#  If a blank keyword was given. use "^" instead, so as to match every record.
+         pad=''
+         if test ! -n "${mkey}"; then
+            mkey='^'
+
+#  If the keyword is not blank but a word-only search was requested, then we
+#  must search for instances of the keyword surrounded by non-word characters
+#  so pad it with regular expressions to match these (use the same definition
+#  of a non-word character as "grep" uses). In order to recognise the beginning
+#  and end of lines as word delimiters, each line must have a non-word
+#  character added at either end. Define a "sed" command to perform this and
+#  store it in the "pad" variable for later use.
+         elif test "${HTX_WORD}" = '1'; then
+            mkey="[^A-Za-z0-9_]${mkey}[^A-Za-z0-9_]"
+            pad='s%^\(.*\)$% \1 %'
+         fi
+
+#  Generate a character which is very unlikely to be included in the keyword
+#  for use in delimiting the keyword within a "sed" script.
+         delim="`echo ' ' | tr ' ' '\001'`"
+
+#  We now define a set of editing scripts for "sed" that will perform the
+#  keyword search and which will therefore depend on which search criteria are
+#  being used. Initialise these.
+         edit1=''
+         edit2=''
+         edit3=''
+
+#  Each record is first edited to pefix "0000 " to it. The 2nd to 4th of these
+#  digits will subsequently be changed to a '1' if the keyword matches the
+#  document name, document title or page heading (respectively) for the record.
+#  The first '0' will be changed to a '1' to reflect the logical "or" of the
+#  following 3 digits and will therefore record if any match occurred.
+         edit0='s%^%0000 %'
+
+#  Define a "sed" script to search for document names.
+#  --------------------------------------------------
+         if test "${HTX_SEARCH_NAMES}" = '1'; then
+
+#  Records with a "T" flag (document title records) are selected so as to give
+#  one record per document. The record is saved in the hold space and
+#  everything except the document name is edited out of the pattern space
+#  which is then converted to upper case and padded with non-word characters
+#  (if necessary). If the keyword then matches the pattern space, the hold
+#  space is retrieved and the '0000 ' prefix edited to record the match before
+#  returning it to the hold space. The script ends by copying the hold space
+#  back into the pattern space in any case where the latter was modified.
+            edit1='/^.... . T / {
+                      h
+                      s%^.... [^ ] T \([^ ][^ ]*\).*%\1%
+                      '"${ucase}
+                        ${pad}"'
+                      \'"${delim}${mkey}${delim}"'{
+                         g
+                         s%^..\(..\)%11\1%
+                         h
+                      }
+                      g
+                   }'
+         fi
+
+#  Define a "sed" script to search for document titles.
+#  ---------------------------------------------------
+         if test "${HTX_SEARCH_TITLES}" = '1'; then
+
+#  This works in the same way as the script above, except that everything
+#  bar the document title string is edited out of the pattern space before
+#  testing for a keyword match and the '0000 ' prefix is edited differently
+#  to record a title match.
+            edit2='/^.... . T / {
+                      h
+                      s%^.... [^ ] T [^ ][^ ]*  *[^ ][^ ]* *%%
+                      '"${ucase}
+                        ${pad}"'
+                      \'"${delim}${mkey}${delim}"'{
+                         g
+                         s%^.\(.\).\(.\)%1\11\2%
+                         h
+                      }
+                      g
+                   }'
+         fi
+
+#  Define a "sed" script to search for page headings.
+#  -------------------------------------------------
+         if test "${HTX_SEARCH_HEADINGS}" = '1'; then
+
+#  This works in the same way as the script above, except that records with a
+#  "t" flag (page heading records) are selected and the '0000 ' prefix is
+#  edited to record a heading match.
+            edit3='/^.... . t / {
+                      h
+                      s%^.... [^ ] t [^ ][^ ]*  *[^ ][^ ]* *%%
+                      '"${ucase}
+                        ${pad}"'
+                      \'"${delim}${mkey}${delim}"'{
+                         g
+                         s%^.\(..\).%1\11%
+                         h
+                      }
+                      g
+                   }'
+         fi
+
+#  This final "sed" script selects records that were matched by any of those
+#  above by looking for a '1' as the first character. Those selected have this
+#  '1' discarded and the following 3 digits separated by spaces. A further '0'
+#  is appended to record no match to document lines (this is considered
+#  separately) and an "A" prefix is added for later recognition of these
+#  results by "awk". After these changes, matched records are written to the
+#  output. In addition, matched records originating from non-hypertext
+#  documents are edited to remove everything except the document file name and
+#  these file names are then written to a scratch file.
+         edit4='/^1/ {
+                   s%^1\(.\)\(.\)\(.\)%A \1 \2 \3 0%p
+                   s%^A . . . . n . [^ ][^ ]*  *\([^ ][^ ]*\).*%\1%w '"${nfile}"'
+                }'
+
+#  If search results are to be sorted by significance (number of matches), then
+#  set up flags for "sort" that will perform a descending numeric sort on each
+#  of the first 4 fields in each record, with the 1st field having highest
+#  significance and the 4th lowest significance.
+         sortflags=''
+         if test "${HTX_SORT}" = '1'; then
+            sortflags='+0 -n -r -1 +1 -n -r -2 +2 -n -r -3 +3 -n -r -4'
+         fi
+
+#  If required, define a "sed" script to be used to edit the final counts
+#  of the number of matches obtained into a suitable format for display to
+#  a user. The input lines to this script will have the form:
+#
+#     [Tt] n1 n2 n3 n4 html...
+#
+#  Where n1...n4 are the match count numbers and html... is the HTML text
+#  which the counts are to accompany. Lines with the [Tt] prefix are first
+#  selected. The counts then have a word describing the type of match prefixed
+#  to them and are enclosed in parentheses. The leading [Tt] is then removed.
+#  Plural words are then changed to singular as necessary, and words
+#  accompanying zero counts are removed. The parenthesised result is then
+#  moved to the end of the line with the redundant trailing comma omitted.
+         if test "${HTX_SHOWMATCH}" = '1'; then
+            editcnts='/^[Tt] / {
+               s%^T \([^ ][^ ]*\) \([^ ][^ ]*\) \([^ ][^ ]*\) \([^ ][^ ]*\)%T ( \1 names, \2 titles, \3 pages, \4 lines, )%
+               s%^t \([^ ][^ ]*\) \([^ ][^ ]*\) \([^ ][^ ]*\) \([^ ][^ ]*\)%t ( \1 names, \2 titles, \3 headings, \4 lines, )%
+               s%^[Tt] %%
+               s% 1 names% 1 name%
+               s% 1 titles% 1 title%
+               s% 1 headings% 1 heading%
+               s% 1 pages% 1 page%
+               s% 1 lines% 1 line%
+               s% 0 names,%%
+               s% 0 titles,%%
+               s% 0 headings,%%
+               s% 0 pages,%%
+               s% 0 lines,%%
+               s%^( \([^)]*\), )\(.*\)$%\2 (\1)%
+            }'
+
+#  If match counts are not to be displayed, then simply remove the [Tt] prefix
+#  and all the count values.
+         else
+            editcnts='s%^[Tt] [^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]* *%%'
+         fi
+
+#  Perform keyword searching.
+#  =========================
+#  Read the data to be searched into "sed" and execute the scripts defined
+#  above. This implements keyword searches on document names, document titles
+#  and/or page headings, as required.
+         {
+            if test -f "${datafile}"; then
+               sed -n -e "${edit0}" -e "${edit1}" -e "${edit2}" -e "${edit3}" \
+                      -e "${edit4}" "${datafile}"
+            fi
+
+#  Check to see if a scratch file containing the file names of all the
+#  non-hypertext documents that were matched was written by "sed" above. If
+#  so, then loop through each of the file names it contains and check if these
+#  files are readable. Output the names of those which cannot be read with a
+#  "B" prefix for use by the "awk" script invoked later (HTML references to any
+#  of these files that are not readable, or don't exist, will later result in a
+#  reference to the remote document server). We have already checked the
+#  existence of all relevant hypertext documents, so don't need to repeat that
+#  here.
+            if test -f "${nfile}"; then
+               for file in `cat "${nfile}"`; do
+                  if test ! -r "${file}"; then echo "B ${file}"; fi
+               done
+
+#  Remove the scratch file.
+               rm -f "${nfile}"
+            fi
+
+#  If required, also perform keyword searching of the lines (i.e. textual
+#  content) of hypertext documents.
+            if test "${HTX_SEARCH_LINES}" = '1'; then
+
+#  Set up flags for "grep" to perform case-insensitive and/or whole-word
+#  matching, as needed.
+               gflags=''
+               if test ! "${HTX_CASE}" = '1'; then gflags='-i'; fi
+               if test "${HTX_WORD}" = '1'; then gflags="${gflags} -w"; fi
+
+#  Initialise counts used for displaying the progress of the search.
+               nb='4'
+               ndone='0'
+               nmatch='0'
+
+#  Find the number of documents to be searched.
+               nmax="`echo "${doclist}" | wc -w | awk '{print $1}'`"
+
+#  Loop to search each hypertext document.
+               for doc in ${doclist}; do
+
+#  Use "showhtml" to obtain a list of all the HTML files in each document.
+#  Then run "grep" to search all these files and generate a count of the number
+#  of lines that matched in each file. Append "/dev/null" to the list of files
+#  so that the file name is prefixed to each "grep" output line even if only
+#  a single HTML file is searched. Pipe the output from "grep" into "sed" to
+#  eliminate references to "/dev/null" and to delete any lines where no match
+#  was found. Also edit in the document name and re-format the output so as to
+#  match that generated by the "sed" scripts used above. Set the match counts
+#  prefixed to each line to '0 0 0 m' where "m" is the number of lines matched
+#  in each file. Add 'h c' flags to denote that the line results from matching
+#  the contents of a hypertext document and an "A" prefix for subsequent
+#  recognition of these results by "awk".
+#
+#  Save a copy of the search output in the "linefile" temporary file (using
+#  "tee").
+                  grep ${gflags} -c "${key}" \
+                     `${HTX_DIR}/showhtml "${doc}.htx"` /dev/null \
+                  | sed '\%^/dev/null:%d
+                     \%^0*$%d
+                     \%:0*$%d
+                     s%^\(.*\):\(.*\)$%\2 '"${doc}"' \1%
+                     s%^\([^ ]*\) [^ ]*/\([^ /]*\)%\1 \2%
+                     s%^\([^ ]*\) %A 0 0 0 \1 h c %' \
+                  | tee "${linefile}"
+
+#  Increment the count of documents searched. Then test if any output was
+#  written to the "linefile" file. If so, increment the count of documents
+#  matched. Remove the temporary file.
+                  ndone="`expr "${ndone}" '+' '1'`"
+                  if test -s "${linefile}"; then
+                     nmatch="`expr "${nmatch}" '+' '1'`"
+                  fi
+                  rm -f "${linefile}"
+
+#  If a progress report is needed, then calculate what percentage of documents
+#  has been searched and generate an appropriate message.
+                  if test ! "${HTX_QUIET}" = '1'; then
+                     pc="`expr '(' '100' '*' "${ndone}" ')' '/' "${nmax}"`"
+                     case "${nmatch}" in
+                     1) txt=" (${pc}% done, 1 match)... ";;
+                     *) txt=" (${pc}% done, ${nmatch} matches)... ";;
+                     esac
+
+#  Output the message, over-writing any previous one.
+                     nb="`${HTX_DIR}/msgover "${nb}" "${txt}"`"
+                  fi
+               done
+
+#  If necessary, remove the progress report when all the documents have been
+#  searched.
+               if test ! "${HTX_QUIET}" = '1'; then
+                  ${HTX_DIR}/msgover "${nb}" '... ' >/dev/null
+               fi
+            fi
+
+#  If heading or line information has been matched, then the "awk" script
+#  below will need to be supplied with the original data that were searched.
+#  If headings were matched, then document title records are needed. If lines
+#  were matched, then both document title and page heading information is
+#  needed. Only hypertext documents need be considered, because these types of
+#  matching cannot be performed on non-hypertext documents.
+
+#  Set up an expression to match the required data records and run "sed" on
+#  the data to select these. Add a "C" prefix to the selected records for
+#  recognition by the "awk" script below.
+            if test "${HTX_SEARCH_HEADINGS}" = '1' \
+                 -o "${HTX_SEARCH_LINES}" = '1'; then
+               sflag='T'
+               if test "${HTX_SEARCH_LINES}" = '1'; then sflag='[Tt]'; fi
+               sed -n 's%^\(h '"${sflag}"' \)%C \1%p' "${datafile}"
+            fi
+
+#  Pipe the concatenated results above into "awk".
+         } | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Propagate search results up the hierarchy of search criteria.
+#  ============================================================
+#  We now accumulate the counts of different types of matches and ensure that
+#  matches to page headings and file lines result in the inclusion of a
+#  document title and page heading record (respectively), even though those
+#  records were not directly matched themselves.
+#  
+#  Initialise variables used as arrays.
+         BEGIN{
+            fnl[ "" ] = ""
+            fthere[ "" ] = ""
+         }{
+
+#  We first accumulate all the input data. Select records that result from
+#  matching document data and extract the counts of matches to document names,
+#  document titles, page headings and file lines.
+            if ( $1 == "A" ) {
+               nct = $2
+               tct = $3
+               hct = $4
+               lct = $5
+
+#  Also extract the type of match record and the document and HTML file name.
+               type = $7
+               doc = $8
+               file = $9
+
+#  Name, title or heading match.
+#  ----------------------------
+#  If the count of line matches is zero, then we have a record that describes
+#  a match to a document name, document title or page heading.
+               if ( lct == "0" ) {
+
+#  If the line contains a document title, then we have a match to a document
+#  name or title. Store the first such line for each document (stripping off
+#  the recognition prefix and count fields) and note which documents we have
+#  processed. Accumulate counts of name and title matches for each document.
+                  if ( type == "T" ) {
+                     if ( ! dthere[ doc ]++ ) line[ ++nline ] = substr( $0, 11 )
+                     dnn[ doc ] += nct
+                     dnt[ doc ] += tct
+
+#  If the line contains a page heading, then store it as above (each heading
+#  should occur only once) and note which files have been processed. Note the
+#  number of matches to the page heading is 1. Also store the name of the
+#  document that contains this HTML file.
+                  } else if ( type == "t" ) {
+                     line[ ++nline ] = substr( $0, 11 )
+                     fthere[ file ] = 1
+                     fnh[ file ] = 1
+                     docname[ file ] = doc
+                  }
+
+#  Line match.
+#  ----------
+#  If the line describes a match to document lines, we do not want to store
+#  the line itself. Instead, simply store the number of matches and the name
+#  of the document that contains the matched HTML file.
+               } else if ( lct != "0" ) {
+                  fnl[ file ] = lct
+                  docname[ file ] = doc
+               }
+
+#  Name of remote file.
+#  -------------------
+#  If the record contains the name of a document file that cannot be accessed
+#  on the local file system, then add the file name to the set of documents
+#  that must be referenced via the remote document server.
+            } else if ( $1 == "B" ) {
+               remote[ $2 ] = 1
+
+#  Raw data line.
+#  -------------
+#  If this is a line containing part of the original data that were matched,
+#  then extract the record type, document name and file name fields. Store the
+#  line in an array indexed by the name of the file from which it is derived,
+#  stripping off the prefix field.
+            } else if ( $1 == "C" ) {
+               type = $3
+               doc = $4
+               file = $5
+               hdata[ file ] = substr( $0, 3 )
+
+#  If the line contains a document title, then also store it in an array
+#  indexed by document name.
+               if ( type == "T" ) tdata[ doc ] = hdata[ file ]
+            }
+         }
+      
+#  Propagate match counts.
+#  ----------------------
+#  When all input has been accumulated, we next propagate information up the
+#  hierarchy of search criteria. This ensures (for example) that a file whose
+#  lines were matched receives an output line containing its page heading
+#  and another giving the name and title of the document, even if these were
+#  not themselves matched.
+         END{
+
+#  Loop through each HTML file whose lines were matched and obtain the name
+#  of the containing document. Accumulate the total count of line matches for
+#  each document.
+            for ( file in fnl ) if ( file ) {
+               doc = docname[ file ]
+               dnl[ doc ] += fnl[ file ]
+
+#  If the HTML file is not already represented in the list of output lines,
+#  then add it and copy a suitable line from the raw page heading data, if
+#  available.
+               if ( ! fthere[ file ]++ ) {
+                  if ( hdata[ file ] ) {
+                     line[ ++nline ] = hdata[ file ]
+
+#  If no page heading data is available, then we have matched an HTML file
+#  without a heading (HTML title), so invent a dummy output line to describe
+#  it.
+                  } else {
+                     line[ ++nline ] = "h t "doc" "file" [no heading]"
+                  }
+               }
+            }
+
+#  Loop through all the HTML files that now appear in the output list to check
+#  they have an associated document title line.
+            for ( file in fthere ) if ( file ) {
+
+#  Obtain the name of the document and increment the number of page heading
+#  lines associated with it.
+               doc = docname[ file ]
+               dnh[ doc ]++
+
+#  If the document is not yet represented in the set of matched documents,
+#  then add it and copy a suitable line from the raw document title data, if
+#  available. Otherwise we have matched an HTML file in a document whose top
+#  page could not be identified. In this case invent a dummy output line (there
+#  is probably no HTML file in the document, so it will be pointless trying
+#  to reference it).
+               if ( ! dthere[ doc ]++ ) {
+                  if ( tdata[ doc ] ) {
+                     line[ ++nline ] = tdata[ doc ]
+                  } else {
+                     line[ ++nline ] = "h T "doc" ""???"" [no title]"
+                  }
+               }
+            }
+
+#  Generate output.
+#  ---------------
+#  Loop to output all the results lines.
+            for ( i = 1; i <= nline; i++ ) {
+
+#  Split each line to extract the record type and document and file names.
+               split( line[ i ], f )
+               type = f[ 2 ]
+               doc = f[ 3 ]
+               file = f[ 4 ]
+
+#  If this is a document title record, then limit the number of name matches
+#  to 1 (because the same name may appear more than once in catalogue files).
+               if ( type == "T" ) {
+                  if ( dnn[ doc ] ) dnn[ doc ] = 1
+
+#  Prevent multiple title lines from being written for the same hypertext
+#  document. (This can happen if both the title and the lines of the
+#  document "top page" are matched, resulting in two title page entries in
+#  the "line" array. It can also happen if there are duplicate entries for
+#  any non-hypertext document in a catalogue file - in this case only the
+#  first one is used if both were matched.)
+                  if ( ! written[ doc ]++ ) {
+
+#  Output the appropriate set of four match counts followed by the record text.
+#  Before doing so, however, check if this document needs to be referenced via
+#  the remote document server. If so, then modify the "n" (non-hypertext) flag
+#  to become "r" (remote) to identify this record when the URL for the
+#  document is later generated.
+                     if ( remote[ file ] ) {
+                        print( int( dnn[ doc ] ), int( dnt[ doc ] ), int( dnh[ doc ] ), int( dnl[ doc ] ), "r "substr( line[ i ], 3 ) )
+                     } else {
+                        print( int( dnn[ doc ] ), int( dnt[ doc ] ), int( dnh[ doc ] ), int( dnl[ doc ] ), line[ i ] )
+                     }
+                  }
+
+#  If this is a page heading record, then output the appropriate match counts
+#  (the first two being zero) followed by the record text.
+               } else {
+                  print( 0, 0, int( fnh[ file ] ), int( fnl[ file ] ), line[ i ] )
+               }
+            }
+
+#  End of "awk" script.
+#  -------------------
+#  The output from the above script consists of the document title and page
+#  heading records needed to display the search results for each document that
+#  was matched. Each is has the same format and is prefixed by four match
+#  counts (decreasing in priority from left to right) which give the
+#  significance of the match. Pipe these results through "sort" to sort them
+#  into display order. By default, this order is alphabetical, but if
+#  the "sortflags" variable has been set earlier, it will be in order of
+#  decreasing match significance, with an alphabetic sort applied to records
+#  with equal significance. Pipe the output of "sort" into another invocation
+#  of "awk".
+         }' | sort ${sortflags} +8 -f | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Group page headings into documents as an HTML list.
+#  ==================================================
+#  For display, we must now associate all the page heading records that belong
+#  to a particular document with the title record for that document. The title
+#  records of each matched document are then output as elements of an HTML
+#  unordered list, with the associated page heading records as a sub-list (also
+#  unordered) for each document.
+
+#  Accumulate input data.
+#  ---------------------
+#  Select document title records. Count these and store them.
+         {
+            if ( $6 == "T" ) {
+               doc[ ++ndoc ] = $0
+
+#  Count and store the page heading records separately. Extract the document
+#  name from each of these and form a list for each document of the pages
+#  which belong to it.
+            } else {
+               page[ ++npage ] = $0
+               docname = $7
+               pagelist[ docname ] = pagelist[ docname ]npage" "
+            }
+         }
+
+#  Generate output.
+#  ---------------
+#  When all input data have been accumulated, generate the output lists in HTML
+#  format. At this stage, however, leave the actual list contents in their
+#  original format.
+         END{
+
+#  First write the number of matched documents to a scratch file and check
+#  that at least one document was matched, otherwise no output is generated.
+            print( int( ndoc ) ) >"'"${resfile}"'"
+            if( ndoc ) {
+
+#  Begin the (outer) HTML list.
+               print( "<UL>" )
+
+#  Output each document title record as a list element.
+               for ( i = 1; i <= ndoc; i++ ) {
+                  print( "<LI>" )
+                  print( doc[ i ] )
+
+#  If "brief" output format was not requested, proceed to generate a sub-list
+#  containing the associated page heading records.
+                  if ( brief != "1" ) {
+
+#  Split the document title record to extract the document name.
+                     split( doc[ i ], f )
+                     docname = f[ 7 ]
+
+#  Split the list of pages in this document to obtain an array of page record
+#  numbers identifying the pages required.
+                     np = split( pagelist[ docname ], pages )
+
+#  If at least one associated page exists, start an HTML sub-list.
+                     if ( np > 0 ) {
+                        print( "<UL>" )
+
+#  Output each associated page heading record as an element of the sub-list.
+                        for ( ip = 1; ip <= np; ip ++ ) {
+                           print( "<LI>" )
+                           print( page[ pages[ ip ] ] )
+                           print( "</LI>" )
+                        }
+
+#  Terminate each of the HTML lists.
+                        print( "</UL>" )
+                     }
+                  }
+                  print( "</LI>" )
+               }
+               print( "</UL>" )
+            }
+
+#  End of "awk" script.
+#  -------------------
+#  Make "awk" read the value of the HTX_BRIEF environment variable and then
+#  read input data from standard input. Pipe the output of "awk" into "sed".
+
+#  At this point, the output is complete except that each list entry is still
+#  in the same format as when it was first generated. We now need to convert
+#  these entries into HTML format, with links to the URLs needed to access the
+#  associated parts of the document(s). This is done using "sed" as follows:
+
+#  o  Add the title "[no title]" to any record without title or heading text.
+#  o  Add the current directory name as a prefix to any file name that is not
+#     absolute (i.e. without a "/" as the first character).
+#  o  Change the file name for any records that are marked with a "r" flag
+#     into a reference to the remote document server.
+#  o  Change document title records into HTML format with a URL referring to
+#     to the top of the document.
+#  o  Change page heading records into HTML format with a URL referring to the
+#     appropriate document page.
+#  o  Apply whatever edits are required to either display or delete the match
+#     count data, using the "sed" script in the "editcnts" variable, as defined
+#     previously.
+         }' brief="${HTX_BRIEF}" - \
+         | sed -e \
+            's%^\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]* . . [^ ][^ ]*  *[^ ][^ ]* *\)$%\1 [no title]%
+             s%^\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]* . . [^ ][^ ]*\)  *\([^/]\)%\1 '"${pwd}"'/\2%
+             s%^\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]* r .\) \([^ ][^ ]*\)  *[^ ][^ ]*%\1 \2 '"${HTX_SERVER}"'/\2.htx/\2.html?xref_%
+             s%^\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]* h T [^ ][^ ]*  *[^ ][^ ]*\)%\1#xref_%
+             s%^\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]*\) . T \([^ ][^ ]*\) \([^ ][^ ]*\) \(.*\)%T \1 <A HREF="\3">\2</A> - \4%
+             s%^\([^ ][^ ]* [^ ][^ ]* [^ ][^ ]* [^ ][^ ]*\) . t \([^ ][^ ]*\) \([^ ][^ ]*\) \(.*\)%t \1 <A HREF="\3">\4</A>%' \
+               -e "${editcnts}"
+
+#  Finish search iterations.
+#  ========================
+#  The results of the current search iteration (if any) have now been written
+#  to standard output. Read the number of documents matched from the scratch
+#  file and remove the file. Provide a default and quit the loop if the file
+#  doesn't exist (the search has probably been interrupted).
+         if test -f "${resfile}"; then
+            ndoc="`cat "${resfile}"`"
+            rm -f "${resfile}"
+         else
+            ndoc='0'
+            break
+         fi
+
+#  If documents have been matched, or we are only performing a single search
+#  iteration, then quit the iteration loop.
+         if test "${ndoc}" != '0' -o \
+                 "${search_default}" != '1'; then break; fi
+      done
+
+#  When the search is complete, generate an appropriate informational message.
+      if test ! "${HTX_QUIET}" = '1'; then
+         case "${ndoc}" in
+         0) txt='no matches found';;
+         1) txt='1 document matched';;
+         *) txt="${ndoc} documents matched";;
+         esac
+
+#  Output the message, over-writing any messages already produced. Add a final
+#  newline.
+         ${HTX_DIR}/msgover "${nblank}" "${txt}" >/dev/null
+         echo '' >/dev/tty
+      fi
+
+#  Remove any remaining temporary files.
+      rm -f "${datafile}" "${catfile}" "${indexdata}"
+
+#  Return the number of documents matched as the script's status.
+      exit "${ndoc}"
+
+#  End of script.

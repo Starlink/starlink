@@ -1,0 +1,159 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     creindex
+
+#  Purpose:
+#     Create an index file for a hypertext document.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script generates the contents of an index file for a hypertext
+#     document whose name is given as an argument. Index files are used to
+#     summarise the inward- and outward-pointing cross links and other
+#     information present in a hypertext document.
+
+#  Invocation:
+#     creindex doc
+
+#  Parameters:
+#     doc
+#        The name of the document for which an index file is to be generated.
+
+#  Output:
+#     The results from this script are written to standard output.
+
+#  Notes:
+#     -  Directory information (which may be relative to the current directory)
+#     should be included in the document name supplied, but the ".htx" file
+#     extension should be omitted.
+#     -  This script searches the entire directory tree of the document (which
+#     may consist of information stored in sub-directories).
+
+#  Implementation Deficiencies:
+#     Although this script will follow symbolic links to find directories
+#     within a document, it will not do so recursively - i.e. directories
+#     contained within other directories which are referenced via symbolic
+#     links may not be found.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     12-JUL-1995 (RFWS):
+#        Original version, derived from earlier work.
+#     4-AUG-1995 (RFWS):
+#        Sort cross-reference labels alphabetically.
+#     11-AUG-1995 (RFWS):
+#        Extended to add title information to the index file and to replace
+#        the home page entry with a line that also gives the document title.
+#     24-OCT-1995 (RFWS):
+#        Fixed bug - wrong switches on "sort" were causing lines to be
+#        eliminated as duplicates when they differed in label value and should
+#        be retained.
+#     7-DEC-1995 (RFWS):
+#        Added extra "sh" to make the script work on Linux.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the document name.
+      doc="${1}"
+
+#  If a name was given, obtain the document directory and the document name
+#  with directory information removed.
+      if test -n "${doc}"; then
+         dir="`dirname ${doc}`"
+         base="`basename ${doc}`"
+
+#  Go to the directory containing the document (this ensures that all file
+#  names generated for the index file will be relative to the document itself).
+         cd "${dir}"
+
+#  Use "find" to locate all directories and subdirectories within the document
+#  and, within each directory, list the names of all the ".html" files using
+#  "showhtml". Save the resulting complete list of ".html" file names, each of
+#  which will have the document name as its first field. (Note we allow "find"
+#  to find both directories and symbolic links, since the latter may also
+#  point at directories. The "showhtml" script will ignore any links that do
+#  not refer to directories. Also note there is a redundant "sh" here - this
+#  is needed on Linux systems where -exec appears unable to execute a shell
+#  script properly unless given this clue.)
+         htmlfiles="`find "${base}.htx" \( -type d -o -type l \) \
+                                        -exec sh ${HTX_DIR}/showhtml {} \;`"
+
+#  Create a name for a temporary file and remove any pre-existing version.
+         tempfile="/tmp/htx-creindex-$$.homefile"
+         rm -f "${tempfile}"
+
+#  Search the document and generate the index file cross-link information, as
+#  follows:
+#
+#  1) Pass the list of ".html" files to "grep" which concatenates all the
+#  lines in all the files with the associated file name added at the start of
+#  each line (/dev/null is included in the list of files to force "grep" to add
+#  the file name even if only one ".html" file was found).
+#
+#  2) Process the resulting text with a "sed" script ("creindex.sed") that
+#  converts it into the cross-link information required.
+#
+#  3) Sort this information to order cross-reference labels alphabetically,
+#  with incoming references appearing before outgoing references. Also remove
+#  any duplicate lines.
+#
+#  4) Pass the result through "sed" which identifies any lines corresponding
+#  to blank cross-reference labels in the document and saves the associated
+#  ".html" file names in the temporary file (the incoming lines are also
+#  echoed unchanged to standard output).
+         grep '^' ${htmlfiles} /dev/null \
+            | sed -n -f ${HTX_DIR}/creindex.sed \
+            | sort -u +0 -1 +3 -4 +2 -3 +1 -2 \
+            | sed -n 'p
+                      s%^<  *\([^ ][^ ]*\) *$%\1%w '"${tempfile}"
+
+#  See if information was written to the temporary file. If so, use it to
+#  identify the ".html" file that contains the "home page" of the document
+#  (the one containing a blank cross-reference label). If more than one page
+#  has a blank label, use only the first one found ("sed '1q'").
+         homefile=''
+         if test -f "${tempfile}"; then
+            homefile="`sed '1q' "${tempfile}"`"
+         fi
+
+#  Remove the temporary file.
+         rm -f "${tempfile}"
+
+#  Obtain the name of the "home page" file, suggesting the one found above.
+         homefile="`${HTX_DIR}/homepage "${base}" "${homefile}"`"
+
+#  Now scan all the ".html" files in the document again, this time extracting
+#  a list of the titles associated with them. Pass the resulting list through
+#  "sed" to add a "t " prefix to each line and to strip off the first field of
+#  each file name. Also modify the "t " prefix of the home file to become "T "
+#  (denoting the title of the document as a whole), allowing for the
+#  possibility that the home file or its title may be missing.
+         {
+            ${HTX_DIR}/gettitle ${htmlfiles} \
+               | sed 's%^[^/]*/%t %
+                      s%^t\( '"${homefile}"' \)%T\1%
+                      s%^t\( '"${homefile}"'\)$%T\1%'
+
+#  If no home page could be identified, then output a blank document title
+#  line.
+            if test ! -n "${homefile}"; then echo 'T'; fi
+
+#  Sort the resulting list alphabetically by title.
+         } | sort +2
+      fi
+
+#  End of script.

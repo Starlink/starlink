@@ -1,0 +1,279 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     hlink
+
+#  Purpose:
+#     Perform cross-linking of hypertext documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command searches for hypertext documents in a specified list of
+#     directories and link-edits their ".html" files to insert the correct URLs
+#     so that cross-reference links between the documents point at the
+#     appropriate files.
+
+#  Invocation:
+#     hlink [switches] [dirlist]
+
+#  Parameters:
+#     dirlist
+#        A space-separated list of directories in which to search for
+#        the hypertext documents to be linked (as identified by their
+#        ".htx" file extension). If this list is not given, the
+#        default directory "." is used.
+
+#  Switches:
+#     -a
+#        Specifies that all documents in the specified directories should be
+#        re-linked "from source". This means that all documents will be
+#        re-examined for cross-references, regardless of whether they appear to
+#        have changed since they were last linked, and all the resulting
+#        cross-references will be resolved.
+#     -d
+#        Specifies that a "deep" dependency test should be performed to see
+#        which documents have changed, and therefore need re-linking. This
+#        involves examining the modification dates of all the ".html" files in
+#        each document. A deep dependency test is more likely to identify
+#        changed documents than the default method (which simply examines the
+#        modification date of the document directory file) but it may take
+#        considerably longer.
+#     -r
+#        Specifies that documents that make references only to other "remote"
+#        documents should be re-linked. This option is present for historical
+#        reasons and it should not normally be necessary to use it. It may
+#        eventually be removed.
+#     -v
+#        Specifies "verbose mode", which results in additional information
+#        about the linking process being written to standard output.
+
+#  Environment Variables Used:
+#     HTX_NOLINK
+#        If this environment variable is set (to any value), no relink will
+#        be performed and a message to this effect will be produced instead.
+#        This allows relinking to be suppressed when not required. Typically,
+#        you might use this when relinking is performed automatically (e.g. by
+#        a makefile) but you wish to bypass it in order to save time.
+#     HTX_PATH
+#        An optional colon-separated list of directories in which to search for
+#        hypertext documents. If this environment variable is not set, the
+#        default is to search the directories containing the HTX documentation,
+#        followed by those containing the rest of the Starlink documentation
+#        (if different). See SUN/188 for full details.
+#     HTX_SERVER
+#        The URL of the document server to be used for serving remote
+#        documents. This will be used as a prefix in all URLs that refer to
+#        remote documents. If this environment variable is not set, the value
+#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+
+#  Notes:
+#     Documents which are found on the HTX_PATH search path will be
+#     linked against (i.e. references to them will be resolved), but
+#     they will not themselves be modified unless they are also found
+#     in the directory list specified on the command line.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     BLY: M.J. Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1995 (RFWS):
+#        Original version.
+#     20-APR-1995 (RFWS):
+#        Added the "-a" and "-d" flags.
+#     2-JUN-1995 (RFWS):
+#        Fixed bug: use of "which" command - replaced with equivalent code.
+#     19-OCT-1995 (RFWS):
+#        Use the "htx.log" file contents to detect which documents have
+#        moved since the last relink.
+#     23-APR-1996 (BLY):
+#        Added support for HTX_NOLINK.
+#     5-JAN-1998 (RFWS):
+#        Updated prologue.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Initialise.
+#  ==========
+#  Test for a directory specification on the name of the script being run.
+      if dir="`expr "//${0}" : '//\(.*\)/.*'`"; then :; else
+
+#  If absent, search $PATH to determine which directory it resides in.
+         dir="`IFS=':'; for d in $PATH; do file="${d:=.}/${0}"
+            test -x "${file}" -a ! -d "${file}" && echo "${d}" && break
+         done`"
+      fi
+
+#  Generate an absolute directory name if necessary.
+      case "${dir}" in [!/]*) dir="`pwd`/${dir}";; esac
+
+#  Define the directory to be used to find related scripts and extract the
+#  name of this script.
+      HTX_DIR="${dir}/htx-scripts"
+      HTX_SCRIPT="`basename "${0}"`"
+
+#  Check to see if a relink is required and exit if not.
+      if test -n "${HTX_NOLINK+z}"; then 
+         echo "${HTX_SCRIPT}: hypertext link bypassed because HTX_NOLINK is set";
+         exit
+      fi
+
+#  Handle command line switches.
+#  ============================
+#  Initialise default values for command line switches.
+      HTX_ALL='0'
+      HTX_DEEP='0'
+      HTX_REMOTE='0'
+      HTX_VERBOSE='0'
+
+#  Interpret command line switches.
+      while :; do
+         case "${1}" in
+
+#  -a - Indicates that all documents should be relinked regardless of whether
+#  they appear to have changed.
+         -a) HTX_ALL='1'; shift;;
+
+#  -d - Indicates that a "deep" test should be performed to see if documents
+#  have changed by inspecting all the ".html" files they contain.
+         -d) HTX_DEEP='1'; shift;;
+
+#  -r - Indicates that documents that refer to remote documents should be
+#  re-linked even if they do not refer to any other documents that have
+#  changed (useful if documents have been de-installed, and have thus become
+#  remote since the last re-link).
+         -r) HTX_REMOTE='1'; shift;;
+
+#  -v - Indicates verbose mode (more information written to standard output).
+         -v) HTX_VERBOSE='1'; shift;;
+
+#  Catch unrecognised switches and report an error.
+         -*)
+            echo >&2 "${HTX_SCRIPT}: unknown flag \""${1}"\" given"
+            exit 1;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         *) break;;
+         esac
+      done
+
+#  Export variables required by related scripts.
+      export HTX_ALL
+      export HTX_ALLDOCS
+      export HTX_DEEP
+      export HTX_DIR
+      export HTX_REMOTE
+      export HTX_SCRIPT
+      export HTX_VERBOSE
+
+
+#  Perform hypertext linking.
+#  =========================
+#  Obtain the list of directories in which documents are to be re-linked.
+#  Use the current directory by default.
+      linkdirs="${*:-.}"
+
+#  Search all the document directories, including those listed in the HTX_PATH
+#  environment variable, to obtain a list of all known documents (this will
+#  include directory information as documents in earlier directories may
+#  occlude those in later ones).
+      HTX_ALLDOCS="`${HTX_DIR}/allfind ${linkdirs}`"
+
+#  Obtain a list of the documents to be considered for relinking (i.e. all
+#  those found on the $linkdirs directory list).
+      linkdocs="`${HTX_DIR}/docfind ${linkdirs}`"
+
+#  If required, obtain the names of all the documents that may need relinking
+#  whose index files either do not exist or are older than the documents
+#  themselves, and update their index files.
+      if test ! "${HTX_ALL}" = "1"; then
+         ${HTX_DIR}/newindex `${HTX_DIR}/oldindex ${linkdocs}`
+
+#  If all documents are to be relinked, then create new index files for all of
+#  them instead.
+      else
+         ${HTX_DIR}/newindex ${linkdocs}
+      fi
+
+#  Generate a list of the documents whose index files have changed since the
+#  last relink performed on the directory in which they reside (as measured by
+#  the htx.log datestamp file in that directory). These documents and any that
+#  depend on them must be relinked.
+      newdocs="`${HTX_DIR}/newdocs ${linkdocs}`"
+
+#  We now loop to inspect each directory containing documents that potentially
+#  need to be relinked and accumulate a list of those documents that actually
+#  need to be relinked. Start with the list of documents that have changed.
+      linklist="${newdocs} "
+      for dir in ${linkdirs}; do
+
+#  Obtain a list, selected from the documents in this directory, of all the
+#  documents that refer to those that are either new or have moved since the
+#  last relink on this directory. These dependent documents must also be
+#  relinked, so append them to the overall list.
+         linklist="${linklist}`${HTX_DIR}/docfind ${dir} | ${HTX_DIR}/depends \
+                               ${newdocs} \`${HTX_DIR}/moveddocs ${dir}\`` "
+      done
+
+#  Remove any duplicates from the list of documents to relink, as it's possible
+#  we visited the same directory more than once.
+      linklist="`for doc in ${linklist}; do echo ${doc}; done | sort -u`"
+
+#  If no documents need relinking, then say so.
+      if test ! -n "${linklist}"; then
+         echo 'No hypertext documents need re-linking'
+
+#  Otherwise, say how many documents will need to be relinked.
+      else
+         nlink="`echo ${linklist} | wc -w | awk '{print $1}'`"
+         case "${nlink}" in
+         1)
+            echo "1 hypertext document needs re-linking";;
+         *)
+            echo "${nlink} hypertext documents need re-linking";;
+         esac
+
+#  For each document that needs relinking, obtain a list of all the known
+#  documents to which it refers (using "reffind") and relink it against them
+#  (using "relink").
+         for doc in ${linklist}; do
+            ${HTX_DIR}/relink ${doc} `${HTX_DIR}/reffind ${doc} ${HTX_ALLDOCS}`
+         done
+      fi
+
+#  Add an "htx.log" file to each document directory and record details of the
+#  current linking operation.
+      for dir in ${linkdirs}; do
+         log="${dir}/htx.log"
+         echo >"${log}" \
+"# Hypertext documents in this directory were last linked by user `whoami` using"
+         echo >>"${log}" \
+"# the \"${HTX_SCRIPT}\" command on `date`. The following local"
+         echo >>"${log}" \
+'# documents were available:'
+
+#  Enter the list of local documents for use when the directory is next
+#  relinked. Pass these names through "stdfile" to generate an absolute file
+#  name in standard form for future recognition and add an "l " prefix.
+         for doc in ${HTX_ALLDOCS}; do echo "${doc}"; done \
+            | ${HTX_DIR}/stdfile | sed 's%^%l %' >>"${log}"
+         echo >>"${log}" '# End of HTX log file.'
+
+#  Touch the the logfile (this synchonises the time system to the current
+#  machine to avoid possible problems with time differences on shared file
+#  systems).
+         touch "${log}"
+      done
+
+#  End of script.

@@ -1,0 +1,2860 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {188.3}
+\newcommand{\stardocsource}    {sun188.3}
+\newcommand{\stardocauthors}   {R.F.~Warren-Smith}
+\newcommand{\stardocdate}      {6th January 1998}
+\newcommand{\stardoctitle}     {HTX\\[1ex]
+                                Hypertext Cross-Reference Utilities}
+\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocmanual}    {User's Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+\newcommand{\cgiurl}{http://hoohoo.ncsa.uiuc.edu/cgi/overview.html}
+\newcommand{\formsurl}{http://www.ncsa.uiuc.edu/SDG/Software/Mosaic/Docs/fill-out-forms/overview.html}
+\newcommand{\HTMLurl}{http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html}
+\newcommand{\latextohtmlurl}{http://cbl.leeds.ac.uk/nikos/tex2html/doc/latex2html/latex2html.html}
+\newcommand{\mosaicurl}{http://www.ncsa.uiuc.edu/SDG/Software/Mosaic/NCSAMosaicHome.html}
+\newcommand{\netscapeurl}{http://home.netscape.com/}
+\newcommand{\psurl}{http://www.cs.indiana.edu/docproject/programming/postscript/postscript.html}
+\newcommand{\urlurl}{http://www.w3.org/hypertext/WWW/Addressing/URL/Overview.html}
+\newcommand{\wwwurl}{http://www.w3.org/hypertext/WWW/}
+
+\newcommand{\cgiref}[1]{\htmladdnormallink{#1}{\cgiurl}}
+\newcommand{\HTMLref}[1]{\htmladdnormallink{#1}{\HTMLurl}}
+\newcommand{\formsref}[1]{\htmladdnormallink{#1}{\formsurl}}
+\newcommand{\latextohtmlref}[1]{\htmladdnormallink{#1}{\latextohtmlurl}}
+\newcommand{\mosaicref}[1]{\htmladdnormallink{#1}{\mosaicurl}}
+\newcommand{\netscaperef}[1]{\htmladdnormallink{#1}{\netscapeurl}}
+\newcommand{\psref}[1]{\htmladdnormallink{#1}{\psurl}}
+\newcommand{\urlref}[1]{\htmladdnormallink{#1}{\urlurl}}
+\newcommand{\wwwref}[1]{\htmladdnormallink{#1}{\wwwurl}}
+
+\newcommand{\HTXref}[1]{\htmlref{#1}{sect:HTX}}
+\newcommand{\latexref}[1]{\xref{#1}{sun9}{}}
+\newcommand{\linkerref}[1]{\htmlref{#1}{hlink}}
+\newcommand{\indexref}[1]{\htmlref{#1}{sect:indexfiles}}
+\newcommand{\docref}[1]{\htmlref{#1}{sect:hypertextdocuments}}
+\newcommand{\dirref}[1]{\htmlref{#1}{sect:documentdirectories}}
+\newcommand{\libref}[1]{\htmlref{#1}{sect:documentlibraries}}
+\newcommand{\labref}[1]{\htmlref{#1}{sect:targetlabels}}
+\newcommand{\remref}[1]{\htmlref{#1}{sect:remotedocuments}}
+\newcommand{\servref}[1]{\htmlref{#1}{sect:remoteservers}}
+\newcommand{\findmeref}[1]{\htmlref{#1}{findme}}
+\newcommand{\showmeref}[1]{\htmlref{#1}{showme}}
+
+\newcommand{\hi}[1]{{\tt{#1}}}
+\newcommand{\qt}[1]{``#1''}
+\newcommand{\st}[1]{{\em{#1}}}
+\begin{htmlonly}
+   \renewcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
+%   \renewcommand{\_}{\_}
+\end{htmlonly}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+This document describes a set of ``Hypertext Cross-Reference
+Utilities'' (HTX) which are designed to help maintain large
+documentation sets whose constituent \docref{documents} are written
+using the \HTMLref{\st{Hypertext Markup Language} (HTML)}.
+
+The central part of HTX is a \st{hypertext linker},
+\linkerref{\hi{hlink}}. This allows hyper-links (or cross-references)
+to be established between related documents in such a way that it is
+easy to maintain their integrity as individual documents are updated.
+Information produced by this linking process is also used by other HTX
+utilities to provide \htmlref{document
+search}{sect:searchingfordocuments} facilities and the ability to
+\htmlref{randomly access}{sect:accessingdocuments} any part of a
+documentation set. This latter capability forms a basis for
+constructing \htmlref{hypertext help}{sect:hypertexthelp} systems for
+use by other software.
+
+The expected readership of this document includes those who read
+hypertext documentation, those who write it, and those who maintain
+it, especially those who \xref{write and maintain Starlink
+documentation}{sgp28}{}. Software developers may also be interested in
+the possibilities for hypertext help that HTX provides.
+
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+\newpage
+\begin{latexonly}
+   \newpage
+   \markright{\stardocname}
+   \null\vspace{5mm}
+   \begin {center}
+   \rule{80mm}{0.5mm} \\ [1ex]
+   {\Large\bf \stardoctitle \\ [2.5ex]
+              \stardocversion} \\ [2ex]
+   \rule{80mm}{0.5mm}
+   \end{center}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+%  Introduction page.
+%  =================
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\begin{latexonly}
+   \newpage
+   \markright{\stardocname}
+   \renewcommand{\thepage}{\arabic{page}}
+   \setcounter{page}{1}
+   \null\vspace{5mm}
+   \begin{center}
+   \rule{80mm}{0.5mm}\\[1ex]
+   {\Large\bf \stardoctitle\\[2.5ex]
+              \stardocversion}\\[2ex]
+   \rule{80mm}{0.5mm}
+   \end{center}
+   \vspace{30mm}
+\end{latexonly}
+
+\section{\xlabel{introduction}INTRODUCTION}
+
+\subsection{\label{sect:HTX}\xlabel{what_does_HTX_do}What Does HTX Do?}
+
+HTX is a set of utilities that allows you to maintain and access a
+collection of dynamic \docref{multi-page hypertext documents} that
+refer to each other. Its main element is a \linkerref{\st{hypertext
+linker}} which can be used to establish cross-references between
+documents and to re-establish these whenever changes occur to
+individual documents.
+
+The information generated by the \htmlref{linking
+process}{sect:howlinkingworks} is used by other HTX utilities to
+provide access to hypertext documentation, permitting
+\htmlref{document searches}{sect:searchingfordocuments} and the rapid
+\htmlref{display of selected parts}{sect:accessingdocuments} of
+documents.
+
+Other software can also make use of these facilities to obtain random
+access to any part of a cross-linked documentation set, forming a
+basis for on-line or context-sensitive \htmlref{hypertext
+help}{sect:hypertexthelp} systems.
+
+See \S\ref{sect:commanddescriptions} for descriptions of each of the
+utilities that HTX provides.
+
+\subsection{\label{sect:hypertextdocuments}\xlabel{what_is_a_hypertext_document}What is a Hypertext Document?}
+
+The documents that \HTXref{HTX} is concerned with are written using
+the \htmladdnormallinkfoot{\st{Hypertext Markup Language}
+(HTML)}{\HTMLurl} which can be read using \wwwref{World Wide Web (WWW)}
+browsers such as \mosaicref{\st{Mosaic}} and \netscaperef{\st{Netscape}}.
+
+Of course, any page of hypertext written using HTML could be
+considered a document in its own right. However, most documents of
+substance will consist of multiple pages of HTML, joined together
+using hypertext links. It is convenient to \dirref{gather these
+related pages together} and to consider them as a single multi-page
+hypertext document. This is the sense in which the term \st{document}
+is used here.
+
+\subsection{\xlabel{why_are_cross_references_a_problem}Why are Cross-References a Problem?}
+
+The hyper-links that join different \HTMLref{HTML} pages {\bf within}
+\docref{hypertext documents} are normally defined by the document's
+author.  These are an internal matter -- if the document structure
+changes, the author can change the internal links accordingly.  If
+proper use is made of relative file names in establishing these links,
+it should also be possible to transport these documents as a whole to
+a different location without damaging the internal links.
+
+\HTXref{HTX} addresses the different problem of maintaining a
+collection of dynamic hypertext documents (probably written by many
+different authors) that have cross-references established between
+them. That is, each document may contain hyper-links to the contents
+of any other document in the collection.
+
+In this situation, document locations may often need to change, and
+revision of individual documents will also result in the referenced
+material moving around within them.  Since the links that implement
+HTML cross-references consist, essentially, of file names, they cannot
+survive this process and will rapidly end up pointing to the wrong
+places unless remedial action is taken.
+
+In a large document collection, re-organising all necessary
+cross-references following every document change is not a task to
+contemplate doing by hand. Establishing and repairing these links is
+therefore a job for the HTX \linkerref{hypertext linker}.
+
+\subsection{\xlabel{mixing_local_and_remote_documents}Mixing Local and Remote Documents}
+
+The inherent fragility of hypertext links is a problem faced by any
+project that needs to maintain a collection of related
+\docref{documents} in hypertext form. The documentation for software
+projects typifies this.  However, software documentation also suffers
+from an additional problem because it is usually distributed and
+installed along with the particular items of software it
+describes. This means that any sub-set of the complete documentation
+set must also be viable in its own right.
+
+To give an example, a particular site may only have installed one or
+two items out of a complete collection of software, and so may only
+have a couple of documents that relate to the installed software
+available locally.  This means that many of the cross-references that
+these documents make will be to other documents that do not exist on
+the local system. Ideally, these links should not simply fail.
+
+The problem can be solved by using a \servref{document server} to
+provide access to the missing documents from a central archive, where
+a copy of all the documents is maintained. A reader with any of the
+documents installed locally will then potentially have easy access to
+the entire documentation set, albeit with some time penalty when
+accessing non-local documents. One of the functions that \HTXref{HTX}
+performs, therefore, is to generate appropriate requests for
+\remref{\st{remote documents}} for processing by a \htmlref{central document
+server}{sect:remoteservers}\begin{latexonly}
+(see \S\ref{sect:remotedocuments} and
+\S\ref{sect:remoteservers})\end{latexonly}.
+
+\section{\xlabel{document_organisation}DOCUMENT ORGANISATION}
+
+This section describes how you should organise your hypertext
+documentation to make use of \HTXref{HTX} to maintain and use
+cross-references between \docref{documents}.
+
+\subsection{\label{sect:documentdirectories}\xlabel{document_directories}Document Directories}
+
+\HTXref{HTX} assumes that each \docref{hypertext document} resides
+beneath a top-level directory and it recognises these \st{document
+directories} from their extension, which should always be \qt{.htx}.
+When it needs to locate the contents of a document, it will search
+inside document directories (to any required depth) looking for files
+with an extension of \qt{.html} which contain the hypertext itself, in
+\HTMLref{HTML} format.
+
+The first step in organising your hypertext documentation should
+therefore be to collect all the HTML files comprising each document
+together into a directory (or directory tree) and to give the (top
+level) directory a distinctive name such as:
+
+\begin{quote}
+\begin{verbatim}
+design-study.htx
+\end{verbatim}
+\end{quote}
+
+The \qt{design-study} part of this is the document name by which it
+will be known to other authors, and the \qt{.htx} part identifies it to
+HTX as a candidate for the various operations it performs. Once you
+have made a document available to other people, you should not
+subsequently change its name, even if you move it somewhere else,
+because other documents may be referring to it and will still know it
+by its original name.
+
+\subsection{\label{sect:documentlibraries}\xlabel{document_libraries}Document Libraries}
+
+Because it is concerned with collections of \docref{hypertext
+documents}, \HTXref{HTX} uses the concept of a \st{document
+library}. There is nothing particularly grand about this.  It is
+simply a directory in which you store a collection of documents. You
+can call it whatever you like and populate it with the
+\dirref{\qt{.htx} directories} for each of the documents in your
+collection. It is also a convenient place to keep other files related
+to the documentation set, perhaps even versions of the same documents
+in other formats.
+
+The key thing about a document library is that it defines a place in
+which to look for documents. When you \st{link} a set of documents
+together (the term used for establishing the correct
+cross-references), HTX identifies the documents involved by searching
+in the document libraries you specify, looking for all the \qt{.htx}
+directories they contain. By default, it will simply look in your
+current directory.
+
+\subsection{\label{sect:searchpath}\xlabel{multiple_libraries_and_the_library_search_path}\xlabel{HTX_PATH_search_path}Multiple Libraries and the Library Search Path}
+
+You may not always want to modify the contents of existing
+\libref{libraries}, even although you may be referring to their
+\docref{documents}.  For example, you may have an established set of
+documentation in one or more libraries and be developing a new
+document that will eventually form part of that set. Your new document
+will probably need to refer to the others while you are working on it,
+but you may not want to (or have permission to) modify any of the
+existing documents.
+
+In this case, you can specify a search path, on which \HTXref{HTX}
+will look for other documents to which you may be referring, but it
+will not attempt to link (\st{i.e.}\ modify) those other
+documents. The search path is specified as a colon-separated list of
+directories via the \hi{HTX\_PATH} environment variable, for instance:
+
+\begin{quote}
+\begin{verbatim}
+setenv HTX_PATH $HOME/mydocs:/docman/newdocs:/docman/olddocs
+\end{verbatim}
+\end{quote}
+
+This search path is used by all HTX commands when they need to find
+documents for which no explicit location has been given.  Note that if
+two documents with the same name occur at different points on your
+\hi{HTX\_PATH}, only the {\bf first} one will be used.
+
+You can set \hi{HTX\_PATH} to search anywhere you like, but if you do not
+specify it yourself, it defaults to:
+
+\begin{quote}
+\begin{verbatim}
+$INSTALL/docs:$INSTALL/help:$STARLINK/docs:$STARLINK/help
+\end{verbatim}
+\end{quote}
+
+where \hi{INSTALL} in turn defaults to \hi{\$HOME/star} and
+\hi{STARLINK} defaults to \hi{/star}. The values of these environment
+variables are evaluated {\bf when the HTX software is installed} (not
+when you later make use of it). By default, therefore, HTX will search
+for the standard set of Starlink documents and on-line hypertext help,
+plus any others you may have installed locally under your own user
+name (in the location identified by the \hi{INSTALL} environment
+variable).
+
+\section{\label{sect:crossreferences}\xlabel{establishing_cross_references}ESTABLISHING CROSS-REFERENCES}
+
+Before you can establish cross-references between \docref{documents}
+using \HTXref{HTX}, you must export \labref{labelled targets} for the
+cross-references to point at from each of the referenced
+documents. You must also enter links to implement the cross-references
+themselves. Both of these make use of standard \HTMLref{HTML}
+\st{anchors}, but in a special form that makes them recognisable to
+HTX.
+
+\subsection{\xlabel{exporting_targets}\label{sect:targetlabels}Exporting Cross-Reference Targets}
+
+If one \docref{document} is to cross-reference another, the referenced
+document should export a label that the other one can refer to. The
+position of this label identifies the point in the referenced document
+to which a reader should be transferred when the cross-reference is
+followed.  If you understand \HTMLref{HTML}, you will be familiar with
+this idea, as it uses an HTML \st{destination anchor} for this
+purpose. For use with \HTXref{HTX}, this should have a form such
+as:\footnote{Any other HTML anchor parameters may also be present and
+the double quotes are optional if the enclosed characters are all
+alphanumeric.}
+
+\begin{quote}
+\begin{verbatim}
+<A NAME="xref_conclusions">any text</A>
+\end{verbatim}
+\end{quote}
+
+In plain HTML, this makes \qt{any text} a potential destination for a
+hypertext link, to which any other piece of HTML may refer.
+
+What makes this anchor special to HTX is the
+\qt{xref\_} prefix given to the value of
+the \hi{NAME} parameter. HTX recognises anchors with this form as
+potential targets for document cross-references, and this
+distinguishes HTX targets from other HTML destination anchors. This is
+important, because it gives the document's author control over which
+points in the document other authors may reference.
+
+Normally, many HTML destination anchors will be used for internal
+navigation within a document. When the document is revised, these may
+be subject to change, so they should not normally be referred to by
+other documents. However, destination anchors with the
+\qt{xref\_} prefix can be chosen carefully (and
+named appropriately) to identify stable components of a document, to
+which enduring references can be made from other documents. The author
+is, in effect, exporting a set of labels that tell other authors which
+parts of his document it is safe to refer to.
+
+We will refer to an anchor with the form above as a
+\st{cross-reference target} and the characters that follow \qt{xref\_}
+as its \st{label} (\qt{conclusions} in the example above). As in
+normal HTML, HTX labels are case sensitive. Unlike plain HTML,
+however, they must be unique within an entire hypertext document, not
+just within a single HTML file.
+
+\subsection{\xlabel{referring_to_targets}\label{sect:referringtotargets}Referring to Cross-Reference Targets}
+
+To establish a cross-reference to another \docref{document} you again
+use an \HTMLref{HTML} anchor, this time with the \hi{HREF} parameter,
+in a form similar to the following:\footnote{Again, any other HTML
+anchor parameters may also be present.}
+
+\begin{quote}
+\begin{verbatim}
+<A HREF="/star/docs/sun188.htx/node33.html#xref_appendix">any text</A>
+\end{verbatim}
+\end{quote}
+
+This is, of course, the standard HTML method of forming a hypertext
+link to another location identified by the \urlref{\st{Uniform
+Resource Locator} (URL)} given between double quotes. If this URL is
+correct (\st{i.e.}\ fully identifies the HTML file you want to
+reference), then this anchor will work as it stands, without any
+intervention from \HTXref{HTX}.
+
+What makes this link special to HTX is the particular form that the
+URL takes.  Anchors containing such URLs are recognised by HTX and can
+then be repaired when the cross-reference target changes, by
+appropriately editing new values into the fields that are no longer
+valid. The key components of the URL that HTX recognises are:
+
+\begin{quote}
+\begin{verbatim}
+/sun188.htx/
+\end{verbatim}
+\end{quote}
+
+which identifies the name of the document being referenced (in this
+case \qt{sun188}, \st{i.e.}\ this document), and:
+
+\begin{quote}
+\begin{verbatim}
+#xref_appendix
+\end{verbatim}
+\end{quote}
+
+where \qt{\#xref\_} is a flag that identifies this
+as an HTX cross-reference and \qt{appendix} is the
+\labref{cross-reference label} in the target document that identifies
+which part of that document is being referenced. Note that HTX will
+only allow you to refer to cross-reference labels that have been
+exported by the target document and will warn you if you use an
+invalid label.
+
+Because HTX can repair URL fields that are wrong, it is quite
+acceptable to omit everything inessential and to strip the URL down to
+just:
+
+\begin{quote}
+\begin{verbatim}
+<A HREF="/sun109.htx/#xref_conclusions">any text</A>
+\end{verbatim}
+\end{quote}
+
+However, entering a full URL (or at least a guess at it) is often a
+good idea to start with, as it means the cross-reference may still
+work even if someone forgets to link your document.
+
+\subsection{\xlabel{blank_labels}\label{sect:entiredocuments}Referring to an Entire Document}
+
+\HTXref{HTX} recognises a \labref{cross-reference target} with the form:
+
+\begin{quote}
+\begin{verbatim}
+<A NAME="xref_">any text</A>
+\end{verbatim}
+\end{quote}
+
+(\st{i.e.}\ with a blank label) as a special case, to be used to
+identify the ``top'' page of a \docref{hypertext document}. This
+should be the point to which a reader is transferred if the entire
+document is requested and no particular part of it is specified.
+
+Any other document can refer to this label, using an anchor with the
+form:
+
+\begin{quote}
+\begin{verbatim}
+<A HREF="/any_where/docname.htx/any_file.html#xref_">any text</A>
+\end{verbatim}
+\end{quote}
+
+but its inclusion as a cross-reference target in the referenced
+document is optional. If it is omitted, HTX will assume that the top
+\HTMLref{HTML} page in a document is named after the document
+itself. That is, it will use a \urlref{URL} such as:
+
+\begin{quote}
+\begin{verbatim}
+/some_where/docname.htx/docname.html#xref_
+\end{verbatim}
+\end{quote}
+
+If your document does not follow this convention, then you should
+include a cross-reference target with a blank label at the start of
+whichever HTML file serves the same purpose.
+
+\subsection{\label{sect:howtolink}\xlabel{how_to_link}Linking your Hypertext Documents}
+
+Once you have set up a collection of \docref{documents} with
+cross-references implemented using the special forms of \HTMLref{HTML}
+anchor recognised by \HTXref{HTX}, the next step is to link these
+documents together.  This consists of editing the \urlref{URLs} in HTX
+cross-references so that they identify the current true location of
+the referenced files. No other URLs are touched during this process.
+
+Linking hypertext documents is straightforward. Simply go to the
+directory containing the document collection (the \libref{document
+library}) and use the command:
+
+\begin{quote}
+\linkerref{\hi{hlink}}
+\end{quote}
+
+{\bf WARNING: this will modify your documents. If you are worried
+about this, then make a backup first.}
+
+The \hi{hlink} command will display some informational messages as it
+links your documents and will warn you if you have referred to any
+\labref{cross-reference labels} that do not exist.  When it completes,
+you should be able to read your documents using any \wwwref{WWW}
+browser and to follow all the cross-references that they contain.
+
+When you change any of your documents, you can re-link them to
+accommodate the changes simply by using the \hi{hlink} command
+again. Because no essential information is discarded during linking,
+this process can be repeated indefinitely. You do not need a fresh
+copy of the documents each time.
+
+If the documents you want to link reside in more than one document
+library, then simply list the library directories on the command line,
+as follows:
+
+\begin{quote}
+\begin{verbatim}
+hlink dir1 dir2 dir3
+\end{verbatim}
+\end{quote}
+
+Remember that any other local documents that you refer to (but do not
+actually want to modify) should reside in libraries that appear on
+your \hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+\S}{)}{sect:searchpath}. If they do not, they will be regarded as
+\remref{remote documents} and the URLs generated for them will invoke
+a \servref{remote document server}\begin{latexonly}
+(see \S\ref{sect:remotedocuments} and \S\ref{sect:remoteservers})
+\end{latexonly}.
+This is usually less efficient than referring directly to local files.
+
+\subsection{\label{sect:convertingfromlatex}\xlabel{using_cross_references_from_latex}Using Cross-References from \LaTeX}
+
+It is quite straightforward to insert \HTXref{HTX} cross-reference
+anchors in \HTMLref{HTML} form directly into \docref{documents} when
+writing them by hand. However, many substantial documents already
+exist in \latexref{\LaTeX} format and can be converted relatively
+easily into hypertext by using the
+\htmladdnormallinkfoot{\latextohtml}{\latextohtmlurl} converter
+(\xref{see SUN/201}{sun201}{}). \LaTeX{} is, in any case, a convenient
+format for the primary source of many documents.
+
+A facility is therefore available for generating HTX cross-references
+from commands within \LaTeX{} documents.  The \LaTeX{} commands
+involved are normally ignored, but are detected by the
+\xref{\hi{star2html}}{sun199}{the_star2html_command} command that provides
+Starlink additions to the standard \latextohtml. To allow these
+commands to work, the appropriate \xref{document
+preamble}{sun199}{using_a_template} must also be included. The procedure to
+follow is described in \xref{SUN/199}{sun199}{}, but an outline of the
+principles involved is also given here.
+
+To export an HTX \labref{cross-reference label} from a \LaTeX{}
+document that is to be converted into hypertext, the following would
+be used:
+
+\begin{quote}
+\begin{verbatim}
+\xlabel{label}
+\end{verbatim}
+\end{quote}
+
+which results in the HTML anchor:
+
+\begin{quote}
+\begin{verbatim}
+<A NAME=xref_label>?</A>
+\end{verbatim}
+\end{quote}
+
+where \qt{?} is some invisible character that simply serves to mark
+the position to which links should point. Note that the name of the
+label chosen should be unique within a \mbox{\LaTeX} document and must
+only contain alphanumeric characters (or be \hyperref{blank}{blank --
+see \S}{}{sect:entiredocuments}).
+
+To insert a cross-reference to the target above into another document,
+you would use:
+
+\begin{quote}
+\begin{verbatim}
+\xref{any text}{docname}{label}
+\end{verbatim}
+\end{quote}
+
+which results in the HTML anchor:
+
+\begin{quote}
+\begin{verbatim}
+<A HREF="/star/docs/docname.htx/docname.html#xref_label">any text</A>
+\end{verbatim}
+\end{quote}
+
+This contains an initial guess at the required URL, which will be
+recognised and \hyperref{modified as necessary}{modified as necessary
+(see \S}{)}{sect:referringtotargets} when the document is linked.
+
+\section{\label{sect:howlinkingworks}\xlabel{how_linking_works}HOW HTX LINKING WORKS}
+
+This section describes the processes that occur when a set of
+\docref{hypertext documents} is linked. It is intended to clarify the
+messages that appear and to give some background information to help
+solve problems and avoid inefficiencies.
+
+\subsection{\label{sect:indexfiles}\xlabel{index_files}Index Files}
+
+When you invoke the \linkerref{\hi{hlink}} command, it first looks to
+find all the \docref{documents} that may need to be linked. This it
+does by searching in all the \libref{document libraries} specified on
+the command line (or just the current directory by default), looking
+for \dirref{directories with a \qt{.htx} extension}.
+
+It then ensures that each document has an up to date \st{index file}
+(a file called \qt{htx.index} stored within the document directory),
+creating one if necessary. Index files are text files that contain,
+amongst other things, details of all the potential in-going and
+out-going cross-references for a document and list the \HTMLref{HTML}
+files in which they occur.  This is a summary of the cross-links the
+document might potentially be involved in and serves to reduce the
+time needed to re-link it on subsequent occasions. New index files are
+normally only re-generated when a document changes.
+
+In addition to cross-reference information, index files also contain
+details of the title of each HTML page in the document and an
+indication of which is the \hyperref{\qt{top} page}{\qt{top} page (see
+\S}{)}{sect:entiredocuments}. This information is used by other HTX
+utilities to perform \htmlref{documentation
+searches}{sect:searchingfordocuments}, \st{etc.}
+
+\subsection{\label{sect:linkediting}\xlabel{link_editing}Link-Editing}
+
+The \linkerref{linker} identifies those \docref{documents} that have
+changed since the \libref{library} they reside in was last linked by
+looking for a file called \qt{htx.log} which serves as a date-stamp in
+each document library (if this file is absent, all documents in the
+library are considered changed). The contents of the \qt{htx.log} file
+also list the location of each local document when the library was
+last re-linked. Any that have moved to a different location are also
+regarded as \qt{changed}.
+
+The linker identifies all other documents which refer to any of the
+changed documents. Since all of these are potentially involved in
+cross-references that may no longer be valid, they will all need to be
+re-linked.
+
+A further search is then made of the libraries that appear on the
+\hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+\S}{)}{sect:searchpath}. If any of the documents that needs re-linking
+refers to a document on this path, then the latter document's
+\indexref{index file} is searched to identify the \HTMLref{HTML} file
+that is being referenced.
+
+Finally, the affected HTML files are edited to insert the new, correct
+\urlref{URLs}. After this, any \wwwref{WWW} browser should be able to
+follow any of the links between the documents and arrive at the
+correct location.
+
+A document set will need linking again whenever a document is added or
+removed, or whenever one of its documents changes. However, because
+the linker can quickly identify which files are affected and can
+utilise existing index file information, subsequent linking operations
+are much faster.
+
+\subsection{\xlabel{absolute_and_relative_links}Absolute and Relative Links}
+
+When establishing a link between two local \docref{documents}, the
+\HTXref{HTX} \linkerref{linker} has a choice of using an absolute file
+name for the target, or a relative one. The rule used is that relative
+cross-references are always generated if two documents reside in the
+same \libref{document library} (\st{i.e.}\ the same directory),
+otherwise an absolute name is used.
+
+This means that if a document library is moved, all cross-links
+between documents within it will remain intact. Only those from
+documents outside the library will fail and require re-linking.
+
+\subsection{\label{sect:remotedocuments}\xlabel{references_to_remote_documents}References to Remote Documents}
+
+In the interests of efficiency, the \HTXref{HTX} \linkerref{linker} is
+designed to generate references to locally-installed documentation
+whenever possible. If a referenced \docref{document} cannot be found
+locally, however, it will instead generate a reference to a
+\servref{remote document server} -- which should have a complete set
+of documentation available.  In this way, links to documents that are
+not available locally should not fail, and the reader should always
+see a complete set of documentation.
+
+The linker regards a document as remote if it is referenced by one of
+the documents it is linking, but it cannot find it either in the
+\libref{document libraries} being linked or on the \hyperref{\hi{HTX\_PATH}
+search path}{\hi{HTX\_PATH} search path (see \S}{)}{sect:searchpath}.
+
+Note that the HTX linker will not look up a document on a remote
+machine. All it does is to insert the remote server reference.
+References to invalid \labref{labels} in remote documents (or, indeed,
+to non-existent documents) cannot therefore be detected at link time
+and diagnosing this type of error is the responsibility of the server
+itself.
+
+\section{\xlabel{when_to_relink}WHEN TO RE-LINK}
+
+The \HTXref{HTX} \linkerref{linker} is equipped to detect when
+\docref{documents} have changed and to decide when re-linking is
+necessary. However, it takes a pragmatic approach to this in order to
+keep linking time to a minimum. As a result, there are occasions on
+which it may report that no documents need to be re-linked when this
+is not, in fact, the case.
+
+This section is intended to help you understand when you need to
+re-link your hypertext documents and how to tell the
+linker to do this for you.
+
+\subsection{\xlabel{accommodating_normal_document_changes}Accommodating Normal Document Changes}
+
+A documentation set may need to be re-linked whenever any file in any
+of its \docref{documents} changes, or when any document is added or
+removed, or moved to a new location.  The \HTXref{HTX}
+\linkerref{linker} detects changed documents by observing the
+modification dates of the document \dirref{\qt{.htx} directories}, the
+associated \indexref{index files}, and both the modification date and
+contents of the \qt{htx.log} date-stamp file in each \libref{document
+library}.
+
+This process is effective, except that it is sometimes possible to
+modify an \HTMLref{HTML} file within a document without changing the
+modification date on the \qt{.htx} directory that contains it. This is
+particularly likely if the HTML file resides in a sub-directory within
+the document. If such modifications are carried out, a simple remedy
+is to use the UNIX \hi{touch} command to update the document's
+\qt{.htx} directory and record the change before running the linker.
+
+As an alternative, the \hi{hlink} command may be invoked with the
+\hi{-d} flag to specify a \st{deep dependency} test of all document
+files. This causes it to check the modification dates of all the HTML
+files in all the documents in order to detect changes. This is a
+thorough way of detecting changes, but may be rather too slow for
+regular use on large document collections.
+
+You should also remember that re-linking can be rendered necessary not
+only by changes in document contents, but also by changes in document
+location. Thus, if documents or libraries are moved, it is always wise
+to re-run \hi{hlink}.
+
+\subsection{\xlabel{forcing_a_relink}Forcing a Re-Link}
+
+There are several ways to force a re-link of a \docref{document} or
+\libref{library}.
+
+To re-link a particular document, or set of documents, from scratch,
+their \indexref{index files} may simply be removed, using a command
+such as:
+
+\begin{quote}
+\begin{verbatim}
+rm *.htx/htx.index
+\end{verbatim}
+\end{quote}
+
+The \linkerref{linker} will then re-generate these indices and
+consider the affected documents to have changed. They, and all other
+documents that refer to them, will then be re-linked as
+necessary. Alternatively, to re-link {\bf all} documents from scratch
+in this way, the \hi{-a} flag may be given on the \hi{hlink} command
+line.
+
+Removing the \htmlref{\qt{htx.log} date-stamp file}{sect:linkediting}
+from a document library will also force the documents in that library
+to be re-linked but without unnecessarily re-generating any of its
+index files.  This can be somewhat faster if the index files are known
+to be up to date.
+
+\subsection{\xlabel{suppressing_relinking}\label{sect:suppressing}Suppressing Re-Linking}
+
+It is often convenient to use the \linkerref{\hi{hlink}} command as
+part of software-maintenance procedures, such as in makefiles, since
+this allows your documentation set to be re-linked automatically
+whenever software is installed or de-installed. However, in a large
+software installation this can take some time. Rather than re-linking
+after each item of software is changed, it can sometimes be more
+efficient to wait until a sequence of changes has been completed. A
+grand re-link of the entire documentation set can then be performed.
+
+To permit this, you can set the \hi{HTX\_NOLINK} environment variable
+(to any value). While this variable is set, the \hi{hlink} command
+will cease to function normally. Instead. it will simply produce a
+message saying that hypertext linking has been suppressed. You can
+then perform your software updates without waiting for re-linking to
+occur. When you have finished, you can un-set the \hi{HTX\_NOLINK}
+environment variable and use \hi{hlink} to bring the cross-references
+in the associated documentation up to date.
+
+\section{\xlabel{remote_document_servers}\label{sect:remoteservers}REMOTE
+DOCUMENT SERVERS}
+
+This section explains how a remote document server is specified and
+the role it performs.
+
+\subsection{\label{sect:specifyingaserver}\xlabel{HTX_SERVER_remote_server_URL}Specifying a Document Server}
+
+If \HTXref{HTX} detects that a \docref{document} has been referenced
+but cannot find it locally (see \S\ref{sect:remotedocuments}), it will
+generate a reference to a remote document server in place of a link to
+the local document. The \urlref{URL} it generates in this case takes
+the form:
+
+\begin{quote}
+\begin{verbatim}
+$HTX_SERVER/docname.htx/some_file.html?xref_label
+\end{verbatim}
+\end{quote}
+
+That is, it replaces any directory path at the start of the URL with
+the URL of a remote document server, obtained by translating the
+\hi{HTX\_SERVER} environment variable. It also replaces
+\qt{\#xref\_} with \qt{?xref\_}
+so that the server will receive the \labref{label field} of the URL as
+a \st{query string} which it can interpret.
+
+You may set the \hi{HTX\_SERVER} environment variable to identify any
+document server you like (for instance, one that you write
+yourself). However, if you do not specify one explicitly, the default
+is to use the Starlink HTX document server at RAL, whose URL is:
+
+\begin{quote}
+\begin{verbatim}
+http://star-www.rl.ac.uk/cgi-bin/htxserver
+\end{verbatim}
+\end{quote}
+
+Once a document has been linked, the choice of server is fixed, until
+it is linked again.
+
+\subsection{\label{sect:docserversrole}\xlabel{the_document_servers_role}The Document Server's Role}
+
+It is the remote document server's responsibility to interpret the
+\urlref{URL} it receives when the cross-reference is followed and,
+typically, to return the correct URL (or the document itself) to the
+browser.  The server will therefore have to search for the
+\docref{document} in whatever form it takes on the remote machine (it
+may not necessarily be in \HTMLref{HTML} format).  This may involve
+similar steps to those that the \HTXref{HTX} \linkerref{linker} would
+have performed had the document been available locally
+(\st{e.g.}\ looking the reference up in an \indexref{index file}),
+except that they are performed at run-time rather than in advance when
+the document is linked. The server should also issue any necessary
+diagnostics -- about invalid \labref{labels} or documents that cannot
+be found, for example.
+
+\section{\label{sect:accessingdocuments}\xlabel{gaining_access_to_documents}GAINING ACCESS TO DOCUMENTS}
+
+In previous sections we have concentrated on how to write
+\htmlref{hypertext documents}{sect:hypertextdocuments} and organise
+them into an inter-linked documentation set. In this section, we turn
+our attention to accessing those parts of the documentation set that
+we want to read.
+
+\subsection{\label{sect:accessingbyname}\xlabel{displaying_documents_by_name}Displaying Documents by Name}
+
+The simplest form of \htmlref{document}{sect:hypertextdocuments}
+access is provided by the \showmeref{\hi{showme}} command, which
+simply displays the document you name. For instance:
+
+\begin{quote}
+\begin{verbatim}
+showme sun188
+\end{verbatim}
+\end{quote}
+
+would display the \htmlref{\qt{top} page}{sect:entiredocuments} of the
+document called \xref{\qt{sun188}}{sun188}{} (\st{i.e.}\ the one you
+are reading now).  Using this command is normally easier than entering
+a full \urlref{URL} for the document.
+
+The \hi{showme} command displays the document \htmlref{using a WWW
+browser}{sect:usingwwwbrowsers} and will make use of one you already
+have running if possible. You can specify \htmlref{which
+browser}{sect:specifyingabrowser} to use, if required\begin{latexonly}
+(see \S\ref{sect:specifyingabrowser})\end{latexonly}.
+
+If you do not give any directory information, \hi{showme} will search
+for the document using the \hyperref{\hi{HTX\_PATH} search
+path}{\hi{HTX\_PATH} search path (see \S}{)}{sect:searchpath}, but you
+can specify explicitly where the document is if you prefer, as in:
+
+\begin{quote}
+\begin{verbatim}
+showme ~/mydocs/galaxy_survey
+\end{verbatim}
+\end{quote}
+
+If \hi{showme} cannot find the document locally, it will try and fetch
+it from the \htmlref{remote document server}{sect:remoteservers}
+instead\begin{latexonly}
+(see \S\ref{sect:remoteservers})
+\end{latexonly}.
+You can suppress this behavior using the \hi{-l} switch if you prefer:
+
+\begin{quote}
+\begin{verbatim}
+showme -l document
+\end{verbatim}
+\end{quote}
+
+in which case failure to find the document locally will simply result
+in an error. You can also specify that a remote copy of the document
+is required using the \hi{-r} switch, in which case any local copy
+will be ignored and the remote document server will be asked to supply
+the document.
+
+\subsection{\xlabel{displaying_parts_of_documents}Displaying Parts of Documents by Label}
+
+The \showmeref{\hi{showme}} command also allows you to read selected
+parts of \htmlref{documents}{sect:hypertextdocuments}, specified using
+the \htmlref{cross-reference labels}{sect:targetlabels} they
+contain\begin{latexonly}
+(see \S\ref{sect:targetlabels})
+\end{latexonly}.
+To do this, you simply add the label as an extra argument. Thus:
+
+\begin{quote}
+\begin{verbatim}
+showme sun188 hlink
+\end{verbatim}
+\end{quote}
+
+will display the description of the \htmlref{\hi{hlink}}{hlink}
+command in \xref{this document}{sun188}{}.
+
+Using this feature requires that you know the names of the
+cross-reference labels present in the document, or at least requires
+that they be easily guessable. If this is not the case, you may prefer
+to select which parts of documents to view by means of a
+\htmlref{document search}{sect:searchingfordocuments}
+instead\begin{latexonly}
+(see \S\ref{sect:searchingfordocuments})
+\end{latexonly}.
+
+\section{\label{sect:searchingfordocuments}\xlabel{searching_for_information}SEARCHING FOR INFORMATION IN DOCUMENTS}
+
+As well as allowing you to access
+\htmlref{documents}{sect:hypertextdocuments} directly \htmlref{by
+name}{sect:accessingbyname} (which is normally the fastest method if
+you know where to find the information you want),
+\htmlref{HTX}{sect:HTX} also allows you to search for information by
+keyword.
+
+\subsection{\xlabel{performing_keyword_searches}Performing Keyword Searches}
+
+Keyword searching is performed using the \findmeref{\hi{findme}}
+command, which is simply illustrated:
+
+\begin{quote}
+\begin{verbatim}
+findme HTX
+\end{verbatim}
+\end{quote}
+
+This command will search your documentation set for the string
+\qt{HTX} and will then display a list of the documents found using
+your \htmlref{WWW browser}{sect:usingwwwbrowsers}, with each entry in
+the list being a hyper-link to the document in question. It is then a
+simple matter to follow the link to the document you want to read (in
+this example there will probably only be one document to choose from
+-- \xref{this one}{sun188}{}).
+
+The way in which the \hi{findme} command performs its search is
+explained in the \htmlref{next section}{sect:depthofsearch}, but in
+essence it attempts to find information about major topics quickly by
+searching only the main titles of documents. It then goes on to
+consider more detailed (and time consuming) searches only for more
+obscure topics that can't be found readily. The progress of the search
+is displayed on your terminal, so you can interrupt it if you fail to
+find what you want quickly and don't want to wait.
+
+The more level of detail \hi{findme} needs to consider, the more
+detailed will be the list of results it generates, with individual
+\HTMLref{HTML} pages being listed if appropriate. This strategy of
+performing progressively deeper searches can be observed if you ask
+for information on something a little more obscure, like:
+
+\begin{quote}
+\begin{verbatim}
+findme findme
+\end{verbatim}
+\end{quote}
+
+which makes \hi{findme} search for information on itself, or even
+something very obscure, like:
+
+\begin{quote}
+\begin{verbatim}
+findme HTX_PATH
+\end{verbatim}
+\end{quote}
+
+which will (probably) only be found in the body of the text of this
+document.
+
+\subsection{\label{sect:depthofsearch}\xlabel{controlling_the_depth_of_search}Controlling the Depth of Search}
+
+The \findmeref{\hi{findme}} command allows you to find information at
+the level of detail you want by searching any of four categories of
+information associated with \htmlref{hypertext
+documents}{sect:hypertextdocuments}:
+
+\begin{enumerate}
+
+\item \label{sect:searchname}{\bf The document name (-n
+switch)}\mbox{}\\ This is given by the name of the
+\htmlref{directory}{sect:documentdirectories} that contains the
+document\begin{latexonly}
+(see \S\ref{sect:documentdirectories})
+\end{latexonly}.
+For example, the name of the document you are reading now is
+\xref{\qt{sun188}}{sun188}{} because its hypertext version resides in
+a directory called \qt{sun188.htx}. The name of a document may
+indicate what category of information it contains and is very quick
+and easy to search.
+
+\item \label{sect:searchtitle}{\bf The document title (-t
+switch)}\mbox{}\\ This is extracted from the \htmlref{\qt{top} HTML
+page}{sect:entiredocuments} of a document\begin{latexonly}
+(see \S\ref{sect:entiredocuments})
+\end{latexonly}
+and consists of the text that appears between the \hi{$<$TITLE$>$} and
+\hi{$<$/TITLE$>$} tags in the HTML header section for that page. The
+title of a document is obviously a good place to search for important
+topics and this can be done quite quickly.
+
+\item \label{sect:searchheading}{\bf The document's page headings (-h
+switch)}\mbox{}\\ These are extracted in the same way as the document
+title (above), but from all the other HTML pages in the document,
+excluding the \qt{top} page. If you have
+\htmlref{converted}{sect:convertingfromlatex} your document from a
+format such as \xref{\LaTeX{}}{sun199}{}\begin{latexonly}
+(see \S\ref{sect:convertingfromlatex} and \xref{SUN/199}{sun199}{})
+\end{latexonly}, then these will be the section headings
+that appear in the printed form of the document. This is normally a
+fruitful place to search for slightly more specialised topics and can
+be done without a serious time penalty because \htmlref{HTX}{sect:HTX}
+caches this information in a document's \htmlref{index
+file}{sect:indexfiles}\begin{latexonly}
+(see \S\ref{sect:indexfiles})
+\end{latexonly}.
+
+\item \label{sect:searchline}{\bf The lines of text in the document (-l switch)}\mbox{}\\
+These consist of the contents of all the HTML files in the document
+(including all their \HTMLref{HTML} tags, \urlref{URLs},
+\st{etc}). This is the ultimate place to search for information, but
+this can take quite a while if the documentation set is large.
+
+\end{enumerate}
+
+If none of the switches shown above is used when \hi{findme} is
+invoked, its default action is to:
+
+\begin{enumerate}
+\item Search the document titles
+\item If that fails to find a match, search the page headings
+\item If that fails to find a match, search the lines of text
+\end{enumerate}
+
+However, if one or more of the \hi{-n}, \hi{-t}, \hi{-h} or \hi{-l}
+switches is used, then \st{only} the specified categories of
+information will be searched, and this will be done in a single pass
+through all the documents. For instance:
+
+\begin{quote}
+\begin{verbatim}
+findme -n sun
+\end{verbatim}
+\end{quote}
+
+will cause only the document names to be searched (for the string
+\qt{sun}), while:
+
+\begin{quote}
+\begin{verbatim}
+findme -t sun
+\end{verbatim}
+\end{quote}
+
+would search only the document titles, and:
+
+\begin{quote}
+\begin{verbatim}
+findme -t -h sun
+\end{verbatim}
+\end{quote}
+
+would search both the titles and page headings in a single pass.
+
+\subsection{\xlabel{searching_specific_documents}Searching Specific Documents}
+
+By default, the \findmeref{\hi{findme}} command will search your
+entire documentation set, consisting of all the
+\htmlref{documents}{sect:hypertextdocuments} found on the
+\hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+\S}{)}{sect:searchpath}.\footnote{It will also include the names and
+titles of documents found in \htmlref{catalogue
+files}{sect:cataloguefiles}\begin{latexonly} (see
+\S\ref{sect:cataloguefiles})
+\end{latexonly}.}
+
+However, you can restrict the search to specific documents by listing
+them after the keyword you are searching for, thus:
+
+\begin{quote}
+\begin{verbatim}
+findme targets sun188
+\end{verbatim}
+\end{quote}
+
+would find information about \qt{targets} in this document. This is
+often a useful way of finding reference information once you are
+reasonably familiar with a document's contents. Restricting the search
+to a specific document will also make it far more rapid.
+
+You may specify as many documents to search as you want. If you do not
+give explicit directory information, the \hi{HTX\_PATH} search path
+will be used to locate them.
+
+\subsection{\xlabel{other_search_options_available}Other Search Options Available}
+
+The \findmeref{\hi{findme}} command has a number of options that allow
+you to fine-tune the \htmlref{search}{sect:searchingfordocuments} that
+it performs. These include:
+
+\begin{itemize}
+\item Performing case-sensitive searches (by default, keyword matching
+is case insensitive)
+
+\item Searching for whole words (by default the keyword you give will
+match any string, even if it is only part of a word)
+
+\item Matching patterns in text by including regular expressions in
+the keyword string
+
+\item Abbreviating the output list by suppressing information about
+individual \HTMLref{HTML} pages and only displaying
+\htmlref{document}{sect:hypertextdocuments} names and titles
+
+\item Sorting the output list into order according to the significance
+or number of matches found in each document.
+
+\item Including information about the number of matches found.
+\end{itemize}
+
+See the \findmeref{\hi{findme} command description}
+\begin{latexonly}
+in \S\ref{sect:commanddescriptions}
+\end{latexonly}
+for full details.
+
+\section{\xlabel{using_HTX_from_other_software}USING HTX FACILITIES FROM OTHER SOFTWARE}
+
+\subsection{\label{sect:hypertexthelp}\xlabel{providing_hypertext_help}Providing Hypertext Help}
+
+An important application of the \showmeref{\hi{showme}} command is to
+provide hypertext help for other software packages.
+
+In this situation, the help information would be contained in one or
+more \htmlref{hypertext documents}{sect:hypertextdocuments} and the
+controlling software would invoke the \hi{showme} command to
+\htmlref{display the required part}{sect:accessingdocuments} of it on
+demand, the information being selected by giving an appropriate
+\htmlref{cross-reference label}{sect:targetlabels}\begin{latexonly}
+(see \S\ref{sect:targetlabels})
+\end{latexonly}. The person
+reading the displayed information can then explore any hyper-links
+within it to gain further information. These could point at other
+documents you have \htmlref{linked}{sect:howtolink} the help
+documents against or, indeed, anything else on the \wwwref{WWW}.
+
+When designing a graphical user interface, help information can easily
+be made \qt{context sensitive} by setting the cross-reference label
+according to the task being performed (\st{e.g.}\ which window is
+active) and invoking \hi{showme} when a \qt{help} button is
+pressed. In fact, with a dedicated \htmlref{WWW
+browser}{sect:usingwwwbrowsers}, one might even consider displaying
+the information automatically as the task in hand changed, without
+waiting to be asked.
+
+By going via this \htmlref{HTX}{sect:HTX} interface, the controlling
+software is insulated from changes in the way the help documentation
+is organised and \htmlref{indexed}{sect:indexfiles}. It also need not
+concern itself with how to
+\htmlref{communicate}{sect:browsercommunication} with the WWW
+browser. \label{text:gettingdocumenturls}In some cases, however, you
+may want your software to handle the display of help information
+yourself. You can do this by using the \hi{-n} switch on the
+\hi{showme} command, thus:
+
+\begin{quote}
+\begin{verbatim}
+showme -n help_document subject_label
+\end{verbatim}
+\end{quote}
+
+This prevents \hi{showme} from displaying the document. Instead, it
+simply writes the \urlref{URL} for the part of the document you
+requested to its standard output. Your software can then read this and
+handle it in whatever way you choose.
+
+\subsection{\xlabel{using_HTX_to_control_a_WWW_browser}Using HTX to Control a WWW Browser}
+
+If you have used the \showmeref{\hi{showme}} command to obtain a
+\urlref{URL} for a \htmlref{document}{sect:hypertextdocuments} (see
+\htmlref{above}{text:gettingdocumenturls}), one possible way of using
+this might be to save it and pass it back to \hi{showme} later on,
+using the \hi{-u} option for displaying a document by URL:
+
+\begin{quote}
+\begin{verbatim}
+showme -u url
+\end{verbatim}
+\end{quote}
+
+Of course, the URL you give need not have come from \hi{showme} in the
+first place -- any URL that your \htmlref{WWW
+browser}{sect:usingwwwbrowsers} can handle would be acceptable.
+
+You can also supply the name of a local file using the \hi{-f} switch,
+thus:
+
+\begin{quote}
+\begin{verbatim}
+showme -f filename
+\end{verbatim}
+\end{quote}
+
+Because you can give relative file names to \hi{showme}, this is often
+an easier way of viewing a file interactively than typing its full
+path into the browser.
+
+These examples illustrate how \hi{showme} provides a convenient and
+uniform interface for ``remotely controlling'' a WWW browser,
+permitting you to display any WWW document for which you have a URL or
+file name.
+
+\subsection{\xlabel{performing_document_searches_from_other_software}Performing Document Searches from Other Software}
+
+You can use the \findmeref{\hi{findme}} command from within other
+software to implement \htmlref{document
+searches}{sect:searchingfordocuments} with a user interface of your
+own design. This is done by using the \hi{-html} switch, as follows:
+
+\begin{quote}
+\begin{verbatim}
+findme -html -q keyword
+\end{verbatim}
+\end{quote}
+
+This switch prevents \hi{findme} from displaying its list of results
+via a \htmlref{WWW browser}{sect:usingwwwbrowsers}, and it instead
+writes them to its standard output in \HTMLref{HTML}
+format.\footnote{In this case the \hi{-q} switch has also been used to
+suppress messages about the progress of the search.} In this mode, a
+\qt{naked} output list is produced that lacks the surrounding HTML
+document and this allows it to be embedded in any other HTML context
+where it may be needed.
+
+An example of this might be a \formsref{WWW forms} interface for
+performing local document searches. Typically, a {\em Common Gateway
+Interface} (\cgiref{CGI}) script would be written to be invoked by
+your \wwwref{WWW} server and perform the search, generating a page of
+HTML as its output. Such a script could invoke the \hi{findme} command
+in the form above to implement the search and then embed its output in
+the page it generates.
+
+Alternatively, a script invoked from the command line or a graphical
+user interface might build an HTML document, including search output
+from \hi{findme}, in a local file. It could then use the
+\showmeref{\hi{showme}} command with its \hi{-f} flag to display the
+result.
+
+You can test for the success of a search by examining the return
+status from \hi{findme} which is set to the number of documents that
+were matched.
+
+\section{\label{sect:cataloguefiles}\xlabel{catalogue_files}CATALOGUE FILES}
+
+Catalogue files provide a way of introducing documents into the
+\htmlref{searches}{sect:searchingfordocuments} performed by the
+\findmeref{\hi{findme}} command which it would not otherwise be able
+to search. This is of particular benefit if some documents are not
+stored locally, or are not in \htmlref{hypertext
+format}{sect:hypertextdocuments}.
+
+\subsection{\label{sect:cataloguefileformat}\xlabel{catalogue_file_name_and_format}Catalogue File Name and Format}
+
+An \htmlref{HTX}{sect:HTX} catalogue file is a text file with the name
+\qt{htx.catalogue} which resides in a \htmlref{document
+library}{sect:documentlibraries}. Each line of the file should contain
+an entry consisting of three fields separated by white space, in the
+form:
+
+\begin{quote}
+\begin{verbatim}
+docname docfile title_text
+\end{verbatim}
+\end{quote}
+
+where:
+
+\begin{itemize}
+\item {\bf docname} is the name by which the document is to be known
+\item {\bf docfile} is the name of the file containing the document, given
+relative to the document library directory
+\item {\bf title\_text} is the document's title, which may contain
+further white space
+\end{itemize}
+
+\subsection{\xlabel{a_catalogue_file_example}A Catalogue File Example}
+
+Suppose, for example, that you are converting an existing
+documentation set into \htmlref{hypertext
+form}{sect:hypertextdocuments}, but still have some documents
+available only in \xref{\st{DVI}}{sun9}{} and \psref{\st{postscript}}
+format (with file extensions \qt{.dvi} and \qt{.ps}). The
+\findmeref{\hi{findme}} command will not be able to search these
+\qt{old} documents because it doesn't know how to extract (for
+example) their titles from the files provided. To help overcome this,
+you would describe these documents in a \htmlref{catalogue
+file}{sect:cataloguefiles}, perhaps along the following lines:
+
+\begin{quote}
+\begin{verbatim}
+review doc1.ps A Review of Documentation Systems
+intro doc2.dvi Introduction to Hypertext
+writing writing.ps How to Communicate Effectively
+...
+\end{verbatim}
+\end{quote}
+
+Note that the document name and file name need not match.  This file
+introduces the listed documents to the \hi{findme} command, tells it
+where to find the corresponding document files and allows it to
+perform \htmlref{searching}{sect:searchingfordocuments} by document
+\htmlref{name and/or title}{sect:depthofsearch} (but not by page
+heading or lines of textual content, since it cannot know how to
+decode the document format to obtain these).
+
+\subsection{\xlabel{how_catalogue_files_are_searched}How Catalogue Files are Searched}
+
+Documents listed in \htmlref{HTX}{sect:HTX} \htmlref{catalogue
+files}{sect:cataloguefiles} are added into the documentation set {\bf
+after} all hypertext documents have first been found using the
+\hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search path (see
+\S}{)}{sect:searchpath}.  If a document is found in hypertext form, it
+occludes any subsequence occurrence of a document with the same name
+in a catalogue file. This means that if you convert an \qt{old}
+document into hypertext form (with a \qt{.htx} file extension), the
+new version will automatically be found in preference to the old one
+-- there is no need to remove it from the catalogue file.
+
+Catalogue files are also found by following the \hi{HTX\_PATH} search
+path after it has been used to find hypertext documents, and are
+recognised by the name \qt{htx.catalogue}. If more than one catalogue
+file is found, their contents are simply concatenated in the order in
+which they are found.
+
+Duplicate entries for a document are permitted in catalogue files (and
+can also arise when catalogue files are concatenated). They provide a
+mechanism for a document to have alternative titles. This can
+sometimes improve the usefulness of document searches if the original
+title lacks any useful keywords (you might think of this as combining
+both a title index and a subject index into the same file).  If more
+than one title entry is matched for a particular document, then the
+one that occurs first in the catalogue file(s) is used.
+
+\subsection{\xlabel{providing_a_local_catalogue_of_remote_documents}Providing a Local Catalogue of Remote Documents}
+
+The documents listed in \htmlref{HTX}{sect:HTX} \htmlref{catalogue
+files}{sect:cataloguefiles} need not necessarily exist on the local
+file system. HTX will check to see if they do, and will generate
+hyper-links to them if they appear to be readable. For files that are
+not accessible, however, it will generate a reference to the
+\htmlref{remote document server}{sect:remoteservers}\begin{latexonly}
+(see \S\ref{sect:remoteservers})
+\end{latexonly}. This reference will
+take the \htmlref{standard
+form}{sect:specifyingaserver}\begin{latexonly}
+(\S\ref{sect:specifyingaserver})
+\end{latexonly}
+using the document name -- not the \htmlref{file
+name}{sect:cataloguefileformat} used in the the catalogue file.
+
+Catalogue files can therefore be used as a
+\htmlref{searchable}{sect:searchingfordocuments} catalogue of
+documents that are available remotely. In fact, a \htmlref{document
+library}{sect:documentlibraries} containing only a catalogue file
+could be searched by the \findmeref{\hi{findme}} command and any
+matches would then refer to the remote version of the document, in
+whatever form it happens to be stored.
+
+\newpage
+\appendix
+\section{\xlabel{command_descriptions}\label{sect:commanddescriptions}DESCRIPTIONS OF HTX COMMANDS}
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+% -
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\newfont{\ssttt}{cmtt10 scaled 1095}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+
+\begin{htmlonly}
+
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
+%  sstroutine.
+   \renewcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \renewcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstusage
+   \renewcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  sstinvocation
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  sstarguments
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstreturnedvalue
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstparameters
+   \renewcommand{\sstparameters}[1]{
+      \item[Parameters:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstexamples
+   \renewcommand{\sstexamples}[1]{
+      \item[Examples:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstsubsection
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+
+%  sstnotes
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstdiytopic
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
+
+%  sstimplementationstatus
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+   }
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+
+\sstroutine{
+   findme
+}{
+   Search for documents by keyword and display a list of those found
+}{
+   \sstdescription{
+      This command performs \htmlref{keyword
+      searching}{sect:searchingfordocuments} of locally available (or
+      locally catalogued) \htmlref{documents}{sect:hypertextdocuments}
+      and displays a list of those found using a \htmlref{WWW
+      browser}{sect:usingwwwbrowsers}. This list includes hyper-links
+      to the parts of each document that were matched.
+   }
+   \sstinvocation{
+      findme [switches] [keyword] [doclist]
+   }
+   \sstdiytopic{
+      Parameters
+   }{
+      \sstsubsection{
+         keyword
+      }{
+         The string of characters to be searched for. This is treated as a
+         single string (not as multiple keywords) and should be quoted if it
+         contains special characters or white space. Pattern matching
+         characters, as used in \qt{sed} or \qt{grep} regular expressions, may be
+         included.
+
+         If this parameter is omitted, then all documents searched will be
+         matched. This provides a convenient way of listing all the
+         documents available.
+      }
+      \sstsubsection{
+         doclist
+      }{
+         An optional space-separated list of the documents to be
+         searched. If this is omitted, then the complete set of
+         hypertext documents will be searched, as found on the
+         \hyperref{\hi{HTX\_PATH} search path.}{\hi{HTX\_PATH} search
+         path (see \S}{).}{sect:searchpath} Any further documents
+         described in \htmlref{catalogue
+         files}{sect:cataloguefiles}\begin{latexonly}
+         (\S\ref{sect:cataloguefiles})
+         \end{latexonly}
+         will also be included.
+
+         Any \qt{.htx} extension on document names is ignored.
+      }
+   }
+   \sstdiytopic{
+      Switches
+   }{
+      \sstsubsection{
+         -b
+      }{
+         Requests that a \qt{brief} list be produced of the documents found. This
+         means that only document names and titles will appear and references
+         to individual pages will be omitted. By default, individual pages will
+         be listed if the search has included them and they match the search
+         criteria.
+      }
+      \sstsubsection{
+         -c
+      }{
+         Indicates that case is significant when searching for the keyword. By
+         default, differences in case are ignored.
+      }
+      \sstsubsection{
+         -f
+      }{
+         Indicates that a full search should be performed, involving searching
+         document names, titles, page headings and lines of text. This option
+         is shorthand for the switches \hi{-n}, \hi{-t}, \hi{-h} and \hi{-l} used together.
+      }
+      \sstsubsection{
+         -h
+      }{
+         Indicates that a search for the keyword is to be performed on
+         all the \htmlref{page
+         headings}{sect:searchheading}\begin{latexonly} (see
+         \S\ref{sect:depthofsearch})
+         \end{latexonly} within each document.This provides a convenient
+         compromise between speed of execution and full search
+         coverage, and generally produces an acceptable amount of
+         output. By default, a search on page headings is performed if
+         the keyword cannot be found in any document title. Page
+         headings may only be searched in local hypertext (\qt{.htx})
+         documents.
+      }
+      \sstsubsection{
+         -html
+      }{
+         Indicates that the list of documents found by this command should not
+         be displayed using a WWW browser. Instead, the results are simply
+         written to standard output as a list in \HTMLref{HTML} format (without
+         a surrounding HTML document). This
+         provides an interface for other software that will display
+         the results itself.
+
+         Note that the \urlref{URLs} used for hyper-links in this output list
+         will be suitable only for local use by a WWW browser running on the
+         same machine as the \hi{findme} command. They may not be suitable,
+         for instance, for embedding in an HTML document that will be
+         interpreted by a remote WWW browser.
+      }
+      \sstsubsection{
+         -l
+      }{
+         Indicates that a search for the keyword is to be performed on
+         all \htmlref{lines of text}{sect:searchline}
+         \begin{latexonly}
+         (see \S\ref{sect:depthofsearch}) \end{latexonly} within each
+document (note that this will include all HTML tags, URLs,
+\st{etc.}). This provides the fullest possible form of keyword search,
+but may take some time to complete and could generate a large volume
+of output. By default, a search of document lines is only performed if
+the keyword cannot be found in any document title or page
+heading. Line-oriented searching can only be performed on local
+hypertext (\qt{.htx}) documents.
+      }
+      \sstsubsection{
+         -m
+      }{
+         Indicates that the output list is to contain information on which
+         search criteria were matched and how many matches were found. By
+         default, this information is omitted.
+      }
+      \sstsubsection{
+         -n
+      }{
+         Indicates that a search for the keyword is to be performed on
+         the \htmlref{name}{sect:searchname}
+\begin{latexonly} (see \S\ref{sect:depthofsearch}) \end{latexonly} of each document.
+         Searching of document names is not performed by default.
+      }
+      \sstsubsection{
+         -q
+      }{
+         Indicates that the search should progress in \qt{quiet} mode without
+         producing messages about its progress. By default, messages about the
+         progress of the search are written to the controlling terminal.
+      }
+      \sstsubsection{
+         -s
+      }{
+         Indicates that the output list is to be sorted so that the most
+         significant matches appear first and the least significant last.
+         In assessing this, matches to the document name are given the highest
+         significance, then matches to titles, page headings and finally lines
+         of textual content (see \S\ref{sect:depthofsearch}). An alphabetical sort on document title and page
+         heading is used to resolve any remaining ambiguity over output order.
+         By default, a simple alphabetical sort on document title and page
+         heading is used alone.
+      }
+      \sstsubsection{
+         -t
+      }{
+         Indicates that a search for the keyword is to be performed on
+         the \htmlref{title}{sect:searchtitle} \begin{latexonly} (see
+         \S\ref{sect:depthofsearch}) \end{latexonly} of each document.
+         This provides a quick but effective form of search for major
+         topics and gives at most one entry in the output list for
+         each document matched. By default, title matching is
+         performed first, and a search of page headings (and
+         eventually lines of textual content) is performed only if
+         this initial search fails to match any documents (see
+         \S\ref{sect:depthofsearch}). Using \hi{-t} prevents these
+         subsequent searches from happening automatically.
+      }
+      \sstsubsection{
+         -w
+      }{
+         Indicates that the keyword supplied must match an entire word
+         (\st{i.e.}\ a
+         string delimited by characters which are not underscores or
+         alphanumerics, or delimited by the beginning or end of the text, or
+         by a newline). By default, the specified string of characters is
+         matched wherever it occurs, so long as it does not span multiple
+         lines of text.
+      }
+      \sstsubsection{
+         -warn
+      }{
+         Indicates that any warning messages issued by the WWW browser
+         (\st{e.g.}\ when it is started up) are to be suppressed. By default, these
+         warnings are written to standard error along with any other warning
+         or error messages.
+      }
+   }
+   \sstdiytopic{
+      Exit Status
+   }{
+      The exit status from this command is set equal to the number of
+      documents matched by the search. Thus a non-zero exit status
+      indicates success, while a zero status indicates failure to find
+      any document. Note that this is the reverse of the convention
+      normally adopted by UNIX commands.
+   }
+   \sstdiytopic{
+      Notes On Searching
+   }{
+      \sstitemlist{
+
+         \sstitem
+         If none of the switches \hi{-n}, \hi{-t}, \hi{-h} or \hi{-l} is used, the keyword
+         given will first be searched for in the title of each document. If this
+         fails to produce a match, it will next be searched for in the page
+         headings of each document. If this also fails to produce a match, a final
+         search of the lines of text within each document will be made.
+
+         \sstitem
+         If one or more of the switches \hi{-n}, \hi{-t}, \hi{-h} or \hi{-l} is used, the
+         automatic sequence of searches described above will not occur. Instead,
+         only those document components specified by these switches (name, title,
+         page header and lines of text, respectively) will be searched. This will
+         be done in a single pass through all documents.
+
+         \sstitem
+         To obtain the fullest possible (but slowest) search, use the \hi{-f}
+         option. This is equivalent to using all of the switches
+         \hi{-n}, \hi{-t}, \hi{-h} and \hi{-l} together.
+      }
+   }
+   \sstdiytopic{
+      Notes on Specifying Documents
+   }{
+      \sstitemlist{
+
+         \sstitem
+         If no documents are specified, then all directories on the
+         \hi{HTX\_PATH} search path will be inspected for hypertext
+         (\qt{.htx}) documents and all those found will be searched.
+         In addition, if any directory on the search path contains a
+         catalogue file, the documents it describes will also be
+         included in any search of document names or titles (but not
+         of page headings or lines of text).
+
+         \sstitem
+         If one or more document names are supplied, then the search will be
+         restricted to the specified documents only.
+         If these document names are supplied without directory information, then
+         they will be located by following the \hi{HTX\_PATH} search path
+         and then by reading the contents of any catalogue files, if necessary.
+         If document names are supplied with explicit directory information,
+         then they must refer to local hypertext documents and no
+         search will be made to locate them.
+
+         \sstitem
+         If documents with the same name are found both locally in hypertext
+         form and in one or more catalogue files, then the hypertext version takes
+         precedence.
+         If a document with the same name appears more than once in the list
+         given for the \hi{doclist} parameter, then the first occurrence takes
+         precedence, except that the first occurrence of a name with explicit
+         directory information always takes precedence over the same document
+         specified without directory information.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         findme
+      }{
+         Finds all available documents.
+      }
+      \sstexamplesubsection{
+         findme guide
+      }{
+         Finds all documents with the string \qt{guide} in them. This is done
+         by first searching their titles, then (if that fails) by searching
+         all their page headings, then (if that also fails) by searching all
+         of their lines of text.
+      }
+      \sstexamplesubsection{
+         findme -t guide
+      }{
+         Finds all documents with the string \qt{guide} in their
+         title. Only titles are searched.
+      }
+      \sstexamplesubsection{
+         findme -n sun
+      }{
+         Finds all documents whose names contain the string \qt{sun}.
+      }
+      \sstexamplesubsection{
+         findme -w star
+      }{
+         Finds documents that contain \qt{star} as a word on its own.
+      }
+      \sstexamplesubsection{
+         findme -c GnS
+      }{
+         Finds documents that contain the string \qt{GnS} with the correct
+         capitalisation.
+      }
+      \sstexamplesubsection{
+         findme -l -b unix
+      }{
+         Searches all lines of text in all documents for the string \qt{unix} and
+         displays a brief listing of the results, so that only the relevant
+         document names and titles are shown.
+      }
+      \sstexamplesubsection{
+         findme -h DAT\_ sun92
+      }{
+         Finds a document called \qt{sun92} and searches its page headings (only)
+         for the string \qt{DAT\_}. Each page which matches is listed.
+      }
+      \sstexamplesubsection{
+         findme -t -h '?\$' docs/$*$.htx
+      }{
+         Searches the titles and page headings of all hypertext documents
+         stored in directory \hi{docs} and lists those which end in a question
+         mark (\qt{?\$} is a regular expression specifying that there should be a
+         question mark at the end of a line).
+      }
+      \sstexamplesubsection{
+         findme -h -html -q "\$keyword" pkg\_manual >>/tmp/results\$\$
+      }{
+         This command might be used to provide a command lookup facility for a
+         software package. It searches all the page headings in
+         the document called \qt{pkg\_manual} for the command stored
+         in the \hi{keyword} variable
+         and appends the resulting list (in HTML format) to a scratch file in
+         which an HTML page of results is being constructed. Messages about
+         the progress of the search are suppressed with the \hi{-q} switch.
+      }
+   }
+   \sstdiytopic{
+      Environment Variables Used
+   }{
+      \sstsubsection{
+         \htmlref{\hi{HTX\_BROWSER}}{sect:specifyingabrowser}
+      }{
+         The command which will be used to invoke the \htmlref{WWW
+         browser}{sect:usingwwwbrowsers}\begin{latexonly} (see
+         \S\ref{sect:specifyingabrowser})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_PATH}}{sect:searchpath}
+      }{
+         A colon-separated list of the library directories in which to
+         search for hypertext documents\begin{latexonly} (see
+         \S\ref{sect:searchpath})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_SERVER}}{sect:specifyingaserver}
+      }{
+         The URL of the document server to be used for serving remote
+         documents\begin{latexonly} (see
+         \S\ref{sect:specifyingaserver})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_TMP}}{sect:intermachinecommunication}
+      }{
+         The name of the directory in which to create temporary communication
+         files. If this variable is not set or is null, then
+         \hi{\$HOME/.htxtmp} is used instead\begin{latexonly} (see
+         \S\ref{sect:intermachinecommunication})\end{latexonly}.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   hlink
+}{
+   Perform cross-linking of hypertext documents
+}{
+   \sstdescription{
+      This command searches for \htmlref{hypertext
+      documents}{sect:hypertextdocuments} in a specified list of
+      \htmlref{library directories}{sect:documentlibraries} and
+      link-edits their \qt{.html} files to insert the correct
+      \urlref{URLs} so that
+      \htmlref{cross-reference}{sect:crossreferences} links between
+      the documents point at the appropriate files.
+   }
+   \sstinvocation{
+      hlink [switches] [dirlist]
+   }
+   \sstdiytopic{
+      Parameters
+   }{
+      \sstsubsection{
+         dirlist
+      }{
+         A space-separated list of directories in which to search for
+         the hypertext documents to be linked (as identified by their
+         \qt{.htx} file extension). If this list is not given, the
+         default directory \qt{.} is used.
+      }
+   }
+   \sstdiytopic{
+      Switches
+   }{
+      \sstsubsection{
+         -a
+      }{
+         Specifies that all documents in the specified directories should be
+         re-linked \qt{from source}. This means that all documents will be
+         re-examined for cross-references, regardless of whether they appear to
+         have changed since they were last linked, and all the
+         resulting cross-references will be resolved.
+      }
+      \sstsubsection{
+         -d
+      }{
+         Specifies that a \qt{deep} dependency test should be performed to see
+         which documents have changed, and therefore need re-linking. This
+         involves examining the modification dates of all the \qt{.html} files in
+         each document. A deep dependency test is more likely to identify
+         changed documents than the default method (which simply examines the
+         modification date of the \dirref{document directory} file) but it may take
+         considerably longer.
+      }
+      \sstsubsection{
+         -r
+      }{
+         Specifies that documents that make references only to other \remref{\qt{remote}}
+         documents should be re-linked. This option is present for historical
+         reasons and it should not normally be necessary to use it. It may
+         eventually be removed.
+      }
+      \sstsubsection{
+         -v
+      }{
+         Specifies \qt{verbose mode}, which results in additional
+         information about the linking process being written to
+         standard output.
+      }
+   }
+   \sstnotes{
+      Documents which are found on the
+      \htmlref{\hi{HTX\_PATH} search path}{sect:searchpath} will be
+      linked against (\st{i.e.}\ references to them will be resolved),
+      but they will not themselves be modified unless they are also
+      found in the directory list specified on the command line.
+   }
+\newpage
+   \sstexamples{
+      \sstexamplesubsection{
+         hlink
+      }{
+         Re-links all documents in the current directory against
+         themselves and all other documents found on the
+         \hi{HTX\_PATH} search path. New \htmlref{index
+         files}{sect:indexfiles} are first generated for any documents
+         that have changed.
+      }
+      \sstexamplesubsection{
+         hlink . mydocs
+      }{
+         Re-links all documents found in both the current directory
+         and the \qt{mydocs} directory against themselves and all
+         other documents found on the \hi{HTX\_PATH} search path. Only
+         those documents residing in the \qt{.} and \qt{mydocs}
+         directories will be modified by this command.
+      }
+      \sstexamplesubsection{
+         hlink -d
+      }{
+         Re-links all documents in the current directory after first checking
+         the modification dates of {\bf all} the \qt{.html} files they contain
+         to determine which documents have changed since the last re-link.
+      }
+      \sstexamplesubsection{
+         hlink -a dir1 dir2 dir3
+      }{
+         Generates new index files and re-links all documents in the specified
+         directories regardless of whether they have changed since the last
+         re-link.
+      }
+   }
+   \sstdiytopic{
+      Environment Variables Used
+   }{
+      \sstsubsection{
+         \htmlref{\hi{HTX\_NOLINK}}{sect:suppressing}
+      }{
+         Setting this environment variable (to any value) will suppress
+         re-linking. A message to this effect will be produced
+         instead\begin{latexonly} (see
+         \S\ref{sect:suppressing})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_PATH}}{sect:searchpath}
+      }{
+         A colon-separated list of the library directories in which to
+         search for hypertext documents\begin{latexonly} (see
+         \S\ref{sect:searchpath})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_SERVER}}{sect:specifyingaserver}
+      }{
+         The URL of the document server to be used for serving remote
+         documents\begin{latexonly} (see
+         \S\ref{sect:specifyingaserver})\end{latexonly}.
+      }
+   }
+}
+\newpage
+\sstroutine{
+   showme
+}{
+   Display a specified part of a document using a WWW browser
+}{
+   \sstdescription{
+      This command takes the name of a
+      \htmlref{document}{sect:hypertextdocuments} and (optionally) the
+      name of a \htmlref{cross-reference label}{sect:targetlabels}
+      within it, and displays the requested part of the document using
+      a \htmlref{WWW browser}{sect:usingwwwbrowsers}. It may also be
+      used to display local files or any other \wwwref{WWW} page for
+      which a \urlref{URL} is available.
+
+   }
+   \sstinvocation{
+      showme [switches] doc [label]
+   }
+   \sstdiytopic{
+      Parameters
+   }{
+      \sstsubsection{
+         doc
+      }{
+         The name of the document. If no directory information is supplied,
+         the document will be located using the
+         \hyperref{\hi{HTX\_PATH} search path}{\hi{HTX\_PATH} search
+         path (see \S}{)}{sect:searchpath}. If directory information is
+         given, no search will be performed. In either case, a
+         \qt{.htx} extension to the document name is optional.
+
+         If the \hi{-f} option is used, this parameter is interpreted
+         as the name of a local file which is to be displayed. If the
+         \hi{-u} option is used, it is interpreted as a general URL.
+      }
+      \sstsubsection{
+         label
+      }{
+         An optional cross-reference label. If given, this specifies
+         which part of the document is required. If omitted, it is
+         assumed that the entire document is required and the
+         appropriate \htmlref{\qt{top} page}{sect:entiredocuments} is
+         displayed\begin{latexonly} (see
+         \S\ref{sect:entiredocuments})\end{latexonly}.
+
+         This parameter is ignored if the \hi{-f} or \hi{-u} options are used.
+      }
+   }
+   \sstdiytopic{
+      Switches
+   }{
+      \sstsubsection{
+         -f
+      }{
+         Specifies that the document name supplied is the name of a
+         local file (\st{e.g.}\ in \HTMLref{HTML} format) which is to
+         be displayed. If this option is used, the \hi{label}
+         parameter and the \hi{-l} and \hi{-r} switches are ignored.
+      }
+      \sstsubsection{
+         -l
+      }{
+         Specifies that a local document should be displayed and that it
+         should not be fetched from a remote document server. In this
+         case, if the document cannot be found locally an error will result.
+      }
+      \sstsubsection{
+         -n
+      }{
+         Specifies that the document is not to be displayed. In this case, no
+         WWW browser will be used and the URL that would otherwise have been
+         passed to it is simply written to standard output. This provides an
+         interface for use by other software that will handle
+         document display itself.
+
+         Note that the URL generated is suitable only
+         for local use by a WWW browser running on the same machine as the
+         \hi{showme} command. It may not be suitable, for instance,
+         for embedding in an HTML document that will be interpreted by a remote
+         WWW browser. 
+      }
+      \sstsubsection{
+         -r
+      }{
+         Specifies that a \htmlref{remote
+         document}{sect:remotedocuments} is required. In this case, a
+         reference to a remote document server will be generated and
+         passed to the WWW browser, even if a local copy of the
+         document exists.
+      }
+      \sstsubsection{
+         -u
+      }{
+         Specifies that the document name supplied is a URL which is to be
+         passed directly to the WWW browser for interpretation. Any form of URL
+         which the browser can handle may be given. If this option is used, the
+         \hi{label} parameter and the \hi{-l} and \hi{-r} switches are ignored.
+      }
+      \sstsubsection{
+         -warn
+      }{
+         Indicates that any warning messages issued by the WWW browser
+         (\st{e.g.}\ when it is started up) are to be suppressed. By default, these
+         warnings are written to standard error along with any other warning
+         or error messages.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+         \sstitem
+         If the document is found locally, the local copy will be displayed.
+         If it is not found locally (subject to any command switches) a reference
+         to a remote document server will be passed to the WWW browser instead.
+         \sstitem
+         If a cross-reference label is specified for a local document but it
+         cannot be found in that document, then an error will result.
+         There is no checking of the existence of remote documents, nor of
+         the cross-reference labels they contain. This checking must be performed
+         by the remote document server.
+         \sstitem
+         The \hi{-l} and \hi{-r} switches are mutually exclusive. If both are given,
+         the latter one predominates.
+         Similarly, the \hi{-f} and \hi{-u} switches are mutually exclusive. If both
+         are given, the latter one predominates.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         showme sun188
+      }{
+         Displays the document called
+         \xref{\qt{sun188}}{sun188}{}. The local copy is used, if
+         available, otherwise it is fetched from the remote document
+         server.
+      }
+      \sstexamplesubsection{
+         showme sun188 showme
+      }{
+         Displays the part of document \qt{sun188} identified by the
+         cross-reference label \qt{showme} (\st{i.e.}\ the section you are
+         reading now). As before, the local copy of the document is used, if
+         possible.
+      }
+      \sstexamplesubsection{
+         showme -l quantum-theory
+      }{
+         Searches for a local copy of the document \qt{quantum-theory} and
+         displays it. If the document cannot be found locally, an error
+         results.
+      }
+      \sstexamplesubsection{
+         showme -r quantum-theory speculation
+      }{
+         Displays the section identified by the \qt{speculation}
+         cross-reference label in a remote copy of the document called
+         \qt{quantum-theory}. Any local copy is ignored.
+      }
+      \sstexamplesubsection{
+         showme mydocs/help available\_commands
+      }{
+         Displays the section identified by the
+         \qt{available\_commands} label in a local document stored in
+         the directory \hi{mydocs/help.htx}.  Because explicit
+         directory information is given, the document is not searched
+         for using the \hi{HTX\_PATH} search path. If the document
+         doesn't exist, a copy will be fetched from the remote
+         document server.
+      }
+      \sstexamplesubsection{
+         showme -n -l mydocs/help available\_commands
+      }{
+         Performs the same function as the previous example, except
+         that the document is not actually displayed. Instead, its URL
+         is simply written to standard output. The \hi{-l} switch
+         specifies that a local document is required, so an error will
+         result if it cannot be found.
+      }
+   }
+   \sstdiytopic{
+      Environment Variables Used
+   }{
+      \sstsubsection{
+         \htmlref{\hi{HTX\_BROWSER}}{sect:specifyingabrowser}
+      }{
+         The command which will be used to invoke the \htmlref{WWW
+         browser}{sect:usingwwwbrowsers}\begin{latexonly} (see
+         \S\ref{sect:specifyingabrowser})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_PATH}}{sect:searchpath}
+      }{
+         A colon-separated list of the library directories in which to
+         search for hypertext documents\begin{latexonly} (see
+         \S\ref{sect:searchpath})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_SERVER}}{sect:specifyingaserver}
+      }{
+         The URL of the document server to be used for serving remote
+         documents\begin{latexonly} (see
+         \S\ref{sect:specifyingaserver})\end{latexonly}.
+      }
+      \sstsubsection{
+         \htmlref{\hi{HTX\_TMP}}{sect:intermachinecommunication}
+      }{
+         The name of the directory in which to create temporary communication
+         files. If this variable is not set or is null, then
+         \hi{\$HOME/.htxtmp} is used instead\begin{latexonly} (see
+         \S\ref{sect:intermachinecommunication})\end{latexonly}.
+      }
+   }
+}
+\newpage
+\section{\label{sect:usingwwwbrowsers}\xlabel{using_WWW_browsers}USING WWW BROWSERS WITH HTX}
+
+\subsection{\xlabel{specifying_a_WWW_browser}\xlabel{HTX_BROWSER_browser_command}\label{sect:specifyingabrowser}Specifying a WWW Browser}
+
+\htmlref{HTX}{sect:HTX} commands that need to display
+\htmlref{documents}{sect:hypertextdocuments} do so using a WWW browser
+and will try to make use of one that you already have running, if
+possible. Otherwise a new one will be started. By default, the
+\netscaperef{\st{Netscape}} browser will be used and will be invoked
+using the command:
+
+\begin{quote}
+\begin{verbatim}
+netscape
+\end{verbatim}
+\end{quote}
+
+You can change this command, or cause HTX to invoke the
+\mosaicref{\st{Mosaic}} browser instead if you prefer, by means of the
+HTX\_BROWSER environment variable. Thus, if you normally use the
+command \qt{Mosaic} to invoke your browser, you could put the
+following into your \hi{.login} file:
+
+\begin{quote}
+\begin{verbatim}
+setenv HTX_BROWSER Mosaic
+\end{verbatim}
+\end{quote}
+
+Note that this command should not be an alias (\st{e.g.}\ if you
+normally use the C~shell).
+
+Currently, HTX can work only with \st{Mosaic} and \st{Netscape} -- and
+it has to know which one you are using. To determine this, it searches
+for either of the strings \qt{mosaic} or \qt{netscape} in the value
+you give for the HTX\_BROWSER environment variable.\footnote{This
+search is case insensitive.} You should therefore ensure that the
+comand you use contains one of these strings.
+
+\subsection{\xlabel{defining_your_X_display}Defining Your X~Display}
+
+In order to run a \htmlref{WWW browser}{sect:usingwwwbrowsers} on an
+X~windows display, the environment variable \hi{DISPLAY} should first
+be defined to identify the display you want to
+use. \htmlref{HTX}{sect:HTX} only supports WWW browsers which use
+\st{X~displays}.
+
+If you are a regular user of an X~display, you will probably already
+have the necessary command in your \hi{.login} file. If not, you may
+want to use the Starlink \hi{xdisplay} command (described in
+\xref{SUN/129}{sun129}{}) to make the appropriate definition.
+
+If HTX detects that the \hi{DISPLAY} variable has not been defined, it
+will attempt to run the \hi{xdisplay} utility itself before starting a
+WWW browser. For this to succeed, \hi{xdisplay} must be installed on
+your system and the directory \hi{/star/bin}\footnote{Or the
+equivalent if your Starlink software is not installed under the
+standard \hi{/star} directory.} must be on your UNIX \hi{PATH}. If the
+\hi{xdisplay} command cannot be found (and the \hi{DISPLAY}
+environment variable is undefined), then an error will result.
+
+Because the \hi{xdisplay} command may take some time to complete, you
+will be warned if this must be repeated by each subsequent HTX
+command (not all WWW browsers require this), as it will slow down your
+access to documents. Defining the \hi{DISPLAY} environment variable
+yourself will eliminate this delay.
+
+\subsection{\label{sect:browsercommunication}\xlabel{WWW_browser_communication}WWW Browser Communication}
+
+\htmlref{HTX}{sect:HTX} communicates with your \htmlref{WWW
+browser}{sect:usingwwwbrowsers} using a \st{remote control} mechanism
+which is different for each browser. At the time of writing, the
+method used by \mosaicref{\st{Mosaic}} is somewhat faster and more
+flexible, but the technology is still evolving and both \st{Mosaic}
+and \netscaperef{\st{Netscape}} have some limitations in this area.
+
+In general, if you use only one machine at a time and never start up
+more than one copy of your browser, you are unlikely to have
+problems. However, if you use multiple machines or multiple browsers,
+the following describes some of the browser-specific behaviour you may
+need to be aware of.
+
+\subsubsection{Mosaic Behaviour}
+
+\htmlref{HTX}{sect:HTX} determines whether you have an invocation of
+\mosaicref{\st{Mosaic}} running by looking for the \hi{.mosaicpid}
+file which it creates in your login directory and then checking that
+the browser process it describes still exists. This means that if you
+have more than one invocation of \st{Mosaic} running on the same
+machine, HTX will normally talk to the one you started most
+recently. If you run \st{Mosaic} on two machines that share the same
+\hi{.mosaicpid} file, the results can be unpredictable.
+
+If you open new windows from within \st{Mosaic}, HTX output will generally
+go to the most recently used one. This can sometimes make it difficult
+to use more than one window to view different documents, as HTX output
+tends to over-write whichever was used last. The best way of avoiding
+this problem is to start two separate copies of the browser.
+
+\subsubsection{Netscape Behaviour}
+
+\htmlref{HTX}{sect:HTX} communicates with \netscaperef{\st{Netscape}}
+by means of \st{X~resources}, in essence looking for a window on your
+X~display which was created by \st{Netscape}. If there is more than
+one of these, the first one will generally be used. If it cannot find
+such a window, HTX will start a new invocation of \st{Netscape} to
+create one.
+
+One problem with this arrangement is that HTX may detect an invocation
+of \st{Netscape} running on a different machine but displaying on the
+same X~display. In this case, attempts to communicate with it will
+succeed, but the browser may not necessarily be able to access the
+local files that HTX asks it to view (but
+see~\S\ref{sect:intermachinecommunication}). The best way around this
+problem is to ensure that the browser to be used by HTX is started
+first.
+
+\subsection{\label{sect:intermachinecommunication}\xlabel{inter_machine_browser_communication}Inter-Machine Browser Communication}
+
+Often, your file system will be shared by more than one machine so
+that communication between different machines is possible via
+files. Such an arrangement provides an opportunity for
+\htmlref{HTX}{sect:HTX} to pass information to WWW browsers which are
+already running on other machines. With the
+\netscaperef{\st{Netscape}} browser, this can make working on multiple
+machines considerably easier by reducing the number of browser
+invocations you require. For it to work successfully, however, the
+files you are accessing must be known by identical names on all the
+machines involved.
+
+If your file system is suitably set up, then HTX will normally be able
+to take advantage of this without any further action on your part. To
+achieve this, the temporary files which HTX creates to communicate
+with the browser will be placed in the directory
+\hi{\$HOME/.htxtmp}\footnote{This directory is created automatically
+when needed.}. Therefore, if you use the same login directory (and
+\hi{\$HOME} translates to the same name) on each machine, these
+temporary files will be accessible to the browser wherever it is
+running.
+
+If your login directory is not the same on each machine, then you can
+set the environment variable \hi{HTX\_TMP} to give the name of a
+suitable alternative directory to hold these temporary communication
+files. The directory you use should be accessible (for both reading
+and writing) and be known by identical names on all the machines which
+will use it.
+
+\newpage
+\section{\xlabel{changes_and_new_features}CHANGES AND NEW FEATURES}
+
+\subsection{Changes and New Features in V1.1}
+
+The following describes the most significant changes which occurred in
+\htmlref{HTX}{sect:HTX} between versions V1.0 and V1.1.
+
+\begin{enumerate}
+\item Two new commands have been added\begin{latexonly} (see
+\S\ref{sect:commanddescriptions} for a full
+description)\end{latexonly}:
+
+\begin{description}
+
+\item[\findmeref{\hi{findme}}]\mbox{}\\
+Performs \htmlref{keyword searching}{sect:searchingfordocuments} of
+local documents with hypertext display of the results using a
+\htmlref{WWW browser}{sect:usingwwwbrowsers}. This forms the main
+command-line user interface to an HTX hypertext documentation set. A
+variety of search options are available.
+
+\item[\showmeref{\hi{showme}}]\mbox{}\\ Allows viewing of specified
+parts of documents, as identified by a document name and (optional)
+\htmlref{cross-reference label}{sect:targetlabels}. The selected
+document is displayed using a WWW browser. This provides a useful
+command-line user interface for documents whose name or structure is
+known. It also provides a programming interface, for instance for
+implementing on-line \htmlref{hypertext help}{sect:hypertexthelp}
+systems in other software.
+
+\end{description}
+
+\item \htmlref{Index files}{sect:indexfiles} \begin{latexonly} (see
+\S\ref{sect:indexfiles}) \end{latexonly} created by the
+\htmlref{\hi{hlink}}{hlink} command are no longer stored in the
+\htmlref{document library}{sect:documentlibraries} using the file name
+\qt{document.index}. Instead, they are now stored \st{inside} the
+document in a file named:
+
+\begin{quote}
+\begin{verbatim}
+document.htx/htx.index
+\end{verbatim}
+\end{quote}
+
+This means that if a document is removed from a library, its index
+file is automatically removed as well. This avoids the need for other
+library maintenance software to know about HTX index files.
+
+The old \qt{docname.index} files are no longer used and may be
+removed. New index files will then be generated when \hi{hlink} is
+next run.
+
+\item The format of index files has been changed and additional
+information is now stored in them. This means that index file
+generation is a little slower, but the additional information allows
+subsequent document searches (\st{e.g.}\ using the \hi{findme}
+command) to run more rapidly.
+
+\item Additional information is now stored in the
+\htmlref{\qt{htx.log}}{sect:linkediting} file which acts as a
+date-stamp in each document library and records when it was last
+re-linked using \hi{hlink}\begin{latexonly} (see
+\S\ref{sect:linkediting})\end{latexonly}. This information allows
+\hi{hlink} to detect if documents have been added or removed from the
+documentation set, or moved to a different location, and will trigger
+a re-link of any documents that refer to them. This change removes the
+need to use the \hi{-r} option with \hi{hlink}.
+
+\item The default for the \htmlref{\hi{HTX\_PATH} search
+path}{sect:searchpath} used for locating documents is now evaluated
+from the \hi{INSTALL} and \hi{STARLINK} environment variables when the
+HTX software is installed, rather than at run time\begin{latexonly}
+(see \S\ref{sect:searchpath})\end{latexonly}.
+
+This means that by default HTX can now locate both its own and other
+Starlink documentation even if it is not installed in the standard
+place (\st{i.e.} under the \hi{/star} directory).
+
+\item The concept of \htmlref{\st{catalogue
+files}}{sect:cataloguefiles} \begin{latexonly} (see
+\S\ref{sect:cataloguefiles}) \end{latexonly} has been introduced to
+allow searches to be performed on the names and titles of documents
+that are not installed locally in hypertext format.
+
+\item Various improvements to efficiency have been implemented.
+
+\item This document (\xref{SUN/188}{sun188}{}) has been revised and updated.
+
+\end{enumerate}
+
+\subsection{\xlabel{list_of_most_recent_changes}Changes and New
+Features in V1.2}
+
+The following describes the most significant changes which have
+occurred in \htmlref{HTX}{sect:HTX} between versions V1.1 and V1.2
+(the current version).
+
+\begin{enumerate}
+\item The default WWW browser used by the \findmeref{\hi{findme}} and
+\showmeref{\hi{showme}} commands is now \netscaperef{\st{Netscape}},
+rather than \mosaicref{\st{Mosaic}}. See
+\S\ref{sect:specifyingabrowser} if you wish to continue using
+\st{Mosaic} as your browser.
+
+\item The \htmlref{\hi{HTX\_NOLINK}}{sect:suppressing} environment
+variable may now be used to suppress hypertext re-linking when it is not
+required\begin{latexonly} (see
+\S\ref{sect:suppressing})\end{latexonly}.
+
+\item HTX now creates a directory (\hi{\$HOME/.htxtmp} by default) to
+hold the temporary files used to communicate with WWW browsers.  This
+enhances the opportunities for communication with browsers running on
+other machines.  The environment variable
+\htmlref{\hi{HTX\_TMP}}{sect:intermachinecommunication} may be used to
+specify an alternative directory for these files if
+necessary\begin{latexonly} (see
+\S\ref{sect:intermachinecommunication})\end{latexonly}.
+
+\item The method used to pass local documents to the
+\netscaperef{\st{Netscape}} WWW browser has changed slightly. This is
+because the original mechanism no longer works correctly with recent
+versions of \st{Netscape}.
+
+\item A problem has been fixed which could prevent the Starlink
+\hi{xdisplay} utility from being used by HTX to set the DISPLAY
+environment variable on PC~Linux systems. This could prevent a WWW
+browser from being started unless DISPLAY was already set.
+
+\item This document (\xref{SUN/188}{sun188}{}) has been revised and updated.
+\end{enumerate}
+
+\end{document}

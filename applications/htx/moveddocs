@@ -1,0 +1,117 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     moveddocs
+
+#  Purpose:
+#     Identify documents that have been added, removed or moved.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script identifies hypertext documents that have been added to a
+#     documentation set, removed from it, or moved to a different location
+#     since the last relink was performed on a specified directory containing
+#     a set of documents. Other documents that refer to these may therefore
+#     require relinking.
+
+#  Invocation:
+#     moveddocs dir
+
+#  Parameters:
+#     dir
+#        The directory containing the set of documents being linked. This
+#        script will search for an HTX logfile (with name "htx.log") in this
+#        directory and use it to determine the set of local documents present
+#        when that directory was last linked.
+
+#  Environment Variables Used:
+#     HTX_ALLDOCS
+#        A space-separated list of all known local documents. If a local
+#        document appears in an "htx.log" file but does not appear in this
+#        list, or if it appears in this list but not in an "htx.log" file, then
+#        it is considered to have "moved" and will be listed by this script
+#        (in making these comparisons, directory information is significant).
+
+#  Notes:
+#     -  The output document list is written to standard output, one document
+#     per line.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-OCT-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the name of the directory containing documents to be linked.
+      dir="${*}"
+
+#  Echo the global list of documents into "stdfile" to add default directory
+#  information and to "standardise" the document names. This is necessary
+#  before comparing them with the contents the "htx.log" file. Then use "sed"
+#  to add a ">" prefix for recognition by "awk" (below).
+      { 
+         for doc in ${HTX_ALLDOCS}; do echo "${doc}"; done \
+            | ${HTX_DIR}/stdfile | sed 's%^%> %'
+
+#  If a readable logfile is present in the directory, filter its contents
+#  through "sed" to extract the names of the "old" documents that were present
+#  when the last relink was performed (these appear on lines starting with
+#  "l "). Distinguish them with a "<" prefix.
+         if test -f "${dir}/htx.log" -a -r "${dir}/htx.log"; then
+            sed -n 's%^l  *\([^ ][^ ]*\).*$%< \1%p' "${dir}/htx.log"
+         fi
+
+#  Pipe the combined lists of documents into "awk".
+      } | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Initialise variables that will be used as arrays.
+          BEGIN {
+             old[ "" ] = ""
+             now[ "" ] = ""
+          }
+
+#  Separate the input lines into the two sets of document names - "now" and
+#  "old" according to when the document was present.
+          {
+             if ( $1 == ">" ) {
+                now[ $2 ]++
+             } else {
+                old[ $2 ]++
+             }
+          }
+
+#  When all input has been read, find documents that were present when the
+#  documents were last relinked but are not present (or not in the same
+#  location) now. Print their names.
+          END {
+             for ( i in old ) if ( i ) {
+                if ( ! now[ i ] ) print( i )
+             }
+
+#  Similarly, output the names of any documents which are present now but were
+#  not present at the last relink.
+             for ( i in now ) if ( i ) {
+                if ( ! old[ i ] ) print( i )
+             }
+
+#  End of "awk" script.
+#  -------------------
+          }'
+
+#  End of script.

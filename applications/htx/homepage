@@ -1,0 +1,121 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     homepage
+
+#  Purpose:
+#     Identify the "home" (or top) page in a hypertext document.
+
+#  Description:
+#     This script returns the name of the HTML file that contains the home
+#     page in a multi-page hypertext document. This is the page to which a
+#     reader will be referred if the "entire document" is requested. The script
+#     first looks for a file whose name is (optionally) supplied as an
+#     argument. If this file doesn't exist, it then looks at a standard
+#     sequence of other file names to find one that does exist.
+
+#  Invocation:
+#     homefile doc [file]
+
+#  Parameters:
+#     doc
+#        The name of the document (with optional directory information but
+#        no file extension present).
+#     file
+#        An optional name for a ".html" file within the document which is to
+#        be searched for before considering any other files. This name should
+#        be given relative to the document directory.
+
+#  Output:
+#     The name of the file containing the home page is written to standard
+#     output. If no home page could be identified, no output is produced.
+
+#  Notes:
+#     -  The output file name is given relative to the document directory.
+#     -  This script checks that the file it identifies is a regular file and
+#     is readable.
+#     -  A home page will be returned so long as at least one such ".html"
+#     file exists at the top level within the document directory.
+
+#  Copyright:
+#     Copyright (C) 1995, The Central Laboratory of the Research Councils.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-JUL-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  Obtain the name of the document and abort if this is blank.
+         doc="${1}"
+         if test ! -n "${doc}"; then
+            echo >&2 "${HTX_SCRIPT}: homepage: no document name given"
+            exit 1
+         fi
+
+#  Obtain the (optional) home page file. If this was supplied, check if it
+#  is a regular file and is readable. If not, then reset the file name.
+         file="${2}"
+         if test -n "${file}"; then
+            if test ! -f "${doc}.htx/${file}" -o \
+                    ! -r "${doc}.htx/${file}"; then
+               file=''
+            fi
+         fi
+
+#  If a home file has not yet been identified, use the name of the document
+#  to generate a possible file name, stripping off any path information and
+#  adding a ".html" suffix.
+         if test ! -n "${file}"; then
+            file=`echo "${doc}" | sed -e 's%.*/%%'`.html
+
+#  Check whether the identified file is a regular file and is readable. If
+#  not, reset the file name.
+            if test ! -f "${doc}.htx/${file}" -o \
+                    ! -r "${doc}.htx/${file}"; then
+               file=''
+            fi
+         fi
+
+#  If no home file has yet been identified, we will now perform a search for
+#  any HTML file we can find.
+         if test ! -n "${file}"; then
+
+#  Generate a list of all the HTML files at the top level within the document.
+            html=`(cd "${doc}.htx" 1>/dev/null 2>/dev/null; echo *.html)`
+            if test "${html}" = "*.html"; then html=''; fi
+
+#  Edit the resulting list to remove known files which are not normally
+#  suitable for use as top-level entry points for a document. We will use
+#  these only as a last resort.
+            html=`for f in ${html}; do echo "${f}"; done | sed \
+                     -e '/^icons.html$/d' \
+                     -e '/^footnode.html$/d'`
+
+#  Search for the first HTML file that is a regular file and is readable.
+#  Use "index.html" by preference and the "known" files last of all.
+            for f in index.html ${html} icons.html footnode.html; do
+               if test -f "${doc}.htx/${f}" -a -r "${doc}.htx/${f}"; then
+
+#  Save the name of the first suitable file found.
+                  file="${f}"
+                  break
+               fi
+            done
+         fi
+
+#  If a home file was found, output its name.
+         if test -n "${file}"; then echo "${file}"; fi
+
+#  End of script.

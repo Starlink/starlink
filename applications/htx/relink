@@ -1,0 +1,195 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     relink
+
+#  Purpose:
+#     Relink a hypertext document with respect to other documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script modifies the ".html" files in a hypertext document
+#     so as to insert the correct URLs for cross-references to other
+#     documents. A list of the other documents against which the
+#     relinking is to be performed must be given. Modifications are
+#     carried out in place.
+
+#  Invocation:
+#     relink maindoc refs
+
+#  Parameters:
+#     maindoc
+#        The document to be relinked (i.e. modified).
+#     refs
+#        A space-separated list of the other documents to which it
+#        refers.  Only cross-references to these documents (and to
+#        remote documents, if any) will be modified.
+
+#  Prior Requirements:
+#     All documents must have up to date index files associated with
+#     them before invoking this script.
+
+#  Notes:
+#     Directory information (which may be relative to the current
+#     directory) should be included for all the document names
+#     supplied, but the ".htx" file extension should be omitted.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1995 (RFWS):
+#        Original version.
+#     7-DEC-1995 (RFWS):
+#        Added quotes around invocation of "multised" as this now contains
+#        significant newline characters.
+#     8-JUN-1998 (RFWS):
+#        Before relinking, search for files with a link count which is
+#        not unity and turn them into copies rather than links. This
+#        solves a data corruption problem in "wrfiles" if we attempt
+#        to modify multiply-linked files.
+#     17-JUL-1998 (RFWS):
+#        Use temporary files instead of directly over-writing the
+#        originals on platforms (e.g. Linux) where the former approach
+#        is unsafe. Also install traps to handle interrupts and delete
+#        temporary files.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the name of the document being relinked.
+      maindoc="${1}"
+
+#  Obtain the list of documents to link against.
+      shift
+      refs="${*}"
+
+#  Include the definition of the "settrap" function which is used to
+#  define traps for clearing up scratch files if the script is
+#  aborted.
+      . ${HTX_DIR}/settrap
+
+#  Pass the contents of the main document's index file through "sed"
+#  to extract the name of the ".html" file containing each
+#  cross-reference. Sort the resulting list of ".html" files and
+#  remove duplicates to give a list of the files which must be
+#  modified.
+      files=`sed -n -e 's%^> *\([^ ]*\).*$%\1%p' "${maindoc}.htx/htx.index" \
+                | sort -u`
+
+#  Output a message saying which document is being relinked and how
+#  many ".html" files must be modified.
+      docname=`basename ${maindoc}`
+      nfiles=`echo ${files} | wc -w | awk '{print $1}'`
+      echo \
+"   updating cross-references in document ${docname} (${nfiles} files to modify)..."
+
+#  If any of the files being modified have link counts which are not
+#  unity, then the relinking performed below may not work (the file
+#  buffering in "wrfiles" may fail because the files are not
+#  distinct). Identify any such files using "find".
+      (
+         cd "${maindoc}.htx"
+         links="`find ${files} -type f ! -links 1 -print 2>/dev/null`"
+
+#  If multiply-linked files exist, then generate a temporary file name
+#  and set up a trap to delete this file if the script is interrupted.
+         if test -n "${links}"; then
+            tempfile="htx-relink-$$.nolink"
+            settrap 'rm -f "${tempfile}"'
+
+#  Turn each link into a temporary copy and then replace the original
+#  with this copy.
+            for f in ${links}; do
+               cp "${f}" "${tempfile}"
+               rm -f "${f}"
+               mv "${tempfile}" "${f}"
+            done
+
+#  Remove the trap when done.
+            settrap
+         fi
+      )
+
+#  If we are on a platform where writing the relinked files back over
+#  the originals is unsafe, then define a suffix to be appended to
+#  each file name, so that a new set of files will be created instead.
+      suffix=''
+      if test "`uname -s`" = 'Linux'; then suffix=".htx-relink"; fi
+
+#  If a file suffix is being used, then generate a list of all the new
+#  (temporary) files that will be created and set up a trap to delete
+#  them if this script is interrupted.
+      if test -n "${suffix}"; then
+         newfiles="`for f in ${files}; do echo "${f}${suffix}"; done`"
+         settrap '(cd "${maindoc}.htx"; rm -f ${newfiles})'
+      fi
+
+#  Relink the document, as follows:
+#
+#  1) Go to the document directory and use "grep" to concatenate the contents
+#  of all the ".html" files to be modified. This also adds a "filename:"
+#  prefix to each line so we know which file it came from.
+#
+#  2) Use "resolve" to generate a set of link-edits to be performed on the
+#  hypertext so as to insert the correct URLs.
+#
+#  3) Pass the output of "resolve" to "multised", which generates a series
+#  of "sed" commands to perform the required link-edits.
+#
+#  4) Execute these "sed" commands (using "eval") and pipe the hypertext output
+#  from (1) through them.
+#
+#  5) Pipe the edited hypertext into "wrfiles", which writes it back
+#  into the original files (it also buffers the contents of each file,
+#  so that the same pipe can read and write the same set of ".html"
+#  files). If necessary, supply a file suffix so that new files will
+#  be created (instead of over-writing the originals) on platforms
+#  where the normal (faster) procedure is unsafe. 
+      (cd ${maindoc}.htx; grep '^' ${files} /dev/null) \
+       | eval "`${HTX_DIR}/resolve ${maindoc} ${refs} | ${HTX_DIR}/multised`" \
+       | ${HTX_DIR}/wrfiles "${maindoc}.htx" "${suffix}"
+
+#  If new files have been created, then replace each original with the
+#  new relinked version. Output a message to show that this is being
+#  done.
+      if test -n "${suffix}"; then
+         echo "   replacing original files with re-linked versions..."
+         (
+            cd ${maindoc}.htx
+            for f in ${files}; do mv "${f}${suffix}" "${f}"; done
+         )
+
+#  Remove the trap for deleting temporary files.
+         settrap
+
+#  Since we have created new files, the document's directory will have
+#  been updated. To ensure its index file is newer than the document
+#  directory (see the "touch" command below), we wait for one time
+#  resolution element. Note that this is to overcome a limitation in
+#  the "oldindex" script which may regard an index as out of date if
+#  its modification time equals that of the document directory (rather
+#  than simply being older). However, this version of "oldindex" is a
+#  lot faster than alternative ways of comparing modification times
+#  (and more reliable than "make" when directories are involved), so
+#  we stick with this arrangement...
+         sleep 1
+      fi
+
+#  Output a message when the document has been linked and touch its
+#  index file to make this more recent than the files which were
+#  changed during linking.
+      echo "      ...document ${docname} linked"
+      touch "${maindoc}.htx/htx.index"
+
+#  End of script.

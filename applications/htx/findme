@@ -1,0 +1,571 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     findme
+
+#  Purpose:
+#     Search for documents by keyword and display a list of those found.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command performs keyword searching of locally-available documents
+#     and displays a list of those found using a WWW browser. This list
+#     includes "hot links" to the parts of each document that were matched.
+
+#  Invocation:
+#     findme [switches] [keyword] [doclist]
+
+#  Parameters:
+#     keyword
+#        The string of characters to be searched for. This is treated as a
+#        single string (not as multiple keywords) and should be quoted if it
+#        contains special characters or white space. Pattern matching
+#        characters, as used in "sed" or "grep" regular expressions, may be
+#        included.
+#
+#        If this parameter is omitted, then all documents searched will be
+#        matched. This provides a convenient way of listing all of the
+#        documents available.
+#     doclist
+#        An optional space-separated list of the documents to be searched. If
+#        this is omitted, then the complete set of hypertext documents will be
+#        searched, as found on the HTX_PATH search path or its default (see
+#        below). Any further documents described in "catalogue files" (see
+#        SUN/188) appearing in any of the directories searched will also be
+#        included.
+
+#  Switches:
+#     -b
+#        Requests that a "brief" list be produced of the documents found. This
+#        means that only document names and titles will appear and references
+#        to individual pages will be omitted. By default, individual pages will
+#        be listed if the search has included them and they match the search
+#        criteria.
+#     -c
+#        Indicates that case is significant when searching for the keyword. By
+#        default, differences in case are ignored.
+#     -f
+#        Indicates that a full search should be performed, involving searching
+#        document names, titles, page headings and lines of text. This option
+#        is shorthand for the swiches "-n", "-t", "-h" and "-l" used together.
+#     -h
+#        Indicates that a search for the keyword is to be performed on all the
+#        page headings within each document (a page heading consists of the
+#        contents of the HTML "<TITLE>...</TITLE>" section for that page, but
+#        excluding the top page of each document). This provides a convenient
+#        compromise between speed of execution and full search coverage, and
+#        generally produces an acceptable amount of output. By default, a
+#        search on page headings is only performed if a keyword cannot be
+#        found in any document title. Page headings may only be searched in
+#        hypertext (".htx") documents.
+#     -html
+#        Indicates that the list of documents found by this command should not
+#        be displayed using a WWW browser. Instead, the results are simply
+#        written to standard output as a list in HTML format. None of the
+#        surrounding HTML tags or normal output decoration are included. This
+#        provides a simplified interface for other software that can handle
+#        displaying the results itself.
+#     -l
+#        Indicates that a search for the keyword is to be performed on all
+#        lines of text within each document (note that this will include all
+#        HTML tags, URLs, etc.). This provides the fullest possible form of
+#        keyword search, but may take some time to complete and could generate
+#        a large volume of output. By default, a search of document lines is
+#        only performed if a keyword cannot be found in any document title or
+#        page heading. Line-oriented searching can only be performed on
+#        hypertext (".htx") documents.
+#     -m
+#        Indicates that the output list is to contain information on which
+#        search criteria were matched and how many matches were found. By
+#        default, this information is omitted.
+#     -n
+#        Indicates that a search for the keyword is to be performed on the
+#        name of each document (a document's name is determined by the name of
+#        the file or directory in which it resides, or by its entry in a
+#        catalogue file). Searching of document names is not performed by
+#        default.
+#     -q
+#        Indicates that the search should progress in "quiet" mode without
+#        producing messages about progress. By default, messages about the
+#        progress of the search are written to /dev/tty.
+#     -s
+#        Indicates that the output list is to be sorted so that the most
+#        significant matches appear first and the least significant last.
+#        In assessing this, matches to the document name are given the highest
+#        significance, then matches to titles, page headings and finally lines
+#        of textual content. An alphabetical sort on document title and page
+#        heading is used to resolve any remaining ambiguity over output order.
+#        By default, a simple alphabetical sort on document title and page
+#        heading is used alone.
+#     -t
+#        Indicates that a search for the keyword is to be performed on the
+#        title of each document (the title of a hypertext document consists of
+#        the contents of the HTML "<TITLE>...</TITLE>" section for the top page
+#        of that document). This provides a quick but effective form of search
+#        for major topics and gives at most one entry in the output list for
+#        each document matched. By default, title matching is performed first,
+#        and a search of page headings (and eventually lines of textual
+#        content) is performed only if this initial search fails to match any
+#        documents. Using "-t" prevents these subsequent searches from
+#        happening automatically.
+#     -w
+#        Indicates that the keyword supplied must match an entire word (i.e. a
+#        string delimited by characters which are not underscores or
+#        alphanumerics, or delimited by the beginning or end of the text, or
+#        by a newline). By default, the specified string of characters is
+#        matched wherever it occurs, so long as it does not span multiple
+#        lines of text.
+#     -warn
+#        Indicates that any warning messages issued by the WWW browser (e.g.
+#        when it is started up) are to be suppressed. By default, these
+#        warnings are written to standard error along with any other warning
+#        or error messages.
+
+#  Examples:
+#     findme
+#        Finds all available documents.
+#     findme guide
+#        Finds all documents with the string "guide" in them. This is done
+#        by first searching their titles, then (if that fails) by searching
+#        all their page headings, then (if that also fails) by searching all
+#        of their lines of text.
+#     findme -t guide
+#        Finds all documents with the string "guide" in their title (only
+#        titles are searched).
+#     findme -n sun
+#        Finds all documents whose names contain the string "sun".
+#     findme -w star
+#        Finds documents that contain "star" as a word on its own.
+#     findme -c GNS
+#        Finds documents that contain the string "GNS" with the correct
+#        capitalisation.
+#     findme -l -b unix
+#        Searches all lines of text in all documents for the string "unix" and
+#        displays a brief listing of the results, so that only the relevant
+#        document names and titles are shown.
+#     findme -h DAT_ sun92
+#        Finds a document called "sun92" and searches its page headings (only)
+#        for the string "DAT_". Each page which matches is listed.
+#     findme -t -h '?\$' docs/$*$.htx
+#        Searches the titles and page headings of all hypertext documents
+#        stored in directory "docs" and lists those which end in a question
+#        mark ('?\$' is a regular expression specifying that the question mark
+#        be at the end of a line).
+#     findme -h -html -q "\$keyword" pkg\_manual >>/tmp/results\$\$
+#        This command might be used to provide a command lookup facility for a
+#        software package. It searches all the page headings in
+#        "pkg_manual" for the command stored in the "keyword" variable
+#        and appends the resulting list (in HTML format) to a scratch file in
+#        which an HTML page of results is being constructed. Messages about
+#        the progress of the search are suppressed with the "-q" switch.
+
+#  Environment Variables Used:
+#     HTX_BROWSER
+#        This defines the command which will be used to invoke the WWW browser.
+#        In order that the browser being used can be recognised, this command
+#        should contain a string corresponding to one of the supported WWW
+#        browsers - currently "netscape" or "Mosaic" (case insensitive). If
+#        this variable is not set, then the command "Mosaic" is used by
+#        default.
+#     HTX_PATH
+#        An optional colon-separated list of directories in which to search for
+#        hypertext documents. If this environment variable is not set, the
+#        default is to search the directories containing the HTX documentation,
+#        followed by those containing the rest of the Starlink documentation
+#        (if different). See SUN/188 for full details.
+#     HTX_SERVER
+#        The URL of the document server to be used for serving remote
+#        documents. This will be used as a prefix in all URLs that refer to
+#        remote documents. If this environment variable is not set, the value
+#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+#     HTX_TMP
+#        The name of the directory in which to create temporary communication
+#        files. If this variable is not set, or is null, $HOME/.htxtmp is used
+#        instead.
+
+#  Notes On Searching:
+#     -  If none of the switches "-n", "-t", "-h" or "-l" is used, the keyword
+#     given will first be searched for in the title of each document. If this
+#     fails to produce a match, it will next be searched for in the page
+#     headings of each document. If this also fails to produce a match, a final
+#     search of the lines of text within each docement will be made.
+#     -  If one or more of the switches "-n", "-t", "-h" or "-l" is used, the
+#     automatic sequences of searches described above will not occur. Instead,
+#     only those document components specified by these switches (name, title,
+#     page header and lines of text, respectively) will be searched. This will
+#     be done in a single pass through all documents.
+#     -  To obtain the fullest possible (but slowest) search, use the "-f"
+#     option. This is equivalent using all of the switches "-n", "-t", "-h"
+#     and "-l" together.
+
+#  Notes on Specifying Documents:
+#     -  If no documents are specified, then all directories on the HTX_PATH
+#     search path will be inspected for hypertext (".htx") documents and all
+#     those found will be searched.
+#     -  In addition, if any directory on the search path contains a file named
+#     "htx.catalogue", then it is interpreted as a catalogue file (see SUN/188)
+#     which lists the names, files and titles of additional documents not
+#     available locally in hypertext form. These documents will also be
+#     included in any search of document name or title (but not searches of
+#     page headings or lines of text).
+#     -  If one or more document names are supplied, then the search will be
+#     restricted to the specified documents only.
+#     -  If document names are supplied without directory information, then
+#     they will be located by following the HTX_PATH search path, or its
+#     default (see SUN/188). The contents of any catalogue files (see above)
+#     will also be considered when searching for documents.
+#     -  If document names are supplied with explicit directory information,
+#     then they must refer to hypertext documents and no search will be made
+#     for them.
+#     -  Any ".htx" extension on document names is ignored.
+#     -  If hypertext documents with the same name are found in more than one
+#     directory, then the one found first takes precedence.
+#     -  If documents with the same name are found both locally in hypertext
+#     form and in one or more catalogue files, then the hypertext version takes
+#     precedence.
+#     -  If a document with the same name appears more than once in the list
+#     given for the "doclist" parameter, then the first occurrence takes
+#     precedence, except that the first occurrence of a name with explicit
+#     directory information always takes precedence over the same document
+#     specified without directory information.
+#     -  If the same document is found in more than one catalogue file, or
+#     occurs more than once in any of these files (and is not over-ridden by
+#     a local hypertext version), then all occurrences will be used. This
+#     allows multiple document titles to be provided in catalogue files to
+#     enhance the probability of a keyword match. However, the behaviour is
+#     undefined if these entries refer to different document files.
+#     -  If any document that is matched appears in a catalogue file, but the
+#     file containing the document cannot be found on the local file system,
+#     then a reference to the remote document server will be generated as a
+#     link to that document. This reference will take the standard form (i.e.
+#     it will refer to the document by name and not by the file it resides in).
+#     This allows catalogue files to be used as local indices for documents
+#     stored remotely, in whatever format.
+
+#  Examples:
+#     findme
+#        Finds all available documents.
+#     findme guide
+#        Finds all documents with the string "guide" in them. This is done
+#        by first searching their titles, then (if that fails) by searching
+#        all their page headings, then (if that also fails) by searching all
+#        of their lines of text.
+#     findme -t guide
+#        Finds all documents with the string "guide" in their title (only
+#        titles are seached).
+#     findme -n sun
+#        Finds all documents whose names contain the string "sun".
+#     findme -w star
+#        Finds documents that contain "star" as a word on its own.
+#     findme -c GnS
+#        Finds documents that contain the string "GnS" with the correct
+#        capitalisation.
+#     findme -l -b unix
+#        Searches all lines of text in all documents for the string "unix" and
+#        displays a brief listing of the results, so that only the relevant
+#        document names and titles are shown.
+#     findme -h DAT_ sun92
+#        Finds a document called "sun92" and searches its page headings (only)
+#        for the string "DAT_". Each page which matches is listed.
+#     findme -t -h '?$' docs/*.htx
+#        Searches the titles and page headings of all hypertext documents
+#        stored in directory "docs" and lists those which end in a question
+#        mark ('?$' is a regular expression specifying that there should be a
+#        question mark at the end of a line).
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-OCT-1995 (RFWS):
+#        Original version.
+#     24-OCT-1995 (RFWS):
+#        Added the -q and -html switches.
+#     6-NOV-1995 (RFWS):
+#        Return status set to the number of documents matched.
+#     15-NOV-1995 (RFWS):
+#        Added parsing of "-s" parameter (omitted).
+#     6-JAN-1998 (RFWS):
+#        Pass HTX_TTY to "browse".
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Initialise.
+#  ==========
+#  Test for a directory specification on the name of the script being run.
+      if dir="`expr "//${0}" : '//\(.*\)/.*'`"; then :; else
+
+#  If absent, search $PATH to determine which directory it resides in.
+         dir="`IFS=':'; for d in $PATH; do file="${d:=.}/${0}"
+            test -x "${file}" -a ! -d "${file}" && echo "${d}" && break
+         done`"
+      fi
+
+#  Generate an absolute directory name if necessary.
+      case "${dir}" in [!/]*) dir="`pwd`/${dir}";; esac
+
+#  Define the directory to be used to find related scripts and extract the
+#  name of this script.
+      HTX_DIR="${dir}/htx-scripts"
+      HTX_SCRIPT="`basename "${0}"`"
+
+#  Obtain the name of the terminal connected to standard input. If it is
+#  not a terminal, then use /dev/null since this seems to work OK on some
+#  systems.
+      if test -t 0; then
+         HTX_TTY="`tty 2>/dev/null`"
+      else
+         HTX_TTY='/dev/null'
+      fi
+
+#  Include the definition of the "settrap" function which is used to define
+#  traps for clearing up scratch files if the script is aborted.
+      . ${HTX_DIR}/settrap
+
+#  Handle command line switches.
+#  ============================
+#  Initialise default values for command line switches.
+      HTX_BRIEF=''
+      HTX_CASE=''
+      HTX_QUIET=''
+      HTX_SEARCH_HEADINGS=''
+      HTX_SEARCH_LINES=''
+      HTX_SEARCH_NAMES=''
+      HTX_SEARCH_TITLES=''
+      HTX_SHOWMATCH=''
+      HTX_SORT=''
+      HTX_WARN='1'
+      HTX_WORD=''
+      outfmt='browse'
+
+#  Interpret command line switches.
+      while :; do
+         case "${1}" in
+
+#  -b - Requests abbreviated output.
+         -b)
+            HTX_BRIEF='1'
+            shift;;
+
+#  -c - Indicates case sensitive matching.
+         -c)
+            HTX_CASE='1'
+            shift;;
+
+#  -f - requests a full search (all options)
+         -f)
+            HTX_SEARCH_NAMES='1'
+            HTX_SEARCH_TITLES='1'
+            HTX_SEARCH_HEADINGS='1'
+            HTX_SEARCH_LINES='1'
+            shift;;
+
+#  -h - Indicates search page headings.
+         -h)
+            HTX_SEARCH_HEADINGS='1'
+            shift;;
+
+#  -html - Requests output in HTML format written directly to standard output.
+         -html)
+            outfmt='html'
+            shift;;
+
+#  -l - Indicates search document lines.
+         -l)
+            HTX_SEARCH_LINES='1'
+            shift;;
+
+#  -m - requests information about the number of matches.
+         -m)
+            HTX_SHOWMATCH='1'
+            shift;;
+
+#  -n - Indicates search document names.
+         -n)
+            HTX_SEARCH_NAMES='1'
+            shift;;
+
+#  -q - Indicates quiet searching (no progress messages).
+         -q)
+            HTX_QUIET='1'
+            shift;;
+
+#  -s - Indicates sort results into priority order.
+         -s)
+            HTX_SORT='1'
+            shift;;
+
+#  -t - Indicates search document titles.
+         -t)
+            HTX_SEARCH_TITLES='1'
+            shift;;
+
+#  -w - Indicates complete word matching.
+         -w)
+            HTX_WORD='1'
+            shift;;
+
+#  -warn - requests suppression of warning messages.
+         -warn)
+            HTX_WARN=''
+            shift;;
+
+#  Catch unrecognised switches and report an error.
+         -*)
+            echo >&2 "${HTX_SCRIPT}: unknown flag \""${1}"\" given"
+            exit 1;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         *) break;;
+         esac
+      done
+
+#  Export variables used by related scripts.
+      export DISPLAY
+      export HTX_BRIEF
+      export HTX_CASE
+      export HTX_DIR
+      export HTX_QUIET
+      export HTX_SCRIPT
+      export HTX_SEARCH_HEADINGS
+      export HTX_SEARCH_LINES
+      export HTX_SEARCH_NAMES
+      export HTX_SEARCH_TITLES
+      export HTX_SHOWMATCH
+      export HTX_SORT
+      export HTX_TTY
+      export HTX_WARN
+      export HTX_WHERE
+      export HTX_WORD
+
+#  Indicate to the "browse" script that a document will be supplied on its
+#  standard input.
+      HTX_WHERE='i'
+
+#  Obtain parameter values.
+#  =======================
+#  Obtain the keyword to be searched for.
+      key="${1}"
+
+#  If supplied, obtain the list of documents to be searched, removing any
+#  ".htx" extensions if necessary.
+      if test "${#}" -gt '0'; then shift; fi
+      doclist="`for doc in ${*}; do
+         case "${doc}" in
+         *.htx)
+            expr "X${doc}" : 'X\(.*\)\.htx$';;
+         *)
+            echo "${doc}";;
+         esac
+      done`"
+
+#  Perform the search and generate HTML output.
+#  ===========================================
+#  Generate the name of a temporary file to contain the number of documents
+#  matched and set up a trap to remove the file if this script is aborted.
+      tempfile="/tmp/htx-findme-$$.ndocs"
+      settrap 'rm -f "${tempfile}"'
+
+#  If required, invoke "dockey" to perform the search and send its HTML output
+#  directly to standard output.
+      if test "${outfmt}" = 'html'; then
+            ${HTX_DIR}/dockey "${key}" ${doclist}
+
+#  Write the number of documents matched to the temporary file.
+            ndoc="$?"
+            echo "${ndoc}" >"${tempfile}"
+
+#  Perform the search and display the results.
+#  ==========================================
+#  Generate the preamble for the HTML page of results.
+      else
+         {
+            cat <<END
+<HTML>
+<HEAD>
+<TITLE>Result of Document Search for Keyword "${key}"</TITLE>
+</HEAD>
+<BODY>
+<H1>Result of Document Search</H1>
+<H2>For keyword "${key}"</H2>
+<HR>
+<P>
+<H2>Documents found:</H2>
+<BLOCKQUOTE>
+END
+
+#  Invoke "dockey" to perform the keyword search and generate an HTML list
+#  of results.
+            ${HTX_DIR}/dockey "${key}" ${doclist}
+
+#  Record the exit status, which gives the number of documents matched and
+#  report its value.
+            ndoc="$?"
+            case "${ndoc}" in
+            0) 
+               echo 'None';;
+            1)
+               echo '1 document matched';;
+            *)
+               echo "${ndoc} documents matched";;
+            esac
+
+#  Write the number of documents matched to the temporary file.
+            echo "${ndoc}" >"${tempfile}"
+
+#  Locally re-define variables used by "urlgen" and invoke this script to
+#  locate SUN/188 and return suitable URLs for obtaining help information
+#  (note we use "urlgen" so that the remote document server will be used if
+#  the documentation is missing locally). The directory to search (HTX_PATH)
+#  is generated by offsetting from the HTX scripts directory to the associated
+#  documentation directory, and then converting this directory path to
+#  standard form with "stdfile". (By putting it into standard form, the WWW
+#  browser is more likely to recognise correctly whether this URL has been
+#  visited before.)
+            HTX_WHERE=''
+            HTX_PATH="`echo "${HTX_DIR}/../../docs" | ${HTX_DIR}/stdfile`"
+            export HTX_WHERE
+            export HTX_PATH
+            cmdurl="`${HTX_DIR}/urlgen sun188 findme 2>/dev/null`"
+            docurl="`${HTX_DIR}/urlgen sun188 2>/dev/null`"
+
+#  Generate a message about obtaining help information and end the HTML page.
+            cat <<END
+</BLOCKQUOTE>
+<HR>
+For help, see the <A HREF="${cmdurl}">${HTX_SCRIPT}</A>
+command in <A HREF="${docurl}">SUN/188</A>.
+<HR>
+</BODY>
+</HTML>
+END
+
+#  Pipe the HTML page generated above into "browse" for display.
+         } | ${HTX_DIR}/browse
+      fi
+
+#  Extract the number of documents matched from the temporary file (if created)
+#  and remove the file. Exit with status set to this number.
+      if test -f "${tempfile}"; then
+         ndoc="`cat "${tempfile}"`"
+         rm -f "${tempfile}"
+         exit "${ndoc}"
+
+#  If no temporary file was created, exit with status zero, which indicates
+#  that no documents were matched.
+      else
+         exit 0
+      fi
+
+#  End of script.

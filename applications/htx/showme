@@ -1,0 +1,325 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     showme
+
+#  Purpose:
+#     Display a specified part of a document using a WWW browser.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command takes the name of a document and (optionally) the name of a
+#     cross-reference label within it, and displays the requested part of the
+#     document using a WWW browser. It may also be used to display local files
+#     or any other WWW page for which a URL is available.
+
+#  Invocation:
+#     showme [switches] doc [label]
+
+#  Parameters:
+#     doc
+#        The name of the document. If no directory information is supplied,
+#        the document will be located using the HTX_PATH search path or its
+#        default (see below). If directory information is given, no search will
+#        be performed. In either case, a ".htx" extension to the document name
+#        is optional.
+#
+#        If the "-f" option is used, this parameter is interpreted as the name
+#        of a local file which is to be displayed. If the "-u" option is used,
+#        it is interpreted as a general URL.
+#     label
+#        An optional cross-reference label. If given, this specifies which
+#        part of the document is required. If omitted, it is assumed that the
+#        entire document is required and the appropriate "top" page (see
+#        SUN/188) is displayed.
+#
+#        This parameter is ignored if the "-f" or "-u" options are used.
+
+#  Switches:
+#     -f
+#        Specifies that the document name supplied is the name of a local file
+#        (e.g. in HTML format) which is to be displayed. If this option is
+#        used, the "label" parameter and the "-l" and "-r" switches are
+#        ignored.
+#     -l
+#        Specifies that a local document should be displayed and that no
+#        reference to a remote document server should be generated. In this
+#        case, if the document cannot be found locally an error will result.
+#     -n
+#        Specifies that the document is not to be displayed. In this case, no
+#        WWW browser will be used and the URL that would otherwise have been
+#        passed to it is simply written to standard output. This provides a
+#        simplified interface for use by other software that can handle
+#        document display itself.
+#     -r
+#        Specifies that a remote document is required. In this case, a
+#        reference to a remote document server will be generated and passed to
+#        the WWW browser, even if a local copy of the document exists.
+#     -u
+#        Specifies that the document name supplied is a URL which is to be
+#        passed directly to the WWW browser for interpretation. Any form of URL
+#        which the browser can handle may be given. If this option is used, the
+#        "label" parameter and the "-l" and "-r" switches are ignored.
+#     -warn
+#        Indicates that any warning messages issued by the WWW browser (e.g.
+#        when it is started up) are to be suppressed. By default, these
+#        warnings are written to standard error along with any other warning
+#        or error messages.
+
+#  Examples:
+#     showme sun188
+#        Displays the document called "sun188". The local copy is used, if
+#        available, otherwise it is fetched from the remote document server.
+#     showme sun188 showme
+#        Displays the part of document "sun188" identified by the
+#        cross-reference label "showme". As before, the local copy of the
+#        document is used, if possible.
+#     showme -l quantum-theory
+#        Searches for a local copy of the document "quantum-theory" and
+#        displays it. If the document cannot be found locally, an error
+#        results.
+#     showme -r quantum-theory speculation
+#        Displays the section identified by the "speculation"
+#        cross-reference label in a remote copy of the document called
+#        "quantum-theory". Any local copy is ignored.
+#     showme mydocs/help available_commands
+#        Displays the section identified by the "available_commands" label
+#        in a local document stored in the directory "mydocs/help.htx".
+#        Because explicit directory information is given, the document is not
+#        searched for using the HTX_PATH search path. If the document doesn't
+#        exist, a copy will be fetched from the remote document server.
+#     showme -n -l mydocs/help available_commands
+#        Performs the same function as the previous example, except that the
+#        document is not actually displayed. Instead, its URL is simply
+#        written to standard output. The "-l" switch specifies that a local
+#        document is required, so an error will result if it cannot be found.
+
+#  Environment Variables Used:
+#     HTX_BROWSER
+#        This defines the command which will be used to invoke the WWW browser.
+#        In order that the browser being used can be recognised, this command
+#        should contain a string corresponding to one of the supported WWW
+#        browsers - currently "netscape" or "Mosaic" (case insensitive). If
+#        this variable is not set, then the command "Mosaic" is used by
+#        default.
+#     HTX_PATH
+#        An optional colon-separated list of directories in which to search for
+#        hypertext documents. If this environment variable is not set, the
+#        default is to search the directories containing the HTX documentation,
+#        followed by those containing the rest of the Starlink documentation
+#        (if different). See SUN/188 for full details.
+#     HTX_SERVER
+#        The URL of the document server to be used for serving remote
+#        documents. This will be used as a prefix in all URLs that refer to
+#        remote documents. If this environment variable is not set, the value
+#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+#     HTX_TMP
+#        The name of the directory in which to create temporary communication
+#        files. If this variable is not set, or is null, $HOME/.htxtmp is used
+#        instead.
+
+#  Notes:
+#     -  If the document is found locally, the local copy will be displayed.
+#     If it is not found locally (subject to any command switches) a reference
+#     to a remote document server will be passed to the WWW browser instead.
+#     -  If a cross-reference label is specified for a local document but it
+#     cannot be found in that document, then an error will result.
+#     -  There is no checking of the existence of remote documents, nor of
+#     the cross-reference labels they contain. This checking must be performed
+#     by the remote document server.
+#     -  The "-l" and "-r" switches are mutually exclusive. If both are given,
+#     the latter one predominates.
+#     -  Similarly, the "-f" and "-u" switches are mutually exclusive. If both
+#     are given, the latter one predominates.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-OCT-1995 (RFWS):
+#        Original version.
+#     6-JAN-1998 (RFWS):
+#        Pass HTX_TTY to "browse".
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Initialise.
+#  ==========
+#  Test for a directory specification on the name of the script being run.
+      if dir="`expr "//${0}" : '//\(.*\)/.*'`"; then :; else
+
+#  If absent, search $PATH to determine which directory it resides in.
+         dir="`IFS=':'; for d in $PATH; do file="${d:=.}/${0}"
+            test -x "${file}" -a ! -d "${file}" && echo "${d}" && break
+         done`"
+      fi
+
+#  Generate an absolute directory name if necessary.
+      case "${dir}" in [!/]*) dir="`pwd`/${dir}";; esac
+
+#  Define the directory to be used to find related scripts and extract the
+#  name of this script.
+      HTX_DIR="${dir}/htx-scripts"
+      HTX_SCRIPT="`basename "${0}"`"
+
+#  Obtain the name of the terminal connected to standard input. If it is
+#  not a terminal, then use /dev/null since this seems to work OK on some
+#  systems.
+      if test -t 0; then
+         HTX_TTY="`tty 2>/dev/null`"
+      else
+         HTX_TTY='/dev/null'
+      fi
+
+#  Handle command line switches.
+#  ============================
+#  Initialise default values for command line switches.
+      HTX_WARN='1'
+      browse='1'
+      ref=''
+      where=''
+
+#  Interpret command line switches.
+      while :; do
+         case "${1}" in
+
+#  -f - Indicates a local file reference was supplied.
+         -f) ref='file'; shift;;
+
+#  -l - Indicates only find local documents.
+         -l) where='l'; shift;;
+
+#  -n - Indicates don't display the document, just output its URL.
+         -n) browse=''; shift;;
+
+#  -r - Indicates find a remote document.
+         -r) where='r'; shift;;
+
+#  -u - Indicates a URL reference was supplied.
+         -u) ref='url'; shift;;
+
+#  -warn - Indicates suppress warning messages.
+         -warn) HTX_WARN=''; shift;;
+
+#  Catch unrecognised switches and report an error.
+         -*)
+            echo >&2 "${HTX_SCRIPT}: unknown switch \""${1}"\" given"
+            exit 1;;
+
+#  Once all switches have been read, continue with the rest of the script.
+         *) break;;
+         esac
+      done
+
+#  Export variables required by related scripts.
+      export DISPLAY
+      export HTX_DIR
+      export HTX_SCRIPT
+      export HTX_TTY
+      export HTX_WARN
+      export HTX_WHERE
+
+#  Classify and locate the document reference.
+#  ==========================================
+#  Local file.
+#  ----------
+#  If a local file name has been supplied, then test to ensure it is not null.
+      if test "${ref}" = 'file'; then
+         if test ! -n "${1}"; then
+            echo >&2 "${HTX_SCRIPT}: no file name given"
+            exit 1
+         fi
+
+#  If OK, convert it into an absolute file name by adding the current
+#  directory name if necessary.
+         url="${1}"
+         case "${url}" in [!/]*) url="`pwd`/${url}";; esac
+
+#  Note we have a local document.
+         where='l'
+
+#  Direct URL.
+#  ----------
+#  If a direct URL has been supplied, then test to ensure it is not null.
+      elif test "${ref}" = 'url'; then
+         if test ! -n "${1}"; then
+            echo >&2 "${HTX_SCRIPT}: no url given"
+            exit 1
+         fi
+
+#  If OK, store the URL and note we have a remote document.
+         url="${1}"
+         where='r'
+
+#  Document name and label.
+#  -----------------------
+#  If we have been given a document and (optional) label, extract these.
+      else
+         doc="${1}"
+         label="${2}"
+
+#  Remove any ".htx" extension from the document name if necessary.
+         case "${doc}" in *.htx)
+            doc="`expr "X${doc}" : 'X\(.*\)\.htx$'`";;
+         esac
+
+#  Unless a remote document was specifically requested, first attempt to get a
+#  local URL that references the required part of the document.
+         url=''
+         if test ! "${where}" = 'r'; then
+            HTX_WHERE='l'
+
+#  Abort if generating the URL fails (e.g. because no document name or a bad
+#  label was given).
+            url="`${HTX_DIR}/urlgen "${doc}" "${label}"`" || exit
+         fi
+
+#  If a local URL was obtained, then note this fact.
+         if test -n "${url}"; then
+            where='l'
+
+#  If no URL was obtained, the document could not be found locally. If a local
+#  document was specifically requested, then abort with an error message.
+         elif test "${where}" = 'l'; then
+            echo >&2 \
+            "${HTX_SCRIPT}: document ${doc} not found on local file system"
+            exit 1
+
+#  If the document was not found locally, then obtain the URL of a remote copy.
+#  Abort if this produces an error. If successful, note that the document is
+#  remote.
+         else
+            HTX_WHERE='r'
+            url="`${HTX_DIR}/urlgen "${doc}" "${label}"`" || exit
+            where='r'
+         fi
+      fi
+
+#  If the document is to be displayed, tell the "browse" script what sort of
+#  document we have and then invoke it to display the document using a WWW
+#  browser.
+      if test "${browse}" = '1'; then
+         HTX_WHERE="${where}"
+         ${HTX_DIR}/browse "${url}"
+
+#  If the document is not being displayed, simply write out its URL instead.
+      else
+         if test "${where}" = 'l'; then
+            echo "file://localhost${url}"
+         else
+            echo "${url}"
+         fi
+      fi
+
+#  End of script.

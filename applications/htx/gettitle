@@ -1,0 +1,137 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     gettitle
+
+#  Purpose:
+#     Obtain the title from one or more HTML files.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script searches a list of files containing text in HTML format and
+#     extracts the title from each file (i.e. the text appearing between the
+#     <TITLE> and </TITLE> tags in the page <HEAD>...</HEAD> section). The
+#     results are written to standard output, one title per line. Each line is
+#     prefixed by the name of the HTML file, separated by a single space from
+#     the text of the title.
+
+#  Invocation:
+#     gettitle htmllist
+
+#  Parameters:
+#     htmllist
+#        A space-separated list of the HTML files to search.
+
+#  Notes:
+#     -  If the title is absent from any file, an output line is still written,
+#     but the title is blank.
+#     -  This script attempts to accommodate moderate abuse of the HTML format
+#     such as missing </TITLE> tags, etc.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-OCT-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of ".html" files to inspect and check the list is not
+#  empty.
+      files="${*}"
+      if test -n "${files}"; then
+
+#  Run "awk" on the contents of these files.
+         awk -F"\n" '
+
+#  Whenever a new file is opened, print the lines containing title information
+#  from the previous file, prefixed with the file name (if any) and reset
+#  values for use on the new file.
+            {
+               if ( FILENAME != last ) {
+                  if ( last ) print( last":"output )
+                  last = FILENAME
+                  head = 0
+                  nhead = 0
+                  title = 0
+                  ntitle = 0
+                  output=""
+               }
+            }
+
+#  Select lines with <HEAD> in them and count these lines in the current file.
+#  If this is the first such line (there should only be one, but best play
+#  safe) note we are in the header section.
+            /<[Hh][Ee][Aa][Dd]/{
+               if ( ! nhead++ ) head = 1
+            }
+
+#  Select lines with <TITLE> in them. If we are in the header section of the
+#  current file, count these lines. If this is the first such line (there
+#  should only be one) note we are in the title section.
+            /<[Tt][Ii][Tt][Ll][Ee]/{
+               if ( head && ! ntitle++ ) title = 1
+            }
+
+#  Concatenate all title lines, separating them with a space.
+            {
+               if ( title ) output = output $0 " "
+            }
+
+#  Select lines with </TITLE> in them. These mark the end of the title section
+#  of the current file, wherever they occur.
+            /<\/[Tt][Ii][Tt][Ll][Ee]/{
+               title = 0
+            }
+
+#  Select lines with </HEAD> in them. These mark the end of the header section,
+#  wherever they occur. They also end the title section (if not properly
+#  terminated with </TITLE> already).
+            /<\/[Hh][Ee][Aa][Dd]/{
+               head = 0
+               title = 0
+            }
+
+#  Select lines with <BODY> in them. These also mark the end of the header
+#  and title sections (in case of a missing </HEAD> tag).
+            /<[Bb][Oo][Dd][Yy]>/{
+               head = 0
+               title = 0
+            }
+
+#  When all input has been processed, output a title line for the final file
+#  (if any), as for previous files.
+            END{
+               if ( last ) print( last":"output )
+
+#  Make "awk" read all the input ".html" files and pipe the output of the
+#  above script into "sed". The following "sed" script then:
+#
+#  o  Removes the <TITLE> and the following </TITLE>, <HEAD> or <BODY> tags
+#     and anything outside them.
+#  o  Changes the ":" after the file name prefix to a space.
+#  o  Removes all extraneous white space, converting it into single spaces.
+#
+            }' ${files} | sed '
+s%^\([^:]*\):.*<[Tt][Ii][Tt][Ll][Ee]>\(.*\)</[Tt][Ii][Tt][Ll][Ee]>.*$%\1 \2%
+s%^\([^:]*\):.*<[Tt][Ii][Tt][Ll][Ee]>\(.*\)</[Hh][Ee][Aa][Dd]>.*$%\1 \2%
+s%^\([^:]*\):.*<[Tt][Ii][Tt][Ll][Ee]>\(.*\)<[Bb][Oo][Dd][Yy]>.*$%\1 \2%
+s%^\([^:]*\): *$%\1%
+               s%[ 	][ 	]*% %g
+               s%^ *%%
+               s% *$%%'
+      fi
+
+#  End of script.

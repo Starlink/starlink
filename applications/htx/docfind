@@ -1,0 +1,94 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     docfind
+
+#  Purpose:
+#     Find hypertext documents that may need relinking.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script searches a list of directories to find the hypertext
+#     documents they contain, identifying them by their ".htx" file extension.
+#     The names of the documents found are written to standard output, one
+#     per line.  Directory path information (which may be relative to the
+#     default directory) is included, but the ".htx" file extension is omitted.
+
+#  Invocation:
+#     docfind [dirlist]
+
+#  Parameters:
+#     dirlist
+#        An optional space-separated list of the directories to search. By
+#        default, "." is used.
+
+#  Environment Variables Used:
+#     HTX_SCRIPT
+#        The name of the script that the user originally invoked (which in turn
+#        invoked this script). This is only used for generating error messages.
+
+#  Notes:
+#     -  All documents residing in the specified directories are found by this
+#     script, even if document names are duplicated (i.e. directories appearing
+#     earlier in the directory list do NOT occlude later ones).
+#     -  All the document files found by this script should be directories.
+#     If any of them are not, a warning is written to standard error and the
+#     offending files are skipped. The remaining files are still processed
+#     normally.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of directories to search, supplying a default of "." if
+#  necessary.
+      dirlist="${*}"
+      if test "${dirlist}" = ""; then dirlist='.'; fi
+
+#  Search each directory in turn.
+      for dir in ${dirlist}; do
+
+#  Obtain the directory path prefix to be applied to files in each directory.
+         if test "${dir}" = "."; then dir=''; else dir="${dir}/"; fi
+
+#  Obtain a list of all the ".htx" files in the directory and check that at
+#  least one was found.
+         doclist=`echo ${dir}*.htx`
+         if test ! "${doclist}" = "${dir}*.htx"; then
+
+#  Check that all the files found are directories. Report an error if any are
+#  not, but carry on processing the rest.
+            for doc in ${doclist}; do
+               if test ! -d ${doc}; then
+                  echo >&2 \
+"${HTX_SCRIPT}: warning document ${doc} is not a directory"
+
+#  Echo the names of all valid document directories found. These will be read
+#  by "sed" (below).
+               else
+                  echo "${doc}"
+               fi
+            done
+         fi
+
+#  Pipe the list of document directories through "sed" to remove the trailing
+#  ".htx" file extensions.
+      done | sed -e 's%.htx$%%'
+
+#  End of script.

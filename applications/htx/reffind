@@ -1,0 +1,114 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     reffind
+
+#  Purpose:
+#     Identify the documents referenced by a particular document.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script inspects the index file for a hypertext document (which
+#     contains the symbolic names of the documents which it cross-references)
+#     and converts this into a list giving the full path of each document
+#     referenced (i.e. it finds the referenced documents). The resulting list
+#     is written to standard output, one document name per line.
+
+#  Invocation:
+#     reffind maindoc doclist
+
+#  Parameters:
+#     maindoc
+#        The name of the document containing the cross references.
+#     doclist
+#        A space-separated list giving the full names of all the documents that
+#        may be referenced (excluding remote documents).
+
+#  Prior Requirements:
+#     The document to be relinked must have an up to date index file associated
+#     with it before invoking this script.
+
+#  Notes:
+#     Directory information (which may be relative to the current directory)
+#     should be included for all the document names supplied, but the ".htx"
+#     file extension should be omitted. The same document name format is used
+#     on output.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-APR-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the name of the document containing the cross references.
+      maindoc="${1}"
+
+#  Obtain the list of documents that may be referenced.
+      shift
+      refs="${*}"
+
+#  Pipe the list of documents that may be referenced (containing directory
+#  information) into "awk", one per line.
+      for doc in ${refs}; do echo "${doc}"; done | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Make sure that "awk" recognises "ref" as an array.
+         BEGIN{
+            ref[ "" ] = ""
+         }
+
+#  When reading lines from standard input (which gives the list of documents
+#  that may be referenced, as generated above), extract the last field in the
+#  path to give the document name.
+         {
+            if ( FILENAME == "-" ) {
+               np = split( $0, path, "/" )
+               doc = path[ np ]
+
+#  Set up an array to generate document paths from their names.
+               fullpath[ doc ] = $0
+
+#  When reading lines from the index file of the main document, select those
+#  which identify cross-references to other documents. Set up an array to
+#  record the names of all the documents referenced.
+            } else if ( $1 == ">" ) {
+               ref[ $3 ] = 1
+            }
+         }
+
+#  After reading the input, scan through all the documents that were referenced
+#  and check that they appear in the list of documents that may be referenced
+#  (if not, they are regarded as "remote" documents and we are not interested
+#  in them here).
+         END{
+            for ( doc in ref ) if ( doc ) {
+               if ( fullpath[ doc ] ) {
+
+#  Print out the full path for each non-remote document referenced.
+                  print( fullpath[ doc ] )
+               }
+            }
+         }
+
+#  End of "awk" script.
+#  -------------------
+#  Make "awk" read the list of documents that may be referenced from standard
+#  input, followed by the contents of the index file for the main document.
+         ' - "${maindoc}.htx/htx.index"
+
+#  End of script.

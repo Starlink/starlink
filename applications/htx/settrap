@@ -1,0 +1,74 @@
+
+#+
+#  Name:
+#     settrap
+
+#  Purpose:
+#     Define a function to set up traps.
+
+#  Type of Module:
+#     Include file for shell scripts
+
+#  Description:
+#     This file is intended for inclusion by a shell script and contains a
+#     definition of the "settrap" function. When invoked, this function sets
+#     up a trap which executes the command given as an argument if the calling
+#     script is interrupted (by the user pressing ctrl-C) and then exits the
+#     calling script.
+
+#  Invocation:
+#     . settrap
+#     settrap [command]
+
+#  Parameters:
+#     command
+#        The command to be executed if the script is interrupted. If no
+#        command is given, then any previously established trap is cancelled.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-OCT-1995 (RFWS):
+#        Original version.
+#     14-NOV-1995 (RFWS):
+#        Ensure the calling script exits after the trap is invoked.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Define the "settrap" function.
+      settrap() {
+
+#  Test if the signals which will invoke the trap can be specified numerically.
+         if test ! -n "`trap 2>&1 1>/dev/null 2`"; then
+
+#  If the above test did not produce an error message, then go ahead and use
+#  numerical signal values. If a trap is being set, make it disable itself
+#  when first invoked so that it only runs once.
+            if test -n "${1}"; then
+               trap "trap 2; ${1}; exit" 2
+
+#  Disable the trap if required.
+            else
+               trap 2
+            fi
+
+#  If numerical signal values don't work, then use symbolic ones instead.
+         else
+            if test -n "${1}"; then
+               trap "trap SIGINT; ${1}; exit" SIGINT
+            else
+               trap SIGINT
+            fi
+         fi
+      }
+
+#  End of file.   

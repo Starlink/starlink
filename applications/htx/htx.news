@@ -1,0 +1,39 @@
+   HTX - Utilities for Accessing Hypertext Documentation
+   =====================================================
+
+   New Features
+   ------------
+      Version 1.2 of the HTX Hypertext Utilities is now available.
+      This release introduces a number of minor new features and bug
+      fixes, as follows:
+
+         o  The default WWW browser is now Netscape instead of Mosaic.
+
+         o  You may now suppress hypertext linking when using the
+            "hlink" command by setting the HTX_NOLINK environment
+            variable. This can be useful when installing and
+            de-installing software to prevent unwanted re-links of
+            the associated documentation.
+
+         o  The environment variable HTX_TMP may now be used to
+            specify where temporary communication files are created.
+            This can enhance the opportunities for HTX to communicate
+            with WWW browsers running on other machines. By default, a
+            directory $HOME/.htxtmp is created for this purpose.
+
+         o  A problem has been fixed which could prevent recent versions
+            of Netscape from accessing local documents.
+
+         o  A problem has been fixed which could prevent the Starlink
+            "xdisplay" utility being used to automatically define the
+            DISPLAY environment variable before starting a new WWW
+            browser. This only affected PC~Linux systems.
+
+   Further Details
+   ---------------
+      For further details of these changes, see the final appendix of
+      SUN/188, or use the command:
+   
+         showme sun188 list_of_most_recent_changes
+
+      to jump straight to the relevant page using your WWW browser.

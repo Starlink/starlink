@@ -1,0 +1,130 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     oldindex
+
+#  Purpose:
+#     Identify documents with out of date index files.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script identifies hypertext documents where the index file either
+#     does not exist or where it is older than the document itself. The names
+#     of affected documents are written to standard output, one per line.
+
+#  Invocation:
+#     oldindex doclist
+
+#  Parameters:
+#     doclist
+#        A space-separated list of the documents to inspect.
+
+#  Environment Variables Used:
+#     HTX_DEEP
+#        If this is set to "1", the script will perform a "deep" dependency
+#        test, to see if a document's index file is older than the document
+#        directory or any of the ".html" files it contains. Otherwise, a
+#        "shallow" test is performed and the index file will only be compared
+#        with the document directory file.
+
+#  Notes:
+#     Directory information (which may be relative to the current directory)
+#     should be included for all the document names supplied, but the ".htx"
+#     file extension should be omitted. The same document name format is used
+#     on output.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     20-APR-1995 (RFWS):
+#        Original version.
+#     20-APR-1995 (RFWS)"
+#        Added "deep" dependency test.
+#     5-JUN-1995 (RFWS):
+#        Complete re-write (hopefully temporary) to overcome problems with
+#        using "make" on Solaris systems.
+#     31-JUL-1995 (RFWS):
+#        Re-implemeted the "shallow" test to use "ls". This overcomes the
+#        efficiency problem with using "find" as an alternative to "make"
+#        ("find" remains an efficient approach for the "deep" case).
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of documents to inspect.
+      doclist="${*}"
+
+#  If the list is empty, do nothing. Otherwise, see if a "deep" dependency
+#  test is required.
+      if test -n "${doclist}"; then
+         if test "${HTX_DEEP}" = "1"; then
+
+#  Deep dependency test.
+#  ====================
+#  Loop to test each document in turn.
+            for doc in ${doclist}; do
+
+#  Check if there is an index file associated with the document. If not, then
+#  output the document's name. 
+               if test ! -f "${doc}.htx/htx.index"; then
+                  echo "${doc}"
+
+#  If there is an index file, then use "find" to search the document directory
+#  file and any ".html" files within the document that are newer than the
+#  index file.
+               else
+                  old=`find "${doc}.htx" \
+                            \( -name "${doc}.htx" -o -name '*.html' \) \
+                            -newer "${doc}.htx/htx.index" -print`
+
+#  If any files newer than the index file were found, then output the
+#  document's name.
+                  if test -n "${old}"; then echo "${doc}"; fi
+               fi
+            done
+
+#  Shallow dependency test.
+#  =======================
+#  Echo the names of all the document directories and their associated index
+#  files and pass the resulting list to "ls", specifying that the output list
+#  be sorted by date of last modification. Suppress any error messages from
+#  "ls" due to files that don't exist.
+         else
+            ls -d -t -1 2>/dev/null `for doc in ${doclist}; do
+               echo "${doc}.htx ${doc}.htx/htx.index"
+
+#  Pipe the output of "ls" into "awk".
+            done` | awk -F/ '{
+
+#  Start of "awk" script.
+#  ---------------------
+#  If the last field is "htx.index", then note that an index file has been
+#  found for this document.
+               if ( $NF == "htx.index" ) {
+                  i[ substr( $0, 1, length( $0 ) - 10 ) ]++
+
+#  Otherwise this is a document directory. If the associated index file has
+#  not yet been found the document directory has been modified more recently,
+#  so output the document name (omitting the ".htx" extension).
+               } else if ( ! i[ $0 ] ) {
+                  print( substr( $0, 1, length( $0 ) - 4 ) )
+               }
+
+#  End of "awk" script.
+#  -------------------
+            }'
+         fi
+      fi
+
+#  End of script.

@@ -1,0 +1,149 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     wrfiles
+
+#  Purpose:
+#     Write link-edited text back into the appropriate files.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script reads a stream of link-edited text from standard
+#     input, with each line being prefixed with the name of the file
+#     to which it should be written. It then strips off the file name
+#     prefix from each line and writes the remaining text to the
+#     appropriate files, replacing the previous file contents if
+#     necessary.
+
+#  Invocation:
+#     cat edited_text | wrfiles dir [suffix]
+
+#  Parameters:
+#     edited_text
+#        The link-edited hypertext, where each line is prefixed by the
+#        name of the file to which it should be written
+#        (e.g. "file:text").
+#     dir
+#        The path of a directory, relative to which the file names at
+#        the start of each text line will be given.
+#     suffix
+#        An optional suffix to be appended to the name of each output
+#        file. This allows the script to create a new copy of each
+#        file instead of over-writing the original, if necessary.
+
+#  Environment Variables Used:
+#     HTX_VERBOSE
+#        Controls how much information about the linking of files will
+#        be written to standard output. This should be set to '0' for
+#        the standard amount of information, or to '1' for extra
+#        information.
+
+#  Notes:
+#     - The contents of each file should follow consecutively
+#     (i.e. lines intended for different files should not be
+#     interleaved).
+#     - This script buffers the text for each file until the last line
+#     intended for that file is read. This allows it to be used to
+#     update files in a pipe, where the reading end of the pipe may be
+#     accessing the same set of files.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-APR-1995 (RFWS):
+#        Original version.
+#     8-DEC-1995 (RFWS):
+#        Changed "%" delimiter to "/" to work on Linux.
+#     17-JUL-1998 (RFWS):
+#        Append a suffix to each output file name if necessary.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Go to the directory relative to which file names will be given.
+      cd "${1}"
+
+#  Invoke "awk" to re-format the input text into a series of shell "here
+#  documents" that will then be re-directed to the appropriate files.
+      awk '
+
+#  Start of "awk" script.
+#  ---------------------
+# Set the field separator so as to extract the initial file name on
+# each line.
+         BEGIN{
+            FS = ":"
+         }
+
+#  On reading each line, first see if the initial file name differs
+#  from the last one used (i.e. extracted from the previous line, if
+#  any).
+         {
+            if ( $1 != file ) {
+
+#  If it differs, and this is not the first file name, then we are at
+#  the start of a new file and must flush the contents of the previous
+#  file.
+               if ( file ) {
+
+#  Write a "sed" command that reads the shell "here document" that
+#  follows it, strips off the leading blank from each line and writes
+#  the result to the required file. Quote the "END" flag, to suppress
+#  shell expansion of the document contents.
+                  printf( "sed <<\\END >%s%s -e '\''s/^ //'\''\n", file, suffix)
+
+#  Follow this with the actual document, prefixing each line with a
+#  blank so that the end flag can be recognised. Mark the end of the
+#  document with "END" (no leading blank).
+                  for( i = 0; i < n; i++ ) printf( " %s\n", line[i] )
+                  printf( "END\n" )
+
+#  If required, add an "echo" command that will provide the user with
+#  a message once the "sed" command above has executed.
+                  if ( verbose == "1" ) {
+                     printf( "echo '\''      file %s linked (%d lines)'\''\n", file, n )
+                  }
+               }
+
+#  Record the name of the next file and initialise its line count.
+               file = $1
+               n = 0
+            }
+
+#  Store each input line in the line buffer array, after stripping off
+#  its initial file name.
+            line[ n++ ] = substr( $0, length( $1 ) + 2 )
+         }
+
+#  After all input lines have been read, flush the contents of the
+#  last file in the same way as above.
+         END{
+            if ( file ) {
+               printf( "sed <<\\END >%s%s -e '\''s/^ //'\''\n", file, suffix )
+               for( i = 0; i < n; i++ ) printf( " %s\n", line[i] )
+               printf( "END\n" )
+               if ( verbose == "1" ) {
+                  printf( "echo '\''      file %s linked (%d lines)'\''\n", file, n )
+               }
+            }
+         }
+
+#  End of "awk" script.
+#  -------------------
+#  Set the "suffix" and "verbose" variables for use by "awk" and then
+#  make it read from standard input. Pipe the resulting shell commands
+#  (written by "awk") into "sh" for interpretation.
+         ' suffix="${2}" verbose="${HTX_VERBOSE}" - | sh
+
+#  End of script.

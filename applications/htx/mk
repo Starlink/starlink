@@ -1,0 +1,239 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     mk
+
+#  Version:
+#     Application, Mk IV
+
+#  Purpose:
+#     Invoke make to build and install the HTX package.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should normally be used to invoke the make utility to build
+#     and install the HTX package and to perform other housekeeping tasks. It
+#     invokes the make utility after first defining appropriate environment
+#     variables and macros for the computer system in use. This file also
+#     serves to document the systems on which HTX is implemented.
+
+#  Invocation:
+#     The user of this script should normally first define the SYSTEM
+#     environment variable to identify the host computer system (see the
+#     "Supported Systems" section). This script should then be used in the
+#     same way as the make utility would be used. For instance, to build,
+#     install and test HTX, you might use the following commands:
+#
+#        ./mk build
+#        ./mk install
+#        ./mk test
+#        ./mk clean
+
+#  Supported Systems:
+#     The following systems are currently supported and may be identified by
+#     defining the SYSTEM environment variable appropriately before invoking
+#     this script:
+#
+#        alpha_OSF1
+#           DEC Alpha machines running OSF1
+#
+#        sun4_Solaris
+#           SUN Sparcstations running SunOS 5.x (Solaris)
+#
+#        ix86_Linux
+#           Linux systems running on PC hardware
+#
+#     The following systems have been supported in the past and the relevant
+#     code has been retained. They may still work, or may work with only
+#     minor repairs, but have not recently been tested.
+#        sun4
+#           SUN Sparcstations running SunOS 4.x
+#
+#     This script will exit without action if the SYSTEM environment variable
+#     is not defined. A warning will be issued if it is defined but is not set
+#     to one of the recognised values above. In this case, no additional
+#     environment variables will be defined by this script (any that are
+#     pre-defined will be passed on to make unaltered).
+#
+#     Since HTX uses only standard UNIX utilities and has very few system
+#     dependencies, you may be able to use it on other systems simply by
+#     setting SYSTEM to "unknown". If this doesn't work, then see the "Notes on
+#     Porting" section below.
+
+#  Targets:
+#     For details of what targets are provided, see the associated makefile.
+#     The latter will normally provide a default target called "help", which
+#     outputs a message describing this script and lists the targets provided.
+
+#  Notes on Porting:
+#     If your machine or system setup does not appear in this script, then it
+#     should be possible to build and install HTX by adding a new case to this
+#     script with appropriate definitions (probably based on one of the
+#     existing implementations).
+
+#  make Macros:
+#     The following "global" make macros are used in the associated makefile
+#     and may be changed by means of appropriate environment variable
+#     definitions (in each case the default is shown in parentheses). Note
+#     that these macros are provided to allow external control over the
+#     directories in which software is installed, etc., so they should not
+#     normally be re-defined within this script.
+#
+#        STARLINK (/star)
+#           Pathname of the root directory beneath which Starlink software is
+#           currently installed. This indicates to HTX where to find other
+#           Starlink software (include files, libraries, etc.) which it uses.
+#           Currently, HTX does not use other Starlink software.
+#        INSTALL ($HOME/star)
+#           Pathname of the root directory beneath which HTX will be installed
+#           for use. A directory called "star" beneath your home directory will
+#           be used by default. This macro is provided to allow HTX to be
+#           installed locally for personal use (e.g. by an individual user or
+#           during development or testing). It should be set to the $STARLINK
+#           directory if you want to add HTX into an already installed set of
+#           Starlink software. You should ensure that the directory
+#           $INSTALL/bin appears on the search path which your system uses for
+#           locating executable files.
+#        EXPORT (.)
+#           Pathname of the directory into which compressed tar files will be
+#           written if the "export" or "export_source" make targets are used to
+#           produce an exportable copy of HTX or its source files. The current
+#           working directory (i.e. the HTX source directory) will be used by
+#           default.
+#
+#     The following "local" make macros are used in the associated makefile and
+#     should normally be overridden by environment variable definitions within
+#     this script. All the local macros that are used in building a package
+#     should be specified in this script, even when the value is the same as
+#     the default. This documents which macros are used and ensures that the
+#     package will continue to build correctly even if the default values are
+#     changed. Macros that are not used on a particular machine should not be
+#     set in this script. In each case the default is shown in parentheses.
+#
+#        LINK (ln)
+#           The command required to establish a link to a file.  The default
+#           assumes POSIX.2 behavior, which only provides a "hard" link
+#           operating within a single file system. If the host operating system
+#           allows "symbolic" links, then this macro might be re-defined as
+#           'ln -s'. Alternatively, if the use of multiple file systems is
+#           essential but not supported by any form of link, then a copy
+#           command could be substituted (e.g. 'cp -p'), at some cost in file
+#           space.
+#        TAR_IN (pax -w -v -x ustar -f)
+#           Command to use to insert a file into a .tar archive file. The
+#           default uses the POSIX.2 pax command, which is not available on
+#           traditional UNIX systems. These typically use a tar command such
+#           as 'tar -cvhf' instead (if symbolic links are supported, then an
+#           option to follow these must be included in this command).
+#        TAR_OUT (pax -r -f)
+#           Command to use to extract a file from a .tar archive file. The
+#           default uses the POSIX.2 pax command, which is not available on
+#           traditional UNIX systems. These typically use a tar command such
+#           as 'tar -xf' instead.
+
+#  Copyright:
+#     Copyright (C) 1995, Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F.Warren-Smith (Starlink, RAL)
+#     PMA: P.M.Allan (Starlink, RAL)
+#     PTW: P.T.Wallace (Starlink, RAL)
+#     BLY: M.J.Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-JAN-1993 (RFWS):
+#        Original version.
+#     15-MAR-1993 (RFWS):
+#        Adapted for use on sun4_Solaris and alpha_OSF1.
+#     30-JUN-1993 (PMA):
+#        Added definitions of CC and CFLAGS for all machines.
+#     13-OCT-1993 (PMA):
+#        Added comments about definitions of CC and CFLAGS for all machines.
+#     15-NOV-1993 (PTW):
+#        Cosmetics.
+#     23-MAR-1995 (BLY):
+#        Generic applications version.
+#     19-APR-1995 (RFWS):
+#        Adapted for use in HTX, which consists only of UNIX scripts.
+#     7-DEC-1995 (RFWS):
+#        Added Linux implementation.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Export "local" definitions to the environment for use by make.
+      export LINK
+      export TAR_IN
+      export TAR_OUT
+
+#  Check that the SYSTEM environment variable is defined.
+      if test "$SYSTEM" = ""; then
+         echo "mk: Please define the environment variable SYSTEM to identify"
+         echo "    your computer system (the prologue in the mk script file"
+         echo "    contains more information if you require it)."
+
+#  If OK, test for each recognised system.
+      else
+         case "$SYSTEM" in
+
+#  DEC Alpha:
+#  =========
+#  DEC Alpha machines running OSF1.
+#  -------------------------------
+            alpha_OSF1)
+               LINK='ln -s'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  SUN4 systems:
+#  ============
+#  SUN Sparcstations running SunOS 5.x (Solaris).
+#  ---------------------------------------------
+            sun4_Solaris)
+               LINK='ln -s'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  SUN Sparcstations running SunOS 4.x.
+#  -----------------------------------
+            sun4)
+               LINK='ln -s'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  Linux systems:
+#  =============
+            ix86_Linux)
+               LINK='ln -s'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+#  Issue a warning if SYSTEM is not recognised.
+            *)
+               echo "mk: WARNING: value of SYSTEM = $SYSTEM not recognised..."
+               echo "             ...assuming default system characteristics"
+               ;;
+         esac
+
+#  Invoke make with the appropriate environment variables set to override
+#  default macros defined in the makefile.
+         echo make -e $*
+         make -e $*
+      fi
+
+#  End of script.

@@ -1,0 +1,140 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     depends
+
+#  Purpose:
+#     Identify hypertext documents that refer to changed documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script identifies hypertext documents that depend on (i.e. refer to)
+#     other documents that have changed, and which therefore require relinking.
+#     Their names are written to standard output, one per line.
+
+#  Invocation:
+#     cat doclist | depends newlist
+
+#  Parameters:
+#     doclist
+#        The list of documents to inspect. This should be supplied on standard
+#        input, one document name per line. The documents found will be a
+#        subset of these.
+#     newlist
+#        A space-separated list of the documents that have changed (supplied as
+#        script arguments).
+
+#  Environment Variables Used:
+#     HTX_ALLDOCS
+#        A space-separated list of all known documents. Any reference to a
+#        document that does not appear in this list will be considered a
+#        "remote" reference.
+#     HTX_REMOTE
+#        If set to '1', any document that refers to a remote file (i.e. one
+#        that does not appear in the list of all known documents) will be
+#        considered as needing to be relinked. If set to '0', remote references
+#        will not, on their own, cause a document to be selected for relinking
+#        by this script.
+
+#  Prior Requirements:
+#     All documents must have up to date index files associated with them
+#     before invoking this script.
+
+#  Notes:
+#     Directory information (which may be relative to the current directory)
+#     should be included for all the document names supplied, but the ".htx"
+#     file extension should be omitted. The same document name format is used
+#     on output.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of documents that have changed.
+      newlist="${*}"
+
+#  Read the list of documents that are to be considered (one per line) from
+#  the standard input and append ".htx/htx.index" to each name to construct a
+#  list of the associated index files.
+      indexlist=`sed -e 's%$%.htx/htx.index%'`
+
+#  Echo the list of all known documents followed by the list of new documents,
+#  one name per line, for use by "awk".  Distinguish the two lists by adding a
+#  ">" or "<" prefix to each line. Pipe the result into "awk".
+      (
+         for doc in ${HTX_ALLDOCS}; do echo "> ${doc}"; done
+         for doc in ${newlist}; do echo "< ${doc}"; done
+      ) | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Test for input lines read from standard input (these will be from the
+#  document lists generated above).
+         {
+            if ( FILENAME == "-" ) {
+
+#  Split the full document name into its component path fields and extract the
+#  basic document name from the last field.
+               np = split( $2, path, "/" )
+               doc = path[ np ]
+
+#  Enter the document name into either the global document set or the new
+#  document set, as appropriate (distinguished by the line prefix).
+               if ( $1 == ">" ) {
+                  global[ doc ] = 1
+               } else if ( $1 == "<" ) {
+                  new[ doc ] = 1
+               }
+
+#  Now consider the remaining input lines (that are read from the index files
+#  of all the known documents).
+            } else {
+
+#  Select lines from the index files that describe outgoing cross-references.
+               if ( $1 == ">" ) {
+
+#  Use the referenced document name ($3) to test if the index file is referring
+#  to a document in the new document set. If "remote" is set, also test to
+#  see if it is referring to a remote document (one that is not included in the
+#  global document set).
+                  if ( new[ $3 ] || ( !global[ $3 ] && ( remote == "1" ) ) ) {
+
+#  If either of the above tests is true, the document whose index file we are
+#  reading will need relinking. If this is the first time this has been
+#  detected, write out its name (by removing the ".htx/htx.index" from its
+#  index file name).
+                     if ( FILENAME != note ) {
+                        print( substr( FILENAME, 1, length( FILENAME) - 14 ) )
+
+#  Note we have now detected that this document needs relinking.
+                        note = FILENAME
+                     }
+                  }
+               }
+            }
+         }
+
+#  End of "awk" script.
+#  -------------------
+#  Set the "remote" variable in "awk" according to the setting of HTX_REMOTE.
+#  Make "awk" read from standard input and then from the index files of all
+#  the documents being considered.
+         ' remote="${HTX_REMOTE}" - ${indexlist}
+
+#  End of script.

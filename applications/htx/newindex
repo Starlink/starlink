@@ -1,0 +1,103 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     newindex
+
+#  Purpose:
+#     Generate new index files for a set of hypertext documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script creates new index files (called "htx.index") for a set of
+#     hypertext documents whose names are given as arguments. Any pre-existing
+#     index files are over-written by this script. Index files are used to
+#     summarise the inward- and outward-pointing cross links and other
+#     information present in a hypertext document.
+
+#  Invocation:
+#     newindex doclist
+
+#  Parameters:
+#     doclist
+#        A space-separated list of the documents for which new index files are
+#        required.
+
+#  Environment Variables Used:
+#     HTX_SCRIPT
+#        The name of the script that the user originally invoked (which in turn
+#        invoked this script). This is only used for generating error messages.
+
+#  Notes:
+#     -  Directory information (which may be relative to the current directory)
+#     should be included for all the document names supplied, but the ".htx"
+#     file extension should be omitted.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1995 (RFWS):
+#        Original version.
+#     2-MAY-1995 (RFWS):
+#        Set the "htx.index" file protections to match the document from which
+#        it is derived.
+#     12-JUL-1995 (RFWS):
+#        Moved generation of the index file contents into a separate script.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of documents for which index files are required.
+      doclist="${*}"
+
+#  Loop to process each document.
+      for doc in ${doclist}; do
+
+#  Obtain the document name with directory information removed.
+         base=`basename ${doc}`
+
+#  Check that write access to the document directory is available. Write a
+#  warning message to standard error if it is not, but continue processing
+#  other documents.
+         if test ! -w "${doc}.htx"; then
+            echo >&2 \
+            "${HTX_SCRIPT}: cannot update index for document \"${base}\" \
+- no write access to directory ${doc}.htx"
+
+#  Output an informational message before processing each document.
+         else
+            echo "Updating index file for document: ${base}"
+
+#  Generate the index file.
+            ${HTX_DIR}/creindex "${doc}" >"${doc}.htx/htx.index"
+
+#  Obtain the file access modes of the document directory (using "ls") and pass
+#  the output through "sed" to generate a set of flags for "chmod".  Then use
+#  "chmod" to set the protection on the "htx.index" file to be the same as on
+#  the document directory itself (but omitting any execute permissions).
+            modes=`ls -dl "${doc}.htx" | \
+                      sed -e 's%^.\(..\).\(..\).\(..\)..*%u=\1 g=\2 o=\3%' \
+                          -e 's%-%%'g`
+            for mode in ${modes}; do
+               chmod "${mode}" "${doc}.htx/htx.index"
+            done
+
+#  Touch the "htx.index" file, which synchronises the time system to the
+#  current machine to avoid possible problems with time differences on shared
+#  file systems. This also makes the index file more recent than the document
+#  directory it resides in.
+            touch "${doc}.htx/htx.index"
+         fi
+      done
+
+#  End of script.

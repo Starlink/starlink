@@ -1,0 +1,56 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     showhtml
+
+#  Purpose:
+#     List the ".html" files in a directory.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script echos a list of all the ".html" files in a directory to
+#     standard output.  The list is space-separated and includes directory
+#     path information for each file.  If the directory doesn't exist, or if
+#     it contains no ".html" files, then no output is generated.
+
+#  Invocation:
+#     showhtml dir
+
+#  Parameters:
+#     dir
+#        The directory to be searched.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the name of the directory to search.
+      dir="${1}"
+
+#  Check that the directory can be visited to ensure it exists.
+      if (cd ${dir} 1>/dev/null 2>/dev/null); then
+
+#  Obtain a list of the ".html" files it contains.
+         files=`echo ${1}/*.html`
+
+#  If at least one ".html" file was found, echo the list to standard output.
+         if test ! "${files}" = "${1}/*.html"; then echo ${files}; fi
+      fi
+
+#  End of script.

@@ -1,0 +1,92 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     allfind
+
+#  Purpose:
+#     Obtain a complete list of known hypertext documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script searches the set of directories supplied as arguments,
+#     followed by the set specified in the HTX_PATH environment variable.
+#     It identifies all the hypertext documents that reside in these
+#     directories and echos a list of them to standard output, one per line.
+#     Documents are identified by their ".htx" file extension. Where a
+#     document with the same name occurs in more than one directory, only the
+#     first occurrence is used (i.e. earlier directories occlude later ones).
+#     Directory path information (which may be relative to the default
+#     directory) is included in the output document list, but the ".htx" file
+#     extension is omitted.
+
+#  Invocation:
+#     allfind [dirlist]
+
+#  Parameters:
+#     dirlist
+#        An optional space-separated list of directories to be searched before
+#        those appearing in the HTX_PATH list. If none are specified, then only
+#        those appearing in the HTX_PATH list are considered.
+
+#  Environment Variables Used:
+#     HTX_PATH
+#        An optional colon-separated list of directories in which to search for
+#        hypertext documents. If this environment variable is not defined, a
+#        default is used (see the htxpath script).
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1995 (RFWS):
+#        Original version.
+#     18-JUL-1995 (RFWS):
+#        Moved translation of HTX_PATH into a separate script.
+#     8-AUG-1995 (RFWS):
+#        Changed to translate HTX_PATH locally if possible. Also changed to
+#        handle colons in the search path.
+#     16-OCT-1995 (RFWS):
+#        Re-implemented using "awk" for better performance.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of directories to search in addition to those appearing in
+#  the HTX_PATH list.
+      extradirs="${*}"
+
+#  Obtain the HTX_PATH search path, using a default if necessary.
+      path="${HTX_PATH-`${HTX_DIR}/htxpath`}"
+
+#  Concatenate the directory list supplied via arguments with that specified
+#  via HTX_PATH, removing colons from the latter. Then loop to inspect each
+#  directory in the resulting global list.
+      for dir in ${extradirs} `echo "${path}" | tr ':' ' '`; do
+
+#  Obtain the names of all the ".htx" files in each directory.
+         ls -d -1 ${dir}/*.htx 2>/dev/null
+
+#  Pipe the resulting list through "awk" to remove duplicates.
+      done | awk -F/ '{
+
+#  Select lines for which the document name (final field) has not yet been
+#  output and note each name as it is used.
+         if ( !done[ $NF ]++ ) {
+
+#  Write out a unique set of document names with directory information, but
+#  omitting the final ".htx" extension.
+            print( substr( $0, 1, length( $0 ) - 4 ) )
+         }
+      }'
+
+#  End of script.

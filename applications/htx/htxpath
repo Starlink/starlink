@@ -1,0 +1,87 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     htxpath
+
+#  Purpose:
+#     Output the default list of directories to be searched for documents.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script writes a colon-separated list of directories which specifies
+#     the default sequence of locations to be searched for hypertext documents
+#     to standard output.
+
+#  Invocation:
+#     htxpath
+
+#  Environment Variables Used:
+#     The script outputs the value of:
+#
+#       "$INSTALL/docs:$INSTALL/help:$STARLINK/docs:$STARLINK/help"
+#
+#     where the environment variable INSTALL defaults to "$HOME/star" and
+#     the environment variable STARLINK defaults to "/star" if not defined.
+#     If $INSTALL and $STARLINK have the same value, then the first half of
+#     this search path is omitted.
+#
+#     If this script has been installed using the HTX makefile, this value
+#     will be "hard-wired" into this script during installation, and will
+#     therefore reflect the values of $INSTALL, $STARLINK and $HOME at the
+#     time of installation. If it has not been installed (e.g. during software
+#     development), then these variables will be translated at the time the
+#     script is invoked.
+
+#  Notes:
+#     The value of the environment variable HTX_PATH (if defined and not null)
+#     should normally be used to override the default provided by this script.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-JUL-1995 (RFWS):
+#        Original version.
+#     8-AUG-1995 (RFWS):
+#        Changed to provide the default search path only.
+#     19-OCT-1995 (RFWS):
+#        Allow the script to be edited during installation.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  The following lines should be edited to define the values used during
+#  software installation.
+      install='|INSTALL|'
+      starlink='|STARLINK|'
+
+#  Test if the above edits have been made. If not, then provide defaults.
+      if test "${install}" = '|INS''TALL|'; then
+         install="${INSTALL:-${HOME}/star}"
+      fi
+      if test "${starlink}" = '|STAR''LINK|'; then
+         starlink="${STARLINK:-/star}"
+      fi
+
+#  If "install" and "starlink" have the same values, then output a simplified
+#  search path.
+      if test "${install}" = "${starlink}"; then
+         echo "${starlink}/docs:${starlink}/help"
+
+#  Otherwise, output the full search path.
+      else
+         echo \
+         "${install}/docs:${install}/help:${starlink}/docs:${starlink}/help"
+      fi
+
+#  End of script.

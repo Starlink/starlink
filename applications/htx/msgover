@@ -1,0 +1,103 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     msgover
+
+#  Purpose:
+#     Overprint a message on the user's terminal.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This command displays a message on the controlling terminal. If required
+#     the message over-writes a specified number of the characters that were
+#     last printed so that a previous message (or the final part of it) is
+#     obliterated by the new one.
+
+#  Invocation:
+#     msgover nb msg
+
+#  Parameters:
+#     nb
+#        A non-negative integer, specifying how many of the most recently
+#        printed characters should be over-written. If this is zero, the new
+#        message will be concatenated with a previous one. Otherwise, all or
+#        part of the previous message will be over-written.
+#     msg
+#        The new message to be displayed. This should not normally contain
+#        newline characters (and none will be added) otherwise over-writing of
+#        previous messages will not work.
+
+#  Output:
+#     The number of characters in the "msg" parameter is written as a decimal
+#     integer to standard output. This may be passed (as the "nb" parameter)
+#     to a subsequent invocation in order to over-write the message with
+#     another one.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-NOV-1995 (RFWS):
+#        Original version.
+#     8-DEC-1995 (RFWS):
+#        Make awk read from "/dev/null" rather than closing standard input.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the number of old characters to be over-written.
+      nb="${1}"
+
+#  Obtain the new message to be displayed.
+      shift
+      msg="${1}"
+
+#  Put a backspace character into the "bs" variable (this contortion seems
+#  necessary in order to generate a backspace character on all platforms - only
+#  the "tr" syntax seems sufficiently uniform).
+      bs="`echo ' ' | tr ' ' '\010'`"
+
+#  Run "awk" (reading from "/dev/null") to generate and print the necessary
+#  characters.
+      awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Generate characters to backspace over the specified number of characters of
+#  the previous message.
+      END{
+         chars=""
+         nb = int( nb )
+         while ( i++ < nb ) chars = chars bs
+
+#  Append the new message.
+         chars = chars msg
+
+#  If the old message was longer than the new one, append characters to pad
+#  the new message out with blanks (to erase the end of the old one) and then
+#  to backspace over these blanks.
+         i = j = length( msg )
+         while ( i++ < nb ) chars = chars " "
+         while ( j++ < nb ) chars = chars bs
+
+#  Write the generated characters to the controlling terminal.
+         printf( "%s", chars ) >"/dev/tty"
+
+#  Write the length of the new message to standard output.
+         print( length( msg ) )
+
+#  End of "awk" script.
+#  -------------------
+#  Supply "awk" with the data it needs and then read from standard input (which
+#  is closed).
+      }' nb="${nb}" msg="${msg}" bs="${bs}" /dev/null

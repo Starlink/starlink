@@ -1,0 +1,131 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     newdocs
+
+#  Purpose:
+#     Identify new hypertext documents that need relinking.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script identifies hypertext documents whose index files have changed
+#     since the most recent relink of documents in their directory (as
+#     indicated by the "htx.log" datestamp file, if present, in that
+#     directory). These documents are therefore in need of relinking. Their
+#     names are written to standard output, one per line.
+
+#  Invocation:
+#     newdocs doclist
+
+#  Parameters:
+#     doclist
+#        A space-separated list of the documents to inspect. The documents
+#        found will be a subset of those supplied here as arguments.
+
+#  Prior Requirements:
+#     The index files for all the documents being considered should be brought
+#     up to date before using this script.
+
+#  Notes:
+#     Directory information (which may be relative to the current directory)
+#     should be included in all document names, but the ".htx" file extension
+#     should be omitted. The same document name format is used on output.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1995 (RFWS):
+#        Original version.
+#     7-DEC-1995 (RFWS):
+#        Removed backslash from second argument of "tr".
+#     8-DEC-1995 (RFWS):
+#        Added "-s" flag on "make" to prevent Linux producing helpful
+#        messages.
+#     13-DEC-1996 (RFWS):
+#        Split up document list on output from "awk" to avoid hitting a limit
+#        in "printf".
+#     3-JUN-1998 (RFWS):
+#        Fixed a bug in extraction of directory prefix: documents
+#        without a prefix were having their names used as the
+#        directory prefix on Linux.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Obtain the list of documents to inspect.
+      doclist="${*}"
+
+#  Echo each document name (on a separate line) and pipe the result into "awk"
+#  to format a dependencies file for use by "make".
+      for doc in ${doclist}; do echo "${doc}"; done | awk '
+
+#  Start of "awk" script.
+#  ---------------------
+#  Ensure that "docsin" is recognised as an array,
+         BEGIN{
+            docsin[ "" ] = ""
+         }
+
+#  Split the document name up into its constituent path fields.
+         {
+            np = split( $0, path, "/" )
+
+#  Extract the directory prefix, if present, otherwise use ".".
+            dir = substr( $0, 1, length( $0 ) - length( path [ np ] ) )
+            if ( dir == "" ) dir = "./"
+
+#  Construct an associative array, indexed by directory name, where each
+#  element contains a space separated list of all the "htx.index" files
+#  associated with documents in that directory.
+            docsin[ dir ] = docsin[ dir ] $0 ".htx/htx.index "
+         }
+
+#  When all documents have been processed, output a "make" target that depends
+#  on the "htx.log" files in all the directories that contain documents. Add a
+#  rule for updating this target that does nothing.
+         END {
+            printf( "newdocs_update: " )
+            for ( dir in docsin ) if ( dir ) {
+               printf( "%shtx.log ", dir )
+            }
+            printf( "; @ :\n" )
+
+#  For each directory containing documents, make the "htx.log" file depend
+#  on all the "htx.index" files that should exist in the document directories.
+            for ( dir in docsin ) if ( dir ) {
+               printf( "%shtx.log:", dir )
+
+#  Split up the document list and output one document name at a time to
+#  avoid limits on "printf" string length.
+               ndocs = split( docsin[ dir ], doc, " " )
+               for ( i = 1; i <= ndocs; i++ ) printf( " %s", doc[ i ] )
+
+#  Add a rule that echos the list of "htx.index" files which are newer than the
+#  corresponding "htx.log" file.
+               printf( "; @ echo $?\n" )
+            }
+         }
+
+#  End of "awk" script.
+#  -------------------
+#  Pipe the output from the above script as a dependencies file into "make",
+#  which results in a space-separated list of the updated "htx.index" files for
+#  the documents in each directory, with the lists separated by newlines. Use
+#  "tr" to convert all the embedded spaces into newlines as well, and then use
+#  "sed" to remove the trailing ".htx/htx.index" from each file name to give a
+#  standard document name on each line.
+         ' | make -s -f - | tr ' ' '
+' | sed -e 's%\.htx/htx\.index$%%'
+
+#  End of script.

@@ -1,0 +1,70 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     stdfile
+
+#  Purpose:
+#     Translate a list of file names into standard form.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script reads a list of file names, one per line, from standard input
+#     and converts them into a standard form. This involves adding the default
+#     directory as a prefix (if necessary) to produce an absolute path. It
+#     then involves removing all redundant occurrences of "/./", "//" and
+#     "/dir/../". The resulting file names are written to standard output, one
+#     per line.
+
+#  Invocation:
+#     cat filelist | stdfile
+
+#  Parameters:
+#     filelist
+#        The list of file names to be translated, one per line.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-OCT-1995 (RFWS):
+#        Original version.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Use "sed" to:
+#
+#  o  Add the current directory as a prefix if the file name doesn't start
+#     with "/".
+#  o  Loop to change all occurrences of "/./" to "/".
+#  o  Loop to change all occurrences of "//" to "/".
+#  o  Loop to change all occurrences of "/../" to "//" (temporarily).
+#  o  Loop to change all occurrences of "/dir//" to "/", thus eliminating
+#     anything of the form "/dir/../".
+#
+#  Allow "sed" to read from standard input and write to standard output.
+      sed 's%^\([^/]\)%'"`pwd`"'/\1%
+           :a
+           s%/\./%/%g
+           t a
+           :b
+           s%//%/%g
+           t b
+           :c
+           s%/../%//%g
+           t c
+           :d
+           s%/[^/][^/]*//%/%g
+           t d'
+
+#  End of script.

@@ -1,0 +1,204 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     urlgen
+
+#  Purpose:
+#     Generate a URL for a document reference.
+
+#  Type of Module:
+#     Shell script
+
+#  Description:
+#     This script accepts the name of a document and (optionally) a
+#     cross-reference label within it and generates the URL needed to access
+#     the specified part of the document.
+
+#  Invocation:
+#     urlgen doc [label]
+
+#  Parameters:
+#     doc
+#        The name of the document. If no directory information is supplied,
+#        this will be searched for using the HTX_PATH search path (or its
+#        default, if necessary).
+#     label
+#        An optional cross-reference label. If given, this specifies which
+#        part of the document is required. If omitted, it is assumed that the
+#        "entire" document is required and a URL for the appropriate "top"
+#        page is returned.
+#
+#        The label supplied may contain pattern matching characters (for use
+#        by the "sed" utility), in which case the alphabetically first match to
+#        a label in the document will be used.
+
+#  Environment Variables Used:
+#     HTX_PATH
+#        An optional colon-separated list of directories in which to search for
+#        hypertext documents. If this environment variable is not defined, a
+#        default is used (see the htxpath script).
+#     HTX_SERVER
+#        The URL of the document server to be used for serving remote
+#        documents. This will be used as a prefix in all URLs that refer to
+#        remote documents. If this environment variable is not set, the value
+#        used is "http://star-www.rl.ac.uk/cgi-bin/htxserver".
+#     HTX_WHERE
+#        If this is set to "l", it specifies that a local document is required
+#        and that no reference to a remote document server should be generated.
+#        In this case, if the document cannot be found locally no URL is
+#        returned.
+#
+#        If HTX_WHERE is set to "r", it specifies that a remote document is
+#        required. In this case, a reference to a remote document server will
+#        be generated, even if a local copy of the document exists.
+#
+#        If HTX_WHERE has neither of the above values, a local file reference
+#        will be generated if the document is found locally, otherwise a
+#        remote URL will be generated.
+
+#  Notes:
+#     -  If a cross-reference label is specified but it cannot be found in
+#     a local document, then an error will result.
+#     -  There is no checking of the existence of remote documents, nor of
+#     the cross-reference labels they contain.
+
+#  Copyright:
+#     Copyright (C) 1995 The Central Laboratory of the Research Councils
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-AUG-1995 (RFWS):
+#        Original version.
+#     9-AUG-1995 (RFWS):
+#        Revised to improve efficiency.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+#.
+
+#  Obtain the document specification. Strip off any directory specification to
+#  obtain the document name.
+      docspec="${1}"
+      docname="`basename "${docspec}"`"
+
+#  Obtain the cross-reference label.
+      label="${2}"
+
+#  Check that a document name was given. Abort if not, giving an appropriate
+#  error message.
+      if test ! -n "${docname}"; then
+         if test -n "${docspec}"; then
+            echo >&2 "${HTX_SCRIPT}: no document name given: ${docspec}"
+         else
+            echo >&2 "${HTX_SCRIPT}: no document name given"
+         fi
+         exit 1
+      fi
+
+#  Note that no URL has yet been generated.
+      done=''
+
+#  Search for the document locally.
+#  -------------------------------
+#  Unless a remote document was requested, we must search for the document in
+#  the local file system. Extract any directory information from the document
+#  specification.
+      if test ! "${HTX_WHERE}" = 'r'; then
+         if path="`expr "//${docspec}" : '//\(.*\)/.*'`"; then :; else
+
+#  If no directory information was present, obtain the search path on which to
+#  search for documents by translating the HTX_PATH environment variable. Use
+#  the output of the "htxpath" script as a default if necessary.
+            path="${HTX_PATH-`${HTX_DIR}/htxpath`}"
+         fi
+
+#  Search each directory in $path to see if the required document (directory)
+#  exists within it (use "cd" to test for this as it also works with symbolic
+#  links). Save the full document name when found.
+         doc="`IFS=':'; for dir in ${path}; do doc="${dir:-.}/${docname}"
+            (cd "${doc}.htx" 1>/dev/null 2>/dev/null) && echo "${doc}" && break
+         done`"
+
+#  Document found locally.
+#  ----------------------
+         if test -n "${doc}"; then
+
+#  If a label was given, then we must search the document's index file to find
+#  the name of the file containing the label and hence generate the file name
+#  and fragment specifier required. Set up a "sed" script to perform the
+#  search and to quit once the required index file entry has been found (this
+#  ensures that only a single match can be obtained which is important if the
+#  label given contains any pattern matching characters.)
+            if test -n "${label}"; then
+               eds='s%^<  *\([^ ][^ ]*\)  *\('"${label}"'\) *$%\1#xref_\2%p
+                    t done
+                    b
+                    :done
+                    q'
+
+#  If no label was given, then we must search the document's index file to
+#  identify the file containing the "home page" (identified by an entry with a
+#  "T " prefix). Set up a "sed" script to perform this search.
+            else
+               eds='s%^T  *\([^ ][^ ]*\).*$%\1#xref_%p'
+            fi
+
+#  If the document has a readable index file, then run "sed" on it directly.
+#  Otherwise, output a warning message and generate the required index file
+#  contents by invoking "creindex" to scan the document (which will be a lot
+#  slower). Note we do not create an index file if it does not already exist.
+            ifile="${doc}.htx/htx.index"
+            if test -f "${ifile}" -a -r "${ifile}"; then
+               filefrg="`sed -n "${eds}" "${ifile}"`"
+            else
+               echo >&2 \
+               "${HTX_SCRIPT}: warning - document ${doc} has no index file"
+               filefrg="`${HTX_DIR}/creindex "${doc}" | sed -n "${eds}"`"
+            fi
+
+#  Construct an absolute file name for the document by adding the current
+#  directory name if necessary. 
+            case "${doc}" in [!/]*) doc="`pwd`/${doc}";; esac
+
+#  If the file and fragment specifier were found, then output the full local
+#  URL.
+            if test -n "${filefrg}"; then
+               echo "${doc}.htx/${filefrg}"
+
+#  If they were not found, but no label was given, then output a URL using a
+#  file name based on the document name instead.
+            elif test ! -n "${label}"; then
+               echo "${doc}.htx/${docname}.html"
+
+#  Otherwise, the required label was not found, so output an error message and
+#  abort.
+            else
+               echo >&2 \
+"${HTX_SCRIPT}: cannot find label \"${label}\" in document ${docname}"
+               exit 1
+            fi
+
+#  Note that a local URL has been generated.
+            done='1'
+         fi
+      fi
+
+#  Remote document.
+#  ---------------
+#  If no local URL was generated, then check if a local URL was specifically
+#  requested. If not, then output a remote URL constructed from that of the
+#  remote server (provide a default for this if necessary). In this case there
+#  is no check that the document or label exists.
+      if test ! -n "${done}" -a ! "${HTX_WHERE}" = 'l'; then
+         HTX_SERVER="${HTX_SERVER-http://star-www.rl.ac.uk/cgi-bin/htxserver}"
+         echo "${HTX_SERVER}/${docname}.htx/${docname}.html?xref_${label}"
+      fi         
+
+#  End of script.
