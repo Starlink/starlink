@@ -160,8 +160,9 @@
             type LITERAL
             access READ
             vpath PROMPT
-            ppath CURRENT
+            ppath CURRENT DEFAULT
             prompt {Destination coordinate frame}
+            default !
             helpkey *
           }
 
