@@ -1,0 +1,89 @@
+interface IPOSIT
+  parameter LOAD
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Load a list of positions'
+  endparameter
+  parameter SEL
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Select position from list'
+  endparameter
+  parameter SHOW
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Show list of positions'
+  endparameter
+  parameter LIST
+    type '_CHAR'
+    prompt 'List of positions'
+    help 'Source list file or ASCII file of RA/DECs'
+  endparameter
+  parameter NUM
+    type '_INTEGER'
+    prompt 'Position number'
+    help 'Number in current list'
+  endparameter
+  parameter FRAME
+    position 1
+    type '_INTEGER'
+    default 1
+    prompt 'Coordinate frame'
+    help '1-celestial  2-ecliptic  3-galactic  4-axis  5-pixel'
+  endparameter
+  parameter RA
+    position 2
+    type '_CHAR'
+    prompt 'RA'
+    help 'RA in any form : 234.56   2.345rad  12h34m56.5s  12:34:56.5'
+  endparameter
+  parameter DEC
+    position 3
+    type '_CHAR'
+    prompt 'DEC'
+    help 'DEC in any form : -50.56   2.345rad  12d34m56.5s  12:34:56.5'
+  endparameter
+  parameter ELON
+    type '_DOUBLE'
+    prompt 'Ecliptic lon.'
+    help 'Ecliptic longitude in decimal degrees'
+  endparameter
+  parameter ELAT
+    type '_DOUBLE'
+    prompt 'Ecliptic lat.'
+    help 'Ecliptic latitude in decimal degrees'
+  endparameter
+  parameter L
+    type '_DOUBLE'
+    prompt 'Galactic lon.'
+    help 'Galactic longitude in decimal degrees'
+  endparameter
+  parameter B
+    type '_DOUBLE'
+    prompt 'Galactic lat.'
+    help 'Galactic latitude in decimal degrees'
+  endparameter
+  parameter X
+    type '_REAL'
+    prompt 'X-position'
+    help 'X-coord. in axis units'
+  endparameter
+  parameter Y
+    type '_REAL'
+    prompt 'Y-position'
+    help 'Y-coord. in axis units'
+  endparameter
+  parameter XPIX
+    type '_REAL'
+    prompt 'X-pixels'
+    help 'X-coord. in pixels'
+  endparameter
+  parameter YPIX
+    type '_REAL'
+    prompt 'Y-pixel'
+    help 'Y-coord. in pixels'
+  endparameter
+endinterface
