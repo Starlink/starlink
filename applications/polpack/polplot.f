@@ -180,19 +180,22 @@
 *
 *        The appearance of the text in the key is controlled using "String" 
 *        attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
-*        TEXT can be used in place of STRINGS). The appearance of the example 
-*        vector is controlled using "Curve" attributes (e.g. COLOUR(CURVES), 
-*        etc - the synonym VECTOR can be used in place of CURVES). The
-*        numerical scale value is formatted as an axis 1 value (using 
-*        attributes FORMAT(1), DIGITS(1), etc - the synonym SCALE can be 
-*        used in place of the value 1). The length of the example vector is 
-*        formatted as an axis 2 value (using attribute FORMAT(2), etc - the 
-*        synonym VECTOR can be used in place of the value 2). The vertical 
-*        space between lines in the key can be controlled using attribute
-*        TextLabGap. A value of 1.0 is used if no value is set for this
-*        attribute, and produces default vertical spacing. Values larger
-*        than 1.0 increase the vertical space, and values less than 1.0
-*        decrease the vertical space. [current value] 
+*        TEXT can be used in place of STRINGS). Note, the Size attribute 
+*        specifies the size of key text relative to the size of the numerical 
+*        labels on the vector map axes. Thus a value of 2.0 for Size will
+*        result in text which is twice the size of the numerical axis labels.
+*        The appearance of the example vector is controlled using "Curve" 
+*        attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be 
+*        used in place of CURVES). The numerical scale value is formatted as 
+*        an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the 
+*        synonym SCALE can be used in place of the value 1). The length of 
+*        the example vector is formatted as an axis 2 value (using attribute 
+*        FORMAT(2), etc - the synonym VECTOR can be used in place of the 
+*        value 2). The vertical space between lines in the key can be 
+*        controlled using attribute TextLabGap. A value of 1.0 is used if 
+*        no value is set for this attribute, and produces default vertical 
+*        spacing. Values larger than 1.0 increase the vertical space, and 
+*        values less than 1.0 decrease the vertical space. [current value] 
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
@@ -936,11 +939,11 @@
             GO TO 999
          END IF
 
-*  Get the PGPLOT character height scale factor used for strings in the main 
-*  vector map area.
-         CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTRS, STATUS )
+*  Get the PGPLOT character height scale factor used for numerical labels 
+*  in the main vector map area.
+         CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .TRUE., ATTRS, STATUS )
          CALL PGQCH( HGT )
-         CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTRS, STATUS )
+         CALL KPG1_PGSTY( IPLOT, 'NUMLAB', .FALSE., ATTRS, STATUS )
 
 *  If no value was supplied for the vertical position of the KEY using 
 *  parameter KEYPOS, find the value which puts the top of the key level 
