@@ -45,7 +45,6 @@ edit = sed \
 
 ## The above rule can get confused about pongo.icl and looks for pongo.icl.in.
 pongo.icl: ;
-icl/pongo_proc.icl: ;
 
 ## File not mentioned elsewhere that we need to distribute.
 EXTRA_DIST = PONGO_PAR PONGO_CMN
