@@ -47,6 +47,8 @@ $!    1992 September 7 (MJC):
 $!       Original version based on MAKE_KAPPA.
 $!    1992 September 29 (MJC):
 $!       Added IRAF libraries and used released FIO.
+$!    1992 September 30 (MJC):
+$!       Used options file to reduce size of executables.
 $!    {enter_further_changes_here}
 $!
 $!-
@@ -56,7 +58,7 @@ $!  using the Adam command MLINK.
 $!
 $ MLINK CONVERT.OBJ,-
 CONVERT_DIR:CONVERT/LIB,-
-CONVERT_DIR:CONLIB/LIB,-
+CONVERT_DIR:CONVERT/OPT,-
 INTERIM/LIB/INCLUDE=(STL_DATA),-
 PRM_LINK/OPT,-
 FIGARO_LIBS:DTA/LIB,-
