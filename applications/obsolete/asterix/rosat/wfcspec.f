@@ -343,9 +343,9 @@
       IF ( SSDS ) THEN
 
 *    Copy values
-        CALL ARR_COP1R( 1, FLUX, %VAL(DOUT), STATUS )
+        CALL ARR_SELEM1R( DOUT, 1, 1, FLUX, STATUS )
         IF ( LVAR ) THEN
-          CALL ARR_COP1R( 1, FLUXERR*FLUXERR, %VAL(VOUT), STATUS )
+          CALL ARR_SELEM1R( VOUT, 1, 1, FLUXERR**2, STATUS )
         END IF
 
 *  Binned dataset case
@@ -358,7 +358,7 @@
           CALL ERR_REP( ' ', 'Error transferring data value', STATUS )
           GOTO 99
         END IF
-        CALL ARR_COP1R( 1, %VAL(DIN), %VAL(DOUT), STATUS )
+        CALL ARR_SELEM1R( DOUT, 1, 1, %VAL(DIN), STATUS )
 
 *    ..and variance
         IF ( LVAR )THEN
@@ -367,7 +367,7 @@
             CALL MSG_PRNT( 'Error transferring variance value' )
             CALL ERR_ANNUL( STATUS )
           END IF
-          CALL ARR_COP1R( 1, %VAL(VIN), %VAL(VOUT), STATUS )
+          CALL ARR_SELEM1R( VOUT, 1, 1, %VAL(VIN), STATUS )
         END IF
 
 *    ..and quality
@@ -377,7 +377,7 @@
             CALL MSG_PRNT( 'Error transferring quality value' )
             CALL ERR_ANNUL( STATUS  )
           END IF
-          CALL ARR_COP1B( 1, %VAL(QIN), %VAL(QOUT), STATUS )
+          CALL ARR_SELEM1B( QOUT, 1, 1, %VAL(QIN), STATUS )
         END IF
 
       END IF
