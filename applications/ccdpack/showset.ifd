@@ -100,7 +100,7 @@
             helpkey *
          }
 
-         parameter sortby {
+         parameter listby {
             type LITERAL
             access READ
             vpath CURRENT DEFAULT
