@@ -124,7 +124,6 @@
       INTEGER			AX_PTR(ADI__MXDIM)	! Ptr to axis data
       INTEGER			AX_WPTR(ADI__MXDIM)	! Ptr to axis widths
       INTEGER                AXIS                ! Axis selected for ratio
-      INTEGER                DIMS(ADI__MXDIM)    ! A spare dims array
       INTEGER                DUMMY               !
       INTEGER                I,J                 ! Axis loop counters
       INTEGER                IDIMS(ADI__MXDIM)   ! Input data dimensions
@@ -142,7 +141,6 @@
       INTEGER                ODIMS(ADI__MXDIM)   ! Output data dimensions
       INTEGER                ONDIM               ! Number of output data dims
       INTEGER                ONELM               ! # output data items
-      INTEGER                QNDIM               ! No of input quality dims
       INTEGER                OD_PTR              ! Output data pointer
       INTEGER			OFID			! Output dataset id
       INTEGER                OQ_PTR              ! Output quality pointer
@@ -151,7 +149,6 @@
       INTEGER                TLEN                ! Length of a string
       INTEGER                T_PTR               ! Temporary pointer
       INTEGER                USE                 ! Number of history elements
-      INTEGER                VNDIM               ! No of input variance dims
       INTEGER                WD_PTR              ! Workspace data
       INTEGER                WV_PTR              ! Workspace variance
 
@@ -240,40 +237,26 @@
         CALL BDI_CHK( IFID, 'Quality', QUAL_OK, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( QUAL_OK ) THEN
-          IF ( QNDIM .NE. NDIM ) THEN
-            CALL MSG_PRNT( 'Quality and data dimensions'/
-     :                                /' do not match.' )
-            STATUS = SAI__ERROR
-
-          ELSE
-
-*          Map it and tell user
-            CALL MSG_PRNT( 'Input has valid QUALITY' )
-            CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQ_PTR,
-     :                     STATUS )
-
-          END IF
+          CALL MSG_PRNT( 'Input has valid QUALITY' )
         END IF
+
+*    Map logical quality regardless - BDI invents if not present
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQ_PTR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*      See if we've got variance available
+*    See if we've got variance available
         CALL BDI_CHK( IFID, 'Variance', VARI_OK, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
-        IF ( VARI_OK .AND. ( VNDIM .NE. NDIM )) THEN
-          CALL MSG_PRNT( 'Variance and data '/
-     :           /'dimensions do not match.' )
-          STATUS = SAI__ERROR
+        IF ( VARI_OK ) THEN
 
-        ELSE IF ( VARI_OK ) THEN
-
-*        Use weights?
+*      Use weights?
           CALL USI_GET0L( 'WEIGHT', USE_WEIGHT, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*        Reset variance flag if no weighting
+*      Reset variance flag if no weighting
           VARI_OK = USE_WEIGHT
 
-*        Map it and tell user
+*      Map it and tell user
           IF ( VARI_OK ) THEN
             CALL MSG_PRNT( 'Input has valid VARIANCE' )
             CALL BDI_MAPR( IFID, 'Variance', 'READ', IV_PTR, STATUS )
@@ -284,24 +267,8 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    If we've no quality so far, whether because the input was primitive or
-*    the non-primitive input didn't have a quality array, then we have to
-*    generate a dummy quality array. The reason we do this is simple. It is
-*    more efficient and easier to code RATIO_INT to assume its got quality
-*    there. The overheads of having one more array mapped shouldn't be too
-*    high.
-      IF ( .NOT. QUAL_OK ) THEN
-        CALL DYN_MAPL( NDIM, IDIMS, IQ_PTR, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-
-*      Set all the quality to good
-        CALL ARR_INIT1L( .TRUE., NELM, %VAL(IQ_PTR), STATUS )
-
-      END IF
-
-*    Output a small table giving the relevant information. Tells the user
-*    about the axes if the input isn't primitive, otherwise it just shows
-*    the dimensions.
+*  Output a small table giving the relevant information. Tells the user about
+*  the axes if the input isn't primitive, otherwise it just shows the dims
       CALL MSG_PRNT( ' ' )
       IF ( PRIM ) THEN
         CALL MSG_PRNT( 'Assuming data regularly spaced' )
@@ -379,7 +346,8 @@
 *         Find normalisation. If we can't get normalisation then we assume
 *         it is unnormalised.
            IF ( OK ) THEN
-             CALL BDI_AXGET0L( IFID, I, 'Normalised', AX_NORM(I), STATUS )
+             CALL BDI_AXGET0L( IFID, I, 'Normalised', AX_NORM(I),
+     :                         STATUS )
              IF ( STATUS .NE. SAI__OK ) THEN
                CALL ERR_FLUSH( STATUS )
                AX_NORM(I) = .FALSE.
