@@ -106,6 +106,6 @@
       CALL ADI_ERASE( AXID, STATUS )
 
 *  Set return value
-      PSF0_GETAXDR = SCALE
+      PSF0_GETAXDR = DR
 
       END

@@ -1,4 +1,4 @@
-      SUBROUTINE PSF0_GETAXVAL( PSID, AX, DIM, REG, PTR, BASE, SCALE,
+      SUBROUTINE PSF0_GETAXVAL( PSID, AX, DIM, REG, PTR, BR, DR,
      :                          TOR, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL PSF0_GETAXVAL( PSID, AX, DIM, REG, PTR, BASE, SCALE, TOR, STATUS )
+*     CALL PSF0_GETAXVAL( PSID, AX, DIM, REG, PTR, BR, DR, TOR, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -27,10 +27,10 @@
 *        Axis values regularly spaced?
 *     PTR = INTEGER (returned)
 *        Axis data pointer if REG false
-*     BASE = REAL (returned)
-*        Axis data base
-*     SCALE = REAL (returned)
-*        Axis data scale
+*     BR = REAL (returned)
+*        Axis data base in radians
+*     DR = REAL (returned)
+*        Axis data scale in radians
 *     TOR = REAL (returned)
 *        Conversion factor to radians
 *     STATUS = INTEGER (given and returned)
@@ -103,7 +103,7 @@
 *  Arguments Returned:
       INTEGER			DIM, PTR
       LOGICAL			REG
-      REAL			BASE, SCALE, TOR
+      REAL			BR, DR, TOR
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -122,9 +122,10 @@
       CALL ADI_CGET0I( AXID, 'Dim', DIM, STATUS )
       CALL ADI_CGET0L( AXID, 'Reg', REG, STATUS )
       CALL ADI_CGET0I( AXID, 'Ptr', PTR, STATUS )
-      CALL ADI_CGET0R( AXID, 'Base', BASE, STATUS )
-      CALL ADI_CGET0R( AXID, 'Scale', SCALE, STATUS )
+      CALL ADI_CGET0R( AXID, 'Base', BR, STATUS )
+      CALL ADI_CGET0R( AXID, 'Dr', DR, STATUS )
       CALL ADI_CGET0R( AXID, 'Tor', TOR, STATUS )
+      BR = BR * TOR
 
 *  Release the axis
       CALL ADI_ERASE( AXID, STATUS )
