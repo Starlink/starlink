@@ -20,17 +20,17 @@
       INTEGER                   USI__F_DEF0
         PARAMETER               ( USI__F_DEF0 = 1 )
       INTEGER                   USI__F_DEF1
-        PARAMETER               ( USI__F_DEF1 = 5 )
+        PARAMETER               ( USI__F_DEF1 = 6 )
       INTEGER                   USI__F_GET0
-        PARAMETER               ( USI__F_GET0 = 10 )
+        PARAMETER               ( USI__F_GET0 = 11 )
       INTEGER                   USI__F_GET1
-        PARAMETER               ( USI__F_GET1 = 15 )
+        PARAMETER               ( USI__F_GET1 = 16 )
       INTEGER                   USI__F_PUT0
-        PARAMETER               ( USI__F_PUT0 = 20 )
+        PARAMETER               ( USI__F_PUT0 = 21 )
       INTEGER                   USI__F_PUT1
-        PARAMETER               ( USI__F_PUT1 = 25 )
+        PARAMETER               ( USI__F_PUT1 = 26 )
       INTEGER                   USI__F_REST
-        PARAMETER               ( USI__F_REST = 40 )
+        PARAMETER               ( USI__F_REST = 41 )
 
       INTEGER			USI__F_DEF0L
         PARAMETER               ( USI__F_DEF0L = USI__F_DEF0+USI__F_L )
