@@ -152,6 +152,17 @@ f        This attribute controls whether or not routine AST_GRID should draw
 *        major axis values. The default is to draw tick marks if the entire 
 *        plotting area is filled by valid physical coordinates, and to draw 
 *        curves otherwise.
+*     Invisible (int)
+*        This attribute controls the appearance of all graphics produced by
+*        Plot methods by determining whether graphics should be visible or
+*        invisible. If the Invisible value of a Plot is non-zero, then all 
+*        the Plot methods which normally generate graphical output do not 
+*        do so (you can think of them drawing with "invisible ink"). Such 
+*        methods do, however, continue to do all the calculations which 
+*        would be needed to produce the graphics. In particular, the bounding 
+*        box encoding the graphics is still calculated and can be retrieved 
+*        as normal using astBoundingBox. The default value is zero, resulting 
+*        in all methods drawing graphics as normal, using visible ink.
 *     LabelAt(axis) (double)
 *        This attribute has a value for each physical axis of the grid drawn
 c        by function astGrid. For each axis, it gives the value on the other
@@ -423,6 +434,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *        astBorder
 *           Draw a curve outlining the regions containing valid physical
 *           coordinates.
+*        astBoundingBox
+*           Return a bounding box for previously drawn graphics.
 *        astClip
 *           Set up or remove additional clipping for a Plot.
 *        astGrid
@@ -538,7 +551,7 @@ f     - Strings: Text strings drawn using AST_TEXT
 
 /* Macros. */
 /* ======= */
-#define AST__NPID      20   /* No. of different plot object id's */
+#define AST__NPID      15   /* No. of different genuine plot object id's */
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
 #define AST__GFLUSH	1
@@ -642,6 +655,7 @@ typedef struct AstPlot {
    int font[ AST__NPID ];
    int grf;
    int grid;
+   int invisible;
    int labelling;
    int labelunits[ 2 ];
    int labelup[ 2 ];
@@ -688,6 +702,7 @@ typedef struct AstPlotVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    int (* Border)( AstPlot * );
+   void (* BoundingBox)( AstPlot *, float[2], float[2] );
    void (* Clip)( AstPlot *, int, const double [], const double [] );
    int (* CvBrk)( AstPlot *, int, double *, double *, double * );
    void (* GridLine)( AstPlot *, int, const double [], double );
@@ -713,6 +728,10 @@ typedef struct AstPlotVtab {
    int (* TestTickAll)( AstPlot * );
    void (* SetTickAll)( AstPlot *, int );
    void (* ClearTickAll)( AstPlot * );
+   int (* GetInvisible)( AstPlot * );
+   int (* TestInvisible)( AstPlot * );
+   void (* SetInvisible)( AstPlot *, int );
+   void (* ClearInvisible)( AstPlot * );
    int (* GetBorder)( AstPlot * );
    int (* TestBorder)( AstPlot * );
    void (* SetBorder)( AstPlot *, int );
@@ -852,6 +871,7 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
    int astBorder_( AstPlot * );
+   void astBoundingBox_( AstPlot *, float[2], float[2] );
    void astClip_( AstPlot *, int, const double [], const double [] );
    void astGridLine_( AstPlot *, int, const double [], double );
    void astCurve_( AstPlot *, const double [], const double [] );
@@ -884,6 +904,11 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    int astTestTickAll_( AstPlot * );
    void astSetTickAll_( AstPlot *, int );
    void astClearTickAll_( AstPlot * );
+
+   int astGetInvisible_( AstPlot * );
+   int astTestInvisible_( AstPlot * );
+   void astSetInvisible_( AstPlot *, int );
+   void astClearInvisible_( AstPlot * );
 
    int astGetBorder_( AstPlot * );
    int astTestBorder_( AstPlot * );
@@ -1066,6 +1091,9 @@ astINVOKE(O,astLoadPlot_(mem,size,init,vtab,name,astCheckChannel(channel)))
 #define astBorder(this) \
 astINVOKE(V,astBorder_(astCheckPlot(this)))
 
+#define astBoundingBox(this,lbnd,ubnd) \
+astINVOKE(V,astBoundingBox_(astCheckPlot(this),lbnd,ubnd))
+
 #define astClip(this,iframe,lbnd,ubnd) \
 astINVOKE(V,astClip_(astCheckPlot(this),iframe,lbnd,ubnd))
 
@@ -1163,6 +1191,15 @@ astINVOKE(V,astGetClipOp_(astCheckPlot(this)))
 astINVOKE(V,astSetClipOp_(astCheckPlot(this),clipop))
 #define astTestClipOp(this) \
 astINVOKE(V,astTestClipOp_(astCheckPlot(this)))
+
+#define astClearInvisible(this) \
+astINVOKE(V,astClearInvisible_(astCheckPlot(this)))
+#define astGetInvisible(this) \
+astINVOKE(V,astGetInvisible_(astCheckPlot(this)))
+#define astSetInvisible(this,invisible) \
+astINVOKE(V,astSetInvisible_(astCheckPlot(this),invisible))
+#define astTestInvisible(this) \
+astINVOKE(V,astTestInvisible_(astCheckPlot(this)))
 
 #define astClearGrf(this) \
 astINVOKE(V,astClearGrf_(astCheckPlot(this)))

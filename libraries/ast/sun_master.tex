@@ -17633,12 +17633,10 @@ TextLabs and Ticks.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-7}
+\subsection{Changes Introduced in V1.8-7}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.8-5 and V1.8-7 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V1.8-5 and V1.8-7:
 
 \begin{enumerate}
 
@@ -17679,6 +17677,45 @@ f+
 AST\_SET,
 f-
 etc., on certain platforms (MacOS, for instance).
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.8-8}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-7 and V1.8-8 (the
+current version):
+
+\begin{enumerate}
+
+\item A new method called 
+c+
+astBoundingBox
+c-
+f+
+AST_BOUNDINGBOX
+f-
+has been added to the Plot class. This method returns the bounding box of
+the previous graphical output produced by a Plot method.
+
+\item A new attribute called Invisible has been added to the Plot class
+which suppresses the graphical output normally produced by Plot methods.
+All the calculations needed to produce the normal output are still
+performed however, and so the bounding box returned by the new 
+c+
+astBoundingBox
+c-
+f+
+AST_BOUNDINGBOX
+f-
+method is still usable.
+
+\item Bugs have been fixed related to the appearance of graphical output 
+produced by the Plot class. These bugs were to do with the way in which 
+graphical elements relating to a specific axis (e.g. {\tt Colour(axis1)}, etc.) 
+interacted with the corresponding generic element (e.g. 
+{\tt Colour(axes)}, etc.).
 
 \end{enumerate}
 

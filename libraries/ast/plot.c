@@ -79,6 +79,7 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     - Gap(axis): Interval between major axis values of a Plot
 *     - Grf: Select the graphics interface to use.
 *     - Grid: Draw grid lines for a Plot?
+*     - Invisible: Draw graphics in invisible ink?
 *     - LabelAt(axis): Where to place numerical labels for a Plot
 *     - LabelUnits(axis): Use axis unit descriptions in a Plot?
 *     - LabelUp(axis): Draw numerical Plot labels upright?
@@ -104,6 +105,7 @@ f     In addition to those routines applicable to all FrameSets, the
 f     following routines may also be applied to all Plots:
 *
 c     - astBorder: Draw a border around valid regions of a Plot
+c     - astBoundingBox: Returns a bounding box for previously drawn graphics
 c     - astClip: Set up or remove clipping for a Plot
 c     - astCurve: Draw a geodesic curve
 c     - astGenCurve: Draw a generalized curve
@@ -116,6 +118,7 @@ c     - astMark: Draw a set of markers for a Plot
 c     - astPolyCurve: Draw a series of connected geodesic curves
 c     - astText: Draw a text string for a Plot
 f     - AST_BORDER: Draw a border around valid regions of a Plot
+f     - AST_BOUNDINGBOX: Returns a bounding box for previously drawn graphics
 f     - AST_CLIP: Set up or remove clipping for a Plot
 f     - AST_CURVE: Draw a geodesic curve
 f     - AST_GENCURVE: Draw a generalized curve
@@ -133,56 +136,54 @@ f     - AST_TEXT: Draw a text string for a Plot
 *     line width used for plotting can be set independently for
 *     various elements of the graphical output produced by a Plot.
 *     The different graphical elements are identified by appending the
-*     following strings as subscripts to the Plot attributes
+*     strings listed below as subscripts to the Plot attributes
 *     Colour(element), Font(element), Size(element), Style(element)
 *     and Width(element). These strings are case-insensitive and
-*     unambiguous abbreviations may be used:
+*     unambiguous abbreviations may be used. Elements of the graphical 
+*     output which relate to individual axes can be referred to either
+*     independently (e.g. "(Grid1)" and "(Grid2)" ) or together (e.g.
+*     "(Grid)"):
 *
-c     - Border: The Plot border drawn using astBorder or astGrid
-f     - Border: The Plot border drawn using AST_BORDER or AST_GRID
-c     - Grid: Grid lines drawn using astGridLine or astGrid (provides
-f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID (provides
-      default values for Grid1 and Grid2)
-c     - Grid1: Grid lines which cross axis 1, drawn using astGridLine or astGrid 
-f     - Grid1: Grid lines which cross axis 1, drawn using AST_GRIDLINE or AST_GRID
-c     - Grid2: Grid lines which cross axis 2, drawn using astGridLine or astGrid 
-f     - Grid2: Grid lines which cross axis 2, drawn using AST_GRIDLINE or AST_GRID
-c     - Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
-f     - Curves: Geodesic curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
-c     - NumLab: Numerical axis labels drawn using astGrid (provides
-f     - NumLab: Numerical axis labels drawn using AST_GRID (provides
-      default values for NumLab1 and NumLab2)
-c     - NumLab1: Numerical labels for axis 1 drawn using astGrid 
-f     - NumLab1: Numerical labels for axis 1 drawn using AST_GRID
-c     - NumLab2: Numerical labels for axis 2 drawn using astGrid
-f     - NumLab2: Numerical labels for axis 2 drawn using AST_GRID
-c     - TextLab: Descriptive axis labels drawn using astGrid (provides
-f     - TextLab: Descriptive axis labels drawn using AST_GRID (provides
-      default values for TextLab1 and TextLab2)
-c     - TextLab1: Descriptive label for axis 1 drawn using astGrid
-f     - TextLab1: Descriptive label for axis 1 drawn using AST_GRID 
-c     - TextLab2: Descriptive label for axis 2 drawn using astGrid
-f     - TextLab2: Descriptive label for axis 2 drawn using AST_GRID 
-c     - Title: The Plot title drawn using astGrid
-f     - Title: The Plot title drawn using AST_GRID
-c     - Markers: Graphical markers (symbols) drawn using astMark
-f     - Markers: Graphical markers (symbols) drawn using AST_MARK
-c     - Strings: Text strings drawn using astText
-f     - Strings: Text strings drawn using AST_TEXT
-c     - Ticks: Tick marks (both major and minor) drawn using astGrid
-f     - Ticks: Tick marks (both major and minor) drawn using AST_GRID
-        (provides default values for Ticks1 and Ticks2)
-c     - Ticks1: Tick marks (both major and minor) for axis 1 drawn using astGrid
-f     - Ticks1: Tick marks (both major and minor) for axis 1 drawn using AST_GRID
-c     - Ticks2: Tick marks (both major and minor) for axis 2 drawn using astGrid
-f     - Ticks2: Tick marks (both major and minor) for axis 2 drawn using AST_GRID
-      - Axes: Axis lines drawn through tick marks using
-c     astGrid (provides default values for Axis1 and Axis2)
-f     AST_GRID (rovides default values for Axis1 and Axis2)
+c     - Axes: Axis lines drawn through tick marks using astGrid 
+f     - Axes: Axis lines drawn through tick marks using AST_GRID
 c     - Axis1: Axis line drawn through tick marks on axis 1 using astGrid
 f     - Axis1: Axis line drawn through tick marks on axis 1 using AST_GRID
 c     - Axis2: Axis line drawn through tick marks on axis 2 using astGrid
 f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
+c     - Border: The Plot border drawn using astBorder or astGrid
+f     - Border: The Plot border drawn using AST_BORDER or AST_GRID
+c     - Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
+f     - Curves: Geodesic curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
+c     - Grid: Grid lines drawn using astGridLine or astGrid
+f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID 
+c     - Grid1: Grid lines which cross axis 1, drawn using astGridLine or astGrid 
+f     - Grid1: Grid lines which cross axis 1, drawn using AST_GRIDLINE or AST_GRID
+c     - Grid2: Grid lines which cross axis 2, drawn using astGridLine or astGrid 
+f     - Grid2: Grid lines which cross axis 2, drawn using AST_GRIDLINE or AST_GRID
+c     - Markers: Graphical markers (symbols) drawn using astMark
+f     - Markers: Graphical markers (symbols) drawn using AST_MARK
+c     - NumLab: Numerical axis labels drawn using astGrid 
+f     - NumLab: Numerical axis labels drawn using AST_GRID 
+c     - NumLab1: Numerical labels for axis 1 drawn using astGrid 
+f     - NumLab1: Numerical labels for axis 1 drawn using AST_GRID
+c     - NumLab2: Numerical labels for axis 2 drawn using astGrid
+f     - NumLab2: Numerical labels for axis 2 drawn using AST_GRID
+c     - Strings: Text strings drawn using astText
+f     - Strings: Text strings drawn using AST_TEXT
+c     - TextLab: Descriptive axis labels drawn using astGrid 
+f     - TextLab: Descriptive axis labels drawn using AST_GRID 
+c     - TextLab1: Descriptive label for axis 1 drawn using astGrid
+f     - TextLab1: Descriptive label for axis 1 drawn using AST_GRID 
+c     - TextLab2: Descriptive label for axis 2 drawn using astGrid
+f     - TextLab2: Descriptive label for axis 2 drawn using AST_GRID 
+c     - Ticks: Tick marks (both major and minor) drawn using astGrid
+f     - Ticks: Tick marks (both major and minor) drawn using AST_GRID
+c     - Ticks1: Tick marks (both major and minor) for axis 1 drawn using astGrid
+f     - Ticks1: Tick marks (both major and minor) for axis 1 drawn using AST_GRID
+c     - Ticks2: Tick marks (both major and minor) for axis 2 drawn using astGrid
+f     - Ticks2: Tick marks (both major and minor) for axis 2 drawn using AST_GRID
+c     - Title: The Plot title drawn using astGrid
+f     - Title: The Plot title drawn using AST_GRID
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -354,6 +355,11 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *     14-JUN-2002 (DSB):
 *       Re-wrote PlotLabels to improve abbreviation of labels and the
 *       choice of which labels not to print. 
+*     14-AUG-2002 (DSB):
+*       - Added method astBoundingBox. 
+*       - Added attribute Invisible.
+*       - Correct handling of "axis specific" plot elements cuch as
+*       (Axis1), (Axis2), etc.
 *class--
 */
 
@@ -382,25 +388,25 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 #define MAJTICKS_MIN    6 /* Min. number of major ticks or grid lines */
 #define EDGETICKS_DIM 100 /* No. of edge samples used to find tick marks */
 #define BORDER_ID       0 /* Id for astBorder curves */
-#define GRIDLINE_ID     1 /* Id for astGridLine curves */
-#define CURVE_ID        2 /* Id for astCurve, astGenCurve or astPolyCurve curves */
-#define NUMLABS_ID      3 /* Id for numerical labels */
-#define TEXTLABS_ID     4 /* Id for textual axis labels */
-#define TITLE_ID        5 /* Id for textual title */
-#define MARKS_ID        6 /* Id for marks drawn by astMark */
-#define TEXT_ID         7 /* Id for text strings drawn by astText */
-#define TICKS_ID        8 /* Id for major and minor tick marks */
-#define AXIS_ID         9 /* Id for both axes through interior tick marks */
-#define AXIS1_ID       10 /* Id for axis 1 through interior tick marks */
-#define AXIS2_ID       11 /* Id for axis 2 through interior tick marks */
-#define NUMLABS1_ID    12 /* Id for numerical labels */
-#define NUMLABS2_ID    13 /* Id for numerical labels */
-#define TEXTLAB1_ID    14 /* Id for textual axis labels */
-#define TEXTLAB2_ID    15 /* Id for textual axis labels */
-#define TICKS1_ID      16 /* Id for major and minor tick marks */
-#define TICKS2_ID      17 /* Id for major and minor tick marks */
-#define GRIDLINE1_ID   18 /* Id for axis 1 astGridLine curves */
-#define GRIDLINE2_ID   19 /* Id for axis 2 astGridLine curves */
+#define CURVE_ID        1 /* Id for astCurve, astGenCurve or astPolyCurve curves */
+#define TITLE_ID        2 /* Id for textual title */
+#define MARKS_ID        3 /* Id for marks drawn by astMark */
+#define TEXT_ID         4 /* Id for text strings drawn by astText */
+#define AXIS1_ID        5 /* Id for axis 1 through interior tick marks */
+#define AXIS2_ID        6 /* Id for axis 2 through interior tick marks */
+#define NUMLAB1_ID      7 /* Id for numerical labels */
+#define NUMLAB2_ID      8 /* Id for numerical labels */
+#define TEXTLAB1_ID     9 /* Id for textual axis labels */
+#define TEXTLAB2_ID    10 /* Id for textual axis labels */
+#define TICKS1_ID      11 /* Id for major and minor tick marks */
+#define TICKS2_ID      12 /* Id for major and minor tick marks */
+#define GRIDLINE1_ID   13 /* Id for axis 1 astGridLine curves */
+#define GRIDLINE2_ID   14 /* Id for axis 2 astGridLine curves */
+#define AXES_ID        15 /* Id for axes through interior tick marks */
+#define NUMLABS_ID     16 /* Id for numerical labels */
+#define TEXTLABS_ID    17 /* Id for textual axis labels */
+#define GRIDLINE_ID    18 /* Id for astGridLine curves */
+#define TICKS_ID       19 /* Id for major and minor tick marks */
 #define LEFT            0 /* Id for the left edge of the plotting area */
 #define TOP             1 /* Id for the top edge of the plotting area */
 #define RIGHT           2 /* Id for the right edge of the plotting area */
@@ -1206,9 +1212,15 @@ static int Crv_out;
 static void (*Crv_map)( int, double *, double *, double *, const char *, const char * );
 
 /* The lower and upper bounds of the graphics coordinates enclosing all
-   lines and numerical labels. */
+   lines and numerical labels drawn by astGrid. */
 static float Box_lbnd[ 2 ] = {FLT_MAX, FLT_MAX };
 static float Box_ubnd[ 2 ] = {FLT_MIN, FLT_MIN };
+
+/* The lower and upper bounds of the graphics coordinates enclosing all
+   drawn graphics primatives, maintained by functions GLine, GMark and 
+   GText. */
+static float Boxp_lbnd[ 2 ] = {FLT_MAX, FLT_MAX };
+static float Boxp_ubnd[ 2 ] = {FLT_MIN, FLT_MIN };
 
 /* Variables used to stored buffered poly lines (see functions Opoly, Bpoly
    and Apoly). */
@@ -1256,10 +1268,9 @@ static CurveData Curve_data;
 
 /* Strings giving the label for the graphics items corresponding to
    BORDER_ID, GRIDLINE_ID, etc. */
-static char *GrfLabels = "Border Grid Curves NumLab TextLab Title "
-                         "Markers Strings Ticks Axes Axis1 Axis2 "
-                         "NumLab1 NumLab2 TextLab1 TextLab2 "
-                         "Ticks1 Ticks2 Grid1 Grid2";
+static char *GrfLabels = "Border Curves Title Markers Strings Axis1 Axis2 "
+                         "NumLab1 NumLab2 TextLab1 TextLab2 Ticks1 Ticks2 "
+                         "Grid1 Grid2 Axes NumLab TextLab Grid Ticks";
 
 /* Text values used to represent edges externally. */
 static const char *xedge[4] = { "left", "top", "right", "bottom" };
@@ -1289,6 +1300,11 @@ static int GetBorder( AstPlot * );
 static int TestBorder( AstPlot * );
 static void ClearBorder( AstPlot * );
 static void SetBorder( AstPlot *, int );
+
+static int GetInvisible( AstPlot * );
+static int TestInvisible( AstPlot * );
+static void ClearInvisible( AstPlot * );
+static void SetInvisible( AstPlot *, int );
 
 static int GetInk( AstPlot * );
 static int TestInk( AstPlot * );
@@ -1446,8 +1462,8 @@ static char *GrfItem( int, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double, double **, int *, int *, int, int *, double *, const char *, const char * );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
-static double UseSize( AstPlot *, int );
-static double UseWidth( AstPlot *, int );
+static double GetUseSize( AstPlot *, int );
+static double GetUseWidth( AstPlot *, int );
 static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
@@ -1476,15 +1492,22 @@ static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **,
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
-static int UseColour( AstPlot *, int );
-static int UseFont( AstPlot *, int );
-static int UseStyle( AstPlot *, int );
+static int TestUseColour( AstPlot *, int );
+static int TestUseFont( AstPlot *, int );
+static int TestUseSize( AstPlot *, int );
+static int TestUseStyle( AstPlot *, int );
+static int TestUseWidth( AstPlot *, int );
+static int GetUseColour( AstPlot *, int );
+static int GetUseFont( AstPlot *, int );
+static int GetUseStyle( AstPlot *, int );
+static int IdFind( int, int *, int * );
 static int Ustrcmp( const char *, const char * );
 static int Ustrncmp( const char *, const char *, size_t );
 static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
 static void AddCdt( CurveData *, CurveData *, const char *, const char * );
 static void Apoly( AstPlot *, float, float, const char *, const char * );
 static void AxPlot( AstPlot *, int, const double *, double, int, CurveData *, int, const char *, const char * );
+static void BoundingBox( AstPlot *, float[2], float[2] );
 static void Bpoly( AstPlot *, float, float, const char *, const char * );
 static void Clip( AstPlot *, int, const double [], const double [] );
 static void Copy( const AstObject *, AstObject * );
@@ -1626,6 +1649,50 @@ astMAKE_TEST(Plot,Grid,( this->grid != -1 ))
 
 MAKE_GET2(Plot,UsedGrid,int,0,this->ugrid)
 MAKE_SET2(Plot,UsedGrid,int,ugrid,( value ? 1 : 0 ))
+
+/* Invisible. */
+/* ---------- */
+/*
+*att++
+*  Name:
+*     Invisible
+
+*  Purpose:
+*     Draw graphics using invisible ink?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute controls the appearance of all graphics produced by
+*     Plot methods by determining whether graphics should be visible or
+*     invisible.
+*
+*     If the Invisible value of a Plot is non-zero, then all the Plot
+*     methods which normally generate graphical output do not do so (you
+*     can think of them drawing with "invisible ink"). Such methods do,
+*     however, continue to do all the calculations which would be needed to 
+*     produce the graphics. In particular, the bounding box enclosing the
+*     graphics is still calculated and can be retrieved as normal using
+c     astBoundingBox. The default value is zero, resulting in all methods
+f     AST_BOUNDINGBOX. The default value is zero, resulting in all methods
+*     drawing graphics as normal, using visible ink.
+
+*  Applicability:
+*     Plot
+*        All Plots have this attribute.
+
+*att--
+*/
+/* If non-zero use invisible ink. Has a value of -1 when not set yielding 
+a default value of 0. */
+astMAKE_CLEAR(Plot,Invisible,invisible,-1)
+astMAKE_GET(Plot,Invisible,int,0,(this->invisible == -1 ? 0 : this->invisible))
+astMAKE_SET(Plot,Invisible,int,invisible,( value ? 1 : 0 ))
+astMAKE_TEST(Plot,Invisible,( this->invisible != -1 ))
 
 /* TickAll */
 /* ------- */
@@ -3994,6 +4061,12 @@ f     with STATUS set to an error value, or if it should fail for any
    method = "astBorder";
    class = astGetClass( this_nd );
 
+/* Initialise the bounding box for primitives produced by this call. */
+   Boxp_lbnd[ 0 ] = FLT_MAX;
+   Boxp_lbnd[ 1 ] = FLT_MAX;
+   Boxp_ubnd[ 0 ] = FLT_MIN;
+   Boxp_ubnd[ 1 ] = FLT_MIN;
+
 /* Check the base Frame of the Plot is 2-D. */
    naxes = astGetNin( this_nd );
    if( naxes != 2 && astOK ){
@@ -4047,6 +4120,92 @@ f     with STATUS set to an error value, or if it should fail for any
 
 /* Return. */
    return inval;
+
+}
+
+static void BoundingBox( AstPlot *this, float lbnd[2], float ubnd[2] ){
+/*
+*++
+*  Name:
+c     astBoundingBox
+f     AST_BOUNDINGBOX
+
+*  Purpose:
+*     Return a bounding box for previously drawn graphics.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "plot.h"
+c     void astBoundingBox( AstPlot *this, float lbnd[2], float ubnd[2] )
+f     CALL AST_BOUNDINGBOX( THIS, LBND, UBND, STATUS )
+
+*  Class Membership:
+*     Plot method.
+
+*  Description:
+c     This function returns the bounds of a box which just encompasess the 
+f     This routine returns the bounds of a box which just encompasess the 
+*     graphics produced by the previous call to any of the Plot methods 
+*     which produce graphical output. If no such previous call has yet
+*     been made, or if the call failed for any reason, then the bounding box 
+c     returned by this function is undefined.
+f     returned by this routine is undefined.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Plot.
+c     lbnd
+f     LBND( 2 ) = REAL (Returned)
+*        A two element array in which is returned the lower limits of the
+*        bounding box on each of the two axes of the graphics coordinate
+*        system (the base Frame of the Plot).
+c     ubnd
+f     UBND( 2 ) = REAL (Returned)
+*        A two element array in which is returned the upper limits of the
+*        bounding box on each of the two axes of the graphics coordinate
+*        system (the base Frame of the Plot).
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Notes:
+*     - An error results if the base Frame of the Plot is not
+*     2-dimensional.
+*--
+*/
+
+/* Local Variables: */
+   AstFrame *fr;           /* Pointer to the clipping Frame */
+   AstFrameSet *fset;      /* Pointer to the Plot's FrameSet */
+   int i;                  /* Axis index */
+   int ifrm;               /* The validated frame index */ 
+   int naxes;              /* No. of axes in the base Frame */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the FrameSet at the start of the Plot. */
+   fset = (AstFrameSet *) this;
+
+/* Check the base Frame of the Plot is 2-D. */
+   naxes = astGetNin( fset );
+   if( naxes != 2 && astOK ){
+      astError( AST__NAXIN, "astBoundingBox(%s): Number of axes (%d) in the "
+                "base Frame of the supplied %s is invalid - this number "
+                "should be 2.", astGetClass( this ), naxes,  
+                astGetClass( this ) );
+   } 
+
+/* Return the bounding box. */
+   lbnd[ 0 ] = Boxp_lbnd[ 0 ];
+   lbnd[ 1 ] = Boxp_lbnd[ 1 ];
+   ubnd[ 0 ] = Boxp_ubnd[ 0 ];
+   ubnd[ 1 ] = Boxp_ubnd[ 1 ];
+   
+/* Return. */
+   return;
 
 }
 
@@ -5234,7 +5393,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstPlot *this;                /* Pointer to the Plot structure */
    char label[21];               /* Graphics item label */
+   const char *class;            /* Pointer to class string */
    int axis;                     /* Axis number */
+   int id1;                      /* Plot object id */
+   int id2;                      /* Plot object id */
    int id;                       /* Plot object id */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
@@ -5337,7 +5499,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      astClearStyle( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
+          &id1, &id2 ) ) astClearStyle( this, id2 );
+      astClearStyle( this, id1 );
 
 /* Font. */
 /* ----- */
@@ -5349,7 +5514,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      astClearFont( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
+          &id1, &id2 ) ) astClearFont( this, id2 );
+      astClearFont( this, id1 );
 
 /* Colour. */
 /* ------- */
@@ -5361,7 +5529,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      astClearColour( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
+          &id1, &id2 ) ) astClearColour( this, id2 );
+      astClearColour( this, id1 );
 
 /* Color. */
 /* ------ */
@@ -5373,7 +5544,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      astClearColour( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
+          &id1, &id2 ) ) astClearColour( this, id2 );
+      astClearColour( this, id1 );
 
 /* Width. */
 /* ------ */
@@ -5385,7 +5559,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      astClearWidth( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
+          &id1, &id2 ) ) astClearWidth( this, id2 );
+      astClearWidth( this, id1 );
 
 /* Size. */
 /* ----- */
@@ -5397,7 +5574,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      astClearSize( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, attrib, "astClear", class ), 
+          &id1, &id2 ) ) astClearSize( this, id2 );
+      astClearSize( this, id1 );
 
 /* LabelAt(axis). */
 /* -------------- */
@@ -5492,6 +5672,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "tickall" ) ) {
       astClearTickAll( this );
+
+/* Invisible. */
+/* ---------- */
+   } else if ( !strcmp( attrib, "invisible" ) ) {
+      astClearInvisible( this );
 
 /* Border. */
 /* ------- */
@@ -7094,6 +7279,12 @@ f     contains any coordinates with the value AST__BAD.
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", method, class, naxes, class );
    } 
+
+/* Initialise the bounding box for primitives produced by this call. */
+   Boxp_lbnd[ 0 ] = FLT_MAX;
+   Boxp_lbnd[ 1 ] = FLT_MAX;
+   Boxp_ubnd[ 0 ] = FLT_MIN;
+   Boxp_ubnd[ 1 ] = FLT_MIN;
 
 /* Draw the curve. The break information is stored in an external structure
    where it can be accessed by public methods which return information
@@ -8903,7 +9094,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
       frame = astGetFrame( this, AST__CURRENT );
 
 /* Initialize the id value for graphical element being drawn. */
-      gelid = NUMLABS1_ID;
+      gelid = NUMLAB1_ID;
 
 /* If required, draw the labels for each axis in turn. */
       for( axis = 0; axis < 2 && ink; axis++ ){
@@ -8921,7 +9112,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
          GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-         gelid = NUMLABS2_ID;
+         gelid = NUMLAB2_ID;
 
       }
 
@@ -10558,6 +10749,12 @@ f        The global status.
 /* Only proceed if there has been no error. */
    if( astOK ){   
 
+/* Initialise the bounding box for primitives produced by this call. */
+      Boxp_lbnd[ 0 ] = FLT_MAX;
+      Boxp_lbnd[ 1 ] = FLT_MAX;
+      Boxp_ubnd[ 0 ] = FLT_MIN;
+      Boxp_ubnd[ 1 ] = FLT_MIN;
+
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
       GrfAttrs( this, CURVE_ID, 1, GRF__LINE, method, class );
@@ -10762,16 +10959,21 @@ static void GLine( AstPlot *this, int n, const float *x,
 */
 
 /* Local Variables: */
+   int i;               /* Loop count */
    int status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Do not draw anything if we are using "invisible ink". */
+   if( astGetInvisible( this ) ) {
+      status = 1;
+
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
-   if( astGetGrf( this ) && this->grffun[ AST__GLINE ] ) {
+   } else if( astGetGrf( this ) && this->grffun[ AST__GLINE ] ) {
       status = ( *( this->GLine ) )( this, n, x, y );
 
 /* Otherwise, use the function in the external Grf module, selected at
@@ -10784,6 +10986,15 @@ static void GLine( AstPlot *this, int n, const float *x,
    if( !status ) {
       astError( AST__GRFER, "%s(%s): Graphics error in astGLine. ", method, 
                 class );
+
+/* Otherwise, update the box containing all drawn graphics primitives. */
+   } else {
+      for( i = 0; i < n; i++ ) {
+         Boxp_lbnd[ 0 ] = MIN( x[ i ], Boxp_lbnd[ 0 ] );
+         Boxp_ubnd[ 0 ] = MAX( x[ i ], Boxp_ubnd[ 0 ] );
+         Boxp_lbnd[ 1 ] = MIN( y[ i ], Boxp_lbnd[ 1 ] );
+         Boxp_ubnd[ 1 ] = MAX( y[ i ], Boxp_ubnd[ 1 ] );
+      }
    }
 
 }
@@ -10840,16 +11051,21 @@ static void GMark( AstPlot *this, int n, const float *x,
 */
 
 /* Local Variables: */
+   int i;               /* Loop count */
    int status;          /* Status retruned from Grf function */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Do not draw anything if we are using "invisible ink". */
+   if( astGetInvisible( this ) ) {
+      status = 1;
+
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
-   if( astGetGrf( this ) && this->grffun[ AST__GMARK ] ) {
+   } else if( astGetGrf( this ) && this->grffun[ AST__GMARK ] ) {
       status = ( *( this->GMark ) )( this, n, x, y, type );
 
 /* Otherwise, use the function in the external Grf module, selected at
@@ -10862,6 +11078,15 @@ static void GMark( AstPlot *this, int n, const float *x,
    if( !status ) {
       astError( AST__GRFER, "%s(%s): Graphics error in astGMark. ", method, 
                 class );
+
+/* Otherwise, update the box containing all drawn graphics primitives. */
+   } else {
+      for( i = 0; i < n; i++ ) {
+         Boxp_lbnd[ 0 ] = MIN( x[ i ], Boxp_lbnd[ 0 ] );
+         Boxp_ubnd[ 0 ] = MAX( x[ i ], Boxp_ubnd[ 0 ] );
+         Boxp_lbnd[ 1 ] = MIN( y[ i ], Boxp_lbnd[ 1 ] );
+         Boxp_ubnd[ 1 ] = MAX( y[ i ], Boxp_ubnd[ 1 ] );
+      }
    }
 
 }
@@ -10938,15 +11163,22 @@ static void GText( AstPlot *this, const char *text, float x, float y,
 
 /* Local Variables: */
    int status;          /* Status retruned from Grf function */
+   float xbn[ 4 ];      /* X coords at corners of new bounding box */
+   float ybn[ 4 ];      /* Y coords at corners of new bounding box */
+   int i;               /* Loop count */
 
 /* Check the global error status. */
    if ( !astOK ) return;
+
+/* Do not draw anything if we are using "invisible ink". */
+   if( astGetInvisible( this ) ) {
+      status = 1;
 
 /* If the Grf attribute is set to a non-zero value, use the Grf function
    registered using astGrfSet (so long as a function has been supplied).
    This is called via a wrapper which adapts the interface to suit the
    language in which the function is written. */
-   if( astGetGrf( this ) && this->grffun[ AST__GTEXT ] ) {
+   } else if( astGetGrf( this ) && this->grffun[ AST__GTEXT ] ) {
       status = ( *( this->GText ) )( this, text, x, y, just, upx, upy );
 
 /* Otherwise, use the function in the external Grf module, selected at
@@ -10959,6 +11191,24 @@ static void GText( AstPlot *this, const char *text, float x, float y,
    if( !status ) {
       astError( AST__GRFER, "%s(%s): Graphics error in astGText. ", method, 
                 class );
+
+/* Otherwise, update the box containing all drawn graphics primitives. */
+   } else {
+
+/* Get the bounds of the box containing the new text. */
+      BoxText( this, 0, text, x, y, just, upx, upy, xbn, ybn,
+               method, class );
+
+/* Extend the bounds of the global bounding box held externally to include 
+   the new box. */
+      if( astOK ){
+         for( i = 0; i < 4; i++ ){
+            Boxp_lbnd[ 0 ] = MIN( xbn[ i ], Boxp_lbnd[ 0 ] );
+            Boxp_ubnd[ 0 ] = MAX( xbn[ i ], Boxp_ubnd[ 0 ] );
+            Boxp_lbnd[ 1 ] = MIN( ybn[ i ], Boxp_lbnd[ 1 ] );
+            Boxp_ubnd[ 1 ] = MAX( ybn[ i ], Boxp_ubnd[ 1 ] );
+         }
+      }
    }
 
 }
@@ -11183,6 +11433,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "tickall" ) ) {
       ival = astGetTickAll( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* Invisible. */
+/* ---------- */
+   } else if ( !strcmp( attrib, "invisible" ) ) {
+      ival = astGetInvisible( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11438,7 +11697,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Style. */
 /* ------ */
    } else if ( !strcmp( attrib, "style" ) ) {
-      ival = astGetStyle( this, BORDER_ID );
+      ival = GetUseStyle( this, BORDER_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11449,7 +11708,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = astGetStyle( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseStyle( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11458,7 +11717,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Font. */
 /* ----- */
    } else if ( !strcmp( attrib, "font" ) ) {
-      ival = astGetFont( this, TEXTLABS_ID );
+      ival = GetUseFont( this, TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11469,7 +11728,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = astGetFont( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseFont( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11478,7 +11737,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Colour. */
 /* ------- */
    } else if ( !strcmp( attrib, "colour" ) ) {
-      ival = astGetColour( this, TEXTLABS_ID );
+      ival = GetUseColour( this, TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11489,7 +11748,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = astGetColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11498,7 +11757,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Color. */
 /* ------ */
    } else if ( !strcmp( attrib, "color" ) ) {
-      ival = astGetColour( this, TEXTLABS_ID );
+      ival = GetUseColour( this, TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11509,7 +11768,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      ival = astGetColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      ival = GetUseColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -11518,7 +11777,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Width. */
 /* ------ */
    } else if ( !strcmp( attrib, "width" ) ) {
-      dval = astGetWidth( this, BORDER_ID );
+      dval = GetUseWidth( this, BORDER_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -11530,7 +11789,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      dval = astGetWidth( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      dval = GetUseWidth( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -11539,7 +11798,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Size. */
 /* ----- */
    } else if ( !strcmp( attrib, "size" ) ) {
-      dval = astGetSize( this, TEXTLABS_ID );
+      dval = GetUseSize( this, TEXTLABS_ID );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -11550,7 +11809,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      dval = astGetSize( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
+      dval = GetUseSize( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
          (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
@@ -12842,19 +13101,16 @@ static char *GrfItem( int item, const char *text ){
    } else if ( item == TICKS_ID ) {        
       desc = "Major and minor ticks";
 
-   } else if ( item == AXIS_ID ) {         
-      desc = "Default axis";
-
    } else if ( item == AXIS1_ID ) {         
       desc = "Axis 1";
 
    } else if ( item == AXIS2_ID ) {         
       desc = "Axis 2";
 
-   } else if ( item == NUMLABS1_ID ) {         
+   } else if ( item == NUMLAB1_ID ) {         
       desc = "Axis 1 numerical labels";
 
-   } else if ( item == NUMLABS2_ID ) {         
+   } else if ( item == NUMLAB2_ID ) {         
       desc = "Axis 2 numerical labels";
 
    } else if ( item == TEXTLAB1_ID ) {         
@@ -13268,6 +13524,13 @@ f        The global status.
 /* Free the 2D Plot. */
    this = astAnnul( this );
 
+/* Copy the total bounding box to the box which is returned by
+   astBoundingBox. */
+   Boxp_lbnd[ 0 ] = Box_lbnd[ 0 ];
+   Boxp_lbnd[ 1 ] = Box_lbnd[ 1 ];
+   Boxp_ubnd[ 0 ] = Box_ubnd[ 0 ]; 
+   Boxp_ubnd[ 1 ] = Box_ubnd[ 1 ]; 
+
 /* Return. */
    return;
 
@@ -13365,6 +13628,12 @@ f     coordinates with the value AST__BAD, nor if LENGTH has this value.
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", method, class, naxes, class );
    } 
+
+/* Initialise the bounding box for primatives produced by this call. */
+   Boxp_lbnd[ 0 ] = FLT_MAX;
+   Boxp_lbnd[ 1 ] = FLT_MAX;
+   Boxp_ubnd[ 0 ] = FLT_MIN;
+   Boxp_ubnd[ 1 ] = FLT_MIN;
 
 /* Validate the axis index, converting the axis index to be zero-based. */
    (void) astValidateAxis( this, axis - 1, method );
@@ -13640,7 +13909,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
 
 /* See if a value has been set in the Plot for the line style attribute for 
    the specified object, If so, use the value. */
-      ival = UseStyle( this, id );      
+      ival = GetUseStyle( this, id );      
       if( ival != NOSTYLE ){
 
 /* Save the current value, and establish the new value. */
@@ -13654,7 +13923,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
       }
 
 /* Do the same for the line width attribute. */
-      dval = UseWidth( this, id );      
+      dval = GetUseWidth( this, id );      
       if( dval != NOWIDTH ){
          GAttr( this, GRF__WIDTH, dval, attr++, prim, method, class );
       } else {
@@ -13662,7 +13931,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
       }
 
 /* Do the same for the character size attribute. */
-      dval = UseSize( this, id );      
+      dval = GetUseSize( this, id );      
       if( dval != NOSIZE ) {
          GAttr( this, GRF__SIZE, dval, attr++, prim, method, class );
       } else {
@@ -13670,7 +13939,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
       }
 
 /* Do the same for the character font attribute. */
-      ival = UseFont( this, id );      
+      ival = GetUseFont( this, id );      
       if( ival != NOFONT ){
          GAttr( this, GRF__FONT, (double) ival, attr++, prim, method, class );
       } else {
@@ -13678,7 +13947,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
       }
 
 /* Do the same for the colour attribute. */
-      ival = UseColour( this, id );      
+      ival = GetUseColour( this, id );      
       if( ival != NOCOLOUR ) {
          GAttr( this, GRF__COLOUR, (double) ival, attr++, prim, method,
                 class );
@@ -14604,6 +14873,107 @@ static int GVec( AstPlot *this, AstMapping *mapping, double *phy,
 
 }
 
+static int IdFind( int id, int *id1, int *id2 ) {
+/*
+*  Name:
+*     IdFind
+
+*  Purpose:
+*     Find the numerical identifiers to use for a given identifier.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int IdFind( int id, int *id1, int *id2  )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     The supplied integer should be a numerical identifier for a
+*     graphical element of a plot (MARKS_ID, CURVES_ID, etc), or a
+*     "psuedo-identifier" which represents two other genuine identifiers. 
+*     If the supplied value is a genuine identifier then it is returned 
+*     in *id1, and *id2 is returned equal to -1. If the supplied value 
+*     is a pseudo-identifier then the two corresponding genuine
+*     identifiers are returned in *id1 and *id2
+
+*     For instance, if "id" is AXIS1_ID (a genuine id), then *id1 is 
+*     returned equal to AXIS1_ID and *id2 is returned equal to -1. If 
+*     "id" is AXES_ID (a pseudo-identifier), then *id1 is returned equal
+*     to AXIS1_ID and *id2 is returned equal to AXIS2_ID.
+
+*     Genuine identifiers all have values which are less than the value 
+*     of AST__NPID. Pseudo-identifiers have values which are greater than 
+*     or equal to the value of AST__NPID.
+
+*  Parameters:
+*     id
+*        The supplied identifier (genuine or pseudo).
+*     id1
+*        Pointer to the int at which to return the first genuine
+*        identifier corresponding to "id".
+*     id2
+*        Pointer to the int at which to return the second genuine
+*        identifier corresponding to "id" (or -1 if "id" is a genuine
+*        identifier).
+
+*  Returned Value:
+*     One is returned if the supplied identifier is a pseudo-identifier,
+*     and zero otherwise.
+
+*/
+
+/* Local Variables: */
+   int ret;
+
+/* Initialise returned values. */
+   *id1 = id;
+   *id2 = -1;
+   ret = 0;
+
+/* Check the local error status. */
+   if ( !astOK ) return ret;
+
+/* Check against all known pseudo-identifier. */
+   if( id == AXES_ID ) {
+      ret = 1;
+      *id1 = AXIS1_ID;
+      *id2 = AXIS2_ID;
+
+   } else if( id == GRIDLINE_ID ) {
+      ret = 1;
+      *id1 = GRIDLINE1_ID;
+      *id2 = GRIDLINE2_ID;
+
+   } else if( id == NUMLABS_ID ) {
+      ret = 1;
+      *id1 = NUMLAB1_ID;
+      *id2 = NUMLAB2_ID;
+
+   } else if( id == TEXTLABS_ID ) {
+      ret = 1;
+      *id1 = TEXTLAB1_ID;
+      *id2 = TEXTLAB2_ID;
+
+   } else if( id == TICKS_ID ) {
+      ret = 1;
+      *id1 = TICKS1_ID;
+      *id2 = TICKS2_ID;
+
+   } else if( id >= AST__NPID ) {
+      astError( AST__INTER, "AST internal programming error - "
+                "function IdFind in class Plot does not yet support "
+                "pseudo-identifier value %d", id );
+   }
+
+/* Return the answer. */
+   return ret;
+
+}
+
 static void InitVtab( AstPlotVtab *vtab ) {
 /*
 *  Name:
@@ -14653,6 +15023,7 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->Mark = Mark;
    vtab->Text = Text;
    vtab->Border = Border;
+   vtab->BoundingBox = BoundingBox;
    vtab->Clip = Clip; 
    vtab->GridLine = GridLine;
    vtab->Curve = Curve;
@@ -14676,6 +15047,10 @@ static void InitVtab( AstPlotVtab *vtab ) {
    vtab->SetTickAll = SetTickAll;
    vtab->GetTickAll = GetTickAll;
    vtab->TestTickAll = TestTickAll;
+   vtab->ClearInvisible = ClearInvisible;
+   vtab->SetInvisible = SetInvisible;
+   vtab->GetInvisible = GetInvisible;
+   vtab->TestInvisible = TestInvisible;
    vtab->ClearBorder = ClearBorder;
    vtab->SetBorder = SetBorder;
    vtab->GetBorder = GetBorder;
@@ -15301,7 +15676,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
       mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
 
 /* Initialize the id value for graphical element being drawn. */
-      gelid = NUMLABS1_ID;
+      gelid = NUMLAB1_ID;
 
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
@@ -15536,7 +15911,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
             GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
 
 /* Set up the id for the next graphical element to be drawn. */
-            gelid = NUMLABS2_ID;
+            gelid = NUMLABS_ID;
 
          }
       }
@@ -16725,6 +17100,12 @@ f     - If any marker position is clipped (see AST_CLIP), then the
                 "markers being drawn (%d).", nmark );
    }
 
+/* Initialise the bounding box for primatives produced by this call. */
+   Boxp_lbnd[ 0 ] = FLT_MAX;
+   Boxp_lbnd[ 1 ] = FLT_MAX;
+   Boxp_ubnd[ 0 ] = FLT_MIN;
+   Boxp_ubnd[ 1 ] = FLT_MIN;
+
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
    GrfAttrs( this, MARKS_ID, 1, GRF__MARK, method, class );
@@ -17518,6 +17899,12 @@ f        The global status.
                 "be 2.", method, class, naxes, class );
    } 
 
+/* Initialise the bounding box for primatives produced by this call. */
+   Boxp_lbnd[ 0 ] = FLT_MAX;
+   Boxp_lbnd[ 1 ] = FLT_MAX;
+   Boxp_ubnd[ 0 ] = FLT_MIN;
+   Boxp_ubnd[ 1 ] = FLT_MIN;
+
 /* Check the current Frame of the Plot has ncoord axes. */
    naxes = astGetNout( this );
    if( naxes != ncoord && astOK ){
@@ -17811,9 +18198,12 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Local Variables: */
    AstPlot *this;                /* Pointer to the Plot structure */
    char label[21];               /* Graphics item label */
+   const char *class;            /* Pointer to class string */
    double dval;                  /* Double attribute value */
    int axis;                     /* Index for the axis */
    int edge;                     /* Index of edge within list */
+   int id1;                      /* Plot object id */
+   int id2;                      /* Plot object id */
    int id;                       /* Plot object id */
    int ival;                     /* Int attribute value */
    int len;                      /* Length of setting string */
@@ -17854,6 +18244,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         ( 1 == astSscanf( setting, "tickall= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetTickAll( this, ival );
+
+/* Invisible. */
+/* ---------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "invisible= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetInvisible( this, ival );
 
 /* Border. */
 /* ------- */
@@ -18080,7 +18477,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 2 == astSscanf( setting, "style(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
-      astSetStyle( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
+          &id1, &id2 ) ) astSetStyle( this, id2, ival );
+      astSetStyle( this, id1, ival );
 
 /* Font. */
 /* ----- */
@@ -18095,7 +18495,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 2 == astSscanf( setting, "font(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
-      astSetFont( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
+          &id1, &id2 ) ) astSetFont( this, id2, ival );
+      astSetFont( this, id1, ival );
 
 /* Colour. */
 /* ------- */
@@ -18110,7 +18513,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 2 == astSscanf( setting, "colour(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
-      astSetColour( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
+          &id1, &id2 ) ) astSetColour( this, id2, ival );
+      astSetColour( this, id1, ival );
 
 /* Color. */
 /* ------ */
@@ -18125,7 +18531,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 2 == astSscanf( setting, "color(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
-      astSetColour( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
+          &id1, &id2 ) ) astSetColour( this, id2, ival );
+      astSetColour( this, id1, ival );
 
 /* Width. */
 /* ------ */
@@ -18140,7 +18549,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 2 == astSscanf( setting, "width(%20[^()])= %lg %n",
                               label, &dval, &nc ) )
                && ( nc >= len ) ) {
-      astSetWidth( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), dval );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
+          &id1, &id2 ) ) astSetWidth( this, id2, dval );
+      astSetWidth( this, id1, dval );
 
 /* Size. */
 /* ----- */
@@ -18155,7 +18567,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                ( 2 == astSscanf( setting, "size(%20[^()])= %lg %n",
                               label, &dval, &nc ) )
                && ( nc >= len ) ) {
-      astSetSize( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), dval );
+      class =  astGetClass( this );
+      if( IdFind( FullForm( GrfLabels, label, setting, "astSet", class ), 
+          &id1, &id2 ) ) astSetSize( this, id2, dval );
+      astSetSize( this, id1, dval );
 
 /* TitleGap. */
 /* ----------- */
@@ -18419,6 +18834,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "tickall" ) ) {
       result = astTestTickAll( this );
 
+/* Invisible. */
+/* ---------- */
+   } else if ( !strcmp( attrib, "invisible" ) ) {
+      result = astTestInvisible( this );
+
 /* Border. */
 /* ------- */
    } else if ( !strcmp( attrib, "border" ) ) {
@@ -18555,74 +18975,74 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Style. */
 /* ------ */
    } else if ( !strcmp( attrib, "style" ) ) {
-      result = astTestStyle( this, BORDER_ID );
+      result = TestUseStyle( this, BORDER_ID );
 
 /* Style(label). */
 /* ------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = astTestStyle( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseStyle( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* Font. */
 /* ----- */
    } else if ( !strcmp( attrib, "font" ) ) {
-      result = astTestFont( this, TEXTLABS_ID );
+      result = TestUseFont( this, TEXTLABS_ID );
 
 /* Font(label). */
 /* ------------ */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = astTestFont( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseFont( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* Colour. */
 /* ------- */
    } else if ( !strcmp( attrib, "colour" ) ) {
-      result = astTestColour( this, TEXTLABS_ID );
+      result = TestUseColour( this, TEXTLABS_ID );
 
 /* Color. */
 /* ------- */
    } else if ( !strcmp( attrib, "color" ) ) {
-      result = astTestColour( this, TEXTLABS_ID );
+      result = TestUseColour( this, TEXTLABS_ID );
 
 /* Colour(label). */
 /* -------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = astTestColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* Color(label). */
 /* ------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = astTestColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* Width. */
 /* ------ */
    } else if ( !strcmp( attrib, "width" ) ) {
-      result = astTestWidth( this, BORDER_ID );
+      result = TestUseWidth( this, BORDER_ID );
 
 /* Width(label). */
 /* ------------- */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = astTestWidth( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseWidth( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* Size. */
 /* ----- */
    } else if ( !strcmp( attrib, "size" ) ) {
-      result = astTestSize( this, TEXTLABS_ID );
+      result = TestUseSize( this, TEXTLABS_ID );
 
 /* Size(label). */
 /* ------------ */
    } else if ( nc = 0,
                ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
-      result = astTestSize( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
+      result = TestUseSize( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* TitleGap. */
 /* --------- */
@@ -18783,6 +19203,12 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
                 "Frame of the supplied %s is invalid - this number should "
                 "be 2.", method, class, naxes, class );
    } 
+
+/* Initialise the bounding box for primatives produced by this call. */
+   Boxp_lbnd[ 0 ] = FLT_MAX;
+   Boxp_lbnd[ 1 ] = FLT_MAX;
+   Boxp_ubnd[ 0 ] = FLT_MIN;
+   Boxp_ubnd[ 1 ] = FLT_MIN;
 
 /* Establish the correct graphical attributes as defined by attributes
    with the supplied Plot. */
@@ -20589,10 +21015,10 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 }
 
-static int UseColour( AstPlot *this, int id ) {
+static int GetUseColour( AstPlot *this, int id ) {
 /*
 *  Name:
-*     UseColour
+*     GetUseColour
 
 *  Purpose:
 *     Get the Colour value to use for a specified graphical element.
@@ -20602,19 +21028,20 @@ static int UseColour( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int UseColour( AstPlot *this, int id )
+*     int GetUseColour( AstPlot *this, int id )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This returns the Colour value for the graphical element specified by
-*     id. If an element related to a specific axis is requested, but is
-*     not set, a default value equal to the non-axis-specific element 
-*     is returned. For eaxmple, if the Colour for AXIS1_ID is requested
-*     but the user has not set a value for Colour(axis1), then the value
-*     of Colour(axes) is returned, or NOCOLOUR if Colour(axes) has not been
-*     set either.
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the colour
+*     for the first set specific value is returned. For example, if the 
+*     Colour for AXES_ID is requested, then the colour for AXIS1_ID will be
+*     returned if set, and otherwise the colour for AXIS2_ID will be returned.
+*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
+*     returned.
 
 *  Parameters:
 *     this
@@ -20623,63 +21050,31 @@ static int UseColour( AstPlot *this, int id ) {
 *        An integer specifying the graphical element to be drawn.
 
 *  Returned Value:
-*     The Colour value to use or NOCOLOUR.
+*     The Colour value to use.
 
 */
 
 /* Local Variables: */
-   int ret;
-  
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
 /* Check the global error status. */
-   ret = NOCOLOUR;
-   if ( !astOK ) return ret;
+   if ( !astOK ) return NOCOLOUR;
 
-/* Colour(axes) provides the default for Colour(axis1) and Colour(axis2),
-   so if Colour(axis1) or Colour(axis2) has been requested but is not set,
-   use Colour(axes) instead. */
-   if( id == AXIS1_ID || id == AXIS2_ID ) {
-      if( !astTestColour( this, id ) ) {
-         id = AXIS_ID;
-      }
-
-/* Likewise for NumLabs1 and NumLabs2 */
-   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
-      if( !astTestColour( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for TextLab1 and TextLab2 */
-   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
-      if( !astTestColour( this, id ) ) {
-         id = TEXTLABS_ID;
-      }
-
-/* Likewise for Ticks1 and Ticks2 */
-   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
-      if( !astTestColour( this, id ) ) {
-         id = TICKS_ID;
-      }
-
-/* Likewise for Grid1 and Grid2 */
-   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
-      if( !astTestColour( this, id ) ) {
-         id = GRIDLINE_ID;
-      }
-   }
-
-/* If the requested value is set, get the value. Otherwise retain the
-   NOCOLOUR value set earlier. */
-   if( astTestColour( this, id ) ) ret = astGetColour( this, id );
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the value of the first set
+   genuine identifier. */
+   if( IdFind( id, &id1, &id2 ) ) id = astTestColour( this, id1 ) ? id1 : id2;
 
 /* Return the result. */
-   return ret;
+   return astGetColour( this, id );
 
 }
 
-static int UseFont( AstPlot *this, int id ) {
+static int GetUseFont( AstPlot *this, int id ) {
 /*
 *  Name:
-*     UseFont
+*     GetUseFont
 
 *  Purpose:
 *     Get the Font value to use for a specified graphical element.
@@ -20689,19 +21084,20 @@ static int UseFont( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int UseFont( AstPlot *this, int id )
+*     int GetUseFont( AstPlot *this, int id )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This returns the Font value for the graphical element specified by
-*     id. If an element related to a specific axis is requested, but is
-*     not set, a default value equal to the non-axis-specific element 
-*     is returned. For eaxmple, if the Font for AXIS1_ID is requested
-*     but the user has not set a value for Font(axis1), then the value
-*     of Font(axes) is returned, or NOFONT if Font(axes) has not been
-*     set either.
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the Font
+*     for the first set specific value is returned. For example, if the 
+*     Font for AXES_ID is requested, then the Font for AXIS1_ID will be
+*     returned if set, and otherwise the Font for AXIS2_ID will be returned.
+*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
+*     returned.
 
 *  Parameters:
 *     this
@@ -20710,63 +21106,31 @@ static int UseFont( AstPlot *this, int id ) {
 *        An integer specifying the graphical element to be drawn.
 
 *  Returned Value:
-*     The Font value to use or NOFONT.
+*     The Font value to use.
 
 */
 
 /* Local Variables: */
-   int ret;
-  
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
 /* Check the global error status. */
-   ret = NOFONT;
-   if ( !astOK ) return ret;
+   if ( !astOK ) return NOFONT;
 
-/* Font(axes) provides the default for Font(axis1) and Font(axis2),
-   so if Font(axis1) or Font(axis2) has been requested but is not set,
-   use Font(axes) instead. */
-   if( id == AXIS1_ID || id == AXIS2_ID ) {
-      if( !astTestFont( this, id ) ) {
-         id = AXIS_ID;
-      }
-
-/* Likewise for NumLabs1 and NumLabs2 */
-   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
-      if( !astTestFont( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for TextLab1 and textLab2 */
-   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
-      if( !astTestFont( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for Ticks1 and Ticks2 */
-   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
-      if( !astTestFont( this, id ) ) {
-         id = TICKS_ID;
-      }
-
-/* Likewise for Grid1 and Grid2 */
-   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
-      if( !astTestFont( this, id ) ) {
-         id = GRIDLINE_ID;
-      }
-   }
-
-/* If the requested value is set, get the value. Otherwise retain the
-   NOFONT value set earlier. */
-   if( astTestFont( this, id ) ) ret = astGetFont( this, id );
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the value of the first set
+   genuine identifier. */
+   if( IdFind( id, &id1, &id2 ) ) id = astTestFont( this, id1 ) ? id1 : id2;
 
 /* Return the result. */
-   return ret;
+   return astGetFont( this, id );
 
 }
 
-static double UseSize( AstPlot *this, int id ) {
+static double GetUseSize( AstPlot *this, int id ) {
 /*
 *  Name:
-*     UseSize
+*     GetUseSize
 
 *  Purpose:
 *     Get the Size value to use for a specified graphical element.
@@ -20776,19 +21140,20 @@ static double UseSize( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     double UseSize( AstPlot *this, int id )
+*     double GetUseSize( AstPlot *this, int id )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This returns the Size value for the graphical element specified by
-*     id. If an element related to a specific axis is requested, but is
-*     not set, a default value equal to the non-axis-specific element 
-*     is returned. For eaxmple, if the Size for AXIS1_ID is requested
-*     but the user has not set a value for Size(axis1), then the value
-*     of Size(axes) is returned, or NOSIZE if Size(axes) has not been
-*     set either.
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the Size
+*     for the first set specific value is returned. For example, if the 
+*     Size for AXES_ID is requested, then the Size for AXIS1_ID will be
+*     returned if set, and otherwise the Size for AXIS2_ID will be returned.
+*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
+*     returned.
 
 *  Parameters:
 *     this
@@ -20797,63 +21162,31 @@ static double UseSize( AstPlot *this, int id ) {
 *        An integer specifying the graphical element to be drawn.
 
 *  Returned Value:
-*     The Size value to use or NOSIZE.
+*     The Size value to use.
 
 */
 
 /* Local Variables: */
-   double ret;
-  
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
 /* Check the global error status. */
-   ret = NOSIZE;
-   if ( !astOK ) return ret;
+   if ( !astOK ) return NOSIZE;
 
-/* Size(axes) provides the default for Size(axis1) and Size(axis2),
-   so if Size(axis1) or Size(axis2) has been requested but is not set,
-   use Size(axes) instead. */
-   if( id == AXIS1_ID || id == AXIS2_ID ) {
-      if( !astTestSize( this, id ) ) {
-         id = AXIS_ID;
-      }
-
-/* Likewise for NumLabs1 and NumLabs2 */
-   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
-      if( !astTestSize( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for TextLab1 and textLab2 */
-   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
-      if( !astTestSize( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for Ticks1 and Ticks2 */
-   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
-      if( !astTestSize( this, id ) ) {
-         id = TICKS_ID;
-      }
-
-/* Likewise for Grid1 and Grid2 */
-   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
-      if( !astTestSize( this, id ) ) {
-         id = GRIDLINE_ID;
-      }
-   }
-
-/* If the requested value is set, get the value. Otherwise retain the
-   NOSIZE value set earlier. */
-   if( astTestSize( this, id ) ) ret = astGetSize( this, id );
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the value of the first set
+   genuine identifier. */
+   if( IdFind( id, &id1, &id2 ) ) id = astTestSize( this, id1 ) ? id1 : id2;
 
 /* Return the result. */
-   return ret;
+   return astGetSize( this, id );
 
 }
 
-static int UseStyle( AstPlot *this, int id ) {
+static int GetUseStyle( AstPlot *this, int id ) {
 /*
 *  Name:
-*     UseStyle
+*     GetUseStyle
 
 *  Purpose:
 *     Get the Style value to use for a specified graphical element.
@@ -20863,19 +21196,20 @@ static int UseStyle( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     int UseStyle( AstPlot *this, int id )
+*     int GetUseStyle( AstPlot *this, int id )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This returns the Style value for the graphical element specified by
-*     id. If an element related to a specific axis is requested, but is
-*     not set, a default value equal to the non-axis-specific element 
-*     is returned. For eaxmple, if the Style for AXIS1_ID is requested
-*     but the user has not set a value for Style(axis1), then the value
-*     of Style(axes) is returned, or NOSTYLE if Style(axes) has not been
-*     set either.
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the style
+*     for the first set specific value is returned. For example, if the 
+*     Style for AXES_ID is requested, then the style for AXIS1_ID will be
+*     returned if set, and otherwise the style for AXIS2_ID will be returned.
+*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
+*     returned.
 
 *  Parameters:
 *     this
@@ -20884,63 +21218,31 @@ static int UseStyle( AstPlot *this, int id ) {
 *        An integer specifying the graphical element to be drawn.
 
 *  Returned Value:
-*     The Style value to use or NOSTYLE.
+*     The Style value to use.
 
 */
 
 /* Local Variables: */
-   int ret;
-  
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
 /* Check the global error status. */
-   ret = NOSTYLE;
-   if ( !astOK ) return ret;
+   if ( !astOK ) return NOSTYLE;
 
-/* Style(axes) provides the default for Style(axis1) and Style(axis2),
-   so if Style(axis1) or Style(axis2) has been requested but is not set,
-   use Style(axes) instead. */
-   if( id == AXIS1_ID || id == AXIS2_ID ) {
-      if( !astTestStyle( this, id ) ) {
-         id = AXIS_ID;
-      }
-
-/* Likewise for NumLabs1 and NumLabs2 */
-   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
-      if( !astTestStyle( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for TextLab1 and textLab2 */
-   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
-      if( !astTestStyle( this, id ) ) {
-         id = NUMLABS_ID;
-      }
-
-/* Likewise for Ticks1 and Ticks2 */
-   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
-      if( !astTestStyle( this, id ) ) {
-         id = TICKS_ID;
-      }
-
-/* Likewise for Grid1 and Grid2 */
-   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
-      if( !astTestStyle( this, id ) ) {
-         id = GRIDLINE_ID;
-      }
-   }
-
-/* If the requested value is set, get the value. Otherwise retain the
-   NOSTYLE value set earlier. */
-   if( astTestStyle( this, id ) ) ret = astGetStyle( this, id );
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the value of the first set
+   genuine identifier. */
+   if( IdFind( id, &id1, &id2 ) ) id = astTestStyle( this, id1 ) ? id1 : id2;
 
 /* Return the result. */
-   return ret;
+   return astGetStyle( this, id );
 
 }
 
-static double UseWidth( AstPlot *this, int id ) {
+static double GetUseWidth( AstPlot *this, int id ) {
 /*
 *  Name:
-*     UseWidth
+*     GetUseWidth
 
 *  Purpose:
 *     Get the Width value to use for a specified graphical element.
@@ -20950,19 +21252,20 @@ static double UseWidth( AstPlot *this, int id ) {
 
 *  Synopsis:
 *     #include "plot.h"
-*     double UseWidth( AstPlot *this, int id )
+*     double GetUseWidth( AstPlot *this, int id )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This returns the Width value for the graphical element specified by
-*     id. If an element related to a specific axis is requested, but is
-*     not set, a default value equal to the non-axis-specific element 
-*     is returned. For eaxmple, if the Width for AXIS1_ID is requested
-*     but the user has not set a value for Width(axis1), then the value
-*     of Width(axes) is returned, or NOWIDTH if Width(axes) has not been
-*     set either.
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the Width
+*     for the first set specific value is returned. For example, if the 
+*     Width for AXES_ID is requested, then the Width for AXIS1_ID will be
+*     returned if set, and otherwise the Width for AXIS2_ID will be returned.
+*     If AXIS2_ID is not set either, then the default for AXIS2_ID will be
+*     returned.
 
 *  Parameters:
 *     this
@@ -20971,53 +21274,331 @@ static double UseWidth( AstPlot *this, int id ) {
 *        An integer specifying the graphical element to be drawn.
 
 *  Returned Value:
-*     The Width value to use or NOWIDTH.
+*     The Width value to use.
 
 */
 
 /* Local Variables: */
-   double ret;
-  
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
 /* Check the global error status. */
-   ret = NOWIDTH;
-   if ( !astOK ) return ret;
+   if ( !astOK ) return NOWIDTH;
 
-/* Width(axes) provides the default for Width(axis1) and Width(axis2),
-   so if Width(axis1) or Width(axis2) has been requested but is not set,
-   use Width(axes) instead. */
-   if( id == AXIS1_ID || id == AXIS2_ID ) {
-      if( !astTestWidth( this, id ) ) {
-         id = AXIS_ID;
-      }
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the value of the first set
+   genuine identifier. */
+   if( IdFind( id, &id1, &id2 ) ) id = astTestWidth( this, id1 ) ? id1 : id2;
 
-/* Likewise for NumLabs1 and NumLabs2 */
-   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
-      if( !astTestWidth( this, id ) ) {
-         id = NUMLABS_ID;
-      }
+/* Return the result. */
+   return astGetWidth( this, id );
 
-/* Likewise for TextLab1 and textLab2 */
-   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
-      if( !astTestWidth( this, id ) ) {
-         id = NUMLABS_ID;
-      }
+}
 
-/* Likewise for Ticks1 and Ticks2 */
-   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
-      if( !astTestWidth( this, id ) ) {
-         id = TICKS_ID;
-      }
+static int TestUseColour( AstPlot *this, int id ) {
+/*
+*  Name:
+*     TestUseColour
 
-/* Likewise for Grid1 and Grid2 */
-   } else if( id == GRIDLINE1_ID || id == GRIDLINE2_ID ) {
-      if( !astTestWidth( this, id ) ) {
-         id = GRIDLINE_ID;
-      }
+*  Purpose:
+*     Test the Colour value for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int TestUseColour( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This tests the Colour value for the graphical element specified by
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the element
+*     is considered to be set if all the corresponding specific values are 
+*     set. 
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Colour value state (1 if set, zero otherwise).
+
+*/
+
+/* Local Variables: */
+   int ret;
+
+/* Local Variables: */
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the logical AND of the test
+   flags for the two genuine identifiers. */
+   if( IdFind( id, &id1, &id2 ) ) {
+      ret = astTestColour( this, id1 ) && astTestColour( this, id2 );
+
+/* Otherwise, test the specified attribute directly. */
+   } else {
+      ret = astTestColour( this, id );
    }
 
-/* If the requested value is set, get the value. Otherwise retain the
-   NOWIDTH value set earlier. */
-   if( astTestWidth( this, id ) ) ret = astGetWidth( this, id );
+/* Return the result. */
+   return ret;
+
+}
+
+static int TestUseFont( AstPlot *this, int id ) {
+/*
+*  Name:
+*     TestUseFont
+
+*  Purpose:
+*     Test the Font value for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int TestUseFont( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This tests the Font value for the graphical element specified by
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the element
+*     is considered to be set if all the corresponding specific values are 
+*     set. 
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Font value state (1 if set, zero otherwise).
+
+*/
+
+/* Local Variables: */
+   int ret;
+
+/* Local Variables: */
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the logical AND of the test
+   flags for the two genuine identifiers. */
+   if( IdFind( id, &id1, &id2 ) ) {
+      ret = astTestFont( this, id1 ) && astTestFont( this, id2 );
+
+/* Otherwise, test the specified attribute directly. */
+   } else {
+      ret = astTestFont( this, id );
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
+static int TestUseSize( AstPlot *this, int id ) {
+/*
+*  Name:
+*     TestUseSize
+
+*  Purpose:
+*     Test the Size value for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int TestUseSize( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This tests the Size value for the graphical element specified by
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the element
+*     is considered to be set if all the corresponding specific values are 
+*     set. 
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Size value state (1 if set, zero otherwise).
+
+*/
+
+/* Local Variables: */
+   int ret;
+
+/* Local Variables: */
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the logical AND of the test
+   flags for the two genuine identifiers. */
+   if( IdFind( id, &id1, &id2 ) ) {
+      ret = astTestSize( this, id1 ) && astTestSize( this, id2 );
+
+/* Otherwise, test the specified attribute directly. */
+   } else {
+      ret = astTestSize( this, id );
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
+static int TestUseStyle( AstPlot *this, int id ) {
+/*
+*  Name:
+*     TestUseStyle
+
+*  Purpose:
+*     Test the Style value for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int TestUseStyle( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This tests the Style value for the graphical element specified by
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the element
+*     is considered to be set if all the corresponding specific values are 
+*     set. 
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Style value state (1 if set, zero otherwise).
+
+*/
+
+/* Local Variables: */
+   int ret;
+
+/* Local Variables: */
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the logical AND of the test
+   flags for the two genuine identifiers. */
+   if( IdFind( id, &id1, &id2 ) ) {
+      ret = astTestStyle( this, id1 ) && astTestStyle( this, id2 );
+
+/* Otherwise, test the specified attribute directly. */
+   } else {
+      ret = astTestStyle( this, id );
+   }
+
+/* Return the result. */
+   return ret;
+
+}
+
+static int TestUseWidth( AstPlot *this, int id ) {
+/*
+*  Name:
+*     TestUseWidth
+
+*  Purpose:
+*     Test the Width value for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int TestUseWidth( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This tests the Width value for the graphical element specified by
+*     id. If an element related to a generic value is being accessed (e.g
+*     "Axes" is generic, "Axis1" and "Axis2" are not), then the element
+*     is considered to be set if all the corresponding specific values are 
+*     set. 
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Width value state (1 if set, zero otherwise).
+
+*/
+
+/* Local Variables: */
+   int ret;
+
+/* Local Variables: */
+   int id1;        /* First genuine identifier */
+   int id2;        /* Second genuine identifier */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* See if the supplied identifier is a psuedo-identifier representing two 
+   other genuine identifiers. If so, return the logical AND of the test
+   flags for the two genuine identifiers. */
+   if( IdFind( id, &id1, &id2 ) ) {
+      ret = astTestWidth( this, id1 ) && astTestWidth( this, id2 );
+
+/* Otherwise, test the specified attribute directly. */
+   } else {
+      ret = astTestWidth( this, id );
+   }
 
 /* Return the result. */
    return ret;
@@ -21379,6 +21960,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    set = TestTickAll( this );
    ival = set ? GetTickAll( this ) : astGetTickAll( this );
    astWriteInt( channel, "TckAll", set, 1, ival, "Put ticks on all edges?" );
+
+/* Invisible. */
+/* ---------- */
+   set = TestInvisible( this );
+   ival = set ? GetInvisible( this ) : astGetInvisible( this );
+   astWriteInt( channel, "Invsbl", set, 1, ival, "Use invisible ink?" );
 
 /* Border. */
 /* ------- */
@@ -22130,6 +22717,11 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    cause a default value of 1 (yes) to be used. */
       new->border = -1;
 
+/* Should graphics be drawn invisible? Store a value of -1 to indicate that 
+   no value has yet been set. This will cause a default value of 0 (no) to 
+   be used. */
+      new->invisible = -1;
+
 /* Is clipping to be done using a logical OR operation between the axes? 
    Store a value of -1 to indicate that no value has yet been set. This will 
    cause a default value of 0 (no, i.e. a logical AND) to be used. */
@@ -22435,6 +23027,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 /* -------- */
       new->tickall = astReadInt( channel, "tckall", -1 );
       if ( TestTickAll( new ) ) SetTickAll( new, new->tickall );
+
+/* Invisible. */
+/* ---------- */
+      new->invisible = astReadInt( channel, "invsbl", -1 );
+      if ( TestInvisible( new ) ) SetInvisible( new, new->invisible );
 
 /* Border. */
 /* -------- */
@@ -22768,6 +23365,11 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 int astBorder_( AstPlot *this ){
    if( !astOK ) return 0;
    return (**astMEMBER(this,Plot,Border))(this);
+}
+
+void astBoundingBox_( AstPlot *this, float lbnd[2], float ubnd[2] ){
+   if( !astOK ) return;
+   (**astMEMBER(this,Plot,BoundingBox))(this,lbnd,ubnd);
 }
 
 void astClip_( AstPlot *this, int iframe, const double lbnd[], const double ubnd[] ){

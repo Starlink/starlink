@@ -15,6 +15,7 @@
 
 *  Routines Defined:
 *     AST_BORDER
+*     AST_BOUNDINGBOX
 *     AST_CLIP
 *     AST_CURVE
 *     AST_GENCURVE
@@ -53,6 +54,8 @@
 *     13-JUN-2001 (DSB):
 *        Modified to add support for astGenCurve, astGrfSet, astGrfPop, 
 *        astGrfPush and EXTERNAL grf functions.
+*     14-AUG-2002 (DSB):
+*        Added AST_BOUNDINGBOX.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -139,6 +142,20 @@ F77_LOGICAL_FUNCTION(ast_border)( INTEGER(THIS),
       RESULT = astBorder( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
    )
    return RESULT;
+}
+
+F77_SUBROUTINE(ast_boundingbox)( INTEGER(THIS),
+                          REAL_ARRAY(LBND),
+                          REAL_ARRAY(UBND),
+                          INTEGER(STATUS) ){
+   GENPTR_INTEGER(THIS)
+   GENPTR_REAL_ARRAY(LBND)
+   GENPTR_REAL_ARRAY(UBND)
+
+   astAt( "AST_BOUNDINGBOX", NULL, 0 );
+   astWatchSTATUS(
+      astBoundingBox( astI2P( *THIS ), LBND, UBND );
+   )
 }
 
 F77_SUBROUTINE(ast_clip)( INTEGER(THIS),
