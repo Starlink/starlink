@@ -5,10 +5,13 @@
 #
 #           Thu Nov 27 14:08:35 GMT 1997
 
-# The names of all the tar files containing text within kappa.tar:
-TAR_FILES = kappa_source  aif_sub fts_sub irm_sub kapgen_sub \
-kappa_data_alpha_OSF1 kappa_data_ix86_Linux kappa_data_sun4_Solaris \
+# The names of all the tar files containing system-independant files:
+TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub kapgen_sub \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub
+
+# The names of all the tar files containing system-specific files:
+TAR_FILES_B = kappa_data_alpha_OSF1 kappa_data_ix86_Linux \
+kappa_data_sun4_Solaris 
 
 # The contents of the kappa_source.tar file:
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
@@ -149,19 +152,23 @@ nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
 kpg1_trmsz.c ctm_xcols.f
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
-KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf cont_lut.sdf fc_lut.sdf \
-heat_lut.sdf ikon_lut.sdf ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf \
-ccdframec.sdf comwest.sdf spectrum.sdf
+KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf/alpha_OSF1 cont_lut.sdf/alpha_OSF1 \
+fc_lut.sdf/alpha_OSF1 heat_lut.sdf/alpha_OSF1 ikon_lut.sdf/alpha_OSF1 \
+ramps_lut.sdf/alpha_OSF1 spectrum_lut.sdf/alpha_OSF1 zebra_lut.sdf/alpha_OSF1 \
+ccdframec.sdf/alpha_OSF1 comwest.sdf/alpha_OSF1 spectrum.sdf/alpha_OSF1
 
 # The contents of the kappa_data_ix86_Linux.tar file:
-KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf ccdframec.sdf comwest.sdf \
-cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf ramps_lut.sdf \
-spectrum.sdf spectrum_lut.sdf zebra_lut.sdf
+KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf.ix86_Linux ccdframec.sdf.ix86_Linux \
+comwest.sdf.ix86_Linux cont_lut.sdf.ix86_Linux fc_lut.sdf.ix86_Linux \
+heat_lut.sdf.ix86_Linux ikon_lut.sdf.ix86_Linux ramps_lut.sdf.ix86_Linux \
+spectrum.sdf.ix86_Linux spectrum_lut.sdf.ix86_Linux zebra_lut.sdf.ix86_Linux
 
 # The contents of the kappa_data_sun4_Solaris.tar file:
-KAPPA_DATA_SUN4_SOLARIS = bgyrw_lut.sdf ccdframec.sdf comwest.sdf \
-cont_lut.sdf fc_lut.sdf heat_lut.sdf ikon_lut.sdf ramps_lut.sdf \
-spectrum.sdf spectrum_lut.sdf zebra_lut.sdf
+KAPPA_DATA_SUN4_SOLARIS = bgyrw_lut.sdf.sun4_Solaris \
+ccdframec.sdf.sun4_Solaris comwest.sdf.sun4_Solaris cont_lut.sdf.sun4_Solaris \
+fc_lut.sdf.sun4_Solaris heat_lut.sdf.sun4_Solaris ikon_lut.sdf.sun4_Solaris \
+ramps_lut.sdf.sun4_Solaris spectrum.sdf.sun4_Solaris \
+spectrum_lut.sdf.sun4_Solaris zebra_lut.sdf.sun4_Solaris
 
 # The contents of the kappa_ifls.tar file:
 KAPPA_IFLS = add.ifl aperadd.ifl ardgen.ifl ardmask.ifl block.ifl \
