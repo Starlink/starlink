@@ -52,6 +52,8 @@
        causing GAIA to lock up when used behind a web proxy that had not
        yet been configured.
 
+     - GAIA should now co-exist with interception proxy servers.
+
      - The UKSTU plate library has been removed from the default
        catalogue list. This facility is no longer available.
 
