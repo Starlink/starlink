@@ -1183,6 +1183,107 @@ f     invoked with STATUS set to an error value, or if it should fail for
    }  
 }
 
+static double GetSourceVel( AstSpecFrame *this ) {
+/*
+*  Name:
+*     astGetSourceVel
+
+*  Purpose:
+*     Obtain the value of the SourceVel attribute for a SpecFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specframe.h"
+*     double GetSourceVel( AstSpecFrame *this )
+
+*  Class Membership:
+*     SpecFrame member function.
+
+*  Description:
+*     This function returns the value of the SourceVel attribute for a 
+*     SpecFrame. If the attribute has not been set, the returned default 
+*     value corresponds to zero velocity within the rest frame given by 
+*     the current value of the StdOfRest attribute.
+
+*  Parameters:
+*     this
+*        Pointer to the SpecFrame.
+
+*  Returned Value:
+*     The SourceVel value in m/s. This is a heliocentric velocity.
+
+*  Notes:
+*     -  A value of 0.0 is returned if this function is invoked with the
+*     global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstSpecMap *specmap;          /* Pointer to a SpecMap */
+   AstStdOfRestType sor;         /* Standard of rest type code */
+   double dval;                  /* The SourceVel value in StdOfRest */
+   double result;                /* Value to return */
+   double rf;                    /* Rest frequency */
+
+/* Initialise */
+   result = 0.0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If a value has been set for the SourceVel attribute, return it. */
+   if( astTestSourceVel( this ) ){
+      result = this->sourcevel;
+
+/* Otherwise, we convert zero velocity within the StdOfRest rest frame
+   into a heliocentric velocity. */
+   } else {
+
+      sor = astGetStdOfRest( this );
+      if( sor != AST__HLSOR && sor != AST__SCSOR ) {
+         specmap = astSpecMap( 1, 0, "" );
+
+/* Add a conversion from velocity to frequency since SorConvert converts
+   frequencies. */
+         rf = astGetRestFreq( this );
+         if( rf == AST__BAD && astOK ) {
+            astError( AST__NORSF, "astSet(SpecFrame): Cannot convert "
+                      "the source velocity (SourceVel attribute) to "
+                      "the heliocentric standard of rest because the "
+                      "rest frequency (attributes RestFreq) is "
+                      "undefined." );
+         }
+         astSpecAdd( specmap, "VLTOFR", &rf );
+
+/* Now add a conversion from frequency in the current standard of rest to 
+   heliocentric frequency. */
+         if( !SorConvert( this, specmap, sor, 0.0, AST__HLSOR, 0.0 ) && astOK ) {
+            astError( AST__NOSOR, "astSet(SpecFrame): Cannot convert "
+                      "the source velocity (SourceVel attribute) to "
+                      "the heliocentric standard of rest because the "
+                      "source position (attributes RefRA and RefDec) is "
+                      "undefined." );
+         }
+
+/* Finally, add a conversion from frequency back to velocity. */
+         astSpecAdd( specmap, "FRTOVL", &rf );
+
+/* Use the SpecMap to convert the zero velocity in the current 
+   standard of rest to the heliocentric velocity to be returned. */
+         dval = 0.0;
+         astTran1( specmap, 1, &dval, 1, &result );
+         specmap = astAnnul( specmap );
+      }
+   }
+
+/* If an error occurred, clear the returned value. */
+   if ( !astOK ) result = 0.0;
+
+/* Return the result. */
+   return result;
+}
+
 static const char *GetSymbol( AstFrame *this, int axis ) {
 /*
 *  Name:
@@ -2004,7 +2105,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                TRANSFORM_0( "BTTOVL" )
             }
 
-            if( astTestRestFreq( target ) ) {
+            if( rest_freq != AST__BAD ) {
                TRANSFORM_1( "VLTOFR", rest_freq )
             } else {
                match = 0;
@@ -2033,7 +2134,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* Now if the alignment system is relativistic velocity, convert from  
    frequency to relativisitic velocity. */
       if( align_sys == AST__VREL ) {
-         if( astTestRestFreq( target ) ) {
+         if( rest_freq != AST__BAD ) {
             TRANSFORM_1( "FRTOVL", rest_freq )
          } else {
             match = 0;
@@ -2083,7 +2184,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                TRANSFORM_0( "BTTOVL" )
             }
 
-            if( astTestRestFreq( target ) ) {
+            if( rest_freq != AST__BAD ) {
                TRANSFORM_1( "VLTOFR", rest_freq )
 
             } else {
@@ -2131,7 +2232,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
                TRANSFORM_0( "AWTOFR" )
             }
 
-            if( astTestRestFreq( target ) ) {
+            if( rest_freq != AST__BAD ) {
                TRANSFORM_1( "FRTOVL", rest_freq )
             } else {
                match = 0;
@@ -2163,7 +2264,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
 /* SpecMap will only apply doppler shifts to frequency values. So first
    convert to frequency unless the alignment system is already frequency. */
       if( align_sys == AST__VREL ) {
-         if( astTestRestFreq( result ) ) {
+         if( rest_freq != AST__BAD ) {
             TRANSFORM_1( "VLTOFR", rest_freq )
          } else {
             match = 0;
@@ -2209,7 +2310,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    rest frequency is undefined. */
          } else {
 
-            if( astTestRestFreq( result ) ) {
+            if( rest_freq != AST__BAD ) {
                TRANSFORM_1( "FRTOVL", rest_freq )
             } else {
                match = 0;
@@ -2261,7 +2362,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    velocity using the rest frequency. Report an error if the rest frequency 
    is undefined. */
          } else if( system != AST__FREQ ) {
-            if( astTestRestFreq( result ) ) {
+            if( rest_freq != AST__BAD ) {
                TRANSFORM_1( "FRTOVL", rest_freq )
 
             } else {
@@ -2310,7 +2411,7 @@ static int MakeSpecMapping( AstSpecFrame *target, AstSpecFrame *result,
    undefined. */
          } else if( system != AST__VREL ) {
 
-            if( astTestRestFreq( result ) ) {
+            if( rest_freq != AST__BAD ) {
                TRANSFORM_1( "VLTOFR", rest_freq )
             } else {
                match = 0;
@@ -3542,8 +3643,7 @@ static int SorConvert( AstSpecFrame *this, AstSpecMap *specmap,
         args[ 4 ] = arg4; \
         astSpecAdd( specmap, cvt, args );
 
-/* Get the reference RA and DEC. Return zero if either is not defined
-   (these attributes do not have usable default values). */
+/* Get the reference RA and DEC. Return zero if either is bad. */
    ra = astGetRefRA( this );
    dec = astGetRefDec( this );
    if( ra == AST__BAD || dec == AST__BAD ) {
@@ -4759,8 +4859,7 @@ astMAKE_TEST(SpecFrame,GeoLon,(this->geolon!=AST__BAD))
 *  Description:
 *     This attribute specifies the FK5 J2000.0 declination of a reference 
 *     point on the sky. See the description of attribute RefRA for details. 
-*     The default RefDec is "<bad>", which results in a floating point
-*     value of AST__BAD. 
+*     The default RefDec is "0:0:0".
 
 *  Applicability:
 *     SpecFrame
@@ -4769,10 +4868,10 @@ astMAKE_TEST(SpecFrame,GeoLon,(this->geolon!=AST__BAD))
 *att--
 */
 /* The reference declination (FK5 J2000, radians). Clear the RefDec value by 
-   setting it to AST__BAD, which is also returned as the default value. Any
+   setting it to AST__BAD, which results in a default value of zero. Any
    value is acceptable. */
 astMAKE_CLEAR(SpecFrame,RefDec,refdec,AST__BAD)
-astMAKE_GET(SpecFrame,RefDec,double,AST__BAD,(this->refdec))
+astMAKE_GET(SpecFrame,RefDec,double,0.0,((this->refdec!=AST__BAD)?this->refdec:0.0))
 astMAKE_SET(SpecFrame,RefDec,double,refdec,value)
 astMAKE_TEST(SpecFrame,RefDec,( this->refdec != AST__BAD ))
 
@@ -4823,14 +4922,7 @@ c     astSetRefPos and astGetRefPos may be used to access the values of
 f     AST_SETREFPOS and AST_GETREFPOS may be used to access the value of
 *     these attributes directly as unformatted values in radians.
 *
-*     The default for both RefRA and RefDec is "<bad>", which results in a 
-*     floating point value of AST__BAD. This default value will cause the
-c     astFindFrame and astConvert functions
-f     AST_FINDFRAME and AST_CONVERT routines
-*     to fail to find a conversion between two SpecFrames if they 
-*     refer to different standards of rest. Explicit values must be 
-*     set for the RefRA and RefDec attributes in both SpecFrames to
-*     overcome this.
+*     The default for RefRA is "0:0:0".
 
 *  Applicability:
 *     SpecFrame
@@ -4839,10 +4931,10 @@ f     AST_FINDFRAME and AST_CONVERT routines
 *att--
 */
 /* The reference right ascension (FK5 J2000, radians). Clear the RefRA value 
-   by setting it to AST__BAD, which is also returned as the default value. Any
+   by setting it to AST__BAD, which gives a default value of 0.0. Any
    value is acceptable. */
 astMAKE_CLEAR(SpecFrame,RefRA,refra,AST__BAD)
-astMAKE_GET(SpecFrame,RefRA,double,AST__BAD,(this->refra))
+astMAKE_GET(SpecFrame,RefRA,double,0.0,((this->refra!=AST__BAD)?this->refra:0.0))
 astMAKE_SET(SpecFrame,RefRA,double,refra,value)
 astMAKE_TEST(SpecFrame,RefRA,( this->refra != AST__BAD ))
 
@@ -4865,18 +4957,7 @@ astMAKE_TEST(SpecFrame,RefRA,( this->refra != AST__BAD ))
 *     This attribute specifies the frequency corresponding to zero
 *     velocity. It is used when converting between between velocity-based 
 *     coordinate systems and and other coordinate systems (such as frequency, 
-*     wavelength, energy, etc).
-
-*     The default value is AST__BAD, resulting in it being impossible to
-*     convert between a velocity system and a non-velocity system. If you 
-*     want to work entirely within one system or the other, it is not
-*     necessary to assign a value to this attribute. Note, the 
-c     astFindFrame and astConvert 
-f     AST_FINDFRAME and AST_CONVERT 
-*     methods will fail to align two SpecFrames if a conversion between
-*     velocity and non-velocity systems is required, and no value has been
-*     assigned for the relevant RestFreq attribute. See the description of 
-*     the AlignStdOfRest attribute for details of the alignment process.
+*     wavelength, energy, etc). The default value is 1.0E5 GHz.
 *
 *     When setting a new value for this attribute, the new value can be 
 *     supplied either directly as a frequency, or indirectly as a wavelength 
@@ -4903,10 +4984,10 @@ f     AST_FINDFRAME and AST_CONVERT
 
 *att--
 */
-/* The rest frequency (Hz). Clear the RestFreq value by setting it to AST__BAD, 
-   which is also returned as the default value. Any value is acceptable. */
+/* The rest frequency (Hz). Clear the RestFreq value by setting it to AST__BAD,
+   which gives 1.0E14 as the default value. Any value is acceptable. */
 astMAKE_CLEAR(SpecFrame,RestFreq,restfreq,AST__BAD)
-astMAKE_GET(SpecFrame,RestFreq,double,AST__BAD,(this->restfreq))
+astMAKE_GET(SpecFrame,RestFreq,double,1.0E14,((this->restfreq!=AST__BAD)?this->restfreq:1.0E14))
 astMAKE_SET(SpecFrame,RestFreq,double,restfreq,value)
 astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 
@@ -4934,8 +5015,10 @@ astMAKE_TEST(SpecFrame,RestFreq,( this->restfreq != AST__BAD ))
 c     astGet or astSet.
 f     AST_GET or AST_SET.
 *
-*     The default value is zero, resulting in the "Source" standard of
-*     rest being equivalent to the "Heliocentric" standard of rest.
+*     The default value results in the "Source" standard of rest being 
+*     equivalent to the standard of rest specified by the StdOfrest 
+*     attribute (i.e. a source velocity of zero within the specified rest
+*     frame).
 
 *  Applicability:
 *     SpecFrame
@@ -4944,10 +5027,10 @@ f     AST_GET or AST_SET.
 *att--
 */
 /* The source velocity (stored internally as a heliocentric speed in m/s). 
-   Clear it by setting it to AST__BAD, which is returns a default value of zero. 
-   Any value is acceptable. */
+   Clear it by setting it to AST__BAD, which is returns a default value 
+   corresponding to zero within the StdOfRest rest frame. Any value is 
+   acceptable. */
 astMAKE_CLEAR(SpecFrame,SourceVel,sourcevel,AST__BAD)
-astMAKE_GET(SpecFrame,SourceVel,double,0.0,((this->sourcevel==AST__BAD )?0.0:this->sourcevel))
 astMAKE_SET(SpecFrame,SourceVel,double,sourcevel,value)
 astMAKE_TEST(SpecFrame,SourceVel,( this->sourcevel != AST__BAD ))
 
@@ -5795,6 +5878,10 @@ void astSetRefPos_( AstSpecFrame *this, AstSkyFrame *frm, double lon,
                     double lat ){
    if ( !astOK ) return;
    (**astMEMBER(this,SpecFrame,SetRefPos))(this,frm,lon,lat);
+}
+double astGetSourceVel_( AstSpecFrame *this ){
+   if ( !astOK ) return 0.0;
+   return (**astMEMBER(this,SpecFrame,GetSourceVel))(this);
 }
 
 /* Special public interface functions. */

@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {28th January 2003}
+\newcommand{\stardocdate}      {25th February 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -8866,12 +8866,20 @@ f-
 ) if either SpecFrame has a Unit value which is inappropriate for its
 System value.
 
-Some SpecFrame attributes (RefRA, RefDec and RestFreq) have no default
-value. If no value is set for one of these attributes, an error will be
-reported when a calculation is performed which needs a value for the
-attribute. For RefRA and RefDec, this will be when converting between
-different standards of rest, and for RestFreq it will be when converting
-between different systems.
+SpecFrame attributes, like all other attributes, all have default
+value. However, be aware that for some attributes these default values
+can never be more than ``a legal numerical value'' and have no
+astronomical significance. For instance, the RefRA and RefDec attributes
+(which give the source position) both have a default value of zero. So
+unless your source happens to be at that point (highly unlikely!) you will
+need to set new values. Likewise, the RestFreq (rest frequency) attribute
+has an arbitrary default value of 1.0E5 GHz. Some operations are not
+affected by inappropriate values for these attributes (for instance,
+converting from frequency to wavelength, changing axis units, \emph{etc}),
+but some are. For instance, converting from frequency to velocity
+requires a correct rest frequency, moving between different standards of
+rest requires a correct source position. The moral is, always set explicit
+values for as many attributes as possible.
 
 \subsection{\label{ss:creatingspectralcubes}Creating Spectral Cubes}
 You can use a SpecFrame to describe the spectral axis in a data cube
