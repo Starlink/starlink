@@ -24,6 +24,9 @@
 
   The following minor changes have also been made since v3.1-1:
 
+   - A bug in FINDOFF which caused failure when NDFNAMES=false has
+     been fixed.
+
    - PLOTLIST has been modified to interact with the AGI database
      in a more KAPPA-compatible way, so that alignment with KAPPA 
      graphical output should be improved.
