@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*      SUBROUTINE SURFLIB_CALC_OUTPUT_GRID (N_FILES, N_PTS, PIXEL_SZ,
+*      CALL SURFLIB_CALC_OUTPUT_GRID (N_FILES, N_PTS, PIXEL_SZ,
 *     :     X_PTR, Y_PTR, NX, NY, I_CENTRE, J_CENTRE, 
 *     :     STATUS )
 
@@ -56,6 +56,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20 - taken from SURF_REBIN.F
 *     $Log$
+*     Revision 1.5  1999/08/06 02:29:05  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.4  1999/08/03 19:32:48  timj
 *     Add copyright message to header.
 *

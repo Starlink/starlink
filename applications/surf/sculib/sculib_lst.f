@@ -7,20 +7,17 @@
 *     returns LST in radians
 
 *  Description:
+*     Calculates the current LST in radians. 
 
 *  Invocation:
 *     LST = SCULIB_LST
 
 *  Arguments:
+*     None
 
-*  Result:
+*  Returned Value:
 *     LST = DOUBLE PRECISION 
-*           LST in radians
-
-*  Method:
-
-*  Deficiencies:
-*     Not working yet.
+*         LST in radians
 
 *  Bugs:
 
@@ -30,6 +27,11 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+*     Not working yet.
 
 
 *  History:

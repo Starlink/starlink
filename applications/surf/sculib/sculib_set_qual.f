@@ -8,6 +8,9 @@
 *     set quality bits in a subset of a quality array
 
 *  Description:
+*     Set the bits in the quality array as specified by a mask.
+*     Can be used to set or unset bits as well as using the mask
+*     or the inverse of the mask. This is used to mask scuba sections.
 
 *  Invocation:
 *     CALL SCULIB_SET_QUAL (QUALITY, N_BOLS, N_POS, N_BEAM, 
@@ -15,7 +18,7 @@
 
 *  Arguments:
 *     USE_SECT                = LOGICAL (Given)
-*           am I changing SECTION or not SECTION
+*           am I changing SECTION or .NOT. SECTION
 *     QUALITY (N_BOLS, N_POS, N_BEAM)
 *                             = BYTE (Given and returned)
 *           the quality array

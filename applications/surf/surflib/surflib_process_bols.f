@@ -26,7 +26,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAMS, 
+*     CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAMS, 
 *    :     N_BOL, N_POS, N_POS_BEAMS, N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, 
 *    :     N_MEASUREMENTS,START_EXP, END_EXP, START_INT, END_INT, 
 *    :     START_MEAS, END_MEAS,N_MAP, N_FITS, FITS, DEM_PNTR, LST_STRT,
@@ -272,6 +272,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.7  1999/08/06 02:29:06  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.6  1999/08/03 19:32:51  timj
 *     Add copyright message to header.
 *

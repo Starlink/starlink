@@ -8,7 +8,7 @@
 *     Splits a string into a filename and parameters for REBIN
 
 *  Invocation:
-*      SUBROUTINE SCULIB_DECODE_REBIN_LINE(LINE, N_FOUND, NAME,
+*      CALL SCULIB_DECODE_REBIN_LINE(LINE, N_FOUND, NAME,
 *     :     WEIGHT, SHIFT_DX, SHIFT_DY, STATUS)
 
 *  Description:

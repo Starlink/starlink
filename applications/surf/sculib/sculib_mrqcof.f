@@ -20,14 +20,34 @@
 *    :  BETA, NALP, CHISQ, FUNCS, STATUS)
 
 *  Arguments:
-*     parameter[(dimensions)]=type(access)
-*           <description of parameter>
-
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*     X( NDATA ) = REAL (Given)
+*       X Data points
+*     Y( NDATA ) = REAL (Given)
+*       Y data points
+*     SIG ( NDATA ) = REAL (Given)
+*     NDATA = INTEGER (Given)
+*       Number of data points in arrays
+*     A( MA ) = REAL (Given & Returned)
+*       The input parameter values. Contains the best-fit values on exit.
+*     IA( MA ) = INTEGER (Given)
+*       Array specifying which components should be fitted. A zero
+*       indicates the parameter should not be fitted -- the parameters
+*       are kept at their input values. Non-zero indicates the parameter
+*       is free to be modified.
+*     MA = INTEGER (Given)
+*       Number of coefficients/parameters for function.
+*     ALPHA( NALP, NALP ) = REAL (Returned)
+*     BETA( MA ) = REAL (Returned)
+*     NALP = INTEGER  (Given)
+*       Size of ALPHA.
+*     CHISQ = REAL (Returned)
+*       ChiSq of fit.
+*     FUNCS = REAL FUNCTION (Given)
+*       The function to be fitted. Must take arguments of X, A, YFIT,
+*       DYDA and MA, where YFIT is the fitting function and DYDA the
+*       the derivatives with respect to parameters A at X.
+*     STATUS = INTEGER (Given & Returned)
+*       Global Status
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -36,6 +56,12 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 *  History:
 *     $Id$
@@ -52,13 +78,21 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      INTEGER MA, NALP, NDATA, IA(MA)
-      REAL A(MA), SIG(NDATA), X(NDATA), Y(NDATA)
+      INTEGER MA
+      INTEGER NALP
+      INTEGER NDATA
+      INTEGER IA( MA )
+      REAL    A( MA )
+      REAL    SIG( NDATA )
+      REAL    X(NDATA)
+      REAL    Y(NDATA)
 
 *  Arguments Given & Returned:
 
 *  Arguments Returned:
-      REAL CHISQ, ALPHA(NALP,NALP), BETA(MA)
+      REAL    CHISQ
+      REAL    ALPHA( NALP, NALP )
+      REAL    BETA( MA )
 
 *  Status:
       INTEGER STATUS
@@ -73,8 +107,17 @@
       PARAMETER (MMAX = 20)
 
 *  Local variables:
-      INTEGER MFIT, I, J, K, L, M
-      REAL DY, SIG2I, WT, YMOD, DYDA(MMAX)
+      INTEGER MFIT
+      INTEGER I
+      INTEGER J
+      INTEGER K
+      INTEGER L
+      INTEGER M
+      REAL    DY
+      REAL    SIG2I
+      REAL    WT
+      REAL    YMOD
+      REAL    DYDA( MMAX )
 
 *  Internal References:
 

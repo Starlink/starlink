@@ -52,9 +52,12 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
-*  History :
+*  History:
 *     $Id$
 *     $Log$
+*     Revision 1.5  1999/08/06 02:24:48  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.4  1999/08/03 19:35:26  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

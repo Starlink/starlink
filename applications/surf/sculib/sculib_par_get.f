@@ -1,7 +1,7 @@
 
 *+
 *  Name:
-*     SCULIB_PAR_GET0I
+*     SCULIB_PAR_GET0?
 
 *  Purpose:
 *     Wrapper for the standard PAR_GET0 routines
@@ -39,6 +39,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/06 02:24:47  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.3  1999/08/03 19:35:17  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

@@ -1,16 +1,16 @@
       SUBROUTINE SCULIB_EXTRACT_2DIM_B(X, NX, NY, TWOD, ONED, STATUS)
 *+
 *  Name:
-*     SCULIB_EXTRACT_2DIM_R
+*     SCULIB_EXTRACT_2DIM_B
 
 *  Purpose:
 *     To extract the second dimension (at a given X) from a 2d array
 
 *  Invocation:
-*     SUBROUTINE SCULIB_EXTRACT_2DIM_B(X, NX, NY, TWOD, ONED, STATUS)
+*     CALL SCULIB_EXTRACT_2DIM_B(X, NX, NY, TWOD, ONED, STATUS)
 
 *  Description:
-*     This routine extracts a second dimension from a 2D array.
+*     This routine extracts a second dimension from a 2D byte array.
 
 *  Arguments:
 *     X = INTEGER (Given)

@@ -7,29 +7,31 @@
 *     returns date and time as day number since 1st Jan
 
 *  Description:
+*     Calculates the time since 1st January. The time is returned
+*     as a day number and fractional day.
 
 *  Invocation:
 *     DAY = SCULIB_DAY ()
 
 *  Arguments:
+*     None
 
-*  Result:
+*  Returned Value:
 *     SCULIB_DAY = DOUBLE PRECISION 
 *           date and time as a day number since 1st Jan
+
+*  Authors:
+*     J.Lightfoot (REVAD::JFL)
+
+*  Copyright:
+*     Copyright (C) 1994,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *  Method:
 
 *  Deficiencies:
 
 *  Bugs:
-
-*  Authors:
-*     J.Lightfoot (REVAD::JFL)
-
-*  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
-
 
 *  History:
 *     $Id$

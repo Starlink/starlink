@@ -14,7 +14,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_WTFN_REGRID_2 (RES, IN_DATA, IN_VARIANCE,
+*     CALL SCULIB_WTFN_REGRID_2 (RES, IN_DATA, IN_VARIANCE,
 *    :  WEIGHT, USEVARWT, VARWT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM,
 *    :  CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
@@ -147,16 +147,21 @@
 *        convolution weighting function
 *     STATUS                           = INTEGER (Given and Returned)
 *        The global status.
+
 *  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
-
+*     Tim Jenness (JAC)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
-*    21-AUG-1995: original version, adapted from JCMT_BESSEL_REGRID_2.
+*     $Log$
+*     Revision 1.13  1999/08/06 02:24:52  timj
+*     Tweak headers for use with PROLAT.
+*
+*     21-AUG-1995: original version, adapted from JCMT_BESSEL_REGRID_2.
 
 *  Bugs:
 

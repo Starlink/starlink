@@ -4,26 +4,33 @@
 *     SCULIB_UT1
 
 *  Purpose:
-*     returns UT1 as a modified Julian day (calculated from
-*     Hawaiian local time)
+*     returns UT1 as a modified Julian day
 
 *  Description:
+*     Return the current modified Julian day calculated for Hawaiian
+*     local time.
 
 *  Invocation:
 *     UT1 = SCULIB_UT1
 
 *  Arguments:
+*     None
 
-*  Result:
-*     UT1 = DOUBLE PRECISION 
-*           UT1 expressed as a modified Julian day (JD - 2400000.5)
+*  Returned Value:
+*     SCULIB_UT1 = DOUBLE PRECISION 
+*        UT1 expressed as a modified Julian day (JD - 2400000.5)
 
-*  Method:
 
-*  Deficiencies:
-*     Depends on VAX clock for local time and date
+*  Notes:
+*     - Depends on system clock for local time and date
+*     - Uses the IDATE function to retrieve the current date. This 
+*     only returns a 2-digit year (not Y2K compliant) but is not
+*     a problem since the output is immediately passed to the SLALIB
+*     routine SLA_CALDJ which uses windowing to select the correct
+*     year.
 
 *  Bugs:
+*     The time zone is hard-wired for Hawaii (10).
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)

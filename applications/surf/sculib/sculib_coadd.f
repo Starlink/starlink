@@ -21,7 +21,7 @@
 *     Input pixels with bad quality are ignored.
 
 *  Invocation:
-*     SUBROUTINE SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
+*     CALL SCULIB_COADD (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
 *    :   INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
 *    :   OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
 *    :   BADBIT, VARIANCE, STATUS)
@@ -76,6 +76,9 @@
 *     $Id$
 *     5-JUL-1994: Renamed from SCUDR_COADD (JFL).
 *     $Log$
+*     Revision 1.5  1999/08/06 02:24:40  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.4  1999/08/03 19:34:49  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

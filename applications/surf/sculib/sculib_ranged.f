@@ -8,6 +8,9 @@
 
 *  Language:
 *     Starlink Fortran 77
+
+*  Description:
+*     Find the maximum and minimum values in a double precision array.
  
 *  Invocation:
 *     CALL SCULIB_RANGED( ARRAY, IST, IEN, VMAX, VMIN, STATUS)
@@ -38,6 +41,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.4  1999/08/06 02:24:47  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.3  1999/08/03 19:35:20  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

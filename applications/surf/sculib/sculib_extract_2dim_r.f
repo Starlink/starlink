@@ -7,10 +7,10 @@
 *     To extract the second dimension (at a given X) from a 2d array
 
 *  Invocation:
-*     SUBROUTINE SCULIB_EXTRACT_2DIM_R(X, NX, NY, TWOD, ONED, STATUS)
+*     CALLSCULIB_EXTRACT_2DIM_R(X, NX, NY, TWOD, ONED, STATUS)
 
 *  Description:
-*     This routine extracts a second dimension from a 2D array.
+*     This routine extracts a second dimension from a 2D REAL array.
 
 *  Arguments:
 *     X = INTEGER (Given)

@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_GET_MJD(N_FITS, FITS, MJD, STATUS)
+*     CALL SCULIB_GET_MJD(N_FITS, FITS, MJD, STATUS)
 
 *  Description:
 *     This routine retrieves the UTSTART and UTDATE values from the FITS

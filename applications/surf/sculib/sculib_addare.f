@@ -44,6 +44,14 @@
 *     VARIANCE     = LOGICAL (Given)
 *             True if both input arrays have variance arrays
 
+*  Notes:
+*     - Does not use Quality correctly. 
+*       Uses INTEGER quality rather than UBYTE
+
+*  Implementation Status:
+*     - Propagates variance
+*     - Checks for bad values
+
 *  Method:
 
 *  Deficiencies:

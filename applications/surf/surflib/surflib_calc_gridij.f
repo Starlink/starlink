@@ -11,6 +11,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
+*     CALL SURFLIB_CALC_GRIDIJ( TYPE, NX, NY, ICEN, JCEN, I, J, STATUS)
 
 *  Description:
 *     Calculates the I,J grid positions related to pixel numbers 
@@ -53,6 +54,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 23
 *     $Log$
+*     Revision 1.3  1999/08/06 02:29:04  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.2  1999/08/03 19:32:47  timj
 *     Add copyright message to header.
 *

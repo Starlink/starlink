@@ -1,7 +1,6 @@
       SUBROUTINE SURFLIB_CALC_IJPOS (N_PTS, PIXEL_SZ,
      :     I_CENTRE, J_CENTRE, X_POS, Y_POS, IJ,
      :     STATUS )
-
 *+
 *  Name:
 *     SURFLIB_CALC_IJPOS
@@ -13,7 +12,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*      SUBROUTINE SURFLIB_CALC_IJPOS (N_PTS, PIXEL_SZ,
+*      CALL SURFLIB_CALC_IJPOS (N_PTS, PIXEL_SZ,
 *     :     I_CENTRE, J_CENTRE, X_POS, Y_POS, IJ,
 *     :     STATUS )
 
@@ -53,6 +52,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.3  1999/08/06 02:29:04  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.2  1999/08/03 19:32:47  timj
 *     Add copyright message to header.
 *

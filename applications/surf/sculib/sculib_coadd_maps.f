@@ -11,12 +11,12 @@
 *  Language:
 *     Starlink Fortran 77
 
-*  Invocation
-*     SUBROUTINE SCULIB_COADD_MAPS(NPTS, DATA_IN, QUALITY_IN, WEIGHT,
+*  Invocation:
+*     CALL SCULIB_COADD_MAPS(NPTS, DATA_IN, QUALITY_IN, WEIGHT,
 *    :     NCOADD, DATA_OUT, VARIANCE_OUT, QUALITY_OUT, WEIGHT_OUT,
 *    :     STATUS)
 
-*    Description :
+*  Description:
 *     This routine coadds the current integration image to the output image.
 *     The coadd variance is calculated from the spread of the integrations
 *     about the mean if more than one integration has been added in. The
@@ -57,13 +57,17 @@
 *     Research Council. All Rights Reserved.
 
 *  History:
+*     $Log$
+*     Revision 1.4  1999/08/06 02:24:40  timj
+*     Tweak headers for use with PROLAT.
+*
 *     1997 April 17 (TIMJ)
 *        Rework SCULIB_COADD
 
 *  Bugs:
 *     {note_any_bugs_here}
  
-*_
+*-
 
 *     Type Definitions :
       IMPLICIT NONE

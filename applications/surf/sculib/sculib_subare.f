@@ -44,11 +44,8 @@
 *     VARIANCE     = LOGICAL (Given)
 *             True if both input arrays have variance arrays
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*  Notes:
+*     Consider using VEC_SUBR (SUN/39) instead
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL), adapted from GEN_SUBAFE by K.Shortridge

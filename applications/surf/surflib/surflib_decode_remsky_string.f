@@ -13,7 +13,10 @@
 *     Starlink Fortran 77
  
 *  Invocation:
- 
+*     CALL SURFLIB_DECODE_REMSKY_STRING( SUB_INSTRUMENT, 
+*    :     N_ELEMENTS, BOL_DESC, N_BOLS, BOL_ADC, BOL_CHAN,
+*    :     BOL_LIST, N_BOLS_OUT, 
+*    :     STATUS )
  
 *  Description:
 *     Given an array of bolometer descriptions, return an array
@@ -57,7 +60,8 @@
 *     [h7,r1]                               - inner ring and h7
 *     [r1,-h8]                              - inner ring without h8
 *     [r1,-18]                              - inner ring without bolometer 18
-*     [all,-r1,-h7]                         - all pixels except the inner ring/h7
+*     [all,-r1,-h7]                         - all pixels except the inner 
+*                                             ring/h7
 *     [all,-r3,g1]                          - all pixels except ring 3 but with
 *                                             g1 (which happens to be in r3)
 *     [all,-r1,-r2,-r3,-r4,-r5]             - Selects the central pixel!!
@@ -75,6 +79,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  1999/08/06 02:29:05  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.5  1999/08/03 19:32:49  timj
 *     Add copyright message to header.
 *

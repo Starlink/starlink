@@ -154,15 +154,11 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           Global status
 
-*  Method:
-
-*  Deficiencies:
+*  Notes:
 *     Does not handle LOCAL_COORDS for MAP_X and MAP_Y
 *     (see SCULIB_APARRENT_2_MP for information on how to do this)
 
-*  Bugs:
-
-*    Authors :
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
 *     T.Jenness (timj@jach.hawaii.edu)
 
@@ -172,12 +168,15 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
-*    History :
+*  History:
 *     $Id$
 *     22-DEC-1992: Original
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
 *     $Log$
+*     Revision 1.11  1999/08/06 02:24:39  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.10  1999/08/03 19:34:46  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

@@ -8,7 +8,7 @@
 *     To calculate mean and standard deviation of a REAL array
 
 *  Invocation:
-*     SUBROUTINE SCULIB_STATR(N_POS, SCUDATA, SCUQUAL, BADBIT,
+*     CALL SCULIB_STATR(N_POS, SCUDATA, SCUQUAL, BADBIT,
 *    :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, QSORT, STATUS)
 
 *  Description:

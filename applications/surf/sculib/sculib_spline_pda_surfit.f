@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_SPLINE_PDA_SURFIT (NDP, X_IN, Y_IN, DATA_IN,
+*     CALL SCULIB_SPLINE_PDA_SURFIT (NDP, X_IN, Y_IN, DATA_IN,
 *    :   VARIANCE_IN, NX_OUT, NY_OUT, X_OUT, Y_OUT, DATA_OUT, STATUS)
 
 *  Description:

@@ -8,7 +8,7 @@
 *     To remove sky background from SCUBA data
 
 *  Invocation:
-*     SUBROUTINE SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, SCUDATA,
+*     CALL SCULIB_REM_SKY(MODE, ADD_BACK, N_BOLS, N_POS, SCUDATA,
 *    :     SCUVAR, SCUQUAL, CLIP, N_SKYBOLS, SKYBOLS, BADBIT, STATUS)
 
 *  Description:
@@ -47,9 +47,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        Global Status value
 
-*  Implementation Status:
-*     Uses Kappa library routines
-
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
@@ -63,6 +60,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.7  1999/08/06 02:24:48  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.6  1999/08/03 19:35:26  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

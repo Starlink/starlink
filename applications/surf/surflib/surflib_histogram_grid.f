@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*      SUBROUTINE SURFLIB_HISTOGRAM_GRID (N_PTS, NX, NY, USEDATA,
+*      CALL SURFLIB_HISTOGRAM_GRID (N_PTS, NX, NY, USEDATA,
 *     :     IN_DATA, IN_QUALITY, BADBIT, IJ, GRID, IMAX, JMAX, NMAX,
 *     :     STATUS )
 
@@ -77,6 +77,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.5  1999/08/06 02:29:06  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.4  1999/08/03 19:32:50  timj
 *     Add copyright message to header.
 *

@@ -35,11 +35,11 @@
 *     FLAGGED                 = LOGICAL (Given)
 *           .TRUE. if input data has flagged values
 
-*  Method:
+*  Notes:
+*     Consider using VEC_SQRTR (SUN/39) instead.
 
-*  Deficiencies:
-
-*  Bugs:
+*  Implementation Status:
+*     Uses INTEGER rather than BYTE Quality.
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)

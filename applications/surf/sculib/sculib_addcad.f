@@ -1,7 +1,7 @@
       SUBROUTINE SCULIB_ADDCAD (N, IN, DVAL, OUT)
 *+
 *  Name:
-*     SCULIB_ADDCAR
+*     SCULIB_ADDCAD
 
 *  Purpose:
 *     add a constant to a double array
@@ -24,7 +24,10 @@
 
 *  Method:
 
-*  Deficiencies:
+*  Notes:
+*     - No range checks are performed
+*     - No status checking
+*     - No checks for bad values
 
 *  Bugs:
 

@@ -12,6 +12,9 @@
 *     Starlink Fortran 77
 
 *  Invocation:
+*     CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT,
+*    :     IN_DATA, X, Y, NPIX, 
+*    :     PIXSPACE, NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
 
 *  Description:
 *     This routine performs two tasks:
@@ -54,16 +57,21 @@
 *        Temporary workspace.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
 *  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
-
+*     Tim Jenness (JAC)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
-*    17-AUG-1995: original version, adapted from JCMT_BESSEL_REGRID_1
+*     $Log$
+*     Revision 1.6  1999/08/06 02:24:52  timj
+*     Tweak headers for use with PROLAT.
+*
+*     17-AUG-1995: original version, adapted from JCMT_BESSEL_REGRID_1
 
 *  Bugs:
 

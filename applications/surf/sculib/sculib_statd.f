@@ -8,7 +8,7 @@
 *     To calculate mean and standard deviation of a DOUBLE array
 
 *  Invocation:
-*     SUBROUTINE SCULIB_STATD(N_POS, SCUDATA, SCUQUAL, BADBIT,
+*     CALL SCULIB_STATD(N_POS, SCUDATA, SCUQUAL, BADBIT,
 *    :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, QSORT, STATUS)
 
 *  Description:

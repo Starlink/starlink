@@ -10,9 +10,8 @@
 *     This routine converts an angle in dd:mm:ss.dd format into a
 *     double precision number in radians. It assumes that the input
 *     string specifies the angle in degrees. The process involves 
-
-*  removing the:
-*     the conversion. An error will be returned if there are less than 2 :
+*     removing the ':' delimiters, then calling SLA_DAFIN to perform
+*     the conversion. An error will be returned if there are less than 2 ':'
 *     delimiters in the string, or if the SLA routine errors.
 
 *  Invocation:
@@ -26,12 +25,6 @@
 *     STATUS         = INTEGER (Given and returned)
 *           Global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
@@ -39,6 +32,12 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 *  History:
 *     $Id$

@@ -20,12 +20,6 @@
 *     TO (N)     = BYTE (Returned)
 *           array copied to
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 *     T. Jenness  (timj@jach.hawaii.edu)
@@ -34,11 +28,22 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Notes:
+*     This routine is deprecated. Use VEC_BTOB (SUN/39) instead.
+
 
 *  History:
 *     $Id$
 *     25.11.1992: Original version
 *    endhistory
+
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
 
 *-
 

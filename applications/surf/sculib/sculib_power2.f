@@ -4,7 +4,7 @@
 *     SCULIB_POWER2
 
 *  Purpose:
-*     <brief title for subroutine>
+*     Calculate next highest power of 2
 
 *  Description:
 *     Given a number, returns that number or the next highest
@@ -16,24 +16,28 @@
 
 *  Arguments:
 *     N              = INTEGER (Given)
-*             The number in question.
+*       The number in question.
 *     NP2            = INTEGER (Returned)
-*             The next number that is a power of 2.
+*       The next number that is a power of 2. Returns 0 if N is less
+*       than 1.
+
+*  Returned Value:
 *     SCULIB_POWER2  = INTEGER (Returned)
-*             The power of 2.  ie NP2=2**SCULIB_POWER2
+*       The power of 2.  ie NP2=2**SCULIB_POWER2.
+*       Returns -1 if N is less than 1.
+
+*  Authors:
+*     K. Shortridge
+*     J.Lightfoot (REVAD::JFL), copied from GEN_POWER2 by K.Shortridge
+*     Tim Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1992,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *  Method:
 
-*  Deficiencies:
-
 *  Bugs:
-
-*  Authors:
-*     J.Lightfoot (REVAD::JFL), copied from GEN_POWER2 by K.Shortridge
-
-*  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
-*     Research Council. All Rights Reserved.
 
 
 *  History:
@@ -66,7 +70,8 @@
 *  Local Constants:
 
 *  Local variables:
-      INTEGER I,IP2
+      INTEGER I
+      INTEGER IP2
 
 *  Internal References:
 

@@ -38,14 +38,40 @@
 *    :  ALPHA, NCA, CHISQ, FUNCS, ALAMDA, STATUS)
 
 *  Arguments:
-*     parameter[(dimensions)]=type(access)
-*           <description of parameter>
-
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*     X( NDATA ) = REAL (Given)
+*       X Data points
+*     Y( NDATA ) = REAL (Given)
+*       Y data points
+*     SIG ( NDATA ) = REAL (Given)
+*     NDATA = INTEGER (Given)
+*       Number of data points in arrays
+*     A( MA ) = REAL (Given & Returned)
+*       The input parameter values. Contains the best-fit values on exit.
+*     IA( MA ) = INTEGER (Given)
+*       Array specifying which components should be fitted. A zero
+*       indicates the parameter should not be fitted -- the parameters
+*       are kept at their input values. Non-zero indicates the parameter
+*       is free to be modified.
+*     MA = INTEGER (Given)
+*       Number of coefficients/parameters for function.
+*     COVAR ( NCA, NCA ) = REAL (Returned)
+*       The covariance matrix. Fixed parameters will return zero covariance.
+*     ALPHA ( NCA, NCA ) = REAL (Returned)
+*       The curvature matrix.
+*     NCA = INTEGER (Given)
+*       Size of output arrays. Must be greater than the number of fitted
+*       parameters
+*     CHISQ = REAL (Returned)
+*       ChiSq of fit.
+*     FUNCS = REAL FUNCTION (Given)
+*       The function to be fitted. Must take arguments of X, A, YFIT,
+*       DYDA and MA, where YFIT is the fitting function and DYDA the
+*       the derivatives with respect to parameters A at X.
+*     ALAMDA = REAL (Given & Returned)
+*       The stepping factor for the iteration. Should be set to <0 
+*       initially.
+*     STATUS = INTEGER (Given & Returned)
+*       Global Status
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -53,6 +79,13 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:
@@ -71,20 +104,28 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      INTEGER MA, NCA, NDATA, IA(MA)
-      REAL SIG (NDATA), X(NDATA), Y(NDATA)
+      INTEGER MA
+      INTEGER NCA
+      INTEGER NDATA
+      INTEGER IA( MA )
+      REAL    SIG( NDATA )
+      REAL    X( NDATA )
+      REAL    Y( NDATA )
 
 *  Arguments Given & Returned:
-      REAL ALAMDA, A(MA)
+      REAL    ALAMDA
+      REAL    A( MA )
 
 *  Arguments Returned:
-      REAL CHISQ, ALPHA (NCA,NCA), COVAR (NCA,NCA)
+      REAL    CHISQ
+      REAL    ALPHA ( NCA,NCA ) 
+      REAL    COVAR ( NCA,NCA )
 
 *  Status:
       INTEGER STATUS
 
 *  External references:
-      REAL FUNCS
+      REAL    FUNCS
 
 *  Global variables:
 
@@ -93,8 +134,15 @@
       PARAMETER (MMAX = 20)
 
 *  Local variables:
-      INTEGER J, K, L, M, MFIT
-      REAL OCHISQ, ATRY(MMAX), BETA(MMAX), DA (MMAX)
+      INTEGER J
+      INTEGER K
+      INTEGER L
+      INTEGER M
+      INTEGER MFIT
+      REAL    OCHISQ
+      REAL    ATRY( MMAX )
+      REAL    BETA( MMAX )
+      REAL    DA ( MMAX )
       SAVE OCHISQ, ATRY, BETA, DA, MFIT
 
 *  Internal References:

@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, PARAM,
+*     CALL SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, PARAM,
 *    :     SUB_POINTER, WAVE, INST, FILT, STATUS)
 
 *  Description:

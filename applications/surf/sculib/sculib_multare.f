@@ -48,14 +48,10 @@
 *              Flag value
 *     VARIANCE            = LOGICAL (Given)
 *              True if both input arrays have variance arrays
-*
-*     Note that any of the arrays may be the same.
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*  Notes:
+*     - Any of the arrays may be the same.
+*     - Consider using VEC_MULR (SUN/39) instead.
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)

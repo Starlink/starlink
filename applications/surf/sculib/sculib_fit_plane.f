@@ -69,8 +69,6 @@
 *        status returned.
 *     end if
 
-*  Deficiencies:
-
 *  Bugs:
 
 *  Authors:
@@ -80,6 +78,7 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+*  Deficiencies:
 
 *  History:
 *     $Id$

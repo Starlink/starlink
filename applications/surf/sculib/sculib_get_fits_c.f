@@ -4,12 +4,6 @@
 *  Name:
 *     SCULIB_GET_FITS_C
 
-*  Purpose:
-*     get the value of specified FITS character keyword
-*+
-*  Name:
-*     SCULIB_GET_FITS_C
-
 
 *  Purpose:
 *     get the value of specified FITS character keyword
@@ -68,6 +62,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.4  1999/08/06 02:24:44  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.3  1999/08/03 19:35:04  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

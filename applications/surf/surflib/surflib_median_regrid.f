@@ -13,6 +13,10 @@
 *     Starlink Fortran 77
  
 *  Invocation:
+*     CALL SURFLIB_MEDIAN_REGRID( N_FILES, N_PTS, DIAMETER,
+*    :     WAVELENGTH, OUT_PIXEL, NX, NY, ICEN, JCEN, BOL_RA_PTR, 
+*    :     BOL_DEC_PTR, DATA_PTR,  OUT_DATA, OUT_VAR, OUT_QUAL,
+*    :     STATUS )
 
 *  Description:
 *     This is done in two stages:
@@ -110,6 +114,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.3  1999/08/06 02:29:06  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.2  1999/08/03 19:32:50  timj
 *     Add copyright message to header.
 *

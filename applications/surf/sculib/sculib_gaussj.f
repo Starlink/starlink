@@ -22,14 +22,21 @@
 *     CALL SCULIB_GAUSSJ (A, N, NP, B, M, MP, STATUS)
 
 *  Arguments:
-*     parameter[(dimensions)]=type(access)
-*           <description of parameter>
-
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*     A ( NP, NP ) = REAL (Given & Returned)
+*       Input matrix. On exit, contains its inverse.
+*     N = INTEGER (Given)
+*       Required size of A (< NP)
+*     NP = INTEGER (Given)
+*       Dimensions of input matrix.
+*     B ( NP, MP) = REAL (Given & Returned)
+*       Input matrix containing M right-hand side vectors. On exit, contains
+*       the solution vectors.
+*     M = INTEGER (Given)
+*       Required size of B. (< MP)
+*     MP = INTEGER (Given)
+*       Size of second dimension of B.
+*     STATUS = INTEGER (Given & Returned)
+*       Global status.
 
 *  Authors:
 *     J.LIGHTFOOT copied from Numerical Recipes (REVAD::JFL)
@@ -38,6 +45,12 @@
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 *  History:
 *     $Id$
@@ -54,10 +67,14 @@
       INCLUDE 'SAE_PAR'
 
 *  Arguments Given:
-      INTEGER M, MP, N, NP
+      INTEGER M
+      INTEGER MP
+      INTEGER N
+      INTEGER NP
 
 *  Arguments Given & Returned:
-      REAL A (NP,NP), B (NP,MP)
+      REAL A (NP,NP)
+      REAL B (NP,MP)
 
 *  Arguments Returned:
 
@@ -73,9 +90,19 @@
       PARAMETER (NMAX = 50)
 
 *  Local variables:
-      INTEGER I, ICOL, IROW, J, K, L, LL, INDXC(NMAX), INDXR(NMAX),
-     :  IPIV(NMAX)
-      REAL BIG, DUM, PIVINV
+      INTEGER I
+      INTEGER ICOL
+      INTEGER IROW
+      INTEGER J
+      INTEGER K 
+      INTEGER L 
+      INTEGER LL 
+      INTEGER INDXC(NMAX)
+      INTEGER INDXR(NMAX)
+      INTEGER IPIV(NMAX)
+      REAL    BIG
+      REAL    DUM
+      REAL    PIVINV
 
 *  Internal References:
 

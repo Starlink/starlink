@@ -9,9 +9,11 @@
 *     routine to unpack compressed chop-scan data
 
 *  Description:
+*     Used by the on-line system to unpack notice-board entries
+*     and retrieve demodulated data.
 
 *  Invocation:
-*     SUBROUTINE SCULIB_UNPACK_CHOPSCAN (RESNBS, N_POINTS, ISTART,
+*     CALL SCULIB_UNPACK_CHOPSCAN (RESNBS, N_POINTS, ISTART,
 *    :   NPIX, POINTER, RESDATA_450, RESWT_450, RESDATA_850, RESWT_850, 
 *    :   RESDIM1, RESDIM2, BAD)
 
@@ -42,8 +44,6 @@
 *           value signalling bad pixel
 
 *  Method:
-
-*  Deficiencies:
 
 *  Bugs:
 

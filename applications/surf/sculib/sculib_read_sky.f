@@ -42,7 +42,7 @@
 *
 
 *  Invocation:
-*     SUBROUTINE SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB, 
+*     CALL SCULIB_READ_SKY (FILE, MAX_SKY, N_SKY, SUB, 
 *    :  FILTER, ETA_TEL, B, TAUZ, DATEM, DAY, RUN, STATUS)
 
 *  Arguments:
@@ -73,8 +73,6 @@
 *           global status
 
 *  Method:
-
-*  Deficiencies:
 
 *  Bugs:
 

@@ -1,4 +1,4 @@
-      FUNCTION SCULIB_BESSJ1 (X, STATUS)
+      REAL FUNCTION SCULIB_BESSJ1 (X, STATUS)
 *+
 *  Name:
 *     SCULIB_BESSJ1
@@ -19,12 +19,16 @@
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
 
+*  Returned Value:
+*     SCULIB_BESSJ1 = REAL
+*       Bessel function J1(X)
+
+*  Notes:
+*     Probably should be changed to use PDA_DBESJ1 (SUN/194). That routine
+*     is DOUBLE PRECISION.
+
 *  Method:
 *     Uses an algorithm from Numerical Recipes in Fortran.
-
-*  Deficiencies:
-
-*  Bugs:
 
 *  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
@@ -32,6 +36,11 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

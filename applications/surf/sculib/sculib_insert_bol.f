@@ -8,7 +8,7 @@
 *     To insert a single bolometer into a data array
 
 *  Invocation:
-*     SUBROUTINE SCULIB_INSERT_BOL(NBOL, N_BOLS, N_POS, BOLDATA,
+*     CALL SCULIB_INSERT_BOL(NBOL, N_BOLS, N_POS, BOLDATA,
 *    :     BOLQUAL, SCUDATA, SCUQUAL, STATUS)
 
 *  Description:

@@ -24,7 +24,10 @@
 
 *  Method:
 
-*  Deficiencies:
+*  Notes:
+*     - No range checks are performed
+*     - No status checking
+*     - No checks for bad values
 
 *  Bugs:
 

@@ -8,7 +8,7 @@
 *     To clip a bolometer at +/- nsigma
 
 *  Invocation:
-*     SUBROUTINE SCULIB_CLIP_BOL(N_POS, SCUDATA, SCUQUAL,
+*     CALL SCULIB_CLIP_BOL(N_POS, SCUDATA, SCUQUAL,
 *    :     N_SIGMA, BADBIT, NSPIKES, STATUS)
 
 *  Description:
@@ -37,7 +37,7 @@
 *  Implementation Status:
 
 *  Authors:
-*     TIMJ: Tim Jenness (JACH)
+*     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
  
 
@@ -49,6 +49,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.9  1999/08/06 02:24:39  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.8  1999/08/03 19:34:49  timj
 *     Add copyright message to header.
 *     Convert old header style to new.

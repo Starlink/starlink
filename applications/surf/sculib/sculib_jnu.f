@@ -4,7 +4,7 @@
 *     SCULIB_JNU
 
 *  Purpose:
-*     Rayleigh-Jeans corrected brightness temperature
+*     Calculate the Rayleigh-Jeans corrected brightness temperature
 
 *  Description:
 *     This function calculates the Rayleigh-Jeans corrected brightness
@@ -28,11 +28,9 @@
 *     STATUS            = INTEGER (Given and returned)
 *           global status
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
+*  Returned Value:
+*     SCULIB_JNU = REAL
+*        Rayleigh-Jeans corrected brightness temperature
 
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
@@ -40,6 +38,12 @@
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

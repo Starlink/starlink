@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SURFLIB_TRIM_IMAGE( TRIM, NX, NY, BITNUM,
+*     CALL SURFLIB_TRIM_IMAGE( TRIM, NX, NY, BITNUM,
 *     IN_QUAL, OUT_QUAL, STATUS)
 
 *  Description:
@@ -53,6 +53,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/08/06 02:29:07  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.2  1999/08/03 19:32:54  timj
 *     Add copyright message to header.
 *

@@ -8,7 +8,7 @@
 *     Splits a string into a filename and SCUBA section
 
 *  Invocation:
-*      SUBROUTINE SCULIB_SPLIT_FILE_SPEC( NAME, MAX_SPEC, FILENAME, NSPEC, 
+*      CALL SCULIB_SPLIT_FILE_SPEC( NAME, MAX_SPEC, FILENAME, NSPEC, 
 *     :     DATA_SPEC, STATUS)
 
 *  Description:

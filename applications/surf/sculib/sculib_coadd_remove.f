@@ -18,7 +18,7 @@
 *     remains, 0 otherwise. Exposure pixels with bad quality are ignored.
 
 *  Invocation:
-*     SUBROUTINE SCUDR_COADD_REMOVE (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
+*     CALL SCULIB_COADD_REMOVE (N, IN_DATA, IN_VARIANCE, IN_QUALITY,
 *    :  INCOADD_DATA, INCOADD_VAR, INCOADD_QUAL, INCOADD_NUMBER, 
 *    :  OUTCOADD_DATA, OUTCOADD_VAR, OUTCOADD_QUAL, OUTCOADD_NUMBER,
 *    :  VARIANCE)
@@ -51,18 +51,19 @@
 *     VARIANCE                = LOGICAL (Given)
 *           T if input data has variance associated with it
 
-*  Method:
-
-*  Deficiencies:
-
-*  Bugs:
-
 *  Authors:
 *     J.Lightfoot (REVAD::JFL)
 
 *  Copyright:
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
+
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
 
 
 *  History:

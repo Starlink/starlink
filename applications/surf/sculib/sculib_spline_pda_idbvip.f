@@ -12,14 +12,14 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     SUBROUTINE SCULIB_SPLINE_PDA_IDBVIP (NDP, X_IN, Y_IN, DATA_IN,
+*     CALL SCULIB_SPLINE_PDA_IDBVIP (NDP, X_IN, Y_IN, DATA_IN,
 *    :  N_PTS, X_OUT, Y_OUT, DATA_OUT, STATUS)
 
 *  Description:
 *     This routine provides a wrapper for the PDA_IDBVIP spline interpolation
 *     routine. The quirks of the algorithm are dealt with here so that
-*     SCULIB_SPLINE_REGRID does not have to know anything about the interpolation
-*     routine.
+*     SCULIB_SPLINE_REGRID does not have to know anything about the
+*     interpolation routine.
 
 *  Arguments:
 *     NDP = INTEGER (Given)

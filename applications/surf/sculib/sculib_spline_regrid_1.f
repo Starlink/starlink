@@ -6,14 +6,22 @@
 *     SCULIB_WTFN_REGRID_1
 
 *  Purpose:
+*     Calculate the areas of the output map that contain good data points
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
+*     CALL SCULIB_SPLINE_REGRID_1 (DIAMETER, WAVELENGTH,
+*    :     IN_DATA, X, Y, NPIX, 
+*    :     PIXSPACE, NI, NJ, ICEN, JCEN, QUALITY, STATUS)
 
 *  Description:
-*
+*     Calculate the areas of the output map that will be affected by
+*     points in the input data array. This is used to generate a mask
+*     so that the rebinned output map only contains data points close
+*     to input data. Similar to SCULIB_WTFN_REGRID_1.
+
 *  Arguments:
 *     DIAMETER   = REAL (Given)
 *        Diameter of telescope
@@ -41,6 +49,7 @@
 *        Quality mask
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
 *  Authors:
 *     John Lightfoot (jfl@roe.ac.uk)
 *     Tim Jenness (timj@jach.hawaii.edu)

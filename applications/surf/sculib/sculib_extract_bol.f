@@ -8,7 +8,7 @@
 *     To extract a single bolometer from a data array
 
 *  Invocation:
-*     SUBROUTINE SCULIB_EXTRACT_BOL(NBOL, N_BOLS, N_POS, SCUDATA,
+*     CALL SCULIB_EXTRACT_BOL(NBOL, N_BOLS, N_POS, SCUDATA,
 *    :     SCUQUAL, BOLDATA, BOLQUAL, STATUS)
 
 *  Description:

@@ -22,7 +22,49 @@
 *
 *     where n is the number of artificial samples available.
 *     
-*
+
+
+*  Invocation:
+*     CALL SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES, 
+*    :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL, 
+*    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
+
+*  Arguments:
+*     DEMOD (4, N_BOLS, N_SAMPLES)    = REAL (Given)
+*           the demodulated data (data,-,-,quality)
+*     N_BOLS                          = INTEGER (Given)
+*           the number of bolometers taking data
+*     N_SAMPLES                       = INTEGER (Given)
+*           the number of samples taken for each bolometer
+*     N_ALLAN_BOL                     = INTEGER (Given)
+*           the number of bolometers whose data is to be averaged together
+*           at each sample position
+*     ALLAN_BOL (N_ALLAN_BOL)         = INTEGER (Given)
+*           the positions in the demodulated data array of the bolometers
+*           whose measurements are to be used for the calculation of Allan
+*           variance
+*     KMAX                            = INTEGER (Given)
+*           the size of the Allan variance array
+*     SUM (KMAX)                      = REAL (Given and returned)
+*           the accumulator for current artificial sample of length K real 
+*           samples
+*     N_SUM (KMAX)                    = INTEGER (Given and returned)
+*           the number of samples currently in the artificial sample
+*           accumulator
+*     ARTIFICIAL (KMAX)               = REAL (Given and returned)
+*           the last artificial sample of length K samples that was
+*           calculated
+*     N_ARTIFICIAL (KMAX)             = INTEGER (Given and returned) 
+*           the number of artificial samples of length K samples that
+*           have been calculated
+*     ALLAN_VARIANCE (KMAX)           = REAL (Given and returned)
+*           the Allan variance
+*     ALLAN_QUALITY (KMAX)            = INTEGER (Returned)
+*           quality on the Allan variance
+*     STATUS                          = INTEGER (Given and returned)
+*           global status
+
+*  Method:
 *     If status on entry is good the routine will:-
 *
 *     loop through the data samples to be incorporated -
@@ -92,51 +134,7 @@
 *        end if
 *
 *     end of loop through samples in this dataslice
-*
 
-*  Invocation:
-*     SUBROUTINE SCULIB_MAP_ALLAN_VARIANCE (DEMOD, N_BOLS, N_SAMPLES, 
-*    :  N_ALLAN_BOL, ALLAN_BOL, KMAX, SUM, N_SUM, ARTIFICIAL, 
-*    :  N_ARTIFICIAL, ALLAN_VARIANCE, ALLAN_QUALITY, STATUS)
-
-*  Arguments:
-*     DEMOD (4, N_BOLS, N_SAMPLES)    = REAL (Given)
-*           the demodulated data (data,-,-,quality)
-*     N_BOLS                          = INTEGER (Given)
-*           the number of bolometers taking data
-*     N_SAMPLES                       = INTEGER (Given)
-*           the number of samples taken for each bolometer
-*     N_ALLAN_BOL                     = INTEGER (Given)
-*           the number of bolometers whose data is to be averaged together
-*           at each sample position
-*     ALLAN_BOL (N_ALLAN_BOL)         = INTEGER (Given)
-*           the positions in the demodulated data array of the bolometers
-*           whose measurements are to be used for the calculation of Allan
-*           variance
-*     KMAX                            = INTEGER (Given)
-*           the size of the Allan variance array
-*     SUM (KMAX)                      = REAL (Given and returned)
-*           the accumulator for current artificial sample of length K real 
-*           samples
-*     N_SUM (KMAX)                    = INTEGER (Given and returned)
-*           the number of samples currently in the artificial sample
-*           accumulator
-*     ARTIFICIAL (KMAX)               = REAL (Given and returned)
-*           the last artificial sample of length K samples that was
-*           calculated
-*     N_ARTIFICIAL (KMAX)             = INTEGER (Given and returned) 
-*           the number of artificial samples of length K samples that
-*           have been calculated
-*     ALLAN_VARIANCE (KMAX)           = REAL (Given and returned)
-*           the Allan variance
-*     ALLAN_QUALITY (KMAX)            = INTEGER (Returned)
-*           quality on the Allan variance
-*     STATUS                          = INTEGER (Given and returned)
-*           global status
-
-*  Method:
-
-*  Deficiencies:
 
 *  Bugs:
 

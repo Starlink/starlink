@@ -9,8 +9,14 @@
 *     crosstalk measurements
 
 *  Description:
+*     Experimental routine for calculating crosstalk between
+*     A-to-D cards. Averages signal for each bolometer and writes
+*     to a file. The file name comes from the FILE ADAM parameter.
 
 *  Invocation:
+*     CALL SCULIB_CROSSTALK (SWITCH_PER_EXP, EXP_PER_INT,
+*    :  N_INTEGRATIONS, N_MEASUREMENTS, DEMOD_POINTER, N_BOLS, 
+*    :  NUMPOS, DATA, BOL_CHAN, BOL_ADC, STATUS)
 
 *  Arguments:
 *     SWITCH_PER_EXP         = INTEGER (Given)
@@ -49,7 +55,7 @@
 *     J.Lightfoot (JFL/ROE)
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 1995,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 

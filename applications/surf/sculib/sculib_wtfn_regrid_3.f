@@ -4,7 +4,7 @@
      :     WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 *+
 *  Name:
-*     SCULIB_BESSEL_REGRID_3
+*     SCULIB_WTFN_REGRID_3
 
 *  Purpose:
 *     Sets up the 'guard ring' of bolometers outside the data.
@@ -13,7 +13,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SCULIB_BESSEL_REGRID_3 (METHOD,RES,PIXSPACE, NI, NJ, ICEN, JCEN, 
+*     CALL SCULIB_WTFN_REGRID_3 (METHOD,RES,PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOT_WEIGHT_IN, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
 *    :  CONV_QUALITY_SUM, CONV_WEIGHT, WEIGHTSIZE, SCLSZ, WTFN, STATUS)
 
@@ -70,8 +70,10 @@
 *        convolution weighting function
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
+
 *  Authors:
 *     REVAD::JFL: John Lightfoot
+*     Tim Jenness (JAC)
 
 
 *  Copyright:
@@ -79,6 +81,10 @@
 *     Research Council. All Rights Reserved.
 
 *  History:
+*     $Log$
+*     Revision 1.8  1999/08/06 02:24:53  timj
+*     Tweak headers for use with PROLAT.
+*
 *     15-AUG-1995: original version, modified from JCMT_BESSEL_REGRID_3
 
 *  Bugs:

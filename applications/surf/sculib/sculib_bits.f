@@ -1,7 +1,8 @@
 
-*+ 
+* no plus (not a real prologue)
+ 
 *  Name:
-*     SCULIB_BIT*
+*     SCULIB_BITS
 
 *  Purpose:
 *     These are the SCULIB bitwise operator routines
@@ -11,7 +12,10 @@
 *     Bits start counting at 0
 *     Do it this way just in case the FORTRAN is non-portable in a similar
 *     way to NDF_FUNC (NDF_QMASK)
-*
+
+*  Invocation:
+*     Various
+
 *  Functions:
 *     BYTE SCULIB_BITON
 *     BYTE SCULIB_BITOFF
@@ -29,6 +33,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.9  1999/08/06 02:24:39  timj
+*     Tweak headers for use with PROLAT.
+*
 *     Revision 1.8  1999/08/03 19:34:44  timj
 *     Add copyright message to header.
 *     Convert old header style to new.
@@ -57,7 +64,7 @@ c Revision 1.1  1996/08/28  01:40:50  timj
 c Initial revision
 c
 *    endhistory
-*-
+**************************************
 
       BYTE FUNCTION SCULIB_BITON (VAL, BIT)
 *+
@@ -82,6 +89,14 @@ c
 *     BIT              = INT (Given)
 *           The bit to be turned on
 
+*  Returned Value:
+*     SCULIB_BITON = BYTE
+*       Modified byte.
+
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 *-
 
 *  Type Definitions:
@@ -109,9 +124,8 @@ c
 
       END
 
-*+ SCULIB_BITOFF - turn off a bit
-      BYTE FUNCTION SCULIB_BITOFF (VAL, BIT)
 
+      BYTE FUNCTION SCULIB_BITOFF (VAL, BIT)
 *+
 *  Name:
 *     SCULIB_BITOFF
@@ -133,6 +147,14 @@ c
 *           The byte to be changed
 *     BIT              = INT (Given)
 *           The bit to be turned off
+
+*  Returned Value:
+*     SCULIB_BITOFF = BYTE
+*       Modified byte.
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *-
 
@@ -160,7 +182,7 @@ c
 
       END
 
-*+ SCULIB_BITOR - returns the bitwise OR of two bytes
+
       BYTE FUNCTION SCULIB_BITOR (VAL1, VAL2)
 *+
 *  Name:
@@ -178,11 +200,19 @@ c
 *  Description:
 *     Returns the bitwise OR
 
-*  Invocation:
+*  Arguments:
 *     VAL1              = BYTE (Given)
 *           First byte
 *     VAL2              = BYTE (Given)
 *           Second byte
+
+*  Returned Value:
+*     SCULIB_BITOR = BYTE
+*       OR of bytes
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *-
 
@@ -226,11 +256,19 @@ c
 *  Description:
 *     Returns the bitwise AND
 
-*  Arguments Given:
+*  Arguments:
 *     VAL1              = BYTE (Given)
 *           First byte
 *     VAL2              = BYTE (Given)
 *           Second byte
+
+*  Returned Value:
+*     SCULIB_BITAND = BYTE
+*       AND of bytes.
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *-
 
@@ -255,7 +293,7 @@ c
 
       END
 
-*+ SCULIB_BITON - turn on a bit
+
 
       LOGICAL FUNCTION SCULIB_BITTEST (VAL, BIT)
 *+
@@ -280,6 +318,14 @@ c
 *           The byte to be tested
 *     BIT              = INT (Given)
 *           The bit to be tested
+
+*  Returned Value:
+*     SCULIB_BITTEST = LOGICAL
+*       True if specified bit is turned on.
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
 
 *-
 
