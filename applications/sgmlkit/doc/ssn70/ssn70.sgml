@@ -135,10 +135,16 @@ SGML project.
 
 <distribution string='DR-0.7-8' date='23-Aug-2000' author=ng
 versionid='v0-7-8'>
-<px>RCS $Id$
+<px>RCS Id: ssn70.sgml,v 1.56 2000/08/24 18:16:11 norman Exp 
 <px>This release took a couple of goes to get right&ellip;.  But I
 took the opportunity of reading through the text, correcting and
-updating things here and there.
+updating things here and there.  No big changes, but various things
+have been clarified.
+
+<distribution string='DR-0.7-10' date='30-Aug-2000' author=ng
+versionid='v0-7-10'>
+<px>RCS $Id$
+<px>Slight changes to explanations of maths elements.
 
 </history>
 
@@ -1780,6 +1786,10 @@ syntactically acceptable, but astronomical nonsense.
 <subsect id=str.maths export>Maths
 <update versionid="v0-4">Slight edit to discuss new mline and mlabel
 elements</update>
+<update versionid='v0-7-10'>Substantial edit.  Changes to shortref
+cleverness made some of the advice in here wrong.  It now tells folk
+not to use entity references at all in maths.
+</update>
 
 <p>Includes
 <ref id='el.sun.m' >m</ref>,
@@ -1807,30 +1817,50 @@ if you give it an ID, you can refer to that equation number from elsewhere.
 <p>Note that, although the parser `knows'
 that the content of these elements is in &latex notation there is no
 suppression of markup-recognition within them -- entity references and
-element start-tags are still recognised as such by the parser.  The
-latter is rather a pest, but the former means that you can still use
-entity references to parameterise or abbreviate mathematical
-expressions.
+element start-tags are still recognised as such by the parser.
 
-<p>When you are typing an eqnarray, you might want to escape all
-occurrences of <code/&amp> and <code/&lt> with the corresponding
-entity references <code/&amp;amp;> and <code/&amp;lt;>.  This is not
-wrong, but it can become tedious and could obscure what you are
-writing, so you may prefer to take advantage of the fact that SGML
-recognises these bits of markup only in context: only if an ampersand
-or less-than symbol is immediately followed by a name-start character
-(an upper- or lowercase letter) is it recognised as an entity
-reference or element start-tag.  Thus the following element is
-correctly formed (with <code>&lt!ENTITY dec "\delta"></code>):
+<p>When you are typing maths, switch your brain completely into
+&latex;-mode, and do not use SGML entity references for things like
+ampersands, backslashes and the like.  If you do use these, they will
+generally appear to 
+work, in the sense that your document will process without errors, but
+the results will be different from what you expect<note>For example,
+<code/&amp;amp;> inside an <code>&lt;meqnarray&gt;</code> element
+results in a literal ampersand in the maths, rather than being
+interpreted as alignment characters.  I could go on (you guessed!), but
+even at this 
+temporal distance, I feel my reader's tolerance for parser detail
+gurgling down the plughole.</note>.  When you are typing maths,
+therefore, you have to make sure you do not type anything the
+SGML parser thinks it ought to pay attention to.  That means that
+occurrences of <code/&amp> and <code/&lt> should not look like entity
+references or tags.  SGML recognises these bits of markup only in
+context: only if an ampersand or less-than symbol is immediately
+followed by a name-start character (an upper- or lowercase letter) is
+it recognised as an entity reference or element start-tag (so that
+none of `<code>& x;</code>', `<code>< x></code>' and `<code></ x></code>'
+are recognised as entity references or tags).  Thus the following
+element is correctly formed:
 <verbatim><![CDATA[
-<meqnarray><mline>\alpha&<& x<mline>&dec&=&amp;4< x</meqnarray>
+<meqnarray><mline>x&\sim& a<mline>\delta&=&4< x</meqnarray>
 ]]></verbatim>
-I do, however, advise you against typing anything so wilfully obscure.
-The best practice when typing meqnarray
+Rather than worrying about the details of this rule, however, 
+the best practice when typing meqnarray
 elements is to reflexively put a space after all occurrences of
 <code/&amp;> and <code/&lt;>: this will keep the SGML parser from
 interfering, and make no difference to &latex, which ignores all
 spaces in maths mode anyway.
+
+<p>Alternatively, you can surround the maths element with a CDATA
+marked section (see <ref id=markup.ms.cdata/>).  That's more typing,
+but switches off SGML recognition completely:
+<verbatim>
+&lt;meqnarray>
+&lt;mline>&lt;![CDATA[    a&lt;b&lt;c&amp;\sim&amp;x    ]]&gt;
+&lt;mline>x & = & y
+&lt;/meqnarray>
+</verbatim>
+Hmm -- typing a few extra spaces won't hurt you.
 
 <p>If you need or wish to make some definitions which are to be
 effective in all sucessive maths elements -- for example you want to
