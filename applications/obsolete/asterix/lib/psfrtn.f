@@ -3701,7 +3701,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       REAL                    BASE, SCALE       ! Axis quantities
 
-      INTEGER                 BDA               ! BDA identifier
       INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
       INTEGER                 DPTR              ! Ptr to data
       INTEGER                 NDIM              ! Dimensionality
