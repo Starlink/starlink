@@ -1417,7 +1417,7 @@ clean:
                 $(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
                 $(SPP_F_ROUTINES) \
                 $(OBJECT_FILES) \
-                $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES) \
+                $(OBJECT_LIBRARIES) $(IRAF_LIBRARIES:.a=.*) \
                 $(A_TASKS_F) $(IFL_FILES) \
                 $(HELP_SOURCES) 1>/dev/null 2>/dev/null
 	@- rm -r -f $(FIGARO_INCLUDES) 1>/dev/null 2>/dev/null
