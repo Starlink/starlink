@@ -607,7 +607,7 @@ $(F_SUB1) $(I_SUB1) $(C_SUB1):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC):
+$(F_SUB2) $(I_SUB2) $(C_SUB2) $(GENLRDICSRC) grf_kappa.c:
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
