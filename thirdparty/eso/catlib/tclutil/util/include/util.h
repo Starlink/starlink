@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: util.h,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $" 
+ * "@(#) $Id: util.h,v 1.2 2003/01/03 22:09:04 brighton Exp $" 
  *
  * util.h - utility routines
  * 
