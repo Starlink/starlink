@@ -1,0 +1,5 @@
+*.lo
+*.la
+Makefile
+*_ERR
+fac_*_err

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="ary">
+  <version>1.1-9</version>
+  <path>libraries/fary</path>
+  <description>A Subroutine Library for Accessing ARRAY Data Structures</description>
+  <abstract><p> The ARY library is a set of routines for accessing
+  Starlink ARRAY data structures built using the Hierarchical Data
+  System (HDS).
+    </p></abstract>
+  <dependencies >
+    <build>sae</build><build>prm</build><build>hds</build><build>chr</build><build>ems</build><link>hds</link><link>ems</link><link>chr</link><link>prm</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Rodney Warren-Smith</name>
+      <uname>rfws</uname>
+    </person>
+  </developers>
+  <documentation> sun11</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
