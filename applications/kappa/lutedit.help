@@ -293,7 +293,9 @@ o How to...:
   Click and drag the short horizontal black line (the "marker") which is
   displayed at the point the cursor crosses the current curve (use the
   "+" and "-" buttons to zoom in if it is too small to see). The marker
-  can only be dragged vertically.
+  can only be dragged vertically. Alternatively, type the required value 
+  into the text box which displays the current pen value, or use the up
+  and down arrow keys to change the value.
 
 
 >>> Change the values of a range of pens:
