@@ -117,10 +117,10 @@ sub _GMark {
    my $canvas = $$external[0];
    my $width = $canvas->cget( '-width' );
 
-   use Data::Dumper;
-   print "\n# _GMark()\n";
-   print Dumper( $xf ) . "\n";
-   print Dumper( $yf ) . "\n";
+   #use Data::Dumper;
+   #print "\n# _GMark()\n";
+   #print Dumper( $xf ) . "\n";
+   #print Dumper( $yf ) . "\n";
          
    if( scalar(@$xf) > 1 && scalar(@$xf) == scalar(@$yf) ) {      
         
