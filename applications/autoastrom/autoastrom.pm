@@ -43,6 +43,8 @@
 package autoastrom;
 use Exporter;
 use POSIX qw (sqrt atan2 sin cos fabs);
+use FileHandle;
+
 @ISA = qw(Exporter);
 
 @EXPORT = qw( extract_objects ndf_info get_catalogue match_positions
@@ -50,7 +52,7 @@ use POSIX qw (sqrt atan2 sin cos fabs);
 	      twodarray2ndf ndf2twodarray txt2arr txt2ndf ndf2txt
 	      reuse_files get_temp_files make_pseudo_fits
 	      decompose_transform
-	      verbosity wmessage check_obsdata_kwd);
+	      verbosity wmessage check_obsdata_kwd run_command_pipe);
 
 @EXPORT_OK = (@EXPORT,
 	      'deg2sex',
@@ -104,10 +106,11 @@ sub check_kwd_list ($$);
 sub check_obsdata_kwd (\%);
 sub verbosity ($);
 sub wmessage ($$);
+sub run_command_pipe(\@);
 
 my $noregenerate = 0;
 my @tempfiles = ();
-my $verbose = 0;	  
+my $verbose = 0;
 
 # Useful values
 my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
@@ -408,7 +411,7 @@ sub extract_objects ($$$$) {
 	}
 	close (DUMPCAT);
     }
-    
+
     $rethash{catalogue} = \@catarr;
 
     return \%rethash;
@@ -1248,7 +1251,7 @@ sub match_positions_findoff ($$$$$) {
 # We want to assemble ASTROM entries consisting of
 #
 #    ra      dec  0.0 0.0 J2000  * id1/id2
-#    x-pos1  y-pos1  
+#    x-pos1  y-pos1
 #
 # for each of the pairs in the two catalogues.
 #
@@ -1256,6 +1259,8 @@ sub match_positions_findoff ($$$$$) {
 # (the name of the generated ASTROM input file), {nmatches} (the
 # number of matches found) and {samplesd} (s.d. of residuals from the
 # matching).
+#
+# Return undef if we can't generate the file, for some reason.
 #
 # Single argument is a reference to a hash, containing keys:
 #    CCDin          : SExtractor output catlogue -- CCD positions
@@ -1304,7 +1309,10 @@ sub generate_astrom ($) {
 			  && ($#CCDarray >= 10))) {
 	$nterms = 6;
 
-	if ($#CCDarray < 10) {
+        if ($#CCDarray < 0) {
+            wmessage('warning', "Ooops, input CCDarray has NO matchces");
+            return undef;       # JUMP OUT
+        } elsif ($#CCDarray < 10) {
 	    wmessage ('warning',
 		      "Too few matches ($#CCDarray).  Restricted to 6-parameter fit");
 	    print STDERR "generate_astrom: Too few matches ($#CCDarray).  Restricted to 6-parameter fit\n" if $verbose;
@@ -1513,13 +1521,13 @@ sub generate_astrom ($) {
 	    samplesd => $samplesd };
 }
 
-# Run astrom, using the given input file.  
+# Run astrom, using the given input file.
 #
-# Return an array of references to anonymous hashes, each containing
-# fields {nterms}, {q}, {rarad}, {decrad} (RA and Dec in radians),
-# {rasex}, {decsex} (RA and Dec in sexagesimal notation), {wcs} (name
-# of FITS-WCS file), {nstars}, {prms} (RMS residual in pixels),
-# {STATUS} (true if the fit was OK, false otherwise).
+# Return a reference to an array of references to anonymous hashes,
+# each containing fields {nterms}, {q}, {rarad}, {decrad} (RA and Dec
+# in radians), {rasex}, {decsex} (RA and Dec in sexagesimal notation),
+# {wcs} (name of FITS-WCS file), {nstars}, {prms} (RMS residual in
+# pixels), {STATUS} (true if the fit was OK, false otherwise).
 #
 # Return information about _all_ the fits, even the ones which didn't
 # work.  The field {STATUS} will always be defined, and if the fit
@@ -1538,22 +1546,25 @@ sub run_astrom ($$) {
     my $arep = "$tempfn-astrom.report";
     my $asum = "$tempfn-astrom.summary";
     my $alog = "$tempfn-astrom.log";
-    printf STDERR ("Starting %s\t\\\n\t%s\t\\\n\t%s\t\\\n\t%s\t\\\n\t%s\t\\\n\t%s\t\\\n\t%s\n",
-		   "$ENV{ASTROM_DIR}/astrom.x",
-		   '.',
-		   $astromin,
-		   $arep,
-		   $asum,
-		   "$tempfn-astromout-wcs",
-		   $alog)
-      if $verbose;
-    my $astromexit = system ("$ENV{ASTROM_DIR}/astrom.x",
-			     '.',
-			     $astromin,
-			     $arep,
-			     $asum,
-			     "$tempfn-astromout-wcs",
-			     $alog);
+    my @astromargs = ("$ENV{ASTROM_DIR}/astrom.x",
+                   "input=$astromin",
+                   "report=$arep",
+                   "summary=$asum",
+                   "fits=$tempfn-astromout-wcs",
+                   "log=$alog");
+    if ($verbose) {
+        printf STDERR ("Starting ASTROM:");
+        foreach my $w (@astromargs) {
+            printf STDERR ("\t%s \\\n", $w);
+        }
+    }
+    my $astromexit = system(@astromargs);
+
+    if ($astromexit != 0) {
+        print STDERR "Failed calling ASTROM\n";
+        return undef;
+    }
+    print STDERR "...OK\n" if $verbose;
 
     push (@tempfiles, ($arep, $asum, $alog));
 
@@ -1603,9 +1614,9 @@ sub run_astrom ($$) {
     }
     close (SUM);
 
-    @ret || print STDERR "run_astrom: no return values! Either astrom failed, or the log file was incomplete\n";
+    ($#ret > 0) || print STDERR "run_astrom: no return values! Either astrom failed, or the log file was incomplete\n";
 
-    return @ret;
+    return \@ret;
 }
 
 
@@ -2355,6 +2366,68 @@ sub check_obsdata_kwd (\%) {
     return check_kwd_list ($t, \%goodkws);
 }
 
+# Runs the given command in a pipe, and collects the command's stdout
+# into an array of strings with any trailing whitespace discarded, and
+# returns a reference to this array.  Returns undef on any error.
+sub run_command_pipe (\@) {
+    my $argref = shift;
+    my @cmdargs = @$argref;
+    my $rval;
+
+    my $pid = open(P,'-|');
+    if (!defined($pid)) {
+        wmessage ('warning', "Couldn't fork");
+        $rval = undef;
+    } elsif ($pid == 0) {
+        # In the child
+        $| = 1;
+	exec (@cmdargs);
+        # NOT REACHED
+
+        # Unlike execve(2) and friends, Perl exec guarantees
+        # never to return, therefore we needn't (and since we run with
+        # -w, we shouldn't) have any cleanup code here.
+    } else {
+        # In the parent
+        my $rstr;
+        my @lines;
+        my $line;
+        while (defined($line = <P>)) {
+            $line =~ s/\s*$//;
+            printf STDERR "%s: <%s>\n", $cmdargs[0], $line;
+            push(@lines,$line);
+        }
+        my $retriedloop = 0;
+        {
+            while (<P>) {
+                push(@lines,$_);
+            }
+            if ($#lines == 0 && !$retriedloop) {
+                # odd... We've apparently found EOF in the pipe, but
+                # haven't read anything.  This shouldn't happen, but I
+                # think there's a race condition here, as this does
+                # happen occasionally, so in this case try going round
+                # the loop again.  It's possible that the child
+                # program collapsed without producing any output, but
+                # if that has happened, we'll detect it when we look
+                # at the error status below.
+                wmessage('warning',
+                         "$cmdargs[0] produced no output?  Trying again");
+                $retriedloop = 1;
+                redo;
+            }
+        }
+        close(P) || wmessage('warning', "Closing P failed: $?");
+        if ($? == 0) {
+            $rval = \@lines;
+        } else {
+            wmessage('warning', "$cmdargs[0] produced error status $?");
+            $rval = undef;
+        }
+    }
+    return $rval;
+}
+
 # Wmessage writes a message on the stdout.  $1 is one of `info',
 # `warning', `fatal', with unrecognised strings being fatal (checks
 # for errors).   $2 is the message.  In the case of `fatal'
@@ -2365,7 +2438,6 @@ sub wmessage ($$) {
     my @prefixes = ('--I ', '--W ', '--E ');
     my $prefix = undef;
     my $croak = 0;
-    
 
     if ($type eq 'INFO') {
 	$prefix = $prefixes[0];
