@@ -719,6 +719,7 @@ static int Test##attribute( AstFrame *this_frame, int axis ) { \
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <math.h>
 
 /* Module Variables. */
@@ -806,6 +807,7 @@ static void Offset( AstFrame *, const double[], const double[], double, double[]
 static void Overlay( AstFrame *, const int *, AstFrame * );
 static void PermAxes( AstFrame *, const int[] );
 static void RegBaseBox( AstRegion *this, double *, double * );
+static void RegSetAttrib( AstRegion *, const char *, char ** );
 static void GetRegionBounds( AstRegion *this, double *, double * );
 static void RegOverlay( AstRegion *, AstRegion * );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
@@ -3665,6 +3667,7 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    vtab->RegCentre = RegCentre;
    vtab->RegGrid = RegGrid;
    vtab->RegMesh = RegMesh;
+   vtab->RegSetAttrib = RegSetAttrib;
    vtab->GetDefUnc = GetDefUnc;
    vtab->GetUncFrm = GetUncFrm;
    vtab->SetUnc = SetUnc;
@@ -6601,6 +6604,162 @@ static void RegOverlay( AstRegion *this, AstRegion *that ){
 /* If the original Region has no uncertainty, ensure the new Region has
    no uncertainty. */
    if( !astTestUnc( that ) ) astSetUnc( this, NULL );
+
+}
+
+static void RegSetAttrib( AstRegion *this, const char *setting, 
+                          char **base_setting ) {
+/*
+*  Name:
+*     astRegSetAttrib
+
+*  Purpose:
+*     Set an attribute value for a Region.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "region.h"
+*     void astRegSetAttrib( AstRegion *this, const char *setting, 
+*                           char **base_setting ) 
+
+*  Class Membership:
+*     Region virtual function 
+
+*  Description:
+*     This function assigns an attribute value to both the base and
+*     current Frame in the FrameSet encapsulated within a Region, without
+*     remapping either Frame. 
+*
+*     No error is reported if the attribute is not recognised by the base 
+*     Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     setting
+*        Pointer to a null terminated attribute setting string. NOTE, IT 
+*        SHOULD BE ENTIRELY LOWER CASE. The supplied string will be 
+*        interpreted using the public interpretation implemented by
+*        astSetAttrib. This can be different to the interpretation of the 
+*        protected accessor functions. For instance, the public
+*        interpretation of an unqualified floating point value for the 
+*        Epoch attribute is to interpet the value as a gregorian year,
+*        but the protected interpretation is to interpret the value as an 
+*        MJD.
+*     base_setting
+*        Address of a location at which to return a pointer to the null 
+*        terminated attribute setting string which was applied to the
+*        base Frame of the encapsulated FrameSet. This may differ from
+*        the supplied setting if the supplied setting contains an axis 
+*        index and the current->base Mapping in the FrameSet produces an
+*        axis permutation. The returned pointer should be freed using
+*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        which case no pointer is returned.
+
+*/
+
+/* Local Variables: */
+   AstFrame *frm;
+   AstMapping *junkmap;
+   AstMapping *map;
+   AstRegion *unc;
+   char *bsetting;
+   char buf1[ 100 ];
+   int *outs;          
+   int axis;
+   int baxis;
+   int len;
+   int nc;
+   int rep;
+   int value;          
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Apply the setting to the current Frame in the encapsulated FrameSet.
+   Use the protected astSetAttrib method which does not cause the Frame
+   to be remapped within the FrameSet. */
+   frm = astGetFrame( this->frameset, AST__CURRENT );
+   astSetAttrib( frm, setting );
+   frm = astAnnul( frm );
+   
+/* Indicate that we should use the supplied setting with the base Frame. */
+   bsetting = NULL;
+
+/* If the attribute name contains an axis number, we need to create a new
+   attribute setting which refers to the corresponding base Frame axis
+   (since the base<->current Mapping may permute the axes). First parse the 
+   supplied attribute setting to locate any axis index. */
+   len = strlen( setting );
+   if( nc = 0, ( 2 == astSscanf( setting, "%[^(](%d)= %n%*s %n", buf1, &axis, 
+                                 &value, &nc ) ) && ( nc >= len ) ) {
+
+/* If found, convert the axis index from one-based to zero-based. */
+      axis--;
+
+/* See if the specified current Frame axis is connected to one and only
+   one base Frame axis. If so, get the index of the base Frame axis. */
+      map = astGetMapping( this->frameset, AST__CURRENT, AST__BASE );
+      outs = astMapSplit( map, 1, &axis, &junkmap );
+      if( junkmap && astGetNout( junkmap ) == 1 ) {
+         baxis = outs[ 0 ]; 
+
+/* If the base Frame axis index is different to the current Frame axis
+   index, create a new setting string using the base Frame axis index. */
+         if( baxis != axis ) {
+            bsetting = astMalloc( strlen( setting ) + 10 );
+            if( bsetting ) {
+               sprintf( bsetting, "%s(%d)=%s", buf1, baxis + 1, setting + value );
+            }
+         }
+
+/* If there is no one base Frame axis which corresponds to the supplied
+   current Frame axis, report an error. */
+      } else if( astOK ) {
+         astError( AST__INTER, "astRegSetAttrib(%s): Unable to apply "
+                   "attribute setting \"%s\" to the base Frame in the %s",
+                   astGetClass( this ), setting, astGetClass( this ) );
+         astError( AST__INTER, "There is no base Frame axis corresponding "
+                   "to current Frame axis %d\n", axis + 1 );
+      }
+
+/* Free resources */
+      outs = astFree( outs );
+      if( junkmap ) junkmap = astAnnul( junkmap );
+      map = astAnnul( map );
+   }
+
+/* Apply the appropriate attribute setting to the base Frame. This time
+   ensure that any error caused by the attribute setting is annulled. Also
+   apply it to any uncertainty Region (the current Frameof hte
+   uncertainty Region is assumed to be equivalent to the base Frame of the
+   parent Region). */
+   frm = astGetFrame( this->frameset, AST__BASE );
+   if( frm ) {
+      rep = astReporting( 0 );
+      astSetAttrib( frm, bsetting ? bsetting : setting );
+      if( astTestUnc( this ) ) {
+         unc = astGetUncFrm( this, AST__BASE );
+         astRegSetAttrib( unc, bsetting ? bsetting : setting, NULL );
+         unc = astAnnul( unc );
+      }
+      if( astStatus == AST__BADAT ) astClearStatus;
+      astReporting( rep );
+   }
+   frm = astAnnul( frm );
+
+/* If required return the modified base Frame setting. Otherwise, free it. */
+   if( base_setting ) {
+      if( bsetting ) {
+         *base_setting = bsetting;
+      } else {
+         *base_setting = astStore( NULL, setting, strlen( setting ) + 1 );
+      }
+   } else {
+      bsetting = astFree( bsetting );
+   }      
 
 }
 
@@ -9659,6 +9818,10 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
    have been over-ridden by a derived class. However, it should still have the
    same interface. */
 
+void astRegSetAttrib_( AstRegion *this, const char *setting, char **base_setting ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Region,RegSetAttrib))( this, setting, base_setting );
+}
 void astNegate_( AstRegion *this ){
    if ( !astOK ) return;
    (**astMEMBER(this,Region,Negate))( this );

@@ -77,6 +77,7 @@ typedef struct AstInterval {
    double *lbnd;                 /* Lower limits */
    double *ubnd;                 /* Lower limits */
    AstBox *box;                  /* Equivalent Box */
+   int stale;                    /* Is cached information stale? */
 
 } AstInterval;
 

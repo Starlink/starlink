@@ -42,11 +42,18 @@
 *        Add facility to astAt to allow astAt to be called from public
 *        interface without private interface settings over-riding the
 *        public interface settings.
+*     30-MAR-2005 (DSB):
+*        Added facility to report deferred messages when reporting is
+*        switched back on.
 */
 
 /* Define the astCLASS macro (even although this is not a class
    implementation) to obtain access to protected interfaces. */
 #define astCLASS
+
+/* Max number of messages which can be deferred when reporting is
+   switched off. */
+#define MSTACK_SIZE 100
 
 /* Include files. */
 /* ============== */
@@ -59,6 +66,8 @@
 /* --------------- */
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Module Variables. */
 /* ================= */
@@ -74,6 +83,16 @@ static const char *current_file = NULL; /* Current file name pointer */
 static const char *current_routine = NULL; /* Current routine name pointer */
 static int current_line = 0;     /* Current line number */
 static int foreign_set = 0;      /* Have foreign values been set? */
+
+/* Un-reported message stack */
+static char *message_stack[ MSTACK_SIZE ];
+static int mstack_size = 0;
+
+
+/* Function prototypes. */
+/* ==================== */
+void EmptyStack( int );
+
 
 /* Function implementations. */
 /* ========================= */
@@ -171,6 +190,10 @@ c++
 c--
 */
 
+/* Empty the deferred error stack without displaying the messages on the
+   stack. */
+   EmptyStack( 0 );
+
 /* Reset the error status value. */
    astSetStatus( 0 );
 }
@@ -225,6 +248,7 @@ void astError_( int status, const char *fmt, ... ) {
 
 /* Local Variables: */
    char buff[ BUFF_LEN + 1 ];    /* Message buffer */
+   int imess;                    /* Index into deferred message stack */
    int nc;                       /* Number of characters written */
    va_list args;                 /* Variable argument list pointer */
 
@@ -249,8 +273,16 @@ void astError_( int status, const char *fmt, ... ) {
       nc += sprintf( buff + nc, "." );
 
 /* Deliver the error message unless reporting has been switched off using
-   astReporting. */
-      if( reporting ) astPutErr( status, buff );
+   astReporting. In which case store them in a static array. */
+      if( reporting ) {
+         astPutErr( status, buff );
+      } else if( mstack_size < MSTACK_SIZE ){
+         imess = mstack_size++;
+         message_stack[ imess ] = malloc( strlen( buff ) + 1 );
+         if( message_stack[ imess ] ) {
+            strcpy( message_stack[ imess ], buff );                 
+         }
+      }
 
 /* Set the global status. */
       astSetStatus( status );
@@ -264,7 +296,15 @@ void astError_( int status, const char *fmt, ... ) {
 
 /* Deliver the error message unless reporting has been switched off using
    astReporting. */
-   if( reporting ) astPutErr( status, buff );
+   if( reporting ) {
+      astPutErr( status, buff );
+   } else if( mstack_size < MSTACK_SIZE ){
+      imess = mstack_size++;
+      message_stack[ imess ] = malloc( strlen( buff ) + 1 );
+      if( message_stack[ imess ] ) {
+         strcpy( message_stack[ imess ], buff );                 
+      }
+   }
 
 /* Set the error status value. */
    astSetStatus( status );
@@ -333,7 +373,12 @@ c+
 *     underlying error system if the "Reporting" flag is set to a
 *     non-zero value. Setting this flag to zero suppresses the reporting
 *     of error messages (the value of the AST error status however is
-*     unaffected).
+*     unaffected). Instead, the reports are saved in an internal message
+*     stack. When reporting is switched back on again, any messages on this 
+*     stack of deferred messages will be reported (and the stack emptied) 
+*     if the AST error status is not astOK. Also the stack is emptied each 
+*     time astClearStatus is called (the stacked messages are not displayed 
+*     in this case).
 
 *  Parameters:
 *     report
@@ -349,6 +394,7 @@ c-
    int oldval;
    oldval = reporting;
    reporting = report;
+   if( reporting ) EmptyStack( 1 );
    return oldval;
 }
 
@@ -495,3 +541,51 @@ c--
 /* Return the old address. */
    return result;
 }
+
+void EmptyStack( int display ) {
+/*
+*  Name:
+*     EmptyStack
+
+*  Purpose:
+*     Empty the stack of deferred error messages, optionally displaying
+*     them.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "error.h"
+*     void EmptyStack( int display ) 
+
+*  Description:
+*     This function removes all messages from the stack of deferred error
+*     messages. If "display" is non-zero it reports them using astPutErr
+*     before deleting them.
+
+*  Parameters:
+*     display
+*        Report messages before deleting them?
+
+*/
+
+/* Local variables; */
+   int i;
+
+/* Loop round all messages on the stack. */
+   for( i = 0; i < mstack_size; i++ ) {
+
+/* Display the message if required. */
+      if( display ) astPutErr( astStatus, message_stack[ i ] );
+
+/* Free the memory used to hold the message. */
+      free( message_stack[ i ] );
+      message_stack[ i ] = NULL;
+   }
+
+/* Reset the stack size to zero. */
+   mstack_size = 0;
+
+}
+
+

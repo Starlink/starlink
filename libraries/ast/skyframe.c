@@ -2850,7 +2850,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
             }
             if( astTestEpoch( this ) || astGetUseDefs( this ) ) {
                pos += sprintf( buff + pos,
-                               "epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
+                               "; epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
             }
 	    break;
 
@@ -2865,7 +2865,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
             }
             if( astTestEpoch( this ) || astGetUseDefs( this ) ) {
                pos += sprintf( buff + pos,
-                               "epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
+                               "; epoch B%s", astFmtDecimalYr( slaEpb( epoch ), 9 ) );
             }
 	    break;
 
@@ -2902,7 +2902,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	 case AST__GAPPT:
 	    pos = sprintf( buff,
                            "Geocentric apparent equatorial %s; "
-                           "epoch J%s", word, astFmtDecimalYr( slaEpj( epoch ), 9 ) );
+                           "; epoch J%s", word, astFmtDecimalYr( slaEpj( epoch ), 9 ) );
 	    break;
 
 /* Ecliptic coordinates. */
@@ -7076,6 +7076,9 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
 /* Delete the temporary copy of the target SkyFrame. */
       temp = astDelete( temp );
    }
+
+/* Ensure the returned Frame does not have active units. */
+   astSetActiveUnit( *result, 0 );
 
 /* If an error occurred or no match was found, annul the returned
    objects and reset the returned result. */

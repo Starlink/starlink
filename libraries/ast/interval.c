@@ -109,6 +109,7 @@ static int (* parent_overlap)( AstRegion *, AstRegion * );
 static double *(* parent_regcentre)( AstRegion *this, double *, double **, int, int );
 static void (* parent_setregfs)( AstRegion *, AstFrame * );
 static void (* parent_setunc)( AstRegion *, AstRegion * );
+static void (*parent_regsetattrib)( AstRegion *, const char *, char ** );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -128,7 +129,7 @@ static AstRegion *GetDefUnc( AstRegion * );
 static int GetBounded( AstRegion * );
 static int Overlap( AstRegion *, AstRegion * );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void Cache( AstInterval * );
+static AstBox *Cache( AstInterval * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
@@ -136,6 +137,7 @@ static void RegBaseBox( AstRegion *this, double *, double * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int );
 static void SetRegFS( AstRegion *, AstFrame * );
 static void SetUnc( AstRegion *, AstRegion * );
+static void RegSetAttrib( AstRegion *, const char *, char ** );
 
 /* Member functions. */
 /* ================= */
@@ -219,7 +221,7 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
 /* If the Interval is effectively a Box, invoke the astBndBaseMesh
    function on the equivalent Box. A pointer to the equivalent Box will
    be stored in the Interval structure. */
-   box = ((AstInterval *) this)->box;
+   box = Cache( (AstInterval *) this );
    if( box ) {
       result = astBndBaseMesh( box, lbnd, ubnd );
 
@@ -403,7 +405,7 @@ AstInterval *astBoxInterval_( AstBox *box ) {
    return result;
 }
 
-static void Cache( AstInterval *this ){
+static AstBox *Cache( AstInterval *this ){
 /*
 *  Name:
 *     Cache
@@ -416,7 +418,7 @@ static void Cache( AstInterval *this ){
 
 *  Synopsis:
 *     #include "interval.h"
-*     void Cache( AstInterval *this )
+*     AstBox *Cache( AstInterval *this )
 
 *  Class Membership:
 *     Interval member function 
@@ -429,6 +431,11 @@ static void Cache( AstInterval *this ){
 *  Parameters:
 *     this
 *        Pointer to the Interval.
+
+*  Returned Value:
+*     If the Interval is equivalent to a Box, then a pointer to the
+*     equivalent Box is returned. This is a copy of the pointer stored in
+*     the Interval structure and should not be annulled.
 
 */
 
@@ -447,8 +454,9 @@ static void Cache( AstInterval *this ){
    int nc;                  /* Number of base Frame axes */
    int neg;                 /* Is the equivalent Box negated? */
 
-/* Check the global error status. */
-   if ( !astOK ) return;
+/* Check the global error status. Also return if the cached information
+   is up to date (i.e. not stale). */
+   if( !this->stale || !astOK ) return this->box;
 
 /* Get a pointer to the Region structure */
    reg = (AstRegion *) this;
@@ -528,7 +536,7 @@ static void Cache( AstInterval *this ){
    and store a pointer to it in the Interval structure. */
       if( isBox && !neg ) {
          bfrm = astGetFrame( reg->frameset, AST__BASE );
-         cfrm = astGetFrame( reg->frameset, AST__BASE );
+         cfrm = astGetFrame( reg->frameset, AST__CURRENT );
          map = astGetMapping( reg->frameset, AST__BASE, AST__CURRENT );
          unc = astTestUnc( reg ) ? astGetUncFrm( reg, AST__BASE ) : NULL;
 
@@ -554,6 +562,12 @@ static void Cache( AstInterval *this ){
       this->ubnd = ubnd;
 
    }
+
+/* Indicate the cached information is no longer stale, and return a
+   pointer to any equivalent Box. */
+   this->stale = 0;
+   return this->box;
+
 }
 
 static int GetBounded( AstRegion *this ) {
@@ -603,7 +617,7 @@ static int GetBounded( AstRegion *this ) {
 
 /* The unnegated Interval is bounded only if there is an equivalent Box
    structure stored in the Interval structure. */
-   if( ((AstInterval *) this)->box ) result = 1;
+   if( Cache( (AstInterval *) this ) ) result = 1;
 
 /* Return the required pointer. */
    return result;
@@ -649,6 +663,7 @@ static AstRegion *GetDefUnc( AstRegion *this_region ) {
 */
 
 /* Local Variables: */
+   AstBox *box;               /* Pointer to equivalent Box */
    AstInterval *this;         /* Pointer to Interval structure */
    AstFrame *bfrm;            /* Base Frame of supplied Region */
    AstRegion *result;         /* Returned pointer */
@@ -668,8 +683,9 @@ static AstRegion *GetDefUnc( AstRegion *this_region ) {
 
 /* If this Interval is equivalent to a Box, get the default uncertainty
    for the equivalent Box and return it. */
-   if( this->box ) {
-      result = astGetDefUnc( this->box );
+   box = Cache( this );
+   if( box ) {
+      result = astGetDefUnc( box );
 
 /* Otherwise, we use a box covering 1.0E-6 of each axis interval, centred on 
    the origin. */
@@ -685,6 +701,9 @@ static AstRegion *GetDefUnc( AstRegion *this_region ) {
       lbnd = astMalloc( sizeof( double)*(size_t) nax );
       ubnd = astMalloc( sizeof( double)*(size_t) nax );
       if( astOK ) {
+
+/* Ensure cached information (e.g.bounds) is up to date. */
+         Cache( this );
 
 /* Do each axis in turn */
          for( i = 0; i < nax; i++ ) {
@@ -819,6 +838,7 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
       isnull = 0;
 
       if( astIsAInterval( reg ) ) {
+         Cache( (AstInterval *) reg );
          for( i = 0; i < nax_reg; i++ ) {
             lb = ((AstInterval *) reg )->lbnd[ i ];
             ub = ((AstInterval *) reg )->ubnd[ i ];
@@ -856,6 +876,7 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
 
 /* If OK, append the axis limits for "this". */
       if( ok ) {
+         Cache( this );
          for( i = 0; i < nax_this; i++ ) {
             lb = this->lbnd[ i ];
             ub = this->ubnd[ i ];
@@ -1055,6 +1076,9 @@ void astInitIntervalVtab_(  AstIntervalVtab *vtab, const char *name ) {
 
    parent_setunc = region->SetUnc;
    region->SetUnc = SetUnc;
+
+   parent_regsetattrib = region->RegSetAttrib;
+   region->RegSetAttrib = RegSetAttrib;
 
    region->GetBounded = GetBounded;
    region->GetDefUnc = GetDefUnc;
@@ -1533,7 +1557,7 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
 /* If the Interval is effectively a Box, invoke the astRegBaseBox
    function on the equivalent Box. A pointer to the equivalent Box will
    be stored in the Interval structure. */
-   box = ((AstInterval *) this)->box;
+   box = Cache( (AstInterval *) this );
    if( box ) {
       astRegBaseBox( box, lbnd, ubnd );
 
@@ -1599,7 +1623,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this_region ){
 /* If the Interval is effectively a Box, invoke the astRegBaseMesh
    function on the equivalent Box. A pointer to the equivalent Box will
    be stored in the Interval structure. */
-   box = ((AstInterval *) this_region )->box;
+   box = Cache( (AstInterval *) this_region );
    if( box ) {
       result = astRegBaseMesh( box );
 
@@ -1690,7 +1714,7 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 /* If the Interval is effectively a Box, invoke the astRegCentre
    function on the equivalent Box. A pointer to the equivalent Box will
    be stored in the Interval structure. */
-   box = ((AstInterval *) this_region )->box;
+   box = Cache( (AstInterval *) this_region );
    if( box ) {
       result = astRegCentre( box, cen, ptr, index, ifrm );
 
@@ -1774,7 +1798,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 /* If the Interval is effectively a Box, invoke the astRegPins
    function on the equivalent Box. A pointer to the equivalent Box will
    be stored in the Interval structure. */
-   box = ((AstInterval *) this_region )->box;
+   box = Cache( (AstInterval *) this_region );
    if( box ) {
       result = astRegPins( box, pset, unc, mask );
 
@@ -1788,6 +1812,79 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Return the result. */
    return result;
+}
+
+static void RegSetAttrib( AstRegion *this_region, const char *setting, 
+                          char **base_setting ) {
+/*
+*  Name:
+*     RegSetAttrib
+
+*  Purpose:
+*     Set an attribute value for a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "interval.h"
+*     void RegSetAttrib( AstRegion *this, const char *setting, 
+*                        char **base_setting )
+
+*  Class Membership:
+*     Interval method (over-rides the astRegSetAttrib method inherited from
+*     the Region class).
+
+*  Description:
+*     This function assigns an attribute value to both the base and
+*     current Frame in the FrameSet encapsulated within a Region, without
+*     remapping either Frame. 
+*
+*     No error is reported if the attribute is not recognised by the base 
+*     Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     setting
+*        Pointer to a null terminated attribute setting string. NOTE, IT 
+*        SHOULD BE ENTIRELY LOWER CASE. The supplied string will be 
+*        interpreted using the public interpretation implemented by
+*        astSetAttrib. This can be different to the interpretation of the 
+*        protected accessor functions. For instance, the public
+*        interpretation of an unqualified floating point value for the 
+*        Epoch attribute is to interpet the value as a gregorian year,
+*        but the protected interpretation is to interpret the value as an 
+*        MJD.
+*     base_setting
+*        Address of a location at which to return a pointer to the null 
+*        terminated attribute setting string which was applied to the
+*        base Frame of the encapsulated FrameSet. This may differ from
+*        the supplied setting if the supplied setting contains an axis 
+*        index and the current->base Mapping in the FrameSet produces an
+*        axis permutation. The returned pointer should be freed using
+*        astFree when no longer needed. A NULL pointer may be supplied in 
+*        which case no pointer is returned.
+
+*/
+
+/* Local Variables: */
+   AstInterval *this; 
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the Interval structure. */
+   this = (AstInterval *) this_region;
+
+/* Use the RegSetAttrib method inherited from the parent class to apply the 
+   setting to the current and base Frames in the FrameSet encapsulated by the 
+   parent Region structure. */
+   (*parent_regsetattrib)( this_region, setting, base_setting );
+
+/* Indicate that the cached intermediate information is now stale and
+   should be recreated when next needed. */
+   this->stale = 1;
 }
 
 static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
@@ -1822,6 +1919,7 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
 
 */
 
+
 /* Check the global error status. */
    if ( !astOK ) return;
 
@@ -1829,9 +1927,9 @@ static void SetRegFS( AstRegion *this_region, AstFrame *frm ) {
    structure. */
    (* parent_setregfs)( this_region, frm );
 
-/* Re-create the cached intermediate information. This takes account of
-   any change to the Frame represented by this Interval. */
-   Cache( (AstInterval *) this_region );
+/* Indicate that the cached intermediate information is now stale and
+   should be recreated when next needed. */
+   ( (AstInterval *) this_region )->stale = 1;
 }
 
 static void SetUnc( AstRegion *this, AstRegion *unc ){
@@ -1882,8 +1980,9 @@ static void SetUnc( AstRegion *this, AstRegion *unc ){
 /* Invoke the astSetUnc method inherited from the parent Region class. */
    (*parent_setunc)( this, unc );
 
-/* Re-calculate Cached information */
-   Cache( (AstInterval *) this );
+/* Indicate that the cached intermediate information is now stale and
+   should be recreated when next needed. */
+   ( (AstInterval *) this )->stale = 1;
 }
 
 static AstMapping *Simplify( AstMapping *this_mapping ) {
@@ -1981,8 +2080,9 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* If this Interval is equivalent to a Box, use the astTransform method of
    the equivalent Box. */
-   if( ((AstInterval *) this)->box ) {
-      result = astSimplify( ((AstInterval *) this)->box );
+   box = Cache( this_interval );
+   if( box ) {
+      result = astSimplify( box );
 
 /* Otherwise, we use a new implementation appropriate for unbounded
    intervals. */
@@ -2081,6 +2181,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             psetc = astAnnul( psetc );
    
 /* Limit this box to not exceed the limits imposed by the Interval.*/
+            Cache( this_interval );
             for( ic = 0; ic < nc; ic++ ) {
                lb = this_interval->lbnd[ ic ] ;
                ub = this_interval->ubnd[ ic ] ;
@@ -2361,6 +2462,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 */
 
 /* Local Variables: */
+   AstBox *box;                  /* Pointer to equivalent Box */
    AstInterval *this;            /* Pointer to Interval structure */
    AstPointSet *pset_tmp;        /* Pointer to PointSet holding base Frame positions*/
    AstPointSet *result;          /* Pointer to output PointSet */
@@ -2393,8 +2495,9 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* If this Interval is equivalent to a Box, use the astTransform method of
    the equivalent Box. */
-   if( this->box ) {
-      result = astTransform( this->box, in, forward, out );
+   box = Cache( this );
+   if( box ) {
+      result = astTransform( box, in, forward, out );
 
 /* Otherwise, we use a new implementation appropriate for unbounded
    intervals. */
@@ -2455,6 +2558,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                   setbad = 0;
 
 /* Loop round each base Frame axis */
+                  Cache( this );
                   for ( coord = 0; coord < ncoord_tmp; coord++ ) {
                      p = ptr_tmp[ coord ][ point ];
                      lb = (this->lbnd)[ coord ];
@@ -2523,6 +2627,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                   setbad = 1;
 
 /* Loop round each base Frame axis */
+                  Cache( this );
                   for ( coord = 0; coord < ncoord_tmp; coord++ ) {
                      p = ptr_tmp[ coord ][ point ];
                      lb = (this->lbnd)[ coord ];
@@ -2571,6 +2676,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                   setbad = 0;
 
 /* Loop round each base Frame axis */
+                  Cache( this );
                   for ( coord = 0; coord < ncoord_tmp; coord++ ) {
                      p = ptr_tmp[ coord ][ point ];
                      lb = (this->lbnd)[ coord ];
@@ -2618,6 +2724,7 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
                   setbad = 1;
 
 /* Loop round each base Frame axis */
+                  Cache( this );
                   for ( coord = 0; coord < ncoord_tmp; coord++ ) {
                      p = ptr_tmp[ coord ][ point ];
                      lb = (this->lbnd)[ coord ];
@@ -3252,10 +3359,7 @@ AstInterval *astInitInterval_( void *mem, size_t size, int init, AstIntervalVtab
          new->lbnd = NULL;
          new->ubnd = NULL;
          new->box = NULL;
-
-/* Cache useful information about the Interval within the INterval
-   structure. */
-         Cache( new );
+         new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Interval. */
          if ( !astOK ) new = astDelete( new );
@@ -3394,9 +3498,7 @@ AstInterval *astLoadInterval_( void *mem, size_t size, AstIntervalVtab *vtab,
       new->lbnd = NULL;
       new->ubnd = NULL;
       new->box = NULL;
-
-/* Cache intermediate results in the Interval structure */
-      Cache( new );
+      new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Interval. */
       if ( !astOK ) new = astDelete( new );

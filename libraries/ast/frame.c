@@ -9612,7 +9612,9 @@ MAKE_TEST(Direction)
 *        been set in the second component Frame then the Epoch value from the
 *        second component Frame is used as the default for the CmpFrame.
 *        Otherwise, the default Epoch value from the first component
-*        Frame is used as the default for the CmpFrame.
+*        Frame is used as the default for the CmpFrame. When the Epoch
+*        attribute of a CmpFrame is set or cleared, it is also set or
+*        cleared in the two component Frames. 
 *     FrameSet
 *        The Epoch attribute of a FrameSet is the same as that of its current
 *        Frame (as specified by the Current attribute).

@@ -112,6 +112,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *     23-FEB-2005 (DSB):
 *        Modify GetDomain to avoid over-writing the static "buff" array
 *        if called recursively.
+*     29-MAR-2005 (DSB):
+*        Override astSetEpoch and astClearEpoch by implementations which
+*        propagate the changed epoch value to the component Frames.
 *class--
 */
 
@@ -503,20 +506,22 @@ static AstCmpFrameVtab class_vtab; /* Virtual function table */
 static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
-static void (* parent_setactiveunit)( AstFrame *, int );
-static int (* parent_getactiveunit)( AstFrame * );
-static AstSystemType (* parent_getsystem)( AstFrame * );
 static AstSystemType (* parent_getalignsystem)( AstFrame * );
+static AstSystemType (* parent_getsystem)( AstFrame * );
+static const char *(* parent_getattrib)( AstObject *, const char * );
 static const char *(* parent_getdomain)( AstFrame * );
 static const char *(* parent_gettitle)( AstFrame * );
-static double (* parent_getepoch)( AstFrame * );
 static double (* parent_angle)( AstFrame *, const double[], const double[], const double[] );
-static const char *(* parent_getattrib)( AstObject *, const char * );
+static double (* parent_getepoch)( AstFrame * );
+static int (* parent_getactiveunit)( AstFrame * );
+static int (* parent_getusedefs)( AstObject * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
-static void (* parent_setattrib)( AstObject *, const char * );
+static void (* parent_clearepoch)( AstFrame * );
 static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
-static int (* parent_getusedefs)( AstObject * );
+static void (* parent_setactiveunit)( AstFrame *, int );
+static void (* parent_setattrib)( AstObject *, const char * );
+static void (* parent_setepoch)( AstFrame *, double );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -556,6 +561,8 @@ static double Angle( AstFrame *, const double[], const double[], const double[] 
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetEpoch( AstFrame * );
+static void ClearEpoch( AstFrame * );
+static void SetEpoch( AstFrame *, double );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int GenAxisSelection( int, int, int [] );
 static int GetDirection( AstFrame *, int );
@@ -1205,6 +1212,52 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                 "called \"%s\".", astGetClass( this ), attrib );
    }
 
+}
+
+static void ClearEpoch( AstFrame *this_frame ) {
+/*
+*  Name:
+*     ClearEpoch
+
+*  Purpose:
+*     Clear the value of the Epoch attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void ClearEpoch( AstFrame *this )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astClearEpoch method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function clears the Epoch value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to clear the CmpFrame epoch. */
+   (*parent_clearepoch)( this_frame );
+
+/* Now clear the Epoch attribute in the two component Frames. */
+   astClearEpoch( this->frame1 );
+   astClearEpoch( this->frame2 );
 }
 
 static void ClearMaxAxes( AstFrame *this_frame ) {
@@ -2487,17 +2540,17 @@ static double GetEpoch( AstFrame *this_frame ) {
 /* Otherwise, if the Epoch value is set in the first component Frame,
    return it. */
    } else if( astTestEpoch( this->frame1 ) ){
-      result = (*parent_getepoch)( this->frame1 );
+      result = astGetEpoch( this->frame1 );
 
 /* Otherwise, if the Epoch value is set in the second component Frame,
    return it. */
    } else if( astTestEpoch( this->frame2 ) ){
-      result = (*parent_getepoch)( this->frame2 );
+      result = astGetEpoch( this->frame2 );
 
 /* Otherwise, return the default Epoch value from the first component
    Frame. */
    } else {
-      result = (*parent_getepoch)( this->frame1 );
+      result = astGetEpoch( this->frame1 );
    }
 
 /* Return the result. */
@@ -3016,6 +3069,12 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
 
    parent_getepoch = frame->GetEpoch;
    frame->GetEpoch = GetEpoch;
+
+   parent_setepoch = frame->SetEpoch;
+   frame->SetEpoch = SetEpoch;
+
+   parent_clearepoch = frame->ClearEpoch;
+   frame->ClearEpoch = ClearEpoch;
 
    parent_angle = frame->Angle;
    frame->Angle = Angle;
@@ -6013,6 +6072,54 @@ static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {
          astSetAxis( this->frame2, axis - naxes1, newaxis );
       }
    }
+}
+
+static void SetEpoch( AstFrame *this_frame, double val ) {
+/*
+*  Name:
+*     SetEpoch
+
+*  Purpose:
+*     Set the value of the Epoch attribute for a CmpFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void SetEpoch( AstFrame *this, double val )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astSetEpoch method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function sets the Epoch value in the component Frames as
+*     well as this CmpFrame.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpFrame.
+*     val
+*        New Epoch value.
+
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Invoke the parent method to set the CmpFrame epoch. */
+   (*parent_setepoch)( this_frame, val );
+
+/* Now set the Epoch attribute in the two component Frames. */
+   astSetEpoch( this->frame1, val );
+   astSetEpoch( this->frame2, val );
 }
 
 static void SetMaxAxes( AstFrame *this_frame, int maxaxes ) {
