@@ -57,6 +57,7 @@
 *     14 Jul 93 : V1.7-2 Changed it again to the MATH_RND generator which
 *                        uses the GNU generator (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     14 Dec 94 : V1.8-1 Test to see if corrected model (DJA)
 *
 *    Type definitions :
 *
@@ -165,7 +166,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-        PARAMETER       ( VERSION = 'IMSIM Version 1.8-0' )
+        PARAMETER       ( VERSION = 'IMSIM Version 1.8-1' )
 *-
 
 *    Check status
@@ -215,10 +216,10 @@
 
 *      Check dimensionality
         IF ( .NOT. OK ) THEN
-          CALL MSG_PRNT( '! Invalid model data' )
           STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Invalid model data', STATUS )
         ELSE IF ( NDIM .NE. 2 ) THEN
-          CALL MSG_PRNT( '! Background must be 2D' )
+          CALL ERR_REP( ' ', 'Background must be 2D', STATUS )
           STATUS = SAI__ERROR
         END IF
         IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -242,9 +243,26 @@
         CALL DYN_MAPR( 1, NELM+1, MIPTR, STATUS )
 
 *      Normalise
-        CALL MSG_PRNT( 'Normalising model...' )
         CALL SIM_MNORM( NELM, %VAL(MDPTR), ANYBAD, %VAL(MQPTR),
      :                              %VAL(MIPTR), MTOT, STATUS )
+
+*      Was model exposure corrected?
+        CALL PRO_GET( MLOC, 'CORRECTED.EXPOSURE', ECORR, STATUS )
+        IF ( STATUS .EQ. SAI__OK ) THEN
+          IF ( ECORR ) THEN
+            CALL BDA_LOCHEAD( MLOC, HLOC, STATUS )
+            CALL CMP_GET0R( HLOC, 'EFF_EXPOSURE', TEFF, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+              CALL ERR_ANNUL( STATUS )
+              CALL CMP_GET0R( HLOC, 'EXPOSURE_TIME', TEFF, STATUS )
+            END IF
+            CALL MSG_SETR( 'TEFF', TEFF )
+            CALL MSG_PRNT( 'Model is exposure corrected, scaling up'/
+     :                             /' by exposure of ^TEFF seconds' )
+          END IF
+        ELSE
+          CALL ERR_ANNUL( STATUS )
+        END IF
 
 *      Report counts in model
         CALL MSG_SETR( 'C', MTOT )
