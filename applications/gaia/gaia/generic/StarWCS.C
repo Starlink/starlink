@@ -44,6 +44,8 @@
 //        Merged in Allan's changes (see history above).
 //    19-NOV-1999 (PWD):
 //        Added test for sky coordinates and members to query this.
+//    15-SEP-2000 (PWD):
+//        Fixed ::set member so that it works as advertised.
 //-
 
 #include <string.h>
@@ -68,6 +70,28 @@ extern "C" {
     astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
               forward, ncoord_out, outdim, (double (*)[])out);
   }
+}
+
+//
+//  Utility routines for formating FITS cards.
+//
+static void ccard( char *card, const char* keyword, char* const value )
+{
+    char buf[81];
+    sprintf(buf, "%-8.8s= '%.21s' /", keyword, value);
+    sprintf(card, "%-80s", buf);
+}
+static void icard( char *card, const char* keyword, int value )
+{
+    char buf[81];
+    sprintf(buf, "%-8.8s= %20d /", keyword, value);
+    sprintf(card, "%-80s", buf);
+}
+static void dcard(char *card, const char* keyword, double value)
+{
+    char  buf[81];
+    sprintf(buf, "%-8.8s= %20f /", keyword, value);
+    sprintf(card, "%-80s", buf);
 }
 
 //
@@ -828,58 +852,81 @@ int StarWCS::set( double ra, double dec,
 		  int equinox, double epoch,
 		  const char* proj )
 {
-   if ( wcs_ ) {
-      wcs_ = (AstFrameSet *) astAnnul( wcs_ );
-   }
+    if ( wcs_ ) {
+        wcs_ = (AstFrameSet *) astAnnul( wcs_ );
+    }
 
-   //  Create a FITS channel to which we will send our header cards.
-   AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
-   char card[80];
-   astPutFits( fitschan, "NAXIS   = 2" , 0 );
-   sprintf( card, "NAXIS1  = %d", nxpix );
-   nxpix_ = nxpix;
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "NAXIS2  = %d", nypix );
-   nypix_ = nypix;
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CRVAL1  = %g", ra );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CRVAL2  = %g", dec );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CRDELT1  = %g", secpix / 3600.0 );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CRDELT2  = %g", secpix / 3600.0 );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CRPIX1   = %g", xrefpix );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CRPIX2   = %g", yrefpix );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CROTA1   = %g", rotate );
-   rotate_ = rotate;
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "EQUINOX  = %d", equinox );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "EPOCH    = %g", epoch );
-   astPutFits( fitschan, card, 0 );
-   sprintf( card, "CTYPE1   = %s", proj );
-   astPutFits( fitschan, card, 0 );
+    //  Create a FITS channel to which we will send our header cards.
+    AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
+    char card[81];
+    icard( card, "NAXIS", 2 );
+    astPutFits( fitschan, card, 0 );
 
-   //  Now read the headers back as a suitable frameset.
-   AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
-   if ( fitsset != AST__NULL ) {
-      wcs_ = fitsset;
-   } else {
-      if ( ! astOK ) astClearStatus;
-      fitschan = (AstFitsChan *) astAnnul( fitschan );
-      return error("Cannot locate a valid world coordinate system");
-   }
-   fitschan = (AstFitsChan *) astAnnul( fitschan );
-   setEquinox();
-   setSecPix();
-   if ( ! astOK ) astClearStatus;
-   return 0;
+    icard( card, "NAXIS1", nxpix );
+    astPutFits( fitschan, card, 0 );
+    nxpix_ = nxpix;
+
+    icard( card, "NAXIS2", nypix );
+    astPutFits( fitschan, card, 0 );
+    nypix_ = nypix;
+
+    icard( card, "EQUINOX", equinox );
+    astPutFits( fitschan, card, 0 );
+
+    if ( epoch != 0 ) {
+        dcard( card, "EPOCH", epoch );
+        astPutFits( fitschan, card, 0 );
+    }
+
+    char buf[20];
+    sprintf( buf, "RA---%s", proj );
+    ccard( card, "CTYPE1", buf );
+    astPutFits( fitschan, card, 0 );
+
+    sprintf( buf, "DEC--%s", proj );
+    ccard( card, "CTYPE2", buf );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CRVAL1", ra );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CRVAL2", dec );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CDELT1", -secpix / 3600.0 );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CDELT2", secpix / 3600.0 );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CRPIX1", xrefpix );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CRPIX2", yrefpix );
+    astPutFits( fitschan, card, 0 );
+
+    dcard( card, "CROTA1", rotate );
+    rotate_ = rotate;
+    astPutFits( fitschan, card, 0 );
+
+    //  Now read the headers back as a suitable frameset.
+    astClear( fitschan, "Card" );
+    astShow( fitschan );
+    AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
+    if ( fitsset != AST__NULL ) {
+        wcs_ = fitsset;
+        astShow( fitsset );
+    } else {
+        if ( ! astOK ) astClearStatus;
+        fitschan = (AstFitsChan *) astAnnul( fitschan );
+        return error("Cannot locate a valid world coordinate system");
+    }
+    fitschan = (AstFitsChan *) astAnnul( fitschan );
+    setEquinox();
+    setSecPix();
+    if ( ! astOK ) astClearStatus;
+    return 0;
 }
-
 
 //
 //  Return the world coordinates of the image center
@@ -1197,7 +1244,7 @@ extern "C" {
     int sflset(struct prjprm *);
     int sflfwd(double, double, struct prjprm *, double *, double *);
     int sflrev(double, double, struct prjprm *, double *, double *);
-    
+
     int glsset( struct prjprm *prj ) {
         return sflset( prj );
     }
