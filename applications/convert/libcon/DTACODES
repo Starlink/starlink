@@ -1,0 +1,110 @@
+C+
+C     D T A _ C O D E S
+C
+C     Error codes for the DTA_ data structure routines.
+C
+C     Note, these have been chosen so as not to conflict
+C     with VMS system service codes, in order to allow
+C     the possibility of combining the two (although this
+C     has not in fact been used.)
+C
+C                               KS / CIT  3rd March 1983
+C     Modified:
+C
+C     10th March 1986.  KS / AAO. Modified for use with HDS based
+C                       version of the DTA_ package.  DTA_HDSERR
+C                       through to DTA_RENTOP added.
+C     10th June 1988.   KS / AAO. DTA_INVCPY added.
+C     8th  Nov  1988.   KS / AAO. DTA_UNSAFE added.
+C     7th  Jan  1992.   KS / AAO. PARAMETER statement split into multiple
+C                       statements to conform to standard number of
+C                       continuation lines.
+C     17th Jan  1992.   KS / AAO. Added DTA_OK explicitly as zero.
+C     24th Jan  1992.   KS / AAO. Converted all code values to decimal - the
+C                       fact that their hex values form a nice progression is
+C                       regrettably hidden now, but the numbers are all
+C                       standard Fortran (even if the names aren't!)
+C+
+      INTEGER DTA_OK
+      INTEGER DTA_TRUNC
+      INTEGER DTA_INVDIM
+      INTEGER DTA_INVNAM
+      INTEGER DTA_TOODEEP
+      INTEGER DTA_NOFILE
+      INTEGER DTA_INVPAR
+      INTEGER DTA_CFULL
+      INTEGER DTA_CNTINT
+      INTEGER DTA_RMSERR
+      INTEGER DTA_BADFILE
+      INTEGER DTA_BADVER
+      INTEGER DTA_SSERR
+      INTEGER DTA_INVLEV
+      INTEGER DTA_EXIST
+      INTEGER DTA_NOENV
+      INTEGER DTA_INVTYP
+      INTEGER DTA_INTERR
+      INTEGER DTA_RNGERR
+      INTEGER DTA_NOTFND
+      INTEGER DTA_WRSTRUC
+      INTEGER DTA_CHRCVT
+      INTEGER DTA_BADCON
+      INTEGER DTA_RDSTRUC
+      INTEGER DTA_MAXMAP
+      INTEGER DTA_MPSTRUC
+      INTEGER DTA_NOTMAP
+      INTEGER DTA_DIFLEV
+      INTEGER DTA_DIFENV
+      INTEGER DTA_INCDIM
+      INTEGER DTA_INCSIZ
+      INTEGER DTA_RDONLY
+      INTEGER DTA_DELELM
+      INTEGER DTA_DELTOP
+      INTEGER DTA_HDSERR
+      INTEGER DTA_STRARY
+      INTEGER DTA_INVCHR
+      INTEGER DTA_RENTOP
+      INTEGER DTA_INVCPY
+      INTEGER DTA_UNSAFE
+C
+      PARAMETER  (DTA_OK = 0)
+      PARAMETER  (DTA_TRUNC =     65536
+     :           ,DTA_INVDIM=    131072
+     :           ,DTA_INVNAM=    196608
+     :           ,DTA_TOODEEP=   262144
+     :           ,DTA_NOFILE=    327680
+     :           ,DTA_INVPAR=    393216
+     :           ,DTA_CFULL=     458752
+     :           ,DTA_CNTINT=    524288
+     :           ,DTA_RMSERR=    589824
+     :           ,DTA_BADFILE=   655360
+     :           ,DTA_BADVER=    720896
+     :           ,DTA_SSERR=     786432
+     :           ,DTA_INVLEV=    851968
+     :           ,DTA_EXIST=     917504
+     :           ,DTA_NOENV=     983040)
+      PARAMETER  (DTA_NOTFND=   1048576
+     :           ,DTA_INVTYP=   1114112
+     :           ,DTA_INTERR=   1179648
+     :           ,DTA_RNGERR=   1245184
+     :           ,DTA_WRSTRUC=  1310720
+     :           ,DTA_BADCON=   1376256
+     :           ,DTA_CHRCVT=   1441792
+     :           ,DTA_RDSTRUC=  1507328
+     :           ,DTA_MAXMAP=   1572864
+     :           ,DTA_MPSTRUC=  1638400)
+      PARAMETER  (DTA_NOTMAP=   2097152
+     :           ,DTA_DIFLEV=   2162688
+     :           ,DTA_DIFENV=   2228224
+     :           ,DTA_INCDIM=   2293760
+     :           ,DTA_INCSIZ=   2359296
+     :           ,DTA_RDONLY=   2424832
+     :           ,DTA_DELELM=   2490368
+     :           ,DTA_DELTOP=   2555904
+     :           ,DTA_HDSERR=   2621440
+     :           ,DTA_STRARY=   2686976
+     :           ,DTA_INVCHR=   3145728
+     :           ,DTA_RENTOP=   3211264
+     :           ,DTA_INVCPY=   3276800
+     :           ,DTA_UNSAFE=   3342336
+     :           )
+C

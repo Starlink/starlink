@@ -1,0 +1,43 @@
+*+
+*  Name:
+*     DYNAMIC_MEMORY
+
+*  Purpose:
+*     Common block for memory addressing.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'DYNAMIC_MEMORY'
+
+*  Description:
+*     Include file required for Figaro dynamic memory handling.  This
+*     defines the dummy common base array DYNAMIC_MEM.
+
+*  Arguments:
+*     DYNAMIC_MEM( 1 ) = BYTE (/DYN_DYNAMIC_MEM/)
+*        This minimum array can be shared by any modules and hence
+*        provides a focus point for memory addressing from where
+*        offsets can be calculated.
+
+*  Authors:
+*     ks: Keith Shortridge (AAO)
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     24 Jul 1994 (hme):
+*        Make common blocks SAVE.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Variables:
+      BYTE DYNAMIC_MEM( 1 )
+      COMMON / DYN_DYNAMIC_MEM / DYNAMIC_MEM
+      SAVE   / DYN_DYNAMIC_MEM /
+*.
