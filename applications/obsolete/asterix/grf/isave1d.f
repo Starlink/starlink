@@ -22,7 +22,7 @@
       INTEGER			OFID,BID
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ISAVE1D Version 2.0-0')
+      PARAMETER (VERSION = 'ISAVE1D Version 2.0-1')
 *-
       CALL USI_INIT()
 
@@ -53,6 +53,13 @@
         ENDIF
 
         CALL USI_CANCL( 'OUT', STATUS )
+
+*  synchronise GCBs
+        IF (I_DISP) THEN
+          I_DISP_1D=.TRUE.
+          CALL IMG_2DGCB(STATUS)
+          I_DISP_1D=.FALSE.
+        ENDIF
 
       ENDIF
 
