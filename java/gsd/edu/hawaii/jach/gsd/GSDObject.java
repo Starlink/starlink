@@ -39,7 +39,6 @@ public class GSDObject {
     private static final char[] GSD__TYPES = { 'B','L','W','I','R','D','C' };
 
     // The file data itself
-    private RandomAccessFile fptr;
     private ByteBuffer contents;
 
     // Global meta data from the file
@@ -50,7 +49,7 @@ public class GSDObject {
     private int no_items;
     private String label;
     private float version;
-    private final String filename;
+    private String filename = "<none>";
     private int start_data;
     private int end_data;
     private int size;
@@ -59,32 +58,55 @@ public class GSDObject {
     private GSDItem items[];
     private Map itemmap;
     
-    // Constructor just takes a file
+    /**
+     * Constructs a GSDObject given the name of a GSD file.
+     *
+     * @param filename Name of the GSD file.
+     * @throws GSDException when ....
+     * @throws FileNotFoundException if the specified file can not be found 
+     *         or opened.
+     */
     public GSDObject( String filename ) throws GSDException, 
 	FileNotFoundException, IOException {
 
 	// Need to open the file
-	this.fptr = new RandomAccessFile( filename, "r" );
+	RandomAccessFile fptr = new RandomAccessFile( filename, "r" );
 
-	// Store filename
+	// Once we have opened the file we simply map
+	// it and pass the ByteBuffer to the real constructor
+
+	// First need to get the channel
+	FileChannel chan = fptr.getChannel();
+
+	// And the mapped contents. Note that we map the entire file
+	ByteBuffer allcontents = chan.map( FileChannel.MapMode.READ_ONLY,
+					   0, fptr.length());
+
+
+	// Close the file
+	fptr.close();
+	
+	// File read okay so store the filename
 	this.filename = filename;
 
-	// First read the file header
-	this.readFileDesc();
+	// Now parse the buffer 
+	this.parseBuffer( allcontents );
 
-	// Then read the Item descriptor information
-	this.readItemDesc();
+    }
 
-	// Now map the data array and close the file
-	this.mapData();
+    /**
+     * Read a ByteBuffer as if it were the contents of a GSD file.
+     * Assumes that the beginning of the buffer corresponds to the
+     * beginning of the GSD contents.
+     *
+     * @param contents ByteBuffer representing the GSD file.
+     */
+    public GSDObject( ByteBuffer contents ) throws GSDException, IOException {
+	// Reset the position of the buffer
+	contents.rewind();
 
-	// Now associate correct dimension information with each
-	// array item (since they are specified by scalar items)
-	this.fillDimItems();
-
-	// and populate the look up table for fast by-name access
-	this.fillItemMap();
-
+	// Immediately farm this off to the internal routine
+	this.parseBuffer( contents );
     }
 
     //  General accessor methods
@@ -132,11 +154,12 @@ public class GSDObject {
     }
 
    /**
-     * Return item contents by GSD item name. Throws a GSDException
-     * if the item named is not present. Item names are case insensitive.
+     * Return item contents by GSD item name. Item names are case
+     * insensitive.
      *
      * @param itemname Name of the requested item.
      * @return a GSDItem object with all the Item information
+     * @throws GSDException if the named item is not present.
      */
     public GSDItem itemByName( String itemname ) throws GSDException {
 	itemname = itemname.toUpperCase();
@@ -155,11 +178,13 @@ public class GSDObject {
      * @param itemno The item number (starting at 1, maximum value defined
      *               by getNumItems)
      * @return a GSDItem object with all the Item information
+     * @throws IndexOutOfBoundsException  if the requested item number is 
+     *         outside the allowed range.
      */
-    public GSDItem itemByNum( int itemno ) throws GSDException {
+    public GSDItem itemByNum( int itemno ) {
 	if (itemno < 1 || itemno > this.getNumItems()) {
-	    throw new GSDException("Requested item, " + itemno + 
-				   ", is outside the file limits of 0 and " 
+	    throw new IndexOutOfBoundsException("Requested item, " + itemno + 
+				   ", is outside the file limits of 1 and " 
 				   + this.getNumItems());
 	}
         GSDItem result = this.items[itemno-1];
@@ -228,7 +253,29 @@ public class GSDObject {
 
     /* I N T E R N A L   I O   R O U T I N E S */
 
-    private void readFileDesc () throws IOException, GSDException {
+    private void parseBuffer( ByteBuffer buf ) throws IOException, GSDException {
+
+	// First read the file header
+	this.readFileDesc( buf );
+
+	// Then read the Item descriptor information
+	this.readItemDesc( buf );
+
+	// Now map the data array and close the file
+	this.attachData( buf );
+
+	// Now associate correct dimension information with each
+	// array item (since they are specified by scalar items)
+	this.fillDimItems();
+
+	// and populate the look up table for fast by-name access
+	this.fillItemMap();
+
+    }
+
+
+    private void readFileDesc ( ByteBuffer buf ) throws IOException, 
+	GSDException {
 	// Read the first few bytes for the general file description
 
 	/**
@@ -272,11 +319,7 @@ public class GSDObject {
 	byte[] byteArray = new byte[szstruct];
 
 	// Read the data
-	int nread = this.fptr.read(byteArray,0, szstruct);
-	// System.out.println("Read " + nread + " bytes");
-	if ( nread != szstruct ) {
-	    throw new GSDException("Error reading main header!");
-	}
+	buf.get( byteArray );
 
 	// Versions
 	this.version = GSDVAXBytes.tofloat( byteArray, offset );
@@ -311,7 +354,7 @@ public class GSDObject {
     };
 
 
-    private void readItemDesc () throws IOException, GSDException {
+    private void readItemDesc (ByteBuffer buf) throws IOException, GSDException {
 
 	// For each of the no_items items in the file the next
 	// block of the file contains the information associated
@@ -366,13 +409,7 @@ public class GSDObject {
 
 	// Read the buffer in one ago. I assume this is more efficient
 	// than using little chunks
-	//System.out.println("Attempting to read " + 
-	//		   (szstruct*this.no_items) + " bytes");
-	int nread = this.fptr.read( byteArray, 0, szstruct * this.no_items );
-	if (nread != (szstruct * this.no_items) ) {
-	    throw new GSDException("Error reading Item header!");
-	}
-	//System.out.println("Read " + nread + " bytes from item header");
+	buf.get( byteArray );
 
 	// Loop over each scalar item in turn. We will do the array items
 	// with a second pass
@@ -507,30 +544,20 @@ public class GSDObject {
         }
     }
 
+    // Attach the actual data to each of the individual items
+    private void attachData( ByteBuffer buf ) throws IOException {
 
-    // We always map the data segment even if we have a small
-    // file. We may want to consider reading small files into a normal
-    // ByteBuffer (the system will support this without any changes
-    // to other places in the code).
-    private void mapData() throws IOException {
+	// Set the buffer offset
+	buf.position( start_data );
 
-	// Now need to get the channel
-	FileChannel chan = fptr.getChannel();
-
-	// And the mapped contents
-	contents = chan.map( FileChannel.MapMode.READ_ONLY,
-			     start_data,
-			     end_data - start_data + 1);
+	// Get a slice
+	contents = buf.slice();
 
 	// And attach this to all the items so that they can
 	// read the data themselves
 	for (int i = 0; i< getNumItems(); i++) {
 	    items[i].contents( contents );
 	}
-
-	// We can also "close" the file since we no longer need it
-	fptr.close();
-	fptr = null;
 
     }
 
