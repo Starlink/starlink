@@ -410,7 +410,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = show.tcl
+PUBLIC_SCRIPTS = astshow.tcl
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 
@@ -456,11 +456,11 @@ PAR_ERR FIO_ERR AST_PAR
 
 F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
 
-F_SUB1 = addframe.f astclear.f astget.f astset.f asttest.f \
+F_SUB1 = astaddframe.f astclear.f astget.f astset.f asttest.f \
 atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
-atl1_setop.f cmpframe.f cmpmap.f frame.f getframe.f skyframe.f \
-getmapping.f unitmap.f atlhelp.f frameset.f permmap.f removeframe.f \
-remapframe.f matrixmap.f convert.f
+atl1_setop.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f \
+astskyframe.f astgetmapping.f astunitmap.f atlhelp.f astframeset.f \
+astpermmap.f astremoveframe.f astremapframe.f astmatrixmap.f astconvert.f
 
 F_SUB2 = 
 
@@ -494,9 +494,9 @@ C_SUB2 =
 
 #  List of applications/tasks in monolith.
 
-TASKS = addframe astclear astget astset asttest cmpframe \
-cmpmap frame getframe getmapping unitmap atlhelp skyframe \
-frameset permmap removeframe remapframe matrixmap convert
+TASKS = astaddframe astclear astget astset asttest astcmpframe \
+astcmpmap astframe astgetframe astgetmapping astunitmap atlhelp astskyframe \
+astframeset astpermmap astremoveframe astremapframe astmatrixmap astconvert
 
 #  Monolith routine source name.
 
@@ -1355,24 +1355,24 @@ atl1_ptobj.o: SAE_PAR DAT_PAR AST_PAR NDF_PAR NDF_ERR DAT_ERR
 atl1_setop.o: SAE_PAR AST_PAR GRP_PAR PAR_ERR
 atlhelp.o   : SAE_PAR PAR_ERR
 atools_mon.o: SAE_PAR 
-addframe.o  : SAE_PAR AST_PAR
-remapframe.o: SAE_PAR AST_PAR
-removeframe.o: SAE_PAR AST_PAR
+astaddframe.o  : SAE_PAR AST_PAR
+astremapframe.o: SAE_PAR AST_PAR
+astremoveframe.o: SAE_PAR AST_PAR
 astclear.o  : SAE_PAR AST_PAR
 astget.o    : SAE_PAR AST_PAR
 astset.o    : SAE_PAR AST_PAR
 asttest.o   : SAE_PAR AST_PAR
-cmpframe.o  : SAE_PAR AST_PAR
-cmpmap.o    : SAE_PAR AST_PAR
-frame.o     : SAE_PAR NDF_PAR AST_PAR
-frameset.o  : SAE_PAR AST_PAR
-skyframe.o  : SAE_PAR AST_PAR
-getframe.o  : SAE_PAR AST_PAR       
-getmapping.o: SAE_PAR AST_PAR     
-convert.o   : SAE_PAR AST_PAR PAR_ERR
-matrixmap.o : SAE_PAR NDF_PAR AST_PAR
-unitmap.o   : SAE_PAR NDF_PAR AST_PAR
-permmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
+astcmpframe.o  : SAE_PAR AST_PAR
+astcmpmap.o    : SAE_PAR AST_PAR
+astframe.o     : SAE_PAR NDF_PAR AST_PAR
+astframeset.o  : SAE_PAR AST_PAR
+astskyframe.o  : SAE_PAR AST_PAR
+astgetframe.o  : SAE_PAR AST_PAR       
+astgetmapping.o: SAE_PAR AST_PAR     
+astconvert.o   : SAE_PAR AST_PAR PAR_ERR
+astmatrixmap.o : SAE_PAR NDF_PAR AST_PAR
+astunitmap.o   : SAE_PAR NDF_PAR AST_PAR
+astpermmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR
 
 #-------------------------------------------------------------------------------
 #

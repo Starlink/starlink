@@ -9,35 +9,39 @@
 TAR_FILES_A = atools_source  atools_iraf
 
 # The contents of the atools_source.tar file:
-ATOOLS_SOURCE = addframe.f addframe.ifl astclear.f astclear.ifl astget.f \
-astget.ifl astset.f astset.ifl asttest.f asttest.ifl atl1_assoc.f \
-atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f atl1_rm.c \
-atl1_setop.f atools.csh atools.hlp atools.icl atools_link_adam \
-atools_mon.ifl atools_mon.f cmpframe.f cmpframe.ifl cmpmap.f cmpmap.ifl \
-frame.f frame.ifl getframe.f getframe.ifl getmapping.ifl getmapping.f \
-kpg1_gtgrp.f unitmap.f unitmap.ifl atlhelp.f atlhelp.ifl frameset.f \
-frameset.ifl skyframe.f skyframe.ifl permmap.f permmap.ifl \
-removeframe.ifl removeframe.f remapframe.ifl remapframe.f matrixmap.f \
-matrixmap.ifl convert.f convert.ifl show.tcl
+ATOOLS_SOURCE = astaddframe.ifl astaddframe.f astclear.f \
+astclear.ifl astcmpframe.ifl astcmpframe.f astcmpmap.f astcmpmap.ifl \
+astconvert.f astconvert.ifl astframe.f astframe.ifl astframeset.ifl \
+astframeset.f astget.f astget.ifl astgetframe.f astgetframe.ifl \
+astgetmapping.ifl astgetmapping.f astmatrixmap.ifl astmatrixmap.f \
+astpermmap.ifl astpermmap.f astremapframe.ifl astremapframe.f \
+astremoveframe.f astremoveframe.ifl astset.f astset.ifl astshow.tcl \
+astskyframe.ifl astskyframe.f asttest.f asttest.ifl astunitmap.f \
+astunitmap.ifl atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \
+atl1_ptobj.f atl1_rm.c atl1_setop.f atlhelp.f atlhelp.ifl atools.csh \
+atools.hlp atools.icl atools_link_adam atools_mon.f atools_mon.ifl \
+kpg1_gtgrp.f
 
 # The contents of the atools_iraf.tar file:
-ATOOLS_IRAF = doc addframe.par astclear.par astget.par astset.par \
-asttest.par cmpframe.par cmpmap.par frame.par getframe.par getmapping.par \
-unitmap.par skyframe.par frameset.par permmap.par removeframe.par \
-remapframe.par matrixmap.par convert.par
+ATOOLS_IRAF = doc astaddframe.par astclear.par astget.par astset.par \
+asttest.par astcmpframe.par astcmpmap.par astframe.par astgetframe.par \
+astgetmapping.par astunitmap.par astskyframe.par astframeset.par \
+astpermmap.par astremoveframe.par astremapframe.par astmatrixmap.par \
+astconvert.par
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
-USER_TASKS = addframe.f astclear.f astget.f astset.f atlhelp.f \
-asttest.f cmpframe.f cmpmap.f frame.f getframe.f getmapping.f \
-unitmap.f skyframe.f frameset.f permmap.f removeframe.f remapframe.f \
-matrixmap.f convert.f
+USER_TASKS = astaddframe.f astclear.f astget.f astset.f atlhelp.f \
+asttest.f astcmpframe.f astcmpmap.f astframe.f astgetframe.f astgetmapping.f \
+astunitmap.f astskyframe.f astframeset.f astpermmap.f astremoveframe.f \
+astremapframe.f astmatrixmap.f astconvert.f
 
 #  Contents of the doc/ directory in atools_iraf.tar
-IRAF_DOCS = addframe.hlp astclear.hlp astget.hlp astset.hlp \
-asttest.hlp cmpframe.hlp cmpmap.hlp frame.hlp getframe.hlp getmapping.hlp \
-unitmap.hlp skyframe.hlp frameset.hlp permmap.hlp removeframe.hlp \
-remapframe.hlp matrixmap.hlp convert.hlp
+IRAF_DOCS = astaddframe.hlp astclear.hlp astget.hlp astset.hlp \
+asttest.hlp astcmpframe.hlp astcmpmap.hlp astframe.hlp astgetframe.hlp \
+astgetmapping.hlp astunitmap.hlp astskyframe.hlp astframeset.hlp \
+astpermmap.hlp astremoveframe.hlp astremapframe.hlp astmatrixmap.hlp \
+astconvert.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.

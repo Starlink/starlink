@@ -4,7 +4,7 @@ package atools {
 
    executable atools_mon {
 
-      action addframe {
+      action astaddframe {
 
          helplib {$ATOOLS_HELP}
 
@@ -234,7 +234,7 @@ iraf! {
 
       }
 }
-      action cmpframe {
+      action astcmpframe {
          helplib {$ATOOLS_HELP}
          parameter frame1 {
             position 1
@@ -271,7 +271,7 @@ iraf! {
           }
 
       }
-      action cmpmap {
+      action astcmpmap {
 
          helplib {$ATOOLS_HELP}
 
@@ -318,7 +318,7 @@ iraf! {
           }
 
       }
-      action convert {
+      action astconvert {
 
          helplib {$ATOOLS_HELP}
 
@@ -358,7 +358,7 @@ iraf! {
           }
 
       }
-      action frame {
+      action astframe {
          helplib {$ATOOLS_HELP}
 
          parameter naxes {
@@ -389,7 +389,7 @@ iraf! {
           }
 
       }
-      action frameset {
+      action astframeset {
          helplib {$ATOOLS_HELP}
 
          parameter frame {
@@ -419,7 +419,7 @@ iraf! {
           }
 
       }
-      action getframe {
+      action astgetframe {
          helplib {$ATOOLS_HELP}
          parameter iframe {
             position 2
@@ -448,7 +448,7 @@ iraf! {
             helpkey *
           }
       }
-      action getmapping {
+      action astgetmapping {
 
          helplib {$ATOOLS_HELP}
 
@@ -489,7 +489,7 @@ iraf! {
           }
 
       }
-      action skyframe {
+      action astskyframe {
          helplib {$ATOOLS_HELP}
 
          parameter options {
@@ -511,7 +511,7 @@ iraf! {
           }
 
       }
-      action permmap {
+      action astpermmap {
          helplib {$ATOOLS_HELP}
 
          parameter inperm {
@@ -557,7 +557,7 @@ iraf! {
           }
 
       }
-      action remapframe {
+      action astremapframe {
 
          helplib {$ATOOLS_HELP}
 
@@ -596,7 +596,7 @@ iraf! {
             helpkey *
           }
       }
-      action removeframe {
+      action astremoveframe {
 
          helplib {$ATOOLS_HELP}
 
@@ -627,7 +627,7 @@ iraf! {
             helpkey *
           }
       }
-      action unitmap {
+      action astunitmap {
          helplib {$ATOOLS_HELP}
 
          parameter ncoord {
@@ -658,7 +658,7 @@ iraf! {
           }
 
       }
-      action matrixmap {
+      action astmatrixmap {
          helplib {$ATOOLS_HELP}
 
          parameter form {
@@ -719,8 +719,8 @@ iraf! {
 
    }
 
-   command show {
-      obey {$ATOOLS_DIR/show.tcl}      
+   command astshow {
+      obey {$ATOOLS_DIR/astshow.tcl}      
    }
 
    icl {defhelp atools $ATOOLS_HELP 0}
