@@ -99,7 +99,7 @@
 *        case-insensitive. [RED]
 *     DPI = _INTEGER (Read)
 *        The dots per inch on the display screen. Some X servers fail to 
-*        supply the correct value, resulting in the GUI being unplesantly
+*        supply the correct value, resulting in the GUI being unpleasantly
 *        small or large. For this reason, an explicit value may be supplied 
 *        using this parameter. If a null (!) value is supplied, then the
 *        DPI value returned by the X server is used. This parameter may
@@ -107,7 +107,7 @@
 *        preference, even if the DPI value returned by the X server is correct.
 *        Note, this value cannot be set from the GUI's "Options" menu. [!]
 *     DUALBEAM = _LOGICAL (Read)
-*        If a TRUE value is suplied, then POLKA will operate in
+*        If a TRUE value is supplied, then POLKA will operate in
 *        dual-beam mode, producing two output images for each input image.
 *        Otherwise, it will operate in single-beam mode, with one output
 *        image being produced for each input image. In single-beam mode,
@@ -279,13 +279,12 @@
 *        This controls how images are placed within the image display
 *        area of the GUI when a new image is selected using the "Images"
 *        menu. It may take one of the following values:
-*    
-*        ZOOMED - The new image is displayed with the current zoom factor 
-*        and image centre. 
-*
-*        UNZOOMED - The zoom factor and image centre are reset so that
-*        the new image just fills the image display area in at least one 
-*        dimension. [ZOOMED]
+*           - ZOOMED -- The new image is displayed with the current zoom 
+*           factor and image centre. 
+*           - UNZOOMED -- The zoom factor and image centre are reset so that
+*           the new image just fills the image display area in at least one 
+*           dimension. 
+*        [ZOOMED]
 *
 *     XHAIR = _LOGICAL (Update)
 *        If a TRUE value is supplied, then a cross hair will be used
@@ -304,7 +303,7 @@
 *        (estimated from areas within the object frames), and stores the 
 *        corresponding Stokes vectors in 'cube'. The aligned intensity
 *        images are not saved.
-*     polka \verb+^+in.lis out=\verb+^+out.lis out_s=! dualbeam=no skyframes=\verb+^+sky.lis reset
+*     polka ^in.lis out=^out.lis out_s=! dualbeam=no skyframes=^sky.lis reset
 *        This example uses single-beam mode. It reads the names of input 
 *        images from the text file 'in.lis', subtracts the sky frames
 *        read from the text file 'sky.lis', aligns them and stores 
@@ -318,29 +317,27 @@
 *     output intensity images (the extension is first created if it does 
 *     not already exist): 
 *
-*     RAY - A string identifying which of the two rays the image
-*     contains. This will be either "O" or "E". This is only written in
-*     dual-beam mode (see parameter DUALBEAM).
-*
-*     IMGID - An string identifier for the input image from which the
-*     output image was derived. If the input image already contains a
-*     POLPACK extension with a IMGID value, then the IMGID value is copied
-*     unchanged to the corresponding output images. Otherwise, the name of
-*     the input image (without a directoty path) is used.
-*
-*     ANGROT - The anti-clockwise angle from the first axis of the
-*     image to the analyser axis. This value is only written if the input 
-*     image already contains an ANGROT value, in which case the input value
-*     is modified to take account of any rotation introduced by the mapping. 
+*       -  RAY -- A string identifying which of the two rays the image
+*       contains. This will be either "O" or "E". This is only written in
+*       dual-beam mode (see parameter DUALBEAM).
+*       - IMGID -- An string identifier for the input image from which the
+*       output image was derived. If the input image already contains a
+*       POLPACK extension with a IMGID value, then the IMGID value is copied
+*       unchanged to the corresponding output images. Otherwise, the name of
+*       the input image (without a directory path) is used.
+*       - ANGROT -- The anti-clockwise angle from the first axis of the
+*       image to the analyser axis. This value is only written if the input 
+*       image already contains an ANGROT value, in which case the input value
+*       is modified to take account of any rotation introduced by the mapping. 
 *
 *     - The following components are added to the POLPACK extension in the 
 *     output cube holding Stokes parameter (the extension is first created 
 *     if it does not already exist): 
 *
-*     STOKES - A string containing one character for each plane in 
-*     the data cube. Each character identifies the quantity 
-*     stored in the corresponding plane of the data array, and will be one 
-*     of I, Q, U or V. 
+*       - STOKES -- A string containing one character for each plane in 
+*       the data cube. Each character identifies the quantity 
+*       stored in the corresponding plane of the data array, and will be one 
+*       of I, Q, U or V. 
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

@@ -23,7 +23,7 @@
 *     This application displays information about POLPACK. This includes
 *     general topics common to all applications, as well as detailed
 *     descriptions of each application. The information is organised in a
-*     heirarchical structure of topics, subtopics, subsubtopics, etc.
+*     hierarchical structure of topics, subtopics, sub-subtopics, etc.
 *     Each entry ends with a list of related sub-topics. You can then
 *     examine any of these sub-topics or return to the previous level.
 
@@ -41,28 +41,23 @@
 *        Subsubsubtopic for which help is to be given. [" "]
 
 *  Navigating the Help Tree:
-*     The text for each topic is displayed in screenfulls. A prompt is issued 
+*     The text for each topic is displayed in screen-fulls. A prompt is issued 
 *     at the end of each topic at which you may:
 *
-*        o  enter a topic and/or subtopic name(s) to display the help for 
+*        -  enter a topic and/or subtopic name(s) to display the help for 
 *           that topic or subtopic, so for example, "polka parameters dpi"
 *           gives help on DPI, which is a subtopic of Parameters, which
 *           in turn is a subtopic of POLKA;
-*
-*        o  press the RETURN key to see more text at a "Press RETURN to 
+*        -  press the RETURN key to see more text at a "Press RETURN to 
 *           continue ..." request;
-*
-*        o  press the RETURN key at topic and subtopic prompts to move up 
+*        -  press the RETURN key at topic and subtopic prompts to move up 
 *           one level in the hierarchy, and if you are at the top level it 
 *           will terminate the help session;
-*
-*        o  enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
+*        -  enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
 *           response to any prompt will terminate the help session;
-*
-*        o  enter a question mark "?" to redisplay the text for the current
+*        -  enter a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
-* 
-*        o  enter an ellipsis "..." to display all the text below the
+*        -  enter an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "POLKA..."
 *           displays information on the POLKA topic as well as
 *           information on all the subtopics under POLKA.
@@ -70,23 +65,19 @@
 *     You can abbreviate any topic or subtopic using the following
 *     rules.
 *
-*        o  Just give the first few characters, e.g. "PARA" for
+*        -  Just give the first few characters, e.g. "PARA" for
 *           Parameters.
-* 
-*        o  Some topics are composed of several words separated by
+*        -  Some topics are composed of several words separated by
 *           underscores.  Each word of the keyword may be abbreviated,
 *           e.g. "Colour_Set" can be shortened to "C_S".
-* 
-*        o  The characters "%" and "*" act as wildcards, where the
+*        -  The characters "%" and "*" act as wild-cards, where the
 *           percent sign matches any single character, and asterisk
 *           matches any sequence of characters.  Thus to display
 *           information on all available topics, type an asterisk in
 *           reply to a prompt.
-*
-*        o  If a word contains, but does end with an asterisk wildcard,
+*        -  If a word contains, but does end with an asterisk wild-card,
 *           it must not be truncated.
-* 
-*        o  The entered string must not contain leading or embedded
+*        -  The entered string must not contain leading or embedded
 *           spaces.
 *
 *     Ambiguous abbreviations result in all matches being displayed.

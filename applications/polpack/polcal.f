@@ -27,7 +27,7 @@
 *
 *     Each input image should contain either the O or E ray image
 *     extracted from a single dual-beam exposure. The sky backgrounds
-*     should have been removed, and they should have been resampled so
+*     should have been removed, and they should have been re-sampled so
 *     that a given pixel corresponds to the same point on the sky in all 
 *     images.
 *
@@ -37,7 +37,7 @@
 *     polarization, the output cube has 2 planes which contain I and V values. 
 *
 *     If input images for all four half-wave plate positions are provided
-*     (0, 22.5, 45 and 67.5) then a correction is made for any difference
+*     (0, 22.5, 45 and 67.5 degrees) then a correction is made for any difference
 *     in sensitivity of the two channels (such as can be caused by the
 *     use of polarized flat-field for instance). This correction is known
 *     as the "F-factor" and is based on the redundancy provided by using four 
@@ -49,7 +49,7 @@
 *     the supplied intensity images. These are based on the fact that the 
 *     sum of the O and E ray intensities should always equal the total
 *     intensity (after any F-factor correction), and should therefore be
-*     the same for all pairs of corresponing O and E ray images if they have 
+*     the same for all pairs of corresponding O and E ray images if they have 
 *     equal exposure times.
 *
 *     The E and F factors are calculated by inter-comparing pairs of
@@ -152,8 +152,8 @@
 *  Notes:
 *     -  An item named STOKES is added to the POLPACK extension. It is a
 *     character string identifying the quantity stored in each plane of
-*     the cube. For linear polarimetery, it is set to "IQU", and for
-*     circular polarimetery it is set to "IV".
+*     the cube. For linear polarimetry, it is set to "IQU", and for
+*     circular polarimetry it is set to "IV".
 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)

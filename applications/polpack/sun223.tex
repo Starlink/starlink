@@ -608,11 +608,12 @@ follows:
 \end{myquote}
 
 where $I_{p}$ is the {\em polarized intensity}. However, the estimation
-of $p$ is complicated by the non-symmetric statistics produced by squaring
-and adding $Q$ and $U$. For low polarizations, this will tend to shift
-the mean of the distribution of $p$ to higher values, thus resulting in
-an over-estimation of $p$. The use of the following expression for $I_{p}$
-reduces the effect of this statistical bias:
+of $p$ is complicated by the non-symmetric noise statistics produced by
+squaring and adding $Q$ and $U$. For low polarizations, the squaring of
+the noise will tend to shift the mean of the distribution of $p$ to
+higher values, thus resulting in an over-estimation of $p$. The use of
+the following expression for $I_{p}$ reduces the effect of this
+statistical bias:
 
 \begin{myquote}
 \begin{eqnarray*}
@@ -633,20 +634,21 @@ a vector parallel to the plane of polarization. The length of the vector
 is proportional to the degree of polarization, which varies from 0\% to
 100\%. The Stokes vectors can be binned to reduce the number of vectors
 in the map to a manageable number. The map is often overlayed on a total
-intensity image of the object to emphasize any correlation between the
-visual appearance of the object and the morphology of the polarization
-map.
+intensity image or contour map of the object to emphasize any correlation
+between the visual appearance of the object and the morphology of the
+polarization map.
 
 \section{\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
-This section gives a detailed description of the steps involved in using 
-POLPACK to produce a vector map from dual-beam polarimetry data which
-conforms to the model outlines in the previous section. An over-view of
-the data reduction process is given in Figure~\ref{fig:dataflow}.
+This section gives a detailed description of the steps involved in using
+POLPACK to produce a vector map from dual-beam polarimetry data. It is
+assumed that the data conforms to the model outlines in the previous
+section. An over-view of the data reduction process is given in
+Figure~\ref{fig:dataflow}.
 
 \begin{latexonly}
   \begin{figure}[htpb]
   \begin{center}
-  \includegraphics[scale=0.8]{sun223_figures/dataflow.eps}
+  \includegraphics[scale=0.7]{sun223_figures/dataflow.eps}
   \caption{The main steps in the production of a polarization map.}
   \label{fig:dataflow}
   \end{center}
@@ -662,6 +664,23 @@ the data reduction process is given in Figure~\ref{fig:dataflow}.
    \end{quote}
 \end{htmlonly}
 
+All POLPACK applications use standard Starlink subroutine libraries for
+accessing parameters, producing graphics, reporting errors, etc. They
+therefore look and feel very similar to applications in other Starlink
+packages such as KAPPA and CCDPACK. The following sections in
+\xref{SUN/95}{sun95}{} should therefore be consulted for general
+information about these issues:
+
+\begin{itemize}
+\item ``\xref{Parameters}{sun95}{se_param}''
+\item ``\xref{Graphics Devices and Files}{sun95}{se_graphdev}''
+\item ``\xref{Data Structures}{sun95}{se_datastr}''
+\item ``\xref{NDF Sections}{sun95}{se_ndfsect}''
+\item ``\xref{NDF History}{sun95}{se_ndfhistory}''
+\item ``\xref{Graphics Database}{sun95}{se_agitate}''
+\item ``\xref{Procedures}{sun95}{se_procedures}''
+\end{itemize}
+
 \subsection{\label{SEC:CONVERT}\xlabel{formatconversion}Format Conversion}
 The first step is to ensure that your data files are in a format which
 POLPACK can process. The native data format used by POLPACK is the 
@@ -673,8 +692,8 @@ you have two options:
 \begin{enumerate}
 
 \item You can explicitly convert your data files into NDF format at the
-beginning, and use the NDF versions there-after. The
-\xref{CONVERT}{sun55}{} package provides facilities for converting to and
+beginning, and use the NDF versions there-after. The \xref{CONVERT}{sun55}{} 
+package {\latexonly (see SUN/55)} provides facilities for converting to and
 from most common astronomical data formats. For instance, if your data is
 in the form of a set of FITS files, you could use commands similar to the
 following to convert them into NDFs:
@@ -724,7 +743,7 @@ data for any known instrumental effects such as non-linearity, variation
 of sensitivity across the detector, zero point offsets, etc, before
 proceeding to use POLPACK. The details will obviously depend on your
 detector, but if you are using a CCD camera, then \xref{CCDPACK}{sun139}{} 
-will usually be able to perform these corrections,
+{\latexonly (see SUN/139)} will usually be able to perform these corrections.
 
 If target exposures are available at half-wave plate positions of
 45.0\dgs\ and 67.5\dgs\ (as well as 0\dgs and 22.5\dgs), then POLPACK can
@@ -761,13 +780,13 @@ gets passed directly into the final results.
 
 Another aspect of instrumental calibration is the estimation of the
 uncertainty on every pixel value. If you know the noise characteristics
-of your detector, you may be able to store this information with your data in 
-the form of an NDF {\em VARIANCE component}. This is an array holding an 
-estimate of the variance at every pixel in your data. If present, POLPACK
-will process this information to obtain estimates of the uncertainty in
-the final polarisation parameters. If you use CCDPACK to calibrate your
-data, then VARIANCE components are created automatically if you supply the
-required information.
+of your detector, you may be able to store this information with your
+data in the form of an NDF {\em VARIANCE component}. This is an array
+holding an estimate of the variance at every pixel in your data. If
+present, POLPACK will process this information to obtain estimates of the
+uncertainty in the final polarization parameters. If you use CCDPACK to
+calibrate your data, then the \xref{DEBIAS}{sun139}{DEBIAS} application
+can be used to create a VARIANCE component.
 
 \subsection{\xlabel{startup}Starting up POLPACK}
 
@@ -779,8 +798,9 @@ command:
 \end{verbatim}
 \end{myquote}
 
-This command must be issued before attempting to use any POLPACK command.
-POLPACK is also available from the \xref{ICL}{sg5}{} command language.
+This command must be issued before attempting to use any POLPACK
+applications. POLPACK is also available from the \xref{ICL}{sg5}{}
+command language.
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -804,7 +824,7 @@ line for each item of information to be imported into the POLPACK
 extension. Each such item has a name by which other POLPACK applications
 refer to it (these are described \hyperref{here}{in
 appendix}{}{APP:POLEXT}). As well as the name of a POLPACK extension
-item, each line of the control table contains a description of where to
+item, each line of the control table should contain a description of where to
 obtained the corresponding value. This description is given in terms of
 FITS keywords. For instance, the line
 
@@ -814,25 +834,53 @@ FITS keywords. For instance, the line
 \end{verbatim}
 \end{myquote}
 
-tells POLIMP to find the value of the FITS keyword HWPANG and store it as 
-item ``WPLATE'' in the POLPACK extension (this is the half-wave plate 
-position).
+tells POLIMP to find the value of the FITS keyword \verb+HWPANG+ and
+store it as item ``WPLATE'' in the POLPACK extension (this is the
+half-wave plate position).
 
 If your data is supplied in the form of a set of FITS files, then the
-HWPANG value is simply obtained from the primary header. If your data is
-supplied in the form of a set of NDF structures, then the value is read
-from the FITS extension in the NDF structure (which should have been
-created by the data aquisition system). For other data formats, the
-origin of the keyword value depends on how the data conversion is
-performed. \xref{SUN/55}{sun55}{} contains details of how FITS keywords are
-created from the foreign data file.
+\verb+HWPANG+ value would simply be obtained from the primary header. If your
+data is supplied in the form of a set of NDF structures, then the value
+would be read from the FITS extension in the NDF structure (which should
+have been created by the data aquisition system). For other data formats,
+the origin of the keyword value depends on how the data conversion is
+performed. \xref{SUN/55}{sun55}{} contains details of how FITS keywords
+are created from foreign data files.
 
 The POLIMP control table also allows POLPACK extension items to be
 derived from one or more FITS keyword values, combined together to form a
 Fortran-like mathematical expression. For instance, this may be useful if
 the FITS keyword uses a different set of units, or has a different sign
-convention. See the description of the \htmlref{POLIMP}{POLIMP}
-application for further details of the syntax of the control table.
+convention. When used in this way, each FITS keyword must be ``declared''
+earlier in the control table. This declaration tells POLIMP what sort of
+data values the keyword can take. For instance:
+
+\begin{myquote}
+\begin{verbatim}
+   _REAL  ROTA
+   ANGROT 57.29578*ROTA
+\end{verbatim}
+\end{myquote}
+
+converts the value of the FITS keyword \verb+ROTA+ from radians to
+degrees, and assign the result to the item ANGROT in the POLPACK extension.
+The first line informs POLIMP that the keyword \verb+ROTA+ should be
+treaed as a single precision floating point value. The recognized data
+types are:
+
+\begin{myquote}
+\begin{description}
+\item[\_BYTE]		- Single byte signed integer values.
+\item[\_CHAR]		- Character strings.
+\item[\_DOUBLE]		- Double precision floating point values.
+\item[\_INTEGER]	- Single precision integer values.
+\item[\_REAL]		- Single precision floating point values.
+\item[\_WORD]		- Two byte signed integer values.
+\end{description}
+\end{myquote}
+
+See the description of the \htmlref{POLIMP}{POLIMP} application for
+further details of the syntax of the control table.
 
 There is also a \htmlref{POLEXP}{POLEXP} application which reverses the 
 importing process. It copies the information stored in the POLPACK
@@ -842,7 +890,7 @@ convert a POLPACK NDF structure back into a foreign data file.
 It is generally not necessary for users to call POLEXP explicitly. 
 
 The contents of the POLPACK extension within an NDF can be examined using
-the \xref{\verb+hdstrace+}{sun102} command. For instance, to check the
+the \xref{\verb+hdstrace+ }{sun102}{} command. For instance, to check the
 contents of the POLPACK extension in the NDF \verb+partproc.sdf+, do:
 
 \begin{myquote}
@@ -882,9 +930,9 @@ processing as would be available if the individual applications were
 called ``by hand''. If you hit a problem which POLKA cannot handle, then
 you may need to adopt this alternative approach.
 
-The POLKA command activates a standard Starlink a-atask which aquires
+The POLKA command activates a standard Starlink A-task which aquires
 parameter values using the normal methods employed by most Starlink
-applications. The a-task then activates a script written in a language
+applications. The A-task then activates a script written in a language
 called Tk/Tcl which performs the processing. This script requires you
 to identify the following features:
 
@@ -900,39 +948,40 @@ and controls to select any of the above features. Once the required
 features have been supplied, POLKA commences the processing of the
 supplied data frames. This may take a significant length of time depending
 on your hardware, and the size and number of your images. A window
-display the progress being made during this phase.
+displays the progress being made during this phase.
 
 Once complete, a 3D cube is created in which the x-y plane corresponds to
 pixel positions within the extracted, aligned intensity images. Each
 plane in the cube contains a single Stokes parameter. The lowest plane is
 always the total intensity. The other planes contain either Q and U for
-linear polarisation, or V for circular polarization. In addition, the
+linear polarization, or V for circular polarization. In addition, the
 separate intensity images on which the Stokes parameters were based may
 be saved once the processing is complete.
 
-The POLKA application has many parameters. The values provided for some of
+The POLKA application has many parameters. The values used for some of
 these may be changed from within the GUI. However, some may not be
-changed and should always be assigned appropriate values when invoking POLKA.
+changed and should be assigned appropriate values when invoking POLKA.
 Of these, the most important will usually be:
 
+\begin{myquote}
 \begin{description}
-\item [IN] - A list of the input target frames. These should have been
+\item [IN]	- A list of the input target frames. These should have been
 calibrated and imported. The list may be supplied in several forms
 (described \hyperref{here}{in section}{}{SEC:GRPEXP}).
-\item [MODE] - Can be CIRCULAR or LINEAR, and indicates what sort of
-polarization you are measuring.
-\item [OUT\_E] - A list of the output images to recieve the extracted,
+\item [MODE]	- Indicates what sort of polarization you are measuring. It 
+can be ``CIRCULAR'' or ``LINEAR''.
+\item [OUT\_E]	- A list of the output images to recieve the extracted,
 aligned, sky-subtracted $E$ ray images. If a null value (!) is supplied, 
 these images are not saved.
-\item [OUT\_O] - This is like OUT\_E, but refers to the $O$ ray images
+\item [OUT\_O]	- This is like OUT\_E, but refers to the $O$ ray images
 instead of the $E$ ray images.
-\item [OUT\_S] - The name of the output cube to receive the Stokes
+\item [OUT\_S]	- The name of the output cube to receive the Stokes
 parameters. If a null value (!) is supplied, no Stokes parameters are
 created.
-\item [POL] - This should be set to FALSE if you want to use POLKA as a
+\item [POL]	- This should be set to FALSE if you want to use POLKA as a
 general purpose image alignment tool for non-polarimetric data. If this
 is done, the aligned, sky-subtracted images should be specified using parameter
-OUT (parameters OUT\_S, OUT\_E and OUT\_O are not used). In this mode,
+OUT (parameters OUT\_S, OUT\_E and OUT\_O are then not used). In this mode,
 the supplied images are treated like $O$ ray images, and the controls
 related to the $E$ ray images are disabled.
 \item [SKYFRAMES] - POLKA provides two methods of sky subtraction. If a
@@ -943,6 +992,7 @@ identify areas of sky within each of the input target frames. A smooth
 surface is then fitted to these areas and used as the sky background.
 
 \end{description}
+\end{myquote}
 
 A separate guide is available describing POLKA in detail. This guide
 contains a step-by-step tutorial, detailed descriptions of 
@@ -950,7 +1000,8 @@ each control in the GUI, answers to some common questions, etc. It may be
 accessed using the \verb+Help+ menu within the GUI. When POLKA is
 activated, the tutorial is automatically displayed in a WWW browser (this
 may be disabled using the STARTHELP parameter when running POLKA). If you
-are new to POLKA, it is  a good idea to work your way through the tutorial.
+are new to POLKA, it is  a good idea to work your way through the
+tutorial first.
 
 
 \subsection{Displaying the Results}
@@ -961,10 +1012,13 @@ these quantities graphically. The following POLPACK applications can be
 used to produce a map of vectors describing the polarization at different
 points on the sky:
 
+\begin{myquote}
 \begin{description}
-\item [\htmlref{POLVEC}{POLVEC}] - This converts a 3-D cube containing Stokes parameters
+\item [\htmlref{POLVEC}{POLVEC}] - This converts a 3D cube containing Stokes parameters
 (such as produced by POLKA or POLCAL) into a catalogue containing the
 following columns:
+
+\begin{myquote}
 \begin{description}
 \item [X] - X pixel coordinates within the supplied cube.
 \item [Y] - Y pixel coordinates within the supplied cube.
@@ -975,6 +1029,7 @@ following columns:
 \item [ANG] - The anti-clockwise angle from the X pixel axis to the plane of 
 polarization, in degrees.
 \end{description}
+\end{myquote}
 
 For cicular polarimetry, the Q and U columns are replaced by a single V
 column. If variance information is available (see
@@ -983,29 +1038,31 @@ holding the standard deviations associated with each of the above
 quantities (except X and Y). The catalogue contains a single row for each
 pixel in the x-y plane of the supplied cube.
 
-POLVEC can also produce a set of 2-D images holding the above quantities.
+POLVEC can also produce a set of 2D images holding the above quantities.
 
-\item [\htmlref{POLBIN}{POLBIN}] - This accepts a catalogue containing Stokes parameters
-as input (such as produced by POLVEC), and creates a new output catalogue
-in the same format. The output catalogue is formed by binning the Stokes 
-vectors in the input catalogue within a grid of equally sized
+\item [\htmlref{POLBIN}{POLBIN}] - This accepts a catalogue containing Stokes
+parameters as input (such as produced by POLVEC), and creates a new
+output catalogue in the same format, but containing fewer rows (i.e.
+fewer polarization vectors). The output catalogue is formed by binning the
+Stokes vectors in the input catalogue within a grid of equally sized
 rectangular bins. Corresponding values for the P and ANG columns are
 calculated on the basis of the binned Stokes parameters.
 
 \item [\htmlref{POLPLOT}{POLPLOT}] - This displays a map of polarization 
 vectors, obtained from a catalogue produced by POLVEC or POLBIN. If the
 map is drawn over an existing picture, then the vectors can be aligned
-with the previously displayed image.
+with the previously displayed picture.
 
 \end{description}
+\end{myquote}
 
 Since the polarization parameters are stored in a catalogue, the
-\xref{CURSA}{sun190} package {\latexonly (see SUN/190)} can be used to
+\xref{CURSA}{sun190}{} package {\latexonly (see SUN/190)} can be used to
 examine and manipulate them. One particularly useful facility within
 CURSA is the \xref{CATSELECT}{sun190}{SELECT} application, which
 allows rows within a catalogue to be selected on the basis of an
 arbitrary mathematical expression. For instance the following commands
-creates a new catalogue called \verb+selcat.FIT+ which contains all the
+create a new catalogue called \verb+selcat.FIT+ which contains all the
 vectors from \verb+bincat.FIT+ for which the polarization is less than
 30 \% and has a standard deviation less than 5 \%:
 
@@ -1025,7 +1082,7 @@ would involve the following steps:
 
 \begin{enumerate}
 
-\item Convert the 3-D NDF containing Stokes vector in file \verb+cube.sdf+ 
+\item Convert the 3D NDF in file \verb+cube.sdf+ containing Stokes vector 
 (created by POLKA) into a catalogue stored in file \verb+cat.FIT+:
 
 \begin{myquote}
@@ -1034,10 +1091,11 @@ would involve the following steps:
 \end{verbatim}
 \end{myquote}
 
-\item Bin the catalogue to reduce the noise, and to decrease the density
+\item Bin the catalogue to reduce the noise and decrease the density
 of vectors in the final map. The bins used are 8 by 8 pixels (measured in
-the Stokes parameter NDF \verb+cube.sdf+), and the Stokes parameters are
-combined using a median. The binned catalogue is stored in file \verb+bincat.FIT+:
+the x-y plane of the Stokes parameter NDF \verb+cube.sdf+), and the
+Stokes parameters are combined using a median. The binned catalogue is
+stored in file \verb+bincat.FIT+:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1056,8 +1114,8 @@ less than 5 \%:
 \end{verbatim}
 \end{myquote}
 
-\item \label{STEP:DEVICE} Select the graphics device and the image display device (both set to an X 
-windows display in this case):
+\item \label{STEP:DEVICE} Select the graphics device and the image
+display device (both are set to an X windows display in this example):
 \begin{myquote}
 \begin{verbatim}
    % gdset xwindows
@@ -1097,7 +1155,7 @@ monochrome colour table:
 vectors appear in alignment with the previously displayed total intensity
 image. The vectors are drawn in blue. A default scale will be used for the 
 vectors, but this can be over-ridden if necessary by specifying a value for
-parameter VSCALE:
+parameter \htmlref{VSCALE}{POLPLOT}:
 \begin{myquote}
 \begin{verbatim}
    % polplot selcat noclear "style='colour(vect)=blue'"
@@ -1138,15 +1196,17 @@ greyscale image, replace step \ref{STEP:DISPLAY} with:
 
 \item If you want your output in the form of a PostScript file, there is
 an extra step. This is because graphics applications such as DISPLAY,
-CONTOUR and POLPLOT produce separate output PostScript files which then
-need to be combined into a single file. In step \ref{STEP:DEVICE},
+CONTOUR, POLPLOT, etc, produce separate output PostScript files which
+then need to be combined into a single file using the 
+\xref{\verb+psmerge+}{sun164}{} command. In step \ref{STEP:DEVICE},
 specify the device as \verb+epsf_l+ (Encapsulated PostScript, landscape
 mode) instead of \verb+xwindows+. The first graphics applications to be
 run will then write its output to the file \verb+gks74.ps+, and
 subsequent graphics applications will write their output to files
-\verb+gks74.ps.1+, \verb+gks74.ps.2+, etc. To produce a contour map with
-overlaid vectors, replace steps \ref{STEP:DISPLAY} and \ref{STEP:POLPLOT}
-with:
+\verb+gks74.ps.1+, \verb+gks74.ps.2+, etc\footnote{The sequence number
+added to the end of the file name is always one higher than in any
+existing files.}. To produce a contour map with overlaid vectors, replace
+steps \ref{STEP:DISPLAY} and \ref{STEP:POLPLOT} with:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1172,7 +1232,7 @@ recipe. Familiarity with the parameters of the relevant KAPPA and POLPACK
 applications will suggest many more.
 
 \subsection{\xlabel{gettinghelp}Getting Help}
-Help is available in several forms: 
+Information describing all POLPACK commands is available in several forms: 
 \begin{itemize}
 \item As simple text in the command-line window. Type:
 
@@ -1259,18 +1319,18 @@ instance if the objects are the names of data files, then wild-card characters
 are allowed in the supplied values (see \hyperref{here}{section}{}{SEC:NDF}) 
 
 \subsection{\label{SEC:IND}Indirection}
-It is sometimes convenient to store strings in a text file which specify the
-objects to be used. The name of the text file can
-then be given in response to a prompt for a group expression,
-rather than giving a long list of explicit values. This is done
-by preceeding the name of the text file with an up-arrow (``\verb+^+'')
-character. For instance, the group expression ``\^{}{\small style.dat}''
-would result in the file {\small style.dat} being opened and the strings
-read from the file. Each line within the file is considered to
-be a group expression, and is processed in the same way as a
-group expression supplied directly. In particular, a text file
-may contain references to other text files. If the file
-{\small style.dat} contained the following two lines: 
+It is sometimes convenient to store the strings specifing the objects to
+be used within a text file. The name of the text file can then be given
+in response to a prompt for a group expression, rather than giving a long
+list of explicit values. This is done by preceeding the name of the text
+file with an up-arrow (``\verb+^+'') character. For instance, the group
+expression ``\^{}\verb+style.dat+'' would result in the file
+\verb+style.dat+ being opened and the strings read from the file. Each
+line within the file is considered to be a group expression, and is
+processed in the same way as a group expression supplied directly. In
+particular, a text file may contain references to other text files. If
+the file
+\verb+style.dat+ contained the following two lines:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1279,9 +1339,9 @@ colour(border)=red,^labels.dat
 \end{verbatim}
 \end{myquote}
 
-The the strings \verb+grid=1+, \verb+colour(grid)=red+, \verb+border=1+
+then the strings \verb+grid=1+, \verb+colour(grid)=red+, \verb+border=1+
 and \verb+colour(border)=red+ would be returned to the 
-application, and in addition the file {\small labels.dat} would be 
+application, and in addition the file \verb+labels.dat+ would be 
 searched for further strings. This nesting of text files can go
 down to seven levels. Text files may also contain comments. 
 Anything occurring after a ``\verb+#+'' character is ignored. To ignore
@@ -1304,9 +1364,9 @@ for a group expression, then the following steps occur:
 \item  The string ``new\_'' is added to the start of the string.
 \end{itemize}
 
-Thus if the existing group contained the strings {\small file1\_ds} and
-{\small file2\_ds}, the resulting group would be {\small new\_file1\_imb}
-and {\small new\_file2\_imb}. Note, this facility is only available if
+Thus if the existing group contained the strings \verb+file1_ds+ and
+\verb+file2_ds+, the resulting group would be \verb+new_file1_imb+
+and \verb+new_file2_imb+. Note, this facility is only available if
 the parameter description identifies an existing group which will be used
 as the basis for the modified strings.
 
@@ -1340,9 +1400,10 @@ are all possible responses:
 \end{myquote}
 \vspace{-3mm}
 
-This means ``Use the NDFs stored in files b1.sdf, b2.sdf, b3.sdf and
-b4.sdf''. If automatic format conversion is being used (see 
-\hyperref{here}{section}{}{SEC:CONVERT}), then an example such as 
+This means ``Use the NDFs stored in files \verb+b1.sdf+, \verb+b2.sdf+,
+\verb+b3.sdf+ and \verb+b4.sdf+''. If automatic format conversion is being 
+used (see \hyperref{here}{section}{}{SEC:CONVERT}), then an example such
+as:
 
 \begin{myquote}
 \begin{verbatim}
@@ -1358,8 +1419,9 @@ is also legal, and reads the corresponding FITS files.
 \end{verbatim}
 \end{myquote}
 \vspace{-3mm}
-This means ``Use cena\_b1.sdf and then (because of the minus sign at the end)
-ask the user for  more data files''.
+
+This means ``Use \verb+cena_b1.sdf+ and then (because of the minus sign
+at the end) ask the user for more data files''.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1375,7 +1437,7 @@ This means ``Use all accessable data files in the current directory''.
 \end{verbatim}
 \end{myquote}
 \vspace{-3mm}
-This means ``Use hh1\_b1s1\_ds.sdf, hh1\_b1s2\_ds.sdf, etc''.
+This means ``Use \verb+hh1_b1s1_ds.sdf+, \verb+hh1_b1s2_ds.sdf+, etc''.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1393,7 +1455,7 @@ This means ``Read the names of data files from the text file
 \end{myquote}
 \vspace{-3mm}
 This means ``Use all accessable data files contained in the directory 
-../data''.
+\verb+../data+''.
 
 \item If an application asks for a group of output data files, the following 
 are possible responses:
@@ -1404,7 +1466,7 @@ are possible responses:
 \end{verbatim}
 \end{myquote}
 \vspace{-3mm}
-This means ``Create file1.sdf, file2.sdf and file3.sdf''.
+This means ``Create \verb+file1.sdf+, \verb+file2.sdf+ and \verb+file3.sdf+''.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1413,7 +1475,7 @@ This means ``Create file1.sdf, file2.sdf and file3.sdf''.
 \end{myquote}
 \vspace{-3mm}
 This means ``Read the names of the output data files from 
-text file out.dat''.
+text file \verb+out.dat+''.
 
 \begin{myquote}
 \begin{verbatim}
@@ -1432,7 +1494,7 @@ This means ``Append the string ``\_ds'' to the end of all
 \vspace{-3mm}
 This means ``Substitute the string ``\_bk'' for all  occurrences of the string
 ``\_ds'' in the  input data file names, and put the files in 
-directory ../bk''.
+directory \verb+../bk+''.
 \end{itemize}
 
 Group expressions can be used to specify objects other than data files.
@@ -1440,14 +1502,18 @@ For instance,  if an application asks for a group of pixels to
 be specified by  their X and Y pixel indices, then the pixels (10,11),
 (21,-10) and (0,0) could be specified in any of the following ways:
 
+\begin{enumerate}
+\item 
 \begin{myquote}
 \begin{verbatim}
   10,11,21,-10,0,0  
 \end{verbatim}
 \end{myquote}
-\vspace{-3mm}
+\vspace{3mm}
 This gives the indices as a comma separated list.
+\vspace{3mm}
 
+\item 
 \begin{myquote}
 \begin{verbatim}
   10,11-
@@ -1455,18 +1521,22 @@ This gives the indices as a comma separated list.
   0,0
 \end{verbatim}
 \end{myquote}
-\vspace{-3mm}
+\vspace{3mm}
 Ending each line with a minus  sign causes the user to be re-prompted for more
 values.
+\vspace{3mm}
 
+\item 
 \begin{myquote}
 \begin{verbatim}
   ^pixels.dat
 \end{verbatim}
 \end{myquote}
-\vspace{-3mm}
-The file pixels.dat is read. The file could contain the  following four lines:
+\vspace{3mm}
+The file \verb+pixels.dat+ is read. The file could contain the  following four 
+lines:
 
+\item 
 \begin{myquote}
 \begin{verbatim}
   #  Approximate star centres.
@@ -1475,6 +1545,7 @@ The file pixels.dat is read. The file could contain the  following four lines:
   0,0
 \end{verbatim}
 \end{myquote}
+\end{enumerate}
 
 \newpage
 \appendix
@@ -1510,6 +1581,8 @@ polarization vectors.}{ POLVEC }
 \subsection{Complete routine descriptions \label{descriptions}}
 
 The POLPACK routine descriptions are contained in the following pages.
+These descriptions follow the style used in \xref{SUN/95}{sun95}{ap_full}
+for NDF applications.
 
 % +
 %  Name:
@@ -1784,29 +1857,26 @@ The POLPACK routine descriptions are contained in the following pages.
 \sstroutine{
    POLBIN
 }{
-   Bins a catalogue containing Stokes vectors
+   Bins a catalogue containing Stokes parameters
 }{
    \sstdescription{
       This application creates a new catalogue of polarization vectors by
-      binning the Stokes vectors in the supplied catalogue. The input
-      catalogue should contain columns with the same names and meanings
-      as those produced by POLVEC. In particularly, the bin sizes are
-      given as increments within the coordinate Frame implied by the
-      columns with names {\tt "}X{\tt "} and {\tt "}Y{\tt "}. If the original catalogue was
-      created by POLVEC, then {\tt "}X{\tt "} and {\tt "}Y{\tt "} will be pixel coordinates within
-      the cube supplied as input to POLVEC.
+      binning the Stokes parameters in the supplied catalogue. The columns in
+      the supplied catalogue should correspond to those created by
+      \htmlref{POLVEC}{POLVEC}.
 
-      The bins used form a grid of equal sized rectangular cells, the
-      dimensions of each cell being specified by the user. The grid contains
+      The bins used form a grid of equally sized rectangular cells, the
+      dimensions of each cell being specified by the parameter BOX in
+      terms of the X and Y columns in the catalogue. The grid contains
       sufficient cells to span the entire range of X and Y covered by the
       input catalogue. Each position in the output catalogue corresponds
       to one of these cells. The Stokes parameters for the cell are formed
-      by combining together the Stokes parameter of all input positions
-      which fall within the cell, using a method specified by the user.
-      The degree of polarization, angle of polarization, and polarized
-      intensity are then derived from these Stokes parameters. The (X,Y)
-      positions in the output catalogue are the positions at the centre
-      of each of the cells.
+      by combining together the Stokes parameters of all input positions
+      which fall within the cell, using the method specified by the
+      parameter METHOD. The degree of polarization, angle of polarization,
+      and polarized intensity are then derived from these combined Stokes
+      parameters. The (X,Y) positions in the output catalogue are the
+      positions at the centre of each of the cells.
    }
    \sstusage{
       polbin in out box [method]
@@ -1815,21 +1885,16 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          BOX( 2 ) = \_REAL (Read)
       }{
-         The x and y bin sizes (in pixels). These values refer to the
-         coordinate Frame defined by columns {\tt "}X{\tt "} and {\tt "}Y{\tt "}.
+         The x and y bin sizes. These values refer to the coordinate Frame
+         defined by columns {\tt "}X{\tt "} and {\tt "}Y{\tt "} and will usually be in units of pixels.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
       }{
          TRUE if a correction for statistical bias is to be made to
-         percentage polarization and polarized intensity. This correction
-         subtracts the variance of the percentage polarization from the
-         squared percentage polarization, and uses the square root of this
-         as the corrected percentage polarization.  The corresponding
-         polarized intensity is then found by multiplying the corrected
-         percentage polarization by the total intensity.  The returned
+         percentage polarization and polarized intensity. The returned
          variance values are unchanged. This correction only applies to
-         calculations of plane polarization, and cannot be used if the
+         calculations of linear polarization, and cannot be used if the
          input catalogue does not contain variance values. If a null value
          (!) is supplied, then the correction is applied if output variances
          are being created, and not otherwise.           [!]
@@ -1837,7 +1902,8 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          IN = LITERAL (Read)
       }{
-         The name of the input catalogue.
+         The name of the input catalogue. A file type of .FIT is assumed
+         if none is provided.
       }
       \sstsubsection{
          METHOD = LITERAL (Read)
@@ -1866,7 +1932,8 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          OUT = LITERAL (Read)
       }{
-         The name of the output catalogue.
+         The name of the output catalogue. A file type of .FIT is assumed
+         if none is provided.
       }
       \sstsubsection{
          SIGMAS = \_REAL (Read)
@@ -1879,94 +1946,232 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstexamplesubsection{
          polbin intab outtab 4
       }{
-         Bins the Stokes vectors in catalogue {\tt "}intab{\tt "} and produces
-         catalogue {\tt "}outtab{\tt "} containing binned Stokes parameters and
-         corresponding polarization parameters. Each bin measures 4 units
+         Bins the Stokes parameters in catalogue {\tt "}intab.FIT{\tt "} and produces
+         catalogue {\tt "}outtab.FIT{\tt "} containing binned Stokes parameters and
+         corresponding polarization parameters. Each bin measures 4 pixels
          along both the X and Y axes, and has a value based on the median
          of the corresponding input Stokes values.
       }
    }
 }
+\newpage
 \sstroutine{
    POLCAL
 }{
-   Calculate polarization parameters for dual-beam imaging
-   linear and circular polarimetry
+   Converts a set of analysed intensity images into a cube holding Stokes
+   vectors
 }{
    \sstdescription{
-      Calculate polarization parameters for dual-beam imaging
-      polarimetry. This routine accesses a list of input NDF data
-      structures which should contain processed polarimetric
-      information. It is assumed that the input data are bias/dark
-      corrected, flatfielded, sky subtracted and mutually aligned.
+      This application converts a set of 2D intensity images into a
+      3D data cube holding a Stokes vector at every pixel in the area
+      covered by the supplied intensity images.
 
-      Each input NDF should contain an image recorded in a
-      single polarization state. The polarization state should be
-      indicated by two descriptors WPLATE (the waveplate position, one of
-      0.0,45.0,22.5,67.5) and RAY (either O (ordinary) or E
-      (extraordinary)) which should reside in a POLPACK NDF extension.
-      The descriptors are checked for validity and used to sort the
-      input data into polarimetric sets. In addition, a third
-      descriptor, IMGID, should be present to indicate which images were
-      recorded on the same exposure.
+      Each input image should contain either the O or E ray image
+      extracted from a single dual-beam exposure. The sky backgrounds
+      should have been removed, and they should have been re-sampled so
+      that a given pixel corresponds to the same point on the sky in all
+      images.
 
-      The input data files are first validated using the descriptor
-      information in their POLPACK extensions. They are then sorted into
-      sets that can be used to calculate the output polarization
-      parameters.
+      Both circular and linear polarization can be measured (see
+      parameter PMODE). For linear polarization, the output cube has
+      3 planes which contain I, Q and U values (in that order). For circular
+      polarization, the output cube has 2 planes which contain I and V values.
 
-      The instrumental polarization efficiency (F factor) is calculated
-      by intercomparing images to calculate the scale factors and zero
-      levels. All possible intercomparisons are used and a weighted mean
-      F factor calculated.
+      If input images for all four half-wave plate positions are provided
+      (0, 22.5, 45 and 67.5 degrees) then a correction is made for any difference
+      in sensitivity of the two channels (such as can be caused by the
+      use of polarized flat-field for instance). This correction is known
+      as the {\tt "}F-factor{\tt "} and is based on the redundancy provided by using four
+      half-wave plate positions. If images with the required half-wave plate
+      positions are not provided, then it is assumed that the two channels
+      are equally sensitive (that is, an F-factor of 1.0 is used).
 
-      The time dependent efficiencies (E factors) due, for example, to
-      changes in integration time or sky conditions between exposures,
-      are calculated. The E factors are calculated by comparing total
-      intensity images against an iteratively refined median image.
+      Corrections are also made for any difference in exposure times for
+      the supplied intensity images. These are based on the fact that the
+      sum of the O and E ray intensities should always equal the total
+      intensity (after any F-factor correction), and should therefore be
+      the same for all pairs of corresponding O and E ray images if they have
+      equal exposure times.
 
-      The input data is `corrected{\tt '} by the polarization and time
-      dependent efficiencies and the stokes images (I,Q,U) or (I,V) are
-      calculated. The output stokes images are formed by median stacking
-      all possible estimates.
+      The E and F factors are calculated by inter-comparing pairs of
+      intensity images to estimate their relative scale factor and zero
+      point. This estimation is an iterative process, and is controlled by
+      parameters TOLS, TOLZ, SKYSUP and MAXIT.
+   }
+   \sstusage{
+      polcal in out
+   }
+   \sstparameters{
+      \sstsubsection{
+         ETOL = \_REAL (Read)
+      }{
+         The E factors are found using an iterative procedure in which
+         the supplied intensity images are corrected using the current
+         estimates of the E factors, and new estimates are then
+         calculated on the basis of these corrected images. This procedure
+         continues until the change in E-factor produced by an iteration
+         is less than the value supplied for ETOL, or the maximum number
+         of iterations specified by parameter MAXIT is reached. [0.01]
+      }
+      \sstsubsection{
+         ILEVEL = \_INTEGER (Read)
+      }{
+         Specifies the amount of information to display on the screen.
+         Zero suppresses all output. A value of 1 produces minimal output
+         describing such things as the E and F factors adopted, and a
+         value of 2 produces more verbose output including details of
+         each iteration in the iterative process used to calculate the E
+         and F factors. [1]
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         A group specifying the names of the input intensity images. This
+         may take the form of a comma separated list, or any of the other
+         forms described in the help on {\tt "}Group Expressions{\tt "}.
+      }
+      \sstsubsection{
+         MAXIT = \_INTEGER (Read)
+      }{
+         This parameter specifies the maximum number of iterations to
+         be used when inter-comparing pairs of input images to determine
+         their relative scale-factor and/or zero-point. If the specified
+         number of iterations is exceeded without achieving the accuracy
+         required by the settings of the TOLS and TOLZ parameters, then a
+         warning message will be issued, but the results will still be used.
+         The value given for MAXIT must be at least one. [30]
+      }
+      \sstsubsection{
+         OUT = NDF (Read)
+      }{
+         The name of the output 3D cube holding the Stokes parameters.
+         The x-y plane of this cube covers the overlap region of the
+         supplied intensity images. Plane 1 contains the total intensity.
+         The other planes contain either Q and U, or V, depending on the
+         value of parameter PMODE.
+      }
+      \sstsubsection{
+         PMODE = LITERAL (Read)
+      }{
+         The mode of operation; CIRCULAR for measuring circular polarization,
+         or LINEAR for measuring linear polarization. [LINEAR]
+      }
+      \sstsubsection{
+         SKYSUP = \_REAL (Read)
+      }{
+         A positive {\tt "}sky noise suppression factor{\tt "} used to control the
+         effects of sky noise when pairs of input images are
+         inter-compared to determine their relative scale-factor. It is
+         intended to prevent the resulting scale-factor estimate being
+         biased by the many similar values present in the {\tt "}sky
+         background{\tt "} of typical astronomical data.  SKYSUP controls an
+         algorithm which reduces the weight given to data where there
+         is a high density of points with the same value, in order to
+         suppress this effect.
 
-      In LINEAR polarimetry mode the output NDF contains I, Q and U
-      stokes images. In CIRCULAR polarimetry mode the output NDF
-      contains I, V stokes images.
+         A SKYSUP value of unity can often be effective, but a value
+         set by the approximate ratio of sky pixels to useful object
+         pixels (i.e. those containing non-sky signal) in a {\tt "}typical{\tt "}
+         image will usually be better. The precise value
+         is not critical. A value of zero disables the sky noise
+         suppression algorithm completely. The default value for SKYSUP
+         is 10. This is normally reasonable for CCD frames of extended
+         objects such as galaxies, but a larger value, say 100, may give
+         slightly better results for star fields. [10]
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         A title for the output cube. [Output from POLCAL]
+      }
+      \sstsubsection{
+         TOLS = \_REAL (Read)
+      }{
+         This parameter defines the accuracy tolerance to be achieved
+         when inter-comparing pairs of input images to determine their
+         relative scale-factor. The value given for TOLS specifies the
+         tolerable fractional error in the estimation of the relative
+         scale-factor between any pair of input NDFs. This value must
+         be positive. [0.001]
+      }
+      \sstsubsection{
+         TOLZ = \_REAL (Read)
+      }{
+         This parameter defines the accuracy tolerance to be achieved
+         when inter-comparing pairs of input images to determine their
+         relative zero-points. The value given for TOLZ specifies the
+         tolerable absolute error in the estimation of the relative
+         zero-point between any pair of input images whose relative
+         scale-factor is unity. The value used is multiplied by the relative
+         scale-factor estimate (which reflects the fact that an image with
+         a larger data range can tolerate a larger error in estimating its
+         zero-point). The TOLS value supplied must be positive. [0.05]
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         This parameter should be set to a TRUE value if variances are to
+         be included in the output cube. This can only be done if all the
+         input intensity images have associated variance values. A null (!)
+         value results in variance values being created if possible, but
+         not otherwise. [!]
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         polcal {\tt "}$*$\_O,$*$\_E{\tt "} stokes
+      }{
+         This example uses all images in the current directory which have
+         file names ending with either {\tt "}\_O{\tt "} or {\tt "}\_E{\tt "}, and stores the
+         corresponding I, Q and U values in the 3d cube {\tt "}stokes{\tt "}.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An item named STOKES is added to the POLPACK extension. It is a
+         character string identifying the quantity stored in each plane of
+         the cube. For linear polarimetry, it is set to {\tt "}IQU{\tt "}, and for
+         circular polarimetry it is set to {\tt "}IV{\tt "}.
+      }
    }
 }
+\newpage
 \sstroutine{
    POLEXP
 }{
-   Copies information from the POLPACK extension to the FITS extension
+   Copies information from the POLPACK extension to named FITS keywords
 }{
    \sstdescription{
-      This routine creates FITS header cards describing the contents of
-      the POLPACK extensions in a group of NDFs. The header cards are
+      This application copies information from the POLPACK extension of
+      a group of NDFs, into the corresponding FITS extensions. It is
+      intended primarily for use when converting NDFs created by POLPACK
+      into a foreign data format. Appropriate FITS header cards are
       written to the FITS extensions of the NDFs, replacing any existing
       cards for the same keywords. The keywords used are listed below.
       Information exported to the FITS extension can be imported back
-      into the POLPACK extension using POLIMP.
-
-      The main use of this routine is for exporting POLPACK NDFs for use
-      bu other non-NDF based packages.
+      into the POLPACK extension using 
+      \htmlref{POLIMP}{POLIMP}.
    }
    \sstusage{
-      POLEXP in
+      polexp in
    }
    \sstparameters{
       \sstsubsection{
          IN = LITERAL (Read)
       }{
-         A list of NDF names. The NDF names should be separated by commas
-         and may include wildcards.
+         A group of NDF names. This may take the form of a comma separated
+         list, or any of the other forms described in the help on {\tt "}Group
+         Expressions{\tt "}.
       }
       \sstsubsection{
          NAMELIST = LITERAL (Read)
       }{
-         The name of a file to create containing a list of the
-         succesfully processed NDFs. This file can be used when
-         specifying the input NDFs for subsequent applications. [!]
+         The name of a file to create containing a list of the successfully
+         processed NDFs. This file can be used when specifying the input
+         NDFs for subsequent applications. No file is created if a null
+         (!) value is given. [!]
       }
       \sstsubsection{
          QUIET = \_LOGICAL (Read)
@@ -1977,7 +2182,7 @@ The POLPACK routine descriptions are contained in the following pages.
    }
    \sstexamples{
       \sstexamplesubsection{
-         POLEXP in=$\wedge$names.lis
+         polexp in=$^\wedge$names.lis
       }{
          This example processes the NDFs listed in the text file
          {\tt "}names.lis{\tt "}. The information stored in the POLPACK extension of
@@ -1988,44 +2193,43 @@ The POLPACK routine descriptions are contained in the following pages.
       FITS Keywords
    }{
       The following FITS keywords are created. The POLPACK extension item
-      stored in the keyword is shown in parenthesise (see POLIMP for a
-      description of these extension items):
+      stored in the keyword is shown in parentheses (see 
+      \htmlref{POLIMP}{POLIMP} for a description of these extension items):
+      \sstitemlist{
 
+         \sstitem
             PPCKANGR  (ANGROT)
+
+         \sstitem
             PPCKFILT  (FILTER)
+
+         \sstitem
             PPCKIMID  (IMGID)
+
+         \sstitem
             PPCKWPLT  (WPLATE)
+
+         \sstitem
             PPCKRAY   (RAY)
-            PPCKROT   (ROTATION)
-            PPCKYROT  (YROTATION)
+
+         \sstitem
             PPCKSTOK  (STOKES)
+      }
    }
 }
+\newpage
 \sstroutine{
    POLHELP
 }{
-   Gives help about POLPACK
+   Display information about POLPACK
 }{
    \sstdescription{
-      Displays help about POLPACK.  The help information has
-      alphabetical lists of commands, general information about
-      POLPACK and related material; it describes individual commands in
-      detail.
-
-      Here are some of the main options.
-         polhelp
-            No parameter is given so the introduction and the top-level
-            help index is displayed.
-         polhelp application/topic
-            This gives help about the specified application or topic.
-         polhelp application/topic subtopic
-            This lists help about a subtopic of the specified
-            application or topic. The hierarchy of topics has a maximum
-            of four levels.
-
-      See the Section {\tt "}Navigating the Help Library{\tt "} for details how to
-      move around the help information, and to select the topics you
-      want to view.
+      This application displays information about POLPACK. This includes
+      general topics common to all applications, as well as detailed
+      descriptions of each application. The information is organised in a
+      hierarchical structure of topics, subtopics, sub-subtopics, etc.
+      Each entry ends with a list of related sub-topics. You can then
+      examine any of these sub-topics or return to the previous level.
    }
    \sstusage{
       polhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
@@ -2053,85 +2257,91 @@ The POLPACK routine descriptions are contained in the following pages.
       }
    }
    \sstdiytopic{
-      Navigating the Help Library
+      Navigating the Help Tree
    }{
-      The help information is arranged hierarchically.  You can move
-      around the help information whenever POLHELP prompts.  This
-      occurs when it has either presented a screen{\tt '}s worth of text or
-      has completed displaying the previously requested help.  The
-      information displayed by POLHELP on a particular topic includes a
-      description of the topic and a list of subtopics that further
-      describe the topic.
+      The text for each topic is displayed in screen-fulls. A prompt is issued
+      at the end of each topic at which you may:
 
-      At a prompt you may enter:
-         o  a topic and/or subtopic name(s) to display the help for that
-            topic or subtopic, so for example, {\tt "}polka parameters dpi{\tt "}
-            gives help on DPI, which is a subtopic of Parameters, which
-            in turn is a subtopic of POLKA;
-
-         o  a $<$CR$>$ to see more text at a {\tt "}Press RETURN to continue ...{\tt "}
-            request;
-
-         o  a $<$CR$>$\} at topic and subtopic prompts to move up one level
-            in the hierarchy, and if you are at the top level it will
-            terminate the help session;
-
-         o  a CTRL/D (pressing the CTRL and D keys simultaneously) in
-            response to any prompt will terminate the help session;
-
-         o  a question mark {\tt "}?{\tt "} to redisplay the text for the current
-            topic, including the list of topic or subtopic names; or
-
-         o  an ellipsis {\tt "}...{\tt "} to display all the text below the
-            current point in the hierarchy.  For example, {\tt "}POLKA...{\tt "}
-            displays information on the POLKA topic as well as
-            information on all the subtopics under POLKA.
-
-      You can abbreviate any topic or subtopic using the following
-      rules.
-
-         o  Just give the first few characters, e.g. {\tt "}PARA{\tt "} for
-            Parameters.
-
-         o  Some topics are composed of several words separated by
-            underscores.  Each word of the keyword may be abbreviated,
-            e.g. {\tt "}Colour\_Set{\tt "} can be shortened to {\tt "}C\_S{\tt "}.
-
-         o  The characters {\tt "}\%{\tt "} and {\tt "}$*${\tt "} act as wildcards, where the
-            percent sign matches any single character, and asterisk
-            matches any sequence of characters.  Thus to display
-            information on all available topics, type an asterisk in
-            reply to a prompt.
-
-         o  If a word contains, but does end with an asterisk wildcard,
-            it must not be truncated.
-
-         o  The entered string must not contain leading or embedded
-            spaces.
-
-      Ambiguous abbreviations result in all matches being displayed.
-   }
-   \sstimplementationstatus{
       \sstitemlist{
 
          \sstitem
-         Uses the portable help system.
+            enter a topic and/or subtopic name(s) to display the help for
+               that topic or subtopic, so for example, {\tt "}polka parameters dpi{\tt "}
+               gives help on DPI, which is a subtopic of Parameters, which
+               in turn is a subtopic of POLKA;
+
+         \sstitem
+            press the RETURN key to see more text at a {\tt "}Press RETURN to
+               continue ...{\tt "} request;
+
+         \sstitem
+            press the RETURN key at topic and subtopic prompts to move up
+               one level in the hierarchy, and if you are at the top level it
+               will terminate the help session;
+
+         \sstitem
+            enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
+               response to any prompt will terminate the help session;
+
+         \sstitem
+            enter a question mark {\tt "}?{\tt "} to redisplay the text for the current
+               topic, including the list of topic or subtopic names; or
+
+         \sstitem
+            enter an ellipsis {\tt "}...{\tt "} to display all the text below the
+               current point in the hierarchy.  For example, {\tt "}POLKA...{\tt "}
+               displays information on the POLKA topic as well as
+               information on all the subtopics under POLKA.
+
       }
+      You can abbreviate any topic or subtopic using the following
+      rules.
+
+      \sstitemlist{
+
+         \sstitem
+            Just give the first few characters, e.g. {\tt "}PARA{\tt "} for
+               Parameters.
+
+         \sstitem
+            Some topics are composed of several words separated by
+               underscores.  Each word of the keyword may be abbreviated,
+               e.g. {\tt "}Colour\_Set{\tt "} can be shortened to {\tt "}C\_S{\tt "}.
+
+         \sstitem
+            The characters {\tt "}\%{\tt "} and {\tt "}$*${\tt "} act as wild-cards, where the
+               percent sign matches any single character, and asterisk
+               matches any sequence of characters.  Thus to display
+               information on all available topics, type an asterisk in
+               reply to a prompt.
+
+         \sstitem
+            If a word contains, but does end with an asterisk wild-card,
+               it must not be truncated.
+
+         \sstitem
+            The entered string must not contain leading or embedded
+               spaces.
+
+      }
+      Ambiguous abbreviations result in all matches being displayed.
    }
 }
+\newpage
 \sstroutine{
    POLIMP
 }{
-   Stores information in the POLPACK extension
+   Copies FITS keyword values into the POLPACK extension
 }{
    \sstdescription{
-      This routine should be used to prepare data prior to processing
-      with POLPACK. It records the values of various items of information
-      required by POLPACK (wave-plate position, filter, etc) in the POLPACK
-      extensions of the supplied NDFs. These values can either be supplied
-      explicitly or can be copied ({\tt "}imported{\tt "}) from keywords stored in the
-      FITS extensions of the supplied NDFs. Such keywords may, for instance,
-      be provided by the instrument/telescope control systems.
+      This application should be used to prepare data files prior to
+      processing them with POLPACK. It records the values of various items
+      of information required by POLPACK (half-wave plate position, filter,
+      etc). These values can either be supplied explicitly or can be copied
+      ({\tt "}imported{\tt "}) from FITS keywords stored in the files. Such keywords
+      may, for instance, be provided by the instrument/telescope control
+      systems. The specified values are stored in the POLPACK extensions
+      of the supplied data files for use
 
       The import is controlled by a {\tt "}table{\tt "} which specifies how FITS
       keyword values should be used to create the corresponding POLPACK
@@ -2143,7 +2353,8 @@ The POLPACK routine descriptions are contained in the following pages.
       extension to indicate the state of the processing which has been
       applied to the data. This routine also allows values to be assigned
       to these extra extension items and thus can be used to import partially
-      processed data. POLIMP can be used in conjunction with POLEXP to
+      processed data. POLIMP can be used in conjunction with 
+      \htmlref{POLEXP}{POLEXP} to
       allow data to be moved backwards and forwards between POLPACK and
       other non-NDF based packages.
    }
@@ -2154,20 +2365,22 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          IN = LITERAL (Read)
       }{
-         A list of NDF names. The NDF names should be separated by commas
-         and may include wildcards.
+         A group of data files. This may take the form of a comma separated
+         list, or any of the other forms described in the help on {\tt "}Group
+         Expressions{\tt "}.
       }
       \sstsubsection{
          NAMELIST = LITERAL (Read)
       }{
-         The name of a file to create containing a list of the
-         succesfully processed NDFs. This file can be used when
-         specifying the input NDFs for subsequent applications. [!]
+         The name of a file to create containing a list of the successfully
+         processed data files. This file can be used when specifying the input
+         data files for subsequent applications. No file is created if a null
+         (!) value is given. [!]
       }
       \sstsubsection{
          QUIET = \_LOGICAL (Read)
       }{
-         If FALSE, then the values stored in each NDF are listed as it is
+         If FALSE, then the values stored in each data file are listed as it is
          processed. Otherwise, nothing is written to the screen. [FALSE]
       }
       \sstsubsection{
@@ -2175,33 +2388,32 @@ The POLPACK routine descriptions are contained in the following pages.
       }{
          The name of the file containing the table describing how FITS
          keyword values are to be translated into POLPACK extension
-         items. See the topic {\tt "}Table Format{\tt "} for information on how to
-         create a translation table. If a null value (!) is supplied,
-         then a default table is used which corresponds to the FITS
-         keywords written by POLEXP:
+         items. If a null value (!) is supplied, then the following default
+         table is used which corresponds to the FITS keywords written by
+         \htmlref{POLEXP}{POLEXP}:
 
-            ANGROT      PPCKANGR
-            FILTER      PPCKFILT
-            IMGID       PPCKIMID
-            WPLATE      PPCKWPLT
-            RAY?        PPCKRAY
-            ROTATION?   PPCKROT
-            YROTATION?  PPCKYROT
-            STOKES?     PPCKSTOK
-         [!]
+\hspace*{1in}\makebox[1in][l]{\tt ANGROT}   {\tt PPCKANGR}\\
+\hspace*{1in}\makebox[1in][l]{\tt FILTER}   {\tt PPCKFILT}\\
+\hspace*{1in}\makebox[1in][l]{\tt IMGID}    {\tt PPCKIMID}\\
+\hspace*{1in}\makebox[1in][l]{\tt WPLATE}   {\tt PPCKWPLT}\\
+\hspace*{1in}\makebox[1in][l]{\tt RAY?}     {\tt PPCKRAY}\\
+\hspace*{1in}\makebox[1in][l]{\tt STOKES?}  {\tt PPCKSTOK}
+
+         See the topic {\tt "}Table Format{\tt "} for information on how to create
+         translation tables. [!]
       }
    }
    \sstexamples{
       \sstexamplesubsection{
          polimp in={\tt '}$*${\tt '} table=mytable.dat
       }{
-         This example processes all the NDFs in the current directory
+         This example processes all the data files in the current directory
          using the import control table mytable.dat.
       }
       \sstexamplesubsection{
-         polimp in=$\wedge$names.lis
+         polimp in=$^\wedge$names.lis
       }{
-         This example processes the NDFs listed in the text file
+         This example processes the data files listed in the text file
          {\tt "}names.lis{\tt "} using the default control table appropriate for
          partially processed data which has previously been exported using
          POLEXP.
@@ -2215,7 +2427,7 @@ The POLPACK routine descriptions are contained in the following pages.
          processing the supplied control table.
 
          \sstitem
-         A new Frame is added to the NDF{\tt '}s WCS component and is given the
+         A new Frame is added to the WCS component of each NDF and is given the
          Domain {\tt "}POLANAL{\tt "}. This Frame is formed by rotating the pixel coordinates
          Frame so that the first axis is parallel to the analyser axis. The
          angle of rotation is given by the ANGROT item in the POLPACK extension
@@ -2227,9 +2439,9 @@ The POLPACK routine descriptions are contained in the following pages.
    }{
       The import control (translation) table is an ordinary text file
       which contains instructions on how to assign values to the components
-      of the POLPACK extension in an NDF. Constant values specified in
+      of the POLPACK extension. Constant values specified in
       the file may be used, or the values may be derived from the values
-      of FITS keywords stored in the FITS extension of the NDF.
+      of FITS keywords stored in the FITS extension.
 
       In its most simple format each line in a FITS control table contains
       the name of a POLPACK extension item, followed by a constant value
@@ -2237,19 +2449,24 @@ The POLPACK routine descriptions are contained in the following pages.
       or constant, to be assigned to the specified extension item. Some
       examples:
 
-         ANGROT             ANROTA
 
-      This copies the value of the FITS keyword ANROTA from the FITS
+\hspace*{1in}\makebox[1in][l]{\tt ANGROT} {\tt ANROTA}\\
+
+
+       This copies the value of the FITS keyword ANROTA from the FITS
       extension to the ANGROT component in the POLPACK extension.
 
-         ANGROT             45.0
 
-      This assigns the value 45.0 to the ANGROT component of the POLPACK
+\hspace*{1in}\makebox[1in][l]{\tt ANGROT} {\tt 45.0}\\
+
+
+       This assigns the value 45.0 to the ANGROT component of the POLPACK
       extension.
 
-         IMGID              {\tt "}M51\_PLATEB{\tt "}
 
-      This assigns the value M51\_PLATE to the IMGID component of the
+\hspace*{1in}\makebox[1in][l]{\tt IMGID} {\tt "}M51\_PLATEB{\tt "}\\
+
+       This assigns the value M51\_PLATE to the IMGID component of the
       POLPACK extension. Note, textual constants must be enclosed within
       quotes.
 
@@ -2260,36 +2477,54 @@ The POLPACK routine descriptions are contained in the following pages.
       lines with the following form in the control table prior to the
       function reference:
 
-         Data-type          FITS-keyword
 
-      Here {\tt "}Data-type{\tt "} must be one of \_INTEGER, \_REAL, \_DOUBLE, \_WORD, \_BYTE,
+\hspace*{1in}\makebox[1in][l]{\tt Data-type} {\tt FITS-keyword}\\
+
+       Here {\tt "}Data-type{\tt "} must be one of \_INTEGER, \_REAL, \_DOUBLE, \_WORD, \_BYTE,
       \_CHAR. So for instance if you wanted to assign a value to the ANGROT
       extension item, the orientation of the analyser in degrees, from the
       FITS keyword ROTA which gives the required value in radians, you
       could use this sequence of commands:
 
-         \_REAL             ROTA
-         ANGROT            57.29578$*$ROTA
 
-      The function may use any of the usual Fortran operators; $+$, -, $*$, /,
-      $*$$*$ and built-in functions (SIN, COS, TAN, LOG, etc). See SUN/61
-      (appendix A) for complete details.
+\hspace*{1in}\makebox[1in][l]{\tt \_REAL} {\tt ROTA}\\
+\hspace*{1in}\makebox[1in][l]{\tt ANGROT} {\tt 57.29578$*$ROTA}\\
 
-      Characters strings cannot be manipulated by these functions so a single
-      special format for translating their values is provided. The name
-      of the destination extension item is given as usual followed by a
-      FITS-keyword which supplies the string to be translated. This is then
-      followed by statements which translate an {\tt "}input{\tt "} string into an
-      {\tt "}output{\tt "} string. So for instance if you wanted to translate waveplate
-      positions to the equivalent strings recognised by POLPACK you might
-      use something like:
+       The function may use any of the usual Fortran operators; $+$, -, $*$, /,
+      $*$$*$ and built-in functions (SIN, COS, TAN, LOG, etc). See 
+      \xref{SUN/61}{sun61}{} (appendix A) for complete details.
 
-         WPLATE     WAVEPLT  A=0.0 -
-                             B=22.5 -
-                             C=45.0 -
-                             D=67.5
+      Characters strings cannot be manipulated by these functions so two
+      special formats for translating their values are provided.
+      The first form allows for the concatenation of keywords and
+      the second the translation from a known word to another
+      (which is usually one of the POLPACK special names). The
+      concatenation form looks like:
 
-      This does a case insensitive comparison between the value of the FITS
+
+\hspace*{1in}\makebox[1in][l]{\tt \_INTEGER} {\tt OBSNUM}\\
+\hspace*{1in}\makebox[1in][l]{\tt \_INTEGER} {\tt IDATE}\\
+\hspace*{1in}\makebox[1in][l]{\tt IMGID} {\tt OBSNUM//IDATE}\\
+
+       Which results in the IMGID extension item being set to the
+      concatenation of the values of the FITS keywords OBSNUM and
+      IDATE (you can concatentate more than two values). Note, conversion
+      of numeric values to character strings occurs automatically.
+
+      In the second special form, the name of the destination extension item
+      is given as usual followed by a FITS-keyword which supplies the string
+      to be translated. This is then followed by statements which translate
+      an {\tt "}input{\tt "} string into an {\tt "}output{\tt "} string. So for instance if you
+      wanted to translate waveplate positions to the equivalent strings
+      recognised by POLPACK you might use something like:
+
+
+\hspace*{1in}\makebox[1in][l]{\tt WPLATE} {\tt WAVEPLT  A=0.0 -}\\
+\hspace*{1in}\makebox[1in][l]{}           {\tt B=22.5 -}\\
+\hspace*{1in}\makebox[1in][l]{}           {\tt C=45.0 -}\\
+\hspace*{1in}\makebox[1in][l]{}           {\tt D=67.5}\\
+
+       This does a case insensitive comparison between the value of the FITS
       keyword WAVEPLT and the strings on the left hand sides of the equals
       signs ({\tt "}A{\tt "}, {\tt "}B{\tt "}, etc), If a match is found, it assigns the value from
       the right hand side of the equals sign ({\tt "}0.0{\tt "}, {\tt "}22.5{\tt "}, etc, these
@@ -2317,8 +2552,9 @@ The POLPACK routine descriptions are contained in the following pages.
       to its default value if it has one, or left undefined otherwise (see
       below). For instance:
 
-         RAY?  OLDRAY
-         RAY?  PPCKRAY
+
+\hspace*{1in}\makebox[1in][l]{\tt RAY?} {\tt OLDRAY}\\
+\hspace*{1in}\makebox[1in][l]{\tt RAY?} {\tt PPCKRAY}\\
 
       causes the POLPACK extension item RAY to be assigned the value of the
       FITS keyword PPCKRAY if the keyword has a value in the FITS
@@ -2334,113 +2570,75 @@ The POLPACK routine descriptions are contained in the following pages.
       placed anywhere and should start with the characters {\tt "}\#{\tt "} or {\tt "}!{\tt "}.
       Continuation onto a new line is indicated by use of {\tt "}-{\tt "}.
    }
-   \sstdiytopic{
-      POLPACK extension items
-   }{
-      The POLPACK extension of an NDF may contain the following items.
-      The names and types of the extension items are those as used in
-      import tables. Of these, ANGROT, FILTER, WPLATE and possibly IMGID
-      are the only ones that most users need be concerned with. Values
-      should be assigned to these extension items before processing of
-      raw data commences. Their values will often be derived from FITS
-      headers written by the instrument/telescope control system. Values
-      for the remaining extension items are produced by POLPACK as the
-      processing proceeds and need only be included in the control
-      table if you are importing partially processed data.
-
-      Some extension items have default values which are used if the
-      control table does not specify a value for them. These are
-      indicated in the descriptions below:
-
-         ANGROT (\_REAL):  The anti-clockwise angle from the first axis of
-         the image to the analyser position corresponding to WPLATE=0.0,
-         in degrees. Defaults to 0.0.
-
-         FILTER (\_CHAR):  The filter name. If a value is supplied, then
-         the value of WPLATE is appended to it (unless the filter already
-         includes the WPLATE value). This value is also copied to the FILTER
-         item in the CCDPACK extension. Defaults to the value of WPLATE.
-
-         IMGID (\_CHAR):  An arbitrary textual identifier for each input
-         image, used to associate corresponding O and E ray images. It must
-         be unique amongst the input images. Defaults to the name of the
-         input image.
-
-         RAY (\_CHAR):  This item should only be specified in the control
-         table if the images being imported are partially processed images
-         which have been split into separate O and E ray images. It
-         identifies which ray the image is derived from, and can take the
-         two values {\tt "}O{\tt "} and {\tt "}E{\tt "} (upper case). Left undefined by default.
-
-         ROTATION (\_REAL):  This item should only be specified in the
-         control table if the images being imported are partially processed
-         images which have already been aligned. It is the clockwise
-         rotation introduced into the image in order to align it with other
-         images, in degrees. Left undefined by default.
-
-         STOKES (\_CHAR):  This item should only be specified in the
-         control table if the images being imported are partially processed
-         images containing Stokes parameters. It is a string containing one
-         character for each plane in the data array of the NDF. Each
-         character identifies the quantity stored in the corresponding plane
-         of the data array, and will be one of I, Q, U or V. Left
-         undefined by default.
-
-         WPLATE (\_CHAR):  The wave-plate position, in degrees. Must be one
-         of; {\tt "}0.0{\tt "}, {\tt "}22.5{\tt "}, {\tt "}45.0{\tt "}, {\tt "}67.5{\tt "}. There is no default (an error
-         is reported if no value is supplied).
-
-         YROTATION (\_REAL): This item should only be specified in the
-         control table if the images being imported are partially processed
-         images which have already been aligned, and if the final map may
-         contain shear. It gives the clockwise rotation in degrees of the
-         Y axis introduced into the image in order to align it with other
-         images. In this case the ROTATION item (see above) is understood
-         as giving the rotation of the X axis. Left undefined by default.
-   }
 }
+\newpage
 \sstroutine{
    POLKA
 }{
-   Extract and align O and E ray areas from a set of images
+   Creates Stokes vectors from a set of intensity frames
 }{
    \sstdescription{
-      This routine extracts and aligns areas containing corresponding rays
-      from a set of images containing dual or single beam polarimetry data.
-      It can also perform sky subtraction based either on a set of
-      supplied sky frames, or on user-specified background areas within
-      the object frames.
+      This application converts a set of intensity frames into a cube
+      containing a Stokes vector for every measured pixel on the sky. It
+      may also be used as an image alignment tool for non-polarimetric
+      data (see parameter POL).
 
-      In dual-beam mode, two output images are created for each
-      supplied input image, one containing the O-ray areas and the other
-      containing the E-ray areas from the corresponding input image. All
-      output images are aligned pixel-for-pixel. In single-beam mode, only
-      one output image is created for each input image.
+      The main processes applied to the data are:
 
-      The mappings between rays and images are determined from a set of
-      fiducial positions supplied by the user, using an integrated
-      graphical user interface (GUI) which activates various applications
-      from the KAPPA, CCDPACK and POLPACK packages. The same GUI is used to
-      specify masks enclosing the O and E ray areas of each image (each mask
-      comprises one or more polygonal areas). For each input image, the
-      contents of the O-ray mask is copied to the corresponding {\tt "}O-ray{\tt "}
-      output, and the contents of the E-ray mask is copied to the corresponding
-      {\tt "}E-ray{\tt "} output. In single-beam mode only a single mask is used
-      (notionally the {\tt "}O-ray{\tt "} mask), but the user has the option of not
-      supplying any mask at all, in which case the whole input image is
-      copied to the output.
+      1) Extraction of the required sub-regions from each input frame.
 
-      Various options controlling the behaviour of the GUI can be set on
-      the command line by assigning values to the parameters listed below.
-      Alternatively, they can be set using the {\tt "}Options{\tt "} menu in the menu
-      bar at the top of the GUI. If not supplied on the command line, these
-      parameters usually adopt the values they had on the previous
-      invocation of Polka. The values shown in square brackets in the
-      parameter descriptions below are the initial default values.
+      2) Alignment of all extracted sub-regions using stars within the field.
 
-      Detailed information on the operation of Polka and how to use the GUI
-      is available by clicking on the {\tt "}Help{\tt "} button at the right hand end of
-      the menu bar.
+      3) Sky subtraction within each aligned sub-region.
+
+      4) Calculation of a Stokes vector for each pixel.
+
+      In the current version of POLKA, step 4) is only available when
+      processing dual-beam data (see parameter DUALBEAM). It is hoped that
+      the next release will remove this restriction.
+
+      The inputs to this application are a set of intensity frames which
+      have been corrected to remove any instrumental effects
+      introduced by the detector (such as de-biassing, flat-fielding, etc).
+      Output Stokes vectors can only be produced if all input frames contain
+      a POLPACK extension (see application \htmlref{POLIMP}{POLIMP}). In dual-beam mode, each
+      input frame contains two images of the sky (the O and E ray images).
+      In single-beam mode, each input frame contains only a single image of
+      the sky.
+
+      The outputs from this application consist of the aligned,
+      sky-subtracted intensity images, and the cube holding the Stokes
+      vectors. In dual beam mode two output intensity frames are created
+      for each input frame, one containing the O ray image, and the other
+      containing the E ray image. In single-beam mode one output intensity
+      frame is created for each input frame, holding the usable area of
+      the corresponding input frame. The user may choose not to create
+      any or all of these outputs. For instance, the Stokes vectors may
+      be produced without retaining the aligned intensity images (see
+      parameters OUT\_S, OUT\_E, OUT\_O and OUT).
+
+      Use of this application divides into two stages. In the first stage, a
+      Graphical User Interface (GUI) is used to obtain all the information
+      required to produce the output data files from the user. This includes
+      identifying stars, masks and sky regions on each of the supplied input
+      images. This is the labour-intensive bit. Once this has been completed to
+      the satisfaction of the user, the second stage is entered in which the
+      output data files are created. Once initiated, no further interaction on
+      the part of the user is required. This is the computationally intensive
+      bit. The GUI makes use of various applications from POLPACK, \xref{KAPPA}{sun95}{} and
+      \xref{CCDPACK}{sun139}{} to perform all these tasks.
+
+      A step-by-step tutorial on the use of the GUI is available within the
+      {\tt "}Help{\tt "} menu at the right hand end of the menu bar (see also the STARTHELP
+      parameter).
+
+      Various options controlling the behaviour of the GUI can be set on the
+      command line by assigning values to the parameters listed below.
+      Alternatively, most of them can be set using the {\tt "}Options{\tt "} menu in the
+      menu bar at the top of the GUI. If not supplied on the command line,
+      these parameters usually adopt the values they had on the previous
+      invocation of POLKA. The values shown in square brackets in the parameter
+      descriptions below are the initial default values.
    }
    \sstusage{
       polka in out\_s [skyframes]
@@ -2449,16 +2647,16 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          BADCOL = LITERAL (Update)
       }{
-         The colour with which to represent missing data. This should be
-         one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
-         unambiguous abbreviation can be supplied, and the value is
-         case-insensitive. [CYAN]
+         The colour with which to represent missing data in the image
+         display. This should be one of RED, BLUE, GREEN, CYAN, MAGENTA,
+         YELLOW, BLACK. Any unambiguous abbreviation can be supplied, and
+         the value is case-insensitive. [CYAN]
       }
       \sstsubsection{
          CURCOL = LITERAL (Update)
       }{
-         The colour with which to mark the objects (i.e. image features
-         or masks) currently being entered by the user. This should be
+         The colour with which to mark the objects (i.e. image features and
+         masks) currently being entered by the user. This should be
          one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
          unambiguous abbreviation can be supplied, and the value is
          case-insensitive. [RED]
@@ -2467,7 +2665,7 @@ The POLPACK routine descriptions are contained in the following pages.
          DPI = \_INTEGER (Read)
       }{
          The dots per inch on the display screen. Some X servers fail to
-         supply the correct value, resulting in the GUI being unplesantly
+         supply the correct value, resulting in the GUI being unpleasantly
          small or large. For this reason, an explicit value may be supplied
          using this parameter. If a null (!) value is supplied, then the
          DPI value returned by the X server is used. This parameter may
@@ -2478,50 +2676,48 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          DUALBEAM = \_LOGICAL (Read)
       }{
-         If a true value is suplied, then Polka will operate in
+         If a TRUE value is supplied, then POLKA will operate in
          dual-beam mode, producing two output images for each input image.
          Otherwise, it will operate in single-beam mode, with one output
          image being produced for each input image. In single-beam mode,
          the output image is notionally referred to as the {\tt "}O-ray{\tt "} image,
          and all the GUI controls related to the E-ray areas are disabled.
-         Note, this parameter cannot be set from the GUI{\tt '}s {\tt "}Options{\tt "}
-         menu. [TRUE]
+         This parameter is only used when processing polarimeter data
+         (see parameter POL). It{\tt '}s value cannot be set from the
+         {\tt "}Options{\tt "} menu within the GUI. [TRUE]
       }
       \sstsubsection{
          FITTYPE = \_INTEGER (Update)
       }{
          The type of mapping which should be used between images. This
-         may take the following values:
+         may take any of the following values:
 
-         1 - Shift of origin.
+         1 - Shift of origin.\\
+         2 - Shift of origin and rotation.\\
+         3 - Shift of origin and magnification.\\
+         4 - Shift of origin, rotation and magnification.\\
+         5 - A full 6 parameter mapping of the form:\\
 
-         2 - Shift of origin and rotation.
+         \hspace*{5mm} X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in\\
+         \hspace*{5mm} Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in\\
 
-         3 - Shift of origin and magnification.
-
-         4 - Shift of origin, rotation and magnification.
-
-         5 - A full 6 parameter mapping of the form:
-
-               X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in
-               Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in
-
-             This form of mapping allows the rotation and magnification
-             to be different for each axis, and is unlikely to be of use
-             with most polarimetry data. [1]
+         Only mapping types 1 and 3 are available when processing
+         polarimeter data (see parameter POL). [1]
       }
       \sstsubsection{
          HELPAREA = \_LOGICAL (Update)
       }{
-         If a true value is supplied, then dynamic help information will be
+         If a TRUE value is supplied, then dynamic help information will be
          displayed in a box at the bottom of the GUI. This information
-         describes the component of the GUI currently under the mouse
-         pointer. [TRUE]
+         is continuously updated to describe the control or area currently
+         under the mouse pointer. [TRUE]
       }
       \sstsubsection{
          IN = NDF (Read)
       }{
-         A list of input images. Note, the input images cannot be
+         A group of input intensity frames. This may take the form of a
+         comma separated list, or any of the other forms described in the
+         help on {\tt "}Group Expressions{\tt "}. Note, the input frames cannot be
          specified within the GUI.
       }
       \sstsubsection{
@@ -2545,62 +2741,69 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          NEWCOLMAP = \_LOGICAL (Read)
       }{
-         If a true value is supplied for NEWCOLMAP, then the GUI will use
-         its own private colour map. Otherwise it will share the standard
-         colour map. Note, with a false value for NEWCOLMAP, there may
+         If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
+         its own private X colour map. Otherwise it will share the standard
+         X colour map. Note, with a FALSE value for NEWCOLMAP, there may
          be insufficient free colours in the standard colour map (i.e. if
-         other X applications are running). In this case polka will report
+         other X applications are running). In this case POLKA will report
          an error and abort. If this happens, try re-running with a true
-         value for NEWCOLMAP. [FALSE]
+         value for NEWCOLMAP. Note, when using a private X colour map, the
+         cursor must be over the POLKA window to see the {\tt "}correct{\tt "} colours.
+         [FALSE]
       }
       \sstsubsection{
          OEFITTYPE = \_INTEGER (Update)
       }{
          The type of mapping which should be used between O and E rays. See
-         parameter FITTYPE for a description of the allowed values. [1]
+         parameter FITTYPE for a description of the allowed values. This
+         parameter is only accessed when processing polarimeter data (see
+         parameter POL). [1]
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         A group specifying the names of the output intensity images to
+         create in single-beam mode, or when processing non-polarimeter
+         data (see parameters DUALBEAM and POL). The specified names should
+         correspond one-for-one to the input images. See the help on {\tt "}Group
+         Expressions{\tt "} for information on the allowed formats for this list.
+         Any asterisk within the supplied string is replaced in turn by
+         each of the input image names. If a null (!) value is given, then
+         the intensity images are not saved. Note, the output images cannot
+         be specified within the GUI.
+      }
+      \sstsubsection{
+         OUT\_E = LITERAL (Write)
+      }{
+         A group specifying the names of the E-ray output intensity images to
+         create in dual-beam mode (see parameter DUALBEAM). These should
+         correspond one-for-one to the input images. See the help on {\tt "}Group
+         Expressions{\tt "} for information on the allowed formats for this list.
+         Any asterisk within the supplied string is replaced in turn by
+         each of the input image names. If a null (!) value is given, then
+         the E-ray intensity images are not saved. Note, the output images
+         cannot be specified within the GUI.
+      }
+      \sstsubsection{
+         OUT\_O = LITERAL (Write)
+      }{
+         A group specifying the names of the O-ray output intensity images to
+         create in dual-beam mode (see parameter DUALBEAM). These should
+         correspond one-for-one to the input images. See the help on {\tt "}Group
+         Expressions{\tt "} for information on the allowed formats for this list.
+         Any asterisk within the supplied string is replaced in turn by
+         each of the input image names. If a null (!) value is given, then
+         the E-ray intensity images are not saved. Note, the output images
+         cannot be specified within the GUI.
       }
       \sstsubsection{
          OUT\_S = NDF (Write)
       }{
          The name of the output cube to hold the Stokes parameters
          calculated from the input images. If a null value is given then
-         no Stokes parameters are calculated. Note, the output images
-         cannot be specified within the GUI.
-      }
-      \sstsubsection{
-         OUT = LITERAL (Write)
-      }{
-         This parameter is only used if parameter DUALBEAM
-         is given a false value. It is a list of the names of the
-         output images to create in single-beam mode, holding aligned
-         intensity values from the input images. These should correspond
-         one-for-one to the input images supplied using parameter IN. If
-         a null (!) value is given, then no intensity images are created.
-         Note, the output images cannot be specified within the GUI.
-      }
-      \sstsubsection{
-         OUT\_E = LITERAL (Write)
-      }{
-         This parameter is only used if parameter DUALBEAM is given a
-         true value. It is a list of the
-         names of the E-ray output images to create in dual-beam mode,
-         holding aligned E-ray intensity values from the input images. These
-         should correspond one-for-one to the input images supplied using
-         parameter IN. If  a null (!) value is given, then no E-ray intensity
-         images are created. Note, the output images cannot be specified
-         within the GUI.
-      }
-      \sstsubsection{
-         OUT\_O = LITERAL (Write)
-      }{
-         This parameter is only used if parameter DUALBEAM is given a
-         true value. It is a list of the
-         names of the O-ray output images to create in dual-beam mode,
-         holding aligned O-ray intensity values from the input images. These
-         should correspond one-for-one to the input images supplied using
-         parameter IN. If  a null (!) value is given, then no O-ray intensity
-         images are created. Note, the output images cannot be specified
-         within the GUI.
+         no Stokes parameters are calculated. Note, the output cube
+         cannot be specified within the GUI. This parameter is only
+         accessed when processing polarimeter data (see parameter POL).
       }
       \sstsubsection{
          PERCENTILES( 2 ) = \_REAL (Update)
@@ -2608,6 +2811,18 @@ The POLPACK routine descriptions are contained in the following pages.
          The percentiles that define the scaling limits for the displayed
          images. For example, [25,75] would scale between the quartile
          values. [5,95]
+      }
+      \sstsubsection{
+         POL = \_LOGICAL (Read)
+      }{
+         Indicates the nature of the input Frames. Input frames containing
+         non-polarimeter data may be aligned and sky subtracted using POLKA
+         if parameter POL is assigned a FALSE value. This indicates that the
+         input intensity frames are not to be treated as polarimeter data. In
+         this case, a wider range of mappings are available (see parameter
+         FITTYPE) when aligning the input frames, but Stokes vectors may not
+         be produced (see parameter OUT\_S). The use of the GUI is the same as
+         in single-beam mode (see parameter DUALBEAM). [TRUE]
       }
       \sstsubsection{
          PSFSIZE = \_INTEGER (Update)
@@ -2640,15 +2855,15 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          SKYFRAMES = NDF (Read)
       }{
-         A list of sky frames. These frames are subtracted from the
-         supplied object frames before the output images are created. If only
-         one sky frame is supplied, then it is used for all the object
-         frames. Otherwise, the number of sky frames must equal the
-         number of supplied object frames, and must be given in the same
-         order. If a null value (!) is given for SKYFRAMES, then the sky
-         background to be subtracted from each output image is determined
-         by fitting a surface to sky areas identified by the user within
-         the supplied object frames. [!]
+         A group specifying the sky frames to use. These frames are subtracted
+         from the supplied object frames before the output images are created.
+         If only one sky frame is supplied, then it is used for all the object
+         frames. Otherwise, the number of sky frames must equal the number of
+         supplied object frames, and must be given in the same order. If a
+         null value (!) is given for SKYFRAMES, then the sky background to be
+         subtracted from each output image is determined by fitting a surface
+         to sky areas identified by the user within the supplied object
+         frames. [!]
       }
       \sstsubsection{
          SKYPAR = \_INTEGER (Update)
@@ -2664,7 +2879,7 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          SKYOFF = \_LOGICAL (Update)
       }{
-         If a true value is supplied, then the sky background is removed
+         If a TRUE value is supplied, then the sky background is removed
          from each output image. Otherwise, no sky background is removed.
          The method used to estimate the sky background is determined by
          the SKYFRAMES parameter. [TRUE]
@@ -2672,8 +2887,8 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          STARTHELP = \_LOGICAL (Read)
       }{
-         If a true value is supplied, then a hyper-text browser will be
-         created with the GUI, displaying the contents page of the Polka
+         If a TRUE value is supplied, then a hyper-text browser will be
+         created with the GUI, displaying the tutorial page of the POLKA
          on-line help documentation. Otherwise, the browser is only created
          if the user accesses the on-line help information explicitly
          from within the GUI by using the {\tt "}Help{\tt "} menu or the F1 key on
@@ -2682,7 +2897,7 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          STATUSAREA = \_LOGICAL (Update)
       }{
-         If a true value is supplied, then information describing the
+         If a TRUE value is supplied, then information describing the
          currently displayed image, current options values, etc, will be
          displayed in a box underneath the displayed image. The contents
          of this box can be selected using the {\tt "}Options{\tt "} menu in the GUI.
@@ -2694,18 +2909,23 @@ The POLPACK routine descriptions are contained in the following pages.
          This controls how images are placed within the image display
          area of the GUI when a new image is selected using the {\tt "}Images{\tt "}
          menu. It may take one of the following values:
+         \sstitemlist{
 
-         ZOOMED - The new image is displayed with the curremt zoom factor
-         and image centre.
+            \sstitem
+               ZOOMED -- The new image is displayed with the current zoom
+               factor and image centre.
 
-         UNZOOMED - The zoom factor and image centre are reset so that
-         the new image just fills the image display area in at least one
-         dimension. [ZOOMED]
+            \sstitem
+               UNZOOMED -- The zoom factor and image centre are reset so that
+               the new image just fills the image display area in at least one
+               dimension.
+            [ZOOMED]
+         }
       }
       \sstsubsection{
          XHAIR = \_LOGICAL (Update)
       }{
-         If a true value is supplied, then a cross hair will be used
+         If a TRUE value is supplied, then a cross hair will be used
          instead of a pointer while the mouse is over the image display
          area. [TRUE]
       }
@@ -2720,23 +2940,24 @@ The POLPACK routine descriptions are contained in the following pages.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polka {\tt '}im1,im2{\tt '} {\tt '}$*$\_o{\tt '} {\tt '}$*$\_e{\tt '}
+         polka {\tt '}im1,im2,im3,im4{\tt '} cube out\_o=! out\_e=!
       }{
-         This example aligns and extracts the O and E ray areas from the two
-         images `im1` and `im2`, subtracts a sky background (estimated
-         from areas within the object frames), and stores the results in
-         the images `im1\_o`, `im1\_e`, `im2\_o` and `im2\_e`. The current
-         values for all other parameters are used.
+         This example aligns and extracts the O and E ray areas from the
+         four images {\tt '}im1{\tt '} to {\tt '}im4{\tt '}, subtracts a sky background from each
+         (estimated from areas within the object frames), and stores the
+         corresponding Stokes vectors in {\tt '}cube{\tt '}. The aligned intensity
+         images are not saved.
       }
       \sstexamplesubsection{
-         polka $\wedge$in.lis out=$\wedge$out.lis dualbeam=no skyframes=$\wedge$sky.lis reset
+         polka $^\wedge$in.lis out=$^\wedge$out.lis out\_s=! dualbeam=no skyframes=$^\wedge$sky.lis reset
       }{
          This example uses single-beam mode. It reads the names of input
-         images from the text file `in.lis`, subtracts the sky frames
-         read from the text file `sky.lis`, aligns them and stores
-         them in the images named in the text file `out.lis`. All
+         images from the text file {\tt '}in.lis{\tt '}, subtracts the sky frames
+         read from the text file {\tt '}sky.lis{\tt '}, aligns them and stores
+         them in the images named in the text file {\tt '}out.lis{\tt '}. All
          other parameters are reset to their initial default values listed
-         in the parameter descriptions above.
+         in the parameter descriptions above. No Stokes vectors are
+         produced.
       }
    }
    \sstnotes{
@@ -2747,46 +2968,42 @@ The POLPACK routine descriptions are contained in the following pages.
          output intensity images (the extension is first created if it does
          not already exist):
 
-      }
-      ROTATION (\_REAL): The clockwise rotation from the input
-      image to the output image (in degrees). If the input image already
-      contains a POLPACK extension, then the value of ROTATION written to the
-      output image is the sum of the input image value and the value
-      implied by the new mapping.
+         \sstitemlist{
+            \sstitem
+              RAY -- A string identifying which of the two rays the image
+              contains. This will be either {\tt "}O{\tt "} or {\tt "}E{\tt "}. This is only written in
+              dual-beam mode (see parameter DUALBEAM).
 
-      YROTATION (\_REAL): This component is only written to the extension
-      if the output image may contain shear. It is the clockwise
-      rotation from the input image Y axis to the output image Y axis (in
-      degrees). In this case the ROTATION component (see above) is understood
-      as giving the rotation of the X axis. If the input image already
-      contains a POLPACK extension, then the value of YROTATION written to the
-      output image is the sum of the input image value and the value
-      implied by the new mapping.
+            \sstitem
+              IMGID -- An string identifier for the input image from which the
+              output image was derived. If the input image already contains a
+              POLPACK extension with a IMGID value, then the IMGID value is copied
+              unchanged to the corresponding output images. Otherwise, the name of
+              the input image (without a directory path) is used.
 
-      RAY (\_CHAR): A label identifying which of the two rays the image
-      contains. This will be either {\tt "}O{\tt "} or {\tt "}E{\tt "}. This is only written in
-      dual-beam mode (see parameter DUALBEAM).
-
-      IMGID (\_CHAR): An identifier for the input image from which the
-      output image was derived. If the input image already contains a
-      POLPACK extension with a IMGID value, then the IMGID value is copied
-      unchanged to the corresponding output images. Otherwise, the name of
-      the input image (without a directoty path) is used.
-
-      \sstitemlist{
+            \sstitem
+              ANGROT -- The anti-clockwise angle from the first axis of the
+              image to the analyser axis. This value is only written if the input
+              image already contains an ANGROT value, in which case the input value
+              is modified to take account of any rotation introduced by the mapping.
+         }
 
          \sstitem
          The following components are added to the POLPACK extension in the
          output cube holding Stokes parameter (the extension is first created
          if it does not already exist):
 
+         \sstitemlist{
+            \sstitem
+              STOKES -- A string containing one character for each plane in
+              the data cube. Each character identifies the quantity
+              stored in the corresponding plane of the data array, and will be one
+              of I, Q, U or V.
+         }
       }
-      STOKES (\_CHAR):  A string containing one character for each plane in
-      the data array of the NDF. Each character identifies the quantity
-      stored in the corresponding plane of the data array, and will be one
-      of I, Q, U or V. Left undefined by default.
    }
 }
+\newpage
 \sstroutine{
    POLPLOT
 }{
@@ -2811,13 +3028,13 @@ The POLPACK routine descriptions are contained in the following pages.
          ANGROT = \_REAL (Read)
       }{
          A rotation angle in degrees to be added to each vector
-         orientation before plotting the vectors (see parameter COLANG).
-         It should be in the range 0--360. [0.0]
+         orientation before plotting the vectors (see parameters
+         COLANG and NEGATE). It should be in the range 0--360. [0.0]
       }
       \sstsubsection{
          ARROW = LITERAL (Read)
       }{
-         Vectors are drawn as arrows with the size of the arrow head
+         Vectors are drawn as arrows, with the size of the arrow head
          specified by this parameter. Simple lines can be drawn by setting
          the arrow head size to zero. The value should be expressed as a
          fraction of the largest dimension of the vector map. [0.0]
@@ -2826,13 +3043,16 @@ The POLPACK routine descriptions are contained in the following pages.
          AXES = \_LOGICAL (Read)
       }{
          TRUE if labelled and annotated axes are to be drawn around the
-         plot.  [TRUE]
+         vector map, showing the coordinate Frame specified by parameter
+         COSYS. The appearance of the axes can be controlled using
+         the STYLE parameter. [TRUE]
       }
       \sstsubsection{
          CAT = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see SUN/181).
+         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A 
+         file type of .FIT is assumed if no file type is supplied.
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
@@ -2843,10 +3063,15 @@ The POLPACK routine descriptions are contained in the following pages.
          on top of an existing DATA picture, then set CLEAR to FALSE. The
          vector map will then be drawn in alignment with the displayed
          data. If possible, alignment occurs within the coordinate Frame
-         specified by parameter COSYS. If this is not possible, (for instance
-         if suitable WCS information was not available when the existing DATA
-         picture was created), then a warning is issued, and alignment
-         occurs in pixel coordinates (again if possible). [TRUE]
+         specified using parameter COSYS. If this is not possible, (for
+         instance if suitable WCS information was not available when the
+         existing DATA picture was created), then an alignment is attempted
+         in PIXEL coordinates. If this is not possible, then alignment is
+         attempted in GRID coordinates. If this is not possible, then
+         alignment is attempted in the first suitable Frame in the catalogue
+         irrespective of its Domain. A message is displayed indicating the
+         Domain in which alignment occurred. If there are no suitable Frames
+         in the catalogue then an error is reported. [TRUE]
       }
       \sstsubsection{
          COLANG = LITERAL (Read)
@@ -2854,10 +3079,10 @@ The POLPACK routine descriptions are contained in the following pages.
          The name of the catalogue column holding the orientation of each
          vector. The values are considered to be in units of degrees unless
          the UNITS attribute of the column has the value {\tt "}Radians{\tt "} (case
-         insensitive).  The positive Y axis defines zero orientation, and
+         insensitive).  The positive X axis defines zero orientation, and
          rotation from the X axis to the Y axis is considered positive.
          A list of available column names is displayed if a non-existent
-         column name is given. [THETA]
+         column name is given. [ANG]
       }
       \sstsubsection{
          COLMAG = LITERAL (Read)
@@ -2882,7 +3107,7 @@ The POLPACK routine descriptions are contained in the following pages.
          existing picture (in the coordinate Frame given by parameter COSYS).
          This will only be possible if the catalogue contains information
          about coordinate Frames in the form of an AST FrameSet (see
-         SUN/210). [X]
+         \xref{SUN/210}{sun210}{}). [X]
       }
       \sstsubsection{
          COLY = LITERAL (Read)
@@ -2893,16 +3118,18 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          COSYS = GROUP (Read)
       }{
-         This gives the co-ordinate Frame to be displayed along annotated
-         axes. The supplied value will usually be a Domain name such as
+         This gives the co-ordinate Frame to be displayed along the annotated
+         axes (see parameter AXES). The supplied value will usually be a
+         Domain name such as
          SKY, AXIS, PIXEL, etc, but more specific Frame descriptions can
          also be given by supplying a group of {\tt "}name=value{\tt "} strings where
-         {\tt "}name{\tt "} is the name of an AST Frame attribute (see SUN/210), and
+         {\tt "}name{\tt "} is the name of an AST Frame attribute (see
+         \xref{SUN/210}{sun210}{}), and
          {\tt "}value{\tt "} is the value to assign to it. In addition, IRAS90 Sky
          Coordinate System (SCS) values (such as {\tt "}EQUATORIAL(J2000){\tt "},
-         {\tt "}GALACTIC{\tt "}, etc - see SUN/163) can be given. Domains {\tt "}WORLD{\tt "} and
+         {\tt "}GALACTIC{\tt "}, etc - see \xref{SUN/163}{sun163}{}) can be given. Domains {\tt "}WORLD{\tt "} and
          {\tt "}DATA{\tt "} are taken as synonyms for {\tt "}PIXEL{\tt "} and {\tt "}AXIS{\tt "} (unless the
-         catalogue contains explicit definitons for the {\tt "}WORLD{\tt "} and {\tt "}DATA{\tt "}
+         catalogue contains explicit definitions for the {\tt "}WORLD{\tt "} and {\tt "}DATA{\tt "}
          Domains). The available coordinate Frames are defined by an AST
          FrameSet (see SUN/210) in the supplied catalogue. If the catalogue
          does not contain a FrameSet, then a default FrameSet is used
@@ -2934,17 +3161,21 @@ The POLPACK routine descriptions are contained in the following pages.
       }{
          The justification for each vector; it can take any of the
          following values:
+         \sstitemlist{
 
-          {\tt "}Centre{\tt "} - the vectors are drawn centred on the
-                     corresponding pixel coordinates.
+            \sstitem
+               CENTRE -- the vectors are drawn centred on the
+               corresponding pixel coordinates.
 
-          {\tt "}Start{\tt "}  - the vectors are drawn starting at the
-                     corresponding pixel coordinates.
+            \sstitem
+               START -- the vectors are drawn starting at the
+               corresponding pixel coordinates.
 
-          {\tt "}End{\tt "}    - the vectors are drawn ending at the corresponding
-                     pixel coordinates.
-
-         [{\tt "}Centre{\tt "}]
+            \sstitem
+               END -- the vectors are drawn ending at the corresponding
+               pixel coordinates.
+            [{\tt "}Centre{\tt "}]
+         }
       }
       \sstsubsection{
          KEY = \_LOGICAL (Read)
@@ -2959,7 +3190,7 @@ The POLPACK routine descriptions are contained in the following pages.
          hand edge of the key. The second value gives the vertical position of
          the top of the key. If the second value is not given, the top of
          the key is placed level with the top of the vector map. Both
-         values should be in the range 0.0 to 1.0. [0.15]
+         values should be in the range 0.0 to 1.0. [0.03]
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
@@ -2977,10 +3208,9 @@ The POLPACK routine descriptions are contained in the following pages.
          of the value 1). The length of the example vector is formatted as an
          axis 2 value (using attribute FORMAT(2), etc - the synonym VECTOR
          can be used in place of the value 2). A null (!) value causes the
-         key style used on the previous invocation of contour to be
+         key style used on the previous invocation of POLPLOT to be
          re-used. If no previous key style is available, or if the keyword
-         RESET is supplied, then the default key style established using
-         application SETSTYLE is used. [!]
+         RESET is supplied, then a default key style is used. [!]
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -2990,16 +3220,32 @@ The POLPACK routine descriptions are contained in the following pages.
          lengths in the plot. []
       }
       \sstsubsection{
+         LBND(2) = \_REAL (Given)
+      }{
+         The coordinates to put at the lower left corner of the plotting
+         area, in the coordinates system specified by parameters COLX and
+         COLY. The suggested value just encloses all the data in the supplied
+         catalogue. []
+      }
+      \sstsubsection{
          PXSIZE = \_REAL (Read)
       }{
          The length (x axis) of the plot in metres. [Maximum that can
-         fit in the current picture whilst preserving square pixels]
+         fit in the current picture while preserving square pixels]
       }
       \sstsubsection{
          PYSIZE = \_REAL (Read)
       }{
          The length (y axis) of the plot in metres. [Maximum that can
-         fit in the current picture whilst preserving square pixels]
+         fit in the current picture while preserving square pixels]
+      }
+      \sstsubsection{
+         NEGATE = \_LOGICAL (Read)
+      }{
+         If a TRUE value is supplied, then the angles giving the
+         orientation of the polarization (i.e. the values in the column
+         specified by parameter COLANG) are negated before adding on any
+         value specified by parameter ANGROT. [FALSE]
       }
       \sstsubsection{
          STYLE = GROUP (Read)
@@ -3008,16 +3254,20 @@ The POLPACK routine descriptions are contained in the following pages.
          a group of comma-separated name=value strings where {\tt "}name{\tt "} is the
          name of a Plot attribute, and {\tt "}value{\tt "} is the value to assign to
          the attribute. Vectors are drawn as {\tt "}Curves{\tt "} but may also be
-         refered to using the synonym {\tt "}Vectors{\tt "} when specifying Plot
-         attributes. Default values are supplied for any attributes
-         which are not specified. If the vectors are being drawn over an
-         existing DATA picture (see parameter CLEAR), then these defaults
-         come from the existing DATA picture. Otherwise, they are inherited
-         from the previous invocation of POLPLOT. If this is the first
-         invocation (or if the options database file has been deleted), or
-         if the keyword RESET is supplied, then the defaults used are those
-         established by KAPPA application SETSTYLE. A null (!) value causes
-         defaults to be used for all attributes. [!]
+         referred to using the synonym {\tt "}Vectors{\tt "} when specifying Plot
+         attributes. Default values are supplied for any attributes which
+         are not specified. These are obtained from the WCS information
+         in the supplied catalogue, or inherited from the previous
+         invocation of POLPLOT. A null (!) value causes defaults to be used
+         for all attributes. [!]
+      }
+      \sstsubsection{
+         UBND(2) = \_REAL (Given)
+      }{
+         The coordinates to put at the top right corner of the plotting
+         area, in the coordinates system specified by parameters COLX and
+         COLY. The suggested value just encloses all the data in the supplied
+         catalogue. []
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
@@ -3029,64 +3279,77 @@ The POLPACK routine descriptions are contained in the following pages.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polplot poltab x y p theta
+         polplot poltab
       }{
          Produces a vector map on the current graphics device with
          vectors defined in the FITS binary table {\tt "}poltab{\tt "}. The magnitudes
-         are taken from column P, the orientations from column THETA, and
-         the coordinates of each vector from columns X and Y. All
-         other settings are defaulted, so for example a key is plotted.
+         are taken from column P, the orientations from column ANG and
+         the coordinates of each vector from columns X and Y.
       }
       \sstexamplesubsection{
-         polplot poltab ra dec p theta angrot=23.4 cosys=eq(B1950)
+         polplot poltab style=$^\wedge$mystyle.dat
       }{
-         Produces a vector map in which the primary axis of the vectors
-         (as defined by the value zero in the column THETA) is at the
+         As above, but the annotated axes and vectors are drawn according
+         to the description given in text file $\backslash$verb$+$mystyle.dat$+$. If this
+         files contains the following lines:
+
+            title=My favorite colours
+            grid=1
+            minticklen=0
+            colour(border)=green
+            colour(grid)=blue
+            colour(vec)=red
+            width(border)=0.05
+
+         then the title is set to {\tt "}My favourite colours{\tt "}; a grid is drawn
+         across the plot instead of tick marks around the edge; the border,
+         grid and vectors are drawn in green, blue and red respectively,
+         and slightly thicker lines are used to draw the border.
+      }
+      \sstexamplesubsection{
+         polplot poltab ra dec noclear angrot=23.4 cosys=eq(B1950)
+      }{
+         Produces a vector map in which the reference direction for the vectors
+         (as defined by the value zero in the column ANG) is at the
          position angle 23.4 degrees (measured anti-clockwise from the
          positive y axis) in the displayed map. The position of each vector
          is specified by columns {\tt "}ra{\tt "} and {\tt "}dec{\tt "}. The annotated axes give
-         equatorial (RA/DEC) coordinates refered to the equinox of B1950.
-         If the vector map is displayed over an existing DATA picture,
-         then the FrameSet associated with the existing picture (in the
-         AGI database) must contain sky coordinate Frame so that the
-         vectors can be aligned with the existing picture.
+         equatorial (RA/DEC) coordinates referred to the equinox of B1950.
+         If the vector map is displayed over an existing DATA picture, then
+         the vector map will be aligned on the sky with the previously
+         displayed data if possible (i.e. the FrameSet associated with the
+         existing picture in the AGI database contains a sky coordinate
+         Frame). If this is not possible, then the vector map will be
+         aligned in pixel or grid coordinates. A message is displayed
+         indicating the domain in which alignment took place.
       }
       \sstexamplesubsection{
-         polplot poltab x y p theta arrow=0.01 just=start nokey
+         polplot poltab arrow=0.01 just=start nokey
       }{
          Produces a vector map in which each vector is represented by an
          arrow, starting at the position of the corresponding pixel.  No key
          to the vector scale and justification is produced.
       }
    }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         Only real data can be processed directly.  Other non-complex
-         numeric data types will undergo a type conversion before the
-         vector plot is drawn.
-      }
-   }
 }
+\newpage
 \sstroutine{
    POLVEC
 }{
    Calculates polarization vectors from supplied Stokes parameters
 }{
    \sstdescription{
-      This routine calculates values of percentage polarization, polarization
+      This application calculates values of percentage polarization, polarization
       angle, total intensity and polarized intensity, based on Stokes
       parameters in the supplied input cube (which will normally have been
-      created by POLCAL). These calculated values may be stored either in
-      a series of 2-dimensional NDFs, or in a single table which may be
-      examined and manipulated using the CURSA package (see SUN/190).
-
-      The Stokes parameters may be binned before calculating the output
-      values.
+      created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}). These 
+      calculated values may be stored either in
+      a series of 2D NDFs, or in a single catalogue which may be
+      examined and manipulated using the \xref{CURSA}{sun190}{} package
+      {\latexonly (see SUN/190)}.
    }
    \sstusage{
-      polvec in cat [p] [theta] [i] [ip]
+      polvec in cat [p] [ang] [i] [ip]
    }
    \sstparameters{
       \sstsubsection{
@@ -3096,28 +3359,51 @@ The POLPACK routine descriptions are contained in the following pages.
          binning the supplied Stokes parameters prior to estimating the
          polarization vectors. If only a single value is given,
          then it will be duplicated so that a square bin is used. A value
-         of 1 produces no binning. If a null (!) value is supplied, then a
-         default is used which gives about 30 square bins along the longest
-         axis. [!]
+         of 1 produces no binning, and causes the origin of the output
+         NDFs and catalogue to be the same as the x-y origin in the input
+         cube (the output origin is set to [0.0,0.0] if any binning is
+         performed).
+
+         Note, if the output vectors are being stored in a catalogue, it
+         is usually better to use the \htmlref{POLBIN}{POLBIN} application 
+         to bin the Stokes vectors. [1]
       }
       \sstsubsection{
          CAT = LITERAL (Read)
       }{
          The name of a catalogue to create, holding the calculated
-         polarization paremeters tabulated at each point for which Stokes
+         polarization parameters tabulated at each point for which Stokes
          parameters are available. If a null (!) value is supplied, then
          no catalogue is created. The catalogue will contain the following
          columns (all stored as single precision \_REAL values):
+         \sstitemlist{
 
-            X     : The pixel X coordinate at the tabulated point.
-            Y     : The pixel Y coordinate at the tabulated point.
-            I     : The total intensity.
-            Q     : The Stokes Q parameter.
-            U     : The Stokes U parameter.
-            P     : The percentage polarization.
-            THETA : The polarization angle (in degrees).
-            PI    : The polarized intensity.
+            \sstitem
+               X  -- The pixel X coordinate at the tabulated point.
 
+            \sstitem
+               Y  -- The pixel Y coordinate at the tabulated point.
+
+            \sstitem
+               I  -- The total intensity.
+
+            \sstitem
+               Q  -- The Stokes Q parameter.
+
+            \sstitem
+               U  -- The Stokes U parameter.
+
+            \sstitem
+               P  -- The percentage polarization.
+
+            \sstitem
+               ANG  -- The polarization angle (anti-clockwise from the X axis
+               to the plane of polarization - in degrees).
+
+            \sstitem
+               PI -- The polarized intensity.
+
+         }
          If VAR is TRUE, then the catalogue will also contain
          additional columns giving the standard deviation on each of the
          tabulated values (excluding the X and Y columns). The names of
@@ -3125,34 +3411,31 @@ The POLPACK routine descriptions are contained in the following pages.
          start of the column names listed above.
 
          When measuring circular polarization, the columns describing Q
-         and U will be replaced by equivalent columns describing V.
+         and U will be replaced by equivalent columns describing V; and
+         the ANG value will be zero if the normalised Stokes parameter V
+         is positive, and 90 otherwise.
 
          The coordinates contained in columns X and Y refer to pixel
-         coordinates after binning (i.e. to the pixel coordinate frames
-         of the output NDFs associated with parameters P, THETA, I, and
-         IP). Information describing the mappings between this coordinate
-         Frame and any other known coordinate Frames will be stored in the
-         catalogue in textual form, as an AST FrameSet (see SUN/210).
+         coordinates after any binning. For this reason it is usually better to avoid
+         binning the Stokes vectors in this application (see parameter BOX).
+         Information describing the mappings between pixel coordinates and
+         any other known coordinate Frames will be stored in the catalogue
+         in textual form, as an AST FrameSet (see \xref{SUN/210}{sun210}{}).
 
          The storage format of the catalogue is determined by the {\tt "}file
          type{\tt "} specified with the file name. If no file type is supplied,
          the catalogue will be stored in the form of a FITS binary table
          with file extension {\tt "}.FIT{\tt "}. Other possibilities are described in
-         SUN/190.
+         \xref{SUN/190}{sun190}{}.
       }
       \sstsubsection{
          DEBIAS = \_LOGICAL (Read)
       }{
          TRUE if a correction for statistical bias is to be made to
-         percentage polarization and polarized intensity. This correction
-         subtracts the variance of the percentage polarization from the
-         squared percentage polarization, and uses the square root of this
-         as the corrected percentage polarization.  The corresponding
-         polarized intensity is then found by multiplying the corrected
-         percentage polarization by the total intensity.  The returned
+         percentage polarization and polarized intensity. The returned
          variance values are unchanged. This correction only applies to
-         calculations of plane polarization, and cannot be used if the
-         input NDF does not contain variance values, or if you supply a
+         calculations of linear polarization, and cannot be used if the
+         input cube does not contain variance values, or if you supply a
          FALSE value for parameter VARIANCE. If a null value (!) is
          supplied, then the correction is applied if output variances
          are being created, and not otherwise.           [!]
@@ -3166,8 +3449,8 @@ The POLPACK routine descriptions are contained in the following pages.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         The 3-d NDF holding the Stokes parameters. This should have been
-         created by POLCAL.
+         The 3D cube holding the Stokes parameters. This should have been
+         created by \htmlref{POLKA}{POLKA} or \htmlref{POLCAL}{POLCAL}.
       }
       \sstsubsection{
          IP = NDF (Write)
@@ -3190,7 +3473,8 @@ The POLPACK routine descriptions are contained in the following pages.
 
             \sstitem
                SIGMA     -- A sigma clipped mean
-            [MEDIAN]
+            Note, only the MEAN method may be used with bins containing more
+            than 100 values. [MEDIAN]
          }
       }
       \sstsubsection{
@@ -3206,9 +3490,10 @@ The POLPACK routine descriptions are contained in the following pages.
          METHOD is set to {\tt "}SIGMA{\tt "}. [4.0]
       }
       \sstsubsection{
-         THETA = NDF (Write)
+         ANG = NDF (Write)
       }{
-         An output NDF holding the polarization angle in degrees. In the
+         An output NDF holding the polarization angle (anti-clockwise from
+         the pixel X axis to the plane of polarization - in degrees). In the
          the case of circular polarization, a value of zero is stored
          if the normalised Stokes parameter V is positive, and a value
          of 90 is stored otherwise. A null value can be supplied if this
@@ -3218,8 +3503,8 @@ The POLPACK routine descriptions are contained in the following pages.
          VARIANCE = \_LOGICAL (Read)
       }{
          TRUE if output variances are to be calculated.  This parameter
-         is only accessed if all input NDFs contain variances, otherwise
-         no variances are generated.  [TRUE]
+         is only accessed if the supplied Stokes cube contains variances,
+         otherwise no variances are generated.  [TRUE]
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -3252,7 +3537,7 @@ The POLPACK routine descriptions are contained in the following pages.
 
 \section{\label{APP:POL}\xlabel{calculatingthepolarization}Calculating the Polarization}
 This section gives a mathematical description of the calculation of the
-degree and orientation of the polarisation, based on the observed
+degree and orientation of the polarization, based on the observed
 intensities. It is assumes that any required corrections (such as
 flat-fielding, sky-subtraction, etc), have already been applied.
 
@@ -3365,7 +3650,7 @@ be found using only two exposures. However, it is usually advisable to
 obtain additional exposures at half-wave plate positions of 45\dgs\ and
 67.5\dgs\ in order to correct for any difference in the sensitivity of
 the two channels of the polarimeter (such as may be produced for instance
-by a polarised flat-field).
+by a polarized flat-field).
 
 \section{\label{APP:FFCOR}\xlabel{flatfieldcorrectionsandtheFFactor}Flat-field
           Corrections, and the E and F-Factors}
@@ -3398,19 +3683,21 @@ The signals measured by the detector (before flat-fielding) are:
 \end{myquote}
 
 where $S_{o}$ and $S_{e}$ are the sensitivities of the detector to the $O$ 
-and $E$ rays (These are independent of $\alpha$, but vary across the
+and $E$ rays (these are independent of $\alpha$, but vary across the
 detector), and $E_{\alpha}$ is an {\em exposure factor} which takes into
-account any differences in exposure time, sky transparency, etc.
+account any differences in exposure time, sky transparency, etc. Note, it
+is assumed that the $O$ and $E$ ray images are in a fixed position
+with respect to the detector in all exposures.
 
 For target exposure $T_{0}$ (for which $\alpha$ is zero), the transmitted
 intensities are denoted as $I^{t}_{o}(0)$ and $I^{t}_{e}(0)$ and the
 measured signals as $M^{t}_{o}(0)$ and $M^{t}_{e}(0)$. 
 
 If the polarization of the flat-field surface is spatially constant, then
-the measured signals in the flat-field exposure will be proportional to
+the measured signals in the master flat-field will be proportional to
 the detector sensitivity functions $S_{o}$ and $S_{e}$. If the constants
 of proportionality for the $O$ and $E$ ray images are $K_{o}$ and
-$K_{e}$, then the measured signals in the flat-field images can be
+$K_{e}$, then the measured signals in the master flat-field can be
 written as:
 
 \begin{myquote}
@@ -3420,8 +3707,8 @@ written as:
 \end{eqnarray*}
 \end{myquote}
 
-Target exposure $T_{0}$ is flat-fielded by dividing it by the flat-field
-exposure. Thus, the measured intensities after the flat-field correction
+Target exposure $T_{0}$ is flat-fielded by dividing it by the master 
+flat-field. Thus, the measured intensities after the flat-field correction
 ($M^{c}_{o}(0)$ and $M^{c}_{e}(0)$) are:
 
 \begin{myquote}
@@ -3435,9 +3722,10 @@ exposure. Thus, the measured intensities after the flat-field correction
 \end{eqnarray*}
 \end{myquote}
 
-The target exposure $T_{45}$ is taken with an analyser angle 
-of 90\dgs\ (accomplished by rotating the half-wave plate by 45\dgs), and
-the $O$ and $E$ ray intensities are $I^{t}_{o}(90)$ and $I^{t}_{e}(90)$, where:
+The target exposure $T_{45}$ is taken with an analyser angle of 90\dgs\
+(accomplished by rotating the half-wave plate by 45\dgs), and the
+corresponding $O$ and $E$ ray intensities are $I^{t}_{o}(90)$ and
+$I^{t}_{e}(90)$, where:
 
 \begin{myquote}
 \begin{eqnarray*}
@@ -3481,8 +3769,8 @@ signals:
 To simplify the notation, put $s_{1}=M^{c}_{o}(0)$, $s_{2}=M^{c}_{e}(0)$,
 $s_{3}=M^{c}_{o}(90)$ and $s_{4}=M^{c}_{e}(90)$. In other words, $s_{1}$ and
 $s_{2}$ are the flat-fielded $O$ and $E$ ray signals from exposure
-$T_{0}$, and $s_{5}$ and $s_{6}$ are the corresponding signals from
-exposure $T_{45}$. In order to calculate the polarisation we need signals
+$T_{0}$, and $s_{3}$ and $s_{4}$ are the corresponding signals from
+exposure $T_{45}$. In order to calculate the polarization we need signals
 which are proportional to the incoming intensities, with a common
 constant of proportionality. In order to achive this, we need to
 estimate the ratio of the exposure factors, $E_{0}$ and $E_{90}$, and the 
@@ -3569,7 +3857,7 @@ and \htmlref{POLIMP}{POLIMP} applications may be used to transfer these items
 to and from a set of corresponding FITS keywords (see 
 \hyperref{here}{section}{}{SEC:IMPORT}). The contents of the POLPACK
 extension within an NDF may be examined using the
-\xref{\verb+hdstrace+}{sun102} command.
+\xref{\verb+hdstrace+}{sun102}{} command.
 \begin{latexonly}
   \begin{figure}[htb]
   \begin{center}

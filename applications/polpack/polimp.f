@@ -52,7 +52,7 @@
 *        list, or any of the other forms described in the help on "Group 
 *        Expressions".
 *     NAMELIST = LITERAL (Read)
-*        The name of a file to create containing a list of the succesfully 
+*        The name of a file to create containing a list of the successfully 
 *        processed data files. This file can be used when specifying the input 
 *        data files for subsequent applications. No file is created if a null
 *        (!) value is given. [!]
@@ -62,24 +62,19 @@
 *     TABLE = LITERAL (Read)
 *        The name of the file containing the table describing how FITS
 *        keyword values are to be translated into POLPACK extension
-*        items. See the topic "Table Format" for information on how to
-*        create a translation table. If a null value (!) is supplied,
-*        then a default table is used which corresponds to the FITS
-*        keywords written by POLEXP:
+*        items. If a null value (!) is supplied, then the following default 
+*        table is used which corresponds to the FITS keywords written by 
+*        POLEXP:
 *
-*           ANGROT      PPCKANGR
+*              ANGROT   PPCKANGR
+*              FILTER   PPCKFILT
+*              IMGID    PPCKIMID
+*              WPLATE   PPCKWPLT
+*              RAY?     PPCKRAY
+*              STOKES?  PPCKSTOK
 *
-*           FILTER      PPCKFILT
-*
-*           IMGID       PPCKIMID
-*
-*           WPLATE      PPCKWPLT
-*
-*           RAY?        PPCKRAY 
-*
-*           STOKES?     PPCKSTOK
-*
-*        [!]
+*        See the topic "Table Format" for information on how to create 
+*        translation tables. [!]
 
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
@@ -210,7 +205,7 @@
 *        This example processes all the data files in the current directory 
 *        using the import control table mytable.dat.
 *
-*     polimp in=\verb+^+names.lis
+*     polimp in=^names.lis
 *        This example processes the data files listed in the text file
 *        "names.lis" using the default control table appropriate for
 *        partially processed data which has previously been exported using
@@ -275,7 +270,7 @@
       INTEGER IPREAL             ! Pointer to real storage
       INTEGER LINGRP             ! GRP identifier for line nos in table
       INTEGER NAMLEN             ! Length of name string
-      INTEGER NGOOD              ! No. of NDF's processed succesfully
+      INTEGER NGOOD              ! No. of NDF's processed successfully
       INTEGER NLINES             ! Number of "lines" read from table
       INTEGER NNDF               ! Number of input NDFs
       INTEGER WRDGRP( 3 )        ! GRP identifiers for table "words"
@@ -302,7 +297,7 @@
 *  Access the control table for items in the FITS block. 
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )
 
-*  If succesful, get the file name.
+*  If successful, get the file name.
       FNAME = '<unknown>'
       IF ( TOPEN ) THEN
          CALL FIO_FNAME( FDIN, FNAME, STATUS )
@@ -358,7 +353,7 @@
       CALL CCD1_MALL( NLINES, '_INTEGER', IPCHR, STATUS )
 
 *  Create a group to hold the names of the NDFs which were processed
-*  succesfully.
+*  successfully.
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
 
 *  Tell the user how many NDFs there are to process.
@@ -450,7 +445,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
 
-*  Otherwise, add the name of the NDF to the group of succesfully
+*  Otherwise, add the name of the NDF to the group of successfully
 *  processed NDFs.
          ELSE
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
@@ -460,12 +455,12 @@
 
  100  CONTINUE
 
-*  Report an error if no NDFs were processed succesfully.
+*  Report an error if no NDFs were processed successfully.
       CALL GRP_GRPSZ( IGRP2, NGOOD, STATUS )
       IF( NGOOD .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLIMP_ALLBAD', 'None of the input images '//
-     :                 'were processed succesfully.', STATUS )
+     :                 'were processed successfully.', STATUS )
       END IF
 
 *  Write an output list of the NDF names for other applications to use.

@@ -38,7 +38,7 @@
 *        list, or any of the other forms described in the help on "Group 
 *        Expressions".
 *     NAMELIST = LITERAL (Read)
-*        The name of a file to create containing a list of the succesfully 
+*        The name of a file to create containing a list of the successfully 
 *        processed NDFs. This file can be used when specifying the input 
 *        NDFs for subsequent applications. No file is created if a null
 *        (!) value is given. [!]
@@ -50,18 +50,12 @@
 *     The following FITS keywords are created. The POLPACK extension item
 *     stored in the keyword is shown in parentheses (see POLIMP for a 
 *     description of these extension items):
-*
-*           PPCKANGR  (ANGROT)
-*
-*           PPCKFILT  (FILTER)
-*
-*           PPCKIMID  (IMGID)     
-*
-*           PPCKWPLT  (WPLATE)
-*
-*           PPCKRAY   (RAY)
-*
-*           PPCKSTOK  (STOKES)
+*        -  PPCKANGR  (ANGROT)
+*        -  PPCKFILT  (FILTER)
+*        -  PPCKIMID  (IMGID)     
+*        -  PPCKWPLT  (WPLATE)
+*        -  PPCKRAY   (RAY)
+*        -  PPCKSTOK  (STOKES)
 
 *  Examples:
 *     polexp in=^names.lis
@@ -116,7 +110,7 @@
       INTEGER IPFITS             ! Pointer to FITS block
       INTEGER J                  ! Index of current extension item
       INTEGER NCARD              ! Max. no. of cards in FITS extension
-      INTEGER NGOOD              ! No. of NDF's processed succesfully
+      INTEGER NGOOD              ! No. of NDF's processed successfully
       INTEGER NNDF               ! Number of input NDFs
       INTEGER UCARD              ! No. of cards in final FITS extension
       LOGICAL NEW                ! Was a new card added?
@@ -150,7 +144,7 @@
      :            NNDF, STATUS )
 
 *  Create a group to hold the names of the NDFs which were processed
-*  succesfully.
+*  successfully.
       CALL GRP_NEW( 'Good NDFs', IGRP2, STATUS )
 
 *  Tell the user how many NDFs there are to process.
@@ -298,7 +292,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_FLUSH( STATUS )
 
-*  Otherwise, add the name of the NDF to the group of succesfully
+*  Otherwise, add the name of the NDF to the group of successfully
 *  processed NDFs.
          ELSE
             CALL GRP_PUT( IGRP2, 1, NDFNAM, 0, STATUS )
@@ -308,12 +302,12 @@
 
  100  CONTINUE
 
-*  Report an error if no NDFs were processed succesfully.
+*  Report an error if no NDFs were processed successfully.
       CALL GRP_GRPSZ( IGRP2, NGOOD, STATUS )
       IF( NGOOD .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'POLEXP_ALLBAD', 'None of the input images '//
-     :                 'were processed succesfully.', STATUS )
+     :                 'were processed successfully.', STATUS )
       END IF
 
 *  Write an output list of the NDF names for other applications to use.

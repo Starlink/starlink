@@ -51,7 +51,7 @@
 *     CAT = LITERAL (Read)
 *        The name of the input catalogue. This may be in any format
 *        supported by the CAT library (see SUN/181). A file type of .FIT
-*        is assumed if no file stype is supplied.
+*        is assumed if no file type is supplied.
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the graphics device is to be cleared before displaying
 *        the vector map. This will result in the vector map being drawn
@@ -109,7 +109,7 @@
 *        Coordinate System (SCS) values (such as "EQUATORIAL(J2000)", 
 *        "GALACTIC", etc - see SUN/163) can be given. Domains "WORLD" and 
 *        "DATA" are taken as synonyms for "PIXEL" and "AXIS" (unless the 
-*        catalogue contains explicit definitons for the "WORLD" and "DATA" 
+*        catalogue contains explicit definitions for the "WORLD" and "DATA" 
 *        Domains). The available coordinate Frames are defined by an AST 
 *        FrameSet (see SUN/210) in the supplied catalogue. If the catalogue 
 *        does not contain a FrameSet, then a default FrameSet is used 
@@ -132,16 +132,12 @@
 *     JUST = LITERAL (Read)
 *        The justification for each vector; it can take any of the
 *        following values:
-*
-*         "Centre" - the vectors are drawn centred on the
-*                    corresponding pixel coordinates.
-*
-*         "Start"  - the vectors are drawn starting at the
-*                    corresponding pixel coordinates.
-*
-*         "End"    - the vectors are drawn ending at the corresponding
-*                    pixel coordinates.
-
+*           - CENTRE -- the vectors are drawn centred on the
+*           corresponding pixel coordinates.
+*           - START -- the vectors are drawn starting at the
+*           corresponding pixel coordinates.
+*           - END -- the vectors are drawn ending at the corresponding
+*           pixel coordinates.
 *        ["Centre"]
 *     KEY = _LOGICAL (Read)
 *        TRUE if a key is to be produced. [TRUE]
@@ -180,10 +176,10 @@
 *        catalogue. []
 *     PXSIZE = _REAL (Read)
 *        The length (x axis) of the plot in metres. [Maximum that can
-*        fit in the current picture whilst preserving square pixels]
+*        fit in the current picture while preserving square pixels]
 *     PYSIZE = _REAL (Read)
 *        The length (y axis) of the plot in metres. [Maximum that can
-*        fit in the current picture whilst preserving square pixels]
+*        fit in the current picture while preserving square pixels]
 *     NEGATE = _LOGICAL (Read)
 *        If a TRUE value is supplied, then the angles giving the
 *        orientation of the polarization (i.e. the values in the column
@@ -194,7 +190,7 @@
 *        a group of comma-separated name=value strings where "name" is the 
 *        name of a Plot attribute, and "value" is the value to assign to 
 *        the attribute. Vectors are drawn as "Curves" but may also be 
-*        refered to using the synonym "Vectors" when specifying Plot 
+*        referred to using the synonym "Vectors" when specifying Plot 
 *        attributes. Default values are supplied for any attributes which 
 *        are not specified. These are obtained from the WCS information 
 *        in the supplied catalogue, or inherited from the previous 
@@ -216,7 +212,7 @@
 *        vectors defined in the FITS binary table "poltab". The magnitudes
 *        are taken from column P, the orientations from column ANG and
 *        the coordinates of each vector from columns X and Y. 
-*     polplot poltab style=\verb+^+mystyle.dat
+*     polplot poltab style=^mystyle.dat
 *        As above, but the annotated axes and vectors are drawn according
 *        to the description given in text file \verb+mystyle.dat+. If this
 *        files contains the following lines:
@@ -239,7 +235,7 @@
 *        position angle 23.4 degrees (measured anti-clockwise from the
 *        positive y axis) in the displayed map. The position of each vector
 *        is specified by columns "ra" and "dec". The annotated axes give
-*        equatorial (RA/DEC) coordinates refered to the equinox of B1950.
+*        equatorial (RA/DEC) coordinates referred to the equinox of B1950.
 *        If the vector map is displayed over an existing DATA picture, then
 *        the vector map will be aligned on the sky with the previously 
 *        displayed data if possible (i.e. the FrameSet associated with the 

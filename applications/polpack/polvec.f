@@ -46,27 +46,19 @@
 *        vectors. [1]
 *     CAT = LITERAL (Read)
 *        The name of a catalogue to create, holding the calculated
-*        polarization paremeters tabulated at each point for which Stokes
+*        polarization parameters tabulated at each point for which Stokes
 *        parameters are available. If a null (!) value is supplied, then
 *        no catalogue is created. The catalogue will contain the following
 *        columns (all stored as single precision _REAL values):
-*
-*           X     : The pixel X coordinate at the tabulated point.
-*
-*           Y     : The pixel Y coordinate at the tabulated point.
-*
-*           I     : The total intensity.
-*
-*           Q     : The Stokes Q parameter.
-*
-*           U     : The Stokes U parameter.
-*
-*           P     : The percentage polarization.
-*
-*           ANG   : The polarization angle (anti-clockwise from the X axis
-*                   to the plane of polarization - in degrees).
-*
-*           PI    : The polarized intensity.
+*           - X  -- The pixel X coordinate at the tabulated point.
+*           - Y  -- The pixel Y coordinate at the tabulated point.
+*           - I  -- The total intensity.
+*           - Q  -- The Stokes Q parameter.
+*           - U  -- The Stokes U parameter.
+*           - P  -- The percentage polarization.
+*           - ANG  -- The polarization angle (anti-clockwise from the X axis
+*           to the plane of polarization - in degrees).
+*           - PI -- The polarized intensity.
 *
 *        If VAR is TRUE, then the catalogue will also contain 
 *        additional columns giving the standard deviation on each of the 
