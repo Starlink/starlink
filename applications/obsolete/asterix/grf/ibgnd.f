@@ -1506,7 +1506,7 @@
         CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, I_BGM_X0, I_BGM_Y0,
      :                  I_BGM_RBIN, %VAL(I_BGM_SAMIDX), STATUS )
 
-      ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
+      ELSE IF ( I_BGM_AREA(1:3) .EQ. 'BOX' ) THEN
       END IF
 
       END
