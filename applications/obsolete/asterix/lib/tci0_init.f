@@ -112,11 +112,12 @@
         CALL ADI_REQPKG( 'time', STATUS )
 
 *    Define methods
-        CALL ADI_DEFMTH( 'ReadTiming(HDSfile)', TCI1_READ, DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteTiming(HDSfile,TimingInfo)', TCI1_WRITE,
+        CALL ADI_DEFMTH( 'ReadTiming(_HDSfile)', TCI1_READ,
      :                   DID, STATUS )
-        CALL ADI_DEFMTH( 'WriteTiming(FITSfile,TimingInfo)', TCI2_WRITE,
-     :                   DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteTiming(_HDSfile,_TimingInfo)',
+     :                   TCI1_WRITE, DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteTiming(_FITSfile,_TimingInfo)',
+     :                   TCI2_WRITE, DID, STATUS )
 
 *    Now initialised
 	TCI_INIT = .TRUE.

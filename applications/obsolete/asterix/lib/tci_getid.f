@@ -100,6 +100,9 @@
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  Local Variables:
+      INTEGER			FILID			! File identifier
 *.
 
 *  Check inherited global status.
@@ -111,8 +114,11 @@
 *  Initialise return values
       TIMID = ADI__NULLID
 
+*  Locate file object
+      CALL ADI_GETFILE( ID, FILID, STATUS )
+
 *  Invoke the read method
-      CALL ADI_EXEC( 'ReadTiming', 1, ID, TIMID, STATUS )
+      CALL ADI_EXEC( 'ReadTiming', 1, FILID, TIMID, STATUS )
 
 *  Store the returned object on the property list of the object
       CALL ADI_CPUTID( ID, TCI_PROP, TIMID, STATUS )
