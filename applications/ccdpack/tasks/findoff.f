@@ -546,7 +546,6 @@
 *  Check file has at least MINMAT values, otherwise it isn't possible
 *  to proceed.
          IF ( NREC( I ) .LT. MINMAT ) THEN
-            CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'FNAME', FNAME )
             CALL MSG_SETI( 'NREC', NREC( I ) )

@@ -116,6 +116,11 @@
 *        increase in processing speed.
 *     16-SEP-1996 (PDRAPER):
 *        Changed NAG calls to PDA calls.
+*     7-SEP-1998 (PDRAPER):
+*        Changed to output the XDIFF and YDIFF of the selected position,
+*        rather than a mean derived from this. This caused the
+*        completeness calcs to fail as the same positions are not
+*        guaranteed. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -396,10 +401,6 @@
          XDIFF = XDIST( BESTI, JJ )
          YDIFF = YDIST( BESTI, JJ )
 
-*  Now initialise counter for sum of X and Y deviations.
-         XSUM = 0.0D0
-         YSUM = 0.0D0
-
 *  Initialise counter for number of output positions.
          NOUT = 0
 
@@ -423,10 +424,6 @@
                      XOUT2( NOUT ) = XIN2( KK ) 
                      YOUT2( NOUT ) = YIN2( KK ) 
 
-*  Sum the deviations.
-                     XSUM = XSUM + XDIST( L, KK  )
-                     YSUM = YSUM + YDIST( L, KK )
-
 *  Record the original positions.
                      IND1( NOUT ) = L
                      IND2( NOUT ) = KK
@@ -438,9 +435,9 @@
  9          CONTINUE
  8       CONTINUE      
 
-*  Work out the actual translations.
-         XOFF = XSUM / DBLE( NOUT )
-         YOFF = YSUM / DBLE( NOUT )
+*  Now record the offsets used to determine these matches.
+         XOFF = XDIFF
+         YOFF = YDIFF
       ELSE
 
 *  No translation has been selected. Set STATUS report an error and

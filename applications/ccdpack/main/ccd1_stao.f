@@ -83,6 +83,10 @@
 *        Original version.
 *     6-APR-1993 (PDRAPER):
 *        Added array index outputs for arranging associated data.
+*     7-SEP-1998 (PDRAPER):
+*        Stopped update of offsets on last iteration. This was causing
+*        problem when still converging (the output offsets were not the
+*        ones used to select the positions).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -201,10 +205,11 @@ C      WID = WIDTH / 2.0D0
      :                   NOUT, IND1, IND2, STATUS )
          IF ( NOUT .GT. 0 ) THEN 
 
-*  Check for convergence.
-            IF ( NOUT .EQ. NLAST ) THEN
+*  Check for convergence, or last iteration.
+            IF ( NOUT .EQ. NLAST .OR. NITER .EQ. 5 ) THEN
 
-*  Convergence has occurred.
+*  Convergence has occurred, or time to stop (do not update the offsets
+*  on the last iteration).
                OK = .FALSE.
             ELSE
 
