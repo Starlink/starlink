@@ -186,28 +186,35 @@
             INEAR = NINT (REAL(X(PIX))/XINC) + ICEN
             JNEAR = NINT (REAL(Y(PIX))/YINC) + JCEN
 
+*     Check that INEAR or JNEAR are allowed (they may be outside the
+*     box
+
+            IF ((INEAR .GT. 0) .AND. (INEAR .LE. NI) .AND.
+     :           (JNEAR .GT. 0) .AND. (JNEAR .LE. NJ)) THEN
+
 *  loop over x's and y's in output array that are covered by the convolution 
 *  function centred at (INEAR, JNEAR)
          
-            DO JOUT = MAX(1,JNEAR-PIX_RANGE), MIN(NJ,JNEAR+PIX_RANGE)
-               DO IOUT = MAX(1,INEAR-PIX_RANGE), MIN(NI,INEAR+PIX_RANGE)
+               DO JOUT = MAX(1,JNEAR-PIX_RANGE), MIN(NJ,JNEAR+PIX_RANGE)
+                  DO IOUT = MAX(1,INEAR-PIX_RANGE), 
+     :                 MIN(NI,INEAR+PIX_RANGE)
 
 *  add into the convolution result and weight arrays unless TOTAL_WEIGHT
 *  of output is zero, signifying output pixel is beyond limits of
 *  mapped area. The coaddition is normalised by the `total weight' 
 *  associated with this input pixel.
 
-                  IF (TOTAL_WEIGHT (IOUT,JOUT) .GT. SMALL) THEN
+                     IF (TOTAL_WEIGHT (IOUT,JOUT) .GT. SMALL) THEN
 
 *  work out x,y offset of current output pixel
 
-                     YPIX = REAL (JOUT-JCEN) * YINC
-                     XPIX = REAL (IOUT-ICEN) * XINC
+                        YPIX = REAL (JOUT-JCEN) * YINC
+                        XPIX = REAL (IOUT-ICEN) * XINC
 
 *  distance between output and input pixels, in arcsec**2 units
  
-                     RPIX = (YPIX-REAL(Y(PIX)))**2 + 
-     :                    (XPIX-REAL(X(PIX)))**2
+                        RPIX = (YPIX-REAL(Y(PIX)))**2 + 
+     :                       (XPIX-REAL(X(PIX)))**2
 
 * Now work out which part of the weight function to use
 * I used to do this:
@@ -217,29 +224,32 @@
 *     etc..
 *     Remove RPIX * SCALESQ since this is not really necessary
 
-                     WT = 0.0
+                        WT = 0.0
 *     Is the distance close enough? If so find the weight value
-                     IF (RPIX .LT. RAD_OV_SCAL) THEN
-                        ICPIX = NINT(RES_SCAL * RPIX)
-                        WT = WTFN(ICPIX+1)
-                     END IF
+                        IF (RPIX .LT. RAD_OV_SCAL) THEN
+                           ICPIX = NINT(RES_SCAL * RPIX)
+                           WT = WTFN(ICPIX+1)
+                        END IF
 
 * Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT?
-                     WWEIGHT = WT * WEIGHT / TOTAL_WEIGHT (INEAR,JNEAR)
+                        WWEIGHT = WT * WEIGHT / 
+     :                       TOTAL_WEIGHT (INEAR,JNEAR)
 
-                     CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT) + 
-     :                    WWEIGHT
-                     CONV_DATA_SUM (IOUT,JOUT) = 
-     :                    CONV_DATA_SUM (IOUT,JOUT) + 
-     :                    WWEIGHT * IN_DATA(PIX)
-                     CONV_VARIANCE_SUM (IOUT,JOUT) =
-     :                    CONV_VARIANCE_SUM (IOUT,JOUT) +
-     :                    (WWEIGHT)**2 * IN_VARIANCE (PIX)
+                        CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT)
+     :                       + WWEIGHT
+                        CONV_DATA_SUM (IOUT,JOUT) = 
+     :                       CONV_DATA_SUM (IOUT,JOUT) + 
+     :                       WWEIGHT * IN_DATA(PIX)
+                        CONV_VARIANCE_SUM (IOUT,JOUT) =
+     :                       CONV_VARIANCE_SUM (IOUT,JOUT) +
+     :                       (WWEIGHT)**2 * IN_VARIANCE (PIX)
+                        
+                     END IF
 
-                  END IF
-
+                  END DO
                END DO
-            END DO
+            
+            END IF
 
          END IF
 
