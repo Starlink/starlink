@@ -2,8 +2,8 @@
       SUBROUTINE NIPSUB(NX, NY, imager, rdata, THRESH, NDET,
      &   XPOS, YPOS, COUNTS, STATUS)
 
-	integer nsize
-	real imager(nx,ny)
+c     integer nsize
+      real imager(nx,ny)
       INTEGER NX, NY  	  !input	Dimensions of raw data array
       REAL RDATA(NX,NY)  !input	Raw data counts (non-negative)
       REAL THRESH     	  !input	detection threshold, -log10(pfa)
@@ -295,7 +295,7 @@ C	CALL LIB$FREE_VM(NBYTES, IMEAN)
 	REAL ARRAY(NX,NY)	!input	Data array
 	REAL OUTPUT(NX,NY)	!output	Output (must not be same as input)
 *-Author	Clive Page	1990-OCT-15
-	INTEGER IX, IY, N, I, J, K, L, MID
+	INTEGER IX, IY, N, I, J
 	REAL TEMP(9), TMID, DELTA
 	EXTERNAL SORTR
 *
