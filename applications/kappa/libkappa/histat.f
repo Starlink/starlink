@@ -53,7 +53,7 @@
 *        value is supplied (the default), then no logging of results
 *        will take place. [!]
 *     MAXCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the user co-ordinates of
+*        A 1-dimensional array of values giving the WCS co-ordinates of
 *        the centre of the (first) maximum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
@@ -68,7 +68,7 @@
 *     MEDIAN = _DOUBLE (Write)
 *        The median value of all the valid pixels in the NDF array.
 *     MINCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the user co-ordinates of
+*        A 1-dimensional array of values giving the WCS co-ordinates of
 *        the centre of the (first) minimum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
@@ -147,7 +147,7 @@
 *     Figaro: ISTAT.
 
 *  Implementation Status:
-*     -  This routine correctly processes the AXIS, DATA, VARIANCE,
+*     -  This routine correctly processes the AXIS, WCS, DATA, VARIANCE,
 *     QUALITY, TITLE, and HISTORY components of the NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
@@ -158,6 +158,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry STARLINK
 *     {enter_new_authors_here}
 
 *  History:
@@ -170,6 +171,8 @@
 *        Removed NUMBIN parameter.  No longer obtains dynamic space
 *        for the histogram.  Uses improved algorithm for calculating
 *        the median and percentiles.
+*     6-AUG-2004 (DSB):
+*        Display current Frame WCS coords at max and min pixel positions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -209,6 +212,7 @@
       INTEGER IFIL               ! File descriptor for logfile
       INTEGER IMAX( 1 )          ! Vector index of max. pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
+      INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       LOGICAL LOGFIL             ! Log file is required
       DOUBLE PRECISION MAXC( NDF__MXDIM ) ! Co-ordinates of max. pixel
@@ -427,15 +431,18 @@
 *  display routines, so give it the flagged value.
       STDEV = VAL__BADD
 
+*  Get the WCS FrameSet.
+      CALL KPG1_GTWCS( NDF, IWCS, STATUS )
+
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_STDSD( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+         CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
      :                    STATUS )
       ELSE
-         CALL KPG1_STDSR( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+         CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
      :                    STATUS )
@@ -444,17 +451,20 @@
 *  Also write the statistics to the logfile, if used.
       IF ( LOGFIL ) THEN
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_STFLD( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+            CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
      :                       IFIL, STATUS )
          ELSE
-            CALL KPG1_STFLR( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+            CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                       MEDIAN, MODE, NUMPER, PERCNT, PERVAL,
      :                       IFIL, STATUS )
          END IF
       END IF
+
+*  Annul the WCS FrameSet.
+      CALL AST_ANNUL( IWCS, STATUS )
 
 *  Write the final results to the output parameters.
       CALL PAR_PUT0D( 'MAXIMUM', DMAX, STATUS )

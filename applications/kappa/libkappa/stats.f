@@ -66,7 +66,7 @@
 *        value is supplied (the default), then no logging of results
 *        will take place. [!]
 *     MAXCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the data co-ordinates of
+*        A 1-dimensional array of values giving the WCS co-ordinates of
 *        the centre of the (first) maximum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number of
 *        NDF dimensions.
@@ -79,7 +79,7 @@
 *     MEAN = _DOUBLE (Write)
 *        The mean value of all the valid pixels in the NDF array.
 *     MINCOORD( ) = _DOUBLE (Write)
-*        A 1-dimensional array of values giving the data co-ordinates of
+*        A 1-dimensional array of values giving the WCS co-ordinates of
 *        the centre of the (first) minimum-valued pixel found in the
 *        NDF array.  The number of co-ordinates is equal to the number
 *        of NDF dimensions.
@@ -145,6 +145,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie  STARLINK
+*     DSB: David S. Berry STARLINK
 *     {enter_new_authors_here}
 
 *  History:
@@ -156,6 +157,8 @@
 *     1992 March 3 (MJC):
 *        Replaced AIF parameter-system calls by the extended PAR
 *        library.
+*     6-AUG-2004 (DSB):
+*        Display current Frame WCS coords at max and min pixel positions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -213,6 +216,7 @@
       INTEGER IMAXC( 1 )         ! Vector index of max. clipped pixel
       INTEGER IMIN( 1 )          ! Vector index of min. pixel
       INTEGER IMINC( 1 )         ! Vector index of min. clipped pixel
+      INTEGER IWCS               ! Pointer to WCS FrameSet
       INTEGER LBND( NDF__MXDIM ) ! NDF lower bounds
       INTEGER MAXP( NDF__MXDIM ) ! Indices of maximum-valued pixel
       INTEGER MAXPC( NDF__MXDIM ) ! Maximum pixel indices after clipping
@@ -244,6 +248,9 @@
 
 *  Obtain the NDF to be analysed.
       CALL LPG_ASSOC( 'NDF', 'READ', NDF, STATUS )
+
+*  Get its WCS FrameSet
+      CALL KPG1_GTWCS( NDF, IWCS, STATUS )
 
 *  Determine which array component is to be analysed, converting
 *  'ERROR' into 'VARIANCE'.
@@ -429,19 +436,19 @@
       END IF
 
 *  Assign undefined values to the ordered statistics.
-         MEDIAN = VAL__BADD
-         MODE = VAL__BADD
-         PERCNT( 1 ) = VAL__BADR
-         PERVAL( 1 ) = VAL__BADD
+      MEDIAN = VAL__BADD
+      MODE = VAL__BADD
+      PERCNT( 1 ) = VAL__BADR
+      PERVAL( 1 ) = VAL__BADD
 
 *  Display the statistics, using the most appropriate floating-point
 *  precision.
       IF ( TYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPG1_STDSD( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+         CALL KPG1_STDSD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
       ELSE
-         CALL KPG1_STDSR( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+         CALL KPG1_STDSR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                    DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                    MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
       END IF
@@ -449,12 +456,12 @@
 *  Also write the statistics to the logfile, if used.
       IF ( LOGFIL ) THEN
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_STFLD( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+            CALL KPG1_STFLD( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                       MEDIAN, MODE, 1, PERCNT, PERVAL,
      :                       IFIL, STATUS )
          ELSE
-            CALL KPG1_STFLR( NDIM, EL, NGOOD, DMIN, MINP, MINC,
+            CALL KPG1_STFLR( IWCS, NDIM, EL, NGOOD, DMIN, MINP, MINC,
      :                       DMAX, MAXP, MAXC, SUM, MEAN, STDEV,
      :                       MEDIAN, MODE, 1, PERCNT, PERVAL,
      :                       IFIL, STATUS )
@@ -490,11 +497,13 @@
 *  most appropriate floating-point precision.
          CALL MSG_OUT( 'CLIPDONE', BUF( : NC ), STATUS )
          IF ( TYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPG1_STDSD( NDIM, EL, NGOODC, DMINC, MINPC, MINCC,
+            CALL KPG1_STDSD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+     :                       MINCC,
      :                       DMAXC, MAXPC, MAXCC, SUMC, MEANC, STDEVC,
      :                       MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
          ELSE
-            CALL KPG1_STDSR( NDIM, EL, NGOODC, DMINC, MINPC, MINCC,
+            CALL KPG1_STDSR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+     :                       MINCC,
      :                       DMAXC, MAXPC, MAXCC, SUMC, MEANC, STDEVC,
      :                       MEDIAN, MODE, 1, PERCNT, PERVAL, STATUS )
          END IF
@@ -503,13 +512,13 @@
          IF ( LOGFIL ) THEN
             CALL FIO_WRITE( IFIL, BUF( : NC ), STATUS )
             IF ( TYPE .EQ. '_DOUBLE' ) THEN
-               CALL KPG1_STFLD( NDIM, EL, NGOODC, DMINC, MINPC, MINCC,
-     :                          DMAXC, MAXPC, MAXCC, SUMC, MEANC,
+               CALL KPG1_STFLD( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+     :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, MEDIAN, MODE, 1, PERCNT, PERVAL,
      :                          IFIL, STATUS )
             ELSE
-               CALL KPG1_STFLR( NDIM, EL, NGOODC, DMINC, MINPC, MINCC,
-     :                          DMAXC, MAXPC, MAXCC, SUMC, MEANC,
+               CALL KPG1_STFLR( IWCS, NDIM, EL, NGOODC, DMINC, MINPC, 
+     :                          MINCC, DMAXC, MAXPC, MAXCC, SUMC, MEANC,
      :                          STDEVC, MEDIAN, MODE, 1, PERCNT, PERVAL,
      :                          IFIL, STATUS )
             END IF
@@ -532,6 +541,9 @@
 
 *  Arrive here if an error occurs.
  99   CONTINUE     
+
+*  Annul the WCS FrameSet
+      CALL AST_ANNUL( IWCS, STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
