@@ -34,7 +34,7 @@ STAR_DOCS_FILES(sun86a.tex sun86_2df.eps sun86_ech1.eps sun86_ech2.eps sun86_ech
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml figaro.csh figaro.icl)
 
 dnl    Need to go into sub-directories.
 AC_CONFIG_SUBDIRS([appcb appsub dsa dta fda fig fibre fit fitres fla gen gkd graph ich jty main opt par spext sploop tio twoutil unix work util figaro1 figaro2 figaro3 figaro4 figaro5])
