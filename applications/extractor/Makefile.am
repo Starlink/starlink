@@ -41,10 +41,15 @@ dist_pkgdata_DATA = \
  extract/src/config/gauss_2.5_5x5.conv  extract/src/config/mexhat_4.0_9x9.conv
 
 ## Local rules for building the (pre-configured) sub-directories and
-## extracting the required products. ?? What to make these dependent on?
+## extracting the required products. When developing you need to use the
+## makefiles in the sub-directories and return to this level to complete the
+## build. 
 
 #  EXTRACTOR needs the libextractor.a and libfits.a libraries.
-libextractor.a:
+
+libextractor.a: extract/src/libextractor.a
+
+extract/src/libextractor.a:
 	(cd extract ;\
 	export INSTALL; unset INSTALL;\
 	export SHELL; unset SHELL;\
@@ -55,7 +60,10 @@ libextractor.a:
         cp -p src/extractor.o ..)
 
 #  SExtractor runs to completion.
-sex:
+
+sex: sextractor/src/sex
+
+sextractor/src/sex:
 	(cd sextractor ;\
         export INSTALL; unset INSTALL;\
         export SHELL; unset SHELL;\
@@ -66,11 +74,11 @@ sex:
 ##  Clean recurses into these directories.
 clean-local:
 	(cd extract; make clean )
-	(cd sextractor;make clean )
+	(cd sextractor; make clean )
 
 distclean-local:
 	(cd extract; make distclean )
-	(cd sextractor;make distclean )
+	(cd sextractor; make distclean )
 
 ##  Link the main extractor program as an atask. Note this isn't a monolith so
 ##  we cannot use the MONOLITH builtin rules.
@@ -84,6 +92,6 @@ extractor.ifl:
 extractor.icl:
 	cp -p extract/src/extractor.icl .
 
-#  IFL to IFC
+#  Rule IFL to IFC compilation.
 .ifl.ifc:
 	@COMPIFL@ $<
