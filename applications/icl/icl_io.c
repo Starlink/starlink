@@ -55,6 +55,8 @@
 # include <curses.h>
 #elif HAVE_CURSESX_H
 # include <cursesX.h>
+#elif HAVE_CURSES_CURSES_H
+# include <curses/curses.h>
 #else
 # error "Unable to locate curses installation"
 #endif
@@ -64,6 +66,8 @@
 #include <term.h>
 #elif HAVE_NCURSES_TERM_H
 #include <ncurses/term.h>
+#else
+# error "Unable to locate term.h"
 #endif
 #include <termios.h>
 #ifndef TIOCGWINSZ

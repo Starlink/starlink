@@ -44,7 +44,7 @@ AC_PROG_LIBTOOL
 AC_CHECK_FUNCS([atexit on_exit])
 
 # icl_io.c
-AC_CHECK_HEADERS([curses.h cursesX.h])
+AC_CHECK_HEADERS([curses.h cursesX.h curses/curses.h])
 
 # icl_io.c
 dnl    Or ncurses term.h in /usr/include.
