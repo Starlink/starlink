@@ -39,6 +39,12 @@ AC_DEFUN([STAR_DEFAULTS],
 # inconsistent value of this variable.
 AC_ARG_VAR(STARLINK, [Where all the Starlink software lives])dnl
 
+# AC_SUBST the STARLINK variable.  Macro AC_ARG_VAR does this anyway,
+# but automake doesn't know that (in 1.6 at least): however any
+# variable that automake finds has been AC_SUBSTed, it includes in
+# Makefile.in, and that is useful to us.
+AC_SUBST(STARLINK)
+
 # Ensure that STARLINK has a value, defaulting to @DEFAULT_STARLINK@.  
 # Note that this directory will be different from /star, if the
 # `starconf' component was configured with a non-default value of STARLINK
@@ -73,9 +79,9 @@ _star_tmp=m4_ifval([$2], [$2], [${PACKAGE}_err.msg])
 cat >>$STAR_BOILERPLATE <<EOD
 #  Rules for generating files built by the error message system.
 #  ------------------------------------------------------------
-${PACKAGE}_err:   $_star_tmp; messgen -f $_star_tmp
-${PACKAGE}_err.h: $_star_tmp; messgen -c $_star_tmp
-fac_$1_err:       $_star_tmp; messgen -e $_star_tmp
+${PACKAGE}_err:   $_star_tmp; $(STARLINK)/bin/messgen -f $_star_tmp
+${PACKAGE}_err.h: $_star_tmp; $(STARLINK)/bin/messgen -c $_star_tmp
+fac_$1_err:       $_star_tmp; $(STARLINK)/bin/messgen -e $_star_tmp
 EOD
 ])# STAR_FACILITY_CODE
 
