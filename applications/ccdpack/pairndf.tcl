@@ -44,6 +44,12 @@
 #     PERCLO = real (Given)
 #        The percentile of the data below which all values should be 
 #        plotted as the same colour.  Must be between 0 and 100.
+#     PREVX = integer (Given and Returned)
+#        X dimension of the preview window for each NDF in the chooser 
+#        widget.
+#     PREVY = integer (Given and Returned)
+#        Y dimensino of the preview window for each NDF in the chooser
+#        widget.
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
 #     WINY = integer (Given and Returned)
@@ -63,7 +69,8 @@
 
 #  Set defaults for some arguments.
       foreach pair { { MAXCANV 0 } { MAXPOS 100 } { PERCLO 5 } { PERCHI 95 } \
-                     { WINX 300 } { WINY 300 } { ZOOM 1 } } {
+                     { PREVX 300 } { PREVY 300 } { WINX 300 } { WINY 300 } \
+                     { ZOOM 1 } } {
          if { ! [ info exists [ lindex $pair 0 ] ] } {
             eval set $pair
          }
@@ -90,7 +97,7 @@
       wm withdraw $aligner
       $aligner configure \
                          -title "PAIRNDF: %An -- %Bn" \
-                         -info "%N (%h x %w) Frame: %f" \
+                         -info "%n" \
                          -watchstate alignstate \
                          -zoom $ZOOM \
                          -uselabels 0 \
@@ -115,6 +122,7 @@
                          -title "PAIRNDF chooser" \
                          -watchstate choosestate \
                          -validpair [ code pairok %A %B ] \
+                         -viewport [ list [ expr $PREVX * 2 ] $PREVY ] \
                          -percentiles [ list $PERCLO $PERCHI ]
 
 #  Create an exit confirmation widget which may or may not be used.
@@ -252,6 +260,14 @@
          set matpts [ lindex $val 3 ]
          lappend PAIRS [ list $iA $iB $nmatch $xoff $yoff ]
          lappend MATPTS $matpts
+      }
+
+#  Retrieve characteristics of the chooser window which may have been 
+#  changed by the user.
+      set vp [ $chooser cget -viewport ]
+      if { [ llength $vp ] == 2 } {
+         set PREVX [ lindex $vp 0 ]
+         set PREVY [ lindex $vp 1 ]
       }
 
 #  Destroy remaining windows.

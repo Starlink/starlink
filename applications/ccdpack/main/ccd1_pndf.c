@@ -10,6 +10,7 @@
    F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), DOUBLE_ARRAY(percnt), 
                               INTEGER(count), DOUBLE(zoom), 
                               INTEGER(maxcanv), INTEGER_ARRAY(windim),
+                              INTEGER_ARRAY(prvdim),
                               INTEGER_ARRAY(nodes), INTEGER_ARRAY(nmat),
                               DOUBLE_ARRAY(xoff), DOUBLE_ARRAY(yoff),
                               POINTER_ARRAY(ipx1), POINTER_ARRAY(ipy1),
@@ -48,6 +49,9 @@
 *        The maximum X or Y dimension of the intial NDF display.
 *     WINDIM( 2 ) = INTEGER (Given and Returned)
 *        Dimensions of the window used for display.
+*     PRVDIM( 2 ) = INTEGER (Given and Returned)
+*        Dimensions of the preview window for each NDF used in the 
+*        chooser widget.
 *     COUNT = INTEGER (Returned)
 *        The number of pairings which have been made by the user.
 *     NODES( 2, * ) = INTEGER (Returned)
@@ -130,6 +134,7 @@
       GENPTR_DOUBLE(zoom)
       GENPTR_INTEGER(maxcanv)
       GENPTR_INTEGER_ARRAY(windim)
+      GENPTR_INTEGER_ARRAY(prvdim)
       GENPTR_DOUBLE_ARRAY(xoff)
       GENPTR_DOUBLE_ARRAY(yoff)
       GENPTR_POINTER_ARRAY(ipx1)
@@ -177,6 +182,8 @@
       ccdTclSetI( cinterp, "MAXCANV", *maxcanv, status );
       ccdTclSetI( cinterp, "WINX", windim[ 0 ], status );
       ccdTclSetI( cinterp, "WINY", windim[ 1 ], status );
+      ccdTclSetI( cinterp, "PREVX", prvdim[ 0 ], status );
+      ccdTclSetI( cinterp, "PREVY", prvdim[ 1 ], status );
 
 /* Execute the Tcl script. */
       ccdTclRun( cinterp, "pairndf.tcl", status );
@@ -227,6 +234,8 @@
       ccdTclGetI( cinterp, "set MAXCANV", maxcanv, status );
       ccdTclGetI( cinterp, "set WINX", windim + 0, status );
       ccdTclGetI( cinterp, "set WINY", windim + 1, status );
+      ccdTclGetI( cinterp, "set PREVX", prvdim + 0, status );
+      ccdTclGetI( cinterp, "set PREVY", prvdim + 1, status );
 
 /* Delete the Tcl interpreter. */
       ccdTclStop( cinterp, status );

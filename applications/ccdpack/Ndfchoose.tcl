@@ -136,10 +136,6 @@
 #  first named NDF as an example.
          set allfits [ [ lindex $ndflist 1 ] fitshead ]
 
-#  Calculate the dimensions available for viewing the NDFs themselves.
-         set viewx [ expr [ lindex $viewport 0 ] / 2 ]
-         set viewy [ lindex $viewport 1 ]
-       
 #  Add buttons to the control panel.
          set panel [ panel ]
          itk_component add showfits {
@@ -182,6 +178,10 @@
             frame $interior.choosearea
          }
 
+#  Calculate the dimensions available for viewing the NDFs themselves.
+         set viewx [ expr [ lindex $viewport 0 ] / 2 ]
+         set viewy [ lindex $viewport 1 ]
+       
 #  Most elements of the choosearea have an A side and a B side; construct
 #  these in a loop.
          set tabpos(A) w
@@ -755,7 +755,7 @@
 #-----------------------------------------------------------------------
 #  If the viewport size is changed, then all the windows will need to
 #  be redrawn at the right size.
-         if { $state == "active" && $viewport != $lastvp } {
+         if { $viewport != $lastvp } {
             set viewx [ expr [ lindex $viewport 0 ] / 2 ]
             set viewy [ lindex $viewport 1 ]
             foreach slot { A B } {
@@ -766,7 +766,9 @@
                $itk_component(image$i) configure \
                    -width $viewx -height $viewy
             }
-            refreshplot all
+            if { $state == "active" } {
+               refreshplot all
+            }
          }
          set lastvp $viewport
       }

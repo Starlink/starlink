@@ -171,20 +171,32 @@
 *        the situation where images have different brightnesses.
 *        In the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
-*     WINX = INTEGER (Read and Write)
-*        The width in pixels of the window to display the image and
-*        associated controls in.  If the image is larger than the area
-*        allocated for display, it can be scrolled around within the
-*        window.  The window can be resized in the normal way using
-*        the window manager while the program is running.
-*        [200]
-*     WINY = INTEGER (Read and Write)
-*        The height in pixels of the window to display the image and
-*        associated controls in.  If the image is larger than the area
-*        allocated for display, it can be scrolled around within the
-*        window.  The window can be resized in the normal way using
-*        the window manager while the program is running.
+*     PREVX = INTEGER (Read and Write)
+*        The width in pixels of the preview display for each image;
+*        two images will be displayed side by side at any one time at
+*        this size in the chooser window.
 *        [300]
+*     PREVY = INTEGER (Read and Write)
+*        The height in pixels of the preview display for each image;
+*        two images will be displayed side by side at any one time at
+*        this size in the chooser window.
+*        [300]
+*     WINX = INTEGER (Read and Write)
+*        The width in pixels of the aligner window, which contains a 
+*        space for dragging around a pair of images and associated
+*        controls.  If the region required for the images is larger 
+*        than the area allocated for display, it can be scrolled 
+*        around within the window.  The window can be resized in the 
+*        normal way using the window manager while the program is running.
+*        [500]
+*     WINY = INTEGER (Read and Write)
+*        The height in pixels of the aligner window, which contains a 
+*        space for dragging around a pair of images and associated
+*        controls.  If the region required for the images is larger 
+*        than the area allocated for display, it can be scrolled 
+*        around within the window.  The window can be resized in the 
+*        normal way using the window manager while the program is running.
+*        [400]
 *     ZOOM = DOUBLE (Read and Write)
 *        A factor giving the initial level to zoom in to the image
 *        displayed, that is the number of screen pixels to use for one
@@ -337,6 +349,7 @@
       INTEGER NRET              ! Dummy variable
       INTEGER OFFS( CCD1__MXNDF+ 1 ) ! Offsets into extended lists
       INTEGER OUTGRP            ! Output group identifier
+      INTEGER PRVDIM( 2 )       ! Preview image dimensions for display
       INTEGER TOTNOD            ! Total number of nodes in graph
       INTEGER WINDIM( 2 )       ! Window dimensions for display
       LOGICAL COMPL             ! True if graph is complete
@@ -361,6 +374,8 @@
       CALL PAR_GET0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
+      CALL PAR_GET0I( 'PREVX', PRVDIM( 1 ), STATUS )
+      CALL PAR_GET0I( 'PREVY', PRVDIM( 2 ), STATUS )
 
 *  Get a list of NDF names.
       CALL CCD1_NDFGL( 'IN', 2, CCD1__MXNDF, NDFGR, NNDF, STATUS )
@@ -386,8 +401,9 @@
 
 *  Call the routine which does all the user interaction and obtains a
 *  list of pairings with associated offsets.
-      CALL CCD1_PNDF( NDFGR, PERCNT, COUNT, ZOOM, MAXCNV, WINDIM, NODES, 
-     :                NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
+      CALL CCD1_PNDF( NDFGR, PERCNT, COUNT, ZOOM, MAXCNV, WINDIM, 
+     :                PRVDIM, NODES, NMAT, XOFF, YOFF, IPX1, IPY1, 
+     :                IPX2, IPY2, STATUS )
 
 *=======================================================================
 *  Spanning graph determination section
@@ -516,6 +532,8 @@
       CALL PAR_PUT0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_PUT0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
+      CALL PAR_PUT0I( 'PREVX', PRVDIM( 1 ), STATUS )
+      CALL PAR_PUT0I( 'PREVY', PRVDIM( 2 ), STATUS )
 
 *  Exit label.
  99   CONTINUE

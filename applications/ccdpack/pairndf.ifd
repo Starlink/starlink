@@ -120,24 +120,46 @@
          }
 
          parameter winx {
-                         # Window X dimension
+                          # Aligner window X dimension
             type _INTEGER
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 200
-            prompt {Width of display window in pixels}
+            default 500
+            prompt {Width of aligner window in pixels}
             helpkey *
          }
 
          parameter winy {
-                         # Window Y dimension
+                          # Aligner window Y dimension
             type _INTEGER
             access UPDATE
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default 300
-            prompt {Height of display window in pixels}
+            default 400
+            prompt {Height of aligner window in pixels}
+            helpkey *
+         }
+
+         parameter prevx {
+                          # Preview display X dimension
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 600
+            prompt {Width of NDF preview display in pixels}
+            helpkey *
+         }
+
+         parameter prevy {
+                          # Preview display Y dimension
+            type _INTEGER
+            access UPDATE
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default 400
+            prompt {Height of NDF preview display in pixels}
             helpkey *
          }
 
