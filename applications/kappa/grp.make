@@ -497,7 +497,7 @@ settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
 wcsremove.f wcsshow.f chain.f reshape.f 
 
 # A group of all the generic source files.
-GENERIC_SOURCES = $(KAPSUB_GEN)
+GENERIC_SOURCES = $(KAPSUB_GEN) $(KAPGEN_GEN)
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
@@ -509,7 +509,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
-$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
+$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SOURCES) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
 $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SOURCES) $(KAPPA_CCDPACK) $(KAPVIEW_SUB) \
 $(NDFPACK_SUB) 
