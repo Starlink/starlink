@@ -139,8 +139,8 @@
         IF ( BCOL .GT. 0 ) THEN
 
 *      Map the column
-          CALL ADI2_MAPCOL( ARGS(1), SPHDU, BCOL, 1, NELM, 'INTEGER', 'READ',
-     :                      PSID, QPTR, STATUS )
+          CALL ADI2_MAPCOL( ARGS(1), SPHDU, BCOL, 1, NELM, 'INTEGER',
+     :                      'READ', PSID, QPTR, STATUS )
 
 *      Create dynamic array
           CALL DYN_MAPL( 1, NELM, PTR, STATUS )

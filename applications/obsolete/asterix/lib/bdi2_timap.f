@@ -155,8 +155,8 @@ C      {data_type} {external_name} ! [external_description]
         CALL ADI2_HGKYI( TIHDU, 'NAXIS2', DIM, CMNT, STATUS )
 
 *    Map the column
-        CALL ADI2_MAPCOL( ARGS(1), TIHDU, BCOL, 1, DIM, TYPE, MODE, PSID,
-     :                    PTR, STATUS )
+        CALL ADI2_MAPCOL( ARGS(1), TIHDU, BCOL, 1, DIM, TYPE, MODE,
+     :                    PSID, PTR, STATUS )
 
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )

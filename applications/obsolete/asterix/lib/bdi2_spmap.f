@@ -165,8 +165,8 @@
         CALL ADI2_HGKYI( SPHDU, 'NAXIS2', DIM, CMNT, STATUS )
 
 *    Map the column (sphdu -> args(1) - rb)
-        CALL ADI2_MAPCOL( ARGS(1), SPHDU, BCOL, 1, DIM, TYPE, MODE, PSID,
-     :                    PTR, STATUS )
+        CALL ADI2_MAPCOL( ARGS(1), SPHDU, BCOL, 1, DIM, TYPE, MODE,
+     :                    PSID, PTR, STATUS )
 
 *   Fudge! (rb)
         if (item.eq.'Variance') then
