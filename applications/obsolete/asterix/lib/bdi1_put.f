@@ -99,13 +99,17 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
+      CHARACTER*(DAT__SZLOC)	DLOC			! New DATA_ARRAY cmp
       CHARACTER*20		ITEM
+      CHARACTER*(DAT__SZLOC)	TLOC			! Top level object
 
       DOUBLE PRECISION		SCWID			! Scalar width
       DOUBLE PRECISION		SPARR(2)		! Spaced array data
 
       INTEGER			NELM			! # data elements
       INTEGER			PTR			! Mapped axis values
+
+      LOGICAL			STRUC			! Object is a structure
 *.
 
 *  Check inherited global status.
@@ -173,6 +177,38 @@
 *    Unmap the array
         CALL DAT_UNMAP( CLOC, STATUS )
 
+*  Magic values flag?
+      ELSE IF ( ITEM .EQ. 'MagicFlag' ) THEN
+
+*    Locate primary data array
+        CALL BDI1_CFIND( ARGS(1), ARGS(2), 'Data', .TRUE.,
+     :                   CLOC, STATUS )
+
+*    Is the array a structure? If not, rename it, create a structure and
+*    move the data into that new structure
+        CALL DAT_STRUC( CLOC, STRUC, STATUS )
+        IF ( .NOT. STRUC ) THEN
+
+*      Create the new structure
+          CALL ADI1_GETLOC( ARGS(2), TLOC, STATUS )
+          CALL DAT_NEW( TLOC, '_DATA_ARRAY', 'ARRAY', 0, 0, STATUS )
+          CALL DAT_FIND( TLOC, '_DATA_ARRAY', DLOC, STATUS )
+          CALL DAT_MOVE( CLOC, DLOC, 'DATA', STATUS )
+
+*      Rename
+          CALL DAT_RENAM( DLOC, 'DATA_ARRAY', STATUS )
+          CALL DAT_ANNUL( DLOC, STATUS )
+          CLOC = DLOC
+
+        END IF
+
+*    Write the flag
+        CALL ADI_CCA2HL( ARGS(4), ' ', DLOC, 'BAD_PIXEL', STATUS )
+
+*    Release HDS item
+        CALL DAT_ANNUL( CLOC, STATUS )
+
+*  All other items
       ELSE
 
 *    Locate object to be got

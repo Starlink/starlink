@@ -79,8 +79,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     20 Nov 1995 (DJA):
+*        Added MagicFlag item.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -115,9 +117,10 @@
         PARAMETER		( AXSUBS =
      :   'SCALARWIDTH,SPACEDDATA,DATA,WIDTH,LABEL,UNITS,NORMALISED,'/
      :       /'LOWIDTH,HIWIDTH' )
-      CHARACTER*114		SUBS
+      CHARACTER*124		SUBS
         PARAMETER		( SUBS =
-     :   'DATA,VARIANCE,ERROR,QUALITY,QUALITYMASK,LABEL,UNITS,'/
+     :   'DATA,VARIANCE,ERROR,QUALITY,QUALITYMASK,LABEL,'/
+     :   /'UNITS,MAGICFLAG,'/
      :  /'TITLE,LOGICALQUALITY,LOERROR,HIERROR,AXES,MASKEDQUALITY' )
 
 *  Local Variables:
@@ -293,6 +296,8 @@
               LITEM = 'QualityMask'
             ELSE IF ( LCOP(1:ILEN) .EQ. 'LOGICALQUALITY' ) THEN
               LITEM = 'LogicalQuality'
+            ELSE IF ( LCOP(1:ILEN) .EQ. 'MAGICFLAG' ) THEN
+              LITEM = 'MagicFlag'
             ELSE IF ( LCOP(1:ILEN) .EQ. 'MASKEDQUALITY' ) THEN
               LITEM = 'MaskedQuality'
             ELSE IF ( LCOP(1:ILEN) .EQ. 'LOERROR' ) THEN

@@ -1,45 +1,142 @@
-*+  MAGIC - sets magic values according to QUALITY
-      SUBROUTINE MAGIC(STATUS)
-*    Description :
-*    Authors :
-*      BHVAD::RJV
-*    History :
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      SUBROUTINE MAGIC( STATUS )
+*+
+*  Name:
+*     MAGIC
+
+*  Purpose:
+*     Set magic values according to quality array
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL MAGIC( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     {routine_description}
+
+*  Usage:
+*     magic {parameter_usage}
+
+*  Environment Parameters:
+*     {parameter_name}[pdims] = {parameter_type} ({parameter_access_mode})
+*        {parameter_description}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     magic, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     RJV: Bob Vallance (ROSAT, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     24 Nov 1994 V1.8-0 (DJA):
+*        New user interface
+*     17 Nov 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'
       INCLUDE 'PRM_PAR'
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-*    Local variables :
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'MAGIC Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER*(DAT__SZLOC) ILOC
       CHARACTER*(DAT__SZLOC) OLOC
       CHARACTER*(DAT__SZTYP) TYPE
-      CHARACTER*8 MSTR
-      REAL MAGVAL
+      CHARACTER*8               MSTR
+
+      REAL                      MAGVAL
+
+      INTEGER                   IFID                    ! Input dataset id
+      INTEGER                   OFID                    ! Output dataset id
       INTEGER NDIM,DIMS(DAT__MXDIM),LEN
       INTEGER DPTR,QPTR
+
       BYTE MASK
-      LOGICAL OVER
+
+      LOGICAL                   OVER                    ! Overwrite mode?
       LOGICAL PRIM
       LOGICAL DOK,QOK
+*.
 
-*    Version :
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MAGIC Version 1.8-0')
-*-
-      CALL MSG_PRNT(VERSION)
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Version id
+      CALL MSG_PRNT( VERSION )
+
+*  Initialise ASTERIX
       CALL AST_INIT()
 
-      CALL USI_GET0L('OVER',OVER,STATUS)
+*  Overwrite mode?
+      CALL USI_GET0L( 'OVER' OVER, STATUS )
 
-*  overwrite case - input becomes output
+*  Overwrite case - input becomes output
       IF (OVER) THEN
         CALL USI_ASSOCI('INP','UPDATE',OLOC,PRIM,STATUS)
       ELSE
@@ -57,34 +154,39 @@
         ENDIF
       ENDIF
 
-      CALL BDA_CHKDATA(OLOC,DOK,NDIM,DIMS,STATUS)
-      CALL BDA_CHKQUAL(OLOC,QOK,NDIM,DIMS,STATUS)
-
-      CALL ARR_SUMDIM( NDIM, DIMS, LEN )
-
+*  Check data and quality
+      CALL BDI_CHK( OFID, 'Data', DOK, STATUS )
+      CALL BDI_CHK( OFID, 'Quality', QOK, STATUS )
+      CALL BDI_GETNEL( OFID, LEN, STATUS )
       IF (STATUS.EQ.SAI__OK.AND.DOK.AND.QOK) THEN
 
-        CALL USI_GET0R('MAGIC',MAGVAL,STATUS)
+*    Get the magic value
+        CALL USI_GET0R( 'MAGIC', MAGVAL, STATUS )
         IF (STATUS.EQ.PAR__NULL) THEN
           CALL ERR_ANNUL( STATUS )
-          MAGVAL=VAL__BADR
-        ENDIF
+          MAGVAL = VAL__BADR
+        END IF
 
-        CALL BDA_GETMASK(OLOC,MASK,STATUS)
-        CALL STR_BTOC(MASK,MSTR,STATUS)
-        CALL USI_DEF0C('MASK',MSTR,STATUS)
-        CALL USI_GET0C('MASK',MSTR,STATUS)
-        CALL STR_CTOB(MSTR,MASK,STATUS)
+*    Allow user to change the mask
+        CALL BDI_GET( OFID, 'QualityMask', 'UBYTE', 0, 0,
+     :                MASK, IDUM, STATUS )
+        CALL STR_BTOC( MASK, MSTR, STATUS )
+        CALL USI_DEF0C( 'MASK', MSTR, STATUS )
+        CALL USI_GET0C( 'MASK', MSTR, STATUS )
+        CALL STR_CTOB( MSTR, MASK, STATUS )
 
-        CALL BDA_MAPDATA(OLOC,'U',DPTR,STATUS)
-        CALL BDA_MAPQUAL(OLOC,'R',QPTR,STATUS)
+*    Map data to be updated, and the quality
+        CALL BDI_MAPR( OFID, 'Data', 'UPDATE', DPTR, STATUS )
+        CALL BDI_MAP( OFID, 'Quality', 'READ', 'UBYTE', QPTR,
+     :                STATUS )
 
-        CALL MAGIC_WRITE(OLOC,MASK,MAGVAL,LEN,%VAL(QPTR),%VAL(DPTR),
-     :                                                       STATUS)
+*    Set the magic values
+        CALL MAGIC_WRITE( OFID, MASK, MAGVAL, LEN, %VAL(QPTR),
+     :                    %VAL(DPTR), STATUS )
 
+      END IF
 
-      ENDIF
-
+*  Tidy up
       CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
@@ -93,7 +195,7 @@
 
 
 *+  MAGIC_WRITE
-      SUBROUTINE MAGIC_WRITE(LOC,MASK,MAGIC,LEN,Q,D,STATUS)
+      SUBROUTINE MAGIC_WRITE(FID,MASK,MAGIC,LEN,Q,D,STATUS)
 *    Description :
 *    Authors :
 *      BHVAD::RJV
@@ -102,9 +204,9 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER FID
       BYTE MASK
       REAL MAGIC
       INTEGER LEN
@@ -114,9 +216,7 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
-*    Local constants :
-      BYTE GOOD
-      PARAMETER (GOOD=0)
+      BYTE BIT_ANDUB
 *    Local variables :
       LOGICAL FLAG
       INTEGER I
@@ -126,14 +226,14 @@
         FLAG=.FALSE.
 
         DO I=1,LEN
-          IF ((Q(I).AND.MASK).NE.GOOD) THEN
-            D(I)=MAGIC
-            FLAG=.TRUE.
+          IF (BIT_ANDUB(Q(I),MASK).NE.QUAL__GOOD) THEN
+            D(I) = MAGIC
+            FLAG = .TRUE.
           ENDIF
         ENDDO
 
         IF (FLAG) THEN
-          CALL BDA_PUTMAGIC(LOC,FLAG,STATUS)
+          CALL BDA_PUT0L(FID,'MagicFlag',FLAG,STATUS)
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
