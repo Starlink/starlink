@@ -126,9 +126,12 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.24  1997/03/06 20:07:55  timj
-*     Improve documentation
+*     Revision 1.25  1997/03/20 21:56:36  jfl
+*     modified to handle aborted observations correctly
 *
+c Revision 1.24  1997/03/06  20:07:55  timj
+c Improve documentation
+c
 c Revision 1.23  1997/01/11  01:43:05  timj
 c Merge with BOLREBIN.
 c Fix RASTER map problems (DEC_END)
@@ -211,7 +214,7 @@ c
       INTEGER WTFNRES                  ! number of values per scale length
       PARAMETER (WTFNRES = 64)
       INTEGER WTFNRAD                  ! radius of Bessel reconstruction
-      PARAMETER (WTFNRAD = 10)          ! filter in scale-lengths
+      PARAMETER (WTFNRAD = 10)         ! filter in scale-lengths
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       INTEGER     MAX_FILE             ! max number of input files
@@ -220,17 +223,29 @@ c
       PARAMETER (BADBIT = 1)
 
 *    Local variables :
-      INTEGER          ABOL_DATA_PTR(MAX_FILE)! Pointer to bolometer data
-      INTEGER          ABOL_DATA_END(MAX_FILE)! Pointer to bolometer data end
-      INTEGER          ABOL_VAR_PTR(MAX_FILE) ! Pointer to bolometer variance
-      INTEGER          ABOL_VAR_END(MAX_FILE) ! Pointer to bolometer var end
-      INTEGER          ABOL_RA_PTR(MAX_FILE)  ! Pointer to bolometer RA
-      INTEGER          ABOL_RA_END(MAX_FILE)  ! Pointer to bolometer RA end
-      INTEGER          ABOL_DEC_PTR(MAX_FILE) ! Pointer to bolometer dec
-      INTEGER          ABOL_DEC_END(MAX_FILE) ! Pointer to bolometer dec end
-      DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent declination of array centre
-                                        ! (radians)
-      DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (radians)
+
+      LOGICAL          ABORTED         ! .TRUE. if an observation has been
+                                       ! aborted
+      INTEGER          ABOL_DATA_END(MAX_FILE)
+                                       ! Pointer to bolometer data end
+      INTEGER          ABOL_DATA_PTR(MAX_FILE)
+                                       ! Pointer to bolometer data
+      INTEGER          ABOL_DEC_END(MAX_FILE)
+                                       ! Pointer to bolometer dec end
+      INTEGER          ABOL_DEC_PTR(MAX_FILE)
+                                       ! Pointer to bolometer dec
+      INTEGER          ABOL_RA_END(MAX_FILE)
+                                       ! Pointer to bolometer RA end
+      INTEGER          ABOL_RA_PTR(MAX_FILE)
+                                       ! Pointer to bolometer RA
+      INTEGER          ABOL_VAR_END(MAX_FILE)
+                                       ! Pointer to bolometer var end
+      INTEGER          ABOL_VAR_PTR(MAX_FILE)
+                                       ! Pointer to bolometer variance
+      DOUBLE PRECISION ARRAY_DEC_CENTRE
+                                       ! apparent declination of array 
+                                       ! centre (radians)
+      DOUBLE PRECISION ARRAY_RA_CENTRE ! apparent RA of array centre (radians)
       INTEGER          BAD_INTS        ! Number of bad integrations in file
       CHARACTER * (3)  BOLNAME         ! Name of each bolometer
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -271,15 +286,18 @@ c
       INTEGER          DATA_OFFSET     ! offset within data array
       CHARACTER*12     DATEOBS         ! Date of map obs
       INTEGER          DAYMON(12)      ! Days in each month
-      REAL             DEC_END          ! apparent dec of scan end (radians)
-      REAL             DEC_START        ! apparent dec of scan start (radians)
+      REAL             DEC_END         ! apparent dec of scan end (radians)
+      REAL             DEC_START       ! apparent dec of scan start (radians)
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       INTEGER          DIMX (MAX_DIM)  ! expected array dimensions
-      INTEGER          DUMMY_QUALITY(MAX__INTS) ! Dummy quality array
+      INTEGER          DUMMY_QUALITY (MAX__INTS)
+                                       ! Dummy quality array
       DOUBLE PRECISION DTEMP           ! scratch double
       DOUBLE PRECISION DTEMP1          ! scratch double
-      INTEGER          DUMMY_VARIANCE_PTR(MAX_FILE) ! Pointer to dummy variance
-      INTEGER          DUMMY_ENDVAR_PTR(MAX_FILE) ! Pointer to end of dummy var
+      INTEGER          DUMMY_ENDVAR_PTR (MAX_FILE)
+                                       ! Pointer to end of dummy var
+      INTEGER          DUMMY_VARIANCE_PTR (MAX_FILE)
+                                       ! Pointer to dummy variance
       INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          EXPOSURE        ! exposure index in DO loop
       INTEGER          EXP_END         ! end index of data for an exposure
@@ -302,7 +320,8 @@ c
       REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
-      INTEGER          GOOD_INTS      ! Total number of good ints per file
+      INTEGER          GOOD_INTS       ! Total number of good ints per
+                                       ! file
       INTEGER          HMSF (4)        ! holds converted angle information from
                                        ! SLA routine
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
@@ -316,27 +335,29 @@ c
       INTEGER          IMIN            ! minute at which observation started
       CHARACTER*40     INSTRUMENT      ! FITS instrument entry
       INTEGER          INTEGRATION     ! integration index in DO loop
-      INTEGER          INT_BAD (MAX__INT) ! Numbers of integrations to be
+      INTEGER          INT_BAD (MAX__INT)
+                                       ! Numbers of integrations to be
                                        ! ignored
-      INTEGER          INT_TIME        ! Number of good jiggles
       INTEGER          INT_QUAL        ! Scratch quality
-      INTEGER          INT_QUALITY(MAX__INTS) ! Integration quality (modify)
+      INTEGER          INT_QUALITY(MAX__INTS)
+                                       ! Integration quality (modify)
+      INTEGER          INT_TIME        ! Number of good jiggles
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       INTEGER          IN_DATA_END (MAX_FILE)
                                        ! pointer to end of scratch space 
                                        ! holding data from input files
       INTEGER          IN_DATA_PTR (MAX_FILE)
-                                        ! pointer to scratch space holding
-                                        ! data from input files
-      DOUBLE PRECISION IN_DEC_CEN       ! apparent Dec of input file map centre
-                                        ! (radians)
-      INTEGER          IN_DEC1_ARY      ! array identifier to .SCUCD.DEC1
-      INTEGER          IN_DEC1_PTR      ! array pointer to .SCUCD.DEC1
-      INTEGER          IN_DEC2_ARY      ! array identifier to .SCUCD.DEC2
-      INTEGER          IN_DEC2_PTR      ! array pointer to .SCUCD.DEC2
-      INTEGER          IN_DEM_PNTR_ARY  ! array identifier to .SCUBA.DEM_PNTR
-      INTEGER          IN_DEM_PNTR_PTR  ! pointer to .SCUBA.DEM_PNTR
+                                       ! pointer to scratch space holding
+                                       ! data from input files
+      DOUBLE PRECISION IN_DEC_CEN      ! apparent Dec of input file map centre
+                                       ! (radians)
+      INTEGER          IN_DEC1_ARY     ! array identifier to .SCUCD.DEC1
+      INTEGER          IN_DEC1_PTR     ! array pointer to .SCUCD.DEC1
+      INTEGER          IN_DEC2_ARY     ! array identifier to .SCUCD.DEC2
+      INTEGER          IN_DEC2_PTR     ! array pointer to .SCUCD.DEC2
+      INTEGER          IN_DEM_PNTR_ARY ! array identifier to .SCUBA.DEM_PNTR
+      INTEGER          IN_DEM_PNTR_PTR ! pointer to .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
                                        ! file
@@ -359,10 +380,10 @@ c
       INTEGER          IN_NDF          ! NDF index of input file
       DOUBLE PRECISION IN_RA_CEN       ! apparent RA of input file map centre
                                        ! (radians)
-      INTEGER          IN_RA1_ARY       ! array identifier to .SCUCD.RA1
-      INTEGER          IN_RA1_PTR       ! pointer to .SCUCD.RA1
-      INTEGER          IN_RA2_ARY       ! array identifier to .SCUCD.RA2
-      INTEGER          IN_RA2_PTR       ! pointer to .SCUCD.RA2
+      INTEGER          IN_RA1_ARY      ! array identifier to .SCUCD.RA1
+      INTEGER          IN_RA1_PTR      ! pointer to .SCUCD.RA1
+      INTEGER          IN_RA2_ARY      ! array identifier to .SCUCD.RA2
+      INTEGER          IN_RA2_PTR      ! pointer to .SCUCD.RA2
       CHARACTER*(DAT__SZLOC) IN_REDSX_LOC
                                        ! locator to REDS extension in input
                                        ! file
@@ -397,62 +418,69 @@ c
       REAL             JIGGLE_X (SCUBA__MAX_JIGGLE)
                                        ! x jiggle offsets (arcsec)
       REAL             JIGGLE_Y (SCUBA__MAX_JIGGLE)
-                                        ! y jiggle offsets (arcsec)
-      INTEGER          J_CENTRE         ! J index of central pixel in output
-                                        ! map
-      LOGICAL          KEEP_INT         ! Keep the specified ints
-      DOUBLE PRECISION LAT_OBS          ! latitude of observatory (radians)
-      INTEGER          LBND (MAX_DIM)   ! pixel indices of bottom left corner
-                                        ! of output image
-      DOUBLE PRECISION LST              ! sidereal time at which measurement
-                                        ! made (radians)
-      REAL             MAP_X            ! x offset of map centre from telescope
-                                        ! centre (radians)
-      REAL             MAP_Y            ! y offset of map centre from telescope
-                                        ! centre (radians)
-      INTEGER          MEASUREMENT      ! measurement index in DO loop
-      DOUBLE PRECISION MJD_STANDARD     ! date for which apparent RA,Decs of all
-                                        ! measured positions are calculated
-      INTEGER          NDAYS            ! Number of days in year
-      INTEGER          NDIM             ! the number of dimensions in an array
-      INTEGER          NERR             ! Number of errors from VEC_
-      INTEGER          NP               ! size of P array in call to IRA_CREAT
-      INTEGER          NREC             ! number of history records in input
-                                        ! file
-      INTEGER          NX_OUT           ! x dimension of output map
-      INTEGER          NY_OUT           ! y dimension of output map
-      INTEGER          N_BOL (MAX_FILE) ! number of bolometers measured in input
-                                        ! files
-      INTEGER          N_EXPOSURES      ! number of exposures per integration
-                                        ! in input file
-      INTEGER          N_FITS           ! number of items in FITS array
-      INTEGER          N_INTEGRATIONS   ! number of integrations per measurement
-                                        ! in input file
-      INTEGER          N_INT_BAD        ! the number of integrations
-                                        ! with data to be ignored
-      INTEGER          N_MEASUREMENTS   ! number of measurements in input file
-      INTEGER          N_POINT          ! dimension of pointing correction 
-                                        ! array in input file
-      INTEGER          N_POS (MAX_FILE) ! number of positions measured in input
-                                        ! files
-      INTEGER          N_PTS (MAX_FILE) ! Number of bols * positions
-      INTEGER          N_SWITCHES       ! number of switches per exposure in
-                                        ! input file
-      CHARACTER*40     OBJECT           ! name of object
-      CHARACTER*40     OBSERVING_MODE   ! observing mode of input file
-      DOUBLE PRECISION OBSRA            ! RA of output map (degrees)
-      DOUBLE PRECISION OBSDEC           ! Dec of output map (degrees)
-      CHARACTER*15     OFFSET_COORDS    ! coord system of OFFSET_X and OFFSET_Y
-      REAL             OFFSET_X         ! x offset of measurement
-      REAL             OFFSET_Y         ! y offset of measurement
+                                       ! y jiggle offsets (arcsec)
+      INTEGER          J_CENTRE        ! J index of central pixel in output
+                                       ! map
+      LOGICAL          KEEP_INT        ! Keep the specified ints
+      DOUBLE PRECISION LAT_OBS         ! latitude of observatory (radians)
+      INTEGER          LAST_EXP        ! exposure during which abort
+                                       ! occurred
+      INTEGER          LAST_INT        ! integration during which abort
+                                       ! occurred
+      INTEGER          LAST_MEAS       ! measurement during which abort
+                                       ! occurred
+      INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left 
+                                       ! corner of output image
+      DOUBLE PRECISION LST             ! sidereal time at which measurement
+                                       ! made (radians)
+      REAL             MAP_X           ! x offset of map centre from telescope
+                                       ! centre (radians)
+      REAL             MAP_Y           ! y offset of map centre from telescope
+                                       ! centre (radians)
+      INTEGER          MEASUREMENT     ! measurement index in DO loop
+      DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
+                                       ! of all
+                                       ! measured positions are calculated
+      INTEGER          NDAYS           ! Number of days in year
+      INTEGER          NDIM            ! the number of dimensions in an array
+      INTEGER          NERR            ! Number of errors from VEC_
+      INTEGER          NP              ! size of P array in call to IRA_CREAT
+      INTEGER          NREC            ! number of history records in input
+                                       ! file
+      INTEGER          NX_OUT          ! x dimension of output map
+      INTEGER          NY_OUT          ! y dimension of output map
+      INTEGER          N_BOL (MAX_FILE)! number of bolometers measured in input
+                                       ! files
+      INTEGER          N_EXPOSURES     ! number of exposures per integration
+                                       ! in input file
+      INTEGER          N_FITS          ! number of items in FITS array
+      INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
+                                       ! in input file
+      INTEGER          N_INT_BAD       ! the number of integrations
+                                       ! with data to be ignored
+      INTEGER          N_MEASUREMENTS  ! number of measurements in input file
+      INTEGER          N_POINT         ! dimension of pointing correction 
+                                       ! array in input file
+      INTEGER          N_POS (MAX_FILE)! number of positions measured in input
+                                       ! files
+      INTEGER          N_PTS (MAX_FILE)! Number of bols * positions
+      INTEGER          N_SWITCHES      ! number of switches per exposure in
+                                       ! input file
+      CHARACTER*40     OBJECT          ! name of object
+      CHARACTER*40     OBSERVING_MODE  ! observing mode of input file
+      DOUBLE PRECISION OBSRA           ! RA of output map (degrees)
+      DOUBLE PRECISION OBSDEC          ! Dec of output map (degrees)
+      CHARACTER*15     OFFSET_COORDS   ! coord system of OFFSET_X and OFFSET_Y
+      REAL             OFFSET_X        ! x offset of measurement
+      REAL             OFFSET_Y        ! y offset of measurement
       CHARACTER*(132)  OUT             ! Output file name
-      INTEGER          OUT_A_PTR        ! pointer to axis in output file
-      CHARACTER*40     OUTCRDS          ! dummy coord system of output map
-      CHARACTER*40     OUT_COORDS       ! coordinate system of output map
-      INTEGER          OUT_DATA_PTR     ! pointer to output map data array
-      DOUBLE PRECISION OUT_DEC_CEN      ! apparent Dec of output map centre
-                                        ! (radians)
-      DOUBLE PRECISION OUT_EPOCH        ! epoch of output map
+      INTEGER          OUT_A_PTR       ! pointer to axis in output file
+      CHARACTER*40     OUTCRDS         ! dummy coord system of output map
+      CHARACTER*40     OUT_COORDS      ! coordinate system of output map
+      INTEGER          OUT_DATA_PTR    ! pointer to output map data array
+      DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
+                                       ! (radians)
+      DOUBLE PRECISION OUT_EPOCH       ! epoch of output map
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
                                        ! locator of FITS extension in output
                                        ! file
@@ -480,29 +508,31 @@ c
                                        ! elevation pointing corrections
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
-                                        ! LST of pointing corrections (radians)
-      CHARACTER*5      RADECSYS         ! Type of coordinate system
-      REAL             RA_END           ! apparent RA of scan end (radians)
-      REAL             RA_START         ! apparent RA of scan start (radians)
-      LOGICAL          READING          ! .TRUE. while reading input files
-      LOGICAL          REBIN            ! .TRUE. if REBIN application has 
-                                        ! been run on input file
-      LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH application
-                                        ! has been run on input file
-      INTEGER          REGRID1_END      ! pointer to end of REGRID1_PTR space
-      INTEGER          REGRID1_PTR      ! pointer to scratch array used by
-                                        ! SCULIB_BESSEL_REGRID_1
-      REAL             RDEPOCH          ! Epoch of observation
-      REAL             RTEMP            ! scratch real
-      INTEGER          RUN_NUMBER       ! run number of input file
-      CHARACTER*15     SAMPLE_COORDS    ! coordinate system of sample offsets
-      CHARACTER*15     SAMPLE_MODE      ! sample mode of input file
-      REAL             SAMPLE_PA        ! position angle of sample x axis
-                                        ! relative to x axis of SAMPLE_COORDS
-                                        ! system
-      CHARACTER*30     SCS              ! name of sky coordinate system
-      DOUBLE PRECISION SEC              ! second at which observation started
-      LOGICAL          SELECT_INTS      ! Choose some integrations
+                                       ! LST of pointing corrections (radians)
+      CHARACTER*5      RADECSYS        ! Type of coordinate system
+      REAL             RA_END          ! apparent RA of scan end (radians)
+      REAL             RA_START        ! apparent RA of scan start (radians)
+      LOGICAL          READING         ! .TRUE. while reading input files
+      LOGICAL          REBIN           ! .TRUE. if REBIN application has 
+                                       ! been run on input file
+      LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
+                                       ! has been run on input file
+      INTEGER          REGRID1_END     ! pointer to end of REGRID1_PTR space
+      INTEGER          REGRID1_PTR     ! pointer to scratch array used by
+                                       ! SCULIB_BESSEL_REGRID_1
+      REAL             RDEPOCH         ! Epoch of observation
+      REAL             RTEMP           ! scratch real
+      INTEGER          RUN_NUMBER      ! run number of input file
+      CHARACTER*15     SAMPLE_COORDS   ! coordinate system of sample offsets
+      CHARACTER*15     SAMPLE_MODE     ! sample mode of input file
+      REAL             SAMPLE_PA       ! position angle of sample x axis
+                                       ! relative to x axis of SAMPLE_COORDS
+                                       ! system
+      CHARACTER*30     SCS             ! name of sky coordinate system
+      CHARACTER*80     SCUCD_STATE     ! 'state' of SCUCD at the end of
+                                       ! the observation
+      DOUBLE PRECISION SEC             ! second at which observation started
+      LOGICAL          SELECT_INTS     ! Choose some integrations
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
@@ -527,7 +557,8 @@ c
                                        ! `total weight' array
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
                                        ! of output image
-      LOGICAL          USE_INT(SCUBA__MAX_INT) ! To use or not to use
+      LOGICAL          USE_INT (SCUBA__MAX_INT)
+                                       ! To use or not to use
       LOGICAL          USE_INTS        ! How to use the specified ints
       CHARACTER*15     UTDATE          ! date of input observation
       CHARACTER*15     UTSTART         ! UT of start of input observation
@@ -539,7 +570,7 @@ c
       DOUBLE PRECISION YMAX            ! max of map offsets
       DOUBLE PRECISION YMIN            ! min of map offsets
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
-      REAL             WTFN(WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
+      REAL             WTFN (WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
                                        ! Weighting function
       CHARACTER* 20    XLAB            ! X label for output map
       CHARACTER* 20    YLAB            ! Y label for output map
@@ -1006,7 +1037,6 @@ c
                END IF
             END IF
 
-
 *  map the various components of the data array and check the data
 *  dimensions
 
@@ -1016,7 +1046,7 @@ c
             CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', 
      :        FILE_DATA_PTR, ITEMP, STATUS)
 
-* Need to check if FIGARO has removed the VARIANCE array
+*  Need to check if FIGARO has removed the VARIANCE array
 
             CALL NDF_STATE(IN_NDF, 'VARIANCE', STATE, STATUS)
 
@@ -1152,6 +1182,16 @@ c
 
             N_SWITCHES = DIM (1)
 
+*  find if the observation was aborted
+
+            CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'STATE', SCUCD_STATE, STATUS)
+            CALL CHR_UCASE (SCUCD_STATE)
+            ABORTED = .FALSE.
+            IF (INDEX(SCUCD_STATE,'ABORTING') .NE. 0) THEN
+               ABORTED = .TRUE.
+            END IF
+
 *       Calculate the number of GOOD integrations so that I can report
 *       time contribution from each map
                
@@ -1181,14 +1221,38 @@ c
 *     Find number of good ints and add to running total
             GOOD_INTS = TOTAL_INTS - BAD_INTS
 
-*     Print out information on observation
+*  Print out information on observation
+
             CALL MSG_SETI ('N_E', N_EXPOSURES)
             CALL MSG_SETI ('N_I', N_INTEGRATIONS)
             CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
-            CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
+            IF (.NOT. ABORTED) THEN
+               CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
+            ELSE
+
+*  get the exposure, integration, measurement numbers at which the abort
+*  occurred
+
+               CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'EXP_NO', LAST_EXP, STATUS)
+               CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'INT_NO', LAST_INT, STATUS)
+               CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'MEAS_NO', LAST_MEAS, STATUS)
+
+               CALL MSG_OUT (' ', 'REDS: the observation should have '//
+     :           'had ^N_E exposure(s) in ^N_I integration(s) in '//
+     :           '^N_M measurement(s)', STATUS)
+               CALL MSG_SETI ('N_E', LAST_EXP)
+               CALL MSG_SETI ('N_I', LAST_INT)
+               CALL MSG_SETI ('N_M', LAST_MEAS)
+               CALL MSG_OUT (' ', ' - However, the observation was '//
+     :           'ABORTED during exposure ^N_E of integration ^N_I '//
+     :           'of measurement ^N_M', STATUS)
+            END IF
 
             CALL MSG_SETI('TOT', GOOD_INTS)
             CALL MSG_SETI('TIME', GOOD_INTS * JIGGLE_COUNT)
@@ -1565,6 +1629,7 @@ c
                   CALL PAR_CANCL ('INTEGRATIONS', STATUS)
 
                   IF (INT_BAD(1) .GT. 0) THEN
+
 *  do we want to keep or discard
  
                      CALL PAR_GET0L ('USE_INTS', USE_INTS, STATUS)
@@ -1584,11 +1649,13 @@ c
                      END IF
 
 *  Initialise the usage array
+
                      DO I = 1, N_INTEGRATIONS
                         USE_INT(I) = .NOT.KEEP_INT
                      END DO
 
-* Now set the ones we want to keep
+*  Now set the ones we want to keep
+
                      DO I = 1, N_INT_BAD
                         IF (INT_BAD(I) .GT. 0) THEN
                            USE_INT(INT_BAD(I)) = KEEP_INT
@@ -1636,8 +1703,6 @@ c
      :           (GOOD_INTS * JIGGLE_COUNT)
             SUM_GOOD_INTS = SUM_GOOD_INTS + GOOD_INTS
 
-*     calculate position of each bolometer at each measurement
-
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBD,
      :           BOL_RA_PTR(FILE), BOL_RA_END(FILE), STATUS)
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBD,
@@ -1645,158 +1710,173 @@ c
 
             IF (STATUS .EQ. SAI__OK) THEN
 
-*     now go through the various exposures of the observation calculating the
-*     observed positions
+*  now go through the various exposures of the observation calculating the
+*  observed positions
 
                DO MEASUREMENT = 1, N_MEASUREMENTS
                   DO INTEGRATION = 1, N_INTEGRATIONS
                      DO EXPOSURE = 1, N_EXPOSURES
 
-*     calculate mean LST for the switch sequence making up the exposure
+*  find where the exposure starts and finishes in the data array
 
-                        EXP_LST = 0.0D0
-                        DO I = 1, N_SWITCHES
-                           DATA_OFFSET = (((MEASUREMENT-1) *
+                        CALL SCULIB_FIND_SWITCH (
+     :                    %val(IN_DEM_PNTR_PTR), 1, N_EXPOSURES,
+     :                    N_INTEGRATIONS, N_MEASUREMENTS,N_POS(FILE),
+     :                    1, EXPOSURE, INTEGRATION, MEASUREMENT,
+     :                    EXP_START, EXP_END, STATUS)
+
+                        IF ((EXP_START .EQ. VAL__BADI) .OR.
+     :                      (EXP_START .EQ. 0))        THEN
+                           CALL MSG_SETI ('E', EXPOSURE)
+                           CALL MSG_SETI ('I', INTEGRATION)
+                           CALL MSG_SETI ('M', MEASUREMENT)
+                           CALL MSG_OUT (' ', 'REDS: no data for '//
+     :                       'exp ^E in int ^I, meas ^M', STATUS)
+                        ELSE
+
+*  OK, there is some data, first calculate mean LST for the switch
+*  sequence making up the exposure
+
+                           EXP_LST = 0.0D0
+                           DO I = 1, N_SWITCHES
+                              DATA_OFFSET = (((MEASUREMENT-1) *
      :                          N_INTEGRATIONS + INTEGRATION - 1) *
      :                          N_EXPOSURES + EXPOSURE - 1) *
      :                          N_SWITCHES + I - 1
-                           CALL VEC_DTOD(.FALSE., 1,
+                              CALL VEC_DTOD(.FALSE., 1,
      :                          %val(IN_LST_STRT_PTR + DATA_OFFSET *
      :                          VAL__NBD), DTEMP, IERR, NERR, STATUS)
-                           EXP_LST = EXP_LST + DTEMP
-                        END DO
-                        EXP_LST = EXP_LST / DBLE (N_SWITCHES)
+                              EXP_LST = EXP_LST + DTEMP
+                           END DO
+                           EXP_LST = EXP_LST / DBLE (N_SWITCHES)
 
-*     get the scan parameters for a raster map
+*  get the scan parameters for a raster map
  
-                        IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                           CALL VEC_RTOR(.FALSE., 1,
+                           IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+                              CALL VEC_RTOR(.FALSE., 1,
      :                          %val(IN_RA1_PTR + DATA_OFFSET *
      :                          VAL__NBR), RA_START, IERR, NERR, STATUS)
-                           CALL VEC_RTOR(.FALSE., 1,
+                              CALL VEC_RTOR(.FALSE., 1,
      :                          %val(IN_RA2_PTR + DATA_OFFSET *
      :                          VAL__NBR), RA_END, IERR, NERR, STATUS)
-                           CALL VEC_RTOR(.FALSE., 1,
+                              CALL VEC_RTOR(.FALSE., 1,
      :                          %val(IN_DEC1_PTR + DATA_OFFSET *
      :                          VAL__NBR), DEC_START, IERR, NERR,STATUS)
-                           CALL VEC_RTOR(.FALSE., 1,
+                              CALL VEC_RTOR(.FALSE., 1,
      :                          %val(IN_DEC2_PTR + DATA_OFFSET *
      :                          VAL__NBR), DEC_END, IERR, NERR, STATUS)
 
 *  convert to radians
 
-                           RA_START = RA_START * REAL (PI) / 12.0
-                           RA_END = RA_END * REAL (PI) / 12.0
-                           DEC_START = DEC_START * REAL (PI) / 180.0
-                           DEC_END = DEC_END * REAL (PI) / 180.0
-                        END IF
+                              RA_START = RA_START * REAL (PI) / 12.0
+                              RA_END = RA_END * REAL (PI) / 12.0
+                              DEC_START = DEC_START * REAL (PI) / 180.0
+                              DEC_END = DEC_END * REAL (PI) / 180.0
+                           END IF
 
-*     find where the exposure starts and finishes in the data array
+*  cycle through the measurements in the exposure
 
-                        CALL SCULIB_FIND_SWITCH (
-     :                       %val(IN_DEM_PNTR_PTR), 1, N_EXPOSURES,
-     :                       N_INTEGRATIONS, N_MEASUREMENTS,N_POS(FILE),
-     :                       1, EXPOSURE, INTEGRATION, MEASUREMENT,
-     :                       EXP_START, EXP_END, STATUS)
+                           DO I = EXP_START, EXP_END
 
-*     cycle through the measurements in the exposure
+*  calculate the LST at which the measurement was made (hardly worth the
+*  bother because it's averaged over the switches anyway)
 
-                        DO I = EXP_START, EXP_END
-
-*     calculate the LST at which the measurement was made (hardly worth the
-*     bother because it's averaged over the switches anyway)
-
-                           LST = EXP_LST + DBLE(I - EXP_START) *
+                              LST = EXP_LST + DBLE(I - EXP_START) *
      :                          DBLE(EXP_TIME) * 1.0027379D0 * 
      :                          2.0D0 * PI / (3600.0D0 * 24.0D0)
 
 
 *  work out the offset at which the measurement was made in arcsec
  
-                           IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
-                              ARRAY_RA_CENTRE = IN_RA_CEN
-                              ARRAY_DEC_CENTRE = IN_DEC_CEN
+                              IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+                                 ARRAY_RA_CENTRE = IN_RA_CEN
+                                 ARRAY_DEC_CENTRE = IN_DEC_CEN
  
-                              IF (JIGGLE_REPEAT .EQ. 1) THEN
-                                 JIGGLE = (EXPOSURE-1) *
+                                 IF (JIGGLE_REPEAT .EQ. 1) THEN
+                                    JIGGLE = (EXPOSURE-1) *
      :                                JIGGLE_P_SWITCH +
      :                                I - EXP_START + 1
-                              ELSE
-                                 JIGGLE = MOD (I - EXP_START,
+                                 ELSE
+                                    JIGGLE = MOD (I - EXP_START,
      :                                JIGGLE_COUNT) + 1
-                              END IF
-                              OFFSET_X = JIGGLE_X (JIGGLE)
-                              OFFSET_Y = JIGGLE_Y (JIGGLE)
+                                 END IF
+                                 OFFSET_X = JIGGLE_X (JIGGLE)
+                                 OFFSET_Y = JIGGLE_Y (JIGGLE)
 
-                              IF (SAMPLE_COORDS .EQ. 'NA') THEN
-                                 OFFSET_COORDS = 'NA'
-                              ELSE IF (SAMPLE_COORDS .EQ. 'AZ') THEN
-                                 OFFSET_COORDS = 'AZ'
-                              ELSE 
+                                 IF (SAMPLE_COORDS .EQ. 'NA') THEN
+                                    OFFSET_COORDS = 'NA'
+                                 ELSE IF (SAMPLE_COORDS .EQ. 'AZ') THEN
+                                    OFFSET_COORDS = 'AZ'
+                                 ELSE 
+                                    OFFSET_COORDS = 'RD'
+                                 END IF
+
+                              ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+                                 ARRAY_RA_CENTRE = DBLE (RA_START) +
+     :                             DBLE (RA_END - RA_START) *
+     :                             DBLE (I - EXP_START) /
+     :                             DBLE (EXP_END - EXP_START)
+                                 ARRAY_DEC_CENTRE = DBLE (DEC_START) +
+     :                             DBLE (DEC_END - DEC_START) *
+     :                             DBLE (I - EXP_START) /
+     :                             DBLE (EXP_END - EXP_START)
+
+                                 OFFSET_X = 0.0
+                                 OFFSET_Y = 0.0
                                  OFFSET_COORDS = 'RD'
                               END IF
 
-                           ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                              ARRAY_RA_CENTRE = DBLE (RA_START) +
-     :                          DBLE (RA_END - RA_START) *
-     :                          DBLE (I - EXP_START) /
-     :                          DBLE (EXP_END - EXP_START)
-                              ARRAY_DEC_CENTRE = DBLE (DEC_START) +
-     :                          DBLE (DEC_END - DEC_START) *
-     :                          DBLE (I - EXP_START) /
-     :                          DBLE (EXP_END - EXP_START)
+*  now call a routine to work out the apparent RA,Dec of the measured
+*  bolometers at this position
 
-                              OFFSET_X = 0.0
-                              OFFSET_Y = 0.0
-                              OFFSET_COORDS = 'RD'
-                           END IF
+                              DATA_OFFSET = (I - 1) * N_BOL(FILE)
 
-*     now call a routine to work out the apparent RA,Dec of the measured
-*     bolometers at this position
+                              IF ((OUT_COORDS .EQ. 'NA')  .OR.
+     :                            (OUT_COORDS .EQ. 'AZ')) THEN
+                                 OUTCRDS = OUT_COORDS
+                              ELSE
+                                 OUTCRDS = 'RA'
+                              END IF
 
-                           DATA_OFFSET = (I - 1) * N_BOL(FILE)
+                              CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
+     :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, LST, 
+     :                          LAT_OBS, OFFSET_COORDS, OFFSET_X, 
+     :                          OFFSET_Y, IN_ROTATION, N_POINT,
+     :                          SCUBA__MAX_POINT,
+     :                          POINT_LST, POINT_DAZ, POINT_DEL, 
+     :                          SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :                          N_BOL(FILE), BOL_CHAN,
+     :                          BOL_ADC, BOL_DU3, BOL_DU4,
+     :                          CENTRE_DU3, CENTRE_DU4,
+     :                          %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
+     :                          VAL__NBD),
+     :                          %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
+     :                          VAL__NBD),
+     :                          STATUS)
 
-                           IF (OUT_COORDS.EQ.'NA'.OR.
-     :                          OUT_COORDS.EQ.'AZ') THEN
-                              OUTCRDS = OUT_COORDS
-                           ELSE
-                              OUTCRDS = 'RA'
-                           END IF
+*  convert the coordinates to apparent RA,Dec on MJD_STANDARD
 
-                           CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
-     :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, LST, 
-     :                       LAT_OBS, OFFSET_COORDS, OFFSET_X, 
-     :                       OFFSET_Y, IN_ROTATION, N_POINT,
-     :                       SCUBA__MAX_POINT,
-     :                       POINT_LST, POINT_DAZ, POINT_DEL, 
-     :                       SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :                       N_BOL(FILE), BOL_CHAN,
-     :                       BOL_ADC, BOL_DU3, BOL_DU4,
-     :                       CENTRE_DU3, CENTRE_DU4,
-     :                       %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
-     :                       VAL__NBD),
-     :                       %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
-     :                       VAL__NBD),
-     :                       STATUS)
+                              IF (OUTCRDS .EQ. 'RA') THEN
 
-*     convert the coordinates to apparent RA,Dec on MJD_STANDARD
-                           IF (OUTCRDS .EQ. 'RA') THEN
-
-                              IF (FILE .NE. 1) THEN
-                                 CALL SCULIB_STANDARD_APPARENT (
+                                 IF (FILE .NE. 1) THEN
+                                    CALL SCULIB_STANDARD_APPARENT (
      :                                N_BOL(FILE),
      :                                %val(BOL_RA_PTR(FILE) + 
      :                                DATA_OFFSET * VAL__NBD),
      :                                %val(BOL_DEC_PTR(FILE) +
      :                                DATA_OFFSET * VAL__NBD),
      :                                IN_UT1, MJD_STANDARD, STATUS)
+                                 END IF
                               END IF
-                              
-                           END IF
-                        END DO
+
+                           END DO
+
+                        END IF
+
                      END DO
                   END DO
                END DO
+
             END IF
 
 
@@ -1842,12 +1922,11 @@ c
             READING = .FALSE.
          END IF
 
-
       END DO
 
 
-*     OK, all the data required should have been read in by now, check that
-*     there is some input data
+*  OK, all the data required should have been read in by now, check that
+*  there is some input data
 
       IF (FILE .LE. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
@@ -1857,19 +1936,20 @@ c
          END IF
       END IF
 
-*     Report total number of good integrations
+*  Report total number of good integrations
+
       CALL MSG_SETI('TIME', INT_TIME)
       CALL MSG_SETI('INTS', SUM_GOOD_INTS)
 
       CALL MSG_OUT(' ','REDS:Total number of integrations in output'//
      :     ' map is ^INTS (^TIME jiggles)', STATUS)
 
-*     get a title for the output map
+*  get a title for the output map
 
       CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
       CALL PAR_GET0C ('OUT_OBJECT', OBJECT, STATUS)
 
-*     Nasmyth rebin doesn't need a coordinate frame
+*  Nasmyth rebin doesn't need a coordinate frame
 
       IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
 
@@ -1947,15 +2027,15 @@ c
             END IF
          END IF
 
-*     calculate the apparent RA,Dec of the selected output centre
+*  calculate the apparent RA,Dec of the selected output centre
 
          CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
      :        0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
      :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
 
-*     convert the RA,Decs of the observed points to tangent plane offsets
-*     from the chosen output centre
+*  convert the RA,Decs of the observed points to tangent plane offsets
+*  from the chosen output centre
 
          IF (STATUS .EQ. SAI__OK) THEN
             DO I = 1, FILE
@@ -1967,7 +2047,7 @@ c
          END IF
 
 
-*     Deal with NA coords
+*  Deal with NA coords
       ELSE
 
          OUT_RA_CEN = 0.0
@@ -1983,12 +2063,12 @@ c
       CALL PAR_GET0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
 
-*     Now want to have full REBIN and looped BOLREBIN in same code
+*  Now want to have full REBIN and looped BOLREBIN in same code
 
       IF (BOLREBIN) THEN
          TOTAL_BOLS = N_BOL(1)
 
-*     create the output file that will contain the reduced data in NDFs
+*  create the output file that will contain the reduced data in NDFs
  
          CALL PAR_GET0C ('OUT', OUT, STATUS)
          CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
@@ -2126,7 +2206,8 @@ c
       END IF
 
 *  There will be bad pixels in the output map.
-      CALL NDF_SBAD(.TRUE.,OUT_NDF,'Data,Variance', STATUS)
+
+      CALL NDF_SBAD (.TRUE., OUT_NDF, 'Data,Variance', STATUS)
 
 *  get some workspace for the `total weight' array and the scratch area
 *  used by SCULIB_BESSEL_REGRID_1
@@ -2259,7 +2340,7 @@ c
       CALL NDF_ACPUT ('arcsec', OUT_NDF, 'UNITS', 2, STATUS)
       CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
 
-* and a title
+*  and a title
 
       OUT_TITLE = OBJECT
       IF (BOLREBIN) THEN
@@ -2331,7 +2412,7 @@ c
 
       END IF
 
-* Get telescope and instrument from FITS
+*  Get telescope and instrument from FITS
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'INSTRUME', INSTRUMENT, STATUS)
@@ -2380,13 +2461,13 @@ c
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'INSTRUME',
      :  INSTRUMENT, 'name of instrument', STATUS)
 
-* Store SCUBA projection name
+*  Store SCUBA projection name
+
       CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS, 'SCUPROJ',
      :     OUT_COORDS, 'SCUBA output coordinate system', STATUS)
 
-* Put in a DATE-OBS field
+*  Put in a DATE-OBS field, converting MJD to DATE
 
-*     Convert MJD to DATE
       CALL SLA_DJCL(MJD_STANDARD, IY, IM, ID, DTEMP, ITEMP)
 
       ITEMP = 0
@@ -2400,8 +2481,8 @@ c
      :        'DATE-OBS', DATEOBS, 'Date of first observation', STATUS)
 
 
-* Now need to calculate the FITS Axis info
-* If this is NA then NDF2FITS will do this for us
+*  Now need to calculate the FITS Axis info
+*  If this is NA then NDF2FITS will do this for us
 
       IF (OUT_COORDS .NE. 'NA'.AND.OUT_COORDS.NE.'AZ') THEN
 
@@ -2460,7 +2541,8 @@ c
       CALL SCULIB_FREE ('CONV_WEIGHT', CONV_WEIGHT_PTR,
      :  CONV_WEIGHT_END, STATUS)
 
-*       Tidy up each loop
+*  Tidy up each loop
+
       IF (BOLREBIN) THEN
          DO I = 1, FILE
             CALL SCULIB_FREE('BOL_DATA', ABOL_DATA_PTR(I),
@@ -2477,7 +2559,8 @@ c
       CALL NDF_ANNUL(OUT_NDF, STATUS)
       END DO
       END IF
-*     This is the end of the BOLOMETER looping
+
+*  This is the end of the BOLOMETER looping
 
 *  now finish off
 
