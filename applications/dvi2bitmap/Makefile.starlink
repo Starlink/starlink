@@ -382,8 +382,7 @@ PKG_VERS = 1.0-6
 #  List of documentation files.
 NEWS = $(PKG_NAME).news
 
-#  Do include version.h -- see notes below.
-DOCUMENTATION=README.distrib $(NEWS) version.h dvi2bitmap_doc.tar
+DOCUMENTATION=README.distrib $(NEWS) dvi2bitmap_doc.tar
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -781,6 +780,9 @@ export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
+#
+#  Include version.h in this bundle.  The presence of this stops the
+#  makefile attempting to unpack the source (see notes below).
 $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 		$(DATE_STAMP) $(BUILT_FILES)
 	#  Issue a warning if the package has not been tested.
@@ -792,7 +794,7 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) \
 	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z || \
 		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 	$(TAR_IN) - mk Makefile.starlink $(NEWS) $(BUILT_FILES) \
-		$(DATE_STAMP) $(DOCUMENTATION) .BUILT  \
+		$(DATE_STAMP) $(DOCUMENTATION) version.h .BUILT  \
 		| compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
