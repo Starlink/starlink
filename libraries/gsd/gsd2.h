@@ -75,15 +75,42 @@
 #define  IEEE      1            /* IEEE floating point format */
 #define  IEEEBS    2            /* IEEE floating point format byte swapped */
 
+
+/* See if we have IEEE floats */
+#if STDC_HEADERS
+# include <float.h>
+# if FLT_RADIX == 2
+#  if FLT_MANT_DIG == 24
+#    define HAVE_IEEE_FLOATS
+#  endif
+# endif
+#endif
+
+/* Choose the endianness of our ints and floats*/
+#ifdef WORDS_BIGENDIAN
+# define GSD_INTEND BIGEND
+# ifdef HAVE_IEEE_FLOATS
+#   define GSD_FLOAT  IEEE
+# else
+    /* have no idea */
+#   define GSD_FLOAT IEEE
+# endif
+#else
+# define GSD_INTEND LITTLEEND
+# ifdef HAVE_IEEE_FLOATS
+#   define GSD_FLOAT  IEEEBS
+# else
+#   define GSD_FLOAT  VAXF
+# endif
+#endif
+
+
+
 /* Since I have not worked out how configure will tell me the form
    of floating point numbers (real and double) assume IEEE */
 
 static const int host_order[GSD_NTYPES] =
-#ifdef WORDS_BIGENDIAN
- { BIGEND, BIGEND, BIGEND, BIGEND, IEEE, IEEE, 0 };
-#else
-   { LITTLEEND, LITTLEEND, LITTLEEND, LITTLEEND, IEEEBS, IEEEBS, 0 };
-#endif
+ { GSD_INTEND, GSD_INTEND, GSD_INTEND, GSD_INTEND, GSD_FLOAT, GSD_FLOAT, 0 };
 
 /* These are the old way of doing things */
 /* sun4_Solaris.
@@ -112,7 +139,35 @@ static const unsigned char gsd__dbad[8] = { 0xFF, 0xFF, 0xF7, 0xFF,
 
 /* Set the PRIMDAT bad value pattern for the local machine. The VAX/GSD bad
  * patterns are replaced with these (even on a VAX).
+ *
+ * This simply switches on endiannes. In principal we should be using
+ * primdat directly.
  */
+
+#ifdef WORDS_BIGENDIAN
+static const union { unsigned char c[1]; char b; }
+   val1__badb = { 0x80 };
+static const union { unsigned char c[2]; short w; }
+   val1__badw = { 0x80, 0x00 };
+static const union { unsigned char c[4]; int i; }
+   val1__badi = { 0x80, 0x00, 0x00, 0x00 };
+static const union { unsigned char c[4]; float r; }
+   val1__badr = { 0xFF, 0x7F, 0xFF, 0xFF };
+static const union { unsigned char c[8]; double d; }
+   val1__badd = { 0xFF, 0xEF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }; 
+#else
+static const union { unsigned char c[1]; char b; }
+   val1__badb = { 0x80 };
+static const union { unsigned char c[2]; short w; }
+   val1__badw = { 0x00, 0x80 };
+static const union { unsigned char c[4]; int i; }
+   val1__badi = { 0x00, 0x00, 0x00, 0x80 };
+static const union { unsigned char c[4]; float r; }
+   val1__badr = { 0xFF, 0xFF, 0x7F, 0xFF };
+static const union { unsigned char c[8]; double d; }
+   val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF };
+#endif
+
 
 /* sun4_Solaris.
  * sun4.
@@ -129,7 +184,7 @@ static const union { unsigned char c[8]; double d; }
 */
 
 /* alpha_OSF1.
- * ix86_Linux */
+ * ix86_Linux 
 static const union { unsigned char c[1]; char b; }
    val1__badb = { 0x80 };
 static const union { unsigned char c[2]; short w; }
@@ -140,6 +195,7 @@ static const union { unsigned char c[4]; float r; }
    val1__badr = { 0xFF, 0xFF, 0x7F, 0xFF };
 static const union { unsigned char c[8]; double d; }
    val1__badd = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xEF, 0xFF };
+*/
 
 /* vax.
 static const union { unsigned char c[1]; char b; }
