@@ -70,20 +70,9 @@
         ENDIF
 
 *  Current position
-	call adi_print(i_sysid,status)
-	call adi_print(i_prjid,status)
-	call adi_print(i_pixid,status)
-	print *,'W to pix'
-	call flush(6)
         CALL IMG_WORLDTOPIX(I_X,I_Y,XPIX,YPIX,STATUS)
-	print *,'W to cel'
-	call flush(6)
         CALL IMG_WORLDTOCEL(I_X,I_Y,RA,DEC,STATUS)
-	print *,'W to ecl'
-	call flush(6)
         CALL IMG_WORLDTOECL(I_X,I_Y,ELON,ELAT,STATUS)
-	print *,'W to gal'
-	call flush(6)
         CALL IMG_WORLDTOGAL(I_X,I_Y,L,B,STATUS)
         CALL USI_PUT0R('X',I_X,STATUS)			! axis coords
         CALL USI_PUT0R('Y',I_Y,STATUS)
