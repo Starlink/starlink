@@ -674,7 +674,7 @@ kpg1_cpbdd.f kpg1_cpbdr.f kpg1_mixvr.f kpg1_pgopn.f kpg1_pgcls.f \
 kpg1_expob.f kpg1_expoi.f kpg1_expoub.f kpg1_expow.f kpg1_expod.f \
 kpg1_expor.f kpg1_expouw.f kpg1_logab.f kpg1_logai.f kpg1_logaub.f \
 kpg1_logaw.f kpg1_logad.f kpg1_logar.f kpg1_logauw.f kpg1_asshr.f \
-kpg1_lutky.f
+kpg1_lutky.f kpg1_pvers.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -724,7 +724,7 @@ rotate.f segment.f setmagic.f shadow.f slide.f \
 sqorst.f stats.f sub.f substitute.f surfit.f thresh.f \
 trandat.f traninvert.f tranjoin.f tranmake.f \
 transformer.f trantrace.f trig.f wiener.f zaplin.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f 
+listmake.f listshow.f profile.f wcsalign.f wcstran.f version.f
 
 #  kappa routines for which the atask action name can be derived from the 
 #  the f file name by remving the .f file suffix.
@@ -3680,6 +3680,7 @@ turbocont.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR GKS_PAR
 uget.o:          ME_COM C1_COM
 uput.o:	         ME_COM C1_COM
 vecplot.o:	 SAE_PAR PRM_PAR NDF_PAR CTM_PAR GKS_PAR
+version.o:	 SAE_PAR PAR_ERR
 wcsadd.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR
 wcsalign.o:	 SAE_PAR PRM_PAR PAR_ERR GRP_PAR
 wcsattrib.o:	 SAE_PAR NDF_PAR PAR_ERR AST_PAR

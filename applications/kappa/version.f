@@ -32,7 +32,7 @@
 *        comparison takes place. If a non-null value is supplied, the 
 *        version of the installed package is not displayed. 
 *
-*        The suppleid string should be in the format "V<ddd>.<ddd>-<ddd>, 
+*        The supplied string should be in the format "V<ddd>.<ddd>-<ddd>, 
 *        where "<ddd>" represents a set of digits. The leading "V" can be
 *        omitted, as can any number of trailing fields (missing trailing
 *        fields default to zero).

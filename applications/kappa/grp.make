@@ -188,7 +188,7 @@ kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_mixvr.f kpg1_expob.f \
 kpg1_expod.f kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f \
 kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
 kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
-kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f
+kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f kpg1_pvers.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \
@@ -229,7 +229,7 @@ wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
 scatter.par lutcont.par lutheat.par lutramps.par picbase.par piclast.par \
 lutbgyrw.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
-lutgrey.par lutneg.par lutzebra.par picframe.par
+lutgrey.par lutneg.par lutzebra.par picframe.par version.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
@@ -272,7 +272,7 @@ automatic_data_conv.hlp colour_table_and_pa.hlp getting_data_into_k.hlp \
 image_display_inter.hlp masking__bad_values.hlp selecting_graphics_.hlp \
 iraf_usage.hlp listshow.hlp listmake.hlp wcsadd.hlp wcsalign.hlp \
 wcsattrib.hlp wcscopy.hlp wcsframe.hlp wcsremove.hlp wcsshow.hlp \
-chain.hlp reshape.hlp copybad.hlp wcstran.hlp scatter.hlp
+chain.hlp reshape.hlp copybad.hlp wcstran.hlp scatter.hlp version.hlp
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
 KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
@@ -326,7 +326,7 @@ setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
 reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
-kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl
+kapview_mon.ifl ndfpack_mon.ifl mem2d.ifl version.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -340,7 +340,7 @@ numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f 
+listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f version.f
 
 # The contents of the kapsub_sub.tar file:
 KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \

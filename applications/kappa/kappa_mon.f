@@ -450,6 +450,10 @@
          ELSE IF ( NAME .EQ. 'TRIG' ) THEN
             CALL TRIG ( STATUS )
 
+*  Check the package version number.
+         ELSE IF ( NAME .EQ. 'VERSION' ) THEN
+            CALL VERSION ( STATUS )
+
 *  Align a group of NDFs using the WCS components.
          ELSE IF ( NAME .EQ. 'WCSALIGN' ) THEN
             CALL WCSALIGN ( STATUS )

@@ -16594,6 +16594,31 @@ iraf! {
 
       }
 
+      action version {
+
+         helplib {$KAPPA_HELP}
+
+         parameter compare {
+            position 1
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT 
+            default !
+            prompt {The version string for comparison}
+            helpkey *
+         }
+
+         parameter result {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+         }
+
+      }
+
       action wiener {
          alias {wien(er)}
 
