@@ -125,6 +125,36 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'YMAX','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+        DO I=1,9
+          NAME='RED'
+          WRITE(NAME(4:4),'(I1)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+          NAME='GREEN'
+          WRITE(NAME(6:6),'(I1)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+          NAME='BLUE'
+          WRITE(NAME(5:5),'(I1)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        ENDDO
+        DO I=10,16
+          NAME='RED'
+          WRITE(NAME(4:5),'(I2)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+          NAME='GREEN'
+          WRITE(NAME(6:7),'(I2)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+          NAME='BLUE'
+          WRITE(NAME(5:6),'(I2)') I
+          CALL NBS_DEFINE_PRIMITIVE(ID,NAME,'_REAL',0,VAL__NBR,SID,
+     :                                                       STATUS)
+        ENDDO
+        CALL NBS_DEFINE_PRIMITIVE(ID,'COLOUR','_INTEGER',0,VAL__NBI,
+     :                                                    SID,STATUS)
 
 *  create shadow of GCB
         CALL NBS_DEFINE_STRUCTURE(ID,'GCB','GCB',GCBID,STATUS)
