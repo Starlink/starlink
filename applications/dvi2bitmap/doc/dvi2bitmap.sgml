@@ -1,0 +1,455 @@
+<!doctype ssn public "-//Starlink//DTD Starlink SSN//EN">
+<!-- $Id$ -->
+
+<title>Dvi2bitmap -- convert DVI files to bitmap images
+<author email="norman@astro.gla.ac.uk"
+	webpage="http://www.astro.gla.ac.uk/users/norman/"
+	affiliation="Starlink, Glasgow University"
+	id="ng"
+	>Norman Gray
+
+<docnumber>71
+
+<history>
+<version number=1 date='14-JUN-1999' author=ng>Initial
+version</version>
+<distribution string="1" date="14-JUN-1999" author="ng">
+First public release
+</distribution>
+</history>
+
+<copyright>
+Copyright 1999, Particle Physics and Astronomy Research Council
+</copyright>
+
+<abstract>
+<px>This application processes a DVI file produced by &tex;,
+converting each page to a single bitmap.
+</abstract>
+
+<sect id=intro export>Introduction
+
+<p>It is sometimes useful to convert the typeset output of &tex; into
+a bitmap image viewable on the web.  This is most often the case when
+&tex; or &latex; are being used to typeset the mathematics in a paper
+being conveted to HTML.  It is possible to do this with a chain of
+general-purpose tools, for example going from DVI to postscript to PNM
+files to GIFs, but this is generally slow.  For an overview of maths
+and SGML/HTML, see <ref id=sgml.maths>.
+
+<p>The tool dvi2bitmap does this processing in a single step, reading
+the DVI file and font files, and emitting a bitmap.  It can, at
+present, generate XBM and GIF files.
+
+<p>See <ref id=usage> for usage instructions, and <ref id=install> for
+installation instructions.
+
+<sect id=usage export>Usage
+
+<p>Synopsis:
+<verbatim>
+dvi2bitmap 
+    [-f font-path] [-r resolution] [-m magnification] [-P[bt]]
+    [-s scalefactor] [-t gif|xbm] [-o output] [-lLnqV]
+    dvi-file
+</verbatim>
+
+<p>This program is intended to conform to the DVI processing standard.
+
+<subsect id=usage.options export>Options
+
+<p><dl>
+<dt><code>-f font-path</code>
+<dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
+also <ref id=usage.env>.
+
+<dt><code>-l</code>
+<dd>Show missing fonts.
+The program writes on standard output one line per missing font, with
+five fields: the 
+font name, the DPI value it was looking for, the base-DPI of the font,
+the magnification factor, and the filename which it tried to look for.
+This output can 
+be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
+generate the required fonts.
+
+<dt><code>-L</code>
+<dd>Show all fonts in the DVI file.  The output is as for the 
+<code>-l</code>
+option, except that found fonts are also listed, prefixed by a % character.
+
+<dt><code>-m magnification</code>
+<dd>The TeX magnification parameter which is used when processing the DVI
+file. It is a float, with 1.0 corresponding to no magnification (the
+default).  This interacts with the resolution as follows: if you
+specify a resolution of 100, and a magnification of 2, then dvi2bitmap
+will search for PK files at 200 dpi.
+
+<dt><code>-n</code>
+<dd>Do not actually process the DVI file, but read the DVI pre- and
+postamble.  Useful in conjunction with the 
+<code>-l</code>
+option.  If this option is present, then the program returns non-zero
+if any fonts were missing.
+
+<dt><code>-o output</code>
+<dd>Choose the output filename pattern.  The value is a 
+`printf' formatting string, with a single <code>%d</code>
+formatting descriptor, which will be replaced in output filenames
+with the page number.  This can be overridden on a per-page basis by
+a TeX <code/\special/ embedded in the DVI file (see <ref
+id=usage.special>).  If there is no 
+file extension, or if it does not match the output type, a suitable file
+extension will be added.
+
+<dt><code/-P[bt]/
+<dd>Specifies processing of the output bitmap.
+<code/-Pb/ blurs the bitmap, making a half-hearted attempt to make a
+low-resolution bitmap look better.
+<code/-Pt/ makes the output bitmap have a transparent background, if
+that's supported by the particular format you choose using option
+<code/-t/
+
+<dt><code/-q/
+<dd>Quiet mode.  Do not display warnings or errors.
+
+<dt><code/-r resolution/
+<dd>Specifies the output resolution, in pixels-per-inch.  This is used
+when deciding which PK files to use. The default is 72.
+
+<dt><code/-s scalefactor/
+<dd>Reduces the linear size of the output bitmap by a factor
+<code/scalefactor/ (default 1).
+
+<dt><code/-t xbm|gif/
+<dd>Choose the output format.  The program generates XBM bitmaps by
+default.  The GIF option may not be available if it wasn't selected
+when the program was configured.
+
+<dt><code/-V/
+<dd>Display the version number, and exit.
+
+</dl>
+
+<subsect id=usage.special export>DVI specials
+
+<p>dvi2bitmap recognises a single DVI special command, and emits a
+warning if it finds any others.
+
+<p>If the TeX file contains a special command:
+<verbatim>
+\special{dvi2bitmap outputfile thispage}
+</verbatim>
+then the output file used for the current page will be 
+<em/thispage.gif/
+(the extension will depend on the output type selected).
+
+<subsect id=usage.exit export>Exit value
+
+<p>Exits with a non-zero status if there were any processing errors.  See
+also the <code/-n/ option in <ref id=usage.options>.
+
+<subsect id=usage.examples export>Examples
+
+<p><verbatim>
+% dvi2bitmap -r 110 -m 2 -s 2 -t gif hello.dvi
+</verbatim>
+This converts the file <code/hello.dvi/ to a GIF bitmap.  It first sets the
+magnification factor to 2, so that the program uses a double-size font
+(eg, <code>.../cmr10.220pk</code>), then scales the bitmap down by a
+factor of 2 to obtain a bitmap of the correct size.
+
+<p><verbatim>
+% dvi2bitmap -n -l -r 110 -m 1.5 -q hello.dvi
+cmr10 165 110 1.5 /var/lib/.../cm/cmr10.165pk
+</verbatim>
+This reads the DVI file to find out what fonts are required, but does
+not process it further.  It then tries to find the fonts, fails, and
+produces a list of parameters which could be used to generate the
+font files.
+
+<p>How you generate fonts depends on your TeX distribution.  As explained
+above, you can determine which fonts you need using the 
+<code/-l/ option.  The teTeX and TeXLive TeX distributions include scripts to
+generate fonts for you; if you have a different distribution, there
+might be a similar script for you to use, or you might have to do it
+by hand.  In the case of teTeX, the command you'd use in the above
+example would be:
+<verbatim>
+% MakeTeXPK cmr10 165 110 1.5 ibmvga
+</verbatim>
+assuming you want to use the 
+<code/ibmvga/ metafont mode.  If you want to use the same mode as you
+use for other documents, then the mode
+<code/localfont/ should do the right thing.  Otherwise, and probably
+better if these images are intended for the screen rather than paper,
+you could use a more specialised mode such as 
+<code/ibmvga/,
+which has been tweaked to be readable at small resolutions.  See the file
+<code/modes.mf/
+somewhere in your metafont distribution for the list of possibilities.
+
+<p>If you're using the TeXLive distribution, the command would be:
+<verbatim>
+% mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10
+</verbatim>
+
+<p>After you have created the fonts, try giving the command
+<verbatim>
+% kpsewhich pk cmr10.165pk
+</verbatim>
+to confirm that TeX and friends can find the new fonts, and that your 
+dvi2bitmap environment variable is set correctly.
+
+<subsect id=usage.env export>Environment
+
+<p>The <code/DVI2BITMAP_PK_PATH/
+environment variable gives the directory which is to be searched for
+PK files.  Note that, although the variable name refers to a
+`path', you may specify only one directory.  I may make this
+marginally more sophisticated in future versions, but probably not:
+the correct thing to do here is to use the same Kpathsearch library
+that the rest of the TeX system uses.
+
+<sect id=install export>Building and installing dvi2bitmap
+
+<p>dvi2bitmap is packaged in two slightly different ways, one
+which respects the bundling conventions of the <webref
+url='http://www.starlink.rl.ac.uk' >Starlink Project</webref>, and one
+which is more usual for network-distributed software.  
+
+<p>When you unpack the distribution tarball, you should fine three files:
+<code/dvi2bitmap_source.tar/, <code/Makefile.starlink/ and <code/mk/.
+You can build the software the Starlink way, using the <code/mk/
+script (see <ref id=install.starlink>), or unpack the
+<code/dvi2bitmap_source.tar/ file, and build it the other way (see
+<ref id=install.nonstarlink>).  Since the <code/mk/ script is really
+just a driver for the Makefile within the tar file, you should get the
+same results both ways.
+
+<subsect id=install.starlink export>Starlink nodes
+
+<p>If you are on a Starlink node, then you
+should be able to use the usual <code/mk/ script.  Define the
+environment variables <code/INSTALL/ and <code/SYSTEM/ as usual.
+<code/SYSTEM/ can be any one of the Starlink-supported platforms
+<code/ix86_Linux/, <code/alpha_OSF1/ or <code/sun4_Solaris/.  Then
+give the commands
+<verbatim>
+% ./mk build
+% ./mk install
+</verbatim>
+
+<subsect id=install.nonstarlink export>Non-starlink machines
+
+<p>If you are not on a Starlink node, then you should build and
+install as follows.
+
+<p>To configure and build:
+<verbatim>
+% ./configure
+% make
+</verbatim>
+You can override the C++ compiler the configure script will choose by
+setting the environment variable <code/CXX/, either via 
+<verbatim>
+% CXX=cxx ./configure
+</verbatim>
+or
+<verbatim>
+% env CXX=cxx ./configure
+</verbatim>
+depending on your shell.
+
+<p>To install, just copy the executable dvi2bitmap wherever you want it
+to live.  The program generates XBM bitmaps by default.  
+
+<p>If you want it to be able to generate GIFs, then give the configure
+option <code/--enable-gif/.  The GIF format is the copyright of
+CompuServe.  As far as I understand it, one does not need a licence
+from CompuServe if one is distributing non-commercial, not-for-profit
+software, such as this.  You probably shouldn't enable GIF support
+when you build this program unless you're in that category as well.
+But don't listen to me: there's a much fuller account of the whole
+sorry business in the <webref
+url='http://www.lib.ox.ac.uk/internet/news/faq/archive/graphics.fileformats-faq.part1.html'
+>comp.graphics.misc FAQ</webref>
+
+<p>The program builds successfully on (at least) egcs-2.90, Sun Workshop
+C++ 5.0, and Alpha Digital C++ 6.0.  It should be written in
+standards-conforming C++, so if it doesn't build then (1) it's not as
+conformant as I think it is (in which case please tell me), (2) your
+compiler is not as conformant as you think it is (in which case please
+don't tell me), or (3) you need to invoke some magic to get the
+compiler to be conformant (in which case tell me, if there's something
+I can do in the autoconfigure script).
+
+<sect id=refs export>References
+
+<p>CTAN, the Comprehensive &tex; Archive Network, is <em/the/
+repository of &tex; and &latex; documentation.  The archive is
+mirrored in numerous places, but the UK node is at
+<url>http://www.tex.ac.uk</url>.
+
+<p>DVItype and PKtoPX are two programs Donald Knuth programs intended
+as model DVI and PK file 
+readers, and as containers for the canonical documentation of the DVI
+and PK file formats.  They might be available as part of your TeX
+distribution, but are also available on CTAN, in
+<code fspath>/tex-archive/systems/knuth/texware/dvitype.web</code>
+and 
+<code fspath>/tex-archive/systems/knuth/pxl/pktopx.web</code>.
+
+<p>The <cite/DVI Driver Standard, Level 0/ is
+available on CTAN, in directory 
+<code fspath>/tex-archive/dviware/driv-standard</code>.
+This incorporates sections of the DVItype documentation.
+This program claims to conform to this standard: if it doesn't, please
+let me know.
+
+
+
+<appendices>
+<sect id=sgml.maths export>Maths and SGML/HTML
+
+<p><ul>
+<li><webref url="http://www.w3.org/Math/"
+	>W3C's maths WG</webref>.  
+This covers
+<webref url='http://www.w3.org/TR/REC-MathML/'
+	>MathML</webref>, which is now a W3C Recommendation.
+The working group also supports the
+<webref url='http://lists.w3.org/Archives/Public/www-math/'
+	>www-math</webref> mailing list.
+
+<li><webref url='http://www.oasis-open.org/cover/topics.html#sgml-math'
+	>Maths special topic at the SGML web page</webref>
+
+<li>Also, 
+<webref url='http://www.oreilly.com/people/staff/crism/math/'
+	>maths proposal from O'Reilly</webref>.
+
+<li><webref url='http://indy.cs.concordia.ca/mathml/'
+	>MathML at Concordia</webref>
+
+</ul>
+
+<subsect id=sgml.maths.latex export>LaTeX maths within HTML
+
+<p>The <em/real/ issue here (for me at least) is rendering
+equations within an HTML document.  There are several tools available
+which can do that with different trade-offs. The most popular method
+is to write the equations in a LaTeX document, process it, and then howk
+the equations out of the resulting DVI file somehow (typically using
+<code/dvips/ and a postscript to gif converter), and display them
+on the web as gifs.  The big disadvantage with this is that you get an
+awful lot of gifs, and the conversion is rather inefficient.
+
+<p>All this hassle <em/should/ become irrelevant once we get browsers
+which can render MathML directly.
+
+<p>There are reviews of the problems, and some of the tools, in articles
+<webref url="http://forum.swarthmore.edu/typesetting/index.html"
+	><cite>Maths Typesetting for the Internet</cite></webref>, 
+and
+<webref url='http://hutchinson.belmont.ma.us/tth/mmlreview/'
+	><cite>Comparative Review of World-Wide-Web Mathematics
+Renderers</cite></webref>.
+
+<p><webref url='http://www.tex.ac.uk/tex-archive/support/latex2html/'
+	>LaTeX2HTML</webref> is the granddaddy of these translators -- it
+parses the LaTeX using Perl, and spits out HTML, turning maths into
+gifs.  It's very robust by now.
+
+<p>John Walker's 
+<webref url="http://www.fourmilab.ch/webtools/textogif/textogif.html"
+	>textogif</webref>
+is a Perl program which orchestrates the various tools to do the
+conversion via postscript, once you've generated the DVI file.
+
+<p><webref url="http://www.cis.ohio-state.edu/~gurari/TeX4ht/mn.html"
+	>TeX4ht</webref> (TeX for Hypertext) uses TeX's own
+parser, but still produces equations as gifs.
+TeX4ht can produce
+<webref url='http://www.cis.ohio-state.edu/~gurari/TeX4ht/mml/'
+	>XML and MathML from LaTeX</webref>.  The TeX4ht documentation has
+a useful collection of resources.
+There's an alternative location for TeX4ht
+<webref url='http://www.tug.org/applications/tex4ht/mn.html'
+	>at TUG</webref>.
+The package's 
+<webref url="http://www.cis.ohio-state.edu/~gurari/TeX4ht/mn28.html"
+	>unix installationn instructions</webref> provide notes on the
+commands you might use to convert DVIs to gifs.
+
+<p><webref url="http://hutchinson.belmont.ma.us/tth/"
+	>tth: TeX to HTML translator</webref> 
+(<webref url="http://hutchinson.belmont.ma.us/tth/manual.cgi"
+>manual</webref>).  <code/tth/ translates LaTeX maths directly to HTML,
+with remarkable success, and with good failure strategies.  It works
+very sweetly, but (a) requires you to tweak your browser to have it
+map the symbol font appropriately, and (b) the resulting HTML can't be
+printed legibly.  From the same source is 
+<webref url='http://hutchinson.belmont.ma.us/tth/mml/'
+	>TtHMML</webref>, which translates (La)TeX to HTML plus MathML.
+
+<p><webref url='http://norma.nikhef.nl/~t16/ndvi_doc.html'
+	>nDVI</webref> is a DVI viewer plugin for Unix Netscape.  This
+addresses the problem at the client end.
+
+<subsect id=sgml.maths.other export>Other approaches to maths
+
+<p>A quite different approach is to use a different markup for maths,
+possibly requiring specialised client software.  These other notations
+typically use semantic markup -- expressing the structure of the maths.
+At first sight, this seems preferable to LaTeX's presentational
+markup, but its weaknesses for authoring are exposed (I feel) when you
+realise that maths is not as closed and unambiguous a language as
+computer scientists feel it ought to be.  Semantic markup's strength
+is in interfaces with computer algebra systems, and databases --
+Abramowitz and Stegun would be ideal in this form!  The major
+dislocation between the two approaches is what makes conversion from
+presentational to semantic markup so easy.  In passing, I'll note that
+MathML has both a presentational and a semantic variant.
+
+<p><webref url="http://www.lfw.org/math/top.html"
+	>MINSE</webref>
+uses a server to render maths into gifs on the fly.  It seems to work
+rather nicely, but works with its own semantic maths notation.
+
+<p>There is (was?) a project called
+<webref url='http://www.dcs.fmph.uniba.sk/~emt/'
+	>Euromath</webref>, which includes a structured SGML editor.  This
+project included a converter which could transform 
+<webref url="http://www.dcs.fmph.uniba.sk/~emt/EmSystem.html#editor"
+	>LaTeX to Euromath SGML</webref>.
+
+<p><webref url='http://www.nag.co.uk/projects/OpenMath/'
+	>OpenMath</webref> might be a successor to Euromath.  It's an
+EC Esprit project which `proposes to develop standards for the
+semantically-rich representation of mathematics'.
+
+<p><webref url='http://www.albany.edu/~hammond/gellmu/'
+	>GELLMU</webref>
+is a LaTeX-like markup language, intended to be easy to convert to
+SGML.  Specifically, it is intended to support maths (and hence
+conversion to MathML) well.
+
+<p>The following are specifically concerned with maths in SGML, using
+either MathML or other maths DTD fragments.
+
+<p><webref url='http://www.webeq.com/'
+	>WebEQ</webref>
+is a suite of Java programs which implement MathML.  It's commercial.
+
+<p><webref url='http://www.alphaworks.ibm.com/formula/texml'
+	>TeXML</webref> is a gadget from IBM which converts XML to TeX via
+a DTD fragment.  You transform your XML to an equivalent document
+marked up in TeXML, which you then separately transform to TeX.
+
+<p><webref url='http://www.w3.org/People/Raggett/EzMath'
+	>EzMath</webref> is a Dave Raggett proposal for producing maths on
+the web.  It uses yet another notation, and converts it to online
+form using a plugin (no printing, and Windows only, as of
+April 1999).
+
