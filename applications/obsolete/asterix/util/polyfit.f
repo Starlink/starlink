@@ -49,6 +49,7 @@
 *     30 Jun 93 : V1.7-1 Fixed by in above update (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *      5 Apr 95 : V1.8-1 Now uses new data interface (DJA)
+*     29 Nov 95 : V2.0-0 Writes fit data into GCB (RJV)
 *
 *    Type Definitions :
 *
@@ -71,6 +72,8 @@
 *    Local variables :
 *
       CHARACTER*80           TEXT (5)        ! History file message
+      CHARACTER*12           NAME
+      REAL                   COEFF(12)
 
       INTEGER                AXPTR           ! Pointers to mapped axis values
       INTEGER                BLEN            ! No. of fits to be performed
@@ -101,11 +104,12 @@
       LOGICAL                QUALOK          ! Is QUALITY present & ok ?
       LOGICAL                VAROK           ! Is VARIANCE present & ok ?
       LOGICAL                WFIT            ! Perform weighted fit?
+      LOGICAL                SUPER           ! Superimpose fit
 *
 *    Version id :
 *
       CHARACTER*22           VERSION
-        PARAMETER            ( VERSION = 'POLYFIT Version 1.8-1' )
+        PARAMETER            ( VERSION = 'POLYFIT Version 2.0-0' )
 *-
 
 *    Check status.
@@ -129,6 +133,9 @@
 *    Find out if are overwritting input file
       CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*    See if fit data to be written to GCB for superimposing fit
+      CALL USI_GET0L('SUPER',SUPER,STATUS)
 
 *    Open input
       IF ( OVERWRITE ) THEN
@@ -289,6 +296,20 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
+*    Write fit data into GCB
+      IF (SUPER) THEN
+        CALL GCB_LCONNECT(STATUS)
+        CALL GCB_FLOAD(IFID,STATUS)
+        CALL GCB_SETL('FUNC_FLAG',.TURE.,STATUS)
+        CALL GCB_SETC('FUNC_TYPE','POLY',STATUS)
+        NAME='FUNC_PAR'
+        DO I=1,MIN(6,NDEG+1)
+          WRITE(NAME(9:9),'(I1)') I
+          CALL GCB_SETR(NAME,COEFF(I),STATUS)
+        ENDDO
+        CALL GCB_FSAVE(IFID,STATUS)
+        CALL GCB_DETACH(STATUS)
+
 *    History file entry
       CALL HSI_ADD( OFID, VERSION, STATUS )
       CALL USI_NAMEI( I, TEXT, STATUS )
@@ -403,7 +424,7 @@
 
 *+  POLYFIT_LOOPWT - Loop over dataset performing 1d weighted fits
       SUBROUTINE POLYFIT_LOOPWT (POLY, NDEG, NDIM, NDAT, BLEN, AXIS,
-     :                                        BAD, WEIGHT, DATA, STATUS)
+     :                                BAD, WEIGHT, DATA, COEFF,STATUS)
 *    Description :
 *     Loops ofer n dimensioal dataset performing 1d fits
 *    Environment parameters :
@@ -433,6 +454,7 @@
       REAL                   DATA(NDAT, BLEN)   ! Data array on exit contains either
                                                 ! original data - fit (POLY = .FALSE.)
                                                 ! or fit (POLY = .TRUE.)
+      REAL                   COEFF(*)       ! Coeffs of polynomial fitted to normalized axis
 *    Status :
       INTEGER STATUS
 *
@@ -449,7 +471,6 @@
 
       LOGICAL                POLY            ! Selects DTREND or POLYFIT function.
 
-      REAL                   COEFF(12)       ! Coeffs of polynomial fitted to normalized axis
 
       REAL                   AXMAX, AXMIN    ! Max & min axis values
       REAL                   C1, C2, FIT     ! Used in calculating fit coefficients to real axis
@@ -537,7 +558,7 @@
 
 *+  POLYFIT_LOOPNOWT - Loop over dataset performing 1d unweighted fits
       SUBROUTINE POLYFIT_LOOPNOWT (POLY, NDEG, NDIM, NDAT, BLEN, AXIS,
-     :                                                     DATA, STATUS)
+     :                                            DATA,COEFF, STATUS)
 *    Description :
 *     Loops ofer n dimensioal dataset performing 1d fits
 *    Environment parameters :
@@ -565,6 +586,7 @@
       REAL                   DATA(NDAT, BLEN)   ! Data array on exit contains either
                                                 ! original data - fit (POLY = .FALSE.)
                                                 ! or fit (POLY = .TRUE.)
+      REAL                   COEFF(*)       ! Coeffs of polynomial fitted to normalized axis
 *    Status :
       INTEGER STATUS
 *
@@ -581,7 +603,6 @@
 
       LOGICAL                POLY            ! Selects DTREND or POLYFIT function.
 
-      REAL                   COEFF(12)       ! Coeffs of polynomial fitted to normalized axis
 
       REAL                   AXMAX, AXMIN    ! Max & min axis values
       REAL                   C1, C2, FIT     ! Used in calculating fit coefficients to real axis

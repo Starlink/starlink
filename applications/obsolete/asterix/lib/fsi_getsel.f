@@ -101,7 +101,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			ARGS(2)			! Method arguments
+      INTEGER			ARGS(3)			! Method arguments
       INTEGER			OARG			! Method return data
 *.
 
@@ -110,13 +110,14 @@
 
 *  Construct selection object
       ARGS(1) = FID
-      CALL ADI_NEWV0I( IDX, ARGS(2), STATUS )
+      CALL ADI_GETLINK( FID, ARGS(2), STATUS )
+      CALL ADI_NEWV0I( IDX, ARGS(3), STATUS )
 
 *  Invoke method
-      CALL ADI_EXEC( 'ReadSel', 2, ARGS, OARG, STATUS )
+      CALL ADI_EXEC( 'ReadSel', 3, ARGS, OARG, STATUS )
 
 *  Destroy argument
-      CALL ADI_ERASE( ARGS(2), STATUS )
+      CALL ADI_ERASE( ARGS(3), STATUS )
 
 *  Extract selections
       IF ( OARG .NE. ADI__NULLID ) THEN
