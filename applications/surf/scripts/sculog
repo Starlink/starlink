@@ -337,8 +337,8 @@ foreach $scufile (@sortndf) {
       $lat = $fitsitem{'LAT'};
       $long = $fitsitem{'LONG'};
 
-      @ra = split(/:/,$lat);
-      @dec = split(/:/,$long);
+      @ra = split(/:/,$long);
+      @dec = split(/:/,$lat);
 
     }
 
