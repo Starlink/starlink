@@ -78,6 +78,7 @@ f     The ZoomMap class does not define any new routines beyond those
 /* C header files. */
 /* --------------- */
 #include <float.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -567,8 +568,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       ngone = imap2 - imap1;
 
 /* Determine if the replacement Mapping can be a UnitMap. This will be
-   the case only if the accumulated zoom factor is unity. */
-      unit = ( zoom == 1.0 );
+   the case only if the accumulated zoom factor is unity (within some
+   tolerable error). */
+      unit = ( fabs( zoom - 1.0 ) <= ( 10.0 * DBL_EPSILON ) );
 
 /* Determine if simplification is possible. This will be so if (a)
    Mappings can be eliminated ("ngone" is non-zero), or (b) the
