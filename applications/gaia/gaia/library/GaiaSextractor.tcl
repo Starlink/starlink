@@ -743,11 +743,11 @@ itcl::class gaia::GaiaSextractor {
 
       #  Detection filter. Either NONE or some known filename. Note
       #  the use of full path names.
-      #  -variable [scope values_($this,detfilter)]
       itk_component add detfilter {
          LabelMenu $parent.detfilter \
             -text "Detection filter:" \
-            -labelwidth $lwidth
+            -labelwidth $lwidth \
+            -variable [scope values_($this,detfilter)]
       }
       pack $itk_component(detfilter) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(detfilter) \
@@ -1035,7 +1035,8 @@ itcl::class gaia::GaiaSextractor {
             -labelwidth $lwidth \
             -nentry $values_($this,photnum) \
             -anchor w \
-            -orient vertical
+            -orient vertical \
+            -command [code $this set_values_ photapps]
       }
       eval $itk_component(photapps) setvals $values_($this,photapps)
       pack $itk_component(photapps) -side top -fill x -ipadx 1m -ipady 1m
@@ -1086,11 +1087,11 @@ itcl::class gaia::GaiaSextractor {
          {Minimum applicable radius for Kron magnitudes}
 
       #  Type of MASKing used on photometry neighbours.
-      #  -variable [scope values_($this,photmask)]
       itk_component add photmask {
          LabelMenu $childsite.detmask \
             -text "Neighbour mask:" \
-            -labelwidth $lwidth
+            -labelwidth $lwidth \
+            -variable [scope values_($this,photmask)]
       }
       pack $itk_component(photmask) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(photmask) \
@@ -1186,11 +1187,11 @@ itcl::class gaia::GaiaSextractor {
       set vwidth 5
 
       #  Type of detector.
-      #  -variable [scope values_($this,dettype)]
       itk_component add dettype {
          LabelMenu $parent.dettype \
             -text "Detector type:" \
-            -labelwidth $lwidth
+            -labelwidth $lwidth \
+            -variable [scope values_($this,dettype)]
       }
       pack $itk_component(dettype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(dettype) \
@@ -1312,11 +1313,11 @@ itcl::class gaia::GaiaSextractor {
          {FWHM of stellar images in arcseconds}
 
       #  Neural network weight table.
-      #  -variable [scope values_($this,nettable)]
       itk_component add nettable {
          LabelMenu $parent.nettable \
             -text "Neural network table:" \
-            -labelwidth $lwidth
+            -labelwidth $lwidth \
+            -variable [scope values_($this,nettable)]
       }
       pack $itk_component(nettable) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(nettable) \
@@ -1398,11 +1399,11 @@ itcl::class gaia::GaiaSextractor {
          {Size of local median filter (size or width,height) max=7}
 
       #  Type of background estimates used when estimate magnitudes.
-      #  -variable [scope values_($this,backtype)]
       itk_component add backtype {
          LabelMenu $parent.backtype \
             -text "Photometry type:" \
-            -labelwidth $lwidth
+            -labelwidth $lwidth \
+            -variable [scope values_($this,backtype)]
       }
       pack $itk_component(backtype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(backtype) \
@@ -1465,11 +1466,11 @@ itcl::class gaia::GaiaSextractor {
       set vwidth 5
 
       #  Type of checkimage to produce.
-      #  -variable [scope values_($this,checktype)]
       itk_component add checktype {
          LabelMenu $parent.checktype \
             -text "Checkimage type:" \
-            -labelwidth $lwidth
+            -labelwidth $lwidth \
+            -variable [scope values_($this,checktype)]
       }
       pack $itk_component(checktype) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(checktype) \
