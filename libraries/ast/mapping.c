@@ -6902,6 +6902,10 @@ c     envelope function, given by "params[1]", to the point spread function
 f     envelope function, given by PARAMS(2), to the point spread function
 *     of the input data. However, there does not seem to be any theoretical
 *     reason for this.
+*
+*     In addition, the following schemes are provided which are not based
+*     on a 1-dimensional kernel:
+*
 *     - AST__BLOCKAVE: This scheme simply takes an average of all the
 *     pixels on the input grid in a cube centred on the interpolation
 *     point.  The number of pixels in the cube is determined by the
