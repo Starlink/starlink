@@ -242,9 +242,6 @@ itcl::class gaia::Gaia {
 
       #  Center image first time.
       after 0 [code $image_ center]
-
-      #  When interface exists, display any AST warnings.
-      after 0 [code $image_ display_astwarn 1]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -404,6 +401,14 @@ itcl::class gaia::Gaia {
       $m entryconfigure "Pick Object..." -accelerator {Control-i}
       bind $w_  <Control-i> [code $image_ pick_dialog]
       bind $w_  <Control-f> [code $image_ view_fits_header]
+
+      #  Add item to show any AST warnings abot the header associated
+      #  with the image.
+      set index [$m index "Fits header..."]
+      incr index
+      insert_menuitem $m $index command "Astrometry warnings..." \
+         {See any problems found with current astrometry headers} \
+         -command [code $image_ display_astwarn]
 
       #  HDUs are for NDFs too.
       $m entryconfigure "Select FITS HDU..." \

@@ -45,6 +45,12 @@ class GaiaRtdRemote : public RtdRemote {
    void removeConnection();
    void restoreConnection();
 
+   //  Create an additional status file with pid/port info.
+   int makeExtraStatusFile();
+
+   //  Get name of one of the status files.
+   int getStatusName( int extra, char *filename );
+
   public:
 
    //  Constructor

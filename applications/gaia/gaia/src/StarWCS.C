@@ -177,7 +177,9 @@ StarWCS::StarWCS( const char* header )
                setCelestial();
                if ( issky_ ) {
                   
-                  // Set the equinox value and string.
+                  // Set the equinox value and string. Note this may
+                  // be reset later if any warnings about the equinox
+                  // are given.
                   setEquinox();
                   
                   // Finally work out which axes are longitude and which are
@@ -1133,9 +1135,13 @@ void StarWCS::setCelestial() {
 }
 
 //
-//  Construct a single warning message from a fitschan.
+//  Construct a single warning message from a fitschan. This may be
+//  used to report any problem with the FITS headers that AST has
+//  identified. It also checks if one of the cards reports the absence 
+//  of equinox and resets the equinox to blank.
 //
-void StarWCS::constructWarning( AstFitsChan *fitschan ) {
+void StarWCS::constructWarning( AstFitsChan *fitschan ) 
+{
 
    //  Release previous warnings.
    if ( warnings_ ) { 
@@ -1147,32 +1153,22 @@ void StarWCS::constructWarning( AstFitsChan *fitschan ) {
    //     ASTWARN = 'The message'
    //  or
    //     ASTWARN = '           '
-   //  for empty cards.
+   //  for empty cards. We just concatenate these together.
    char card[81];
-   char *ptr;
-   char *lptr;
+   char *equinox;
    int nwarns = 0;
    ostrstream os;
    astClear( fitschan, "Card" );
    while ( astFindFits( fitschan, "ASTWARN", card, 1 ) ) {
-      if ( ( ptr = strstr( card, "=" ) ) != NULL ) {
 
-         //  Remove leading and trailing quotes.
-         ptr = strchr( ptr, '\'' );
-         lptr = strrchr( ++ptr, '\'' );
-         *lptr = '\0';
-
-         //  Strip leading and trailing blanks.
-         lptr = ptr + strlen( ptr );
-         for ( ; *ptr == ' ' && ptr < lptr; ptr++ );
-         for ( lptr = ptr + strlen( ptr ); *lptr == ' ' && lptr > ptr; lptr-- );
-
-         //  If any string is left then add this.
-         if ( *ptr != '\0' ) {
-            nwarns++;
-            os << ptr;
-         }
+      //  See if this is a report about the equinox. If so don't
+      //  show a valid one.
+      equinox = strstr( ptr, "equinox" );
+      if ( equinox != NULL ) {
+         equinoxStr_[0] = '\0';
       }
+      nwarns++;
+      os << card << endl;
    }
    if ( nwarns > 0 ) {
       os << ends;

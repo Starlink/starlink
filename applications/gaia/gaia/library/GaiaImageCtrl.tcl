@@ -407,28 +407,29 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Record this name, until another new image is set.
       set last_file_ $itk_option(-file)
-
-      #  Issue any warnings about problems with the WCS.
-      display_astwarn 0
    }
 
    #  Issue a warning containing any AST messages about WCS.
-   public method display_astwarn { {init 0} } {
-      if { $init } { 
-         #  First message is deferred until image is visible. If init
-         #  is 1 then we set show_astwarn_ which allows future warnings
-         #  to be issued.
-         set show_astwarn_ 1
+   public method display_astwarn {} {
+      set warn [$image_ astwarnings]
+      if { $warn != {} } {
+         set message \
+            "The astrometric calibration of your produced the following warnings:\n\n$warn"
+      } else {
+         set message "There are no known problems with your astrometry calibration"
       }
-      if { $show_astwarn_ && ! $itk_option(-hide_astwarn) } {
-         set warn [$image_ astwarnings]
-         if { $warn != {} } {
-            option_dialog \
-               "Your WCS calibration has the following deficiency:\n$warn" \
-               "Don't show any further warnings about WCS deficiencies" \
-               [code $this configure -hide_astwarn] \
-               $itk_option(-hide_astwarn)
-         }
+      set existed [winfo exists $w_.astwarn]
+      utilReUseWidget util::TextDialog $w_.astwarn \
+         -bitmap {} \
+         -textwidth 80 \
+         -textheight 20 \
+         -buttons "Close" \
+         -modal 0 \
+         -text "Astrometry warnings" \
+         -title "Astrometry warnings" \
+         -contents "$message"
+      if { ! $existed } {
+         $w_.astwarn activate
       }
    }
 
@@ -884,9 +885,6 @@ itcl::class gaia::GaiaImageCtrl {
    #  Component of the NDF that is displayed.
    itk_option define -component component Component data
 
-   #  Whether to hide warnings about WCS issues or not.
-   itk_option define -hide_astwarn hide_astwarn Hide_astwarn 0
-
    #  Protected variables:
    #  ====================
 
@@ -911,9 +909,6 @@ itcl::class gaia::GaiaImageCtrl {
    #  Last zoom factor stack.
    protected variable lastzoom_
    protected variable nlastzoom_ 0
-
-   #  Initialisation flag for AST warnings (not issued until this 1).
-   protected variable show_astwarn_ 0
 
    #  Common variables:
    #  =================
