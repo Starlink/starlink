@@ -129,5 +129,6 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 	$(PERL) -I $(PERLSGMLDIR) dtd2sgml.pl $< >$@
 
 
-clean:
+maintainer-clean: distclean
 	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
+distclean clean:

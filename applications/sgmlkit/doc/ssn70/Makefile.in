@@ -40,6 +40,7 @@ tmp-sgml2docs: ../../bin/sgml2docs.x
 	sed -e 's,!!pkglibdir!!,'`cd $(TOP);pwd`,g ../../bin/sgml2docs.x >$@
 	chmod +x $@
 
-clean:
+maintainer-clean: distclean
 	rm -f tmp-sgml2docs
 	rm -f $(TARBALLS)
+distclean clean:

@@ -45,10 +45,16 @@ install-data-local: dtd/manifest
 
 EXTRA_DIST = dsssl dtd
 
-clean: clean-am
-	for d in dtd doc/dtd2sgml doc/ssn70 misc dsssl/sl/lib; do \
-	    (cd $$d; $(MAKE) clean); \
-	done
+clean: clean-private
+distclean: distclean-private
+maintainer-clean: maintainer-clean-private
+clean-private distclean-private maintainer-clean-private:
+	@target=`echo $@ | sed s/-private//`; \
+	  for d in dtd doc/dtd2sgml doc/ssn70 misc dsssl/sl/lib; do \
+	    (echo "In $$d..."; \
+	    cd $$d; test -f Makefile && $(MAKE) $$target); \
+	  done; \
+	  $(MAKE) $$target-am
 
 SL_COMMON = \
 	dsssl/sl/common/sl-gentext.dsl \

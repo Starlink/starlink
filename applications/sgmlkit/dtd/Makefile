@@ -18,5 +18,6 @@ CATALOG-override: CATALOG CATALOG-override.header
 	rm -f CATALOG-override
 	cat CATALOG-override.header CATALOG >CATALOG-override
 
+maintainer-clean distclean: clean
 clean:
 	rm -f CATALOG-override manifest

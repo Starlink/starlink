@@ -14,5 +14,6 @@ sllib.dsl: sllib-jade-1.2.1.dsl sllib-openjade-1.3.dsl
 	    echo "Using Jade library functions"; \
 	fi
 
+maintainer-clean distclean: clean
 clean:
 	rm -f sllib.dsl
