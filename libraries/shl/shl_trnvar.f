@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     CALL SHL_ADAM( LIBNAM, STATUS )
+*     CALL SHL_TRNVAR( LIBNAM, ISENV, LIBRAY, STATUS )
 
 *  Arguments:
 *     LIBNAM = CHARACTER (Given)
