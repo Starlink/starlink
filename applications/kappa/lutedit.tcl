@@ -44,6 +44,71 @@
 # Define procedures...
 
 
+#
+#  Set the cursor in the editor to the pen used to paint the pixel
+#  within the image at canvas coords (x$,$y).
+#
+proc DisplayPen {x y} {
+   global NDCX1
+   global NDCY1
+   global NDCX0
+   global NDCY0
+   global PNX1 
+   global PNX0
+   global PNY1
+   global PNY0
+   global IMAGE
+   global DV
+   global CAN
+   global LP
+   global HPNX1
+   global HPNX0
+   global CPEN
+
+# Convert canvas to NDC cords within the GWM base picture.
+   set nx [expr $x*$NDCX1 + $NDCX0]
+   set ny [expr $y*$NDCY1 + $NDCY0]
+
+# Find the histogram pen number at this X NDC 
+   set pen [expr int($nx*$HPNX1 + $HPNX0 + 0.5)]
+
+# If this is a legal pen, set it as the current pen.
+   if { $pen >= $LP } {
+      set CPEN $pen
+      updateCursor 1
+
+# Otherwise, find the pen corresponding to the image pixel value under the
+# pointer.
+   } else {      
+
+# Convert NDC to pixel coords within the displayed image.
+      set px [expr $nx*$PNX1+$PNX0]
+      set py [expr $ny*$PNY1+$PNY0]
+
+# Convert these pixel coords to the current Frame of the displayed image.
+      Obey kappa wcstran "ndf=$IMAGE framein=pixel frameout=\! posin=\"$px,$py\"" 1
+      set pos [GetParamED kappa wcstran:posout]
+
+# Check for bad positions.
+      if { [string first "<" $pos] == -1 } {
+
+# Get the data value of the displayed image at these current frame coords.
+         Obey kappa look "ndf=$IMAGE centre=\"$pos\" size=1 mode=centre" 1
+         set dv [GetParamED kappa look:value]
+      } else { 
+         set dv "BAD"
+      }
+
+# Convert to a pen number.
+      if { $dv != "BAD" } {     
+         set DV $dv
+         setDV 1
+      } else {
+         Message "The image data value cannot be determined at the given position"
+      }
+   }
+}
+
 # 
 # Set the current pen value to a specified value
 #
@@ -2459,6 +2524,10 @@ proc imageDisp { } {
    global DVC
    global LP
    global UP
+   global PNX1
+   global PNX0
+   global PNY1
+   global PNY0
 
    if { $NEGIMAGE } {
       set per "\[$AUTOCUT,[expr 100-$AUTOCUT]\]"
@@ -2478,6 +2547,25 @@ proc imageDisp { } {
    set DVC [expr $SCALOW - $LP*$DVM]
    setDV 0
 
+# Set up the coefficients of the transformation from NDC to PIXEL coords
+# within the data picture created above.
+   Obey kapview picin "name=data frame=pixel" 1
+   set pxlo [GetParamED kapview picin:x1]
+   set pxhi [GetParamED kapview picin:x2]
+   set pylo [GetParamED kapview picin:y1]
+   set pyhi [GetParamED kapview picin:y2]
+
+   Obey kapview picin "name=data frame=ndc" 1
+   set nxlo [GetParamED kapview picin:x1]
+   set nxhi [GetParamED kapview picin:x2]
+   set nylo [GetParamED kapview picin:y1]
+   set nyhi [GetParamED kapview picin:y2]
+
+   set PNX1 [expr ($pxhi-$pxlo)/($nxhi-$nxlo)]
+   set PNX0 [expr $pxlo - $nxlo*$PNX1]
+   set PNY1 [expr ($pyhi-$pylo)/($nyhi-$nylo)]
+   set PNY0 [expr $pylo - $nylo*$PNY1]
+
 #  Update the histogram to ensure it reflects the new image display.
    histDisp
 
@@ -2491,11 +2579,26 @@ proc histDisp { } {
    global LUTEDIT_SCRATCH
    global SCALOW
    global SCAHIGH
+   global HPNX0
+   global HPNX1
 
    Obey kapview picsel "label=hist" 1
    Obey kapview gdclear "current=yes" 1
    Obey kapview picsel "label=hist2" 1
    Obey kapview lutview "mode=pic low=$SCALOW high=$SCAHIGH ndf=$IMAGE style=^$LUTEDIT_SCRATCH/hstyle" 1
+
+# Store the coefficients of the transformation from X NDC to pen number
+   Obey kapview picin "name=key frame=ndc" 1
+   set nxlo [GetParamED kapview picin:x1]
+   set nxhi [GetParamED kapview picin:x2]
+
+   Obey kapview picin "name=key frame=pen-y" 1
+   set pxlo [GetParamED kapview picin:x1]
+   set pxhi [GetParamED kapview picin:x2]
+
+   set HPNX1 [expr ($pxhi-$pxlo)/($nxhi-$nxlo)]
+   set HPNX0 [expr $pxlo - $nxlo*$HPNX1]
+
 }
 
 proc histStyle { update } {
@@ -2834,7 +2937,7 @@ proc OpenImage {} {
 #  the image and histogram.
       } else {
          set IMAGE $ndf
-         SetHelp disp "$IMAGE displayed with the current colour table."
+         SetHelp disp "$IMAGE displayed with the current colour table. Click to select a pen."
          gwmDisplay
       }      
    }
@@ -3407,7 +3510,8 @@ proc GetParamED {task param} {
 #
 #  Purpose:
 #     Returns the value of an ATASK parameter substituing "E" exponents for 
-#     "D" exponents.
+#     "D" exponents. Also removes single quotes. Also converts values with
+#     a 3 digit exponent to "BAD".
 #
 #  Arguments:
 #     task
@@ -3419,8 +3523,13 @@ proc GetParamED {task param} {
 #     The parameter value.
 #
 #-
-   regsub -nocase -all D [GetParam $task $param] E res
-   return $res
+   regsub -nocase -all D [GetParam $task $param] E res1
+   regsub -nocase -all "'" $res1 "" res2
+
+   if { [regexp {E[0-9][0-9][0-9]} $res2] } {
+       set res2 "BAD"
+   }
+   return $res2
 }
     
 proc GetPars {vars ntypes nlabels nlimits title help dhelp} {
@@ -3981,6 +4090,10 @@ proc gwmMake {} {
    global UP
    global PPENT
    global NENT
+   global NDCX1
+   global NDCY1
+   global NDCX0
+   global NDCY0
 
 # Indicate that as yet no new GWM canvas item has been created.
    set GWMNEW 0
@@ -4053,6 +4166,32 @@ proc gwmMake {} {
 #  coord in the editor canvas, pen number and table entry.
          setTrans
       }
+   }
+
+# Establish the canvas coords to GWM NDC scaling factors.
+   update idletasks
+   set wid  [winfo width $CAN]
+   set hgt [winfo height $CAN]
+   if { $wid > 1 && $hgt > 1 } {
+
+      set gw [$CAN itemcget gwm -width]
+      set gh [$CAN itemcget gwm -height]
+
+      set co [$CAN coords gwm]
+      set a [lindex $co 0]
+      set b [lindex $co 1]
+
+      set NDCX1 [expr 1.0/$gw]
+      set NDCX0 [expr -$a/$gw]
+
+      set NDCY1 [expr -1.0/$gh]
+      set NDCY0 [expr ( $b + $gh )/($gh)]
+
+   } else {
+      set NDCX1 1
+      set NDCY1 1
+      set NDCX0 0
+      set NDCY0 0
    }
 
    return $mess
@@ -6519,6 +6658,10 @@ proc WaitFor {name args} {
    $CAN bind current <Enter> "+Helper 0"
    $CAN bind current <Leave> "+Helper 1"
 
+# Create bindings for the GWM idents so that clicking on them sets the
+# cursor in the editor to the corresponding colour table entry.
+   bind $CAN <Button-1> "DisplayPen %x %y"
+
 # Create a binding which calls MenuMotionBind whenever the pointer moves
 # over any menu. This is used to determine the help information to display.
    bind Menu <Motion> {+MenuMotionBind %W %y}
@@ -6528,8 +6671,8 @@ proc WaitFor {name args} {
    SetHelp pcurs "The cursor... Drag to select a range of pens" LUTEDIT_PCURS
    SetHelp mark "A marker indicating the extent and value of the table entry under the pointer.. Drag vertically to change the value of the entry." LUTEDIT_MARK
    SetHelp cp "A control point... click and drag to bend the current colour curve."
-   SetHelp disp "$IMAGE displayed with the current colour table."
-   SetHelp hist "A histogram of the pen numbers used within the neighbouring image display, with each bin coloured using its own pen colour."
+   SetHelp disp "$IMAGE displayed with the current colour table. Click to select a pen."
+   SetHelp hist "A histogram of the pens used within the image display. Each bin is coloured using its own pen colour. Click to select a pen."
 
 #  Keyboard left and right arrow keys move the cursor by one pen.
    bind $F4 <Left> {set CPEN [expr $CPEN-1.0];updateCursor 1}
@@ -6565,3 +6708,4 @@ proc WaitFor {name args} {
    wm protocol $UWIN WM_DELETE_WINDOW {Finish}
 
    destroy $wait
+

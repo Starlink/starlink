@@ -93,7 +93,63 @@ demo v1.0 {
 
       text "Use of the NDF Quality component has been simplified by the 
       addition of four new applications; <COMMAND SETQUAL>, <COMMAND SHOWQUAL>, 
-      <COMMAND REMQUAL> and <COMMAND QUALTOBAD>."
+      <COMMAND REMQUAL> and <COMMAND QUALTOBAD>. With these you can
+      attach qualitative labels to particular pixels, and then select
+      subsets of pixels using logical expressions such as \"SOURCE .AND. .NOT.
+      SATURATED\" (here \"SOURCE\" and \"SATURATED\" are labels which have been 
+      attached to pixels within the NDF)."
+
+      pause 7
+
+      command {Obey kapview gdclear ""}
+      command {exec cp $KAPPA_DIR/m57.sdf ./temp.sdf}
+      command {exec echo "xx=x+69" > ctop}
+      command {exec echo "yy=y-372" >> ctop}
+      command {exec echo "r=sqrt(xx**2+yy**2)" >> ctop}
+      command {exec echo "theta=atan2d(yy,xx)" >> ctop}
+
+      command {exec echo "x=r*cosd(theta) - 69" > ptoc}
+      command {exec echo "y=r*sind(theta) + 372" >> ptoc}
+
+      command {Obey ndfpack wcsadd "ndf=temp frame=pixel domain=polar maptype=math forexp=^ctop invexp=^ptoc"}
+      command {Obey ndfpack wcsattrib "ndf=temp mode=set name=title newval='Polar co-ordinates'"}
+      command {Obey ndfpack wcsattrib "ndf=temp mode=set name='label(1)' newval='Radius'"}
+      command {Obey ndfpack wcsattrib "ndf=temp mode=set name='Unit(1)' newval='Pixel'"}
+      command {Obey ndfpack wcsattrib "ndf=temp mode=set name='label(2)' newval='Polar angle'"}
+      command {Obey ndfpack wcsattrib "ndf=temp mode=set name='Unit(2)' newval='Degrees'"}
+
+      command {Obey kapview picdef "mode=array xpic=2 ypic=1 outline=no prefix=a"}
+      command {Obey kapview display "in=temp mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/cold_lut style=def accept"}
+
+      text "Various ways of attaching arbitrary co-ordinate Frames to
+      an NDF has been added to the WCSADD command. One method is to define 
+      the Mapping between an existing Frame and the new Frame using
+      textual algebraic expression. "
+
+      pause 9
+
+      text "For instance, a polar coordinates Frame been added to M57 in 
+      the above display, using expressions \"xx=x+69\", \"yy=y-372\", 
+      \"r=sqrt(xx**2+yy**2)\" and  \"theta=atan2d(yy,xx)\" to define the 
+      mapping from the PIXEL Frame to the new (r,theta) Frame."
+
+      pause 8
+
+      command {Obey kapview picsel "label=a2"}
+      command {Obey kappa regrid "in=temp mapping=\! out=temp2"}
+      command {Obey kapview display "in=temp2 mode=perc percentiles=\[10,90\] lut=$KAPPA_DIR/cold_lut style=def accept"}
+      command {exec rm -f temp.sdf temp2.sdf}
+
+      text "The new REGRID application allows an NDF to be resampled using
+      an arbitrary Mapping, such as produced by WCSADD. This is similar to
+      the old TRANSFORMER application, with the difference that REGRID
+      correctly propagates WCS information."
+
+      pause 6
+
+      text "The above right hand image of m57 has been created by resampling 
+      the left hand image using REGRID so that the radius axis is horizontal and the
+      angle axis is vertical."
 
       pause 5
 
