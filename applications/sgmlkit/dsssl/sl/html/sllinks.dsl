@@ -29,11 +29,20 @@ Check that the target is a member of the list <funcname/target-element-list/.
 <funcname/section-element-list/, then make the section reference by
 calling <funcname/make-section-reference/; otherwise, process the
 target in mode <code/section-reference/.
+<p>Once we have obtained the element pointed to by the ID,
+check to see if it is a <funcname/mapid/ element, and if it is,
+immediately resolve the indirection.
 <codebody>
 (element ref
   (let* ((target-id (attribute-string (normalize "id")
 				      (current-node)))
-	 (target (node-list-or-false (element-with-id target-id)))
+	 (tmp-target (node-list-or-false (element-with-id target-id)))
+	 (target (if (and tmp-target
+			  (string=? (gi tmp-target)
+				    (normalize "mapid")))
+		     (element-with-id (attribute-string (normalize "to")
+							tmp-target))
+		     tmp-target))
 	 (linktext (attribute-string (normalize "text")
 				     (current-node))))
     (if (and target
@@ -125,6 +134,10 @@ being able to do that; there is a Jade patch which allows it to do
 that, which I hope to build into a Starlink version of Jade when I
 can.
 
+<p>Once we have obtained the element pointed to by the ID,
+check to see if it is a <funcname/mapid/ element, and if it is,
+immediately resolve the indirection.
+
 <p>This rule invokes the <funcname/get-link-policy-target/ function to check
 that the target of the link conforms to the policy -- if it doesn't,
 it produces an <funcname/error/.
@@ -134,10 +147,15 @@ it produces an <funcname/error/.
 <codebody>
 (element docxref
   (let* ((xrefent (attribute-string (normalize "doc") (current-node)))
-	 (xrefent-pubid (and xrefent
-			     (entity-public-id xrefent)))
-	 (xrefent-sysid (and xrefent
-			     (entity-system-id xrefent)))
+	 ;; At one time, I extracted the entity's system id here.
+	 ;; It's not clear why I did this, as the only apparent use to
+	 ;; which I put it was to check whether it existed, and object
+	 ;; vigourously if it did.  I don't know why I had such a
+	 ;; downer on system ids in the entity declaration -- if I
+	 ;; decide that this is, after all, a good thing to forbid,
+	 ;; then perhaps I can put some explanation in next time.
+	 ;(xrefent-sysid (and xrefent
+	 ;	     (entity-system-id xrefent)))
 	 (xrefent-gen-sysid (and xrefent
 				 (entity-generated-system-id xrefent)))
 	 (docelem (and xrefent-gen-sysid
@@ -147,16 +165,22 @@ it produces an <funcname/error/.
 	 ;; xreftarget is the element the docxref refers to, or #f if
 	 ;; attribute LOC is implied or the document doesn't have such
 	 ;; an ID
-	 (xreftarget (and xrefid
-			  docelem
-			  (node-list-or-false (element-with-id xrefid docelem))))
+	 (tmp-xreftarget (and xrefid
+			      docelem
+			      (node-list-or-false (element-with-id xrefid
+								   docelem))))
+	 (xreftarget (if (and tmp-xreftarget
+			      (string=? (gi tmp-xreftarget)
+					(normalize "mapid")))
+			 (element-with-id (attribute-string (normalize "to")
+							    tmp-xreftarget)
+					  docelem)
+			 tmp-xreftarget))
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget)))
 	 (linktext (attribute-string (normalize "text")
 				     (current-node))))
-    (if (and xrefent-pubid
-	     (not xrefent-sysid)
-	     xrefent-gen-sysid
+    (if (and xrefent-gen-sysid
 	     docelem
 	     (string=? (gi docelem)
 		       (normalize "documentsummary"))) ; sanity check...
@@ -200,26 +224,28 @@ it produces an <funcname/error/.
 		      (literal linktext)
 		      (with-mode mk-docxref
 			(process-node-list docelem)))))
-	(cond
-	 (docelem (error (string-append "DOCXREF: target " xrefent
-					" has document type " (gi docelem)
-					": expected "
-					(normalize "documentsummary"))))
-	 (xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
-					      " has a SYSTEM id")))
-	 (xrefent-gen-sysid (error (string-append
-				"DOCXREF: Couldn't parse " xrefent
-				" (gen-sys-id " xrefent-gen-sysid ")")))
-	 (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid linktext)
-			    (error (string-append
-				    "DOCXREF: couldn't make sense of FPI '"
-				    xrefent-pubid "'"))))
-	 (xrefent (error (string-append "DOCXREF: entity " xrefent
-					" has no PUBLIC identifier")))
-	 ;;(xrefent (string-append
-	 ;;   "DOCXREF: Couldn't generate sysid for entity "
-	 ;;	   xrefent))
-	 (else (error "DOCXREF: missing DOC attribute"))))))
+	(let ((xrefent-pubid (and xrefent
+				  (entity-public-id xrefent))))
+	  (cond
+	   (docelem (error (string-append "DOCXREF: target " xrefent
+					  " has document type " (gi docelem)
+					  ": expected "
+					  (normalize "documentsummary"))))
+	   ;;(xrefent-sysid (error (string-append "DOCXREF: entity " xrefent
+	   ;;				      " has a SYSTEM id")))
+	   (xrefent-gen-sysid (error (string-append
+				      "DOCXREF: Couldn't parse " xrefent
+				      " (gen-sys-id " xrefent-gen-sysid ")")))
+	   (xrefent-pubid (or ($make-dummy-link$ xrefent-pubid linktext)
+			      (error (string-append
+				      "DOCXREF: couldn't make sense of FPI '"
+				      xrefent-pubid "'"))))
+	   (xrefent (error (string-append "DOCXREF: entity " xrefent
+					  " has no PUBLIC identifier")))
+	   ;;(xrefent (string-append
+	   ;;   "DOCXREF: Couldn't generate sysid for entity "
+	   ;;	   xrefent))
+	   (else (error "DOCXREF: missing DOC attribute")))))))
 
 
 ; (mode section-reference
