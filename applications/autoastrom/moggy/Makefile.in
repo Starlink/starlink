@@ -69,7 +69,7 @@ $(EXEC): $(OBJS) SkyCat
 #moggy.o: moggy.C SkyCat
 
 # The skycat library will have been configured at the ./configure
-# stage, and will have beein installed in $(CATLIBINSTALLDIR) by the
+# stage, and will have been installed in $(CATLIBINSTALLDIR) by the
 # dependency on libcat.a.  Copy the required parts of this library to
 # the SkyCat subdirectory, and remove problematic modules from the library.
 # This target can also be used to express a dependency on the SkyCat includes.
@@ -101,13 +101,20 @@ configure: config/configure.in
 	autoconf config/configure.in >configure
 	chmod 755 configure
 
-tags:
+TAGS:
 	etags --c++ *.C *.h
 
-clean:
-	rm -f $(EXEC)
-	rm -Rf SkyCat
+tidy:
 	rm -f *~ *.o core
+
+# The CATLIB* variables are not independent by default, so these successive
+# deletions will probably (but not certainly) be redundant.
+clean: tidy
+	rm -f $(EXEC)
+	test ! -d SkyCat || rm -Rf SkyCat
+	test ! -d $(CATLIBSRCDIR) || rm -Rf $(CATLIBSRCDIR)
+	test ! -d $(CATLIBINSTALLDIR) || rm -Rf $(CATLIBINSTALLDIR)
+	test ! -d $(CATLIBTOP) || rm -Rf $(CATLIBTOP)
 
 distclean: clean
 	rm -f config.cache config.log config.status config.h Makefile
