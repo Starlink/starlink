@@ -12,6 +12,7 @@
 CXX=@CXX@
 CXXFLAGS=-I.. @CXXFLAGS@
 PERLBIN=@PERL@
+LIBS=@LIBS@
 
 all: test
 
@@ -58,25 +59,25 @@ t1.run: t1.cc libdvi2bitmap.a
 # of object files.  libdvi2bitmap.a is therefore a phony target, here
 # to force all the parent object files to be built.
 t2.run: t2.o libdvi2bitmap.a
-	$(CXX) $(CXXFLAGS) -o $@ t2.o `ls ../*.o|sed '/dvi2bitmap/d'`
+	$(CXX) $(CXXFLAGS) -o $@ t2.o `ls ../*.o|sed '/dvi2bitmap/d'` $(LIBS)
 #	$(CXX) $(CXXFLAGS) -o $@ t2.cc -L.. -ldvi2bitmap
 
 libdvi2bitmap.a:
 	cd ..; $(MAKE) libdvi2bitmap.a
 	cp ../libdvi2bitmap.a .
 
-dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
-	../dvi2bitmap -X >dvi2bitmap.test
-	diff dvi2bitmap.correct dvi2bitmap.test >dvi2bitmap.diff; \
-		if test $$? -gt 0; then echo Fail; else echo OK; fi
-
-# The order of the files in the for statement below must match the
-# order of the calls in dvi2bitmap::doRegression.
+#dvi2bitmap.diff: ../dvi2bitmap dvi2bitmap.correct
+#	../dvi2bitmap -X >dvi2bitmap.test
+#	diff dvi2bitmap.correct dvi2bitmap.test >dvi2bitmap.diff; \
+#		if test $$? -gt 0; then echo Fail; else echo OK; fi
 #
-# Naw -- use the t? tests instead.
-dvi2bitmap.correct: ../dvi2bitmap
-	rm -f $@
-	for f in ../PkFont.cc ../Util.cc; do \
-		FN=`echo $$f|sed -e 's+^.*/\([^.]*\).*$$+\1+' `; \
-		sed -n "/REGRESSIONTEST/s+^.*REGRESSIONTEST:+$$FN:+p" $$f >> $@; \
-	done
+## The order of the files in the for statement below must match the
+## order of the calls in dvi2bitmap::doRegression.
+##
+## Naw -- use the t? tests instead.
+#dvi2bitmap.correct: ../dvi2bitmap
+#	rm -f $@
+#	for f in ../PkFont.cc ../Util.cc; do \
+#		FN=`echo $$f|sed -e 's+^.*/\([^.]*\).*$$+\1+' `; \
+#		sed -n "/REGRESSIONTEST/s+^.*REGRESSIONTEST:+$$FN:+p" $$f >> $@; \
+#	done
