@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {210.9}
+\newcommand{\stardocnumber}    {210.10}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {20th June 2001}
+\newcommand{\stardocdate}      {11th September 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -4162,18 +4162,23 @@ great circle.
 
 The routines \htmlref{AST\_AXDISTANCE}{AST_AXDISTANCE} and \htmlref{AST\_AXOFFSET}{AST_AXOFFSET} are similar to AST\_DISTANCE
 and AST\_OFFSET, except that the curves which they use as ``straight
-lines'' are not geodesics, but curves parallel to a specified axis. One
+lines'' are not geodesics, but curves parallel to a specified axis\footnote
+{For instance, a line of constant Declination is not a geodesic}. One
 reason for using these routines is to deal with the cyclic ambigity of
 longitude and latitude axes.
 
 The \htmlref{AST\_OFFSET2}{AST_OFFSET2} routine is similar to AST\_OFFSET, but instead of using the
 geodesic which passes through two positions, it uses the geodesic which
-passes at a given position angle\footnote{The angle from the positive
-direction of the second Frame axis to the geodesic, positive values being
-in the same sense as rotation from the positive direction of the second
-axis to the positive direction of the first Frame axis.}through a given
-starting position. The method is restricted to 2-dimensional Frames, and
-may not be used with CmpFrames.
+passes at a given position angle through the starting position. For
+SkyFrames, the position angle is the angle from north to the required
+geodesic, with positive rotation in the same sense as rotation from north
+to east. Any permutation of the axes in a SkyFrame is taken into
+account when interpreting position angles. For simple Frames, axis
+permutations are ignored, and the position angle is always the angle 
+between the positive direction of the second Frame axis to the required
+line, with positive angles being in the same sense as rotation from the 
+positive direction of the second axis to the positive direction of the 
+first Frame axis. 
 
 Within a Cartesian coordinate system, the position angle of a geodesic
 ({\em{i.e.}}\ a straight line) is constant along its entire length, but
@@ -4192,11 +4197,28 @@ position angle returned by AST\_OFFSET2.
 
 The \htmlref{AST\_ANGLE}{AST_ANGLE} routine 
 calculates the angle subtended by two points, at a third point.
-It can only be used with 2 or 3 dimensional Frames, and may not be used
-with a \htmlref{CmpFrame}{CmpFrame}. If used with a 2-dimensional Frame the returned angle
+If used with a 2-dimensional Frame the returned angle
 is signed to indicate the sense of rotation (clockwise or anticlockwise)
 in taking the ``shortest route'' from the first point to the second.
-If used with a 3-dimensional Frame the result is un-signed.
+If used with a 3-dimensional Frame the result is un-signed. Other
+dimensionalities cause a value of AST\_\_BAD to be returned.
+
+The \htmlref{AST\_BEAR}{AST_BEAR} routine 
+calculates the position angle of one point as seen from a second point
+within a 2 dimensional Frame (an error is reported if the Frame is not
+2 dimensional). Again, the algorithm used is appropriate to the class of
+the Frame.
+
+The AST_RESOLVE routine
+resolves a given displacement within a Frame into two components, parallel and 
+perpendicular to a given reference direction. 
+
+The displacement is specified by two positions within the Frame; the
+starting and ending positions. The reference direction is defined by the 
+geodesic curve passing through the starting position and a third specified
+position. The lengths of the two components are returned, together with
+the position on the reference geodesic which is closest to the third
+supplied point.
 
 \subsection{\label{ss:framedomains}The Domain Attribute}
 
@@ -9995,6 +10017,105 @@ Object            - Base class for all AST Objects
 \section{\label{ss:functiondescriptions}AST Routine Descriptions}
 \small
 \sstroutine{
+   AST\_CHANNEL\sstlabel{AST_CHANNEL}
+}{
+   Create a Channel
+}{
+   \sstdescription{
+      This function creates a new \htmlref{Channel}{Channel} and optionally initialises
+      its attributes.
+
+      A Channel implements low-level input/output for the AST library.
+      Writing an \htmlref{Object}{Object} to a Channel (using \htmlref{AST\_WRITE}{AST_WRITE}) will generate a
+      textual representation of that Object, and reading from a
+      Channel (using \htmlref{AST\_READ}{AST_READ}) will create a new Object from its
+      textual representation.
+
+      Normally, when you use a Channel, you should provide {\tt{"}}source{\tt{"}}
+      and {\tt{"}}sink{\tt{"}} routines which connect it to an external data store
+      by reading and writing the resulting text. By default, however,
+      a Channel will read from standard input and write to standard
+      output.
+   }
+   \sstinvocation{
+      RESULT = AST\_CHANNEL( SOURCE, SINK, OPTIONS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         SOURCE = SUBROUTINE (Given)
+      }{
+         A source routine, which is a subroutine which takes a single
+         integer error status argument.  This routine will be used by
+         the Channel to obtain lines of input text. On each
+         invocation, it should read the next input line from some
+         external data store, and then return the resulting text to
+         the AST library by calling \htmlref{AST\_PUTLINE}{AST_PUTLINE}. It should supply a
+         negative line length when there are no more lines to read.
+         If an error occurs, it should set its own error status
+         argument to an error value before returning.
+
+         If the null routine AST\_NULL is suppied as the SOURCE value,
+         the Channel will read from standard input instead.
+      }
+      \sstsubsection{
+         SINK = SUBROUTINE (Given)
+      }{
+         A sink routine, which is a subroutine which takes a single
+         integer error status argument.  This routine will be used by
+         the Channel to deliver lines of output text. On each
+         invocation, it should obtain the next output line from the
+         AST library by calling \htmlref{AST\_GETLINE}{AST_GETLINE}, and then deliver the
+         resulting text to some external data store.  If an error
+         occurs, it should set its own error status argument to an
+         error value before returning.
+
+         If the null routine AST\_NULL is suppied as the SINK value,
+         the Channel will write to standard output instead.
+      }
+      \sstsubsection{
+         OPTIONS = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A character string containing an optional comma-separated
+         list of attribute assignments to be used for initialising the
+         new Channel. The syntax used is identical to that for the
+         \htmlref{AST\_SET}{AST_SET} routine.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_CHANNEL = INTEGER
+      }{
+         A pointer to the new Channel.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The names of the routines supplied for the SOURCE and SINK
+         arguments should appear in EXTERNAL statements in the Fortran
+         routine which invokes AST\_CHANNEL. However, this is not generally
+         necessary for the null routine AST\_NULL (so long as the AST\_PAR
+         include file has been used).
+
+         \sstitem
+         A null Object pointer (AST\_\_NULL) will be returned if this
+         function is invoked with STATUS set to an error value, or if it
+         should fail for any reason.
+
+         \sstitem
+         Note that the null routine AST\_NULL (one underscore) is
+         different to AST\_\_NULL (two underscores), which is the null Object
+         pointer.
+      }
+   }
+}
+\sstroutine{
    AST\_ADDFRAME\sstlabel{AST_ADDFRAME}
 }{
    Add a Frame to a FrameSet to define a new coordinate system
@@ -10092,8 +10213,8 @@ Object            - Base class for all AST Objects
    Calculate the angle subtended by two points at a third point
 }{
    \sstdescription{
-      This routine is only applicable to 2 or 3 dimensional Frames.
-      It finds the angle at point B between the line
+      This routine
+      finds the angle at point B between the line
       joining points A and B, and the line joining points C
       and B. These lines will in fact be geodesic curves appropriate to
       the \htmlref{Frame}{Frame} in use. For instance, in \htmlref{SkyFrame}{SkyFrame}, they will be great
@@ -10106,10 +10227,10 @@ Object            - Base class for all AST Objects
       \sstsubsection{
          THIS = INTEGER (Given)
       }{
-         Pointer to the 2-dimensional Frame.
+         Pointer to the Frame.
       }
       \sstsubsection{
-         A( $*$) = DOUBLE PRECISION (Given)
+         A( $*$ ) = DOUBLE PRECISION (Given)
       }{
          An array with one element for each Frame axis
          (\htmlref{Naxes}{Naxes} attribute) containing the coordinates of the first point.
@@ -10137,34 +10258,30 @@ Object            - Base class for all AST Objects
          AST\_ANGLE = DOUBLE PRECISION
       }{
          The angle in radians, from the line AB to the line CB. If the
-         Frame is 2-dimensional, it will be in the range \$$\backslash$pm $\backslash$pi\$
-         with positive rotation is in the same sense as rotation from
-         the positive direction of axis 2 to the positive direction of
-         axis 1. If the Frame has 3 axes, a positive value will
-         always be returned in the range zero to \$$\backslash$pi\$.
+         Frame is 2-dimensional, it will be in the range \$$\backslash$pm $\backslash$pi\$.
+         If the Frame has 3 axes, a positive value will
+         always be returned in the range zero to \$$\backslash$pi\$. A value of
+         AST\_BAD will be returned if the Frame is not 2 or 3 dimensional.
       }
    }
    \sstnotes{
       \sstitemlist{
 
          \sstitem
-         An error will be reported if the supplied Frame is
-         not 2 or 3 dimensional.
+         For a simple Frame positive rotation is in the same sense as
+         rotation from the positive direction of axis 2 to the positive
+         direction of axis 1.
 
          \sstitem
-         An error will be reported if an attempt is made to use this
-         method with a \htmlref{CmpFrame}{CmpFrame}.
+         For a SkyFrame positive rotation is in the same sense as
+         rotation from the north to east.
 
          \sstitem
-         This function will return a {\tt{"}}bad{\tt{"}} result value (AST\_\_BAD) if
-         any of the input coordinates has this value.
-
-         \sstitem
-         A {\tt{"}}bad{\tt{"}} value will also be returned if points A and B are
+         A value of AST\_BAD will also be returned if points A and B are
          co-incident, or if points B and C are co-incident.
 
          \sstitem
-         A {\tt{"}}bad{\tt{"}} value will also be returned if this function is
+         A value of AST\_BAD will also be returned if this function is
          invoked with STATUS set to an error value, or if it should fail for
          any reason.
       }
@@ -10337,6 +10454,76 @@ Object            - Base class for all AST Objects
          A {\tt{"}}bad{\tt{"}} value will also be returned if this function is
          invoked with STATUS set to an error value, or if it should fail for
          any reason.
+      }
+   }
+}
+\sstroutine{
+   AST\_BEAR\sstlabel{AST_BEAR}
+}{
+   Returns the bearing (position angle) of one point as seen from another
+}{
+   \sstdescription{
+      This routine
+      finds the bearing (position angle) of point B as seen from point A.
+      It can only be used with 2-dimensional Frames.
+   }
+   \sstinvocation{
+      RESULT = AST\_BEAR( THIS, A, B, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the \htmlref{Frame}{Frame}.
+      }
+      \sstsubsection{
+         A( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array with one element for each Frame axis
+         (\htmlref{Naxes}{Naxes} attribute) containing the coordinates of the first point.
+      }
+      \sstsubsection{
+         B( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array with one element for each Frame axis
+         (Naxes attribute) containing the coordinates of the second point.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         AST\_BEAR = DOUBLE PRECISION
+      }{
+         The position angle in radians, of the point B as seen from the
+         point A. The value will be in the range zero to 2.PI.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         For a simple Frame, the returned position angle is the angle from the
+         positive direction of the second axis, to the line joining the supplied
+         positions. Positive rotation is in the sense of rotation from the
+         positive direction of the second axis, to the positive direction of the
+         first axis.
+
+         \sstitem
+         For a \htmlref{SkyFrame}{SkyFrame}, the returned position angle is the angle from north
+         to the great circle joining the supplied positions. Positive rotation is
+         in the sense of rotation from north to east.
+
+         \sstitem
+         An error will be reported if the Frame is not 2-dimensional.
+
+         \sstitem
+         This function will return {\tt{"}}bad{\tt{"}} coordinate values (AST\_\_BAD)
+         if any of the input coordinates has this value, or if the require
+         position angle is undefined.
       }
    }
 }
@@ -15090,9 +15277,7 @@ Object            - Base class for all AST Objects
       }{
          The angle (in radians) from the positive direction of the second
          axis, to the direction of the required position, as seen from
-         the starting position. Positive rotation is in the sense of
-         rotation from the positive direction of the second axis to the
-         positive direction of the first axis.
+         the starting position.
       }
       \sstsubsection{
          OFFSET = DOUBLE PRECISION
@@ -15128,16 +15313,21 @@ Object            - Base class for all AST Objects
       \sstitemlist{
 
          \sstitem
+         For a simple Frame, positive rotation is in the sense of
+         rotation from the positive direction of the second axis to the
+         positive direction of the first axis.
+
+         \sstitem
+         For a \htmlref{SkyFrame}{SkyFrame}, positive rotation is in the sense of
+         rotation from north to east.
+
+         \sstitem
          The geodesic curve used by this routine is the path of
          shortest distance between two points, as defined by the
          \htmlref{AST\_DISTANCE}{AST_DISTANCE} function.
 
          \sstitem
          An error will be reported if the Frame is not 2-dimensional.
-
-         \sstitem
-         An error will be reported if an attempt is made to use this
-         method with a \htmlref{CmpFrame}{CmpFrame}.
 
          \sstitem
          This function will return {\tt{"}}bad{\tt{"}} coordinate values (AST\_\_BAD)
@@ -16760,6 +16950,93 @@ Object            - Base class for all AST Objects
          \sstitem
          The variance value lies outside the range which can be
          represented using the data type of the OUT\_VAR array.
+      }
+   }
+}
+\sstroutine{
+   AST\_RESOLVE\sstlabel{AST_RESOLVE}
+}{
+   Resolve a vector into two orthogonal components
+}{
+   \sstdescription{
+      This routine resolves a vector into two perpendicular components.
+      The vector from point 1 to point 2 is used as the basis vector.
+      The vector from point 1 to point 3 is resolved into components
+      parallel and perpendicular to this basis vector. The lengths of the
+      two components are returned, together with the position of closest
+      aproach of the basis vector to point 3.
+   }
+   \sstinvocation{
+      CALL AST\_RESOLVE( THIS, POINT1, POINT2, POINT3, POINT4, D1, D2,
+                        STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the \htmlref{Frame}{Frame}.
+      }
+      \sstsubsection{
+         POINT1( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array with one element for each Frame axis
+         (\htmlref{Naxes}{Naxes} attribute). This marks the start of the basis vector,
+         and of the vector to be resolved.
+      }
+      \sstsubsection{
+         POINT2( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array with one element for each Frame axis
+         (Naxes attribute). This marks the end of the basis vector.
+      }
+      \sstsubsection{
+         POINT3( $*$ ) = DOUBLE PRECISION (Given)
+      }{
+         An array with one element for each Frame axis
+         (Naxes attribute). This marks the end of the vector to be
+         resolved.
+      }
+      \sstsubsection{
+         POINT4( $*$ ) = DOUBLE PRECISION (Returned)
+      }{
+         An array with one element for each Frame axis
+         in which the coordinates of the point of closest approach of the
+         basis vector to point 3 will be returned.
+      }
+      \sstsubsection{
+         D1 = DOUBLE PRECISION (Returned)
+      }{
+         The distance from
+         point 1 to point 4 (that is, the length of the component parallel
+         to the basis vector). Positive values are in the same sense as
+         movement from point 1 to point 2.
+      }
+      \sstsubsection{
+         D2 = DOUBLE PRECISION (Returned)
+      }{
+         The distance from
+         point 4 to point 3 (that is, the length of the component
+         perpendicular to the basis vector). Positive values are to the
+         right of the basis vector when moving from point 1 to point 2.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Each vector used in this routine is the path of
+         shortest distance between two points, as defined by the
+         \htmlref{AST\_DISTANCE}{AST_DISTANCE} function.
+
+         \sstitem
+         This function will return {\tt{"}}bad{\tt{"}} coordinate values (AST\_\_BAD)
+         if any of the input coordinates has this value, or if the required
+         output values are undefined.
       }
    }
 }
@@ -23499,6 +23776,9 @@ Object            - Base class for all AST Objects
          \htmlref{AST\_AXOFFSET}{AST_AXOFFSET}: Calculate an offset along an axis
 
          \sstitem
+         \htmlref{AST\_BEAR}{AST_BEAR}: Calculate the bearing of one point seen from another point.
+
+         \sstitem
          \htmlref{AST\_CONVERT}{AST_CONVERT}: Determine how to convert between two coordinate systems
 
          \sstitem
@@ -23517,10 +23797,16 @@ Object            - Base class for all AST Objects
          \htmlref{AST\_OFFSET}{AST_OFFSET}: Calculate an offset along a geodesic curve
 
          \sstitem
+         \htmlref{AST\_OFFSET2}{AST_OFFSET2}: Calculate an offset along a geodesic curve in a 2D Frame
+
+         \sstitem
          \htmlref{AST\_PERMAXES}{AST_PERMAXES}: Permute the order of a Frame's axes
 
          \sstitem
          \htmlref{AST\_PICKAXES}{AST_PICKAXES}: Create a new Frame by picking axes from an existing one
+
+         \sstitem
+         \htmlref{AST\_RESOLVE}{AST_RESOLVE}: Resolve a vector into two orthogonal components
 
          \sstitem
          \htmlref{AST\_UNFORMAT}{AST_UNFORMAT}: Read a formatted coordinate value for a Frame axis
