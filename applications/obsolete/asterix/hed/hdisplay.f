@@ -264,7 +264,11 @@
         CALL HDISPLAY_GETFMT( TYPE, FWID, OUTFMT, STATUS )
 
 *      Choose formatter
-        CALL AIO_CREFCO( TYPE, OUTFMT, FCO, STATUS )
+        IF ( INTYP ) THEN
+          CALL AIO_CREFCO( '_INTEGER', OUTFMT, FCO, STATUS )
+        ELSE
+          CALL AIO_CREFCO( TYPE, OUTFMT, FCO, STATUS )
+        END IF
 
 *      Map data
         IF ( INTYP ) THEN
