@@ -411,7 +411,14 @@
         LWORLD(1) = X
         LWORLD(2) = Y
 
+	print *,'calling wci_cna2s'
+	call flush(6)
+	call flush(6)
+	call flush(6)
+	call flush(6)
         CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, LCEL, STATUS )
+	print *,'done'
+	call flush(6)
 
         RA = LCEL(1) * MATH__DRTOD
         DEC = LCEL(2) * MATH__DRTOD
