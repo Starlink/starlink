@@ -16,8 +16,8 @@
 //     foreign catalogues are controlled by the GaiaLocalCatalog
 //     class.
 //
-//     A special override of the plot_objects function is added to 
-//     sort out problems with catalogues that have both WCS and X-Y 
+//     A special override of the plot_objects function is added to
+//     sort out problems with catalogues that have both WCS and X-Y
 //     coordinates.
 //
 //  Authors:
@@ -180,7 +180,7 @@ GaiaSkySearch::GaiaSkySearch( Tcl_Interp *interp,
                               const char *instname )
   : SkySearch( interp, cmdname, instname ),
     TclAstroCat(interp, cmdname, instname) //  Needed as SkySearch
-                                           //  inherits TclAstroCat 
+                                           //  inherits TclAstroCat
                                            // as "public virtual"!
 {
 }
@@ -233,7 +233,7 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
   if ( feedback_ ) {
     cat_->feedback( feedback_ );
   }
-  
+
   return TCL_OK;
 }
 
@@ -334,10 +334,10 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
       if ( ! e ) {
         return TCL_ERROR;
       }
-      //  May be an existing file, check for existence of URL, plus it 
+      //  May be an existing file, check for existence of URL, plus it
       //  cannot be itself.
       struct stat buf;
-      if ( stat( e->url(), &buf ) != 0 || 
+      if ( stat( e->url(), &buf ) != 0 ||
            strcmp( e->url(), e->longName() ) == 0) {
 
         //  Temporary file for this file doesn't exist, so we need to
@@ -379,7 +379,7 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
 //  of lists and the return is a list of the number of characters
 //  needed. This is implemented in C++ for speed reasons only.
 //
-int GaiaSkySearch::csizeCmd( int argc, char *argv[] ) 
+int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
 {
   char **mainArgv;
   int mainArgc = 0;
@@ -388,7 +388,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
   int *sizes = NULL;
   int ncolumn = 0;
   int len = 0;
-  int i; 
+  int i;
   int j;
 
   //  Split the list into a list of rows.
@@ -402,7 +402,7 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
       }
       return error( "not a sub list" );
     } else {
-      
+
       //  Allocate memory for columns sizes.
       if ( ncolumn == 0  ) {
         sizes = new int[rowArgc];
@@ -411,9 +411,9 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
           sizes[j] = 0;
         }
       }
-      
+
       //  Check list if same length as before.
-      if ( rowArgc != ncolumn ) { 
+      if ( rowArgc != ncolumn ) {
         if ( mainArgc > 0 ) {
           Tcl_Free( (char *) mainArgv );
         }
@@ -456,11 +456,11 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
 
 
 //
-//  Override plot_objects to sort out problems with plotting when 
+//  Override plot_objects to sort out problems with plotting when
 //  have both pixel coordinates and sky coordinates.
 //
-int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r, 
-                                 const char* cols, const char* symbol, 
+int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
+                                 const char* cols, const char* symbol,
                                  const char* expr )
 {
     int status = 0;
@@ -475,7 +475,7 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
     // this loop executes only once and is used for error handling/cleanup via "break"
     int once = 1;
     while (once-- > 0) {
-	// check that plot columns are valid and also save the column indexes 
+	// check that plot columns are valid and also save the column indexes
 	// for accessing row values as variables later
 	if ((status = Tcl_SplitList(interp_, (char*)cols, &numCols, &colNames)) != TCL_OK)
 	    break;
@@ -486,12 +486,12 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 		break;
 	    }
 	}
-    
-	// parse symbol info, a variable length list of 
+
+	// parse symbol info, a variable length list of
 	// {shape color ratio angle label cond}
 	if ((status = Tcl_SplitList(interp_, (char*)symbol, &nsymb, &symb)) != TCL_OK)
 	    break;
-    
+
 	// default values
 	char* shape = "";
 	char* fg = "white"; // if no color is specified, use 2: b&w
@@ -500,10 +500,10 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 	char* angle = "0";
 	char* label = "";
 	char* cond = "1";
-	if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio, 
-				   angle, label, cond)) != TCL_OK) 
+	if ((status = parse_symbol(r, nsymb, symb, shape, fg, bg, ratio,
+				   angle, label, cond)) != TCL_OK)
 	    break;
-    
+
 	// parse the size expr list: {size units}
 	if ((status = Tcl_SplitList(interp_, (char*)expr, &nexpr, &exprList)) != TCL_OK)
 	    break;
@@ -521,10 +521,10 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 	int id_col = r.id_col();
 	for (int rownum = 0; rownum < nrows; rownum++) {
 	    char* id;
-	    if ((status = r.get(rownum, id_col, id)) != 0) 
+	    if ((status = r.get(rownum, id_col, id)) != 0)
 		break;
 	    WorldOrImageCoords pos;
-	    if ((status = r.getPos(rownum, pos)) != 0) 
+	    if ((status = r.getPos(rownum, pos)) != 0)
 		break;
 	    double x, y;
 	    char xy_units[32];
@@ -537,14 +537,14 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 		x = pos.ra_deg();
 		y = pos.dec_deg();
 		strcpy(xy_units, "deg");
-	    } 
+	    }
 	    else {
 		status = error("no wcs or image coordinates to plot");
 		break;
 	    }
-	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units, 
-				   numCols, colNames, colIndexes, shape, bg, fg, ratio, 
-				   angle, label, cond, size, units)) != TCL_OK) 
+	    if ((status = plot_row(image, r, rownum, id, x, y, xy_units,
+				   numCols, colNames, colIndexes, shape, bg, fg, ratio,
+				   angle, label, cond, size, units)) != TCL_OK)
 		break;
 	}
     }

@@ -389,12 +389,15 @@ int GaiaLocalCatalog::readTemp()
     }
     strncpy( data, (char*) m.ptr(), size-1 );
     data[ size-1 ] = '\0';
-    if (info_.init(data, 0, 1) != 0) {
+
+    //  This will extract any catalog config info from the file's
+    //  header (do this before reading data which replaces \n with \0).
+    info_.entry( entry_, data );
+
+    //  Read the data.
+    if ( info_.init( data, 0, 1 ) != 0 ) {
         return TCL_ERROR;
     }
-
-    //  This will extract any catalog config info from the file's header
-    info_.entry( entry_, data );
 
     //  Record modification date at this read.
     tempstamp_ = modDate( filename_ );
