@@ -164,8 +164,10 @@
       REAL             J_TEL         ! brightness temperature of telescope 
       DOUBLE PRECISION LAMBDA
       LOGICAL          LOOPING
+      INTEGER          NDEG          ! Number of degrees of freedom
       REAL             NU            ! frequency
       INTEGER          QUALITY       ! quality of fit
+      REAL             REXISQ        ! Reduced chi square
       DOUBLE PRECISION XICUT         ! when an iteration produces an
                                      ! improvement in chi-squared below
                                      ! this limit no further iterations
@@ -206,6 +208,13 @@
          C_J_QUALITY (I) = 0
       END DO
 
+*     Work out the number of degrees of freedom
+*     This is number of observations plus number of free parameters - 1
+*     (yes I know that the observations are free parameters)
+*     + 1 since tau is always free
+
+      NDEG = N_MEASUREMENTS - 1 + 1
+
 * Now try to fit this
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -216,6 +225,8 @@
             C_B_HI = 0.9999D0
             C_B_LO = 0.0001D0
             FIT (2) = 0.7D0
+
+            NDEG = NDEG + 1
          ELSE
             C_B_HI = DBLE (B_IN)
             C_B_LO = DBLE (B_IN)
@@ -226,6 +237,8 @@
             C_ETA_TEL_HI = 0.9999D0
             C_ETA_TEL_LO = 0.0001D0
             FIT (1) = 0.7D0
+
+            NDEG = NDEG + 1
          ELSE
             C_ETA_TEL_HI = DBLE (ETA_TEL_IN)
             C_ETA_TEL_LO = DBLE (ETA_TEL_IN)
@@ -284,6 +297,8 @@
 
 *  output results
 
+         REXISQ = REAL(XISQ) / REAL(NDEG) ! Reduce chi sq
+
          IF (QUALITY .NE. 0) THEN
             CALL MSG_SETC ('SUB', SUB_INSTRUMENT)
             CALL MSG_SETC ('FILT', SUB_FILTER)
@@ -294,7 +309,7 @@
             CALL ERR_REP (' ', ' - last fit values were:-', STATUS)
 
             WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
-     :           REAL(XISQ), ITERATION
+     :           REXISQ, ITERATION
 
             CALL MSG_SETC ('BUFFER', BUFFER)
             CALL ERR_REP (' ', ' ^BUFFER', STATUS)
@@ -306,7 +321,7 @@
      :           '^FILT and sub-instrument ^SUB', STATUS)
 
             WRITE (BUFFER, 20) ETA_TEL_FIT, B_FIT, TAUZ_FIT, 
-     :           REAL(XISQ), ITERATION
+     :           REXISQ, ITERATION
  20         FORMAT ('eta = ', F6.2, '          b = ', F6.2,
      :           '  tau = ', F6.2, '  X = ', F7.1, '  N = ', I4)
 
