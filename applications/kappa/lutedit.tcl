@@ -2802,6 +2802,44 @@ proc Open {} {
    }
 }
 
+proc OpenImage {} {
+#  
+#  Open and display a new image, retaining the current colour table.
+#
+   global IMAGE
+
+   set file [tk_getOpenFile -defaultextension ".sdf" -filetypes {{SDF {.sdf}} {All {*}}}]
+
+#  Retain the current image if anything went wrong.
+   if { $file != "" } { 
+
+#  Get the name of the NDF, and the full file name.
+      if { [file extension $file] == "" } {
+         set ndf $file         
+         set file "$ndf.sdf"
+      } elseif { [file extension $file] == ".sdf" } {
+         set ndf [file rootname $file]
+      } else {
+         set ndf $file
+      }         
+
+#  Check the new NDF exists, and is readable.
+      if { ![file exists $file] } { 
+         Message "Cannot find \"$file\""
+
+      } elseif { ![file readable $file] } { 
+         Message "Cannot read \"$file\""
+
+#  If so, assign the NDF name to the global variable and display 
+#  the image and histogram.
+      } else {
+         set IMAGE $ndf
+         SetHelp disp "$IMAGE displayed with the current colour table."
+         gwmDisplay
+      }      
+   }
+}
+
 proc openNamed {file force} {
 #  
 #  Open and display a new colour table, specified by the caller.
@@ -6147,13 +6185,15 @@ proc WaitFor {name args} {
 
 # Add menu items to the File menu.
       $filemenu add command -label "Open        " -command {Open} -accelerator "Ctrl-o"
+      $filemenu add command -label "Open Image  " -command {OpenImage} -accelerator "Ctrl-i"
       $filemenu add command -label "Read Current" -command {Read 1} -accelerator "Ctrl-r"
       $filemenu add command -label "New         " -command {New} -accelerator "Ctrl-n"
       $filemenu add command -label "Save        " -command {Save 0} -accelerator "Ctrl-s"
       $filemenu add command -label "Save As     " -command {SaveAs} -accelerator "Ctrl-a"
       $filemenu add command -label "Exit        " -command {Finish} -accelerator "Ctrl-e"
    
-      MenuHelp $filemenu "Open        " "Use a colour table contained in an existing NDF."
+      MenuHelp $filemenu "Open        " "Open a colour table contained in an existing NDF."
+      MenuHelp $filemenu "Open Image  " "Open a new image, retaining the current colour table."
       MenuHelp $filemenu "Read Current" "Read colour table currently in use by the image display."
       MenuHelp $filemenu "New         " "Create a new greyscale colour table."
       MenuHelp $filemenu "Save        " "Save the current colour table."
@@ -6161,6 +6201,7 @@ proc WaitFor {name args} {
       MenuHelp $filemenu "Exit        " "Exit the application."
    
       bind $UWIN <Control-o> {Open}
+      bind $UWIN <Control-i> {OpenImage}
       bind $UWIN <Control-r> {Read 1}
       bind $UWIN <Control-n> {New}
       bind $UWIN <Control-s> {Save 0}
@@ -6233,6 +6274,9 @@ proc WaitFor {name args} {
       $optsmenu add cascade -label "Image display" -menu $imagemenu
       MenuHelp $optsmenu "Image display" "Options related to the image display"
          menu $imagemenu 
+
+         $imagemenu add command -label "Open" -command {OpenImage} -accelerator "Ctrl-i"
+         MenuHelp $imagemenu "Open" "Open a new image, retaining the current colour table."
 
          set imagecutmenu "$imagemenu.cut"
          $imagemenu add cascade -label "Auto-cut" -menu $imagecutmenu
