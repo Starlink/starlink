@@ -1246,11 +1246,16 @@ dnl                       $star_cv_initialise_fortran)
 AC_DEFUN([STAR_SUPPRESS_BUILD_IF],
    [m4_ifval([$1], [], [AC_FATAL([$0: needs two arguments])])dnl
     m4_ifval([$2], [], [AC_FATAL([$0: needs two arguments])])dnl
-    rm -f STAR_[]SUPPRESS_BUILD
+    rm -f STAR_SUPPRESS_BUILD
     if [$1]; then
-        AC_MSG_WARN([Build inhibited: $2])
-        echo "$2" >STAR_[]SUPPRESS_BUILD
+        AC_MSG_WARN([Build inhibited:
+        $2])
+        echo "$2" >STAR_SUPPRESS_BUILD
+        ALL_TARGET=all-am-suppress
+    else
+        ALL_TARGET=all-am-normal
     fi
+    AC_SUBST(ALL_TARGET)
 ])# STAR_SUPPRESS_BUILD_IF
 
 
