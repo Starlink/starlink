@@ -1,9 +1,9 @@
-      SUBROUTINE KPS_$TRDR<T>( FD, DIM1, DIM2, POSCOD, COUNT, CODATA,
+      SUBROUTINE KPS1_TRDR<T>( FD, DIM1, DIM2, POSCOD, COUNT, CODATA,
      :                        VADATA, LBND, UBND, CMPLET, STATUS )
 
 *+
 *  Name:
-*     KPS_$TRDRx
+*     KPS1_TRDRx
 
 *  Purpose:
 *     Reads co-ordinate and value data from an ASCII free-format file.
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, VADATA, 
+*     CALL KPS1_TRDRx( FD, DIM1, DIM2, POSCOD, COUNT, CODATA, VADATA, 
 *    :                 LBND, UBND, CMPLET, STATUS )
 
 *  Description:
@@ -208,8 +208,8 @@
       IF ( IFAIL .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'IFAIL', IFAIL )
-         CALL ERR_REP( 'KPS_$TRDRx_NAG1',
-     :     'KPS_$TRDRx: Error ^IFAIL returned by NAG routine '/
+         CALL ERR_REP( 'KPS1_TRDRx_NAG1',
+     :     'KPS1_TRDRx: Error ^IFAIL returned by NAG routine '/
      :     /'M01DBF during a sort of column positions.', STATUS )
          GOTO 999
       END IF
@@ -219,8 +219,8 @@
       IF ( IFAIL .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'IFAIL', IFAIL )
-         CALL ERR_REP( 'KPS_$TRDRx_NAG1',
-     :     'KPS_$TRDRx: Error ^IFAIL returned by NAG routine '/
+         CALL ERR_REP( 'KPS1_TRDRx_NAG1',
+     :     'KPS1_TRDRx: Error ^IFAIL returned by NAG routine '/
      :     /'M01ZAF during a sort of column positions.', STATUS )
          GOTO 999
       END IF
@@ -230,8 +230,8 @@
       IF ( IFAIL .NE. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'IFAIL', IFAIL )
-         CALL ERR_REP( 'KPS_$TRDRx_NAG1',
-     :     'KPS_$TRDRx: Error ^IFAIL returned by NAG routine '/
+         CALL ERR_REP( 'KPS1_TRDRx_NAG1',
+     :     'KPS1_TRDRx: Error ^IFAIL returned by NAG routine '/
      :     /'M01CBF during a sort of column positions.', STATUS )
          GOTO 999
       END IF
@@ -366,8 +366,8 @@
 
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETC( 'BUFFER', BUFFER )
-               CALL ERR_REP( 'KPS_$TRDRx_FORMAT',
-     :           'KPS_$TRDRx: Input file is not in the correct '/
+               CALL ERR_REP( 'KPS1_TRDRx_FORMAT',
+     :           'KPS1_TRDRx: Input file is not in the correct '/
      :           /'format.  For example, it must contain co-ordinate '/
      :           /'data.  The last buffer was "^BUFFER".', STATUS )
             END IF
@@ -378,8 +378,8 @@
 
 *          Report an error and abort
 
-            CALL ERR_REP( 'KPS_$TRDRx_RDATA',
-     :        'KPS_$TRDRx: Error reading data file : ^STATUS.  Line '/
+            CALL ERR_REP( 'KPS1_TRDRx_RDATA',
+     :        'KPS1_TRDRx: Error reading data file : ^STATUS.  Line '/
      :        /'was ^BUFFER', STATUS )
             GOTO 980
 

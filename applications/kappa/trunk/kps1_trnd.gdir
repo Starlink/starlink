@@ -1,7 +1,7 @@
-      SUBROUTINE KPS_$TRND<T>( FD, NELM, ARRAY, STATUS )
+      SUBROUTINE KPS1_TRND<T>( FD, NELM, ARRAY, STATUS )
 *+
 *  Name:
-*     KPS_$TRNDx
+*     KPS1_TRNDx
 
 *  Purpose:
 *     Reads a formatted ASCII file who records comprise data values
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$TRNDx( FD, NELM, ARRAY, STATUS )
+*     CALL KPS1_TRNDx( FD, NELM, ARRAY, STATUS )
 
 *  Description:
 *     This routine reads records from an ASCII file comprising data
@@ -175,7 +175,7 @@
 
 *          Trim the input buffer and extract the data values.
 
-            CALL KPG_$PRSA<T>( BUFFER( 1:COM-1 ), MXVALS, LIST, NVAL,
+            CALL KPG1_PRSA<T>( BUFFER( 1:COM-1 ), MXVALS, LIST, NVAL,
      :                         STATUS )
 
 *          If values were returned append to the data file.
@@ -189,7 +189,7 @@
 
 *                Report a warning message.
 
-                  CALL MSG_OUT( 'KPS_$TRND<T>_TMANY',
+                  CALL MSG_OUT( 'KPS1_TRND<T>_TMANY',
      :              'The output array is full before all the input '/
      :              /'data values have been used.', STATUS )
                   NVAL = NELM - N

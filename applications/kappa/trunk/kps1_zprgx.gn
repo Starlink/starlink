@@ -1,8 +1,8 @@
-      SUBROUTINE KPS_$ZPRG<T>( DIM1, DIM2, LBND, UBND, NOISE,
+      SUBROUTINE KPS1_ZPRG<T>( DIM1, DIM2, LBND, UBND, NOISE,
      :                         VAR, ARRAY, STATUS )
 *+
 *  Name:
-*     KPS_$ZPRGx
+*     KPS1_ZPRGx
 
 *  Purpose:
 *     Linearly interpolates over a region in a 2-d array.
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$ZPRGx( DIM1, DIM2, LBND, UBND, NOISE, VAR, ARRAY,
+*     CALL KPS1_ZPRGx( DIM1, DIM2, LBND, UBND, NOISE, VAR, ARRAY,
 *                      STATUS )
 
 *  Description:
@@ -242,7 +242,7 @@
 *                may be present.
 
                   IF ( NOISE .AND. VAR( I, J ) .NE. VAL__BAD<T> )
-     :              CALL KPG_$NOIS<T>( .TRUE., 1, VAR( I, J ),
+     :              CALL KPG1_NOIS<T>( .TRUE., 1, VAR( I, J ),
      :                                 ARRAY( I, J ), STATUS )
                END DO
 
@@ -262,7 +262,7 @@
 *                may be present.
 
                   IF ( NOISE .AND. VAR( I, J ) .NE. VAL__BAD<T> )
-     :              CALL KPG_$NOIS<T>( .TRUE., 1, VAR( I, J ),
+     :              CALL KPG1_NOIS<T>( .TRUE., 1, VAR( I, J ),
      :                                 ARRAY( I, J ), STATUS )
                END DO
 
@@ -309,7 +309,7 @@
 *                may be present.
 
                   IF ( NOISE .AND. VAR( I, J ) .NE. VAL__BAD<T> )
-     :              CALL KPG_$NOIS<T>( .TRUE., 1, VAR( I, J ),
+     :              CALL KPG1_NOIS<T>( .TRUE., 1, VAR( I, J ),
      :                                 ARRAY( I, J ), STATUS )
                END DO
             END IF
@@ -390,7 +390,7 @@
 *                may be present.
 
                   IF ( NOISE .AND. TEMVAR .NE. VAL__BAD<T> )
-     :              CALL KPG_$NOIS<T>( .TRUE., 1, TEMVAR, TEMARR,
+     :              CALL KPG1_NOIS<T>( .TRUE., 1, TEMVAR, TEMARR,
      :                                 STATUS )
 
 *                If the interpolation across lines gave an undefined
@@ -441,7 +441,7 @@
 *                may be present.
 
                   IF ( NOISE .AND. TEMVAR .NE. VAL__BAD<T> )
-     :              CALL KPG_$NOIS<T>( .TRUE., 1, TEMVAR, TEMARR,
+     :              CALL KPG1_NOIS<T>( .TRUE., 1, TEMVAR, TEMARR,
      :                                 STATUS )
 
 *                If the interpolation across lines gave an undefined
@@ -523,7 +523,7 @@
 *                may be present.
 
                   IF ( NOISE .AND. TEMVAR .NE. VAL__BAD<T> )
-     :              CALL KPG_$NOIS<T>( .TRUE., 1, TEMVAR, TEMARR,
+     :              CALL KPG1_NOIS<T>( .TRUE., 1, TEMVAR, TEMARR,
      :                                 STATUS )
 
 *                If the interpolation across lines gave an undefined

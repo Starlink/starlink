@@ -1,9 +1,9 @@
 
-      SUBROUTINE KPS_$TRNV<T> ( NDIMS, ODIMS, NPTS, CODATA, VADATA,
+      SUBROUTINE KPS1_TRNV<T> ( NDIMS, ODIMS, NPTS, CODATA, VADATA,
      :                         PSCALE, COMIN, OUTARR, STATUS )
 *+
 *  Name:
-*     KPS_$TRNVx
+*     KPS1_TRNVx
 
 *  Purpose:
 *     Converts co-ordinate and value arrays of data into an n-d array.
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPS_$TRNVx( NDIMS, ODIMS, NPTS, CODATA, VADATA, PSCALE,
+*     CALL KPS1_TRNVx( NDIMS, ODIMS, NPTS, CODATA, VADATA, PSCALE,
 *    :                 COMIN, OUTARR, STATUS )
 
 *  Description:

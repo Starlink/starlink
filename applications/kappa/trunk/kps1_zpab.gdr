@@ -1,8 +1,8 @@
-      SUBROUTINE KPS_$ZPAB<T>( REGION, LINE, COLBND, LINBND, BUFFER,
+      SUBROUTINE KPS1_ZPAB<T>( REGION, LINE, COLBND, LINBND, BUFFER,
      :                       LEN, STATUS )
 *+
 *  Name:
-*     KPS_$ZPABx
+*     KPS1_ZPABx
 
 *  Purpose:
 *     Creates a string to be output to an ASCII steering file from
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$ZPABx( REGION, LINE, COLBND, LINBND, BUFFER, LEN,
+*     CALL KPS1_ZPABx( REGION, LINE, COLBND, LINBND, BUFFER, LEN,
 *                      STATUS )
 
 *  Description:
