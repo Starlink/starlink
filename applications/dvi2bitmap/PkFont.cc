@@ -18,7 +18,7 @@
 #include "kpathsea.h"
 #endif
 
-#if defined(MKTEXPK) || defined (MAKETEXPK)
+#if ENABLE_FONT_GEN
 #ifdef HAVE_SSTREAM
 #include <sstream>
 #define SSTREAM ostringstream
@@ -97,7 +97,7 @@ PkFont::PkFont(unsigned int dvimag,
 	bool got_path = find_font (pk_file_path);
 	if (! got_path)
 	{
-#if defined(MKTEXPK) || defined(MAKETEXPK)
+#if ENABLE_FONT_GEN
 	    if (makeMissingFonts_)
 	    {
 		string cmd;
@@ -790,6 +790,8 @@ string PkFont::fontgenCommand (void)
 {
     string rval;
 
+#if ENABLE_FONT_GEN
+
 #if defined(MKTEXPK)
 
     SSTREAM cmd;
@@ -818,7 +820,13 @@ string PkFont::fontgenCommand (void)
 
     rval = "";
 
-#endif
+#endif /* defined(MKTEXPK) */
+
+#else  /* if ENABLE_FONT_GEN */
+
+    rval = "";
+
+#endif /* if ENABLE_FONT_GEN */
 
     return rval;
 }
