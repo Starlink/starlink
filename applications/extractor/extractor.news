@@ -4,10 +4,12 @@
  if the measurement image contained BAD values that the 
  detection image did not.
 
+ The output format for the X_WORLD and Y_WORLD fields has been 
+ changed to always give at least 0.01 arcsecond accuracy.
+
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
     % showme sun226
 
- Peter W. Draper 18th May 2001 (extractor@star.rl.ac.uk).
-
+ Peter W. Draper 12th June 2001 (extractor@star.rl.ac.uk).
