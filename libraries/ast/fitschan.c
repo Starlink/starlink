@@ -275,6 +275,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        PROJP9. This could cause projection parameter values to be
 *        incorrectly numbered when they are written out upon deletion of 
 *        the FitsChan.
+*     1-FEB-2000 (DSB):
+*        Check that FITS_IRAF encoding is not being used before using a
+*        PC matrix when reading WCS information from a header. This is
+*        important if the header contains both PC and CD matrices.
 *        
 *class--
 */
@@ -542,7 +546,7 @@ static int GetNcard( AstFitsChan * );
 static AstCmpMap *WcsNative( FitsStore *, AstWcsMap *, const char *, const char * );
 static AstFrame *WcsFrame( FitsStore *, const char *, const char * );
 static AstFrameSet *ReadDSS( AstFitsChan * );
-static AstFrameSet *ReadWcs( AstFitsChan * );
+static AstFrameSet *ReadWcs( AstFitsChan *, int );
 static AstMapping *WcsMapping( FitsStore *, const char *, const char * );
 static AstMatrixMap *WcsMatrix( FitsStore *, const char *, const char * );
 static AstObject *Read( AstChannel * );
@@ -599,7 +603,7 @@ static int SearchCard( AstFitsChan *, const char *, const char *, const char *);
 static int SkySys( int, AstFrame *, int, FitsStore *, int, int );
 static int SplitMap( int, AstMapping *, AstMapping **, AstMapping **, AstMapping **, const char * );
 static int SplitMat( int, double *, double * );
-static int StoreFits( AstFitsChan *, int, int, int *, FitsStore *, const char *, const char *  );
+static int StoreFits( AstFitsChan *, int, int, int, int *, FitsStore *, const char *, const char *  );
 static int TestAttrib( AstObject *, const char * );
 static int Use( AstFitsChan *, int, int );
 static int Ustrcmp( const char *, const char * );
@@ -8824,7 +8828,7 @@ static AstObject *Read( AstChannel *this_channel ) {
    function to read a FrameSet (the only class of Object which can be
    stored using FITS-WCS encoding). */
    } else if( encode == FITSWCS_ENCODING || encode == FITSIRAF_ENCODING ){
-      new = (AstObject *) ReadWcs( this );
+      new = (AstObject *) ReadWcs( this, encode );
    
 /* If we are reading from a FitsChan in which AST objects are encoded using
    STScI DSS keywords, use the ReadDSS private function to read a FrameSet 
@@ -9058,7 +9062,7 @@ static AstFrameSet *ReadDSS( AstFitsChan *this ){
    return new;
 }
 
-static AstFrameSet *ReadWcs( AstFitsChan *this ){
+static AstFrameSet *ReadWcs( AstFitsChan *this, int encoding ){
 /*
 *  Name:
 *     ReadWcs
@@ -9071,7 +9075,7 @@ static AstFrameSet *ReadWcs( AstFitsChan *this ){
 
 *  Synopsis:
 *     #include "fitschan.h"
-*     AstFrameSet *ReadWcs( AstFitsChan *this )
+*     AstFrameSet *ReadWcs( AstFitsChan *this, int encoding )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -9096,6 +9100,8 @@ static AstFrameSet *ReadWcs( AstFitsChan *this ){
 *  Parameters:
 *     this
 *        Pointer to the FitsChan.
+*     encoding
+*        The encoding scheme.
 
 *  Returned Value:
 *     A pointer to the new FrameSet. 
@@ -9213,7 +9219,8 @@ static AstFrameSet *ReadWcs( AstFitsChan *this ){
 /* Identify and store the required FITS keyword values. The results of this 
    preprocesing are stored in "store". Zero is returned if the set of axis 
    descriptions could not be used. */
-         if( StoreFits( this, prim, naxis, desc, &store, method, class ) ){
+         if( StoreFits( this, encoding, prim, naxis, desc, &store, method, 
+                        class ) ){
 
 /* Get a Mapping between pixel coordinates and physical coordinates, using the 
    current set of axis descriptions. */
@@ -10840,8 +10847,9 @@ static int SplitMat( int naxis, double *matrix, double *cdelt ){
  
 }
 
-static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
-                      FitsStore *store, const char *method, const char *class ){
+static int StoreFits( AstFitsChan *this, int encoding, int rep, int naxis, 
+                      int *ialt, FitsStore *store, const char *method, 
+                      const char *class ){
 /*
 *  Name:
 *     StoreFits
@@ -10854,8 +10862,9 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
 *     Private function.
 
 *  Synopsis:
-*     int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
-*                    FitsStore *store, const char *method, const char *class )
+*     int StoreFits( AstFitsChan *this, int encoding, int rep, int naxis, 
+*                    int *ialt, FitsStore *store, const char *method, 
+*                    const char *class )
 
 *  Class Membership:
 *     FitsChan member function.
@@ -10871,6 +10880,8 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
 *  Parameters:
 *     this
 *        A pointer to a FitsChan object containing values for FITS keywords.
+*     encoding
+*        The encoding scheme (FITSIRAF_ENCODING or FITSWCS_ENCODING).
 *     rep
 *        Should an error be reported if an inconsistent set of axis
 *        descriptions is requested (e.g. if a celestial longitude axis is
@@ -11004,7 +11015,8 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
 
 /* See if a CD or PC matrix has been supplied. Store a template for the matrix 
    keywords to be used. */
-   if( matfmt = "PC%3d%3d", astKeyFields( this, matfmt, 2, hi, lo ) ) {
+   if( matfmt = "PC%3d%3d", encoding != FITSIRAF_ENCODING && 
+       astKeyFields( this, matfmt, 2, hi, lo ) ) {
       matfmt2 = "PC%.3d%.3d";
       cd = 0;
       cdeltrep = 1;
