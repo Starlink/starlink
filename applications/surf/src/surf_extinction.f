@@ -1416,7 +1416,7 @@
      :                    SCUBA__NUM_ADC * SCUBA__NUM_CHAN, N_BOL_OUT,
      :                    %val(OUT_DATA_PTR + DATA_OFFSET * VAL__NBR), 
      :                    %val(OUT_VARIANCE_PTR+DATA_OFFSET*VAL__NBR),
-     :                    %val(OUT_QUALITY_PTR +DATA_OFFSET*VAL__NBI),
+     :                    %val(OUT_QUALITY_PTR +DATA_OFFSET*VAL__NBUB),
      :                    BOL_RA, BOL_DEC, LST, LAT_OBS, TAUZ, BADBIT,
      :                    STATUS)
                      END DO
