@@ -71,15 +71,31 @@
 #        Removed KAPPA dependencies.  Reworded and reordered the
 #        description.  Added some comments.  Used a special tifftopnm
 #        for alpha_OSF1.
+#     1997 October 3 (MJC):
+#        Improved the parameter handling to allow for no arguments, and
+#        to remove any .tif that may be present in the first argument.
  
 #  Bugs:
 #     {note_any_bugs_here}
  
 #-
 
-# Find the required output filename
-out=${2:-$1}
-name=`basename $1`
+# Check that a file name was given.
+if [ "$#" -eq 0 ]
+then
+   echo "!! TIFF2NDF: no TIFF name supplied"
+   echo "!  Usage: tiff2ndf in [out]"
+   exit
+fi
+
+# Remove any .gif file extension.
+root=`echo $1 | sed 's#.tif##'`
+
+# Find the filename less any path.
+name=`basename $root`
+
+# Set required output file name.  Defaults to the input name.
+out=${2:-$name}
 
 # Determine whether the operating system is alpha_OSF1 or not.
 machine=`uname -m`
@@ -93,7 +109,7 @@ opsys=`uname`
 # temporary files.  Make the error look as if it came from MSG.
 if test "$machine" = "alpha" -a  "$opsys" = "OSF1"
 then
-   $CONVERT_DIR/tifftopnm $1.tif 2> convert_err1_$name.lis | \
+   $CONVERT_DIR/tifftopnm ${root}.tif 2> convert_err1_$name.lis | \
    ppmtopgm 2> convert_err2_$name.lis | \
    pnmflip -topbottom 2> convert_err3_$name.lis | \
    pgmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
@@ -103,7 +119,7 @@ then
      }
 
 else
-   tifftopnm $1.tif 2> convert_err1_$name.lis | \
+   tifftopnm ${root}.tif 2> convert_err1_$name.lis | \
    ppmtopgm 2> convert_err2_$name.lis | \
    pnmflip -topbottom 2> convert_err3_$name.lis | \
    pgmtofits 2> convert_err4_$name.lis > convert_temp_$name.fit || \
