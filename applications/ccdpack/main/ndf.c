@@ -2317,7 +2317,7 @@
    smooths it out quite significantly. */
          factor = zoom * psize;
          if ( factor > 0.35 ) {
-            ischeme = AST__LINEAR;
+            ischeme = AST__NEAREST;
          }
          else {
             ischeme = AST__BLOCKAVE;
@@ -2355,7 +2355,7 @@
          data = ndfset->plotarray->data;
 
 /* Initialise the pixel array with bad values. */
-         for ( i = 0; i < xdim * ydim; i++ ) {
+         for ( i = 0; i < ( xdim + 1 ) * ( ydim + 1 ); i++ ) {
             data[ i ] = badcolour;
          }
 
