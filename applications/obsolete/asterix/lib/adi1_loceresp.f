@@ -1,4 +1,4 @@
-      SUBROUTINE ADI1_LOCERESP( ID, ELOC, STATUS )
+      SUBROUTINE ADI1_LOCERESP( ID, CREATE, ELOC, STATUS )
 *+
 *  Name:
 *     ADI1_LOCERESP
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI1_LOCERESP( ID, ELOC, STATUS )
+*     CALL ADI1_LOCERESP( ID, CREATE, ELOC, STATUS )
 
 *  Description:
 *     Locate ENERGY_RESP structure given HDS object. The routine first
@@ -19,6 +19,8 @@
 *  Arguments:
 *     ID = INTEGER (given)
 *        ADI identifier referencing HDS object
+*     CREATE = LOGICAL (given)
+*        Create component if it doesn't exist?
 *     ELOC = CHARACTER*(DAT__SZLOC) (returned)
 *        Locator ENERGY_RESP object
 *     STATUS = INTEGER (given and returned)
@@ -88,9 +90,10 @@
 
 *  Arguments Given:
       INTEGER			ID			! ADI identifier
+      LOGICAL			CREATE			! Create if not there?
 
 *  Arguments Returned:
-      CHARACTER*(DAT__SZLOC)	ELOC			! HEADER locator
+      CHARACTER*(DAT__SZLOC)	ELOC			! ENERGY_RESP locator
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -114,6 +117,10 @@
         CALL ADI_CGET0C( ID, EPROPN, ELOC, STATUS )
       ELSE
         CALL ADI1_LOCAST( ID, ALOC, STATUS )
+        CALL DAT_THERE( ALOC, 'ENERGY_RESP', THERE, STATUS )
+        IF ( CREATE .AND. .NOT. THERE ) THEN
+          CALL DAT_NEW( ALOC, 'ENERGY_RESP', 'EXTENSION', 0, 0, STATUS )
+        END IF
         CALL DAT_FIND( ALOC, 'ENERGY_RESP', ELOC, STATUS )
         CALL ADI_CPUT0C( ID, EPROPN, ELOC, STATUS )
       END IF

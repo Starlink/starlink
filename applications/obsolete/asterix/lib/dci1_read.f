@@ -123,7 +123,7 @@
       OARG = ADI__NULLID
 
 *  Locate HEADER structure
-      CALL ADI1_LOCHEAD( ARGS(1), HLOC, STATUS )
+      CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
 
 *  Look for the various header components
       CALL ADI1_CGET0C( HLOC, 'OBSERVATORY', MOK, MISSION, STATUS )

@@ -1,4 +1,4 @@
-      SUBROUTINE ADI1_LOCINSTR( ID, ILOC, STATUS )
+      SUBROUTINE ADI1_LOCINSTR( ID, CREATE, ILOC, STATUS )
 *+
 *  Name:
 *     ADI1_LOCINSTR
@@ -10,15 +10,18 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI1_LOCINSTR( ID, ILOC, STATUS )
+*     CALL ADI1_LOCINSTR( ID, CREATE, ILOC, STATUS )
 
 *  Description:
 *     Locate ASTERIX INSTRUMENT structure given HDS object. The routine first
-*     checks that the object has not already been found.
+*     checks that the object has not already been found, but only creates
+*     if CREATE is specified true.
 
 *  Arguments:
 *     ID = INTEGER (given)
 *        ADI identifier referencing HDS object
+*     CREATE = LOGICAL (given)
+*        Create component if it doesn't exist?
 *     ILOC = CHARACTER*(DAT__SZLOC) (returned)
 *        Locator to INSTRUMENT object
 *     STATUS = INTEGER (given and returned)
@@ -88,6 +91,7 @@
 
 *  Arguments Given:
       INTEGER			ID			! ADI identifier
+      LOGICAL 			CREATE			! Create if not there?
 
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC)	ILOC			! INSTRUMENT locator
@@ -113,7 +117,11 @@
       IF ( THERE ) THEN
         CALL ADI_CGET0C( ID, IPROPN, ILOC, STATUS )
       ELSE
-        CALL ADI1_LOCAST( ID, ALOC, STATUS )
+        CALL ADI1_LOCAST( ID, CREATE, ALOC, STATUS )
+        CALL DAT_THERE( ALOC, 'INSTRUMENT', THERE, STATUS )
+        IF ( CREATE .AND. .NOT. THERE ) THEN
+          CALL DAT_NEW( ALOC, 'INSTRUMENT', 'EXTENSION', 0, 0, STATUS )
+        END IF
         CALL DAT_FIND( ALOC, 'INSTRUMENT', ILOC, STATUS )
         CALL ADI_CPUT0C( ID, IPROPN, ILOC, STATUS )
       END IF

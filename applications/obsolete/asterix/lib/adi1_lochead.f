@@ -90,6 +90,7 @@
 
 *  Arguments Given:
       INTEGER			ID			! ADI identifier
+      LOGICAL			CREATE			! Create if not there?
 
 *  Arguments Returned:
       CHARACTER*(DAT__SZLOC)	HLOC			! HEADER locator
