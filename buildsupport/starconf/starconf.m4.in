@@ -703,8 +703,12 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
           STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
           m4_ifval([$2],
                    [dnl non-empty second argument -- just add to variable
-                    _STAR_EXTRA_DIST($2)
-                    STAR_DOCS_FILES($2)],
+                    if $_star_build_docs; then
+                        _STAR_EXTRA_DIST($2)
+                        STAR_DOCS_FILES($2)
+                    else
+                        AC_MSG_WARN([not installing docs $1])
+                    fi],
                    [dnl second arg empty -- use defaults
                     if $_star_build_docs; then
                         for d in $1
