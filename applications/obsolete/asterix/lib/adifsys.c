@@ -359,7 +359,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
   _chk_init; _chk_stat;			/* Check status on entry */
 
-  _GET_STRING(fspec,flen);		/* Import strings resolving lengths */
+  _GET_NAME(fspec,flen);		/* Import strings resolving lengths */
   _GET_STRING(cls,clen);
   _GET_STRING(mode,mlen);
 
