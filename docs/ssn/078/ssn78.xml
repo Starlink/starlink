@@ -6293,17 +6293,20 @@ BUILT_SOURCES = $(include_MESSAGES)
             manifest<index>installation!special</index>.  It is 
             reasonably easy to add such support, however, as
             described in <ref id="config-tclsys"/>.  The crucial
-            feature is the installation command declared in the macro
+            feature is the <em>one line</em> installation command
+            declared in the macro
             <code>STAR_SPECIAL_INSTALL_COMMAND</code>.  If this macro
             variable is present in a <code>configure.ac</code> file,
             then Starlink automake will generate an
             <code>install</code> target which uses this command to do
             the installation, in such a way that a manifest file can
-            be generated automatically.  For this to work, the command
-            must have the following features:
+            be generated automatically.  The argument to this macro is
+            executed as the last command (or commands) in a subshell,
+            the exit value of which is tested for a success status.
+            For this to work, the command must have the following features:
             <ol>
               <li>
-                <p>It must include the string <code>$(MAKE)</code> (as
+                <p>It must include the exact string <code>$(MAKE)</code> (as
                 opposed to plain `<code>make</code>'), as part of some
                 <code>$(MAKE) ... install</code> command.</p>
               </li>
@@ -6316,19 +6319,30 @@ BUILT_SOURCES = $(include_MESSAGES)
                   have had the same functionality, but used a variable
                   <code>$INSTALL_ROOT</code> for it.</p>
               </li>
+              <li>
+                <p>The subshell within which the given command is
+                  executed must exit with a zero status if the command
+                  is successful, and a non-zero status otherwise.
+                  This will happen if, for example, the last command
+                  in the macro argument is a `make' command, since
+                  this exits with a non-zero status if the make fails,
+                  and this is passed on to the containing shell.</p>
+              </li>
             </ol>
             The example shown in <ref id="config-tclsys"/> shows a use
             of this macro which satisfies these constraints.</p>
 
           <p>The command may be as complicated as you like, but note
-            that it is collapsed onto a single line by autoconf, so
+            that <em>it is collapsed onto a single line</em> by autoconf, so
             although you may spread the macro argument over several
             lines for readability, each command <em>must</em> be
             separated by a semicolon (or double-ampersand or double-bar).</p>
 
+<!-- This comment is rather puzzling: it's redundant, isn't it?
           <p>The generated Makefile rule requires that the makefile
             variables <code>$(PACKAGE_NAME)</code> and
             <code>$(PACKAGE_VERSION)</code> be set.</p>
+-->
 
           <p>See <ref id="importing-thirdparty"/> for general
             discussion of importing third-party
