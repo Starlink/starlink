@@ -3976,9 +3976,10 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* Look for the primary celestial axes. */
    FindLonLatSpecAxes( store, s, &axlon, &axlat, &axspec, method, class );
 
-/* Axis 1 must be spectral and 2 and 3 must be celestial. */
-   if( axspec == 0 && ( ( axlon == 1 && axlat == 2 ) ||
-                        ( axlon == 2 && axlat == 1 ) ) ) {
+/* Spectral and celestial axes must be present in axes 1,2 and 3. */
+   if( axspec >= 0 && axspec < 3 &&
+       axlon >= 0 && axlon < 3 &&
+       axlat >= 0 && axlat < 3 ) {
       ok = 1;
 
 /* Get the CRVAL values for both spatial axes. */
@@ -9291,8 +9292,7 @@ static int GetEncoding( AstFitsChan *this ){
 *     i, j and m are integers and s is a single upper case character):
 *
 *     1) Any keywords starting with "BEGAST" = Native encoding 
-*     2) FITS-CLASS: CTYPE1='FREQ' .and. (CTYPE2='RA' or 'GLON' )
-*        .and. (CTYPE3='DEC' or 'GLAT') 
+*     2) ORIGIN keyword with the value 'CLASS-Grenoble' = FITS-CLASS.
 *     3) Any AIPS spectral CTYPE values:
 *         Any of CDi_j, PROJP, LONPOLE, LATPOLE = FITS-AIPS++ encoding:
 *         None of the above = FITS-AIPS encoding.
@@ -30897,13 +30897,12 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *       will therefore be inaccurate (typically by up to about 0.5 km/s)
 *       unless suitable values are assigned to these attributes after the
 *       FrameSet has been created.
-*     - Axis 1 must be a linear frequency axis or a linear radio velocity
-*       axis (but note that there is a bug in CLASS version "aug04a" and
-*       earlier which can cause radio velocity axes to be mis-interpreted in 
-*       some situations). 
-*     - Axes 2 and 3 must be a pair of celestial axes - either (RA,Dec) or 
-*       (GLON,GLAT). The order of the axes in this pair can be reversed.
-*       RA and Dec must be either FK4/B1950 or FK5/J2000.
+*     - There must be at least 3 WCS axes, of which one must be a linear 
+*       frequency axis or a linear radio velocity axis (but note that there
+*       is a bug in CLASS version "aug04a" and earlier which can cause radio 
+*       velocity axes to be mis-interpreted in some situations). 
+*     - There must be a pair of celestial axes - either (RA,Dec) or 
+*       (GLON,GLAT). RA and Dec must be either FK4/B1950 or FK5/J2000.
 *     - A limited range of projection codes (TAN, ARC, STG, AIT, SFL, SIN) 
 *       can be used. For AIT and SFL, the reference point must be at the
 *       origin of longitude and latitude. For SIN, the associated projection
