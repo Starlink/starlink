@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="kappa">
+  <version>1.3-1</version>
+  <path>applications/kappa</path>
+  <description>KAPPA - Kernel Application Package</description>
+  <abstract><p>
+KAPPA is an applications package comprising about 180
+general-purpose commands for image processing, data visualisation, and
+manipulation of the standard Starlink data format---the NDF.  It is
+intended to work in conjunction with Starlink's various specialised
+packages.
+  </p></abstract>
+  <dependencies >
+    <build>parsecon</build><build>dtask</build><build>fio</build><build>prm</build><build>par</build><build>sae</build><build>hds</build><build>kaplibs</build><build>ard</build><build>pgplot</build><sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Malcolm Currie</name>
+      <uname>dsb</uname>
+    </person>
+  </developers>
+  <documentation> sun95 sun221</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
