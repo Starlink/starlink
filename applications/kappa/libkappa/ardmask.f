@@ -202,7 +202,7 @@
 *  Get the WCS FrameSet from the NDF and use it to establish the WCS
 *  information used by the following cal to ARD_WORK.
       CALL KPG1_GTWCS( INDF1, IWCS, STATUS )
-      CALL ARD_WCS( IWCS, STATUS )
+      CALL ARD_WCS( IWCS, ' ', STATUS )
 
 *  Create the mask.  Value 2 should be used to represent pixels
 *  specified by the first keyword in the ARD description. TRCOEF is
