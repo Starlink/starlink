@@ -3328,6 +3328,107 @@ JFL: John Lightfoot (jfl@roe.ac.uk)
 
 TIMJ: Tim Jenness (t.jenness@jach.hawaii.edu)
 
+1 SCUBA2MEM
+Calculate bolometer positions as tangent plane offsets
+
+Usage:
+
+   scuba2mem in out
+
+Description:
+
+   This routine reads in SCUBA demodulated data and writes it
+   out along with the positions of the bolometers on the sky
+   for each sample. The positions of the
+   chop beams can be requested as well as the positions of the tracking
+   centre. Returns tangent plane offsets from the map centre in arcseconds.
+   Additionally, the LST of each sample is stored as axis information.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = CHAR (Read)
+   The name ofthe input files to be processed. This is a demodulated
+   data file. RESTORE should not have been run on it. Multiple
+   file names can be specified (see the documentation on GRP).
+   All the input files are referenced to the same output coordinate
+   frame.
+3 LAT
+LAT = CHAR (Read)
+   The latitude of the output map centre. The supplied default value
+   is that of the map centre of the observation in the output
+   coordinates.
+3 LONG
+LONG = CHAR (Read)
+   The longitude of the output map centre. The supplied default value
+   is that of the map centre of the observation in the output
+   coordinates.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   This parameter specifies the name of the output file to be used
+   to store the positional information.
+   The file format is described below.
+3 OUT_COORDS
+OUT_COORDS = CHAR (Read)
+   The coordinate system of the output map. Available coordinate
+   systems are:
+
+   - AZ:  Azimuth/elevation offsets
+
+   - NA:  Nasmyth offsets
+
+   - PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+   - RB:  RA/Dec (B1950)
+
+   - RJ:  RA/Dec (J2000)
+
+   - RD:  RA/Dec (epoch of observation)
+
+   - GA:  Galactic coordinates (J2000)
+3 SHIFT
+SHIFT = REAL( 2 ) (Read)
+   The pointing shift [X,Y] to be applied that would bring the
+   map into the correct position.
+   This is a shift in the output coordinate frame. CHANGE_POINTING
+   should be used to add Az/El pointing offsets.
+2 Examples
+scuba2mem out_coords=GA o34_lon_ext o34_mem nbeams=1 \\
+   Calculate the coordinates of all bolometer positions
+   in tangent plane offsets from the GA map centre.
+
+scuba2mem o34_lon_ext nbeams=3 \\
+   Calculate all chop positions for o34_lon_ext. Use RJ coordinates.
+2 Notes
+- Can be used on JIGGLE and SCAN data.
+
+- The coordinates of the selected output frame are written
+  to the output FITS extension in keywords OUT_CRDS, OUTLONG and
+  OUTLAT. The full FITS header of the observation itself is still
+  available.
+2 Format_of_output_file
+   SCUBA DBMEM requires the data, positions of every beam and the
+   LST for every point. This information (along with a standard FITS
+   header) is stored as a standard NDF. The data array is constructed
+   as follows:
+       3 dimensional: N_BOL * N_POS * ((N_BEAM * 2) + 1)
+       where N_BOL is the number of bolometers
+             N_POS is the number of samples for each bolometer (time axis)
+             N_BEAM is the number of beams
+
+       The 3rd dimension contains the actual data value plus positions
+       of every beam associated with the data point. Each beam has two
+       positions (X offset and Y offset)
+       Axis components store bolometer number, LST and beam weight.
+2 Related_Applications
+   SURF: EXTRACT_DATA, REBIN
+   DBMEM
+2 Authors
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+
 1 SCUCAT
 Concatenate photometry datasets for further processing
 
