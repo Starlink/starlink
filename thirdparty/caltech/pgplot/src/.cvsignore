@@ -1,0 +1,17 @@
+*.lo
+*.la
+.deps
+.libs
+Makefile
+Makefile.in
+acinclude.m4
+aclocal.m4
+autom4te.cache
+config.log
+config.status
+configure
+libtool
+starconf.m4
+starconf.status
+starconf.status.local
+
