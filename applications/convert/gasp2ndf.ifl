@@ -50,7 +50,7 @@ interface GASP2NDF
       type        _INTEGER
       vpath       'PROMPT'
       ppath       'CURRENT'
-      prompt      'Dimensdions of the GASP image'
+      prompt      'Dimensions of the GASP image'
       helpkey    '*'
    endparameter
 
