@@ -625,7 +625,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_cosub.f ccd1_crdat.f ccd1_crgr.f ccd1_crgr2.f \
  ccd1_dcen.f ccd1_dcon.f ccd1_debia.f ccd1_decl2.f \
  ccd1_decl3.f ccd1_decl4.f ccd1_dlcat.f ccd1_dmprg.f ccd1_docmp.f \
- ccd1_domos.f ccd1_drawp.f ccd1_dtrn.f \
+ ccd1_domos.f ccd1_drawa.f ccd1_dtrn.f \
  ccd1_duesc.f ccd1_dxy12.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_fra.f ccd1_frdm.f ccd1_frtmp.f \
@@ -658,7 +658,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_rfcr.f ccd1_rflt.f ccd1_rglo.f ccd1_rmcom.f \
  ccd1_rmsd.f ccd1_rmsk.f ccd1_rmulo.f ccd1_rnorm.f \
  ccd1_rsetu.f ccd1_rtran.f ccd1_save.f \
- ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f \
+ ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f ccd1_splot.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_szlsf.f \
  ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tfun.f \
@@ -2246,7 +2246,7 @@ ccd1_adkey.o: SAE_PAR
 ccd1_agtmd.o: FIO_ERR CCD1_PAR SAE_PAR
 ccd1_aldif.o: PRM_PAR SAE_PAR
 ccd1_anoi.o: PRM_PAR SAE_PAR
-ccd1_aplot.o: SAE_PAR AST_PAR DAT_PAR
+ccd1_aplot.o: SAE_PAR AST_PAR DAT_PAR CCD1_PAR
 ccd1_appnd.o: SAE_PAR
 ccd1_asfio.o: FIO_PAR PAR_ERR SAE_PAR
 ccd1_asnk.o: CCD1_PAR CCD1_FDCM SAE_PAR
@@ -2293,7 +2293,7 @@ ccd1_docmd.o: SAE_PAR
 ccd1_docmp.o: DAT_PAR NDF_PAR SAE_PAR USER_ERR
 ccd1_domos.o: NDF_PAR SAE_PAR
 ccd1_dqeds.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
-ccd1_drawp.o: PRM_PAR SAE_PAR
+ccd1_drawa.o: PRM_PAR SAE_PAR
 ccd1_dtrn.o: SAE_PAR
 ccd1_duesc.o: MSG_PAR SAE_PAR
 ccd1_dxy12.o: SAE_PAR
@@ -2454,6 +2454,7 @@ ccd1_sgare.o: SAE_PAR
 ccd1_slice.o: SAE_PAR
 ccd1_sngl.o: PRM_PAR SAE_PAR
 ccd1_soff.o: PRM_PAR SAE_PAR
+ccd1_splot.o: SAE_PAR AST_PAR DAT_PAR
 ccd1_stao.o: SAE_PAR
 ccd1_start.o: CCD1_MEMCM CCD1_PAR CCD1_TMPCM DAT_PAR SAE_PAR
 ccd1_strgr.o: PAR_ERR SAE_PAR
@@ -2677,7 +2678,7 @@ tranndf.o: AST_PAR CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 drizzle.o: AST_PAR CCD1_MOSCM CCD1_MOSPR CCD1_PAR DAT_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PRM_PAR SAE_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
 wcsedit.o: AST_PAR PAR_ERR SAE_PAR GRP_PAR
-outline.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR CCD1_PAR
+outline.o: SAE_PAR AST_PAR NDF_PAR PRM_PAR GRP_PAR PAR_ERR CCD1_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
