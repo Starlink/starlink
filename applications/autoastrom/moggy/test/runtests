@@ -6,11 +6,35 @@
 # of scripts named `t<number>', and these are executed in turn and their
 # output diffed against `t<number>.correct'.  Exit status is the
 # number of failures.
+#
+# Run without an argument, this runs all the tests in the directory;
+# run with an argument, it runs only the specified tests.
+#
+# If the option --keep is present, then it doesn't delete temporary files.
 
+UsageString="$0 [--keep] [filename...]"
+deletetemp=true
 LS=/bin/ls
 
-filelist=`$LS | grep '^t[0-9]*$'`
-echo "filelist=$filelist"
+
+filelist=""
+
+while [ $# -gt 0 ]; do
+    case $1 in
+    --keep) deletetemp=false ;;
+    --*) echo "Usage: $UsageString"
+	 exit 1
+	 ;;
+    *) filelist="$filelist $1"
+	 ;;
+    esac
+    shift
+done
+
+# Check filelist is non-null, and make it t* if it is.
+test -n "$filelist" || filelist=`$LS | grep '^t[0-9]*$'`
+
+
 
 nfailures=0
 
@@ -27,12 +51,13 @@ do
 			nfailures=`expr $nfailures + 1`
 		else
 			echo "ok"
-			rm $name.diff $name.stdout $name.stderr
+			$deletetemp && rm $name.diff $name.stdout $name.stderr
 		fi
 	else
 		echo "apparently OK, but no correct results to compare"
-		mv $name.out $name.correct
+		mv $name.stdout $name.correct
 		echo "    (now in $name.correct)"
+		$deletetemp && rm $name.stderr
 	fi
 done
 

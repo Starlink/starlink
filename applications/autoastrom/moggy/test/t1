@@ -1,0 +1,14 @@
+# Test simple radius search
+test -n "$MOGGY" || MOGGY=../moggy
+
+$MOGGY <<'EOD'
+coord1  17 27  9.5      74 20  8
+type radius
+nrow 10
+radius 10
+name usno@eso
+search
+quit
+EOD
+
+	
