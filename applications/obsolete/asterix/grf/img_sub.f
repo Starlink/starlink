@@ -2764,6 +2764,59 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       END
 
 
+
+*+ IMG_ELLIPSE
+	SUBROUTINE IMG_ELLIPSE(XC,YC,A,B,ANGLE,STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+        REAL XC,YC,A,B,ANGLE
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+	REAL PI, DTOR
+	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
+*  Local variables :
+      REAL A
+      REAL SA,CA
+      REAL SANG,CANG
+      INTEGER IA
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL PGUPDT(0)
+
+        SANG=SIN(ANGLE)
+        CANG=COS(ANGLE)
+        CALL PGMOVE(A*CANG,A*SANG)
+
+        DO IA=1,360
+
+
+          A=REAL(IA)*DTOR
+          CA=COS(A)
+          SA=SIN(A)
+
+          CALL PGMOVE(XC+A*CA*CANG-B*SA*SANG,YC+A*CA*SANG+B*SA*CANG)
+
+        ENDDO
+
+        CALL PGUPDT(2)
+        CALL PGUPDT(1)
+
+      ENDIF
+
+      END
+
+
+
 *+ IMG_INIT - initialise common block
 	SUBROUTINE IMG_INIT()
 
@@ -3415,7 +3468,11 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *  set region mask
         CALL IMG_SETSLICE_SUB(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
      :                                         FLAG,%val(I_REG_PTR))
-        I_REG_TYPE='COMPLEX'
+        IF (I_REG_TYPE.EQ.'NONE') THEN
+          I_REG_TYPE='SLICE'
+        ELSE
+          I_REG_TYPE='COMPLEX'
+        ENDIF
       ENDIF
 
       END
@@ -3446,6 +3503,83 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       ENDDO
 
       END
+
+
+
+
+*+ IMG_SETELLIPSE
+	SUBROUTINE IMG_SETELLIPSE(XC,YC,MAJOR,MINOR,EXCLUDE,ANGLE
+     :                                                      STATUS)
+
+        IMPLICIT NONE
+
+*  Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*  Import :
+        REAL XC,YC,MAJOR,MINOR,ANGLE
+        LOGICAL EXCLUDE
+*  Export :
+*  Status :
+        INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER I1,I2,J1,J2
+      BYTE FLAG
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        IF (EXCLUDE) THEN
+          FLAG='00'X
+        ELSE
+          FLAG='01'X
+        ENDIF
+
+*  get range of pixels containing slice
+        CALL IMG_SLICETOBOX(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
+     :                                                     STATUS)
+
+*  set region mask
+        CALL IMG_SETELLIPSE_SUB(XC,YC,MAJOR,MINOR,ANGLE,I1,I2,J1,J2,
+     :                                           FLAG,%val(I_REG_PTR))
+        IF (I_REG_TYPE.EQ.'NONE') THEN
+          I_REG_TYPE='ELLIPSE'
+        ELSE
+          I_REG_TYPE='COMPLEX'
+        ENDIF
+      ENDIF
+
+      END
+
+
+      SUBROUTINE IMG_SETELLIPSE_SUB(XC,YC,MAJOR,MINOR,ANGLE,
+     :                                   I1,I2,J1,J2,FLAG,REG)
+
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'IMG_CMN'
+
+      REAL XC,YC,ANGLE,LENGTH,WIDTH
+      INTEGER I1,I2,J1,J2
+      BYTE FLAG
+      BYTE REG(I_NX,I_NY)
+
+      LOGICAL IMG_INELLIPSE
+
+      INTEGER I,J
+
+      DO J=J1,J2
+        DO I=I1,I2
+          IF (IMG_INELLIPSE(I,J,XC,YC,MAJOR,MINOR,ANGLE)) THEN
+            REG(I,J)=FLAG
+          ENDIF
+        ENDDO
+      ENDDO
+
+      END
+
 
 
 
@@ -3555,6 +3689,38 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         J1=INT(MIN(PY1,MIN(PY2,MIN(PY3,PY4))))
         J2=INT(MAX(PY1,MAX(PY2,MAX(PY3,PY4))))
 
+
+	END
+
+
+
+
+
+*+ IMG_ELLIPSETOBOX - get box enclosing ellipse
+	SUBROUTINE IMG_ELLIPSETOBOX(XC,YC,MAJOR,MINOR,ANGLE,
+     :                                    I1,I2,J1,J2,STATUS)
+*    Description :
+*    Type Definitions :
+        IMPLICIT NONE
+*    Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*    Import :
+        REAL XC,YC,MAJOR,MINOR,ANGLE
+*    Import-Export :
+*    Export :
+        INTEGER I1,I2,J1,J2
+*    Status :
+        INTEGER STATUS
+*    Function declarations :
+*    Local variables :
+*-
+        IF (STATUS.NE.SAI__OK) RETURN
+
+          call img_slicetobox(xc,yc,angle,major,minor,i1,i2,j1,j2,
+     :                                                       status)
 
 	END
 
@@ -3793,6 +3959,69 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 *  check transformed coord falls within slice
         IMG_INSLICE=(ABS(X).LE.LENGTH/2.0.AND.ABS(Y).LE.WIDTH/2.0)
+
+
+	END
+
+
+
+
+
+*+ IMG_INELLIPSE - determine whether pixel is inside ellipse
+	LOGICAL FUNCTION IMG_INELLIPSE(I,J,XC,YC,MAJOR,MINOR,ANGLE)
+
+*    Description :
+*    Type Definitions :
+        IMPLICIT NONE
+*    Global constants :
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'DAT_PAR'
+*    Global variables :
+        INCLUDE 'IMG_CMN'
+*    Import :
+        INTEGER I,J
+        REAL XC,YC,MAJOR,MINOR,ANGLE
+*    Import-Export :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local variables :
+      REAL X,Y
+      REAL THETA
+      REAL DISP
+      REAL LANGLE
+      REAL ALPHA
+      REAL RAD
+*-
+
+*  get world coord of pixel centre
+        STATUS=SAI__OK
+        CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
+
+*  adjust angle to direction of axes
+        LANGLE=ANGLE*(I_XSCALE/ABS(I_XSCALE))
+     :                         *(I_YSCALE/ABS(I_YSCALE))
+
+
+*  transform to frame centred on ellipse
+        X=X-XC
+        Y=Y-YC
+
+*  rotate to frame parallel with major axis
+        THETA=ATAN2(Y,X)
+        DISP=SQRT(X**2 + Y**2)
+        X=DISP*COS(LANGLE-THETA)
+        Y=DISP*SIN(LANGLE-THETA)
+
+*  get angular displacement of point
+        ALPHA=ATAN2(Y,X)
+
+*  get radius of ellipse at this point
+        RAD=SQRT((MAJOR*COS(ALPHA))**2 + (MINOR*SIN(ALPHA))**2)
+
+*  check transformed coord falls within ellipse
+        IMG_INELLIPSE=(DISP.LE.RAD)
 
 
 	END
@@ -4043,6 +4272,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       END
 
+
+
 *+ IMG_GETSLICE - get rectangular slice of image
       SUBROUTINE IMG_GETSLICE(PAR1,PAR2,PAR3,PAR4,PAR5,XCENT,YCENT,
      :                                   ANGLE,LENGTH,WIDTH,STATUS)
@@ -4205,6 +4436,121 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         CALL PGDRAW(XBR,YBR)
         CALL PGSLS(LS)
 
+
+      ENDIF
+
+
+      END
+
+
+
+*+ IMG_GETELLIPSE - get ellipse
+      SUBROUTINE IMG_GETELLIPSE(PAR1,PAR2,PAR3,PAR4,PAR5,XCENT,YCENT,
+     :                                       MAJOR,MINOR,ANGLE,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
+*    Import :
+      CHARACTER*(*) PAR1,PAR2,PAR3,PAR4,PAR5
+*    Export :
+      REAL XCENT,YCENT,MAJOR,MINOR,ANGLE
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+      REAL PI,DTOR
+      PARAMETER (PI=3.14159265,DTOR=PI/180.0)
+*    Local variables :
+      CHARACTER*1 CH
+      REAL PXCENT,PYCENT
+      REAL XEND,YEND
+      REAL PXEND,PYEND
+      REAL XOEND,YOEND
+      REAL XWID,YWID
+      REAL A,ASQ,B,BSQ,C,CSQ
+      LOGICAL LEFT,RIGHT
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+*  get centre of cut
+        IF (I_MODE.EQ.1) THEN
+          CALL MSG_PRNT(' ')
+          XCENT=I_X
+          YCENT=I_Y
+          CALL MSG_SETR('X',XCENT)
+          CALL MSG_SETR('Y',YCENT)
+          CALL MSG_PRNT('Select centre/^X,^Y/...')
+          CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
+            XCENT=I_X
+            YCENT=I_Y
+          ENDIF
+          CALL PGPOINT(1,XCENT,YCENT,2)
+
+*  get mid-point of end
+          CALL MSG_PRNT('Select major radius...')
+          XEND=XCENT
+          YEND=YCENT
+          CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
+          CALL PGPOINT(1,XEND,YEND,2)
+
+*  calculate other end and draw centre line
+          XOEND=2.0*XCENT-XEND
+          YOEND=2.0*YCENT-YEND
+          CALL PGPOINT(1,XOEND,YOEND,2)
+          CALL PGSLS(2)
+          CALL PGDRAW(XEND,YEND)
+
+          CALL GCB_SETDEF(STATUS)
+
+*  get width
+          CALL MSG_PRNT('Select minor radius...')
+          XWID=XCENT
+          YWID=YCENT
+          CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
+
+*  calc major radius
+          MAJOR=SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+
+*  calc angle
+          CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+          CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
+          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+
+*  calc width (world coords)
+          ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
+          A=SQRT(ASQ)
+          BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
+          B=SQRT(BSQ)
+          CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
+          ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
+          MINOR=A*SIN(ALPHA)
+
+*  keyboard mode
+        ELSE
+          CALL PAR_DEF0R(PAR1,I_X,STATUS)
+          CALL PAR_GET0R(PAR1,XCENT,STATUS)
+          CALL PAR_DEF0R(PAR2,I_Y,STATUS)
+          CALL PAR_GET0R(PAR2,YCENT,STATUS)
+          CALL PAR_GET0R(PAR3,MAJOR,STATUS)
+          CALL PAR_GET0R(PAR4,MINOR,STATUS)
+          CALL PAR_GET0R(PAR5,ANGLE,STATUS)
+          ANGLE=ANGLE*DTOR
+        ENDIF
+
+*  plot ellipse
+        CALL IMG_ELLIPSE(XC,YC,MAJOR,MINOR,ANGLE,STATUS)
 
       ENDIF
 
