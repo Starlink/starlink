@@ -1,6 +1,10 @@
 
 vers="`cat ${AST_REF}/version.number`"
 versno="`echo "${vers}" | sed -e 's/\-.*$//'`"
+majversno="`echo "${versno}" | sed -e 's/\..*$//'`"
+minversno="`echo "${versno}" | sed -e 's/^.*\.//'`"
 relsno="`echo "${vers}" | sed -e 's/^.*-//'`"
 sed -e 's/<VERSION_NUMBER>/'"${versno}"'/g' \
+    -e 's/<MAJOR_VERSION_NUMBER>/'"${majversno}"'/g' \
+    -e 's/<MINOR_VERSION_NUMBER>/'"${minversno}"'/g' \
     -e 's/<RELEASE_NUMBER>/'"${relsno}"'/g'
