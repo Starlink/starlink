@@ -579,7 +579,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_frdm.f ccd1_frtmp.f ccd1_ftval.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
  ccd1_gefp.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
- ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_gtbds.f \
+ ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_grrep.f ccd1_gtbds.f \
  ccd1_gtcmp.f ccd1_gtcpb.f ccd1_gtcpc.f ccd1_gtdir.f \
  ccd1_gtlig.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hisp.f ccd1_hvcon.f \
@@ -2250,6 +2250,7 @@ ccd1_gmid.o: PRM_PAR SAE_PAR
 ccd1_gmmp.o: PRM_PAR SAE_PAR
 ccd1_grapc.o: PRM_PAR SAE_PAR
 ccd1_grpth.o: PRM_PAR SAE_PAR
+ccd1_grrep.o: CCD1_PAR SAE_PAR
 ccd1_groff.o: MSG_PAR PRM_PAR SAE_PAR
 ccd1_gtbds.o: SAE_PAR
 ccd1_gtcmp.o: SAE_PAR
@@ -2641,7 +2642,7 @@ runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
-wcsreg.o: AST_PAR CCD1_PAR SAE_PAR
+wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
