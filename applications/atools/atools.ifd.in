@@ -4,6 +4,88 @@ package atools {
 
    executable atools_mon {
 
+      action astfluxframe {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter specval {
+            position 1
+            type DOUBLE
+            prompt {The spectral position at which flux values are measured}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter specfrm {
+            position 2
+            type LITERAL
+            prompt {The SpecFrame to which SPECVAL refers}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the FluxFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the FluxFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
+
+      action astsfluxframe {
+         helplib {$ATOOLS_HELP}
+         parameter frame1 {
+            position 1
+            type LITERAL
+            prompt {The SpecFrame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter frame2 {
+            position 2
+            type LITERAL
+            prompt {The FluxFrame}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter options {
+            position 3
+            type LITERAL
+            prompt {Options for the SpecFluxFrame}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the SpecFluxFrame}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+      }
+
+
       action astpolymap {
          helplib {$ATOOLS_HELP}
 

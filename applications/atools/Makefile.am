@@ -21,7 +21,8 @@ atools_mon_TASKS = astcopy astaddframe astclear astget astset asttest \
  astmatrixmap astconvert astlutmap astpcdmap astwinmap astshiftmap \
  astfindframe astpermaxes astpickaxes astsimplify asttrann astmapbox \
  astinvert astspecframe astsetrefpos astgetrefpos astformat asttran1 asttran2 \
- astmathmap astsetactunit astgetactunit astpolymap asttranmap astdsbframe
+ astmathmap astsetactunit astgetactunit astpolymap asttranmap astdsbframe \
+ astfluxframe astsfluxframe
 
 FSRC = \
  atl1_gtgrp.f atl1_rdgrp.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f \

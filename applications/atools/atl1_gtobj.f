@@ -39,6 +39,8 @@
 *  History:
 *     12-JAN-2001 (DSB):
 *        Original version.
+*     6-JAN-2005 (DSB):
+*        Allow CLASS and ISA to specify particular subclasses of Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +75,7 @@
       INTEGER IAST2
       INTEGER IGRP
       INTEGER INDF
+      LOGICAL OK
 *.
 
 *  Initialise.
@@ -114,31 +117,60 @@
 
 *  Check the Object class if CLASS is not blank.
       IF( CLASS .NE. ' ' .AND. STATUS .EQ. SAI__OK ) THEN 
-         IF( .NOT. ISA( IAST, STATUS ) ) THEN
-            CALL MSG_SETC( 'C', AST_GETC( IAST, 'CLASS', STATUS ) )
-            CALL MSG_SETC( 'P', PARAM )
-            CALL MSG_SETC( 'L', CLASS )
-            STATUS = SAI__ERROR
-            CALL ERR_REP( 'ATL1_GTOBJ_ERR1', '$^P contains a ^C. '//
-     :                 'A ^L is required.', STATUS )
-         END IF
 
-*  If a FrameSet is supplied, but a Frame or Mapping is required, extract
-*  a Frame or Mapping from the FrameSet.
+*  See if the object is of the required class.
+         OK = ISA( IAST, STATUS ) 
+
+*  If not, and if the object is a FrameSet, see if the current Frame is
+*  of the required class. If so return a pointer to the current Frame.
          IF( AST_ISAFRAMESET( IAST, STATUS ) ) THEN
-
-            IF( CHR_SIMLR( CLASS, 'Frame' ) ) THEN
+            IF( .NOT. OK ) THEN
                IAST2 = AST_GETFRAME( IAST, AST__CURRENT, STATUS )
-               CALL AST_ANNUL( IAST, STATUS )
-               IAST = IAST2
-
-            ELSE IF( CHR_SIMLR( CLASS, 'Mapping' ) ) THEN
-               IAST2 = AST_GETMAPPING( IAST, AST__BASE, AST__CURRENT, 
-     :                                 STATUS )
-               CALL AST_ANNUL( IAST, STATUS )
-               IAST = IAST2
+               IF( ISA( IAST2, STATUS ) ) THEN
+                  OK = .TRUE.
+                  CALL AST_ANNUL( IAST, STATUS )
+                  IAST = IAST2
+               ELSE
+                  CALL AST_ANNUL( IAST2, STATUS )
+               END IF
             END IF
 
+*  If not, see if the base to current Mapping is of the required class. If 
+*  so return a pointer to the base to current Mapping.
+            IF( .NOT. OK ) THEN
+               IAST2 = AST_GETMAPPING( IAST, AST__BASE, AST__CURRENT, 
+     :                                STATUS )
+               IF( ISA( IAST2, STATUS ) ) THEN
+                  OK = .TRUE.
+                  CALL AST_ANNUL( IAST, STATUS )
+                  IAST = IAST2
+               ELSE
+                  CALL AST_ANNUL( IAST2, STATUS )
+               END IF
+            END IF
+
+         END IF
+
+*  Report an error if we could not find an object of the correct class.
+         IF( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
+            IF( AST_ISAFRAMESET( IAST, STATUS ) ) THEN
+               IAST2 = AST_GETFRAME( IAST, AST__CURRENT, STATUS )
+               CALL MSG_SETC( 'C', AST_GETC( IAST2, 'CLASS', STATUS ) )
+               CALL MSG_SETC( 'P', PARAM )
+               CALL MSG_SETC( 'L', CLASS )
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'ATL1_GTOBJ_ERR1', '$^P contains a '//
+     :                       'FrameSet representing a ^C, but a '//
+     :                       '^L is required.', STATUS )
+               CALL AST_ANNUL( IAST2, STATUS )
+            ELSE
+               CALL MSG_SETC( 'C', AST_GETC( IAST, 'CLASS', STATUS ) )
+               CALL MSG_SETC( 'P', PARAM )
+               CALL MSG_SETC( 'L', CLASS )
+               STATUS = SAI__ERROR
+               CALL ERR_REP( 'ATL1_GTOBJ_ERR2', '$^P contains a ^C, '//
+     :                       'but a ^L is required.', STATUS )
+            END IF
          END IF
 
       END IF
