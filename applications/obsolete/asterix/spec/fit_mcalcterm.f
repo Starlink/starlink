@@ -154,7 +154,7 @@
 
 *    Does model have a negative sign?
       IF ( SIGNS(ITERM) .LT. 0 ) THEN
-        CALL ARR_MULTR( -1.0, NMDAT, PRED )
+        CALL ARR_MULTR( -1.0, NMDAT, PRED, STATUS )
       END IF
 
 *    Abort point

@@ -144,7 +144,8 @@
 
 *        get current centre value
           CALL ARR_ELEM1R( I_DPTR_AUX, I_N_AUX, 1, CMAX, STATUS )
-          CALL ARR_MULTR( PMAX/CMAX, I_N_AUX, %VAL(I_DPTR_AUX) )
+          CALL ARR_MULTR( PMAX/CMAX, I_N_AUX, %VAL(I_DPTR_AUX),
+     :                    STATUS )
 
         END IF
 

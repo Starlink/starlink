@@ -341,7 +341,7 @@
 
 *      Normalise
         CALL ARR_SUM1R( AS_NXY*AS_NXY, %VAL(CPTR), SUM, STATUS )
-        CALL ARR_MULTR( 1.0/SUM, AS_NXY*AS_NXY, %VAL(CPTR) )
+        CALL ARR_MULTR( 1.0/SUM, AS_NXY*AS_NXY, %VAL(CPTR), STATUS )
 
 *      Move to next HDU
         IF ( IE .LT. 10 ) THEN

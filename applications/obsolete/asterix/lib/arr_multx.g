@@ -1,4 +1,4 @@
-      SUBROUTINE ARR_MULT<T>( CONST, NEL, ARRAY, STATUS )
+      SUBROUTINE ARR_MULT<T>( CONST, N, ARRAY, STATUS )
 *+
 *  Name:
 *     ARR_MULT<T>
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ARR_MULT<T>( CONST, NEL, ARRAY, STATUS )
+*     CALL ARR_MULT<T>( CONST, N, ARRAY, STATUS )
 
 *  Description:
 *     {routine_description}
