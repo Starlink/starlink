@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun183.4}
 \newcommand{\stardocnumber}    {183.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {18th July 2001}
+\newcommand{\stardocdate}      {9th August 2001}
 \newcommand{\stardoctitle}     {ARD \\ [1ex]
                                 A Textual Language for Describing \\
                                 Regions within a Data Array}
@@ -286,13 +286,6 @@ in pixel co-ordinates. The ARD language includes two systems which allow
 positions and distances to be given in other co-ordinate systems:
 \begin{enumerate}
 
-\item The calling application can define an "application co-ordinate
-system" which is linearly related to pixel co-ordinates. Positions within the 
-ARD description can then either be given directly in application co-ordinates, 
-or in any co-ordinate system linearly related to application coordinates
-(in which case the ARD description must include statements describing the
-linear transformation).
-
 \item As of ARD version 2.0, the calling application can define an
 arbitrary collection of coordinate systems (which need not be linearly
 related to pixel co-ordinates) by supplying an {\em AST FrameSet} (see 
@@ -305,7 +298,7 @@ array has an RA/DEC calibration, the application could supply a FrameSet
 indicating how to convert from RA/DEC to pixel coordinates. This would
 allow the ARD description to include positions in RA/DEC.
 
-Alternatively, the ARD description itself can include a FrameSet defining
+In addition, the ARD description itself can include a FrameSet defining
 a collection of inter-related coordinate systems (positions in the ARD
 description should be given in the "current" Frame of this FrameSet). In
 this case, an attempt is made to find a coordinate system which is
@@ -319,6 +312,15 @@ image, into RA/DEC, and then into pixel coordinates within the required
 mask image. This effectively allows pixel positions to be given within
 one image and then transfomed so that they can be used within another 
 image.
+
+\item The calling application can also define an ``application co-ordinate 
+system'' which is linearly related to pixel co-ordinates. Positions within the 
+ARD description can then either be given directly in application co-ordinates, 
+or in any co-ordinate system linearly related to application coordinates
+(in which case the ARD description must include statements describing the
+linear transformation). This system was present in version 1 of ARD and
+is still present in the current version, but is now depracacted in favour
+of the above more general system.
 
 \end{enumerate}
 
@@ -381,12 +383,6 @@ close to the south equatorial pole, the pixel region containing this
 
 \small
 \begin{verbatim}
-      SCALE( 0.5 )         #  Make unit distance in user co-ordinates equal to
-                           #  0.5 in application co-ordinates.
-      TWIST( 45 )          #  Rotate the user co-ordinate system anti-
-                           #  clockwise by 45 degrees.
-      OFFSET( 10,15 )      #  Move the origin of user co-ordinates to (10,15) 
-                           #  in application co-ordinates.
       PIXEL(  1,  1 )
       PIXEL( 20, 13 )
       PIXEL(-55,122 )
@@ -395,16 +391,12 @@ close to the south equatorial pole, the pixel region containing this
 \end{verbatim}
 \normalsize
 
-This example shows the use of comments in an ARD description. It also
-shows the use of more \htmlref{statements}{SEC:STAT}. These establish a
-user co-ordinate system which is linearly related to the coordinate
-system expected by the application. Another feature demonstrated by this
-example is the ability of ARD to recognise implicit \htmlref{.OR.}{OP:OR}
-operators. The list of \htmlref{PIXEL}{KEY:PIX} keywords specifies a set
-of individual pixels. Since these keywords have no intervening operators,
-ARD assumes that a \htmlref{.OR.}{OP:OR} operator is to be inserted
-between each pair, i.e. the union of all the individual pixels is
-assumed.
+This example demonstrates the ability of ARD to recognise implicit
+\htmlref{.OR.}{OP:OR} operators. The list of \htmlref{PIXEL}{KEY:PIX}
+keywords specifies a set of individual pixels. Since these keywords have
+no intervening operators, ARD assumes that a \htmlref{.OR.}{OP:OR}
+operator is to be inserted between each pair, i.e. the union of all the
+individual pixels is assumed.
 
 \subsection{\label{SEC:EXAMC}An Example ARD Application}
 
@@ -466,8 +458,9 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 *  any coordinate Frame included in the above WCS FrameSet.
       CALL ARD_WCS( IWCS, STATUS )                              [11]
 
-*  Indicate that this application does not use a separate linear user
-*  coordinate system.
+*  Indicate that we are handling WCS information using the system 
+*  introduced by ARD version 2 (as opposed to the restricted linear
+*  system used prior to version 2).
       TRCOEF( 1 ) = VAL__BADR                                   [12]
                                                               
 *  Indicate that the value 2 should be used to represent      
@@ -592,17 +585,16 @@ calling ARD\_WCS, positions within the ARD description can be supplied in
 any coordinate system which can be related to any of the coordinate
 systems in the NDF's WCS FrameSet.
 
-\item This application expects the user to supply positions and distances in 
+\item This application expects the user to supply positions and distances in
 one of the co-ordinate systems stored in the WCS component of the NDF
 ({\em i.e.} one of the coordinate Frames in the FrameSet obtained above).
-It does not define any extra ``user'' coordinate system. It indicates
-this by assigning the ``special'' value given by the symbolic constant
-VAL\_\_BADR to the first element of the TRCOEF array. It is possible for
-an application to define an extra ``user'' co-ordinate system which is
-linearly related to pixel co-ordinates. In this case TRCOEF would be used
-to store the co-efficients of the mapping from the new ``application''
-co-ordinate system, to the pixel co-ordinate system. See Section
-\ref{SEC:COORD}.
+It indicates this by assigning the ``special'' value given by the
+symbolic constant VAL\_\_BADR to the first element of the TRCOEF array.
+Version 1 of the ARD library did not include support for general WCS
+information. Instead, it allowed a single ``user coordinate system'' to
+be defined which was linearly related to pixel coordinates. In this case
+TRCOEF would be used to store the co-efficients of a linear transformation. 
+See Section \ref{SEC:COORD}.
 
 \item The subroutine \htmlref{ARD\_WORK}{ARD_WORK} is now called to create the pixel mask
 identifying the pixels specified by the ARD description. Positive values are
@@ -1425,39 +1417,56 @@ upper bound. This condition should always be checked for before using a
 bounding box. 
 
 \section{\label{SEC:COORD}\xlabel{ARDCoords}Co-ordinate Systems}
-At the end of the day, ARD\_WORK needs to be able to locate pixels within
-the given pixel mask. To do this, every position supplied in an ARD
-description must be converted into {\em pixel co-ordinates}. The position
-of the origin of pixel co-ordinates within the mask is fixed by the upper
-and lower bounds of the mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}.
-The conventions for pixel co-ordinates used by Starlink software are
-described in \xref{Starlink System Note (SSN) 22}{ssn22}{}.
+ARD\_WORK needs to be able to locate pixels within the given pixel mask.
+To do this, every position supplied in an ARD description must be
+converted into {\em pixel co-ordinates}. The position of the origin of
+pixel co-ordinates within the mask is fixed by the upper and lower bounds
+of the mask supplied to \htmlref{ARD\_WORK}{ARD_WORK}. The conventions
+for pixel co-ordinates used by Starlink software are described in
+\xref{Starlink System Note (SSN) 22}{ssn22}{}.
 
 However, it is not always appropriate for an ARD description to describe
 a region in terms of pixel co-ordinates. For instance, in a mosaic image
 a given position on the sky may have different pixel co-ordinates in each
 image. To describe a given region in pixel coordinates would therefore
-require a separate description for each image. Ideally, we would like to
-use a single ARD description in which the region was defined in terms of
-RA and Dec. positions. This can be done, so long as ARD\_WORK knows how
-to transform an RA/Dec position into pixel coordinates within the
-specified pixel masks. The ARD\_WCS routine allows this information to be
-specified prior to calling ARD\_WORK\footnote{You may be wondering why a
-separate routine is used instead of simply passing the information to
-ARD\_WORK as an argument. This was done so that existing ARD application
-would continue to work without modification.}.
+require a separate description for each image. In this case, we would
+ideally like to use a single ARD description in which the region was
+defined in terms of RA and Dec. positions. This can be done, so long as
+ARD\_WORK knows how to transform an RA/Dec position into pixel
+coordinates within each of the specified pixel masks.
 
-ARD uses the facilities of the AST library (see \xref{SUN/210}{sun210}{})
-to manage coordinate systems. An AST ``FrameSet'' describes a collection
-of related coordinate systems (also called ``Frames''), together with the
+There are two schemes supported by the ARD library to allow the ARD 
+description to include positions in a coordinate system other than pixel 
+coordinates. As of version 2 of the ARD library, the facilities of the
+AST library (see \xref{SUN/210}{sun210}{}) can be used to specify
+positions within generalised non-linear coordinate systems. Prior to 
+version 2, positions needed to be supplied in a coordinate system which
+was linearly related to pixel coordinates in the mask supplied to
+ARD\_WORK. The version 1 scheme is still available in version 2 of the
+library, but is depracted.
+
+\subsection{World Co-ordinate Systems in ARD Version 2}
+
+ARD version 2 uses the facilities of the \xref{AST library}{sun210}{} to
+manage coordinate systems. An AST ``FrameSet'' describes a collection of
+related coordinate systems (also called ``Frames''), together with the
 mappings which allows positions to be transformed from one Frame to
-another. The calling application should create a FrameSet describing all
-the co-ordinate systems which it nows about. One of these systems must be
-pixel co-ordinates within the pixel mask supplied to ARD\_WORK\footnote{ARD 
-recognizes this Frame by the fact that its Domain attribute is set to 
-``PIXEL''.}. It then passes this FrameSet to the ARD system by calling
-ARD\_WCS prior to calling ARD\_WORK. This FrameSet is known as the
-``Application FrameSet''.
+another. The calling application will always know how to locate a point
+within the mask if the point is specified in pixel co-ordinates. If, in
+addition, it can also locate points specified in one or more other
+coordinate systems, then it should create a FrameSet describing all the
+co-ordinate systems which it nows about, one of which must be pixel
+co-ordinates within the mask\footnote{ARD recognizes this Frame by the
+fact that its Domain attribute is set to ``PIXEL''.}. It then passes this
+FrameSet to the ARD system by calling routine ARD\_WCS (this must be done
+prior to calling ARD\_WORK)\footnote{You may be wondering why a separate
+routine is used instead of simply passing the information to ARD\_WORK as
+an argument. This was done so that existing application which use ARD
+version 1 would continue to work without modification.}. This FrameSet is
+known as the ``Application FrameSet'', and encapsulates knowledge of all
+the co-ordinate systems known to the application. If ARD\_WCS is not
+used, then a default application FrameSet containing a single Frame
+describing pixel coordinates is generated automatically.
 
 The ARD description must then include statements describing the 
 coordinate system in which positions are given. This can be done in one
@@ -1475,71 +1484,58 @@ If there is, then the corresponding transformation is used to locate
 positions within the pixel mask. Otherwise, an error is reported.
 
 \item By including a \htmlref{WCS}{ST:WCS} statement before any
-keywords. A WCS statement specifies a FrameSet describing a collection 
-of related coordinate system. Positions within the ARD description are
-then assumed to be given within the ``current'' Frame of this FrameSet.
-This FrameSet is known as the ``User FrameSet'' to distinguish it from
-the ``Application FrameSet''.
+keywords. A WCS statement specifies a FrameSet describing all the
+coordinate system known to the user. Positions within the ARD description
+are then assumed to be given within the ``current'' Frame of this
+FrameSet. This FrameSet is known as the ``User FrameSet'' to distinguish
+it from the ``Application FrameSet''.
 
 ARD\_WORK will search both FrameSets looking for a co-ordinate system
-which is present in both. If such a Frame is found, the User FrameSet is 
-used to convert positions in the ARD description into the common Frame,
-and the Application FrameSet is then used to convert positions from the
-common Frame into pixel co-ordinates. If no common Frame is found, then
-an error is reported. It may be that there is more than one common Frame,
-in this case priority is given to Frames describing celestial coordinate
-systems, followed by pixel co-ordinate Frames, followed by Frames with
-Domain GRID, followed by Frames with Domain ARDAPP.
+which is present in both. If such a Frame is found, the User FrameSet is
+used to convert positions included in the ARD description into the common
+Frame, and the Application FrameSet is then used to convert positions
+from the common Frame into pixel co-ordinates. If no common Frame is
+found, then an error is reported. It may be that there is more than one
+common Frame, in this case priority is given to Frames describing
+celestial coordinate systems, followed by pixel co-ordinate Frames,
+followed by Frames with Domain GRID, followed by Frames with Domain
+ARDAPP. The highest priority Frame found within this list is used as the
+common Frame.
 
 \item If there is neither a WCS nor a COFRAME statement in the ARD
 description, then it is assumed that positions are supplied in pixel
-coordinates. The exception to this is that various depracated statements
-exist (COEFFS, OFFSET, TWIST, STRETCH, SCALE) which were used prior to
-ARD version 2.0 to allow another user coordinate system to be defined,
-with the proviso that it needed to be linearly related to pixel
-coordinates. If any of these statements are found, then positions are
-interpreted according to the old, version 1 system described below.
+coordinates. The exception to this is if any of the depracated statements
+COEFFS, OFFSET, TWIST, STRETCH, SCALE are included in the ARD description,
+in which case positions are interpreted according to the old, version 1 system 
+described below.
 
 \end{enumerate}
 
+An ARD description can contain zero, one or more of the above WCS-related 
+statements. The positions, {\em etc}, defining a given region in the
+description are interpreted using the most recent WCS-related statement.
+Thus, WCS information given later in an ARD description over-rides any
+given earlier.
 
 
+\subsection{Co-ordinate Handling in ARD Prior to Version 2}
 
+ARD version 1 required the transformation between ``user co-ordinates''
+({\em i.e.} the co-ordinate system in which positions are supplied in the
+ARD description) to pixel co-ordinates to be linear. This linear
+transfomation was split up into two components; the application specified
+a linear transformation from pixel co-ordinates to ``application
+co-ordinates'' when calling ARD\_WORK, and the ARD description included
+statements which defined a linear transformation from application
+coordinates to user co-ordinates (by default, user co-ordinates were
+assumed to be identical with application co-ordinates). These two
+components were concatenated to get the total transformation from pixel
+to user co-ordinates.
 
-
-
-
-\subsection{Co-ordinate Handling in ARD Version 1.0}
-
-
-
-
-
-
-
-\item {\em Application Co-ordinates} - These are the co-ordinates in which an
-application {\em expects} positions within an ARD description to be given. Any
-co-ordinate system can be used which is linearly related to pixel co-ordinates.
-An application would usually select a co-ordinate system which naturally
-describes the data in the data array. All applications in a given package
-could, for instance, use the same application co-ordinate system.
-
-\item {\em User Co-ordinates} - These are the co-ordinates in which the user
-decides to give positions within an ARD description. By default, user
-co-ordinates will be assumed to be identical with application co-ordinates.
-\htmlref{statements}{SEC:STAT} which establish an alternative user co-ordinate system must be
-included in the ARD description in order to replace this default. 
-
-\end{enumerate}
-
-In order to locate a given keyword region within the pixel mask, the positions 
-supplied within the ARD description are first transformed from user co-ordinates
-into application co-ordinates, and then from application co-ordinates into pixel
-co-ordinates (in fact the two transformations are combined into a single step). 
-
-\subsection{Application Co-ordinates}
-The application uses the TRCOEF argument of the \htmlref{ARD\_WORK}{ARD_WORK} routine to define the
-application co-ordinate system. TRCOEF should be supplied holding the
+\subsubsection{Application Co-ordinates}
+Version 1 applications use the TRCOEF argument of the \htmlref{ARD\_WORK}{ARD_WORK} 
+routine to define the application co-ordinate system. TRCOEF would be supplied 
+holding the
 co-efficients of the linear mapping from application co-ordinates to pixel
 co-ordinates. For instance, if a 2-dimensional application co-ordinates system
 $(x_{a},y_{a})$ is required to be equal to pixel co-ordinates $(x_{p},y_{p})$,
@@ -1590,141 +1586,136 @@ first co-efficient ( C(1) or T(0,1) ) is set equal to the symbolic constant
 VAL\_\_BADR (defined in include file PRM\_PAR), then \htmlref{ARD\_WORK}{ARD_WORK} will ignore the
 supplied values of TRCOEF and use a unit mapping instead.
 
-\subsection{User Co-ordinates}
-The positions and displacements within an ARD description are interpreted as
-application co-ordinates by default. If the user wishes to supply such positions
-and displacements in some other co-ordinate system, then the ARD description
-should contain suitable statement fields defining the mapping from user
-co-ordinates to application co-ordinates. Such mappings are restricted to be
-linear and can be set up using the \htmlref{statements}{SEC:STAT} \htmlref{COEFFS}{ST:COE}, \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCALE}, \htmlref{TWIST}{ST:TWI} and
+\subsubsection{User Co-ordinates}
+The positions and displacements within a Version 1 ARD description are 
+interpreted as
+application co-ordinates by default. To supply positions
+and displacements in some other linearly-related co-ordinate system, the ARD 
+description would contain statement fields defining the mapping from user
+co-ordinates to application co-ordinates. Such mappings were set up using the 
+\htmlref{statements}{SEC:STAT} 
+\htmlref{COEFFS}{ST:COE}, 
+\htmlref{OFFSET}{ST:OFF}, 
+\htmlref{SCALE}{ST:SCALE}, 
+\htmlref{TWIST}{ST:TWI} and
 \htmlref{STRETCH}{ST:STR}.
-For instance, if the application expects co-ordinates to be given in arc-seconds
-but the user wishes to give them in arc-minutes, then the statement \htmlref{SCALE}{ST:SCALE}( 60 )
-should be included in the ARD description before the first keyword. This mapping
-is then concatenated with the mapping supplied by the application to get the
-mapping from user co-ordinates to pixel co-ordinates. 
+
+For instance, if the application expects co-ordinates to be given in
+arc-seconds but the user wishes to give them in arc-minutes, then the
+statement \htmlref{SCALE}{ST:SCALE}( 60 ) should be included in the ARD
+description before the first keyword. This mapping is then concatenated
+with the mapping supplied by the application to get the mapping from user
+co-ordinates to pixel co-ordinates.
 
 The user co-ordinate system may be changed at any point within an ARD
-description using suitable statement (\htmlref{COEFFS}{ST:COE}, etc.), and the new mapping
-will be used to interpret all further positions until the user co-ordinate 
-system is modified again.
+description using suitable statement (\htmlref{COEFFS}{ST:COE}, etc.),
+and the new mapping will be used to interpret all further positions until
+the user co-ordinate system is modified again.
 
 Arguments which specify distances (such as the radius of a circle for instance)
 are subject to the current mapping. Thus, for instance, a circle may be
 transformed into an ellipse if the co-ordinate axes have different scales. 
 
-The following example ARD description illustrates these last two points:
-
-\small
-\begin{verbatim}
-      DIMENSION( 2 )
-      CIRCLE( 0, 0, 10 )
-      COEFFS( 0, 1, 0, 0, 0, 2 )
-      CIRCLE( 0, 0, 10 )
-\end{verbatim}
-\normalsize
-
-The arguments of the first \htmlref{CIRCLE}{KEY:CIR} keyword refer to the application co-ordinate
-system because no alternative user co-ordinate system has been specified at this
-point. Thus, the first circular region is centred on application co-ordinates
-$(0,0)$ and cuts the axes at $(\pm10,0)$ and $(0,\pm10)$. The following \htmlref{COEFFS}{ST:COE}
-statement establishes a user co-ordinate system which is identical with
-application co-ordinates except that Y co-ordinate values in the application
-co-ordinate system are twice the corresponding Y values in user co-ordinates.
-The arguments of the second \htmlref{CIRCLE}{KEY:CIR} keyword refer to this new user co-ordinate
-system. Thus, even though the arguments are numerically the same as the first
-\htmlref{CIRCLE}{KEY:CIR} keyword, they will result in a different region being selected. The
-selected region will be a circle which has been stretched in the Y direction to
-produce an ellipse. The ellipse will be centred on application co-ordinates
-$(0,0)$ and will cut the application co-ordinate axes at $(\pm10,0)$ and
-$(0,\pm20)$. 
-
 \section{\label{SEC:KEYW}\xlabel{ARDKeywords}Keywords}
-Keywords are fields within an ARD description which specify one of the basic
-shapes known to ARD. Most are followed by an argument list giving numerical
-values for the size, position, orientation, etc., of the shape. Argument lists
-are contained within parentheses, and arguments are separated by commas.
-Keywords can be abbreviated to three characters. The following keywords are
-currently supported ($N$ represents the dimensionality of the ARD description,
-and all positions and distances are given in user co-ordinates): 
+Keywords are fields within an ARD description which specify one of the
+basic shapes known to ARD. Most are followed by an argument list giving
+values for the size, position, orientation, etc., of the shape. Argument
+lists are contained within parentheses, and arguments are separated by
+commas. Positions and distances should be supplied in a format
+appropriate to the current user co-ordinate system as determined by the
+WCS and/or COFRAME statements. Keywords can be abbreviated to three
+characters. The following keywords are currently supported ($N$
+represents the dimensionality of the ARD description, and all positions
+and distances are given in user co-ordinates):
 
 \begin{description}
 
-\item [\label{KEY:BOX}BOX] - A rectangular box with sides parallel to the user co-ordinate
-axes. The argument list should contain $2*N$ values; the first $N$ values give
-the co-ordinates of the box centre, and the remaining $N$ values give the
-lengths of the box sides. It may sometimes be more convenient to use the
-\htmlref{RECT}{KEY:REC}
-keyword which specifies a rectangular box in terms of two diagonally opposite
-corners. 
+\item [\label{KEY:BOX}BOX] - A rectangular box with sides parallel to the
+user co-ordinate axes. The argument list should contain $2*N$ values; the
+first $N$ values give the co-ordinates of the box centre, and the
+remaining $N$ values give the lengths of the box sides. It may sometimes
+be more convenient to use the \htmlref{RECT}{KEY:REC} keyword which specifies 
+a rectangular box in terms of two diagonally opposite corners. 
 
-\item [\label{KEY:CIR}CIRCLE] - A circle (for $N=2$) or sphere (for $N>2$). The argument list
-should contain $N+1$ values; the first $N$ values give the co-ordinates of the
-centre of the circle or sphere, and the remaining value gives the radius
-(in user co-ordinates). 
+\item [\label{KEY:CIR}CIRCLE] - A circle (for $N=2$) or sphere (for $N>2$).
+The argument list should contain $N+1$ values; the first $N$ values give
+the co-ordinates of the centre of the circle or sphere, and the remaining
+value gives the radius (in user co-ordinates).
 
-\item [\label{KEY:COL}COLUMN] - A set of lines parallel to the Y axis. The argument list can
-contain any number of values (one for each of the lines). Each argument value $X$
-specifies that the corresponding line should pass through the position $(X,0)$.
-This keyword can only be used in 2-dimensional ARD descriptions. 
+\item [\label{KEY:COL}COLUMN] - A set of lines parallel to the second
+axis of the user co-ordinate system. The argument list can contain any number 
+of values (one for each of the lines). Each argument value $X$ specifies that 
+the corresponding line should pass through the position $(X,0)$. This keyword 
+can only be used in 2-dimensional ARD descriptions.
 
-\item [\label{KEY:ELL}ELLIPSE] - A 2-dimensional ellipse. The argument list should contain 5
-values; the first pair give the X and Y co-ordinates of the centre of the
-ellipse, the second pair give the half-lengths of the two axes of the
-ellipse (in user co-ordinates),
-and the fifth value gives the angle (in degrees) between the X axis and the
-first of the two ellipse axes. Rotation from the X to the Y axis is positive.
-This keyword can only be used in 2-dimensional ARD descriptions. 
+\item [\label{KEY:ELL}ELLIPSE] - A 2-dimensional ellipse. The argument list 
+should contain 5 values; the first pair give the user co-ordinates of
+the centre of the ellipse, the second pair give the half-lengths of the
+two axes of the ellipse (in user co-ordinates), and the fifth value gives
+the angle (in degrees) between the first user axis and the first of the two
+ellipse axes. Rotation from the first to the second user axis is positive. 
+This keyword can only be used in 2-dimensional ARD descriptions.
 
-\item [\label{KEY:FRA}FRAME] - The entire mask excluding a border of given width. The argument
-list should contain a single value giving the width of the border. This keyword
-can only be used in 2-dimensional ARD descriptions. A further restriction on its
-use is that the current mapping from user co-ordinates to pixel co-ordinates
-must be isomorphic (i.e. each mask pixel must correspond to a square area in
-user co-ordinates; the square may be rotated, shifted and/or scaled, but it must
-still be a square). If this is not the case an error will be reported by
+\item [\label{KEY:FRA}FRAME] - The entire mask excluding a border of given 
+width. The argument list should contain a single value giving the width
+of the border. This keyword can only be used in 2-dimensional ARD
+descriptions. A further restriction on its use is that the current
+mapping from user co-ordinates to pixel co-ordinates must be isomorphic
+(i.e. each mask pixel must correspond to a square area in user
+co-ordinates; the square may be rotated, shifted and/or scaled, but it
+must still be a square). If this is not the case an error will be
+reported by \htmlref{ARD\_WORK}{ARD_WORK}.
+
+\item [\label{KEY:INP}INPUT] - The pixel mask supplied as input to routine 
 \htmlref{ARD\_WORK}{ARD_WORK}. 
 
-\item [\label{KEY:INP}INPUT] - The pixel mask supplied as input to routine \htmlref{ARD\_WORK}{ARD_WORK}. 
+\item [\label{KEY:LIN}LINE] - A straight line between two given positions. 
+The argument list should contain $2*N$ values, the first set of $N$
+values giving the user co-ordinates of the first position, and the second set
+of $N$ values giving the second position. Only the section of the line
+between (and including) the two positions is included in the mask.
 
-\item [\label{KEY:LIN}LINE] - A straight line between two given positions. The argument list
-should contain $2*N$ values, the first set of $N$ values giving the co-ordinates
-of the first position, and the second set of $N$ values giving the second
-position. Only the section of the line between (and including) the two positions
-is included in the mask.
-
-\item [\label{KEY:PIX}PIXEL] - A set of individual pixels. The argument list should contain an
-integer multiple of $N$ values; each set of $N$ values giving the co-ordinates 
-of a point to be included.
+\item [\label{KEY:PIX}PIXEL] - A set of individual pixels. The argument list 
+should contain an integer multiple of $N$ values; each set of $N$ values 
+giving the user co-ordinates of a point to be included.
 
 \item [\label{KEY:POI}POINT] - POINT is a synonym for PIXEL. 
 
-\item [\label{KEY:POL}POLYGON] - A 2-dimensional polygonal area. The argument list should
-contain an even number of values; each pair giving the co-ordinates of a vertex
-of the polygon. These vertices are joined together in the order given to form
-the polygon. The last vertex is joined to the first to close the polygon. This
-keyword can only be used in 2-dimensional ARD descriptions. 
+\item [\label{KEY:POL}POLYGON] - A 2-dimensional polygonal area. The argument 
+list should contain an even number of values; each pair giving the
+user co-ordinates of a vertex of the polygon. These vertices are joined
+together in the order given to form the polygon. The last vertex is
+joined to the first to close the polygon. This keyword can only be used
+in 2-dimensional ARD descriptions. Note, the edges of a polygon are {\em 
+geodesics} within the user co-ordinate Frame. So, for instance, if user 
+co-ordinates are RA and DEC then the edges of a polygon will correspond to 
+great circles on the sky.
 
-\item [\label{KEY:REC}RECT] - A rectangular box with sides parallel to the user co-ordinate
-axes. The argument list should contain $2*N$ values; each set of $N$ values
-giving the co-ordinates of a pair of diagonally opposite corners. It may 
-sometimes be more convenient to use the BOX keyword which specifies a 
-rectangular box in terms of its centre and dimensions.
+\item [\label{KEY:REC}RECT] - A rectangular box with sides parallel to the 
+user co-ordinate axes. The argument list should contain $2*N$ values;
+each set of $N$ values giving the co-ordinates of a pair of diagonally
+opposite corners. It may sometimes be more convenient to use the BOX
+keyword which specifies a rectangular box in terms of its centre and
+dimensions.
 
-\item [\label{KEY:ROT}ROTBOX] - A rotated box. The argument list should contain 5 values; the
-first pair give the co-ordinates of the box centre, the second pair give the
-lengths of the two sides, and the fifth value gives the angle (in degrees)
-between the X axis and the first side of the box. Rotation from the X to the Y
-axis is positive. This keyword can only be used in 2-dimensional ARD
-descriptions. 
+\item [\label{KEY:ROT}ROTBOX] - A rotated box. The argument list should 
+contain 5 values; the first pair give the co-ordinates of the box centre,
+the second pair give the lengths of the two sides, and the fifth value
+gives the angle (in degrees) between the first user axis and the first side 
+of the box. Rotation from the first to the second user axis is positive. This 
+keyword can only be used in 2-dimensional ARD descriptions. Note, the
+edges of a rotated box are {\em geodesics} within the user co-ordinate
+Frame. So, for instance, if user co-ordinates are RA and DEC then the
+edges of a rotated box will correspond to great circles on the sky.
 
-\item [\label{KEY:ROW}ROW] - A set of lines parallel to the X axis. The argument list can
-contain any number of values (one for each of the lines). Each argument value $Y$
-specifies that the corresponding line should pass through the position $(0,Y)$.
-This keyword can only be used in 2-dimensional ARD descriptions. 
+\item [\label{KEY:ROW}ROW] - A set of lines parallel to the first user axis. 
+The argument list can contain any number of values (one for each of the
+lines). Each argument value $Y$ specifies that the corresponding line
+should pass through the position $(0,Y)$. This keyword can only be used
+in 2-dimensional ARD descriptions.
 
-\item [\label{KEY:WHO}WHOLE] - This keyword selects all pixels in the mask. It has no argument
-list. 
+\item [\label{KEY:WHO}WHOLE] - This keyword selects all pixels in the mask. It 
+has no argument list. 
 
 \end{description}
 
@@ -1762,25 +1753,26 @@ or if it is within {\em neither}.
 an ARD description. 
 
 \section{\label{SEC:STAT}\xlabel{ARDStatements}Statements}
-Statements are fields within an ARD description which modify the way in which
-\htmlref{keywords}{SEC:KEYW} are interpreted. They are followed by an argument list giving various
-numerical values. Statements can be abbreviated to three characters. The
-following statements are currently supported ($N$ represents the dimensionality
-of the ARD description): 
+Statements are fields within an ARD description which modify the way in
+which \htmlref{keywords}{SEC:KEYW} are interpreted. They are followed by
+an argument list giving various numerical or textual values. Statements can be
+abbreviated to three characters. The following statements are currently
+supported ($N$ represents the dimensionality of the ARD description):
 
 \begin{description}
 
-\item [\label{ST:DIM}DIMENSION( N )] - This establishes the number of co-ordinates (N)
-required to describe a single point. If no DIMENSION statement is found before
-the first keyword field, a value of 2 is assumed for N. The dimensionality may
-not be changed after the first keyword field, but multiple DIMENSION statements
-may be included (so long as they all specify the same value for N) to improve
-readability, and to allow the concatenation of multiple ARD descriptions which
-contain compatible DIMENSION statements. 
+\item [\label{ST:DIM}DIMENSION( N )] - This establishes the number of
+co-ordinates (N) required to describe a single point. If no DIMENSION
+statement is found before the first keyword field, a value of 2 is
+assumed for N. The dimensionality may not be changed after the first
+keyword field, but multiple DIMENSION statements may be included (so long
+as they all specify the same value for N) to improve readability, and to
+allow the concatenation of multiple ARD descriptions which contain
+compatible DIMENSION statements.
 
-\item [\label{ST:COE}COEFFS( C1, C2, ... )] - This establishes a new linear mapping from user
-co-ordinates to application co-ordinates replacing any previous mapping (see 
-Section \ref{SEC:COORD}). The
+\item [\label{ST:COE}COEFFS( C1, C2, ... )] - {\bf DEPRACATED. Use the COFRAME or WCS statement instead.} This establishes
+a new linear mapping from user co-ordinates to application co-ordinates 
+replacing any previous mapping (see Section \ref{SEC:COORD}). The
 statement must have $N*(N+1)$ arguments. If ($X_{1}$, $X_{2}$, $X_{3}$, ...,
 $X_{N}$) are a set of user co-ordinates in $N$ dimensions, and ($Y_{1}$,
 $Y_{2}$, $Y_{3}$, ..., $Y_{N}$) are the corresponding application co-ordinates,
@@ -1800,7 +1792,17 @@ mapping results in user co-ordinates being identical with application
 co-ordinates. The \htmlref{OFFSET}{ST:OFF}, \htmlref{SCALE}{ST:SCALE}, \htmlref{TWIST}{ST:TWI} and \htmlref{STRETCH}{ST:STR} statements allow complex
 mappings to be created without the use of COEFF statement in certain cases. 
 
-\item [\label{ST:OFF}OFFSET( X, Y, Z, ... )] - This modifies the current mapping
+\item [\label{ST:COFRAME}COFRAME(DOMAIN,...)] - Specifies the user
+co-ordinate system ({\em i.e.} the co-ordinate system in which positions
+are supplied within the remainder of the ARD description). The first
+argument is the Domain of the co-ordinate system. If this is ``SKY'' and
+the ARD description is 2-dimensional, then an AST SkyFrame will be used
+to describe the user co-ordinate system. Otherwise a simple AST Frame
+will be used instead. Any subsequent arguments should be of the form 
+{\tt <keyword>=<value>} where {\tt <keyword>} is the name of an AST
+attribute and {\tt <value>} is the value to assign to the attribute.
+
+\item [\label{ST:OFF}OFFSET( X, Y, Z, ... )] - {\bf DEPRACATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping
 from user co-ordinates to application co-ordinates so that the origin of the
 user co-ordinate system is moved by the given offsets in application
 co-ordinates. The initial position for the origin of user co-ordinates is
@@ -1809,12 +1811,12 @@ would put the origin at (10,15) in the application co-ordinates system. A second
 statement OFFSET(2,3) would move it to (12,18). The statement must have $N$ 
 arguments.
 
-\item [\label{ST:SCA}SCALE( F )] - This modifies the current mapping from user co-ordinates to
+\item [\label{ST:SCA}SCALE( F )] - {\bf DEPRACATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping from user co-ordinates to
 application co-ordinates so that the user co-ordinate system is magnified by the
 given factor F along all axes. The magnification is centred on the origin of the
 application co-ordinate system. 
 
-\item [\label{ST:STR}STRETCH( F1, F2, F3, ... )] - This modifies the current mapping from user
+\item [\label{ST:STR}STRETCH( F1, F2, F3, ... )] - {\bf DEPRACATED. Use the COFRAME or WCS statement instead.} This modifies the current mapping from user
 co-ordinates to application co-ordinates so that the user co-ordinate system is
 magnified by the given factor $F_{i}$ along axis $i$. Unlike the SCALE
 statement, the magnifications are centred on the origin of the {\em user}
@@ -1822,7 +1824,7 @@ co-ordinate system (i.e. the position of the origin of the user co-ordinate
 system within the application co-ordinate system is not changed by this
 statement). The statement must have $N$ arguments. 
 
-\item [\label{ST:TWI}TWIST( T )] - This statement modifies the current mapping from user
+\item [\label{ST:TWI}TWIST( T )] - {\bf DEPRACATED. Use the COFRAME or WCS statement instead.} This statement modifies the current mapping from user
 co-ordinates to application co-ordinates so that the user co-ordinate system is
 rotated by an angle T (in degrees). The rotation is about the origin of the
 application co-ordinate system. If the ARD description has more than 2
@@ -1830,6 +1832,28 @@ dimensions, then the rotation takes place in the X-Y plane. Rotation from the X
 axis to the Y axis is positive. ``TWIST'' is used rather than the more obvious
 ``ROTATE'' in order to avoid a name clash with the keyword
 \htmlref{ROTBOX}{KEY:ROT}. 
+
+\item [\label{ST:WCS}WCS(...)] - Specifies an AST FrameSet in which the
+current Frame is the user co-ordinate system ({\em i.e.} the co-ordinate
+system in which positions are supplied within the remainder of the ARD
+description). The ``argument list'' should be a textual dump of an AST
+FrameSet as produced by the AST Channel class ({\em e.g.} using the
+AST\_SHOW routine). Each line of the dump should be stored as a separate
+GRP element in the supplied ARD expression - the simplest way to do this
+is probably to supply the ARD description within a text file, and put
+each line of the dump on a separate line in the file:
+
+\small
+\begin{verbatim}
+   WCS(Begin FrameSet 
+       IsA Frame      
+       Nframe = 6  
+       ...
+       ...
+       End FrameSet
+   )
+\end{verbatim}
+\normalsize
 
 \end{description}
 
@@ -2419,49 +2443,16 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
 \end{small}
 
 
-\section{\label{APP:ERRORS}ARD Error Status Values}
-
-This appendix lists the STATUS values generated within the ARD package.
-These STATUS values are defined in the include file
-\verb+/star/include/ard_err+. Note, STATUS values generated by the
-packages listed in Appendix \ref{APP:PACK} may also be returned.
-
-\begin{description}
-\item [ARD\_\_ARGS]   -  Invalid argument list found for a keyword or statement.
-\item [ARD\_\_BADAR]  -  Invalid argument value found in an argument list.
-\item [ARD\_\_BADDM]  -  ARD description has an invalid dimensionality.
-\item [ARD\_\_BADFL]  -  An unrecognised field was found in an ARD description.
-\item [ARD\_\_BADIN]  -  An illegal value was supplied for \htmlref{ARD\_WORK}{ARD_WORK} argument 
-                         REGVAL.
-\item [ARD\_\_INDET]  -  Singular or indeterminate mapping or arguments encountered.
-\item [ARD\_\_INTER]  -  Internal programming error. Notify Starlink 
-                         User Support at RAL.
-\item [ARD\_\_MISOP]  -  \htmlref{operators}{SEC:OPER} found with no intervening \htmlref{keywords}{SEC:KEYW}.
-\item [ARD\_\_MSPAR]  -  Missing parenthesis.
-\item [ARD\_\_NOT2D]  -  A Keyword which is only valid in a 2-dimensional ARD 
-description has been found in an ARD description which is not 2-dimensional.
-\item [ARD\_\_SCALE]  -  Current mapping is not isotropic.
-\end{description}
-
-\section{\label{APP:PACK}Packages Called From Within ARD}
-
-The ARD package makes use of subroutines from the GRP library (see \xref{SUN/150}{sun150}{}), the
-SLALIB library (see \xref{SUN/67}{sun67}{}), the PSX library (see 
-\xref{SUN/121}{sun121}{}), the CHR library (see
-\xref{SUN/40}{sun40}{}) and the ERR library (see \xref{SUN/104}{sun104}{}). 
-
 \section{Acknowledgements}
 
 The current ARD system arose out of previous system produced by Peter Draper. I
 am grateful to the following people for useful suggestions: Peter Draper,
 Malcolm Currie, Richard Saxton, Rodney Warren-Smith and Grant Privet. 
 
-\section{Changes Introduced in Version 3 of this Document}
-The only changes are a clarification of the use of modification elements
-within ARD descriptions (section \ref{SEC:MOD}), and the manner in which
-multi-line ARD descriptions are split into separate elements by the
-carriage returns (section \ref{SEC:GRPCC}). No changes have been made to
-the code.
+\section{Changes Introduced in Version 2.0}
+The WCS and COFRAME statements, and the ARD\_WCS routine have been introduced.
+The COEFFS, STRETCH, OFFSET, SCALE and TWIST statements have been
+depracted in favour of the new WCS adn COFRAME statements.
 
 
 \end{document}
