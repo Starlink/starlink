@@ -109,7 +109,8 @@ string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
 bool parse_boolean_string(char *s);
 void Usage (string msg);
-void Usage (void);
+void Usage (bool);
+void show_help();
 char *progname;
 
 #if !HAVE_DECL_GETSUBOPT
@@ -172,6 +173,7 @@ int main (int argc, char **argv)
 	{ (char*)"debug",         1, 0, 'g' },
 	{ (char*)"font-gen",      1, 0, 'G' },
 	{ (char*)"height",        1, 0, 'h' },
+        { (char*)"help",          0, 0, '?' },
 	{ (char*)"end-page",      1, 0, 'l' },
 	{ (char*)"magnification", 1, 0, 'm' },
 	{ (char*)"font-mode",     1, 0, 'M' },
@@ -701,14 +703,13 @@ int main (int argc, char **argv)
 			throw DviBug("Impossible process suboption "+suboptch);
 		    }
 		}
-
-// 		cerr << "processing: " << processing_
-// 		     << " blur:" << bm.blur_bitmap
-// 		     << " transparent:" << bm.make_transparent
-// 		     << " crop:" << bm.crop_bitmap
-// 		     << endl;
 	    }
 	    break;
+
+          case '?':             // --help
+            show_help();
+            processing_ = options_only; // ...and exit
+            break;
 	    
 	  default:
 	    Usage("unrecognised option");
@@ -1365,12 +1366,50 @@ bool parse_boolean_string(char *s)
     return false;
 }
 
+void show_help()
+{
+    Usage(false);
+    cerr << "Options:" << endl;
+    cerr << "
+    --colours, --colors=[foreground|background]=spec
+                                   RGB spec, as red/blue/green or #rrggbb
+    --crop=[left|right|top|bottom|all]=n   Specify margin round output bitmap
+    --crop=[absolute|relative]     Specify cropping of bitmap
+    --debug=[dpribmg]              Trace execution
+    --font-search=[path|command|kpathsea]=value
+    --font-search=[nopath|nocommand|nokpathsea|none]
+                                   Control font-searching
+    --font-gen=boolean             Generate missing fonts?
+    --font-mode=mode               MetaFont mode used when generating fonts
+    --height=size, --width=size    Size of output bitmap
+    --help                         Show this help
+    --magnification=n              Magnification parameter for DVI file
+    -n, --preamble-only            Read only the DVI pre- and postamble
+    --output=filename-pattern      Specify pattern for output bitmaps
+    --output-type=type             Type of output bitmap, cf --query=types
+    --paper-size=string            Preset bitmap size, cf --query=paper
+    --process=[options-only|preamble-only|blur|transparent|crop]=boolean
+                                   Processing to do
+    --query=[missing-fonts|missing-fontgen|all-fonts|all-fontgen|f|F|g|G]
+                                   Display missing/present fonts
+    --query=bitmaps                Log bitmaps generated
+    --query=paper                  Show predefiend `paper' sizes
+    --query=types                  Show available bitmap formats
+    --resolution=n                 Output resolution, pixels-per-inch
+    --start-page=n, --end-page=n, --page-range=spec
+                                   Control which pages are processed
+    --scalefactor=n                Scale output bitmap down by n
+    --verbose=[quiet|silent]       Suppress chatter
+    -V, --version                  Show version and configuration info
+" << endl;
+}
+
 void Usage (string msg)
 {
     cerr << "Error: " << msg << endl;
-    Usage();
+    Usage(true);
 }
-void Usage (void)
+void Usage (bool andExit)
 {
     cerr << "Usage: " << progname << " [flags...] filename" << endl;
 #if 0
@@ -1402,5 +1441,6 @@ void Usage (void)
 "       t=supported output types, b=output bitmap names, p=paper sizes in -bp" << endl <<
 "  -P   Processing: b=blur bitmap, t=set transparent, c=do cropping (BTC->off)" << endl;
 #endif
-    exit (1);
+    if (andExit)
+        exit (1);
 }

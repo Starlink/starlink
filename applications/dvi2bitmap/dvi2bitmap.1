@@ -134,7 +134,7 @@ extra `g' increases still further the amount of debugging code.  The
 debugging information may be uninformative or unintelligible; it might
 even crash the program (mention that to me).
 .TP
-.I "\-h, \-\-height=size; \-w, \-\-width=size"
+.I "-h, --height=size; -w, --width=size"
 .\" .I "\-bh size, \-bw size"
 Specify the height and width of the canvas on which the output
 bitmap is painted.  The program tries to make an estimate of this
@@ -147,9 +147,12 @@ you'll need to specify a bitmap size.  The numbers
 .I "(1183,1072)...(4134,6255)"
 are the coordinates of the top-left and
 bottom-right of the bitmap: in this case 
-.I "\-\-height=6300 \-\-width=4200"
+.I "--height=6300 --width=4200"
 would suffice.  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.
+.TP
+.I "--help"
+Display simple help for the options on stderr, and exit.
 .TP
 .I "-l, --end-page"
 See option 

@@ -318,6 +318,10 @@ bottom-right of the bitmap: in this case
 would suffice.  At some point, I'd like to make the bitmap
 `expandable', obviating the need for these options.</p></dd>
 
+<dt><code>&ddash;help</code></dt>
+
+<dd><p>Display outline help for the options on stderr, and exit</p></dd>
+
 <dt><code>-l, &ddash;end-page</code></dt>
 
 <dd><p>See option <code>&ddash;start-page</code></p></dd>
