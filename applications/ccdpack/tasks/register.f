@@ -389,16 +389,10 @@
 *       and assumed to contain the names of the lists whose positions
 *       are to be used for registration.
 *
-*       On exit, if OUTFORMAT is "WCS" then a new coordinate system
-*       with a label as given by the OUTDOMAIN parameter will be 
-*       attached to the input NDFs.  Taken together these contain the 
-*       registration information and can be inspected using WCSEDIT.
-*
-*       If OUTFORMAT is "TRANSFORM" then an item "TRANSFORM" will be 
-*       added to the .MORE.CCDPACK structure of the input NDFs.
-*       This contains the registration information as a TRANSFORM
-*       structure and may be inspected using the utility HDSTRACE
-*       (SUN/102).
+*       On exit, a new coordinate frame with a Domain as given by the
+*       OUTDOMAIN parameter will be inserted in the WCS component of 
+*       the input NDFs.  Taken together these contain the registration
+*       information and can be inspected using WCSEDIT.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
