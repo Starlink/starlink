@@ -1544,7 +1544,7 @@
          CALL PGQCS( 4, XCH, HGT )
 
 *  Set the line spacing.
-         LNSP = 1.2*HGT*AST_GETR( IPLOTK, 'SIZE(TEXT)', STATUS )
+         LNSP = 1.2*HGT*AST_GETR( IPLOTK, 'SIZE(TEXTLAB)', STATUS )
 
 *  Use horizontal text.
          UP( 1 ) = 0.0D0
