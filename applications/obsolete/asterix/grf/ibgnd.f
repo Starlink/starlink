@@ -2119,30 +2119,37 @@
 *    Compute means from accumulators
         DO S = 1, I_BGM_NSAMP
 
-          MEAN = WRK(S)
-          WTSUM = REAL(SAMNP(S))
-          WTSUM2 = WTSUM
+*      Any points in sample?
+          IF ( SAMNP(S) .GT. 0 ) THEN
 
-*      Find values from sums
-          MEAN = MEAN / WTSUM
-          D = WTSUM - WTSUM2/WTSUM
+            MEAN = WRK(S)
+            WTSUM = REAL(SAMNP(S))
+            WTSUM2 = WTSUM
 
-*      Correct standard deviation for assumed mean
-          IF ( SAMNP(S) .GT. 1 ) THEN
-            DMEAN = SAMM(S) - MEAN
-            SAMEM(S) = SAMEM(S) - WTSUM*DMEAN**2
-            SAMEM(S) = SQRT(SAMEM(S)/D) / SQRT(REAL(SAMNP(S)))
+*        Find values from sums
+            MEAN = MEAN / WTSUM
+            D = WTSUM - WTSUM2/WTSUM
+
+*        Correct standard deviation for assumed mean
+            IF ( SAMNP(S) .GT. 1 ) THEN
+              DMEAN = SAMM(S) - MEAN
+              SAMEM(S) = SAMEM(S) - WTSUM*DMEAN**2
+              SAMEM(S) = SQRT(SAMEM(S)/D) / SQRT(REAL(SAMNP(S)))
+            ELSE
+              SAMEM(S) = -1.0
+            END IF
+
+*        Store sample mean
+            SAMM(S) = MEAN
+
           ELSE
-            SAMEM(S) = -1.0
-          END IF
+            SAMM(S) = 0.0
 
-*      Store sample mean
-          SAMM(S) = MEAN
+          END IF
 
         END DO
 
       END IF
-
 
 *  Export details of means to environment
       S = 1
@@ -2203,6 +2210,7 @@
 
 *    Set default plotting style
         CALL IMG_1DGCB( STATUS )
+        CALL GCB_SETDEF( STATUS )
         CALL GCB_SETL( 'ERR_FLAG', .TRUE., STATUS )
         CALL GCB_SETL( 'STEP_FLAG', .FALSE., STATUS )
         CALL GCB_SETL( 'POLY_FLAG', .FALSE., STATUS )
