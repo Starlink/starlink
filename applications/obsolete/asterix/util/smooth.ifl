@@ -2,7 +2,7 @@
 
 	    PARAMETER INP
                POSITION 1
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Input Data File '
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION  '<->GLOBAL.BINDS'
@@ -12,7 +12,7 @@
 
 	    PARAMETER OUT
                POSITION 2
-               TYPE    'UNIV'
+               TYPE    'LITERAL'
                PROMPT  'Output Data File '
                ASSOCIATION  '->GLOBAL.BINDS'
                VPATH   'PROMPT'
