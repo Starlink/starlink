@@ -2,17 +2,20 @@ INTERFACE EVMERGE
 
  PARAMETER INP1
   TYPE        'LITERAL'
+  POSITION    2
   PROMPT      'Input dataset 1'
  ENDPARAMETER
 
  PARAMETER INP2
   TYPE        'LITERAL'
+  POSITION    3
   PROMPT      'Input dataset 2'
  ENDPARAMETER
 
  PARAMETER INP3
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    4
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 3'
@@ -22,6 +25,7 @@ INTERFACE EVMERGE
  PARAMETER INP4
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    5
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 4'
@@ -31,6 +35,7 @@ INTERFACE EVMERGE
  PARAMETER INP5
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    6
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 5'
@@ -40,6 +45,7 @@ INTERFACE EVMERGE
  PARAMETER INP6
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    7
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 6'
@@ -49,6 +55,7 @@ INTERFACE EVMERGE
  PARAMETER INP7
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    8
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 7'
@@ -58,6 +65,7 @@ INTERFACE EVMERGE
  PARAMETER INP8
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    9
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 8'
@@ -67,6 +75,7 @@ INTERFACE EVMERGE
  PARAMETER INP9
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    10
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 9'
@@ -76,6 +85,7 @@ INTERFACE EVMERGE
  PARAMETER INP10
   TYPE        'LITERAL'
   DEFAULT     !
+  POSITION    11
   VPATH       'PROMPT'
   PPATH       'DEFAULT'
   PROMPT      'Input dataset 10'
