@@ -1,4 +1,4 @@
-1 GAIA major update
+1 Starlink GAIA major update
 
   Release 2.8-0: 04 November 2004
   ===============================
@@ -14,35 +14,35 @@
 
   The following minor issues have also been fixed.
 
-    - A print of the "whole image" now works when repeated.
-
     - The astrometry tables now offer a button to project X,Y to RA,DEC
       to complement the reset projection of RA,DEC to X,Y.
-
-    - Incompatibilities in the WCS are now ignored (older versions of 
-      AST cannot read newer encodings). This will naturally only effect
-      GAIA in future versions.
-
-    - XY profiles now display a local value when a row or column contains
-      no valid values (previous this displayed zero, which occasionally 
-      made the graphs scale to silly values). 
 
     - Contouring toolbox bug fixed. If you entered an incorrect NDF name for
       the second image, the error was never recovered and GAIA had to be
       restarted. 
 
-    - Fixed problem with coordinate readout coupling when more than one
+    - GAIA has been relinked against AST to fix a problem when the 
+      presence of multiple possible astrometries in FITS headers
+      causes the image scale to be incorrectly estimated.
+
+    - Printing the "whole image" now works when repeated without exiting
+      GAIA. 
+
+    - Incompatibilities in the WCS components of NDFs are now ignored (older
+      versions of AST cannot read newer encodings).
+
+    - A problem with coordinate readout coupling when using more than one
       interactive slice or XY profile is being used.
 
+    - A error reading the CRPIX values in the blink/compare toolbox has been 
+      fixed.
 
-  Release 2.7-4: 28 April 2004
-  ============================
+  Changes in the previous version of GAIA (2.7-5):
 
-  This is a major release of GAIA incorporating two new automated astrometry
-  toolboxes, a major re-write of the blink comparison toolbox and many
-  changes and fixes.
+  GAIA 2.7-5 incorporated two new automated astrometry toolboxes, a major
+  re-write of the blink comparison toolbox and many changes and fixes.
 
-  GAIA now offers two new toolboxes based on the Starlink AUTOASTROM
+  GAIA 2.7-5 offered two new toolboxes based on the Starlink AUTOASTROM
   program. These make it possible to provide a minimum of positional
   information (image centre and scale) and then fit an astrometric
   solution. They also make it possible, for the first time, to fit optical
@@ -51,16 +51,16 @@
      Image-Analysis->Astrometry Calibration->Automatic position matching
 
   One is for simple use and the other for advanced use.
-
-  The blink comparison toolbox has been substantially upgraded in this
-  release. New features are options to alignment to NDF origins or FITS CRPIX
-  values. This gives much better behaviour when comparing images of different
+  
+  The blink comparison toolbox was substantially upgraded in this release. 
+  New features are options to alignment to NDF origins or FITS CRPIX values. 
+  This gives much better behaviour when comparing images of different 
   dimensions. Better performance (less flickering artifacts). The ability to
   drag images and enter image coordinate offsets. All images can now be viewed
   together or one-by-one as before. Images should now always scroll and the
   "Refresh" button has been removed.
 
-  Other changes in this release:
+  Other changes in 2.7-5 release:
 
      - Spitzer/SIRTF FITS headers, including the optical distortion,
        are now handled.
@@ -132,9 +132,10 @@
        component.
 
 
-
   If you have any comments or problems with GAIA then mail:
 
       gaia@star.rl.ac.uk
 
   Peter W. Draper (p.w.draper@durham.ac.uk)
+
+  10th November 2004

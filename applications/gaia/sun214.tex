@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {214.15}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {4th November 2004}
+\newcommand{\stardocdate}      {10th November 2004}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.12}
@@ -427,12 +427,11 @@ GAIA provides the following normal ``image display tool'' features:
   displayed.
 
 \item Display of image planes from data cubes. Using this you can step
-  through on the axes and display the image formed by the other two axes. 
+  along an axis and display the image formed by the other two axes. 
   You can also combine a range of image planes or do the stepping
   using a timed animation. The displayed images created by this tool can be 
   analysed just like any other image, but the data format should be 
   NDF for efficiency.
-
 \end{itemize}
 
 \subsection{\xlabel{image_analysis_capabilities}Image analysis capabilities}
@@ -875,8 +874,36 @@ to read about ``SkyCat plugins''.
 
 \section{Recent \xlabel{changes}Changes}
 
+\subsection{The current release 2.8}
+
+This is a major release of GAIA (2.8.0) which can now display image planes
+from data cubes. Using this you can step through along an axis and display the
+image formed by the other two axes.  You can also combine a range of image
+planes or do the stepping using a timed animation. The displayed images
+created by this tool can be analysed just like any other image, but note the
+data format should be NDF for good efficiency.
+
+Other changes in this release:
+\begin{itemize}
+ \item GAIA has been relinked against AST to fix a problem when the 
+       presence of multiple possible astrometries in FITS headers
+       causes the image scale to be incorrectly estimated.
+
+ \item Printing the `whole image' now works when repeated without exiting
+       GAIA. 
+
+ \item Incompatibilities in the WCS components of NDFs are now ignored (older
+       versions of AST cannot read newer encodings).
+
+ \item A problem with coordinate readout coupling when using more than one
+       interactive slice or XY profile is being used.
+
+ \item A error reading the CRPIX values in the blink/compare toolbox has been 
+       fixed.
+\end{itemize}
+
 \subsection{Release - 2.7} 
-This is a major release of GAIA incorporating two new automated astrometry
+This was a major release of GAIA incorporating two new automated astrometry
 toolboxes, a major re-write of the blink comparison toolbox and many
 changes and fixes.
 
