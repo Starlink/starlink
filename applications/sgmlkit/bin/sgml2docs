@@ -37,13 +37,13 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #     <dt>--htmlsingle<dd>generate HTML in a single file.  Not really
 #           supported, so not often tested.
 #     <dt>--latex<dd>generate LaTeX.
-#     <dt>--packagedir my-dir<dd>package up the generated files into a
+#     <dt>--packagedir=my-dir<dd>package up the generated files into a
 #           directory called `my-dir'.  The default directory is based
 #           on the input filename.
-#     <dt>--tarball my.tar<dd>bundle the package-dir into a tarball
+#     <dt>--tarball=my.tar<dd>bundle the package-dir into a tarball
 #           named `my.tar'.  The default tarball name is based
 #           on the input filename.
-#     <dt>--jadeflags flags<dd>add the given flags to the invocation
+#     <dt>--jadeflags=flags<dd>add the given flags to the invocation
 #           of Jade.  See the
 #           <webref url='http://www.jclark.com/jade/' 
 #           >Jade documentation</webref> for details.
@@ -53,7 +53,7 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #           bug in the mechanism which generates the manifest.
 #     <dt>--quiet<dd>Don't chatter (not completely silent, since it
 #           doesn't suppress output from TeX).
-#     <dt>--options opt,opt,...<dd>set format-specific options.
+#     <dt>--options=opt,opt,...<dd>set format-specific options.
 #	    <p>With <code>--latex</code>: options are
 #	    <code>cts-sect</code> and <code>cts-appx</code>, which suppresses
 #	    any page-break between sections in the main text and
@@ -187,13 +187,13 @@ trap tidy-up 0
 # Start parsing the arguments
 
 USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
-	[--packagedir directory] [--tarball file.tar] [--jadeflags flags]\
+	[--packagedir=directory] [--tarball=file.tar] [--jadeflags=flags]\
 	[--ignore-manifest] [--quiet]\
 	[--help] [--debug] [--version] [-n]\
-	[--options]\
+	[--options=options...]\
 	sgml-file\
     (--latex options: cts-sect, cts-appx, onepass)\
-    (--html options: sgmlnorm,simplenorm,nonorm)"
+    (--html options: sgmlnorm, simplenorm, nonorm)"
 
 while [ $# -gt 0 ]; do
     case $1 in
@@ -201,13 +201,41 @@ while [ $# -gt 0 ]; do
 	--latex) TARGETFORMAT=1 ;;
 	--htmlsingle) TARGETFORMAT=0; 
 	    JADEFLAGS="$JADEFLAGS -V nochunks -isingle.file" ;;
-	--packagedir) PACKAGEDIR=$2; shift ;;
-	--tarball) TARNAME=$2; shift ;;
-	--jadeflags) JADEFLAGS="$JADEFLAGS $2"; shift ;;
-	--debug) DEBUGGING=true ;;
-	--options) OPTIONS=$2; shift ;;
+	--packagedir*) arg=`expr match $1 '.*=\(.*\)'`
+	    if test -z "$arg"
+	    then 
+		PACKAGEDIR=$2; shift
+	    else
+		PACKAGEDIR=$arg
+	    fi
+	    ;;
+	--tarball*) arg=`expr match $1 '.*=\(.*\)'`
+	    if test -z "$arg"
+	    then 
+		TARNAME=$2; shift
+	    else
+		TARNAME=$arg
+	    fi
+	    ;;
+	--jadeflags*) arg=`expr match $1 '.*=\(.*\)'`
+	    if test -z "$arg"
+	    then 
+		JADEFLAGS="$JADEFLAGS $2"; shift
+	    else
+		JADEFLAGS="$JADEFLAGS $arg"
+	    fi
+	    ;;
+	--options*) arg=`expr match $1 '.*=\(.*\)'`
+	    if test -z "$arg"
+	    then 
+		OPTIONS=$2; shift
+	    else
+		OPTIONS=$arg
+	    fi
+	    ;;
 	--ignore-manifest) USEMANIFEST=false ;;
 	--quiet) VERBOSE=false; DVI2BITMAP="$DVI2BITMAP -q" ;;
+	--debug) DEBUGGING=true ;;
 	--help) echo $USAGE; exit 0;;
 	--version) echo "$PROGNAME:I:" $ident_string; echo "$PROGNAME:I:" $RCSID; exit 0;;
 	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
