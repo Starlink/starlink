@@ -173,12 +173,16 @@
      
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1995 April 16 (MJC):
 *        Original version.  Some of the documentation was derived from
 *        R.F. Warren-Smith's EDRS manual. 
+*     21-MAY-1998 (DSB):
+*        Check that input variances are not all bad or zero, and ignore
+*        them if they are.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -207,52 +211,53 @@
       PARAMETER ( NDIM = 2 )   
 
 *  Local Variables:
-      LOGICAL BAD                ! Bad pixels present?
+      CHARACTER * ( 13 ) COMP    ! The array component(s) of NDF
+      CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
+      CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
+      DOUBLE PRECISION CNGMAX    ! Maximum change of value at last iteration
+                                 ! per block
+      DOUBLE PRECISION CNGRMS    ! RMS change at last iteration per block
+      DOUBLE PRECISION CNGSUM    ! Some of weighted square changes at last 
+                                 ! iteration
+      DOUBLE PRECISION DMNV      ! Min variance value
+      DOUBLE PRECISION DMXV      ! Max variance value
+      DOUBLE PRECISION MAXCNG    ! Maximum change of value at last iteration
+      DOUBLE PRECISION RMSCNG    ! RMS change at last iteration
       INTEGER BLDIM( NDF__MXDIM ) ! Size of an block in each dimension
       INTEGER BLKSIZ             ! Maximum dimension when blocking
-      LOGICAL BLOCK              ! Process in blocks?
-      DOUBLE PRECISION CNGMAX    ! Maximum change of value at last
-                                 ! iteration per block
-      DOUBLE PRECISION CNGRMS    ! RMS change at last iteration per
-                                 ! block
-      DOUBLE PRECISION CNGSUM    ! Some of weighted square changes at
-                                 ! last iteration
-      CHARACTER * ( 13 ) COMP    ! The array component(s) of NDF
       INTEGER DIM( NDF__MXDIM )  ! Size of the image in each dimension
-      CHARACTER * ( NDF__SZFTP ) DTYPE ! Numeric type for output arrays
       INTEGER EL                 ! Number of elements in mapped array
       INTEGER I                  ! Loop index
       INTEGER IDIM               ! Actual number of dimensions of image
-      CHARACTER * ( NDF__SZTYP ) ITYPE ! Numeric type for processing
-      DOUBLE PRECISION MAXCNG    ! Maximum change of value at last
-                                 ! iteration
-      INTEGER NBAD               ! Number of bad values replaced in a
-                                 ! block 
-      INTEGER NBLOCK             ! Number of blocks the array is
-                                 ! divided into for processing
+      INTEGER MNVP               ! Index of min variance value
+      INTEGER MXVP               ! Index of max variance value
+      INTEGER NBAD               ! Number of bad values replaced in a block 
+      INTEGER NBLOCK             ! Number of blocks the array is divided into 
+                                 ! for processing
       INTEGER NDFBI              ! NDF identifier for input image block
       INTEGER NDFBO              ! NDF identifier for output image block
       INTEGER NDFI               ! NDF identifier for input image
       INTEGER NDFO               ! NDF identifier for output image
       INTEGER NITER              ! Number of iterations
-      INTEGER PNTRI( 2 )         ! Pointer to the mapped data and
-                                 ! variance of the input image
+      INTEGER NVBAD              ! Number of bad variance values
+      INTEGER PNTRI( 2 )         ! Pointer to the mapped data and variance of 
+                                 ! the input image
+      INTEGER PNTRO( 2 )         ! Pointer to the mapped data and variance of 
+                                 ! the output image
       INTEGER PNTW1              ! Pointer to work space
       INTEGER PNTW2              ! Pointer to work space
       INTEGER PNTW3              ! Pointer to work space
       INTEGER PNTW4              ! Pointer to work space
-      INTEGER PNTRO( 2 )         ! Pointer to the mapped data and
-                                 ! variance of the output image
-      DOUBLE PRECISION RMSCNG    ! RMS change at last iteration
       INTEGER SDIM( NDF__MXDIM ) ! Significant NDF dimensions
-      REAL SIZE                  ! Scale length
-      INTEGER SLBND( NDIM )      ! Lower bounds of significant
-                                 ! dimensions
-      INTEGER SUBND( NDIM )      ! Upper bounds of significant
-                                 ! dimensions
+      INTEGER SLBND( NDIM )      ! Lower bounds of significant dimensions
+      INTEGER SUBND( NDIM )      ! Upper bounds of significant dimensions
       INTEGER TOTBAD             ! Total number of bad values replaced
+      LOGICAL BAD                ! Bad pixels present?
+      LOGICAL BLOCK              ! Process in blocks?
       LOGICAL VAR                ! Variance proessing?
-
+      REAL RMNV                  ! Min variance value
+      REAL RMXV                  ! Max variance value
+      REAL SIZE                  ! Scale length
 *.
 
 *  Check the inherited global status.
@@ -304,6 +309,8 @@
 
 *  Check the state of variance component of the NDF.      
       CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
+
+
 
 *  See if output NDF is to have a VARIANCE component, provided the
 *  input NDF has a variance array.
@@ -387,8 +394,56 @@
          DIM( 1 ) = DIM( SDIM( 1 ) )
          DIM( 2 ) = DIM( SDIM( 2 ) )
 
-*  Map the input and output data arrays.
+*  Map the input arrays.
          CALL NDF_MAP( NDFBI, COMP, ITYPE, 'READ', PNTRI, EL, STATUS )
+
+*  Abort if an error has occurred.
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  If variances are available in the input, check that they are not all
+*  bad or zero. If so, issue a warning and do not produce output variances.
+         IF( VAR ) THEN
+
+            IF ( ITYPE .EQ. '_REAL' ) THEN
+               CALL KPG1_MXMNR( .TRUE., EL, %VAL( PNTRI( 2 ) ), NVBAD,
+     :                          RMXV, RMNV, MXVP, MNVP, STATUS )
+
+               IF( RMXV .NE. VAL__BADR ) THEN
+                  DMXV = DBLE( RMXV )
+               ELSE
+                  DMXV = VAL__BADD
+               END IF
+
+            ELSE 
+               CALL KPG1_MXMND( .TRUE., EL, %VAL( PNTRI( 2 ) ), NVBAD,
+     :                          DMXV, DMNV, MXVP, MNVP, STATUS )
+            END IF
+
+*  If an error occurred above (eg if all variance values are bad), annull
+*  the error and ignore the variances. 
+            IF( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               VAR = .FALSE.
+
+*  Otherwise, check the maximum variance value is greater than zero.
+            ELSE IF( DMXV .EQ. VAL__BADD .OR. DMXV .EQ. 0.0 ) THEN
+               VAR = .FALSE.
+            END IF
+
+*  If we are ignoring variances, warn the user.
+            IF( .NOT. VAR ) THEN
+               CALL MSG_BLANK( STATUS )
+               CALL MSG_OUT( ' ','FILLBAD: Warning - all input '//
+     :                    'variances are zero or bad and will not be '//
+     :                    'used. No output variances will be created.',
+     :                    STATUS )
+               CALL MSG_BLANK( STATUS )
+               COMP = 'Data'
+
+            END IF
+         END IF
+
+*  Map the output arrays.
          CALL NDF_MAP( NDFBO, COMP, ITYPE, 'WRITE', PNTRO, EL, STATUS )
 
 *  Create and map work space for the filtering.
