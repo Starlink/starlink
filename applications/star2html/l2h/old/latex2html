@@ -4653,16 +4653,26 @@ sub add_child_links {
 	}
 
 	if (%open) {
-	# close-off any remaining <UL> lists
-	    local $cnt = (split('/',%open))[0];
+            # close-off any remaining <UL> lists
+            # PWD: next line was:
+            #
+            #     local $cnt = (split('/',%open))[0];
+            #
+            # but that fails for some Perls (hashing function changed?). The
+            # intention is to get the size of the hash, but it returns the 
+            # number of used buckets which is only guaranteed to be less than
+            # equal, for the keys given it's less.
+            local $cnt = 0 + scalar keys( %open );
 	    local $i = $cnt;
-		while ($i > $depth) {
-		    if ($open{$i}) {
-			$_ .= "</UL>";
-			delete $open{$i};
-		    }
-		$i-- }
-	}
+
+            while ($i > $depth) {
+              if ($open{$i}) {
+                $_ .= "</UL>";
+                delete $open{$i};
+              }
+              $i--;
+            }
+          }
     }
     $_ = join('', $_, "\n$childlinks_end") if ($_);
     $_;
