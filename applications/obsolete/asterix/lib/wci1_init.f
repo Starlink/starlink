@@ -98,7 +98,8 @@
 
 *  External References:
       EXTERNAL			ADI_REQPKG
-      EXTERNAL                  WCI1_READHDS
+      EXTERNAL                  WCI1_READ
+      EXTERNAL                  WCI1_WRITE
       EXTERNAL			WCI2_WRITFIT
 
 *  Local variables:
@@ -115,7 +116,9 @@
         CALL ADI_REQPKG( 'wcs', STATUS )
 
 *    Define the methods
-        CALL ADI_DEFMTH( 'ReadWCS(HDSfile)', WCI1_READHDS, DID, STATUS )
+        CALL ADI_DEFMTH( 'ReadWCS(HDSfile)', WCI1_READ, DID, STATUS )
+        CALL ADI_DEFMTH( 'WriteWCS(HDSfile,Pixellation,Projection,'/
+     :                   /'CoordSystem)', WCI1_WRITE, DID, STATUS )
         CALL ADI_DEFMTH( 'WriteWCS(FITSfile,Pixellation,Projection,'/
      :                   /'CoordSystem)', WCI2_WRITFIT, DID, STATUS )
 
