@@ -94,8 +94,6 @@
          gdset $device \\
          gdclear \\
          paldef \\
-      else
-         kappa
       endif
 
 #  Try to locate the object specification file. If this does not exists
@@ -160,17 +158,12 @@
       set ndfs = ( $ndfs data-2a data-2b data-2c )
 
 #  Get the AST file describing the relative positions of images on the 
-#  focal plane of the notional instrument.  If it does not exist, then
-#  sneakily create it from the data we have.
-      set astfile=CCDTEST.AST
+#  focal plane of the notional instrument.
       if ( -e $astfile ) then
          'rm' $astfile
       endif
       if ( -e $CCDPACK_DIR/$astfile ) then
          cp $CCDPACK_DIR/$astfile ./
-      else
-         astexp in='data-1?' idtype=fitsid fitsid=iseq astfile=$astfile accept \
-            >& /dev/null
       endif
 
       echo " "
@@ -183,10 +176,13 @@
       echo "  necessary.  We will use this as an aid to registration, but where"
       echo "  possible alignment will be done by object matching."
       echo " "
-      echo "  We set the Domain of the Current frames of NDFs from the two"
-      echo "  exposures to different values, since coordinates refer to the"
-      echo "  notional instrument's focal plane, which has moved between the"
-      echo "  two."
+      echo "  While importing the alignment information, we use the knowledge"
+      echo "  the camera was rotated by 180 degrees to import the second set"
+      echo "  of data rotated."
+      echo " "
+      echo "  The domain of each set of observations is assigned a different"
+      echo "  name since the camera was moved, so that the coordinates of"
+      echo "  first observation are not the same as those of the second."
       echo " "
       astimp \
          in='data-1?' \
@@ -198,24 +194,9 @@
          in='data-2?' \
          astfile=$astfile \
          indomain=set2 \
+         rot=180 \
          accept
 #     end astimp
-
-      echo " "
-      echo "  Since we know that the instrument has been rotated by 180 degrees"
-      echo "  between exposures, we add a new frame to the WCS components"
-      echo "  which is identical to the instrument alignment plane for the"
-      echo "  first set, and rotated for the second set.  Before object "
-      echo "  identification is attempted by FINDOFF the images must have"
-      echo "  the same orientation, although not necessarily the correct"
-      echo "  translational alignment."
-      echo " "
-      wcsadd data-1a set1 provisional 
-      wcsadd data-1b set1 provisional
-      wcsadd data-1c set1 provisional
-      wcsadd data-2a set2 provisional '[0,-1,0,0,0,-1]'
-      wcsadd data-2b set2 provisional '[0,-1,0,0,0,-1]'
-      wcsadd data-2c set2 provisional '[0,-1,0,0,0,-1]'
 
 #  If display capability is enabled then display the data frames.
       if ( "$device" != "NONE" ) then
@@ -348,50 +329,50 @@
       echo " "
       echo "  Not all of the images could be registered by object matching, so"
       echo "  there is no single domain in which they can all be aligned."
-      echo "  However, by using the information in the WCS component"
-      echo "  (the frames with domains SET1 and SET2 inserted using ASTIMP"
-      echo "  as well as the frames with domain CCD_REG just added to some"
-      echo "  of them by REGISTER) it is possible to find an aligment of all"
-      echo "  of them.  The task WCSREG tries to register all the images"
-      echo "  making the best use of information in the WCS component that"
-      echo "  it can."
+      echo "  However, by using the information in the WCS component it is"
+      echo "  possible to find an aligment of all of them.  The task WCSREG"
+      echo "  makes the best alignment it can; in this case it aligns using"
+      echo "  the CCD_REG frame (inserted by the object matching) if it "
+      echo "  exists, and if not, uses the SET1 or SET2 frames, which describe"
+      echo "  what is known about the geometry of the camera."
       echo " "
       wcsreg \
          in='data-??' \
          domains='[ccd_reg,set1,set2]' \
          accept
 #     end wcsreg
+
+      echo " "
+      echo "  Write the alignment we have found to an exported AST file."
+      echo "  This contains information about the relative positions of"
+      echo "  the CCDs in the mosaic camera, and could be used to process"
+      echo "  future data sets."
+      astexp \
+         in='data-1?' \
+         astfile=ccdtest_out.ast \
+         idtype=fitsid \
+         fitsid=ISEQ \
+         outdomain=TEST_DATA \
+         accept
+#     end astexp
         
 #  Resample the data.
       echo " "
       echo "  The reduced NDFs will now be resampled to the same coordinate"
-      echo "  system. After this is performed they can then be combined"
-      echo "  (after determining normalising scale and zero points which "
-      echo "  take into account any variations in sky transparency and "
-      echo "  exposure time) into a single frame which shows the complete"
-      echo "  data coverage for the target area."
+      echo "  system."
       echo " "
-# Until TRANNDF is rewritten to be WCS-aware, we use WCSALIGN to do more
-# or less the same job.
-#       tranndf \
-#          in='data?' \
-#          out='*|reduced|resamp|' \
-#          accept
-# #     end tranndf
-      wcsalign \
+      tranndf \
          in='data-??' \
-         out='*-align' \
-         lbnd=\! \
-         ref=\! \
+         out='*-r' \
          accept
-#     end wcsalign
+#     end tranndf
 
 #  Combine to a mosaic.
       echo " "
       echo "  The aligned images are now combined into a single mosaic."
       echo " "
       makemos \
-         in='*-align' \
+         in='data-??-r' \
 	 scale=false \
 	 zero=false \
 	 out=mosaic \
