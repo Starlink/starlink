@@ -117,7 +117,7 @@
 
 *  Extract data from the returned object
       CALL ADI_CGET0C( OARG, 'File', NAME, STATUS )
-      L = CHR_LEN(NAME)
+      NLEN = CHR_LEN(NAME)
 
 *  And destroy the result
       CALL ADI_ERASE( OARG, STATUS )
