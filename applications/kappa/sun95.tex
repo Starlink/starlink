@@ -17176,9 +17176,10 @@ KAPPA. Use ``CONTOUR CLEAR=NO'' instead.}
          KEYPOS = \_REAL (Read)
       }{
          A value giving the gap between the right hand edge of the display
-         and the left hand edge of the key (0.0 for no gap, 1.0 for the 
-         largest gap). If a key is produced, then the right hand margin 
-         specified by parameter MARGIN is ignored. {\tt [current value]}
+         and the left hand edge of the key, given as a fraction of the
+         width of the current picture. If a key is produced, then the 
+         right hand margin specified by parameter MARGIN is ignored, and
+         the value supplied for KEYPOS is used instead. {\tt [current value]}
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)

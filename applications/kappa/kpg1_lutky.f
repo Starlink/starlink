@@ -155,7 +155,7 @@
       FRM = AST_FRAME( 2, 'DOMAIN=LUTKEY', STATUS )
       CALL AST_SETC( FRM, 'LABEL(1)', LABEL, STATUS )
       CALL AST_SETC( FRM, 'SYMBOL(1)', 'VALUE', STATUS )
-      CALL AST_SETC( FRM, 'SYMBOL(2)', 'WIDTH', STATUS )
+      CALL AST_SETC( FRM, 'SYMBOL(2)', 'OFFSET', STATUS )
 
 *  Add the annotation Frame into the Plot using a UnitMapping to connect it 
 *  the GRAPHICS (Base) Frame in the Plot. The new Frame becomes the current 

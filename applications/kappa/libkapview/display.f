@@ -156,9 +156,10 @@
 *        displaying the image. [TRUE]
 *     KEYPOS = _REAL (Read)
 *        A value giving the gap between the right hand edge of the display
-*        and the left hand edge of the key (0.0 for no gap, 1.0 for the 
-*        largest gap). If a key is produced, then the right hand margin 
-*        specified by parameter MARGIN is ignored. [current value]
+*        and the left hand edge of the key, given as a fraction of the
+*        width of the current picture). If a key is produced, then the 
+*        right hand margin specified by parameter MARGIN is ignored, and
+*        the value supplied for KEYPOS is used instead. [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        for the key (see parameter KEY). 
@@ -626,6 +627,7 @@
       REAL GLBND( NDIM )       ! Low grid co-ord bounds of PGPLOT window
       REAL GUBND( NDIM )       ! High grid co-ord bounds of PGPLOT window
       REAL KEYPOS              ! Horizontal position of key
+      REAL KWID                ! Width to reserve for the KEY (if any)
       REAL LUT( NPRICL, 0:MXLUTE ) ! Lookup table
       REAL MARGIN( 4 )         ! Width of margins round DATA picture
       REAL OPLBND( NDIM )      ! Low pixel co-ord bounds of NDF overlap
@@ -732,8 +734,34 @@
 *  If so, see how large a gap is required between the DATA picture and
 *  the key. This replaces the MARGIN value for the right hand edge.
       IF( KEY ) THEN
-         CALL PAR_GET0R( 'KEYPOS', KEYPOS, STATUS )
+         CALL PAR_GDR0R( 'KEYPOS', 0.0, 0.0, 0.99 - MARGIN( 4 ) - KW, 
+     :                   .FALSE., KEYPOS, STATUS )
          MARGIN( 2 ) = KEYPOS
+         KWID = KW
+      ELSE
+         KWID = 0.0
+      END IF
+
+*  Report an error if the margins do not leave any room for the DATA
+*  picture.
+      IF( ( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) .LE. 0.005 .OR.
+     :      1.0 - MARGIN( 2 ) - MARGIN( 4 ) - KWID .LE. 0.005 ) .AND. 
+     :    STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+
+         IF( KEY ) THEN
+            CALL ERR_REP( 'DISPLAY_ERR5', 'No room left for the DATA '//
+     :                    'picture (try reducing the size of the '//
+     :                    'margins or key - see parameters MARGIN '//
+     :                    'and KEYPOS).', STATUS )
+         ELSE 
+            CALL ERR_REP( 'DISPLAY_ERR4', 'No room left for the DATA '//
+     :                    'picture (try reducing the size of the '//
+     :                    'margins - see parameter MARGIN).', STATUS )
+         END IF
+
+         GO TO 999
+
       END IF
 
 *  Determine the section of the supplied NDF to be displayed.
@@ -785,13 +813,8 @@
 
 *  Now find the aspect ratio of the available space (i.e. the current
 *  picture minus the margins). 
-      IF( KEY ) THEN
-         ASP0 = ( ( Y2 - Y1 )*( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) ) ) /
-     :          ( ( X2 - X1 )*( 1.0 - MARGIN( 2 ) - MARGIN( 4 ) - KW ) ) 
-      ELSE
-         ASP0 = ( ( Y2 - Y1 )*( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) ) ) /
-     :          ( ( X2 - X1 )*( 1.0 - MARGIN( 2 ) - MARGIN( 4 ) ) ) 
-      END IF
+      ASP0 = ( ( Y2 - Y1 )*( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) ) ) /
+     :       ( ( X2 - X1 )*( 1.0 - MARGIN( 2 ) - MARGIN( 4 ) - KWID ) ) 
 
 *  Get the aspect ratio of the supplied data array.
       ASPD = REAL( DIMS( 2 ) )/ REAL( DIMS( 1 ) )
