@@ -2818,7 +2818,7 @@ AstObject *astInitObject_( void *mem, size_t size, int init,
 
 /* Zero the entire new Object structure (to prevent accidental re-use
    of any of its values after deletion). */
-      (void) memset( new, 0, new->size );
+      (void) memset( new, 0, size );
 
 /* If necessary, initialise the virtual function table. */
 /* ---------------------------------------------------- */
