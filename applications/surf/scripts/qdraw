@@ -46,6 +46,9 @@ foreach $arg (@ARGV) {
 # Check for file
 
 if ($#ndfs > -1) {
+
+# Setup ndf environment
+  ndf_begin;
  
 # If there are more than one possible files given, loop through and
 # take the first one that exists.
@@ -79,6 +82,10 @@ if ($#ndfs > -1) {
     print "No NDFs were found named: ",join(" ",@ndfs),"\n";
     exit;
   }
+
+  # Close ndf
+  ndf_end($status);
+
 } else {
   print "\tUsage: qdraw [par=] file\n";
   exit;
