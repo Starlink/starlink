@@ -23,7 +23,7 @@
 *     The information needed to create the FrameSet can be stored several
 *     times in a single FITS header, using different keywords each time. Each
 *     of these descriptions is known as an "encoding" and AST supports several
-*     different encoding schemes (i.e. FITS-WCS, FITS-IRAF, DSS, NATIVE).
+*     different encoding schemes (i.e. FITS-WCS, FITS-IRAF, DSS, NATIVE, etc).
 *     If the supplied FITS header contains more than one encoding then we
 *     need to choose which one to use. This decision is important because
 *     is is possible for encodings to be inconsistent (i.e. software may

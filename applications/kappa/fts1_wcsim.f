@@ -85,6 +85,8 @@
 *        deleted if the FITS header has no WCS information of any sort.
 *     9-DEC-1998 (DSB):
 *        Modified to include references to the FITS-IRAF encoding.
+*     18-APR-2000 (DSB):
+*        Added FITS-PC and FITS-AIPS encodings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,7 +114,7 @@
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of non-native AST encodings.
-      PARAMETER ( DEFNCD = 3 )
+      PARAMETER ( DEFNCD = 5 )
 
 *  External References:
       LOGICAL FTS1_WCSDF
@@ -141,7 +143,8 @@
       INTEGER TMPF               ! Template 2D Frame
 
 *  Store names of non-native AST encodings to use.
-      DATA ASTCOD / 'DSS', 'FITS-IRAF', 'FITS-WCS' /
+      DATA ASTCOD / 'FITS-WCS', 'DSS', 'FITS-IRAF', 'FITS-PC', 
+     :              'FITS-AIPS' /
 *.
 
 *  Check inherited global status.

@@ -84,30 +84,63 @@
 *        prefix.
 *     ENCODINGS = LITERAL (Read)
 *        Determines which FITS keywords should be used to define the
-*        world co-ordinate information stored in NDF's WCS component.  
-*        The allowed values (case-insensitive) are:
+*        world co-ordinate systems to be stored in the NDF's WCS 
+*        component.  The allowed values (case-insensitive) are:
 *
-*        - "FITS-IRAF" --- This uses keywords CRVALi, CRPIXi, CDiiijjj,
-*           CDi_j, etc., and is the system used by IRAF.
-*           
-*        - "FITS-WCS" -- This uses keywords CRVALi, CDELTi, CRPIXi,
-*           PCiiijjj, etc., as described in the (draft) FITS world
-*           co-ordinate system paper by E.W.Greisen and M.Calabretta
-*           (A & A, in preparation).
-*	    
-*        - "DSS" -- This is the system used by the Digital Sky Survey,
-*           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
-*	    
-*        - "Native" -- This is the native system used by the AST library
-*           (see SUN/210), and is the most general.  The others are
-*           limited in the co-ordinate systems they can describe, and
-*           may thus not fully describe the NDF's WCS component.
+*        "FITS-IRAF" --- This uses keywords CRVALi CRPIXi, CDi_j, and is the
+*           system commonly used by IRAF. It is described in the document
+*           "World Coordinate Systems Representations Within the FITS Format" 
+*           by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
+*           fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. 
 *
-*        A comma-separated list of up to three values may be supplied,
+*        "FITS-WCS" --- This is the proposed FITS standard WCS encoding scheme
+*           described in the paper "Representation of celestial coordinates 
+*           in FITS" (http://www.cv.nrao.edu/fits/documents/wcs/wcs.html).
+*           It is very similar to FITS-IRAF but supports a wider range of
+*           projections and co-ordinate systems. Once the standard has been 
+*           agreed, this encoding should be understood by any FITS-WCS 
+*           compliant software and it is likely to be adopted widely for FITS 
+*           data in future. 
+*
+*        "FITS-PC" --- This uses keywords CRVALi, CDELTi, CRPIXi, PCiiijjj, 
+*           etc, as described in a previous (now superceded) draft of the 
+*           above FITS world co-ordinate system paper by E.W.Greisen and 
+*           M.Calabretta.
+*
+*        "FITS-AIPS" --- This uses conventions described in the document
+*           "Non-linear Coordinate Systems in AIPS" by Eric W. Greisen 
+*           (revised 9th September, 1994), available by ftp from 
+*           fits.cv.nrao.edu /fits/documents/wcs/aips27.ps.Z. It is currently 
+*           employed by the AIPS data analysis facility, so its use will 
+*           facilitate data exchange with AIPS. This encoding uses CROTAi 
+*           and CDELTi keywords to describe axis rotation and scaling.
+*
+*        "DSS" --- This is the system used by the Digital Sky Survey, and 
+*           uses keywords AMDXn, AMDYn, PLTRAH, etc.
+*
+*        "NATIVE" --- This is the native system used by the AST library (see
+*           SUN/210) and provides a loss-free method for transferring WCS
+*           information between AST-based application. It allows more
+*           complicated WCS information to be stored and retrieved than any of 
+*           the other encodings.
+*
+*        A comma-separated list of up to six values may be supplied,
 *        in which case the value actually used is in the first in the
 *        list for which corresponding keywords can be found in the FITS
-*        header. If a null parameter value (!) is supplied, the encoding
-*        is chosen automatically on the basis of the available headers. [!]
+*        header.
+*        
+*        A FITS header may contain keywords from more than one of these
+*        encodings, in which case it is possible for the encodings to
+*        be inconsistent with each other.  This may happen for instance
+*        if an application modifies the keyword associated with one
+*        encoding but fails to make equivalent modifications to the
+*        others.  If a null parameter value (!) is supplied for
+*        ENCODINGS, then an attempt is made to determine the most
+*        reliable encoding to use as follows.  If both native and
+*        non-native encodings are available, then the first non-native
+*        encoding to be found which is inconsistent with the native
+*        encoding is used.  If all encodings are consistent, then the
+*        native encoding is used (if present). [!]
 *     FILES() = LITERAL (Read)
 *        A list of (optionally wild-carded) file specifications which
 *        identify the disc-FITS files to be processed.  Up to 10 values
@@ -313,6 +346,8 @@
 *     9-JUN-1999 (DSB):
 *        Remove use of non-standard RECORDTYPE option in INQUIRE
 *        statements, and READONLY in OPEN statements.
+*     11-APR-2000 (DSB):
+*        Added FITS-PC and FITS-AIPS WCS encodings.
 *     {enter_further_changes_here}
 
 *  Bugs:
