@@ -63,8 +63,8 @@
 *          function declarations.  The Tru64 Unix C compiler's "-protois" 
 *          flag is useful for identifying these.
 *
-*     The program tries to adjust spacing so that the output looks OK.
-*     It currently does not cope will with tab characters however.
+*     The program tries to adjust padding whitespace outside comments 
+*     so that the spacing of the output looks OK.
 *       
 *  Notes:
 *     Although this program behaves as a filter, it is written on
@@ -89,6 +89,9 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Macro for working out which column a tab character advances to. */
+#define tabstop(c) ( ( (c) / 8 ) * 8 + 8 )
 
 /* Local function prototypes. */
    void crepint();
@@ -561,15 +564,19 @@
 
 /* Declare local variables. */
       int arg;
+      int col0;
+      int col1;
       int done;
       int hasint;
       int hasintp;
       int i;
       int incomm;
       int j;
+      int lastspc;
       int leng = 0;
       int lost;
       int nlittok;
+      int padding;
       int skipspc;
       int t;
       int t1;
@@ -619,7 +626,8 @@
 /* Check for, and mostly change, occurences of 'int'.  
    NB. this isn't perfect - it will, incorrectly, make a substitution if
    it finds something like 'short static int'.  Such usages must be pretty 
-   rare. */
+   rare, and in any case, such erroneous substitutions will lead to 
+   syntax errors when INT_BIG=long, so will not go unnoticed. */
          if ( t == INT && tbuf[ i - 1 ].tokval != SHORT 
                        && tbuf[ i + 1 ].tokval != SHORT
                        && tbuf[ i - 1 ].tokval != LONG 
@@ -790,35 +798,87 @@
 
 /* Go through token buffer outputting the characters associated with each 
    token. */
-      skipspc = 0;
+      col0 = 0;    /* Column the input text is at */
+      col1 = 0;    /* Column the output text is at */
       for ( i = 1; i < leng; i++ ) {
          string = tbuf[ i ].string;
          strmat = tbuf[ i ].strmat;
          interp = tbuf[ i ].interp;
          c1 = 0;
          incomm = 0;
+
+/* Output the original content of one token, skipping spaces if necessary. */
          while ( c = *(string++) ) {
-            if ( c == ' ' && c1 == ' ' && skipspc && ! incomm ) {
-               skipspc--;
+
+/* Was the last character a space? */
+            lastspc = ( c1 == ' ' || c1 == '\t' );
+
+/* Are we in the semantically significant part of the token text? */
+            padding = ( string < strmat );
+
+/* We encounter a space, when we need to skip space. */
+            if ( col1 > col0 && ! incomm && padding && c == ' ' && lastspc ) {
+               col0++;
             }
+
+/* We encounter a tab, when we need to skip space. */
+            else if ( c == '\t' && tabstop( col1 ) > tabstop( col0 ) 
+                                              && padding && ! incomm ) {
+               col0 = tabstop( col0 );
+               if ( ! lastspc ) {
+                  putchar( ' ' );
+                  col1++;
+               }
+            }
+
+/* We encounter any other character, or we do not need to skip space. */
             else {
                putchar( c );
-               if ( c == '\n' || c == '\t' ) skipspc = 0;
-               if ( string < strmat ) {
+               switch ( c ) {
+                  case '\n':
+                  case '\r':
+                  case '\f':
+                     col0 = 0;
+                     col1 = 0;
+                     break;
+                  case '\t':
+                     col0 = tabstop( col0 );
+                     col1 = tabstop( col1 );
+                     break;
+                  default:
+                     col0++;
+                     col1++;
+               }
+               if ( padding ) {
                   if ( c1 == '/' && c == '*' ) incomm = 1;
                   if ( c1 == '*' && c == '/' ) incomm = 0;
                }
             }
             c1 = c;
          }
+
+/* Output interpolated content associated with the token, recording how
+   much space this means we would like to skip in subsequent tokens. */
          if ( interp ) {
             while ( c = *(interp++) ) {
                putchar( c );
-               skipspc = ( c == '\n' ) ? 0 : skipspc + 1;
+               switch( c ) {
+                  case '\n':
+                  case '\r':
+                  case '\f':
+                     col1 = 0;
+                     break;
+                  case '\t':
+                     col1 = tabstop( col1 );
+                     break;
+                  default:
+                     col1++;
+               }
             }
          }
       }
    }
+
 
 
 
