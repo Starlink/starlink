@@ -136,6 +136,7 @@
 
       INTEGER			DIMS(ADI__MXDIM)	! Dimensions
       INTEGER			NDIM			! Dimensionality
+      INTEGER			I
 
       LOGICAL			DIDCRE			! Did we create cache
 							! object?
@@ -361,6 +362,10 @@ c     LOGICAL			ISBIND			! Binned dataset
                 CALL ADI_CGET0C( CACHEID, 'Comment', UNITS, STATUS )
                 IF ( INDEX( UNITS, 'deg' ) .GT. 0 ) THEN
                   UNITS = 'degrees'
+                ELSE IF ( INDEX( UNITS, 'pix' ) .GT. 0 ) THEN
+                  UNITS = 'pixels'
+                ELSE
+                  UNITS = 'pixels'
                 END IF
               ELSE
                 UNITS = 'pixels'
