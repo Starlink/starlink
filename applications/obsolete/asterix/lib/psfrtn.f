@@ -2767,6 +2767,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    History :
 *
 *     23 Dec 93 : Original (DJA)
+*     13 Jun 95 : Return absolute value of min(dx,dy) for granularity in
+*                 rectangular case (DJA)
 *
 *    Type definitions :
 *
@@ -2824,7 +2826,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         IF ( RF_RADIAL(SLOT) ) THEN
           CALL ARR_COP1R( 1, RF_SCALE(3,SLOT), DATA, STATUS )
         ELSE
-          CALL ARR_COP1R( 1, MIN(RF_SCALE(3,SLOT),RF_SCALE(4,SLOT)),
+          CALL ARR_COP1R( 1,
+     :                    ABS(MIN(RF_SCALE(3,SLOT),RF_SCALE(4,SLOT))),
      :                    DATA, STATUS )
         END IF
 
