@@ -85,6 +85,7 @@
                                  /* language or graphics interfaces. */
 char **astStringArray_( const char *, int, int );
 char *astString_( const char *, int );
+int astSscanf_( const char *str, const char *format, ...);
 size_t astSizeOf_( void * );
 void *astFree_( void * );
 void *astGrow_( void *, int, size_t );
