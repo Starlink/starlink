@@ -1,4 +1,4 @@
-<!SGML  "ISO 8879:1986"
+<!SGML  "ISO 8879:1986 (WWW)"
 --
 	SGML Declaration for Starlink DTDs
 
@@ -76,6 +76,10 @@ SYNTAX
                   NAMECASE GENERAL NO
                            ENTITY  NO
          DELIM    GENERAL  SGMLREF
+                  --
+                  NESTC "/"
+                  NET ">"
+                  --
                   SHORTREF SGMLREF
 		"&#RS;*+"
 		"&#RS;*-"
@@ -98,7 +102,35 @@ FEATURES
     DATATAG  NO
     OMITTAG  YES
     RANK     NO
-    SHORTTAG YES
+    SHORTTAG 		-- Modify the short tag rules to allow
+			   XML-style null end tags.  These require
+			   changes to the NET and NESTC delimiters
+			   above.  For a clear discussion, see
+			   http://www.sgml.u-net.com/book/sgml-9.htm#NET
+			   --
+      STARTTAG
+        EMPTY NO
+        UNCLOSED NO
+        NETENABL ALL
+      ENDTAG
+        EMPTY YES
+        UNCLOSED NO
+      ATTRIB
+        DEFAULT YES
+        OMITNAME YES
+        VALUE YES
+			-- The following declarations are for
+			   completeness.  They are all (I think) the
+			   defaults, and the same as the corresponding
+			   declarations in the XML declaration.
+			   --
+    EMPTYNRM YES
+    IMPLYDEF
+      ATTLIST NO
+      DOCTYPE NO
+      ELEMENT NO
+      ENTITY NO
+      NOTATION NO
   LINK
     SIMPLE   NO
     IMPLICIT NO

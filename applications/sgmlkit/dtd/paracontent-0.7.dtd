@@ -272,7 +272,7 @@
      guarantee that this is precisely what the stylesheets do (check
      them), but this at least documents the intent.
      -->
-<!ELEMENT ref %MXO; EMPTY>
+<!ELEMENT ref %MXO; (#PCDATA)>
 		<!-- Internal cross reference, with effective content
 		     to be title of target --> 
 <!ATTLIST ref
