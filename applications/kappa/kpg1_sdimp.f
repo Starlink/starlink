@@ -29,7 +29,7 @@
 *        The NDF identifier.
 *     NDIM = INTEGER (Given)
 *        The desired number of dimensions.
-*     DIMV( NDF__MXDIM ) = INTEGER (Returned)
+*     DIMV( NDIM ) = INTEGER (Returned)
 *        The significant dimensions i.e. the ones that are greater than
 *        one.  There is an execption when there are fewer than NDIM
 *        present in the NDF, whereupon this array includes in dimension
@@ -42,11 +42,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1992 December 21 (MJC):
 *        Original version.
+*     15-JUN-1998 (DSB):
+*        Avoid addressing DIMV outside range [1-NDIM]
 *     {enter_changes_here}
 
 *  Bugs:
@@ -68,7 +71,7 @@
 
 *  Arguments Returned:
       INTEGER
-     :  DIMV( NDF__MXDIM )
+     :  DIMV( NDIM )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -106,7 +109,7 @@
          SIGDIM = 0
 
 * Initialise the significant dimensions.
-         DO I = 1, ACTDIM
+         DO I = 1, NDIM
             DIMV( I ) = 0
          END DO
 
@@ -120,7 +123,7 @@
                SIGDIM = SIGDIM + 1
 
 *  Record the dimension.
-               DIMV( SIGDIM ) = I
+               IF( SIGDIM .LE. NDIM ) DIMV( SIGDIM ) = I
             END IF
          END DO
 
