@@ -80,7 +80,7 @@
 *  Find the height and width of the screen.  Use the full screen area.
 *  A zero or negative LBOT (which occurs when there is an error) will
 *  suppress paging.
-      CALL IRM1_SCRSZ( WIDTH, MCM_LBOT, STATUS )
+      CALL ONE_SCRSZ( WIDTH, MCM_LBOT, STATUS )
       MCM_LTOP = 1
 
 *  Reset the line count.
