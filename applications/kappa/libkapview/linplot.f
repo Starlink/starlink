@@ -395,6 +395,9 @@
 *  History:
 *     1-OCT-1998 (DSB):
 *        Original AST version, based on earlier version by MJC.
+*     8-DEC-1998 (DSB):
+*        Use the 1st *significant* axis when accessing AXIS structures using
+*        NDF_A routines.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -746,8 +749,8 @@
 *  Map the required NDF arrays, and get some work space.
 *  =====================================================
 *  Map the NDF AXIS centre values in double precision.
-      CALL NDF_AMAP( INDF, 'CENTRE', 1, '_DOUBLE', 'READ', IPXDAT,
-     :               EL, STATUS ) 
+      CALL NDF_AMAP( INDF, 'CENTRE', SDIM( 1 ), '_DOUBLE', 'READ', 
+     :               IPXDAT, EL, STATUS ) 
 
 *  Allocate work space to hold the corresponding values to be displayed
 *  on the horizontal axis of the Plot.
@@ -759,12 +762,12 @@
       IF( .NOT. ERRBAR ) THEN
          XVAR = .FALSE.
       ELSE
-         CALL NDF_ASTAT( INDF, 'VARIANCE', 1, XVAR, STATUS ) 
+         CALL NDF_ASTAT( INDF, 'VARIANCE', SDIM( 1 ), XVAR, STATUS ) 
       END IF
 
 *  If X axis variance values are required map them. 
       IF( XVAR ) THEN
-         CALL NDF_AMAP( INDF, 'VARIANCE', 1, '_DOUBLE', 'READ', 
+         CALL NDF_AMAP( INDF, 'VARIANCE', SDIM( 1 ), '_DOUBLE', 'READ', 
      :                  IPXVAR, EL, STATUS ) 
 
 *  See how many standard deviations are to be used for a horizontal error bar.
@@ -791,8 +794,8 @@
       IF( IMODE .EQ. 4 ) THEN
 
 *  Map the axis widths.
-         CALL NDF_AMAP( INDF, 'WIDTH', 1, '_DOUBLE', 'READ', IPAWID,
-     :                  EL, STATUS ) 
+         CALL NDF_AMAP( INDF, 'WIDTH', SDIM( 1 ), '_DOUBLE', 'READ', 
+     :                  IPAWID, EL, STATUS ) 
 
 *  Allocate work space to hold the upper and lower limits of each horizontal
 *  step on the displayed horizontal axis.
