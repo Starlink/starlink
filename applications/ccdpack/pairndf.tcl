@@ -122,7 +122,7 @@
                          -title "PAIRNDF chooser" \
                          -watchstate choosestate \
                          -validpair [ code pairok %A %B ] \
-                         -viewport [ list [ expr $PREVX * 2 ] $PREVY ] \
+                         -viewport [ list $PREVX $PREVY ] \
                          -percentiles [ list $PERCLO $PERCHI ]
 
 #  Create an exit confirmation widget which may or may not be used.
