@@ -27,6 +27,9 @@
  *      Modified ajc  5/3/99
  *         Allow lines up to 256 characters and correct editing for long
  *         lines. Works with xterm and dumb terms and various between.
+ *      Modified timj 28/3/05
+ *         Tweak ncurses discovery.
+ *         Fix compiler warnings
  *
  * This is the routine used by ADAM tasks to read input in response to
  * parameter prompts when running from the shell.
@@ -45,6 +48,8 @@
 
 #if HAVE_CURSES_H
 # include <curses.h>
+#elif HAVE_NCURSES_H
+# include <ncurses.h>
 #elif HAVE_CURSESX_H
 # include <cursesX.h>
 #else
@@ -57,6 +62,7 @@
 #elif HAVE_NCURSES_TERM_H
 #include <ncurses/term.h>
 #endif
+#include <ctype.h>
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -66,6 +72,8 @@
 #include <errno.h>
 #include <setjmp.h>
 #include <glob.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 /* Own include files */
 #include "f77.h"
 
@@ -193,7 +201,7 @@ void
 addtorecall(char *line)
 {
     char *txt;
-    int len, tlen;
+    int len;
 
     inc_recall();
     recall_p = recall;
@@ -833,17 +841,12 @@ int nexts;
 void 
 keyboard_input(void)
 {
-    int status, readret, inputavailable, worker, worker1;
+    int readret, inputavailable, worker, worker1;
     char readbuff[255], *w;
     char combuff[256];
-    char *cp;
     char *result;
     fd_set infds;
     struct timeval time;
-    glob_t filelist;
-    int globflags=0;
-    char **fp;
-    int nfiles, nmatch;
     int i;
     int save_cpos, save_epos;
 /*
@@ -1430,7 +1433,7 @@ void
 initscreen(int nolines)
 {
     char ch;
-    int i, nochars;
+    int i;
     struct sigaction act;
 
 /*
@@ -1616,8 +1619,6 @@ F77_SUBROUTINE(icl_reada)( CHARACTER(fpr1), INTEGER(len1),
                            CHARACTER(fdflt), INTEGER(deflen)
                            TRAIL(fpr1) TRAIL(fpr2) TRAIL(fval) ) {
  
-    int status, message_status, message_context;
-    int i;
     fd_set infds;
     /* sleep(20); * Debug! */
 

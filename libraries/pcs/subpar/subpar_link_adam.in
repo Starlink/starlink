@@ -32,6 +32,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -47,6 +48,8 @@
 #        Add curses library for MISC
 #     16-AUG-2001 (AJC):
 #        Remove -ladam_adam -lmessys_adam 
+#     28-MAR-2005 (TIMJ):
+#        Curses library inserted by autoconf
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -61,7 +64,7 @@
            -lsock \
            -latimer \
            -lmisc_adam \
-           -lcurses \
+           @CURSES_LIB@ \
            -lstring_adam \
            `hds_link_adam` \
            `hlp_link_adam` \

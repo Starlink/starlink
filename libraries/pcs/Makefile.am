@@ -26,7 +26,7 @@ compifl_LDADD = \
 	msp/libmsp.la \
 	misc/libmisc_adam.la \
 	sock/libsock.la \
-	-lhds -lemsf -lems -lchr -lcnf -lpsx -lhlp -lcurses
+	-lhds -lemsf -lems -lchr -lcnf -lpsx -lhlp @CURSES_LIB@
 
 # We are building libsubpar_adam.la from convenience libraries.  However,
 # the libraries contain Fortran source, and so must be assembled into

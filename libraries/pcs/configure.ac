@@ -36,8 +36,54 @@ AC_CHECK_FUNC(gethostbyname,,
 AC_CHECK_FUNC(socket,,
   AC_CHECK_LIB(socket, connect,,,-lnsl))
 
-AC_CHECK_HEADERS([curses.h cursesX.h term.h ncurses/term.h])
+dnl    Look for the term interface
+dnl    Curses header files are included in the MP_WITH_CURSES macro
+AC_CHECK_HEADERS([cursesX.h term.h ncurses/term.h])
 
+
+dnl    We need to find out whether we are looking for libcurses
+dnl    or libncurses. On SUSe libcurses is provided by the termcap
+dnl    RPM but we really want to use libncurses (ncurses-devel)
+dnl    The MP_WITH_CURSES macro comes from the Gnu autoconf macro
+dnl    archive. http://autoconf-archive.cryp.to/mp_with_curses.html
+
+AC_DEFUN([MP_WITH_CURSES],
+  [AC_ARG_WITH(ncurses, [  --with-ncurses          Force the use of ncurses over curses],,)
+   mp_save_LIBS="$LIBS"
+   CURSES_LIB=""
+   if test "$with_ncurses" != yes
+   then
+     AC_CACHE_CHECK([for working curses], mp_cv_curses,
+       [LIBS="$LIBS -lcurses"
+        AC_TRY_LINK(
+          [#include <curses.h>],
+          [chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ],
+          mp_cv_curses=yes, mp_cv_curses=no)])
+     if test "$mp_cv_curses" = yes
+     then
+       AC_DEFINE(HAVE_CURSES_H, 1, [Define to 1 if you have the <curses.h> header file available])
+       CURSES_LIB="-lcurses"
+     fi
+   fi
+   if test ! "$CURSES_LIB"
+   then
+     AC_CACHE_CHECK([for working ncurses], mp_cv_ncurses,
+       [LIBS="$mp_save_LIBS -lncurses"
+        AC_TRY_LINK(
+          [#include <ncurses.h>],
+          [chtype a; int b=A_STANDOUT, c=KEY_LEFT; initscr(); ],
+          mp_cv_ncurses=yes, mp_cv_ncurses=no)])
+     if test "$mp_cv_ncurses" = yes
+     then
+       AC_DEFINE(HAVE_NCURSES_H, 1, [Define to 1 if you have the <ncurses.h> header file available])
+       CURSES_LIB="-lncurses"
+     fi
+   fi
+   LIBS="$mp_save_LIBS"
+   AC_SUBST(CURSES_LIB)
+])dnl
+
+MP_WITH_CURSES
 
 dnl    Because we build the application compifl, we need to link against
 dnl    the following components, rather than just use their include files,
@@ -73,6 +119,7 @@ AC_CONFIG_FILES([Makefile component.xml
                 subpar/Makefile task/Makefile])
 AC_CONFIG_FILES([sock/sock_link],      [chmod 755 sock/sock_link])
 AC_CONFIG_FILES([sock/sock_link_adam], [chmod 755 sock/sock_link_adam])
+AC_CONFIG_FILES([subpar/subpar_link_adam], [chmod 755 subpar/subpar_link_adam])
 
 
 AC_OUTPUT
