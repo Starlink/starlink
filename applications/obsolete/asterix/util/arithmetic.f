@@ -1,8 +1,25 @@
-*+  ARITHMETIC  - Does C = A o B
-      SUBROUTINE ARITHMETIC ( STATUS )
-*
-*    Description :
-*
+      SUBROUTINE ARITHMETIC( STATUS )
+*+
+*  Name:
+*     ARITHMETIC
+
+*  Purpose:
+*     Performs C = A o B
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL ARITHMETIC( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Performs a specified arithmetic operation on two data objects
 *     one or both of which may be primitive and stores the result in
 *     a third data object, which may be either of the two input objects
@@ -14,121 +31,192 @@
 *     primitive.
 *     If both input objects are arrays, they must have identical axes. (The
 *     axis data from the first object is propagated.)
-*
-*    Parameters :
-*
-*     INP1=UNIV(R)
-*           First input data object
-*     INP2=UNIV(R)
-*           Second input data object
-*     OUT=UNIV(U)
-*           Output data object
-*     OPER=CHAR(R)
-*           Type of operation (+,-,*,/)
-*     ERROR1=UNIV(R)
-*           error estimate for first primitive data object
-*     ERROR2=UNIV(R)
-*           error estimate for second primitive data object
-*
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*
-*     Jim Peden (BHVAD::JCMP)
-*
-*    History :
-*
-*     27 Jan 86 : V0.4-1 Modified from various programs (BHVAD::JCMP)
-*     30 Apr 86 : V0.4-2 Better error propagation (BHVAD::JCMP)
-*     16 May 86 : V0.4-3 Better condition handling (BHVAD::JCMP)
-*     14 Aug 86 : V0.5-1 Data quality handling (BHVAD::JCMP)
-*     14 Nov 86 : V0.5-2 Modified UTIL_ASSOC3 to allow ops on 2 prim objs JKD
-*      8 Jan 87 : V0.6-1 Bug fixed in quality handling for scalar divisor (TJP)
-*     13 Jan 87 : V0.6-2 Mod. to allow primitive output (TJP)
-*      4 Jun 87 : V0.6-1 Renamed ARITHMETIC V0.6-1
-*      3 May 88 : V1.0-1 Asterix88 version (BHVAD::ADM)
-*      9 Dec 89 : V1.0-2 Now uses BDA calls - code tidied (BHVAD::DJA)
-*     12 Jan 90 : V1.0-3 A few bug fixes done (BHVAD::DJA)
-*     16 Feb 90 : V1.2-1 Quality bug if none in input fixed. Now uses
-*                        quality include file QUAL_PAR (BHVAD::DJA)
-*     27 Feb 90 : V1.2-2 Variance handling fixed (RJV)
-*      1 Mar 90 : V1.2-3 Overwrite mode now works (RJV)
-*     28 May 90 : V1.2-4 Overwrite mode really does work now (honest) (DJA)
-*     10 Aug 90 : V1.2-5 Overwrite for primitive input doesn't try to
-*                        create QUALITY (RJV)
-*     10 May 91 : V1.4-0 Points with bad quality no longer operated on (DJA)
-*     23 May 91 : V1.4-1 Bug fix from above (DJA)
-*     28 May 91 : V1.4-2 Manual error more robust (DJA)
-*     25 Mar 92 : V1.6-0 Use ERR_ANNUL (DJA)
-*      9 Jul 92 : V1.6-1 Corrected erroneous ACCESS2 argument to USI_ASSOC3.
-*      2 Dec 93 : V1.7-0 Removed use of structures - was causing many problems
-*                        on Solaris (DJA).
-*      1 Mar 94 : V1.7-1 Updated handling of bit quality - now use BIT_
-*                        routines and QUAL__ constants (DJA)
-*     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
-*     12 Jan 95 : V1.8-1 Use new data interfaces (DJA)
-*      8 Aug 95 : V1.8-2 Create quality in 1st input in overwrite mode if
-*                        it exists in input2 (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Usage:
+*     arithmetic {parameter_usage}
+
+*  Environment Parameters:
+*     INP1 = CHAR (read)
+*        First input data object
+*     INP2 = CHAR (read)
+*        Second input data object
+*     OUT = CHAR (read)
+*        Output data object
+*     OVER = LOGICAL (read)
+*        Overwrite first input?
+*     OPER = CHAR (read)
+*        Type of operation (+,-,*,/)
+*     ERRORS = LOGICAL (read)
+*        Supply error objects for primitive inputs?
+*     ERROR1 = CHAR (read)
+*        Error estimate for first primitive data object
+*     ERROR2 = CHAR (read)
+*        Error estimate for second primitive data object
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     arithmetic, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     JCMP: Jim Peden( University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     27 Jan 1986 V0.4-1 (JCMP):
+*        Modified from various programs
+*     30 Apr 1986 V0.4-2 (JCMP):
+*        Better error propagation
+*     16 May 1986 V0.4-3 (JCMP):
+*        Better condition handling
+*     14 Aug 1986 V0.5-1 (JCMP):
+*        Data quality handling
+*     14 Nov 1986 V0.5-2 (JKD):
+*        Modified UTIL_ASSOC3 to allow ops on 2 prim objects
+*      8 Jan 1987 V0.6-1 (TJP):
+*        Bug fixed in quality handling for scalar divisor
+*     13 Jan 1987 V0.6-2 (TJP):
+*        Mod. to allow primitive output
+*      4 Jun 1987 : V0.6-1 Renamed ARITHMETIC V0.6-1
+*      3 May 1988 V1.0-1 (ADM):
+*        Asterix88 version
+*      9 Dec 1989 V1.0-2 (ADM):
+*        Now uses BDA calls - code tidied
+*     12 Jan 1990 V1.0-3 (DJA):
+*        A few bug fixes done
+*     16 Feb 1990 V1.2-1 (DJA):
+*        Quality bug if none in input fixed. Now uses QUAL_PAR include file
+*     27 Feb 1990 V1.2-2 (RJV):
+*        Variance handling fixed
+*      1 Mar 1990 V1.2-3 (RJV):
+*        Overwrite mode now works
+*     28 May 1990 V1.2-4 (DJA):
+*        Overwrite mode really does work now (honest)
+*     10 Aug 1990 V1.2-5 (DJA):
+*        Overwrite for primitive input doesn't try to create quality
+*     10 May 1991 V1.4-0 (DJA):
+*        Points with bad quality no longer operated on
+*     23 May 1991 V1.4-1 (DJA):
+*        Bug fix from above
+*     28 May 1991 V1.4-2 (DJA):
+*        Manual error more robust
+*     25 Mar 1992 V1.6-0 (DJA):
+*        Use ERR_ANNUL
+*      9 Jul 1992 V1.6-1 (DJA):
+*        Corrected erroneous ACCESS2 argument to USI_ASSOC3.
+*      2 Dec 1993 V1.7-0 (DJA):
+*        Removed use of structures - was causing many problems on Solaris
+*      1 Mar 1994 V1.7-1 (DJA):
+*        Updated handling of bit quality - now use BIT_ and QUAL__
+*     24 Nov 1994 V1.8-0 (DJA):
+*        Now use USI for user interface
+*     12 Jan 1995 V1.8-1 (DJA):
+*        Use new data interfaces
+*      8 Aug 1995 V1.8-2 (DJA):
+*        Create quality in 1st input in overwrite mode if it exists in 2nd
+*     11 Dec 1995 V2.0-0 (DJA):
+*        ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'        ! Asterix quality definitions
-*
-*    Status :
-*
-      INTEGER STATUS
-*
-*    Functions :
-*
-      BYTE			BIT_ANDUB
-*
-*    Local constants :
-*
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      EXTERNAL                  BIT_ANDUB
+        BYTE                    BIT_ANDUB
+
+*  Local Constants:
       INTEGER			MAXTXT			! Max amount of history
         PARAMETER		( MAXTXT = 8 )
-*
-*    Local variables :
-*
+
+      CHARACTER*30              ICLS			! Input class list
+        PARAMETER		( ICLS = 'BinDS|Array|Scalar' )
+
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'ARITHMETIC Version V2.0-0' )
+
+*  Local Variables:
       CHARACTER              	OPER             	! Operation
       CHARACTER*6           	MODE             	! 'READ' or 'UPDATE'
-      CHARACTER*(ADI__SZTYP)	OUT_TYPE         	! Output array type
+      CHARACTER*40		OUT_TYPE         	! Output array type
 
       CHARACTER*80 		TEXT(MAXTXT)            ! History text
 
+      INTEGER			EID1, EID2		! External error ids
       INTEGER			FID1, FID2		! Input file ids
       INTEGER 			I			! index
+      INTEGER			IDUM(ADI__MXDIM)	! Dummy return values
+      INTEGER 			IN1_DPTR, IN2_DPTR, OUT_DPTR    ! Dataset data pointers
+      INTEGER 			IN1_DIMS(ADI__MXDIM)    ! 1st input dimensions
+      INTEGER 			IN2_DIMS(ADI__MXDIM)    ! 2nd input dimensions
+      INTEGER 			IN1_NELM, IN2_NELM, OUT_NELM    ! # elements in datasets
+      INTEGER 			IN1_NDIM, IN2_NDIM, OUT_NDIM    ! Dimensionality of datasets
+      INTEGER 			IN1_QPTR, IN2_QPTR, OUT_QPTR    ! Dataset quality pointers
+      INTEGER 			IN1_VPTR, IN2_VPTR, OUT_VPTR    ! Dataset variance pointers
+      INTEGER 			IN1_VNELM, IN2_VNELM, OUT_VNELM ! # elements in dataset variances
       INTEGER 			NAX                     ! # axes present
       INTEGER 			NBAD                    ! # new bad points
       INTEGER			NHIN			! # i/p history lines
+      INTEGER 			NIG                     ! # ignored points
       INTEGER			NLINE			! # o/p history lines
-
-      INTEGER NIG                             ! Number of ignored points
-      INTEGER IN1_DPTR, IN2_DPTR, OUT_DPTR    ! Dataset data pointers
-      INTEGER IN1_DIMS(ADI__MXDIM)            ! 1st input dimensions
-      INTEGER IN2_DIMS(ADI__MXDIM)            ! 2nd input dimensions
-      INTEGER OUT_DIMS(ADI__MXDIM)            ! Output dimensions
-      INTEGER IN1_NELM, IN2_NELM, OUT_NELM    ! # elements in datasets
-      INTEGER IN1_NDIM, IN2_NDIM, OUT_NDIM    ! Dimensionality of datasets
-      INTEGER IN1_VDIMS(ADI__MXDIM)           ! Dimensions of 1st input error
-      INTEGER IN2_VDIMS(ADI__MXDIM)           ! Dimensions of 2nd input error
-      INTEGER IN1_QPTR, IN2_QPTR, OUT_QPTR    ! Dataset quality pointers
-      INTEGER IN1_VPTR, IN2_VPTR, OUT_VPTR    ! Dataset variance pointers
-      INTEGER IN1_VNDIM, IN2_VNDIM            ! Dataset variance dimensionality
-      INTEGER IN1_VNELM, IN2_VNELM, OUT_VNELM ! # elements in dataset variances
       INTEGER			OFID			! Output file id
-      INTEGER                 	TDIMS(ADI__MXDIM)
+      INTEGER 			OUT_DIMS(ADI__MXDIM)    ! Output dimensions
       INTEGER			TID
       INTEGER			TLEN			! Length of a string
-      INTEGER                 	TNDIM
-      INTEGER			VID1, VID2		! External variance ids
 
       BYTE                    	IN1_MASK        	! 1st i/p quality mask
       BYTE                    	IN2_MASK        	! 2nd i/p quality mask
@@ -141,79 +229,79 @@
       LOGICAL                 	IN1_QOK, IN2_QOK, OUT_QOK
       LOGICAL                 	IN1_SCALAR      	! 1st input scalar?
       LOGICAL                 	IN2_SCALAR      	! 2nd input scalar?
-      LOGICAL                 IN1_UERR        ! Supplied error for input #1
-      LOGICAL                 IN2_UERR        ! Supplied error for input #1
-      LOGICAL                 IN1_VOK, IN2_VOK! Variance present in inputs?
+      LOGICAL                 	IN1_UERR        	! Supplied error for input #1
+      LOGICAL                 	IN2_UERR        	! Supplied error for input #1
+      LOGICAL                 	IN1_VOK, IN2_VOK	! Variance present in inputs?
       LOGICAL                 	OK              	! General validity test
       LOGICAL                 	OUT_PRIM        	! Output primitive?
       LOGICAL                 	OVER            	! Overwrite input file?
-      LOGICAL                 	SAME12          	! Input 1 same as 2?
-*
-*    Local data :
-*
-      CHARACTER*30            VERSION
-         PARAMETER            (VERSION = 'ARITHMETIC Version 1.8-2')
-*-
+*.
 
-*    Version id
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
-      CALL AST_INIT()
-
-*    Initialise logicals
+*  Initialise logicals
       IN1_UERR = .FALSE.
       IN2_UERR = .FALSE.
 
-*    Overwrite existing input?
+*  Overwrite existing input?
       CALL USI_GET0L( 'OVER', OVER, STATUS )
 
-*    Associate data objects
+*  Associate input data objects
       IF ( OVER ) THEN
         CALL MSG_PRNT( 'First input file will be overwritten' )
-        CALL USI_TASSOCI( 'INP1', '*', 'UPDATE', FID1, STATUS )
-        CALL USI_TASSOCI( 'INP2', '*', 'READ', FID2, STATUS )
+        CALL USI_ASSOC( 'INP1', ICLS, 'UPDATE', FID1, STATUS )
+      ELSE
+        CALL USI_ASSOC( 'INP1', ICLS, 'UPDATE', FID1, STATUS )
+      END IF
+      CALL USI_ASSOC( 'INP2', ICLS, 'READ', FID2, STATUS )
+
+*  Inputs are primitive?
+      CALL ADI_DERVD( FID1, 'BinDS', IN1_PRIM, STATUS )
+      IN1_PRIM = (.NOT. IN1_PRIM)
+      CALL ADI_DERVD( FID2, 'BinDS', IN2_PRIM, STATUS )
+      IN2_PRIM = (.NOT. IN2_PRIM)
+
+*  Get output object
+      IF ( OVER ) THEN
         OFID = FID1
       ELSE
-        CALL USI_TASSOC3('INP1','INP2','OUT','READ','READ', FID1,
-     :         FID2, OFID, SAME12, STATUS )
+        CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       END IF
-      CALL BDI_PRIM( FID1, IN1_PRIM, STATUS )
-      CALL BDI_PRIM( FID2, IN2_PRIM, STATUS )
       OUT_PRIM = IN1_PRIM
 
-*    See if errors wanted for primitive input
+*  See if errors wanted for primitive input
       IF ( IN1_PRIM .OR. IN2_PRIM ) THEN
         CALL USI_GET0L( 'ERRORS', ERRORS, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check size of input datasets
-      CALL BDI_CHKDATA( FID1, OK, IN1_NDIM, IN1_DIMS, STATUS )
+*  Check size of 1st input dataset
+      CALL BDI_CHK( FID1, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( FID1, ADI__MXDIM, IN1_DIMS, IN1_NDIM, STATUS )
       IF ( OK ) THEN
         IN1_SCALAR = ( IN1_NDIM .EQ. 0 )
-        IF ( IN1_SCALAR ) THEN
-          IN1_NELM = 1
-        ELSE
-          CALL ARR_SUMDIM( IN1_NDIM, IN1_DIMS, IN1_NELM )
-        END IF
-      ELSE
-        CALL ERR_REP( ' ', 'Bad input data - not numeric', STATUS )
-      END IF
-      CALL BDI_CHKDATA( FID2, OK, IN2_NDIM, IN2_DIMS, STATUS )
-      IF ( OK ) THEN
-        IN2_SCALAR = ( IN2_NDIM .EQ. 0 )
-        IF ( IN2_SCALAR ) THEN
-          IN2_NELM = 1
-        ELSE
-          CALL ARR_SUMDIM( IN2_NDIM, IN2_DIMS, IN2_NELM )
-        END IF
+        CALL ARR_SUMDIM( IN1_NDIM, IN1_DIMS, IN1_NELM )
       ELSE
         CALL ERR_REP( ' ', 'Bad input data - not numeric', STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Datasets must be same size or unity
+*  Check size of 2nd input dataset
+      CALL BDI_CHK( FID2, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( FID2, ADI__MXDIM, IN2_DIMS, IN2_NDIM, STATUS )
+      IF ( OK ) THEN
+        IN2_SCALAR = ( IN2_NDIM .EQ. 0 )
+        CALL ARR_SUMDIM( IN2_NDIM, IN2_DIMS, IN2_NELM )
+      ELSE
+        CALL ERR_REP( ' ', 'Bad input data - not numeric', STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Datasets must be same size or unity
       IF ( IN2_NELM .NE. IN1_NELM ) THEN
         IF ( .NOT. ( IN1_NELM .EQ.1.OR. IN2_NELM .EQ.1 ) ) THEN
           STATUS = SAI__ERROR
@@ -223,10 +311,10 @@
         END IF
       END IF
 
-*    Obtain errors and validate for first object
+*  Obtain errors and validate for first object
       IF ( IN1_PRIM ) THEN
         IF ( ERRORS ) THEN
-          CALL USI_TASSOCI( 'ERROR1', '*', 'READ', VID1, STATUS)
+          CALL USI_ASSOC( 'ERROR1', ICLS, 'READ', EID1, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             IN1_UERR = .TRUE.
             IN1_VOK = .TRUE.
@@ -236,15 +324,13 @@
           END IF
         END IF
       ELSE
-        CALL BDI_CHKVAR( FID1, IN1_VOK, IN1_VNDIM,
-     :                         IN1_VDIMS, STATUS )
+        CALL BDI_CHK( FID1, 'Variance', IN1_VOK, STATUS )
+        IN1_VNELM = IN1_NELM
       END IF
       IF ( ( STATUS .EQ. SAI__OK ) .AND. IN1_VOK ) THEN
         IF ( IN1_UERR ) THEN
-          CALL BDI_CHKVAR( VID1, IN1_VOK, IN1_VNDIM,
-     :                               IN1_VDIMS, STATUS )
+          CALL BDI_GETNEL( EID1, IN1_VNELM, STATUS )
         END IF
-        CALL ARR_SUMDIM( IN1_VNDIM, IN1_VDIMS, IN1_VNELM )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP(' ','1st object''s error data is invalid',
      :                                                   STATUS )
@@ -259,10 +345,10 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Obtain errors and validate for first second
+*  Obtain errors and validate for first second
       IF ( IN2_PRIM ) THEN
         IF ( ERRORS ) THEN
-          CALL USI_TASSOCI( 'ERROR2', '*', 'READ', VID2, STATUS )
+          CALL USI_ASSOC( 'ERROR2', ICLS, 'READ', EID2, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             IN2_VOK = .TRUE.
             IN2_UERR = IN2_VOK
@@ -272,15 +358,13 @@
           END IF
         END IF
       ELSE
-        CALL BDI_CHKVAR( FID2, IN2_VOK, IN2_VNDIM,
-     :                               IN2_VDIMS, STATUS )
+        CALL BDI_CHK( FID2, 'Variance', IN2_VOK, STATUS )
+        IN2_VNELM = IN2_NELM
       END IF
       IF ( ( STATUS .EQ. SAI__OK ) .AND. IN2_VOK ) THEN
         IF ( IN2_UERR ) THEN
-          CALL BDI_CHKVAR( VID2, IN2_VOK, IN2_VNDIM,
-     :                               IN2_VDIMS, STATUS )
+          CALL BDI_GETNEL( EID2, IN2_VNELM, STATUS )
         END IF
-        CALL ARR_SUMDIM( IN2_VNDIM, IN2_VDIMS, IN2_VNELM )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP(' ','2nd object''s error data is invalid',
      :                                                   STATUS )
@@ -294,56 +378,66 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Obtain operation type
+*  Obtain operation type
       CALL USI_GET0C( 'OPER', OPER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Select mapping mode
+*  Select mapping mode
       IF ( OVER ) THEN
-        MODE='UPDATE'
+        MODE = 'UPDATE'
       ELSE
-        MODE='READ'
+        MODE = 'READ'
       END IF
 
-*    Map first object
-      CALL BDI_MAPDATA( FID1, MODE, IN1_DPTR, STATUS )
+*  Map first object
+      CALL BDI_MAPR( FID1, 'Data', MODE, IN1_DPTR, STATUS )
       IF ( IN1_PRIM .AND. IN1_VOK ) THEN
-        CALL BDI_MAPDATA( VID1, MODE, IN1_VPTR, STATUS )
-        IF ( IN1_UERR ) THEN
-          CALL ARR_SQR1R( %VAL(IN1_VPTR), IN1_VNELM, STATUS )
-        END IF
+
+*    Map workspace
+        CALL DYN_MAPR( 1, IN1_VNELM, IN1_VPTR, STATUS )
+
+*    Load data from errors object
+        CALL BDI_GETR( EID1, 'Data', IN1_NDIM, IN1_DIMS,
+     :                   %VAL(IN1_VPTR), IDUM, STATUS )
+
+*    Square errors to create variances
+        CALL ARR_SQR1R( %VAL(IN1_VPTR), IN1_VNELM, STATUS )
+
+*  Otherwise map variance if present
       ELSE IF ( IN1_VOK ) THEN
-        CALL BDI_MAPVAR( FID1, MODE, IN1_VPTR, STATUS )
+        CALL BDI_MAPR( FID1, 'Variance', MODE, IN1_VPTR, STATUS )
+
       END IF
 
-*    And second object - always map for read
-      CALL BDI_MAPDATA( FID2, 'READ', IN2_DPTR, STATUS )
+*  And second object - always map for read
+      CALL BDI_MAPR( FID2, 'Data', 'READ', IN2_DPTR, STATUS )
       IF ( IN2_PRIM .AND. IN2_VOK ) THEN
-        CALL BDI_MAPDATA( VID2, MODE, IN2_VPTR, STATUS )
-        IF ( IN2_UERR ) THEN
-          CALL ARR_SQR1R( %VAL(IN2_VPTR), IN2_VNELM, STATUS )
-        END IF
+
+*    Map workspace
+        CALL DYN_MAPR( 1, IN2_VNELM, IN2_VPTR, STATUS )
+
+*    Load data from errors object
+        CALL BDI_GETR( EID2, 'Data', IN2_NDIM, IN2_DIMS,
+     :                   %VAL(IN2_VPTR), IDUM, STATUS )
+
+*    Square errors to create variances
+        CALL ARR_SQR1R( %VAL(IN2_VPTR), IN2_VNELM, STATUS )
+
+*  Otherwise map variance if present
       ELSE IF ( IN2_VOK ) THEN
-        CALL BDI_MAPVAR( FID2, 'READ', IN2_VPTR, STATUS )
+        CALL BDI_MAPR( FID2, 'Variance', 'READ', IN2_VPTR, STATUS )
+
       END IF
 
-*    Variance can be calculated but not available in 1st input
+*  Variance can be calculated but not available in 1st input
       IF ( OVER .AND. IN2_VOK .AND. .NOT. IN1_VOK ) THEN
-        CALL BDI_CREVAR( FID1, IN1_NDIM, IN1_DIMS, STATUS )
-        CALL BDI_MAPVAR( FID1, 'WRITE', IN1_VPTR, STATUS )
+        CALL BDI_MAPR( FID1, 'Variance', 'WRITE', IN1_VPTR, STATUS )
       END IF
 
-*    Create components in output dataset
-      IF ( .NOT. IN1_PRIM ) THEN
-        CALL BDI_TYPE( FID1, OUT_TYPE, STATUS )
-      ELSE IF ( .NOT. IN2_PRIM ) THEN
-        CALL BDI_TYPE( FID2, OUT_TYPE, STATUS )
-      ELSE IF ( IN1_PRIM ) THEN
-        CALL BDI_TYPE( FID1, OUT_TYPE, STATUS )
-      ELSE IF ( IN2_PRIM ) THEN
-        CALL BDI_TYPE( FID2, OUT_TYPE, STATUS )
-      END IF
+*  Create components in output dataset
       IF ( .NOT. OVER ) THEN
+
+*    Decide on output dimensions
         IF ( .NOT. IN1_SCALAR ) THEN
           OUT_NDIM = IN1_NDIM
           DO I = 1, ADI__MXDIM
@@ -355,22 +449,32 @@
             OUT_DIMS(I) = IN2_DIMS(I)
           END DO
         END IF
-        CALL BDI_CREDATA( OFID, OUT_NDIM, OUT_DIMS, STATUS )
-        IF ( IN1_VOK .OR. IN2_VOK ) THEN
-          CALL BDI_CREVAR( OFID, OUT_NDIM, OUT_DIMS, STATUS )
+
+*    Select basis of output
+        IF ( .NOT. IN1_PRIM ) THEN
+          CALL ADI_TYPE( FID1, OUT_TYPE, STATUS )
+        ELSE IF ( .NOT. IN2_PRIM ) THEN
+          CALL ADI_TYPE( FID2, OUT_TYPE, STATUS )
+        ELSE IF ( IN1_PRIM ) THEN
+          CALL ADI_TYPE( FID1, OUT_TYPE, STATUS )
+        ELSE IF ( IN2_PRIM ) THEN
+          CALL ADI_TYPE( FID2, OUT_TYPE, STATUS )
         END IF
+
+*    Create output interface object
+        IF ( .NOT. OVER ) THEN
+          CALL BDI_LINK( OUT_TYPE, OUT_NDIM, OUT_DIMS, 'REAL',
+     :                   OFID, STATUS )
+        END IF
+
       END IF
 
-*    Find no. output points.
-      IF (OVER) THEN
-        OUT_NELM=MAX(IN1_NELM,IN2_NELM)
-        OUT_VNELM=MAX(IN1_VNELM,IN2_VNELM)
+*  Find no. output points.
+      IF ( OVER ) THEN
+        OUT_NELM = MAX(IN1_NELM,IN2_NELM)
+        OUT_VNELM = MAX(IN1_VNELM,IN2_VNELM)
       ELSE
-        IF ( OUT_NDIM .GT. 0 ) THEN
-          CALL ARR_SUMDIM( OUT_NDIM, OUT_DIMS, OUT_NELM )
-        ELSE
-          OUT_NELM = 1
-        END IF
+        CALL ARR_SUMDIM( OUT_NDIM, OUT_DIMS, OUT_NELM )
         IF ( IN1_VNELM.EQ.0 .AND. IN2_VNELM.EQ.0 ) THEN
           OUT_VNELM = 0
         ELSE
@@ -378,39 +482,47 @@
         END IF
       END IF
 
-*    Map output dataset data
+*  Map output dataset data
       IF ( OVER ) THEN
         OUT_DPTR = IN1_DPTR
         OUT_VPTR = IN1_VPTR
       ELSE
-        CALL BDI_MAPDATA( OFID, 'WRITE', OUT_DPTR, STATUS )
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE', OUT_DPTR, STATUS )
         IF ( IN1_VOK .OR. IN2_VOK  ) THEN
-          CALL BDI_MAPVAR( OFID, 'WRITE', OUT_VPTR, STATUS )
+          CALL BDI_MAPR( OFID, 'Variance', 'WRITE', OUT_VPTR, STATUS )
         ELSE
           OUT_VNELM = 0
         END IF
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    See what input quality flags we have
-      CALL BDI_CHKQUAL( FID1, IN1_QOK, TNDIM, TDIMS, STATUS )
-      CALL BDI_CHKQUAL( FID2, IN2_QOK, TNDIM, TDIMS, STATUS )
+*  See what input quality flags we have
+      CALL BDI_CHK( FID1, 'Quality', IN1_QOK, STATUS )
+      CALL BDI_CHK( FID2, 'Quality', IN2_QOK, STATUS )
 
-*    Decide whether to set up or modify QUALITY in output dataset
+*  Decide whether to set up or modify QUALITY in output dataset
       DQD = (OPER.EQ.'/') .AND. (IN2_NELM.GT.1) .AND. .NOT. OUT_PRIM
       OUT_QOK = .FALSE.
       OUT_QPTR = 0
       OUT_MASK = QUAL__MASK
       IF ( IN1_QOK .OR. IN2_QOK .OR. DQD ) THEN
+
+*     Overwriting input?
          IF ( OVER .AND. .NOT. OUT_PRIM ) THEN
+
+*       No existing quality?
            IF ( .NOT. IN1_QOK ) THEN
 *   Create output QUALITY
-             CALL BDI_CREQUAL(FID1,IN1_NDIM,IN1_DIMS,STATUS)
-             CALL BDI_PUTMASK(FID1,QUAL__MASK,STATUS)
+             CALL BDI_PUT0UB( FID1, 'QualityMask', QUAL__MASK, STATUS )
+             CALL BDI_MAPUB( FID1, 'Quality', 'WRITE', IN1_QPTR,
+     :                       STATUS )
              CALL BDI_MAPQUAL(FID1,'WRITE',OUT_QPTR,STATUS)
              OUT_QOK = .TRUE.
+
+*       Quality exists
            ELSE
-             CALL BDI_MAPQUAL(FID1,'U',IN1_QPTR,STATUS)
+             CALL BDI_MAPUB( FID1, 'Quality', 'UPDATE', IN1_QPTR,
+     :                       STATUS )
              OUT_QPTR = IN1_QPTR
              IF ( IN2_QOK ) THEN
                CALL BDI_MAPQUAL(FID2,'READ',IN2_QPTR,STATUS)
@@ -418,51 +530,55 @@
              END IF
            END IF
 
+*     Not overwriting
          ELSE
 
-*          Create output QUALITY
-            CALL BDI_CREQUAL(OFID,OUT_NDIM,OUT_DIMS,STATUS)
-            CALL BDI_MAPQUAL( OFID,'WRITE',OUT_QPTR,STATUS )
+*       Create output QUALITY
+           CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OUT_QPTR, STATUS )
 
-            IF ( IN1_QOK ) THEN
-              CALL BDI_MAPQUAL(FID1,'READ',IN1_QPTR,STATUS)
-              CALL BDI_GETMASK( FID1, IN1_MASK, STATUS )
-            ELSE
-              IN1_MASK = QUAL__MASK
-            END IF
+*       Map 1st input quality
+           IF ( IN1_QOK ) THEN
+             CALL BDI_MAPUB( FID1, 'Quality', 'READ', IN1_QPTR, STATUS )
+             CALL BDI_GET0UB( FID1, 'QualityMask', IN1_MASK, STATUS )
+           ELSE
+             IN1_MASK = QUAL__MASK
+           END IF
 
-            IF ( IN2_QOK ) THEN
-              CALL BDI_MAPQUAL(FID2,'READ',IN2_QPTR,STATUS)
-              CALL BDI_GETMASK( FID2, IN2_MASK, STATUS )
-            ELSE
-              IN2_MASK = QUAL__MASK
-            END IF
+*       Map 2nd input quality
+           IF ( IN2_QOK ) THEN
+             CALL BDI_MAPUB( FID2, 'Quality', 'READ', IN2_QPTR, STATUS )
+             CALL BDI_GET0UB( FID2, 'QualityMask', IN2_MASK, STATUS )
+           ELSE
+             IN2_MASK = QUAL__MASK
+           END IF
 
-            OUT_MASK = BIT_ANDUB(IN1_MASK,IN2_MASK)
-            CALL BDI_PUTMASK( OFID, OUT_MASK, STATUS )
+*       Write output quality mask
+           OUT_MASK = BIT_ANDUB(IN1_MASK,IN2_MASK)
+           CALL BDI_PUT0UB( OFID, 'QualityMask', OUT_MASK, STATUS )
 
          END IF
 
       END IF
       OUT_QOK = ( OUT_QPTR .NE. 0 )
 
-*    Perform operation
+*  Perform operation
       IF ( OUT_QOK ) THEN
 
-        CALL ARITHMETIC_QUAL(OUT_NELM,IN1_QOK,%VAL(IN1_QPTR),
-     :                                IN2_QOK,%VAL(IN2_QPTR),
-     :                                   %VAL(OUT_QPTR), STATUS )
+*    Generate output quality
+        CALL ARITHMETIC_QUAL( OUT_NELM, IN1_QOK, %VAL(IN1_QPTR),
+     :         IN2_QOK, %VAL(IN2_QPTR), %VAL(OUT_QPTR), STATUS )
 
+*    Perform operation with quality
         CALL ARITHMETIC_SUMSQ( OPER, IN1_NELM, %VAL(IN1_DPTR),
-     :                           IN1_VNELM, %VAL(IN1_VPTR),
-     :                               IN2_NELM, %VAL(IN2_DPTR),
-     :                           IN2_VNELM, %VAL(IN2_VPTR),
-     :                               OUT_NELM,
+     :                         IN1_VNELM, %VAL(IN1_VPTR),
+     :                         IN2_NELM, %VAL(IN2_DPTR),
+     :                         IN2_VNELM, %VAL(IN2_VPTR),
+     :                         OUT_NELM,
      :              %VAL(OUT_QPTR), OUT_MASK,
      :         %VAL(OUT_DPTR),OUT_VNELM,%VAL(OUT_VPTR),
      :                                       NIG,NBAD,STATUS)
 
-*      Report ignored points
+*    Report ignored points
         IF ( NIG .GT. 0 ) THEN
           CALL MSG_SETI( 'NIG', NIG )
           CALL MSG_PRNT( 'WARNING : ^NIG points ignored due to'/
@@ -476,7 +592,7 @@
           END IF
         END IF
 
-*      Report new bad points
+*    Report new bad points
         IF ( NBAD .GT. 0 ) THEN
           CALL MSG_SETI( 'NBAD', NBAD )
           CALL MSG_PRNT( 'WARNING : ^NBAD new bad points due to '/
@@ -490,7 +606,7 @@
      :           %VAL(OUT_DPTR),OUT_VNELM,%VAL(OUT_VPTR),STATUS)
       END IF
 
-*    Transfer ancillary info
+*  Transfer ancillary info
       IF ( .NOT. OVER ) THEN
         IF ( .NOT. ( IN1_PRIM .AND. IN2_PRIM ) ) THEN
           IF ( IN1_PRIM ) THEN
@@ -499,25 +615,24 @@
             TID = FID1
           END IF
 
-*        Copy top level text
-          CALL BDI_COPTEXT( TID, OFID, STATUS )
+*      Copy top level text
+          CALL BDI_COPY( TID, 'Title,Label,Units', OFID, ' ', STATUS )
 
-*        Copy axis data
-          CALL BDI_CHKAXES( TID, NAX, STATUS )
-          IF ( NAX .GT. 0 ) THEN
-            CALL BDI_COPAXES( TID, OFID, STATUS )
-          END IF
+*      Copy axis data
+          DO I = 1, NDIM
+            CALL BDI_AXCOPY( TID, I, ' ', OFID, I, STATUS )
+          END DO
 
-*        Copy MORE box
-          CALL BDI_COPMORE( TID, OFID, STATUS )
+*      Copy ancillaries
+          CALL UDI_COPANC( TID, ' ', OFID, STATUS )
 
-*        Copy HISTORY
+*      Copy HISTORY
           CALL HSI_COPY( TID, OFID, STATUS )
 
         END IF
       END IF
 
-*    History update
+*  History update unless output is primitive
       IF ( .NOT. OUT_PRIM ) THEN
         CALL HSI_ADD( OFID, VERSION, STATUS )
         CALL HSI_PTXT( OFID, 1, 'Operation: '//OPER, STATUS )
@@ -549,13 +664,8 @@
 
       END IF
 
-*    Tidy up
- 99   CALL BDI_RELEASE( FID2, STATUS )
-      IF ( .NOT. OVER ) THEN
-        CALL BDI_RELEASE( FID1, STATUS )
-      END IF
-
-      CALL AST_CLOSE()
+*  Tidy up
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
