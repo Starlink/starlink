@@ -474,6 +474,9 @@
 *        lists to the output lists.
 *     20-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
+*     18-MAY-2001 (MBT):
+*        Fixed the propagation of extra columns - it was failing to do
+*        more than one of them properly.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -948,17 +951,10 @@
 
 *  Extract additional values from the mapped data array if present.
          IF ( NXVAL( I ) .GT. 0 ) THEN
-            CALL CCD1_MALL( NREC( I ), '_DOUBLE', IPWRK1, STATUS )
             CALL CCD1_MALL( NREC( I ) * NXVAL( I ), '_DOUBLE',
      :                      IPXDAT( I ), STATUS )
-            DO J = 1, NXVAL( I )
-               CALL CCD1_LEXT( %VAL( IPDAT ), NREC( I ), NVAL, 2 + J,
-     :                         %VAL( IPWRK1 ), STATUS )
-               CALL CCG1_COPSD( 1, %VAL( IPWRK1 ), NREC( I ),
-     :                          1 + ( J - 1 ) * NREC( I ),
-     :                          %VAL( IPXDAT( I ) ), STATUS )
-            END DO
-            CALL CCD1_MFREE( IPWRK1, STATUS )
+            CALL CCD1_XDAT( %VAL( IPDAT ), NREC( I ), NVAL, 
+     :                      %VAL( IPXDAT( I ) ), STATUS )
          END IF
 
 *  Release workspace.
