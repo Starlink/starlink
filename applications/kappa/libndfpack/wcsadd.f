@@ -372,7 +372,7 @@
 
 *  Local Constants:
       INTEGER MAXEXP             ! Maximum number of expressions for MathMap
-      PARAMETER( MAXEXP = 12 )
+      PARAMETER( MAXEXP = 100 )
 
 *  Local Variables:
       CHARACTER ATTRIB*20        ! Attribute name
@@ -603,7 +603,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'MX', MAXEXP )
             CALL MSG_SETI( 'N', NFEXP )
-            CALL MSG_OUT( 'WCSADD_MSG3', 'Too many (^N) forward '//
+            CALL ERR_REP( 'WCSADD_MSG3', 'Too many (^N) forward '//
      :                    'expressions given. No more than ^MX '//
      :                    'should be supplied.', STATUS )
          END IF
@@ -626,7 +626,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETI( 'MX', MAXEXP )
             CALL MSG_SETI( 'N', NIEXP )
-            CALL MSG_OUT( 'WCSADD_MSG3', 'Too many (^N) inverse '//
+            CALL ERR_REP( 'WCSADD_MSG3', 'Too many (^N) inverse '//
      :                    'expressions given. No more than ^MX '//
      :                    'should be supplied.', STATUS )
          END IF
