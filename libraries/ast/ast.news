@@ -24,6 +24,10 @@ o A function called astRate (AST_RATE) has been added which allows an
 estimate to be made of the rate of change of a Mapping output with
 respect to one of the Mapping inputs.
 
+o A new subclass of Mapping, the PolyMap, has been added which calculates
+each output coordinate value as a general polynomial function of the
+input coordinate values.
+
 o A new subclass of Mapping, the GrismMap, has been added which models
 the spectral dispersion produced by a grating, prism or grism.
 
