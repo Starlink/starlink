@@ -3,7 +3,7 @@
 # grfont.dat and rgb.txt are not actually programs but they still need to
 # go into bin/
 
-bin_SCRIPTS = pgp_link grfont.dat rgb.txt
+bin_SCRIPTS = pgp_link pgp_link_adam grfont.dat rgb.txt
 
 lib_LTLIBRARIES = libpgp.la
 
