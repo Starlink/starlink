@@ -44,6 +44,8 @@
 *  History:
 *     2-SEP-1999 (DSB):
 *        Original version.
+*     4-OCT-2004 (DSB):
+*        Use IRA accessor routines to access IRA common block values.
 *     {enter_further_changes_here}
 
 *-
@@ -54,21 +56,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'PRM_PAR'          ! VAL__ constants
-      INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'IRA_PAR'          ! IRAS90 astrometry library constants
-      INCLUDE 'IRA_ERR'          ! IRAS90 astrometry library error constants
-
-*  Global Variables:
-      INCLUDE 'IRA_COM'          ! IRA common values.
-*        ACM_EPOCH( IRA__MAX ) = DOUBLE PRECISION (Read)
-*           Julian epoch of observation from the associated AS.
-*        ACM_PROJN( IRA__MAX ) = CHARACTER (Read)
-*           Full projection name from the associated AS.
-*        ACM_PROJP( IRA__MAXP, IRA__MAX ) = DOUBLE PRECISION (Read)
-*           Projection parameter values from the associated AS.
-*        ACM_SCS( IRA__MAX ) = CHARACTER (Read)
-*           Full sky coordinate system (SCS) name from the associated
-*           AS, with optional equinox specifier.
 
 *  Arguments Given:
       INTEGER IDA
@@ -86,11 +74,14 @@
 *  Local Variables:
       CHARACTER BJ               ! The type of epoch held by variable EQU
       CHARACTER PROJ*(IRA__SZPRJ)! Full projection name
+      CHARACTER PROJN*(IRA__SZPRJ)! Projection name for IRA identifier
+      CHARACTER SCS*(IRA__SZSCS) ! SCS value for IRA identifier
       CHARACTER SCSNAM*(IRA__SZSCS)! Full SCS name with no equinox specifier
       CHARACTER TEXT*40          ! Attribute setting text
       DOUBLE PRECISION COSROT    ! Cosine of U,V rotation angle
       DOUBLE PRECISION DX        ! Pixel size (radians) in X
       DOUBLE PRECISION DY        ! Pixel size (radians) in Y
+      DOUBLE PRECISION EPOCH     ! The epoch for the IRA identifier
       DOUBLE PRECISION EQU       ! The epoch of the SCS reference equinox
       DOUBLE PRECISION INA( 2 )  ! Position A in X,Y (image) co-ords
       DOUBLE PRECISION INB( 2 )  ! Position B in X,Y (image) co-ords
@@ -100,6 +91,10 @@
       DOUBLE PRECISION OUTB( 2 ) ! Position B in unrotated U,V co-ords
       DOUBLE PRECISION SINROT    ! Sine of U,V rotation angle
       DOUBLE PRECISION T         ! Temporary storage
+      DOUBLE PRECISION T1        ! Projection parameter value
+      DOUBLE PRECISION T2        ! Projection parameter value
+      DOUBLE PRECISION T7        ! Projection parameter value
+      DOUBLE PRECISION T8        ! Projection parameter value
       INTEGER IAT                ! No. of characters in TEXT
       INTEGER M1                 ! Pointer to AST Mapping
       INTEGER M12                ! Pointer to AST Mapping
@@ -133,8 +128,10 @@
 *  First create the Mapping from image to sky co-ordinates.    
 *  =======================================================
 *  Store the absolute pixel sizes.
-      DX = ABS( ACM_PROJP( 5, IDA ) )
-      DY = ABS( ACM_PROJP( 6, IDA ) )
+      CALL IRA_IDPROJP( IDA, 5, DX, STATUS )
+      CALL IRA_IDPROJP( IDA, 6, DY, STATUS )
+      DX = ABS( DX )
+      DY = ABS( DY )
 
 *  Check the requested pixel area is not zero.
       IF( DX*DY .EQ. 0.0D0 ) THEN
@@ -163,8 +160,12 @@
       INB( 1 ) = 1.0D3
       INB( 2 ) = 1.0D3
 
-      OUTA( 1 ) = -ACM_PROJP( 3, IDA )*DX
-      OUTA( 2 ) = -ACM_PROJP( 4, IDA )*DY
+      CALL IRA_IDPROJP( IDA, 3, OUTA( 1 ), STATUS )
+      OUTA( 1 ) = -OUTA( 1 )*DX
+
+      CALL IRA_IDPROJP( IDA, 4, OUTA( 2 ), STATUS )
+      OUTA( 2 ) = -OUTA( 2 )*DY
+
       OUTB( 1 ) = OUTA( 1 ) + 1.0D3*DX
       OUTB( 2 ) = OUTA( 2 ) + 1.0D3*DY
 
@@ -176,8 +177,10 @@
 *  right handed system. Therefore, negate the first row of the matrix
 *  (i.e. MAT2(1) and MAT2(2) ) to produce a left-handed system as needed
 *  by the WcsMap.
-      COSROT = COS( ACM_PROJP( 7, IDA ) - ACM_PROJP( 8, IDA ) )
-      SINROT = SIN( ACM_PROJP( 7, IDA ) - ACM_PROJP( 8, IDA ) )
+      CALL IRA_IDPROJP( IDA, 7, T7, STATUS )
+      CALL IRA_IDPROJP( IDA, 8, T8, STATUS )
+      COSROT = COS( T7 - T8 )
+      SINROT = SIN( T7 - T8 )
 
       MAT2( 1 ) =  -COSROT 
       MAT2( 2 ) =  SINROT 
@@ -187,7 +190,8 @@
       M2 = AST_MATRIXMAP( 2, 2, 0, MAT2, ' ', STATUS ) 
 
 *  Get the full projection name.
-      CALL IRA1_CHPRJ( ACM_PROJN( IDA ), PROJ, NPREQ, STATUS )
+      CALL IRA_IDPROJN( IDA, PROJN, STATUS )
+      CALL IRA1_CHPRJ( PROJN, PROJ, NPREQ, STATUS )
 
 *  Now we transform the (U,V) co-ordinates into "local co-ordinates"
 *  using the sky projection. Create a WcsMap equivalent to the IRA 
@@ -253,8 +257,10 @@
 *  required rotation (about a radius through the reference point) of the 
 *  celestial sphere so that "north" in the local coordinate system is at the 
 *  position angle specified by projection parameter P(8).
-      CALL SLA_DEULER( 'ZYX', ACM_PROJP( 1, IDA ), -ACM_PROJP( 2, IDA ),
-     :                 -ACM_PROJP( 8, IDA ), MAT3 )
+      CALL IRA_IDPROJP( IDA, 1, T1, STATUS )
+      CALL IRA_IDPROJP( IDA, 2, T2, STATUS )
+      CALL IRA_IDPROJP( IDA, 8, T8, STATUS )
+      CALL SLA_DEULER( 'ZYX', T1, -T2, -T8, MAT3 )
 
 *  SLA_DEULER returns the matrix in column order, AST_MATRIXMAP requires it
 *  in row order. So transpose the matrix by swapping the 6 off-diagonal terms.
@@ -293,10 +299,11 @@
 
 *  If a valid Julian epoch value is available, create an AST attribute
 *  setting string for it.
-      IF( ACM_EPOCH( IDA ) .NE. VAL__BADD ) THEN
+      CALL IRA_IDEPOCH( IDA, EPOCH, STATUS )
+      IF( EPOCH .NE. VAL__BADD ) THEN
          TEXT = 'EPOCH=J'
          IAT = 7
-         CALL CHR_PUTD( ACM_EPOCH( IDA ), TEXT, IAT )
+         CALL CHR_PUTD( EPOCH, TEXT, IAT )
       ELSE
          TEXT = ' '
       END IF
@@ -305,7 +312,8 @@
       FRM = AST_SKYFRAME( TEXT, STATUS )
 
 *  Identify the Sky Co-ordinate System.
-      CALL IRA1_CHSCS( ACM_SCS( IDA ), SCSNAM, EQU, BJ, STATUS )
+      CALL IRA_IDSCS( IDA, SCS, STATUS )
+      CALL IRA1_CHSCS( SCS, SCSNAM, EQU, BJ, STATUS )
 
 *  Now set the attributes of the SkyFrame to match the values specified
 *  by the SCS. First deal with "EQUATORIAL" systems (AST equivalents are 
