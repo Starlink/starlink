@@ -34,9 +34,16 @@
 */
 
 // Minimally converted to a C++ class
-#include <cstdio>
 #include "Bitmap.h"		// for BitmapError exception class
 #include "GIFBitmap.h"
+
+#if ! NO_CSTD_INCLUDE		// ie, there _is_ a <cstdio>
+using std::fopen;
+using std::fwrite;
+using std::fputc;
+using std::fclose;
+using std::fflush;
+#endif
 
 
 /*
@@ -121,7 +128,7 @@ void GIFBitmap::write (const string filename)
     //int Green[] = { 255, 0 };
     //int Blue[]  = { 255, 0 };
 
-    FILE *F = std::fopen (filename.c_str(), "wb");
+    FILE *F = fopen (filename.c_str(), "wb");
     if (F == 0)
 	throw BitmapError ("can't open GIF file "+filename+" to write");
     GIFEncode (F,		// open file
@@ -286,7 +293,7 @@ void GIFBitmap::GIFEncode(FILE* fp,
         /*
          * Write the Magic header
          */
-        std::fwrite( Transparent < 0 ? "GIF87a" : "GIF89a", 1, 6, fp );
+        fwrite( Transparent < 0 ? "GIF87a" : "GIF89a", 1, 6, fp );
 
         /*
          * Write out the screen width and height
@@ -312,45 +319,45 @@ void GIFBitmap::GIFEncode(FILE* fp,
         /*
          * Write it out
          */
-        std::fputc( B, fp );
+        fputc( B, fp );
 
         /*
          * Write out the Background colour
          */
-        std::fputc( Background, fp );
+        fputc( Background, fp );
 
         /*
          * Byte of 0's (future expansion)
          */
-        std::fputc( 0, fp );
+        fputc( 0, fp );
 
         /*
          * Write out the Global Colour Map
          */
         for( i=0; i<ColorMapSize; ++i ) {
-                std::fputc( Red[i], fp );
-                std::fputc( Green[i], fp );
-                std::fputc( Blue[i], fp );
+                fputc( Red[i], fp );
+                fputc( Green[i], fp );
+                fputc( Blue[i], fp );
         }
 
 	/*
 	 * Write out extension for transparent colour index, if necessary.
 	 */
 	if ( Transparent >= 0 ) {
-	    std::fputc( '!', fp );
-	    std::fputc( 0xf9, fp );
-	    std::fputc( 4, fp );
-	    std::fputc( 1, fp );
-	    std::fputc( 0, fp );
-	    std::fputc( 0, fp );
-	    std::fputc( Transparent, fp );
-	    std::fputc( 0, fp );
+	    fputc( '!', fp );
+	    fputc( 0xf9, fp );
+	    fputc( 4, fp );
+	    fputc( 1, fp );
+	    fputc( 0, fp );
+	    fputc( 0, fp );
+	    fputc( Transparent, fp );
+	    fputc( 0, fp );
 	}
 
         /*
          * Write an Image separator
          */
-        std::fputc( ',', fp );
+        fputc( ',', fp );
 
         /*
          * Write the Image header
@@ -365,14 +372,14 @@ void GIFBitmap::GIFEncode(FILE* fp,
          * Write out whether or not the image is interlaced
          */
         if( Interlace )
-                std::fputc( 0x40, fp );
+                fputc( 0x40, fp );
         else
-                std::fputc( 0x00, fp );
+                fputc( 0x00, fp );
 
         /*
          * Write out the initial code size
          */
-        std::fputc( InitCodeSize, fp );
+        fputc( InitCodeSize, fp );
 
         /*
          * Go and actually compress the data
@@ -382,17 +389,17 @@ void GIFBitmap::GIFEncode(FILE* fp,
         /*
          * Write out a Zero-length packet (to end the series)
          */
-        std::fputc( 0, fp );
+        fputc( 0, fp );
 
         /*
          * Write the GIF file terminator
          */
-        std::fputc( ';', fp );
+        fputc( ';', fp );
 
         /*
          * And close the file
          */
-        std::fclose( fp );
+        fclose( fp );
 }
 
 /*
@@ -400,8 +407,8 @@ void GIFBitmap::GIFEncode(FILE* fp,
  */
 void GIFBitmap::Putword(int w, FILE* fp)
 {
-        std::fputc( w & 0xff, fp );
-        std::fputc( (w / 256) & 0xff, fp );
+        fputc( w & 0xff, fp );
+        fputc( (w / 256) & 0xff, fp );
 }
 
 
@@ -680,7 +687,7 @@ void GIFBitmap::output(code_int  code)
 
         flush_char();
 
-        std::fflush( g_outfile );
+        fflush( g_outfile );
 
         if( ferror( g_outfile ) )
                 throw BitmapError ("error in GIFBitmap");
@@ -783,8 +790,8 @@ void GIFBitmap::char_out( int c )
 void GIFBitmap::flush_char()
 {
         if( a_count > 0 ) {
-                std::fputc( a_count, g_outfile );
-                std::fwrite( accum, 1, a_count, g_outfile );
+                fputc( a_count, g_outfile );
+                fwrite( accum, 1, a_count, g_outfile );
                 a_count = 0;
         }
 }

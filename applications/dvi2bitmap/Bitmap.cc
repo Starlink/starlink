@@ -3,9 +3,16 @@
 #include "dvi2bitmap.h"
 
 #include <iostream>		// debug code writes to cerr
+
+#if NO_CSTD_INCLUDE
+#include <stdarg.h>
+#include <stdio.h>
+#include <string.h>
+#else
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+#endif
 
 #include "Bitmap.h"
 #include "BitmapImage.h"
@@ -285,52 +292,3 @@ void Bitmap::write (const string filename, const string format)
     delete bi;
 }
 
-/*
-void Bitmap::write_debugbitmap (string filename)
-{
-    FILE *F = fopen (filename.c_str(), "wb");
-    if (F == 0)
-	throw BitmapError ("can't open file " + filename + " to write");
-
-    fputs ("   ", F);
-    int dig;
-    for (int col=cropL, dig='0'; col<cropR; col++, dig++)
-    {
-	fputc (dig, F);
-	if (dig == '9')
-	    dig = '0'-1;
-    }
-    fputc ('\n', F);
-
-    for (int row=cropT; row<cropB; row++)
-    {
-	fprintf (F, "%2d:", row);
-	for (int col=cropL; col<cropR; col++)
-	    fputc ((B[row*W+col] ? '*' : ' '), F);
-	fputc ('\n', F);
-    }
-
-    fclose (F);
-}
-
-void Bitmap::write_gif (string filename)
-{
-    if (cropped_)
-    {
-	GIFBitmap gif(cropR-cropL, cropB-cropT, bpp_);
-	for (int row=cropT; row<cropB; row++)
-	    gif.setBitmapRow(&B[row*W+cropL]);
-	if (transparent_)
-	    gif.setTransparent(true);
-	gif.write (filename);
-    }
-    else
-    {
-	GIFBitmap gif(W, H, B, bpp_);
-	if (transparent_)
-	    gif.setTransparent(true);
-	gif.write (filename);
-    }
-}
-
-*/

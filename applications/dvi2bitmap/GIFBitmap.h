@@ -5,7 +5,11 @@
 
 #include "dvi2bitmap.h"
 #include "BitmapImage.h"
+#if NO_CSTD_INCLUDE
+#include <stdio.h>
+#else
 #include <cstdio>
+#endif
 
 typedef int             code_int;
 #ifdef SIGNED_COMPARE_SLOW

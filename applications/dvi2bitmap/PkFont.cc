@@ -3,9 +3,19 @@
 
 #include "dvi2bitmap.h"
 #include <iostream>		// for debugging code, written to cerr
+
+#if NO_CSTD_INCLUDE
+#include <string.h>
+#include <math.h>
+#include <stdio.h>		// for sprintf
+#else
 #include <cstring>
 #include <cmath>
 #include <cstdio>		// for sprintf
+using std::sprintf;
+using std::memcpy;
+#endif
+
 #include "InputByteStream.h"
 #include "PkFont.h"
 
@@ -39,7 +49,7 @@ PkFont::PkFont(unsigned int dvimag,
     int scaled_res = static_cast<int>(resolution_
 				      * ((double)s * (double)dvimag)
 				      / ((double)d * 1000.0));
-    std::sprintf (fnbuf, "%s/%s.%dpk",
+    sprintf (fnbuf, "%s/%s.%dpk",
 	     fontpath_.c_str(), name.c_str(), scaled_res);
     path_ = fnbuf;
     if (verbosity_ > 1)
@@ -89,7 +99,7 @@ PkFont::PkFont(unsigned int dvimag,
     back_space_ = 0.9*quad_;
     if (verbosity_ > 1)
 	cerr << "Quad="<<quad_<<" dvi units\n";
-};
+}
 
 PkFont::~PkFont()
 {
@@ -152,7 +162,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		    g_hoff     = pkf.getSIS(4);
 		    g_voff     = pkf.getSIS(4);
 
-		    if (g_cc < 0 || g_cc >= nglyphs_)
+		    if (g_cc >= nglyphs_) // g_cc unsigned, so >= 0
 			throw DviError
 			    ("PK file has out-of-range character code");
 
@@ -197,7 +207,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		    g_hoff     = pkf.getSIS(2);
 		    g_voff     = pkf.getSIS(2);
 
-		    if (g_cc < 0 || g_cc >= nglyphs_)
+		    if (g_cc >= nglyphs_) // g_cc unsigned, so >= 0
 			throw DviError
 			    ("PK file has out-of-range character code");
 
@@ -241,7 +251,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		g_hoff     = pkf.getSIS(1);
 		g_voff     = pkf.getSIS(1);
 
-		if (g_cc < 0 || g_cc >= nglyphs_)
+		if (g_cc >= nglyphs_) // g_cc unsigned, so >= 0
 		    throw DviError
 			("PK file has out-of-range character code");
 
@@ -314,10 +324,8 @@ void PkFont::read_font (InputByteStream& pkf)
 		break;
 	      case 257:		// pk_pre
 		throw DviError ("Found PK preamble in body of file");
-		break;
 	      default:
 		throw DviError ("Found unexpected opcode in PK file");
-		break;
 	    }
 	}
     }
@@ -339,7 +347,7 @@ PkGlyph::PkGlyph(unsigned int cc,
     tfmwidth_ = (double)tfmwidth/two20_ * f->designSize();
     dx_ = dm;
     dy_ = 0;
-};
+}
 
 PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int tfmwidth,
@@ -358,7 +366,7 @@ PkGlyph::PkGlyph(unsigned int cc,
     tfmwidth_ = (double)tfmwidth/(double)two20_ * f->designSize();
     dx_ = static_cast<int>(floor(dx / (double)two16_ + 0.5));
     dy_ = static_cast<int>(floor(dy / (double)two16_ + 0.5));
-};
+}
 
 PkGlyph::PkGlyph(int resolution, PkFont *f)
     : font_(f)
@@ -388,9 +396,9 @@ PkRasterdata::PkRasterdata(Byte opcode,
     dyn_f_ = opcode >> 4;
     start_black_ = opcode&8;
     rasterdata_ = new Byte[len];
-    (void) std::memcpy ((void*)rasterdata_, (void*)rasterdata, len);
+    (void) memcpy ((void*)rasterdata_, (void*)rasterdata, len);
     eob_ = rasterdata_+len_;
-};
+}
 
 unsigned int PkRasterdata::unpackpk ()
 {

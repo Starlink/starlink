@@ -7,8 +7,6 @@
 
 class BitmapImage {
  public:
-    //enum imageFormats { gif, debugbitmap };
-    //BitmapImage (imageFormats format, int width, int height, int bpp=1);
     BitmapImage(const int w, const int h)
 	: w_(w), h_(h), bitmap_(0), bitmapRows_(0),
 	  isTransparent_(false), myBitmap_(false) { };

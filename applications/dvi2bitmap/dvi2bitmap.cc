@@ -4,12 +4,24 @@
 #include "dvi2bitmap.h"
 #include <iostream>
 #include <vector>
+
+#if NO_CSTD_INCLUDE
+#include <stdlib.h>
+#include <stdarg.h>
+#include <ctype.h>
+#else
 #include <cstdlib>
 #include <cstdarg>
 #include <cctype>
+using std::exit;
+#endif
 
 #if VSPRINTF_IN_STDIO
+#if NO_CSTD_INCLUDE
+#include <stdio.h>
+#else
 #include <cstdio>
+#endif
 #endif
 
 #include "DviFile.h"
@@ -146,7 +158,7 @@ main (int argc, char **argv)
 		break;
 	      case 'V':		// display version
 		cout << version_string << '\n';
-		std::exit(0);	// ...and exit
+		exit(0);	// ...and exit
 
 	      default:
 		Usage();
@@ -393,6 +405,10 @@ string_list *tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-lLnqV] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm|gif]\n\tdvifile" << '\n';
+    cerr << "Usage: " << progname << " [-lLnqV] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm"
+#if ENABLE_GIF
+	 << "|gif"
+#endif
+	 << "]\n\tdvifile" << '\n';
     exit (1);
 }

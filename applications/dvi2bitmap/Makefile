@@ -1,6 +1,13 @@
 # part of dvi2bitmap
 # $Id$
 
+#CXXFLAGS=-g
+
+# Uncomment the following to enable support for GIFs (NB patent problems)
+CXXFLAGS=$(CXXFLAGS) -DENABLE_GIF
+GIFOBJ=GIFBitmap.o
+
+# Uncomment following for Alphas
 # Alpha cxx requires `-std strict_ansi' or else the iostream header doesn't
 # work (alternatively, you can define __USE_STD_STREAM),
 # and it doesn't seem to have the
@@ -8,11 +15,17 @@
 # There's some issue with `using namespace std;' which I don't fully
 # understand (my lack of understanding of namespaces, I think).
 # The flag -using_std is connected with this.
-CXXFLAGS=-g
+#CXX=cxx
+#CXXFLAGS=$(CXXFLAGS) -std strict_ansi -DNO_CSTD_INCLUDE
+#LIBS=$(LIBS) -lm
+
+# Uncomment the following for Suns
+#CXX=CC
+
 
 EXEC=dvi2bitmap
 OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
-	BitmapImage.o GIFBitmap.o XBMBitmap.o
+	BitmapImage.o XBMBitmap.o $(GIFOBJ)
 
 # Add a suffix rule for stupid makes (hello, Tru64...)
 .SUFFIXES: .o .cc
@@ -20,7 +33,7 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 	$(CXX) $(CXXFLAGS) -c $<
 
 $(EXEC): $(OBJS)
-	$(CXX) $(OBJS) -o $@
+	$(CXX) $(OBJS) -o $@ $(LIBS)
 
 DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h
 

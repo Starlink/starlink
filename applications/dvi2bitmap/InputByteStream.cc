@@ -4,8 +4,15 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#if NO_CSTD_INCLUDE
+#include <stdio.h>
+#include <errno.h>
+#else
 #include <cstdio>
 #include <cerrno>
+using std::sprintf;
+#endif
+
 #include "dvi2bitmap.h"
 #include "InputByteStream.h"
 
@@ -115,7 +122,7 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 	    if (blockp > eob_)
 	    {
 		char buf[100];
-		std::sprintf (buf,
+		sprintf (buf,
 		      "InputByteStream::getBlock: pointer beyond EOF (%d,%d)",
 			 pos, length);
 		throw DviBug (buf);
@@ -123,7 +130,7 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 	    if (blockp+length > eob_)
 	    {
 		char buf[100];
-		std::sprintf (buf,
+		sprintf (buf,
 		"InputByteStream::getBlock: requested block too large (%d,%d)",
 			 pos,length);
 		throw DviBug (buf);
@@ -146,7 +153,7 @@ void InputByteStream::seek (unsigned int pos)
 {
     if (preloaded_)
     {
-	if (pos < 0 || pos > buflen_)
+	if (pos > buflen_)	// pos unsigned, so can't be negative
 	    throw DviBug ("InputByteStream::seek: out of range");
 	p_ = buf_ + pos;
     }

@@ -3,7 +3,13 @@
 
 #define NULL 0
 #include <iostream>
+
+#if NO_CSTD_INCLUDE
+#include <math.h>
+#else
 #include <cmath>
+#endif
+
 #include "DviFile.h"
 #include "PkFont.h"
 #include "InputByteStream.h"

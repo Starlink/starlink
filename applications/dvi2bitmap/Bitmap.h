@@ -36,9 +36,6 @@ class Bitmap {
     int bpp_;			// bits-per-pixel
     int max_colour_;		// ==> max colour index
     static int verbosity_;
-
-    //void write_debugbitmap (string filename);
-    //void write_gif (string filename);
 };
 
 class BitmapError : public DviError {

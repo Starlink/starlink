@@ -4,8 +4,14 @@
 #include "XBMBitmap.h"
 
 #include <iostream>		// debug code writes to cerr
+
+#if NO_CSTD_INCLUDE
+#include <stdio.h>
+#include <ctype.h>
+#else
 #include <cstdio>
 #include <cctype>
+#endif
 
 XBMBitmap::XBMBitmap (const int w, const int h)
     : BitmapImage (w, h)
@@ -21,7 +27,7 @@ void XBMBitmap::write (const string filename)
     int seppos = filename.find_last_of(path_separator);
     if (seppos < 0) seppos = 0;
     if (dotpos < 0) dotpos = filename.length();
-    cerr << "seppos="<<seppos<<" dotpos="<<dotpos<<'\n';
+    //cerr << "seppos="<<seppos<<" dotpos="<<dotpos<<'\n';
     string fnroot_str = "";
     for (int charno=seppos; charno<dotpos; charno++)
 	fnroot_str += (isalnum(filename[charno]) ? filename[charno] : '_');

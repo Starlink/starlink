@@ -2,20 +2,25 @@
 
 #include <string>
 #include "BitmapImage.h"
+#if ENABLE_GIF
 #include "GIFBitmap.h"
+#endif
 #include "XBMBitmap.h"
 
 BitmapImage *BitmapImage::newBitmapImage
 	(const string format, const int w, const int h, const int bpp)
 {
     // format may be zero length: pick default
+#if ENABLE_GIF
     if (format == "gif")
 	return new GIFBitmap (w, h, bpp);
-    else if (format == "xbm")
+    else
+#endif
+    if (format == "xbm")
 	return new XBMBitmap (w, h);
     else
 	return new XBMBitmap (w, h);
-};
+}
 
 
 BitmapImage::~BitmapImage ()
