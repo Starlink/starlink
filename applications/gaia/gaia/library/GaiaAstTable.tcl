@@ -420,6 +420,11 @@ itcl::class gaia::GaiaAstTable {
       redraw_cross_
    }
 
+   #  Temporarily undraw (i.e. remove) markers.
+   public method undraw {} {
+      clear_marks
+   }
+
    #  Add or restore bindings to the markers.
    protected method restore_bindings_ {} {
        set canvas $itk_option(-canvas)

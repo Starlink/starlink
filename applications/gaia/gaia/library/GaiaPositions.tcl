@@ -138,6 +138,10 @@ itcl::class gaia::GaiaPositions {
       #  Initialisations after widget creation.
       auto_centroid_changed_
       configure -iqesize $itk_option(-iqesize)
+
+      # XXX debug code.
+      $itk_component(table) read_positions "temp.ast"
+      
    }
 
    #  Destructor:
@@ -233,8 +237,16 @@ itcl::class gaia::GaiaPositions {
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
-      #  Edit menu (filled by GaiaPosTable).
-      add_menubutton Edit
+      #  Edit menu (also filled by GaiaPosTable).
+      set Edit [add_menubutton Edit]
+
+      #  Add celestial coordinate precession toolbox.
+      $Edit add command -label {Precess sky coordinates...} \
+         -command [code $this precess_] \
+         -accelerator {Control-p}
+      bind $w_ <Control-p> [code $this precess_]
+      $short_help_win_ add_menu_short_help $Edit {Precess sky coordinates...} \
+         {Transform celestial coordinates to image system}
 
       #  Options menu.
       set Options [add_menubutton Options]
@@ -469,6 +481,29 @@ itcl::class gaia::GaiaPositions {
             } elseif { $ra == -1 && $dec == -1 } {
                $itk_component(table) update_ra_and_dec
             }
+         }
+      }
+   }
+
+   #  Transform celestial coordinates to system of image.
+   protected method precess_ {} {
+      busy {
+
+         #  Start precession dialog. When started give it name of 
+         #  our existing table to copy. When finished we may need to
+         #  update our table.
+         set transform [gaia::GaiaAstTransform $w_.\#auto \
+                           -image $itk_option(-image) \
+                           -rtdimage $itk_option(-rtdimage) \
+                           -canvas $itk_option(-canvas) \
+                           -number $itk_option(-number)]
+         $itk_component(table) undraw
+         $transform grab $itk_component(table)
+         if { [$transform activate] } {
+            $itk_component(table) clear_table
+            eval $itk_component(table) set_contents [$transform get_contents]
+         } else {
+            $itk_component(table) redraw
          }
       }
    }

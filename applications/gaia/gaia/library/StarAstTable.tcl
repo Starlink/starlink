@@ -411,6 +411,11 @@ itcl::class gaia::StarAstTable {
        redraw_cross_
    }
 
+   #  Temporarily undraw (i.e. remove) markers.
+   public method undraw {} {
+      $itk_option(-canvas) delete ${this}_mark
+   }
+
    #  Add or restore bindings to the markers.
    protected method restore_bindings_ {} {
        set canvas $itk_option(-canvas)

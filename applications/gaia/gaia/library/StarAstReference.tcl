@@ -1169,11 +1169,11 @@ itcl::class gaia::StarAstReference {
    protected variable systemattrib_ \
       {FK5 1 0 FK4 1 1 FK4-NO-E 1 1 GAPPT 0 1}
 
-   #  Array of the various system names and their default
+   #  List of the various system names and their default
    #  equinoxes and the initialising list.
    protected variable systemmap_ {FK5 J2000 FK4 B1950 FK4-NO-E B1950 GAPPT {} }
 
-   #  Names of sensible some equinoxes.
+   #  Names of some sensible equinoxes.
    protected variable equinoxmap_ {J2000.0 B1950.0}
 
    #  Widths of various fields.

@@ -135,6 +135,10 @@
 //     27-MAR-2000 (PWD):
 //        Added globalstats command. Performs same job as statistics
 //        command except on a list of X,Y positions.
+//     08-MAY-2000 (PWD):
+//        Modified astsystem command to transform between current
+//        frame and new celestial coordinates. Also added asttran2
+//        command to transform coordinates between such frames.
 //-
 
 #include <string.h>
@@ -199,8 +203,9 @@ public:
    { "astreplace",    &StarRtdImage::astreplaceCmd,   0, 0 },
    { "astreset",      &StarRtdImage::astresetCmd,     1, 1 },
    { "astrestore",    &StarRtdImage::astrestoreCmd,   0, 1 },
+   { "asttran2",      &StarRtdImage::asttran2Cmd,     2, 2 },
    { "aststore",      &StarRtdImage::aststoreCmd,     2, 4 },
-   { "astsystem",     &StarRtdImage::astsystemCmd,    2, 2 },
+   { "astsystem",     &StarRtdImage::astsystemCmd,    2, 3 },
    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
    { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
    { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
@@ -1966,10 +1971,10 @@ int StarRtdImage::addLinear( int iframe, AstFrameSet *fset,
 //  StarRtdImage::astassignCmd
 //
 //  Purpose:
-//     Adds a linear transform to a WCS. The linear
-//     transform is given as a set of 6 coefficients. The source of
-//     the WCS is given as the first parameter and should be either
-//     local or image as in astrefine.
+//     Adds a linear transform to a WCS. The linear transform is given
+//     as a set of 6 coefficients. The source of the WCS is given as
+//     the first parameter and should be either local or image as in
+//     astrefine.
 //-
 int StarRtdImage::astassignCmd( int argc, char *argv[] )
 {
@@ -2026,12 +2031,13 @@ int StarRtdImage::astassignCmd( int argc, char *argv[] )
   }
   return TCL_OK;
 }
+
 //+
 //   StarRtdImage::astwriteCmd
 //
 //   Purpose:
 //      Debugging procedure. Writes either the current local or the
-//      image  WCS system out to terminal using the given encoding,
+//      image WCS system out to terminal using the given encoding,
 //      plus a FITS channel if requested.
 //
 //   Arguments:
@@ -2581,11 +2587,18 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //       Creates a WCS system with new celestial/pixel coordinates.
 //
 //    Notes:
-//       The system attributes are passed in the argv[1] element
-//       in a pre-formatted manner (such as can be used by as astSet
+//       The system attributes are passed in the argv[1] element in a
+//       pre-formatted manner (such as can be used by as astSet
 //       routine, i.e. system=newsystem epoch=epoch equinox=equinox).
-//       The first value is the source of the WCS to modify and
-//       should be image or local (as in astassign and astrefine).
+//       The first value is the source of the WCS to modify and should
+//       be image or local (as in astassign and astrefine).
+//
+//       The third (optional) argument determines whether we get a
+//       FrameSet describing the transformation from the current base
+//       frame to this new system, or from the current current
+//       frame. The default is to transform from the base frame (thus
+//       retaining a connection with the image pixels) and is
+//       indicated by the value 0.
 //
 //       If system is set to "pixel" then a pixel coordinate system is
 //       used, rather than sky coordinates.
@@ -2593,78 +2606,81 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::astsystemCmd" << endl;
+   cout << "Called StarRtdImage::astsystemCmd" << endl;
 #endif
-  if (!image_) {
-    return error("no image loaded");
-  }
+   if (!image_) {
+      return error("no image loaded");
+   }
 
-  //  Decode the first argument. This should be the source of the
-  //  FrameSet that we are to modify.
-  char *source = argv[0];
-  switch ( source[0] ) {
-    case 'i': {
-      //  FrameSet from image, so take a copy of it to modify
-      //  non-destructively.
-      if ( newset_ ) newset_ = (AstFrameSet *) astAnnul( newset_ );
+   //  Decode the first argument. This should be the source of the
+   //  FrameSet that we are to modify.
+   char *source = argv[0];
+   switch ( source[0] ) {
+      case 'i': {
+         //  FrameSet from image, so take a copy of it to modify
+         //  non-destructively.
+         if ( newset_ ) newset_ = (AstFrameSet *) astAnnul( newset_ );
 
-      StarWCS* wcsp = getStarWCSPtr();
-      if (!wcsp)
-         return TCL_ERROR;
-
-      newset_ = wcsp->astWCSCopy();
-    }
-    break;
-    case 'l': {
-      //  Local, so make sure that astcreate has already been called
-      //  (or this function once before).
-      if ( !newset_ ) {
-         return error("cannot use a local WCS system as none is "
-                      "available (see astcreate, or use this command "
-                      "once previously with source 'image')");
+         StarWCS* wcsp = getStarWCSPtr();
+         if ( !wcsp ) {
+            return TCL_ERROR;
+         }
+         newset_ = wcsp->astWCSCopy();
       }
-    }
-    break;
-    default: {
-       return error( source,
-                     ": unknown WCS source, should be 'image' or 'local'");
-    }
-  }
+      break;
+      case 'l': {
+         //  Local, so make sure that astcreate has already been called
+         //  (or this function once before).
+         if ( !newset_ ) {
+            return error("cannot use a local WCS system as none is "
+                         "available (see astcreate, or use this command "
+                         "once previously with source 'image')");
+         }
+      }
+      break;
+      default: {
+         return error( source,
+                       ": unknown WCS source, should be 'image' or 'local'");
+      }
+   }
 
-  AstFrame *newfrm;
-  if ( strstr( argv[1], "pixel" ) == NULL ) {
+   AstFrame *newfrm;
+   if ( strstr( argv[1], "pixel" ) == NULL ) {
 
-    //  Ok now create a new SkyFrame with the options we have been given.
-    newfrm = (AstFrame *) astSkyFrame( argv[1] );
-  } else {
+      //  Ok now create a new SkyFrame with the options we have been given.
+      newfrm = (AstFrame *) astSkyFrame( argv[1] );
+   } else {
 
-    //  Want a pixel coordinate system (only sensible for NDFs when
-    //  pixel coordinates are different from grid coordinates).
-    newfrm = (AstFrame *) makeGridWCS( );
-  }
-  if ( !astOK ) {
+      //  Want a pixel coordinate system (only sensible for NDFs when
+      //  pixel coordinates are different from grid coordinates).
+      newfrm = (AstFrame *) makeGridWCS( );
+   }
+   if ( !astOK ) {
 
-    // If any of the above failed, then report the error.
-    return error ( "failed to establish new system coordinates system");
-  } else {
+      //  If any of the above failed, then report the error.
+      return error ( "failed to establish new system coordinates system");
+   } else {
 
-    // Get a mapping to convert to the new system and add this
-    // to the current frameset. Note we convert from BASE frame to
-    // the new skyframe to force AST to retain all the current
-    // frameset mappings.
-    astSetI( newset_, "Current", AST__BASE );
-    AstFrameSet *cvt = (AstFrameSet *) astConvert( newset_, newfrm, "" );
-    newfrm = (AstFrame *) astAnnul( newfrm );
-    if ( astOK ) {
-      newset_ = (AstFrameSet *) astAnnul( newset_ );
-      newset_ = cvt;
-    } else {
-      cvt = (AstFrameSet *) astAnnul( cvt );
-      return error ( "failed to convert from existing system "
-                     "to new system");
-    }
-  }
-  return TCL_OK;
+      //  Get a mapping to convert to the new system and add this
+      //  to the current frameset. Note we convert from BASE frame to
+      //  the new skyframe to force AST to retain all the current
+      //  frameset mappings or just get the current-current mapping
+      //  (useful for converting between celestial coordinates).
+      if ( argc == 2 || ( argc == 3 && *argv[2] == '0' ) ) {
+         astSetI( newset_, "Current", AST__BASE );
+      }
+      AstFrameSet *cvt = (AstFrameSet *) astConvert( newset_, newfrm, "" );
+      newfrm = (AstFrame *) astAnnul( newfrm );
+      if ( astOK ) {
+         newset_ = (AstFrameSet *) astAnnul( newset_ );
+         newset_ = cvt;
+      } else {
+         cvt = (AstFrameSet *) astAnnul( cvt );
+         return error ( "failed to convert from existing system "
+                        "to new system");
+      }
+   }
+   return TCL_OK;
 }
 
 //
@@ -4906,12 +4922,12 @@ int StarRtdImage::remoteTclCmd( int argc, char* argv[] )
 //  Description:
 //     This command accepts a list of positions and a related size
 //     parameter. The size parameter determines the region about each
-//     position that will be used in the IQE parameter estimation (IQE 
+//     position that will be used in the IQE parameter estimation (IQE
 //     fits a 2D gaussian, i.e.:
 //
 //        {x1 y1 x2 y2 ...} box_size
 //
-//  Return: 
+//  Return:
 //     The return from this routine is a list consisting of the
 //     following mean values:
 //
@@ -4939,7 +4955,7 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
   if ( Tcl_GetInt( interp_, argv[1], &size ) != TCL_OK ) {
     return error( argv[1], "is not a valid size" );
   }
-  
+
   //  Split the input list of positions into individual X and Y's.
   char **listArgv;
   int listArgc = 0;
@@ -4972,10 +4988,10 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
   double minFwhmY = DBL_MAX, maxFwhmY = -DBL_MIN;
   double fwhmX = 0.0, sumFwhmX = 0.0;
   double fwhmY = 0.0, sumFwhmY = 0.0;
-  double angle = 0.0, sumAngle = 0.0; 
+  double angle = 0.0, sumAngle = 0.0;
   double objectPeak = 0.0, sumObjectPeak = 0.0;
   double meanBackground = 0.0, sumMeanBackground = 0.0;
-  
+
   //  And get the image statistics sums.
   int ncount = 0;
   double newx, newy;
@@ -5017,7 +5033,139 @@ int StarRtdImage::globalstatsCmd( int argc, char *argv[] )
            sumObjectPeak / (double) ncount,
            sumMeanBackground / (double) ncount,
            ncount );
-           
+
   set_result( result );
   return TCL_OK;
+}
+
+//+
+//   StarRtdImage::asttran2Cmd
+//
+//   Purpose:
+//       Transform two dimensional coordinates using either the image
+//       WCS or a locally derived frameset.
+//
+//  Arguments:
+//     argv, argc strings.
+//
+//     The first argument to this command is either "image" or "local"
+//     and describes the source of the frameset to use during the
+//     transformation. If "local" then a suitable astxxx command must
+//     have been called to create it.
+//
+//     The second argument is a list consisting of pairs of
+//     coordinates to be transformed.
+//
+//     The result of this command is the new set of coordinate, if
+//     successful.
+//-
+int StarRtdImage::asttran2Cmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+   cout << "Called StarRtdImage::asttran2Cmd" << endl;
+#endif
+   if (!image_) {
+      return error("no image loaded");
+   }
+
+   //  Decode the first argument. This should be the source of the
+   //  FrameSet that we are to use.
+   char *source = argv[0];
+   AstFrameSet *wcs = (AstFrameSet *) NULL;
+   switch ( source[0] ) {
+      case 'i': {
+         //  FrameSet from image, need a clone.
+         if ( newset_ ) newset_ = (AstFrameSet *) astAnnul( newset_ );
+         StarWCS* wcsp = getStarWCSPtr();
+         if ( !wcsp ) {
+            return TCL_ERROR;
+         }
+         wcs = wcsp->astWCSClone();
+      }
+      break;
+      case 'l': {
+         //  Local, so make sure that astcreate has already been called
+         //  (or this function once before).
+         if ( !newset_ ) {
+            return error("cannot use a local WCS system as none is "
+                         "available (see astcreate, or use this command "
+                         "once previously with source 'image')");
+         }
+         wcs = newset_;
+      }
+      break;
+      default: {
+         return error( source,
+                       ": unknown WCS source, should be 'image' or 'local'");
+      }
+   }
+
+   //  Extract the coordinates from the input list.
+   char **listArgv;
+   int listArgc = 0;
+   if ( Tcl_SplitList( interp_, argv[1], &listArgc, &listArgv ) != TCL_OK ) {
+      return error( "failed to interpret RA/Dec positions list" );
+   }
+   int npoints = listArgc / 2;
+   if ( npoints * 2 != listArgc ) {
+    Tcl_Free( (char *) listArgv );
+    return error("coordinate lists contain a odd number of values");
+   }
+
+   // Check have at least two positions.
+   if ( listArgc < 2 ) {
+      Tcl_Free( (char *) listArgv );
+      return error("need at least two positions");
+   }
+
+   // Now attempt to translate all these values into doubles.
+   double *oldra = new double[npoints];
+   double *olddec = new double[npoints];
+   int i, j;
+   for ( i = 0, j = 0; i < listArgc; i += 2, j++ ) {
+
+      //  These should either be in degrees or H/D:M:S strings
+      // (note values may only be in HH:MM:SS/DD:MM:SS or DD.ddd/DD.ddd
+      //  no HH.hh, 2000.0 mean values are not converted to another equinox)
+      WorldCoords wcs( listArgv[i], listArgv[i+1], 2000, 1);
+      if ( wcs.status() != TCL_OK ) {
+         delete [] oldra;
+         delete [] olddec;
+         return error( listArgv[i], " is not a celestial coordinate value" );
+      }
+      oldra[j] = wcs.ra_deg() * D2R;
+      olddec[j] = wcs.dec_deg() * D2R;
+   }
+   double *newra = new double[npoints];
+   double *newdec = new double[npoints];
+
+   //  Now do the transformation.
+   astTran2( wcs, npoints, oldra, olddec, 1, newra, newdec );
+   if ( !astOK ) {
+      astClearStatus;
+      Tcl_Free( (char *) listArgv );
+      delete [] oldra;
+      delete [] olddec;
+      delete [] newra;
+      delete [] newdec;
+      return error( "failed to transform positions" );
+   }
+   
+   //  Construct a return list of the values.
+   for (i = 0; i < npoints; i++) {
+
+      //  Format the ra,dec position arguments in H:M:S.
+      const char *ra_buf = astFormat( wcs, 1, newra[i] );
+      const char *dec_buf = astFormat( wcs, 2, newdec[i] );
+      Tcl_AppendElement( interp_, (char *)ra_buf );
+      Tcl_AppendElement( interp_, (char *)dec_buf );
+   }
+
+   //  Release memory.
+   Tcl_Free( (char *) listArgv );
+   delete [] oldra;
+   delete [] olddec;
+   delete [] newra;
+   delete [] newdec;
+   return TCL_OK;
 }

@@ -65,8 +65,9 @@ itcl::class gaia::GaiaPosTable {
    #  Constructor:
    #  ------------
    constructor {args} {
-      #  Remove -showmsize from argument list.
+      #  Remove -showmsize & editcontrols from argument list.
       regsub {\-showmsize[\ ]+[^\ ]+} "$args" {} safeargs
+      regsub {\-editcontrols[\ ]+[^\ ]+} "$safeargs" {} safeargs
       eval gaia::GaiaAstTable::constructor $safeargs
    } {
       #  Evaluate any options.
@@ -80,19 +81,19 @@ itcl::class gaia::GaiaPosTable {
       #  Reset configuration of base class to suit this case.
       add_short_help $itk_component(table) {Selected positions}
 
-      #  Disable some of the control buttons to customise the
-      #  interface.
-      $itk_component(new) configure -state disabled
-      add_short_help $itk_component(new) {disabled}
-      $itk_component(flipxy) configure -state disabled
-      add_short_help $itk_component(flipxy) {disabled}
-      $itk_component(flipx) configure -state disabled
-      add_short_help $itk_component(flipx) {disabled}
-      $itk_component(flipy) configure -state disabled
-      add_short_help $itk_component(flipy) {disabled}
-
       #  Update short help for centroid, which now also updates RA/Dec.
       add_short_help $itk_component(centroid) {Centroid positions}
+
+      #  Disable some of the control buttons to customise the
+      #  interface.
+      set disables "new flipxy flipx flipy"
+      if { ! $itk_option(-editcontrols) } {
+         append disables " modify delete grab centroid clip clear"
+      }
+      foreach c $disables {
+         $itk_component($c) configure -state disabled
+         add_short_help $itk_component($c) {disabled}
+      }
    }
 
    #  Destructor:
@@ -277,9 +278,12 @@ itcl::class gaia::GaiaPosTable {
    #  Whether to centroid initial position or not.
    itk_option define -init_centroid init_centroid Init_Centroid 1
 
-
    #  Whether to remove menu item that controls marker size.
    itk_option define -showmsize showmsize Showmsize 1
+
+   #  Whether table positions can be editted (table control that allow
+   #  this are disabled).
+   itk_option define -editcontrols editcontrols Editcontrols 1
 
    #  Protected variables: (available to instance)
    #  --------------------

@@ -349,7 +349,7 @@ itcl::class gaia::StarAstSystem {
 
    #  Set the labels of the defaults for the default system. Just
    #  done once at initialisation time and when image is modified for
-   #  the defauly system, default epoch and equinox change when
+   #  the default system, default epoch and equinox change when
    #  system changes.
    protected method set_system_defaults_ { {modsys 1} } {
       if { $modsys } {
