@@ -22,6 +22,9 @@
     for parameter YMAP will produce the same effect as setting YLOG 
     to TRUE.
 
+ o Modified ELPROF so that WCS information is propagated from the input
+ image to the output profile and mask.
+
  o Modified COLLAPSE so that output variances can be created for any
  size of input array when using the median estimator.
 

@@ -11,12 +11,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.24}
-\newcommand{\stardocnumber}    {95.24}
+\newcommand{\stardocsource}    {sun95.25}
+\newcommand{\stardocnumber}    {95.25}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {27th November 2003}
+\newcommand{\stardocdate}      {24th February 2004}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.1-3}
+\newcommand{\stardocversion}   {1.2}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -19301,7 +19301,9 @@ plot (101k).
 
          \sstitem
          This routine correctly processes the DATA, VARIANCE, TITLE,
-         UNITS, and HISTORY components of the input NDF.
+         UNITS, WCS (in radialmode only) and HISTORY components of the 
+         input NDF to the output profile NDF. WCS information is also 
+         propagated to the output mask NDF.
 
          \sstitem
          WCS information is currently lost by this application.
@@ -47221,6 +47223,12 @@ The following applications have been modified:
 	       less than 300 input values, the output variance is
 	       calculated as before using the order statistics
 	       variance-covariance array.
+      \end{itemize}
+
+   \item [\htmlref{ELPROF}{ELPROF}] \mbox{}
+      \begin{itemize}
+         \item Modified ELPROF so that WCS information is propagated from 
+         the input image to the output profile and mask.
       \end{itemize}
 
    \item [\htmlref{LINPLOT}{LINPLOT}] \mbox{}
