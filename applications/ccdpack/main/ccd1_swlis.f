@@ -6,7 +6,7 @@
 *     CCD1_SWLIS
 
 *  Purpose:
-*     Get Set and WCS information about lists files.
+*     Get Set and WCS information about list files.
 
 *  Language:
 *     Starlink Fortran 77.
@@ -182,7 +182,6 @@
       LOGICAL DIFDMN            ! True if different domains have been used
       LOGICAL OK                ! CCD_SET and Current frames consistent?
 
-      
 *.
 
 *  Check inherited global status.
@@ -213,6 +212,8 @@
       NSUP = 0
       IF ( USESET ) THEN
          CALL GRP_NEW( 'CCD:NAMES', NAMGRP, STATUS )
+      ELSE 
+         NAMGRP = GRP__NOID
       END IF
 
 *  Loop over position lists to acquire coordinate and Set information.
@@ -234,8 +235,7 @@
                DIFDMN = .TRUE.
             END IF
 
-*  Get a mapping from the PIXEL-domain frame to the Current frame,
-*  and export it so it survives the end of this AST context.
+*  Get a mapping from the PIXEL-domain frame to the Current frame.
             MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
             MAPPIX( I ) = AST_SIMPLIFY( MAP1, STATUS )
             CALL AST_ANNUL( MAP1, STATUS )
@@ -305,8 +305,11 @@
                   ELSE
                      CALL MSG_SETC( 'WORK', 'PIXEL' )
                   END IF
-                  CALL CCD1_MSG( ' ', '  ** Warning: CCD_SET -> ^WORK'//
-     :            ' frame coordinate mapping not consistent.', STATUS )
+                  CALL CCD1_MSG( ' ', '  ** Warning: ^WORK'//
+     :' coordinates are not consistent with Set alignment.', STATUS )
+                  CALL CCD1_MSG( ' ', '              This will'//
+     :            ' almost certainly result in errors.', STATUS )
+                  CALL CCD1_MSG( ' ', ' ', STATUS )
                END IF
             END IF
 
@@ -403,6 +406,9 @@
      :'  Position list names extracted from NDF extensions.', STATUS )
          END IF
       END IF
+
+*  Release group resources.
+      CALL CCD1_GRDEL( NAMGRP, STATUS )
 
       END
 * $Id$
