@@ -165,6 +165,7 @@
 #  while the later ones are being modified.
          .vref configure -status active
          [ .vref component exit ] configure -state disabled
+         [ .vref component abort ] configure -state disabled
 
 #  Try to place the new viewer next to the reference viewer on the screen
 #  if it will fit.  If not, positioning is left to the window manager.
