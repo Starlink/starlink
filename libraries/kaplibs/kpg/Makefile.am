@@ -156,8 +156,8 @@ kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f kpg1_pvers.f \
 kpg1_is3d.f kpg1_wtm3d.f kpg1_is3r.f kpg1_wtm3r.f kpg1_orvar.f \
 kpg1_lutk2.f kpg1_lutk3.f kpg1_lutk4.f kpg1_pglut.f kpg1_lstar.f  \
 kpg1_ltlod.f  kpg1_ltget.f kpg1_ltsav.f kpg1_pgloc.f \
-kpg1_dnag2r.f  kpg1_dr2nag.f  kpg1_nag2r.f  kpg1_r2nag.f
-
+kpg1_dnag2r.f  kpg1_dr2nag.f  kpg1_nag2r.f  kpg1_r2nag.f \
+kpg1_pgsht.f kpg1_pacol.f
 
 .gn.f:
 	cp $< $(<:.gn=.gen)
