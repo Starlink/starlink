@@ -1,0 +1,279 @@
+\newpage
+\sstroutine{
+   NDF2FITS
+}{
+   Converts NDFs into FITS files
+}{
+   \sstdescription{
+      This application converts one or more NDF files into files in the
+      FITS format.  It uses the IMAGE extension to store VARIANCE and
+      QUALITY, and binary tables to store NDF extensions, except for
+      the FITS extension, which may be merged into the output FITS
+      file's headers.
+   }
+   \sstusage{
+      ndf2fits in out [comp] [bitpix] [origin]
+   }
+   \sstparameters{
+      \sstsubsection{
+         BITPIX = GROUP (Read)
+      }{
+         The FITS bits-per-pixel (BITPIX) value for each conversion.
+         This specifies the data type of the output FITS file.
+         Permitted values are: 8 for unsigned byte, 16 for signed word,
+         32 for integer, $-$32 for real, $-$64 for double precision.  0
+         will cause the output file to have the data type equivalent to
+         that of the input NDF.
+
+         BITPIX values must be enclosed in double quotes and may be a list 
+         of comma-separated values to be applied to each conversion in turn.
+         An error results if more values than the number of input NDFs are
+         supplied.  If too few are given, the last value in the list is
+         applied to the remainder of the NDFs; thus a single value is 
+         applied to all the conversions.  
+         The given values must be in the same order as that of the input NDFs.
+         Indirection through a text file may be used.
+         If more than one line is required to enter the information at a prompt
+         then type a {\tt "-"} at the end of each line where a
+         continuation line is desired.
+         {\tt [0]}
+      }
+      \sstsubsection{
+         COMP = GROUP (Read)
+      }{
+         The list of array components to attempt to transfer to each
+         FITS file.  The acceptable values are {\tt "D"} for the main data
+         array {\tt "V"} for variance, {\tt "Q"} for quality, or any permutation
+         thereof.  The special value {\tt "A"} means all components,
+         {\it i.e.}\ COMP=\dqt{DVQ}. Thus COMP=\dqt{VD} requests that 
+         both the data array and variance are to be converted if present.  
+         During processing at least one, if not all, of the requested
+         components must be present, otherwise an error is reported and
+         processing turns to the next input NDF.  If the data component
+         is in the list, it will always be processed first into the
+         FITS primary array.  The order of the variance and quality
+         in COMP decides the order they will appear in the FITS file.
+
+         COMP may be a list of comma-separated values to be applied to
+         each conversion in turn.  The list must be enclosed in double quotes.
+         An error results if more values than
+         the number of input NDFs are supplied.  If too few are given,
+         the last value in the list is applied to the remainder of the
+         NDFs; thus a single value is applied to all the conversions.
+         The given values must be in the same order as that of the
+         input NDFs.  Indirection through a text file may be used.  If
+         more than one line is required to enter the information at a prompt
+         then type a {\tt "-"} at the end of each line where a continuation 
+         line is desired.  {\tt ["A"]}
+      }
+      \sstsubsection{
+         IN = GROUP (Read)
+      }{
+         The names of the NDFs to be converted into FITS format.  It
+         may be a list of NDF names or direction specifications
+         separated by commas and enclosed in double quotes.  
+         NDF names may include the regular
+         expressions ({\tt "$*$"}, {\tt "?"}, {\tt "[a-z]"} {\it etc.})
+         on UNIX systems.
+         Indirection may occur through text files (nested up to seven
+         deep).  The indirection character is {\tt "$\wedge$"}.  If extra prompt
+         lines are required, append the continuation character {\tt "-"} to
+         the end of the line.  Comments in the indirection file begin
+         with the character \hash.
+      }
+      \sstsubsection{
+         OUT = GROUP (Write)
+      }{
+         The names for the output FITS files.  These may be enclosed in double
+         quotes and specified as a list of comma-separated names, OR, using 
+         modification elements to specify output filenames based on the input
+         NDF filenames. Indirection may be used if required. 
+
+         The simplest modification element is the asterisk {\tt "$*$"}, which
+         means call the output FITS files the same name (without any directory
+         specification) as the corresponding input NDF, but with file 
+         extension {\tt ".fit"} instead of the NDF's extension of {\tt ".sdf"}.
+
+         Other types of modification can also occur so OUT=\dqt{x$*$}
+         would mean that the output files would have the same name
+         as the input NDFs except for an {\tt "x"} prefix and the
+         file extension of {\tt ".fit"}.  You can also replace a specified
+         string in the output filename, for example OUT=\dqt{x$*$|cal|Starlink|}
+         replaces the string {\tt "cal"} with {\tt "Starlink"} in any of
+         the output names {\tt "x$*$.fit"}.
+      }
+      \sstsubsection{
+         ORIGIN = LITERAL (Read)
+      }{
+         The origin of the FITS files.  This becomes the value of the
+         ORIGIN keyword in the FITS headers.  If a null value is given
+         it defaults to {\tt "Starlink Project, U.K."}.
+         {\tt [!]}
+      }
+      \sstsubsection{
+         PROEXTS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the NDF extensions (other than the FITS extension)
+         are propagated to the FITS files as FITS binary-table
+         extensions, one per structure of the hierarchy. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         PROFITS = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the contents of the FITS extension of the NDF are
+         merged with the header information derived from the standard
+         NDF components.  See the Notes for details of the merger.
+         {\tt [TRUE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2fits horse logo.fit d
+      }{
+         This converts the NDF called horse to the FITS file called
+         {\tt logo.fit}.  The data type of the FITS primary data array matches
+         that of the NDF's data array.  The FITS extension in the NDF
+         is merged into the FITS header of {\tt logo.fit}.
+      }
+      \sstexamplesubsection{
+         ndf2fits horse logo.fit d proexts
+      }{
+         This converts the NDF called horse to the FITS file called
+         {\tt logo.fit}.  The data type of the FITS primary data array matches
+         that of the NDF's data array.  The FITS extension in the NDF
+         is merged into the FITS header of {\tt logo.fit}.  In addition any
+         NDF extensions (apart from FITS) are turned into binary tables
+         that follow the primary header and data unit.
+      }
+      \sstexamplesubsection{
+         ndf2fits horse logo.fit
+      }{
+         This converts the NDF called horse to the FITS file called
+         {\tt logo.fit}.  The data type of the FITS primary data array matches
+         that of the NDF's data array.  The FITS extension in the NDF
+         is merged into the FITS header of {\tt logo.fit}.  Should horse
+         contain variance and quality arrays, these are written in IMAGE
+         extensions.
+      }
+      \sstexamplesubsection{
+         ndf2fits "data/a$*$z" "$*$" comp=v noprofits bitpix="-32"
+      }{
+         This converts the NDFs with names beginning with {\tt "a"} and ending
+         in {\tt "z"} in the directory called {\tt data} into FITS files of the
+         same name and with a file extension of {\tt ".fit"}.  The variance
+         array becomes the data array of each FITS file.  The data type
+         of the FITS primary data array single-precision floating
+         point.  Any FITS extension in the NDF is ignored.
+      }
+      \sstexamplesubsection{
+         ndf2fits "abc,def" "jvp1.fit,jvp2.fit" comp=d  bitpix="16,-64"
+      }{
+         This converts the NDFs called abc and def into FITS files
+         called {\tt jvp1.fit} and {\tt jvp2.fit} respectively.  
+         The data type of the FITS primary data array is signed integer words
+         in {\tt jvp1.fit}, and double-precision floating point in
+         {\tt jvp2.fit}. The FITS extension in each NDFs is merged into the
+         FITS header of the corresponding FITS file.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF main data array becomes the primary data array of the
+         FITS file if it is in value of parameter COMP, otherwise the first
+         array defined by parameter COMP will become the primary data
+         array.  A conversion from floating point to integer or to a
+         shorter integer type will cause the output array to be scaled and
+         offset, the values being recorded in keywords BSCALE and BZERO.
+         There is an offset (keyword BZERO) applied to signed byte and
+         unsigned word types to make them unsigned-byte and signed-word
+         values respectively in the FITS array (this is because FITS does
+         not support these data types).
+
+         \sstitem
+         The FITS keyword BLANK records the bad values for integer
+         output types.  Bad values in floating-point output arrays are
+         denoted by IEEE not-a-number values.
+
+         \sstitem
+         The NDF's quality and variance arrays appear in individual
+         FITS IMAGE extensions immediately following the primary header
+         and data unit, unless that component already appears as the
+         primary data array.  The quality array will always be written as
+         an unsigned-byte array in the FITS file, regardless of the value
+         of the parameter BITPIX.
+
+         \sstitem
+         Here are details of the processing of standard items from the
+         NDF into the FITS header, listed by FITS keyword.
+
+         \sstitemlist{
+
+            \sstitem
+            SIMPLE, EXTEND, PCOUNT, GCOUNT -- all take their default
+              values.
+
+            \sstitem
+            BITPIX, NAXIS, NAXISn -- are derived directly from the NDF
+              data array;
+
+            \sstitem
+            CRVAL{\em{n}}, CDELT{\em{n}}, CRPIX{\em{n}}, CRTYPE{\em{n}}, CTYPE{\em{n}} -- are derived from
+              the NDF axis structures if possible.  If no linear NDF axis
+              structures are present, the values in the NDF FITS extension
+              are copied (when parameter PROFITS is {\tt TRUE}).  If any axes
+              are non-linear, all FITS axis information is lost.
+
+            \sstitem
+            OBJECT, LABEL, BUNITS -- the values held in the NDF's title,
+              label, and units components respectively are used if
+              they are defined; otherwise any values found in the FITS
+              extension are used (provided parameter PROFITS is {\tt TRUE}).
+
+            \sstitem
+            ORIGIN and DATE -- are created automatically.  However, the
+              former may be overridden by an ORIGIN card in the NDF
+              extension.
+
+            \sstitem
+            EXTNAME -- is the component name of the object from the COMP
+              argument.
+
+            \sstitem
+            HDUCLAS1, HDUCLAS{\em{n}} -- {\tt "NDF"} and the value of COMP
+              respectively.
+
+            \sstitem
+            LBOUND{\em{n}} -- is the pixel origin for the $n^{\rm th}$ dimension
+              when any of the pixel origins is not equal to 1.  (This is not a
+              standard FITS keyword.)
+
+            \sstitem
+            XTENSION, BSCALE, BZERO, BLANK and END -- are not propagated
+              from the NDF's FITS extension.  XTENSION will be set for
+              any extension.  BSCALE and BZERO will be defined based on
+              the chosen output data type in comparison with the NDF
+              array's type, but cards with values 1.0 and 0.0 respectively
+              are written to reserve places in the header section.  These
+              `reservation' cards are for efficiency and they can always
+              be deleted later.  BLANK is set to the Starlink standard bad
+              value corresponding to the type specified by BITPIX, but only
+              for integer types and not for the quality array.  It appears
+              regardless of whether or not there are bad values actually
+              present in the array; this is for the same efficiency reasons
+              as before.  The END card terminates the FITS header.
+
+         }
+      }
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         All NDF data types are supported.
+      }
+   }
+}
+
