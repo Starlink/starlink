@@ -53,10 +53,6 @@ AC_SUBST(STAR_BUILD_DEPENDENCIES)dnl
 STAR_USE_DEPENDENCIES=''
 AC_SUBST(STAR_USE_DEPENDENCIES)dnl
 
-# List of documentation.  See [STAR_LATEX_DOCUMENTATION].
-# STAR_DOCUMENTATION is a list of document codes,
-STAR_DOCUMENTATION=
-AC_SUBST([STAR_DOCUMENTATION])
 dnl    Note: the following adds an EXTRA_DIST variable to the
 dnl    generated Makefile.  automake generates Makefile.in in such a
 dnl    way that that the contents of the $(EXTRA_DIST) variable is
@@ -303,10 +299,10 @@ AC_CONFIG_FILES(install-with-manifest, [chmod +x install-with-manifest])
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
 [AC_REQUIRE([_STAR_BOILERPLATE])dnl
 m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
-STAR_DOCUMENTATION="$STAR_DOCUMENTATION $1"
 m4_ifval([$2],
          [dnl non-empty second argument -- just add to variable
-	  _STAR_EXTRA_DIST($2)],
+	  _STAR_EXTRA_DIST($2)
+	  STAR_DOC_FILES($2)],
 	 [dnl second arg empty -- use defaults
 	  for d in $1; do
               docno=`basename $d .tex`
@@ -320,8 +316,9 @@ $docno.htx: $docno.tex
 $docno.htx_tar: $docno.htx
 	tar cf $docno.htx_tar $docno.htx
 EOD
+              _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
+	      STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
 	  done
-	  _STAR_EXTRA_DIST($docno.tex $docno.ps $docno.htx_tar)
 	  dnl STAR_DECLARE_BUILD_DEPENDENCIES(star2html)
 ])dnl
 ])# STAR_LATEX_DOCUMENTATION
@@ -345,19 +342,50 @@ if test "X$_STAR_INSTALL_HELP" = X; then
     AC_SUBST(_STAR_INSTALL_HELP)
     cat >>$STAR_BOILERPLATE <<\_EOD
 install-starhelp: $(_STAR_INSTALL_HELP) 
-	@$(NORMAL_INSTALL)
+	@ $(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(STAR_HELPDIR)
-	@list='$(_STAR_INSTALL_HELP)'; for p in $$list; do \
+	@ list='$(_STAR_INSTALL_HELP)'; for p in $$list; do \
 	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
 	  f="`echo $$p | sed -e 's|^.*/||'`"; \
 	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_HELPDIR)/$$f"; \
 	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_HELPDIR)/$$f; \
 	done
 _EOD
+    _STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-starhelp"
 fi
 _STAR_INSTALL_HELP="$_STAR_INSTALL_HELP $1"
-_STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-starhelp"
 ])# STAR_HELP_FILES
+
+# STAR_DOC_FILES(docfiles)
+# ------------------------
+#
+# Declare a list of files to be installed into the Starlink
+# documentation directory.  This can be used both internally and in
+# user configure.ac files.
+#
+AC_DEFUN([STAR_DOC_FILES],
+[AC_REQUIRE([_STAR_BOILERPLATE])dnl
+m4_ifval([$1], [], [AC_FATAL([$0: called with no doc files])])dnl
+if test "X$_STAR_INSTALL_DOCS" = X; then
+    # First time
+    STAR_DOCDIR='$(prefix)/docs'
+    AC_SUBST(STAR_DOCDIR)
+    AC_SUBST(_STAR_INSTALL_DOCS)
+    cat >>$STAR_BOILERPLATE <<\_EOD
+install-stardocs: $(_STAR_INSTALL_DOCS)
+	@ $(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(STAR_DOCDIR)
+	@ list='$(_STAR_INSTALL_DOCS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f="`echo $$p | sed -e 's|^.*/||'`"; \
+	  echo " $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_DOCDIR)/$$f"; \
+	  $(INSTALL_DATA) $$d$$p $(DESTDIR)$(STAR_DOCDIR)/$$f; \
+	done
+_EOD
+    _STAR_INSTALL_DATA_LOCAL="$_STAR_INSTALL_DATA_LOCAL install-stardocs"
+fi
+_STAR_INSTALL_DOCS="$_STAR_INSTALL_DOCS $1"
+])# STAR_DOC_FILES
 
 
 
