@@ -404,7 +404,7 @@ C Queue introduces a knee
 * IX and IY are always 0-511 for zoomed and unzoomed data. For zoomed data
 * this range corresponds to the centre quarter section giving twice the
 * (linear) resolution
-        REAL MATH_RND
+        REAL SLA_RANDOM
 	LOGICAL CIN_HIT_MASK
 
 	NPIX = 512/NLIN
@@ -421,15 +421,15 @@ C Add half a pixel to compensate (on average) for digitisation
 		IDY = IY(NE)/2 + 128
 		IXX = IDX/NPIX
 		IYY = IDY/NPIX
-		XS = REAL(IX(NE) - (IXX-16)*NPIX2) + MATH_RND()
-		YS = REAL(IY(NE) - (IYY-16)*NPIX2) + MATH_RND()
+		XS = REAL(IX(NE) - (IXX-16)*NPIX2) + SLA_RANDOM(ISEED)
+		YS = REAL(IY(NE) - (IYY-16)*NPIX2) + SLA_RANDOM(ISEED)
 		XS=XS/REAL(NPIX2)
 		YS=YS/REAL(NPIX2)
 	      ELSE
 		IXX=IX(NE)/NPIX
 		IYY=IY(NE)/NPIX
-	        XS=REAL(IX(NE)-IXX*NPIX) + MATH_RND()
-		YS=REAL(IY(NE)-IYY*NPIX) + MATH_RND()
+	        XS=REAL(IX(NE)-IXX*NPIX) + SLA_RANDOM(ISEED)
+		YS=REAL(IY(NE)-IYY*NPIX) + SLA_RANDOM(ISEED)
 		XS=XS/REAL(NPIX)
 		YS=YS/REAL(NPIX)
 	      ENDIF
