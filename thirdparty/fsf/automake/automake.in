@@ -4434,10 +4434,11 @@ sub handle_messgen
                                        MSG => $msg,
                                        );
 
-      my $starhelpdata = var ('starhelp_DATA');
-      # Append the fac_ file to starhelp_DATA if this is defined, or define if not.
-      Automake::Variable::define ('starhelp_DATA', VAR_MAKEFILE,
-                                  ($starhelpdata ? '+' : ''), TRUE,
+      my $starfacsdata = var ('starfacs_DATA');
+      # Append the fac_ file to starfacs_DATA if this is defined,
+      # or define if not.
+      Automake::Variable::define ('starfacs_DATA', VAR_MAKEFILE,
+                                  ($starfacsdata ? '+' : ''), TRUE,
                                   $facfile,
                                   '', INTERNAL, VAR_ASIS);
       # ...and distribute it.

@@ -180,10 +180,11 @@ _poss_STAR_RESTFP_FIX
 # Installation directory options (these are no longer handled
 # by _STAR_EXTRADIR_COMMON).  There should be an entry here for each of
 # Starlink's special installation locations.
-AC_SUBST([stardocsdir],     ['${prefix}/docs'])dnl
-AC_SUBST([starhelpdir],     ['${prefix}/help'])dnl
+AC_SUBST([stardocsdir],     ['${prefix}/docs'])dnl     documentation
+AC_SUBST([starhelpdir],     ['${prefix}/help'])dnl     other help files
 AC_SUBST([staretcdir],      ['${prefix}/etc'])dnl
 AC_SUBST([starexamplesdir], ['${prefix}/examples'])dnl
+AC_SUBST([starfacsdir],     ['${prefix}/help'])dnl     facilities files
 
 # Certain directories are affected by the $_star_per_package_dir variable;
 # if it's true, then add the $PACKAGE_NAME to the directory.
@@ -196,7 +197,12 @@ if $_star_per_package_dirs; then
     staretcdir="$staretcdir/$PACKAGE_NAME"
     AC_MSG_NOTICE([[STAR_DEFAULTS] has option per-package-dirs:])
     AC_MSG_NOTICE([    bindir=$bindir starhelpdir=$starhelpdir staretcdir=$staretcdir])
+    # Note that starfacsdir is unaffected by per-package-dirs -- facility
+    # files must always be installed in .../help (this also facilitates
+    # changing this installation location in future, to somewhere with a
+    # more logical name than .../help).
 fi
+
 
 # Dependency declarations and checks.
 # Everything is dependent on starconf, so we don't have to declare that 
