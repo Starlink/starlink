@@ -123,7 +123,7 @@ Type ? to see the main help topics.
 
 1 Group Expressions
 
-A description of the syntax used to specify groups of objects.
+How to specify groups of objects within POLPACK.
 
 Several of the POLPACK applications have parameters which are described
 as being associated with "groups" (or "lists") of objects. For instance,
