@@ -71,7 +71,15 @@
 #
 #  Point to specx.shl (.shl default) as help file.
 #
+if (-e ${SYS_SPECX}/specx.shl) then
    setenv SPECX_HELP  ${SYS_SPECX}/specx
+else
+   # Kluge this for now. This is caused by .shl files being installed
+   # by default into $prefix/help not $prefix/share/package
+   # Need to decide whether to force the install into share
+   # or to dynamically edit this file at install time
+   setenv SPECX_HELP ${SYS_SPECX}/../../help/specx
+endif
 #
 #  The standard command definitons use $SPECX_COMMAND for the directory
 #  to find .spx files. This is the same as $SYS_SPECX.
@@ -84,8 +92,10 @@
    setenv SPECX_DUMP specx.dmp
 #
 #  Finally, the user wants to run the programme via the alias specx.
+#  [this is no longer true since SPECX is now installed into the path
+#  as a binary]
 #
-   alias specx $SYS_SPECX/specx
+#   alias specx $SYS_SPECX/specx
 #
 #  PGPLOT X displayer and font file
 #
