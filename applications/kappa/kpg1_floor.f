@@ -43,13 +43,23 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       REAL VALUE
 
 *  Do it.
-      KPG1_FLOOR = INT( VALUE )
-      IF( REAL( KPG1_FLOOR ) .GT. VALUE ) KPG1_FLOOR = KPG1_FLOOR - 1.0
+      IF( VALUE > VAL__MAXI ) THEN
+         KPG1_FLOOR = VAL__MAXI
+
+      ELSE IF( VALUE < VAL__MINI ) THEN
+         KPG1_FLOOR = VAL__MINI
+
+      ELSE
+         KPG1_FLOOR = INT( VALUE )
+         IF( REAL( KPG1_FLOOR ) .GT. VALUE ) KPG1_FLOOR = KPG1_FLOOR 
+     :                                                    - 1.0
+      END IF
 
       END
  

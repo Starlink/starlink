@@ -296,6 +296,9 @@
 *  will be modified below.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDO, UBNDO, IDIM, STATUS )
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
       IF ( NRAFLG ) THEN
 
 *  Work out the dimensions of the output array to hold the results of

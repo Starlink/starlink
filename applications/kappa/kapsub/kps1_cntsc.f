@@ -140,9 +140,14 @@
       PCLBND = REAL( GLBND( 1 ) ) - 1.5 + REAL( SLBND( 1 ) )
       PCUBND = REAL( GUBND( 1 ) ) - 1.5 + REAL( SLBND( 1 ) )
 
-*  Find the pixel index bounds of the NDF section.
-      LBND( SDIM( 1 ) ) = KPG1_FLOOR( PCLBND ) + 1
-      UBND( SDIM( 1 ) ) = KPG1_CEIL( PCUBND )
+*  Find the pixel index bounds of the NDF section, limit the bounds to the 
+*  dimensions of the supplied NDF. If the limits returned by AST_MAPBOX
+*  look bad (e.g. if they are the wrong way round), retain the original
+*  bounds.
+      IF( PCUBND .GT. PCLBND ) THEN
+         LBND( SDIM( 1 ) ) = MAX( SLBND( 1 ), KPG1_FLOOR( PCLBND ) + 1 )
+         UBND( SDIM( 1 ) ) = MIN( SUBND( 1 ), KPG1_CEIL( PCUBND ) )
+      END IF
 
 *  Do the same for axis 2.
       CALL AST_MAPBOX( MAP, LBNDG, UBNDG, .TRUE., 2, GLBND( 2 ), 
@@ -151,8 +156,10 @@
       PCLBND = REAL( GLBND( 2 ) ) - 1.5 + REAL( SLBND( 2 ) )
       PCUBND = REAL( GUBND( 2 ) ) - 1.5 + REAL( SLBND( 2 ) )
 
-      LBND( SDIM( 2 ) ) = KPG1_FLOOR( PCLBND ) + 1
-      UBND( SDIM( 2 ) ) = KPG1_CEIL( PCUBND )
+      IF( PCUBND .GT. PCLBND ) THEN
+         LBND( SDIM( 2 ) ) = MAX( SLBND( 2 ), KPG1_FLOOR( PCLBND ) + 1 )
+         UBND( SDIM( 2 ) ) = MIN( SUBND( 2 ), KPG1_CEIL( PCUBND ) )
+      END IF
 
 *  Extract the required section from the NDF.
       CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS ) 
