@@ -98,7 +98,7 @@ itcl::class gaia::GaiaAstTransform {
 
       #  Add window help.
       global gaia_dir
-      add_help_button $gaia_dir/gaiaAstTransform.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstTransform.hlp "On Window..."
 
       #  Markers menu
       set Markers [add_menubutton Markers]
