@@ -457,7 +457,6 @@
 *    And export
         RA = LCEL(1) * MATH__DRTOD
         DEC = LCEL(2) * MATH__DRTOD
-	print *,x,y,fsys(1),fsys(2),ra,dec
 
       ENDIF
 
