@@ -279,7 +279,7 @@
 
 *  precess or convert the output coords as required
 
-                  IF (B1950 .EQ. .FALSE.) THEN
+                  IF (.NOT.B1950) THEN
                      CALL SLA_FK45Z (RAOUT(IX,IY), DECOUT(IX,IY),
      :                  1950.0D0, RAOUT(IX,IY), DECOUT(IX,IY))
                   END IF
