@@ -41,6 +41,8 @@ F_ROUTINES = const.f ctoj.f interp.f jtoc.f pleph.f \
 
 FPP_ROUTINES = ephopn.fpp
 
+ephopn.fpp: ephopn.f
+
 #  List of Fortran BLOCK DATA routines
 BLOCK_DATA_ROUTINES = comdat.f
 

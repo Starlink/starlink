@@ -89,7 +89,8 @@ C   Use autoconf without trying to do variable substitution
 #elif FC_RECL_UNIT == 4
        PARAMETER ( BYTEPRU = 4 )
 #else
-#  error "Impossible FC_RECL_UNIT"
+*      Should get a compilation error for this.
+ error 'Impossible record length'
 #endif
 
 C
