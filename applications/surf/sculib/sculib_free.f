@@ -102,6 +102,14 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     DEBUG message. Should convert this to a CPP directive
+*      CALL MSG_SETC('NM',NAME)
+*      CALL MSG_SETI('PTR', %LOC(START_PTR))
+*      CALL MSG_SETI('ACTPTR', START_PTR)
+*     KLUGE the MSG__QUIET value
+*      CALL MSG_OUTIF(1,' ','FREE: ^NM at ^ACTPTR using var ^PTR',STATUS)
+
+
       IF (START_PTR .NE. 0) THEN
 
 *  check sentinel integers, calls to VAL routines are just a way of

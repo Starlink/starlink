@@ -60,6 +60,10 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.7  1999/08/19 21:17:24  timj
+*     Add (commented) debug statements for checking that a malloc is
+*     followed by a free (not very sophisticated).
+*
 *     Revision 1.6  1999/08/19 03:37:16  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -150,5 +154,12 @@
          END IF
 
       END IF
+
+*     DEBUG statements (should be in CPP macro)
+*     Simply write out all successful mallocs (ie good status)
+*      CALL MSG_SETI('PTR', %LOC(START_PTR))
+*      CALL MSG_SETI('ACTPTR', START_PTR)
+*     KLUGE the MSG__QUIET value
+*      CALL MSG_OUTIF(1,' ','MALLOC: at ^ACTPTR using var ^PTR',STATUS)
 
       END
