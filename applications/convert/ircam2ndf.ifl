@@ -1,0 +1,82 @@
+## IRCAM2NDF - Converts an IRCAM data file to a series of NDFs.
+
+#+
+#  Name:
+#     IRCAM2NDF.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 September 2 (MJC):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface IRCAM2NDF
+
+   helplib        'CONVERT_HELP:'
+
+   parameter      CONFIG         # Select the data array to copy
+      position    4
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Data-array configuration to copy'
+      default     'STARE'
+      helpkey     '*'
+   endparameter
+
+   parameter      FMTCNV         # Apply scale and zero?
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      prompt      'Apply non-null scale and zero?'
+      default     FALSE
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Name of IRCAM file
+      position    1
+      type        'IRCAM'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Name of IRCAM file to be converted'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Name of NDF
+      type        'NDF'
+      access      'WRITE'
+      vpath       'NOPROMPT
+      prompt      'Name of output NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      helpkey     '*'
+   endparameter
+
+   parameter      OBS            # Observation numbers
+      position    3
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'List of observations to convert'
+      default     '*'
+      helpkey     '*'
+   endparameter
+
+   parameter      PREFIX         # Prefix for the output NDF names
+      position    2
+      type        'LITERAL'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Data-array configuration to copy'
+      default     'STARE'
+      helpkey     '*'
+   endparameter
+
+endinterface
