@@ -1,7 +1,7 @@
 Interface POWER
    Parameter    INP
       position    1
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<->GLOBAL.ANAL_DATA'
       prompt      'Enter name of input dataset'
@@ -10,7 +10,7 @@ Interface POWER
 
    Parameter    OUT
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       association '->GLOBAL.GRAFDS'
       prompt      'Enter name for the output dataset'
       help        'This will be an HDS file'
