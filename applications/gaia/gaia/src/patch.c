@@ -271,10 +271,10 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
         ndfId = info->NDFid;
         switch ( info->type ) {
         case  BYTE_IMAGE:
-            cnf_exprt( "_BYTE", type, 10 );
+            cnf_exprt( "_UBYTE", type, 10 );
             break;
         case  X_IMAGE:
-            cnf_exprt( "_UBYTE", type, 10 );
+            cnf_exprt( "_BYTE", type, 10 );
             break;
         case  SHORT_IMAGE:
             cnf_exprt( "_WORD", type, 10 );

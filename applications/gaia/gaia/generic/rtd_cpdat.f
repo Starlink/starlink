@@ -91,7 +91,7 @@
 
 *  Get the size and type of the NDF.
          CALL NDF_TYPE( ID, COMP, DTYPE, STATUS )
-         IF ( DTYPE .EQ. '_UBYTE' ) DTYPE = '_WORD'
+         IF ( DTYPE .EQ. '_BYTE' ) DTYPE = '_WORD'
 
 *  Determine the number of chunks to needed to copy the data.
          CALL NDF_NCHNK( ID, MXPIX, NCHUNK, STATUS )

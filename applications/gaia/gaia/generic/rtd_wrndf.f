@@ -25,8 +25,8 @@
 *        The name of the NDF to be created.
 *     TYPE = INTEGER (Given)
 *        The data type of the image. This will be one of the codes:
-*            8 = byte image
-*           -8 = X image data (written as unsigned byte).
+*            8 = unsigned byte image
+*            8 = X image data (written as byte).
 *           16 = signed word
 *          -16 = unsiged word
 *           32 = integer
@@ -171,9 +171,9 @@
          ELSE IF ( TYPE .EQ. -16 ) THEN
             DTYPE = '_UWORD'
          ELSE IF ( TYPE .EQ. 8 ) THEN
-            DTYPE = '_BYTE'
-         ELSE IF ( TYPE .EQ. -8 ) THEN
             DTYPE = '_UBYTE'
+         ELSE IF ( TYPE .EQ. -8 ) THEN
+            DTYPE = '_BYTE'
          END IF
 
 *  If the NDF identifier is 0 then create a new NDF, otherwise propagate

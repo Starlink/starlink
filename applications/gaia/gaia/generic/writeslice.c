@@ -142,10 +142,10 @@ int writesliceCmd( struct StarImageInfo *info, char *args, char **errStr )
     /*  Determine HDS type of image. */
   switch ( info->type ) {
   case  BYTE_IMAGE:
-    cnf_exprt( "_BYTE", (char *)type, 10 );
+    cnf_exprt( "_UBYTE", (char *)type, 10 );
     break;
   case  X_IMAGE:
-    cnf_exprt( "_UBYTE", (char *)type, 10 );
+    cnf_exprt( "_BYTE", (char *)type, 10 );
     break;
   case  SHORT_IMAGE:
     cnf_exprt( "_WORD", (char *)type, 10 );

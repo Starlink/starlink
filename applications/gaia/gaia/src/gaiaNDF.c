@@ -468,18 +468,6 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
       }
    }
    else if ( strncmp( dtype, "_BYTE", 5 ) == 0 ) {
-      unsigned char *fromPtr;
-      unsigned char *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned char *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
-   }
-   else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
 
       /*  Cannot represent this type, so mapping is to short */
       unsigned char *fromPtr;
@@ -490,6 +478,19 @@ int gaiaCopyComponent( int ndfid, void **data, const char* component,
          fromPtr = (unsigned char *) ptr[0];
          for( j = 0; j < el; j++ ) {
             *toPtr++ = (unsigned short) *fromPtr++;
+         }
+      }
+   }
+   else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
+
+      unsigned char *fromPtr;
+      unsigned char *toPtr = *data;
+      for ( i = 1; i <= nchunk; i++ ) {
+         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
+         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
+         fromPtr = (unsigned char *) ptr[0];
+         for( j = 0; j < el; j++ ) {
+            *toPtr++ = *fromPtr++;
          }
       }
    }
@@ -533,8 +534,8 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    ndfBegin();
    ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
 
-   /*  Trap _UBYTE and map _WORD */
-   if ( strncmp( dtype, "_UBYTE", 7 ) == 0 ) {
+   /*  Trap _BYTE and map _WORD */
+   if ( strncmp( dtype, "_BYTE", 7 ) == 0 ) {
       strcpy( dtype, "_WORD" );
    }
    ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status );

@@ -86,7 +86,8 @@
 *     15-NOV-1997 (PWD):
 *        Added changes to support AST WCS systems.
 *     18-DEC-1997 (PWD):
-*        Converted to return _UBYTE data as _WORD.
+*        Converted to return _BYTE data as _WORD (otherwise this is
+*        a special XImage type in Skycat).
 *     30-MAY-2001 (PWD):
 *        Now supports _DOUBLE directly.
 *     {enter_changes_here}
@@ -202,10 +203,10 @@
             ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
                TYPE = -16
             ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
-               TYPE = 8
-            ELSE IF ( DTYPE .EQ. '_UBYTE' ) THEN
                TYPE = 16
                DTYPE = '_WORD'
+            ELSE IF ( DTYPE .EQ. '_UBYTE' ) THEN
+               TYPE = 8
             END IF
 
 *  Now set up the FITS information to describe the world coordinate
