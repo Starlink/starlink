@@ -100,8 +100,12 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  Local Constants:
+      INTEGER			MAXLEN
+        PARAMETER		( MAXLEN = 400 )
+
 *  Local Variables:
-      CHARACTER*400	        VALUE			! Intermediate value
+      CHARACTER*(MAXLEN)	VALUE			! Intermediate value
 
       INTEGER			CLEN			! Length of ADI string
       INTEGER			DIMS(ADI__MXDIM)	! Data dimensions
