@@ -1,10 +1,13 @@
 package edu.hawaii.jach.gsd;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.NoSuchElementException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Iterator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -26,7 +29,7 @@ import java.util.TimeZone;
 
 public final class GSDObject {
 
-	// Constants
+        // Constants
 	// Size of GSD numerical data types in bytes
 	private static final int GSD__SZBYTE = GSDVAXBytes.VAX__SZBYTE;
 	private static final int GSD__SZLOGICAL = GSDVAXBytes.VAX__SZLOGICAL;
@@ -38,8 +41,9 @@ public final class GSDObject {
 	// These constants denote how much space is used for the different
 	// types of strings and what the maximum number of dimensions are
 	// allowed for array data. These values are required for the header read.
-    // Make GSD__SZUNIT and GSD__SZNAME package-private so that we know the largest possible size
-    // of the name and unit for printing without having to look at all the unts.
+        // Make GSD__SZUNIT and GSD__SZNAME package-private so that we know the 
+        // largest possible size
+        // of the name and unit for printing without having to look at all the unts.
 	private static final int GSD__SZLABEL = 40;
 	static final int GSD__SZUNIT = 10;
 	static final int GSD__SZNAME = 15;
@@ -59,7 +63,7 @@ public final class GSDObject {
 	private int no_items;
 	private String label;
 	private float version;
-	private String filename = "<none>";
+        private File file;
 	private int start_data;
 	private int end_data;
 	private int size;
@@ -69,9 +73,9 @@ public final class GSDObject {
 	private Map itemmap;
 
 	/**
-	 * Constructs a GSDObject given the name of a GSD file.
+	 * Constructs a GSDObject given a File object
 	 *
-	 * @param filename Name of the GSD file on disk.
+	 * @param file File object corresponding to the name of the GSD file on disk.
 	 * @throws FileNotFoundException if the specified file can not be found 
 	 *         or opened.
 	 * @throws IOException if there is an error reading the file contents.
@@ -79,10 +83,13 @@ public final class GSDObject {
 	 * dimension has not been read before the array item itself. This
 	 * suggests an internal error in the organisation of the file.
 	 */
+
     // Need to do the proper Java thing and also allow
     // GSDObject( File file )
-	public GSDObject(String filename)
+	public GSDObject(File file)
 		throws FileNotFoundException, IOException {
+
+    	        String filename = file.getAbsolutePath();
 
 		// Need to open the file
 		RandomAccessFile fptr = new RandomAccessFile(filename, "r");
@@ -101,7 +108,7 @@ public final class GSDObject {
 		fptr.close();
 
 		// File read okay so store the filename
-		this.filename = filename;
+		this.file = file;
 
 		// Now parse the buffer 
 		this.parseBuffer(allcontents);
@@ -148,13 +155,29 @@ public final class GSDObject {
 		return this.version;
 	}
 
+
 	/**
-	 * The name of the GSD file. If this object was constructed
-	 * from a ByteBuffer the filename will be set to &quot;&lt;none&gt;&quot;.
+	 * The File object associated with the GSD file. If this object was constructed
+	 * from a ByteBuffer the file object will not be defined.
 	 */
-	public String getFilename() {
-		return this.filename;
+	public File getFile() {
+		return this.file;
 	}
+
+    /**
+     * Return the filename associated with this GSD object. If this object was constructed
+     * from a ByteBuffer the filename will be set to "<none>".
+     */
+        public String getFilename() {
+	    String filename;
+	    try {
+		filename = getFile().getName();
+	    } catch (NullPointerException e) {
+		filename = "<none>";
+	    }
+	    return filename;
+        }
+
 
 /**
  * Return the date and time of observation as a java.util.Date object.
@@ -231,11 +254,41 @@ public final class GSDObject {
 		return (GSDItem[]) this.items.clone();
 	}
 
+    /**
+     * Return an item iterator. Each time a call to .next() is made the next GSD 
+     * item is returned. Always starts from item 1.
+     *
+     */
+
+    public Iterator getItemIterator() {
+	return new Iterator () {
+		private int itemno = 1;
+
+		public Object next() {
+		    if (hasNext()) {
+			Object item = itemByNum( itemno );
+			itemno++;
+			return item;
+		    } else {
+			throw new NoSuchElementException();
+		    }
+		}
+
+		/* Return true if we have another item */
+		public boolean hasNext() {
+		    return itemno <= getNumItems();
+		}
+		public void remove() {
+		    throw new UnsupportedOperationException();
+		}
+	    };
+    }
+
 	/**
 	  * Return item contents by GSD item name. Item names are case
 	  * insensitive. The name can be either the long name or the short
 	  * name.
-      * 
+          * 
 	  * @param itemname Name of the requested item.
 	  * @return a GSDItem object with all the Item information
 	  * @throws GSDException if the named item is not present.
@@ -309,7 +362,7 @@ public final class GSDObject {
 		System.out.println(" GSD version    : " + getGsdVersion());
 		System.out.println(" Label          : " + getLabel());
 		System.out.println(" Number of items: " + getNumItems());
-        System.out.println(" Date of Observation:" + getDateObs());
+                System.out.println(" Date of Observation: " + getDateObs());
 		System.out.println("");
 		System.out.println("");
 		System.out.println("");
@@ -325,8 +378,10 @@ public final class GSDObject {
 
 		// Loop over each item. Draw a divider if we have just reached
 		// an array item
-		for (int i = 1; i <= getNumItems(); i++) {
-			GSDItem item = itemByNum(i);
+		Iterator all = getItemIterator();
+
+		while ( all.hasNext() ) {
+  		        GSDItem item = (GSDItem)all.next();
 
 			// print a divider if we are an array item
 			if (item.isArray()) {
