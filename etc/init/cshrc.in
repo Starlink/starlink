@@ -345,9 +345,9 @@ endif
 #   Jcmtdr
 #
  
-if ( -e @bindir@/jcmtdr/start ) then
-   alias jcmtdr 'source $JCMTDR_DIR/start'
-   alias jcmtdrsetup 'source $JCMTDR_DIR/start'
+if ( -e @bindir@/jcmtdr/jcmtdr.csh ) then
+   alias jcmtdr 'source $JCMTDR_DIR/jcmtdr.csh'
+   alias jcmtdrsetup 'source $JCMTDR_DIR/jcmtdr.csh'
 else
    alias jcmtdr '@staretcdir@/notinst jcmtdr'
    alias jcmtdrsetup '@staretcdir@/notinst jcmtdrsetup'

@@ -305,7 +305,7 @@ endif
 
 #
 #  JCMTDR
-if ( -e @bindir@/jcmtdr/start ) then
+if ( -e @bindir@/jcmtdr/jcmtdr.csh ) then
    setenv JCMTDR_DIR @bindir@/jcmtdr
    setenv JCMTDR_HELP @starhelpdir@/jcmtdr/jcmtdr
    setenv JCMTDR_HTML @starhelpdir@/jcmtdr/html
