@@ -3,7 +3,8 @@
 // See file LICENCE for conditions.
 //
 // part of dvi2bitmap
-// $Id$
+static const char RCSID[] =
+	"$Id$";
 
 #define NULL 0
 #include <iostream>
