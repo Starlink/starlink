@@ -126,7 +126,7 @@
             END IF
          END DO
          IF ( FOUND ) THEN
-            VALUE = IOR( VALUE ,CODES(I) )
+            VALUE = OR( VALUE ,CODES(I) )
          ELSE
             CALL ERR_REP( 'INVMASK', 'Invalid mask name', STATUS )
             GOTO 99

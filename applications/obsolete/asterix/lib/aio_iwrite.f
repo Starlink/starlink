@@ -17,7 +17,10 @@
 *
 *    History :
 *
-*      4 May 94 : Original. Derived from old UTIL_SELOUT routine (DJA)
+*      4 May 1994 (DJA):
+*        Original version. Derived from old UTIL_SELOUT routine
+*     22 Feb 1996 (DJA):
+*        Strict F77 version to cope with Linux
 *
 *    Type definitions :
 *
@@ -39,17 +42,26 @@
 *
 *    Local data :
 *
+      CHARACTER*200		OBUF			! Output buffer
       CHARACTER*80		BLANKS
         DATA			BLANKS/'                             '/
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Write the text with leading blanks
-      CALL AIO_WRITE( ID, BLANKS(1:INDENT)//TEXT, STATUS )
+*  Write blanks to buffer
+      IF ( INDENT .GT. 0 ) THEN
+        OBUF(:INDENT) = BLANKS(:INDENT)
+      END IF
 
-*    Tidy up
+*  Fill rest of buffer
+      OBUF(INDENT+1:) = TEXT
+
+*  Write buffer
+      CALL AIO_WRITE( ID, OBUF(:INDENT+LEN(TEXT)), STATUS )
+
+*  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'AIO_IWRITE', STATUS )
       END IF

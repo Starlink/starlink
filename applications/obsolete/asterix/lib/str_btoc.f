@@ -122,7 +122,7 @@
             BIT=-128
           END IF
           JBIT=8-IBIT
-          IF (BIT_ANDUB(NUM,BIT)/BIT) THEN
+          IF ( (BIT_ANDUB(NUM,BIT)/BIT) .NE. 0) THEN
             STRING(JBIT:JBIT)='1'
           ENDIF
           IBIT = IBIT + 1
