@@ -1,3 +1,7 @@
+2001-10-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/remdbm.pl: Support ARDMASK from kappa 0.18
+
 2001-04-09  Tim Jenness  <timj@jach.hawaii.edu>
 
 	********** V1.6-7 ***************

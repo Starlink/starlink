@@ -9,6 +9,7 @@ use Carp;
 
 use Getopt::Long;                       # Command line options
 use NDF;                                # to access NDF headers
+use Starlink::Versions qw/ starversion_gt /;
 
 use constant DIAMETER => 15.0;          # Diameter of telescope
 
@@ -381,10 +382,16 @@ if ($filter) {
   # Create ARD file
   my $ardfile = "ard$$.mask";
   open ARD, "> $ardfile" || die "Error creating ARD file for fourier filter\n";
+
+  if (starversion_gt('kappa', 'V0.18-0')) {
+    # ARD will support WCS
+    print ARD "COFRAME(PIXEL)\n";
+  }
   print ARD ".NOT.ELLIPSE($xcen,$ycen,$xrad,$yrad,0)\n";
   close ARD || die "Error closing ARD file\n";
 
-  my $args = "cosys=world ardfile=$ardfile";
+  my $args = "ardfile=$ardfile";
+  $args .= " cosys=world " unless starversion_gt('kappa','V0.18-0');
   $status = $Mon{kappa_mon}->obeyw("ardmask","in=rediv out=rediv_ard $args");
   check_status($status);
   $status = $Mon{kappa_mon}->obeyw("ardmask","in=imdiv out=imdiv_ard $args");
