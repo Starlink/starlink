@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "ast.h"
 #include "f77.h"
+#include "sae_par.h"
 #include <tcl.h>
 #include <tk.h>
 
@@ -16,9 +17,6 @@ int *tclDummyMathPtr = (int *) matherr;
 #endif
 
 static FILE *fd = NULL;
-
-#define SAI__OK 0
-#define SAI__ERROR 148013867
 
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
                                 INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
@@ -63,6 +61,7 @@ F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +69,8 @@ F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *        Original version.
 *     3-JUL-2002 (DSB):
 *        Replaced use of tmpnam with mkstemp.
+*     2-SEP-2004 (TIMJ):
+*        Use sae_par.h for good/bad status
 *     {enter_changes_here}
 
 *  Bugs:

@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include "f77.h"
 #include "cnf.h"
-
-#define SAI__OK 0
-#define SAI__ERROR 148013867
+#include "sae_par.h"
 
 F77_SUBROUTINE(lpg1_tmpnm)( CHARACTER(TMPNAM), INTEGER(STATUS) TRAIL(TMPNAM) ){
 /*
