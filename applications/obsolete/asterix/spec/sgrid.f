@@ -82,6 +82,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'FIT_PAR'
 *
@@ -112,7 +113,7 @@
 *
 *    Local variables :
 *
-      RECORD /GRID_AXIS/     GAX(DAT__MXDIM)    ! Grid axes
+      RECORD /GRID_AXIS/     GAX(ADI__MXDIM)    ! Grid axes
       RECORD /INSTR_RESP/    INSTR(NDSMAX)      ! Instrument responses
       RECORD /MODEL_SPEC/    MODEL              ! Model specification
       RECORD /DATASET/       OBDAT(NDSMAX)      ! Observed datasets
@@ -139,11 +140,11 @@
 
       INTEGER                FSTAT		! Fit statistic flag (1=chisq, 2=l'hood)
       INTEGER                	GDPTR(MXGRID)      	! Grid data pointer
-      INTEGER                	GDIMS(DAT__MXDIM)  	! Grid dimensions
+      INTEGER                	GDIMS(ADI__MXDIM)  	! Grid dimensions
       INTEGER 			GFID(MXGRID)       	! Fit grid datasets
       INTEGER                	GNELM              	! # grid elements
       INTEGER                	GPARS(MXGRID)      	! Things to be gridded
-      INTEGER                	GPS(DAT__MXDIM)    	! Grid parameters
+      INTEGER                	GPS(ADI__MXDIM)    	! Grid parameters
       INTEGER                	GQPTR              	! Grid quality pointer
       INTEGER                	I, J, N            	! Loop variables
       INTEGER			IFID			! Input dataset id
@@ -269,7 +270,7 @@
       CALL SEDIT_LISTPAR( MFID, NPAR, PCOMP, PPAR, 6, STATUS )
 
 *    Select parameters for grid axes
-      CALL USI_GET1I( 'PARS', DAT__MXDIM, GPS, NGRIDAX, STATUS )
+      CALL USI_GET1I( 'PARS', ADI__MXDIM, GPS, NGRIDAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check free parameters
