@@ -614,15 +614,19 @@ generated HTML documents.
    (let* ((in-sect (ancestor-member elemnode (list (normalize "sect"))))
           (sect-id (and in-sect (attribute-string (normalize "id") in-sect))))
       (make element gi: "a"
-            attributes: (list (list "href" 
-                                    (string-append (idindex-sys-id)
-                                                   "#"
-                                                   (if sect-id
-                                                       (string-append
-                                                           idindex-frag-id
-							   "_" sect-id)
-                                                       idindex-frag-id))))
+            attributes: `(("href" ,(string-append (idindex-sys-id)
+                                                  "#"
+                                                  (if sect-id
+                                                      (string-append
+                                                       idindex-frag-id
+                                                       "_" sect-id)
+                                                      idindex-frag-id))))
             (literal "[ID index]"))))
+
+(define (keyword-index-link)
+  (make element gi: "a"
+        attributes: `(("href" ,(keywordindex-sys-id)))
+        (literal "[Keyword index]")))
 
 ;; Generates a standard navigation bar.
 (define (navbar nd #!key (uplink #f))
@@ -637,6 +641,7 @@ generated HTML documents.
       (navlink (if uplink uplink (nav-up-element nd)) "Up" "title")
       (navlink (nav-backward-element nd) "Previous" "title")
       (idindex-link nd)
+      (keyword-index-link)
       (make empty-element gi: "hr")))
 
 
