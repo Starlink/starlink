@@ -43,11 +43,11 @@ PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//ENT"
 						ISOent/ISOlat1-ent.ent
 
 public "-//Starlink//ENTITIES Additional entities//EN//HTML" 
-						entities-html.sdata
+						entities-html.ent
 public "-//Starlink//ENTITIES Additional entities//EN//LATEX" 
-						entities-latex.sdata
+						entities-latex.ent
 public "-//Starlink//ENTITIES Additional entities//EN//PLAIN" 
-						entities-plain.sdata
+						entities-plain.ent
 
 	-- DSSSL DTDs, added from Jade1.1.1 --
 PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" "dsssl/fot.dtd"

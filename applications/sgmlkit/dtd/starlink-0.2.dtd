@@ -196,10 +196,21 @@
 <!entity % Feature.Routinelist 'ignore'>
 
 
-<!--========== Entities for special symbols ==========-->
+<!--========== Entities for special symbols ==========
 
-<!entity % LaTeX.sdata 'IGNORE'>
-<!entity % HTML.sdata 'IGNORE'>
+  There's a feature here I don't understand.  I had thought that the
+  appropriate way to switch between entity sets (for LaTeX or HTML
+  output) was to use SDATA entities.  However, when I do that - doing
+  something like <!entity copy   SDATA "(c)">, what comes out the back
+  of Jade is what looks like a multibyte character reference &#65533,
+  independently of what I have in the actual SDATA entity
+  declaration.  I can't find any enlightenment in Goldfarb, either.
+  The entities are therefore currently defined using CDATA character
+  entities.
+-->
+
+<!entity % LaTeX.entities 'IGNORE'>
+<!entity % HTML.entities 'IGNORE'>
 
 <![ %LaTeX.sdata [
 <!entity % Additional.Char.Ents

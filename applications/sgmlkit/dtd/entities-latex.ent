@@ -1,0 +1,19 @@
+<!--
+  Additional SDATA entities, for LaTeX use.
+-->
+
+<!entity copy   CDATA "\copyright{}"	-- copyright sign	-->
+<!entity amp    CDATA "\&"		-- ampersand		-->
+<!entity gt     CDATA ">"		-- greater than		-->
+<!entity lt     CDATA "<"		-- less than		-->
+<!entity quot   CDATA '\dquote{}'	-- double quote		-->
+<!entity nbsp   CDATA "~"		-- non breaking space	-->
+<!entity hash	CDATA "\#"		-- hash sign		-->
+<!entity pounds	CDATA "{\normalfont\pounds{}}" -- pound sign	-->
+<!entity dollar CDATA "\$"		-- dollar sign		-->
+<!entity ellip  CDATA "\dots{}"		-- ellipses		-->
+<!entity emdash CDATA "---"		-- em dash 		-->
+<!entity endash CDATA "--"		-- en dash		-->
+<!entity percent CDATA "\%"		-- percent sign		-->
+<!entity deg    CDATA "\ensuremath{{}^\circ}"	-- degree	-->
+<!entity latex  CDATA "\LaTeX{}"	-- might as well...	-->

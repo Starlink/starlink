@@ -1,0 +1,20 @@
+<!--
+  Additional SDATA entities, for use when generating neither HTML nor LaTeX
+  (when?).
+-->
+
+<!entity copy   CDATA "(c)"	-- copyright sign	-->
+<!entity amp    CDATA "&"	-- ampersand		-->
+<!entity gt     CDATA ">"	-- greater than		-->
+<!entity lt     CDATA "<"	-- less than		-->
+<!entity quot   CDATA '"'	-- double quote		-->
+<!entity nbsp   CDATA " "	-- non breaking space	-->
+<!entity hash	CDATA "#"	-- hash sign		-->
+<!entity pounds	CDATA "GBP"	-- pound sign		-->
+<!entity dollar CDATA "$"	-- dollar sign		-->
+<!entity ellip  CDATA "..."	-- ellipses		-->
+<!entity emdash CDATA "---"	-- em dash 		-->
+<!entity endash CDATA "--"	-- en dash		-->
+<!entity percent CDATA "%"	-- percent sign		-->
+<!entity deg    CDATA "^o"	-- degree		-->
+<!entity latex  CDATA "LaTeX"	-- might as well...	-->
