@@ -24,31 +24,14 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'AST_PKG'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Status :
 *
       INTEGER STATUS
-*
-*    Local variables :
-*
-      INTEGER                   I                 ! Loop over libraries/psfs
 *-
 
 *  Reset status
       STATUS = SAI__OK
-
-*  Release any active psfs
-      DO I = 1, PSF_NMAX
-        IF ( P_USED(I) ) THEN
-          CALL PSF_RELEASE( I, STATUS )
-        END IF
-      END DO
 
 *  System is now shut down
       CALL AST_CPKGI( PSF__PKG )

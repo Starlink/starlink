@@ -1,5 +1,5 @@
 *+  PSF_QMODEL - Is the psf handle a psf model specification
-      SUBROUTINE PSF_QMODEL( SLOT, MODEL, STATUS )
+      SUBROUTINE PSF_QMODEL( PSID, MODEL, STATUS )
 *
 *    Authors :
 *
@@ -16,16 +16,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      INTEGER                  SLOT                    ! Psf handle
+      INTEGER                  PSID                    ! Psf handle
 *
 *    Export :
 *
@@ -36,10 +30,10 @@
       INTEGER                  STATUS
 *-
 
-*    Check status
+*  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Is the psf a model?
-      MODEL = P_MODEL(SLOT)
+*  Is the psf a model?
+      CALL ADI_CGET0L( PSID, 'IsModel', MODEL, STATUS )
 
       END

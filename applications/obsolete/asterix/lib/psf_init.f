@@ -49,9 +49,6 @@
 *  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Reset psf slots
-      CALL ARR_INIT1L( .FALSE., PSF_NMAX, P_USED, STATUS )
-
 *  Load the ADI package
       CALL ADI_REQPKG( 'psf', STATUS )
 
