@@ -1,3 +1,4 @@
+
 proc Accept {} {
 #+
 #  Name:
@@ -7903,9 +7904,12 @@ proc Obey {task action params args} {
    global ACTION
    global ADAM_ERRORS
    global ATASK_OUTPUT
-   global CANCEL_WAIT
+   global CANCEL_OP
    global LOGFILE_ID
    global STATUS
+
+# Return without action if the opoeration was canceleed.
+   if { $CANCEL_OP } { return 0 }
 
 # Store the current action being performed in global.
    set ACTION "$task:$action"
@@ -7964,9 +7968,9 @@ proc Obey {task action params args} {
 # Wait until the action is finished. Check that the Rendevous file exists
 # every 200 milliseconds. If the WaitFor command aborts early, try
 # re-executing the obey command. Do not re-execute the command if it was
-# terminated due to a user requested cancel (indicated by CANCEL_WAIT being
+# terminated due to a user requested cancel (indicated by CANCEL_OP being
 # non-zero).
-   if { ![WaitFor STATUS [list CheckRF $task] 200] && !$CANCEL_WAIT } {
+   if { ![WaitFor STATUS [list CheckRF $task] 200] && !$CANCEL_OP } {
       set ADAM_ERRORS {}
       set ATASK_OUTPUT {}
 
@@ -7979,7 +7983,7 @@ proc Obey {task action params args} {
                          -endmsg {set STATUS "%S"} \
                          -paramreq $param_req
 
-      if { ![WaitFor STATUS [list CheckRF $task] 200] && !$CANCEL_WAIT } {
+      if { ![WaitFor STATUS [list CheckRF $task] 200] && !$CANCEL_OP } {
          Message "Problems with rendevous file! Aborting..."
          exit 1
       }
@@ -8008,7 +8012,7 @@ proc Obey {task action params args} {
 
 # Return the status. Return zero if the operation was cancelled by the
 # user.
-   if { $CANCEL_WAIT } { set ok 0 }
+   if { $CANCEL_OP } { set ok 0 }
 
    return $ok
 }
@@ -8812,6 +8816,7 @@ proc Save {} {
 #
 #-
    global ATASK_OUTPUT
+   global CANCEL_OP
    global DBEAM
    global EFFECTS_MAPPINGS
    global FITTYPE
@@ -8833,6 +8838,7 @@ proc Save {} {
    global POLY
    global RESAVE
    global SAFE
+   global S_FONT
    global SKY_AREA
    global SKY_METHOD
    global STOP_BLINK
@@ -8893,6 +8899,7 @@ proc Save {} {
 
          set imlist [frame $fr0.imlist -bd 2 -relief raised -background $back]
          SetHelp $imlist ".  A list of all the input images. A tick mark is displayed next to the images which have been completed. "
+         pack [label $imlist.lb -text " Input images " -font $S_FONT -background $back] -side top -pady 1m
 
          set pfrm [frame $fr0.pfrm]
          SetHelp $pfrm ".  A list of the processing stages involved in creating the output images. Tick marks are displayed next to the stages which have been completed, and the current stage is highlighted in red. "
@@ -8914,12 +8921,13 @@ proc Save {} {
          set image ""
          set fr1 [frame $pfrm.fr1]
          pack $fr1 -side top -anchor w -fill both -expand 1
-         set l1 [label $fr1.l1 -text "Doing image: "]
+         set l1 [label $fr1.l1 -text "Doing image: " -font $S_FONT]
          set l2 [label $fr1.l2 -textvariable image]
          pack $l1 $l2 -side left -padx 6m 
 
          set fr234 [frame $pfrm.fr234 -background $back -bd 2 -relief raised]
          pack $fr234 -side left -padx 5m -pady 3m -fill both -expand 1
+         pack [label $fr234.lb -text "Processing stages" -font $S_FONT -background $back] -side top 
 
          set fr2 [frame $fr234.fr2 -background $back]
          set fr3 [frame $fr234.fr3 -background $back]
@@ -8983,7 +8991,7 @@ proc Save {} {
          pack $butfrm -side top -fill both -expand 1
 
          set b1 [button $butfrm.close -text "Close" -command "destroy $top"]
-         set b2 [button $butfrm.cancel -text "Cancel" -command {set CANCEL_WAIT 1}]
+         set b2 [button $butfrm.cancel -text "Cancel" -command {set CANCEL_OP 1}]
 
          SetHelp $b1 ".  Press to close the dialog box, proceeding silently with the operation."
          SetHelp $b2 ".  Press to close the dialog box, cancelling the operation."
@@ -9007,16 +9015,16 @@ proc Save {} {
             set tfci [BeginUF]
 
 # Make the ticks invisible in the progress report.
-            $setick(O) configure -foreground $back
-            $setick(E) configure -foreground $back
-            $sstick(O) configure -foreground $back
-            $sstick(E) configure -foreground $back
-            $metick(O) configure -foreground $back
-            $metick(E) configure -foreground $back
-            $iatick(O) configure -foreground $back
-            $iatick(E) configure -foreground $back
-            $hitick(O) configure -foreground $back
-            $hitick(E) configure -foreground $back
+            Wop $setick(O) configure -foreground $back
+            Wop $setick(E) configure -foreground $back
+            Wop $sstick(O) configure -foreground $back
+            Wop $sstick(E) configure -foreground $back
+            Wop $metick(O) configure -foreground $back
+            Wop $metick(E) configure -foreground $back
+            Wop $iatick(O) configure -foreground $back
+            Wop $iatick(E) configure -foreground $back
+            Wop $hitick(O) configure -foreground $back
+            Wop $hitick(E) configure -foreground $back
 
 # Extract the image name section string from the image-section string.
             GetSec $imsec image section
@@ -9052,7 +9060,8 @@ proc Save {} {
             foreach ray $rays {
                upvar #0 ${ray}_RAY_MASK obj
 
-               Blink $melab -foreground red black 500
+# Highlight the "mask extraction" label in red in the progress dialog box.
+               Wop $melab configure -foreground red
 
 # If in dual-beam mode, ensure that the mask is available.
                set got_mask [CreateMask $image $obj] 
@@ -9083,10 +9092,12 @@ proc Save {} {
                   }
                }
 
-               set STOP_BLINK black
-               tkwait variable STOP_BLINK
-               $metick($ray) configure -foreground black
-               Blink $ialab -foreground red black 500
+# Make the "mask extraction" label (and associated tick mark) in the 
+# progress dialog box revert to black, and highlight the "image alignment" 
+# label in red.
+               Wop $melab configure -foreground black
+               Wop $metick($ray) configure -foreground black
+               Wop $ialab configure -foreground red 
 
 # Determine the output image name.
                set outim $OUTIMS($image,$ray)
@@ -9132,10 +9143,12 @@ proc Save {} {
                      break
                   }
 
-                  set STOP_BLINK black
-                  tkwait variable STOP_BLINK
-                  $iatick($ray) configure -foreground black
-                  Blink $hilab -foreground red black 500
+# Make the "image alignment" label (and associated tick mark) in the 
+# progress dialog box revert to black, and highlight the "header information"
+# label in red.
+                  Wop $ialab configure -foreground black
+                  Wop $iatick($ray) configure -foreground black
+                  Wop $hilab configure -foreground red
 
 # Get the numerical index of the fit type used between images.
                   foreach fittype [array names MAPTYPE] {
@@ -9226,9 +9239,11 @@ proc Save {} {
                      }
                   }
 
-                  set STOP_BLINK black
-                  tkwait variable STOP_BLINK
-                  $hitick($ray) configure -foreground black
+# Make the "header information" label (and associated tick mark) in the 
+# progress dialog box revert to black.
+                  Wop $hilab configure -foreground red 
+                  Wop $hitick($ray) configure -foreground black
+                  update idletasks
 
 # Null mappings should not happen.
                } {
@@ -9249,9 +9264,7 @@ proc Save {} {
 
 # Set the foreground colour of the image's tick in the progress dialog
 # box to black.
-            if { [winfo exists $tick($image)] } {
-               $tick($image) configure -foreground black
-            }
+            Wop $tick($image) configure -foreground black
 
 # Delete all the temporary files created in this pass through the loop.
             EndUF $tfci ""
@@ -9266,7 +9279,7 @@ proc Save {} {
 
 # Destroy the progress dialog box.
          if { [winfo exists $top] } { 
-            after 2000
+            after 1000
             destroy $top 
          }
       }
@@ -9276,6 +9289,7 @@ proc Save {} {
 # images which were created.
    if { !$ok } { 
       Message "The registered images could not be saved." 
+      set CANCEL_OP 0
       foreach image $IMAGES {
          foreach ray $rays {
             set file $OUTIMS($image,$ray)
@@ -10687,7 +10701,6 @@ proc SkySub {data image args} {
 
 # Extract the names of the widgets which are used to indicate progress.
    if { [llength $args] == 6 } {
-      set report 1
       set selab [lindex $args 0]
       set setick(O) [lindex $args 1]
       set setick(E) [lindex $args 2]
@@ -10695,21 +10708,23 @@ proc SkySub {data image args} {
       set sstick(O) [lindex $args 4]
       set sstick(E) [lindex $args 5]
    } {
-      set report 0
+      set selab "no.such.window"
+      set setick(O) "no.such.window"
+      set setick(E) "no.such.window"
+      set sslab "no.such.window"
+      set sstick(O) "no.such.window"
+      set sstick(E) "no.such.window"
    }
 
 # If the sky background has been supplied in a separate image, subtract
 # it from the object frame.
    if { $SKY_METHOD == $SKY_FRAME } {
 
-# If a progress report is required, indicate that the sky areas have been
-# extracted, and blink the "sky subraction" label to indicate that the
-# sky is being subtracted.
-      if { $report } {
-         $setick(O) configure -foreground black
-         $setick(E) configure -foreground black
-         Blink $sslab -foreground red black 500
-      }
+# Indicate that the sky areas have been extracted, and highlight the 
+# "sky subraction" label to indicate that the sky is being subtracted.
+      Wop $setick(O) configure -foreground black
+      if { $DBEAM } { Wop $setick(E) configure -foreground black }
+      Wop $sslab configure -foreground red 
 
 # Do the subtraction.
       set ssimage [UniqueFile]
@@ -10717,14 +10732,10 @@ proc SkySub {data image args} {
          set ssimage ""
       }
 
-# If a progress report is required, stop the "sky subraction" label
-# blinking, and indicate that the sky has been subtracted.
-      if { $report } {
-         set STOP_BLINK black
-         tkwait variable STOP_BLINK
-         $sstick(O) configure -foreground black
-         $sstick(E) configure -foreground black
-      }
+# Indicate that the sky areas have been subtracted.
+      Wop $sstick(O) configure -foreground black
+      if { $DBEAM } { Wop $sstick(E) configure -foreground black}
+      Wop $sslab configure -foreground black
 
 # If the sky background is defined by an area in the supplied object
 # frame...
@@ -10748,9 +10759,7 @@ proc SkySub {data image args} {
 
 # If a progress report is required, indicate that the sky areas are being
 # extracted.
-         if { $report } {
-            Blink $selab -foreground red black 500
-         }
+         Wop $selab configure -foreground red
 
 # Issue a warning if the sky areas have not been identified.
          if { ![CreateMask $image $skyobj] } {
@@ -10799,20 +10808,14 @@ proc SkySub {data image args} {
 
 #------------ End of temporary bit -----------------------------------
 
-# If a progress report is required, stop the "sky extraction" label
-# blinking, and indicate that the sky has been extracted. Then make the
-# "sky subtraction" label blink.
-         if { $report } {
-            set STOP_BLINK black
-            tkwait variable STOP_BLINK
-            $setick($ray) configure -foreground black
-         }
+# If a progress report is required, un-highlight the "sky extraction" label
+# and indicate that the sky has been extracted.
+         Wop $selab configure -foreground black
+         Wop $setick($ray) configure -foreground black
       }
 
-# If a progress report is required, make the "sky subtraction" label blink.
-      if { $report } {
-         Blink $sslab -foreground red black 500
-      }
+# If a progress report is required, make the "sky subtraction" label red.
+      Wop $sslab configure -foreground red 
 
 # If the fits to the sky areas for the required rays were obtained ok,
 # combine them into a single sky image.
@@ -10876,12 +10879,9 @@ proc SkySub {data image args} {
 
 # If a progress report is required, stop the "sky subtraction" label
 # blinking, and indicate that the sky has been subtracted.
-      if { $report } {
-         set STOP_BLINK black
-         tkwait variable STOP_BLINK
-         $sstick(O) configure -foreground black
-         $sstick(E) configure -foreground black
-      }
+      Wop $sslab configure -foreground black
+      Wop $sstick(O) configure -foreground black
+      if { $DBEAM } { Wop $sstick(E) configure -foreground black }
 
 # If anything went wrong, return a null string.
       if { !$ok } { set ssimage "" }
@@ -10889,12 +10889,10 @@ proc SkySub {data image args} {
 # Do no sky subtraction for any other type. 
    } {
       set ssimage $image
-      if { $report } {
-         $setick(O) configure -foreground grey
-         $setick(E) configure -foreground grey
-         $sstick(O) configure -foreground grey
-         $sstick(E) configure -foreground grey
-      }
+      Wop $setick(O) configure -foreground grey
+      Wop $setick(E) configure -foreground grey
+      Wop $sstick(O) configure -foreground grey
+      Wop $sstick(E) configure -foreground grey
    }
 
 # Delete all the temporary files created in this procedure, except for the 
@@ -12148,7 +12146,7 @@ proc WaitFor {name args} {
 #
 #  Returned Value:
 #     Zero if a supplied command returned a zero value or the
-#     CANCEL_WAIT variable was set to a non-zero value (in which
+#     CANCEL_OP variable was set to a non-zero value (in which
 #     case the delay is aborted prematurely), and one otherwise.
 #
 #  Globals:
@@ -12163,7 +12161,7 @@ proc WaitFor {name args} {
 #-
    global CAN
    global SAFE
-   global CANCEL_WAIT
+   global CANCEL_OP
 
 # Access the supplied variable using the local name "VAR".
    upvar #0 $name VAR
@@ -12216,11 +12214,8 @@ proc WaitFor {name args} {
          if { !$ret } { break }
       }
 
-# Break out of the loop if CANCEL_WAIT was set to a non-zero value.
-      if { $CANCEL_WAIT } { 
-         set ret 0 
-         break
-      }
+# Break out of the loop if CANCEL_OP was set to a non-zero value.
+      if { $CANCEL_OP } { break }
 
 # Pause and then repeat.
       after $delay {set a 1}
@@ -12240,76 +12235,37 @@ proc WaitFor {name args} {
       $CAN config -cursor $old_cancur
    }
 
+# Return zero if the operation has been cancelled.
+   if { $CANCEL_OP } { set ret 0 }
+
    return $ret
 }
 
-proc Zoom {} {
+proc Wop {w args} {
 #+
 #  Name:
-#     Zoom
+#     Wop
 #
 #  Purpose:
-#     Update the display to show just the selected area.
+#     Execute a widget command, gaurding against the possibility of the 
+#     widget no longer existing.
 #
 #  Arguments:
-#     None.
+#     w
+#        The name of the widget.
+#     args
+#        Further arguments to pass to the widget command.
 #
-#  Globals:
-#     SELECTED_AREA (Read)
-#        The bounds of the selected area in the order xmin, xmax, ymin,
-#        ymax. 
-#
+#  Returned Value:
+#     The returned value from the widget command, or a blank string if
+#     the widget no longer exists.
 #-
-   global SELECTED_AREA
-   global SECTION_STACK
-   global SECTION_DISP
-   global SECTION_REQ
-   global UNZOOM
-
-# Do nothing if there is no selected area.
-   if { $SELECTED_AREA != "" } {
-
-# Get the bounds in canvas coordinates of the selected area.
-      set cxlo [lindex $SELECTED_AREA 0]      
-      set cylo [lindex $SELECTED_AREA 1]      
-      set cxhi [lindex $SELECTED_AREA 2]      
-      set cyhi [lindex $SELECTED_AREA 3]      
-
-# Convert these to pixel coordinates. Note, the Y axis is reversed since the
-# TK origin is at the UPPER left corner.
-      set pxyl [CanToNDF $cxlo $cyhi]
-      if { $pxyl == "" } { return } 
-      set pxlo [lindex $pxyl 0]
-      set pylo [lindex $pxyl 1]
-      set pxyl [CanToNDF $cxhi $cylo]
-      set pxhi [lindex $pxyl 0]
-      set pyhi [lindex $pxyl 1]
-
-# Convert these to pixel indices.
-      set ipxlo [expr round($pxlo) + 1 ]
-      set ipylo [expr round($pylo) + 1 ]
-      set ipxhi [expr round($pxhi) ]
-      set ipyhi [expr round($pyhi) ]
-
-# Only accept the Zoom request if the selected area is larger than 4
-# pixels on each edge.
-      set dx [expr $ipxhi - $ipxlo]
-      set dy [expr $ipyhi - $ipylo]
-      if { $dx > 4 && $dy > 4 } {
-
-# Save the currently displayed section on the section stack so that it can be
-# restored later using the Unzoom button.
-         Push SECTION_STACK $SECTION_DISP
-         $UNZOOM configure -state normal
-
-# Display the modified section. 
-         set SECTION_REQ "($ipxlo:$ipxhi,$ipylo:$ipyhi)"
-         UpdateDisplay
-       } {
-         Message "Selected area is too small to display."
-         CancelArea
-      }
+   if { [winfo exists $w] } {
+      set ret [eval $w $args]
+   } { 
+      set ret ""
    }
+   return $ret
 }
 
 proc Xhair {cx cy} {
@@ -12395,6 +12351,75 @@ proc Xhair {cx cy} {
 # cross hair.
          set XHAIR_IDH ""
          set XHAIR_IDV ""
+      }
+   }
+}
+
+proc Zoom {} {
+#+
+#  Name:
+#     Zoom
+#
+#  Purpose:
+#     Update the display to show just the selected area.
+#
+#  Arguments:
+#     None.
+#
+#  Globals:
+#     SELECTED_AREA (Read)
+#        The bounds of the selected area in the order xmin, xmax, ymin,
+#        ymax. 
+#
+#-
+   global SELECTED_AREA
+   global SECTION_STACK
+   global SECTION_DISP
+   global SECTION_REQ
+   global UNZOOM
+
+# Do nothing if there is no selected area.
+   if { $SELECTED_AREA != "" } {
+
+# Get the bounds in canvas coordinates of the selected area.
+      set cxlo [lindex $SELECTED_AREA 0]      
+      set cylo [lindex $SELECTED_AREA 1]      
+      set cxhi [lindex $SELECTED_AREA 2]      
+      set cyhi [lindex $SELECTED_AREA 3]      
+
+# Convert these to pixel coordinates. Note, the Y axis is reversed since the
+# TK origin is at the UPPER left corner.
+      set pxyl [CanToNDF $cxlo $cyhi]
+      if { $pxyl == "" } { return } 
+      set pxlo [lindex $pxyl 0]
+      set pylo [lindex $pxyl 1]
+      set pxyl [CanToNDF $cxhi $cylo]
+      set pxhi [lindex $pxyl 0]
+      set pyhi [lindex $pxyl 1]
+
+# Convert these to pixel indices.
+      set ipxlo [expr round($pxlo) + 1 ]
+      set ipylo [expr round($pylo) + 1 ]
+      set ipxhi [expr round($pxhi) ]
+      set ipyhi [expr round($pyhi) ]
+
+# Only accept the Zoom request if the selected area is larger than 4
+# pixels on each edge.
+      set dx [expr $ipxhi - $ipxlo]
+      set dy [expr $ipyhi - $ipylo]
+      if { $dx > 4 && $dy > 4 } {
+
+# Save the currently displayed section on the section stack so that it can be
+# restored later using the Unzoom button.
+         Push SECTION_STACK $SECTION_DISP
+         $UNZOOM configure -state normal
+
+# Display the modified section. 
+         set SECTION_REQ "($ipxlo:$ipxhi,$ipylo:$ipyhi)"
+         UpdateDisplay
+       } {
+         Message "Selected area is too small to display."
+         CancelArea
       }
    }
 }

@@ -109,7 +109,7 @@
    set ATASK 0
    set BADCOL cyan
    set BASE_SECTION ""
-   set CANCEL_WAIT 0
+   set CANCEL_OP 0
    set CURCOL red
    set CUROBJ_DISP ""
    set CUROBJ_REQ $O_RAY_FEATURES
