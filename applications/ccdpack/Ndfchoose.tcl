@@ -125,6 +125,11 @@
 #        Prevented resize attempts during window plotting.  For some
 #        reason I don't understand, this can cause core dumps.
 #        Also added the pre-plot button.
+#     7-JUN-2001 (MBT):
+#        Modified to avoid unnecessary re-creation of GWM window.  This
+#        also leads to core dumps (GWM window lost by PGPLOT - I suspect,
+#        but can't prove, a bug in GWM or PGPLOT).  This can still 
+#        happen however if you do a lot of chooser resizing.
 #-
 
 #  Inheritance.
@@ -508,32 +513,53 @@
             set wcsframe 0
          }
 
-#  Check whether the window exists and is out of date.  If so, destroy
-#  it preparatory to generating a new one.
-         if { [ array names itk_component plot$index ] != "" && \
-              ( $plotted($index,width) != $width || \
-                $plotted($index,height) != $height || \
-                $plotted($index,percs) != $percs || \
-                $plotted($index,wcsframe) != $wcsframe || \
-                $plotted($index,displaystyle) != $displaystyle ) } {
-            destroy $itk_component(plot$index)
-            unset itk_component(plot$index)
+
+#  Unless we establish otherwise, we will need to create a new window
+#  and GWM widget, and draw the image onto it.
+         set createwindow 1
+         set drawimage 1
+
+#  See if the window and GWM widget already exists.
+         if { [ array names itk_component plot$index ] != "" } {
+
+#  See if it has the right shape; if so, we will not need to create a
+#  new one.
+            if { ! $isndfset || ( $plotted($index,width) == $width && \
+                                  $plotted($index,height) == $height ) } {
+               set createwindow 0
+
+#  If it has the right shape, see if the image has been plotted with 
+#  all the right attributes; if so, we will not need to plot it again.
+               if { $plotted($index,percs) == $percs && \
+                    $plotted($index,wcsframe) == $wcsframe && \
+                    $plotted($index,displaystyle) == $displaystyle } {
+                  set drawimage 0
+               }
+
+#  The window has the wrong shape; we have to destroy the existing one
+#  so that we can create a new one and replot the image.
+            } else {
+               destroy $itk_component(plot$index)
+               unset itk_component(plot$index)
+            }
          }
 
-#  Check whether the window already exists.  If it does, all we need
-#  to do is return the name.
-         if { [ array names itk_component plot$index ] == "" } {
+#  Check whether we need to do anything; we may only need to return
+#  the window name.
+         if { $drawimage } {
 
 #  The window does not currently exist; we need to create and fill it.
 #  Create the containing frame.
-            container plot$index $itk_component(choosearea) \
-                                 [ expr "{$index}" == "{1}" ]
+            if { $createwindow } {
+               container plot$index $itk_component(choosearea) \
+                                    [ expr "{$index}" == "{1}" ]
+            }
 
 #  Only proceed if the widget is in the active state.
-            if { $status == "active" } {
+            if { $isndfset } {
 
 #  Create the GWM widget.
-               if { $isndfset } {
+               if { $status == "active" } {
 
 #  Display might be time-consuming: post a busy window.
                   waitpush "Drawing image [ $ndfset name ]"
@@ -557,13 +583,17 @@
                      }
                   }
 
-#  Construct the GWM widget.
+#  Get the name that the GWM widget has/will have.
                   set gwmname [ winfo id $itk_component(choosearea) ]_$index
-                  itk_component add plot$index:display {
-                     gwm $itk_component(plot$index).gwm \
-                         -width [ expr $width * $scale ] \
-                         -height [ expr $height * $scale ] \
-                         -name $gwmname
+
+#  Construct the GWM widget if necessary.
+                  if { $createwindow } {
+                     itk_component add plot$index:display {
+                        gwm $itk_component(plot$index).gwm \
+                            -width [ expr $width * $scale ] \
+                            -height [ expr $height * $scale ] \
+                            -name $gwmname
+                     }
                   }
 
 #  Plot the NDF inside the GWM.
@@ -575,34 +605,36 @@
                                   [ lindex $percs 0 ] [ lindex $percs 1 ] \
                                   $wcsframe [ join $options "," ]
 
+                  pack $itk_component(plot$index:display) -expand 1 -fill both
+
 #  It may be a good idea to unmap the NDF here (although it may not).
                   $ndfset mapped 0
 
 #  Remove the busy window.
                   waitpop
+               }
 
 #  This is a blank window; write instructions to the user.
-               } else {
-                  itk_component add plot$index:display {
-                     frame $itk_component(plot$index).blank \
-                         -width $width \
-                         -height $height
-                  }
-                  set msg \
-                     "Use the tabs to\npick an image for\ndisplay on the $side"
-                  itk_component add plot$index:instructions {
-                     label $itk_component(plot$index:display).instruct$index \
-                        -justify $side -text $msg
-                  }
-                  itk_component add plot$index:arrow {
-                     label $itk_component(plot$index:display).arrow$index \
-                        -bitmap @$CCDdir/arrow_$side.xbm
-                  }
-                  pack $itk_component(plot$index:arrow) \
-                     -side $side -anchor n -expand 0
-                  pack $itk_component(plot$index:instructions) \
-                     -side $side -anchor n -expand 1 -fill both
+            } else {
+               itk_component add plot$index:display {
+                  frame $itk_component(plot$index).blank \
+                      -width $width \
+                      -height $height
                }
+               set msg \
+                  "Use the tabs to\npick an image for\ndisplay on the $side"
+               itk_component add plot$index:instructions {
+                  label $itk_component(plot$index:display).instruct$index \
+                     -justify $side -text $msg
+               }
+               itk_component add plot$index:arrow {
+                  label $itk_component(plot$index:display).arrow$index \
+                     -bitmap @$CCDdir/arrow_$side.xbm
+               }
+               pack $itk_component(plot$index:arrow) \
+                  -side $side -anchor n -expand 0
+               pack $itk_component(plot$index:instructions) \
+                  -side $side -anchor n -expand 1 -fill both
                pack $itk_component(plot$index:display) -expand 1 -fill both
             }
 
