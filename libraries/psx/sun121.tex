@@ -998,6 +998,8 @@ PSX\_\_NOMEM & Could not get required memory
             {Generate a random number}
 \noteroutine{PSX\_REALLOC}{PSX_REALLOC}{( SIZE, PNTR, STATUS )}
             {Change the size of an allocated region of virtual memory}
+\noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
+            {Remove a file or empty directory}
 \noteroutine{PSX\_SRAND}{PSX_SRAND}{( SEED, STATUS )}
             {Set the seed for the random number generator}
 \noteroutine{PSX\_TIME}{PSX_TIME}{( NTICKS, STATUS )}
@@ -1041,6 +1043,13 @@ PSX\_\_NOMEM & Could not get required memory
              MACHINE,}
             {\textnormal{\textbf{STATUS )}}\\
             Gets information about the host computer system }
+\end{description}
+
+
+\subsection{\xlabel{file_system_support}File System Support}
+\begin{description}
+\noteroutine{PSX\_REMOVE}{PSX_REMOVE}{( PATH, STATUS )}
+            {Remove a file or empty directory}
 \end{description}
 
 \subsection{\xlabel{language_specific_services_for_c_fortran_versions}Language Specific Services for C (FORTRAN versions)}
@@ -2528,6 +2537,61 @@ PSX\_\_NOMEM & Could not get required memory
       Copyright
    }{
       Copyright (C) 1991 Science \& Engineering Research Council
+   }
+}
+\sstroutine{
+   PSX\_REMOVE
+}{
+   Remove a file or directory
+}{
+   \sstdescription{
+      This C function calls the {\tt "}remove{\tt "} RTL function to remove a specified
+      file or directory. It is equivalent to {\tt "}unlink{\tt "} for files and {\tt "}rmdir{\tt "}
+      for directories. A directory must be empty. On error, STATUS is set
+     to PSX\_\_ERRNO and the error message will contain the system error
+     message.
+   }
+   \sstinvocation{
+      CALL PSX\_REMOVE( PATHNAME, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PATHNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The path to the file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The inherited global status.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         CALL PSX\_REMOVE( {\tt '}tmp.dat{\tt '}, STATUS )
+      }{
+         This will remove the file tmp.dat
+      }
+   }
+   \sstdiytopic{
+      External Routines Used
+   }{
+      cnf: cnfImprt
+      ems: emsSyser
+   }
+   \sstdiytopic{
+      References
+   }{
+      \sstitemlist{
+
+         \sstitem
+         POSIX standard, IEEE Std 1003.1
+      }
+   }
+   \sstdiytopic{
+      Copyright
+   }{
+      Copyright (C) 1999-2004 CLRC
    }
 }
 \sstroutine{
