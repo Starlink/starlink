@@ -64,29 +64,40 @@
           CALL MSG_PRNT(' ')
           XC=I_X
           YC=I_Y
-          CALL MSG_SETR('X',XC)
-          CALL MSG_SETR('Y',YC)
-          CALL MSG_PRNT('Select centre/^X,^Y/...')
-          CALL PGCURSE(XC,YC,CH)
-          IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
-            XC=I_X
-            YC=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XC,YC,STATUS)
+          ELSE
+            CALL MSG_SETR('X',XC)
+            CALL MSG_SETR('Y',YC)
+            CALL MSG_PRNT('Select centre/^X,^Y/...')
+            CALL PGCURSE(XC,YC,CH)
+            IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
+              XC=I_X
+              YC=I_Y
+            ENDIF
           ENDIF
           CALL PGPOINT(1,XC,YC,2)
           CALL IMG_WORLDTOPIX(XC,YC,PXC,PYC,STATUS)
 
 *  get radius
-          CALL MSG_SETR('R',I_R)
-          CALL MSG_PRNT('Select radius/^R/...')
-          XR=XC
-          YR=YC
-          CALL PGCURSE(XR,YR,CH)
-          IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
-            RAD=I_R
-            XR=XC+RAD
-            YR=YC
-          ELSE
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select radius...')
+            CALL IMG_GUICURS(XR,YR,STATUS)
             RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+          ELSE
+            CALL MSG_SETR('R',I_R)
+            CALL MSG_PRNT('Select radius/^R/...')
+            XR=XC
+            YR=YC
+            CALL PGCURSE(XR,YR,CH)
+            IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
+              RAD=I_R
+              XR=XC+RAD
+              YR=YC
+            ELSE
+              RAD=SQRT((XR-XC)**2 + (YR-YC)**2)
+            ENDIF
           ENDIF
           CALL IMG_WORLDTOPIX(XR,YR,PXR,PYR,STATUS)
 

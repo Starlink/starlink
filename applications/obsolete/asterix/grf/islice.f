@@ -74,13 +74,18 @@
           CALL MSG_PRNT(' ')
           XCENT=I_X
           YCENT=I_Y
-          CALL MSG_SETR('X',XCENT)
-          CALL MSG_SETR('Y',YCENT)
-          CALL MSG_PRNT('Select centre/^X,^Y/...')
-          CALL PGCURSE(XCENT,YCENT,CH)
-          IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
-            XCENT=I_X
-            YCENT=I_Y
+          IF (I_GUI) THEN
+            CALL MSG_PRNT('Select centre...')
+            CALL IMG_GUICURS(XCENT,YCENT,STATUS)
+          ELSE
+            CALL MSG_SETR('X',XCENT)
+            CALL MSG_SETR('Y',YCENT)
+            CALL MSG_PRNT('Select centre/^X,^Y/...')
+            CALL PGCURSE(XCENT,YCENT,CH)
+            IF (CH.EQ.CHAR(13).OR.CH.EQ.CHAR(50)) THEN
+              XCENT=I_X
+              YCENT=I_Y
+            ENDIF
           ENDIF
           CALL PGPOINT(1,XCENT,YCENT,2)
           CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
@@ -89,7 +94,11 @@
           CALL MSG_PRNT('Select end...')
           XEND=XCENT
           YEND=YCENT
-          CALL PGCURSE(XEND,YEND,CH)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(XEND,YEND,STATUS)
+          ELSE
+            CALL PGCURSE(XEND,YEND,CH)
+          ENDIF
           CALL PGPOINT(1,XEND,YEND,2)
           CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
 
@@ -106,7 +115,11 @@
           CALL MSG_PRNT('Select width...')
           XWID=XCENT
           YWID=YCENT
-          CALL PGCURSE(XWID,YWID,CH)
+          IF (I_GUI) THEN
+            CALL IMG_GUICURS(XWID,YWID,STATUS)
+          ELSE
+            CALL PGCURSE(XWID,YWID,CH)
+          ENDIF
           CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
 
 *  calc length
