@@ -20,6 +20,8 @@
       INTEGER                 AS_PHALO(PSF_NMAX)        !
       INTEGER                 AS_PHAHI(PSF_NMAX)        ! Channel bounds
       LOGICAL                 AS_PHA_DEF(PSF_NMAX)      ! Channel bounds defined
+      REAL                    AS_RAW_LO(PSF_NMAX)
+      REAL                    AS_RAW_HI(PSF_NMAX)
 
       CHARACTER*3	      AS_INSTR(PSF_NMAX)	! ASCA detector
       CHARACTER*200		AS_CALDB
@@ -28,6 +30,7 @@
       COMMON /PSF_ASCA_CMN/    AS_INIT, AS_ENERGY,
      :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF,
      :                        AS_GPTR,AS_SPTR, AS_GPIX,
-     :                        AS_SPIX, AS_CALDBL
+     :                        AS_SPIX, AS_CALDBL,
+     :                        AS_RAW_LO, AS_RAW_HI
 
       COMMON /PSF_ASCA_CMNC/   AS_INSTR, AS_CALDB
