@@ -4750,6 +4750,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
       INCLUDE 'GRP_PAR'
       INCLUDE 'PRM_PAR'
 *    Global Variables :
@@ -4765,16 +4766,72 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *    External references :
 *    Local Constants :
 *    Local variables :
+      CHARACTER*132 ARDIN
       REAL TR(6)
-      INTEGER GRPID
+      INTEGER GRPID,FID
       INTEGER LBND(2),LBNDI(2),LBNDE(2)
       INTEGER UBND(2),UBNDI(2),UBNDE(2)
       INTEGER REGVAL
+      INTEGER INDEX
+      LOGICAL FILE
+      LOGICAL THERE
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get ARD input
-        CALL ARD_GROUP(PAR1,GRP__NOID,GRPID,STATUS)
+        CALL USI_GET0C(PAR1,ARDIN,STATUS)
+
+*  look for indirection symbol
+        IF (ARDIN(1:1).EQ.'^') THEN
+          FILE=.TRUE.
+          ARDIN=ARDIN(2:)
+          INQUIRE(FILE=ARDIN,EXIST=THERE)
+          IF (.NOT.THERE) THEN
+            CALL MSG_SETC('FIL',ARDIN)
+            CALL MSG_PRNT('AST_ERR: file ^FIL does not exist')
+            STATUS=SAI__ERROR
+          ENDIF
+        ELSE
+*  if not see if there is a file of that name
+          INQUIRE(FILE=ARDIN,EXIST=THERE)
+          FILE=THERE
+        ENDIF
+
+        IF (STATUS.EQ.SAI__OK) THEN
+
+          CALL GRP_NEW('ARD input',GRPID,STATUS)
+
+          IF (FILE) THEN
+*  read from file
+            CALL FIO_OPEN(ARDIN,'READ','NONE',0,FID,STATUS)
+            INDEX=0
+            DO WHILE (STATUS.EQ.SAI__OK)
+              CALL FIO_READ(FID,ARDIN,STATUS)
+              IF (STATUS.EQ.SAI__OK) THEN
+                INDEX=INDEX+1
+                CALL GRP_PUT(GRPID,1,ARDIN,INDEX,STATUS)
+              ENDIF
+            ENDDO
+            CALL FIO_CLOSE(FID,STATUS)
+*  read from environment
+          ELSE
+            INDEX=1
+            DO WHILE (ARDIN.GT.' '.AND.STATUS.EQ.SAI__OK)
+              CALL GRP_PUT(GRPID,1,ARDIN,INDEX,STATUS)
+              CALL USI_CANCL(PAR1,STATUS)
+              ARDIN=' '
+              CALL USI_GET0C(PAR1,ARDIN,STATUS)
+              IF (STATUS.EQ.PAR__NULL) THEN
+                CALL ERR_ANNUL(STATUS)
+                ARDIN=' '
+              ENDIF
+            ENDDO
+          ENDIF
+
+        ENDIF
+
+
+C        CALL ARD_GROUP(PAR1,GRP__NOID,GRPID,STATUS)
 
 *  set image dimensions
         LBND(1)=1
