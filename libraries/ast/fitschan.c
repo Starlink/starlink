@@ -24648,6 +24648,7 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
    char **comms;             /* Pointer to array of CTYPE commments */
    char buf[ 100 ];          /* Buffer for textual attribute value */
    char buf2[ 100 ];         /* Buffer for textual attribute value */
+   char buf3[ 20 ];          /* Buffer for default CTYPE value */
    char *newdom;             /* Pointer to new Domain value */
    const char *ckeyval;      /* Pointer to character keyword value */
    int i;                    /* Axis index */
@@ -24698,7 +24699,7 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
 
 /* If this axis has no CTYPE comment, we will use CTYPE values as axis
    labels (if given, the CNAME keyword take precedence). */
-            if( astChrLen( ckeyval ) == 0  ) {
+            if( !ckeyval || astChrLen( ckeyval ) == 0  ) {
                usecom = 0;
 
 /* If the CTYPE comment for this axis is the same as any other comment, we 
@@ -24756,14 +24757,18 @@ static AstMapping *WcsOthers( AstFitsChan *this, FitsStore *store, char s,
    Domain of the primary Frame. */
             if( !pfrm2 ) pfrm2 = astClone( pfrm );
 
-/* Get the CTYPE value. */
+/* Get the CTYPE value. Use a default of "AXISn". */
             ckeyval = GetItemC( &(store->ctype), i, s, NULL, method, class );
+            if( !ckeyval ) {
+               sprintf( buf3, "AXIS%d", i + 1 );
+               ckeyval = buf3;
+            }
 
 /* If the CTYPE value ends with "-LOG", assume it is a logarithmically spaced 
    axis. Get the Mapping from IWC to WCS. Reduce the used length of the
    CTYPE string to exlude any trailing "-LOG" string. */
             len = strlen( ckeyval );
-            if( ckeyval && !strcmp( ckeyval + len - 4, "-LOG" ) ){
+            if( len > 3 && !strcmp( ckeyval + len - 4, "-LOG" ) ){
                map1 = LogWcs( store, i, s, method, class );
                sprintf( buf2, "%.*s", len - 4, ckeyval );
 
