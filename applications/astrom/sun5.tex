@@ -327,7 +327,10 @@ the default \texttt{astrom.lis}.
 \end{quote}
 reads \texttt{astrom.input}, and produces its report on
 \texttt{astrom.report}, plus a number of FITS files with names
-beginning \texttt{wcsout} (see Section~\ref{output} below).
+beginning \texttt{wcsout} (see Section~\ref{output} below).  The
+specifiers \texttt{input=-} and \texttt{report=-} cause the input to
+be read from, and the report to be written to, the standard input and
+output respectively.
 
 A summary report normally appears on the command terminal, but can be
 sent to a file by giving the file's name as the \texttt{summary=}
