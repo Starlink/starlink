@@ -65,6 +65,9 @@
 *        Original version.
 *     1996 June 13 (MJC):
 *        Output the pixel dimensions in arcseconds, where appropriate.
+*     3-DEC-1998 (DSB):
+*        Fix bug which caused the same position to be displayed on each
+*        line of the log.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -206,7 +209,7 @@
             RESID = SQRT( MAX( 0.0D0, ( XX( I ) - XO( I ) )**2 + 
      :                                ( YY( I ) - YO( I ) )**2 ) )
 
-            CALL IRA_DTOC( AA( 1 ), BB( 2 ), SCS, 0, ATEXT, BTEXT, 
+            CALL IRA_DTOC( AA( I ), BB( I ), SCS, 0, ATEXT, BTEXT, 
      :                     STATUS )
             CALL MSG_SETI( 'I', I )
             CALL MSG_SETC( 'A', ATEXT )

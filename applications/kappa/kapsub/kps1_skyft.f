@@ -96,6 +96,10 @@
 *     1997 May 22 (MJC):
 *        Implemented DSB's 1997 Jan 27 changes made to the NAG version.
 *        These improved the security of error checking and reporting.
+*     3-DEC-1998 (DSB):
+*        Change tolerance used in PDA routine from 1.0D-8 to 1.0D-3 (the 
+*        smaller value usually prevented the PDA routine from finding a
+*        solution).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -201,7 +205,6 @@
       CHARACTER * ( IRA__SZPLS ) PRJLST ! List of recognised projections
       INTEGER START              ! Index of 1st char in projection name
       DOUBLE PRECISION XC( 8 )   ! The free parameters
-
 *.
 
 *  Check the inherited global status.
@@ -335,14 +338,9 @@
 *  KPS1_SKYFN.
                ISTAT = SAI__OK
 
-*  Do the search.  The tolerance value selected may be erroneous.
-*  It was based on an image being up to 30000 pixels, and being able to
-*  centroid to a few percent of a pixel, and a factor of ten for good
-*  measure.  It's equivalent to about millarcsecond accuracy across
-*  about 3 degrees.  Even if the tolerance is too low, these errors
-*  returned through IFAIL are ignored.
+*  Do the search.  The tolerance value is fairly arbitrary.
                CALL PDA_LMDIF1( KPS1_SKYFN, 2 * NPOS, N, XC,
-     :                          %VAL( IPWFV ), 1.0D-8, IFAIL,
+     :                          %VAL( IPWFV ), 1.0D-3, IFAIL,
      :                          %VAL( IPWNA1 ), %VAL( IPWNA2 ), LW )
 
 *  If an error occurred in the PDA service routine (KPS1_SKYFN), add a
