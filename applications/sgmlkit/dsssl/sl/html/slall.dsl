@@ -9,8 +9,6 @@
 
 ;; Document Head
 
-;(element title
-;  (process-children))
 (element title
   (literal (normalise-string (data (current-node)))))
 
@@ -19,13 +17,14 @@
 
 (mode make-html-author-links
   (element author
-    (make empty-element
-      gi: "link"
-      attributes: (list (list "rev" "made")
-			(list "href" (attribute-string "email"))
-			(list "title" (data (current-node)))
-			)))
-)
+    (let ((email (attribute-string "email")))
+      (if email
+	  (make empty-element
+	    gi: "link"
+	    attributes: (list (list "rev" "made")
+			      (list "href" email)
+			      (list "title" (data (current-node)))))
+	  (empty-sosofo)))))
 
 ;; In the default mode, make author a link to the author details,
 ;; if either of the webpage or email attributes is present
