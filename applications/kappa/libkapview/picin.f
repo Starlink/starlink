@@ -114,7 +114,7 @@
 *        the current picture for the current graphics device. The bounds
 *        of the picture in its current co-ordinate Frame are reported.
 *     picin frame=pixel
-*        As abovem but the bounds of the picture in the PIXEL Frame are
+*        As above but the bounds of the picture in the PIXEL Frame are
 *        reported.
 *     picin refnam=(object) current
 *        This reports the attributes of the last data picture within
