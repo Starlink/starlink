@@ -126,7 +126,7 @@ by the "figurecontent" element.
 	    (rde (document-element nd)))
 	(make entity system-id: %latex-manifest%
 	      (make fi
-		data: (string-append (root-file-name) ".tex
+		data: (string-append (index-file-name) ".tex
 ")) ; see sldocs.dsl
 	      (with-mode make-manifest-mode
 		(process-node-list

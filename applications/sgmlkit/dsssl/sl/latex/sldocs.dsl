@@ -23,7 +23,7 @@ stdout, then generates an entity which contains the entire LaTeX file.
 (define (process-latex-document)
   (make sequence
     (literal (string-append (root-file-name) ":"))
-    (make entity system-id: (string-append (root-file-name) ".tex")
+    (make entity system-id: (string-append (index-file-name) ".tex")
 	  (make empty-command name: "documentclass"
 		parameters: %latex-document-class%)
 	  (make fi data: %latex-document-preamble%)
