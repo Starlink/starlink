@@ -32,13 +32,34 @@
             helpkey *
          }
 
-         parameter index {
+         parameter pickindex {
             type LITERAL
             access READ
             vpath PROMPT
             ppath CURRENT DEFAULT
-            prompt {Allowed Set Index attribute values}
-            default !
+            prompt {Selection criteria for Set Index (ALL,EQUAL,LIKE)}
+            in ALL EQUAL LIKE
+            default ALL
+            helpkey *
+         }
+
+         parameter pickname {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT DEFAULT
+            prompt {Selection criteria for Set Name (ALL,EQUAL,LIKE)}
+            in ALL EQUAL LIKE
+            default ALL
+            helpkey *
+         }
+
+         parameter index {
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Acceptable Set Index values}
             helpkey *
          }
 
@@ -46,29 +67,26 @@
             type LITERAL
             access READ
             vpath PROMPT
-            ppath CURRENT DEFAULT
-            prompt {Allowed Set Name attribute values}
-            default !
+            ppath CURRENT
+            prompt {Allowed Set Name values}
             helpkey *
          }
 
          parameter indexlike {
-            type _LOGICAL
+            type LITERAL
             access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Interpret INDEX as corresponding NDFs?}
-            default FALSE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Template NDFs for Set Index value}
             helpkey *
          }
 
          parameter namelike {
-            type _LOGICAL
+            type LITERAL
             access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {Interpret NAME as NDFs in same Set?}
-            default FALSE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Template NDFs for Set Name value}
             helpkey *
          }
 
@@ -78,7 +96,7 @@
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Output file for selected NDFs}
-            default SHOWSET.LIS
+            default showset.lis
             helpkey *
          }
 
@@ -88,6 +106,7 @@
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
             prompt {Primary sort key (INDEX or NAME)}
+            in INDEX NAME
             default NAME
             helpkey *
          }
