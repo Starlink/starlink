@@ -175,9 +175,10 @@
 *        Removed the above IDI_ASSOC call since it causes obscure
 *        problems on alpha_osf1 and sun4_solaris.
 *     29-AUG-2000 (MBT):
-*        Replaced use of CCDNDFAC A-task/routine, which caused weird 
+*        Replaced use of CCDNDFAC A-task/routine, to try to fix weird 
 *        platform-dependent parameter-related problems, with the normal
-*        routine CCD1_NGLIS.
+*        routine CCD1_NGLIS.  Turned out to be an NDG bug, but it's
+*        cleaner this way anyway.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -366,6 +367,7 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
      :                  OPLEN, STATUS )
 
 *  Get a list of NDFs from the user which constitute this group.
+         CALL PAR_CANCL( 'IN', STATUS )
          CALL CCD1_NGLIS( 'IN', NAMLST, 100, .TRUE., NNDF, STATUS )
 
 *  Bump the group number if the user gave some NDF names this time.
@@ -398,6 +400,7 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
      :       'the first group will be used.'
       CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
       CALL MSG_BLANK( STATUS )
+      CALL PAR_CANCL( 'IN', STATUS )
       CALL CCD1_NGLIS( 'IN', 'ccdalign_ref.list', 100, .TRUE., NNDF,
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
