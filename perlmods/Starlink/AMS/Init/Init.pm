@@ -107,7 +107,10 @@ sub new {
   if (@_) {
     my $value = shift;
     if ($value) {
-      $task->init;
+      my $status = $task->init;
+      my $errhand = $task->stderr;
+      print $errhand "Error initialising messaging system\n"
+	unless $status == &Starlink::ADAM::SAI__OK;
     }
   }
 
@@ -344,22 +347,22 @@ likely that the messaging system is not running correctly (eg
 because the system was shutdown uncleanly - try removing named pipes
 from the ~/adam directory).
 
+Starlink Status is returned.
+
 =cut
 
 
 sub init {
 
   my $self = shift;
+  my $status = &Starlink::ADAM::SAI__ERROR;
 
   # Start up ADAM as long as one is not already active
   # Should be able to check by trying to contact the relay
   # for now just keep a state variable
   if (! $AMSRUNNING) {
 
-    $self->__adamtask_init;
-
-    # Set up the running flag
-    $self->running(1);
+    $status = $self->__adamtask_init;
 
     # Set up default options
     # Messages on
@@ -371,11 +374,21 @@ sub init {
     # 30 second timeout
     $self->timeout(30);
     
-    # Set the AMSRUNNING flag
-    $AMSRUNNING = 1;
+    # If Status is good; set up the running flags
+    if ($status == &Starlink::ADAM::SAI__OK) {
+
+      # Set up the running flag
+      $self->running(1);
+
+      # Set the AMSRUNNING flag
+      $AMSRUNNING = 1;
+    }
+
   } else {
     carp "AMS already running. Can not start more than one instance";
   }
+  return $status;
+
 }
 
 =item DESTROY
@@ -395,7 +408,7 @@ sub DESTROY {
   my $self = shift;
 
   # No point killing messaging if it was never initialised
-  $self->__adamtask_exit if $self->running;
+  my $status = $self->__adamtask_exit if $self->running;
   print "Returning from adamtask_exit\n" if $debug;
 }
 
@@ -416,8 +429,9 @@ sub __adamtask_init {
   # See if we have a RELAY running already
   if (defined $self->relay_name) { 
     if (adam_path($self->relay_name) == 1) {
-      print "Relay task is already running\n" if $self->messages;
-      return;
+      my $msghand = $self->stdout;
+      print $msghand "Relay task is already running\n" if $self->messages;
+      return &Starlink::ADAM::SAI__OK;
     }
   }
 
@@ -425,7 +439,8 @@ sub __adamtask_init {
   $taskname = "perl_ams" . $$;
 
   # Initialise ams using the program name as the task name
-  adam_start $taskname;
+  my $status = adam_start $taskname;
+  return $status if ($status != &Starlink::ADAM::SAI__OK);
 
   # Start the relay process
   # Hardwire the location
@@ -447,6 +462,11 @@ sub __adamtask_init {
   print "Waiting for relay...(from $RELAY)\n" if $debug;
 
   my @reply = adam_receive;
+
+  # Status is the 7 member
+  $status = $reply[7];
+  return $status if ($status != &Starlink::ADAM::SAI__OK);
+
   print join("::",@reply),"\n" if $debug;
 
   # Store the path to the relay
@@ -456,13 +476,16 @@ sub __adamtask_init {
 
   # Reply to the obey
   print "Replying to OBEY\n" if $debug;
-  adam_reply($self->relay_path, $self->relay_messid, 
-             "ACTSTART", $reply[1], "");
+  $status = adam_reply($self->relay_path, $self->relay_messid, 
+		       "ACTSTART", $reply[1], "");
+
 
   # Print some info
 #  print "Name path messid : $RELAY_NAME $RELAY_PATH $RELAY_MESSID\n";
 
   print "ID: ",$self->relay, $self->relay_path, $self->relay_name, $self->relay_messid,"\n" if $debug;
+
+  return $status;
 
 }
 
@@ -482,10 +505,13 @@ sub __adamtask_exit {
   print "Ask the relay to kill itself\n" if $debug;
   print "ID: ",$self->relay, $self->relay_path, $self->relay_name, $self->relay_messid,"\n" if $debug;
 
-  adam_reply($self->relay_path, $self->relay_messid, "SYNC", 
-             "", "adam_exit; exit") ;
+  my $status = adam_reply($self->relay_path, $self->relay_messid, "SYNC", 
+			  "", "adam_exit; exit") ;
 
-; #    if adam_path($self->relay_path);
+  carp "Error shutting down message relay" 
+    if ($status != &Starlink::ADAM::SAI__OK);
+
+  #    if adam_path($self->relay_path);
 
   print "Killing the pipe\n" if $debug;
   # Remove the pipe
@@ -501,6 +527,8 @@ sub __adamtask_exit {
   $self->running(0);
 
   $AMSRUNNING = 0;
+
+  return $status;
 
 }
 

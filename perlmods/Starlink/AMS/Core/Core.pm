@@ -141,7 +141,7 @@ sub adamtask_init {
   if ($RELAY_NAME =~ /./) { 
     if (adam_path($RELAY_NAME) == 1) {
       print $MSGHAND "Relay task is already running\n" unless $msg_hide;
-      return;
+      return &Starlink::ADAM::SAI__OK;
     }
   }
 
@@ -149,7 +149,9 @@ sub adamtask_init {
   $taskname = "perl_ams" . $$;
 
   # Initialise ams using the program name as the task name
-  adam_start $taskname;
+  $ADAM_STATUS = adam_start $taskname;
+
+  return $ADAM_STATUS if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
 
   # Set a global variable that tells me I have started ams
   # need this to protect against exit
@@ -174,6 +176,10 @@ sub adamtask_init {
 #  print "Waiting for relay...(from $RELAY)\n";
 
   my @reply = adam_receive;
+  # Status is the 7 member
+  $ADAM_STATUS = $reply[7];
+  return $ADAM_STATUS if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
+
 #  print join("::",@reply),"\n";
 
   # Store the path to the relay
@@ -184,13 +190,17 @@ sub adamtask_init {
 
   # Reply to the obey
 #  print "Replying to OBEY\n";
-  adam_reply($RELAY_PATH, $RELAY_MESSID, "ACTSTART", $reply[1], "");
+  $ADAM_STATUS = 
+    adam_reply($RELAY_PATH, $RELAY_MESSID, "ACTSTART", $reply[1], "");
+  return $ADAM_STATUS if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
 
   # Need to setup an exit handler 
 
 
   # Print some info
 #  print "Name path messid : $RELAY_NAME $RELAY_PATH $RELAY_MESSID\n";
+
+  return $ADAM_STATUS;
   
 }
 
@@ -201,6 +211,9 @@ sub adamtask_init {
 #    Arguments: message
 #   Routine does not read from the PIPE. It relies on another process
 #   to pass the text from the pipe to this routine
+# Returns immediately if status (arg 7) is not SAI__OK
+# Returns a status (usually SAI__OK -- will only change in response
+# to a paramrep)
 
 sub adamtask_message {
 
@@ -214,6 +227,9 @@ sub adamtask_message {
   $command = $message[0];
   $path    = $message[3];
   $messid  = $message[4];
+  my $status = $message[7];
+
+  return ($status, undef) if $status != &Starlink::ADAM::SAI__OK;
 
   # Evaluate the command here (need to think about this)
 
@@ -221,20 +237,20 @@ sub adamtask_message {
   # then we have ended a transaction so return
   # Also return if we are using the internal message of 'badstatus'
 
-  return if $command =~ /endmsg|setresponse|badstatus/;
+  return ($status, undef) if $command =~ /endmsg|setresponse|badstatus/;
 
   # If this is a control response then we should print the directory
   # but only if we are sending a 'default' action. 'par_reset' returns nothing 
   $command eq "controlresponse" && do {
     print $MSGHAND "$message[2] = $message[6]\n" 
       if ($message[2] eq "default" & !$msg_hide);
-    return $message[6];
+    return ($status, $message[6]);
   };
 
 
   # If this is a getresponse then return the parameter value
   $command eq "getresponse" && do {
-    return $message[6];
+    return ($status, $message[6]);
     
   };
 
@@ -247,7 +263,7 @@ sub adamtask_message {
     } else {
       print $MSGHAND "$message[6]\n" unless $msg_hide;
     }
-    return;
+    return ($status, undef);
   };
 
   # Need to ask for a parameter if we have a paramreq
@@ -261,10 +277,9 @@ sub adamtask_message {
     my $value = &$PARAMREP_SUB(@bits);
 
     # Now need to send this back to the message
-    adam_reply($path, $messid, "PARAMREP", "", $value);
-
+    $status = adam_reply($path, $messid, "PARAMREP", "", $value);
   };
-
+  return ($status,undef);
 }
 
 =item adamtask($name, $image)
@@ -401,8 +416,8 @@ sub adamtask_send {
 sub adamtask_sendw {
 
   my $command = shift;
-
-  my ($reply, @reply, $response);
+  
+  my ($reply, @reply, $response, $status);
 
   # First I need to send the command
   # Since we are evalling an adam_send we should receive the 
@@ -437,7 +452,7 @@ sub adamtask_sendw {
     print $ERRHAND "!! $fac"."__$ident: $text\n" unless $err_hide;
     # Now actually return it
     if ($get) {
-      return (undef, $badstatus);
+      return ($badstatus, undef);
     } else {
       return $badstatus;
     }
@@ -455,11 +470,13 @@ sub adamtask_sendw {
 
     @reply = adam_getreply(1000 * $TIMEOUT, $returns[0], $returns[1]);
     $reply = join("::",@reply);
-
+    
     # Now need to acknowledge the message if it is a paramreq or something
     # Send the reply off to a generic subroutine
 
-    $response = adamtask_message($reply);
+    ($status, $response) = adamtask_message($reply);
+
+    last if ($status != &Starlink::ADAM::SAI__OK);
 
     # Exit loop if we received an 'endmsg' or 'get|setresponse' 
     # If there was an error with the getreply itself (ie the monolith 
@@ -485,16 +502,17 @@ sub adamtask_sendw {
   # Record the error status (whether it was from the task or from the message
   # system
   
-  if ($reply[0] eq "badstatus") {
-    $ADAM_STATUS = $reply[1];
-  } else {
+#  if ($reply[0] eq "badstatus") {
+#    $ADAM_STATUS = $reply[7];
+#  } else {
       $ADAM_STATUS = $reply[5];
-  }
+#  }
 
 
   # Return the parameter value if this is a 'getresponse'
-  return ($response,$ADAM_STATUS) 
+  return ($ADAM_STATUS,$response) 
     if $reply[0] =~ 'getresponse|controlresponse';
+
 
   # Else just return status
   return $ADAM_STATUS;
@@ -564,7 +582,7 @@ sub adamtask_get {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my ($result,$status) = adamtask_sendw("adam_send(\"$task\",\"$param\",\"GET\",\"\")");
+  my ($status, $result) = adamtask_sendw("adam_send(\"$task\",\"$param\",\"GET\",\"\")");
 
   return ($result, $status);
 
@@ -672,9 +690,8 @@ sub adamtask_control {
   # Reset ADAM_STATUS
   $ADAM_STATUS = &Starlink::ADAM::SAI__OK;
 
-  my ($result, $status) = 
-    adamtask_sendw("adam_send(\"$task\",\"$command\",\"CONTROL\",\"$params\")");
-
+  my ($status, $result) = 
+    adamtask_sendw("adam_send(\"$task\",\"$command\",\"CONTROL\",\"$params\")"); 
 #  return $result if $command eq 'default';
   return ($result, $status);
 
@@ -770,8 +787,11 @@ sub adamtask_exit {
 
   # Ask the relay to kill itself
 #  print "Ask the relay to kill itself\n";
-  adam_reply($RELAY_PATH, $RELAY_MESSID, "SYNC", "", "adam_exit; exit") 
+  $ADAM_STATUS = adam_reply($RELAY_PATH, $RELAY_MESSID, "SYNC", "", "adam_exit; exit") 
     if defined $RELAY_PATH;
+
+ carp "Error shutting down message relay" 
+    if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
 
 #  print "Killing the pipe\n";
 
