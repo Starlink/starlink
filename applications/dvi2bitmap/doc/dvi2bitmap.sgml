@@ -771,19 +771,38 @@ to position this bitmap within a generated HTML file.
 </p>
 </dd>
 
+<dt id="usage.special.unit"><code>unit u</code>, <code>default unit
+u</code></dt>
+
+<dd><p>
+The units in the `strut' and `crop' specials are by default in TeX
+points.  You may switch to a different unit with the `unit' special.
+The specifier `u' gives a unit name, which may be selected from the
+set of units TeX knows about (`pt', `bp', `cm', and so on), plus
+`pixels', and `dvi' to select DVI file units (usually the same as
+`sp').  If the `default' qualifier is present, this setting applies
+to subsequent special strings as well.
+</p>
+
 </dl>
 
 <p>For example, the pair of commands
 <verbatim>
-\special{dvi2bitmap default outputfile trial-#.gif crop all 5}
-\special{dvi2bitmap absolute crop left 0}
+\special{dvi2bitmap default outputfile trial-#.gif unit pc crop all 5}
+\special{dvi2bitmap absolute crop left 5}
 </verbatim>
 will change the output filename pattern for the rest of the DVI file,
-and set a 5pt margin round the bounding box.  The current page,
-however, will have a left-hand crop zero points in from the left hand
+and set a 5pc margin round the bounding box.  The current page,
+however, will have a left-hand crop five points in from the left hand
 side.  Remember that &tex;'s origin is one inch from the left and the
 top of the paper, and it is with respect to this origin that the
-program reckons the absolute distances for the cropping.
+program reckons the absolute distances for the cropping.</p>
+
+<p>Both here
+and in the support for the `strut' special, there is a great deal of
+scope for off-by-one errors; also it's unclear what is the best
+interface to this functionality, so it's possible that this might
+change in subsequent versions.  The author welcomes comments.</p>
 
 <subsect id=usage.exit export>Exit value
 
@@ -1334,6 +1353,70 @@ script which generates a file like this and then looks for the
 resulting bitmaps, with known names of course, can run very
 efficiently.  Combining that with the techniques in <ref
 id="usagenotes.pipe"/> can work wonders.</p>
+</subsect>
+
+<subsect id="usagenotes.marks" export="export">
+<subhead>
+<title>Using marks to position bitmaps</title>
+</subhead>
+
+<p>When including small images in an HTML page, it can be difficult to
+get the images to line up with the rest of the text, because
+a text with descenders (characters which go below the line such as `p'
+or `g') cause the image to be offset from the text line.
+You can use the `mark' facility to tell you how much you need to
+offset such an image so that it lines up properly with the surrounding
+text.</p>
+
+<p>For example, consider the following usage:
+<verbatim>
+% cat temp.tex
+\nopagenumbers
+\noindent\special{dvi2bitmap mark}%
+Hello, this is dvi2bitmap
+\bye
+% tex temp.tex
+This is TeX, Version 3.14159 (Web2C 7.3.11)
+(./temp.tex [1] )
+Output written on temp.dvi (1 page, 240 bytes).
+Transcript written on temp.log.
+</verbatim>
+So, a simple test file with a single line in it, with descenders (the
+`p').  The `mark' special goes at the beginning, following \noindent.
+This is important, otherwise the point that is marked is the very
+top-left of the image, not the bottom-left.</p>
+
+<p>The output with <code>--query=bitmaps</code> is:
+<verbatim>
+% dvi2bitmap --verbose=quiet --query=bitmaps temp
+Qbitmaps temp-page1.png 163 14 -1 11
+</verbatim>
+...where <code>verbose=quiet</code> has been used to turn off the
+usual chatter.  It tells us that the bitmap as a whole is 14pixels
+deep, and that the mark, which is on the TeX baseline, remember, is at
+position (-1,11) relative to an origin at the top-left of the bitmap;
+or in other words there's 3 pixels of space between the TeX baseline
+and the bottom of the image.  We therefore know that we need to offset
+the image by three pixels to make it line up properly.</p>
+
+<p>There are several ways to do that, but one way is to use
+per-element CSS properties, like this:
+<verbatim><![CDATA[
+% dvi2bitmap --verbose=quiet --query=bitmaps temp | awk  
+'{printf "<img src=\"%s\" style=\"margin-bottom: %dpx\"/>\n", $2,  
+$6-$4}'
+<img src="temp-page1.png" style="margin-bottom: -3px"/>
+%
+]]></verbatim>
+So that's generated an <code>&lt;img&gt;</code> element which has the
+correct `src' attribute
+(from column 2 of the Qbitmaps line) and the correct offset (column6 -
+column4).  That uses awk, but if you're generating your HTML pages
+with something like Perl or Pythn (substantially more sensible than
+awk...!), say, you could do an analogous thing with the dvi2bitmap
+output, and put the generated <code>&lt;img&gt;</code> elements in the
+correct places in the output HTML file. </p>
+
 </subsect>
 
 </sect>

@@ -1,5 +1,12 @@
 2003-10-03  Norman Gray  <norman@astro.gla.ac.uk>
 
+	* dvi2bitmap.cc (process_special): add `unit' special, and
+	refactor the `strut' special.
+
+	* Bitmap.cc (strut, rule, mark): modified logic to match rule()
+	better, causing a few single-pixel changes; rule() logic
+	clarified.  Support for `mark' now works.
+
 	* DviFile.cc, DviFile.h (convertUnits): added functionality to
 	convert to and from arbitrary unit combinations.
 
@@ -9,6 +16,8 @@
 	is tremendously error-prone, and difficult to write a regression
 	test for, but it produces apparently correct results from
 	test/magtest.tex.
+
+	* all: released 0.12b2
 
 2003-09-30  Norman Gray  <norman@astro.gla.ac.uk>
 

@@ -1,3 +1,25 @@
+<subsect id=rn=0.12b2 export>Release 0.12b2
+
+<p>New and changed functionality:
+<ul>
+
+<li>Add `unit' special, and fix bugs in the `mark' and `strut'
+specials.  This causes a few single-pixel changes in the reported
+locations of marks and the bounding-boxes coerced by struts.</li>
+
+<li>Conversions between units (`pt', `cm', and so on) are
+generalised, and extra library functionality means you'll get this
+right more often.</li>
+
+<li>Refactoring of internal logic handling magnification and unit
+conversions.  This is tremendously error-prone, and difficult to write
+a regression test for, but it produces apparently correct results as
+far as I've been able to test it.  Be on the lookout for subtle errors.</li>
+
+<li>Various uninitialised-variable bugs caught.</li>
+
+</ul>
+
 <subsect id=rn-0.12b1 export>Release 0.12b1
 
 <p>New and changed functionality:
@@ -23,6 +45,10 @@
   <li>Added `mark' special; the format of the
   <code>--query=bitmaps</code> output has been consequently slightly
   enhanced.</li>
+
+  <li>Modified interface to <code>DviFile::getEvent</code> so that
+  the returned event should be released by a method call, rather than
+  <code>delete</code>.</li>
 
   <li>Fixed bug which meant DviFile could search for PK files in
   demented sizes (non-initialised variable...)</li>

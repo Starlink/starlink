@@ -653,8 +653,9 @@ in the file, it knows nothing of the extra space you want.
 .IP
 The `strut' special forces the bounding box to be at least `left',
 `right', `top' and `bottom' points away from the position in the file
-where this special appears.  All the dimensions must be positive, and
-they are floats rather than integers.
+where this special appears.  All the dimensions must be positive;
+they are floats rather than integers, but they are rounded to pixels
+before being applied to the growing bitmap.
 .IP
 If you wanted to set a page containing only the maths
 .I "${}^\ecirc$"
@@ -709,17 +710,34 @@ the `H' probably has some negative offset), and the `10' indicates
 that the baseline of this text is 10 pixels from the top of the
 bitmap;  this latter information might be useful when working out how
 to position this bitmap within a generated HTML file.
+.TP
+.I "unit u",
+.I "default unit u"
+.IP
+The units in the `strut' and `crop' specials are by default in TeX
+points.  You may switch to a different unit with the `unit' special.
+The specifier `u' gives a unit name, which may be selected from the
+set of units TeX knows about (`pt', `bp', `cm', and so on), plus
+`pixels', and `dvi' to select DVI file units (usually the same as
+`sp').  If the `default' qualifier is present, this setting applies
+to subsequent special strings as well.
 .PP
 As an example, the pair of commands
-  \f(CR\especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
-  \especial{dvi2bitmap absolute crop left 0}\fP
+  \f(CR\especial{dvi2bitmap default outputfile trial-#.gif unit pc crop all 5}
+  \especial{dvi2bitmap absolute crop left 5}\fP
 .br
 will change the output filename pattern for the rest of the DVI file,
-and set a 5pt margin round the bounding box.  The current page,
-however, will have a left-hand crop zero points in from the left hand
+and set a 5pc margin round the bounding box.  The current page,
+however, will have a left-hand crop five points in from the left hand
 side.  Remember that TeX's origin is one inch from the left and the
 top of the paper, and it is with respect to this origin that the
 program reckons the absolute distances for the cropping.
+.PP
+Both here
+and in the support for the `strut' special, there is a great deal of
+scope for off-by-one errors; also it's unclear what is the best
+interface to this functionality, so it's possible that this might
+change in subsequent versions.  The author welcomes comments.
 .SH "EXIT VALUE"
 Exits with a non-zero status if there were any processing errors.
 Having
