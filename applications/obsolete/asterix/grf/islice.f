@@ -14,6 +14,7 @@
 *      1 Jul 93: V1.7-1  GTR used (RJV)
 *      9 Aug 94: V1.7-2  really handles QUALITY (RJV)
 *     31 Jan 95: V1.8-0  bug fix to keyboard mode (RJV)
+*     31 Jan 95: V1.8-1  axis units pixels->angle (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -191,13 +192,21 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         I_N_AUX=0
 
 *  axis and labels
-        I_XBASE_1D=0.5
-        I_XSCALE_1D=1.0
-        I_XWID_1D=1.0
-        I_XLABEL_1D='Slice position'
-        I_XUNITS_1D='pixels'
+        I_XSCALE_1D=ABS(I_XSCALE)
+        I_XBASE_1D=0.5*I_XSCALE_1D
+        I_XWID_1D=I_XSCALE_1D
+        I_XLABEL_1D='Distance along slice'
+        I_XUNITS_1D=I_XYUNITS
         I_LABEL_1D='Surface brightness'
-        I_UNITS_1D='Counts/sec/pixel'
+        I_UNITS_1D=I_UNITS
+        L=CHR_LEN(I_UNITS)
+        L=L+1
+        I_UNITS_1D(L:)='/'//I_XYUNITS
+        L=CHR_LEN(I_UNITS_1D)
+        IF (I_UNITS_1D(L:L).EQ.'S'.OR.I_UNITS_1D(L:L).EQ.'s') THEN
+          L=L-1
+        ENDIF
+        I_UNITS_1D(L:)='\u2\d'
         I_TITLE_1D='Projected slice'
         CALL ARR_REG1R(I_XBASE_1D,I_XSCALE_1D,I_N_1D,%VAL(I_APTR_1D),
      :                                                          STATUS)
@@ -205,7 +214,7 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
 
 *  set default axis ranges
         I_X1_1D=0.0
-        I_X2_1D=REAL(I_N_1D)+0.5
+        I_X2_1D=(REAL(I_N_1D)+0.5)*I_XSCALE_1D
         CALL ARR_RANG1R(I_N_1D,%VAL(I_DPTR_1D),I_Y1_1D,I_Y2_1D,STATUS)
         I_Y2_1D=I_Y2_1D*1.1
 
@@ -346,7 +355,7 @@ C Mark gaps
 	    CUT(J)=0.0
 	  ELSE
 C Normalise and calculate standard deviations
-	    RNN=1./COUNT(J)
+	    RNN=1./COUNT(J)/I_XSCALE**2
             RNN2=RNN*RNN
 *
 	    IF( .NOT. I_VOK) THEN
