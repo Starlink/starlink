@@ -8247,6 +8247,8 @@ package kappa {
       }
 
       action creframe {
+         alias {cref(rame)}
+         helplib {$KAPPA_HELP}
 
          parameter background {
             type _REAL
