@@ -144,6 +144,8 @@
                IF ( QCODE .EQ. 'X' ) THEN
                  IF ( CHR_INSET( 'X_RAW,X_CORR', LABEL ) .OR.
      :                (LABEL(1:1) .EQ. 'X') .OR.
+     :                (INDEX( LABEL, 'LONGITUDE' ) .GT. 0) .OR.
+     :                (INDEX( LABEL, 'ASCENSION' ) .GT. 0) .OR.
      :                (INDEX( LABEL, 'X AXIS' ) .GT. 0) ) THEN
                    FOUND = .TRUE.
                  END IF
@@ -151,6 +153,8 @@
                ELSE IF ( QCODE .EQ. 'Y' ) THEN
                  IF ( CHR_INSET( 'Y_RAW,Y_CORR', LABEL ) .OR.
      :                (LABEL(1:1) .EQ. 'Y') .OR.
+     :                (INDEX( LABEL, 'LATITUDE' ) .GT. 0) .OR.
+     :                (INDEX( LABEL, 'DECLINATION' ) .GT. 0) .OR.
      :                (INDEX( LABEL, 'Y AXIS' ) .GT. 0) ) THEN
                    FOUND = .TRUE.
                  END IF
