@@ -619,20 +619,28 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
-      CHARACTER*40 REC/' '/
+      CHARACTER FILE*132,REC*40,NUM*4,NAME*16,RA*12,DEC*12
       INTEGER IPOS
+      INTEGER FID
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL MSG_BLNK()
+        CALL USI_GET0C('FILE',FILE,STATUS)
+        CALL FIO_OPEN(FILE,'WRITE','NONE',0,FID,STATUS)
+
         DO IPOS=1,I_NPOS
-          CALL GRP_GET(I_POS_ID,IPOS,1,REC(6:),STATUS)
-          WRITE(REC(:3),'(I3)') IPOS
-          CALL MSG_PRNT(REC)
+          REC=' '
+          WRITE(NUM,'(I4)') IPOS
+          NAME=NUM
+          CALL GRP_GET(I_POS_ID,IPOS,1,REC,STATUS)
+          CALL CONV_SPLIT(REC,RA,DEC)
+          REC=NAME//RA//DEC
+          CALL FIO_WRITE(FID,REC,STATUS)
         ENDDO
-        CALL MSG_BLNK()
+
+        CALL FIO_CLOSE(FID,STATUS)
 
       ENDIF
 
