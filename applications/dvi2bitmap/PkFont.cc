@@ -128,7 +128,7 @@ PkFont::PkFont(unsigned int dvimag,
 	    }
 	    else
 		throw InputByteStreamError
-		    ("can't find font file, and instructed not to mke fonts");
+		    ("can't find font file, and instructed not to make fonts");
 #else
 	    throw InputByteStreamError
 		("can't find font file, and don't know how to make fonts");
