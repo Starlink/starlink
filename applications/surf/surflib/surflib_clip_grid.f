@@ -1,6 +1,6 @@
-      SUBROUTINE SURFLIB_CLIP_GRID(N_FILES, N_PTS, NX, NY, NMAX, NSIGMA,
-     :     N_BOLS, BITNUM, DATA_PTR, QUALITY_PTR, BINS, BIN_POS, PNTS, 
-     :     NSPIKES, STATUS)
+      SUBROUTINE SURFLIB_CLIP_GRID(N_FILES, N_PTS, NX, NY, NMAX,
+     :     N_BOLS, BITNUM, DATA_PTR, QUALITY_PTR, BINS, BIN_POS, STATS,
+     :     IPOS, JPOS, NSPIKES, STATUS)
 *+
 *  Name:
 *     SURFLIB_CLIP_GRID
@@ -13,13 +13,14 @@
  
 *  Invocation:
 *     CALL SURFLIB_CLIP_GRID(N_FILES, N_PTS, NX, NY, NMAX, NSIGMA,
-*    :     N_BOLS, BITNUM, QUALITY_PTR, BINS, BIN_POS, PNTS, NSPIKES,
-*    :     STATUS)
+*    :     N_BOLS, BITNUM, QUALITY_PTR, BINS, BIN_POS, STATS, IPOS, 
+*    :     JPOS, NSPIKES, STATUS)
 
 *  Description:
 *     Given the binned data calculated by SURFLIB_FILL_GRID
-*     Calculates the mean and standard deviation of all the data
-*     in each cell and then clips at NSIGMA sigma.
+*     and the limits calculated by SURFLIB_STATS_GRID,
+*     clip all points that lie outside the statistical limits provided
+*     by the stats array.
 
 *  Arguments:
 *     N_FILES = INTEGER (Given)
@@ -32,8 +33,6 @@
 *       Size of Y dimension
 *     NMAX = INTEGER (Given)
 *       Maximum value allowed for third dimension of BINS
-*     NSIGMA = REAL (Given)
-*       Sigma clipping level
 *     N_BOLS ( N_FILES ) = INTEGER (Given)
 *       Number of bolometers per file (used for constructing message for users)
 *     BITNUM = INTEGER (Given)
@@ -47,8 +46,14 @@
 *       The data stored in relation to its position
 *     BIN_POS (NX, NY, NMAX) = INTEGER (Given)
 *       Position of each data point in quality arrays
+*     STATS (NX, NY, 3) = REAL (Given)
+*       Statistics of each bin. 1=Median, 2=High, 3=Low
 *     PNTS(NMAX) = REAL (Given)
 *       Scratch space for copying in the data from each I,J
+*     IPOS(NX*NY) = INTEGER (Given)
+*       I position in array
+*     JPOS(NX*NY) = INTEGER (Given)
+*       J position in array
 *     NSPIKES = INTEGER (Returned)
 *       Number of spikes removed for a given file
 *     STATUS = INTEGER (Given & Returned)
@@ -62,6 +67,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 21
 *     $Log$
+*     Revision 1.2  1997/11/12 00:10:48  timj
+*     Pass STATS into subroutine rather than calculating inside.
+*
 *     Revision 1.1  1997/11/10 19:42:03  timj
 *     Initial revision
 *
@@ -88,10 +96,11 @@
       INTEGER N_BOLS(N_FILES)
       INTEGER N_PTS(N_FILES)
       INTEGER BITNUM
-      REAL    NSIGMA
+      REAL    STATS(NX, NY, 3)
       REAL    BINS (NX, NY, NMAX)
-      REAL    PNTS(NMAX)
       INTEGER BIN_POS (NX, NY, NMAX)
+      INTEGER IPOS(NX * NY)
+      INTEGER JPOS(NX * NY)
 
 *  Arguments Given & Returned:
       INTEGER DATA_PTR(N_FILES)
@@ -114,85 +123,48 @@
       INTEGER IERR            ! For VEC_
       INTEGER J               ! J coordinate
       REAL    LOW             ! Mena - sigma range
-      DOUBLE PRECISION MEAN   ! Mean
-      DOUBLE PRECISION MEDIAN ! Median
       INTEGER N               ! Z coordinate
       INTEGER NBS             ! X coordinate in input file
       INTEGER NN              ! Loop variable
       INTEGER NERR            ! For VEC_
-      INTEGER NGOOD           ! Number of good points
       INTEGER NPS             ! Y position in input file
       INTEGER REAL_FILE       ! File number associated with point
       INTEGER REAL_POS        ! Position in file of point
-      DOUBLE PRECISION STDEV  ! Standard deviation
-      DOUBLE PRECISION SUM    ! Sum of data
-      DOUBLE PRECISION SUMSQ  ! Sum of squares
       INTEGER QPTR            ! Pointer to quality byte
-      INTEGER QUAL_END        ! end of dummy quality array
-      INTEGER QUAL_PTR        ! Dummy quality array
-      INTEGER QSORT_END       ! End of sorted array
-      INTEGER QSORT_PTR       ! Sort array for statr
-
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
-
-*     Initialise pointers
-      QUAL_PTR = 0
-      QUAL_END = 0
-      QSORT_PTR = 0
-      QSORT_END = 0
 
 *     Initialise the spike counting
       DO I = 1, N_FILES
          NSPIKES(I) = 0
       END DO
 
-*     Get some memory for the stats routine
-
-      CALL SCULIB_MALLOC(NMAX * VAL__NBR, QSORT_PTR, QSORT_END,
-     :     STATUS)
-      CALL SCULIB_MALLOC(NMAX * VAL__NBUB, QUAL_PTR, QUAL_END,
-     :     STATUS)
-
-*     Fill this dummy quality array with 0
-      BTEMP = 0
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLB(NMAX, BTEMP, %VAL(QUAL_PTR))
-      END IF      
-
-
 *     Loop over each position in the grid
 
       DO COUNT = 1, NX*NY
 
 *     Calculate the I,J corresponding to this pixel number
+*     There is in fact no need to use the unwrapping pointers
+*     to find (I,J) except that people might want to see where their
+*     bad points correspond to position on the plotted image.
 
-         J = INT((COUNT - 1) / NX) + 1 
-         I = COUNT - ((J-1) * NX)
+*         J = INT((COUNT - 1) / NX) + 1 
+*         I = COUNT - ((J-1) * NX)
 
-*     Copy the data for an I,J into the scratch array
+         I = IPOS(COUNT)
+         J = JPOS(COUNT)
 
-         DO N = 1, NMAX
-
-            PNTS(N) = BINS(I,J,N)
-
-         END DO
-
-*     Find the mean and sigma (Quality array is a dummy for this)
-         CALL SCULIB_STATR(NMAX, NSIGMA, PNTS, %VAL(QUAL_PTR), 
-     :        BTEMP, NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, 
-     :        %VAL(QSORT_PTR), STATUS)
+*     High and low clipping values are stored in the STATS array
+         HIGH = STATS(I,J,2)
+         LOW  = STATS(I,J,3)
 
 *     Find the range outside of which  lie spikes
 *     Use the mean (as long as it is good)
 
-         IF (MEAN .NE. VAL__BADD .AND. STDEV .NE. VAL__BADD) THEN
+         IF ((HIGH .NE. VAL__BADR) .AND. (LOW .NE. VAL__BADR)) THEN
          
-            HIGH = REAL(MEAN) + (NSIGMA * REAL(STDEV))
-            LOW  = REAL(MEAN) - (NSIGMA * REAL(STDEV))
-
-*     Go through the data for this bin again
+*     Go through the data for this bin
 
             DO N = 1, NMAX
                
@@ -248,7 +220,7 @@
                      QPTR = DATA_PTR(REAL_FILE) + 
      :                    (REAL_POS - 1) * VAL__NBR
 
-                     CALL VEC_DTOR(.FALSE., 1, MEDIAN, %VAL(QPTR),
+                     CALL VEC_RTOR(.FALSE., 1, STATS(I,J,1), %VAL(QPTR),
      :                    IERR, NERR, STATUS)
 
 
@@ -289,10 +261,5 @@
          END IF
 
       END DO
-
-*     Free the memory
-      CALL SCULIB_FREE('QSORT', QSORT_PTR, QSORT_END, STATUS)
-      CALL SCULIB_FREE('QUAL', QUAL_PTR, QUAL_END, STATUS)
-
 
       END
