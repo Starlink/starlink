@@ -844,7 +844,7 @@
       WRITE( OBUF, 10 )
       CALL AIO_WRITE( OCH, OBUF, STATUS )
 
-      WRITE( OBUF, '(7X,A1,2X,I10,1X,3A,5X,I10,1X,2A,8X,A1)' )
+      WRITE( OBUF, '(7X,A1,2X,I10,1X,A5,A5,A2,5X,I10,1X,A5,A7,8X,A1)' )
      :         '*', N, 'data ',OBJ,'s.', NVALID, OBJ, 's used.','*'
       CALL AIO_WRITE( OCH, OBUF, STATUS )
       WRITE( OBUF, 10 )
