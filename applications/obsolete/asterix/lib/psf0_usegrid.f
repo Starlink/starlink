@@ -182,8 +182,8 @@
       AFAC = (ABS(DX*DY) / GDX**2) / SAMPLE**2
 
 *  Find LHS and BOT in radians
-      LHS = X0 + QX - DX * REAL(NX) / 2.0
-      BOT = Y0 + QY - DY * REAL(NY) / 2.0
+      LHS = QX - DX * REAL(NX) / 2.0
+      BOT = QY - DY * REAL(NY) / 2.0
 
 *  Semi-widths of psf images in radians
       WIDX = GDX * REAL(DIMS(1))/2.0
@@ -270,7 +270,7 @@
               YPP = YP - 0.5*DY + (REAL(JJ-1)+0.5)*DY/SAMPLE
 
 *          Sub-pixel is on the psf image?
-              IF ( ABS(YPP) .GT. WIDY ) THEN
+              IF ( ABS(YPP) .LE. WIDY ) THEN
 
 *            The Y psf row in which the sub-pixel lies
                 YROW = NINT(YPP/GDX)
@@ -282,7 +282,7 @@
                   XPP = XP - 0.5*DX + (REAL(II-1)+0.5)*DX/SAMPLE
 
 *              Sub-pixel is on the psf image?
-                  IF ( ABS(XPP) .GT. WIDX ) THEN
+                  IF ( ABS(XPP) .LE. WIDX ) THEN
 
 *                The X psf row in which the sub-pixel lies
                     XROW = NINT(XPP/GDX)
