@@ -2,10 +2,8 @@
  
   This is a minor update to CCDPACK. 
 
-  The FINDOFF application has been modified to use the correct offsets
-  when estimating the completeness factor (these were wrong by a very 
-  small factor). This stops the occasion crash seen when writing the output
-  files on Digital UNIX.
+  The CCDALIGN application has been changed so that images of
+  different sizes are displayed at different scales.
 
   CCDPACK is fully described in SUN/139 and can be viewed on-line using 
   the "showme sun139" command. The latest information about CCDPACK 
