@@ -96,7 +96,7 @@
           ELSEIF (MODE.EQ.'ANN') THEN
             CALL IREGION_ANNULUS(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ELL') THEN
-            CALL IREGION_ELLIPSE(EXCLUDE,STATUS)
+            CALL IREGION_ELLIPSE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'WHO') THEN
             CALL IREGION_WHOLE(STATUS)
           ELSEIF (MODE.EQ.'SLI') THEN
@@ -371,7 +371,7 @@
 
 
 *+
-      SUBROUTINE IREGION_ELLIPSE(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_ELLIPSE(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -385,11 +385,13 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
       REAL RTOD
       PARAMETER (RTOD=180.0/3.14159265)
