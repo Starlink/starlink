@@ -1,16 +1,17 @@
 ==================== 1
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <t5>
--- NDF <t5> examined OK
--- WCS information from AST
--- Dumping state, and exiting...
+--I Starting monoliths...
+--I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
+--I Processing NDF <t5>
+--I NDF <t5> examined OK
+--I WCS information from AST
+--I Dumping state, and exiting...
 NDF=t5
 keeptemps=0
 tempDir=/tmp/t7-temp/t1
 insertwcs=1
 retainwcs=<UNDEF>
-CCDcat=<UNDEF>
+CCDcatname=<UNDEF>
 monolithTimeout=180
 monolithMessages=1
 maxobj=500
@@ -585,18 +586,19 @@ $NDFinfo->{wcs}: ref to ARRAY:
     End FrameSet
 --------------------
 ==================== 2
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <t5>
--- NDF <t5> examined OK
--- WCS information from FITS
--- Dumping state, and exiting...
+--I Starting monoliths...
+--I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
+--I Processing NDF <t5>
+--I NDF <t5> examined OK
+--I WCS information from FITS
+--I Dumping state, and exiting...
 NDF=t5
 keeptemps=0
 tempDir=/tmp/t7-temp/t2
 insertwcs=1
 retainwcs=<UNDEF>
-CCDcat=<UNDEF>
+CCDcatname=<UNDEF>
 monolithTimeout=180
 monolithMessages=1
 maxobj=500
@@ -1136,18 +1138,19 @@ $NDFinfo->{wcs}: ref to ARRAY:
     END
 --------------------
 ==================== 3
--- Starting monoliths...
--- Monoliths OK
--- Processing NDF <t5>
--- NDF <t5> examined OK
--- WCS information from command line
--- Dumping state, and exiting...
+--I Starting monoliths...
+--I Monoliths OK
+--I Loaded plugin /home/norman/s/src/autoastrom/test-install/plugin-match-match.pl
+--I Processing NDF <t5>
+--I NDF <t5> examined OK
+--I WCS information from command line
+--I Dumping state, and exiting...
 NDF=t5
 keeptemps=0
 tempDir=/tmp/t7-temp/t3
 insertwcs=1
 retainwcs=<UNDEF>
-CCDcat=<UNDEF>
+CCDcatname=<UNDEF>
 monolithTimeout=180
 monolithMessages=1
 maxobj=500
