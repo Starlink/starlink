@@ -2160,7 +2160,15 @@
      :                    FTSTAT)
                   ENDIF
 
-*               Coordinates of reference point, and the transformation matrix
+*               Coordinates of reference point, and the transformation
+*               matrix.  Note that the coordinates, and the
+*               transformation matrix, are in degrees not radians.
+*               Calabretta and Greisen paper II recommends that FITS
+*               writers check check the consistency of these figures
+*               with their eqns (8), (9) and (10) -- I don't do this at
+*               present.  The estimated and predicted coordinates here
+*               in ASTROM are in the projected plane, and are the
+*               `intermediate world coordinates' of the FITS-WCS proposals.
                   CALL FTPKYG (FTUNIT, 'CRVAL1', RAPCG/D2R, 7,
      :                 'Projection pole -- RA', FTSTAT)
                   CALL FTPKYG (FTUNIT, 'CRVAL2', DCPCG/D2R, 7,
@@ -2172,15 +2180,15 @@
      :                 fnorm*pltcon(4,nsol+maxsol), 7,
      :                 'Projection pole -- y-pixels', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD1_1',
-     :                 PLTCON(2,NSOL)/FNORM, 7,
+     :                 PLTCON(2,NSOL)/FNORM/D2R, 7,
      :                 'Transformation to intermed. world coords',
      :                 FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_1',
-     :                 PLTCON(2+MAXSOL,NSOL)/FNORM, 7, '', FTSTAT)
+     :                 PLTCON(2+MAXSOL,NSOL)/FNORM/D2R, 7, '', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD1_2',
-     :                 PLTCON(3,NSOL)/FNORM, 7, '', FTSTAT)
+     :                 PLTCON(3,NSOL)/FNORM/D2R, 7, '', FTSTAT)
                   CALL FTPKYD (FTUNIT, 'CD2_2',
-     :                 PLTCON(3+MAXSOL,NSOL)/FNORM, 7, '', FTSTAT)
+     :                 PLTCON(3+MAXSOL,NSOL)/FNORM/D2R, 7, '', FTSTAT)
 
 *               Write date of observation
                   IF (GOTPEP) THEN
