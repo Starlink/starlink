@@ -1032,14 +1032,14 @@
 
 # Save the current WCS Frame in the NDF so that it can be re-instated
 # when the output images are saved.
-      if { [Obey ndfpack wcsattrib "$copy get domain"] } {
+      if { [Obey ndfpack wcsattrib "$copy get domain" 1] } {
          set WCSDOMAIN($image) [GetParam ndfpack wcsattrib:value]
       } {
          set WCSDOMAIN($image) "PIXEL"
       }
 
 # Now set the current WCS Frame in the NDF explicitly to pixel co-ordinates.
-      Obey ndfpack wcsframe "ndf=$copy frame=pixel"
+      Obey ndfpack wcsframe "ndf=$copy frame=pixel" 1
 
 # Push the name of the NDF copy onto the image's IMAGE_STACK. 
       set IMAGE_STACK($image) $copy
