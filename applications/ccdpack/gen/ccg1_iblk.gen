@@ -149,11 +149,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  Bugs:
-*     The value of the FLAGS argument cannot be read, owing to a bug in
-*     AST.  The value of the FLAGS argument is assumed to be equal to
-*     AST__USEBAD.
-
 *  Copyright:
 *     Copyright (C) 2000 Central Laboratory of the Research Councils
 
@@ -235,14 +230,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Decode flags.
-*  The commented out lines ought to work, but at present AST_RESAMPLE<T>
-*  seems to cause FLAGS to be passed by value instead of reference so
-*  that it cannot be accessed in FORTRAN.  This is a bug in AST.  Until
-*  it is fixed, we assume values for the flags.
-c     USEBAD = MOD( FLAGS / AST__USEBAD, 2 ) .EQ. 1
-c     USEVAR = MOD( FLAGS / AST__USEVAR, 2 ) .EQ. 1
-      USEBAD = .TRUE. 
-      USEVAR = .FALSE.
+      USEBAD = MOD( FLAGS / AST__USEBAD, 2 ) .EQ. 1
+      USEVAR = MOD( FLAGS / AST__USEVAR, 2 ) .EQ. 1
 
 *  Check that we don't have too many dimensions.
       IF ( INDIM .GT. MAXDIM ) THEN
