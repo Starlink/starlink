@@ -1503,7 +1503,7 @@ static int Overlap( AstRegion *this, AstRegion *that ){
    return result;
 }
 
-static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
+static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 /*
 *  Name:
 *     RegBaseBox
@@ -1543,30 +1543,27 @@ static void RegBaseBox( AstRegion *this, double *lbnd, double *ubnd ){
 *        FrameSet. It should have at least as many elements as there are 
 *        axes in the base Frame.
 
-*  Notes:
-*     - An error is reported if the Interval is unbounded.
-
 */
 
 /* Local Variables: */
-   AstBox *box;                  /* The equivalent Box */
+   AstInterval *this;
+   int nax;
+   int i;
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* If the Interval is effectively a Box, invoke the astRegBaseBox
-   function on the equivalent Box. A pointer to the equivalent Box will
-   be stored in the Interval structure. */
-   box = Cache( (AstInterval *) this );
-   if( box ) {
-      astRegBaseBox( box, lbnd, ubnd );
+/* Get a pointer to the Interval structure */
+   this = (AstInterval *) this_region;
 
-/* If the Interval is not equivalent to a Box, report an error. */
-   } else {
-      astError( AST__INTER, "astRegBaseBox(%s): The %s given is "
-                "unbounded and therefore no bounding box can be "
-                "found (internal AST programming error).", 
-                astGetClass( this ), astGetClass( this ) );
+/* Ensure the cached bounds are up to date. */
+   Cache( this );
+
+/* Copy the cached bounds into the supplied arrays. */
+   nax = astGetNin( this_region->frameset );
+   for( i = 0; i < nax; i++ ) {
+      lbnd[ i ] = this->lbnd[ i ];
+      ubnd[ i ] = this->ubnd[ i ];
    }
 }
 

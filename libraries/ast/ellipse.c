@@ -1085,6 +1085,7 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    double l2;                   /* Length of bounding box diagonal */
    double lbnd_tunc[2];         /* Lower bounds of "this" uncertainty Region */ 
    double lbnd_unc[2];          /* Lower bounds of supplied uncertainty Region */ 
+   double lim;                  /* Smallest semi-minor/major axis length */
    double p1[2];                /* New ellipse axis lengths */
    double ubnd_tunc[2];         /* Upper bounds of "this" uncertainty Region */ 
    double ubnd_unc[2];          /* Upper bounds of supplied uncertainty Region */ 
@@ -1158,8 +1159,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
       p1[ 0 ] = this->a - 0.5*drad;
       p1[ 1 ] = this->b - 0.5*drad;
-      if( p1[ 0 ] < 0.0 ) p1[ 0 ] = 0.0;
-      if( p1[ 1 ] < 0.0 ) p1[ 1 ] = 0.0;
+      lim = 1.0E-6*drad;
+      if( p1[ 0 ] < lim ) p1[ 0 ] = lim;
+      if( p1[ 1 ] < lim ) p1[ 1 ] = lim;
       small_ellipse = astEllipse( frm, 1, this->centre, p1, &(this->angle), NULL, "" );
 
 /* Negate the smaller region.*/

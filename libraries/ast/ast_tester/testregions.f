@@ -6,6 +6,7 @@
       status = sai__ok
 
 
+      call generalChecks( status )
       call checkPrism( status )
       call checkInterval( status )
       call checkPolygon( status )
@@ -14,7 +15,7 @@
       call checkCircle( status )
       call checkEllipse( status )
       call checkNullRegion( status )
-      call checkCmpRegion( status )
+      call checkCmpRegion( status ) 
 
       if( status .eq. sai__ok ) then
          write(*,*) 'All Region tests passed'
@@ -23,6 +24,150 @@
       end if
 
       end
+
+
+      subroutine generalChecks( status )
+      implicit none
+      include 'AST_PAR'
+      include 'PRM_PAR'
+      include 'SAE_PAR'
+
+      integer status, frm1, frm2, frm3, reg1, reg2, reg3, reg4, reg5
+      double precision lbnd(3), ubnd(3), p1(2), p2(2)
+
+      if( status .ne.sai__ok ) return
+
+      call ast_begin( status )
+
+
+
+      lbnd(1) = 0.0D0
+      lbnd(2) = AST__BAD
+      ubnd(1) = AST__BAD
+      ubnd(2) = 0.0D0
+      frm1 = ast_frame( 2, ' ', status )
+      reg1 = ast_interval( frm1, lbnd, ubnd, AST__NULL, ' ', status )
+
+      call ast_getregionbounds( reg1, lbnd, ubnd, status )
+      if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 'General 1' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 2' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 3' )
+      if( ubnd(2) .ne. 0.0D0 ) call stopit( status, 'General 4' )
+
+
+
+      p1(1) = 0.0D0
+      p1(2) = 0.0D0
+      p2(1) = 1.0D0
+      reg2 = ast_circle( frm1, 1, p1, p2, AST__NULL, ' ', status )
+
+      call ast_getregionbounds( reg2, lbnd, ubnd, status )
+      if( lbnd(1) .ne. -1.0D0 ) call stopit( status, 'General 5' )
+      if( lbnd(2) .ne. -1.0D0 ) call stopit( status, 'General 6' )
+      if( ubnd(1) .ne. 1.0D0 ) call stopit( status, 'General 7' )
+      if( ubnd(2) .ne. 1.0D0 ) call stopit( status, 'General 8' )
+
+
+
+      reg3 = ast_cmpregion( reg1, reg2, AST__OR, ' ', status )
+
+      call ast_getregionbounds( reg3, lbnd, ubnd, status )
+      if( lbnd(1) .ne. -1.0D0 ) call stopit( status, 'General 9' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 10' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 11' )
+      if( ubnd(2) .ne. 1.0D0 ) call stopit( status, 'General 12' )
+
+
+
+      lbnd(1) = -1.0D0
+      ubnd(1) = 1.0D0
+      frm2 = ast_frame( 1, ' ', status )
+      reg4 = ast_interval( frm2, lbnd, ubnd, AST__NULL, ' ', status )
+
+      call ast_getregionbounds( reg4, lbnd, ubnd, status )
+      if( lbnd(1) .ne. -1.0D0 ) call stopit( status, 'General 13' )
+      if( ubnd(1) .ne. 1.0D0 ) call stopit( status,  'General 14' )
+
+
+
+      reg5 = ast_prism( reg3, reg4, ' ', status )
+
+      call ast_getregionbounds( reg5, lbnd, ubnd, status )
+      if( lbnd(1) .ne. -1.0D0 ) call stopit( status, 'General 15' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 16' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 17' )
+      if( ubnd(2) .ne. 1.0D0 ) call stopit( status, 'General 18' )
+      if( lbnd(3) .ne. -1.0D0 ) call stopit( status, 'General 19' )
+      if( ubnd(3) .ne. 1.0D0 ) call stopit( status,  'General 20' )
+
+
+
+      call ast_negate( reg2, status )
+      reg3 = ast_cmpregion( reg1, reg2, AST__OR, ' ', status )
+
+      call ast_getregionbounds( reg3, lbnd, ubnd, status )
+      if( lbnd(1) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 21' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 22' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 23' )
+      if( ubnd(2) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 24' )
+
+
+      reg5 = ast_prism( reg3, reg4, ' ', status )
+
+      call ast_getregionbounds( reg5, lbnd, ubnd, status )
+      if( lbnd(1) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 25' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 26' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 27' )
+      if( ubnd(2) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 28' )
+      if( lbnd(3) .ne. -1.0D0 ) call stopit( status, 'General 29' )
+      if( ubnd(3) .ne. 1.0D0 ) call stopit( status,  'General 30' )
+
+
+      reg3 = ast_cmpregion( reg1, reg2, AST__AND, ' ', status )
+
+      call ast_getregionbounds( reg3, lbnd, ubnd, status )
+      if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 'General 31' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 32' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 33' )
+      if( ubnd(2) .ne. 0.0D0 ) call stopit( status, 'General 34' )
+
+
+
+      reg5 = ast_prism( reg3, reg4, ' ', status )
+
+      call ast_getregionbounds( reg5, lbnd, ubnd, status )
+      if( lbnd(1) .ne. 0.0D0 ) call stopit( status, 'General 35' )
+      if( lbnd(2) .gt. 0.99*val__mind ) call stopit( status, 
+     :                                               'General 36' )
+      if( ubnd(1) .lt. 0.99*val__maxd ) call stopit( status, 
+     :                                               'General 37' )
+      if( ubnd(2) .ne. 0.0D0 ) call stopit( status, 'General 38' )
+      if( lbnd(3) .ne. -1.0D0 ) call stopit( status, 'General 39' )
+      if( ubnd(3) .ne. 1.0D0 ) call stopit( status,  'General 40' )
+
+
+      call ast_end( status )
+      if( status .ne. sai__ok ) write(*,*) 'General tests failed'
+
+      end
+
+
 
 
       subroutine checkInterval( status )

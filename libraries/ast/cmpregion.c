@@ -151,6 +151,7 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void GetRegions( AstCmpRegion *, AstRegion **, AstRegion **, int *, int *, int *);
 static void RegBaseBox( AstRegion *, double *, double * );
+static void RegBaseBox2( AstRegion *, double *, double * );
 static void RegSetAttrib( AstRegion *, const char *, char ** );
 static void SetRegFS( AstRegion *, AstFrame * );
 static void SetClosed( AstRegion *, int );
@@ -943,6 +944,7 @@ void astInitCmpRegionVtab_(  AstCmpRegionVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    region->RegBaseBox = RegBaseBox;
+   region->RegBaseBox2 = RegBaseBox2;
    region->RegBaseMesh = RegBaseMesh;
    region->RegPins = RegPins;
    region->GetBounded = GetBounded;
@@ -1102,6 +1104,190 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    double *clbnd2;              /* Point to 2nd comp lower bounds array */
    double *cubnd1;              /* Point to 1st comp upper bounds array */
    double *cubnd2;              /* Point to 2nd comp upper bounds array */
+   double lb;                   /* Lower limit */
+   double ub;                   /* Upper limit */
+   int i;                       /* Axis index */
+   int inc1;                    /* First component interval is included? */
+   int inc2;                    /* Second component interval is included? */
+   int nax;                     /* Number of axes in Frame */
+   int neg1;                    /* First component negated? */
+   int neg2;                    /* Second component negated? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the CmpRegion structure */
+   this = (AstCmpRegion *) this_region;
+
+/* Get pointers to the component Regions. */
+   reg1 = this->region1;
+   reg2 = this->region2;
+
+/* Get their negated flags */
+   neg1 = astGetNegated( reg1 );
+   neg2 = astGetNegated( reg2 );
+
+/* The base Frame of the parent Region structure is the current Frame of
+   the component Regions. Get the no. of axes in this Frame. */
+   nax = astGetNaxes( reg1 );
+
+/* Get the bounding boxes of the component Regions in this Frame. */
+   clbnd1 = astMalloc( sizeof( double )*(size_t) nax );
+   cubnd1 = astMalloc( sizeof( double )*(size_t) nax );
+   clbnd2 = astMalloc( sizeof( double )*(size_t) nax );
+   cubnd2 = astMalloc( sizeof( double )*(size_t) nax );
+   if( astOK ) {
+      astGetRegionBounds( reg1, clbnd1, cubnd1 ); 
+      astGetRegionBounds( reg2, clbnd2, cubnd2 ); 
+
+/* Loop round every axis. */
+      for( i = 0; i < nax; i++ ) {
+         double ub1, lb1;
+         double ub2, lb2;
+         lb1 = clbnd1[ i ];
+         ub1 = cubnd1[ i ];
+         lb2 = clbnd2[ i ];
+         ub2 = cubnd2[ i ];
+
+/* If the first component Region has been negated, the lower and upper
+   bounds from the first component are the bounds of an *excluded* axis 
+   interval, not an included interval. If either of the bounds are
+   infinite, we can swap it to an included interval. If both bounds are
+   finite, we cannot convert to an included interval. In this case, we
+   assume that the gap will be filled at some point on another axis, if
+   there is more than 1 axis, and convert it to an unbouded included
+   interval. */
+         inc1 = 1;
+         if( neg1 ) {
+            lb = clbnd1[ i ];
+            ub = cubnd1[ i ];
+            if( lb == -DBL_MAX ) clbnd1[ i ] = ub;
+            if( ub == DBL_MAX ) cubnd1[ i ] = lb;
+            if( lb != -DBL_MAX && ub != DBL_MAX ) {
+               if( nax == 1 ) {
+                  inc1 = 0;
+               } else {
+                  clbnd1[ i ] = -DBL_MAX;
+                  cubnd1[ i ] = DBL_MAX;
+               }
+            }
+         }
+
+/* Likewise attempt to convert an excluded interval into an included
+   interval for the second component Region. */   
+         inc2 = 1;
+         if( neg2 ) {
+            lb = clbnd2[ i ];
+            ub = cubnd2[ i ];
+            if( lb == -DBL_MAX ) clbnd2[ i ] = ub;
+            if( ub == DBL_MAX ) cubnd2[ i ] = lb;
+            if( lb != -DBL_MAX && ub != DBL_MAX ) {
+               if( nax == 1 ) {
+                  inc2 = 0;
+               } else {
+                  clbnd2[ i ] = -DBL_MAX;
+                  cubnd2[ i ] = DBL_MAX;
+               }
+            }
+         }
+
+/* If the component Regions are combined using AND, find the overlap of
+   the axis intervals. This depends on whether the intervals are included
+   or excluded. */
+         if( this->oper == AST__AND ) {
+
+            if( inc1 ) {
+               if( inc2 ) {
+                  lbnd[ i ] = MAX( clbnd1[ i ], clbnd2[ i ] );
+                  ubnd[ i ] = MIN( cubnd1[ i ], cubnd2[ i ] );
+               } else {
+                  lbnd[ i ] = clbnd1[ i ] < clbnd2[ i ] ? clbnd1[ i ] : cubnd2[ i ];
+                  ubnd[ i ] = cubnd1[ i ] > cubnd2[ i ] ? cubnd1[ i ] : clbnd2[ i ];
+               }
+            } else {
+               if( inc2 ) {
+                  lbnd[ i ] = clbnd2[ i ] < clbnd1[ i ] ? clbnd2[ i ] : cubnd1[ i ];
+                  ubnd[ i ] = cubnd2[ i ] > cubnd1[ i ] ? cubnd2[ i ] : clbnd1[ i ];
+               } else {
+                  lbnd[ i ] = clbnd1[ i ] < clbnd2[ i ] ? clbnd1[ i ] : cubnd2[ i ];
+                  ubnd[ i ] = cubnd1[ i ] > cubnd2[ i ] ? cubnd1[ i ] : clbnd2[ i ];
+               }
+            }
+
+/* If the component Regions are not combined using AND, find the union of
+   the axis intervals. */
+         } else {
+            if( inc1 && inc2 ) {
+               lbnd[ i ] = MIN( clbnd1[ i ], clbnd2[ i ] );
+               ubnd[ i ] = MAX( cubnd1[ i ], cubnd2[ i ] );
+            } else {
+               lbnd[ i ] = -DBL_MAX;
+               ubnd[ i ] = DBL_MAX;
+            } 
+         }
+      }
+   }   
+
+/* Free resources. */
+   clbnd1 = astFree( clbnd1 );
+   cubnd1 = astFree( cubnd1 );
+   clbnd2 = astFree( clbnd2 );
+   cubnd2 = astFree( cubnd2 );
+
+}
+
+static void RegBaseBox2( AstRegion *this_region, double *lbnd, double *ubnd ){
+/*
+*  Name:
+*     RegBaseBox2
+
+*  Purpose:
+*     Returns the bounding box of an un-negated Region in the base Frame of 
+*     the encapsulated FrameSet.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpregion.h"
+*     void RegBaseBox2( AstRegion *this, double *lbnd, double *ubnd )
+
+*  Class Membership:
+*     CmpRegion member function (over-rides the astRegBaseBox2 protected
+*     method inherited from the Region class).
+
+*  Description:
+*     This function is similar to astRegBaseBox in that it returns the 
+*     upper and lower axis bounds of a Region in the base Frame of the 
+*     encapsulated FrameSet. But, in addition to assuming that the
+*     supplied Region has not been negated, it also assumes that any
+*     component Regions contained within the supplied Region have not been
+*     negated.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     lbnd
+*        Pointer to an array in which to return the lower axis bounds
+*        covered by the Region in the base Frame of the encpauslated
+*        FrameSet. It should have at least as many elements as there are 
+*        axes in the base Frame.
+*     ubnd
+*        Pointer to an array in which to return the upper axis bounds
+*        covered by the Region in the base Frame of the encapsulated
+*        FrameSet. It should have at least as many elements as there are 
+*        axes in the base Frame.
+
+*/
+
+/* Local Variables: */
+   AstCmpRegion *this;          /* Pointer to CmpRegion structure */
+   AstRegion *reg1;             /* Pointer to first component Region */
+   AstRegion *reg2;             /* Pointer to second component Region */
+   double *clbnd1;              /* Point to 1st comp lower bounds array */
+   double *clbnd2;              /* Point to 2nd comp lower bounds array */
+   double *cubnd1;              /* Point to 1st comp upper bounds array */
+   double *cubnd2;              /* Point to 2nd comp upper bounds array */
    int i;                       /* Axis index */
    int nax;                     /* Number of axes in Frame */
 
@@ -1125,8 +1311,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    clbnd2 = astMalloc( sizeof( double )*(size_t) nax );
    cubnd2 = astMalloc( sizeof( double )*(size_t) nax );
    if( astOK ) {
-      astGetRegionBounds( reg1, clbnd1, cubnd1 ); 
-      astGetRegionBounds( reg2, clbnd2, cubnd2 ); 
+      astGetRegionBounds2( reg1, clbnd1, cubnd1 ); 
+      astGetRegionBounds2( reg2, clbnd2, cubnd2 ); 
 
 /* How we combine the two bounding boxes depends on the boolean operator
    associated with this CmpRegion.  For AND find the overlap of the two
