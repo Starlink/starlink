@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(messgen, 1.1-5, ussc@star.rl.ac.uk)
+AC_INIT(messgen, 1.2, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -30,6 +30,6 @@ dnl   the length of generated command lines.
 AM_CONFIG_HEADER(config.h)
 
 
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile component.xml)
 
 AC_OUTPUT
