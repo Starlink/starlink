@@ -50,6 +50,16 @@
 #        used by default if the environment variable EXPORT is not defined.
 #        After unpacking the exported file on a similar machine, the recipient
 #        may simply install it for use.
+#     make export_run
+#        Produces an export copy of the built package suitable for
+#        passing to another user.  A compressed tar file is created
+#        in the $EXPORT directory containing copies of the built 
+#        files for the package (the current directory is used by 
+#        default if the environment variable EXPORT is not defined).
+#        The package should normally be built, installed and tested 
+#        (see above) before using this target.  After unpacking the
+#        exported file on a similar machine, the recipient may simply
+#        install it for use. [this is the bare-bones release]
 #     make export_source
 #        Produces an export copy of the source for the system suitable for
 #        passing to another user to build (possibly on on a different type of
@@ -153,6 +163,7 @@
 #     cac: Chris Clayton (Starlink, RAL)
 #     pdraper: P.W. Draper (Starlink, Durham University)
 #     rp: Rachael Padman (MRAO)
+#     timj: Tim Jenness (JAC, Hilo)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -167,6 +178,11 @@
 #        Add the GSD library.
 #     12 Jan 1995 (hme):
 #        Add HTML directory.
+#     29 Mar 2003 (timj):
+#        Remove HTML directory. Distribute .htx_tar files and include
+#        Latex documents (inc SC/1). Add Licence file.
+#     28 May 2003 (timj):
+#        Add export_run target. Switch to $COMPRESS and $COMPSFX
 #     {note_further_changes_here}
 #
 #-
@@ -206,6 +222,13 @@ help:
 "      test          - Describes how to test the installation";\
         echo \
 "      export        - Make a tar file for exporting the built package";\
+        echo \
+   '                      complete with source and documentation';\
+        echo \
+   '      export_run    - Make a compressed tar file for exporting the'\
+   'built package';\
+        echo \
+   '                      with documentation but no source';\
         echo \
 "      export_source - Make a tar file for exporting the package source";\
         echo \
@@ -288,6 +311,14 @@ TAR_IN = pax -w -v -x ustar -f
 TAR_OUT = pax -r -f
 TAR_ADD = tar rvhf
 
+#  Command to compress the tar files and the suffix used for the
+#  compression system. The compress command must send the output
+#  to standard out.
+
+COMPRESS = gzip --best
+COMPSFX  = gz
+
+
 #  Command for linking an atask.
 
 ALINK = alink
@@ -315,6 +346,7 @@ CP = cp -p
 #  number (after the dash) should be incremented for other minor changes (bug
 #  fixes, etc.) which no not merit documentation changes.
 
+PACK_NAME = JCMTDR
 PKG_NAME = jcmtdr
 PKG_VERS = 1.2-2
 
@@ -375,19 +407,31 @@ PUBLIC_SCRIPTS = start jcmtdr.icl test_csh
 
 DATAFILES = rxa_146.sdf rxa_146.dat test.log
 
-#  There are a lot of HyperText files, gathered in the source tree in ./html.
-#  There is no detailed list of files. We rely on the continuous integrity of
-#  the directory.
+# LaTeX files
 
-HTML_DIR = html
+LATEX_DOCS = sun132.tex sc1.tex \
+sc1_cont.eps      sc1_display2.eps  sc1_display5.eps  sc1_fitgauss.eps \
+sc1_spindex2.eps  sc1_cover.eps     sc1_display3.eps  sc1_figure.eps \
+sc1_skyphot.eps   sc1_display1.eps  sc1_display4.eps  sc1_fitcheby.eps \
+sc1_spindex1.eps
+
+#  HTML documentation is now stored in the currently approved manner
+#  in the form of tar files
+
+HYPERTEXT_DOCS = sun132.htx sc1.htx
 
 #  Help library source.
 
 HELPHLP = $(PKG_NAME).hlp
 
+#  Conditions of use file.
+
+LICENCE = $(PACK_NAME)_CONDITIONS
+
 #  List of documentation files. These are just left where they are.
 
-DOCUMENTATION = jcmtdr_news.txt
+DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
+	$(PKG_NAME)_news.txt $(LICENCE)
 
 
 #  Other macros.
@@ -406,8 +450,9 @@ INSTALL_HELPTOP = $(INSTALL)/help
 INSTALL_HTML    = $(INSTALL_HELP)/$(HTML_DIR)
 INSTALL_INC     = $(INSTALL)/include
 INSTALL_LIB     = $(INSTALL)/lib
+INSTALL_DOCS    = $(INSTALL)/docs
 
-INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_HELP)
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_HELP) $(INSTALL_DOCS)
 INSTALL_DIRSTOP = $(INSTALL_BINTOP) $(INSTALL_HELPTOP)
 
 #  Built help library.
@@ -467,7 +512,6 @@ BUILT_FILES = $(MONOLITH) $(HELPTASK) $(HELPSHL) $(DATE_STAMP)
 
 MONOLITH = $(PKG_NAME)
 
-
 #  Check target.
 #  =============
 
@@ -482,7 +526,7 @@ check: $(SOURCE_FILES)
 	done
 	@ echo
 	@ echo \
-   "*** This is $(PKG_NAME) version V$(PKG_VERS) on system $(SYSTEM)"
+   "*** This is $(PACK_NAME) version V$(PKG_VERS) on system $(SYSTEM)"
 	@ echo
 	@ echo "    All essential source files are present"
 	@ echo
@@ -532,11 +576,6 @@ install: $(INSTALL_DIRSTOP) $(INSTALL_DIRS)
 	   $(RM) $$f;\
 	   $(LINK) $(INSTALL_BIN)/$$f $$f;\
 	done
-#  Copy and back-link the HTML directory.
-	-mkdir $(INSTALL_HTML)
-	-cd $(HTML_DIR); $(CP) * $(INSTALL_HTML); $(RM) *
-	-rmdir $(HTML_DIR)
-	$(LINK) $(INSTALL_HTML) $(HTML_DIR)
 #  Monolith
 	strip $(MONOLITH)
 	$(CP) $(MONOLITH) $(INSTALL_BIN)
@@ -554,12 +593,48 @@ install: $(INSTALL_DIRSTOP) $(INSTALL_DIRS)
 	$(RM) $(HELPTASK)
 	chmod 755 $(INSTALL_BIN)/$(HELPTASK)
 	$(LINK) $(INSTALL_BIN)/$(HELPTASK) $(HELPTASK)
-#  Help library.
-	$(CP) $(HELPSHL) $(INSTALL_BIN); \
-	chmod 644 $(INSTALL_BIN)/$(HELPSHL); \
-	$(LINK) $(INSTALL_BIN)/$(HELPSHL) $(INSTALL_HELP)/$(HELPSHL); \
-	$(RM) $(HELPSHL); \
-	$(LINK) $(INSTALL_BIN)/$(HELPSHL) $(HELPSHL)
+#
+#  Install the help files, giving them world read permission.
+	for f in $(HELPSHL) ""; do \
+	   if test -n "$$f"; then \
+	      cp -p $$f $(INSTALL_HELP);\
+	      chmod 644 $(INSTALL_HELP)/$$f;\
+	      rm -f $$f;\
+	      $(LINK) $(INSTALL_HELP)/$$f $$f;\
+	   else :; fi;\
+	done
+#
+#  Install the Latex documentation, giving it world read permission,
+#  leaving the source copy in place.
+	for f in $(LATEX_DOCS) ""; do \
+	   if test -n "$$f"; then \
+	      $(CP) $$f $(INSTALL_DOCS);\
+	      chmod 644 $(INSTALL_DOCS)/$$f;\
+	   else :; fi;\
+	done
+#
+#  Install any hypertext documents, giving world read access to all the files
+#  they contain and linking with other documents.
+	if test -n "$(HYPERTEXT_DOCS)"; then \
+	   pwd=`pwd`;\
+	   (cd $(INSTALL_DOCS);\
+	   for f in $(HYPERTEXT_DOCS) ""; do \
+	      if test -n "$$f"; then\
+	         $(TAR_OUT) $$pwd/$${f}_tar;\
+	         chmod 755 `find $$f -type d -print`;\
+	         chmod 644 `find $$f ! -type d -print`;\
+	         touch $$f;\
+	      else :; fi;\
+	   done);\
+	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+	   export HTX_PATH;\
+	   $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	fi;
+#
+#  Install the conditions of use file and make it read-only to prevent its
+#  date being changed.
+	$(CP) $(LICENCE) $(INSTALL_DATES)
+	chmod 444 $(INSTALL_DATES)/$(LICENCE)
 #  Copy and back-link the date stamp. The installed file is write-protected.
 	$(CP) $(DATE_STAMP) $(INSTALL_DATES)
 	chmod 444 $(INSTALL_DATES)/$(DATE_STAMP)
@@ -741,12 +816,6 @@ deinstall:
 	      $(RM) $(INSTALL_BIN)/$$f; \
 	   else :; fi \
 	done
-#  Deinstall the HTML directory.
-	- if test -d $(INSTALL_HTML); then \
-	   $(RM) $(HTML_DIR); mkdir $(HTML_DIR); \
-	   $(CP) $(INSTALL_HTML)/* $(HTML_DIR); $(RM) $(INSTALL_HTML)/*; \
-	   rmdir $(INSTALL_HTML); \
-	else :; fi
 #  Remove links for all the tasks.
 	cd $(INSTALL_BIN); \
 	for f in $(TASKS:.task=); do \
@@ -763,11 +832,40 @@ deinstall:
 	   $(CP) $(INSTALL_BIN)/$(HELPTASK) $(HELPTASK); \
 	   $(RM) $(INSTALL_BIN)/$(HELPTASK); \
 	else :; fi
-	- if test -f $(INSTALL_BIN)/$(HELPSHL); then \
-	   $(RM) $(HELPSHL); \
-	   $(RM) $(INSTALL_HELP)/$(HELPSHL); \
-	   $(CP) $(INSTALL_BIN)/$(HELPSHL) $(HELPSHL); \
-	   $(RM) $(INSTALL_BIN)/$(HELPSHL); \
+#
+#  Deinstall the help files, if installed versions exist.
+	- for f in $(HELPSHL) ""; do \
+	   if test -n "$$f" -a -f $(INSTALL_HELP)/$$f; then \
+	      rm -f $$f;\
+	      cp -p $(INSTALL_HELP)/$$f .;\
+	      rm -f $(INSTALL_HELP)/$$f;\
+	   else :; fi;\
+	done
+#
+#  Deinstall the Latex documentation, if installed versions exist.
+	- for f in $(LATEX_DOCS) ""; do \
+	   if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+	      $(RM) $(INSTALL_DOCS)/$$f;\
+	   else :; fi;\
+	done
+#
+#  Deinstall any hypertext documents,  and relink the hypertext if required.
+	- if test -n "$(HYPERTEXT_DOCS)"; then \
+	   for f in $(HYPERTEXT_DOCS) ""; do \
+	      if test -n "$$f" -a -d $(INSTALL_DOCS)/$$f; then \
+	         $(RM) -r $(INSTALL_DOCS)/$$f;\
+	      else :; fi;\
+	   done;\
+	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
+	   export HTX_PATH;\
+	   $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
+	fi
+#
+#  Deinstall the conditions of use file after setting its protection so it may
+#  be removed.
+	- if test -f $(INSTALL_DATES)/$(LICENCE); then \
+	   chmod 644 $(INSTALL_DATES)/$(LICENCE);\
+	   $(RM) $(INSTALL_DATES)/$(LICENCE);\
 	else :; fi
 #  Deinstall the date stamp. The installed file is write-protected.
 	- if test -f $(INSTALL_DATES)/$(DATE_STAMP); then \
@@ -856,8 +954,8 @@ export:
 #  Remove pre-existing tar file and file list.
 	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar; then \
 	   $(RM) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar; else :; fi
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-	   $(RM) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX); then \
+	   $(RM) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX); else :; fi
 	if test -f $(EXPORT)/filelist; then \
 	   $(RM) $(EXPORT)/filelist; else :; fi
 #  Start the file list by entering the files from this makefile.
@@ -873,15 +971,52 @@ export:
 	   `cat $(EXPORT)/filelist`
 	$(RM) $(EXPORT)/filelist
 #  Compress the final tar file.
-	compress -v $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar
+	$(COMPRESS) $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar
 #  Report back.
 	@ echo
 	@ echo \
 "*** Export copy of the built $(PKG_NAME) package is in the compressed"
 	@ echo \
-"    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z"
+"    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.$(COMPSFX)"
 	@ echo
 
+#  Export_run target.
+#  ==============
+
+#  This requires either the built or the installed state. In both cases .BUILT
+#  exists and is to be archived. Only export the files needed to run the application
+
+export_run:
+	test -f .BUILT
+#  Remove pre-existing tar file and file list.
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar; then \
+	   $(RM) $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX); then \
+	   $(RM) $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX); else :; fi
+	if test -f $(EXPORT)/filelist; then \
+	   $(RM) $(EXPORT)/filelist; else :; fi
+#  Start the file list by entering the files from this makefile.
+	echo mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
+	   $(DATAFILES) $(PUBLIC_SCRIPTS) .BUILT > $(EXPORT)/filelist
+#  Go into ifl subdirectory and have it add its share to the file list.
+	for dir in ifl; do \
+	   $(MAKE) -f $$dir/makefile $@ $(MKFLAGS) PKG_NAME=$(PKG_NAME) \
+	      TASKS='$(TASKS)'; \
+	done
+#  Create new tar file by inserting the source and built files as
+#  nominated in the file list. The list can then be removed.
+	$(TAR_IN) $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar \
+	   `cat $(EXPORT)/filelist`
+	$(RM) $(EXPORT)/filelist
+#  Compress the final tar file.
+	$(COMPRESS) $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar
+#  Report back.
+	@ echo
+	@ echo \
+"*** Export copy of the built $(PKG_NAME) package is in the compressed"
+	@ echo \
+"    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.$(COMPSFX)"
+	@ echo
 
 #  Export_source target.
 #  =====================
@@ -890,8 +1025,8 @@ export_source:
 #  Remove pre-existing tar file and file list.
 	if test -f $(EXPORT)/$(PKG_NAME).tar; then \
            $(RM) $(EXPORT)/$(PKG_NAME).tar; else :; fi
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           $(RM) $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX); then \
+           $(RM) $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX); else :; fi
 	if test -f $(EXPORT)/filelist; then \
 	   $(RM) $(EXPORT)/filelist; else :; fi
 #  Start the file list by entering the files from this makefile.
@@ -907,13 +1042,13 @@ export_source:
 	   `cat $(EXPORT)/filelist`
 	$(RM) $(EXPORT)/filelist
 #  Compress the final tar file.
-	compress -v $(EXPORT)/$(PKG_NAME).tar
+	$(COMPRESS) $(EXPORT)/$(PKG_NAME).tar
 #  Report back.
 	@ echo
 	@ echo \
 "*** Export copy of the $(PKG_NAME) package source is in the compressed"
 	@ echo \
-"    tar file $(EXPORT)/$(PKG_NAME).tar.Z"
+"    tar file $(EXPORT)/$(PKG_NAME).tar.$(COMPSFX)"
 	@ echo
 
 
