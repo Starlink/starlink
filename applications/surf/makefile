@@ -28,6 +28,7 @@ misc/calsig_450_map.sdf \
 misc/calsig_450_850_map.sdf \
 misc/calsig_850_map.sdf \
 misc/ipfile.dat \
+misc/polimp.scuba \
 surf_kap/ctm_com \
 surf_kap/ctm_par \
 surf_kap/hlpcmd
