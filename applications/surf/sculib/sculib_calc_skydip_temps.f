@@ -100,6 +100,9 @@
 *     1997 March 21 (TIMJ)
 *        Original version
 *     $Log$
+*     Revision 1.9  2004/07/14 21:54:04  timj
+*     Now include SURF_PAR from ../src
+*
 *     Revision 1.8  2000/10/28 03:06:27  timj
 *     Catch division by zero error in SCULIB_JNU
 *
@@ -124,6 +127,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'PRM_PAR'          ! VAL__BAD
+      INCLUDE 'SURF_PAR'         ! SURF constants
 
 *  External references
       INTEGER  CHR_LEN           ! Length of string
@@ -163,9 +167,6 @@
       INTEGER STATUS
 
 *  Local constants:
-
-      INTEGER   SCUBA__MAX_SUB   ! I need SURF_PAR
-      PARAMETER (SCUBA__MAX_SUB = 5)
 
 *  Local Variables:
       LOGICAL ADJUST_TCOLD       ! Have we overriden T_COLD
