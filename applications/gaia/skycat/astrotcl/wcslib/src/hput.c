@@ -33,6 +33,7 @@
  *              express or implied warranty.
  */
 #include <sys/time.h>
+#include <time.h>
 #include <string.h>             /* NULL, strlen, strstr, strcpy */
 #include <stdio.h>
 #include <stdlib.h>

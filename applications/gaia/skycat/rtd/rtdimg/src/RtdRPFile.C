@@ -13,6 +13,7 @@
  */
 
 #include "RtdRPFile.h"
+#include <time.h>
 
 /*
  * NULL constructor for RtdRPFile class.
