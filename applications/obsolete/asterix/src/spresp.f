@@ -92,32 +92,34 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     21 Apr 1993 (DJA):
-*        V1.7-0  Original version.
-*     20 Jan 1994 (DJA):
-*        V1.7-1  Fixed locator annulling bug.
-*     21 Jan 1994 (DJA):
-*        V1.7-2  Fixed bug in compression algorithm.
-*      3 Mar 1994 (DJA):
-*        V1.7-3  Write first 2 axis attributes.
-*     17 Aug 1994 (DJA):
-*        V1.7-4  Reduces expanded dimensions to minimum required
-*     25 Nov 1994 (DJA):
-*        V1.8-0  User interface now uses only USI.
-*     25 Apr 1995 (DJA):
-*        V1.8-1  New data interfaces.
-*     31 Jul 1995 (DJA):
-*        V2.0-0  Allow user to control energy resolution using NEBIN
-*      1 Aug 1995 (DJA):
-*        V2.0-1  Fixed bug in rectangular mode where output units were
-*                not written in radians
-*      3 Oct 1995 (DJA):
-*        V2.0-2  Fixed another bug in rectangular mode, where Y was zero
-*                going into PSF_2D_DATA
-*     16 Oct 1995 (DJA):
-*        V2.0-3  Use new BDI_ routines to read and write data
-*      8 Jan 1996 (DJA):
-*        V2.0-4  Fixed bug in energy axis copying
+*     21 Apr 1993 V1.7-0 (DJA):
+*        Original version.
+*     20 Jan 1994 V1.7-1 (DJA):
+*        Fixed locator annulling bug.
+*     21 Jan 1994 V1.7-2 (DJA):
+*        Fixed bug in compression algorithm.
+*      3 Mar 1994 V1.7-3 (DJA):
+*        Write first 2 axis attributes.
+*     17 Aug 1994 V1.7-4 (DJA):
+*        Reduces expanded dimensions to minimum required
+*     25 Nov 1994 V1.8-0 (DJA):
+*        User interface now uses only USI.
+*     25 Apr 1995 V1.8-1 (DJA):
+*        New data interfaces.
+*     31 Jul 1995 V2.0-0 (DJA):
+*        Allow user to control energy resolution using NEBIN
+*      1 Aug 1995 V2.0-1 (DJA):
+*        Fixed bug in rectangular mode where output units were
+*        not written in radians
+*      3 Oct 1995 V2.0-2 (DJA):
+*        Fixed another bug in rectangular mode, where Y was zero
+*        going into PSF_2D_DATA
+*     16 Oct 1995 V2.0-3 (DJA):
+*        Use new BDI_ routines to read and write data
+*      8 Jan 1996 V2.0-4 (DJA):
+*        Fixed bug in energy axis copying
+*     13 May 1996 V2.0-5 (DJA):
+*        Added perturbation option
 *     {enter_changes_here}
 
 *  Bugs:
@@ -140,20 +142,24 @@
       INTEGER STATUS             ! Global status
 
 *  External references:
-      INTEGER  CHR_LEN
+      EXTERNAL			CHR_LEN
+        INTEGER  		CHR_LEN
 
 *  Local Constants:
-      CHARACTER*(DAT__SZNAM)  SRESP         	! Spatial response object name
-        PARAMETER ( SRESP = 'SPATIAL_RESP' )
+      CHARACTER*(DAT__SZNAM)  	SRESP         		! Spatial response object name
+        PARAMETER 		( SRESP = 'SPATIAL_RESP' )
+
+      CHARACTER*30       	VERSION
+        PARAMETER        	( VERSION = 'SPRESP Version 2.0-5' )
 
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC) ALOC           	! Input ASTERIX structure
+      CHARACTER*(DAT__SZLOC) 	ALOC           		! Input ASTERIX structure
       CHARACTER*40		EAXLAB			! Energy axis label
-      CHARACTER*(DAT__SZLOC) SLOC           	! SPATIAL_RESP object
-      CHARACTER*40           UNITS              ! Axis units
+      CHARACTER*(DAT__SZLOC) 	SLOC           		! SPATIAL_RESP object
+      CHARACTER*40           	UNITS              	! Axis units
 
       REAL                   	CUTOFF			! Cutoff amplitude
-      REAL 		     	DX, DY		! Psf data bin widths in radians
+      REAL 		     	DX, DY			! Psf data bin widths in radians
       REAL                   	E, R, X, Y         	!
       REAL			EBASE, ESCALE		! Energy axis data
       REAL                   	ELO, EHI           	! Energy axis extrema
@@ -162,7 +168,7 @@
       REAL			PXSCALE, PYSCALE
       REAL			SPARR(2)		! Space array data
       REAL                   	SRES           		! Spatial resolution
-      REAL                   	TOR 		! Units to radians conversion
+      REAL                   	TOR 			! Units to radians conversion
       REAL                   	XBASE, XSCALE      	! X axis attributes
       REAL                   	XLO, XHI           	! X axis extrema
       REAL                   	YBASE, YSCALE      	! Y axis attributes
@@ -170,41 +176,42 @@
 
       INTEGER			BIID			! Output response id
       INTEGER                	CDIMS(4)        	! Dimensions of response index
-      INTEGER                CNDIM           	! Dimensionality of response i'x
-      INTEGER                CNELM           	! Total no. elements in index
-      INTEGER		     CP_PTR		! Cursor over spatial response
-      INTEGER                DIMS(5)        	! Dimensions of response
-      INTEGER 		     EBIN      		! Loop over energy axis
-      INTEGER 		     EPTR      		! Ptr to energy bin centres
+      INTEGER                	CNDIM           	! Dimensionality of response i'x
+      INTEGER                	CNELM           	! Total no. elements in index
+      INTEGER		     	CP_PTR		! Cursor over spatial response
+      INTEGER                	NDIM, DIMS(5)        	! Response dimensions
+      INTEGER 		     	EBIN      		! Loop over energy axis
+      INTEGER 		     	EPTR      		! Ptr to energy bin centres
       INTEGER                	I                     	! Loop variable
-      INTEGER                IDIMS(ADI__MXDIM)  ! Dimensions of input file
+      INTEGER                	IDIMS(ADI__MXDIM),INDIM ! Dimensions of input file
       INTEGER			IDUM			! Dummy argument
       INTEGER			IFID			! Input dataset id
-      INTEGER                INDIM           	! Dimensionality of input file
       INTEGER                	IPSF           		! PSF handle
-      INTEGER                NDIM           	! Dimensionality of response
-      INTEGER                NPSF            	! Number of psfs in response
-      INTEGER                NUSED            	! Length of compressed response
+      INTEGER                	NPSF            	! Number of psfs in response
+      INTEGER                	NUSED            	! Length of compressed response
       INTEGER			ONEBIN			! O/p # energy bins
+      INTEGER			PDPTR			! Perturbation data
+      INTEGER			PFID			! Perturbation file
+      INTEGER			PDIMS(2), PNDIM		! Perturb file shape
+      INTEGER			PNRAD			! Perturb polar bins
+      INTEGER			POPT			! Perturbation option
       INTEGER                	PSFSIZ			! Psf size in bytes
+      INTEGER			PWPTR1, PWPTR		! Perturbation workspace
       INTEGER 		     	RBIN      		! Loop over off-axis angle
       INTEGER                	RLIMIT			! Limiting psf radius
       INTEGER		     	SI_PTR			! Spatial reponse index
-      INTEGER                SNELM           	! Total no. elements in response
+      INTEGER                	SNELM           	! Total # elements in response
       INTEGER		     	SP_PTR			! Full spatial reponse
       INTEGER                	X_AX,Y_AX,E_AX,T_AX 	! Axis numbers
       INTEGER 		     	XBIN, YBIN     		! Loop over detector X, Y axes
       INTEGER		     	XSMAX, YSMAX		! Extreme psf sizes
 
       LOGICAL                	EVDS           		! Input is event dataset?
-      LOGICAL 		     H_OK		! Could psf system do a hint?
+      LOGICAL 		     	H_OK			! Psf system do a hint?
+      LOGICAL			PERTURB			! Perturb psf?
       LOGICAL                	PIXCENT            	! Pixel centred?
-      LOGICAL                RADIAL         	! Psf is only function of R
+      LOGICAL                	RADIAL         		! Psf is only function of R
       LOGICAL                	THERE          		! Component exists?
-
-*  Version
-      CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 2.0-3' )
 *.
 
 *  Check inherited global status.
@@ -448,6 +455,54 @@
         CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
       END IF
 
+*  Perturb the psfs?
+      CALL USI_GET0L( 'PERTURB', PERTURB, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( PERTURB ) THEN
+
+*    Get perturbation option
+        CALL USI_GET0I( 'POPT', POPT, STATUS )
+        IF ( (POPT.LT.1) .OR. (POPT.GT.2) ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Illegal perturbation option', STATUS )
+          GOTO 99
+        END IF
+
+*    Get perturbation control
+        IF ( POPT .EQ. 1 ) THEN
+          CALL USI_PROMT( 'PFILE', 'Enclosed energy redistribution '/
+     :                    /'function', STATUS )
+        ELSE IF ( POPT .EQ. 2 ) THEN
+          CALL USI_PROMT( 'PFILE', 'Smoothing kernel', STATUS )
+        END IF
+        CALL USI_ASSOC( 'PFILE', 'BinDS', 'READ', PFID, STATUS )
+
+*    Get perturbation data
+        CALL BDI_GETSHP( PFID, POPT, PDIMS, PNDIM, STATUS )
+        IF ( POPT .EQ. 1 ) THEN
+          CALL BDI_MAPR( PFID, 'Data', 'READ', PDPTR, STATUS )
+          PNRAD = DIMS(1)/2 + 1
+          CALL DYN_MAPR( 1, PNRAD, PWPTR, STATUS )
+          CALL DYN_MAPI( 1, PNRAD, PWPTR1, STATUS )
+
+        ELSE IF ( POPT .EQ. 2 ) THEN
+          IF ( ((PDIMS(1)/2)*2 .EQ. PDIMS(1)) .OR.
+     :         ((PDIMS(2)/2)*2 .EQ. PDIMS(2)) ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'Both dimensions of smoothing mask '/
+     :                    /'should be odd', STATUS )
+          END IF
+          CALL BDI_MAPR( PFID, 'Data', 'READ', PDPTR, STATUS )
+          CALL DYN_MAPR( 2, DIMS, PWPTR, STATUS )
+        END IF
+
+*  No perturbation
+      ELSE
+        POPT = 0
+
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
 *  Map space for expanded spatial response structure
       CALL DYN_MAPR( NDIM, DIMS, SP_PTR, STATUS )
 
@@ -482,41 +537,63 @@
 *    Radial symmetry?
         IF ( RADIAL ) THEN
 
-*        Loop over radial bins
+*      Loop over radial bins
           DO RBIN = 1, DIMS(3)
 
-*          This radius in radians
+*        This radius in radians
             R = (REAL(RBIN)-1.0) * SRES * TOR
 
-*          Evaluate the psf
+*        Evaluate the psf
             CALL PSF_2D_DATA( IPSF, R, 0.0, 0.0, 0.0, DX, DY, .TRUE.,
      :                        DIMS(1), DIMS(2), %VAL(CP_PTR), STATUS )
 
-*          Advance to next psf
+*        Perturb it?
+            IF ( POPT .EQ. 1 ) THEN
+              CALL SPRESP_PERT_EN( PDIMS(1), %VAL(PDPTR), PNRAD,
+     :                             %VAL(PWPTR), %VAL(PWPTR1), DIMS(1),
+     :                             DIMS(2), %VAL(CP_PTR), STATUS )
+            ELSE IF ( POPT .EQ. 2 ) THEN
+              CALL SPRESP_PERT_SM( PDIMS(1), PDIMS(2), %VAL(PDPTR),
+     :                             %VAL(PWPTR), DIMS(1),
+     :                             DIMS(2), %VAL(CP_PTR), STATUS )
+            END IF
+
+*        Advance to next psf
             CP_PTR = CP_PTR + PSFSIZ
 
           END DO
 
-*      Cartesian grid
+*    Cartesian grid
         ELSE
 
-*        Loop over Y psf bins
+*      Loop over Y psf bins
           DO YBIN = 1, DIMS(3)
 
-*          This Y position in radians
+*        This Y position in radians
             Y = (YBASE + (REAL(YBIN)-1.0) * PYSCALE) * TOR
 
-*          Loop over X psf bins
+*        Loop over X psf bins
             DO XBIN = 1, DIMS(4)
 
-*            This X position in radians
+*          This X position in radians
               X = (XBASE + (REAL(XBIN)-1.0) * PXSCALE) * TOR
 
-*            Evaluate the psf
+*          Evaluate the psf
               CALL PSF_2D_DATA( IPSF, X, Y, 0.0, 0.0, DX, DY, .TRUE.,
      :                       DIMS(1), DIMS(2), %VAL(CP_PTR), STATUS )
 
-*            Advance to next psf
+*          Perturb it?
+              IF ( POPT .EQ. 1 ) THEN
+                CALL SPRESP_PERT_EN( PDIMS(1), %VAL(PDPTR), PNRAD,
+     :                             %VAL(PWPTR), %VAL(PWPTR1), DIMS(1),
+     :                               DIMS(2), %VAL(CP_PTR), STATUS )
+              ELSE IF ( POPT .EQ. 2 ) THEN
+                CALL SPRESP_PERT_SM( PDIMS(1), PDIMS(2), %VAL(PDPTR),
+     :                               %VAL(PWPTR), DIMS(1),
+     :                               DIMS(2), %VAL(CP_PTR), STATUS )
+              END IF
+
+*          Advance to next psf
               CP_PTR = CP_PTR + PSFSIZ
 
             END DO
@@ -526,10 +603,10 @@
 
       END DO
 
-*    The index for the compressed data has 1 dimension less than the full
-*    spatial response. The first dimension has size 3 holding, 1) the
-*    start point in the compressed file, 2) number of bins in X and 3)
-*    number of bins in Y.
+*  The index for the compressed data has 1 dimension less than the full
+*  spatial response. The first dimension has size 3 holding, 1) the
+*  start point in the compressed file, 2) number of bins in X and 3)
+*  number of bins in Y.
       CDIMS(1) = 3
       DO I = 3, NDIM
         CDIMS(I-1) = DIMS(I)
@@ -889,6 +966,348 @@
         XMAX = MAX( XMAX, INDEX(2,IPSF) )
         YMAX = MAX( YMAX, INDEX(3,IPSF) )
 
+      END DO
+
+      END
+
+
+      SUBROUTINE SPRESP_PERT_SM( PNX, PNY, PDATA, PWORK, NX, NY,
+     :                           PSF, STATUS )
+*+
+*  Name:
+*     SPRESP_PERT_SM
+
+*  Purpose:
+*     Perturbs a psf by smoothing it. The normalisation of the original psf
+*     is NOT retained.
+
+*  Language:
+*     FORTRAN
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*
+
+*  Usage:
+*     {routine_name} {parameter_usage}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {routine_references}...
+
+*  Keywords:
+*     {routine_keywords}...
+
+*  Copyright:
+*     {routine_copyright}
+
+*  Authors:
+*     DJA: David J. Allan (ROSAT)
+*     {enter_new_authors_here}
+
+*  History:
+*     14 May 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              		! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          		! Standard SAE constants
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Given :
+      INTEGER			PNX, PNY, NX, NY
+      REAL			PDATA(-PNX/2:PNX/2,
+     :                                -PNY/2:PNY/2)
+      REAL			PWORK(NX,NY)
+
+*  Given and Returned :
+      REAL			PSF(NX,NY)
+
+*  Local Variables:
+      INTEGER                	I,J,II,JJ	       	! Loops over psf
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Make copy of psf, and zero the output
+      DO J = 1, NY
+        DO I = 1, NX
+          PWORK(I,J) = PSF(I,J)
+          PSF(I,J) = 0.0
+        END DO
+      END DO
+
+*  Make smoothed output
+      DO J = 1, NY
+        DO I = 1, NX
+          DO JJ = MAX(1,J-PNY/2), MIN(NY,J+PNY/2)
+            DO II = MAX(1,I-PNX/2), MIN(NX,I+PNX/2)
+              PSF(II,JJ) = PSF(II,JJ) + PWORK(I,J) * PDATA(II-I,JJ-J)
+            END DO
+          END DO
+        END DO
+      END DO
+
+      END
+
+
+
+      SUBROUTINE SPRESP_PERT_EN( PNBIN, PDATA, NRAD, POL, COUNT, NX,
+     :                           NY, PSF, STATUS )
+*+
+*  Name:
+*     SPRESP_PERT_EN
+
+*  Purpose:
+*     Perturbs a psf by altering its radial profile. The normalisation
+*     of the original psf is retained.
+
+*  Language:
+*     FORTRAN
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     A polar profile of the input psf is constructed. The profile is
+*     then adjusted by a factor derived from the perturbation profile
+*     and then a copy of the 2-D psf is made where each value is
+*     scaled by its distance from the origin. Finally the psf is rescaled
+*     to its original normalisation.
+
+*  Usage:
+*     {routine_name} {parameter_usage}
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {routine_references}...
+
+*  Keywords:
+*     {routine_keywords}...
+
+*  Copyright:
+*     {routine_copyright}
+
+*  Authors:
+*     DJA: David J. Allan (ROSAT)
+*     {enter_new_authors_here}
+
+*  History:
+*     14 May 1996 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              		! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          		! Standard SAE constants
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Given :
+      INTEGER			PNBIN, NX, NY, NRAD, COUNT(*)
+      REAL			PDATA(PNBIN)
+      REAL			POL(*)
+
+*  Given and Returned :
+      REAL			PSF(NX,NY)
+
+*  Local Constants:
+      INTEGER			SAMPLE			! Oversampling
+        PARAMETER		( SAMPLE = 3 )
+
+*  Local Variables:
+      REAL			SUM			! Psf normalisation
+      REAL			XP,YP,XOLD,YOLD,SCALE,NSUM,SUM
+      INTEGER                	LCOUNT,I,J,II,JJ,K,KK	       	! Loops over psf
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find sum of input psf
+      SUM = 0.0
+      DO J = 1, NY
+        DO I = 1, NX
+          SUM = SUM + PSF(I,J)
+        END DO
+      END DO
+
+*  Zero output arrays and counter
+      DO K = 1, NRAD
+	POL(K) = 0.0
+        COUNT(K) = 0
+      END DO
+
+*  Polar the input psf
+      DO J = 1, NY
+        YOLD = REAL(J-1) - REAL(NY)/2.0
+        DO JJ = 1, SAMPLE
+          YP = YOLD + (REAL(JJ)-0.5)/REAL(SAMPLE)
+          DO I = 1, NX
+            XOLD = REAL(I-1) - REAL(NX)/2.0
+
+            DO II = 1, SAMPLE
+              XP = XOLD + (REAL(II)-0.5)/REAL(SAMPLE)
+
+*          Find radial bin number
+              KK = INT(SQRT(XP*XP+YP*YP)*REAL(SAMPLE))/SAMPLE+1
+
+*          In valid range?
+	      IF ( (KK.GT.0) .AND. (KK.LE.NRAD) ) THEN
+                COUNT(KK) = COUNT(KK) + 1
+	        POL(KK) = POL(KK) + PSF(I,J)
+              END IF
+
+            END DO
+          END DO
+
+        END DO
+      END DO
+
+*  Adjust polar profile for varying number of counts
+      DO I = 1, NRAD
+        POL(I) = POL(I) / REAL(COUNT(I))
+      END DO
+
+*  Adjust polar profile using user supplied scale profile
+      DO I = 1, MIN( NRAD, PNBIN )
+        POL(I) = POL(I) * PDATA(I)
+      END DO
+
+*  Scale the input psf
+      NSUM = 0.0
+      DO J = 1, NY
+        YOLD = REAL(J-1) - REAL(NY)/2.0
+        DO I = 1, NX
+          XOLD = REAL(I-1) - REAL(NX)/2.0
+
+*      Find weighted rescale for this psf pixel
+          LCOUNT = 0
+          SCALE = 0.0
+          DO JJ = 1, SAMPLE
+            YP = YOLD + (REAL(JJ)-0.5)/REAL(SAMPLE)
+            DO II = 1, SAMPLE
+              XP = XOLD + (REAL(II)-0.5)/REAL(SAMPLE)
+
+*          Find radial bin number
+              KK = INT(SQRT(XP*XP+YP*YP)*REAL(SAMPLE))/SAMPLE+1
+
+*          In valid range?
+	      IF ( (KK.GT.0) .AND. (KK.LE.NRAD) ) THEN
+                LCOUNT = LCOUNT + 1
+                SCALE = SCALE + POL(KK)
+              END IF
+
+            END DO
+          END DO
+
+*      Adjust psf value
+          IF ( LCOUNT .GT. 0 ) THEN
+            SCALE = SCALE / REAL(LCOUNT)
+            PSF(I,J) = PSF(I,J) * SCALE
+          END IF
+
+          NSUM = NSUM + PSF(I,J)
+
+        END DO
+      END DO
+
+*  Renormalise the psf
+      DO J = 1, NY
+        DO I = 1, NX
+          PSF(I,J) = PSF(I,J) * SUM / NSUM
+        END DO
       END DO
 
       END
