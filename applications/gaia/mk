@@ -252,7 +252,7 @@
                CC='cc'
                CXX='cxx'
                FC='f77'
-               DEC_CXX='-std arm -taso'; export DEC_CXX  # Need for V6 compiler & AST plus 32 bit addressing
+               DEC_CXX='-taso'; export DEC_CXX  # 32 bit addressing
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
