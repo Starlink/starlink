@@ -4238,12 +4238,10 @@ c        REAL XX,XP,YP
 *  Functions :
       LOGICAL IMG_INBOUNDS
 *    Local variables :
-      REAL X,Y
-      REAL THETA
       REAL DISP
-      REAL LANGLE
       REAL ALPHA
       REAL RAD
+      REAL XP,YP,XPC,YPC,AP,BP
 *-
 
         STATUS=SAI__OK
