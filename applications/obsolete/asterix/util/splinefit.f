@@ -53,7 +53,6 @@
 *
 *    Local variables :
 *
-      CHARACTER*6               PREC                   ! Precision required
       CHARACTER*80              TEXT(MAXLINES)         ! History text
 
       REAL                      SQ_RES                 ! Spline fit control
@@ -73,16 +72,15 @@
       INTEGER                   NEST(ADI__MXDIM)       ! Max # knots per dim
       INTEGER                   NHREC                  ! # history recs used
       INTEGER                   NKNOT(ADI__MXDIM)      ! Actual # of knots
-      INTEGER                   ODPTR, OVPTR           ! Output data pointers
+      INTEGER                   ODPTR           	! Output data pointers
       INTEGER			OFID			! Output dataset id
-      INTEGER                   TDIMS(ADI__MXDIM)      ! Dummy dims array
-      INTEGER                   TLEN                   ! String length
-      INTEGER                   TNDIM                  ! Temp dimensionality
-      INTEGER                   WGTPTR                 ! Weights array
-      INTEGER                   LWRK,WRKPTR            ! NAG float workspace
+      INTEGER                   TDIMS(ADI__MXDIM)       ! Dummy dims array
+      INTEGER                   TLEN                    ! String length
+      INTEGER                   TNDIM                   ! Temp dimensionality
+      INTEGER                   WGTPTR                  ! Weights array
+      INTEGER                   LWRK,WRKPTR             ! NAG float workspace
 
       LOGICAL                   ANYBAD                 ! Any bad quality data?
-      LOGICAL                   AFLIP(ADI__MXDIM)      ! Flipped axis
       LOGICAL                   OK                     ! General validity
       LOGICAL                   PRIM                   ! Input primitive
       LOGICAL                   QUAL_OK, VAR_OK        ! Quality,variance ok?
