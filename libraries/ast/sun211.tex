@@ -1650,10 +1650,10 @@ For data systems that do not use FITS header cards, a different
 approach may be needed, possibly involving use of a \htmlref{Channel}{Channel}
 (\secref{ss:channels}) rather than a FitsChan.  In the case of the
 Starlink NDF data format, for example, all of the above may be
-replaced by a single call to the (Fortran) routine
-\xref{NDF\_PTWCS}{sun33}{NDF_PTWCS}---see \xref{SUN/33}{sun33}{}. The
-whole process can probably be encapsulated in a similar way in C for
-most data systems, whether they use FITS header cards or not.
+replaced by a single call to the function
+\xref{ndfPtwcs}{sun33}{ndfPtwcs}---see \xref{SUN/33}{sun33}{}. The
+whole process can probably be encapsulated in a similar way for most
+data systems, whether they use FITS header cards or not.
 
 For an overview of how to propagate WCS information through data
 processing steps, see \secref{ss:propagatingwcsinformation}.  For more
