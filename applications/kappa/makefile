@@ -2203,7 +2203,7 @@ do_deinstall:
 #  so, it causes the do_test target to be made, which performs the
 #  installation test.
 
-test:
+test: $(INSTALL_BIN)/v$(PKG_VERS).demo
 	@ if test ! -f .INSTALLED_$(SYSTEM); then \
            echo;\
            echo '*** The $(PACK_NAME) package is not currently installed';\
@@ -2224,7 +2224,7 @@ test:
 #  The do_test target performs the installation test. A file named do_test
 #  should never exist.
 
-do_test:
+do_test: 
 #
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
