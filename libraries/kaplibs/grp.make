@@ -6,7 +6,8 @@ EXCLUDE = ctg_test.f lpg_test.f kaplibs_test.f
 SEARCHTOOLS = kapform.html kapresults.html search.html search.js
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = kaplibs_source ira_source aif_source fts_source kpg_source
+TAR_FILES_A = kaplibs_source ira_source aif_source fts_source kpg_source \
+kapgrf_source
 
 # The contents of the ira_source.tar file:
 KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch \
@@ -143,7 +144,7 @@ kpg1_plotp.f kpg1_plots.f kpg1_pltln.f kpg1_pqvid.f kpg1_prnth.f \
 kpg1_rdast.f kpg1_rdlst.f kpg1_short.f kpg1_verb.f kpg1_fit1d.f \
 kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f \
 kpg1_tkast.c kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f \
-grf_kaplibs.c kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
+kpg1_snkta.f kpg1_wcatw.f kpg1_srcta.f \
 kpg1_plsav.f kpg1_pllod.f kpg1_plput.f kpg1_plget.f kpg1_mkpos.f \
 kpg1_graph.f kpg1_ndfnm.f kpg1_grphw.f kpg1_assig.f kpg1_cpndb.f \
 kpg1_cpndd.f kpg1_cpndi.f kpg1_cpndr.f kpg1_cpndub.f kpg1_cpnduw.f \
@@ -186,6 +187,9 @@ fts1_chvai.f fts1_chvaub.f fts1_chvaw.f
 AIF_SOURCE = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
 aif_ptfnm.f aif_temp.f
 
+# The contents of the kapgrf_source.tar file:
+KAPGRF_SOURCE = grf_kaplibs.c
+
 # The contents of the ira_source.tar file:
 IRA_SOURCE = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
 ira1_asset.f ira1_check.f ira1_chprj.f ira1_chscs.f ira1_decod.f ira1_ecec.f \
@@ -207,12 +211,12 @@ UNIX_OTHERS = makefile mk sun238.tex kaplibs.news KAPLIBS_CONDITIONS
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) \
-$(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES) $(SEARCHTOOLS)
+$(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES) $(SEARCHTOOLS) $(KAPGRF_SOURCE)
 
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
 kaplibs.news ira_source.tar fts_source.tar aif_source.tar ctg_source.tar \
-kpg_source.tar lpg_source.tar KAPLIBS_CONDITIONS
+kpg_source.tar lpg_source.tar kapgrf_source.tar KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.
 $(action)

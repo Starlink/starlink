@@ -425,7 +425,7 @@ LIB_VERS = 1.1
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 ira_source.tar aif_source.tar fts_source.tar ctg_source.tar kpg_source.tar \
-lpg_source.tar
+lpg_source.tar kapgrf_source.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -459,10 +459,11 @@ IRA_PRIVATE_INCLUDES = ira_com
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
-KPG_PRIVATE_INCLUDES = kpg_par ctm_com grf.h
+KPG_PRIVATE_INCLUDES = kpg_par ctm_com 
+KAPGRF_PRIVATE_INCLUDES = grf.h
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
-                   $(KPG_PRIVATE_INCLUDES) 
+                   $(KPG_PRIVATE_INCLUDES) $(KAPGRF_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -660,9 +661,10 @@ IRA_C_ROUTINES =
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
-KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c grf_kaplibs.c
+KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c
+KAPGRF_C_ROUTINES =  grf_kaplibs.c
 C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
-             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) 
+             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) $(KAPGRF_C_ROUTINES) 
 
 #  The facility error file.
 
@@ -778,6 +780,11 @@ SUBPAR_PAR:  $(STAR_INC)/subpar_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
+$(KAPGRF_C_ROUTINES) $(KAPGRF_PRIVATE_INCLUDES):
+	$(TAR_OUT) kapgrf_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in kapgrf_source.tar; exit 1; fi
+
 $(IRA_PUBLIC_INCLUDES) $(IRA_PRIVATE_INCLUDES) \
 $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) $(IRA_C_ROUTINES):
 	$(TAR_OUT) ira_source.tar $@
@@ -832,6 +839,8 @@ $(PLATFORM_F) dummy_target1:
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
+KAPGRF_OBJECT_FILES = $(KAPGRP_C_ROUTINES:.c=.o) 
+
 AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
 
 IRA_OBJECT_FILES = $(IRA_BLOCK_DATA:.f=.o) $(IRA_F_ROUTINES:.f=.o) \
@@ -850,7 +859,8 @@ LPG_OBJECT_FILES = $(LPG_BLOCK_DATA:.f=.o) $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
-               $(LPG_OBJECT_FILES) $(FTS_OBJECT_FILES) $(KPG_OBJECT_FILES) 
+               $(LPG_OBJECT_FILES) $(FTS_OBJECT_FILES) $(KPG_OBJECT_FILES) \
+               $(KAPGRF_OBJECT_FILES)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -860,9 +870,13 @@ OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfts.a libkpg.a
+OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfts.a libkpg.a libkapgrf.a
 
 libaif.a: $(AIF_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+libkapgrf.a: $(KAPGRF_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
