@@ -28,7 +28,7 @@
 *                                  = REAL (Given)
 *           variance on IN_DATA
 *     IN_QUALITY (N_BOL_IN,N_POS,N_BEAM)
-*                                  = INTEGER (Given)
+*                                  = BYTE (Given)
 *           quality on IN_DATA
 *     N_BOL_OUT                    = INTEGER (Given)
 *           number of bolometers in output array
@@ -41,7 +41,7 @@
 *                                  = REAL (Returned)
 *           variance on OUT_DATA
 *     OUT_QUALITY (N_BOL_OUT,N_POS,N_BEAM)
-*                                  = INTEGER (Returned)
+*                                  = BYTE (Returned)
 *           quality on OUT_DATA
 *     STATUS                       = INTEGER (Given and returned)
 *           global status
@@ -65,14 +65,14 @@
       INTEGER N_BEAM
       REAL    IN_DATA (N_BOL_IN, N_POS, N_BEAM)
       REAL    IN_VARIANCE (N_BOL_IN, N_POS, N_BEAM)
-      INTEGER IN_QUALITY (N_BOL_IN, N_POS, N_BEAM)
+      BYTE IN_QUALITY (N_BOL_IN, N_POS, N_BEAM)
       INTEGER N_BOL_OUT
       INTEGER IN_POINTER (N_BOL_OUT)
 *    Import-Export :
 *    Export :
       REAL    OUT_DATA (N_BOL_OUT, N_POS, N_BEAM)
       REAL    OUT_VARIANCE (N_BOL_OUT, N_POS, N_BEAM)
-      INTEGER OUT_QUALITY (N_BOL_OUT, N_POS, N_BEAM)
+      BYTE OUT_QUALITY (N_BOL_OUT, N_POS, N_BEAM)
 *    Status :
       INTEGER STATUS
 *    External references :
