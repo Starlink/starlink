@@ -238,7 +238,7 @@ void lstx_sperase( ADIobj *list, ADIstatus status )
 
 void lstx_addtoset( ADIobj *list, ADIobj obj, ADIstatus status )
   {
-  ADIobj curp = list;
+  ADIobj curp = *list;
   ADIobj *ipoint = list;
   ADIobj	test = (-1);
 
