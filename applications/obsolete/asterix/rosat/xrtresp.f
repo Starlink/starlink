@@ -97,6 +97,7 @@ c        CALL AST_PATH('AST_ETC','XRTCAL','hri_drm',CALDIR,L,STATUS)
 c        CALL AST_PATH('AST_ETC','XRTCAL','drmpspc',CALDIR,L,STATUS)
         CALDIR='$AST_ETC/drmpspc'
       ENDIF
+      L=CHR_LEN(CALDIR)
       CALL USI_DEF0C('RESPFILE', CALDIR(:L), STATUS)
 *
 *   Get detector response matrix name
