@@ -68,6 +68,9 @@
 
 
 
+/* The structure to hold all the information gained from the lexer about
+   the input read from the input file, and any further information used
+   when doing output. */
    struct tokitem {
       char *string;      /* The whole input string                         */
       char *strmat;      /* Start of the substring which matches the token */
@@ -76,13 +79,43 @@
    };
 
 
-   int tokmatch( struct tokitem *tok, ... ) {
+   int tokmatch( struct tokitem *ptok, ... ) {
+/*
+*+
+*  Name:
+*     tokmatch
+*
+*  Purpose:
+*     Check a token buffer for a list of token IDs.
+*
+*  Description:
+*     This function checks the token ID values of a set of token structures
+*     in memory against a list given in the arguments.  The arguments given
+*     are of variable number; the last one should be a zero (this causes
+*     matching to stop).  If by the time the final (zero) argument is 
+*     encountered no mismatches have occurred, a true result is returned,
+*     but if any mismatches occur matching attempts stop and a false 
+*     (zero) result is returned.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Start of an array of tokitem structures.
+*     ... = int
+*        A variable number of int arguments which are to be matched against
+*        the tokval components of successive tokitem structures starting
+*        at ptok.
+*
+*  Return value:
+*     int
+*        Unity if the lists match, zero if they don't.
+*-
+*/
       va_list ap;
       int mtok;
 
-      va_start( ap, tok );
+      va_start( ap, ptok );
       while ( mtok = va_arg( ap, int ) ) {
-         if ( mtok != (tok++)->tokval ) {
+         if ( mtok != (ptok++)->tokval ) {
             va_end( ap );
             return 0;
          }
@@ -91,7 +124,38 @@
       return 1;
    }
 
+
    char *stlitcat( struct tokitem *ptok, int *nlittok ) {
+/*
+*+
+*  Name:
+*     stlitcat
+*
+*  Purpose:
+*     Concatenate a number of literal strings.
+*
+*  Description:
+*     This function returns a string which contains the concatenation 
+*     (without the surrounding '"' characters) of as many consecutive
+*     string literals as are represented by the tokitem list starting
+*     at ptok.  The number of tokens concatenated is also returned in
+*     the arguments.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Pointer to the start of a list of tokitem structures.
+*     nlittok = int *
+*        On exit, *nlittok contains the number of consecutive tokens
+*        starting at ptok which are string literals.
+*
+*  Return value:
+*     char *
+*        If the token at ptok is a string literal, this gives the address
+*        of a string (malloc'd for the purpose) containing the concatenation
+*        of the string literals.  If the token at ptok is not a string
+*        literal, the return value is NULL.
+*-
+*/
       int buflen = 0;
       int slen;
       char *buf = NULL;
@@ -110,6 +174,35 @@
    }
 
    struct tokitem *nextarg( struct tokitem *ptok ) {
+/*
+*+
+*  Name:
+*     nextarg
+*
+*  Purpose:
+*     Skip to the start of the next argument of a function call.
+*
+*  Description:
+*     This function, given the position in the token list of the start
+*     of an argument in a function call, returns the position in the 
+*     token list of the token after the end of this argument.  This 
+*     should be either the start of the next argument, or the terminating
+*     parenthesis of the function call.  It does this basically by 
+*     skipping forward to the next unbracketed (by significant '()', 
+*     '[]' or '{}' characters) comma or closing parenthesis.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        The position in the token list of the start of a parameter in
+*        a function call.
+*
+*  Return value:
+*     struct tokitem *
+*        The position in the token list of the start of the next parameter
+*        of the function call, or of the closing parenthesis if this is
+*        the last one.
+*-
+*/
       int blev = 0;
       int plev = 0;
       int slev = 0;
@@ -148,7 +241,33 @@
       return ptok;
    }
 
+
    int idmatch( struct tokitem *ptok, char *ident ) {
+/*
+*+
+*  Name:
+*     idmatch
+*
+*  Purpose:
+*     Check if a token is an identifier with a given value.
+*
+*  Description:
+*     This function returns true if the token specified is of type 
+*     IDENTIFIER, and if the significant part of its string is equal
+*     to a given string.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Pointer to a token.
+*     ident = char *
+*        A string which the token's representation must match.
+*
+*  Return value:
+*     int
+*        Unity if the token is an identifier which matches the given 
+*        string, zero otherwise.
+*-
+*/
       if ( ptok->tokval != IDENTIFIER )
          return 0;
       else if ( strcmp( ptok->strmat, ident ) )
@@ -158,6 +277,26 @@
    }
 
    void subst( struct tokitem *ptok, char *replace ) {
+/*
+*+
+*  Name:
+*     subst
+*
+*  Purpose:
+*     Substitute text into a token.
+*
+*  Description:
+*     This function replaces the significant portion of the text of a
+*     token with the supplied string.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        Pointer to token to change.
+*     replace = char *
+*        The string which should replace the matched string of the token
+*        at ptok.
+*-
+*/
       char *put;
       put = ptok->strmat;
       while ( *put && *replace ) *(put++) = *(replace++);
@@ -171,6 +310,34 @@
    }
 
    void comment( struct tokitem *ptok, char *message ) {
+/*
+*+
+*  Name:
+*     comment
+*
+*  Purpose:
+*     To slip a comment into the output stream.
+*
+*  Description:
+*     This function writes a comment into the output stream, which is 
+*     typically done as a warning to the user of the program that 
+*     something needs human attention.  The comment appears on a line
+*     of its own, in a distinctive format (it contains the name of this
+*     program).  It will be placed at the previous line break to the
+*     token specified by the argument ptok.
+*
+*  Arguments:
+*     ptok = struct tokitem *
+*        This gives the position into which to interpolate the comment.
+*        The comment should go on the previous line to the matched 
+*        string represented by this token.
+*     message = char *
+*        A short string to form the content text of the comment.
+*        It should not exceed (about?) sixty characters.
+*-
+*/
+
+/* Declare local variables. */
       char *cbuf;
       char *nl = NULL;
       char *pc;
@@ -179,6 +346,7 @@
       int incomm;
       int tleng;
       
+/* Build the text of the comment itself. */
       sprintf( text, "/* %s: %-60s */\n", name, message );
       tleng = strlen( text );
 
@@ -269,7 +437,6 @@
       char *string;
       char *strmat;
       char *warn;
-
       struct tokitem *tbuf;
 
 /* Dummy zeroth record to act as stop indicator for functions that search
@@ -301,22 +468,35 @@
       for ( i = 1; i < leng; i++ ) {
          t = tbuf[ i ].tokval;
          t1 = tbuf[ i + 1 ].tokval;
+
+/* Check for, and mostly change, occurences of 'int'. */
          if ( t == INT && tbuf[ i - 1 ].tokval != SHORT 
                        && tbuf[ i - 1 ].tokval != LONG )
             if ( idmatch( tbuf + i + 1, "argc" ) || 
                  idmatch( tbuf + i + 1, "main" ) ) {
-               sprintf( line, "Type of %s not changed from int", 
+               sprintf( line, "Type of %s not changed from int.", 
                         tbuf[ i + 1 ].strmat );
                comment( tbuf + i + 1, line );
             }
             else {
                subst( tbuf + i, "INT_BIG" );
             }
+
+/* Check for and change occurrences of symbolic constants. */
          if ( idmatch( tbuf + i, "INT_MAX" ) )
             subst( tbuf + i, "INT_BIG_MAX" );
          if ( idmatch( tbuf + i, "INT_MIN" ) )
             subst( tbuf + i, "INT_BIG_MIN" );
+         if ( idmatch( tbuf + i, "UINT_MAX" ) )
+            subst( tbuf + i, "UINT_BIG_MAX" );
 
+/* Check for and warn about variable argument lists. */
+         if ( t == DOTDOTDOT && t1 == ')' ) {
+            comment( tbuf + i, "Function with variable arguments." );
+         }
+
+/* Check for, and warn about if necessary, printf (etc) format strings.
+   This code was written with reference to K&R (2nd Ed.) */
          if ( t1 == '(' && ( idmatch( tbuf + i, "printf" ) 
                           || idmatch( tbuf + i, "fprintf" )
                           || idmatch( tbuf + i, "sprintf" ) ) ) {
@@ -359,18 +539,20 @@
                   }
                }
                if ( lost )
-                  warn = "Failed to parse format string";
+                  warn = "Failed to parse format string.";
                else if ( hasintp )
-                  warn = "Format string contains %n";
+                  warn = "Format string contains %n.";
                else if ( hasint )
-                  warn = "Format string contains %[cdiouxX*]";
+                  warn = "Format string contains %[cdiouxX*].";
             }
             else {
-               warn = "Non-literal format string";
+               warn = "Non-literal format string.";
             }
             if ( *warn ) comment( tbuf + i, warn );
          }
 
+/* Check for, and warn about if necessary, scanf (etc) format strings. 
+   This code was written with reference to K&R (2nd Ed.) */
          if ( t1 == '(' && ( idmatch( tbuf + i, "scanf" )
                           || idmatch( tbuf + i, "fscanf" )
                           || idmatch( tbuf + i, "sscanf" ) ) ) {
@@ -410,12 +592,12 @@
                   }
                }
                if ( lost )
-                  warn = "Failed to parse format string";
+                  warn = "Failed to parse format string.";
                else if ( hasintp )
-                  warn = "Format string contains pointers to int";
+                  warn = "Format string contains pointers to int.";
             }
             else {
-               warn = "Non-literal format string";
+               warn = "Non-literal format string.";
             }
             if ( *warn ) comment( tbuf + i, warn );
          }
