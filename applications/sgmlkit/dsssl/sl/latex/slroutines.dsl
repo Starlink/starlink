@@ -169,26 +169,36 @@ $Id$
 		    (process-node-list (cdr purp))
 		    (empty-sosofo))))
 	(make environment brackets: '("{" "}")
-	      (apply sosofo-append
-		     (map (lambda (gi)
-			    (let ((gi-and-nd (assoc (normalize gi) kids)))
-			      (if gi-and-nd
+	      (make sequence
+		(apply sosofo-append
+		       (map (lambda (gi)
+			      (let ((gi-and-nd (assoc (normalize gi) kids)))
+				(if gi-and-nd
+				    (process-node-list (cdr gi-and-nd))
+				    (empty-sosofo))))
+			    '(;;"routinename"
+			      ;;"purpose"
+			      "description"
+			      "userkeywords"
+			      "softwarekeywords"
+			      "returnvalue"
+			      "argumentlist"
+			      "parameterlist"
+			      ;;"authorlist"
+			      ;;"history"
+			      "usage"
+			      "invocation"
+			      "examplelist"
+			      "implementationstatus"
+			      "bugs")))
+		; now collect together the diytopics
+		(apply sosofo-append
+		       (map (lambda (gi-and-nd)
+			      (if (string=? (normalize (car gi-and-nd))
+					    (normalize "diytopic"))
 				  (process-node-list (cdr gi-and-nd))
-				  (empty-sosofo))))
-			  '(;;"routinename"
-			    ;;"purpose"
-			    "description"
-			    "returnvalue"
-			    "argumentlist"
-			    "parameterlist"
-			    ;;"authorlist"
-			    ;;"history"
-			    "usage"
-			    "invocation"
-			    "examplelist"
-			    "notelist"
-			    "implementationstatus"
-			    "bugs")))))))
+				  (empty-sosofo)))
+			    kids)))))))
   (element routinename
     (process-children))
   (element name
@@ -211,6 +221,14 @@ $Id$
   ;;      (process-children)))
   (element description
     (make command name: "sstdescription"
+	  (process-children)))
+  (element userkeywords
+    (make command name: "sstdiytopic"
+	  parameters: '("Keywords")
+	  (process-children)))
+  (element softwarekeywords
+    (make command name: "sstdiytopic"
+	  parameters: '("Code group")
 	  (process-children)))
   (element returnvalue
     (let ((none-att (attribute-string (normalize "none")))
@@ -239,14 +257,23 @@ $Id$
 	   (type (select-elements kids (normalize "type")))
 	   (desc (select-elements kids (normalize "description")))
 	   ;;(opt-att (attribute-string (normalize "optional")))
-	   (dir-att (attribute-string (normalize "direction"))))
+	   (given-att (attribute-string (normalize "given")))
+	   (returned-att (attribute-string (normalize "returned"))))
       (make sequence
 	(make command name: "sstsubsection"
 	      (make sequence
 		(process-node-list name)
 		(literal "=")
 		(process-node-list type)
-		(literal "(" dir-att ")")))
+		(literal "("
+			 (cond
+			  ((and given-att returned-att)
+			   "given and returned")
+			  (given-att "given")
+			  (returned-att "returned")
+			  (else		;default is given
+			   "given"))
+			 ")")))
 	(make environment brackets: '("{" "}")
 	      (process-node-list desc)))))
   (element examplelist
@@ -268,9 +295,7 @@ $Id$
   (element bugs
     (make command name: "sstbugs"
 	  (process-children)))
-  (element notelist
-    (process-children))
-  (element othernote
+  (element diytopic
     (let ((kids (children (current-node))))
       (make sequence
 	(make command name: "sstdiytopic"
