@@ -199,7 +199,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
@@ -867,4 +866,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 8 minutes 12 seconds
+Total time: 7 minutes 40 seconds

@@ -219,6 +219,7 @@ javadoc-sources:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
@@ -228,7 +229,6 @@ javadoc-sources:
   [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - Tag @see: malformed: "AstAxisLabels,"
@@ -249,7 +249,6 @@ javadoc-sources:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
   [javadoc]  AppContext or an ApplicationContext.)  "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
 
@@ -264,6 +263,7 @@ javadoc-sources:
   [javadoc]  
   [javadoc]  Assumes that the two scenes are composed of the
   [javadoc]  same number of strokes in the same order."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
@@ -412,10 +412,10 @@ javadoc-sources:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -627,11 +627,11 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/compat/xml/XmlWriter.java:158: warning - Tag @see: can't find makeExternalIdentifiers in diva.compat.xml.XmlWriter
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/util/xml/XmlWriter.java:135: warning - Tag @see: can't find makeExternalIdentifiers in diva.util.xml.XmlWriter
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/compat/xml/XmlWriter.java:135: warning - Tag @see: can't find makeExternalIdentifiers in diva.compat.xml.XmlWriter
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the supports of the two elements (i.e. the
   [javadoc]  sets elements that they cover) are identical."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/overview-summary.html...
@@ -767,10 +767,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/package.html: warning - Tag @link: reference not found: SelectCharacters
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawBasicFigure.java:38: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFreehandFigure.java:23: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawPathFigure.java:39: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/package.html: warning - Tag @link: reference not found: DrawGraphicsMenu
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/diva/package-summary.html...
   [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
@@ -779,6 +775,7 @@ javadoc-sources:
   [javadoc] "DrawBasicFigure extends the diva BasicFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawCompositeFigure.java:42: warning - The first sentence is interpreted to be:
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
   [javadoc]  figures to be made aware of any changes, i.e.<!-- --> composite figure
@@ -787,12 +784,14 @@ javadoc-sources:
   [javadoc] "DrawCompositeFigure extends the Diva BackgroundedCompositeFigure
   [javadoc]  class to add support for events that allow users of any derived
   [javadoc]  figures to be made aware of any changes, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFreehandFigure.java:23: warning - The first sentence is interpreted to be:
   [javadoc] "A figure that displays a polyline that can have its vertices moved,
   [javadoc]  intended for use as a freehand (i.e.<!-- --> many vertices) figure, same as
   [javadoc]  Polyline figure but can be identified as needing different treatment."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A figure that displays a polyline that can have its vertices moved,
   [javadoc]  intended for use as a freehand (i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawPathFigure.java:39: warning - The first sentence is interpreted to be:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!-- --> figure creation, removal and transformations."
@@ -800,6 +799,7 @@ javadoc-sources:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/package.html: warning - Tag @link: reference not found: DrawGraphicsMenu
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/jaiutil/package-summary.html...
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
@@ -851,11 +851,11 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set position along the Y axis at which to start labelling
   [javadoc]  (i.e. the X axis intersection with the Y axis). "
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/AstAxisLabels.html...
   [javadoc] "The suggested gap resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstAxisLabels.java:93: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstFigureStore.java:84: warning - Tag @link: reference not found: DrawActions
@@ -897,11 +897,11 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -1039,8 +1039,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ImageTransducer.java:30: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/InterpolateStrokeFilter.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LineRecognizer.java:28: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/sketch/toolbox/LLRSceneMetric.html...
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
@@ -1062,6 +1060,8 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g. zooming).  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneRecognizer.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
@@ -1184,13 +1184,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/GraphModel.html...
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeController.java:90: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/NodeController.html...
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeController.java:268: Tag @see: Malformed: GraphController#rerenderSubgraph(Iterator);
@@ -1256,20 +1256,21 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/TransformContext.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/BackgroundedCompositeFigure.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:191: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/toolbox/LabelFigure.html...
   [javadoc] "Get the point at which this figure is "anchored." This
   [javadoc]  will be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the point at which this figure is "anchored." "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/PointConstraint.html...
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." A snap means that the output value of the point
@@ -1277,7 +1278,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/SelectionModel.html...
   [javadoc] "Add an array of objects to the selection."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2366,4 +2366,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 10 minutes 21 seconds
+Total time: 10 minutes 27 seconds
