@@ -2246,6 +2246,17 @@ M Makefile.dependencies
           <code>STAR_DEFAULTS</code>), you do not need to supply the
           brackets.</p>
 
+        <p>The macros below ultimately do their work by expanding into
+          shell script, and these results are exposed in the
+          <code>./configure</code> file.  Although it can occasionally
+          be useful to examine these implementation details, resist the
+          temptation to write your <code>configure.ac</code> scripts
+          based on what you find there.  If macro behaviour is not
+          documented here, you should not rely on it.  If you
+          <em>need</em> to rely on it, then consult with the starconf
+          maintainer to have the documentation changed, and the
+          behaviour thus fixed.</p>
+
         <subsect id='macro-check-progs' export='export'>
           <subhead>
             <title>STAR_CHECK_PROGS(progs-to-check-for, [package=''])</title>
@@ -2441,6 +2452,39 @@ M Makefile.dependencies
             present is `per-package-dirs', which causes applications
             and help to be installed in a package-specific
             directory (see <ref id="developments"/>).
+          </p>
+
+          <p>As part of its initialisation, this macro does the following:
+            <ul>
+              <li>
+                <p>Makes sure that the variable <code>STARLINK</code>
+                  is defined, so that you can use it elsewhere in your
+                  <code>configure.ac</code> file.  The value of this
+                  variable depends on the
+                  <code>STARCONF_DEFAULT_STARLINK</code> `sticky
+                  variable' which is defined by the
+                  <code>./starconf.status</code> script (see <ref
+                    id="starconf"/>), and can be
+                  overridden by a setting of <code>STARLINK</code> in
+                  the environment, though you are discouraged from
+                  doing that.</p>
+              </li>
+              <li>
+                <p>Sets appropriate values for variables
+                  <code>FCFLAGS</code>, <code>FFLAGS</code>,
+                  <code>CFLAGS</code> and <code>LDFLAGS</code>.</p>
+              </li>
+              <li>
+                <p>Defines and substitutes variables
+                  <code>PACKAGE_VERSION_MAJOR</code>,
+                  <code>..._MINOR</code>, <code>..._RELEASE</code> and
+                  <code>..._INTEGER</code>.  These are respectively
+                  the major, minor and release numbers extracted from
+                  <code>PACKAGE_VERSION</code>, and an integer
+                  representation of these consisting of <code>major *
+                  1000000 + minor * 1000 + release</code>.</p>
+              </li>
+            </ul>
           </p>
 
         </subsect>
