@@ -40,6 +40,11 @@
        changes the "PIXEL" system is now removed from the celestial
        coordinates and grid overlay toolboxes.
 
+     - SuperCOSMOS surveys are now available. To access these you need
+       to remove the file $HOME/.skycat/skycat.cfg, if it exists, and 
+       then look in "Data-Servers"->"Browse Catalog Directories"
+       dialog and look for the sub-list "SuperCOSMOS catalogues".
+
      - FITS file with more than one period in their names can now be
        displayed by GAIA. However, some toolboxes are effectively
        disabled by this as it breaks the NDF library naming conventions
