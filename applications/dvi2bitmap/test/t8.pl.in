@@ -8,7 +8,7 @@
 sub compare_bitmaps($$\@);
 
 $texbin='@TEX@';
-if ($texbin eq 'NOTEX') {
+if ($texbin eq 'NO_TEX') {
     print STDERR "No TeX binary available.  Can't run t8, so assume success\n";
     exit 0;
 }
