@@ -98,7 +98,7 @@ $| = 1;
 
 #  Required libraries.
 
-use Fcntl;
+use lib (".", "$PERL_MOD_DIR");
 use Cwd;
 use Scb;
 use StarIndex;

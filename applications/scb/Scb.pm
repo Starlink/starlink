@@ -68,26 +68,35 @@ use Cwd;
 #  Global variables.
 ########################################################################
 
-#  Directory locations.
+#  The capitalised variable names in this section may be replaced by
+#  environment variables or mk script variables by the makefile at 
+#  build time.  However, the script will work before such replacements 
+#  have taken place.
 
-# $srcdir = "/local/star/src/from-ussc";  # head of source tree
-$srcdir = "/local/star/sources";        # head of source tree
-$bindir = "/star/bin";                  # Starlink binaries directory
-$incdir = "/star/include";              # Starlink include directory
+#  Starlink source tree directory locations.
+
+$star   = "$STARLINK"    || "/star";
+$srcdir = "$SOURCES_DIR" || "$star/sources";
+$bindir = "$star/bin";
+$incdir = "$star/include";
+
+$srcdir = "/local/star/src/from-ussc";
+$srcdir = "/local/star/sources";
 
 #  System file locations.
 
-$mimetypes_file = "/etc/mime.types";
+$mimetypes_file = "$MIMETYPES_FILE" || "/etc/mime.types";
 
 #  HTX server base URL
 
-$htxserver = "http://star-www.rl.ac.uk/cgi-bin/htxserver";
+$htxserver = "$HTXSERVER_URL" || "http://star-www.rl.ac.uk/cgi-bin/htxserver";
 
 #  Index file locations.
 
-$func_indexfile = cwd . "/func";
-$file_indexfile = cwd . "/file";
-$taskfile  = cwd . "/tasks";
+$indexdir = "$INDEX_DIR" || cwd;
+$func_indexfile = "$indexdir/func";
+$file_indexfile = "$indexdir/file";
+$taskfile       = "$indexdir/tasks";
 
 #  Language-specific tagging routines.
 #     By defining the hash of references to functions %tagger, file tagging 

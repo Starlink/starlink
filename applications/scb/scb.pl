@@ -117,6 +117,7 @@ $usage = "Usage: $self [-html] [-exact] \\\n"
 
 #  Required libraries.
 
+use lib (".", "$PERL_MOD_DIR");
 use Scb;
 use StarIndex;
 
