@@ -18,7 +18,7 @@
 \newcommand{\stardocnumber}    {226.1}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {1 December 1998}
+\newcommand{\stardocdate}      {6 January 1999}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocversion}   {1.0}
@@ -576,8 +576,8 @@ as a Starlink Miscellaneous User Document, MUD/165\footnote{Note this
 document is still in draft consequently you should read this in
 conjunction with the A\&AS paper.}) \dash\ you configure \EXTRACTOR\
 in much the same way, although with 
-\htmlref{some restrictions}{some_restrictions}
-\latex{(see Section~\ref{some_restrictions})}.
+\htmlref{some restrictions}{implementation_notes}
+\latex{(see Section~\ref{implementation_notes})}.
 
 This document describes how to run \EXTRACTOR, and includes
 \htmlref{instructions for running \SExtractor}{running_sextractor}
@@ -759,28 +759,42 @@ measurements, or select a row of measurements and view the associated
 object). The catalogue interface also allows you to sort and select
 objects on the basis of their measurements.
 
-\section{\label{some_restrictions}\xlabel{some_restrictions}Some Restrictions}
+\section{\label{implementation_notes}\xlabel{implementation_notes}Implementation Notes}
 
-\SExtractor\ uses various configuration files to provide numerous
-processing options.  Many of these options have not been tried
-extensively in the \EXTRACTOR\ incarnation, so it is quite possible
-that problems may arise. Please notify the authors if you come across
-any problems in using \EXTRACTOR. Further development and testing is
-planned.
+\EXTRACTOR, unlike the PISA (\xref{SUN/109}{sun109}{}) package that it
+will eventually replace, will read data in floating point format
+(c.f. the PISA restriction of data in the range 0-32000).  It will
+also read NDFs that contain BAD pixels. These will appear as
+``missing'' regions, so any objects that are intersected will be split
+into sub-objects.
 
+Since \EXTRACTOR\ uses the AST (\xref{SUN/211}{sun211}{}) library to
+perform astrometry, it can be used with images that contain DSS
+solutions, as well as FITS-WCS and AST native ones (native
+\SExtractor\ will only use images that have FITS-WCS solutions). The
+GAIA display tool is a convenient way to add such astrometrical
+calibrations.
+
+One current limitation is that no support is provided for the use of
+NDF variance arrays (although these would probably map onto the
+``weight'' image concept of \SExtractor).
+
+The \SExtractor\ program has a very large range of processing
+options. Consequently many of these options have not been tried
+extensively in the \EXTRACTOR\ incarnation, so it is quite probable
+that problems may arise. 
+
+In particular some areas of \SExtractor\ that have not been
+implemented are:
 \begin{itemize}
-\item Some areas which have not been implemented are:
-\begin{itemize}
- \item Bad pixel support.
- \item Propagation of ancillary data into check images.
- \item The catalogue cannot be piped to STDOUT.
+ \item The propagation of the input NDF to the check image (so the WCS
+       information, for instance, is lost).
+ \item The piping of catalogues to standard output.
 \end{itemize}
-\item Some areas which have not been tried are:
-\begin{itemize}
- \item Weight images.
- \item Flag images.
-\end{itemize}
-\end{itemize}
+The use of weight and flag images is not supported.
+
+If you come across any problems with \EXTRACTOR\ please notify the
+authors.
 
 \section{\xlabel{references}References}
 Bailey J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
