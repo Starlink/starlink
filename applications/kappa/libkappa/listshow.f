@@ -713,7 +713,7 @@
             CALL MSG_BLANK( STATUS )
             CALL KPG1_DSFRM( IWCS, 'Positions will be reported in '//
      :                       'the following co-ordinate Frame:', 
-     :                       STATUS )
+     :                       .TRUE., STATUS )
          END IF
 
 *  Display any title read from the positions list.

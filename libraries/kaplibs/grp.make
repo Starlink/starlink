@@ -131,7 +131,7 @@ kpg1_asgfr.f kpg1_asgfw.f kpg1_asgrd.f kpg1_asgrp.f kpg1_asira.f \
 kpg1_aslog.f kpg1_asmrg.f kpg1_asoff.f kpg1_asplt.f kpg1_aspsy.f \
 kpg1_asptp.f kpg1_asreg.f kpg1_asset.f kpg1_assim.f kpg1_assir.f \
 kpg1_assmp.f kpg1_asspl.f kpg1_assts.f kpg1_assty.f kpg1_ast2h.f \
-kpg1_bilnr.f kpg1_ceil.f kpg1_dsfrm.f kpg1_floor.f kpg1_flpth.f \
+kpg1_bilnr.f kpg1_ceil.f kpg1_dsfrm.f kpg1_dsfr1.f kpg1_floor.f kpg1_flpth.f \
 kpg1_gdare.f kpg1_gdbnd.f kpg1_gdget.f kpg1_gdnew.f kpg1_gdold.f \
 kpg1_gdput.f kpg1_gdqpc.f kpg1_gdwin.f kpg1_gtaxi.f kpg1_gtaxv.f \
 kpg1_gtchv.f kpg1_gtgrp.f kpg1_gtpos.f kpg1_gtwcs.f kpg1_h2ast.f \

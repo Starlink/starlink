@@ -168,7 +168,7 @@
          CALL MSG_BLANK( STATUS )
          CALL NDF_MSG( 'NDF', INDF )
          CALL KPG1_DSFRM( IWCS, 'Current co-ordinate Frame in ^NDF:', 
-     :                    STATUS )
+     :                    .TRUE., STATUS )
       END IF
 
 *  Abort if an error has occurred.

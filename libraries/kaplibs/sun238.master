@@ -530,7 +530,7 @@ related items to be removed.
 \item Script \verb+kaplibs_link+ has been added to enable linking of standalone 
 applications.
 \item The routine KPG1_DSFRM has been modified to include details of AST 
-SpecFrames.
+SpecFrames. \emph{The argument list has also been changed.}
 \item The routine KPG1_ASMRG has been modified to attempt alignment in 
 Domain SPECTRAL.
 \end{itemize}

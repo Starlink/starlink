@@ -1032,7 +1032,7 @@
                IF( DESC .AND. .NOT. QUIET ) THEN
                   CALL KPG1_DSFRM( IPLOT, 'Positions in this '//
      :                    'picture will be reported in the following '//
-     :                    'co-ordinate Frame:', STATUS )
+     :                    'co-ordinate Frame:', .TRUE., STATUS )
                END IF
 
 *  If this is the first selected picture, store an AGI identifier for it.

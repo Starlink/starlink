@@ -360,10 +360,10 @@
          IF( DESC ) THEN
             IF( USECUR ) THEN
                CALL KPG1_DSFRM( IPLOT, '   Current co-ordinate Frame:', 
-     :                          STATUS )
+     :                          .TRUE., STATUS )
             ELSE
                CALL KPG1_DSFRM( IPLOT, '   Requested co-ordinate '//
-     :                          'Frame:', STATUS )
+     :                          'Frame:', .TRUE., STATUS )
             END IF
 
          ELSE

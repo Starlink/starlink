@@ -123,8 +123,9 @@
 *        axis arrays will also be given. [FALSE]
 *     FULLFRAME = _LOGICAL (Read)
 *        If a FALSE value is given for this parameter then only the
-*        Title and Domain attributes are displayed for a co-ordinate Frame.
-*        Otherwise, a more complete description is given.   [FALSE]
+*        Title and Domain attributes plus the axis labels and units are 
+*        displayed for a co-ordinate Frame. Otherwise, a more complete 
+*        description is given.   [FALSE]
 *     FULLWCS = _LOGICAL (Read)
 *        If a TRUE value is given for this parameter then all co-ordinate 
 *        Frames in the WCS component of the NDF are displayed. Otherwise, 
@@ -246,12 +247,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  External References:
-      INTEGER CHR_LEN            ! Used length of a string
-      LOGICAL CHR_SIMLR          ! Strings equal apart from case?
-      DOUBLE PRECISION SLA_EPJ2D
-      DOUBLE PRECISION SLA_EPB2D
-
 *  Local Constants:
       INTEGER MXEXTN             ! Maximum number of extensions
       PARAMETER ( MXEXTN = 32 )
@@ -261,18 +256,13 @@
 
 *  Local Variables:
       BYTE BADBIT                ! Bad-bits mask
-      CHARACTER * ( 20 ) ATTRIB  ! AST Frame attribute name
-      CHARACTER * ( 30 ) SOR     ! Spectral standard of rest
-      CHARACTER * ( 30 ) SYS     ! Coordinate system
       CHARACTER * ( 35 ) APPN    ! Last recorded application name
-      CHARACTER * ( 50 ) PRJ     ! Sky projection
       CHARACTER * ( 8 ) BINSTR   ! Binary bad-bits mask string
       CHARACTER * ( 80 ) ALABEL( NDF__MXDIM ) ! Axis label
       CHARACTER * ( 80 ) AUNITS( NDF__MXDIM ) ! Axis units
       CHARACTER * ( 80 ) CCOMP   ! Character component
       CHARACTER * ( 80 ) FRMDMN  ! Frame domain
       CHARACTER * ( 80 ) FRMTTL  ! Frame title
-      CHARACTER * ( 80 ) POSBUF  ! Buffer for position
       CHARACTER * ( 80 ) WCSDMN( MXFRM )  ! Frame domains
       CHARACTER * ( 80 ) WCSTTL( MXFRM )  ! Frame titles
       CHARACTER * ( DAT__SZLOC ) XLOC ! Extension locator
@@ -288,39 +278,23 @@
       CHARACTER * ( NDF__SZTYP ) CTYPE( NDF__MXDIM ) ! Type for axis centres 
       CHARACTER * ( NDF__SZTYP ) XTYPE( MXEXTN ) ! Extension name
       CHARACTER * ( NDF__SZXNM ) XNAME( MXEXTN ) ! Extension name
-      CHARACTER * 80 TEXT                        ! General text string
-      CHARACTER * 3 MONTH( 12 )  ! Month names
-      CHARACTER * 1 SIGN         ! Sign of day value
       DOUBLE PRECISION AEND( NDF__MXDIM ) ! End of NDF extent along an axis
       DOUBLE PRECISION ASTART( NDF__MXDIM ) ! Start of NDF extent along an axis
-      DOUBLE PRECISION CFIRST( 1, NDF__MXDIM ) ! Frame coords of first pixel
-      DOUBLE PRECISION EP        ! Epoch of observattion
-      DOUBLE PRECISION EQ        ! Epoch of reference equinox
       DOUBLE PRECISION GFIRST( 1, NDF__MXDIM ) ! GRID coords of first pixel
-      DOUBLE PRECISION FD        ! Fraction of day
-      DOUBLE PRECISION MJD       ! Modified Julian Date corresponding to Epoch
       INTEGER AXPNTR( 1 )        ! Pointer to axis centres
       INTEGER BBI                ! Bad-bits value as an integer
       INTEGER DIGVAL             ! Binary digit value
       INTEGER DIM( NDF__MXDIM )  ! Dimension sizes
       INTEGER EL                 ! Number of array elements mapped
-      INTEGER FRM                ! AST pointer to Frame
       INTEGER FRMNAX             ! Frame dimensionality
       INTEGER I                  ! Loop counter for dimensions
-      INTEGER IAT                ! Current length of a string
       INTEGER IAXIS              ! Loop counter for axes
-      INTEGER IBASE              ! Index of Base Frame in WCS FrameSet
       INTEGER ICURR              ! Index of Current Frame in WCS FrameSet
-      INTEGER ID                 ! Day of month
       INTEGER IDIG               ! Loop counter for binary digits
       INTEGER IEXTN              ! Extension index
       INTEGER IFRAME             ! Frame index
-      INTEGER IHMSF( 4 )         ! Hours, mins, secs, fraction of sec
-      INTEGER IM                 ! Index of month
       INTEGER INDF               ! NDF identifier
       INTEGER IWCS               ! AST identifier for NDF's WCS FrameSet
-      INTEGER IY                 ! Year
-      INTEGER J                  ! SLALIB status
       INTEGER LBND( NDF__MXDIM ) ! Lower pixel-index bounds
       INTEGER N                  ! Loop counter for extensions
       INTEGER NC                 ! Character count
@@ -342,18 +316,12 @@
       LOGICAL NORM( NDF__MXDIM ) ! Axis normalisation flags
       LOGICAL QUIET              ! Do not report the trace?
       LOGICAL REPORT             ! Report the trace?
-      LOGICAL SHOWCS             ! Display an AST dump of the WCS component?
-      LOGICAL SHOWEP             ! Display the Epoch value?
       LOGICAL THERE              ! Whether NDF component is defined
       LOGICAL WIDTH( NDF__MXDIM ) ! Whether NDF axis-width components are defined
-
-      DATA MONTH/ 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 
-     :            'AUG', 'SEP', 'OCT', 'NOV', 'DEC' /
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion routines
       INCLUDE 'NUM_DEF_CVT'
-
 *.
 
 *  Check the inherited global status.
@@ -957,13 +925,13 @@
 *  Loop round each coordinate system.
          DO 304 IFRAME = 1, NFRAME
 
-*  Get an AST pointer to the Frame with index IFRAME. 
-            FRM = AST_GETFRAME( IWCS, IFRAME, STATUS )            
+*  Make this Frame the current Frame
+            CALL AST_SETI( IWCS, 'CURRENT', IFRAME, STATUS )            
 
 *  Get the Frame title, domain and dimensionality.
-            FRMTTL = AST_GETC( FRM, 'TITLE', STATUS )
-            FRMDMN = AST_GETC( FRM, 'DOMAIN', STATUS )
-            FRMNAX = AST_GETI( FRM, 'NAXES', STATUS )
+            FRMTTL = AST_GETC( IWCS, 'TITLE', STATUS )
+            FRMDMN = AST_GETC( IWCS, 'DOMAIN', STATUS )
+            FRMNAX = AST_GETI( IWCS, 'NAXES', STATUS )
 
 *  Remove any PGPLOT escape sequences from the title.
             CALL KPG1_PGESC( FRMTTL, STATUS )
@@ -984,354 +952,20 @@
 *  Display the Frame index.
                CALL MSG_SETI( 'INDEX', IFRAME )
                IF( FULLWC ) THEN
-                  CALL MSG_OUT( 'WCS_INDEX',
-     :             '      Frame index: ^INDEX', STATUS )
+                  CALL KPG1_DSFRM( IWCS, 
+     :                           '      Frame index: ^INDEX', 
+     :                             FULLFR, STATUS )
+
                ELSE IF( FULLFR ) THEN
-                  CALL MSG_OUT( 'WCS_INDEX',
-     :             '        Index               : ^INDEX', STATUS )
-               END IF
-
-*  Display the title (upto 44 characters), and domain if necessary. The number 
-*  of dimensions is implied by the list of axes displayed later.
-               CALL MSG_SETC( 'TTL', FRMTTL( : 44 ) )
-               IF( CHR_LEN( FRMTTL ) .GT. 44 ) THEN
-                  CALL MSG_SETC( 'TTL', '...' )
-               END IF
-
-               CALL MSG_OUT( 'WCS_TITLE',
-     :         '        Title               : "^TTL"', STATUS )
-
-               CALL MSG_SETC( 'DOMAIN', FRMDMN )
-               CALL MSG_OUT( 'WCS_DOMAIN',
-     :         '        Domain              : ^DOMAIN', STATUS )
-
-*  The rest is only displayed for full Frame descriptions.
-               IF( FULLFR ) THEN
-
-*  Initialise a flag to induicate that we do not have a SkyFrame or a
-*  SpecFrame, and should therefore not display the EPOCH.
-                  SHOWEP = .FALSE.
-
-*  If the Frame is a SkyFrame, display the equinox, system and projection.
-                  IF( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
-
-*  Indicate that the EPOCH should be displayed.
-                     SHOWEP = .TRUE.
-
-                     EQ = AST_GETD( FRM, 'EQUINOX', STATUS )
-                     SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
-                     PRJ = AST_GETC( FRM, 'PROJECTION', STATUS )
-   
-                     IF( SYS .EQ. 'FK4' .OR. SYS .EQ. 'FK5' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Equatorial (' )
-                        CALL MSG_SETC( 'SYS', SYS )
-                        CALL MSG_SETC( 'SYS', ' -' )
-                        IF( EQ .LT. 1984.0 ) THEN
-                           CALL MSG_SETC( 'SYS', 'B' )
-                        ELSE 
-                           CALL MSG_SETC( 'SYS', 'J' )
-                        END IF
-                        CALL MSG_SETD( 'SYS', EQ )
-                        CALL MSG_SETC( 'SYS', ')' )
-              
-                     ELSE IF( SYS .EQ. 'FK4-NO-E' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Equatorial without '//
-     :                                 'E-terms (FK4 -' )
-                        IF( EQ .LT. 1984.0 ) THEN
-                           CALL MSG_SETC( 'SYS', ' B' )
-                        ELSE 
-                           CALL MSG_SETC( 'SYS', ' J' )
-                        END IF
-                        CALL MSG_SETD( 'SYS', EQ )
-                        CALL MSG_SETC( 'SYS', ')' )
-   
-                     ELSE IF( SYS .EQ. 'GAPPT' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Equatorial '//
-     :                                 '(geocentric apparent)' )
-
-                     ELSE IF( SYS .EQ. 'ECLIPTIC' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Ecliptic (' )
-                        IF( EQ .LT. 1984.0 ) THEN
-                           CALL MSG_SETC( 'SYS', ' B' )
-                        ELSE 
-                           CALL MSG_SETC( 'SYS', ' J' )
-                        END IF
-                        CALL MSG_SETD( 'SYS', EQ )
-                        CALL MSG_SETC( 'SYS', ')' )
-   
-                     ELSE IF( SYS .EQ. 'GALACTIC' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Galactic' )
-   
-                     ELSE IF( SYS .EQ. 'SUPERGALACTIC' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Supergalactic' )
-                     ELSE
-                        CALL MSG_SETC( 'SYS', SYS )
-                     END IF                        
-   
-                     CALL MSG_OUT( 'WCS_SYS',
-     :         '        System              : ^SYS', STATUS )
-
-                     IF( PRJ .NE. ' ' ) THEN
-                        CALL MSG_SETC( 'PROJ', PRJ )
-                        CALL MSG_OUT( 'WCS_PROJ',
-     :         '        Projection          : ^PROJ', STATUS )
-                     END IF
-
-*  If the Frame is a SpecFrame, display SpecFrame specific information...
-                  ELSE IF( AST_ISASPECFRAME( FRM, STATUS ) ) THEN
-
-*  Indicate that the EPOCH should be displayed.
-                     SHOWEP = .TRUE.
-
-*  System...
-                     SYS = AST_GETC( FRM, 'SYSTEM', STATUS )
-                     IF( SYS .EQ. 'FREQ' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Frequency' )
-                     ELSE IF( SYS .EQ. 'ENER' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Energy' )
-                     ELSE IF( SYS .EQ. 'WAVN' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Wave number' )
-                     ELSE IF( SYS .EQ. 'WAVE' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Wavelength' )
-                     ELSE IF( SYS .EQ. 'AWAV' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Wavelength (in air)' )
-                     ELSE IF( SYS .EQ. 'VRAD' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Radio velocity' )
-                     ELSE IF( SYS .EQ. 'VOPT' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Optical velocity' )
-                     ELSE IF( SYS .EQ. 'ZOPT' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Redshift' )
-                     ELSE IF( SYS .EQ. 'BETA' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Beta factor' )
-                     ELSE IF( SYS .EQ. 'VELO' ) THEN
-                        CALL MSG_SETC( 'SYS', 'Relativistic velocity' )
-                     ELSE
-                        CALL MSG_SETC( 'SYS', SYS )
-                     END IF
-
-                     CALL MSG_SETC( 'SYS', ' (' )
-                     CALL MSG_SETC( 'SYS', AST_GETC( FRM, 'UNIT(1)', 
-     :                                             STATUS ) ) 
-                     CALL MSG_SETC( 'SYS', ')' )
-                     CALL MSG_OUT( 'WCS_SYS',
-     :         '        System              : ^SYS', STATUS )
-
-*  Rest Frequency...
-                     IF( AST_TEST( FRM, 'RestFreq', STATUS ) ) THEN
-                        CALL MSG_SETD( 'RF', AST_GETD( FRM, 'RestFreq',
-     :                                                 STATUS ) )
-                        CALL MSG_SETC( 'RF', ' GHz' )
-                     ELSE
-                        CALL MSG_SETC( 'RF', '<not defined>' )
-                     END IF
-                     CALL MSG_OUT( 'WCS_RF',
-     :         '        Rest frequency      : ^RF', STATUS )
-                     
-
-*  Standard of Rest...
-                     SOR = AST_GETC( FRM, 'STDOFREST', STATUS )
-                     IF( CHR_SIMLR( SOR, 'NONE' ) ) THEN
-                        CALL MSG_SETC( 'SOR', '<not defined>' )
-            
-                     ELSE IF( CHR_SIMLR( SOR, 'LSR' ) ) THEN
-                        CALL MSG_SETC( 'SOR', 'Kinematical Local '//
-     :                                 'Standard of Rest' )
-            
-                     ELSE IF( CHR_SIMLR( SOR, 'LSRD' ) ) THEN
-                        CALL MSG_SETC( 'SOR', 'Dynamical Local '//
-     :                                 'Standard of Rest' )
-            
-                     ELSE IF(  CHR_SIMLR( SOR, 'LOCAL_GROUP' ) ) THEN
-                        CALL MSG_SETC( 'SOR', 'Local group' )
-            
-                     ELSE IF(  CHR_SIMLR( SOR, 'SOURCE' ) ) THEN
-                        CALL AST_SETC( FRM, 'StdOfRest', 'HELIO', 
-     :                                 STATUS )
-                        POSBUF = 'Source ('
-                        IAT = 8
-                        CALL CHR_PUTR( AST_GETR( FRM, 'SourceVel',
-     :                                           STATUS ), POSBUF, IAT )
-                        CALL CHR_APPND( ' km/s - heliocentric)', POSBUF, 
-     :                                  IAT )
-                        CALL MSG_SETC( 'SOR', POSBUF( : IAT ) )
-                        CALL AST_SETC( FRM, 'StdOfRest', 'SOURCE', 
-     :                                 STATUS )
-            
-                     ELSE 
-                        CALL MSG_SETC( 'SOR', SOR )
-                     END IF
-
-                     CALL MSG_OUT( 'WCS_SOR',
-     :         '        Standard of rest    : ^SOR', STATUS )
-               
-
-* Reference position...
-                     IF( AST_TEST( FRM, 'RefRA', STATUS ) ) THEN
-                        POSBUF = ' '
-                        IAT = 0
-                        CALL CHR_APPND( AST_GETC( FRM, 'RefRA',
-     :                                           STATUS ), POSBUF, IAT )
-                        CALL CHR_APPND( ',', POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL CHR_APPND( AST_GETC( FRM, 'RefDEC',
-     :                                           STATUS ), POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL CHR_APPND( '(FK5 J2000)', POSBUF, IAT )
-                        CALL MSG_SETC( 'REF', POSBUF( : IAT ) )
-
-                     ELSE
-                        CALL MSG_SETC( 'REF', '<not defined>' )
-                     END IF
-                     CALL MSG_OUT( 'WCS_REF',
-     :         '        Reference (RA,Dec)  : ^REF', STATUS )
-
-* Observers position...
-                     IF( AST_TEST( FRM, 'GeoLon', STATUS ) ) THEN
-                        POSBUF = ' '
-                        IAT = 0
-                        CALL CHR_APPND( AST_GETC( FRM, 'GeoLon',
-     :                                           STATUS ), POSBUF, IAT )
-                        CALL CHR_APPND( ',', POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL CHR_APPND( AST_GETC( FRM, 'GeoLat',
-     :                                           STATUS ), POSBUF, IAT )
-                        IAT = IAT + 1
-                        CALL MSG_SETC( 'OBS', POSBUF( : IAT ) )
-                     ELSE
-                        CALL MSG_SETC( 'OBS', '<not defined>' )
-                     END IF
-                     CALL MSG_OUT( 'WCS_REF',
-     :         '        Observer (Lon,Lat)  : ^OBS', STATUS )
-
-                  END IF
-
-*  Display the epoch for all Frames (as a Julian or Besselian epoch followed 
-*  by a Gregorian date). For SkyFrames and SpecFrames, always display the
-*  epoch. For other Frames, only display it if set. 
-                  IF( .NOT. SHOWEP ) SHOWEP = AST_TEST( FRM, 'EPOCH', 
-     :                                                  STATUS )
-
-                  IF( SHOWEP ) THEN
-                     EP = AST_GETD( FRM, 'EPOCH', STATUS )
-                     IF( EP .LT. 1984.0 ) THEN
-                        CALL MSG_SETC( 'EPOCH', 'B' )
-                        MJD = SLA_EPB2D( EP )
-                     ELSE 
-                        CALL MSG_SETC( 'EPOCH', 'J' )
-                        MJD = SLA_EPJ2D( EP )
-                     END IF
-               
-                     CALL MSG_SETD( 'EPOCH', EP )
-               
-                     CALL SLA_DJCL( MJD, IY, IM, ID, FD, J ) 
-                     CALL SLA_CD2TF( 0, REAL( FD ), SIGN, IHMSF ) 
-               
-                     CALL MSG_SETI( 'DATE', ID )
-                     CALL MSG_SETC( 'DATE', '-' )
-                     CALL MSG_SETC( 'DATE', MONTH( IM ) )
-                     CALL MSG_SETC( 'DATE', '-' )
-                     CALL MSG_SETI( 'DATE', IY )
-                     CALL MSG_SETI( 'TIME', IHMSF( 1 ) )
-                     CALL MSG_SETC( 'TIME', ':' )
-                     CALL MSG_SETI( 'TIME', IHMSF( 2 ) )
-                     CALL MSG_SETC( 'TIME', ':' )
-                     CALL MSG_SETI( 'TIME', IHMSF( 3 ) )
-               
-                     CALL MSG_OUT( 'WCS_EPOCH', 
-     :   '        Epoch of observation: ^EPOCH (^DATE ^TIME)', STATUS )
-                  END IF
-
-*  Map the GRID coordinates at the centre of the first pixel to obtain the 
-*  corresponding coordinates in the Frame with index IFRAME. First make this 
-*  Frame the FrameSet's Current Frame. This enables us to the use the FrameSet 
-*  itself as the mapping (since the NDF library ensures that the base Frame is 
-*  the GRID Frame).
-                  CALL AST_SETI( IWCS, 'CURRENT', IFRAME, STATUS )
-                  CALL AST_TRANN( IWCS, 1, NDIM, 1, GFIRST,
-     :                               .TRUE., FRMNAX, 1, CFIRST,
-     :                               STATUS )
-
-*  Normalise the position for display.
-                  CALL AST_NORM( IWCS, CFIRST, STATUS )
-
-*  Display the resulting coordinates.
-                  CALL MSG_SETC( 'FIRST', AST_FORMAT( FRM, 1, 
-     :                           CFIRST( 1, 1 ), STATUS ) )
-
-                  DO 302 IAXIS = 2, FRMNAX
-                     CALL MSG_SETC( 'FIRST', ',' )
-                     CALL MSG_SETC( 'FIRST', ' ' )
-                     CALL MSG_SETC( 'FIRST', AST_FORMAT( FRM, 
-     :                             IAXIS, CFIRST( 1, IAXIS ), STATUS ) )
- 302              CONTINUE
-
-                  CALL MSG_OUT( 'WCS_FIRSTP',
-     :         '        First pixel centre  : ^FIRST', STATUS )
-
-*  Now display the axis number, label and units for each axis of the Frame.
-*  Note, these are not written to output parameters.
-                  CALL MSG_BLANK( STATUS )
-                  DO 303 IAXIS = 1, FRMNAX
-
-*  Display the axis number.
-                     CALL MSG_SETI( 'IAXIS', IAXIS )
-                     CALL MSG_OUT( 'AXIS_NUMBER',
-     :         '           Axis ^IAXIS:', STATUS )
-
-*  Construct the name of the attribute holding the label for this axis.
-                     ATTRIB = 'LABEL('
-                     IAT = 6
-                     CALL CHR_PUTI( IAXIS, ATTRIB, IAT )
-                     CALL CHR_APPND( ')', ATTRIB, IAT )
-
-*  Get the label and display it.
-                     TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS ) 
-                     CALL KPG1_PGESC( TEXT, STATUS )
-                     CALL MSG_SETC( 'LABEL', TEXT )
-                     CALL MSG_OUT( 'AXIS_LABEL',
-     :         '              Label : ^LABEL', STATUS )
-
-*  Construct the name of the attribute holding the symbol for this axis.
-                     ATTRIB = 'SYMBOL('
-                     IAT = 7
-                     CALL CHR_PUTI( IAXIS, ATTRIB, IAT )
-                     CALL CHR_APPND( ')', ATTRIB, IAT )
-
-*  Get the symbold and display it if not blank.
-                     TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS )
-                     IF( TEXT .NE. ' ' ) THEN
-                        CALL KPG1_PGESC( TEXT, STATUS )
-                        CALL MSG_SETC( 'SYM', TEXT )
-                        CALL MSG_OUT( 'AXIS_SYMBOL',
-     :         '              Symbol: ^SYM', STATUS )
-                     END IF
-
-*  Construct the name of the attribute holding the units for this axis.
-                     ATTRIB = 'UNIT('
-                     IAT = 5
-                     CALL CHR_PUTI( IAXIS, ATTRIB, IAT )
-                     CALL CHR_APPND( ')', ATTRIB, IAT )
-
-*  Get the units string and display it (if not blank).
-                     TEXT = AST_GETC( FRM, ATTRIB( : IAT ), STATUS )
-                     IF( TEXT .NE. ' ' ) THEN
-                        CALL KPG1_PGESC( TEXT, STATUS )
-                        CALL MSG_SETC( 'UNIT', TEXT )
-                        CALL MSG_OUT( 'AXIS_UNITS',
-     :         '              Units : ^UNIT', STATUS )
-                     END IF
-
- 303              CONTINUE
+                  CALL KPG1_DSFRM( IWCS, 
+     :                           '        Index               : ^INDEX',
+     :                             FULLFR, STATUS )
+               ELSE
+                  CALL KPG1_DSFRM( IWCS, ' ', FULLFR, STATUS )
 
                END IF
-
-*  Add a spacing line after the information for each Frame.
-               IF ( IFRAME .NE. NFRAME ) CALL MSG_BLANK( STATUS )
 
             END IF
-
-*  Annul the pointer to the Frame.
-            CALL AST_ANNUL( FRM, STATUS )
 
  304     CONTINUE 
 

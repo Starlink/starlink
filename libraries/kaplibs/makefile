@@ -574,7 +574,7 @@ kpg1_csubuw.f kpg1_csubw.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_d2w2d.f \
 kpg1_d2w2r.f kpg1_danot.f kpg1_darab.f kpg1_darad.f kpg1_darai.f \
 kpg1_darar.f kpg1_daraub.f kpg1_darauw.f kpg1_daraw.f kpg1_dauni.f \
 kpg1_dclid.f kpg1_dclir.f kpg1_debug.f kpg1_divd.f kpg1_divr.f \
-kpg1_dsfrm.f kpg1_dwsod.f kpg1_dwsor.f kpg1_elnmb.f kpg1_elnmd.f \
+kpg1_dsfrm.f kpg1_dsfr1.f kpg1_dwsod.f kpg1_dwsor.f kpg1_elnmb.f kpg1_elnmd.f \
 kpg1_elnmi.f kpg1_elnmr.f kpg1_elnmub.f kpg1_elnmuw.f kpg1_elnmw.f \
 kpg1_env0r.f kpg1_envdf.f kpg1_erbar.f kpg1_expob.f kpg1_expod.f \
 kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f kpg1_expow.f \
@@ -2049,6 +2049,7 @@ kpg1_debug.o:	 SAE_PAR PSX_ERR
 kpg1_divd.o:	 SAE_PAR PRM_PAR
 kpg1_divr.o:	 SAE_PAR PRM_PAR
 kpg1_dsfrm.o:	 SAE_PAR AST_PAR NDF_PAR
+kpg1_dsfr1.o:	 SAE_PAR AST_PAR NDF_PAR
 kpg1_dwsod.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_dwsor.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_elnmb.o:	 SAE_PAR NUM_DEC_CVT NUM_DEF_CVT
