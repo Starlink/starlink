@@ -41,7 +41,7 @@ void XBMBitmap::write (const string filename)
     if (dotpos == string::npos) dotpos = filename.length();
     //cerr << "seppos="<<seppos<<" dotpos="<<dotpos<<'\n';
     string fnroot_str = "";
-    for (int charno=(int)seppos; charno<dotpos; charno++)
+    for (unsigned int charno=(unsigned int)seppos; charno<dotpos; charno++)
 	fnroot_str += (isalnum(filename[charno]) ? filename[charno] : '_');
     const char *fnroot = fnroot_str.c_str();
 
