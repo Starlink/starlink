@@ -34,7 +34,7 @@
 *     {routine_notes}...
 
 *  References:
-*     ARR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/arr.html
+*     ARR Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/arr.html
 
 *  Keywords:
 *     package:arr, usage:public, array, initialisation

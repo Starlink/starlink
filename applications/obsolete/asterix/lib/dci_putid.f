@@ -57,7 +57,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     DCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/dci.html
+*     DCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/dci.html
 
 *  Keywords:
 *     package:dci, usage:public

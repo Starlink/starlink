@@ -54,7 +54,6 @@
       INTEGER          IDPTR                          ! Input data values
       INTEGER			IFID			! Input dataset id
       INTEGER          IQPTR                          ! Input quality values
-      INTEGER          IVPTR                          ! Input variance values
       INTEGER          NAX                            ! Number of axes
       INTEGER          NDIM                           ! Input dimensionality
       INTEGER          ODIMS(ADI__MXDIM)              ! Output dimensions
@@ -62,7 +61,6 @@
       INTEGER			OFID			! Output dataset id
       INTEGER          ONDIM                          ! Output dimensionality
       INTEGER          OQPTR                          ! Output quality
-      INTEGER          		OVPTR                   ! Output variance
       INTEGER			TLEN			! Amount of TEXT used
 
       BYTE             MASK                           ! Input quality mask
@@ -71,7 +69,7 @@
       LOGICAL          OK                             ! Validity test
       LOGICAL          PRIM                           ! Input primitive
       LOGICAL          QOK                            ! Input quality there?
-      LOGICAL          VOK                            ! Input variance there?
+C      LOGICAL          VOK                            ! Input variance there?
 *
 *    Version :
 *
@@ -104,7 +102,7 @@
         GOTO 99
       END IF
       CALL BDI_CHKQUAL( IFID, QOK, DNDIM, DDIMS, STATUS )
-      CALL BDI_CHKVAR( IFID, VOK, DNDIM, DDIMS, STATUS )
+C      CALL BDI_CHKVAR( IFID, VOK, DNDIM, DDIMS, STATUS )
 
 *    Select axis
       IF ( NDIM .EQ. 1 ) THEN
@@ -178,7 +176,7 @@ C          CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
 C          CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
 C          CALL BDI_MAPVAR( OFID, 'WRITE', OVPTR, STATUS )
 C        END IF
-        VOK = .FALSE.
+C        VOK = .FALSE.
 
 *      Copy stuff from input
         IF ( .NOT. PRIM ) THEN
@@ -202,8 +200,8 @@ C        END IF
         END IF
 
 *    Reset flags if scalar output
-      ELSE
-        VOK = .FALSE.
+C      ELSE
+C        VOK = .FALSE.
 
       END IF
 
@@ -220,17 +218,21 @@ C        END IF
         CALL AXCENTROID_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                     DIMS(5), DIMS(6), DIMS(7), AXIS,
      :                     %VAL(IAPTR), %VAL(IDPTR), QOK, MASK,
-     :                     %VAL(IQPTR), VOK, %VAL(IVPTR),
+     :                     %VAL(IQPTR),
+C     :                     VOK, %VAL(IVPTR),
      :                     ODIMS(1), ODIMS(2), ODIMS(3), ODIMS(4),
      :                     ODIMS(5), ODIMS(6), ODIMS(7),
-     :                     %VAL(ODPTR), %VAL(OQPTR), %VAL(OVPTR),
+     :                     %VAL(ODPTR), %VAL(OQPTR),
+C     :                    %VAL(OVPTR),
      :                     STATUS )
       ELSE
         CALL AXCENTROID_INT( DIMS(1), DIMS(2), DIMS(3), DIMS(4),
      :                     DIMS(5), DIMS(6), DIMS(7), AXIS,
      :                     %VAL(IAPTR), %VAL(IDPTR), QOK, MASK,
-     :                     %VAL(IQPTR), VOK, 0, 1, 1, 1, 1, 1, 1, 1,
-     :                     AXCEN, OQUAL, 0, STATUS )
+     :                     %VAL(IQPTR),
+C     :                     VOK, %VAL(IVPTR),
+     :                     1, 1, 1, 1, 1, 1, 1,
+     :                     AXCEN, OQUAL, STATUS )
 
         IF ( NAX .GT. 0 ) THEN
           CALL BDI_GETAXUNITS( IFID, AXIS, UNITS, STATUS )
@@ -261,8 +263,10 @@ C        END IF
 
 *+  AXCENTROID_INT - Peform ratioing on 7D data sets
       SUBROUTINE AXCENTROID_INT( L1,L2,L3,L4,L5,L6,L7,AXIS,
-     :                         I_A, I_D, QFLAG, MASK,I_Q, VFLAG, I_V,
-     :                         M1,M2,M3,M4,M5,M6,M7, O_D, O_Q, O_V,
+     :                         I_A, I_D, QFLAG, MASK,I_Q,
+c     :                        VFLAG, I_V,
+     :                         M1,M2,M3,M4,M5,M6,M7, O_D, O_Q,
+c     :                        O_V,
      :                         STATUS )
 *
 *    Description :
@@ -297,18 +301,18 @@ C        END IF
       LOGICAL                QFLAG               ! Use quality?
       BYTE                   MASK                ! Quality mask
 
-      LOGICAL                VFLAG               ! Use variance?
+c      LOGICAL                VFLAG               ! Use variance?
       INTEGER                L1,L2,L3,L4,L5,L6,L7!
       LOGICAL                I_Q(L1,L2,L3,L4,L5,L6,L7) ! Input qual
       REAL                   I_D(L1,L2,L3,L4,L5,L6,L7) ! Input data
-      REAL                   I_V(L1,L2,L3,L4,L5,L6,L7) ! Input vari
+c      REAL                   I_V(L1,L2,L3,L4,L5,L6,L7) ! Input vari
       INTEGER                M1,M2,M3,M4,M5,M6,M7!
 *
 *    Export :
 *
       BYTE                   O_Q(M1,M2,M3,M4,M5,M6,M7) ! Output quality
       REAL                   O_D(M1,M2,M3,M4,M5,M6,M7) ! Output data
-      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
+c      REAL                   O_V(M1,M2,M3,M4,M5,M6,M7) ! Output variance
 *-
 
 *    Check status
@@ -317,31 +321,31 @@ C        END IF
 *    Accumulate the data from I_D into W_D and O_D
       IF ( AXIS .EQ. 7 ) THEN
         CALL AXCENTROID_7( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 6 ) THEN
         CALL AXCENTROID_6( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 5 ) THEN
         CALL AXCENTROID_5( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 4 ) THEN
         CALL AXCENTROID_4( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 3 ) THEN
         CALL AXCENTROID_3( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 2 ) THEN
         CALL AXCENTROID_2( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       ELSE IF ( AXIS .EQ. 1 ) THEN
         CALL AXCENTROID_1( L1,L2,L3,L4,L5,L6,L7, I_A, I_D, I_Q, QFLAG,
-     :                     MASK, VFLAG, M1,M2,M3,M4,M5,M6, O_D, O_Q )
+     :                     MASK, M1,M2,M3,M4,M5,M6, O_D, O_Q )
 
       END IF
 

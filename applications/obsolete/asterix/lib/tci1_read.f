@@ -59,7 +59,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     TCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/tci.html
+*     TCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/tci.html
 
 *  Keywords:
 *     package:tci, usage:private

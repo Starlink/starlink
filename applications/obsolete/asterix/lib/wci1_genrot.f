@@ -63,7 +63,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
 *     package:wci, usage:private, rotation matrices
