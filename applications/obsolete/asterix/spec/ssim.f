@@ -129,6 +129,7 @@
 
 *  Version
       CALL MSG_PRNT( VERSION )
+      CALL NAG_MISSING ('S14AAF, S15ABF', STATUS )
 
 *  Initialise
       CALL AST_INIT()

@@ -248,6 +248,7 @@
 
 *  Version id
       CALL MSG_PRNT( VERSION )
+      CALL NAG_MISSING( 'S14AAF, S15ABF', STATUS )
 
 *  Initialise ASTERIX
       CALL AST_INIT()
