@@ -7,31 +7,36 @@
 *     C extension to Tcl.
 
 *  Purpose:
-*     Get an offset between a pair of NDFs by centroding matched objects.
+*     Get an offset between a pair of NDFs by centroiding matched objects.
 
 *  Usage:
 *     ndfcentroffset ndfA frameA ndfB frameB points zoom
 
 *  Description:
-*     Given a pair of NDFs and lists of points in the chosen coordinate
-*     system of each, this command will centroid the positions in
-*     each NDF and attempt to match them up (only failing if the
-*     centroid corresponding to the item in one list is too far
-*     from the one in the other list, or no centroid could be found for
-*     one or both).  Having done that, it will average the offsets
-*     implied by each one to generate an accurate offset between the
-*     two NDFs, and return lists of the accurately centroided points 
-*     for each NDF.
+*     Given a pair of NDFs or NDF Sets (or one of each) and lists of 
+*     points in the chosen coordinate system of each, this command
+*     will centroid the positions in each NDF and attempt to match 
+*     them up.  It will fail if the centroid corresponding to the item
+*     in one list is too far from the one in the other list, or no 
+*     centroid could be found for one or both, or the position appears
+*     outside the bounds of any of the NDFs in either set.  If
+*     the position is within the bounds of more than one NDF in
+*     a single NDF Set (this is unlikely to be the case for sensible
+*     data) the first such will be used to find the centroid.
+*     If centroids can be found for both NDF Sets, the offsets implied
+*     by each one will be averaged to generate an accurate offset 
+*     between the two Sets, and return lists of the accurately 
+*     centroided points for each one.
 
 *  Arguments:
-*     ndfA = ndf object
-*        The first NDF.
+*     ndfA = ndf-or-ndfset object
+*        The first NDF or NDF Set.
 *     frameA = string
 *        The frame in which the coordinates of the centroidable features
 *        in the first NDF are supplied and returned.  May be a frame index
 *        integer, a domain name, or CURRENT or BASE.
-*     ndfB = ndf object
-*        The second NDF.
+*     ndfB = ndf-or-ndfset object
+*        The second NDF or NDF Set.
 *     frameB = string
 *        The frame in which the coordinates of the centroidable features
 *        in the second NDF are supplied and returned.  May be a frame index
@@ -79,6 +84,8 @@
 *  History:
 *     5-SEP-2000 (MBT):
 *        Initial version.
+*     12-MAR-2001 (MBT):
+*        Upgraded for use with Sets.
 
 *-
 */
@@ -98,24 +105,29 @@
       double *ypos[ 2 ];
       double *xmat[ 2 ];
       double *ymat[ 2 ];
-      double *gxpos[ 2 ];
-      double *gypos[ 2 ];
-      double *gxmat[ 2 ];
-      double *gymat[ 2 ];
+      double gxmat[ 2 ];
+      double gymat[ 2 ];
+      double **gxpos[ 2 ];
+      double **gypos[ 2 ];
       double xoffset;
       double yoffset;
       double zoom;
       int i;
-      int iframe[ 2 ];
+      int *iframes[ 2 ];
       int j;
       int nmatch;
+      int nndf[ 2 ];
       int npoint;
       int oc;
-      int xdim[ 2 ];
-      int ydim[ 2 ];
-      Ndf *ndf[ 2 ];
+      int xdim;
+      int ydim;
+      AstMapping **map[ 2 ];
+      NdfOrNdfset *ndfset[ 2 ];
+      Ndf **ndfs[ 2 ];
       Tcl_Obj *result;
       Tcl_Obj **ov;
+      const F77_LOGICAL_TYPE true = F77_TRUE;
+      const F77_LOGICAL_TYPE false = F77_FALSE;
 
 /* Check syntax. */
       if ( objc != 7 ) {
@@ -124,16 +136,36 @@
       }
 
 /* Extract and validate ndf object arguments. */
-      if ( NdfGetNdfFromObj( interp, objv[ 1 ], &ndf[ 0 ] ) != TCL_OK ||
-           NdfGetNdfFromObj( interp, objv[ 3 ], &ndf[ 1 ] ) != TCL_OK ) {
+      if ( NdfGetNdfFromObj( interp, objv[ 1 ], &ndfset[ 0 ] ) != TCL_OK ||
+           NdfGetNdfFromObj( interp, objv[ 3 ], &ndfset[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
       }
 
+/* Get a list of ndf objects to work with. */
+      for ( i = 0; i < 2; i++ ) {
+         if ( ndfset[ i ]->nmember ) {
+            nndf[ i ] = ndfset[ i ]->nmember;
+            ndfs[ i ] = ndfset[ i ]->content.ndfs;
+         }
+         else {
+            nndf[ i ] = 1;
+            ndfs[ i ] = &ndfset[ i ];
+         }
+      }
+
+/* Allocate space for frame indices. */
+      for ( i = 0; i < 2; i++ ) {
+         iframes[ i ] = malloc( max( 1, nndf[ i ] ) * sizeof( int ) );
+         if ( tclmemok( interp, iframes[ i ] ) != TCL_OK ) {
+            return TCL_ERROR;
+         }
+      }
+
 /* Extract and validate WCS frame index arguments. */
-      if ( NdfGetIframeFromObj( interp, objv[ 2 ], ndf[ 0 ]->wcs, 
-                                &iframe[ 0 ] ) != TCL_OK ||
-           NdfGetIframeFromObj( interp, objv[ 4 ], ndf[ 1 ]->wcs,
-                                &iframe[ 1 ] ) != TCL_OK ) {
+      if ( NdfGetIframesFromObj( interp, objv[ 2 ], ndfset[ 0 ], 
+                                 iframes[ 0 ] ) != TCL_OK ||
+           NdfGetIframesFromObj( interp, objv[ 4 ], ndfset[ 1 ],
+                                 iframes[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
       }
 
@@ -182,61 +214,98 @@
          return TCL_ERROR;
       }
 
-/* Get the dimensions of the NDFs. */
-      for ( i = 0; i < 2; i++ ) {
-         xdim[ i ] = ndf[ i ]->ubnd[ 0 ] - ndf[ i ]->lbnd[ 0 ] + 1;
-         ydim[ i ] = ndf[ i ]->ubnd[ 1 ] - ndf[ i ]->lbnd[ 1 ] + 1;
-      }
-
 /* Allocate some more workspace. */
       for ( i = 0; i < 2; i++ ) {
-         gxpos[ i ] = malloc( npoint * sizeof( double ) );
-         gypos[ i ] = malloc( npoint * sizeof( double ) );
+         map[ i ] = malloc( nndf[ i ] * sizeof( AstMapping * ) );
          xmat[ i ] = malloc( npoint * sizeof( double ) );
          ymat[ i ] = malloc( npoint * sizeof( double ) );
-         gxmat[ i ] = malloc( npoint * sizeof( double ) );
-         gymat[ i ] = malloc( npoint * sizeof( double ) );
-         if ( tclmemok( interp, gxpos[ i ] ) != TCL_OK ||
-              tclmemok( interp, gypos[ i ] ) != TCL_OK ||
-              tclmemok( interp, xmat[ i ] ) != TCL_OK ||
+         gxpos[ i ] = malloc( nndf[ i ] * sizeof( double * ) );
+         gypos[ i ] = malloc( nndf[ i ] * sizeof( double * ) );
+         if ( tclmemok( interp, xmat[ i ] ) != TCL_OK ||
               tclmemok( interp, ymat[ i ] ) != TCL_OK ||
-              tclmemok( interp, gxmat[ i ] ) != TCL_OK ||
-              tclmemok( interp, gymat[ i ] ) != TCL_OK ) {
+              tclmemok( interp, gxpos[ i ] ) != TCL_OK ||
+              tclmemok( interp, gypos[ i ] ) != TCL_OK ) {
             return TCL_ERROR;
+         }
+         for ( j = 0; j < nndf[ i ]; j++ ) {
+            gxpos[ i ][ j ] = malloc( npoint * sizeof( double ) );
+            gypos[ i ][ j ] = malloc( npoint * sizeof( double ) );
+            if ( tclmemok( interp, gxpos[ i ][ j ] ) != TCL_OK ||
+                 tclmemok( interp, gypos[ i ][ j ] ) != TCL_OK ) {
+               return TCL_ERROR;
+            }
          }
       }
 
+/* Define a macro to call a type-dependent function. */
+#define CASE_CENT(Xccdtype,Xcnftype,Xgentype) \
+                        case Xccdtype: \
+\
+/* Begin an error context. */ \
+                           errMark(); \
+\
+/* Call the centroiding routine. */ \
+                           F77_CALL(ccg1_cen##Xgentype)( \
+                                     DOUBLE_ARG(&gxpos[ i ][ j ][ k ]), \
+                                     DOUBLE_ARG(&gypos[ i ][ j ][ k ]), \
+                                     Xcnftype##_ARG(ndf1->data), \
+                                     INTEGER_ARG(&xdim), INTEGER_ARG(&ydim), \
+                                     INTEGER_ARG(&ssize), LOGICAL_ARG(&true), \
+                                     DOUBLE_ARG(&maxshift), \
+                                     INTEGER_ARG(&maxit), \
+                                     DOUBLE_ARG(&toler), \
+                                     DOUBLE_ARG(&gxmat[ i ]), \
+                                     DOUBLE_ARG(&gymat[ i ]), \
+                                     INTEGER_ARG(status) ); \
+\
+/* Record whether the centroiding was successful, and if not annul the \
+   error status. */ \
+                           if ( *status == SAI__OK ) { \
+                              done[ i ] = 1; \
+                           } \
+                           else { \
+                              errAnnul( status ); \
+                           } \
+\
+/* Exit the error context. */ \
+                           errRlse(); \
+                           break;
+
 /* Call fortran routines which do the calculations. */
       ASTCALL(
-         int dummy_lbnd[ 2 ];
+         int done[ 2 ];
+         int k;
          int maxit;
          int ssize;
          double cscale;
          double maxshift;
          double toler;
-         AstMapping *map[ 2 ];
-         DECLARE_CHARACTER( type0, DAT__SZTYP );
-         DECLARE_CHARACTER( type1, DAT__SZTYP );
-         const F77_LOGICAL_TYPE true = F77_TRUE;
-         const F77_LOGICAL_TYPE false = F77_FALSE;
+         Ndf1 *ndf1;
 
 /* Start an AST context. */
          astBegin;
 
-/* Ensure that both arrays are mapped. */
+/* Ensure that all NDFs are mapped. */
          for ( i = 0; i < 2; i++ ) {
-            if ( ! ndf[ i ]->mapped ) domapdata( ndf[ i ], status );
+            for ( j = 0; j < nndf[ i ]; j++ ) {
+               if ( ! ndfs[ i ][ j ]->content.ndf1->mapped ) {
+                  domapdata( ndfs[ i ][ j ]->content.ndf1, status );
+               }
+            }
          }
 
-/* Prepare the string arguments for fortran. */
-         cnfExprt( ndf[ 0 ]->mtype, type0, DAT__SZTYP );
-         cnfExprt( ndf[ 1 ]->mtype, type1, DAT__SZTYP );
-
-/* Transform the point lists into grid coordinates. */
+/* Map each of the points from its coordinates in the displayed frame to */
+/* GRID coordinates of each of the NDFs in its set.  This is required    */
+/* so that we can see within which of the NDFs each point lies.          */
+/* The overheads on astTran2 are quite high, so it is faster to do       */
+/* them all here. */
          for ( i = 0; i < 2; i++ ) {
-            map[ i ] = astGetMapping( ndf[ i ]->wcs, iframe[ i ], AST__BASE );
-            astTran2( map[ i ], npoint, xpos[ i ], ypos[ i ], 1, 
-                      gxpos[ i ], gypos[ i ] );
+            for ( j = 0; j < nndf[ i ]; j++ ) {
+               map[ i ][ j ] = astGetMapping( ndfs[ i ][ j ]->wcs, 
+                                              iframes[ i ][ j ], AST__BASE );
+               astTran2( map[ i ][ j ], npoint, xpos[ i ], ypos[ i ], 1, 
+                         gxpos[ i ][ j ], gypos[ i ][ j ] );
+            }
          }
 
 /* Set up some parameters for the centroid location. */
@@ -246,39 +315,66 @@
          toler = min( 0.5, cscale * 0.5 );
          maxit = 5;
 
-/* We set these values to unity so that prevent ccd1_cen2 effectivly returns
-   positions in BASE frame, rather than Pixel frame, coordinates. */
-         dummy_lbnd[ 0 ] = 1;
-         dummy_lbnd[ 1 ] = 1;
+/* Loop over each point, attempting to centroid it in both sets. */
+         nmatch = 0;
+         for ( k = 0; k < npoint; k++ ) {
 
-/* Locate the matched centroids. */
-         F77_CALL(ccd1_cen2)( CHARACTER_ARG(type0), 
-                              (F77_POINTER_TYPE) &ndf[ 0 ]->data,
-                              INTEGER_ARG(&xdim[ 0 ]), INTEGER_ARG(&ydim[ 0 ]),
-                              INTEGER_ARG(dummy_lbnd),
-                              CHARACTER_ARG(type1),
-                              (F77_POINTER_TYPE) &ndf[ 1 ]->data,
-                              INTEGER_ARG(&xdim[ 1 ]), INTEGER_ARG(&ydim[ 1 ]),
-                              INTEGER_ARG(dummy_lbnd),
-                              DOUBLE_ARG(gxpos[ 0 ]), DOUBLE_ARG(gypos[ 0 ]),
-                              DOUBLE_ARG(gxpos[ 1 ]), DOUBLE_ARG(gypos[ 1 ]),
-                              INTEGER_ARG(&npoint), INTEGER_ARG(&ssize),
-                              LOGICAL_ARG(&true), DOUBLE_ARG(&maxshift),
-                              INTEGER_ARG(&maxit), DOUBLE_ARG(&toler),
-                              DOUBLE_ARG(gxmat[ 0 ]), DOUBLE_ARG(gymat[ 0 ]),
-                              DOUBLE_ARG(gxmat[ 1 ]), DOUBLE_ARG(gymat[ 1 ]),
-                              INTEGER_ARG(&nmatch), INTEGER_ARG(status)
-                              TRAIL_ARG(type0) TRAIL_ARG(type1) );
-
-/* Transform the centroided positions back from grid into frame coordinates. */
-         if ( nmatch ) {
+/* Loop over both sets. */
             for ( i = 0; i < 2; i++ ) {
-               astTran2( map[ i ], nmatch, gxmat[ i ], gymat[ i ], 0,
-                         xmat[ i ], ymat[ i ] );
+
+/* Find which NDF in this set contains this point. */
+               done[ i ] = 0;
+               for ( j = 0; j < nndf[ i ]; j++ ) {
+                  ndf1 = ndfs[ i ][ j ]->content.ndf1;
+
+/* Get the bounds. */
+                  xdim = ndf1->ubnd[ 0 ] - ndf1->lbnd[ 0 ] + 1;
+                  ydim = ndf1->ubnd[ 1 ] - ndf1->lbnd[ 1 ] + 1;
+
+                  if ( ! done[ i ] &&
+                       ( i == 0 || done[ 0 ] ) &&
+                       gxpos[ i ][ j ][ k ] >= 0.5 &&
+                       gxpos[ i ][ j ][ k ] <= 0.5 + (double) xdim &&
+                       gypos[ i ][ j ][ k ] >= 0.5 &&
+                       gypos[ i ][ j ][ k ] <= 0.5 + (double) ydim ) {
+
+/* Use the macro we have defined to invoke one of the typed subroutines. */
+                     switch ( CCD_TYPE( ndf1->mtype ) ) {
+                        CASE_CENT(CCD_TYPE_B,BYTE,b)
+                        CASE_CENT(CCD_TYPE_UB,UBYTE,ub)
+                        CASE_CENT(CCD_TYPE_W,WORD,w)
+                        CASE_CENT(CCD_TYPE_UW,UWORD,uw)
+                        CASE_CENT(CCD_TYPE_I,INTEGER,i)
+                        CASE_CENT(CCD_TYPE_R,REAL,r)
+                        CASE_CENT(CCD_TYPE_D,DOUBLE,d)
+                        default:
+                           *status = SAI__ERROR;
+                           errRep( "OFFSET_BADTYP", "Bad type value", status );
+                     }
+
+/* If the centroiding was successful, transform back to original coordinates. */
+                     if ( done[ i ] ) {
+                        astTran2( map[ i ][ j ], 1, &gxmat[ i ], &gymat[ i ],
+                                  0, &xmat[ i ][ nmatch ], 
+                                  &ymat[ i ][ nmatch ] );
+                     }
+                  }
+               }
             }
 
-/* Get accurate X and Y offsets by averaging the values for each of the
-   matched points. */
+/* Increment the number of matches if we managed to centroid it   */
+/* successfully in both sets. */   
+            if ( done[ 0 ] && done[ 1 ] ) {
+               nmatch++;
+            }
+         }
+
+/* Exit the AST context. */
+         astEnd;
+
+/* Get accurate X and Y offsets by averaging the values for each of the */
+/* matched points. */
+         if ( astOK && nmatch > 0 ) {
             F77_CALL(ccg1_mdifd)( LOGICAL_ARG(&false), DOUBLE_ARG(xmat[ 0 ]),
                                   DOUBLE_ARG(xmat[ 1 ]), INTEGER_ARG(&nmatch),
                                   DOUBLE_ARG(&xoffset), INTEGER_ARG(status) );
@@ -286,10 +382,10 @@
                                   DOUBLE_ARG(ymat[ 1 ]), INTEGER_ARG(&nmatch),
                                   DOUBLE_ARG(&yoffset), INTEGER_ARG(status) );
          }
-
-/* Exit the AST context. */
-         astEnd;
       )
+
+/* Undefine the macro we defined. */
+#undef CASE_CENT
 
 /* Set the result object. */
       result = Tcl_NewIntObj( nmatch );
@@ -315,14 +411,18 @@
 
 /* Free workspace memory. */
       for ( i = 0; i < 2; i++ ) {
+         for ( j = 0; j < nndf[ i ]; j++ ) {
+            free( gxpos[ i ][ j ] );
+            free( gypos[ i ][ j ] );
+         }
+         free( map[ i ] );
+         free( gxpos[ i ] );
+         free( gypos[ i ] );
          free( xpos[ i ] );
          free( ypos[ i ] );
          free( xmat[ i ] );
          free( ymat[ i ] );
-         free( gxpos[ i ] );
-         free( gypos[ i ] );
-         free( gxmat[ i ] );
-         free( gymat[ i ] );
+         free( iframes[ i ] );
       }
 
 /* Return with success status. */

@@ -11,16 +11,16 @@
 
 *  Usage:
 *     ndfdrawpair device xorigin yorigin xdev ydev zoom 
-*                 ndfA frameA xoffA yoffA lopercA hipercA
-*                 ndfB frameB xoffB yoffB lopercB hipercB
+*                 ndfsetA frameA xoffA yoffA lopercA hipercA
+*                 ndfsetB frameB xoffB yoffB lopercB hipercB
 
 *  Description:
-*     The ndfdrawpair command causes two NDFs to be drawn on the plotting
-*     device specified by the device parameter.  The entirety of the
-*     plotting surface is used, and the routine ought to be able to
-*     generate and cache pixel representations of the NDF in such a 
+*     The ndfdrawpair command causes two NDFs or NDF Sets to be 
+*     drawn on the plotting device specified by the device parameter.
+*     The entirety of the plotting surface is used, and the routine
+*     can generate and cache pixel representations of the NDF in such a 
 *     way that repeatedly plotting the same images at different 
-*     positions is done fairly efficiently.  The coordinate offset
+*     positions is done quite efficiently.  The coordinate offset
 *     of each NDF is specified, and if there is any overlap of good
 *     pixels between the two, such pixels are drawn as the average of
 *     the two NDFs.  The plotting surface is taken to extend from
@@ -52,8 +52,8 @@
 *        the size of one plotting pixel (though not necessarily one 
 *        screen pixel, which is determined by the size of the plotting
 *        device).
-*     ndfA = ndf object
-*        The first NDF to plot.
+*     ndfsetA = ndf-or-ndfset object
+*        The first NDF or NDF Set to plot.
 *     frameA = string
 *        Indicates the WCS frame into which the first NDF should be
 *        resampled; may be a numerical frame index, a domain name, or 
@@ -68,8 +68,8 @@
 *     hipercA = real
 *        Percentile in the data of the first NDF to correspond to the 
 *        upper colour index for plotting (0 <= lopercA <= hipercA <= 100).
-*     ndfB = ndf object
-*        The second NDF to plot
+*     ndfsetB = ndf-or-ndfset object
+*        The second NDF or NDF Set to plot.
 *     frameB = string
 *        Indicates the WCS frame into which the second NDF should be
 *        resampled; may be a numerical frame index, a domain name, or 
@@ -98,13 +98,15 @@
 *  History:
 *     5-SEP-2000 (MBT):
 *        Initial version.
+*     12-MAR-2001 (MBT):
+*        Upgraded for use with Sets.
+
 *-
 */
 
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "ast.h"
 #include "cpgplot.h"
 #include "tcl.h"
 #include "tclndf.h"
@@ -119,10 +121,10 @@
 
    struct ndfdrawpair_args_t {
       int **pixbloc;
-      Ndf **ndf;
+      NdfOrNdfset **ndfset;
       double *xoff;
       double *yoff;
-      int *iframe;
+      int **iframes;
       char *device;
       double shrink;
       double xdev;
@@ -145,15 +147,16 @@
 
       char *arglist = "device xorigin yorigin xdev ydev zoom "
                   /*   1      2       3       4    5    6      */
-                      "ndfA frameA xoffA yoffA lopercA hipercA "
-                  /*   7    8      9     10    11      12      */
-                      "ndfB frameB xoffB yoffB lopercB hipercB ";
-                  /*   13   14     15    16    17      18      */
+                      "ndfsetA frameA xoffA yoffA lopercA hipercA "
+                  /*   7       8      9     10    11      12      */
+                      "ndfsetB frameB xoffB yoffB lopercB hipercB ";
+                  /*   13      14     15    16    17      18      */
+      int retval;
       int xpdev;
       int ypdev;
       int xporig;
       int yporig;
-      int iframe[ 2 ];
+      int *iframes[ 2 ];
       double xoff[ 2 ];
       double yoff[ 2 ];
       double xorigin;
@@ -181,7 +184,7 @@
       Tcl_Obj *result;
       Tcl_Obj argob;
       Tcl_Obj *ov[ 1 ];
-      Ndf *ndf[ 2 ];
+      NdfOrNdfset *ndfset[ 2 ];
       struct ndfdrawpair_args_t args;
 
 /* Check syntax. */
@@ -216,35 +219,25 @@
       }
 
 /* Extract and validate ndf object arguments. */
-      if ( NdfGetNdfFromObj( interp, objv[ 7 ], &ndf[ 0 ] ) != TCL_OK ||
-           NdfGetNdfFromObj( interp, objv[ 13 ], &ndf[ 1 ] ) != TCL_OK ) {
+      if ( NdfGetNdfFromObj( interp, objv[ 7 ], &ndfset[ 0 ] ) != TCL_OK ||
+           NdfGetNdfFromObj( interp, objv[ 13 ], &ndfset[ 1 ] ) != TCL_OK ) {
+         return TCL_ERROR;
+      }
+
+/* Allocate memory for frame indices. */
+      iframes[ 0 ] = malloc( min( 1, ndfset[ 0 ]->nmember ) * sizeof( int ) );
+      iframes[ 1 ] = malloc( min( 1, ndfset[ 1 ]->nmember ) * sizeof( int ) );
+      if ( tclmemok( interp, iframes[ 0 ] ) != TCL_OK ||
+           tclmemok( interp, iframes[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
       }
 
 /* Extract and validate frame objects. */
-      if ( NdfGetIframeFromObj( interp, objv[ 8 ], ndf[ 0 ]->wcs, 
-                                &iframe[ 0 ] ) != TCL_OK ||
-           NdfGetIframeFromObj( interp, objv[ 14 ], ndf[ 1 ]->wcs, 
-                                &iframe[ 1 ] ) != TCL_OK ) {
+      if ( NdfGetIframesFromObj( interp, objv[ 8 ], ndfset[ 0 ], 
+                                 iframes[ 0 ] ) != TCL_OK ||
+           NdfGetIframesFromObj( interp, objv[ 14 ], ndfset[ 1 ], 
+                                 iframes[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
-      }
-
-/* Get the data values which correspond to the requested percentiles. */
-      for ( i = 0; i < 2; i++ ) {
-         Tcl_Obj *ob[ 4 ];
-         Tcl_Obj **ov;
-         int oc;
-         ob[ 0 ] = objv[ 7 + 6 * i ];
-         ob[ 1 ] = Tcl_NewStringObj( "percentile", -1 );
-         ob[ 2 ] = Tcl_NewDoubleObj( loperc[ i ] );
-         ob[ 3 ] = Tcl_NewDoubleObj( hiperc[ i ] );
-         if ( Tcl_EvalObjv( interp, 4,ob, 0 ) != TCL_OK ||
-              Tcl_ListObjGetElements( interp, Tcl_GetObjResult( interp ),
-                                      &oc, &ov ) != TCL_OK ||
-              Tcl_GetDoubleFromObj( interp, ov[ 0 ], &loval[ i ] ) != TCL_OK ||
-              Tcl_GetDoubleFromObj( interp, ov[ 1 ], &hival[ i ] ) != TCL_OK ) {
-            return TCL_ERROR;
-         }
       }
 
 /* Open the PGPLOT plotting device. */
@@ -277,7 +270,7 @@
 /* This prevents us from resampling into a frame which has many units for
    a single pixel, which would be a waste. */
       STARCALL(
-         psize = getpixelsize( ndf[ 0 ], iframe[ 0 ], status );
+         psize = getpixelsize( ndfset[ 0 ], *iframes[ 0 ], status );
       )
       shrink = ( psize * zoom < 2.1 ) ? 1.0 : 1.0 / ( psize * zoom );
 
@@ -286,8 +279,8 @@
    calculated data block in the NDF structure. */
       for ( i = 0; i < 2; i++ ) {
          STARCALL( 
-            pixbloc[ i ] = getpixbloc( ndf[ i ], iframe[ i ], zoom * shrink,
-                                       loval[ i ], hival[ i ], 
+            pixbloc[ i ] = getpixbloc( ndfset[ i ], iframes[ i ], 
+                                       zoom * shrink, loperc[ i ], hiperc[ i ], 
                                        locolour, hicolour, badcolour, status );
          )
       }
@@ -300,10 +293,10 @@
       argob.internalRep.otherValuePtr = &args;
       ov[ 0 ] = &argob;
       args.pixbloc = pixbloc;
-      args.ndf = ndf;
+      args.ndfset = ndfset;
       args.xoff = xoff;
       args.yoff = yoff;
-      args.iframe = iframe;
+      args.iframes = iframes;
       args.device = device;
       args.shrink = shrink;
       args.xdev = xdev;
@@ -320,8 +313,11 @@
       return tclbgcmd( (ClientData) do_ndfdrawpair, interp, 1, ov )
    However, this doesn't sem to solve enough problems to be worthwhile,
    so it is currently written to execute in the main process. */
-      return ((Tcl_ObjCmdProc *) do_ndfdrawpair)( (ClientData) NULL,
-                                                  interp, 1, ov );
+      retval = ((Tcl_ObjCmdProc *) do_ndfdrawpair)( (ClientData) NULL,
+                                                    interp, 1, ov );
+      free( iframes[ 0 ] );
+      free( iframes[ 1 ] );
+      return retval;
    }
 
 
@@ -342,10 +338,10 @@
 /* Set values from the structure passed in the argument list. */
       struct ndfdrawpair_args_t *pargs = objv[ 0 ]->internalRep.otherValuePtr;
       int **pixbloc = pargs->pixbloc;
-      Ndf **ndf = pargs->ndf;
+      NdfOrNdfset **ndfset = pargs->ndfset;
       double *xoff = pargs->xoff;
       double *yoff = pargs->yoff;
-      int *iframe = pargs->iframe;
+      int **iframes = pargs->iframes;
       char *device = pargs->device;
       double shrink = pargs->shrink;
       double xdev = pargs->xdev;
@@ -359,7 +355,7 @@
 /* Calculate the position and extent of the pixel array. */
       for ( i = 0; i < 2; i++ ) {
          STARCALL( 
-            getbbox( ndf[ i ], iframe[ i ], lbox[ i ], ubox[ i ], status );
+            getbbox( ndfset[ i ], iframes[ i ], lbox[ i ], ubox[ i ], status );
          )
          lbox[ i ][ 0 ] += xoff[ i ];
          ubox[ i ][ 0 ] += xoff[ i ];
@@ -371,8 +367,8 @@
    be used in pixel-like contexts.  Although the PGPLOT routines mostly
    require floating point numbers, it is easier to put things in the 
    right place if we use numbers which are in fact integers. */
-         xpix[ i ] = ndf[ i ]->plotarray.xdim;
-         ypix[ i ] = ndf[ i ]->plotarray.ydim;
+         xpix[ i ] = ndfset[ i ]->plotarray->xdim;
+         ypix[ i ] = ndfset[ i ]->plotarray->ydim;
          xpof[ i ] = zoom * shrink * lbox[ i ][ 0 ];
          ypof[ i ] = zoom * shrink * lbox[ i ][ 1 ];
       }
