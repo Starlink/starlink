@@ -38,4 +38,4 @@ install:
      [copy] Copying 1031 files to /apps/cvsbuild/starjava/docs/ant
 
 BUILD SUCCESSFUL
-Total time: 28 seconds
+Total time: 30 seconds
