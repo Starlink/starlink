@@ -37,6 +37,8 @@ The following methods are available:
 use strict;
 use Carp;
 
+use base qw/Exporter/;  # So that version checking is available
+
 use vars qw/$VERSION/;
 
 # NDF required for A-task parameter retrieval
@@ -259,11 +261,20 @@ If the second argument is omitted it is assumed that the binary
 is already running and can be called by "name".   
 
 The last argument, if needed, is a reference to a hash containing
-the load options. The only option currently supported is TASKTYPE
-which can be either 'A' (for A-task) or 'I' (for I-tasks).
+the load options. 
+
+Options currently supported are:
+
+  TASKTYPE => 'A' for A-task, 'I' for I-task.
+  MONOLITH => monolith name to be used for A-task parameter retrieval
 
 Default is to launch an A-task. Default task type when no monolith
-is specified is 'I'.
+or options are specified is 'I'.
+
+The MONOLITH option can be used to configure A-tasks such that 
+they can retrieve parameters from monoliths that were not started by this 
+object. (It is identical to creating the object and then setting the
+monolith name via the monolith() method)
 
 If a path to a binary with name "name" already exists then the monolith
 is not loaded.
@@ -278,6 +289,9 @@ sub load {
  
   # First argument is the name of the system so set that in the object
   $self->name(shift);
+
+  # Store ADAM_USER
+  $self->adamdir;
 
   # A further argument (optional) will be the monolith name
   # and optional hash.
@@ -308,10 +322,13 @@ sub load {
 	# to our default value.
 	$options->{TASKTYPE} = $self->tasktype;
       }
+
+      # Check monolith name
+      $self->monolith($options->{MONOLITH})
+	if exists $options->{MONOLITH};
+
       push(@args, $options); # Store the options
       
-      print "TASKTYPE Is ". keys(%{$options}) ."and ".$options->{TASKTYPE}
-      ."\n";
     } 
 
 
@@ -324,16 +341,14 @@ sub load {
  
       unless ($self->contact) {
 
-
-
-
 	# Get the monolith name (if present)
 	if (not ref $_[0]) {
 	  # Need to extract the monolith name
 	  my $monolith = (split(/\//, $_[0]))[-1];
-	  # Store ADAM_USER
-	  $self->monolith( $monolith );
-	  $self->adamdir;
+	  # Store monolith name unless it has already been
+	  # stored - eg by the MONOLITH options
+	  $self->monolith( $monolith )
+	    unless defined $self->monolith;
 	  
 	  # Store the monolith path and name on arg list
 	  unshift @args, $_[0];	
