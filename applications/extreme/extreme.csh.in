@@ -24,10 +24,6 @@
 #        Initial version.
 #-
 
-#  Set the value of the executables directory.  The value of to which 
-#  EXTREME_DIR is set gets edited into the script at install time.
-      setenv EXTREME_DIR INSTALL_BIN
-
 #  Set aliases for all the public commands provided by the package.
       alias extmk $EXTREME_DIR/extmk
       alias extmakefile $EXTREME_DIR/extmakefile
@@ -46,7 +42,7 @@
 
 #  Write startup message.
       echo " "
-      echo "   EXTREME commands are now available -- Version PKG_VERS"
+      echo "   EXTREME commands are now available -- Version @PACKAGE_VERSION"
       echo " "
 
 
