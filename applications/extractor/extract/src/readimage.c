@@ -11,13 +11,13 @@
 *
 *	Contents:	functions for input of image data.
 *
+*	Last modify:	06/05/99 (EB):
 *	Last modify:	28/10/98 (AJC)
 *                          In line with V2.0.15
 *                       14/12/98 (PWD):
 *                          Added USHORT and UBYTE support.
 *                       17/12/98 (PWD):
 *                          Changed to use NDF WCS component for astrometry.
-*	Last modify:	28/11/98 (EB):
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -188,6 +188,11 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
 
     if (flags ^ FLAG_FIELD)
       {
+/*---- Allocate space for the frame-buffer */
+      if (!(field->strip=(PIXTYPE *)malloc(field->stripheight*field->width
+        *sizeof(PIXTYPE))))
+        error(EXIT_FAILURE,"Not enough memory for the image buffer of ",
+		field->rfilename);
 
       data = field->strip;
 /*---- We assume weight data have been read just before */
@@ -200,11 +205,8 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
         copydata(field, 0, nbpix);
       else
         readdata(field, data, nbpix);
-      if (flags & WEIGHT_FIELD)
+      if (flags & (WEIGHT_FIELD|RMS_FIELD|BACKRMS_FIELD|VAR_FIELD))
         weight_to_var(field, data, nbpix);
-      else if (flags & (RMS_FIELD|BACKRMS_FIELD))
-        rms_to_var(field, data, nbpix);
-
       if ((flags & MEASURE_FIELD) && (check=prefs.check[CHECK_IDENTICAL]))
         writecheck(check, data, nbpix);
       for (y=0; y<field->stripheight; y++, data += w)
@@ -233,10 +235,8 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
               writecheck(check, data, w);
             if (check = prefs.check[CHECK_SUBPCPROTOS])
               writecheck(check, data, w);
-            if (check = prefs.check[CHECK_PCOPROTOS])
-              writecheck(check, data, w);
             }
-          else if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
+          if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
             {
             backrmsline(field, y, (PIXTYPE *)check->pix);
             writecheck(check, check->pix, w);
@@ -245,7 +245,13 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
         }
       }
     else
+      {
+      if (!(field->fstrip=(FLAGTYPE *)malloc(field->stripheight*field->width
+		*sizeof(FLAGTYPE))))
+      error(EXIT_FAILURE,"Not enough memory for the flag buffer of ",
+	field->rfilename);
       readidata(field, field->fstrip, nbpix);
+      }
 
     field->ymax = field->stripheight;
     if (field->ymax < field->height)
@@ -272,10 +278,8 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
       else
         readdata(field, data, w);
 
-      if (flags & WEIGHT_FIELD)
+      if (flags & (WEIGHT_FIELD|RMS_FIELD|BACKRMS_FIELD|VAR_FIELD))
         weight_to_var(field, data, w);
-      else if (flags & (RMS_FIELD|BACKRMS_FIELD))
-        rms_to_var(field, data, w);
 
       if ((flags & MEASURE_FIELD) && (check=prefs.check[CHECK_IDENTICAL]))
         writecheck(check, data, w);
@@ -299,12 +303,10 @@ void	*loadstrip(picstruct *field, picstruct *wfield)
             writecheck(check, data, w);
           if (check = prefs.check[CHECK_SUBPCPROTOS])
             writecheck(check, data, w);
-          if (check = prefs.check[CHECK_PCOPROTOS])
-            writecheck(check, data, w);
           }
-        else if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
+        if ((flags&DETECT_FIELD) && (check=prefs.check[CHECK_BACKRMS]))
           {
-          backrmsline(field, y, (PIXTYPE *)check->pix);
+          backrmsline(field, field->ymax, (PIXTYPE *)check->pix);
           writecheck(check, check->pix, w);
           }
         }
@@ -329,8 +331,8 @@ Copy image data from one field to the other.
 */
 void	copydata(picstruct *field, int offset, int size)
   {
-  memcpy(field->strip+offset, field->copystrip+offset, size*sizeof(PIXTYPE));
-
+  memcpy(field->strip+offset, field->reffield->strip+offset,
+		size*sizeof(PIXTYPE));
   return;
   }
 
