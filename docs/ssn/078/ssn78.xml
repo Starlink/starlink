@@ -2652,7 +2652,7 @@ test1_wrap.c:
 
         <p>If the tests you add use components other than those
           declared or implied as component dependencies (see <ref
-            id="macros-declare-dependencies"/>), then you should
+            id="macro-declare-dependencies"/>), then you should
           declare the full set of test dependencies using
           <code>STAR_DECLARE_DEPENDENCIES([test], [...])</code>.</p>
 
@@ -3006,7 +3006,7 @@ M Makefile.dependencies
 
               <dt><code>FPP_MAKE_FLAGS</code></dt>
               <dd><p>This is used
-                  to pass flags to the <code><code>cpp</code> or
+                  to pass flags to the <code>cpp</code> or
                   <code>fpp</code> command if we compile directly, and
                   leave them out otherwise.</p></dd>
 
