@@ -506,9 +506,12 @@ char-property - see notes at
 	 (rl (reverse (trim-leading-whitespace cl))))
     (list->string (reverse (trim-leading-whitespace rl)))))
 
-;; Shorthand
+;; Shorthand: return trimmed data, or false if argument is false
+;; (ie, don't just fail in this second case)
 (define (trim-data nd)
-  (trim-string (data nd)))
+  (if nd
+      (trim-string (data nd))
+      #f))
 
 ;; Normalise a list of characters by replacing non-space whitespace by
 ;; space.
@@ -543,6 +546,10 @@ of various auxiliary files.
 <parameter optional default='(current-node)'>
   nd<type>node-list<description>Node which identifies the grove 
   we want the root file name of
+<history>
+<change author=ng date='16-JUN-1999'>Added clause to get docref when 
+	docdate missing
+</history>
 <codebody>
 (define (root-file-name #!optional (nd (current-node)))
   (let* ((dn (getdocinfo 'docnumber nd))
@@ -551,17 +558,26 @@ of various auxiliary files.
 			      (attribute-string (normalize "documenttype") dn)
 			      (error "DOCNUMBER has no DOCUMENTTYPE"))
 			  (gi (document-element))))
-	 (docref (if dn
-		     (if (attribute-string "UNASSIGNED" dn)
-			 "unassigned"	; is there a better alternative?
-			 (trim-data dn))
-		     (trim-data (getdocinfo 'docdate nd))
-		 )))
+	 (docref (cond (dn (if (attribute-string "UNASSIGNED" dn)
+			       "unassigned" ; better alternative?
+			       (trim-data dn)))
+		       ((getdocinfo 'docdate nd)
+			(trim-data (getdocinfo 'docdate nd)))
+		       (else  ; if no date, at least it should have a history
+			(let ((rel (document-release-info)))
+			  (car rel)))))
+	 ;;(docref (if dn
+		;;     (if (attribute-string "UNASSIGNED" dn)
+		;;	 "unassigned"	; is there a better alternative?
+		;;	 (trim-data dn))
+		;;     (trim-data (getdocinfo 'docdate nd))))
+	 )
     (string-append docelemtype ;(gi (document-element))
 		   (if docref (string-append "-" docref) ""))))
 
 <func>
 <routinename>document-release-info
+<purpose>Extract release numbers and dates from history
 <description>
 <p>
 Return a list containing
