@@ -1306,6 +1306,7 @@
           CALL GCB_CAN('DEFAULT_STYLE',STATUS)
           CALL GCB_CAN('DEFAULT_WIDTH',STATUS)
           CALL GCB_CAN('DEFAULT_COLOUR',STATUS)
+          CALL GCB_CAN('DEFAULT_BGND',STATUS)
 
           IF (LIVE) THEN
             CALL GCB_SETDEF(STATUS)
@@ -1345,8 +1346,8 @@
 *    Local variables :
       REAL SIZE
       INTEGER ISEL,GFID
-      INTEGER STYLE,WIDTH,COLOUR,FONT
-      LOGICAL SETS,SETW,SETC,SETF,SETSZ
+      INTEGER STYLE,WIDTH,COLOUR,BGND,FONT
+      LOGICAL SETS,SETW,SETC,SETBG,SETF,SETSZ
 *-
       SETF=.TRUE.
       SETSZ=.TRUE.
@@ -1360,6 +1361,7 @@
         CALL GSET_GET0I( 'WIDTH', SETW, WIDTH, STATUS )
         CALL GSET_GET0I( 'STYLE', SETS, STYLE, STATUS )
         CALL GSET_GET0I( 'COLOUR', SETC, COLOUR, STATUS )
+        CALL GSET_GET0I( 'BGND', SETBG, BGND, STATUS )
         CALL GSET_GET0I( 'FONT', SETF, FONT, STATUS )
         CALL GSET_GET0R( 'SIZE', SETSZ, SIZE, STATUS )
 
@@ -1381,6 +1383,10 @@
 
           IF (SETC) THEN
             CALL GCB_SETI('DEFAULT_COLOUR',COLOUR,STATUS)
+          ENDIF
+
+          IF (SETBG) THEN
+            CALL GCB_SETI('DEFAULT_BGND',COLOUR,STATUS)
           ENDIF
 
           IF (SETF) THEN
@@ -3564,9 +3570,14 @@
               IVAL=1
             ENDIF
             CALL MSG_SETI('COL',IVAL)
+            CALL GCB_GETI('DEFAULT_BGND',OK,IVAL,STATUS)
+            IF (.NOT.OK) THEN
+              IVAL=0
+            ENDIF
+            CALL MSG_SETI('BG',IVAL)
             CALL MSG_PRNT('  LineWidth=^WID   LineStyle=^STY   '//
      :                  'CharFont=^FON   CharSize=^SIZ   '//
-     :                  'Colour=^COL')
+     :                  'Colour=^COL BackGroundCol=^BG')
             CALL MSG_BLNK()
           ENDIF
           IF (SWITCH.EQ.'*'.OR.SWITCH.EQ.'ALL') THEN
