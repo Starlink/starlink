@@ -72,7 +72,7 @@ f     AST_CLIP) to limit the extent of any plotting you perform, and
 *     - Border: Draw a border around valid regions of a Plot?
 *     - ClipOp: Combine Plot clipping limits using a boolean OR?
 *     - Colour(element): Colour index for a Plot element
-*     - DrawAxes: Draw axes for a Plot?
+*     - DrawAxes(axis): Draw axes for a Plot?
 *     - DrawTitle: Draw a title for a Plot?
 *     - Edge(axis): Which edges to label in a Plot
 *     - Font(element): Character font for a Plot element
@@ -281,6 +281,7 @@ f     using AST_GRID
 *        most appropriate edges are used for text labels.
 *     13-JUN-2001 (DSB):
 *        Added public method astGrfSet, astGrfPop, astGrfPush.
+*        Made DrawAxes attribute axis specific.
 *class--
 */
 
@@ -1212,10 +1213,10 @@ static int TestDrawTitle( AstPlot * );
 static void ClearDrawTitle( AstPlot * );
 static void SetDrawTitle( AstPlot *, int );
 
-static int GetDrawAxes( AstPlot * );
-static int TestDrawAxes( AstPlot * );
-static void ClearDrawAxes( AstPlot * );
-static void SetDrawAxes( AstPlot *, int );
+static int GetDrawAxes( AstPlot *, int );
+static int TestDrawAxes( AstPlot *, int );
+static void ClearDrawAxes( AstPlot *, int );
+static void SetDrawAxes( AstPlot *, int, int );
 
 static int GetEscape( AstPlot * );
 static int TestEscape( AstPlot * );
@@ -1817,7 +1818,7 @@ MAKE_SET(LabelUp,int,labelup,( value ? 1 : 0 ),2)
 /*
 *att++
 *  Name:
-*     DrawAxes
+*     DrawAxes(axis)
 
 *  Purpose:
 *     Draw axes for a Plot?
@@ -1833,6 +1834,9 @@ MAKE_SET(LabelUp,int,labelup,( value ? 1 : 0 ),2)
 c     coordinate grid (drawn with the astGrid function) by determining
 f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     whether curves representing coordinate axes should be drawn.
+*     It takes a separate value for each physical axis of a
+*     Plot so that, for instance, the setting "DrawAxes(2)=0"
+*     specifies that no axis should be drawn for the second axis.
 *
 *     If drawn, these axis lines will pass through any tick marks
 *     associated with numerical labels drawn to mark values on the
@@ -1854,15 +1858,18 @@ f     coordinate grid (drawn with the AST_GRID routine) by determining
 *     drawn around the edges of the plotting area (see the Labelling
 *     attribute).  In this case, the value of the DrawAxes attribute
 *     is ignored.
+*     - If no axis is specified, (e.g. "DrawAxes" instead of
+*     "DrawAxes(2)"), then a "set" or "clear" operation will affect
+*     the attribute value of all the Plot axes, while a "get" or
+*     "test" operation will use just the DrawAxes(1) value.
 *att--
 */
 /* If non-zero draw a curve through the tick marks. Has a value of -1
    when not set yielding a default value of 1. */
-astMAKE_CLEAR(Plot,DrawAxes,drawaxes,-1)
-astMAKE_GET(Plot,DrawAxes,int,1,(this->drawaxes == -1 ? 1 : this->drawaxes))
-astMAKE_SET(Plot,DrawAxes,int,drawaxes,( value ? 1 : 0 ))
-astMAKE_TEST(Plot,DrawAxes,( this->drawaxes != -1 ))
-
+MAKE_CLEAR(DrawAxes,drawaxes,-1,2)
+MAKE_GET(DrawAxes,int,1,( this->drawaxes[axis] == -1 ? 1 : this->drawaxes[axis] ),2)
+MAKE_TEST(DrawAxes,( this->drawaxes[axis] != -1 ),2)
+MAKE_SET(DrawAxes,int,drawaxes,( value ? 1 : 0 ),2)
 
 /* Escape. */
 /* ------- */
@@ -5379,7 +5386,8 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* DrawAxes. */
 /* --------- */
    } else if ( !strcmp( attrib, "drawaxes" ) ) {
-      astClearDrawAxes( this );
+      astClearDrawAxes( this, 0 );
+      astClearDrawAxes( this, 1 );
 
 /* Escape. */
 /* ------- */
@@ -7325,27 +7333,31 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
 /* Consider drawing a curve parallel to each axis in turn. */
    for( axis = 0; axis < 2; axis++ ){
 
+/* Check the axis is required. */
+      if( astGetDrawAxes( this, axis ) ){ 
+
 /* If the tick marks have been placed round the edges of the plotting
    area, we do not need to draw the curves. */
-      if( labelat[ axis ] != AST__BAD ){
+         if( labelat[ axis ] != AST__BAD ){
 
 /* Get a pointer to the structure containing information describing the 
    positions of the major tick marks along the current axis. */  
-         info = grid[ axis ];
+            info = grid[ axis ];
 
 /* Get a pointer to the axis value at the first major tick mark. */
-         value = info->ticks;
+            value = info->ticks;
 
 /* Loop round all ticks. */
-         for( tick = 0; tick < info->nmajor; tick++ ){
+            for( tick = 0; tick < info->nmajor; tick++ ){
 
 /* Draw a curve parallel to the current axis, starting at the tick mark,
    with length equal to the gap between tick marks. Do not draw sections
    of the curve which are outside the normal ranges of the physical axes. */
-            start[ axis ] = *(value++);
-            start[ 1 - axis ] = labelat[ axis ];
-            AxPlot( this, axis, start, gap[ axis ], 1, &cdata, 1, method, 
-                    class );
+               start[ axis ] = *(value++);
+               start[ 1 - axis ] = labelat[ axis ];
+               AxPlot( this, axis, start, gap[ axis ], 1, &cdata, 1, method, 
+                       class );
+            }
          }
       }
    }
@@ -10763,15 +10775,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
-/* DrawAxes. */
-/* --------- */
-   } else if ( !strcmp( attrib, "drawaxes" ) ) {
-      ival = astGetDrawAxes( this );
-      if ( astOK ) {
-         (void) sprintf( buff, "%d", ival );
-         result = buff;
-      }
-
 /* Escape. */
 /* ------- */
    } else if ( !strcmp( attrib, "escape" ) ) {
@@ -10938,6 +10941,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == sscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = GetUsedTextLab( this, axis - 1 );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* DrawAxes. */
+/* ----------- */
+   } else if ( !strcmp( attrib, "drawaxes" ) ) {
+      ival = astGetDrawAxes( this, 0 );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
          result = buff;
@@ -12036,7 +12048,7 @@ f       The following symbolic values are defined in GRF_PAR:
 *       GRF__COLOUR (Colour index).
 c     - value - 
 f     - VAL = DOUBLE PRECISION (Given) - 
-*       A new value to store for the attribute. If this is AST__BAD
+c       A new value to store for the attribute. If this is AST__BAD
 *       no value is stored.
 c     - old_value - A pointer to a double in which to return 
 f     - OLDVAL = DOUBLE PRECISION (Returned) - Returned holding
@@ -12689,9 +12701,7 @@ f        The global status.
       DrawTicks( this, grid, drawgrid, labelat, gap, method, class );
 
 /* If required, ensure that curves through the tick marks have been drawn */
-      if( astGetDrawAxes( this ) ){ 
-         DrawAxis( this, grid, labelat, gap, method, class );
-      }
+      DrawAxis( this, grid, labelat, gap, method, class );
 
 /* If required, draw a curve around the edge of the area containing valid 
    physical coordinates. */
@@ -17073,7 +17083,16 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    } else if ( nc = 0,
         ( 1 == sscanf( setting, "drawaxes= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
-      astSetDrawAxes( this, ival );
+      astSetDrawAxes( this, 0, ival );
+      astSetDrawAxes( this, 1, ival );
+
+/* DrawAxes(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 2 == sscanf( setting, "drawaxes(%d)= %d %n",
+                              &axis, &ival, &nc ) )
+               && ( nc >= len ) ) {
+      astSetDrawAxes( this, axis - 1, ival );
 
 /* Escape. */
 /* ------- */
@@ -17618,7 +17637,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* DrawAxes. */
 /* --------- */
    } else if ( !strcmp( attrib, "drawaxes" ) ) {
-      result = astTestDrawAxes( this );
+      result = astTestDrawAxes( this, 0 );
+
+/* DrawAxes(axis). */
+/* --------------- */
+   } else if ( nc = 0,
+               ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
+               && ( nc >= len ) ) {
+      result = astTestDrawAxes( this, axis - 1 );
 
 /* Escape. */
 /* ------- */
@@ -20095,11 +20121,14 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    ival = set ? GetDrawTitle( this ) : astGetDrawTitle( this );
    astWriteInt( channel, "DrwTtl", set, 1, ival, "Add a title to the grid?" );
 
-/* DrawAxes. */
-/* --------- */
-   set = TestDrawAxes( this );
-   ival = set ? GetDrawAxes( this ) : astGetDrawAxes( this );
-   astWriteInt( channel, "DrwAxs", set, 1, ival, "Draw axes through ticks?" );
+/* DrawAxesUnits(axis). */
+/* ----------------- */
+   for( axis = 0; axis < 2; axis++ ){
+      set = TestDrawAxes( this, axis );
+      ival = set ? GetDrawAxes( this, axis ) : astGetDrawAxes( this, axis );
+      (void) sprintf( buff, "DrwAxs%d", axis + 1 );
+      astWriteInt( channel, buff, set, 0, ival, "Draw axis through ticks?" );
+   }
 
 /* Escape. */
 /* ------- */
@@ -20847,7 +20876,8 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 /* Are curves to be drawn through the tick marks even if no grid is
    produced? Store a value of -1 to indicate that no value has yet been 
    set. This will cause a default value of 1 (yes) to be used. */
-      new->drawaxes = -1;
+      new->drawaxes[0] = -1;
+      new->drawaxes[1] = -1;
 
 /* Are escape sequences within text strings to be interpreted? If not,
    they are printed literally. Store a value of -1 when not set.
@@ -21144,8 +21174,22 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 
 /* DrawAxes. */
 /* --------- */
-      new->drawaxes = astReadInt( channel, "drwaxs", -1 );
-      if ( TestDrawAxes( new ) ) SetDrawAxes( new, new->drawaxes );
+      new->drawaxes[ 0 ] = astReadInt( channel, "drwaxs", -1 );
+
+      if(  new->drawaxes[ 0 ] != -1 ) {
+         new->drawaxes[ 1 ] = new->drawaxes[ 0 ];
+         if ( TestDrawAxes( new, 0 ) ) SetDrawAxes( new, 0, new->drawaxes[ 0 ] );
+         if ( TestDrawAxes( new, 1 ) ) SetDrawAxes( new, 1, new->drawaxes[ 1 ] );
+
+      } else {
+         for( axis = 0; axis < 2; axis++ ){
+            (void) sprintf( buff, "drwaxs%d", axis + 1 );
+            new->drawaxes[ axis ] = astReadInt( channel, buff, -1 );
+            if ( TestDrawAxes( new, axis ) ) SetDrawAxes( new, axis,
+                                                       new->drawaxes[ axis ] );
+         }
+      }
+
 
 /* Escape. */
 /* ------- */

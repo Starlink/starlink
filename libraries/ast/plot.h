@@ -1,4 +1,3 @@
-#if !defined( PLOT_INCLUDED ) /* Include this file only once */
 #define PLOT_INCLUDED
 /*
 *+
@@ -632,7 +631,7 @@ typedef struct AstPlot {
    int clip_frame;
    int clipop;
    int colour[ AST__NPID ];
-   int drawaxes;
+   int drawaxes[ 2 ];
    int escape;
    int drawtitle;
    int edge[ 2 ];
@@ -729,10 +728,10 @@ typedef struct AstPlotVtab {
    int (* TestLabelUp)( AstPlot *, int );
    void (* SetLabelUp)( AstPlot *, int, int );
    void (* ClearLabelUp)( AstPlot *, int );
-   int (* GetDrawAxes)( AstPlot * );
-   int (* TestDrawAxes)( AstPlot * );
-   void (* SetDrawAxes)( AstPlot *, int );
-   void (* ClearDrawAxes)( AstPlot * );
+   int (* GetDrawAxes)( AstPlot *, int );
+   int (* TestDrawAxes)( AstPlot *, int );
+   void (* SetDrawAxes)( AstPlot *, int, int );
+   void (* ClearDrawAxes)( AstPlot *, int );
    int (* GetEscape)( AstPlot * );
    int (* TestEscape)( AstPlot * );
    void (* SetEscape)( AstPlot *, int );
@@ -905,10 +904,10 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
    void astSetLabelUp_( AstPlot *, int, int );
    void astClearLabelUp_( AstPlot *, int );
 
-   int astGetDrawAxes_( AstPlot * );
-   int astTestDrawAxes_( AstPlot * );
-   void astSetDrawAxes_( AstPlot *, int );
-   void astClearDrawAxes_( AstPlot * );
+   int astGetDrawAxes_( AstPlot *, int );
+   int astTestDrawAxes_( AstPlot *, int );
+   void astSetDrawAxes_( AstPlot *, int, int );
+   void astClearDrawAxes_( AstPlot *, int );
 
    int astGetEscape_( AstPlot * );
    int astTestEscape_( AstPlot * );
@@ -1174,14 +1173,14 @@ astINVOKE(V,astSetDrawTitle_(astCheckPlot(this),drawtitle))
 #define astTestDrawTitle(this) \
 astINVOKE(V,astTestDrawTitle_(astCheckPlot(this)))
 
-#define astClearDrawAxes(this) \
-astINVOKE(V,astClearDrawAxes_(astCheckPlot(this)))
-#define astGetDrawAxes(this) \
-astINVOKE(V,astGetDrawAxes_(astCheckPlot(this)))
-#define astSetDrawAxes(this,drawaxes) \
-astINVOKE(V,astSetDrawAxes_(astCheckPlot(this),drawaxes))
-#define astTestDrawAxes(this) \
-astINVOKE(V,astTestDrawAxes_(astCheckPlot(this)))
+#define astClearDrawAxes(this,axis) \
+astINVOKE(V,astClearDrawAxes_(astCheckPlot(this),axis))
+#define astGetDrawAxes(this,axis) \
+astINVOKE(V,astGetDrawAxes_(astCheckPlot(this),axis))
+#define astSetDrawAxes(this,axis,drawaxes) \
+astINVOKE(V,astSetDrawAxes_(astCheckPlot(this),axis,drawaxes))
+#define astTestDrawAxes(this,axis) \
+astINVOKE(V,astTestDrawAxes_(astCheckPlot(this),axis))
 
 #define astClearEscape(this) \
 astINVOKE(V,astClearEscape_(astCheckPlot(this)))
