@@ -790,7 +790,7 @@ IRA_BLOCK_DATA = ira1_init.f
 #  list of all the C source files.
 
 C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(NDG_C_ROUTINES) \
-             $(OTHER_C_ROUTINES)
+             $(GRF_C_ROUTINES)
 
 FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 
@@ -799,7 +799,7 @@ KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c \
 
 NDG_C_ROUTINES = ndg1_wild.c 
 
-OTHER_C_ROUTINES = grf_kappa.c
+GRF_C_ROUTINES = grf_kappa.c
 
 #  Define the set of all interface files.
 
@@ -1072,7 +1072,7 @@ $(IRM_F_ROUTINES) :
            else echo $@ is not in the tar file; exit 1; fi
 
 $(KAPGEN_F_ROUTINES) $(KAPGEN_C_ROUTINES) $(KAPGEN_BLOCK_DATA) \
-$(OTHER_C_ROUTINES):
+$(GRF_C_ROUTINES):
 	$(TAR_OUT) kapgen_sub.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1127,11 +1127,14 @@ $(IRAF_DEMO) :
 ## End of rules for extracting IRAF package source files
 
 #  List of object files produced by compiling the source code and rules
-#  for performing the compilations.
+#  for performing the compilations (excluding GRF object files which are 
+#  retained in the source directory for use by other packages in the same
+#  way as the kappa libraries).
+
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(NDG_OBJECT_FILES) \
                $(IRA_OBJECT_FILES) $(IRM_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
-               $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) $(OTHER_OBJECT_FILES) \
+               $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
 AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
@@ -1147,7 +1150,7 @@ NDG_OBJECT_FILES = $(NDG_F_ROUTINES:.f=.o) $(NDG_C_ROUTINES:.c=.o)
 KAPGEN_OBJECT_FILES = $(KAPGEN_F_ROUTINES:.f=.o) $(KAPGEN_BLOCK_DATA:.f=.o) \
                       $(KAPGEN_C_ROUTINES:.c=.o)
 
-OTHER_OBJECT_FILES = $(OTHER_C_ROUTINES:.c=.o)
+GRF_OBJECT_FILES = $(GRF_C_ROUTINES:.c=.o)
 
 KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(MEM_F_ROUTINES:.f=.o)
 
@@ -2364,7 +2367,7 @@ ira_sub.tar:
 
 kapgen_sub.tar:
 	$(TAR_IN) kapgen_sub.tar $(KAPGEN_F_ROUTINES) \
-                  $(KAPGEN_C_ROUTINES) $(OTHER_C_ROUTINES) $(KAPGEN_BLOCK_DATA)
+                  $(KAPGEN_C_ROUTINES) $(GRF_C_ROUTINES) $(KAPGEN_BLOCK_DATA)
 
 kappa_sub.tar:
 	$(TAR_IN) kappa_sub.tar $(KAPPA_F_ROUTINES) $(MEM_F_ROUTINES)
