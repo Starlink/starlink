@@ -88,20 +88,26 @@ Jade command line).
 than to a selection of generated entities/files.  If this is set true,
 then <code/nochunks/ is effectively true as well.
 
-<p>The point of this is to be able to control the name of the
-generated HTML file.  Arguably, the correct way to do this is to
-root around in the grove and find the name of the source file,
-then alter <funcname/root-file-name/ to use that information when it
-generates the output file name.  That should be possible, and it
-almost certainly involves the SosSequence property class (cf,
-HyTime A.6.1, for example, or
-<url>http://www.hytime.org/materials/sgmlpropset/classes/sosseq/index.htm</url>)
+<p>One point of this might be to control the name of the
+generated HTML file.
 
 <p>Set this with the Jade option <code/-V stream-output/.
 <returnvalue type=boolean>True if output is to be streamed
 <argumentlist none>
 <codebody>
 (define stream-output #f)
+
+<func>
+<routinename>%override-root-file-name%
+<description>
+If not <code/#f/, then this is the name of a file which is to become the 
+root of the tree of files.  Note that this does <em/not/ affect the 
+<funcname/root-file-name/ function.
+<returnvalue type=string>File name, without extension
+<argumentlist none>
+<codebody>
+(define %override-root-file-name%
+  "index")
 
 <func>
 <routinename>%html-ext%
