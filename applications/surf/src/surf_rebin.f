@@ -1,7 +1,7 @@
-      SUBROUTINE REDS_WTFN_REBIN (METHOD, STATUS)
+      SUBROUTINE REDS_WTFN_REBIN (METHOD, BOLREBIN, STATUS)
 *+
 *  Name:
-*     REBIN
+*     (BOL)REBIN
 
 *  Purpose:
 *     routine to rebin demodulated SCUBA data onto output map
@@ -19,6 +19,9 @@
 *  Arguments:
 *     METHOD = CHARACTER * ()  (Given)
 *        The rebin method (BESSEL or LINEAR)
+*     BOLREBIN = LOGICAL (Given)
+*        Am I rebinning each bolometer independently (yes) or making a
+*        single map.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -114,10 +117,14 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.22  1997/01/10 19:09:12  timj
-*     Improve header documentation.
-*     Set XMAX and XMIn etc before checking for max and min of data.
+*     Revision 1.23  1997/01/11 01:43:05  timj
+*     Merge with BOLREBIN.
+*     Fix RASTER map problems (DEC_END)
 *
+c Revision 1.22  1997/01/10  19:09:12  timj
+c Improve header documentation.
+c Set XMAX and XMIn etc before checking for max and min of data.
+c
 c Revision 1.21  1996/12/17  21:09:49  timj
 c Write SCUPROJ to output file. (for SCUOVER)
 c
@@ -174,6 +181,7 @@ c
       INCLUDE 'SAE_PAR'                ! SSE global definitions
 
 * Arguments Given:
+      LOGICAL          BOLREBIN
       CHARACTER * (*)  METHOD
 
 * Status :
@@ -200,7 +208,19 @@ c
       PARAMETER (BADBIT = 1)
 
 *    Local variables :
+      INTEGER          ABOL_DATA_PTR(MAX_FILE)! Pointer to bolometer data
+      INTEGER          ABOL_DATA_END(MAX_FILE)! Pointer to bolometer data end
+      INTEGER          ABOL_VAR_PTR(MAX_FILE) ! Pointer to bolometer variance
+      INTEGER          ABOL_VAR_END(MAX_FILE) ! Pointer to bolometer var end
+      INTEGER          ABOL_RA_PTR(MAX_FILE)  ! Pointer to bolometer RA
+      INTEGER          ABOL_RA_END(MAX_FILE)  ! Pointer to bolometer RA end
+      INTEGER          ABOL_DEC_PTR(MAX_FILE) ! Pointer to bolometer dec
+      INTEGER          ABOL_DEC_END(MAX_FILE) ! Pointer to bolometer dec end
+      DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent declination of array centre
+                                        ! (radians)
+      DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (radians)
       INTEGER          BAD_INTS        ! Number of bad integrations in file
+      CHARACTER * (3)  BOLNAME         ! Name of each bolometer
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                        ! A/D numbers of bolometers measured in
                                        ! input file
@@ -239,8 +259,8 @@ c
       INTEGER          DATA_OFFSET     ! offset within data array
       CHARACTER*12     DATEOBS         ! Date of map obs
       INTEGER          DAYMON(12)      ! Days in each month
-      REAL             DEC_START       ! Dec offset of scan start (arcsec)
-      REAL             DEC_VEL         ! Dec velocity of scan (arcsec/sec)
+      REAL             DEC_END          ! apparent dec of scan end (radians)
+      REAL             DEC_START        ! apparent dec of scan start (radians)
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       INTEGER          DIMX (MAX_DIM)  ! expected array dimensions
       INTEGER          DUMMY_QUALITY(MAX__INTS) ! Dummy quality array
@@ -248,6 +268,7 @@ c
       DOUBLE PRECISION DTEMP1          ! scratch double
       INTEGER          DUMMY_VARIANCE_PTR(MAX_FILE) ! Pointer to dummy variance
       INTEGER          DUMMY_ENDVAR_PTR(MAX_FILE) ! Pointer to end of dummy var
+      INTEGER          EACHBOL         ! Bolometer loop counter
       INTEGER          EXPOSURE        ! exposure index in DO loop
       INTEGER          EXP_END         ! end index of data for an exposure
       DOUBLE PRECISION EXP_LST         ! sidereal time at which exposure
@@ -266,6 +287,7 @@ c
                                        ! pointer to variance array in input file
       CHARACTER*80     FITS (SCUBA__MAX_FITS) 
                                        ! array of FITS keywords
+      REAL             FITS_OUT_PIXEL  ! size of pixels in output map (degrees)
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
       INTEGER          GOOD_INTS      ! Total number of good ints per file
@@ -293,16 +315,16 @@ c
                                        ! pointer to end of scratch space 
                                        ! holding data from input files
       INTEGER          IN_DATA_PTR (MAX_FILE)
-                                       ! pointer to scratch space holding
-                                       ! data from input files
-      DOUBLE PRECISION IN_DEC_CEN      ! apparent Dec of input file map centre
-                                       ! (radians)
-      INTEGER          IN_DEC_STRT_ARY ! array identifier to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_STRT_PTR ! pointer to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_VEL_ARY  ! array identifier to .SCUCD.DEC_VEL
-      INTEGER          IN_DEC_VEL_PTR  ! array pointer to .SCUCD.DEC_VEL
-      INTEGER          IN_DEM_PNTR_ARY ! array identifier to .SCUBA.DEM_PNTR
-      INTEGER          IN_DEM_PNTR_PTR ! pointer to .SCUBA.DEM_PNTR
+                                        ! pointer to scratch space holding
+                                        ! data from input files
+      DOUBLE PRECISION IN_DEC_CEN       ! apparent Dec of input file map centre
+                                        ! (radians)
+      INTEGER          IN_DEC1_ARY      ! array identifier to .SCUCD.DEC1
+      INTEGER          IN_DEC1_PTR      ! array pointer to .SCUCD.DEC1
+      INTEGER          IN_DEC2_ARY      ! array identifier to .SCUCD.DEC2
+      INTEGER          IN_DEC2_PTR      ! array pointer to .SCUCD.DEC2
+      INTEGER          IN_DEM_PNTR_ARY  ! array identifier to .SCUBA.DEM_PNTR
+      INTEGER          IN_DEM_PNTR_PTR  ! pointer to .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
                                        ! file
@@ -325,10 +347,10 @@ c
       INTEGER          IN_NDF          ! NDF index of input file
       DOUBLE PRECISION IN_RA_CEN       ! apparent RA of input file map centre
                                        ! (radians)
-      INTEGER          IN_RA_STRT_ARY  ! array identifier to .SCUCD.RA_STRT
-      INTEGER          IN_RA_STRT_PTR  ! pointer to .SCUCD.RA_STRT
-      INTEGER          IN_RA_VEL_ARY   ! array identifier to .SCUCD.RA_VEL
-      INTEGER          IN_RA_VEL_PTR   ! pointer to .SCUCD.RA_VEL
+      INTEGER          IN_RA1_ARY       ! array identifier to .SCUCD.RA1
+      INTEGER          IN_RA1_PTR       ! pointer to .SCUCD.RA1
+      INTEGER          IN_RA2_ARY       ! array identifier to .SCUCD.RA2
+      INTEGER          IN_RA2_PTR       ! pointer to .SCUCD.RA2
       CHARACTER*(DAT__SZLOC) IN_REDSX_LOC
                                        ! locator to REDS extension in input
                                        ! file
@@ -349,6 +371,7 @@ c
                                        ! pointer to scratch space holding
                                        ! data variance from input files
       INTEGER          IPAR            ! ID for DUMMY  parameter
+      INTEGER          IPOSN           ! Position in string
       INTEGER          ISTART          ! index of start of sub-string
       INTEGER          ITEMP           ! scratch integer
       INTEGER          IY              ! year in which input observation started
@@ -362,59 +385,62 @@ c
       REAL             JIGGLE_X (SCUBA__MAX_JIGGLE)
                                        ! x jiggle offsets (arcsec)
       REAL             JIGGLE_Y (SCUBA__MAX_JIGGLE)
-                                       ! y jiggle offsets (arcsec)
-      INTEGER          J_CENTRE        ! J index of central pixel in outpUt
-                                       ! map
-      LOGICAL          KEEP_INT        ! Keep the specified ints
-      DOUBLE PRECISION LAT_OBS         ! latitude of observatory (radians)
-      INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left corner
-                                       ! of output image
-      DOUBLE PRECISION LST             ! sidereal time at which measurement
-                                       ! made (radians)
-      REAL             MAP_X           ! x offset of map centre from telescope
-                                       ! centre (radians)
-      REAL             MAP_Y           ! y offset of map centre from telescope
-                                       ! centre (radians)
-      INTEGER          MEASUREMENT     ! measurement index in DO loop
-      DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs of all
-                                       ! measured positions are calculated
-      INTEGER          NDAYS           ! Number of days in year
-      INTEGER          NDIM            ! the number of dimensions in an array
-      INTEGER          NERR            ! Number of errors from VEC_
-      INTEGER          NP              ! size of P array in call to IRA_CREAT
-      INTEGER          NREC            ! number of history records in input file
-      INTEGER          NX_OUT          ! x dimension of output map
-      INTEGER          NY_OUT          ! y dimension of output map
-      INTEGER          N_BOL (MAX_FILE)! number of bolometers measured in input
-                                       ! files
-      INTEGER          N_EXPOSURES     ! number of exposures per integration
-                                       ! in input file
-      INTEGER          N_FITS          ! number of items in FITS array
-      INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
-                                       ! in input file
-      INTEGER          N_INT_BAD       ! the number of integrations
-                                       ! with data to be ignored
-      INTEGER          N_MEASUREMENTS  ! number of measurements in input file
-      INTEGER          N_POINT         ! dimension of pointing correction 
-                                       ! array in input file
-      INTEGER          N_POS (MAX_FILE)! number of positions measured in input
-                                       ! files
-      INTEGER          N_SWITCHES      ! number of switches per exposure in
-                                       ! input file
-      CHARACTER*40     OBJECT          ! name of object
-      CHARACTER*40     OBSERVING_MODE  ! observing mode of input file
-      DOUBLE PRECISION OBSRA           ! RA of output map (degrees)
-      DOUBLE PRECISION OBSDEC          ! Dec of output map (degrees)
-      CHARACTER*15     OFFSET_COORDS   ! coord system of OFFSET_X and OFFSET_Y
-      REAL             OFFSET_X        ! x offset of measurement
-      REAL             OFFSET_Y        ! y offset of measurement
-      INTEGER          OUT_A_PTR       ! pointer to axis in output file
-      CHARACTER*40     OUTCRDS         ! dummy coord system of output map
-      CHARACTER*40     OUT_COORDS      ! coordinate system of output map
-      INTEGER          OUT_DATA_PTR    ! pointer to output map data array
-      DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
-                                       ! (radians)
-      DOUBLE PRECISION OUT_EPOCH       ! epoch of output map
+                                        ! y jiggle offsets (arcsec)
+      INTEGER          J_CENTRE         ! J index of central pixel in output
+                                        ! map
+      LOGICAL          KEEP_INT         ! Keep the specified ints
+      DOUBLE PRECISION LAT_OBS          ! latitude of observatory (radians)
+      INTEGER          LBND (MAX_DIM)   ! pixel indices of bottom left corner
+                                        ! of output image
+      DOUBLE PRECISION LST              ! sidereal time at which measurement
+                                        ! made (radians)
+      REAL             MAP_X            ! x offset of map centre from telescope
+                                        ! centre (radians)
+      REAL             MAP_Y            ! y offset of map centre from telescope
+                                        ! centre (radians)
+      INTEGER          MEASUREMENT      ! measurement index in DO loop
+      DOUBLE PRECISION MJD_STANDARD     ! date for which apparent RA,Decs of all
+                                        ! measured positions are calculated
+      INTEGER          NDAYS            ! Number of days in year
+      INTEGER          NDIM             ! the number of dimensions in an array
+      INTEGER          NERR             ! Number of errors from VEC_
+      INTEGER          NP               ! size of P array in call to IRA_CREAT
+      INTEGER          NREC             ! number of history records in input
+                                        ! file
+      INTEGER          NX_OUT           ! x dimension of output map
+      INTEGER          NY_OUT           ! y dimension of output map
+      INTEGER          N_BOL (MAX_FILE) ! number of bolometers measured in input
+                                        ! files
+      INTEGER          N_EXPOSURES      ! number of exposures per integration
+                                        ! in input file
+      INTEGER          N_FITS           ! number of items in FITS array
+      INTEGER          N_INTEGRATIONS   ! number of integrations per measurement
+                                        ! in input file
+      INTEGER          N_INT_BAD        ! the number of integrations
+                                        ! with data to be ignored
+      INTEGER          N_MEASUREMENTS   ! number of measurements in input file
+      INTEGER          N_POINT          ! dimension of pointing correction 
+                                        ! array in input file
+      INTEGER          N_POS (MAX_FILE) ! number of positions measured in input
+                                        ! files
+      INTEGER          N_PTS (MAX_FILE) ! Number of bols * positions
+      INTEGER          N_SWITCHES       ! number of switches per exposure in
+                                        ! input file
+      CHARACTER*40     OBJECT           ! name of object
+      CHARACTER*40     OBSERVING_MODE   ! observing mode of input file
+      DOUBLE PRECISION OBSRA            ! RA of output map (degrees)
+      DOUBLE PRECISION OBSDEC           ! Dec of output map (degrees)
+      CHARACTER*15     OFFSET_COORDS    ! coord system of OFFSET_X and OFFSET_Y
+      REAL             OFFSET_X         ! x offset of measurement
+      REAL             OFFSET_Y         ! y offset of measurement
+      CHARACTER*(132)  OUT             ! Output file name
+      INTEGER          OUT_A_PTR        ! pointer to axis in output file
+      CHARACTER*40     OUTCRDS          ! dummy coord system of output map
+      CHARACTER*40     OUT_COORDS       ! coordinate system of output map
+      INTEGER          OUT_DATA_PTR     ! pointer to output map data array
+      DOUBLE PRECISION OUT_DEC_CEN      ! apparent Dec of output map centre
+                                        ! (radians)
+      DOUBLE PRECISION OUT_EPOCH        ! epoch of output map
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
                                        ! locator of FITS extension in output
                                        ! file
@@ -430,38 +456,41 @@ c
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
+      CHARACTER * (132)OUT_TITLE       ! Title of output NDF
       INTEGER          OUT_VARIANCE_PTR! pointer to output map variance array
+      CHARACTER*(DAT__SZLOC) OUT_XLOC  ! locator of IRAS item in output file
       DOUBLE PRECISION P (8)           ! input array to IRA_CREAT
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
+      INTEGER          PLACE           ! Place holder for output NDF
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                        ! azimuth pointing corrections (radians)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
                                        ! elevation pointing corrections
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
-                                       ! LST of pointing corrections (radians)
-      CHARACTER*5      RADECSYS        ! Type of coordinate system
-      REAL             RA_START        ! RA offset of scan start (arcsec)
-      REAL             RA_VEL          ! RA velocity of scan (arcsec/sec)
-      LOGICAL          READING         ! .TRUE. while reading input files
-      LOGICAL          REBIN           ! .TRUE. if REBIN application has 
-                                       ! been run on input file
-      LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
-                                       ! has been run on input file
-      INTEGER          REGRID1_END     ! pointer to end of REGRID1_PTR space
-      INTEGER          REGRID1_PTR     ! pointer to scratch array used by
-                                       ! SCULIB_BESSEL_REGRID_1
-      REAL             RDEPOCH         ! Epoch of observation
-      REAL             RTEMP           ! scratch real
-      INTEGER          RUN_NUMBER      ! run number of input file
-      CHARACTER*15     SAMPLE_COORDS   ! coordinate system of sample offsets
-      CHARACTER*15     SAMPLE_MODE     ! sample mode of input file
-      REAL             SAMPLE_PA       ! position angle of sample x axis
-                                       ! relative to x axis of SAMPLE_COORDS
-                                       ! system
-      CHARACTER*30     SCS             ! name of sky coordinate system
-      DOUBLE PRECISION SEC             ! second at which observation started
-      LOGICAL          SELECT_INTS     ! Choose some integrations
+                                        ! LST of pointing corrections (radians)
+      CHARACTER*5      RADECSYS         ! Type of coordinate system
+      REAL             RA_END           ! apparent RA of scan end (radians)
+      REAL             RA_START         ! apparent RA of scan start (radians)
+      LOGICAL          READING          ! .TRUE. while reading input files
+      LOGICAL          REBIN            ! .TRUE. if REBIN application has 
+                                        ! been run on input file
+      LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH application
+                                        ! has been run on input file
+      INTEGER          REGRID1_END      ! pointer to end of REGRID1_PTR space
+      INTEGER          REGRID1_PTR      ! pointer to scratch array used by
+                                        ! SCULIB_BESSEL_REGRID_1
+      REAL             RDEPOCH          ! Epoch of observation
+      REAL             RTEMP            ! scratch real
+      INTEGER          RUN_NUMBER       ! run number of input file
+      CHARACTER*15     SAMPLE_COORDS    ! coordinate system of sample offsets
+      CHARACTER*15     SAMPLE_MODE      ! sample mode of input file
+      REAL             SAMPLE_PA        ! position angle of sample x axis
+                                        ! relative to x axis of SAMPLE_COORDS
+                                        ! system
+      CHARACTER*30     SCS              ! name of sky coordinate system
+      DOUBLE PRECISION SEC              ! second at which observation started
+      LOGICAL          SELECT_INTS      ! Choose some integrations
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
@@ -478,6 +507,7 @@ c
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
       CHARACTER*10     TELESCOPE       ! FITS telescope entry
+      INTEGER          TOTAL_BOLS      ! Number of bolometers
       INTEGER          TOTAL_INTS      ! Total number of ints per file
       INTEGER          TOTAL_WEIGHT_END! pointer to end of TOTAL_WEIGHT_PTR
                                        ! space
@@ -622,7 +652,7 @@ c
             READING = .FALSE.
             CALL MSG_SETI ('MAX', MAX_FILE)
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: number of '//
+            CALL ERR_REP (' ', 'REDS_WTFN_REBIN: number of '//
      :           'files read exceeds maximum allowed - ^MAX', STATUS)
          ELSE
 *     Store name of file
@@ -654,7 +684,7 @@ c
             IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
                IF (STATUS .EQ. SAI__OK) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: input '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: input '//
      :              'file contains too many FITS items', STATUS)
                END IF
             END IF
@@ -681,16 +711,14 @@ c
             CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE '//
      :        'observation of ^OBJECT with ^SAMPLE sampling', STATUS)
 
-            IF (OBSERVING_MODE .NE. 'MAP'.AND.
-     :           OBSERVING_MODE.NE.'FOCUS' .AND.
-     :           OBSERVING_MODE.NE.'ALIGNX' .AND.
-     :           OBSERVING_MODE.NE.'ALIGNY' .AND.
-     :           OBSERVING_MODE.NE.'POINTING') THEN
+            IF ((OBSERVING_MODE .NE. 'MAP')      .AND.
+     :          (OBSERVING_MODE .NE. 'FOCUS')    .AND.
+     :          (OBSERVING_MODE .NE. 'ALIGN')    .AND.
+     :          (OBSERVING_MODE .NE. 'POINTING')) THEN
                IF (STATUS .EQ. SAI__OK) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the file '//
-     :              'does not contain data for a MAP observation',
-     :              STATUS)
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the file '//
+     :              'does not contain map data', STATUS)
                END IF
             END IF
 
@@ -729,7 +757,7 @@ c
                   CALL ERR_MARK
                   IF (.NOT. REDUCE_SWITCH) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
      :                 'REDUCE_SWITCH application has not been run '//
      :                 'on the input file. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -740,7 +768,7 @@ c
 
                   IF (.NOT. EXTINCTION) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ','REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ','REDS_WTFN_REBIN: '//
      :                 'the input data has not been corrected for '//
      :                 'EXTINCTION. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -751,7 +779,7 @@ c
 
 		  IF (.NOT. FLATFIELD) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
      :                 'FLATFIELD application has not been run on '//
      :                 'the input file. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -762,7 +790,7 @@ c
 
                   IF (REBIN) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
      :                 'REBIN application has already been run on '//
      :                 'the input file. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -786,7 +814,7 @@ c
                      CALL MSG_SETC ('SUB', STEMP)
                      CALL MSG_SETC ('SUB1', SUB_INSTRUMENT)
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
      :                 'file contains data for ^SUB but previous '//
      :                 'file(s) held data for ^SUB1', STATUS)
                   END IF
@@ -803,7 +831,7 @@ c
                      CALL MSG_SETR ('WAVE', RTEMP)
                      CALL MSG_SETR ('WAVE1', WAVELENGTH)
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: the '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
      :                 'file contains data for wavelength ^WAVE but '//
      :                 'previous file(s) held data for ^WAVE1',
      :                 STATUS)
@@ -917,14 +945,14 @@ c
                   IF (STATUS .NE. SAI__OK) THEN
                      CALL MSG_SETI ('SLA', STATUS)
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: error '//
      :                 'returned by SLA_CLDJ - status = ^SLA', STATUS)
                   END IF
                ELSE
                   STATUS = SAI__ERROR
                   CALL MSG_SETC ('UTDATE', UTDATE)
                   CALL MSG_SETC ('UTSTART', UTSTART)
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: error '//
      :              'converting UTDATE=^UTDATE and UTSTART=^UTSTART '//
      :              'to UT1', STATUS)
                END IF
@@ -985,7 +1013,7 @@ c
                CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ',
      :              FILE_VARIANCE_PTR, ITEMP, STATUS)
             ELSE
-               CALL MSG_OUT(' ','WARNING! REDS_BESSEL_REBIN: '//
+               CALL MSG_OUT(' ','WARNING! REDS_WTFN_REBIN: '//
      :              'Variance array is missing. Using dummy array',
      :              STATUS)
                CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBR,
@@ -1007,7 +1035,7 @@ c
                   CALL MSG_SETI ('NDIM', NDIM)
                   CALL MSG_SETI ('DIM1', DIM(1))
                   CALL MSG_SETI ('DIM2', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: data array '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: data array '//
      :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2', STATUS)
                END IF
             END IF
@@ -1027,28 +1055,28 @@ c
                IF (NDIM .NE. 3) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETI ('NDIM', NDIM)
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :              '.SCUBA.DEM_PNTR array has bad number of '//
      :              'dimensions', STATUS)
                ELSE
                   IF (DIM(1) .LE. 0) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('DIM1',DIM(1))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 '.SCUBA.DEM_PNTR array contains bad number '//
      :                 'of exposures - ^DIM1', STATUS)
                   END IF
                   IF (DIM(2) .LE. 0) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('DIM2',DIM(2))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 '.SCUBA.DEM_PNTR array contains bad number '//
      :                 'of integrations - ^DIM2', STATUS)
                   END IF
                   IF (DIM(3) .LE. 0) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('DIM3',DIM(3))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 '.SCUBA.DEM_PNTR array contains bad number '//
      :                 'of measurements - ^DIM3', STATUS)
                   END IF
@@ -1059,8 +1087,6 @@ c
             N_INTEGRATIONS = DIM (2)
             N_MEASUREMENTS = DIM (3)
 
-*           CALL NDF_XIARY (IN_NDF, 'SCUCD', 'LST_STRT', 'READ',
-*    :        IN_LST_STRT_ARY, STATUS)
             CALL ARY_FIND (IN_SCUCDX_LOC, 'LST_STRT', 
      :        IN_LST_STRT_ARY, STATUS)
             CALL ARY_DIM (IN_LST_STRT_ARY, MAX_DIM, DIM, NDIM, STATUS)
@@ -1071,14 +1097,14 @@ c
                IF (NDIM .NE. 4) THEN
                   STATUS = SAI__ERROR
                   CALL MSG_SETI ('NDIM', NDIM)
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :              '.SCUCD.LST_STRT array has bad number of '//
      :              'dimensions - ^NDIM', STATUS)
                ELSE
                   IF (DIM(1) .LE. 0) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('DIM1', DIM(1))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 '.SCUCD.LST_STRT array contains bad '//
      :                 'number of switch(es) - ^DIM1', STATUS)
                   END IF
@@ -1086,7 +1112,7 @@ c
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NEXP', N_EXPOSURES)
                      CALL MSG_SETI ('DIM2', DIM(2))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 'there is a mismatch between the number of '//
      :                 'exposures in .SCUBA.DEM_PNTR (^NEXP) and '//
      :                 'in .SCUCD.LST_STRT (^DIM2)', STATUS)
@@ -1095,7 +1121,7 @@ c
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NINT', N_INTEGRATIONS)
                      CALL MSG_SETI ('DIM3', DIM(3))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 'there is a mismatch between the number of '//
      :                 'integrations in .SCUBA.DEM_PNTR (^NINT) '//
      :                 'and in .SCUCD.LST_STRT (^DIM3)', STATUS)
@@ -1104,7 +1130,7 @@ c
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NMEAS', N_MEASUREMENTS)
                      CALL MSG_SETI ('DIM4', DIM(4))
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 'there is a mismatch between the number of '//
      :                 'measurements in .SCUBA.DEM_PNTR (^NMEAS) '//
      :                 'and in .SCUCD.LST_STRT (^DIM4)', STATUS)
@@ -1189,7 +1215,7 @@ c
                   CALL MSG_SETI ('NDIM', NDIM)
                   CALL MSG_SETI ('DIM1', DIM(1))
                   CALL MSG_SETI ('DIM2', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :              '.SCUBA.BOL_DU3 array has bad dimensions - '//
      :              '(^NDIM) ^DIM1 ^DIM2', STATUS)
                END IF
@@ -1209,7 +1235,7 @@ c
                   CALL MSG_SETI ('NDIM', NDIM)
                   CALL MSG_SETI ('DIM1', DIM(1))
                   CALL MSG_SETI ('DIM2', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :              '.SCUBA.BOL_DU4 array has bad dimensions - '//
      :              '(^NDIM) ^DIM1 ^DIM2', STATUS)
                END IF
@@ -1222,7 +1248,7 @@ c
             IF (STATUS .EQ. SAI__OK) THEN
                IF (ITEMP .NE. N_BOL(FILE)) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: dimension '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: dimension '//
      :              'of .SCUBA.BOL_CHAN does not match main data '//
      :              'array', STATUS)
                END IF
@@ -1235,7 +1261,7 @@ c
             IF (STATUS .EQ. SAI__OK) THEN
                IF (ITEMP .NE. N_BOL(FILE)) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: dimension '//
+                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: dimension '//
      :              'of .SCUBA.BOL_ADC does not match main data '//
      :              'array', STATUS)
                END IF
@@ -1259,7 +1285,7 @@ c
                IF (ITEMP .NE. JIGGLE_COUNT) THEN
                   IF (STATUS .EQ. SAI__OK) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 'mismatch between JIGGLE_COUNT and number '//
      :                 'of X jiggle offsets read', STATUS)
                   END IF
@@ -1271,7 +1297,7 @@ c
                IF (ITEMP .NE. JIGGLE_COUNT) THEN
                   IF (STATUS .EQ. SAI__OK) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                 'mismatch between JIGGLE_COUNT and number '//
      :                 'of Y jiggle offsets read', STATUS)
                   END IF
@@ -1285,224 +1311,212 @@ c
 *  likewise for raster maps
 
             ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-*              CALL NDF_XIARY (INDF, 'SCUCD', 'RA_STRT', 'READ',
-*    :           IN_RA_STRT_ARY, STATUS)
-               CALL ARY_FIND (IN_SCUCDX_LOC, 'RA_STRT', IN_RA_STRT_ARY,
-     :           STATUS)
-               CALL ARY_DIM (IN_RA_STRT_ARY, MAX_DIM, DIM, NDIM, STATUS)
-               CALL ARY_MAP (IN_RA_STRT_ARY, '_REAL', 'READ',
-     :           IN_RA_STRT_PTR, ITEMP, STATUS)
-
+               CALL ARY_FIND (IN_SCUCDX_LOC, 'RA1', IN_RA1_ARY, STATUS)
+               CALL ARY_DIM (IN_RA1_ARY, MAX_DIM, DIM, NDIM, STATUS)
+               CALL ARY_MAP (IN_RA1_ARY, '_REAL', 'READ', IN_RA1_PTR,
+     :           ITEMP, STATUS)
+ 
                IF (STATUS .EQ. SAI__OK) THEN
                   IF (NDIM .NE. 4) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NDIM', NDIM)
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 '.SCUCD.RA_STRT array has bad number of '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
+     :                 '.SCUCD.RA1 array has bad number of '//
      :                 'dimensions - ^NDIM', STATUS)
                   ELSE
                      IF (DIM(1) .NE. N_SWITCHES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_SWITCHES)
                         CALL MSG_SETI ('D', DIM(1))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.RA1 (^D)', STATUS)
                      END IF
                      IF (DIM(2) .NE. N_EXPOSURES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_EXPOSURES)
                         CALL MSG_SETI ('D', DIM(2))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.RA1 (^D)', STATUS)
                      END IF
                      IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_INTEGRATIONS)
                         CALL MSG_SETI ('D', DIM(3))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.RA1 (^D)', STATUS)
                      END IF
                      IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_MEASUREMENTS)
                         CALL MSG_SETI ('D', DIM(4))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.RA1 (^D)', STATUS)
                      END IF
                   END IF
                END IF
 
-*              CALL NDF_XIARY (INDF, 'SCUCD', 'RA_VEL', 'READ',
-*    :           IN_RA_VEL_ARY, STATUS)
-               CALL ARY_FIND (IN_SCUCDX_LOC, 'RA_VEL', IN_RA_VEL_ARY,
-     :           STATUS)
-               CALL ARY_DIM (IN_RA_VEL_ARY, MAX_DIM, DIM, NDIM, STATUS)
-               CALL ARY_MAP (IN_RA_VEL_ARY, '_REAL', 'READ',
-     :           IN_RA_VEL_PTR, ITEMP, STATUS)
-
+               CALL ARY_FIND (IN_SCUCDX_LOC, 'RA2', IN_RA2_ARY, STATUS)
+               CALL ARY_DIM (IN_RA2_ARY, MAX_DIM, DIM, NDIM, STATUS)
+               CALL ARY_MAP (IN_RA2_ARY, '_REAL', 'READ', IN_RA2_PTR,
+     :           ITEMP, STATUS)
+ 
                IF (STATUS .EQ. SAI__OK) THEN
                   IF (NDIM .NE. 4) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NDIM', NDIM)
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 '.SCUCD.RA_VEL array has bad number of '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
+     :                 '.SCUCD.RA2 array has bad number of '//
      :                 'dimensions - ^NDIM', STATUS)
                   ELSE
                      IF (DIM(1) .NE. N_SWITCHES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_SWITCHES)
                         CALL MSG_SETI ('D', DIM(1))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.RA2 (^D)', STATUS)
                      END IF
                      IF (DIM(2) .NE. N_EXPOSURES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_EXPOSURES)
                         CALL MSG_SETI ('D', DIM(2))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.RA2 (^D)', STATUS)
                      END IF
                      IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_INTEGRATIONS)
                         CALL MSG_SETI ('D', DIM(3))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.RA2 (^D)', STATUS)
                      END IF
                      IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_MEASUREMENTS)
                         CALL MSG_SETI ('D', DIM(4))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.RA_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.RA2 (^D)', STATUS)
                      END IF
                   END IF
                END IF
 
-*              CALL NDF_XIARY (INDF, 'SCUCD', 'DEC_STRT', 'READ',
-*    :           IN_DEC_STRT_ARY, STATUS)
-               CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC_STRT', 
-     :           IN_DEC_STRT_ARY, STATUS)
-               CALL ARY_DIM (IN_DEC_STRT_ARY, MAX_DIM, DIM, NDIM, 
+               CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC1', IN_DEC1_ARY,
      :           STATUS)
-               CALL ARY_MAP (IN_DEC_STRT_ARY, '_REAL', 'READ',
-     :           IN_DEC_STRT_PTR, ITEMP, STATUS)
+               CALL ARY_DIM (IN_DEC1_ARY, MAX_DIM, DIM, NDIM, STATUS)
+               CALL ARY_MAP (IN_DEC1_ARY, '_REAL', 'READ', IN_DEC1_PTR,
+     :           ITEMP, STATUS)
 
                IF (STATUS .EQ. SAI__OK) THEN
                   IF (NDIM .NE. 4) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NDIM', NDIM)
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 '.SCUCD.DEC_STRT array has bad number of '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
+     :                 '.SCUCD.DEC1 array has bad number of '//
      :                 'dimensions - ^NDIM', STATUS)
                   ELSE
                      IF (DIM(1) .NE. N_SWITCHES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_SWITCHES)
                         CALL MSG_SETI ('D', DIM(1))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.DEC1 (^D)', STATUS)
                      END IF
                      IF (DIM(2) .NE. N_EXPOSURES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_EXPOSURES)
                         CALL MSG_SETI ('D', DIM(2))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.DEC1 (^D)', STATUS)
                      END IF
                      IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_INTEGRATIONS)
                         CALL MSG_SETI ('D', DIM(3))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS__REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.DEC1 (^D)', STATUS)
                      END IF
                      IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_MEASUREMENTS)
                         CALL MSG_SETI ('D', DIM(4))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_STRT (^D)', STATUS)
+     :                    'and in .SCUCD.DEC1 (^D)', STATUS)
                      END IF
                   END IF
                END IF
 
-*              CALL NDF_XIARY (INDF, 'SCUCD', 'DEC_VEL', 'READ',
-*    :           IN_DEC_VEL_ARY, STATUS)
-               CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC_VEL', 
-     :           IN_DEC_VEL_ARY, STATUS)
-               CALL ARY_DIM (IN_DEC_VEL_ARY, MAX_DIM, DIM, NDIM, 
+               CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC2', IN_DEC2_ARY,
      :           STATUS)
-               CALL ARY_MAP (IN_DEC_VEL_ARY, '_REAL', 'READ',
-     :           IN_DEC_VEL_PTR, ITEMP, STATUS)
+               CALL ARY_DIM (IN_DEC2_ARY, MAX_DIM, DIM, NDIM, STATUS)
+               CALL ARY_MAP (IN_DEC2_ARY, '_REAL', 'READ', IN_DEC2_PTR,
+     :           ITEMP, STATUS)
 
                IF (STATUS .EQ. SAI__OK) THEN
                   IF (NDIM .NE. 4) THEN
                      STATUS = SAI__ERROR
                      CALL MSG_SETI ('NDIM', NDIM)
-                     CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 '.SCUCD.DEC_VEL array has bad number of '//
+                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
+     :                 '.SCUCD.DEC2 array has bad number of '//
      :                 'dimensions - ^NDIM', STATUS)
                   ELSE
                      IF (DIM(1) .NE. N_SWITCHES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_SWITCHES)
                         CALL MSG_SETI ('D', DIM(1))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.DEC2 (^D)', STATUS)
                      END IF
                      IF (DIM(2) .NE. N_EXPOSURES) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_EXPOSURES)
                         CALL MSG_SETI ('D', DIM(2))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.DEC2 (^D)', STATUS)
                      END IF
                      IF (DIM(3) .NE. N_INTEGRATIONS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_INTEGRATIONS)
                         CALL MSG_SETI ('D', DIM(3))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.DEC2 (^D)', STATUS)
                      END IF
                      IF (DIM(4) .NE. N_MEASUREMENTS) THEN
                         STATUS = SAI__ERROR
                         CALL MSG_SETI ('N', N_MEASUREMENTS)
                         CALL MSG_SETI ('D', DIM(4))
-                        CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
+                        CALL ERR_REP (' ', 'REDS_WTFN_REBIN: '//
      :                    'there is a mismatch between the number '//
      :                    'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                    'and in .SCUCD.DEC_VEL (^D)', STATUS)
+     :                    'and in .SCUCD.DEC2 (^D)', STATUS)
                      END IF
                   END IF
                END IF
@@ -1642,20 +1656,27 @@ c
                         EXP_LST = EXP_LST / DBLE (N_SWITCHES)
 
 *     get the scan parameters for a raster map
-
+ 
                         IF (SAMPLE_MODE .EQ. 'RASTER') THEN
                            CALL VEC_RTOR(.FALSE., 1,
-     :                          %val(IN_RA_STRT_PTR + DATA_OFFSET *
+     :                          %val(IN_RA1_PTR + DATA_OFFSET *
      :                          VAL__NBR), RA_START, IERR, NERR, STATUS)
                            CALL VEC_RTOR(.FALSE., 1,
-     :                          %val(IN_RA_VEL_PTR + DATA_OFFSET *
-     :                          VAL__NBR), RA_VEL, IERR, NERR, STATUS)
+     :                          %val(IN_RA2_PTR + DATA_OFFSET *
+     :                          VAL__NBR), RA_END, IERR, NERR, STATUS)
                            CALL VEC_RTOR(.FALSE., 1,
-     :                          %val(IN_DEC_STRT_PTR + DATA_OFFSET *
+     :                          %val(IN_DEC1_PTR + DATA_OFFSET *
      :                          VAL__NBR), DEC_START, IERR, NERR,STATUS)
                            CALL VEC_RTOR(.FALSE., 1,
-     :                          %val(IN_DEC_VEL_PTR + DATA_OFFSET *
-     :                          VAL__NBR), DEC_VEL, IERR, NERR, STATUS)
+     :                          %val(IN_DEC2_PTR + DATA_OFFSET *
+     :                          VAL__NBR), DEC_END, IERR, NERR, STATUS)
+
+*  convert to radians
+
+                           RA_START = RA_START * REAL (PI) / 12.0
+                           RA_END = RA_END * REAL (PI) / 12.0
+                           DEC_START = DEC_START * REAL (PI) / 180.0
+                           DEC_END = DEC_END * REAL (PI) / 180.0
                         END IF
 
 *     find where the exposure starts and finishes in the data array
@@ -1677,11 +1698,13 @@ c
      :                          DBLE(EXP_TIME) * 1.0027379D0 * 
      :                          2.0D0 * PI / (3600.0D0 * 24.0D0)
 
-*     work out the pointing offset at which the measurement was made,
-*     remembering that for the `raster' mode the RA offset increases towards
-*     decreasing RA
 
+*  work out the offset at which the measurement was made in arcsec
+ 
                            IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+                              ARRAY_RA_CENTRE = IN_RA_CEN
+                              ARRAY_DEC_CENTRE = IN_DEC_CEN
+ 
                               IF (JIGGLE_REPEAT .EQ. 1) THEN
                                  JIGGLE = (EXPOSURE-1) *
      :                                JIGGLE_P_SWITCH +
@@ -1690,17 +1713,29 @@ c
                                  JIGGLE = MOD (I - EXP_START,
      :                                JIGGLE_COUNT) + 1
                               END IF
-                              
                               OFFSET_X = JIGGLE_X (JIGGLE)
                               OFFSET_Y = JIGGLE_Y (JIGGLE)
-                              OFFSET_COORDS = SAMPLE_COORDS
+
+                              IF (SAMPLE_COORDS .EQ. 'NA') THEN
+                                 OFFSET_COORDS = 'NA'
+                              ELSE IF (SAMPLE_COORDS .EQ. 'AZ') THEN
+                                 OFFSET_COORDS = 'AZ'
+                              ELSE 
+                                 OFFSET_COORDS = 'RD'
+                              END IF
+
                            ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                              OFFSET_X = - RA_START - RA_VEL *
-     :                             (REAL(I - EXP_START) + 0.5) *
-     :                             EXP_TIME
-                              OFFSET_Y = DEC_START + DEC_VEL *
-     :                             (REAL(I - EXP_START) + 0.5) *
-     :                             EXP_TIME
+                              ARRAY_RA_CENTRE = DBLE (RA_START) +
+     :                          DBLE (RA_END - RA_START) *
+     :                          DBLE (I - EXP_START) /
+     :                          DBLE (EXP_END - EXP_START)
+                              ARRAY_DEC_CENTRE = DBLE (DEC_START) +
+     :                          DBLE (DEC_END - DEC_START) *
+     :                          DBLE (I - EXP_START) /
+     :                          DBLE (EXP_END - EXP_START)
+
+                              OFFSET_X = 0.0
+                              OFFSET_Y = 0.0
                               OFFSET_COORDS = 'RD'
                            END IF
 
@@ -1717,20 +1752,20 @@ c
                            END IF
 
                            CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
-     :                          IN_RA_CEN, IN_DEC_CEN, LST, LAT_OBS,
-     :                          OFFSET_COORDS, OFFSET_X, OFFSET_Y,
-     :                          IN_ROTATION, N_POINT,
-     :                          SCUBA__MAX_POINT,
-     :                          POINT_LST, POINT_DAZ, POINT_DEL, 
-     :                          SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :                          N_BOL(FILE), BOL_CHAN,
-     :                          BOL_ADC, BOL_DU3, BOL_DU4,
-     :                          CENTRE_DU3, CENTRE_DU4,
-     :                          %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
-     :                          VAL__NBD),
-     :                          %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
-     :                          VAL__NBD),
-     :                          STATUS)
+     :                       ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE, LST, 
+     :                       LAT_OBS, OFFSET_COORDS, OFFSET_X, 
+     :                       OFFSET_Y, IN_ROTATION, N_POINT,
+     :                       SCUBA__MAX_POINT,
+     :                       POINT_LST, POINT_DAZ, POINT_DEL, 
+     :                       SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
+     :                       N_BOL(FILE), BOL_CHAN,
+     :                       BOL_ADC, BOL_DU3, BOL_DU4,
+     :                       CENTRE_DU3, CENTRE_DU4,
+     :                       %val(BOL_RA_PTR(FILE) + DATA_OFFSET *
+     :                       VAL__NBD),
+     :                       %val(BOL_DEC_PTR(FILE) + DATA_OFFSET*
+     :                       VAL__NBD),
+     :                       STATUS)
 
 *     convert the coordinates to apparent RA,Dec on MJD_STANDARD
                            IF (OUTCRDS .EQ. 'RA') THEN
@@ -1770,6 +1805,12 @@ c
 
             CALL ARY_ANNUL (IN_DEM_PNTR_ARY, STATUS)
             CALL ARY_ANNUL (IN_LST_STRT_ARY, STATUS)
+            IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+               CALL ARY_ANNUL (IN_RA1_ARY, STATUS)
+               CALL ARY_ANNUL (IN_RA2_ARY, STATUS)
+               CALL ARY_ANNUL (IN_DEC1_ARY, STATUS)
+               CALL ARY_ANNUL (IN_DEC2_ARY, STATUS)
+            END IF
 
  1          CONTINUE   ! Jump here if error before mapping ARY
 
@@ -1799,7 +1840,7 @@ c
       IF (FILE .LE. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: there is no '//
+            CALL ERR_REP (' ', 'REDS_WTFN_REBIN: there is no '//
      :           'input data', STATUS)
          END IF
       END IF
@@ -1857,7 +1898,7 @@ c
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
             IF (STATUS .NE. 0) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error reading '//
+               CALL ERR_REP (' ', 'REDS_WTFN_REBIN: error reading '//
      :              'output centre longitude - it must be in '//
      :              '5 10 34.6 format', STATUS)
             ELSE
@@ -1888,7 +1929,7 @@ c
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
             IF (STATUS .NE. 0) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error reading '//
+               CALL ERR_REP (' ', 'REDS_WTFN_REBIN: error reading '//
      :              'output centre latitude -  it must be in '//
      :              '-30 13 56.4 format', STATUS)
             END IF
@@ -1930,6 +1971,72 @@ c
       CALL PAR_GET0R ('PIXSIZE_OUT', OUT_PIXEL, STATUS)
       OUT_PIXEL = OUT_PIXEL / REAL(R2AS)
 
+*     Now want to have full REBIN and looped BOLREBIN in same code
+
+      IF (BOLREBIN) THEN
+         TOTAL_BOLS = N_BOL(1)
+
+*     create the output file that will contain the reduced data in NDFs
+ 
+         CALL PAR_GET0C ('OUT', OUT, STATUS)
+         CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
+
+         print *,'Processing ',TOTAL_BOLS,' bolometers'
+
+      ELSE
+         TOTAL_BOLS = 1     ! Loop once if REBIN
+      END IF
+
+*     Start looping on each bolometer
+      IF (STATUS .EQ. SAI__OK) THEN
+      DO EACHBOL = 1, TOTAL_BOLS
+
+         IF (BOLREBIN) THEN
+*     Find bolometer name
+            CALL SCULIB_BOLNAME(BOL_ADC(EACHBOL), BOL_CHAN(EACHBOL), 
+     :           BOLNAME, STATUS)
+
+            CALL MSG_SETC('BOL', BOLNAME)
+            CALL MSG_OUT(' ',' Processing bolometer: ^BOL', STATUS)
+
+            DO I = 1, FILE
+
+               N_PTS(I) = N_POS(I)
+*     Extract EACHBOL from each file
+*     Need IN_DATA_PTR, BOL_RA_PTR and BOL_DEC_PTR
+*     Get the memory
+               CALL SCULIB_MALLOC(N_POS(I) * VAL__NBR, ABOL_DATA_PTR(I),
+     :              ABOL_DATA_END(I), STATUS)
+               CALL SCULIB_MALLOC(N_POS(I) * VAL__NBR, ABOL_VAR_PTR(I),
+     :              ABOL_VAR_END(I), STATUS)
+               CALL SCULIB_MALLOC(N_POS(I) * VAL__NBD, ABOL_RA_PTR(I),
+     :              ABOL_RA_END(I), STATUS)
+               CALL SCULIB_MALLOC(N_POS(I) * VAL__NBD, ABOL_DEC_PTR(I),
+     :              ABOL_DEC_END(I), STATUS)
+
+*     Extract a bolometer
+               CALL SCULIB_EXTRACT_2DIM_R(EACHBOL, N_BOL(I), N_POS(I),
+     :              %val(IN_DATA_PTR(I)), %val(ABOL_DATA_PTR(I)),STATUS)
+               CALL SCULIB_EXTRACT_2DIM_R(EACHBOL, N_BOL(I), N_POS(I),
+     :              %val(IN_VARIANCE_PTR(I)), %val(ABOL_VAR_PTR(I)),
+     :              STATUS)
+               CALL SCULIB_EXTRACT_2DIM_D(EACHBOL, N_BOL(I), N_POS(I),
+     :              %val(BOL_RA_PTR(I)), %val(ABOL_RA_PTR(I)), STATUS)
+               CALL SCULIB_EXTRACT_2DIM_D(EACHBOL, N_BOL(I), N_POS(I),
+     :              %val(BOL_DEC_PTR(I)), %val(ABOL_DEC_PTR(I)), STATUS)
+            END DO
+         ELSE
+            DO I = 1, FILE
+               N_PTS(I) = N_POS(I) * N_BOL(I)
+*     Just need to copy pointer in this case
+               ABOL_DATA_PTR(I)= IN_DATA_PTR(I)
+               ABOL_VAR_PTR(I) = IN_VARIANCE_PTR(I)
+               ABOL_DEC_PTR(I) = BOL_DEC_PTR(I)
+               ABOL_RA_PTR(I)  = BOL_RA_PTR(I)
+            END DO
+         END IF
+
+
 *  find the extent of the input data
 
       XMAX = -1.0D30
@@ -1938,19 +2045,19 @@ c
       YMAX = -1.0D30
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_RANGED (%val(BOL_RA_PTR(1)), 1,
-     :     N_BOL(1) * N_POS(1), XMAX, XMIN)
-         CALL SCULIB_RANGED (%val(BOL_DEC_PTR(1)), 1,
-     :     N_BOL(1) * N_POS(1), YMAX, YMIN)
+         CALL SCULIB_RANGED (%val(ABOL_RA_PTR(1)), 1,
+     :     N_PTS(1), XMAX, XMIN)
+         CALL SCULIB_RANGED (%val(ABOL_DEC_PTR(1)), 1,
+     :     N_PTS(1), YMAX, YMIN)
      
          IF (FILE .GT. 1) THEN
             DO I = 1, FILE
-               CALL SCULIB_RANGED (%val(BOL_RA_PTR(I)), 1,
-     :           N_BOL(I) * N_POS(I), DTEMP, DTEMP1)
+               CALL SCULIB_RANGED (%val(ABOL_RA_PTR(I)), 1,
+     :           N_PTS(I), DTEMP, DTEMP1)
                XMAX = MAX (XMAX,DTEMP)
                XMIN = MIN (XMIN,DTEMP1)
-               CALL SCULIB_RANGED (%val(BOL_DEC_PTR(I)), 1,
-     :           N_BOL(I) * N_POS(I), DTEMP, DTEMP1)
+               CALL SCULIB_RANGED (%val(ABOL_DEC_PTR(I)), 1,
+     :           N_PTS(I), DTEMP, DTEMP1)
                YMAX = MAX (YMAX,DTEMP)
                YMIN = MIN (YMIN,DTEMP1)
             END DO
@@ -1972,7 +2079,7 @@ c
       IF ((NX_OUT .GT. 1000) .OR. (NY_OUT .GT. 1000)) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: output map is too '//
+            CALL ERR_REP (' ', 'REDS_WTFN_REBIN: output map is too '//
      :        'big, having one or both dimensions greater than 1000 '//
      :        'pixels', STATUS)
          END IF
@@ -1984,7 +2091,13 @@ c
       LBND (2) = 1
       UBND (1) = NX_OUT
       UBND (2) = NY_OUT
-      CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, OUT_NDF, STATUS)
+
+      IF (BOLREBIN) THEN
+         CALL NDF_PLACE(OUT_LOC, BOLNAME, PLACE, STATUS)
+         CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, OUT_NDF, STATUS)
+      ELSE
+         CALL NDF_CREAT ('OUT', '_REAL', 2, LBND, UBND, OUT_NDF, STATUS)
+      END IF
 
       CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
@@ -2019,15 +2132,17 @@ c
 *  now go through the datasets calculating the `total weight' going into
 *  each output pixel
 
-      T0 = SECNDS(0.0)
-      CALL MSG_OUT(' ','REDS: Beginning regrid process', STATUS)
+      IF (.NOT.BOLREBIN) THEN
+         T0 = SECNDS(0.0)
+         CALL MSG_OUT(' ','REDS: Beginning regrid process', STATUS)
+      END IF
 
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
             CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT(I), 
-     :           %val(IN_DATA_PTR(I)),
-     :           %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)), 
-     :           N_BOL(I) * N_POS(I), DBLE(OUT_PIXEL), NX_OUT, 
+     :           %val(ABOL_DATA_PTR(I)),
+     :           %val(ABOL_RA_PTR(I)), %val(ABOL_DEC_PTR(I)), 
+     :           N_PTS(I), DBLE(OUT_PIXEL), NX_OUT, 
      :           NY_OUT, I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), 
      :           %val(REGRID1_PTR), STATUS)
          END DO
@@ -2044,18 +2159,19 @@ c
 
 *  go through the input datasets coadding them into the convolution
 
-      T1 = SECNDS(T0)
-
-      CALL MSG_SETR('T1', T1)
-      CALL MSG_OUT(' ','REDS: Entering second rebin phase (T = ^T1 '//
-     :     'seconds)', STATUS)
+      IF (.NOT.BOLREBIN) THEN
+         T1 = SECNDS(T0)
+         CALL MSG_SETR('T1', T1)
+         CALL MSG_OUT(' ','REDS: Entering second rebin phase (T = '//
+     :     '^T1 seconds)', STATUS)
+      END IF
 
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
             CALL SCULIB_WTFN_REGRID_2 (DIAMETER, WTFNRES,
-     :        %val(IN_DATA_PTR(I)), %val(IN_VARIANCE_PTR(I)),
-     :        WEIGHT(I), %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)),
-     :        N_BOL(I) * N_POS(I), OUT_PIXEL, NX_OUT, NY_OUT,
+     :        %val(ABOL_DATA_PTR(I)), %val(ABOL_VAR_PTR(I)),
+     :        WEIGHT(I), %val(ABOL_RA_PTR(I)), %val(ABOL_DEC_PTR(I)),
+     :        N_PTS(I), OUT_PIXEL, NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR),
      :        WAVELENGTH, %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
      :        %val(CONV_WEIGHT_PTR), WEIGHTSIZE, WTFN, STATUS)
@@ -2065,11 +2181,12 @@ c
 *  now add the output pixels with zero `total weight' into the
 *  convolution sum and calculate the final result
 
-      T1 = SECNDS(T0)
-
-      CALL MSG_SETR('T1', T1)
-      CALL MSG_OUT(' ','REDS: Entering third rebin phase (T = ^T1 '//
-     :     'seconds)', STATUS)
+      IF (.NOT.BOLREBIN) THEN
+         T1 = SECNDS(T0)
+         CALL MSG_SETR('T1', T1)
+         CALL MSG_OUT(' ','REDS: Entering third rebin phase (T = ^T1 '//
+     :        'seconds)', STATUS)
+      END IF
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_WTFN_REGRID_3 (DIAMETER, WTFNRES, OUT_PIXEL, 
@@ -2080,11 +2197,12 @@ c
      :        WTFN, STATUS)
       END IF
 
-      T1 = SECNDS(T0)
-
-      CALL MSG_SETR('T1', T1)
-      CALL MSG_OUT(' ','REDS: Regrid complete. Elapsed time = ^T1 '//
-     :     'seconds.', STATUS)
+      IF (.NOT.BOLREBIN) THEN
+         T1 = SECNDS(T0)
+         CALL MSG_SETR('T1', T1)
+         CALL MSG_OUT(' ','REDS: Regrid complete. Elapsed time = ^T1 '//
+     :        'seconds.', STATUS)
+      END IF
 
 
 *  set up the output axes
@@ -2130,8 +2248,15 @@ c
       CALL NDF_AUNMP (OUT_NDF, 'CENTRE', 2, STATUS)
 
 * and a title
+
+      OUT_TITLE = OBJECT
+      IF (BOLREBIN) THEN
+         IPOSN = CHR_LEN(OUT_TITLE)
+         CALL CHR_APPND('_', OUT_TITLE, IPOSN)
+         CALL CHR_APPND(BOLNAME, OUT_TITLE, IPOSN)
+      END IF
  
-      CALL NDF_CPUT(OBJECT, OUT_NDF, 'Title', STATUS)
+      CALL NDF_CPUT(OUT_TITLE, OUT_NDF, 'Title', STATUS)
       CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', STATUS)
 
 *  create the IRAS astrometry structure
@@ -2183,13 +2308,14 @@ c
             CTYPE2 = 'GLAT-TAN'
          END IF
 
-         CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0, 0,OUT_LOC,
+         CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0,0,OUT_XLOC,
      :        STATUS)
          NP = 8
          CALL IRA_CREAT ('GNOMONIC', NP, P, SCS, OUT_EPOCH, OUT_NDF,
      :        ITEMP, STATUS)
 
          CALL IRA_CLOSE (STATUS)
+         CALL DAT_ANNUL(OUT_XLOC, STATUS)
 
       END IF
 
@@ -2269,7 +2395,7 @@ c
 
          OBSRA = OUT_LONG * 180.0D0 / PI
          OBSDEC= OUT_LAT  * 180.0D0 / PI
-         OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
+         FITS_OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
 
          IF (OUT_COORDS.NE.'GA') THEN
             CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
@@ -2287,7 +2413,8 @@ c
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CRVAL1',
      :        OBSRA, 'Map centre (degrees)', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CDELT1',
-     :        DBLE(-OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
+     :        DBLE(-FITS_OUT_PIXEL), 'increment per pixel (degrees)', 
+     :        STATUS)
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'CUNIT1',
      :        'deg','physical units of axis 1', STATUS)
 
@@ -2299,7 +2426,8 @@ c
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CRVAL2',
      :        OBSDEC, 'Map centre (degrees)', STATUS)
          CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,'CDELT2',
-     :        DBLE(OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
+     :        DBLE(FITS_OUT_PIXEL), 'increment per pixel (degrees)', 
+     :        STATUS)
          CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,'CUNIT2',
      :        'deg','physical units of axis 2', STATUS)
 
@@ -2313,6 +2441,31 @@ c
      :  OUT_FITSX_LOC, STATUS)
       CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
       CALL DAT_ANNUL (OUT_FITSX_LOC, STATUS)
+
+      CALL SCULIB_FREE ('TOTAL WEIGHT', TOTAL_WEIGHT_PTR,
+     :  TOTAL_WEIGHT_END, STATUS)
+      CALL SCULIB_FREE ('REGRID1', REGRID1_PTR, REGRID1_END, STATUS)
+      CALL SCULIB_FREE ('CONV_WEIGHT', CONV_WEIGHT_PTR,
+     :  CONV_WEIGHT_END, STATUS)
+
+*       Tidy up each loop
+      IF (BOLREBIN) THEN
+         DO I = 1, FILE
+            CALL SCULIB_FREE('BOL_DATA', ABOL_DATA_PTR(I),
+     :           ABOL_DATA_END(I), STATUS)
+            CALL SCULIB_FREE('BOL_VAR', ABOL_VAR_PTR(I),
+     :           ABOL_VAR_END(I), STATUS)
+            CALL SCULIB_FREE('BOL_RA', ABOL_RA_PTR(I),
+     :           ABOL_RA_END(I), STATUS)
+            CALL SCULIB_FREE('BOL_DEC', ABOL_DEC_PTR(I),
+     :           ABOL_DEC_END(I), STATUS)
+         END DO
+      END IF
+
+      CALL NDF_ANNUL(OUT_NDF, STATUS)
+      END DO
+      END IF
+*     This is the end of the BOLOMETER looping
 
 *  now finish off
 
@@ -2328,15 +2481,7 @@ c
 
          CALL SCULIB_FREE ('DUMMY_VAR', DUMMY_VARIANCE_PTR(I),
      :        DUMMY_ENDVAR_PTR(I), STATUS)
-
-
       END DO
-
-      CALL SCULIB_FREE ('TOTAL WEIGHT', TOTAL_WEIGHT_PTR,
-     :  TOTAL_WEIGHT_END, STATUS)
-      CALL SCULIB_FREE ('REGRID1', REGRID1_PTR, REGRID1_END, STATUS)
-      CALL SCULIB_FREE ('CONV_WEIGHT', CONV_WEIGHT_PTR,
-     :  CONV_WEIGHT_END, STATUS)
 
 
       CALL NDF_END (STATUS)
