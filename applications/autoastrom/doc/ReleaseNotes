@@ -8,7 +8,7 @@
 <p>Changes since version 0.5-2:
 <ul>
   <li><p>Better behaved in the case where an input file has no date or
-    time information.</li>
+    time information.</p></li>
   <li><p>Uses version 3.7 of ASTROM</p></li>
 </ul>
 </p>
