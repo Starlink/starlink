@@ -766,7 +766,7 @@
 
 *  write each pixel allowing for line continuation
               NPIX=NPIX+1
-              CALL IMG_PIXTOWORLD(REAL(I)+0.5,REAL(J)+0.5,X,Y,STATUS)
+              CALL IMG_PIXTOWORLD(REAL(I),REAL(J),X,Y,STATUS)
               CALL MSG_SETR( 'X', X)
               CALL MSG_SETR( 'Y', Y)
               CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
