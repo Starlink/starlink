@@ -102,7 +102,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( 80 ) BUFFER  ! Text read from file
+      CHARACTER * ( 80 ) BUFFER  ! Text buffer mostly for reading file
       INTEGER COUNT              ! Start and end line in file
       LOGICAL CMPLET             ! The file has been completely read?
       INTEGER FD                 ! File descriptor
@@ -189,9 +189,9 @@
 *  Report the number of positions read and the file name.
       CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
       CALL MSG_SETI( 'NXY', COUNT )
-      CALL MSG_SETI( 'FN', PNAME )
-      CALL MSG_OUTIF( MSG__NORM, 'NREAD', ' ^NXY pixel positions read '/
-     :                /'in from $'//PNAME//'.', STATUS )
+      CALL MSG_SETC( 'FN', PNAME )
+      BUFFER = ' ^NXY pixel positions read in from $'//PNAME//'.'
+      CALL MSG_OUTIF( MSG__NORM, 'NREAD', BUFFER, STATUS )
       CALL MSG_OUTIF( MSG__NORM, 'BLANK', ' ', STATUS )
 
 *  Close the file.
