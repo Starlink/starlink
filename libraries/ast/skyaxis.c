@@ -71,6 +71,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *        o  Added 'g' format character which produces graphical separators. 
 *        o  Modified AxisAbbrev to use AxisFields so that delimiters which 
 *           include digits can be recognised.
+*     13-SEP-20904 (DSB):
+*        Modify AxisFields to correct usage of the "p" pointer in the
+*        case that the first and only field begins with a minus sign.
 *class--
 */
 
@@ -524,10 +527,13 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
             p = t + strlen( term );
 
 /* In all other cases, the first field is the only field and is not
-   terminated. Note its length (ignoring trailing spaces). */
+   terminated. Note its length (ignoring trailing spaces). Move the
+   pointer on by the length of the field, remembering that any leading
+   minus sign has already been skipped. */
          } else {
             nc[ 0 ] = astChrLen( fields[ 0 ] );
             p += nc[ result ];
+            if( sign == -1 ) p--;
          }
 
 /* Read a numerical value from the first field. */
