@@ -131,11 +131,15 @@
  
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
 *     1991 November 10 (MJC):
 *        Original version.
+*     11-JUN-1998 (DSB):
+*        Corrected the initialisation of the edges of the first summation 
+*        box so that it works for cases where NDIM > 2.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -259,9 +263,13 @@
 *  sum.
       START( 1 ) = 1
       FINISH( 1 ) = EDIMS( 1 )
-      DO  I = 2, NDIM
-         START( I ) = 1 - COMPRS( I )
-         FINISH( I ) = 0
+
+      START( 2 ) = 1 - COMPRS( 2 )
+      FINISH( 2 ) = 0
+
+      DO  I = 3, NDIM
+         START( I ) = 1
+         FINISH( I ) = COMPRS( I )
       END DO
  
 *  Compute the strides.
