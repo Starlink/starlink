@@ -1,7 +1,7 @@
 Interface KSTAT
    Parameter INP
       Position    1
-      Type        'UNIV'
+      Type        'LITERAL'
       ppath       'GLOBAL'
       Association '<->GLOBAL.BINDS'
       Prompt      'Enter input dataset'
@@ -10,7 +10,7 @@ Interface KSTAT
 
    Parameter INP2
       Position    2
-      Type        'UNIV'
+      Type        'LITERAL'
       Prompt      'Enter another primitive array of the same size'
       Help        'This will be correlated with the first'
    EndParameter
