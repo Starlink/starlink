@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>thirdparty/caltech/pgplot</path>
+  <description>Native PGPLOT</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

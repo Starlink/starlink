@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="pgplot">
+  <version>5.2.2-1</version>
+  <path>thirdparty/caltech/pgplot</path>
+  <description>Native PGPLOT</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies >
+    
+  </dependencies>
+  <!--
+  <developers>
+    <person>
+      <name></name>
+      <uname></uname>
+      <email></email>
+    </person>
+  </developers>
+  -->
+  <!-- <documentation></documentation> -->
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
