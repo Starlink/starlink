@@ -22525,9 +22525,10 @@ plot (101k).
    Shows which graphics devices are available
 }{
    \sstdescription{
-      The routine displays a list of the graphics devices available and
-      the names which identify them.  Each name is accompanied by a
-      brief descriptive comment.
+     The routine displays a list of the graphics devices available and
+     the names (both traditional Starlink GNS names and the equivalent
+     PGPLOT names) which identify them.  Each name is accompanied by a
+     brief descriptive comment.
    }
    \sstusage{
       gdnames
@@ -26909,13 +26910,7 @@ plot (10k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  The device must be in
-         one of the following GNS categories: IMAGE\_DISPLAY,
-         IMAGE\_OVERLAY, MATRIX\_PRINTER, or WINDOW, and have at least 24
-         greyscale intensities or colour indices when parameter FULL is
-         {\tt FALSE}, and at least 8 when FULL is {\tt TRUE}.  It must
-         also not reset when the device is opened (since the new colour
-         table would be lost).  {\tt [}Current image-display device{\tt ]}
+         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
       }
       \sstsubsection{
          COLTAB = LITERAL (Read)
@@ -27050,6 +27045,17 @@ plot (10k).
          equalisation between the 5 and 90 percentiles of an NDF called
          nebula to the colour table on the current image-display
          device.  There is no bias or shading to white or black.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The effects of this command will only be immediately apparent
+	 when run on X windows which have 256 colours (or other similar
+	 pseudocolour devices). On other devices (for instance, X windows
+	 with more than 256 colours) the effects will only become
+	 apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -31885,10 +31891,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  The device must be in
-         one of the following GNS categories: IMAGE\_DISPLAY,
-         IMAGE\_OVERLAY, MATRIX\_PRINTER or WINDOW, and have at least 24
-         colour indices. {\tt [}Current image-display device{\tt ]}
+         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
       }
    }
    \sstexamples{
@@ -31903,6 +31906,17 @@ plot (9k).
       }{
          This loads the standard palette into the reserved portion of
          the colour table of the xwindows device.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The effects of this command will only be immediately apparent
+	 when run on X windows which have 256 colours (or other similar
+	 pseudocolour devices). On other devices (for instance, X windows
+	 with more than 256 colours) the effects will only become
+	 apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -31950,10 +31964,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  The device must be in
-         one of the following GNS categories: IMAGE\_DISPLAY,
-         IMAGE\_OVERLAY, WINDOW, WINDOW\_OVERLAY, or MATRIX\_PRINTER and
-         have at least 2 colour indices. {\tt [}Current image-display device{\tt ]}
+         Name of the image display to be used. {\tt [}Current image-display device{\tt ]}
       }
       \sstsubsection{
          PALNUM = \_INTEGER (Read)
@@ -31977,6 +31988,17 @@ plot (9k).
       }{
          This makes the xwindows device's palette entry number 12 have a
          pale-yellow colour.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The effects of this command will only be immediately apparent
+	 when run on X windows which have 256 colours (or other similar
+	 pseudocolour devices). On other devices (for instance, X windows
+	 with more than 256 colours) the effects will only become
+	 apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -32006,12 +32028,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  The device must be in
-         one of the following GNS categories: IMAGE\_DISPLAY,
-         IMAGE\_OVERLAY, or WINDOW, and have at least 24 colour indices.
-         The device must also not reset when the device is opened
-         (since the existing colour table would be lost).  {\tt [}Current
-         image-display device{\tt ]}
+         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
       }
       \sstsubsection{
          PALETTE = NDF (Read)
@@ -32039,6 +32056,17 @@ plot (9k).
          This loads the palette stored in the NDF called rustic into
          the reserved portion of the colour table of the xwindows
          device.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The effects of this command will only be immediately apparent
+	 when run on X windows which have 256 colours (or other similar
+	 pseudocolour devices). On other devices (for instance, X windows
+	 with more than 256 colours) the effects will only become
+	 apparent when subsequent graphics applications are run.
       }
    }
    \sstdiytopic{
@@ -32069,12 +32097,7 @@ plot (9k).
       \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         Name of the image display to be used.  The device must be in
-         one of the following GNS categories: IMAGE\_DISPLAY,
-         IMAGE\_OVERLAY, or WINDOW, and have at least 24 colour indices.
-         The device must also not reset when the device is opened
-         (since the existing colour table would be lost).  {\tt [}Current
-         image-display device{\tt ]}
+         Name of the image display to be used.  {\tt [}Current image-display device{\tt ]}
       }
       \sstsubsection{
          PALETTE = NDF (Write)

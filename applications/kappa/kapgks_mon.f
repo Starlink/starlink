@@ -79,7 +79,7 @@
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the KAPPA release source tar file 
 *  is contructed.
-      CALL NDF_HAPPN( NAME // ' (KAPPA PKG_VERS)', STATUS )
+      CALL NDF_HAPPN( NAME // ' (KAPPA 0.19)', STATUS )
 
 *  See if NDF names should be reported when looping.
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
@@ -107,10 +107,6 @@
 *  Creates or manipulates an image-display lookup table using a palette.
          IF ( NAME .EQ. 'CRELUT' ) THEN
             CALL CRELUT ( STATUS )
-
-*  Shows which graphics devices are available.
-         ELSE IF ( NAME .EQ. 'GDNAMES' ) THEN
-            CALL GDNAMES ( STATUS )
 
 *  Makes memory planes of an image-display device invisible.
          ELSE IF ( NAME .EQ. 'IDINVISIBLE' ) THEN

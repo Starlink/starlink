@@ -232,22 +232,22 @@
             CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR, NCARD, 
      :                     STATUS )
 
-*  Check the pointer can be used.
-            IF( STATUS .EQ. SAI__OK ) THEN
-
 *  If we have write access to the NDF, then any WCS component can be 
 *  stored in the supplied NDF so that it can be accessed faster next
 *  time it is needed. If we do not have write access to the NDF, then 
 *  we take a copy of the supplied NDF, and attempt to create a WCS component
 *  in the copy. If write access is available, use the supplied identifier.
-               IF( WRACC ) THEN
-                  INDFC = INDF
+            IF( WRACC ) THEN
+               INDFC = INDF
 
 *  Otherwise, create a temporary copy of the NDF.
-               ELSE
-                  CALL NDF_TEMP( PLACE, STATUS )
-                  CALL NDF_COPY( INDF, PLACE, INDFC, STATUS )               
-               END IF
+            ELSE
+               CALL NDF_TEMP( PLACE, STATUS )
+               CALL NDF_COPY( INDF, PLACE, INDFC, STATUS )               
+            END IF
+
+*  Check the pointer can be used.
+            IF( STATUS .EQ. SAI__OK ) THEN
 
 *  Attempt to get the value of the anvironment variable KAPPA_ENCODINGS.
                CALL PSX_GETENV( 'KAPPA_ENCODINGS', ENV, STATUS )
@@ -284,7 +284,7 @@
    
                      NENCOD = MAXCOD
 
-                  ENDIF
+                  END IF
 
 *  Extract the encodings from the group into the ENCODS array.
                   CALL GRP_GET( IGRP, 1, NENCOD, ENCODS, STATUS ) 

@@ -514,7 +514,7 @@ F_ROUTINES = $(CCDPACK_F_ROUTINES) \
 KAPVIEW_F_ROUTINES = \
 ardplot.f colcomp.f contour.f \
 cursor.f drawsig.f display.f elprof.f \
-gdclear.f gdset.f gdstate.f \
+gdclear.f gdnames.f gdset.f gdstate.f \
 idclear.f \
 idset.f idstate.f \
 linplot.f lutable.f \
@@ -526,7 +526,7 @@ piclist.f picsel.f pictrans.f picvis.f \
 scatter.f vecplot.f 
 
 KAPGKS_F_ROUTINES = \
-crelut.f gdnames.f idinvisible.f idpazo.f lutflip.f luthilite.f \
+crelut.f idinvisible.f idpazo.f lutflip.f luthilite.f \
 lutrot.f luttweak.f 
 
 # Special kappa f routines for commands which clash with the C 
