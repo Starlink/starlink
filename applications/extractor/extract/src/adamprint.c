@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
+
 #include "sae_par.h"
 #include "merswrap.h"
 #include "msg_par.h"

@@ -155,7 +155,6 @@ initialize check-image.
 */
 checkstruct	*initcheck(char *filename, checkenum check_type, int next)
 {
-  catstruct	*fitscat;
   checkstruct	*check;
 
   QCALLOC(check, checkstruct, 1);
@@ -172,16 +171,11 @@ initialize check-image (for subsequent writing).
 */
 void	reinitcheck(picstruct *field, checkstruct *check)
 {
-  char		*buf;
-  int		i, ival;
-  size_t	padsize;
-  double	dval;
-  USHORT	*pntri;
+  int		i;
   PIXTYPE	*pntrf;
   void         *pntr[3];
   int 		placehldr;
   int          lbnd[2], ubnd[2];
-  int 		ndim;
   int          status = SAI__OK;
   
   ndfOpen( DAT__ROOT, check->filename, "WRITE", "UNKNOWN",
@@ -367,8 +361,7 @@ void	writecheck(checkstruct *check, PIXTYPE *data, int w)
 */
 void	reendcheck(picstruct *field, checkstruct *check)
   {
-   char		*buf;
-   size_t	padsize;
+  size_t	padsize;
 
   switch(check->type)
     {

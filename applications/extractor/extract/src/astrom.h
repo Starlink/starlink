@@ -52,12 +52,8 @@ extern void		astrom_errparam(picstruct *, objstruct *),
 			computeastrom(picstruct *, objstruct *),
 			copyastrom(picstruct *infield, picstruct *outfield),
 			endastrom(picstruct *),
-			initastrom(picstruct *);
-static                  void fk5( picstruct *field, double inalp,
-                                  double indec, double *outalp, double
-                                  *outdec );
-static                  void fk4( picstruct *field, double inalp,
-                                  double indec, double *outalp, double
-                                  *outdec );
+			initastrom(picstruct *),
+			j2b(double, double, double, double *, double *),
+			precess(double,double,double,double,double *,double *);
 
 extern double		*compute_wcs(picstruct *, double, double);

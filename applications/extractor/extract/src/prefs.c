@@ -369,7 +369,7 @@ void    readprefs(char *filename, char **argkey, char **argval, int narg)
   for (i=0; key[i].name[0]; i++)
     if (!key[i].flag)
       error(EXIT_FAILURE, key[i].name, " configuration keyword missing");
-  if (flage)
+  if (!flage)
     fclose(infile);
 
   return;

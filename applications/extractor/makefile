@@ -228,6 +228,8 @@
 #     13-JUL-2000 (PWD):
 #        Changed documentation install to "copy and link" to save disk 
 #        space.
+#     15-MAR-2004 (PWD):
+#        Changed to SExtractor 2.3.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -401,11 +403,11 @@ PKG_LINK =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.4-3
+PKG_VERS = 2.3-0
 
 #  List the source subdirectories
 
-SOURCE_DIRS = sextractor
+SOURCE_DIRS = extractor sextractor
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -448,18 +450,11 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  it, but which are not required by users of it.
 
 
-PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2) $(I_SUB3)
+PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
 
-I_SUB1 = assoc.h astrom.h back.h bpro.h check.h clean.h define.h \
-         extract.h field.h filter.h fitscat.h fitscat_defs.h \
-         fitshead.h fitsutil.h flag.h globals.h growth.h \
-         interpolate.h key.h mydefs.h neurro.h param.h photom.h \
-         plist.h poly.h prefs.h psf.h retina.h sexhead.h sexhead1.h \
-         sexheadsc.h som.h types.h weight.h image.h userradii.h
+I_SUB1 =
 
 I_SUB2 =
-
-I_SUB3 =
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -467,7 +462,7 @@ I_SUB3 =
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = sae_par.h dat_par.h par.h merswrap.h ndf.h ast.h msg_par.h
+EXTERNAL_INCLUDES =
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -491,13 +486,7 @@ PLATFORM_F =
 
 C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
-C_SUB1 = adamprint.c analyse.c assoc.c astrom.c back.c bpro.c catout.c \
-         check.c clean.c extract.c field.c filter.c fitscat.c fitsconv.c \
-         fitsfield.c fitshead.c fitskey.c fitsmisc.c fitsread.c fitstab.c \
-         fitsutil.c fitswrite.c flag.c graph.c growth.c image.c interpolate.c \
-         makeit.c manobjlist.c misc.c neurro.c photom.c plist.c poly.c \
-         prefs.c psf.c readimage.c refine.c retina.c scan.c som.c \
-         weight.c pc.c userradii.c
+C_SUB1 =
 
 C_SUB2 =
 
@@ -546,8 +535,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 
 #  Conditions of use file.
 
-#LICENCE = $(PACK_NAME)_CONDITIONS
-LICENCE =
+LICENCE = $(PACK_NAME)_CONDITIONS
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -580,14 +568,6 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITH) \
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 
 #  Rules to set up links to locate each of the above include files.
-
-sae_par.h:         $(STAR_INC)/sae_par.h;        $(LINK) $? $@
-dat_par.h:         $(STAR_INC)/dat_par.h;        $(LINK) $? $@
-par.h:             $(STAR_INC)/par.h;            $(LINK) $? $@
-merswrap.h:        $(STAR_INC)/merswrap.h;       $(LINK) $? $@
-ndf.h:             $(STAR_INC)/ndf.h;            $(LINK) $? $@
-ast.h:             $(STAR_INC)/ast.h;            $(LINK) $? $@
-msg_par.h:         $(STAR_INC)/msg_par.h;        $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -637,16 +617,31 @@ MONO_OBJECT = $(MONO_SOURCE:.c=.o)
 #  List of object library files to be built and rules for building
 #  them.
 
-OBJECT_LIBRARIES = libsub1.a
+OBJECT_LIBRARIES = libextractor.a libfits.a
 
-libsub1.a: $(O_SUB1)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
+libextractor.a libfits.a: extractor_source.tar
+	- mkdir extract
+	(cd extract ;\
+	$(TAR_OUT) ../extractor_source.tar ;\
+	./configure ;\
+	make ;\
+	cp -p src/libextractor.a .. ;\
+	cp -p src/fits/libfits.a .. ;\
+	cp -p src/$(MONO_OBJECT) ..)
+
+$(MONO_IFL):
+	cp -p extract/src/extractor.ifl .
+
+$(ICL_SCRIPT):
+	cp -p extract/src/extractor.icl .
+
+$(STARTUP_SCRIPT):
+	cp -p extract/src/extractor.csh .
 
 #  Rule and dependencies for building the monolith(s).
 
-$(MONOLITH): $(MONO_SOURCE) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
-	$(ALINK) $(MONO_SOURCE) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
+$(MONOLITH): extractor_source.tar $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
+	$(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
             $(ADDLIBS) `ndf_link_adam`
 
 #  Rule and dependencies for build the native binary.
@@ -654,9 +649,9 @@ $(NATIVE_BINARY): sextractor_source.tar
 	- mkdir sextractor
 	(cd sextractor ;\
 	 $(TAR_OUT) ../sextractor_source.tar ;\
-	 cd source ;\
-	 make SEXMACHINE=$(SYSTEM) ;\
-	 cp -p sex ../..)
+	 ./configure ;\
+	 make ;\
+	 cp -p src/sex ..)
 
 #  Rules for building the help libraries.
 
@@ -1340,7 +1335,7 @@ clean: DUMMY
 	@- rm -f $(INCLUDE_LINKS) $(PRIVATE_INCLUDES) $(IFL_FILES) \
               $(MONO_IFL) $(HELP_SOURCES) $(PLATFORM_F) $(BLOCK_DATA) \
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
-	@- rm -f $(MONO_SOURCE) $(F_ROUTINES) 1>/dev/null 2>/dev/null
+	@- rm -f $(MONO_OBJECT) $(F_ROUTINES) 1>/dev/null 2>/dev/null
 	@- rm -f $(OBJECT_FILES) 1>/dev/null 2>/dev/null
 	@- rm -rf $(SOURCE_DIRS) 1>/dev/null 2>/dev/null
 	@ echo
