@@ -11,7 +11,7 @@
 # and defaults to .
 
 srcdir=.
-ln_s=@LN_S@
+ln_s="@LN_S@"
 
 # Command line contains optional target directory
 if test -n "$1"; then
