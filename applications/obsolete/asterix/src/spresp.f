@@ -116,6 +116,8 @@
 *                going into PSF_2D_DATA
 *     16 Oct 1995 (DJA):
 *        V2.0-3  Use new BDI_ routines to read and write data
+*      8 Jan 1996 (DJA):
+*        V2.0-4  Fixed bug in energy axis copying
 *     {enter_changes_here}
 
 *  Bugs:
@@ -202,7 +204,7 @@
 
 *  Version
       CHARACTER*30       VERSION
-        PARAMETER        ( VERSION = 'SPRESP Version 2.0-2' )
+        PARAMETER        ( VERSION = 'SPRESP Version 2.0-3' )
 *.
 
 *  Check inherited global status.
@@ -431,7 +433,7 @@
 
 *  Copy energy axis if present
       IF ( (E_AX.GT.0) .AND. (ONEBIN .EQ. IDIMS(E_AX)) ) THEN
-        CALL BDI_AXCOPY( IFID, E_AX, ' ', BIID, E_AX, STATUS )
+        CALL BDI_AXCOPY( IFID, E_AX, ' ', BIID, NDIM, STATUS )
       ELSE IF ( E_AX .GT. 0 ) THEN
         CALL BDI_AXPUT0C( BIID, NDIM, 'Label', EAXLAB, STATUS )
         CALL BDI_AXCOPY( IFID, E_AX, 'Units', BIID, NDIM, STATUS )

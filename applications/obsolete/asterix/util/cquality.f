@@ -179,7 +179,7 @@
         OFID = IFID
       ELSE
         CALL USI_ASSOC( 'INP', 'BinDS', 'READ', IFID, STATUS )
-        CALL USI_CREAT( 'INP', 'OUT', 'BinDS', OFID, STATUS )
+        CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
