@@ -394,7 +394,7 @@
       IF ( I_BGM_ON .AND. ((I_NX*I_NY) .GT. I_BGM_NELM) ) THEN
         CALL DYN_UNMAP( I_BGM_DPTR, STATUS )
         CALL DYN_UNMAP( I_BGM_QPTR, STATUS )
-      ELSE
+      ELSE IF ( I_BGM_ON ) THEN
         ALLOC = .FALSE.
       END IF
       IF ( ALLOC ) THEN
