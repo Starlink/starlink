@@ -486,6 +486,10 @@ int gaiaMapNDF( int ndfid, void **data, const char* component,
    if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
       strcpy( dtype, "_REAL" );
    }
+   /*  Trap _UBYTE and map _WORD */
+   if ( strncmp( dtype, "_UBYTE", 7 ) == 0 ) {
+      strcpy( dtype, "_WORD" );
+   }
    ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status );
    *data = ptr[0];
 

@@ -51,8 +51,12 @@
      equinox, epoch and coordinate system can now be viewed.
 
      - Catalogue windows now have the option to interpret X and Y
-       coordinates as NDF pixel coordinates (useful for plotting
-       POLPACK results). 
+     coordinates as NDF pixel coordinates (useful for plotting
+     POLPACK results). 
+
+     - The precision shown for the RA and DEC fields in the main
+     window has been restored to show 0.1 arcsec resolution.
+
 
   To try out GAIA for yourself type the following command:
 
@@ -66,4 +70,4 @@
 
   Peter W. Draper (P.W.Draper@durham.ac.uk)
 
-  18th July 2000.
+  16th October 2000.
