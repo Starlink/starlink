@@ -25,27 +25,30 @@ This directory contains the following directories:
      or library.
 
 
-To build the starlink classic applications the following steps are required:
+
+To build the COMPLETE set of Starlink classic applications the
+following steps are required:
 
  - Specify where you want the installed files to end up (_PREFIX)
    and where you want the build to find previously installed files (_STARLINK)
    (defaults to /star)
 
-      % setenv STARCONF_DEFAULT_STARLINK /export3/sun
-      % setenv STARCONF_DEFAULT_PREFIX   /export3/sun
+      % setenv STARCONF_DEFAULT_STARLINK /local-star
+      % setenv STARCONF_DEFAULT_PREFIX   /local-star
 
 -  Delete previous Starlink environment variables. 
 
       % unsetenv INSTALL
       % unsetenv STARLINK
 
-   and also make sure that an old-style starlink system is not in your
+   and also make sure that an old-style Starlink system is not in your
    path (since tools like messgen will get very confused).
 
- - First build the thirdparty applications and buildsupport system.
-   Some of these applications have been patched specifically for
-   building Starlink applications so the default versions shipped with
-   the OS may not work.
+ - First build the buildsupport system (the tools in the buildsupport
+   directory, plus third-party applications autoconf, automake and
+   libtool).  Some of these applications have been patched
+   specifically for building Starlink applications so the default
+   versions shipped with the OS will not work.
 
       % ./bootstrap
 
@@ -53,11 +56,41 @@ To build the starlink classic applications the following steps are required:
    so you should add $STARCONF_DEFAULT_PREFIX/buildsupport/bin to your
    path at this point.
 
- - Now configure and build the core libraries (running the configure
-   from this directory forces things to build in the correct order)
+ - Now configure and build the system.  The dependencies within the
+   Makefile ensure that everthing in built in the correct order.
 
       % ./configure -C   # -C means caching results
       % make
+
+ - If you wish to build only as far as a given component, then specify
+   it by giving the name of the associated `manifest' file.
+
+      % make /local-star/manifests/ast
+
+   This will build, and install under STARCONF_DEFAULT_PREFIX, this
+   component and everything it depends on.
+
+
+
+Note that this sequence of './bootstrap; ./configure; make' is a
+`make world' command -- it builds everything in the repository that
+has been brought into the configure-based system, and will fail if
+some components have not been checked out.  If you wish to build a
+specific component, the instructions are slightly different.
+
+ - Specify the _PREFIX and _STARLINK variables as before, though this
+   time it might be appropriate to give them different values, if you
+   want to build against one installation tree (_STARLINK), but
+   install into another (_PREFIX).  As above, unset the INSTALL and
+   STARLINK variables, and make sure there is no old-style Starlink
+   system in your path.
+
+ - If you have already built the buildsupport tools (autoconf,
+   automake, libtool and starconf), then make sure these are in your
+   path.  If not, you can build just these by going to the top-level
+   of your checkout and giving the command
+
+      % ./bootstrap --buildsupport-only
 
  - Now you can go into a specific directory and build the library/application
    as normal (a bootstrap is required if building from CVS)
@@ -66,6 +99,8 @@ To build the starlink classic applications the following steps are required:
       % ./configure -C
       % make
       % make install-manifest
+
+
 
 See SSN/78 (in docs/ssn78) for more details on building Starlink classic
 applications.
