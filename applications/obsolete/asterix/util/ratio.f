@@ -309,7 +309,7 @@
 *         the equivalent dimension and work in Pixels.
            DATEXT = ' '
 
-           CALL BDI_CHK( IFID, I, 'Data', OK, STATUS )
+           CALL BDI_AXCHK( IFID, I, 'Data', OK, STATUS )
            AX_REG(I) = .FALSE.
            IF ( STATUS .NE. SAI__OK ) THEN
              DATEXT = 'No axis data. '
