@@ -8952,7 +8952,120 @@ view.
 
 
 %\cleardoublepage
-%\section{\label{ss:cmpframes}TBW - Compound Frames (CmpFrames)}
+%\section{\label{ss:cmpframes}Compound Frames (CmpFrames)}
+
+We now turn to a rather special form of Mapping, the CmpFrame. The
+Frames we have considered so far have been atomic, in the sense that
+they represent pre-defined elementary physical domains. A CmpFrame,
+however, is a compound Frame. In essence, it is a structure for
+containing other Frames and its purpose is to allow those Frames
+to work together in various combinations while appearing as a single
+Object. A CmpFrame's behaviour is therefore not pre-defined, but is
+determined by the other Frames it contains (its ``component'' Frames).
+
+\subsection{Creating a CmpFrame}
+A very common use for a CmpFrame within astronomy is to represent a
+``spectral cube''. This is a 3-dimensional Frame in which one of the axes
+represents position within a spectrum, and the other two axes represent
+position on the sky (or some other spatial domain such as the focal plane
+of a telescope). As an example, we create such a CmpFrame in which axes
+1 and 2 represent Right Ascension and Declination (FK5 J2000), and axis 3 
+represents wavelength (these are the default coordinate Systems
+represented by a SkyFrame and a SpecFrame respectively):
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstSkyFrame *skyframe;
+AstSpecFrame *specframe;
+AstCmpFrame *cmpframe;
+...
+skyframe = astSkyFrame( "" );
+specframe = astSpecFrame( "" );
+cmpframe = astCmpFrame( skyframe, specframe, "" );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER SKYFRAME
+      INTEGER SPECFRAME
+      INTEGER CMPFRAME
+      ...
+      SKYFRAME = AST_SKYFRAME( ' ', STATUS )
+      SPECFRAME = AST_SPECFRAME( ' ', STATUS )
+      CMPFRAME = AST_CMPFRAME( SKYFRAME, SPECFRAME, ' ', STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+If it was desired to make RA and Dec correspond to axes 1 and 3, with
+axis 2 being the spectral axis, then the axes of the CmpFrame created 
+above would need to be permuted as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+int perm[ 3 ];
+...
+
+perm[ 0 ] = 0;
+perm[ 1 ] = 2;
+perm[ 2 ] = 1;
+astPermAxes( cmpframe, perm ); 
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER PERM(3)
+      ...
+
+      PERM( 1 ) = 1
+      PERM( 2 ) = 3
+      PERM( 3 ) = 2
+      CALL AST_PERMAXES( CMPFRAME, PERM, STATUS ) 
+\end{verbatim}
+\normalsize
+f-
+
+\subsection{The Attributes of a CmpFrame}
+A CmpFrame has no extra attributes over and above those common to all
+Frames. The default value for its Domain attribute is ``CMP'' and the
+(fixed) value for its System attribute is ``Compound''. 
+
+Frame attributes which are specific to individual axes (such as Label(2),
+Format(1), \emph{etc}) simply mirror the corresponding axes of the
+relevant component Frame. That is, if the ``Label(2)'' attribute of a
+CmpFrame is accessed, the CmpFrame will forward the access request to the
+component Frame which contains axis 2. Thus, default values for axis
+attributes will be the same as those provided by the component Frames.
+
+An axis index can optionally be appended to the name of Frames attributes
+which do not normally have such an index (System, Domain, Epoch, Title,
+\emph{etc}). If this is done, the access request is forwarded to the
+component Frame containing the indicated axis. For instance, if a
+CmpFrame contains a SpecFrame and a SkyFrame in that order, and the axes
+have not been permuted, then getting the value of attribute ``System'' will 
+return  ``Compound'' as mentioned above (that is, the System value of the
+CmpFrame as a whole), whereas getting the value of attribute
+``System(1)'' will return ``Spectral''(that is, the System value of the
+component Frame containing axis 1 --- the SpecFrame).
+
+This technique is not limited to attributes common to all Frames. For
+instance, the SkyFrame class defines an attribute called Equinox which is
+not held by other classes of Frames. To set a value for the Equinox
+attribute of the SkyFrame contained within the above CmpFrame, assign the
+value to the ``Equinox(2)'' attribute of the CmpFrame. Since the SkyFrame
+defines both axes 2 and 3 of the CmpFrame, we could equivalently have set
+a value for ``Equinox(3)'' since this would also result in the attribute
+access being forwarded to the SkyFrame.
 
 \cleardoublepage
 \section{\label{ss:introducingconversion}An Introduction to Coordinate System Conversions}
@@ -18897,6 +19010,23 @@ c-
 f+
 AST\_FINDFRAME and AST\_CONVERT.
 f-
+
+
+\item The CmpFrame class has been modified so that attributes of a 
+component Frame can be accessed without needing to extract the Frame first.
+To do this, append an axis index to the end of the attribute name. For
+instance, if a CmpFrame contains a SpecFrame and a SkyFrame (in that order), 
+then the StdOfRest attribute of the SpecFrame can be referred to as the
+"StdOfRest(1)" attribute of the CmpFrame. Likewise, the Equinox attribute
+of the SkyFrame can be accessed as the "Equinox(2)" (or equivalently
+"Equinox(3)") attribute of the CmpFrame. The "System(1)" attribute of the
+CmpFrame will refer to the System attribute of the SpecFrame, whereas the 
+"System(2)" and "System(3)" attributes of the CmpFrame will refer to the
+System attribute of the SkyFrame (the "System" attribute without an axis
+specifier will refer to the System attribute of the CmpFrame as a whole,
+since System is an attribute of all Frames, and a CmpFrame is a Frame and
+so has its own System value which is independant of the System attributes
+of its component Frames).
 
 \item The algorithms used by the Plot class for determining when to omit
 overlapping axis labels, and the abbreviation of redundant leading fields 
