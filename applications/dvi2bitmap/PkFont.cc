@@ -15,6 +15,16 @@
 #include "kpathsea.h"
 #endif
 
+#if defined(MKTEXPK) || defined (MAKETEXPK)
+#ifdef HAVE_SSTREAM
+#include <sstream>
+#define SSTREAM ostringstream
+#else
+#include <strstream>
+#define SSTREAM ostrstream
+#endif
+#endif
+
 #if NO_CSTD_INCLUDE
 #include <string.h>
 #include <math.h>
@@ -31,6 +41,10 @@ using std::memcpy;
 #define PATH_SEP ':'
 #endif
 
+#ifndef DEFAULT_MFMODE
+#define DEFAULT_MFMODE "ibmvga"
+#endif
+
 #include "InputByteStream.h"
 #include "PkFont.h"
 
@@ -43,7 +57,7 @@ verbosities PkFont::verbosity_ = normal;
 verbosities PkGlyph::verbosity_ = normal;
 string PkFont::fontpath_ = "";
 int PkFont::resolution_ = 72;
-bool PkFont::mktexpk_ = true;
+bool PkFont::makeMissingFonts_ = true;
 
 PkFont::PkFont(unsigned int dvimag,
 	       unsigned int c,
@@ -65,18 +79,40 @@ PkFont::PkFont(unsigned int dvimag,
 	bool got_path = find_font (pk_file_path);
 	if (! got_path)
 	{
-#ifdef MKTEXPK
-	    if (mktexpk_)
+#if defined(MKTEXPK) || defined(MAKETEXPK)
+	    if (makeMissingFonts_)
 	    {
-		// make the font (XXX FINISH THIS)
-		string mktexpkcmd = MKTEXPK;
-		cerr << "mktexpk: " << mktexpkcmd << '\n';
-	    }
-	    // try again...
-	    got_path = find_font (pk_file_path);
-	    if (! got_path)
+		SSTREAM cmd;
+#ifdef MKTEXPK
+		cmd << MKTEXPK
+		    << " --dpi " << dpi()
+		    << " --bdpi " << dpiBase()
+		    << " --mag " << dvimag_/1000.0
+		    << " --mfmode " << DEFAULT_MFMODE
+		    << ' ' << name
+		    << '\0';
+#else
+		cmd << MAKETEXPK	<< ' '
+		    << name		<< ' '
+		    << dpi()		<< ' '
+		    << dpiBase()	<< ' '
+		    << dvimag_/1000.0	<< ' '
+		    << DEFAULT_MFMODE
+		    << '\0';
 #endif
+		if (verbosity_ >= normal)
+		    cerr << "mktexpk: " << cmd.str() << '\n';
+		system (cmd.str());
+		// try again...
+		got_path = find_font (pk_file_path);
+		if (! got_path)
+		    throw InputByteStreamError ("can't make font file");
+	    }
+	    else
+		throw InputByteStreamError ("can't find font file");
+#else
 	    throw InputByteStreamError ("can't find font file");
+#endif
 	}
 	path_ = pk_file_path;
 
@@ -140,12 +176,14 @@ void PkFont::verbosity (const verbosities level)
 // the kpathsea library.
 //
 // Return true if we found a file to open, and return the path in the
-// argument.  Return false on error.  Success doesn't guarantee
+// argument, which is unchanged otherwise.  Return false on error.  
+// Success doesn't guarantee 
 // that the file exists, just that it was constructed without problems
 // (in fact, in both cases, success _does_ mean that
 // the file was found, but this is not guaranteed by this routine).
 bool PkFont::find_font (string& path)
 {
+    bool got_it = false;
     double scaled_res = resolution_
 	* ((double)font_header_.s * (double)dvimag_)
 	/ ((double)font_header_.d * 1000.0);
@@ -182,24 +220,27 @@ bool PkFont::find_font (string& path)
 	if (search_pkpath (pkpath, name_, scaled_res, found_file))
 	{
 	    path = found_file;
-	    return true;
+	    got_it = true;
 	}
     }
 
 #ifdef ENABLE_KPATHSEA
-    const char *kpse_file;
-
-    kpse_file = kpathsea::find (name_.c_str(), static_cast<int>(scaled_res));
-
-    if (kpse_file != 0)
+    if (! got_it)
     {
-	path = kpse_file;
-	return true;
+	const char *kpse_file;
+
+	kpse_file = kpathsea::find (name_.c_str(),
+				    static_cast<int>(scaled_res));
+
+	if (kpse_file != 0)
+	{
+	    path = kpse_file;
+	    got_it = true;
+	}
     }
 #endif
 
-    path = "";
-    return false;
+    return got_it;
 }
 
 // Find a file on the colon-separated path, with the specified name,
