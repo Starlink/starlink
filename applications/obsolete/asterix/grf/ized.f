@@ -151,6 +151,8 @@
         CALL GDV_CLEAR(STATUS)
         CALL IMG_PLOT(STATUS)
 
+        CALL GCB_CACHE(I_CACHE_1D,STATUS)
+
 *  flag current plotting status
         I_DISP_1D=.TRUE.
         I_DISP=.FALSE.

@@ -1156,18 +1156,13 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 
-*  if 2D data currently displayed
-        IF (I_DISP) THEN
-*  cache GCB for 2D data
-          CALL GCB_CACHE(I_CACHE,STATUS)
-          IF (I_CACHE_1D.EQ.0) THEN
-*  create one for 1D if first time
-            CALL GCB_CRECACHE(I_CACHE_1D,STATUS)
-            CALL GCB_CLEAR(STATUS)
-          ELSE
+        IF (I_CACHE_1D.EQ.0) THEN
+*  create cache for 1D if first time
+          CALL GCB_CRECACHE(I_CACHE_1D,STATUS)
+          CALL GCB_CLEAR(STATUS)
+        ELSE
 *  or uncache previous one
-            CALL GCB_UNCACHE(I_CACHE_1D,STATUS)
-          ENDIF
+          CALL GCB_UNCACHE(I_CACHE_1D,STATUS)
         ENDIF
 
 
@@ -1193,18 +1188,13 @@
       IF (STATUS.EQ.SAI__OK) THEN
 
 
-*  if 1D data currently displayed
-        IF (I_DISP_1D) THEN
-*  cache GCB for 1D data
-          CALL GCB_CACHE(I_CACHE_1D,STATUS)
-          IF (I_CACHE.EQ.0) THEN
-*  create one for 2D if first time
-            CALL GCB_CRECACHE(I_CACHE,STATUS)
-            CALL GCB_CLEAR(STATUS)
-          ELSE
+        IF (I_CACHE.EQ.0) THEN
+*  create cache for 2D if first time
+          CALL GCB_CRECACHE(I_CACHE,STATUS)
+          CALL GCB_CLEAR(STATUS)
+        ELSE
 *  or uncache previous one
-            CALL GCB_UNCACHE(I_CACHE,STATUS)
-          ENDIF
+          CALL GCB_UNCACHE(I_CACHE,STATUS)
         ENDIF
 
 

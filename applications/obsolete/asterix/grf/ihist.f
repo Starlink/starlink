@@ -93,6 +93,7 @@
         I_DISP=.FALSE.
         I_CLEAR=.FALSE.
 
+        CALL GCB_CACHE(I_CACHE_1D,STATUS)
 
       ENDIF
 

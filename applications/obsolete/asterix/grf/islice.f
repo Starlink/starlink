@@ -262,6 +262,8 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
         CALL GCB_SETL('POLY_FLAG',.FALSE.,STATUS)
         CALL GCB_SETL('POINT_FLAG',.FALSE.,STATUS)
 
+        CALL GCB_CACHE(I_CACHE_1D,STATUS)
+
         IF (PLOT) THEN
           CALL GDV_CLEAR(STATUS)
           CALL IMG_PLOT(STATUS)
@@ -272,9 +274,7 @@ c     :                        ABS(I_YSCALE*COS(ANGLE)))
           I_CLEAR=.FALSE.
         ELSE
 *  if not plotting then resynchronise GCBs
-          I_DISP_1D=.TRUE.
           CALL IMG_2DGCB(STATUS)
-          I_DISP_1D=.FALSE.
         ENDIF
 
 
