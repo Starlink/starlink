@@ -8,25 +8,21 @@ bin_MONOLITHS = figaro5
 figaro5_SOURCES = figaro5.f \
                   $(figaro5_TASKS:=.f)
 
-figaro5_TASKS = arc2d cadd comb cscan cube2long fibdisp himage	    \
-longslit arcsdi changed crigauss csub fib2cube fibsep fitcont iscan \
-vig
+figaro5_TASKS = \
+arc2d arcsdi cadd changed comb crigauss cscan csub cube2long fib2cube \
+fibdisp fibsep fitcont himage iscan longslit vig
 
-
-figaro5_LDADD = \
+figaro5_LDADD = $(LDADD) \
 ../main/libmain.la \
 ../opt/libopt.la \
 ../twoutil/libtwoutil.la \
 ../graph/libgraph.la \
-../par/libfigpar.la \
-../fibre/libfibre.la \
-../fda/libfda.la \
-../fig/libfig.la \
-../gen/libgen.la \
 ../unix/libunix.la \
+../fda/libfda.la \
+../dta/libdta.la \
+../fibre/libfibre.la \
+../fig/libfig.la \
+../par/libfigpar.la \
+../gen/libgen.la \
 ../ich/libich.la \
-$(EXTERNAL_LIBS)
-
-
-EXTERNAL_LIBS = `pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
-         `fio_link_adam`
+`pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
