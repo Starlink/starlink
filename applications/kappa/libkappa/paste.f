@@ -105,6 +105,8 @@
 *        Original version.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     22-JUN-2004 (DSB):
+*        Correct bounds matching logic for CONFINE=YES case.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -239,14 +241,15 @@
 *  Match the bounds of the input NDFs.  If the output NDF's bounds are
 *  confined to be within the principal NDF's, we first match bounds by
 *  trimming the second and later NDFs with those of the principal NDF.
-*  First the principal NDF identifier must be cloned, so the original
-*  NDF may be propagated to form the output NDF.
+*  The principal NDF identifier must be cloned each time because the call
+*  to NDF_MBND will modify its bounds.
       IF ( CONFIN ) THEN
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL NDF_CLONE( NDFI( 1 ), NDFIP, STATUS )
             DO I = 2, NUMNDF
                CALL ERR_MARK
+               CALL NDF_CLONE( NDFI( 1 ), NDFIP, STATUS )
                CALL NDF_MBND( 'TRIM', NDFIP, NDFI( I ), STATUS )
+               CALL NDF_ANNUL( NDFIP, STATUS )
 
 *  Watch for the special case where the NDF is not within the bounds of
 *  the output, and so cannot be pasted.  This is done by starting a new
@@ -260,9 +263,6 @@
                END IF
                CALL ERR_RLSE
             END DO
-
-*  The clone is no longer required so dispense with it.
-            CALL NDF_ANNUL( NDFIP, STATUS )
          END IF
 
 *  Clone then pad all the input NDFs.  Cloning is required so that
