@@ -6,7 +6,7 @@ dnl      Research Councils (`CCLRC').
 AC_REVISION($Revision$)
 
 dnl  package name, version, and bug-report address
-AC_INIT(autoastrom, 0.5-10, [norman@astro.gla.ac.uk])
+AC_INIT(autoastrom, 0.5-11, [norman@astro.gla.ac.uk])
 
 dnl  config.* and install-sh are in config/
 AC_CONFIG_AUX_DIR(config)
