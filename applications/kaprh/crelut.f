@@ -172,9 +172,9 @@
 *        palette colour.  The pens must lie in the range zero to the
 *        maximum number of available pens.
 *     PTITLE = LITERAL (Read)
-*        Title for the output palette NDF. ["KAPPA - Crelut"]
+*        Title for the output palette NDF. ["KAPRH - Crelut"]
 *     TITLE = LITERAL (Read)
-*        Title for the output lookup table NDF. ["KAPPA - Crelut"]
+*        Title for the output lookup table NDF. ["KAPRH - Crelut"]
 *     VALRANGE() = _DOUBLE (Read)
 *        The range of data values in the histogram/image which is to
 *        be allocated a set of colours from the palette, and hence be
@@ -753,7 +753,7 @@
 
 *    Store this zone in the graphics database.
 
-      CALL AGS_SZONE( 'FRAME', 'KAPPA_CRELUT', PICID2, STATUS )
+      CALL AGS_SZONE( 'FRAME', 'KAPRH_CRELUT', PICID2, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CRELUT_DBSF',
@@ -1505,7 +1505,7 @@
 *       Record the data picture in the database.
 *       ========================================
 
-         CALL KPG1_SDTRN( 'KAPPA_CRELUT_Picture', NDF, PICID3,
+         CALL KPG1_SDTRN( 'KAPRH_CRELUT_Picture', NDF, PICID3,
      :                    STATUS )
 
 *       Record for messages the type of the plot.
@@ -1678,7 +1678,7 @@
 
 *    Store the information in the database.
 
-      CALL AGS_SZONE( 'FRAME', 'KAPPA_CRELUT_'//DATTYP, PICIDH, STATUS )
+      CALL AGS_SZONE( 'FRAME', 'KAPRH_CRELUT_'//DATTYP, PICIDH, STATUS )
 
 *    Get AUTOGRAPH to use the SGS zone.
 
@@ -1775,7 +1775,7 @@
 *    Store the ramp or histogram picture in the database.
 *    ====================================================
 
-      CALL AGS_SZONE( 'DATA', 'KAPPA_CRELUT_'//DATTYP, PICID4, STATUS )
+      CALL AGS_SZONE( 'DATA', 'KAPRH_CRELUT_'//DATTYP, PICID4, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETC( 'DATTYP', DATTYP )

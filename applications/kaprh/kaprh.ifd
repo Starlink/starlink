@@ -7,7 +7,7 @@ package kaprh {
       action crelut {
          alias {crel(ut)}
 
-         helplib {$KAPPA_HELP}
+         helplib {$KAPRH_HELP}
 
          parameter colour {
             size *
@@ -152,7 +152,7 @@ package kaprh {
             vpath DEFAULT
             prompt {Title for the palette}
             helpkey *
-            default {Kappa - Crelut}
+            default {Kaprh - Crelut}
           }
 
          parameter title {
@@ -160,7 +160,7 @@ package kaprh {
             vpath DEFAULT
             prompt {Title for the lookup table}
             helpkey *
-            default {Kappa - Crelut}
+            default {Kaprh - Crelut}
           }
 
          parameter valrange {
@@ -602,7 +602,7 @@ package kaprh {
       action inspect {
          alias {insp(ect)}
 
-         helplib {$KAPPA_HELP}
+         helplib {$KAPRH_HELP}
 
          parameter abslab {
             type LITERAL
@@ -662,7 +662,7 @@ package kaprh {
             vpath DEFAULT
             ppath DEFAULT
             prompt {Title for histogram}
-            default {Kappa - Inspect_Histogram}
+            default {Kaprh - Inspect_Histogram}
           }
 
          parameter in {
@@ -826,7 +826,7 @@ package kaprh {
             vpath DEFAULT
             ppath DEFAULT
             prompt {Title for slice}
-            default {Kappa - Inspect_Slice}
+            default {Kaprh - Inspect_Slice}
           }
 
          parameter thick {
@@ -842,7 +842,7 @@ package kaprh {
             vpath DEFAULT
             ppath DEFAULT
             prompt {Title for the region}
-            default {Kappa - Inspect}
+            default {Kaprh - Inspect}
           }
 
          parameter ubound {
@@ -894,7 +894,7 @@ package kaprh {
             ppath DEFAULT
             prompt {Title for ASCII file}
             helpkey *
-            default {# Kappa - Inspect_XYcur}
+            default {# Kaprh - Inspect_XYcur}
           }
 
          parameter ylog {
@@ -1163,7 +1163,7 @@ iraf! {
             type _CHAR
             vpath DEFAULT
             prompt {Title for output image}
-            default {KAPPA - Mosaic}
+            default {Kaprh - Mosaic}
             help "Character string used as a title for the output IMAGE structure."
           }
 
@@ -1275,7 +1275,7 @@ iraf! {
             type _CHAR
             vpath DEFAULT
             prompt {Title for output image}
-            default {KAPPA - Quilt}
+            default {Kaprh - Quilt}
             help "Character string used as a title for the output IMAGE structure."
           }
 
