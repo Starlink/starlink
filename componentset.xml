@@ -779,4 +779,74 @@
   <documentation> sun67</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
 </component>
+
+<component id="autoconf">
+  <version>2.59</version>
+  <path>thirdparty/fsf/autoconf</path>
+  <description>GNU autoconf</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of autoconf has been patched to include
+      Fortran preprocessor support.  Those patches were submitted
+      to autoconf-patches@gnu.org in January 2004, and were being
+      examined after that.</p></notes>
+</component>
+
+<component id="automake">
+  <version>1.8.2-starlink</version>
+  <path>thirdparty/fsf/automake</path>
+  <description>GNU automake, patched</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build>autoconf libtool</build>
+  </dependencies>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of automake has been patched to include
+      Fortran preprocessor support, and a variety of Starlink-specific
+      targets.  The Fortran patches were submitted
+      to automake-patches@gnu.org in January 2004, and were being
+      examined after that.</p></notes>
+</component>
+
+<component id="libtool">
+  <version>1.5</version>
+  <path>thirdparty/fsf/libtool</path>
+  <description>GNU libtool</description>
+  <!-- <abstract><p></p></abstract> -->
+  <dependencies>
+    <build></build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <!-- Cast of thousands, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <notes><p>This version of libtool is unpatched -- just the standard
+      version.</p></notes>
+</component>
 </componentset>

@@ -3,36 +3,38 @@
 # define the variable MANIFEST to point to the directory which
 # contains the collection of manifest files, typically /star/manifests
 
-
-
 $(MANIFEST)/messgen: 
-	cd applications/messgen && make>make.log && make install-manifest>>make.log
+	cd applications/messgen \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/starconf: 
-
-	cd buildsupport/starconf && make>make.log && make install-manifest>>make.log
-
+	cd buildsupport/starconf \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/chr:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/cnf
-	cd libraries/chr && make>make.log && make install-manifest>>make.log
+	cd libraries/chr \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/cnf: 
-	cd libraries/cnf && make>make.log && make install-manifest>>make.log
+	cd libraries/cnf \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/ems:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/messgen
-	cd libraries/ems && make>make.log && make install-manifest>>make.log
+	cd libraries/ems \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/fio:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/par \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/messgen
-	cd libraries/fio && make>make.log && make install-manifest>>make.log
+	cd libraries/fio \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/hds:  \
 		$(MANIFEST)/sae \
@@ -41,7 +43,8 @@ $(MANIFEST)/hds:  \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/messgen
-	cd libraries/hds && make>make.log && make install-manifest>>make.log
+	cd libraries/hds \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/mers:  \
 		$(MANIFEST)/ems \
@@ -51,7 +54,8 @@ $(MANIFEST)/mers:  \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messgen
-	cd libraries/mers && make>make.log && make install-manifest>>make.log
+	cd libraries/mers \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/par:  \
 		$(MANIFEST)/cnf \
@@ -72,19 +76,22 @@ $(MANIFEST)/par:  \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/messgen
-	cd libraries/par && make>make.log && make install-manifest>>make.log
+	cd libraries/par \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/adam:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/ams
-	cd libraries/pcs/adam && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/adam \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/lex:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/lex && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/lex \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/pcs:  \
 		$(MANIFEST)/adam \
@@ -138,12 +145,14 @@ $(MANIFEST)/pcs:  \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
-	cd libraries/pcs && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/messys:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/messys && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/messys \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/subpar:  \
 		$(MANIFEST)/sae \
@@ -165,7 +174,8 @@ $(MANIFEST)/subpar:  \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/subpar && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/subpar \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/ams:  \
 		$(MANIFEST)/sae \
@@ -189,7 +199,8 @@ $(MANIFEST)/ams:  \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/mers
-	cd libraries/pcs/ams && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/ams \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/dtask:  \
 		$(MANIFEST)/sae \
@@ -216,7 +227,8 @@ $(MANIFEST)/dtask:  \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/dtask && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/dtask \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/adamnet:  \
 		$(MANIFEST)/sae \
@@ -233,21 +245,25 @@ $(MANIFEST)/adamnet:  \
 		$(MANIFEST)/msp \
 		$(MANIFEST)/sock \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/adamnet && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/adamnet \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/hdspar:  \
 		$(MANIFEST)/sae
-	cd libraries/pcs/hdspar && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/hdspar \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/misc:  \
 		$(MANIFEST)/cnf
-	cd libraries/pcs/misc && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/misc \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/msp:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sock \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/msp && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/msp \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/parsecon:  \
 		$(MANIFEST)/sae \
@@ -273,12 +289,14 @@ $(MANIFEST)/parsecon:  \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/parsecon && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/parsecon \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sock:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/sock && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/sock \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/task:  \
 		$(MANIFEST)/sae \
@@ -311,30 +329,52 @@ $(MANIFEST)/task:  \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/task && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/task \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/string:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/chr
-	cd libraries/pcs/string && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/string \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/atimer:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/messgen
-	cd libraries/pcs/atimer && make>make.log && make install-manifest>>make.log
+	cd libraries/pcs/atimer \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sae:  \
 		$(MANIFEST)/messgen
-	cd libraries/sae && make>make.log && make install-manifest>>make.log
+	cd libraries/sae \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/psx:  \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/messgen
-	cd libraries/psx && make>make.log && make install-manifest>>make.log
+	cd libraries/psx \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/hlp: 
-	cd libraries/hlp && make>make.log && make install-manifest>>make.log
+	cd libraries/hlp \
+		&& make>make.log && make install-manifest>>make.log
 
 $(MANIFEST)/sla: 
-	cd libraries/sla && make>make.log && make install-manifest>>make.log
+	cd libraries/sla \
+		&& make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/autoconf: 
+	cd thirdparty/fsf/autoconf \
+		&& make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/automake:  \
+		$(MANIFEST)/autoconf \
+		$(MANIFEST)/libtool
+	cd thirdparty/fsf/automake \
+		&& make>make.log && make install-manifest>>make.log
+
+$(MANIFEST)/libtool: 
+	cd thirdparty/fsf/libtool \
+		&& make>make.log && make install-manifest>>make.log
+

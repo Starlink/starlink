@@ -1,20 +1,66 @@
 # Process this file with autoconf to generate the Makefile
 # @configure_input@
 
-# TOP_LEVEL_TARGETS is the list of targets built by default
-# Trivial at the moment
-TOP_LEVEL_TARGETS=sst
+# Keep the following in alphabetical order
+ALL_TARGETS = \
+	$(MANIFEST)/adam \
+	$(MANIFEST)/ams \
+	$(MANIFEST)/atimer \
+	$(MANIFEST)/chr \
+	$(MANIFEST)/cnf \
+	$(MANIFEST)/dtask \
+	$(MANIFEST)/ems \
+	$(MANIFEST)/fio \
+	$(MANIFEST)/hds \
+	$(MANIFEST)/hdspar \
+	$(MANIFEST)/hlp \
+	$(MANIFEST)/lex \
+	$(MANIFEST)/mers \
+	$(MANIFEST)/messgen \
+	$(MANIFEST)/messys \
+	$(MANIFEST)/misc \
+	$(MANIFEST)/msp \
+	$(MANIFEST)/par \
+	$(MANIFEST)/parsecon \
+	$(MANIFEST)/pcs \
+	$(MANIFEST)/psx \
+	$(MANIFEST)/sae \
+	$(MANIFEST)/sla \
+	$(MANIFEST)/sock \
+	$(MANIFEST)/starconf \
+	$(MANIFEST)/string \
+	$(MANIFEST)/subpar \
+	$(MANIFEST)/task
 
-## prefix=@prefix@
+# Targets which are used when bootstrapping.
+# Keep these in alphabetical order.
+BUILDSUPPORT_TARGETS = \
+	$(MANIFEST)/autoconf \
+	$(MANIFEST)/automake \
+	$(MANIFEST)/libtool \
+	$(MANIFEST)/starconf
+
+SUBDIRS = @subdirs@
+@SET_MAKE@
+
+RECURSIVE_TARGETS = clean maintainer-clean
+
+# Targets present in tree, but excluded from list
+#   adamnet -- obsolete
+
 
 # Java support: need a java runtime
 JAVA=@JAVA@
 
-# MANIFEST must match the value defaulted in starconf
-# XXX tie these together in future?
+# MANIFEST and prefix must match the value defaulted in starconf.
+# FIXME: tie these together, and link with starconf values.
+prefix=@prefix@
 MANIFEST=$(prefix)/manifests
 
-all: $(TOP_LEVEL_TARGETS)
+
+
+all: $(ALL_TARGETS)
+buildsupport: $(BUILDSUPPORT_TARGETS)
 
 # FIXME: this depends on the xt jar being handy; either check this in or,
 # better, write a 10-line Java application under buildsupport to replace it,
@@ -36,3 +82,7 @@ componentset.xml:
 # which holds the manifest files, typically /star/manifests
 include Makefile.dependencies
 
+$(RECURSIVE_TARGETS):
+	for d in $(SUBDIRS); do \
+	    (cd $$d; $(MAKE) $@); \
+	done
