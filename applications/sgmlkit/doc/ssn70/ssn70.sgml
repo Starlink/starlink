@@ -10,10 +10,12 @@
 	-- Star2HTML -->
   <!entity sgmlsystem.eps system 'SGMLsystem.eps' ndata eps>
   <!entity sgmlsystem.gif system 'SGMLsystem.gif' ndata gif87a>
-  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.2.sgmltext'>
+  <!entity starlinkdtddoc system '../dtd2sgml/starlink-0.3.sgmltext'>
   <!entity programcodedtddoc system '../dtd2sgml/programcode-0.2.sgmltext'>
   <!entity % Feature.Routinelist 'include'>
-  <!entity rsqbrack ']'>
+  <!entity rsqbrack ']'	-- needed in order to describe marked sections -->
+  <!entity ddash '--'	-- so I can use this in CODE els without it
+			   being recognised as a shortref -->
   <!-- DSSSL source code -->
   <!entity dsssl.lib
 	system "../../dsssl/sl/lib/sllib.dsl" subdoc>
@@ -32,7 +34,7 @@
 
 <title>The Starlink SGML system
 <author email='norman@astro.gla.ac.uk'
-	webpage='http://www.astro.gla.ac.uk/users/norman'
+	webpage='http://www.astro.gla.ac.uk/users/norman/'
 	affiliation='University of Glasgow'
 	id=ng
 	>Norman Gray
@@ -650,6 +652,18 @@ readability, can get you into terrible messes, and is part of the
 `parser hell' which XML was designed to avoid.  I mention it purely
 for completeness.</note>
 
+<p><update versionid="post-0.2" author="ng">Added note to the effect that
+attribute names can be minimised when the value is from a set</update>
+In certain cases, attributes may have only one of a limited set of
+values.  In this case, specifying one of these values is enough to
+indicate which attribute you are referring to.  For example, the <ref
+id=el.sun.figure text='figure'> element has a `float' attribute, which
+can take either of the values `float' or `nofloat'.  You might
+normally specify it as <code>&lt;figure float="nofloat"></code>, but
+since the attribute values come from a limited set, this can be
+abbreviated to <code>&lt;figure nofloat></code>.  The same is true of
+the `export' attribute associated with exported IDs.
+
 <p>SGML also has single-character entity references.  The character
 <code><![cdata[~]]></code> in normal text turns into the entity
 <code/&amp;nbsp;/, and <code><![cdata[--]]></code> (two hyphens) turns
@@ -799,6 +813,12 @@ that the discussion there is intended to provide an overview of the
 possibilities provided by the group, and it does not necessarily
 describe all of the functionality available; see the individual
 element listings for further details.
+
+<p>Remember that the markup of your document is quite distinct from
+its processing, so that not all elements and attributes will
+necessarily have a detectable effect on the output (ie, formatted)
+document you produce.  Nonetheless, you should future-proof your
+document by including as much element and attribute detail as you can.
 
 <table id=table.elements float>
 <caption>
@@ -1283,10 +1303,14 @@ for other documents (see also <docxref doc=sun188
 loc=establishing_cross_references>), most of the Starlink document
 types enforce a `link policy' (see the `EnforceLinkPolicy' feature in
 <ref id=str.structure>), requiring that <em/all/ sect and subsect
-elements have both the `id' and `export' attributes present.  The
-`export' attribute is both an indication to the processing system
-that it may link to this element, and a warning to future maintainers
-of this document that they should not delete or change this ID.
+elements (at least) have both the `id' and `export' attributes
+present.  Note that the export attribute must be explicitly present --
+it is not automatically inserted or assumed -- even though it is
+redundant when it is mandatory.  The `export' attribute is thus both
+an indication to the processing system that it may link to this
+element from outside, and an explicit warning to future
+maintainers of the document that they should not delete or change this
+ID.
 
 <p>The <ref id=el.sun.webref text='webref'> and <ref id=el.sun.url
 text='url'> elements are straightforward: they both refer to a
@@ -2675,27 +2699,381 @@ See <ref id=doccode.languages> for details.
 &programcodedtddoc;
 
 <sect id=appx.system export>The Starlink SGML system for maintainers
+<update versionid="post-0.2">Added the HTX section</update>
 
 <p>This section is a reference for maintainers of the Starlink SGML
 system
 
-<p>Supporting software: in .../sgml/lib (inc BibTeX style).
+<subsect id=appx.system.sgml export>SGML arcana
 
-<p>Document summaries, including makefile target
+<subsubsect id=appx.system.sgmldoc export>The SGML status of this project
 
-<p>Documentation system is standard in SGML and HyTime terms (apart
-from the `SQL query...' bit in the definition of docxref).  The
-processing system uses <webref
-url="http://www.oasis-open.org/cover/dsssl.html" >DSSSL</webref>,
+<p>This is an SGML application, ISO/IEC 8879:1986, blah.  Same for HyTime.
+<!-- FIXME find the appropriate incantations here -->
+
+<p>The system is standard in SGML and HyTime terms (apart from the
+unresolved `<code>SQL query...</code>' in the definition of docxref).
+The processing system uses DSSSL (see <ref id=appx.system.dsssl>),
 which is a standard, but generates HTML using DSSSL extensions
 specific to Jade, and generates LaTeX using DSSSL extensions specific
-to a version of Jade using my patch.  Include the `This is an
-SGML/HyTime application...' declaration somewhere -- here?
+to a version of Jade using my patch.
 
-<p><ref id=appx.dssslcode> include a selection of the more important
+<subsubsect id=appx.system.hytime export>HyTime, architectures and groves
+
+<p>As noted above, in <ref id=appx.system.sgmldoc>, this DTD is an
+application of the HyTime standard.
+
+<p>The HyTime standard <citation/iso10744/ specifies three things,
+which are distinct, but easily confused (the standards document is not
+an easy read -- not because it is unclear, but because it is so very
+abstract; there are unfortunately few accessible alternatives).  It
+defines a standard processing model for SGML documents in terms of the
+`grove'; it extends the SGML standard by introducing the notion of
+`architectures'; and it specifies a particular architecture -- the
+HyTime architecture -- for abstracting the semantics of document
+links.
+
+<!-- FIXME refine this description of  HyTime -->
+
+<p>A `grove' is an acyclic directed labelled graph (I think!) --
+alternatively defined, even in the HyTime standard, as `a bunch of
+trees and other stuff' -- which is the data structure into which an
+SGML document is nominally transformed, and with respect to which the
+semantics of SGML standards (SGML itself, HyTime, DSSSL and others) are
+now formally defined.  DSSSL is designed to be able to query the grove
+straightforwardly and efficiently, but unless you are maintaining the
+more recondite parts of the DSSSL sources, which query a few grove
+properties directly, you will not need to be aware of anything more
+than the grove's formal existence.
+
+<p>An `architecture' is a skeleton DTD (the HyTime first edition name
+for it was `meta-DTD').  An individual DTD may declare itself to be a
+`client' of the architecture by asserting the fact, and defining (or
+allowing to be defaulted) a mapping between the element forms it
+defines, and those defined in the architecture (the architectural
+elements are referred to as `architectural forms' in that context).
+For example, the Starlink General DTD declares itself to be a client
+of the DocumentSummary DTD (which is easy, because the elements
+defined in the latter are a subset of the elements defined in the
+former), and the DSSSL programcode DTD declares itself to be a client
+of the DSSSL architecture, with suitable remappings of element and
+attribute names (see <ref id=doccode.dsssl> for discussion, and see
+the reference cited there).  For formal details see the HyTime
+standard, particularly clause~A.3, <cite/Architectural forms
+declaration requirement/.
+
+<p>Finally, the HyTime standard defines a particular architecture --
+the so-called HyTime Architecture.  This architecture defines forms
+(ie, elements in a meta-DTD) suitable for expressing all kinds of
+linking semantics, from a simple link from one part of a document to
+another, all the way up to indirect many-to-many links between
+fragments of non-SGML media (for example sections of an image or
+passages in a piece of music).  Crucially, it defines the semantics of
+these forms formally and precisely.
+
+<p>As a consequence a DTD can declare itself
+to be a client of (some subset of) the HyTime architecture, formally associate
+elements it defines with the available architectural forms, and thus
+inherit the precise semantics and associated documentation.
+The point of this is twofold.  Firstly, it means that the DTD
+inherits the documentation of the forms it has referred to.  A reader
+of the DTD, who is familiar with HyTime, can therefore look at a
+declaration and immediately know what its intended meaning is.
+Secondly, that reader of the DTD need not be human: a `HyTime engine'
+is a processor which can interpret the HyTime forms in a document and
+process them correctly without further configuration.
+
+<p>For example,
+the Panorama SGML viewer is an application, which is also available as
+a Netscape plug-in, which will display SGML.  When it displays SGML,
+it formats it appropriately, guided by a style-sheet which expresses
+things like what font to display headings in.  It also, however, has
+built-in knowledge about the HyTime <code/clink/ element (`contextual
+link'), and knows what to do with it.  If the viewer is given a
+document and DTD which has properly declared itself as a HyTime
+client, such as the Starlink General DTD, then Panorama can format and
+follow <code>&lt;ref></code> elements (for example) immediately.
+
+<p>The <ref id=el.sun.webref text='webref'> element in the Starlink
+General DTD is declared much as follows:
+<verbatim>
+&lt;!element WEBREF - - (#pcdata)>
+&lt;!attlist WEBREF
+    url      cdata #required
+    &ddash HyTime attributes... &ddash
+    HyTime   name  #fixed clink
+    HyNames  cdata #fixed "linkend url"
+    anchcstr names #fixed "self required"
+    linktrav names #fixed "A D"
+    loctype  cdata #fixed "url QUERYLOC URL"
+    >
+</verbatim>
+Line-by-line, this says that the element is mapped to the HyTime
+`clink' element, that that element's `linkend' attribute should be
+mapped to the webref element's `url' attribute, that the direction of
+the link is from the link itself to a to a required target, that
+traversal of the link consists of arriving at it (putting a mouse over
+it and clicking, for example) and then departing from it (ie, the link
+is one-way -- the fact that a browser may add semantics to this by
+providing a back button is not part of the definition of a webref
+element, nor part of its meaning in the context of a particular
+document), and finally that the content of the `url' attribute is a
+query in a predefined notation referred to as `URL'.  A HyTime
+processor therefore transforms the element <code>&lt;webref
+url="http://www.hytime.org">Hello&lt;/webref></code> into
+<code>&lt;clink linkend="http://www.hytime.org" linktrav="A D"
+loctype="url QUERYLOC URL">&lt;/clink></code>.
+<!-- FIXME: is this right, or should it be loctype="linkend queryloc url"?-->
+
+<p>If you're curious, you can obtain the HyTime view of a document
+with the command <kbd/sgmlnorm -A hytime ssn70.sgml/.
+
+<p>The linking elements in the Starlink General DTD have been defined
+in terms of HyTime.  This is partly for documentation purposes, partly
+for completeness, but mostly so that the groundwork will have been
+done when there is an opportunity to use a HyTime-aware application
+such as Panorama.  I will claim this as a full implementation,
+however: I have no access to a HyTime engine, and so I cannot test
+that the HyTime declarations here are in fact correct.
+
+<p>See <ref id=appx.system.online> for online resources.
+
+<subsect id=appx.system.software export>Supporting software
+
+<p>As well as the specifically SGML materials in this distribution --
+that is, the DTDs and associated DSSSL stylesheets -- there is some
+auxiliary software.  This is located in <code
+fspath>$STARLINK_SGML_DIR/lib</code>. 
+
+<dl>
+<dt><code/Makefile.common/
+<dd>A common makefile, intended to be included by the makefiles
+associated with individual documents.  It is described in more detail
+in <ref id=proc.makefile>.
+
+<dt><code/abstract-star2html.pl/
+<dd>A Perl script which does a simple but robust parse of &latex;
+files suitable for the Star2HTML system, generating DocumentSummary
+documents.  See <ref id=appx.system.summaries>.
+
+<dt><code/img-eqlist.pl/
+<dd>This post-processes the file produced by the <code/img.maths/ mode
+of <code fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slmaths.dsl</code>.
+It produces two files, based on the filename root of the argument.
+The SGML one conforms to a very simple DTD (with system id
+<code/img-eqlist/) which maps equation labels to filenames, the the &latex;
+one consists of a &latex; document with one equation per page.  The
+latter should be processed by &latex; plus whatever dvi to gif magic
+you need, making sure that the resulting GIF filenames match those
+in the img-eqlist document.  See the file header for further
+documentation.
+
+<dt><code/plainhtml.bst/ and <code/plainlatex.bst/
+<dd>These are Bib&tex; style files used by the Bib&tex; step in the
+common makefile.
+
+<dt><code/postprocess-bbl.sed/
+<dd>This postprocesses the bibliography file produced by
+<code/plainhtml.bst/, rejoining the long lines which Bib&tex;
+erroneously splits.
+
+<dt><code/pstopnm-s/
+<dd>Used by the common makefile, to translate a postscript file to one
+or more Portable Anymap files.  It is generally available, but this
+version was modified by me to include an extra resolution option.
+
+</dl>
+
+<p><ref id=appx.system.dssslcode> include a selection of the more important
 DSSSL code modules.
 
-<subsect id=appx.dssslcode export>The DSSSL source code
+<subsect id=appx.system.summaries export>Document summaries
+
+<p>When referring to an external Starlink document via a <ref
+id=el.sun.docxref text='docxref'> element, the processing system must
+generate both the link text and, in the case of the HTML stylesheet,
+the URL which is the link target.  It does this by processing the
+document referred to by the element's `doc' attribute.  This document
+must be marked up using the `document summary' DTD,
+<code>"-//Starlink//DTD Document Summary 0.1//EN"</code>.
+
+<p>The Document Summary DTD has the same general structure as the
+Starlink General one, but the only text in it is the abstract
+(possibly) and the content of the various section headings.  The
+system uses the structure expressed in here, to work out the section
+number which will be given to the link text.
+The DTD has attributes to control a `link policy' (whether we may link
+to all elements, or only those with the export attribute present), and
+exercise some control over the URLs which will be used in HTML
+targets, if these are not to be generated using the same algorithm
+used for the main document.  There is more flexibility in the Document
+Summary DTD than is used at present.  The DTD is well-commented, and
+you should refer to it for further details.
+
+<p>The installation procedure generates document summaries for all the
+Starlink documents it can find, using the script
+<code fspath>$STARLINK_SGML_DIR/lib/abstract-star2html.pl</code> to scan
+documents marked up ready for processing by Star2HTML.  This script
+does not currently do a very neat job -- it's primarily designed to be
+robust enough to be used in an unattended installation procedure, so its
+&latex; parsing is somewhat simpleminded.  As noted in <ref
+id=appx.system.htx>, the installation makefile invokes this script in
+a precise way, to make generated HTML output conform to the
+requirements of HTX.
+
+<p>Since the Starlink General DTD declares itself as a client of the
+Document Summary DTD (see <ref id=appx.system.hytime> for a discussion
+of architectures), the processing of cross-referenced documents could
+be done by having the `doc' attribute point to the main SGML source of
+the target document and extracting the DocumentSummary architectural
+instance.  DSSSL's <code/(sgml-parse)/ function does not, however,
+support the extraction of architectural instances.  There is a Jade
+patch at <webref url='http://www.isogen.com' >Isogen</webref> which
+adds this as a Jade extension, but this has not (yet) been
+incorporated into the Starlink version of Jade which accompanies this
+system.  Note, however, that this is almost entirely an implementation
+issue: if this feature were to be added to Jade, as it might be if it
+conforms to any updated DSSSL standard which includes this feature,
+the only changes necessary would be a possible adjustment of that
+element's HyTime declaration, some adjustment of the call of the
+relevant <code/(sgml-parse)/ function, and corresponding changes in
+the package's installation script so that the document summary
+catalogue points to the original documents rather than a
+freshly-generated set of summaries.  There would be no need for
+documentation updates, since there would be no user-visible changes.
+It is possible to extract the DocumentSummary architectural instance
+by hand, using the command <kbd>sgmlnorm -A documentsummary
+ssn70.sgml</kbd> for example.
+
+<subsect id=appx.system.htx export>Cross-references, installing
+documents, and the interaction with HTX
+
+<p>The system generates cross-references to other Starlink documents
+without further editing.  It does not test that the HTML target
+exists, but assumes that if the document summary files exist, then the
+HTML targets exist, or will exist by the time the output documentation
+is installed.  An alternative system would have the link targets refer
+to a live document server, so that the targets would be resolved when
+they are referenced, rather than when the document is processed.  This
+would, however, be unnecessarily complicated for a first version of
+the system, as well as going beyond the current, and adequate, HTX
+model.
+
+<p>The current system uses Star2html and HTX.  Star2html (see <docxref
+doc=sun199>) generates a distributable document set with correct
+internal cross-references, and `best guess', but possibly broken,
+external ones.  These references are then patched up in a separate
+installation phase, being edited by a copy of HTX primed with
+appropriate local knowledge (see <docxref doc=sun188
+loc=how_linking_works>).
+
+<p>The aim of the current system is to produce documents which are in
+their final form, and can be moved to their final location without
+further editing -- this assumes that documents are distributed in
+(SGML) source form and processed at installation time, and that the
+SGML system is the only system producing documentation.  This aim has
+been achieved in the current version, but could benefit from more
+convenient parameterisation.
+
+<p>Since HTX is likely to remain in use for the forseeable future, 
+the current system is intended to be used with HTX, and is claimed
+to be compatible with it.  It produces links in the format recognised
+by HTX, as described (or defined?) in <docxref doc=sun188
+loc=referring_to_targets>.  Note two points, however.  
+
+<ul>
+<li>The generated
+document set is compatible as <em/input/ to HTX, and does not attempt
+to emulate it to the extent of generating HTX index, catalogue and log
+files.  This would not, however, be terribly difficult, and might
+appear in a future version of this system.  There is therefore at
+least a potential interaction between the development of the two
+systems, and if you are involved in the development of either, some
+liason would be useful.
+
+<li>The compatibility is assured by cooperation between several
+disjoint processing steps.  The DSSSL style sheets generate
+appropriate internal labels, and the HTML parameters style sheet
+contains a variable which sets the `document server' which is used
+when generating URLs.  The document-summary DTD (see <ref
+id=appx.system.summaries>) includes a <code/urlpath/ attribute in its
+section and label elements which specifies the tail of the URL where a
+particular section lives, relative to an (unspecified) document
+server.  The <code/abstract-star2html.pl/ script includes a
+<code/&ddash;prefix/ option to control the start of this attribute,
+and this option is used when this script is invoked during the
+installation stage of the package makefile, so that the <code/urlpath/
+attribute starts with the string <code>sunNNN.htx/</code> (as
+appropriate), ready to be recognised by HTX.  This separation may seem
+complicated, but it separates, as much as possible, features which are
+internal to the system (internal labels and generated HTML filenames)
+from features which are properly external (URL paths and locations in
+a filesystem), using the document-summary files and the script used to
+generate them as the interface.
+
+</ul>
+
+<subsect id=appx.system.dsssl export>DSSSL
+
+<p>The SGML processing part of this package is implemented in DSSSL,
+which is a standard <citation/iso10179/ for device independent
+formatting of SGML documents.  DSSSL includes both a style language
+and a (DTD to DTD) transformation language.  
+
+<p>I have used James Clark's <webref
+url="http://www.jclark.com/jade/" >Jade</webref>
+implementation of DSSSL.  This implements the style language, but not
+the transformation language.<note>Although I believe Clark was involved with
+the specification of the DSSSL standard, he has said (on the <webref
+url="http://www.mulberrytech.com/dsssl/dssslist/" >DSSSList
+discussion list</webref>, May 1999) that the transformation
+language has significant weaknesses.</note>  Jade has back-ends which
+generate RTF, MIF and rather odd &tex; requiring a specialised
+&tex; format.  Clark added an SGML-transformation back-end, as a Jade
+extension of the standard, which uses non-standard flow-object
+constructors to specify SGML elements, entities and the like.  In
+addition, I added a back-end which generates &latex;.
+
+<p>It follows that the stylesheets which implement this Starlink
+package are not standards-conforming, and are specific to Jade.  This
+needs a little justification.
+
+<ul>
+<li>There are not too many alternative ways of producing HTML.  Perl
+is a contender, since the <code/SGMLSpm/ package (see <webref
+url='http://www.cpan.org' >CPAN</webref>) can parse the output of
+<code/nsgmls/.  This is perfectly legitimate, but I know from
+experience that it can become rather messy.<note>It's a matter of
+taste whether you prefer Perl or DSSSL.  DSSSL, based on Scheme Lisp,
+is undeniably odd, but I've grown to rather like it.  A language with
+no assignments, no loops, no real sequences of actions, and where
+absolutely everything is a function, has a certain rather twisted
+glamour to it, like a nature programme about fish-life four miles down
+the Marianas Trench.</note>
+
+<li>DSSSL has very good access to the SGML grove, and processes the
+document in a generally `SGML-ish' way.  This feels like keeping
+things in the family, as it were, even if the non-standard back-ends
+have something of the wicked stepmother about them.
+
+<li>One alternative is through XML and XSLT, but this would require
+doing the work to transform the document from SGML to XML (which would
+lose the subdocument processing features), and using XSLT which, from
+what I've seen of it, looks like hell on earth.
+
+</ul>
+
+<p>This does not in any way affect the standards conformance of the
+rest of the SGML system -- the various DTDs and the HyTime support --
+since the processing of documents is by design completely independent
+of the standards which define their markup.
+
+<p>See <ref id=appx.system.online> for online resources.
+
+<p><ref id=appx.system.dssslcode> includes documentation for some of
+the important DSSSL stylesheets.
+
+<subsubsect id=appx.system.dssslcode>The DSSSL source code
 
 <routinelist>
 <codecollection doc="dsssl.common">
@@ -2703,12 +3081,68 @@ DSSSL code modules.
 <codecollection doc="dsssl.latex.params">
 <codecollection doc=dsssl.lib>
 
+<subsect id=appx.system.online export>Online resources
+
+<subsubsect>HyTime and architectures
+
+<p><dl>
+
+<dt><url>http://www.ornl.gov/sgml/wg4/docs/n1920/</url>
+<dd>Online materials for the HyTime standard
+
+<dt><url>http://www.hytime.org/</url>
+<dd>The HyTime users' group, including
+<url>http://www.hytime.org/papers/htguide.html</url>,
+The HyTime reader's guide
+
+<dt><url>http://www.oasis-open.org/cover/hytime.html</url>
+<dd>The HyTime pages at Oasis.
+
+<dt><url>http://www.isogen.com/papers/archintro.html</url>
+<dd>A very good tutorial introduction to SGML architectures
+
+<dt><url>http://www.cogsci.ed.ac.uk/~ht/grove.html</url>
+<dd>A picture of a grove.
+
+<dt><url>http://www.hytime.org/materials/sgmlpropset/index.html</url>
+<dd>An online, hyperlinked, version of the SGML Property Set.  This
+requires some understanding of the grove concept and the SGML property
+set, but once you have that, it's invaluable.
+
+</dl>
+
+<subsubsect>DSSSL
+
+<p><dl>
+
+<dt><url>ftp://ftp.ornl.gov/pub/sgml/WG4/DSSSL/</url>
+<dd>The DSSSL standard
+
+<dt><url>http://www.oasis-open.org/cover/dsssl.html</url>
+<dd>The DSSSL pages at the Oasis SGML site
+
+<dt><url>http://itrc.uwaterloo.ca/~papresco/dsssl/tutorial.html</url>
+<dd>Paul Prescod's excellent DSSSL tutorial
+
+<dt><url>http://www.mulberrytech.com/dsssl/</url>
+<dd>Mulberry Technologies' DSSSL pages
+
+<dt><url>http://www.mulberrytech.com/dsssl/dssslist/</url>
+<dd>The DSSSList archive
+
+<dt><url>http://www-swiss.ai.mit.edu/scheme-home.html</url>
+<dd>The home page for the programming language Scheme, which is the
+basis for the DSSSL language.  The language reference manual here is
+excellently concise.
+
+</dl>
+
 <subsect id=install export>Installation
+
+<p>How to install everything, including building Jade.
 
 <p>More here presently.  For the present, see the notes on setting up,
 in <ref id=proc.setup>.
-
-<p>How to install everything, including building Jade.
 
 <sect id=appx.releasenotes export>Release Notes
 
@@ -2716,6 +3150,4 @@ in <ref id=proc.setup>.
 
 &release.notes-0.2;
 
-<backmatter>
-<notecontents>
-<bibliography bib=ssn70>
+<backmatter bibliography=ssn70>
