@@ -84,6 +84,8 @@
 *        Nov 93: V1.7-4 Complete rebuild and new features (RJV)
 *     19 Mar 94: V1.7-5 Model component plot (RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     24 Apr 95 : V1.8-1 Updated input and model data interfaces (DJA)
+*
 *    Type definitions :
 	IMPLICIT NONE
 *    Global constants :
@@ -106,7 +108,6 @@
 	RECORD /MODEL_SPEC/ MODEL	! Model specification
 	RECORD /MODEL_SPEC/ TMODEL	! Model specification
 
-	CHARACTER*(DAT__SZLOC) ILOC	! Locator to input data (or ref object)
 	CHARACTER*(DAT__SZLOC) OLOC	! Locator to output multiple dataset
 	CHARACTER*(DAT__SZLOC) QLOC	! Locator to quality array
 	CHARACTER*(DAT__SZLOC) SLOC	! Locator to slice
@@ -125,6 +126,7 @@
 
         INTEGER NGOOD
         INTEGER SSCALE
+        INTEGER			IFID			! Input dataset id
         INTEGER			MFID			! Model spec dataset id
 
 	INTEGER N			! Dataset index
@@ -164,7 +166,7 @@
         REAL EWID			! channel width for model plot
 *    Version :
 	CHARACTER*30 VERSION
-	PARAMETER		(VERSION='SPLOT Version 1.8-0')
+	PARAMETER		(VERSION='SPLOT Version 1.8-1')
 *-
 
 * Announce version
@@ -189,8 +191,8 @@
         ELSE
 
 * Get observed data and response
-          CALL USI_ASSOCI('INP','READ',ILOC,IPRIM,STATUS)
-          CALL FIT_DATINGET(ILOC,'SPEC',1,.FALSE.,.FALSE.,NDS,OBDAT,
+          CALL USI_TASSOCI('INP','*','READ',IFID,STATUS)
+          CALL FIT_GETDAT( IFID, 'SPEC',1,.FALSE.,.FALSE.,NDS,OBDAT,
      :                             NGOOD,SSCALE,PREDDAT,INSTR,STATUS)
           NDMAX=OBDAT(1).NDAT
           NFMAX=PREDDAT(1).NMDAT
