@@ -119,7 +119,8 @@
       CALL ADI_NEW0( 'TimingInfo', OARG, STATUS )
 
 *  Simple conditional copies
-      CALL ADI1_CCH2AR( HLOC, 'EXPOSURE', OARG, 'Exposure', STATUS )
+      CALL ADI1_CCH2AR( HLOC, 'EXPOSURE_TIME', OARG, 'Exposure',
+     :                  STATUS )
       CALL ADI1_CCH2AR( HLOC, 'EFF_EXPOSURE', OARG, 'EffExposure',
      :                  STATUS )
       CALL ADI1_CCH2AD( HLOC, 'BASE_TAI', OARG, 'TAIObs', STATUS )

@@ -129,7 +129,8 @@
       END IF
 
 *  Conditional copying for the rest
-      CALL ADI1_CCA2HR( TIMID, 'Exposure', HLOC, 'EXPOSURE', STATUS )
+      CALL ADI1_CCA2HR( TIMID, 'Exposure', HLOC, 'EXPOSURE_TIME',
+     :                  STATUS )
       CALL ADI1_CCA2HR( TIMID, 'EffExposure', HLOC, 'EFF_EXPOSURE',
      :                 STATUS )
       CALL ADI1_CCA2HD( TIMID, 'TAIObs', HLOC, 'BASE_TAI', STATUS )
