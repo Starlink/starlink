@@ -57,16 +57,18 @@
 
             CALL GCB_ATTACH('IMAGE',STATUS)
             CALL IMG_1DGCB(STATUS)
+
             IF (GCB) THEN
               CALL GCB_FLOAD(IFID,STATUS)
             ELSE
               CALL GCB_CLEAR(STATUS)
             ENDIF
+
+            CALL GCB_CACHE(I_CACHE_1D,STATUS)
+
 *  make sure GCB caching is synchronised
             IF (I_DISP) THEN
-              I_DISP_1D=.TRUE.
               CALL IMG_2DGCB(STATUS)
-              I_DISP_1D=.FALSE.
             ENDIF
           ENDIF
 

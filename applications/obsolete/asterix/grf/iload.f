@@ -142,6 +142,8 @@
           CALL GCB_SETL('PIX_FLAG',.TRUE.,STATUS)
         ENDIF
 
+        CALL GCB_CACHE(I_CACHE,STATUS)
+
 *  zero transformations
         CALL GTR_ZERO(STATUS)
 
