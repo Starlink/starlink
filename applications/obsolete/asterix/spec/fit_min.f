@@ -180,9 +180,9 @@ c     RECORD /PREDICTION/	PREDDAT(NDS)
                  CALL FLUSH(6)
 
 *    Genetic algorithm
-        CALL FIT_MIN4( NDS, OBDAT, INSTR, MODEL, PRGRES, NPAR,
+        CALL FIT_MIN4( NDS, IMOD, PRGRES, NPAR,
      :          LB, UB, FROZEN, SSCALE, LNDFAC, FSTAT, PREDICTOR,
-     :          PREDDAT, PARAM, PEGGED, STAT, FINISHED, FITERR,
+     :          PARAM, PEGGED, STAT, FINISHED, FITERR,
      :          MCTRL, STATUS )
 
 
