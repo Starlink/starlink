@@ -374,7 +374,7 @@ PKG_NAME = sgmlkit
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.6-1
+PKG_VERS = 0.7
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
