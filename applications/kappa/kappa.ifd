@@ -16848,6 +16848,10 @@ iraf! {
       }
    }
 
+   command fitshead {
+      obey {$STARHELP_DIR/starthelp.csh}      
+   }
+
    command picxy {
       alias {picx(y)}
       task picdef {
