@@ -138,7 +138,7 @@
       DOUBLE PRECISION A
       REAL             BREAK( 2, IRA__MXBRK )
       DOUBLE PRECISION CINC
-      INTEGER          CLOSED
+      LOGICAL          CLOSED
       DOUBLE PRECISION CSTART
       INTEGER          I
       INTEGER          IINC
