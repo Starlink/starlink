@@ -1431,8 +1431,9 @@ hds_machine.txt: hds_machine
             This doesn't set <code>CXX</code> as an environment
             variable, but sets it in a similar-looking way as one of the
             <code>./configure</code> arguments.  This way is
-            preferable to either of the above for two reasons: firstly, it does not leave the
-            variable set; secondly this way <code>./configure</code>
+            preferable to either of the above for two reasons:
+            firstly, it does not leave the 
+            variable set; secondly, this way <code>./configure</code>
             `knows' that the compiler has been overridden, so that if
             you are using a configure cache, and
             you <em>fail</em> to do this when the directory is
@@ -1486,6 +1487,14 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
               behaviour of <code>./configure</code></em>.  You should
             not have them set in your environment if you don't want
             this to happen.</p>
+
+          <p>The values you set here act as defaults in the Makefile,
+            and can be overriden at make time by giving arguments to
+            make:
+<verbatim>
+% make CFLAGS=-I/somewhere/else
+</verbatim></p>
+
         </subsubsect>
 
       </subsect>
