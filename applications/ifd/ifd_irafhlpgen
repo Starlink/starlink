@@ -1,0 +1,194 @@
+#!TCLSH
+#
+#  This script tries to generate the help files for an Starlink/IRAF
+#  package from the (Starlink) <package>.hlp file.
+#
+#  The following files are created:
+#
+#	doc/<task>.hlp
+#	<package>.gd
+#	_<package>.hd
+#	root.hd
+#	<package>.men
+#  The script takes one command line argument - the package name.
+#
+#  History:
+#      9-DEC-1996 (AJC):
+#        Assume topics start "digit space"
+#     18-DEC-1996 (AJC):
+#        Handle figaro help better i.e.
+#         Find first genuine line after topic and use as description
+#         (this often doesn't give sensible results in .men file)
+#         Strip * surrounding lines
+#     24-DEC-1996 (AJC):
+#        Don't add "task --" to descrip line in .hlp file
+#        Use . instead of [pwd] in defining $doc
+#        Trim descrip in .men file
+#     16-OCT-1997 (AJC):
+#        Truncate topic to 19 chars and replace non-alphanumerics with _
+#      5-OCT-2000 (AJC):
+#        Mods due to changes in TCLSH8.2
+
+set package [lindex $argv 0]
+
+#  Open the input help file
+
+set package_hlp [open ${package}.hlp r]
+
+#  Create the output files.
+
+set package_hd [open ${package}.hd w]
+set _package_hd [open _${package}.hd w]
+set root [open root.hd w]
+set package_men [open ${package}.men w]
+
+#  Create sub-directory.
+
+if {![file isdirectory doc]} {exec mkdir doc}
+
+#  Write the root file.
+
+puts $root "# Root help directory for $package"
+puts $root ""
+puts $root "_${package}  pkg = _${package}.hd"
+close $root
+
+#  Write the _<package>.hd file
+
+puts $_package_hd "# Help definitions for the ${package} package"
+puts $_package_hd "$package men = ${package}.men,"
+puts $_package_hd "         hlp = ..,"
+puts $_package_hd "         sys = ${package}.hlp,"
+puts $_package_hd "         pkg = ${package}.hd,"
+puts $_package_hd "         src = ${package}.cl"
+close $_package_hd
+
+#  Write the header for the <package>.hd file.
+
+puts $package_hd "#  Help directory for the ${package} package"
+puts $package_hd ""
+puts $package_hd "\$doc = \"./doc/\""
+puts $package_hd ""
+
+#  Discard lines from the input file until a level 1 help topic is found.
+
+set line {}
+while {[string range $line 0 1] != "1 "} {
+    set line [gets $package_hlp]
+    if { $line == ""} { 
+	if { [eof  $package_hlp] } {
+	    puts "Error: No level 1 help topics found - giving up"
+	    exit
+	}
+    }
+}
+
+#  Process the level 1 help topics into separate iraf .hlp files.
+
+set level 1
+while { ![eof  $package_hlp] } {
+
+#  Extract the task (or whatever) name.
+#  Substitute non-(alphanumeric,- or _) with _ and
+#   truncate it to 19 characters (a restriction in the .hlp file)
+    set task [string tolower [string range $line 2 end]]
+    regsub -all {[^a-z0-9\-_]} $task _ topic
+    if { [string length $topic] > 19 } {
+       set topic [string range $topic 0 18]
+    }
+    if { ! [string compare $task $topic] } {
+       puts $task
+    } {
+       puts "$task becomes $topic"
+    }
+    set task $topic
+
+#  Assume that the next line is a pithy description of what it does.
+#  but skip any lines of nothing but space or *
+#  Also lines starting '*      '
+    set descrip {}
+    set box 0
+    while { [regexp {^[* ]*$|(^[* ]*       )} "$descrip"] } {
+      set descrip [gets $package_hlp]
+      set box [expr ([regexp {^ *\*+ *$} $descrip ] || $box ) ]
+    }
+#  Check for no description
+    if { ![regexp {^[1-9] } $descrip] } {
+#  Strip leading and trailing * if we are in a box
+       if { $box } {
+          regsub {^ *\*} $descrip {} descrip
+          regsub {[* ]*$} $descrip {} descrip
+       }
+    } {
+       puts "WARNING: No description"
+       set line "$descrip"
+       set descrip {}       
+    }
+#  Add line for this task to the <package>.hd file.
+#  We don't have a src= entry as the source is not available.
+    puts $package_hd "$task        hlp = doc\$${task}.hlp"
+
+#  Add line for this task to the <package>.men file.
+    set blanks "               "
+    set mask [string range $blanks 0 [string length $task]]
+    regsub $mask\$ $blanks $task prefix
+    puts $package_men "$prefix - [string trim $descrip]"
+
+#  Open the task .hlp file.
+    set hlp [open doc/${task}.hlp w]
+
+#  Write the .help directive.
+    puts $hlp ".help $task Starlink $package"
+
+#  Turn off filling and justification.
+    puts $hlp ".nf"
+
+#  Write the command description.
+    puts $hlp "$descrip"
+
+#  Copy the rest of the description replacing sub-topic headers with .ih
+    while {1} {
+#     If descrip == {}, we already have the line which follows the null
+#     description.
+        if { $descrip != {} } {
+	   set line [gets $package_hlp]
+        }
+        set descrip {xxx}
+	set first [string range $line 0 1]
+	if { ![string compare $first "1 " ] || [eof $package_hlp] } {
+	    puts $hlp ".endhelp"
+	    close $hlp
+	    break
+	}
+	if { [regexp {^[2-9] } $line]
+          &&  $first <= $level+1  } {
+            set box 0
+	    set level [string range $line 0 0]
+	    puts $hlp ""
+	    puts $hlp [string range $line 2 end]
+	    puts $hlp ""
+	} {
+            if {![regexp {^ *\*[*]+ *$} $line ]} {
+               if { $box } {
+                  regsub {^ *\*} $line {} line
+                  regsub { [* ]*$} $line {} line
+               }
+               puts $hlp $line
+            } {
+#         Line is all *
+               if { $box } {
+#         Is a box bottom '*********************'
+                  set box 0
+               } {
+                  puts $hlp $line
+               }          
+            }
+	}
+    }
+}
+
+
+#  Close remaining open files.
+
+close $package_men
+close $package_hd

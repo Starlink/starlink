@@ -1,0 +1,179 @@
+#!TCLSH
+#
+# This script converts an interface definition (ifd) file to produce monolithic
+# ADAM interface (ifl) files for use when running from IRAF.
+#
+# History:
+#    11-JUL-1997 (AJC):
+#       Original mod of ifd2star
+#     6-NOV-2001 (AJC)
+#       Avoid outputting position 0
+
+source /star/bin/ifd_front.tcl
+
+global Date
+global Ifd
+global Universe
+
+
+proc adamonly {defn} {
+
+   eval $defn
+}
+
+proc executable_start_hook {name} {
+    global mon_ifl
+    global Current
+    global Date
+    global Ifd
+
+    proc helplib_start_hook {par} {
+       global Current
+       global task_ifl
+       global mon_ifl
+       puts $mon_ifl "   helplib '$Current(helplib)'"
+    }
+
+    puts "Creating $name.ifl"
+    set mon_ifl [open $name.ifl w]
+    puts $mon_ifl "monolith [string toupper $name]"
+    puts $mon_ifl "# ADAM Interface file for IRAF use"
+    puts $mon_ifl "# Created automatically from $Ifd using ifd2star"
+    puts $mon_ifl "# $Date"
+}
+proc executable_end_hook {name} {
+    global mon_ifl
+    puts $mon_ifl "endmonolith"
+    close $mon_ifl
+    proc helplib_start_hook {par} {}
+}
+
+proc action_start_hook {name} {
+    global mon_ifl
+    global Current
+    global Date
+    global Ifd
+
+    puts $mon_ifl "interface [string toupper $name]"
+}
+proc action_end_hook {name} {
+    global mon_ifl
+    global Current
+
+    puts $mon_ifl endinterface
+}
+
+proc parameter_start_hook {name} {
+    global mon_ifl
+    global Current
+
+    puts $mon_ifl "   parameter [string toupper $name]"
+}
+proc parameter_end_hook {name} {
+    global mon_ifl
+    global Current
+    if {$Current(position) != 0} {
+	puts $mon_ifl "      position $Current(position)"
+    }
+    if {$Current(type) != ""}     {
+	puts $mon_ifl "      type $Current(type)"
+    }
+    if {$Current(ptype) != ""}    {
+	puts $mon_ifl "      ptype '$Current(ptype)'"
+    }
+    if {$Current(keyword) != ""}  {
+	puts $mon_ifl "      keyword '$Current(keyword)'"
+    }
+    if {$Current(access) != ""}   {
+	puts $mon_ifl "      access '$Current(access)'"
+    }
+    if {$Current(vpath) != ""}    {
+	puts $mon_ifl "      vpath '[join $Current(vpath) ,]'"
+    }
+    if {$Current(prompt) != ""}   {
+	regsub -all ' [lindex $Current(prompt) 0] '' string
+	puts $mon_ifl "      prompt '$string'"
+    }
+    if {$Current(ppath) != ""}    {
+	puts $mon_ifl "      ppath '[join $Current(ppath) ,]'"
+    }
+    if {$Current(default) != ""}  {
+	switch [string toupper $Current(type)] {
+	    _CHAR -
+	    LITERAL {
+
+		regsub -all ' $Current(default) '' string
+                if { $string != "!" } {
+		   puts $mon_ifl "      default '[join $string ',']'"
+                } else {
+		   puts $mon_ifl "      default !"
+                }
+
+	    }
+            _LOGICAL {
+		regsub -all 0 $Current(default) F string
+		regsub -all 1 $string T string
+		puts $mon_ifl "      default [join $string ,]"
+            }
+	    default {
+		puts $mon_ifl "      default [join $Current(default) ,]"
+	    }
+	}
+    }
+    if {$Current(association) != ""} {
+	puts $mon_ifl "      association $Current(association)"
+    }
+    if {$Current(range) != ""}  {
+	switch [string toupper $Current(type)] {
+            _CHAR -
+            LITERAL {
+                regsub -all ' $Current(range) '' string
+                puts $mon_ifl "      range '[join $string ',']'"
+	    }
+            default {
+                puts $mon_ifl "      range [join $Current(range) ,]"
+	    }
+	}
+    }
+    if {$Current(in) != ""}  {
+	switch [string toupper $Current(type)] {
+            _CHAR -
+            LITERAL {
+                regsub -all ' $Current(in) '' string
+                puts $mon_ifl "      in '[join $string ',']'"
+	    }
+            default {
+                puts $mon_ifl "      in [join $Current(in) ,]"
+	    }
+	}
+    }
+    if {$Current(help) != ""}   {
+	regsub -all ' [lindex $Current(help) 0] '' string
+	puts $mon_ifl "      help '$string'"
+    }
+    if {$Current(helpkey) != ""}  {
+	regsub -all ' $Current(helpkey) '' string
+	puts $mon_ifl "      helpkey '$string'"
+    }
+    puts $mon_ifl "   endparameter"
+}
+
+proc message_start_hook {name} {
+    global mon_ifl
+    global Current
+    puts $mon_ifl "   message [string toupper $name]"
+}
+proc message_end_hook {name} {
+    global mon_ifl
+    global Current
+    regsub -all ' [lindex $Current(text) 0] '' string
+    puts $mon_ifl "      text '$string'"
+    puts $mon_ifl "   endmessage"
+}
+
+
+set Universe irafifl
+set Date [exec date]
+set Ifd [lindex $argv 0].ifd
+
+source $Ifd

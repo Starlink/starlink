@@ -1,0 +1,38 @@
+package test {
+   executable test {
+# ADAM Interface file
+# Created automatically from test.ifd using ifd2star
+# Mon Feb 17 15:07:37 GMT 1997
+      action test1 {
+         parameter a {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            prompt {(SPectrum) First of the two spectra to be adjoined}
+            ppath CURRENT DYNAMIC DEFAULT
+            association <->GLOBAL.SPECTRUM
+            helpkey *
+          }
+         parameter b {
+            position 2
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 1.0
+            helpkey *
+          }
+      }
+      action test2 {
+         parameter a {
+            position 1
+            type NDF
+            access READ
+            vpath CURRENT DYNAMIC DEFAULT
+            prompt {(SPectrum) First of the two spectra to be adjoined}
+            association <->GLOBAL.SPECTRUM
+            helpkey *
+          }
+      }
+   }
+}

@@ -1,0 +1,38 @@
+1 IFD - Interface File Definition package - update
+                                                    Expires: ????.??.??
+ 19-May-2003: v1.2-8
+ 
+    Avoids misleading messages from the installation test
+    
+ 23-Jan-2002: v1.2-7
+
+    In ifd2star, escape harmfull characters (like (), quotes and comma) in
+    command-print and command-obsolete messages
+
+ 06-Nov-2001: v1.2-6
+
+    Fixed "position 0" bug in ifd2irafifl
+
+ 05-Oct-2000: v1.2-5
+
+    Some modifications to ifd_irafhlpgen were necessary due to changed
+    behaviour of Tcl v8.2.
+
+ 21-Aug-2000: v1.2-4
+
+    Remove hardcoded path to Tclsh from ifd_irafhlpgen
+
+ 31-Jul-2000: v1.2-3
+
+    IFD  has been updated to use Tcl v8.2.
+
+ 03-Dec-1999: v1.2-2
+
+    IFD v1.2-2 is now available.  
+
+    Any occurrence of ! is escaped in the alias commands set up in the
+    .csh file by IFD2STAR for 'command/task' definitions.
+
+    In Version 1.2-1 some corrections were made to the define,
+    defstring and defhelp commands written to the .icl file when an
+    alias is generated using the package prefix.

@@ -1,0 +1,498 @@
+#!TCLSH
+#
+# This script converts an interface definition (ifd) file to one or more
+#  ADAM interface (ifl) files.
+#
+# History:
+#    xx-xxx-1996 (DLT):
+#       Original ifd2ifl
+#    24-JUL-1996 (AJC):
+#       Renamed to ifd2star
+#       Add alias/start/end
+#       package_start - Create pkg.icl and pkg.csh - write header.
+#       Add .icl and .csh bits to action and psedonym
+#    25-JUL-1996 (AJC):
+#       Correct default in .ifl for LOGICALS
+#    26-JUL-1996 (AJC):
+#       Improve ordering of parameter fields
+#       Correct ordering of helplib
+#       Allow default to be array or ! for LOGICAL and CHAR
+#    29-JUL-1996 (AJC):
+#       use all keys in helpkey spec
+#    AUG/SEP-1996 (AJC):
+#       Add display
+#       Write .csh and .icl files
+#       Add headings with date to files
+#       Add alias within action
+#       Add comment
+#       Add command print/obey/task/obsolete
+#       Add defproc, icl, csh
+#    18-MAR-1997 (AJC):
+#       Allow for ICL comments in proc icl.
+#    16-APR-1997 (AJC):
+#       Quote strings in IN and RANGE
+#    12-DEC-1997 (AJC):
+#       Avoid outputting position 0
+#     6-OCT-1999 (AJC):
+#       Correct action and topic in defhelp and defstring commands for
+#        prefix aliases.
+#     3-DEC-1999 (AJC):
+#       Escape ! in command task alias command in .csh files
+#    22-JAN-2002 (AJC):
+#       Escape harmfull characters (like (), quotes and comma) in
+#       command-print and command-obsolete messages
+
+source INSTALL_BIN/ifd_front.tcl
+
+global Date
+global Ifd
+global Universe
+
+   proc defproc {command file {procedure {}}} {
+      global pkg_icl
+      puts $pkg_icl "defproc $command $file $procedure"
+   }
+
+   proc icl {text} {
+      global pkg_icl
+      foreach line [split $text \n] {
+         regsub {\\\{} $line \{ line
+         puts $pkg_icl $line
+      }
+   }
+
+   proc csh {text} {
+      global pkg_csh
+      foreach line [split $text \n] {
+         puts $pkg_csh $line
+      }
+   }
+
+proc adamonly {defn} {
+
+   eval $defn
+}
+
+proc comment_start_hook {comment} {
+    global pkg_icl
+    global pkg_csh
+
+    if {$comment=={}} {
+       puts $pkg_icl ""
+       puts $pkg_csh ""
+    } else {
+       foreach line [split $comment \n] {
+          puts $pkg_icl "\{ $line"
+          puts $pkg_csh "# $line"
+       }
+    }
+}
+
+proc package_start_hook {name} {
+
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Date
+    global Ifd
+
+    set Current(prefix) ""
+    puts "Creating $name.icl"
+    puts "Creating $name.csh"
+    set pkg_icl [open $name.icl w]
+    set pkg_csh [open $name.csh w]
+    puts $pkg_icl "\{ ICL initialisation for package [string toupper $name]"
+    puts $pkg_icl "\{ Created automatically from $Ifd using ifd2star"
+    puts $pkg_icl "\{ $Date"
+
+    puts $pkg_csh "# Shell initialisation for package [string toupper $name]"
+    puts $pkg_csh "# Created automatically from $Ifd using ifd2star"
+    puts $pkg_csh "# $Date"
+}
+proc package_end_hook {name} {
+    global pkg_icl
+    global pkg_csh
+    close $pkg_icl
+    close $pkg_csh
+}
+
+proc display_start_hook {message} {
+    global pkg_icl
+    global pkg_csh
+    puts $pkg_icl ""
+    puts $pkg_csh ""
+    foreach line [split $message \n] {
+      regsub -all \" $line ' line
+      puts $pkg_icl "print \"$line\""
+      puts $pkg_csh "echo \"$line\""
+    }
+    puts $pkg_icl ""
+    puts $pkg_csh ""
+}
+
+proc defhelp_start_hook {topic entry lib} {
+    global Current
+    global pkg_icl
+    puts $pkg_icl \
+     "defhelp $topic [expr {$lib=={}} ? {$Current(helplib)} : $lib] $entry"
+}
+
+proc executable_start_hook {name} {
+    global mon_ifl
+    global Current
+    global Date
+    global Ifd
+
+    proc helplib_start_hook {par} {
+       global Current
+       global task_ifl
+       global mon_ifl
+       puts $task_ifl "   helplib '$Current(helplib)'"
+       puts $mon_ifl "   helplib '$Current(helplib)'"
+    }
+
+    puts "Creating $name.ifl"
+    set mon_ifl [open $name.ifl w]
+    puts $mon_ifl "monolith [string toupper $name]"
+    puts $mon_ifl "# ADAM Interface file"
+    puts $mon_ifl "# Created automatically from $Ifd using ifd2star"
+    puts $mon_ifl "# $Date"
+}
+proc executable_end_hook {name} {
+    global mon_ifl
+    puts $mon_ifl "endmonolith"
+    close $mon_ifl
+    proc helplib_start_hook {par} {}
+}
+
+proc action_start_hook {name} {
+    global mon_ifl
+    global task_ifl
+    global Current
+    global Aliases
+    global Date
+    global Ifd
+
+    puts "Creating $name.ifl"
+    set task_ifl [open $name.ifl w]
+    puts $mon_ifl "interface [string toupper $name]"
+    puts $task_ifl "interface [string toupper $name]"
+    puts $task_ifl "# ADAM Interface file"
+    puts $task_ifl "# Created automatically from $Ifd using ifd2star"
+    puts $task_ifl "# $Date"
+    set Aliases {}
+}
+proc action_end_hook {name} {
+    global mon_ifl
+    global task_ifl
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Aliases
+
+    puts $task_ifl endinterface
+    close $task_ifl
+    puts $mon_ifl endinterface
+# Ensure that Aliases has the action name in it if it wasn't defined
+# as an alias of the ACT(ION) form.
+    set aliased 0
+    foreach alias $Aliases {
+       regsub -all {\(|\)} $alias {} alias
+       if { $alias == $name } {
+          set aliased 1
+          break
+       }
+    }          
+    if {! $aliased} { set Aliases [linsert $Aliases 0 $name] }
+
+# Write the .icl file
+    puts $pkg_icl ""
+    foreach alias $Aliases {
+       regsub -all {\(|\)} $alias {} temp
+       puts $pkg_icl \
+        "define $alias $Current(exepath)/$Current(executable) $name"
+       puts $pkg_icl "defhelp $temp $Current(helplib) $name"
+# Write automatic aliases if Current(prefix) is set
+       if [string length $Current(prefix)] {
+         puts -nonewline $pkg_icl "define $Current(prefix)_$alias "
+         puts $pkg_icl "$Current(exepath)/$Current(executable) $name"
+         puts $pkg_icl "defhelp $Current(prefix)_$temp $Current(helplib) $name"
+       }
+    }
+
+# Write the .csh file
+    puts $pkg_csh ""
+    puts $pkg_csh "alias $name $Current(exepath)/$name"
+    if [string length $Current(prefix)] {
+       puts $pkg_csh "alias $Current(prefix)_$name $Current(exepath)/$name"
+    }
+}
+
+proc alias_start_hook {name} {
+    global Current
+    global Aliases
+    set Aliases [concat $Aliases $name]
+}
+
+proc parameter_start_hook {name} {
+    global mon_ifl
+    global task_ifl
+    global Current
+
+    puts $task_ifl "   parameter [string toupper $name]"
+    puts $mon_ifl "   parameter [string toupper $name]"
+}
+proc parameter_end_hook {name} {
+    global mon_ifl
+    global task_ifl
+    global Current
+    if {$Current(position) != 0} {
+	puts $task_ifl "      position $Current(position)"
+	puts $mon_ifl "      position $Current(position)"
+    }
+    if {$Current(type) != ""}     {
+	puts $task_ifl "      type $Current(type)"
+	puts $mon_ifl "      type $Current(type)"
+    }
+    if {$Current(ptype) != ""}    {
+	puts $task_ifl "      ptype '$Current(ptype)'"
+	puts $mon_ifl "      ptype '$Current(ptype)'"
+    }
+    if {$Current(keyword) != ""}  {
+	puts $task_ifl "      keyword '$Current(keyword)'"
+	puts $mon_ifl "      keyword '$Current(keyword)'"
+    }
+    if {$Current(access) != ""}   {
+	puts $task_ifl "      access '$Current(access)'"
+	puts $mon_ifl "      access '$Current(access)'"
+    }
+    if {$Current(vpath) != ""}    {
+	puts $task_ifl "      vpath '[join $Current(vpath) ,]'"
+	puts $mon_ifl "      vpath '[join $Current(vpath) ,]'"
+    }
+    if {$Current(prompt) != ""}   {
+	regsub -all ' [lindex $Current(prompt) 0] '' string
+	puts $task_ifl "      prompt '$string'"
+	puts $mon_ifl "      prompt '$string'"
+    }
+    if {$Current(ppath) != ""}    {
+	puts $task_ifl "      ppath '[join $Current(ppath) ,]'"
+	puts $mon_ifl "      ppath '[join $Current(ppath) ,]'"
+    }
+    if {$Current(default) != ""}  {
+	switch [string toupper $Current(type)] {
+	    _CHAR -
+	    LITERAL {
+		regsub -all ' $Current(default) '' string
+                if { $string != "!" } {
+       		   puts $task_ifl "      default '[join $string ',']'"
+		   puts $mon_ifl "      default '[join $string ',']'"
+                } else {
+       		   puts $task_ifl "      default !"
+		   puts $mon_ifl "      default !"
+                }
+
+	    }
+            _LOGICAL {
+		regsub -all 0 $Current(default) F string
+		regsub -all 1 $string T string
+		puts $task_ifl "      default [join $string ,]"
+		puts $mon_ifl "      default [join $string ,]"
+            }
+	    default {
+		puts $task_ifl "      default [join $Current(default) ,]"
+		puts $mon_ifl "      default [join $Current(default) ,]"
+	    }
+	}
+    }
+    if {$Current(association) != ""} {
+	puts $task_ifl "      association $Current(association)"
+	puts $mon_ifl "      association $Current(association)"
+    }
+    if {$Current(range) != ""}  {
+	switch [string toupper $Current(type)] {
+            _CHAR -
+            LITERAL {
+                regsub -all ' $Current(range) '' string
+                puts $task_ifl "      range '[join $string ',']'"
+                puts $mon_ifl "      range '[join $string ',']'"
+	    }
+            default {
+                puts $task_ifl "      range [join $Current(range) ,]"
+                puts $mon_ifl "      range [join $Current(range) ,]"
+	    }
+	}
+    }
+    if {$Current(in) != ""}  {
+	switch [string toupper $Current(type)] {
+            _CHAR -
+            LITERAL {
+                regsub -all ' $Current(in) '' string
+                puts $task_ifl "      in '[join $string ',']'"
+                puts $mon_ifl "      in '[join $string ',']'"
+	    }
+            default {
+                puts $task_ifl "      in [join $Current(in) ,]"
+                puts $mon_ifl "      in [join $Current(in) ,]"
+	    }
+	}
+    }
+    if {$Current(help) != ""}   {
+	regsub -all ' [lindex $Current(help) 0] '' string
+	puts $task_ifl "      help '$string'"
+	puts $mon_ifl "      help '$string'"
+    }
+    if {$Current(helpkey) != ""}  {
+	regsub -all ' $Current(helpkey) '' string
+	puts $task_ifl "      helpkey '$string'"
+	puts $mon_ifl "      helpkey '$string'"
+    }
+    puts $task_ifl "   endparameter"
+    puts $mon_ifl "   endparameter"
+}
+
+proc message_start_hook {name} {
+    global mon_ifl
+    global task_ifl
+    global Current
+    puts $task_ifl "   message [string toupper $name]"
+    puts $mon_ifl "   message [string toupper $name]"
+}
+proc message_end_hook {name} {
+    global mon_ifl
+    global task_ifl
+    global Current
+    regsub -all ' [lindex $Current(text) 0] '' string
+    puts $task_ifl "      text '$string'"
+    puts $mon_ifl "      text '$string'"
+    puts $task_ifl "   endmessage"
+    puts $mon_ifl "   endmessage"
+}
+
+proc command_end_hook {name} {
+    global Current
+    global Aliases
+    global Cmdicl
+    global Cmdcsh
+    global pkg_icl
+    global pkg_csh
+
+    set aliased 0
+    foreach alias $Aliases {
+       regsub -all {\(|\)} $alias {} alias
+       if { $alias == $name } {
+          set aliased 1
+          break
+       }
+    }          
+    if {! $aliased} { set Aliases [linsert $Aliases 0 $name] }
+
+# Write the .icl file
+    puts $pkg_icl ""
+    foreach alias $Aliases {
+       regsub -all {\(|\)} $alias {} temp
+       puts $pkg_icl "defstring $alias $Cmdicl"
+       puts $pkg_icl "defhelp $temp $Current(helplib) $name"
+# Write automatic aliases if Current(prefix) is set
+       if [string length $Current(prefix)] {
+         puts $pkg_icl "defstring $Current(prefix)_$alias $Cmdicl"
+         puts $pkg_icl "defhelp $Current(prefix)_$temp $Current(helplib) $name"
+       }
+    }
+
+# Write the .csh file
+    puts $pkg_csh ""
+    puts $pkg_csh "alias $name $Cmdcsh"
+    if [string length $Current(prefix)] {
+       puts $pkg_csh "alias $Current(prefix)_$name $Cmdcsh"
+    }
+}
+proc print_start_hook {mess} {
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Cmdicl
+    global Cmdcsh
+
+    set Cmdcsh "echo $mess"
+    regsub -all {'} $Cmdcsh {\\\\\\'} Cmdcsh
+    regsub -all {"} $Cmdcsh {\\\\\\"} Cmdcsh
+    regsub -all {;} $Cmdcsh {\\\\\\;} Cmdcsh
+    regsub -all {\$} $Cmdcsh {\\\\\\$} Cmdcsh
+    regsub -all {\(} $Cmdcsh {\\\\\\(} Cmdcsh
+    regsub -all {\)} $Cmdcsh {\\\\\\)} Cmdcsh
+
+    regsub -all ' $mess '' mess
+    set mess "'$mess'"
+    regsub -all ' $mess '' mess
+    set Cmdicl "print '$mess'"
+}
+
+proc obey_start_hook {command} {
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Cmdicl
+    global Cmdcsh
+
+    set Cmdicl "$command"
+    set Cmdcsh "'$command'"
+}
+
+proc task_start_hook {action} {
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Cmdicl
+    global Cmdcsh
+    global Parameters
+
+    set Parameters {}
+}
+
+proc task_end_hook {action} {
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Cmdicl
+    global Cmdcsh
+    global Parameters
+
+    set Cmdicl "$action $Parameters"
+    regsub -all ! "$action $Parameters" {\!} temp
+    set Cmdcsh "'$temp'"
+}
+
+proc taskparam_start_hook { val } {
+    global Parameters
+
+    set Parameters [concat $Parameters $val]
+}
+
+proc obsolete_start_hook {mess} {
+    global pkg_icl
+    global pkg_csh
+    global Current
+    global Cmdicl
+    global Cmdcsh
+
+    set Cmdcsh "echo $mess"
+    regsub -all {'} $Cmdcsh {\\\\\\'} Cmdcsh
+    regsub -all {"} $Cmdcsh {\\\\\\"} Cmdcsh
+    regsub -all {;} $Cmdcsh {\\\\\\;} Cmdcsh
+    regsub -all {\$} $Cmdcsh {\\\\\\$} Cmdcsh
+    regsub -all {\(} $Cmdcsh {\\\\\\(} Cmdcsh
+    regsub -all {\)} $Cmdcsh {\\\\\\)} Cmdcsh
+
+    regsub -all ' $mess '' mess
+    set mess "'$mess'"
+    regsub -all ' $mess '' mess
+    set Cmdicl "print '$mess'"
+}
+
+
+set Universe adam
+set Date [exec date]
+set Ifd [lindex $argv 0].ifd
+
+source $Ifd

@@ -1,0 +1,478 @@
+#!TCLSH
+#
+# This script converts an interface definition (ifd) file to the parameter
+# files and cl scripts needed to run ADAM applications from the IRAF cl.
+# History:
+#    15-OCT-1996 (AJC):
+#       Use adampar2iraf to convert parameter names and trap specials
+#    17-OCT-1996 (AJC):
+#       Set mode with greater care
+#       Make any non-primitive to type f
+#       Default vpath to PROMPT
+#    22-OCT-1996 (AJC):
+#       Set DynParList and mode 'a' if VPATH DYNAMIC or GLOBAL
+#    14-NOV-1996 (AJC):
+#       Set packagedir to starlinkdir$package
+#    15-NOV-1996 (AJC):
+#       Set $ in task command if no parameters
+#    13-FEB-1997 (AJC):
+#       Edit out DynParlist system - DYNAMIC and GLOBAL VPATH -> 'h'
+#     4-MAR-1997 (AJC):
+#       Correct quoting of strings
+#       Don't enter null string iraf_default
+#    13-MAR-1997 (AJC):
+#       Assume all f parameters are not output unless access OUTPUTPAR
+#       defined by iraf: {access OUTPUTPAR}
+#    15-APR-1997 (AJC):
+#       Write empty DynParList to .tcl file
+#       Correct handling of LOGICAL defaults
+#       Correctly determine struct from default if no size
+#       Quote string min and max values
+#    17-APR-1997 (AJC):
+#       Add 'outputpar' keyword
+#       Remove OUTPUTPAR mode from access
+#    21-APR-1997 (AJC):
+#       Restore DynParList with mode q
+#    22-APR-1997 (AJC):
+#       Add 'repeated' keyword for parameters which are called repeatedly.
+#         These must be set mode q so hidden mode override doesn't result
+#         in the same value repeatedly
+#    25-APR-1997 (AJC):
+#       Add Package Parameter File
+#       Change Date format
+#     1-MAY-1997 (AJC):
+#       Add 'dynamic' keyword to force params in or out of DynParList.
+#       Dynamic paramters now mode 'a' as even if mode is overridden you
+#        don't get a value on the command line. 'repeated' must override
+#        this however.
+#     9-JUN-1997 (AJC):
+#       Add *! to prompt of dynamic params
+#       packageIniScript:
+#         Change packagedir$ to package$
+#         Add cl < zzsetenev.def
+#       Add the cl command
+#    15-OCT-1997 (AJC):
+#       ! not INDEF for non-primitive types
+#       Save par records at end of par. Sort on position and print
+#        at end of action
+#       List iraf_name in OutputParList and DynParList
+#    20-OCT-1997 (AJC):
+#       Add the command subcommands print, obey and obsolete for iraf
+#         use the foreign command technique.
+#       Add the task subcommand for IRAF using auxiliary scripts.
+#       Convert adam param name to iraf in taskparam
+#       Add taskinherit
+
+global Date
+global Ifd
+global Universe
+
+source INSTALL_BIN/ifd_front.tcl
+
+proc adampar2iraf {par} {
+    set lcase [string tolower $par]
+    switch $lcase {
+       mode {return "mode_"}
+       default {return $lcase}
+    }
+}
+
+proc adamlog2iraf {par} {
+    set lcase [string tolower $par]
+    switch $lcase {
+       y -
+       yes -
+       t -
+       true {return "y"}
+       n -
+       no -
+       f -
+       false {return "n"}
+       default {return "x"}
+    }
+}
+
+proc cl {text} {
+   global packageIniScript
+   foreach line [split $text \n] {
+      puts $packageIniScript $line
+   }
+}
+
+proc package_start_hook {name} {
+    global packageIniScript
+    global packageParFile
+    global Current
+    global Date
+    global Ifd
+
+# Create the package initialisation script.
+    puts "Creating $name.cl"
+    set packageIniScript [open $name.cl w]
+    puts $packageIniScript "# IRAF package initialisation script for the \
+	ADAM $name package"
+    puts $packageIniScript "# Created automatically from $Ifd using ifd2iraf"
+    puts $packageIniScript "# $Date"
+    puts $packageIniScript ""
+    puts $packageIniScript "package $name\n"
+    puts $packageIniScript "cl < \"starlink\$irafstar/zzsetenv.def\"\n"
+
+# Create the package parameter file
+    puts "Creating $name.par"
+    set packageParFile [open $name.par w]
+    puts $packageParFile "# Package parameters for the $name package"
+    puts $packageParFile "# Created automatically from $Ifd using ifd2iraf"
+}
+
+proc package_end_hook {name} {
+    global Current
+    global Date
+    global packageIniScript
+    global packageParFile
+    puts $packageIniScript ""
+    puts $packageIniScript "clbye()"
+    close $packageIniScript
+
+    puts $packageParFile "version,s,h,\"$Current(version) - $Date\""
+    close $packageParFile
+}
+
+proc executable_start_hook {name} {
+    global exeTclScript
+    global Current
+    global Date
+    global Ifd
+    puts "Creating $name.tcl"
+    set exeTclScript [open $name.tcl w]
+    puts $exeTclScript \
+	"\# Output parameter definitions for the $name package"
+    puts $exeTclScript "# Created automatically from $Ifd using ifd2iraf"
+    puts $exeTclScript "# $Date"
+    puts $exeTclScript "\#"
+
+# Initialise action list
+#    global actionList
+#    set actionList ""
+}
+
+proc executable_end_hook {name} {
+    global exeTclScript
+    global packageIniScript
+    global Current
+#    global actionList
+
+    close $exeTclScript
+}
+
+proc action_start_hook {name} {
+    global Current
+#    global actionList
+#    lappend actionList $name
+    global actionPars
+    set actionPars {}
+    global parRec
+    foreach i [array names parRec] {unset parRec($i)}
+    global parFile
+    puts "Creating $name.par"
+    set parFile [open $name.par w]
+}
+proc action_end_hook {name} {
+    global Current
+    global parFile
+    global actionPars
+    global OutputPars
+    global DynPars
+    global packageIniScript
+    global exeTclScript
+    global parRec
+
+# Write the par file
+# First the positional arguments, if any
+# We assume the numbering is correct
+    if { [lsearch -exact [array names parRec] 0] >= 0 } {
+        set non_positionals 1
+    } else { 
+        set non_positionals 0
+    }
+    if { [lsearch -exact [array names parRec] 1] >= 0 } {
+       for {set i 1} {$i <= ([array size parRec] - $non_positionals)} {incr i} {
+           puts -nonewline $parFile "$parRec($i)"
+       }
+    }
+# Then the others
+    if { $non_positionals == 1 } {
+      puts -nonewline $parFile $parRec(0)
+    }
+
+    close $parFile
+
+    if {$actionPars == "yes"} {
+       puts $packageIniScript \
+            "task $name = \"$Current(package)\$$Current(executable).e\""
+    } {
+       puts $packageIniScript \
+            "task \$$name = \"$Current(package)\$$Current(executable).e\""
+    }    
+    puts $exeTclScript "set OutputParList($name) \{$OutputPars\}"
+    puts $exeTclScript "set DynParList($name) \{$DynPars\}"
+}
+
+proc parameter_start_hook {name} {
+    global actionPars
+    set actionPars yes
+}
+
+proc parameter_end_hook {name} {
+    global Current
+    global OutputPars
+    global DynPars
+
+#  Name is adam name in lower case.
+    set iraf_name [adampar2iraf $name]
+
+#  Type.
+#  Set all arrays to type struct.
+    if { ([llength $Current(default)] > 1 ) || ($Current(size) != "")} {
+        set iraf_type struct
+    } {
+        switch [string toupper $Current(type)] {
+            _INTEGER {set iraf_type i}
+            _REAL    {set iraf_type r}
+            _DOUBLE  {set iraf_type r}
+            _LOGICAL {set iraf_type b}
+            _CHAR    {set iraf_type s}
+            _UBYTE   {set iraf_type i}
+            _BYTE    {set iraf_type i}
+            _UWORD   {set iraf_type i}
+            _WORD    {set iraf_type i}
+            LITERAL  {set iraf_type s}
+            default  {set iraf_type f}
+        }
+    }
+# See if it is an output parameter
+    if {(($iraf_type != "f") && \
+         [regexp -nocase WRITE|UPDATE $Current(access)]) || \
+        ( $Current(outputpar) )} {
+        set OutputPars [linsert $OutputPars [llength $OutputPars] $iraf_name]
+    }
+
+#  mode; set according to the first element of "vpath" unless overridden
+#  by `repeated' or `dynamic'.
+    if {$Current(repeated)} {
+       set iraf_mode q
+    } {
+       set element [string toupper [string trim [lindex $Current(vpath) 0]]]
+       if {[adamlog2iraf $Current(dynamic)] == "y"} {
+          set iraf_mode a
+          set DynPars [linsert $DynPars [llength $DynPars] $iraf_name]
+       } {
+          switch $element {
+             {} -
+             PROMPT  {set iraf_mode a}
+             GLOBAL  {set iraf_mode a
+                      if {!([adamlog2iraf $Current(dynamic)] == "n")} {
+                        set DynPars [linsert $DynPars [llength $DynPars] \
+                            $iraf_name]
+                        set Current(dynamic) y
+                      }
+                     }
+             CURRENT -
+             DEFAULT -
+             DYNAMIC -
+             default {set iraf_mode h}
+          }
+       }
+    }
+
+#  default; handle arrays and quote string values
+    if {$Current(default) == "!"} {
+        switch [string toupper $Current(type)] {
+            _INTEGER -
+            _REAL    -
+            _DOUBLE  -
+            _LOGICAL -
+            _CHAR    -
+            _UBYTE   -
+            _BYTE    -
+            _UWORD   -
+            _WORD    -
+            LITERAL  {set iraf_default INDEF}
+            default  {set iraf_default !}
+        }
+    } {
+       switch [string toupper $Current(type)] {
+           _CHAR -
+           LITERAL    {set iraf_default \"[join $Current(default) {" "}]\"
+                       if {$iraf_default == {""} } {set iraf_default ""} }
+           _LOGICAL   { set iraf_default ""
+                        foreach el $Current(default) {
+                           lappend iraf_default [adamlog2iraf $el]
+                        }
+                      }
+           default    {set iraf_default [join $Current(default)]}
+       }
+    }
+
+#  min and max; quote string values
+    set iraf_min [lindex $Current(range) 0]
+    set iraf_max [lindex $Current(range) 1]
+    if { [regexp {_CHAR|LITERAL} [string toupper $Current(type)]]} {
+       if {$iraf_min != ""} {set iraf_min \"$iraf_min\"}
+       if {$iraf_max != ""} {set iraf_max \"$iraf_max\"}
+    }
+
+#  prompt
+#  Add leading *! if dynamic
+    regsub -all \" [join $Current(prompt)] \\\" iraf_prompt
+    if {[adamlog2iraf $Current(dynamic)] == "y"} {
+       set iraf_prompt "\"*! $iraf_prompt\""
+    } {
+       set iraf_prompt \"$iraf_prompt\"
+    }
+
+#  Save the parameter records
+    global parRec
+    if { $iraf_type != "struct"} {
+         append parRec($Current(position)) \
+          "$iraf_name,$iraf_type,$iraf_mode,$iraf_default,"\
+          "$iraf_min,$iraf_max,$iraf_prompt\n"
+    } {
+         append parRec($Current(position)) \
+          "$iraf_name,$iraf_type,$iraf_mode,,"\
+          "$iraf_min,$iraf_max,$iraf_prompt\n$iraf_default\n"
+    }
+}
+
+proc print_start_hook {mess} {
+    global packageIniScript
+    global Current
+
+# Use the foreign task mechanism to cause the shell to echo the message
+    puts $packageIniScript \
+            "task \$$Current(command) = \"\$echo $mess\""
+}
+
+proc obey_start_hook {command} {
+    global packageIniScript
+    global Current
+
+# Use the foreign task mechanism to cause the shell to obey the command
+    puts $packageIniScript \
+            "task \$$Current(command) = \"\$$command\""
+}
+
+proc obsolete_start_hook {mess} {
+    global packageIniScript
+    global Current
+
+# Use the foreign task mechanism to cause the shell to echo the message
+    puts $packageIniScript \
+            "task \$$Current(command) = \"\$echo $mess\""
+}
+
+proc task_start_hook {action} {
+    global Inheritpars
+    global Parameters
+
+    set Inheritpars {}
+    set Parameters {}
+}
+
+proc task_end_hook {action} {
+    global packageIniScript
+    global Current
+    global Inheritpars
+    global Parameters
+
+    if { [ llength $Inheritpars ] } {
+# If the procedure needs parameters,
+# Create a .par file for the command containing copies of the task's .par
+# file entries for all `inherited' parameters and remember the type in
+# Partype(parname)
+       set taskParFile [open $action.par r]
+       set commandParFile [open $Current(command).par w]
+       puts "Creating $Current(command).par"
+       while {[gets $taskParFile line] >= 0} {
+          set record [split $line ,]
+          if { [lsearch -exact $Inheritpars [lindex $record 0]] >= 0 } {
+             set Partype([lindex $record 0]) [lindex $record 1]
+             puts $commandParFile $line
+             if { [lindex $record 1] == "struct" } {
+                if {[gets $taskParFile line] >= 0} {
+                   puts $commandParFile $line
+                } {
+                   puts "Missing default line for struct [lindex $record 0]"
+                }
+             }
+          }
+       }    
+
+       puts $packageIniScript \
+         "task $Current(command) = \"$Current(package)\$$Current(command).cl\""
+       close $commandParFile
+       close $taskParFile
+    } {
+# Otherwise no parameter - write appropriate task definition
+       puts $packageIniScript \
+         "task \$$Current(command) = \"$Current(package)\$$Current(command).cl\""
+    }
+
+# Create an auxiliary script to run the given task with the given parameters
+    set auxScript [open $Current(command).cl w]
+    puts "Creating auxiliary script $Current(command).cl"
+    puts $auxScript \
+      "procedure $Current(command)( [join $Inheritpars {, }] )"
+    puts $auxScript \
+      "begin"
+    foreach param $Inheritpars {
+       puts $auxScript \
+         " string t${param}=\"\""          
+       puts $auxScript \
+         " string g${param}"          
+    }
+    foreach param $Inheritpars {
+       puts $auxScript \
+         " g$param = str($param)"          
+       if { $Partype($param) == "s" || $Partype($param) == "struc" } {
+         puts $auxScript \
+            " if ( g${param} != \"\" ) t$param = \"$param=\\\"\" + g$param + \"\\\" \""  
+       } {
+         puts $auxScript \
+            " if ( g${param} != \"\" ) t$param = \"$param=\" + g$param + \" \""  
+       }
+       puts $auxScript \
+         " ;"
+    }
+    puts $auxScript \
+      " print (\"$action \",[join $Parameters ,]) | cl"
+    puts $auxScript \
+      "end"
+    close $auxScript
+}
+
+proc taskparam_start_hook { val } {
+    global Parameters
+
+    set temp [split $val =]
+    set temp [lreplace $temp 0 0 [adampar2iraf [lindex $temp 0] ] ]
+    regsub -all {"} [lindex $temp 1] {\"} tmp
+    set temp [lreplace $temp 1 1 $tmp]
+    
+    set string [join $temp =]
+    lappend Parameters "\"$string \""
+}
+
+proc taskinherit_start_hook { param } {
+    global Inheritpars
+    global Parameters
+
+    lappend Inheritpars $param
+    lappend Parameters "t$param"
+}
+
+
+set Universe iraf
+set Date [exec date {+%d%h%y}]
+set Ifd [lindex $argv 0].ifd
+
+source $Ifd

@@ -1,0 +1,318 @@
+#!TCLSH
+
+#  Each keyword in the interface file is defined as a tcl procedure so that
+#  the ifl file can be executed as a tcl script. However, some processing
+#  is necessary to remove end of line comments and deal with the different
+#  character string quoting rules.
+#
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+#
+#  Authors:
+#     DLT: D L Terrett (Starlink, RAL)
+#     AJC: A J Chipperfield (Starlink, RAL)
+#
+#  History:
+#        Original version.
+#     24-JUL-1996 (AJC):
+#        Recover from missing end quote
+#        Add linenum count for helpful error report
+#     26-JUL-1996 (AJC):
+#        Allow LOGICAL default to be array or !
+#     29-JUL-1996 (AJC):
+#        Don't split line, to avoid losing comma within strings
+#        but split in proc vpath and ppath
+#      1-AUG-1996 (AJC):
+#        Initialise $par_default in proc_par in case there is no TYPE specifier
+#        Insert type specifier if require for default, in and range.
+#      9-SEP-1996 (AJC):
+#        Replace traing : by leading $ in helplib spec.
+#     15-APR-1996 (AJC):
+#        Output TRUE/FALSE not 1/0 for LOGICAL values.
+#
+#  Bugs:
+#     {note_any_bugs_here}
+#
+
+proc unknown {cmd args} {
+    set cmd [string tolower $cmd]
+    if {[info procs $cmd] != "" } {eval $cmd $args}
+}
+
+proc StringToLogical x {
+    switch [string toupper $x] {
+	Y -
+	YES -
+	T -
+	TRUE {return "TRUE"}
+        ! {return !}
+	default {return "FALSE"}
+    }
+}
+
+proc write {string} {
+    global ifd
+    puts $ifd $string
+    return [string length $string]
+}
+
+proc interface { par } {
+    puts $par 
+    write "      action [string tolower $par] \{"
+}
+proc endinterface { } {
+    write "      \}"
+}
+
+proc parameter { par } {
+    global par_default
+    global par_name
+    global par_type
+    set par_type ""
+    set par_default ""
+    set par_name [string tolower $par]
+    write "         parameter $par_name \{"
+}
+
+proc endparameter { } {
+    global par_default
+
+# if the default value is a list then this parameter must be an array.
+    if {[llength $par_default] > 1} {
+	write "            size *"
+    }
+    write "          \}"
+}
+
+proc prompt { par } {
+    write "            prompt {$par}"
+}
+
+proc type { par } {
+    global par_type
+    set par_type $par
+    write "            type $par"
+}
+
+proc default { args } {
+    global par_type
+    global par_default
+
+# Ensure a type is provided
+#    if { $par_type == "" } {
+#       type {UNIV}
+#       puts "Inserted 'type UNIV' before 'default'"
+#    }
+
+# Convert logical values to TCL logical values.
+    if {[string toupper $par_type] == "_LOGICAL"} {
+	set par_default $args
+        set string ""
+        foreach el $args {
+          lappend string [StringToLogical $el]
+        }
+	write "            default $string"
+    } {
+	set par_default $args
+	write "            default $args"
+    }
+}
+
+proc vpath { par } {
+    write "            vpath [split $par ,]"
+}
+
+proc ppath { par } {
+    regsub -all { } $par {} ppath
+    write "            ppath [split $ppath ,]"
+}
+
+proc in { args } {
+
+# Ensure a type is provided
+    global par_type
+#    if { $par_type == "" } {
+#       type {UNIV}
+#       puts "Inserted 'type UNIV' before 'in'"
+#    }
+    write "            in $args"
+}
+
+proc access { par } {
+    write "            access $par"
+}
+
+proc position { par } {
+    write "            position $par"
+}
+
+proc ptype { par } {
+    write "            ptype $par"
+}
+
+proc helplib { par } {
+# Change NAME: form to $NAME form
+    if [regexp {(.*):$} $par a b] {
+       set par "\$$b"
+    }
+    write "         helplib {$par}"
+}
+proc association { par } {
+    write "            association $par"
+}
+proc helpkey { par } {
+    write "            helpkey $par"
+}
+proc program { par } {
+    return 0
+}
+proc keyword { par } {
+    global par_name
+    set par [string tolower $par]
+
+# Only write keyword if different from parameter name.
+    if {[string compare $par $par_name] != 0} {
+	write "           keyword $par"
+    } {
+	return 0
+    }
+}
+proc help { par } {
+    write "            help \"$par\""
+}
+proc message { par } {
+    write "            message $par \{"
+}
+proc text { par } {
+    write "              text \"$par\""
+}
+proc range { args } {
+
+# Ensure a type is provided
+    global par_type
+#    if { $par_type == "" } {
+#       type {UNIV}
+#       puts "Inserted 'type UNIV' before 'default'"
+#    }
+    write "            range $args"
+}
+proc endmessage {} {
+    write "	\}"
+}
+
+proc monolith {par} {
+    write "   executable [string tolower $par] \{"
+}
+proc endmonolith {} {
+    write "   \}"
+}
+
+set ifd [open [lindex $argv 0].ifd w]
+set input [open [lindex $argv 0].ifl r]
+set linenum 0
+write "package [lindex $argv 0] \{"
+while { [gets $input line] != -1 } {
+#  Next line - increment line number
+#  Output line is empty, we are not inside a quoted string and we haven't
+#  just exited from a quoted string.
+    incr linenum
+    set line1 ""
+    set inquote 0
+    set exitquote 0
+    set multiple 0
+    set comment ""
+
+    for { set i 0 } { $i < [string length $line]} { incr i } {
+        set next [string index $line $i]
+
+#  The characters ' { } $ and # need special handling
+        case $next in \
+        ' {
+
+#      If we are currently inside quotes then this is (probably) a closing
+#      quote so replace it with \}. Record that we are now outside quotes
+#      and we have just exited a quoted string.
+            if {$inquote} {
+                set line1 $line1\}
+                set inquote 0
+                set exitquote 1
+            } else {
+
+#      We are not inside quotes 
+                if { $exitquote } {
+
+#         The previous character was a closing quote so this must be the
+#         second quote of a pair. So remove the \} from the output string
+#         and replace it with a '.
+                    set inquote 1
+                    set l [string length $line1]
+                    incr l -2
+                    set line1 [string range $line1 0 $l]
+                    set line1 $line1$next 
+                    set exitquote 0
+                } else {
+
+#      It really was an opening quotes so replace the quote with \{ 
+#      and record that we are now inside quotes.
+                    set inquote 1
+                    set exitquote 0
+                    set line1 $line1\{
+                }
+            }
+        } \
+	\$ {
+            set line1 "$line1\$"
+	} \
+        \# {
+
+#      A # not inside quotes is an end of line comment
+            if {$inquote} {
+                set line1 $line1$next 
+                set exitquote 0
+            } else {
+		set comment [string range $line $i end]
+                break
+            }
+        } \
+        , {
+            set exitquote 0
+            if { $inquote } {
+                set line1 $line1$next 
+            } else {
+                set line1 "$line1 "
+                set multiple 1
+            }
+        } \
+        default {
+
+#     Nothing special so just copy the character
+            set line1 $line1$next
+            set exitquote 0
+        }
+        set last $next
+    }
+
+# If we were in quotes at end of line, assume missing quote and carry on
+    if {$inquote} {
+       puts "Missing end quote assumed line $linenum"
+       puts "Parameter [string toupper $par_name]"
+       set line1 $line1\} 
+    }
+
+#  Convert the line to a list
+    set line1 [string trim $line1]
+    if {[string length $line1] != 0} {
+	set l [eval $line1]       
+#  Add end-of-line comment if any
+	if {[string length [string trim $comment]] != 0 } {
+	    for {} {$l} {incr l -1} {puts -nonewline $ifd " "}
+	    write $comment
+	}
+    } else {
+	write $line
+    }
+}
+close $input
+puts $ifd "\}"
+close $ifd
+exit
