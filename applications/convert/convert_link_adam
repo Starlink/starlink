@@ -31,6 +31,7 @@
 #     RFWS: R.F. Warren-Smith (Starlink, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A. J. Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 
 #  History:
@@ -44,6 +45,8 @@
 #        Cosmetic mods to reflect current practice.
 #      1-OCT-1999 (AJC):
 #        Version for CONVERT monolith
+#     28-JUL-2004 (TIMJ):
+#        Add SHL
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -52,7 +55,7 @@
 #-
 
       echo `sla_link` `cfitsio_link` `ndf_link_adam` `grp_link_adam` \
-           `fio_link_adam` `prm_link_adam` `pda_link_adam` `hlp_link` \
+           `fio_link_adam` `prm_link_adam` `pda_link_adam` `shl_link_adam` \
            `pda_link_adam` `ndg_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
