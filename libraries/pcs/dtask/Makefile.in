@@ -269,6 +269,21 @@ C_ROUTINES = \
 	dts_setsig.c
 
 BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
+
+# Files alink.in and ilink.in depend on the values of the $(prefix)
+# variable, and so must be substituted at `make' time, rather than
+# `configure' time (see section `Installation Directory Variables' in
+# the autoconf manual).
+edit = sed \
+    -e 's,@staretcdir\@,$(staretcdir),g' \
+    -e 's,@libdir\@,$(libdir),g' \
+    -e 's,@CC\@,$(CC),g' \
+    -e 's,@CFLAGS\@,$(CFLAGS),g' \
+    -e 's,@FC\@,$(FC),g' \
+    -e 's,@FCFLAGS\@,$(FCFLAGS),g' \
+    -e 's,@PACKAGE_NAME\@,$(PACKAGE_NAME),g' \
+    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
+
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -494,47 +509,29 @@ GTAGS:
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
 
-# Create an install manifest, and install it in the required manifest location
-install-manifest.xml: all-am
-	rm -f $@
-	echo "<?xml version='1.0'?>"                            >$@
-	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
-	echo "<manifest component='$(PACKAGE)'>"                >>$@
-	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
-	echo "<files>"                                          >>$@
-	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
-	echo "</files>"                                         >>$@
-	echo "</manifest>"                                      >>$@
-
-# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
-# We should respect $(DESTDIR), but needn't worry about $(srcdir),
-# since we know that the file was created in the current directory.
-# Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
-	@$(NORMAL_INSTALL)
-	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
-	$(INSTALL_DATA) install-manifest.xml \
-		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-
-# Compile messages for message file act_err.msg
+# Compile messages for message file act_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
 ACT_ERR: act_err.msg
-	$(STARLINK)/bin/messgen -F act_err.msg
+	@MESSGEN@ -F act_err.msg
 act_err: act_err.msg
-	$(STARLINK)/bin/messgen -f act_err.msg
+	@MESSGEN@ -f act_err.msg
 act_err.h: act_err.msg
-	$(STARLINK)/bin/messgen -c act_err.msg
+	@MESSGEN@ -c act_err.msg
 fac_320_err: act_err.msg
-	$(STARLINK)/bin/messgen -e act_err.msg
+	@MESSGEN@ -e act_err.msg
 
-# Compile messages for message file dtask_err.msg
+# Compile messages for message file dtask_err.msg.  This requires that the 
+# @MESSGEN@ substitution was requested in configure.ac, probably implicitly
+# by the STAR_MESSGEN macro.
 DTASK_ERR: dtask_err.msg
-	$(STARLINK)/bin/messgen -F dtask_err.msg
+	@MESSGEN@ -F dtask_err.msg
 dtask_err: dtask_err.msg
-	$(STARLINK)/bin/messgen -f dtask_err.msg
+	@MESSGEN@ -f dtask_err.msg
 dtask_err.h: dtask_err.msg
-	$(STARLINK)/bin/messgen -c dtask_err.msg
+	@MESSGEN@ -c dtask_err.msg
 fac_120_err: dtask_err.msg
-	$(STARLINK)/bin/messgen -e dtask_err.msg
+	@MESSGEN@ -e dtask_err.msg
 install-staretcSTARDATA: $(staretc_STARDATA)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(staretcdir)
@@ -575,6 +572,28 @@ uninstall-starhelpSTARDATA:
 	  echo " rm -f $(DESTDIR)$(starhelpdir)/$$f"; \
 	  rm -f $(DESTDIR)$(starhelpdir)/$$f; \
 	done
+
+# Create an install manifest, and install it in the required manifest location
+install-manifest.xml: all-am
+	rm -f $@
+	echo "<?xml version='1.0'?>"                            >$@
+	echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>"   >>$@
+	echo "<manifest component='$(PACKAGE)'>"                >>$@
+	echo "<version>$(PACKAGE_VERSION)</version>"            >>$@
+	echo "<files>"                                          >>$@
+	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
+	echo "</files>"                                         >>$@
+	echo "</manifest>"                                      >>$@
+
+# Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
+# We should respect $(DESTDIR), but needn't worry about $(srcdir),
+# since we know that the file was created in the current directory.
+# Having done that, delete the install-manifest.xml file
+install-manifest: install-manifest.xml
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
+	$(INSTALL_DATA) install-manifest.xml \
+		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
 
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
@@ -760,7 +779,8 @@ info-am:
 install-data-am: install-includeHEADERS install-staretcSTARDATA \
 	install-starhelpSTARDATA
 
-install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
+install-exec-am: install-binSCRIPTS install-exec-local \
+	install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -800,10 +820,10 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binSCRIPTS install-data \
 	install-data-am install-exec install-exec-am \
-	install-includeHEADERS install-info install-info-am \
-	install-libLTLIBRARIES install-man install-staretcSTARDATA \
-	install-starhelpSTARDATA install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-exec-local install-includeHEADERS install-info \
+	install-info-am install-libLTLIBRARIES install-man \
+	install-staretcSTARDATA install-starhelpSTARDATA install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binSCRIPTS \
@@ -811,6 +831,30 @@ uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
 	uninstall-libLTLIBRARIES uninstall-staretcSTARDATA \
 	uninstall-starhelpSTARDATA
 
+
+# The alink and ilink scripts require a dtask_main.o file in $(libdir).
+# Build and install this, taking care to include it in the MANIFEST_FILE, too.
+dtask_main.o: dtask_main.f
+install-exec-local: dtask_main.o
+	$(INSTALL_DATA) dtask_main.o $(DESTDIR)$(libdir)
+	if test -n "$$MANIFEST_FILE"; then \
+	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >>$$MANIFEST_FILE; \
+	fi
+
+alink: Makefile $(srcdir)/alink.in
+	rm -f alink alink.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,alink: Generated from alink.in by Makefile.am,' \
+	    $(srcdir)/alink.in >alink.tmp
+	chmod +x alink.tmp
+	mv alink.tmp alink
+ilink: Makefile $(srcdir)/ilink.in
+	rm -f ilink ilink.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,ilink: Generated from ilink.in by Makefile.am,' \
+	    $(srcdir)/ilink.in >ilink.tmp
+	chmod +x ilink.tmp
+	mv ilink.tmp ilink
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

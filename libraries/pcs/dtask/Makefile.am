@@ -52,3 +52,41 @@ C_ROUTINES = \
 	dts_setsig.c
 
 BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
+
+# The alink and ilink scripts require a dtask_main.o file in $(libdir).
+# Build and install this, taking care to include it in the MANIFEST_FILE, too.
+dtask_main.o: dtask_main.f
+install-exec-local: dtask_main.o
+	$(INSTALL_DATA) dtask_main.o $(DESTDIR)$(libdir)
+	if test -n "$$MANIFEST_FILE"; then \
+	    echo "$(DESTDIR)$(libdir)/dtask_main.o" >>$$MANIFEST_FILE; \
+	fi
+
+# Files alink.in and ilink.in depend on the values of the $(prefix)
+# variable, and so must be substituted at `make' time, rather than
+# `configure' time (see section `Installation Directory Variables' in
+# the autoconf manual).
+edit = sed \
+    -e 's,@staretcdir\@,$(staretcdir),g' \
+    -e 's,@libdir\@,$(libdir),g' \
+    -e 's,@CC\@,$(CC),g' \
+    -e 's,@CFLAGS\@,$(CFLAGS),g' \
+    -e 's,@FC\@,$(FC),g' \
+    -e 's,@FCFLAGS\@,$(FCFLAGS),g' \
+    -e 's,@PACKAGE_NAME\@,$(PACKAGE_NAME),g' \
+    -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
+
+alink: Makefile $(srcdir)/alink.in
+	rm -f alink alink.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,alink: Generated from alink.in by Makefile.am,' \
+	    $(srcdir)/alink.in >alink.tmp
+	chmod +x alink.tmp
+	mv alink.tmp alink
+ilink: Makefile $(srcdir)/ilink.in
+	rm -f ilink ilink.tmp
+	$(edit) \
+	    -e 's,@edited_input\@,ilink: Generated from ilink.in by Makefile.am,' \
+	    $(srcdir)/ilink.in >ilink.tmp
+	chmod +x ilink.tmp
+	mv ilink.tmp ilink
