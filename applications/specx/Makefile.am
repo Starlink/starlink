@@ -3,7 +3,8 @@
 SUBDIRS = @subdirs@
 
 
-dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES) $(COMFILES)
+dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES) $(COMFILES) \
+	$(INIT_FILES)
 
 
 # These files are needed for specx to run
@@ -11,6 +12,8 @@ dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES) $(COMFILES)
 # Probably easiest to move it to cwd
 RUNTIME_FILES = misc/graphcap.txt misc/init.spx \
 misc/specx_init.dat misc/specx_welcome.txt
+
+INIT_FILES = misc/specxstart
 
 # These are the actual specx command macros
 # Currently should be installed into $SPECX_COMMAND/
