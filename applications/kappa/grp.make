@@ -374,12 +374,14 @@ listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f kapversion.f
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 
-# The contents of the kapsub_sub.tar file:
+# The contents of the kapsub_sub.tar file (including expanded generic
+# files and the generic source files):
 KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_sparb.f kps1_spard.f kps1_spari.f kps1_sparr.f \
-kps1_sparub.f kps1_sparuw.f kps1_sparw.f 
+kps1_sparub.f kps1_sparuw.f kps1_sparw.f kps1_pgftb.f kps1_pgftd.f kps1_pgfti.f \
+kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f kps1_pgftw.f 
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = kps1_sparx.gen
+KAPSUB_GEN = kps1_sparx.gen kps1_pgftx.gen
 
 # Non-generic source files needed for kapsub_sub.tar:
 KAPSUB_NONGEN = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
@@ -415,8 +417,7 @@ kps1_memin.f kps1_memnm.f kps1_memou.f kps1_memsa.f kps1_memsy.f \
 kps1_memtr.f kps1_mlcof.f kps1_mlgof.f kps1_mlofl.f kps1_mlput.f \
 kps1_mlylm.f kps1_mthcd.f kps1_mthcr.f kps1_ncuco.f kps1_nom1b.f \
 kps1_nom1d.f kps1_nom1i.f kps1_nom1r.f kps1_nom1ub.f kps1_nom1uw.f \
-kps1_nom1w.f kps1_op1.f kps1_op2.f kps1_pgftb.f kps1_pgftd.f kps1_pgfti.f \
-kps1_pgftr.f kps1_pgftub.f kps1_pgftuw.f kps1_pgftw.f kps1_plclc.f \
+kps1_nom1w.f kps1_op1.f kps1_op2.f kps1_plclc.f \
 kps1_plcpb.f kps1_plcpd.f kps1_plcpi.f kps1_plcpr.f kps1_plcpub.f \
 kps1_plcpuw.f kps1_plcpw.f kps1_plcpy.f kps1_plmsk.f kps1_psdim.f \
 kps1_psevl.f kps1_psplt.f kps1_putb.f kps1_putc.f kps1_putd.f kps1_puti.f \
