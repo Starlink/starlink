@@ -2,3 +2,4 @@ Astrom.pm
 Makefile.PL
 MANIFEST
 ChangeLog
+t/01_compile.t
