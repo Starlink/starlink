@@ -6,7 +6,7 @@
 # Usage:
 #    make-starconf file...
 #
-# `file' has the format '[<option>*]<file>[:<sourcefile>].
+# `file' has the format '[-<option>*:]<file>[:<sourcefile>].
 #
 # The file <sourcefile> is packaged up and unpacked as <file>.  If
 # [:<sourcefile>] is omitted, then <sourcefile>=<file>.  This allows us to say
@@ -14,26 +14,26 @@
 # current directory doesn't have to be called acinclude.m4, which
 # would confuse things.
 #
-# The <option> characters are `?', `!' and `*'.
+# The <option> characters are `q', `f' and `x'.
 #
-#     If the files start with a `?' then they are optionally unpacked,
-#     depending on logic contained within this script, which is kept
-#     consistent with the requirements of macros in starconf.m4.in.
-#     That is, files which do not have a `?' <option> are always
-#     unpacked. 
+#     If the `q' option (for query) is present then the files are
+#     optionally unpacked, depending on logic contained within this
+#     script, which is kept consistent with the requirements of macros
+#     in starconf.m4.in.  That is, files which do not have a `q' 
+#     <option> are always unpacked.
 #
-#     If the <option> includes `!' then the file is will overwrite any
-#     file of the same name in the directory in which the `starconf'
-#     script is run; if the <option> `!' is not present, then the
-#     script will not overwrite a file named <file> if one exists in
-#     the directory.  Thus files which the starconf package `owns'
-#     (such as the `acinclude.m4' file) should be given with a `!'
-#     option, and ones which it merely provides if they are not
-#     present (such as the `component.xml.in' file) should not have a
-#     `!' option. 
+#     If the <option> includes `f' (for force) then the file is will
+#     overwrite any file of the same name in the directory in which
+#     the `starconf' script is run; if the <option> `f' is not
+#     present, then the script will not overwrite a file named <file>
+#     if one exists in the directory.  Thus files which the starconf
+#     package `owns' (such as the `acinclude.m4' file) should be given
+#     with a `f' option, and ones which it merely provides if they are
+#     not present (such as the `component.xml.in' file) should not
+#     have a `f' option.
 #
-#     If the <option> includes `*', then the corresponding file is
-#     made executable after it is extracted.
+#     If the <option> includes `x' (for executable), then the
+#     corresponding file is made executable after it is extracted.
 #
 # This script generates a starconf script which has the specified
 # files contained within it.  When the (generated) starconf script is
@@ -72,19 +72,20 @@ fi
 allconfchunks="$@"
 
 # The list of option characters
-optchars="?!\*"
+optchars="qfx"
 
 # Find all the files which are always extracted -- that is, all the
 # files which do not have a `?' <option>
 defaultchunklist=
 for c in $allconfchunks
 do
-    if expr $c : "[$optchars]*?" >/dev/null; then
+    if expr x$c : "x-[$optchars]*q" >/dev/null; then
         : skip it
     else
         defaultchunklist="$defaultchunklist $c"
     fi
 done
+# echo "XXX defaultchunklist=$defaultchunklist"
 
 
 # Start generating the output -- open FD 3 for the generated script
@@ -266,8 +267,13 @@ fi
 filelist=" $defaultchunks $extrachunks "
 # echo "XXX filelist=$filelist"
 
-# Make sure there's a link to the installed componentinfo.dtd
-test -e componentinfo.dtd || $ln_s $buildsupportdata/componentinfo.dtd componentinfo.dtd
+# Make sure there's a link to the installed componentinfo.dtd.
+# 'test -e' returns false if the link exists but points to a non-existent
+# file, so delete any link first.
+test -e componentinfo.dtd || {
+    rm -f componentinfo.dtd
+    $ln_s $buildsupportdata/componentinfo.dtd componentinfo.dtd
+}
 
 # Start writing the starconf.status file; send output to FD 4
 exec 4>starconf.status
@@ -293,7 +299,10 @@ EOF
 for f in $filelist
 do
 _STARCONF3_EOD
-echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
+# Following regexp fails with input -x:-x:y (produces y, not -x), but that's
+# because we're using * instead of ?, which isn't allowed in BREs.
+# Not a big problem.
+echo "    echo \$f | sed \"s/^\(-[$optchars]*:\)*\([^:]*\).*/#    \2/\" >&4">&3
 echo 'done'                                                              >&3
 echo 'echo "" >&4'                                                       >&3
 
@@ -436,12 +445,29 @@ _STARCONF3_EOD
 # Start the extraction of the files
 echo 'echo "allm4=" >&4'                                                 >&3
 echo 'echo "allextracted=" >&4'                                          >&3
-  
+
+orig_IFS="$IFS"
+
 for ch in $allconfchunks
 do
     # extract the options, destination and source filenames
-    eval `echo $ch | sed 's/\(['$optchars']*\)\([^:]*\)\(:\(.*\)\)*/opts=\1;filename=\2; filesource=\4/'`
-    test -n "$filename" || { echo "Impossible: null filename"; exit 1; }
+    IFS=:
+    xch="x:$ch"
+    set $xch; shift
+    IFS="$orig_IFS"
+    if expr x$1 : x- >/dev/null; then
+        opts="$1"
+        shift
+    else
+        # no options
+        opts=
+    fi
+    filename="$1"
+    test -n "$filename" || { 
+        echo "$0: Impossible: null filename <$ch>"; exit 1; 
+    }
+    shift
+    filesource="$1"
     test -n "$filesource" || filesource=$filename
     echo "Including $filename from $filesource (opts=$opts)"
 
@@ -450,18 +476,16 @@ do
     echo "# -------------------- $filename --------------------"         >&3
     echo "echo '# ---------- $filename ----------'       >&4"            >&3
 
-    # Handle the ! option
-    echo 't=`expr "x $filelist" : "x .* \(['$optchars']*\)'$filename'"`' >&3
-    echo '# If the ! option is present, ...'                             >&3
-    echo 'if expr "x$t" : "x.*\(!\)" >/dev/null; then'                   >&3
-    echo '    # ...then just unpack the file (stomp stomp stomp)'        >&3
-    echo '    echo unpack_this=true                      >&4'            >&3
-    echo 'else'                                                          >&3
-    echo '    # ...but if not, then only unpack the file if'             >&3
-    echo '    # there is no such file in the current directory'          >&3
-    echo '    # (ie, avoid stomping on modified files)'                  >&3
-    echo "    echo 'if test -e $filename; then unpack_this=false; else unpack_this=true;fi' >&4" >&3
-    echo 'fi'                                                            >&3
+    # Handle the f option
+    if expr x$opts : "x.*f" >/dev/null; then
+        echo '# Just unpack the file (stomp stomp stomp)'                >&3
+        echo 'echo unpack_this=true >&4'                                 >&3
+    else
+        echo '# Only unpack the file if'                                 >&3
+        echo '# there is no such file in the current directory'          >&3
+        echo '# (ie, avoid stomping on modified files)'                  >&3
+        echo "echo 'if test -e $filename; then unpack_this=false; else unpack_this=true;fi' >&4" >&3
+    fi
 
     # do the unpacking
     echo "echo 'if \$unpack_this; then'                  >&4"            >&3
@@ -471,8 +495,8 @@ do
     cat $filesource                                                      >&3
     echo '_STARCONF_EOD'                                                 >&3
     echo 'echo _STARCONF_EOD                             >&4'            >&3
-    # Is this file to be made executable (* option present)?
-    if expr "$opts" : '.*\*' >/dev/null; then
+    # Is this file to be made executable (x option present)?
+    if expr "$opts" : '.*x' >/dev/null; then
         echo "echo '    chmod +x $filename'              >&4"            >&3
     fi
     echo "echo 'else'                                    >&4"            >&3
@@ -481,6 +505,7 @@ do
     echo "echo 'expr $filename : \".*m4\$\" >/dev/null && allm4=\"\$allm4 $filename\"' >&4" >&3
     echo "echo 'allextracted=\"\$allextracted $filename\"' >&4"          >&3
 done
+
 
 cat >&3 <<\_STARCONF3_EOD
 cat >&4 <<\_STARCONF4_EOD
