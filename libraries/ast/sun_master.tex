@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.5}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {28th October 1999}
+\newcommand{\stardocdate}      {11th November 1999}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -16940,6 +16940,17 @@ class. This allows the transformation routines used by IntraMaps to
 adapt to produce the required transformation on a per-IntraMap basis
 (\secref{ss:intraflag}).
 f-
+
+\item The Plot attributes MajTickLen and MinTickLen, which control the
+length of major and minor tick marks on coordinate axes, may now be
+subscripted using an axis number. This allows tick marks of different
+lengths to be used on each axis. It also allows tick marks to be
+suppressed on one axis only by setting the length to zero.
+
+\item The value of the Plot attribute NumLab, which controls the
+plotting of numerical labels on coordinate axes, no longer has any
+effect on whether labelling of a coordinate grid is interior or
+exterior (as controlled by the Labelling attribute).
 
 \item Some minor memory leaks have been fixed.
 

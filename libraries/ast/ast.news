@@ -35,6 +35,15 @@ o  A new IntraFlag attribute has been added to the IntraMap class. This
    allows the transformation functions used by IntraMaps to adapt to
    produce the required transformation on a per-IntraMap basis.
 
+o  The Plot attributes MajTickLen and MinTickLen, which control the
+   length of major and minor tick marks on coordinate axes, may now be
+   subscripted using an axis number.
+
+o  The value of the Plot attribute NumLab, which controls the
+   plotting of numerical labels on coordinate axes, no longer has any
+   effect on whether labelling of a coordinate grid is interior or
+   exterior (as controlled by the Labelling attribute).
+
 o  Some minor memory leaks have been fixed.
 
 o  A small number of documentation errors have been corrected.
