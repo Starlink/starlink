@@ -99,42 +99,11 @@ open (SGMLOUT, ">$filenameroot.imgeq.sgml")
 open (LATEXOUT, ">$filenameroot.imgeq.tex")
     || die "Can't open $filenameroot.imgeq.tex to write";
 
-print LATEXOUT <<'EOT';
-\documentclass[fleqn]{article}
-\pagestyle{empty}
-\oddsidemargin=10pt
-\hoffset=0pt
-\mathindent=2cm
-\makeatletter
-\newif\if@SetEqnNum\@SetEqnNumfalse
-\def\SetEqnNum#1{\global\def\Eqn@Number{#1}\global\@SetEqnNumtrue}
-%\def\@eqnnum{{\normalfont \normalcolor (\Eqn@Number)}}
-% leqno:
-\def\@eqnnum{\if@SetEqnNum 
-    \hb@xt@.01\p@{}%
-    \rlap{\normalfont\normalcolor
-      \hskip -\displaywidth(\Eqn@Number)}
-    \global\@SetEqnNumfalse
-  \else
-    \relax
-  \fi}
-%\def\equation{$$}
-%\def\endequation{\if@SetEqnNum\eqno \hbox{\@eqnnum}\global\@SetEqnNumfalse\fi 
-%    $$\@ignoretrue}
-\def\@@eqncr{\let\reserved@a\relax
-    \ifcase\@eqcnt \def\reserved@a{& & &}\or \def\reserved@a{& &}%
-     \or \def\reserved@a{&}\else
-       \let\reserved@a\@empty
-       \@latex@error{Too many columns in eqnarray environment}\@ehc\fi
-     \reserved@a \if@SetEqnNum\@eqnnum\global\@SetEqnNumfalse\fi
-     \global\@eqcnt\z@\cr}
-\makeatother
-\begin{document}
-\special{dvi2bitmap default crop all 10 absolute crop left 0}
-EOT
+
+LaTeXHeader (\*LATEXOUT);
 print LATEXOUT "\\special{dvi2bitmap default imageformat $imgformat}\n";
 
-print SGMLOUT "<!doctype img-eqlist system 'img-eqlist'>\n<img-eqlist>\n";
+print SGMLOUT "<!DOCTYPE img-eqlist SYSTEM 'img-eqlist'>\n<img-eqlist>\n";
 
 $eqn = '';
 while (defined($line = <EQIN>)) {
@@ -188,6 +157,42 @@ close (EQIN);
 
 exit 0;
 
+sub LaTeXHeader {
+    my $fh = shift;
+    print $fh <<'EOT';
+\documentclass[fleqn]{article}
+\pagestyle{empty}
+\oddsidemargin=10pt
+\hoffset=0pt
+\mathindent=2cm
+\makeatletter
+\newif\if@SetEqnNum\@SetEqnNumfalse
+\def\SetEqnNum#1{\global\def\Eqn@Number{#1}\global\@SetEqnNumtrue}
+%\def\@eqnnum{{\normalfont \normalcolor (\Eqn@Number)}}
+% leqno:
+\def\@eqnnum{\if@SetEqnNum 
+    \hb@xt@.01\p@{}%
+    \rlap{\normalfont\normalcolor
+      \hskip -\displaywidth(\Eqn@Number)}
+    \global\@SetEqnNumfalse
+  \else
+    \relax
+  \fi}
+%\def\equation{$$}
+%\def\endequation{\if@SetEqnNum\eqno \hbox{\@eqnnum}\global\@SetEqnNumfalse\fi 
+%    $$\@ignoretrue}
+\def\@@eqncr{\let\reserved@a\relax
+    \ifcase\@eqcnt \def\reserved@a{& & &}\or \def\reserved@a{& &}%
+     \or \def\reserved@a{&}\else
+       \let\reserved@a\@empty
+       \@latex@error{Too many columns in eqnarray environment}\@ehc\fi
+     \reserved@a \if@SetEqnNum\@eqnnum\global\@SetEqnNumfalse\fi
+     \global\@eqcnt\z@\cr}
+\makeatother
+\begin{document}
+\special{dvi2bitmap default crop all 10 absolute crop left 0}
+EOT
+}
 
 sub Usage {
     die "$ident_string\nUsage: $0 [--imgformat fmt] [--version] filename\n";
