@@ -605,6 +605,96 @@ DSB: David S. Berry (STARLINK)
    -  Bad pixels and automatic quality masking are supported.
 
    -  All non-complex numeric data types can be handled.
+1 ARDPLOT
+Plot regions described in an ARD file.
+
+Usage:
+
+   ardplot ardfile [device] [regval]
+
+Description:
+
+   This application draws the outlines of regions described in
+   a supplied 2-dimensional ARD file. The outlines are drawn over
+   the top of a previously displayed picture, aligned (if possible)
+   in the current coordinate Frame of the previously drawn picture.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ARDFILE
+ARDFILE = FILENAME (Read)
+   The name of the ARD file containing a description of the regions
+   to be outlined. The co-ordinate system in which positions within
+   this file are given should be indicated by including suitable
+   COFRAME or WCS statements within the file (see SUN/183). For
+   instance, starting the file with a line containing the text
+   "COFRAME(PIXEL)" will indicate that positions are specified in
+   pixel coordinates. The statement "COFRAME(SKY,System=FK5)" would
+   indicate that positions are specified in RA/DEC (FK5,J2000). If
+   no such statements are included, then it is assumed that positions
+   are given within the current co-ordinate system of the existing
+   DATA picture.
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The plotting device. [Current graphics device]
+3 REGVAL
+REGVAL = _INTEGER (Read)
+   Indicates which regions within the ARD description are to be
+   outlined. If zero (the default) is supplied, then the plotted
+   boundary encloses all the regions within the ARD file. If a
+   positive value is supplied, then only the region with the
+   specified index is outlined (the first region in the ARD file
+   has index 2, for historical reasons). If a negative value is
+   supplied, then all regions with indices greater than or equal
+   to the absolute value of the supplied index are outlined. See
+   SUN/183 for further information on the numbering of regions
+   within an ARD description. [0]
+3 STYLE
+STYLE = GROUP (Read)
+   A group of attribute settings describing the plotting style to use
+   for the curves.
+
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and
+   interpreted in the same manner. Attribute settings are applied in
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported).
+
+   The appearance of the plotted curves is controlled by the attributes
+   Colour(Curves), Width(Curves), etc. [current value]
+2 Examples
+ardplot bulge
+   Draws an outline around all the regions included in the ardfile
+   named "bulge". The outline is drawn on the current graphics device
+   and is drawn in alignment with the previous picture.
+2 Notes
+-  A DATA picture must already exist on the selected graphics
+device before running this command. An error will be reported if no
+DATA picture can be found.
+
+-  The application stores a new DATA picture in the graphics
+database. On exit the current database picture for the chosen
+device reverts to the input picture.
+2 Related_Applications
+   KAPPA: ARDGEN, ARDMASK.
+2 Authors
+DSB: David Berry (STARLINK)
+2 History
+ 13-SEP-2001 (DSB):
+    Original version.
 1 Automatic_Data_Conversion
 
 Although KAPPA tasks do not work directly with `foreign' formats,
@@ -2100,6 +2190,7 @@ LUTWARM     - Loads the warm lookup table.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
 
 3 Output
+ARDPLOT     - Draws outlines of regions described in an ARD file.
 CONTOUR     - Contours a 2-d NDF.
 DISPLAY     - Displays a 1-d or 2-d NDF.
 DRAWSIG     - Draws n standard-deviation lines on a line plot.
@@ -2266,6 +2357,7 @@ WCSTRAN     - Transforms a position from one NDF co-ordinate Frame to
 ARDGEN      - Creates a text file describing selected regions of an
               image.
 ARDMASK     - Uses an ARD file to set some pixels of an NDF to be bad.
+ARDPLOT     - Draws outlines of regions described in an ARD file.
 CHPIX       - Replaces the values of selected pixels in an NDF.
 COPYBAD     - Copies the bad pixel mask from one NDF to another.
 ERRCLIP     - Removes pixels with large errors from an NDF.
@@ -28500,6 +28592,7 @@ ARDGEN      - Creates a text file describing selected regions of an
               image.
 ARDMASK     - Uses an ARD file to set some pixels of an NDF to be
               bad.
+ARDPLOT     - Draws outlines of regions described in an ARD file.
 AXCONV      - Expands spaced axes in an NDF into the primitive form.
 AXLABEL     - Sets a new label value for an axis within an NDF data
               structure.
