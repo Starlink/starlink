@@ -28,7 +28,7 @@
       software.</p>
   </abstract>
   <dependencies >
-    <build>sae</build><build>cnf</build><build>ems</build><link>chr</link><link>cnf</link><link>ems</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>cnf</build><build>ems</build><link>chr</link><link>cnf</link><link>ems</link><test>chr</test><test>cnf</test><test>ems</test><test>prm</test><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
