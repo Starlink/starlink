@@ -460,6 +460,63 @@ AC_DEFUN([_AC_FC_DIALECT_YEAR],
          [m4_fatal([unknown Fortran dialect])])])
 
 
+# _AC_FC_MOD_SUFFIX
+# -----------------
+# Determines the form of the filename of modules produced
+# by the Fortran compiler.
+# Tests for all forms of file extension I've (TW) found in the
+# wild. Note that at least one compiler (PGI??) changes the
+# case of the basename as well. Whether this happens is
+# encoded in the variable ac_fc_mod_uppercase.
+#
+AC_DEFUN([_AC_FC_MOD_SUFFIX],
+[
+ac_mod_ext=
+ac_fc_mod_uppercase=no
+cat > conftest.$ac_ext << \_ACEOF
+      module conftest
+       implicit none
+       integer :: i
+      end module conftest
+_ACEOF
+_AC_EVAL_STDERR($ac_compile)
+AC_MSG_CHECKING([for suffix of module files])
+for ac_mod_file in conftest.mod conftest.MOD conftest.M CONFTEST.MOD none	 
+do
+  if test -f $ac_mod_file; then
+    break;
+  fi
+done
+rm -f conftest.$ac_ext conftest.$ac_exe_ext conftest.mod conftest.MOD conftest.M CONFTEST.MOD
+#
+case $ac_mod_file in
+  conftest.mod)
+    ac_mod_ext=mod
+    ;;
+  conftest.MOD)
+    ac_mod_ext=MOD
+    ;;
+  conftest.M)
+    ac_mod_ext=M
+    ;;
+  CONFTEST.MOD)
+    ac_mod_ext=MOD
+    ac_fc_mod_uppercase=yes
+    ;;
+  none)
+    AC_MSG_WARN([Could not find Fortran module file extension.])
+    ;;
+esac
+
+if test $ac_mod_file != none; then
+  AC_MSG_RESULT([$ac_mod_ext])
+fi
+if test $ac_fc_mod_uppercase = yes; then
+  AC_MSG_NOTICE([Fortran module filenames are uppercase.])
+fi
+])
+
+
 # _AC_PROG_FC([DIALECT], [COMPILERS...])
 # --------------------------------------
 # DIALECT is a Fortran dialect, given by Fortran [YY]YY or simply [YY]YY,
@@ -510,6 +567,9 @@ rm -f a.out
 
 m4_expand_once([_AC_COMPILER_EXEEXT])[]dnl
 m4_expand_once([_AC_COMPILER_OBJEXT])[]dnl
+dnl This next will warn but continue if we have an F77-only compiler.
+dnl FIXME: do we care about the (potentially) superfluous warning?
+_AC_FC_MOD_SUFFIX
 # If we don't use `.F' as extension, the preprocessor is not run on the
 # input file.  (Note that this only needs to work for GNU compilers.)
 ac_save_ext=$ac_ext
