@@ -33,6 +33,8 @@
 #include "ctokens.h"
 
 #include <stdio.h>
+#include <stdarg.h>
+#include <stdlib.h>
 
 /* Local function prototypes. */
    void crepint();
@@ -65,7 +67,85 @@
    }
 
 
-   void crepint() {
+
+   struct tokitem {
+      char *string;
+      char *strmat;
+      char *interp;
+      int tokval;
+   };
+
+
+   int tokmatch( struct tokitem *tok, ... ) {
+      va_list ap;
+      int mtok;
+
+      va_start( ap, tok );
+      while ( mtok = va_arg( ap, int ) ) {
+         if ( mtok != (tok++)->tokval ) {
+            va_end( ap );
+            return 0;
+         }
+      }
+      va_end( ap );
+      return 1;
+   }
+
+   struct tokitem *nextarg( struct tokitem *ptok ) {
+      int blev = 0;
+      int plev = 0;
+      int slev = 0;
+      int t;
+      int trouble;
+      while( t = (++ptok)->tokval ) {
+         trouble = 0;
+         switch ( t ) {
+            case '(': 
+               ++plev; 
+               break;
+            case ')': 
+               trouble = ( --plev < 0 );
+               break;
+            case '{': 
+               ++blev; 
+               break;
+            case '}': 
+               trouble = ( --blev < 0 ); 
+               break;
+            case '[': 
+               ++slev; 
+               break;
+            case ']': 
+               trouble = ( --slev < 0 ); 
+               break;
+            case ',':
+               if ( plev == 0 && blev == 0 && slev == 0 ) return ++ptok;
+               break;
+         }
+         if ( trouble ) {
+            while ( (++ptok)->tokval );
+            return( ptok );
+         }
+      }
+      return ptok;
+   }
+
+
+   void subst( struct tokitem *ptok, char *replace ) {
+      char *put;
+      put = ptok->strmat;
+      while ( *put && *replace ) *(put++) = *(replace++);
+      if ( *put ) {
+         while ( *put ) *(put++) = ' ';
+      }
+      else if ( *replace ) {
+         ptok->interp = memok( malloc( strlen( replace ) + 1 ) );
+         strcpy( ptok->interp, replace );
+      }
+   }
+
+
+   void crepint() { 
 /*
 *+
 *  Name:
@@ -87,71 +167,100 @@
 *-
 */
 
-/* Local variable declarations. */
-      char c;
-      char c1;
-      char *newint;
+/* Declare local variables. */
+      int arg;
       int i;
       int incomm;
-      int lnewint;
-      int loldint;
+      int leng = 0;
       int skipspc;
-
+      int t;
+      int t1;
+      int tbufsiz = 0;
       int tok;
-      int tok1 = 0;
+      char c;
+      char c1;
+      char *string;
+      char *strmat;
+      char *interp;
 
-/* Get lengths. */
-      newint = "INT_BIG";
-      lnewint = strlen( newint );
-      loldint = strlen( "int" );
+      struct tokitem *tbuf = NULL;
 
-/* Initialise. */
-      skipspc = 0;
-
-/* Cycle through the input stream getting tokens from yylex. */
+/* Fill buffer of tokens with all the information we get from the lexer. */
       while ( ( tok = yylex() ) || ( yylval != NULL ) ) {
-
-/* If we have reached the end of the file apart from trailing untokenised
-   characters, output them and exit the loop. */
-         if ( tok == 0 ) { 
-            printf( "%s", yylval );
-            break;
+         if ( leng + 1 >= tbufsiz ) {
+            tbufsiz += BUFINC;
+            tbuf = memok( realloc( tbuf, tbufsiz * sizeof( struct tokitem ) ) );
          }
+         tbuf[ leng ].tokval = tok;
+         tbuf[ leng ].string = yylval;
+         tbuf[ leng ].strmat = ymatst;
+         tbuf[ leng ].interp = NULL;
+         leng++;
+      }
 
-/* Dispose of whitespace associated with (preceding) this token. */
-         incomm = 0;
-         for ( i = 0; i < ymatchst; i++ ) {
-            c = yylval[ i ];
-            c1 = i ? yylval[ i - 1 ] : 0;
-            if ( c == ' ' ) {
-               if ( skipspc > 0 && c1 == ' ' && ! incomm )
-                  skipspc--;
-               else
-                  putchar( c );
+/* Go through the token buffer looking for sequences which we need to do
+   something about. */
+      for ( i = 0; i < leng; i++ ) {
+         t = tbuf[ i ].tokval;
+         t1 = tbuf[ i + 1 ].tokval;
+         if ( t1 == INT && t != SHORT && t != LONG )
+            subst( tbuf + i + 1, "INT_BIG" );
+         if ( t == INT_MAX )
+            subst( tbuf + i, "INT_BIG_MAX" );
+         if ( t == INT_MIN )
+            subst( tbuf + i, "INT_BIG_MIN" );
+         if ( ( t == PRINTF || t == FPRINTF || t == SPRINTF ) && t1 == '(' ) {
+            arg = i + 1;
+            if ( t != PRINTF ) arg = nextarg( tbuf + arg ) - tbuf;
+            if ( tokmatch( tbuf + arg, STRING_LITERAL, ',', 0 ) ||
+                 tokmatch( tbuf + arg, STRING_LITERAL, ')', 0 ) ) { 
             }
             else {
-               if ( c1 == '/' && c == '*' ) incomm = 1;
-               else if ( c1 == '*' && c == '/' ) incomm = 0;
-               else if ( c == '\t' ) skipspc = 0;
-               else if ( c == '\n' ) skipspc = 0;
-               putchar( c );
             }
          }
-         
-/* See if there is a suitable INT token and replace it if so. */
-         if ( tok == INT && tok1 != SHORT && tok1 != LONG ) {
-            printf( "%s", newint );
-            skipspc = lnewint - loldint;
+         if ( ( t == SCANF || t == FSCANF || t == SSCANF ) && t1 == '(' ) {
+            arg = i + 1;
+            if ( t != SCANF ) arg = nextarg( tbuf + arg ) - tbuf;
+            if ( tokmatch( tbuf + arg, STRING_LITERAL, ',', 0 ) ||
+                 tokmatch( tbuf + arg, STRING_LITERAL, ')', 0 ) ) {
+            }
+            else {
+            }
          }
-         else {
-            while ( i < strlen( yylval ) ) 
-               putchar( yylval[ i++ ] );
-         }
+      }
 
-/* Keep track of the last token. */
-         tok1 = tok;
+/* Go through token buffer outputting the characters associated with each 
+   token. */
+      for ( i = 0; i < leng; i++ ) {
+         string = tbuf[ i ].string;
+         strmat = tbuf[ i ].strmat;
+         interp = tbuf[ i ].interp;
+         c1 = 0;
+         incomm = 0;
+         while ( c = *(string++) ) {
+            if ( c == ' ' && c1 == ' ' && skipspc && ! incomm ) {
+               skipspc--;
+            }
+            else {
+               putchar( c );
+               if ( c == '\n' || c == '\t' ) skipspc = 0;
+               if ( string < strmat ) {
+                  if ( c1 == '/' && c == '*' ) incomm = 1;
+                  if ( c1 == '*' && c == '/' ) incomm = 0;
+               }
+            }
+            c1 = c;
+         }
+         if ( interp ) {
+            while ( c = *(interp++) ) {
+               putchar( c );
+               skipspc = ( c == '\n' ) ? 0 : skipspc + 1;
+            }
+         }
       }
    }
+
+
 
 
 
