@@ -38,6 +38,11 @@
 *           Create a C string from an array of characters.
 *        astStringArray
 *           Create an array of C strings from an array of characters.
+*        astChrLen
+*           Returns length of a string without trailing white space, etc.
+*        astSscanf
+*           Like sscanf, but fixes certain platform-specific bugs in the
+*           native sscanf implementation.
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -62,6 +67,8 @@
 *        graphics interfaces, etc.
 *     18-MAR-1998 (RFWS):
 *        Added explicit arguments to function macros.
+*     29-JAN-2002 (DSB):
+*        Added astChrLen and astSscanf.
 *-
 */
 
@@ -101,5 +108,7 @@ void *astStore_( void *, const void *, size_t );
 #define astStore(ptr,data,size) astStore_(ptr,data,size)
 #define astString(chars,nchars) astString_(chars,nchars)
 #define astStringArray(chars,nel,len) astStringArray_(chars,nel,len)
+#define astChrLen(string) astChrLen_(string)
+#define astSscanf astSscanf_
 #endif
 #endif

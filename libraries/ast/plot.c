@@ -5188,7 +5188,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    int axis;                     /* Axis number */
    int id;                       /* Plot object id */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -5204,7 +5204,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Edge(axis). */
 /* ------------ */
    if ( nc = 0,
-               ( 1 == sscanf( attrib, "edge(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "edge(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearEdge( this, axis - 1 );
 
@@ -5222,7 +5222,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUp(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearLabelUp( this, axis - 1 );
 
@@ -5235,7 +5235,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLab(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "numlab(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "numlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearNumLab( this, axis - 1 );
 
@@ -5248,7 +5248,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTick(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearMinTick( this, axis - 1 );
 
@@ -5261,7 +5261,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLab(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearTextLab( this, axis - 1 );
 
@@ -5274,7 +5274,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUnits(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearLabelUnits( this, axis - 1 );
 
@@ -5286,7 +5286,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Style(label). */
 /* --------------*/
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "style(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       astClearStyle( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
 
@@ -5298,7 +5298,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Font(label). */
 /* -------------*/
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "font(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       astClearFont( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
 
@@ -5310,7 +5310,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Colour(label). */
 /* ---------------*/
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       astClearColour( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
 
@@ -5322,7 +5322,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Color(label). */
 /* --------------*/
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "color(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       astClearColour( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
 
@@ -5334,7 +5334,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Width(label). */
 /* --------------*/
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "width(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       astClearWidth( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
 
@@ -5346,21 +5346,21 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Size(label). */
 /* -------------*/
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "size(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       astClearSize( this, FullForm( GrfLabels, label, attrib, "astClear", astGetClass( this ) ) );
 
 /* LabelAt(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelat(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelat(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearLabelAt( this, axis - 1 );
 
 /* Centre(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "centre(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "centre(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearCentre( this, axis - 1 );
 
@@ -5373,7 +5373,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Gap(axis). */
 /* ---------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "gap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "gap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearGap( this, axis - 1 );
 
@@ -5386,7 +5386,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLabGap(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "numlabgap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "numlabgap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearNumLabGap( this, axis - 1 );
 
@@ -5399,7 +5399,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLabGap(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "textlabgap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "textlabgap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearTextLabGap( this, axis - 1 );
 
@@ -5417,7 +5417,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearMajTickLen( this, axis - 1 );
 
@@ -5430,7 +5430,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTickLen(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearMinTickLen( this, axis - 1 );
 
@@ -5473,7 +5473,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* DrawAxes(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearDrawAxes( this, axis - 1 );
 
@@ -11022,7 +11022,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int axis;                     /* Axis number */
    int ival;                     /* Int attribute value */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -11117,7 +11117,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelAt(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelat(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelat(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = GetUsedLabelAt( this, axis - 1 );
       if ( astOK ) {
@@ -11128,7 +11128,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Centre(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "centre(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "centre(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = GetUsedCentre( this, axis - 1 );
       if ( astOK ) {
@@ -11148,7 +11148,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Gap(axis). */
 /* ---------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "gap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "gap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = GetUsedGap( this, axis - 1 );
       if ( astOK ) {
@@ -11168,7 +11168,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLabGap(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "numlabgap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "numlabgap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = astGetNumLabGap( this, axis - 1 );
       if ( astOK ) {
@@ -11188,7 +11188,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLabGap(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "textlabgap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "textlabgap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = astGetTextLabGap( this, axis - 1 );
       if ( astOK ) {
@@ -11208,7 +11208,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUp(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetLabelUp( this, axis - 1 );
       if ( astOK ) {
@@ -11228,7 +11228,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLab(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "numlab(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "numlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetNumLab( this, axis - 1 );
       if ( astOK ) {
@@ -11248,7 +11248,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTick(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = GetUsedMinTick( this, axis - 1 );
       if ( astOK ) {
@@ -11268,7 +11268,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLab(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = GetUsedTextLab( this, axis - 1 );
       if ( astOK ) {
@@ -11288,7 +11288,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* DrawAxes(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = GetDrawAxes( this, axis - 1 );
       if ( astOK ) {
@@ -11308,7 +11308,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUnits(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = GetUsedLabelUnits( this, axis - 1 );
       if ( astOK ) {
@@ -11328,7 +11328,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Style(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "style(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetStyle( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
@@ -11348,7 +11348,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Font(label). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "font(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetFont( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
@@ -11368,7 +11368,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Colour(label). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
@@ -11388,7 +11388,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Color(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "color(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       ival = astGetColour( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
@@ -11409,7 +11409,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Width(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "width(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       dval = astGetWidth( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
@@ -11429,7 +11429,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Size(label). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "size(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       dval = astGetSize( this, FullForm( GrfLabels, label, attrib, "astGet", astGetClass( this ) ) );
       if ( astOK ) {
@@ -11458,7 +11458,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = GetUsedMajTickLen( this, axis - 1 );
       if ( astOK ) {
@@ -11478,7 +11478,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTickLen(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = astGetMinTickLen( this, axis - 1 );
       if ( astOK ) {
@@ -11497,7 +11497,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Edge(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "edge(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "edge(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       ival = GetUsedEdge( this, axis - 1 );
       if ( astOK ) {
@@ -13932,7 +13932,7 @@ uncommented!
 /* Otherwise, extract any digits following the escape character. If a
    valid digits field is found, store the number of characters in the escape
    sequence and leave the loop. */
-               } else if( (nc = 0, sscanf( sl + 2, "%d%n", &dd, &nc )) &&
+               } else if( (nc = 0, astSscanf( sl + 2, "%d%n", &dd, &nc )) &&
                           *(sl + 2 + nc) == '+' ){
                   nesc = nc + 3;
                   break;
@@ -17531,7 +17531,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int id;                       /* Plot object id */
    int ival;                     /* Int attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -17542,7 +17542,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -17551,56 +17551,56 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Tol. */
 /* ---- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "tol= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "tol= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetTol( this, dval );
 
 /* Grid. */
 /* ----- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "grid= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "grid= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetGrid( this, ival );
 
 /* TickAll. */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "tickall= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "tickall= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetTickAll( this, ival );
 
 /* Border. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "border= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "border= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetBorder( this, ival );
 
 /* ClipOp. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "clipop= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "clipop= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetClipOp( this, ival );
 
 /* Grf. */
 /* ---- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "grf= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "grf= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetGrf( this, ival );
 
 /* DrawTitle. */
 /* ---------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "drawtitle= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "drawtitle= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetDrawTitle( this, ival );
 
 /* DrawAxes. */
 /* --------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "drawaxes= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "drawaxes= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetDrawAxes( this, 0, ival );
       astSetDrawAxes( this, 1, ival );
@@ -17608,7 +17608,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* DrawAxes(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "drawaxes(%d)= %d %n",
+               ( 2 == astSscanf( setting, "drawaxes(%d)= %d %n",
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetDrawAxes( this, axis - 1, ival );
@@ -17616,14 +17616,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Escape. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "escape= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "escape= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetEscape( this, ival );
 
 /* Edge(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "edge(%d)= %n%*s %n", &axis, &ival, &nc ) )
+               ( 1 == astSscanf( setting, "edge(%d)= %n%*s %n", &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       edge = FullForm( "left right top bottom", setting + ival, setting, 
                        "astSet", astGetClass( this ) );
@@ -17640,7 +17640,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* LabelAt (axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "labelat(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "labelat(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetLabelAt( this, axis - 1, dval );
@@ -17648,7 +17648,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Centre(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "centre(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "centre(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetCentre( this, axis - 1, dval );
@@ -17656,7 +17656,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Gap. */
 /* ---- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "gap= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "gap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetGap( this, 0, dval );
       astSetGap( this, 1, dval );
@@ -17664,7 +17664,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Gap(axis). */
 /* ---------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "gap(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "gap(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetGap( this, axis - 1, dval );
@@ -17672,7 +17672,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* NumLabGap. */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "numlabgap= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "numlabgap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetNumLabGap( this, 0, dval );
       astSetNumLabGap( this, 1, dval );
@@ -17680,7 +17680,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* NumLabGap(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "numlabgap(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "numlabgap(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetNumLabGap( this, axis - 1, dval );
@@ -17688,7 +17688,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* TextLabGap. */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "textlabgap= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "textlabgap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetTextLabGap( this, 0, dval );
       astSetTextLabGap( this, 1, dval );
@@ -17696,7 +17696,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* TextLabGap(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "textlabgap(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "textlabgap(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetTextLabGap( this, axis - 1, dval );
@@ -17704,7 +17704,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* LabelUp. */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "labelup= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "labelup= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetLabelUp( this, 0, ival );
       astSetLabelUp( this, 1, ival );
@@ -17712,7 +17712,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* LabelUp(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "labelup(%d)= %d %n",
+               ( 2 == astSscanf( setting, "labelup(%d)= %d %n",
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetLabelUp( this, axis - 1, ival );
@@ -17720,7 +17720,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* NumLab. */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "numlab= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "numlab= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetNumLab( this, 0, ival );
       astSetNumLab( this, 1, ival );
@@ -17728,7 +17728,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* NumLab(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "numlab(%d)= %d %n",
+               ( 2 == astSscanf( setting, "numlab(%d)= %d %n",
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetNumLab( this, axis - 1, ival );
@@ -17736,7 +17736,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* MinTick. */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "mintick= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "mintick= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetMinTick( this, 0, ival );
       astSetMinTick( this, 1, ival );
@@ -17744,7 +17744,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* MinTick(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "mintick(%d)= %d %n",
+               ( 2 == astSscanf( setting, "mintick(%d)= %d %n",
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetMinTick( this, axis - 1, ival );
@@ -17752,7 +17752,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* TextLab. */
 /* ---------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "textlab= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "textlab= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetTextLab( this, 0, ival );
       astSetTextLab( this, 1, ival );
@@ -17760,7 +17760,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* TextLab(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "textlab(%d)= %d %n",
+               ( 2 == astSscanf( setting, "textlab(%d)= %d %n",
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetTextLab( this, axis - 1, ival );
@@ -17768,7 +17768,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* LabelUnits. */
 /* --------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "labelunits= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "labelunits= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetLabelUnits( this, 0, ival );
       astSetLabelUnits( this, 1, ival );
@@ -17776,7 +17776,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* LabelUnits(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "labelunits(%d)= %d %n",
+               ( 2 == astSscanf( setting, "labelunits(%d)= %d %n",
                               &axis, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetLabelUnits( this, axis - 1, ival );
@@ -17784,14 +17784,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Style. */
 /* ------ */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "style= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "style= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       for( id = 0; id < AST__NPID; id++ ) astSetStyle( this, id, ival );
 
 /* Style(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "style(%20[^()])= %d %n",
+               ( 2 == astSscanf( setting, "style(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetStyle( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
@@ -17799,14 +17799,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Font. */
 /* ----- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "font= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "font= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       for( id = 0; id < AST__NPID; id++ ) astSetFont( this, id, ival );
 
 /* Font(label). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "font(%20[^()])= %d %n",
+               ( 2 == astSscanf( setting, "font(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetFont( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
@@ -17814,14 +17814,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Colour. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "colour= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "colour= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       for( id = 0; id < AST__NPID; id++ ) astSetColour( this, id, ival );
 
 /* Colour(label). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "colour(%20[^()])= %d %n",
+               ( 2 == astSscanf( setting, "colour(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetColour( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
@@ -17829,14 +17829,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Color. */
 /* ------ */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "color= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "color= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       for( id = 0; id < AST__NPID; id++ ) astSetColour( this, id, ival );
 
 /* Color(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "color(%20[^()])= %d %n",
+               ( 2 == astSscanf( setting, "color(%20[^()])= %d %n",
                               label, &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetColour( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), ival );
@@ -17844,14 +17844,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Width. */
 /* ------ */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "width= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "width= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       for( id = 0; id < AST__NPID; id++ ) astSetWidth( this, id, dval );
 
 /* Width(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "width(%20[^()])= %lg %n",
+               ( 2 == astSscanf( setting, "width(%20[^()])= %lg %n",
                               label, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetWidth( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), dval );
@@ -17859,14 +17859,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Size. */
 /* ----- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "size= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "size= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       for( id = 0; id < AST__NPID; id++ ) astSetSize( this, id, dval );
 
 /* Size(label). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "size(%20[^()])= %lg %n",
+               ( 2 == astSscanf( setting, "size(%20[^()])= %lg %n",
                               label, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetSize( this, FullForm( GrfLabels, label, setting, "astSet", astGetClass( this ) ), dval );
@@ -17874,14 +17874,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* TitleGap. */
 /* ----------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "titlegap= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "titlegap= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetTitleGap( this, dval );
 
 /* MajTickLen. */
 /* ----------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "majticklen= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "majticklen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetMajTickLen( this, 0, dval );
       astSetMajTickLen( this, 1, dval );
@@ -17889,7 +17889,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* MajTickLen(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "majticklen(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "majticklen(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetMajTickLen( this, axis - 1, dval );
@@ -17897,7 +17897,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* MinTickLen. */
 /* ----------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "minticklen= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "minticklen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetMinTickLen( this, 0, dval );
       astSetMinTickLen( this, 1, dval );
@@ -17905,7 +17905,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* MinTickLen(axis). */
 /* ----------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "minticklen(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "minticklen(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetMinTickLen( this, axis - 1, dval );
@@ -17913,7 +17913,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Labelling. */
 /* -------- */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "labelling= %n%*s %n", &ival, &nc ) )
+               ( 0 == astSscanf( setting, "labelling= %n%*s %n", &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetLabelling( this, FullForm( "exterior interior", 
                                         setting + ival, setting, 
@@ -18094,7 +18094,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    char label[21];               /* Graphics item label */
    int axis;                     /* Axis number */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -18119,7 +18119,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Edge(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "edge(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "edge(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestEdge( this, axis - 1 );
 
@@ -18161,7 +18161,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* DrawAxes(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "drawaxes(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestDrawAxes( this, axis - 1 );
 
@@ -18178,7 +18178,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Gap(axis). */
 /* ---------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "gap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "gap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestGap( this, axis - 1 );
 
@@ -18190,7 +18190,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLabGap(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "numlabgap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "numlabgap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestNumLabGap( this, axis - 1 );
 
@@ -18202,7 +18202,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLabGap(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "textlabgap(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "textlabgap(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestTextLabGap( this, axis - 1 );
 
@@ -18214,7 +18214,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUp(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelup(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestLabelUp( this, axis - 1 );
 
@@ -18226,7 +18226,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* NumLab(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "numlab(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "numlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestNumLab( this, axis - 1 );
 
@@ -18238,7 +18238,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTick(axis). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "mintick(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestMinTick( this, axis - 1 );
 
@@ -18250,7 +18250,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* TextLab(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "textlab(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestTextLab( this, axis - 1 );
 
@@ -18262,7 +18262,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* LabelUnits(axis). */
 /* --------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "labelunits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestLabelUnits( this, axis - 1 );
 
@@ -18274,7 +18274,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Style(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "style(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "style(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       result = astTestStyle( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
@@ -18286,7 +18286,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Font(label). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "font(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "font(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       result = astTestFont( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
@@ -18303,14 +18303,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Colour(label). */
 /* -------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "colour(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       result = astTestColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
 /* Color(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "color(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "color(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       result = astTestColour( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
@@ -18322,7 +18322,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Width(label). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "width(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "width(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       result = astTestWidth( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
@@ -18334,7 +18334,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Size(label). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "size(%20[^()])%n", label, &nc ) )
+               ( 1 == astSscanf( attrib, "size(%20[^()])%n", label, &nc ) )
                && ( nc >= len ) ) {
       result = astTestSize( this, FullForm( GrfLabels, label, attrib, "astTest", astGetClass( this ) ) );
 
@@ -18351,7 +18351,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* MajTickLen(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "majticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestMajTickLen( this, axis - 1 );
 
@@ -18363,7 +18363,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* MinTickLen(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "minticklen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestMinTickLen( this, axis - 1 );
 

@@ -2226,7 +2226,7 @@ static int CnvValue( AstFitsChan *this, int type, void *buff,
 *     by a real numerical value of zero and the character string "N".
 *     -  When converting from a string to any numerical value, zero is
 *     returned if the string is not a formatted value which can be converted 
-*     into the corresponding type using sscanf.
+*     into the corresponding type using astSscanf.
 *     - Real and imaginary parts of a complex value should be separated by 
 *     spaces within strings. If a string does contains only a single numerical 
 *     value, it is assumed to be the real part, and the imaginary part is 
@@ -2328,7 +2328,7 @@ static int CnvType( int otype, void *odata, int osize, int type,
 *     by a real numerical value of zero and the character string "N".
 *     -  When converting from a string to any numerical value, zero is
 *     returned if the string isn not a formatted value which can be converted 
-*     into the corresponding type using sscanf.
+*     into the corresponding type using astSscanf.
 *     - Real and imaginary parts of a complex value should be separated by 
 *     spaces within strings. If a string does contains only a single numerical 
 *     value, it is assumed to be the real part, and the imaginary part is 
@@ -2405,7 +2405,7 @@ static int CnvType( int otype, void *odata, int osize, int type,
 
          if( type == AST__FLOAT ){
             if( nc = 0, 
-                     ( 1 != sscanf( ostring, "%lf %n", (double *) buff, &nc ) )
+                     ( 1 != astSscanf( ostring, "%lf %n", (double *) buff, &nc ) )
                   || (nc < len ) ){
                ret = 0;
             }
@@ -2416,14 +2416,14 @@ static int CnvType( int otype, void *odata, int osize, int type,
 
          } else if( type == AST__INT      ){
             if( nc = 0, 
-                     ( 1 != sscanf( ostring, "%d %n", (int *) buff, &nc ) )
+                     ( 1 != astSscanf( ostring, "%d %n", (int *) buff, &nc ) )
                   || (nc < len ) ){
                ret = 0;
             }
 
          } else if( type == AST__LOGICAL  ){
             if( nc = 0, 
-                     ( 1 == sscanf( ostring, "%d %n", &ival, &nc ) )
+                     ( 1 == astSscanf( ostring, "%d %n", &ival, &nc ) )
                   && (nc >= len ) ){
                *( (int *) buff ) = ival ? 1 : 0;               
 
@@ -2445,12 +2445,12 @@ static int CnvType( int otype, void *odata, int osize, int type,
 
          } else if( type == AST__COMPLEXF ){
             if( nc = 0, 
-                     ( 1 != sscanf( ostring, "%lf %lf %n", (double *) buff, 
+                     ( 1 != astSscanf( ostring, "%lf %lf %n", (double *) buff, 
                                     (double *) buff + 1, &nc ) )
                   || (nc < len ) ){
 
                if( nc = 0, 
-                        ( 1 != sscanf( ostring, "%lf %n", (double *) buff, 
+                        ( 1 != astSscanf( ostring, "%lf %n", (double *) buff, 
                                        &nc ) )
                      || (nc < len ) ){
                   ret = 0;
@@ -2462,12 +2462,12 @@ static int CnvType( int otype, void *odata, int osize, int type,
 
          } else if( type == AST__COMPLEXI ){
             if( nc = 0, 
-                    ( 1 != sscanf( ostring, "%d %d %n", (int *) buff, 
+                    ( 1 != astSscanf( ostring, "%d %d %n", (int *) buff, 
                                    (int *) buff + 1, &nc ) )
                    || (nc < len ) ){
 
                if( nc = 0, 
-                        ( 1 != sscanf( ostring, "%d %n", (int *) buff, &nc ) )
+                        ( 1 != astSscanf( ostring, "%d %n", (int *) buff, &nc ) )
                      || (nc < len ) ){
 
                   ret = 0;
@@ -3125,7 +3125,7 @@ static double DateObs( const char *dateobs ) {
 
 /* First check for the old "dd/mm/yy" format. */
    if( nc = 0,
-        ( sscanf( dateobs, " %2d/%2d/%d %n", &dd, &mm, &yy, &nc ) == 3 ) &&
+        ( astSscanf( dateobs, " %2d/%2d/%d %n", &dd, &mm, &yy, &nc ) == 3 ) &&
         ( nc >= len )  ){
       ok = 1;
       hr = 0;
@@ -3135,7 +3135,7 @@ static double DateObs( const char *dateobs ) {
 
 /* Otherwise, check for the new short format "ccyy-mm-dd". */
    } else if( nc = 0,
-        ( sscanf( dateobs, " %4d-%2d-%2d %n", &yy, &mm, &dd, &nc ) == 3 ) &&
+        ( astSscanf( dateobs, " %4d-%2d-%2d %n", &yy, &mm, &dd, &nc ) == 3 ) &&
         ( nc >= len )  ){
       ok = 1;
       hr = 0;
@@ -3146,7 +3146,7 @@ static double DateObs( const char *dateobs ) {
 /* Otherwise, check for the new format "ccyy-mm-ddThh:mm:ss" without a 
    fractional seconds field or the trailing Z. */
    } else if( nc = 0,
-        ( sscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2d %n", &yy, &mm, &dd,
+        ( astSscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2d %n", &yy, &mm, &dd,
                   &hr, &mn, &sc, &nc ) == 6 ) && ( nc >= len )  ){
       ok = 1;
       fsc = 0;
@@ -3154,14 +3154,14 @@ static double DateObs( const char *dateobs ) {
 /* Otherwise, check for the new format "ccyy-mm-ddThh:mm:ss.sss" with a 
    fractional seconds field but without the trailing Z. */
    } else if( nc = 0,
-        ( sscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2d.%d %n", &yy, &mm, &dd,
+        ( astSscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2d.%d %n", &yy, &mm, &dd,
                   &hr, &mn, &sc, &fsc, &nc ) == 7 ) && ( nc >= len )  ){
       ok = 1;
 
 /* Otherwise, check for the new format "ccyy-mm-ddThh:mm:ssZ" without a 
    fractional seconds field but with the trailing Z. */
    } else if( nc = 0,
-        ( sscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2dZ %n", &yy, &mm, &dd,
+        ( astSscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2dZ %n", &yy, &mm, &dd,
                   &hr, &mn, &sc, &nc ) == 6 ) && ( nc >= len )  ){
       ok = 1;
       fsc = 0;
@@ -3169,7 +3169,7 @@ static double DateObs( const char *dateobs ) {
 /* Otherwise, check for the new format "ccyy-mm-ddThh:mm:ss.sssZ" with a 
    fractional seconds field and the trailing Z. */
    } else if( nc = 0,
-        ( sscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2d.%dZ %n", &yy, &mm, &dd,
+        ( astSscanf( dateobs, " %4d-%2d-%2dT%2d:%2d:%2d.%dZ %n", &yy, &mm, &dd,
                   &hr, &mn, &sc, &fsc, &nc ) == 7 ) && ( nc >= len )  ){
       ok = 1;
    }
@@ -8838,7 +8838,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
    int freedata;                 /* Should the data pointer be freed? */
    int i;                        /* Loop counter for keyword characters */
    int len;                      /* Length of current keyword */
-   int nc;                       /* Number of characters read by "sscanf" */
+   int nc;                       /* Number of characters read by "astSscanf" */
    int nn;                       /* No. of characters after UnPreQuoting */
    int type;                     /* Data type code */
    void *data;                   /* Pointer to current data value */
@@ -8899,7 +8899,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
    number. */
          if ( ( type == AST__STRING ) &&
               ( nc = 0,
-                ( 0 == sscanf( keyword, "BEGAST"
+                ( 0 == astSscanf( keyword, "BEGAST"
                                         "%*1[" SEQ_CHARS "]"
                                         "%*1[" SEQ_CHARS "]%n", &nc ) )
                 && ( nc >= len ) ) ) {
@@ -8929,7 +8929,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
          } else if ( !skip &&
                      ( type == AST__STRING ) &&
                      ( nc = 0,
-                       ( 0 == sscanf( keyword,
+                       ( 0 == astSscanf( keyword,
                                       "ISA"
                                       "%*1[" SEQ_CHARS "]"
                                       "%*1[" SEQ_CHARS "]%n", &nc ) )
@@ -8953,7 +8953,7 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
          } else if ( !skip &&
                      ( type == AST__STRING ) &&
                      ( nc = 0,
-                       ( 0 == sscanf( keyword,
+                       ( 0 == astSscanf( keyword,
                                       "ENDAST"
                                       "%*1[" SEQ_CHARS "]"
                                       "%*1[" SEQ_CHARS "]%n", &nc ) )
@@ -10464,7 +10464,7 @@ static int Match( const char *test, const char *temp, int maxfld, int *fields,
    if( match && type == 'd' && a > test ){
       if( *nfld < maxfld ){
          sprintf( fmt, "%%%dd", a - test );
-         sscanf( test, fmt, fields + *nfld );
+         astSscanf( test, fmt, fields + *nfld );
       }
       (*nfld)++;
    }
@@ -11876,7 +11876,7 @@ f        The global status.
    most FITS keywords are simple floating point values, the next most
    common are strings, etc). */
       if( type == AST__FLOAT ){
-         if( 1 == sscanf( value, " %lf %n", &fval, &nc ) && nc >= len ){
+         if( 1 == astSscanf( value, " %lf %n", &fval, &nc ) && nc >= len ){
             astFitsSetF( this, name, fval, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read a floating point "
@@ -11897,7 +11897,7 @@ f        The global status.
 
 /* Read and store integer values from the value string. */
       } else if( type == AST__INT ){
-         if( 1 == sscanf( value, " %d %n", &ival, &nc ) && nc >= len ){
+         if( 1 == astSscanf( value, " %d %n", &ival, &nc ) && nc >= len ){
             astFitsSetI( this, name, ival, comment, overwrite );
          } else {
             astError( AST__BDFTS, "%s(%s): Unable to read an integer FITS "
@@ -11910,7 +11910,7 @@ f        The global status.
 
 /* Read and store complex floating point values from the value string. */
       } else if( type == AST__COMPLEXF ){
-         if( 2 == sscanf( value, " %lf %lf %n", cfval, cfval + 1, &nc ) && 
+         if( 2 == astSscanf( value, " %lf %lf %n", cfval, cfval + 1, &nc ) && 
              nc >= len ){
             astFitsSetCF( this, name, cfval, comment, overwrite );
          } else {
@@ -11920,7 +11920,7 @@ f        The global status.
 
 /* Read and store complex integer values from the value string. */
       } else if( type == AST__COMPLEXI ){
-         if( 2 == sscanf( value, " %d %d %n", cival, cival + 1, &nc ) && 
+         if( 2 == astSscanf( value, " %d %d %n", cival, cival + 1, &nc ) && 
              nc >= len ){
             astFitsSetCI( this, name, cival, comment, overwrite );
          } else {
@@ -12294,7 +12294,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    const char *class;            /* Object class */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int warn;                     /* Offset of Warnings string */
 
 /* Check the global error status. */
@@ -12312,14 +12312,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Card. */
 /* ----- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "card= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "card= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetCard( this, ival );
 
 /* Encoding. */
 /* --------- */
    } else if( nc = 0,
-        ( 0 == sscanf( setting, "encoding=%n%*[^\n]%n", &ival, &nc ) )
+        ( 0 == astSscanf( setting, "encoding=%n%*[^\n]%n", &ival, &nc ) )
         && ( nc >= len ) ) {
 
       nc = ChrLen( setting + ival );
@@ -12362,28 +12362,28 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* FitsDigits. */
 /* ----------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "fitsdigits= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "fitsdigits= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetFitsDigits( this, ival );
 
 /* DefB1950 */
 /* -------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "defb1950= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "defb1950= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetDefB1950( this, ival );
 
 /* Warnings. */
 /* -------- */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "warnings=%n%*[^\n]%n", &warn, &nc ) )
+               ( 0 == astSscanf( setting, "warnings=%n%*[^\n]%n", &warn, &nc ) )
                && ( nc >= len ) ) {
       astSetWarnings( this, setting + warn );
 
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
 /* If the attribute was not recognised, use this macro to report an error
@@ -13793,7 +13793,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 
 /* If it is "B" or "J", read a floating value from the rest */
       if( bj == 'B' || bj == 'J' ) {
-         if( 1 == sscanf( cval + 1, " %lf ", &dval ) ){
+         if( 1 == astSscanf( cval + 1, " %lf ", &dval ) ){
 
 /* If it is a Besselian epoch, convert to Julian. */
             if( bj == 'B' ) dval = slaEpj( slaEpb2d( dval ) );
@@ -13931,7 +13931,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                start = strstr( watmem, format );
                if( start ) {
                   sprintf( format, "projp%d=%%lf", iproj );
-                  if( sscanf( start, format, &projp ) ){
+                  if( astSscanf( start, format, &projp ) ){
                      SetValue( ret, FormatKey( "PV", axlat + 1, iproj, ' ' ),
                                (void *) &projp, AST__FLOAT, 
                                "ZPN projection parameter" );
@@ -14013,7 +14013,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                j = 0;
                nch = 0;
                porder = -1;
-               while( ok && 1 == sscanf( start, " %lf %n", (double *) &dval, &nch ) ){
+               while( ok && 1 == astSscanf( start, " %lf %n", (double *) &dval, &nch ) ){
 
 /* The first value gives the correction surface type. We can only handle 
    type 3 (simple polynonial). */
@@ -14397,13 +14397,13 @@ int astSplit_( const char *card, char **name, char **value,
 /* First attempt to read two integers from the string (separated by white
    space). */
                      if( nch = 0, 
-                         ( 2 == sscanf( v, " %d %d%n", &ir, &ii, &nch ) ) &&
+                         ( 2 == astSscanf( v, " %d %d%n", &ir, &ii, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__COMPLEXI;
 
 /* If that failed, attempt to read a single integer from the string. */
                      } else if( nch = 0, 
-                         ( 1 == sscanf( v, " %d%n", &ir, &nch ) ) &&
+                         ( 1 == astSscanf( v, " %d%n", &ir, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__INT;
                      }
@@ -14414,13 +14414,13 @@ int astSplit_( const char *card, char **name, char **value,
 /* First attempt to read two doubles from the string (separated by white
    space). */
                      if( nch = 0, 
-                         ( 2 == sscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
+                         ( 2 == astSscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__COMPLEXF;
 
 /* If that failed, attempt to read a single double from the string. */
                      } else if( nch = 0, 
-                         ( 1 == sscanf( v, " %lf%n", &fr, &nch ) ) &&
+                         ( 1 == astSscanf( v, " %lf%n", &fr, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__FLOAT;
                      }
@@ -14440,13 +14440,13 @@ int astSplit_( const char *card, char **name, char **value,
 /* Attempt to read two doubles from the edited string (separated by white
    space). */
                         if( nch = 0, 
-                          ( 2 == sscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
+                          ( 2 == astSscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
                           ( nch >= len ) ) {
                            type = AST__COMPLEXF;
 
 /* If that failed, attempt to read a single double from the edited string. */
                         } else if( nch = 0, 
-                            ( 1 == sscanf( v, " %lf%n", &fr, &nch ) ) &&
+                            ( 1 == astSscanf( v, " %lf%n", &fr, &nch ) ) &&
                             ( nch >= len ) ) {
                            type = AST__FLOAT;
                         }

@@ -853,7 +853,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    int nc1;                      /* Offset to start of first field */
    int nc2;                      /* Offset to end of first field */
    int nc3;                      /* Offset to start of second field */
-   int nc;                       /* Number of charaters read by "sscanf" */
+   int nc;                       /* Number of charaters read by "astSscanf" */
 
 /* Initialise the returned values. */
    *name = NULL;
@@ -879,7 +879,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    is set. */
       if ( nc = 0,
            ( !skip
-             && ( 0 == sscanf( line,
+             && ( 0 == astSscanf( line,
                                " %n%*" MAX_NAME "[^ \t=]%n = %n%*[^\n]%n",
                                &nc1, &nc2, &nc3, &nc ) )
              && ( nc >= len ) ) ) {
@@ -910,7 +910,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    if the "skip" flag is set. */
       } else if ( nc = 0,
                   ( !skip
-                    && ( 0 == sscanf( line,
+                    && ( 0 == astSscanf( line,
                                       " %n%*" MAX_NAME "[^ \t=]%n = %n",
                                       &nc1, &nc2, &nc ) )
                     && ( nc >= len ) ) ) {
@@ -925,7 +925,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
 /* ------ */
 /* Test for lines of the form " Begin Class " (or similar). */
       } else if ( nc = 0,
-             ( ( 0 == sscanf( line,
+             ( ( 0 == astSscanf( line,
                              " %*1[Bb]%*1[Ee]%*1[Gg]%*1[Ii]%*1[Nn] %n%*s%n %n",
                               &nc1, &nc2, &nc ) )
                && ( nc >= len ) ) ) {
@@ -945,7 +945,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    lies if the "skip" flag is set. */
       } else if ( nc = 0,
                   ( !skip
-                    && ( 0 == sscanf( line,
+                    && ( 0 == astSscanf( line,
                                       " %*1[Ii]%*1[Ss]%*1[Aa] %n%*s%n %n",
                                       &nc1, &nc2, &nc ) )
                     && ( nc >= len ) ) ) {
@@ -964,7 +964,7 @@ static void GetNextData( AstChannel *this, int skip, char **name,
    lines if the "skip" flag is set. */
       } else if ( nc = 0,
                   ( !skip
-                    && ( 0 == sscanf( line,
+                    && ( 0 == astSscanf( line,
                                       " %*1[Ee]%*1[Nn]%*1[Dd] %n%*s%n %n",
                                       &nc1, &nc2, &nc ) )
                     && ( nc >= len ) ) ) {
@@ -2214,7 +2214,7 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
 /* Local Variables: */
    Value *value;                 /* Pointer to required Value structure */
    double result;                /* Value to be returned */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    
 /* Initialise. */
    result = 0.0;
@@ -2237,7 +2237,7 @@ static double ReadDouble( AstChannel *this, const char *name, double def ) {
    wrong name has probably been given, or the input data are corrupt,
    so report an error. */
             nc = 0;
-            if ( !( ( 1 == sscanf( value->ptr.string, " %lf %n",
+            if ( !( ( 1 == astSscanf( value->ptr.string, " %lf %n",
                                                       &result, &nc ) )
                     && ( nc >= (int) strlen( value->ptr.string ) ) ) ) {
                astError( AST__BADIN,
@@ -2327,7 +2327,7 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
 
 /* Local Variables: */
    Value *value;                 /* Pointer to required Value structure */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int result;                   /* Value to be returned */
    
 /* Initialise. */
@@ -2351,7 +2351,7 @@ static int ReadInt( AstChannel *this, const char *name, int def ) {
    wrong name has probably been given, or the input data are corrupt,
    so report an error. */
             nc = 0;
-            if ( !( ( 1 == sscanf( value->ptr.string, " %d %n",
+            if ( !( ( 1 == astSscanf( value->ptr.string, " %d %n",
                                                       &result, &nc ) )
                     && ( nc >= (int) strlen( value->ptr.string ) ) ) ) {
                astError( AST__BADIN,
@@ -2705,7 +2705,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int comment;                  /* Comment attribute value */
    int full;                     /* Full attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by "sscanf" */
+   int nc;                       /* Number of characters read by "astSscanf" */
    int skip;                     /* Skip attribute value */
 
 /* Check the global error status. */
@@ -2717,7 +2717,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -2726,21 +2726,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Comment. */
 /* ---------*/
    if ( nc = 0,
-        ( 1 == sscanf( setting, "comment= %d %n", &comment, &nc ) )
+        ( 1 == astSscanf( setting, "comment= %d %n", &comment, &nc ) )
         && ( nc >= len ) ) {
       astSetComment( this, comment );
 
 /* Full. */
 /* ----- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "full= %d %n", &full, &nc ) )
+               ( 1 == astSscanf( setting, "full= %d %n", &full, &nc ) )
                && ( nc >= len ) ) {
       astSetFull( this, full );
 
 /* Skip. */
 /* ----- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "skip= %d %n", &skip, &nc ) )
+               ( 1 == astSscanf( setting, "skip= %d %n", &skip, &nc ) )
                && ( nc >= len ) ) {
       astSetSkip( this, skip );
 

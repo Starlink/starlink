@@ -1485,7 +1485,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1506,7 +1506,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Digits(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "digits(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "digits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
 
 /* There is no function to clear the Digits attribute for an axis
@@ -1520,7 +1520,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Direction(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "direction(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "direction(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearDirection( this, axis - 1 );
 
@@ -1532,14 +1532,14 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Format(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "format(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "format(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearFormat( this, axis - 1 );
 
 /* Label(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "label(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "label(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearLabel( this, axis - 1 );
 
@@ -1571,7 +1571,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Symbol(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearSymbol( this, axis - 1 );
 
@@ -1583,7 +1583,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Unit(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "unit(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "unit(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearUnit( this, axis - 1 );
 
@@ -1602,7 +1602,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "%*[^()]%n(%d)%n",
+               ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
                                       &axis_nc, &axis, &nc ) )
                && ( nc >= len ) ) {
 
@@ -3177,7 +3177,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int max_axes;                 /* MaxAxes attribute value */
    int min_axes;                 /* MinAxes attribute value */
    int naxes;                    /* Naxes attribute value */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    int permute;                  /* Permute attribute value */
    int preserve_axes;            /* PreserveAxes attribute value */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
@@ -3211,7 +3211,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Digits(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "digits(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "digits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
 
 /* There is no function to obtain the Digits attribute value for an
@@ -3235,7 +3235,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Direction(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "direction(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "direction(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       direction = astGetDirection( this, axis - 1 );
       if ( astOK ) {
@@ -3251,14 +3251,14 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Format(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "format(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "format(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astGetFormat( this, axis - 1 );
 
 /* Label(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "label(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "label(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astGetLabel( this, axis - 1 );
 
@@ -3319,7 +3319,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Symbol(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astGetSymbol( this, axis - 1 );
 
@@ -3331,7 +3331,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Unit(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "unit(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "unit(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astGetUnit( this, axis - 1 );
 
@@ -3341,7 +3341,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "%*[^()]%n(%d)%n",
+               ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
                                       &axis_nc, &axis, &nc ) )
                && ( nc >= len ) ) {
 
@@ -5152,7 +5152,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int match_end;                /* Match final axes of target? */
    int max_axes;                 /* Maximum number of axes matched */
    int min_axes;                 /* Minimum number of axes matched */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int permute;                  /* Permute axes in order to match? */
    int preserve_axes;            /* Preserve matched target axes? */
    int symbol;                   /* Offset of axis Symbol string */
@@ -5168,7 +5168,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse the
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
    case of string values). In each case, use the value set in "nc" to check
    that the entire string was matched. Once a value has been obtained, use the
@@ -5177,14 +5177,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Digits. */
 /* ------- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "digits= %d %n", &digits, &nc ) )
+        ( 1 == astSscanf( setting, "digits= %d %n", &digits, &nc ) )
         && ( nc >= len ) ) {
       astSetDigits( this, digits );
 
 /* Digits(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "digits(%d)= %d %n",
+               ( 2 == astSscanf( setting, "digits(%d)= %d %n",
                               &axis, &digits, &nc ) )
                && ( nc >= len ) ) {
 
@@ -5199,7 +5199,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Direction(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "direction(%d)= %d %n",
+               ( 2 == astSscanf( setting, "direction(%d)= %d %n",
                               &axis, &direction, &nc ) )
                && ( nc >= len ) ) {
       astSetDirection( this, axis - 1, direction );
@@ -5207,14 +5207,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Domain. */
 /* ------- */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "domain=%n%*[^\n]%n", &domain, &nc ) )
+               ( 0 == astSscanf( setting, "domain=%n%*[^\n]%n", &domain, &nc ) )
                && ( nc >= len ) ) {
       astSetDomain( this, setting + domain );
 
 /* Format(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "format(%d)=%n%*[^\n]%n",
+               ( 1 == astSscanf( setting, "format(%d)=%n%*[^\n]%n",
                               &axis, &format, &nc ) )
                && ( nc >= len ) ) {
       astSetFormat( this, axis - 1, setting + format );
@@ -5222,7 +5222,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Label(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "label(%d)=%n%*[^\n]%n",
+               ( 1 == astSscanf( setting, "label(%d)=%n%*[^\n]%n",
                               &axis, &label, &nc ) )
                && ( nc >= len ) ) {
       astSetLabel( this, axis - 1, setting + label );
@@ -5230,35 +5230,35 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* MatchEnd. */
 /* --------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "matchend= %d %n", &match_end, &nc ) )
+               ( 1 == astSscanf( setting, "matchend= %d %n", &match_end, &nc ) )
                && ( nc >= len ) ) {
       astSetMatchEnd( this, match_end );
 
 /* MaxAxes. */
 /* -------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "maxaxes= %d %n", &max_axes, &nc ) )
+               ( 1 == astSscanf( setting, "maxaxes= %d %n", &max_axes, &nc ) )
                && ( nc >= len ) ) {
       astSetMaxAxes( this, max_axes );
 
 /* MinAxes. */
 /* -------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "minaxes= %d %n", &min_axes, &nc ) )
+               ( 1 == astSscanf( setting, "minaxes= %d %n", &min_axes, &nc ) )
                && ( nc >= len ) ) {
       astSetMinAxes( this, min_axes );
 
 /* Permute. */
 /* -------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "permute= %d %n", &permute, &nc ) )
+               ( 1 == astSscanf( setting, "permute= %d %n", &permute, &nc ) )
                && ( nc >= len ) ) {
       astSetPermute( this, permute );
 
 /* PreserveAxes. */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "preserveaxes= %d %n",
+               ( 1 == astSscanf( setting, "preserveaxes= %d %n",
                               &preserve_axes, &nc ) )
                && ( nc >= len ) ) {
       astSetPreserveAxes( this, preserve_axes );
@@ -5266,7 +5266,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Symbol(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "symbol(%d)=%n%*[^\n]%n",
+               ( 1 == astSscanf( setting, "symbol(%d)=%n%*[^\n]%n",
                               &axis, &symbol, &nc ) )
                && ( nc >= len ) ) {
       astSetSymbol( this, axis - 1, setting + symbol );
@@ -5274,14 +5274,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Title. */
 /* ------ */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "title=%n%*[^\n]%n", &title, &nc ) )
+               ( 0 == astSscanf( setting, "title=%n%*[^\n]%n", &title, &nc ) )
                && ( nc >= len ) ) {
       astSetTitle( this, setting + title );
 
 /* Unit(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "unit(%d)=%n%*[^\n]%n",
+               ( 1 == astSscanf( setting, "unit(%d)=%n%*[^\n]%n",
                               &axis, &unit, &nc ) )
                & ( nc >= len ) ) {
       astSetUnit( this, axis - 1, setting + unit );
@@ -5292,7 +5292,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
 /* Use this macro to report an error if a read-only attribute has been
@@ -5308,7 +5308,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "%*[^()]%n(%d)%n=%*[^\n]%n",
+               ( 1 == astSscanf( setting, "%*[^()]%n(%d)%n=%*[^\n]%n",
                                        &axis_nc, &axis, &axis_value, &nc ) )
                && ( nc >= len ) ) {
 
@@ -5697,7 +5697,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -5722,7 +5722,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Digits(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "digits(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "digits(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
 
 /* There is no function to test the Digits attribute for an axis
@@ -5736,7 +5736,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Direction(axis). */
 /* ---------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "direction(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "direction(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestDirection( this, axis - 1 );
 
@@ -5748,14 +5748,14 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Format(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "format(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "format(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestFormat( this, axis - 1 );
 
 /* Label(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "label(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "label(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestLabel( this, axis - 1 );
 
@@ -5787,7 +5787,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Symbol(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestSymbol( this, axis - 1 );
 
@@ -5799,7 +5799,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Unit(axis). */
 /* ----------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "unit(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "unit(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestUnit( this, axis - 1 );
 
@@ -5816,7 +5816,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "%*[^()]%n(%d)%n",
+               ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
                                       &axis_nc, &axis, &nc ) )
                && ( nc >= len ) ) {
 

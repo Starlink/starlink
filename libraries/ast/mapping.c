@@ -9117,7 +9117,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstMapping *this;             /* Pointer to the Mapping structure */
    int invert;                   /* Invert attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int report;                   /* Report attribute value */
 
 /* Check the global error status. */
@@ -9129,7 +9129,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -9138,21 +9138,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Invert. */
 /* ------- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "invert= %d %n", &invert, &nc ) )
+        ( 1 == astSscanf( setting, "invert= %d %n", &invert, &nc ) )
         && ( nc >= len ) ) {
       astSetInvert( this, invert );
 
 /* Report. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "report= %d %n", &report, &nc ) )
+        ( 1 == astSscanf( setting, "report= %d %n", &report, &nc ) )
         && ( nc >= len ) ) {
       astSetReport( this, report );
 
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
 /* If the attribute was not recognised, use this macro to report an error

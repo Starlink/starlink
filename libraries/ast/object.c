@@ -1299,9 +1299,9 @@ c     the string should be made if it is needed for longer than this.
       type
          The C type of the function return value.
       format
-         A quoted string containing a sscanf format specifier that
+         A quoted string containing a astSscanf format specifier that
          will read the attribute value into a variable of the required
-         data type. This format should transfer 1 sscanf value.
+         data type. This format should transfer 1 astSscanf value.
 */
 #define MAKE_GETX(code,type,format) \
 type astGet##code##_( AstObject *this, const char *attrib ) { \
@@ -1326,7 +1326,7 @@ type astGet##code##_( AstObject *this, const char *attrib ) { \
 /* Read the value from the string, ignoring surrounding white \
    space. */ \
       nc = 0; \
-      nval = sscanf( str, " " format " %n", &value, &nc ); \
+      nval = astSscanf( str, " " format " %n", &value, &nc ); \
 \
 /* Check that the number of values read was 1 and that all the \
    string's characters were consumed. If so, use the result. */ \
@@ -1634,7 +1634,7 @@ static void SetAttrib( AstObject *this, const char *setting ) {
 /* Local Variables: */
    int id;                       /* Offset of ID string */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1642,7 +1642,7 @@ static void SetAttrib( AstObject *this, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -1650,13 +1650,13 @@ static void SetAttrib( AstObject *this, const char *setting ) {
 
 /* ID. */
 /* --- */
-   if ( nc = 0, ( 0 == sscanf( setting, "id=%n%*[^\n]%n", &id, &nc ) )
+   if ( nc = 0, ( 0 == astSscanf( setting, "id=%n%*[^\n]%n", &id, &nc ) )
                 && ( nc >= len ) ) {
       astSetID( this, setting + id );
 
 /* Ident. */
 /* ------ */
-   } else if ( nc = 0, ( 0 == sscanf( setting, "ident=%n%*[^\n]%n", &id, &nc ) )
+   } else if ( nc = 0, ( 0 == astSscanf( setting, "ident=%n%*[^\n]%n", &id, &nc ) )
                 && ( nc >= len ) ) {
       astSetIdent( this, setting + id );
 
@@ -1664,7 +1664,7 @@ static void SetAttrib( AstObject *this, const char *setting ) {
    read-only attributes of this class and use this to report an error
    if it does. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
    } else if ( MATCH( "class" ) ||

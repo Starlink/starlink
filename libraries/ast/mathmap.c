@@ -3720,8 +3720,8 @@ static void ParseConstant( const char *method, const char *class,
    int expon;                    /* Exponent character encountered? */
    int i;                        /* Loop counter for characters */
    int iscon;		         /* Character is part of the constant? */
-   int n;                        /* Number of values read by sscanf */
-   int nc;                       /* Number of characters read by sscanf */
+   int n;                        /* Number of values read by astSscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int numer;                    /* Numeral encountered in current field? */
    int sign;                     /* Sign encountered? */
    int valid;		         /* Constant syntax valid? */
@@ -3813,7 +3813,7 @@ static void ParseConstant( const char *method, const char *class,
          if ( astOK ) {
 
 /* Copy the constant's characters, changing 'd' to 'e' so that
-   "sscanf" will recognise it as an exponent character. */
+   "astSscanf" will recognise it as an exponent character. */
             for ( i = istart; i <= *iend; i++ ) {
                str[ i - istart ] = ( exprs[ i ] == 'd' ) ? 'e' : exprs[ i ];
             }
@@ -3821,7 +3821,7 @@ static void ParseConstant( const char *method, const char *class,
             
 /* Attempt to read the constant as a double, noting how many values
    are read and how many characters consumed. */
-            n = sscanf( str, "%lf%n", con, &nc );
+            n = astSscanf( str, "%lf%n", con, &nc );
 
 /* Check that one value was read and all the characters consumed. If
    not, then the constant's syntax is invalid. */
@@ -4465,7 +4465,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstMathMap *this;             /* Pointer to the MathMap structure */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -4476,7 +4476,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse the
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
    case of string values). In each case, use the value set in "nc" to check
    that the entire string was matched. Once a value has been obtained, use the
@@ -4485,21 +4485,21 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Seed. */
 /* ----- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "seed= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "seed= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetSeed( this, ival );
       
 /* SimpFI. */
 /* ------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "simpfi= %d %n", &ival, &nc ) )
+               ( 1 == astSscanf( setting, "simpfi= %d %n", &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetSimpFI( this, ival );
 
 /* SimpIF. */
 /* ------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "simpif= %d %n", &ival, &nc ) )
+               ( 1 == astSscanf( setting, "simpif= %d %n", &ival, &nc ) )
                && ( nc >= len ) ) {
       astSetSimpIF( this, ival );
 

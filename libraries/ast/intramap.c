@@ -1377,7 +1377,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstIntraMap *this;            /* Pointer to the IntraMap structure */
    int intraflag;                /* Offset of IntraFlag value in string */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1388,7 +1388,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse the
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
    case of string values). In each case, use the value set in "nc" to check
    that the entire string was matched. Once a value has been obtained, use the
@@ -1397,7 +1397,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* IntraFlag. */
 /* ---------- */
    if ( nc = 0,
-        ( 0 == sscanf( setting, "intraflag=%n%*[^\n]%n", &intraflag, &nc ) )
+        ( 0 == astSscanf( setting, "intraflag=%n%*[^\n]%n", &intraflag, &nc ) )
         && ( nc >= len ) ) {
       astSetIntraFlag( this, setting + intraflag );
 

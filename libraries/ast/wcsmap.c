@@ -961,7 +961,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    int i;                       /* Axis index */
    int len;                     /* Length of the attribute name */
    int m;                       /* Projection parameter index */
-   int nc;                      /* No. of characters read by sscanf */
+   int nc;                      /* No. of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -973,20 +973,20 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* ProjP. */
 /* ------ */
-   if ( nc = 0, ( 1 == sscanf( attrib, "prpjp(%d)%n", &m, &nc ) )
+   if ( nc = 0, ( 1 == astSscanf( attrib, "prpjp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       astClearPV( this, astGetWcsAxis( this, 1 ), m );
 
 /* PV. */
 /* ------ */
-   } else if ( nc = 0, ( 2 == sscanf( attrib, "pv%d_%d%n", &i, &m, &nc ) )
+   } else if ( nc = 0, ( 2 == astSscanf( attrib, "pv%d_%d%n", &i, &m, &nc ) )
                   && ( nc >= len ) ) {
       astClearPV( this, i - 1, m );
 
 /* If the name was not recognised, test if it matches any of the
    read-only attributes of this class. If it does, then report an
    error. */
-   } else if ( ( nc = 0, ( 1 == sscanf( attrib, "wcsaxis(%d)%n", &i, &nc ) )
+   } else if ( ( nc = 0, ( 1 == astSscanf( attrib, "wcsaxis(%d)%n", &i, &nc ) )
                            && ( nc >= len ) ) ||
         !strcmp( attrib, "wcstype" ) ||
         !strcmp( attrib, "natlat" ) ){
@@ -1296,7 +1296,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int ival;                    /* Integer attribute value */
    int len;                     /* Length of attribute string */
    int m;                       /* Projection parameter index */
-   int nc;                      /* No. of characters read by sscanf */
+   int nc;                      /* No. of characters read by astSscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -1318,7 +1318,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* ProjP. */
 /* ------ */
-   if ( nc = 0, ( 1 == sscanf( attrib, "projp(%d)%n", &m, &nc ) )
+   if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       dval = astGetPV( this, astGetWcsAxis( this, 1 ), m );
       if ( astOK ) {
@@ -1328,7 +1328,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* PV. */
 /* --- */
-   } else if ( nc = 0, ( 2 == sscanf( attrib, "pv%d_%d%n", &i, &m, &nc ) )
+   } else if ( nc = 0, ( 2 == astSscanf( attrib, "pv%d_%d%n", &i, &m, &nc ) )
                   && ( nc >= len ) ) {
       dval = astGetPV( this, i - 1, m );
       if ( astOK ) {
@@ -1357,7 +1357,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* WcsAxis */
 /* ======= */
-   } else if ( nc = 0, ( 1 == sscanf( attrib, "wcsaxis(%d)%n", &i, &nc ) )
+   } else if ( nc = 0, ( 1 == astSscanf( attrib, "wcsaxis(%d)%n", &i, &nc ) )
                          && ( nc >= len ) ) {
       ival = astGetWcsAxis( this, i - 1 ) + 1;
       if ( astOK ) {
@@ -2497,7 +2497,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstWcsMap *this;              /* Pointer to the WcsMap structure */
    double dval;                  /* Attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int i;                        /* Axis index */
    int j;                        /* Axis index */
    int m;                        /* Projection parameter number */
@@ -2511,7 +2511,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -2519,24 +2519,24 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* ProjP(i). */
 /* --------- */
-   if ( nc = 0, ( 2 == sscanf( setting, "projp(%d)= %lg %n", &m, &dval, &nc ) ) 
+   if ( nc = 0, ( 2 == astSscanf( setting, "projp(%d)= %lg %n", &m, &dval, &nc ) ) 
                   && ( nc >= len ) ) {
       astSetPV( this, astGetWcsAxis( this, 1 ), m, dval );
 
 /* PV. */
 /* --- */
-   } else if ( nc = 0, ( 3 == sscanf( setting, "pv%d_%d= %lg %n", &j, &m, &dval, &nc ) )
+   } else if ( nc = 0, ( 3 == astSscanf( setting, "pv%d_%d= %lg %n", &j, &m, &dval, &nc ) )
                   && ( nc >= len ) ) {
       astSetPV( this, j - 1, m, dval );
 
 /* Define macros to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
 #define MATCH2(attrib) \
-        ( nc = 0, ( 1 == sscanf( setting, attrib "(%d)=%*[^\n]%n", &i, &nc ) ) && \
+        ( nc = 0, ( 1 == astSscanf( setting, attrib "(%d)=%*[^\n]%n", &i, &nc ) ) && \
                   ( nc >= len ) )
 
 /* If the attribute was not recognised, use this macro to report an error
@@ -2721,7 +2721,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    int j;                       /* Axis index */
    int m;                       /* Projection parameter index */
    int len;                     /* Length os supplied string */
-   int nc;                      /* No. of characters read by sscanf */
+   int nc;                      /* No. of characters read by astSscanf */
    int result;                  /* Result value to return */
 
 /* Initialise. */
@@ -2738,13 +2738,13 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* ProjP(i). */
 /* --------- */
-   if ( nc = 0, ( 1 == sscanf( attrib, "projp(%d)%n", &m, &nc ) )
+   if ( nc = 0, ( 1 == astSscanf( attrib, "projp(%d)%n", &m, &nc ) )
                   && ( nc >= len ) ) {
       result = astTestPV( this, astGetWcsAxis( this, 1 ), m );
 
 /* PV. */
 /* --- */
-   } else if ( nc = 0, ( 2 == sscanf( attrib, "pv%d_%d%n", &j, &m, &nc ) )
+   } else if ( nc = 0, ( 2 == astSscanf( attrib, "pv%d_%d%n", &j, &m, &nc ) )
                   && ( nc >= len ) ) {
       result = astTestPV( this, j - 1, m );
 
@@ -2753,7 +2753,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    zero. */
    } else if ( !strcmp( attrib, "wcstype" ) ||
                !strcmp( attrib, "natlat" ) ||
-               ( nc = 0, ( 1 == sscanf( attrib, "wcsaxis(%d)%n", &j, &nc ) )
+               ( nc = 0, ( 1 == astSscanf( attrib, "wcsaxis(%d)%n", &j, &nc ) )
                            && ( nc >= len ) ) ) {
       result = 0;
 

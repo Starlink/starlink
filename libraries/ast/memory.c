@@ -34,6 +34,8 @@
 *     18-MAR-1998 (RFWS):
 *        Added notes about these functions being available for writing
 *        foreign language and graphics interfaces, etc.
+*     29-JAN-2002 (DSB):
+*        Added astChrLen and astSscanf.
 */
 
 /* Module Macros. */
@@ -59,6 +61,7 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 /* Module Type Definitions. */
 /* ======================== */
@@ -937,4 +940,235 @@ s
 
 /* Return the result. */
    return result;
+}
+
+size_t astChrLen_( const char *string ) {
+/*
+*+
+*  Name:
+*     astChrLen
+
+*  Purpose:
+*     Determine the used length of a string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     size_t astChrLen( const char *string )
+
+*  Description:
+*     This function returns the used length of a string. This excludes any
+*     trailing white space or non-printable characters (such as the
+*     trailing null character).
+
+*  Parameters:
+*     string
+*        Pointer to the string.
+
+*  Returned Value:
+*     The number of characters in the supplied string, not including the 
+*     trailing newline, and any trailing white-spaces or non-printable 
+*     characters.
+
+*-
+*/
+
+/* Local Variables: */
+   const char *c;           /* Pointer to the next character to check */
+   size_t ret;              /* The returned string length */
+
+/* Initialise the returned string length. */
+   ret = 0;
+
+/* Check a string has been supplied. */
+   if( string ){
+
+/* Check each character in turn, starting with the last one. */
+      ret = strlen( string );
+      c = string + ret - 1;
+      while( ret ){
+         if( isprint( (int) *c ) && !isspace( (int) *c ) ) break;
+         c--;
+         ret--;
+      }
+   }
+
+/* Return the answer. */
+   return ret;
+
+}
+
+int astSscanf_( const char *str, const char *fmt, ...) {
+/*
+*+
+*  Name:
+*     astSscanf
+
+*  Purpose:
+*     A wrapper for the ANSI sscanf function.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     int astSscanf( const char *str, const char *fmt, ...)
+
+*  Description:
+*     This function is a direct plug-in replacement for sscanf. It ensures ANSI
+*     behaviour is available on all platforms, including those (such as
+*     MacOS) on which have the native sscanf function exhibits non-ANSI
+*     behaviour.
+
+*  Parameters:
+*     str
+*        Pointer to the string to be scanned.
+*     fmt
+*        Pointer to the format string which defines the fields to be
+*        looked for within "str".
+*     ...
+*        Pointers to locations at which to return the value of each
+*        succesfuly converted field, in the order specified in "fmt".
+
+*  Returned Value:
+*     The number of fields which were succesfully read from "str".
+*-
+*/
+
+/* Local Variables: */
+   char *newfor;            /* Pointer to modified format string */
+   char *c;                 /* Pointer to the next character to check */
+   const char *d;           /* Pointer to the next character to check */
+   int again;               /* Remove another space before the %n? */
+   int lfor;                /* No. of characters in format string */
+   int lstr;                /* No. of characters in scanned string */
+   int nc;                  /* No. of characters read from str */
+   int nfld;                /* No. of counted field specifiers found so far */
+   int ret;                 /* The returned number of conversions */
+   va_list args;            /* Variable argument list pointer */
+   void *fptr;              /* The next supplied pointer */ 
+
+/* Initialise the variable argument list pointer. */
+   va_start( args, fmt );
+
+/* Initialise the returned string length. */
+   ret = 0;
+
+/* Check a string and format have been supplied. */
+   if( str && fmt ){
+
+/* Get the length of the string to be scanned. */
+      lstr = strlen( str );
+
+/* Get the length of the format string excluding any trailing white space. */
+      lfor = astChrLen( fmt );
+
+/* Bill Joye reports that MacOS sscanf fails to return the correct number of
+   characters read (using a %n conversion) if there is a space before the
+   %n. So check for this. Does the format string contain " %n"? */
+      c = strstr( fmt, " %n" );
+      if( c ) {
+
+/* Take a copy of the supplied format string (excluding any trailing spaces). */
+         newfor = (char *) astStore( NULL, (void *) fmt, (size_t) lfor + 1 ); 
+         if( newfor ) {
+
+/* Ensure the string is terminated (in case the supplied format string
+   has any trailing spaces). */
+            newfor[ lfor ] = 0;
+
+/* Remove all spaces from before any %n. */
+            c = strstr( (const char *) newfor, " %n" );
+            while( c ) {
+               while( *(c++) ) *( c - 1 ) = *c;
+               c = strstr( newfor, " %n" );
+            }
+
+/* Use the native sscanf with the modified format string. */
+            ret = vsscanf( str, newfor, args );
+
+/* Now look through the original format string for conversions specifiers.
+   If any %n conversions are found which are preceeded by a space, then
+   correct the returned character counts to include any spaces following the
+   corresponding point in the scanned string. */
+            nfld = 0;
+            c = (char *) fmt;
+	    while( *c ) {
+
+/* Field specifiers are marked by a % sign. */
+               if( *c == '%' ) {
+
+/* Look at the character following the % sign. Quit if the end of the string 
+   has been reached. */
+                  c++;
+                  if( *c ) {
+
+/* If the % sign is followed by a "*" or another "%", then there will be no
+   corresponding pointer in the variable argument list "args". Ignore such
+   field specifiers. */ 
+                     if( *c != '*' && *c != '%' ) {
+
+/* Get the supplied pointer corresponding to this field specifier. */
+                        fptr = va_arg( args, void *);
+
+/* Increment the number of matched fields required. "%n" specifiers are not 
+   included in the value returned by sscanf so skip over them. */
+                        if( *c != 'n' ) {
+			   nfld++; 
+
+/* If the % sign is followed by a "n", and was preceeded by a space, we
+   may need to correct the returned character count. */
+                        } else if( c > fmt + 1 && *(c-2) == ' ' ) {
+
+/* Do not correct the returned value if sscanf did not get as far as this
+   field specifier before an error occurred. */
+                           if( ret >= nfld ) {
+
+/* Get the original character count produced by sscanf. */
+                              nc = *( (int *) fptr );
+
+/* For each space in "str" which follows, increment the returned count by
+   one (so long as the original count is not zero or more than the length
+   of the string - this is not foolproof, but I can't think of a better
+   check - all uses of %n in AST initialize the supplied count to zero 
+   before calling sscanf so a value fo zero is a safe (ish) bet that the
+   supplied string doesn't match the supplied format). */
+                              if( nc > 0 && nc < lstr ) {
+                                 d = str + nc;
+                                 while( *(d++) == ' ' ) nc++;
+                                 *( (int *) fptr ) = nc;
+                              }
+                           }
+                        }
+                     }
+
+/* Move on the first character following the field specifier. */
+                     c++;
+                  }
+
+/* If this is not the start of a field specifier, pass on. */
+               } else {
+                  c++;
+               }
+            }
+
+/* Release the temporary copy of the format string. */
+            newfor = (char *) astFree( (void *) newfor );
+         }
+
+/* If the format string should not trigger any known problems, use sscanf
+   directly. */
+      } else {
+         ret = vsscanf( str, fmt, args );
+      }      
+   }
+
+/* Tidy up the argument pointer. */
+   va_end( args );
+
+/* Return the answer. */
+   return ret;
+
 }

@@ -809,7 +809,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstZoomMap *this;             /* Pointer to the ZoomMap structure */
    double zoom;                  /* Zoom attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -820,7 +820,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -829,7 +829,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Zoom. */
 /* ----- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "zoom= %lf %n", &zoom, &nc ) )
+        ( 1 == astSscanf( setting, "zoom= %lf %n", &zoom, &nc ) )
         && ( nc >= len ) ) {
       astSetZoom( this, zoom );
 

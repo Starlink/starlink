@@ -5263,7 +5263,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int id;                       /* Offset of ID string */
    int invert;                   /* Invert attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int report;                   /* Report attribute value */
 
 /* Check the global error status. */
@@ -5275,7 +5275,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse the
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
    case of string values). In each case, use the value set in "nc" to check
    that the entire string was matched. Once a value has been obtained, use the
@@ -5288,13 +5288,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* ----- */
 /* Read as an integer. */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "base= %d %n", &base, &nc ) )
+        ( 1 == astSscanf( setting, "base= %d %n", &base, &nc ) )
           && ( nc >= len ) ) {
       astSetBase( this, base );
 
 /* Also allow a string. */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "base= %n%*s %n", &base_off, &nc ) )
+               ( 0 == astSscanf( setting, "base= %n%*s %n", &base_off, &nc ) )
                  && ( nc >= len ) ) {
 
 /* Check for "AST__CURRENT" or "Current". */
@@ -5322,7 +5322,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Read as an integer. */
    } else if ( nc = 0,
-               ( 1 == sscanf( setting, "current= %d %n", &current, &nc ) )
+               ( 1 == astSscanf( setting, "current= %d %n", &current, &nc ) )
                  && ( nc >= len ) ) {
       RestoreIntegrity( this );
       astSetCurrent( this, current );
@@ -5330,7 +5330,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Also allow a string. */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "current= %n%*s %n",
+               ( 0 == astSscanf( setting, "current= %n%*s %n",
                               &current_off, &nc ) )
                  && ( nc >= len ) ) {
 
@@ -5355,7 +5355,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* ID. */
 /* --- */
-   } else if ( nc = 0, ( 0 == sscanf( setting, "id=%n%*[^\n]%n", &id, &nc ) )
+   } else if ( nc = 0, ( 0 == astSscanf( setting, "id=%n%*[^\n]%n", &id, &nc ) )
                        && ( nc >= len ) ) {
       astSetID( this, setting + id );
 
@@ -5365,7 +5365,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    integrity state of the FrameSet before changing this attribute and
    record the new integrity state afterwards. */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "invert= %d %n", &invert, &nc ) )
+        ( 1 == astSscanf( setting, "invert= %d %n", &invert, &nc ) )
         && ( nc >= len ) ) {
       RestoreIntegrity( this );
       astSetInvert( this, invert );
@@ -5374,14 +5374,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Report. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "report= %d %n", &report, &nc ) )
+        ( 1 == astSscanf( setting, "report= %d %n", &report, &nc ) )
         && ( nc >= len ) ) {
       astSetReport( this, report );
 
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
 /* If the attribute was not recognised, use this macro to report an error

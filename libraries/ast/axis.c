@@ -742,14 +742,14 @@ static int AxisUnformat( AstAxis *this, const char *string, double *value ) {
 /* See if the string can be read as a floating point number. If so,
    return its value. Also obtain the number of characters read,
    including any leading and trailing white space. */
-   if ( 1 == sscanf( string, "%lf %n", &coord, &nc ) ) {
+   if ( 1 == astSscanf( string, "%lf %n", &coord, &nc ) ) {
       *value = coord;
 
 /* Otherwise, see if the string starts with "<bad>", allowing mixed
    case and leading, embedded and trailing white space. If so, return
    the value AST__BAD. */
    } else if ( nc = 0,
-               ( 0 == sscanf( string, " < %*1[Bb] %*1[Aa] %*1[Dd] > %n", &nc )
+               ( 0 == astSscanf( string, " < %*1[Bb] %*1[Aa] %*1[Dd] > %n", &nc )
                && ( nc > 0 ) ) ) {
       *value = AST__BAD;
 
@@ -1121,7 +1121,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -1130,42 +1130,42 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Digits. */
 /* ------- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "digits= %d %n", &digits, &nc ) )
+        ( 1 == astSscanf( setting, "digits= %d %n", &digits, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisDigits( this, digits );
 
 /* Direction. */
 /* ---------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "direction= %d %n", &direction, &nc ) )
+        ( 1 == astSscanf( setting, "direction= %d %n", &direction, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisDirection( this, direction );
 
 /* Format. */
 /* ------- */
    } else if ( nc = 0,
-        ( 0 == sscanf( setting, "format=%n%*[^\n]%n", &format, &nc ) )
+        ( 0 == astSscanf( setting, "format=%n%*[^\n]%n", &format, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisFormat( this, setting + format );
 
 /* Label. */
 /* ------ */
    } else if ( nc = 0,
-        ( 0 == sscanf( setting, "label=%n%*[^\n]%n", &label, &nc ) )
+        ( 0 == astSscanf( setting, "label=%n%*[^\n]%n", &label, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisLabel( this, setting + label );
 
 /* Symbol. */
 /* ------- */
    } else if ( nc = 0,
-        ( 0 == sscanf( setting, "symbol=%n%*[^\n]%n", &symbol, &nc ) )
+        ( 0 == astSscanf( setting, "symbol=%n%*[^\n]%n", &symbol, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisSymbol( this, setting + symbol );
 
 /* Unit. */
 /* ----- */
    } else if ( nc = 0,
-        ( 0 == sscanf( setting, "unit=%n%*[^\n]%n", &unit, &nc ) )
+        ( 0 == astSscanf( setting, "unit=%n%*[^\n]%n", &unit, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisUnit( this, setting + unit );
 

@@ -610,7 +610,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstSphMap *this;              /* Pointer to the SphMap structure */
    int len;                      /* Length of setting string */
    int ival;                     /* Int attribute value */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -624,7 +624,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* UnitRadius. */
 /* ------- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "unitradius= %d %n", &ival, &nc ) )
+        ( 1 == astSscanf( setting, "unitradius= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetUnitRadius( this, ival );
 

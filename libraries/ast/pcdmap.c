@@ -804,7 +804,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    AstPcdMap *this;              /* Pointer to the PcdMap structure */
    int axis;                     /* Axis number */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -820,7 +820,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* PcdCen(axis). */
 /* ------------- */
    if ( nc = 0,
-               ( 1 == sscanf( attrib, "pcdcen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "pcdcen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       astClearPcdCen( this, axis - 1 );
 
@@ -898,7 +898,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    double dval;                  /* Double attribute value */
    int axis;                     /* Axis number */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -930,7 +930,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* PcdCen(axis). */
 /* ------------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "pcdcen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "pcdcen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       dval = astGetPcdCen( this, axis - 1 );
       if ( astOK ) {
@@ -1760,7 +1760,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    double dval;                  /* Double attribute value */
    int axis;                     /* Index for the axis */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1771,7 +1771,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -1780,14 +1780,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Disco. */
 /* ------ */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "disco= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "disco= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetDisco( this, dval );
 
 /* PcdCen(axis). */
 /* ------------ */
    } else if ( nc = 0,
-               ( 2 == sscanf( setting, "pcdcen(%d)= %lg %n",
+               ( 2 == astSscanf( setting, "pcdcen(%d)= %lg %n",
                               &axis, &dval, &nc ) )
                && ( nc >= len ) ) {
       astSetPcdCen( this, axis - 1, dval );
@@ -1795,7 +1795,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* PcdCen. */
 /* ------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "pcdcen= %lg %n", &dval, &nc ) )
+        ( 1 == astSscanf( setting, "pcdcen= %lg %n", &dval, &nc ) )
         && ( nc >= len ) ) {
       astSetPcdCen( this, 0, dval );
       astSetPcdCen( this, 1, dval );
@@ -1851,7 +1851,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    AstPcdMap *this;              /* Pointer to the PcdMap structure */
    int axis;                     /* Axis number */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -1881,7 +1881,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* PcdCen(axis). */
 /* ---------- */
    } else if ( nc = 0,
-               ( 1 == sscanf( attrib, "pcdcen(%d)%n", &axis, &nc ) )
+               ( 1 == astSscanf( attrib, "pcdcen(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestPcdCen( this, axis - 1 );
 

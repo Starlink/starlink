@@ -1419,7 +1419,7 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
    digits) and then read the value back again. */
                   (void ) sprintf( buff, "%g", scale *
                                    0.5 * ( table[ i ] + table[ i + 1 ] ) );
-                  (void) sscanf( buff, "%lf", &scaled_table_value );
+                  (void) astSscanf( buff, "%lf", &scaled_table_value );
 
 /* Now test the suggested gap value against the scaled table value. */
                   if ( gap < ( field_value[ field - 1 ] *
@@ -2457,7 +2457,7 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
    successful, and a valid (positive) result was obtained, note its
    value. */
    if ( ( decpos >= 0 ) && ( decpos < ( i - 1 ) ) ) {
-      if ( sscanf( fmt + decpos + 1, "%d", &ndpval ) == 1 ) {
+      if ( astSscanf( fmt + decpos + 1, "%d", &ndpval ) == 1 ) {
          if ( ndpval > 0 ) *ndp = ndpval;
       }
    }
@@ -2509,7 +2509,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int as_time;                  /* Format values as times? */
    int is_latitude;              /* SkyAxis is a latitude axis? */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -2520,7 +2520,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse
+/* Test for each recognised attribute in turn, using "astSscanf" to parse
    the setting string and extract the attribute value (or an offset to
    it in the case of string values). In each case, use the value set
    in "nc" to check that the entire string was matched. Once a value
@@ -2529,14 +2529,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* AsTime. */
 /* ------- */
    if ( nc = 0,
-        ( 1 == sscanf( setting, "astime= %d %n", &as_time, &nc ) )
+        ( 1 == astSscanf( setting, "astime= %d %n", &as_time, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisAsTime( this, as_time );
 
 /* IsLatitude. */
 /* ----------- */
    } else if ( nc = 0,
-        ( 1 == sscanf( setting, "islatitude= %d %n", &is_latitude, &nc ) )
+        ( 1 == astSscanf( setting, "islatitude= %d %n", &is_latitude, &nc ) )
         && ( nc >= len ) ) {
       astSetAxisIsLatitude( this, is_latitude );
 
@@ -2810,7 +2810,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    int len;                      /* Significant length of string */
    int match;                    /* Character pattern matches? */
    int min;                      /* Minutes field required? */
-   int n;                        /* Number of characters read by sscanf */
+   int n;                        /* Number of characters read by astSscanf */
    int nc;                       /* Total no. characters read */
    int nchar;                    /* Number of characters in erroneous value */
    int ndp;                      /* Number of decimal places */
@@ -2882,7 +2882,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    the next significant character. */
    positive = 1;
       n = 0;
-      if ( 1 == sscanf( s, " %1[+-] %n", sign, &n ) ) {
+      if ( 1 == astSscanf( s, " %1[+-] %n", sign, &n ) ) {
          positive = ( *sign == '+' );
          s += n;
       }
@@ -2925,25 +2925,25 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 /* Look for a character sequence like "12.345", or similar, setting a
    flag to identify a match. */
          n = 0;
-         match = ( 0 == sscanf( s, "%*[0123456789].%*[0123456789]%n", &n ) )
+         match = ( 0 == astSscanf( s, "%*[0123456789].%*[0123456789]%n", &n ) )
                    && n;
 
 /* If that failed, then look for a sequence like "12.", or similar. */
          if ( !match ) {
             n = 0;
-            match = ( 0 == sscanf( s, "%*[0123456789].%n", &n ) ) && n;
+            match = ( 0 == astSscanf( s, "%*[0123456789].%n", &n ) ) && n;
          }
 
 /* If that also failed, then look for a sequence like ".12", or similar. */
          if ( !match ) {
             n = 0;
-            match = ( 0 == sscanf( s, ".%*[0123456789]%n", &n ) ) && n;
+            match = ( 0 == astSscanf( s, ".%*[0123456789]%n", &n ) ) && n;
          }
 
 /* If that also failed, then look for a sequence containing digits only. */
          if ( !match ) {
             n = 0;
-            match = ( 0 == sscanf( s, "%*[0123456789]%n", &n ) ) && n;
+            match = ( 0 == astSscanf( s, "%*[0123456789]%n", &n ) ) && n;
 
 /* Note we have not found a decimal point. */
             decimal = 0;
@@ -2963,7 +2963,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
 /* Use this format specification to read the field value. If
    successful, increment the string pointer to the next significant
    character. */
-            if ( 1 == sscanf( s, fmtbuf, field + ifield, &nread ) ) s += nread;
+            if ( 1 == astSscanf( s, fmtbuf, field + ifield, &nread ) ) s += nread;
          }
 
 /* Note the total number of characters read up to the end of the
@@ -3137,7 +3137,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    AST__BAD. */
       if ( !nfield ) {
          if ( n = 0,
-              ( 0 == sscanf( string, " < %*1[Bb] %*1[Aa] %*1[Dd] > %n", &n )
+              ( 0 == astSscanf( string, " < %*1[Bb] %*1[Aa] %*1[Dd] > %n", &n )
                 && n ) ) {
             *value = AST__BAD;
             nc = n;
@@ -3173,7 +3173,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    digits that occur before the decimal point (if any). Determine how
    many such digits there are. */
                   n = 0;
-                  if ( ( 0 == sscanf( field_start[ ifield ],
+                  if ( ( 0 == astSscanf( field_start[ ifield ],
                                       "%*[0123456789]%n", &n ) ) && n ) {
 
 /* If there are none (this shouldn't happen), the field is
@@ -3185,7 +3185,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    and quit if necessary, limiting the string length in the error
    message to include just the significant characters in the value
    read. */
-                     if ( ( 1 == sscanf( field_start[ ifield ], fmtbuf,
+                     if ( ( 1 == astSscanf( field_start[ ifield ], fmtbuf,
                                          &testval ) )
                           && ( testval >= 60.0 ) ) {
                         nchar = nc - ( string_start - string );

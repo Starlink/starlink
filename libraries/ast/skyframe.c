@@ -540,7 +540,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    int axis;                     /* SkyFrame axis number */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -556,7 +556,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* AsTime(axis). */
 /* ------------- */
    if ( nc = 0,
-        ( 1 == sscanf( attrib, "astime(%d)%n", &axis, &nc ) )
+        ( 1 == astSscanf( attrib, "astime(%d)%n", &axis, &nc ) )
         && ( nc >= len ) ) {
       astClearAsTime( this, axis - 1 );
 
@@ -1076,7 +1076,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int axis;                     /* SkyFrame axis number */
    int neglon;                   /* Display long. values as [-pi,pi]? */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
@@ -1099,7 +1099,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* AsTime(axis). */
 /* ------------- */
    if ( nc = 0,
-        ( 1 == sscanf( attrib, "astime(%d)%n", &axis, &nc ) )
+        ( 1 == astSscanf( attrib, "astime(%d)%n", &axis, &nc ) )
         && ( nc >= len ) ) {
       as_time = astGetAsTime( this, axis - 1 );
       if ( astOK ) {
@@ -3612,7 +3612,7 @@ static double ReadDateTime( const char *value ) {
 /* Besselian epoch in decimal years (e.g. "B1950.0"). */
 /* ================================================== */
    if ( nc = 0,
-        ( 1 == sscanf( value, " %*1[Bb] %lf %n", &epoch, &nc ) )
+        ( 1 == astSscanf( value, " %*1[Bb] %lf %n", &epoch, &nc ) )
         && ( nc >= len ) ) {
 
 /* Convert to Modified Julian Date. */
@@ -3621,7 +3621,7 @@ static double ReadDateTime( const char *value ) {
 /* Julian epoch in decimal years (e.g. "J2000.0"). */
 /* =============================================== */
    } else if ( nc = 0,
-               ( 1 == sscanf( value, " %*1[Jj] %lf %n", &epoch, &nc ) )
+               ( 1 == astSscanf( value, " %*1[Jj] %lf %n", &epoch, &nc ) )
                && ( nc >= len ) ) {
 
 /* Convert to Modified Julian Date. */
@@ -3630,7 +3630,7 @@ static double ReadDateTime( const char *value ) {
 /* Decimal years (e.g. "1976.2"). */
 /* ============================== */
    } else if ( nc = 0,
-               ( 1 == sscanf( value, " %lf %n", &epoch, &nc ) )
+               ( 1 == astSscanf( value, " %lf %n", &epoch, &nc ) )
                && ( nc >= len ) ) {
 
 /* Convert to Modified Julian Date, treating the epoch as Julian or Besselian
@@ -3640,7 +3640,7 @@ static double ReadDateTime( const char *value ) {
 /* Modified Julian Date (e.g. "MJD 54321.0"). */
 /* ============================================ */
    } else if ( nc = 0,
-               ( 1 == sscanf( value, " %*1[Mm] %*1[Jj] %*1[Dd] %lf %n",
+               ( 1 == astSscanf( value, " %*1[Mm] %*1[Jj] %*1[Dd] %lf %n",
                               &mjd, &nc ) ) && ( nc >= len ) ) {
 
 /* Use the result directly. */
@@ -3649,7 +3649,7 @@ static double ReadDateTime( const char *value ) {
 /* Julian Date (e.g. "JD 2454321.5"). */
 /* ==================================== */
    } else if ( nc = 0,
-               ( 1 == sscanf( value, " %*1[Jj] %*1[Dd] %lf %n",
+               ( 1 == astSscanf( value, " %*1[Jj] %*1[Dd] %lf %n",
                               &jd, &nc ) ) && ( nc >= len ) ) {
 
 /* Convert to Modified Julian Date. */
@@ -3681,20 +3681,20 @@ static double ReadDateTime( const char *value ) {
 /* ---------------------------- */
 /* Try to match an initial " 1996 - 10 -" or " 1996 10 " or similar. */
       match =
-         ( nc = 0, ( 4 == sscanf( v, " %d %1[:/-] %2d %1[:/-]%n",
+         ( nc = 0, ( 4 == astSscanf( v, " %d %1[:/-] %2d %1[:/-]%n",
                                   &year, sep1, &month, sep2, &nc ) ) );
       match = match ||
-         ( nc = 0, ( 4 == sscanf( v, " %d%1[ ] %2d%1[ ]%n",
+         ( nc = 0, ( 4 == astSscanf( v, " %d%1[ ] %2d%1[ ]%n",
                                   &year, sep1, &month, sep2, &nc ) ) );
 
 /* If that failed, allow " 1996 - Oct -" or " 1996 Oct " or similar. */
       match = match ||
-         ( nc = 0, ( 4 == sscanf( v,
+         ( nc = 0, ( 4 == astSscanf( v,
                                   " %d %1[:/-] %3[ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                   "abcdefghijklmnopqrstuvwxyz] %1[:/-]%n",
                                   &year, sep1, cmonth, sep2, &nc ) ) );
       match = match ||
-         ( nc = 0, ( 4 == sscanf( v,
+         ( nc = 0, ( 4 == astSscanf( v,
                                   " %d%1[ ] %3[ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                   "abcdefghijklmnopqrstuvwxyz]%1[ ]%n",
                                   &year, sep1, cmonth, sep2, &nc ) ) );
@@ -3719,24 +3719,24 @@ static double ReadDateTime( const char *value ) {
 
 /* Try to match " 12.3456 " or similar. */
          match =
-            ( nc = 0, ( 0 == sscanf( v, " %*2[0123456789].%*[0123456789] %n",
+            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789].%*[0123456789] %n",
                                      &nc ) )
                       && ( nc == l ) );
 
 /* If that failed, then try to match " 12. " or similar. */
          match = match ||
-            ( nc = 0, ( 0 == sscanf( v, " %*2[0123456789]. %n", &nc ) )
+            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789]. %n", &nc ) )
                       && ( nc == l ) );
 
 /* If that also failed, then try to match just " 12 " or similar. */
          match = match ||
-            ( nc = 0, ( 0 == sscanf( v, " %*2[0123456789] %n", &nc ) )
+            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789] %n", &nc ) )
                       && ( nc == l ) );
 
 /* If any of the above patterns matched, now read the data (the day number)
    as a double value. */
          if ( match ) {
-            match = ( nc = 0, ( 1 == sscanf( v, " %lf %n", &day, &nc ) )
+            match = ( nc = 0, ( 1 == astSscanf( v, " %lf %n", &day, &nc ) )
                               && ( nc == l ) );
 
 /* If none of the above matched, then look to see if the day fraction has been
@@ -3744,12 +3744,12 @@ static double ReadDateTime( const char *value ) {
    " 12 13 45 " or similar. */
          } else {
             match =
-               ( nc = 0, ( 5 == sscanf( v,
+               ( nc = 0, ( 5 == astSscanf( v,
                                         " %2d%*1[ ] %2d %1[:/-] %2d %1[:/-]%n",
                                         &iday, &hour, sep3, &minute, sep4,
                                         &nc ) ) );
             match = match ||
-               ( nc = 0, ( 5 == sscanf( v, " %2d%*1[ ] %2d%1[ ] %2d%1[ ]%n",
+               ( nc = 0, ( 5 == astSscanf( v, " %2d%*1[ ] %2d%1[ ] %2d%1[ ]%n",
                                         &iday, &hour, sep3, &minute, sep4,
                                         &nc ) ) );
 
@@ -3774,25 +3774,25 @@ static double ReadDateTime( const char *value ) {
 
 /* Try to match " 12.3456 " or similar. */
                match =
-                  ( nc = 0, ( 0 == sscanf( v,
+                  ( nc = 0, ( 0 == astSscanf( v,
                                           " %*2[0123456789].%*[0123456789] %n",
                                            &nc ) )
                             && ( nc == l ) );
 
 /* If that failed, then try to match " 12. " or similar. */
                match = match ||
-                  ( nc = 0, ( 0 == sscanf( v, " %*2[0123456789]. %n", &nc ) )
+                  ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789]. %n", &nc ) )
                             && ( nc == l ) );
 
 /* If that also failed, then try to match just " 12 " or similar. */
                match = match ||
-                  ( nc = 0, ( 0 == sscanf( v, " %*2[0123456789] %n", &nc ) )
+                  ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789] %n", &nc ) )
                             && ( nc == l ) );
 
 /* If any of the above patterns matched, now read the data (the number of
    seconds) as a double value. */
                if ( match ) {
-                  match = ( nc = 0, ( 1 == sscanf( v, " %lf %n", &sec, &nc ) )
+                  match = ( nc = 0, ( 1 == astSscanf( v, " %lf %n", &sec, &nc ) )
                                     && ( nc == l ) );
                }
             }
@@ -4218,7 +4218,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int epoch;                    /* Offset of Projection attribute value */
    int equinox;                  /* Offset of Equinox attribute value */
    int len;                      /* Length of setting string */
-   int nc;                       /* Number of characters read by sscanf */
+   int nc;                       /* Number of characters read by astSscanf */
    int neglon;                   /* Display -ve longitudes? */
    int projection;               /* Offset of Epoch attribute value */
    int system;                   /* Offset of System attribute value */
@@ -4232,7 +4232,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = strlen( setting );
 
-/* Test for each recognised attribute in turn, using "sscanf" to parse the
+/* Test for each recognised attribute in turn, using "astSscanf" to parse the
    setting string and extract the attribute value (or an offset to it in the
    case of string values). In each case, use the value set in "nc" to check
    that the entire string was matched. Once a value has been obtained, use the
@@ -4241,14 +4241,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* AsTime(axis). */
 /* ------------- */
    if ( nc = 0,
-        ( 2 == sscanf( setting, "astime(%d)= %d %n", &axis, &astime, &nc ) )
+        ( 2 == astSscanf( setting, "astime(%d)= %d %n", &axis, &astime, &nc ) )
         && ( nc >= len ) ) {
       astSetAsTime( this, axis - 1, astime );
 
 /* Epoch. */
 /* ------ */
    } else if ( nc = 0,
-        ( 0 == sscanf( setting, "epoch=%n%*[^\n]%n", &epoch, &nc ) )
+        ( 0 == astSscanf( setting, "epoch=%n%*[^\n]%n", &epoch, &nc ) )
         && ( nc >= len ) ) {
 
 /* Convert the Epoch value to a Modified Julian Date before use. */
@@ -4266,7 +4266,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Equinox. */
 /* -------- */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "equinox=%n%*[^\n]%n",
+               ( 0 == astSscanf( setting, "equinox=%n%*[^\n]%n",
                               &equinox, &nc ) ) && ( nc >= len ) ) {
 
 /* Convert the Equinox value to a Modified Julian Date before use. */
@@ -4284,14 +4284,14 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* NegLon. */
 /* ------- */
    } else if ( nc = 0,
-             ( 1 == sscanf( setting, "neglon= %d %n", &neglon, &nc ) )
+             ( 1 == astSscanf( setting, "neglon= %d %n", &neglon, &nc ) )
                && ( nc >= len ) ) {
       astSetNegLon( this, neglon );
 
 /* Projection. */
 /* ----------- */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "projection=%n%*[^\n]%n",
+               ( 0 == astSscanf( setting, "projection=%n%*[^\n]%n",
                               &projection, &nc ) )
                && ( nc >= len ) ) {
       astSetProjection( this, setting + projection );
@@ -4299,7 +4299,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* System. */
 /* ------- */
    } else if ( nc = 0,
-               ( 0 == sscanf( setting, "system= %n%*s %n", &system, &nc ) )
+               ( 0 == astSscanf( setting, "system= %n%*s %n", &system, &nc ) )
                && ( nc >= len ) ) {
 
 /* Convert the string to a System code before use. */
@@ -4318,7 +4318,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Define a macro to see if the setting string matches any of the
    read-only attributes of this class. */
 #define MATCH(attrib) \
-        ( nc = 0, ( 0 == sscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
+        ( nc = 0, ( 0 == astSscanf( setting, attrib "=%*[^\n]%n", &nc ) ) && \
                   ( nc >= len ) )
 
 /* If the attribute was not recognised, use this macro to report an error
@@ -5160,7 +5160,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    AstSkyFrame *this;            /* Pointer to the SkyFrame structure */
    int axis;                     /* SkyFrame axis number */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
+   int nc;                       /* No. characters read by astSscanf */
    int result;                   /* Result value to return */
 
 /* Initialise. */
@@ -5180,7 +5180,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* AsTime(axis). */
 /* ------------- */
    if ( nc = 0,
-        ( 1 == sscanf( attrib, "astime(%d)%n", &axis, &nc ) )
+        ( 1 == astSscanf( attrib, "astime(%d)%n", &axis, &nc ) )
         && ( nc >= len ) ) {
       result = astTestAsTime( this, axis - 1 );
 
