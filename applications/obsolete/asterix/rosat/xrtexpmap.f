@@ -248,6 +248,7 @@
          GOTO 99
       END IF
 
+      SRT_ROOTNAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/' //SRT_ROOTNAME
       CALL MSG_PRNT('XRTEXPMAP : Using FITS file : '// SRT_ROOTNAME)
 *
 *  Open the FITS file
@@ -405,6 +406,7 @@
 *
 *  The ASPECT/EVRATE tables are in _ANC.FITS
       FILENAME = FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
+      FILENAME =  FITSDIR(1:CHR_LEN(FITSDIR))//'/'//FILENAME
 *
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT,STATUS)
