@@ -6,9 +6,9 @@ SUBDIRS = @subdirs@
 ccdsupportdir = $(bindir)
 
 ccdsupport_DATA = $(DATA_FILES) ccdpack.shl \
-                  $(TCL_SUPPORT_NOEXE) $(TCL_SUPPORT_EXE)
+                  $(TCL_SUPPORT_NOEXE) $(TCL_INDEX)
 
-bin_SCRIPTS = $(PUBLIC_SCR)
+bin_SCRIPTS = $(PUBLIC_SCR) $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_EXE)
 
 bin_PROGRAMS = ccdwish
 
@@ -188,7 +188,7 @@ TCL_SUPPORT_EXE = $(TCL_SUPPORT_BIN)
 
 TCL_SUPPORT_NOEXE = $(TCL_SCRIPTS) $(TCL_SUPPORT_TCL) $(TCL_SUPPORT_TK) \
  $(TCL_SUPPORT_STARTCL) $(TCL_SUPPORT_ITCL) $(TCL_SUPPORT_ITK) \
- $(TCL_SUPPORT_IWIDGETS) $(TCL_INDEX)
+ $(TCL_SUPPORT_IWIDGETS)
 
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
@@ -203,10 +203,6 @@ IFD_FILES = ccdpack.ifd $(REDTASKS:=.ifd) $(REGTASKS:=.ifd) \
 
 #  Rules.
 
-
-$(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) ccdwish
-	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
-        $(srcdir)/ccdwish mkindex.tcl
 
 ccdpack.shl: ccdpack.hlp
 	$(HLIB) ccdpack.hlp
@@ -236,16 +232,26 @@ $(TCL_SUPPORT_TK):
 	cp $(STAR_LIB)/tk$(TCL_VERSION)/$@ $@
 $(TCL_SUPPORT_STARTCL):
 	cp $(STAR_LIB)/startcl/$@ $@
-$(TCL_SUPPORT_MSGRLY):
-	cp $(STAR_LIB)/startcl/$@ $@
 $(TCL_SUPPORT_ITCL):
 	cp $(STAR_LIB)/itcl$(ITCL_VERSION)/$@ $@
 $(TCL_SUPPORT_ITK):
 	cp $(STAR_LIB)/itk$(ITCL_VERSION)/$@ $@
 $(TCL_SUPPORT_IWIDGETS):
 	cp $(STAR_LIB)/iwidgets$(IWIDGETS_VERSION)/scripts/$@ $@
-$(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) $(WISH)
-	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; ./$(WISH) mkindex.tcl
+$(TCL_INDEX): $(TCL_SCRIPTS) $(TCL_SUPPORT_NOEXE) ccdwish
+	CCDPACK_DIR=$(STAR_LIB); export CCDPACK_DIR; \
+        $(srcdir)/ccdwish mkindex.tcl
 
+## Arrange to edit the installation binary directory into script files
+## which need it.  This cannot be done by autoconf because it needs to
+## be changable at make time - see the autoconf manual section on
+## Installation Directory Variables.
+
+$(TCL_SUPPORT_MSGRLY): Makefile
+	rm -f $(TCL_SUPPORT_MSGRLY) $(TCL_SUPPORT_MSGRLY).tmp
+	sed -e '1s%.*%#!$(bindir)/atclsh%' $(STAR_LIB)/startcl/$@ \
+               >$(TCL_SUPPORT_MSGRLY).tmp
+	chmod +x $(TCL_SUPPORT_MSGRLY).tmp
+	mv $(TCL_SUPPORT_MSGRLY).tmp $(TCL_SUPPORT_MSGRLY)
 
 
