@@ -73,6 +73,10 @@
 *  Check the inherited status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Free up any compiled expressions currently in use by CAT. This should
+*  be done by CAT itself, but it can't (at the moment).
+      CALL ANT_XINIT( STATUS )
+
 *  Obtain the action name.
       CALL TASK_GET_NAME( NAME, STATUS )      
 
