@@ -1,7 +1,7 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
   <!entity sl-gentext.dsl	system "sl-gentext.dsl">
 ]>
-<![ ignore [ $Id$ ]]>
+<!-- $Id$ -->
 
 <title>Common functions for the Starlink stylesheets
 
@@ -57,10 +57,12 @@ That is, <code>(getdocbody 'abstract)</code> returns the current document's
 abstract.
 <returnvalue type="node-list">Return a node-list consisting of the 
   specified child, or false if there is no such child.
-<parameter>type
+<parameter optional default='#f'>type
   <type>symbol
   <description>
-  <p>Symbol giving the name of one of the children of the docbody element
+  <p>Symbol giving the name of one of the children of the docbody element.  
+  If this is given as <code/#f/, or omitted, then the docbody element itself
+  is returned.
 <parameter optional default='(current-node)'>nd
   <type>node-list
   <description>
@@ -69,11 +71,15 @@ abstract.
   the document element corresponding to the current grove is obtained
   and returned.
 <codebody>
-(define (getdocbody type #!optional (nd (current-node)))
+(define (getdocbody #!optional (type #f) (nd (current-node)))
   (let* ((docelem (document-element nd))
-	 (dinl (select-elements (children (select-elements (children docelem)
-							            'docbody))
-				type)))
+	 (db (and docelem
+		  (select-elements (children docelem) 'docbody)))
+	 (dinl (if db
+		   (if type
+		       (select-elements (children db) type)
+		       db)
+		   (empty-node-list))))
     (if (node-list-empty? dinl)
 	#f
 	dinl)))
@@ -166,6 +172,97 @@ with elements separated by a constant string.
 				 end-string
 				 sep-string))))))
 
+<func>
+<routinename>make-section-reference
+<description>
+Return a sosofo with the title of the given node,
+prefixed by its section number.  If the optional argument ts is given, it
+is used as the title sosofo, rather than extracting it from the node.
+<p>You can generate a reference to a node either by calling this 
+function with that node as argument, or by processing the node in
+the <code/section-reference/ mode (which might well call this function in
+turn.  In the former case, you can include keyword attributes.
+<returnvalue type=sosofo>Number? and name of section
+<parameter keyword default='extracted from node'>title
+  <type>sosofo
+  <description>A sosofo specifying a title to be used, rather than
+  extracting it from the node
+<parameter keyword default='#f'>specify-type
+  <type>boolean
+  <description>If true, then include the section's type (ie, appendix or
+  section) in the reference.
+<codebody>
+(define (make-section-reference #!key (target (current-node))
+				      (title #f)
+				      (specify-type #f))
+  (let* ((in-backmatter (or (equal? (gi target)
+				    (normalize "backmatter"))
+			    (have-ancestor? (normalize "backmatter")
+					    target)))
+	 (prefix (if in-backmatter
+		      (empty-sosofo)
+		      (let* ((hier-nums (element-number-list
+					 (list
+					  (normalize "appendices")
+					  (normalize "sect")
+					  (normalize "subsect")
+					  (normalize "subsubsect")
+					  (normalize "subsubsubsect"))
+					 target))
+			     (inappendix (> (car hier-nums) 0))
+			     (sn (let loop ((res "")
+					    (nums (cdr hier-nums))
+					    (fmts (if inappendix
+						      %appendix-fmts
+						      %section-fmts)))
+				   (if (or (null? nums)
+					   (= (car nums) 0))
+				       res
+				       (loop (string-append
+					      res
+					      (format-number (car nums)
+							     (car fmts))
+					      ".")
+					     (cdr nums)
+					     (cdr fmts))))))
+			(literal (if specify-type
+				     (if inappendix "Appendix " "Section ")
+				     "")
+				 sn " ")))))
+    (make sequence
+      prefix
+      (if title
+	  title
+	  (with-mode section-reference	;in case we're not in this mode already
+	    (process-node-list (select-elements (children target)
+						(normalize "subhead"))))
+	  ))))
+
+
+; (define (make-section-reference level #!optional (ts #f))
+;   (let* ((inappendix (have-ancestor? "appendices" (current-node)))
+; 					; (have-ancestor?) 10.2.4.4
+; 	 (hier-list (reverse (section-hierarchy (- level 1))))
+; 	 (hier-nums (hierarchical-number hier-list (current-node)))
+; 					; (hierarchical-number) see 10.2.4.2
+; 	 (hier-strs (map (lambda (n f)
+; 			   (format-number n f))
+; 			 (append hier-nums (list (child-number)))
+; 					; make a list of the hierarchy nos,
+; 					; including current child number
+; 			 (if inappendix	; ...formatted appropriately
+; 			     %appendix-fmts
+; 			     %section-fmts)))
+; 	 (sn (stringlist->string hier-strs "" "." ""))
+; 	 )
+;     (make sequence
+;       (literal ;(if inappendix "Appendix " "Section ")
+; 	       sn
+; 	       " ")
+;       (if ts
+; 	  ts
+; 	  (process-first-descendant 'title)))))
+
 <misccode>
 <miscprologue>
 <description>
@@ -184,33 +281,6 @@ with elements separated by a constant string.
 	l
 	(loop (cdr l)))))
 
-;; Return a sosofo with the title of the current node,
-;; prefixed by its section number.  If the optional argument ts is given, it
-;; is used as the title sosofo, rather than extracting it from the node.
-(define (make-section-reference level #!optional (ts #f))
-  (let* ((inappendix (have-ancestor? "appendices" (current-node)))
-					; (have-ancestor?) 10.2.4.4
-	 (hier-list (reverse (section-hierarchy (- level 1))))
-	 (hier-nums (hierarchical-number hier-list (current-node)))
-					; (hierarchical-number) see 10.2.4.2
-	 (hier-strs (map (lambda (n f)
-			   (format-number n f))
-			 (append hier-nums (list (child-number)))
-					; make a list of the hierarchy nos,
-					; including current child number
-			 (if inappendix	; ...formatted appropriately
-			     %appendix-fmts
-			     %section-fmts)))
-	 (sn (stringlist->string hier-strs "" "." ""))
-	 )
-    (make sequence
-      (literal ;(if inappendix "Appendix " "Section ")
-	       sn
-	       " ")
-      (if ts
-	  ts
-	  (process-first-descendant 'title)))))
-
 (define (sectlevel #!optional (sect (current-node)))
   (cond
    ((equal? (gi sect) (normalize "subsubsubsect")) 4)
@@ -219,15 +289,17 @@ with elements separated by a constant string.
    ((equal? (gi sect) (normalize "sect")) 1)
    (else 1)))
 
+;; This mode is added to elsewhere, for example, the code for the back-matter
+;; defines FO constructors in this mode.
 (mode section-reference
   (element sect
-    (make-section-reference 1))
+    (make-section-reference))
   (element subsect
-    (make-section-reference 2))
+    (make-section-reference))
   (element subsubsect
-    (make-section-reference 3))
+    (make-section-reference))
   (element subsubsubsect
-    (make-section-reference 4))
+    (make-section-reference))
   (element appendices
     (literal "Appendices"))
   (element title
@@ -243,7 +315,10 @@ with elements separated by a constant string.
   (element table
     (literal (car (get-caption-details))))
   (element figure
-    (literal (car (get-caption-details)))))
+    (literal (car (get-caption-details))))
+  (element subhead			;so we _do_ get inside the subhead
+    (process-children-trim))
+  )
 
 
 ;; return the title of a section
@@ -270,9 +345,14 @@ with elements separated by a constant string.
 ;; These have to be functions because they have to be evaluated when
 ;; there is a current-node so that normalize can know what declaration
 ;; is in effect.
-;; (I don't really know what the *-element-list functions are for, but
-;; they're in the docbook stylesheets, and needed in (eg) the
-;; dbnavig.dsl sheet.)  See also (chunk-element-list)
+;;
+;; The (section-element-list) is the list elements which are to be
+;; taken to be `sections', for the purposes of navigation, and for
+;; generating tables of contents.  For the (make-contents)
+;; function to work, there should be no `missing levels' -- anything
+;; in this list should have its parent also in this list, apart from
+;; elements which have docbody as their parent.
+;; See also (chunk-element-list).
 (define (section-element-list)
   (list (normalize "sect")
 	(normalize "subsect")
@@ -280,7 +360,10 @@ with elements separated by a constant string.
 	(normalize "subsubsubsect")
 	(normalize "appendices")
 	(normalize "routinelist")
-	(normalize "codecollection")))
+	(normalize "codecollection")
+	(normalize "backmatter")
+	(normalize "notecontents")
+	(normalize "bibliography")))
 </misccode>
 
 <func>
@@ -607,7 +690,8 @@ the first member of this list amongst the target element's ancestors.
   (list (normalize "sect")
 	(normalize "subsect")
 	(normalize "subsubsect")
-	(normalize "appendices")))
+	(normalize "appendices")
+	(normalize "figure")))
 
 
 
