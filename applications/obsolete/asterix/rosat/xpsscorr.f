@@ -10,6 +10,7 @@
 *                         The exposure time (converts to c/s)
 *                   HRI:
 *                         Exposure time.
+*                         Vignetting
 *
 *    Environment parameters :
 *
@@ -46,6 +47,7 @@
 *     17 May 93 : V1.6-7 Optional parameter for the wire correction added (RDS)
 *     14 Dec 93 : V1.7-0 Correctly default CALDIR on UNIX (DJA)
 *     21 Feb 94 : V1.7-1 Correct div. by zero error when Exposure time is zero (RJV)
+*     23 Nov 94 : V1.7-2 Vignetting correction for HRI (RJV)
 *
 *    Type Definitions :
 *
@@ -108,7 +110,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION = 'XPSSCORR version 1.7-1')
+        PARAMETER (VERSION = 'XPSSCORR version 1.7-2')
 *-
 
 *    Check status
@@ -262,7 +264,8 @@
          END IF
 
 *      Apply the exposure correction
-         CALL XPSSCORR_HRI( NSRC, %VAL(FPTR), ERRORS, NED*NELEV,
+         CALL XPSSCORR_HRI( NSRC, %VAL(XPTR),%VAL(YPTR),
+     :                             %VAL(FPTR), ERRORS, NED*NELEV,
      :          %VAL(EFPTR), EXPOS, %VAL(CFPTR), %VAL(ECFPTR), STATUS )
 *
       ELSE
@@ -706,8 +709,8 @@
 
 
 *+  XPSSCORR_HRI - Calculate the correction for each HRI source
-      SUBROUTINE XPSSCORR_HRI(NSRC, FLUX, GOT_ERRORS, NED, EFLUX,
-     :                                EXPOS, CFLUX, ECFLUX, STATUS )
+      SUBROUTINE XPSSCORR_HRI(NSRC,XPOS,YPOS, FLUX, GOT_ERRORS, NED,
+     :                          EFLUX,EXPOS, CFLUX, ECFLUX, STATUS )
 *    Description :
 *    Deficiencies :
 *    Authors :
@@ -727,6 +730,7 @@
 *     <specification of FORTRAN structures>
 *    Import :
       INTEGER NSRC                ! Number of sources
+      REAL XPOS(NSRC),YPOS(NSRC)  ! Source positions
       REAL FLUX(NSRC)             ! Source flux
       LOGICAL GOT_ERRORS          ! Flux errors there
       INTEGER NED                 ! Flux error items per source
@@ -744,6 +748,9 @@
 *     <local constants defined by PARAMETER>
 *    Local variables :
       INTEGER SLP,ELP
+      REAL OFFAX
+      REAL QE,VIG
+      REAL CFACTOR
 *    Local data :
 *-
 *    Check status
@@ -752,13 +759,23 @@
 *    Loop over each source
       DO SLP=1,NSRC
 
+*  get off-axis angle
+        OFFAX=SQRT(XPOS(SLP)**2 + YPOS(SLP)**2)
+
+*  get vignetting and quantum efficiency factors
+        CALL XRT_HRIQE(OFFAX,QE)
+        CALL XRT_HRIVIG(OFFAX,VIG)
+
+*  total correction factor
+        CFACTOR=1.0/QE/VIG/EXPOS
+
 *      Find corrected flux
-        CFLUX(SLP) = FLUX(SLP) / EXPOS
+        CFLUX(SLP) = FLUX(SLP) * CFACTOR
 
 *      Set errors if present
         IF ( GOT_ERRORS ) THEN
           DO ELP = 1, NED
-            ECFLUX(ELP,SLP) = EFLUX(ELP,SLP) / EXPOS
+            ECFLUX(ELP,SLP) = EFLUX(ELP,SLP) * CFACTOR
           END DO
         END IF
 
