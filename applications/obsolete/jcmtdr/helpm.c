@@ -3,6 +3,5 @@
 
 int main( int argc, char ** argv )
 {
-   (void)  shl_standalone("JCMTDR", argc, argv );
-   return EXIT_SUCCESS;
+   return shl_standalone("JCMTDR", 1, argc, argv );
 }
