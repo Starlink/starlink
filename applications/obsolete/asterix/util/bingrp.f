@@ -277,7 +277,8 @@
         END IF
         CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAPUB( IFID, 'Quality', 'READ', IQPTR, STATUS )
+          CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR,
+     :                   STATUS )
         END IF
 
 *    Group the data
