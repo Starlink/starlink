@@ -30,6 +30,9 @@ Main Changes in this Version
    (including SkyFrames), and the astBear method has been replaced
    by astAxAngle. 
 
+   o A new method (astDecompose) has been added which enables pointers to
+   be obtained to the component parts of CmpMap and CmpFrame objects.
+
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
 These are available on the WWW at:
