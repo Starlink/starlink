@@ -83,15 +83,9 @@
 
 *  External References:
       EXTERNAL			DYN0_BLK		! Ensures inclusion
-
-*  Local Variables:
-      INTEGER 			STATUS             	! Local status
 *.
 
-*  Initialise local status
-      STATUS = SAI__OK
-
 *  Check initialised
-      IF ( .NOT. DYN_ISINIT ) CALL DYN0_INIT( STATUS )
+      IF ( .NOT. DYN_ISINIT ) CALL DYN0_INIT()
 
       END

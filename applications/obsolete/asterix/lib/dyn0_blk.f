@@ -13,8 +13,10 @@
 *     BLOCK DATA
 
 *  Description:
-*     Set the initialised flag to false so that DYN class definitions will
-*     be loaded properly
+*     Set the initialised flag to false so that DYN will be initialised
+*     if required. Note that the file sequence number is set here rather
+*     than in DYN0_INIT so that sequence numbers increase even if
+*     DYN_CLOSE is called, followed by a DYN_INIT (eg. in a monolith).
 
 *  Notes:
 *     {routine_notes}...
@@ -52,14 +54,11 @@
       INCLUDE 'DYN_CMN'
 *       DYN_ISINIT = LOGICAL (returned)
 *         DYN system is initialised?
-*       DYS_PTR = INTEGER (returned)
-*         Mapped section memory addresses
 *       DYS_ISEQ = INTEGER (returned)
-*         File sequence number
+*         File sequence flag
 
 *  Global Data:
       DATA DYN_ISINIT / .FALSE. /
-      DATA DYS_PTR / DYN__NMAX*0 /
       DATA DYS_ISEQ / 1 /
 *.
 
