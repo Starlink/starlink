@@ -9,6 +9,10 @@ require_ok("Starlink::AST::Tk");
 
 use File::Spec;
 
+my $zoom = 1;
+my $factor = 1.4;
+print "# zoom = $zoom, factor = $factor\n";
+
 BEGIN {
 
  use Tk;
@@ -54,7 +58,7 @@ isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Create Tk test harness
 # ----------------------
-my $c = create_window( \@axes );
+my $c = create_window( \@axes, $zoom, $factor );
 
 # Handle data 
 # -----------
@@ -62,15 +66,18 @@ my $width = $c->cget( '-width' );
 my $height = $c->cget( '-height' );
 print "# width = $width, height = $height\n";
 
-my $xmin = 0.1*$width;
-my $ymin = 0.9*$height;
-print "# xmin = $xmin, $ymin = $ymin\n";
+my $xmin = $width/2 - $axes[0]*$zoom/2;
+my $ymin = $height/2 + $axes[1]*$zoom/2;
+print "# xmin = $xmin, ymin = $ymin\n";
 
 # Plot image
 # ---------
 my $jpeg = File::Spec->catfile( File::Spec->updir(), "data", "m31.jpg" );
 my $jpg = $c->Photo( -format => 'jpeg', -file => $jpeg );
-$c->createImage( $xmin, $ymin, -image => $jpg, -anchor => 'sw', 
+
+my $image = $c->Photo();
+$image->copy($jpg, -zoom => ($zoom, $zoom));
+$c->createImage( $xmin, $ymin, -image => $image, -anchor => 'sw', 
                  -tags => [ 'image' ] );
 
 # Handle data 
@@ -79,9 +86,9 @@ my ( $x1, $y2, $x2, $y1 ) = $c->bbox( "image" );
 print "# x1 = $x1, x2 = $x2,y1 = $y1, y2 = $y2\n";
 
 my $xleft   = $x1/$width;
-my $xright  = ($x1 + $axes[0])/$width;
+my $xright  = ($x1 + $axes[0]*$zoom)/$width;
 my $ybottom = $y2/$height;
-my $ytop    = ($y2 + $axes[1])/$height;
+my $ytop    = ($y2 + $axes[1]*$zoom)/$height;
 print "# xleft = $xleft, xright = $xright\n";
 print "# ytop = $ytop, ybottom = $ybottom\n";
 
@@ -115,6 +122,8 @@ exit;
 # test harness window
 sub create_window {
    my $axes = shift;
+   my $zoom = shift;
+   my $factor = shift;
 
    my $MW = MainWindow->new();
    $MW->positionfrom("user");
@@ -122,11 +131,11 @@ sub create_window {
    $MW->title("Starlink::AST::Tk");   
    $MW->iconname("Starlink::AST::Tk");
    $MW->configure( -cursor => "tcross" );
-   $MW->after( 4000, sub { exit; } );
+   #$MW->after( 4000, sub { exit; } );
 
    # create the canvas widget
-   my $canvas = $MW->Canvas( -width       => $axes[0]*1.25, 
-                             -height      => $axes[1]*1.25, 
+   my $canvas = $MW->Canvas( -width       => $axes[0]*$zoom*$factor,
+                             -height      => $axes[1]*$zoom*$factor, 
                              -background  => 'dark grey',
                              -borderwidth => 3 );
    $canvas->pack();
