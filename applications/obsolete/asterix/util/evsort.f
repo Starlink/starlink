@@ -70,7 +70,6 @@
       INTEGER                NVAL               ! Number of values mapped
       INTEGER			OFID			! Output dataset
 
-      LOGICAL                INPRIM             ! Is input primitive?
       LOGICAL                ASCEND             ! Sort in ascending order?
 *
 *    Local constants :
