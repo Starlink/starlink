@@ -129,8 +129,8 @@ C
          INQUIRE (FILE=FILE,EXIST=EXIST,IOSTAT=IGNORE)
       END IF
       IF (.NOT.EXIST) THEN
-         STRING='Unable to open disk FITS file '//
-     :                         FILENAME(:ICH_LEN(FILENAME))
+         STRING='Unable to open disk FITS file '/
+     :                         /FILENAME(:ICH_LEN(FILENAME))
          CALL PAR_WRUSER(STRING,IGNORE)
          CALL PAR_WRUSER ('File does not exist.',IGNORE)
          STATUS = 1
@@ -145,8 +145,8 @@ C
          IF (STATUS.EQ.0) THEN
             LU = LUN
          ELSE
-            CALL PAR_WRUSER ('Error opening disk FITS file '//
-     :                                   FILE(:ICH_LEN(FILE)),IGNORE)
+            CALL PAR_WRUSER ('Error opening disk FITS file '/
+     :                                   /FILE(:ICH_LEN(FILE)),IGNORE)
             CALL GEN_FORTERR (STATUS,.FALSE.,ERROR)
             CALL PAR_WRUSER (ERROR(:ICH_LEN(ERROR)),IGNORE)
          END IF
