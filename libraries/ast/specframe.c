@@ -1597,7 +1597,6 @@ static const char *GetTitle( AstFrame *this_frame ) {
 /* Append the standard of rest in parentheses, if set. */
          if( astTestStdOfRest( this ) ) {
             nc = sprintf( buff+pos, " (%s)", sor_string );
-            buff[ pos + 2 ] = tolower( buff[ pos + 2 ] );
             pos += nc;
          }
 
