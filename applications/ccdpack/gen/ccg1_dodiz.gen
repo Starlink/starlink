@@ -195,7 +195,7 @@
 *  If it's neither CCD_REG nor CCD_WCSREG then issue a mild warning.
       IF ( DMN .NE. 'CCD_REG ' .AND. DMN .NE. 'CCD_WCSREG ' ) THEN
          CALL CCD1_MSG( ' ', '      (Warning: this is not a default'//
-     :   'CCDPACK registration coordinate system)', STATUS )
+     :   ' CCDPACK registration coordinate system)', STATUS )
       END IF
 
 *  Check that the image is 2 dimensional, if not we're in real trouble
