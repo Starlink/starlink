@@ -106,19 +106,16 @@
 
 *  Test for the various options.
 *  =============================
-      write(*,*) 'KPG1_PGCOL Colour ',colour
 
 *  MIN causes the minimum value to be used, namely '/'.  This requests
 *  the lowest non-reserved colour.
       IF ( COLOUR .EQ. '/' .OR. COLOUR .EQ. 'MIN' ) THEN
          COLIND = LP
-      write(*,*) 'A'
 
 *  MAX causes the maximum value to be used, namely '{'.  This requests
 *  the highest non-reserved colour.
       ELSE IF ( COLOUR .EQ. '{' .OR. COLOUR .EQ. 'MAX' ) THEN
          COLIND = UP
-      write(*,*) 'B'
 
 *  See whether it is an integer.
       ELSE
@@ -128,7 +125,6 @@
 *  If the conversion was successful use the number as a colour index
 *  constrained to be in the full colour table.
          IF ( STATUS .EQ. SAI__OK ) THEN
-      write(*,*) 'C ',UP, COLIND
             COLIND = MIN( UP, MAX( 0, COLIND ) )
 
 *  The value is not numeric so assume that it is a named colour from
