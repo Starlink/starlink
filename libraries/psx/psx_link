@@ -1,0 +1,68 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     psx
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against standalone PSX.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building standalone
+#     applications which use PSX in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        f77 -o program -L/star/lib `psx_link` program.f
+
+#  Copyright:
+#     Copyright (C) 1993 Science & Engineering Research Council
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     DLT: D.L. Terrett (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1993 (RFWS):
+#        Original version.
+#    12-NOV-1993 (DLT):
+#        Adapted for PSX
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#.
+
+#  Initialise the special options string.
+      special=''
+
+#  Test to see if we are on a system which requires additional
+#  "special" ld options for correct linking.
+
+#  DEC Alpha systems running OSF1:
+#  ------------------------------
+#  Ensure that allocated memory addresses will fit into 32 bits to
+#  prevent problems with storing them in Fortran integers.
+      if test "`uname -m`" = "alpha" -a "`uname -s`" = "OSF1"; then
+         special='-Wl,-D -Wl,40800000 -Wl,-T -Wl,30000000'
+      fi
+
+#  Echo any special options, followed by the PSX library reference,
+#  followed by the list of options for packages on which PSX depends.
+#  Pass the result through an awk script to remove duplicate library
+#  references.
+      echo "${special}" -lpsx `ems_link` `cnf_link` \
+      | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
+
+#  End of script.

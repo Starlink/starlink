@@ -1,0 +1,90 @@
+/* Subroutine: psx_time( nticks, status )
+*+
+*  Name:
+*     PSX_TIME
+
+*  Purpose:
+*     Get the current calendar time
+
+*  Language:
+*     ANSI C
+
+*  Invocation:
+*     CALL PSX_TIME( NTICKS, STATUS )
+
+*  Description:
+*     Determine the current calendar time. The encoding of the value is
+*     unspecified, but is the number of ticks since some date in the
+*     past. If it is not possible to get the value of NTICKS, STATUS is
+*     set to PSX__NOTIM and an error is reported.
+
+*  Arguments:
+*     NTICKS = INTEGER (Returned)
+*        The current time.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine is not directly useful in itself, but the value
+*        returned in NTICKS can be passed to other routines that process
+*        it further.
+
+*  References:
+*     -  POSIX standard (1988), section 4.5.1
+*     -  ANSI C standard (1989), section 4.12.2.4
+      
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-APR-1991 (PMA):
+*        Original version.
+*     27-JUN-1991 (PMA):
+*        Changed IMPORT and EXPORT macros to GENPTR.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+------------------------------------------------------------------------------
+*/
+
+/* Global Constants:							    */
+
+#include <time.h>		 /* Time constants and structures	    */
+#include "f77.h"		 /* C - FORTRAN interface		    */
+#include "psx_err.h"		 /* PSX error codes			    */
+#include "psx1.h"		 /* Internal PSX routines		    */
+#include "sae_par.h"		 /* ADAM constants			    */
+
+#if !defined(NULL)		 /* Do this rather than including stddef.h  */
+#define NULL  (void *) 0	 /* since it causes problems with the gcc   */
+#endif				 /* compiler.				    */
+
+
+F77_SUBROUTINE(psx_time)( INTEGER(nticks), INTEGER(status) )
+{
+
+/* Pointers to Arguments:						    */
+
+   GENPTR_INTEGER(nticks)
+   GENPTR_INTEGER(status)
+
+/* Local Variables:							    */
+
+   *nticks = time( NULL );
+
+/* Check the value returned.						    */
+
+   if( *nticks == -1 )
+   {
+      *status = PSX__NOTIM;
+      psx1_rep_c( "PSX_TIME_NOTIM", "Could not get the time", status );
+   }
+
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="psx">
+  <version>0.4</version>
+  <path>libraries/psx</path>
+  <description>POSIX interface routines</description>
+   <abstract><p>PSX is a FORTRAN subroutine library that allows
+      programmers to use the functionality provided by the POSIX and
+      X/OPEN libraries. The use of this library will enable
+      programmers to make use of operating system facilities in a
+      machine independent way.</p></abstract> 
+  <dependencies>
+    <build> sae messgen</build>
+    <use></use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P M Allan</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>a.j.chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
