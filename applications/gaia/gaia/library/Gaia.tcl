@@ -298,8 +298,8 @@ itcl::class gaia::Gaia {
    #  Add help for GAIA and SkyCat.
    public method add_help_menu {} {
       global ::gaia_dir
-      set m [add_help_button $gaia_dir/Gaia.hlp "On Window..." \
-                {Display help on this window and general features}   ]
+      set m [add_help_button index "Help topics index..." \
+                {Display the main help window and index}]
 
       add_menuitem $m command "About GAIA::SkyCat..." \
          {Display a window with information about this GAIA/SkyCat version} \
@@ -609,11 +609,6 @@ itcl::class gaia::Gaia {
 	 add_menuitem $m command "Demonstration mode..." \
 	       {See a demonstration of GAIA (needs an empty directory)} \
 	       -command [code $this make_toolbox demo]
-      }
-      if { $itk_option(-ramp_print) && $itk_option(-with_colorramp) } {
-	 add_menuitem $m command "Print color ramp..." \
-	    {Print a labelled copy of color ramp to postscript} \
-	    -command [code $this print_ramp_]
       }
    }
 
@@ -1478,9 +1473,6 @@ itcl::class gaia::Gaia {
 
    #  Redefine panel_layout to GAIA default
    itk_option define -panel_layout panel_layout Panel_layout reverse
-
-   #  Show the print colorramp code.
-   itk_option define -ramp_print ramp_print Ramp_Print 1
 
    #  Set focus following policy (can only set once, then stuck with it).
    itk_option define -focus_follows_mouse focus_follows_mouse \

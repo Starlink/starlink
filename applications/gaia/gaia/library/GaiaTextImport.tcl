@@ -150,7 +150,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Add notebook to contain the various controls.
       itk_component add notebook {
-         tabnotebook $w_.notebook -tabpos w -width 410 -height 300
+         ::iwidgets::tabnotebook $w_.notebook -tabpos w -width 410 -height 300
       }
       pack $itk_component(notebook) -side top -fill both -expand 1 \
          -ipadx 1m -ipady 1m
@@ -391,7 +391,7 @@ itcl::class gaia::GaiaTextImport {
 
       #  Create a scrollable region for showing all columns.
       itk_component add headregion {
-         scrolledframe $parent.headregion -width 75 -height 400
+         ::iwidgets::scrolledframe $parent.headregion -width 75 -height 400
       }
       pack $itk_component(headregion) -fill both -expand 1
       set headparent_ [$itk_component(headregion) childsite]

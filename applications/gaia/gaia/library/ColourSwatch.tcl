@@ -202,7 +202,7 @@ itcl::class gaia::ColourSwatch {
 
       #  Canvas for displaying the colours.
       itk_component add canvas {
-         scrolledcanvas $w_.canvas \
+         ::iwidgets::scrolledcanvas $w_.canvas \
             -autoresize 1 \
             -height 200 \
             -hscrollmode none \

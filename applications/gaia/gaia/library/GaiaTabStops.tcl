@@ -73,7 +73,7 @@ itcl::class gaia::GaiaTabStops {
       #  region with a label, a creator blue triangle and a series of
       #  red triangles pointing to the tab positions.
       itk_component add canvas {
-         scrolledcanvas $w_.canvas \
+         ::iwidgets::scrolledcanvas $w_.canvas \
             -autoresize 1 \
             -vscrollmode none \
             -hscrollmode dynamic \

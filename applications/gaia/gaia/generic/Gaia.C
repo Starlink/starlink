@@ -106,7 +106,6 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
       return TCL_ERROR;
     }
 
-
     // The gaia_library path can be found in several places.  Here is the order
     // in which the are searched.
     //		1) the variable may already exist
@@ -138,49 +137,43 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     //  method of doing the init gets confused).
     libDir = Tcl_GetVar(interp, "iwidgets_library", TCL_GLOBAL_ONLY);
     if (libDir == NULL) {
-      libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY",
-                           TCL_GLOBAL_ONLY);
+        libDir = Tcl_GetVar2(interp, "env", "IWIDGETS_LIBRARY",
+                             TCL_GLOBAL_ONLY);
     }
     if (libDir == NULL) {
-      libDir = IWIDGETS_LIBRARY;
+        libDir = IWIDGETS_LIBRARY;
     }
     Tcl_SetVar(interp, "iwidgets_library", libDir, TCL_GLOBAL_ONLY);
     Tcl_SetVar(interp, "iwidgets_version", IWIDGETS_VERSION, TCL_GLOBAL_ONLY);
     sprintf(cmd, "lappend auto_path %s", libDir);
     if (Tcl_Eval(interp, cmd) != TCL_OK)
         return TCL_ERROR;
-
+    
     //  Also do the package provide.
-    if (Tcl_Eval(interp,
-"global iwidgets_library iwidgets_version;"
-"package require Tcl 8.0;"
-"package require Tk 8.0;"
-"package require Itcl 3.0;"
-"package require Itk 3.0;"
-"namespace eval ::iwidgets {;"
-"  namespace export *;"
-"  variable library $iwidgets_library;"
-"  variable version $iwidgets_version;"
-"};"
-"lappend auto_path \"$iwidgets_library/scripts\";"
-"package provide Iwidgets $iwidgets_version;"
-                 ) != TCL_OK) {
-      return TCL_ERROR;
+    if ( Tcl_Eval( interp,
+                   "global iwidgets_library iwidgets_version\n"
+                   "package require Tcl 8.0\n"
+                   "package require Tk 8.0\n"
+                   "package require Itcl 3.0\n"
+                   "package require Itk 3.0\n"
+                   "namespace eval ::iwidgets {\n"
+                   "  namespace export *\n"
+                   "  variable library $iwidgets_library\n"
+                   "  variable version $iwidgets_version\n"
+                   "}\n"
+                   "lappend auto_path \"${iwidgets_library}/scripts\"\n"
+                   "package provide Iwidgets $iwidgets_version\n"
+        ) != TCL_OK ) {
+        return TCL_ERROR;
     }
-
+    
     //  Set up the namespaces used by the itcl/itk classes.
     if (Tcl_Eval(interp,
-#if (TCL_MAJOR_VERSION >= 8)
-		 "namespace eval gaia {namespace export *};"
-		 "namespace import -force gaia::*;"
-		 "namespace import -force iwidgets::*;"
-#else
-		 "namespace ::gaia {}; import add gaia;"
-                 "package require Iwidgets;"
-		 "namespace ::iwidgets; import add ::iwidgets"
-#endif
-                 ) != TCL_OK) {
-      return TCL_ERROR;
+		 "namespace eval gaia {namespace export *}\n"
+		 "namespace import -force gaia::*\n"
+//		 "namespace import -force iwidgets::*\n"
+        ) != TCL_OK) {
+        return TCL_ERROR;
     }
     return TCL_OK;
 }

@@ -139,7 +139,7 @@ itcl::class util::FileSelect {
         pack $fs(filterf).entry -side top -fill x -expand yes -ipady 1m
 		
         # PWD: pane holding directory and file views is split.
-        set fs(panef) [panedwindow $f.listf.pane \
+        set fs(panef) [iwidgets::panedwindow $f.listf.pane \
                           -orient vertical\
                           -width 4i \
                           -height 2i]

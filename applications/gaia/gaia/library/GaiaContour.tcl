@@ -574,7 +574,7 @@ itcl::class gaia::GaiaContour {
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add atframe {
-         scrolledframe $w.atframe -width 75 -height 250
+         ::iwidgets::scrolledframe $w.atframe -width 75 -height 250
       }
       pack $itk_component(atframe) -fill both -expand 1
       set parent [$itk_component(atframe) childsite]

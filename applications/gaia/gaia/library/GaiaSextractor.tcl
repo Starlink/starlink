@@ -1066,7 +1066,7 @@ itcl::class gaia::GaiaSextractor {
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add photframe {
-         scrolledframe $parent.photframe -width 75 -height 400
+         ::iwidgets::scrolledframe $parent.photframe -width 75 -height 400
       }
       pack $itk_component(photframe) -fill both -expand 1
       set childsite [$itk_component(photframe) childsite]
@@ -1750,7 +1750,7 @@ itcl::class gaia::GaiaSextractor {
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add catframe {
-         scrolledframe $parent.catframe -width 75 -height 400
+         ::iwidgets::scrolledframe $parent.catframe -width 75 -height 400
       }
       pack $itk_component(catframe) -fill both -expand 1
       set colparent_ [$itk_component(catframe) childsite]
