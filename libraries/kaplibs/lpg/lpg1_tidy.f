@@ -31,6 +31,8 @@
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     28-MAR-2004 (DSB):
+*        Free GRP groups used to hold input and temp output NDF names.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +70,20 @@
 *        STATE2( LPG__MXPAR ) = INTEGER (Write)
 *           The original (i.e. before the first invocation was performed) 
 *           PAR state of each parameter listed in array PNAME2.
+*        TMPLST = INTEGER (Read and Write)
+*           A GRP identifier for a group holding the full specification
+*           for any temporary output NDFs created during the previous
+*           invocation of the application. A temporary output NDF is
+*           created if the output NDF requested by the user may already
+*           be open by the NDF system. In this case the temporary NDF
+*           is copied to the requested position once the application has
+*           finished.  The TMPLST group holds adjacent pairs of file
+*           specs; the first one in each pair is the spec of the temporary 
+*           output NDF, the second is the spec of the requested output NDF.
+*        OPNLST = INTEGER (Read and Write)
+*           A GRP identifier for a group holding the full specification
+*           for any existing NDFs which have been opened for read-only
+*           input by this invocation of the application. 
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -116,6 +132,11 @@
          CALL ERR_ANNUL( STATUS )
          STATUS = ISTAT
       END IF
+
+*  Free the groups used to hold input NDF names and temporary output NDF
+*  names.
+      IF( TMPLST .NE. GRP__NOID ) CALL GRP_DELET( TMPLST, STATUS )
+      IF( OPNLST .NE. GRP__NOID ) CALL GRP_DELET( OPNLST, STATUS )
 
 *  Release the current error context.
       CALL ERR_RLSE
