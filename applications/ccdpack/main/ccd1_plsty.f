@@ -122,10 +122,17 @@
       CALL ERR_RLSE
 
 *  If required, read elements from the ADAM parameter into a group.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
       IF ( PARAM .NE. ' ' ) THEN
          NGRP = NGRP + 1
+         CALL ERR_MARK
          CALL CCD1_STRGR( PARAM, GRP__NOID, 0, 999, GID( NGRP ), NEL,
      :                    STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+            NEL = 0
+            CALL ERR_ANNUL( STATUS )
+         END IF
+         CALL ERR_RLSE
          IF ( NEL .LT. 1 ) NGRP = NGRP - 1
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
