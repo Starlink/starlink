@@ -14,6 +14,12 @@
 
   Defaults for these (except DTD.Version) are given below.
 
+  Certain entities have both a public and a system identifier -- the
+  latter is a URL derived from the pubid.  This string is maintained
+  by the sed script add-sysids.sed, which demands that the sysid is a
+  string, alone on a line immediately following a line which includes
+  the string `PUBLIC'.
+
   Author:
     NG: Norman Gray (Glasgow)
 
@@ -508,7 +514,7 @@
 <!ENTITY % docinfo.model 
 	'title , authorlist , keyword*, manualtype?, softwareversion?
 	%docnumber; %history; ,
-	coverimage?, copyright?'>
+	coverimage?, copyright?, mapidlist?'>
 <!ELEMENT docinfo %MOO; (%docinfo.model;)>
 
 <!-- The TITLE element contains the document title, or the section title
@@ -584,6 +590,27 @@
 	>
 	<!-- attributes:
 		type	what type of manual is this?
+		-->
+
+<!-- ID substitution: It is always possible for IDs to (have to)
+     change, but since exported IDs may well be referred to from
+     outside the current document, it is necessary to declare a
+     remapping.  Use the MAPID element to do this: resolve a reference
+     to this element as if it were a reference to the element pointed
+     to by newid, possibly also warning or issuing an error about a
+     deprecation.
+     -->
+<!ELEMENT mapidlist	%MOO (mapid+)>
+<!ELEMENT mapid		%MXO EMPTY>
+<!ATTLIST mapid
+	from		ID	#REQUIRED
+	to		IDREF	#REQUIRED
+	export		(export) #FIXED export
+	>
+	<!-- attributes
+		from		the now-obsolete id
+		to		replacement
+		export		for compatibility/consistency
 		-->
 
 
