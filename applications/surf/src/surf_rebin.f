@@ -103,9 +103,12 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.16  1996/11/05 02:08:04  timj
-*     Set BAD_PIXEL flag for DATA and VARIANCE
+*     Revision 1.17  1996/11/07 00:20:17  timj
+*     Change MAX_FILE to 100
 *
+c Revision 1.16  1996/11/05  02:08:04  timj
+c Set BAD_PIXEL flag for DATA and VARIANCE
+c
 c Revision 1.15  1996/11/02  01:22:19  timj
 c Tweak 'arameters' in header
 c
@@ -161,7 +164,7 @@ c
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       INTEGER     MAX_FILE             ! max number of input files
-      PARAMETER (MAX_FILE = 10)
+      PARAMETER (MAX_FILE = 100)
       BYTE BADBIT                      ! Bad bit mask
       PARAMETER (BADBIT = 1)
 
