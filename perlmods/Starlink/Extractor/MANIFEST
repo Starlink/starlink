@@ -3,3 +3,4 @@ README
 Makefile.PL
 Extractor.pm
 ChangeLog
+t/01_compile.t
