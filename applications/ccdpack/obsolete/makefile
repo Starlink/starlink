@@ -569,17 +569,17 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_auto.f ccd1_cen2.f \
  ccd1_cent.f ccd1_cext.f ccd1_cff.f ccd1_ckcdb.f \
  ccd1_ckcon.f ccd1_ckfla.f ccd1_ckfty.f ccd1_cktyp.f \
- ccd1_clcor.f ccd1_cmul.f ccd1_cmult.f ccd1_copy.f \
+ ccd1_clcor.f ccd1_cmul.f ccd1_cmult.f ccd1_cnvgr.f ccd1_copy.f \
  ccd1_cosub.f ccd1_crdat.f ccd1_crgr.f ccd1_crgr2.f \
  ccd1_dcen.f ccd1_dcon.f ccd1_debia.f ccd1_decl2.f \
- ccd1_decl3.f ccd1_decl4.f ccd1_disp.f ccd1_docmp.f \
+ ccd1_decl3.f ccd1_decl4.f ccd1_disp.f ccd1_dlcat.f ccd1_dmprg.f ccd1_docmp.f \
  ccd1_domos.f ccd1_drawi.f ccd1_drawp.f ccd1_dtrn.f \
  ccd1_duesc.f ccd1_end.f ccd1_estm.f ccd1_ffcl.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_frdm.f ccd1_frtmp.f ccd1_ftval.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
  ccd1_gefp.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
- ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_gtbds.f \
+ ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_gtbds.f \
  ccd1_gtcmp.f ccd1_gtcpb.f ccd1_gtcpc.f ccd1_gtdir.f \
  ccd1_gtlig.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hisp.f ccd1_hvcon.f \
@@ -598,7 +598,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_ndfpg.f ccd1_ndfpr.f ccd1_nlmap.f ccd1_nmid.f ccd1_nrmed.f \
  ccd1_nxwrd.f ccd1_objs.f ccd1_opfio.f ccd1_orvar.f \
  ccd1_ovcom.f ccd1_ovlap.f ccd1_plof.f ccd1_pnply.f ccd1_prmin.f \
- ccd1_prndf.f ccd1_prsel.f ccd1_prune.f ccd1_ptbad.f \
+ ccd1_prndf.f ccd1_prsel.f ccd1_prune.f ccd1_ptbad.f ccd1_pthmp.f \
  ccd1_ptins.f ccd1_putr.f ccd1_rbia.f ccd1_rcal.f \
  ccd1_rccr.f ccd1_rdbi.f ccd1_rdlin.f ccd1_redtr.f \
  ccd1_rend.f ccd1_reov.f ccd1_repc.f ccd1_rexp.f \
@@ -714,7 +714,7 @@ CIRGSRC = irg1_wild.c
 
 REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
- pairndf ccdedit makemos tranndf astimp astexp
+ pairndf ccdedit makemos tranndf astimp astexp wcsreg
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 NAGTASKS = nagmakemos
@@ -761,7 +761,8 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
    ccdshow.hlp reduce.hlp command_descriptions.hlp register.hlp \
    debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
    tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
-   use_globals.hlp idicurs.hlp xreduce.hlp import.hlp astimp.hlp astexp.hlp
+   use_globals.hlp idicurs.hlp xreduce.hlp import.hlp \
+   astimp.hlp astexp.hlp wcsreg.hlp
 
 #  Name of the help task.
 
@@ -2197,6 +2198,7 @@ ccd1_cktyp.o: CCD1_PAR DAT_PAR SAE_PAR
 ccd1_clcor.o: SAE_PAR
 ccd1_cmul.o: SAE_PAR
 ccd1_cmult.o: SAE_PAR
+ccd1_cnvgr.o: AST_PAR SAE_PAR
 ccd1_copy.o: SAE_PAR
 ccd1_cosub.o: SAE_PAR
 ccd1_crdat.o: SAE_PAR
@@ -2209,6 +2211,8 @@ ccd1_decl2.o: SAE_PAR
 ccd1_decl3.o: SAE_PAR
 ccd1_decl4.o: SAE_PAR
 ccd1_disp.o: IDI_ERR IDI_PAR SAE_PAR
+ccd1_dlcat.o: SAE_PAR
+ccd1_dmprg.o: AST_PAR SAE_PAR
 ccd1_docmd.o: SAE_PAR
 ccd1_docmp.o: DAT_PAR NDF_PAR SAE_PAR USER_ERR
 ccd1_domos.o: NDF_PAR SAE_PAR
@@ -2244,6 +2248,7 @@ ccd1_gmdcp.o: PAR_ERR PRM_PAR SAE_PAR
 ccd1_gmid.o: PRM_PAR SAE_PAR
 ccd1_gmmp.o: PRM_PAR SAE_PAR
 ccd1_grapc.o: PRM_PAR SAE_PAR
+ccd1_grpth.o: PRM_PAR SAE_PAR
 ccd1_groff.o: MSG_PAR PRM_PAR SAE_PAR
 ccd1_gtbds.o: SAE_PAR
 ccd1_gtcmp.o: SAE_PAR
@@ -2330,6 +2335,7 @@ ccd1_prndf.o: SAE_PAR
 ccd1_prsel.o: SAE_PAR
 ccd1_prune.o: SAE_PAR
 ccd1_ptbad.o: SAE_PAR
+ccd1_pthmp.o: AST_PAR SAE_PAR
 ccd1_ptins.o: SAE_PAR
 ccd1_putr.o: PRM_PAR SAE_PAR
 ccd1_rbia.o: MSG_PAR SAE_PAR
@@ -2634,6 +2640,7 @@ runxreduce.o: SAE_PAR
 schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
+wcsreg.o: AST_PAR CCD1_PAR SAE_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
