@@ -72,8 +72,15 @@
 
       ELSE
 
-*  get memory
 
+*  Make sure data ends on 4 byte boundary (problems with BYTE allocs)
+*  This is because of the CFILLI used for the sentinel number
+
+         IF (MOD(SIZE, VAL__NBI) .NE. 0) THEN
+            SIZE = SIZE + (VAL__NBI - MOD(SIZE, VAL__NBI))
+         END IF
+
+*  get memory
          CALL PSX_MALLOC (SIZE + 2 * VAL__NBI, START_PTR, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
@@ -81,7 +88,6 @@
             END_PTR = START_PTR + SIZE - 1
 
 *  set sentinel integers
-
             CALL SCULIB_CFILLI (1, 37, %val(START_PTR - VAL__NBI))
             CALL SCULIB_CFILLI (1, 37, %val(END_PTR + 1))
          ELSE
