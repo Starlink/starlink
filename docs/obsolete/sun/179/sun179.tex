@@ -1,0 +1,788 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {179.3}
+\newcommand{\stardocauthors}   {Rhys Morris \\ Grant Privett}
+\newcommand{\stardocdate}      {13 July 1995}
+\newcommand{\stardoctitle}     {IRAF --- Image Reduction Analysis Facility}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+CCL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+{\large Particle Physics \& Astronomy Research Council}\\
+{\large Starlink Project\\}
+{\large \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+\section{Introduction} 
+
+IRAF is a powerful and comprehensive environment for reducing and
+analyzing optical astronomical data.  The system was developed by the
+IRAF group at National Optical Astronomy Observatory (NOAO) in Tucson,
+Arizona, who also maintain it (including the production of versions for
+new types of computer) and answer queries from users. It has its own
+file format, programming language, command language and on-line help
+documentation.  The package can be installed on a number of platforms:
+Solaris (Beta-test version), SunOS, Ultrix and VMS are supported by the
+IRAF group, and there is a version for Alpha machines under OSF/1 which
+is maintained by the Space Telescope Science Institute (STScI). This
+Starlink User Note is intended as a brief introduction and a pointer to
+IRAF's own documentation.  A walk through a short IRAF session is
+included as an example.
+
+\subsection{IRAF and Starlink}
+
+IRAF is one of several major software environments which are available
+to Starlink users and upon which entire data-analysis campaigns can be
+based.  Other examples include AIPS, IDL and MIDAS, as well as
+Starlink's own large collection of infrastructure tools and application
+packages and the various forms of the FIGARO system.  Each has its own
+particular strengths and special capabilities;  IRAF and AIPS are the
+most comprehensive overall.
+
+The excellent support provided by IRAF's home institute (with which
+Starlink maintains close contact) means that comparatively little
+national UK Starlink support is called for and provided;  the same is
+true for the other overseas environments mentioned above.
+
+IRAF is a sound choice for many Starlink data-analysis users,
+especially where compatibility with overseas collaborators is a
+requirement.  The choice is harder for those wishing to develop major
+applications of their own, who may be reluctant to adopt IRAF's
+non-industry-standard \verb|SPP| programming language or who feel
+uncomfortable with the limitations of the ``flat'' IRAF data formats.
+Those who need formal guarantees of future support should also be very
+wary about committing themselves to any package which is not under UK
+control.  However, IRAF is an important weapon in the armoury of the
+average Starlink data-analysis user and likely to remain so for some
+years.
+
+An important part of Starlink's present software plans is to enhance
+``interoperability'' with other environments, IRAF being of special
+importance.  Starlink applications can already share data with other
+packages via FITS files, but in the case of IRAF this data-interchange
+capability will be extended by enabling Starlink applications to read
+and write IRAF data files.  This will mean that a user can run IRAF in
+one window on his or her screen and a Starlink package ({\it
+e.g.}\ CCDPACK) in another, processing the same datasets with each.  A
+further capability, currently being investigated, would be to run
+Starlink applications from the IRAF command-line just as if they were
+native IRAF applications.
+
+\section{Documentation}
+
+\subsection*{On-line Documentation}
+
+There is comprehensive on-line help available for each task in IRAF.
+If, for example, you want information on the IRAF task ``{\tt
+imcombine}" then you would type ``{\tt help imcombine}" while running
+IRAF. If you are not sure what a task is called, you can search for all
+occurrences of a particular keyword in the help files using the {\tt
+references} task. Typing ``{\tt ref combine}'' should turn up the {\tt
+imcombine} task mentioned earlier. Command abbreviation is allowed to
+an unambiguous minimum. Should you wish to study one of the on-line
+help pages in detail, you can produce a printable plain ASCII file
+using a command line of the form:
+
+{\tt help imcombine device=text > dump\_file }
+
+Print {\tt dump\_file} and read it at your leisure.
+
+
+\subsection*{Paper Documentation}
+
+The paper documentation for IRAF is archaic;  most of the documentation
+effort goes into the on-line documentation. There are some sets
+of relevant documents available from the Starlink document
+librarian:  the {\it IRAF User Handbook}\/, Volume 1A -- the
+IRAF System (Starlink MUD/104), and the {\it IRAF User Handbook}\/,
+Volume 2B -- User's Guides / KPNO Cookbooks (Starlink MUD/105).
+
+Volume 1A contains:
+
+\begin{itemize}
+
+\item{The IRAF Data Reduction and Analysis System -- a system overview.}
+
+\item{An introduction to the IRAF command language.}
+
+\item{IRAF test procedures.}
+
+\item{IRAF directory trees.}
+
+\item{IMFORT -- a FORTRAN interface to IRAF.}
+
+\end{itemize}
+
+Volume 2B, the ``cookbook'', contains documents
+describing various packages in IRAF. For example, the document on the
+CCD reduction package, {\tt CCDRED}, is included as is a document on
+the spectroscopy package {\tt ONEDSPEC}. 
+
+Starlink MUD/154, the STScI {\it STSDAS Users Guide}\/, contains a useful
+introduction to IRAF which is well worth reading. The rest of the
+document describes an optional add-on package to IRAF called STSDAS
+which is for the analysis of data from the Hubble Space Telescope. See
+later in this document for more about this package and other packages
+that can be added to IRAF.
+
+\subsection*{WWW Documentation}
+ 
+IRAF now maintain a World\,Wide\,Web (WWW) home page via which
+the user may obtain the latest copies of the IRAF FAQ, the IRAF newsletter,
+bug reports and other documentation. This may be accessed via URL
+{\tt http://iraf.noao.edu/}.
+
+\section{File Formats}
+
+The IRAF file format is usually referred to as the OIF or ``Old IRAF
+Format'' (although there is no ``New IRAF Format'' yet) and it consists of
+two files. One file contains header information such as image
+dimensions and any lines of FITS type information from the original
+observation, and has a {\tt .imh} suffix. The other file contains the
+actual data values and has a {\tt .pix} suffix. 
+
+The header file contains the full pathname of the pixel file so the
+pixel file can be in a different directory or even on a separate
+disk. This means that you cannot copy IRAF files around from place to
+place or from machine to machine and expect them to work -- a common
+source of difficulties for new users! There are tools for editing the
+header file should you get into a mess, but in general images should
+always be copied and renamed using the {\tt imcopy} and {\tt imrename}
+tasks within IRAF. If you need to transfer data from one machine to
+another, then you can use the {\tt rfits} and {\tt wfits} tasks in the
+{\tt dataio} package to create disk FITS files which can usually be
+moved from one machine to another.
+
+STSDAS format images are recognized by most IRAF tasks;  this format is
+used for storing Hubble Space Telescope data.  Again there are two
+files:  one file is the
+header file, and has the extension {\tt .XXh}, where X can be any
+alphanumeric character, while the other contains the actual data
+numbers and has a {\tt .XXd} suffix;  these are usually kept together
+in the same directory. STSDAS files have the advantage that the header
+file is an ASCII file and can be read on a terminal without using IRAF
+at all. This is not true of {\tt .imh} files as some of the header
+information is stored in binary form. In a future release of IRAF,
+disk FITS files with the {\tt .fit} extension will be recognized as
+well.
+
+\section{The IRAF Package Structure}
+
+IRAF's ``tasks'', as the individual programs are sometimes called,
+are divided into packages. See the example session, later, for the
+packages available when you start up IRAF. Each of the packages may
+contain tasks or further subpackages. For example, loading the {\tt
+noao} package by typing ``{\tt noao}'', leads to further subpackages,
+while loading the {\tt dataio} package makes available tasks for
+importing and exporting data to and from IRAF. You cannot use any task
+until you have loaded the package which contains it. Typing ``{\tt
+bye}'' unloads the most recently loaded package.
+
+There are documents available describing some of the individual
+packages in Volume 2A of the {\it IRAF User Handbook}\/ (MUD/105,
+the ``cookbook'' volume) while the STSDAS package is described
+in the {\it STSDAS User Guide}\/ (Starlink MUD/154). 
+
+\section{Running IRAF for the First Time}
+
+A few things need to be done before a user can run IRAF. It is usual
+to create a subdirectory called {\tt iraf} for storing IRAF files; do
+this and then move to that directory. You now need to type ``{\tt mkiraf}'' to
+set things up. This creates a file called {\tt login.cl} and a
+subdirectory to your IRAF directory called {\tt uparm}. The former is
+an initialization file for IRAF and the latter is a directory used for
+storing parameter information such as default values for commands. 
+
+You will need to edit {\tt login.cl} so that the variable {\tt home}
+contains your correct disk name for your IRAF home directory. You will
+also need to set the {\it imdir} variable to the directory where you intend
+to keep your pixel files. If you are not sure about this it is
+probably best to set this to ``{\tt HDR\$}'' so that the pixel file is
+created in the same directory as the header file. Running {\tt mkiraf} also
+prompts you for a terminal type: if you run IRAF from an {\tt xterm}
+window, you could reply ``{\tt vt100}'' or ``{\tt xterm}.''
+This is stored in the {\tt login.cl} file, and you
+can always edit it to something different later.
+
+If you wish to customize IRAF you should create a file called {\tt
+loginuser.cl} in which you can define things like variables to
+contain the names of frequently used directories. It is worth doing
+this as sometimes a major revision of IRAF requires all users to
+delete all old parameter files and type ``{\tt mkiraf}'' to get a new {\tt
+login.cl}.  Any customizations will then be lost unless you put them in
+a {\tt loginuser.cl} file.
+
+The IRAF command language is started by typing ``{\tt cl}'';  a welcome
+message appears and you will find yourself at the {\tt cl>} prompt.
+By the time you read this, there may be an IRAF GUI (Graphical User
+Interface) available. To use this, you would go through the set-up
+procedure as above and type ``{\tt xcl}'' instead of ``{\tt cl}''
+to run IRAF.
+
+\section{Useful Tips}
+
+If you are not sure of the task name to perform any particular
+function then, as mentioned before, you could do a keyword search of
+all the help files using the {\tt references} task. Once you think you
+have a found a task that suits your needs you can read the help file
+for it; you do not need to load any packages for this as all the help
+files are accessible at all times. The help file will tell you which
+packages you need to load to use the task.
+
+Once you have found your task and loaded all packages necessary to use
+it, you can either get the parameter list from the help files, or
+if you just want a quick reminder of the order, you could use
+{\tt lpar} to list the parameters of the task.  Similar to {\tt lpar}
+is the {\tt epar} task which allows you to edit the parameter list for
+a task. For example, if you would like the {\tt imdelete} task to
+ask for confirmation before deleting any images, you could edit its
+parameter list so that it does so.
+
+\newpage
+
+%===================================================================
+% The next two pages are meant to be opposite each other. Future  ||
+% modifiers of this document please take note.                    ||
+%===================================================================
+
+\section{An IRAF Session}
+
+This is a simple IRAF session; each step is explained in the text on
+the next page.
+
+{\footnotesize
+\begin{verbatim}
+
+/home/pollux/rahm[pollux]rahm: cd ~/iraf
+/home/pollux/rahm/iraf[pollux]rahm: cl
+setting terminal type to vt100...
+    NOAO SUN/IRAF Revision 2.10.3BETA Thu Aug 18 17:39:59 MST 1994
+    This is the BETA version of Sun/IRAF V2.10.3 for Solaris 2.3.
+
+    Welcome to IRAF.  To list the available commands, type ? or ??.  To get
+    detailed information about a command, type `help command'.   To  run  a
+    command  or  load  a  package,  type  its name.   Type  `bye' to exit a
+    package, or `logout' to get out of the CL.   Type `news'  to  find  out
+    what is new in the version of the system you are using.   The following
+    commands or packages are currently defined:
+
+      apropos     images.     noao.       proto.      system.     
+      dataio.     language.   obsolete.   softools.   tables.     
+      dbms.       lists.      plot.       stsdas.     utilities.  
+cl> images
+      blkavg        geomap        imdelete      imstack       median
+      blkrep        geotran       imdivide      imstatistics  minmax
+      boxcar        gradient      imgets        imsum         mode
+      chpixtype     hedit         imheader      imsurfit      register
+      convolve      hselect       imhistogram   imtranspose   rotate
+      fit1d         imarith       imlintran     laplace       sections
+      fmedian       imcombine     imrename      lineclean     shiftlines
+      fmode         imcopy        imshift       listpixels    tv.
+      gauss         imdebug.      imslice       magnify       
+im> imstat r136
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+                 r136    262144     1.659     1.698        0.       27.
+im> lpar imarith
+     operand1 = ""              Operand image or numerical constant
+           op = "*"             Operator
+     operand2 = "100"           Operand image or numerical constant
+       result = ""              Resultant image
+       (title = "")             Title for resultant image
+     (divzero = 0.)             Replacement value for division by zero
+     (hparams = "")             List of header parameters
+     (pixtype = "")             Pixel type for resultant image
+    (calctype = "")             Calculation data type
+     (verbose = no)             Print operations?
+       (noact = no)             Print operations without performing them?
+        (mode = "ql")           
+im> imarith r136 - 1.659 new_image
+im> imstat new_image
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+            new_image    262144  1.873E-4     1.698    -1.659     25.34
+im> logout
+/home/pollux/rahm/iraf[pollux]rahm:
+\end{verbatim}
+}
+\newpage
+\subsection{Explanation of the IRAF Session}
+
+IRAF must always be started from the directory
+where the {\tt login.cl} and the {\tt loginuser.cl} files are
+kept, otherwise any customizations of IRAF will be lost. Once in your
+IRAF home directory, IRAF is started by typing ``{\tt cl}'' (in
+lowercase -- IRAF is case-sensitive) and the
+IRAF welcome message appears. The version of IRAF shown is version
+2.10.3, which was the most recent at the time of writing. Usually the
+minor version number increments two or three times a year as minor bug
+fixes are applied. The major version number changes less frequently.
+
+Of the top-level packages available on start-up, {\tt apropos} is not
+a package: it is a task from STSDAS which performs a similar task to
+the IRAF {\tt references} task in searching through the helpfiles for
+a keyword. The basic IRAF will not contain this task, but it is part
+of the set-up at the Cardiff Starlink node,
+where this document was written.
+
+The {\tt images} package is loaded and the tasks in that package are
+listed.  The task {\tt imstat} is selected to get the statistics of an
+image. The task {\tt imarith} is a multipurpose application
+for performing arithmetic
+operations. Operands 1 and 2 can be either images or constants while
+the operator argument decides the arithmetic operation to be
+performed. The argument list for {\tt imarith} is quite lengthy, so the {\tt
+lpar} task is used to list the parameters for the task. This is very
+useful if you do not have any paper documentation and cannot remember
+exactly what an argument is called. The bracketed parameters are
+optional, while the other parameters are compulsory and must be specified in
+the correct order.
+
+We use {\tt imarith} to subtract a constant from the image to create
+a new image called {\tt new\_im}. Finally we use {\tt imstat} again on the
+new image to verify that the operation worked.
+
+IRAF is closed down by typing ``{\tt logout}'', which leaves you back in
+the directory in which you started.
+
+\section{The IRAF FAQ}
+
+The single simplest piece of advice for users of IRAF is that they 
+should obtain a copy of the excellent IRAF FAQ (Frequently Asked Questions)
+file without delay.  This document, available both from NOAO
+(where it is maintained) 
+and from the Starlink IRAF Support programmer, contains a wealth
+of information and usually provides a solution to user queries.
+It is a good idea to have a copy permanently available in the terminal room
+or on disk wherever IRAF is being used.
+
+
+\section{IRAF Scripts and Batch Jobs}
+
+A series of IRAF commands can be executed by putting them in a
+file. The IRAF command language, {\tt cl}, is also a programming language
+and contains many features which allow you to write programs to help
+you with repetitive data reduction tasks. Although in general it is
+not possible to pass parameters from one task to another, some tasks
+do have output parameters so that the result of a calculation can be
+stored and accessed by another task. Unfortunately the {\tt imstat}
+task does not have an output parameter for storing the mean value of
+the image, but it is possible to write the output to a file using the
+UNIX-like redirection abilities of the {\tt cl} and then read in only the
+parts we are interested in. This is done in the script {\tt doit.cl}
+which is shown below. 
+
+The commands below are typed into a file called {\tt doit.cl}, but before we
+can run the script we must tell IRAF that it is a ``foreign task''. The
+command line to do this is:
+
+{\tt task \$doit=home\$doit.cl}
+
+This tells IRAF that typing ``{\tt doit}'' will execute the commands in
+the file {\tt doit.cl}, which is stored in the IRAF home directory.
+
+The file {\tt doit.cl} contains the following commands:
+
+{\footnotesize
+\begin{verbatim}
+
+# IRAF script to calculate a value and subtract
+# it from an image.
+
+# Load images package.
+images
+
+# Initialize the cl list variable.
+list = " "
+
+# Store a temporary file name in string s3.
+s3 = "store_file"
+
+# Redirect imstat output to temporary file.
+imstat "star_cluster" > (s3)
+
+# Associate temporary file with list variable.
+list = (s3)
+
+# Read first line and discard it.
+i = fscan (list, s2)
+
+# Read second line, the parameter we want is "y".
+i= fscan (list,s1,x,y,z)
+
+# Use imarith to subtract y from the image.
+imarith ("star_cluster","-",y,"new_image")
+
+# Look at statistics of new image to see if it 
+# worked.
+imstat ("new_image")
+
+# Change protection on the image created
+# and delete it.
+unprotect("new_image")
+delete ("new_image", verify=no)
+
+# Delete temporary file.
+delete ("store", verify=no)
+
+# Print an output message
+print(``subtracted'',y,''from image star_cluster'')
+
+\end{verbatim}
+}
+
+As with any unfamiliar programming language, the first reaction is one
+of trepidation as you wonder what is going on. No variables were
+declared at the start of this program although variables are used
+throughout the program for parameter passing. The {\tt cl} has some built-in
+variables which do not need to be declared. There are three string
+variables named {\tt s1} to {\tt s3}, three real variables
+{\tt x}, {\tt y} and {\tt z}, three
+integers {\tt i}, {\tt j} and {\tt k},
+three booleans and other more esoteric ones. Type
+``{\tt lpar cl}'' for a full list of the parameters available for
+immediate use. Other variables can be used but they need to be
+declared: see the manual for {\tt cl} for information on how to do
+this. List-type parameters are useful, they are usually associated
+with files, and they allow you to use {\tt fscan} and {\tt fprint}
+for reading and
+writing to files -- these are similar to functions found in the C
+language.
+
+Put simply, the script calculates the average pixel
+value for the file {\tt star\_cluster} and then subtracts it from the
+image. Without direct parameter passing this is not
+straightforward but can be done via a temporary file.
+To this end, the output of {\tt imstat} is
+re-directed to a file.  A list parameter is associated with the file. Since
+the first line read back contains only the column headings, this line
+is discarded, as are all of the variables read from the second line
+apart from the mean value which is stored in the real type variable
+{\tt y}. This
+is used in the {\tt imarith} task and subtracted from the input image to
+yield a new image. 
+
+Quoted parameters are passed to the tasks as they are; the brackets
+around some of the parameter lists indicate that the {\tt cl} language is
+meant to interpret these parameters as variables.  Programming in {\tt cl}
+can be tricky sometimes: putting ``{\tt echo=yes}'' at the start of
+the script means that all commands are echoed to the terminal as they
+are executed, useful for debugging.  The file name
+``star\_cluster'' was of course `hardwired' into the script; a more
+typical application would operate on every file in a list, or loop
+until some condition is satisfied. The {\tt cl} can support loops of various
+types -- see the {\tt cl} manual for more information.
+
+Sometimes it is useful to run a batch job on a UNIX machine which
+starts up IRAF in the background, executes some IRAF tasks and then
+quits IRAF and returns to the operating system. This can be done as
+follows:
+
+{\footnotesize
+\begin{verbatim}
+#!/bin/csh
+# Make sure a C shell is used
+# Run IRAF from the UNIX shell, taking parameters
+# up until the word END.
+cl <<END
+images
+imstat( "star_cluster")
+task \$doit = home\$doit.cl
+doit
+logout
+END
+\end{verbatim}
+}
+
+The script above first ensures that a C shell is used, if it is run as
+an executable shell script, then IRAF is started and fed with
+commands. Notice how the {\tt \$} signs need to be escaped in the task
+definition to stop the UNIX shell from interpreting them as shell
+variables.
+
+
+\section{Image Display}
+
+The IRAF image display capabilities were originally developed under
+the {\it sunview}\/ window environment which has now been superseded by
+X windowing systems. Under this old window environment the
+display tools for IRAF were quite good: there was an image display
+tool called {\tt imtool} and a graphics display window called
+{\tt gterm}. X window versions of these tools called {\tt ximtool} and
+{\tt xgterm} have been under development in NOAO for some time,
+and the final versions are expected in one of the next IRAF releases. 
+Alternatively, the {\it SAOimage}\/ program may be used to display 
+images from IRAF. Simply start up {\tt saoimage} on the same machine that 
+you are running IRAF on:  an appropriate command line would be:
+
+{\tt saoimage -quiet -imtool \&}
+
+SAOimage can display IRAF images without having to start up
+IRAF:  typing ``{\tt saoimage image.imh}'' should do the trick. Note
+that the full name of the image including the suffix {\tt .imh} is
+required when using SAOimage from outside IRAF.
+
+
+\section{Obtaining and Installing IRAF}
+
+This section is probably of no interest to a IRAF user.
+It is intended for
+system managers who may have to install IRAF,
+so skip this section if you are not a system manager.
+
+Installing IRAF is fairly straightforward. A username {\tt iraf} needs
+to created whose home directory is $\langle${\it dir}$\rangle${\tt
+/local}, where $\langle${\it dir}$\rangle$ stands for the place you
+have decided to install IRAF. On UNIX, you would use the {\tt
+uncompress} and {\tt tar} programs to unpack the installation kit for
+your machine and operating system into the right place in your file
+system.
+
+The installation kit for IRAF can be obtained in a number of ways.
+Starlink can supply a tape with the 3 {\tt tar} files appropriate to your
+machine along with the STSDAS package if it is required. NOAO also
+will prepare a tape for you, but they will charge for postage and
+packaging. There is an IRAF {\tt ftp} network archive.
+
+ The IRAF network archive contains installation kits for different
+machines in separate directories. It is accessible on the Internet
+using the {\tt ftp} program or any of the other `network browsing' tools now
+available. The Internet name of the archive is {\tt iraf.noao.edu},
+and the
+number is {\tt 140.252.1.1}. You log on to the archive using the username
+``{\tt anonymous}'' and a password composed of your e-mail address. For
+SunOS, for example, the installation instructions for IRAF version
+2.10.2 can be found in the directory {\tt /iraf/v210/SOS4/}. Go to
+that directory and you will find a list of files similar to that shown
+below.
+
+{\footnotesize
+\begin{verbatim}
+ftp>cd iraf/v210/SOS4
+250 CWD command successful.
+ftp> ls -l   
+200 PORT command successful.
+150 ASCII data connection for /bin/ls (131.251.45.11,1901).
+total 5068
+-rw-rw-r--  1 212         19785 Dec  3  1992 README
+-rw-r--r--  1 212          3338 Dec  8 03:38 README.solaris
+drwxr-sr-x  2 root         1536 Jul  9  1992 as.sos4.gen
+drwxr-xr-x  2 root         1024 Nov 21  1992 ib.sos4.f68
+drwxr-xr-x  2 root         1024 Nov 21  1992 ib.sos4.fpa
+drwxr-xr-x  2 root         1024 Nov 21  1992 ib.sos4.spc
+drwxr-xr-x  2 root         1024 Nov 21  1992 nb.sos4.f68
+drwxr-xr-x  2 root         1024 Nov 21  1992 nb.sos4.fpa
+drwxr-xr-x  2 root         1024 Nov 21  1992 nb.sos4.spc
+-rw-r--r--  1 root       947593 Jul 10  1992 patch0.tar.Z
+-rw-r--r--  1 root      2039731 Jul 24  1992 patch1.tar.Z
+-rw-r--r--  1 root      1243869 Nov 21  1992 patch2.tar.Z
+-rw-r--r--  1 root       722167 Aug 12  1992 phsibin.403.tar.Z
+-rw-r--r--  1 root        14332 Jul 17  1992 suniraf.ms.Z
+-rw-r--r--  1 root        33842 Jul 17  1992 suniraf.ps.Z
+-rw-r--r--  1 root        33560 Jul  9  1992 sunsmg.ms.Z
+-rw-r--r--  1 root        74699 Jul  9  1992 sunsmg.ps.Z
+-rw-r--r--  1 root         1904 Jun 26  1992 zzmake
+226 ASCII Transfer complete.
+
+\end{verbatim}
+} 
+
+The README file contains a brief guide to installing IRAF, while more
+complete instructions can be found in {\tt suniraf.ps.Z}, which is the
+guide to installing IRAF, and {\tt sunsmg.ps.Z}, which is the guide to
+managing an IRAF system. Both documents should be read before
+attempting to install IRAF. Use the UNIX {\tt uncompress} program
+to recover the PostScript files from their compressed forms. Remember
+to use binary mode {\tt ftp} to retrieve compressed files.
+
+To install IRAF on a SPARCstation running SunOS, you would require 3
+files: {\tt as.sos4.gen}, {\tt nb.sos4.spc.Z} and {\tt ib.sos4.spc}.
+The file {\tt as.sos4.gen.Z} is found in
+{\tt as.sos4.gen}, a subdirectory
+of the directory shown above. It is split into 38
+files: each one, apart from the last part, is 512,000 bytes long. This
+means that if the file transfer should fail, you would have some of
+the files and could continue retrieving the files later. The file
+fragments can be concatenated into one file as is detailed in the
+{\tt README} file. This process has to repeated for each of the 3 big files
+mentioned above.
+
+Installing IRAF does not entail any compilation; this has already been
+done at NOAO. The file {\tt as.sos4.gen} is a {\tt tar} file containing all
+the text and program sources for IRAF. The files {\tt ib.sos4.spc} and
+{\tt nb.sos4.spc} contain the standard IRAF binaries and the binaries
+for the {\tt noao} package both of which are compiled for a
+SPARCstation.  For a DECStation, the corresponding binaries would be
+{\tt as.dsux.gen.Z}, {\tt ib.dsux.mip} and {\tt nb.dsux.mip.Z} and the
+installation instructions would be found in the directory {\tt
+/iraf/v210/DSUX}.
+
+In summary, before installing IRAF you should obtain and read the
+following documents:
+
+\begin{enumerate}
+\item{The IRAF installation guide}
+
+\item{The IRAF management guide}
+
+\item{The README file for your particular machine}
+
+\item{The REGISTRATION file}
+
+\end{enumerate}
+
+If you are obtaining IRAF from the network archive, these documents
+should be retrieved and read.  If your IRAF kit comes from Starlink,
+make sure you ask for these documents. The
+{\tt REGISTRATION} file is important as it
+contains a form to be filled in and returned to NOAO by e-mail, so that
+you can be added to the mailing list for the {\it IRAF Newsletter}\/ which is
+published once or twice a year.
+
+Finally, before you can put IRAF on your system, you must have around
+{\bf 83\,Mbytes} of disk space available to receive it.
+
+\section{IRAF Directory Structure}
+ 
+Some users have experienced difficulties when changing from one site running 
+IRAF to another. There are a number of potential reasons for this, among which
+is differences in directory structure. Clearly, the flexibility with which
+IRAF can be installed (in particular for sites with several versions of the
+software installed) is very useful to system managers. However, if possible,
+care should be taken to minimise unnecessary differences between sites by
+sticking to the IRAF default choices.
+ 
+The recommended structure is to have "some directory" (in the IRAF documentation
+examples {\tt /iraf}, but {\tt /iraf} can just as easily be a symbolic link to 
+any directory for the iraf files, so keep this consistent to avoid problems) 
+for all of the IRAF directories.  These would be e.g.
+ 
+{\footnotesize
+\begin{verbatim}
+ 
+/iraf/iraf                   - the iraf source tree (i.e. the as.* files)
+/iraf/irafbin                - a directory for the bin directories
+/iraf/irafbin/bin.sparc      - core system SunOS sparc binaries (the ib.*)
+/iraf/irafbin/noao.bin.sparc - NOAO package sparc binaries
+/iraf/extern                 - a directory for external pkgs (e.g. TABLES)
+ 
+\end{verbatim}
+}
+ 
+Even on cross mounted disks an {\tt /iraf} symbolic link would still allow the
+path {\tt /iraf/iraf} to be valid on all machines even if the files were elsewhere.  
+The {\tt irafbin} structure above means that the symbolic links used in the
+IRAF tree for the bin directories will be correct when the distribution
+files are unpacked.
+ 
+Users needing to know what the path is they can find the 
+definition in the {\tt /usr/include/iraf.h} file for that system, since
+this should be on all systems running IRAF (because the install script 
+should be run on all nodes) it works even if there's no IRAF login account
+on that machine.  
+ 
+ 
+\section{Using IRAF on Alpha Hardware}
+
+Paul Collison, the Starlink system manager at Oxford, has spent some
+time working with and modifying the STScI port of IRAF for DEC Alpha 
+machines. As a result of this he has prepared a document LSN/1.1 (OXF)
+describing much of what he (and some of his users) have done. This 
+document will be of great use to system managers with Alpha systems.
+
+Further information of the use of IRAF at Oxford can be obtained from the
+World\,Wide\,Web on URL
+{\tt http://www-astro.physics.ox.ac.uk/iraf/}.
+
+\section{STSDAS}
+
+STSDAS is a separate suite of software programs which can be installed
+as as a subpackage to IRAF. Again it can be obtained by several
+means. Starlink can produce a tape, the STScI
+can send you a tape if you pay some transport costs or
+there is a network archive from which you can obtain the files at any
+time of day or night. The Internet address of this site is
+``stsci.edu'', and the Internet number is {\tt 130.167.1.2}. 
+
+You can
+log on to the archive using ftp with the anonymous login procedure
+described earlier for IRAF and the software for STSDAS can be found in
+the directory {\tt /software/stsdas/v1.3}. It is available as a {\tt tar}
+file, a compressed {\tt tar} file or in 512,000-byte chunks which can be
+re-assembled to create the compressed {\tt tar} file. There is a comprehensive
+installation guide called {\tt InstallGuide.ps} in the directory {\tt
+/software/stsdas/v1.3/doc/manager}. STSDAS needs to be compiled on
+your own system; this can take several hours on a SPARCstation, so it
+is best done overnight.
+
+Finally, before installing STSDAS, you should have about {\bf
+85\,Mbytes} of disk space available.
+This could be reduced if you were sure you were
+not going to use any of the instrument specific tasks in STSDAS and
+could delete parts of the system accordingly.
+
+\section{PROS}
+
+{\tt PROS} is a package for dealing with X-ray data; an e-mail contact
+address is given at the end of this document. After installation this
+introduces the {\tt xray} and {\tt euv} packages into the top level of the
+IRAF package hierarchy.
+
+\section{Useful Addresses}
+
+Both IRAF and STSDAS have a `Hotseat' service. This is an e-mail
+address for any problems you may have with the software. They are
+usually pretty fast at responding, but do bear in mind the time
+difference between the UK and Baltimore or Tucson.
+
+Starlink also provides user support for IRAF. This currently 
+takes the form of one of the contract Application Programmers being 
+available to answer IRAF queries as they arise. This
+programmer is also a good
+source of new copies of the IRAF FAQ -- probably the single most useful 
+IRAF document.
+
+\begin{verbatim}
+   iraf@noao.edu            Address for IRAF problems and queries 
+   iraf-request@noao.edu    Address for ordering IRAF 
+   hotseat@stsci.edu        Address for STSDAS problems 
+   rsdc@cfa.harvard.edu     Address for PROS queries  
+   ussc@star.rl.ac.uk       Starlink software librarian  
+   pmc@astro.ox.ac.uk       Paul Collison, author of LSN/1.1 (OXF) 
+   gjp@astro.cf.ac.uk       Starlink IRAF user support
+\end{verbatim}
+
+This information is subject to change.  Consult your Starlink Site
+Manager in cases of difficulty.
+\end{document}
+

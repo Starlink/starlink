@@ -1,0 +1,499 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {54.1}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {22 February 1990}
+\newcommand{\stardoctitle}     {GENSTAT --- Statistical Data Analysis}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+The GENSTAT system is designed for routine and exploratory statistical data
+analysis.
+It was developed by the statistics department of Rothamsted Experimental
+Station, a research establishment of the U.K.\ Agriculture and Food
+Research Council, where many of the standard methods of Statistical Analysis
+were pioneered by the systems originators: Professor John Nelder, Dr.\ Frank
+Yates, and Sir Ronald A Fisher.
+
+The GENSTAT system offers the user all the benefits of a modern, interactive
+system, plus the security of a system with a long history of successful use:
+\begin{itemize}
+\item A general, command driven system.
+\item Continuously developed over the last 20 years.
+\item Regular new releases.
+\item Open-ended, providing all the tools you require to investigate and
+construct new methods of statistical analysis.
+\item Flexible, allowing you to deal with awkward or unusual data as well as
+routine analyses.
+\item Standard statistical methods are specified in easily understood
+English language commands.
+\end{itemize}
+
+\section{Functions}
+
+GENSTAT has a rich set of functions:
+\begin{description}
+\item [Reads]:
+
+Genstat allows you to access data from character or binary computer files
+recorded in practically any format.
+You can type data at a terminal directly, read data files prepared by an
+editor or a wordprocessor, or read data or results produced by other programs.
+Very large data sets can be condensed during input, to restrict memory usage.
+
+\item [Manipulates]:
+
+Data, and results from analyses are stored in appropriate data structures,
+such as single numbers, series of numbers, matrices, tables, structure values
+and text.
+You can carry out arithmetic on all numeric structures and many standard
+functions are provided.
+Missing values are appropriately handled throughout Genstat.
+Text can also be freely manipulated, particularly with the help of an internal
+editor.
+Other structures are available for holding arithmetic expressions and model
+formulae.
+Groups of structures may be referred to by pointers.
+All data structures are dynamically created and may be deleted at any time
+to free memory for later use within the same Genstat job.
+
+\item [Summarises]:
+
+Simple statistics can be formed and displayed easily, either as tabular
+summaries or as graphs or histograms.
+Tables can be extended, contracted, or combined by powerful commands, and
+their printed form closely controlled if necessary.
+Graphical displays can be produced either in a form suitable for ordinary
+terminals and line-printers, or in a high-resolution form for graphics
+terminals and plotting devices.
+High-resolution graphical displays are made available by the provision of an
+interface to GKS.
+
+\item [Prints]:
+
+As with reading in Genstat, you can print output on your terminal screen or you
+can write to files, either in character or binary form.
+The output format may be specified (such as how many decimal places to print,
+or whether to right-justify values),  but if no constraints are given,
+Genstat will select a suitable layout.
+
+\item [Analyses]:
+
+Genstat provides a wide range of standard statistical techniques which are
+broadly grouped under the headings of regression, analysis of designed
+experiments, multivariate analysis and analysis of time series.
+All analyses are easy to specify and produce clear and well designed reports.
+Results of analyses can be stored in data structures for further analysis or
+processing by Genstat.
+
+\item [Programs]:
+
+Novel or non-standard techniques can be programmed in Genstat's command
+language, which provides all of the elements of a high-level structured
+programming language.
+Easily understood looping and alternative choice selection commands,
+combined with the data structures and manipulation facilities described
+above, provide a powerful environment for the specification of any
+statistical or mathematical task.
+Procedures allow general programs to be stored and reused when needed, and
+a library of tested procedures is distributed with Genstat.
+
+\item [Stores]:
+
+Procedures, data, and results of analyses can all be stored permanently
+for retrieval when needed.
+Storage can be in character files, or in quick-access or hierarchically
+arranged binary files.
+Commands given during an interactive Genstat run can be copied to a file
+for editing and used later.
+The current state of a session can, at any stage, be stored and the session
+resumed later, with data structures intact.
+
+\item [Extends]:
+
+Genstat is designed to be extended by its users as well as by its developers.
+General programs in the Genstat language can be stored as procedures and
+made available to all users at a site, simply by attaching a
+procedure-library file.
+The invocation of a procedure looks like any standard Genstat command.
+\end{description}
+
+\section{The standard statistical analyses}
+
+Genstat provides the standard statistical analyses:
+
+\begin{description}
+
+\item [Regression]:
+
+Within Genstat, regression means much more than fitting straight lines.
+Certainly, lines can be fitted very simply, but Genstat is also
+designed to make it easy to compare alternative lines, both by using
+different sets of explanatory variables, and by using groupings of the
+observations.
+The easy specification of groups simplifies the analysis of unbalanced
+experimental designs.
+Missing values are excluded automatically and analysis can be restricted
+to subsets of observations.
+Stepwise, weighted, grouped and offset regression can be specified, and
+individual parameters can be constrained to fixed values
+
+Regression in Genstat includes generalised linear and nonlinear models,
+all within the same framework provided for linear models.
+Many standard generalised linear models are available, including log-linear
+models for contingency tables, and variance component models.
+The problems of non-additivity of model terms and non-normality of error
+terms, encountered in many regression problems, can be overcome by the use
+of models from this wide class.
+Nonlinear models are fitted by maximum likelihood, using a Newton-Raphson
+or a Gauss-Newton algorithm.
+Full provision is made for exploring partial linearity, and a range of
+standard nonlinear curves can be fitted with particular simplicity.
+
+\item [Multivariate]:
+
+Standard methods of multivariate analysis are available with single commands,
+while many more specialised methods are provided as procedures in the
+Procedure Library.
+The standard methods include:
+\begin{itemize}
+\item Principal components analysis, to describe objects in a space of reduced
+dimension;
+\item Canonical variates analysis, to optimise separation of groups;
+\item Factor rotation on the results of principal components or canonical
+variates analyses, to aid interpretation of the results of the analyses;
+\item Principal coordinates analysis, to generate coordinates that reproduce
+given distances between objects;
+\item Procrustes rotation, to compare two configurations of a set of objects.
+\end{itemize}
+Procedures in the library include correspondence analysis, and generalized
+and multiple Procrustes analyses.
+
+Genstat provides a wide range of methods of classifying objects into clusters.
+Hierarchical classifications can be generated from a variety of similarity
+measures with a choice of clustering criteria and can be displayed as
+dendrograms.
+Nearest neighbours, most typical members of clusters, and minimum spanning
+trees can be obtained.
+Non-hierarchical classification is also available with a choice of criteria.
+
+\item[Time Series]:
+
+Individual time series can be modelled by Box-Jenkins ARIMA or seasonal
+ARIMA models.
+Sample statistics, such as autocorrelations and partial autocorrelations, are
+available to aid model selection.
+Allowance is made for missing values, for restriction to sub-series of
+observations, for transformations of series and for differencing to
+approximate stationarity.
+Parameters can be estimated by least squares or exact likelihood, and the
+resulting models can be used to generate forcasts with confidence
+intervals.
+
+Regression models with autocorrelated errors are available as a special case
+of transfer function models, which relate the behaviour of an output series to
+one or more input series.
+The processes of model selection, fitting, checking and forecasting are
+catered for in the same framework as for univariate models.
+
+Spectral analysis of time series can be handled by use of Fourier
+transformation functions.
+\end{description}
+
+\section{Documentation}
+
+The {\em Genstat 5 Reference Manual} contains a full description of the Genstat
+system, illustrated throughout by worked examples.
+The {\em Genstat 5 Reference Summary} is a pocket book which contains the
+essential information about every Genstat command; it is equivalent to
+Appendix 1 of the Reference Manual and the same information is also available
+from within Genstat through the on-line help facility.
+Loan copies of the {\em Manual} and {\em Summary} should be available from your
+Site Manager.
+There is also an introductory book called {\em Genstat 5: An Introduction}.
+A copy of this should be available at every Starlink site for reference.
+NAG also produce a Genstat {\em Newsletter} and a {\em Procedure Library
+Manual}; if you want a copy of these, please ask your Site Manager or contact
+Mike Lawden directly (username RLVAD::MDL).
+
+\section{Use}
+
+The currently installed version of Genstat is Genstat 5, Release 1.3.
+Genstat is invoked by the command:
+\begin{verbatim}
+    $ GENSTAT    [parameter, parameter, ...]
+\end{verbatim}
+where {\tt parameter} is [KEYWORD=]file-spec or [S=]integer.
+The parameters assign files and data space for the current job.
+
+The ordered list of keywords is:
+\begin{verbatim}
+    IN, OUT, IN2, OUT2, IN3, OUT3, IN4, OUT4, IN5, OUT5
+    BS1, BS2, BS3, BS4, BS5, BS6, UF1, UF2, UF3, UF4, PL1, PL2, PL3, S
+\end{verbatim}
+To exit from a Genstat session, enter the statement:
+\begin{verbatim}
+    > STOP
+\end{verbatim}
+\subsection{Parameters}
+
+If keywords are used, the parameters may appear in any order.
+If not, you must give the file-specs in the correct order: a parameter may be
+omitted if it is not required but the ``," must remain.
+The space after ``GENSTAT" must be present; thereafter spaces are ignored.
+If more than one line is needed, end each line but the last with ``--".
+
+IN \ldots IN5 and OUT \ldots OUT5 attach input and output files to channels
+for normal (formatted) reading and writing.
+BS1 \dots BS6 and UF1 \dots UF4 attach files for unformatted I/O, by backing
+store commands, or READ/PRINT commands with option UNFORMATTED=YES.
+PL1, PL2 and PL3 attach (user) Procedure Libraries.
+
+\subsubsection{Data space}
+
+By default, one data segment (65,536 data units) is allocated.
+Some of this, including the first 18000 units, is used by the system.
+This should be adequate for most jobs.
+For large jobs, set S = n (where $0<n<4$) to reserve n segments.
+As a rough guide, assume that each extra segment will hold 40,000 data values.
+
+\subsubsection{Workfiles}
+
+Default workfiles for backing store and unformatted I/O are automatically
+created at the beginning of a run and deleted when the STOP command is met.
+If the run fails, and STOP is not executed, these files (GNBSWF.DAT and
+GNUFWF.DAT) will be left in your directory and should be deleted.
+
+\subsubsection{Errors}
+
+If you make a mistake in the command line, self-explanatory messages appear.
+If a file cannot be attached, the value of a variable IOSTAT is given: this is
+a FORTRAN Run-Time Error Number (see Table 18-1 in the DEC manual ``Programming
+in Vax Fortran").
+You may have misspelt the filename.
+You will be invited to try again.
+
+\subsubsection{Examples}
+
+To run a Genstat program taking instructions from a file JOB.DAT, sending
+primary output to a file RESULTS.LIS and secondary output to a file OTHER.DAT,
+any of the following forms of the command may be used:
+\begin{verbatim}
+    $ GENSTAT  IN=JOB.DAT, OUT=RESULTS.LIS, OUT2=OTHER.DAT
+    $ GENSTAT     JOB.DAT,     RESULTS.LIS, OUT2=OTHER.DAT
+    $ GENSTAT     JOB.DAT,     RESULTS.LIS,,     OTHER.DAT
+    $ GENSTAT  IN = JOB, -
+             OUT = RESULTS.LIS, OUT2 = OTHER
+\end{verbatim}
+You can display the output at your terminal by using the form:
+\begin{verbatim}
+    $ GENSTAT  IN=EXAMPLE
+\end{verbatim}
+By default the file extension is taken as .DAT.
+
+\subsection{Interactive use}
+
+If you do not set either of the first two parameters, Genstat will run
+interactively, thus:
+\begin{verbatim}
+    $ GENSTAT
+\end{verbatim}
+invokes an interactive run with instructions expected from the terminal
+and output returned to the terminal (with prompt $>$).
+\begin{verbatim}
+    $ GENSTAT   , , DATA, PLOT
+\end{verbatim}
+starts an interactive run with secondary input and output.
+
+Having entered Genstat, try typing:
+\begin{verbatim}
+    $ HELP
+\end{verbatim}
+This initiates a self-explanatory Help system.
+
+No error in your program will cause the run to be abandoned; only
+STOP (or CTRL/Y) will terminate the run.
+
+\subsubsection{Action after errors}
+
+If an error is detected a fault message will appear, followed by an
+indication of the part of the command at which the fault is detected.
+The statement containing the fault and subsequent statements on the
+same line will be ignored.
+Given:
+\begin{verbatim}
+    > SCAL W ; 3  &  X Y ; 2  &  Z ; 10
+\end{verbatim}
+a fault in the second statement will be indicated; only the first
+statement will be executed.
+
+\subsection{Severity codes}
+
+A severity code is set on exit from the program.
+On normal exit, \$SEVERITY will be:
+\begin{verbatim}
+    1  (success)  if there have been no diagnostic comments or faults,
+    0  (warning)  if there have been diagnostic comments but no faults,
+    2  (error)    if there have been diagnostic faults.
+\end{verbatim}
+Genstat Procedures expect to generate warnings and switch off the output of
+diagnostic comments warnings while they are being executed.
+\$SEVERITY may be set to 0 as a consequence.
+
+\subsection{Error recovery}
+
+If a severe error (i.e.\ one that is not trapped by Genstat) occurs,
+standard system messages including a traceback appear in the log file,
+followed by a request that output and log should be sent to NAG, Oxford.
+Before sending the output, rerun the job with the DIAGNOSTIC option of the JOB
+statement set to E to get a full dump when the job fails.
+(To get a copy of the log when you run the job from a terminal, DEFINE
+SYS\$ERROR file-spec before invoking Genstat.)
+The current Genstat job is abandoned and the primary input stream
+scanned for the next ENDJOB or JOB command.
+When exit from the program occurs, \$SEVERITY will be set by the
+system (to something other than 0, 1 or 2) and the system message that
+appears on exit should be ignored.
+
+\subsection{Procedure Libraries}
+
+Sites may set up their own Local Procedure Library, and users may set
+up their own procedure libraries as follows:
+\begin{itemize}
+\item Run a normal Genstat job which defines one or more procedures and write
+ the required set of procedures to a file using the STORE directive with option
+ PROCEDURE=YES (see Manual, Chapter 6.3.3).
+\item If these procedures are to be the Local Procedure Library, the file
+ should be placed in the Genstat directory by the site manager.
+\item A user procedure library can be attached to a subsequent run either
+ by using a keyword PLn when invoking Genstat or by using an OPEN directive
+ with option FILETYPE set to PROCEDURELIBRARY.
+\end{itemize}
+
+\section{Graphics}
+
+The version of Genstat received from NAG incorporates the REGIS graphical
+interface and is ready to use interactively on DEC VT125/240/340 graphical
+terminals.
+Eventually, the Starlink release of Genstat will be adapted to the GKS
+graphical interface.
+However, as it may take some time for this to be done, the REGIS version
+has been released in order to make this software available as soon as
+possible.
+Until the GKS adaptation is available, users will find that the graphical
+facilities are restricted.
+
+\section{Data space}
+
+\begin{itemize}
+\item The numerical space can hold the equivalent of 196608 real values.
+ If more is needed, see HELP GENSTAT Extensions.
+\item The character space can hold 102400 characters.
+\item The space for Identifiers can take 8000 names.
+\item The space holding the current record from each open input channel and
+ a copy of all text structures being used via \#\# is 8192 characters long.
+\end{itemize}
+Parts of these data spaces are used by the system.
+The compressed form of a complete command (comments removed, multiple
+spaces reduced to one space) must not exceed 2048 characters.
+
+\section{Input/output channels}
+\begin{itemize}
+\item Input records are assumed to be 80 characters long.
+\item Output records are assumed to be 132 characters long, except that the
+ (primary) output to a terminal will be of 80 character records.
+\end{itemize}
+The user can override these assumptions by using an OPEN statement with
+an appropriate setting of the WIDTH parameter.
+The maximum permitted record length is 200 characters.
+
+\section{Not implemented yet}
+
+The directive FUNCTION, the CURVE=SPLINE option of INTERPOLATE,
+and the BREAK option of PRINT are not implemented for Release 1.
+
+Qualified identifiers (e.g.\ YIELD\$[5,7,9] ) are not implemented everywhere,
+and will not be for Release 1. But:
+\begin{itemize}
+\item The compiler accepts references to single values of such forms
+ (e.g.\ X\$[W\$[I]] where I has only one value).
+ They may be used in lists of values and as list multipliers.
+\item Qualified identifiers are accepted by the CALCULATE command for
+ one-dimensional structures and matrices (but not tables).
+\end{itemize}
+
+\section{Examples}
+
+The example files listed below should be available in directory GEN5\$DIR.
+You can also enter Genstat interactively and type HELP; parts of the Reference
+Summary will be output to the screen at your request.
+\begin{verbatim}
+    Analysis of Designed Experiments                 ANOVA and AVCCOX
+    Declarations of Structures                                 DECLARE
+    Help                                                       HELP
+    Graphics                                                   GRAPH
+    Input streams                                              INPUT
+    Job control and procedures                                 JCP
+    Lineprinter Graphs                                         LPGRAPH
+    Manipulation of data structures                            MANPLATE
+    Multivariate Analysis                                      MLTVAR
+    Print                                                      OUTPUT
+    Randomise                                                  RANDOM
+    Read                                                       READ
+    Regression:
+     Fitting curves     CURVES;  Generalised Linear Models     GLM
+     Linear models      LINEAR;  Fitting models (Optimisation) NONLINER
+     Sums of Squares and Products                              SSP
+    Structure Storage and Retrieval                            STORE
+    Time Series Analysis                           BOXJENK and SPECTRAL
+\end{verbatim}
+Input files are of type .DAT and the corresponding output files are of
+type .GNX.
+Because Starlink's version of Genstat has been adapted to use GKS for its
+high-resolution graphical output, the output obtained by running the
+examples may differ slightly from that stored in GEN5\$DIR.
+In particular, this will affect the data space used and left, and some
+details of the output from the DUMP directive (which occurs in the example
+files OUTPUT and SSP).
+
+\section{Notice Board}
+
+Information on Errors, Warnings and Hints is stored on a notice board which
+can be accessed by typing:
+\begin{verbatim}
+    $ HELP GENSTAT NB
+\end{verbatim}
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

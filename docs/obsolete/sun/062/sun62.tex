@@ -1,0 +1,1145 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun62.5}
+\newcommand{\stardocnumber}    {62.5}
+\newcommand{\stardocauthors}   {M.\, Denby \& P.\, McGale}
+\newcommand{\stardocdate}      {5 December 1995}
+\newcommand{\stardoctitle}     {WFCPACK --- ROSAT Wide Field Camera data 
+                                reduction}
+\newcommand{\stardocversion}   {Version 6}
+\newcommand{\stardocmanual}    {User's Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+
+The programs described in this document provide the mechanism for
+producing ASTERIX (HDS) datasets from Wide Field Camera data collected
+during the pointed phase of the ROSAT mission. A sort program generates
+ASTERIX datasets ({\em e.g.\/} time series, images, {\em etc}.,) from
+pre-processed event data supplied as part of the Rosat WFC Observation
+Datasets (RWODs). An exposure program corrects these datasets allowing
+for instrument characteristics. In addition a simple database manager
+allows an index of RWODs to be maintained and searched.  The programs
+make use of the ADAM and ICL environment and a number of ICL procedures
+have been provided to perform some of the more commonly required
+operations such as extracting background subtracted lightcurves.
+
+WFCPACK is supported under Digital Unix on DEC Alpha AXP, and under
+Solaris 2.x on Sun SPARC.  There is no longer a VAX/VMS version.  The
+old VAX RWOD which consisted of several VMS format specific files has
+been replaced with a single HDS file that is easily transportable
+between the various UNIX flavours.
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{Getting Started}
+\label{sec:staring}
+
+Assuming that WFCPACK is installed at your site, it may be started 
+by executing the setup commands:
+
+\begin{quote} {\tt
+\% aststart \\
+\% wfcstart}
+\end{quote}
+
+The tasks are callable from the command line by simply typing the 
+task name in response to the UNIX prompt, {\em e.g.}:
+
+\begin{quote}{\tt
+\% wfcsort}
+\end{quote}
+
+Alternatively, in order to make use of the facilities provided by ICL,
+the tasks together with a series of ICL procedures may be loaded into
+the user's ICL session.  This is achieved by means of the following ICL
+command:
+
+\begin{quote}
+{\tt ICL\verb+>+ wfcpack}
+\end{quote}
+
+\section{The ROSAT WFC Observation Dataset (RWOD)}
+\label{sec:rwod}
+
+The RWOD is a set of two data files distributed to the ROSAT WFC observer.
+Each RWOD contains data from a single pointed phase observation in the 
+form of a tar file.  The software described in this document does not 
+require the data to be stored in a predefined directory.  After starting 
+ICL, the data on an RWOD may be recovered to disk as follows:
+
+\begin{verbatim}
+    ICL>default location                     ! The target directory
+    ICL>wfcdisk /dev/rmt0h 141887 location   ! Replace with the tape drive and 
+                                             ! the tar file required
+\end{verbatim}
+
+The files which are essential for the sorting software to work are:
+
+\begin{description}
+\begin{description}
+\item [{\tt mcf\_nn.sdf}] The WFC Master Calibration File, version {\tt nn} 
+{\em e.g.}, 12. 
+\item [{\tt \verb+<+RWOD\verb+>+.sdf}] Events, housekeeping, attitude data file
+\end{description}
+\end{description}
+
+{\tt mcf\_nn.sdf} defines the time history of the WFC calibration
+for the sorting software. {\tt wfcdisk} checks if the tar file contains
+a more recent version of the master calibration file than that pointed
+to by the environment variable {\tt CAL\_WFC\_MASTER}.  If it does,
+check with your system manager regarding updating to the latest
+version.
+
+{\tt \verb+<+RWOD\verb+>+.sdf} is an HDS file whose structures contain
+data arrays that define:
+
+\begin{enumerate}
+
+\item the pointing and rate of change of the pointing over consecutive
+time  intervals,
+
+\item the instrument counters (see Section \ref{sec:programs:wfchk}) at
+8 secs. resolution,
+
+\item the satellite location and instrument pointing at 60 second
+intervals, and
+
+\item a list of event parameters ordered in both time and spatial senses.
+
+\end{enumerate}
+
+For each event the following values are stored:
+
+\begin{itemize}
+
+\item The telemetered coordinates of the event on the surface of the
+detector (in the range 0-511)
+
+\item The linearised coordinates of the event relative to the nominal
+optical axis of the instrument (in the range -2.5 to 2.5 deg and to 9
+arc sec resolution)
+
+\item The local coordinates of the event relative to the nominal
+pointing direction shown in the file header (in the range -2.5 to 2.5
+deg and to 6 arc secs resolution)
+
+\item The time tag of the event in seconds relative to the base time
+shown in the file header (BASE\_MJD) to 1/32 sec resolution.
+
+\end{itemize}
+
+A summary of the contents of an observation may be obtained by showing
+the file header records using the {\tt wfcdbm} program (described in
+section \ref{sec:programs:wfcdbm}).  Below is an example of the header
+records from a typical RWOD:
+
+\begin{verbatim}
+ ROR Sequence #          : B50026    
+ Axis Ra                 :  359.38
+ Axis Dec                :   20.92
+ Roll                    :   -8.50
+ POP_FLAGS               : 00000B03
+ Target                  : MKN335 (Day 46, ROR 150026 offset)      
+ Observer                : WCALIB                                  
+ Instrument              : WFC                                     
+ Base date               : 16-JUL-90  
+ Base MJD                : 48088.8086
+ End MJD                 : 48088.8369
+ Total Events            :    20879
+ File Revision Level     : 5.2 
+
+ Slot        Stime            Etime        Durn.  Flt  Fmt  Zm  Win   HT
+        d:hh:mm:ss       d:hh:mm:ss
+
+    1   0:00:02:59       0:00:07:46         288.  UV         z       161
+    2   0:00:08:03       0:00:40:51        1968.  P1         z       161
+\end{verbatim}
+
+A fixed element of the header defines a number of general observation
+parameters:
+
+\begin{itemize}
+
+\item The Base MJD is the (nominal) start time of the observation and
+serves as the origin for the event time tags.
+
+\item The Axis centre is the (nominal) observation pointing and serves
+as the origin for the event local coordinate frame.
+
+\item The Roll is the angle, in degrees, between Celestial North and
+the Wide Field Camera elevation (defined in a positive clockwise sense
+when viewing the sky).
+
+\end{itemize}
+
+Note that all ROSAT coordinates are for equinox J2000.0.
+
+The fixed header is followed by information for a variable number of
+'slots'. Each time interval during which events were collected and the
+instrument configuration ({\em e.g.}, the filter wheel position, HTs)
+remained constant defines a slot. (Slots are clipped whenever the angle
+between the instrument viewing direction and the zenith exceeds a
+preset threshold of 130 degrees.)  For each slot the following
+information is displayed:
+
+\begin{itemize}
+
+\item The start and end time in units of days, hours, mins, secs after
+Base MJD.
+
+\item The slot duration in secs.
+
+\item The filter configuration ({\em e.g.} S1A, P1, {\em etc.}).
+
+\item The telemetry format. Screening at the pre-processing stage
+rejects data except when the telemetry format was in normal or
+high-speed modes. When the telemetry is in normal mode this field is
+blank, otherwise the {\tt Hi} flag is displayed. The dead-time
+characteristics of the data are different in the two modes, there being
+a 200 count per second limit in normal mode and a 408 count per second
+limit in high-speed mode.
+
+\item The Zoom flag. The WFC has an enhanced spatial resolution mode in
+which events from the central quarter of the detector only are
+processed and the linear resolution is doubled. The field is blank for
+non-zoomed data, otherwise the {\tt z} flag is displayed.
+
+\item The Window flag. Events from pre-set regions of the detector may
+have been discarded before insertion in the telemetry stream. When the
+window mode is in operation (denoted by a {\tt w} flag in the slot
+summary) events from a rectangular area of the detector have been
+excluded, leaving events from outside the window unaffected. For
+inverted window mode (denoted by an {\tt i} flag in the summary) the
+event selection is the reverse of the above ({\em i.e.} events have
+been accepted from within the window and rejected from outside).
+
+\item The detector HT voltage setting. Whilst it is not anticipated
+that this will change, it should be noted that the instrument
+characteristics may change with different HT settings.
+
+\end{itemize}
+
+\section{The WFCPACK Programs}
+\label{sec:programs}
+
+The programs involved are:
+
+\begin{description}
+\begin{description}
+\item [{\tt wfcdbm}]   Data Base Manager
+\item [{\tt wfcsort}]  Sorts events into images, time series, {\em etc.}
+\item [{\tt wfcexp}]   Exposure corrects a binned data set
+\item [{\tt wfcposx}]  Gives exposure at a point in the FOV
+\item [{\tt wfchk}]    Sorts HK rates to an HDS container
+\item [{\tt wfcslots}] Selects a set of filter defined time slots
+\item [{\tt wfcslmrg}] Merges a pair of time slot files
+\item [{\tt wpsscorr}] Exposure corrects a PSS source search list
+\item [{\tt wfchelp}]  Help information on WFCPACK programs and ICL procedures
+\end{description}
+\end{description}
+
+These programs are described below in terms of the parameters which
+they require from the user.  Each program may be started by typing the
+name in response to the ICL prompt together with on--line parameters,
+if required, in the KEYWORD= format.
+
+\begin{quote}
+{\tt ICL\verb+>+wfcsort RA=270. DEC=66.6 \verb+\\+}
+\end{quote}
+
+All programs have context sensitive help which may be obtained by
+replying with the {\tt `?'} character to any program prompt.
+
+\subsection{WFCDBM}
+\label{sec:programs:wfcdbm}
+
+Provides update and search facilities for all RWODs held at a particular
+institute.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item [CMND] 
+A number of commands, specified by the CMND parameter, are
+available and are specified below:
+
+\begin{verbatim}
+     (C)reate      Create an empty Index file
+     (U)pdate      Update the index with a new RWOD
+     (S)earch      Search for datasets matching various criteria.
+     (H)ead        Display the header records from an RWOD.
+     (G)roup       Associate a group of slots within an RWOD.
+\end{verbatim}
+
+\item[WFCF   ]
+The name of the input RWOD. The default extension for the file is {\tt .sdf}.
+
+\item[LISTF   ]
+The name of a file to hold listing o/p. The default is TERMINAL.
+
+\item[INDF   ]
+The name the Index file which holds information on all the RWODs
+in the library. If this file does not already exist it should be created 
+using the CREATE option. Thereafter the index file may be 
+updated and searched.
+
+\item[SMJD   ]
+The start MJD for a search.
+
+\item[EMJD   ]
+The end MJD for a search.
+
+\item[RAL    ]
+The Right ascension lower limit for a search (decimal degs)
+
+\item[RAH    ]
+The Right ascension upper limit for a search (decimal degs)
+
+\item[DECL   ]
+The Declination lower limit for a search (decimal degs)
+
+\item[DECH   ]
+The Declination upper limit for a search (decimal degs)
+
+\item[PI   ]
+Any unique string which identifies the Principal Investigator
+
+\item[TARGET   ]
+Any unique string which identifies the target
+
+\item[SELECT1]
+The search function is performed on a series of selection criteria
+which are entered in response to the repeated SELECTn prompts. The valid 
+requests are:
+
+\begin{verbatim}
+     (M)jd      select on an MJD window
+     (R)a       select on an RA window
+     (D)ec      select on a  DEC window
+     (P)i       select on a  Principal Investigator string
+     (T)arget   select on a  Target string
+     (E)xit     combine selection criteria and perform the search
+\end{verbatim}
+
+\item[GROUP  ]
+The sequence number of a group of slots to be associated together.
+(There will be as many sequence numbers for an observation as there are
+different filter configurations). The slots are present in the RWOD
+event header records and the command groups together slots with the
+same filter at the focus. The slot list is returned in the SLOTS
+parameter. If the number of groups present in the data is exceeded by
+the GROUP command SLOTS is returned as `-999'
+
+\item[SLOTS  ]
+A text string which specifies which observation slots have been
+associated. The text string is constructed by the GROUP command and may
+be used to associate slots with the same filter without a priori
+knowledge of the contents of the RWOD event header records.
+
+\end{description}
+
+\subsection{WFCSORT}
+\label{sec:programs:wfcsort}
+
+This task is used to sort pre-processed events from the RWOD into 
+ASTERIX (HDS) datasets.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[WFCF]
+The name of the input RWOD.  The default extension for the file is {\tt .sdf}.
+
+\item[SHOW]
+Requests that a sub-set of the information from the header records
+is displayed at the user terminal. In a situation where many
+operations are performed on the same RWOD the user may wish to reply
+`Y' to the first occurrence of the prompt but `N' to all subsequent
+occurrences.
+
+\item[OUTPUT]
+The name of the output dataset. The default extension for the file is 
+{\tt .sdf} and should NOT be provided by the user.
+
+\item[DTYPE]
+The type of dataset to be produced by the sort. Valid types are
+
+\begin{verbatim}
+     (I)mage   to create an ASTERIX sky coord image dataset
+     (R)aw     to create a detector coord image
+     (L)in     to create a linearised detector coord image
+     (T)ime    to create a time series dataset
+     (E)vent   to create an event dataset.
+\end{verbatim}
+
+\item[RA]
+The Right Ascension of the sort field centre (decimal degs). By default this
+is set to the axis RA value  given in the header.
+
+\item[DEC]
+The Declination of the sort field centre (decimal degs). By default this
+is set to the axis DEC value in the header.
+
+\item[DAZ]
+The half extent of the square field to be sorted (degs), 
+the default value is 3 degrees.
+
+\item[INRAD]
+In time series mode INRAD specifies the inner radius of an annulus
+from which to select events. The radius should be specified in arcminutes
+and may be set to zero in order to select from a circular region.
+
+\item[OUTRAD]
+In time series mode OUTRAD specifies the outer radius of an annulus
+from which to select events. The radius should be specified in arcminutes.
+
+\item[NXPIX]
+The number of pixels along a side of the image. For the default field
+half extent of 3 degrees NXPIX = 256 would give a pixel width of approx
+1.4 arcminutes.
+
+\item[SLOTS]
+A text string which specifies which observation slots to include in
+the sort. (These are the slots which are displayed when SHOW = Y is selected).
+Specify the slots in the format i-j,k,l-m. The slots selected
+should all have the same filter at the focus. If a slot value of `0' is
+selected the selection mode changes and the user is prompted for the 
+filter type via the FILTER parameter.
+
+\item[START\_T]
+The start time of a selection window which will be combined with the
+slot and discrimination windows. The unit may be either seconds from
+the BASE\_MJD given in the RWOD event header or an absolute MJD (in the
+latter case the MJD value should be preceded by an `M').  The default
+value is the seconds offset of the start of the first selected slot.
+
+It is also possible to input the start and end times from a text file,
+with one time pair per record. In this case the time pairs should be
+specified in MJDs, each preceded by the `M' character and separated by
+a space. When performing background subtraction of two concentric time
+series it is important that the two time series be co-binned and so
+START\_T should be chosen to be the same for both.
+
+\item[END\_T ]
+The end time of a selection window which will be combined with the slot
+and discrimination windows. The unit may be either seconds from the
+BASE\_MJD given in the RWOD event header or an absolute MJD (in the
+latter case the MJD value should be preceded by an `M'). The default
+value is the seconds offset of the end of the last selected slot. It is
+also possible to input the start and end times from a text file, with
+one time pair per record. In this case the time pairs should be
+specified in MJDs, each preceded by the `M' character and separated by
+a space.
+
+\item[USEF]
+The user may optionally specify the time windows from which events
+will be selected by means of a simple text file.
+
+\item[SFILE]
+The name of a text file from which the time windows will be read.
+Each record in the file should contain a pair of start and stop MJDs
+separated by a space and with each MJD preceded by the letter `M'.
+
+\item[NBINS]
+The number of bins into which the time extent of the sort 
+is to be divided. If a value `0' is given the program prompts for the
+time duration for each bin (see TBIN).
+
+\item[TBIN]
+If NBIN is specified as 0 then TBIN should be set to the required
+time duration of a bin (in seconds).
+
+\item[FILTER]
+A text string definition of the filter to use. This is selected from
+the second column of the following table:
+
+\begin{verbatim}
+      MCF #        Filter        Material
+
+      1             UV           UV CAL
+      2             S2B          Le/Be
+      3             P1           Le/Al
+      4             S1B          Le/C
+      5             OPQ          Le/Al
+      6             S2A          Le/Be
+      7             P2           Sn/Al
+      8             S1A          Le/C/B4C
+ 
+      (MCF = Master Calibration File)
+\end{verbatim}
+
+\item[REJECT]
+Wide Field camera data is sometimes contaminated by background features
+whose exact nature and cause are not well understood. It is however
+possible to improve the quality of badly affected data by choosing to
+reject data on a series of constraints. Data may be excluded from a
+sort operation by selecting one of the LEVS or VIEW options described
+below. Alternatively the NONE option should be selected to retain all
+the events.
+
+\item[LEVS]
+Rejects data when the limited event rate was above a user defined
+threshold user is then prompted for the LEVS threshold to use, a typical
+rate which gives noticeable improvement in a large number of cases is
+50 c/s.
+
+\item[VIEW]
+Rejects data when the Velocity-View (or ram) angle or the solar zenith
+angle were below certain limits. The limits are set as hidden defaults
+of the program but may be overridden by giving values for the VELVIEW
+and/or SOLZEN parameters on the command line (or using the PROMPT
+qualifier on the command line).
+
+\end{description}
+
+\subsection{WFCEXP}
+\label{sec:programs:wfcexp}
+
+This program takes as input an ASTERIX dataset (time series or image)
+whose data array contains detected events. It creates
+a dataset whose data array contains event flux (c/s) normalised
+to the on-axis response of the instrument. The flux calculation takes
+into account the following instrument dependencies:
+
+\begin{itemize}
+
+\item Instrument dead time effects (event rates which are needed for
+the calculation are part of the standard observation dataset).
+
+\item Instrument vignetting effects. The Instrument pointing is derived
+from the RWOD attitude structure. The vignetting at points within the
+field is derived from the filter and detector information stored in the
+WFC Calibration File (with the environment variable name {\tt
+CAL\_WFC\_MASTER}).
+
+\item Optionally the program may correct the fluxes in a dataset for
+the degradation of the detector efficiency. The time history of the
+efficiency is stored in the calibration file and is used to determine
+an interpolated value at the epoch appropriate to the dataset. The user
+is warned if the dataset epoch is beyond the end of the current time
+history in the calibration file. In this event the latest value for
+detector efficiency is used.
+
+\item Optionally the program may correct the fluxes in a one
+dimensional dataset for the fraction of the point response function
+which fell outside the source centred circle from which events were
+originally accepted by the {\tt wfcsort} program.
+
+\end{itemize}
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[INP]
+The name of an input ASTERIX dataset. The dataset may be either a time series
+or an image.
+
+\item[OUT]
+The name of an output ASTERIX dataset. The dataset is cloned from the input and 
+then the raw count array is replaced by an exposure corrected 
+count/sec array.
+
+\item[EFFCOR]
+Selects correction of fluxes for the degradation of detector efficiency.
+
+\item[PSFCOR]
+Selects correction of fluxes in a one-dimensional dataset for the point
+spread fraction.
+
+\item[WFCF]
+This hidden parameter, {\em i.e.}, user must specify it if
+required as it is not prompted for, can be used to specify the {\em e.g.}, 
+a time--series' parent RWOD.  ({\tt wfcexp} normally finds the RWOD name
+automatically.)
+
+\end{description}
+
+\subsection{WFCPOSX}
+\label{sec:programs:wfcposx}
+
+This program takes as input an ASTERIX image dataset as produced by
+{\tt wfcsort} and reports exposure information for any location within
+the image.  The quoted effective exposure is the value by which a raw
+count derived at the location should be divided in order to produce a
+count rate corrected to the axis of the instrument at the epoch of the
+data set.  In addition the program displays the efficiency of the
+detector for the epoch of the data set relative to the launch
+efficiency. This relative efficiency may be used to increase a measured
+flux to that appropriate to a non-degraded detector. The exposure
+calculation works in a similar manner to that in the {\tt wfcexp}
+program described above.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[INP]
+The name of an input ASTERIX image dataset.
+
+\item[RA]
+The right ascension of the point in the FOV at which exposure information
+is required. (decimal degrees).
+
+\item[DEC]
+The declination of the point in the FOV at which exposure information
+is required. (decimal degrees).
+
+\end{description}
+
+\subsection{WFCHK}
+\label{sec:programs:wfchk}
+
+This program extracts the counters present in the housekeeping rates
+structure of the RWOD together with the pointing information present in
+the aspect structure into a series of arrays in an HDS file. (Note that
+for flexibility this file does not obey the ASTERIX standard format.
+This means that an extension must be given when giving filenames to
+ASTERIX, {\em e.g.}: {\tt gdraw \verb+<+file\verb+>+.TEVS
+\verb+<+device\verb+>+}).
+
+The following parameters are stored in the HDS file (in arrays
+of the same names):
+
+\begin{description}
+\begin{description}
+\item [{\tt TEVS}] Total events output by the detector preamplifiers
+\item [{\tt VEVS}] Valid events, {\em i.e.}, TEVS within pulse height limits
+\item [{\tt LEVS}] Limited events, {\em i.e.}, VEVS within the electronic f.o.v.
+\item [{\tt AEVS}] Accepted events, {\em i.e.}, LEVS entered into telemetry queue.
+\item [{\tt FEVS}] Final events, {\em i.e.}, AEVS telemetered to ground
+\item [{\tt RA}]   Pointing direction RA (degrees)
+\item [{\tt DEC}]  Pointing direction DEC (degrees)
+\end{description}
+\end{description}
+
+The program gives the option of binning directly from the RWODs' HKR
+structure ({\em i.e.}, using the file start and end MJDs and intrinsic
+bin size of 8 secs) or using the bin structure from an existing time
+series dataset.  In this latter mode the user may create arrays of
+background counts aligned with an existing bin structure. (BUT note
+that the binning mechanism is spot sample at the bin centre {\em i.e.},
+summing over the bin duration is not performed.)
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[USE]
+Requests that the binning information should be extracted from an
+existing time series.
+
+\item[INPUT]
+If USE is selected the user is prompted for the name of a time series
+dataset.
+
+\item[WFCF]
+The name of the input RWOD.
+
+\item[OUTPUT]
+The name of the created HDS file.
+
+\end{description}
+
+\subsection{WFCSLOTS}
+\label{sec:programs:wfcslots}
+
+This program is used to select time slots with the WFC in a particular
+filter configuration. The time slots are written to a text file with
+each record containing one pair of start and end times (MJDs). The file
+may be merged (using the {tt wfcslmrg} program) with a similar file created
+from XRT data and in this way common time slots, when the two instruments
+were simultaneously collecting data, may be defined and used to control
+event selection in the {\tt wfcsort} program.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[WFCF]
+The name of the input RWOD.  The default extension for the file is {\tt .sdf}.
+
+\item[SHOW]
+Requests that a sub-set of the information from the RWOD event header records 
+is displayed at the user terminal. In a situation where many
+operations are performed on the same event file the user may wish to 
+reply `Y' to the first occurrence of the prompt but `N' to all subsequent
+occurrences.
+
+\item[SLOTS]
+A text string which specifies which observation slots to include in
+the sort. (These are the slots which are displayed when SHOW = Y is selected).
+Specify the slots in the format i-j,k,l-m. The slots selected
+should all have the same filter at the focus. If a slot value of `0' is
+selected the selection mode changes and the user is prompted for the 
+filter type via the FILTER parameter.
+
+\item[SFILE]
+The name of a text file into which the time windows will be written.
+Each record in the file contains a pair of start and stop MJDs
+separated by a space and with each MJD preceded by the letter `M'.
+
+\item[FILTER]
+A text string definition of the filter to use. This is selected from
+the second column of the following table:
+
+\begin{verbatim}
+      MCF #        Filter        Material
+
+      1             UV           UV CAL
+      2             S2B          Le/Be
+      3             P1           Le/Al
+      4             S1B          Le/C
+      5             OPQ          Le/Al
+      6             S2A          Le/Be
+      7             P2           Sn/Al
+      8             S1A          Le/C/B4C
+ 
+      (MCF = Master Calibration File)
+\end{verbatim}
+
+\end{description}
+
+\subsection{WFCSLMRG}
+\label{sec:programs:wfcslmrg}
+
+The program is used to merge time slot files into a single file of common
+time slots. The merged file may then be used to control event selection in 
+the {\tt wfcsort} program.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[SFILE1]
+The name of the first time slot file to merge.
+
+\item[SFILE2]
+The name of the second time slot file to merge.
+
+\item[SOFILE]
+The name of the output merged time slot file.
+
+\end{description}
+
+\subsection{WPSSCORR}
+\label{sec:programs:wpsscorr}
+
+Converts raw flux in a source search results file produced by {\tt pss} to 
+``on--axis'' counts per second by correcting for vignetting, dead time,
+and degradation of detector efficiency.  The source list files can be
+examined by using the ASTERIX program {\tt ssdump}.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[SLIST]
+The name of the {\tt pss} source search list file.
+
+\item[CLIST]
+The name of the file that will contain the corrected counts.  (The input
+file is also copied.)
+
+\end{description}
+
+\subsection{WFCHELP}
+\label{sec:programs:wfchelp}
+
+Although help is available for all of the WFCPACK programs by typing
+{\tt `?'} in reply to any prompt, {\tt wfchelp} collates this information
+into an easy to search package. Details on the supplied ICL procedures
+(see Section \ref{sec:procedures}) are also given.
+
+\subsection{An example}
+\label{sec:programs:example}
+
+The following example shows how {\tt wfcsort} and {\tt wfcexp} may be
+used to create and correct a time series from an RWOD. Parameter
+prompts and typical user responses are shown.
+
+\begin{verbatim}
+   % aststart                          ! Define necessary UNIX symbols etc.
+   % wfcstart			       
+
+   ICL>wfcpack                         ! Load up WFC ICL procedures
+
+   ICL>wfcsort
+       WFCF - 015079                   ! Select an RWOD file
+       SHOW - Y                        ! Display the header records
+       DTYPE - TIME                    ! Select a time series o/p
+       RA - 123.45                     ! Set the Ra (decimal degs)
+       DEC - 67.89                     ! Set the Dec
+       INRAD - 0                       ! Select a circular region on source
+       OUTRAD - 6                      ! Circle radius = 6 arcmin
+       SLOTS - 0                       ! Select by filter rather than by slots
+       FILTER - P1                     ! Set the filter
+       NBINS - 0                       ! Select by bin size rather than number
+       TBIN - 5.                       ! Set the bin width to 5 secs
+       REJECT - NONE                   ! Don't do event discrimination
+       OUTPUT - tim_p1                 ! O/p Asterix dataset
+ 
+   ICL>wfcexp
+       INP - tim_p1                    ! I/p raw time series
+       OUT - tim_p1c                   ! O/p corrected time series
+
+\end{verbatim}
+
+\section{The ICL procedures}
+\label{sec:procedures}
+
+The {\tt wfcpack} procedure defines a set of ICL procedures which perform
+commonly required series of operations with minimum user interaction.
+The procedures described here are:
+
+\begin{description}
+\begin{description}
+\item [{\tt wfcdisk}]   Load data from an RWOD onto disk
+\item [{\tt wfcauto} ]  Standard analysis of a series of RWODs
+\item [{\tt wfcbop}]    Maximise signal to noise in producing images
+\item [{\tt wfccounts}] Gives counts in an image at a specified position
+\item [{\tt wfcimage}]  Auto imaging of the events from an RWOD
+\item [{\tt wfclight}]  Produce a light curve at a point in the current image
+\item [{\tt wfcspc}]    Produce a WFC spectrum at a point in the current image
+\item [{\tt wfcsub}]    Subtracts two contemporary time series
+\end{description}
+\end{description}
+
+The procedures have been written to exploit the NOCHECKPARS switch in
+ICL so that if command line arguments are omitted then they are
+prompted for.  The procedures are described below in terms of the
+command line arguments which they require (shown in angle
+parentheses).
+
+\subsection{WFCDISK $<$DEVICE$>$ $<$TARFILE$>$ $<$TARGET$>$}
+\label{sec:procedures:wfcdisk}
+
+The procedure copies an RWOD tar file from tape to the users target
+directory.  Each tar file contains a copy of the WFC calibration file
+and a check is made of its version number.  The user is informed if it
+is more recent than the one currently being pointed to by the {\tt
+CAL\_WFC\_MASTER} environment variable.  If it is, see the your system
+manager first before overwriting the older master calibration file.
+
+\subsection{WFCAUTO $<$INDEX$>$ $<$RWOD$>$}
+\label{sec:procedures:wfcauto}
+
+The procedure produces raw images and exposure maps for the specified
+RWOD for each filter configuration stored in the index file
+created and managed by the {\tt wfcdbm} program.
+
+
+\subsection{WFCIMAGE $<$RWOD$>$ $<$FILT$>$ $<$OUTF$>$}
+\label{sec:procedures:wfcimage}
+
+The procedure creates a full field, 256 pixel, image of the
+data specified by the RWOD argument for the filter specified by the
+FILT argument. An ASTERIX image is formed in the file specified
+by the OUTF argument. In addition an exposure corrected image
+and exposure field are created in files called $<$OUTF$>$\_c
+and $<$OUTF$>$\_x respectively.
+
+\subsection{WFCBOP $<$RWOD$>$ $<$FILT$>$ $<$LEVS$>$}
+\label{sec:procedures:wfcbop}
+
+The procedure aids optimising the background rate (LEVS) threshold
+selection when producing images from the specified RWOD for the filter
+FILT. {\tt wfcbop} computes (in a field-averaged sense) the optimum
+LEVS threshold (optimum for maximising S:N for a point source, assuming
+Gaussian statistics).  The procedure uses {\tt wfcsort} and ASTERIX
+routines and creates several temporary, working files, named {\tt
+boptemp*.sdf}, on the current default directory. These files are
+deleted on successful completion.
+
+\subsection{WFCCOUNTS}
+\label{sec:procedures:wfccounts}
+
+This procedure requests the location of source and background boxes from
+the currently displayed image.  The source position is input via the
+keyboard.  It then returns the number of source counts corrected for
+background and instrument psf --- {\tt wfcposx} can be used to
+calculate exposure at the source location.  {\tt wfccounts} serves as
+a quick check on the significance of a source or on estimating upper
+limit values. The ASTERIX program {\tt pss} provides much more secure
+methods for source searching (a whole image) and deriving upper
+limits.  Both {\tt wfccounts} and {\tt pss} work only on raw images
+{\em i.e.}, not corrected for exposure.
+
+\subsection{WFCLIGHT $<$TBIN$>$ $<$OUTF$>$}
+\label{sec:procedures:wfclight}
+
+The procedure is intended for interactive use only. It requests the
+location of source and background boxes from the currently displayed
+image and produces a background subtracted, exposure corrected, light
+curve for the source in the file specified by the argument OUTF. The
+background can be estimated from either an annulus around the source or
+from an offset position. The bin size in seconds is specified via the 
+TBIN argument.
+
+\subsection{WFCSPC $<$OUTF$>$ $<$MERGE$>$ $<$XTIM$>$}
+\label{sec:procedures:wfcspc}
+
+The procedure is intended for interactive use only. It requests the
+location of source and background boxes from the currently displayed
+image and produces a background subtracted, exposure corrected,
+spectral dataset for the source in the file specified by the argument
+OUTF.  The background can be estimated from either an annulus around
+the source or from an offset position. The procedure may optionally
+arrange to collect data from periods only when the WFC and XRT systems
+were collecting data simultaneously. If this option is required the
+MERGE option should be set to `YES' and the XTIM argument should
+contain the name of a simple text file in which each record contains a
+pair of MJDs between which the XRT was collecting data. The MJDs should
+be separated by a space and each preceded by the letter `M'.
+
+\subsection{WFCSUB $<$SRCF$>$ $<$BKDF$>$ $<$OUTF$>$}
+\label{sec:procedures:wfcsub}
+
+The procedure subtracts a background light curve, specified by the
+BKGF argument, from a source light curve, specified by the SRCF
+argument. The subtracted light curve is formed in a file specified
+by the OUTF argument. The two input light curves must have been
+exposure corrected. The fluxes are normalised by the areas of the
+two original boxes from which events were sorted, then subtracted.
+
+\section{Known Problems}
+\label{sec:problems}
+
+The ASTERIX command {\tt arithmetic}, which is used in many of the
+above ICL procedures, can cause problems when it is repeatedly called
+from within ICL.  Type: {\tt wfcfix} from the ICL command prompt, if
+procedures, or {\tt arithmetic}, are failing to execute properly.
+
+
+\section{Points of Contact}
+\label{sec:contact}
+
+The VMS version of WFCPACK was written by Mike Denby ({\tt md@star.le.ac.uk}).
+It was ported to UNIX by Jeremy Ashley ({\tt jka@star.le.ac.uk}) and Paul 
+McGale ({\tt pam@star.le.ac.uk}).  A further point of contact is John Pye 
+({\tt pye@star.le.ac.uk}).
+
+\end{document}

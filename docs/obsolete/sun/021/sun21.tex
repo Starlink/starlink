@@ -1,0 +1,675 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {21.6}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {10 May 1989}
+\newcommand{\stardoctitle}     {TAPEIO --- Magnetic Tape Routines}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section {INTRODUCTION}
+
+This  note  describes  a  set  of  routines  for  performing  physical  I/O
+operations on non-VAX-standard magnetic tapes.
+The following routines are available:
+\begin{description}
+\begin{description}
+\item[TIO\_OPEN]: assign an I/O channel to a device.
+\item[TIO\_SETDEN]: set the recording density for a tape.
+\item[TIO\_MOUNT]: mount a tape on a device.
+\item[TIO\_DISMT]: dismount a tape from a device.
+\item[TIO\_READ]: read a physical block.
+\item[TIO\_READX]: read a physical block, optionally suppressing retry.
+\item[TIO\_WRITE]: write a physical block.
+\item[TIO\_MARK]: write an end-of-file mark.
+\item[TIO\_SKIP]: skip forward or backward a given number of tape marks.
+\item[TIO\_MOVE]: skip forward or backward a given number of blocks.
+\item[TIO\_REWIND]: reposition a tape to the BOT marker.
+\item[TIO\_CLOSE]: deassign an I/O channel from a device.
+\end{description}
+\end{description}
+All the routines return a status value indicating the success of the operation.
+Currently, this value is the VAX/VMS System Service return status [1], although
+this may not be the case in future versions.
+Therefore, to facilitate VMS-independent validation of the status value, the
+following LOGICAL functions are provided:
+\begin{description}
+\begin{description}
+\item[TIO\_EOF]: test for a physical end-of-file condition.
+\item[TIO\_ERR]: test for an error condition.
+\end{description}
+\end{description}
+A further routine is provided that returns the message text associated with a
+particular status value:
+\begin{description}
+\begin{description}
+\item[TIO\_GETMSG]: return message text.
+\end{description}
+\end{description}
+Finally, the following LOGICAL function is also provided :
+\begin{description}
+\begin{description}
+\item[TIO\_SENSE]: get information about a tape drive.
+\end{description}
+\end{description}
+Before a process can perform any actual I/O operations on a tape device, an I/O
+channel must be assigned using {\bf TIO\_OPEN}.
+
+\section {LINKING}
+
+To use these routines you must specify the object module library
+TAPEIO\_DIR:TAPEIO.OLB in the LINK command, eg.
+\begin{verbatim}
+        $ LINK TAPECOPY,TAPEIO_DIR:TAPEIO/LIB
+\end{verbatim}
+\section {TAPE MOUNTING}
+All tapes to be used by a process must first be mounted using the `FOREIGN'
+qualifier, eg.
+\begin{verbatim}
+        $ ALLOC MTA0: INPUT
+        $ ALLOC MTA1: OUTPUT
+        $ MOUNT/FOR   INPUT
+        $ MOUNT/FOR   OUTPUT
+\end{verbatim}
+\section {REFERENCES}
+\begin{tabbing}
+xx\=[2]xx\=\kill
+\>[1]\>`VAX/VMS System Services Reference Manual', DEC\\
+\>[2]\>`VAX FORTRAN User's Guide', DEC
+\end{tabbing}
+\appendix
+\section {ROUTINE SPECIFICATIONS}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_CLOSE} \hfill Close Tape Drive \hfill {\bf TIO\_CLOSE}}
+\begin{description}
+\item [FUNCTION]:
+De-assign an I/O channel from a magnetic tape device.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_CLOSE(iochan,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+No further I/O operations can be performed on the device unless {\bf TIO\_OPEN}
+is called again.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_DISMT} \hfill Dismount Tape \hfill {\bf TIO\_DISMT}}
+\begin{description}
+\item [FUNCTION]:
+Dismount a tape from a magnetic tape device, optionally unloading it.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_DISMT(device,unload,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em device}\>CHARACTER\>expression\>Name of device to be dismounted (may
+be logical).\\
+{\em unload}\>LOGICAL\>expression\>True if tape is to be unloaded as well as
+dismounted.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+Any channels open on the tape must have been deassigned --- i.e.\ if the tape
+has been opened with {\bf TIO\_OPEN}, it must be closed with {\bf TIO\_CLOSE}
+before this routine is called.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_EOF} \hfill Test for EOF \hfill {\bf TIO\_EOF}}
+\begin{description}
+\item [FUNCTION]:
+Test for end-of-file condition.
+\item [CALL]: (LOGICAL function)
+\begin{quote}
+{\tt TIO\_EOF(status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>expression\>Status value.
+\end{tabbing}
+\item [OUTPUT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em tio\_eof}\>LOGICAL\>value\>Set to TRUE if status indicates an end-of-file condition.
+\end{tabbing}
+\item [NOTES]:
+Under VMS this is accomplished by comparing the value with the appropriate
+System Service return status (SS\$\_ENDOFFILE).
+An end-of-file condition is not regarded as a successful completion of an I/O
+operation and is treated as an error by {\bf TIO\_ERR}.
+Programs should test for this condition prior to any error checking.
+For example:
+\begin{verbatim}
+    IF (TIO_EOF(STATUS)) THEN
+      ...
+    ELSEIF (TIO_ERR(STATUS)) THEN
+      ...
+    ENDIF
+\end{verbatim}
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_ERR} \hfill Test for Error \hfill {\bf TIO\_ERR}}
+\begin{description}
+\item [FUNCTION]:
+Test for error conditions.
+\item [CALL]: (LOGICAL function)
+\begin{quote}
+{\tt TIO\_ERR(status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>expression\>Status value.
+\end{tabbing}
+\item [OUTPUT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em tio\_err}\>LOGICAL\>value\>Set to TRUE if status indicates an error condition.
+\end{tabbing}
+\item [NOTES]:
+Under VMS this is accomplished by examining the low-order bit of the status
+value.
+If the bit is set, the operation completed successfully and {\bf TIO\_ERR} is
+set to FALSE.
+Non-successful completion is indicated by this bit being clear and
+{\bf TIO\_ERR} is set to TRUE.
+The actual cause of the error can be determined by calling {\bf TIO\_GETMSG}.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_GETMSG} \hfill Get Error Message \hfill {\bf TIO\_GETMSG}}
+\begin{description}
+\item [FUNCTION]:
+Return the message text associated with a given status value.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_GETMSG(status,msgbuf,msglen)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>expression\>Status value.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em msgbuf}\>CHARACTER\>variable\>Buffer to receive message text.\\
+{\em msglen}\>INTEGER\>variable\>Length of message text.
+\end{tabbing}
+\item [NOTES]:
+Currently, the text is obtained from the VMS system message file although this
+may not be the case in future versions.
+This routine will generally be used in conjunction with {\bf TIO\_ERR}.
+For example:
+\begin{verbatim}
+    CHARACTER*72 MSG
+      ...
+    CALL TIO_OPEN('TAPE',IOCHAN,STATUS)
+    IF (TIO_ERR(STATUS)) THEN
+       CALL TIO_GETMSG(STATUS,MSG,LEN)
+       WRITE (*,'(X,A)') MSG(:LEN)
+    ENDIF
+\end{verbatim}
+If the user-specified buffer is too small to accommodate the complete message
+text, the string will be truncated from the right.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_MARK} \hfill Write EOF \hfill {\bf TIO\_MARK}}
+\begin{description}
+\item [FUNCTION]:
+Write an end-of-file mark.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_MARK(iochan,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+An error condition occurs if the tape is currently positioned past the
+end-of-tape marker, or if the EOT region is entered as a result of the
+operation.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_MOUNT} \hfill Mount Tape \hfill {\bf TIO\_MOUNT}}
+\begin{description}
+\item [FUNCTION]:
+Attempt to mount a tape on a named drive, ready for use by other TIO\_ routines.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_MOUNT(device,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em device}\>CHARACTER\>expression\>Name of the drive to be used (can be
+logical).
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+If the drive is not already allocated to the user, this routine will try to
+allocate it first.
+The tape is mounted `FOREIGN' and `NOASSIST'.
+Following execution of this routine, the position of a tape that was already
+mounted will be unchanged; a tape that actually had to be mounted will be at
+the load point.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_MOVE} \hfill Skip Tape Blocks \hfill {\bf TIO\_MOVE}}
+\begin{description}
+\item [FUNCTION]:
+Skip forward or backward past a specified number of physical blocks.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_MOVE(iochan,npb,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.\\
+{\em npb}\>INTEGER\>expression\>Number of blocks to skip.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+The number of blocks to be skipped is specified as a signed integer value.
+If a positive count is specified, the tape moves forward.
+If a negative count is specified, the tape moves backward.
+The operation is terminated by a tape mark when the tape moves in either
+direction, by the beginning-of-tape marker when the tape moves backward, and by
+the end-of-tape marker when the tape moves forward.
+If the operation is terminated by a tape mark, an end-of-file status is
+returned.
+If the movement is forward, the operation will leave the tape positioned just
+after the tape mark.
+Backward movement leaves the tape positioned just before a tape mark; i.e.\
+at the end of a file (unless the BOT marker is encountered).
+Consecutive tape marks are treated as such and are not handled as `logical
+end-of-volume' which would otherwise terminate a skip operation in the forward
+direction.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_OPEN} \hfill Assign I/O Channel \hfill {\bf TIO\_OPEN}}
+\begin{description}
+\item [FUNCTION]:
+Assign an I/O channel to a magnetic tape device.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_OPEN(device,iochan,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em device}\>CHARACTER\>expression\>Device name.\\
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>variable\>I/O channel assigned to device.\\
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+The routine does not reposition the tape to the start of the first file, thus
+no assumption should be made about its current position.
+The program specifies the name of the device on which the tape is mounted.
+{\bf TIO\_OPEN} returns the channel number assigned which is used as input to
+the routines which perform the actual I/O operations.
+The routine must be called for every tape device used by a program before any
+I/O operations on them can be performed.
+For example:
+\begin{verbatim}
+    CALL TIO_OPEN('INPUT',INCHAN,STATUS)
+    CALL TIO_OPEN('OUTPUT',OUTCHAN,STATUS)
+\end{verbatim}
+Under VMS, a device name can be a logical name.
+Full recursive translation is performed by {\bf TIO\_OPEN} to resolve the
+physical name.
+Before translation,  the name is stripped of leading and trailing blanks and
+converted to uppercase if necessary.
+To make programs as flexible as possible, avoid specifying the device name
+explicitly as a CHARACTER constant:
+\begin{verbatim}
+    CALL TIO_OPEN('MTA1:',CHAN,STATUS)
+\end{verbatim}
+Device names can be specified implicitly by using a CHARACTER variable whose
+value is determined at run-time:
+\begin{verbatim}
+    CHARACTER*63 DEVICE
+      ...
+    READ (*,'(A)') DEVICE
+    CALL TIO_OPEN(DEVICE,CHAN,STATUS)
+\end{verbatim}
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_READ} \hfill Read Data Block \hfill {\bf TIO\_READ}}
+\begin{description}
+\item [FUNCTION]:
+Read data from the next block
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_READ(iochan,maxlen,buffer,actlen,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.\\
+{\em maxlen}\>INTEGER\>expression\>Max length of transfer (bytes).
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em buffer}\>\>array\>Destination buffer.\\
+{\em actlen}\>INTEGER\>variable\>Actual length of block (bytes).\\
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+The program specifies the maximum number of bytes ({\em maxlen}) to be
+transferred from the tape block to the buffer.
+Under VMS, this value must lie within the range 14 to 65535 inclusive, otherwise
+a status value of SS\$\_BADPARAM is returned.
+{\bf TIO\_READ} returns the actual length ({\em actlen}) of the block read.
+If {\em actlen} $<$ {\em maxlen}, then {\em actlen} bytes have been read into
+the buffer.
+If the block length is greater than {\em maxlen}, only {\em maxlen} bytes will
+be transferred and the status value will indicate `successful completion' and
+not `buffer overflow'.
+In both cases the tape will be positioned at the end of the physical block
+when the transfer completes.
+{\em buffer} can be an array of any type appropriate to the format of the data
+being processed.
+For character-type data, a BYTE (or LOGICAL*1) array can be used.
+Under VAX FORTRAN, a CHARACTER variable (or array) can also be specified, but
+must be passed to {\bf TIO\_READ} explicitly `by reference' [2]:
+\begin{verbatim}
+    CHARACTER*80  CARD
+      ...
+    CARD=' '
+    CALL TIO_READ(IOCHAN,80,%ref(CARD),ACTLEN,STATUS)
+\end{verbatim}
+Numeric data, such as 16 or 32-bit integers, can be read into INTEGER*2 or
+INTEGER*4 arrays, but the byte order may need to be reversed when reading tapes
+produced on non-DEC equipment.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_READX} \hfill Read Data Block (no retry) \hfill {\bf TIO\_READX}}
+\begin{description}
+\item [FUNCTION]:
+Read a physical block from the tape, optionally suppressing retry.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_READX(iochan,retry,maxlen,buffer,actlen,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.\\
+{\em retry}\>LOGICAL\>expression\>True if retry to be attempted on bad records,
+false otherwise.\\
+{\em maxlen}\>INTEGER\>expression\>Maximum length of transfer (bytes).
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em buffer}\>\>array\>Destination buffer.\\
+{\em actlen}\>INTEGER\>variable\>Actual length of block (bytes); returned
+even if the read\\
+\>\>\>operation fails.\\
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+This routine will read tape records that have parity or other errors without
+the reading and re-reading that occurs when {\bf TIO\_READ} encounters such a
+record.
+{\em status} will still be returned with an error code if the record is bad.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_REWIND} \hfill Rewind Tape \hfill {\bf TIO\_REWIND}}
+\begin{description}
+\item [FUNCTION]:
+Reposition a tape to the beginning-of-tape (BOT) marker.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_REWIND(iochan,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+Under VMS, the tape is rewound to its load point and the device is left online.
+The effect is the same as the DCL command:
+\begin{verbatim}
+    $ SET MAGTAPE/REWIND.
+\end{verbatim}
+This routine will generally be used after a call to {\bf TIO\_OPEN} to ensure
+that the tape is positioned correctly for subsequent I/O operations.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_SENSE} \hfill  Interrogate Tape Drive \hfill {\bf TIO\_SENSE}}
+\begin{description}
+\item [FUNCTION]:
+Get information about a tape drive.
+\item [CALL]: (LOGICAL function)
+\begin{quote}
+{\tt CALL TIO\_SENSE(device,test,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em device}\>CHARACTER\>expression\>Name of tape drive (can be logical).\\
+{\em test}\>CHARACTER\>expression\>The test to be performed.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [OUTPUT]:
+\begin{tabbing}
+descrxxxx\=CHARACTER\=expressionxxx\=\kill
+{\em tio\_sense}\>LOGICAL\>value\>Result of the test.
+\end{tabbing}
+\item [NOTES]:
+{\em test} can be one of:
+\begin{tabbing}
+x\='Odd parity'x\=\kill
+\>'Available'\>indicates if device is on-line and available --- it may be
+allocated to someone else.\\
+\>'Foreign'\>indicates if device is a foreign volume.\\
+\>'Mounted'\>indicates if device is mounted.\\
+\>'Tape'\>indicates if device is a tape.\\
+\>'Lost'\>indicates if current tape position is unknown.\\
+\>'Readonly'\>indicates if tape is write protected.\\
+\>'EOT'\>indicates tape is past end-of-tape.\\
+\>'EOF'\>indicates if last operation hit a file mark.\\
+\>'BOT'\>indicates if tape is at load point.\\
+\>'Odd parity'\>indicates tape is odd parity.\\
+\>'6250'\>indicates tape is 6250 bpi.\\
+\>'1600'\>indicates tape is 1600 bpi.\\
+\>'800'\>indicates tape is 800 bpi.
+\end{tabbing}
+The characters of {\em test} may be upper or lower case, and only enough
+characters to indicate unambiguously which item is being requested are tested.
+So unless the first character is `E', it will be the only one that this
+function looks at.
+Note that bad status will be returned for a call that tries to get information
+like `6250' for a device that is not a tape.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_SETDEN} \hfill Set Tape Density \hfill {\bf TIO\_SETDEN}}
+\begin{description}
+\item [FUNCTION]:
+Set the recording density for a tape.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_SETDEN(iochan,dens,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.\\
+{\em dens}\>INTEGER\>expression\>Density to be used (800, 1600, or 6250).
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+Sets the recording density of a tape.
+The tape must already have been opened by {\bf TIO\_OPEN} and is rewound
+before the density is changed.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_SKIP} \hfill Skip Tape Marks \hfill {\bf TIO\_SKIP}}
+\begin{description}
+\item [FUNCTION]:
+Skip forward or backward past a specified number of tape marks.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_SKIP(iochan,ntm,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.\\
+{\em ntm}\>INTEGER\>expression\>Number of tape-marks to skip.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+The number of tape marks to be skipped is passed as a signed integer value.
+If a positive count is specified, the tape moves forward.
+If a negative count is specified, the tape moves backward.
+Only tape  marks (when the tape moves in either direction) and the
+beginning-of-tape marker (when the tape moves backward) are counted during a
+skip operation.
+The BOT marker terminates a backward skip operation, whereas an EOT marker has
+no effect in either direction.
+
+A forward skip operation leaves the tape positioned just after a tape mark.
+A backward skip operation leaves the tape positioned just before a tape mark,
+i.e.\ at the end of a file (unless the BOT marker is encountered).
+Consecutive tape marks are treated as such and are not handled as `logical
+end-of-volume' which would otherwise terminate a skip operation in the forward
+direction.
+\end{description}
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TIO\_WRITE} \hfill Write Data Block \hfill {\bf TIO\_WRITE}}
+\begin{description}
+\item [FUNCTION]:
+Write data to the next block.
+\item [CALL]:
+\begin{quote}
+{\tt CALL TIO\_WRITE(iochan,buffer,length,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em iochan}\>INTEGER\>expression\>I/O channel assigned to device.\\
+{\em buffer}\>\>array\>Source buffer.\\
+{\em length}\>INTEGER\>expression\>Length of transfer (bytes).
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return value.
+\end{tabbing}
+\item [NOTES]:
+The program specifies the number of bytes to be transferred from the
+buffer to the tape.
+Under VMS, this value must lie within the range 14 to 65535 inclusive, otherwise
+a status value of SS\$\_BADPARAM is returned.
+The source buffer can be an array of any type appropriate to the format of the
+data being written.
+Under VAX FORTRAN, a CHARACTER variable (or array) can be specified, but must be
+passed to {\bf TIO\_WRITE} explicitly `by reference' (see {\bf TIO\_READ}).
+\end{description}
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

@@ -1,0 +1,338 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {175.1}
+\newcommand{\stardocauthors}   {P.\,M.\,Allan}
+\newcommand{\stardocdate}      {1 December 1993}
+\newcommand{\stardoctitle}     {MOSAIC --- A hypertext help system}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+This document provides an introduction to the use of a hypertext help
+system. It only gives a brief overview since the tools are described more
+fully in the documents listed in section~\ref{muds}. The tools have not been
+written by Starlink, but are freely available over the Internet.
+
+\section{What {\em is} hypertext?}
+
+Hypertext is a system for displaying plain text, graphics, images and (where
+the hardware allows it) sound. A fundamental part of hypertext is the fact that
+each page has links to other pages. You read the information by following these
+links. DEC's bookreader, Sun's AnswerBook and Microsoft Windows' Help are
+examples of hypertext systems. It is difficult to adequately describe in words
+what is essentially a graphical system. The simplest thing to do it to try it
+out. It really is easy to use. 
+
+\section{The Mosaic program}
+
+The program that you use to read Starlink hypertext information is called
+Mosaic. This is was written by Marc Andreessen at NCSA\footnote{National Center
+for Supercomputing Applications}. To use it, you simply type\footnote{after
+ensuring that {\tt /usr/local/bin} is in your path}: 
+
+\begin{quote}{\tt
+\% Mosaic
+}
+\end{quote}
+
+This is an X~windows application, so you must run the program from a
+workstation or an X~terminal. When you start Mosaic, it will display a window
+on your screen and connect to an information server. This will normally be the
+Starlink one, although section~\ref{service} describes how to chose a different
+server. The first page that is displayed is called the home page. If you get
+warning messages reported on the window where you typed {\tt Mosaic}, then see
+appendix~\ref{warnings}.
+
+Mosaic is currently not available for VMS. However, it is quite sensible to
+run Mosaic on a Unix workstation and display the output on a VAXstation.
+
+\section{How to read a hypertext document}
+
+You browse hypertext information by reading a page and then clicking the mouse
+on a highlighted link to go to the next page. The Mosaic program records links
+that you have taken, so that you know when you have visited a page before. It
+marks the links by underlining them with a broken line (and changing their
+colour on a colour workstation), but does not prevent you from following the
+same link again. It is possible to reset the list of links that you have
+followed by selecting the {\bf Clear Global History} option from the {\bf
+Options} pull down menu. Hypertext information does not have to be organised
+hierarchically or sequentially, although it is possible to do both. A page can
+contain several links to other pages and a page can be pointed to by any number
+of other pages. 
+
+
+\section{The World Wide Web}
+
+You can use Mosaic simply to read files on your own computer. However, this is
+only a small part of the functionality of the program. Mosaic is what is know
+as a World Wide Web client. The World Wide Web (WWW) is a network of
+information servers located at many places around the world. The system was
+developed at CERN, which is a good place to look for more information about it.
+Mosaic can connect to any WWW server to read the information that it provides.
+An up to date list of registered servers is kept at CERN and can be accessed
+through the Starlink page containing introductory information. The World Wide
+Web contains information on many subjects other than astronomy. When you have
+found a useful source of information, you can store its location by selecting
+{\bf Hotlist...} from the {\bf Navigate} pull down menu. 
+
+\section{Selecting an information service}
+\label{service}
+
+The Mosaic program is written so that, by default, it connects you to the
+information service at NCSA. This is a good place to learn about Mosaic, but it
+is clearly not the best place from which to get information about Starlink
+software. The place that Mosaic looks for its initial source of information
+(known as the `home page') can be selected by means of the environment variable
+{\tt WWW\_HOME}. The standard Starlink login file sets this to point to the
+Starlink home page at {\tt star-www.rl.ac.uk} unless you have already set {\tt
+WWW\_HOME} to something else. If you wish to explore the information at NCSA
+you can go there by selecting the {\bf Internet Starting Points} option from
+the {\bf Navigate} pull down menu. Alternatively there is a link to NCSA from
+within the Starlink page containing introductory information. 
+
+It is possible to set your default home page to be anywhere in the world that
+provides a world wide web server. For example, you can set your home page to be
+the one at NRAO by typing:
+
+\begin{quote}{\tt
+\% setenv WWW\_HOME http://info.aoc.nrao.edu/
+}
+\end{quote}
+
+\section{Other Mosaic facilities}
+
+Mosaic has abilities other than just reading hypertext documents. From the {\bf
+Navigate} pull down menu, you can select {\bf Internet Starting Points} for a
+list of resources available on the Internet. One of these is a list of FTP
+servers. By selecting this page and then choosing a site, you can browse
+through the software that is available on many FTP archives. You can copy files
+to your local computer by selecting the name of the file.
+
+Mosaic also provides an interface to Gopher servers and WAIS (Wide Area
+Information System). These are systems for searching the Internet for
+information. For further information on these topics, look at {\bf Internet
+Starting Points}.
+
+\section{Customizing Mosaic}
+
+Since Mosaic is an X windows program, you can customize its appearance by
+setting the values of resources in your {\bf .Xdefaults} file. For example,
+when you click on a hypertext link, Mosaic changes the colour of the text to
+remind you that you have already been to that page. Personally, I find the
+colour of the selected links not to be sufficiently different to the colours of
+the unselected links, so I add the following line to my {\bf .Xdefaults} file
+to show selected links in red:
+
+\begin{quote}{\tt
+Mosaic*visitedAnchorColor:   red
+}
+\end{quote}
+
+A list of all the resources used by Mosaic and their default values are
+available in the file {\bf /usr/local/lib/Mosaic/app-defaults.color}.
+
+If you have heavily customized the colours on your workstation or X terminal,
+you may need to use custom values of resources for Mosaic to achieve an
+acceptable result.
+
+\subsection{Example files}
+
+There are a set of example files for customizing the appearance of Mosaic in
+the directory {\bf /usr/local/lib/Mosaic}. These are as follows:
+
+\begin{description}
+\item[app-defaults.color] All of the standard settings used by Mosaic on a
+colour workstation
+\item[app-defaults.mono] All of the settings needed by Mosaic when used on a
+monochrome workstation
+\item[Xdefaults-decstation] The resources that need to be set when using a
+DECstation as an X server to prevent warning messages being generated.
+\item[Xdefaults-openwin] The resources that need to be set when using a Sun
+running OpenWindows as an X server to prevent warning messages being generated.
+\item[Xdefaults-vt1000] The resources that need to be set when using a
+VT1000 as an X server to prevent warning messages being generated.
+\end{description}
+
+
+\section{Other documents}
+\label{muds}
+
+There are several documents that describe the Mosaic program and associated
+facilities in greater detail. These are available in the Starlink
+`miscellaneous user document' series.
+
+\begin{description}
+\item[MUD/147] Getting Started with NCSA Mosaic
+\item[MUD/148] NCSA Mosaic Technical Summary
+\item[MUD/149] A Beginner's Guide to HTML
+\item[MUD/150] A Beginner's Guide to URLs
+\item[MUD/151] Hypertext Markup Language (HTML)
+\item[MUD/152] A LaTeX to HTML Translator
+\end{description}
+
+\appendix
+
+\section{HTML}
+
+This section is only relevant to users who want to write their own hypertext
+documents.
+
+For a document to be readable by Mosaic, it must be in a format known as
+Hypertext Markup Language (HTML). This is a format not dissimilar to \LaTeX,
+so if you know that, you should have little trouble with HTML. Documents
+describing HTML are available as MUDs (see section~\ref{muds}). There is also a
+program for translating \LaTeX\ documents to HTML format. The program is
+written in perl and uses several Unix utilities, not all of which may be
+installed at your site. See MUD/152 for more details. Contact your site manager
+and the author of this document if you wish to run this program, but do not
+have all of the tools.
+
+\section{What to do if you get error messages}
+\label{warnings}
+
+When you run Mosaic, there are two types of messages that you are likely
+to encounter. The first sort are warning messages that may be printed on the
+terminal window where you typed the {\tt Mosaic} command. The second sort are
+windows that pop up saying that Mosaic could not connect to a server.
+
+The `cannot connect to information server' messages mean exactly what they say.
+When you clicked on a link, the program tried to connect to a server at some
+remote location and failed to do so. If you really want that information, there
+is nothing that you can do but wait for the connection to the remote site to
+come back. In the mean time, you can click on the {\tt BACK} button and
+continue browsing. If you fail to connect to many sites, then it is likely that
+{\em your} connection to the outside world is broken.
+
+The warning messages that are printed on your terminal are usually to do with
+Mosaic not being able to find the appropriate fonts or not being able to map
+keys. Neither of these are fatal errors, but they are clearly untidy. The
+warning messages about fonts are known to occur when using DECstations running
+Ultrix or Suns running OpenWindows as the X server. 
+They are due to the fact that different machines have different sets of fonts.
+If you are happy with the way that Mosaic works, but you are annoyed with the
+warning messages, you can pipe them to {\tt /dev/null}. If you want to do a
+better job, read the rest of this section.
+
+{\em N.B. It is shortcomings in the X server that gives rise to the warning
+messages, not the machine on which you are running the Mosaic program.}
+
+\subsection{Missing fonts}
+
+Warnings about fonts look something like this:
+
+\begin{verbatim}
+Warning: Cannot convert string "-*-lucidatypewriter-medium-r-normal-*-14-*-iso8
+859-1" to type FontList
+\end{verbatim}
+
+This means that Mosaic is trying to use a particular font that is 14 pixels
+high and it cannot find it on your X server. The simplest solution is to just
+ignore the warning messages. Mosaic will chose a suitable replacement font. If
+you want to stop Mosaic complaining, you should put the appropriate lines in
+your {\bf .Xdefaults} file. The first thing that you need is a suitable
+replacement font. The command {\tt xlsfonts} will list all the fonts known to
+your X server. There will be a lot of them and a suitable replacement font is
+likely to exist. The best choice is a font where the first part of the name is
+the same as the one you are replacing, but the pixel size is slightly
+different. Alternatively, chose a font from a different family, but with the
+same weight, slant and set width (the {\tt medium-r-normal} part).  Having
+found the name of the font, you next need to know which X resource needs this.
+The default values that Mosaic uses for resources are in the file {\bf
+/usr/local/lib/Mosaic/app-defaults.color}. Search this file to see which
+resource was using the font that could not be found. Then in your {\bf
+.Xdefaults} file, set that resource. For example, given the warning message
+shown above, a suitable replacement font on a DECstation is:
+
+\begin{verbatim}
+-dec-terminal-medium-r-normal--14-140-75-75-c-80-iso8859-1
+\end{verbatim}
+
+A search through the file {\bf Mosaic.color} reveals that the resources that
+use the missing lucida font are:
+
+\begin{verbatim}
+Mosaic*XmText.fontList
+Mosaic*XmTextField.fontList
+\end{verbatim}
+
+Consequently, what you would enter in your {\bf .Xdefaults} file would be:
+
+\begin{verbatim}
+Mosaic*XmText.fontList: -dec-terminal-medium-r-normal--14-*-iso8859-1
+Mosaic*XmTextField.fontList: -dec-terminal-medium-r-normal--14-*-iso8859-1
+\end{verbatim}
+
+Example {\bf .Xdefaults} record for a DECstation, Sun (running OpenWindows) and
+VT1000 are available in {\bf /usr/local/lib/Mosaic}. Remember that the one you
+need depends on your X~server, not the machine on which you are running Mosaic.
+
+\subsection{Unmapped keys}
+
+Warnings about unmapped keys look something like this:
+
+\begin{verbatim}
+Warning: Cannot convert string "<Key>DRemove    " to type VirtualBinding
+Warning: translation table syntax error: Unknown keysym name: osfActivate
+Warning: ... found while parsing '<Key>osfActivate:     ManagerGadgetSelect() '
+\end{verbatim}
+
+If you get one, you are likely to get a lot more. Sun workstations appear to be
+the worst offenders in generating these warnings. As with missing fonts, you
+can ignore the warnings, but it is tidier if you get rid of them. The best
+solution is to copy a file called {\bf XKeysymDB} into the directory {\bf
+/usr/lib/X11}. This requires root privilege, so see your site manager if you
+need to do it. A copy of {\bf XKeysymDB} is stored in the directory {\bf
+/usr/local/lib/Mosaic}.
+
+\section{Acknowledgments}
+
+Much of the hypertext help information on Starlink software was prepared by
+Dave Mills.
+
+\end{document}

@@ -1,0 +1,112 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {128.2}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {16 July 1993}
+\newcommand{\stardoctitle}     {QDP --- Quick and Dandy Plotter}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+This note presents a brief introduction to QDP.
+The main user document is MUD/62 (`The QDP/PLT User's Guide') which should be
+available at all Starlink sites.
+Ask your Site Manager for a copy.
+
+The text below has been extracted from Chapter 1 of the full guide.
+
+\section{Overview}
+
+The {\em Quick and Dandy Plotter (QDP)} program reads ASCII files containing
+various plotting commands and data.
+It then calls the {\em PLT}\ subroutine which executes the commands
+and plots the data.
+At this point the ``\verb@PLT>@'' prompt appears and the user can enter
+additional PLT commands to:
+\begin{itemize}
+\item Display information about the interactive commands
+{\em via} {\tt HElp},
+
+\item Override various PLT defaults,
+
+\item Override the PLT commands found in the QDP file,
+
+\item Add/remove labels,
+
+\item Plot data with various combinations of lines, markers, and error bars,
+
+\item Change the appearance/style of the plot, for example converting
+all text into Roman Font,
+
+\item Plot the data as a function of a different $x$ variable,
+
+\item Change the number of panels in which the data is plotted,
+
+\item Define models to calculate the `best fit' parameter values,
+
+\item Generate a hardcopy.
+\end{itemize}
+
+Thus, the interactive PLT commands allow you to both tailor the plot to your
+needs/taste and to do some simple analyses of the data.
+PLT commands can be placed in the QDP file, in an indirect command, and/or in
+a command array created by the calling program.
+For example, if you have a set of commands that you commonly use, you can
+place them in a file and then have PLT execute the commands that it finds in
+that file.
+Since exactly the same command syntax is used in all places, it is not
+necessary to learn a special programming language to write software that uses
+PLT.
+Programmers can try out PLT commands interactively to find a set that works
+best with the type of data being plotted, and then make these commands the
+default values.
+
+The PLT software is highly portable.
+It uses the PGPLOT Graphics Subroutine Library written by T J Pearson at the
+California Institute of Technology.
+
+\section{Running the program}
+
+Before attempting to run the program, you must first initialise the
+environment by entering the command:
+\begin{verbatim}
+   $ QDPSTART
+\end{verbatim}
+You can then start the program with the command:
+\begin{verbatim}
+   $ QDP
+\end{verbatim}
+
+\end{document}
