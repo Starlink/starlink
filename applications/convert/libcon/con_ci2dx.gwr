@@ -1,0 +1,247 @@
+      SUBROUTINE CON_CI2D<T>( NDIM, NCOLS, NROWS, NBANDS, IMDES, ERR,
+     :                       ARRAY, LINE, STATUS )
+*+
+*  Name:
+*     CON_CI2DR
+
+*  Purpose:
+*     Copies a one- or two-dimensional IRAF image to an array.
+*     
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CON_CI2Dx( NDIM, NCOLS, NROWS, NBANDS, IMDES, ERR, ARRAY,
+*                     LINE, STATUS )
+
+*  Description:
+*     This routine transfers a one-, two- or three-dimensional IRAF
+*     image to a three-dimensional array.
+*
+*     It copies a line at a time so that dynamic-memory allocation
+*     could be used in the calling routine, so that images of virtually
+*     any size can be catered for without excessive resources.
+*
+*     If an error occurs when writing to the IRAF image, the routine
+*     should set the STATUS to something useful.  Instead, the IRAF
+*     error indicator is passed back up to the calling routine which
+*     then checks it.
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The number of dimensions in the data array.  It must be 1, 2,
+*        or 3.  Although we have the dimension sizes, this is still
+*        required when the trailing dimensions are really one.  For
+*        example, an NCOLS-by-1 element image as opposed to a vector
+*        of NCOLS elements.
+*     NCOLS = INTEGER (Given)
+*        The number of columns in the data array.
+*     NROWS = INTEGER (Given)
+*        The number of rows in the data array.  This is set to one for
+*        a one-dimensional array.
+*     NBANDS = INTEGER (Given)
+*        The number of bands in the data array.  This is set to one for
+*        a one- and two-dimensional arrays.
+*     IMDES = INTEGER (Given)
+*        The image descriptor obtained from the call to to IMFORT
+*        imopen() routine in the calling routine.
+*     ERR = INTEGER (Given and Returned)
+*        The IRAF error reporting integer.
+*     ARRAY( NCOLS, NROWS, NBANDS ) = ? (Returned)
+*        The data array to be copied from the IRAF image file.
+*     LINE( NCOLS ) = ? (Returned)
+*        Work array to enable a line of the input IRAF image to be
+*        copied at a time.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for the real and signed word data types:
+*     replace "x" in the routine name by R or W as appropriate.  ARRAY
+*     and LINE must have the data type specified.
+
+*  External Routines Used:
+*     IRAF IMFORT subroutine library:
+*        IMGL1R(), IMGL2R(), IMGL3R(), IMGL1S(), IMGL2S(), IMGL3S()
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1993 July 22 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NDIM               ! Number of dimensions
+      INTEGER NCOLS              ! Number of columns
+      INTEGER NROWS              ! Number of rows
+      INTEGER NBANDS             ! Number of bands
+      INTEGER IMDES              ! Image descriptor 
+
+*  Arguments Given and Returned:
+      INTEGER ERR                ! The IRAF error indicator.
+
+*  Arguments Returned:
+      <TYPE> ARRAY( NCOLS, NROWS, NBANDS ) ! The entire image
+      <TYPE> LINE( NCOLS )       ! The array to contain each line of
+                                 ! the image in turn.
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+      INTEGER J                  ! Loop counter
+      INTEGER K                  ! Loop counter
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Copy from the signed-word IRAF cube, image or spectrum.
+*  =======================================================
+
+*  Unfortunately, the IRAF suffix for signed word data type is not the
+*  Starlink W.  Therefore we have to compare the token with a constant.
+*  Some compilers will issue a warning that certain parts of the code
+*  are unreachable.  These can safely be ignored.
+      IF ( '<T>' .EQ. 'W' ) THEN
+
+*  Deal with one-dimensional arrays.
+         IF ( NDIM .EQ. 1 ) THEN
+
+*  Use the IRAF imfort routine IMGL1S() to transfer the line of pixels
+*  from the IRAF spectrum to the line buffer.
+            CALL IMGL1S( IMDES, LINE, ERR )
+
+*  Exit immediately if something has gone wrong.
+            IF ( ERR .NE. 0 ) GOTO 999
+
+*  Copy the current line from buffer to the data array.
+            DO I = 1, NCOLS
+               ARRAY( I, 1, 1 ) = LINE( I )
+            END DO
+
+         ELSE IF ( NDIM .EQ. 2 ) THEN
+
+*  Loop for all lines.
+            DO J = 1, NROWS
+
+*  Use the IRAF imfort routine IMGL2S() to transfer the line of pixels
+*  from the IRAF image to the line buffer.
+               CALL IMGL2S( IMDES, LINE, J, ERR )
+
+*  Exit immediately if something has gone wrong.
+               IF ( ERR .NE. 0 ) GOTO 999
+
+*  Copy the current line from buffer to the data array.
+               DO I = 1, NCOLS
+                  ARRAY( I, J, 1 ) = LINE( I )
+               END DO
+            END DO
+
+         ELSE IF ( NDIM .EQ. 3 ) THEN
+
+*  Loop for all bands.
+            DO K = 1, NBANDS
+
+*  Loop for all lines.
+               DO J = 1, NROWS
+
+*  Use the IRAF imfort routine IMGL3S() to transfer the line of pixels
+*  from the IRAF cube to the line buffer.
+                  CALL IMGL3S( IMDES, LINE, J, K, ERR )
+
+*  Exit immediately if something has gone wrong.
+                  IF ( ERR .NE. 0 ) GOTO 999
+
+*  Copy the current line from buffer to the data array.
+                  DO I = 1, NCOLS
+                     ARRAY( I, J, K ) = LINE( I )
+                  END DO
+               END DO
+            END DO
+         END IF
+
+*  Copy from the real-type IRAF cube, image or spectrum.
+*  =====================================================
+      ELSE
+
+*  Deal with one-dimensional arrays.
+         IF ( NDIM .EQ. 1 ) THEN
+
+*  Use the IRAF imfort routine IMGL1R() to transfer the line of pixels
+*  from the IRAF spectrum to the line buffer.
+            CALL IMGL1R( IMDES, LINE, ERR )
+
+*  Exit immediately if something has gone wrong.
+            IF ( ERR .NE. 0 ) GOTO 999
+
+*  Copy the current line from buffer to the data array.
+            DO I = 1, NCOLS
+               ARRAY( I, 1, 1 ) = LINE( I )
+            END DO
+
+         ELSE IF ( NDIM .EQ. 2 ) THEN
+
+*  Loop for all lines.
+            DO J = 1, NROWS
+
+*  Use the IRAF imfort routine IMGL2R() to transfer the line of pixels
+*  from the IRAF image to the line buffer.
+               CALL IMGL2R( IMDES, LINE, J, ERR )
+
+*  Exit immediately if something has gone wrong.
+               IF ( ERR .NE. 0 ) GOTO 999
+
+*  Copy the current line from buffer to the data array.
+               DO I = 1, NCOLS
+                  ARRAY( I, J, 1 ) = LINE( I )
+               END DO
+            END DO
+
+         ELSE IF ( NDIM .EQ. 3 ) THEN
+
+*  Loop for all bands.
+            DO K = 1, NBANDS
+
+*  Loop for all lines.
+               DO J = 1, NROWS
+
+*  Use the IRAF imfort routine IMGL3R() to transfer the line of pixels
+*  from the IRAF cube to the line buffer.
+                  CALL IMGL3R( IMDES, LINE, J, K, ERR )
+
+*  Exit immediately if something has gone wrong.
+                  IF ( ERR .NE. 0 ) GOTO 999
+
+*  Copy the current line from buffer to the data array.
+                  DO I = 1, NCOLS
+                     ARRAY( I, J, K ) = LINE( I )
+                  END DO
+               END DO
+            END DO
+         END IF
+
+      END IF
+
+  999 CONTINUE
+
+*  Set a bad global status when IRAF has generated an error.
+      IF ( ERR .NE. 0 ) STATUS = SAI__ERROR
+
+      END
