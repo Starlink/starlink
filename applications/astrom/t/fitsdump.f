@@ -25,8 +25,9 @@
 
       keepreading = .true.
       i = 1
+      call ftgrec (ftunit, i, s, ftstat)
       do while (keepreading .and. ftstat.eq.0)
-         call ftgrec (ftunit, i, s, ftstat)
+
 *      Suppress printing of lines with certain keywords, to make diffing
 *      the dumped files reasonable.  The file creation DATE will
 *      obviously change from file to file; HISTORY and COMMENT lines are
@@ -49,6 +50,9 @@
          if (printline) write (*, '(a)'), s
          i = i+1
          if (s(1:3).eq.'END') keepreading = .false.
+
+*      Next card
+         call ftgrec (ftunit, i, s, ftstat)
       enddo
 
  998  continue
