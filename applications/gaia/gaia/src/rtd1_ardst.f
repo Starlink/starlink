@@ -1,5 +1,5 @@
-      SUBROUTINE RTD1_ARDST( BAD, SIMPLE, IGRP, DIM1, DIM2,
-     :                       LBND, UBND, TYPE, IPIN, STATUS )
+      SUBROUTINE RTD1_ARDST( BAD, SIMPLE, DATSRC, SHOHED, IGRP, DIM1, 
+     :                       DIM2, LBND, UBND, TYPE, IPIN, STATUS )
 *+
 * Name:
 *    RTD1_ARDST
@@ -11,7 +11,7 @@
 *     Starlink Fortran-77
 
 *  Invocation:
-*     CALL RTD1_ARDST( BAD, SIMPLE, IGRP, DIM1, DIM2,
+*     CALL RTD1_ARDST( BAD, DATSRC, SHOHED, SIMPLE, IGRP, DIM1, DIM2,
 *                      LBND, UBND, TYPE, IPIN, STATUS )
 
 *  Description:
@@ -24,6 +24,11 @@
 *        Whether BAD pixels may be present.
 *     SIMPLE = LOGICAL (Given)
 *        Whether to output results in simple one-line form.
+*     DATSRC = CHARACTER *( * ) (Given)
+*        A string describing the data source (i.e. Data or NDF
+*        component). This will be used to qualify the report.
+*     SHOHED = LOGICAL (Given)
+*        Whether to show the column headers (SIMPLE=.TRUE. only)
 *     IGRP = INTEGER (Given)
 *        ARD description of region to use.
 *     DIM1 = INTEGER (Given)
@@ -45,12 +50,14 @@
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 *  Authors:
-*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     PWD: Peter Draper (STARLINK - Durham University)
 *     {enter_new_authors_here}
 
 *  History:
-*     19-MAR-1996 (PDRAPER):
+*     19-MAR-1996 (PWD):
 *        Original version.
+*     28-APR-2004 (PWD):
+*        Added DATSRC argument.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -70,6 +77,8 @@
 *  Arguments Given:
       LOGICAL BAD
       LOGICAL SIMPLE
+      LOGICAL SHOHED
+      CHARACTER * ( * ) DATSRC
       INTEGER IGRP
       INTEGER DIM1
       INTEGER DIM2
@@ -214,11 +223,27 @@
 
          HEADER( NOWAT: ) = ' No. Pixels'
          CALL CHR_PUTI( NGOOD, BUFFER, NOWAT )
+         NOWAT = MAX( WASAT + 12, NOWAT + 1 )
+         WASAT = NOWAT
 
-         CALL MSG_OUT( ' ', HEADER, STATUS )
+         IF ( DATSRC .NE. ' ' ) THEN 
+            BUFFER( NOWAT: ) = '('
+            CALL CHR_PUTC( DATSRC, BUFFER, NOWAT )
+            NOWAT = NOWAT + 1
+            BUFFER( NOWAT: ) = ')'
+         END IF 
+
+         IF ( SHOHED ) THEN 
+            CALL MSG_OUT( ' ', HEADER, STATUS )
+         END IF
          CALL MSG_OUT( ' ', BUFFER, STATUS )
 
       ELSE
+         IF ( DATSRC .NE. ' ' ) THEN 
+            CALL MSG_SETC( 'DATSRC', DATSRC )
+            CALL MSG_OUT( ' ', ' ^DATSRC:', STATUS )
+         END IF 
+
          CALL MSG_SETD( 'MEAN', MEAN )
          CALL MSG_OUT( ' ','   Mean                = ^MEAN', STATUS )
 

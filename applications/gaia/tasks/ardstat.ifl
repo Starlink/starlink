@@ -27,6 +27,15 @@ interface ARDSTAT
       default TRUE
    endparameter
 
+   parameter FULL
+      type   '_LOGICAL'
+      access 'READ'
+      prompt 'Report stats for any variance component'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default TRUE
+   endparameter
+
    parameter SHAPE
       type   '_CHAR'
       access 'READ'
