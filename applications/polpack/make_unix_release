@@ -32,7 +32,7 @@
       source $SDT_DIR/startup.csh
 
 #  Ensure the sst prohlp command is available.
-      source /home/dsb/bin/sst/start
+      source /dsbwork/bin/sst/start
 
 #  Store the name of the release directory, and go there.
       set REL_DIR = ${TEMPDIR}/polpack_${SYSTEM}
