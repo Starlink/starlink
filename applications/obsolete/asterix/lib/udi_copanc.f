@@ -112,9 +112,9 @@
 *  Invoke method
       CALL ADI_EXEC( 'CopyAncillary', 5, ARGS, OARG, STATUS )
 
-*  Allow no method
-      IF ( STATUS .EQ. ADI__NOMTH ) THEN
-        CALL ERR_ANNUL( STATUS )
+*  Trap errors
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_FLUSH( STATUS )
       END IF
 
 *  Release omit string
