@@ -38,13 +38,16 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
-*     18-Jan-1996 (GJP)
+*     18-Jan-1996 (GJP):
 *     (Original version)
-*     24-FEB-1997 (DSB)
+*     24-FEB-1997 (DSB):
 *        Changed from an ATASK to a stand-alone program.
+*     22-MAR-2005 (TIMJ):
+*        Initialise the TOTAL and write it out.
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -126,6 +129,7 @@
       WRITE(*,*)
 
 *   Check a number of co-ordinates.
+      TOTAL = 0.0
       DO 1001 X=1,NX-1
          DO 2001 Y=1,NY-1
  
@@ -147,6 +151,9 @@
      :             .05*YI(1)*YI(1)*YI(1)-ZI(1,1))/ZI(1,1))
             END IF
 
+*         Change mode after first call. To test alternate code path.
+            MD = 2
+
  2001    CONTINUE
  1001 CONTINUE
 
@@ -154,7 +161,7 @@
       TOTAL=100.*total/(NX-1)/(NY-1)  
       IF (TOTAL.LT.1.0) THEN
          WRITE(*,*) 'Ungridded 2-D polynomial fit PASSED'// 
-     :                ' self test.' 
+     :                ' self test. Total = ',TOTAL 
       ELSE
          WRITE(*,*) 'Ungridded 2-D polynomial fit FAILED'//
      :                ' self test.' 
@@ -180,6 +187,9 @@
       WRITE(*,*)      
       WRITE(*,*) 'Testing PDA_IDSFFT.'
       WRITE(*,*)  
+
+*   Choose mode 1 for initial call
+      MD=1
 
 *   Check a number of co-ordinates.
       DO 3001 X=1,NX-1
@@ -213,7 +223,7 @@
       TOTAL=100.*total/(NX-1)/(NY-1)  
       IF (TOTAL.LT.1.0) THEN
          WRITE(*,*) 'Ungridded 2-D polynomial fit PASSED'// 
-     :                ' self test.' 
+     :                ' self test. Total = ', TOTAL 
       ELSE
          WRITE(*,*) 'Ungridded 2-D polynomial fit FAILED'//
      :                ' self test.' 
