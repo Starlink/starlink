@@ -106,6 +106,7 @@
 
       INTEGER			DIMS(DAT__MXDIM)	! Dimensions
       INTEGER			NDIM			! Dimensionality
+      INTEGER			NELM			! Number of elements
       INTEGER			VPTR			! Mapped data
 
       LOGICAL			THERE			! Object exists?
@@ -143,7 +144,6 @@
 
 *    Simple object
         ELSE
-          MID = ID
           IF ( NDIM .EQ. 0 ) THEN
             CALL ADI_NEWV0<T>( VALUE, ID, STATUS )
           ELSE
