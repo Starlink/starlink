@@ -63,7 +63,7 @@
 *        "V0.14-1", and sets the RESULT parameter appropriately. For
 *        instance, if the installed package was "V0.13-6" then RESULT
 *        would be set to -1. If the installed package was "V0.14-1",
-*        RESULT would be set to 0. If the installed package was "V0.14-2"
+*        RESULT would be set to 0. If the installed package was "V0.14-5"
 *        RESULT would be set to +1.
 
 *  Notes:

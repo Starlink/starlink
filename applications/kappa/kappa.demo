@@ -21,7 +21,7 @@
 #       name <name>            ( e.g. "name KAPPA" )
 #       sun  <doc>             ( e.g. "sun sun95" )
 #       info <text>            
-#       version <version>      ( e.g. "version 0.14-4" )
+#       version <version>      ( e.g. "version 0.14-5" )
 #       email <email>          ( e.g. "email ussc@star.rl.ac.uk" )
 #       url <url>              ( e.g. "url http://www.ast.man.ac.uk/~dsb/kappa/kappa.html" )
 #       monolith <task> <file> ( e.g. "monolith polpack $POLPACK_DIR/polpack_mon")
