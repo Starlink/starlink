@@ -45,8 +45,8 @@
 *        is the minimum that prevents any loss of precision, and hence
 *        is dependent on the data type of the NDF array.  These widths
 *        in characters for each HDS data type are as follows: _UBYTE, 3;
-*        _BYTE, 4; _UWORD, 5; _WORD, 6; _INTEGER, 11; _REAL, 14; and
-*        _DOUBLE, 22.  The record length is the product of the number
+*        _BYTE, 4; _UWORD, 5; _WORD, 6; _INTEGER, 11; _REAL, 16; and
+*        _DOUBLE, 24.  The record length is the product of the number
 *        of characters per value plus one (for a delimiting space),
 *        times the number of values per record given by parameter
 *        NOPEREC, up to a maximum of 512.
