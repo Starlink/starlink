@@ -975,6 +975,12 @@ check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
  $(DOCUMENTATION) $(DATA_FILES) $(PKG_NAME)_iraf.tar \
  rcsrevs
 
+clean_source:
+	$(RM) $(DOCUMENTATION) $(HELPTASK).tar $(PKG_NAME)_source.tar \
+              $(PKG_NAME).tar $(PKG_NAME)_dgen.tar $(PKG_NAME)_gen.tar \
+              $(PKG_NAME)_tasks.tar irg.tar irh.tar $(DATA_FILES) \
+              $(PKG_NAME)_iraf.tar
+
 #  Build list of files under RCS control used at this release, and log
 #  their version numbers.
 
