@@ -1,3 +1,9 @@
+0 Help
+ Welcome to the ESP online help system.  Here you can display
+ details about specific ESP commands. For more general information
+ such as using this help system, consult SUN/180. This can be most easily
+ done using the command "showme sun180".
+
 1 CORR
 Performs cross-correlations on an image using a galaxy template.
 
