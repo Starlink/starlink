@@ -147,6 +147,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -162,6 +163,8 @@
 *        component.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     4-MAY-1999 (TDCA):
+*        Added code to set badbits mask to zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -196,6 +199,8 @@
 *  Local Constants:
       DOUBLE PRECISION NSIGMA  ! The no. of standard deviations which must
       PARAMETER ( NSIGMA = 4.0 )! separate REPVAL from upper or lower limit
+      BYTE BADBIT              ! The value the bad-bits mask of the output
+      PARAMETER ( BADBIT = 0 ) ! NDF is set to after processing.
 
 *  Local Variables:
       LOGICAL BAD( 2 )         ! Data, variance components may have bad
@@ -228,6 +233,7 @@
       LOGICAL PROCES( 2 )      ! Data, variance components are to be
                                ! processed (i.e. present plus may have
                                ! bad pixels)
+      LOGICAL QUAL             ! Quality array present in output NDF ?
       DOUBLE PRECISION REPVAL  ! Replacement value
       REAL RSUVAL              ! Replacement value
       REAL RSDVAL              ! sigma value
@@ -376,6 +382,13 @@
 *  title.
       CALL KPG1_CCPRO( 'TITLE', 'TITLE', NDFI, NDFO, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+* If QUALITY array present output NDF, set bad-bits mask to zero.
+      CALL NDF_STATE( NDFO, 'QUAL', QUAL, STATUS )
+      IF ( QUAL ) THEN
+         CALL NDF_SBB( BADBIT, NDFO, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+      END IF
 
 *  Processing of the data and/or variance components.
 *  ==================================================
@@ -1018,3 +1031,4 @@
 
 *  End
       END
+

@@ -174,6 +174,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TDCA: Tim Ash (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -185,6 +186,8 @@
 *        them if they are.
 *     5-JUN-1998 (DSB):
 *        Added propagation of the WCS component.
+*     4-MAY-1999 (TDCA):
+*        Badbits mask set to zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -203,14 +206,18 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Constant:
+*  Local Constants:
       INTEGER DEFSIZ             ! Default maximum dimension when
                                  ! blocking
       PARAMETER ( DEFSIZ = 512 )   
 
       INTEGER NDIM               ! Max. dimension of images the routine
                                  ! can process
-      PARAMETER ( NDIM = 2 )   
+      PARAMETER ( NDIM = 2 )
+   
+      BYTE BADBIT                ! The value the bad-bits mask of the output
+      PARAMETER ( BADBIT = 0 )   ! NDF is set to after processing.
+
 
 *  Local Variables:
       CHARACTER * ( 13 ) COMP    ! The array component(s) of NDF
@@ -256,6 +263,7 @@
       INTEGER TOTBAD             ! Total number of bad values replaced
       LOGICAL BAD                ! Bad pixels present?
       LOGICAL BLOCK              ! Process in blocks?
+      LOGICAL QUAL               ! Quality array present in output NDF ?
       LOGICAL VAR                ! Variance proessing?
       REAL RMNV                  ! Min variance value
       REAL RMXV                  ! Max variance value
@@ -311,8 +319,6 @@
 
 *  Check the state of variance component of the NDF.      
       CALL NDF_STATE( NDFI, 'Variance', VAR, STATUS )
-
-
 
 *  See if output NDF is to have a VARIANCE component, provided the
 *  input NDF has a variance array.
@@ -512,6 +518,13 @@
       CALL NDF_SBAD( .FALSE., NDFO, 'Data', STATUS )
       IF ( VAR ) CALL NDF_SBAD( .FALSE., NDFO, 'Variance', STATUS )
 
+*  If QUALITY array present in NDFO, set badbits mask to zero.
+      CALL NDF_STATE( NDFO, 'QUAL', QUAL, STATUS )
+      IF ( QUAL ) THEN
+         CALL NDF_SBB( BADBIT, NDFO, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+      END IF
+
   999 CONTINUE
 
 * End the NDF context.
@@ -520,3 +533,12 @@
 *  End the routine.
       
       END
+
+
+
+
+
+
+
+
+
