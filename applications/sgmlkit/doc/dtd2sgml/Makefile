@@ -18,6 +18,8 @@
 #
 #        THE CONTENTS OF THIS DIRECTORY ARE NOT BUILDABLE AFTER DISTRIBUTION
 #
+#     This file is included in the distribution for information only.
+#
 #
 #     Explanations:
 #
@@ -76,7 +78,7 @@
 #     $Id$
 #-
 
-include $(STARLINK_SGML_DIR)/lib/Makefile.common
+#include $(STARLINK_SGML_DIR)/lib/Makefile.common
 
 PERLSGML_DIR=/home/norman/s/src/sgml/misc/lib
 DTDDIR=$(STARLINK_SGML_DIR)/dtd
@@ -107,15 +109,23 @@ all:
 	echo "Error: this directory is included in the distribution for"
 	echo "reference only.  It uses a package (perlSGML) which is not"
 	echo "used in the built package, and so it is NOT BUILDABLE"
-	echo "after distribution"
+	echo "after distribution.  See notes within Makefile."
 
 # This is the main target of this makefile
 #
 # The existence of this stamp file is tested by ../ssn70/Makefile -- 
 # do not rename!
-sgmltext.stamp: starlink-0.6.sgmltext programcode-0.6.sgmltext
+sgmltext.stamp: starlink-0.7.sgmltext programcode-0.7.sgmltext
 	touch sgmltext.stamp
 
+starlink-0.7.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
+			$(DTDDIR)/starlink-0.7.dtd
+	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
+	SGML_SEARCH_PATH=$(DTDDIR) \
+	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
+		$< >$@
+
+# No longer used (here for reference)
 starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.6.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
@@ -124,9 +134,33 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 		$< >$@
 
 
-general-0.6.html: starlink-0.6.description
+# Not only is the following target not buildable after distribution,
+# it is only buildable in a directory which has a subdirectory
+# `general-0.7' (since there is no rule for building this as a
+# target).  That is, it's only usable in a directory which has been
+# set up to receive the result of the dtddoc.pl script.  See notes at top.
+general-0.7.html: starlink-0.7.description starlink-0.7.dtdsummary general-0.7
+	if test general-0.7 -nt starlink-0.7.description; then \
+		for f in `./splice.pl $@ tmp-$@ general-0.7`; do\
+			rm $$f; \
+		done; \
+		mv $@ $@.old; \
+		mv tmp-$@ $@; \
+	fi
 	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
-		$< dtddoc.xslt $@ listprefix=general-0.6
+		$< dtddoc.xslt $@ listprefix=general-0.7
+
+programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary programcode-0.7
+	if test programcode-0.7 -nt programcode-0.7.description; then \
+		echo 'splicing programcode-0.7';\
+		for f in `./splice.pl programcode-0.7.description tmp-programcode-0.7.description programcode-0.7`; do\
+			rm -f $$f; \
+		done; \
+		mv programcode-0.7.description programcode-0.7.description.old; \
+		mv tmp-programcode-0.7.description programcode-0.7.description; \
+	fi
+	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
+		programcode-0.7.description dtddoc.xslt $@ listprefix=programcode-0.7
 
 
 # This dependence on general-0.6 is WRONG, since it fails if the
@@ -139,12 +173,12 @@ general-0.6.html: starlink-0.6.description
 # than the `live' copy of the description file).  This step should
 # be taken out of the Makefile and handed over to the script
 # which invokes it.
-starlink-0.6.description: general-0.6
-	for f in `./splice.pl $@ tmp-$@ general-0.6`; do\
-		rm $$f; \
-	done
-	mv $@ $@.old
-	mv tmp-$@ $@
+#starlink-0.6.description: general-0.6
+#	for f in `./splice.pl $@ tmp-$@ general-0.6`; do\
+#		rm $$f; \
+#	done
+#	mv $@ $@.old
+#	mv tmp-$@ $@
 
 clean:
 	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
