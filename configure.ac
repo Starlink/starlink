@@ -33,7 +33,7 @@ dnl    include buildsupport here, then ./configure will recurse into
 dnl    buildsupport/starconf, which means we end up reconfiguring it
 dnl    with a wrong --prefix whenever we ./configure in the top-level
 dnl    directory.
-AC_CONFIG_SUBDIRS(applications libraries thirdparty)
+AC_CONFIG_SUBDIRS(applications libraries etc thirdparty)
 dnl AC_CONFIG_SUBDIRS(applications libraries buildsupport thirdparty)
 
 AC_CONFIG_FILES(Makefile)
