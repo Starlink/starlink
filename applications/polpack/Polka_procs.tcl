@@ -8343,7 +8343,7 @@ proc LoadTask {task file} {
    lappend ADAM_TASKS $task
 
 # Save the name of the rendevous file.
-   foreach rfile [glob $ADAM_USER/${task}_*] {
+   foreach rfile [glob -nocomplain $ADAM_USER/${task}_*] {
       if { [regexp "${task}_\[0-9\]+\$" $rfile] } {
          set RENDEVOUS($task) $rfile
          break
