@@ -178,30 +178,22 @@
      :    I, J                 ! Array counters
 
       REAL
+     :    CANGLE,              ! Cosine of the rotation angle
      :    ICX,                 ! x co-ordinate of input array centre
      :    ICY,                 ! y     "       "   "     "      "
      :    OCX,                 ! x     "       " output  "      "
      :    OCY,                 ! y     "       "    "    "      "
-     :    XO,                  ! x co-ordinate in input array
-                               ! corresponding to the current output
-                               ! array pixel
-     :    YO,                  ! y co-ordinate in input array
-                               ! corresponding to the current output
-                               ! array pixel
      :    RI,                  ! Real x distance of current output
                                ! array pixel from output array centre
      :    RJ,                  ! Real y distance of current output
                                ! array pixel from output array centre
      :    RIP,                 ! Real x distance of corresponding input
                                ! array point from input array centre
-     :    RJP,                 ! Real y distance of corresponding input
+     :    RJP                  ! Real y distance of corresponding input
                                ! array point from input array centre
-     :    CANGLE,              ! Cosine of the rotation angle
+
+      REAL
      :    SANGLE,              ! Sine of the rotation angle
-     :    XDIST,               ! Fractional pixel displacement of
-                               ! the interpolation point
-     :    YDIST,               ! Fractional pixel displacement of
-                               ! the interpolation point
      :    SUM,                 ! Sum of weighted surrounding pixels
      :    VAL1,                ! Bottom-left point surrounding
                                ! the point to be interpolated
@@ -209,7 +201,17 @@
      :    VAL3,                ! Top-left point
      :    VAL4,                ! Top-right point
      :    WEIGHT,              ! Weight of a pixel for interpolation
-     :    WTSUM                ! Sum of weights
+     :    WTSUM,               ! Sum of weights
+     :    XDIST,               ! Fractional pixel displacement of
+                               ! the interpolation point
+     :    XO,                  ! x co-ordinate in input array
+                               ! corresponding to the current output
+                               ! array pixel
+     :    YDIST,               ! Fractional pixel displacement of
+                               ! the interpolation point
+     :    YO                   ! y co-ordinate in input array
+                               ! corresponding to the current output
+                               ! array pixel
 
 *-
 *    check status on entry - return if not o.k.
