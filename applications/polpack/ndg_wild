@@ -139,11 +139,28 @@ done | for file in `cat`; do
        {
           if ( ! nt ) nt = split( types, type )
           file = ""
-          for ( i = 1; i <= nt; i++ ) {
-             nbits = split( $0, bits, "." )
-             if ( "."bits[ nbits ] == type[ i ] ) {
-                file = substr( $0, 1, length( $0 ) - length( type[ i ] ) )
-                break
+
+#  Extract the text following the last "/" character. This marks the start of 
+#  the file base name.
+          nslash = split( $0, path, "/" )
+          text = path[ nslash ]                    
+
+#  Find the first dot in this text. This marks the end of the base file name. 
+#  Psss on, leaving "file" blank if there is no dot, or if the base file 
+#  name is null.
+          dot = index( text, "." )
+          if ( dot > 1 ) {
+
+#  Extract the file base name, and the file type.
+             file = substr( $0, 1, dot - 1 )
+             ftype = substr( $0, dot, length( $0 ) )
+
+#  Compare the file type with each known type in turn. Leave the loop if a
+#  match is found.
+             for ( i = 1; i <= nt; i++ ) {
+                if ( ftype == type[ i ] ) {
+                   break
+                }
              }
           }
           if ( file != "" ) { 
