@@ -41,6 +41,10 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.4  1997/10/17 02:25:47  timj
+*     Dont reset the despiking quality bit during the despiking. (ie
+*     allow existing clips to remain valid).
+*
 *     Revision 1.3  1997/10/17 02:19:34  timj
 *     Return the actual number of spikes that were removed.
 *
@@ -127,7 +131,7 @@
          CLIPMIN = MEAN - (N_SIGMA * STDEV)
 
          DO I = 1, N_POS
-            SCUQUAL(I) = SCULIB_BITOFF(SCUQUAL(I), SKYBIT) ! Reset SKY bit
+
             IF ((SCUDATA(I) .NE. VAL__BADR) .AND.
      :           (NDF_QMASK(SCUQUAL(I), BADBIT))) THEN
 
