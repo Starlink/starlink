@@ -25,6 +25,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
@@ -50,7 +51,7 @@
       END DO
 
 *  System is now shut down
-      PSFINIT = .FALSE.
+      CALL AST_CPKGI( PSF__PKG )
 
 *  Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN

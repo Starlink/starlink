@@ -25,6 +25,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
@@ -33,9 +34,12 @@
 *    Status :
 *
       INTEGER STATUS
-*
-*    Local variables :
-*
+
+*  External References:
+      EXTERNAL                  AST_QPKGI
+        LOGICAL                 AST_QPKGI
+
+*  Local Variables:
       CHARACTER*15		NAME			! A psf name
       CHARACTER*80             	TEXT               	! Output buffer
 
@@ -48,8 +52,8 @@
 *  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialised?
-      IF ( .NOT. PSFINIT ) CALL PSF_INIT( STATUS )
+*  Check initialised
+      IF ( .NOT. AST_QPKGI( PSF__PKG ) ) CALL PSF_INIT( STATUS )
 
 *  Display header for table
       CALL MSG_PRNT( 'PSF system options : ' )

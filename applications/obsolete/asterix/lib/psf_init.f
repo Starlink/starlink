@@ -21,6 +21,7 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Global variables :
 *
@@ -41,7 +42,7 @@
       EXTERNAL			PSF_RESPFILE_INIT
       EXTERNAL			PSF_TABULAR_INIT
       EXTERNAL			PSF_WFC_INIT
-      EXTERNAL			PSF_XRT_HRI_INIT
+      EXTERNAL			PSF1_RHRI_INI
       EXTERNAL			PSF_XRT_PSPC_INIT
 *
 *    Local variables :
@@ -57,9 +58,6 @@
         P_USED(I) = .FALSE.
       END DO
 
-*  Psf system now initialised
-      PSFINIT = .TRUE.
-
 *  Load the ADI package
       CALL ADI_REQPKG( 'psf', STATUS )
 
@@ -74,7 +72,10 @@
       CALL PSF0_DEFPSF( 'RADIAL', PSF_RADIAL_INIT, STATUS )
       CALL PSF0_DEFPSF( 'TABULAR', PSF_TABULAR_INIT, STATUS )
       CALL PSF0_DEFPSF( 'WFC', PSF_WFC_INIT, STATUS )
-      CALL PSF0_DEFPSF( 'XRT_HRI', PSF_XRT_HRI_INIT, STATUS )
+      CALL PSF0_DEFPSF( 'XRT_HRI', PSF1_RHRI_INI, STATUS )
       CALL PSF0_DEFPSF( 'XRT_PSPC', PSF_XRT_PSPC_INIT, STATUS )
+
+*  Now initialised
+      CALL AST_SPKGI( DCI__PKG )
 
       END
