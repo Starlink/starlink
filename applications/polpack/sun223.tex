@@ -6453,6 +6453,12 @@ union of the input frames, rather than the intersection.
 \item A bug has been fixed which could cause the masks displayed by POLKA 
 in dual-beam mode to jump around as different images were selected.
 
+\item A bug has been fixed in POLKA which caused the output NDFs to have 
+the wrong names if an image was supplied for parameter REFIN. The output
+images corresponding to the first input image were stored in files
+appropriate for the \emph{second} input image, \emph{etc.}, and the 
+output images for the final input image were not produced at all.
+
 \item The use of the MARGIN parameter by POLPLOT to determine the width of
 the margins to place around the annotated axes has been changed. The widths
 of the margins used to be specified as fractions of the height or width
