@@ -71,10 +71,8 @@
 *  Local variables:
       CHARACTER * ( 132 ) INNAM ! Name of input catalogue
       CHARACTER * ( 132 ) OUTNAM ! Name of output catalogue
-      LOGICAL EXISTS            ! TRUE if file exists
       INTEGER CI                ! Catalogue identifier
       INTEGER IFD               ! FIO file identifier
-      INTEGER FI                ! Fortran UNIT number
       LOGICAL INOPN             ! TRUE when input file is opened
 
 *.

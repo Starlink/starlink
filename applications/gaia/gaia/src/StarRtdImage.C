@@ -154,7 +154,7 @@ static const double rad_ = pi_/180.;
 //-
 static class StarRtdImageSubCmds {
 public:
-  char *name;                                        // Method name
+  char const *name;                                  // Method name
   int (StarRtdImage::*fptr)(int argc, char* argv[]); // Ptr to method
   int min_args;                                      // Minimum number of args
   int max_args;                                      // Maximum number of args
@@ -254,7 +254,7 @@ extern "C" int StarRtd_Init( Tcl_Interp *interp )
 //+
 //  StarRtdImage::CreateImage
 //
-//  Function to create a new "starrtdimage" Tk image.
+//  Function to create a new "rtdimage" Tk image with extensions for GAIA.
 //  This function is called directly by Tk image code.
 //
 //  Arguments:
@@ -428,13 +428,23 @@ ImageData* StarRtdImage::getStarImage(const char* filename, const char* slice)
   }
 
   if ( ( !isfits && isNDFtype( type ) ) || slice ) {
-    imio = NDFIO::read( file(), component() );
+    if ( slice ) {
+
+      //  Construct a complete name, including the slice.
+      char *fullname = new char[strlen(filename)+strlen(slice)+1];
+      strcpy( fullname, filename );
+      strcat( fullname, slice );
+      imio = NDFIO::read( fullname, component() );
+      delete fullname;
+    } else {
+      imio = NDFIO::read( filename, component() );
+    }
   }  else {
     //  Note: since some Starlink routines access the raw data and
     //  expect it to be already byte-swapped, if needed, we have to
     //  use a special class that makes a memory copy of the image, if
     //  needed.
-    imio = StarFitsIO::read( file(), Mem::FILE_PRIVATE | Mem::FILE_RDWR );
+    imio = StarFitsIO::read( filename, Mem::FILE_PRIVATE | Mem::FILE_RDWR );
   }
   if ( imio.status() != 0 ) {
     return (ImageData *) NULL;

@@ -185,7 +185,7 @@ Contour::~Contour()
 //
 //  Set new contour levels.
 //
-void Contour::setLevels( const double levels[], int nlevels )
+void Contour::setLevels( const double levels[], const int nlevels )
 {
   freeLevels();
   if ( nlevels > 0 ) {
@@ -210,7 +210,7 @@ void Contour::freeLevels() {
 //
 //  Get a contour level (indexed up to nlevels_).
 //
-double Contour::getLevel( int ilevel )
+double Contour::getLevel( const int ilevel )
 {
   if ( ilevel < nlevels_ ) {
     return levels_[ilevel];
@@ -221,7 +221,7 @@ double Contour::getLevel( int ilevel )
 //
 //  Set/reset the line preferences.
 //
-void Contour::setPrefs( const char *prefs[], int nprefs )
+void Contour::setPrefs( const char *prefs[], const int nprefs )
 {
   //  Release any existing preferences.
   freePrefs();
@@ -255,7 +255,7 @@ void Contour::freePrefs()
 //  Get a copy of a set of preferences. Note caller must copy this
 //  before next call to getPrefs, otherwise the space will be deleted.
 //
-char *Contour::getPrefs( int ipref )
+char *Contour::getPrefs( const int ipref )
 {
   if ( ipref < nprefs_ ) {
     if ( userBuffer_ != (char *) NULL ) {
