@@ -1,7 +1,11 @@
 FLUXES -- JCMT planetary position and flux density calibration
                                                             Expires: ??.??.??
 
-Version 1.1-3 (Spring 2005)
+Version 1.1-4 
+
+   - Add THUMPER lookup tables
+
+Version 1.1-3 (Winter 2004)
 
    - Tidy up usage of MJD vs JD
    - Improve LST calculation and use TT rather than UT where required
