@@ -1,19 +1,46 @@
-1 CONVERT_new_release
-                                             
-A new version of CONVERT (V0.6) is now available.
-It is available for Alpha/OSF1 and Sun/Solaris,
+1 CONVERT_Version_1.0
+                                            Expires: 1997 October 31
 
-Starting up the CONVERT package will switch on the `on-the-fly' data 
-conversion facilities of the NDF library which are described in SSN/20.
-Default commands are set up for the formats handled by CONVERT (except 
-IRCAM and PGM), and for compressed NDFs.
+ A new version of CONVERT is now available.  It offers three new
+ tasks: 
 
-The release includes six new applications:
+  o  FITS2NDF is a powerful FITS reader that supports all standard
+     FITS extensions.  It converts many FITS data products from ISO,
+     the IUE Final Archive, and 2dF to NDF format.
 
- NDF2FITS, converts from an NDF to a FITS file.
- GIF2NDF and NDF2GIF, for converting between NDFs and GIF files.
- TIFFF2NDF and NDF2TIFF, for converting between NDFs and TIFF files.
- NDF2PGM, converts from an NDF to a PBMPLUS PGM file.
+  o  DA2NDF and NDF2DA for conversion between NDFs and unformatted
+     direct-access/stream files.
 
-SUN/55 describes the CONVERT package and now includes a section giving
-advice on converting NDFs to and from IDL format.
+ There are two new formats allowed for automatic conversion:
+
+  o  GZIP for gzip compressed NDFs.  Its file type is ".sdf.gz".
+
+  o  STREAM for unformatted Fortran direct-access files and C
+     unformatted data files.  Its file type is "das".
+
+ Many commands have been improved.  Some of the most important changes
+ are listed below.
+
+  o  IRAF2NDF and NDF2IRAF now support propagation of axis
+     information as far as is possible between NDFs and the IRAF
+     Mini World Coordinate System.  New parameters allow control of
+     of the transfer of HISTORY and header information.  The pixel
+     origin is transferred through headers...
+
+  o  NDF2FITS now generates headers in the FITS file, which enable
+     FITS2NDF to recreate an NDF including NDF extension information.
+     There is special processing of 2dF datasets.  It is now possible
+     to recreate an original FITS data type, even though FITS2NDF
+     may have converted the data from an integer to floating-point...
+
+  o  ASCII2NDF runs about 100 times faster.
+
+ A revised SUN/55 has been issued, and it is available in hypertext
+ form (enter "showme sun55" or "findme CONVERT").
+
+ You can find further details of the changes made at this release by
+ looking at the CONVERT help "conhelp Changes V1.0", or the release
+ notes in the hypertext version of SUN/55 ("findme Release sun55").
+
+ Malcolm Currie
+ mjc@star.rl.ac.uk
