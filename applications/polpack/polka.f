@@ -499,6 +499,7 @@
 *  Report an error if stokes vectors are equested in single beam mode.
          IF( IGRP4 .NE. GRP__NOID .AND. .NOT. DBEAM .AND. 
      :       STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
             CALL ERR_REP( 'POLKA_ERR_1', 'The current version of '//
      :                    'POLKA cannot produce Stokes vectors in '//
      :                    'single-beam mode.', STATUS )
