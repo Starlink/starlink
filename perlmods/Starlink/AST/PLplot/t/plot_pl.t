@@ -63,9 +63,6 @@ plvpor(0,1,0,1);
 plwind(0,1,0,1);
 plschr(2,1);
 
-plschr(0,2);
-plschr(0,1);
-
 plscmap1n(0);
 plscmap1l(1,[0,1],[1,0],[1,0],[1,0],[0,0]);
 

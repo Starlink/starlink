@@ -43,32 +43,32 @@ is( Starlink::AST::PLplot::_GLine( \@x, \@y ), 1, "Calling _GLine()" );
 is( Starlink::AST::PLplot::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 
 # _GText( $text, $x, $y, $justification, $upx, $upy );
-is( Starlink::AST::PLplot::_GText( "Testing", 0.2, 0.4, "CC", 0, 1),
-    1, "Calling _GText()" );
+draw_and_plot( "Testing1", 0.2, 0.4, "CC", 0, 1 );
+draw_and_plot( "Testing2", 0.2, 0.6, "BR", 0.5, 0.5);
 
-# _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
-my ( $status, $xb, $yb );
-($status, $xb, $yb ) =
-      Starlink::AST::PLplot::_GTxExt( "Testing", 0.2, 0.4, "CC", 0, 1 );
-is( $status, 1, "Calling _GTxtEx()" );
+# PGPLOT definitions of upx/upy:
+#   upx  upy   orientation
+#    0    0     no text
+#    1    0     vertical, facing left
+#    1    1     45 degrees facing down left
+#   -1    1     45 degrees facing down right
+#   -1    0     vertical facing right
+#    0   -1     horizontal facing up
+#    0    1     horizontal facing down
+#    1   -1     45 degrees facing up left
 
-$xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
-Starlink::AST::PLplot::_GLine( $xb, $yb );
+my $upxx = 4;
+my $upyy =  3;
+Graphics::PLplot::plptex( 0.4,0.6, $upxx, $upyy, 0.7,"$upxx,$upyy,j=0.7");
+Graphics::PLplot::plcol0(2);
+Graphics::PLplot::plpoin( [0.4],[0.6],5);
+print "# Angle = ". (atan2($upyy, $upxx) * 180/ 3.141592654)."\n";
 
+# Make a bit bigger
+plschr(3.5,3);
 
-# _GText( $text, $x, $y, $justification, $upx, $upy );
-is( Starlink::AST::PLplot::_GText( "Testing", 0.2, 0.6, "CC", 0.5, 0.5),
-    1, "Calling _GText()" );
-
-# _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
-my ( $status, $xb, $yb );
-($status, $xb, $yb ) =
-      Starlink::AST::PLplot::_GTxExt( "Testing", 0.2, 0.6, "CC", 0.5, 0.5);
-is( $status, 1, "Calling _GTxtEx()" );
-
-$xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
-Starlink::AST::PLplot::_GLine( $xb, $yb );
-
+draw_and_plot ("ASTText", 0.6, 0.75, "CC", 0, 1);
+draw_and_plot ("Down Right", 0.7, 0.4, "CC", -3, 4);
 
 
 # _GFlush();
@@ -79,3 +79,14 @@ plend();
 # Done!
 sleep(1);
 exit;
+
+
+sub draw_and_plot {
+  Starlink::AST::PLplot::_GText( @_ );
+  my ($status, $xb, $yb ) =
+    Starlink::AST::PLplot::_GTxExt( @_ );
+  is($status, 1, "Status check from GTxExt");
+  $xb->[4] = $xb->[0]; $yb->[4] = $yb->[0];
+  Starlink::AST::PLplot::_GLine( $xb, $yb );
+  Starlink::AST::PLplot::_GMark([$_[1]],[$_[2]],5);
+}

@@ -138,26 +138,39 @@ top on the screen.
 
 =cut
 
+# PLplot only allows justification relative to the horizontal position
+# within the string going from 0 to 1.0, where 0.5 is halfway along.
+# B and T justification requires offsetting by 0.5 character height.
+
+# PLplot assumes C justification (centre of text) as opposed to PGPLOT
+# which assumes B justification by default for vertical positioning.
+
+# upx and upy for PLplot define the angle where
+# the actual angle is atan2(upy,upx) relative to horizontal (mathematical
+# definition of angle rather than astronomical).
+
+# AST seems to define the angle as atan2(-$upx, $upy )
+
+
 sub _GText {
    my ( $text, $x, $y, $just, $upx, $upy ) = @_;
-   #warn "_GText: not yet implemented for PLplot\n";
-   
+
    # check we have a string to print
    if( defined $text && length($text) != 0 ) {
-   
+
       # validate the justifcation
       my $just1 = substr $just, 0, 1;
       my $just2 = substr $just, 1, 1;
       if ( defined $just && length($just) == 2 ) {
-         
+
         # if we have a bogus justification string default it 
-        unless( $just1 =~ /[TBC]/ ) {
+        unless( $just1 =~ /^[TBC]/ ) {
            warn "_GText: bad vertical justification defaulting to 'C'\n";
            $just1 = "C";
         }
-        unless( $just2 =~ /[LCR]/ ) {
+        unless( $just2 =~ /^[LCR]/ ) {
            warn "_GText: bad horizontal justification defaulting to 'C'\n";
-           $just2 = "C"; 
+           $just2 = "C";
         }
       } else {
          warn "_GText: No justification string defaulting to 'CC'\n";
@@ -165,19 +178,19 @@ sub _GText {
          $just2 = "C";
       }
       $just = $just1 . $just2;
-      
+
       # get the axis scaling
       my ( $ret, $alpha, $beta ) = _GScales();
       return 0 if $ret == 0;
-      
+
       # If either axis is reversed, reverse the supplied up-vector 
       # components so that they refer to the world-coordinates axes.
       $upx = -$upx if $alpha < 0.0;
       $upy = -$upy if $beta < 0.0;
-      
+
       # Get the angle between the text base-line and horizontal. 
-      my $angle = atan2( -$upx*$alpha, $upy*$beta)*R2D;
-      
+      my $angle = atan2( -$upx*$alpha, $upy*$beta);
+
       # Get the fractional horizontal justification as needed by PGPLOT.
       my $fjust;
       if( $just2 eq "L" ) {
@@ -187,19 +200,24 @@ sub _GText {
       } else {
         $fjust = 0.5;
       }
-  
-      # Unless the requested justification is "Bottom", we need to adjust
-      # the supplied reference position before we use it with PGPLOT because
-      # PGPLOT assumes "Bottom" justification.
-      if( $just1 ne "B" ) {
-      
+
+      # Unless the requested justification is "Centre", we need to adjust
+      # the supplied reference position before we use it with PLplot because
+      # PLplot assumes "Centre" justification.
+      if( $just1 ne "C" ) {
+
          # Get the bounding box of the string. Note, only the size of the box 
          # is significant here, not its position. Also note, leading and 
          # trailing spaces are not included in the bounding box.
          my ( @xbox, @ybox );
-        
+
+	 # Get the character height in mm. AAdd a fudge factor since
+	 # the height does not seem to be quite correct
+	 my ($def, $ht ) = plgchr();
+	 $ht *= 1.5;
+
          #pgqtxt( $x, $y, $angle, $fjust, $text, \@xbox, \@ybox );
-         plptex ( $x, $y, $upy, $upx , $fjust, $text);
+         #plptex ( $x, $y, $upy, $upx , $fjust, $text);
          # Normalise the up-vector in world coordinates.
          my $uplen = sqrt( $upx*$upx + $upy*$upy );
          if( $uplen > 0.0 ){ 
@@ -209,6 +227,15 @@ sub _GText {
             ReportGrfError("_GText: Zero length up-vector supplied.");
             return 0;
          }
+
+	 # Adjust the vertical position of the text since PLplot assumes C
+	 if ($just1 eq 'T' ) {
+	   $x -= 0.5 * $upx * mm2world(1, $ht);
+	   $y -= 0.5 * $upy * mm2world(2, $ht);
+	 } elsif ($just1 eq 'B') {
+	   $x += 0.5 * $upx * mm2world(1, $ht);
+	   $y += 0.5 * $upy * mm2world(2, $ht);
+	 }
       }
 
       # Display the text, erasing any graphics.
@@ -218,10 +245,15 @@ sub _GText {
       #pgptxt( $x, $y, $angle, $fjust, $text ); 
       #pgstbg( $tbg );
       plcol0(15);
-      plptex ( $x, $y, $upy, -$upx, $fjust, $text);
-      
+
+      # Need to convert upx and upy to PLplot dx and dy
+      my $dx = cos($angle);
+      my $dy = sin($angle);
+
+      plptex ( $x, $y, $dx, $dy, $fjust, $text);
+
    }
-   
+
    # Return, all is well strangely
    _GFlush();
    return 1;
@@ -240,8 +272,8 @@ increase from bottom to top.
 =cut
 
 sub _GScales {
-  # Query device for world and viewport coordinates
-  my ( $nx1, $nx2, $ny1, $ny2 ) = plgvpd();
+  # Query device for world and page (mm) coordinates
+  my ( $nx1, $nx2, $ny1, $ny2) = plgspa();
   my ( $wx1, $wx2, $wy1, $wy2 ) = plgvpw();
 
   my ($alpha, $beta);
@@ -301,40 +333,177 @@ Notes:
 
 =cut
 
+# PLplot only allows justification relative to the horizontal position
+# within the string going from 0 to 1.0, where 0.5 is halfway along.
+# B and T justification requires offsetting by 0.5 character height.
+
+# PLplot assumes C justification (centre of text) as opposed to PGPLOT
+# which assumes B justification by default for vertical positioning.
+
+# upx and upy for PLplot define the angle where
+# the actual angle is atan2(upy,upx) relative to horizontal (mathematical
+# definition of angle rather than astronomical).
+
+# AST seems to define the angle as atan2(-$upx, $upy )
+
+
 sub _GTxExt {
   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
-  #warn "_GTxExt: not yet implemented for PLplot\n";
 
-  # Get the height of the font in world coordinates
-  my ($chstat, $chv, $chh) = _GQch();
-  return 0 unless Starlink::AST::_OK();
+  #print "Request for Text '$text' Just $just at x=$x y=$y  [$upx/$upy]\n";
 
-  # Get the length of the string in mm
-  my $strlen = Graphics::PLplot::plstrl( $text );
-  my $strlenw = mm2world( 1, $strlen);
+  # Make sure we have something
+  my @xb = map { 0.0 } 0..3;
+  my @yb = map { 0.0 } 0..3;
 
-  # initalise @$xb and @$yb
-  my ( @xb, @yb );
+  # check we have a string to print
+  if( defined $text && length($text) != 0 ) {
 
-  # Kluge - assume text either horizontal or vertical
-  if ($upx == 0 ) {
-    $xb[0] = $x-($strlenw / 2);
-    $yb[0] = $y-($chv / 2);
-    $xb[1] = $x-($strlenw / 2);
-    $yb[1] = $y+($chv/2);
-    $xb[2] = $x+($strlenw/2);
-    $yb[2] = $y+($chv/2);
-    $xb[3] = $x+($strlenw/2);
-    $yb[3] = $y-($chv/2);
-  } else {
-    $yb[0] = $y-($strlenw / 2);
-    $xb[0] = $x-($chv / 2);
-    $yb[1] = $y-($strlenw / 2);
-    $xb[1] = $x+($chv/2);
-    $yb[2] = $y+($strlenw/2);
-    $xb[2] = $x+($chv/2);
-    $yb[3] = $y+($strlenw/2);
-    $xb[3] = $x-($chv/2);
+    # validate the justifcation
+    my $just1 = substr $just, 0, 1;
+    my $just2 = substr $just, 1, 1;
+    if ( defined $just && length($just) == 2 ) {
+
+      # if we have a bogus justification string default it
+      unless( $just1 =~ /[TBC]/ ) {
+	warn "_GText: bad vertical justification defaulting to 'C'\n";
+	$just1 = "C";
+      }
+      unless( $just2 =~ /[LCR]/ ) {
+	warn "_GText: bad horizontal justification defaulting to 'C'\n";
+	$just2 = "C";
+      }
+    } else {
+      warn "_GText: No justification string defaulting to 'CC'\n";
+      $just1 = "C";
+      $just2 = "C";
+    }
+    $just = $just1 . $just2;
+
+    # get the axis scaling
+    my ( $ret, $alpha, $beta ) = _GScales();
+    return ( 0 ) if $ret == 0;
+
+
+    # If either axis is reversed, reverse the supplied up-vector
+    # components so that they refer to the world-coordinates axes.
+    $upx = -$upx if $alpha < 0.0;
+    $upy = -$upy if $beta < 0.0;
+
+    # convert the up-vector into millimetres
+    # [need to think about this - the bounding boxes work perfectly
+    # if I skip this step. They get skewed if I scale by alpha/beta]
+    my $ux = $alpha*$upx;
+    my $uy = $beta*$upy;
+    $ux = $upx;
+    $uy = $upy;
+
+    # normalise the up-vector to a length of 1 millimetre
+    my $uplen = sqrt( $ux*$ux + $uy*$uy );
+    if ( $uplen > 0.0 ) {
+      $ux /= $uplen;
+      $uy /= $uplen;
+    } else {
+      ReportGrfError("_GTxtExt: Zero length up-vector supplied.");
+      return ( 0 );
+    }
+
+    # Form the base-line vector by rotating the up-vector by 90 degrees
+    # clockwise.
+    my $vx = $uy;
+    my $vy = -$ux;
+
+    # Get the height of the string in mm (with fudge factor)
+    my ($def, $ht ) = plgchr();
+    my $fudge = 2;
+    $ht *= $fudge;
+
+    # This is all above the baseline if hd==0 and does not take into account y
+    my $hu =$ht;
+    # but we fudge 10% just in case of string that drops below the baseline
+    my $hd = -0.1* $ht;
+
+    # Get an up and a down vector scaled to the height/depth of the
+    # bounding box above/below the text base-line .
+    my $uxu = $ux*$hu;
+    my $uyu = $uy*$hu;
+    my $uxd = $ux*$hd;
+    my $uyd = $uy*$hd;
+
+    # and the length of the string [in mm]
+    # plstr1 does not work in plplot 5.3.0 so guess
+    #my $width = Graphics::PLplot::plstrl( $text );
+
+    # Assume square characters for now. With a 90% correction
+    # from squareness + 1 character
+    my $width = length($text) * $ht / $fudge * 0.9 + $ht;
+
+    # Scale the base-line vector so that its length is equal to the width
+    # of the bounding box (including spaces).
+    $vx *= $width;
+    $vy *= $width;
+
+    # Convert the base-line vector back into world coordinates.
+    $vx /= $alpha;
+    $vy /= $beta;
+
+    # Convert the up and down vectors into world coordinates.
+    $uxu /= $alpha;
+    $uyu /= $beta;
+    $uxd /= $alpha;
+    $uyd /= $beta;
+
+
+    # Find the coordinates at the centre of the bounding box in world
+    # coordinates.
+    my $xc = $x;
+    my $yc = $y;
+
+    if( $just1 eq 'B' ) {
+      $xc += 0.5*$uxu;
+      $yc += 0.5*$uyu;
+    } elsif( $just1 eq 'T' ) {
+      $xc -= 0.5*$uxu;
+      $yc -= 0.5*$uyu;
+    }
+
+    if( $just2 eq 'L' ) {
+      $xc += 0.5*$vx;
+      $yc += 0.5*$vy;
+    } elsif( $just2 eq 'R' ) {
+      $xc -= 0.5*$vx;
+      $yc -= 0.5*$vy;
+    }
+
+    # Get the corners of the bounding box.
+    my $vdx = 0.5*$vx;
+    my $vdy = 0.5*$vy;
+    my $udx = 0.5*$uxu;
+    my $udy = 0.5*$uyu;
+
+    # Bottom left corner...
+    $xb[ 0 ] = $xc - $vdx - $udx + $uxd;
+    $yb[ 0 ] = $yc - $vdy - $udy + $uyd;
+
+    # Bottom right corner...
+    $xb[ 1 ] = $xc + $vdx - $udx + $uxd;
+    $yb[ 1 ] = $yc + $vdy - $udy + $uyd;
+
+    # Top right corner...
+    $xb[ 2 ] = $xc + $vdx + $udx;
+    $yb[ 2 ] = $yc + $vdy + $udy;
+
+    # Top left corner...
+    $xb[ 3 ] = $xc - $vdx + $udx;
+    $yb[ 3 ] = $yc - $vdy + $udy;
+
+    # Uncomment this if you want to display the bounding box on the plot
+    # my @c = @xb;
+    # my @d = @yb;
+    # $c[4] = $c[0]; $d[4] = $d[0];
+    # _GLine(\@c, \@d);
+    # _GMark([$x],[$y],5);
+
   }
 
 
@@ -362,6 +531,7 @@ sub _GQch {
   # Get the height in millimetres
   my ($def, $ht) = plgchr();
 
+  # This is really just GScales
   my $chv = mm2world( 1, $ht );
   my $chh = mm2world( 2, $ht );
 
