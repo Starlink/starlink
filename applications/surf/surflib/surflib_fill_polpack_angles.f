@@ -24,7 +24,8 @@
 *     Note that since the rotation angles are stored in the file
 *     as one per integration, they need to be averaged over the
 *     integration in order to calculate the correct value for the
-*     measurement.
+*     measurement. ANG_MEAS and ANG_INT should be set to VAL__BADR
+*     before entry to this routine.
 
 *  Arguments:
 *     MAX_FILE = INTEGER (Given)
@@ -65,6 +66,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/05/12 22:46:10  timj
+*     Move array initialisation code out of this routine to the calling routine
+*
 *     Revision 1.1  1999/02/27 04:33:14  timj
 *     First version
 *
@@ -146,21 +150,6 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Start routine proper
-*     Initialise ANG_* to bad values
-
-      DO MEASUREMENT = 1, N_MEAS
-         ANG_MEAS(N_FILE, MEASUREMENT, 1) = VAL__BADR
-         ANG_MEAS(N_FILE, MEASUREMENT, 2) = VAL__BADR
-      END DO
-
-*     This will crash if SCUBA__MAX_INT is defined as the
-*     maximum number of integrations *PER* measurement
-*     rather than the total number of integrations.
-
-      DO INTEGRATION = 1, N_INT * N_MEAS
-         ANG_INT(N_FILE, INTEGRATION,1) = VAL__BADR
-         ANG_INT(N_FILE, INTEGRATION,2) = VAL__BADR
-      END DO
 
 *     Set the integration counter to zero
       NUM_INTS = 0
