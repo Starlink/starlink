@@ -140,7 +140,10 @@
 *     11-JUN-1998 (DSB):
 *        Corrected the initialisation of the edges of the first 
 *        summation box so that it works for cases where NDIM > 2.
-*     {enter_changes_here}
+*     1998 October 20 (MJC):
+*        Protect against accessing COMPRS elements with index > 2, when
+*        NDIM is <3.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_bugs_here}
@@ -262,10 +265,12 @@
       START( 2 ) = 1 - COMPRS( 2 )
       FINISH( 2 ) = 0
 
-      DO  I = 2, NDIM
-         START( I ) = 1 - COMPRS( I )
-         FINISH( I ) = 0
-      END DO
+      IF ( NDIM .GT. 2 ) THEN
+         DO I = 3, NDIM
+            START( I ) = 1
+            FINISH( I ) = COMPRS( I )
+         END DO
+      END IF
 
 *  Compute the strides.
 *  ====================
