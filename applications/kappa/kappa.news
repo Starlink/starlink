@@ -1,6 +1,6 @@
-1 KAPPA_Version_0.14-2
+1 KAPPA_Version_0.14-3
 
-   A new release of KAPPA (V0.14-2) has been made. The changes are
+   A new release of KAPPA (V0.14-3) has been made. The changes are
    described fully in sun95.14. The majority of the changes are
    again in the field of graphics and WCS handling. More
    applications have been changed to use AST/PGPLOT for these
@@ -10,7 +10,7 @@
 
 *      Scripts which make use of any of the removed or
 *      modified parameters will fail when run with KAPPA
-*      V0.14-2. Such scripts will need to be changed to
+*      V0.14-3. Such scripts will need to be changed to
 *      take account of the new features introduced in this
 *      release. Check the lists below for details.}
 
@@ -32,6 +32,9 @@
 
      - A new application SCATTER to perform simple scatter plots of the
      values in two NDFs.
+
+     - A new application COLCOMP to combine 1, 2 or 3 NDFs into a colour
+     composite image, retaining WCS information.
 
      - A new application KAPVERSION which checks the version number of the
      installed package.
