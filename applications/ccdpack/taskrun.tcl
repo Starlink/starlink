@@ -1,3 +1,9 @@
+#
+#  This script is not currently used by any of the CCDPACK code, but it
+#  should work if it is necessary to run monoliths under the control of
+#  tcl scripts.  See also tasksetup.tcl
+# 
+
    proc taskrun {app arguments {message ""} {window ""}} {
 #+
 #  Name:
