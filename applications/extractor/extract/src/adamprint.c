@@ -36,6 +36,7 @@ void adamprint( FILE *file, char *fmt, ... )
     va_start( args, fmt );
     vsprintf( string, fmtcpy, args );
     va_end( args );
+    free( fmtcpy );
     
     /* Write out the string via the message system */
     msgOut( " ", string, &status );
