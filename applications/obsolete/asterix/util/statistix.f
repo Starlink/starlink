@@ -307,7 +307,7 @@
       IF ( USEGRP ) THEN
 
 *    Map grouping array
-        CALL BDI_MAPI( IFID, 'Grouping', GPTR, STATUS )
+        CALL BDI_MAPI( IFID, 'Grouping', 'READ', GPTR, STATUS )
 
 *    Count groups
         CALL UTIL_CNTGRP( NELM, %VAL(GPTR), NGRP, STATUS )
