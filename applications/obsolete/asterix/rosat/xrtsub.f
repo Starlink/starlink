@@ -139,7 +139,7 @@
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XRTSUB  Version 1.8-2')
+      PARAMETER (VERSION = 'XRTSUB Version 2.1-0')
 *-
       CALL AST_INIT
 *

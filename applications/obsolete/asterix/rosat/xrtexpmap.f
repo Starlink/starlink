@@ -185,7 +185,7 @@ c	From INTEGER to improve exposure time evaluation
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.0-1')
+        PARAMETER 		( VERSION = 'XRTEXPMAP Version 2.1-0')
 *-
 
 *    Initialise Asterix

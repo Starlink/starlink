@@ -114,7 +114,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'XPSSCORR version 1.8-3' )
+        PARAMETER 		( VERSION = 'XPSSCORR Version 2.1-0' )
 *-
 
 *    Check status

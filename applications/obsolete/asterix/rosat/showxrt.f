@@ -40,7 +40,7 @@
         EXTERNAL CHR_LEN
 *    Local Constants :
       CHARACTER*30            VERSION
-         PARAMETER          ( VERSION = 'SHOWXRT - version 1.7-1')
+         PARAMETER          ( VERSION = 'SHOWXRT Version 2.1-0')
       INTEGER MAXRAW
          PARAMETER          ( MAXRAW = 20 )
 

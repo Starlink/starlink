@@ -229,7 +229,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'XRTHOT Version V2.0-0' )
+        PARAMETER		( VERSION = 'XRTHOT Version 2.1-0' )
 
 *  Local Variables:
       RECORD /XRT_HEAD/ 	HEAD			! ROSAT header object

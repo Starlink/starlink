@@ -33,7 +33,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'RADOPT  version 1.8-0')
+      PARAMETER (VERSION = 'RADOPT Version 2.1-0')
 *-
 
 *    Version
