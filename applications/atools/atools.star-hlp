@@ -1,3 +1,15 @@
 0 Help
  Welcome to the ATOOLS online help system.  
 
+ The applications in the ATOOLS package follow closely the routines of
+ the same names in the AST library. The AST documentation (SUN/210) is 
+ not repeated here but should be consulted when using these commands.
+ The parameters of a given ATOOLS command correspond to those of the 
+ same AST routine, so for further information on (say) the ATOOLS
+ remapframe command, see the entry for the AST_REMAPFRAME routine in 
+ SUN/210. Any differences in behaviour between the AST routine and the
+ corresponding ATOOLS command are noted in the documentation for the
+ command.
+
+ 
+
