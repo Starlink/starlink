@@ -192,7 +192,8 @@
 *        (presumably present in the unreduced data).  The mappings 
 *        between the frame in the 'AXIS' domain of the input NDFs and 
 *        their Current frames are recorded.
-*     astexp "im1,im2,im3" astfile=camera.ast baseframe=PIXEL accept
+*     astexp "im1,im2,im3" astfile=camera.ast baseframe=PIXEL 
+*            title="Focal plane alignment" accept
 *        In this case the OUTDOMAIN parameter takes its default value
 *        of 'CCD_EXPORT', but mappings are between the Current domains
 *        of the input NDFs and their 'PIXEL' domains.  This would be 
@@ -203,7 +204,8 @@
 *        parameter is allowed to assume its default value of INDEX.  
 *        When camera.ast is used for importing framset information, 
 *        the NDFs from the three different chips must be listed in the 
-*        same order as when this command was invoked.
+*        same order as when this command was invoked.  The title of the
+*        output Current frame will be as given.
 
 *  Notes:
 *     AST file format:
@@ -305,18 +307,19 @@
       PARAMETER( MXFSET = 100 )
 
 *  Local Variables:
-      CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
-      CHARACTER * ( CCD1__BLEN ) BUF ! Buffer for output
+      CHARACTER * ( 12 ) IDTYPE  ! Method of generating frameset ID value
       CHARACTER * ( AST__SZCHR ) BASEFR ! Base frame to use
       CHARACTER * ( AST__SZCHR ) DMBAS ! Domain name of AST Base frame
       CHARACTER * ( AST__SZCHR ) DMBAS1 ! Domain name of first AST Base frame
       CHARACTER * ( AST__SZCHR ) DMCUR ! Domain name of NDF Current frame
       CHARACTER * ( AST__SZCHR ) DMCUR1 ! Domain name of first NDF Current frame
-      CHARACTER * ( CCD1__BLEN ) FITSID ! FITS keyword to identify frameset
-      CHARACTER * ( 12 ) IDTYPE  ! Method of generating frameset ID value
-      CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
       CHARACTER * ( AST__SZCHR ) OUTDOM ! Name of output current domain
+      CHARACTER * ( AST__SZCHR ) OUTTIT ! Output title of frame
       CHARACTER * ( AST__SZCHR ) TITLE ! Title of frame
+      CHARACTER * ( CCD1__BLEN ) BUF ! Buffer for output
+      CHARACTER * ( CCD1__BLEN ) FITSID ! FITS keyword to identify frameset
+      CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
+      CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
       INTEGER CHEXP              ! AST pointer to export channel
       INTEGER FDAST              ! FIO file descriptor of frameset file
       INTEGER FRCUR              ! AST pointer to current frame
@@ -383,6 +386,16 @@
       CALL PAR_GET0C( 'OUTDOMAIN', OUTDOM, STATUS )
       CALL CHR_RMBLK( OUTDOM )
       CALL CHR_UCASE( OUTDOM )
+
+*  Get the Title to use for the Current frame of each frameset when 
+*  written.  If the parameter is null, set the OUTTIT string empty
+*  and a dynamic value will be written.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      CALL PAR_GET0C( 'OUTTITLE', OUTTIT, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         OUTTIT = ' '
+      END IF
 
 *  Get the type of ID value which will be used to distinguish different
 *  framesets.
@@ -534,10 +547,18 @@
          IF ( DMBAS .NE. DMBAS1 ) DIFBAS = .TRUE.
          IF ( DMCUR .NE. DMCUR1 ) DIFCUR = .TRUE.
 
-*  Tweak the Current frame before putting it in the export frameset.
+*  Change the Domain of the Current frame before putting it in the export 
+*  frameset.
          CALL AST_SETC( FRCUR, 'Domain', OUTDOM, STATUS )
-         TITLE = AST_GETC( FRCUR, 'Title', STATUS )
-         TITLE( CHR_LEN( TITLE ) + 1: ) = ' (exported)'
+
+*  Change the Title of the Current frame before putting it in the export
+*  frameset.
+         IF ( OUTTIT .EQ. ' ' ) THEN
+            TITLE = AST_GETC( FRCUR, 'Title', STATUS )
+            TITLE( CHR_LEN( TITLE ) + 1: ) = ' (exported)'
+         ELSE
+            TITLE = OUTTIT
+         END IF
          CALL AST_SETC( FRCUR, 'Title', TITLE( 1:CHR_LEN( TITLE ) ), 
      :                  STATUS )
 
