@@ -7,7 +7,7 @@
 .SUFFIXES : .ifl .ifc
 
 # Version string
-PKG_VERS = "'1.5-0JACtest'"
+PKG_VERS = "'1.6-0JACtest'"
 
 # Location of libsculib.a
 SCULIB   = ../sculib
@@ -30,10 +30,12 @@ STAR_INC = /star/include
 # Linker
 ALINK  = alink -xdbx
 LDFLAGS =  -C -g
+LDFLAGS = 
 
 # Compiler flags
 
 FFLAGS = -C -g
+FFLAGS = -fno-second-underscore -g
 FCPPFLAGS = -DPKG_VERS=$(PKG_VERS)
 FC    = f77
 COMPIFL = compifl
@@ -61,7 +63,8 @@ FSOURCES= surf_extinction.f surf_flatfield.f \
 	surf_despike.f surf_scuclip.f surf_extflat.f \
 	surf_grid_despike.f surf_scuba2mem.f surf_make_weight.f \
 	surf_grid_calcsky.f surf_reduce_noise.f surf_add_dbm.f \
-	surf_remip.f surf_request_output_coords.f
+	surf_remip.f surf_request_output_coords.f \
+	surf_scuclkerr.f
 
 FCPPSOURCES=	surf_write_map_info.F surf_set_app_name.F
 
@@ -71,7 +74,7 @@ TASKS    = \
 bolrebin calcsky  change_data change_flat change_pointing change_quality \
 despike despike2 extinction extract_data extract_flat flatfield intrebin \
 rebin reduce_switch remsky restore scucat scan_rlb scuclip scuhelp scuover \
-scuphot skydip scuba2mem scumakewt reduce_noise add_dbm remip
+scuphot skydip scuba2mem scumakewt reduce_noise add_dbm remip scuclkerr
 
 IFL =   $(TASKS:=.ifl)
 
@@ -204,4 +207,4 @@ surf_write_photom_header.o: PRM_PAR SAE_PAR SURF_PAR
 surf_add_dbm.o: SAE_PAR SURF_PAR NDF_ERR PAR_ERR DAT_PAR
 surf_remip.o: SAE_PAR PRM_PAR SURF_PAR DAT_PAR
 surf_request_output_coords.o: SAE_PAR
-
+surf_scuclkerr.o: SAE_PAR DAT_PAR SURF_PAR MSG_PAR PRM_PAR
