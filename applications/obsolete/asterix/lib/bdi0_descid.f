@@ -99,19 +99,19 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*14		CSTR			! Char version of ID
       CHARACTER*200		FILE			! File path
+      CHARACTER*15		PAR			! USI parameter
       CHARACTER*40		TYPE			! ADI class name
 
-      INTEGER			CLEN			! Lengths of string
+      INTEGER			CLEN, PLEN		! Lengths of strings
       INTEGER			FID			! File identifier
       INTEGER			TSTAT			! Temporary status
+
+      LOGICAL			THERE			! Object exists?
 *.
 
-*  Save the STATUS value and mark the error stack.
-      TSTAT = STATUS
-      CALL ERR_MARK
-      STATUS = SAI__OK
+*  New error context
+      CALL ERR_BEGIN( STATUS )
 
 *  Get the file object
       CALL ADI_GETFILE( ID, FID, STATUS )
@@ -119,29 +119,42 @@
 *  Duff identifier?
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-        CALL MSG_SETC( TOKEN, '<corrupt dataset identifier>' )
+        FILE = '<corrupt dataset identifier>'
+        CLEN = 28
 
 *  Memory based object?
       ELSE IF ( FID .EQ. ADI__NULLID ) THEN
-        CALL CHR_ITOC( ID, CSTR, CLEN )
+        CALL MSG_SETI( 'CODE', ID )
         CALL ADI_TYPE( ID, TYPE, STATUS )
-        CALL MSG_SETC( TOKEN, '<memory object, class='/
-     :            /TYPE(:CHR_LEN(TYPE))//' id='//CSTR(:CLEN)//'>' )
+        CALL MSG_SETC( 'TYP', TYPE )
+        CALL MSG_MAKE( '<memory object, class=^TYP, id=^CODE>', FILE,
+     :                 CLEN )
 
 *  Otherwise file object
       ELSE
         CALL ADI_FOBNAM( FID, FILE, CLEN, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
-          CALL MSG_SETC( TOKEN, '<illegal file identifier>' )
-        ELSE
-          CALL MSG_SETC( TOKEN, FILE(:CLEN) )
+          FILE = '<illegal file identifier>'
+          CLEN = 25
+        END IF
+
+*    Is the file linked to a USI parameter
+        CALL ADI_THERE( FID, '.USI_PAR', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CGET0C( FID, '.USI_PAR', PAR, STATUS )
+          PLEN = CHR_LEN( PAR )
+          FILE = FILE(:CLEN)//' (associated with parameter '/
+     :                /PAR(:PLEN)//')'
+          FLEN = CHR_LEN( FILE )
         END IF
 
       END IF
 
 *  Release error stack
-      STATUS = TSTAT
-      CALL ERR_RLSE
+      CALL ERR_END( STATUS )
+
+*  Set the token
+      CALL MSG_SETC( TOKEN, FILE(:CLEN) )
 
       END
