@@ -24,12 +24,12 @@ This document describes the installation and use of SCB,
 the Starlink Source Code Browser.  
 The package consists of two parts, an indexer program and an
 extractor program.
-The indexer need be run infrequently (when the source code collection
+The indexer need only be run infrequently (when the source code collection
 changes), and the extractor can be run to extract a source file
 by file- or function-name, either in plain text to the command line,
 or in HTML including hyperlinks to called routines to be viewed
 using a WWW browser.  In the latter case, the extractor program 
-should be installed as a CGI script.
+must be installed as a CGI script.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -346,7 +346,7 @@ These variables are:
 The directory containing the Starlink source code.  
 This directory must contain nothing but Starlink source packages,
 each of which must be {\em either\/} in a directory named after the package
-{\em or\/} in tar file named {\tt package.tar}, optionally compressed
+{\em or\/} in a tar file named {\tt package.tar}, optionally compressed
 using {\tt compress} or {\tt gzip} (and named with a suffix .Z or .gz 
 respectively).
 The former of these is the usual format if the sources are in
@@ -371,16 +371,16 @@ If undefined at run time and build time, SCB\_INDEXER\_TMP defaults to
 An example site installation might go as follows:
 \begin{quote}
 \begin{verbatim}
-# zcat scb.tar.Z | tar xf -
-# setenv PERL5 /usr/bin/perl
-# setenv SCB_BROWSER_TMP /scratch/scb/browser
-# setenv SCB_INDEXER_TMP /scratch/scb/indexer
-# setenv INSTALL /star
-# mk build
+% zcat scb.tar.Z | tar xf -
+% setenv PERL5 /usr/bin/perl
+% setenv SCB_BROWSER_TMP /scratch/scb/browser
+% setenv SCB_INDEXER_TMP /scratch/scb/indexer
+% setenv INSTALL /star
+% mk build
     ...
-# mk install
+% mk install
     ...
-# mk test
+% mk test
     ...
 *** Installation test for the SCB package has been run
 \end{verbatim}
@@ -389,21 +389,19 @@ An example site installation might go as follows:
 
 \subsection{\label{sec:install-cgi}Installing the CGI script}
 
-The installation program, as well as installing some of the 
-binaries into \$INSTALL{\tt /bin}, also installs the browser
-program {\tt scb.pl} itself into \$INSTALL/{\tt bin/cgi}.
-
 In order to use this package to browse source code using a
-World Wide Web browser, the browser script itself {\tt scb.pl}
+World Wide Web browser, the browser script {\tt scb.pl}
 must be installed as a CGI (Common Gateway Interface) program
 on a computer running an HTTP server.  
 For this purpose, the browser script is copied by the package
 installation process (the {\tt mk install} step) 
-into \$INSTALL{\tt /bin/cgi} as well as in \$INSTALL{\tt /bin}.
+into \$INSTALL{\tt /bin/cgi} as well as into \$INSTALL{\tt /bin}.
 
 A full discussion of the setup of CGI programs is
 beyond the scope of this document, but by way of example, 
-if the HTTP server being used is Apache, it will typically 
+if the HTTP server being used is 
+\htmladdnormallink{Apache}{http://www.apache.org/}, 
+it will typically 
 be necessary to
 add a stanza like the following to Apache's {\tt conf/access.conf} file:
 \begin{quote}
@@ -497,7 +495,7 @@ write the index files to the directory specified in SCB\_INDEX,
 and print to the screen each index entry as it is encountered.
 If the entire Starlink source code collection is installed, 
 this will take a matter of hours.  Some indication of how far the indexing
-has progressed can be seen by looking at the package currently
+has progressed can be seen by seeing which package is currently
 being indexed (the name is given before the `\#' sign on the 
 printed lines, e.g. lines which look like
 \begin{quote}
@@ -537,6 +535,23 @@ redirected elsewhere, e.g.:
 If the machine will be used by other people while the indexing 
 is running, then you should seek advice from your system manager 
 about the nice level that ought to be used.
+
+While the indexing is taking place, the index files {\it may} 
+(depending on the implementation of the database libraries on
+your system)
+be unreadable, so that the browser program ceases to work.
+To maintain the browser service during an update of the index in this
+case, it will be necessary to update a copy, and write it over the
+original when it is complete, like this:
+\begin{quote}
+\begin{verbatim}
+% setenv SCB_INDEX /usr/tmp/tmp_index
+% mkdir $SCB_INDEX
+% cp /star/etc/scb/* $SCB_INDEX
+% scbindex.pl pack1 pack2
+% cp $SCB_INDEX/* /star/etc/scb
+\end{verbatim}
+\end{quote}
 
 Occasionally some non-fatal error messages will be generated in the 
 course of the indexing, for instance:
@@ -582,7 +597,7 @@ directory, the last line above could be replaced by
 % scbindex.pl ./figaro.tar.Z
 \end{verbatim}
 \end{quote}
-Note that for this usage of {\tt scbindex.pl} at least one '/' character
+Note that for this usage of {\tt scbindex.pl} at least one `/' character
 must appear in the package name, otherwise it will be interpreted
 as a reference to the copy of the package in the SCB\_SOURCES directory.
 The personalised index files will be written in the SCB\_INDEX directory.
@@ -657,7 +672,7 @@ can be found the extractor program will look for a routine with
 the underscore appended.
 
 
-\subsubsection{{\tt package} argument}
+\subsubsection{`{\tt package}' argument}
 
 If the extractor can find a Fortran subroutine or function, 
 or a C function or macro definition with the name supplied on
@@ -666,7 +681,7 @@ However it is sometimes necessary to restrict the search
 further, since there may be more than one source file answering
 to that description.  So it is also possible to specify the
 package in which you expect to find the file or routine. 
-For instance, there is a routine called `{\tt help.f}' in
+For instance, there is one file called `{\tt help.f}' in
 package HLP and another in POLMAP.  
 To ensure that you get the one in HLP, specify it on the 
 command line using the `{\tt package=}' argument:
@@ -695,14 +710,22 @@ will give the same result, which is one or other of the {\tt help.f}
 files from either POLMAP or HLP (picked more or less at random).
 
 The `{\tt package=}' part may be omitted, so that 
+\begin{quote}
+\begin{verbatim}
 `{\tt scb.pl help.f hlp}'
+\end{verbatim}
+\end{quote}
 is equivalent to 
+\begin{quote}
+\begin{verbatim}
 `{\tt scb.pl help.f package=hlp}'.
+\end{verbatim}
+\end{quote}
 
 
-\subsubsection{{\tt type} argument, and pattern matching}
+\subsubsection{`{\tt type}' argument, and pattern matching}
 
-Finally, it is possible to specify whether the requested search
+It is also possible to specify whether the requested search
 term is a routine/function or a file, by specifying `{\tt type=func}'
 or `{\tt type=file}' respectively on the command line.  This is not
 normally necessary, since the names of functions rarely clash with
@@ -742,11 +765,24 @@ fit_mgauss_              => twodspec#twodspec_opt.tar>opt/fit_mgauss.f
 \end{quote}
 
 
-\subsubsection{Producing HTML from the command line}
+\subsubsection{Command line flags}
 
+There are two command line flags which can be supplied to {\tt scb.pl}.
+Neither is required very often, but they are documented here for completeness.
+\begin{itemize}
+\item {\bf -html}
 If the `{\tt -html}' flag is included on the command line, 
 then HTML is written, in the same way as if the extractor were
-being invoked as a CGI script.  This is not particularly useful.
+being invoked as a CGI script.  This is not particularly useful,
+except for debugging purposes.
+\item {\bf -exact}
+Normally the extractor program, if it fails to find the file or
+function exactly as specified, tries a few variations like appending
+underscores or folding the case of the given argument.
+If the {\tt -exact} flag is given then these variations are not attempted.
+\end{itemize}
+
+
 
 
 \subsection{Browsing using HTML}
@@ -755,7 +791,7 @@ If the extractor program {\tt scb.pl} has been installed
 as a CGI program as described in section \ref{sec:install-cgi}
 then the Starlink source code can be viewed as a set of 
 hypertext pages hyperlinked together 
-where there are function or subroutine calls or include files.
+at function/subroutine calls or include files.
 It should be fairly intuitive how to use the pages generated,
 so the following discussion does not give exact instructions
 but clears up a few points.
@@ -764,11 +800,15 @@ The best way to see how it works is to play around with it.
 The URL of the source code browser will depend on exactly how
 the installation has been performed, but it will look something
 like {\tt http://host.domain/cgi-bin/star/scb.pl}.
-By pointing your web browser to the right address, you should
-see a form with the following parts:
+
+
+\subsubsection{Locating a source file}
+
+The top level page of the source code browser is a form
+with the following parts:
 \begin{itemize}
 \item {\bf Name of item}:
-The name of the file or function/subroutine to locate.
+The name of the file or function/subroutine to locate, or the search term.
 \item {\bf Type of item}:
 How to interpret the ``Name of item'' box.  Select one of:
 \begin{itemize}
@@ -778,20 +818,22 @@ How to interpret the ``Name of item'' box.  Select one of:
    For C use the name of the function exactly as it occurs in the source code.
    For Fortran, use the routine's name in lower case with an 
    underscore appended;
-   However, if the underscore is omitted the browser will still probably 
+   however, if the case is wrong or the underscore is omitted the 
+   browser will still probably 
    find the right routine.
    \item {\bf File}:
    The item is a filename.  This is case sensitive.
    \item {\bf Either}:
-   The browser will look for either a routine or a file which matches
-   the item name given.
+   The browser will try both of the above options (File and Routine).
    \item {\bf Search term}:
    The item name is a Perl 5 regular expression, interpreted case-insensitively;
    The browser will present a list of all the routines or filenames 
    which match it.
    For most practical purposes, Perl regular expressions are a superset
-   of ordinary regular expressions, so the can be treated like the 
+   of ordinary regular expressions, so they can be treated like the 
    argument of a `{\tt grep -i}' command.
+   A case sensitive search can be achieved by prepending `(?-i)' to the
+   regular expression; however this requires Perl 5.005.
 \end{itemize}
 \item {\bf Name of package (optional)}:
 If one of the listed packages is selected, it serves
@@ -803,6 +845,80 @@ then any such item in the whole source tree will be presented.
 In particular, this means that even when one package is specified here,
 a routine from another package may be presented.
 \end{itemize}
+
+Instead of entering the name of the file or routine you wish to
+see, you can browse the contents of a given package.
+Below the form is a list of links to all the available packages.
+Following one of these links (or equivalently selecting the package
+name in the `Name of package' box without filling in the `Name of item'
+field) will take you to a page giving more information about the 
+package requested.
+This will contain the same form at the top, 
+but below it are links to files from the package grouped by category:
+\begin{itemize}
+\item {\bf Files}:
+Links to every file in the package.
+\item {\bf Routines}:
+Links to every C and Fortran function and subroutine definition 
+identified in the source files.
+\item {\bf Starlink documents}:
+Links to any SUNs and SSNs which form part of the package
+(although not necessarily all those {\it relevant\/} to the package).
+\item {\bf Tasks}:
+Links to `tasks' in the package.
+This is rather loosely defined, but it is intended to be
+the names of commands which can be invoked from the Unix shell or ICL.
+Because the way these are identified is rather ad hoc,
+the list may be incomplete and/or contain spurious entries.
+\end{itemize}
+Sometimes the `Files' or `Routines' heading is a hyperlink to 
+the actual lists of links, rather than having the list on the page.
+
+Following any of the listed links 
+will take you to one of the files in the package.
+
+\subsubsection{Viewing a source file}
+
+A file from a package is normally presented as text in the browser.
+If it is C or Fortran source code, then each called function or
+subroutine should be a hyperlink to the appropriate definition.
+Similarly, included files (Fortran {\tt INCLUDE} or C {\tt \#include}) 
+are hyperlinked to the right place.
+If any part of the source text is in bold face,
+this indicates that it ought to be a link,
+but that the routine or file in question cannot be found. 
+This can happen because the program has misinterpreted the source code,
+or the index is out of date, or for other reasons.
+The program tries to link to the correct place, 
+but cannot guarantee to do so; for instance if there are two 
+routines with the same name in different packages outside the
+package containing the current file, the link might point to
+the wrong one.
+Most types of file other than C or Fortran source are 
+simply presented as plain text, although some types
+(e.g.\ postscript)
+will be presented using a viewer appropriate to the type.
+
+The title of the HTML document
+(normally displayed in the title bar of your browser)
+is the location of the file in 
+the source tree.  The notation is quite easy to understand: 
+it's like a Unix pathname except that
+a `\#' sign denotes inclusion in a package, 
+and a 
+`\latex{$}>\latex{$}'
+sign denotes inclusion in a tar file.
+So for instance the location
+\begin{quote}
+\begin{verbatim}
+figaro#figaro_dsa.tar>dsa/dsa_dat_sz.f
+\end{verbatim}
+\end{quote}
+means that the file is part of the package FIGARO,
+is contained in the tar archive {\tt figaro\_dsa.tar}, and
+within that archive is called {\tt dsa/dsa\_dat\_sz.f}.
+
+At the bottom of each file is a copyright notice.
 
 
 
