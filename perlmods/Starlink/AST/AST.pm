@@ -378,6 +378,9 @@ use base qw/ AstMappingPtr /;
 package AstFrameSetPtr;
 use base qw/ AstFramePtr /;
 
+package AstPlotPtr;
+use base qw/ AstFrameSetPtr /;
+
 package AstCmpFramePtr;
 use base qw/ AstFramePtr /;
 

@@ -13,6 +13,7 @@ AstLutMap *	T_PTROBJ
 const char *	T_PV
 AstMathMap *	T_PTROBJ
 AstMatrixMap *	T_PTROBJ
+AstPlot *	T_PTROBJ
 AstPcdMap *	T_PTROBJ
 AstPermMap *	T_PTROBJ
 AstPolyMap *	T_PTROBJ

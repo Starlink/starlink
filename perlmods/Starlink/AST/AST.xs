@@ -650,6 +650,32 @@ new( class, nin, nout, matrix, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Plot
+
+AstPlot *
+new( class, frame, graphbox, basebox, options )
+  char * class
+  AstFrame * frame
+  AV* graphbox
+  AV* basebox
+  char * options
+ PREINIT:
+  int len;
+  float * cgraphbox;
+  double * cbasebox;
+ CODE:
+  len = av_len( graphbox ) + 1;
+  if ( len != 4 ) Perl_croak(aTHX_ "GraphBox must contain 4 values" );
+  len = av_len( basebox ) + 1;
+  if ( len != 4 ) Perl_croak(aTHX_ "BaseBox must contain 4 values" );
+  cbasebox = pack1D( newRV_noinc((SV*)basebox), 'd');
+  cgraphbox = pack1D( newRV_noinc((SV*)graphbox), 'f');
+  ASTCALL(
+    RETVAL = astPlot( frame, cgraphbox, cbasebox, options );
+  )
+ OUTPUT:
+  RETVAL
+
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::PcdMap
 
 AstPcdMap *
@@ -1780,6 +1806,15 @@ astSpecAdd( this, cvt, args )
   ASTCALL(
    astSpecAdd( this, cvt, cargs );
   )
+
+MODULE = Starlink::AST   PACKAGE = AstPlotPtr  PREFIX = ast
+
+void
+astGrid( this )
+  AstPlot * this
+ CODE:
+  astGrid( this );
+
 
 # Constants
 
