@@ -1920,13 +1920,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyleProfile.java:59: warning - Tag @link: can't find getStyleCount in uk.ac.starlink.topcat.plot.MarkStyleProfile
   [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyleProfile.java:59: warning - Tag @link: can't find getStyleCount in uk.ac.starlink.topcat.plot.MarkStyleProfile
   [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyleProfile.java:59: warning - Tag @link: can't find getStyleCount in uk.ac.starlink.topcat.plot.MarkStyleProfile
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:25: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:25: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:25: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:47: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:47: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:47: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:47: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:26: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:26: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:26: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:49: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:49: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:49: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PointRegistry.java:49: warning - Tag @link: can't find getPoints in uk.ac.starlink.topcat.plot.PointRegistry
   [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
   [javadoc] 11 warnings
      [echo] Executing Treeview target: javadocs
@@ -2783,4 +2783,4 @@ javadocs:
   [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 13 seconds
+Total time: 3 minutes 12 seconds

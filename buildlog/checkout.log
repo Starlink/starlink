@@ -9005,6 +9005,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterEditor.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterPanel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/TupleSelector.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/plot
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/BlobPanel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/DumbPlotSurface.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyle.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyleProfile.java
@@ -9049,6 +9050,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_n_pad.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/arrow_s_pad.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blob2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/colmeta0.gif

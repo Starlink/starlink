@@ -2150,7 +2150,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -2218,8 +2217,8 @@ dist:
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 184 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 75 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 185 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 76 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -2349,4 +2348,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 22 seconds
+Total time: 5 minutes 11 seconds
