@@ -43,13 +43,29 @@
 
 $ident_string = "Starlink SGML system, release ((PKG_VERS))";
 
-($#ARGV eq 0) || Usage ();
-
-$infile = $ARGV[0];
-($filenameroot = $infile) =~ s/\..*$//;
-
+# Defaults
 $imgformat = 'png';
 $eqcount = '001';
+
+while ($#ARGV >= 0) {
+    if ($ARGV[0] eq '--imgformat') {
+	shift;
+	$#ARGV >= 0 || Usage ();
+	$imgformat = $ARGV[0];
+    } elsif ($ARGV[0] =~ /^-/) {
+	Usage ();
+    } elsif (defined ($infile)) {
+	Usage ();
+	last;
+    } else {
+	$infile = $ARGV[0];
+    }
+    shift;
+}
+
+defined ($infile) || Usage();
+
+($filenameroot = $infile) =~ s/\..*$//;
 
 %eqtypes = ( 'start-inline' => '$',
 	     'end-inline' => '$\special{dvi2bitmap crop all 0}',
@@ -147,7 +163,7 @@ exit 0;
 
 
 sub Usage {
-    die "$ident_string\nUsage: $0 filename\n";
+    die "$ident_string\nUsage: $0 [--imgformat fmt] filename\n";
 }
 
 # Provide a simple checksum with a decent hash length.
