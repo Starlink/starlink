@@ -31,14 +31,14 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*     PDRAPER: Peter W. Draper (STARLINK, Durham University)
+*     PWD: Peter W. Draper (STARLINK, Durham University)
 *     {enter_new_authors_here}
 
 *  Copyright:
 *     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 *  History:
-*     15-NOV-1997 (PDRAPER):
+*     15-NOV-1997 (PWD):
 *        Original version.
 *     {enter_further_changes_here}
 
@@ -84,7 +84,7 @@
       IF ( AST_ISAFRAME( IWCS, STATUS ) ) THEN
 
 *  Create a FITS channel to use when writing the object out.
-         CHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 'Encoding=Native',
+         CHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 'Encoding=Native', 
      :                        STATUS )
 
 *  And write out the FrameSet to the channel.
@@ -95,7 +95,7 @@
  1       CONTINUE
          IF ( AST_FINDFITS( CHAN, '%f', CARD, .TRUE., STATUS ) ) THEN
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL RTD1_WRCRD( CARD, IPHEAD, NHEAD, AVAIL, STATUS)
+               CALL RTD1_WRCRD( CARD, IPHEAD, NHEAD, AVAIL, STATUS )
                GO TO 1
             END IF
          END IF
