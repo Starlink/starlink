@@ -225,5 +225,6 @@ wcscopy        hlp = doc$wcscopy.hlp
 wcsframe        hlp = doc$wcsframe.hlp
 wcsremove        hlp = doc$wcsremove.hlp
 wcsshow        hlp = doc$wcsshow.hlp
+wcstran        hlp = doc$wcstran.hlp
 wiener        hlp = doc$wiener.hlp
 zaplin        hlp = doc$zaplin.hlp
