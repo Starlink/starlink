@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = hds_link hds_link_adam
-noinst_PROGRAMS = hds_machine dat_par_h
+noinst_PROGRAMS = hds_machine dat_par_h dat_par_f
 starhelp_DATA = hds_machine.txt
 
 lib_LTLIBRARIES = libhds.la
@@ -20,6 +20,7 @@ hds_machine_SOURCES = hds_machine.f
 hds_machine_LDADD = libhds.la `ems_link` `chr_link` `cnf_link`
 
 dat_par_h_SOURCES = dat_par_h.c
+dat_par_f_SOURCES = dat_par_f.c
 
 hds_test_SOURCES = hds_test.f
 hds_test_LDADD = libhds.la `ems_link` `chr_link`
@@ -102,9 +103,12 @@ C_ROUTINES = \
 dat_par.h: dat_par_h
 	./dat_par_h >dat_par.h
 
+DAT_PAR: dat_par_f
+	./dat_par_f > DAT_PAR
+
 hds_machine.txt: hds_machine
 	echo "Machine characteristics, as determined by HDS" >$@
 	echo "" >>$@
 	./hds_machine >>$@
 
-BUILT_SOURCES = DAT_ERR dat_err.h dat_par.h CMP_ERR
+BUILT_SOURCES = DAT_ERR dat_err.h dat_par.h DAT_PAR CMP_ERR
