@@ -73,18 +73,41 @@ my $verbose = 0;
 # Useful values
 my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 
+# Extract objects from the NDF file $ndfname, using $tempdir as a
+# path for temporary files, and returning a maximum of $maxobj
+# objects.
+#
+# opts is a reference to a hash containing entries {maxobj}, the
+# maximum number of objects to return (default 100); {filterdefects}
+# which, if present (value ignored) indicates that objects which
+# appear to be CCD defects should be removed (see notes below for the
+# algorithm).
+#
+# Return a (reference to) hash containing: {filename}, filename of the
+# resulting catalogue; {numobj}, the number of objects matched;
+# {poserr}, std.dev. of the positions, in pixels; and {objsize},
+# the size scale of the objects, in pixels.
+#
+# The file which is returned should have the format
+#
+#    int-id, X, Y, int-id, flux, `magnitude'.
+#
+# This is general, but specifically it's in a format which is
+# acceptable to FINDOFF (though that's not the only application
+# which can be used to process it).  The `magnitude' column isn't
+# actually magnitude (which Extractor can't return); however, we
+# wish to be able to use the `match' plug-in easily, which needs a
+# flux column which is ordered like magnitudes: 1/flux would do,
+# but 25-log10(flux) is more `magnitudish', so probably safer in
+# the long term.
+#
+# On error, return undef.
 sub extract_objects ($$$$) {
-    my ($helpers, $ndfname, $maxobj, $tempdir) = @_;
-    # Extract objects from the NDF file $ndfname, using $tempdir as a
-    # path for temporary files, and returning a maximum of $maxobj
-    # objects.
-    #
-    # Return a (reference to) hash containing: {filename}, filename of the
-    # resulting catalogue; {numobj}, the number of objects matched;
-    # {poserr}, std.dev. of the positions, in pixels; and {objsize},
-    # the size scale of the objects, in pixels.  The file which is
-    # returned should be suitable for input to FINDOFF.  On error,
-    # return undef.
+    my ($helpers, $ndfname, $opts, $tempdir) = @_;
+
+    my $maxobj = $opts->{maxobj};
+    defined($maxobj) || ($maxobj = 100);
+    my $filterdefects = $opts->{filterdefects}; # may be undefined
 
     my %rethash = ();
 
@@ -110,14 +133,6 @@ sub extract_objects ($$$$) {
     $status == &Starlink::ADAM::DTASK__ACTCOMPLETE
       || confess "Error running extractor";
 
-    # Now convert the output to a form suitable for input to
-    # FINDOFF. That means that the first three columns should be
-    # `integer-identifier X Y'.  Columns:
-    #
-    #    int-id, X, Y, int-id, flux
-    #
-    # Columns after the first three are ignored by FINDOFF, but
-    # propagated to the output.  Flux column is mostly for debugging.
     # Sort these by column 8, FLUX_MAX, and output at most $maxobj objects.
     open (CAT, $tcat) || return undef;
     my %cathash = ( );
@@ -134,17 +149,20 @@ sub extract_objects ($$$$) {
     }
     # Now $line contains the first non-header line
     my $NUMBERcol = $colkey{NUMBER} - 1;
-    my $FLUXcol = $colkey{FLUX_MAX} - 1;
+    my $FLUXcol = $colkey{FLUX_ISO} - 1; # better than FLUX_MAX, since
+                                         # it ignores spikes
     my $Xcol = $colkey{X_IMAGE} - 1;
     my $Ycol = $colkey{Y_IMAGE} - 1;
     my $Acol = $colkey{A_IMAGE} - 1;
     my $Bcol = $colkey{B_IMAGE} - 1;
     my $ERRX2col = $colkey{ERRX2_IMAGE} - 1;
     my $ERRY2col = $colkey{ERRY2_IMAGE} - 1;
+    my $AREAcol = $colkey{ISOAREA_IMAGE} - 1;
     (defined($NUMBERcol) && defined($FLUXcol)
      && defined($Xcol) && defined($Ycol)
      && defined($Acol) && defined($Bcol)
-     && defined($ERRX2col) && defined($ERRY2col))
+     && defined($ERRX2col) && defined($ERRY2col)
+     && defined($AREAcol))
       || wmessage ('fatal', "EXTRACTOR output $tcat malformed!");
     my $nobj = 0;
     my $objrad = 0.0;
@@ -153,9 +171,15 @@ sub extract_objects ($$$$) {
 	chomp $line;
 	next if ($line !~ /^ *[0-9]/);
 	my @l = split (' ', $line);
-	$cathash{$l[$FLUXcol]} = sprintf ("%5d %12.3f %12.3f %5d %12.1f",
-					  $l[$NUMBERcol], $l[$Xcol], $l[$Ycol],
-					  $l[$NUMBERcol], $l[$FLUXcol]);
+	# Don't use just $l[$FLUXcol] as a key, since that might not
+	# be unique, and in any case hash keys are supposed to be strings.
+	my $catkey = sprintf ("%015.3fi%04d", $l[$FLUXcol], $nobj);
+	$cathash{$catkey} = \@l;
+#	$cathash{$l[$FLUXcol]} =
+#	  sprintf ("%5d %12.3f %12.3f %5d %12.1f %12.5g",
+#		   $l[$NUMBERcol], $l[$Xcol], $l[$Ycol],
+#		   $l[$NUMBERcol], $l[$FLUXcol],
+#		   25.0-log($l[$FLUXcol])/2.30);
 	$nobj++;
 	# Calculate some statistics for the detected objects.  We
 	# don't have to worry too much about the details here -- the
@@ -177,27 +201,69 @@ sub extract_objects ($$$$) {
     while (defined($line = <CAT>));
     close (CAT);
 
-    my @sortcat = sort {$b <=> $a} keys(%cathash);
+    open (NEWCAT, ">$catname") || return undef;
+    print NEWCAT "# Extractor catalogue, munged by $0\n";
+    print NEWCAT "# Input NDF: $ndfname\n";
+    print NEWCAT "# Extractor temp output: $tcat\n";
+
+    # Sort in reverse alphabetic order (ie, descending order of flux)
+    my @sortcat = sort {$b cmp $a} keys(%cathash);
+    #my @sortcat = sort {$b <=> $a} keys(%cathash);
+
+    my $cutoffarea = 0;		# zero: no cutoff by default
+    my $cutoffellip = 1000;	# large number: no cutoff by default
+    if (defined($filterdefects)) {
+	# Cut out CCD blemishes.  Some of the `objects' detected by
+	# EXTRACTOR are in fact CCD defects, or readout errors, or the
+	# like.  These are very bright, so they can confuse a matching
+	# program which examines only or preferentially the brightest
+	# objects.  However these are either very small or, if they're
+	# defects such as a line, extremely elliptical, with
+	# A/B=10+. Examining the list of detections with the test
+	# image r106282xx, all the defects which had an area of more
+	# than 100 pixels also had an `ellipticity' A/B of more than
+	# 3.5.  I think that the 100-pixel threshold will be
+	# independent of the size of the CCD, so it can be hard-wired
+	# into this routine.
+
+	# Cut off very small objects.  We're doing this to remove CCD
+	# flaws which are often bright `objects', but only ten or twenty
+	# pixels in area, whereas the largest objects are thousands.
+	$cutoffarea = 100;
+	$cutoffellip = 3.5;
+	printf NEWCAT ("# Filtered at area %f, ellipticity %f\n",
+		       $cutoffarea, $cutoffellip);
+    }
 
     $rethash{filename} = $catname;
     $rethash{numobj} = $nobj;
     $rethash{poserr} = $objposerr/$nobj;
     $rethash{objsize} = $objrad/$nobj;
 
-    open (CAT, ">$catname") || return undef;
-    print CAT "# SExtractor catalogue, munged by $0\n";
+    print NEWCAT "# Columns are id, x, y, id, flux, pseudo-mag\n";
     foreach my $k (keys (%rethash)) {
-	print CAT "## $k ", $rethash{$k}, "\n";
+	print NEWCAT "## $k ", $rethash{$k}, "\n";
     }
     while ($maxobj > 0 && $#sortcat >= 0) {
-	#print CAT "# $maxobj  $sortcat[0]\n";
-	print CAT $cathash{$sortcat[0]}, "\n";
-	$maxobj--;
+	my $l = $cathash{$sortcat[0]};
+	if ($l->[$AREAcol] >= $cutoffarea
+	    && ($l->[$Acol]/$l->[$Bcol] < $cutoffellip)) {
+	    printf NEWCAT ("%5d %12.3f %12.3f %5d %12.1f %12.5g %12.5g\n",
+			   $l->[$NUMBERcol], $l->[$Xcol], $l->[$Ycol],
+			   $l->[$NUMBERcol], $l->[$FLUXcol],
+			   25.0-log($l->[$FLUXcol])/2.30,
+			   $l->[$AREAcol]);
+	    $maxobj--;
+	} else {
+	    printf NEWCAT ("# Deleted object %d, area %f (min %f), ellipticity %f (max %f)\n",
+			   $l->[$NUMBERcol],
+			   $l->[$AREAcol], $cutoffarea,
+			   $l->[$Acol]/$l->[$Bcol], $cutoffellip);
+	}
 	shift (@sortcat);
     }
-    close (CAT);
+    close (NEWCAT);
 
-    #return $catname;
     return \%rethash;
 }
 
@@ -642,9 +708,6 @@ sub get_catalogue ($\%$$) {
     # Pass the WCS information to moggy, declaring that future points
     # will be specified in the GRID domain (that domain in which the
     # first pixel is centred at coordinate (1,1)).
-
-    # XXX do everything in the GRID domain, not pixel
-    #$cat->astinformation ('pixel', @{$NDFinforef->{wcs}});
     $cat->astinformation ('grid', @{$NDFinforef->{wcs}});
 
     # Determine the bounds of the image, and make a query of all the
@@ -735,16 +798,17 @@ sub match_positions ($$$$$) {
     my $ccdpack = shift;	# CCDPack monolith
     my $cat1 = shift;		# First position list
     my $cat2 = shift;		# Second position list
-    my $foffopts = shift;	# Reference to hash of findoff options
-                                # (may include {error}, {maxdisp},
-                                # {complete}, {minsep})
+    my $matchopts = shift;	# Reference to hash of findoff options
+                                # (may include {poserr}, {objsize}, {area}.
     my $tempfn = shift;		# Temporary filename prefix
 
 
     my $cat1out = "$tempfn-cat1.out";
     my $cat2out = "$tempfn-cat2.out";
+    my $myname = 'match_positions_findoff';
     if ($noregenerate && -e $cat1out && -e $cat2out) {
-	print STDERR "Reusing $cat1out and $cat2out...\n"
+	printf STDERR ("%s: Reusing %s and %s...\n",
+		       $myname, $cat1out, $cat2out);
 	  if $verbose;
 	return ($cat1out, $cat2out);
     }
@@ -773,15 +837,6 @@ sub match_positions ($$$$$) {
     push (@tempfiles, $cat2out);
 
 
-    # Notes:
-    #   ndfnames is false, so restrict and usewcs are ignored.
-    #   error=1 is the default.
-    #   if minsep is unspecified, set it to be 5*error (this is the 
-    #        FINDOFF default, but it appears to be affected by the state of
-    #        the ADAM graphics database).
-    #   usecomp is false: since I'm comparing only two images, this has no
-    #        effect anyway.
-
     # Construct FINDOFF argument list
     # Input and output filenames
     my $findoffarg = "inlist=^$findoffinfile outlist=^$findoffoutfile";
@@ -789,37 +844,47 @@ sub match_positions ($$$$$) {
     $findoffarg .= " ndfnames=false";
     # Log to file
     $findoffarg .= " logto=logfile logfile=$tempfn-findofflog";
-    # error=1 is the default, but is a bit parsimonious.  If $foffopts
+    # error=1 is the default, but is a bit parsimonious.  If $matchopts
     # doesn't have an error entry, then pick 5 as a reasonable guess.
     # I'm not sure how reasonable that is, however, especially since a
     # wrongish image scale seems to throw this off badly.  If we have
     # enough points, then a figure more like 20 seems to be more
     # robust.  However, since this depends significantly on the plate
     # scale, this is just guessing.
-    my $fofferr = (defined($foffopts->{error}) ? $foffopts->{error} : 20);
-    $findoffarg .= " error=$fofferr";
-    # It's best to specify minsep explicitly, rather than relying on
-    # the dynamic default.
-    $findoffarg .= " minsep=".(defined($foffopts->{minsep})
-			       ? $foffopts->{minsep}
-			       : 5*$fofferr);
+    my $fofferr = (defined($matchopts->{poserr})
+		   ? 15*$matchopts->{poserr}
+		   : 20);
+    my $foffminsep = (defined($matchopts->{objsize})
+		      ? 10*$matchopts->{objsize}
+		      : 5*$fofferr);
+    if ($foffminsep < 5*$fofferr) {
+	printf STDERR ("%s: Adjusting foffminsep %f->%f\n",
+		       $myname, $foffminsep, 5*$fofferr);
+	$foffminsep = 5*$fofferr;
+    }
+    # The default value of error is 1, but this is generally too
+    # small.  It's best to specify minsep explicitly, rather than
+    # relying on the dynamic default (5*errro), since that can be
+    # affected by the contents of the ADAM graphics database, which
+    # might have been set by some intermediate by-hand run of FINDOFF.
+    $findoffarg .= " error=$fofferr minsep=$foffminsep";
 
 
     # Other options
-    $findoffarg .= " fast=true failsafe=true";
-    # Take maxdisp, complete and usecomp (latter two rarely used, I'd
-    # think) from $foffopts if present.
-    $findoffarg .= " maxdisp=".$foffopts->{maxdisp}
-      if defined($foffopts->{maxdisp});
-    $findoffarg .= " complete=".$foffopts->{complete}
-      if defined($foffopts->{complete});
-    $findoffarg .= " usecomp=".$foffopts->{usecomp}
-      if defined($foffopts->{usecomp});
+    $findoffarg .= ' fast=true failsafe=true';
+    # Take maxdisp from the {area} argument, if present
+    # think) from $matchopts if present.
+    $findoffarg .= ' maxdisp='.sqrt($matchopts->{area})
+      if defined($matchopts->{area});
+    # Allow a low (ie, very tolerant) completeness.  Default is 0.5
+    $findoffarg .= ' complete=0.2';
+    # No need to weight by completeness (usecomp=true): since we're
+    # comparing only two images, the value of usecomp is ignored.
     $findoffarg .= ' accept';	# safety net: accept default for any
                                 # unspecified parameters
 
     if ($verbose) {
-	print STDERR "Calling findoff\n";
+	print STDERR "$myname: Calling findoff...\n";
 	foreach my $e (split(' ',$findoffarg)) {
 	    print STDERR "\t$e\n";
 	}
@@ -828,10 +893,6 @@ sub match_positions ($$$$$) {
     $ccdpack->contact()
       || confess "Ooops, can't contact the CCDPACK monolith\n";
     my $status = $ccdpack->obeyw ("findoff", $findoffarg);
-
-    # XXX distinguish the case where FINDOFF crashes somehow, from the
-    # case where it fails to find matches, and DO NOT croak in the
-    # latter case, but merely return some error.
 
     # If the status returned here is
     # &Starlink::ADAM::DTASK__ACTCOMPLETE, then the match worked, and
@@ -859,8 +920,8 @@ sub match_positions ($$$$$) {
 #
 # Return a (reference to an) anonymous hash containing keys {filename}
 # (the name of the generated ASTROM input file), {nmatches} (the
-# number of matches found), {quality} (see below) and {findofferror}
-# (a suggested value of the FINDOFF error parameter).
+# number of matches found) and {samplesd} (s.d. of residuals from the
+# matching).
 #
 # The input files are the FINDOFF output files corresponding to the
 # SExtractor and catalogue-query input files.  These have the formats:
@@ -875,26 +936,9 @@ sub match_positions ($$$$$) {
 #
 # for each of the pairs for which lineid1=lineid2.
 #
-# The return value {quality} is a code indicating the quality of the
-# match.  This is an integer ranging from -3 to +3, with
-#
-#   code   FINDOFF:error 
-#    +3     far too high    implausibly good match 
-#    +2      a bit high     dubious
-#    +1    marginally high
-#    -1    marginally low
-#    -2      a bit low      ...or the positions flatly don't match
-#    -3     far too low     either the positions don't match,
-#                           or else FINDOFF:error is way too low
-#
-# Codes +1 and -1 are `good' matches, but splitting them this way
-# allows us to do some CRUDE maximum-likelihood estimation on the
-# results of this step.
-#
 # Single argument is a reference to a hash, containing keys:
 #    CCDin          : SExtractor output file -- CCD positions
 #    catalogue      : The catalogue of known positions
-#    findofferror   : The size of the error parameter used for FINDOFF 
 #    helpers        : Helper applications (ref to hash)
 #    NDFinfo        : NDF information (ref to hash)
 #    tempfn         : Prefix for temporary filenames
@@ -903,14 +947,11 @@ sub match_positions ($$$$$) {
 #		      if none available (ie, first time) (ref to hash).
 #    maxnterms	    : Maximum number of fit terms to try.
 #		      6=fit posn, 7=q, 8=centre, 9=q&centre (default 6).
-#    findoffboxprop : Proportion of points assumed to lie in the FINDOFF
-#		      error box (default 0.5).
 #
 sub generate_astrom ($) {
     my $par = shift;
 
-    foreach my $k ('CCDin', 'catalogue', 'findofferror', 'helpers',
-		   'NDFinfo', 'tempfn') {
+    foreach my $k ('CCDin', 'catalogue', 'helpers', 'NDFinfo', 'tempfn') {
 	defined($par->{$k})
 	  || confess "bad call to generate_astrom: parameter $k not specified\n";
     }
@@ -1024,156 +1065,10 @@ sub generate_astrom ($) {
 		   $xoffset, $yoffset, $statM, $samplesd)
       if $verbose;
 
-#     #+ How good a match is this?
-#     #
-#     # The quantities $S^2_x=M_x/(n-1)$ and $S^2_y=M_y/(n-1)$ are the sample
-#     # variances of the $x$ and $y$ variables.  The variables
-#     # $M_x/\sigma^2$ and $M_y/\sigma^2$ each have a $\chi^2$
-#     # distribution with $n-1$ degrees of freedom, and hence
-#     # $M/\sigma^2$ has a $\chi^2$ distribution with $2(n-1)$ d.o.f.
-#     #
-#     # %Let us take the mean offset (|$xoffset,$yoffset|) as exact and
-#     # %examine the residuals (|$xoffs[]-$xoffset|) and
-#     # %(|$yoffs[]-$yoffset|).  We don't really know the distribution of
-#     # %the errors in $x$ and $y$, but we can guess it might be normal
-#     # %($N(0,\sigma)$).  That means that the variable
-#     # %$Z_i=(x_i^2+y_i^2)/\sigma^2$ has a $\chi^2$ distribution with two
-#     # %degrees of freedom.  This means in turn that the statistic
-#     # %$M=\sum^n Z_i$ also has a $\chi^2$ distribution, but with $2n$
-#     # %degrees of freedom.
-#     #
-#     # We don't know what the $x$ and $y$ standard deviations are,
-#     # other than that we suppose them to be equal, but we can estimate
-#     # them by supposing that the FINDOFF error box contains some
-#     # fraction $p_e$ of the points (take this box to be of side $2e$,
-#     # where $e$ is the ERROR parameter for FINDOFF, passed as argument
-#     # findofferr).  We have $p_e = Prob(|x|<e \& |y|<e)$, or
-#     # $p_e=(P(e/\sigma)-P(-e/\sigma))^2 = [2P(e/\sigma)-1]^2$, where
-#     # $P(x)$ is the cumulative probability distribution for the
-#     # standard Normal distribution.  Thus $P(e/\sigma)=(\sqrt{p_e}+1)/2$, and
-#     # \begin{center}
-#     # \catcode`\|=12
-#     # \begin{tabular}{r|ccccccc}
-#     # $p_e$      & 0.5  & 0.6  & 0.7  & 0.8  & 0.9  & 0.95 & 0.99 \\
-#     # \hline
-#     # $e/\sigma$ & 1.06 & 1.21 & 1.39 & 1.62 & 1.95 & 2.23 & 2.81 \\
-#     # \end{tabular}\end{center}
-#     # We can also calculate this on the fly, using subroutine invP:
-#     # $e/\sigma=\mbox{\texttt{invP}}(p_e)$
-#     #
-#     # That is, the analysis below checks the hypothesis that the values
-#     # of $p_e$, $e$ and $\sigma$ are consistent.  We choose $p_e$, and 
-#     # hence, from the above calculation, implicitly choose
-#     # $e/\sigma$, so it's really testing whether the selected
-#     # value of $e$ is appropriate.
-#     #
-#     # In principle we should also worry about the errors in the
-#     # offset, but these are down on $\sigma$ by a factor of $n$ or so,
-#     # so as long as we have more than about three matches, we can
-#     # ignore them.
-#     #
-#     # Do note, however, that all this is not really worth sweating
-#     # about, since the point of this program is that we have unknown
-#     # systematic errors in the CCD positions, which it is this
-#     # program's task to find out.  However, this is about the only way
-#     # we have of dynamically adjusting FINDOFF's `error' parameter, so
-#     # it is worth trying to do \emph{something} sensible.
-#     #
-#     #-
-# #    my $statM = 0;
-# #    for ($i=0; $i<$nmatches; $i++) {
-# #	my $xo = $xoffs[$i]-$xoffset;
-# #	my $yo = $yoffs[$i]-$yoffset;
-# #	$statM += ($xo*$xo + $yo*$yo);
-# #	printf STDERR "  (%9.5f, %9.5f) %f\n", $xo, $yo, $statM;
-# #    }
-# #    printf STDERR "-- statM=%f\n", $statM;
-
-#     # Debugging/exploration...
-#     #    printf "--- %2s %3s%10.3f%10.3f%10.3f%10.3f\n", "e", "dof", 1.06,
-#     # 1.95, 2.23, 2.81; printf "--- %2s
-#     # %3s%10.3f%10.3f%10.3f%10.3f\n", "-", "---", 0.5, 0.9, 0.95,
-#     # 0.99; foreach $serr ((1, 3, 5, 7, 9)) { printf "--- %2d %3d",
-#     # $serr, 2*$nmatches; foreach $mult ((1.06, 1.95, 2.23, 2.81)) {
-#     # my $sig = $serr/$mult; printf "%10.3f(%5.3f)",
-#     # $statM/($sig*$sig), qchi($statM/($sig*$sig), 2*$nmatches); }
-#     # print "\n"; } 
-
-#     # Get Q(\chi) for this value of M.
-#     my $findoffboxprop = (defined($par->{findoffboxprop})
-# 			  ? $par->{findoffboxprop}
-# 			  : 0.5); # The proportion of points expected
-#                                   # to be in the FINDOFF error box.
-#     my $eoversigma = invP($findoffboxprop);
-#     my $findofferr = $par->{findofferror};
-#     #+ |$findoffsigma| is the value of $\sigma$ that would result in a
-#     # fraction |$findoffboxprop| of the points inside the FINDOFF
-#     # error box.
-#     #-
-#     my $findoffsigma = $findofferr/$eoversigma;
-#     my $Q = qchi ($statM/($findoffsigma*$findoffsigma), 2*($nmatches-1));
-#     my $matchquality;
-#     # Test the quality of the match using a two-tailed test at p=0.99
-#     # and p=0.95 levels of significance.  That is, compare Q with
-#     # 0.5+-(0.99/2) and 0.5+-(0.95/2)
-#   MATCHQUALITY: {
-# 	if ($Q > 0.995) {
-# 	    # An implausibly good match
-# 	    printf STDERR ("Very poor (way too good) match\n\t(%d matches, SSD=%f, Q(chi2)=%.5f).\n\tThe FINDOFF error parameter is probably too high.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels, Q(samplesd)=%.5f)\n",
-# 			   $nmatches, $samplesd, $Q,
-# 			   $findofferr, $findoffboxprop*100, $findoffsigma,
-# 			   qchi($statM/($samplesd*$samplesd),2*($nmatches-1)))
-# 	      if $verbose;
-# 	    $matchquality = +3;
-# 	    last MATCHQUALITY;
-# 	}
-# 	if ($Q > 0.975) {
-# 	    # A dubiously good match
-# 	    printf STDERR ("Rather dodgy (ie, implausibly good) match\n\t(%d matches, SSD=%f, Q(chi2)=%.3f).\n\tThe FINDOFF error parameter may be too high.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
-# 			   $nmatches, $samplesd, $Q,
-# 			   $findofferr, $findoffboxprop*100, $findoffsigma)
-# 	      if $verbose;
-# 	    $matchquality = +2;
-# 	    last MATCHQUALITY;
-# 	}
-# 	if ($Q > 0.025) {
-# 	    # A good match, at p=0.95
-# 	    printf STDERR ("Good match\n\t(%d matches, SSD=%f, Q(chi2)=%.3f).\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
-# 			   $nmatches, $samplesd, $Q,
-# 			   $findofferr, $findoffboxprop*100, $findoffsigma)
-# 	      if $verbose;
-# 	    if ($Q > 0.5) {
-# 		$matchquality = +1;
-# 	    } else {
-# 		$matchquality = -1;
-# 	    }
-# 	    last MATCHQUALITY;
-# 	}
-# 	if ($Q > 0.005) {
-# 	    # A dubiously poor match
-# 	    printf STDERR ("Rather dodgy (ie, implausibly bad) match\n\t(%d matches, SSD=%f, Q(chi2)=%.5f).\n\tEither these position lists do not match,\n\tor else the FINDOFF error parameter is set too low.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
-# 			   $nmatches, $samplesd, $Q,
-# 			   $findofferr, $findoffboxprop*100, $findoffsigma)
-# 	      if $verbose;
-# 	    $matchquality = -2;
-# 	    last MATCHQUALITY;
-# 	}
-# 	# Q<=0.025.  A very poor match
-# 	printf STDERR ("Unlikely (ie, implausibly bad) match\n\t(%d matches, SSD=%f, Q(chi2)=%.3f).\n\tEither these position lists simply do not match,\n\tor else the FINDOFF error parameter is far too low.\n\t(findoff errorbox size=%g, prop=%.0f%%, SExtractor sigma=%.2f pixels)\n",
-# 		       $nmatches, $samplesd, $Q,
-# 		       $findofferr, $findoffboxprop*100, $findoffsigma)
-# 	  if $verbose;
-# 	$matchquality = -3;
-#     }
-#     # e/\sigma=$eoversigma, so given that $samplesd is an estimate of
-#     # \sigma, estimate the value of e which is consistent with the
-#     # $eoversigma we guessed above.
-#     my $suggestedfindofferr = $samplesd * $eoversigma;
-
-    # All this statistical thrashing around is pointless, since
-    # essentially all of the important errors are systematic ones.  We
-    # do as well by simply doubling $samplesd....
-    my $suggestedfindofferr = $samplesd * 3.0;
+    # At this point we can indulge in a good deal of statistical
+    # hi-jinks which is fun, but essentially pointless, since the
+    # systematic errors dominate the random ones.
+    # We do as well as we can by simply scaling $samplesd....
 
 	
 
@@ -1223,11 +1118,9 @@ sub generate_astrom ($) {
 	# (lower-x, lower-y, upper-x, upper-y) for the NDF, and we take
 	# the plate centre as the average of these.  
 	my @projpole;	# Centre of plate, sky coordinates, dec.deg.
-	# XXX replace x0 etc with dim1, dim2
-	# my $pcx = ($par->{NDFinfo}->{x0} + $par->{NDFinfo}->{x1})/2.0;
-	# my $pcy = ($par->{NDFinfo}->{y0} + $par->{NDFinfo}->{y1})/2.0;
-	# These are in the GRID domain (centre of first pixel at (1,1)),
-	# so to get the plate centre, we need to add one to each dimension.
+	# Plate centre: These are in the GRID domain (centre of first
+	# pixel at (1,1)), so to get the plate centre, we need to add
+	# one to each dimension.
 	my $pcx = ($par->{NDFinfo}->{dim1} + 1)/2.0;
 	my $pcy = ($par->{NDFinfo}->{dim2} + 1)/2.0;
 	if (defined($astrom) && defined($astrom->{wcs})) {
@@ -1316,7 +1209,7 @@ sub generate_astrom ($) {
 
     return {filename => $astromofile,
 	    nmatches => $nmatches,
-	    findofferror => $suggestedfindofferr};
+	    samplesd => $samplesd };
 }
 
 # Run astrom, using the given input file.  
@@ -1380,22 +1273,22 @@ sub run_astrom ($$) {
 	    next;
 	};
 
-	($l =~ /^RESULT +(\S+)\s+(\S+)/)
-	  && do { $results{$1} = $2;
-		  next; };
+	($l =~ /^RESULT +(\S+)\s+(\S+)/) && do {
+	    $results{$1} = $2;
+	    next;
+	};
 
-	($l =~ /^STATUS +(\S+)/)
-	  && do {
-	      if ($1 eq 'OK') {
-		  $results{STATUS} = 1;
-	      } elsif ($1 eq 'BAD') {
-		  $results{STATUS} = 0;
-	      } else {
-		  print STDERR "ASTROM logfile: unrecognised STATUS\n";
-		  $results{STATUS} = 0;
-	      }
-	      next;
-	  };
+	($l =~ /^STATUS +(\S+)/) && do {
+	    if ($1 eq 'OK') {
+		$results{STATUS} = 1;
+	    } elsif ($1 eq 'BAD') {
+		$results{STATUS} = 0;
+	    } else {
+		print STDERR "ASTROM logfile: unrecognised STATUS\n";
+		$results{STATUS} = 0;
+	    }
+	    next;
+	};
 
 	($l =~ /^ENDFIT/) && do {
 	    scalar(%results) || do {
@@ -2025,7 +1918,7 @@ sub check_obsdata_kwd (\%) {
 sub wmessage ($$) {
     my $type = uc(shift());
     my $msg = shift;
-    my @prefixes = ('-- ', '!! ', 'XX ');
+    my @prefixes = ('--I ', '--W ', '--E ');
     my $prefix = undef;
     my $croak = 0;
     
