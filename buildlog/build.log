@@ -246,7 +246,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/classes
-    [javac] Compiling 29 source files to /apps/cvsbuild/java/source/votable/build/classes
+    [javac] Compiling 31 source files to /apps/cvsbuild/java/source/votable/build/classes
      [echo] Executing JAIUtil target: build
 
 prepare:
@@ -316,10 +316,10 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 166 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 169 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 68 files to /apps/cvsbuild/java/source/splat/build/classes
+     [copy] Copying 69 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
      [copy] Copying 9 files to /apps/cvsbuild/java/source/splat/lib/splat
 
@@ -462,4 +462,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 5 seconds
+Total time: 1 minute 4 seconds

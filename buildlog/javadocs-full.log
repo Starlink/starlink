@@ -112,7 +112,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/java
-     [copy] Copying 30 files to /apps/cvsbuild/java/source/votable/build/java
+     [copy] Copying 32 files to /apps/cvsbuild/java/source/votable/build/java
      [echo] Executing JAIUtil target: javadoc-sources
 
 javadoc-sources:
@@ -137,7 +137,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 164 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 167 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:

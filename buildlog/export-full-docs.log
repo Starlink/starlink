@@ -1677,6 +1677,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
@@ -2015,7 +2016,7 @@ dist:
 
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 29 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 31 files to /apps/cvsbuild/starjava/docs
      [echo] Executing JAIUtil target: install
 
 prepare:
@@ -2350,4 +2351,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 17 seconds
+Total time: 5 minutes 21 seconds

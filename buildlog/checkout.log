@@ -8289,7 +8289,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/EditableSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSHeaderSource.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/FITSSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/HdxInputNameParser.java
-U java/source/splat/src/main/uk/ac/starlink/splat/data/InputNameParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDMEMSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDSpecData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDSpecDataImpl.java
@@ -8297,6 +8296,9 @@ U java/source/splat/src/main/uk/ac/starlink/splat/data/LineIDTXTSpecDataImpl.jav
 U java/source/splat/src/main/uk/ac/starlink/splat/data/MEMSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/NDFSpecDataImpl.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/NDXSpecDataImpl.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/NameParser.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/PathParser.java
+U java/source/splat/src/main/uk/ac/starlink/splat/data/RemoteSpecData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataAccess.java
 U java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java
@@ -8331,6 +8333,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/FuzzyBooleanCellRenderer
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/GenerateFromInterpFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/GlobalSpecPlotList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/HelpFrame.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/HistoryStringDialog.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LabelFloatJSlider.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitView.java
@@ -8410,6 +8413,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/hydrogen.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/interpolate.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/jpeg.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/jspec.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/location.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/minus.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/minus24.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/modify.gif
@@ -9510,6 +9514,8 @@ U java/source/votable/src/main/uk/ac/starlink/votable/DataFormat.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Encoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/FieldElement.java
+U java/source/votable/src/main/uk/ac/starlink/votable/FitsPlusTableBuilder.java
+U java/source/votable/src/main/uk/ac/starlink/votable/FitsPlusTableWriter.java
 U java/source/votable/src/main/uk/ac/starlink/votable/LinkElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/NumericDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/ParamElement.java
@@ -9539,6 +9545,7 @@ cvs checkout: Updating java/source/votable/src/testcases/uk
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink/votable
+U java/source/votable/src/testcases/uk/ac/starlink/votable/FitsPlusTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/ParameterTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/SerializerTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/VOTableTest.java
