@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: RIPC.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>RIPC</H2><HR>
+<H2>Usage</H2>
+<H3>RIPC=number[,number]</H3>
+<H2>Description</H2>
+This is a polynomial in "X" used to modify the  standard  Echelle  ripple
+calibration function.  The calibration is given by:
+<P>
+<PRE WIDTH=72>
+      SCALE = (SIN(X)/X)**2 * (RIPC(1) + RIPC(2)*X + RIPC(3)*X**2 ...)
+</PRE>
+<P>
+where
+<P>
+<PRE WIDTH=72>
+      X = PI * RIPA * (WAV - WAVC) * ORDER/WAVC
+</PRE>
+<P>
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.
+<P>
+See the <A HREF=ripa.html>
+RIPA</A>
+ and <A HREF=ripk.html>
+RIPK</A>
+ parameter descriptions.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:10 1995
+</ADDRESS>
+</BODY>
+</HTML>

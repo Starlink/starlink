@@ -1,0 +1,12 @@
+*+
+*
+*   CMLINE common blocks.
+*
+*-
+
+*   The text buffer used by the LINE library.
+      INTEGER BUFPOS     ! character position in buffer
+      INTEGER BUFLEN     ! buffer length up to terminator
+      BYTE BUF(512)      ! character buffer
+ 
+      COMMON /CMLINE/ BUFPOS, BUFLEN, BUF

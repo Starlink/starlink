@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: QUAL.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>QUAL</H2><HR>
+<H2>Usage</H2>
+<H3>QUAL=boolean</H3>
+<H2>Description</H2>
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+<P>
+<PRE WIDTH=72>
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+</PRE>
+<P>
+User edits are only shown where no other fault is present.
+<P>
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:10 1995
+</ADDRESS>
+</BODY>
+</HTML>

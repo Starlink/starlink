@@ -1,0 +1,25 @@
+*+
+*
+*   CMSCAN common blocks.
+*
+*-
+
+*   SCAN array information:
+      LOGICAL NOSCAN       ! whether a scan has been done
+      INTEGER NSCAN        ! number of Us
+      REAL*8 U1SCAN        ! start U-grid value
+      REAL*8 DUSCAN        ! U-grid spacing
+      REAL*8 V1SCAN        ! first and only V-value
+      REAL*8 DVSCAN        ! V full width
+      REAL*8 FSCAN(4096)   ! scanned FN values
+      REAL*8 WSCAN(4096)   ! scan weights
+      BYTE QSCAN(4096)     ! scan quality
+      BYTE STITLE(80)      ! title for scan (based on parameters)
+      BYTE SLABEL(40)      ! scan label
+      BYTE SUNITS(40)      ! scan units
+      BYTE ULABEL(40)      ! u-axis label
+      BYTE UUNITS(40)      ! u-axis units
+
+      COMMON / CMSCAN   / NOSCAN, NSCAN, QSCAN
+      COMMON / CMSCAN_1 / STITLE, SLABEL, SUNITS, ULABEL, UUNITS
+      COMMON / CMSCAN_2 / U1SCAN, DUSCAN, V1SCAN, DVSCAN, FSCAN, WSCAN

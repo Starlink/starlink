@@ -1,0 +1,13 @@
+*+
+*
+*   CMLINR common blocks.
+*
+*-
+
+*   Line style rotation data:
+      INTEGER LININD       ! Current line type index.
+      INTEGER LINTYP( 4 )  ! Line types.
+      BYTE LINSTY( 16, 4 ) ! Line type names.
+      LOGICAL LINROT       ! Whether line styles rotate.
+
+      COMMON / CMLINR / LININD, LINTYP, LINSTY, LINROT

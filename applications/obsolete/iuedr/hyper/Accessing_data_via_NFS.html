@@ -1,0 +1,78 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: Accessing_data_via_NFS.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=DATA_VIA_NFS>
+<I>IUEDR-Online HELP</I>
+<HR><H1>Accessing data via NFS</H1><HR>
+</A>
+<H2>Summary</H2>
+ UNIX machines commonly provide disk sharing amongst remote machines
+ using the NFS protocol.
+<P>
+For example your data frame may reside on a DECstation local
+disk called `iuedata' in the Rutherford cluster on machine `adam4'.
+In order to get <A HREF=iuedr.html>
+IUEDR</A>
+ to read it directly you could enter the
+following in response to the <A HREF=drive.html>
+DRIVE</A>
+ prompt :
+<P>
+<PRE WIDTH=72>
+      DRIVE&gt; /adam4/iuedata/swp12345.raw
+</PRE>
+<P>
+To see which disks you have NFS access to you should use the
+<P>
+<PRE WIDTH=72>
+      df
+</PRE>
+<P>
+command. In general any disks whose entry does not start with a `/dev'
+are being served by a remote machine.
+<P>
+<H4>
+IMPORTANT NOTE
+</H4>
+<P>
+<A HREF=iuedr.html>
+IUEDR</A>
+ allows you to use this method of
+data access with the following proviso.
+<P>
+If the data resides on a VAX served disk then you must first
+convert its directory entry using the following command :
+<P>
+<PRE WIDTH=72>
+      UNIX_FORMAT  image-name
+</PRE>
+<P>
+This command does not change the data in any way. It merely alters
+the description of the file format as stored in the VAX directory.
+<P>
+If at some later stage you wish to use the VAX version of <A HREF=iuedr.html>
+IUEDR</A>
+ on
+the same data file it first be necessary to use the command
+<P>
+<PRE WIDTH=72>
+      VAX_FORMAT  image-name
+</PRE>
+<P>
+to convert back.
+<P>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:53 1995
+</ADDRESS>
+</BODY>
+</HTML>

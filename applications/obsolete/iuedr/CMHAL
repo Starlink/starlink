@@ -1,0 +1,16 @@
+*+
+*
+*   CMHAL common blocks.
+*
+*-
+
+*   Halation parameters.
+      LOGICAL NOHAL      ! whether defined
+      BYTE HALTP(16)     ! halation type
+      REAL*8 HALC          ! halation constant at standard wavelength
+      REAL*8 HALWC         ! standard wavelength for halation
+      REAL*8 HALW0         ! wavelength for zero halation
+      REAL*8 HALAV         ! halation averaging (A)
+ 
+      COMMON /CMHAL / NOHAL, HALTP
+      COMMON /CMHAL_1/  HALC, HALWC, HALW0, HALAV

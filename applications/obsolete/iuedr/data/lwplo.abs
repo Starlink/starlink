@@ -1,0 +1,48 @@
+'IUE_ABS'
+'LWP,LAP,LORES: Cassatella, Harris. 1982.'
+
+1.0E-14  0.0  0.0
+
+31   0   0   0
+
+1850   16.24
+1900    6.190
+1950    3.110
+2000    2.420
+2050    2.040
+2100    1.980
+2150    2.000
+2200    1.980
+2250    1.800
+2300    1.500
+2350    1.270
+2400    1.040
+2450    0.879
+2500    0.741
+2550    0.630
+2600    0.578
+2650    0.514
+2700    0.503
+2750    0.502
+2800    0.502
+2850    0.552
+2900    0.566
+2950    0.652
+3000    0.795
+3050    1.080
+3100    1.480
+3150    2.170
+3200    3.350
+3250    5.720
+3300   10.59
+3350   15.46
+
+# Title:     LWP,LORES Absolute Flux Calibration.
+# From:      Cassatella and Harris, VILSPA.
+# Contents:  CALTYP,
+#            CALID,
+#            SCALE, THDA, DFNDT,
+#            NABS,  NSAP, NTRAIL, DATYP,
+#            (WABS(I), DFDFN(I), I = 1, NABS)
+# Notes:     Wavelengths above 2000 A are "Air".
+# End:

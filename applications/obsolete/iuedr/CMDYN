@@ -1,0 +1,12 @@
+*+
+*
+*   CMDYN common blocks.
+*
+*-
+
+*   Dynamic memory table.
+      LOGICAL DFREE( 32 )     ! Whether slots are free.
+      INTEGER DBASE( 32 )     ! Base address of block.
+      INTEGER DSIZE( 32 )     ! Size of block in bytes.
+
+      COMMON / CMDYN / DFREE, DBASE, DSIZE

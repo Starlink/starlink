@@ -1,0 +1,15 @@
+*+
+*
+*   CMFIDT common blocks.
+*
+*-
+
+*   STAK fiducial position temperature sensitivity.
+      LOGICAL NOFIDT         ! whether sensitivity defined
+      BYTE FIDTTP(16)        ! Fiducial Shift Type
+      BYTE FIDTID(40)        ! idenification label
+      REAL*8 FIDST(13, 13)     ! sample position sensitivity
+      REAL*8 FIDLT(13, 13)     ! line position sensitivity
+ 
+      COMMON /CMFIDT/ NOFIDT, FIDTTP
+      COMMON /CMFIDT_1/ FIDST , FIDLT

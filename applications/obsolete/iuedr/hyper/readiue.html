@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: READIUE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=READIUE>
+<I>IUEDR-Online HELP</I>
+<HR><H1>READIUE</H1><HR>
+</A>
+<H2>Summary</H2>
+ Read IUE data from GO format tape or file.
+<P>
+<PRE WIDTH=72>
+   DRIVE           Tape Drive or File Name.
+   FILE            File Number.
+   NLINE           Number of IUE header lines printed.
+   DATASET         Dataset name.
+   TYPE            Dataset Type (RAW, PHOT or GPHOT).
+   OBJECT          Object Identification Text.
+   CAMERA          Camera Name (LWP, LWR, SWP).
+   IMAGE           Image Number.
+   APERTURES       Aperture name.
+   RESOLUTION      Spectrograph Resolution Mode (LORES or HIRES).
+   EXPOSURES       Spectrum exposure time(s) (seconds).
+   THDA            IUE Camera Temperature (C).
+   ITFMAX          Pixel value on tape for ITF saturation.
+   BADITF          Whether bad LORES ITF requires correction.
+   YEAR            Year number (A.D.).
+   MONTH           Month Number (1-12).
+   DAY             Day Number in Month.
+   NGEOM           Number of Chebyshev terms used to represent geometry.
+   ITF             This  is  the  ITF  generation  used  in  the   image
+                   calibration.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command reads an IUE dataset (RAW, GPHOT or PHOT) from tape or from
+a GO format disk file.  The  <A HREF=dataset.html>
+DATASET</A>
+  parameter  determines the names of
+files that will contain the various data  components (Calibration, Image
+& Image Quality etc.)
+<H2>Available Topics</H2>
+<A HREF="apertures.html">APERTURES</A> * 
+<A HREF="baditf.html">BADITF</A> * 
+<A HREF="camera.html">CAMERA</A> * 
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="day.html">DAY</A> * 
+<A HREF="drivefile.html">DRIVEFILE</A> * 
+<A HREF="exposures.html">EXPOSURES</A> * 
+<A HREF="file.html">FILE</A> * 
+<A HREF="image.html">IMAGE</A> * 
+<A HREF="itf.html">ITF</A> * 
+<A HREF="itfmax.html">ITFMAX</A> * 
+<A HREF="month.html">MONTH</A> * 
+<A HREF="ngeom.html">NGEOM</A> * 
+<A HREF="nline.html">NLINE</A> * 
+<A HREF="object.html">OBJECT</A> * 
+<A HREF="resolution.html">RESOLUTION</A> * 
+<A HREF="thda.html">THDA</A> * 
+<A HREF="type.html">TYPE</A> * 
+<A HREF="year.html">YEAR</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:15 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,177 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: TRAK.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=TRAK>
+<I>IUEDR-Online HELP</I>
+<HR><H1>TRAK</H1><HR>
+</A>
+<H2>Summary</H2>
+ Extract spectrum from image.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   NORDER          Number of Echelle orders to be processed.
+   AUTOSLIT        Whether  GSLIT,  BDIST  and  BSLIT   are   determined
+                   automatically.
+   GSLIT           Object channel limits (geometric pixels).
+   BSLIT           Background channel half widths (geometric pixels).
+   BDIST           Distances  of   background   channels   from   centre
+                   (geometric pixels).
+   GSAMP           Spectrum grid sampling rate (geometric pixels).
+   CUTWV           Whether wavelength cutoff data  used  for  extraction
+                   grid.
+   BKGIT           Number of background smoothing iterations.
+   BKGAV           Background averaging filter FWHM (geometric pixels).
+   BKGSD           Discrimination level for background pixels (s.d.).
+   CENTM           Whether pre-existing centroid template is used.
+   CENSH           Whether  the  spectrum  template  is   just   shifted
+                   linearly.
+   CENSV           Whether  the  spectrum  template  is  saved  in   the
+                   dataset.
+   CENIT           Number of centroid tracking iterations.
+   CENAV           Centroid averaging filter FWHM (geometric pixels).
+   CENSD           Significance  level  for  signal  to  be   used   for
+                   centroids.
+   EXTENDED        Whether  the  object  spectrum  is  expected  to   be
+                   extended.
+   CONTINUUM       Whether the object spectrum is  expected  to  have  a
+                   "continuum".
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command extracts a  spectrum  from  an  image.   It  does  this  by
+defining  an  evenly  spaced  wavelength  grid  along  the spectrum, and
+mapping pixel intensities  onto  this  grid  in  object  and  background
+channels.   The  background  pixels are used to form a smooth background
+spectrum.  The object pixels (less smooth background) are used  to  form
+the integrated net signal for the object.
+<P>
+In the LORES case  the spectrum specified  by the <A HREF=aperture.html>
+APERTURE</A>
+  parameter is
+extracted.
+<P>
+In the HIRES case,  the first echelle order to be extracted is specified
+by  the <A HREF=order.html>
+ORDER</A>
+.  Up to <A HREF=norder.html>
+NORDER</A>
+ orders are extracted,  with <A HREF=order.html>
+ORDER</A>
+ each time
+being decremented.
+<P>
+The wavelength  grid is defined  by region  of the dispersion  line contained in  the image subset (faceplate).  The grid spacing is set by the
+<A HREF=gsamp.html>
+GSAMP</A>
+ parameter value which is the sample step in geometric  pixels. The
+wavelength limits can optionally be constrained within the echelle
+cutoff values by specifying <A HREF=cutwv.html>
+CUTWV</A>
+=YES.
+<P>
+The object  and background  channel widths and positions  are determined
+automatically  if <A HREF=autoslit.html>
+AUTOSLIT</A>
+=YES.  Otherwise,  the object channel is specified  by  the values  of the  <A HREF=gslit.html>
+GSLIT</A>
+ parameter,  whilst  the  background
+channel positions and widths are determined by the <A HREF=bdist.html>
+BDIST</A>
+ and <A HREF=bslit.html>
+BSLIT</A>
+ parameter values respectively.
+<P>
+The <A HREF=extended.html>
+EXTENDED</A>
+ and <A HREF=continuum.html>
+CONTINUUM</A>
+ parameters allow  more  precise  control over
+slit determinations (see
+<A HREF="../iuedr_docs/mud45/node52.html">User Guide</A>).
+<P>
+The background spectrum is smoothed with a triangle function, FWHM given
+by  the  <A HREF=bkgav.html>
+BKGAV</A>
+ parameter (in  geometric  pixels).  Once  the  background
+channel spectra have been obtained, they are extracted a  further  <A HREF=bkgit.html>
+BKGIT
+</A>
+times.  Prior to each additional background extraction, pixels which are
+outside <A HREF=bkgsd.html>
+BKGSD</A>
+ local standard deviations are rejected.
+<P>
+The object spectrum is obtained by integrating  pixel  intensities (less
+smooth background)  within the object channel.  Once the object spectrum
+has been obtained, it is extracted an additional  <A HREF=cenit.html>
+CENIT</A>
+ times, each time
+the centroid positions from the previous extraction being used to follow
+the spectrum.  The centroid spectrum (template) is  smoothed by  folding
+with a triangle  function,  FWHM given  by the <A HREF=cenav.html>
+CENAV</A>
+ parameter (in  geometric  pixels).  Wavelengths  with  flux  levels  below  <A HREF=censd.html>
+CENSD</A>
+ standard
+deviations  above  background are not  used in determining  the centroid
+spectrum.
+<P>
+The initial  spectrum template  is by  default given  by  the dispersion
+relations.  However, if <A HREF=centm.html>
+CENTM</A>
+=YES then a pre-defined template associated
+with the dataset may be used as a start guess.  If  <A HREF=censh.html>
+CENSH</A>
+=YES then  this
+template can  be shifted  linearly to  match the image (without changing
+its shape).  If <A HREF=censv.html>
+CENSV</A>
+=YES then the  final centroid  spectrum  is used to
+update the spectrum template in the dataset.
+<P>
+The net flux associated with  a wavelength point in  the final extracted
+spectrum is  defined as the integral of  pixel intensities  over a rectangle with  dimensions given by  the object  channel width and the wavelength interval.  These fluxes are  scaled so that they correspond to an
+interval  along the  wavelength  direction  of 1.414  geometric  pixels.
+This  is  so  that  the  standard  IUESIPS  calibrations  can be applied
+regardless of what actual sample rate has been employed.   The  integral
+is performed by using linear interpolation of pixel intensities.
+<H2>Available Topics</H2>
+<A HREF="aperture.html">APERTURE</A> * 
+<A HREF="autoslit.html">AUTOSLIT</A> * 
+<A HREF="bdist.html">BDIST</A> * 
+<A HREF="bkgav.html">BKGAV</A> * 
+<A HREF="bkgit.html">BKGIT</A> * 
+<A HREF="bkgsd.html">BKGSD</A> * 
+<A HREF="bslit.html">BSLIT</A> * 
+<A HREF="centm.html">CENTM</A> * 
+<A HREF="cenav.html">CENAV</A> * 
+<A HREF="cenit.html">CENIT</A> * 
+<A HREF="censd.html">CENSD</A> * 
+<A HREF="censh.html">CENSH</A> * 
+<A HREF="censv.html">CENSV</A> * 
+<A HREF="continuum.html">CONTINUUM</A> * 
+<A HREF="cutwv.html">CUTWV</A> * 
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="extended.html">EXTENDED</A> * 
+<A HREF="gsamp.html">GSAMP</A> * 
+<A HREF="gslit.html">GSLIT</A> * 
+<A HREF="norder.html">NORDER</A> * 
+<A HREF="order.html">ORDER</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:16 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,20 @@
+*+
+*
+*   CMWAV common blocks.
+*
+*-
+
+*   Wavelength array:
+      INTEGER NWAV          ! Number of wavelengths.
+      REAL*8 WAV1           ! Start wavelength.
+      REAL*8 DWAV           ! Wavelength step.
+      REAL*8 WAV( 1200 )    ! Wavelength array.
+      REAL*8 WAVAIR( 1200 ) ! Air Wavelength array.
+      REAL FWAV( 1200 )     ! Wavelength array.
+      REAL FWAVAIR( 1200 )  ! Air Wavelength array.
+      BYTE WLABEL( 40 )     ! Label for calibrated wavelength.
+      BYTE WUNITS( 40 )     ! Units for calibrated wavelength.
+
+      COMMON / CMWAV   / WAV1, DWAV, WAV, WAVAIR
+      COMMON / CMWAV_1 / WLABEL, WUNITS, NWAV
+      COMMON / CMWAV_2 / FWAV, FWAVAIR

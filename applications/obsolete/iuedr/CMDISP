@@ -1,0 +1,44 @@
+*+
+*
+*   CMDISP common blocks.
+*
+
+*   29-MAR-1995 (MJC):
+*     Added DISPW constants for New correlation model.
+*-
+
+*   IUESIPS dispersion constants
+      LOGICAL NODISP      ! Whether dispersion constants defined.
+      BYTE DISPTP( 16 )   ! Dispersion Data Type.
+      BYTE DISPID( 40 )   ! Identification label.
+      INTEGER NDISP       ! Number of dispersion constants.
+      REAL*8 DISPS( 7 )   ! S-relations.
+      REAL*8 DISPL( 7 )   ! L-relations.
+      REAL*8 DISPDS( 2 )  ! Aperture S-offsets.
+      REAL*8 DISPDL( 2 )  ! Aperture L-offsets.
+      REAL*8 DISPSG( 2 )  ! Global adhoc S-shift for apertures.
+      REAL*8 DISPLG( 2 )  ! Global adhoc L-shift for apertures.
+      REAL*8 DISPT0       ! Standard THDA.
+      REAL*8 DISPD0       ! Standard DATE.
+      REAL*8 DISPST       ! S-dependence on THDA.
+      REAL*8 DISPLT       ! L-dependence on THDA.
+      REAL*8 DISPSD       ! S-dependence on DATE.
+      REAL*8 DISPLD       ! L-dependence on DATE.
+      REAL*8 RIPCON       ! Rough ripple constant.
+      REAL*8 DISPWS1      ! S-dependence offset.
+      REAL*8 DISPWL1      ! L-dependence offset.
+      REAL*8 DISPWS2      ! S-dependence on THDA.
+      REAL*8 DISPWL2      ! L-dependence on THDA.
+      REAL*8 DISPWS3      ! S-dependence on time.
+      REAL*8 DISPWL3      ! L-dependence on time.
+      REAL*8 DISPWS4      ! S-dependence on time sqared.
+      REAL*8 DISPWL4      ! L-dependence on time sqared.
+
+      COMMON / CMDISP   / NODISP, DISPTP, NDISP
+      COMMON / CMDISP_1 / DISPSG, DISPLG
+      COMMON / CMDISP_2 / RIPCON
+      COMMON / CMDISP_3 / DISPID
+      COMMON / CMDISP_4 / DISPS, DISPL, DISPDS, DISPDL, DISPT0, DISPD0,
+     :                    DISPST, DISPLT, DISPSD, DISPLD
+      COMMON / CMDISP_5 / DISPWS1, DISPWL1, DISPWS2, DISPWL2, DISPWS3,
+     :                    DISPWL3, DISPWS4, DISPWL4

@@ -1,0 +1,13 @@
+*+
+*
+*   CMNEED common blocks.
+*
+*-
+
+*   File needs for use by RDIMG.
+      LOGICAL CANEED     ! Need UEC file
+      LOGICAL DANEED     ! Need UED and UEQ files
+      LOGICAL SPNEED     ! Need UES file
+      LOGICAL MENEED     ! Need UEM file
+ 
+      COMMON /CMNEED/ CANEED, DANEED, SPNEED, MENEED

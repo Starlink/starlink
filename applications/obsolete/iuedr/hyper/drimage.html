@@ -1,0 +1,114 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: DRIMAGE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=DRIMAGE>
+<I>IUEDR-Online HELP</I>
+<HR><H1>DRIMAGE</H1><HR>
+</A>
+<H2>Summary</H2>
+ Display image on an image display device.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   XP              X-axis pixel limits, undefined means full extent.
+   YP              Y-axis pixel limits, undefined means full extent.
+   ZL              Data limits for image display, undefined  means  full
+                   range.
+   COLOUR          Whether a false colour look-up table  is used for the
+                   display.
+   ZONE            Zone to be used for plotting.
+   FLAG            Whether data quality for faulty pixels is displayed.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command displays the image, specified by the <A HREF=dataset.html>
+DATASET</A>
+ parameter,  on
+the device specified by the <A HREF=device.html>
+DEVICE</A>
+ parameter.
+<P>
+The part of the  image displayed is specified by the <A HREF=xp.html>
+XP</A>
+ and <A HREF=yp.html>
+YP</A>
+ parameter
+values.  If unspecified,<A HREF=xp.html>
+XP</A>
+ and <A HREF=yp.html>
+YP</A>
+ default to the entire image extent:
+<P>
+<PRE WIDTH=72>
+   XP=[1,768], YP=[1,768]
+</PRE>
+<P>
+If the values of <A HREF=xp.html>
+XP</A>
+ or <A HREF=yp.html>
+YP</A>
+ are specified in  decreasing  order, then  the
+image will NOT be reversed along the appropriate axis.
+<P>
+The range  of data values displayed (as a grey scale) is limited  by the
+two values of the <A HREF=zl.html>
+ZL</A>
+ parameter.  Data values at ZL(1) will appear BLACK,
+whilst those at ZL(2) will appear WHITE.  If the <A HREF=zl.html>
+ZL</A>
+ values are given  in
+decreasing  order,  then high data  values  will be  represented  by low
+(dark)  display intensities,  and vice-versa.   If the values are undefined, then the full intensity range of the image will be used.
+<P>
+Data values which  fall below the  lowest display intensity are drawn in
+BLACK,  while  those  which fall above the highest display intensity are
+drawn BLUE.  If <A HREF=colour.html>
+COLOUR</A>
+=TRUE then a false colour look-up table is used
+instead.
+<P>
+The <A HREF=flag.html>
+FLAG</A>
+ parameter specifies  whether faulty  pixels  are  flagged using
+the following colour scheme:
+<P>
+<PRE WIDTH=72>
+      GREEN       pixels affected by reseau marks
+      RED         pixels which are saturated (DN=255)
+      ORANGE      pixels affected by ITF truncation
+      YELLOW      pixels marked bad by the user
+</PRE>
+<P>
+If a pixel is affected by more than one of the above  faults,  then  the
+first in the list is adopted for display.
+<P>
+The <A HREF=zone.html>
+ZONE</A>
+ parameter  is accepted  by DRIMAGE but is ignored,  the display 
+always using using ZONE=0.
+<P>
+<H2>Available Topics</H2>
+<A HREF="colour.html">COLOUR</A> * 
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="device.html">DEVICE</A> * 
+<A HREF="flag.html">FLAG</A> * 
+<A HREF="xp.html">XP</A> * 
+<A HREF="yp.html">YP</A> * 
+<A HREF="zl.html">ZL</A> * 
+<A HREF="zone.html">ZONE</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:56 1995
+</ADDRESS>
+</BODY>
+</HTML>

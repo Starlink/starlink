@@ -1,0 +1,114 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Release Notes
+
+                                          Richard Hook & Jack Giddings
+                                                       4 February 1985
+
+----------------------------------------------------------------------
+
+                   IUEDR Version 1.3 Release Notes
+                   -------------------------------
+
+
+
+1  INTRODUCTION
+
+This Note describes changes made to  IUEDR  since  the  last  Starlink
+release Version 1.2.
+
+
+
+2  UPDATES
+
+CU:   New  formats.   Also,  for  displayed  images,  wavelengths  and
+intensities are printed.
+
+MI:  (New command):  Modify image using image display cursor.
+
+<files>:  The UED, UEQ, UES and UEM files are only read when needed.
+
+P*:  Automatic axis limits can be specified by providing a NULL  value
+for  the XL or YL parameters.  The old technique of equal values (e.g.
+XL=(0,0)) is still supported, but it's simpler to type "XL=!".
+
+LBLS:  As above but for the RL parameter.
+
+SCAN:  (HIRES only) If the ORDERS parameter is undefined,  a  suitable
+default range is adopted.
+
+MAP:  (HIRES only) ORDERS as for SCAN.
+
+READIUERS:   (New  command):   Reads  MELO/MEHI  from   IUESIPS 1   or
+IUESIPS 2  tape.   operation  much  like  READIUE,  except  that  some
+parameters and associated information are not needed.   Only  UEC  and
+UES files are created.
+
+READIUE,SETD:  The name of the ITFCOR parameter has  been  changed  to
+BADITF, in order to convey its purpose more clearly.
+
+
+                                - 1 -
+IUEDR Version 1.3 Release Notes                                 Page 2
+
+
+LWP Low Resolution:  The absolute calibration has been updated.  Also,
+an error in the shifts for SAP has been corrected.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 2 -

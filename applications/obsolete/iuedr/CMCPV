@@ -1,0 +1,15 @@
+*+
+*
+*   CMCPV common blocks.
+*
+*-
+
+*   Command line copy of parameter system until sucessful.
+      INTEGER CLEN           ! number of values found
+      REAL*8 CVALR(512)        ! REAL*8 values
+      INTEGER CVALI(512)     ! integer values
+      LOGICAL CVALL(512)     ! logical values
+      BYTE CVALC(4096)       ! character values
+ 
+      COMMON /CMCPV / CLEN, CVALI, CVALL, CVALC
+      COMMON /CMCPV_1/ CVALR

@@ -1,0 +1,18 @@
+*+
+*
+*   CMTEM common blocks.
+*
+*-
+
+*   Centroid template data.
+      LOGICAL NOTEM             ! Whether template is defined.
+      INTEGER NTEMO             ! Number of template "orders".
+      INTEGER TEMORD( 100 )     ! Template orders.
+      INTEGER NTEMS( 100 )      ! Number of points per template.
+      REAL*8 TEMWAV( 100, 100 ) ! Wavelengths.
+      REAL*8 TEMCEN( 100, 100 ) ! Centroid shifts about dispersion.
+      REAL*8 TEMW0( 100 )       ! Wavelength of first point in each template.
+      REAL*8 TEMDW( 100 )       ! Wavelength spacing in each template.
+
+      COMMON / CMTEM   / NOTEM, NTEMO, TEMORD, NTEMS
+      COMMON / CMTEM_1 / TEMW0, TEMDW, TEMWAV, TEMCEN

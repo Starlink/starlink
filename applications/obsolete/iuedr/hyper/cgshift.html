@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: CGSHIFT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=CGSHIFT>
+<I>IUEDR-Online HELP</I>
+<HR><H1>CGSHIFT</H1><HR>
+</A>
+<H2>Summary</H2>
+ Determine spectrum shift using cursor on a scan plot.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDERS          This delineates a range of Echelle orders.
+   DEVICE          GKS/SGS graphics device name.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This  command  allows  the  graphics  cursor  to  be  used  to   provide
+information about spectrum registration shifts.
+<P>
+A plot of the current spectrum scan must be made available using <A HREF=plscan.html>
+PLSCAN</A>
+.
+A cycle consisting of any  number of left or middle mouse button hits is
+used to mark the position of the spectrum. Each hit is used to calculate
+a linear geometric shift of the spectrum template relative to the image.
+The cycle is terminated by pressing the right mouse button.
+<P>
+Keyboard keys 1, 2 and 3 can be used  in place of left, middle and right
+mouse buttons respectively.
+<P>
+For LORES, when the cycle is complete, the last geometric shift determined is adopted, and the scan is revoked.
+<P>
+For HIRES, each cursor  hit is automatically associated  with an Echelle
+order in  the range defined by the <A HREF=orders.html>
+ORDERS</A>
+ parameter.  The last shift  is
+again adopted, but the scan is available for further display or measurement.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="aperture.html">APERTURE</A> * 
+<A HREF="orders.html">ORDERS</A> * 
+<A HREF="device.html">DEVICE</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:54 1995
+</ADDRESS>
+</BODY>
+</HTML>

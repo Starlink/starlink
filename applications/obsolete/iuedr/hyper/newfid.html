@@ -1,0 +1,55 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: NEWFID.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=NEWFID>
+<I>IUEDR-Online HELP</I>
+<HR><H1>NEWFID</H1><HR>
+</A>
+<H2>Summary</H2>
+ Read Fiducial positions into <A HREF=dataset.html>
+DATASET</A>
+ from text file with name specified
+ by <A HREF=fidfile.html>
+FIDFILE</A>
+.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   FIDFILE         Name of file containing fiducial positions.
+   NGEOM           Number of Chebyshev terms used to represent geometry.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command reads fiducial positions from a text file specified by  the
+<A HREF=fidfile.html>
+FIDFILE</A>
+ parameter, and stores them in the dataset specified by <A HREF=dataset.html>
+DATASET</A>
+.
+The image data  quality  and  geometry  representation  are  updated  to
+account for any changes that these fiducial positions imply.
+<P>
+In the case of datasets containing image distortion, the <A HREF=ngeom.html>
+NGEOM</A>
+ parameter
+is used to  specify the number  of terms used  (along each axis) for the
+Chebyshev representation.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="fidfile.html">FIDFILE</A> * 
+<A HREF="ngeom.html">NGEOM</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:03 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: RIPK.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>RIPK</H2><HR>
+<H2>Usage</H2>
+<H3>RIPK=number</H3>
+<H2>Description</H2>
+This is the Echelle ripple constant measured in (A).  It corresponds  to
+the   central  wavelength  of  Echelle  order  number  1.   The  central
+wavelength of an arbitrary <A HREF=order.html>
+ORDER</A>
+ is:
+<P>
+<PRE WIDTH=72>
+      WAVC = RIPK / ORDER
+</PRE>
+<P>
+Where this parameter is used for an entire HIRES dataset, the  parameter
+can have more than 1 value, and represent a polynomial in ORDER:
+<P>
+<PRE WIDTH=72>
+      WAVC = (RIPK(1) + RIPK(2) * ORDER + RIPK(3) * ORDER**2...) / ORDER
+</PRE>
+<P>
+See the <A HREF=ripa.html>
+RIPA</A>
+ and <A HREF=ripc.html>
+RIPC</A>
+ parameter descriptions.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:10 1995
+</ADDRESS>
+</BODY>
+</HTML>

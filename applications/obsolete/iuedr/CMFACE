@@ -1,0 +1,20 @@
+*+
+*
+*   CMFACE common blocks.
+*
+*-
+
+*   STAK face plate specification.
+      LOGICAL NOFACE        ! whether faceplate defined
+      BYTE FACETP(16)       ! Faceplate Data Type
+      INTEGER CENTRE(2)     ! coordinates of circle centre
+      INTEGER RADIUS        ! radius of face plate circle
+      LOGICAL NOROT         ! whether rotation defined
+      BYTE ROTTP(16)        ! Rotation Data Type
+      INTEGER RLIM(2)       ! the record limits
+      INTEGER PLIM(2)       ! the pixel limits
+      REAL*8 ANGLE          ! the angle of records and line dirn
+
+      COMMON / CMFACE   / NOFACE, CENTRE, RADIUS, NOROT, RLIM, PLIM
+      COMMON / CMFACE_1 / FACETP, ROTTP
+      COMMON / CMFACE_2 / ANGLE

@@ -1,0 +1,12 @@
+*+
+*
+*   CMPRT common blocks.
+*
+*-
+
+*   PRT data.
+      LOGICAL PRTUSR     ! Run environment (INTERACTIVE, SCRIPT).
+      LOGICAL PRTRED     ! Whether STDOUT is redirected.
+      LOGICAL PARRED     ! Whether parameter values are written to log.
+
+      COMMON / CMPRT / PRTUSR, PRTRED, PARRED

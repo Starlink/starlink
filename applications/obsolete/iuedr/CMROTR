@@ -1,0 +1,24 @@
+*+
+*
+*   CMROTR common blocks.
+*
+*-
+
+*   ROTRAN for crude ungeometric mapping.
+      LOGICAL NOROTR  ! whether ROTRAN is defined
+      REAL*8 DUDX     ! U(X,Y)
+      REAL*8 DUDY     !
+      REAL*8 DU       !
+      REAL*8 DVDX     ! V(X,Y)
+      REAL*8 DVDY     !
+      REAL*8 DV       !
+      REAL*8 DXDU     ! X(U,V)
+      REAL*8 DXDV     !
+      REAL*8 DX       !
+      REAL*8 DYDU     ! Y(U,V)
+      REAL*8 DYDV     !
+      REAL*8 DY       !
+
+      COMMON / CMROTR   / NOROTR
+      COMMON / CMROTR_1 / DUDX, DUDY, DU, DVDX, DVDY, DV, DXDU,
+     :                    DXDV, DX, DYDU, DYDV, DY

@@ -1,0 +1,13 @@
+*+
+*
+*   CMBKGS common blocks.
+*
+*-
+
+*   Seperate BKG arrays.
+      REAL*8 SBKGS(1200, 2)        ! BKG data
+      REAL*8 DBKGS(1200, 2)        ! BKG errors
+      INTEGER QBKGS(1200, 2)     ! BKG quality
+
+      COMMON /CMBKGS/ SBKGS, DBKGS
+      COMMON /CMBKGS_1/ QBKGS

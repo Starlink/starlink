@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: BKGIT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>BKGIT</H2><HR>
+<H2>Usage</H2>
+<H3>BKGIT=number</H3>
+<H2>Description</H2>
+This is the number of background smoothing iterations  performed  during
+spectrum extraction.
+<P>
+BKGIT=0 means that the background is taken as  the  result of  the first
+pass of a triangle function filter with FWHM defined by the <A HREF=bkgav.html>
+BKGAV
+</A>
+parameter.
+<P>
+BKGIT=1 means that,  after producing the initial estimate for the smooth
+background, pixels discrepant by more that <A HREF=bkgsd.html>
+BKGSD</A>
+ standard deviations are
+marked  as  "spikes".   The  smooth  background  is  then  re-evaluated,
+missing out the marked pixels.
+<P>
+Higher values of BKGIT are possible, but seldom necessary.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:05 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,4388 @@
+0 IUEDR
+
+ This is the unix monolith version of IUEDR. There are a number of
+ important changes from the VMS version.
+
+   - The session log is stored in session.lis and can be examined using
+     more or cat at the shell prompt.
+   - To supply a vector parameter on a command line, the components have
+     to be enclosed in square brackets, e.g. XL=[1000,1100]
+     However, when you are prompted for a vector, the brackets are not
+     required.
+   - .CMD command files are no longer supported. However, commands may
+     be piped into IUEDR.
+
+ For a list of IUEDR commands type ? at the `Topic?' prompt.
+
+ For help on a particular command type its name at the `Topic?' prompt,
+ or type HELP name at the `>' prompt.
+
+1 News_IUEDR_3.2-0
+
+ This text describes IUEDR version 3.2-0.
+ Fixes to and changes from a previous release (version 3.1-9) are
+ described.
+
+ Documentation notes:
+
+  o The IUEDR User Guide (MUD/45) has been comprehensively updated.
+  o The IUEDR User Manual (SG/3) has been comprehensively updated.
+    The document now has an index, extensive cross-referencing and is
+    fully up-to-date with the current release and IUEDR usage.
+  o The $IUEDR_USER directory now includes several C shell script
+    examples for handling multiple IUE datasets.  Refer to the 
+    user.info file in the $IUEDR_USER directory for an outline 
+    description.
+  o A few errors in the IUEDR Tutorial (SG/7) have been fixed.
+  o A few errors and omissions to the help text have been fixed.
+  o The out-of-date file global.doc has been removed from the
+    $IUEDR_DOC directory.
+  o The file problems.doc has been updated to reflect improvements in
+    this version of IUEDR.
+
+ Notes on this version:
+
+  o Data in the Calibration file (UEC) are now stored with scale factor 
+    edit "1P" where appropriate.  This effectively adds an extra digit
+    of precision in these figures.
+  o New dispersion (*.dsp) files are available in the $IUEDR_DATA
+    directory.  These new relations are used by default.  The old 
+    dispersion relations can be employed using the NEWDISP (ironic, I 
+    know) command, for example, the action:
+
+       > NEWDISP DISPFILE=$IUEDR_DATA/swphi.dsp
+
+    will use the NEW dispersion relations, whereas
+
+       > NEWDISP DISPFILE=$IUEDR_DATA/swphi_old.dsp
+
+    will use the OLD dispersion relations.  The new dispersion relations
+    are from NASA IUE Newsletter No 51, August 1993.  The old data are
+    dated 1982.
+  o Command line editing and command history features (identical to those
+    in DIPSO) are now available.
+    See HELP/Command_line_editing and documentation for more details.
+  o A "Hidden" Command CONFIGURE toggles the recording of all parameter
+    values for commands in log files.  By default this behaviour is TRUE.
+    See HELP/CONFIGURE and documentation for more details.
+  o Graph titles now have a consistent style of:
+
+       <OBJECT> (ORDER=<M>)
+
+    for HIRES, and for LORES:
+
+      <OBJECT> (APERTURE=<AP>)
+
+  o The title of pseudo-SP0 format NDFs has been changed to be more
+    informative of the contents of the file.
+  o A new command CLEAN for marking bad strips of data in IUE images
+    has been added.  See HELP/CLEAN, WWW pages or SG/3 for details.
+  o A new command AGSHIFT for calculating and setting the GSHIFT parameter
+    has been added.  See HELP/AGSHIFT, WWW pages or SG/3 for details.
+  o The Plotting area used by PL* commands has been enlarged for most
+    SGS zones.
+  o Environment Variable style syntax has been added to file name loading,
+    previously Logical Names and/or explicit files only were supported.
+  o Support for Calibration, fiducial etc. file loading has been
+    rationalised and documented.
+  o Program output redirection is now possible.
+    When using
+
+       % iuedr < script_file
+
+    the default log file session.lis is produced.
+
+       % iuedr < script_file > script_log.lis
+
+    will produce the log file script_log.lis INSTEAD OF session.lis
+  o For TRAK the case EXTENDED=TRUE CONTINUUM=FALSE now prompts for
+    BSLIT as it should.
+  o The NULL parameter response can now be used as advertised in the
+    manual.  It should be noted that the meaning of a NULL response is
+
+       "use suitable defaults this time"
+
+    For example, if XP=[200,400] and a NULL response to a prompt for XP
+    (from DRIMAGE) is given then XP=[1,768] will be used, but the values
+    [200,400] will be retained for subsequent DRIMAGE invocations.
+  o The maximum number of pseudo-orders allowed in LBLS has been increased
+    from 55 to 120 to reflect changes in the default values of GSAMP and
+    RSAMP.
+  o The EXIT command no longer need be present in IUEDR scripts.
+
+ Bug fixes:
+
+  o When Image Data Quality is altered the Data and Quality file is marked
+    as required for update.  Previously this only occurred for Data
+    alteration.
+  o An error in SETD OBJECT which made it impossible to change the case of
+    letters in the OBJECT field has been removed.
+  o A small bug in the use of the NORDER parameter for HIRES TRAK, where
+    the extraction would over-run the available order range has been fixed.
+  o LISTIUE will process multiple files on a tape and does not re-prompt
+    for FILE number.
+  o A bug in the reading of fiducial positions leading to problems
+    TRAKing HIRES data has been removed.
+  o An error translating all environment variables returned by PSX_GETENV
+    in data file reading to lower case has been removed.
+  o Incorrect FWHM values written to SCAN plots, output files and listings
+    have been fixed.  The SCAN subroutine for HIRES has been modified to
+    use the correct FWHM rather than HWHM.  Documentation for SCANAV which
+    is the HALF WHM not FWHM (as documented before) has been changed.
+  o Missing parameter definitions of APERTURE for the SCAN and MAP commands
+    have been added to the interface file.  The On-line help and SG/3 have
+    been corrected also.
+  o Titles in the PRSCAN command have been changed for HIRES so that the
+    SCANDIST parameter is correctly labelled.
+  o A small error in the case of failed attempts to read _UEM files has
+    been corrected.  These do not produce NDF errors, rather a simple
+    "not available" message.  This applies to the SHOW command.
+  o A bug in the writing of Ripple correction data for Sun hosted systems
+    has been fixed.  This bug precluded the use of the BARKER command on
+    such machines.
+  o A bug causing SGS zones to fall over when an out-of-range zone was
+    chosen has been removed.
+
+1 Accessing_data_via_NFS
+ UNIX machines commonly provide disk sharing amongst remote machines
+ using the NFS protocol.
+
+For example your data frame may reside on a DECstation local
+disk called `iuedata' in the Rutherford cluster on machine `adam4'.
+In order to get IUEDR to read it directly you could enter the
+following in response to the DRIVE prompt :
+
+      DRIVE> /adam4/iuedata/swp12345.raw
+
+To see which disks you have NFS access to you should use the
+
+      df
+
+command. In general any disks whose entry does not start with a `/dev'
+are being served by a remote machine.
+
+IMPORTANT NOTE
+--------------
+
+IUEDR allows you to use this method of
+data access with the following proviso.
+
+If the data resides on a VAX served disk then you must first
+convert its directory entry using the following command :
+
+      UNIX_FORMAT  image-name
+
+This command does not change the data in any way. It merely alters
+the description of the file format as stored in the VAX directory.
+
+If at some later stage you wish to use the VAX version of IUEDR on
+the same data file it first be necessary to use the command
+
+      VAX_FORMAT  image-name
+
+to convert back.
+
+1 AESHIFT
+ Determine echelle shift by measuring shifts for several absorption line
+ features in a HIRES image.
+
+   DATASET         Dataset name.
+   CENTREWAVE      Line central wavelengths (A).
+   DELTAWAVE       Half-width of line search windows (A).
+
+2 Full
+AESHIFT can  be  used to  measure the  global echelle  shift for a HIRES
+spectrum.  A set of laboratory wavelengths of absorption features  which
+should be  present in the  spectrum are located  in the spectrum and the
+ESHIFT for each of them is found.   The median value of these ESHIFTs is
+then selected and used for the whole dataset.
+
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 CENTREWAVE=number[,number...]
+These are the  laboratory wavelengths of a set of absorption features in
+the spectrum to be used to estimate a value for the ESHIFT parameter.
+2 DELTAWAVE=number[,number...]
+The  half-width  of the  window used  to search  for an  absorption line
+feature for  wavelength calibration in Angstroms.  If more than one line
+is being used then each may be given a different search window width.
+1 AGSHIFT
+ Determine spectrum shift automatically.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDERS          This delineates a range of Echelle orders.
+
+2 Full
+AGSHIFT  can be  used to measure the global geometric shift  for a
+spectrum.  A scan of the DATASET must  be made available using the SCAN
+command.
+
+For HIRES data, the  scan is traversed starting with the lowest-numbered
+order and a probable site for the peak of each order is found.  The cen-
+tral position of  each order is then estimated using a centroiding algo-
+rithm.   An estimate of the geometric  shift is made for  each order and
+these are recorded and displayed.
+
+A weighted mean  in which the shifts  determined for orders  100 to  110
+inclusive are given greater weight than other shifts is then calculated.
+The mean shift is displayed and the GSHIFT parameter is set.
+
+Using AGSHIFT it is possible to automate the spectrum extraction process
+for  many datasets.   It should be noted that  objects with no continuum
+may break the AGSHIFT mechanism, giving poor shift values.
+
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDERS=number[,number]
+This is a pair of Echelle order numbers delineating a range.  If only  a
+single value is specified, then the range consists that order only.  The
+"order" of the number pair is not significant.
+1 BARKER
+ The spectrum data in DATASET are corrected for echelle ripple in the
+ range ORDERS using the method of Barker (1984).
+
+   DATASET         Dataset name.
+   ORDERS          This delineates a range of Echelle orders.
+
+2 Full
+The spectrum data in DATASET are corrected for residual  echelle  ripple
+using  the  method  described  by  Barker (1984.  Astronomical  Journal,
+Vol. 89,  899).  Orders in  the  range  ORDERS  are  used  in the ripple
+correction  optimisation.  Note  that  this  optimisation method is only
+applicable for SWP spectra.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDERS=number[,number]
+This is a pair of Echelle order numbers delineating a range.  If only  a
+single value is specified, then the range consists that order only.  The
+"order" of the number pair is not significant.
+1 CGSHIFT
+ Determine spectrum shift using cursor on a scan plot.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDERS          This delineates a range of Echelle orders.
+   DEVICE          GKS/SGS graphics device name.
+
+2 Full
+This  command  allows  the  graphics  cursor  to  be  used  to   provide
+information about spectrum registration shifts.
+
+A plot of the current spectrum scan must be made available using PLSCAN.
+A cycle consisting of any  number of left or middle mouse button hits is
+used to mark the position of the spectrum. Each hit is used to calculate
+a linear geometric shift of the spectrum template relative to the image.
+The cycle is terminated by pressing the right mouse button.
+
+Keyboard keys 1, 2 and 3 can be used  in place of left, middle and right
+mouse buttons respectively.
+
+For LORES, when the cycle is complete, the last geometric shift deter-
+mined is adopted, and the scan is revoked.
+
+For HIRES, each cursor  hit is automatically associated  with an Echelle
+order in  the range defined by the ORDERS parameter.  The last shift  is
+again adopted, but the scan is available for further display or measure-
+ment.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDERS=number[,number]
+This is a pair of Echelle order numbers delineating a range.  If only  a
+single value is specified, then the range consists that order only.  The
+"order" of the number pair is not significant.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+1 CLEAN
+ This command is used to mark pixels with values below a selected
+ threshold as BAD.
+
+   DATASET         Dataset name.
+   THRESH          Smallest pixel value to be accepted as GOOD.
+
+2 Full
+Some IUE  datasets are effected  by horizontal  bars of low pixel values.
+These are caused by a weak  signal from the IUE craft at the time of data
+download.  When there are  a few bars  they can be marked as bad with the
+EDIMAGE command.  In the case of many bars a quicker solution is to mark
+all  pixels in  the image below  a user selected  threshold value as BAD.
+
+Successive  CLEAN and DRIMAGE commands starting with a value of THRESH as
+-1000 and increasing THRESH  towards zero will  allow the user to chose a
+value suitable for the problem image.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 THRESH=value
+This is the  minimum value considered to be good.  All pixels with values
+below this threshold will be marked BAD.
+1 Command_files
+The .CMD style of IUEDR command files is no longer supported. Instead
+commands can be piped into iuedr:
+
+    % iuedr < proc.cmd
+
+It is very easy to convert an old .CMD file into the new format:
+
+E.g., DEMO.CMD procedure
+
+   DATASET=SWP03196
+   SHOW
+   ORDERS=(125,66)
+   SCAN
+   TRAK APERTURE=LAP
+   SHOW V=S
+
+would become the script
+
+   SHOW DATASET=SWP03196
+   SCAN ORDERS=[125,66]
+   TRAK APERTURE=LAP
+   SHOW V=S
+
+The only changes which need be made are to move any parameter specifi-
+cations (eg DATASET=) onto the same line as they command they apply to,
+and to change the round () brackets for vector parameters to square []
+brackets.
+1 Command_line_editing
+Command line editing features are available in IUEDR as follows:
+
+    cursor up           - recall previous command in history list.
+    cursor down         - recall next command in history list.
+    cursor left         - move cursor left on line.
+    cursor right        - move cursor right on line.
+    backspace or delete - Delete character under cursor and shift
+                          remaining string left to fill the gap.
+    control-u           - Delete the current line.
+    control-a           - Jump to start of line.
+    control-e           - Jump to end of line.
+    control-n           - Toggle overstrike/insert mode.
+
+IUEDR will record up to 32 commands  which may  be recalled using the up
+cursor key.
+1 CONFIGURE
+ Toggles recording of parameter values in the log file.
+
+2 Full
+This command  toggles  the  writing of  all parameter  values to the log
+file.   By default  this behaviour  is TRUE and a full log is made,  for
+example:
+
+> drimage
+ DATASET='SWP14931'.
+ Reading SWP14931.UEC (Calibration File).
+ Reading SWP14931_UED (Image & Quality File).
+ COLOUR=FALSE.
+ DEVICE='xw'.
+ FLAG=TRUE.
+ XP=[0,0].
+ YP=[0,0].
+ ZL=[0.0000,0.0000].
+
+When parameter logging is switched off the same command produces only:
+
+> drimage
+ Reading SWP14931.UEC (Calibration File).
+ Reading SWP14931_UED (Image & Quality File).
+
+in the log file.
+1 CULIMITS
+ This command allows the display limits to be delineated by the cursor
+ and the appropriate parameters set accordingly.
+
+   DEVICE          GKS/SGS graphics device name.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+   XP              X-axis pixel limits, undefined means full extent.
+   YP              Y-axis pixel limits, undefined means full extent.
+
+2 Full
+This command lets the cursor be used to  delineate  part  of  a  current
+display (graph/picture) to be displayed in some subsequent command (e.g.
+DRIMAGE, PLFLUX).
+
+The two cursor positions  should be at the corners of the required rect-
+angular subset.  The relation between cursor position sequences and axis
+reversals for graphs is:
+
+      position 1    position 2    x-reversed    y-reversed
+
+      bottom/left   top/right         NO           NO
+      bottom/right  top/left          YES          NO
+      top/left      bottom/right      NO           YES
+      top/right     bottom/left       YES          YES
+
+The XL and YL values are changed accordingly.  In the case of  an  image
+display,  the  XP  and  YP parameter values are changed.  The image will
+ALWAYS be drawn without axis reversals.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+2 XP=number,number
+This specifies the pixel limits along the  x-direction  used  for  image
+display.  Values in decreasing order will cause the image to be inverted
+along the x-direction.  If the values are undefined,  the  pixel  limits
+will  default  to  include  the  whole  extent  of  the  image along the
+x-direction.
+2 YP=number,number
+This specifies the pixel limits along the  y-direction  used  for  image
+display.  Values in decreasing order will cause the image to be inverted
+along the y-direction.  If the values are undefined,  the  pixel  limits
+will  default  to  include  the  whole  extent  of  the  image along the
+y-direction.
+1 CURSOR
+ Find display coordinate using the cursor and print on terminal.
+
+2 Full
+This command uses the graphics cursor to mark positions  on  a  diagram.
+The diagram can be either a plot or a displayed image.
+
+Pressing the left or middle  mouse button displays information about the
+pixel being  pointed to.  Pressing the right mouse button terminates the
+CURSOR cycle.  The coordinates for each hit are printed on the terminal;
+they correspond to the unit scale of the axes prevailing  on the current
+diagram,  e.g. wavelength,  flux.  If meaningful,  additional coordinate
+information is also printed.
+1 DRIMAGE
+ Display image on an image display device.
+
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   XP              X-axis pixel limits, undefined means full extent.
+   YP              Y-axis pixel limits, undefined means full extent.
+   ZL              Data limits for image display, undefined  means  full
+                   range.
+   COLOUR          Whether a false colour look-up table  is used for the
+                   display.
+   ZONE            Zone to be used for plotting.
+   FLAG            Whether data quality for faulty pixels is displayed.
+
+2 Full
+This command displays the image, specified by the DATASET parameter,  on
+the device specified by the DEVICE parameter.
+
+The part of the  image displayed is specified by the XP and YP parameter
+values.  If unspecified,XP and YP default to the entire image extent:
+
+   XP=[1,768], YP=[1,768]
+
+If the values of XP or YP are specified in  decreasing  order, then  the
+image will NOT be reversed along the appropriate axis.
+
+The range  of data values displayed (as a grey scale) is limited  by the
+two values of the ZL parameter.  Data values at ZL(1) will appear BLACK,
+whilst those at ZL(2) will appear WHITE.  If the ZL values are given  in
+decreasing  order,  then high data  values  will be  represented  by low
+(dark)  display intensities,  and vice-versa.   If the values are undef-
+ined, then the full intensity range of the image will be used.
+
+Data values which  fall below the  lowest display intensity are drawn in
+BLACK,  while  those  which fall above the highest display intensity are
+drawn BLUE.  If COLOUR=TRUE then a false colour look-up table is used
+instead.
+
+The FLAG parameter specifies  whether faulty  pixels  are  flagged using
+the following colour scheme:
+
+      GREEN       pixels affected by reseau marks
+      RED         pixels which are saturated (DN=255)
+      ORANGE      pixels affected by ITF truncation
+      YELLOW      pixels marked bad by the user
+
+If a pixel is affected by more than one of the above  faults,  then  the
+first in the list is adopted for display.
+
+The ZONE parameter  is accepted  by DRIMAGE but is ignored,  the display 
+always using using ZONE=0.
+
+2 COLOUR=boolean
+
+ If COLOUR=TRUE then a false colour look-up table is used to derive
+ pixel colours.  Otherwise a greyscale is used.
+
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 FLAG=boolean
+This specifies whether the data quality information is  displayed  along
+with  the image.  If so, then faulty pixels will be marked with a colour
+according to the following scheme:
+
+      GREEN       pixels affected by reseau marks
+      RED         pixels which are saturated (DN=255)
+      ORANGE      pixels affected by ITF truncation
+      YELLOW      pixels marked bad by the user
+
+User edits are only shown where no other fault is present.
+
+This option  would normally only  be used when assessing the  quality of
+faulty pixels, possible  with a view to  using them (marking them "good"
+with a cursor editor).
+2 XP=number,number
+This specifies the pixel limits along the  x-direction  used  for  image
+display.  Values in decreasing order will cause the image to be inverted
+along the x-direction.  If the values are undefined,  the  pixel  limits
+will  default  to  include  the  whole  extent  of  the  image along the
+x-direction.
+2 YP=number,number
+This specifies the pixel limits along the  y-direction  used  for  image
+display.  Values in decreasing order will cause the image to be inverted
+along the y-direction.  If the values are undefined,  the  pixel  limits
+will  default  to  include  the  whole  extent  of  the  image along the
+y-direction.
+2 ZL=number,number
+This specifies the data limits used  for  display  of  images.   If  the
+values  are  given  in  decreasing  order, then high data values will be
+represented by low (dark) display intensities, and vice-versa.   If  the
+values are undefined, then the full intensity range of the image will be
+used.
+
+Data values which  fall below the lowest  display intensity are drawn in
+BLACK,  while  those  which fall above the highest display intensity are
+drawn BLUE.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+1 Drive_specifiers
+
+The use of the DRIVE parameter has been enhanced to allow specification
+of disk files containing IUE datasets.  This is intended for use with
+files obtained from online archives (RAL and NASA).
+
+The syntax is to provide the full filename and extension in response to
+the DRIVE prompt.
+
+E.g.
+      DRIVE> SWP12345.RAW
+1 EDIMAGE
+ Edit image data quality using image display cursor.
+
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+
+2 Full
+This command allows the image display cursor to be used to  mark  pixels
+and  regions  of  the current image that are "bad" or "good".  The image
+should have previously been displayed using  the  DRIMAGE  command.   So
+that faulty pixels can be seen, the FLAG=YES option in DRIMAGE should be
+used.
+
+The image display is specified by the  DEVICE parameter, and the associ-
+ated dataset by the DATASET parameter.
+
+The following cursor hit sequences can be used in a cycle:
+
+      1  then  1    marks all pixels in the rectangle GOOD
+      2  then  2    marks all points in the rectangle BAD
+      1             marks the nearest pixel GOOD
+      2             marks the nearest pixel BAD
+      3             causes the cursor cycle to terminate
+
+Mouse buttons can be used for cursor hits where:
+
+      left button     is  hit 1
+      middle button   is  hit 2
+      right button    is  hit 3
+
+Alternatively, keyboard keys 1, 2 and 3 can be used to mark hits.
+
+The pixels/ranges  changed  are  printed  on  the  terminal.   The  term
+"rectangle"  is  used  above  to  indicate  a  rectangular set of pixels
+delineated by the two cursor positions.  Thus, for the  first  hit,  the
+cursor  can  be positioned at the bottom left corner, and for the second
+at the top right corner.
+
+Only the user-defined data quality bit can be changed with this command.
+Initially, all  faulty pixels  have this bit set BAD, so  that spectrum
+extraction can ignore these where appropriate.  However, the user-
+defined data quality can be set GOOD.
+
+See the User Guide (MUD/45) for further information on "data quality".
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+1 EDMEAN
+ Edit mean spectrum using graphics cursor.
+
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+
+2 Full
+This command allows the graphics cursor to be used to  mark  points  and
+regions of the mean spectrum that are "bad" or "good".
+
+The following cursor hit sequences can be used in a cycle:
+
+      1  then  1    marks all points in the x-range GOOD
+      2  then  2    marks all points in the x-range BAD
+      1             marks the nearest point (in x-direction) GOOD
+      2             marks the nearest point (in x-direction) BAD
+      3             causes the cursor cycle to terminate
+
+The points/ranges changed are printed on the terminal.
+
+Mouse buttons can be used for cursor hits where:
+
+      left button     is  hit 1
+      middle button   is  hit 2
+      right button    is  hit 3
+
+Alternatively, keyboard keys 1, 2 and 3 can be used to mark hits.
+
+See the User Guide (MUD/45) for further information on "data quality".
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+1 EDSPEC
+ Edit net spectrum using graphics cursor.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   DEVICE          GKS/SGS graphics device name.
+
+2 Full
+This command allows the graphics cursor to be used to  mark  points  and
+regions of the current net spectrum that are "bad" or "good".  A plot of
+the APERTURE or ORDER spectrum is required before this  command  can  be
+used.
+
+The following cursor hit sequences can be used in a cycle:
+
+      1  then  1    marks all points in the x-range GOOD
+      2  then  2    marks all points in the x-range BAD
+      1             marks the nearest point (in x-direction) GOOD
+      2             marks the nearest point (in x-direction) BAD
+      3             causes the cursor cycle to terminate
+
+The points/ranges changed are printed on the terminal.
+
+Mouse buttons can be used for cursor hits where:
+
+      left button     is  hit 1
+      middle button   is  hit 2
+      right button    is  hit 3
+
+Alternatively, keyboard keys 1, 2 and 3 can be used to mark hits.
+
+
+Only the user-defined data quality bit can be changed with this command.
+Initially, all faulty points have this bit set BAD (e.g. by TRAK).  How-
+ever,  whether they  are considered bad (e.g. when plotting  or creating
+output  files)  is determined  by the  user-defined  bit,  which  can be
+changed at will.
+
+See the User Guide (MUD/45) for further information on "data quality".
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDER=number
+This is the Echelle order number.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+1 ERASE
+ Erase display of graphics device.
+
+   DEVICE          GKS/SGS graphics device name.
+
+2 Full
+The display screen of the specified graphics device is erased.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+1 EXIT
+ Leaves IUEDR and returns to the command shell.
+
+2 Full
+This command leaves the IUEDR programme and returns to the shell from which it 
+was started.  Any data files which require update will be written by this
+command.  The command is a synonym for the QUIT command.
+
+Note that the existing files for the current dataset are overwritten.
+1 Help
+ This is the IUEDR on-line HELP facility.  It operates just like the VMS
+ Help Facility.  It contains entries of the following kind:
+
+    a) Commands (depicted by all UPPER CASE names).
+
+    b) Parameter Information (under "Parameters").
+
+    c) Related Information (depicted by a Capital first letter).
+1 IUEDR
+
+ This is the unix monolith version of IUEDR. There are a number of
+ important changes from the VMS version.
+
+   - The session log is stored in session.lis and can be examined using
+     more or cat at the shell prompt.
+   - To supply a vector parameter on a command line, the components have
+     to be enclosed in square brackets, e.g. XL=[1000,1100]
+     However, when you are prompted for a vector, the brackets are not
+     required.
+   - .CMD command files are no longer supported. However, commands may
+     be piped into IUEDR.
+
+ For a list of IUEDR commands type ? at the `Topic?' prompt.
+
+ For help on a particular command type its name at the `Topic?' prompt,
+ or type HELP name at the `>' prompt.
+
+1 LBLS
+ This extracts a line-by-line-spectrum (LBLS) array from the image.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   CENTM           Whether pre-existing centroid template is used.
+   CUTWV           Whether wavelength cutoff data is used for extraction
+                   grid.
+   GSAMP           Spectrum grid sampling rate (geometric pixels).
+   RL              Limits across spectrum for LBLS array (pixels).
+   RSAMP           Radial coordinate sampling rate  for   LBLS   grid in
+                   pixels.
+
+2 Full
+This command creates  a  line-by-line-spectrum  (LBLS)  array  from  the
+image.   The  array  consists  intensities  F(IR,  IW)  for  a  grid  of
+wavelengths, W(IW), and radial coordinates, R(IR).
+
+The wavelength grid, W, is determined in a similar way to the TRAK comm-
+and, and involves the CUTWV (HIRES) and GSAMP (HIRES/LORES) parameters.
+
+The  radial coordinates are  distances from the  centre of  the spectrum
+along a line perpendicular to the dispersion direction, and  measured in
+geometric pixels.  The radial grid, R, is determined by the RL and RSAMP
+parameters.
+
+The value of each pixel in the array  corresponds  to  the  surface over
+the image of  a rectangle centred on its (R, W) coordinates, and extents
+(R(IR) - DR / 2, R(IR) + DR / 2) and (W(IW) - DW / 2, W(IW)  +  DW / 2).
+DR is the distance between R values, and DW is the wavelength step bet-
+ween W values.
+
+This surface integral is  scaled along the W direction  to correspond to
+an  interval of 1.414 geometric pixels.  The reason for  this is to make
+LBLS intensities  consistent with  those  produced  by the TRAK command.
+For a particular wavelength,  W(IW), the sum  of LBLS intensities (after
+removal of  background) should correspond to the Net flux as measured by
+TRAK.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 CENTM=boolean
+This indicates whether a centroid template from the calibration  dataset
+is  used  as  a  start  in defining the precise position of the spectrum
+signal on the image.
+
+There is no guarantee that such a template will be available in a parti-
+cular situation (camera/aperture/resolution/order).
+2 CUTWV=boolean
+This indicates whether any available  Echelle  order  wavelength  cutoff
+limits  are  to  be  used  for  the  spectrum extraction wavelength grid
+limits.  Highly recommended, provided that  you  are  happy  with  these
+wavelength limits.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 GSAMP=number
+This is the sampling rate used for spectrum extraction.  It is  measured
+in  "geometric pixels".  GSAMP=1.414 corresponds to the original IUESIPS
+(1) sampling rate,  while GSAMP=0.707 corresponds  to  the later IUESIPS
+(2) sampling rate.  Other values can be chosen.
+2 ORDER=number
+This is the Echelle order number.
+2 RL=number,number
+This is a pair of radial coordinate values defining the start and end of
+the radial grid in an LBLS array.  These radial coordinates are measured
+in geometric pixels, and run perpendicular to the dispersion  direction.
+A coordinate of 0.0 corresponds to the centre of the spectrum.
+
+Values of [0.0,0.0] indicate that internal defaults are to be adopted.
+A single value is reflected symmetrically about 0.0.
+2 RSAMP=number
+This is the sample spacing used for the radial grid in the  LBLS  array.
+If it does not fit an integral number of times into the grid limits, RL,
+then the latter are adjusted to fit.
+
+Suggested values range from 0.707 to 1.414 pixels; the latter correspon-
+ding to the IUESIPS LBLS grid.
+1 LISTIUE
+ Analyse the contents of one or more IUE tape files.
+
+   DRIVE           Tape Drive or File Name.
+   FILE            File Number.
+   NFILE           Number of Tape Files to be processed.
+   NLINE           Number of IUE header lines printed.
+   SKIPNEXT        Whether skip to next file.
+
+2 Full
+This performs an analysis of NFILE IUE  tape  files,  starting  at  file
+specified  by  the  FILE  parameter.  NFILE=-1 means all files until the
+end of the tape.   This can also be used to display the header data from
+a GO format disk file.
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+
+Alternatively, a filename may be given. If the filename
+contains a directory specification it should be placed in
+single quotes.
+2 FILE=number
+This is the Tape File Number.  The first file on a tape would be FILE=1.
+One case  which may present  some problems is  that of  a tape with a an
+End-of-volume (EOV) mark in the middle, and valuable  data  beyond.   An
+EOV  is  two  consecutive Tape Marks (sometimes called "File Marks").  A
+File is defined, here, as the information between two Tape Marks.  So if
+the number for a (real) file before EOV is FILEN, then the number of the
+next (real) file following the EOV is (FILEN+2).
+2 NFILE=number
+This is the number of tape files to be processed.  A value of "-1" means
+all files until the end.
+2 NLINE=number
+This is the number of IUE header  lines  printed.   NLINE=-1  means  the
+entire header is printed.
+2 SKIPNEXT=boolean
+This determines whether the tape is positioned at the start of the  next
+file  after processing.  If only the start of a file is being processed,
+then by setting SKIPNEXT=FALSE, time can be saved.
+1 MAP
+ Map and merge spectrum components to produce a mean spectrum.
+
+   DATASET         Dataset name.
+   ORDERS          This delineates a range of Echelle orders.
+   APERTURE        Aperture name (SAP or LAP).
+   RM              Whether mean spectrum is reset before averaging.
+   ML              Wavelength grid limits for mean spectrum.
+   MSAMP           Wavelength sampling rate for mean spectrum grid.
+   FILLGAP         Whether gaps can be filled within order.
+   COVERGAP        Whether gaps can be filled by covering orders.
+
+2 Full
+This command can be used to produce a mean spectrum  with  contributions
+from several Echelle orders (HIRES), or from several apertures (LORES).
+
+If RM=TRUE, or if there is no existing  mean  spectrum,  then  an evenly
+spaced wavelength  grid  is  constructed  between  the  limits specified
+by the ML parameter, and using the sampling rate specified  by the MSAMP
+parameter.
+
+If RM=FALSE and there IS an existing mean spectrum, then the  wavelength
+grid AND CONTENTS  are retained.  New components  will be  averaged with
+what is already there.
+
+In the case of HIRES, the ORDERS parameter is used to delimit  the range
+of echelle orders that are allowed to contribute to the mean.
+
+In the case of LORES only a single  aperture, specified by  the APERTURE
+parameter, is mapped at a given time.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDERS=number[,number]
+This is a pair of Echelle order numbers delineating a range.  If only  a
+single value is specified, then the range consists that order only.  The
+"order" of the number pair is not significant.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 RM=boolean
+This determines whether the mean spectrum  is  reset  before  a  mapping
+takes  place.   If  the  spectrum  is  not reset, then the spectra being
+mapped will be averaged with the existing net spectrum.
+2 ML=number,number
+This is a pair of wavelength values defining the start and  end  of  the
+mean spectrum grid.  The grid will  consist of Vacuum Wavelengths evenly
+spaced between these values.
+2 MSAMP=number
+This is the (Vacuum) wavelength sampling  rate  for  the  mean  spectrum
+grid.   If  it  does  not  fit an integral number of times into the grid
+limits, then the latter are adjusted to fit.
+2 FILLGAP=boolean
+If a grid point in the mean spectrum would have had a contribution  from
+a  bad  data point, this parameter determines whether that grid point is
+marked as  unusable within  the context  of the order  or aperture being
+mapped.  If the grid point is marked  as unusable in this way then other
+(good) points cannot contribute to it.
+2 COVERGAP=boolean
+If after mapping an order/aperture, a grid point is marked as  unusable,
+then  this  parameter  determines  whether other orders/apertures can be
+allowed to contribute to this grid point.
+1 MODIMAGE
+ Modifies actual image intensities interactively.
+
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   FN              Replacement Flux Number for pixel
+
+2 Full
+This command allows the image display cursor to be used to modify  image
+data.   The  image  should already have been displayed using the DRIMAGE
+command.
+
+The following cursor sequences are adopted:
+
+      1 then 2        Copy intensity of first picked pixel to the second
+      2               Prompt for replacement pixel intensity
+      3               Finish
+
+Mouse buttons can be used for cursor hits where:
+
+      left button     is  hit 1
+      middle button   is  hit 2
+      right button    is  hit 3
+
+Alternatively, keyboard keys 1, 2 and 3 can be used to mark hits.
+
+If the data and/or quality changes after a session, the file is saved on
+disk.
+
+The assumption is made that  the current image  displayed corresponds to
+the current dataset!
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 FN=number
+This parameter is the  replacement  Flux  Number  for  a  pixel  changed
+explicitly by the user.
+
+1 MTMOVE
+ Move to the start of a tape file.
+
+   DRIVE           Tape Drive Name.
+   FILE            Tape File Number.
+
+2 Full
+Move to the start of file specified by FILE on tape specified by 
+DRIVE.
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+2 FILE=number
+This is the Tape File Number.  The first file on a tape would be FILE=1.
+One case  which may present  some problems is  that of  a tape with a an
+End-of-volume (EOV) mark in the middle, and valuable  data  beyond.   An
+EOV  is  two  consecutive Tape Marks (sometimes called "File Marks").  A
+File is defined, here, as the information between two Tape Marks.  So if
+the number for a (real) file before EOV is FILEN, then the number of the
+next (real) file following the EOV is (FILEN+2).
+1 MTREW
+ Rewind tape.
+
+   DRIVE           Tape Drive Name.
+
+2 Full
+This command rewinds the tape specified by the DRIVE parameter.
+
+The FILE parameter is also set to 1 by this command.
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+1 MTSHOW
+ Show tape position.
+
+   DRIVE           Tape Drive Name.
+
+2 Full
+This command displays the current tape position.  This includes the file
+number,  and the block position, either relative to the start or the end
+of the file.
+
+Note that the actual file position may differ from the value of the FILE
+parameter.
+
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+1 MTSKIPEOV
+ Skip over EOV mark.
+
+   DRIVE           Tape Drive Name.
+
+2 Full
+This command skips over an EOV mark on the tape specified by  the  DRIVE
+parameter.   An  EOV  condition  is where there are two consecutive tape
+marks.  When attempting to skip across an EOV, an error will be reported
+and the tape left positioned between the two marks.  Subsequent attempts
+to skip forward will fail, and only this command can  be  used  to  move
+forward beyond the second tape mark.
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+1 MTSKIPF
+ Skip over NSKIP tape marks.
+
+   DRIVE           Tape Drive Logical Name.
+   NSKIP           Number of Tape Marks to be skipped over.
+
+2 Full
+This command skips over NSKIP tape marks on the tape  specified  by  the
+DRIVE  parameter.   If  NSKIP is negative this means that tape marks are
+skipped in the reverse direction (towards the start of the tape).
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+2 NSKIP=number
+This is the number of tape marks to be skipped.
+1 NEWABS
+ Read absolute flux calibration into DATASET from text  file  with  name
+ specified by ABSFILE.
+
+   DATASET         Dataset name.
+   ABSFILE         Name of file containing absolute flux calibration.
+   ITF             This  is  the  ITF  generation  used  in  the   image
+                   calibration.
+
+2 Full
+This command reads the  absolute  flux  calibration  from  a  text  file
+specified  by  the  ABSFILE  parameter,  and  stores  it  in the dataset
+specified by DATASET.  The default calibration file is constructed using
+the CAMERA, RESOLUTION and ITF parameters.
+
+The calibration of any current spectrum is automatically updated.
+
+The file type is  assumed to be ".abs", and  should not be  specified as
+part of the ABSFILE parameter value.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ABSFILE=string
+This is the name of a file containing an absolute flux  calibration.
+A  type of ".abs" is assumed, and need not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied calibration file for the SWP camera
+HIRES mode:
+
+   > NEWABS ABSFILE=$IUEDR_DATA/swphi
+2 ITF=number
+This is the ITF generation used in the photometric  calibration  of  the
+image.   This  information  is  needed  for  the  correct  absolute flux
+calibration of the resulting spectra.  Possible values for  each  camera
+are as follows:
+
+      SWP     1 (faulty), 2 and 3
+      LWR     1 and 2
+      LWP     1 and 2
+
+Here are the ITF values associated with various forms of this table:
+
+      ITF       TABLE                           IDENTIFICATION
+      ITF 0     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      ITF 1     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      ITF 1     0  2300  3969  6062  ... 32973  1st LWP ITF
+      ITF 2     0  2723  5429  8145  ... 38389  2nd LWP ITF
+      ITF 0     0  1800  3600  5500  ...        Preliminary SWP ITF
+      ITF 1     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      ITF 2     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+1 NEWCUT
+ Read echelle order wavelength limits into DATASET from text  file  with
+ name specified by CUTFILE.
+
+   DATASET         Dataset name.
+   CUTFILE         Name of  file  containing  Echelle  order  wavelength
+                   limits.
+
+2 Full
+This command reads an echelle order wavelength limits from a  text  file
+specified  by  the  CUTFILE  parameter,  and  stores  it  in the dataset
+specified by DATASET.
+
+The calibration of any current spectrum is automatically updated.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 CUTFILE=string
+This is the name of a file containing Echelle order wavelength limits.
+A file type of ".cut" is assumed, and should not be specified
+explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied cut file for the SWP camera LAP:
+
+   > NEWCUT CUTFILE=$IUEDR_DATA/swplap
+1 NEWDISP
+ Read spectrograph dispersion data into DATASET from text file with name
+ specified by DISPFILE.
+
+   DATASET         Dataset name.
+   DISPFILE        Name of file containing dispersion data.
+
+2 Full
+This command  reads  spectrograph  dispersion  data  from  a  text  file
+specified  by  the  DISPFILE  parameter,  and stores them in the dataset
+specified by DATASET.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DISPFILE=string
+This is the name of a file containing dispersion data.  A type of
+".dsp" is assumed, and should not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied dispersion file for the SWP camera
+HIRES mode:
+
+   > NEWDISP DISPFILE=$IUEDR_DATA/swphi
+1 NEWFID
+ Read Fiducial positions into DATASET from text file with name specified
+ by FIDFILE.
+
+   DATASET         Dataset name.
+   FIDFILE         Name of file containing fiducial positions.
+   NGEOM           Number of Chebyshev terms used to represent geometry.
+
+2 Full
+This command reads fiducial positions from a text file specified by  the
+FIDFILE parameter, and stores them in the dataset specified by DATASET.
+The image data  quality  and  geometry  representation  are  updated  to
+account for any changes that these fiducial positions imply.
+
+In the case of datasets containing image distortion, the NGEOM parameter
+is used to  specify the number  of terms used  (along each axis) for the
+Chebyshev representation.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 FIDFILE=string
+This is the name of a file containing  fiducial  positions.   A
+type of ".fid" is assumed, and should not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied fiducial file for a SWP camera
+PHOT image:
+
+   > NEWFID FIDFILE=$IUEDR_DATA/swpr
+2 NGEOM=number
+This is the number of Chebyshev terms used to represent the  geometrical
+distortion.  The same value is used for each axis direction.
+1 NEWRIP
+ Read echelle ripple calibration into DATASET from text file  with  name
+ specified by RIPFILE.
+
+   DATASET         Dataset name.
+   RIPFILE         Name of file containing Echelle ripple calibration.
+
+2 Full
+This command reads an  echelle  ripple  calibration  from  a  text  file
+specified  by  the  RIPFILE  parameter,  and  stores  it  in the dataset
+specified by DATASET.
+
+The calibration of any current spectrum is automatically updated.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 RIPFILE=string
+This is the name of a file containing an Echelle ripple calibration.
+A  type of ".rip" is assumed, and should not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied ripple file for the SWP camera:
+
+   > NEWRIP RIPFILE=$IUEDR_DATA/swp
+1 NEWTEM
+ Read spectrum centroid template data into DATASET from text  file  with
+ name specified by TEMFILE.
+
+   DATASET         Dataset name.
+   TEMFILE         Name of file containing spectrum template data.
+
+2 Full
+Read spectrum centroid template data into DATASET from  text  file  with
+name specified by TEMFILE.
+
+The file  type is assumed  to be ".tem", and should not be  specified as
+part of the TEMFILE parameter.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 TEMFILE=string
+This is the name of a file which contains the standard spectrum template
+data.  A type of ".tem" is assumed, which should not be specified expli-
+citly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the a template file "swptemp" from the a directory
+named IUEDR_TEM:
+
+   > NEWTEM TEMFILE=$IUEDR_TEM/swptemp
+1 OUTEM
+ This command outputs the templates stored with the current dataset to a
+ separate text file.
+
+   DATASET         Dataset name.
+   TEMFILE         Name of file to contain spectrum template data.
+
+2 Full
+This command outputs the templates stored with the current dataset to  a
+separate text file.
+
+If not specified, the file name is constructed as:
+
+      <CAMERA>HI<APERTURE>.TEM
+
+      or
+
+      <CAMERA>LO.TEM
+
+for the HIRES and LORES cases respectively.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 TEMFILE=string
+This is the name of a file which contains the standard spectrum template
+data.  A type of ".tem" is assumed, which should not be specified expli-
+citly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the a template file "swptemp" from the a directory
+named IUEDR_TEM:
+
+   > NEWTEM TEMFILE=$IUEDR_TEM/swptemp
+1 OUTLBLS
+ Output the current LBLS array to a binary sequential file.
+
+   DATASET         Dataset name.
+   OUTFILE         Name of output file.
+
+2 Full
+This command outputs the current LBLS array to a file.  The  file  name,
+if not specified by the OUTFILE parameter, is constructed:
+
+      <CAMERA><IMAGE>R.DAT
+
+The format of this file is described by the Fortran 77 routine,  RDLBLS,
+which can be found in the file:
+
+      $IUEDR_USER/rdlbls.for
+
+this directory (environment variable $IUEDR_USER) also contains  a  test
+program for using RDLBLS, and other helpful items.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+1 OUTMEAN
+ Output mean spectrum from DATASET to a DIPSO "SP" format file.
+
+   DATASET         Dataset name.
+   OUTFILE         Name of output file.
+   SPECTYPE        "SPECTRUM" file type (0, 1 or 2).
+
+2 Full
+This command outputs the mean spectrum associated with DATASET to a file
+that can be read into DIPSO (see SUN/50).
+
+This file is created with type specified by the SPECTYPE  parameter (see
+SUN/50 for SP options),  and its name, if not specified, is constructed:
+
+      <CAMERA><IMAGE>M.sdf    for SP0
+      <CAMERA><IMAGE>M.DAT    for SP1 or SP2
+
+In DIPSO SP format, bad points are indicated by having zero intensities.
+In determining which  points in the output  file are to be marked "bad",
+the user-defined data quality bit is used.  Since this bit can be arbit-
+rarily  edited,  faulty  data values can be  written to the output file,
+without subsequent information being retained.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+2 SPECTYPE=number
+This is the type of file (in the terminology of Steve Adams old SPECTRUM
+program), to be created.  The following values are allowed:
+
+      0       Starlink standard NDF
+      1       Fixed format file
+      2       Free format file
+
+It is recommended  that  datasets  with  many  points  be  written  with
+SPECTYPE=0,  which  is  more  efficient  in  disk  space  and time spent
+reading/writing.
+
+It should be noted  that files created  with any of these formats can be
+read into the DIPSO program (Maslen/Howarth, UCL, see SUN/50).
+1 OUTNET
+ Output APERTURE or ORDER net spectrum from  DATASET  to  a  DIPSO  "SP"
+ format file.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDER           Echelle order number.
+   OUTFILE         Name of output file.
+   SPECTYPE        "SPECTRUM" file type (0, 1 or 2).
+
+2 Full
+This command outputs the Net spectrum associated with ORDER or  APERTURE
+and DATASET to a file that can be read into DIPSO (see SUN/50).
+
+The file is created with type specified by the  SPECTYPE  parameter (see
+SUN/50 for SP options),  and its name, if not specified, is constructed:
+
+      <CAMERA><IMAGE>_<APERTURE>.sdf    for SP0
+      <CAMERA><IMAGE>.<APERTURE>        for SP1 or SP2
+
+in the case of LORES, and
+
+      <CAMERA><IMAGE>_<ORDER>.sdf       for SP0
+      <CAMERA><IMAGE>.<ORDER>           for SP1 or SP2
+
+in the case of HIRES.  Here <APERTURE> is the aperture name (SAP or LAP)
+or index, and <ORDER> is the echelle order number.
+
+In DIPSO SP format, bad points are indicated by having zero intensities.
+In determining which  points in the output  file are to be marked "bad",
+the user-defined data quality bit is used.  Since this bit can be arbit-
+rarily  edited,  faulty  data values can be  written to the output file,
+without subsequent information being retained.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDER=number
+This is the Echelle order number.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+2 SPECTYPE=number
+This is the type of file (in the terminology of Steve Adams old SPECTRUM
+program), to be created.  The following values are allowed:
+
+      0       Starlink standard NDF
+      1       Fixed format file
+      2       Free format file
+
+It is recommended  that  datasets  with  many  points  be  written  with
+SPECTYPE=0,  which  is  more  efficient  in  disk  space  and time spent
+reading/writing.
+
+It should be noted  that files created  with any of these formats can be
+read into the DIPSO program (Maslen/Howarth, UCL, see SUN/50).
+1 OUTRAK
+ The uncalibrated DATASET spectrum is  written  to  a  formatted  "TRAK"
+ file.
+
+   DATASET         Dataset name.
+   OUTFILE         Name of output file.
+
+2 Full
+This command outputs the uncalibrated spectrum associated  with  DATASET
+to  a  formatted  file  that  is  compatible with output from the "TRAK"
+program.  The default file name is of the form:
+
+      <CAMERA><IMAGE>.TRK
+
+The main difference from an actual "TRAK" file is  that  the  background
+level is uniformly zero, so that GROSS=NET.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+1 OUTSCAN
+ Output the current scan associated with DATASET to a DIPSO "SP"  format
+ file.
+
+   DATASET         Dataset name.
+   OUTFILE         Name of output file.
+   SPECTYPE        "SPECTRUM" file type (0, 1 or 2).
+
+2 Full
+This command outputs the current scan associated with DATASET to a  file
+which can be read into DIPSO (see SUN/50).
+
+The file is created with type specified by the  SPECTYPE  parameter (see
+SUN/50 for SP options),  and its name, if not specified, is constructed:
+
+      <CAMERA><IMAGE>P.sdf    for SP0
+      <CAMERA><IMAGE>P.DAT    for SP1 or SP2
+
+In DIPSO SP format, bad points are indicated by having zero intensities.
+In determining which  points in the output  file are to be marked "bad",
+the user-defined data quality bit is used.  Since this bit can be arbit-
+rarily  edited,  faulty  data values can be  written to the output file,
+without subsequent information being retained.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+2 SPECTYPE=number
+This is the type of file (in the terminology of Steve Adams old SPECTRUM
+program), to be created.  The following values are allowed:
+
+      0       Starlink standard NDF
+      1       Fixed format file
+      2       Free format file
+
+It is recommended  that  datasets  with  many  points  be  written  with
+SPECTYPE=0,  which  is  more  efficient  in  disk  space  and time spent
+reading/writing.
+
+It should be noted  that files created  with any of these formats can be
+read into the DIPSO program (Maslen/Howarth, UCL, see SUN/50).
+1 OUTSPEC
+ Output APERTURE or ORDER spectrum from DATASET to a DIPSO  "SP"  format
+ file.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDER           Echelle order number.
+   OUTFILE         Name of output file.
+   SPECTYPE        "SPECTRUM" file type (0, 1 or 2).
+
+2 Full
+This command outputs the spectrum associated with ORDER or APERTURE  and
+DATASET to a file which can be read into DIPSO (see SUN/50).
+
+The file is created with type specified by the  SPECTYPE  parameter (see
+SUN/50 for SP options),  and its name, if not specified, is constructed:
+
+      <CAMERA><IMAGE>_<APERTURE>.sdf    for SP0
+      <CAMERA><IMAGE>.<APERTURE>        for SP1 or SP2
+
+in the case of LORES, and
+
+      <CAMERA><IMAGE>_<ORDER>.sdf       for SP0
+      <CAMERA><IMAGE>.<ORDER>           for SP1 or SP2
+
+in the case of HIRES.  Here <APERTURE> is the aperture name (SAP or LAP)
+or index, and <ORDER> is the Echelle order number.
+
+In DIPSO SP format, bad points are indicated by having zero intensities.
+In determining which  points in the output  file are to be marked "bad",
+the user-defined data quality bit is used.  Since this bit can be arbit-
+rarily  edited,  faulty  data values can be  written to the output file,
+without subsequent information being retained.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDER=number
+This is the Echelle order number.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+2 SPECTYPE=number
+This is the type of file (in the terminology of Steve Adams old SPECTRUM
+program), to be created.  The following values are allowed:
+
+      0       Starlink standard NDF
+      1       Fixed format file
+      2       Free format file
+
+It is recommended  that  datasets  with  many  points  be  written  with
+SPECTYPE=0,  which  is  more  efficient  in  disk  space  and time spent
+reading/writing.
+
+It should be noted  that files created  with any of these formats can be
+read into the DIPSO program (Maslen/Howarth, UCL, see SUN/50).
+1 Parameters
+ The following is a list of all the parameters available to IUEDR commands.
+
+2 ABSFILE=string
+This is the name of a file containing an absolute flux  calibration.
+A  type of ".abs" is assumed, and need not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied calibration file for the SWP camera
+HIRES mode:
+
+   > NEWABS ABSFILE=$IUEDR_DATA/swphi
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 APERTURES=name
+This specifies an aperture or group of apertures.  The  following  names
+have defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+      BAP       IUE Both Apertures (i.e. SAP and LAP)
+2 AUTOSLIT=boolean
+This determines whether the extraction slit is determined  automatically
+by the command.  When AUTOSLIT=TRUE the BDIST, BSLIT and GSLIT parameter
+values  are  determined  automatically,  based  on   the   IUE   Camera,
+Resolution,  Aperture,  and  on the values of the CONTINUUM and EXTENDED
+parameters.  This mode of operation  is  probably  the  best  for  point
+source objects.
+2 BADITF=boolean
+This parameter determines whether a correction  is  made  to  the  pixel
+intensities to account for errors during Ground Station ITF calibration.
+(Note  that  the  best  scientific  results  would  be   obtained   from
+reprocessed  data which can be obtained on request.) The following cases
+are handled:
+
+      SWP,LORES             Correction of 2nd (Faulty) ITF
+      LWR,LORES             Correction of 2nd (Slightly Inaccurate) ITF
+
+2 BDIST=number[,number]
+This is a pair of numbers delineating the  background  spectrum  channel
+positions  during  spectrum  extraction.   The distances are measured in
+geometric pixels from the spectrum centre.
+
+Negative distances mean "to the left of centre",  and positive distances
+mean "to the right of centre".
+
+If only one value is defined,  then this is taken  as  meaning  that the
+channels are positioned symmetrically about centre.
+
+The spectrum  "centre" is determined by  the  dispersion relations,  and
+modified by any prevailing centroid shifts.
+2 BKGAV=number
+This is the  FWHM of a triangle function  filter  used  in  folding  the
+pixel  intensities  to  form  the  smooth  background  spectrum.   It is
+measured in geometric pixels.
+2 BKGIT=number
+This is the number of background smoothing iterations  performed  during
+spectrum extraction.
+
+BKGIT=0 means that the background is taken as  the  result of  the first
+pass of a triangle function filter with FWHM defined by the BKGAV
+parameter.
+
+BKGIT=1 means that,  after producing the initial estimate for the smooth
+background, pixels discrepant by more that BKGSD standard deviations are
+marked  as  "spikes".   The  smooth  background  is  then  re-evaluated,
+missing out the marked pixels.
+
+Higher values of BKGIT are possible, but seldom necessary.
+2 BKGSD=number
+This is the  discrimination  level,  measured  in  standard  deviations,
+beyond  which  background pixels are marked as "spikes".  It is not used
+for BKGIT=0.
+2 BSLIT=number[,number]
+This defines the half width of  each  background  channel,  measured  in
+geometric pixels.  A single value means that both channels have the same
+width.
+2 CAMERA=name
+This is the Camera Name.  The following are defined:
+
+      LWP          IUE Long Wavelength Prime.
+      LWR          IUE Long Wavelength Redundant.
+      SWP          IUE Short Wavelength Prime.
+2 CENAV=number
+This is the  FWHM of a triangle function  filter  used  in  folding  the
+pixel intensities to form the smooth centroid positions.  It is measured
+in geometric pixels.
+2 CENIT=number
+This is the number of  centroid  tracking  iterations  performed  during
+spectrum extraction.
+
+CENIT=0 means that the spectrum position is taken directly from the
+dispersion relations.
+
+CENIT=1 means that the spectrum position is  first  take  from  the
+dispersion  relations,  but  is  modified  to  forced  it  to follow
+the spectrum centroid.
+
+Higher values of CENIT are  possible,  but  seldom  necessary: it either
+works, or fails.
+2 CENSD=number
+This is  the discrimination  level,  measured  in  standard  deviations,
+below  which  object  signal  is not considered significant enough to be
+used to determine the centroid position.  It is not used for CENIT=0.
+2 CENSH=boolean
+This indicates whether the spectrum  signal  produces  a  single  linear
+shift to the initial template.
+
+This can be used in cases  whether the object signal is too weak to pro-
+vide  a  detailed centroid determination, but it can at least be used to
+move a pre-existing template shape into the right position.
+2 CENSV=boolean
+This indicates whether the spectrum template, as refined by  the  object
+centroid  during  spectrum  extraction,  is  saved  in  the  calibration
+dataset.
+
+The primary use of this facility is in determining templates  from (say)
+the  whole spectrum using TRAK,  and subsequently using these with 
+LBLS,
+or another spectrum.
+2 CENTM=boolean
+This indicates whether a centroid template from the calibration  dataset
+is  used  as  a  start  in defining the precise position of the spectrum
+signal on the image.
+
+There is no guarantee that such a template will be available in a parti-
+cular situation (camera/aperture/resolution/order).
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLOUR=boolean
+
+ If COLOUR=TRUE then a false colour look-up table is used to derive
+ pixel colours.  Otherwise a greyscale is used.
+
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 CONTINUUM=boolean
+This indicates whether the object spectrum  is  expected  to  contain  a
+significant  continuum.   It  is  used  in conjunction with the EXTENDED
+parameter  in  determining  the  positions  and  widths  of  object  and
+background channels for spectrum extraction from HIRES datasets.
+2 COVERGAP=boolean
+If after mapping an order/aperture, a grid point is marked as  unusable,
+then  this  parameter  determines  whether other orders/apertures can be
+allowed to contribute to this grid point.
+2 CUTFILE=string
+This is the name of a file containing Echelle order wavelength limits.
+A file type of ".cut" is assumed, and should not be specified
+explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied cut file for the SWP camera LAP:
+
+   > NEWCUT CUTFILE=$IUEDR_DATA/swplap
+2 CUTWV=boolean
+This indicates whether any available  Echelle  order  wavelength  cutoff
+limits  are  to  be  used  for  the  spectrum extraction wavelength grid
+limits.  Highly recommended, provided that  you  are  happy  with  these
+wavelength limits.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DAY=number
+This is the Day number, measured from the start of the Month,  used  for
+constructing dates. (1st of month=1, 31st of month=31.)
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 DISPFILE=string
+This is the name of a file containing dispersion data.  A type of
+".dsp" is assumed, and should not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied dispersion file for the SWP camera
+HIRES mode:
+
+   > NEWDISP DISPFILE=$IUEDR_DATA/swphi
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+2 ESHIFT=number
+This is a global wavelength shift applied to the wavelengths in  Echelle
+spectral  orders.   It  is  measured  in  (A),  and affects the spectrum
+wavelengths:
+
+      WAV(NEW) = WAV(OLD) + ESHIFT / ORDER
+
+This is designed to account for wavelength errors  that  result  from  a
+global linear shift of the spectrum format on the image.
+2 EXPOSURE=number
+This is an exposure time associated with the spectrum.  If there is more
+than  one  aperture,  then  this  time  applies to that specified by the
+APERTURE parameter.
+2 EXPOSURES=number[,number]
+This is one or more exposure times  (in  seconds)  associated  with  the
+spectrum.  There is an exposure time for each Aperture defined.
+2 EXTENDED=boolean
+This indicates whether the object spectrum is expected  to  be  extended
+(rather  than  a  point  source).   It  is  used in conjunction with the
+CONTINUUM parameter in determining  the  positions  and  widths  of  the
+object  and  background channels used for spectrum extraction from HIRES
+datasets.
+2 FIDFILE=string
+This is the name of a file containing  fiducial  positions.   A
+type of ".fid" is assumed, and should not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied fiducial file for a SWP camera
+PHOT image:
+
+   > NEWFID FIDFILE=$IUEDR_DATA/swpr
+2 FIDSIZE=number
+This is the half width of a fiducial (considered square),  and  measured
+in pixel units.
+2 FILE=number
+This is the Tape File Number.  The first file on a tape would be FILE=1.
+One case  which may present  some problems is  that of  a tape with a an
+End-of-volume (EOV) mark in the middle, and valuable  data  beyond.   An
+EOV  is  two  consecutive Tape Marks (sometimes called "File Marks").  A
+File is defined, here, as the information between two Tape Marks.  So if
+the number for a (real) file before EOV is FILEN, then the number of the
+next (real) file following the EOV is (FILEN+2).
+2 FILLGAP=boolean
+If a grid point in the mean spectrum would have had a contribution  from
+a  bad  data point, this parameter determines whether that grid point is
+marked as  unusable within  the context  of the order  or aperture being
+mapped.  If the grid point is marked  as unusable in this way then other
+(good) points cannot contribute to it.
+2 FLAG=boolean
+This specifies whether the data quality information is  displayed  along
+with  the image.  If so, then faulty pixels will be marked with a colour
+according to the following scheme:
+
+      GREEN       pixels affected by reseau marks
+      RED         pixels which are saturated (DN=255)
+      ORANGE      pixels affected by ITF truncation
+      YELLOW      pixels marked bad by the user
+
+User edits are only shown where no other fault is present.
+
+This option  would normally only  be used when assessing the  quality of
+faulty pixels, possible  with a view to  using them (marking them "good"
+with a cursor editor).
+2 FN=number
+This parameter is the  replacement  Flux  Number  for  a  pixel  changed
+explicitly by the user.
+
+2 FSCALE=number
+This is an (arbitrary) scale factor  applied  to  spectrum  fluxes.   It
+affects fluxes:
+
+      FLUX(NEW) = FLUX(OLD) * FSCALE
+
+It finds application in  accounting for grey attenuation, or obscuration
+of object signal through a narrow aperture.
+2 GSAMP=number
+This is the sampling rate used for spectrum extraction.  It is  measured
+in  "geometric pixels".  GSAMP=1.414 corresponds to the original IUESIPS
+(1) sampling rate,  while GSAMP=0.707 corresponds  to  the later IUESIPS
+(2) sampling rate.  Other values can be chosen.
+2 GSHIFT=number,number
+This is a global constant shift of the spectrum  format  on  the  image,
+(DX, DY), where the geometric coordinates, (X, Y) of a spectrum position
+are:
+
+      X(NEW) = X(OLD) + DX
+      Y(NEW) = Y(OLD) + DY
+2 GSLIT=number[,number]
+This is a pair of numbers delineating the object spectrum channel during
+spectrum extraction.  The distances are measured in geometric pixels.
+
+Negative distances mean "to the left of centre", and  positive distances
+mean "to the right of centre".
+
+Object channels that do NOT cover the actual object signal  on the image
+will not be meaningful when centroid tracking is employed.
+
+If only one value is defined, then this is taken as representing  a
+channel that is symmetrical about the spectrum centre.
+
+The spectrum "centre" is determined by  the  dispersion  relations, and
+modified by any prevailing centroid shifts.
+2 HALAV=number
+This is the FWHM of a triangle  function  used  for  smoothing  the  net
+spectrum for the HALTYPE=POWER halation correction technique.
+2 HALC=number
+This is the Halation correction constant used for  HALTYPE=POWER  cases,
+and  defined  at wavelength HALWC.  The value of the correction constant
+corresponds,  roughly  to  the  measured  depression  of  a  broad  zero
+intensity absorption below "zero", in units of the continuum in adjacent
+orders.  The "constant" varies with wavelength:
+
+      C(WAV) = HALC * (WAV - HALW0) / (HALWC - HALW0)
+
+See the HALAV, HALTYPE, HALW0 and HALWC parameters.
+2 HALTYPE=name
+This is the type of Halation (order-overlap) correction applied  to  the
+flux spectrum.  It can take values:
+
+      POWER         Correction based on power-law PSF decay.
+
+See the HALAV, HALC and HALW0 parameters.
+2 HALW0=number
+This is the wavelength, measured in Angstroms,  at  which  the  halation
+correction is zero.
+
+See the HALC, HALTYPE and HALWC parameters.
+2 HALWC=number
+This is the wavelength, measured in Angstroms,  at  which  the  halation
+correction is HALC.
+
+See the HALC, HALTYPE and HALW0 parameters.
+2 HIST=boolean
+This determines whether lines are  plotted  as  histograms  rather  than
+continuous lines (poly-lines).
+2 IMAGE=number
+This is the Image Sequence Number.
+2 ITF=number
+This is the ITF generation used in the photometric  calibration  of  the
+image.   This  information  is  needed  for  the  correct  absolute flux
+calibration of the resulting spectra.  Possible values for  each  camera
+are as follows:
+
+      SWP     1 (faulty), 2 and 3
+      LWR     1 and 2
+      LWP     1 and 2
+
+Here are the ITF values associated with various forms of this table:
+
+      ITF       TABLE                           IDENTIFICATION
+      ITF 0     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      ITF 1     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      ITF 1     0  2300  3969  6062  ... 32973  1st LWP ITF
+      ITF 2     0  2723  5429  8145  ... 38389  2nd LWP ITF
+      ITF 0     0  1800  3600  5500  ...        Preliminary SWP ITF
+      ITF 1     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      ITF 2     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+2 ITFMAX=number
+This is the pixel value on tape corresponding to  ITF  saturation.   Its
+value  is  fixed  for  a  given  ITF table.  The value of ITFMAX is only
+needed for IUE images of type "GPHOT".  The  appropriate  value  can  be
+determined  from  inspection  of the IUE Text Header for the GPHOT file,
+and in particular the table of numbers following the line  which  begins
+"PCF C/**".  Here are the ITFMAX values associated with various forms of
+this table:
+
+      ITFMAX    TABLE                           IDENTIFICATION
+      20000     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      27220     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      19983     0  1800  3600  5500  ...        Preliminary SWP ITF
+      19740     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      19632     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 ML=number,number
+This is a pair of wavelength values defining the start and  end  of  the
+mean spectrum grid.  The grid will  consist of Vacuum Wavelengths evenly
+spaced between these values.
+2 MONTH=number
+This is the Month number, measured from the start of the Year,  used  in
+constructing dates. (January=1, December=12.)
+2 MSAMP=number
+This is the (Vacuum) wavelength sampling  rate  for  the  mean  spectrum
+grid.   If  it  does  not  fit an integral number of times into the grid
+limits, then the latter are adjusted to fit.
+2 NFILE=number
+This is the number of tape files to be processed.  A value of "-1" means
+all files until the end.
+2 NGEOM=number
+This is the number of Chebyshev terms used to represent the  geometrical
+distortion.  The same value is used for each axis direction.
+2 NLINE=number
+This is the number of IUE header  lines  printed.   NLINE=-1  means  the
+entire header is printed.
+2 NORDER=number
+This is the number of Echelle orders to be processed by a command.
+2 NSKIP=number
+This is the number of tape marks to be skipped.
+2 OBJECT=string
+This is a string  containing  text  to  identify  the  "object"  of  the
+observation.   It  can, but need not, also contain information about the
+observation (Camera, Image etc.).
+2 ORDER=number
+This is the Echelle order number.
+2 ORDERS=number[,number]
+This is a pair of Echelle order numbers delineating a range.  If only  a
+single value is specified, then the range consists that order only.  The
+"order" of the number pair is not significant.
+2 OUTFILE=string
+This is the name of a file to receive the output spectrum.
+2 QUAL=boolean
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+User edits are only shown where no other fault is present.
+
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+2 RESOLUTION=name
+This is the Spectrograph  Resolution  mode.   The  following  modes  are
+defined:
+
+      LORES        IUE Low Resolution.
+      HIRES        IUE High Resolution (Echelle).
+2 RIPA=number
+This is an empirical scale factor that can be used to modify the Echelle
+ripple  function.   The normal value is 1.  The primary component of the
+ripple function is:
+
+      SCALE = (SIN(X) / X)**2
+
+where
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.   Empirical  values  of  RIPA  can be used to optimise the ripple
+correction.
+
+See the RIPC and RIPK parameter descriptions.
+2 RIPC=number[,number]
+This is a polynomial in "X" used to modify the  standard  Echelle  ripple
+calibration function.  The calibration is given by:
+
+      SCALE = (SIN(X)/X)**2 * (RIPC(1) + RIPC(2)*X + RIPC(3)*X**2 ...)
+
+where
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER/WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.
+
+See the RIPA and RIPK parameter descriptions.
+2 RIPFILE=string
+This is the name of a file containing an Echelle ripple calibration.
+A  type of ".rip" is assumed, and should not be specified explicitly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the supplied ripple file for the SWP camera:
+
+   > NEWRIP RIPFILE=$IUEDR_DATA/swp
+2 RIPK=number
+This is the Echelle ripple constant measured in (A).  It corresponds  to
+the   central  wavelength  of  Echelle  order  number  1.   The  central
+wavelength of an arbitrary ORDER is:
+
+      WAVC = RIPK / ORDER
+
+Where this parameter is used for an entire HIRES dataset, the  parameter
+can have more than 1 value, and represent a polynomial in ORDER:
+
+      WAVC = (RIPK(1) + RIPK(2) * ORDER + RIPK(3) * ORDER**2...) / ORDER
+
+See the RIPA and RIPC parameter descriptions.
+2 RL=number,number
+This is a pair of radial coordinate values defining the start and end of
+the radial grid in an LBLS array.  These radial coordinates are measured
+in geometric pixels, and run perpendicular to the dispersion  direction.
+A coordinate of 0.0 corresponds to the centre of the spectrum.
+
+Values of [0.0,0.0] indicate that internal defaults are to be adopted.
+A single value is reflected symmetrically about 0.0.
+2 RM=boolean
+This determines whether the mean spectrum  is  reset  before  a  mapping
+takes  place.   If  the  spectrum  is  not reset, then the spectra being
+mapped will be averaged with the existing net spectrum.
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 RSAMP=number
+This is the sample spacing used for the radial grid in the  LBLS  array.
+If it does not fit an integral number of times into the grid limits, RL,
+then the latter are adjusted to fit.
+
+Suggested values range from 0.707 to 1.414 pixels; the latter correspon-
+ding to the IUESIPS LBLS grid.
+2 SCANAV=number
+This is the FWHM of a triangle function with  which  pixels  are  folded
+during  the  generation  of  a  scan  across  the image perpendicular to
+spectrograph dispersion.  It is measured in geometric pixels.
+2 SCANDIST=number
+This is the distance of a scan across a HIRES image from  the  faceplate
+centre.  It is measured in geometric pixels.
+2 SCANWV=number
+This is the central wavelength for a scan of a LORES image perpendicular
+to spectrograph dispersion.  It is measured in Angstroms (in vacuo).
+2 SKIPNEXT=boolean
+This determines whether the tape is positioned at the start of the  next
+file  after processing.  If only the start of a file is being processed,
+then by setting SKIPNEXT=FALSE, time can be saved.
+2 SPECTYPE=number
+This is the type of file (in the terminology of Steve Adams old SPECTRUM
+program), to be created.  The following values are allowed:
+
+      0       Starlink standard NDF
+      1       Fixed format file
+      2       Free format file
+
+It is recommended  that  datasets  with  many  points  be  written  with
+SPECTYPE=0,  which  is  more  efficient  in  disk  space  and time spent
+reading/writing.
+
+It should be noted  that files created  with any of these formats can be
+read into the DIPSO program (Maslen/Howarth, UCL, see SUN/50).
+2 TEMFILE=string
+This is the name of a file which contains the standard spectrum template
+data.  A type of ".tem" is assumed, which should not be specified expli-
+citly.
+
+An environment variable may be used or pre-pended to the filename,
+for example to load the a template file "swptemp" from the a directory
+named IUEDR_TEM:
+
+   > NEWTEM TEMFILE=$IUEDR_TEM/swptemp
+2 THDA=number
+This is the IUE Camera Temperature, measured in degrees C.  It  is  used
+for  such  things  as adjustments to Fiducial positions and Spectrograph
+Dispersion  Relations.   A  value  of  0.0  implies  that  no  value  is
+available.   A suitable value can be found in the IUE Header Text of the
+final spectrum file on the Guest Observer Tape (IUESIPS 2 only).
+2 THRESH=value
+This is the  minimum value considered to be good.  All pixels with values
+below this threshold will be marked BAD.
+2 TYPE=name
+This is the type for a dataset.  It need  only  be  specified  when  the
+creating  command  cannot  determine  its  value  unambiguously from the
+context.  Defined values are:
+
+      RAW           IUE Raw Image.
+      GPHOT         IUE GPHOT Image (Geometric/Photometric).
+      PHOT          IUE PHOT Image (Photometric only).
+
+Types PHOT and GPHOT are  not  automatically  distinguishable  from  IUE
+Guest Observer  Tape contents.  As a  general guide,  datasets from 1982
+onwards are of type PHOT.
+2 V=string
+This is a string  defining  a  list  of  items,  including  any  of  the
+following characters:
+
+      H      Header and File Information
+      I      Image details
+      F      Fiducials
+      G      Geometry
+      D      Dispersion
+      C      Centroid Templates
+      R      Echelle Ripple and Halation
+      A      Absolute Calibration
+      S      Raw Spectrum
+      M      Mean Spectrum
+      *      All of the above
+      Q      Image Data Quality Summary
+
+2 VSHIFT=number
+This is the radial velocity of the detector relative to the Sun.  It  is
+measured in (km/s) and affects the calibrated wavelength scale:
+
+      WAV(TRUE) = WAV(OBSERVED) / (1 + VSHIFT / VLIGHT)
+
+where VLIGHT is the light velocity in (km/s).
+2 WCUT=number,number
+This is one of the mechanisms that can be used to delimit the  parts  of
+Echelle  orders that are calibrated for ripple response.  The two values
+of this parameter are the start  and  end  wavelengths  for  a  specific
+ORDER.
+
+Apart from poor ripple calibration,  the order ends can also be affected
+by  the parts of the camera faceplate that are retained in the image.
+2 WSHIFT=number
+This is a constant wavelength shift applied to spectrum wavelengths.  It
+is measured in (A), and affects the spectrum wavelengths:
+
+      WAV(NEW) = WAV(OLD) + WSHIFT
+
+This is only used for LORES spectra.
+2 XCUT=number,number
+This is one of the mechanisms that can be used to delimit  the  ends  of
+Echelle  orders that are calibrated for ripple response.  The two values
+of this parameter are the start and end "X" coordinates  of  the  order,
+where:
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The  nature  of  the  standard  ripple
+function is that X is only formally meaningful in the range (-PI, +PI).
+
+See the RIPK, RIPC and RIPA parameter descriptions.
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 XP=number,number
+This specifies the pixel limits along the  x-direction  used  for  image
+display.  Values in decreasing order will cause the image to be inverted
+along the x-direction.  If the values are undefined,  the  pixel  limits
+will  default  to  include  the  whole  extent  of  the  image along the
+x-direction.
+2 YEAR=number
+This is the Year (A.D.) used in constructing dates.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+2 YP=number,number
+This specifies the pixel limits along the  y-direction  used  for  image
+display.  Values in decreasing order will cause the image to be inverted
+along the y-direction.  If the values are undefined,  the  pixel  limits
+will  default  to  include  the  whole  extent  of  the  image along the
+y-direction.
+2 ZL=number,number
+This specifies the data limits used  for  display  of  images.   If  the
+values  are  given  in  decreasing  order, then high data values will be
+represented by low (dark) display intensities, and vice-versa.   If  the
+values are undefined, then the full intensity range of the image will be
+used.
+
+Data values which  fall below the lowest  display intensity are drawn in
+BLACK,  while  those  which fall above the highest display intensity are
+drawn BLUE.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+1 PLCEN
+ Plot smoothed centroid shifts.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+
+2 Full
+This command plots the smoothed centroid shifts produced during the most
+recent  spectrum  extraction  from  the dataset specified by the DATASET
+parameter, on the graphics device and zone specified by the  DEVICE  and
+ZONE parameters respectively.
+
+In the case of a LORES spectrum, if there is more than a single aperture
+available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum,  if there is more than a single echelle
+order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters  determine the  line style which will be
+used for plotting.
+
+The COL and COLROT parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values:
+
+        XL=[0,0], YL=[0,0]
+
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  XL  or YL are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDER=number
+This is the Echelle order number.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+1 PLFLUX
+ Plot calibrated flux spectrum.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   HIST            Whether lines are drawn as histograms.
+   QUAL            Whether data quality information is plotted.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+
+2 Full
+This command plots the calibrated flux spectrum specified by the DATASET
+parameter  on  the  graphics device and zone specified by the DEVICE and 
+ZONE parameters respectively.
+
+The HIST parameter determines  whether the line is drawn  as a histogram
+rather than a continuous polyline.
+
+In the case of a LORES spectrum, if there is more than a single aperture
+available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum,  if there is more than a single echelle
+order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters  determine the  line style which will be
+used for plotting.
+
+The COL and COLROT parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values:
+
+        XL=[0,0], YL=[0,0]
+
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  XL  or YL are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+If a point is affected by more than one of the above  faults,  then  the
+highest  code  is  plotted.   Points  marked  bad by user edits are only
+indicted if they are otherwise fault-free.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDER=number
+This is the Echelle order number.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 HIST=boolean
+This determines whether lines are  plotted  as  histograms  rather  than
+continuous lines (poly-lines).
+2 QUAL=boolean
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+User edits are only shown where no other fault is present.
+
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+1 PLGRS
+ Plot pseudo-gross and background from spectrum extraction.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   HIST            Whether lines are drawn as histograms.
+   QUAL            Whether data quality information is plotted.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+
+2 Full
+This command plots  the  pseudo-gross  and  smooth  background  produced
+during the most recent spectrum extraction from the dataset specified by
+the DATASET parameter, on the graphics device and zone specified by  the
+DEVICE and ZONE parameters respectively.
+
+The pseudo-gross is  constructed by  taking the net  spectrum and adding
+the smooth  background  multiplied  by the width of  the object channel.
+The smooth background plotted is also for the object channel width.
+
+The HIST parameter  determines whether the  line is drawn as a histogram
+rather than a continuous polyline.
+
+In the case of a LORES spectrum, if there is more than a single aperture
+available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum,  if there is more than a single echelle
+order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters  determine the  line style which will be
+used for plotting.
+
+The COL and COLROT parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values:
+
+        XL=[0,0], YL=[0,0]
+
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  XL  or YL are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+If a point is affected by more than one of the above  faults,  then  the
+highest  code  is  plotted.   Points  marked  bad by user edits are only
+indicted if they are otherwise fault-free.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDER=number
+This is the Echelle order number.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 HIST=boolean
+This determines whether lines are  plotted  as  histograms  rather  than
+continuous lines (poly-lines).
+2 QUAL=boolean
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+User edits are only shown where no other fault is present.
+
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+1 PLMEAN
+ Plot mean spectrum.
+
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   HIST            Whether lines are drawn as histograms.
+   QUAL            Whether data quality information is plotted.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+
+2 Full
+This command plots the mean spectrum  associated  with  DATASET  on  the
+graphics  device  and  zone  specified by the DEVICE and ZONE parameters
+respectively.
+
+The HIST parameter  determines whether the line  is drawn as a histogram
+rather than a continuous polyline.
+
+The RS parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters  determine the  line style which will be
+used for plotting.
+
+The COL and COLROT parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values:
+
+        XL=[0,0], YL=[0,0]
+
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  XL  or YL are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+If a point is affected by more than one of the above  faults,  then  the
+highest  code  is  plotted.   Points  marked  bad by user edits are only
+indicted if they are otherwise fault-free.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 HIST=boolean
+This determines whether lines are  plotted  as  histograms  rather  than
+continuous lines (poly-lines).
+2 QUAL=boolean
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+User edits are only shown where no other fault is present.
+
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+1 PLNET
+ Plot uncalibrated net spectrum.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   HIST            Whether lines are drawn as histograms.
+   QUAL            Whether data quality information is plotted.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+
+2 Full
+This command plots  the  uncalibrated  net  spectrum  specified  by  the
+DATASET  parameter  on  the  graphics  device  and zone specified by the
+DEVICE and ZONE parameters respectively.
+
+The HIST parameter  determines whether the line is  drawn as a histogram
+rather than a continuous polyline.
+
+In the case of a LORES spectrum, if there is more than a single aperture
+available, then the APERTURE parameter needs to be specified.
+
+In the case of a HIRES spectrum,  if there is more than a single echelle
+order, then the ORDER parameter needs to be specified.
+
+The RS parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters  determine the  line style which will be
+used for plotting.
+
+The COL and COLROT parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values:
+
+        XL=[0,0], YL=[0,0]
+
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  XL  or YL are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+If a point is affected by more than one of the above  faults,  then  the
+highest  code  is  plotted.   Points  marked  bad by user edits are only
+indicted if they are otherwise fault-free.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDER=number
+This is the Echelle order number.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 HIST=boolean
+This determines whether lines are  plotted  as  histograms  rather  than
+continuous lines (poly-lines).
+2 QUAL=boolean
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+User edits are only shown where no other fault is present.
+
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+1 PLSCAN
+ Plot scan perpendicular to dispersion.
+
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   HIST            Whether lines are drawn as histograms.
+   QUAL            Whether data quality information is plotted.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+2 Full
+Plot the most recent scan perpendicular to  dispersion  associated  with
+the  dataset  specified by the DATASET parameter, on the graphics device
+and zone specified by the DEVICE and ZONE parameters respectively.
+
+The RS parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+
+The LINE and LINEROT parameters  determine the  line style which will be
+used for plotting.
+
+The COL and COLROT parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+
+The diagram limits are specified by the XL and YL parameter values.
+If XL and YL have values:
+
+        XL=[0,0], YL=[0,0]
+
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  XL  or YL are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+
+The QUAL parameter indicates whether faulty points are flagged with
+their data quality codes:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+If a point is affected by more than one of the above  faults,  then  the
+highest  code  is  plotted.   Points  marked  bad by user edits are only
+indicted if they are otherwise fault-free.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DEVICE=name
+This  is  the  GKS/SGS  graphics  device.   A  list  of   possible  GKS
+workstations may  be  found in SUN/83.  A list of SGS workstation names
+available at your site may be obtained either by a null response to the
+DEVICE parameter prompt (i.e.  "!"), or by using the IUEDR command SGS.
+2 ZONE=number
+This specifies the zone to be used for plotting.  The zone numbers range
+from  0  to  8  and  correspond to those defined by the TZONE command in
+DIPSO (see SUN/50):
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quarter
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+2 RS=boolean
+This determines whether the display screen is reset before plotting.
+2 LINE=name
+This specifies the line style to be  used  for  the  next  curve  to  be
+plotted.  It can be one of the following:
+
+      SOLID        Solid (continuous) line
+      DASH         Dashed line
+      DOTDASH      Dot-dash line
+      DOT          Dotted line
+
+The order of these is that invoked when automatic line style rotation is
+in effect (see the LINEROT parameter).
+2 LINEROT=boolean
+This indicates whether the line style is to be changed  after  the  next
+plot.   The  initial  line  style  is SOLID, unless specified explicitly
+using the LINE parameter.  The sequence  of  line  styles  goes  (SOLID,
+DASH, DOTDASH, DOT, SOLID, DASH, ...).
+
+In commands where more than one line is plotted, LINEROT determines
+whether these lines have different styles.
+2 COL=number
+This specifies the line colour to be used  for  the  next  curve  to  be
+plotted.  It can be an integer in the range 1 to 10.
+
+Lines will only appear with different colours on displays which support
+this!, on other devices COL is ignored.
+2 COLROT=boolean
+This indicates whether the line colour is to be changed after  the  next
+plot.   The  initial  line  has  colour  index 1 SOLID, unless specified
+explicitly using the COL parameter.  The sequence of colour indices goes
+(1, 2, 3, ..., 10, 1, 2, ...).
+
+In commands where more than one line is plotted, COLROT  determines
+whether these lines have different colours.
+
+Lines will only appear with different colours on  displays which support
+this!, on other devices COLROT is harmless.
+2 QUAL=boolean
+This specifies whether the data quality  information  is  plotted  along
+with the data.  If so, then faulty points will be marked with their data
+quality severity code, which is one from:
+
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+
+User edits are only shown where no other fault is present.
+
+This option  would normally  only be used  when assessing the quality of
+faulty points,  possible with a view to using  them (marking them "good"
+with a cursor editor).
+2 XL=number,number
+This specifies the data limits used for  plotting  in  the  x-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the x-direction will be determined from the data being
+plotted.
+2 YL=number,number
+This specifies the data limits used for  plotting  in  the  y-direction.
+This  parameter is only read if the display has been reset, and the axes
+are being redrawn.  If both values are the same (e.g.  [0,0]), then  the
+data  limits  in  the y-direction will be determined from the data being
+plotted.
+1 PRGRS
+ Print recently extracted aperture/order spectrum in tabular form.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDER           Echelle order number.
+2 Full
+This command prints the  recently  extracted  spectrum  associated  with
+ORDER or APERTURE and DATASET in tabular form.
+
+The table consists  of wavelengths, "gross", smooth background,  net and
+calibrated fluxes, along with any data quality information.  The "gross"
+and smooth background correspond to an image sample with width specified
+by the adopted extraction slit.
+
+The output from this command should be diverted to a file, since it
+is likely to be to voluminous to read at the terminal.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDER=number
+This is the Echelle order number.
+1 PRLBLS
+ Print current LBLS array in tabular form.
+
+   DATASET         Dataset name.
+2 Full
+This command prints the current LBLS array in tabular form.
+
+Each line  of the main  table consists a wavelength  and a set of mapped
+image intensities (FN), corresponding to cells at distances, R (pixels),
+from spectrum centre.
+
+Any array cells which are affected by "bad" image pixels (reseaux, satu-
+ration, etc.) have printed below  them a data quality value, the meaning
+of which is given at the start of the output.
+
+The output from this  command should be  diverted to a file, since it is
+likely to be to voluminous to read at the terminal.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+1 PRMEAN
+ Print current mean spectrum in tabular form.
+
+   DATASET         Dataset name.
+2 Full
+This command prints the mean spectrum associated with DATASET in tabular
+form.
+
+The table consists wavelengths and calibrated flux, along with  any data
+quality information.
+
+The output from this  command should be  diverted to a file, since it is
+likely to be to voluminous to read at the terminal.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+1 PRSCAN
+ Tabulate intensities of current scan.
+
+   DATASET         Dataset name.
+
+2 Full
+This command prints the scan associated with DATASET  in  tabular  form.
+The  table  consists  wavelengths  and  net, along with any data quality
+information.
+
+The output from  this command should  be diverted to a file, since it is
+likely to be to voluminous to read at the terminal.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+1 PRSPEC
+ Print current aperture/order spectrum in tabular form.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDER           Echelle order number.
+
+2 Full
+This command prints the spectrum associated with ORDER or  APERTURE  and
+DATASET in tabular form.
+
+The table consists wavelengths, net and  calibrated  fluxes,  along with
+any data quality information.
+
+The output from this  command should be  diverted to a file, since it is
+likely to be to voluminous to read at the terminal.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDER=number
+This is the Echelle order number.
+1 QUIT
+ Leaves IUEDR and returns to the command shell.
+
+2 Full
+This command leaves the IUEDR programme and returns to the shell from which it 
+was started.  Any data files which require update will be written by this
+command.  The command is a synonym for the EXIT command.
+
+Note that the existing files for the current dataset are overwritten.
+1 READIUE
+ Read IUE data from GO format tape or file.
+
+   DRIVE           Tape Drive or File Name.
+   FILE            File Number.
+   NLINE           Number of IUE header lines printed.
+   DATASET         Dataset name.
+   TYPE            Dataset Type (RAW, PHOT or GPHOT).
+   OBJECT          Object Identification Text.
+   CAMERA          Camera Name (LWP, LWR, SWP).
+   IMAGE           Image Number.
+   APERTURES       Aperture name.
+   RESOLUTION      Spectrograph Resolution Mode (LORES or HIRES).
+   EXPOSURES       Spectrum exposure time(s) (seconds).
+   THDA            IUE Camera Temperature (C).
+   ITFMAX          Pixel value on tape for ITF saturation.
+   BADITF          Whether bad LORES ITF requires correction.
+   YEAR            Year number (A.D.).
+   MONTH           Month Number (1-12).
+   DAY             Day Number in Month.
+   NGEOM           Number of Chebyshev terms used to represent geometry.
+   ITF             This  is  the  ITF  generation  used  in  the   image
+                   calibration.
+
+2 Full
+This command reads an IUE dataset (RAW, GPHOT or PHOT) from tape or from
+a GO format disk file.  The  DATASET  parameter  determines the names of
+files that will contain the various data  components (Calibration, Image
+& Image Quality etc.)
+2 APERTURES=name
+This specifies an aperture or group of apertures.  The  following  names
+have defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+      BAP       IUE Both Apertures (i.e. SAP and LAP)
+2 BADITF=boolean
+This parameter determines whether a correction  is  made  to  the  pixel
+intensities to account for errors during Ground Station ITF calibration.
+(Note  that  the  best  scientific  results  would  be   obtained   from
+reprocessed  data which can be obtained on request.) The following cases
+are handled:
+
+      SWP,LORES             Correction of 2nd (Faulty) ITF
+      LWR,LORES             Correction of 2nd (Slightly Inaccurate) ITF
+
+2 CAMERA=name
+This is the Camera Name.  The following are defined:
+
+      LWP          IUE Long Wavelength Prime.
+      LWR          IUE Long Wavelength Redundant.
+      SWP          IUE Short Wavelength Prime.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DAY=number
+This is the Day number, measured from the start of the Month,  used  for
+constructing dates. (1st of month=1, 31st of month=31.)
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+
+Alternatively, a filename may be given. If the filename
+contains a directory specification it should be placed in
+single quotes.
+2 EXPOSURES=number[,number]
+This is one or more exposure times  (in  seconds)  associated  with  the
+spectrum.  There is an exposure time for each Aperture defined.
+2 FILE=number
+This is the Tape File Number.  The first file on a tape would be FILE=1.
+One case  which may present  some problems is  that of  a tape with a an
+End-of-volume (EOV) mark in the middle, and valuable  data  beyond.   An
+EOV  is  two  consecutive Tape Marks (sometimes called "File Marks").  A
+File is defined, here, as the information between two Tape Marks.  So if
+the number for a (real) file before EOV is FILEN, then the number of the
+next (real) file following the EOV is (FILEN+2).
+2 IMAGE=number
+This is the Image Sequence Number.
+2 ITF=number
+This is the ITF generation used in the photometric  calibration  of  the
+image.   This  information  is  needed  for  the  correct  absolute flux
+calibration of the resulting spectra.  Possible values for  each  camera
+are as follows:
+
+      SWP     1 (faulty), 2 and 3
+      LWR     1 and 2
+      LWP     1 and 2
+
+Here are the ITF values associated with various forms of this table:
+
+      ITF       TABLE                           IDENTIFICATION
+      ITF 0     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      ITF 1     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      ITF 1     0  2300  3969  6062  ... 32973  1st LWP ITF
+      ITF 2     0  2723  5429  8145  ... 38389  2nd LWP ITF
+      ITF 0     0  1800  3600  5500  ...        Preliminary SWP ITF
+      ITF 1     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      ITF 2     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+2 ITFMAX=number
+This is the pixel value on tape corresponding to  ITF  saturation.   Its
+value  is  fixed  for  a  given  ITF table.  The value of ITFMAX is only
+needed for IUE images of type "GPHOT".  The  appropriate  value  can  be
+determined  from  inspection  of the IUE Text Header for the GPHOT file,
+and in particular the table of numbers following the line  which  begins
+"PCF C/**".  Here are the ITFMAX values associated with various forms of
+this table:
+
+      ITFMAX    TABLE                           IDENTIFICATION
+      20000     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      27220     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      19983     0  1800  3600  5500  ...        Preliminary SWP ITF
+      19740     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      19632     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+2 MONTH=number
+This is the Month number, measured from the start of the Year,  used  in
+constructing dates. (January=1, December=12.)
+2 NGEOM=number
+This is the number of Chebyshev terms used to represent the  geometrical
+distortion.  The same value is used for each axis direction.
+2 NLINE=number
+This is the number of IUE header  lines  printed.   NLINE=-1  means  the
+entire header is printed.
+2 OBJECT=string
+This is a string  containing  text  to  identify  the  "object"  of  the
+observation.   It  can, but need not, also contain information about the
+observation (Camera, Image etc.).
+2 RESOLUTION=name
+This is the Spectrograph  Resolution  mode.   The  following  modes  are
+defined:
+
+      LORES        IUE Low Resolution.
+      HIRES        IUE High Resolution (Echelle).
+2 THDA=number
+This is the IUE Camera Temperature, measured in degrees C.  It  is  used
+for  such  things  as adjustments to Fiducial positions and Spectrograph
+Dispersion  Relations.   A  value  of  0.0  implies  that  no  value  is
+available.   A suitable value can be found in the IUE Header Text of the
+final spectrum file on the Guest Observer Tape (IUESIPS 2 only).
+2 TYPE=name
+This is the type for a dataset.  It need  only  be  specified  when  the
+creating  command  cannot  determine  its  value  unambiguously from the
+context.  Defined values are:
+
+      RAW           IUE Raw Image.
+      GPHOT         IUE GPHOT Image (Geometric/Photometric).
+      PHOT          IUE PHOT Image (Photometric only).
+
+Types PHOT and GPHOT are  not  automatically  distinguishable  from  IUE
+Guest Observer  Tape contents.  As a  general guide,  datasets from 1982
+onwards are of type PHOT.
+2 YEAR=number
+This is the Year (A.D.) used in constructing dates.
+1 READSIPS
+ Reads MELO/MEHI from IUESIPS 1 or IUESIPS 2 tape or file.
+
+   DRIVE           Tape Drive or File Name.
+   FILE            File Number.
+   NLINE           Number of IUE header lines printed.
+   DATASET         Dataset name.
+   OBJECT          Object Identification Text.
+   CAMERA          Camera Name (LWP, LWR, SWP).
+   IMAGE           Image Number.
+   APERTURES       Aperture name.
+   EXPOSURES       Spectrum exposure time(s) (seconds).
+   THDA            IUE Camera Temperature (C).
+   YEAR            Year number (A.D.).
+   MONTH           Month Number (1-12).
+   DAY             Day Number in Month.
+   ITF             This  is  the  ITF  generation  used  in  the   image
+                   calibration.
+
+2 Full
+Reads MELO/MEHI from IUESIPS 1 or IUESIPS 2  tape.   Operation  is  much
+like READIUE, except that some parameters and associated information are
+not needed.  Only  UEC and _UES.sdf files  are created.  The  values for
+certain parameters may be obtained from the tape or file, in which  case
+you will not be prompted for them.
+2 APERTURES=name
+This specifies an aperture or group of apertures.  The  following  names
+have defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+      BAP       IUE Both Apertures (i.e. SAP and LAP)
+2 CAMERA=name
+This is the Camera Name.  The following are defined:
+
+      LWP          IUE Long Wavelength Prime.
+      LWR          IUE Long Wavelength Redundant.
+      SWP          IUE Short Wavelength Prime.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 DAY=number
+This is the Day number, measured from the start of the Month,  used  for
+constructing dates. (1st of month=1, 31st of month=31.)
+2 DRIVE=name
+This the device name of the Tape Drive.  Feasible values are
+/dev/nrmt0h on a unix machine or MSA0 on a VMS machine.
+Other values may apply, check with your system manager.
+
+Alternatively, a filename may be given. If the filename
+contains a directory specification it should be placed in
+single quotes.
+2 EXPOSURES=number[,number]
+This is one or more exposure times  (in  seconds)  associated  with  the
+spectrum.  There is an exposure time for each Aperture defined.
+2 FILE=number
+This is the Tape File Number.  The first file on a tape would be FILE=1.
+One case  which may present  some problems is  that of  a tape with a an
+End-of-volume (EOV) mark in the middle, and valuable  data  beyond.   An
+EOV  is  two  consecutive Tape Marks (sometimes called "File Marks").  A
+File is defined, here, as the information between two Tape Marks.  So if
+the number for a (real) file before EOV is FILEN, then the number of the
+next (real) file following the EOV is (FILEN+2).
+2 IMAGE=number
+This is the Image Sequence Number.
+2 ITF=number
+This is the ITF generation used in the photometric  calibration  of  the
+image.   This  information  is  needed  for  the  correct  absolute flux
+calibration of the resulting spectra.  Possible values for  each  camera
+are as follows:
+
+      SWP     1 (faulty), 2 and 3
+      LWR     1 and 2
+      LWP     1 and 2
+
+Here are the ITF values associated with various forms of this table:
+
+      ITF       TABLE                           IDENTIFICATION
+      ITF 0     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      ITF 1     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      ITF 1     0  2300  3969  6062  ... 32973  1st LWP ITF
+      ITF 2     0  2723  5429  8145  ... 38389  2nd LWP ITF
+      ITF 0     0  1800  3600  5500  ...        Preliminary SWP ITF
+      ITF 1     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      ITF 2     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+2 MONTH=number
+This is the Month number, measured from the start of the Year,  used  in
+constructing dates. (January=1, December=12.)
+2 NLINE=number
+This is the number of IUE header  lines  printed.   NLINE=-1  means  the
+entire header is printed.
+2 OBJECT=string
+This is a string  containing  text  to  identify  the  "object"  of  the
+observation.   It  can, but need not, also contain information about the
+observation (Camera, Image etc.).
+2 THDA=number
+This is the IUE Camera Temperature, measured in degrees C.  It  is  used
+for  such  things  as adjustments to Fiducial positions and Spectrograph
+Dispersion  Relations.   A  value  of  0.0  implies  that  no  value  is
+available.   A suitable value can be found in the IUE Header Text of the
+final spectrum file on the Guest Observer Tape (IUESIPS 2 only).
+2 YEAR=number
+This is the Year (A.D.) used in constructing dates.
+1 SAVE
+ Write new versions for any files that have had their  contents  changed
+ in the current session.
+
+2 Full
+This command forces new versions to be written for  dataset  files  that
+have  had  their  contents changed during the current session.  If there
+are no outstanding files then this command does nothing.
+
+Note that the existing files for the current dataset are overwritten.
+1 SCAN
+ This command performs a scan perpendicular to spectrograph dispersion.
+
+   DATASET         Dataset name.
+   ORDERS          This delineates a range of Echelle orders.
+   APERTURE        Aperture name (SAP or LAP).
+   SCANDIST        Distance  of  HIRES  scan   from   faceplate   centre
+                   (geometric pixels).
+   SCANAV          Averaging  filter  FWHM  for  image  scan  (geometric
+                   pixels).
+   SCANWV          Central wavelength for LORES image scan (A).
+
+2 Full
+This command performs a scan perpendicular to  spectrograph  dispersion.
+The  scan  is  performed by folding pixels with a triangle function with
+FWHM of SCANAV geometric pixels (ALONG the dispersion direction).
+
+In the case of HIRES,  the SCANDIST parameter determines the distance of
+the scan from the faceplate centre.
+
+In the case of LORES,  the SCANWV parameter determines the central wave-
+length of the scan.
+
+The algorithm used to  produce scan  intensities is not very good and so
+quantitative results  should  not be sought from this command.  Its sole
+intention lies in providing data for aligning the spectrum.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 ORDERS=number[,number]
+This is a pair of Echelle order numbers delineating a range.  If only  a
+single value is specified, then the range consists that order only.  The
+"order" of the number pair is not significant.
+2 SCANDIST=number
+This is the distance of a scan across a HIRES image from  the  faceplate
+centre.  It is measured in geometric pixels.
+2 SCANAV=number
+This is the FWHM of a triangle function with  which  pixels  are  folded
+during  the  generation  of  a  scan  across  the image perpendicular to
+spectrograph dispersion.  It is measured in geometric pixels.
+2 SCANWV=number
+This is the central wavelength for a scan of a LORES image perpendicular
+to spectrograph dispersion.  It is measured in Angstroms (in vacuo).
+1 SETA
+ Set dataset parameters that are APERTURE specific.
+
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   EXPOSURE        Spectrum exposure time (seconds).
+   FSCALE          Flux scale factor.
+   WSHIFT          Constant wavelength shift (A).
+   VSHIFT          Velocity shift of detector relative to Sun (km/s).
+   ESHIFT          Global Echelle wavelength shift.
+   GSHIFT          Global shift of spectrum on image (geometric pixels).
+
+2 Full
+This command allows changes to be  made  to  dataset  values  which  are
+specific  to the specified APERTURE.  Items for which parameters are not
+specified retain their current values.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ESHIFT=number
+This is a global wavelength shift applied to the wavelengths in  Echelle
+spectral  orders.   It  is  measured  in  (A),  and affects the spectrum
+wavelengths:
+
+      WAV(NEW) = WAV(OLD) + ESHIFT / ORDER
+
+This is designed to account for wavelength errors  that  result  from  a
+global linear shift of the spectrum format on the image.
+2 EXPOSURE=number
+This is an exposure time associated with the spectrum.  If there is more
+than  one  aperture,  then  this  time  applies to that specified by the
+APERTURE parameter.
+2 FSCALE=number
+This is an (arbitrary) scale factor  applied  to  spectrum  fluxes.   It
+affects fluxes:
+
+      FLUX(NEW) = FLUX(OLD) * FSCALE
+
+It finds application in  accounting for grey attenuation, or obscuration
+of object signal through a narrow aperture.
+2 GSHIFT=number,number
+This is a global constant shift of the spectrum  format  on  the  image,
+(DX, DY), where the geometric coordinates, (X, Y) of a spectrum position
+are:
+
+      X(NEW) = X(OLD) + DX
+      Y(NEW) = Y(OLD) + DY
+2 VSHIFT=number
+This is the radial velocity of the detector relative to the Sun.  It  is
+measured in (km/s) and affects the calibrated wavelength scale:
+
+      WAV(TRUE) = WAV(OBSERVED) / (1 + VSHIFT / VLIGHT)
+
+where VLIGHT is the light velocity in (km/s).
+2 WSHIFT=number
+This is a constant wavelength shift applied to spectrum wavelengths.  It
+is measured in (A), and affects the spectrum wavelengths:
+
+      WAV(NEW) = WAV(OLD) + WSHIFT
+
+This is only used for LORES spectra.
+1 SETD
+ Set dataset parameters which are independent of ORDER/APERTURE.
+
+   DATASET         Dataset name.
+   OBJECT          Object Identification Text.
+   THDA            IUE Camera Temperature (C).
+   FIDSIZE         Half width of fiducials (pixels).
+   BADITF          Whether bad LORES ITF requires correction.
+   NGEOM           Number of Chebyshev terms used to represent geometry.
+   RIPK            Echelle ripple constant (A).
+   RIPA            Ripple function scale factor.
+   XCUT            Global Echelle wavelength clipping.
+   HALTYPE         The type of Halation (order-overlap) correction used.
+   HALC            Halation correction constant (fraction of continuum).
+   HALWC           Wavelength at which the halation correction  is  HALC
+                   is defined (A).
+   HALW0           Wavelength at which halation correction is zero (A).
+   HALAV           Averaging  FWHM  for halation  correction  (geometric
+                   pixels).
+
+2 Full
+This command allows changes to be  made  to  dataset  values  which  are
+independent  of any specific APERTURE/ORDER.  Items for which parameters
+are not specified retain their current values.
+2 BADITF=boolean
+This parameter determines whether a correction  is  made  to  the  pixel
+intensities to account for errors during Ground Station ITF calibration.
+(Note  that  the  best  scientific  results  would  be   obtained   from
+reprocessed  data which can be obtained on request.) The following cases
+are handled:
+
+      SWP,LORES             Correction of 2nd (Faulty) ITF
+      LWR,LORES             Correction of 2nd (Slightly Inaccurate) ITF
+
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 FIDSIZE=number
+This is the half width of a fiducial (considered square),  and  measured
+in pixel units.
+2 HALAV=number
+This is the FWHM of a triangle  function  used  for  smoothing  the  net
+spectrum for the HALTYPE=POWER halation correction technique.
+2 HALC=number
+This is the Halation correction constant used for  HALTYPE=POWER  cases,
+and  defined  at wavelength HALWC.  The value of the correction constant
+corresponds,  roughly  to  the  measured  depression  of  a  broad  zero
+intensity absorption below "zero", in units of the continuum in adjacent
+orders.  The "constant" varies with wavelength:
+
+      C(WAV) = HALC * (WAV - HALW0) / (HALWC - HALW0)
+
+See the HALAV, HALTYPE, HALW0 and HALWC parameters.
+2 HALTYPE=name
+This is the type of Halation (order-overlap) correction applied  to  the
+flux spectrum.  It can take values:
+
+      POWER         Correction based on power-law PSF decay.
+
+See the HALAV, HALC and HALW0 parameters.
+2 HALWC=number
+This is the wavelength, measured in Angstroms,  at  which  the  halation
+correction is HALC.
+
+See the HALC, HALTYPE and HALW0 parameters.
+2 HALW0=number
+This is the wavelength, measured in Angstroms,  at  which  the  halation
+correction is zero.
+
+See the HALC, HALTYPE and HALWC parameters.
+2 NGEOM=number
+This is the number of Chebyshev terms used to represent the  geometrical
+distortion.  The same value is used for each axis direction.
+2 OBJECT=string
+This is a string  containing  text  to  identify  the  "object"  of  the
+observation.   It  can, but need not, also contain information about the
+observation (Camera, Image etc.).
+2 RIPA=number
+This is an empirical scale factor that can be used to modify the Echelle
+ripple  function.   The normal value is 1.  The primary component of the
+ripple function is:
+
+      SCALE = (SIN(X) / X)**2
+
+where
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.   Empirical  values  of  RIPA  can be used to optimise the ripple
+correction.
+
+See the RIPC and RIPK parameter descriptions.
+2 RIPK=number
+This is the Echelle ripple constant measured in (A).  It corresponds  to
+the   central  wavelength  of  Echelle  order  number  1.   The  central
+wavelength of an arbitrary ORDER is:
+
+      WAVC = RIPK / ORDER
+
+Where this parameter is used for an entire HIRES dataset, the  parameter
+can have more than 1 value, and represent a polynomial in ORDER:
+
+      WAVC = (RIPK(1) + RIPK(2) * ORDER + RIPK(3) * ORDER**2...) / ORDER
+
+See the RIPA and RIPC parameter descriptions.
+2 THDA=number
+This is the IUE Camera Temperature, measured in degrees C.  It  is  used
+for  such  things  as adjustments to Fiducial positions and Spectrograph
+Dispersion  Relations.   A  value  of  0.0  implies  that  no  value  is
+available.   A suitable value can be found in the IUE Header Text of the
+final spectrum file on the Guest Observer Tape (IUESIPS 2 only).
+2 XCUT=number,number
+This is one of the mechanisms that can be used to delimit  the  ends  of
+Echelle  orders that are calibrated for ripple response.  The two values
+of this parameter are the start and end "X" coordinates  of  the  order,
+where:
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The  nature  of  the  standard  ripple
+function is that X is only formally meaningful in the range (-PI, +PI).
+
+See the RIPK, RIPC and RIPA parameter descriptions.
+1 SETM
+ Set dataset parameters that are ORDER specific.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   RIPK            Echelle ripple constant (A).
+   RIPA            Ripple function scale factor.
+   RIPC            Ripple function correction polynomial.
+   WCUT            Wavelength limits for Echelle order (A).
+
+2 Full
+This command allows changes to be  made  to  dataset  values  which  are
+specific  to  the  specified  ORDER.  Items for which parameters are not
+specified retain their current values.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 ORDER=number
+This is the Echelle order number.
+2 RIPK=number
+This is the Echelle ripple constant measured in (A).  It corresponds  to
+the   central  wavelength  of  Echelle  order  number  1.   The  central
+wavelength of an arbitrary ORDER is:
+
+      WAVC = RIPK / ORDER
+
+Where this parameter is used for an entire HIRES dataset, the  parameter
+can have more than 1 value, and represent a polynomial in ORDER:
+
+      WAVC = (RIPK(1) + RIPK(2) * ORDER + RIPK(3) * ORDER**2...) / ORDER
+
+See the RIPA and RIPC parameter descriptions.
+2 RIPA=number
+This is an empirical scale factor that can be used to modify the Echelle
+ripple  function.   The normal value is 1.  The primary component of the
+ripple function is:
+
+      SCALE = (SIN(X) / X)**2
+
+where
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.   Empirical  values  of  RIPA  can be used to optimise the ripple
+correction.
+
+See the RIPC and RIPK parameter descriptions.
+2 RIPC=number[,number]
+This is a polynomial in "X" used to modify the  standard  Echelle  ripple
+calibration function.  The calibration is given by:
+
+      SCALE = (SIN(X)/X)**2 * (RIPC(1) + RIPC(2)*X + RIPC(3)*X**2 ...)
+
+where
+
+      X = PI * RIPA * (WAV - WAVC) * ORDER/WAVC
+
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.
+
+See the RIPA and RIPK parameter descriptions.
+2 WCUT=number,number
+This is one of the mechanisms that can be used to delimit the  parts  of
+Echelle  orders that are calibrated for ripple response.  The two values
+of this parameter are the start  and  end  wavelengths  for  a  specific
+ORDER.
+
+Apart from poor ripple calibration,  the order ends can also be affected
+by  the parts of the camera faceplate that are retained in the image.
+1 SGS
+ Write names of available SGS devices at the terminal.
+
+2 Full
+A list of names of SGS devices available are written  at  the  terminal.
+See SUN/85 for details of the SGS graphics system.
+1 SHOW
+ Print dataset values.
+
+   DATASET         Dataset name.
+   V               List of items to be printed.
+
+2 Full
+This command shows the values of parameters in the dataset specified  by
+the  DATASET.  The items to be printed are specified by the V parameter,
+which is a string containing any of the following characters:
+
+      H      Header and File Information
+      I      Image details
+      F      Fiducials
+      G      Geometry
+      D      Dispersion
+      C      Centroid Templates
+      R      Echelle Ripple and Halation
+      A      Absolute Calibration
+      S      Raw Spectrum
+      M      Mean Spectrum
+      *      All of the above
+      Q      Image Data Quality Summary
+
+The V parameter is cancelled afterwards.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 V=string
+This is a string  defining  a  list  of  items,  including  any  of  the
+following characters:
+
+      H      Header and File Information
+      I      Image details
+      F      Fiducials
+      G      Geometry
+      D      Dispersion
+      C      Centroid Templates
+      R      Echelle Ripple and Halation
+      A      Absolute Calibration
+      S      Raw Spectrum
+      M      Mean Spectrum
+      *      All of the above
+      Q      Image Data Quality Summary
+
+1 TRAK
+ Extract spectrum from image.
+
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   NORDER          Number of Echelle orders to be processed.
+   AUTOSLIT        Whether  GSLIT,  BDIST  and  BSLIT   are   determined
+                   automatically.
+   GSLIT           Object channel limits (geometric pixels).
+   BSLIT           Background channel half widths (geometric pixels).
+   BDIST           Distances  of   background   channels   from   centre
+                   (geometric pixels).
+   GSAMP           Spectrum grid sampling rate (geometric pixels).
+   CUTWV           Whether wavelength cutoff data  used  for  extraction
+                   grid.
+   BKGIT           Number of background smoothing iterations.
+   BKGAV           Background averaging filter FWHM (geometric pixels).
+   BKGSD           Discrimination level for background pixels (s.d.).
+   CENTM           Whether pre-existing centroid template is used.
+   CENSH           Whether  the  spectrum  template  is   just   shifted
+                   linearly.
+   CENSV           Whether  the  spectrum  template  is  saved  in   the
+                   dataset.
+   CENIT           Number of centroid tracking iterations.
+   CENAV           Centroid averaging filter FWHM (geometric pixels).
+   CENSD           Significance  level  for  signal  to  be   used   for
+                   centroids.
+   EXTENDED        Whether  the  object  spectrum  is  expected  to   be
+                   extended.
+   CONTINUUM       Whether the object spectrum is  expected  to  have  a
+                   "continuum".
+
+2 Full
+This command extracts a  spectrum  from  an  image.   It  does  this  by
+defining  an  evenly  spaced  wavelength  grid  along  the spectrum, and
+mapping pixel intensities  onto  this  grid  in  object  and  background
+channels.   The  background  pixels are used to form a smooth background
+spectrum.  The object pixels (less smooth background) are used  to  form
+the integrated net signal for the object.
+
+In the LORES case  the spectrum specified  by the APERTURE  parameter is
+extracted.
+
+In the HIRES case,  the first echelle order to be extracted is specified
+by  the ORDER.  Up to NORDER orders are extracted,  with ORDER each time
+being decremented.
+
+The wavelength  grid is defined  by region  of the dispersion  line con-
+tained in  the image subset (faceplate).  The grid spacing is set by the
+GSAMP parameter value which is the sample step in geometric  pixels. The
+wavelength limits can optionally be constrained within the echelle
+cutoff values by specifying CUTWV=YES.
+
+The object  and background  channel widths and positions  are determined
+automatically  if AUTOSLIT=YES.  Otherwise,  the object channel is spec-
+ified  by  the values  of the  GSLIT parameter,  whilst  the  background
+channel positions and widths are determined by the BDIST and BSLIT para-
+meter values respectively.
+
+The EXTENDED and CONTINUUM parameters allow  more  precise  control over
+slit determinations (see User Guide, MUD/45).
+
+The background spectrum is smoothed with a triangle function, FWHM given
+by  the  BKGAV parameter (in  geometric  pixels).  Once  the  background
+channel spectra have been obtained, they are extracted a  further  BKGIT
+times.  Prior to each additional background extraction, pixels which are
+outside BKGSD local standard deviations are rejected.
+
+The object spectrum is obtained by integrating  pixel  intensities (less
+smooth background)  within the object channel.  Once the object spectrum
+has been obtained, it is extracted an additional  CENIT times, each time
+the centroid positions from the previous extraction being used to follow
+the spectrum.  The centroid spectrum (template) is  smoothed by  folding
+with a triangle  function,  FWHM given  by the CENAV parameter (in  geo-
+metric  pixels).  Wavelengths  with  flux  levels  below  CENSD standard
+deviations  above  background are not  used in determining  the centroid
+spectrum.
+
+The initial  spectrum template  is by  default given  by  the dispersion
+relations.  However, if CENTM=YES then a pre-defined template associated
+with the dataset may be used as a start guess.  If  CENSH=YES then  this
+template can  be shifted  linearly to  match the image (without changing
+its shape).  If CENSV=YES then the  final centroid  spectrum  is used to
+update the spectrum template in the dataset.
+
+The net flux associated with  a wavelength point in  the final extracted
+spectrum is  defined as the integral of  pixel intensities  over a rect-
+angle with  dimensions given by  the object  channel width and the wave-
+length interval.  These fluxes are  scaled so that they correspond to an
+interval  along the  wavelength  direction  of 1.414  geometric  pixels.
+This  is  so  that  the  standard  IUESIPS  calibrations  can be applied
+regardless of what actual sample rate has been employed.   The  integral
+is performed by using linear interpolation of pixel intensities.
+2 APERTURE=name
+This is the name of an individual aperture.  The following names have
+defined meanings:
+
+      SAP       IUE Small Aperture
+      LAP       IUE Large Aperture
+
+Other apertures names may also be defined.
+2 AUTOSLIT=boolean
+This determines whether the extraction slit is determined  automatically
+by the command.  When AUTOSLIT=TRUE the BDIST, BSLIT and GSLIT parameter
+values  are  determined  automatically,  based  on   the   IUE   Camera,
+Resolution,  Aperture,  and  on the values of the CONTINUUM and EXTENDED
+parameters.  This mode of operation  is  probably  the  best  for  point
+source objects.
+2 BDIST=number[,number]
+This is a pair of numbers delineating the  background  spectrum  channel
+positions  during  spectrum  extraction.   The distances are measured in
+geometric pixels from the spectrum centre.
+
+Negative distances mean "to the left of centre",  and positive distances
+mean "to the right of centre".
+
+If only one value is defined,  then this is taken  as  meaning  that the
+channels are positioned symmetrically about centre.
+
+The spectrum  "centre" is determined by  the  dispersion relations,  and
+modified by any prevailing centroid shifts.
+2 BKGAV=number
+This is the  FWHM of a triangle function  filter  used  in  folding  the
+pixel  intensities  to  form  the  smooth  background  spectrum.   It is
+measured in geometric pixels.
+2 BKGIT=number
+This is the number of background smoothing iterations  performed  during
+spectrum extraction.
+
+BKGIT=0 means that the background is taken as  the  result of  the first
+pass of a triangle function filter with FWHM defined by the BKGAV
+parameter.
+
+BKGIT=1 means that,  after producing the initial estimate for the smooth
+background, pixels discrepant by more that BKGSD standard deviations are
+marked  as  "spikes".   The  smooth  background  is  then  re-evaluated,
+missing out the marked pixels.
+
+Higher values of BKGIT are possible, but seldom necessary.
+2 BKGSD=number
+This is the  discrimination  level,  measured  in  standard  deviations,
+beyond  which  background pixels are marked as "spikes".  It is not used
+for BKGIT=0.
+2 BSLIT=number[,number]
+This defines the half width of  each  background  channel,  measured  in
+geometric pixels.  A single value means that both channels have the same
+width.
+2 CENTM=boolean
+This indicates whether a centroid template from the calibration  dataset
+is  used  as  a  start  in defining the precise position of the spectrum
+signal on the image.
+
+There is no guarantee that such a template will be available in a parti-
+cular situation (camera/aperture/resolution/order).
+2 CENAV=number
+This is the  FWHM of a triangle function  filter  used  in  folding  the
+pixel intensities to form the smooth centroid positions.  It is measured
+in geometric pixels.
+2 CENIT=number
+This is the number of  centroid  tracking  iterations  performed  during
+spectrum extraction.
+
+CENIT=0 means that the spectrum position is taken directly from the
+dispersion relations.
+
+CENIT=1 means that the spectrum position is  first  take  from  the
+dispersion  relations,  but  is  modified  to  forced  it  to follow
+the spectrum centroid.
+
+Higher values of CENIT are  possible,  but  seldom  necessary: it either
+works, or fails.
+2 CENSD=number
+This is  the discrimination  level,  measured  in  standard  deviations,
+below  which  object  signal  is not considered significant enough to be
+used to determine the centroid position.  It is not used for CENIT=0.
+2 CENSH=boolean
+This indicates whether the spectrum  signal  produces  a  single  linear
+shift to the initial template.
+
+This can be used in cases  whether the object signal is too weak to pro-
+vide  a  detailed centroid determination, but it can at least be used to
+move a pre-existing template shape into the right position.
+2 CENSV=boolean
+This indicates whether the spectrum template, as refined by  the  object
+centroid  during  spectrum  extraction,  is  saved  in  the  calibration
+dataset.
+
+The primary use of this facility is in determining templates  from (say)
+the  whole spectrum using TRAK,  and subsequently using these with 
+LBLS,
+or another spectrum.
+2 CONTINUUM=boolean
+This indicates whether the object spectrum  is  expected  to  contain  a
+significant  continuum.   It  is  used  in conjunction with the EXTENDED
+parameter  in  determining  the  positions  and  widths  of  object  and
+background channels for spectrum extraction from HIRES datasets.
+2 CUTWV=boolean
+This indicates whether any available  Echelle  order  wavelength  cutoff
+limits  are  to  be  used  for  the  spectrum extraction wavelength grid
+limits.  Highly recommended, provided that  you  are  happy  with  these
+wavelength limits.
+2 DATASET=filename
+This is the root name of the file containing the dataset.  The file type
+(e.g. "_UED.sdf") should not be given in the DATASET name.   If the file
+name contains a directory specification, it should be enclosed in quotes.
+2 EXTENDED=boolean
+This indicates whether the object spectrum is expected  to  be  extended
+(rather  than  a  point  source).   It  is  used in conjunction with the
+CONTINUUM parameter in determining  the  positions  and  widths  of  the
+object  and  background channels used for spectrum extraction from HIRES
+datasets.
+2 GSAMP=number
+This is the sampling rate used for spectrum extraction.  It is  measured
+in  "geometric pixels".  GSAMP=1.414 corresponds to the original IUESIPS
+(1) sampling rate,  while GSAMP=0.707 corresponds  to  the later IUESIPS
+(2) sampling rate.  Other values can be chosen.
+2 GSLIT=number[,number]
+This is a pair of numbers delineating the object spectrum channel during
+spectrum extraction.  The distances are measured in geometric pixels.
+
+Negative distances mean "to the left of centre", and  positive distances
+mean "to the right of centre".
+
+Object channels that do NOT cover the actual object signal  on the image
+will not be meaningful when centroid tracking is employed.
+
+If only one value is defined, then this is taken as representing  a
+channel that is symmetrical about the spectrum centre.
+
+The spectrum "centre" is determined by  the  dispersion  relations, and
+modified by any prevailing centroid shifts.
+2 NORDER=number
+This is the number of Echelle orders to be processed by a command.
+2 ORDER=number
+This is the Echelle order number.
+1 UNIX_to_VAX_data_conversion
+
+If you wish to transfer IUE image data from a UNIX machine onto a VAX
+in order to use the VAX IUEDR then the transfer should be done
+using FTP (in BINARY mode) and the command
+
+      VAX_FORMAT  image-name
+
+should then be used to ensure the file has the correct format.
+
+If you use some other method of transferring the file (eg NFS) then
+the above command is STILL required.
+1 VAX_to_UNIX_data_conversion
+
+If you wish to transfer IUE image data from a VAX onto a UNIX machine
+in order to use the UNIX IUEDR then the transfer should be done
+using FTP (in BINARY mode).
+
+If you intend to copy the file using some other method (eg via NFS)
+then you should first use the command
+
+      UNIX_FORMAT image-name
+
+to ensure the file is properly transferred.
+
+Note that this also applies if you wish to just ACCESS the file via
+NFS without explicitly transferring it.
+1 Version_2_Commands
+
+Several commands have been superceded in the current version of IUEDR.
+The following table gives a list of the new commands.
+
+    Old Command  New Command       Old Command  New Command
+
+    ABSCAL       NEWABS            PF           PLFLUX
+    CU           CURSOR            PM           PLMEAN
+    CUTCAL       NEWCUT            PN           PLNET
+    DI           DRIMAGE           PRINTGRS     PRGRS
+    DISPCAL      NEWDISP           PRINTLBLS    PRLBLS
+    EI           EDIMAGE           PRINTMEAN    PRMEAN
+    EM           EDMEAN            PRINTSCAN    PRSCAN
+    ES           EDSPEC            PRINTSPEC    PRSPEC
+    FIDCAL       NEWFID            PS           PLSCAN
+    MI           MODIMAGE          READIUERS    READSIPS
+    PC           PLCEN             RIPCAL       NEWRIP
+    PE           PLGRS             TEMCAL       NEWTEM
+
+2 ABSCAL
+ Read absolute flux calibration into DATASET.
+ This command has been replaced by the NEWABS command.
+
+2 CU
+ Find display coordinate using the cursor and print on terminal.
+ This command has been replaced by the CURSOR command.
+
+2 CUTCAL
+ Read echelle order wavelength limits into DATASET.
+ This command has been replaced by the NEWCUT command.
+
+2 DI
+ Display image on an image display device.
+ This command has been replaced by the DRIMAGE command.
+
+2 DISPCAL
+ Read spectrograph dispersion data into DATASET.
+ This command has been replaced by the NEWDISP command.
+
+2 EI
+ Edit image data quality using image display cursor.
+ This command has been replaced by the EDIMAGE command.
+
+2 EM
+ Edit mean spectrum using graphics cursor.
+ This command has been replaced by the EDMEAN command.
+
+2 ES
+ Edit net spectrum using graphics cursor.
+ This command has been replaced by the EDSPEC command.
+
+2 FIDCAL
+ Read Fiducial positions into DATASET.
+ This command has been replaced by the NEWFID command.
+
+2 MI
+ Modifies actual image intensities interactively.
+ This command has been replaced by the MODIMAGE command.
+
+2 PC
+ Plot smoothed centroid shifts.
+ This command has been replaced by the PLCEN command.
+
+2 PE
+ Plot pseudo-gross and  background  from  spectrum  extraction.
+ This command has been replaced by the PLGRS command.
+
+2 PF
+ Plot calibrated flux spectrum.
+ This command has been replaced by the PLFLUX command.
+
+2 PM
+ Plot mean spectrum.
+ This command has been replaced by the PLMEAN command.
+
+2 PN
+ Plot uncalibrated net spectrum.
+ this command has been replaced by the PLNET command.
+
+2 PRINTGRS
+ Print recently extracted aperture/order spectrum in tabular form.
+ This command has been replaced by the PRGRS command.
+
+2 PRINTLBLS
+ Print current LBLS array in tabular form.
+ This command has been replaced by the PRLBLS command.
+
+2 PRINTMEAN
+ Print current mean spectrum in tabular form.
+ This command has been replaced by the PRMEAN command.
+
+2 PRINTSCAN
+ Tabulate intensities of current scan.
+ This command has been replaced by the PRSCAN command.
+
+2 PRINTSPEC
+ Print current aperture/order spectrum in tabular form.
+ This command has been replaced by the PRSPEC command.
+
+2 PS
+ Plot scan perpendicular to dispersion.
+ This command has been replaced by the PLSCAN command.
+
+2 READIUERS
+ Reads MELO/MEHI from IUESIPS 1 or IUESIPS 2 tape.
+ This command has been replaced by the READSIPS command.
+
+2 RIPCAL
+ Read echelle ripple calibration into DATASET.
+ This command has been replaced by the NEWRIP command.
+
+2 TEMCAL
+ Read spectrum centroid template data into DATASET.
+ This command has been replaced by the NEWTEM command.
+

@@ -1,0 +1,15 @@
+Files in this directory are those described in SG/7 `IUE Analysis-A Tutorial'
+
+The files are as follows:
+
+File                Type
+
+LWR_CORRECTION.sdf  NDF/SP0.
+SWP_CORRECTION.sdf  NDF/SP0.
+WAVECAL_LORES.sdf   NDF/SP0.
+lwp_correction.dat  Two number-column text, wavelength versus correction.
+lwr_correction.dat  Two number-column text, wavelength versus correction.
+swp_correction.dat  Two number-column text, wavelength versus correction.
+page.cmd            DIPSO command procedure for plotting HIRES spectrum.
+
+MJC 25-JAN-1995.

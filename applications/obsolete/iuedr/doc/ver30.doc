@@ -1,0 +1,634 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   UNIVERSITY   COLLEGE   LONDON                                                  SUN/???
+
+   Department of Physics & Astronomy
+
+   Starlink  Project
+
+   Starlink  User  Note  ???
+
+
+
+                                                                                 Dave Mills
+
+                                                                                01-Feb-1993
+
+   _______________________________________________________________________________________
+
+
+
+
+
+
+
+                       IUEDR       Version    3  - Release    notes
+
+
+
+
+
+
+
+
+   1   Introduction
+
+
+
+   This document describes the main changes that have been made to IUEDR during its conversion to an
+
+   ADAM  based application which runs on both VAX and UNIX based systems.
+
+
+   The most significant change from the scientific point of view is that the precision of all floating point
+
+   calculations has been upgraded to DOUBLE PRECISION. This was done after it was noticed that for
+
+   high resolution extraction the output spectra were subject to rounding noise at the 1% level.
+
+
+   The format of the calibration file (.UEC) created by IUEDR3 has been changed to make it more readable.
+
+   Old format files can still be read, the format being automatically determined by the program.
+
+
+   The functionality of the package has been enhanced to allow image data to be read directly from disk,
+
+   and command procedures are provided to automatically retreive images from the IUE archives.
+
+
+   The general operation of IUEDR3, and all the command and parameter names, are identical to those
+
+   used in previous versions.
+
+
+
+
+   2   UNIX      version
+
+
+
+
+   This release of IUEDR is written to run from the ICL command language. However, this is not yet
+
+   available on all UNIX platforms. In these cases IUEDR3 runs as a single task which prompts the user
+
+   for IUEDR3 specific commands.
+
+
+   To start the IUEDR3 monolith task type
+
+
+   IUEDR3  at the system prompt
+
+
+   the monolith then prompts repeatedly for IUEDR3 commands until exit.
+
+
+   To exit from this task type
+
+
+                 EXIT  at the `iuedr>' prompt
+
+
+   To access the on-line help type
+
+
+                 HELP  at the `iuedr>' prompt
+
+
+   To abort a task type
+
+
+                 <CTRL-C>   at any point (but preferably at the `iuedr>' prompt)
+
+
+   In addition to running as a monolithic task each IUEDR3 command is also available from the UNIX
+
+   command line. Thus you can type
+
+
+                 TRAK
+
+
+   at the system prompt and the IUEDR3 TRAK command will be invoked.
+
+
+   However, it is important to remember that in this case the program is re-started for each individual
+
+   command and any previous context is lost leading to the inefficient re-reading of files.
+
+
+
+
+
+
+
+
+
+
+
+
+   SUN/???                                                                               2
+
+
+
+
+   3   Log    files
+
+
+
+
+   The creation of log files recording the output of IUEDR3 is different depending upon whether you are
+
+   running under ICL or not (not available for all UNIX platforms at the time of writing).
+
+
+
+
+
+   3.1   From  ICL
+
+
+
+   ICL has its own message logging and reporting functions and information on these can be found using
+
+   the HELP command.
+
+
+   For convenience IUEDR3 defines the alias HISTORY as a shorthand command to provide a replay of
+
+   the session log. By default this log is stored in SESSION.DAT and may be examined using the ICL
+
+   REPFILE  command.
+
+
+   To direct the logging to a different file the ICL command
+
+
+                 REPORT   filename
+
+
+   may be used.
+
+
+
+
+   3.2   From  UNIX
+
+
+
+   Until ICL arrives on your UNIX platform the easiest way to create a log of a sequence of IUEDR3
+
+   commands is to place the commands in an ascii file (using an editor of your choice) and then type
+
+
+   filename > log-filename
+
+
+   at the system prompt.
+
+
+   If you only need to log the output of a single command then you can simply type
+
+
+   iuedr3-command > log-filename
+
+
+
+
+
+
+   4   IUEDR3        command       files
+
+
+
+   The .CMD style of IUEDR command files is not directly supported by ICL, and neither is the associated
+
+   input/output redirection using < and >.
+
+
+   ICL command procedures provide this functionality in the version 3.
+
+
+   It is very easy to convert a.CMD file into an ICL command procedure.
+
+
+   Eg. DEMO.CMD   procedure...
+
+
+                 DATASET=SWP03196
+
+
+                 SHOW
+
+
+                 TRAK  APERTURE=LAP
+
+
+                 SHOW   V=S
+
+
+   would become ICL procedure
+
+
+                 SHOW   DATASET=SWP03196
+
+
+                 TRAK  APERTURE=LAP
+
+
+                 SHOW   V=S
+
+
+   The only changes which need be made are to move any parameter specifications (eg DATASET=) onto
+
+   the same line as they command they apply to.
+
+
+   ICL command procedures are run by typing
+
+
+
+
+
+
+
+
+
+
+
+
+   SUN/???                                                                               3
+
+
+
+
+                 LOAD  procedure-name
+
+
+   at the ICL prompt.
+
+
+   ICL procedures may contain any valid ICL commands as well as the IUEDR3 provided command set.
+
+   In addition you may include commands provided by other monoliths (eg KAPPA,PONGO) to access
+
+   functions not integrated into IUEDR3.
+
+
+   If ICL is not yet available on your machine then you may simply type the name of your command file at
+
+   the system prompt and the IUEDR3 commands will be executed by the system shell.
+
+
+
+
+
+
+   5   DRIVE       parameter      options
+
+
+
+
+   The use of the DRIVE parameter has been enhanced to allow specification of disk files containing IUE
+
+   datasets. This is intended for use with files obtained from online archives (RAL and NASA).
+
+
+   The sytax is to provide the full filename and extension in response to the DRIVE prompt.
+
+
+   Eg.               DRIVE>  SWP12345.RAW
+
+
+   Two command  procedures are provided to help automate the retreival of datasets from the archives :
+
+
+                 NDADSA_FETCH    and RLVAD_FETCH
+
+
+   retreive datasets from their respective archive sites. To use the procedures type
+
+
+                 NDADSA_FETCH    parmameter-1 [parameter-2]
+
+
+   The first parameter may be either a dataset identifier (eg SWP12345) or the name of a file containing a
+
+   list of dataset identifiers (one per line).
+
+
+   The second parameter is optional and specifies the type of dataset required. The default value is RAW,
+
+   meaning raw data image. The set of available types is
+
+
+                               RAW  raw data image
+
+
+                               MELO  extracted lo-res spectrum
+
+
+                               ELBL  extracted line-by-line hi-res spectra
+
+
+   Eg.               NDADSA_FETCH    images.lis ELBL
+
+
+   would attempt to retreive a set of ELBL files whose identifiers are listed on the file `images.lis'
+
+
+   The process can take some time depending upon the network load and the number of datasets requested.
+
+   It may be convenient to let the job run in the background by typing :
+
+
+                 SPAWN/NOWAIT     NDADSA_FETCH    images.lis ELBL
+
+
+
+
+
+   6   VAX-UNIX          IUEDR      image     file exchange
+
+
+
+   An IUEDR  image file is one of RAW,PHOT, or GPHOT type and consist of 768 by 768 pixels each stored
+
+   in a 1 or 2-byte integer.
+
+
+   The transfer of files between VAX and UNIX systems is complicated by the sophistication of the VAX
+
+   file system. Under VMS the system records a complex description of the precise format of all the files
+
+   (and stores it in the directory entry). Under UNIX this information has to be provided by the user of
+
+   the file when it is opened. Because of this difference it is sometimes necessary to use the following format
+
+   conversion utilities
+
+
+
+
+
+
+
+
+
+
+
+
+   SUN/???                                                                               4
+
+
+
+
+   6.1   VAX   to UNIX
+
+
+
+
+   If you wish to transfer IUE image data from a VAX onto a UNIX machine in order to use the UNIX
+
+   IUEDR3  then the transfer should be done using FTP (in BINARY mode).
+
+
+   If you intend to copy the file using some other method (eg via NFS) then you should first use the command
+
+
+                 UNIX_FORMAT    image-name
+
+
+   to ensure the file is properly transferred.
+
+
+   Note that this also applies if you wish to just access the file via NFS without explicitly transferring it.
+
+
+
+
+   6.2   UNIX   to  VAX
+
+
+
+   If you wish to transfer IUE image data from a UNIX machine onto a VAX in order to use the VAX
+
+   IUEDR3  then the transfer should be done using FTP (in BINARY mode) and the command
+
+
+                 VAX_FORMAT    image-name
+
+
+   should then be used to ensure the file has the correct format.
+
+
+   If you use some other method of transferring the file (eg NFS) then the above command is still required.
+
+
+
+
+
+   6.3   What   will work?
+
+
+
+   In general the following two commands will allow you to use any disk based IUE image with any machine
+
+   running IUEDR3 :
+
+
+                  VAX_FORMAT   sets the file format as required by VAX IUEDR3
+
+
+                 UNIX_FORMAT    sets the file format as required by UNIX IUEDR3
+
+
+   Both commands operate only on the VAX.
+
+
+   The following illustrate some of the situations in which the format conversions are used :
+
+
+
+      o Copy file from archive onto VAX
+
+
+          - YES using VAX IUEDR3
+
+
+          - NO using UNIX IUEDR3  and accessing file via NFS (use UNIX_FORMAT filename).
+
+
+      o FTP file from VAX to a UNIX system using BINARY transfer
+
+
+          - YES using UNIX IUEDR3
+
+
+          - UNKNOWN    using VAX IUEDR3 and accessing file via NFS)
+
+
+      o FTP file from UNIX to a VAX system using BINARY transfer
+
+
+          - NO using VAX IUEDR3  (use VAX_FORMAT   filename command).
+
+
+          - YES using UNIX IUEDR3  and accessing file via NFS)
+
+
+      o NFS copy file from VAX to a UNIX system after using UNIX_FORMAT filename
+
+
+          - YES using UNIX IUEDR3
+
+
+          - UNKNOWN    using VAX IUEDR3 and accessing file via NFS)
+
+
+
+
+
+
+
+
+
+
+
+
+   SUN/???                                                                               5
+
+
+
+
+   7   Accessing      data   via  NFS
+
+
+
+
+   UNIX machines commonly provide disk sharing amongst remote machines using the NFS protocol.
+
+
+   For example your data frame may reside on a DECstation local disk called `iuedata' in the Rutherford
+
+   cluster on machine `adam4'. In order to get IUEDR3 to read it directly you could enter the following in
+
+   response to the DRIVE prompt :
+
+
+                 DRIVE>   /adam4/iuedata/swp12345.raw
+
+
+   To see which disks you have NFS access to you should use the
+
+
+                 df
+
+
+   command. In general any disks whose entry does not start with a `/dev' are being served by a remote
+
+   machine.
+
+
+   IMPORTANT   NOTE
+
+
+   IUEDR3  allows you to use this method of data access with the following proviso.
+
+
+   If the data resides on a VAX served disk then you must first convert its directory entry using the following
+
+   command :
+
+
+                 UNIX_FORMAT    image-name
+
+
+   This command does not change the data in any way. It merely alters the description of the file format
+
+   as stored in the VAX directory.
+
+
+   If at some later stage you wish to use the VAX version of IUEDR3 on the same data file it first be
+
+   necessary to use the command
+
+
+                 VAX_FORMAT    image-name
+
+
+   to convert back.
+
+
+
+   8   Using    on-line    HELP
+
+
+
+   IUEDR3  now has a selection of methods for obtaining on-line help.
+
+
+
+      o From the VAX command line you may type
+
+
+                      HELP  IUEDR
+
+
+      o From the ICL command line you may type
+
+
+                      HELP  IUEDR
+
+
+      o From the IUEDR3 prompt on a UNIX machine you may type
+
+
+                      HELP
+
+
+      o From any IUEDR3 parameter prompt on any machine you may type
+
+
+                      ? for help on that parameter
+
+
+                      ?? for help and to browse the help library
+
+
+
+   9   Specifying      vector   parameters
+
+
+
+   Some IUEDR3  parameters (eg. XP, YP) require the specification of a pair of numbers defining the limits
+
+   of a range of values (eg pixels).
+
+
+   The method of setting such values has changed to the ADAM style :
+
+
+                 XP=[100,300]
+
+
+   Note that the square brackets are only necessary when vector parameters are specified on the command
+
+   line. They are not required when IUEDR3 prompts the user for a vector parameter.

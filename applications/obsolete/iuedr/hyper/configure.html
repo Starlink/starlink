@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: CONFIGURE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=CONFIGURE>
+<I>IUEDR-Online HELP</I>
+<HR><H1>CONFIGURE</H1><HR>
+</A>
+<H2>Summary</H2>
+ Toggles recording of parameter values in the log file.
+<P>
+<H2>Purpose</H2>
+This command  toggles  the  writing of  all parameter  values to the log
+file.   By default  this behaviour  is TRUE and a full log is made,  for
+example:
+<P>
+<PRE WIDTH=72>
+&gt; drimage
+ DATASET='SWP14931'.
+ Reading SWP14931.UEC (Calibration File).
+ Reading SWP14931_UED (Image & Quality File).
+ COLOUR=FALSE.
+ DEVICE='xw'.
+ FLAG=TRUE.
+ XP=[0,0].
+ YP=[0,0].
+ ZL=[0.0000,0.0000].
+</PRE>
+<P>
+When parameter logging is switched off the same command produces only:
+<P>
+<PRE WIDTH=72>
+&gt; drimage
+ Reading SWP14931.UEC (Calibration File).
+ Reading SWP14931_UED (Image & Quality File).
+</PRE>
+<P>
+in the log file.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:54 1995
+</ADDRESS>
+</BODY>
+</HTML>

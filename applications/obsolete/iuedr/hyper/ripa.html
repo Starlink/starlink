@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: RIPA.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>RIPA</H2><HR>
+<H2>Usage</H2>
+<H3>RIPA=number</H3>
+<H2>Description</H2>
+This is an empirical scale factor that can be used to modify the Echelle
+ripple  function.   The normal value is 1.  The primary component of the
+ripple function is:
+<P>
+<PRE WIDTH=72>
+      SCALE = (SIN(X) / X)**2
+</PRE>
+<P>
+where
+<P>
+<PRE WIDTH=72>
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+</PRE>
+<P>
+and PI=3.14159, WAVC=RIPK/ORDER.  The net spectrum is divided  by  SCALE
+above.   Empirical  values  of  RIPA  can be used to optimise the ripple
+correction.
+<P>
+See the <A HREF=ripc.html>
+RIPC</A>
+ and <A HREF=ripk.html>
+RIPK</A>
+ parameter descriptions.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:10 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,67 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: SETD.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=SETD>
+<I>IUEDR-Online HELP</I>
+<HR><H1>SETD</H1><HR>
+</A>
+<H2>Summary</H2>
+ Set dataset parameters which are independent of ORDER/APERTURE.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   OBJECT          Object Identification Text.
+   THDA            IUE Camera Temperature (C).
+   FIDSIZE         Half width of fiducials (pixels).
+   BADITF          Whether bad LORES ITF requires correction.
+   NGEOM           Number of Chebyshev terms used to represent geometry.
+   RIPK            Echelle ripple constant (A).
+   RIPA            Ripple function scale factor.
+   XCUT            Global Echelle wavelength clipping.
+   HALTYPE         The type of Halation (order-overlap) correction used.
+   HALC            Halation correction constant (fraction of continuum).
+   HALWC           Wavelength at which the halation correction  is  HALC
+                   is defined (A).
+   HALW0           Wavelength at which halation correction is zero (A).
+   HALAV           Averaging  FWHM  for halation  correction  (geometric
+                   pixels).
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command allows changes to be  made  to  dataset  values  which  are
+independent  of any specific <A HREF="aperture.html">
+APERTURE</A>
+/<A HREF="order.html">
+ORDER</A>
+.  Items for which parameters
+are not specified retain their current values.
+<H2>Available Topics</H2>
+<A HREF="baditf.html">BADITF</A> * 
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="fidsize.html">FIDSIZE</A> * 
+<A HREF="halav.html">HALAV</A> * 
+<A HREF="halc.html">HALC</A> * 
+<A HREF="haltype.html">HALTYPE</A> * 
+<A HREF="halwc.html">HALWC</A> * 
+<A HREF="halw0.html">HALW0</A> * 
+<A HREF="ngeom.html">NGEOM</A> * 
+<A HREF="object.html">OBJECT</A> * 
+<A HREF="ripa.html">RIPA</A> * 
+<A HREF="ripk.html">RIPK</A> * 
+<A HREF="thda.html">THDA</A> * 
+<A HREF="xcut.html">XCUT</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:15 1995
+</ADDRESS>
+</BODY>
+</HTML>

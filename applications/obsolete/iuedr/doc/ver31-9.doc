@@ -1,0 +1,101 @@
+Martin Clayton, Starlink.   23rd October 1994.
+
+This file describes IUEDR version 3.1-9.  In particular bug fixes from a
+previous release (version 3.1) are described.
+
+Documentation notes:
+o  SUN/37 describing this package has been updated.
+o  SG/7 the introduction to IUEDR has been updated and added to the package.
+o  SG/3 and MUD/45 (the main IUEDR documentation) will be released
+   in updated versions soon.
+o  The out of date and redundant "man" files have been removed from the
+   package.
+
+Notes on this version:
+o  The prompt has been changed back to "> " as in the VMS version.
+o  Leading blanks or tabs before a command are ignored
+   This used to produce a "command not know or ambiguous" message.
+o  A 'minor' bug in the extraction of date information from GO tapes has
+   been fixed so that non-leap year days-of-month are now correct.
+o  The upper-bound wavelength limit when using MAP is now displayed correctly.
+o  The read/write of *.UEC files for the APERTURES=BAP case now works correctly.
+o  The interface file has been updated to reflect some bugs found.
+   (e.g. MTREW resets FILE=1, this parameter was missing and hence produced
+   a spurious error message.)  Some missing parameter prompts have been added.
+o  The IUEDR (actually parameter system) command SET can be used to set a
+   parameter, e.g.
+
+   > SET ORDER=89 NORDER=0
+   > TRAK
+
+   This did work before but produced a "command not know or ambiguous" message.
+o  Incorrect calls to Ndf read/write routines which caused program failure
+   when the sequence
+   > PLMEAN
+   > SCAN
+   was executed with a virtual memory allocation error have been removed.
+o  The axis-units are now read from _UEM files so that these are available
+   for *MEAN commands.  Previously axes were labelled with no units.
+o  The tables produced by the CURSOR command are properly right-justified.
+   Previously each column was left-justified.
+o  Commands which were removed when Vn. 2.0 was released, but produced
+   a simple informational message have been completely removed.
+o  Most parameter prompting is now as in the VMS version and more consistent
+   than in version 3.0.
+o  Filenames suggested by the OUT* family of commands now reflect that the
+   spectype=0 is of Ndf type.
+o  An error in the treatment of NULL (!) response to parameter prompts has been
+   fixed.
+o  Parameters which are documented to adopt default values, (e.g. ranges for
+   display) when the NULL (!) response is given to a parameter prompt now do
+   this.  Previously such parameters would simply remain in the NULL state.
+o  Error handling has been tidied a little, spurious messages after an
+   EXIT or QUIT command are now flushed at the correct point.
+o  The precision of floating point command parameters has been promoted
+   to double precision.  This reflects the internal conversions already made.
+o  A spurious message when the ITF parameter was set out of range has been
+   removed.
+o  An error in the writing of ABSCAL data in the SWP/ITF2 case has been
+   removed.  (The UEC file could not be read.)
+o  PLNET/PLGRS now include order/aperture in the graph title.
+o  The PLSCAN command now has the HIST parameter.
+o  A typographic error (1 instead of I) in the WRITE_NDF call when writing
+   net spectra has been removed.  This caused truncation of all orders to
+   contain the same number of flux points as the first order in the dataset.
+o  The wavelength limits for each order are now read-back from the UES file.
+   Previously these were all left as zero, causing plots to scale incorrectly.
+o  A bug in READ_NDF which meant that reading of the mean spectrum would set
+   the number of orders to 1 (i.e. only a single net spectrum is available)
+   has been removed.
+o  The parameter system is shutdown and restarted for each command executed.
+   This means that forced prompting now works correctly.
+o  The VMS version of IUEDR would crash if two UES files where read.  This
+   appears to have been related to incorrect calls to READ_NDF.  The bug did
+   not appear to have any effect on unix platforms.
+o  The program now release SGS graphics zones correctly when finished with.
+   This means that the zone limit will no longer be hit.
+o  Byte order of raw data files on SunOS/Solaris machines is correctly handled.
+o  Incorrect calls to graph plotting routines when PLSCANning have been
+   corrected.  Quality information is now correctly displayed.
+o  Memory access alignment errors during cursor commands and some plotting
+   commands have been removed.
+o  A bug in the OUT* family of commands limiting the file to 768 data points
+   has been fixed.
+o  Links to enable single commands to be executed at the shell have been
+   removed.
+o  Truncation of the year in the welcome banner to "199" instead of "1994"
+   has been fixed.
+o  The help facility has been brought up to date and some errors corrected
+o  The correction files described in Richard Tweedy's SG/7 document have
+   been included in the package.
+o  The file swpr.FID has been removed from the $IUEDR_DATA directory.
+o  The lwpr.fid and lwrr.fid files can now be read on sun machines.
+o  Parameters specified on the command line now retain their case.
+   This means that SWP14931 and swp14931 are treated as different datasets.
+o  The COLROT and LINEROT parameters for plotting commands now work.
+o  When the RS parameter is set FALSE graph axes are no longer redraw,
+   this is the intended behaviour.
+o  An error in obtaining the OBJECT text when using SETD has been removed.
+   Trailing blanks are now removed from the title.
+
+MJC.

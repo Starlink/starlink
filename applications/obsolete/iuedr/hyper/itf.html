@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: ITF.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>ITF</H2><HR>
+<H2>Usage</H2>
+<H3>ITF=number</H3>
+<H2>Description</H2>
+This is the ITF generation used in the photometric  calibration  of  the
+image.   This  information  is  needed  for  the  correct  absolute flux
+calibration of the resulting spectra.  Possible values for  each  camera
+are as follows:
+<P>
+<PRE WIDTH=72>
+      SWP     1 (faulty), 2 and 3
+      LWR     1 and 2
+      LWP     1 and 2
+</PRE>
+<P>
+Here are the ITF values associated with various forms of this table:
+<P>
+<PRE WIDTH=72>
+      ITF       TABLE                           IDENTIFICATION
+      ITF 0     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      ITF 1     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      ITF 1     0  2300  3969  6062  ... 32973  1st LWP ITF
+      ITF 2     0  2723  5429  8145  ... 38389  2nd LWP ITF
+      ITF 0     0  1800  3600  5500  ...        Preliminary SWP ITF
+      ITF 1     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      ITF 2     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+</PRE>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:02 1995
+</ADDRESS>
+</BODY>
+</HTML>

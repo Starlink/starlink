@@ -1,0 +1,79 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: EDSPEC.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=EDSPEC>
+<I>IUEDR-Online HELP</I>
+<HR><H1>EDSPEC</H1><HR>
+</A>
+<H2>Summary</H2>
+ Edit net spectrum using graphics cursor.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   DEVICE          GKS/SGS graphics device name.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command allows the graphics cursor to be used to  mark  points  and
+regions of the current net spectrum that are "bad" or "good".  A plot of
+the <A HREF=aperture.html>
+APERTURE</A>
+ or <A HREF=order.html>
+ORDER</A>
+ spectrum is required before this  command  can  be
+used.
+<P>
+The following cursor hit sequences can be used in a cycle:
+<P>
+<PRE WIDTH=72>
+      1  then  1    marks all points in the x-range GOOD
+      2  then  2    marks all points in the x-range BAD
+      1             marks the nearest point (in x-direction) GOOD
+      2             marks the nearest point (in x-direction) BAD
+      3             causes the cursor cycle to terminate
+</PRE>
+<P>
+The points/ranges changed are printed on the terminal.
+<P>
+Mouse buttons can be used for cursor hits where:
+<P>
+<PRE WIDTH=72>
+      left button     is  hit 1
+      middle button   is  hit 2
+      right button    is  hit 3
+</PRE>
+<P>
+Alternatively, keyboard keys 1, 2 and 3 can be used to mark hits.
+<P>
+<P>
+Only the user-defined data quality bit can be changed with this command.
+Initially, all faulty points have this bit set BAD (e.g. by <A HREF=trak.html>
+TRAK</A>
+).  However,  whether they  are considered bad (e.g. when plotting  or creating
+output  files)  is determined  by the  user-defined  bit,  which  can be
+changed at will.
+<P>
+See the <A HREF="../iuedr_docs/mud45/node52.html">User Guide</A> 
+for further information on "data quality".
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="order.html">ORDER</A> * 
+<A HREF="aperture.html">APERTURE</A> * 
+<A HREF="device.html">DEVICE</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:56 1995
+</ADDRESS>
+</BODY>
+</HTML>

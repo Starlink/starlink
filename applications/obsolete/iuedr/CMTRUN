@@ -1,0 +1,11 @@
+*+
+*
+*   CMTRUN common blocks.
+*
+*-
+
+*   STAK value for top TN level in ITF table.
+      INTEGER TNMAX     ! top ITF level
+ 
+      COMMON /CMTRUN/ TNMAX
+ 

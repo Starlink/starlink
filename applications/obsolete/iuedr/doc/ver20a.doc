@@ -1,0 +1,114 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Release Notes
+
+                                                             Paul Rees
+                                                         20 March 1989
+
+----------------------------------------------------------------------
+
+                IUEDR Version 2.0 Notes for Re-release
+                --------------------------------------
+
+
+
+1  INTRODUCTION
+
+This Note describes changes made to IUEDR since the  Starlink  release
+of  Version  2.0.   This re-release contains bug fixes to the original
+release and some modifications to the absolute calibration data files.
+
+
+
+2  BUG FIXES
+
+The following bugs in the original release of IUEDR Vn.  2.0 have been
+fixed:
+
+      o  CURSOR command would go into an  infinite  cursor  loop  when
+         used on spectrum plots.
+
+      o  SGS would produce a zoning error message after a large number
+         of plots.
+
+      o  READIUE, READSIPS and LISTIUE would go into an infinite  loop
+         if  the  TAPE  parameter was given a device name instead of a
+         logical name.
+
+      o  The command line  prompt  would  go  into  an  infinite  loop
+         immediately  on  entry  to  IUEDR.   (This  problem  was only
+         experienced on LTVAD.)
+
+      o  The HELP for the ITF parameter has been corrected for the SWP
+         ITF calibrations available.
+
+
+
+
+
+
+
+                                - 1 -
+IUEDR Version 2.0 Release Notes                                 Page 2
+
+
+3  UPDATES
+
+The format of  the  absolute  calibration  data  files,  available  in
+IUEDR_DATA,  has  again  been  changed.  This is to allow the SWP date
+sensitivity correction (i.e.   Bohlin  &  Grillmair,  1988.   Ap.   J.
+Supp.   Series,  Vol.   68,  487-518)  to  be  included.  The Bohlin &
+Grillmair LWR date sensitivity correction is  also  included  in  this
+re-release,   in   the  file  IUEDR_DATA:LWRLO1_BG.ABS.   The  Clavel,
+Gilmozzi & Prieto (1988.  Astron.  & Astrophys,  Vol.   191,  392-398)
+LWR  date  sensitivity  correction  remains  the default.  The command
+NEWABS may be used to associate the Bohlin & Grillmair correction with
+an IUE LWR dataset instead, if desired.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 2 -

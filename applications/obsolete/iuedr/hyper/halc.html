@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: HALC.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>HALC</H2><HR>
+<H2>Usage</H2>
+<H3>HALC=number</H3>
+<H2>Description</H2>
+This is the Halation correction constant used for  <A HREF=haltype.html>
+HALTYPE</A>
+=POWER  cases,
+and  defined  at wavelength <A HREF=halwc.html>
+HALWC</A>
+.  The value of the correction constant
+corresponds,  roughly  to  the  measured  depression  of  a  broad  zero
+intensity absorption below "zero", in units of the continuum in adjacent
+orders.  The "constant" varies with wavelength:
+<P>
+<PRE WIDTH=72>
+      C(WAV) = HALC * (WAV - HALW0) / (HALWC - HALW0)
+</PRE>
+<P>
+See the <A HREF=halav.html>
+HALAV</A>
+, <A HREF=haltype.html>
+HALTYPE</A>
+, <A HREF=halw0.html>
+HALW0</A>
+ and <A HREF=halwc.html>
+HALWC</A>
+ parameters.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:08 1995
+</ADDRESS>
+</BODY>
+</HTML>

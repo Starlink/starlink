@@ -1,0 +1,171 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Release Notes
+
+                                                         Jack Giddings
+                                                       7 December 1982
+
+----------------------------------------------------------------------
+
+                   IUEDR Version 1.0 Release Notes
+                   -------------------------------
+
+
+
+1  INTRODUCTION
+
+This Note describes changes made to IUEDR prior to Starlink release as
+Version 1.0.  This information will only be of importance to the group
+of pre-release users based at the UCL Starlink Node.
+
+
+
+2  27-SEP-82
+
+TRAK:  Pixels marked as spikes  during  background  determination  are
+"unmarked" before the object spectrum is extracted.
+
+
+
+3  28-SEP-82
+
+MAP:  Spectrum Mapping is now done in "calibrated  wavelength"  space.
+Thus  the wavelength grid is even in the final wavelengths.  For grids
+that cross the 2000 A barrier, this means that  the  grid  wavelengths
+are  vacuum  below  there,  and  "air" above.  Since there is a region
+around 2000 A in which wavelengths  corresponding  to  the  convention
+"Air above 2000 A" are ambiguous, this region is photometrically WRONG
+after mapping (1999.5 to 2000 A).
+
+
+
+4  29-SEP-82
+
+It now no longer takes forever to read "STARTUP.CMD".
+
+
+
+
+
+
+                                - 1 -
+IUEDR Version 1.0 Release Notes                                 Page 2
+
+
+5  30-SEP-82
+
+The GSHIFT command has gone.  Its function is  replaced  by  the  SETD
+command.
+
+
+
+6  30-SEP-82
+
+New commands SETD, SETA, SETM allow just about all of the  calibration
+parameters  to be changed.  SETD is for dataset-wide parameters.  SETA
+is for APERTURE specific, and SETM is for ORDER  specific  parameters.
+These   commands   effectively  allow  wavelength,  ripple  and  other
+calibrations to be varied empirically to get the "right" answer.  Also
+included is an empirical order overlap correction technique.
+
+
+
+7  1-OCT-82
+
+TRAK:  The significance criterion for centroid shifts should now  work
+properly (except when Sky emission is strong and displaced relative to
+object spectrum).
+
+
+
+8  8-OCT-82
+
+TRAK:  The integration algorithm has  been  changed  so  that  it  can
+operate with single pixel wide slits.
+
+SH:  This command  is  introduced,  and  allows  printing  of  dataset
+contents.
+
+P*:  These plotting commands  now  produce  sensible  axes  and  title
+information.
+
+PN,PE:  These commands now use different symbols  to  distinguish  bad
+points.
+
+MAP:  This now has two new parameters (FILLGAP,COVERGAP)  which  allow
+flexibility  about  what  to  do when gaps are present in the original
+spectra.  The default action is to produce good quality  results,  but
+at  the  cost  of  gaps  in data.  The Log File now contains an almost
+complete copy of terminal dialogue.
+
+OUTRAK:  This new command allows creation of "TRAK" compatible  output
+files.
+
+OUTSPEC,OUTMEAN,OUTRAK:  These commands cancel the  OUTFILE  parameter
+on  completion.   This  means that unless this parameter is specified,
+then the default file name constructed by the command will be used.
+
+                                - 2 -
+IUEDR Version 1.0 Release Notes                                 Page 3
+
+
+TRAK:  Speeded up by a factor of 2x.
+
+
+
+9  15-NOV-1982
+
+TRAK:  Now has AUTOSLIT parameter which means that for  normal  cases,
+the  object and background channel widths and positions are determined
+autometically, based on the APERTURE, EXTENDED,  CONTINUUM  and  ORDER
+parameters.
+
+READIUE,SETD:  Now have an ITFCOR parameter  which  specifies  whether
+LORES  ITF  corrections  are to be applied during spectrum extraction.
+Corrections exist for the SWP ITF "SNAFFU"  and  the  recent  LWR  ITF
+recalibration.
+
+Operation:  The Log File is now called "SESSION.LIS"  (was  WORK.LOG).
+The  way in which Batch Jobs run is also slightly different, since the
+".LOG" file containing DCL commands is now created  in  the  directory
+from which the job was submitted (and in which it runs).
+
+
+
+10  22-NOV-1982
+
+READIUE:   The  APERTURE  and  EXPOSURE  parameters  are  changed   to
+APERTURES  and  EXPOSURES  respectively.   Also the ORDER and APERTURE
+parameters are canceled by READIUE.
+
+MTREW:  This sets FILE=1.
+
+RIPCAL,ABSCAL  and  CUTCAL:   commands  added.   These  allow  various
+Spectrum  calibrations  to  be  read  from file.  At present, the file
+formats  are  not  described  so  that  only  the  standard  files  in
+"IUEDRDATA" can be read.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 3 -

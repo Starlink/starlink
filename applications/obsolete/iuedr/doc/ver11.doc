@@ -1,0 +1,57 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Porject                                             Issued by
+Release Notes
+
+                                                         Jack Giddings
+                                                          1 March 1983
+
+----------------------------------------------------------------------
+
+                   IUEDR Version 1.1 Release Notes
+                   -------------------------------
+
+
+
+1  INTRODUCTION
+
+This Release Note describes changes introduced with IUEDR Version 1.1.
+This  version  of  IUEDR represents a correction of 1.0; no additional
+commands or facilities are included.
+
+
+
+2  LORES ITF CALIBRATION
+
+An error associated  with  the  correction  of  LORES  ITFs  has  been
+identified  and  corrected.   The  error  is that, for LORES datasets,
+whenever the ".UEC" file is read, the value of ITFCOR  is  left  TRUE.
+This  means,  that for LORES images processed with the "3rd" (correct)
+ITF, there will be significant "over-correction" of the fluxes.
+
+THIS ERROR WILL LIKELY AFFECT  ALL  SWP  LORES  DATA  THAT  HAVE  BEEN
+PROCESSED BY THE GROUND STATION USING THE CORRECT ITF TABLES.
+
+See IUEDRDOC:BUGS for further information.
+
+
+
+3  DOCUMENTATION
+
+Two typographical errors appearing in  the  documentation  related  to
+ITFMAX  have been corrected.  The errors are in the Table of ITFNs for
+the SWP3 (3rd, correct) ITF which appears in Chapter 4, Section  2  of
+the  User  Guide,  and  in  the  HELP/MANUAL  entries  for the READIUE
+command.  The value "9091" changes to "6783", and "29500" to "28500".
+
+
+
+
+
+
+                                - 1 -

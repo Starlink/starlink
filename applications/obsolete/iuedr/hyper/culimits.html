@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: CULIMITS.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=CULIMITS>
+<I>IUEDR-Online HELP</I>
+<HR><H1>CULIMITS</H1><HR>
+</A>
+<H2>Summary</H2>
+ This command allows the display limits to be delineated by the cursor
+ and the appropriate parameters set accordingly.
+<P>
+<PRE WIDTH=72>
+   DEVICE          GKS/SGS graphics device name.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+   XP              X-axis pixel limits, undefined means full extent.
+   YP              Y-axis pixel limits, undefined means full extent.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command lets the cursor be used to  delineate  part  of  a  current
+display (graph/picture) to be displayed in some subsequent command (e.g.
+<A HREF=drimage.html>
+DRIMAGE</A>
+, <A HREF=plflux.html>
+PLFLUX</A>
+).
+<P>
+The two cursor positions  should be at the corners of the required rectangular subset.  The relation between cursor position sequences and axis
+reversals for graphs is:
+<P>
+<PRE WIDTH=72>
+      position 1    position 2    x-reversed    y-reversed
+<P>
+      bottom/left   top/right         NO           NO
+      bottom/right  top/left          YES          NO
+      top/left      bottom/right      NO           YES
+      top/right     bottom/left       YES          YES
+</PRE>
+<P>
+The <A HREF=xl.html>
+XL</A>
+ and <A HREF=yl.html>
+YL</A>
+ values are changed accordingly.  In the case of  an  image
+display,  the  <A HREF=xp.html>
+XP</A>
+  and  <A HREF=yp.html>
+YP</A>
+ parameter values are changed.  The image will
+ALWAYS be drawn without axis reversals.
+<H2>Available Topics</H2>
+<A HREF="device.html">DEVICE</A> * 
+<A HREF="xl.html">XL</A> * 
+<A HREF="yl.html">YL</A> * 
+<A HREF="xp.html">XP</A> * 
+<A HREF="yp.html">YP</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:55 1995
+</ADDRESS>
+</BODY>
+</HTML>

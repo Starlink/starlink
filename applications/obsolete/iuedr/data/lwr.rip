@@ -1,0 +1,11 @@
+'IUE_RIP'
+'LWR:  Ake (1982).'
+3  230036.0  15.3456  -0.050638
+0.896
+-3.0 +3.0
+
+# Title:     LWR Ripple Constants.
+# From:      Ake:  1982, NASA IUE Newsletter, No. 19, 37-47.
+# Contents:  (TYPE, LABEL,  NRIPM, (RIPM(I),I=1,NRIPM), ALPHA, XMIN, XMAX)
+# Notes:     Wavelengths above 2000 A are "Air".
+# End:

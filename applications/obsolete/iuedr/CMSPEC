@@ -1,0 +1,10 @@
+*+
+*
+*   CMSPEC common blocks.
+*
+*-
+
+*   This is a fudge for now, it contains the current ORDER value.
+      INTEGER ORDER     ! Current echelle order/aperture.
+ 
+      COMMON / CMSPEC / ORDER

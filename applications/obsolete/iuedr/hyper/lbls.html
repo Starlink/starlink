@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: LBLS.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=LBLS>
+<I>IUEDR-Online HELP</I>
+<HR><H1>LBLS</H1><HR>
+</A>
+<H2>Summary</H2>
+ This extracts a line-by-line-spectrum (LBLS) array from the image.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   ORDER           Echelle order number.
+   APERTURE        Aperture name (SAP or LAP).
+   CENTM           Whether pre-existing centroid template is used.
+   CUTWV           Whether wavelength cutoff data is used for extraction
+                   grid.
+   GSAMP           Spectrum grid sampling rate (geometric pixels).
+   RL              Limits across spectrum for LBLS array (pixels).
+   RSAMP           Radial coordinate sampling rate  for   LBLS   grid in
+                   pixels.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command creates  a  line-by-line-spectrum  (LBLS)  array  from  the
+image.   The  array  consists  intensities  F(IR,  IW)  for  a  grid  of
+wavelengths, W(IW), and radial coordinates, R(IR).
+<P>
+The wavelength grid, W, is determined in a similar way to the <A HREF=trak.html>
+TRAK</A>
+ command, and involves the <A HREF=cutwv.html>
+CUTWV</A>
+ (HIRES) and <A HREF=gsamp.html>
+GSAMP</A>
+ (HIRES/LORES) parameters.
+<P>
+The  radial coordinates are  distances from the  centre of  the spectrum
+along a line perpendicular to the dispersion direction, and  measured in
+geometric pixels.  The radial grid, R, is determined by the <A HREF=rl.html>
+RL</A>
+ and <A HREF=rsamp.html>
+RSAMP
+</A>
+parameters.
+<P>
+The value of each pixel in the array  corresponds  to  the  surface over
+the image of  a rectangle centred on its (R, W) coordinates, and extents
+(R(IR) - DR / 2, R(IR) + DR / 2) and (W(IW) - DW / 2, W(IW)  +  DW / 2).
+DR is the distance between R values, and DW is the wavelength step between W values.
+<P>
+This surface integral is  scaled along the W direction  to correspond to
+an  interval of 1.414 geometric pixels.  The reason for  this is to make
+LBLS intensities  consistent with  those  produced  by the <A HREF=trak.html>
+TRAK</A>
+ command.
+For a particular wavelength,  W(IW), the sum  of LBLS intensities (after
+removal of  background) should correspond to the Net flux as measured by
+<A HREF=trak.html>
+TRAK</A>
+.
+<H2>Available Topics</H2>
+<A HREF="aperture.html">APERTURE</A> * 
+<A HREF="centm.html">CENTM</A> * 
+<A HREF="cutwv.html">CUTWV</A> * 
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="gsamp.html">GSAMP</A> * 
+<A HREF="order.html">ORDER</A> * 
+<A HREF="rl.html">RL</A> * 
+<A HREF="rsamp.html">RSAMP</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:59 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: AGSHIFT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=AGSHIFT>
+<I>IUEDR-Online HELP</I>
+<HR><H1>AGSHIFT</H1><HR>
+</A>
+<H2>Summary</H2>
+ Determine spectrum shift automatically.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   APERTURE        Aperture name (SAP or LAP).
+   ORDERS          This delineates a range of Echelle orders.   
+</PRE>
+<P>
+<H2>Purpose</H2>
+AGSHIFT  can be  used to measure the global geometric shift for a
+spectrum.  A scan of the <A HREF=dataset.html>
+DATASET</A>
+ must  be made available using the <A HREF=scan.html>
+SCAN
+</A>
+command.
+<P>
+For HIRES data, the scan  data is  traversed starting at  the lowest  numbered
+order and a probable site for the peak of each order is found.  The central position of  each order is then estimated using a centroiding algorithm.   An estimate of the geometric  shift is made for  each order and
+these are recorded and displayed.
+<P>
+A weighted mean  in which the shifts  determined for orders  100 to  110
+inclusive are given greater weight than other shifts is then calculated.
+The mean shift is displayed and the <A HREF=gshift.html>
+GSHIFT</A>
+ parameter is set.
+<P>
+Using AGSHIFT it is possible to automate the spectrum extraction process
+for  many datasets.   It should be noted that  objects with no continuum
+may break the AGSHIFT mechanism, giving poor shift values.
+<P>
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="aperture.html">APERTURE</A> *
+<A HREF="orders.html">ORDERS</A>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:53 1995
+</ADDRESS>
+</BODY>
+</HTML>

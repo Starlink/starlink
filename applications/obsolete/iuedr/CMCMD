@@ -1,0 +1,22 @@
+*+
+*
+*   CMCMD common blocks.
+*
+*-
+
+*   CMD Data.
+      INTEGER CMDLEV           ! input file nesting level
+      INTEGER CMDFDS(10)       ! file descriptors for nested input
+      INTEGER CMDFDL(10)       ! line counts for each nested file
+      INTEGER CMDBPS(10)       ! pushed back character counts
+      BYTE CMDBAK(400, 10)     ! pushed back text
+      BYTE CMDPRM(400)         ! pernament prompt string
+      BYTE CMDPRE(400)         ! temporary prompt prefix
+      BYTE CMDBUF(400, 10)     ! input text buffers for each file
+      INTEGER CMDPOS(10)       ! current character positions
+      BYTE CMDFNS(81, 10)      ! nested file names
+      LOGICAL CMDUSR(10)       ! whether file is interactive user
+
+      COMMON /CMCMD / CMDLEV, CMDFDS, CMDFDL, CMDBPS, CMDBAK, CMDPRM, 
+     &                CMDPRE, CMDBUF, CMDPOS, CMDFNS
+      COMMON /CMCMD_1/ CMDUSR

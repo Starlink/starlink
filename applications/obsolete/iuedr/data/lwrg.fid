@@ -1,0 +1,13 @@
+'FID_IUEG'
+'LWR,GEOM:  Thompson et al (1982).'
+2 13.0
+13
+80 135 190 245 300 355 410 465 520 575 630 685 740
+13
+60 115 170 225 280 335 390 445 500 555 610 665 720
+
+# Title:     LWR,GEOM Fiducial Positions.
+# From:      Thompson, Turnrose and Bohlin: 1982, Astron. Astrophys.,
+#            107, 11-22.
+# Contents:  (TYPE, NPIXEL, THDA, NX, (X(I),I=1,NX), NY, (Y(I),I=1,NY))
+# End:

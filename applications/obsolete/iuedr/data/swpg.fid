@@ -1,0 +1,13 @@
+'FID_IUEG'
+'SWP,GEOM:  Thompson et al (1982).'
+2  9.0
+   13
+   74 130 186 242 298 354 410 466 522 578 634 690 746
+   13
+   54 110 166 222 278 334 390 446 502 558 614 670 726
+
+# Title:     SWP,GEOM Fiducial Positions.
+# From:      Thompson, Turnrose and Bohlin: 1982, Astron. Astrophys.,
+#            107, 11-22.
+# Contents:  (TYPE, NPIXEL, THDA, NX, (X(I),I=1,NX), NY, (Y(I),I=1,NY))
+# End:

@@ -1,0 +1,42 @@
+*+
+*
+*   CMEXTP common blocks.
+*
+*-
+
+*   Spectrum extraction parameters:
+      LOGICAL NOEXTP      ! Whether defined.
+      REAL*8 GSAMP        ! Sample rate in geometric pixels.
+      INTEGER CENIT       ! Number of centroid iterations.
+      REAL*8 CENAV        ! Centroid averaging half-width in geo-pixels.
+      REAL*8 CENSD        ! Centroid rejection S.D.
+      INTEGER BKGIT       ! Number of background iterations.
+      REAL*8 BKGAV        ! Background averaging half-width in geo-pixels.
+      REAL*8 BKGSD        ! Background rejection level in S.D.
+      LOGICAL EXTND       ! Whether extended object.
+      LOGICAL CONTN       ! Whether continuum expected.
+      REAL*8 GSLIT( 2 )   ! GROSS slit limits.
+      REAL*8 BDIST( 2 )   ! Background distances.
+      REAL*8 BSLIT( 2 )   ! Background widths.
+      REAL*8 ROBJ( 2 )    ! R-limits for object.
+      INTEGER NBKG        ! Number of background channels.
+      REAL*8 RBKG( 2, 2 ) ! R-limits for background.
+      INTEGER QSPK        ! Data Quality Severity for Spike.
+      INTEGER QMAX        ! Data Quality Severity for No Value.
+      REAL*8 BBASE        ! Background folding range in W-coordinates.
+      REAL*8 CBASE        ! Centroid folding range in W-coordinates.
+      LOGICAL AUSLIT      ! Whether slit is determined automatically.
+      LOGICAL CENSH       ! Whether centroid is shifted globally.
+      LOGICAL CENTM       ! Whether preset template is used.
+      LOGICAL CENSV       ! Whether template is saved in dataset.
+      LOGICAL CUTWV       ! Whether cutoff wavelengths used for grid.
+      REAL*8 RL( 2 )      ! R-value limits for LBLS.
+      REAL*8 RSAMP        ! R-value sample step.
+
+      COMMON / CMEXTP   / NOEXTP, CENIT, BKGIT, EXTND, CONTN, NBKG,
+     :                    QSPK, QMAX
+      COMMON / CMEXTP_1 / AUSLIT
+      COMMON / CMEXTP_2 / CENSH, CENTM, CENSV
+      COMMON / CMEXTP_3 / CUTWV
+      COMMON / CMEXTP_4 / RL, RSAMP, CBASE, BBASE, RBKG, GSAMP, CENAV,
+     :                    CENSD, BKGAV, BKGSD, GSLIT, BDIST, BSLIT, ROBJ

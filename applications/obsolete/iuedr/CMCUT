@@ -1,0 +1,16 @@
+*+
+*
+*   CMCUT common blocks.
+*
+*-
+
+*   Cut-offs for each order/aperture.
+      LOGICAL NOCUT           ! Whether defined.
+      BYTE CUTTP( 16 )        ! Cut Data Type.
+      INTEGER NCUT            ! Number of wavelength cutoff pairs.
+      INTEGER CUTORD( 100 )   ! Cutoff order identification.
+      REAL*8 CUTW1( 100 )     ! Start of order.
+      REAL*8 CUTW2( 100 )     ! End of order.
+
+      COMMON / CMCUT   / NOCUT, CUTTP, NCUT, CUTORD
+      COMMON / CMCUT_1 / CUTW1, CUTW2

@@ -1,0 +1,13 @@
+*+
+*
+*   CMCAL common blocks.
+*
+*-
+
+*   Calibration (FLX/NET).
+      LOGICAL NOCAL          ! whether defined
+      REAL*8 SCAL(1200)      ! calibration scale factors
+      INTEGER QCAL(1200)     ! calibration data quality
+
+      COMMON / CMCAL   / QCAL, NOCAL
+      COMMON / CMCAL_1 / SCAL

@@ -1,0 +1,12 @@
+*+
+*
+*   CMPAL common blocks.
+*
+*-
+
+*   Colour palet:
+      INTEGER TILUT( 16 ) ! Palette LUT indices.
+      INTEGER NPAL        ! Number of colours defined.
+      INTEGER CUPAL       ! Current palet selection.
+
+      COMMON / CMPAL / NPAL, TILUT, CUPAL

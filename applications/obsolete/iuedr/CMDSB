@@ -1,0 +1,22 @@
+*
+*  This is the include file used by the command line recall
+*  routines (see getingp.f).
+*
+*--------------------------------------------------------------
+
+*
+* SET THE MAXIMUM NUMBER OF RECALLS ALLOWED
+*
+      integer DSB_max, DSB_ncy
+      parameter ( DSB_max = 33 )
+      parameter ( DSB_ncy = 2 )
+
+*
+* SET UP COMMON VALUES.
+*
+      integer DSB_pw(DSB_ncy)   !  Index of next free slot
+      character DSB_REC( DSB_max, DSB_ncy )*255 ! Input command lines
+      integer DSB_top(DSB_ncy)  ! Index of highest defined slot
+
+      common /DSB_CLR1/ DSB_pw, DSB_top
+      common /DSB_CLR2/ DSB_rec

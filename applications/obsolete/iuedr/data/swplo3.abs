@@ -1,0 +1,20 @@
+'IUE_ABS'
+'SWP,LORES,ITF3: Not yet installed.'
+
+1.0E-14  8.0  -0.0043
+
+0  0  0  0
+
+# Title:      SWP,LORES,ITF3 Absolute Flux Calibration.
+# From:       
+# Contents:   (CALTYP,
+               CALID, 
+               SCALE, THDA, DFNDT,
+               NABS,  NSAP, NTRAIL, NDATE,
+               (WABS(I),   DFDFN(I),  I = 1, NABS),
+               (WSAP(I),   SAPCOR(I), I = 1, NSAPC),
+               (WTRAIL(I), TRACOR(I), I = 1, NTRAIL),
+               (WDATE(I),  DATCOR(I), I = 1, NDATE))
+# Notes:      Not yet installed.
+# End:
+

@@ -1,0 +1,12 @@
+*+
+*
+*   CMECOR common blocks.
+*
+*-
+
+*   Echelle Wavelength correction.
+      LOGICAL NOECOR     ! Whether defined.
+      REAL*8 ECOR( 2 )   ! Wavelength correction (M.DW).
+
+      COMMON / CMECOR   / NOECOR
+      COMMON / CMECOR_1 / ECOR

@@ -1,0 +1,29 @@
+*+
+*
+*   CMABS common blocks.
+*
+*-
+
+*   IUE absolute calibration table.
+      LOGICAL NOABS          ! Whether defined.
+      BYTE ABSTP( 16 )       ! Absolute Calibration Type.
+      BYTE ABSID( 40 )       ! Idenification label.
+      INTEGER NABS           ! Number of points.
+      REAL*8 XABS( 27800 )   ! Wavelengths.
+      REAL*8 YABS( 27800 )   ! Erg/cm2/s/A/FN.
+      REAL*8 YCORR( 27800 )  ! Assoc. sensitivity fn(date, THDA, ap, tr).
+      REAL*8 TSEN( 2 )       ! Camera temperature sensitivity.
+      REAL*8 DSEN( 2 )       ! Dummy date sensitivity.
+      INTEGER NAPSEN         ! Calibration aperture sensitivity points.
+      INTEGER NTRSEN         ! Calibration trailed spectrum correction points.
+      REAL*8 XTRSEN( 27800 ) ! Wavelengths.
+      REAL*8 YTRSEN( 27800 ) ! Correction applied to point source calibration.
+      INTEGER NDSEN          ! Date sensitivity points.
+      REAL*8 XDSEN( 27800 )  ! Wavelengths.
+      REAL*8 YDSEN( 27800 )  ! Date sensitivity correction.
+
+      COMMON / CMABS   / XABS, YABS, YCORR, TSEN, DSEN
+      COMMON / CMABS_1 / ABSTP, NOABS, NABS
+      COMMON / CMABS_2 / ABSID, NDSEN, NAPSEN, NTRSEN
+      COMMON / CMABS_4 / XTRSEN, YTRSEN
+      COMMON / CMABS_5 / XDSEN, YDSEN

@@ -1,0 +1,16 @@
+*+
+*
+*   CMNET common blocks.
+*
+*-
+
+*   NET spectrum arrays:
+      LOGICAL NONET          ! Whether defined.
+      REAL*8 SNET( 1200 )    ! NET spectrum.
+      REAL*8 DNET( 1200 )    ! NET errors.
+      INTEGER QNET( 1200 )   ! NET Data Quality.
+      BYTE NLABEL( 40 )      ! NET label.
+      BYTE NUNITS( 40 )      ! NET units.
+
+      COMMON / CMNET   / SNET, DNET
+      COMMON / CMNET_1 / QNET, NLABEL, NUNITS, NONET

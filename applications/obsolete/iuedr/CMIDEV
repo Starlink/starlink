@@ -1,0 +1,20 @@
+*+
+*
+*   CMIDEV common blocks.
+*
+*-
+
+*   Image display specific display information.
+      REAL*8 ZLIM(2)    ! z-data limits
+      INTEGER IX0       ! x-pixel offset
+      INTEGER IY0       ! y-pixel offset
+      INTEGER XP(2)     ! x-pixel limits in data
+      INTEGER YP(2)     ! y-pixel limits in data
+      INTEGER XBIN      ! x-pixels per display cell
+      INTEGER YBIN      ! y-pixels per display cell
+      INTEGER XEXP      ! x-cells per data pixel
+      INTEGER YEXP      ! y-cells per data pixel
+
+      COMMON / CMIDEV   / ZLIM
+      COMMON / CMIDEV_2 / IX0, IY0, XP, YP, XBIN, YBIN, XEXP, YEXP
+

@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: SCAN.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=SCAN>
+<I>IUEDR-Online HELP</I>
+<HR><H1>SCAN</H1><HR>
+</A>
+<H2>Summary</H2>
+ This command performs a scan perpendicular to spectrograph dispersion.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   ORDERS          This delineates a range of Echelle orders.
+   APERTURE        Aperture name (SAP or LAP).
+   SCANDIST        Distance  of  HIRES  scan   from   faceplate   centre
+                   (geometric pixels).
+   SCANAV          Averaging  filter  FWHM  for  image  scan  (geometric
+                   pixels).
+   SCANWV          Central wavelength for LORES image scan (A).
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command performs a scan perpendicular to  spectrograph  dispersion.
+The  scan  is  performed by folding pixels with a triangle function with
+FWHM of <A HREF=scanav.html>
+SCANAV</A>
+ geometric pixels (ALONG the dispersion direction).
+<P>
+In the case of HIRES,  the <A HREF=scandist.html>
+SCANDIST</A>
+ parameter determines the distance of
+the scan from the faceplate centre.
+<P>
+In the case of LORES,  the <A HREF=scanwv.html>
+SCANWV</A>
+ parameter determines the central wavelength of the scan.
+<P>
+The algorithm used to  produce scan  intensities is not very good and so
+quantitative results  should  not be sought from this command.  Its sole
+intention lies in providing data for aligning the spectrum.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="aperture.html">APERTURE</A> * 
+<A HREF="orders.html">ORDERS</A> * 
+<A HREF="scandist.html">SCANDIST</A> * 
+<A HREF="scanav.html">SCANAV</A> * 
+<A HREF="scanwv.html">SCANWV</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:15 1995
+</ADDRESS>
+</BODY>
+</HTML>

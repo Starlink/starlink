@@ -1,0 +1,171 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Release Notes
+
+                                                             Paul Rees
+                                                      15 December 1987
+
+----------------------------------------------------------------------
+
+                   IUEDR Version 1.4 Release Notes
+                   -------------------------------
+
+
+
+1  INTRODUCTION
+
+This Note describes changes made to  IUEDR  since  the  last  Starlink
+release, Version 1.3.
+
+
+
+2  BUG FIXES
+
+A number of bug fixes have been made to Version 1.3:
+
+      o  GRAFX - A bug in the  use  of  ARGSLIB  within  GRAFX.   This
+         manifested  itself as a cursor hangup when a plotting session
+         was initiated on one ARGS and then  moved  to  another  ARGS.
+         After  this  move, any further change in ARGS device resulted
+         in the interactive cursor becoming inoperative.
+
+      o  BARKER - A bug in  the  short  wavelength  ripple  correction
+         procedure  BARKER caused IUEDR to crash with a floating point
+         divide by zero error when used  on  certain  saturated  HIRES
+         images.  This has now been rectified.
+
+      o  ABSOLUTE  CALIBRATIONS  -  In  updating  the  absolute   flux
+         calibration  procedures  the  correction for THDA sensitivity
+         was found to have been applied wrongly.  This error is  small
+         (less  than  the noise, but systematic), even for the largest
+         differences in  THDA  between  images,  but  will  result  in
+         greater  differences between spectra than should be the case.
+         I will be investigating this further.  The effects of such an
+         error  are  discussed by Clavel, Gilmozzi & Prieto, 1986 (ESA
+         IUE Newsletter No.  26, 65-79).
+
+
+
+
+
+                                - 1 -
+IUEDR Version 1.4 Release Notes                                 Page 2
+
+
+3  UPDATES
+
+The  LORES  absolute  flux  calibrations  have  been   comprehensively
+updated.   No  update of the HIRES absolute flux calibrations has been
+performed.  References are to be found in the file for each individual
+calibration.   Of  particular  importance  is  the availability of the
+calibrations for the new ITF tables, except for the SWP  camera  which
+is  still  under  investigation.  The first of these calibrations came
+into use on 1987  December  20  for  the  LWP  camera.   The  absolute
+calibration  data  for the old ITF tables have also been brought up to
+date.  The data files used by IUEDR V1.4 are to be found in IUEDR_DATA
+(if   you  have  executed  IUEDRSTART)  and  follow  the  file  naming
+convention
+
+           <Camera><Resolution><ITF>.ABS. 
+
+For example, LWRLO1.ABS is the absolute calibration data file for  the
+LWR  camera  used  in  low resolution mode with ITF1.  The appropriate
+calibration data file is read in and stored in the IUEDR  ".UEC"  file
+when  reading  an IUE image from tape.  Calibration files which do not
+have either a "1", "2" or "3" in their name are files  containing  the
+absolute  calibration  data  used  by  IUEDR  V1.3.  However, absolute
+calibration files readable by  IUEDR  V1.3  cannot  be  read  by  V1.4
+without  modification.   The change in structure is very simple and is
+documented  within  the  data  files  themselves.   The   data   files
+containing  IUEDR  V1.3  absolute calibration data, or the user's own,
+may be associated with a data set using the command ABSCAL  in  IUEDR.
+The  absolute calibation data associated with an IUEDR data set may be
+interrogated using the command SH (i.e.  SH V=A) in IUEDR.
+
+The ITF nomenclature used in the User Guide is slightly  different  to
+that  used  by  the  IUE  Project.   The  absolute  flux calibrations,
+however,  follow  the  IUE  project   nomenclature.    The   different
+nomenclatures are summarised in the table below:
+
+              User Guide                    IUE Project
+              ----------                    -----------
+
+
+           LWR1                          LWR Preliminary ITF
+           LWR2                          LWR ITF1
+
+           SWP1                          SWP Preliminary ITF
+           SWP2 (Faulty ITF)             SWP ITF1 
+           SWP3                          SWP ITF2
+
+Further information about the ITFs can be found in Chapter 4,  Section
+2 of the IUEDR User Guide.
+
+Where possible, the  new  calibration  files  include  time  dependent
+sensitivity  corrections  and  relative corrections for small aperture
+spectra.  It should be noted that the small aperture IUE  spectra  are
+
+                                - 2 -
+IUEDR Version 1.4 Release Notes                                 Page 3
+
+
+subject  to variation and are therefore not photometric.  However, the
+small aperture flux correction is designed to restore  any  wavelength
+dependence  in  the  scaling  between  the  large  and  small aperture
+spectra.  Corrections for trailed spectra are  also  included  in  the
+data  files  but are not currently used by IUEDR.  The corrections for
+trailed spectra are likely to be installed in IUEDR V2.0.
+
+
+
+4  FUTURE
+
+This version of IUEDR is the last release  of  IUEDR  which  uses  the
+GRAFX  and DIAGRAM I graphics packages.  IUEDR V2.0, to be released in
+1988, will use GKS 7.2 based graphics allowing the use  of  a  greater
+selection of graphics devices than is presently possible.
+
+Although the release notes for IUEDR and some other documentation have
+been  tidied up, the User Guide has remained the same.  It is intended
+that a comprehensive rewrite of  the  User  Guide  will  be  done  and
+released with IUEDR V2.0 in 1988.  Furthermore, the bug reports in the
+file "BUGS.DOC" will be placed in the appropriate release notes.
+
+In preparing Version 1.4 for release it was noted  that  a  number  of
+calibration  data  sets  other than the absolute calibrations had been
+superseded since the release of Version 1.3.  These will be looked  at
+in detail during the development of IUEDR V2.0 with a view to bringing
+all the calibration data up to date.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 3 -

@@ -1,0 +1,16 @@
+*+
+*
+*   CMPAN common blocks.
+*
+*      Martin Clayton     09-DEC-94     IUEDR Vn. 3.2
+*          Expanded to 120 pseudo-orders.
+*
+*-
+
+*   Static Arrays for LBLS
+      REAL*8 FPAN(120, 1200)   ! fluxes (Net)
+      REAL*8 WPAN(120, 1200)   ! weights
+      BYTE QPAN(120, 1200)     ! data quality
+ 
+      COMMON / CMPAN   / FPAN, WPAN
+      COMMON / CMPAN_1 / QPAN

@@ -1,0 +1,53 @@
+*+
+*
+*   CMGRAF common blocks.
+*
+*-
+
+*   Graphics parameters:
+      BYTE DVNAME( 16 ) ! Device name.
+      INTEGER DEV       ! Graphics device.
+      INTEGER DTERM     ! Terminal number.
+      INTEGER ZBASE     ! SGS base zone.
+      INTEGER ZONE      ! Zone number.
+      LOGICAL ZCLEAR    ! Clear workstation screen if zones overlap.
+      LOGICAL ERASED    ! Whether erased.
+      LOGICAL DRAWN     ! Whether drawn.
+      LOGICAL IDRAWN    ! Whether image is drawn.
+      LOGICAL RESET     ! Whether axes are reset each time.
+      LOGICAL EMPTY     ! Whether the plot data are reset.
+      LOGICAL NOXL      ! Whether no x-limits.
+      REAL XLIM( 2 )    ! X-limits.
+      LOGICAL NOYL      ! Whether no y-limits.
+      REAL YLIM( 2 )    ! Y-limits.
+      BYTE XLAB( 40 )   ! X-axis label.
+      BYTE XUN( 40 )    ! X-axis units.
+      BYTE YLAB( 40 )   ! Y-axis label.
+      BYTE YUN( 40 )    ! Y-axis units.
+      BYTE GTITLE( 80 ) ! Graph title.
+      INTEGER NLEGND    ! Number of legend lines required.
+      LOGICAL XJST      ! Whether x-axis divisions are justified.
+      LOGICAL YJST      ! Whether y-axis divisions are justified.
+      INTEGER XREV      ! X-reversal parameter.
+      INTEGER YREV      ! Y-reversal parameter.
+      LOGICAL HISTLN    ! Whether histograms required.
+      INTEGER LUTS( 2 ) ! LUT level limits (e.g. 0 -> 255).
+      INTEGER LUTB      ! LUT level for bad pixels (e.g. 0).
+      REAL XTIC         ! X-tick size in H.
+      REAL YTIC         ! Y-tick size in H.
+      REAL XVRT( 2 )    ! X-vertex coordinates.
+      REAL YVRT( 2 )    ! Y-vertex coordinates.
+      LOGICAL COLUT     ! Whether colour look-up table is used for images.
+      LOGICAL NEWLUT    ! Whether new look-up table requires loading.
+
+      COMMON / CMGRAF   / DVNAME, DEV, DTERM, ZBASE, ZONE, ZCLEAR,
+     :                    ERASED, DRAWN, IDRAWN, RESET, EMPTY, NOXL,
+     :                    XLIM, NOYL, YLIM, XLAB, XUN, YLAB, YUN,
+     :                    GTITLE, XJST, YJST, XREV, YREV
+      COMMON / CMGRAF_2 / NLEGND
+      COMMON / CMGRAF_3 / HISTLN
+      COMMON / CMGRAF_4 / LUTS
+      COMMON / CMGRAF_5 / LUTB
+      COMMON / CMGRAF_6 / XTIC, YTIC
+      COMMON / CMGRAF_7 / XVRT, YVRT
+      COMMON / CMGRAF_8 / COLUT, NEWLUT

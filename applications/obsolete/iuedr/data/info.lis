@@ -1,0 +1,28 @@
+The State of $IUEDR_DATA:
+
+ o New dispersion data from M.P.Garhart, NASA IUE Newsletter No 51,
+   August 1993 have been added.  The old data have been renamed as
+   follows:
+
+        New Data           Old data
+
+        lwphi.dsp          lwphi_old.dsp
+        lwplo.dsp          lwplo_old.dsp
+        lwrhi.dsp          lwrhi_old.dsp
+        lwrlo.dsp          lwrlo_old.dsp
+        swphi.dsp          swphi_old.dsp
+        swplo.dsp          swplo_old.dsp
+
+ o lwphi.abs has been added as of release v3.2.
+
+ o The following wavelength cutt-off files are missing:
+
+        lwplap.cut
+        lwpsap.cut
+
+ o The following files are fudged:
+
+        lwpsap.cut         # a copy of lwrsap.cut
+        lwplap.cut         # a copy of lwrlap.cut
+
+Martin Clayton, 3-APR-1995.

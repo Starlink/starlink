@@ -1,0 +1,34 @@
+*+
+*
+*   CMHEAD common blocks.
+*
+*-
+
+*   STAK identification:
+      LOGICAL NOHEAD        ! whether defined
+      BYTE TITLE(40)        ! image title
+      BYTE CAMERA(16)       ! camera
+      INTEGER IMAGE         ! image number
+      BYTE APER(16)         ! aperture
+      BYTE RESOL(16)        ! resolution mode
+      REAL*8 TSEC           ! exposure time
+      BYTE TYPE(16)         ! image type
+      LOGICAL GEOM          ! whether geometric
+      LOGICAL PHOT          ! whether photometric
+      INTEGER ITF           ! ITF version used
+      REAL*8 THDA           ! Camera temperature (K)
+      INTEGER YEAR          ! year of observation
+      INTEGER MONTH         ! month index of observation
+      INTEGER DAY           ! day of observation in month
+      INTEGER DATE          ! IUE date in days from 1 January 1978
+      INTEGER NAPER         ! number of apertures
+      BYTE APERS(16, 2)     ! aperture names
+      REAL*8 TSECS(2)       ! aperture exposure times
+      REAL*8 FSCALE(2)      ! aperture scale factors
+      REAL*8 UTS(2)         ! UT of observation relative to DAY
+
+      COMMON / CMHEAD   / NOHEAD, TITLE, CAMERA, IMAGE, APER, RESOL,
+     :                    TYPE, GEOM, PHOT, ITF, APERS, YEAR, MONTH,
+     :                    DAY, DATE, NAPER
+      COMMON / CMHEAD_1 / THDA, TSEC, TSECS, FSCALE, UTS
+

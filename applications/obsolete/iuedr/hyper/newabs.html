@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: NEWABS.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=NEWABS>
+<I>IUEDR-Online HELP</I>
+<HR><H1>NEWABS</H1><HR>
+</A>
+<H2>Summary</H2>
+ Read absolute flux calibration into <A HREF=dataset.html>
+DATASET</A>
+ from text  file  with  name
+ specified by <A HREF=absfile.html>
+ABSFILE</A>
+.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   ABSFILE         Name of file containing absolute flux calibration.
+   ITF             This  is  the  ITF  generation  used  in  the   image
+                   calibration.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command reads the  absolute  flux  calibration  from  a  text  file
+specified  by  the  <A HREF=absfile.html>
+ABSFILE</A>
+  parameter,  and  stores  it  in the dataset
+specified by <A HREF=dataset.html>
+DATASET</A>
+.  The default calibration file is constructed using
+the <A HREF=camera.html>
+CAMERA</A>
+, <A HREF=resolution.html>
+RESOLUTION</A>
+ and <A HREF=itf.html>
+ITF</A>
+ parameters.
+<P>
+The calibration of any current spectrum is automatically updated.
+<P>
+The file type is  assumed to be ".abs", and  should not be  specified as
+part of the <A HREF=absfile.html>
+ABSFILE</A>
+ parameter value.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="absfile.html">ABSFILE</A> * 
+<A HREF="itf.html">ITF</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:02 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,27 @@
+*+
+*
+*   CMDATA common blocks.
+*
+*-
+
+*   SCAN DATA Array information:
+      LOGICAL NODATA       ! Whether the image is defined (can be unread).
+      BYTE DATATP( 16 )    ! Data Array Storage Type.
+      INTEGER NS           ! Number of SAMPLEs.
+      INTEGER NL           ! Number of LINEs.
+      INTEGER LMIN         ! Lowest LINE.
+      INTEGER LMAX         ! Highest LINE.
+      INTEGER SMIN( 4096 ) ! Start SAMPLE for each LINE.
+      INTEGER SMAX( 4096 ) ! End SAMPLE for each LINE.
+      INTEGER DBLANK       ! Blank Data value.
+      REAL*8 DZERO         ! Data zero point.
+      REAL*8 DSCALE        ! Data Scale Factor.
+      INTEGER DLIM( 2 )    ! Data limits (excluding scaling).
+      LOGICAL NOIMA        ! Whether actual image/quality arrays are read.
+
+      COMMON / CMDATA   / NODATA, NS, NL, LMIN, LMAX, SMIN, SMAX
+      COMMON / CMDATA_1 / DATATP
+      COMMON / CMDATA_2 / DLIM
+      COMMON / CMDATA_3 / DBLANK
+      COMMON / CMDATA_4 / NOIMA
+      COMMON / CMDATA_5 / DZERO, DSCALE

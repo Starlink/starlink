@@ -1,0 +1,3747 @@
+#+
+#  Name:
+#    iuedr.ifl
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DMILLS: Dave Mills (UCL)
+#     MJC: Martin Clayton (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     ??-???-?? (DMILLS):
+#       Original version.
+#     01-SEP-95 (MJC):
+#       IUEDR Vn. 3.2
+#     11-JUL-96 (MJC)
+#       Patched DEVICE parameters back to type '_CHAR'.
+#     {enter_further_changes_here}
+
+#-
+
+monolith IUEDR3
+   interface IUEDR3
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+ 	endparameter
+   endinterface
+
+   interface SET
+ 	parameter ABSFILE
+ 	   keyword	'ABSFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing absolute flux calibration.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.ABSFILE'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+ 	endparameter
+ 	parameter APERTURES
+ 	   keyword	'APERTURES'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURES'
+ 	endparameter
+ 	parameter AUTOSLIT
+ 	   keyword	'AUTOSLIT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether GSLIT, BDIST and BSLIT are determined automatically.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.AUTOSLIT'
+ 	endparameter
+ 	parameter BADITF
+ 	   keyword	'BADITF'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether bad LORES ITF requires correction.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.BADITF'
+ 	endparameter
+ 	parameter BDIST
+ 	   keyword	'BDIST'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Distances of background channels from centre (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.BDIST'
+ 	endparameter
+ 	parameter BKGAV
+ 	   keyword	'BKGAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Background averaging filter FWHM (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	30.0
+	   association	'<->global.BKGAV'
+ 	endparameter
+ 	parameter BKGIT
+ 	   keyword	'BKGIT'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of background smoothing iterations.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1
+	   association	'<->global.BKGIT'
+ 	endparameter
+ 	parameter BKGSD
+ 	   keyword	'BKGSD'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Discrimination level for background pixels (s.d.).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	2.0
+	   association	'<->global.BKGSD'
+ 	endparameter
+ 	parameter BSLIT
+ 	   keyword	'BSLIT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Background channel half widths (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.BSLIT'
+ 	endparameter
+ 	parameter CAMERA
+ 	   keyword	'CAMERA'
+ 	   type		'_CHAR'
+ 	   prompt	'Camera Name (LWP, LWR, SWP).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.CAMERA'
+ 	endparameter
+ 	parameter CENAV
+ 	   keyword	'CENAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Centroid averaging filter FWHM (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	30.0
+	   association	'<->global.CENAV'
+ 	endparameter
+ 	parameter CENIT
+ 	   keyword	'CENIT'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of centroid tracking iterations.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1
+	   association	'<->global.CENIT'
+ 	endparameter
+ 	parameter CENSD
+ 	   keyword	'CENSD'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Significance level for signal to be used for centroids.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	4.0
+	   association	'<->global.CENSD'
+ 	endparameter
+ 	parameter CENSH
+ 	   keyword	'CENSH'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the spectrum template is just shifted linearly.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENSH'
+ 	endparameter
+ 	parameter CENSV
+ 	   keyword	'CENSV'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the spectrum template is saved in the dataset.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENSV'
+ 	endparameter
+ 	parameter CENTM
+ 	   keyword	'CENTM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether pre-existing centroid template is used.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENTM'
+ 	endparameter
+ 	parameter CENTREWAVE
+ 	   keyword	'CENTREWAVE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Line central wavelengths (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.CENTREWAVE'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+ 	endparameter
+ 	parameter CONTINUUM
+ 	   keyword	'CONTINUUM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the object spectrum is expected to have a "continuum".'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.CONTINUUM'
+ 	endparameter
+ 	parameter COVERGAP
+ 	   keyword	'COVERGAP'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether gaps can be filled by covering orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.COVERGAP'
+ 	endparameter
+ 	parameter CUTFILE
+ 	   keyword	'CUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing Echelle order wavelength limits.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.CUTFILE'
+ 	endparameter
+ 	parameter CUTWV
+ 	   keyword	'CUTWV'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether wavelength cutoff data used for extraction grid.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.CUTWV'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+ 	endparameter
+ 	parameter DAY
+ 	   keyword	'DAY'
+ 	   type		'_INTEGER'
+ 	   prompt	'Day Number in Month.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DAY'
+ 	endparameter
+ 	parameter DELTAWAVE
+ 	   keyword	'DELTAWAVE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Half-width of line search windows (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+           default      1.0
+	   association	'<->global.DELTAWAVE'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+           default      'xwindows'
+	   association	'<->global.DEVICE'
+ 	endparameter
+ 	parameter DISPFILE
+ 	   keyword	'DISPFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing dispersion data.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.DISPFILE'
+ 	endparameter
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive or File Name.'
+ 	   ppath	'global'
+ 	   vpath	'prompt'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter ESHIFT
+ 	   keyword	'ESHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Global Echelle wavelength shift.'
+ 	   ppath	'default'
+ 	   vpath	'default'
+	   association	'<->global.ESHIFT'
+ 	endparameter
+ 	parameter EXPOSURE
+ 	   keyword	'EXPOSURE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time (seconds).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.EXPOSURE'
+ 	endparameter
+ 	parameter EXPOSURES
+ 	   keyword	'EXPOSURES'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time(s) (seconds).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.EXPOSURES'
+ 	endparameter
+ 	parameter EXTENDED
+ 	   keyword	'EXTENDED'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the object spectrum is expected to be extended.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.EXTENDED'
+ 	endparameter
+ 	parameter FIDFILE
+ 	   keyword	'FIDFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing fiducial positions.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.FIDFILE'
+ 	endparameter
+ 	parameter FIDSIZE
+ 	   keyword	'FIDSIZE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Half width of fiducials (pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.FIDSIZE'
+ 	endparameter
+ 	parameter FILE
+ 	   keyword	'FILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'File Number.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.FILE'
+ 	endparameter
+ 	parameter FILLGAP
+ 	   keyword	'FILLGAP'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether gaps can be filled within order.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.FILLGAP'
+ 	endparameter
+ 	parameter FLAG
+ 	   keyword	'FLAG'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality for faulty pixels is displayed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.FLAG'
+ 	endparameter
+ 	parameter FN
+ 	   keyword	'FN'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Replacement Flux Number for pixel'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.FN'
+ 	endparameter
+ 	parameter FSCALE
+ 	   keyword	'FSCALE'
+ 	   type		'_DOUBLE'
+           prompt       'Flux scale factor'
+ 	   ppath	'default'
+ 	   vpath	'default'
+	   association	'<->global.FSCALE'
+ 	endparameter
+ 	parameter GSAMP
+ 	   keyword	'GSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum grid sampling rate (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1.414
+	   association	'<->global.GSAMP'
+ 	endparameter
+ 	parameter GSHIFT
+ 	   keyword	'GSHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Global shift of spectrum on image (geometric pixels).'
+ 	   ppath	'default'
+ 	   vpath	'default'
+	   association	'<->global.GSHIFT'
+ 	endparameter
+ 	parameter GSLIT
+ 	   keyword	'GSLIT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Object channel limits (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.GSLIT'
+ 	endparameter
+ 	parameter HALAV
+ 	   keyword	'HALAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Averaging FWHM for halation correction (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.HALAV'
+ 	endparameter
+ 	parameter HALC
+ 	   keyword	'HALC'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Halation correction constant (fraction of continuum).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.HALC'
+ 	endparameter
+ 	parameter HALTYPE
+ 	   keyword	'HALTYPE'
+ 	   type		'_CHAR'
+ 	   prompt	'The type of Halation (order-overlap) correction used.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.HALTYPE'
+ 	endparameter
+ 	parameter HALW0
+ 	   keyword	'HALW0'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength at which halation correction is zero (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.HALW0'
+ 	endparameter
+ 	parameter HALWC
+ 	   keyword	'HALWC'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength at which the halation correction is HALC is defined (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.HALWC'
+ 	endparameter
+ 	parameter HIST
+ 	   keyword	'HIST'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether lines are drawn as histograms.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.HIST'
+ 	endparameter
+ 	parameter IMAGE
+ 	   keyword	'IMAGE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Image Number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.IMAGE'
+ 	endparameter
+ 	parameter ITF
+ 	   keyword	'ITF'
+ 	   type		'_INTEGER'
+ 	   prompt	'This is the ITF generation used in the image calibration.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ITF'
+ 	endparameter
+ 	parameter ITFMAX
+ 	   keyword	'ITFMAX'
+ 	   type		'_INTEGER'
+ 	   prompt	'Pixel value on tape for ITF saturation.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ITFMAX'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+ 	endparameter
+ 	parameter ML
+ 	   keyword	'ML'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength grid limits for mean spectrum.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ML'
+ 	endparameter
+ 	parameter MONTH
+ 	   keyword	'MONTH'
+ 	   type		'_INTEGER'
+ 	   prompt	'Month Number (1-12).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.MONTH'
+ 	endparameter
+ 	parameter MSAMP
+ 	   keyword	'MSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength sampling rate for mean spectrum grid.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.MSAMP'
+ 	endparameter
+ 	parameter NFILE
+ 	   keyword	'NFILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Files to be processed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1
+	   association	'<->global.NFILE'
+ 	endparameter
+ 	parameter NGEOM
+ 	   keyword	'NGEOM'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Chebyshev terms used to represent geometry.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.NGEOM'
+ 	endparameter
+ 	parameter NLINE
+ 	   keyword	'NLINE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of IUE header lines printed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	10
+	   association	'<->global.NLINE'
+ 	endparameter
+ 	parameter NORDER
+ 	   keyword	'NORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Echelle orders to be processed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.NORDER'
+ 	endparameter
+ 	parameter NSKIP
+ 	   keyword	'NSKIP'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Tape Marks to be skipped over.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   default	1
+	   association	'<->global.NSKIP'
+ 	endparameter
+ 	parameter OBJECT
+ 	   keyword	'OBJECT'
+ 	   type		'_CHAR'
+ 	   prompt	'Object Identification Text.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OBJECT'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+ 	endparameter
+ 	parameter ORDERS
+ 	   keyword	'ORDERS'
+ 	   type		'_INTEGER'
+ 	   prompt	'This delineates a range of Echelle orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDERS'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+ 	endparameter
+ 	parameter QUAL
+ 	   keyword	'QUAL'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality information is plotted.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.QUAL'
+ 	endparameter
+ 	parameter RESOLUTION
+ 	   keyword	'RESOLUTION'
+ 	   type		'_CHAR'
+           prompt       'Spectrograph resolution (HIRES or LORES).'
+ 	   ppath	'dynamic,default'
+ 	   vpath	'prompt'
+	   association	'<->global.RESOL'
+ 	endparameter
+ 	parameter RIPA
+ 	   keyword	'RIPA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Ripple function scale factor.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.RIPA'
+ 	endparameter
+ 	parameter RIPC
+ 	   keyword	'RIPC'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Ripple function correction polynomial.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.RIPC'
+ 	endparameter
+ 	parameter RIPFILE
+ 	   keyword	'RIPFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing Echelle ripple calibration.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.RIPFILE'
+ 	endparameter
+ 	parameter RIPK
+ 	   keyword	'RIPK'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Echelle ripple constant (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.RIPK'
+ 	endparameter
+ 	parameter RL
+ 	   keyword	'RL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Limits across spectrum for LBLS array (pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.RL'
+ 	endparameter
+ 	parameter RM
+ 	   keyword	'RM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether mean spectrum is reset before averaging.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RM'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+ 	endparameter
+ 	parameter RSAMP
+ 	   keyword	'RSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Radial coordinate sampling rate for LBLS grid (pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0.7071
+	   association	'<->global.RSAMP'
+ 	endparameter
+ 	parameter SCANAV
+ 	   keyword	'SCANAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Averaging filter FWHM for image scan (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	5
+	   association	'<->global.SCANAV'
+ 	endparameter
+ 	parameter SCANDIST
+ 	   keyword	'SCANDIST'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Distance of HIRES scan from faceplate centre (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.SCANDIST'
+ 	endparameter
+ 	parameter SCANWV
+ 	   keyword	'SCANWV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Central wavelength for LORES image scan (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.SCANWV'
+ 	endparameter
+ 	parameter SKIPNEXT
+ 	   keyword	'SKIPNEXT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether skip to next file.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.SKIPNEXT'
+ 	endparameter
+ 	parameter SPECTYPE
+ 	   keyword	'SPECTYPE'
+ 	   type		'_INTEGER'
+ 	   prompt	'"SPECTRUM" file type (0=NDF, 1 or 2).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.SPECTYPE'
+ 	endparameter
+ 	parameter TEMFILE
+ 	   keyword	'TEMFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing spectrum template data.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.TEMFILE'
+ 	endparameter
+ 	parameter THDA
+ 	   keyword	'THDA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'IUE Camera Temperature (C).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.THDA'
+ 	endparameter
+ 	parameter TYPE
+ 	   keyword	'TYPE'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset Type (RAW, PHOT, GPHOT).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.TYPE'
+ 	endparameter
+ 	parameter V
+ 	   keyword	'V'
+ 	   type		'_CHAR'
+ 	   prompt	'List of items to be printed.'
+ 	   ppath	'default'
+ 	   vpath	'prompt'
+	   association	'<->global.V'
+           default      'H'
+ 	endparameter
+ 	parameter VSHIFT
+ 	   keyword	'VSHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Velocity shift of detector relative to Sun (km/s).'
+ 	   ppath	'default'
+ 	   vpath	'default'
+	   association	'<->global.VSHIFT'
+ 	endparameter
+ 	parameter WCUT
+ 	   keyword	'WCUT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength limits for Echelle order (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.WCUT'
+ 	endparameter
+ 	parameter WSHIFT
+ 	   keyword	'WSHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Constant wavelength shift (A).'
+ 	   ppath	'default'
+ 	   vpath	'default'
+	   association	'<->global.WSHIFT'
+ 	endparameter
+ 	parameter XCUT
+ 	   keyword	'XCUT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Global Echelle wavelength clipping.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.XCUT'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+ 	endparameter
+ 	parameter XP
+ 	   keyword	'XP'
+ 	   type		'_INTEGER'
+ 	   prompt	'X-axis pixel limits, undefined means full extent.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0,0
+	   association	'<->global.XP'
+ 	endparameter
+ 	parameter YEAR
+ 	   keyword	'YEAR'
+ 	   type		'_INTEGER'
+ 	   prompt	'Year number (A.D.).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.YEAR'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+ 	endparameter
+ 	parameter YP
+ 	   keyword	'YP'
+ 	   type		'_INTEGER'
+ 	   prompt	'Y-axis pixel limits, undefined means full extent.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0,0
+	   association	'<->global.YP'
+ 	endparameter
+ 	parameter ZL
+ 	   keyword	'ZL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Data limits for image display, undefined means full range.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   association	'<->global.ZL'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+ 	endparameter
+   endinterface
+
+   interface AESHIFT
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: AESHIFT DATASET'
+ 	endparameter
+ 	parameter CENTREWAVE
+ 	   keyword	'CENTREWAVE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Line central wavelengths (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.CENTREWAVE'
+	   help		'%IUEDR_HELP: AESHIFT CENTREWAVE'
+ 	endparameter
+ 	parameter DELTAWAVE
+ 	   keyword	'DELTAWAVE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Half-width of line search windows (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+           default      1.0
+	   association	'<->global.DELTAWAVE'
+	   help		'%IUEDR_HELP: AESHIFT DELTAWAVE'
+ 	endparameter
+   endinterface
+
+   interface AGSHIFT
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: AGSHIFT APERTURE'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: AGSHIFT DATASET'
+ 	endparameter
+ 	parameter ORDERS
+ 	   keyword	'ORDERS'
+ 	   type		'_INTEGER'
+ 	   prompt	'This delineates a range of Echelle orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDERS'
+	   help		'%IUEDR_HELP: AGSHIFT ORDERS'
+ 	endparameter
+   endinterface
+
+   interface BARKER
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: BARKER DATASET'
+ 	endparameter
+ 	parameter ORDERS
+ 	   keyword	'ORDERS'
+ 	   type		'_INTEGER'
+ 	   prompt	'This delineates a range of Echelle orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDERS'
+	   help		'%IUEDR_HELP: BARKER ORDERS'
+ 	endparameter
+   endinterface
+
+   interface CLEAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: CLEAN DATASET'
+ 	endparameter
+ 	parameter THRESH
+ 	   keyword	'THRESH'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Minimum accepted pixel value.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.THRESH'
+	   help		'%IUEDR_HELP: CLEAN THRESH'
+ 	endparameter
+   endinterface
+
+   interface CMDREAD
+ 	parameter SCRIPT
+ 	   keyword	'SCRIPT'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing script.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.SCRIPT'
+ 	endparameter
+   endinterface
+
+   interface CGSHIFT
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: CGSHIFT APERTURE'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: CGSHIFT DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+           default      'xwindows'
+	   association	'<->global.DEVICE'
+	   help		'%IUEDR_HELP: CGSHIFT DEVICE'
+ 	endparameter
+ 	parameter ORDERS
+ 	   keyword	'ORDERS'
+ 	   type		'_INTEGER'
+ 	   prompt	'This delineates a range of Echelle orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDERS'
+	   help		'%IUEDR_HELP: CGSHIFT ORDERS'
+ 	endparameter
+   endinterface
+
+   interface CULIMITS
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: CULIMITS DEVICE'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: CULIMITS XL'
+ 	endparameter
+ 	parameter XP
+ 	   keyword	'XP'
+ 	   type		'_INTEGER'
+ 	   prompt	'X-axis pixel limits, undefined means full extent.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0,0
+	   association	'<->global.XP'
+	   help		'%IUEDR_HELP: CULIMITS XP'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: CULIMITS YL'
+ 	endparameter
+ 	parameter YP
+ 	   keyword	'YP'
+ 	   type		'_INTEGER'
+ 	   prompt	'Y-axis pixel limits, undefined means full extent.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0,0
+	   association	'<->global.YP'
+	   help		'%IUEDR_HELP: CULIMITS YP'
+ 	endparameter
+   endinterface
+
+   interface CURSOR
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: CURSOR'
+ 	endparameter
+   endinterface
+
+   interface DRIMAGE
+ 	parameter COLOUR
+ 	   keyword	'COLOUR'
+ 	   type		'_LOGICAL'
+           prompt       'Whether to use false colour in display.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+           default      'FALSE'
+	   association	'<->global.COLOUR'
+	   help		'%IUEDR_HELP: DRIMAGE COLOUR'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: DRIMAGE DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: DRIMAGE DEVICE'
+ 	endparameter
+ 	parameter FLAG
+ 	   keyword	'FLAG'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality for faulty pixels is displayed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.FLAG'
+	   help		'%IUEDR_HELP: DRIMAGE FLAG'
+ 	endparameter
+ 	parameter XP
+ 	   keyword	'XP'
+ 	   type		'_INTEGER'
+ 	   prompt	'X-axis pixel limits, undefined means full extent.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0,0
+	   association	'<->global.XP'
+	   help		'%IUEDR_HELP: DRIMAGE XP'
+ 	endparameter
+ 	parameter YP
+ 	   keyword	'YP'
+ 	   type		'_INTEGER'
+ 	   prompt	'Y-axis pixel limits, undefined means full extent.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0,0
+	   association	'<->global.YP'
+	   help		'%IUEDR_HELP: DRIMAGE YP'
+ 	endparameter
+ 	parameter ZL
+ 	   keyword	'ZL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Data limits for image display, undefined means full range.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ZL'
+	   help		'%IUEDR_HELP: DRIMAGE ZL'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: DRIMAGE ZONE'
+ 	endparameter
+   endinterface
+
+   interface EDIMAGE
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: EDIMAGE DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: EDIMAGE DEVICE'
+ 	endparameter
+   endinterface
+
+   interface EDMEAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: EDMEAN DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: EDMEAN DEVICE'
+ 	endparameter
+   endinterface
+
+   interface EDSPEC
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: EDSPEC DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: EDSPEC ORDER'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: EDSPEC APERTURE'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: EDSPEC DEVICE'
+ 	endparameter
+   endinterface
+
+   interface ERASE
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: ERASE DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: ERASE ZONE'
+ 	endparameter
+   endinterface
+
+   interface EXIT
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SAVE DATASET'
+ 	endparameter
+   endinterface
+
+   interface LBLS
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: LBLS DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: LBLS ORDER'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: LBLS APERTURE'
+ 	endparameter
+ 	parameter GSAMP
+ 	   keyword	'GSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum grid sampling rate (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0.7071
+	   association	'<->global.GSAMP'
+	   help		'%IUEDR_HELP: LBLS GSAMP'
+ 	endparameter
+ 	parameter CUTWV
+ 	   keyword	'CUTWV'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether wavelength cutoff data used for extraction grid.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.CUTWV'
+	   help		'%IUEDR_HELP: LBLS CUTWV'
+ 	endparameter
+ 	parameter CENTM
+ 	   keyword	'CENTM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether pre-existing centroid template is used.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENTM'
+	   help		'%IUEDR_HELP: LBLS CENTM'
+ 	endparameter
+ 	parameter RL
+ 	   keyword	'RL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Limits across spectrum for LBLS array (pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.RL'
+	   help		'%IUEDR_HELP: LBLS RL'
+ 	endparameter
+ 	parameter RSAMP
+ 	   keyword	'RSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Radial coordinate sampling rate for LBLS grid (pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0.7071
+	   association	'<->global.RSAMP'
+	   help		'%IUEDR_HELP: LBLS RSAMP'
+ 	endparameter
+   endinterface
+
+   interface LISTIUE
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive or File Name.'
+ 	   ppath	'global'
+ 	   vpath	'prompt'
+	   help		'%IUEDR_HELP: LISTIUE DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter FILE
+ 	   keyword	'FILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'File Number.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.FILE'
+	   help		'%IUEDR_HELP: LISTIUE FILE'
+ 	endparameter
+ 	parameter NFILE
+ 	   keyword	'NFILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Files to be processed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1
+	   association	'<->global.NFILE'
+	   help		'%IUEDR_HELP: LISTIUE NFILE'
+ 	endparameter
+ 	parameter NLINE
+ 	   keyword	'NLINE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of IUE header lines printed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	10
+	   association	'<->global.NLINE'
+	   help		'%IUEDR_HELP: LISTIUE NLINE'
+ 	endparameter
+ 	parameter SKIPNEXT
+ 	   keyword	'SKIPNEXT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether skip to next file.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.SKIPNEXT'
+	   help		'%IUEDR_HELP: LISTIUE SKIPNEXT'
+ 	endparameter
+   endinterface
+
+   interface MAP
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: MAP DATASET'
+ 	endparameter
+ 	parameter ORDERS
+ 	   keyword	'ORDERS'
+ 	   type		'_INTEGER'
+ 	   prompt	'This delineates a range of Echelle orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDERS'
+	   help		'%IUEDR_HELP: MAP ORDERS'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: MAP APERTURE'
+ 	endparameter
+ 	parameter RM
+ 	   keyword	'RM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether mean spectrum is reset before averaging.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RM'
+	   help		'%IUEDR_HELP: MAP RM'
+ 	endparameter
+ 	parameter ML
+ 	   keyword	'ML'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength grid limits for mean spectrum.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ML'
+	   help		'%IUEDR_HELP: MAP ML'
+ 	endparameter
+ 	parameter MSAMP
+ 	   keyword	'MSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength sampling rate for mean spectrum grid.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.MSAMP'
+	   help		'%IUEDR_HELP: MAP MSAMP'
+ 	endparameter
+ 	parameter FILLGAP
+ 	   keyword	'FILLGAP'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether gaps can be filled within order.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.FILLGAP'
+	   help		'%IUEDR_HELP: MAP FILLGAP'
+ 	endparameter
+ 	parameter COVERGAP
+ 	   keyword	'COVERGAP'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether gaps can be filled by covering orders.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.COVERGAP'
+	   help		'%IUEDR_HELP: MAP COVERGAP'
+ 	endparameter
+   endinterface
+
+   interface MODIMAGE
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: MODIMAGE DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: MODIMAGE DEVICE'
+ 	endparameter
+ 	parameter FN
+ 	   keyword	'FN'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Replacement Flux Number for pixel'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.FN'
+	   help		'%IUEDR_HELP: MODIMAGE FN'
+ 	endparameter
+   endinterface
+
+   interface MTMOVE
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive Name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   help		'%IUEDR_HELP: MTMOVE DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter FILE
+ 	   keyword	'FILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Tape File Number.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.FILE'
+	   help		'%IUEDR_HELP: MTMOVE FILE'
+ 	endparameter
+   endinterface
+
+   interface MTREW
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive Name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   help		'%IUEDR_HELP: MTREW DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter FILE
+ 	   keyword	'FILE'
+ 	   type		'_INTEGER'
+           ppath        'dynamic,global'
+ 	   vpath	'dynamic'
+	   association	'<->global.FILE'
+	   help		'%IUEDR_HELP: MTREW FILE'
+ 	endparameter
+   endinterface
+
+   interface MTSHOW
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive Name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   help		'%IUEDR_HELP: MTSHOW DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+   endinterface
+
+   interface MTSKIPEOV
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive Name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   help		'%IUEDR_HELP: MTSKIPEOV DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+   endinterface
+
+   interface MTSKIPF
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive Name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+ 	   help		'%IUEDR_HELP: MTSKIPF DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter NSKIP
+ 	   keyword	'NSKIP'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Tape Marks to be skipped over.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   default	1
+	   association	'<->global.NSKIP'
+	   help		'%IUEDR_HELP: MTSKIPF NSKIP'
+ 	endparameter
+   endinterface
+
+   interface NEWABS
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: NEWABS DATASET'
+ 	endparameter
+ 	parameter ABSFILE
+ 	   keyword	'ABSFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing absolute flux calibration.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.ABSFILE'
+	   help		'%IUEDR_HELP: NEWABS ABSFILE'
+ 	endparameter
+   endinterface
+
+   interface NEWCUT
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: NEWCUT DATASET'
+ 	endparameter
+ 	parameter CUTFILE
+ 	   keyword	'CUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing Echelle order wavelength limits.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.CUTFILE'
+	   help		'%IUEDR_HELP: NEWCUT CUTFILE'
+ 	endparameter
+   endinterface
+
+   interface NEWDISP
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: NEWDISP DATASET'
+ 	endparameter
+ 	parameter DISPFILE
+ 	   keyword	'DISPFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing dispersion data.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.DISPFILE'
+	   help		'%IUEDR_HELP: NEWDISP DISPFILE'
+ 	endparameter
+   endinterface
+
+   interface NEWFID
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: NEWFID DATASET'
+ 	endparameter
+ 	parameter FIDFILE
+ 	   keyword	'FIDFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing fiducial positions.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.FIDFILE'
+	   help		'%IUEDR_HELP: NEWFID FIDFILE'
+ 	endparameter
+ 	parameter NGEOM
+ 	   keyword	'NGEOM'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Chebyshev terms used to represent geometry.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.NGEOM'
+	   help		'%IUEDR_HELP: NEWFID NGEOM'
+ 	endparameter
+   endinterface
+
+   interface NEWRIP
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: NEWRIP DATASET'
+ 	endparameter
+ 	parameter RIPFILE
+ 	   keyword	'RIPFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing Echelle ripple calibration.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.RIPFILE'
+	   help		'%IUEDR_HELP: NEWRIP RIPFILE'
+ 	endparameter
+   endinterface
+
+   interface NEWTEM
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: NEWTEM DATASET'
+ 	endparameter
+ 	parameter TEMFILE
+ 	   keyword	'TEMFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing spectrum template data.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.TEMFILE'
+	   help		'%IUEDR_HELP: NEWTEM TEMFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTEM
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTEM DATASET'
+ 	endparameter
+ 	parameter TEMFILE
+ 	   keyword	'TEMFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of file containing spectrum template data.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.TEMFILE'
+	   help		'%IUEDR_HELP: OUTEM TEMFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTLBLS
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTLBLS DATASET'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+	   help		'%IUEDR_HELP: OUTLBLS OUTFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTMEAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTMEAN DATASET'
+ 	endparameter
+ 	parameter SPECTYPE
+ 	   keyword	'SPECTYPE'
+ 	   type		'_INTEGER'
+ 	   prompt	'"SPECTRUM" file type (0=NDF, 1 or 2).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.SPECTYPE'
+	   help		'%IUEDR_HELP: OUTMEAN SPECTYPE'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+	   help		'%IUEDR_HELP: OUTMEAN OUTFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTNET
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTNET DATASET'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: OUTNET APERTURE'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: OUTNET ORDER'
+ 	endparameter
+ 	parameter SPECTYPE
+ 	   keyword	'SPECTYPE'
+ 	   type		'_INTEGER'
+ 	   prompt	'"SPECTRUM" file type (0=NDF, 1 or 2).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.SPECTYPE'
+	   help		'%IUEDR_HELP: OUTNET SPECTYPE'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+	   help		'%IUEDR_HELP: OUTNET OUTFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTRAK
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTRAK DATASET'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+	   help		'%IUEDR_HELP: OUTRAK OUTFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTSCAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTSCAN DATASET'
+ 	endparameter
+ 	parameter SPECTYPE
+ 	   keyword	'SPECTYPE'
+ 	   type		'_INTEGER'
+ 	   prompt	'"SPECTRUM" file type (0=NDF, 1 or 2).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.SPECTYPE'
+	   help		'%IUEDR_HELP: OUTSCAN SPECTYPE'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+	   help		'%IUEDR_HELP: OUTSCAN OUTFILE'
+ 	endparameter
+   endinterface
+
+   interface OUTSPEC
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: OUTSPEC DATASET'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: OUTSPEC APERTURE'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: OUTSPEC ORDER'
+ 	endparameter
+ 	parameter SPECTYPE
+ 	   keyword	'SPECTYPE'
+ 	   type		'_INTEGER'
+ 	   prompt	'"SPECTRUM" file type (0=NDF, 1 or 2).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.SPECTYPE'
+	   help		'%IUEDR_HELP: OUTSPEC SPECTYPE'
+ 	endparameter
+ 	parameter OUTFILE
+ 	   keyword	'OUTFILE'
+ 	   type		'_CHAR'
+ 	   prompt	'Name of output file.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OUTFILE'
+	   help		'%IUEDR_HELP: OUTSPEC OUTFILE'
+ 	endparameter
+   endinterface
+
+   interface PLCEN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PLCEN DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: PLCEN ORDER'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: PLCEN APERTURE'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: PLCEN DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: PLCEN ZONE'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+	   help		'%IUEDR_HELP: PLCEN RS'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.LINE'
+	   help		'%IUEDR_HELP: PLCEN LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+	   help		'%IUEDR_HELP: PLCEN LINEROT'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.COL'
+	   help		'%IUEDR_HELP: PLCEN COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+	   help		'%IUEDR_HELP: PLCEN COLROT'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: PLCEN XL'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: PLCEN YL'
+ 	endparameter
+   endinterface
+
+   interface PLFLUX
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PLFLUX DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: PLFLUX ORDER'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: PLFLUX APERTURE'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: PLFLUX DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: PLFLUX ZONE'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+	   help		'%IUEDR_HELP: PLFLUX RS'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.LINE'
+	   help		'%IUEDR_HELP: PLFLUX LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+	   help		'%IUEDR_HELP: PLFLUX LINEROT'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.COL'
+	   help		'%IUEDR_HELP: PLFLUX COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+	   help		'%IUEDR_HELP: PLFLUX COLROT'
+ 	endparameter
+ 	parameter HIST
+ 	   keyword	'HIST'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether lines are drawn as histograms.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.HIST'
+	   help		'%IUEDR_HELP: PLFLUX HIST'
+ 	endparameter
+ 	parameter QUAL
+ 	   keyword	'QUAL'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality information is plotted.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.QUAL'
+	   help		'%IUEDR_HELP: PLFLUX QUAL'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: PLFLUX XL'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: PLFLUX YL'
+ 	endparameter
+   endinterface
+
+   interface PLGRS
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PLGRS DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: PLGRS ORDER'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: PLGRS APERTURE'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: PLGRS DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: PLGRS ZONE'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+	   help		'%IUEDR_HELP: PLGRS RS'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.LINE'
+	   help		'%IUEDR_HELP: PLGRS LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+	   help		'%IUEDR_HELP: PLGRS LINEROT'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.COL'
+	   help		'%IUEDR_HELP: PLGRS COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+	   help		'%IUEDR_HELP: PLGRS COLROT'
+ 	endparameter
+ 	parameter HIST
+ 	   keyword	'HIST'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether lines are drawn as histograms.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.HIST'
+	   help		'%IUEDR_HELP: PLGRS HIST'
+ 	endparameter
+ 	parameter QUAL
+ 	   keyword	'QUAL'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality information is plotted.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.QUAL'
+	   help		'%IUEDR_HELP: PLGRS QUAL'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: PLGRS XL'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: PLGRS YL'
+ 	endparameter
+   endinterface
+
+   interface PLMEAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PLMEAN DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: PLMEAN DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: PLMEAN ZONE'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+	   help		'%IUEDR_HELP: PLMEAN RS'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.LINE'
+	   help		'%IUEDR_HELP: PLMEAN LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+	   help		'%IUEDR_HELP: PLMEAN LINEROT'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.COL'
+	   help		'%IUEDR_HELP: PLMEAN COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+	   help		'%IUEDR_HELP: PLMEAN COLROT'
+ 	endparameter
+ 	parameter HIST
+ 	   keyword	'HIST'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether lines are drawn as histograms.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.HIST'
+	   help		'%IUEDR_HELP: PLMEAN HIST'
+ 	endparameter
+ 	parameter QUAL
+ 	   keyword	'QUAL'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality information is plotted.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.QUAL'
+	   help		'%IUEDR_HELP: PLMEAN QUAL'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: PLMEAN XL'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: PLMEAN YL'
+ 	endparameter
+   endinterface
+
+   interface PLNET
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PLNET DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: PLNET ORDER'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: PLNET APERTURE'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: PLNET DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: PLNET ZONE'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+	   help		'%IUEDR_HELP: PLNET RS'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'SOLID'
+	   association	'<->global.LINE'
+	   help		'%IUEDR_HELP: PLNET LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+	   help		'%IUEDR_HELP: PLNET LINEROT'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.COL'
+	   help		'%IUEDR_HELP: PLNET COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+	   help		'%IUEDR_HELP: PLNET COLROT'
+ 	endparameter
+ 	parameter HIST
+ 	   keyword	'HIST'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether lines are drawn as histograms.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.HIST'
+	   help		'%IUEDR_HELP: PLNET HIST'
+ 	endparameter
+ 	parameter QUAL
+ 	   keyword	'QUAL'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality information is plotted.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.QUAL'
+	   help		'%IUEDR_HELP: PLNET QUAL'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: PLNET XL'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: PLNET YL'
+ 	endparameter
+   endinterface
+
+   interface PLSCAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PLSCAN DATASET'
+ 	endparameter
+ 	parameter DEVICE
+ 	   keyword	'DEVICE'
+ 	   type		'_CHAR'
+ 	   prompt	'GKS/SGS graphics device name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.DEVICE'
+           default      'xwindows'
+	   help		'%IUEDR_HELP: PLSCAN DEVICE'
+ 	endparameter
+ 	parameter ZONE
+ 	   keyword	'ZONE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Zone to be used for plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	0
+	   association	'<->global.ZONE'
+	   help		'%IUEDR_HELP: PLSCAN ZONE'
+ 	endparameter
+ 	parameter RS
+ 	   keyword	'RS'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether display is reset before plotting.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.RS'
+	   help		'%IUEDR_HELP: PLSCAN RS'
+ 	endparameter
+ 	parameter LINE
+ 	   keyword	'LINE'
+ 	   type		'_CHAR'
+ 	   prompt	'Plotting line style (SOLID,DASH,DOTDASH,DOT)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.LINE'
+	   help		'%IUEDR_HELP: PLSCAN LINE'
+ 	endparameter
+ 	parameter LINEROT
+ 	   keyword	'LINEROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line style is changed after next plot'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'FALSE'
+	   association	'<->global.LINEROT'
+	   help		'%IUEDR_HELP: PLSCAN LINEROT'
+ 	endparameter
+ 	parameter COL
+ 	   keyword	'COL'
+ 	   type		'_INTEGER'
+ 	   prompt	'Plotting line colour (1, 2, 3, ..., 10).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.COL'
+	   help		'%IUEDR_HELP: PLSCAN COL'
+ 	endparameter
+ 	parameter COLROT
+ 	   keyword	'COLROT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether line colour is changed after next plot.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	'TRUE'
+	   association	'<->global.COLROT'
+	   help		'%IUEDR_HELP: PLSCAN COLROT'
+ 	endparameter
+ 	parameter HIST
+ 	   keyword	'HIST'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether lines are drawn as histograms.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.HIST'
+	   help		'%IUEDR_HELP: PLSCAN HIST'
+ 	endparameter
+ 	parameter QUAL
+ 	   keyword	'QUAL'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether data quality information is plotted.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.QUAL'
+	   help		'%IUEDR_HELP: PLSCAN QUAL'
+ 	endparameter
+ 	parameter XL
+ 	   keyword	'XL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'X-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.XL'
+	   help		'%IUEDR_HELP: PLSCAN XL'
+ 	endparameter
+ 	parameter YL
+ 	   keyword	'YL'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Y-axis plotting limits, [0,0] means auto-scale.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   default	0.0,0.0
+	   association	'<->global.YL'
+	   help		'%IUEDR_HELP: PLSCAN YL'
+ 	endparameter
+   endinterface
+
+   interface PRGRS
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PRGRS DATASET'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: PRGRS APERTURE'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: PRGRS ORDER'
+ 	endparameter
+   endinterface
+
+   interface PRLBLS
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PRLBLS DATASET'
+ 	endparameter
+   endinterface
+
+   interface PRMEAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PRMEAN DATASET'
+ 	endparameter
+   endinterface
+
+   interface PRSCAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PRSCAN DATASET'
+ 	endparameter
+   endinterface
+
+   interface PRSPEC
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: PRSPEC DATASET'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: PRSPEC APERTURE'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: PRSPEC ORDER'
+ 	endparameter
+   endinterface
+
+   interface READIUE
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive or File Name.'
+ 	   ppath	'global'
+ 	   vpath	'prompt'
+	   help		'%IUEDR_HELP: READIUE DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter FILE
+ 	   keyword	'FILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'File Number.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'prompt'
+	   association	'<->global.FILE'
+	   help		'%IUEDR_HELP: READIUE FILE'
+ 	endparameter
+ 	parameter NLINE
+ 	   keyword	'NLINE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of IUE header lines printed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	10
+	   association	'<->global.NLINE'
+	   help		'%IUEDR_HELP: READIUE NLINE'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: READIUE DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: READIUE ORDER'
+ 	endparameter
+ 	parameter TYPE
+ 	   keyword	'TYPE'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset Type (RAW, PHOT, GPHOT).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.TYPE'
+	   help		'%IUEDR_HELP: READIUE TYPE'
+ 	endparameter
+ 	parameter OBJECT
+ 	   keyword	'OBJECT'
+ 	   type		'_CHAR'
+ 	   prompt	'Object Identification Text.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OBJECT'
+	   help		'%IUEDR_HELP: READIUE OBJECT'
+ 	endparameter
+ 	parameter CAMERA
+ 	   keyword	'CAMERA'
+ 	   type		'_CHAR'
+ 	   prompt	'Camera Name (LWP, LWR, SWP).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.CAMERA'
+	   help		'%IUEDR_HELP: READIUE CAMERA'
+ 	endparameter
+ 	parameter IMAGE
+ 	   keyword	'IMAGE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Image Number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.IMAGE'
+	   help		'%IUEDR_HELP: READIUE IMAGE'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: READIUE APERTURE'
+ 	endparameter
+ 	parameter APERTURES
+ 	   keyword	'APERTURES'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,default'
+	   association	'<->global.APERTURES'
+	   help		'%IUEDR_HELP: READIUE APERTURES'
+ 	endparameter
+ 	parameter RESOLUTION
+ 	   keyword	'RESOLUTION'
+ 	   type		'_CHAR'
+           prompt       'Spectrograph resolution (HIRES or LORES).'
+ 	   ppath	'dynamic,default'
+ 	   vpath	'prompt'
+	   association	'<->global.RESOL'
+	   help		'%IUEDR_HELP: READIUE RESOL'
+ 	endparameter
+ 	parameter EXPOSURE
+ 	   keyword	'EXPOSURE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time (seconds).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.EXPOSURE'
+	   help		'%IUEDR_HELP: READIUE EXPOSURE'
+ 	endparameter
+ 	parameter EXPOSURES
+ 	   keyword	'EXPOSURES'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time(s) (seconds).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.EXPOSURES'
+	   help		'%IUEDR_HELP: READIUE EXPOSURES'
+ 	endparameter
+ 	parameter THDA
+ 	   keyword	'THDA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'IUE Camera Temperature (C).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.THDA'
+	   help		'%IUEDR_HELP: READIUE THDA'
+ 	endparameter
+ 	parameter ITFMAX
+ 	   keyword	'ITFMAX'
+ 	   type		'_INTEGER'
+ 	   prompt	'Pixel value on tape for ITF saturation.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ITFMAX'
+	   help		'%IUEDR_HELP: READIUE ITFMAX'
+ 	endparameter
+ 	parameter BADITF
+ 	   keyword	'BADITF'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether bad LORES ITF requires correction.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.BADITF'
+	   help		'%IUEDR_HELP: READIUE BADITF'
+ 	endparameter
+ 	parameter YEAR
+ 	   keyword	'YEAR'
+ 	   type		'_INTEGER'
+ 	   prompt	'Year number (A.D.).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.YEAR'
+	   help		'%IUEDR_HELP: READIUE YEAR'
+ 	endparameter
+ 	parameter MONTH
+ 	   keyword	'MONTH'
+ 	   type		'_INTEGER'
+ 	   prompt	'Month Number (1-12).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.MONTH'
+	   help		'%IUEDR_HELP: READIUE MONTH'
+ 	endparameter
+ 	parameter DAY
+ 	   keyword	'DAY'
+ 	   type		'_INTEGER'
+ 	   prompt	'Day Number in Month.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.DAY'
+	   help		'%IUEDR_HELP: READIUE DAY'
+ 	endparameter
+ 	parameter NGEOM
+ 	   keyword	'NGEOM'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Chebyshev terms used to represent geometry.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.NGEOM'
+	   help		'%IUEDR_HELP: READIUE NGEOM'
+ 	endparameter
+ 	parameter ITF
+ 	   keyword	'ITF'
+ 	   type		'_INTEGER'
+ 	   prompt	'This is the ITF generation used in the image calibration.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ITF'
+	   help		'%IUEDR_HELP: READIUE ITF'
+ 	endparameter
+   endinterface
+
+   interface READSIPS
+ 	parameter DRIVE
+ 	   keyword	'DRIVE'
+ 	   type		'_CHAR'
+ 	   prompt	'Tape Drive or File Name.'
+ 	   ppath	'global'
+ 	   vpath	'prompt'
+	   help		'%IUEDR_HELP: READSIPS DRIVE'
+	   association	'<->global.DRIVE'
+ 	endparameter
+ 	parameter FILE
+ 	   keyword	'FILE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Tape File Number.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'prompt'
+	   association	'<->global.FILE'
+	   help		'%IUEDR_HELP: READSIPS FILE'
+ 	endparameter
+ 	parameter NLINE
+ 	   keyword	'NLINE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of IUE header lines printed.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	10
+	   association	'<->global.NLINE'
+	   help		'%IUEDR_HELP: READSIPS NLINE'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: READSIPS DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: READSIPS ORDER'
+ 	endparameter
+ 	parameter OBJECT
+ 	   keyword	'OBJECT'
+ 	   type		'_CHAR'
+ 	   prompt	'Object Identification Text.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.OBJECT'
+	   help		'%IUEDR_HELP: READSIPS OBJECT'
+ 	endparameter
+ 	parameter CAMERA
+ 	   keyword	'CAMERA'
+ 	   type		'_CHAR'
+ 	   prompt	'Camera Name (LWP, LWR, SWP).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.CAMERA'
+	   help		'%IUEDR_HELP: READSIPS CAMERA'
+ 	endparameter
+ 	parameter IMAGE
+ 	   keyword	'IMAGE'
+ 	   type		'_INTEGER'
+ 	   prompt	'Image Number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.IMAGE'
+	   help		'%IUEDR_HELP: READSIPS IMAGE'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: READSIPS APERTURE'
+ 	endparameter
+ 	parameter EXPOSURE
+ 	   keyword	'EXPOSURE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time (seconds).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.EXPOSURE'
+	   help		'%IUEDR_HELP: READSIPS EXPOSURE'
+ 	endparameter
+ 	parameter APERTURES
+ 	   keyword	'APERTURES'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.APERTURES'
+	   help		'%IUEDR_HELP: READSIPS APERTURES'
+ 	endparameter
+ 	parameter EXPOSURES
+ 	   keyword	'EXPOSURES'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time(s) (seconds).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.EXPOSURES'
+	   help		'%IUEDR_HELP: READSIPS EXPOSURES'
+ 	endparameter
+ 	parameter THDA
+ 	   keyword	'THDA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'IUE Camera Temperature (C).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.THDA'
+	   help		'%IUEDR_HELP: READSIPS THDA'
+ 	endparameter
+ 	parameter YEAR
+ 	   keyword	'YEAR'
+ 	   type		'_INTEGER'
+ 	   prompt	'Year number (A.D.).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.YEAR'
+	   help		'%IUEDR_HELP: READSIPS YEAR'
+ 	endparameter
+ 	parameter MONTH
+ 	   keyword	'MONTH'
+ 	   type		'_INTEGER'
+ 	   prompt	'Month Number (1-12).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.MONTH'
+	   help		'%IUEDR_HELP: READSIPS MONTH'
+ 	endparameter
+ 	parameter DAY
+ 	   keyword	'DAY'
+ 	   type		'_INTEGER'
+ 	   prompt	'Day Number in Month.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.DAY'
+	   help		'%IUEDR_HELP: READSIPS DAY'
+ 	endparameter
+ 	parameter ITF
+ 	   keyword	'ITF'
+ 	   type		'_INTEGER'
+ 	   prompt	'This is the ITF generation used in the image calibration.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.ITF'
+	   help		'%IUEDR_HELP: READSIPS ITF'
+ 	endparameter
+   endinterface
+
+   interface SAVE
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SAVE DATASET'
+ 	endparameter
+   endinterface
+
+   interface SCAN
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SCAN DATASET'
+ 	endparameter
+ 	parameter ORDERS
+ 	   keyword	'ORDERS'
+ 	   type		'_INTEGER'
+ 	   prompt	'This delineates a range of Echelle orders.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.ORDERS'
+	   help		'%IUEDR_HELP: SCAN ORDERS'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: SCAN APERTURE'
+ 	endparameter
+ 	parameter SCANDIST
+ 	   keyword	'SCANDIST'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Distance of HIRES scan from faceplate centre (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.SCANDIST'
+	   help		'%IUEDR_HELP: SCAN SCANDIST'
+ 	endparameter
+ 	parameter SCANAV
+ 	   keyword	'SCANAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Averaging filter FWHM for image scan (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	5
+	   association	'<->global.SCANAV'
+	   help		'%IUEDR_HELP: SCAN SCANAV'
+ 	endparameter
+ 	parameter SCANWV
+ 	   keyword	'SCANWV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Central wavelength for LORES image scan (A).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.SCANWV'
+	   help		'%IUEDR_HELP: SCAN SCANWV'
+ 	endparameter
+   endinterface
+
+   interface SETA
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SETA DATASET'
+ 	endparameter
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: SETA APERTURE'
+ 	endparameter
+ 	parameter EXPOSURE
+ 	   keyword	'EXPOSURE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum exposure time (seconds).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.EXPOSURE'
+	   help		'%IUEDR_HELP: SETA EXPOSURE'
+ 	endparameter
+ 	parameter FSCALE
+ 	   keyword	'FSCALE'
+ 	   type		'_DOUBLE'
+           prompt       'Flux scale factor'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.FSCALE'
+	   help		'%IUEDR_HELP: SETA FSCALE'
+ 	endparameter
+ 	parameter WSHIFT
+ 	   keyword	'WSHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Constant wavelength shift (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.WSHIFT'
+	   help		'%IUEDR_HELP: SETA WSHIFT'
+ 	endparameter
+ 	parameter VSHIFT
+ 	   keyword	'VSHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Velocity shift of detector relative to Sun (km/s).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.VSHIFT'
+	   help		'%IUEDR_HELP: SETA VSHIFT'
+ 	endparameter
+ 	parameter ESHIFT
+ 	   keyword	'ESHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Global Echelle wavelength shift.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.ESHIFT'
+	   help		'%IUEDR_HELP: SETA ESHIFT'
+ 	endparameter
+ 	parameter GSHIFT
+ 	   keyword	'GSHIFT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Global shift of spectrum on image (geometric pixels).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.GSHIFT'
+	   help		'%IUEDR_HELP: SETA GSHIFT'
+ 	endparameter
+   endinterface
+
+   interface SETD
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SETD DATASET'
+ 	endparameter
+ 	parameter OBJECT
+ 	   keyword	'OBJECT'
+ 	   type		'_CHAR'
+ 	   prompt	'Object Identification Text.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.OBJECT'
+	   help		'%IUEDR_HELP: SETD OBJECT'
+ 	endparameter
+ 	parameter THDA
+ 	   keyword	'THDA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'IUE Camera Temperature (C).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.THDA'
+	   help		'%IUEDR_HELP: SETD THDA'
+ 	endparameter
+ 	parameter FIDSIZE
+ 	   keyword	'FIDSIZE'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Half width of fiducials (pixels).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.FIDSIZE'
+	   help		'%IUEDR_HELP: SETD FIDSIZE'
+ 	endparameter
+ 	parameter BADITF
+ 	   keyword	'BADITF'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether bad LORES ITF requires correction.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.BADITF'
+	   help		'%IUEDR_HELP: SETD BADITF'
+ 	endparameter
+ 	parameter NGEOM
+ 	   keyword	'NGEOM'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Chebyshev terms used to represent geometry.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.NGEOM'
+	   help		'%IUEDR_HELP: SETD NGEOM'
+ 	endparameter
+ 	parameter RIPK
+ 	   keyword	'RIPK'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Echelle ripple constant (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.RIPK'
+	   help		'%IUEDR_HELP: SETD RIPK'
+ 	endparameter
+ 	parameter RIPA
+ 	   keyword	'RIPA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Ripple function scale factor.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.RIPA'
+	   help		'%IUEDR_HELP: SETD RIPA'
+ 	endparameter
+ 	parameter XCUT
+ 	   keyword	'XCUT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Global Echelle wavelength clipping.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.XCUT'
+	   help		'%IUEDR_HELP: SETD XCUT'
+ 	endparameter
+ 	parameter HALAV
+ 	   keyword	'HALAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Averaging FWHM for halation correction (geometric pixels).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.HALAV'
+	   help		'%IUEDR_HELP: SETD HALAV'
+ 	endparameter
+ 	parameter HALC
+ 	   keyword	'HALC'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Halation correction constant (fraction of continuum).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.HALC'
+	   help		'%IUEDR_HELP: SETD HALC'
+ 	endparameter
+ 	parameter HALTYPE
+ 	   keyword	'HALTYPE'
+ 	   type		'_CHAR'
+ 	   prompt	'The type of Halation (order-overlap) correction used.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.HALTYPE'
+	   help		'%IUEDR_HELP: SETD HALTYPE'
+ 	endparameter
+ 	parameter HALW0
+ 	   keyword	'HALW0'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength at which halation correction is zero (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.HALW0'
+	   help		'%IUEDR_HELP: SETD HALW0'
+ 	endparameter
+ 	parameter HALWC
+ 	   keyword	'HALWC'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength at which the halation correction is HALC is defined (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.HALWC'
+	   help		'%IUEDR_HELP: SETD HALWC'
+ 	endparameter
+   endinterface
+
+   interface SETM
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SETM DATASET'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: SETM ORDER'
+ 	endparameter
+ 	parameter RIPA
+ 	   keyword	'RIPA'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Ripple function scale factor.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.RIPA'
+	   help		'%IUEDR_HELP: SETM RIPA'
+ 	endparameter
+ 	parameter RIPC
+ 	   keyword	'RIPC'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Ripple function correction polynomial.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.RIPC'
+	   help		'%IUEDR_HELP: SETM RIPC'
+ 	endparameter
+ 	parameter RIPK
+ 	   keyword	'RIPK'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Echelle ripple constant (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.RIPK'
+	   help		'%IUEDR_HELP: SETM RIPK'
+ 	endparameter
+ 	parameter WCUT
+ 	   keyword	'WCUT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Wavelength limits for Echelle order (A).'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global'
+	   association	'<->global.WCUT'
+	   help		'%IUEDR_HELP: SETM WCUT'
+ 	endparameter
+   endinterface
+
+   interface SGS
+   endinterface
+
+   interface SHOW
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: SHOW DATASET'
+ 	endparameter
+ 	parameter V
+ 	   keyword	'V'
+ 	   type		'_CHAR'
+ 	   prompt	'List of items to be printed.'
+ 	   ppath	'default'
+ 	   vpath	'prompt'
+	   association	'<->global.V'
+           default      'H'
+	   help		'%IUEDR_HELP: SHOW V'
+ 	endparameter
+   endinterface
+
+   interface TRAK
+ 	parameter APERTURE
+ 	   keyword	'APERTURE'
+ 	   type		'_CHAR'
+ 	   prompt	'Aperture name. (SAP or LAP)'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'prompt'
+	   association	'<->global.APERTURE'
+	   help		'%IUEDR_HELP: TRAK APERTURE'
+ 	endparameter
+ 	parameter AUTOSLIT
+ 	   keyword	'AUTOSLIT'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether GSLIT, BDIST and BSLIT are determined automatically.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.AUTOSLIT'
+	   help		'%IUEDR_HELP: TRAK AUTOSLIT'
+ 	endparameter
+ 	parameter BDIST
+ 	   keyword	'BDIST'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Distances of background channels from centre (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.BDIST'
+	   help		'%IUEDR_HELP: TRAK BDIST'
+ 	endparameter
+ 	parameter BKGAV
+ 	   keyword	'BKGAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Background averaging filter FWHM (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	30.0
+	   association	'<->global.BKGAV'
+	   help		'%IUEDR_HELP: TRAK BKGAV'
+ 	endparameter
+ 	parameter BKGIT
+ 	   keyword	'BKGIT'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of background smoothing iterations.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1
+	   association	'<->global.BKGIT'
+	   help		'%IUEDR_HELP: TRAK BKGIT'
+ 	endparameter
+ 	parameter BKGSD
+ 	   keyword	'BKGSD'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Discrimination level for background pixels (s.d.).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	2.0
+	   association	'<->global.BKGSD'
+	   help		'%IUEDR_HELP: TRAK BKGSD'
+ 	endparameter
+ 	parameter BSLIT
+ 	   keyword	'BSLIT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Background channel half widths (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.BSLIT'
+	   help		'%IUEDR_HELP: TRAK BSLIT'
+ 	endparameter
+ 	parameter CENAV
+ 	   keyword	'CENAV'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Centroid averaging filter FWHM (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	30.0
+	   association	'<->global.CENAV'
+	   help		'%IUEDR_HELP: TRAK CENAV'
+ 	endparameter
+ 	parameter CENIT
+ 	   keyword	'CENIT'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of centroid tracking iterations.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1
+	   association	'<->global.CENIT'
+	   help		'%IUEDR_HELP: TRAK CENIT'
+ 	endparameter
+ 	parameter CENSD
+ 	   keyword	'CENSD'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Significance level for signal to be used for centroids.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	4.0
+	   association	'<->global.CENSD'
+	   help		'%IUEDR_HELP: TRAK CENSD'
+ 	endparameter
+ 	parameter CENSH
+ 	   keyword	'CENSH'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the spectrum template is just shifted linearly.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENSH'
+	   help		'%IUEDR_HELP: TRAK CENSH'
+ 	endparameter
+ 	parameter CENSV
+ 	   keyword	'CENSV'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the spectrum template is saved in the dataset.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENSV'
+	   help		'%IUEDR_HELP: TRAK CENSV'
+ 	endparameter
+ 	parameter CENTM
+ 	   keyword	'CENTM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether pre-existing centroid template is used.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.CENTM'
+	   help		'%IUEDR_HELP: TRAK CENTM'
+ 	endparameter
+ 	parameter CONTINUUM
+ 	   keyword	'CONTINUUM'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the object spectrum is expected to have a "continuum".'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.CONTINUUM'
+	   help		'%IUEDR_HELP: TRAK CONTINUUM'
+ 	endparameter
+ 	parameter CUTWV
+ 	   keyword	'CUTWV'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether wavelength cutoff data used for extraction grid.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'TRUE'
+	   association	'<->global.CUTWV'
+	   help		'%IUEDR_HELP: TRAK CUTWV'
+ 	endparameter
+ 	parameter DATASET
+ 	   keyword	'DATASET'
+ 	   type		'_CHAR'
+ 	   prompt	'Dataset name.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.DATASET'
+	   help		'%IUEDR_HELP: TRAK DATASET'
+ 	endparameter
+ 	parameter EXTENDED
+ 	   keyword	'EXTENDED'
+ 	   type		'_LOGICAL'
+ 	   prompt	'Whether the object spectrum is expected to be extended.'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	'FALSE'
+	   association	'<->global.EXTENDED'
+	   help		'%IUEDR_HELP: TRAK EXTENDED'
+ 	endparameter
+ 	parameter GSAMP
+ 	   keyword	'GSAMP'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Spectrum grid sampling rate (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   default	1.414
+	   association	'<->global.GSAMP'
+	   help		'%IUEDR_HELP: TRAK GSAMP'
+ 	endparameter
+ 	parameter GSLIT
+ 	   keyword	'GSLIT'
+ 	   type		'_DOUBLE'
+ 	   prompt	'Object channel limits (geometric pixels).'
+ 	   ppath	'global,default'
+ 	   vpath	'global,default'
+	   association	'<->global.GSLIT'
+	   help		'%IUEDR_HELP: TRAK GSLIT'
+ 	endparameter
+ 	parameter NORDER
+ 	   keyword	'NORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Number of Echelle orders to be processed.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   default	0
+	   association	'<->global.NORDER'
+	   help		'%IUEDR_HELP: TRAK NORDER'
+ 	endparameter
+ 	parameter ORDER
+ 	   keyword	'ORDER'
+ 	   type		'_INTEGER'
+ 	   prompt	'Echelle order number.'
+ 	   ppath	'dynamic,global,default'
+ 	   vpath	'dynamic,global,prompt'
+	   association	'<->global.ORDER'
+	   help		'%IUEDR_HELP: TRAK ORDER'
+ 	endparameter
+   endinterface
+endmonolith

@@ -1,0 +1,10 @@
+*+
+*
+*   CMBUG common blocks.
+*
+*-
+
+*   This is debug information.
+      INTEGER BUGLEV     ! debug level
+ 
+      COMMON /CMBUG / BUGLEV

@@ -1,0 +1,17 @@
+*+
+*
+*   CMFLX common blocks.
+*
+*-
+
+*   FLX spectrum arrays:
+      LOGICAL NOFLX          ! Whether defined.
+      REAL*8 SFLX( 1200 )    ! FLX spectrum.
+      REAL*8 DFLX( 1200 )    ! FLX errors.
+      INTEGER QFLX( 1200 )   ! FLX Data Quality.
+      BYTE FLABEL( 40 )      ! Label for calibrated flux.
+      BYTE FUNITS( 40 )      ! Units for calibrated flux.
+
+      COMMON / CMFLX   / QFLX, NOFLX
+      COMMON / CMFLX_1 / FLABEL, FUNITS
+      COMMON / CMFLX_2 / SFLX, DFLX

@@ -1,0 +1,153 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: NEWS.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=IUEDR_v3.2-0_NEWS>
+<I>IUEDR-Online HELP</I>
+<HR><H1>IUEDR v3.2-0 News</H1><HR>
+</A>
+<P>
+ This text describes IUEDR version 3.2-0.
+ Fixes to and changes from a previous release (version 3.1-9) are
+ described.
+<P>
+<H2>Documentation notes</H2>
+<P>
+<PRE WIDTH=72>
+  o The IUEDR User Guide (MUD/45) has been comprehensively updated.
+  o The IUEDR User Manual (SG/3) has been comprehensively updated.
+    The document now has an index, extensive cross-referencing and is
+    fully up-to-date with the current release and IUEDR usage.
+  o The $IUEDR_USER directory now includes several C shell script
+    examples for handling multiple IUE datasets.  Refer to the 
+    user.info file in the $IUEDR_USER directory for an outline 
+    description.
+  o A few errors in the IUEDR Tutorial (SG/7) have been fixed.
+  o A few errors and omissions to the help text have been fixed.
+  o The out-of-date file global.doc has been removed from the
+    $IUEDR_DOC directory.
+  o The file problems.doc has been updated to reflect improvements in
+    this version of IUEDR.
+</PRE>
+<P>
+<H2>Version notes</H2>
+<P>
+<PRE WIDTH=72>
+  o Data in the Calibration file (UEC) are now stored with scale factor 
+    edit "1P" where appropriate.  This effectively adds an extra digit
+    of precision in these figures.
+  o New dispersion (*.dsp) files are available in the $IUEDR_DATA
+    directory.  These new relations are used by default.  The old 
+    dispersion relations can be employed using the NEWDISP (ironic, I 
+    know) command, for example, the action:
+<P>
+       > NEWDISP DISPFILE=$IUEDR_DATA/swphi.dsp
+<P>
+    will use the NEW dispersion relations, whereas
+<P>
+       > NEWDISP DISPFILE=$IUEDR_DATA/swphi_old.dsp
+<P>
+    will use the OLD dispersion relations.  The new dispersion relations
+    are from NASA IUE Newsletter No 51, August 1993.  The old data are
+    dated 1982.
+  o Command line editing and command history features (identical to those
+    in DIPSO) are now available.
+    See HELP/Command_line_editing and documentation for more details.
+  o A "Hidden" Command CONFIGURE toggles the recording of all parameter
+    values for commands in log files.  By default this behaviour is TRUE.
+    See HELP/CONFIGURE and documentation for more details.
+  o Graph titles now have a consistent style of:
+<P>
+       <OBJECT> (ORDER=<M>)
+<P>
+    for HIRES, and for LORES:
+<P>
+      <OBJECT> (APERTURE=<AP>)
+<P>
+  o The title of pseudo-SP0 format NDFs has been changed to be more
+    informative of the contents of the file.
+  o A new command CLEAN for marking bad strips of data in IUE images
+    has been added.  See HELP/CLEAN, WWW pages or SG/3 for details.
+  o A new command AGSHIFT for calculating and setting the GSHIFT parameter
+    has been added.  See HELP/AGSHIFT, WWW pages or SG/3 for details.
+  o The Plotting area used by PL* commands has been enlarged for most
+    SGS zones.
+  o Environment Variable style syntax has been added to file name loading,
+    previously Logical Names and/or explicit files only were supported.
+  o Support for Calibration, fiducial etc. file loading has been
+    rationalised and documented.
+  o Program output redirection is now possible.
+    When using
+<P>
+       % iuedr < script_file
+<P>
+    the default log file session.lis is produced.
+<P>
+       % iuedr < script_file > script_log.lis
+<P>
+    will produce the log file script_log.lis INSTEAD OF session.lis
+  o For TRAK the case EXTENDED=TRUE CONTINUUM=FALSE now prompts for
+    BSLIT as it should.
+  o The NULL parameter response can now be used as advertised in the
+    manual.  It should be noted that the meaning of a NULL response is
+<P>
+       "use suitable defaults this time"
+<P>
+    For example, if XP=[200,400] and a NULL response to a prompt for XP
+    (from DRIMAGE) is given then XP=[1,768] will be used, but the values
+    [200,400] will be retained for subsequent DRIMAGE invocations.
+  o The maximum number of pseudo-orders allowed in LBLS has been increased
+    from 55 to 120 to reflect changes in the default values of GSAMP and
+    RSAMP.
+  o The EXIT command no longer need be present in IUEDR scripts.
+</PRE>
+<P>
+<H2>Bug fixes</H2>
+<P>
+<PRE WIDTH=72>
+  o When Image Data Quality is altered the Data and Quality file is marked
+    as required for update.  Previously this only occurred for Data
+    alteration.
+  o An error in SETD OBJECT which made it impossible to change the case of
+    letters in the OBJECT field has been removed.
+  o A small bug in the use of the NORDER parameter for HIRES TRAK, where
+    the extraction would over-run the available order range has been fixed.
+  o LISTIUE will process multiple files on a tape and does not re-prompt
+    for FILE number.
+  o A bug in the reading of fiducial positions leading to problems
+    TRAKing HIRES data has been removed.
+  o An error translating all environment variables returned by PSX_GETENV
+    in data file reading to lower case has been removed.
+  o Incorrect FWHM values written to SCAN plots, output files and listings
+    have been fixed.  The SCAN subroutine for HIRES has been modified to
+    use the correct FWHM rather than HWHM.  Documentation for SCANAV which
+    is the HALF WHM not FWHM (as documented before) has been changed.
+  o Missing parameter definitions of APERTURE for the SCAN and MAP commands
+    have been added to the interface file.  The On-line help and SG/3 have
+    been corrected also.
+  o Titles in the PRSCAN command have been changed for HIRES so that the
+    SCANDIST parameter is correctly labelled.
+  o A small error in the case of failed attempts to read _UEM files has
+    been corrected.  These do not produce NDF errors, rather a simple
+    "not available" message.  This applies to the SHOW command.
+  o A bug in the writing of Ripple correction data for Sun hosted systems
+    has been fixed.  This bug precluded the use of the BARKER command on
+    such machines.
+  o A bug causing SGS zones to fall over when an out-of-range zone was
+    chosen has been removed.
+</PRE>
+<P>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:55:16 1995
+</ADDRESS>
+</BODY>
+</HTML>

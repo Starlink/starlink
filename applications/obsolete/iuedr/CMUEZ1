@@ -1,0 +1,16 @@
+*+
+*
+*   CMUEZ1 common blocks.
+*
+*-
+
+*   Specific values from the general part of IUE Record Zero.
+      INTEGER NRECRD        ! number of records per group (order)
+      INTEGER DATMIN(8)     ! minimum value of group member
+      INTEGER DATMAX(8)     ! maximum value of group member
+      REAL*8 DATSCL(8)        ! scale factor for group member
+      REAL*8 WOFFS(100)       ! wavelength offset for each order
+      REAL*8 SLITS(100)       ! slit widths for each order
+ 
+      COMMON /CMUEZ1/ NRECRD, DATMIN, DATMAX
+      COMMON /CMUEZ1_1/ DATSCL, WOFFS, SLITS

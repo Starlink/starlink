@@ -1,0 +1,285 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Release Notes
+
+                                                             Paul Rees
+                                                        3 January 1989
+
+----------------------------------------------------------------------
+
+                   IUEDR Version 2.0 Release Notes
+                   -------------------------------
+
+
+
+1  INTRODUCTION
+
+This Note describes changes made to  IUEDR  since  the  last  Starlink
+release, Version 1.4.
+
+
+
+2  BUG FIXES
+
+No bugs were reported for the last released version of IUEDR.  Several
+deficiencies were noted, however, and these have either been rectified
+or are to be investigated and rectified in forthcoming versions.
+
+
+
+3  UPDATES
+
+This version of IUEDR has some major updates and  a  number  of  minor
+changes.  The updates are reviewed below.
+
+
+
+3.1  Graphics
+
+Both the graph plotting and image display graphics have been rewritten
+to  use  the Starlink recommended NCAR, SNX, SGS and GKS 7.2 packages.
+The approach used in the graphics rewrite was to  maintain  the  basic
+"flavour"  of the graphics in IUEDR with only minor changes in the use
+of the existing  graphics  parameters.   Perhaps  the  most  noticable
+change  resulting  from this rewrite is DIPSO-like plotting zones (see
+SUN/50 for details) which have been incorporated in  the  program  for
+the graph plotting.
+
+
+
+
+                                - 1 -
+IUEDR Version 2.0 Release Notes                                 Page 2
+
+
+Changes in the graph plotting include the ZONE parameter which defines
+the plotting zone as follows:
+
+     0 entire display surface
+     1 top left quarter
+     2 top right quarter
+     3 bottom left quater
+     4 bottom right quarter
+     5 top half
+     6 bottom half
+     7 left half
+     8 right half
+
+By default, the entire  display  surface  is  erased  if  a  requested
+plotting  zone will plot over an existing plot.  However, for multiple
+plots within one set of drawn axes, the reset flag may  be  set  FALSE
+(i.e.  RS=F).  This has the effect of disabling the automatic clearing
+of the display for overlapping zones.  If multiple plots are required,
+then  the  axes  limits must be set not autoscaled:  i.e.  XL=(x1,x2),
+YL=(y1,y2) not XL=!, YL=!.
+
+The image diplay in this version of IUEDR will  only  draw  and  image
+with  the  pixel  (1,1) in the bottom left hand corner of the display.
+Defining new axes limits using the parameters XP and YP or the  cursor
+will  NOT result in a reversal of either axis, regardless of the order
+of input.
+
+
+
+3.2  FORTRAN Conversion
+
+IUEDR has now been converted into FORTRAN code from the original  AT4.
+This  change, although invisible to the user, will hopefully result in
+a faster turnaround between versions of the program.  The inclusion of
+the FORTRAN source code in future releases is also anticipated.
+
+
+
+3.3  Command Names
+
+Two changes  affect  the  names  of  commands  used  in  IUEDR  -  the
+implementation  of  shortest  unambiguous command name (e.g.  like the
+use of DCL commands)  and  a  rationalisation  of  the  command  names
+themselves.   This  version  of  IUEDR  will remind the user if an old
+command name is to be withdrawn.   However,  the  command  will  still
+work.   The  next release of IUEDR will only provide the user with the
+new name for the command and then  return  the  user  to  the  command
+prompt.
+
+
+
+
+
+                                - 2 -
+IUEDR Version 2.0 Release Notes                                 Page 3
+
+
+The command names which have changed and their replacements are listed
+below:
+       Old command     New command     Shortest abreviation
+
+          ABSCAL         NEWABS               NEWA
+          CU             CURSOR               CUR
+          CUL            CULIMITS             CUL
+          CUTCAL         NEWCUT               NEWC
+          DI             DRIMAGE              DRI
+          DISPCAL        NEWDISP              NEWD
+          EI             EDIMAGE              EDI
+          EM             EDMEAN               EDM
+          ER             ERASE                ER
+          ES             EDSPEC               EDS
+          FIDCAL         NEWFID               NEWF
+          MI             MODIMAGE             MODI
+          PC             PLCEN                PLC
+          PE             PLGRS                PLG
+          PF             PLFLUX               PLF
+          PM             PLMEAN               PLM
+          PN             PLNET                PLN
+          PRINTGRS       PRGRS                PRG
+          PRINTLBLS      PRLBLS               PRL
+          PRINTMEAN      PRMEAN               PRM
+          PRINTSCAN      PRSCAN               PRSC
+          PRINTSPEC      PRSPEC               PRSP
+          PS             PLSCAN               PLS
+          QU             QUIT                 Q
+          READIUERS      READSIPS             READS
+          RIPCAL         NEWRIP               NEWR
+          SH             SHOW                 SH
+          TEMCAL         NEWTEM               NEWT
+
+
+
+
+3.4  New Commands And Parameters
+
+Two new commands have been introduced in this release:  EXIT and  SGS.
+EXIT  has  exactly the same function as the QUIT command.  SGS gives a
+list of the SGS workstation names available and which may be  used  in
+IUEDR  in  response  to  the  DEVICE prompt (see SUN/85 for details of
+SGS).
+
+Two new parameters have been introduced  in  this  release:   ITF  and
+ZONE.   ITF  is  used  mainly by the command READIUE to obtain the ITF
+version used in the photometric calibration of the data.  This  is  of
+importance  to  the absolute flux calibration of LORES data.  ZONE has
+been discussed above.
+
+
+
+
+                                - 3 -
+IUEDR Version 2.0 Release Notes                                 Page 4
+
+
+Three parameters have been withdrawn:  ARGS, PLOTTER and TBALL.
+
+
+
+3.5  Editing Data
+
+Because the IKON image display systems only have three  mouse  buttons
+to  control  cursor  functions (the SIGMEX ARGS had four buttons), the
+cursor control for the commands EDIMAGE, EDMEAN, EDSPEC  and  MODIMAGE
+have  been  changed  slightly.   There  is a full description of their
+operation in the IUEDR help system and in the  manual  information  in
+the IUEDR_MAN directory.
+
+
+
+3.6  Documentation And Online Help
+
+The HELP library for IUEDR has been entirely rebuilt for this version.
+It   has  complete  information  available  for  all  commands.   This
+information is also available in the command manual in  the  IUEDR_MAN
+directory  and  the  global  parameter descriptions in the RUNOFF file
+IUEDR_DOC:GLOBAL.RND.     However,    the     user     guide     (i.e.
+IUEDR_DOC:GUIDE.RND)  has not yet been updated.  If contradictions are
+found between the user guide and the more  recent  documentation,  the
+recent documentation is the more correct.
+
+
+
+3.7  Other Changes
+
+Two other changes are noteable:  several parameter defaults have  been
+changed for the commands READIUE and READSIPS, also the maximum length
+of the spectrum array for the  commands  MAP  and  OUTMEAN  have  been
+increased  to  27800  points.   The  behaviour of the parameters FILE,
+DATASET, CAMERA and IMAGE has been changed for  the  commands  READIUE
+and  READSIPS  to  avoid  accidently  reading the same image from tape
+twice in succession.  The maximum array length used in  the  execution
+of  the commands MAP and OUTMEAN has been changed to enable a complete
+long wave HIRES spectrum to be mapped at an interval 0.05A and output.
+
+Several minor changes to IUEDR have also been made.
+
+Please note that IUEDR now requires a  larger  Page  File  Quota  than
+previously.   Please  check your Page File Quota using the DCL command
+SHOW PROCESS /ALL and consult your Starlink Site Manager if it is less
+than 30000 pages.
+
+
+
+4  FUTURE
+
+Several further enhancements of the  IUEDR  graphics  system  will  be
+
+                                - 4 -
+IUEDR Version 2.0 Release Notes                                 Page 5
+
+
+released in future versions of the program.
+
+It is noted  that  no  updating  of  the  calibration  data  has  been
+performed  for  this  release.   Although this may be inconvenient for
+some applications, and certainly needs to be completed at the earliest
+opportunity,  the  FORTRAN conversion was considered a higher priority
+for this release.  It is hoped that the next release  will  contain  a
+complete overhaul of the calibration data.
+
+It is also noted that the bulk of the documentation for IUEDR is still
+in  need  of updating.  This is under review and a number of documents
+will be released independent of the software releases  in  the  coming
+months.
+
+Lastly, I would like to personally apologise to  users  who  may  have
+been  inconvenienced  by the long delay in the release of this version
+of IUEDR.  It is hoped that now the IUEDR code is in  FORTRAN,  I  can
+make full use of the VAXset software productivity tools to shorten the
+development time for future versions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 5 -

@@ -1,0 +1,16 @@
+*+
+*
+*   CMBKG common blocks.
+*
+*-
+
+*   Background arrays.
+      LOGICAL NOBKG          ! whether defined
+      REAL*8 SBKG(1200)      ! Mean background per pixel
+      REAL*8 GBKG(1200)      ! Mean bacground gradient in R-coordinate
+      REAL*8 DBKG(1200)      ! Mean background errors
+      INTEGER QBKG(1200)     ! Mean background quality
+
+      COMMON / CMBKG   / NOBKG, QBKG
+      COMMON / CMBKG_1 / SBKG, GBKG, DBKG
+

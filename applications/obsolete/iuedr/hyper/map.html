@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: MAP.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=MAP>
+<I>IUEDR-Online HELP</I>
+<HR><H1>MAP</H1><HR>
+</A>
+<H2>Summary</H2>
+ Map and merge spectrum components to produce a mean spectrum.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   ORDERS          This delineates a range of Echelle orders.
+   APERTURE        Aperture name (SAP or LAP).
+   RM              Whether mean spectrum is reset before averaging.
+   ML              Wavelength grid limits for mean spectrum.
+   MSAMP           Wavelength sampling rate for mean spectrum grid.
+   FILLGAP         Whether gaps can be filled within order.
+   COVERGAP        Whether gaps can be filled by covering orders.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command can be used to produce a mean spectrum  with  contributions
+from several Echelle orders (HIRES), or from several apertures (LORES).
+<P>
+If <A HREF=rm.html>
+RM</A>
+=TRUE, or if there is no existing  mean  spectrum,  then  an evenly
+spaced wavelength  grid  is  constructed  between  the  limits specified
+by the <A HREF=ml.html>
+ML</A>
+ parameter, and using the sampling rate specified  by the <A HREF=msamp.html>
+MSAMP
+</A>
+parameter.
+<P>
+If <A HREF=rm.html>
+RM</A>
+=FALSE and there IS an existing mean spectrum, then the  wavelength
+grid AND CONTENTS  are retained.  New components  will be  averaged with
+what is already there.
+<P>
+In the case of HIRES, the <A HREF=orders.html>
+ORDERS</A>
+ parameter is used to delimit  the range
+of echelle orders that are allowed to contribute to the mean.
+<P>
+In the case of LORES only a single  aperture, specified by  the <A HREF=aperture.html>
+APERTURE
+</A>
+parameter, is mapped at a given time.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="orders.html">ORDERS</A> * 
+<A HREF="aperture.html">APERTURE</A> * 
+<A HREF="rm.html">RM</A> * 
+<A HREF="ml.html">ML</A> * 
+<A HREF="msamp.html">MSAMP</A> * 
+<A HREF="fillgap.html">FILLGAP</A> * 
+<A HREF="covergap.html">COVERGAP</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:00 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,13 @@
+*+
+*
+*   CMMUST common blocks.
+*
+*-
+
+*   File musts for use by RDIMG.
+      LOGICAL CAMUST     ! Must have UEC file
+      LOGICAL DAMUST     ! Must have UED and UEQ files
+      LOGICAL SPMUST     ! Must have UES file
+      LOGICAL MEMUST     ! Must have UEM file
+ 
+      COMMON /CMMUST/ CAMUST, DAMUST, SPMUST, MEMUST

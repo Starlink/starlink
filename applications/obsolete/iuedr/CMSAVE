@@ -1,0 +1,20 @@
+*+
+*
+*   CMSAVE common blocks.
+*
+*-
+
+*   Saved spectra for a set of echelle orders.
+      LOGICAL NOSPEC            ! Whether defined.
+      INTEGER NORDER            ! Number of orders.
+      INTEGER ORDERS( 100 )     ! List of echelle order numbers.
+      INTEGER NWAVS( 100 )      ! Numbers of wavelengths.
+      REAL*8 WAV1S( 100 )       ! Start wavelengths.
+      REAL*8 WAV2S( 100 )       ! End wavelengths.
+      REAL*8 WAVS( 1200, 100 )  ! Wavelengths (uncalibrated).
+      REAL*8 SNETS( 1200, 100 ) ! Net spectra.
+      BYTE QNETS( 1200, 100 )   ! Net quality.
+
+      COMMON / CMSAVE   / NOSPEC, NORDER, ORDERS, NWAVS, QNETS
+      COMMON / CMSAVE_1 / WAV1S, WAV2S, WAVS, SNETS
+      SAVE

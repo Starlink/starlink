@@ -1,0 +1,14 @@
+*+
+*
+*   CMCEN common blocks.
+*
+*-
+
+*   Centroid Shift arrays:
+      LOGICAL NOCEN          ! Whether defined.
+      REAL*8 SCEN( 1200 )    ! Centroid Shift values.
+      REAL*8 DCEN( 1200 )    ! Centroid Shift errors.
+      INTEGER QCEN( 1200 )   ! Centroid Shift quality.
+
+      COMMON / CMCEN   / NOCEN, QCEN
+      COMMON / CMCEN_1 / SCEN, DCEN

@@ -1,0 +1,10 @@
+*+
+*
+*   CMTAPE common blocks.
+*
+*-
+
+*   MT library states.
+      INTEGER TCHAN    ! Device channel.
+
+      COMMON / CMTAPE / TCHAN

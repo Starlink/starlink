@@ -1,0 +1,12 @@
+'IUE_FACE'
+340 386 391
+-51.20 -130 50
+
+# Title:     LWP,RAW,LORES Faceplate Specification
+# From:      Giddings (1982, Private Communication).
+# Contents:  (RADIUS, SC, LC, ANGLE, RMIN, RMAX)
+# Notes:     The circular specification of faceplate bounds is only
+#            an approximation to a real IUE camera.
+#            The RMIN and RMAX values are quite rough, measured from
+#            ARGS.
+# End:

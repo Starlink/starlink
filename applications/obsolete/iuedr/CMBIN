@@ -1,0 +1,12 @@
+*+
+*
+*   CMBIN common blocks.
+*
+*-
+
+*   Bin size values along spectrum
+      LOGICAL NOBIN       ! whether defined
+      REAL*8 SBIN(1200)   ! bin sizees
+ 
+      COMMON / CMBIN   / NOBIN
+      COMMON / CMBIN_1 / SBIN

@@ -1,0 +1,30 @@
+*+
+*
+*   CMSIST common blocks.
+*
+*-
+
+*   Extraction statistics:
+      INTEGER NBUSE(2)     ! pixels used for BKG
+      INTEGER NBBAD(2)     ! pixels bad and not used for BKG
+      INTEGER NBUND(2)     ! number of undefined pixels in BKG
+      INTEGER NBREJ(2)     ! pixels rejected in BKG
+      INTEGER NCUSE        ! pixels used for CEN
+      INTEGER NCBAD        ! pixels defective, but used for CEN
+      INTEGER NCUND        ! pixels undefined, not used
+      INTEGER NGUSE        ! pixels used for NET
+      INTEGER NGBAD        ! pixels defective, but used for NET
+      INTEGER NGUND        ! pixels undefined, not used
+      REAL*8 ASBKG(2)      ! average of SCEN
+      REAL*8 ADBKG(2)      ! average of DCEN
+      REAL*8 ASCEN         ! average of SCEN
+      REAL*8 ADCEN         ! average of DCEN
+      REAL*8 ASNET         ! average of SNET
+      REAL*8 ADNET         ! average of DNET
+      REAL*8 AGCEN         ! average global centroid correction
+
+      COMMON / CMSIST   / NBUSE, NBBAD, NBREJ, NCUSE, NCBAD, NCUND,
+     :                    NGUSE, NGBAD, NGUND
+      COMMON / CMSIST_1 / ASBKG, ADBKG, ASCEN, ADCEN, ASNET, ADNET
+      COMMON / CMSIST_2 / NBUND
+      COMMON / CMSIST_3 / AGCEN

@@ -1,0 +1,13 @@
+*+
+*
+*   CMDEV common blocks.
+*
+*-
+
+*   Background Pixel Standard Deviation arrays.
+      LOGICAL NODEV          ! whether defined
+      REAL*8 SDEV(1200)      ! Standard Deviation on a background pixel
+      INTEGER QDEV(1200)     ! Quality of SDEV
+
+      COMMON / CMDEV   / NODEV, QDEV
+      COMMON / CMDEV_1 / SDEV

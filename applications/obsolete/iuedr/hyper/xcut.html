@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: XCUT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>XCUT</H2><HR>
+<H2>Usage</H2>
+<H3>XCUT=number,number</H3>
+<H2>Description</H2>
+This is one of the mechanisms that can be used to delimit  the  ends  of
+Echelle  orders that are calibrated for ripple response.  The two values
+of this parameter are the start and end "X" coordinates  of  the  order,
+where:
+<P>
+<PRE WIDTH=72>
+      X = PI * RIPA * (WAV - WAVC) * ORDER / WAVC
+</PRE>
+<P>
+and PI=3.14159, WAVC=RIPK/ORDER.  The  nature  of  the  standard  ripple
+function is that X is only formally meaningful in the range (-PI, +PI).
+<P>
+See the <A HREF=ripk.html>
+RIPK</A>
+, <A HREF=ripc.html>
+RIPC</A>
+ and <A HREF=ripa.html>
+RIPA</A>
+ parameter descriptions.
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:12 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,11 @@
+*+
+*
+*   CMERR common blocks.
+*
+*-
+
+*   Error String.
+      INTEGER EPOS        ! Position in error string.
+      BYTE EMESS( 400 )   ! Error message string.
+ 
+      COMMON / CMERR / EPOS, EMESS

@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: OUTMEAN.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=OUTMEAN>
+<I>IUEDR-Online HELP</I>
+<HR><H1>OUTMEAN</H1><HR>
+</A>
+<H2>Summary</H2>
+ Output mean spectrum from <A HREF=dataset.html>
+DATASET</A>
+ to a <A HREF=http://star-www.rl.ac.uk/dvi/sun50.dvi>
+DIPSO</A>
+ "SP" format file.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   OUTFILE         Name of output file.
+   SPECTYPE        "SPECTRUM" file type (0, 1 or 2).
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command outputs the mean spectrum associated with <A HREF=dataset.html>
+DATASET</A>
+ to a file
+that can be read into <A HREF=http://star-www.rl.ac.uk/dvi/sun50.dvi>
+DIPSO</A>
+ (see SUN/50).
+<P>
+This file is created with type specified by the <A HREF=spectype.html>
+SPECTYPE</A>
+  parameter (see
+<A HREF=http://star-www.rl.ac.uk/dvi/sun50.dvi>
+SUN/50</A>
+ for SP options),  and its name, if not specified, is constructed:
+<P>
+<PRE WIDTH=72>
+      &lt;CAMERA&gt;&lt;IMAGE&gt;M.sdf    for SP0
+      &lt;CAMERA&gt;&lt;IMAGE&gt;M.DAT    for SP1 or SP2
+</PRE>
+<P>
+In <A HREF=http://star-www.rl.ac.uk/dvi/sun50.dvi>
+DIPSO</A>
+ SP format, bad points are indicated by having zero intensities.
+In determining which  points in the output  file are to be marked "bad",
+the user-defined data quality bit is used.  Since this bit can be arbitrarily  edited,  faulty  data values can be  written to the output file,
+without subsequent information being retained.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="outfile.html">OUTFILE</A> * 
+<A HREF="spectype.html">SPECTYPE</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:04 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,1140 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL
+RUTHERFORD APPLETON LABORATORY
+SPACE & ASTROPHYSICS DIVISION
+
+Starlink Project                                             Issued by
+Release Notes
+
+                                                         Jack Giddings
+                                                        12 August 1983
+
+----------------------------------------------------------------------
+
+                   IUEDR Version 1.2 Release Notes
+                   -------------------------------
+
+
+
+1  INTRODUCTION
+
+This Release Note describes changes introduced with IUEDR Version 1.2.
+IUEDR  users  familiar with the User Guide can use these notes to find
+out how to use new commands and facilities.  The User  Guide  has  NOT
+been  updated  to  reflect ALL of these changes; however, updated HELP
+and Manual entries are available.
+
+
+
+2  SUMMARY
+
+One  minor  "bug"  has  been  corrected.   This  bug  was  related  to
+wavelength scales and should have been very apparent to users; that it
+was not reported to the Author  or  Starlink  implies  that  very  few
+people  (if  any)  are  affected.   The following commands are changed
+(improved):
+
+      PC, PE, PF, PM, PN, PS, CU, TRAK, OUTSPEC, OUTMEAN, SH, SETM
+
+These changes are  mostly  "transparent"  in  that  they  provide  new
+facilities and capabilities.
+
+Where sensible, the initial defaults for parameters have been arranged
+so  that  the  effect  of  earlier versions is maintained.  Of course,
+users who wish to take advantage of these new facilities all the  time
+can  create/modify  their  personal LOGIN.CMD file.  The following new
+commands are introduced:
+
+      LBLS         Create LBLS array from image
+      DI           Display Image on ARGS
+      EI           Edit Image using ARGS cursor
+      CUL          Set display limits using graphics cursor
+      PRINTSCAN    Print table of SCAN fluxes
+      PRINTGRS     Print table of gross and background
+
+                                - 1 -
+IUEDR Version 1.2 Release Notes                                 Page 2
+
+
+                   (order or aperture)
+      PRINTSPEC    Print table of spectrum fluxes (order or aperture)
+      PRINTMEAN    Print table of mean spectrum fluxes
+      PRINTLBLS    Print table of LBLS pixel intensities
+      OUTSCAN      Output SCAN fluxes to SPECTRUM or DIPSO 
+                   compatible file
+      OUTNET       Output Net spectrum to SPECTRUM or DIPSO 
+                   compatible file
+      OUTLBLS      Output LBLS pixel intensities to binary file
+      OUTEM        Output the spectrum templates to a file
+      TEMCAL       Read spectrum templates from a file
+
+The following parameters are introduced (commands indicated):
+
+      LINE         Line Style for plotting;  solid, dashed, etc. 
+                   (PC, PE, PF, PM, PN, PS).
+      LINEROT      Whether line style is rotated through a sequence 
+                   (PC, PE, PF, PM, PN, PS).
+      COL          Line Colour index (1, 2, 3, etc.) for plotting 
+                   (PC, PE, PF, PM, PN, PS).
+      COLROT       Whether Colour index is rotated through a sequence 
+                   (PC, PE, PF, PM, PN, PS).
+      HIST         Whether curves are plotted as histograms 
+                   (PE, PF, PM, PN).
+      QUAL         Whether data quality flags are plotted 
+                   (PE, PF, PM, PN, PS).
+      XP           Pixel limits for display along x-direction 
+                   (DI, CUL).
+      YP           Pixel limits for display along y-direction 
+                   (DI, CUL).
+      ZL           Intensity limits for image display (DI).
+      CUTWV        Whether cutoff wavelengths re used for wavelength 
+                   grid (TRAK, LBLS).
+      CENTM        Whether spectrum templates are used (TRAK, LBLS).
+      CENSH        Whether spectrum template is JUST shifted linearly 
+                   (TRAK).
+      CENSV        Whether generated spectrum template is saved (TRAK).
+      RL           LBLS R-grid limits (LBLS).
+      RSAMP        LBLS R-grid sample width (LBLS).
+      TEMFILE      File name for template data (TEMCAL, OUTEM).
+      SPECTYPE     Type of SPECTRUM compatible file produced (OUTSPEC,
+                   OUTMEAN, OUTSCAN, OUTNET).
+
+The structure of the Command Manual has been rationalised to  make  it
+easier  to  read  and  maintain.  The Manual is much more compact than
+before.
+
+Additional features which are not Command/Parameter specific include:
+
+      o  Reduced virtual memory requirements.
+
+
+
+                                - 2 -
+IUEDR Version 1.2 Release Notes                                 Page 3
+
+
+      o  Redirection of  printable  output  to  files  (which  can  be
+         printed within a session).
+
+      o  Better control over the submission of Batch Jobs.
+
+      o  Improvements to  the  way  in  which  scripts  are  processed
+         (prompting and echoing).
+
+
+
+
+3  BUG CORRECTIONS
+
+A full account of these and other bugs can be found in the files:
+
+      IUEDR_DOC:BUGS.LIS
+      IUEDR_DOC:BUGS.DOC
+
+SETA:  When used to set a velocity correction by, for example:
+
+      SETA VSHIFT=150.5
+
+this velocity was only associated with the dataset for  the  remainder
+of  the  IUEDR  session,  or  until the dataset is changed (which ever
+comes sooner).  When a dataset was  read  from  disk  into  IUEDR  the
+velocity  corrections  were  always  zero.   Velocities are now always
+remembered properly, and can be inspected using:
+
+      SH V=
+
+
+
+
+4  MANUAL
+
+The Manual information has been  re-organised  to  take  account  more
+sensibly  of  the  fact  that  parameters  are  "global" and hence not
+necessarily  restricted  to  any  particular  command.    The   Manual
+consists, as before, of files:
+
+      IUEDR_MAN:command.LIS
+      IUEDR_MAN:command.DOC
+
+where "command" is the name of the IUEDR  Command.   These  files  now
+contain  a  description of the command and a summary of the parameters
+used.  Detailed descriptions of the parameters can  be  found  in  the
+files:
+
+      IUEDR_DOC:GLOBAL.LIS
+      IUEDR_DOC:GLOBAL.DOC
+
+The HELP facility is unchanged.
+
+                                - 3 -
+IUEDR Version 1.2 Release Notes                                 Page 4
+
+
+5  REDIRECTION OF OUTPUT
+
+With few exceptions, IUEDR commands which output  textual  information
+send  this  directly  to  the  command terminal.  In some cases, it is
+helpful  if  this  can  be  diverted  to  a   file,   which   can   be
+inspected/printed  at  some  later  time.   This  can  be done by, for
+example:
+
+      LISTIUE  FILE=1  NFILE=-1  >JRG029
+
+In this case the primary output from the LISTIUE command  is  sent  to
+the  file "JRG029.LIS", and does not appear on the terminal.  If it is
+necessary to specify a more precise file name, then this can  be  done
+by using a quoted string:
+
+      LISTIUE  FILE=1  NFILE=-1  >"U1:[JRG.IUEDR]JRG029.TXT"
+
+Certain text  will  always  appear  on  the  command  terminal.   This
+includes  prompts  for parameter values, and also messages designed to
+keep the user informed about WHEN things are happening as in:
+
+      Reading Image from Tape
+
+Sometimes it is helpful to see the output on the terminal AND send  it
+to a file.  This can be done using, for example:
+
+      LISTIUE  FILE=1  NFILE=-1  &JRG029
+
+It should be emphasised that this redirection facility can be used for
+ANY  IUEDR  command.  However, it is expected to find most application
+in the LISTIUE, PRINT* and SH commands.
+
+
+
+6  LBLS ARRAY
+
+The LBLS command is  introduced  to  produce  a  line-by-line-spectrum
+(LBLS)  similar  to  the corresponding IUESIPS product.  The LBLS is a
+2-dimensional array with wavelength along one axis and  distance  from
+spectrum "centre" along the other.  Applications include:
+
+      o  Access to spatial information  present  in  extended  objects
+         observed through LAP.
+
+      o  Inspecting the region of the image along a spectrum in  order
+         to establish the reality of features.
+
+Like the TRAK command, the LBLS array is produced either for  a  LORES
+aperture or a HIRES order, as in:
+
+      LBLS  APERTURE=LAP
+
+
+                                - 4 -
+IUEDR Version 1.2 Release Notes                                 Page 5
+
+
+or
+
+      LBLS  ORDER=89
+
+The initial defaults for parameters which affect the operation of LBLS
+are described by:
+
+      LBLS  RL=(0,0),RSAMP=0.707,GSAMP=1.414,CUTWV=NO
+
+The RL parameter values are used along with RSAMP in  determining  the
+grid  of  R coordinates (measured in geometric pixels perpendicular to
+dispersion).  The case RL=(0,0) means that the range of R  coordinates
+will  be  decided  by the LBLS command, based on available information
+(camera, resolution, aperture, etc.).
+
+The RSAMP value indicates the spacing between positions on the  R-grid
+(in geometric pixels).  The R-grid can be specified explicitly by, for
+example:
+
+      LBLS  RL=(-10,10),RSAMP=1.0
+
+The  default  R-grid  is  only  really  useful  for  HIRES,  since  it
+guarantees  that  it  will  cover  the  area  around the Echelle order
+properly.
+
+There is a practical limit to the extent of the R-grid, so  that  (for
+example):
+
+      LBLS  RL=(-50,50),RSAMP=0.1
+
+would not be possible.  The actual limit is not easily described,  but
+is designed not to be exceeded by serious attempts to use LBLS.
+
+The wavelength grid is determined by the GSAMP and  CUTWV  parameters,
+which share value and meaning with their use in the TRAK command.
+
+The sampling rate of the  old  IUESIPS  LBLS  data  can  be  simulated
+(roughly) by:
+
+      LBLS  RL=(-38.178,38.178),RSAMP=1.414,GSAMP=1.414,CUTWV=YES
+
+However, better resolution can be obtained with:
+
+      LBLS  RL=(-16,16),RSAMP=1.0,GSAMP=1.0,CUTWV=YES
+
+Each pixel in the LBLS array represents a  surface  integral  of  size
+RSAMP  x  GSAMP geometric pixels (spatial x wavelength).  However, the
+intensities have been scaled (as with  TRAK)  so  that  the  effective
+wavelength  bin  is  equivalent to 1.414 geometric pixels.  This is so
+that, if the background were removed and pixels for a given wavelength
+were  "added up", then the existing IUESIPS absolute calibration could
+be used directly (LORES at least).
+
+                                - 5 -
+IUEDR Version 1.2 Release Notes                                 Page 6
+
+
+The PRINTLBLS and OUTLBLS comands are described separately below.
+
+
+
+7  SPECTRUM EXTRACTION TECHNIQUES
+
+TRAK, LBLS:  The technique used for integrating pixel  intensities  is
+now stabilised against over-sampling problems.
+
+In TRAK, the intensity of a point in the spectrum is  defined  as  the
+integral  of  image  intensity  over  a rectangle at its centre.  This
+rectangle  has  a  dimension  along  the  dispersion   direction   (W)
+corresponding  to  GSAMP  geometric  pixels,  and  a  dimension in the
+direction  perpendicular  to  dispersion  (R)  of  (GSLIT(2)-GSLIT(1))
+geometric pixels.
+
+In LBLS the only difference is in  the  dimension  of  this  rectangle
+perpendicular  to  dispersion  which  is  RSAMP geometric pixels.  The
+integral over this rectangle is formed by  folding  pixel  intensities
+with a 2-D function of the form:
+
+      F(DR,DW) = F(DR)*F(DW)
+
+where
+
+      FR(DR) = MAX(1.0, RPEAK*(1.0 - DR/RFWHM))
+
+and
+
+      FW(DW) = MAX(1.0, WPEAK*(1.0 - DW/FWHM))
+
+DR and DW are the absolute distances of the pixel from  the  rectangle
+centre  measured  along  the R and W directions (in geometric pixels).
+The integral is then:
+
+      AREA * SUMOF ( FN(P)*FR(DR)*FW(DW) ) / SUMOF ( FR(DR)*FW(DW) )
+
+where AREA is the effective area of the rectangle, and  the  ratio  of
+summations  over pixels are the weighted mean intensity per pixel, and
+FN(P) is the intensity of pixel P.
+
+The functions FW(DW) and FR(DR) are in fact truncated  triangles  with
+bases of half width RBASE and WBASE, and peaks RPEAK and WPEAK.
+
+The parameters describing these folding functions  are  obtained  from
+the following criteria:
+
+      o  The full width at  0.5  intensity  must  be  at  least  0.707
+         geometric pixels.
+
+
+
+
+                                - 6 -
+IUEDR Version 1.2 Release Notes                                 Page 7
+
+
+      o  The product of full widths at 0.5 intensity must be at  least
+         1.0 geometric pixels.
+
+      o  Precedence  is  given  to  resolution   in   the   wavelength
+         direction.
+
+This is achieved by the following (Fortran) sequence:
+
+      WMID = MAX( 0.707, GSAMP)
+      RMID = MAX (1.0/WMID), RSAMP)
+
+where  GSAMP  and  RSAMP  are  the  values  of   their   corresponding
+Parameters.  (In the case of TRAK RSAMP=(GSLIT(2)=GSLIT(1)).) Then for
+W:
+
+      WBASE = WMID + 0.707
+      WFWHM = WBASE/2.0
+      WPEAK = 0.5*WBASE/(WBASE - WMID)
+
+and R
+
+      RBASE = RMID + 0.707
+      RFWHM = RBASE/2.0
+      RPEAK = 0.5*RBASE/(RBASE - RMID)
+
+In both TRAK  and  LBLS  the  intensities  are  scaled  so  that  they
+correspond  to  an  integral  of  1.414  geometric  pixels  along  the
+wavelength direction.   This  means  that,  in  the  LORES  case,  the
+standard IUESIPS absolute calibration functions can be applied without
+scaling.
+
+The primary consequence of this algorithm  is  in  the  LBLS  command.
+Consider the example:
+
+      LBLS  GSAMP=0.707,RSAMP=0.707
+
+The folding function along wavelength will have FWHM  0.707  geometric
+pixels, however that perpendicular to dispersion will be:
+
+      MAX(1.414, RSAMP)
+
+If it is needed to obtain high  spatial  resolution,  then  wavelength
+resolution must be forfeited by adopting a higher GSAMP value.
+
+
+
+8  SPECTRUM EXTRACTION WAVELENGTH GRIDS
+
+TRAK, LBLS:  The CUTWV parameter is introduced.  It  controls  whether
+the Echelle Wavelength Clipping limits associated with a HIRES dataset
+are used as the start-end wavelengths in  the  extracted  spectrum  or
+LBLS array.  These limits can be displayed using:
+
+                                - 7 -
+IUEDR Version 1.2 Release Notes                                 Page 8
+
+
+      SH V=R
+
+The initial default is  CUTWV=NO,  which  means  that  the  extraction
+wavelength  grid  is  determined by the intersection of the dispersion
+line with the faceplate "circle".  For example,  the  wavelength  grid
+for order 89 in LWR is:
+
+      (2575.030,2620.598)
+
+In the case of the LWR camera, this leads to the bad photometry on the
+faceplate  ring  disrupting  the  accuracy  of  the  background (after
+smoothing).   By  setting  CUTWV=YES  for  the  above   example,   the
+wavelength grid would be:
+
+      (2580.0,2615.0)
+
+Which entirely avoids the faceplate ring defects, but at the  possible
+expense  of  losing features at the ends of the order.  If you want to
+look at features outside the Clipping limits for a  particular  order,
+then these limits can be changed using, for example:
+
+      SETM  WCUT=(2577.0,2617.0)
+
+(see further on about changes to the operation of SETM).
+
+
+
+9  SPECTRUM EXTRACTION TEMPLATES
+
+The path of a spectrum across an IUE  image  is  represented  only  to
+first  approximation  by  the  (almost) linear function defined by the
+dispersion constants.  Small-scale geometric distortions mean that the
+actual spectrum path will depart from that specified by the dispersion
+constants.  We can  think  of  the  spectrum  as  departing  from  the
+dispersion line in two ways:
+
+      o  A  linear   shift   with   components   in   wavelength   and
+         perpendicular to dispersion.
+
+      o  A detailed shape.
+
+Given a reasonable object signal, both of these can be defined  during
+spectrum  extraction  using  a  centroid approach.  However, there are
+situations where it would be better  to  not  determine  the  detailed
+shape from a particular image.
+
+For example, the signal may be so weak that the effects of  noise  and
+blemishes  produce an unrealistic "shape" from the centroids.  In this
+case, we should like to adopt a  detailed  shape  from  a  calibration
+image  (the  shape  doesn't  change  much in time), and merely use the
+object signal in our image to shift this into alignment.
+
+
+                                - 8 -
+IUEDR Version 1.2 Release Notes                                 Page 9
+
+
+In using the LBLS command, no analysis  is  performed  on  the  object
+signal centroids, thus it is essential to know the precise location of
+the spectrum on the image beforehand.  This can be obtained, as above,
+from  a  calibration image, or more simple by running TRAK on the same
+image.
+
+The detailed spectrum shapes are called (spectrum) "templates".   They
+consist  a  set  of  displacements, DR, perpendicular to dispersion at
+specified wavelengths.
+
+These templates can be associated with a DATASET  and  stored  in  the
+".UEC" file.  By typing:
+
+      SH V=C
+
+the orders (HIRES)  or  apertures  (LORES)  for  which  templates  are
+defined are displayed.
+
+There are a number of ways in which these templates can be defined.
+
+      o  They may be supplied automatically by  the  READIUE  command,
+         while  the  dataset  is  being read from tape.  However, this
+         will not apply to datasets created prior to version 1.2.
+
+      o  They may be read into the  dataset  explicitly  from  a  file
+         using the TEMCAL command.
+
+      o  They may be created by using the TRAK command and associating
+         the  resultant  centroid shifts with the template calibration
+         in that dataset (CENSV parameter).
+
+TEMCAL(NEW):  This new command can be used to read  templates  into  a
+dataset, as in:
+
+      TEMCAL  TEMFILE="IUEDR_DATA:SWPHILAP"
+
+which reads the file "SWPHILAP.TEM" from  the  "IUEDRDATA"  directory.
+Here  is  a  list  of  the  names of files containing various Template
+Calibrations:
+
+      FILE            CONTENTS
+      SWPHILAP.TEM    SWP,LAP,HIRES
+      SWPHISAP.TEM    SWP,SAP,HIRES
+      LWRHILAP.TEM    LWR,LAP,HIRES
+      LWRHISAP.TEM    LWR,SAP,HIRES
+      LWPHILAP.TEM    LWP,LAP,HIRES
+      LWPHISAP.TEM    LWP,SAP,HIRES
+      SWPLO.TEM       SWP,LORES
+      LWRLO.TEM       LWR,LORES
+      LWPLO.TEM       LWP,LORES
+
+Due to lack of suitable calibration images, some of  these  files  may
+
+                                - 9 -
+IUEDR Version 1.2 Release Notes                                Page 10
+
+
+not exist at the present.
+
+The internal format of these ".TEM" files will  not  be  described  at
+this  time.   However,  it  is  possible  for users to create template
+files, based on their own "calibration"  images.   This  can  be  done
+using the TRAK and the OUTEM commands.
+
+OUTEM(NEW):  This new command can be  used  to  output  the  templates
+associated with a dataset to a text file, as in:
+
+      OUTEM  TEMFILE=SWP3196
+
+This creates a file "SWP3196.TEM", which can subsequently be input  to
+other datasets (other images) using the TEMCAL command.
+
+It should be reaslised that TRAK does not automatically store centroid
+shifts  in  the  dataset.   This  must be done by specifying the CENSV
+parameter.
+
+TRAK:  The CENSV parameter is introduced to allow the centroid  shifts
+determined  by  TRAK  to  be  stored as a template in the dataset.  An
+example is:
+
+      TRAK  CENSV=YES,CENIT=1
+
+Note that the initial default for CENSV=NO.
+
+The standard templates (in the files listed  above)  were  created  by
+extracting spectra of various types with CENSV=YES.
+
+TRAK, LBLS:  The CENTM parameter  is  introduced.   This  is  used  to
+indicate  whether any available predefined spectrum templates are used
+to modify the dispersion relations in specifying where the spectrum is
+on the image.  In the case of TRAK this may just represent an improved
+initial guess to  the  spectrum  shape,  to  be  refined  by  centroid
+iterations (CENIT=1).
+
+Although TRAK can very often determine  the  detailed  spectrum  shape
+from  the object signal, LBLS (to be described) cannot do this.  Also,
+in some cases, the object signal is too weak to specify  the  detailed
+spectrum shape.
+
+These predefined spectrum  templates  can  be  produced  by  the  TRAK
+command,  stored  with a dataset, written to a separate file, and read
+into a dataset from a file.  Thus "standard" spectrum  shapes  can  be
+determined from good quality images for use with weak ones.
+
+TRAK:   The  CENSH  parameter  controls   whether,   during   centroid
+iterations,  the  object  signal  is  just  used  to shift the initial
+template (CENSH=YES)  without  changing  its  shape,  or  whether  the
+detailed shape can be refined (CENSH=NO).
+
+
+                                - 10 -
+IUEDR Version 1.2 Release Notes                                Page 11
+
+
+For weak object signals, the best approach would be to use a  standard
+spectrum  template (see below on how to get this), and just shift this
+laterally to allign with the data.  This can be done by, for example:
+
+      TRAK  CENTM=YES,CENSH=YES,CENIT=1
+
+The assumption here is that the shapes of the calibration  and  object
+spectra   are   similar,   suffering   only   a   linear  displacement
+(perpendicular to dispersion).
+
+In the  case  of  HIRES  where  the  spectrum  contains  gaps  (strong
+absorption  features),  the  adoption of a pre-defined template allows
+precise  signal  location;  this  is  important  in  positioning   the
+inter-order channels.
+
+The initial template can be used simply as a good first  approximation
+to the detailed shape, using:
+
+      TRAK CENTM=YES,CENSH=NO,CENIT=1
+
+This approach is not recommended unless there  are  good  reasons  for
+thinking  that  the  pre-defined template has a different "shape" from
+the actual spectrum; in which case, it is  probably  better  to  start
+from the dispersion constants:
+
+      TRAK CENTM=NO,CENSH=NO,CENIT=1
+
+which is the initial default.
+
+
+
+10  SPECTRUM EXTRACTION BACKGROUND SLITS
+
+TRAK:  It is now possible to specify, with complete freedom, the GSLIT
+and  BDIST  parameter  values.   For  example,  in  order  to  use the
+background on one side of a spectrum:
+
+      TRAK ...,AUTOSLIT=NO,GSLIT=(-8.0,0.0),BDIST=(-10,-10)
+
+This works for both LORES and HIRES, but it must  be  remembered  that
+for  HIRES  it  is  necessary  to specify EXTENDED=YES,CONTINUUM=NO in
+order to be allowed to over-ride the standard  restrictions  on  GSLIT
+and BDIST.
+
+
+
+11  PRINT COMMANDS
+
+A number commands have been added which allow various kinds of data to
+be  output  in tabular form.  These commands generally produce a large
+amount of output which should be diverted away from the  terminal  and
+to  a file (using the ">" command line syntax) for subsequent spooling
+
+                                - 11 -
+IUEDR Version 1.2 Release Notes                                Page 12
+
+
+to a line-printer.
+
+The outputs are intended for "visual" examination,  and  their  format
+cannot be guaranteed to remain the same; therefore, they should not be
+read into programs!
+
+PRINTSCAN(NEW):  This new  command  can  be  used  to  print  a  table
+containing  the  intensities  in  the current scan (as produced by the
+SCAN command).  For example:
+
+      SCAN
+      PRINTSCAN  >SWP3196P
+
+PRINTGRS(NEW):  This new  command  can  be  used  to  output  detailed
+information (gross, net, smooth background, calibrated flux) available
+following spectrum extraction with the TRAK command.  For example:
+
+      TRAK
+      PRINTGRS  >SWP3196G
+
+PRINTSPEC(NEW):  This new command prints out the  net  and  calibrated
+fluxes for a spectrum (LORES aperture or HIRES order), as in:
+
+      PRINTSPEC  DATASET=SWP3196  APERTURE=LAP  >SWP3196L
+
+or
+
+      PRINTSPEC  DATASET=SWP6766  ORDER=89  >"SWP6766.89"
+
+which prints a table consisting  of  Wavelength,  Net  and  Calibrated
+Fluxes, along with any data quality information.
+
+PRINTMEAN(NEW):  This new command can be used  to  tabulate  the  mean
+spectrum, as in:
+
+      PRINTMEAN  >SWP3196M
+
+It is important to realise, when using this  command  that  some  mean
+spectra  may  involve  20000  points, and that this would lead to over
+20000 lines of output!
+
+PRINTLBLS(NEW):  This new command can be used to tabulate the  current
+LBLS array, as in:
+
+      PRINTLBLS  >SWP3196R
+
+It should be born in mind that since the LBLS command allows the array
+size  to  be  selected  at  creation,  arrays with more than a certain
+number of R-values  cannot  be  printed  "sensibly".   However,  every
+effort  is  made to print the pixel intensities for a given wavelength
+on a single output line.
+
+
+                                - 12 -
+IUEDR Version 1.2 Release Notes                                Page 13
+
+
+12  DATA OUTPUT COMMANDS
+
+Some additional "OUT" commands have been added  which  produce  output
+files  suitable  for  input  to  separate  data reduction and analysis
+programs.
+
+For  spectrum-like  data,  the  OUTSPEC  and  OUTMEAN   commands   are
+complemented  by  OUTNET  and  OUTSCAN.  All of these commands produce
+files suitable for input to either  SPECTRUM  (Steve  Adams,  UCL)  or
+DIPSO (Maslen & Howarth, UCL).
+
+The OUTLBLS command is introduced to make the LBLS array available  to
+separate   analysis   programs.    OUTNET(NEW):    This   produces   a
+SPECTRUM/DIPSO file containing the uncalibrated Net spectrum.  If  the
+OUTFILE parameter is not specified, a default file name is constructed
+using the camera,  image  number  and  aperture/order,  which  can  be
+inspected with:
+
+      OUTNET OUTFILE=?
+
+All of the calibrations concerned with intensity are omitted.   OUTNET
+is expected to be helpful for cases where calibrations will be handled
+independently.
+
+OUTSCAN(NEW):  This command produces a  file  containing  the  current
+scan.  It can be run by, for example:
+
+      OUTSCAN OUTFILE=?
+
+It should be pointed out that in a scan,  the  ordinate  (x-axis)  can
+include  negative  values,  and that such "spectra" may not be handled
+sensibly in some programs.
+
+OUTSPEC,  OUTMEAN,  OUTNET,  OUTSCAN:   The  SPECTYPE   parameter   is
+introduced.   SPECTYPE  corresponds  to  the type of file input to the
+SPECTRUM or DIPSO programs.  Values 0, 1 and 2 (binary,  fixed  format
+and  free  format)  are  available.   This  should  make getting IUEDR
+results into other programs much easier than before.
+
+OUTLBLS(NEW):  This command can be used to  output  the  current  LBLS
+array to a binary sequential file, as in:
+
+      OUTLBLS OUTFILE=?
+
+The contents of this  file  are  best  described  by  the  Fortran  77
+subroutine,  RDLBLS,  and the program, READLB, the source of which can
+be found in the directory with Logical Name:
+
+      IUEDR_USER:
+
+The RDLBLS source is  well  commented,  and  can  be  called  directly
+(probably  without  change)  from  programs which wish to access these
+
+                                - 13 -
+IUEDR Version 1.2 Release Notes                                Page 14
+
+
+LBLS files.
+
+
+
+13  PLOTTING
+
+PF, PN, PM, PS, PC, PE:  These commands now have additional parameters
+which allow control over line styles (solid, dashed, etc.) and colours
+(on ARGS only).
+
+The line style is controlled by the LINE and LINEROT parameters.   The
+LINE parameter can take on one of the following names:
+
+      SOLID       Solid (continuous) line
+      DASH        Dashed line
+      DOTDASH     Dot-dash line
+      DOT         Dotted line
+
+These line styles represent a cycle which can be used instead  of  (or
+as  well as) colour as a means of differentiating several spectra on a
+single graph.  To step through the cycle (SOLID, DASH,  DOTDASH,  DOT,
+SOLID, DASH, ...) for a particular graph, the LINEROT parameter should
+have the value TRUE.  Thus:
+
+      DEVICE=S5670
+      LINEROT=TRUE
+      PF ORDER=89
+      PF ORDER=90,RS=NO
+
+which plots order 89 as a solid line and order 90 as  a  dashed  line.
+Alternatively, the initial line style can be chosen explicitly, as in:
+
+      LINEROT=TRUE
+      PF ORDER=89,LINE=DASH
+      PF ORDER=90,RS=NO
+
+which plots order 89 as a dashed line and order 90 as dot-dashed line.
+The  line  style  can,  of course be selected explicitly for each plot
+command, using LINE (regardless of LINEROT), as in:
+
+      PF ORDER=89,LINE=DASH
+      PF ORDER=90,LINE=SOLID,RS=NO
+
+For a given graph there is a current position in  the  cycle  of  line
+styles.    This  is  initially  set  to  SOLID,  although  it  can  be
+over-ridden by the LINE parameter.  The rule is that  if  LINEROT=TRUE
+then  this current position is changed after plotting to the next line
+style.  This behaviour is consistent with the PE and PC commands which
+plot more than a single set of points at a time.
+
+
+
+
+                                - 14 -
+IUEDR Version 1.2 Release Notes                                Page 15
+
+
+The colour used for lines within a graph is controlled by the COL  and
+COLROT  parameters.   The  effect  of  the (COL,COLROT) combination is
+similar to that of (LINE,LINEROT) described above,  and  will  not  be
+re-iterated.   The  difference is that COL takes integer values from 1
+to  10,  corresponding  to  a  pre-selected  set   of   line   colours
+(yellow,green, etc.).  So for example:
+
+      PF ORDER=89,COL=4
+      PF ORDER=90,COL=2
+
+will plot order 89 as green and  order  90  as  yellow.   The  initial
+defaults for LINEROT and COLROT are:
+
+      LINEROT=FALSE
+      COLROT=TRUE
+
+Users not using an ARGS should therefore set LINEROT=TRUE.
+
+PC:  This command now always plots 2 curves.  The first represents the
+departure  of  the  spectrum template (as used in spectrum extraction)
+from the formal  dispersion  relations.   The  second  represents  the
+correction  to  this  template  defined  by  the object signal.  These
+curves can be differentiated by line styles and/or colour as described
+above.
+
+PF,  PN:   These  commands  now  no  longer  attempt   to   plot   the
+"significance"  level  corresponding  to  1  standard deviation in the
+background.
+
+PF, PN, PM, PE:  These commands have  a  new  parameter,  HIST,  which
+specifies  whether  the  spectra  are  plotted  as  a  histogram.  For
+example,
+
+      PF ORDER=89 HIST=YES
+      PF ORDER=90,HIST=NO,RS=NO
+
+plots order 89 as a histogram  and  order  90  as  a  poly-line.   The
+initial  default  for  HIST=TRUE.   The PS and PC commands always plot
+their curves as poly-lines.
+
+PE, PF, PN, PM:  These commands have  a  new  parameter,  QUAL,  which
+controls  whether  the data quality information associated with faulty
+points is plotted.  The default is QUAL=YES  which  leads  to  symbols
+being  plotted at the positions of faulty points in the spectrum.  The
+key to these symbols is given in the Manual/HELP text.
+
+Use of QUAL=NO would normally be needed if  the  symbols  from  faulty
+points are obscuring the "good" data!
+
+
+
+
+
+                                - 15 -
+IUEDR Version 1.2 Release Notes                                Page 16
+
+
+14  IMAGE DISPLAY
+
+DI(NEW):  This command displays the image on the ARGS.  An example is:
+
+      DI  ARGS=IDA0
+
+This is probably the simplest way in which DI  can  be  invoked.   The
+ARGS  parameter  can  take one of "IDA0" or "IDB0", according to which
+ARGS is to be used.  Note that the ARGS parameter  is  independent  of
+the  DEVICE  parameter used by the various spectrum plotting commands.
+Thus the sequence:
+
+      PF DEVICE=S5670
+      DI ARGS=IDA0
+      PF
+
+will produce two plots (in sequence) on  the  S5670  device,  with  an
+image  displayed on the ARGS (IDA0).  One problem remains in that when
+output is sent to a new device (ARGS  or  DEVICE)  then  the  previous
+plots are no longer available for cursor measures etc.
+
+The output from DI can be controlled by the XP, YP and ZL  parameters.
+XP and YP specify the pixel subset to be drawn.  If either of XP or YP
+are undefined, then the  full  extent  of  the  image  is  adopted  as
+default.  An example of specific image display is:
+
+      DI XP=(380,420),YP=(220,180)
+
+which displays  an  expanded  subset  of  the  image.   Note  that  by
+reversing  the order of values in YP (as above) you are able to "flip"
+the image; XP behaves similarly.  DI expands or compresses  the  image
+to fit on the display so that:
+
+      o  Maximum display space is used.
+
+      o  The complete image subset (as specified  by  XP  and  YP)  is
+         displayed.
+
+Expansion is performed by duplicating image  pixels.   Compression  is
+performed  by averaging adjacent image pixels.  The shape of the image
+is always preserved; therefore, it is sensible to keep the XP  and  YP
+ranges of a similar size to avoid rather odd shaped pictures.
+
+The image intensities displayed are limited by the values  of  the  ZL
+parameter, and relate to picture intensities by:
+
+      ZL(1)     is black
+      ZL(2)     is white
+
+Image intensities between ZL(1) and ZL(2) follow a linear  grey-scale.
+If  the  ZL  parameter  is  undefined, the full intensity range of the
+image  is  displayed.   However,  specific  intensity  ranges  can  be
+
+                                - 16 -
+IUEDR Version 1.2 Release Notes                                Page 17
+
+
+selected, as in:
+
+      DI  ZL=(-1000,1000)
+
+which will  enhance  the  contrast  for  intensities  around  zero  FN
+(assuming a GPHOT or PHOT image).  Alternatively:
+
+      DI  ZL=(32000,-2000)
+
+will display a "negative" image (black is  bright,  white  is  faint).
+The  FLAG parameter controls whether bad pixels are colour coded (c.f.
+QUAL for  plotting  commands).   The  details  of  colour  coding  are
+available in the Manual/HELP text.
+
+
+
+15  IMAGE EDITING
+
+EI(NEW):  This command allows the data quality of a displayed image to
+be  edited  using  the cursor.  The edits affect the user-setable data
+quality bit associated with each pixel in the  image.   To  invoke  EI
+type:
+
+      EI
+
+The only parameter of significance is TBALL which selects  either  the
+Tracker Ball or keyboard as cursor control mechanism.
+
+EI uses the cursor in a similar way to the ES and EM  commands  except
+that  both  the  x-  and  y-coordinates of pixels/regions are defined.
+(See the EI Manual entry for details).
+
+The data quality for a pixel consists a series of switches  indicating
+whether it is affected by various phenomena:
+
+      ITF Extrapolation
+      ITF Truncation
+      ITF Saturation
+      Proximity of fiducial (reseau mark)
+
+These switches cannot be changed;  however,  there  is  an  additional
+user-setable  switch for each pixel.  Any pixels affected by the above
+phenomena (except ITF extrapolation) have  the  user-switch  set  BAD.
+Additional  pixels/regions  can  be  set  BAD  (or  GOOD) using the EI
+command.
+
+
+
+16  CURSOR COMMANDS
+
+CUL(NEW):  This command uses the cursor to select a subset of  a  plot
+or  displayed  image for future plotting or display respectively.  The
+
+                                - 17 -
+IUEDR Version 1.2 Release Notes                                Page 18
+
+
+command consists  two  cursor  hits,  specifying  the  start  and  end
+coordinates  of  the  region.   The  sequence of the hits is important
+since it allows for the case of reverse limits.
+
+For displayed image, CUL uses its measurements to set values  for  the
+XP  and  YP parameters.  For any other plot, it sets values for the XL
+and YL parameter.
+
+CU:  This command  now  provides  better  information  about  measured
+coordinates and operates on displayed images.
+
+
+
+17  OTHERS
+
+SETM:  This  command  now  behaves  slightly  differently  to  before.
+Reasonable  default  values  will  be  obtained,  where  possible, for
+parameters associated with the specified order.  These can be values:
+
+      o  Previously associated with the order
+
+      o  Generated from a global calibration
+
+The latter are provided to give guidance in cases where some  kind  of
+individual  value  is  needed,  but where the actual value needs to be
+determined by subsequent experimentation.
+
+A NULL response (the "!" character) to any calibration parameter (i.e.
+RIPK,  RIPA,  RIPC,  WCUT)  will lead to the removal of any individual
+value associated with the order.
+
+Acceptance of the default leads to retention of that parameter  value.
+If  the  value  was  obtained from a global default then no individual
+value is associated with  the  order.   Otherwise  and  if  the  value
+actually changes, an individual value is stored.
+
+This all sounds complicated, but in essence should behave  "sensibly".
+If  in  doubt  as  to what values are retained, use the appropriate SH
+command to inspect the calibration(s).
+
+SH:  This command now allows an additional item to be contained in the
+V parameter string, as in:
+
+      SH V=C
+
+which shows the  spectrum  templates  currently  associated  with  the
+dataset.
+
+
+
+
+
+
+                                - 18 -
+IUEDR Version 1.2 Release Notes                                Page 19
+
+
+18  BATCH JOB SUBMISSION
+
+The "built-in" way of running IUEDR in a VMS Batch Job has  been  made
+more  flexible.   Essentially, by invoking IUEDR with a command of the
+form:
+
+      $ IUEDR  file  /BATCH
+
+a file "file.JOB" is created containing, essentially:
+
+      $ IUEDR file
+
+and this is supplied to the DCL SUBMIT command to run as a  Batch  Job
+in  the  current  directory.   Additional  SUBMIT  qualifiers  can  be
+supplied by, for example:
+
+      $ IUEDR  file  /BATCH/QUEUE=SLOW/NOTIFY
+
+Note that "file" is separated from "/BATCH..." by one or more  blanks,
+and that the qualifiers should not contain embedded blanks.
+
+To find out more about the DCL SUBMIT command use VMS HELP.   However,
+the  /LOGFILE qualifier should not be used, since this file is already
+specified as "file.LOG".
+
+
+
+19  SCRIPTS
+
+Until now, if parameters used by commands running  in  a  script  were
+undefined,  the  command  failed,  and the remainder of the script was
+ignored.
+
+It is now possible to run scripts which  will  prompt.   For  example,
+suppose to file "TEST.CMD" contains:
+
+      PF
+      CU
+
+Assuming that the DATASET parameter is undefined, the command:
+
+      <"TEST.CMD"
+
+will lead to the user being prompted for DATASET before the PF command
+completes.  The CU command then runs, requesting cursor inputs.
+
+The commands read  from  a  script  are  now  echoed  on  the  command
+terminal.   This  should  make it clearer what is actually being done,
+and the  ability  to  be  prompted  when  something  is  undefined  or
+unsuitable makes scripts a lot easier to use.
+
+
+
+                                - 19 -
+IUEDR Version 1.2 Release Notes                                Page 20
+
+
+20  PAGE FILE QUOTAS
+
+This version of IUEDR requires less virtual memory (Page  File  Quota)
+than  previously.   An implication of this is that larger programs can
+be run from within IUEDR, as in:
+
+      @SPECTRUM
+
+which runs Steve Adams' SPECTRUM program from IUEDR.  (The combination
+of  IUEDR+SPECTRUM  has  previously  been  excluded  since it required
+unreasonable amounts of Page File Quota.)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 20 -

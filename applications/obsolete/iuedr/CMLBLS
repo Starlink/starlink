@@ -1,0 +1,26 @@
+*+
+*
+*   CMLBLS common blocks.
+*
+*-
+
+*   LBLS data.
+      LOGICAL NOLBLS     ! whether exists
+      INTEGER NU         ! number of u-values
+      REAL*8 U1          ! start u-value
+      REAL*8 DU          ! u-spacing
+      REAL*8 US(120)     ! u-values
+      BYTE ULAB(40)      ! u-label
+      BYTE UUNT(40)      ! u-units
+      INTEGER NV         ! number of v-values
+      REAL*8 V1          ! start v-value
+      REAL*8 DV          ! v-spacing
+      REAL*8 VS(1200)    ! v-values
+      BYTE VLAB(40)      ! v-label
+      BYTE VUNT(40)      ! v-units
+      BYTE DLAB(40)      ! Data label
+      BYTE DUNT(40)      ! Data units
+
+      COMMON / CMLBLS   / NOLBLS, NU, ULAB, UUNT, NV, VLAB, VUNT
+      COMMON / CMLBLS_1 / DLAB, DUNT
+      COMMON / CMLBLS_2 / U1, DU, US, V1, DV, VS

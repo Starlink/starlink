@@ -1,0 +1,21 @@
+*+
+*
+*   CMCOLR common blocks.
+*
+*-
+
+*   Image display colour/intensities for use with line graphics:
+      INTEGER TIAXES     ! Axis intensity.
+      INTEGER TIPLOT(10) ! Colours for each curve.
+      INTEGER TICNT      ! Number of curve colours.
+      INTEGER TICUR      ! Current colour index.
+      INTEGER TIUSER     ! User marker colour.
+      INTEGER TITEXT     ! Text colour.
+      INTEGER TIMARK     ! Marker colour.
+      LOGICAL TIROT      ! Colour table rotation?
+
+      COMMON / CMCOLR   / TIAXES, TIPLOT, TIUSER, TITEXT
+      COMMON / CMCOLR_1 / TIMARK
+      COMMON / CMCOLR_2 / TICNT
+      COMMON / CMCOLR_3 / TICUR
+      COMMON / CMCOLR_4 / TIROT

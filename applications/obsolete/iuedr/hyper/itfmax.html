@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: ITFMAX.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>ITFMAX</H2><HR>
+<H2>Usage</H2>
+<H3>ITFMAX=number</H3>
+<H2>Description</H2>
+This is the pixel value on tape corresponding to  <A HREF=itf.html>
+ITF</A>
+  saturation.   Its
+value  is  fixed  for  a  given  <A HREF=itf.html>
+ITF</A>
+ table.  The value of ITFMAX is only
+needed for IUE images of type "GPHOT".  The  appropriate  value  can  be
+determined  from  inspection  of the IUE Text Header for the GPHOT file,
+and in particular the table of numbers following the line  which  begins
+"PCF C/**".  Here are the ITFMAX values associated with various forms of
+this table:
+<P>
+<PRE WIDTH=72>
+      ITFMAX    TABLE                           IDENTIFICATION
+      20000     0  1800  3700  5600  ... 30000  Preliminary LWR ITF
+      27220     0  2303  4069  8008  ... 42032  2nd LWR ITF
+      19983     0  1800  3600  5500  ...        Preliminary SWP ITF
+      19740     0  1753  3461  6936  ... 28674  Faulty, 2nd SWP ITF
+      19632     0  1684  3374  6873  ... 28500  Corrected, 3rd SWP ITF
+</PRE>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:09 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: MTSKIPEOV.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=MTSKIPEOV>
+<I>IUEDR-Online HELP</I>
+<HR><H1>MTSKIPEOV</H1><HR>
+</A>
+<H2>Summary</H2>
+ Skip over EOV mark.
+<P>
+<PRE WIDTH=72>
+   DRIVE           Tape Drive Name.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command skips over an EOV mark on the tape specified by  the  <A HREF=drive.html>
+DRIVE
+</A>
+parameter.   An  EOV  condition  is where there are two consecutive tape
+marks.  When attempting to skip across an EOV, an error will be reported
+and the tape left positioned between the two marks.  Subsequent attempts
+to skip forward will fail, and only this command can  be  used  to  move
+forward beyond the second tape mark.
+<H2>Available Topics</H2>
+<A HREF="drive.html">DRIVE</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:02 1995
+</ADDRESS>
+</BODY>
+</HTML>

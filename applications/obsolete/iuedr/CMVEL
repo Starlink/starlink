@@ -1,0 +1,12 @@
+*+
+*
+*   CMVEL common blocks.
+*
+*-
+
+*   Velocity Shift Data
+      LOGICAL NOVEL     ! whether defined
+      REAL*8 VEL(2)     ! velocity for each aperture
+
+      COMMON / CMVEL   / NOVEL
+      COMMON / CMVEL_1 / VEL

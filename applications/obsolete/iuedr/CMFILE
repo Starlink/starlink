@@ -1,0 +1,18 @@
+!   CMFILE common blocks
+
+!   FILE information for SCAN
+      LOGICAL NODSN         ! Whether DSNAME is defined.
+      LOGICAL DSCHAN        ! Whether current image has changed.
+      INTEGER DATA_VM       ! DATA VM address.
+      INTEGER QUAL_VM       ! QUAL VM address.
+      LOGICAL CACHAN        ! Whether calibration has changed.
+      LOGICAL DQCHAN        ! Whether data quality has changed.
+      LOGICAL DACHAN        ! Whether data array has changed.
+      LOGICAL SPCHAN        ! Whether spectrum has changed.
+      LOGICAL MECHAN        ! Whether mean spectrum has changed.
+      BYTE DSNAME( 81 )     ! File name of current image.
+
+      COMMON / CMFILE   / NODSN, DSCHAN, DATA_VM, QUAL_VM, CACHAN,
+     :                    DACHAN, SPCHAN, DSNAME
+      COMMON / CMFILE_1 / DQCHAN
+      COMMON / CMFILE_2 / MECHAN

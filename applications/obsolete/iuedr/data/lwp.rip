@@ -1,0 +1,12 @@
+'IUE_RIP'
+'LWP:  Ake (1982).'
+1  231150
+0.896
+-3.0 +3.0
+
+# Title:     LWP Ripple Constants.
+# From:      Canonical LWR value (not the fudge).
+# Contents:  (TYPE, LABEL,  NRIPM, (RIPM(I),I=1,NRIPM), ALPHA, XMIN, XMAX)
+# Notes:     Wavelengths above 2000 A are "Air".
+#            WARNING ... these are only rough values
+# End:

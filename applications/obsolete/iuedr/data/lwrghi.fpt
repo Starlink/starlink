@@ -1,0 +1,10 @@
+'IUE_FACE'
+364 404 390
+54.42 -364 364
+
+# Title:     LWR,GEOM,HIRES Faceplate Specification
+# From:      Giddings (1982, Private Communication).
+# Contents:  (RADIUS, SC, LC, ANGLE, RMIN, RMAX)
+# Notes:     The circular specification of faceplate bounds is only
+#            an approximation to a real IUE camera.
+# End:

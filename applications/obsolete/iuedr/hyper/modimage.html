@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: MODIMAGE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=MODIMAGE>
+<I>IUEDR-Online HELP</I>
+<HR><H1>MODIMAGE</H1><HR>
+</A>
+<H2>Summary</H2>
+ Modifies actual image intensities interactively.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   FN              Replacement Flux Number for pixel
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command allows the image display cursor to be used to modify  image
+data.   The  image  should already have been displayed using the <A HREF=drimage.html>
+DRIMAGE
+</A>
+command.
+<P>
+The following cursor sequences are adopted:
+<P>
+<PRE WIDTH=72>
+      1 then 2        Copy intensity of first picked pixel to the second
+      2               Prompt for replacement pixel intensity
+      3               Finish
+</PRE>
+<P>
+Mouse buttons can be used for cursor hits where:
+<P>
+<PRE WIDTH=72>
+      left button     is  hit 1
+      middle button   is  hit 2
+      right button    is  hit 3
+</PRE>
+<P>
+Alternatively, keyboard keys 1, 2 and 3 can be used to mark hits.
+<P>
+If the data and/or quality changes after a session, the file is saved on
+disk.
+<P>
+The assumption is made that  the current image  displayed corresponds to
+the current dataset!
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="device.html">DEVICE</A> * 
+<A HREF="fn.html">FN</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:01 1995
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,26 @@
+*+
+*
+*   CMRIP common blocks.
+*
+*-
+
+*   Ripple calibration data.
+      LOGICAL NORIP           ! whether defined
+      BYTE RIPTP(16)          ! Ripple Data Type
+      BYTE RIPID(40)          ! identification label
+      INTEGER NRIPM           ! number of terms in M
+      REAL*8 RIPM(6)          ! Ripcon in terms of M
+      REAL*8 RIPALF           ! Ripple "alpha" value
+      REAL*8 XRLIM(2)         ! ripple "x" limits
+      INTEGER NRIPO           ! number of ripple orders
+      INTEGER RIPOS(100)      ! ripple order numbers
+      REAL*8 RIPKS(100)       ! ripple K-values
+      REAL*8 RIPAS(100)       ! ripple A-values
+      INTEGER NRIPCS(100)     ! number of coefficients per order
+      REAL*8 RIPCS(6, 100)    ! ripple polynomials
+
+      COMMON / CMRIP   / NORIP, NRIPM
+      COMMON / CMRIP_1 / RIPTP
+      COMMON / CMRIP_2 / RIPID
+      COMMON / CMRIP_3 / NRIPO, RIPOS, NRIPCS
+      COMMON / CMRIP_4 / RIPM, RIPALF, XRLIM, RIPKS, RIPAS, RIPCS

@@ -1,0 +1,14 @@
+*+
+*
+*   CMPLOT common blocks.
+*
+*-
+
+*   Plot data (design):
+      INTEGER NPOINT          ! Plot length.
+      REAL XPLOT( 27800 )     ! X-values.
+      REAL YPLOT( 27800 )     ! Y-values.
+      INTEGER QPLOT( 27800 )  ! Q-values.
+
+      COMMON / CMPLOT   / XPLOT, YPLOT
+      COMMON / CMPLOT_1 / QPLOT, NPOINT

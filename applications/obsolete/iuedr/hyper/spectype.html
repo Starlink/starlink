@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: SPECTYPE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>IUEDR-Online HELP</I>
+<HR><H2>SPECTYPE</H2><HR>
+<H2>Usage</H2>
+<H3>SPECTYPE=number</H3>
+<H2>Description</H2>
+This is the type of file (in the terminology of Steve Adams old SPECTRUM
+program), to be created.  The following values are allowed:
+<P>
+<PRE WIDTH=72>
+      0       Starlink standard NDF
+      1       Fixed format file
+      2       Free format file
+</PRE>
+<P>
+It is recommended  that  datasets  with  many  points  be  written  with
+SPECTYPE=0,  which  is  more  efficient  in  disk  space  and time spent
+reading/writing.
+<P>
+It should be noted  that files created  with any of these formats can be
+read into the <A HREF=http://star-www.rl.ac.uk/dvi/sun50.dvi>
+DIPSO</A>
+ program (Maslen/Howarth, UCL, see SUN/50).
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:04 1995
+</ADDRESS>
+</BODY>
+</HTML>

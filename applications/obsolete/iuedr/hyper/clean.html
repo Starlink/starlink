@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: CLEAN.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=CLEAN>
+<I>IUEDR-Online HELP</I>
+<HR><H1>CLEAN</H1><HR>
+</A>
+<H2>Summary</H2>
+ This command is used to mark pixels with values below a selected
+ threshold as BAD.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   THRESH          Smallest pixel value to be accepted as GOOD.
+</PRE>
+<P>
+<H2>Purpose</H2>
+Some IUE  datasets are effected  by horizontal  bars of low pixel values.
+These are caused by a weak  signal from the IUE craft at the time of data
+download.  When there are  a few bars  they can be marked as bad with the
+<A HREF=edimage.html>
+EDIMAGE</A>
+ command.  In the case of many bars a quicker solution is to mark
+all  pixels in  the image below  a user selected  threshold value as BAD.
+<P>
+Successive  CLEAN and <A HREF=drimage.html>
+DRIMAGE</A>
+ commands starting with a value of <A HREF=thresh.html>
+THRESH</A>
+ as
+-1000 and increasing <A HREF=thresh.html>
+THRESH</A>
+  towards zero will  allow the user to chose a
+value suitable for the problem image.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="thresh.html">THRESH</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:44:54 1995
+</ADDRESS>
+</BODY>
+</HTML>

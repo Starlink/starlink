@@ -1,0 +1,25 @@
+*+
+*
+*   CMFIDS common blocks.
+*
+*-
+
+*   STAK fiducial positions
+      LOGICAL NOFIDS        ! whether fiducials defined
+      BYTE FIDSTP(16)       ! Fiducial Data Type
+      BYTE FIDSID(40)       ! identification label
+      REAL*8 FIDHW          ! fiducial half width
+      REAL*8 FIDT0          ! standard THDA for fiducials
+      INTEGER NFIDX         ! number of x-fiducials
+      REAL*8 FIDX(13)       ! x-fiducial positions
+      INTEGER NFIDY         ! number of y-fiducials
+      REAL*8 FIDY(13)       ! y-fiducial positions
+      REAL*8 FIDS(13, 13)   ! sample positions
+      REAL*8 FIDL(13, 13)   ! line positions
+      BYTE FIDQ(13, 13)     ! fiducial quality
+ 
+      COMMON /CMFIDS/ NOFIDS, NFIDX, NFIDY, 
+     :                FIDQ
+      COMMON /CMFIDS_1/ FIDSTP
+      COMMON /CMFIDS_2/ FIDSID
+      COMMON /CMFIDS_3/ FIDHW, FIDT0, FIDX, FIDY, FIDS, FIDL

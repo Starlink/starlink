@@ -1,0 +1,12 @@
+*+
+*
+*   CMWCOR common blocks.
+*
+*-
+
+*   Wavelength Correction (after extraction, but prior to calibration).
+      LOGICAL NOWCOR     ! whether defined
+      REAL*8 WCOR(2)       ! wavelength correction for each aperture
+ 
+      COMMON /CMWCOR/ NOWCOR
+      COMMON /CMWCOR_1/ WCOR

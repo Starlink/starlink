@@ -1,0 +1,162 @@
+1 FILE
+    FILE is a utility for modifying file attributes.
+
+    FILE DOES NOT convert a file. FILE changes characteristics of
+the file, and thus VMS' view of the file. FILE can be used simply to view
+the current characteristics of a file, or it can be used to change any of
+the changeable characteristics. This utility can be VERY dangerous, and
+should only be used if you have a good understanding of RMS. Care should
+be taken when using this utility. While it doesn't actually change the file
+itself, you might consider using a backup copy of the file.
+
+    The first thing you should do is to use FILE/OUTPUT=output
+to generate a listing of the current characteristics of the file. In
+this way, you will be able to return the file to its original state.
+2 Examples
+    One common use of file, is to 'coerce' a file into being a
+    Fixed 512 byte file, to upload/download the file via kermit.
+    For example, given a saveset A.SAV, you could do the following:
+
+ FILE/OUTPUT=A.FIX/NOEXACT A.SAV/RECORD_SIZE=512/ORGANIZATION=INDEXED
+
+    You could then transfer the two files A.FIX and A.SAV
+    using Kermit (it would take two transfers, A.FIX with
+    'set file type text', and A.SAV using 'set file type fixed')
+
+    To turn the file back into its original useable self, you could
+    then do:
+ @A.FIX
+    Which would cause the originally saved characteristics to be put
+    back on the file.
+
+
+    Another common use is to set the Fortran carriage control attribute
+    so that a file can be printed with fortran carriage control, this
+    can be done as follows:
+
+ FILE/OUTPUT=OLD.TMP NETMONTH.*/ATTRIBUTES=(FORTRANCC,NOIMPLIEDCC,NOPRINTCC)
+
+2 parameters
+    File takes one parameter, a filename, or list of filenames.
+    The filenames can be wildcarded.
+2 qualifiers
+/OUTPUT
+    /OUTPUT[=filename]
+
+    This qualifier causes the characteristics of the file to
+    be displayed. Note that if you are also changing characteristics
+    the displayed characteristics are the orginal characteristics.
+    You can have the output placed in a file, by specifying a file
+    name in the OUTPUT clause. This is usefull for restoring a file
+    to its original state.
+/EXACT
+    /[NO]EXACT
+
+    When used with /OUTPUT, this qualifier determines wether a
+  complete file spec is displayed (/EXACT) or wether only the filename and
+  filetype will be displayed (/NOEXACT).
+
+    /EXACT is the default.
+/ATTRIBUTES
+    This qualifier determines the record attributes.
+    You may enter a list of (negatable) attributes.
+    The following attributes are legal:
+        FORTRANCC
+        IMPLIEDCC
+        PRINTCC
+        SPAN
+/CHARACTERISTICS
+    This qualifier determines the file characteristics.
+    You may enter a list of (negatable) items.
+    The following items are legal:
+        ACL_CORRUPT
+        BACKUP
+        BEST_TRY_CONTIGUOUS
+        CHARGE
+        CONTIGUOUS
+        DIRECTORY
+        ERASE_ON_DELETE
+        FILE_CORRUPT
+        LOCKED
+        MARKED_FOR_DELETE
+        READ_VERIFY
+        SPOOL
+        WRITE_BACK
+        WRITE_VERIFY
+    Note that not all of these items are really changeable. They
+    are merely included for completeness sake.
+/ORGANIZATION
+    This qualifier determines the file organization.
+    you must enter one of:
+        DIRECT
+        INDEXED
+        RELATIVE
+        SEQUENTIAL
+/TYPE
+    This qualifier determines the record type.
+    you must enter one of:
+        FIXED
+        VARIABLE
+        VFC
+        STREAM
+        LFSTREAM
+        CRSTREAM
+        UNDEFINED
+/BUCKET_SIZE
+    This qualifier determines the bucket size.
+/DEFAULT_EXTEND_QUANTITY
+    This qualifier determines the default extend quantity.
+/END_OF_FILE_BLOCK
+    This qualifier determines the end of file block.
+/FIRST_FREE_BYTE
+    This qualifier determines the first free byte in the end
+    of file block.
+/HIGHEST_ALLOCATED_BLOCK
+    This qualifier determines the highest allocated block.
+/GLOBAL_BUFFER_COUNT
+    This qualifier determines the global buffer count.
+/JOURNAL
+    This qulifier determines the type of journaling enabled on the file.
+    you must enter on of:
+        JOURNAL
+        AIJNL
+        ATJNL
+        BIJNL
+        RUJNL
+        NEVER_RU
+        ONLY_RU
+/MAXIMUM_RECORD_SIZE
+    This qualifier determines the maximum record size.
+/RECORD_SIZE
+    This qualifier determines the record size.
+/DIRECTORY_VERSION_LIMIT
+    This qualifier allows you to set the default number of allowable
+    versions of file. This is applicable only to directories. Note that
+    32767 is equivalent to 0, or No Limit, so to say.
+
+    This is equivalent to SET DIRECTORY/VERSION=n.
+/VERSION_LIMIT
+    This qualifier allows you to set the number of allowable versions
+    of a file. Note that 32767 is equivalent to 0, or No Limit, so to say.
+
+    This is equivalent to SET FILE/VERSION=n.
+/VFC_SIZE
+    This qualifier allows you to set the vcf size.
+/CREATION_DATE
+    /[NO]CREATION_DATE
+
+    This qualifier allows you to set the creation date.
+/REVISION_DATE
+    /[NO]REVISION_DATE
+
+    This qualifier allows you to set the revision date.
+/EXPIRATION_DATE
+    /[NO]EXPIRATION_DATE
+
+    This qualifier allows you to set the expiration date.
+/BACKUP_DATE
+    /[NO]BACKUP_DATE
+
+    This qualifier allows you to set the backup date.
+/NUMBER_OF_REVISIONS
+    This qualifier allows you to set the number of revisions.

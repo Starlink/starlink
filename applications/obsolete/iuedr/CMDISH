@@ -1,0 +1,28 @@
+*+
+*
+*   CMDISH common blocks.
+*
+*-
+
+*   Corrected dispersion constants.
+      INTEGER CORD       ! current order
+      REAL*8 A(7)        ! S(M,W)
+      REAL*8 B(7)        ! L(M,W)
+      REAL*8 A0          ! S(constant)
+      REAL*8 A1          ! S(W)
+      REAL*8 A2          ! S(W2)
+      REAL*8 B0          ! L(constant)
+      REAL*8 B1          ! L(W)
+      REAL*8 B2          ! L(W2)
+      REAL*8 DXDR        ! X-gradient for constant wavelength
+      REAL*8 DYDR        ! Y-gradient for constant wavelength
+      REAL*8 WC          ! central wavelength
+      REAL*8 DRDM        ! estimate of distance between orders
+      REAL*8 DRDW        ! estimate of distance for unit wavelength
+      REAL*8 DVDW        ! V-displacement for wavelength step
+      REAL*8 DUDR        ! U-displacement for R-step
+
+      COMMON / CMDISH   / A, B, A0, A1, A2, B0, B1, B2, DXDR, DYDR, WC,
+     :                    DRDM, DRDW
+      COMMON / CMDISH_1 / DVDW, DUDR
+      COMMON / CMDISH_2 / CORD

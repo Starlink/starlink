@@ -1,0 +1,12 @@
+*+
+*
+*   CMDEVS common blocks.
+*
+*-
+
+*   Separate DEV arrays.
+      REAL*8 SDEVS(1200, 2)        ! DEV data
+      INTEGER QDEVS(1200, 2)     ! DEV quality
+
+      COMMON /CMDEVS/ QDEVS
+      COMMON /CMDEVS_1/ SDEVS

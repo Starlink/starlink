@@ -1,0 +1,125 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: PLSCAN.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=PLSCAN>
+<I>IUEDR-Online HELP</I>
+<HR><H1>PLSCAN</H1><HR>
+</A>
+<H2>Summary</H2>
+ Plot scan perpendicular to dispersion.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   DEVICE          GKS/SGS graphics device name.
+   ZONE            Zone to be used for plotting.
+   RS              Whether display is reset before plotting.
+   LINE            Plotting line style (SOLID, DASH, DOTDASH or DOT).
+   LINEROT         Whether line style is changed after next plot.
+   COL             Plotting line colour (1, 2, 3, ..., 10).
+   COLROT          Whether line colour is changed after next plot.
+   HIST            Whether lines are drawn as histograms.
+   QUAL            Whether data quality information is plotted.
+   XL              X-axis plotting limits.  [0,0] means auto-scale.
+   YL              Y-axis plotting limits.  [0,0] means auto-scale.
+</PRE>
+</A>
+<H2>Purpose</H2>
+Plot the most recent scan perpendicular to  dispersion  associated  with
+the  dataset  specified by the <A HREF=dataset.html>
+DATASET</A>
+ parameter, on the graphics device
+and zone specified by the <A HREF=device.html>
+DEVICE</A>
+ and <A HREF=zone.html>
+ZONE</A>
+ parameters respectively.
+<P>
+The <A HREF=rs.html>
+RS</A>
+ parameter specifies whether a new plot is started, or whether the
+data can be plotted over an existing plot.
+<P>
+The <A HREF=line.html>
+LINE</A>
+ and <A HREF=linerot.html>
+LINEROT</A>
+ parameters  determine the  line style which will be
+used for plotting.
+<P>
+The <A HREF=col.html>
+COL</A>
+ and <A HREF=colrot.html>
+COLROT</A>
+ parameters  determine the  line colour which  will be
+used for plotting if the DEVICE supports colour graphics.
+<P>
+The diagram limits are specified by the <A HREF=xl.html>
+XL</A>
+ and <A HREF=yl.html>
+YL</A>
+ parameter values.
+If <A HREF=xl.html>
+XL</A>
+ and <A HREF=yl.html>
+YL</A>
+ have values:
+<P>
+<PRE WIDTH=72>
+        XL=[0,0], YL=[0,0]
+</PRE>
+<P>
+Then the plot limits along each axis are determined so  that  the  whole
+spectrum  is  visible.   If  the  values  of  <A HREF=xl.html>
+XL</A>
+  or <A HREF=yl.html>
+YL</A>
+ are specified in
+decreasing order, then  the  coordinates  will  be  reversed  along  the
+appropriate axis.
+<P>
+The <A HREF=qual.html>
+QUAL</A>
+ parameter indicates whether faulty points are flagged with
+their data quality codes:
+<P>
+<PRE WIDTH=72>
+     1    affected by extrapolated ITF
+     2    affected by microphonics
+     3    affected by spike
+     4    affected by bright point (or user)
+     5    affected by reseau mark
+     6    affected by ITF truncation
+     7    affected by saturation
+     U    affected by user edit
+</PRE>
+<P>
+If a point is affected by more than one of the above  faults,  then  the
+highest  code  is  plotted.   Points  marked  bad by user edits are only
+indicted if they are otherwise fault-free.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="device.html">DEVICE</A> * 
+<A HREF="zone.html">ZONE</A> * 
+<A HREF="rs.html">RS</A> * 
+<A HREF="line.html">LINE</A> * 
+<A HREF="linerot.html">LINEROT</A> * 
+<A HREF="col.html">COL</A> * 
+<A HREF="colrot.html">COLROT</A> * 
+<A HREF="qual.html">QUAL</A> * 
+<A HREF="xl.html">XL</A> * 
+<A HREF="yl.html">YL</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:14 1995
+</ADDRESS>
+</BODY>
+</HTML>

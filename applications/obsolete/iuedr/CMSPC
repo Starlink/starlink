@@ -1,0 +1,10 @@
+*+
+*
+*   CMSPC common blocks.
+*
+*-
+
+*   Temporary common block used by READSIPS for control.
+      INTEGER SWVER     ! Software version (IUESIPS).
+ 
+      COMMON / CMSPC / SWVER

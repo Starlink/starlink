@@ -1,0 +1,21 @@
+*+
+*
+*   CMGEOM common blocks.
+*
+*-
+
+*   SCAN - representation of geometry.
+      LOGICAL NOGEOM        ! Whether geometry represented.
+      BYTE GEOMTP( 16 )     ! Geometry Data Type.
+      INTEGER NGTERM( 2 )   ! Number of terms for each axis.
+      REAL*8 GAXMIN( 2 )    ! Axis minima.
+      REAL*8 GAXMAX( 2 )    ! Axis maxima.
+      INTEGER NGCHEB        ! Total number of Chebyshev terms.
+      REAL*8 GCHEBS( 36 )   ! S-Chebyshev coefficients.
+      REAL*8 GCHEBL( 36 )   ! L-Chebyshev coefficients.
+      REAL*8 GCHEBX( 36 )   ! U-Chebyshev coefficients.
+      REAL*8 GCHEBY( 36 )   ! V-Chebyshev coefficients.
+
+      COMMON / CMGEOM   / NOGEOM, NGTERM, NGCHEB
+      COMMON / CMGEOM_1 / GEOMTP
+      COMMON / CMGEOM_2 / GCHEBS, GCHEBL, GCHEBX, GCHEBY, GAXMIN, GAXMAX

@@ -1,0 +1,13 @@
+*+
+*
+*   CMITFC common blocks.
+*
+*-
+
+*   ITF correction data.
+      LOGICAL NOITFC      ! whether ITF correction required
+      BYTE ITFCTP(16)     ! ITF correction type
+ 
+      COMMON /CMITFC/ NOITFC
+      COMMON /CMITFC_1/ ITFCTP
+

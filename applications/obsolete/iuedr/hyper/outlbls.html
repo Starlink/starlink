@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+<TITLE>
+IUEDR Help: OUTLBLS.
+</TITLE>
+</HEAD>
+
+<BODY>
+<A NAME=OUTLBLS>
+<I>IUEDR-Online HELP</I>
+<HR><H1>OUTLBLS</H1><HR>
+</A>
+<H2>Summary</H2>
+ Output the current <A HREF=lbls.html>
+LBLS</A>
+ array to a binary sequential file.
+<P>
+<PRE WIDTH=72>
+   DATASET         Dataset name.
+   OUTFILE         Name of output file.
+</PRE>
+<P>
+<H2>Purpose</H2>
+This command outputs the current <A HREF=lbls.html>
+LBLS</A>
+ array to a file.  The  file  name,
+if not specified by the <A HREF=outfile.html>
+OUTFILE</A>
+ parameter, is constructed:
+<P>
+<PRE WIDTH=72>
+      &lt;CAMERA&gt;&lt;IMAGE&gt;R.DAT
+</PRE>
+<P>
+The format of this file is described by the Fortran 77 routine,  RDLBLS,
+which can be found in the file:
+<P>
+<PRE WIDTH=72>
+      $IUEDR_USER/rdlbls.for
+</PRE>
+<P>
+this directory (environment variable $IUEDR_USER) also contains  a  test
+program for using RDLBLS, and other helpful items.
+<H2>Available Topics</H2>
+<A HREF="dataset.html">DATASET</A> * 
+<A HREF="outfile.html">OUTFILE</A></H3>
+<P>
+<H2><A HREF="iuedr3.html">IUEDR HELP directory</A></H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@starlink.ucl.ac.uk">mjc@starlink.ucl.ac.uk</A><BR>
+Wed Dec 27 16:45:04 1995
+</ADDRESS>
+</BODY>
+</HTML>

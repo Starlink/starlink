@@ -1,0 +1,28 @@
+*+
+*
+*   CMCOMB common blocks.
+*
+*-
+
+*   Combined spectrum:
+      LOGICAL NOCOMB           ! Whether defined.
+      INTEGER NCOMB            ! Number of points.
+      REAL*8 XCOMB1            ! Start wavelength.
+      REAL*8 DXCOMB            ! Wavelength step.
+      REAL*8 XCOMB( 27800 )    ! Wavelengths.
+      REAL*8 XCOMBA( 27800 )   ! Air wavelength (+calib).
+      REAL*8 YCOMB( 27800 )    ! Fluxes.
+      REAL*8 WCOMB( 27800 )    ! Folding weights.
+      REAL*8 DCOMB( 27800 )    ! Error (if any).
+      INTEGER QCOMB( 27800 )   ! Data quality.
+      BYTE XMLAB( 40 )         ! X-label.
+      BYTE XMUN( 40 )          ! X-units.
+      BYTE YMLAB( 40 )         ! Y-label.
+      BYTE YMUN( 40 )          ! Y-units.
+      BYTE MTITLE( 80 )        ! Title.
+
+      COMMON / CMCOMB   / NOCOMB, NCOMB, QCOMB
+      COMMON / CMCOMB_4 / XCOMB, YCOMB, WCOMB, DCOMB
+      COMMON / CMCOMB_1 / XCOMB1, DXCOMB, XCOMBA
+      COMMON / CMCOMB_2 / XMLAB, XMUN, YMLAB, YMUN, MTITLE
+      SAVE
