@@ -57,7 +57,7 @@ FSOURCES= surf_extinction.f surf_flatfield.f \
 	surf_despike.f surf_scuclip.f surf_extflat.f \
 	surf_grid_despike.f surf_scuba2mem.f surf_make_weight.f \
 	surf_grid_calcsky.f surf_reduce_noise.f surf_add_dbm.f \
-	surf_remip.f
+	surf_remip.f surf_request_output_coords.f
 
 FCPPSOURCES=	surf_write_map_info.F surf_set_app_name.F
 
@@ -187,7 +187,7 @@ surf_reduce_switch.o: DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_remsky.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_restore.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
 surf_scan_rlb.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
-surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR MSG_PAR GRP_PAR
 surf_scucat.o: DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
 surf_scuclip.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_scuhelp.o: PAR_ERR SAE_PAR
@@ -199,5 +199,5 @@ surf_write_photom.o: PRM_PAR SAE_PAR
 surf_write_photom_header.o: PRM_PAR SAE_PAR SURF_PAR
 surf_add_dbm.o: SAE_PAR SURF_PAR NDF_ERR PAR_ERR DAT_PAR
 surf_remip.o: SAE_PAR PRM_PAR SURF_PAR DAT_PAR
-
+surf_request_output_coords.o: SAE_PAR
 

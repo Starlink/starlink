@@ -1697,7 +1697,7 @@ surf_reduce_switch.o: DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_remsky.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_restore.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
 surf_scan_rlb.o: DAT_PAR MSG_PAR SAE_PAR SURF_PAR
-surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR
+surf_scuba2mem.o: DAT_PAR PRM_PAR SAE_PAR SURF_PAR MSG_PAR GRP_PAR
 surf_scucat.o: DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR PRM_PAR SAE_PAR SURF_PAR
 surf_scuclip.o: DAT_PAR MSG_PAR PRM_PAR SAE_PAR SURF_PAR
 surf_scuhelp.o: PAR_ERR SAE_PAR
@@ -1714,7 +1714,7 @@ sculib_2pos_confn.o: SAE_PAR
 sculib_2pos_deconv.o: MSG_PAR PRM_PAR SAE_PAR
 sculib_3pos_confn.o: SAE_PAR
 sculib_3pos_deconv.o: MSG_PAR PRM_PAR SAE_PAR
-sculib_add_chop.o: PRM_PAR SAE_PAR
+sculib_add_chop.o: SAE_PAR
 sculib_add_demod_exposure.o: SAE_PAR
 sculib_addare.o: PRM_PAR SAE_PAR
 sculib_airmass.o: SAE_PAR
