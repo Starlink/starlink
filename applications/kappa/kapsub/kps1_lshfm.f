@@ -26,8 +26,9 @@
 *        The number of axes for the supplied positions.
 *     ID( NPOS ) = INTEGER (Given)
 *        The supplied position identifiers.
-*     POS( NPOS, NAX ) = DOUBLE PRECISION (Given)
-*        The supplied positions.
+*     POS( NPOS, NAX ) = DOUBLE PRECISION (Given and Returned)
+*        The supplied positions. These are normalised using AST_NORM on
+*        return.
 *     IGRP = INTEGER (Given)
 *        A GRP identifier for the group to receive the formatted positions.
 *     STATUS = INTEGER (Given)
@@ -40,6 +41,8 @@
 *  History:
 *     16-SEP-1998 (DSB):
 *        Original version.
+*     7-AUG-2003 (DSB):
+*        Normalise the supplied positions.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -60,9 +63,11 @@
       INTEGER FRM
       INTEGER NPOS
       INTEGER NAX
-      DOUBLE PRECISION POS( NPOS, NAX )
       INTEGER ID( NPOS )
       INTEGER IGRP
+
+*  Arguments Given and Returned:
+      DOUBLE PRECISION POS( NPOS, NAX )
 
 *  Status:
       INTEGER STATUS               ! Global status
@@ -78,6 +83,7 @@
       CHARACTER ATTRIB*15          ! AST attribute name
       CHARACTER LINE*( GRP__SZNAM )! Buffer for text
       CHARACTER TEXT*40            ! AST attribute value
+      DOUBLE PRECISION C( NDF__MXDIM ) ! Buffer for a single position
       INTEGER BLEN                 ! Length of each line
       INTEGER I                    ! Axis index
       INTEGER IAT                  ! No. of characters in a string
@@ -99,6 +105,15 @@
 
 *  Loop round each position.
       DO K = 1, NPOS
+
+*  Normalise the position.
+         DO I = 1, NAX
+            C( I ) = POS( K, I )
+         END DO
+         CALL AST_NORM( FRM, C, STATUS )         
+         DO I = 1, NAX
+            POS( K, I ) = C( I )
+         END DO
 
 *  Do each axis.
          DO I = 1, NAX
