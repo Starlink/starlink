@@ -64,7 +64,7 @@ $ENV{CCDPACK_DIR} = "$ENV{STARLINK}/bin/ccdpack"
   unless defined $ENV{CCDPACK_DIR};
 $ENV{ATOOLS_DIR} = "$ENV{STARLINK}/bin/atools"
   unless defined $ENV{ATOOLS_DIR};
-$ENV{ASTROM_DIR} = "$ENV{AUTOASTROM_DIR}/astrom"
+$ENV{ASTROM_DIR} = "$ENV{AUTOASTROM_DIR}"
   unless defined $ENV{ASTROM_DIR};
 $ENV{CONVERT_DIR} = "$ENV{STARLINK}/bin/convert"
   unless defined $ENV{CONVERT_DIR};
@@ -84,8 +84,10 @@ use Getopt::Long;
 
 # Include the Moggy modules, for querying catalogues
 # FOR TESTING ONLY, INCLUDE LIB DIR
-use lib "$ENV{AA}";
-use moggy::Moggy;
+#use lib "$ENV{AA}";
+#use moggy::Moggy;
+use lib "$ENV{AUTOASTROM_DIR}";
+use Moggy;
 
 
 # Include the subroutines
