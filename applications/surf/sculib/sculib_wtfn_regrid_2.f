@@ -1,7 +1,8 @@
       SUBROUTINE SCULIB_WTFN_REGRID_2 (DIAMETER, RES, IN_DATA,
-     :  IN_VARIANCE, WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
-     :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
-     :  CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
+     :     IN_VARIANCE, WEIGHT, USEVARWT, VARWT, X, Y, NPIX, 
+     :     PIXSPACE, NI, NJ, ICEN, JCEN, 
+     :     TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM, 
+     :     CONV_WEIGHT, WEIGHTSIZE, WTFN, STATUS)
 *+
 *  Name:
 *     SCULIB_WTFN_REGRID_2
@@ -13,7 +14,7 @@
 
 *  Invocation:
 *     SUBROUTINE SCULIB_WTFN_REGRID_2 (DIAMETER, RES, IN_DATA, IN_VARIANCE,
-*    :  WEIGHT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
+*    :  WEIGHT, USEVARWT, VARWT, X, Y, NPIX, PIXSPACE, NI, NJ, ICEN, JCEN, 
 *    :  TOTAL_WEIGHT, WAVELENGTH, CONV_DATA_SUM, CONV_VARIANCE_SUM,
 *    :  CONV_WEIGHT, STATUS)
 
@@ -30,6 +31,10 @@
 *        Variance on IN_DATA.
 *     WEIGHT                           = REAL (Given)
 *        The weight of this dataset.
+*     USEVARWT                         = LOGICAL (Given)
+*        Are we using a different weight for each point
+*     VARWT (NPIX)                     = REAL (Given)
+*        The different weight for each pixel
 *     X (NPIX)                         = DOUBLE PRECISION (Given)
 *        The x coordinates of the input pixels.
 *     Y (NPIX)                         = DOUBLE PRECISION (Given)
@@ -95,8 +100,10 @@
       INTEGER ICEN
       INTEGER JCEN
       REAL TOTAL_WEIGHT (NI,NJ)
+      LOGICAL USEVARWT
       REAL WAVELENGTH
       INTEGER WEIGHTSIZE
+      REAL VARWT(NPIX)
       REAL WTFN(RES * RES * WEIGHTSIZE * WEIGHTSIZE + 1)
 
 *  Arguments Returned:
@@ -233,6 +240,8 @@
 * Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT?
                            WWEIGHT = WT * WEIGHT / 
      :                          TOTAL_WEIGHT (INEAR,JNEAR)
+
+                           IF (USEVARWT) WWEIGHT = WWEIGHT * VARWT(PIX)
 
                            CONV_WEIGHT (IOUT,JOUT) = 
      :                          CONV_WEIGHT(IOUT,JOUT)
