@@ -159,6 +159,8 @@
 *        Use new BDI, don't use FIO ADAM calls
 *     20 Nov 1995 V2.0-0 (DJA):
 *        Full ADI port. No longer coerces regular axes.
+*      3 Apr 1996 V2.0-1 (DJA):
+*        Added ability import grouping
 *     {enter_changes_here}
 
 *  Bugs:
@@ -206,7 +208,7 @@
         PARAMETER        	( NMASKS = 6 )		! mask names
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'IMPORT Version V2.0-0' )
+        PARAMETER		( VERSION = 'IMPORT Version V2.0-1' )
 
 *  Local Variables:
       CHARACTER*80		AX_LABEL(ADI__MXDIM) 	! Axis labels
@@ -653,6 +655,18 @@
               USE_VAR = .TRUE.
               POS_VAR = NUM_DESCS
               ERROR_TO_VAR = .FALSE.
+            END IF
+
+*      Grouping descriptor
+          ELSE IF ( IMPORT_LOCSYM('GROUP') .EQ. 1 ) THEN
+
+*        Make sure GROUP hasn't already been specified
+            IF ( USE_GRP ) THEN
+              CALL IMPORT_ERROR( 'GROUP multiply specified', CLINE )
+            ELSE
+              NUM_DESCS = NUM_DESCS + 1
+              USE_GRP = .TRUE.
+              POS_GRP = NUM_DESCS
             END IF
 
 *      Error descriptor
@@ -1785,6 +1799,10 @@
      :                   STATUS )
         END IF
       END IF
+      IF ( USE_GRP ) THEN
+        CALL BDI_MAPR( OFID, 'Grouping', 'WRITE/ZERO', PTR_GRP,
+     :                 STATUS )
+      END IF
 
 *  QUALITY descriptor present?
       IF ( USE_QUAL ) THEN
@@ -1824,6 +1842,10 @@
             CALL ARR_COP1R( 1, %VAL(MASTER(I)+VAL__NBR*(POS_VAR-1)),
      :                        %VAL(PTR_VAR+(I-1)*VAL__NBR), STATUS )
           END IF
+          IF ( USE_GRP ) THEN
+            CALL ARR_COP1R( 1, %VAL(MASTER(I)+VAL__NBR*(POS_GRP-1)),
+     :                        %VAL(PTR_GRP+(I-1)*VAL__NBR), STATUS )
+          END IF
           IF ( USE_QUAL ) THEN
 
 *          Convert quality to byte value
@@ -1862,6 +1884,12 @@
           IF ( USE_DATA ) THEN
             CALL AR7_MOV0R( %VAL(ORIG(I)+VAL__NBR*(POS_DATA-1)),
      :            INDS, DIMS, %VAL(PTR_DATA), STATUS )
+          END IF
+
+*      GROUP if present
+          IF ( USE_GRP ) THEN
+            CALL AR7_MOV0R( %VAL(ORIG(I)+VAL__NBR*(POS_GRP-1)),
+     :            INDS, DIMS, %VAL(PTR_GRP), STATUS )
           END IF
 
 *      VARIANCE if present
