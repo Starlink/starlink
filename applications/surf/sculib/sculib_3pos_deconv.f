@@ -115,10 +115,10 @@
       INTEGER SCAN_START                       ! index of start of scan in
                                                ! demodulated data array
       REAL    SCRATCH1_DATA (MAX_SCAN)         ! scratch data
-      INTEGER SCRATCH1_QUALITY (MAX_SCAN)      ! scratch variance
+      BYTE    SCRATCH1_QUALITY (MAX_SCAN)      ! scratch variance
       REAL    SCRATCH1_VARIANCE (MAX_SCAN)     ! scratch quality
       REAL    SCRATCH2_DATA (MAX_SCAN)         ! scratch data
-      INTEGER SCRATCH2_QUALITY (MAX_SCAN)      ! scratch variance
+      BYTE    SCRATCH2_QUALITY (MAX_SCAN)      ! scratch variance
       REAL    SCRATCH2_VARIANCE (MAX_SCAN)     ! scratch quality
       REAL    SY_CONV_FUNCTION (MAX_CONV)      ! the `symmetric' convolution
                                                ! function
