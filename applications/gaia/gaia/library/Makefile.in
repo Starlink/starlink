@@ -46,7 +46,7 @@ FILES        = \
  GaiaProperties.tcl GaiaStartup.tcl \
  adamtask.tcl gaiaMain.tcl gaia_defaults.tcl gaia_util.tcl \
  gaia_version.tcl graphics_features.tcl \
- skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs gaia2astrom.tcl \
+ skycat2.0.cfg gaiawcs2tab tclIndex pix2wcs wcs2pix gaia2astrom.tcl \
  adamtask.tcl .gaFilters
 
 PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
