@@ -1,9 +1,9 @@
 #  Names and current revision numbers of files under RCS control.
-#  Package CCDPACK version V4.0-7b.
+#  Package CCDPACK version V4.0-8.
 #  
 makefile: 1.79
 mk: 1.3
-sun139.tex: 1.100
+sun139.tex: 1.101
 sun139geo.eps: 1.1
 sun139reg.eps: 1.4
 sun139red.eps: 1.1
@@ -567,7 +567,6 @@ ccd1_tran.f: 1.5
 ccd1_fspec.f: 1.2
 ccd1_slice.f: 1.2
 ccd1_grdel.f: 1.1
-subpar_init.f: 1.2
 ccd1_exec.c: 1.1
 slv.c: 1.5
 find_file.c: 1.1
@@ -776,7 +775,7 @@ ccdimp.f: 1.6
 ccdexp.f: 1.4
 makeset.f: 1.14
 showset.f: 1.10
-reduce.f: 1.3
+reduce.f: 1.4
 ccdalign.f: 1.25
 xreduce.f: 1.2
 ccdtest.ard: 1.1
