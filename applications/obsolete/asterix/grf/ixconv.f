@@ -289,7 +289,7 @@
       CALL DYN_MAPD( 1, 2*M3*N3, WPTR_S, STATUS )
 
 *  Workspace
-      CALL DYN_MAPD( 1, 6*MAX(N3,N3)+15, WPTR_PDA, STATUS )
+      CALL DYN_MAPD( 1, 6*MAX(M3,N3)+15, WPTR_PDA, STATUS )
 
 *  Do FFT on X array
       CALL MSG_PRNT( 'Transforming first input...' )
