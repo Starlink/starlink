@@ -97,6 +97,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -188,9 +189,9 @@
 
 *        Write in RA and DEC
           IF ( GE_OK ) THEN
-            CALL STR_DRADTOC( S_RA(ID)*DTOR, 'HH MM SS.S',
+            CALL STR_DRADTOC( S_RA(ID)*MATH__DDTOR, 'HH MM SS.S',
      :                                  TEXT(7:16), STATUS )
-            CALL STR_DRADTOC( S_DEC(ID)*DTOR, 'SDD MM SS',
+            CALL STR_DRADTOC( S_DEC(ID)*MATH__DDTOR, 'SDD MM SS',
      :                               TEXT(19:27), STATUS )
           ELSE
             TEXT(7:27) = '**  Not available  **'
