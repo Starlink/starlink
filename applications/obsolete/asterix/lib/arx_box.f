@@ -13,7 +13,6 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Global variables :
-      INCLUDE 'IMG_CMN'
 *    Import :
       INTEGER ARDID
       INTEGER INDEX

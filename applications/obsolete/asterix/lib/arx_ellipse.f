@@ -27,7 +27,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*80 TEXT
-      INTEEGER L
+      INTEGER L
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
