@@ -67,6 +67,8 @@
 *  History:
 *     14 Aug 1995 (DJA):
 *        Original version.
+*      1 May 1996 (DJA):
+*        Added PRF2_GET to service generic processing flag requests
 *     {enter_changes_here}
 
 *  Bugs:
@@ -97,6 +99,8 @@
       EXTERNAL        		BDI2_UNLNK
 
       EXTERNAL        		EDI2_SETLNK
+
+      EXTERNAL			PRF2_GET
 
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
@@ -148,6 +152,10 @@
 
 *  Define EDI interface
       CALL ADI_DEFMTH( 'SetLink(_EventDS,_FITSfile)', EDI2_SETLNK,
+     :                 DID, STATUS )
+
+*  Processing flag methods
+      CALL ADI_DEFMTH( 'GetProFlag(_,_FITSfile,_CHAR)', PRF2_GET,
      :                 DID, STATUS )
 
 *  Report any errors
