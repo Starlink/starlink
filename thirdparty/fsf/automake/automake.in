@@ -3439,10 +3439,43 @@ sub handle_man_pages
 # buildsupport/starconf/starconf.m4.in 
 sub handle_data
 {
+    # Starlink extension:
+    my @stardirs = qw( stardocs staretc starhelp starexamples );
+    if (defined $starlink_seen_features{'per-package-dirs'})
+      {
+        # Two magic things happen in this case.  Neither of these is a
+        # Good Thing (in Norman's humble opinion), but they're
+        # traditional behaviour in Starlink applications, and
+        # therefore must be preserved.  Reactionary!  Infamy!  All
+        # intellectuals to the fields!  Except for me, obviously, and
+        # people I like, and people with other virtues, and I don't
+        # think I really have the temperament to be a revolutionary.
+        # But aaaaanyway: installing into .../bin is supported (because if I
+        # don't, the users will do it anyway, and probably botch it),
+        # and version.dat is back.
+
+        # Allow data installs into the bin directory.  bin_DATA is a
+        # user variable, am__bin_DATA is ours (is this the right way
+        # to do this? --  I rather suspect it isn't, but can't work
+        # out what would be preferred)
+        push (@stardirs, 'bin', 'am__bin');
+
+        # Additionally, in this case, cause the magic extra file version.dat
+        # to be installed in the binaries directory.
+        Automake::Variable::define('am__bindir', VAR_MAKEFILE,
+                                   '', TRUE,
+                                   '$(bindir)',
+                                   '', INTERNAL, VAR_ASIS);
+        Automake::Variable::define('am__bin_DATA', VAR_MAKEFILE,
+                                   '', TRUE, # set in all conditions
+                                   'version.dat',
+                                   '', INTERNAL, VAR_ASIS);
+      }
+
     &am_install_var ('-noextra', '-candist', 'data', 'DATA',
                      'data', 'sysconf', 'sharedstate', 'localstate',
                      'pkgdata', 'lisp', 'noinst', 'check',
-                     'stardocs', 'staretc', 'starhelp', 'starexamples' );
+                     @stardirs);
 }
 
 # Handle TAGS.
@@ -4832,10 +4865,13 @@ sub handle_starlink
         register_suffix_rule (INTERNAL, '.dvi', '.ps');
       }
 
+    my $want_version_dat = defined $starlink_seen_features{'per-package-dirs'};
+
     $output_rules .= &file_contents ('starlink',
                                      new Automake::Location,
                                      LATEXDOCS => $havelatex,
-                                     COMPIFL => $want_compifl
+                                     COMPIFL => $want_compifl,
+                                     VERSIONDAT => $want_version_dat
                                     );
 }
 
@@ -5112,6 +5148,11 @@ sub scan_autoconf_traces ($)
       elsif ($macro eq 'STAR_DEFAULTS')
         {
             $starlink_seen_features{star_defaults} = 1;
+            if (defined $args[1])
+              {
+                $starlink_seen_features{'per-package-dirs'} = 1
+                  if ($args[1] =~ 'per-package-dirs');
+              }
         }
       elsif ($macro eq 'STAR_LATEX_DOCUMENTATION')
         {

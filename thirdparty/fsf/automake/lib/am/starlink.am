@@ -46,3 +46,12 @@ if %?COMPIFL%
 .ifl.ifc:
 	@COMPIFL@ $<
 endif %?COMPIFL%
+
+if %?VERSIONDAT%
+# Create the version.dat file.  This is installed in the binaries directory,
+# only because we saw STAR_DEFAULTS(per-package-dir) in the configure.ac.
+# This is installed as a result of being included in the bin_DATA variable.
+version.dat: configure.ac
+	rm -f version.dat
+	echo $(PACKAGE_VERSION) >version.dat
+endif %?VERSIONDAT%

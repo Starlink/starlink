@@ -1037,6 +1037,7 @@ SUBCSRC = find_file.c
 
 PRIVATE_INCLUDES = SST_PAR SST_SCB
 
+# special installation directory (but see discussion below)
 sstsupportdir = $(bindir)
 sstsupport_DATA = sun.tex sst.tex layout.tex forstats.dat html.sty
 
@@ -1124,8 +1125,8 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             <code>sstsupport_DATA</code>.  In this particular case, we
             want to install data files in the same location as the
             binaries (why, and whether this is a good thing, is not
-            for us to worry about here).  The obvious thing (trust
-            me!) would be to say <code>bin_DATA = sun.tex ...</code>,
+            for us to worry about here).  The obvious thing
+            would be to say <code>bin_DATA = sun.tex ...</code>,
             but automake forbids that particular combination of prefix
             and primary, precisely because it wouldn't generally make
             sense (see <webref url="&automakehtml;/Data.html"
@@ -1140,6 +1141,17 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
             variable, as eventually substituted (see section <webref
               url="&automakehtml;/Uniform.html" >The Uniform Naming
               Scheme</webref> in the automake manual).</p>
+
+          <p>If you look at the real <code>sst</code> component's
+            <code>Makefile.am</code> file, you will see that it does
+            in fact use <code>bin_DATA</code> rather than the
+            <code>sstsupport_DATA</code> illustrated above.  This is
+            because the <code>configure.ac</code> in the
+            <code>sst</code> component declares the option
+            <code>STAR_DEFAULTS(per-package-dirs)</code> (see <ref
+              id="macro-defaults"/>) which,
+            amongst a couple of other magic features, causes the
+            variable <code>bin_DATA</code> to become legal.</p>
 
           <p>This is a rather special case, and you should not have to
             do this sort of semi-licensed hacking very often.  In
@@ -4495,9 +4507,30 @@ file.f: file.$(FPP_SRC_EXT)
             <code>configure.ac</code> files.  The optional
             <code>OPTIONS</code> argument holds a space-separated list
             of option keywords, of which the only one defined at
-            present is `per-package-dirs', which causes applications
-            and help to be installed in a package-specific
-            directory (see <ref id="developments"/>).
+            present is <code>per-package-dirs</code></p>
+
+          <p>The option <code>per-package-dirs</code>, has three
+            consequences:
+            <ol>
+              <li>
+                <p>applications, help and etc files are installed in a
+                  package-specific directory</p>
+              </li>
+              <li>
+                <p>The otherwise-forbidden variable
+                <code>bin_DATA</code> is permitted: any files assigned
+                to this variable are installed in the
+                (package-specific) binary directory as data, as
+                opposed to executables.</p>
+              </li>
+              <li>
+                <p>A file <code>version.dat</code> is created (at make
+                rather than install time).  This holds the bare
+                <code>PACKAGE_VERSION</code> number, and is installed in the
+                binary directory.</p>
+              </li>
+            </ol>
+            See also <ref id="developments"/>.
           </p>
 
           <p>As part of its initialisation, this macro does the following:
