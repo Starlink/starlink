@@ -50,6 +50,11 @@
 *
 *  D.S. Berry (6th August 1996)
 *
+*     -  Perspective zenithal projections (AZP, TAN, SIN) modified so that
+*     bad (x,y) co-ordinates are returned if the supplied native latitude
+*     represents a point on the "far-side" of the unit sphere (i.e. the
+*     side away from the projection plane).
+*
 *=============================================================================
 *
 *   C implementation of the spherical map projections recognized by the FITS
@@ -228,6 +233,7 @@
 *      prj->r0     r0; reset to 180/pi if 0.
 *      prj->w[0]   r0*(mu+1)
 *      prj->w[1]   1/prj->w[0]
+*      prj->w[2]   -1/prj->p[1]
 *===========================================================================*/
 
 int azpset(prj)
@@ -245,6 +251,9 @@ struct prjprm *prj;
    prj->w[1] = 1.0/prj->w[0];
 
    prj->flag = PRJSET;
+
+   if (prj->p[1] != 0.0) prj->w[2] = -1.0/prj->p[1];
+
    return 0;
 }
 
@@ -256,15 +265,25 @@ double phi, theta, *x, *y;
 struct prjprm *prj;
 
 {
-   double r, s;
+   double r, s, sinth, mu;
 
    if (prj->flag != PRJSET) {
       if (azpset(prj)) return 1;
    }
 
-   s = prj->p[1] + sind(theta);
+   sinth = sind(theta);
+   mu = prj->p[1];
+   s = mu + sinth;
+
    if (s == 0.0) {
       return 2;
+
+   } else if (mu <= 1.0) {
+      if( sinth < -mu ) return 2;
+
+   } else {
+      if( sinth < prj->w[2] ) return 2;
+
    }
 
    r =  prj->w[0]*cosd(theta)/s;
@@ -343,7 +362,7 @@ struct prjprm *prj;
    }
 
    s = sind(theta);
-   if (s == 0.0) return 2;
+   if (s <= 0.0) return 2;
 
    r =  prj->r0*cosd(theta)/s;
    *x =  r*sind(phi);
@@ -417,7 +436,7 @@ double phi, theta, *x, *y;
 struct prjprm *prj;
 
 {
-   double cthe, t, z;
+   double cthe, t, z, sinth;
 
    if (prj->flag != PRJSET) {
       if (sinset(prj)) return 1;
@@ -428,11 +447,13 @@ struct prjprm *prj;
       if (theta > 0.0) {
          z = -t*t/2.0;
       } else {
-         z = 2.0 - t*t/2.0;
+         return 2;
       }
       cthe = t;
    } else {
-      z =  sind(theta) - 1.0;
+      sinth =  sind(theta);
+      if( sinth < -1.0e-5 ) return 2;
+      z =  sinth - 1.0;
       cthe = cosd(theta);
    }
 
