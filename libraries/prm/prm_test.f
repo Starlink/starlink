@@ -17,6 +17,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     AJC: A.J. Chipperfield (STARLINK, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -24,6 +25,8 @@
 *        Original version.
 *     27-FEB-1995 (AJC):
 *        Use INCLUDE file links
+*     6-OCT-2004 (TIMJ):
+*        Use new interface to NUM_ERROR
 *     {enter_changes_here}
 
 *  Bugs:
@@ -43,12 +46,12 @@
 
 
 *  Global Variables:
-      INCLUDE 'NUM_CMN'          ! Define NUM_ERROR flag
-
 
 *  External References:
       EXTERNAL NUM_TRAP          ! Numerical error handler
+      EXTERNAL NUM_WASOK
       INTEGER VAL_DTOI           ! Convert D to I
+      LOGICAL NUM_WASOK
 
 *  Local Variables:
       DOUBLE PRECISION D2        ! The value 2.0D0
@@ -59,6 +62,7 @@
       INTEGER I2A( 1 )           ! I2 as an array
       INTEGER IERR               ! Error pointer (junk)
       INTEGER NERR               ! Error count (junk)
+      INTEGER NUM_ERR            ! Numerical error status
       INTEGER STATUS             ! Status variable
       LOGICAL OK                 ! Test succeeded?
 
@@ -115,12 +119,15 @@
 *  num_han.cdefault.  Thus it's not necessarily an error (or at least not 
 *  a fixable error) if this next test fails.
       CALL NUM_HANDL( NUM_TRAP )
-      NUM_ERROR = SAI__OK
+      CALL NUM_CLEARERR()
+
       WRITE( *, * ) ' Testing divide by zero: 1.0/0.0 = ',
      :              REAL( I1 ) / REAL( I0 )
-      IF ( NUM_ERROR .NE. SAI__OK ) THEN
+      IF ( .NOT. NUM_WASOK() ) THEN
+         NUM_ERR = SAI__OK
+         CALL NUM_GETERR( NUM_ERR )
          WRITE( *, * ) ' NUM_TRAP error handler responding OK.'
-         WRITE( *, * ) ' Returns error number ', NUM_ERROR
+         WRITE( *, * ) ' Returns error number ', NUM_ERR
       ELSE
          WRITE( *, * )
      :    ' Warning: NUM_TRAP error handler not responding (not impl?).'
