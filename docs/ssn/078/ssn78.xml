@@ -1974,6 +1974,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           the libtool command using the library's
           <code>LDFLAGS</code> variable, as follows.  First the
           <code>Makefile.am</code> (from the <code>prm</code> component):
+          <index>flags, compiler and linker</index>
 <verbatim>
 libprm_la_SOURCES = \
     $(F_ROUTINES)
@@ -5155,7 +5156,7 @@ C A dummy Fortran routine.  See comments in Makefile.am
 
       <subsect id="tip-conditional-build" export="export">
         <subhead>
-          <title>Conditionally building components</title>
+          <title>Conditionally building components, I</title>
         </subhead>
 
         <p>It is occasionally useful to build code conditionally,
@@ -5238,6 +5239,89 @@ jpeglib-stamp:
           then avoids installing anything if
           <code>$(MAIN_TARGET)</code> is not the string
           <code>jpeglib</code>.</p>
+      </subsect>
+
+      <subsect id="tip-conditional-build-2" export="export">
+        <subhead>
+          <title>Conditionally Building Components, II</title>
+        </subhead>
+
+        <p>The other way in which you might conditionally build a
+          component is to suppress building it at the end of the
+          configuration stage, if it turns out that the important
+          features are missing from the environment.  For a
+          description of this, see
+          <ref id="macro-suppress-build-if"/>.</p>
+      </subsect>
+
+      <subsect id="tip-adding-flags" export="export"
+        indexkey="flags, compiler and linker">
+        <subhead>
+          <title>Manipulating compiler and linker flags</title>
+        </subhead>
+
+        <p>Sometimes it is necessary to add compiler or linker flags
+          for particular make targets, or add libraries to a link.
+          This is described in the automake manual, in the section
+          <webref
+            url="&automakehtml;/Program-and-Library-Variables.html"
+            >Program and Library Variables</webref>.  This is a
+          powerful mechanism, but there is a gotcha.</p>
+
+        <p>For each of the variables <code>CFLAGS</code>,
+          <code>LDFLAGS</code> and so on, automake maintains a
+          parallel variable <code>AM_CFLAGS</code> or
+          <code>AM_LDFLAGS</code><index>flags, compiler and linker!AM_
+          flags</index>, the contents
+          of which are managed by automake and autoconf, so that the
+          unprefixed variables are free to be overridden by the user
+          (see section <webref
+          url="&automakehtml;/User-Variables.html" >Variables reserved
+          for the user</webref> of the automake manual; to be clear,
+          `user' in this context means the person building the
+          distributed software, as opposed to the maintainer, or
+          whoever is creating the distribution).  If automake
+          sees one of the above per-target variables, however, it
+          carefully uses this <em>instead</em> of the <code>AM_</code>
+          variable, not in addition to it.  This replacement is
+          sensible, since if this were not the case then there would
+          be no way to remove a problematic flag from an
+          <code>AM_</code> variable, but it is not the behaviour you
+          might guess at first, and so can come as rather a surprise.
+          Given that you want to add to these flags rather than
+          replace them, you do so with the idiom:
+<verbatim>
+libxxx_la_FCFLAGS = $(AM_FCFLAGS) -my-magic-flag
+</verbatim>
+        </p>
+
+        <p>An alternative to setting per-target flags like this is to
+          set one or more of the <code>AM_*FLAGS</code> variables
+          directly.  These variables
+          are `yours' as the author of the <code>Makefile.am</code>
+          and <code>configure.ac</code> files -- the automake system
+          ensures that the variables are included in the correct
+          places in compile and link commands, but neither it nor
+          autoconf set these flags.  See the FAQ on `Flag Variables
+          Ordering' in the <webref url="&automakehtml;" >automake
+          manual</webref> for some further discussion.</p>
+
+        <p>There is another set of similar variables, named
+          <code>STAR_*FLAGS</code><index>flags, compiler and
+          linker!STAR_ flags</index>, which are maintained by
+          <code>starconf</code> and the <code>STAR_*</code> macros in
+          <code>configure.ac</code>, and which are the means by which
+          those macros pass their discovered magic on to the Makefile.
+          You shouldn't need to know that, and you should not need to
+          adjust these variables at all, but if for some occult reason
+          you need to refer to the complete set of flags used to
+          compile and link programs, you will need to include these
+          flags also.  In general, Makefile variables such as
+          <code>$(COMPILE)</code> and <code>$(FCCOMPILE)</code> are
+          most suitable for any by-hand compilations you need to do,
+          and they already have all the extra flags you need, in the
+          right order..</p>
+
       </subsect>
     </sect>
 
@@ -5957,9 +6041,13 @@ target: dependency
                   doing that.</p>
               </li>
               <li>
-                <p>Sets appropriate values for variables
-                  <code>FCFLAGS</code>, <code>FFLAGS</code>,
-                  <code>CFLAGS</code> and <code>LDFLAGS</code>.</p>
+                <p>Sets appropriate vales for variables
+                  <code>AM_FCFLAGS</code> and
+                  <code>AM_LDFLAGS</code><index>AM_FLAGS</index> 
+                  (you shouldn't have to care, as the point of these
+                  prefixed variables is that they should be orthogonal
+                  to the unprefixed variables with the similar names,
+                  but see <ref id="tip-adding-flags"/> for a gotcha).</p>
               </li>
               <li>
                 <p>Defines and substitutes variables
