@@ -151,7 +151,7 @@
             END DO
                 
 *  Find whether the reversing is required.
-            IF ( SCNDIR( FLX ) .EQ. SCNDIR( CRSFLX( 1 ) ) ) THEN
+            IF ( SCNDIR( FLX ) .EQV. SCNDIR( CRSFLX( 1 ) ) ) THEN
                REVS = .FALSE.
             ELSE
                REVS = .TRUE.
