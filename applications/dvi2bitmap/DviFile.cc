@@ -93,7 +93,8 @@ verbosities DviFile::verbosity_ = normal;
  * both as-is, and with an extension <code>.dvi</code> added.
  *
  * @param res the base DPI to be used for processing the file, in
- * pixels-per-inch
+ * pixels-per-inch.  If given as zero, default to the resolution
+ * returned by {@link PkFont#dpiBase}.
  *
  * @param externalmag the factor by which the DVI file's internal
  * magnification factor should itself be magnified, specified
@@ -109,20 +110,26 @@ verbosities DviFile::verbosity_ = normal;
  * is not seekable, the value of <code>read_post</code> is ignored
  * (taken to be false), and the file is opened without attempting to
  * add any <code>.dvi</code> extension.
+ *
+ * @throws DviError if the DVI file cannot be opened
  */
 DviFile::DviFile (string& fn,
 		  int res,
 		  double externalmag,
 		  bool read_post,
 		  bool seekable)
+    throw (DviError)
     : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
-      current_font_(0), dvif_(0), resolution_(res), extmag_(externalmag),
+      current_font_(0), dvif_(0), extmag_(externalmag),
       netmag_(1.0), skipPage_(false),
       max_drift_(0),
       widest_page_(-1), deepest_page_(-1),
       have_preread_postamble_(false), have_read_to_postamble_(false)
 {
-    PkFont::setResolution(res);
+
+    if (resolution_ == 0)	// then default it
+	resolution_ = PkFont::dpiBase();
+    PkFont::setResolution(resolution_);
 
     try
     {
@@ -728,6 +735,59 @@ int DviFile::pixel_round(int dp)
 	return -static_cast<int>(floor(px_per_dviu_ * (-dp) + 0.5));
 #endif
 }
+
+/**
+ * Convert a TeX scaled point to another unit.  You cannot convert to
+ * pixels or DVI units with this method; instead you should get a
+ * pixel position solely through {@link #currH} or {@link #currV}.
+ *
+ * @param sp the length in scaled points
+ * @param unit the unit to convert it to
+ *
+ * @return the converted unit, or zero if the target unit was,
+ * erroneously, pixels or DVI units
+ */
+double DviFile::convertFromScaledPoints(int sp, DviUnits units)
+{
+    double ans;
+    switch (units) {
+      case unit_pt:
+	ans = sp / 65536.0;
+	break;
+      case unit_pc:
+	ans = sp / 65536.0 / 12.0;
+	break;
+      case unit_in:
+	ans = sp / 65536.0 / 72.27;
+	break;
+      case unit_bp:
+	ans = sp / 65536.0 / 72.0;
+	break;
+      case unit_cm:
+	ans = sp / 65536.0 / 72.27 * 2.54;
+	break;
+      case unit_mm:
+	ans = sp / 65536.0 / 72.27 * 25.4;
+	break;
+      case unit_dd:
+	ans = sp / 65536.0 / 1238.0 * 1157.0;
+	break;
+      case unit_cc:
+	ans = sp / 65536.0 / 1238.0 * 1157.0 / 12.0;
+	break;
+      case unit_sp:
+	ans = sp;
+	break;
+      case unit_pixels:
+      case unit_dvi:
+	ans = 0;
+	break;
+      default:
+	assert(false);
+    }
+    return ans;
+}
+
 
 /**
  * Return width of character in DVIUnits

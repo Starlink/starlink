@@ -64,15 +64,12 @@ class DviFilePreamble;
  */
 class DviFile {
 public:
-    // magmag is a factor by which the file's internal
-    // magnification should be increased.
     DviFile (string& s,
-	     int resolution,
+	     int resolution=0,
 	     double magmag=1.0,
 	     bool read_postamble=true,
-	     bool seekable=true);
-/*     DviFile (const char* s, int resolution, */
-/* 	     double magmag=1.0, bool read_postamble=true); */
+	     bool seekable=true)
+	    throw (DviError);
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
@@ -88,17 +85,121 @@ public:
 	return oldv;
     }
     /**
-     * Obtains the current horizontal position in pixel units,
-     * including any drift corrections.
-     * @return the horizontal position
+     * Units of length.  Used for {@link #currH} and {@link #currV}.
      */
-    int currH() const { return hh_; }	// device units
+    enum DviUnits {
+	/**
+	 * Traditional printer's point.  There are 72.27pt in 1in.
+	 */
+	unit_pt,
+	/**
+	 * Pica; 1pc=12pt.
+	 */
+	unit_pc,
+	/**
+	 * Inch; 1in=25.4mm.
+	 */ 
+	unit_in,
+	/**
+	 * The big point;  72bp=1in.  Postscript points are bigpoints
+	 * in this terminology.
+	 */
+	unit_bp,
+	/**
+	 * Centimetre; 1cm=10E-2m.
+	 */
+	unit_cm,
+	/**
+	 * Millimetre; 1mm=10E-3m.  One metre is the distance light
+	 * travels, in vacuum, in a time 1/299792458 seconds.
+	 * 1mm=2.84527559pt; 1pt=0.3515mm.
+	 */
+	unit_mm,
+	/**
+	 * Didot point; 1157dd=1238pt.
+	 */
+	unit_dd,
+	/**
+	 * Cicero; 1cc=12dd.
+	 */
+	unit_cc,
+	/**
+	 * TeX `scaled points'.  These are the dimensions which TeX
+	 * itself works in, where 65536sp=1pt, or 1sp=5.363E-9 metres.
+	 */
+	unit_sp,
+	/** 
+	 * Pixel units.  The DVI standard calls these `device
+	 * units', and refers to them with the notation <em>hh</em>.
+	 */
+	unit_pixels,
+	/**
+	 * DVI units.  All dimensions within the DVI file are
+	 * expressed in these units, written as <em>h</em> in the
+	 * standard.  The conversion of DVI units to physical units is
+	 * governed by the values in the preamble.  DVI files written by TeX
+	 * (that is, essentially all of them, except those written by
+	 * converters such as <code>dtl</code>, which write
+	 * compatible ones) have a preamble which ensures that the DVI
+	 * units are scaled points, times the overall magnification factor.
+	 */
+	unit_dvi,
+    };
     /**
-     * Obtains the current vertical position in pixel units,
-     * including any drift corrections.
-     * @return the vertical position
+     * Obtains the current horizontal position.  The position can be
+     * reported in any of {@link #unit_pixels}, {@link #unit_dvi} or
+     * {@link #unit_sp}; it is an error to call this function with
+     * any other of the defined units.
+     *
+     * <p>The conversion to pixel units includes any drift
+     * correction, and is correctly rounded.  Scaled points are
+     * calculated as DVI units times the overall magnification (that
+     * is, we ignore the general case of DVI files with odd preamble
+     * scalings).
+     *
+     * @return the horizontal position, in the chosen units
+     * @throws DviError if we are invoked with an inappropriate unit argument
      */
-    int currV() const { return vv_; }
+    int currH(DviUnits units=unit_pixels) const
+	    throw (DviError) {
+	int r;
+	switch (units) {
+	  case unit_pixels:
+	    r = hh_;		/* device units */
+	    break;
+	  case unit_dvi:
+	    r = h_;
+	    break;
+	  case unit_sp:
+	    r = (netmag_ == 1.0 ? h_ : static_cast<int>(h_*netmag_));
+	    break;
+	  default:
+	    throw DviError("Bad unit in currH");
+	}
+	return r;
+    }
+    /**
+     * Obtains the current vertical position.  See {@link #currH}, to
+     * which this is precisely analogous.
+     */
+    int currV(DviUnits units=unit_pixels) const
+	    throw (DviError) {
+	int r;
+	switch (units) {
+	  case unit_pixels:
+	    r = vv_;		/* device units */
+	    break;
+	  case unit_dvi:
+	    r = v_;
+	    break;
+	  case unit_sp:
+	    r = (netmag_ == 1.0 ? v_ : static_cast<int>(v_*netmag_));
+	    break;
+	  default:
+	    throw DviError("Bad unit in currV");
+	}
+	return r;
+    }
     /**
      * Obtains the `width of the widest page'.  This is either the
      * value obtained from the postamble of the DVI file, if that was
@@ -114,7 +215,6 @@ public:
      * @return the horizontal size of the largest `page', in pixels
      */
     int hSize() const { return widest_page_; }
-    //int hSize() const { return static_cast<int>(postamble_.u * px_per_dviu_); }
     /**
      * Obtains the `height plus depth of the tallest page'.    This is either the
      * value obtained from the postamble of the DVI file, if that was
@@ -130,12 +230,12 @@ public:
      * @return the vertical size of the largest `page', in pixels
      */
     int vSize() const { return deepest_page_; }
-    //int vSize() const { return static_cast<int>(postamble_.l * px_per_dviu_); }
     /**
      * Return the net magnification factor for the DVI file
      * @return the overall magnification factor applied to lengths in
      * the DVI file.  A value of 1.0 implies no magnification at all.
      */
+    static double convertFromScaledPoints(int sp, DviUnits units);
     double magnification() const { return netmag_; }
     /**
      * Converts a length in points to one in pixels, using the current
@@ -183,7 +283,7 @@ private:
     double dviu_per_pt_;	// 1dviu = 1/dviu_per_pt_ * 1pt
     double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
     // resolution is in pixels-per-inch
-    const int resolution_;
+    int resolution_;
     // extmag is a factor by which the file's internal magnification
     // should be increased (1.0 = no magnification).  This is set
     // externally to the DVI file.
@@ -390,7 +490,12 @@ private:
  * Abstracts the contents of a DVI file.  All the features of a DVI
  * file which calling code might be interested in are represented by
  * one of the subclasses of this, and these are obtained in order by
- * calling the {@link DviFile#getEvent} method on <code>DviFile</code>.
+ * calling the {@link DviFile#getEvent} method on
+ * <code>DviFile</code>.
+ *
+ * <p>The documentation here concentrates on how the methods and
+ * variables here relate to the underlying quantities obtained from
+ * the DVI file.  For fuller information on these, see the DVI standard.
  */
 class DviFileEvent {
  public:
@@ -402,11 +507,20 @@ class DviFileEvent {
     virtual void debug() const;
 
     /**
-     * Gets the type of this event
+     * Gets the type of this event.  This information can also be
+     * obtained in a more object-oriented style by attempting a cast
+     * to the appropriate subtype, using, for example,
+     * <code>dynamic_cast&lt;DviFileSetChar *&gt;(event_ptr)</code>.
      *
      * @return the type
      */
     eventTypes type() const { return type_; }
+
+    /**
+     * Gets the underlying opcode which produced this event.
+     * @return the opcode
+     */
+    const unsigned char opcode() const { return opcode_; }
 
  protected:
     /**
@@ -435,10 +549,9 @@ class DviFileSetChar : public DviFileEvent {
 	    : DviFileEvent(charno, setchar, dptr), charno_(charno) { }
     DviFileSetChar(unsigned char opcode, int charno, DviFile *dptr)
 	    : DviFileEvent(opcode, setchar, dptr), charno_(charno) { }
-    //~DviFileSetChar () { };
     void debug() const;
     /**
-     * Obtains the character requested.
+     * Obtains the character which is to be set.
      * @return the character as an integer
      */
     const int charno() const { return charno_; }
@@ -447,25 +560,35 @@ class DviFileSetChar : public DviFileEvent {
 };
 class DviFileSetRule: public DviFileEvent {
  public:
-    const int h, w;
+    /**
+     * The height of the rule to be set at this position.  Given in
+     * scaled points -- that is, after any required magnification has
+     * been applied.
+     */
+    const int h;
+    /**
+     * The width of the rule to be set at this position.  Given in
+     * scaled points -- that is, after any required magnification has
+     * been applied.
+     */
+    const int w;
     DviFileSetRule(unsigned char opcode, DviFile *dptr, int h, int w)
 	    : DviFileEvent(opcode, setrule, dptr), h(h), w(w) { }
-    //~DviFileSetRule () { };
     void debug() const;
 };
 class DviFileFontChange : public DviFileEvent {
  public:
     DviFileFontChange(unsigned char opcode, PkFont *f)
 	    : DviFileEvent(opcode, fontchange), font(f) { }
-    //~DviFileFontChange () { };
     void debug() const;
+    /** The font we are to change to. */
     const PkFont *font;
 };
 class DviFileSpecial : public DviFileEvent {
  public:
     DviFileSpecial(unsigned char opcode, string str)
 	    : DviFileEvent(opcode, special), specialString(str) { }
-    //~DviFileSpecial () { };
+    /** The content of the special, as stored in the DVI file. */
     const string specialString;
     void debug() const;
 };
@@ -473,26 +596,58 @@ class DviFilePage : public DviFileEvent {
  public:
     DviFilePage(unsigned char opcode, bool isStart)
 	    : DviFileEvent(opcode, page), isStart(isStart) { }
-    //~DviFilePage () { };
     void debug() const;
-    const bool isStart;		// true/false if this is a bop/eop
+    /**
+     * Is this the beginning or end of a page?  Member
+     * <code>isStart</code> is true if this event was produced by a
+     * <em>bop</em> even (opcode 139), and false if it came from a
+     * <em>eop</em> (opcode 140) event.
+     */
+    const bool isStart;
+    /**
+     * If <code>isStart</code> is true, then <code>count[]</code> holds
+     * the ten TeX page counters.
+     */
     signed int count[10];
+    /**
+     * If <code>isStart</code> is true, then <code>previous</code>
+     * holds the offset within the DVI file of the previous page in
+     * the sequence.
+     */
     signed int previous;
 };
 class DviFilePreamble : public DviFileEvent {
  public:
     DviFilePreamble()
 	    : DviFileEvent(247, preamble) { }
-    //~DviFilePreamble () { };
     void debug() const;
-    unsigned int dviType, num, den, mag;
+    /** 
+     * The DVI file identification byte.  Always 2 for DVI files
+     * produced by standard TeX.
+     */
+    unsigned int dviType;
+    /**
+     * The numerator of the fraction defining the standard of measurement.
+     */
+    unsigned int num;
+    /**
+     * The denominator of the fraction defining the standard of measurement.
+     */
+    unsigned int den;
+    /**
+     * Magnification specification.  1000 times the desired
+     * magnification factor.
+     */
+    unsigned int mag;
+    /**
+     * The DVI file comment, as a string.
+     */
     string comment;
 };
 class DviFilePostamble : public DviFileEvent {
  public:
     DviFilePostamble()
 	    : DviFileEvent(248, postamble) { }
-    //~DviFilePostamble () { };
 };
 
 #endif //#ifndef DVI_FILE_HEADER_READ
