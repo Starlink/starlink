@@ -8,6 +8,8 @@ AC_CONFIG_SRCDIR(Makefile.dependencies)
 AC_PATH_PROG([JAVA], [java], [NOJAVA])
 AC_ARG_VAR([JAVA], [Location of java runtime])
 
+AC_PROG_MAKE_SET
+
 dnl    The following list of active directories must be maintained by hand
 AC_CONFIG_SUBDIRS(applications libraries)
 
