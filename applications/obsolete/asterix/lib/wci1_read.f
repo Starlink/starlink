@@ -138,6 +138,7 @@
       LOGICAL			EQOK, EPOK		! Equinox & epoch ok?
       LOGICAL			FRAOK, FDECOK		! Nominal pointing ok?
       LOGICAL			HASPIX			! Spatial axes exist?
+      LOGICAL			ISPRIM			! Input is primitive?
       LOGICAL			RAOK, DECOK, PAOK       ! Found ok flags
       LOGICAL			REG(2)			! Axes regular
       LOGICAL			PRJOK, SYSOK		! Projection/system ok?
