@@ -367,7 +367,7 @@
                   END IF
 
 *              Copy variance?
-                  IF ( QOK ) THEN
+                  IF ( VOK ) THEN
                     DO I = 1, L1
                       VAR(I,J,K,L,M,N,O) = GVAR(IND(AXIS))
                     END DO
