@@ -27,7 +27,7 @@ FCPPFLAGS = -DUSESH -DSUN4
 # This is the list of sub-directories to loop over
 
 SUBDIRS = astro command inc exprt external fitting fv4 gen graph \
-mapdis4 mv4 plots reduce scl tek term util vms getaline
+mapdis4 mv4 plots reduce scl tek term util vms comfiles getaline
 
 # This is the files required to complete specx_source.tar
 # for the Starlink distribution
@@ -51,8 +51,8 @@ src/run_specx.c \
 src/scl_main.f \
 src/specx_help_link \
 src/specx_link \
-src/title.inc
-
+src/title.inc \
+docs/hlp/specx.hlp
 
 # This is a list of tar files created by other makefiles
 # I make it the responsibility of this makefile to copy them
