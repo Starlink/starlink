@@ -927,7 +927,9 @@ programcode document, to elements in another programcode document.
 	(normalize "figure")
 	(normalize "table")
 	(normalize "mlabel")
-	(normalize "routine")))
+	(normalize "routine")
+	(normalize "dt")
+	(normalize "li")))
 
 <routine>
 <routinename>ref-target-element-list
