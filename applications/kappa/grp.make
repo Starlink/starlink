@@ -1,3 +1,10 @@
+
+
+
+
+
+
+
 #  File to define groups for use by the SDT grp command.
 #  ====================================================
 #  This is a description file for the "make" utility.
@@ -18,9 +25,9 @@ kappa_data_sun4_Solaris
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
-c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd irg_err irg_err.h \
+c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
-ira_err ndg_const ndg_err
+ira_err ndg_const ndg_err kpg_ast kpg_par grf.h style.def
 
 # The contents of the aif_sub.tar file:
 AIF_SUB = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
@@ -167,9 +174,25 @@ kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_vect.f kpg1_wmodb.f \
 kpg1_wmodd.f kpg1_wmodi.f kpg1_wmodr.f kpg1_wmodub.f kpg1_wmoduw.f \
 kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f \
 kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f normal.f \
-nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
+nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f kpg1_asprp.f kpg1_ieeer.c \
-kpg1_ieeed.c kpg1_map.f kpg1_wgndf.f kpg1_rgndf.f
+kpg1_ieeed.c kpg1_map.f kpg1_wgndf.f kpg1_rgndf.f grf_kappa.c \
+kpg1_arcog.f kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f \
+kpg1_asffr.f kpg1_asfgt.f kpg1_asfil.f kpg1_asfrm.f kpg1_asget.f \
+kpg1_asgfr.f kpg1_asgfw.f kpg1_asgrd.f kpg1_asgrp.f kpg1_asira.f \
+kpg1_aslog.f kpg1_asmrg.f kpg1_asoff.f kpg1_asplt.f kpg1_aspsy.f \
+kpg1_asptp.f kpg1_asreg.f kpg1_asset.f kpg1_assim.f kpg1_assir.f \
+kpg1_assmp.f kpg1_asspl.f kpg1_assts.f kpg1_assty.f kpg1_ast2h.f \
+kpg1_bilnr.f kpg1_ceil.f kpg1_dsfrm.f kpg1_floor.f kpg1_flpth.f \
+kpg1_gdare.f kpg1_gdbnd.f kpg1_gdget.f kpg1_gdnew.f kpg1_gdold.f \
+kpg1_gdput.f kpg1_gdqpc.f kpg1_gdwin.f kpg1_gtaxi.f kpg1_gtaxv.f \
+kpg1_gtchv.f kpg1_gtgrp.f kpg1_gtpos.f kpg1_gtwcs.f kpg1_h2ast.f \
+kpg1_isscs.f kpg1_lintd.f kpg1_pacol.f kpg1_pgcol.f kpg1_pgcur.f \
+kpg1_pgcut.f kpg1_pgesc.f kpg1_pgpix.f kpg1_pgsht.f kpg1_pgsty.f \
+kpg1_pgtxt.f kpg1_plcip.f kpg1_plot.f kpg1_plota.f kpg1_plotn.f \
+kpg1_plotp.f kpg1_plots.f kpg1_pltln.f kpg1_pqvid.f kpg1_prnth.f \
+kpg1_rdast.f kpg1_rdls2.f kpg1_rdlst.f kpg1_short.f kpg1_verb.f \
+kpg1_wrast.f kpg1_wread.f kpg1_wrls2.f kpg1_wrlst.f kpg1_wwrt.f 
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \
@@ -293,7 +316,8 @@ fitsimp.ifl fitsin.ifl fitslist.ifl fitsmod.ifl fitstext.ifl hiscom.ifl \
 hislist.ifl hisset.ifl native.ifl ndfcopy.ifl ndftrace.ifl setaxis.ifl \
 setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
-mem2d.ifl 
+mem2d.ifl wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
+wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -306,7 +330,8 @@ median.f mosaic.f mstats.f mult.f noglobals.f nomagic.f normalize.f \
 numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
-tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f 
+tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
+listmake.f listshow.f profile.f wcsalign.f
 
 # The contents of the kapsub_sub.tar file:
 KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
@@ -376,7 +401,11 @@ mamore.f manyg.f masame.f med3d.f medref.f medrep.f medset.f medwts.f \
 medwv.f mfnext.f mfopen.f moscad.f moscdv.f namsrv.f nmplot.f opus.f \
 otstsb.f peepsb.f setcr.f setknt.f shifts.f shiftx.f shifty.f slc2t1.f \
 slc2t3.f sqshs.f sqshx.f sqshy.f stat3d.f statsb.f statv.f strx.f stry.f \
-thrsr.f trgscl.f trigsb.f tropus.f uget.f uput.f 
+thrsr.f trgscl.f trigsb.f tropus.f uget.f uput.f kps1_cntky.f \
+kps1_cntpn.f kps1_cntsc.f kps1_discl.f kps1_lmkpc.f kps1_lmkst.f \
+kps1_lplfs.f kps1_lpllm.f kps1_lplnm.f kps1_lshcp.f kps1_lshct.f \
+kps1_lshfm.f kps1_lshpl.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f \
+kps1_wala0.f kps1_wala3.f kps1_wala4.f kps1_wala5.f kps1_wala6.f
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
@@ -392,7 +421,8 @@ NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \
 fitsimp.f fitsin.f fitslist.f fitsmod.f fitstext.f hiscom.f hislist.f \
 hisset.f native.f ndfcopy.f ndftrace.f setaxis.f setbad.f setbb.f \
 setbound.f setext.f setlabel.f setnorm.f setorigin.f setsky.f settitle.f \
-settype.f setunits.f setvar.f
+settype.f setunits.f setvar.f wcsadd.f wcsattrib.f wcscopy.f wcsframe.f \
+wcsremove.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kappa.tar.
