@@ -66,3 +66,9 @@ be declared <em/somewhere/: the default is declared in the General DTD.
 (define %starlink-decl-entity% "starlink.decl")
 ;; defined in DTD to point to "-//Starlink//SYNTAX Starlink Declaration//EN"
 
+<routine>
+<routinename>%copyright-string%
+<description>Standard copyright string, unless overridded.
+<codebody>
+(define %copyright-string%
+  "Copyright 1999, Central Laboratories for the Research Councils")
