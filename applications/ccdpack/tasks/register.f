@@ -473,6 +473,10 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     22-FEB-2001 (MBT):
 *        Upgraded for use with Sets.
+*     21-MAR-2001 (MBT):
+*        Modified so that the registration frame added is a copy of the
+*        relevant frame of the reference NDF, rather than a virgin frame.
+*        Thus, inter alia, the new CCD_REG frame can now be a SkyFrame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1235,6 +1239,29 @@
          END DO
       END IF
 
+*  Generate a new frame to add to the WCS frameset.  If we are using
+*  NDFs it will be a copy of the Current or PIXEL frame from the 
+*  reference NDF.
+      IF ( NDFS ) THEN
+         CALL NDG_NDFAS( NDFGR, IPREF, 'READ', ID, STATUS )
+         CALL CCD1_GTWCS( ID, IWCS, STATUS )
+         CALL NDF_ANNUL( ID, STATUS )
+         IF ( USEWCS ) THEN
+            JREG = AST__CURRENT
+         ELSE
+            CALL CCD1_FRDM( IWCS, 'Pixel', JREG, STATUS )
+         END IF
+         FRREG = AST_GETFRAME( IWCS, JREG, STATUS )
+
+*  Not using NDFs: the registration frame will be a plain 2-dimensional
+*  frame.
+      ELSE
+         FRREG = AST_FRAME( 2, ' ', STATUS )
+      END IF
+      CALL AST_SETC( FRREG, 'Title', 'Alignment by REGISTER', STATUS )
+
+      call ast_show( frreg, status )
+
 *  Loop through each NDF which had an associated position list.
       DO 9 I = 1, NOPEN
 
@@ -1248,11 +1275,8 @@
             CALL CHR_PUTI( I, DMN, IAT )
          END IF
 
-*  Generate a new frame to add to the WCS frameset.
-         FRREG = AST_FRAME( 2, ' ', STATUS )
+*  Write the correct domain to the registration frame.
          CALL AST_SETC( FRREG, 'Domain', DMN( 1:IAT ), STATUS )
-         CALL AST_SETC( FRREG, 'Title', 'Alignment by REGISTER',
-     :                  STATUS )
 
 *  If we are putting frames into each NDF, open the right one here and
 *  get its frameset identifier.
