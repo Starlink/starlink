@@ -604,7 +604,8 @@ myfile.o: myfile.c
             would allow you to produce a file <code>Makefile</code>
             which was customised to use the C compiler appropriate to
             the local environment, and which had, in the makefile
-            variable <code>$(LN_S)</code> a command which makes links
+            variable <code>$(LN_S)</code><index>symbolic links</index>
+            a command which makes links
             between files if the local platform supports that, or
             makes hard links or simple copies if that is all that is
             possible.</p>
@@ -2869,7 +2870,8 @@ foo_TASKS = a b
           monolith, that these <code>.ifl</code> files should be
           distributed, and that the appropriate extra links should
           be made, in the binary directory, when the monolith is
-          installed.  The tasks variable might also be used in the
+          installed<index>symbolic links!to monoliths</index>.
+          The tasks variable might also be used in the
           <code>foo_SOURCES</code> variable to declare the
           dependence of the monolith on the Fortran files
           corresponding to the tasks (it would be possible to
@@ -4240,7 +4242,8 @@ AC_OUTPUT
             prefix=$$DESTDIR$$prefix install</code> in the
             installation macro.  The distributed Tcl Makefile appears
             to respect the variable, but it is important to check for
-            errors such as making absolute links, or using the current
+            errors such as making absolute links<index>symbolic
+            links!absolute links are bad</index>, or using the current
             directory incautiously (search for <code>LN_S</code> or
             <code>`pwd`</code> in the <code>Makefile.in</code>).</p>
 
@@ -4491,7 +4494,11 @@ M Makefile.dependencies
                   id="config-cfitsio"/>.</p>
             </dd>
 
-            <dt>I want to do odd things at install time.  How?</dt> 
+            <dt>I want to install symbolic links at install time.  How?</dt>
+            <dd>That counts as `weird' for the purposes of this
+              discussion.  See the next item.</dd>
+
+            <dt>I want to do weird things at install time.  How?</dt> 
             <dd>
               <p>Automake provides a couple of escape hatches for
                 installing extra material.  These are the
@@ -4557,8 +4564,8 @@ install-exec-local: dtask_main.o
                 adjusted by hand.  That is, don't use this mechanism
                 unless you really have to.</p>
 
-              <p>You often need to create links in this
-                situation<index>symlinks</index>.  To 
+              <p>In particular, you often need to create links in this
+                situation<index>symbolic links!installing</index>.  To 
                 do that portably (symbolic links are not required by
                 POSIX, and so the autoconf macros are able to emulate
                 them if necessary), put the <code>AC_PROG_LN_S</code> macro in
@@ -4569,12 +4576,17 @@ install-exec-local: dtask_main.o
                   >notes</webref> that this macro does not in
                 principle support a path in the second argument; thus
                 do not write
-                <code>$(LN_S) /path/to/target/TARGET
-                  /path/to/link/LINK</code>, but instead
+                <code>$(LN_S) /target/TARGET
+                  /link/LINK</code>, but instead
 <verbatim>
-cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
+cd $(DESTDIR)/link; rm -f LINK; $(LN_S) $(DESTDIR)/target/TARGET LINK
 </verbatim>
-                The option <code>rm -f</code> is portable.</p>
+                The option <code>rm -f</code> is portable.  Note that
+                we have included the important <code>$(DESTDIR)</code>
+                variable here, and that the <code>/link</code> and
+                <code>/target</code> locations here should probably be
+                one or other of the <code>$(???dir)</code> variables
+                instead.</p>
             </dd>
 
           </dl>
