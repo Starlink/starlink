@@ -1,0 +1,223 @@
+      SUBROUTINE COF_FT2NE( FUNIT, NDF, STATUS )
+*+
+*  Name:
+*     COF_FT2NE
+
+*  Purpose:
+*     Converts a FITS ASCII- or binary-table into an NDF extension
+*     structure.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COF_FT2NE( FUNIT, NDF, STATUS )
+
+*  Description:
+*     The routine recreates an NDF extension's structure from a FITS
+*     ASCII or binary table written by NDF2FITS.  It uses the EXTNAME
+*     and EXTTYPE keywords to determine the structure's path and data
+*     type.  EXTNAME also has the element indices if the extension or
+*     sub-structure is an array; the dimensions of such a structure
+*     are taken from the EXTSHAPE keyword.  It creates the extension or
+*     structure only if it does not exist.
+
+*  Arguments:
+*     FUNIT = INTEGER (Given)
+*        The FITSIO unit number for the FITS file.
+*     NDF = INTEGER (Given)
+*        The identifier for the NDF to contain the axis structure.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Prior Requirements:
+*     The NDF and FITS files must be open.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1997 March 21 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'NDF_PAR'          ! NDF__ constants
+
+*  Arguments Given:
+      INTEGER FUNIT
+      INTEGER NDF
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER FITSOK             ! Good status for FITSIO library
+      PARAMETER( FITSOK = 0 )
+
+      INTEGER MAXWRD             ! Maximum number of words in line
+      PARAMETER( MAXWRD = 10 )
+
+*  Local Variables:
+      CHARACTER * ( 48 ) COMENT  ! FITS header comment
+      INTEGER DIMS( DAT__MXDIM ) ! Dimensions of the structure
+      INTEGER END( MAXWRD )      ! End columns of words (not used)
+      CHARACTER * ( ( MAXWRD+1 ) * DAT__SZNAM ) EXPATH ! Extension path
+      CHARACTER * ( DAT__SZTYP ) EXTYPE ! Extension data type
+      INTEGER INDICE( MAXWRD - 2 ) ! Indices of the structure's cell
+      INTEGER LEVEL              ! Extension level
+      CHARACTER * ( DAT__SZLOC ) LOC ! Locator to full structure
+      CHARACTER * ( DAT__SZNAM ) NAME ! Extension or structure name
+      INTEGER NDIM               ! Number of dimensions of the structure
+      INTEGER NWORD              ! Number of words in HISTORY card
+      INTEGER START( MAXWRD )    ! Start columns of words (not used)
+      CHARACTER * ( DAT__SZLOC ) SXLOC( MAXWRD - 2 ) ! Locators to
+                                 ! nested structures or cells thereof
+      LOGICAL THERE              ! Keyword is present?
+      CHARACTER * ( 30 ) WORDS( MAXWRD ) ! Words in extension's path
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the EXTNAME keyword.
+      CALL COF_GKEYC( FUNIT, 'EXTNAME', THERE, EXPATH, COMENT, STATUS )
+
+      IF ( .NOT. THERE ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'COF_FT2NE_EXTNAME',
+     :     'EXTNAME keyword is missing.  Unable to recreate the '/
+     :     /'NDF extension.', STATUS )
+         GOTO 999
+      END IF
+
+*  Obtain the EXTTYPE keyword.
+      CALL COF_GKEYC( FUNIT, 'EXTTYPE', THERE, EXTYPE, COMENT, STATUS )
+
+      IF ( .NOT. THERE ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'COF_FT2NE_EXTYPE',
+     :     'EXTTYPE keyword is missing.  Unable to recreate the '/
+     :     /'NDF extension.', STATUS )
+         GOTO 999
+      END IF
+
+*  If some obscure reason, there is no type specified, say because there
+*  wasn't any defined in the original NDF extension, assign a default
+*  data type.
+      IF ( EXTYPE .EQ. ' ' ) EXTYPE = 'STRUCT'
+
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Replace the dots in the path by spaces.
+      CALL CHR_TRCHR( '.', ' ', EXPATH, STATUS )
+
+*  Break the path into words.
+      CALL CHR_DCWRD( EXPATH, MAXWRD, NWORD, START, END, WORDS, STATUS )
+
+*  Extract the extension's name, number of dimensions and their values,
+*  dimensions, and indices to a structure element.
+      CALL COF_EXDIM( FUNIT, WORDS( 3 ), DAT__MXDIM, NAME, NDIM, DIMS,
+     :                INDICE, STATUS )
+
+*  The extensions begin at level 3.
+      CALL NDF_XSTAT( NDF, NAME, THERE, STATUS )
+
+*  If it exists, obtain an HDS locator to the structure.  This can be
+*  done directly if the extension is not an array, but for an array of
+*  extensions we have to obtain a locator to the current element of the
+*  extension.
+      IF ( THERE ) THEN
+         IF ( NDIM .EQ. 0 ) THEN
+            CALL NDF_XLOC( NDF, NAME, 'UPDATE', SXLOC( 1 ), STATUS )
+         ELSE
+            CALL NDF_XLOC( NDF, NAME, 'UPDATE', LOC, STATUS )
+            CALL DAT_CELL( LOC, NDIM, INDICE, SXLOC( 1 ), STATUS )
+            CALL DAT_ANNUL( LOC, STATUS )
+         END IF
+
+*  Otherwise create a new extension of the appropriate shape.  Obtain a
+*  locator to the current array element for an array of extensions.
+      ELSE
+         IF ( NDIM .EQ. 0 ) THEN
+            CALL NDF_XNEW( NDF, NAME, EXTYPE, 0, 0, SXLOC( 1 ), STATUS )
+         ELSE
+            CALL NDF_XNEW( NDF, NAME, EXTYPE, NDIM, DIMS, LOC, STATUS )
+            CALL DAT_CELL( LOC, NDIM, INDICE, SXLOC( 1 ), STATUS )
+            CALL DAT_ANNUL( LOC, STATUS )
+         END IF
+      END IF
+
+*  Create sub-structures of the extension.
+      IF ( NWORD .GT. 3 ) THEN
+         DO LEVEL = 2, NWORD - 2
+
+*  Extract the structure's name, number of dimensions and their values,
+*  dimensions, and indices to a structure element.
+            CALL COF_EXDIM( FUNIT, WORDS( LEVEL + 2 ), DAT__MXDIM,
+     :                      NAME, NDIM, DIMS, INDICE, STATUS )
+
+*  Determine whether or not the structure exists.
+            CALL DAT_THERE( SXLOC( LEVEL - 1 ), NAME, THERE, STATUS )
+
+            IF ( .NOT. THERE ) THEN
+
+               IF ( LEVEL .EQ. NWORD - 2 ) THEN
+
+*  Make the structure using the data type.  When it is the last
+*  structure in the path, it is the component to which EXTYPE refers.
+                  IF ( NDIM .EQ. 0 ) THEN
+                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, EXTYPE,
+     :                             0, 0, STATUS )
+                  ELSE
+                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, EXTYPE,
+     :                             NDIM, DIMS, STATUS )
+                  END IF
+
+*  NDF2FITS via COF_H2BIN only creates binary tables when the structure
+*  contains primitive objects.  If the structure merely contains other
+*  structures then at present there is no way of determining the data
+*  type.  So use something generic.
+               ELSE
+                  IF ( NDIM .EQ. 0 ) THEN
+                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, 'STRUCT',
+     :                             0, 0, STATUS )
+                  ELSE
+                     CALL DAT_NEW( SXLOC( LEVEL - 1 ), NAME, 'STRUCT',
+     :                             NDIM, DIMS, STATUS )
+                  END IF
+               END IF
+
+            END IF
+
+*  Obtain the locator to the structure.
+            CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME,
+     :                     SXLOC( LEVEL ), STATUS )
+
+         END DO
+      END IF
+
+*  At this point the structure is accessed via locator SXLOC( NWORD-2 )
+*  Call a routine to propagate the table into the structure.
+      CALL COF_T2HDS( FUNIT, SXLOC( NWORD - 2 ), STATUS )
+
+*  Annul all the locators.
+      DO LEVEL = 1, NWORD - 2
+         CALL DAT_ANNUL( SXLOC( LEVEL ), STATUS )
+      END DO
+
+  999 CONTINUE
+
+      END
