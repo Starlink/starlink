@@ -136,7 +136,7 @@
 
       END IF
 
-*    Try to locate the data routine
+*  Try to locate the data routine
       ROUT = 'PSF_'//L_MODN(MID,LID)
       RLEN = CHR_LEN(ROUT)
       CALL PSF_FINDRTN( LID, ROUT(:RLEN), L_MOD_D(MID,LID), STATUS )
@@ -147,56 +147,38 @@
         GOTO 99
       END IF
 
-*    Energy profiling routine
+*  Energy profiling routine
       CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_PFL',
      :                  L_MOD_PFL(MID,LID), STATUS )
 
-*    Time/energy definition routine
-      CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_DEF',
-     :                  L_MOD_DEF(MID,LID), STATUS )
-
-*    Hint supplier routine
+*  Hint supplier routine
       CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_HINT',
      :                  L_MOD_H(MID,LID), STATUS )
 
-*    Must have a definition routine for energy modelling. Turn off modelling
-*    if not present.
-      IF ( (L_MOD_DEF(MID,LID).EQ.0) .AND. EM_OK(SLOT) ) THEN
-        CALL MSG_PRNT( '! Modelled energy dependence is not '/
-     :                 /'supported by this psf. The' )
-        IF ( EM_MODE(SLOT) .EQ. PSF_E_CHANNEL ) THEN
-          CALL MSG_SETC( 'MM', 'channel spectrum' )
-        ELSE
-          CALL MSG_SETC( 'MM', 'spectral model' )
-        END IF
-        CALL MSG_PRNT( '  ^MM supplied will be ignored.' )
-
-        EM_OK(SLOT) = .FALSE.
-      END IF
-
-*    Initialisation routine
+*  Initialisation routine
       CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_INIT',
      :                  L_MOD_I(MID,LID), STATUS )
 
-*    Closure routine
+*  Closure routine
       CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_CLOSE',
      :                  L_MOD_C(MID,LID), STATUS )
 
-*    Call T/E definition if energy modelling OR energy data available. This
-*    acts as flag to library routines that energy information will be passed
-*    from above, and so prevents prompts like "mean photon energy" from
-*    appearing
+*  Call T/E definition if energy modelling OR energy data available. This
+*  acts as flag to library routines that energy information will be passed
+*  from above, and so prevents prompts like "mean photon energy" from
+*  appearing
       IF ( EM_OK(SLOT) .OR. (E_AX .GT. 0) ) THEN
         CALL PSF_DEF( SLOT, 0.0D0, 0.0D0, 1, 1, 0, 0, STATUS )
       END IF
 
-*    Call the INIT routine if defined
+*  Call the INIT routine if defined
       IF ( L_MOD_I(MID,LID) .NE. 0 ) THEN
         CALL PSF_PSF_INIT_EXEC( %VAL(L_MOD_I(MID,LID)),
      :                          P_PSID(SLOT), SLOT,
      :                          P_FID(SLOT), P_INST(SLOT), STATUS )
       END IF
 
+*  Abort point
  99   CONTINUE
 
       END
