@@ -49,6 +49,7 @@
 *     30 Jun 94 : V1.5-4 quality problem fixed (RJV)
 *      9 Sep 94 : V1.5-5 another quality problem fixed (RJV)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     12 Dec 94 : V1.8-1 Uses axis bounds rather than widths (RJV)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -108,6 +109,8 @@
       INTEGER VPTR	              ! data VARIANCE
       INTEGER AXVP(DAT__MXDIM)        ! axes
       INTEGER AXWP(DAT__MXDIM)        ! axes widths
+      INTEGER AXBP(DAT__MXDIM)	      ! axes bounds
+
 *   ...and output
       INTEGER DPTRO	              ! data
       INTEGER QPTRO	              ! quality
@@ -133,11 +136,12 @@
       REAL BNDS(2,MXBIN,DAT__MXDIM)	! required boundaries (irregular)
       REAL DUMAXVAL(DAT__MXDIM)		! dummy axis values for coerced dims
       REAL DUMAXWID(DAT__MXDIM)		! dummy axis widths
+      REAL DUMAXBND(2,DAT__MXDIM)	! dummy axis bounds
 *
 *    Version id :
 *
       CHARACTER*20 VERSION
-         PARAMETER (VERSION='REBIN Version 1.8-0')
+         PARAMETER (VERSION='REBIN Version 1.8-1')
 *-
       CALL MSG_PRNT (VERSION)
 
@@ -197,6 +201,9 @@
         CALL BDA_GETAXLABEL(ILOC,I,AXLABEL(I),STATUS)
         CALL BDA_MAPAXVAL(ILOC,'READ',I,AXVP(I),STATUS)
 
+* axis bounds
+        CALL BDA_MAPAXBNDS(ILOC,'READ',I,AXBP(I),STATUS)
+
 * axis widths
         CALL BDA_CHKAXWID(ILOC,I,WDOK(I),UNIF(I),NAXWDIM(I),STATUS)
         CALL BDA_MAPAXWID(ILOC,'READ',I,AXWP(I),STATUS)
@@ -211,8 +218,11 @@
         AXVP(I)=UTIL_PLOC(DUMAXVAL(I))
         AXWP(I)=UTIL_PLOC(DUMAXWID(I))
         AXWPO(I)=UTIL_PLOC(DUMAXWID(I))
+        AXBP(I)=UTIL_PLOC(DUMAXBND(1,I))
         DUMAXVAL(I)=0.5
         DUMAXWID(I)=1.0
+        DUMAXBND(1,I)=0.0
+        DUMAXBND(2,I)=1.0
         DIMS(I)=1
         NORM(I)=.FALSE.
         DIR(I)=1.0
@@ -254,8 +264,8 @@
 * initialise bounds etc for output
       DO I=1,7
         RAT(I)=1
-        BNDS(1,1,I)=0
-        BNDS(2,1,I)=1
+        BNDS(1,1,I)=0.0
+        BNDS(2,1,I)=1.0
         REGO(I)=.TRUE.
         UNIFO(I)=.TRUE.
         ODIM(I)=1
@@ -263,14 +273,9 @@
 
 * Find axes ranges
       DO I=1,NDIM
-        IF (REG(I)) THEN
-          CALL ARR_ELEM1R(AXVP(I),DIMS(I),1,RLOW,STATUS)
-          CALL ARR_ELEM1R(AXVP(I),DIMS(I),DIMS(I),RUPP,STATUS)
-        ELSE
-          IF (STATUS.EQ.SAI__OK) THEN
-            CALL ARR_RANG1R(DIMS(I),%VAL(AXVP(I)),RLOW,RUPP,STATUS)
-          ENDIF
-        ENDIF
+
+        CALL ARR_ELEM1R(AXVP(I),DIMS(I),1,RLOW,STATUS)
+        CALL ARR_ELEM1R(AXVP(I),DIMS(I),DIMS(I),RUPP,STATUS)
 
 * set axis direction indicator
         IF (RUPP.GE.RLOW) THEN
@@ -392,10 +397,8 @@
       ELSE
         CALL REBIN_DOIT_BYBOUNDS(NDIM,DIMS,
      :    %VAL(DPTR),VOK,%VAL(VPTR),QOK,MASK,%VAL(QPTR),
-     :    %VAL(AXVP(1)),%VAL(AXVP(2)),%VAL(AXVP(3)),%VAL(AXVP(4)),
-     :    %VAL(AXVP(5)),%VAL(AXVP(6)),%VAL(AXVP(7)),
-     :    %VAL(AXWP(1)),%VAL(AXWP(2)),%VAL(AXWP(3)),%VAL(AXWP(4)),
-     :    %VAL(AXWP(5)),%VAL(AXWP(6)),%VAL(AXWP(7)),DIR,NORM,
+     :    %VAL(AXBP(1)),%VAL(AXBP(2)),%VAL(AXBP(3)),%VAL(AXBP(4)),
+     :    %VAL(AXBP(5)),%VAL(AXBP(6)),%VAL(AXBP(7)),DIR,NORM,
      :    ODIM,BNDS,REGO,SEL,%VAL(DPTRO),%VAL(VPTRO),%VAL(QPTRO),
      :                                                     STATUS)
 
@@ -774,9 +777,8 @@
 
 
       SUBROUTINE REBIN_DOIT_BYBOUNDS(NDIM,DIMS,FRVAL,VOK,FRVAR,QOK,
-     :   MASK,FRQAL,FRPOS1,FRPOS2,FRPOS3,FRPOS4,FRPOS5,FRPOS6,FRPOS7,
-     :   FRWID1,FRWID2,FRWID3,FRWID4,FRWID5,FRWID6,FRWID7,DIR,
-     :   NORM,NBIN,BNDS,REGO,SEL,TOVAL,TOVAR,TOQAL,STATUS)
+     :   MASK,FRQAL,FRBND1,FRBND2,FRBND3,FRBND4,FRBND5,FRBND6,FRBND7,
+     :          DIR,NORM,NBIN,BNDS,REGO,SEL,TOVAL,TOVAR,TOQAL,STATUS)
 
 *    Description :
 *
@@ -787,6 +789,7 @@
 *     4 Aug 1988: original, based on reb_gen2eq (BHVAD::ADM)
 *       Nov 1989: major overhaul (BHVAD::RJV)
 *       Jun 1992: DQUAL changed to BYTE type (LTVAD::RDS)
+*       Dec 1994: change from using widths to bounds (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -802,20 +805,13 @@
         LOGICAL QOK			! whether input QUALITY present
         BYTE MASK			! QUALITY mask
 	BYTE FRQAL(*)			! values of donor qualities
-	REAL FRPOS1(*)			! donor bin  positions
-	REAL FRPOS2(*)			! donor bin  positions
-	REAL FRPOS3(*)			! donor bin  positions
-	REAL FRPOS4(*)			! donor bin  positions
-	REAL FRPOS5(*)			! donor bin  positions
-	REAL FRPOS6(*)			! donor bin  positions
-	REAL FRPOS7(*)			! donor bin  positions
-        REAL FRWID1(*) 			! donor bin widths
-        REAL FRWID2(*) 			! donor bin widths
-        REAL FRWID3(*) 			! donor bin widths
-        REAL FRWID4(*) 			! donor bin widths
-        REAL FRWID5(*) 			! donor bin widths
-        REAL FRWID6(*) 			! donor bin widths
-        REAL FRWID7(*) 			! donor bin widths
+        REAL FRBND1(2,*) 		! donor bin widths
+        REAL FRBND2(2,*) 		! donor bin widths
+        REAL FRBND3(2,*) 		! donor bin widths
+        REAL FRBND4(2,*) 		! donor bin widths
+        REAL FRBND5(2,*) 		! donor bin widths
+        REAL FRBND6(2,*) 		! donor bin widths
+        REAL FRBND7(2,*)		! donor bin widths
         REAL DIR(7)			! axis direction indicator
 	LOGICAL NORM(7)	        	! whether axes normalised
 	INTEGER NBIN(7)	        	! number of receptor bins
@@ -839,9 +835,9 @@
 	REAL DVAL		! donor bin value
         REAL DVAR               ! donor bin VAR
         BYTE DQUAL		! donor bin QUALITY
-	REAL DPOS(7)		! current donor bin position
         REAL DWID(7)            ! donor bin width
-        REAL DHWID(7)           ! donor bin half-width
+        REAL DLBND(7)           ! donor lower bound
+        REAL DUBND(7)		! donor upper bound
 	REAL DBOT(7)		! donor bin lower boundary
 	REAL DTOP(7)		! donor bin upper boundary
 	REAL RBOT(7)		! receptor lower boundary
@@ -896,30 +892,29 @@
                 DO I2=1,DIMS(2)
                   DO I1=1,DIMS(1)
 
-*  Get donor bin attributes
-	            DPOS(1)=FRPOS1(I(1))
-                    DPOS(2)=FRPOS2(I(2))
-	            DPOS(3)=FRPOS3(I(3))
-	            DPOS(4)=FRPOS4(I(4))
-	            DPOS(5)=FRPOS5(I(5))
-	            DPOS(6)=FRPOS6(I(6))
-	            DPOS(7)=FRPOS7(I(7))
-
 *  Upper and lower extent of bin in each axis
-                    DHWID(1)=FRWID1(I(1))/2.0
-                    DHWID(2)=FRWID2(I(2))/2.0
-                    DHWID(3)=FRWID3(I(3))/2.0
-                    DHWID(4)=FRWID4(I(4))/2.0
-                    DHWID(5)=FRWID5(I(5))/2.0
-                    DHWID(6)=FRWID6(I(6))/2.0
-                    DHWID(7)=FRWID7(I(7))/2.0
+                    DLBND(1)=FRBND1(1,I(1))
+                    DUBND(1)=FRBND1(2,I(1))
+                    DLBND(2)=FRBND2(1,I(2))
+                    DUBND(2)=FRBND2(2,I(2))
+                    DLBND(3)=FRBND3(1,I(3))
+                    DUBND(3)=FRBND3(2,I(3))
+                    DLBND(4)=FRBND4(1,I(4))
+                    DUBND(4)=FRBND4(2,I(4))
+                    DLBND(5)=FRBND5(1,I(5))
+                    DUBND(5)=FRBND5(2,I(5))
+                    DLBND(6)=FRBND6(1,I(6))
+                    DUBND(6)=FRBND6(2,I(6))
+                    DLBND(7)=FRBND7(1,I(7))
+                    DUBND(7)=FRBND7(2,I(7))
 
 *  boundaries and width of donor bin in each dimension
                     DO IAX=1,NDIM
-	              DBOT(IAX)=DPOS(IAX)-DHWID(IAX)*DIR(IAX)
-	              DTOP(IAX)=DPOS(IAX)+DHWID(IAX)*DIR(IAX)
-	              DWID(IAX)=DHWID(IAX)+DHWID(IAX)
+	              DBOT(IAX)=DLBND(IAX)
+	              DTOP(IAX)=DUBND(IAX)
+	              DWID(IAX)=ABS(DUBND(IAX)-DLBND(IAX))
                     ENDDO
+	print *,dbot(1),dtop(1),dwid(1)
 
 *  get donor bin values
                     IF (VOK.AND.QOK) THEN
