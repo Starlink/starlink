@@ -96,7 +96,7 @@ itcl::class gaia::GaiaNDFCube {
             -labelwidth 15 \
             -text "Input NDF cube:" \
             -textvariable [scope itk_option(-ndfcube)] \
-            -command [code $this setndf_] \
+            -command [code $this set_chosen_ndf_] \
             -filter_types $itk_option(-filter_types)
       }
       pack $itk_component(ndfcube) -side top -fill x -ipadx 1m -ipady 2m
@@ -114,35 +114,104 @@ itcl::class gaia::GaiaNDFCube {
       }
       foreach {label value} { one 1 two 2 three 3 } {
          $itk_component(axis) add \
-            -command [code $this set_axis_ $value] \
+            -command [code $this set_step_axis_ $value] \
             -label $label \
             -value $value
       }
-      set_axis_ 1
+      $itk_component(axis) configure -value 3
 
       pack $itk_component(axis) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(axis) \
          {Axis to step along}
 
       #  Slider that moves along the chosen axis.
-      #  XXX How to define a range...
       itk_component add index {
          LabelEntryScale $w_.index \
             -text {Index of plane:} \
             -value $plane_ \
             -labelwidth 15 \
             -valuewidth 20 \
-            -from 100 \
-            -to 1 \
+            -from 1 \
+            -to 100 \
             -increment 1 \
             -resolution 1 \
             -show_arrows 1 \
             -anchor w \
-            -command [code $this set_plane_]
+            -delay 25 \
+            -command [code $this set_display_plane_]
       }
       pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
+
+      #  Animation section. Choose upper and lower limits and then set it
+      #  away, need to loop around...
+      itk_component add aruler {
+         LabelRule $w_.aruler -text "Animation controls:"
+      }
+      pack $itk_component(aruler) -side top -fill x
+
+      itk_component add lower {
+         LabelEntryScale $w_.lower \
+            -text {Lower index:} \
+            -value 1 \
+            -labelwidth 15 \
+            -valuewidth 20 \
+            -from 1 \
+            -to 100 \
+            -increment 1 \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -delay 25 \
+            -command [code $this set_lower_bound_]
+      }
+      pack $itk_component(lower) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(lower) \
+         {Lower index used during animation}
+
+      itk_component add upper {
+         LabelEntryScale $w_.upper \
+            -text {Upper index:} \
+            -value 1 \
+            -labelwidth 15 \
+            -valuewidth 20 \
+            -from 1 \
+            -to 100 \
+            -increment 1 \
+            -resolution 1 \
+            -show_arrows 1 \
+            -anchor w \
+            -delay 25 \
+            -command [code $this set_upper_bound_]
+      }
+      pack $itk_component(upper) -side top -fill x -ipadx 1m -ipady 2m
+      add_short_help $itk_component(upper) \
+         {Upper index used during animation}
+
+      itk_component add animation {
+         frame $w_.animation
+      }
+      pack $itk_component(animation) -side top -fill x -ipadx 1m -ipady 2m
+
+      itk_component add stop {
+         button $itk_component(animation).stop -text Stop \
+            -command [code $this stop_]
+      }
+      pack $itk_component(stop) -side right -expand 1 -pady 3 -padx 3
+      add_short_help $itk_component(stop) {Stop animation}
+
+      itk_component add start {
+         button $itk_component(animation).start -text Start \
+            -command [code $this start_]
+      }
+      pack $itk_component(start) -side right -expand 1 -pady 3 -padx 3
+      add_short_help $itk_component(start) {Start animation}
+
+      #  Use limits to create a collapsed image using KAPPA COLLAPSE.
+      #  Use a section to pass to COLLAPSE so we do not need to know the world
+      #  coordinates.
+
 
       #  Close window.
       itk_component add close {
@@ -160,6 +229,7 @@ itcl::class gaia::GaiaNDFCube {
       if { $id_ != 0 } {
          $rtdimage_ ndf close $id_
       }
+      stop_
    }
 
    #  Methods:
@@ -167,11 +237,12 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Close window.
    public method close {} {
+      stop_
       wm withdraw $w_
    }
 
    #  Open the chosen NDF.
-   protected method setndf_ { args } {
+   protected method set_chosen_ndf_ { args } {
 
       set namer [GaiaImageName \#auto -imagename $itk_option(-ndfcube)]
       if { [$namer exists] } {
@@ -189,26 +260,31 @@ itcl::class gaia::GaiaNDFCube {
             return
          }
          set axis_ 2
-         set_axis_ 1
-         set_plane_ $plane_
+         set_step_axis_ 3
+         set_display_plane_ $plane_
       }
    }
 
    #  Set the axis we step along.
-   protected method set_axis_ {value} {
+   protected method set_step_axis_ {value} {
       if { $value != $axis_ && $bounds_ != {} } {
          set axis_ $value
          set plane_min_ [lindex $bounds_ [expr (${axis_}-1)*2]]
          set plane_max_ [lindex $bounds_ [expr (${axis_}-1)*2+1]]
-         
+
          $itk_component(index) configure -from $plane_min_ -to $plane_max_
-         set plane_ 2
-         set_plane_ 1
-      }         
+         $itk_component(lower) configure -from $plane_min_ -to $plane_max_
+         $itk_component(upper) configure -from $plane_min_ -to $plane_max_
+         set_lower_bound_ $plane_min_
+         set_upper_bound_ $plane_max_
+
+         set plane_ $plane_min_
+         set_display_plane_ [expr (${plane_max_}- ${plane_min_})/2]
+      }
    }
 
    #  Set the plane to display.
-   protected method set_plane_ { newvalue } {
+   protected method set_display_plane_ { newvalue } {
       if { $newvalue != $plane_ && $ndfname_ != {} } {
          if { $newvalue >= $plane_max_ } {
             set plane_ $plane_max_
@@ -234,12 +310,55 @@ itcl::class gaia::GaiaNDFCube {
       $itk_option(-gaia) open $name
    }
 
+   #  Set the animation lower bound.
+   protected method set_lower_bound_ {bound} {
+      set lower_bound_ $bound
+   }
+
+   #  Set the animation upper bound.
+   protected method set_upper_bound_ {bound} {
+      set upper_bound_ $bound
+   }
+
+   #  Start the animation.
+   protected method start_ {} {
+      if { $afterId_ == {} } {
+         if { $lower_bound_ > $upper_bound_ } {
+            set temp $lower_bound_
+            set lower_bound_ $upper_bound_
+            set upper_bound_ $temp
+         }
+         set_display_plane_ $lower_bound_
+         increment_
+      }
+   }
+
+   #  Stop the animation.
+   protected method stop_ {} {
+      if { $afterId_ != {} } {
+         after cancel $afterId_
+         set afterId_ {}
+      }
+   }
+
+   #  Increment the displayed section by one.
+   protected method increment_ {} {
+      if { $plane_ >= $lower_bound_ && $plane_ < $upper_bound_ } {
+         $itk_component(index) configure -value [expr ${plane_}+1]
+         set_display_plane_ [expr ${plane_}+1]
+         set afterId_ [after $itk_option(-delay) [code $this increment_]]
+      } else {
+         #  Off end so stop.
+         stop_
+      }
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
 
    #  Name of the input text file.
-   itk_option define -ndfcube ndfcube Ndfcube {
-      setndf_
+   itk_option define -ndfcube ndfcube Ndfcube {} {
+      set_chosen_ndf_
    }
 
    #  Name of the Gaia instance we're controlling.
@@ -247,6 +366,9 @@ itcl::class gaia::GaiaNDFCube {
 
    #  Filters for selecting files.
    itk_option define -filter_types filter_types Filter_types {}
+
+   #  The animation delay (ms).
+   itk_option define -delay delay Delay 100
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -266,12 +388,19 @@ itcl::class gaia::GaiaNDFCube {
    #  Maximum and minimum possible value for plane.
    protected variable plane_max_ 0
    protected variable plane_min_ 0
-   
+
+   #  Animation bounds.
+   protected variable lower_bound_ 0
+   protected variable upper_bound_ 0
+
    #  The current axis.
    protected variable axis_ 1
 
    #  The current NDF identifier.
    protected variable id_ 0
+   
+   #  Id of the animation thread.
+   protected variable afterId_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------

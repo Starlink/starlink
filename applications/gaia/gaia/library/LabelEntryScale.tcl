@@ -104,7 +104,7 @@ itcl::class util::LabelEntryScale {
 		eval $cmd
 	    }
 	}
-	set afterId_ [after 200 [code $this increment $sign]]
+	set afterId_ [after $itk_option(-delay) [code $this increment $sign]]
     }
 
 
@@ -255,6 +255,9 @@ itcl::class util::LabelEntryScale {
 
     #  Whether to show the scale widget.
     itk_option define -show_scale show_scale Show_Scale 1 {}
+
+    #  The pause in milliseconds for the animation delay.
+    itk_option define -delay delay Delay 150
 
     #  State of increment command.
     protected variable afterId_ {}

@@ -77,6 +77,8 @@
 #        Added UKIRT quick look option.
 #     21-JUL-2003 (PWD):
 #        Added support for the new tabbed interface.
+#     13-OCT-2004 (PWD):
+#        Added cube display toolbox and associated changes.
 #     {enter_changes_here}
 
 #-
@@ -133,6 +135,7 @@ Options:
  -catalog  "<c1> <c2> .." - open windows for the given catalogs on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
+ -check_for_cubes <bool>  - reopen cubes using the cube toolbox (default: 1)
  -debug <bool>            - debug flag: run bg processes in fg.
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
@@ -295,6 +298,9 @@ itcl::class gaia::Gaia {
 
       #  Center image first time.
       after 0 [code $image_ center]
+
+      #  Check if any post display tasks are required.
+      after 0 [file_loaded_]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -374,6 +380,7 @@ itcl::class gaia::Gaia {
          GaiaImageCtrl $image_ \
             -file $itk_option(-file) \
             -file_change_cmd [code $this configure -file] \
+            -file_open_cmd [code $this file_loaded_] \
             -file_types $itk_option(-file_types) \
             -usexshm $itk_option(-usexshm) \
             -verbose $itk_option(-verbose) \
@@ -1122,6 +1129,48 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Notification that a file has been loaded into the GaiaImageCtrl.
+   #  Not for trivial or non-UI changes (i.e. only respond to changes 
+   #  from the command-line or the open-file dialog of GaiaImageCtrl).
+   protected method file_loaded_ { {filename {}} } {
+      if { $filename != {} } {
+         configure -file $filename
+      }
+      if { $itk_option(-file) == {} } { 
+         return
+      }
+      if { ! $itk_option(-check_for_cubes) } {
+         return
+      }
+
+      #  Do not re-display or check a cube that has already been passed 
+      #  on (there is feedback as the cube tool displays a cube, which 
+      #  re-calls this method).
+      if { $itk_option(-file) == $lastcube_ } {
+         return
+      }
+      set lastcube_ $itk_option(-file)
+
+      #  See if this is a cube, if so offer to load it using the cube
+      #  browser. Cheat bigtime by looking for a NAXIS3 card. This should work
+      #  for FITS and NDF cubes.
+      set iscube 0
+      set rtdimage [$image_ get_image]
+      set naxis3 [$rtdimage fits get NAXIS3]
+      set naxis4 [$rtdimage fits get NAXIS4]
+      if { $naxis4 == {} && $naxis3 != {} } {
+         set naxis1 [$rtdimage fits get NAXIS1]
+         set naxis2 [$rtdimage fits get NAXIS2]
+
+         #  No trivial cubes?
+         if { $naxis1 != 1 && $naxis2 != 1 && $naxis3 != 1 } {
+            #  Load it into cube browser.
+            make_toolbox opencube 0 1
+            $itk_component(opencube) configure -ndfcube $itk_option(-file)
+         }
+      }
+   }
+
    #  When image is flipped etc. we may want to redraw some items that
    #  are too expensive to flip via Tcl commands.  If auto is set 1
    #  then the grid is only redrawn if automatic redraws are on.
@@ -1234,7 +1283,7 @@ itcl::class gaia::Gaia {
    #  determining when the clone has been created). It also provides
    #  the ability to specify the file name directly (thus replacing
    #  the command-line version) and to gain access to an existing
-   #  clone (by number). Used for demo/remote control. Note that 
+   #  clone (by number). Used for demo/remote control. Note that
    #  a clone number of -1 generates a clone number.
    public method noblock_clone {number {file ""} {block 0} args} {
       global ::argv ::argc ::gaia_usage
@@ -1792,7 +1841,10 @@ window gives you access to this."
 
    #  The default percentage cut used for new files.
    itk_option define -default_cut default_cut Default_Cut 100.0
- 
+
+   #  Check any images that are opened to see if they are cubes.
+   itk_option define -check_for_cubes check_for_cubes Check_For_Cubes 1
+  
    # -- Protected variables --
 
    #  Application name.
@@ -1827,6 +1879,9 @@ window gives you access to this."
 
    #  The text catalogue importer dialog.
    protected variable importer_ .importer
+
+   #  The last cube sent for display.
+   protected variable lastcube_ {}
 
    # -- Common variables --
 
