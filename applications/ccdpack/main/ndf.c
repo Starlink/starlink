@@ -2040,7 +2040,8 @@
 
 /* If we don't now have memory to put the pixel array in, allocate some. */
          if ( ! ndfset->plotarray->exists ) {
-            ndfset->plotarray->data = malloc( sizeof( int ) * xdim * ydim );
+            ndfset->plotarray->data = 
+               malloc( sizeof( int ) * ( xdim + 1 ) * ( ydim + 1 ) );
             if ( ndfset->plotarray->data == NULL ) {
                *status = SAI__ERROR;
                errRep( " ", "Memory allocation failed", status );
@@ -2120,7 +2121,7 @@
                case Xccdtype: \
 \
 /* Allocate space for the intermediate resampled data. */ \
-                  work = malloc( xd * yd * sizeof( Xctype ) ); \
+                  work = malloc( ( xd + 1 ) * ( yd + 1 ) * sizeof( Xctype ) ); \
                   if ( work == NULL ) { \
                      *status = SAI__ERROR; \
                      errRep( "NDF_NOMEM", "Memory allocation failed", \
