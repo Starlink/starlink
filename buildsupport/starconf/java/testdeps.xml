@@ -18,7 +18,7 @@
     <description>x</description>
     <dependencies>
       <build>c</build>
-      <!-- <build option="link">c</build> -->
+      <configure>i</configure>
     </dependencies>
   </component>
 
@@ -27,6 +27,7 @@
     <path>c</path>
     <description>x</description>
     <dependencies>
+      <!-- none -->
     </dependencies>
   </component>
 
@@ -65,6 +66,26 @@
     <description>x</description>
     <dependencies>
       <link>f</link>
+    </dependencies>
+  </component>
+
+  <!-- h has a configure dependency on b, and thus also on c (via build)
+       and i (via configure) -->
+  <component id="h">
+    <version>1</version>
+    <path>h</path>
+    <description>x</description>
+    <dependencies>
+      <configure>b</configure>
+    </dependencies>
+  </component>
+
+  <component id="i">
+    <version>1</version>
+    <path>i</path>
+    <description>x</description>
+    <dependencies>
+      <!-- none -->
     </dependencies>
   </component>
 
@@ -160,6 +181,7 @@
     <path>zb</path>
     <description>x</description>
     <dependencies>
+      <!-- none -->
     </dependencies>
   </component>
 

@@ -4,13 +4,19 @@ a:
   path=a \
   --
 
+# Component b is a configure dependency, so is configurable in place.
+# Component b has configure dependencies on { i },
+# which must be built before this component is configured.
 b:
   c
   path=b \
+  (configdep)
   --
 
+# Component c is a configure dependency, so is configurable in place.
 c:
   path=c \
+  (configdep)
   --
 
 d:
@@ -33,6 +39,18 @@ g:
   path=g \
   --
 
+# Component h has configure dependencies on { b i },
+# which must be built before this component is configured.
+h:
+  path=h \
+  --
+
+# Component i is a configure dependency, so is configurable in place.
+i:
+  path=i \
+  (configdep)
+  --
+
 Component t: circular build dependencies
 Component u: circular build dependencies
 Component v: circular build dependencies
@@ -40,6 +58,7 @@ Component w: circular build dependencies
 Component x: circular build dependencies
 Component y: circular build dependencies
 Component z: circular build dependencies
+# Component za is a buildsupport component
 za:
   zb
   path=za \
@@ -59,3 +78,10 @@ EXTRA_BUILDSUPPORT_MANIFESTS =
 buildsupport: $(BUILDSUPPORT_MANIFESTS)
 clean-buildsupport:
 	rm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)
+
+# Configuration dependencies
+# Run 'make configure-deps' to make these components before ./configure
+configure-deps:
+  b
+  c
+  i
