@@ -74,6 +74,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.6  2004/09/01 00:41:11  timj
+*     use CNF_PVAL
+*
 *     Revision 1.5  1999/08/03 19:35:13  timj
 *     Add copyright message to header.
 *     Convert old header style to new.
@@ -104,6 +107,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'PRM_PAR'         ! for VAL__BADI
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  Arguments Given:
       LOGICAL       USE_SECT
@@ -205,7 +209,7 @@
       BTEMP = 0
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_CFILLB(N_POS * N_BOLS * N_BEAM, BTEMP, 
-     :        %VAL(BYTE_PTR))
+     :        %VAL(CNF_PVAL(BYTE_PTR)))
       END IF
 
 *     I am setting bit 0 in the mask array to ON
@@ -221,12 +225,15 @@
          CALL SCULIB_DECODE_SPEC (DATA_SPEC(I), DEMOD_POINTER,
      :        N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS, 
      :        N_POS, N_BOLS, SWITCH_EXPECTED, POS_SELECTED, 
-     :        %val(POS_S_PTR), %VAL(SW_S_PTR), %VAL(EXP_S_PTR), 
-     :        %VAL(INT_S_PTR), %VAL(MEAS_S_PTR), %VAL(BOL_S_PTR), 
+     :        %VAL(CNF_PVAL(POS_S_PTR)), %VAL(CNF_PVAL(SW_S_PTR)), 
+     :        %VAL(CNF_PVAL(EXP_S_PTR)),
+     :        %VAL(CNF_PVAL(INT_S_PTR)), %VAL(CNF_PVAL(MEAS_S_PTR)), 
+     :        %VAL(CNF_PVAL(BOL_S_PTR)),
      :        STATUS)
          
-         CALL SCULIB_SET_QUAL (.TRUE., %val(BYTE_PTR), N_BOLS,
-     :        N_POS, N_BEAM, %VAL(BOL_S_PTR), %val(POS_S_PTR), 
+         CALL SCULIB_SET_QUAL (.TRUE., %VAL(CNF_PVAL(BYTE_PTR)), N_BOLS,
+     :        N_POS, N_BEAM, %VAL(CNF_PVAL(BOL_S_PTR)), 
+     :        %VAL(CNF_PVAL(POS_S_PTR)),
      :        MASK_BIT, BIT_SWITCH, STATUS)
 
       END DO
@@ -238,20 +245,20 @@
       IF (TYPE .EQ. 'BYTE') THEN
 
          CALL SCULIB_SET_DATA_UB (USE_SECT, 
-     :        N_BOLS, N_POS, N_BEAM, %VAL(BYTE_PTR),
-     :        BVALUE, %val(DATA_PTR), STATUS)
+     :        N_BOLS, N_POS, N_BEAM, %VAL(CNF_PVAL(BYTE_PTR)),
+     :        BVALUE, %val(cnf_pval(DATA_PTR)), STATUS)
 
       ELSE IF (TYPE .EQ. 'REAL') THEN
 
          CALL SCULIB_SET_DATA (USE_SECT, N_BOLS, N_POS, 
-     :        N_BEAM, %VAL(BYTE_PTR), 
-     :        VALUE, %val(DATA_PTR), STATUS)
+     :        N_BEAM, %VAL(CNF_PVAL(BYTE_PTR)),
+     :        VALUE, %val(cnf_pval(DATA_PTR)), STATUS)
 
       ELSE IF (TYPE .EQ. 'BIT') THEN
 
          CALL SCULIB_SET_DATA_BIT(USE_SECT, N_BOLS, N_POS, 
-     :        N_BEAM, %VAL(BYTE_PTR), 
-     :        BITNUM, BIT_STATE, %val(DATA_PTR), STATUS)
+     :        N_BEAM, %VAL(CNF_PVAL(BYTE_PTR)),
+     :        BITNUM, BIT_STATE, %val(cnf_pval(DATA_PTR)), STATUS)
 
       END IF
 

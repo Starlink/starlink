@@ -65,6 +65,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! VAL__ constants
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDP
@@ -130,7 +131,8 @@
       IF (STATUS .EQ. SAI__OK) THEN
 
          CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN,
-     :        1,1, X_IN(1), Y_IN(1), RTEMP, %VAL(IWK_PTR), %VAL(WK_PTR), 
+     :        1,1, X_IN(1), Y_IN(1), RTEMP, %VAL(CNF_PVAL(IWK_PTR)), 
+     :        %VAL(CNF_PVAL(WK_PTR)),
      :        ISTAT, STATUS)
 
          IF (STATUS .NE. SAI__OK .OR. ISTAT .NE. 0) THEN
@@ -146,8 +148,9 @@
             DATA_OFFSET = 1
 
             CALL PDA_IDSFFT(MODE, NCP, NDP, X_IN, Y_IN, DATA_IN, NX_OUT,
-     :           NY_OUT, X_OUT, Y_OUT, DATA_OUT, %VAL(IWK_PTR), 
-     :           %VAL(WK_PTR), ISTAT, STATUS)
+     :           NY_OUT, X_OUT, Y_OUT, DATA_OUT, 
+     :           %VAL(CNF_PVAL(IWK_PTR)),
+     :           %VAL(CNF_PVAL(WK_PTR)), ISTAT, STATUS)
 
             IF (ISTAT .NE. 0 .OR. STATUS .NE. SAI__OK) THEN
                CALL MSG_SETI('ISTAT', ISTAT)

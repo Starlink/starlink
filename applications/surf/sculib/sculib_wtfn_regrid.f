@@ -164,6 +164,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.7  2004/09/01 00:42:14  timj
+*     use CNF_PVAL
+*
 *     Revision 1.6  1999/08/19 03:37:32  timj
 *     Header tweaks to ease production of SSN72 documentation.
 *
@@ -182,6 +185,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *  Arguments Given:
       LOGICAL USEGRD
@@ -265,7 +269,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_CFILLR (NX_OUT * NY_OUT, 0.0,
-     :     %val(TOTAL_WEIGHT_PTR))
+     :     %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)))
       END IF
 
 *     Start a timer
@@ -280,11 +284,12 @@
 
       DO I = 1, N_MAPS
          CALL SCULIB_WTFN_REGRID_1 (DIAMETER, WAVELENGTH, WEIGHT(I), 
-     :        %val(DATA_PTR(I)),
-     :        %val(XPOS_PTR(I)), %val(YPOS_PTR(I)), 
+     :        %VAL(CNF_PVAL(DATA_PTR(I))),
+     :        %VAL(CNF_PVAL(XPOS_PTR(I))), %VAL(CNF_PVAL(YPOS_PTR(I))),
      :        N_PTS(I), DBLE(PXSIZE), NX_OUT, 
-     :        NY_OUT, I_CENTRE, J_CENTRE, %VAL(TOTAL_WEIGHT_PTR),
-     :        %val(REGRID1_PTR), STATUS)
+     :        NY_OUT, I_CENTRE, J_CENTRE, 
+     :        %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
+     :        %VAL(CNF_PVAL(REGRID1_PTR)), STATUS)
       END DO
 
 *     Free the scratch array
@@ -338,7 +343,8 @@
                   DATA_OFFSET = ((K-1) * N_BOL(I)) + (J-1)
 
                   CALL VEC_RTOR(.FALSE., 1, BOLWT(J,I),
-     :                 %VAL(BOLWT_PTR + (DATA_OFFSET * VAL__NBR)),
+     :                 
+     :   %VAL(CNF_PVAL(BOLWT_PTR) + (DATA_OFFSET * VAL__NBR)),
      :                 IERR, NERR, STATUS)
 
                END DO
@@ -349,11 +355,11 @@
 
 *     The actual dirty work
          CALL SCULIB_WTFN_REGRID_2 (WTFNRES,
-     :        %val(DATA_PTR(I)), %val(VAR_PTR(I)),
-     :        WEIGHT(I), USEBOLWT, %VAL(BOLWT_PTR),
-     :        %val(XPOS_PTR(I)), %val(YPOS_PTR(I)),
+     :        %VAL(CNF_PVAL(DATA_PTR(I))), %VAL(CNF_PVAL(VAR_PTR(I))),
+     :        WEIGHT(I), USEBOLWT, %VAL(CNF_PVAL(BOLWT_PTR)),
+     :        %VAL(CNF_PVAL(XPOS_PTR(I))), %VAL(CNF_PVAL(YPOS_PTR(I))),
      :        N_PTS(I), PXSIZE, NX_OUT, NY_OUT,
-     :        I_CENTRE, J_CENTRE, %VAL(TOTAL_WEIGHT_PTR),
+     :        I_CENTRE, J_CENTRE, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)),
      :        WAVELENGTH, OUT_DATA, OUT_VARIANCE,
      :        CONV_WEIGHT, WEIGHTSIZE, SCALE, WTFN, STATUS)
 
@@ -375,7 +381,8 @@
 
       CALL SCULIB_WTFN_REGRID_3 (USEGRD, WTFNRES, PXSIZE, 
      :     NX_OUT, NY_OUT,
-     :     I_CENTRE, J_CENTRE, %VAL(TOTAL_WEIGHT_PTR), WAVELENGTH,
+     :     I_CENTRE, J_CENTRE, %VAL(CNF_PVAL(TOTAL_WEIGHT_PTR)), 
+     :     WAVELENGTH,
      :     OUT_DATA, OUT_VARIANCE,
      :     OUT_QUALITY, CONV_WEIGHT, WEIGHTSIZE, SCALE,
      :     WTFN, STATUS)
