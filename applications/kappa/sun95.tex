@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.14}
 \newcommand{\stardocnumber}    {95.14}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {3 November 1999}
+\newcommand{\stardocdate}      {29 November 1999}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.14-2}
+\newcommand{\stardocversion}   {0.14-3}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1102,7 +1102,7 @@ only be issued once per login session.  Thus you will see
 
 \small
 \begin{verbatim}
-      KAPPA commands are now available -- (Version 0.14-2)
+      KAPPA commands are now available -- (Version 0.14-3)
  
       Type kaphelp for help on KAPPA commands
 \end{verbatim}
@@ -11181,6 +11181,8 @@ Martin Shaw.  Mike Lawden helped produce the quick-reference card.
  Concatenates a series of vectorized NDFs.}
 \menuitem{CMULT}{
  Multiplies an NDF by a scalar.}
+\menuitem{COLCOMP}{
+ Produce a colour composite image from 1, 2 or 3 individual NDFs.}
 \menuitem{COMPADD}{
  Reduces the size of an NDF by adding values in rectangular boxes.}
 \menuitem{COMPAVE}{
@@ -11603,6 +11605,8 @@ functions as follows.
 %
 \item {\large\bf Detail enhancement}
 \begin{description}
+\classitem{COLCOMP}
+ Produce a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{HISTEQ}
  Performs an histogram equalisation on an NDF.
 \classitem{LAPLACE}
@@ -11830,6 +11834,8 @@ functions as follows.
 \begin{description}
 \classitem{CALPOL}
  Calculates polarisation parameters.
+\classitem{COLCOMP}
+ Produce a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{KSTEST}
  Compares data sets using the Kolmogorov-Smirnov test.
 \classitem{MOSAIC}
@@ -14470,6 +14476,279 @@ default value.
          Arithmetic is carried out using the appropriate floating-point
          type, but the numeric type of the input pixels is preserved in
          the output NDF.
+      }
+   }
+}
+\sstroutine{
+   COLCOMP
+}{
+   Produces a colour composite of up to three 2-dimensional NDFs
+}{
+   \sstdescription{
+      This application combines up to three 2-dimensional NDFs, using a
+      different primary colour (red, green or blue) to represent each NDF.
+      The resulting colour composite image is available in two forms; as an
+      NDF with an associated colour table (see parameters OUT and LUT), and
+      as an ASCII PPM image file (see parameter PPM). The full pixel
+      resolution of the input NDFs is retained. Note, this application
+      does not actually display the image, it just creates various output
+      files which must be displayed using other tools (see below).
+
+      The data values in each of the input NDFs which are to be mapped onto
+      zero intensity and full intensity can be given manually using
+      parameters RLOW, RHIGH, GLOW, GHIGH, BLOW and BHIGH, but by default
+      they are evaluated automatically. This is done by finding specified
+      percentile points within the data histograms of each of the input
+      images (see parameter PERCENTILES).
+
+      The NDF outputs are intended to be displayed with KAPPA application
+      DISPLAY, using the command:
+
+      \hspace{5mm} {\small {\tt display $<$out$>$ scale=no lut=$<$lut$>$} }
+
+      where ``{\tt $<$out$>$}'' and ``{\tt $<$lut$>$}'' are the names of the
+      NDF image and colour table created by this application using
+      parameters OUT and LUT. The main advantage of this NDF form of
+      output over the PPM form is that any WCS or AXIS information in the
+      input NDFs is still available, and can be used to create axis
+      annotations by the DISPLAY command. The graphics device which will
+      be used to display the image must be specified when running this
+      application (see parameter DEVICE).
+
+      The PPM form of output can be displayed using tools such as {\tt "}xv{\tt "}, or
+      converted into other forms (GIF or JPEG, for instance) using tools
+      such as {\tt "}ppmtogif{\tt "} and {\tt "}cjpeg{\tt "} from the NetPbm or PbmPlus packages.
+      These tools provide more sophisticated colour quantisation methods
+      than are used by this application when creating the NDF outputs, and
+      so may give better visual results.
+   }
+   \sstusage{
+      colcomp inr ing inb out lut device
+   }
+   \sstparameters{
+      \sstsubsection{
+         BADCOL = LITERAL (Read)
+      }{
+         The colour with which to mark any bad (\emph{i.e.} missing) pixels in the
+         display.  There are a number of options described below:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}MAX{\tt "} -- The maximum colour index used for the display of the image.
+
+            \sstitem
+            {\tt "}MIN{\tt "} -- The minimum colour index used for the display of the image.
+
+            \sstitem
+            An integer -- The actual colour index.  It is constrained between
+            0 and the maximum colour index available on the device.
+
+            \sstitem
+            A named colour -- Uses the named colour from the palette, and if it
+            is not present, the nearest colour from the palette is selected.
+
+         }
+         If the colour is to remain unaltered as the lookup table is
+         manipulated choose an integer between 0 and 15, or a named
+         colour.  Note, if only the PPM output is to be created (see
+         parameter PPM), then a named colour must be given for BADCOL.
+         {\tt [current value]}
+      }
+      \sstsubsection{
+         BHIGH = \_DOUBLE (Read)
+      }{
+         The data value corresponding to full blue intensity. If a null
+         (!) value is supplied, the value actually used will be determined
+         by forming a histogram of the data values in the NDF specified by
+         parameter INB, and finding the data value at the second histogram
+         percentile specified by parameter PERCENTILES. {\tt [!]}
+      }
+      \sstsubsection{
+         BLOW = \_DOUBLE (Read)
+      }{
+         The data value corresponding to zero blue intensity. If a null
+         (!) value is supplied, the value actually used will be determined
+         by forming a histogram of the data values in the NDF specified by
+         parameter INB, and finding the data value at the first histogram
+         percentile specified by parameter PERCENTILES. {\tt [!]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device which will be used to display
+         the NDF output (see parameter OUT). This is needed only to
+         determine the number of available colours. No graphics output
+         is created by this application. This parameter is not accessed
+         if a null (!) value is supplied for parameter OUT. The device
+         must have at least 24 colour indices or greyscale intensities.
+         {\tt [current image-display device]}
+      }
+      \sstsubsection{
+         GHIGH = \_DOUBLE (Read)
+      }{
+         The data value corresponding to full green intensity. If a null
+         (!) value is supplied, the value actually used will be determined
+         by forming a histogram of the data values in the NDF specified by
+         parameter ING, and finding the data value at the second histogram
+         percentile specified by parameter PERCENTILES. {\tt [!]}
+      }
+      \sstsubsection{
+         GLOW = \_DOUBLE (Read)
+      }{
+         The data value corresponding to zero green intensity. If a null
+         (!) value is supplied, the value actually used will be determined
+         by forming a histogram of the data values in the NDF specified by
+         parameter ING, and finding the data value at the first histogram
+         percentile specified by parameter PERCENTILES. {\tt [!]}
+      }
+      \sstsubsection{
+         INB = NDF (Read)
+      }{
+         The input NDF containing the data to be displayed in blue. A null
+         (!) value may be supplied in which case the blue intensity in the
+         output will be zero at every pixel.
+      }
+      \sstsubsection{
+         ING = NDF (Read)
+      }{
+         The input NDF containing the data to be displayed in green. A null
+         (!) value may be supplied in which case the green intensity in the
+         output will be zero at every pixel.
+      }
+      \sstsubsection{
+         INR = NDF (Read)
+      }{
+         The input NDF containing the data to be displayed in red. A null
+         (!) value may be supplied in which case the red intensity in the
+         output will be zero at every pixel.
+      }
+      \sstsubsection{
+         LUT = NDF (Write)
+      }{
+         Name of the output NDF to contain the colour lookup table which
+         should be used when displaying the NDF created using parameter OUT.
+         This colour table can be loaded using LUTREAD, or specified when
+         the image is displayed. This parameter is not accessed if a null
+         (!) value is given for parameter OUT.
+      }
+      \sstsubsection{
+         RHIGH = \_DOUBLE (Read)
+      }{
+         The data value corresponding to full red intensity. If a null
+         (!) value is supplied, the value actually used will be determined
+         by forming a histogram of the data values in the NDF specified by
+         parameter INR, and finding the data value at the second histogram
+         percentile specified by parameter PERCENTILES. {\tt [!]}
+      }
+      \sstsubsection{
+         RLOW = \_DOUBLE (Read)
+      }{
+         The data value corresponding to zero red intensity. If a null
+         (!) value is supplied, the value actually used will be determined
+         by forming a histogram of the data values in the NDF specified by
+         parameter INR, and finding the data value at the first histogram
+         percentile specified by parameter PERCENTILES. {\tt [!]}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The output colour composite image in NDF format. Values in
+         this output image are integer colour indices into the colour
+         table created using parameter LUT. The values are shifted to
+         account for the indices reserved for the palette (\emph{i.e.} the first
+         entry in the colour table is addressed as entry 16, not entry 1).
+         The NDF is intended to be used as the input data in conjunction with
+         DISPLAY SCALE=FALSE. If a null value (!) is supplied, no output NDF
+         will be created.
+      }
+      \sstsubsection{
+         PERCENTILES( 2 ) = \_REAL (Read)
+      }{
+         The percentiles that define the default scaling limits. For example,
+         [25,75] would scale between the quartile values. {\tt [5,95]}
+      }
+      \sstsubsection{
+         PPM = FILE (Write)
+      }{
+         The name of the output text file to contain the PPM form of the
+         colour composite image. The colours specified in this file
+         represent the input data values directly. They are not quantised or
+         dithered in any way. Also note that because this is a text file,
+         containing formatted data values, it is portable, but can be
+         very large, and slow to read and write. If a null (!) value is
+         supplied, no PPM output is created. {\tt [!]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         colcomp m31\_r m31\_g m31\_b m31\_col m31\_lut
+      }{
+         Combines the 3 NDFs m31\_r, m31\_g, and m31\_b to create a colour
+         composite image stored in NDF m31\_col. A colour look up table is
+         also created and stored in NDF m31\_lut. It is assumed that the
+         output image will be displayed on the current graphics device.
+         The created colour composite image should be displayed using the
+         command:
+
+         \hspace{5mm} {\small {\tt display m31\_col scale=no lut=m31\_lut} }
+
+      }
+      \sstexamplesubsection{
+         colcomp m31\_r m31\_g m31\_b out=$\backslash$! ppm=m31.ppm
+      }{
+         As above, but no NDF outputs are created. Instead, a file called
+         m31.ppm is created which (for instance) can be displayed using
+         the command:
+
+         \hspace{5mm} {\small {\tt xv m31.ppm} }
+
+         It can be converted to a GIF (for instance, for inclusion in
+         WWW pages) using the command:
+
+         \hspace{5mm} {\small {\tt ppmquant 256 m31.ppm $|$ ppmtogif $>$ m31.gif} }
+
+         These commands assume you have {\tt xv}, {\tt ppmquant} and 
+         {\tt ppmtogif} installed at your site. None of them are 
+         part of KAPPA.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The output image (PPM or NDF) covers the area of overlap between
+         the input NDFs at full resolution. If the input NDFs are very large
+         is is a good idea to compress them first (for instance, using
+         COMPAVE) to reduce the size of the output images. Note, compressing
+         the output NDF will normally produce spurious colours in the
+         compressed image.
+
+         \sstitem
+         The output image is based on the values in the DATA components
+         of the input NDFs. Any VARIANCE and QUALITY arrays in the input NDFs
+         are ignored.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: DISPLAY, LUTREAD; XV; PBMPLUS; NETPBM.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The HISTORY, WCS and AXIS components, together with any extensions
+         are propagated to the output NDF, from the first supplied input NDF.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         Only data of type \_REAL can be processed directly. Data of other
+         types will be converted to \_REAL before being processed.
       }
    }
 }
@@ -40396,7 +40675,7 @@ plot (7k).
          {\tt "}V0.14-1{\tt "}, and sets the RESULT parameter appropriately. For
          instance, if the installed package was {\tt "}V0.13-6{\tt "} then RESULT
          would be set to -1. If the installed package was {\tt "}V0.14-1{\tt "},
-         RESULT would be set to 0. If the installed package was {\tt "}V0.14-2{\tt "}
+         RESULT would be set to 0. If the installed package was {\tt "}V0.14-3{\tt "}
          RESULT would be set to $+$1.
       }
    }
@@ -43942,7 +44221,7 @@ section \ref{se:style} the use of graphical style parameters.
 \end{itemize}
 \end{htmlonly}
 
-\section{\xlabel{se_changes}Release Notes---V0.14-2\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V0.14-3\label{se:changes}}
 
 More applications have been changed to enable them to make use
 of the NDF WCS component, which stores descriptions of world
@@ -43955,7 +44234,7 @@ new parameters.
 
 \begin{quote}
 \emph{ Scripts which make use of any of the removed or modified parameters
-will fail when run with KAPPA V0.14-2. Such scripts will need to be changed
+will fail when run with KAPPA V0.14-3. Such scripts will need to be changed
 to take account of the new features introduced in this release. Check the
 lists below for details.}
 \end{quote}
@@ -44528,6 +44807,8 @@ The following applications have been modified:
 
 \subsection{New applications}
 \begin{description}
+   \item [\htmlref{COLCOMP}{COLCOMP}] -- Produces a colour composite image 
+    from 1, 2 or 3 individual NDFs.
    \item [\htmlref{SCATTER}{SCATTER}] -- Displays a scatter plot between
     data in two n-dimension NDFs.
    \item [\htmlref{KAPVERSION}{KAPVERSION}] -- Check the version number of the 
@@ -44654,6 +44935,8 @@ functions as follows.
 %
 \item {\large\bf Detail enhancement}
 \begin{description}
+\classitem{COLCOMP}
+ Produce a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{HISTEQ}
  Performs an histogram equalisation on an NDF.
 \classitem{LAPLACE}
@@ -44880,6 +45163,8 @@ functions as follows.
 \begin{description}
 \classitem{CALPOL}
  Calculates polarisation parameters.
+\classitem{COLCOMP}
+ Produce a colour composite image from 1, 2 or 3 individual NDFs.
 \classitem{KSTEST}
  Compares data sets using the Kolmogorov-Smirnov test.
 \classitem{MOSAIC}
