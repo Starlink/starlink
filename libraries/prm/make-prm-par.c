@@ -235,8 +235,10 @@ void Usage(void);
 
 /* Conditional functions, to replace possibly missing library functions */
 #if !HAVE_NEXTAFTER
-float  nextafterf(float, float);
 double nextafter(double, double);
+#endif
+#if !HAVE_NEXTAFTERF
+float  nextafterf(float, float);
 #endif
 #if FLOAT_IS_IEEE
 float min_denorm_f(void);
@@ -1023,7 +1025,7 @@ void generate_test_output(FILE *out)
 #endif
 
         
-#if !HAVE_NEXTAFTER
+#if !HAVE_NEXTAFTERF
 /* 
  * Replacement nextafter functions.  These are NOT general
  * implementations of these functions: they work only for negative
@@ -1047,7 +1049,9 @@ float nextafterf(float x, float y)
     pair.i--;
     return pair.f;
 }
+#endif
 
+#if !HAVE_NEXTAFTER
 double nextafter(double x, double y)
 {
     union {
