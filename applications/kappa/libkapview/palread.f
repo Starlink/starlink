@@ -32,12 +32,7 @@
 
 *  ADAM Parameters:
 *     DEVICE = DEVICE (Read)
-*        Name of the image display to be used.  The device must be in
-*        one of the following GNS categories: IMAGE_DISPLAY,
-*        IMAGE_OVERLAY, or WINDOW, and have at least 24 colour indices.
-*        The device must also not reset when the device is opened
-*        (since the existing colour table would be lost).  [Current
-*        image-display device]
+*        Name of the image display to be used.  [Current image-display device]
 *     PALETTE = NDF (Read)
 *        The name of the NDF containing the palette of reserved colours
 *        as its data array.  The palette must be 2-dimensional, the
@@ -56,6 +51,13 @@
 *        This loads the palette stored in the NDF called rustic into
 *        the reserved portion of the colour table of the xwindows
 *        device.
+
+*  Notes:
+*     - The effects of this command will only be immediately apparent
+*     when run on X windows which have 256 colours (or other similar 
+*     pseudocolour devices). On other devices (for instance, X windows
+*     with more than 256 colours) the effects will only become apparent 
+*     when subsequent graphics applications are run.
 
 *  Related Applications:
 *     KAPPA: PALDEF, PALENTRY, PALSAVE.

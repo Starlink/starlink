@@ -45,10 +45,7 @@
 
 *  ADAM Parameters:
 *     DEVICE = DEVICE (Read)
-*        Name of the image display to be used.  The device must be in
-*        one of the following GNS categories: IMAGE_DISPLAY,
-*        IMAGE_OVERLAY, MATRIX_PRINTER or WINDOW, and have at least 24
-*        colour indices.  [Current image-display device]
+*        Name of the image display to be used.  [Current image-display device]
 
 *  Examples:
 *     paldef 
@@ -58,10 +55,16 @@
 *        This loads the standard palette into the reserved portion of
 *        the colour table of the xwindows device.
 
+*  Notes:
+*     - The effects of this command will only be immediately apparent
+*     when run on X windows which have 256 colours (or other similar 
+*     pseudocolour devices). On other devices (for instance, X windows
+*     with more than 256 colours) the effects will only become apparent 
+*     when subsequent graphics applications are run.
+
 *  Related Applications:
 *     KAPPA: PALENTRY, PALREAD, PALSAVE.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)

@@ -153,7 +153,7 @@
          IF ( NGOOD .GT. 0 ) THEN
 
 *  Sort these values into increasing order.
-            CALL CCG1_IS2R( WRK1, POINT, NGOOD, STATUS )
+            CALL CCG1_IS3R( WRK1, WRK2, POINT, NGOOD, STATUS )
 
 *  Find the weighted median.
             CALL CCG1_WTM2R( WRK1, WRK2, NGOOD, USED, VAL, STATUS )

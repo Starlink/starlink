@@ -33,12 +33,7 @@
 
 *  ADAM Parameters:
 *     DEVICE = DEVICE (Read)
-*        Name of the image display to be used.  The device must be in
-*        one of the following GNS categories: IMAGE_DISPLAY,
-*        IMAGE_OVERLAY, or WINDOW, and have at least 24 colour indices.
-*        The device must also not reset when the device is opened
-*        (since the existing colour table would be lost).  [Current
-*        image-display device]
+*        Name of the image display to be used. [Current image-display device]
 *     PALETTE = NDF (Write)
 *        The NDF in which the current colour-table reserved pens are
 *        to be stored.  Thus if you have created non-standard colours
@@ -59,7 +54,6 @@
 *  Related Applications:
 *     KAPPA: PALDEF, PALENTRY, PALREAD.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)

@@ -47,10 +47,7 @@
 *          commas or spaces.  Each value must lie in the range 0.0--1.0.
 *          For example, "0.7,0.7,1.0" would give a pale blue.
 *     DEVICE = DEVICE (Read)
-*        Name of the image display to be used.  The device must be in
-*        one of the following GNS categories: IMAGE_DISPLAY,
-*        IMAGE_OVERLAY, WINDOW, WINDOW_OVERLAY, or MATRIX_PRINTER and
-*        have at least 2 colour indices.  [Current image-display device]
+*        Name of the image display to be used.  [Current image-display device]
 *     PALNUM = _INTEGER (Read)
 *        The number of the palette entry whose colour is to be
 *        modified.  PALNUM must lie in the range zero to the minimum
@@ -66,10 +63,16 @@
 *        This makes the xwindows device's palette entry number 12 have
 *        a pale-yellow colour.
 
+*  Notes:
+*     - The effects of this command will only be immediately apparent
+*     when run on X windows which have 256 colours (or other similar 
+*     pseudocolour devices). On other devices (for instance, X windows
+*     with more than 256 colours) the effects will only become apparent 
+*     when subsequent graphics applications are run.
+
 *  Related Applications:
 *     KAPPA: PALDEF, PALREAD, PALSAVE.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
