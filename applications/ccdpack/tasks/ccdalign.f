@@ -59,7 +59,7 @@
 *     transform other position lists or when resampling the data.
 
 *  Usage:
-*     ccdalign [device]
+*     ccdalign
 
 *  ADAM Parameters:
 *     CONTINUE = _LOGICAL (Read)
@@ -68,17 +68,6 @@
 *        only possible if you are intending to use linear
 *        transformations (this is the usual case).
 *        [FALSE]
-*     DEVICE = _CHAR (Read)
-*        The graphics device to use when displaying images.
-*        [Current image display device]
-*     HARDCOPY = _LOGICAL (Read)
-*        If TRUE then a hardcopy of the reference NDF will be made.
-*        [TRUE]
-*     HARDDEV = _CHAR (Read)
-*        A graphics device that can be used to draw a copy of the 
-*        displayed image into a file that can be subsequently printed.
-*        A postscript device such as "ps_p" or "ps_l" is normal.
-*        [ps_p]
 *     IN = LITERAL (Read)
 *        A list of NDF names suitable to the current stage in
 *        processing. The NDF names should be separated by commas
@@ -129,11 +118,6 @@
 *        higher than the second will have the same colour.  Must be in
 *        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
-*     PRINTCMD = _CHAR (Read)
-*        A command that will print the file "snapshot.ps". This file
-*        is the result of printing a hardcopy of the image display
-*        device. 
-*        [lpr snapshot.ps]
 *     WINX = INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
@@ -158,9 +142,8 @@
 *        [1]
 
 *  Examples:
-*     ccdalign device=xw
-*        This starts the CCDALIGN script and displays all images
-*        in a GWM xwindows window.
+*     ccdalign
+*        This starts the CCDALIGN script.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The

@@ -28,7 +28,6 @@
 
          parameter percentiles {
                                 # Display percentile values
-            position 2
             type _DOUBLE
             access UPDATE
             vpath CURRENT PROMPT
