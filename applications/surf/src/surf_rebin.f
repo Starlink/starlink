@@ -125,6 +125,12 @@
 *        specified RA/Dec centre. Default is to use the middle pixel
 *        if a size is specified or the optimal pixel if the default
 *        size is used (see the SIZE parameter).
+*     SCALE = REAL (Read)
+*        Radius of one scale size in arcsec. This effectively governs the
+*        size of the weighting function. For LINEAR one scale size corresponds
+*        to the zero of the cone, for BESSEL it is the first zero of the
+*        Bessel function (PI) and for Gaussian it is the half-width
+*        half maximum (HWHM).
 *     SHIFT_DX = REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinte frame.
@@ -141,6 +147,13 @@
 *        The supplied value should be in arcseconds. All pixels closer
 *        to a bad pixel than this distance will be set to bad in the
 *        output image. Default is 0.0.
+*     TIMES = LOGICAL (Read)
+*        Store an extra NDF in the output map containing the 2-D histogram
+*        of the data. This can be used to make an estimate of the actual
+*        number of samples responsible for each point in the output grid.
+*        Note that, in general, the number of pixels in the output grid
+*        exceeds the number of independent beams in the image.
+*        The data can be accessed as OUT.more.reds.times. Default is FALSE.
 *     GUARD = LOGICAL (Read)
 *        Determines whether a guard ring of bolometers should be used
 *        during the weight function regridding. A guard ring simulates
@@ -155,6 +168,13 @@
 *     WEIGHTS = LOGICAL (Read)
 *        Governs whether the convolution weights array will be stored.
 *        The default is false (ie do not store the weights array)
+*     WTFNRAD = INTEGER (Read)
+*        Size of the weighting function in scale sizes. This parameter
+*        is irrelevant for LINEAR regridding. For Gaussian the default
+*        is 3 (i.e. a diameter of 3 FWHM for the footprint), and for
+*        Bessel it is 10. The smaller the weighting function is (a
+*        combination of WTFNRAD and SCALE) the faster the regridding goes.
+
 
 *  Examples:
 *     rebin REBIN_METHOD=LINEAR OUT_COORDS=RJ
@@ -221,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.64  1999/06/18 03:20:24  timj
+*     Add missing parameters to docs
+*
 *     Revision 1.63  1999/06/16 21:08:41  timj
 *     Add REFPIX and allow OUT=! to be okay
 *
