@@ -1495,14 +1495,14 @@ install:
 #  package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 #
-#  Install the public scripts, giving them world-execute permission.
-#  Modify any position dependent references.
-	for f in $(PUBLIC_SCRIPTS); do \
-           sed < $$f \
-	      -e 's:$${INSTALL}:$(INSTALL):g' \
-	      -e 's:(INSTALL):$(INSTALL):g' \
-	      > $(INSTALL_BIN)/$$f; \
-	   chmod 755 $(INSTALL_BIN)/$$f;\
+#  Install the public scripts, giving them world execute permission.
+	for f in $(PUBLIC_SCRIPTS) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 755 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
         done
 #
 #  Install the monoliths, giving them world-execute permission.
@@ -1842,15 +1842,13 @@ do_deinstall:
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
 #  Deinstall the public script files, if installed versions exist.
-#  These files may have been edited so restore the originals.
-	- for f in $(PUBLIC_SCRIPTS); do \
-            if test -n "$$f"; then \
-               if test -f $(INSTALL_BIN)/$$f; then \
-                  rm -f $(INSTALL_BIN)/$$f; \
-               else :; fi ;\
-               $(MAKE) $$f; \
-           else :; fi ;\
-	done
+	- for f in $(PUBLIC_SCRIPTS) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
 #
 #  Remove the links to applications whose name clashes with the C run-time 
 #  library.  Also remove their corresponding compiled interface file links.
