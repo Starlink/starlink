@@ -66,10 +66,9 @@
                           # Are we Set specific?
             type _LOGICAL
             access READ
-            vpath PROMPT GLOBAL CURRENT DEFAULT
-            ppath GLOBAL CURRENT DEFAULT
+            vpath PROMPT CURRENT DEFAULT
+            ppath CURRENT DEFAULT
             default FALSE
-            association <-global.ccdpack_useset
             prompt {Set up values specific to one Set Index?}
             helpkey *
           }
