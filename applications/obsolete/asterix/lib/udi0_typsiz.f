@@ -120,9 +120,9 @@
         SIZE = VAL__NBI
       ELSE IF ( LTYPE .EQ. 'DOUBLE' ) THEN
         SIZE = VAL__NBD
-      ELSE IF ( ((LTYPE .EQ. 'BYTE') .OR. (LTYPE .EQ. 'UBYTE') ) THEN
+      ELSE IF ( (LTYPE .EQ. 'BYTE') .OR. (LTYPE .EQ. 'UBYTE') ) THEN
         SIZE = VAL__NBB
-      ELSE IF ( ((LTYPE .EQ. 'WORD') .OR. (LTYPE .EQ. 'UWORD') ) THEN
+      ELSE IF ( (LTYPE .EQ. 'WORD') .OR. (LTYPE .EQ. 'UWORD') ) THEN
         SIZE = VAL__NBW
       ELSE
         STATUS = SAI__ERROR
