@@ -62,14 +62,14 @@ is( $wcsinfo->Format( 2, $$yworld[1] ),
 is( $wcsinfo->Unformat( 1, "0:00:00.0" ), 0, "RA unformatted for output" );
 is( $wcsinfo->Unformat( 2, "0:00:00" ), 0, "Dec unformated for output" );
 
-is( $wcsinfo->Unformat( 1, "5:46:14.7" ), 
-             1.51077881714194, "RA of lower bound (to radians)" );
-is( $wcsinfo->Unformat( 2, "-0:06:38" ),
-             -0.00192955845081595, "Dec of lower bound (to radians)" );
-is( $wcsinfo->Unformat( 1, "5:46:10.9" ), 
-             1.51050247334371, "RA of upper bound (to radians)" );
-is( $wcsinfo->Unformat( 2, "-0:05:42" ), 
-             -0.00165806278939461, "Dec of upper bound (to radians)" );
+is( sprintf ( "%9f", $wcsinfo->Unformat( 1, "5:46:14.7" ) ), 
+    sprintf ( "%9f", 1.51077881714194 ), "RA of lower bound (to radians)" );
+is( sprintf ( "%9f", $wcsinfo->Unformat( 2, "-0:06:38" ) ),
+    sprintf ( "%9f", -0.00192955845081595), "Dec of lower bound (to radians)");
+is( sprintf ( "%9f", $wcsinfo->Unformat( 1, "5:46:10.9" ) ), 
+    sprintf ( "%9f", 1.51050247334371 ), "RA of upper bound (to radians)" );
+is( sprintf ( "%9f", $wcsinfo->Unformat( 2, "-0:05:42" ) ), 
+    sprintf ( "%9f", -0.00165806278939461 ), "Dec of upper bound (to radians)");
 
 # Done!
 
