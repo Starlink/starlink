@@ -34,6 +34,15 @@
 #        The global parameters selected by the user are return in this
 #	 array which is indexed by the name of the CCDPACK global
 #	 parameters (i.e. CCDglobalpars(ADC) is the ADC factor).
+#     CCDgloprefix = string (read and write)
+#        Keeps track of the Set Index to which the currently displayed
+#        entry panel refers.  If Sets are in use it will be the current 
+#        Set Index followed by a comma, otherwise it will be the empty
+#        string.  It is used to index the elements of CCDglobalpars;
+#        e.g. the ADC value corresponding to the panel currently 
+#        displayed can be accessed as $CCDglobalpars(${CCDgloprefix}ADC).
+#     CCDsetindices = list of integers (read and write)
+#        The NDF Set Index values that we know about.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -58,18 +67,33 @@
 #        but not available here.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     22-JUN-2001 (MBT):
+#        Upgraded for Sets.
 #     {enter_changes_here}
 
 #-
 
 
 #  Global parameters:
+      global CCDgloprefix
       global CCDglobalpars
+      global CCDsetindices
 
 #  Local constants:
-      set params "EXTENT DIRECTION BOUNDS ADC RNOISE MASK DEFERRED SATURATION ZERO"
+      set params \
+         "EXTENT DIRECTION BOUNDS ADC RNOISE MASK DEFERRED SATURATION ZERO"
 
 #.
+
+#  If we are using CCDPACK Sets, work out how many different Set Index 
+#  values we have (hence how many panels are required to get values).
+      if { $CCDglobalpars(USESET) == "TRUE" } {
+         CCDGetSetIndices $Topwin
+         set useset [expr [llength $CCDsetindices] > 1]
+      } else {
+         set useset 0
+      }
+     
 
 #------------------------------------------------------------------------------
 #  Widget Creation
@@ -85,62 +109,96 @@
 #  Frame for containing the parameter regions.
       CCDTkWidget Frame frame frame $top.center
 
+#  Buttons for selecting Set Index.  If we are using Sets, then allow 
+#  for selecting a different window for each one.  Otherwise, just
+#  create a dummy frame here which will have no effect.
+      if { $useset } {
+         CCDCcdWidget Setswitch setswitch \
+            Ccd_reveal $Frame.switch \
+                       -placebar top -stack array -columns 4 -in $Frame.switch
+         set setindices $CCDsetindices
+      } else {
+         CCDTkWidget Setswitch setswitch \
+            frame $frame.dummy -borderwidth 0
+         set setindices {0}
+      }
+
+#  Loop over all the entry panels to be constructed.  If we are not using
+#  Sets, there will only be one of these.
+      foreach sindex $setindices {
+
+#  Frame to contain all the entry widgets.
+         CCDTkWidget Panel($sindex) panel($sindex) \
+            frame $setswitch.panel$sindex
+
+#  If using Sets, add a selection button for this panel (if not using Sets,
+#  this is the only panel which will be revealed anyway).
+         if { $useset } {
+            $Setswitch addbutton "Set Index $sindex" $Panel($sindex)
+            set prefix "$sindex,"
+         } else {
+            set prefix ""
+         }
+
 #  Labelled entry for EXTENT value.
-      CCDCcdWidget Extent extent \
-         Ccd_labent $Frame.extent \
+         CCDCcdWidget Extent($sindex) extent($sindex) \
+            Ccd_labent $Panel($sindex).extent$sindex \
                      -text "Extent of useful detector area:" \
-                     -textvariable CCDglobalpars(EXTENT)
+                     -textvariable CCDglobalpars(${prefix}EXTENT)
 
 #  Radioarray for DIRECTION value.
-      CCDCcdWidget Direct direct \
-         Ccd_radioarray $Frame.direction \
+         CCDCcdWidget Direct($sindex) direct($sindex) \
+            Ccd_radioarray $Panel($sindex).direction$sindex \
                      -label "Readout direction:" \
-                     -variable CCDglobalpars(DIRECTION)
+                     -variable CCDglobalpars(${prefix}DIRECTION)
 
 #  Labelled entry for BOUNDS value.
-      CCDCcdWidget Bounds bounds \
-         Ccd_labent $Frame.bounds \
-                     -text "Bounds of bias strips (1 or 2 pairs):" \
-                     -textvariable CCDglobalpars(BOUNDS)
+         CCDCcdWidget Bounds($sindex) bounds($sindex) \
+            Ccd_labent $Panel($sindex).bounds$sindex \
+                        -text "Bounds of bias strips (1 or 2 pairs):" \
+                        -textvariable CCDglobalpars(${prefix}BOUNDS)
 
 #  Labelled entry for ADC value.
-      CCDCcdWidget Adc adc \
-         Ccd_labent $Frame.adc \
-                  -text "Analogue-to-digital conversion factor:" \
-                  -textvariable CCDglobalpars(ADC)
+         CCDCcdWidget Adc($sindex) adc($sindex) \
+            Ccd_labent $Panel($sindex).adc$sindex \
+                     -text "Analogue-to-digital conversion factor:" \
+                     -textvariable CCDglobalpars(${prefix}ADC)
 
 #  Labelled entry for RNOISE value.
-      CCDCcdWidget Rnoise rnoise \
-         Ccd_labent $Frame.rnoise \
-                     -text "Readout noise (ADUs):" \
-                     -textvariable CCDglobalpars(RNOISE)
+         CCDCcdWidget Rnoise($sindex) rnoise($sindex) \
+            Ccd_labent $Panel($sindex).rnoise$sindex \
+                        -text "Readout noise (ADUs):" \
+                        -textvariable CCDglobalpars(${prefix}RNOISE)
 
 #  Labelled entry for MASK value.
-      CCDCcdWidget Mask mask \
-         Ccd_labent $Frame.mask \
-                   -text "Defect mask:" \
-                   -textvariable CCDglobalpars(MASK)
+         CCDCcdWidget Mask($sindex) mask($sindex) \
+            Ccd_labent $Panel($sindex).mask$sindex \
+                      -text "Defect mask:" \
+                      -textvariable CCDglobalpars(${prefix}MASK)
 
 #  Labelled entry for DEFERRED value.
-      CCDCcdWidget Deferred deferred \
-         Ccd_labent $Frame.deferred \
-                       -text "Deferred charge (usually zero):" \
-                       -textvariable CCDglobalpars(DEFERRED)
+         CCDCcdWidget Deferred($sindex) deferred($sindex) \
+            Ccd_labent $Panel($sindex).deferred$sindex \
+                          -text "Deferred charge (usually zero):" \
+                          -textvariable CCDglobalpars(${prefix}DEFERRED)
 
 #  Labelled entry for SATURATION value.
-      CCDCcdWidget Satur satur \
-         Ccd_labent $Frame.saturation \
-                    -text "Saturated pixel value (ADUs):" \
-                    -textvariable CCDglobalpars(SATURATION)
+         CCDCcdWidget Satur($sindex) satur($sindex) \
+            Ccd_labent $Panel($sindex).saturation$sindex \
+                       -text "Saturated pixel value (ADUs):" \
+                       -textvariable CCDglobalpars(${prefix}SATURATION)
 
 #  Labelled entry for bias level.
-      CCDCcdWidget Zero zero \
-         Ccd_labent $Frame.bias \
-                   -text "Bias level (ADUs):" \
-                   -textvariable CCDglobalpars(ZERO)
+         CCDCcdWidget Zero($sindex) zero($sindex) \
+            Ccd_labent $Panel($sindex).bias$sindex \
+                      -text "Bias level (ADUs):" \
+                      -textvariable CCDglobalpars(${prefix}ZERO)
+      }
 
 #  Choice bar for OK etc.
-      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
+      CCDCcdWidget Choice choice \
+         Ccd_choice $Top.choice \
+                    -standard 0
 
 #------------------------------------------------------------------------------
 #  Widget configuration
@@ -157,9 +215,13 @@
            global CCDimportfile
            global CCDimportfilter
            set CCDimportfilter \"*.DAT\"
-           CCDGetFileName $Top.restore \"Read restoration file\"
+           CCDGetFileName $Top.restore \"Read restoration file\" 0
            if { \$CCDimportexists } { 
               CCDReadRestoreFile \"\$CCDimportfile\" 
+              $Choice invoke OK
+              CCDIssueInfo \"Parameters restored from file \$CCDimportfile\"
+           } else {
+              CCDIssueInfo \"File not found: \$CCDimportfile\"
            }
          "
 
@@ -183,22 +245,53 @@
       $Menu addcommand Options {Display/define CCD geometry...} \
          "CCDGeometry $Top.geom"
 
+#  Add bindings for an expose of each of the Set Index-specific panels.
+#  Then when any of them is exposed, it will fill in blank fields 
+#  from the corresponding fields on panels which have already been
+#  filled in.  This means you don't have to type the same thing for
+#  each Set Index if they have the same values.
+      if { $useset } {
+         foreach sindex $CCDsetindices {
+            bind $panel($sindex) <Expose> "
+               global CCDgloprefix
+               global CCDglobalpars
+               set CCDgloprefix {$sindex,}
+               foreach param {$params} {
+                  if { \$CCDglobalpars($sindex,\$param) == \"\" } {
+                     foreach sjndex \"$CCDsetindices\" {
+                        if { \$CCDglobalpars(\$sjndex,\$param) != \"\" } {
+                           set CCDglobalpars($sindex,\$param) \\
+                               \$CCDglobalpars(\$sjndex,\$param)
+                        }
+                     }
+                  }
+               }
+            "
+         }
+
+#  No Sets: set the global prefix to the empty string.
+      } else {
+         set CCDgloprefix {}
+      }
+
+
 #  Add menu option to select MASK from existing files.
       $Menu addcommand Options \
          {Select MASK from existing files ....} \
-         " global CCDimportexists
+         " global CCDgloprefix
+           global CCDimportexists
            global CCDimportfile
-           CCDGetFileName $Top.restore \"Select MASK (NDF or ARD file)\"
+           CCDGetFileName $Top.restore \"Select MASK (NDF or ARD file)\" 1
            if { \$CCDimportexists } { 
-              $Mask clear 0 end
-              $Mask insert 0 \"\$CCDimportfile\" 
+              set CCDglobalpars(\${CCDgloprefix}MASK) \"\$CCDimportfile\"
            }
          "
 
 #  Add buttons showing available directions.
-      $Direct addbutton {x} {X}
-      $Direct addbutton {y} {Y}
-
+      foreach sindex $setindices {
+         $Direct($sindex) addbutton {x} {X}
+         $Direct($sindex) addbutton {y} {Y}
+      }
 
 #  Add OK to choice bar. This runs the CCDSETUP application and exits.
       $Choice addbutton OK \
@@ -215,45 +308,66 @@
          "
 
 #  Reset button clears the  current setup and restores default. Note need
-#  to set CCDglobalpars to "" before unset as this is only way to clear
-#  entry widgets.
-      $Choice addbutton Reset \
-         "foreach element \"$params\" {
-             set CCDglobalpars(\$element) {}
-             unset CCDglobalpars(\$element)
-          }
-         "
+#  to set CCDglobalpars to "" as this is only way to clear entry widgets.
+      if { $useset } {
+         set resetcmd \
+            "foreach element \"$params\" {
+                set CCDglobalpars(\$element) {}
+                foreach sindex \$CCDsetindices {
+                   set CCDglobalpars(\$sindex,\$element) {}
+                }
+             }
+            "
+      } else {
+         set resetcmd \
+            "foreach element \"$params\" {
+                set CCDglobalpars(\$element) {}
+             }
+            "
+      }
+      $Choice addbutton Reset $resetcmd
+
 #------------------------------------------------------------------------------
 #  All widget and subparts created so add help.
 #------------------------------------------------------------------------------
       $Top sethelp ccdpack CCDSetCCDGlobalsWindow
       $Menu sethelpitem {On Window} ccdpack CCDSetCCDGlobalsWindow
       $Menu sethelp all ccdpack CCDSetCCDGlobalsMenu
-      $Adc sethelp sun139 CCDADC
-      $Bounds sethelp sun139 CCDbounds
-      $Deferred sethelp sun139 CCDdeferred
-      $Direct sethelp sun139 CCDdirection
-      $Extent sethelp sun139 CCDextent
-      $Mask sethelp sun139 datamasks
-      $Rnoise sethelp sun139 CCDrnoise
-      $Satur sethelp sun139 CCDsaturate
-      $Zero sethelp sun139 CCDbiaslevel
+      foreach sindex $setindices {
+         $Adc($sindex) sethelp sun139 CCDADC
+         $Bounds($sindex) sethelp sun139 CCDbounds
+         $Deferred($sindex) sethelp sun139 CCDdeferred
+         $Direct($sindex) sethelp sun139 CCDdirection
+         $Extent($sindex) sethelp sun139 CCDextent
+         $Mask($sindex) sethelp sun139 datamasks
+         $Rnoise($sindex) sethelp sun139 CCDrnoise
+         $Satur($sindex) sethelp sun139 CCDsaturate
+         $Zero($sindex) sethelp sun139 CCDbiaslevel
+      }
 
 #------------------------------------------------------------------------------
 #  Pack all widgets.
 #------------------------------------------------------------------------------
-      pack $extent    -fill x
-      pack $direct    -fill x
-      pack $bounds    -fill x
-      pack $adc       -fill x
-      pack $rnoise    -fill x
-      pack $mask      -fill x
-      pack $deferred  -fill x
-      pack $satur     -fill x
-      pack $zero      -fill x
+      foreach sindex $setindices {
+         pack $extent($sindex)    -fill x
+         pack $direct($sindex)    -fill x
+         pack $bounds($sindex)    -fill x
+         pack $adc($sindex)       -fill x
+         pack $rnoise($sindex)    -fill x
+         pack $mask($sindex)      -fill x
+         pack $deferred($sindex)  -fill x
+         pack $satur($sindex)     -fill x
+         pack $zero($sindex)      -fill x
+      }
       pack $menu      -fill x
       pack $choice    -side bottom -fill x
+      pack $setswitch -fill both
       pack $frame     -fill x -expand true
+      if { $useset } {
+         $Setswitch invoke "Set Index [lindex $CCDsetindices 0]"
+      } else {
+         pack $panel(0)  -fill x
+      }
 
 #  Wait for this procedure to exit.
       CCDWindowWait $Top
