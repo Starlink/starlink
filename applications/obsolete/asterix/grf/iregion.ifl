@@ -5,6 +5,12 @@ interface IREGION
     prompt 'Mode'
     help 'Type HELP for a full list'
   endparameter
+  parameter EXC
+    type '_LOGICAL'
+    prompt 'Exclude this region'
+    vpath 'DEFAULT'
+    default N
+  endparameter
   parameter XC
     position 2
     type '_REAL'
