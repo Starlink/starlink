@@ -4815,6 +4815,31 @@ STAR_MANIFEST_INSTALL_COMMAND = cd unix; \
 
         </subsect>
 
+        <subsect id="path-tcltk" export="export">
+          <subhead>
+            <title>STAR_PATH_TCLTK</title>
+          </subhead>
+
+          <p><strong><code>STAR_PATH_TCLTK([minversion=0])</code></strong></p>
+
+          <p>Finds a tclsh and wish, and the associated libraries.
+            Sets output variable <code>TCL_CFLAGS</code> to the C
+            compiler flags necessary to compile with Tcl, and
+            <code>TCL_LIBS</code> to the required library flags.
+            Define the cpp variable <code>TCL_MISSING</code> to 1 if
+            Tcl is not available.  Similar to macro
+            <code>AC_PATH_XTRA</code>.</p>
+
+          <p>If argument minversion is present, it specifies the
+            minimum Tcl/Tk version number required.  The macro
+            searches first in the path, and then in a selection of
+            platform-specific standard locations.  The configure
+            option <code>--with-tcl</code> allows you to provide a
+            path to a tclsh binary, which is put at the head of the
+            list of locations to search.</p>
+
+        </subsect>
+
         <subsect id='macro-platform-sources' export='export'>
           <subhead>
             <title>STAR_PLATFORM_SOURCES</title>
