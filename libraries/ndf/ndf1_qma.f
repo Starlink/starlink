@@ -59,6 +59,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,6 +69,9 @@
 *        Extended to process up to four arrays at once.
 *     14-NOV-1990 (RFWS):
 *        Added an extra status check.
+*     12-OCT-2004 (TIMJ):
+*        Fix warnings from valgrind when CNF_PVAL is asked to
+*        translate an uninintialised variable
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -100,6 +104,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER I                  ! Loop counter
       CHARACTER * ( NDF__SZTYP ) UTYPE ! Upper case version of TYPE
       LOGICAL TYPOK              ! Whether the TYPE argument is valid
 
@@ -111,6 +116,15 @@
 *  Make a copy of the TYPE argument and check it is not truncated.
       UTYPE = TYPE
       TYPOK = UTYPE .EQ. TYPE
+
+*  Make sure that CNF_PVAL does not attempt to access an unintialised
+*  variable by forcing initialisation of variables in PNTR that are
+*  not of interest to the caller
+      IF (NPNTR .NE. 4) THEN
+         DO I = NPNTR+1, 4 
+            PNTR( I ) = 0
+         END DO
+      END IF
 
 *  If OK, then convert to upper case.
       IF ( TYPOK ) THEN
