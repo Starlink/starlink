@@ -7,6 +7,7 @@ libparsecon_convenience_la_SOURCES = \
 	$(FPP_ROUTINES) \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES)
+AM_FCFLAGS = -I../subpar
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 

@@ -11,7 +11,7 @@ libdtask_adam_la_SOURCES = \
 	$(FPP_ROUTINES) \
 	$(C_ROUTINES)
 # We use ../subpar/SUBPAR_SYS
-libdtask_adam_la_FCFLAGS = -I../subpar
+AM_FCFLAGS = -I../subpar -I../messys -I../adam
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = ACT_ERR act_err.h DTASK_ERR dtask_err.h

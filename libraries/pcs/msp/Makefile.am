@@ -9,6 +9,7 @@ libmsp_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
 	$(PRIVATE_INCLUDES)
+AM_CFLAGS = -I../sock
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)

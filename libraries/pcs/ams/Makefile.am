@@ -4,13 +4,11 @@ dist_bin_SCRIPTS = ams_link_adam
 
 lib_LTLIBRARIES = libams_adam.la
 
-## Declare the sources for the libcnf.la library.  Note that the
-## prefix which corresponds to the libcnf.la library has non-letters
-## canonicalised to underscores.
 libams_adam_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES) \
 	$(C_ROUTINES)
+AM_CFLAGS = -I../adam -I../dtask -I../messys -I../msp -I../atimer
 
 ## List headers which are to be installed -- these are built first if necessary
 include_HEADERS = $(PUBLIC_INCLUDES)
