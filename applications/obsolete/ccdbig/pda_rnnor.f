@@ -52,6 +52,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David Berry (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -60,6 +61,9 @@
 *        version of SNORM.
 *     1997 February 26 (DSB)
 *        Remove "      INCLUDE 'SAE_PAR'"
+*     1998 July 2 (MBT)
+*        Fixed bug ('.GT. 0.5' used instead of '.GE. 0.5' which 
+*        caused failure).
 *     {enter_changes_here}
  
 *  Bugs:
@@ -132,7 +136,7 @@
       U = PDA_RAND( 0.0 )
 
 *  Use half the range but maintain the [0,1] scaling.
-      IF ( U .GE. 0.5 ) THEN
+      IF ( U .GT. 0.5 ) THEN
          S = 1.0
       ELSE
          S = 0.0
