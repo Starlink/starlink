@@ -1,0 +1,65 @@
+#+
+#  Name:
+#     POLSIM.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAR-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLSIM
+
+   helplib 'POLPACK_HELP:'
+
+   parameter      CUBE
+      position    1
+      type        NDF
+      access      READ
+      ppath       'GLOBAL'
+      association <-GLOBAL.DATA_ARRAY
+      prompt      'Input Stokes cube'
+      helpkey     '*'
+   endparameter
+
+   parameter IN
+      position 2
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT,CURRENT'
+      ppath    'CURRENT'
+      prompt   'Input intensity images'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     LITERAL
+      access   WRITE
+      vpath    'PROMPT '
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output intensity images'
+      helpkey  '*'
+   endparameter
+
+   parameter QUIET
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  F
+      prompt   'Should all screen output be suppressed?'
+      helpkey  '*'
+   endparameter
+
+endinterface
