@@ -1074,15 +1074,16 @@
 #     when the output images are saved.
 #   - Setting the current WCS Frame in the NDF explicitly to pixel 
 #     co-ordinates.
-
-      set copy [UniqueFile]
-      
-      if { $ref } {
+#
+# Do not check for the POLPACK extension if the image is the reference
+# image or if it does not contain polarimetry data.
+      if { $ref || !$POL } {
          set refpar T
       } {
          set refpar F
       }
      
+      set copy [UniqueFile]
       Obey polpack polprep "in=$imsec ref=$refpar out=$copy" 1
       set WCSDOMAIN($image) [GetParam polpack polprep:frame]
       if { $WCSDOMAIN($image) == "'BADPOL'" } {
