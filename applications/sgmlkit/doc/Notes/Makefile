@@ -9,6 +9,9 @@ include $(STARLINK_SGML_DIR)/lib/Makefile
 Notes.html.stamp: Notes.sgml $(STARLINK_SGML_DIR)/dsssl/sl/html \
 		Notes2.summary Notes.maths.stamp
 
+Notes.latex.stamp: Notes.sgml $(STARLINK_SGML_DIR)/dsssl/sl/latex \
+		Notes2.summary
+
 index.html: Notes.html.stamp
 	ln -sf `awk -F: '{print $$1}' Notes.html.stamp`.html index.html
 
