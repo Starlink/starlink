@@ -821,13 +821,9 @@
 
 *    Redo the quality
         CALL IBGND_SETQ( STATUS )
-	print *,'Done setq',I_BGM_SRCPTR(1),I_BGM_SRCPTR(2),
-     :           I_BGM_SRCPTR(3)
-	call flush(6)
+
 *    Recompute the samples and surface
         CALL IBGND_RECALC( .TRUE., .TRUE., STATUS )
-	print *,'Done recalc'
-	call flush(6)
 
 *    Update noticeboard
         IF ( I_GUI ) THEN
@@ -2694,8 +2690,6 @@
 
 *  Compute the samples
       IF ( SAMP ) THEN
-	print *,'pre samp comp'
-	call flush(6)
 
         CALL IBGND_SAMP_COMP( I_NX, I_NY, %VAL(I_DPTR),
      :                      %VAL(I_BGM_SAMIDX), %VAL(I_BGM_DPTR),
@@ -2704,8 +2698,6 @@
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      STATUS )
       END IF
-	print *,'Done samp comp'
-	call flush(6)
 
 *  Compute the background surface
       IF ( SURF ) THEN
@@ -2716,8 +2708,6 @@
      :                      %VAL(I_BGM_SAMPTR(3)),
      :                      %VAL(I_BGM_DPTR),
      :                      STATUS )
-	print *,'Done surf comp'
-	call flush(6)
 
 *    Bgnd derived image is displayed?
         IF ( (I_BGM_DISIM .EQ. 1) .OR. (I_BGM_DISIM.EQ.-1) ) THEN
@@ -2726,8 +2716,6 @@
           CALL IBGND_DISP_SURF( I_BGM_DISIM, STATUS )
 
         END IF
-	print *,'Done surf disp'
-	call flush(6)
 
       END IF
 
@@ -2874,11 +2862,6 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-	print *,'In samp comp'
-	print *,'mean = '//i_bgm_mean
-	print *,'nsamp = ',i_bgm_nsamp
-	print *,'nsrc = ',i_bgm_nsrc
-	call flush(6)
 
 *  Switch on mean method
       IF ( I_BGM_MEAN .EQ. 'MEAN' ) THEN
@@ -2949,8 +2932,6 @@
         END DO
 
       END IF
-	print *,'Done comps'
-	call flush(6)
 
 *  Export details of means to environment
       S = 1
