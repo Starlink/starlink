@@ -1587,8 +1587,7 @@ polcal.o:	PRM_PAR
 polcal.o:	SAE_PAR     
 polcal.o:	PAR_ERR
 polcal.o:	DAT_PAR
-polcent.o:	PAR_ERR     
-polcent.o:	SAE_PAR     
+polcent.o:	PAR_ERR SAE_PAR FIO_ERR
 polexp.o:	DAT_PAR
 polexp.o:	GRP_PAR
 polexp.o:	SAE_PAR
@@ -1601,10 +1600,7 @@ polhelp.o:	SAE_PAR
 polimp.o:	DAT_PAR
 polimp.o:	FIO_PAR
 polimp.o:	SAE_PAR
-polka.o:	GRP_PAR     
-polka.o:	PAR_ERR     
-polka.o:	PRM_PAR     
-polka.o:	SAE_PAR     
+polka.o:	GRP_PAR PAR_ERR PRM_PAR NDF_PAR SAE_PAR     
 polpack_mon.o:	SAE_PAR PAR_PAR
 polvec.o:	NDF_PAR
 polvec.o:	PRM_PAR

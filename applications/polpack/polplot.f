@@ -298,7 +298,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
-      INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management constants
       INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT_ constants 
       INCLUDE 'PAR_ERR'          ! PAR_ error constants 
