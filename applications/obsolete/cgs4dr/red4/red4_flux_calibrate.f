@@ -180,8 +180,8 @@
 
 *         Map the data, variance and quality arrays in the input structure.
             CALL DSA_MAP_DATA( 'GRPFILE', 'READ', 'FLOAT', GDATA_PTR, GDATA_SLOT, DSA_STATUS )
-            CALL DSA_MAP_VARIANCE( 'GRPFILE', 'READ', 'FLOAT', VAR_PTR, GVAR_SLOT, DSA_STATUS )
-            CALL DSA_MAP_QUALITY( 'GRPFILE', 'READ', 'BYTE', QUAL_PTR, GQUAL_SLOT, DSA_STATUS )
+            CALL DSA_MAP_VARIANCE( 'GRPFILE', 'READ', 'FLOAT', GVAR_PTR, GVAR_SLOT, DSA_STATUS )
+            CALL DSA_MAP_QUALITY( 'GRPFILE', 'READ', 'BYTE', GQUAL_PTR, GQUAL_SLOT, DSA_STATUS )
 
 *         Map the data, quality and variance arrays of output
             CALL DSA_MAP_DATA( 'OUTFILE', 'WRITE', 'FLOAT', ODATA_PTR, ODATA_SLOT, DSA_STATUS )
