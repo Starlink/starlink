@@ -249,6 +249,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.80  2005/03/23 08:04:08  timj
+*     + DIAMETER is no longer a constant, it is derived from the TELESCOP
+*     + Calculate Nyquist value once and use it everywhere
+*
 *     Revision 1.79  2005/03/23 03:49:28  timj
 *     No longer use wavelength + diameter for determining resolution element. Use
 *     the effective radius of influence for SPLINE and SCALE for weight function.
@@ -523,8 +527,6 @@ c
       BYTE    SCULIB_BITON             ! Turn on bit
 
 * Local Constants:
-      REAL DIAMETER                    ! diameter of JCMT mirror
-      PARAMETER (DIAMETER = 15.0)
       INTEGER WTFNRES                  ! number of values per scale length
       PARAMETER (WTFNRES = 64)
       INTEGER WTFN_MAXRAD              ! Max radius of weighting function
@@ -602,6 +604,7 @@ c
       INTEGER          CURR_INT        ! Current int in INTREBIN loop
       LOGICAL          DEFOUT          ! Take default output files for DESPIKE
       LOGICAL          DESPIKE         ! Is this the despike task
+      REAL             DIAMETER        ! diameter of primary mirror
       LOGICAL          DOLOOP          ! Loop for input data
       LOGICAL          DOREBIN         ! True if we are rebinning the data
       DOUBLE PRECISION DTEMP           ! Scratch double
@@ -688,6 +691,8 @@ c
       INTEGER          NFILES          ! Number of files in INTREBIN/REBIN
       INTEGER          NPARS           ! Number of dummy pars
       INTEGER          NSPIKES(MAX_FILE) ! Number of spikes per file
+      DOUBLE PRECISION NYQUIST         ! Nyquist sampling Lambda/2D
+      REAL             NYQWAV          ! Wavelength used for Nyquist calc
       INTEGER          N_BOL (MAX_FILE)! number of bolometers measured in input
                                        ! files
       INTEGER          N_FILE_LOOPS    ! Number of loops for INTREBIN/REBIN
@@ -1346,6 +1351,35 @@ c
 
       END IF
 
+*     Extract the telescope name from the first fits array
+      CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
+     :     FITS(1,1), 'TELESCOP', TELESCOPE, STATUS)
+
+*     The diameter of the primary mirror should really be a FITS
+*     header but now must be derived from the telescope name
+      DIAMETER = 1
+      IF ( TELESCOPE .EQ. 'JCMT' ) THEN
+         DIAMETER = 15.0
+      ELSE
+         IF (STATUS .EQ. SAI__OK) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'PKG', PACKAGE )
+            CALL MSG_SETC( 'TEL', TELESCOPE )
+            CALL ERR_REP( ' ', '^PKG: Unable to determine primary '//
+     :           'mirror diameter for telescope "^TEL"', STATUS )
+         END IF
+      END IF
+
+*     Calculate the Nyquist sampling value (in radians)
+*     The WAVELENGTH value can not always be trusted: THUMP
+*     THUMPER is has feedhorns that behave like the 850 micron SCUBA
+*     pixels
+      NYQWAV = WAVELENGTH
+      IF ( SUB_INSTRUMENT .EQ. 'THUMP' ) NYQWAV = 850.0
+
+      NYQUIST = (DBLE(NYQWAV) * 1.0D-6 ) / 
+     :     ( 2.0D0 * DBLE(DIAMETER))
+
 *     Now if I want to I can simply write the data out to a file
 *     I can do this for task EXTRACT_DATA
 
@@ -1419,7 +1453,7 @@ c
 
 *     Bin and despike the data
          CALL SURF_GRID_DESPIKE(FILE, N_PTS, N_POS, N_BOL, BITNUM,
-     :        WAVELENGTH, DIAMETER, BOL_RA_PTR, BOL_DEC_PTR, 
+     :        NYQUIST, BOL_RA_PTR, BOL_DEC_PTR, 
      :        IN_DATA_PTR, IN_QUALITY_PTR, 
      :        MAP_SIZE(1), MAP_SIZE(2), I_CENTRE, J_CENTRE, NSPIKES,
      :        QBITS, STATUS)
@@ -1601,7 +1635,7 @@ c
 
 *     Calculate the sky contribution
          CALL SURF_GRID_CALCSKY(TSKNAME, FILE, N_PTS, N_POS, N_BOL,
-     :        WAVELENGTH, DIAMETER, IMNDF, N_M_FITS, MODEL_FITS,  
+     :        NYQUIST, IMNDF, N_M_FITS, MODEL_FITS,  
      :        CHOP_THROW, CHOP_PA, BOX_SIZE, BOL_RA_PTR, 
      :        BOL_DEC_PTR,  IN_DATA_PTR, IN_QUALITY_PTR, 
      :        SKY_PTR, SKY_VPTR, QBITS, STATUS)
@@ -1713,11 +1747,10 @@ c
      :     METHOD .EQ. 'GAUSSIAN') THEN
 
          IF (STATUS .EQ. SAI__OK) THEN
-*     Calculate my default scale length - Lambda/4D
+*     Calculate my default scale length - Nyquist
 *     Also maybe should include factor for the width of the filter
 *     Need to convert to arcsec before changing back again
-            DTEMP = R2AS * DBLE(WAVELENGTH) * 1.0E-6 / 
-     :           (2.0 * DBLE(DIAMETER))
+            DTEMP = R2AS * NYQUIST
 
 *     Make it a bit smaller if we have a Gaussian regrid
 *     Claire Chandler tells me that she had best results
@@ -2257,10 +2290,11 @@ c
 *     Note that for INTREBIN we need to supply a different
 *     N_INTS and INT_LIST
 
-*     Calculate the effective radius of influence that each data point
+*     The effective radius of influence that each data point
 *     contributes to the final map. This controls how filled the final
 *     spline filled image will be for sparse data sets
-                     EFF_RADIUS = WAVELENGTH*1.0E-6 / (2.0*DIAMETER)
+*     Assume nyquist or half a pixel, whichever is larger
+                     EFF_RADIUS = REAL(NYQUIST)
                      IF (2*EFF_RADIUS .LT. OUT_PIXEL) THEN
                         EFF_RADIUS = OUT_PIXEL / 2.0
                      END IF
@@ -2369,10 +2403,6 @@ c
 *     Extract the instrument name from the first fits array
                   CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
      :                 FITS(1,1), 'INSTRUME', INSTRUMENT, STATUS)
-
-*     Extract the telescope name from the first fits array
-                  CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS(1),
-     :                 FITS(1,1), 'TELESCOP', TELESCOPE, STATUS)
 
 *     Retrieve the waveplate and rotation angles
 *     Can always do this since they will be bad if there was no
