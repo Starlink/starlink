@@ -23,6 +23,7 @@
 
  V0.5-1
 
-   * import PDA_DRANN and PDA_RANS from CCDPACK and PISA
+   * import PDA_DRANN and PDA_DRANS from CCDPACK and PISA
      [double precision random number generator and seed]
-   * Add PDA_R1MACH to completment PDA_D1MACH
+   * Add PDA_R1MACH to complement PDA_D1MACH
+
