@@ -92,10 +92,13 @@
 
 *  Local Variables:
       CHARACTER*8		HDU			! HDU name
+      CHARACTER*20		HDUTYPE			! HDU type
 
       INTEGER			EID			! EXTENSIONS object
+      INTEGER			FSTAT			! FITSIO status
       INTEGER			HID			! HDU object
       INTEGER			IHDU			! Loop over HDUs
+      INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU count
 
       LOGICAL			THERE			! Object exists?
@@ -104,8 +107,15 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Extract logical unit
+      CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
+
 *  Write the other keywords
       CALL ADI2_LOCHDU( FID, ' ', HID, STATUS )
+      CALL FTGHDN( LUN, IHDU )
+      IF ( IHDU .NE. 1 ) THEN
+        CALL FTMAHD( LUN, 1, HDUTYPE, FSTAT )
+      END IF
       CALL ADI2_FCOMIT_HDU( FID, HID, ' ', STATUS )
       CALL ADI_ERASE( HID, STATUS )
 
@@ -116,7 +126,8 @@
         CALL ADI_NCMP( EID, NHDU, STATUS )
 
         DO IHDU = 1, NHDU
-
+          CALL FTCRHD( LUN, FSTAT )
+          CALL FTMAHD( LUN, IHDU + 1, FSTAT )
           CALL ADI_INDCMP( EID, IHDU, HID, STATUS )
           CALL ADI_NAME( HID, HDU, STATUS )
           CALL ADI2_FCOMIT_HDU( FID, HID, HDU, STATUS )
