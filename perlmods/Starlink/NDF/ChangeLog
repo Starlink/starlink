@@ -1,3 +1,8 @@
+1998-06-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Improve DAT__ROOT, DAT__NOLOC routines so that gcc
+	doesn't complain about pointer mismatch
+
 1998-05-27  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.xs: Use PREINIT for declaring variables in an XS routine.
