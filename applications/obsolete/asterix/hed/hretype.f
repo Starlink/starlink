@@ -20,6 +20,7 @@
 *        Now use USI for user interface
 *     18 Jan 1996 V2.0-0 (DJA):
 *        New USI routine
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -32,7 +33,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRETYPE Version 2.2-0')
+      PARAMETER (VERSION='HRETYPE Version 2.2-1')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*(DAT__SZTYP) TYPE
@@ -44,8 +45,7 @@
 *    Start ASTERIX
       CALL AST_INIT()
 
-      CALL USI_ASSOC( 'INP', '*', 'UPDATE', FID, STATUS )
-      CALL ADI1_GETLOC( FID, LOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'UPDATE', LOC, STATUS )
 
       IF (STATUS.EQ.SAI__OK) THEN
 

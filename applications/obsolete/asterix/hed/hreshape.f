@@ -14,6 +14,7 @@
 *             (BHVAD::RJV)
 *    History :
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -26,20 +27,18 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRESHAPE Version 2.2-0')
+      PARAMETER (VERSION='HRESHAPE Version 2.2-1')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC	! locator to object
       INTEGER NDIM,DIMSO(DAT__MXDIM)	! old dimensions
       INTEGER NVAL			! number of values read
       INTEGER DIMSN(DAT__MXDIM)		! new dimensions
-      INTEGER ID
 *-
       CALL MSG_PRNT(VERSION)
 
       CALL AST_INIT()
 
-      CALL USI_ASSOC('INP','*','UPDATE',ID,STATUS)
-      CALL ADI1_GETLOC(ID,LOC,STATUS)
+      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
 
 *  get existing shape of object
       CALL DAT_SHAPE(LOC,DAT__MXDIM,DIMSO,NDIM,STATUS)

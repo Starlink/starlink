@@ -14,6 +14,7 @@
 *    History :
 *
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -24,7 +25,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRESET Version 2.2-0')
+      PARAMETER (VERSION='HRESET Version 2.2-1')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
 
@@ -34,8 +35,7 @@
 
       CALL AST_INIT()
 
-      CALL USI_ASSOC('INP','*','UPDATE',ID,STATUS)
-      CALL ADI1_GETLOC(ID,LOC,STATUS)
+      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
 
       CALL DAT_RESET(LOC,STATUS)
 

@@ -1,6 +1,6 @@
 interface HRESHAPE
   parameter INP
-    type 'LITERAL'
+    type 'UNIV'
     position 1
     ppath 'GLOBAL'
     association '<->GLOBAL.HDSOBJ'
