@@ -690,7 +690,7 @@
 	>
 
 <!-- Subhead and title are the header and title for (sub*)sections -->
-<!entity % subhead.model 'title, %update.pc'>
+<!entity % subhead.model 'title %update.pc'>
 <!element SUBHEAD o o (%subhead.model;)>
 
 <!--
