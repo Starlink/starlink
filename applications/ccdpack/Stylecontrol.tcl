@@ -166,8 +166,9 @@
 ########################################################################
 
    itk::usual Stylecontrol {
-      keep -background -cursor -foreground
+      keep -background -cursor -foreground -selectcolor
    }
+   option add *Stylecontrol.selectColor #b03060 widgetDefault
 
 
 ########################################################################
