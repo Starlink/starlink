@@ -7,7 +7,7 @@
 *     The width of the Bessel function is such that it should preserve all
 *     spatial information obtained by the telescope at the wavelength of
 *     observation, but suppress higher spatial frequencies. To minimise edge
-*     effects the Bessel function is truncated at a radius of 7 half-widths
+*     effects the Bessel function is truncated at a radius of 10 half-widths
 *     from the centre, and apodized over its outer third by a cosine function.
 *
 *     Viewed in frequency space the method consists of Fourier transforming 
@@ -50,6 +50,14 @@
       INTEGER CHR_LEN                  ! CHR used-string-length function
 *    Global variables :
 *    Local Constants :
+      INTEGER          MAX__INT                  ! max number of integrations 
+      PARAMETER (MAX__INT = 20)                  ! that can be specified
+      REAL DIAMETER                    ! diameter of JCMT mirror
+      PARAMETER (DIAMETER = 15.0)
+      INTEGER WTFNRES                  ! number of values per scale length
+      PARAMETER (WTFNRES = 64)
+      INTEGER WTFNRAD                  ! radius of Bessel reconstruction
+      PARAMETER (WTFNRAD = 10)          ! filter in scale-lengths
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       INTEGER     MAX_FILE             ! max number of input files
@@ -132,6 +140,8 @@
       INTEGER          IMIN            ! minute at which observation started
       CHARACTER*40     INSTRUMENT      ! FITS instrument entry
       INTEGER          INTEGRATION     ! integration index in DO loop
+      INTEGER          INT_BAD (MAX__INT) ! Numbers of integrations to be
+                                       ! ignored
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       INTEGER          IN_DATA_END (MAX_FILE)
@@ -210,6 +220,7 @@
                                        ! y jiggle offsets (arcsec)
       INTEGER          J_CENTRE        ! J index of central pixel in outpUt
                                        ! map
+      LOGICAL          KEEP_INT        ! Keep the specified ints
       DOUBLE PRECISION LAT_OBS         ! latitude of observatory (radians)
       INTEGER          LBND (MAX_DIM)  ! pixel indices of bottom left corner
                                        ! of output image
@@ -235,6 +246,8 @@
       INTEGER          N_FITS          ! number of items in FITS array
       INTEGER          N_INTEGRATIONS  ! number of integrations per measurement
                                        ! in input file
+      INTEGER          N_INT_BAD                 ! the number of integrations
+                                                 ! with data to beignored
       INTEGER          N_MEASUREMENTS  ! number of measurements in input file
       INTEGER          N_POINT         ! dimension of pointing correction 
                                        ! array in input file
@@ -296,6 +309,7 @@
                                        ! system
       CHARACTER*30     SCS             ! name of sky coordinate system
       DOUBLE PRECISION SEC             ! second at which observation started
+      LOGICAL          SELECT_INTS     ! Choose some integrations
       REAL             SHIFT_DX (MAX_FILE)
                                        ! x shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
@@ -314,6 +328,8 @@
                                        ! `total weight' array
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
                                        ! of output image
+      LOGICAL          USE_INT(SCUBA__MAX_INT) ! To use or not to use
+      LOGICAL          USE_INTS        ! How to use the specified ints
       CHARACTER*15     UTDATE          ! date of input observation
       CHARACTER*15     UTSTART         ! UT of start of input observation
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
@@ -324,8 +340,8 @@
       DOUBLE PRECISION YMAX            ! max of map offsets
       DOUBLE PRECISION YMIN            ! min of map offsets
       INTEGER WEIGHTSIZE               ! Radius of weighting function
-      REAL             WTFN(SCUIP__RES1 * SCUIP__RES1 *
-     :     SCUIP__FILTRAD * SCUIP__FILTRAD) ! Weighting function
+      REAL             WTFN(WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
+                                       ! Weighting function
 
       REAL T0, T1
       REAL SECNDS
@@ -348,14 +364,14 @@
 *   Bessel
          CALL MSG_OUT(' ', 'Initialising BESSEL weighting functions',
      :        STATUS)
-         WEIGHTSIZE = SCUIP__FILTRAD
-         CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, SCUIP__RES1,STATUS)
+         WEIGHTSIZE = WTFNRAD
+         CALL SCULIB_BESSEL_WTINIT(WTFN, WEIGHTSIZE, WTFNRES, STATUS)
       ELSE IF (METHOD.EQ.'LINEAR') THEN
 *   Linear
          CALL MSG_OUT(' ', 'Initialising LINEAR weighting functions',
      :        STATUS)
          WEIGHTSIZE = 1
-         CALL SCULIB_LINEAR_WTINIT(WTFN, SCUIP__RES1, STATUS)
+         CALL SCULIB_LINEAR_WTINIT(WTFN, WTFNRES, STATUS)
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC('METHOD', METHOD)
@@ -775,8 +791,6 @@
 
 *  map the DEM_PNTR and LST arrays and check their dimensions
 
-*           CALL NDF_XIARY (IN_NDF, 'SCUBA', 'DEM_PNTR', 'READ',
-*    :        IN_DEM_PNTR_ARY, STATUS)
             CALL ARY_FIND (IN_SCUBAX_LOC, 'DEM_PNTR', IN_DEM_PNTR_ARY,
      :        STATUS)
             CALL ARY_DIM (IN_DEM_PNTR_ARY, MAX_DIM, DIM, NDIM, STATUS)
@@ -881,6 +895,7 @@
             CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
      :        'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :        'measurement(s)', STATUS)
+
 
 *  get the bolometer description arrays
 
@@ -1242,6 +1257,66 @@
      :           %val(FILE_VARIANCE_PTR),
      :           %val(IN_VARIANCE_PTR(FILE)))
             END IF
+
+*  Maybe we only want to rebin some of the integrations
+
+            IF (N_INTEGRATIONS .GT. 1) THEN
+
+               CALL PAR_GET0L ('SELECT_INTS', SELECT_INTS, STATUS)
+
+               IF (SELECT_INTS) THEN
+                  CALL PAR_DEF1I ('INTEGRATIONS', 1, 0, STATUS)
+                  CALL PAR_GET1I ('INTEGRATIONS', MAX__INT, INT_BAD,
+     :                 N_INT_BAD, STATUS)
+                  CALL PAR_CANCL ('INTEGRATIONS', STATUS)
+
+                  IF (INT_BAD(1) .GT. 0) THEN
+*  do we want to keep or discard
+ 
+                     CALL PAR_GET0L ('USE_INTS', USE_INTS, STATUS)
+                     CALL PAR_CANCL ('USE_INTS', STATUS)
+                     IF (USE_INTS) THEN
+                        KEEP_INT = .TRUE.
+                     ELSE
+                        KEEP_INT = .FALSE.
+                     END IF
+
+*  Initialise the usage array
+                     DO I = 1, N_INTEGRATIONS
+                        USE_INT(I) = .NOT.KEEP_INT
+                     END DO
+
+* Now set the ones we want to keep
+                     DO I = 1, N_INT_BAD
+                        IF (INT_BAD(I) .GT. 0) THEN
+                           USE_INT(INT_BAD(I)) = KEEP_INT
+                        END IF
+                     END DO
+
+
+                     DO INTEGRATION = 1, N_INTEGRATIONS
+                        IF (.NOT.USE_INT(INTEGRATION)) THEN
+*     Find start and end of integration
+                          CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
+     :                          1, N_EXPOSURES, N_INTEGRATIONS, 1,
+     :                          N_POS(FILE), 1, 1, INTEGRATION,1,
+     :                          EXP_START, ITEMP, STATUS)
+                          CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
+     :                          1, N_EXPOSURES, N_INTEGRATIONS, 1,
+     :                          N_POS(FILE), 1,N_EXPOSURES, INTEGRATION,
+     :                          1, ITEMP, EXP_END, STATUS)
+*     Set these data to bad values
+                          CALL SCULIB_CFILLR((1+EXP_END-EXP_START)*
+     :                         N_BOL(FILE), VAL__BADR,
+     :                         %VAL(IN_DATA_PTR(FILE) + VAL__NBR *
+     :                         (N_BOL(FILE)*(EXP_START-1))))
+                           
+                        END IF
+                     END DO
+                  END IF
+               END IF
+            END IF
+
 
 *  calculate position of each bolometer at each measurement
 
@@ -1662,7 +1737,7 @@
       PRINT *, 'REGRID 2 at T = ',T1
       IF (STATUS .EQ. SAI__OK) THEN
          DO I = 1, FILE
-            CALL SCULIB_WTFN_REGRID_2 (DIAMETER, SCUIP__RES1,
+            CALL SCULIB_WTFN_REGRID_2 (DIAMETER, WTFNRES,
      :        %val(IN_DATA_PTR(I)), %val(IN_VARIANCE_PTR(I)),
      :        WEIGHT(I), %val(BOL_RA_PTR(I)), %val(BOL_DEC_PTR(I)),
      :        N_BOL(I) * N_POS(I), OUT_PIXEL, NX_OUT, NY_OUT,
@@ -1678,7 +1753,7 @@
       T1 = SECNDS(T0)
       PRINT *, 'REGRID 3 at T= ', T1
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_WTFN_REGRID_3 (DIAMETER, SCUIP__RES1, OUT_PIXEL, 
+         CALL SCULIB_WTFN_REGRID_3 (DIAMETER, WTFNRES, OUT_PIXEL, 
      :        NX_OUT, NY_OUT,
      :        I_CENTRE, J_CENTRE, %val(TOTAL_WEIGHT_PTR), WAVELENGTH,
      :        %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
@@ -1831,5 +1906,4 @@
       CALL NDF_END (STATUS)
  
       END
-
 
