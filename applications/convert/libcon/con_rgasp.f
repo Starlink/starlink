@@ -38,6 +38,7 @@
 *  Authors:
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: A J Chipperfield (STARLINK, RAL)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *     1993 July 27 (MJC):
 *        Renamed from READGASP.  Removed the call to PSX_UNAME and used
 *        RIO to open the GASP file
+*     21-NOV-1995 (AJC):
+*        Correct token name MESSAGE to IOVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,7 +118,7 @@
 *  Make a contextual error report.
          IF ( IOVAL .NE. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_FIOER( 'MESSAGE', IOVAL )
+            CALL ERR_FIOER( 'IOVAL', IOVAL )
             CALL MSG_SETC( 'DATFIL', DATFIL )
             CALL MSG_SETI( 'REC', J )
             CALL ERR_REP( 'CON_RGASP_FILEREAD',
