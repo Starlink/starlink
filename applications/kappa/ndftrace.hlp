@@ -19,7 +19,7 @@ Description:
    -  its shape (pixel bounds, dimension sizes, number of dimensions
    and total number of pixels);
 
-   -  zxis co-ordinate information (axis labels, units and extents);
+   -  axis co-ordinate information (axis labels, units and extents);
 
    -  optionally, axis array attributes (type and storage form) and
    the values of the axis normalisation flags;
@@ -27,6 +27,13 @@ Description:
    -  attributes of the main data array and any other array
    components present (including the type and storage form and an
    indication of whether `bad' pixels may be present);
+
+   -  attributes of the current co-ordinate Frame in the WCS component
+   (title, domain, and ,optionally, axis labels and axis units, plus the
+   system epoch and projection for sky co-ordinate Frames).
+
+   -  optionally, attributes of all other co-ordinate Frames in the WCS
+   component.
 
    -  a list of any NDF extensions present, together with their data
    types; and
@@ -112,6 +119,12 @@ BADBITS
 BADBITS = LITERAL (Write)
    The BADBITS mask.  This is only valid when QUALITY is TRUE.
 
+CURRENT
+
+CURRENT = _INTEGER (Write)
+   The integer Frame index of the current co-ordinate Frame in the
+   WCS component.
+
 DIMS
 
 DIMS( ) = _INTEGER (Write)
@@ -130,10 +143,34 @@ EXTTYPE( ) = LITERAL (Write)
    corresponds to the names in EXTNAME.  It is only written when
    NEXTN is positive.
 
+FDIM
+
+FDIM( ) = _INTEGER (Write)
+   The numbers of axes in each co-ordinate Frame stored in the WCS
+   component of the NDF. The elements in this parameter correspond to
+   those in the FDOMAIN and FTITLE parameters. The number of elements
+   in each of these parameters is given by NFRAME.
+
+FDOMAIN
+
+FDOMAIN( ) = LITERAL (Write)
+   The domain of each co-ordinate Frame stored in the WCS component
+   of the NDF. The elements in this parameter correspond to
+   those in the FDIM and FTITLE parameters. The number of elements
+   in each of these parameters is given by NFRAME.
+
 FORM
 
 FORM = LITERAL (Write)
    The storage form of the NDF's data array.
+
+FTITLE
+
+FTITLE( ) = LITERAL (Write)
+   The title of each co-ordinate Frame stored in the WCS component of
+   the NDF. The elements in this parameter correspond to those in the
+   FDOMAIN and FDIM parameters. The number of elements in each
+   of these parameters is given by NFRAME.
 
 FULLAXIS
 
@@ -143,6 +180,20 @@ FULLAXIS = _LOGICAL (Read)
    each axis will be displayed.  However, if a TRUE value is given
    for this parameter, full details of the attributes of all the
    axis arrays will also be given. [FALSE]
+
+FULLFRAME
+
+FULLFRAME = _LOGICAL (Read)
+   If a FALSE value is given for this parameter then only the
+   Title and Domain attributes are displayed for a co-ordinate Frame.
+   Otherwise, a more complete description is given.   [FALSE]
+
+FULLWCS
+
+FULLWCS = _LOGICAL (Read)
+   If a TRUE value is given for this parameter then all co-ordinate
+   Frames in the WCS component of the NDF are displayed. Otherwise,
+   only the current co-ordinate Frame is displayed. [FALSE]
 
 HISTORY
 
@@ -173,6 +224,12 @@ NEXTN
 
 NEXTN = _INTEGER (Write)
    The number of extensions in the NDF.
+
+NFRAME
+
+NFRAME = _INTEGER (Write)
+   The number of WCS Frames described by parameters FDIM, FDOMAIN and
+   FTITLE. Set to zero if WCS is FALSE.
 
 QUALITY
 
@@ -211,6 +268,12 @@ VARIANCE
 VARIANCE = _LOGICAL (Write)
    Whether or not the NDF contains a VARIANCE array.
 
+WCS
+
+WCS = _LOGICAL (Write)
+   Whether or not the NDF has any WCS co-ordinate Frames, over
+   and above the default GRID, PIXEL and AXIS Frames.
+
 WIDTH
 
 WIDTH( ) = _LOGICAL (Write)
@@ -231,15 +294,27 @@ ndftrace mydata quiet ndim=(mdim)
    Passes the number of dimensions of the NDF called mydata
    into the ICL variable mdim.  No information is displayed.
 
+Notes
+
+-  If the WCS component of the NDF is undefined, then an attempt is
+made to find WCS information from two other sources: firstly, an
+IRAS90 astrometry structure, and secondly, the FITS extension. If
+either of these sources yield usable WCS information, then it is
+displayed in the same way as the NDF WCS component. Other KAPPA
+applications will use this WCS information as if it were stored in
+the WCS component.
+
 Related_Applications
 
-   HDSTRACE.
+   KAPPA: WCSFRAME; HDSTRACE
 
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
@@ -268,4 +343,7 @@ History
 
  1995 June 18 (MJC):
     Added QUIET option and the output parameters.
+
+ 1997 November 27 (DSB):
+    Added support for WCS component.
 .endhelp

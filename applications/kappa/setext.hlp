@@ -120,12 +120,12 @@ SHAPE( ) = _INTEGER (Read)
 
 XNAME
 
-XNAME = LITERAL (Given)
+XNAME = LITERAL (Read)
    The name of the extension to modify.
 
 XTYPE
 
-XTYPE = LITERAL (Given)
+XTYPE = LITERAL (Read)
    The type of the extension to create.  The suggested default is
    the current value or "EXT" when there is no current value.
 

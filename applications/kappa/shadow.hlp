@@ -30,7 +30,7 @@ OUT = NDF (Write)
 
 SHIFT
 
-SHIFT( 2 )  =  _INTEGER (Given)
+SHIFT( 2 )  =  _INTEGER (Read)
    The shift in x and y pixel indices to be used in the
    enhancement.  If the x shift is positive, positive features
    in the original array will appear to be lit from the positive

@@ -26,17 +26,18 @@ Description:
          is available on the chosen graphics workstation;
      2.  obtaining the bounds from the environment (in world
          co-ordinates of the reference picture);
-     3.  or by giving a position code for the new picture, and
-         specifying its linear fractional size along each axis in
-         terms of the reference picture, and/or its aspect ratio.
-         The position code comprises two characters.  The first
+     3.  or by giving a position and size for the new picture. The
+         position is specified by a two-character code. The first
          controls the vertical location, and may be "T", "B", or "C"
          to create the new picture at the top, bottom, or in the
          centre respectively.  The second defines the horizontal
          situation, and may be "L", "R", or "C" to define a new
          picture to the left, right, or in the centre respectively.
          Thus a code of "BR" will make a new picture in the
-         bottom-right corner.
+         bottom-right corner. The size of the new picture along each
+         axis may be specified either in centimetres, or as a fraction
+         of the corresponding axis of the reference picture. The picture
+         may also be forced to have a specified aspect ratio.
 
    The picture created becomes the current picture on exit.
 
@@ -112,7 +113,8 @@ FRACTION( ) = _REAL (Read)
    the shape of the reference picture.  So a value of 0.5 would
    create a picture 0.25 the area of the current or BASE picture.
    The default is 0.5, unless parameter ASPECT is not null, when
-   the default is 1.0. []
+   the default is 1.0. This parameter is not used if the picture
+   size is specified in centimetres using parameter SIZE. []
 
 LABELNO
 
@@ -137,8 +139,7 @@ MODE = LITERAL (Read)
    by two characters, the first corresponding to the vertical
    position and the second the horizontal.  For the vertical,
    valid positions are T(op), B(ottom), or C(entre); and for the
-   horizontal the options are L(eft), R(ight), or C(entre). (It
-   is the same as the disposition code in SGS). ["Cursor"]
+   horizontal the options are L(eft), R(ight), or C(entre). ["Cursor"]
 
 OUTLINE
 
@@ -156,6 +157,15 @@ PREFIX = LITERAL (Read)
    increases the chance of losing existing labels.  A ! response
    means no labelling is required.  The suggested default is the
    last-used prefix.
+
+SIZE
+
+SIZE( 2 ) = _REAL (Read)
+   The size of the new picture along both axes, in centimetres,
+   applicable for modes other than Array, Cursor, and XY. If a
+   single value is given, it is used for both axes. If a null
+   value (!) is given, then the size of the picture is determined
+   by parameter FRACTION. [!]
 
 UBOUND
 
@@ -195,6 +205,13 @@ picdef bl aspect=1.0
    and it is justified to the bottom-left corner.  It becomes the
    current picture.
 
+picdef bl size=[15,10]
+   Creates a new FRAME picture within the full display area on
+   the current graphics device, and an outline is drawn around
+   the new picture.  This picture is 15 by 10 centimetres in size
+   and it is justified to the bottom-left corner.  It becomes the
+   current picture.
+
 picdef cc 0.7 current nooutline
    Creates a new FRAME picture situated in the centre of the
    current picture on the current graphics device.  The new
@@ -231,6 +248,8 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie  (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
@@ -295,4 +314,7 @@ History
     Removed CURRENT as a positional parameter, and made LBOUND and
     UBOUND positional; this is to enable PICXY to operate and to
     allow both PICGRID and PICXY to inherit the CURRENT option.
+
+ 21-AUG-1998 (DSB):
+    Converted to use PGPLOT. Re-formatted code. Added parameter SIZE.
 .endhelp
