@@ -110,11 +110,14 @@
 *
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     11-SEP-1997 (TMG):
 *        Original version.
+*     16-JAN-1998 (DSB):
+*        Declaration of RE changed from REAL to DOUBLE PRECISION.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -180,7 +183,7 @@
       INTEGER ITER               ! iteration count in convergence loop
       INTEGER NITER, NPTS        ! number of iterations and points used
                                  ! in image intercomparisons
-      REAL E, RE                 ! local estimates of E and 1/E
+      REAL E                     ! local estimate of E 
       REAL MAXDE                 ! max change in E
       REAL SENSL, SENSR, SENS2L, SENS2R ! sensitivity corrections
       REAL EMED, ZMED            ! median scale factor and zero shift
@@ -188,6 +191,7 @@
       LOGICAL GETS, GETZ, BAD    ! logical flags
       LOGICAL CONVERGED          ! convergence flag
       
+      DOUBLE PRECISION RE        ! local estimate of 1/E
       DOUBLE PRECISION SCALE, DSCALE ! scale factor and standard error
       DOUBLE PRECISION ZERO, DZERO   ! zero shift and standard error
       DOUBLE PRECISION ORIGIN, DS, DZ ! false origin and changes in
@@ -319,7 +323,7 @@
             
 * Apply the E factor estimate.
 
-            RE = 1.0 / E
+            RE = 1.0D0 / DBLE( E )
             CALL CCG1_CMLTR( BAD, NEL, TI1( 1, IPAIR ), RE,
      :                       TI2( 1, IPAIR ), NERR, STATUS )
 

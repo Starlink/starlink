@@ -78,11 +78,14 @@
 *
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     11-SEP-1997 (TMG):
 *        Original version.
+*     16-JAN-1998 (DSB):
+*        Added missing IERR argument to VEC_RTOR calls.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -166,7 +169,7 @@
      :              %VAL( IPVCOR( 2, ISET ) ), VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ), VQEST( 1, NQ ),
-     :              NERR, STATUS )
+     :              IERR, NERR, STATUS )
             ENDIF
          ENDIF
 
@@ -188,7 +191,7 @@
      :              %VAL( IPVCOR( 3, ISET ) ), VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ), VQEST( 1, NQ ),
-     :              NERR, STATUS )
+     :              IERR, NERR, STATUS )
             ENDIF
          ENDIF
 
@@ -211,7 +214,7 @@
      :              %VAL( IPVCOR( 6, ISET ) ), VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ),
-     :              VUEST( 1, NU ), NERR, STATUS )
+     :              VUEST( 1, NU ), IERR, NERR, STATUS )
             ENDIF
          ENDIF
 
@@ -234,7 +237,7 @@
      :              %VAL( IPVCOR( 8, ISET ) ), VIEST( 1, NI ), IERR,
      :              NERR, STATUS )
                CALL VEC_RTOR( BAD, NEL, VIEST( 1, NI ),
-     :              VUEST( 1, NQ ), NERR, STATUS )
+     :              VUEST( 1, NQ ), IERR, NERR, STATUS )
             ENDIF
          ENDIF
 
