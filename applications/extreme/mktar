@@ -1,0 +1,37 @@
+#!/bin/sh
+
+#  Autogenerate system-specific extreme.h files.
+
+      sysvariants="alpha_OSF1 \
+                   alpha_OSF1_64 \
+                   sun4_Solaris \
+                   sun4_Solaris_64 \
+                   ix86_Linux"
+
+      for s in $sysvariants
+      do
+         if `echo $s | grep -q _64`
+         then
+            itype='long'
+         else
+            itype='int'
+         fi
+         echo "Generating extreme.h_$s"
+         sed -e "s/^. *extreme\.h/&_$s/" \
+             -e "s/^#define INT_BIG .*/#define INT_BIG $itype/" \
+             < extreme.h > extreme.h_$s
+         sysvarfiles="$sysvarfiles extreme.h_$s"
+      done
+      echo
+
+
+#  Make tar file
+      tar cvf extreme_source.tar \
+              crepint.c frepint.c inscnf.c \
+              ctok.l ftok.l ctokens.h ftokens.h ygen.c ygen.h \
+              do_filter cmp_filter.pl \
+              ext_dec ext_def ext_par ext_dev \
+              $sysvarfiles
+
+      rm -f $sysvarfiles
+
