@@ -51,7 +51,7 @@ itcl::class cat::AstroCat {
 	    }
 	}
         catch {
-           if {tempimage_ != {} } { 
+           if { $tempimage_ != {} } { 
               file delete $tempimage_
            }
         }
