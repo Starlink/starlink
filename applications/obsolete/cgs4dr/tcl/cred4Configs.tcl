@@ -40,6 +40,7 @@ proc cred4Configs {taskname} {
     if {$bv == 0} {
       cgs4drCursor watch red white
       set config_file [string trim [$Cred4Widgets(CONFIG) get]]
+      if {[file extension ${config_file}] == ""} {set config_file "${config_file}.cred4"}
       if {$config_file == ""} {
         set message "cred4Configs error : You must specify a configuration filename!"
         cgs4drInform $taskname $message
@@ -67,6 +68,7 @@ proc cred4Configs {taskname} {
     } elseif {$bv == 1} {
       cgs4drCursor watch red white
       set config_file [string trim [$Cred4Widgets(CONFIG) get]]
+      if {[file extension ${config_file}] == ""} {set config_file "${config_file}.cred4"}
       if {$config_file == ""} {
         set message "cred4Configs error : You must specify a configuration filename!"
         cgs4drInform $taskname $message

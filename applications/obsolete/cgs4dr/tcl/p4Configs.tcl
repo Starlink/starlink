@@ -40,6 +40,7 @@ proc p4Configs {taskname} {
     if {$bv == 0} {
       cgs4drCursor watch red white
       set p4config_file [string trim [$P4Widgets(CONFIG) get]]
+      if {[file extension ${p4config_file}] == ""} {set p4config_file "${p4config_file}.p4"}
       if {$p4config_file == ""} {
         set message "p4Configs error : You must specify a configuration filename!"
         cgs4drInform $taskname $message
@@ -67,6 +68,7 @@ proc p4Configs {taskname} {
     } elseif {$bv == 1} {
       cgs4drCursor watch red white
       set p4config_file [string trim [$P4Widgets(CONFIG) get]]
+      if {[file extension ${p4config_file}] == ""} {set p4config_file "${p4config_file}.p4"}
       if {$p4config_file == ""} {
         set message "p4Configs error : You must specify a configuration filename!"
         cgs4drInform $taskname $message
