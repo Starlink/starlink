@@ -127,6 +127,8 @@ SPACE			[ \t]*
 <FIRST>{W}{O}{R}{D}			{ count(); return( WORD ); }
 <FIRST>{U}{W}{O}{R}{D}			{ count(); return( UWORD ); }
 <FIRST>{D}{I}{M}{E}{N}{S}{I}{O}{N}	{ count(); return( DIMENSION ); }
+<FIRST>{E}{Q}{U}{I}{V}{A}{L}{E}{N}{C}{E}	{
+					  count(); return( EQUIVALENCE ); }
 <FIRST>"<"{T}{Y}{P}{E}">"		{ count(); return( GENERIC_TYPE ); }
 <FIRST>{E}{N}{D}			{ count(); return( END ); }
 
@@ -136,6 +138,7 @@ SPACE			[ \t]*
 
 {V}{A}{L}				{ count(); return( VAL ); }
 {C}{N}{F}"_"{P}{V}{A}{L}		{ count(); return( CNF_PVAL ); }
+{I}{O}{S}{T}{A}{T}			{ count(); return( IOSTAT ); }
 
 {DIGIT}+				{ count(); return( INTEGER_CONSTANT ); }
 \'(''|[^'\n]|{CONT})*\'			{ count(); return( STRING_CONSTANT ); }
