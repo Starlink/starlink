@@ -90,11 +90,11 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER			NARG			! # of input arguments
-      INTEGER			ARGS(NARG)		! Input arguments
+      INTEGER			NARG
+      INTEGER			ARGS(NARG)
 
 *  Arguments Returned:
-      INTEGER			OARG			! Output structure
+      INTEGER			OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -110,9 +110,7 @@
       CHARACTER*(DAT__SZLOC)	INLOC			! INSTRUMENT object
       CHARACTER*20		INSTRUM			!
       CHARACTER*20		MISSION			!
-      CHARACTER*50		OBSERVER		!
       CHARACTER*(DAT__SZLOC)	SOLOC			! SORT object
-      CHARACTER*50		TARGET			!
 
       LOGICAL			DOK, FOK, IOK, MOK	! Things present?
 *.
@@ -182,6 +180,6 @@
       END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'DCI1_READ', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'DCI1_READ', STATUS )
 
       END

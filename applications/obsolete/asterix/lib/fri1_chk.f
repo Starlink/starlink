@@ -115,6 +115,10 @@
 
 *  Reference exists?
       CALL DAT_THERE( ALOC, ROBJ, THERE, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        THERE = .FALSE.
+        CALL ERR_ANNUL( STATUS )
+      END IF
 
 *  Create return value
       CALL ADI_NEWV0L( THERE, OARG, STATUS )
