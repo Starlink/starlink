@@ -50,22 +50,22 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Unmap
-          IF ( SSO.MI(NMI).MAPPED ) THEN
-            CALL CMP_UNMAP( SSO.MI(NMI).FLOC, 'DATA_ARRAY', STATUS )
-            SSO.MI(NMI).MAPPED = .FALSE.
+          IF ( SSO_MI_MAPPED(NMI) ) THEN
+            CALL CMP_UNMAP( SSO_MI_FLOC(NMI), 'DATA_ARRAY', STATUS )
+            SSO_MI_MAPPED(NMI) = .FALSE.
           END IF
 
 *        Free field locator
-          CALL DAT_ANNUL( SSO.MI(NMI).FLOC, STATUS )
+          CALL DAT_ANNUL( SSO_MI_FLOC(NMI), STATUS )
 
 *        And reset slot
-          SSO.MI(NMI).USED = .FALSE.
+          SSO_MI_USED(NMI) = .FALSE.
 
         END IF
 
 *      Tidy up
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_UNMAPFLD', STATUS )
+          CALL AST_REXIT( 'SSO_UNMAPFLD', STATUS )
         END IF
 
       END IF

@@ -60,7 +60,7 @@
         I = 1
         DO WHILE ( ( I .LE. SSO__MXMI ) .AND. ( N .EQ. 0 ) )
           IF ( ( NDS .EQ. SSO_MI_DS(I) ) .AND.
-     :         ( FLD .EQ. SSO_MI_FLD(I) ) .AND.
+     :         ( FLD .EQ. SSO_MI_FNAM(I) ) .AND.
      :         ( TYPE .EQ. SSO_MI_TYPE(I) ) .AND.
      :         SSO_MI_USED(I) ) THEN
             N = I

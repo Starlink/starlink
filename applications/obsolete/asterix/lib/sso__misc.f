@@ -232,19 +232,19 @@
         CALL SSO_ADDMAP( LOC, FLD, SSO__MI_ERROR, NMI, STATUS )
 
 *      Already mapped?
-        IF ( SSO.MI(NMI).MAPPED ) THEN
+        IF ( SSO_MI_MAPPED(NMI) ) THEN
 
 *        Return pointer
-          PTR = SSO.MI(NMI).PTR
+          PTR = SSO_MI_PTR(NMI)
 
         ELSE
 
 *        Map its error array
           CALL CMP_MAPV( FLOC, 'ERROR', TYPE, MODE, PTR, NELM, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
-            SSO.MI(NMI).MAPPED = .TRUE.
-            SSO.MI(NMI).PTR = PTR
-            SSO.MI(NMI).FLOC = FLOC
+            SSO_MI_MAPPED(NMI) = .TRUE.
+            SSO_MI_PTR(NMI) = PTR
+            SSO_MI_FLOC(NMI) = FLOC
           END IF
 
         END IF
@@ -254,7 +254,7 @@
 
 *      Tidy up
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_MAPFLDERR', STATUS )
+          CALL AST_REXIT( 'SSO_MAPFLDERR', STATUS )
         END IF
 
       END IF
@@ -386,16 +386,16 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *        Unmap
-          IF ( SSO.MI(NMI).MAPPED ) THEN
-            CALL CMP_UNMAP( SSO.MI(NMI).FLOC, 'ERROR', STATUS )
-            SSO.MI(NMI).MAPPED = .FALSE.
+          IF ( SSO_MI_MAPPED(NMI) ) THEN
+            CALL CMP_UNMAP( SSO_MI_FLOC(NMI), 'ERROR', STATUS )
+            SSO_MI_MAPPED(NMI) = .FALSE.
           END IF
 
 *        Free field locator
-          CALL DAT_ANNUL( SSO.MI(NMI).FLOC, STATUS )
+          CALL DAT_ANNUL( SSO_MI_FLOC(NMI), STATUS )
 
 *        And reset slot
-          SSO.MI(NMI).USED = .FALSE.
+          SSO_MI_USED(NMI) = .FALSE.
 
         END IF
 
