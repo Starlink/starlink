@@ -492,7 +492,7 @@ AC_LANG_POP(Fortran 77)dnl
 # COMPILERS is a space separated list of Fortran 77 compilers to search
 # for, and [DIALECT] is an optional dialect.  See also _AC_PROG_FC.
 AC_DEFUN([AC_PROG_FC],
-[# AC_BEFORE([$0], [AC_PROG_FPP])dnl
+[AC_BEFORE([$0], [AC_PROG_FPP])dnl
 AC_LANG_PUSH(Fortran)dnl
 AC_ARG_VAR([FC],    [Fortran compiler command])dnl
 AC_ARG_VAR([FCFLAGS], [Fortran compiler flags])dnl
@@ -1305,10 +1305,30 @@ fi
 ])# AC_FC_FREEFORM
 
 
+# AC_F77_HAVE_OPEN_READONLY
+# -------------------------
+# Tests if the Fortran compiler supports the READONLY specifier on the
+# OPEN statement, and define variable F77_HAVE_OPEN_READONLY if so.
+AC_DEFUN([AC_F77_HAVE_OPEN_READONLY],
+         [AC_REQUIRE([AC_PROG_F77])dnl
+          AC_CACHE_CHECK([whether OPEN has the READONLY specifier],
+                         [ac_cv_f77_have_open_readonly],
+                         [AC_LANG_PUSH([Fortran 77])dnl
+                          AC_COMPILE_IFELSE(AC_LANG_PROGRAM([],
+                                              [      OPEN(UNIT=99,READONLY)]),
+                                            [ac_cv_f77_have_open_readonly=yes],
+                                            [ac_cv_f77_have_open_readonly=no])
+                          AC_LANG_POP(Fortran 77)])
+          if test $ac_cv_f77_have_open_readonly = yes; then
+              AC_DEFINE([F77_HAVE_OPEN_READONLY], 1,
+                        [Define to 1 if F77 OPEN has the READONLY specifier])
+          fi
+])
+
+
 # -------------------------------------- #
 # Feature tests for Preprocessed Fortran #
 # -------------------------------------- #
-# fpptests
 
 
 # ------------------------------------------#
@@ -1516,7 +1536,6 @@ if test -z "$ac_cv_prog_fpp"; then
 # We must find another way for preprocessing.
 # We try the "best" preprocessors first. At this point, F77 has already
 # proven that it is insufficient, so use it as a last resort only.
-# Again, test that no ...?
 # XXX: is there a more up-to-date list?
   for ac_j in 'fpp' "$CPP" 'g77 -E' '$CC -E' 'cpp' '/lib/cpp' \
               '/usr/ccs/lib/cpp' "$F77 -F" "$F77 -E"; do
@@ -1807,6 +1826,11 @@ else
 fi   
 ])
 
+if test -z "$ac_fpp_status"; then
+    # must be non-empty below
+    ac_fpp_status=cached
+fi
+
 if test $ac_fpp_status = fatal; then
 
   AC_MSG_ERROR([cannot find a valid build rule for Fortran/cpp source: consider installing the free Fortran preprocessor fpp from ftp.netlib.org])
@@ -1847,14 +1871,13 @@ fi
 #
 # [required features] is a space-separated list of features that the Fortran
 # preprocessor must have for the code to compile.
+# It is up to the package maintainer to properly set these requirements.
 #
 # [FPP-SRC-EXT] is an optional specification of the file extension for
 # preprocessable Fortran source files (without a leading dot).  It
 # defaults to `fpp', which is better than .F in general, since .F and
 # .f are indistinguishable on case-insensitive filesystems (such as
 # HFS+ on MacOS X).
-#
-# It is up to the package maintainer to properly set these requirements.
 #
 # Supported features are:
 #
@@ -1893,7 +1916,7 @@ AC_REQUIRE([AC_PROG_CPP])dnl
 
 # Prefer AC_PROG_FC to AC_PROG_F77
 if test "X$F77" != X; then
-    dnl Need to add spurious space after AC below: how should I quote this?
+    dnl FIXME: Need to add spurious space after AC below: how should I quote this?
     AC_MSG_WARN([Use AC _PROG_FC with AC _PROG_FPP, instead of AC _PROG_F77])
 fi
 
@@ -2010,8 +2033,8 @@ if test $ac_fpp_need_CSTYLE = yes; then
     [ac_cv_prog_fpp_CSTYLE=$ac_prog_fc_cpp_CSTYLE])
 
 elif test $ac_fpp_need_cstyle = yes; then 
-# It makes only sense to test this for indirect compilation, 
-# i.e. if .f files are generated
+# It only makes sense to test this for indirect compilation, 
+# i.e., if .f files are generated
     _AC_PROG_FPP_CSTYLE
 fi
 
@@ -2022,7 +2045,7 @@ AC_CACHE_CHECK([whether $FPP fulfills requested features],
 # We have all necessary information.
 # It remains to construct optimal build rules 
 # (direct: .fpp.o or indirect: .fpp.f)
-# and carry out the substitutions
+# and carry out the substitutions.
 _AC_FPP_BUILD_RULE
 
 AC_SUBST(FPP)
