@@ -1,0 +1,87 @@
+#+
+#  Name:
+#     POLSTACK.IFL 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Copyright:
+#     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAY-1999 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLSTACK
+
+   helplib 'POLPACK_HELP:'
+
+   parameter BIN
+      position 3
+      type     _REAL
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Bin size, in degrees'
+      default  10
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  
+      position 1
+      type     NDF
+      access   READ
+      ppath    'GLOBAL'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt   'Input intensity frames'
+      helpkey  '*'
+   endparameter
+
+   parameter MININ
+      type     _INTEGER
+      access   READ
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Minimum number of input images per output image'
+      default  3
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output intensity images'
+      helpkey  '*'
+   endparameter
+
+   parameter QUIET
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Run quietly?'
+      default  FALSE
+      helpkey  '*'
+   endparameter
+
+   parameter STACK
+      type     NDF
+      access   WRITE
+      vpath    'DEFAULT'
+      vpath    'CURRENT,DEFAULT'
+      prompt   '3D output stack'
+      default  !
+      helpkey  '*'
+   endparameter
+
+endinterface
