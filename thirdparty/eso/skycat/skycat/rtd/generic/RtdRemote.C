@@ -15,6 +15,9 @@
  *                           loses this values occasionally. 
  * Allan Brighton  18/03/99  Added #ifdef in RtdRemote.h, since Tcl_File
  *                           is no longer supported in tcl8...
+ * Peter W. Draper 11/05/99  Added changes to getsockname calls so
+ *                           that size_t is used for addrSize (this
+ *                           is needed for OSF/1). 
  */
 static const char* const rcsId="@(#) $Id: RtdRemote.C,v 1.14 1999/03/19 20:09:49 abrighto Exp $";
 
@@ -182,7 +185,7 @@ RtdRemote::RtdRemote(Tcl_Interp* interp, int port, int verbose)
 
     // clear out address structures 
     sockaddr_in addr;	// for local socket address    
-    int addrSize = sizeof(addr);
+    size_t addrSize = (size_t) sizeof(addr);
     memset ((char *)&addr, 0, addrSize);
 
     addr.sin_family = AF_INET;
@@ -243,7 +246,7 @@ RtdRemote::~RtdRemote()
  */
 int RtdRemote::makeStatusFile(sockaddr_in& addr)
 {
-    unsigned int addrSize = sizeof(sockaddr_in);
+    size_t addrSize = sizeof(sockaddr_in);
     if (getsockname(socket_, (struct sockaddr *)&addr, &addrSize) == -1) 
 	return sys_error("getsockname");
     
@@ -324,7 +327,7 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-	unsigned int addrSize = sizeof(addr);
+	size_t addrSize = (size_t) sizeof(addr);
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");
