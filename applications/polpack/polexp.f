@@ -4,7 +4,7 @@
 *     POLEXP
 
 *  Purpose:
-*     Copies information from the POLPACK extension to the FITS extension.
+*     Copies information from the POLPACK extension to named FITS keywords.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,45 +20,51 @@
 *        The global status.
 
 *  Description:
-*     This routine creates FITS header cards describing the contents of
-*     the POLPACK extensions in a group of NDFs. The header cards are
+*     This application copies information from the POLPACK extension of
+*     a group of NDFs, into the corresponding FITS extensions. It is
+*     intended primarily for use when converting NDFs created by POLPACK
+*     into a foreign data format. Appropriate FITS header cards are
 *     written to the FITS extensions of the NDFs, replacing any existing
 *     cards for the same keywords. The keywords used are listed below.
 *     Information exported to the FITS extension can be imported back 
 *     into the POLPACK extension using POLIMP.
-*
-*     The main use of this routine is for exporting POLPACK NDFs for use
-*     bu other non-NDF based packages. 
 
 *  Usage:
-*     POLEXP in 
+*     polexp in 
 
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
-*        A list of NDF names. The NDF names should be separated by commas 
-*        and may include wildcards.
+*        A group of NDF names. This may take the form of a comma separated 
+*        list, or any of the other forms described in the help on "Group 
+*        Expressions".
 *     NAMELIST = LITERAL (Read)
-*        The name of a file to create containing a list of the
-*        succesfully processed NDFs. This file can be used when 
-*        specifying the input NDFs for subsequent applications. [!]
+*        The name of a file to create containing a list of the succesfully 
+*        processed NDFs. This file can be used when specifying the input 
+*        NDFs for subsequent applications. No file is created if a null
+*        (!) value is given. [!]
 *     QUIET = _LOGICAL (Read)
 *        If FALSE, then each NDF is listed as it is processed. Otherwise,
 *        nothing is written to the screen. [FALSE] 
 
 *  FITS Keywords:
 *     The following FITS keywords are created. The POLPACK extension item
-*     stored in the keyword is shown in parenthesise (see POLIMP for a 
+*     stored in the keyword is shown in parentheses (see POLIMP for a 
 *     description of these extension items):
-
+*
 *           PPCKANGR  (ANGROT)
+*
 *           PPCKFILT  (FILTER)
+*
 *           PPCKIMID  (IMGID)     
+*
 *           PPCKWPLT  (WPLATE)
+*
 *           PPCKRAY   (RAY)
+*
 *           PPCKSTOK  (STOKES)
 
 *  Examples:
-*     POLEXP in=^names.lis
+*     polexp in=^names.lis
 *        This example processes the NDFs listed in the text file
 *        "names.lis". The information stored in the POLPACK extension of
 *        each is exported to the FITS extension.

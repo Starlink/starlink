@@ -4,8 +4,8 @@
 *     POLCAL
 
 *  Purpose:
-*     Calculate polarisation parameters for dual beam imaging
-*     linear and circular polarimetry.
+*     Converts a set of analysed intensity images into a cube holding Stokes 
+*     vectors.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,61 +21,150 @@
 *        The global status.
 
 *  Description:
-*     Calculate polarisation parameters for dual beam imaging
-*     polarimetry. This routine accesses a list of input NDF data
-*     structures which should contain processed polarimetric
-*     information. It is assumed that the input data are bias/dark
-*     corrected, flatfielded, sky subtracted and mutually aligned.
+*     This application converts a set of 2D intensity images into a
+*     3D data cube holding a Stokes vector at every pixel in the area
+*     covered by the supplied intensity images.
 *
-*     Each input NDF should contain an image recorded in a
-*     single polarisation state. The polarisation state should be
-*     indicated by two descriptors WPLATE (the waveplate position, one of
-*     0.0,45.0,22.5,67.5) and RAY (either O (ordinary) or E
-*     (extraordinary)) which should reside in a POLPACK NDF extension.
-*     The descriptors are checked for validity and used to sort the
-*     input data into polarimetric sets. In addition, a third
-*     descriptor, IMGID, should be present to indicate which images were
-*     recorded on the same exposure.
+*     Each input image should contain either the O or E ray image
+*     extracted from a single dual-beam exposure. The sky backgrounds
+*     should have been removed, and they should have been resampled so
+*     that a given pixel corresponds to the same point on the sky in all 
+*     images.
 *
-*     The input data files are first validated using the descriptor
-*     information in their POLPACK extensions. They are then sorted into
-*     sets that can be used to calculate the output polarisation
-*     parameters.
+*     Both circular and linear polarization can be measured (see
+*     parameter PMODE). For linear polarization, the output cube has
+*     3 planes which contain I, Q and U values (in that order). For circular 
+*     polarization, the output cube has 2 planes which contain I and V values. 
 *
-*     The instrumental polarisation efficiency (F factor) is calculated
-*     by intercomparing images to calculate the scale factors and zero
-*     levels. All possible intercomparisons are used and a weighted mean
-*     F factor calculated.
+*     If input images for all four half-wave plate positions are provided
+*     (0, 22.5, 45 and 67.5) then a correction is made for any difference
+*     in sensitivity of the two channels (such as can be caused by the
+*     use of polarized flat-field for instance). This correction is known
+*     as the "F-factor" and is based on the redundancy provided by using four 
+*     half-wave plate positions. If images with the required half-wave plate 
+*     positions are not provided, then it is assumed that the two channels 
+*     are equally sensitive (that is, an F-factor of 1.0 is used).
 *
-*     The time dependent efficiencies (E factors) due, for example, to
-*     changes in integration time or sky conditions between exposures,
-*     are calculated. The E factors are calculated by comparing total
-*     intensity images against an iteratively refined median image.
+*     Corrections are also made for any difference in exposure times for
+*     the supplied intensity images. These are based on the fact that the 
+*     sum of the O and E ray intensities should always equal the total
+*     intensity (after any F-factor correction), and should therefore be
+*     the same for all pairs of corresponing O and E ray images if they have 
+*     equal exposure times.
 *
-*     The input data is `corrected' by the polarisation and time
-*     dependent efficiencies and the stokes images (I,Q,U) or (I,V) are
-*     calculated. The output stokes images are formed by median stacking
-*     all possible estimates.
-*
-*     In LINEAR polarimetry mode the output NDF contains I, Q and U
-*     stokes images. In CIRCULAR polarimetry mode the output NDF
-*     contains I, V stokes images.
-
-*  Notes:
+*     The E and F factors are calculated by inter-comparing pairs of
+*     intensity images to estimate their relative scale factor and zero
+*     point. This estimation is an iterative process, and is controlled by
+*     parameters TOLS, TOLZ, SKYSUP and MAXIT.
 
 *  Usage:
+*     polcal in out
 
 *  ADAM Parameters:
-
+*     ETOL = _REAL (Read)
+*        The E factors are found using an iterative procedure in which 
+*        the supplied intensity images are corrected using the current
+*        estimates of the E factors, and new estimates are then
+*        calculated on the basis of these corrected images. This procedure
+*        continues until the change in E-factor produced by an iteration
+*        is less than the value supplied for ETOL, or the maximum number
+*        of iterations specified by parameter MAXIT is reached. [0.01]
+*     ILEVEL = _INTEGER (Read)
+*        Specifies the amount of information to display on the screen.
+*        Zero suppresses all output. A value of 1 produces minimal output
+*        describing such things as the E and F factors adopted, and a
+*        value of 2 produces more verbose output including details of
+*        each iteration in the iterative process used to calculate the E
+*        and F factors. [1]
+*     IN = NDF (Read)
+*        A group specifying the names of the input intensity images. This
+*        may take the form of a comma separated list, or any of the other 
+*        forms described in the help on "Group Expressions".
+*     MAXIT = _INTEGER (Read)
+*        This parameter specifies the maximum number of iterations to
+*        be used when inter-comparing pairs of input images to determine 
+*        their relative scale-factor and/or zero-point. If the specified 
+*        number of iterations is exceeded without achieving the accuracy 
+*        required by the settings of the TOLS and TOLZ parameters, then a 
+*        warning message will be issued, but the results will still be used. 
+*        The value given for MAXIT must be at least one. [30]
+*     OUT = NDF (Read)
+*        The name of the output 3D cube holding the Stokes parameters.
+*        The x-y plane of this cube covers the overlap region of the 
+*        supplied intensity images. Plane 1 contains the total intensity. 
+*        The other planes contain either Q and U, or V, depending on the 
+*        value of parameter PMODE.
+*     PMODE = LITERAL (Read)
+*        The mode of operation; CIRCULAR for measuring circular polarization, 
+*        or LINEAR for measuring linear polarization. [LINEAR]
+*     SKYSUP = _REAL (Read)
+*        A positive "sky noise suppression factor" used to control the
+*        effects of sky noise when pairs of input images are
+*        inter-compared to determine their relative scale-factor. It is
+*        intended to prevent the resulting scale-factor estimate being
+*        biased by the many similar values present in the "sky
+*        background" of typical astronomical data.  SKYSUP controls an
+*        algorithm which reduces the weight given to data where there
+*        is a high density of points with the same value, in order to
+*        suppress this effect. 
+*
+*        A SKYSUP value of unity can often be effective, but a value
+*        set by the approximate ratio of sky pixels to useful object
+*        pixels (i.e. those containing non-sky signal) in a "typical"
+*        image will usually be better. The precise value
+*        is not critical. A value of zero disables the sky noise
+*        suppression algorithm completely. The default value for SKYSUP
+*        is 10. This is normally reasonable for CCD frames of extended 
+*        objects such as galaxies, but a larger value, say 100, may give 
+*        slightly better results for star fields. [10]
+*     TITLE = LITERAL (Read)
+*        A title for the output cube. [Output from POLCAL]
+*     TOLS = _REAL (Read)
+*        This parameter defines the accuracy tolerance to be achieved
+*        when inter-comparing pairs of input images to determine their 
+*        relative scale-factor. The value given for TOLS specifies the 
+*        tolerable fractional error in the estimation of the relative 
+*        scale-factor between any pair of input NDFs. This value must 
+*        be positive. [0.001]
+*     TOLZ = _REAL (Read)
+*        This parameter defines the accuracy tolerance to be achieved
+*        when inter-comparing pairs of input images to determine their 
+*        relative zero-points. The value given for TOLZ specifies the 
+*        tolerable absolute error in the estimation of the relative 
+*        zero-point between any pair of input images whose relative 
+*        scale-factor is unity. The value used is multiplied by the relative 
+*        scale-factor estimate (which reflects the fact that an image with 
+*        a larger data range can tolerate a larger error in estimating its
+*        zero-point). The TOLS value supplied must be positive. [0.05]
+*     VARIANCE = _LOGICAL (Read)
+*        This parameter should be set to a TRUE value if variances are to
+*        be included in the output cube. This can only be done if all the
+*        input intensity images have associated variance values. A null (!)
+*        value results in variance values being created if possible, but
+*        not otherwise. [!]
+ 
 *  Examples:
+*     polcal "*_O,*_E" stokes
+*        This example uses all images in the current directory which have
+*        file names ending with either "_O" or "_E", and stores the
+*        corresponding I, Q and U values in the 3d cube "stokes".
+
+*  Notes:
+*     -  An item named STOKES is added to the POLPACK extension. It is a
+*     character string identifying the quantity stored in each plane of
+*     the cube. For linear polarimetery, it is set to "IQU", and for
+*     circular polarimetery it is set to "IV".
 
 *  Authors:
-*     TMG: Tim Gledhill (tmg@star.herts.ac.uk)
+*     TMG: Tim Gledhill (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-JUL-1997 (TMG):
 *        Original version.
+*     15-MAY-1998 (DSB):
+*        Prologue re-written.
 *     {enter_changes_here}
 
 *  Bugs:

@@ -4,7 +4,7 @@
 *     POLVEC
 
 *  Purpose:
-*     Calculates polarisation vectors from supplied Stokes parameters.
+*     Calculates polarization vectors from supplied Stokes parameters.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,11 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This routine calculates values of percentage polarisation, polarisation 
-*     angle, total intensity and polarised intensity, based on Stokes 
+*     This application calculates values of percentage polarization, polarization 
+*     angle, total intensity and polarized intensity, based on Stokes 
 *     parameters in the supplied input cube (which will normally have been 
-*     created by POLCAL). These calculated values may be stored either in
-*     a series of 2-dimensional NDFs, or in a single table which may be
+*     created by POLKA or POLCAL). These calculated values may be stored either in
+*     a series of 2D NDFs, or in a single catalogue which may be
 *     examined and manipulated using the CURSA package (see SUN/190).
 
 *  Usage:
@@ -34,7 +34,7 @@
 *     BOX( 2 ) = _INTEGER (Read)
 *        The x and y sizes (in pixels) of the bins to be used when
 *        binning the supplied Stokes parameters prior to estimating the
-*        polarisation vectors. If only a single value is given,
+*        polarization vectors. If only a single value is given,
 *        then it will be duplicated so that a square bin is used. A value
 *        of 1 produces no binning, and causes the origin of the output
 *        NDFs and catalogue to be the same as the x-y origin in the input 
@@ -42,28 +42,31 @@
 *        performed).
 *
 *        Note, if the output vectors are being stored in a catalogue, it
-*        is usually better to avoid binning the Stokes vectors in POLVEC
-*        by giving a value of 1 for parameter BOX. The POLBIN application can 
-*        then be used to bin the Stokes vectors creates by this application. 
-*        This ensures that the vector coordinates stored in the catalogue
-*        refer to positions in the x-y frame of the input cube, rather than
-*        to positions in the binned frame. [1]
+*        is usually better to use the POLBIN application to bin the Stokes 
+*        vectors. [1]
 *     CAT = LITERAL (Read)
 *        The name of a catalogue to create, holding the calculated
-*        polarisation paremeters tabulated at each point for which Stokes
+*        polarization paremeters tabulated at each point for which Stokes
 *        parameters are available. If a null (!) value is supplied, then
 *        no catalogue is created. The catalogue will contain the following
 *        columns (all stored as single precision _REAL values):
 *
 *           X     : The pixel X coordinate at the tabulated point.
+*
 *           Y     : The pixel Y coordinate at the tabulated point.
+*
 *           I     : The total intensity.
+*
 *           Q     : The Stokes Q parameter.
+*
 *           U     : The Stokes U parameter.
-*           P     : The percentage polarisation.
-*           ANG   : The polarisation angle (anti-clockwise from the X axis
-*                   to the plane of polarisation - in degrees).
-*           PI    : The polarised intensity.
+*
+*           P     : The percentage polarization.
+*
+*           ANG   : The polarization angle (anti-clockwise from the X axis
+*                   to the plane of polarization - in degrees).
+*
+*           PI    : The polarized intensity.
 *
 *        If VAR is TRUE, then the catalogue will also contain 
 *        additional columns giving the standard deviation on each of the 
@@ -71,15 +74,13 @@
 *        these columns will be formed by prepending the letter D to the
 *        start of the column names listed above.
 *
-*        When measuring circular polarisation, the columns describing Q
+*        When measuring circular polarization, the columns describing Q
 *        and U will be replaced by equivalent columns describing V; and
 *        the ANG value will be zero if the normalised Stokes parameter V 
 *        is positive, and 90 otherwise. 
 *
 *        The coordinates contained in columns X and Y refer to pixel
-*        coordinates after any binning (i.e. to the pixel coordinate
-*        Frames of the output NDFs associated with parameters I, P,
-*        ANG, etc). For this reason it is usually better to avoid
+*        coordinates after any binning. For this reason it is usually better to avoid
 *        binning the Stokes vectors in this application (see parameter BOX).
 *        Information describing the mappings between pixel coordinates and 
 *        any other known coordinate Frames will be stored in the catalogue
@@ -92,15 +93,10 @@
 *        SUN/190. 
 *     DEBIAS = _LOGICAL (Read)
 *        TRUE if a correction for statistical bias is to be made to
-*        percentage polarisation and polarised intensity. This correction
-*        subtracts the variance of the percentage polarisation from the
-*        squared percentage polarisation, and uses the square root of this
-*        as the corrected percentage polarisation.  The corresponding
-*        polarised intensity is then found by multiplying the corrected
-*        percentage polarisation by the total intensity.  The returned 
+*        percentage polarization and polarized intensity. The returned 
 *        variance values are unchanged. This correction only applies to
-*        calculations of plane polarisation, and cannot be used if the 
-*        input NDF does not contain variance values, or if you supply a 
+*        calculations of linear polarization, and cannot be used if the 
+*        input cube does not contain variance values, or if you supply a 
 *        FALSE value for parameter VARIANCE. If a null value (!) is
 *        supplied, then the correction is applied if output variances
 *        are being created, and not otherwise.           [!]
@@ -108,10 +104,10 @@
 *        An output NDF holding the total intensity. A null value can be
 *        supplied if this output image is not required. [!]
 *     IN = NDF (Read)
-*        The 3-d NDF holding the Stokes parameters. This should have been
-*        created by POLCAL.
+*        The 3D cube holding the Stokes parameters. This should have been
+*        created by POLKA or POLCAL.
 *     IP = NDF (Write)
-*        An output NDF holding the polarised intensity. A null value can be
+*        An output NDF holding the polarized intensity. A null value can be
 *        supplied if this output image is not required. [!]
 *     METHOD = LITERAL (Read)
 *        The method to be used when binning Stokes parameters. This may be 
@@ -122,22 +118,22 @@
 *        Note, only the MEAN method may be used with bins containing more
 *        than 100 values. [MEDIAN]
 *     P = NDF (Write)
-*        An output NDF holding percentage polarisation. A null value can be
+*        An output NDF holding percentage polarization. A null value can be
 *        supplied if this output image is not required. [!]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
 *     ANG = NDF (Write)
-*        An output NDF holding the polarisation angle (anti-clockwise from 
-*        the pixel X axis to the plane of polarisation - in degrees). In the
-*        the case of circular polarisation, a value of zero is stored 
+*        An output NDF holding the polarization angle (anti-clockwise from 
+*        the pixel X axis to the plane of polarization - in degrees). In the
+*        the case of circular polarization, a value of zero is stored 
 *        if the normalised Stokes parameter V is positive, and a value
 *        of 90 is stored otherwise. A null value can be supplied if this 
 *        output image is not required. [!]
 *     VARIANCE = _LOGICAL (Read)
 *        TRUE if output variances are to be calculated.  This parameter
-*        is only accessed if all input NDFs contain variances, otherwise
-*        no variances are generated.  [TRUE]
+*        is only accessed if the supplied Stokes cube contains variances, 
+*        otherwise no variances are generated.  [TRUE]
 *     WLIM = _REAL (Read)
 *        If the input cube contains bad pixels, then this parameter
 *        may be used to determine the number of good Stokes parameters 
@@ -156,7 +152,7 @@
 
 *  Notes:
 *     -  The output NDFs are deleted if there is an error during the
-*     formation of the polarisation parameters.
+*     formation of the polarization parameters.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)

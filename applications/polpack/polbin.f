@@ -4,7 +4,7 @@
 *     POLBIN
 
 *  Purpose:
-*     Bins a catalogue containing Stokes vectors.
+*     Bins a catalogue containing Stokes parameters.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,44 +20,41 @@
 *        The global status.
 
 *  Description:
-*     This application creates a new catalogue of polarisation vectors by
-*     binning the Stokes vectors in the supplied catalogue. The columns in
+*     This application creates a new catalogue of polarization vectors by
+*     binning the Stokes parameters in the supplied catalogue. The columns in
 *     the supplied catalogue should correspond to those created by POLVEC.
 *
-*     The bins used form a grid of equal sized rectangular cells, the
-*     dimensions of each cell being specified by the user. The grid contains 
+*     The bins used form a grid of equally sized rectangular cells, the
+*     dimensions of each cell being specified by the parameter BOX in
+*     terms of the X and Y columns in the catalogue. The grid contains 
 *     sufficient cells to span the entire range of X and Y covered by the
 *     input catalogue. Each position in the output catalogue corresponds
 *     to one of these cells. The Stokes parameters for the cell are formed
-*     by combining together the Stokes parameter of all input positions
-*     which fall within the cell, using a method specified by the user.
-*     The degree of polarisation, angle of polarisation, and polarised
-*     intensity are then derived from these Stokes parameters. The (X,Y)
-*     positions in the output catalogue are the positions at the centre
-*     of each of the cells.
+*     by combining together the Stokes parameters of all input positions
+*     which fall within the cell, using the method specified by the
+*     parameter METHOD. The degree of polarization, angle of polarization, 
+*     and polarized intensity are then derived from these combined Stokes 
+*     parameters. The (X,Y) positions in the output catalogue are the 
+*     positions at the centre of each of the cells.
 
 *  Usage:
 *     polbin in out box [method]
 
 *  ADAM Parameters:
 *     BOX( 2 ) = _REAL (Read)
-*        The x and y bin sizes (in pixels). These values refer to the
-*        coordinate Frame defined by columns "X" and "Y".
+*        The x and y bin sizes. These values refer to the coordinate Frame 
+*        defined by columns "X" and "Y" and will usually be in units of pixels.
 *     DEBIAS = _LOGICAL (Read)
 *        TRUE if a correction for statistical bias is to be made to
-*        percentage polarisation and polarised intensity. This correction
-*        subtracts the variance of the percentage polarisation from the
-*        squared percentage polarisation, and uses the square root of this
-*        as the corrected percentage polarisation.  The corresponding
-*        polarised intensity is then found by multiplying the corrected
-*        percentage polarisation by the total intensity.  The returned 
-*        variance values are unchanged. This correction only applies to
-*        calculations of plane polarisation, and cannot be used if the 
+*        percentage polarization and polarized intensity. The returned 
+*        variance values are unchanged. This correction only applies to 
+*        calculations of linear polarization, and cannot be used if the 
 *        input catalogue does not contain variance values. If a null value 
 *        (!) is supplied, then the correction is applied if output variances
 *        are being created, and not otherwise.           [!]
 *     IN = LITERAL (Read)
-*        The name of the input catalogue. 
+*        The name of the input catalogue. A file type of .FIT is assumed
+*        if none is provided.
 *     METHOD = LITERAL (Read)
 *        The method to be used when binning Stokes parameters. This may be 
 *        set to any unique abbreviation of the following:
@@ -69,16 +66,17 @@
 *        The minimum number of good input values which must be present in
 *        a cell to create a good output value. [1]
 *     OUT = LITERAL (Read)
-*        The name of the output catalogue. 
+*        The name of the output catalogue. A file type of .FIT is assumed
+*        if none is provided.
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
 
 *  Examples:
 *     polbin intab outtab 4
-*        Bins the Stokes vectors in catalogue "intab" and produces
-*        catalogue "outtab" containing binned Stokes parameters and
-*        corresponding polarisation parameters. Each bin measures 4 units 
+*        Bins the Stokes parameters in catalogue "intab.FIT" and produces
+*        catalogue "outtab.FIT" containing binned Stokes parameters and
+*        corresponding polarization parameters. Each bin measures 4 pixels
 *        along both the X and Y axes, and has a value based on the median 
 *        of the corresponding input Stokes values.
 
@@ -348,7 +346,7 @@
          END IF          
       END IF
 
-*  If we are dealing with linear polarisation, get the ACW angle from the
+*  If we are dealing with linear polarization, get the ACW angle from the
 *  X axis to the reference direction (ANGROT). 
       IF( .NOT. CIRC ) THEN
          CALL CAT_TIDNT( CIIN, 'ANGROT', GANG, STATUS )       
@@ -361,7 +359,7 @@
 *  Check the global status.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  See if a correction is to be made to the percentage polarisation to
+*  See if a correction is to be made to the percentage polarization to
 *  correct for bias introduced as a result of the noise distribution not
 *  being symmetric.
       CALL PAR_GET0L( 'DEBIAS', DEBIAS, STATUS )
@@ -688,7 +686,7 @@
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Now calculate the polarisation parameters based on the binned Stokes
+*  Now calculate the polarization parameters based on the binned Stokes
 *  parameters, storing them in the catalogue created above.
 *  ====================================================================
 *  Store the coefficients of the transformation from cell indices to
@@ -698,8 +696,8 @@
       TR2( 3 ) = Y0 - 0.5*BOX( 2 )
       TR2( 4 ) = BOX( 2 )
 
-*  Calculate the polarisation vectors. POL1_PLVEC has the cabability to
-*  produce output images containing the polarisation parameters, These
+*  Calculate the polarization vectors. POL1_PLVEC has the cabability to
+*  produce output images containing the polarization parameters, These
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IPI as a safe pointer.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
@@ -761,7 +759,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'POLBIN_ERR', 'POLBIN: Error binning a '//
-     :                 'polarisation catalogue.', STATUS )
+     :                 'polarization catalogue.', STATUS )
       END IF
 
       END

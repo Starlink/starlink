@@ -4,7 +4,7 @@
 *     POLIMP
 
 *  Purpose:
-*     Stores information in the POLPACK extension.
+*     Copies FITS keyword values into the POLPACK extension.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,13 +20,14 @@
 *        The global status.
 
 *  Description:
-*     This routine should be used to prepare data prior to processing 
-*     with POLPACK. It records the values of various items of information 
-*     required by POLPACK (wave-plate position, filter, etc) in the POLPACK
-*     extensions of the supplied NDFs. These values can either be supplied 
-*     explicitly or can be copied ("imported") from keywords stored in the 
-*     FITS extensions of the supplied NDFs. Such keywords may, for instance, 
-*     be provided by the instrument/telescope control systems.
+*     This application should be used to prepare data files prior to 
+*     processing them with POLPACK. It records the values of various items 
+*     of information required by POLPACK (half-wave plate position, filter, 
+*     etc). These values can either be supplied explicitly or can be copied 
+*     ("imported") from FITS keywords stored in the files. Such keywords 
+*     may, for instance, be provided by the instrument/telescope control 
+*     systems. The specified values are stored in the POLPACK extensions
+*     of the supplied data files for use 
 *
 *     The import is controlled by a "table" which specifies how FITS
 *     keyword values should be used to create the corresponding POLPACK
@@ -47,14 +48,16 @@
 
 *  ADAM Parameters:
 *     IN = LITERAL (Read)
-*        A list of NDF names. The NDF names should be separated by commas 
-*        and may include wildcards.
+*        A group of data files. This may take the form of a comma separated 
+*        list, or any of the other forms described in the help on "Group 
+*        Expressions".
 *     NAMELIST = LITERAL (Read)
-*        The name of a file to create containing a list of the
-*        succesfully processed NDFs. This file can be used when 
-*        specifying the input NDFs for subsequent applications. [!]
+*        The name of a file to create containing a list of the succesfully 
+*        processed data files. This file can be used when specifying the input 
+*        data files for subsequent applications. No file is created if a null
+*        (!) value is given. [!]
 *     QUIET = _LOGICAL (Read)
-*        If FALSE, then the values stored in each NDF are listed as it is 
+*        If FALSE, then the values stored in each data file are listed as it is 
 *        processed. Otherwise, nothing is written to the screen. [FALSE] 
 *     TABLE = LITERAL (Read)
 *        The name of the file containing the table describing how FITS
@@ -65,19 +68,25 @@
 *        keywords written by POLEXP:
 *
 *           ANGROT      PPCKANGR
+*
 *           FILTER      PPCKFILT
+*
 *           IMGID       PPCKIMID
+*
 *           WPLATE      PPCKWPLT
+*
 *           RAY?        PPCKRAY 
+*
 *           STOKES?     PPCKSTOK
+*
 *        [!]
 
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
 *     which contains instructions on how to assign values to the components
-*     of the POLPACK extension in an NDF. Constant values specified in
+*     of the POLPACK extension. Constant values specified in
 *     the file may be used, or the values may be derived from the values
-*     of FITS keywords stored in the FITS extension of the NDF.
+*     of FITS keywords stored in the FITS extension.
 *
 *     In its most simple format each line in a FITS control table contains
 *     the name of a POLPACK extension item, followed by a constant value 
@@ -196,61 +205,13 @@
 *     placed anywhere and should start with the characters "#" or "!".
 *     Continuation onto a new line is indicated by use of "-". 
 
-*  POLPACK extension items:
-*     The POLPACK extension of an NDF may contain the following items.
-*     The names and types of the extension items are those as used in
-*     import tables. Of these, ANGROT, FILTER, WPLATE and possibly IMGID 
-*     are the only ones that most users need be concerned with. Values
-*     should be assigned to these extension items before processing of 
-*     raw data commences. Their values will often be derived from FITS
-*     headers written by the instrument/telescope control system. Values
-*     for the remaining extension items are produced by POLPACK as the
-*     processing proceeds and need only be included in the control
-*     table if you are importing partially processed data.
-*
-*     Some extension items have default values which are used if the 
-*     control table does not specify a value for them. These are
-*     indicated in the descriptions below:
-*
-*        ANGROT (_REAL):  The anti-clockwise angle from the first axis of 
-*        the image to the analyser position corresponding to WPLATE=0.0, 
-*        in degrees. Defaults to 0.0.
-*
-*        FILTER (_CHAR):  The filter name. If a value is supplied, then 
-*        the value of WPLATE is appended to it (unless the filter already
-*        includes the WPLATE value). This value is also copied to the FILTER
-*        item in the CCDPACK extension. Defaults to the value of WPLATE.
-*
-*        IMGID (_CHAR):  An arbitrary textual identifier for each input 
-*        image, used to associate corresponding O and E ray images. It must 
-*        be unique amongst the input images. Defaults to the name of the
-*        input image.
-*
-*        RAY (_CHAR):  This item should only be specified in the control
-*        table if the images being imported are partially processed images 
-*        which have been split into separate O and E ray images. It
-*        identifies which ray the image is derived from, and can take the 
-*        two values "O" and "E" (upper case). Left undefined by default.
-*
-*        STOKES (_CHAR):  This item should only be specified in the 
-*        control table if the images being imported are partially processed 
-*        images containing Stokes parameters. It is a string containing one 
-*        character for each plane in the data array of the NDF. Each 
-*        character identifies the quantity stored in the corresponding plane 
-*        of the data array, and will be one of I, Q, U or V. Left
-*        undefined by default.
-*        
-*        WPLATE (_CHAR):  The wave-plate position, in degrees. Must be one 
-*        of; "0.0", "22.5", "45.0", "67.5". There is no default (an error 
-*        is reported if no value is supplied).
-
 *  Examples:
 *     polimp in='*' table=mytable.dat
-*        This example processes all the NDFs in the current directory 
+*        This example processes all the data files in the current directory 
 *        using the import control table mytable.dat.
 *
-*     polimp in=^names.lis
-*        This example processes the NDFs listed in the text file
+*     polimp in=\verb+^+names.lis
+*        This example processes the data files listed in the text file
 *        "names.lis" using the default control table appropriate for
 *        partially processed data which has previously been exported using
 *        POLEXP.
@@ -258,7 +219,7 @@
 *  Notes:
 *     -  Any existing values in the POLPACK extension are deleted before 
 *     processing the supplied control table.
-*     -  A new Frame is added to the NDF's WCS component and is given the
+*     -  A new Frame is added to the WCS component of each NDF and is given the
 *     Domain "POLANAL". This Frame is formed by rotating the pixel coordinates 
 *     Frame so that the first axis is parallel to the analyser axis. The
 *     angle of rotation is given by the ANGROT item in the POLPACK extension

@@ -4,7 +4,7 @@
 *     POLHELP
 
 *  Purpose:
-*     Gives help about POLPACK.
+*     Display information about POLPACK.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,25 +20,12 @@
 *        The global status.
 
 *  Description:
-*     Displays help about POLPACK.  The help information has 
-*     alphabetical lists of commands, general information about
-*     POLPACK and related material; it describes individual commands in
-*     detail.
-*
-*     Here are some of the main options.
-*        polhelp
-*           No parameter is given so the introduction and the top-level
-*           help index is displayed.
-*        polhelp application/topic
-*           This gives help about the specified application or topic.
-*        polhelp application/topic subtopic
-*           This lists help about a subtopic of the specified
-*           application or topic. The hierarchy of topics has a maximum
-*           of four levels.
-
-*     See the Section "Navigating the Help Library" for details how to
-*     move around the help information, and to select the topics you
-*     want to view.
+*     This application displays information about POLPACK. This includes
+*     general topics common to all applications, as well as detailed
+*     descriptions of each application. The information is organised in a
+*     heirarchical structure of topics, subtopics, subsubtopics, etc.
+*     Each entry ends with a list of related sub-topics. You can then
+*     examine any of these sub-topics or return to the previous level.
 
 *  Usage:
 *     polhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
@@ -53,42 +40,29 @@
 *     SUBSUBSUBTOPIC = LITERAL (Read)
 *        Subsubsubtopic for which help is to be given. [" "]
 
-*  Algorithm:
-*     -  Check for error on entry; return if not o.k.
-*     -  Obtain topic and subtopics required.  Concatenate them
-*        separated by spaces.
-*     -  If an error has occurred set all topics to be null.
-*     -  Get help on required topic.
-
-*  Navigating the Help Library:
-*     The help information is arranged hierarchically.  You can move
-*     around the help information whenever POLHELP prompts.  This
-*     occurs when it has either presented a screen's worth of text or
-*     has completed displaying the previously requested help.  The
-*     information displayed by POLHELP on a particular topic includes a
-*     description of the topic and a list of subtopics that further
-*     describe the topic.
+*  Navigating the Help Tree:
+*     The text for each topic is displayed in screenfulls. A prompt is issued 
+*     at the end of each topic at which you may:
 *
-*     At a prompt you may enter:
-*        o  a topic and/or subtopic name(s) to display the help for that
-*           topic or subtopic, so for example, "polka parameters dpi"
+*        o  enter a topic and/or subtopic name(s) to display the help for 
+*           that topic or subtopic, so for example, "polka parameters dpi"
 *           gives help on DPI, which is a subtopic of Parameters, which
 *           in turn is a subtopic of POLKA;
 *
-*        o  a <CR> to see more text at a "Press RETURN to continue ..."
-*           request;
+*        o  press the RETURN key to see more text at a "Press RETURN to 
+*           continue ..." request;
 *
-*        o  a <CR>} at topic and subtopic prompts to move up one level
-*           in the hierarchy, and if you are at the top level it will
-*           terminate the help session;
+*        o  press the RETURN key at topic and subtopic prompts to move up 
+*           one level in the hierarchy, and if you are at the top level it 
+*           will terminate the help session;
 *
-*        o  a CTRL/D (pressing the CTRL and D keys simultaneously) in
+*        o  enter CTRL/D (i.e. press the CTRL and D keys simultaneously) in
 *           response to any prompt will terminate the help session;
 *
-*        o  a question mark "?" to redisplay the text for the current
+*        o  enter a question mark "?" to redisplay the text for the current
 *           topic, including the list of topic or subtopic names; or
 * 
-*        o  an ellipsis "..." to display all the text below the
+*        o  enter an ellipsis "..." to display all the text below the
 *           current point in the hierarchy.  For example, "POLKA..."
 *           displays information on the POLKA topic as well as
 *           information on all the subtopics under POLKA.
@@ -116,9 +90,6 @@
 *           spaces.
 *
 *     Ambiguous abbreviations result in all matches being displayed.
-
-*  Implementation Status:
-*     -  Uses the portable help system.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)

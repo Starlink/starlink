@@ -39,7 +39,7 @@
 *        orientation before plotting the vectors (see parameters
 *        COLANG and NEGATE). It should be in the range 0--360. [0.0]
 *     ARROW = LITERAL (Read)
-*        Vectors are drawn as arrows with the size of the arrow head
+*        Vectors are drawn as arrows, with the size of the arrow head
 *        specified by this parameter. Simple lines can be drawn by setting
 *        the arrow head size to zero. The value should be expressed as a 
 *        fraction of the largest dimension of the vector map. [0.0]
@@ -50,7 +50,8 @@
 *        the STYLE parameter. [TRUE]
 *     CAT = LITERAL (Read)
 *        The name of the input catalogue. This may be in any format
-*        supported by the CAT library (see SUN/181).
+*        supported by the CAT library (see SUN/181). A file type of .FIT
+*        is assumed if no file stype is supplied.
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the graphics device is to be cleared before displaying
 *        the vector map. This will result in the vector map being drawn
@@ -98,8 +99,9 @@
 *        The name of the catalogue column holding the Y coordinate at
 *        each vector (see COLX for additional information). [Y]
 *     COSYS = GROUP (Read)
-*        This gives the co-ordinate Frame to be displayed along annotated 
-*        axes. The supplied value will usually be a Domain name such as
+*        This gives the co-ordinate Frame to be displayed along the annotated 
+*        axes (see parameter AXES). The supplied value will usually be a 
+*        Domain name such as
 *        SKY, AXIS, PIXEL, etc, but more specific Frame descriptions can
 *        also be given by supplying a group of "name=value" strings where 
 *        "name" is the name of an AST Frame attribute (see SUN/210), and 
@@ -166,8 +168,7 @@
 *        can be used in place of the value 2). A null (!) value causes the 
 *        key style used on the previous invocation of POLPLOT to be 
 *        re-used. If no previous key style is available, or if the keyword 
-*        RESET is supplied, then the default key style established using 
-*        application SETSTYLE is used. [!]
+*        RESET is supplied, then a default key style is used. [!]
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
@@ -197,8 +198,8 @@
 *        attributes. Default values are supplied for any attributes which 
 *        are not specified. These are obtained from the WCS information 
 *        in the supplied catalogue, or inherited from the previous 
-*        invocation of POLPLOT. See application SETSTYLE. A null (!) value 
-*        causes defaults to be used for all attributes. [!]
+*        invocation of POLPLOT. A null (!) value causes defaults to be used 
+*        for all attributes. [!]
 *     UBND(2) = _REAL (Given)
 *        The coordinates to put at the top right corner of the plotting 
 *        area, in the coordinates system specified by parameters COLX and
@@ -210,14 +211,30 @@
 *        one centimetre.  []
 
 *  Examples:
-*     polplot poltab x y p ang
+*     polplot poltab 
 *        Produces a vector map on the current graphics device with
 *        vectors defined in the FITS binary table "poltab". The magnitudes
 *        are taken from column P, the orientations from column ANG and
-*        the coordinates of each vector from columns X and Y. All 
-*        other settings are defaulted, so for example a key is plotted.
-*     polplot poltab ra dec p ang angrot=23.4 cosys=eq(B1950)
-*        Produces a vector map in which the primary axis of the vectors
+*        the coordinates of each vector from columns X and Y. 
+*     polplot poltab style=\verb+^+mystyle.dat
+*        As above, but the annotated axes and vectors are drawn according
+*        to the description given in text file \verb+mystyle.dat+. If this
+*        files contains the following lines:
+*    
+*           title=My favorite colours
+*           grid=1
+*           minticklen=0
+*           colour(border)=green
+*           colour(grid)=blue
+*           colour(vec)=red
+*           width(border)=0.05
+*
+*        then the title is set to "My favourite colours"; a grid is drawn
+*        across the plot instead of tick marks around the edge; the border,
+*        grid and vectors are drawn in green, blue and red respectively,
+*        and slightly thicker lines are used to draw the border.
+*     polplot poltab ra dec noclear angrot=23.4 cosys=eq(B1950)
+*        Produces a vector map in which the reference direction for the vectors
 *        (as defined by the value zero in the column ANG) is at the
 *        position angle 23.4 degrees (measured anti-clockwise from the
 *        positive y axis) in the displayed map. The position of each vector
@@ -230,15 +247,10 @@
 *        Frame). If this is not possible, then the vector map will be
 *        aligned in pixel or grid coordinates. A message is displayed
 *        indicating the domain in which alignment took place.
-*     polplot poltab x y p ang arrow=0.01 just=start nokey
+*     polplot poltab arrow=0.01 just=start nokey
 *        Produces a vector map in which each vector is represented by an 
 *        arrow, starting at the position of the corresponding pixel.  No key
 *        to the vector scale and justification is produced.
-
-*  Implementation Status:
-*     -  Only real data can be processed directly.  Other non-complex
-*     numeric data types will undergo a type conversion before the
-*     vector plot is drawn.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
