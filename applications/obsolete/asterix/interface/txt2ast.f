@@ -1721,7 +1721,7 @@
       CALL BDI_LINK( TYPE, NAXES, DIMS, 'REAL', OFID, STATUS )
 
 *  Create axis data
-      IF ( .NOT PRIM ) THEN
+      IF ( .NOT. PRIM ) THEN
 
         DO I = 1, NAXES
 
