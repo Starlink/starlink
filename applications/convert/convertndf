@@ -81,8 +81,8 @@
 #  =================================
 
 #  Ensure that ADAM tasks think they are running from the shell
-unset ICL_TASK_NAME
 export ICL_TASK_NAME
+unset ICL_TASK_NAME
 
 #  Now select the required command according to the format
 case $2 in
