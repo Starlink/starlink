@@ -66,11 +66,6 @@
 <!NOTATION linespecific SYSTEM
   "line ends and leading white space must be preserved in output">
 
-<!ENTITY % text.figure.notations 'linespecific | latexgraphics | metapost'>
-	<!-- Figure notations which use only SGML characters (terminology? see
-	     8879, 9.2), which can therefore be included directly within
-	     figurecontent element -->
-
 <!-- Declare an attribute for the latexgraphics notation.  If there is
      indeed a need for this (and it's not implemented at present),
      then it can be used as follows.  In the DTD subset, declare an
