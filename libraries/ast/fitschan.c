@@ -552,12 +552,15 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        - Corrected text of output SPECSYS keyword values.
 *     17-MAY-2004 (DSB):
 *        - Added IWC attribute.
-*     15-JUNE-2004 (DSB):
+*     15-JUN-2004 (DSB):
 *        - Ensure out-of-bounds longitude CRPIX values for CAR
 *        projections are wrapped back into bounds.
-*     21-JUNE-2004 (DSB):
+*     21-JUN-2004 (DSB):
 *        - Ensure primary MJD-OBS value is used when reading foreign FITS
 *        headers.
+*     7-JUL-2004 (DSB):
+*        - Issue errors if an un-invertable PC/CD matrix is supplied in a
+*        FITS-WCS Header.
 *class--
 */
 
@@ -22872,6 +22875,12 @@ static AstMatrixMap *WcsCDeltMatrix( FitsStore *store, char s, int naxes,
 /* Create the diagional matrix. */
       new = astMatrixMap( naxes, naxes, 1, mat, "" );
 
+/* Report an error if the inverse transformation is undefined. */
+      if( !astGetTranInverse( new ) && astOK ) {
+        astError( AST__BDFTS, "%s(%s): Unusable CDELT values found "
+                  "in the FITS-WCS header - one or more values are zero.", method, class );
+      }
+
 /* Release the memory used to hold the matrix. */
       mat = (double *) astFree( (void *) mat );
 
@@ -24830,6 +24839,12 @@ static AstMatrixMap *WcsPCMatrix( FitsStore *store, char s, int naxes,
 
 /* Create the matrix. */
       new = astMatrixMap( naxes, naxes, 0, mat, "" );
+
+/* Report an error if the inverse transformation is undefined. */
+      if( !astGetTranInverse( new ) && astOK ) {
+        astError( AST__BDFTS, "%s(%s): Unusable rotation matrix (PC or CD) found "
+                  "in the FITS-WCS header - the matrix cannot be inverted.", method, class );
+      }
 
 /* Release the memory used to hold the matrix. */
       mat = (double *) astFree( (void *) mat );

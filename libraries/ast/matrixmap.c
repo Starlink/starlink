@@ -104,6 +104,9 @@ f     The MatrixMap class does not define any new routines beyond those
 *        zero.
 *     23-APR-2004 (DSB):
 *        Changes to simplification algorithm.
+*     8-JUL-2004 (DSB):
+*        astMtrMult - Report an error if either MatrixMap does not have a
+*        defined forward transformation.
 *class--
 */
 
@@ -2615,7 +2618,8 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a){
 
 *  Notes:
 *     -  An error is reported if the two MatrixMaps have incompatible
-*     shapes.
+*     shapes, or if either MatrixMap does not have a defined forward
+*     transformation.
 *     - A null Object pointer will also be returned if this function
 *     is invoked with the AST error status set, or if it should fail
 *     for any reason.
@@ -2649,6 +2653,22 @@ static AstMatrixMap *MtrMult( AstMatrixMap *this, AstMatrixMap *a){
 
 /* Initialise */
    new = NULL;
+
+/* Report an error if eitherof the MatrixMaps doe snot have a defined
+   forward transformation.*/
+   if( !astGetTranForward( this ) ){
+      astError( AST__MTRML, "astMtrMult(%s): Cannot find the product of 2 "
+                "MatrixMaps- the first MatrixMap has no forward transformation.",
+                astClass(this) ); 
+      return NULL;
+   }
+
+   if( !astGetTranInverse( this ) ){
+      astError( AST__MTRML, "astMtrMult(%s): Cannot find the product of 2 "
+                "MatrixMaps- the second MatrixMap has no forward transformation.",
+                astClass(this) ); 
+      return NULL;
+   }
 
 /* Report an error if the shapes of the two matrices are incompatible. */
    nrow_a = astGetNout( a );
