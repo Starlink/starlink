@@ -19,7 +19,7 @@ static const char* const rcsId="@(#) $Id$";
 #include <math.h>
 #include "error.h"
 #include "wcs.h"
-#include "WorldCoords.h"
+#include "WorldCoords.hxx"
 
 // prototypes for ESO Archive routines used 
 // (the header files are not ANSI C or C++ compat...)
