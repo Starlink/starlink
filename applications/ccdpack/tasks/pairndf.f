@@ -172,25 +172,29 @@
 *        In the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
 *     PREVX = INTEGER (Read and Write)
-*        The width in pixels of the preview display for each image;
+*        The initial width in pixels of the preview display for each image;
 *        two images will be displayed side by side at any one time at
-*        this size in the chooser window.
+*        this size in the chooser window.  This can be effectively changed
+*        by resizing the entire chooser window in the normal way using
+*        the window manager while the program is running.
 *        [300]
 *     PREVY = INTEGER (Read and Write)
-*        The height in pixels of the preview display for each image;
+*        The initial height in pixels of the preview display for each image;
 *        two images will be displayed side by side at any one time at
-*        this size in the chooser window.
+*        this size in the chooser window.  This can be effectively changed
+*        by resizing the entire chooser window in the normal way using
+*        the window manager while the program is running.
 *        [300]
 *     WINX = INTEGER (Read and Write)
-*        The width in pixels of the aligner window, which contains a 
-*        space for dragging around a pair of images and associated
+*        The initial width in pixels of the aligner window, which contains
+*        a space for dragging around a pair of images and associated
 *        controls.  If the region required for the images is larger 
 *        than the area allocated for display, it can be scrolled 
 *        around within the window.  The window can be resized in the 
 *        normal way using the window manager while the program is running.
 *        [500]
 *     WINY = INTEGER (Read and Write)
-*        The height in pixels of the aligner window, which contains a 
+*        The initial height in pixels of the aligner window, which contains
 *        space for dragging around a pair of images and associated
 *        controls.  If the region required for the images is larger 
 *        than the area allocated for display, it can be scrolled 
