@@ -715,7 +715,7 @@ CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c lpg1_tmpnm.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c kpg1_isfind.c \
-kpg1_isfinr.c
+kpg1_isfinr.c kpg1_memry.c
 KAPGRF_C_ROUTINES =  grf_kaplibs.c
 C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
              $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) $(KAPGRF_C_ROUTINES) 
