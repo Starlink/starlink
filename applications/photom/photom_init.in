@@ -17,7 +17,7 @@
 #     each application monolith.
 #
 #  Notes:
-#     The target PKG_VERS is set outside of this script, and edited at
+#     The target VERSION is set outside of this script, and edited at
 #     install time to indicate the version number.
 #
 #  Authors:
@@ -55,7 +55,7 @@ alias photomhelp ${PHOTOM_DIR}/photomhelp
 
 #if ($#argv == 0 || $1 != "-quiet") then  
       echo " "
-      echo "   PHOTOM applications are now available -- (Version PKG_VERS)"
+      echo "   PHOTOM applications are now available -- (Version @VERSION@)"
       echo "    Support is available by emailing photom@star.rl.ac.uk"
       echo "          Type photomhelp for help or consult SUN/45"
       echo " "

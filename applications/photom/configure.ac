@@ -42,7 +42,7 @@ STAR_DOC_FILES(sun45fig.ps)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml photomstart.icl photom_init)
 
 dnl    Need to go into sub directories
 AC_CONFIG_SUBDIRS([subs tasks help])

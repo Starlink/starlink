@@ -16,7 +16,7 @@ defhelp autophotom   $PHOTOM_HELP
 { Print welcome message
 {
 print " "
-print "   PHOTOM commands are now available - (Version PKG_VERS)"
+print "   PHOTOM commands are now available - (Version @VERSION@)"
 print " "
 print "   For help use the command 'help photom'"
 print " "
