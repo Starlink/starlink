@@ -562,7 +562,7 @@ PRIVATE_INCLUDES = $(SURF_INC) $(KAP_INC)
 
 SURF_INC = surf_par
 
-KAP_INC = ctm_com ctm_par hlpcmd kpg_ast kpg_par ndg_err ndg_const lpg_com \
+KAP_INC = ctm_com ctm_par hlpcmd kpg_ast kpg_par lpg_com \
 lpg_const grf.h
 
 #  List of external include files.  These are files which are required
@@ -574,7 +574,7 @@ lpg_const grf.h
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GKS_PAR GRP_PAR MSG_PAR NDF_PAR \
 	            NUM_DEC_CVT NUM_DEF_CVT PAR_ERR PAR_PAR FIO_ERR \
 	            PRM_PAR DAT_ERR GNS_PAR NDF_FUNC AST_PAR NDF_ERR \
-	PSX_ERR AST_ERR AGI_PAR SUBPAR_PAR GRP_ERR
+	PSX_ERR AST_ERR AGI_PAR SUBPAR_PAR GRP_ERR NDG_ERR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -611,16 +611,7 @@ kpg1_prnth.f kpg1_short.f kpg1_pgcol.f kpg1_plget.f \
 kpg1_aslog.f kpg1_rdast.f kpg1_wrast.f kpg1_plcip.f \
 kpg1_h2ast.f kpg1_ast2h.f kpg1_nmcol.f kpg1_pgsht.f \
 kpg1_pgsty.f \
-lpg_assoc.f  lpg_state.f lpg1_init.f lpg1_ptpar.f \
-ndg_assoc.f ndg_asso1.f ndg_ptsup.f ndg_ndfas.f \
-ndg1_asexp.f ndg_setsz.f ndg_gtsup.f ndg1_ndfch.f \
-ndg1_gtyps.f ndg1_expan.f ndg1_appen.f ndg1_fpars.f \
-ndg1_hfind.f ndg1_lasto.f ndg1_sdfex.f ndg1_sort.f \
-ndg1_match.f ndg1_hsplt.f ndg1_fparx.f ndg1_hcut.f \
-ndg1_chscn.f ndg1_subst.f ndg1_pshde.f ndg1_pshdf.f \
-ndg1_pshdb.f
-
-
+lpg_assoc.f  lpg_state.f lpg1_init.f lpg1_ptpar.f
 
 SURFLIB_F_ROUTINES = \
 surflib_calc_gridij.f surflib_diff_despike.f surflib_fill_grid.f \
@@ -719,7 +710,7 @@ PF_SUB2 =
 
 C_ROUTINES = $(KAP_C_ROUTINES) $(SCULIB_C_ROUTINES)
 
-KAP_C_ROUTINES = kpg1_trmsz.c grf_kappa.c lpg1_rm.c ndg1_wild.c
+KAP_C_ROUTINES = kpg1_trmsz.c grf_kappa.c lpg1_rm.c
 
 SCULIB_C_ROUTINES = 
 
@@ -822,7 +813,7 @@ $(NDFPERL_SCRIPTS)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES)  HLPCMD CTM_COM CTM_PAR \
- KPG_AST KPG_PAR NDG_ERR NDG_CONST LPG_COM LPG_CONST $(PKG_LINK)_PAR
+ KPG_AST KPG_PAR LPG_COM LPG_CONST $(PKG_LINK)_PAR
 
 #  Rules to set up links to locate each of the above include files.
 
@@ -832,8 +823,6 @@ CTM_PAR:     ctm_par;                 $(LINK) $? $@
 HLPCMD:      hlpcmd;                  $(LINK) $? $@
 KPG_AST:     kpg_ast;                 $(LINK) $? $@
 KPG_PAR:     kpg_par;                 $(LINK) $? $@
-NDG_ERR:     ndg_err;                 $(LINK) $? $@
-NDG_CONST:     ndg_const;                 $(LINK) $? $@
 LPG_COM:     lpg_com;                 $(LINK) $? $@
 LPG_CONST:     lpg_const;                 $(LINK) $? $@
 
@@ -860,6 +849,7 @@ FIO_ERR:     $(STAR_INC)/fio_err;     $(LINK) $? $@
 AGI_PAR:     $(STAR_INC)/agi_par;     $(LINK) $? $@
 SUBPAR_PAR:  $(STAR_INC)/subpar_par;  $(LINK) $? $@
 GRP_ERR:     $(STAR_INC)/grp_err;     $(LINK) $? $@
+NDG_ERR:     $(STAR_INC)/ndg_err;     $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -2020,31 +2010,6 @@ lpg1_init.o: DAT_PAR GRP_PAR LPG_COM LPG_CONST
 lpg1_ptpar.o: DAT_PAR GRP_PAR SAE_PAR
 lpg_assoc.o: DAT_PAR GRP_PAR LPG_COM LPG_CONST NDF_PAR PAR_ERR SAE_PAR SUBPAR_PAR
 lpg_state.o: DAT_PAR LPG_COM LPG_CONST SAE_PAR
-ndg1_appen.o: GRP_PAR NDG_CONST NDG_ERR SAE_PAR
-ndg1_asexp.o: GRP_PAR NDG_CONST NDG_ERR SAE_PAR
-ndg1_chscn.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_expan.o: DAT_PAR GRP_PAR NDG_CONST SAE_PAR
-ndg1_fpars.o: SAE_PAR
-ndg1_fparx.o:
-ndg1_gtyps.o: SAE_PAR
-ndg1_hcut.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_hfind.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_hsplt.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_lasto.o: SAE_PAR
-ndg1_match.o: GRP_PAR NDG_CONST SAE_PAR
-ndg1_ndfch.o: GRP_PAR NDG_CONST NDG_ERR PSX_ERR SAE_PAR
-ndg1_sdfex.o: DAT_PAR GRP_PAR SAE_PAR
-ndg1_sort.o: GRP_PAR NDG_CONST PRM_PAR SAE_PAR
-ndg_asso1.o: GRP_PAR NDF_PAR SAE_PAR
-ndg_assoc.o: GRP_ERR GRP_PAR NDG_ERR PAR_ERR SAE_PAR
-ndg_gtsup.o: GRP_PAR SAE_PAR
-ndg_ndfas.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
-ndg_ptsup.o: GRP_PAR SAE_PAR
-ndg_setsz.o: GRP_PAR SAE_PAR
-ndg1_pshdb.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_pshde.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_pshdf.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_subst.o: SAE_PAR
 pthlpo.o: HLPCMD SAE_PAR
 sread.o:
 
