@@ -1,10 +1,10 @@
-      SUBROUTINE OUTLINE( STATUS )
+      SUBROUTINE BOUNDS( STATUS )
 *+
 *  Name:
-*     OUTLINE
+*     BOUNDS
 
 *  Purpose:
-*     Draws aligned outlines of NDFs on a graphics display.
+*     Draws aligned boundaries of NDFs on a graphics display.
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,23 +13,23 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL OUTLINE( STATUS )
+*     CALL BOUNDS( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Description:
-*     This routine draws on a graphics device the outlines of a set of
-*     NDFs in their Current attached coordinate system.  This will
-*     show their relative positions in their current coordinates,
+*     This routine draws on a graphics device the boundary outlines of 
+*     a set of NDFs in their Current attached coordinate system.  This
+*     will show their relative positions in their current coordinates,
 *     and so can, for instance, be used to check that alignment looks
 *     sensible prior to resampling and combining into a mosaic.
-*     Each outline indicates the extent of the data of the 
+*     Each outline indicates the extent of the data array of the 
 *     corresponding NDF, and is therefore basically rectangular
 *     in shape, though it may be distorted if the mapping
 *     between pixel and Current coordinates is nonlinear.  The origin
-*     (minimum X,Y pixel value) of each outline can be marked and
+*     (minimum X,Y pixel value) of each boundary can be marked and
 *     the outline labelled with the NDF's name and/or index number
 *     (as determined by the LABMODE parameter).
 *
@@ -38,15 +38,15 @@
 *     registered.  If they do not all have the same current Domain
 *     name, a warning will be issued, but plotting will proceed.
 *
-*     OUTLINE uses the AGI graphics database in a way which is 
+*     BOUNDS uses the AGI graphics database in a way which is 
 *     compatible with KAPPA applications; if the CLEAR parameter is set
-*     to false then it will attempt to align the outline drawings with
+*     to false then it will attempt to align the boundary drawings with
 *     suitably registered graphics which are already on the graphics 
 *     device.  So, for instance, it is easy to overlay the outlines
 *     of a set of NDFs on a mosaic image which has been constructed 
 *     using those NDFs, or to see how an undisplayed set of NDFs 
 *     would map onto one already displayed, either by a previous 
-*     invocation of OUTLINE or by a KAPPA program such as DISPLAY
+*     invocation of BOUNDS or by a KAPPA program such as DISPLAY
 *     or CONTOUR.
 *
 *     This routine is designed for use on two-dimensional NDFs;
@@ -54,7 +54,7 @@
 *     ones will be ignored.
 
 *  Usage:
-*     outline in [device]
+*     bounds in [device]
 
 *  ADAM Parameters:
 *     AXES = _LOGICAL (Read)
@@ -74,7 +74,7 @@
 *        possible, alignment will occur within the Current coordinate
 *        system of the NDF.  If this is not possible, an attempt is
 *        made in SKY, PIXEL or GRID domains.  If the image cannot be
-*        aligned in any suitable domain, then OUTLINE will terminate
+*        aligned in any suitable domain, then BOUNDS will terminate
 *        with an error.  If CLEAR is set to FALSE, then there must
 *        already be a picture displayed on the graphics device.
 *        [TRUE]
@@ -82,7 +82,7 @@
 *        The name of the device on which to draw the outlines.
 *        [Current display device]
 *     IN = LITERAL (Read)
-*        A list of the NDFs whose outlines are to be drawn.
+*        A list of the NDFs whose boundaries are to be drawn.
 *     LABMODE = LITERAL( * ) (Read)
 *        This is a comma-separated list of keywords indicating what 
 *        sort of label should be written to label the outlines.
@@ -165,21 +165,21 @@
 *        [""]
 
 *  Examples:
-*     outline reg-data* clear
+*     bounds reg-data* clear
 *        This will clear the current graphics device and plot on it 
 *        labelled outlines of all the `reg-data*' NDFs, as well as
 *        axes showing the common coordinate system in which they
 *        all reside.  The plotting area will be made just large enough
-*        that all the outlines fit in.  Prior to running this, the 
+*        that all the boundaries fit in.  Prior to running this, the 
 *        Current attached coordinate system of all the reg-data* NDFs
 *        should be one in which they are all aligned.
-*     outline ccd* noclear
-*        This will attempt to plot outlines of all the `ccd*' NDFs 
+*     bounds ccd* noclear
+*        This will attempt to plot boundaries of all the `ccd*' NDFs 
 *        aligned with whatever is already plotted on the graphics 
 *        device, for instance the result of a KAPPA DISPLAY command
-*        or of a previous call of OUTLINE.  Parts of the NDF outlines
+*        or of a previous call of BOUNDS.  Parts of the NDF outlines
 *        which fall outside the existing plot area will not be visible.
-*     outline in="one,two,three' axes=yes label=[name,index] penrot=yes
+*     bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
 *             style="size(strings)=2,width(curves)=3"
 *        This will draw outlines of the NDFs `one', `two' and `three' 
 *        in the current directory with labelled axes, in triple-thick 
@@ -187,7 +187,7 @@
 *        `2: two' and `3: three' respectively.  The colour of each 
 *        outline and its associated text label will be different from
 *        the others.
-*     outline in=a* noclear nopenrot style="colour=2" label=\!
+*     bounds in=a* noclear nopenrot style="colour=2" label=\!
 *        All the NDFs beginning with `a' will be outlined in colour 2,
 *        with no text labels or indication of the origin.
 
@@ -212,7 +212,7 @@
 *     co-operation with KAPPA (SUN/95) image display/control routines.
 
 *  Implementation Status:
-*     OUTLINE's communication with the AGI database is compatible with
+*     BOUNDS's communication with the AGI database is compatible with
 *     most of KAPPA's behaviour, but is slightly less capable; in 
 *     particular it will fail to align with pictures whose alignment
 *     has been stored using TRANSFORM structures instead of MORE.AST
@@ -355,7 +355,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Start up CCDPACK.
-      CALL CCD1_START( 'OUTLINE', STATUS )
+      CALL CCD1_START( 'BOUNDS', STATUS )
 
 *  Start an NDF context.
       CALL NDF_BEGIN
@@ -427,7 +427,7 @@
      :        LABPOS( 2:2 ) .NE. 'N' .AND. LABPOS( 2:2 ) .NE. 'C' .AND.
      :        LABPOS( 2:2 ) .NE. 'F' ) ) THEN
             STATUS = SAI__ERROR
-            CALL CCD1_ERREP( 'OUTLINE_BADJUST', 'OUTLINE: LABPOS ' //
+            CALL CCD1_ERREP( 'BOUNDS_BADJUST', 'BOUNDS: LABPOS ' //
      :                       'parameter not of form [NCF][NCF]',
      :                       STATUS )
             GO TO 99
@@ -504,7 +504,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NDF', NDFNAM )
             CALL MSG_SETI( 'NAXES', NAXES )
-            CALL CCD1_ERREP( ' ', 'OUTLINE: NDF ''^NDF'' has ^NAXES '
+            CALL CCD1_ERREP( ' ', 'BOUNDS: NDF ''^NDF'' has ^NAXES '
      :                    // 'axes in Current coordinates.', STATUS )
             CALL CCD1_ERREP( ' ', '         It must have 2.', STATUS )
             GO TO 99
@@ -522,7 +522,7 @@
          IF ( NAXES .LT. 2 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'NDF', NDFNAM )
-            CALL CCD1_ERREP( ' ', 'OUTLINE: NDF ''^NDF'' must have at '
+            CALL CCD1_ERREP( ' ', 'BOUNDS: NDF ''^NDF'' must have at '
      :                    // 'least 2 dimensions.', STATUS )
             GO TO 99
          ELSE IF ( NAXES .GT. 2 ) THEN
@@ -670,7 +670,7 @@ c        CALL PGSCLP( 0 )
       CALL CCD1_PLSTY( PLOT, 'Tol=0.001', 'STYLE', STATUS )
 
 *  Save the PGPLOT viewport as a new picture in the AGI database.
-      CALL AGP_SVIEW( 'DATA', 'CCDPACK_OUTLINE', PICOD, STATUS )
+      CALL AGP_SVIEW( 'DATA', 'CCDPACK_BOUNDS', PICOD, STATUS )
 
 *  Save the Plot in the new picture.
       CALL CCD1_SPLOT( PICOD, PLOT, STATUS )
@@ -933,8 +933,8 @@ c        CALL PGSCLP( 0 )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( 'OUTLINE_ERR',
-     :                  'OUTLINE: Outline plotting failed.', STATUS )
+          CALL ERR_REP( 'BOUNDS_ERR',
+     :                  'BOUNDS: Boundary plotting failed.', STATUS )
       END IF
 
 *  Close CCDPACK logging system.

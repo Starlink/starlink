@@ -38,7 +38,7 @@
 #        Changed name CCDEXERCISE -> WCSEXERCISE and removed
 #        pre-registration steps.
 #     9-JAN-2001 (MBT):
-#        Added demo of OUTLINE task.
+#        Added demo of BOUNDS task.
 #     {enter_further_changes_here}
 #-
 #
@@ -363,11 +363,11 @@
          echo "  alignment."
          echo " "
          gdclear \\
-         outline \
+         bounds \
             in='data-??' \
             clear \
             reset accept
-#        end outline
+#        end bounds
          plotlist \
             inlist='data-1?' \
             mtype=2 \
@@ -439,20 +439,20 @@
          echo " "
          echo "  Drawing outlines of the images over the displayed mosaic."
          echo " "
-         outline \
+         bounds \
             in='data-1?' \
             noclear \
             nopenrot \
             style='"colour=2"' \
             reset accept
-#        end outline
-         outline \
+#        end bounds
+         bounds \
             in='data-2?' \
             noclear \
             nopenrot \
             style='"colour=3"' \
             reset accept
-#        end outline
+#        end bounds
       endif
 
 #  Exercise is completed.

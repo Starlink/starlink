@@ -19,7 +19,7 @@
   The following new program has been added for viewing positioning of
   registered images:
 
-      - OUTLINE -- Draws aligned outlines of images on a graphics display
+      - BOUNDS   -- Draws aligned boundaries of images on a graphics display
 
 
   The following minor changes have also been made since v3.1-1:

@@ -1,23 +1,23 @@
-.help outline Starlink out
+.help bounds Starlink out
 .nf
-Draws aligned outlines of images on a graphics display.
+Draws aligned boundaries of images on a graphics display.
 
 Usage:
 
-   outline in [device]
+   bounds in [device]
 
 Description:
 
-   This routine draws on a graphics device the outlines of a set of
-   images in their Current attached coordinate system.  This will
-   show their relative positions in their current coordinates,
+   This routine draws on a graphics device the boundary outlines of 
+   a set of images in their Current attached coordinate system.  This
+   will show their relative positions in their current coordinates,
    and so can, for instance, be used to check that alignment looks
    sensible prior to resampling and combining into a mosaic.
-   Each outline indicates the extent of the data of the
+   Each outline indicates the extent of the data array of the
    corresponding image, and is therefore basically rectangular
    in shape, though it may be distorted if the mapping
    between pixel and Current coordinates is nonlinear.  The origin
-   (minimum X,Y pixel value) of each outline can be marked and
+   (minimum X,Y pixel value) of each boundary can be marked and
    the outline labelled with the image's name and/or index number
    (as determined by the LABMODE parameter).
 
@@ -26,15 +26,15 @@ Description:
    registered.  If they do not all have the same current Domain
    name, a warning will be issued, but plotting will proceed.
 
-   OUTLINE uses the AGI graphics database in a way which is
+   BOUNDS uses the AGI graphics database in a way which is
    compatible with KAPPA applications; if the CLEAR parameter is set
-   to false then it will attempt to align the outline drawings with
+   to false then it will attempt to align the boundary drawings with
    suitably registered graphics which are already on the graphics
    device.  So, for instance, it is easy to overlay the outlines
    of a set of images on a mosaic image which has been constructed
    using those images, or to see how an undisplayed set of images
    would map onto one already displayed, either by a previous
-   invocation of OUTLINE or by a KAPPA program such as DISPLAY
+   invocation of BOUNDS or by a KAPPA program such as DISPLAY
    or CONTOUR.
 
    This routine is designed for use on two-dimensional images;
@@ -67,7 +67,7 @@ CLEAR = _LOGICAL (Read)
    possible, alignment will occur within the Current coordinate
    system of the image.  If this is not possible, an attempt is
    made in SKY, PIXEL or GRID domains.  If the image cannot be
-   aligned in any suitable domain, then OUTLINE will terminate
+   aligned in any suitable domain, then BOUNDS will terminate
    with an error.  If CLEAR is set to FALSE, then there must
    already be a picture displayed on the graphics device.
    [TRUE]
@@ -81,7 +81,7 @@ DEVICE = DEVICE (Read)
 IN
 
 IN = LITERAL (Read)
-   A list of the images whose outlines are to be drawn.
+   A list of the images whose boundaries are to be drawn.
 
 LABMODE
 
@@ -194,23 +194,23 @@ STYLE = LITERAL (Read)
 
 Examples
 
-outline reg-data* clear
+bounds reg-data* clear
    This will clear the current graphics device and plot on it
    labelled outlines of all the `reg-data*' images, as well as
    axes showing the common coordinate system in which they
    all reside.  The plotting area will be made just large enough
-   that all the outlines fit in.  Prior to running this, the
+   that all the boundaries fit in.  Prior to running this, the
    Current attached coordinate system of all the reg-data* images
    should be one in which they are all aligned.
 
-outline ccd* noclear
-   This will attempt to plot outlines of all the `ccd*' images
+bounds ccd* noclear
+   This will attempt to plot boundaries of all the `ccd*' images
    aligned with whatever is already plotted on the graphics
    device, for instance the result of a KAPPA DISPLAY command
-   or of a previous call of OUTLINE.  Parts of the image outlines
+   or of a previous call of BOUNDS.  Parts of the image outlines
    which fall outside the existing plot area will not be visible.
 
-outline in="one,two,three' axes=yes label=[name,index] penrot=yes
+bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
         style="size(strings)=2,width(curves)=3"
    This will draw outlines of the images `one', `two' and `three'
    in the current directory with labelled axes, in triple-thick
@@ -219,7 +219,7 @@ outline in="one,two,three' axes=yes label=[name,index] penrot=yes
    outline and its associated text label will be different from
    the others.
 
-outline in=a* noclear nopenrot style="colour=2" label=\!
+bounds in=a* noclear nopenrot style="colour=2" label=\!
    All the images beginning with `a' will be outlined in colour 2,
    with no text labels or indication of the origin.
 
@@ -255,7 +255,7 @@ History
 
 Implementation_Status
 
-   OUTLINE's communication with the AGI database is compatible with
+   BOUNDS's communication with the AGI database is compatible with
    most of KAPPA's behaviour, but is slightly less capable; in
    particular it will fail to align with pictures whose alignment
    has been stored using TRANSFORM structures instead of MORE.AST

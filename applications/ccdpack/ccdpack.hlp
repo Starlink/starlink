@@ -86,6 +86,8 @@
 
      ASTIMP: Imports AST FrameSet information into images.
 
+     BOUNDS: Draws aligned boundaries of images on a graphics display
+
      CALCOR: Performs dark or flash count corrections.
 
      CCDALIGN: Aligns images graphically by interactive object selection.
@@ -133,8 +135,6 @@
 
      MAKEMOS: Makes image mosaics by combining and (optionally) normalising.
 
-     OUTLINE: Draws aligned outlines of images on a graphics display
-
      PAIRNDF: Aligns images graphically by drag and drop.
 
      PLOTLIST: Draws position markers on a graphics display.
@@ -178,7 +178,7 @@
   The following new program has been added for viewing positioning of
   registered images:
 
-      - OUTLINE -- Draws aligned outlines of images on a graphics display
+      - BOUNDS -- Draws aligned boundaries of images on a graphics display
 
 
   The following minor changes have also been made since v3.1-1:
@@ -771,6 +771,232 @@ MBT: Mark Taylor (STARLINK)
 2 History
  05-MAR-1999 (MBT):
     Original version.
+1 BOUNDS
+Draws aligned boundaries of images on a graphics display.
+
+Usage:
+
+   bounds in [device]
+
+Description:
+
+   This routine draws on a graphics device the boundary outlines of
+   a set of images in their Current attached coordinate system.  This
+   will show their relative positions in their current coordinates,
+   and so can, for instance, be used to check that alignment looks
+   sensible prior to resampling and combining into a mosaic.
+   Each outline indicates the extent of the data array of the
+   corresponding image, and is therefore basically rectangular
+   in shape, though it may be distorted if the mapping
+   between pixel and Current coordinates is nonlinear.  The origin
+   (minimum X,Y pixel value) of each boundary can be marked and
+   the outline labelled with the image's name and/or index number
+   (as determined by the LABMODE parameter).
+
+   The results are only likely to be sensible if the Current
+   coordinate system of all the images is one in which they are all
+   registered.  If they do not all have the same current Domain
+   name, a warning will be issued, but plotting will proceed.
+
+   BOUNDS uses the AGI graphics database in a way which is
+   compatible with KAPPA applications; if the CLEAR parameter is set
+   to false then it will attempt to align the boundary drawings with
+   suitably registered graphics which are already on the graphics
+   device.  So, for instance, it is easy to overlay the outlines
+   of a set of images on a mosaic image which has been constructed
+   using those images, or to see how an undisplayed set of images
+   would map onto one already displayed, either by a previous
+   invocation of BOUNDS or by a KAPPA program such as DISPLAY
+   or CONTOUR.
+
+   This routine is designed for use on two-dimensional images;
+   if the images presented have more than two dimensions, any extra
+   ones will be ignored.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 AXES
+AXES = _LOGICAL (Read)
+   True if labelled and annotated axes are to be drawn around the
+   outlines, showing the common Current coordinate system of the
+   NDFs.  The appearance of the axes can be controlled using the
+   STYLE parameter.  This parameter has a dynamic default; it
+   defaults to the same value as the CLEAR parameter.
+   [dynamic]
+3 CLEAR
+CLEAR = _LOGICAL (Read)
+   If CLEAR is set to true, the graphics device will be cleared
+   before the plot is made.
+
+   If you want the outlines to be drawn over the top
+   of an existing DATA picture, for instance one displayed with
+   KAPPA's DISPLAY application, then set CLEAR to false.  If
+   possible, alignment will occur within the Current coordinate
+   system of the image.  If this is not possible, an attempt is
+   made in SKY, PIXEL or GRID domains.  If the image cannot be
+   aligned in any suitable domain, then BOUNDS will terminate
+   with an error.  If CLEAR is set to FALSE, then there must
+   already be a picture displayed on the graphics device.
+   [TRUE]
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The name of the device on which to draw the outlines.
+   [Current display device]
+3 IN
+IN = LITERAL (Read)
+   A list of the images whose boundaries are to be drawn.
+3 LABMODE
+LABMODE = LITERAL( * ) (Read)
+   This is a comma-separated list of keywords indicating what
+   sort of label should be written to label the outlines.
+   Any combination of one or more of the following keywords may
+   be used:
+
+      - NAME   -- The name of the image is written
+
+      - INDEX  -- The index number of the image is written
+
+      - ORIGIN -- The pixel coordinate origin of the image is marked
+
+      - OPAQUE -- The text is written on an opaque background
+
+   Unrecognised values will be ignored.  If you don't want any
+   of these options, use the null value (!).
+   [NAME,ORIGIN]
+3 LABPOS
+LABPOS = LITERAL (Read)
+   A two-character string identifying the positioning of the text
+   label (only used if the value of LABEL includes either "INDEX"
+   or "NAME").  The first letter indicates the side-to-side
+   position and the second indicates the up-and-down position
+   in the pixel coordinates of each image.  Each letter must be
+   "N", "C" or "F", for Near to the origin, Central or Far from
+   the origin.  Normally (unless LABUP is true) the text
+   will be written parallel or antiparallel to the X pixel
+   direction for each image, with one edge anchored as per the
+   value of LABPOS in such a way that the text sits inside the
+   outline (if it will fit).
+
+   Only the first two characters are significant.
+
+   LABPOS normally defaults to "NN", indicating the label written
+   next to the origin, but if LABUP is set TRUE, then it
+   defaults to "CC".
+   [NN]
+3 LABUP
+LABUP = _LOGICAL (Read)
+   Normally this parameter is FALSE, and each text label (as
+   determined by LABMODE) is written parallel or anti-parallel
+   to the pixel X axis of the corresponding image.  If this
+   parameter is set TRUE however, text will be written upright,
+   that is, horizontal on the graphics device.  In this case
+   the positioning algorithm may fail to place it inside the
+   corresponding outline; it is generally not advisable to
+   set LABUP to TRUE unless the label is positioned in the
+   centre of the outline by setting LABPOS="CC".
+   [FALSE]
+3 LOGFILE
+LOGFILE = FILENAME (Read)
+   Name of the CCDPACK logfile.  If a null (!) value is given for
+   this parameter then no logfile will be written, regardless of
+   the value of the LOGTO parameter.
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "CCDPACK.LOG".
+   [CCDPACK.LOG]
+3 LOGTO
+LOGTO = LITERAL (Read)
+   Every CCDPACK application has the ability to log its output
+   for future reference as well as for display on the terminal.
+   This parameter controls this process, and may be set to any
+   unique abbreviation of the following:
+
+      -  TERMINAL  -- Send output to the terminal only
+
+      -  LOGFILE   -- Send output to the logfile only (see the
+                      LOGFILE parameter)
+
+      -  BOTH      -- Send output to both the terminal and the
+                      logfile
+
+      -  NEITHER   -- Produce no output at all
+
+   If the logging system has been initialised using CCDSETUP
+   then the value specified there will be used. Otherwise, the
+   default is "BOTH".
+   [BOTH]
+3 PENROT
+PENROT = _LOGICAL (Read)
+   If TRUE, each outline will be drawn with a different pen
+   (colour).  Otherwise, they will all be drawn in the same pen.
+   [FALSE]
+3 STYLE
+STYLE = LITERAL (Read)
+   A group of attribute settings describing the plotting style
+   to use for the outlines and annotated axes.  This should be
+   a string consisting of comma-separated `attribute=value'
+   items, as explained in the `Plotting Styles and Attributes'
+   section of SUN/95, except that colours may only be specified
+   by index, and not by name.
+2 Examples
+bounds reg-data* clear
+   This will clear the current graphics device and plot on it
+   labelled outlines of all the `reg-data*' images, as well as
+   axes showing the common coordinate system in which they
+   all reside.  The plotting area will be made just large enough
+   that all the boundaries fit in.  Prior to running this, the
+   Current attached coordinate system of all the reg-data* images
+   should be one in which they are all aligned.
+
+bounds ccd* noclear
+   This will attempt to plot boundaries of all the `ccd*' images
+   aligned with whatever is already plotted on the graphics
+   device, for instance the result of a KAPPA DISPLAY command
+   or of a previous call of BOUNDS.  Parts of the image outlines
+   which fall outside the existing plot area will not be visible.
+
+bounds in="one,two,three' axes=yes label=[name,index] penrot=yes
+       style="size(strings)=2,width(curves)=3"
+   This will draw outlines of the images `one', `two' and `three'
+   in the current directory with labelled axes, in triple-thick
+   lines and with double-size text labels which read `1: one',
+   `2: two' and `3: three' respectively.  The colour of each
+   outline and its associated text label will be different from
+   the others.
+
+bounds in=a* noclear nopenrot style="colour=2" label=\!
+   All the images beginning with `a' will be outlined in colour 2,
+   with no text labels or indication of the origin.
+2 Behaviour_of_Parameters
+   All parameters retain their current value as default. The
+   "current" value is the value assigned on the last run of the
+   application. If the application has not been run then the
+   "intrinsic" defaults, as shown in the parameter help, apply.
+
+   Retaining parameter values has the advantage of allowing you to
+   define the default behaviour of the application. The intrinsic
+   default behaviour of the application may be restored by using the
+   RESET keyword on the command line.
+
+   Certain parameters (LOGTO and LOGFILE) have global
+   values. These global values will always take precedence, except
+   when an assignment is made on the command line. Global values may
+   be set and reset using the CCDSETUP and CCDCLEAR commands.
+
+   The DEVICE parameter also has a global association. This is not
+   controlled by the usual CCDPACK mechanisms, instead it works in
+   co-operation with KAPPA (SUN/95) image display/control routines.
+2 Authors
+MBT: Mark Taylor (STARLINK)
+2 History
+ 22-DEC-2000 (MBT):
+    Original version.
+2 Implementation_Status
+   BOUNDS's communication with the AGI database is compatible with
+   most of KAPPA's behaviour, but is slightly less capable; in
+   particular it will fail to align with pictures whose alignment
+   has been stored using TRANSFORM structures instead of MORE.AST
+   extensions.  This affects only older applications.
 1 CALCOR
 Subtracts a scaled dark or flash calibration image from a series of images.
 
@@ -6639,232 +6865,6 @@ AALLAN: Alasdair Allan (Keele University, STARLINK)
      present, will normally be extrapolated as a result of
      propagation to the output mosaic, which will typically have a
      larger extent than any of the input images).
-1 OUTLINE
-Draws aligned outlines of images on a graphics display.
-
-Usage:
-
-   outline in [device]
-
-Description:
-
-   This routine draws on a graphics device the outlines of a set of
-   images in their Current attached coordinate system.  This will
-   show their relative positions in their current coordinates,
-   and so can, for instance, be used to check that alignment looks
-   sensible prior to resampling and combining into a mosaic.
-   Each outline indicates the extent of the data of the
-   corresponding image, and is therefore basically rectangular
-   in shape, though it may be distorted if the mapping
-   between pixel and Current coordinates is nonlinear.  The origin
-   (minimum X,Y pixel value) of each outline can be marked and
-   the outline labelled with the image's name and/or index number
-   (as determined by the LABMODE parameter).
-
-   The results are only likely to be sensible if the Current
-   coordinate system of all the images is one in which they are all
-   registered.  If they do not all have the same current Domain
-   name, a warning will be issued, but plotting will proceed.
-
-   OUTLINE uses the AGI graphics database in a way which is
-   compatible with KAPPA applications; if the CLEAR parameter is set
-   to false then it will attempt to align the outline drawings with
-   suitably registered graphics which are already on the graphics
-   device.  So, for instance, it is easy to overlay the outlines
-   of a set of images on a mosaic image which has been constructed
-   using those images, or to see how an undisplayed set of images
-   would map onto one already displayed, either by a previous
-   invocation of OUTLINE or by a KAPPA program such as DISPLAY
-   or CONTOUR.
-
-   This routine is designed for use on two-dimensional images;
-   if the images presented have more than two dimensions, any extra
-   ones will be ignored.
-2 Parameters
-For information on individual parameters, select from the list below:
-3 AXES
-AXES = _LOGICAL (Read)
-   True if labelled and annotated axes are to be drawn around the
-   outlines, showing the common Current coordinate system of the
-   NDFs.  The appearance of the axes can be controlled using the
-   STYLE parameter.  This parameter has a dynamic default; it
-   defaults to the same value as the CLEAR parameter.
-   [dynamic]
-3 CLEAR
-CLEAR = _LOGICAL (Read)
-   If CLEAR is set to true, the graphics device will be cleared
-   before the plot is made.
-
-   If you want the outlines to be drawn over the top
-   of an existing DATA picture, for instance one displayed with
-   KAPPA's DISPLAY application, then set CLEAR to false.  If
-   possible, alignment will occur within the Current coordinate
-   system of the image.  If this is not possible, an attempt is
-   made in SKY, PIXEL or GRID domains.  If the image cannot be
-   aligned in any suitable domain, then OUTLINE will terminate
-   with an error.  If CLEAR is set to FALSE, then there must
-   already be a picture displayed on the graphics device.
-   [TRUE]
-3 DEVICE
-DEVICE = DEVICE (Read)
-   The name of the device on which to draw the outlines.
-   [Current display device]
-3 IN
-IN = LITERAL (Read)
-   A list of the images whose outlines are to be drawn.
-3 LABMODE
-LABMODE = LITERAL( * ) (Read)
-   This is a comma-separated list of keywords indicating what
-   sort of label should be written to label the outlines.
-   Any combination of one or more of the following keywords may
-   be used:
-
-      - NAME   -- The name of the image is written
-
-      - INDEX  -- The index number of the image is written
-
-      - ORIGIN -- The pixel coordinate origin of the image is marked
-
-      - OPAQUE -- The text is written on an opaque background
-
-   Unrecognised values will be ignored.  If you don't want any
-   of these options, use the null value (!).
-   [NAME,ORIGIN]
-3 LABPOS
-LABPOS = LITERAL (Read)
-   A two-character string identifying the positioning of the text
-   label (only used if the value of LABEL includes either "INDEX"
-   or "NAME").  The first letter indicates the side-to-side
-   position and the second indicates the up-and-down position
-   in the pixel coordinates of each image.  Each letter must be
-   "N", "C" or "F", for Near to the origin, Central or Far from
-   the origin.  Normally (unless LABUP is true) the text
-   will be written parallel or antiparallel to the X pixel
-   direction for each image, with one edge anchored as per the
-   value of LABPOS in such a way that the text sits inside the
-   outline (if it will fit).
-
-   Only the first two characters are significant.
-
-   LABPOS normally defaults to "NN", indicating the label written
-   next to the origin, but if LABUP is set TRUE, then it
-   defaults to "CC".
-   [NN]
-3 LABUP
-LABUP = _LOGICAL (Read)
-   Normally this parameter is FALSE, and each text label (as
-   determined by LABMODE) is written parallel or anti-parallel
-   to the pixel X axis of the corresponding image.  If this
-   parameter is set TRUE however, text will be written upright,
-   that is, horizontal on the graphics device.  In this case
-   the positioning algorithm may fail to place it inside the
-   corresponding outline; it is generally not advisable to
-   set LABUP to TRUE unless the label is positioned in the
-   centre of the outline by setting LABPOS="CC".
-   [FALSE]
-3 LOGFILE
-LOGFILE = FILENAME (Read)
-   Name of the CCDPACK logfile.  If a null (!) value is given for
-   this parameter then no logfile will be written, regardless of
-   the value of the LOGTO parameter.
-
-   If the logging system has been initialised using CCDSETUP
-   then the value specified there will be used. Otherwise, the
-   default is "CCDPACK.LOG".
-   [CCDPACK.LOG]
-3 LOGTO
-LOGTO = LITERAL (Read)
-   Every CCDPACK application has the ability to log its output
-   for future reference as well as for display on the terminal.
-   This parameter controls this process, and may be set to any
-   unique abbreviation of the following:
-
-      -  TERMINAL  -- Send output to the terminal only
-
-      -  LOGFILE   -- Send output to the logfile only (see the
-                      LOGFILE parameter)
-
-      -  BOTH      -- Send output to both the terminal and the
-                      logfile
-
-      -  NEITHER   -- Produce no output at all
-
-   If the logging system has been initialised using CCDSETUP
-   then the value specified there will be used. Otherwise, the
-   default is "BOTH".
-   [BOTH]
-3 PENROT
-PENROT = _LOGICAL (Read)
-   If TRUE, each outline will be drawn with a different pen
-   (colour).  Otherwise, they will all be drawn in the same pen.
-   [FALSE]
-3 STYLE
-STYLE = LITERAL (Read)
-   A group of attribute settings describing the plotting style
-   to use for the outlines and annotated axes.  This should be
-   a string consisting of comma-separated `attribute=value'
-   items, as explained in the `Plotting Styles and Attributes'
-   section of SUN/95, except that colours may only be specified
-   by index, and not by name.
-2 Examples
-outline reg-data* clear
-   This will clear the current graphics device and plot on it
-   labelled outlines of all the `reg-data*' images, as well as
-   axes showing the common coordinate system in which they
-   all reside.  The plotting area will be made just large enough
-   that all the outlines fit in.  Prior to running this, the
-   Current attached coordinate system of all the reg-data* images
-   should be one in which they are all aligned.
-
-outline ccd* noclear
-   This will attempt to plot outlines of all the `ccd*' images
-   aligned with whatever is already plotted on the graphics
-   device, for instance the result of a KAPPA DISPLAY command
-   or of a previous call of OUTLINE.  Parts of the image outlines
-   which fall outside the existing plot area will not be visible.
-
-outline in="one,two,three' axes=yes label=[name,index] penrot=yes
-        style="size(strings)=2,width(curves)=3"
-   This will draw outlines of the images `one', `two' and `three'
-   in the current directory with labelled axes, in triple-thick
-   lines and with double-size text labels which read `1: one',
-   `2: two' and `3: three' respectively.  The colour of each
-   outline and its associated text label will be different from
-   the others.
-
-outline in=a* noclear nopenrot style="colour=2" label=\!
-   All the images beginning with `a' will be outlined in colour 2,
-   with no text labels or indication of the origin.
-2 Behaviour_of_Parameters
-   All parameters retain their current value as default. The
-   "current" value is the value assigned on the last run of the
-   application. If the application has not been run then the
-   "intrinsic" defaults, as shown in the parameter help, apply.
-
-   Retaining parameter values has the advantage of allowing you to
-   define the default behaviour of the application. The intrinsic
-   default behaviour of the application may be restored by using the
-   RESET keyword on the command line.
-
-   Certain parameters (LOGTO and LOGFILE) have global
-   values. These global values will always take precedence, except
-   when an assignment is made on the command line. Global values may
-   be set and reset using the CCDSETUP and CCDCLEAR commands.
-
-   The DEVICE parameter also has a global association. This is not
-   controlled by the usual CCDPACK mechanisms, instead it works in
-   co-operation with KAPPA (SUN/95) image display/control routines.
-2 Authors
-MBT: Mark Taylor (STARLINK)
-2 History
- 22-DEC-2000 (MBT):
-    Original version.
-2 Implementation_Status
-   OUTLINE's communication with the AGI database is compatible with
-   most of KAPPA's behaviour, but is slightly less capable; in
-   particular it will fail to align with pictures whose alignment
-   has been stored using TRANSFORM structures instead of MORE.AST
-   extensions.  This affects only older applications.
 1 PAIRNDF
 Aligns images graphically by drag and drop.
 
@@ -7206,7 +7206,7 @@ Description:
    Before this application can be run an image (or other graphical
    output such as a contour image) must have been displayed using a
    suitable routine such as KAPPA's DISPLAY (SUN/95) or CCDPACK's
-   OUTLINE.
+   BOUNDS.
 
    For a more interactive display of markers on an Xwindows display,
    you can use the IDICURS program instead.

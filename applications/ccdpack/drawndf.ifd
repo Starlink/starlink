@@ -1,7 +1,7 @@
-      action outline {
+      action bounds {
 #+
 #  Name:
-#     outline.ifd
+#     bounds.ifd
 
 #  Type of Module:
 #     IFD parameter interface file.
