@@ -63,7 +63,7 @@
          source ${TEMPDIR}/blt3
          tar -cvh -f ${TEMPDIR}/${file}.tar `cat ${TEMPDIR}/blt2`
          rm -f `cat ${TEMPDIR}/blt2`
-         rm ${TEMPDIR}/blt1 ${TEMPDIR}/blt2 ${TEMPDIR}/blt3
+#         rm ${TEMPDIR}/blt1 ${TEMPDIR}/blt2 ${TEMPDIR}/blt3
          mv ${TEMPDIR}/${file}.tar ${REL_DIR}
       end
 
