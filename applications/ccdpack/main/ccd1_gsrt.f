@@ -18,7 +18,7 @@
 *     the group is respected.
 *
 *     The algorithm currently used is an insertion sort, which is not
-*     particularly efficient; if the routine is likely to be used for
+*     very efficient; if the routine is likely to be used for
 *     large or repeated sorts it ought to be recoded.
 
 *  Arguments:
@@ -65,12 +65,14 @@
 *  Local Variables:
       INTEGER I                  ! Loop variable
       INTEGER J                  ! Loop variable
+      INTEGER K                  ! Loop variable
       INTEGER NITEM              ! Group size
       LOGICAL CSFLAG             ! Is group case sensitive?
       CHARACTER * ( GRP__SZNAM ) CINAME ! Case-folded name from input group
       CHARACTER * ( GRP__SZNAM ) CONAME ! Case-folded name from output group
       CHARACTER * ( GRP__SZNAM ) INAME ! Name from input group
       CHARACTER * ( GRP__SZNAM ) ONAME ! Name from output group
+      CHARACTER * ( GRP__SZNAM ) TNAME ! Temporary name
 
 *.
 
@@ -89,18 +91,33 @@
 
 *  Copy the next ones across into the sorted positions.
       DO I = 2, NITEM
+
+*  Get the name from the input group.
          CALL GRP_GET( IGRP, I, 1, INAME, STATUS )
+
+*  Fold case if necessary.
          CINAME = INAME
          IF ( .NOT. CSFLAG ) CALL CHR_UCASE( CINAME )
+
+*  Look through the output group to see where to insert it.
          DO J = 1, I - 1
             CALL GRP_GET( OGRP, J, 1, ONAME, STATUS )
             CONAME = ONAME
             IF ( .NOT. CSFLAG ) CALL CHR_UCASE( CONAME )
+
+*  If we need to insert it here, shift the higher names up one and
+*  slip it in to the gap.
             IF ( CINAME .LT. CONAME ) THEN
+               DO K = I - 1, J, -1
+                  CALL GRP_GET( OGRP, K, 1, TNAME, STATUS )
+                  CALL GRP_PUT( OGRP, 1, TNAME, K + 1, STATUS )
+               END DO
                CALL GRP_PUT( OGRP, 1, INAME, J, STATUS )
                GO TO 1
             END IF
          END DO
+
+*  Not inserted in the middle of the group, so append it to the end.
          CALL GRP_PUT( OGRP, 1, INAME, 0, STATUS )
   1      CONTINUE
       END DO
