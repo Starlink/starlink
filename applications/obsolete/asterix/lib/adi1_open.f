@@ -141,6 +141,8 @@
           DP = 0
           FLEN = FLEN - 4
         END IF
+      ELSE
+        DP = 0
       END IF
 
 *    Simple HDS file name?
