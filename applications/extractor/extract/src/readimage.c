@@ -11,6 +11,8 @@
 *
 *	Last modify:	28/10/98 (AJC)
 *                          In line with V2.0.15
+*                       14/12/98 (PWD):
+*                          Added USHORT and UBYTE support.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -65,16 +67,24 @@ void	readimagehead(picstruct *field)
   ndfType( field->ndf, "DATA", type, 20, &status );
   if (!(status == SAI__OK))
     error(EXIT_FAILURE,"*Error*: Failed to get data type. ", field->filename);
-  if (!strcmp(type,"_UBYTE")) {
-     field->bitpix = BP_BYTE;
+
+  field->bitsgn = 1;
+  if (!strcmp(type,"_BYTE")) {
+    field->bitpix = BP_BYTE;
+  } else if (!strcmp(type,"_UBYTE")) {
+    field->bitpix = BP_BYTE;
+    field->bitsgn = 0;
   } else if (!strcmp(type,"_WORD")) {
-     field->bitpix = BP_SHORT;
+    field->bitpix = BP_SHORT;
+  } else if (!strcmp(type,"_UWORD")) {
+    field->bitpix = BP_SHORT;
+    field->bitsgn = 0;
   } else if (!strcmp(type,"_INTEGER")) {
-     field->bitpix = BP_LONG;
+    field->bitpix = BP_LONG;
   } else if (!strcmp(type,"_REAL")) {
-     field->bitpix = BP_FLOAT;
+    field->bitpix = BP_FLOAT;
   } else if (!strcmp(type,"_DOUBLE")) {
-     field->bitpix = BP_DOUBLE;
+    field->bitpix = BP_DOUBLE;
   } else error(EXIT_FAILURE, "Sorry, I don't know that kind of data.", "");
 
 /*  field->bytepix = (field->bitpix>0?field->bitpix:-field->bitpix)>>3;*/
@@ -90,7 +100,6 @@ void	readimagehead(picstruct *field)
 
   field->bscale = 1.0;
   field->bzero = 0.0;
-  field->bitsgn = 1;
   if (field->bitsgn && prefs.fitsunsigned_flag)
     field->bitsgn = 0;
 
