@@ -80,7 +80,7 @@
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
 *          data array;
-*        CRVALn, CDELTn, CRPIXn, CRTYPEn, CTYPEn --- are derived from
+*        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
 *          structures are present, the values in the NDF FITS extension
 *          are copied (when parameter PROFITS is true).  If any axes
@@ -130,6 +130,8 @@
 *        Original version.
 *     1995 November 22 (MJC):
 *        Some bug fixes and improvements.
+*     1996 September 11 (MJC):
+*        Simplified the error message when the FITS file exists.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -188,6 +190,7 @@
       DOUBLE PRECISION BZERO     ! Block-integer offset
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER EL                 ! Number of elements in array
+      LOGICAL FEXIST             ! FITS already exists?
       LOGICAL FITPRE             ! FITS extension is present
       INTEGER FSTAT              ! FITSIO error status
       INTEGER FSTATC             ! FITSIO error status for file closure
@@ -209,6 +212,7 @@
       INTEGER NULL32             ! Null value for BITPIX=32
       REAL NUL_32                ! Null value for BITPIX=-32
       DOUBLE PRECISION NUL_64    ! Null value for BITPIX=-64
+      LOGICAL OPEN               ! FITS file exists?
       LOGICAL PROPEX             ! True if the FITS extension is to be
                                  ! propagated for the current header
       LOGICAL SCALE              ! True if the array is to be scaled
@@ -237,12 +241,29 @@
       CALL FTINIT( FUNIT, FILNAM, BLOCKF, FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
-*  warnings.
+*  warnings.  To simplify the error message, test to see if the file
+*  exists, and if it does make a shorter report (note that the status
+*  must be set bad too) and clear the FITSIO error-message stack.
+*  Record whether the file was actually opened or not.
       IF ( FSTAT .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTAT, 'COF_NDF2F_OPENERR', 'FTINIT',
-     :     'Error opening output FITS file '/
-     :     /FILNAM( :CHR_LEN( FILNAM ) )//'.', STATUS )
+         INQUIRE( FILE=FILNAM, EXIST=FEXIST )
+         IF ( FEXIST ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'COF_NDF2F_FILEEXIST',
+     :        'Error creating the output FITS file '/
+     :        /FILNAM( :CHR_LEN( FILNAM ) )//' because it already '/
+     :        /'exists.', STATUS )
+            CALL FTCMSG
+
+         ELSE
+            CALL COF_FIOER( FSTAT, 'COF_NDF2F_OPENERR', 'FTINIT',
+     :        'Error creating the output FITS file '/
+     :        /FILNAM( :CHR_LEN( FILNAM ) )//'.', STATUS )
+         END IF
+         OPEN = .FALSE.
          GOTO 999
+      ELSE
+         OPEN = .TRUE.
       END IF
 
 *  Validate the NDF identifier.
@@ -750,10 +771,12 @@
   999 CONTINUE      
 
 *  Close the FITS file.
-      CALL FTCLOS( FUNIT, FSTATC )
-      IF ( FSTATC .GT. FITSOK ) THEN
-         CALL COF_FIOER( FSTATC, 'COF_NDF2F_CLOSE', 'FTCLOS',
-     :     'Error closing the FITS file '//FILNAM, STATUS )
+      IF ( OPEN ) THEN
+         CALL FTCLOS( FUNIT, FSTATC )
+         IF ( FSTATC .GT. FITSOK ) THEN
+            CALL COF_FIOER( FSTATC, 'COF_NDF2F_CLOSE', 'FTCLOS',
+     :        'Error closing the FITS file '//FILNAM, STATUS )
+         END IF
       END IF
 
       END
