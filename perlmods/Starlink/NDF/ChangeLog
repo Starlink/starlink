@@ -1,3 +1,12 @@
+1998-10-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* PDL/NDF.pm: Check for array extensions and skip them.
+
+1998-10-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Finally realise that bad pixel values are defined in
+	img.h (of all places) so add real support for bad pixels.
+
 1998-09-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.pm (fits_extract_key_val): Modify so that an undefined value 
