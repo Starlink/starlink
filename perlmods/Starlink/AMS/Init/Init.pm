@@ -256,16 +256,16 @@ sub stderr {
 
   if (@_) {
     # also need to set the flag in the Core module
-    *Starlink::AMS::Core::ERRHAND = shift;
+    $Starlink::AMS::Core::ERRHAND = shift;
   }
 
-  return *Starlink::AMS::Core::ERRHAND;
+  return $Starlink::AMS::Core::ERRHAND;
 
 }
 
 # Set the filehandle for normal messages. Default is STDOUT
 
-=item stderr
+=item stdout
 
 Set and retrieve the current filehandle to be used for printing
 normal ADAM messages. Default is to use STDOUT.
@@ -281,7 +281,7 @@ sub stdout {
     $Starlink::AMS::Core::MSGHAND = shift;
   }
 
-  return *Starlink::AMS::Core::MSGHAND;
+  return $Starlink::AMS::Core::MSGHAND;
 }
 
 # Parameter reqquests

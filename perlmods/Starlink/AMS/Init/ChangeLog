@@ -1,3 +1,8 @@
+1999-03-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Init.pm (stderr): Fix setting of ERRHAND filehandle. Set to
+	variable not glob (it stores a reference to a glob).
+
 1998-07-02  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Init.pm (new): Make sure that only shut down messaging when last 
