@@ -106,8 +106,8 @@
       CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
 
 *  Primary HDU
-      CALL ADI_GKEY0I( FID, ' ', 'NAXIS', .TRUE., .FALSE.,
-     :                 NAXIS, CMT, STATUS )
+      CALL ADI2_GKEY0I( FID, ' ', 'NAXIS', .TRUE., .FALSE.,
+     :                  NAXIS, CMT, STATUS )
 
 *  If NAXIS not present then write a null header
       IF ( STATUS .NE. SAI__OK ) THEN
