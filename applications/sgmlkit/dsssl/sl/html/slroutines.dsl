@@ -215,7 +215,9 @@ $Id$
 			    ;; docblock, and not for the docblock elements in
 			    ;; codegroups, for example.
 			    (select-elements
-			     (descendants (parent (current-node)))
+			     (select-by-class
+			      (descendants (parent (current-node)))
+			      'element)
 			     (normalize "author"))
 			    (empty-node-list))))
 	(if (or (> (node-list-length (children (current-node))) 1)
