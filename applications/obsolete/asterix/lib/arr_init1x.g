@@ -7,7 +7,7 @@
 *     Initialise elements of a <TYPE> array
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL ARR_INIT1<T>( VALUE, N, ARRAY, STATUS )
@@ -33,11 +33,14 @@
 *  Notes:
 *     {routine_notes}...
 
+*  References:
+*     ARR Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/arr.html
+
 *  Keywords:
 *     package:arr, usage:public, array, initialisation
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     JCMP: Jim Peden (University of Birmingham)
@@ -64,7 +67,7 @@
       <TYPE>			ARRAY(*)		! Array to initialise
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
       INTEGER			I			! Loop variable
