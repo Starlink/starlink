@@ -245,6 +245,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *     12-FEB-1998 (DSB):
 *        Modified EncodeFloat to avoid exceeding the 20 character FITS 
 *        limit wherever possible if FitsDigits is positive.
+*     10-MAY-1998 (DSB):
+*        Bug fixed in astSplit which caused comments associated with string
+*        keywords to be lost when storing the card in a FitsChan.
 *class--
 */
 
@@ -10129,7 +10132,7 @@ int astSplit_( const char *card, char **name, char **value,
    The pointer "d" is left pointing to the first character
    after the terminating quote. */
                      if( lq ){
-                        if( (size_t)( d - card ) < FITSSTCOL - 1 ) break;
+                        break;
 
 /* If the last character was not a quote, copy it to the returned string. */
                      } else {
