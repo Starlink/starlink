@@ -817,12 +817,22 @@ register_language ('name' => 'f77',
                   );
 
 # Fortran
+#
+# Include $([AM_]CPPFLAGS) here, because this is where -I options will
+# be placed.  This might also end up including -D options, which won't
+# make much sense to a non-preprocessing compiler, but which shouldn't
+# cause it to fail (one hopes).  AM_FCFLAGS would seem the obvious
+# place to put this, but &handle_languages carefully rewrites these
+# away, if it sees any specially-handled objects (eg,
+# libxxx_la_FCFLAGS).  Do this only for the more modern FC interface
+# -- leave the F77 interface untouched (superstition, more than
+# anything else).
 register_language ('name' => 'fc',
                    'Name' => 'Fortran',
                    'linker' => 'FCLINK',
                    'link' => '$(FCLD) $(AM_FCFLAGS) $(FCFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@',
-                   'flags' => ['FCFLAGS'],
-                   'compile' => '$(FC) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'flags' => ['CPPFLAGS', 'FCFLAGS'],
+                   'compile' => '$(FC) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
                    'compiler' => 'FCCOMPILE',
                    'compile_flag' => '-c',
                    'output_flag' => '-o',
@@ -885,7 +895,7 @@ register_language ('name' => 'ppfc',
                    'ld' => '$(FC)',
                    'flags' => ['FFLAGS', 'CPPFLAGS'],
 
-                   'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
+                   'compile' => '$(FC) $(FPP_MAKE_FLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_FCFLAGS) $(FCFLAGS)',
                    'compiler' => 'FCCOMPILE',
                    'compile_flag' => '-c',
                    'output_flag' => '-o',
