@@ -270,7 +270,7 @@
                set xoff(A) [ expr 0 - $xlo(A) ]
                set yoff(A) [ expr 0 - $ylo(A) ]
                set xoff(B) [ expr $xhi(A) - $xlo(A) \
-                                + $pixgap * $pixelsize * $z - $xlo(B) ]
+                                + $pixgap * $pixelsize / $z - $xlo(B) ]
                set yoff(B) [ expr 0 - $ylo(B) ]
 
 #  Work out how big the GWM will need to be to display the pair of images.
@@ -303,7 +303,7 @@
                set xoff(A) [ expr 0 - $xlo(A) ]
                set yoff(A) [ expr 0 - $ylo(A) ]
                set xoff(B) [ expr $xhi(A) - $xlo(A) \
-                                + $pixgap * $pixelsize * $z - $xlo(B) ]
+                                + $pixgap * $pixelsize / $z - $xlo(B) ]
                set yoff(B) [ expr 0 - $ylo(B) ]
 
 #  Work out how big the GWM will need to be to display the pair of images.
