@@ -687,8 +687,8 @@
 
 
 *+  EVBIN_GETRANGE - Obtains min, max & range of data
-      SUBROUTINE EVBIN_GETRANGE( LID, NAME, DECR, QOK, QUANT, LDAT, LHS,
-     :                           RHS, STATUS )
+      SUBROUTINE EVBIN_GETRANGE( LID, NAME, DECR, QOK, QUANT, LLEN,
+     :                           LDAT, LHS, RHS, STATUS )
 *    Description :
 *     Obtains FIELD_MIN/MAX & range for the list pointed to by AXN.
 *     QUANTUM is taken into account if present.
@@ -747,7 +747,7 @@
       CALL ADI_CGET0R( LID, 'Min', FMIN, STATUS )
       CALL ADI_CGET0R( LID, 'Max', FMAX, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_FLUSH( STATUS )
+        CALL ERR_ANNUL( STATUS )
         CALL MSG_SETC( 'NAME', NAME )
         CALL MSG_PRNT( 'WARNING : Error reading field min/max for '/
      :             /'list ^NAME, data range will be used instead' )
