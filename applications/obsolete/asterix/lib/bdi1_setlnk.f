@@ -126,6 +126,7 @@
 *  Default return value
       OARG = ADI__NULLID
       MDID = ARGS(1)
+      GOTAX = .FALSE.
 
 *  Extract locator from HDSfile
       CALL ADI1_GETLOC( ARGS(2), LOC, STATUS )
@@ -198,7 +199,6 @@
             CALL ERR_BEGIN( STATUS )
 
 *        Try looking for AXIS structure as a last resort
-            GOTAX = .FALSE.
             CALL DAT_THERE( LOC, 'AXIS', THERE, STATUS )
             IF ( THERE ) THEN
 
