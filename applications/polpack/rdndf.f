@@ -102,6 +102,7 @@
 *  Local Variables:
       LOGICAL FLAG               ! True if the supplied group expression
                                  ! was terminated by a minus sign.
+      LOGICAL VERB               ! Verose errors required?
       INTEGER NEWSIZ             ! The new group size.
 *.
 
@@ -121,6 +122,9 @@
      :'the minimum (^MIN)', STATUS )
          GO TO 999
       END IF
+
+*  See if the user wants verbose error messages.
+      CALL KPG1_VERB( VERB, 'POLPACK', STATUS )
 
 *  The names of the NDFs are stored in a GRP group. The NDG package is
 *  used to access the actual NDFs using the names stored in this group.
@@ -145,7 +149,7 @@
 *  and IGRP is returned holding a valid group identifier.  On successive
 *  passes, new names are appended to the group created on the first
 *  pass.
-         CALL NDG_ASSOC( PARAM, IGRP, NEWSIZ, FLAG, STATUS )
+         CALL NDG_ASSOC( PARAM, VERB, IGRP, NEWSIZ, FLAG, STATUS )
 
 *  If no error occured, save the new group size.
          IF( STATUS .EQ. SAI__OK ) THEN

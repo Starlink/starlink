@@ -38436,6 +38436,12 @@ Click \htmladdnormallink{here}{shadow_exam.gif} to see an example plot
          NDF to contain the fitted 2-dimensional data array.
       }
       \sstsubsection{
+         RMS = \_REAL (Write)
+      }{
+         An output parameter in which is stored the RMS deviation of the 
+         fit from the original data (per pixel).
+      }
+      \sstsubsection{
          THRHI = \_REAL (Read)
       }{
          Upper threshold above which values will be excluded from the
@@ -45194,6 +45200,13 @@ The following applications have been modified:
 
             \end{description}
 
+      \end{itemize}
+
+   \item [\htmlref{SURFIT}{SURFIT}] \mbox{}
+      \begin{itemize}
+         A new output parameter called RMS has been added. The RMS
+         deviation of the fit from the original data (per pixel) is 
+         stored in this output parameter on exit.
       \end{itemize}
 
    \item [\htmlref{ZAPLIN}{ZAPLIN}] \mbox{}

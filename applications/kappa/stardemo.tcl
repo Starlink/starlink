@@ -82,7 +82,7 @@
    set CHECK_DEMO 0
    set DEMO_INFO ""
    set DOING ""
-   set ENV_VARS ""
+   set ENV_VARS "DEMO_TEMP"
    set F3 ""
    set F4 ""
    set HAREA 1 
@@ -108,6 +108,7 @@
    set SELECTED_DEMOS ""
    set SEQ_STOP ""
    set STOP_BLINK ""
+   set PRESS ""
 
 # Get the KAPPA directory.
    if { [info exists env(KAPPA_DIR)] } {
@@ -199,8 +200,13 @@
    bind . <q> {Finish 0}
    bind . <Q> {Finish 0}
 
-# Get the pixels per inch on the screen.
-   set dpi [winfo fpixels . "1i"]
+# Find a factor to scale the screeen size by. A nominal screen size of
+# 1200x900 is assumed.
+   set fac [expr [winfo screenwidth .]/1200.0 ]
+   set fac2 [expr [winfo screenheight .]/900.0 ]
+   if { $fac2 < $fac } {
+      set fac $fac2
+   }
 
 # Create the required fonts.
 
@@ -218,20 +224,20 @@
 
 
 
-   set px180 [expr round( ( 18.0 * $dpi ) / 88.0 ) ]   
-   set px140 [expr round( ( 14.0 * $dpi ) / 88.0 ) ]   
-   set px120 [expr round( ( 12.0 * $dpi ) / 88.0 ) ]   
-   set px100 [expr round( ( 10.0 * $dpi ) / 88.0 ) ]   
+   set px180 [expr round( 18.0 * $fac ) ]   
+   set px140 [expr round( 14.0 * $fac ) ]   
+   set px120 [expr round( 12.0 * $fac ) ]   
+   set px100 [expr round( 10.0 * $fac ) ]   
 
-   set BIG_FONT [SelectFont "-*-times-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
-   set FONT [SelectFont "-*-*-bold-r-*-*-$px140-*-*-*-*-*-*-*"]
-   set COM_FONT [SelectFont "-*-times-bold-r-*-*-$px180-*-*-*-*-*-*-*"]
-   set HLP_FONT [SelectFont "-*-*-medium-r-*-*-$px120-*-*-*-*-*-*-*"]
-   set B_FONT [SelectFont "-*-*-bold-r-*-*-$px120-*-*-*-*-*-*-*"]
-   set RB_FONT [SelectFont "-*-*-medium-r-*-*-$px120-*-*-*-*-*-*-*"]
-   set S_BFONT [SelectFont "-*-*-bold-r-*-*-$px120-*-*-*-*-*-*-*"]
-   set S_FONT [SelectFont "-*-*-medium-r-*-*-$px120-*-*-*-*-*-*-*"]
-   set IT_FONT [SelectFont "-*-times-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
+   set BIG_FONT [SelectFont "-*-*-bold-i-*-*-$px180-*-*-*-*-*-*-*"]
+   set FONT [SelectFont "-*-*-bold-r-*-sans-$px140-*-*-*-*-*-*-*"]
+   set COM_FONT [SelectFont "-*-*-bold-r-*-sans-$px180-*-*-*-*-*-*-*"]
+   set HLP_FONT [SelectFont "-*-*-medium-r-*-sans-$px120-*-*-*-*-*-*-*"]
+   set B_FONT [SelectFont "-*-*-bold-r-*-sans-$px120-*-*-*-*-*-*-*"]
+   set RB_FONT [SelectFont "-*-*-medium-r-*-sans-$px120-*-*-*-*-*-*-*"]
+   set S_BFONT [SelectFont "-*-*-bold-r-*-sans-$px120-*-*-*-*-*-*-*"]
+   set S_FONT [SelectFont "-*-*-medium-r-*-sans-$px120-*-*-*-*-*-*-*"]
+   set IT_FONT [SelectFont "-*-*-bold-i-*--$px180-*-*-*-*-*-*-*"]
    set TT_FONT [SelectFont "-*-helvetica-medium-r-*-*-$px140-*-*-*-*-*-*-*"]
    set BTT_FONT [SelectFont "-*-helvetica-bold-r-*-*-$px180-*-*-*-*-*-*-*"]
 
@@ -252,6 +258,9 @@
    }
    catch {exec mkdir -p $ADAM_USER}
 
+# Use the saem directory for temporary files.
+   set env(DEMO_TEMP) $ADAM_USER
+
 # Avoid messing up the main AGI database by using a new AGI database.
 # Create it in the ADAM_USER directory created above.
    if { [info exists env(AGI_USER)] } {
@@ -260,7 +269,6 @@
       set OLD_AGI_USER ""
    }
    set env(AGI_USER) $ADAM_USER
-
 
 #  Create a directory in which stardemo can keep the temporary files it
 #  creates. This directory will be deleted on exit. Try to put it in
@@ -381,22 +389,22 @@
       pack $F1 $F2 -padx 1m -pady 1m -fill both -expand 1
 
 # Make the menu buttons for the menu bar.
-      set file [menubutton $F1.file -text File -menu $F1.file.menu -background $MENUBACK ]
+      set file [menubutton $F1.file -text File -padx 1m -pady 1 -menu $F1.file.menu -background $MENUBACK ]
       set filemenu [menu $file.menu]
       SetHelp $file ".  Menu of commands for exiting, etc..." STARDEMO_FILE_MENU
       set HELP_TEXT(STARDEMO_FILE_MENU) "Menu of commands for exiting, and loading demonstrations from disk."
 
-      set demo [menubutton $F1.demo -text Demo -menu $F1.demo.menu -background $MENUBACK ]
+      set demo [menubutton $F1.demo -text Demo -padx 1m -pady 1 -menu $F1.demo.menu -background $MENUBACK ]
       set demomenu [menu $demo.menu]
       SetHelp $demo ".  Menu of commands for controlling demonstrations..." STARDEMO_OPTIONS_MENU
       set HELP_TEXT(STARDEMO_DEMO_MENU) "Menu of commands for controlling demonstrations. Demonstrations can be selected, removed, executed, paused, aborted, etc."
    
-      set opts [menubutton $F1.opts -text Options -menu $F1.opts.menu -background $MENUBACK ]
+      set opts [menubutton $F1.opts -text Options -padx 1m -pady 1 -menu $F1.opts.menu -background $MENUBACK ]
       set OPTSMENU [menu $opts.menu]
       SetHelp $opts ".  Menu of commands to set up various options..." STARDEMO_OPTIONS_MENU
       set HELP_TEXT(STARDEMO_FILE_MENU) "Menu of commands for setting options which control how the demonstrations are run."
    
-      set help [menubutton $F1.help -text Help -menu $F1.help.menu -background $MENUBACK ]
+      set help [menubutton $F1.help -text Help -padx 1m -pady 1 -menu $F1.help.menu -background $MENUBACK ]
       set helpmenu [menu $help.menu]
       SetHelp $help ".  Display further help information..." STARDEMO_HELP_MENU
       set HELP_TEXT(STARDEMO_FILE_MENU) "Menu of commands for displaying help information."
@@ -475,8 +483,14 @@ display will not."
 # bar.
       set dolab [label $F1.label -width 80 -textvariable DOING \
                               -relief sunken -bd 2 -font $S_FONT -anchor w ]
-      pack $dolab -side left -anchor w -padx 20m
+      pack $dolab -side left -anchor w -padx 10m
       SetHelp $dolab ".  Shows the package command which has just been executed." STARDEMO_DOING
+
+# Create a label to display the "Press any key to continue" message when
+# in manual paging mode.
+      set presslab [label $F1.presslab -fg red -bg $MENUBACK -width 27 -textvariable PRESS ]
+      pack $presslab -side left -anchor w -fill x -expand 1 -padx 2m
+      SetHelp $presslab ".  Displays instructions during manual paging." STARDEMO_PRESSLAB
 
 # Set up the main frame (F2). It is made up from two columns arranged 
 # horizontally...
@@ -487,7 +501,7 @@ display will not."
 
 # Create and pack a frame containing the demo controls.
       set con [frame $COL1.con -bd 2 -relief groove ]
-      pack $con -fill both -expand 1 -ipady 2m
+      pack $con -fill both -expand 1 -ipady 1m
 
 # Create a label showing the demo currently being run.
       set con1 [frame $con.f1 -relief raised -bd 2 -background $MENUBACK]
@@ -497,9 +511,9 @@ display will not."
                         $BIG_FONT -relief groove -bd 2 -background $WHITEBACK -height 3]   
       SetHelp $label1 ".  The name of the package being demonstrated." STARDEMO_PACKAGE_DESC
 
-      set package [button $conf1.pkg -text "Info" -command Info -background $MENUBACK]
+      set package [button $conf1.pkg -text "Info" -padx 1m -pady 1 -command Info -background $MENUBACK]
       SetHelp $package ".  Click to see further information about the package being demonstrated." STARDEMO_PACKAGE
-      pack $label1 -side top -pady 2m -padx 2m -ipadx 2m -ipady 1m
+      pack $label1 -side top -pady 1m -padx 2m -ipadx 2m -ipady 1m
       pack $package -side top -pady 1m -padx 2m -pady 1m
    
       set conf2 [frame $con1.conf2 -background $MENUBACK]
@@ -514,48 +528,42 @@ display will not."
    
       pack $conf1 $conf2 -side top 
    
-      pack $con1 -side top -pady 2m -padx 2m -ipady 2m -fill x -expand 1
+      pack $con1 -side top -pady 1m -padx 2m -ipady 1m -fill x -expand 1
 
 #  Row 1 of buttons...
       set con2a [frame $con.con2a]
 
 # Create the button which allows the user to select the demos to run.
-      set SELECT [button $con2a.select -text "Select" -width 6 -relief raised -bd 2 -command Select]
+      set SELECT [button $con2a.select -text "Select" -padx 1m -pady 1 -width 6 -relief raised -bd 2 -command Select]
       SetHelp $SELECT ".  Click to select the demonstrations to be run from amongst those currently loaded." STARDEMO_SELECT
 
 # Create the button which allows the user to run all the selected demos.
-      set RUN [button $con2a.run -text "Run" -width 6 -relief raised -bd 2 -command Run]
+      set RUN [button $con2a.run -text "Run" -padx 1m -pady 1 -width 6 -relief raised -bd 2 -command Run]
       SetHelp $RUN ".  Click to run all the selected demonstrations, starting with the first." STARDEMO_RUN
 
-#  Pack row 1 of buttons...
+# Pack row 1 of buttons...
       pack $SELECT $RUN -side left -pady 1m -padx 2m -expand 1 -fill x -anchor c
 
-#  Row 2 of buttons...
+# Row 2 of buttons...
       set con2b [frame $con.con2b]
 
-# Create the button which starts the next demo.
-      set NEXT [button $con2b.next -text "Next" -width 6 -relief raised -bd 2 -command Next -state disabled]
-      SetHelp $NEXT ".  Click to start the next selected demonstration immediately." STARDEMO_NEXT
-
 # Create the button which aborts the running demo.
-      set ABORT [button $con2b.abort -text "Abort" -width 6 -relief raised -bd 2 -command Abort -state disabled]
+      set ABORT [button $con2b.abort -text "Abort" -padx 1m -pady 1 -width 6 -relief raised -bd 2 -command Abort -state disabled]
       SetHelp $ABORT ".  Click to abort the currently running demonstrations." STARDEMO_ABORT
 
-#  Pack row 2 of buttons...
-      pack $NEXT $ABORT -side left -pady 1m -padx 2m -expand 1 -fill x -anchor c
-
-#  Row 3 of buttons...
-      set con2c [frame $con.con2c]
+# Create the button which starts the next demo.
+      set NEXT [button $con2b.next -text "Next" -padx 1m -pady 1 -width 6 -relief raised -bd 2 -command Next -state disabled]
+      SetHelp $NEXT ".  Click to start the next selected demonstration immediately." STARDEMO_NEXT
 
 # Create the button which pauses the running demo.
-      set PAUSE [button $con2c.pause -text "Pause" -width 6 -relief raised -bd 2 -command PauseDemo -state disabled]
+      set PAUSE [button $con2b.pause -text "Pause" -padx 1m -pady 1 -width 6 -relief raised -bd 2 -command PauseDemo -state disabled]
       SetHelp $PAUSE ".  Click to pause the currently running demonstration." STARDEMO_PAUSE
 
-#  Pack row 3 of buttons...
-      pack $PAUSE -side left -pady 1m -padx 2m -expand 1 -fill x -anchor c
- 
+#  Pack row 2 of buttons...
+      pack $ABORT $NEXT $PAUSE -side left -pady 1m -padx 2m -expand 1 -fill x -anchor c
+
 #  Pack all the rows of buttons.
-      pack $con2a $con2b $con2c -side top -anchor n 
+      pack $con2a $con2b -side top -anchor n 
 
 #  Radio buttons etc to control looping.
       set con3 [frame $con.con3 -relief groove -bd 2]
@@ -571,7 +579,7 @@ display will not."
       pack [label $con3.lbl -text "Looping:" -justify left] $RB_LOOP $RB_HALT \
            -side top -anchor nw -fill both -expand 1 -padx 2m
    
-      pack $con3 -side top -ipady 1m -pady 2m -padx 2m -expand 1 -fill x
+      pack $con3 -side top -ipady 1m -pady 1m -padx 2m -expand 1 -fill x
 
 #  Radio buttons to control paging.
       set con4 [frame $con.con4 -relief groove -bd 2]
@@ -600,7 +608,7 @@ display will not."
       pack [label $con4.lbl4 -text "Speed" -justify center -font $S_BFONT] \
            -side right -expand 1 -fill x
    
-      pack $con4 -side top -ipady 1m -padx 2m -pady 2m -expand 1 -fill x
+      pack $con4 -side top -ipady 1m -padx 2m -pady 1m -expand 1 -fill x
 
 # Create the help area.
       HelpArea
@@ -617,8 +625,19 @@ display will not."
 
 # Get the size of the canvas. 
       update 
-      set CANWID [expr [winfo width $CAN] - 8]
-      set CANHGT [expr [winfo height $CAN] - 8]
+
+      set CANWID [winfo width $CAN]
+      set CANHGT [winfo height $CAN]
+      set MINHGT [expr round( 0.62*[winfo height .])]
+
+      if { $CANHGT < $MINHGT } {
+         set CANHGT $MINHGT
+         $CAN configure -height $CANHGT
+         update
+      }
+
+      set CANWID [expr $CANWID - 8]
+      set CANHGT [expr $CANHGT - 8]
 
 # Create a GWM canvas items which fills the canvas.
       if { [catch {set GWM [$CAN create gwm 4 4 -height $CANHGT \

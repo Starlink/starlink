@@ -15688,6 +15688,14 @@ iraf! {
             helpkey *
           }
 
+         parameter rms {
+            type _REAL
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+
          parameter thrhi {
             type _REAL
             vpath DEFAULT

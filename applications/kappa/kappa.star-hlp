@@ -30004,6 +30004,10 @@ ORDER( 2 ) = _INTEGER (Read)
 3 OUT
 OUT = NDF (Write)
    NDF to contain the fitted 2-dimensional data array.
+3 RMS
+RMS = _REAL (Write)
+   An output parameter in which is stored the RMS deviation of the 
+   fit from the original data (per pixel).
 3 THRHI
 THRHI = _REAL (Read)
    Upper threshold above which values will be excluded from the

@@ -462,6 +462,7 @@
       LOGICAL NEGATE             ! Negate supplied angles?
       LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
       LOGICAL V2PLUS             ! Catalogue created by POLPACK V2 or later?
+      LOGICAL VERB               ! Verose errors required?
       REAL AHSIZE                ! Arrowhead size in world co-ordinates
       REAL AHSIZM                ! Arrowhead size in metres
       REAL ANGFAC                ! Supplied angles to radians conversion factor
@@ -502,8 +503,11 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
+*  See if the user wants verbose error messages.
+      CALL KPG1_VERB( VERB, 'POLPACK', STATUS )
+
 *  Open the input catalogue, and get its name.
-      CALL CTG_ASSO1( 'CAT', 'READ', CI, FIELDS, STATUS )
+      CALL CTG_ASSO1( 'CAT', VERB, 'READ', CI, FIELDS, STATUS )
 
 *  Get CAT identifiers for the columns which are to be used to define the 
 *  vector magnitudes, orientations, X and Y coordinates.

@@ -239,6 +239,7 @@
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
       LOGICAL VAR                ! Producing variances?
+      LOGICAL VERB               ! Verose errors required?
       REAL ANG                   ! Stored angle in input catalogue
       REAL ANGROT                ! ACW angle from X axis to i/p ref dirn (degs)
       REAL ANGRT                 ! ACW angle from X axis to o/p ref dirn (degs)
@@ -260,8 +261,11 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  See if the user wants verbose error messages.
+      CALL KPG1_VERB( VERB, 'POLPACK', STATUS )
+
 *  Open the input catalogue, and get its name.
-      CALL CTG_ASSO1( 'IN', 'READ', CIIN, FIELDS, STATUS )
+      CALL CTG_ASSO1( 'IN', VERB, 'READ', CIIN, FIELDS, STATUS )
 
 *  Store the values of the required catalogue columns in work arrays.
 *  ==================================================================

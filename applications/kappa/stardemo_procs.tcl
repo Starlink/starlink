@@ -578,16 +578,15 @@ proc HelpArea {} {
 # within it requires a narrower area.
          set HSTRUT [Strut $F4 $height]
 
-# Create a label widget to display the "Press any key to continue"
-# messages.
-         set con [label $F4.conlab -justify right -textvariable CONLAB \
-                            -anchor e -font $FONT -width 27 ]
+# Create a label widget to display the time remaining.
+         set con [label $F4.conlab -justify center -textvariable TLEFT \
+                            -anchor e -font $FONT -width 3 ]
          pack $con -side right
 
 # The width is the requested width of the whole window.
          update idletasks
          set width [expr [winfo width .] - [winfo width $con]]
-         set width [expr 0.9 * $width]
+         set width [expr 0.95 * $width]
 
 # Create a message widget to display dynamic help information about 
 # the widget underneath the pointer.
@@ -1506,9 +1505,14 @@ proc CommentaryArea {} {
 # within it requires a narrower area.
       set HSTRUT [Strut $F3 $height]
 
-# Create a message widget to display dynamic commentary information
+# Create a scroll bar to scroll the text.
+      set sc [scrollbar $F3.sc -command "$F3.lab yview" -width 15 -relief sunken]
+      pack $sc -side right -fill y
+
+# Create a text widget to display dynamic commentary information
       set CLAB [text $F3.lab -state disabled -relief flat -wrap word -bd 0 \
-                -highlightthickness 0 -font $COM_FONT -width $width ]
+                -highlightthickness 0 -font $COM_FONT -width $width \
+                -yscrollcommand "$F3.sc set" -spacing1 1m -spacing2 1m]
       pack $CLAB -fill both -expand 1 -padx 7m -pady 4m
 
 # Adjust the width of the message width so that it occupies exactly the
@@ -2124,7 +2128,8 @@ proc Pause {time} {
    global TIMER
    global ABORT_DEMO
    global CONTINUE
-   global CONLAB
+   global TLEFT
+   global PRESS
    global SPEED
 
    Diag "      $time"
@@ -2138,19 +2143,20 @@ proc Pause {time} {
          set TIMER 0
          while { $TIMER < [expr int($time*$SPEED) ] } {
             if { $CONTINUE || $PAUSE_DEMO || $ABORT_DEMO } { break }
-            set CONLAB "[expr int($time*$SPEED)-$TIMER]"
+            set TLEFT "[expr int($time*$SPEED)-$TIMER]"
             after 1000 "incr TIMER"
             tkwait variable TIMER
          }
 
          if { $PAUSE_DEMO } { tkwait variable PAUSE_DEMO }
-         set CONLAB ""
+         set TLEFT ""
 
 # Manual paging...
       } {
 
 # Add instructions to the commentary explaining how to resume the demo.
-         set CONLAB "Press any key to continue..."
+         set TLEFT ""
+         set PRESS "Press any key to continue..."
 
 # Set a flag to indicate the demo is paused, and wait for its state to
 # change by ResumeDemo.
@@ -2692,14 +2698,16 @@ proc Next {} {
 proc PauseDemo {} {
    global PAUSE_DEMO
    global PAUSE
-   global CONLAB
+   global TLEFT
+   global PRESS
   
 # Set a global flag which causes the demo procedures to pause, untill the
 # flag changes value again.
    set PAUSE_DEMO 1
 
 # Add instructions to the commentary explaining how to resume the demo.
-   set CONLAB "Press any key to continue..."
+   set TLEFT ""
+   set PRESS "Press any key to continue..."
 
 # Disable the pause button.
    $PAUSE configure -state disabled
@@ -2709,14 +2717,14 @@ proc PauseDemo {} {
 proc ResumeDemo {} {
    global PAUSE
    global PAUSE_DEMO
-   global CONLAB
+   global PRESS
    global CONTINUE
 
 # If the demo is paused...
    if { $PAUSE_DEMO } {
 
 # Clear the "Press any key to continue" message.
-      set CONLAB ""
+      set PRESS ""
 
 # Enable the pause button.
       $PAUSE configure -state normal
@@ -2987,7 +2995,7 @@ proc ShowText {name mess scope args} {
    global COM_FONT
    global TEXTDONE
 
-# Get a version of the suppleid name without any spaces, etc.
+# Get a version of the supplied name without any spaces, etc.
    regsub -all " " $name "" res
    set label [string tolower $res]
 

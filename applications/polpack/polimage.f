@@ -258,6 +258,7 @@
       REAL Y0                    ! Y at bottom left of bottom left cell
       INTEGER INDF               ! NDF identifier for output NDF
       LOGICAL SHAPE              ! Does output NDF have shape?
+      LOGICAL VERB               ! Verose errors required?
 *.
 
 *  Check the inherited global status.
@@ -269,8 +270,11 @@
 *  Begin an NDF context.
       CALL NDF_BEGIN
 
+*  See if the user wants verbose error messages.
+      CALL KPG1_VERB( VERB, 'POLPACK', STATUS )
+
 *  Open the input catalogue, and get its name.
-      CALL CTG_ASSO1( 'IN', 'READ', CI, FIELDS, STATUS )
+      CALL CTG_ASSO1( 'IN', VERB, 'READ', CI, FIELDS, STATUS )
 
 *  See if the output NDF is to be 2-dimensional.
       CALL PAR_GET0L( 'SHAPE', SHAPE, STATUS )

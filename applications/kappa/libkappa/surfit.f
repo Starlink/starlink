@@ -122,6 +122,9 @@
 *        value, which is 4 initially. []
 *     OUT = NDF (Write)
 *        NDF to contain the fitted 2-dimensional data array.
+*     RMS = _REAL (Write)
+*        An output parameter in which is stored the RMS deviation of the 
+*        fit from the original data (per pixel).
 *     THRHI = _REAL (Read)
 *        Upper threshold above which values will be excluded from the
 *        analysis to derive representative values for the bins.  If it
@@ -192,6 +195,8 @@
 *        Added propagation of the WCS component.
 *     3-FEB-2000 (DSB):
 *        Replace AIF_FLNAM calls with NDF_MSG.
+*     12-APR-2000 (DSB):
+*        Added parameter RMS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1411,6 +1416,9 @@
       CALL CHR_PUTC( ' per pixel.', BUFFER, NC )
       CALL MSG_OUTIF( MSG__NORM, 'RMSFIT', BUFFER, STATUS )
       IF ( LOGFIL ) CALL FIO_WRITE( FDL, BUFFER( :NC ), STATUS )
+
+*  Save it in an output parameter.
+      CALL PAR_PUT0R( 'RMS', RMSF, STATUS )
 
 *  Closedown sequence.
 *  ===================
