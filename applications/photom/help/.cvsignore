@@ -1,3 +1,4 @@
+*.ifc
 .deps
 .libs
 *.la
