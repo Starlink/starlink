@@ -6968,19 +6968,57 @@ U java/source/splat/src/docs/SPLAT_CONDITIONS
 U java/source/splat/src/docs/splat.news
 cvs checkout: Updating java/source/splat/src/etc
 cvs checkout: Updating java/source/splat/src/etc/ids
-U java/source/splat/src/etc/ids/absorption.ids
-U java/source/splat/src/etc/ids/cuar.ids
-U java/source/splat/src/etc/ids/emission.ids
-U java/source/splat/src/etc/ids/h2.ids
-U java/source/splat/src/etc/ids/helium.ids
-U java/source/splat/src/etc/ids/krypton_ir.ids
-U java/source/splat/src/etc/ids/mercury.ids
-U java/source/splat/src/etc/ids/neon.ids
-U java/source/splat/src/etc/ids/redlines.ids
-U java/source/splat/src/etc/ids/sky.ids
-U java/source/splat/src/etc/ids/thor.ids
-U java/source/splat/src/etc/ids/uv.ids
-U java/source/splat/src/etc/ids/xenon_ir.ids
+U java/source/splat/src/etc/ids/Arc_Copper_Argon.ids
+U java/source/splat/src/etc/ids/Arc_Helium.ids
+U java/source/splat/src/etc/ids/Arc_Krypton.ids
+U java/source/splat/src/etc/ids/Arc_Mercury.ids
+U java/source/splat/src/etc/ids/Arc_Neon.ids
+U java/source/splat/src/etc/ids/Arc_Thorium.ids
+U java/source/splat/src/etc/ids/Echelle_redlines.ids
+U java/source/splat/src/etc/ids/H2.ids
+U java/source/splat/src/etc/ids/IR_Xenon.ids
+U java/source/splat/src/etc/ids/Optical_absorption.ids
+U java/source/splat/src/etc/ids/Optical_emission.ids
+U java/source/splat/src/etc/ids/Optical_sky.ids
+U java/source/splat/src/etc/ids/UV_QSO.ids
+cvs checkout: Updating java/source/splat/src/etc/ids/submilli
+U java/source/splat/src/etc/ids/submilli/13-CI.ids
+U java/source/splat/src/etc/ids/submilli/13-CO.ids
+U java/source/splat/src/etc/ids/submilli/13-CS.ids
+U java/source/splat/src/etc/ids/submilli/C-13-N.ids
+U java/source/splat/src/etc/ids/submilli/C-17-O.ids
+U java/source/splat/src/etc/ids/submilli/C-18-O.ids
+U java/source/splat/src/etc/ids/submilli/C-34-S.ids
+U java/source/splat/src/etc/ids/submilli/CH.ids
+U java/source/splat/src/etc/ids/submilli/CH3CN_v8=0,1.ids
+U java/source/splat/src/etc/ids/submilli/CH3OH.ids
+U java/source/splat/src/etc/ids/submilli/CI.ids
+U java/source/splat/src/etc/ids/submilli/CN,_v_=_0,_1.ids
+U java/source/splat/src/etc/ids/submilli/CO.ids
+U java/source/splat/src/etc/ids/submilli/CS.ids
+U java/source/splat/src/etc/ids/submilli/DCO+_v=0.ids
+U java/source/splat/src/etc/ids/submilli/H-13-CN.ids
+U java/source/splat/src/etc/ids/submilli/H-13-CO+_v=0.ids
+U java/source/splat/src/etc/ids/submilli/H2CO.ids
+U java/source/splat/src/etc/ids/submilli/H2O.ids
+U java/source/splat/src/etc/ids/submilli/H3O+.ids
+U java/source/splat/src/etc/ids/submilli/HCCCN.ids
+U java/source/splat/src/etc/ids/submilli/HCN.ids
+U java/source/splat/src/etc/ids/submilli/HCO+_v=0.ids
+U java/source/splat/src/etc/ids/submilli/HCS+.ids
+U java/source/splat/src/etc/ids/submilli/HCl.ids
+U java/source/splat/src/etc/ids/submilli/HNC.ids
+U java/source/splat/src/etc/ids/submilli/LineCatalog.java
+U java/source/splat/src/etc/ids/submilli/LineDetails.java
+U java/source/splat/src/etc/ids/submilli/N2H+.ids
+U java/source/splat/src/etc/ids/submilli/NH3.ids
+U java/source/splat/src/etc/ids/submilli/OCS.ids
+U java/source/splat/src/etc/ids/submilli/OH.ids
+U java/source/splat/src/etc/ids/submilli/SO.ids
+U java/source/splat/src/etc/ids/submilli/SiC.ids
+U java/source/splat/src/etc/ids/submilli/SiCC.ids
+U java/source/splat/src/etc/ids/submilli/SiO.ids
+U java/source/splat/src/etc/ids/submilli/SiS.ids
 cvs checkout: Updating java/source/splat/src/etc/plugins
 cvs checkout: Updating java/source/splat/src/etc/testdata
 cvs checkout: Updating java/source/splat/src/jni
@@ -7039,8 +7077,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/ColourIconLine.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ColumnGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ColumnGeneratorFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ColumnGeneratorListener.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/ConfigFontField.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/ConfigTextField.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/CoordinateGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/CoordinateGeneratorFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/CoordinateGeneratorListener.java
@@ -7064,6 +7100,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitViewModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineProperties.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineRenderer.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/LocalLineIDManager.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/MultiTableView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/NumberCellRenderer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotChangedEvent.java
@@ -7076,7 +7113,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotWindowOrganizer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/PolyFitFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/ProxySetupFrame.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/SelectTextField.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleBinaryMaths.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleDataLimitControls.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleUnaryMaths.java
@@ -7092,6 +7128,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecSubList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTableModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecTransferHandler.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecViewerFrame.java
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecXCoordTypeFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileView.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java
@@ -7222,6 +7259,8 @@ U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/BorderControls.ja
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ColourIcon.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ColourStore.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ComponentColourControls.java
+U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ConfigFontField.java
+U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/ConfigTextField.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/DecimalDocument.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/DecimalField.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/DownPointerFigure.java
@@ -7258,6 +7297,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SelectCharactersE
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SelectCharactersListener.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SelectCharactersModel.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SelectCharactersWindow.java
+U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SelectTextField.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SimplePlot.java.bck
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/SplatGlobalDisplayer.java
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/TickControls.java
@@ -7273,6 +7313,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/FunctionFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/FuzzyBoolean.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianFitter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/GaussianGenerator.java
+U java/source/splat/src/main/uk/ac/starlink/splat/util/GridBagLayouter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/JPEGUtilities.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFactory.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/KernelFilter.java
@@ -7540,9 +7581,11 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/AuxWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BasicAction.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BitsRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxMenu.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnDialog.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnsDisplay.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/MetaColumn.java
@@ -7553,6 +7596,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ParameterWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/PlasticStarTable.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/PlotWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/RestrictedColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/RowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SizingScrollPane.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/StatsWindow.java
