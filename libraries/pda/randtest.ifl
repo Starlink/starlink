@@ -1,0 +1,39 @@
+#+
+#  Name:
+#     RANDTEST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1996 November 21 (MJC):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface RANDTEST
+
+   parameter RANDOM              # Random seed to be used?
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Produce non-reproducable sequences of random numbers?'
+      help     'When TRUE this uses the computer''s clock to generate non-reproduceabble sequences'
+   endparameter
+
+   parameter SEED              # Fixed seed
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      prompt   'The fixed seed to use'
+      help     'Should be 4*K+1, where K is non-negative integer'
+   endparameter
+
+endinterface

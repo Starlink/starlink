@@ -1,0 +1,534 @@
+
+ SIMULATED ANNEALING EXAMPLE
+
+ NUMBER OF PARAMETERS:   2   MAXIMAZATION:     F
+ INITIAL TEMP:  5.0       RT: 0.50       EPS: 0.10E-05
+ NS:  20   NT:  5   NEPS:  4
+ MAXEVL:     100000   IPRINT: 1   ISEED1:    1   ISEED2:    2
+
+                         STARTING VALUES
+  2.3545     -0.31919    
+
+                         INITIAL STEP LENGTH
+  1.0000       1.0000    
+
+                         LOWER BOUND
+-0.10000E+26 -0.10000E+26
+
+                         UPPER BOUND
+ 0.10000E+26  0.10000E+26
+
+                         C VECTOR
+  2.0000       2.0000    
+
+  ****   END OF DRIVER ROUTINE OUTPUT   ****
+  ****   BEFORE CALL TO PDA_SA.         ****
+  
+
+                         INITIAL X
+  2.3545     -0.31919    
+  INITIAL F: 
+  20.9805010533463445    
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:              5.0000    
+  MIN FUNCTION VALUE SO FAR:    16.9576829826421935    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      57
+     ACCEPTED UPHILL:               53
+     REJECTED UPHILL:               90
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       5
+
+                         CURRENT OPTIMAL X
+  1.0784       1.2328    
+
+                         STEP LENGTH (VM)
+  1.4000       2.1875    
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:              2.5000    
+  MIN FUNCTION VALUE SO FAR:    16.1215791887942217    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      46
+     ACCEPTED UPHILL:               39
+     REJECTED UPHILL:              115
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       4
+
+                         CURRENT OPTIMAL X
+ 0.96383       1.1689    
+
+                         STEP LENGTH (VM)
+ 0.87500      0.77778    
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:              1.2500    
+  MIN FUNCTION VALUE SO FAR:    16.0966390800575638    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      40
+     ACCEPTED UPHILL:               35
+     REJECTED UPHILL:              125
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.83831       1.2352    
+
+                         STEP LENGTH (VM)
+ 0.46667      0.38889    
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.62500    
+  MIN FUNCTION VALUE SO FAR:    16.0887894737125841    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      42
+     ACCEPTED UPHILL:               47
+     REJECTED UPHILL:              111
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.90023       1.2230    
+
+                         STEP LENGTH (VM)
+ 0.31111      0.27222    
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.31250    
+  MIN FUNCTION VALUE SO FAR:    16.0887894737125841    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      41
+     ACCEPTED UPHILL:               49
+     REJECTED UPHILL:              110
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.90023       1.2230    
+
+                         STEP LENGTH (VM)
+ 0.24889      0.22685    
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.15625    
+  MIN FUNCTION VALUE SO FAR:    16.0834843349539192    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      44
+     ACCEPTED UPHILL:               50
+     REJECTED UPHILL:              106
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       2
+
+                         CURRENT OPTIMAL X
+ 0.84968       1.2399    
+
+                         STEP LENGTH (VM)
+ 0.34844      0.12963    
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.78125E-01
+  MIN FUNCTION VALUE SO FAR:    16.0832322006022927    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      38
+     ACCEPTED UPHILL:               38
+     REJECTED UPHILL:              124
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.84749       1.2482    
+
+                         STEP LENGTH (VM)
+ 0.73745E-01  0.55309E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.39063E-01
+  MIN FUNCTION VALUE SO FAR:    16.0818545186783197    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      49
+     ACCEPTED UPHILL:               49
+     REJECTED UPHILL:              102
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.87063       1.2322    
+
+                         STEP LENGTH (VM)
+ 0.73745E-01  0.46091E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.19531E-01
+  MIN FUNCTION VALUE SO FAR:    16.0817935720311311    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      43
+     ACCEPTED UPHILL:               51
+     REJECTED UPHILL:              106
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       2
+
+                         CURRENT OPTIMAL X
+ 0.86845       1.2332    
+
+                         STEP LENGTH (VM)
+ 0.39331E-01  0.46091E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.97656E-02
+  MIN FUNCTION VALUE SO FAR:    16.0817935720311311    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      47
+     ACCEPTED UPHILL:               52
+     REJECTED UPHILL:              101
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86845       1.2332    
+
+                         STEP LENGTH (VM)
+ 0.49163E-01  0.28807E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.48828E-02
+  MIN FUNCTION VALUE SO FAR:    16.0817933198322720    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      41
+     ACCEPTED UPHILL:               44
+     REJECTED UPHILL:              115
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.86871       1.2332    
+
+                         STEP LENGTH (VM)
+ 0.39331E-01  0.11523E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.24414E-02
+  MIN FUNCTION VALUE SO FAR:    16.0817374316402422    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      42
+     ACCEPTED UPHILL:               48
+     REJECTED UPHILL:              110
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.86367       1.2366    
+
+                         STEP LENGTH (VM)
+ 0.14983E-01  0.19753E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.12207E-02
+  MIN FUNCTION VALUE SO FAR:    16.0817372752883117    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      49
+     ACCEPTED UPHILL:               46
+     REJECTED UPHILL:              105
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.86364       1.2366    
+
+                         STEP LENGTH (VM)
+ 0.18729E-01  0.11287E-01
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.61035E-03
+  MIN FUNCTION VALUE SO FAR:    16.0817372752883117    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      47
+     ACCEPTED UPHILL:               48
+     REJECTED UPHILL:              105
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86364       1.2366    
+
+                         STEP LENGTH (VM)
+ 0.28093E-01  0.64500E-02
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.30518E-03
+  MIN FUNCTION VALUE SO FAR:    16.0817348416293591    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      36
+     ACCEPTED UPHILL:               44
+     REJECTED UPHILL:              120
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.86364       1.2363    
+
+                         STEP LENGTH (VM)
+ 0.93644E-02  0.33444E-02
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.15259E-03
+  MIN FUNCTION VALUE SO FAR:    16.0817305788254110    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      48
+     ACCEPTED UPHILL:               44
+     REJECTED UPHILL:              108
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.86508       1.2355    
+
+                         STEP LENGTH (VM)
+ 0.51371E-02  0.37160E-02
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.76294E-04
+  MIN FUNCTION VALUE SO FAR:    16.0817305788254110    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      42
+     ACCEPTED UPHILL:               47
+     REJECTED UPHILL:              111
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86508       1.2355    
+
+                         STEP LENGTH (VM)
+ 0.41096E-02  0.20645E-02
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.38147E-04
+  MIN FUNCTION VALUE SO FAR:    16.0817304214203425    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      44
+     ACCEPTED UPHILL:               53
+     REJECTED UPHILL:              103
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       2
+
+                         CURRENT OPTIMAL X
+ 0.86471       1.2357    
+
+                         STEP LENGTH (VM)
+ 0.39955E-02  0.24774E-02
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.19073E-04
+  MIN FUNCTION VALUE SO FAR:    16.0817301874588878    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      40
+     ACCEPTED UPHILL:               46
+     REJECTED UPHILL:              114
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       2
+
+                         CURRENT OPTIMAL X
+ 0.86484       1.2357    
+
+                         STEP LENGTH (VM)
+ 0.26637E-02  0.12387E-02
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.95367E-05
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      42
+     ACCEPTED UPHILL:               45
+     REJECTED UPHILL:              113
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       1
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.14206E-02  0.82579E-03
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.47684E-05
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      43
+     ACCEPTED UPHILL:               52
+     REJECTED UPHILL:              105
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.12430E-02  0.66063E-03
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.23842E-05
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      43
+     ACCEPTED UPHILL:               46
+     REJECTED UPHILL:              111
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.55246E-03  0.36702E-03
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.11921E-05
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      44
+     ACCEPTED UPHILL:               52
+     REJECTED UPHILL:              104
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.55246E-03  0.29361E-03
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.59605E-06
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      43
+     ACCEPTED UPHILL:               44
+     REJECTED UPHILL:              113
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.36831E-03  0.16778E-03
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.29802E-06
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      44
+     ACCEPTED UPHILL:               52
+     REJECTED UPHILL:              104
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.26308E-03  0.16778E-03
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.14901E-06
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      42
+     ACCEPTED UPHILL:               44
+     REJECTED UPHILL:              114
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.15033E-03  0.67112E-04
+ 
+
+ INTERMEDIATE RESULTS BEFORE NEXT TEMPERATURE REDUCTION
+
+  CURRENT TEMPERATURE:             0.74506E-07
+  MIN FUNCTION VALUE SO FAR:    16.0817301336683869    
+  TOTAL MOVES:                     200
+     DOWNHILL:                      50
+     ACCEPTED UPHILL:               48
+     REJECTED UPHILL:              102
+  TRIALS OUT OF BOUNDS:              0
+  NEW MINIMA THIS TEMPERATURE:       0
+
+                         CURRENT OPTIMAL X
+ 0.86477       1.2358    
+
+                         STEP LENGTH (VM)
+ 0.13470E-03  0.67112E-04
+ 
+
+  PDA_SA ACHIEVED TERMINATION CRITERIA. IER = 0. 
+
+
+  ****   RESULTS AFTER PDA_SA   ****   
+
+                         SOLUTION
+ 0.86477       1.2358    
+
+                         FINAL STEP LENGTH
+ 0.13470E-03  0.67112E-04
+
+ OPTIMAL FUNCTION VALUE:   16.08173013367    
+ NUMBER OF FUNCTION EVALUATIONS:           5401
+ NUMBER OF ACCEPTED EVALUATIONS:           2453
+ NUMBER OF OUT OF BOUND EVALUATIONS:          0
+ FINAL TEMP:  0.7450580596924E-07  IER:   0

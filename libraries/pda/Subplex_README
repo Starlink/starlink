@@ -1,0 +1,52 @@
+README file for SUBPLEX
+
+NAME
+     subplex - subspace-searching simplex method for unconstrained
+     optimization
+
+DESCRIPTION
+     Subplex is a subspace-searching simplex method for the
+     unconstrained optimization of general multivariate functions.
+     Like the Nelder-Mead simplex method it generalizes, the subplex
+     method is well suited for optimizing noisy objective functions.
+     The number of function evaluations required for convergence
+     typically increases only linearly with the problem size, so for
+     most applications the subplex method is much more efficient than
+     the simplex method.
+
+INSTALLATION
+     To build subplex on UNIX systems, edit the Makefile as necessary
+     and type:
+
+             make
+
+     This will create a linkable library named subplex.a and a
+     demonstration executable named demo.
+
+EXAMPLE
+     To run subplex on a simple objective function type:
+
+             demo < demo.in
+
+     To run subplex on other problems, edit a copy of the sample driver
+     demo.f as necessary.
+
+AUTHOR
+     Tom Rowan
+     Oak Ridge National Laboratory
+     Mathematical Sciences Section
+     P.O. Box 2008, Bldg. 6012
+     Oak Ridge, TN 37831-6367
+
+     Phone:   (615) 574-3131
+     Fax  :   (615) 574-0680
+     Email:   na.rowan@na-net.ornl.gov
+
+REFERENCE
+     T. Rowan, "Functional Stability Analysis of Numerical Algorithms",
+     Ph.D. thesis, Department of Computer Sciences, University of Texas
+     at Austin, 1990.
+
+COMMENTS
+     Please send comments, suggestions, or bug reports to
+     na.rowan@na-net.ornl.gov.

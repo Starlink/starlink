@@ -1,0 +1,35 @@
+
+ Sample size =            2
+ Variance-covariance matrix
+   0.6817
+   0.3183  0.6817
+
+ Sample size =            3
+ Variance-covariance matrix
+   0.5595
+   0.2728  0.4543
+   0.1677  0.2728  0.5595
+
+ Sample size =            4
+ Variance-covariance matrix
+   0.4917
+   0.2458  0.3606
+   0.1578  0.2358  0.3606
+   0.1047  0.1578  0.2458  0.4917
+
+ Sample size =            5
+ Variance-covariance matrix
+   0.4475
+   0.2248  0.3098
+   0.1479  0.2092  0.2876
+   0.1057  0.1506  0.2092  0.3098
+   0.0742  0.1057  0.1479  0.2248  0.4475
+
+ Sample size =            6
+ Variance-covariance matrix
+   0.4159
+   0.2090  0.2774
+   0.1392  0.1896  0.2466
+   0.1023  0.1402  0.1821  0.2466
+   0.0773  0.1064  0.1402  0.1896  0.2774
+   0.0563  0.0773  0.1023  0.1392  0.2090  0.4159

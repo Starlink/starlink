@@ -1,0 +1,52 @@
+
+ Doing comparison between real sequence routines...
+    FFTPACK done.
+    NAG done.
+
+   Elapsed time for a NAG convolution     :   1.2048720E-03 s
+   Elapsed time for an FFTPACK convolution:   5.3533597E-04 s
+
+   Mean absolute difference:   5.7967521E-15
+   RMS absolute difference :   1.9537299E-14
+   Max. absolute difference:   4.9737992E-14
+
+   Mean relative difference:   4.5304547E-16
+   RMS relative difference :   1.7413764E-15
+   Max. relative difference:   7.6097694E-15
+
+
+ Doing comparison between complex sequence routines...
+    FFTPACK done.
+    NAG done.
+
+ Results of comparison between complex sequence routines:
+
+   Elapsed time for a NAG convolution     :   2.0398402E-03 s
+   Elapsed time for an FFTPACK convolution:   1.0145520E-03 s
+
+ Comparison of real parts...
+
+   Mean absolute difference:   2.9146823E-15
+   RMS absolute difference :   7.1393507E-14
+   Max. absolute difference:   1.7896795E-13
+
+   Mean relative difference:   2.6571608E-15
+   RMS relative difference :   1.5993053E-14
+   Max. relative difference:   1.6369488E-13
+
+
+ Comparison of imaginary parts...
+
+   Mean absolute difference:   1.4832579E-15
+   RMS absolute difference :   7.5079394E-14
+   Max. absolute difference:   1.7053026E-13
+
+   Mean relative difference:   3.8870612E-16
+   RMS relative difference :   2.4795187E-15
+   Max. relative difference:   1.9498975E-14
+
+
+ Relative speed of real to complex routines:
+    NAG    :    1.692993    
+    FFTPACK:    1.895169    
+

@@ -1,0 +1,5 @@
+ MODEL IS H(T) = X(1)*EXP(-T*X(2)) + X(3)*EXP(T*X(4))
+ X(1),X(2),X(3),X(4) = 
+    1.999475   -0.999801    0.500057   -9.953993
+ RESIDUAL AFTER THE FIT =   4.2409D-04
+ OUTPUT FLAG FROM SOLVER =                      4

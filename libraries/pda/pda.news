@@ -1,0 +1,22 @@
+1 PDA_library
+                                                   Expires: 1/5/97
+
+ The Public Domain Algorithms' Library (PDA), which is intended to 
+ replace the NAG library in Starlink application code, has been 
+ upgraded to include 30 new routines in the areas of:
+
+ o  Matrices.
+ o  Minimisation.
+ o  Normal distribution.
+ o  Pseudo-random numbers.
+ o  Simple statistics.
+ o  Sorting.
+ o  Two-dimensional interpolation and fitting.
+
+ A new link script `pda_link_adam` is included which should be used to
+ link ADAM tasks with PDA. The `pda_link` script is still available but
+ should now be used only to link stand-alone (i.e. not ADAM) programs.
+ This brings PDA into line with other Starlink libraries.
+
+ Full details of the release are given in the updated Starlink 
+ User Note SUN/194.2.

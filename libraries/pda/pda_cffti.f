@@ -1,0 +1,8 @@
+      SUBROUTINE PDA_CFFTI (N,WSAVE)
+      DIMENSION       WSAVE(1)
+      IF (N .EQ. 1) RETURN
+      IW1 = N+N+1
+      IW2 = IW1+N+N
+      CALL PDA_CFFTI1 (N,WSAVE(IW1),WSAVE(IW2))
+      RETURN
+      END

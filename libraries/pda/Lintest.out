@@ -1,0 +1,9 @@
+ PDA_LSQR Example Program Results
+
+
+ Solution returned by PDA_LSQR
+     1.250    1.250    1.250    1.247    1.247
+     1.250    1.250    1.247    1.247    1.250
+     1.250    1.250
+
+ Norm of the residual =     1.15D-02
