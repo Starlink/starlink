@@ -1709,8 +1709,9 @@ static void MapBox( AstMapping *this,
          }
 
 /* First examine a set of special input points to obtain an initial
-   estimate of the required output bounds. */
-         SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
+   estimate of the required output bounds. Do this only so long as the
+   number of points involved is not excessive. */
+         if ( nin <= 12 ) SpecialBounds( &mapdata, &lbnd, &ubnd, x_l, x_u );
 
 /* Then attempt to refine this estimate using a global search
    algorithm. */
@@ -3913,7 +3914,11 @@ static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
 
 /* Estimate the error on the result as the difference between the
    highest and lowest simplex vertices. */
-         range = f[ hi ] - f[ lo ];
+         if ( ( f[ hi ] == -DBL_MAX ) || ( f[ lo ] == -DBL_MAX ) ) {
+            range = DBL_MAX;
+         } else {
+            range = f[ hi ] - f[ lo ];
+         }
 
 /* Test for convergence. Ideally, the accuracy criterion should have
    been met. However, also quit if the maximum number of Mapping
