@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="dvi2bitmap">
-  <version>0.13b1</version>
+  <version>0.13b2</version>
   <path>applications/dvi2bitmap</path>
   <description>Converts TeX DVI files to bitmaps</description>
   <abstract><p>This application processes a DVI file produced by TeX,
