@@ -60,7 +60,10 @@
 *        can continue to be built.
 *      1-MAY-2001 (AJC):
 *        Allow any non-HISTORY card to terminate a HISTORY record
-*     {enter_further_changes_here}
+*     2004 August 25 (MJC):
+*        Allowed for the shift in alignment made by CFITSIO starting
+*        in column 11 from 9, but also still valid for old data written
+*        with the original alignment.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -104,6 +107,7 @@
       PARAMETER( MAXWRD = 7 )
 
 *  Local Variables:
+      INTEGER ALIGN              ! Alignment with respect to column 9
       CHARACTER * ( NDF__SZAPP ) APPN ! Application name
       CHARACTER * ( 80 ) CARD    ! FITS header card
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to a character component
@@ -181,12 +185,18 @@
 
 *  Was the HISTORY card written by COF_WHISR?  Need to find the heading.
 *  If this HISTORY card does not contain it, search for another HISTORY
-*  card, starting from the next card.
-            IF ( INDEX( CARD( 11:80 ), 'History structure' ) .NE. 1 )
-     :        THEN
+*  card, starting from the next card.  Search from the first possible
+*  location but allow for some formatting offset.
+            ALIGN = INDEX( CARD( 9:80 ), 'History structure' )
+            IF ( ALIGN .LT. 1 .OR. ALIGN .GT. 5 ) THEN
                KINDEX = KINDEX + 1
                GOTO 100
             END IF
+
+* Alignment correction is with respect to column 9.  ALIGN would be 1
+* for column 9 when it should be zero.  The old alignment was to
+* column 11, so ALIGN would be 2.
+            ALIGN = ALIGN - 1
 
 *  Create HISTORY structure.
 *  =========================
@@ -203,7 +213,7 @@
             CALL DAT_ANNUL( LOC, STATUS )
 
 *  Extract the creation date from the header card.
-            CREATD = CARD( 37:60 )
+            CREATD = CARD( 35 + ALIGN:58 + ALIGN )
 
 *  Convert the date from the KAPPA-style to the NDF format.
             CALL COF_DATEH( CREATD, STATUS )
@@ -237,7 +247,7 @@
             RETAIN( KINDEX ) = .FALSE.
 
 *  Obtain the update mode.
-            MODE = CARD( 24:NDF__SZHUM+23 )
+            MODE = CARD( 22 + ALIGN:NDF__SZHUM + 21 + ALIGN )
 
 *  Make the UPDATE_MODE component and assign it the update mode via a
 *  locator.
@@ -313,7 +323,8 @@
                CALL DAT_CELL( RLOC, 1, IREC, ELOC, STATUS )
 
 *  Extract for the date and convert it from KAPPA-style to its NDF form.
-               DATE = CARD( 13 + NC: 36 + NC )
+               NC = NC + ALIGN
+               DATE = CARD( 11 + NC: 34 + NC )
                CALL COF_DATEH( DATE, STATUS )
 
 *  Make the DATE component and assign it the date via a locator.
@@ -323,7 +334,7 @@
                CALL DAT_ANNUL( CLOC, STATUS )
 
 *  Extract for the command.
-               APPN = CARD( 40 + NC: )
+               APPN = CARD( 38 + NC: )
                CSIZE = MAX( 1, MIN( CHR_LEN( APPN ), NDF__SZAPP ) )
 
 *  Make the COMMAND component and assign it the application name via a
@@ -384,7 +395,7 @@
                RETAIN( KINDEX ) = .FALSE.
 
 *  Extract the dataset name.
-               REFER = CARD( 20: )
+               REFER = CARD( 18 + ALIGN: )
                CSIZE = MAX( 1, MIN( CHR_LEN( REFER ), NDF__SZREF ) )
 
 *  Make the DATASET component and assign it the reference dataset via a
@@ -422,7 +433,7 @@
 
 *  Set PARSKP if end of paragraph within a history record
                   PARSKP = KEYWRD .EQ. 'HISTORY' .AND.
-     :                     CARD( 11: ) .EQ. ' ' 
+     :                     CARD( 9 + ALIGN: ) .EQ. ' ' 
                   IF ( KEYWRD .NE. 'HISTORY' .OR.
      :                 PARSKP ) THEN
 
@@ -492,7 +503,8 @@
                   ELSE 
 
 *  Append the current record to the paragraph buffer.
-                     CALL CHR_APPND( CARD( 11: ), PARAGR, PARCOL )
+                     CALL CHR_APPND( CARD( 9 + ALIGN: ), PARAGR, 
+     :                               PARCOL )
                      IF ( CARD( 80:80 ) .EQ. ' ' ) PARCOL = PARCOL + 1
                   END IF
 
