@@ -66,6 +66,24 @@ I'm just using Makefile.in.
 
 
 
+Linking problems
+----------------
+
+I'm getting a variety of symbol-not-found errors on Solaris.  They
+seem to be the same ones mentioned in
+<http://www.tek-tips.com/gviewthread.cfm/lev2/4/lev3/29/pid/139/qid/90108>,
+but the `solutions' presented there are extremely opaque, and seem to
+refer to Sun's 5.0 C++ compiler, whereas the one on rlsul0 is 5.3
+(however those notes are dated 2002 and the 5.3 compiler is 2001 --
+what's happening?).  See also
+<http://www.experts-exchange.com/Programming/Programming_Languages/Cplusplus/Q_20313326.html>
+for more opacity.  Hmm, there are also threads on Sun's forums' site
+(searched for __deallocate_buffer on `Developers Site' and `Developers
+Forums'.
+See eg <http://forum.sun.com/thread.jsp?forum=5&thread=6971>, which
+refers to Bug ID 4632564
+
+
 Things to implement
 -------------------
 
