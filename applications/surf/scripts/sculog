@@ -1,0 +1,1156 @@
+#!/star/bin/ndfperl 
+#
+#  This program requires the NDF module and ndfperl.
+#  This program will run as long as ndfperl exists in /star/bin
+#  Note that this ndfperl can be a soft link to your normal
+#  perl so long as the NDF module is installed as a shareable module.
+#
+#  Produce journal of scuba observations
+#
+
+use NDF;
+
+# Safe way to get current working directory
+use Cwd;
+
+# Command line arguments
+use Getopt::Long;
+
+# Parse the command line options
+
+$result = GetOptions("help"     => \$h,
+		     "all"      => \$all,
+		     "summary!" => \$summary,
+		     "begin=i"  => \$begin,
+		     "end=i"    => \$end,
+		     "demod!"   => \$demod,
+		     "reduced!" => \$reduced,
+		     "nodatadir"=> \$nodatadir,
+		     "mode=s"   => \$whichmode
+		    );
+
+$h = 1 unless $result == 1;  # Print help info if unknown option
+
+# Parameter for max number of sub-instruments
+$MAX_SUB = 5;
+
+# Work out what I have been called as
+
+@parts = split(/\//, $0);
+$prog = $parts[$#prog];
+
+# Help information
+
+($h) && do {
+    print qq/
+Usage: 
+  $prog [-h] [-all] [-demod] [-reduced]
+Options:
+  -h[elp]\t This message
+  -summary\t Gives a one line summary of each file
+  -all\t\t Catalog all sdf files regardless of numeric range
+  -begin nn\t First scan number to be considered
+  -end nn\t Final scan number to be considered
+  -demod\t Only look at raw demodulated data files (ie _dem_)
+  -reduced\t Only look at files reduced on-line (ie _red_)
+/;
+    print "  -mode obs\t Select observation modes" if ($prog eq 'sculog');
+    print qq/
+also
+  --begin=nn\t First scan number (note the -- prefix)
+  --end=nn\t Final scan number
+/;
+    print "  --mode=obs\t Select observation modes" if ($prog eq 'sculog');
+    print qq/
+  Where nn is an integer and 'obs' is a comma delimited list of obsmodes.
+  Use 'showme sun216' or 'scuhelp sculog' for more information.
+Author:
+  Tim Jenness (timj\@jach.hawaii.edu)
+
+/;
+    exit;
+};
+
+sub bydatakeys {$datakeys[$a] <=> $datakeys[$b]; }
+
+# CWD
+
+$startdir = cwd;
+
+# PI
+
+$pi = 3.141592654;
+
+# NDF name for FITS information in RO files
+
+$rohead = ".HEADER";
+
+
+# Am I processing skydip data 
+$dotau = 0;
+if ($prog =~ /photsum|mapsum|pointsum|skysum/) {
+  $dotau = 1;
+}
+
+# Set up mode filter
+if ($prog eq "photsum") {
+  $whichmode = "photom,skydip";
+} elsif ($prog eq "mapsum") {
+   $whichmode = "mapsum,skydip";
+
+} elsif ($prog eq 'pointsum') {
+  $whichmode = "pointing";
+
+} elsif ($prog eq 'skysum') {
+  $whichmode = "skydip";
+
+}
+
+
+# Get name of file
+# Get list of files....
+# Now start asking some questions
+
+$start = 0;
+$stop = 9999;
+unless ($all) {
+
+  if (defined $begin) {
+    $start = $begin;
+  } else {
+    
+    print "\n Enter starting observation number [0] ";
+ 
+    chomp($start = <>);
+    $start !~ /./ && ($start = 0);
+  }
+
+  if (defined $end) {
+    $stop = $end;
+  } else {
+
+    print " Enter final observation number [last] ";
+    
+    chomp($stop =<>);
+    $stop !~ /./ && ($stop = "last");
+    $stop = 9999 if $stop =~ /^l/i;
+  }
+}
+ 
+# Create search list for files
+@dirlist = ("$startdir"); # select cwd
+push(@dirlist,$ENV{'DATADIR'}) if defined $ENV{'DATADIR'};
+
+ 
+# Read in the list of files from each directory in @dirlist
+# The file list will depend on the command line options for
+#   1) Range
+#   2) Whether we are selecting demodulated
+#   3) Whether we want reduced
+# Modify the pattern match accordingly
+
+$pattern = ".*";
+$pattern = "_dem_" if $demod;
+$pattern = "_red_" if $reduced;
+$pattern = "_(red|dem)_" if ($reduced & $demod); # Yes this is a kludge
+
+ 
+@datalis = ();
+%location = ();
+ 
+foreach $ddir (@dirlist) {
+ 
+    $current_size = ($#datalis > -1 ? $#datalis : -1);
+
+    opendir(DATADIR,"$ddir");
+    # I like this line :-)
+    # Get all the sdf files and remove the trailing .sdf
+    push(@datalis,grep(s/\.sdf$//, readdir(DATADIR)));
+    closedir(DATADIR);
+
+    # Now see if we need to drop files (ie if $demod)
+    @datalis = grep(/$pattern/,@datalis);
+
+    # Associate each file with a directory
+    for ($i = $current_size + 1; $i <= $#datalis; $i++) {
+      $location{$datalis[$i]} = $ddir;
+    }
+
+};
+
+# If we have no files then we may as well die
+die "\nSorry but no observation files have been found.\n\n" if $#datalis < 0;
+ 
+# Now sort them by observation number
+ 
+foreach (@datalis) {
+  # Find the run number (the number before the . and after _ or month
+  ($root,$junk) = split(/\./);
+  @bits = split(/\D/,$root);
+  $num = 0 + $bits[$#bits];
+  do {
+    push(@datakeys, $bits[$#bits]);
+    push(@keep, $_);
+  } if (($num >= $start) && ($num <= $stop));
+}
+@sortndf = @keep[ sort bydatakeys $[..$#keep ];
+
+# Now begin to read in FITS information
+
+
+# Open the NDF environment
+
+$status = &NDF::SAI__OK;
+
+ndf_begin;
+err_begin($status);
+
+foreach $scufile (@sortndf) {
+
+  err_annul($status) if $status != &NDF::SAI__OK;
+
+  # Go to the correct directory
+  chdir $location{$scufile};
+
+  # Is this an ro_ file
+  $scufile =~ /^ro_|_red_/ && ($scufile .= $rohead);
+
+  # Open the file
+  ndf_find(&NDF::DAT__ROOT, $scufile, $indf, $status);
+
+  if ($status != &NDF::SAI__OK) {
+    err_flush($status);
+    print "Error opening $scufile\n";
+    next;
+  }
+
+  # Find the FITS extension
+  ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
+
+  if ($status != &NDF::SAI__OK) {
+    err_annul($status);
+    ndf_annul($indf, $status);
+    print "Error finding FITS in $scufile\n";
+    next;
+  }
+
+
+
+  @fits = ();
+  #...and read it
+  dat_get1c($xloc, 200, @fits, $nfits, $status);
+
+  if ($status != &NDF::SAI__OK) {
+    err_annul($status);
+    dat_annul($xloc, $status);
+    ndf_annul($indf, $status);
+    print "Error reading FITS in $scufile\n";
+    next;
+  }
+
+
+  $i = 0;
+
+  %fitsitem = ();
+
+# Read in all the FITS items and store in HASH
+  for ($i = 0; $i < $nfits; $i++) {
+    ($item, $value, $comment) = fits_get_nth_item(@fits,$i);
+    $fitsitem{$item} = $value;
+  }
+
+  # Now check the observation mode against $whichmode
+  # If whichmode is not specified run anyway
+  if ($whichmode !~ /./ | $whichmode =~ /$fitsitem{'MODE'}/i) {
+
+
+    #######################
+    # Calculate some things
+
+    $mean_air = ($fitsitem{'AMSTART'} + $fitsitem{'AMEND'}) / 2.0;
+    $mean_hum = ($fitsitem{'HUMSTART'} + $fitsitem{'HUMEND'}) / 2.0;
+    $mean_hum = sprintf("%d", $mean_hum);
+
+    $az = ($fitsitem{'END_AZD'} + $fitsitem{'STRT_AZD'}) / 2.0;
+    $az = sprintf("%d", $az);
+    $el = ($fitsitem{'END_ELD'} + $fitsitem{'STRT_ELD'}) / 2.0;
+    $el = sprintf("%d", $el);
+
+    $hst = $fitsitem{'HSTSTART'};
+    $hst =~ s/:\d+\..*$//;  # Remove the decimal places and seconds
+    $hst = '0'.$hst if length($hst) < 5;
+
+    $lst = $fitsitem{'STSTART'};
+    $lst =~ s/:\d+\..*$//;  # Remove the decimal places and seconds
+    $lst = '0'.$lst if length($lst) < 5;
+
+    # Work out whether the seeing and tau values are current
+    # (ie less than 1 hour old)
+    # For now I will just give the value regardless
+    $seedate = $fitsitem{'SEE_DATE'};
+    
+    $seeing = $fitsitem{'SEEING'};
+    $csotau = $fitsitem{'TAU_225'};
+
+    # Make sure the file name is just the filename and not .HEADER
+    (@junk) = split(/\//,$scufile);
+    $fname = $junk[$#junk];
+    $fname =~ s/$rohead$//;
+
+    # SKYDIP requires that I put some work in - I need to open
+    # The SKYDIP_FIT extension to examine the fit results
+
+    @tauz = &find_skydip if $dotau;
+
+    # Find the PHOTOM data in a _red_ file
+    @photom = &find_photom if ($prog eq 'photsum');
+
+    # Undef variables referring to unused subinstruments
+    for ($i = $fitsitem{'N_SUBS'}+1; $i <= $MAX_SUB; $i++) {
+      $fitsitem{"SUB_$i"} = undef;
+      $fitsitem{"FILT_$i"} = undef;
+    }
+
+    # Convert radians RA and DEC to HMS/DMS
+    
+    $ra_rad = $fitsitem{'MEANRA'} * $pi / 180.0;
+    $dec_rad= $fitsitem{'MEANDEC'} * $pi / 180.0;
+
+    ($ra_sign, @ra) = Dr2tf(2,$ra_rad);
+    ($dec_sign, @dec) = Dr2af(1,$dec_rad);
+
+    # Read EQUINOX
+
+    $equinox = ($fitsitem{'EQUINOX'} == 2000 ? J : B).$fitsitem{'EQUINOX'};
+
+    # Set format
+
+    $^ = STDOUT_TOP;
+    $~ = ($fitsitem{'MODE'} =~ /^$/ ? "NOFITS" : $fitsitem{'MODE'});
+
+    if ($prog eq 'photsum') {
+
+      $^ = PHOTSUM_TOP;
+
+      # Only set if mode is recognised 
+      # of course shouldnt be in here if that is the case since I
+      # am only processing photometry data
+      if ($~ !~ /NOFITS/) {
+	if ($fitsitem{'MODE'} eq 'SKYDIP') {
+	  $~ = SKYDIP_SUM;
+	} else {
+	  $~ = PHOTSUM
+	}
+      }
+    } elsif ($prog eq 'pointsum') {
+
+      $^ = POINTSUM_TOP;
+
+      # Only set if mode is recognised 
+      # of course shouldnt be in here if that is the case since I
+      # am only processing photometry data
+      if ($~ !~ /NOFITS/) {
+	if ($fitsitem{'MODE'} eq 'POINTING') {
+	  $~ = POINTSUM;
+	}
+      }
+
+    } elsif ($prog eq 'mapsum') {
+
+      $^ = MAPSUM_TOP;
+
+      # Only set if mode is recognised 
+      # of course shouldnt be in here if that is the case since I
+      # am only processing photometry data
+      if ($~ !~ /NOFITS/) {
+	if ($fitsitem{'MODE'} eq 'SKYDIP') {
+	  $~ = SKYDIP_SUM;
+	} else {
+	  $~ = MAPSUM;
+	}
+      }
+
+    } elsif ($prog eq 'skysum') {
+
+      # This is the skydip summary mode
+
+      $^ = SKYSUM_TOP;
+	
+      $~ = SKYSUM;
+
+
+    } elsif ($summary) {
+
+      if ($~ !~ /NOFITS/) {
+
+	if ($fitsitem{'MODE'} eq 'NOISE') {
+
+	  $~ = SHORT_NOISE;
+
+	} elsif ($fitsitem{'MODE'} eq 'SKYDIP') {
+
+	  $~ = SHORT_SKYDIP;
+
+	} else {
+
+	  $~ = SHORT;
+	}
+      }
+
+      $^ = SUMMARY_TOP;
+
+    }
+
+    write;
+    
+    # Read in HISTORY information (if present)
+
+    ndf_hnrec($indf,$nrec,$status);
+
+    # if there is history...
+    if (($status == &NDF::SAI__OK) && (!$summary) && ($prog eq 'sculog')) {
+
+      # Loop through the history components and find last "APPLICATION"
+      for ($i=$nrec; $i > 0; $i--) {
+	ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
+	last if $value !~ /<unknown>/;
+      }
+      # Get date as well
+      ndf_hinfo($indf, 'DATE', $i, $date, $status);
+      $~ = "HISTORY";
+      write;
+    } else {
+      err_annul($status);    
+    }
+  }
+  
+  # Close file
+  dat_annul($xloc, $status);
+  ndf_annul($indf,$status);
+ 
+}
+
+# End the error reporting
+err_end($status);
+
+chdir $startdir;
+
+exit;
+
+# Subroutines (dont need SLALIB)
+
+# Convert radians to h m s
+sub Dr2tf {
+  my ($dps, $rad) = @_;
+
+  # Convert to hours
+  $rad = $rad / 15;
+
+  return Dr2af($dps, $rad); 
+}
+
+
+# Convert radians to sexagesimal
+sub Dr2af {
+
+  my ($dps, $rad) = @_;
+  my ($hours, $hour, $minutes, $minute, $seconds, $secs, $frac);
+
+  # Store the sign
+  my $sign = $rad >= 0.0 ? '+' : '-';
+
+  # Convert to degrees :  180 / pi
+  $hours = abs($rad * 180 / $pi);
+  $hour = int($hours);
+
+  $minutes = ($hours - $hour) * 60;
+  $minute = int($minutes);
+
+  $seconds = ($minutes - $minute) * 60;
+  $secs = int($seconds);
+
+  $frac = int(0.5 + ($seconds - $secs) * 10**$dps);
+
+  return($sign, $hour, $minute, $secs, $frac);
+}
+
+
+# Routine to search through the extensions of each NDF and find the skydip
+# results
+
+sub find_skydip {
+  my @tauz = ();
+
+  if (($fitsitem{'MODE'} =~ /SKYDIP/) && ($fname =~ /_red_/)) {
+    # Can only do this for modern _red_ files
+    hds_open($fname, 'READ', $sdip_loc, $status);
+    dat_ncomp($sdip_loc, $ncomp, $status);
+    
+    # Cycle over the HDS components
+    for $comp (1..$ncomp - 1) { # HEADER is always last so ignore
+      dat_index($sdip_loc, $comp, $nsdip_loc, $status);
+      dat_name($nsdip_loc, $name, $status);
+      dat_type($nsdip_loc, $sdip_type, $status);
+      
+      if ($sdip_type eq 'NDF') {
+	  
+	# Open ths NDF
+	ndf_find(&NDF::DAT__ROOT, "$fname.$name", $sdip_ndf, $status);
+	
+	# Open the SKYDIP_FIT extension
+	ndf_xloc($sdip_ndf, 'SKYDIP_FIT', 'READ', $sdip_xloc, $status);
+
+	# Now read the fit result
+	cmp_get0r($sdip_xloc, 'TAUZ_FIT1', $tauz, $status);
+  
+	dat_annul($sdip_xloc, $status);
+	ndf_annul($sdip_ndf, $status);
+
+	# and store
+	push(@tauz, sprintf("%6.3f",$tauz));
+      }
+
+      dat_annul($nsdip_loc, $status);
+    }
+
+    dat_annul($sdip_loc, $status);
+
+  }
+
+  return @tauz;
+
+}
+
+# Routine to search through the extensions of each NDF and find the
+# PHOTOMetry results
+
+sub find_photom {
+  my @photom = ();
+  my ($el, $pntr, $indf, $pntr2, $i, $j);
+
+  if (($fitsitem{'MODE'} =~ /PHOTOM/) && ($fname =~ /_red_/)) {
+      
+    # All PHOTOMetry data is stored in a subinstrument extension
+    # eg LONG, SHORT, P1350...
+
+    # Return back an array that has 0: Name 1: Signal 2: Error
+    # Repeated for all subinstruments/bolometers
+    # Deal with precision here rather than in format
+
+    ndf_begin;
+
+    for ($i = 1; $i <= $fitsitem{'N_SUBS'}; $i++) {
+
+      my @data = ();
+      my @err = ();
+      $name = $fitsitem{"SUB_$i"};
+
+      # Open ths NDF
+      ndf_find(&NDF::DAT__ROOT, "$fname.$name", $indf, $status);
+
+      # Now retrieve the data from the DATA_ARRAY and VARIANCE.
+      # Note that there is one number per measurement.
+	
+      # Find and map the data array
+      ndf_map($indf, 'DATA', '_REAL', 'READ', $pntr, $el, $status);
+
+      # Sum the elements
+      @data = mem2array($pntr, "f*", $el) if ($status == &NDF::SAI__OK);
+
+      # Now also get the error array
+      ndf_map($indf, 'Error', '_REAL', 'READ', $pntr2, $el, $status);
+
+      # Sum the elements
+      @err = mem2array($pntr2, "f*", $el) if ($status == &NDF::SAI__OK);
+
+
+
+#      print "$name: DATA: $data[0] and $err[0] $status\n";
+      
+
+
+      # Construct a string (assume one measurement)
+
+      push (@photom, $name,sprintf("%8.2e",$data[0]));
+
+      # Signal to noise
+      $StoN = undef;
+      $StoN = $data[0] / $err[0] if ($err[0] > 1.0e-9);
+      push (@photom, $StoN);
+
+      # Unmap
+      ndf_unmap($indf, "*", $status);
+
+      # Annul the NDF
+      ndf_annul($indf, $status);
+
+    }
+
+    if ($status != &NDF::SAI__OK) { 
+      err_rep(' ',"\U$prog\E: Error mapping reduced data. You may need to set the HDS_SCRATCH environment variable to a writeable directory (such as /tmp) to prevent these errors.",
+    $status);
+      err_flush($status);
+    }
+
+    ndf_end($status);
+  }
+
+  return @photom;
+
+}
+
+
+
+# FORMATS
+
+
+format SUMMARY_TOP = 
+-Log for directory: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$dirlist[0]
+~                   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$dirlist[1]
+
+ #    HST    Obsmode   Source   Meas/Int Airmass  Filter  Bolometers
+---- -----   --------- -------  -------- ------- -------- ----------
+.
+
+
+format STDOUT_TOP = 
+-Log for directory: @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$dirlist[0]
+~                   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$dirlist[1]
+.
+
+format STDOUT =
+--------- Do not know how to interpret mode @<<<<<<<<<<
+$fitsitem{'MODE'}
+
+.
+
+format NOFITS =
+--------- No FITS entry for @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$scufile
+
+.
+
+#### HISTORY ###
+
+format HISTORY = 
+   Most recent HISTORY entry:
+        @<<<<<<<<<<<<<<<<<<<<<<<<          @<<<<<<<<<<<<<<<<
+$date $value
+
+.
+
+
+##### MAP ######
+
+format MAP =
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA:  @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
+@ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec @< PA: @<<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'CHOP_PA'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+##### FLATFIELD ######
+
+format FLATFIELD =
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA:  @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
+ @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec @< PA: @<<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'CHOP_PA'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+
+##### SKYDIP ########
+format SKYDIP =
+@<<<<              @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   Bolometers:   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Max EL: @<<  Min EL: @<< Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'MAX_EL'}, $fitsitem{'MIN_EL'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+##### SKYDIP ########
+format NOISE =
+@<<<< @<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJ_TYPE'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   Bolometers:   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+                            Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+##### POINTING ######
+
+format POINTING =
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA:  @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
+ @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+
+
+##### FOCUS #####
+format FOCUS = 
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA: @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
+ @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+##### ALIGN #####
+format ALIGN = 
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<< @<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'ALIGN_AX'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA: @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
+ @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+---------
+
+.
+
+
+###### Photom ######
+format PHOTOM =
+@<<<<   @<<<<<<<<<<<<<<<<   @<<<<<<<<<<<< @<<<<<<<<<<<< @<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $fitsitem{'OBJECT'}, $fitsitem{'MODE'}, $fitsitem{'UTDATE'}, $fitsitem{'UTSTART'}
+   RA: @> @> @>.@< Dec: @@> @> @>.@ (@<<<<) Observed centre: @<<<<<<<<<<<
+ @ra, $dec_sign, @dec, $equinox, $fitsitem{'CENT_CRD'}
+   Mean airmass: @<<<<<<<<< Bolometers:   @<<<<<<<<<<<<<<<< Filter: @<<<<<<<
+$mean_air, $fitsitem{'BOLOMS'}, $fitsitem{'FILTER'}
+   Throw: @>>>> arcsec  @<  Integrations: @<<<<  Measurements: @<<<<
+$fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'N_INT'}, $fitsitem{'N_MEASUR'} 
+   Accept: @<<<<<<<<        DATA_KPT: @<<<<<<<<<<<<<<<<< Gain: @<<<<<<
+$fitsitem{'ACCEPT'}, $fitsitem{'DATA_KPT'}, $fitsitem{'GAIN'}
+   Observation file: @<<<<<<<<<<<<<<<<<<<<<<<<< Data file: @<<<<<<<<<<<<<<<<<<<
+$fitsitem{'OBSDEF'}, $fname
+   @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$photom_result
+---------
+
+.
+
+#####################
+# Now need to define the summary fields (SHORT is default)
+
+# This is the -summary format
+
+
+format SHORT =
+@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
+.
+
+format SHORT_NOISE =
+@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJ_TYPE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
+.
+
+format SHORT_SKYDIP =
+@<<< @<<<<<< @<<<<<<<< SKY        @>/@<<       @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
+.
+
+
+# These are the PHOTSUM formats
+
+format PHOTSUM_TOP =
+ #    HST    Source   Meas/Int  Am   Filter  SubInst Signal   S/N   Tau  Seeing
+---  -----   -------  -------- ---- -------- ------- ------  -----  ---  ------
+.
+
+format PHOTSUM =
+@<<< @<<<<<< @<<<<<<<<< @>/@<< @.## @<<<<<<< @<<<< @>>>>>>>> @<<<<  @<<<< @<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $photom[0], $photom[1], $photom[2], $csotau, $seeing
+~                                            @<<<< @>>>>>>>> @<<<
+$photom[3], $photom[4], $photom[5]
+.
+
+
+format SKYDIP_SUM =
+**************
+@<<< @<<<<<< @<<<<<<<<< @>/@<<      @<<<<<<< @<<<<: @#.###          @<<<< @<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
+~                                            @<<<<  @<<<<<<
+$fitsitem{'SUB_2'}, $tauz[1]
+~                                            @<<<<  @<<<<<<
+$fitsitem{'SUB_3'}, $tauz[2]
+~                                            @<<<<  @<<<<<<
+$fitsitem{'SUB_4'}, $tauz[3]
+~                                            @<<<<  @<<<<<<
+$fitsitem{'SUB_5'}, $tauz[4]
+--------------
+.
+
+
+# These are the POINTSUM formats
+
+format POINTSUM_TOP =
+ #    LST    Source  Meas/Int Az  El  Filter  Inst   Uaz  Uel   Tau  Seeing Hum
+---  -----   ------- -------- --- -- -------  ----   ---  ---   ---  ------ ---
+.
+
+format POINTSUM =
+@<<< @<<<<<< @<<<<<<<< @>/@<< @<< @< @<<<<<<< @<<<< @<<< @<<<  @<<<< @<<<< @>>%
+$fitsitem{'RUN'}, $lst, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $az, $el, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $fitsitem{'UAZ'}, $fitsitem{'UEL'}, $csotau, $seeing, $mean_hum
+.
+
+# These are the SKYSUM formats
+
+format SKYSUM_TOP =
+ #    LST    HST   Meas/Int   Filter    Sub Inst    TAU          CSO  Seeing
+---  -----  -----  --------  --------- ----------  -----        ----- ------
+.
+
+
+format SKYSUM =
+@<<< @<<<<  @<<<<   @>/@<<   @<<<<<<<<   @<<<<    @#.###        @<<<< @<<<<
+$fitsitem{'RUN'}, $lst, $hst,$fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $fitsitem{'FILTER'}, $fitsitem{'SUB_1'}, $tauz[0], $csotau, $seeing
+~                                        @<<<<    @<<<<<<
+$fitsitem{'SUB_2'}, $tauz[1]
+~                                        @<<<<    @<<<<<<
+$fitsitem{'SUB_3'}, $tauz[2]
+~                                        @<<<<    @<<<<<<
+$fitsitem{'SUB_4'}, $tauz[3]
+~                                        @<<<<    @<<<<<<
+$fitsitem{'SUB_5'}, $tauz[4]
+.
+
+
+
+# These are the MAPSUM formats:
+
+format MAPSUM_TOP =
+ #    HST    Source   Meas/Int  Am   Filter    Mode   Thr Crd  PA   Tau  Seeing
+---  -----   -------  -------- ---- -------- -------- --- --- ----  ---  ------
+.
+
+format MAPSUM = 
+@<<< @<<<<<< @<<<<<<<<< @>/@<< @.## @<<<<<<< @<<<<<<< @<< @<  @>>>  @<<<< @<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $fitsitem{'SAM_MODE'}, $fitsitem{'CHOP_THR'}, $fitsitem{'CHOP_CRD'}, $fitsitem{'CHOP_PA'}, $csotau, $seeing
+.
+
+# These are old formats
+
+# Pointing summary
+format POINTING_SHORT =
+@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< H@>>% Az: @<<< El: @<<< UAZ: @<<< UEL: @<<< Seeing: @<<<< CSOtau: @>>>>
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_hum, $az, $el, $fitsitem{'UAZ'}, $fitsitem{'UEL'}, $seeing, $csotau
+.
+
+# Skydip summary
+format SKYDIP_SHORT =
+@<<< @<<<<<< @<<<<<<<<            @>/@<< H@>>% Az: @<<< Seeing: @<<<< CSOtau: @>>>> @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_hum, $az, $seeing, $csotau, $taustring
+.
+
+# Photom summary
+format PHOTOM_SHORT =
+@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<<<< @<<<<<<< @<<<<<<<<<<<<<<<<< 
+$fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
+    @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+$photom_result
+.
+
+
+
+__END__
+
+
+=head1 NAME
+
+SCULOG - Generate journal/log summaries of SCUBA observations
+
+=head1 SYNOPSIS
+
+   sculog [-all] [-h] [-summary]
+   sculog
+
+=head1 DESCRIPTION
+
+Sculog goes through all the sdf files in the current directory and,
+optionally, DATADIR (defined in an environment variable) and extracts
+information from any FITS entries that may be present. If a HISTORY
+record is present (i.e. the data has been partially reduced) the most
+recent application to manipulate the data is reported.
+
+In the absence of the -all flag, a numeric range is requested. This
+range only has an effect on raw data or ro files which have the run
+number embedded into the file name. Reduced data will all be treated
+as run 0 for the purposes of listing.
+
+The -summary flag gives a one line summary of each NDF file.
+
+RO files taken prior to Thursday August 15th 1996 will not show any
+useful log entry because the FITS information is not present.
+
+=head1 REQUIREMENTS
+
+The NDF perl module must be available.
+
+=head1 AUTHOR
+
+Program created by T. Jenness, timj@jach.hawaii.edu
+
+=head1 SEE ALSO
+
+  l<perl(1)>, l<NDF>,
+  SURF
+
+=cut
+
+
+*+
+*  Name:
+*    SCULOG
+
+*  Purpose:
+*    Produce summary of SCUBA observations
+
+*  Language:
+*    Perl 5
+
+*  Description: 
+*    Sculog goes through all the sdf files in the current  directory
+*    and, optionally, DATADIR (defined in an environment  variable)
+*    and extracts information from any FITS entries that may  be
+*    present. If a HISTORY record is present (i.e. the data have
+*    been partially reduced) the most recent application to
+*    manipulate  the data is reported.  
+*
+*    In the absence of the -all flag, a  numeric range is
+*    requested. This range only has an effect on raw data or reduced
+*    files which have the run number embedded into the file 
+*    name. Filenames with no numbers are treated as scan 0.
+*
+
+*  Usage:
+*    sculog [-h] [-summary] [-demod] [-reduced] [-mode ??]
+*           [-all|[-begin nn -end nn]] 
+
+*  ADAM Parameters:
+*    -h[elp]
+*      Return a help message only. More help can be obtained by using
+*      `showme sun217' or `scuhelp sculog'. 
+*    -summary
+*      Return a one line summary of each observation file. No HISTORY 
+*      information is reported.
+*    -all
+*      List all files in the current directory and $DATADIR
+*    -demod
+*      Only list demodulated data files (signified by _dem_ file name)
+*    -reduced
+*      Only list reduced data files (signified by _red_ file name)
+*    -begin nn
+*      First scan number to be considered (same as --begin==nn)
+*    -end nn
+*      Final scan number to be considered (same as --end=nn)
+*    -mode obs
+*      Select only specified observation modes for listing.
+*      The list should be comma separated. (same as --mode=obs)
+
+
+*  Examples:
+*     sculog
+*       Ask for a range of scan numbers and then give a full listing
+*       of every sdf file matching this criterion in DATADIR and the
+*       current directory.
+*     sculog -all
+*       Generate a full listing of all sdf files in the current and
+*       DATADIR directory.
+*     sculog --begin=5 -end 100
+*       Generate a detailed log of all data from scans 5 to 100 inclusive.
+*     sculog -summary -all
+*       Produce a one line summary of all files.
+*     sculog -summary -all -reduced
+*       Produce a one line summary of all reduced (_red_) files.
+*     sculog -summary -all -reduced > log.txt
+*       Produce a one line summary of all the reduced files and store
+*       the output in the text file log.txt (note this example is
+*       shell specific).
+*     sculog -summary -all -reduced -demod
+*       Produce a summary of all reduced (_red_) and demodulated (_dem_)
+*       data files (ie not files produced during off-line data reduction).
+*     sculog -summary -all -mode pointing
+*       Produce a one line summary of all pointing observations
+*     sculog -summary -reduced --begin=100 --end=200 --mode=photom,skydip
+*       Produce a one line summary of the photom and skydip observations
+*       of reduced files with scan numbers 100 to 200. This is similar to
+*       photsum except that the signal and signal-to-noise will not be
+*       displayed even if reduced files are being listed.
+
+*  Notes:
+*    - sculog only uses information stored in the FITS header of
+*      reduced and raw data files and does not  provide summaries
+*      of reduced (RO) data such as photometry results (essentially for
+*      reasons of clarity). `photsum' must
+*      be used to generate a summary of photometry observations that
+*      includes reduced data.
+*    - Files are drawn from the current working directory and the directory
+*      indicated by the $DATADIR environment variable.
+*    - Data reduced by the off-line system will all be treated as 
+*      run 0 for the purposes of listing unless numbers are present 
+*      in the filename.
+*    - The output can be stored in a file by using unix redirection as
+*      long as the search range is fully specified (either as `-all' or
+*      with `-begin' and `-end').
+*    - Command line options can be abbreviated.
+*    - Options that take values can be used either as `-flag option' or
+*      as `--flag=option'
+*    
+*
+
+*.
+*-
+
+*+
+*  Name:
+*    photsum
+
+*  Purpose:
+*    Produce summary of SCUBA photometry observations
+
+*  Language:
+*    Perl 5
+
+*  Description: 
+*    Photsum produces a one line summary of all photometry (and skydip)
+*    observations in the current directory (and optionally $DATADIR).
+*    If reduced data is present then this summary will also include the
+*    signal and signal-to-noise calculated by the on-line software.
+*
+*    In the absence of the -all flag, a  numeric range is
+*    requested. This range only has an effect on raw data or reduced
+*    files which have the run number embedded into the file 
+*    name. Filenames with no numbers are treated as scan 0.
+*
+
+*  Usage:
+*    photsum [-h] [-summary] [-demod] [-reduced]
+*           [-all | [-begin=nn -end=nn]] 
+
+*  ADAM Parameters:
+*    -h[elp]
+*      Return a help message only. More help can be obtained by using
+*      `showme sun217' or `scuhelp photsum'. 
+*    -summary
+*      Return a one line summary of each observation file. No HISTORY 
+*      information is reported.
+*    -all
+*      List all files in the current directory and $DATADIR
+*    -demod
+*      Only list demodulated data files (signified by _dem_ file name)
+*    -reduced
+*      Only list reduced data files (signified by _red_ file name)
+*    -begin nn
+*      First scan number to be considered (same as --begin==nn)
+*    -end nn
+*      Final scan number to be considered (same as --end=nn)
+
+*  Examples:
+*     photsum
+*       Ask for a range of scan numbers and then give a summary
+*       of every photometry and skydip file matching this criterion 
+*       in DATADIR and the current directory.
+*     photsum -all
+*       Generate a summary listing of all photometry and skydip  files 
+*       in the current and DATADIR directory.
+*     photsum --begin=5 --end=100
+*       Generate a detailed log of all photometry and skydip data from 
+*       scans 5 to 100 inclusive.
+*     photsum -all -reduced
+*       Produce a one line summary of all reduced (_red_) photometry files.
+*     photsum -all -reduced > log.txt
+*       Produce a one line summary of all the reduced photometry files 
+*       and store the output in the text file log.txt (note this example is
+*       shell specific).
+*     photsum -summary -all -reduced -demod
+*       Produce a summary of all reduced (_red_) and demodulated (_dem_)
+*       photometry data files (ie not files produced during off-line 
+*       data reduction).
+
+*  Notes:
+*    - Files are drawn from the current working directory and the directory
+*      indicated by the $DATADIR environment variable.
+*    - photsum requires that you have write access to directories containing
+*      data so that temporary files can be written. In general, this is
+*      not possible (or desirable) when using $DATADIR so the HDS_SCRATCH
+*      environment variable should be set to a writeable directory (usually
+*      /tmp). This step will only be necessary when accessing reduced data
+*      since temporary files are created when the DATA_ARRAY's are accessed.
+*    - Data reduced by the off-line system will all be treated as 
+*      run 0 for the purposes of listing unless numbers are present 
+*      in the filename.
+*    - The output can be stored in a file by using unix redirection as
+*      long as the search range is fully specified (either as `-all' or
+*      with `-begin' and `-end').
+*    - Command line options can be abbreviated.
+*    - RO files taken prior to Thursday August 15th 1996 will not show any
+*      useful log entry because the FITS information is not present.
+*    
+
+*.
+*-
