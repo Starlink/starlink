@@ -5937,10 +5937,10 @@ f     and PARAMS arguments are not used:
 *     oscillations at the edges of the data grid.
 *
 *     Unless otherwise noted in the following schemes (which are based
-*     on a 1-dimensional interpolation kernel), the value of
-c     "params[0]" should be used to specify how many pixels are to
-f     PARAMS(1) should be used to specify how many pixels are to
-*     contribute to the interpolated result on either side of the
+*     on a 1-dimensional interpolation kernel), the first element of
+c     the "params" array should be used to specify how many pixels are
+f     the PARAMS array should be used to specify how many pixels are
+*     to contribute to the interpolated result on either side of the
 *     interpolation point in each dimension (the nearest integer value
 *     is used). Typically a value of 2 is appropriate (the execution
 *     time increases rapidly with this number) and the minimum value
