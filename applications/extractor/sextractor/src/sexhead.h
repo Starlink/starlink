@@ -9,7 +9,7 @@
 *
 *	Contents:	header structure and templates for catalog data.
 *
-*	Last modify:	29/11/97
+*	Last modify:	25/05/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -103,5 +103,9 @@ keystruct	headkey[] = {
 	&prefs.mem_pixstack, H_INT, T_LONG, "%8d"},
   {"SEXFBUFS", "Image-buffer height (scanlines)",
 	&prefs.mem_bufsize, H_INT, T_LONG, "%5d"},
+  {"SEXMWSCL", "Measurement-weight re-scaling factor",
+	&thewfield1.sigfac, H_EXPO, T_FLOAT, "%-13G"},
+  {"SEXDWSCL", "Detection-weight re-scaling factor",
+	&thewfield2.sigfac, H_EXPO, T_FLOAT, "%-13G"},
   {""}};
 

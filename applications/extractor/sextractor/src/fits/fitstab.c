@@ -279,11 +279,11 @@ VERSION	15/02/96
 void	free_tab(tabstruct *tab)
 
   {
+
   free(tab->naxisn);
   free(tab->headbuf);
   free(tab->bodybuf);
   remove_keys(tab);
-
   free(tab);
 
   return;

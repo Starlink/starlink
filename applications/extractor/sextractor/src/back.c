@@ -9,7 +9,7 @@
 *
 *	Contents:	functions dealing with background computation.
 *
-*	Last modify:	28/11/98
+*	Last modify:	03/02/2000
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -23,24 +23,29 @@
 #include	"globals.h"
 #include	"back.h"
 #include	"field.h"
+#include	"weight.h"
 
 /******************************** makeback ***********************************/
 /*
-A background map is established from the frame itself; thus we need to make
-at least one first pass through the data.
+Background maps are established from the images themselves; thus we need to
+make at least one first pass through the data.
 */
-void	makeback(picstruct *field)
+void	makeback(picstruct *field, picstruct *wfield)
 
   {
-   backstruct	*backmesh, *bm;
-   PIXTYPE	*buf, *buft, *bufpos;
-   LONG		*histo;
-   size_t	fcurpos, fcurpos2, bufsize, bufsize2, bufshift,
-		size,meshsize,jumpsize;
+   backstruct	*backmesh,*wbackmesh, *bm,*wbm;
+   PIXTYPE	*buf,*wbuf, *buft,*wbuft, *bufpos;
+   size_t	fcurpos,wfcurpos, wfcurpos2,fcurpos2, bufsize, bufsize2,
+		bufshift, size,meshsize,jumpsize;
    int		i,j,k,m,n, bin, step, nlines,
 		lastbite, w,bw,bwx, bh, nx,ny,nb, x,y,h, offset, nlevels,
-		lflag;
-   float	*sig, qscale, cste;
+		lflag, nr;
+   float	*ratio,*ratiop, *weight, *sigma,
+		qscale, cste, sratio;
+
+/* If the weight-map is not an external one, no stats are needed for it */
+  if (wfield && wfield->flags&(INTERP_FIELD|BACKRMS_FIELD))
+    wfield= NULL;
 
   w = field->width;
   bw = field->backw;
@@ -49,19 +54,17 @@ void	makeback(picstruct *field)
   ny = field->nbacky;
   nb = field->nback;
 
-  NFPRINTF(OUTPUT, "Setting up background map");
+  NFPRINTF(OUTPUT, "Setting up background maps");
 
 /* Decide if it is worth displaying progress each 16 lines */
 
   lflag = (field->width*field->backh >= (size_t)65536);
 
-/* Save current position in file */
+/* Save current positions in files */
 
-#ifdef MEMORY_READ
-  prefs.memlink_imaoffset = 0;
-#else
   QFTELL(fcurpos, field->file, field->filename);
-#endif /* ifdef MEMORY_READ */
+  if (wfield)
+    QFTELL(wfcurpos, wfield->file, wfield->filename);
 
 /* Allocate a correct amount of memory to store pixels */
 
@@ -78,13 +81,31 @@ void	makeback(picstruct *field)
     }
 
 /* Allocate some memory */
-
   QMALLOC(backmesh, backstruct, nx);		/* background information */
   QMALLOC(buf, PIXTYPE, bufsize);		/* pixel buffer */
+  free(field->back);
   QMALLOC(field->back, float, nb);		/* background map */
+  free(field->backline);
   QMALLOC(field->backline, PIXTYPE, w);		/* current background line */
+  free(field->sigma);
   QMALLOC(field->sigma, float, nb);		/* sigma map */
-  sig = field->sigma;
+  if (wfield)
+    {
+    QMALLOC(wbackmesh, backstruct, nx);		/* background information */
+    QMALLOC(wbuf, PIXTYPE, bufsize);		/* pixel buffer */
+    free(wfield->back);
+    QMALLOC(wfield->back, float, nb);		/* background map */
+    free(wfield->backline);
+    QMALLOC(wfield->backline, PIXTYPE, w);	/* current background line */
+    free(wfield->sigma);
+    QMALLOC(wfield->sigma, float, nb);		/* sigma map */
+    wfield->sigfac = 1.0;
+    }
+  else
+    {
+    wbackmesh = NULL;
+    wbuf = NULL;
+    }
 
 /* Loop over the data packets */
 
@@ -95,54 +116,42 @@ void	makeback(picstruct *field)
 	      j*bh);
     if (!nlines)
       {
+/*---- The image is small enough so that we can make exhaustive stats */
       if (j == ny-1 && field->npix%bufsize)
         bufsize = field->npix%bufsize;
-#    ifdef MEMORY_READ
-      memcpy(buf, prefs.memlink_ima+prefs.memlink_imaoffset,
-	bufsize*sizeof(PIXTYPE));
-      prefs.memlink_imaoffset += bufsize;
-#    else
       readdata(field, buf, bufsize);
-#    endif /* ifdef MEMORY_READ */
-      backstat(backmesh, buf, bufsize,nx, w, bw);
-      h = bufsize/w;
-      bm = backmesh;
-      bufpos = buf;
-      bwx = bw;
-      offset = w - bwx;
-      for (m=0; m++<nx; bm++ , bufpos+=bwx)
+      if (wfield)
         {
-        if (m==nx && (lastbite=w%bwx))
-          {
-          bwx = lastbite;
-          offset = w-bwx;
-          }
-        nlevels = bm->nlevels;
-        QCALLOC(bm->histo, LONG, nlevels);
-        histo = bm->histo;
-        qscale = bm->qscale;
-        cste = 0.499999 - bm->qzero/qscale;
-        buft = bufpos;
-        for (y=h; y--;)
-          {
-          for (x=bwx; x--;)
-            {
-            bin = (int)(*(buft++)/qscale + cste);
-            if (bin>=0 && bin<nlevels)
-              (*(histo+bin))++;
-            }
-          buft += offset;
-          }
+        readdata(wfield, wbuf, bufsize);
+        weight_to_var(wfield, wbuf, bufsize);
         }
+/*---- Build the histograms */
+      backstat(backmesh, wbackmesh, buf, wbuf, bufsize,nx, w, bw,
+	wfield?wfield->weight_thresh:0.0);
+      bm = backmesh;
+      for (m=nx; m--; bm++)
+        if (bm->mean <= -BIG)
+          bm->histo=NULL;
+        else
+          QCALLOC(bm->histo, LONG, bm->nlevels);
+      if (wfield)
+        {
+        wbm = wbackmesh;
+        for (m=nx; m--; wbm++)
+          if (wbm->mean <= -BIG)
+            wbm->histo=NULL;
+          else
+            QCALLOC(wbm->histo, LONG, wbm->nlevels);
+        }
+      backhisto(backmesh, wbackmesh, buf, wbuf, bufsize,nx, w, bw,
+	wfield?wfield->weight_thresh:0.0);
       }
     else
       {
-#    ifdef MEMORY_READ
-      fcurpos2 = prefs.memlink_imaoffset;
-#    else
+/*---- Image size too big, we have to skip a few data !*/
       QFTELL(fcurpos2, field->file, field->filename);
-#    endif /* ifdef MEMORY_READ */
-
+      if (wfield)
+        QFTELL(wfcurpos2, wfield->file, wfield->filename);
       if (j == ny-1 && (n=field->height%field->backh))
         {
         meshsize = n*(size_t)w;
@@ -153,118 +162,190 @@ void	makeback(picstruct *field)
         jumpsize = (step-1)*(size_t)w;
         free(buf);
         QMALLOC(buf, PIXTYPE, bufsize);		/* pixel buffer */
+        if (wfield)
+          {
+          free(wbuf);
+          QMALLOC(wbuf, PIXTYPE, bufsize);	/* pixel buffer */
+          }
         }
 
-#    ifdef MEMORY_READ
-      prefs.memlink_imaoffset += bufshift;
-#    else
+/*---- Read and skip, read and skip, etc... */
       QFSEEK(field->file, bufshift*field->bytepix, SEEK_CUR, field->filename);
-#    endif /* ifdef MEMORY_READ */
-
       buft = buf;
-      for (i=nlines; i--;)
+      for (i=nlines; i--; buft += w)
         {
-#      ifdef MEMORY_READ
-        memcpy(buft, prefs.memlink_ima+prefs.memlink_imaoffset,
-		w*sizeof(PIXTYPE));
-        prefs.memlink_imaoffset += w;
-#      else
         readdata(field, buft, w);
-#      endif /* ifdef MEMORY_READ */
         if (i)
-#        ifdef MEMORY_READ
-          prefs.memlink_imaoffset += jumpsize;
-#        else
           QFSEEK(field->file, jumpsize*field->bytepix, SEEK_CUR,
 		field->filename);
-#        endif /* ifdef MEMORY_READ */
-        buft += w;
         }
-      backstat(backmesh,buf,bufsize, nx, w, bw);
-#    ifdef MEMORY_READ
-      prefs.memlink_imaoffset = fcurpos2;
-#    else
-      QFSEEK(field->file, fcurpos2, SEEK_SET, field->filename);
-#    endif /* ifdef MEMORY_READ */
 
+      if (wfield)
+        {
+/*------ Read and skip, read and skip, etc... now on the weight-map */
+        QFSEEK(wfield->file,bufshift*wfield->bytepix, SEEK_CUR,
+		wfield->filename);
+        wbuft = wbuf;
+        for (i=nlines; i--; wbuft += w)
+          {
+          readdata(wfield, wbuft, w);
+          weight_to_var(wfield, wbuft, w);
+          if (i)
+            QFSEEK(wfield->file, jumpsize*wfield->bytepix, SEEK_CUR,
+		wfield->filename);
+          }
+        }
+      backstat(backmesh, wbackmesh, buf, wbuf, bufsize, nx, w, bw,
+	wfield?wfield->weight_thresh:0.0);
+      QFSEEK(field->file, fcurpos2, SEEK_SET, field->filename);
       bm = backmesh;
       for (m=nx; m--; bm++)
         QCALLOC(bm->histo, LONG, bm->nlevels);
+      if (wfield)
+        {
+        QFSEEK(wfield->file, wfcurpos2, SEEK_SET, wfield->filename);
+        wbm = wbackmesh;
+        for (m=nx; m--; wbm++)
+          QCALLOC(wbm->histo, LONG, wbm->nlevels);
+        }
+/*---- Build (progressively this time) the histograms */
       for(size=meshsize, bufsize2=bufsize; size>0; size -= bufsize2)
         {
         if (bufsize2>size)
           bufsize2 = size;
-#      ifdef MEMORY_READ
-        memcpy(buf, prefs.memlink_ima+prefs.memlink_imaoffset,
-		bufsize2*sizeof(PIXTYPE));
-        prefs.memlink_imaoffset += bufsize2;
-#      else
         readdata(field, buf, bufsize2);
-#      endif /* ifdef MEMORY_READ */
-        h = bufsize2/w;
-        bm = backmesh;
-        bufpos = buf;
-        bwx = bw;
-        offset = w - bwx;
-        for (m=0; m++<nx; bm++, bufpos+=bwx)
+        if (wfield)
           {
-          if (m==nx && (lastbite=w%bwx))
-            {
-            bwx = lastbite;
-            offset = w-bwx;
-            }
-          nlevels = bm->nlevels;
-          histo = bm->histo;
-          qscale = bm->qscale;
-          cste = 0.499999 - bm->qzero/qscale;
-          buft = bufpos;
-          for (y=h; y--;)
-            {
-            for (x=bwx; x--;)
-              {
-              bin = (int)(*(buft++)/qscale + cste);
-              if (bin>=0 && bin<nlevels)
-                (*(histo+bin))++;
-              }
-            buft += offset;
-            }
+          readdata(wfield, wbuf, bufsize2);
+          weight_to_var(wfield, wbuf, bufsize2);
           }
+        backhisto(backmesh, wbackmesh, buf, wbuf, bufsize2, nx, w, bw,
+		wfield?wfield->weight_thresh:0.0);
         }
       }
-      
+
+    /*-- Compute background statistics from the histograms */
     bm = backmesh;
     for (m=0; m<nx; m++, bm++)
       {
       k = m+nx*j;
-      backguess(bm, field->back+k, sig+k);
+      backguess(bm, field->back+k, field->sigma+k);
       free(bm->histo);
+      }
+    if (wfield)
+      {
+      wbm = wbackmesh;
+      for (m=0; m<nx; m++, wbm++)
+        {
+        k = m+nx*j;
+        backguess(wbm, wfield->back+k, wfield->sigma+k);
+        free(wbm->histo);
+        }
       }
     }
 
 /* Free memory */
   free(buf);
   free(backmesh);
+  if (wfield)
+    {
+    free(wbackmesh);
+    free(wbuf);
+    }
 
 /* Go back to the original position */
-
-#ifdef MEMORY_READ
-  prefs.memlink_imaoffset = 0;
-#else
   QFSEEK(field->file, fcurpos, SEEK_SET, field->filename);
-#endif /* ifdef MEMORY_READ */
+  if (wfield)
+    QFSEEK(wfield->file, wfcurpos, SEEK_SET, wfield->filename);
 
 /* Median-filter and check suitability of the background map */
-  NFPRINTF(OUTPUT, "Filtering background map");
+  NFPRINTF(OUTPUT, "Filtering background map(s)");
   filterback(field);
+  if (wfield)
+    filterback(wfield);
+
+/* Compute normalization for variance- or weight-maps*/
+  if (wfield && wfield->flags&(VAR_FIELD|WEIGHT_FIELD))
+    {      
+    nr = 0;
+    QMALLOC(ratio, float, wfield->nback);
+    ratiop = ratio;
+    weight = wfield->back;
+    sigma = field->sigma;
+    for (i=wfield->nback; i--; sigma++)
+      if ((sratio=*(weight++)) > 0.0
+		&& (sratio = *sigma/sqrt(sratio)) > 0.0)
+        {
+        *(ratiop++) = sratio;
+        nr++;
+        }
+    wfield->sigfac = hmedian(ratio, nr);
+    for (i=0; i<nr && ratio[i]<=0.0; i++);
+    if (i<nr)
+      wfield->sigfac = hmedian(ratio+i, nr-i);
+    else
+      {
+      warning("Null or negative global weighting factor:","defaulted to 1");
+      wfield->sigfac = 1.0;
+      } 
+
+    free(ratio);
+    }
 
 /* Compute 2nd derivatives along the y-direction */
-  if (field->flags^WEIGHT_FIELD)
+  NFPRINTF(OUTPUT, "Computing backgound d-map");
+  free(field->dback);
+  field->dback = makebackspline(field, field->back);
+  NFPRINTF(OUTPUT, "Computing backgound-noise d-map");
+  free(field->dsigma);
+  field->dsigma = makebackspline(field, field->sigma);
+/* If asked for, force the backmean parameter to the supplied value */
+  if (field->back_type == BACK_ABSOLUTE)
+    field->backmean = (float)prefs.back_val[(field->flags&DETECT_FIELD)?0:1];
+
+/* Set detection/measurement threshold */
+  if (prefs.ndthresh > 1)
     {
-    NFPRINTF(OUTPUT, "Computing backgound d-map");
-    field->dback = makebackspline(field, field->back);
-    NFPRINTF(OUTPUT, "Computing backgound-noise d-map");
-    field->dsigma = makebackspline(field, field->sigma);
+     double	dval;
+
+    if (fabs(dval=prefs.dthresh[0] - prefs.dthresh[1])> 70.0)
+      error(EXIT_FAILURE,
+	"*Error*: I cannot deal with such extreme thresholds!", "");
+
+    field->dthresh = field->pixscale*field->pixscale*pow(10.0, -0.4*dval);
     }
+  else if (prefs.thresh_type[0]==THRESH_ABSOLUTE)
+    field->dthresh = prefs.dthresh[0];
+  else
+    field->dthresh = prefs.dthresh[0]*field->backsig;
+  if (prefs.nthresh > 1)
+    {
+     double	dval;
+
+    if (fabs(dval=prefs.thresh[0] - prefs.thresh[1]) > 70.0)
+      error(EXIT_FAILURE,
+	"*Error*: I cannot deal with such extreme thresholds!", "");
+
+    field->thresh = field->pixscale*field->pixscale*pow(10.0, -0.4*dval);
+    }
+  else if (prefs.thresh_type[1]==THRESH_ABSOLUTE)
+    field->thresh = prefs.thresh[0];
+  else
+    field->thresh = prefs.thresh[0]*field->backsig;
+
+#ifdef	QUALITY_CHECK
+  printf("%-10g %-10g %-10g\n", field->backmean, field->backsig,
+	(field->flags & DETECT_FIELD)? field->dthresh : field->thresh);
+#endif
+  if (field->dthresh<=0.0 || field->thresh<=0.0)
+    error(EXIT_FAILURE,
+	"*Error*: I cannot deal with zero or negative thresholds!", "");
+
+  if (prefs.detect_type == PHOTO
+	&& field->backmean+3*field->backsig > 50*field->ngamma)
+    error(EXIT_FAILURE,
+	"*Error*: The density range of this image is too large for ",
+	"PHOTO mode");
 
   return;
   }
@@ -272,62 +353,124 @@ void	makeback(picstruct *field)
 
 /******************************** backstat **********************************/
 /*
-compute robust statistical estimators in multiple background meshes.
+Compute robust statistical estimators in a row of meshes.
 */
-void	backstat(backstruct *backmesh, PIXTYPE *buf, size_t bufsize,
-			int n, int w, int bw)
+void	backstat(backstruct *backmesh, backstruct *wbackmesh,
+		PIXTYPE *buf, PIXTYPE *wbuf, size_t bufsize,
+			int n, int w, int bw, PIXTYPE wthresh)
 
   {
-   backstruct	*bm;
-   int		m,h,x,y, npix, offset, lastbite;
-   double	pix, sig, mean, sigma, step;
-   PIXTYPE	*buft, *bufpos, lcut, hcut;
+   backstruct	*bm, *wbm;
+   double	pix,wpix, sig, mean,wmean, sigma,wsigma, step;
+   PIXTYPE	*buft,*wbuft, *bufpos, lcut,wlcut, hcut,whcut;
+   int		m,h,x,y, npix,wnpix, offset, lastbite, ngood;
 
   h = bufsize/w;
   bm = backmesh;
+  wbm = wbackmesh;
   offset = w - bw;
-  bufpos = buf;
   step = sqrt(2/PI)*QUANTIF_NSIGMA/QUANTIF_AMIN;
-  for (m = n; m--; bm++,bufpos+=bw)
+  for (m = n; m--; bm++,buf+=bw)
     {
-    mean = sigma = 0.0;
     if (!m && (lastbite=w%bw))
       {
       bw = lastbite;
       offset = w-bw;
       }
-    buft = bufpos;
-    for (y=h; y--;)
+    mean = sigma = 0.0;
+    buft=buf;
+/*-- We separate the weighted case at this level to avoid penalty in CPU */
+    if (wbackmesh)
       {
-      for (x=bw; x--;)
-        {
-        mean += (pix = *(buft++));
-        sigma += pix*pix;
-        }
-      buft += offset;
+      wmean = wsigma = 0.0;
+      ngood = 0;
+      wbuft = wbuf;
+      for (y=h; y--; buft+=offset,wbuft+=offset)
+        for (x=bw; x--;)
+          {
+          pix = *(buft++);
+          if ((wpix = *(wbuft++)) < wthresh)
+            {
+            wmean += wpix;
+            wsigma += wpix*wpix;
+            mean += pix;
+            sigma += pix*pix;
+            ngood++;
+            }
+	  }
       }
+    else
+      for (y=h; y--; buft+=offset)
+        for (x=bw; x--;)
+          {
+          mean += (pix = *(buft++));
+          sigma += pix*pix;
+          }
     npix = bw*h;
+    if (wbackmesh)
+      {
+/*---- If not enough valid pixels, discard this mesh */
+      if ((float)ngood < (float)(npix*BACK_MINGOODFRAC))
+        {
+        bm->mean = bm->sigma = -BIG;
+        if (wbackmesh)
+          {
+          wbm->mean = wbm->sigma = -BIG;
+          wbm++;
+          wbuf += bw;
+          }
+        continue;
+        }
+      else
+        npix = ngood;
+      wmean /= (double)npix;
+      wsigma = (sig = wsigma/npix - wmean*wmean)>0.0? sqrt(sig):0.0;
+      wlcut = wbm->lcut = (PIXTYPE)(mean - 2.0*sigma);
+      whcut = wbm->hcut = (PIXTYPE)(mean + 2.0*sigma);
+      }
     mean /= (double)npix;
     sigma = (sig = sigma/npix - mean*mean)>0.0? sqrt(sig):0.0;
     lcut = bm->lcut = (PIXTYPE)(mean - 2.0*sigma);
     hcut = bm->hcut = (PIXTYPE)(mean + 2.0*sigma);
     mean = sigma = 0.0;
     npix = 0;
-    buft = bufpos;
-    for (y=h; y--;)
+    buft = buf;
+    if (wbackmesh)
       {
-      for (x=bw; x--;)
-        {
-        pix = *(buft++);
-        if (pix>=lcut && pix<=hcut)
+      wmean = wsigma = 0.0;
+      wnpix = 0;
+      wbuft=wbuf;
+      for (y=h; y--; buft+=offset, wbuft+=offset)
+        for (x=bw; x--;)
           {
-          mean += pix;
-          sigma += pix*pix;
-          npix++;
+          pix = *(buft++);
+          if ((wpix = *(wbuft++))<wthresh && pix<=hcut && pix>=lcut)
+            {
+            mean += pix;
+            sigma += pix*pix;
+            npix++;
+            if (wpix<=whcut && wpix>=wlcut)
+              {
+              wmean += wpix;
+              wsigma += wpix*wpix;
+              wnpix++;
+              }
+            }
           }
-        }
-      buft += offset;
       }
+    else
+      for (y=h; y--; buft+=offset)
+        for (x=bw; x--;)
+          {
+          pix = *(buft++);
+          if (pix<=hcut && pix>=lcut)
+            {
+            mean += pix;
+            sigma += pix*pix;
+            npix++;
+            }
+          }
+
     bm->npix = npix;
     mean /= (double)npix;
     sig = sigma/npix - mean*mean;
@@ -338,9 +481,174 @@ void	backstat(backstruct *backmesh, PIXTYPE *buf, size_t bufsize,
       bm->nlevels = QUANTIF_NMAXLEVELS;
     bm->qscale = sigma>0.0? 2*QUANTIF_NSIGMA*sigma/bm->nlevels : 1.0;
     bm->qzero = mean - QUANTIF_NSIGMA*sigma;
+    if (wbackmesh)
+      {
+      wbm->npix = wnpix;
+      wmean /= (double)wnpix;
+      sig = wsigma/wnpix - wmean*wmean;
+      wsigma = sig>0.0 ? sqrt(sig):0.0;
+      wbm->mean = wmean;
+      wbm->sigma = wsigma;
+      if ((wbm->nlevels = (int)(step*wnpix+1)) > QUANTIF_NMAXLEVELS)
+        wbm->nlevels = QUANTIF_NMAXLEVELS;
+      wbm->qscale = wsigma>0.0? 2*QUANTIF_NSIGMA*wsigma/wbm->nlevels : 1.0;
+      wbm->qzero = wmean - QUANTIF_NSIGMA*wsigma;
+      wbm++;
+      wbuf += bw;
+      }
     }
 
   return;
+  }
+
+
+/******************************** backhisto *********************************/
+/*
+Compute robust statistical estimators in a row of meshes.
+*/
+void	backhisto(backstruct *backmesh, backstruct *wbackmesh,
+		PIXTYPE *buf, PIXTYPE *wbuf, size_t bufsize,
+			int n, int w, int bw, PIXTYPE wthresh)
+  {
+   backstruct	*bm,*wbm;
+   PIXTYPE	*buft,*wbuft;
+   float	qscale,wqscale, cste,wcste, wpix;
+   LONG		*histo,*whisto;
+   int		h,m,x,y, nlevels,wnlevels, lastbite, offset, bin;
+
+  h = bufsize/w;
+  bm = backmesh;
+  wbm = wbackmesh;
+  offset = w - bw;
+  for (m=0; m++<n; bm++ , buf+=bw)
+    {
+    if (m==n && (lastbite=w%bw))
+      {
+      bw = lastbite;
+      offset = w-bw;
+      }
+/*-- Skip bad meshes */
+    if (bm->mean <= -BIG)
+      {
+      if (wbackmesh)
+        {
+        wbm++;
+        wbuf += bw;
+        }
+      continue;
+      }
+    nlevels = bm->nlevels;
+    histo = bm->histo;
+    qscale = bm->qscale;
+    cste = 0.499999 - bm->qzero/qscale;
+    buft = buf;
+    if (wbackmesh)
+      {
+      wnlevels = wbm->nlevels;
+      whisto = wbm->histo;
+      wqscale = wbm->qscale;
+      wcste = 0.499999 - wbm->qzero/wqscale;
+      wbuft = wbuf;
+      for (y=h; y--; buft+=offset, wbuft+=offset)
+        for (x=bw; x--;)
+          {
+          bin = (int)(*(buft++)/qscale + cste);
+          if (wpix = *(wbuft++)<wthresh && bin<nlevels && bin>=0)
+            {
+            (*(histo+bin))++;
+            bin = (int)(wpix/wqscale + wcste);
+            if (bin>=0 && bin<wnlevels)
+              (*(whisto+bin))++;
+            }
+          }
+      wbm++;
+      wbuf += bw;
+      }
+    else
+      for (y=h; y--; buft += offset)
+        for (x=bw; x--;)
+          {
+          bin = (int)(*(buft++)/qscale + cste);
+          if (bin>=0 && bin<nlevels)
+            (*(histo+bin))++;
+          }
+    }
+
+  return;
+  }
+
+/******************************* backguess **********************************/
+/*
+Estimate the background from a histogram;
+*/
+float	backguess(backstruct *bkg, float *mean, float *sigma)
+
+#define	EPS	(1e-4)	/* a small number */
+
+  {
+   LONG		*histo, *hilow, *hihigh, *histot;
+   unsigned long lowsum, highsum, sum;
+   double	ftemp, mea, sig, sig1, med, dpix;
+   int		i, n, lcut,hcut, nlevelsm1, pix;
+
+/* Leave here if the mesh is already classified as `bad' */
+  if (bkg->mean<=-BIG)
+    {
+    *mean = *sigma = -BIG;
+    return -BIG;
+    }
+
+  histo = bkg->histo;
+  hcut = nlevelsm1 = bkg->nlevels-1;
+  lcut = 0;
+
+  sig = 10.0*nlevelsm1;
+  sig1 = 1.0;
+  for (n=100; n-- && (sig>=0.1) && (fabs(sig/sig1-1.0)>EPS);)
+    {
+    sig1 = sig;
+    sum = mea = sig = 0.0;
+    lowsum = highsum = 0;
+    histot = hilow = histo+lcut;
+    hihigh = histo+hcut;
+    for (i=lcut; i<=hcut; i++)
+      {
+      if (lowsum<highsum)
+        lowsum += *(hilow++);
+      else
+        highsum +=  *(hihigh--);
+      sum += (pix = *(histot++));
+      mea += (dpix = (double)pix*i);
+      sig += dpix*i;
+      }
+
+    med = hihigh>=histo?
+	((hihigh-histo)+0.5+((double)highsum-lowsum)/(2.0*(*hilow>*hihigh?
+                                                *hilow:*hihigh)))
+       : 0.0;
+
+    if (sum)
+      {
+      mea /= (double)sum;
+      sig = sig/sum - mea*mea;
+      }
+    sig = sig>0.0?sqrt(sig):0.0;
+    lcut = (ftemp=med-3.0*sig)>0.0 ?(int)(ftemp>0.0?ftemp+0.5:ftemp-0.5):0;
+    hcut = (ftemp=med+3.0*sig)<nlevelsm1 ?(int)(ftemp>0.0?ftemp+0.5:ftemp-0.5)
+								: nlevelsm1;
+    }
+
+  *mean = fabs(sig)>0.0? (fabs(bkg->sigma/(sig*bkg->qscale)-1) < 0.0 ?
+			    bkg->qzero+mea*bkg->qscale
+			    :(fabs((mea-med)/sig)< 0.3 ?
+			      bkg->qzero+(2.5*med-1.5*mea)*bkg->qscale
+			     :bkg->qzero+med*bkg->qscale))
+                       :bkg->qzero+mea*bkg->qscale;
+
+  *sigma = sig*bkg->qscale;
+
+
+  return *mean;
   }
 
 
@@ -352,12 +660,13 @@ sources.
 void	filterback(picstruct *field)
 
   {
-   int		i,px,py, np, nx, npxm,npxp, npym,npyp, dpx,dpy, x,y;
    float	*back,*sigma, *back2,*sigma2, *bmask,*smask, *sigmat,
-		fthresh, med;
+		d2,d2min, fthresh, med, val,sval;
+   int		i,j,px,py, np, nx,ny, npxm,npxp, npym,npyp, dpx,dpy, x,y, nmin;
 
   fthresh = prefs.backfthresh;
   nx = field->nbackx;
+  ny = field->nbacky;
   np = field->nback;
   npxm = field->nbackfx/2;
   npxp = field->nbackfx - npxm;
@@ -370,9 +679,43 @@ void	filterback(picstruct *field)
   QMALLOC(smask, float, field->nbackfx*field->nbackfy);
   QMALLOC(back2, float, np);
   QMALLOC(sigma2, float, np);
+
   back = field->back;
   sigma = field->sigma;
 
+/* Look for `bad' meshes and interpolate them if necessary */
+  for (i=0,py=0; py<ny; py++)
+    for (px=0; px<nx; px++,i++)
+      if ((back2[i]=back[i])<=-BIG)
+        {
+/*------ Seek the closest valid mesh */
+        d2min = BIG;
+        nmin = 0.0;
+        for (j=0,y=0; y<ny; y++)
+          for (x=0; x<nx; x++,j++)
+            if (back[j]>-BIG)
+              {
+              d2 = (float)(x-px)*(x-px)+(y-py)*(y-py);
+              if (d2<d2min)
+                {
+                val = back[j];
+                sval = sigma[j];
+                nmin = 1;
+                d2min = d2;
+                }
+              else if (d2==d2min)
+                {
+                val += back[j];
+                sval += sigma[j];
+                nmin++;
+                }
+              }
+        back2[i] = nmin? val/nmin: 0.0;
+        sigma[i] = nmin? sval/nmin: 1.0;
+        }
+  memcpy(back, back2, (size_t)np*sizeof(float));
+
+/* Do the actual filtering */
   for (py=0; py<np; py+=nx)
     for (px=0; px<nx; px++)
       {
@@ -427,71 +770,6 @@ void	filterback(picstruct *field)
 
 
   return;
-  }
-
-
-/******************************* backguess **********************************/
-/*
-Estimate the background from a histogram;
-*/
-float	backguess(backstruct *bkg, float *mean, float *sigma)
-
-#define	EPS	(1e-4)	/* a small number */
-
-  {
-   LONG		*histo, *hilow, *hihigh, *histot;
-   unsigned long lowsum, highsum, sum;
-   double	ftemp, mea, sig, sig1, med, dpix;
-   int		i, n, lcut,hcut, nlevelsm1, pix;
-
-  histo = bkg->histo;
-  hcut = nlevelsm1 = bkg->nlevels-1;
-  lcut = 0;
-
-  sig = 10.0*nlevelsm1;
-  sig1 = 1.0;
-  for (n=100; n-- && (sig>=0.1) && (fabs(sig/sig1-1.0)>EPS);)
-    {
-    sig1 = sig;
-    sum = mea = sig = 0.0;
-    lowsum = highsum = 0;
-    histot = hilow = histo+lcut;
-    hihigh = histo+hcut;
-    for (i=lcut; i<=hcut; i++)
-      {
-      if (lowsum<highsum)
-        lowsum += *(hilow++);
-      else 
-        highsum +=  *(hihigh--);
-      sum += (pix = *(histot++));
-      mea += (dpix = (double)pix*i);
-      sig += dpix*i;
-      }
-
-    med = (hihigh-histo)+0.5+((double)highsum-lowsum)/(2.0*(*hilow>*hihigh?
-						*hilow:*hihigh));
-    if (sum)
-      {
-      mea /= (double)sum;
-      sig = sig/sum - mea*mea;
-      }
-    sig = sig>0.0?sqrt(sig):0.0;
-    lcut = (ftemp=med-3.0*sig)>0.0 ?(int)(ftemp>0.0?ftemp+0.5:ftemp-0.5):0;
-    hcut = (ftemp=med+3.0*sig)<nlevelsm1 ?(int)(ftemp>0.0?ftemp+0.5:ftemp-0.5)
-								: nlevelsm1;
-    }
-
- *mean = fabs(sig)>0.0? (fabs(bkg->sigma/(sig*bkg->qscale)-1) < 0.0 ?
-			    bkg->qzero+mea*bkg->qscale
-			    :(fabs((mea-med)/sig)< 0.3 ?
-			      bkg->qzero+(2.5*med-1.5*mea)*bkg->qscale
-			     :bkg->qzero+med*bkg->qscale))
-                       :bkg->qzero+mea*bkg->qscale;
-
-  *sigma = sig*bkg->qscale;
-
-
-  return *mean;
   }
 
 
@@ -575,23 +853,30 @@ float	localback(picstruct *field, objstruct *obj)
           }
       }
 
-    backstat(&backmesh, backpix, npix, 1, 1, 1);
-    QCALLOC(backmesh.histo, LONG, backmesh.nlevels);
-    bmh = backmesh.histo;
-    bmn = backmesh.nlevels;
-    cste = 0.499999 - backmesh.qzero/(bqs = backmesh.qscale);
-    bp = backpix;
-    for (i=npix; i--;)
+    if (npix)
       {
-      bin = (int)(*(bp++)/bqs + cste);
-      if (bin>=0 && bin<bmn)
-        (*(bmh+bin))++;
+      backstat(&backmesh, NULL, backpix, NULL, npix, 1, 1, 1, 0.0);
+      QCALLOC(backmesh.histo, LONG, backmesh.nlevels);
+      bmh = backmesh.histo;
+      bmn = backmesh.nlevels;
+      cste = 0.499999 - backmesh.qzero/(bqs = backmesh.qscale);
+      bp = backpix;
+      for (i=npix; i--;)
+        {
+        bin = (int)(*(bp++)/bqs + cste);
+        if (bin>=0 && bin<bmn)
+          (*(bmh+bin))++;
+        }
+      backguess(&backmesh, &bkg, &obj->sigbkg);
+      obj->bkg += (obj->dbkg = bkg);
+      free(backmesh.histo);
       }
-
+    else
+      {
+      obj->dbkg = 0.0;
+      obj->sigbkg = field->backsig;
+      }
     free(backpix);
-    backguess(&backmesh, &bkg, &obj->sigbkg);
-    obj->bkg += (obj->dbkg = bkg);
-    free(backmesh.histo);
     }
   else
     {
@@ -998,3 +1283,4 @@ void	endback(picstruct *field)
 
   return;
   }
+

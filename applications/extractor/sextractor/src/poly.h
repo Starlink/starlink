@@ -5,11 +5,11 @@
 *
 *	Part of:	A program using polynomial fits
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO) 
+*	Author:		E.BERTIN (IAP) 
 *
 *	Contents:	Include for poly.c
 *
-*	Last modify:	28/11/98
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -17,7 +17,7 @@
 /*--------------------------------- constants -------------------------------*/
 
 #define	POLY_MAXDIM		4	/* Max dimensionality of polynom */
-#define POLY_MAXDEGREE		6	/* Max degree of the polynom */
+#define POLY_MAXDEGREE		10	/* Max degree of the polynom */
 
 /*---------------------------------- macros ---------------------------------*/
 
@@ -27,16 +27,18 @@ typedef struct poly
   {
   double	*basis;		/* Current values of the basis functions */
   double	*coeff;		/* Polynom coefficients */
-  double	ncoeff;		/* Number of coefficients */
+  int		ncoeff;		/* Number of coefficients */
+  int		*group;		/* Groups */
   int		ndim;		/* dimensionality of the polynom */
-  int		*degree;	/* Degree in each dimension */
+  int		*degree;	/* Degree in each group */
+  int		ngroup;		/* Number of different groups */
   }	polystruct;
 
 /*---------------------------------- protos --------------------------------*/
 
-extern polystruct	*poly_init(int *dim, int ndim);
+extern polystruct	*poly_init(int *group,int ndim,int *degree,int ngroup);
 
-extern double		poly_func(polystruct *poly, double *pos);
+extern double			poly_func(polystruct *poly, double *pos);
 
 extern void		cholsolve(double *a, double *b, int n),
 			poly_end(polystruct *poly),

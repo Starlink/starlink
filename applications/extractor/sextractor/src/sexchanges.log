@@ -9,7 +9,7 @@
 *
 *       Contents:       log of changes made to the SExtractor source
 *
-*       Last modify:    13/01/99
+*       Last modify:    13/11/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -190,8 +190,10 @@ EB      07/05/98        getconv()       Uninitialized variable pb fixed.
 EB      12/05/98        loadstrip()     Bug in the production of BACKGROUND
                                         CHECK-image fixed.
 
-EB      28/05/98        define.h        new VECFLAG() macro for flagging arrays.
-                        prefs.h         Remove "&" before ptrs to static arrays.
+EB      28/05/98        define.h        new VECFLAG() macro for flagging
+                                        arrays.
+                        prefs.h         Remove "&" before ptrs to static
+                                        arrays.
 
 EB      13/06/98        initastrom()    Wrong mapping of PC components fixed.
                         readimagehead() Wrong mapping of CD components fixed.
@@ -241,14 +243,87 @@ EB      20/11/98        back.c          New BACK_FILTTHRESH parameter.
 EB      23/11/98        prefs.c
                         weight.c        Quick fix of MAP_RMS measurement mode.
 
-EB      26/11/98        -               New key->alloc flag to distinguish between
-                                        constant and dynamic pointers.
+EB      26/11/98        -               New key->alloc flag to distinguish
+                                        between constant and dynamic pointers.
 
 EB      28/11/98        -               lint warnings fixed.
 
 EB      29/11/98        assoc.c         New ASSOC_TYPE NEAREST option.
 
-EB      28/12/98        catout.c        Added dependency between flux_auto and flux_radius
+EB      28/12/98        catout.c        Added dependency between flux_auto and
+                                        flux_radius
 
-EB      13/01/99        endobject()     Fixed numbering problem in SEGMENTATION maps when
-                                        CLEAN is N.
+EB      13/01/99        endobject()     Fixed numbering problem in SEGMENTATION
+                                        maps when CLEAN is N.
+
+EB      27/01/99        load_assoc()    Stupid bug in 2 ASSOC_PARAMS mode
+                                        fixed.
+
+EB      19/02/99        examineiso()    Variable thresholding is now taken into
+                                        account for S/G classification and
+                                        FWHMs.
+
+EB      25/02/99        types.h         Wrong data-type for BACK_VALUE fixed.
+
+EB      02/03/99        examineiso()    XPEAK and YPEAK offset bug fixed.
+
+EB      06/04/99        -               Unused variables removed.
+                        clean.c
+                        scan.c          New handling of CLEANed blanked
+					detections.
+
+EB      08/04/99        -               Various memory leaks fixed
+                        readimage()     BACKGROUND_RMS check-images now
+                                        operational in single-image mode.
+
+EB      15/04/99        param.h         Remove the 0's from the formatting
+                                        of flags.
+
+EB      21/04/99        -               New _PROFILE photometric parameters.
+
+EB      06/05/99        examineiso()    Potential bug in the threshs[i] fixed.
+                        readimage()     Bug in BACKGROUND_RMS mode fixed.
+
+EB      11/05/99        -               Major change: handling of weight-maps
+                                        during the background processing.
+                                        New WEIGHT_GAIN parameter.
+
+EB      19/05/99        scanimage()     Important "bug" fix: slight differences
+                                        between single- and double-image modes
+                                        supressed.
+
+EB      24/05/99        makeback()      Memory leak in double-weight/single-
+                                        image mode fixed.
+                        makeit()        New info display.
+                        inheritfield()  Interpolation flag is no longer
+                                        inherited (fixes a bug in some weird
+                                        double-weight-maps configs).
+
+EB      12/08/99        endfield()      Fixed segmentation fault at the end
+                                        of processing when ASSOC is used.
+                        psf_load()      Remove malloc() of null-size data
+                                        with constant PSFs.
+
+EB      10/09/99        makeit()        Background pb in WEIGHT_TYPE NONE,...
+                                        fixed.
+
+EB      14/09/99        back()          Replacement value for bad variance map
+                                        background meshes changed to 1.0
+                        scanimage()     Bug with THRESH_TYPE ABSOLUTE in
+                                        WEIGHTing mode fixed.
+
+EB      30/09/99        fitsread()      The quote (') symbol is now properly
+                                        handled in FITS headers.
+
+EB      07/10/99        scanimage()     Removed debug information inadvertently
+                                        left in the previous release.
+
+EB      24/01/2000      computeautoflux()
+                                        Small inaccuracy in crowding-flag
+                                        positioning fixed.
+
+EB      01/02/2000      localback()     Fixed division by zero in local background
+					estimates of some heavily deblended
+					detections in MASK_TYPE CORRECT mode.
+EB      03/02/2000      makeback()      Risk of segmentation fault with huge weight
+                                        maps fixed.

@@ -9,7 +9,7 @@
 *
 *	Contents:	Astrometrical computations.
 *
-*	Last modify:	13/06/98
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -522,7 +522,7 @@ void	precess(double yearin, double alphain, double deltain,
 		double yearout, double *alphaout, double *deltaout)
 
   {
-   double	dzeta,theta,z, t1,t1t1,t1t1t1,t2,t2t2,t2t2t2,
+   double	dzeta,theta,z, t1,t1t1, t2,t2t2,t2t2t2,
 		cddsadz, cddcadz, cdd, sdd, adz, cdin,sdin,ct,st,caindz;
 
   alphain *= DEG;
@@ -530,7 +530,7 @@ void	precess(double yearin, double alphain, double deltain,
 
   t1 = (yearin - 2000.0)/1000.0;
   t2 = (yearout - yearin)/1000.0;
-  t1t1t1 = (t1t1 = t1*t1)*t1;
+  t1t1 = t1*t1;
   t2t2t2 = (t2t2 = t2*t2)*t2;
   theta = (97171.735e-06 - 413.691e-06*t1 - 1.052e-06 * t1t1) * t2
 	+ (-206.846e-06 - 1.052e-06*t1) * t2t2 - 202.812e-06 * t2t2t2;

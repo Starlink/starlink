@@ -9,7 +9,7 @@
 *
 *	Contents:	low-level functions for handling LDAC FITS catalogs.
 *
-*	Last modify:	25/04/97
+*	Last modify:	13/03/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -185,15 +185,15 @@ INPUT	A pointer to both catalog structures.
 OUTPUT	RETURN_OK if at least one table was copied, RETURN_ERROR otherwise.
 NOTES	The output catalog should be ``cleaned'' before call.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	25/04/96
+VERSION	13/03/99
  ***/
 int	inherit_cat(catstruct *catin, catstruct *catout)
 
   {
    tabstruct	*tabin, *tabout, *prevtabout;
-   int		j, ntab;
+   int		j;
 
-  ntab = catout->ntab = 1;
+  catout->ntab = 1;
   tabin = catin->tab;
 
 /*copy only one table: well it could be simpler, but let's stay general!*/
@@ -324,7 +324,6 @@ int	map_cat(catstruct *cat)
 
   cat->ntab = ntab;
   free(tab);
-
   if (prevtab)
     {
     prevtab->nexttab = cat->tab;

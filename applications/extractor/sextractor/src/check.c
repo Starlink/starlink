@@ -9,7 +9,7 @@
 *
 *	Contents:	handling of "check-images".
 *
-*	Last modify:	23/11/98
+*	Last modify:	10/05/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -348,17 +348,6 @@ void	writecheck(checkstruct *check, PIXTYPE *data, int w)
       *(pixt++) = (*data>-BIG)? *data:0.0;
     data = check->line;
     }
-  else if (check->type == CHECK_BACKRMS)
-    {
-     int	i;
-     PIXTYPE	*pixt;
-
-    pixt = check->line;
-    for (i=w; i--;)
-      *(pixt++) = (PIXTYPE)sqrt(*(data++));
-    data = check->line;
-    }
-
 
 # ifdef BSWAP
   swapbytes(data, sizeof(PIXTYPE), w);
@@ -394,6 +383,8 @@ void	endcheck(picstruct *field, checkstruct *check)
     case CHECK_FILTERED:
     case CHECK_SUBTRACTED:
       free(check->pix);
+      free(check->line);
+      check->line = NULL;
       padsize = (FBSIZE -((check->npix*sizeof(PIXTYPE))%FBSIZE)) % FBSIZE;
       break;
 

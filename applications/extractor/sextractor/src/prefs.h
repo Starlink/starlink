@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Keywords for the configuration file.
 *
-*	Last modify:	29/11/98
+*	Last modify:	12/11/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -110,6 +110,9 @@ pkeystruct key[] =
    {""}, 1, MAXNAPER, &prefs.nflux_frac},
   {"PIXEL_SCALE", P_FLOAT, &prefs.pixel_scale, 0,0, 0.0, 1e+10},
   {"PSF_NAME", P_STRING, prefs.psf_name},
+  {"PSF_NMAX", P_INT, &prefs.psf_npsfmax, 1, PSF_NPSFMAX},
+  {"PSFDISPLAY_TYPE", P_KEY, &prefs.psfdisplay_type, 0,0, 0.0,0.0,
+   {"SPLIT","VECTOR",""}},
   {"SATUR_LEVEL", P_FLOAT, &prefs.satur_level, 0,0, -1e+30, 1e+30},
   {"SEEING_FWHM", P_FLOAT, &prefs.seeing_fwhm, 0,0, 1e-10, 1e+10},
   {"SOM_NAME", P_STRING, prefs.som_name},
@@ -119,6 +122,7 @@ pkeystruct key[] =
     1, 2, &prefs.nthresh_type},
   {"VERBOSE_TYPE", P_KEY, &prefs.verbose_type, 0,0, 0.0,0.0,
    {"QUIET","NORMAL", "EXTRA_WARNINGS", "FULL",""}},
+  {"WEIGHT_GAIN", P_BOOL, &prefs.weightgain_flag},
   {"WEIGHT_IMAGE", P_STRINGLIST, prefs.wimage_name, 0,0,0.0,0.0,
     {""}, 0, MAXIMAGE, &prefs.nwimage_name},
   {"WEIGHT_THRESH", P_FLOATLIST, prefs.weight_thresh, 0,0, 0.0, BIG,
@@ -159,9 +163,12 @@ char *default_prefs[] =
   "PHOT_AUTOAPERS	0.0,0.0",
   "PHOT_FLUXFRAC	0.5",
   "PSF_NAME		default.psf",
+  "PSF_NMAX		11",
+  "PSFDISPLAY_TYPE	SPLIT",
   "SOM_NAME		default.som",
   "THRESH_TYPE		RELATIVE",
   "VERBOSE_TYPE		NORMAL",
+  "WEIGHT_GAIN		Y",
   "WEIGHT_IMAGE		weight.fits",
   "WEIGHT_TYPE      	NONE",
   "WEIGHT_THRESH	",

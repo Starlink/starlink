@@ -9,7 +9,7 @@
 *
 *	Contents:	global declarations.
 *
-*	Last modify:	28/11/98
+*	Last modify:	25/05/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -20,7 +20,7 @@
 
 sexcatstruct		cat;
 prefstruct		prefs;
-picstruct		thefield1, thefield2;
+picstruct		thefield1,thefield2, thewfield1,thewfield2;
 objstruct		flagobj;
 obj2struct		flagobj2;
 extern obj2struct	outobj2;

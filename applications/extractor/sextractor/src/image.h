@@ -16,7 +16,7 @@
 
 /*----------------------------- Internal constants --------------------------*/
 
-#define INTERPW		6	/* Interpolation function range (x) */
+#define INTERPW	6		/* Interpolation function range (x) */
 #define INTERPH		6	/* Interpolation function range (y) */
 
 #define INTERPF(x)	(x==0.0?1.0:sin(PI*x)*sin(PI*x/3.0)/(PI*PI/3.0*x*x))

@@ -9,7 +9,7 @@
 *
 *	Contents:	main program.
 *
-*	Last modify:	13/01/99
+*	Last modify:	10/09/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -54,14 +54,16 @@ void	makeit()
 
   NFPRINTF(OUTPUT, "Setting catalog parameters");
   readcatparams(prefs.param_name);
+  useprefs();			/* update things accor. to prefs parameters */
 
-  if (FLAG(obj2.flux_psf))
+  if (prefs.psf_flag)
     {
     NFPRINTF(OUTPUT, "Reading PSF information");
     thepsf = psf_load(prefs.psf_name); 
+ /*-- Need to check things up because of PSF context parameters */
+    updateparamflags();
+    useprefs();
     }
-
-  useprefs();			/* update things accor. to prefs parameters */
 
   if (prefs.filter_flag)
     {
@@ -96,6 +98,7 @@ void	makeit()
   if (prefs.growth_flag)
     initgrowth();
 
+/* Init the Detection and Measurement-images */
   if (prefs.dimage_flag)
     {
     dfield = newfield(prefs.image_name[0], DETECT_FIELD);
@@ -103,34 +106,22 @@ void	makeit()
     if ((field->width!=dfield->width) || (field->height!=dfield->height))
       error(EXIT_FAILURE, "*Error*: Frames have different sizes","");
 /*-- Prepare interpolation */
-    if (prefs.weight_flag && prefs.interp_type[0] == INTERP_ALL)
+    if (prefs.dweight_flag && prefs.interp_type[0] == INTERP_ALL)
       init_interpolate(dfield, -1, -1);
     if (prefs.interp_type[1] == INTERP_ALL)
       init_interpolate(field, -1, -1);
-/*-- Copy field structures to static ones (for catalog info) */
-    thefield1 = *field;
-    thefield2 = *dfield;
     }
   else
     {
     field = newfield(prefs.image_name[0], DETECT_FIELD | MEASURE_FIELD);
 /*-- Prepare interpolation */
-    if (prefs.weight_flag && prefs.interp_type[0] == INTERP_ALL)
+    if ((prefs.dweight_flag || prefs.weight_flag)
+	&& prefs.interp_type[0] == INTERP_ALL)
       init_interpolate(field, -1, -1);       /* 0.0 or anything else */
-    thefield1 = thefield2 = *field;
-    }
-
-  for (i=0; i<prefs.nimaflag; i++)
-    {
-    pffield[i] = newfield(prefs.fimage_name[i], FLAG_FIELD);
-    if ((pffield[i]->width!=field->width)
-	|| (pffield[i]->height!=field->height))
-      error(EXIT_FAILURE,
-	"*Error*: Incompatible FLAG-map size in ", prefs.fimage_name[i]);
     }
 
 /* Init the WEIGHT-images */
-  if (prefs.weight_flag) 
+  if (prefs.dweight_flag || prefs.weight_flag) 
     {
      weightenum	wtype;
      PIXTYPE	interpthresh;
@@ -145,10 +136,7 @@ void	makeit()
         wtype = prefs.weight_type[1];
         interpthresh = prefs.weight_thresh[1];
 /*------ Convert the interpolation threshold to variance units */
-        if (wtype == WEIGHT_FROMWEIGHTMAP)
-          weight_to_var(wfield, &interpthresh, 1);
-        else if (wtype == WEIGHT_FROMRMSMAP || wtype == WEIGHT_FROMBACK)
-          rms_to_var(wfield, &interpthresh, 1);
+        weight_to_var(wfield, &interpthresh, 1);
         wfield->weight_thresh = interpthresh;
         if (prefs.interp_type[1] != INTERP_NONE)
           init_interpolate(wfield,
@@ -157,20 +145,18 @@ void	makeit()
 /*---- The "detection" weights */
       if (prefs.weight_type[0] != WEIGHT_NONE)
         {
+        interpthresh = prefs.weight_thresh[0];
         if (prefs.weight_type[0] == WEIGHT_FROMINTERP)
+          {
           dwfield=newweight(prefs.wimage_name[0],wfield,prefs.weight_type[0]);
+          weight_to_var(wfield, &interpthresh, 1);
+          }
         else
+          {
           dwfield = newweight(prefs.wimage_name[0], dfield?dfield:field,
 		prefs.weight_type[0]);
-/*------ Interpolated weight-fields lack info about the orig. weight-type */
-        wtype = (prefs.weight_type[0] == WEIGHT_FROMINTERP)?
-		prefs.weight_type[1]: prefs.weight_type[0];
-        interpthresh = prefs.weight_thresh[0];
-/*------ Convert the interpolation threshold to variance units */
-        if (wtype == WEIGHT_FROMWEIGHTMAP)
           weight_to_var(dwfield, &interpthresh, 1);
-        else if (wtype == WEIGHT_FROMRMSMAP || wtype == WEIGHT_FROMBACK)
-          rms_to_var(dwfield, &interpthresh, 1);
+          }
         dwfield->weight_thresh = interpthresh;
         if (prefs.interp_type[0] != INTERP_NONE)
           init_interpolate(dwfield,
@@ -185,16 +171,60 @@ void	makeit()
       wtype = prefs.weight_type[0];
       interpthresh = prefs.weight_thresh[0];
 /*---- Convert the interpolation threshold to variance units */
-      if (wtype == WEIGHT_FROMWEIGHTMAP)
-        weight_to_var(wfield, &interpthresh, 1);
-      else if (wtype == WEIGHT_FROMRMSMAP || wtype == WEIGHT_FROMBACK)
-        rms_to_var(wfield, &interpthresh, 1);
+      weight_to_var(wfield, &interpthresh, 1);
       wfield->weight_thresh = interpthresh;
       if (prefs.interp_type[0] != INTERP_NONE)
         init_interpolate(wfield,
 		prefs.interp_xtimeout[0], prefs.interp_ytimeout[0]);
       }
     }
+
+/* Init the FLAG-images */
+  for (i=0; i<prefs.nimaflag; i++)
+    {
+    pffield[i] = newfield(prefs.fimage_name[i], FLAG_FIELD);
+    if ((pffield[i]->width!=field->width)
+	|| (pffield[i]->height!=field->height))
+      error(EXIT_FAILURE,
+	"*Error*: Incompatible FLAG-map size in ", prefs.fimage_name[i]);
+    }
+
+/* Compute background maps for `standard' fields */
+  QPRINTF(OUTPUT, dfield? "Measurement image:"
+			: "Detection+Measurement image: ");
+  makeback(field, wfield);
+  QPRINTF(OUTPUT, (dfield || (dwfield&&dwfield->flags^INTERP_FIELD))? "(M)   "
+		"Background: %-10g RMS: %-10g / Threshold: %-10g \n"
+		: "(M+D) "
+		"Background: %-10g RMS: %-10g / Threshold: %-10g \n",
+	field->backmean, field->backsig, (field->flags & DETECT_FIELD)?
+	field->dthresh: field->thresh);
+  if (dfield)
+    {
+    QPRINTF(OUTPUT, "Detection image: ");
+    makeback(dfield, dwfield? dwfield
+			: (prefs.weight_type[0] == WEIGHT_NONE?NULL:wfield));
+    QPRINTF(OUTPUT, "(D)   "
+		"Background: %-10g RMS: %-10g / Threshold: %-10g \n",
+	dfield->backmean, dfield->backsig, dfield->dthresh);
+    }
+  else if (dwfield && dwfield->flags^INTERP_FIELD)
+    {
+    makeback(field, dwfield);
+    QPRINTF(OUTPUT, "(D)   "
+		"Background: %-10g RMS: %-10g / Threshold: %-10g \n",
+	field->backmean, field->backsig, field->dthresh);
+    }
+
+/* For interpolated weight-maps, copy the background structure */
+  if (dwfield && dwfield->flags&(INTERP_FIELD|BACKRMS_FIELD))
+    copyback(dwfield->reffield, dwfield);
+  if (wfield && wfield->flags&(INTERP_FIELD|BACKRMS_FIELD))
+    copyback(wfield->reffield, wfield);
+
+/* Prepare learn and/or associations */
+  if (prefs.assoc_flag)
+    init_assoc(field);                  /* initialize assoc tasks */
 
 /* Init the CHECK-images */
   if (prefs.check_flag)
@@ -215,12 +245,28 @@ void	makeit()
    }
 
 /* Initialize PSF contexts and workspace */
-
-  if (FLAG(obj2.flux_psf))
+  if (prefs.psf_flag)
     {
     psf_readcontext(thepsf, field);
     psf_init(thepsf);
     }
+
+/* Copy field structures to static ones (for catalog info) */
+  if (dfield)
+    {
+    thefield1 = *field;
+    thefield2 = *dfield;
+    }
+  else
+    thefield1 = thefield2 = *field;
+
+  if (wfield)
+    {
+    thewfield1 = *wfield;
+    thewfield2 = dwfield? *dwfield: *wfield;
+    }
+  else if (dwfield)
+    thewfield2 = *dwfield;
 
   NFPRINTF(OUTPUT, "Initializing catalog");
   initcat(field);
@@ -253,6 +299,9 @@ void	makeit()
 
   endcat();
 
+/* Close ASSOC routines */
+  end_assoc(field);
+
   for (i=0; i<prefs.nimaflag; i++)
     endfield(pffield[i]);
   endfield(field);
@@ -272,14 +321,13 @@ void	makeit()
   if (prefs.growth_flag)
     endgrowth();
 
-  if (FLAG(obj2.flux_psf))
+  if (prefs.psf_flag)
     psf_end(thepsf);
 
   if (FLAG(obj2.sprob))
     neurclose();
 
-  if (prefs.verbose_type != QUIET)
-    fprintf(OUTPUT, "Objects: detected %-8d / sextracted %-8d\n",
+  QPRINTF(OUTPUT, "Objects: detected %-8d / sextracted %-8d\n",
 	cat.ndetect, cat.ntotal);
 /*
   if (FLAG(obj.retinout))

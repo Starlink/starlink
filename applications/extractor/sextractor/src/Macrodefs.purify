@@ -4,8 +4,8 @@
 # E.BERTIN 1997
 #
 SEXMACHINE= purify
-CC    = cc				# the C compiler
-COPTS = purify cc -fast -xO5 -DSUN_SOLARIS		# options for the C compiler
+CC    = purify cc				# the C compiler
+COPTS = -fast -xO5 -DSUN_SOLARIS		# options for the C compiler
 CD    = cd
 CP    = cp
 RM    = rm -f

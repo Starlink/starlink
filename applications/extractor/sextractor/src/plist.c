@@ -183,17 +183,18 @@ void	init_plist(void)
     plistexist_var = 1;
     plistoff_var = plistsize;
     plistsize += sizeof(PIXTYPE);
-    if (prefs.dweight_flag)
-      {
-      plistexist_dthresh = 1;
-      plistoff_dthresh = plistsize;
-      plistsize += sizeof(PIXTYPE);
-      }
-    else
-      plistexist_dthresh = 0;
     }
   else
     plistexist_var = 0;
+
+  if (prefs.dweight_flag)
+    {
+    plistexist_dthresh = 1;
+    plistoff_dthresh = plistsize;
+    plistsize += sizeof(PIXTYPE);
+    }
+  else
+    plistexist_dthresh = 0;
 
   return;
   }

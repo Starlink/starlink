@@ -5,11 +5,11 @@
 *
 *	Part of:	A program using Polynomials
 *
-*	Author:		E.BERTIN (IAP, Leiden observatory & ESO)
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Polynomial fitting
 *
-*	Last modify:	28/11/98
+*	Last modify:	05/04/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -17,6 +17,7 @@
 #include	<math.h>
 #include	<stdio.h>
 #include	<stdlib.h>
+#include	<string.h>
 
 #include	"define.h"
 #include	"globals.h"
@@ -24,20 +25,24 @@
 
 
 /****** poly_init ************************************************************
-PROTO   polystruct *poly_init(int *dim, int ndim)
+PROTO   polystruct *poly_init(int *group, int ndim, int *degree, int ngroup)
 PURPOSE Allocate and initialize a polynom structure.
-INPUT   1D array of degrees of the polynom,
-        number of dimensions.
+INPUT   1D array containing the group for each parameter,
+        number of dimensions (parameters),
+        1D array with the polynomial degree for each group,
+        number of groups.
 OUTPUT  polystruct pointer.
 NOTES   -.
-AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 16/07/98
+AUTHOR  E. Bertin (IAP)
+VERSION 11/02/99
  ***/
-polystruct	*poly_init(int *dim, int ndim)
+polystruct	*poly_init(int *group, int ndim, int *degree, int ngroup)
   {
    polystruct	*poly;
    char		str[MAXCHAR];
-   int		d;
+   static int	nd[POLY_MAXDIM];
+   int		*groupt,
+		d,g,n,num,den;
 
   QCALLOC(poly, polystruct, 1);
   if ((poly->ndim=ndim) > POLY_MAXDIM)
@@ -47,23 +52,46 @@ polystruct	*poly_init(int *dim, int ndim)
     error(EXIT_FAILURE, "*Error*: ", str);
     }
 
-  QMALLOC(poly->degree, int, poly->ndim);
+  if (ndim)
+    QMALLOC(poly->group, int, poly->ndim);
+    for (groupt=poly->group, d=ndim; d--;)
+      *(groupt++) = *(group++)-1;
 
-/* Fill the "degree" array and compute the total number of coefficients */
-  poly->ncoeff = 1;
-  for (d=0; d<ndim; d++)
+  poly->ngroup = ngroup;
+  if (ngroup)
     {
-    if ((poly->degree[d]=*(dim++))>POLY_MAXDEGREE)
+    group = poly->group;	/* Forget the original *group */
+
+    QMALLOC(poly->degree, int, poly->ngroup);
+
+/*-- Compute the number of context parameters for each group */
+    memset(nd, 0, ngroup*sizeof(int));
+    for (d=0; d<ndim; d++)
+      {
+      if ((g=group[d])>ngroup)
+        error(EXIT_FAILURE, "*Error*: polynomial GROUP out of range", "");
+      nd[g]++;
+      }
+    }
+
+/* Compute the total number of coefficients */
+  poly->ncoeff = 1;
+  for (g=0; g<ngroup; g++)
+    {
+    if ((d=poly->degree[g]=*(degree++))>POLY_MAXDEGREE)
       {
       sprintf(str, "The degree of the polynom (%d) exceeds the maximum\n"
-		"allowed one (%d)", poly->degree[d], POLY_MAXDEGREE);
+		"allowed one (%d)", poly->degree[g], POLY_MAXDEGREE);
       error(EXIT_FAILURE, "*Error*: ", str);
       }
-    poly->ncoeff *= (poly->degree[d]+1);
+
+/*-- There are (n+d)!/(n!d!) coeffs per group, that is Prod_(i<=d) (n+i)/i */
+    for (num=den=1, n=nd[g]; d; num*=(n+d), den*=d--);
+    poly->ncoeff *= num/den;
     }
 
   QMALLOC(poly->basis, double, poly->ncoeff);
-  QMALLOC(poly->coeff, double, poly->ncoeff);
+  QCALLOC(poly->coeff, double, poly->ncoeff);
 
   return poly;
   }
@@ -76,13 +104,14 @@ INPUT   polystruct pointer.
 OUTPUT  -.
 NOTES   -.
 AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 01/07/98
+VERSION 28/01/99
  ***/
 void	poly_end(polystruct *poly)
   {
   free(poly->coeff);
   free(poly->basis);
   free(poly->degree);
+  free(poly->group);
   free(poly);
   }
 
@@ -94,57 +123,74 @@ INPUT   polystruct pointer,
         pointer to the 1D array of input vector data.
 OUTPUT  Polynom value.
 NOTES   Values of the basis functions are updated in poly->basis.
-AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 02/07/98
+AUTHOR  E. Bertin (IAP)
+VERSION 11/02/99
  ***/
 double	poly_func(polystruct *poly, double *pos)
   {
    static double	xpol[POLY_MAXDIM+1];
-   double		*post, *xpolt, *basis, *coeff, val;
-   static int		expo[POLY_MAXDIM+1];
-   int			*expot, *degree,*degreet,
-			d,t;
+   double		*post, *xpolt, *basis, *coeff, val, xval;
+   static int		expo[POLY_MAXDIM+1], gexpo[POLY_MAXDIM+1];
+   int			*expot, *degree,*degreet, *group,*groupt, *gexpot,
+			d,g,t, ndim;
 
 /* Prepare the vectors and counters */
+  ndim = poly->ndim;
   basis = poly->basis;
   coeff = poly->coeff;
+  group = poly->group;
   degree = poly->degree;
-  xpolt = xpol;
-  post = pos;
-  expot = expo;
-  for (d=poly->ndim; d--;)
+  if (ndim)
     {
-    *(xpolt++) = *(post++);
-    *(expot++) = 0;
+    for (xpolt=xpol, expot=expo, post=pos, d=ndim; --d;)
+      {
+      *(++xpolt) = 1.0;
+      *(++expot) = 0;
+      }
+    for (gexpot=gexpo, degreet=degree, g=poly->ngroup; g--;)
+      *(gexpot++) = *(degreet++);
+    if (gexpo[*group])
+      gexpo[*group]--;
     }
 
+/*
+*pos=1.001;*(pos+1)=1.0001;*(pos+2)=1.00001;
+*/
 /* The constant term is handled separately */
   val = *(coeff++);
   *(basis++) = 1.0;
+  *expo = 1;
+  *xpol = *pos;
 
 /* Compute the rest of the polynom */
   for (t=poly->ncoeff; --t; )
     {
 /*-- xpol[0] contains the current product of the x^n's */
-    val += *xpol**(coeff++);
-    *(basis++) = *xpol;
-
+    val += (*(basis++)=*xpol)**(coeff++);
 /*-- A complex recursion between terms of the polynom speeds up computations */
     post = pos;
+    groupt = group;
     expot = expo;
     xpolt = xpol;
-    degreet = degree;
-    for (d=poly->ndim; d--; expot++)
-      if ((++*expot) < *(degreet++))
+/*
+printf("%d%d%d %7.5f %7.5f %7.5f  %d %d\n",
+		*expo, *(expo+1), *(expo+2), *xpol,
+		*(xpol+1), *(xpol+2) , *gexpo, *(gexpo+1));
+*/
+    for (d=0; d<ndim; d++, groupt++)
+      if (gexpo[*groupt]--)
         {
-        *(xpolt++) *= *(post++);
+        ++*(expot++);
+        xval = (*(xpolt--) *= *post);
+        while (d--)
+          *(xpolt--) = xval;
         break;
         }
       else
         {
-        *expot = -1;
-        *xpolt = *(xpolt+1);
-        xpolt++;
+        gexpo[*groupt] = *expot;
+        *(expot++) = 0;
+        *(xpolt++) = 1.0;
         post++;
         }
     }
@@ -154,7 +200,7 @@ double	poly_func(polystruct *poly, double *pos)
 
 
 /****** poly_fit *************************************************************
-PROTO   void poly_fit(polystruct *poly, double *x, double *y, double *w,
+PROTO   double poly_fit(polystruct *poly, double *x, double *y, double *w,
         int ndata, double *extbasis)
 PURPOSE Least-Square fit of a multidimensional polynom to weighted data.
 INPUT   polystruct pointer,
@@ -169,7 +215,7 @@ NOTES   If different from NULL, extbasis can be provided to store the
         precomputed basis functions stored in extbasis are used (which saves
         CPU).
 AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 28/11/98
+VERSION 05/04/99
  ***/
 void	poly_fit(polystruct *poly, double *x, double *y, double *w, int ndata,
 		double *extbasis)
@@ -250,7 +296,7 @@ OUTPUT  -.
 NOTES   Based on Numerical Recipes, 2nd ed. (Chap 2.9). The matrix of
         coefficients must be symmetric and positive definite.
 AUTHOR  E. Bertin (IAP, Leiden observatory & ESO)
-VERSION 02/07/98
+VERSION 13/12/98
  ***/
 void	cholsolve(double *a, double *b, int n)
   {
@@ -262,7 +308,7 @@ void	cholsolve(double *a, double *b, int n)
 
 /* Cholesky decomposition */
   for (i=0; i<n; i++)
-    for (j=0; j<n; j++)
+    for (j=i; j<n; j++)
       {
       for (sum=a[i*n+j],k=i-1; k>=0; k--)
         sum -= a[i*n+k]*a[j*n+k];

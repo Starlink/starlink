@@ -9,7 +9,7 @@
 *
 *	Contents:	general functions for handling FITS file headers.
 *
-*	Last modify:	13/08/97
+*	Last modify:	13/03/99
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -73,7 +73,7 @@ int	get_head(tabstruct *tab)
   }
 
 
-/****** readbasic_head *********************************************************
+/****** read_fitsbasic *********************************************************
 PROTO	void readbasic_head(tabstruct *tab)
 PURPOSE	Read the current FITS header basic keywords.
 INPUT	pointer to catstruct.
@@ -197,9 +197,10 @@ int	readbintabparam_head(tabstruct *tab)
 
     sprintf(strk, "TTYPE%-3d", i+1);
     if (fitsread(tab->headbuf, strk, key->name, H_STRING, T_STRING)
-	!= RETURN_OK)
+	!= RETURN_OK) {
       error(EXIT_FAILURE,
 	"*Error*: Incorrect FITS binary-table header in ", cat->filename); 
+    }
     fitsread(tab->headbuf, strk, key->comment, H_HCOMMENT, T_STRING);
 
     sprintf(strk, "TUNIT%-3d", i+1);
@@ -210,9 +211,10 @@ int	readbintabparam_head(tabstruct *tab)
       strcpy(key->printf,tdisptoprintf(key->printf));
 
     sprintf(strk, "TFORM%-3d", i+1);
-    if (fitsread(tab->headbuf, strk, strf, H_STRING, T_STRING) != RETURN_OK)
+    if (fitsread(tab->headbuf, strk, strf, H_STRING, T_STRING) != RETURN_OK) {
       error(EXIT_FAILURE,
 	"*Error*: Incorrect FITS binary-table header in ", cat->filename); 
+    }
     key->pos = pos;
     pos += (key->nbytes = tsizeof(strf));
     key->ttype = ttypeof(strf);
@@ -241,7 +243,7 @@ int	readbintabparam_head(tabstruct *tab)
       if (fitsread(tab->headbuf, strk, strf, H_STRING, T_STRING) == RETURN_OK)
         {
         str = strf;
-        for (j=0; naxisn[j]=(int)strtol(str+1, &str, 10); j++);
+        for (j=0; (naxisn[j]=(int)strtol(str+1, &str, 10)); j++);
         key->naxis = j;
         }
       else
@@ -283,7 +285,7 @@ int	update_head(tabstruct *tab)
   {
    keystruct	*key;
    tabstruct	*ctab;
-   int		i,j,n, endpos;
+   int		i,j,n, endpos, naxis1;
    static char	strk[82], str[82];
 
 /* If not a binary table, do only a few basic things */
@@ -329,9 +331,20 @@ int	update_head(tabstruct *tab)
     }
 
 /*Change NAXIS1 in order to take into account changes in width*/
-  fitswrite(tab->headbuf, "NAXIS1  ", &tab->naxisn[0], H_INT, T_LONG);
+  naxis1 = 0;
+  key = tab->key;
+  if (tab->nkey>1000) {
+     for (i=0; i<MIN(999,tab->nkey); i++) {
+        naxis1 += key->nbytes;
+        key = key->nextkey;
+     }
+     fitswrite(tab->headbuf, "NAXIS1  ", &naxis1, H_INT, T_LONG);
+  } else {
+     fitswrite(tab->headbuf, "NAXIS1  ", &tab->naxisn[0], H_INT, T_LONG);
+  }
 
 /*Change NAXIS1 in the number of fields */
+  tab->tfields = MIN(999,tab->tfields);
   fitswrite(tab->headbuf, "TFIELDS ", &tab->tfields, H_INT, T_LONG);
 
 /*Changes in the number of elements (look for possible segments)*/
@@ -345,7 +358,9 @@ int	update_head(tabstruct *tab)
     return RETURN_ERROR;
 
   endpos = fitsfind(tab->headbuf, "END     ");
-  for (i=0; i<tab->nkey; i++)
+  if (tab->nkey>1000)
+     warning("Too many output keys, trashing the ones bejond 999", "");
+  for (i=0; i<MIN(999,tab->nkey); i++)
     {
 /*--Check that the new parameters will fit in the allocated memory space*/
     endpos += 2;
@@ -522,16 +537,15 @@ INPUT	TFORM string (see the FITS documentation).
 OUTPUT	size in bytes, or RETURN_ERROR if the TFORM is unknown.
 NOTES	-.
 AUTHOR	E. Bertin (IAP & Leiden observatory)
-VERSION	08/02/96
+VERSION	13/03/99
  ***/
 t_type	ttypeof(char *str)
 
   {
-   int	n;
    char	*str2;
 
   str2 = str;
-  n = strtol(str, &str2, 10);
+  strtol(str, &str2, 10);
   switch ((int)*str2)
     {
     case 'L': case 'B': case 'X':	return	T_BYTE;

@@ -5,11 +5,11 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *
 *	Contents:	Compute magnitudes and other photometrical parameters.
 *
-*	Last modify:	28/11/98
+*	Last modify:	24/01/2000
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -35,7 +35,7 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
 			offsetx,offsety,scalex,scaley,scale2, ngamma, locarea;
    double		tv, sigtv, area, pix, var, backnoise2, gain;
    int			x,y, x2,y2, xmin,xmax,ymin,ymax, sx,sy, w,h,
-			fymin,fymax, pflag,corrflag;
+			fymin,fymax, pflag,corrflag, gainflag;
    long			pos;
    PIXTYPE		*strip,*stript, *wstrip,*wstript,
 			wthresh;
@@ -51,6 +51,7 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
   ngamma = field->ngamma;
   pflag = (prefs.detect_type==PHOTO)? 1:0;
   corrflag = (prefs.mask_type==MASK_CORRECT);
+  gainflag = wfield && prefs.weightgain_flag;
   var = backnoise2 = field->backsig*field->backsig;
   gain = prefs.gain;
 /* Integration radius */
@@ -156,7 +157,7 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
         else
           sigtv += var*locarea;
         tv += locarea*pix;
-        if (wfield && pix>0.0 && gain>0.0)
+        if (gainflag && pix>0.0 && gain>0.0)
           sigtv += pix/gain*var/backnoise2;
         }
       }
@@ -170,7 +171,7 @@ void  computeaperflux(picstruct *field, picstruct *wfield,
   else
     {
     tv -= area*obj->dbkg;
-    if (!wfield && gain > 0.0 && tv>0.0)
+    if (!gainflag && gain > 0.0 && tv>0.0)
       sigtv += tv/gain;
     }
 
@@ -200,7 +201,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
 			dxlim, dylim;
    int			area,areab, x,y, x2,y2, xmin,xmax,ymin,ymax,
 			fymin,fymax, w,h,
-			pflag, corrflag, pos;
+			pflag, corrflag, gainflag, pos;
    PIXTYPE		*strip,*stript, *dstrip,*dstript, *wstrip,*wstript,
 			*dwstrip,*dwstript,
 			pix, wthresh,dwthresh;
@@ -226,6 +227,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
   gain = prefs.gain;
   pflag = (prefs.detect_type==PHOTO)? 1:0;
   corrflag = (prefs.mask_type==MASK_CORRECT);
+  gainflag = wfield && prefs.weightgain_flag;
 
 /* First step: find the extent of the ellipse (the kron factor r1) */
 /* Clip boundaries in x and y */
@@ -282,11 +284,12 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
     if (dwfield)
       dwstript = dwstrip + pos;
     for (x=xmin; x<xmax; x++, dstript++, dwstript++)
-      if ((pix=*dstript)>-BIG && (!dwfield || (dwfield&&*dwstript<dwthresh)))
+      {
+      dx = x - mx;
+      dy = y - my;
+      if ((r2=cx2*dx*dx + cy2*dy*dy + cxy*dx*dy) <= klim2)
         {
-        dx = x - mx;
-        dy = y - my;
-        if ((r2=cx2*dx*dx + cy2*dy*dy + cxy*dx*dy) <= klim2)
+        if ((pix=*dstript)>-BIG && (!dwfield || (dwfield&&*dwstript<dwthresh)))
           {
           area++;
           r1 += sqrt(r2)*pix;
@@ -295,6 +298,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
         }
       else
         areab++;
+      }
     }
 
   area += areab;
@@ -409,7 +413,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
           else
             sigtv += var;
           tv += pix;
-          if (wfield && pix>0.0 && gain>0.0)
+          if (gainflag && pix>0.0 && gain>0.0)
             sigtv += pix/gain*var/backnoise2;
           }
         }
@@ -427,7 +431,7 @@ void  computeautoflux(picstruct *field, picstruct *dfield, picstruct *wfield,
     else
       {
       tv -= area*bkg;
-      if (!wfield && gain > 0.0 && tv>0.0)
+      if (!gainflag && gain > 0.0 && tv>0.0)
         sigtv += tv/gain;
       }
     }
@@ -551,15 +555,26 @@ void  computemags(picstruct *field, objstruct *obj)
 			 1.086*obj2->fluxerr_somfit/obj2->flux_somfit
 			:99.0;
 
-/* Mag. PSF */
-  if (FLAG(obj2.mag_psf))
-    obj2->mag_psf = obj2->flux_psf>0.0?
-			 -2.5*log10(obj2->flux_psf) + prefs.mag_zeropoint
+/* Mag. PROFILE */
+  if (FLAG(obj2.mag_prof))
+    obj2->mag_prof = obj2->flux_prof>0.0?
+			 -2.5*log10(obj2->flux_prof) + prefs.mag_zeropoint
 			:99.0;
-  if (FLAG(obj2.magerr_psf))
-    obj2->magerr_psf = obj2->flux_psf>0.0?
-			 1.086*obj2->fluxerr_psf/obj2->flux_psf
+  if (FLAG(obj2.magerr_prof))
+    obj2->magerr_prof = obj2->flux_prof>0.0?
+			 1.086*obj2->fluxerr_prof/obj2->flux_prof
 			:99.0;
+
+/* Mag. GALFIT */
+  if (FLAG(obj2.mag_galfit))
+    obj2->mag_galfit = obj2->flux_galfit>0.0?
+			 -2.5*log10(obj2->flux_galfit) + prefs.mag_zeropoint
+			:99.0;
+  if (FLAG(obj2.magerr_galfit))
+    obj2->magerr_galfit = obj2->flux_galfit>0.0?
+			 1.086*obj2->fluxerr_galfit/obj2->flux_galfit
+			:99.0;
+
 /* SB units */
   if (FLAG(obj2.maxmu))
     outobj2.maxmu = obj->peak > 0.0 ?
