@@ -86,7 +86,7 @@
          parameter astfile {
             type LITERAL
             access READ
-            vpath prompt
+            vpath PROMPT
             ppath CURRENT DEFAULT
             prompt {Name of file containing exported AST framesets}
             default !

@@ -231,11 +231,11 @@ USESET = _LOGICAL (Read)
    separate NDF structures into a single HDS container file.
    If no Set header information is present in the input files, 
    then calibration is done on all the input files together,
-   so USESET can usually be safely set to TRUE (the default).
+   so USESET can usually be safely set to TRUE.
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 
 USEEXT
 

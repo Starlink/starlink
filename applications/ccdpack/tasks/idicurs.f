@@ -153,7 +153,7 @@
 *        [2,98]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether Set header information
-*        should be used in the object matching.  If USESET is true,
+*        should be used or not.  If USESET is true,
 *        IDICURS will try to group images according to their Set
 *        Name attribute before displaying them, rather than treating
 *        them one by one.  All images which share the same (non-blank)
@@ -170,7 +170,7 @@
 *
 *        If a global value for this parameter has been set using
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     VERBOSE = _LOGICAL (Read)
 *        If this parameter is true, then at the end of processing all
 *        the positions will be written through the CCDPACK log system.

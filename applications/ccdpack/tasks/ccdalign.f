@@ -212,7 +212,7 @@
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP than that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     WINX = INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area

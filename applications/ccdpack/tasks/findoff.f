@@ -235,7 +235,7 @@
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     USEWCS = _LOGICAL (Read)
 *        This parameter specifies whether the coordinates in the
 *        position lists should be transformed from Pixel coordinates

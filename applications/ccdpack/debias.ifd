@@ -310,7 +310,7 @@
             ppath GLOBAL CURRENT DEFAULT
             prompt "Use Set header information?[ccd_global]"
             association <-global.ccdpack_useset
-            default TRUE
+            default FALSE
             helpkey *
           }
 

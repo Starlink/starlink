@@ -349,7 +349,7 @@
 *        The data saturation value. Only used if SATURATE is TRUE.
 *
 *        If a global value has been set using CCDSETUP then this will
-*        be used.   If USESET is true then a value specific to the 
+*        be used.  If USESET is true then a value specific to the 
 *        Set Index of each image will be sought.
 *        [1.0D6]
 *     SETBAD = _LOGICAL (Read)
@@ -424,12 +424,12 @@
 *        be processed using a master bias image with a Set Index
 *        attribute which matches its own.  An IN file with no Set
 *        header is considered to match a master bias file with
-*        no Set header, so USESET can safely be set true (the default)
+*        no Set header, so USESET can safely be set true
 *        when the input files contain no Set header information.
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     WMODE = LITERAL (Read)
 *        The weighting method which is to be used when deriving means
 *        or performing the least squares interpolation fits using any

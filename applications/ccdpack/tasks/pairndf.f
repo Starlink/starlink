@@ -243,7 +243,7 @@
 *        [350]
 *     USESET = _LOGICAL (Read)
 *        This parameter determines whether Set header information should
-*        be used in the object matching.  If USESET is true,
+*        be used or not.  If USESET is true,
 *        PAIRNDF will try to group images according to their Set Name
 *        attribute.  All NDFs which share the same (non-blank) Set
 *        Name attribute, and which have a CCD_SET attached coordinate
@@ -257,7 +257,7 @@
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     WINX = _INTEGER (Read and Write)
 *        The initial width in pixels of the aligner window, which contains
 *        a space for dragging around a pair of images and associated

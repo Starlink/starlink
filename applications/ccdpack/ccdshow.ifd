@@ -62,7 +62,7 @@
             access READ
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
-            default TRUE
+            default FALSE
             association <-global.ccdpack_useset
           }
  

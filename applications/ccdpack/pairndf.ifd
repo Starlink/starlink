@@ -110,7 +110,7 @@
             ppath GLOBAL CURRENT DEFAULT
             prompt "Group NDFs by Set Name attribute?[ccd_global]"
             association <-global.ccdpack_useset
-            default TRUE
+            default FALSE
             helpkey *
          }
 
@@ -118,9 +118,9 @@
                             # Use a chooser if it's not necessary?
             type _LOGICAL
             access READ
-            vpath CURRENT PROMPT
+            vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
-            prompt "Preview images in chooser widget before alignment?"
+            prompt "Preview 2 images in chooser widget before alignment?"
             default FALSE
             helpkey *
          }

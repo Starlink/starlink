@@ -59,7 +59,7 @@
 *        each Set, and this parameter is true, CCDSHOW will display
 *        the parameter values specific to each Set Index value
 *        as well as the current unkeyed value.
-*        [TRUE]
+*        [FALSE]
 
 *  Behaviour of parameters:
 *     The parameters LOGTO, LOGFILE and USESET have global values. These

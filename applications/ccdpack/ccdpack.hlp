@@ -1020,12 +1020,12 @@ USESET = _LOGICAL (Read)
    processed using a calibration image with a Set Index 
    attribute which matches its own.  An IN file with no Set
    header is considered to match a CAL file with no Set header,
-   so USESET can safely be set true (the default) when the 
+   so USESET can safely be set true when the 
    input files contain no Set header information.
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 2 Examples
 calcor frame1 frame2 calibration 250
    This example runs CALCOR in its most basic mode. The input data
@@ -1340,7 +1340,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using
    CCDSETUP than that value will be used.
-   [TRUE]
+   [FALSE]
 3 WINX
 WINX = INTEGER (Read and Write)
    The width in pixels of the window to display the image and
@@ -2564,7 +2564,7 @@ USESET = _LOGICAL (Read)
    programs to ignore existing Set information for some reason.
 
    If BYSET is true, this parameter will default to true also.
-   [TRUE]
+   [FALSE]
 2 Examples
 ccdsetup
    This will prompt you to enter all the global variables.  You
@@ -2714,7 +2714,7 @@ USESET = _LOGICAL (Read)
    each Set, and this parameter is true, CCDSHOW will display
    the parameter values specific to each Set Index value
    as well as the current unkeyed value.
-   [TRUE]
+   [FALSE]
 2 Behaviour_of_parameters
    The parameters (LOGTO and LOGFILE ) have global values. These
    global values will always take precedence, except when an
@@ -3175,12 +3175,12 @@ USESET = _LOGICAL (Read)
    be processed using a master bias image with a Set Index
    attribute which matches its own.  An IN file with no Set
    header is considered to match a master bias file with
-   no Set header, so USESET can safely be set true (the default)
+   no Set header, so USESET can safely be set true
    when the input files contain no Set header information.
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 WMODE
 WMODE = LITERAL (Read)
    The weighting method which is to be used when deriving means
@@ -3658,7 +3658,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 2 Examples
 drawndf reg-data* clear
    This will clear the current graphics device and plot on it
@@ -5006,7 +5006,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 USEWCS
 USEWCS = _LOGICAL (Read)
    This parameter specifies whether the coordinates in the
@@ -5390,7 +5390,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 2 Examples
 flatcor frame1 frame1_f flatr
    In this example the data in image frame1 are corrected for the
@@ -5620,7 +5620,7 @@ PERCENTILES( 2 ) = _DOUBLE (Read and Write)
 3 USESET
 USESET = _LOGICAL (Read)
    This parameter determines whether Set header information
-   should be used in the object matching.  If USESET is true,
+   should be used.  If USESET is true,
    IDICURS will try to group images according to their Set
    Name attribute before displaying them, rather than treating
    them one by one.  All images which share the same (non-blank)
@@ -5637,7 +5637,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 VERBOSE
 VERBOSE = _LOGICAL (Read)
    If this parameter is true, then at the end of processing all
@@ -6275,7 +6275,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 ZERO
 ZERO = _LOGICAL (Read)
    Flag indicating whether the output master bias is to have a
@@ -6572,11 +6572,11 @@ USESET = _LOGICAL (Read)
    separate NDF structures into a single HDS container file.
    If no Set header information is present in the input files, 
    then calibration is done on all the input files together,
-   so USESET can usually be safely set to TRUE (the default).
+   so USESET can usually be safely set to TRUE.
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 USEEXT
 USEEXT = _LOGICAL (Read)
    If TRUE then the EXPOSE parameter of this program will not
@@ -6882,7 +6882,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 USEVAR
 USEVAR = _LOGICAL (Read)
    If TRUE and all the input images contain error information
@@ -8365,7 +8365,7 @@ PREVY = _INTEGER (Read and Write)
 3 USESET
 USESET = _LOGICAL (Read)
    This parameter determines whether Set header information should
-   be used in the object matching.  If USESET is true,
+   be used or not.  If USESET is true,
    PAIRNDF will try to group images according to their Set Name
    attribute.  All images which share the same (non-blank) Set
    Name attribute, and which have a CCD_SET attached coordinate
@@ -8379,7 +8379,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 WINX
 WINX = _INTEGER (Read and Write)
    The initial width in pixels of the aligner window, which contains
@@ -9526,7 +9526,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 3 USEWCS
 USEWCS = _LOGICAL (Read)
    This parameter specifies whether the coordinates in the
@@ -11453,7 +11453,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 2 Examples
 wcsreg * [ccd_reg,sky]
    In this example all the images in the current directory are

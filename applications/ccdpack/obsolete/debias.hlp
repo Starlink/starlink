@@ -507,12 +507,12 @@ USESET = _LOGICAL (Read)
    be processed using a master bias image with a Set Index
    attribute which matches its own.  An IN file with no Set
    header is considered to match a master bias file with
-   no Set header, so USESET can safely be set true (the default)
+   no Set header, so USESET can safely be set true
    when the input files contain no Set header information.
 
    If a global value for this parameter has been set using 
    CCDSETUP then that value will be used.
-   [TRUE]
+   [FALSE]
 
 WMODE
 

@@ -84,7 +84,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_useset
-            default TRUE
+            default FALSE
             prompt "Rotate pens by Set membership?[ccd_global]"
             helpkey *
          }

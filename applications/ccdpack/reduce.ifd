@@ -335,7 +335,7 @@
             access READ
             vpath PROMPT DYNAMIC GLOBAL CURRENT DEFAULT
             ppath DYNAMIC GLOBAL CURRENT DEFAULT
-            default TRUE
+            default FALSE
             prompt {Use CCDPACK Set header information if available?}
             association <->global.ccdpack_useset
           }

@@ -289,7 +289,7 @@
 *        programs to ignore existing Set information for some reason.
 *
 *        If BYSET is true, this parameter will default to true also.
-*        [TRUE]
+*        [FALSE]
 
 *  Examples:
 *     ccdsetup

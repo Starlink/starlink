@@ -3844,28 +3844,27 @@ The Set itself does not exist as a separate file or other entity,
 so you never need to specify a Set as such when giving input
 parameters to CCDPACK programs, but when presented with a list
 of input files, they will read and make use of Set header information
-if exists.  In fact in most cases, after adding the Set header
+if it exists.  In fact in most cases, after adding the Set header
 in the first place, you can forget about Sets altogether and let
 CCDPACK worry about them for you.
 
 All the CCDPACK programs which can do Set-sensitive processing
 consult the USESET global parameter to see whether they should
-use Set header information if it exists (files without Set headers are
-always treated the same).
-USESET is true by default, which is normally harmless, 
-but if for some reason you wish to ignore Set information
-which exists in files you can use \xroutine{CCDSET} to set it
-globally false like this:
+use Set header information if it exists.
+To make CCDPACK use Set headers, you should use \xroutine{CCDSETUP}
+to set USESET true like this:
 \begin{myquote}
 \begin{verbatim}
-% ccdsetup useset=false accept
+% ccdsetup useset=true accept
 \end{verbatim}
 \end{myquote}
-or for individual programs by specifying USESET=FALSE on the command line.
-If you are storing intermediate files in a foreign (non-native)
-data format, which is a slow way to proceed in any case,
-and do not wish to use Sets, you may find that processing is speeded
-up by globally setting USESET to false as above.
+All subsequent commands will then use Set headers where they have been
+added.  Alternatively you could specify USESET=TRUE on the command line
+of each CCDPACK program.
+Since files without Set headers are always treated the same whether 
+USESET is true or false, it is harmless to have set it true all
+the time, but in certain cases (especially if a non-native data
+format such as FITS is being used) it may result in slower operation.
 
 Note that Set Name attributes don't need to be (and in general will not be)
 totally unique between different Sets; for instance \routine{DEBIAS}
@@ -4501,9 +4500,13 @@ for all Set members.
 
 The Set Index values you should use depend on how you have used
 \xroutine{MAKESET} to add the Set headers; they will nearly
-always be $1, 2, 3,\ldots$ up to the number of members in 
+always be 1, 2, 3, ... up to the number of members in 
 each Set, but if you are unsure you can use the \xroutine{SHOWSET}
 command to see the values they have.
+
+Note that when using CCDPACK with Sets, you should ensure that 
+the USESET parameter is set to true by \routine{CCDSETUP};
+when it is run with BYSET true, USESET will default to true as well.
 
 
 \subsection{Using Sets in reduction tasks}
@@ -4513,9 +4516,13 @@ reduction tasks
 (\xroutine{MAKEBIAS}, \xroutine{MAKECAL}, \xroutine{MAKEFLAT},
 \xroutine{DEBIAS}, \xroutine{CALCOR}, \xroutine{FLATCOR})
 do when they encounter input files with Set header information.
-It assumes that the USESET parameter is TRUE, which should be the
-case unless you have taken steps to set it FALSE using \xroutine{CCDSETUP}
-or on the command line.
+It assumes that the global USESET parameter is TRUE, 
+so you should first have set it using a command like
+\begin{myquote}
+\begin{verbatim}
+% ccdsetup useset=true accept
+\end{verbatim}
+\end{myquote}
 
 The reduction tasks considered here are all concerned with constructing
 calibration frames from a stack of input frames 
@@ -4727,6 +4734,12 @@ package:
 \end{myquote}
 This creates one new HDS container file for each MEF with the same name,
 but with the extension \text{.sdf} instead of \text{.fit}.
+We next indicate to CCDPACK that we will be using Set headers:
+\begin{myquote}
+\begin{verbatim}
+% ccdsetup useset=yes accept
+\end{verbatim}
+\end{myquote}
 The next job is to inform CCDPACK that each HDS container file 
 represents a single Set:
 \begin{myquote}
@@ -4739,7 +4752,7 @@ each frame.
 We can now proceed to the data reduction itself:
 \begin{myquote}
 \begin{verbatim}
-% makebias in='bias-*' out=master-bias useset=true
+% makebias in='bias-*' out=master-bias
 \end{verbatim}
 \end{myquote}
 This combines all the bias container files and produces one new
@@ -4747,11 +4760,6 @@ container file called \text{master-bias}.  The new file will have
 the same structure as the files which went to generate it, that is
 it will represent a single Set, and will have as many constituent
 frames as those files, one for each Set Index value in the inputs.
-The USESET=TRUE parameter setting indicates to \routine{MAKEBIAS}
-that it should take notice of Set headers in this way; however,
-unless you have previously set USESET=FALSE either globally or
-for \routine{MAKEBIAS} it is not necessary to set it explicitly 
-here, so we will omit it in the rest of this section.
 The master bias Set can now be used to debias the data and flat field
 frames like this:
 \begin{myquote}
@@ -4782,8 +4790,16 @@ Here we revisit the example in Section \ref{mosexnoset}.
 By making use of the Set alignment coordinates we have described above,
 the same job can be done with less user effort.
 
-The data files are the same as before. 
-This time however the first thing we do is to group the 
+As always when working with Sets, the first thing to do is to
+tell CCDPACK that Set headers are important:
+\begin{myquote}
+\begin{verbatim}
+% ccdsetup useset=true accept
+\end{verbatim}
+\end{myquote}
+
+The data files are the same as in the un-Setted example.
+This time however the first thing we do with them is to group the 
 images into two Sets, one for each exposure.  Using \xroutine{MAKESET}'s
 ASTFILE parameter we can import the saved AST file alignment information
 at the same time
@@ -4810,7 +4826,8 @@ and behaves just as usual.
 % findobj in='"1?,2?"' outlist='*.find'
 \end{verbatim}
 \end{myquote}
-\xroutine{FINDOFF} however takes special notice of the Set headers.
+The \xroutine{FINDOFF} program however takes special notice 
+of the Set headers:
 \begin{myquote}
 \begin{verbatim}
 % findoff inlist='"1?,2?"' outlist='*.off'
@@ -6665,12 +6682,12 @@ The CCDPACK routine descriptions are contained in the following pages.
          processed using a calibration image with a Set Index 
          attribute which matches its own.  An IN file with no Set
          header is considered to match a CAL file with no Set header,
-         so USESET can safely be set true (the default) when the 
+         so USESET can safely be set true when the 
          input files contain no Set header information.
 
          If a global value for this parameter has been set using 
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
    }
    \sstexamples{
@@ -7048,7 +7065,7 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} than that value will be used.
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          WINX = INTEGER (Read and Write)
@@ -8528,7 +8545,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          programs to ignore existing Set information for some reason.
 
          If BYSET is true, this parameter will default to true also.
-         [TRUE]
+         [FALSE]
       }
    }
    \sstexamples{
@@ -8694,7 +8711,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          each Set, and this parameter is true, \routine{CCDSHOW} will display
          the parameter values specific to each Set Index value
          as well as the current unkeyed value.
-         [TRUE]
+         [FALSE]
       }
    }
    \sstdiytopic{
@@ -9229,12 +9246,12 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          be processed using a master bias image with a Set Index
          attribute which matches its own.  An IN file with no Set
          header is considered to match a master bias file with
-         no Set header, so USESET can safely be set true (the default)
+         no Set header, so USESET can safely be set true
          when the input files contain no Set header information.
 
          If a global value for this parameter has been set using 
          CCDSETUP then that value will be used.
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          WMODE = LITERAL (Read)
@@ -9803,7 +9820,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
    }
    \sstexamples{
@@ -11323,7 +11340,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If a global value for this parameter has been set using 
          CCDSETUP then that value will be used. 
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          USEWCS = \_LOGICAL (Read)
@@ -11737,7 +11754,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If a global value for this parameter has been set using 
          CCDSETUP then that value will be used. 
-         [TRUE]
+         [FALSE]
       }
    }
    \sstexamples{
@@ -12021,7 +12038,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
          USESET = \_LOGICAL (Read)
       }{
          This parameter determines whether Set header information
-         should be used in the object matching.  If USESET is true,
+         should be used or not.  If USESET is true,
          \routine{IDICURS} will try to group images according to their Set
          Name attribute before displaying them, rather than treating
          them one by one.  All images which share the same (non-blank)
@@ -12038,7 +12055,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          VERBOSE = \_LOGICAL (Read)
@@ -12811,11 +12828,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          NDFs into a single HDS container file.  If no Set header
          information is present in the input files, then all the
          input files are combined together to form the master bias, 
-         so USESET can usually be safely set to TRUE (the default).
+         so USESET can usually be safely set to TRUE.
 
          If a global value for this parameter has been set using 
          CCDSETUP then that value will be used. 
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          ZERO = \_LOGICAL (Read)
@@ -13170,11 +13187,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          separate NDF structures into a single HDS container file.
          If no Set header information is present in the input files, 
          then calibration is done on all the input files together,
-         so USESET can usually be safely set to TRUE (the default).
+         so USESET can usually be safely set to TRUE.
 
          If a global value for this parameter has been set using 
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          USEEXT = \_LOGICAL (Read)
@@ -13542,11 +13559,11 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          a single HDS container file.  If no Set header information 
          is present in the input files, then flatfielding is done  
          on all the input files together, so USESET can usually be 
-         safely set to TRUE (the default).
+         safely set to TRUE.
 
          If a global value for this parameter has been set using 
          \xroutine{CCDSETUP} then that value will be used. 
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          USEVAR = \_LOGICAL (Read)
@@ -15223,7 +15240,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          USESET = \_LOGICAL (Read)
       }{
          This parameter determines whether Set header information should
-         be used in the object matching.  If USESET is true,
+         be used or not.  If USESET is true,
          \routine{PAIRNDF} will try to group images according to their Set Name
          attribute.  All images which share the same (non-blank) Set
          Name attribute, and which have a CCD\_SET attached coordinate
@@ -15237,7 +15254,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          WINX = \_INTEGER (Read and Write)
@@ -16604,7 +16621,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
          If a global value for this parameter has been set using
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
       \sstsubsection{
          USEWCS = \_LOGICAL (Read)
@@ -18882,7 +18899,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
 
          If a global value for this parameter has been set using 
          \xroutine{CCDSETUP} then that value will be used.
-         [TRUE]
+         [FALSE]
       }
    }
    \sstexamples{

@@ -280,7 +280,7 @@
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 
 *  Examples:
 *     drawndf reg-data* clear

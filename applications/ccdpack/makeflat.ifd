@@ -165,7 +165,7 @@
             ppath GLOBAL CURRENT DEFAULT
             prompt "Use Set headers if available?[ccd_global]"
             association <-global.ccdpack_useset
-            default TRUE
+            default FALSE
             helpkey *
           }
 

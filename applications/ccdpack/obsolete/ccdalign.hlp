@@ -246,7 +246,7 @@ USESET = _LOGICAL (Read)
 
    If a global value for this parameter has been set using
    CCDSETUP than that value will be used.
-   [TRUE]
+   [FALSE]
 
 WINX
 

@@ -175,11 +175,11 @@
 *        separate NDFs into a single HDS container file.
 *        If no Set header information is present in the input files, 
 *        then calibration is done on all the input files together,
-*        so USESET can usually be safely set to TRUE (the default).
+*        so USESET can usually be safely set to TRUE.
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     TYPE = LITERAL (Read)
 *        The frame types of the input data. This should be a recognised
 *        name "FLASH", "DARK" or "NONE". The value of this parameter

@@ -186,11 +186,11 @@
 *        a single HDS container file.  If no Set header information 
 *        is present in the input files, then flatfielding is done 
 *        on all the input files together, so USESET can usually be 
-*        safely set to TRUE (the default).
+*        safely set to TRUE.
 *
 *        If a global value for this parameter has been set using 
 *        CCDSETUP then that value will be used.
-*        [TRUE]
+*        [FALSE]
 *     USEVAR = _LOGICAL (Read)
 *        If TRUE and all the input images contain error information
 *        (variances), then these will be used as weights during image

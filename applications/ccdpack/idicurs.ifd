@@ -53,7 +53,7 @@
                              # Use initial position list?
             type _LOGICAL
             access READ
-            vpath CURRENT 
+            vpath PROMPT CURRENT 
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Use initial position list?}
@@ -64,7 +64,7 @@
                               # Write positions at the end?
             type _LOGICAL
             access READ
-            vpath CURRENT
+            vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default TRUE
             prompt {Write marked positions to list file?}
@@ -75,7 +75,7 @@
                               # Overwrite input position list file?
             type _LOGICAL
             access READ
-            vpath CURRENT
+            vpath PROMPT CURRENT
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Use the same position list file for read and write?}
@@ -110,7 +110,7 @@
             vpath GLOBAL CURRENT DEFAULT
             ppath GLOBAL CURRENT DEFAULT
             association <-global.ccdpack_useset
-            default TRUE
+            default FALSE
             prompt "Group images by Set membership?[ccd_global]"
          }
 
