@@ -62,32 +62,34 @@
 #  Define symbols for the applications and scripts.
 #  ===============================================
 #
-      alias polcal    INSTALL_BIN/polcal
-      alias polhelp   INSTALL_BIN/polhelp 
-      alias polext    INSTALL_BIN/polext
-      alias polexp    INSTALL_BIN/polexp
-      alias polimp    INSTALL_BIN/polimp
-      alias polmap    INSTALL_BIN/polmap
-      alias polka     INSTALL_BIN/polka
-      alias polvec    INSTALL_BIN/polvec
       alias polbin    INSTALL_BIN/polbin
-      alias polsim    INSTALL_BIN/polsim
-      alias polplot   INSTALL_BIN/polplot
+      alias polcal    INSTALL_BIN/polcal
+      alias polexp    INSTALL_BIN/polexp
+      alias polext    INSTALL_BIN/polext
+      alias polhelp   INSTALL_BIN/polhelp 
       alias polimage  INSTALL_BIN/polimage
+      alias polimp    INSTALL_BIN/polimp
+      alias polka     INSTALL_BIN/polka
+      alias polmap    INSTALL_BIN/polmap
+      alias polplot   INSTALL_BIN/polplot
+      alias polsim    INSTALL_BIN/polsim
+      alias polstack  INSTALL_BIN/polstack
+      alias polvec    INSTALL_BIN/polvec
 #
 #  Now do the same with alternative names.
 #
-      alias pol_polcal    INSTALL_BIN/polcal
-      alias pol_polhelp   INSTALL_BIN/polhelp 
-      alias pol_polexp    INSTALL_BIN/polexp
-      alias pol_polimp    INSTALL_BIN/polimp
-      alias pol_polmap    INSTALL_BIN/polmap
-      alias pol_polka     INSTALL_BIN/polka
-      alias pol_polvec    INSTALL_BIN/polvec
       alias pol_polbin    INSTALL_BIN/polbin
-      alias pol_polsim    INSTALL_BIN/polsim
-      alias pol_polplot   INSTALL_BIN/polplot
+      alias pol_polcal    INSTALL_BIN/polcal
+      alias pol_polexp    INSTALL_BIN/polexp
+      alias pol_polhelp   INSTALL_BIN/polhelp 
       alias pol_polimage  INSTALL_BIN/polimage
+      alias pol_polimp    INSTALL_BIN/polimp
+      alias pol_polka     INSTALL_BIN/polka
+      alias pol_polmap    INSTALL_BIN/polmap
+      alias pol_polplot   INSTALL_BIN/polplot
+      alias pol_polsim    INSTALL_BIN/polsim
+      alias pol_polstack  INSTALL_BIN/polstack
+      alias pol_polvec    INSTALL_BIN/polvec
 #
 #
 #  Set up the commands and environment variables needed to export and

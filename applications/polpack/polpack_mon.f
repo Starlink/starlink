@@ -42,6 +42,8 @@
 *        SEGMENT removed (POLKA now uses KAPPA:SEGMENT).
 *     25-MAR-1999 (DSB):
 *        Added POLSIM.
+*     8-JUN-1999 (DSB):
+*        Added POLSTACK.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -118,6 +120,9 @@
 
       ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
          CALL POLSIM( STATUS )
+
+      ELSE IF ( NAME .EQ. 'POLSTACK' ) THEN
+         CALL POLSTACK( STATUS )
 
       ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
          CALL POLVEC( STATUS )
