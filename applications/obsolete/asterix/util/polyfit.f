@@ -358,10 +358,10 @@
       CALL MSG_SETI( 'NDEG', NDEG )
       IF ( POLY ) THEN
         CALL MSG_MAKE( 'Polynomial fit of degree ^NDEG produced.',
-     :                                                TEXT, N )
+     :                                                HTXT, N )
       ELSE
         CALL MSG_MAKE( 'Polynomial of degree ^NDEG subtracted.',
-     :                                              TEXT, N )
+     :                                              HTXT, N )
       END IF
       CALL HSI_PTXT( OFID, 1, HTXT, STATUS )
 
