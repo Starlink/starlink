@@ -793,6 +793,7 @@ sub pgplot {
   $self->GQch(\&Starlink::AST::PGPLOT::_GQch);
   $self->GAttr(\&Starlink::AST::PGPLOT::_GAttr);
   $self->GScales(\&Starlink::AST::PGPLOT::_GScales);
+  $self->GCap(\&Starlink::AST::PGPLOT::_GCap);
 
   return 1;
 }
