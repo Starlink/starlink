@@ -163,18 +163,7 @@ more-or-less as much like the existing star2html output as possible.
                     (empty-sosofo))
                 (getdocauthors)
                 (make empty-element gi: "br")
-                ;(literal (getdocdate))
-		(literal (string-append (if (car rel)
-					    (format-date (car rel))
-					    "not released")
-					(if (cadr rel)
-					    (string-append
-					     " [release "
-					     (cadddr rel)
-					     ", "
-					     (format-date (cadr rel))
-					     "]")
-					    "")))))
+                (literal (getdocdate))))
          (if (not suppress-banner)
              (%starlink-banner%)
              (empty-sosofo))
