@@ -1,0 +1,108 @@
+/*
+ *  Name:
+ *     imgOutGen
+
+ *  Purpose:
+ *     Creates an output image with a specific type.
+
+ *  Language:
+ *     ANSI C
+
+ *  Invocation:
+ *     imgOut?( param1, param2, ip, status )
+
+ *  Description:
+ *     This C function sets up the required arguments and calls the
+ *     Fortran subroutine img_out[x].
+ *     On return, values are converted back to C form if necessary.
+ *
+ *     This version is the generic form for the float, double, int,
+ *     short, unsigned short, char and unsigned char versions. Just
+ *     include this in the appropriate stub after setting the 
+ *     values of the macros:
+ *
+ *        IMG_F77_TYPE   = (r|d|l|i|w|uw|b|ub)
+ *        IMG_FULL_C_TYPE   = (float|double|short etc.)
+ *        IMG_SHORT_C_TYPE   = (F|D|I|S|US|B|UB)
+ *
+ *     The IMG_F77_TYPE essentially names the fortran version of this
+ *     routine to invoke.
+
+ *  Arguments:
+ *     param1 = char * (Given)
+ *        Parameter name for the input image (case insensitive).
+ *     param2 = char * (Given)
+ *        Parameter name for the output image (case insensitive).
+ *     ip = ? * (Returned)
+ *        Pointer to the mapped output data.
+ *     status = int * (Given and Returned)
+ *        The global status.
+
+ *  Authors:
+ *     The orginal version was generated automatically from the
+ *     Fortran source of img_out by the Perl script fcwrap.
+ *     PDRAPER: Peter W. Draper (STARLINK - Durham University)
+ *     {enter_new_authors_here}
+
+ *  History:
+ *     17-May-1996 (fcwrap):
+ *        Original version
+ *     24-May-1996 (PDRAPER):
+ *        Added code to handle pointer arrays correctly. Made into
+ *        generic include file. 
+ *     10-JUN-1996 (PDRAPER):
+ *        Converted to use more C-like names.
+ *     {enter_changes_here}
+ *-
+ */
+
+#include <string.h>
+#include "f77.h"
+#include "cnf.h"
+
+IMG_OUT( IMG_F77_TYPE )( CHARACTER(param1),
+                         CHARACTER(param2),
+                         POINTER_ARRAY(ip),
+                         INTEGER(status)
+                         TRAIL(param1)
+                         TRAIL(param2) );
+
+IMGOUT( IMG_SHORT_C_TYPE ) ( char *param1,
+                             char *param2,
+                             IMG_FULL_C_TYPE **ip,
+                             int *status ) {
+  
+   DECLARE_CHARACTER_DYN(fparam1);
+   DECLARE_CHARACTER_DYN(fparam2);
+   int nparam;
+   int i;
+   F77_POINTER_TYPE *fip;
+  
+   /*  Count the number of output parameters and create enough space for
+       the corresponding Fortran pointers */
+   nparam = img1CountParams( param2, status );
+   fip = (F77_POINTER_TYPE *) malloc( nparam * sizeof(F77_POINTER_TYPE) );
+
+   F77_CREATE_CHARACTER(fparam1,strlen( param1 ));
+   cnf_exprt( param1, fparam1, fparam1_length );
+   F77_CREATE_CHARACTER(fparam2,strlen( param2 ));
+   cnf_exprt( param2, fparam2, fparam2_length );
+
+   IMGOUT_CALL( IMG_F77_TYPE ) ( CHARACTER_ARG(fparam1),
+                                 CHARACTER_ARG(fparam2),
+                                 POINTER_ARRAY_ARG(fip),
+                                 INTEGER_ARG(status)
+                                 TRAIL_ARG(fparam1)
+                                 TRAIL_ARG(fparam2) );
+
+   /*  Now copy the addresses back to to C pointers */
+   for( i=0; i < nparam; i++ ) { 
+      ip[i] = (IMG_FULL_C_TYPE *) fip[i];
+   }
+   free( (void *) fip );
+   F77_FREE_CHARACTER(fparam1);
+   F77_FREE_CHARACTER(fparam2);
+
+   return;
+}
+/* $Id$ */

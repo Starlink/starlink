@@ -1,0 +1,119 @@
+#+
+#{prologue}
+#-
+
+interface EXERCISE
+
+   parameter COMMAND
+      type     'LITERAL'
+      access   'READ'
+      prompt   'Operation to perform'
+      default  ' '
+      vpath    'PROMPT,DEFAULT'
+   endparameter
+
+   parameter A
+      prompt   'Image A'
+   endparameter
+
+   parameter B
+      prompt   'Image B'
+   endparameter
+
+   parameter C
+      prompt   'Image C'
+   endparameter
+
+   parameter D
+      prompt   'Image D'
+   endparameter
+
+   parameter E
+      prompt   'Image E'
+   endparameter
+
+   parameter F
+      prompt   'Image F'
+   endparameter
+
+   parameter G
+      prompt   'Image G'
+   endparameter
+
+   parameter H
+      prompt   'Image H'
+   endparameter
+
+   parameter I
+      prompt   'Image I'
+   endparameter
+
+   parameter J
+      prompt   'Image J'
+   endparameter
+
+   parameter K
+      prompt   'Image K'
+   endparameter
+
+   parameter L
+      prompt   'Image L'
+   endparameter
+
+   parameter M
+      prompt   'Image M'
+   endparameter
+
+   parameter N
+      prompt   'Image N'
+   endparameter
+
+   parameter O
+      prompt   'Image O'
+   endparameter
+
+   parameter P
+      prompt   'Image P'
+   endparameter
+
+   parameter Q
+      prompt   'Image Q'
+   endparameter
+
+   parameter R
+      prompt   'Image R'
+   endparameter
+
+   parameter S
+      prompt   'Image S'
+   endparameter
+
+   parameter T
+      prompt   'Image T'
+   endparameter
+
+   parameter U
+      prompt   'Image U'
+   endparameter
+
+   parameter V
+      prompt   'Image V'
+   endparameter
+
+   parameter W
+      prompt   'Image W'
+   endparameter
+
+   parameter X
+      prompt   'Image X
+   endparameter
+
+   parameter Y
+      prompt   'Image Y'
+   endparameter
+
+   parameter Z
+      prompt   'Image Z'
+   endparameter
+
+endinterface

@@ -1,0 +1,663 @@
+!  Define the package.
+DEFINE PACKAGE "IMG" -
+   /HELP_LIBRARY = IMG_DIR:IMG.HLB -
+   /LANGUAGE = STARLINK_FORTRAN -
+   /ROUTINE_EXPAND = LSE$PKG_EXPAND_ROUT_ -
+   /PARAMETER_EXPAND = LSE$PKG_EXPAND_PARM_
+
+!  Define the routines.
+DEFINE ROUTINE "IMG_CANCL" -
+   /TOPIC_STRING = "IMG_CANCL" -
+   /DESCRIPTION = "Cancel an image/parameter association" -
+   /PACKAGE = "IMG" -
+   PARAM, STATUS
+
+DEFINE ROUTINE "IMG_FREE" -
+   /TOPIC_STRING = "IMG_FREE" -
+   /DESCRIPTION = "Release resources associated with an image" -
+   /PACKAGE = "IMG" -
+   PARAM, STATUS
+
+DEFINE ROUTINE "IMG_IN" -
+   /TOPIC_STRING = "IMG_IN" -
+   /DESCRIPTION = "Obtain access to an input image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1" -
+   /TOPIC_STRING = "IMG_IN1" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1B" -
+   /TOPIC_STRING = "IMG_IN1B" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1UB" -
+   /TOPIC_STRING = "IMG_IN1UB" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1D" -
+   /TOPIC_STRING = "IMG_IN1D" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1I" -
+   /TOPIC_STRING = "IMG_IN1I" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1R" -
+   /TOPIC_STRING = "IMG_IN1R" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1W" -
+   /TOPIC_STRING = "IMG_IN1W" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN1UW" -
+   /TOPIC_STRING = "IMG_IN1UW" -
+   /DESCRIPTION = "Obtain access to a 1-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2" -
+   /TOPIC_STRING = "IMG_IN2" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2B" -
+   /TOPIC_STRING = "IMG_IN2B" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2UB" -
+   /TOPIC_STRING = "IMG_IN2UB" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2D" -
+   /TOPIC_STRING = "IMG_IN2D" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2I" -
+   /TOPIC_STRING = "IMG_IN2I" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2R" -
+   /TOPIC_STRING = "IMG_IN2R" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2W" -
+   /TOPIC_STRING = "IMG_IN2W" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN2UW" -
+   /TOPIC_STRING = "IMG_IN2UW" -
+   /DESCRIPTION = "Obtain access to a 2-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3" -
+   /TOPIC_STRING = "IMG_IN3" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3B" -
+   /TOPIC_STRING = "IMG_IN3B" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3UB" -
+   /TOPIC_STRING = "IMG_IN3UB" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3D" -
+   /TOPIC_STRING = "IMG_IN3D" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3I" -
+   /TOPIC_STRING = "IMG_IN3I" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3R" -
+   /TOPIC_STRING = "IMG_IN3R" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3W" -
+   /TOPIC_STRING = "IMG_IN3W" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_IN3UW" -
+   /TOPIC_STRING = "IMG_IN3UW" -
+   /DESCRIPTION = "Obtain access to a 3-dimensional input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_INDF" -
+   /TOPIC_STRING = "IMG_INDF" -
+   /DESCRIPTION = "Obtain an NDF identifier for an image" -
+   /PACKAGE = "IMG" -
+   PARAM, INDF, STATUS
+
+DEFINE ROUTINE "IMG_INB" -
+   /TOPIC_STRING = "IMG_INB" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_INUB" -
+   /TOPIC_STRING = "IMG_INUB" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_IND" -
+   /TOPIC_STRING = "IMG_IND" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_INI" -
+   /TOPIC_STRING = "IMG_INI" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_INR" -
+   /TOPIC_STRING = "IMG_INR" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_INW" -
+   /TOPIC_STRING = "IMG_INW" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_INUW" -
+   /TOPIC_STRING = "IMG_INUW" -
+   /DESCRIPTION = "Obtain access to an input image using a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW" -
+   /TOPIC_STRING = "IMG_NEW" -
+   /DESCRIPTION = "Create a new image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1" -
+   /TOPIC_STRING = "IMG_NEW1" -
+   /DESCRIPTION = "Create a new 1-dimensional image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1B" -
+   /TOPIC_STRING = "IMG_NEW1B" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1UB" -
+   /TOPIC_STRING = "IMG_NEW1UB" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1D" -
+   /TOPIC_STRING = "IMG_NEW1D" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1I" -
+   /TOPIC_STRING = "IMG_NEW1I" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1R" -
+   /TOPIC_STRING = "IMG_NEW1R" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1W" -
+   /TOPIC_STRING = "IMG_NEW1W" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW1UW" -
+   /TOPIC_STRING = "IMG_NEW1UW" -
+   /DESCRIPTION = "Create a new 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2" -
+   /TOPIC_STRING = "IMG_NEW2" -
+   /DESCRIPTION = "Create a new 2-dimensional image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2B" -
+   /TOPIC_STRING = "IMG_NEW2B" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2UB" -
+   /TOPIC_STRING = "IMG_NEW2UB" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2D" -
+   /TOPIC_STRING = "IMG_NEW2D" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2I" -
+   /TOPIC_STRING = "IMG_NEW2I" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2R" -
+   /TOPIC_STRING = "IMG_NEW2R" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2W" -
+   /TOPIC_STRING = "IMG_NEW2W" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW2UW" -
+   /TOPIC_STRING = "IMG_NEW2UW" -
+   /DESCRIPTION = "Create a new 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3" -
+   /TOPIC_STRING = "IMG_NEW3" -
+   /DESCRIPTION = "Create a new 3-dimensional image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3B" -
+   /TOPIC_STRING = "IMG_NEW3B" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3UB" -
+   /TOPIC_STRING = "IMG_NEW3UB" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3D" -
+   /TOPIC_STRING = "IMG_NEW3D" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3I" -
+   /TOPIC_STRING = "IMG_NEW3I" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3R" -
+   /TOPIC_STRING = "IMG_NEW3R" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3W" -
+   /TOPIC_STRING = "IMG_NEW3W" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEW3UW" -
+   /TOPIC_STRING = "IMG_NEW3UW" -
+   /DESCRIPTION = "Create a new 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWB" -
+   /TOPIC_STRING = "IMG_NEWB" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWUB" -
+   /TOPIC_STRING = "IMG_NEWUB" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWD" -
+   /TOPIC_STRING = "IMG_NEWD" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWI" -
+   /TOPIC_STRING = "IMG_NEWI" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWR" -
+   /TOPIC_STRING = "IMG_NEWR" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWW" -
+   /TOPIC_STRING = "IMG_NEWW" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_NEWUW" -
+   /TOPIC_STRING = "IMG_NEWUW" -
+   /DESCRIPTION = "Create a new image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUT" -
+   /TOPIC_STRING = "IMG_OUT" -
+   /DESCRIPTION = "Create an output image" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTB" -
+   /TOPIC_STRING = "IMG_OUTB" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTUB" -
+   /TOPIC_STRING = "IMG_OUTUB" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTD" -
+   /TOPIC_STRING = "IMG_OUTD" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTI" -
+   /TOPIC_STRING = "IMG_OUTI" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTR" -
+   /TOPIC_STRING = "IMG_OUTR" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTW" -
+   /TOPIC_STRING = "IMG_OUTW" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_OUTUW" -
+   /TOPIC_STRING = "IMG_OUTUW" -
+   /DESCRIPTION = "Create an output image with a specified access type" -
+   /PACKAGE = "IMG" -
+   PARAM1, PARAM2, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP" -
+   /TOPIC_STRING = "IMG_TMP" -
+   /DESCRIPTION = "Create a temporary image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1" -
+   /TOPIC_STRING = "IMG_TMP1" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1B" -
+   /TOPIC_STRING = "IMG_TMP1B" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1UB" -
+   /TOPIC_STRING = "IMG_TMP1UB" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1D" -
+   /TOPIC_STRING = "IMG_TMP1D" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1I" -
+   /TOPIC_STRING = "IMG_TMP1I" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1R" -
+   /TOPIC_STRING = "IMG_TMP1R" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1W" -
+   /TOPIC_STRING = "IMG_TMP1W" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP1UW" -
+   /TOPIC_STRING = "IMG_TMP1UW" -
+   /DESCRIPTION = "Create a temporary 1-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2" -
+   /TOPIC_STRING = "IMG_TMP2" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2B" -
+   /TOPIC_STRING = "IMG_TMP2B" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2UB" -
+   /TOPIC_STRING = "IMG_TMP2UB" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2D" -
+   /TOPIC_STRING = "IMG_TMP2D" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2I" -
+   /TOPIC_STRING = "IMG_TMP2I" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2R" -
+   /TOPIC_STRING = "IMG_TMP2R" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2W" -
+   /TOPIC_STRING = "IMG_TMP2W" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP2UW" -
+   /TOPIC_STRING = "IMG_TMP2UW" -
+   /DESCRIPTION = "Create a temporary 2-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3" -
+   /TOPIC_STRING = "IMG_TMP3" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3B" -
+   /TOPIC_STRING = "IMG_TMP3B" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3UB" -
+   /TOPIC_STRING = "IMG_TMP3UB" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3D" -
+   /TOPIC_STRING = "IMG_TMP3D" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3I" -
+   /TOPIC_STRING = "IMG_TMP3I" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3R" -
+   /TOPIC_STRING = "IMG_TMP3R" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3W" -
+   /TOPIC_STRING = "IMG_TMP3W" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMP3UW" -
+   /TOPIC_STRING = "IMG_TMP3UW" -
+   /DESCRIPTION = "Create a temporary 3-dimensional image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, NZ, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPB" -
+   /TOPIC_STRING = "IMG_TMPB" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPUB" -
+   /TOPIC_STRING = "IMG_TMPUB" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPD" -
+   /TOPIC_STRING = "IMG_TMPD" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPI" -
+   /TOPIC_STRING = "IMG_TMPI" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPR" -
+   /TOPIC_STRING = "IMG_TMPR" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPW" -
+   /TOPIC_STRING = "IMG_TMPW" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+DEFINE ROUTINE "IMG_TMPUW" -
+   /TOPIC_STRING = "IMG_TMPUW" -
+   /DESCRIPTION = "Create a temporary image of a specified numeric type" -
+   /PACKAGE = "IMG" -
+   PARAM, NX, NY, IP, STATUS
+
+!  Define the parameters.
+DEFINE PARAMETER /PACKAGE = "IMG" INDF
+DEFINE PARAMETER /PACKAGE = "IMG" IP
+DEFINE PARAMETER /PACKAGE = "IMG" NX
+DEFINE PARAMETER /PACKAGE = "IMG" NY
+DEFINE PARAMETER /PACKAGE = "IMG" NZ
+DEFINE PARAMETER /PACKAGE = "IMG" PARAM
+DEFINE PARAMETER /PACKAGE = "IMG" PARAM1
+DEFINE PARAMETER /PACKAGE = "IMG" PARAM2
+DEFINE PARAMETER /PACKAGE = "IMG" STATUS
+ DEC/CMS REPLACEMENT HISTORY, Element IMG.LSE
+ *1    22-FEB-1993 15:58:36 RFWS "STARLSE package definition source file for the IMG system"
+ DEC/CMS REPLACEMENT HISTORY, Element IMG.LSE

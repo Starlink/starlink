@@ -1,0 +1,3657 @@
+1 IMG_CANCL
+Cancel an image/parameter association.
+
+CALL IMG_CANCL( PARAM, STATUS )
+
+Description:
+
+   This routine may be used to release the resources associated with
+   an image. Its behaviour is similar to that of IMG_FREE, except
+   that it also removes the association between an image and a
+   parameter. If the same parameter is later used to access an
+   image, than a new image will be obtained (whereas if IMG_FREE is
+   used, then the original image will be re-accessed).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name, specifying either the individual
+   image/parameter association to be cancelled, or '*',
+   indicating that all such associations should be cancelled.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+This routine attempts to execute even if STATUS is set on entry,
+although no further error report will be made if it subsequently
+fails under these circumstances.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_FREE
+Release resources associated with an image.
+
+CALL IMG_FREE( PARAM, STATUS )
+
+Description:
+
+   This routine should be used to release the resources associated
+   with each image when it has been finished with. This should
+   always be done before the end of a program (a "wild card"
+   parameter name may be used to simplyfy this).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name, specifying either the individual image to be
+   released, or '*', indicating that all images should be
+   released.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+This routine attempts to execute even if STATUS is set on entry,
+although no further error report will be made if it subsequently
+fails under these circumstances.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+
+ 21-FEB-1992 (RFWS):
+    Added contextual error report.
+1 IMG_IN
+Obtain access to an input image.
+
+CALL IMG_IN( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image. It
+   returns the size of the image and a pointer to its data, mapped
+   as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1
+Obtain access to a 1-dimensional input image.
+
+CALL IMG_IN1( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtain access to a 1-dimensional input image. It
+   returns the size of the image and a pointer to its data, mapped
+   as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1B
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1UB
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1D
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1I
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1R
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1W
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN1UW
+Obtain access to a 1-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 1-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   Size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2
+Obtain access to a 2-dimensional input image.
+
+CALL IMG_IN2( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image. It
+   returns the size of the image and a pointer to its data, mapped
+   as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2B
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2UB
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2D
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2I
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2R
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2W
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN2UW
+Obtain access to a 2-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3
+Obtain access to a 3-dimensional input image.
+
+CALL IMG_IN3( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image. It
+   returns the size of the image and a pointer to its data, mapped
+   as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3B
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3UB
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3D
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3I
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3R
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3W
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IN3UW
+Obtain access to a 3-dimensional input image using a specified
+numeric type.
+
+CALL IMG_IN3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 3-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Returned)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INDF
+Obtain an NDF identifier for an image.
+
+CALL IMG_INDF( PARAM, INDF, STATUS )
+
+Description:
+
+   This routine obtains an NDF identifier for an image. The
+   resulting identifier may be passed to routines from the NDF_
+   library (see SUN/33) to perform lower-level operations on the
+   data which cannot be done using IMG_ routines.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+INDF = INTEGER (Returned)
+   NDF identifier for the image.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+-  The NDF identifier returned by this routine should be annulled
+(e.g. using NDF_ANNUL) when it is no longer required.  The IMG_
+system will not perform this operation itself.
+
+-  If this routine is called with STATUS set, then a value of
+NDF__NOID will be returned for the INDF argument, although no
+further processing will occur. The same value will also be
+returned if the routine should fail for any reason.  The
+NDF__NOID constant is defined in the NDF_PAR include file.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INB
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INUB
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_IND
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INI
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INR
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INW
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_INUW
+Obtain access to an input image using a specified numeric type.
+
+CALL IMG_INx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine obtains access to a 2-dimensional input image.  It
+   returns the size of the image and a pointer to its data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Returned)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Returned)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 17-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW
+Create a new image.
+
+CALL IMG_NEW( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image and returns a
+   pointer to its data, mapped as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1
+Create a new 1-dimensional image.
+
+CALL IMG_NEW1( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image and returns a
+   pointer to its data, mapped as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1B
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1UB
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1D
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1I
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1R
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1W
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW1UW
+Create a new 1-dimensional image of a specified numeric type.
+
+CALL IMG_NEW1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a new 1-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2
+Create a new 2-dimensional image.
+
+CALL IMG_NEW2( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image and returns a
+   pointer to its data, mapped as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2B
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2UB
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2D
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2I
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2R
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2W
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW2UW
+Create a new 2-dimensional image of a specified numeric type.
+
+CALL IMG_NEW2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3
+Create a new 3-dimensional image.
+
+CALL IMG_NEW3( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image and returns a
+   pointer to its data, mapped as floating point (_REAL) values.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3B
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3UB
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3D
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3I
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3R
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3W
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEW3UW
+Create a new 3-dimensional image of a specified numeric type.
+
+CALL IMG_NEW3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a new 3-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 25-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWB
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWUB
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWD
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWI
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWR
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWW
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_NEWUW
+Create a new image of a specified numeric type.
+
+CALL IMG_NEWx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a new 2-dimensional image, with a specified
+   numeric type, and returns a pointer to its data, mapped using the
+   same numeric type.
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUT
+Create an output image.
+
+CALL IMG_OUT( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped as
+   floating point (_REAL) values.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the new output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTB
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTUB
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTD
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTI
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTR
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTW
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_OUTUW
+Create an output image with a specified access type.
+
+CALL IMG_OUTx( PARAM1, PARAM2, IP, STATUS )
+
+Description:
+
+   This routine creates a new output image by duplicating an input
+   image.  A pointer is returned to the output image data, mapped
+   using the specified numeric type.
+2 Arguments
+PARAM1 = CHARACTER * ( * ) (Given)
+   Parameter name for the input image (case insensitive).
+
+PARAM2 = CHARACTER * ( * ) (Given)
+   Parameter name for the output image (case insensitive).
+
+IP = INTEGER (Returned)
+   Pointer to the mapped output data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for accessing the output data
+using each numeric type, obtained by replacing the "x" in the
+routine name by D, R, I, W, UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 18-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP
+Create a temporary image.
+
+CALL IMG_TMP( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image for use as
+   workspace and returns a pointer to its data, mapped as floating
+   point (_REAL) values. The image will be deleted automatically
+   when it is later released (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1
+Create a temporary 1-dimensional image.
+
+CALL IMG_TMP1( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image for use as
+   workspace and returns a pointer to its data, mapped as floating
+   point (_REAL) values. The image will be deleted automatically
+   when it is later released (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1B
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1UB
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1D
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1I
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1R
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1W
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP1UW
+Create a temporary 1-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP1x( PARAM, NX, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 1-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   Dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2
+Create a temporary 2-dimensional image.
+
+CALL IMG_TMP2( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image for use as
+   workspace and returns a pointer to its data, mapped as floating
+   point (_REAL) values. The image will be deleted automatically
+   when it is later released (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2B
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2UB
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2D
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2I
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2R
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2W
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP2UW
+Create a temporary 2-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP2x( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3
+Create a temporary 3-dimensional image.
+
+CALL IMG_TMP3( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image for use as
+   workspace and returns a pointer to its data, mapped as floating
+   point (_REAL) values. The image will be deleted automatically
+   when it is later released (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3B
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3UB
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3D
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3I
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3R
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3W
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMP3UW
+Create a temporary 3-dimensional image of a specified numeric
+type.
+
+CALL IMG_TMP3x( PARAM, NX, NY, NZ, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 3-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+NZ = INTEGER (Given)
+   Third dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPB
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPUB
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPD
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPI
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPR
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPW
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+1 IMG_TMPUW
+Create a temporary image of a specified numeric type.
+
+CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+Description:
+
+   This routine creates a temporary 2-dimensional image, with a
+   specified numeric type, for use as workspace and returns a
+   pointer to its data, mapped using the same numeric type.  The
+   image will be deleted automatically when it is later released
+   (e.g. by calling IMG_FREE).
+2 Arguments
+PARAM = CHARACTER * ( * ) (Given)
+   Parameter name (case insensitive).
+
+NX = INTEGER (Given)
+   First dimension size of the image (in pixels).
+
+NY = INTEGER (Given)
+   Second dimension size of the image (in pixels).
+
+IP = INTEGER (Returned)
+   Pointer to the image data.
+
+STATUS = INTEGER (Given and Returned)
+   The global status.
+2 Notes
+There is a version of this routine for each numeric type,
+obtained by replacing the "x" in the routine name by D, R, I, W,
+UW, B or UB as appropriate.
+2 Authors
+RFWS: R.F. Warren-Smith (STARLINK, RAL)
+2 History
+ 21-FEB-1992 (RFWS):
+    Original version.
+ DEC/CMS REPLACEMENT HISTORY, Element IMG.HLP
+ *1    22-FEB-1993 15:57:25 RFWS "Help library source for the IMG system"
+ DEC/CMS REPLACEMENT HISTORY, Element IMG.HLP

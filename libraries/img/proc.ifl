@@ -1,0 +1,10 @@
+interface proc
+   parameter bias
+   endparameter
+   parameter flat
+   endparameter
+   parameter raw
+   endparameter
+   parameter proc
+   endparameter
+endinterface

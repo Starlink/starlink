@@ -1,0 +1,15 @@
+1 IMG_update
+
+  In this release several bugs in the Linux version of IMG have been
+  corrected. These affected the release of headers when using the
+  IMG_CANCL routine and counting of header items by HDR_NUMB.
+
+  A new routine has also been introduced -- IMG_NAME. This returns the
+  name of the image data file for use when producing logfile information
+  etc.
+
+  IMG is fully described in SUN/160, which you can view on-line with
+  the "showme sun160" command.
+
+  Peter Draper & Rodney Warren-Smith (email to P.W.Draper@durham.ac.uk).
+

@@ -1,0 +1,22 @@
+#+
+#{prologue}
+#-
+
+interface TEST1
+
+   helplib ' '
+   parameter IN
+      position 1
+      type     NDF
+      access   READ
+      prompt   'Input image'
+   endparameter
+   parameter OUT
+      position 2
+      type     NDF
+      access   WRITE
+      prompt   'Output image'
+   endparameter
+
+
+endinterface

@@ -1,0 +1,1 @@
+echo -lndf_adam -lndf -lary_adam -lprm -lprm_a -lhdspar_adam -lpar_adam -ldtask_adam -ltask_adam -lerr -lerr_adam -lsubpar_adam -lparsecon_adam -llex_adam -ladam_adam -lmessys_adam -lmsp_adam -lmisc_adam -lstring_adam -lhds -lhlp -lpsx -lems -lchr -lcnf 

@@ -1,0 +1,85 @@
+      SUBROUTINE IMG1_RDESC( DESCR, LEN, ADDR, STATUS )
+*+
+*  Name:
+*     IMG1_RDESC
+
+*  Purpose:
+*     Returns information about a VMS character array descriptor.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL IMG1_RDESC( DESCR, LEN, ADDR, STATUS )
+
+*  Description:
+*     This routine gets the starting address and number of characters
+*     per array element from a VMS character array descriptor (see
+*     "Introduction to System Services" section 2.8 and 2.9).
+
+*  Arguments:
+*     DESCR( 2 ) = INTEGER (Given)
+*        The VMS descriptor describing the character array.
+*     LEN = INTEGER (Returned)
+*        The no. of characters in each element of the character array.
+*     ADDR = INTEGER (Returned)
+*        The starting address of the memory used to store the character
+*        array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - VMS-specific. A different mechanism may be used for
+*     passing character arrays on other machines.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1992 (DSB):
+*        Original version
+*     6-SEP-1994 (PDRAPER):
+*        Originally called GRP1_CDGET, copied and renamed for use in
+*        IMG.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Structure definitions:
+      STRUCTURE /CHAR_DESC/
+         INTEGER*2 CLEN          ! No. of characters per element.
+         BYTE   DTYPE            ! Data type.
+         BYTE   CLASS            ! Descriptor class.
+         INTEGER ADDR            ! Starting address.
+      END STRUCTURE                                 !
+
+*  Arguments Given:
+      RECORD /CHAR_DESC/ DESCR
+
+*  Arguments Returned:
+      INTEGER LEN
+      INTEGER ADDR
+
+*  Status:
+      INTEGER STATUS             ! Global status
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      LEN = DESCR.CLEN
+      ADDR = DESCR.ADDR
+
+      END
+* $Id$

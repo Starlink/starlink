@@ -1,0 +1,18 @@
+interface ADD
+   parameter IN
+      access 'READ'
+      prompt 'Input image'
+   endparameter
+
+   parameter OUT
+      access 'WRITE'
+      prompt 'Output image'
+   endparameter
+
+   parameter CONSTANT
+      access 'READ'
+      type   '_REAL'
+      prompt 'Constant to add'
+   endparameter
+endinterface
+# $Id$

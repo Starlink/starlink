@@ -1,0 +1,179 @@
+# Class makefile created by:
+#
+#    User      : pdraper
+#    Node      : dual1.dur.ac.uk
+#    Time      : Tue Oct 18 11:55:01 BST 1994
+#    Machine   : alpha running OSF1 250 (release V2.1)
+#
+#    Directory : /home/pdraper/img/SCCS
+
+#  Default action (fetch each file from sccs).
+action = sccs get $@ -r
+
+#  Default target for files not included in this class.
+.DEFAULT:; @ echo "class makefile: warning - $@ is not in this class" >&2
+
+#  Files included in this class.
+Class_Contents: \
+add.f add.ifl exercise.f exercise.ifl extlist.f extlist.ifl \
+fac_1599_err fitsread.f fitsread.ifl fitswrite.f fitswrite.ifl flat.f \
+flat.ifl grp.make hdr_delet.f hdr_exist.f hdr_in.f hdr_inx.gsc \
+hdr_name.f hdr_numb.f hdr_out.f hdr_outx.gsc img.hlp img.lse \
+img1_callo.f img1_callo.f_vms img1_cdesc.f_vms img1_cfree.f \
+img1_cfree.f_vms img1_ckey.f img1_cnslt.f img1_creal.f img1_creal.f_vms \
+img1_dcel.f img1_dkey.f img1_dlex.f img1_dlft.f img1_exex.f img1_exft.f \
+img1_exini.f img1_fobj.f img1_frext.f img1_frslt.f img1_ftscp.f \
+img1_gkeyc.f img1_gkeyx.gsd img1_gtndf.f img1_gtslt.f img1_init.f \
+img1_ncel.f img1_nex.f img1_nft.f img1_nkey.f img1_nmex.f img1_nmft.f \
+img1_nwndf.f img1_ok.f img1_ploc.f img1_prndf.f img1_pshdb.f \
+img1_pshde.f img1_pshdf.f img1_rdesc.f_vms img1_rdexx.gsc \
+img1_rdftx.gsc img1_rkey.f img1_tpndf.f img1_trace.f img1_vpar.f \
+img1_wcel.f img1_wkeyx.gsc img1_wrexx.gsc img1_wrftx.gsc img_cancl.f \
+img_const img_delet.f img_dev img_dlhd.f img_ecb img_err img_err.msg \
+img_exhd.f img_free.f img_in.f img_in1.f img_in1x.gen img_in2.f \
+img_in2x.gen img_in3.f img_in3x.gen img_indf.f img_inx.gen \
+img_link_adam img_new.f img_new1.f img_new1x.gen img_new2.f \
+img_new2x.gen img_new3.f img_new3x.gen img_news.txt img_newx.gen \
+img_nex.f img_nhd.f img_out.f img_outx.gen img_pcb img_rdhdx.gsc \
+img_rexn.f img_rhdn.f img_test.f img_test.ifl img_tmp.f img_tmp1.f \
+img_tmp1x.gen img_tmp2.f img_tmp2x.gen img_tmp3.f img_tmp3x.gen \
+img_tmpx.gen img_wrhdx.gsc link_shared makefile mean.f mean.ifl mk \
+nohdr.class ref.make shadow.f shadow.ifl sun160.tex test1.f test1.ifl
+
+#  Targets specifying the version of each file.
+add.f:;$(action)1.2
+add.ifl:;$(action)1.2
+exercise.f:;$(action)1.2
+exercise.ifl:;$(action)1.2
+extlist.f:;$(action)1.3
+extlist.ifl:;$(action)1.2
+fac_1599_err:;$(action)1.1
+fitsread.f:;$(action)1.2
+fitsread.ifl:;$(action)1.2
+fitswrite.f:;$(action)1.2
+fitswrite.ifl:;$(action)1.2
+flat.f:;$(action)1.2
+flat.ifl:;$(action)1.2
+grp.make:;$(action)1.4
+hdr_delet.f:;$(action)1.8
+hdr_exist.f:;$(action)1.4
+hdr_in.f:;$(action)1.6
+hdr_inx.gsc:;$(action)1.5
+hdr_name.f:;$(action)1.5
+hdr_numb.f:;$(action)1.8
+hdr_out.f:;$(action)1.7
+hdr_outx.gsc:;$(action)1.7
+img.hlp:;$(action)1.1
+img.lse:;$(action)1.1
+img1_callo.f:;$(action)1.2
+img1_callo.f_vms:;$(action)1.2
+img1_cdesc.f_vms:;$(action)1.2
+img1_cfree.f:;$(action)1.2
+img1_cfree.f_vms:;$(action)1.2
+img1_ckey.f:;$(action)1.5
+img1_cnslt.f:;$(action)1.3
+img1_creal.f:;$(action)1.2
+img1_creal.f_vms:;$(action)1.2
+img1_dcel.f:;$(action)1.3
+img1_dkey.f:;$(action)1.5
+img1_dlex.f:;$(action)1.7
+img1_dlft.f:;$(action)1.7
+img1_exex.f:;$(action)1.4
+img1_exft.f:;$(action)1.6
+img1_exini.f:;$(action)1.15
+img1_fobj.f:;$(action)1.4
+img1_frext.f:;$(action)1.12
+img1_frslt.f:;$(action)1.7
+img1_ftscp.f:;$(action)1.8
+img1_gkeyc.f:;$(action)1.11
+img1_gkeyx.gsd:;$(action)1.7
+img1_gtndf.f:;$(action)1.12
+img1_gtslt.f:;$(action)1.3
+img1_init.f:;$(action)1.8
+img1_ncel.f:;$(action)1.2
+img1_nex.f:;$(action)1.8
+img1_nft.f:;$(action)1.5
+img1_nkey.f:;$(action)1.4
+img1_nmex.f:;$(action)1.2
+img1_nmft.f:;$(action)1.6
+img1_nwndf.f:;$(action)1.5
+img1_ok.f:;$(action)1.2
+img1_ploc.f:;$(action)1.3
+img1_prndf.f:;$(action)1.6
+img1_pshdb.f:;$(action)1.2
+img1_pshde.f:;$(action)1.2
+img1_pshdf.f:;$(action)1.2
+img1_rdesc.f_vms:;$(action)1.2
+img1_rdexx.gsc:;$(action)1.7
+img1_rdftx.gsc:;$(action)1.8
+img1_rkey.f:;$(action)1.6
+img1_tpndf.f:;$(action)1.6
+img1_trace.f:;$(action)1.3
+img1_vpar.f:;$(action)1.2
+img1_wcel.f:;$(action)1.2
+img1_wkeyx.gsc:;$(action)1.7
+img1_wrexx.gsc:;$(action)1.6
+img1_wrftx.gsc:;$(action)1.7
+img_cancl.f:;$(action)1.14
+img_const:;$(action)1.6
+img_delet.f:;$(action)1.15
+img_dev:;$(action)1.2
+img_dlhd.f:;$(action)1.3
+img_ecb:;$(action)1.11
+img_err:;$(action)1.15
+img_err.msg:;$(action)1.1
+img_exhd.f:;$(action)1.2
+img_free.f:;$(action)1.16
+img_in.f:;$(action)1.7
+img_in1.f:;$(action)1.5
+img_in1x.gen:;$(action)1.5
+img_in2.f:;$(action)1.5
+img_in2x.gen:;$(action)1.4
+img_in3.f:;$(action)1.5
+img_in3x.gen:;$(action)1.4
+img_indf.f:;$(action)1.5
+img_inx.gen:;$(action)1.7
+img_link_adam:;$(action)1.3
+img_new.f:;$(action)1.6
+img_new1.f:;$(action)1.5
+img_new1x.gen:;$(action)1.5
+img_new2.f:;$(action)1.5
+img_new2x.gen:;$(action)1.5
+img_new3.f:;$(action)1.5
+img_new3x.gen:;$(action)1.4
+img_news.txt:;$(action)1.1
+img_newx.gen:;$(action)1.4
+img_nex.f:;$(action)1.4
+img_nhd.f:;$(action)1.5
+img_out.f:;$(action)1.5
+img_outx.gen:;$(action)1.4
+img_pcb:;$(action)1.2
+img_rdhdx.gsc:;$(action)1.6
+img_rexn.f:;$(action)1.3
+img_rhdn.f:;$(action)1.5
+img_test.f:;$(action)1.6
+img_test.ifl:;$(action)1.3
+img_tmp.f:;$(action)1.5
+img_tmp1.f:;$(action)1.5
+img_tmp1x.gen:;$(action)1.4
+img_tmp2.f:;$(action)1.5
+img_tmp2x.gen:;$(action)1.4
+img_tmp3.f:;$(action)1.5
+img_tmp3x.gen:;$(action)1.4
+img_tmpx.gen:;$(action)1.4
+img_wrhdx.gsc:;$(action)1.4
+link_shared:;$(action)1.1
+makefile:;$(action)1.41
+mean.f:;$(action)1.2
+mean.ifl:;$(action)1.2
+mk:;$(action)1.14
+nohdr.class:;$(action)1.1
+ref.make:;$(action)1.1
+shadow.f:;$(action)1.2
+shadow.ifl:;$(action)1.2
+sun160.tex:;$(action)1.5
+test1.f:;$(action)1.2
+test1.ifl:;$(action)1.2
+
+#  End of class makefile.
+#$Id$

@@ -1,0 +1,28 @@
+interface SHADOW
+
+   parameter IN
+      type    'NDF'
+      access  'READ'
+      prompt  'Input image'
+   endparameter
+
+   parameter OUT
+      type   'NDF'
+      access 'WRITE'
+      prompt 'Output image'
+   endparameter
+
+   parameter XSHIFT
+      type   '_INTEGER'
+      access  'READ'
+      prompt 'X shift'
+   endparameter
+
+   parameter YSHIFT
+      type   '_INTEGER'
+      access  'READ'
+      prompt 'Y shift'
+   endparameter
+
+endinterface
+# $Id$

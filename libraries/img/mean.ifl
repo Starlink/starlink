@@ -1,0 +1,6 @@
+interface MEAN
+   parameter IN
+      prompt 'Input image'
+   endparameter
+endinterface
+# $Id$

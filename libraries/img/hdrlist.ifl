@@ -1,0 +1,20 @@
+interface HDRLIST
+
+      parameter IN
+         type   NDF
+         access 'READ'
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'Input image'
+      endparameter
+
+      parameter SOURCE
+         type   LITERAL
+         access 'READ'
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'Source of header information'
+      endparameter
+
+endinterface
+# $Id$

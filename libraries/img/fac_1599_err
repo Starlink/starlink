@@ -1,0 +1,12 @@
+FACILITY IMG
+200,NODEL,images not deleted
+300,FATIN,fatal internal error
+301,MIXED,new images mixed with previously-acquired ones
+302,PARIN,parameter name invalid
+303,XSPAR,too many parameters used
+304,NOACC,access not allowed
+305,NOITM,no extension item
+306,CONER,conversion error
+307,TRUNC,string truncation
+308,BDDIM,bad dimension
+309,BDBND,bad bounds

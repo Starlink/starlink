@@ -1,0 +1,31 @@
+#+
+#  Name:
+#     IMG_TEST.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     1-MAR-1993 (RFWS):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface IMG_TEST
+
+   parameter IMAGE               # Name of test image
+      position 1
+      type     NDF
+      access   UPDATE
+      ppath    'CURRENT,DEFAULT'
+      vpath    'DEFAULT'
+      default  img_test
+      prompt   'Name of test image'
+   endparameter
+endinterface
+# $Id$

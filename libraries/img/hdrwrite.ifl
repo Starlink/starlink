@@ -1,0 +1,42 @@
+interface HDRWRITE
+
+      parameter IN
+         type   NDF
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'Input image'
+      endparameter
+
+      parameter OUT
+         type   NDF
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'Output image'
+      endparameter
+
+      parameter ITEM
+         type   LITERAL
+         access 'READ'
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'FITS keyword'
+      endparameter
+
+      parameter COMMENT
+         type   LITERAL
+         access 'READ'
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'Comment for record'
+      endparameter
+
+      parameter VALUE
+         type   LITERAL
+         access 'READ'
+         vpath  'PROMPT'
+         ppath  'CURRENT'
+         prompt 'Keyword value'
+      endparameter
+
+endinterface
+# $Id$

@@ -1,0 +1,159 @@
+      SUBROUTINE IMG1_WRFT<T>( SLOT, ITEM, COMMEN, VALUE, STATUS )
+*+
+* Name:
+*    IMG1_WRFTx
+
+*  Purpose:
+*    Writes the value of a FITS item.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL IMG1_WRFTx( SLOT, ITEM, COMMEN, VALUE, STATUS )
+
+*  Description:
+*     This routine writes the value associated with a FITS keyword into
+*     a FITS block. A FITS block must have been already associated with
+*     the indicated NDF. If the keyword already exists in the FITS block
+*     then it will be superceded (unless it is one of the specials
+*     'COMMENT', 'HISTORY' or ' '), otherwise the new value will be
+*     appended.
+
+*  Arguments:
+*     SLOT = INTEGER (Given)
+*        The slot number of the NDF.
+*     ITEM = CHARACTER * ( * ) (Given)
+*        The FITS keyword. This may be heirarchical.
+*     COMMEN = CHARACTER * ( * ) (Given)
+*        A comment to write with the value.
+*     VALUE = <COMM> (Given)
+*        The value to be associated with the keyword.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - this routine has a version for the types C, L, D, R and I.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     22-JUL-1994 (PDRAPER):
+*        Original version.
+*     7-SEP-1994 (PDRAPER):
+*        Added check for status return from GKEY.
+*     20-SEP-1994 (PDRAPER):
+*        Removed PSX calls.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'IMG_CONST'        ! IMG_ constants
+      INCLUDE 'IMG_ERR'          ! IMG_ error codes
+      INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
+
+*  Global Variables:
+      INCLUDE 'IMG_ECB'          ! IMG Extension Control Block
+*        ECB_FTSP( IMG__MXPAR ) = INTEGER (Read)
+*        Pointer to mapped FITS block.
+*
+*        ECB_FTSN( IMG__MXPAR ) = INTEGER (Read)
+*        Number of entries in the FITS block.
+
+      INCLUDE 'IMG_PCB'          ! IMG Parameter Control Block
+*        PCB_INDF( IMG__MXPAR ) = INTEGER (Read)
+*           NDF identifiers
+
+*   Arguments Given:
+      INTEGER SLOT
+      CHARACTER * ( * ) ITEM
+      CHARACTER * ( * ) COMMEN
+      <TYPE> VALUE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL IMG1_INIT         ! Initialise common blocks
+
+*  Local Variables:
+      CHARACTER * ( 80 ) LKEY    ! Local copy of keyword
+      LOGICAL THERE              ! Item has been located in FITS block
+      LOGICAL NEWEND             ! Whether a new END record is required
+      INTEGER AT                 ! The record number of the item
+      <LTYPE> LVAL               ! Local to receive value if found
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Note the %VAL(80)'s following the last genuine arguments of certain
+*  calls. This is the usual method used by compilers for passing the
+*  lengths of strings on UNIX and needs to be used here since the
+*  characters are mapped.
+*
+*  Before proceeding we need to find out if the keyword already exists,
+*  if not then the memory allocated to the FITS block needs to be
+*  extended to allow an extra record. Trap errors to do with format
+*  conversion etc. from GKEY. THERE is still true if the keyword is
+*  found in this state (we will overwrite regardless).
+*
+*  Avoid these checks if the keyword is one of the specials (COMMENT,
+*  HISTORY or ' '). In this case a new card is always appended to any
+*  existing ones (or more precisely just before the 'END' keyword).
+      LKEY = ITEM
+      CALL CHR_UCASE( LKEY )
+      CALL CHR_LDBLK( LKEY )
+      IF ( LKEY .EQ. 'COMMENT' .OR. LKEY .EQ. 'HISTORY' .OR.
+     :     LKEY .EQ. ' ' ) THEN
+         CALL ERR_MARK
+         CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+     :                      1, 'END', 0, THERE, LVAL, AT, STATUS,
+     :                      %VAL( 80 ) )
+         IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         CALL ERR_RLSE
+         THERE = .FALSE.
+      ELSE
+         CALL ERR_MARK
+         CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+     :                      1, LKEY, 0, THERE, LVAL, AT, STATUS,
+     :                      %VAL( 80 ) )
+         IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+         CALL ERR_RLSE
+      END IF
+      IF ( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  Extend the FITS block in memory to allow for an extra card.
+         ECB_FTSN( SLOT ) = ECB_FTSN( SLOT ) + 1
+         CALL IMG1_CREAL( 80, ECB_FTSN( SLOT ), ECB_FTSP( SLOT ),
+     :                    STATUS )
+      END IF
+
+*  Now write in the value.
+      NEWEND = .NOT. THERE
+      CALL IMG1_WKEY<T>( ECB_FTSN( SLOT ), %VAL( ECB_FTSP( SLOT ) ),
+     :                   AT, NEWEND, LKEY, COMMEN, VALUE,
+     :                   STATUS, %VAL( 80 ) )
+
+*  Beef up the report to include mention of the NDF name.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETC( 'ITEM', ITEM )
+         CALL NDF_MSG( 'NDF', PCB_INDF( SLOT ) )
+         CALL ERR_REP( 'IMG1_RDFTX_NOVAL', 'Unable to write ' //
+     :        'header item ''^ITEM'' in the FITS extension of ' //
+     :        'image ^NDF.', STATUS )
+      END IF
+      END
+
+* $Id$

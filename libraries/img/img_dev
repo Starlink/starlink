@@ -1,0 +1,92 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     img_dev
+
+#  Purpose:
+#     Create links to IMG include files.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script sets up (or removes) symbolic links in the current
+#     working directory which refer to IMG public include files.
+#     It exists to allow source code which contains references to the
+#     standard public IMG include files to be compiled without
+#     having to know where these files actually reside.
+
+#  Invocation:
+#     img_dev
+#        Sets up links for all ths IMG public include files.
+#     img_dev remove
+#        Removes the links previously set up.
+
+#  Notes:
+#     The pathname of the installation include directory (/star/include)
+#     must be edited into this script when it is installed.  This is
+#     normally done by the standard Starlink makefile.
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     PDRAPER: P.W. Draper (Starlink, Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-JAN-1992 (RFWS):
+#     	 Original version.
+#     22-JUN-1995 (BLY):
+#        Generic version.
+#     4-DEC-1995 (PDRAPER):
+#        Converted for use by IMG.
+#     {enter_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Set list of include file names.  These are those listed in the makefile
+#  PUBLIC_INCLUDES macro.
+
+includes="img_err"
+
+#  Interpret command line and act according to flags.
+while :; do
+   case "${1}" in
+
+#  No arguments: create appropriate links.
+      "")
+         for name in ${includes}; do \
+         LINK INSTALL_INC/${name} `echo ${name} | tr '[a-z]' '[A-Z]'`
+         done
+         break
+         ;;
+
+#  Argument is `remove': delete links.
+      remove)
+         for name in ${includes}; do \
+            rm -f `echo $name | tr '[a-z]' '[A-Z]'`
+         done
+         break
+         ;;
+
+#  Default: any other argument is invalid: report it.
+      *)
+         echo "img_dev: invalid option \"$*\"" >&2
+         exit 1
+         break
+      ;;
+
+   esac
+done
+
+#  End of script.
+      exit 0
+
+# $Id$

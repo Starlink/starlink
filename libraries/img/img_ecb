@@ -1,0 +1,64 @@
+*+
+*  Name:
+*     IMG_ECB
+
+*  Purpose:
+*     Define the IMG_ Extension Control Block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Fortran include file.
+
+*  Description:
+*     This file defines Fortran common blocks constituting the IMG_
+*     system Extension Control Block (ECB). This holds details of
+*     which extension are currently available in an NDF. The NDF slot
+*     number is the same as that used in the Parameter Control Block.
+
+*  Prior Requirements:
+*     The files IMG_CONST NDF_PAR and DAT_PAR must be included before
+*     this file, in order to define necessary constants.
+
+*  Authors:
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-JUL-1994 (PDRAPER):
+*        Original version.
+*     22-AUG-1994 (PDRAPER):
+*        Removed FITS modification check array.
+*     2-SEP-1994 (PDRAPER):
+*        Added space for storing pointers to extension locator stacks.
+*     15-NOV-1994 (PDRAPER):
+*        Removed ECB_XREAD variable. Readonly access is no longer
+*        checked.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Variables:
+      CHARACTER * ( NDF__SZXNM ) ECB_XNAME( IMG__MXPAR, IMG__MXEXT )
+                                 ! Extension names
+      CHARACTER * ( DAT__SZLOC ) ECB_XLOC( IMG__MXPAR, IMG__MXEXT )
+                                 ! Extension names
+      INTEGER ECB_FTSP( IMG__MXPAR )  ! Pointers to mapped  FITS block
+      INTEGER ECB_FTSN( IMG__MXPAR )  ! Number of entries in FITS block
+      INTEGER ECB_XPSTK( IMG__MXPAR, IMG__MXEXT ) ! Pointers to
+                                 ! extension locator stacks
+      INTEGER ECB_XNSTK( IMG__MXPAR, IMG__MXEXT ) ! Number of locator in
+                                 ! extension stacks.
+      INTEGER ECB_XNLEN( IMG__MXPAR, IMG__MXEXT ) ! Length of the
+                                 ! (hds_)trace of the extension locator.
+
+      COMMON /IMG1_ECB1/ ECB_XNAME, ECB_XLOC
+      COMMON /IMG1_ECB2/ ECB_FTSP, ECB_FTSN, ECB_XPSTK, ECB_XNSTK,
+     :                   ECB_XNLEN
+
+*.
+* $Id$

@@ -1,0 +1,54 @@
+*+
+*  Name:
+*     IMG_PCB
+
+*  Purpose:
+*     Define the IMG_ Parameter Control Block.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Fortran include file.
+
+*  Description:
+*     This file defines Fortran common blocks constituting the IMG_
+*     system Parameter Control Block (PCB). This holds details of
+*     associations between images and parameter names.
+
+*  Prior Requirements:
+*     The files IMG_CONST and NDF_PAR must be included before this
+*     file, in order to define necessary constants.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-FEB-1992 (RFWS):
+*        Original version.
+*     16-NOV-1994 (PDRAPER):
+*        Added PCB_TYPE variables to keep tabs on _mapped_ data types.
+*        Include file now depends on NDF_PAR include file.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Variables:
+      CHARACTER * ( IMG__SZPAR ) PCB_PARAM( IMG__MXPAR ) ! Parameter
+                                                         ! names
+      CHARACTER * ( NDF__SZTYP ) PCB_TYPE( IMG__MXPAR ) ! Data type of
+                                                        ! mapped
+                                                        ! component 
+      INTEGER PCB_INDF( IMG__MXPAR ) ! NDF identifiers
+      INTEGER PCB_PNTR( IMG__MXPAR ) ! Pointers to mapped data
+
+      COMMON /IMG1_PCB1/ PCB_PARAM, PCB_TYPE
+      COMMON /IMG1_PCB2/ PCB_INDF, PCB_PNTR
+
+*.
+* $Id$

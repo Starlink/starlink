@@ -1,0 +1,90 @@
+      SUBROUTINE IMG1_CDESC( LEN, ADDR, DESCR, STATUS )
+*+
+*  Name:
+*     IMG1_CDESC
+
+*  Purpose:
+*     Construct a VMS character array descriptor.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL IMG1_CDESC( LEN, ADDR, DESCR, STATUS )
+
+*  Description:
+*     This routine constructs a VMS character array descriptor
+*     with "Character string" data type and "Array descriptor"
+*     descriptor class (see "Introduction to System Services" section
+*     2.8 and 2.9).
+
+*  Arguments:
+*     LEN = INTEGER (Given)
+*        The no. of characters in each element of the character array.
+*     ADDR = INTEGER (Given)
+*        The starting address of the memory used to store the character
+*        array.
+*     DESCR( 2 ) = INTEGER (Returned)
+*        The VMS descriptor describing the character array.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - VMS-specific. A different mechanism may be used for passing
+*     character arrays on other machines.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     18-AUG-1992 (DSB):
+*        Original version
+*     6-SEP-1994 (PDRAPER):
+*        Originally called GRP1_CDSTO, copied and renamed for use in
+*        IMG.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE '($DSCDEF)'        ! VMS system constants.
+
+*  Structure definitions:
+      STRUCTURE /CHAR_DESC/
+         INTEGER*2 CLEN          ! No. of characters per element.
+         BYTE   DTYPE            ! Data type.
+         BYTE   CLASS            ! Descriptor class.
+         INTEGER ADDR            ! Starting address.
+      END STRUCTURE                                 !
+
+*  Arguments Given:
+      INTEGER LEN
+      INTEGER ADDR
+
+*  Arguments Returned:
+      RECORD /CHAR_DESC/ DESCR
+
+*  Status:
+      INTEGER STATUS             ! Global status
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DESCR.CLEN = LEN
+      DESCR.DTYPE = DSC$K_DTYPE_T
+      DESCR.CLASS = DSC$K_CLASS_A
+      DESCR.ADDR = ADDR
+
+      END
+      
+* $Id$

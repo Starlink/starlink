@@ -1,0 +1,124 @@
+      SUBROUTINE IMG1_CALLO( SIZE, QUAN, POINT, STATUS )
+*+
+*  Name:
+*     IMG1_CALLO
+
+*  Purpose:
+*     Allocate character virtual memory (VMS version).
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL IMG1_CALLO( SIZE, QUAN, POINT, STATUS )
+
+*  Description:
+*     This routine allocates arbitrary amounts of virtual memory for
+*     character strings. It should be used as this allows encapsulation
+*     of any system dependent problems with this process within this
+*     routine. The inverse process of freeing memory should also be
+*     performed with IMG1_CFREE and memory extension by IMG1_CREAL.
+
+*  Arguments:
+*     SIZE = INTEGER (Given)
+*        The size of the character strings which are to be allocated
+*        (declared size of strings).
+*     QUAN = INTEGER (Given)
+*        The number of character strings of SIZE which are to be
+*        allocated (array dimension).
+*     POINT = INTEGER (Returned)
+*        The pointer to the virtual memory.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - VMS specific. Deals with character descriptors.
+
+*  Authors:
+*     PDRAPER: Peter Draper (Durham University - Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     6-SEP-1994 (PDRAPER):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'IMG_CONST'        ! IMG internal constants
+      
+*  Arguments Given:
+      INTEGER SIZE
+      INTEGER QUAN
+
+*  Arguments Returned:
+      INTEGER POINT
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER NREQD              ! Number of byte-size elements actually
+                                 ! required
+      INTEGER IPMAIN             ! Pointer to main data array
+      INTEGER IPDESC             ! Pointer to descriptor part
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set pointer to NULL.
+      POINT = IMG__NOPTR
+
+*  Determine the amount of memory we really require.
+      NREQD = QUAN * SIZE
+      IF ( NREQD .GT. 0 ) THEN
+
+*  Attempt to main allocate memory.
+         CALL PSX_MALLOC( NREQD, IPMAIN, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Failed to access the memory.
+            CALL MSG_SETI( 'NREQD', NREQD )
+            CALL ERR_REP( 'IMG1_MALLO_FAIL', 'IMG1_MALLO: Could not ' //
+     :           'allocate ^NREQD bytes of memory.' , STATUS )
+
+         ELSE
+
+*  Now get memory for descriptor "header".
+            CALL PSX_MALLOC( VAL__SZI * 2, IPDESC, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+
+*  Failed to access the memory.
+               CALL MSG_SETI( 'QUAN', VAL__SZI * 2 )
+               CALL ERR_REP( 'IMG1_MALLO_FAIL', 'IMG1_MALLO: Could ' //
+     :              'not allocate ^QUAN bytes of memory.' , STATUS )
+
+*  Release main area.
+               CALL PSX_FREE( IPMAIN, STATUS )
+            ELSE
+
+*  Construct the descriptor for the character array.
+               CALL IMG1_CDESC( SIZE, IPMAIN, %VAL( IPDESC ), STATUS )
+               POINT = IPDESC
+            END IF
+         END IF
+      ELSE
+
+*  Invalid input value - set status and exit.
+         STATUS = IMG__FATIN
+         CALL ERR_REP( 'CCD1_MALLO_BAD',
+     :   '  IMG1_MALLO: Requested memory less than 1 byte (possible ' //
+     :        'programming error).', STATUS )
+      END IF
+      END
+* $Id$

@@ -1,0 +1,3558 @@
+\documentstyle[twoside,11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun160.3}
+\newcommand{\stardocnumber}    {160.3}
+\newcommand{\stardocauthors}   {P.W. Draper \\
+                                R.F. Warren-Smith}
+\newcommand{\stardocdate}      {16 December 1996}
+\newcommand{\stardoctitle}     {IMG \\ [1ex]
+                                Simple Image Data Access}
+\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocmanual}    {Subroutine Library}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+% In-line verbatim. Note that special characters within this still need
+% escaping.
+\newcommand{\myverb}[1]{{\tt{#1}}}
+%
+%  Notes are:
+\newcommand{\mynote}{The following notes refer to the numbered statements:}
+%
+%  Start of code section.
+\newenvironment{code}{\begin{small} \begin{quote}}
+                     {\end{quote} \end{small}}
+
+
+% Latex only sections, subsections etc. Surround these with a latexonly
+% environment.
+\newcommand{\latexonlysection}[1]{\section{#1}}
+\newcommand{\latexonlysubsection}[1]{\subsection{#1}}
+\newcommand{\latexonlysubsubsection}[1]{\subsubsection{#1}}
+\begin{htmlonly}
+   \newcommand{\latexonlysection}[1]{#1}
+   \newcommand{\latexonlysubsection}[1]{#1}
+   \newcommand{\latexonlysubsubsection}[1]{#1}
+\end{htmlonly}
+
+% Enumeration of notes.
+\newenvironment{enumnotes}
+{
+   \renewcommand{\labelenumi}{\myverb{[\theenumi]}}
+   \begin{enumerate}
+}{
+   \end{enumerate}
+   \renewcommand{\labelenumi}{\theenumi}
+}
+\begin{htmlonly}
+  \renewenvironment{enumnotes}
+  {
+    \begin{enumerate}
+  }{
+    \end{enumerate}
+  }
+\end{htmlonly}
+
+%  SST quotes.
+\newcommand{\qt}[1]{{\tt "}#1{\tt "}}
+\newcommand{\qs}[1]{{\tt '}#1{\tt '}}
+\begin{htmlonly}
+   \renewcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
+   \renewcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
+\end{htmlonly}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Description}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+   \begin{rawhtml} </H1> \end{rawhtml}
+   \begin{rawhtml} <H2> \end{rawhtml}
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H2> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents.
+%  ================================
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
+  \label{stardoccontents}
+  \begin{rawhtml}
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Description}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+\begin{center}
+  \textsl{
+    IMG is a subroutine library for accessing astronomical image data and
+    associated header information. It is designed to be easy to use and
+    understand.
+  }
+\end{center}
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+\newpage
+% \renewcommand{\thepage}{\arabic{page}}
+% \setcounter{page}{1}
+\begin{latexonly}
+  \markboth{\stardocname}{\stardocname}
+  \vspace{5mm}
+  \begin {center}
+     \rule{80mm}{0.5mm} \\ [1ex]
+     {\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+     \rule{80mm}{0.5mm}
+  \end{center}
+  \vspace{30mm}
+  \setlength{\parskip}{0mm}
+  \latexonlytoc
+  \setlength{\parskip}{\medskipamount}
+  \markboth{\stardocname}{\stardocname}
+\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+%  Introduction page
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\begin{latexonly}
+   \markboth{\stardocname}{\stardocname}
+   \vspace {5mm}
+   \begin {center}
+      \rule{80mm}{0.5mm} \\ [1ex]
+      {\Large\bf \stardoctitle \\ [2.5ex]
+            \stardocversion} \\ [2ex]
+      \rule{80mm}{0.5mm}
+   \end{center}
+   \vspace{30mm}
+\end{latexonly}
+
+\section{INTRODUCTION}
+This document describes the IMG library and how to use it to access
+astronomical images and header information from within your
+programs. The library has been designed to be easy to use and
+understand and will be of most interest to astronomers who write their
+own software and require uncomplicated access to their data.  In this
+context, an ``image'' may be an ordinary (2-D) image, but could also be
+a spectrum (1-D) or ``data cube'' (3-D).
+
+The data format used by the IMG library will normally be the Starlink
+``Extensible N-Dimensional Data Format'' or NDF (described in
+\xref{SUN/33}{sun33}{}), which is typically stored in files with a
+\myverb{.sdf} extension.  However, IMG can also \htmlref{access other
+astronomical formats}{IMGFOREIGNDATAFORMATS} (such as IRAF, disk FITS
+or FIGARO) and new ones can easily be added, so using IMG gives your
+programs access to a wide range of astronomical data in a very
+straightforward way\latexonly{ (see \S\ref{IMGFOREIGNDATAFORMATS})}.
+
+IMG can be used from the Fortran-77 and C programming languages and some
+familiarity with one of these is assumed, as is knowledge of
+the UNIX C-shell. If you want to use IMG from C then you should
+briefly study the earlier sections (which are Fortran specific, but
+nevertheless show the appropriate calling sequences and discuss more
+general issues) and then look at 
+\hyperref{this later section}{appendix }{}{IMGCinterface}.
+
+\section{ACCESSING IMAGE DATA \label{USINGIMG}}
+The easiest way to understand IMG is to look at how simple example
+programs work. That's what this section does. The examples are generally
+snippets of more complete programs that can be found in the
+directory
+\htmladdnormallink{\myverb{/star/bin/examples/img}}{../../bin/examples/img}
+(on non-Starlink machines replace \myverb{/star} with wherever you
+have the software installed).  You are encouraged to copy and modify
+these for your own use.
+
+\xref{SUN/101}{sun101}{} also contains examples of programming
+techniques that you might want to to use with IMG. You should ideally
+read these two documents together, although this isn't absolutely
+necessary.
+
+\subsection{Accessing \label{IMGMEAN}an existing image}
+The first example is a complete program. It gets an existing image,
+works out its mean value and then writes it out:
+\begin{code}
+\begin{verbatim}
+      SUBROUTINE MEAN( ISTAT )                                [1]
+
+*  Access an input image.
+      CALL IMG_IN( 'IN', NX, NY, IP, ISTAT )                  [2]
+
+*  Derive the mean and write it out.
+      CALL DOSTAT( %VAL( IP ), NX, NY, ISTAT )                [3]
+
+*  Free the input image.
+      CALL IMG_FREE( 'IN', ISTAT )                            [4]
+      END
+
+      SUBROUTINE DOSTAT( IMAGE, NX, NY, ISTAT )
+      INCLUDE 'SAE_PAR'                                       [5]
+      REAL IMAGE( NX, NY )                                    [6]
+
+      IF ( ISTAT .NE. SAI__OK ) RETURN                        [7]
+
+*  Initialise the sum and loop over all elements of the image.
+      SUM = 0.0
+      DO 1 J = 1, NY
+         DO 2 I = 1, NX
+            SUM = SUM + IMAGE( I, J )
+ 2       CONTINUE
+ 1    CONTINUE
+
+*  Write out the mean value.
+      WRITE( *, * ) 'Mean = ', SUM / REAL( NX * NY )          [8]
+
+      END
+\end{verbatim}
+\end{code}
+
+\mynote
+%\renewcommand{\labelenumi}{\myverb{[\theenumi]}}
+\begin{enumnotes}
+% 1
+\item Programs that use IMG should {\em always} have a main subroutine
+with an \myverb{INTEGER} argument. This subroutine should be named
+after the program and be stored in a file with the same name
+(\myverb{mean} and \htmladdnormallink{\myverb{mean.f}}{../../bin/examples/img/mean.f} in this
+case). You should consider this subroutine as a replacement for the
+file that normally has a \myverb{PROGRAM} statement in it.
+
+% 2
+\item The call to \htmlref{\myverb{IMG\_IN}}{IMG_INnx} gets the input
+image. The image is associated with the ``parameter'' \myverb{'IN'}
+which usually means that you will be prompted for the name of an image
+data-file.  The subroutine then returns the size of the image --
+\myverb{NX}~$\times$~\myverb{NY} -- and a pointer \myverb{IP} to its
+data (don't panic -- hold on for the next item).
+
+% 3
+\item A call to the subroutine \myverb{DOSTAT}, which performs the
+real work, is now made. Since any realistically useful program
+needs to be able to handle images of any size, a cheat is necessary
+-- this is the \myverb{\%VAL(IP)} argument. Basically, this makes the
+pointer to the image data, \myverb{IP}, look just like an array
+declaration in the calling routine (i.e.\ like say \myverb{REAL
+IMAGE(NX,NY)}).  This isn't standard Fortran, but should work on any
+machine that has IMG installed. Pointers are stored in
+\myverb{INTEGER} variables.
+
+% 4
+\item A call to \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} is made for
+each image parameter to tidy up before a program ends.
+
+% 5
+\item The \myverb{INCLUDE} statement in the subroutine \myverb{DOSTAT}
+inserts the contents of the file \myverb{`SAE\_PAR'}. This defines
+some standard Fortran parameters for you, such as \myverb{SAI\_\_OK}
+(note the double underscore). Include this file as standard as the
+parameters it defines are usually necessary.
+
+% 6
+\item The image is now available as an adjustable 2-dimensional array
+within the subroutine \myverb{DOSTAT}.
+
+% 7
+\item The value of the \myverb{ISTAT} argument is tested against
+\myverb{SAI\_\_OK} at the start of \myverb{DOSTAT}. This is done in case an
+error has occurred earlier on (in which case \myverb{ISTAT} will not
+be equal to \myverb{SAI\_\_OK}, so the remainder of \myverb{DOSTAT}
+will not execute).
+
+Doing this means that the program will not crash if an earlier error
+results in (say) the \myverb{IMAGE} array containing rubbish, and it
+makes sure that you get a sensible error message at the end telling
+you what went wrong.
+
+% 8
+\item The calculation result is written out. In a more sophisticated
+program you might want to use routines from the MSG library
+(\xref{SUN/104}{sun104}{}) to do this.
+\end{enumnotes}
+
+To complete the program another file is required. This is an
+``interface'' file (which should be named after the program but with a
+file extension of \myverb{.ifl}). It contains a description of each
+parameter associated with an image.  The following will do
+for this example program:
+\begin{code}
+\begin{verbatim}
+interface MEAN
+   parameter IN
+      prompt 'Input image'
+   endparameter
+endinterface
+\end{verbatim}
+\end{code}
+The main point is that it is necessary to include a \myverb{parameter}
+\ldots \myverb{endparameter} statement for each input or output image.
+\xref{SUN/101}{sun101}{} and \xref{SUN/115}{sun115}{} describe
+numerous other parameter options if you need more sophisticated
+control.
+
+Once you have the two files
+\htmladdnormallink{\myverb{mean.f}}{../../bin/examples/img/mean.f}
+and
+\htmladdnormallink{\myverb{mean.ifl}}{../../bin/examples/img/mean.ifl}
+you can compile and run the program by following the instructions
+\hyperref{given elsewhere}{in \S}{}{IMGCOMPILING}.
+
+{\bf To recap:} The most important IMG concepts to remember
+from this example are:
+
+\begin{enumerate}
+\item {\em Images are associated with a label known as a ``parameter''.}
+
+\item {\em Image data is accessed by a ``pointer'' that needs to be passed
+           to a subroutine using the \myverb{\%VAL} mechanism.}
+
+\item {\em It is necessary to call \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} to free
+           images before the program ends.}
+\end{enumerate}
+
+\subsection{Creating a new image}
+This second example (taken from the program
+\htmladdnormallink{\myverb{flat.f}}{../../bin/examples/img/flat.f}
+in the example directory\latexonly{ - see \S\ref{USINGIMG}}), shows how to
+create a new image and then write values to it:
+\begin{code}
+\begin{verbatim}
+
+*  Create a new image.
+      CALL IMG_NEW( 'OUT', 416, 578, IP, ISTAT )              [1]
+
+*  Fill the array with the value 1.
+      CALL DOFILL( %VAL( IP ), 416, 578, ISTAT )              [2]
+
+*  Free the image.
+      CALL IMG_FREE( 'OUT', ISTAT )                           [3]
+      END
+
+      SUBROUTINE DOFILL( IMAGE, NX, NY, ISTAT )
+      INCLUDE 'SAE_PAR'
+      REAL IMAGE( NX, NY )
+      IF ( ISTAT .NE. SAI__OK ) RETURN
+
+*  Loop over all the elements of the image setting them to 1.0.
+      DO 1 J = 1, NY
+         DO 2 I = 1, NX
+            IMAGE( I, J ) = 1.0
+ 2       CONTINUE
+ 1    CONTINUE
+      END
+
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+%1
+\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEWnx} creates the new image dataset
+(usually prompting you for a name). The image size in this example is
+416~$\times$~578 pixels.
+
+%2
+\item The newly created image is passed to the subroutine
+\myverb{DOFILL} where all its elements are set to the value $1.0$.
+
+%3
+\item Calling \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} ensures that the output image is
+correctly freed (avoiding possible loss of the data you have written).
+\end{enumnotes}
+
+\subsection{Modifying images}
+One of the most common things that programs do is modify an existing
+image or create an image that is a modification of an existing one. The
+examples shown here deal with both these cases.
+
+\subsubsection{Modifying an image}
+
+This snippet of Fortran shows an existing image being accessed so that
+it can be modified in place (that is, without creating a new copy):
+\begin{code}
+\begin{verbatim}
+*  Access an existing image.
+      CALL IMG_MOD( 'IN', NX, NY, IP, ISTAT )
+
+*  Fill the image with a value.
+      CALL DOFILL( %VAL( IP ), NX, NY, ISTAT )
+
+*  Free the image.
+      CALL IMG_FREE( 'IN', ISTAT )
+\end{verbatim}
+\end{code}
+
+\subsubsection{Modifying a copy of an image}
+
+This example copies the input image first and then modifies the
+copy. This is essential if the input image needs to be kept.
+A complete program called
+\htmladdnormallink{\myverb{add.f}}{../../bin/examples/img/add.f}
+exists\latexonly{ (see \S\ref{USINGIMG})}.
+\begin{code}
+\begin{verbatim}
+*  Access an existing image.
+      CALL IMG_IN( 'IN', NX, NY, IPIN, ISTAT )
+
+*  Create a new output image by copying the input image.
+      CALL IMG_OUT( 'IN', 'OUT', IPOUT, ISTAT )               [1]
+
+*  Modify the output image.
+      CALL DOFILL( %VAL( IPOUT ), NX, NY, ISTAT )
+
+*  Free the input and output images.
+      CALL IMG_FREE( '*', ISTAT )                             [2]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+\item The call to \htmlref{\myverb{IMG\_OUT}}{IMG_OUTx} creates a new output image
+associated with the parameter \myverb{'OUT'} by copying the one
+associated with the parameter \myverb{'IN'}. It returns a pointer
+\myverb{IPOUT} for the output image data.
+
+\item Notice that the names of the image parameters are not shown
+explicitly in this call to \htmlref{\myverb{IMG\_FREE}}{IMG_FREE}. Using a \myverb{'*'}
+indicates that all known images should be freed.
+\end{enumnotes}
+
+\section{ACCESSING HEADER INFORMATION}
+Most astronomical images have collections of numeric, character or
+logical values associated with them. Typically these consist of
+important calibration values, but they are also often used to describe
+the history or status of the data. Collections of such data, which are
+not actually part of the image array, are known as ``header''
+information (this name derives from the fact that FITS\footnote{FITS,
+the ``Flexible Image Transport System'' is the {\em de facto} standard
+for the interchange of astronomical data.}  stores these values at the
+beginning -- head -- of a file). IMG refers to a single piece of such
+information as a ``header item'' and a separate set of subroutines
+exists to read, write and make enquiries about them.
+
+\subsection{Reading header items}
+This example (taken from a complete program called
+\htmladdnormallink{\myverb{hdrread.f}}{../../bin/examples/img/hdrread.f}
+\latexonly{-- see \S \ref{USINGIMG}}) shows how to read the value of a
+header item from an image associated with the parameter \myverb{'IN'}:
+\begin{code}
+\begin{verbatim}
+*  Read the header item.
+      CALL HDR_IN( 'IN', ' ', 'OBSERVER', 1, VALUE, ISTAT )
+\end{verbatim}
+\end{code}
+The call to \htmlref{\myverb{HDR\_IN}}{HDR_INx} specifies the image by using its
+parameter name -- \myverb{'IN'} (argument 1). If you have not
+previously accessed this image you will probably be prompted for its
+file name at this point.
+
+The 2nd, blank argument, indicates that an ``ordinary'' FITS header
+item is required (there are other possible ``sources'' of header information
+which are described
+\hyperref{elsewhere}{later -- \S}{}{IMGNAMEDEXTENSIONS}).
+
+The 3rd argument \myverb{'OBSERVER'} specifies the name of the header
+item required and the 4th argument \myverb{1} indicates that you want
+the first occurrence of that item (just in case it occurs several
+times, which some items are allowed to do).
+
+The 5th argument \myverb{VALUE} returns the header item value as a
+character string. If the header item you requested doesn't exist, then
+\myverb{VALUE} is returned unchanged, so you may want to set it to a
+sensible value (say \myverb{'$<$unknown$>$'}) beforehand.
+
+\subsection{Writing header items}
+This example (taken from a complete program
+\htmladdnormallink{\myverb{hdrwrite.f}}{../../bin/examples/img/hdrwrite.f}\latexonly{
+-- see \S \ref{USINGIMG}}) shows how to write the value of a
+header item to an image associated with the parameter \myverb{'OUT'}:
+\begin{code}
+\begin{verbatim}
+*  Write the new header item.
+      CALL HDR_OUT( 'OUT', ' ', 'OBSERVER', 'The observer',   [1]
+     :              'Fred Bloggs', ISTAT )
+
+*  Free the image.
+      CALL IMG_FREE( 'OUT', ISTAT )                           [2]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+\item The call to \htmlref{\myverb{HDR\_OUT}}{HDR_OUTx} specifies the image by using its
+parameter name -- \myverb{'OUT'} (argument 1). If you have not
+previously accessed this image you will probably be prompted for its
+file name at this point. If you have already accessed the image then
+it should be either an output image or one accessed for modification,
+as you cannot write items to images accessed by \htmlref{\myverb{IMG\_IN}}{IMG_INnx}.
+
+The 2nd, blank argument, indicates that an ``ordinary'' FITS header
+item is to be written.
+
+The 3rd argument (\myverb{'OBSERVER'}) specifies the name of the header
+item and the 4th argument \myverb{'The observer'} is a comment
+to store with the item.
+
+The 5th argument (\myverb{'Fred Bloggs'}) is the header item value.
+
+\item The image is freed. If this wasn't done, the new header item
+would be lost.
+\end{enumnotes}
+
+\section{ADDITIONAL FEATURES}
+The IMG library has more capabilities than have been covered in the
+preceding descriptions, which have been kept as simple as possible.
+You should read the following  if you need to do more than has been
+covered so far.
+
+\subsection{More advanced image access}
+\subsubsection{Getting workspace}
+Any reasonably complex program sooner or later needs to be able to
+store image information between processing stages. This program
+snippet (from an example called
+\htmladdnormallink{\myverb{shadow.f}}{../../bin/examples/img/shadow.f}
+\latexonly{-- see \S\ref{USINGIMG}})
+shows you how to create a temporary image for this purpose:
+\begin{code}
+\begin{verbatim}
+*  Access the input image.
+      CALL IMG_IN( 'IN', NX, NY, IPIN, ISTAT )
+      ...
+*  Get an image-sized piece of workspace.
+      CALL IMG_TMP( 'TEMP', NX, NY, IPTEMP, ISTAT )           [1]
+      ...
+*  Free all the images (this deletes the temporary image).
+      CALL IMG_FREE( '*', ISTAT )                             [2]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+\item The call to \htmlref{\myverb{IMG\_TMP}}{IMG_TMPnx} creates a temporary image of
+the size you specify (in this case the same size as the input image).
+You will {\em not} be prompted for a file name for a temporary image,
+and {\em no } entry is needed for it in the program's interface file.
+
+\item The call to \htmlref{\myverb{IMG\_FREE}}{IMG_FREE} will delete the temporary image.
+\end{enumnotes}
+
+\subsubsection{Using ``images'' which are not 2-dimensional}
+IMG subroutines can access ``image'' data with between 1 and 3
+dimensions. This allows you to handle spectra (1-D) and cubes (3-D) as
+well as traditional 2-dimensional images. The subroutine calls needed
+are almost identical to the normal ones \latexonly{(above)} that assume 2
+dimensions. They differ only in having more or less arguments for the
+dimension sizes. The following illustrates the possibilities:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_IN1( 'SPECTRUM', NX, IP, ISTAT )
+      CALL IMG_IN2( 'IMAGE', NX, NY, IP, ISTAT )
+      CALL IMG_IN3( 'CUBE', NX, NY, NZ, IP, ISTAT )
+\end{verbatim}
+\end{code}
+Note how the number of dimensions is specified by appending a number
+to the routine name, and how \myverb{IMG\_IN2} is just a synonym for
+\htmlref{\myverb{IMG\_IN}}{IMG_INnx} (2 dimensions are assumed if you do not say
+otherwise).
+
+As well as accessing input images, there are equivalent routines for
+performing most other IMG operations on images with between 1 and 3
+dimensions. For instance, the following would create a new
+3-dimensional image:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_NEW3( 'CUBE', NX, NY, NZ, IP, ISTAT )
+\end{verbatim}
+\end{code}
+
+When accessing an existing image with (say) 2 dimensions, you will
+also be able to access an appropriate slice from (say) a 3-dimensional
+image if you specify this when you are prompted for the image name
+(see \hyperref{elsewhere}{\S}{}{IMGREGIONS}).
+
+\subsubsection{Accessing \label{IMGDIFFERENTDATATYPES} images using different data types}
+IMG also allows access to images using data types other than
+\myverb{REAL} (which is the default). The most useful of these are
+\myverb{INTEGER}, \myverb{INTEGER*2}, and \myverb{DOUBLE
+PRECISION}. The subroutine calls needed are almost identical to the
+normal ones except that you should append a character code to the
+routine name to indicate the data type you require.  The character
+codes (and their data types) are:
+\begin{small}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Character code & Fortran-77 data type      &  Description      \\
+\hline
+ \myverb{R}    & \myverb{REAL}             &  Single precision \\
+ \myverb{D}    & \myverb{DOUBLE PRECISION} &  Double precision \\
+ \myverb{I}    & \myverb{INTEGER}          &  Integer          \\
+\hline
+  \myverb{W}   & \myverb{INTEGER*2}        &  Word             \\
+  \myverb{UW}  & \myverb{INTEGER*2}        &  Unsigned word    \\
+  \myverb{B}   & \myverb{BYTE}             &  Byte             \\
+  \myverb{UB}  & \myverb{BYTE}             &  Unsigned byte    \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+so among the possibilities are the calls:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_IND( 'IMAGE', NX, NY, IP, ISTAT )              [1]
+      CALL IMG_INI( 'IMAGE', NX, NY, IP, ISTAT )              [2]
+      CALL IMG_INR( 'IMAGE', NX, NY, IP, ISTAT )              [3]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+\item Access an image using \myverb{DOUBLE PRECISION}.
+
+\item Access an image using \myverb{INTEGER}.
+
+\item Access an image using \myverb{REAL}. Note that
+this is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_INnx}, since it also gets a 2-D
+\myverb{REAL} image.
+\end{enumnotes}
+
+You should declare the image array in your program to have the
+corresponding Fortran data type, as in the following example that
+accesses and modifies an image using \myverb{INTEGER} format:
+\begin{code}
+\begin{verbatim}
+
+*  Access an input image, allowing it to be modified.
+      CALL IMG_MODI( 'IN', NX, NY, IP, ISTAT )                [1]
+
+*  Fill the array with zeros.
+      CALL DOZERO( %VAL( IP ), NX, NY, ISTAT )
+
+*  Free the image.
+      CALL IMG_FREE( 'IN', ISTAT )
+      END
+
+      SUBROUTINE DOZERO( IMAGE, NX, NY, ISTAT )
+      INCLUDE 'SAE_PAR'
+      INTEGER IMAGE( NX, NY )                                 [2]
+
+      IF ( ISTAT .NE. SAI__OK ) RETURN
+      DO 1 J = 1, NY
+         DO 2 I = 1, NX
+            IMAGE( I, J ) = 0
+ 2       CONTINUE
+ 1    CONTINUE
+      END
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+\item An \myverb{INTEGER} input image is accessed for modification
+
+\item In the subroutine \myverb{DOZERO} the image is declared as an
+adjustable dimension \myverb{INTEGER} array.
+\end{enumnotes}
+
+All IMG subroutines that access images have variants that allow you to
+use different data types. There are also versions that allow these to
+be mixed with different numbers of data dimensions. Some possibilities
+are:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_IN1D( 'SPECTRUM', NX, IP, ISTAT )              [1]
+      CALL IMG_MOD2I( 'IMAGE', NX, NY, IP, ISTAT )            [2]
+      CALL IMG_NEW3W( 'CUBE', NX, NY, NZ, IP, ISTAT )         [3]
+      CALL IMG_IN2R( 'IMAGE', NX, NY, IP, ISTAT )             [4]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+\item This call accesses a 1-D image for reading using \myverb{DOUBLE
+PRECISION}.
+
+\item This call accesses a 2-D image for modification using the
+\myverb{INTEGER} data type.
+
+\item This call creates a new 3-D data cube with the word (Fortran
+\myverb{INTEGER*2}) data type.
+
+\item This call is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_INnx}, since it gets a 2-D
+\myverb{REAL} image.
+\end{enumnotes}
+
+If your image isn't stored with the type that you ask for, then it
+will be converted from the stored type (if possible). If you modify
+the data it will be re-converted to the storage type when the image is
+freed.  New images are stored using the data type you ask for.
+
+The data types unsigned word (UW), signed byte (B) and unsigned byte
+(UB) are less commonly used. Indeed, the unsigned data types have no
+equivalents in Fortran and should be manipulated using the
+PRIMDAT library (\xref{SUN/39}{sun39}{}).
+
+
+\subsubsection{Accessing multiple images}
+IMG can access more than one image at a time using a single subroutine
+call. An example of this is:
+\begin{code}
+\begin{verbatim}
+
+*  Declare pointers.
+      INTEGER IP( 3 )
+
+*  Access images.
+      CALL IMG_IN( 'BIAS,FLAT,RAW', NX, NY, IP, ISTAT )       [1]
+
+*  Create a new output image by copying the RAW input image.
+      CALL IMG_OUT( 'RAW', 'PROC', IPPROC, ISTAT )            [2]
+
+*  Debias and flatfield data.
+      CALL DOPROC( %VAL( IP( 1 ) ), %VAL( IP( 2 ) ),          [3]
+     :             %VAL( IP( 3 ) ), NX, NY, %VAL( IPPROC ),
+     :             ISTAT )
+
+*  Free all the images.
+      CALL IMG_FREE( '*', ISTAT )
+      END
+
+      SUBROUTINE DOPROC( BIAS, FLAT, RAW, NX, NY, PROC, ISTAT )
+      INCLUDE 'SAE_PAR'
+      REAL BIAS( NX, NY ), FLAT( NX, NY ), RAW( NX, NY ),     [4]
+     :     PROC( NX, NY )
+
+      IF ( ISTAT .NE. SAI__OK ) RETURN
+      DO 1 J = 1, NY
+         DO 2 I = 1, NX
+            PROC( I, J ) = ( RAW( I, J ) - BIAS( I, J ) ) / FLAT( I, J )
+ 2       CONTINUE
+ 1    CONTINUE
+      END
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item
+This call accesses three images \myverb{'BIAS'}, \myverb{'FLAT'} and
+\myverb{'RAW'}. Prompts for the actual image files will be made for
+each of these names and pointers to the image data will returned in IP,
+which should now be an array of size 3.
+
+% 2
+\item
+The image \myverb{'RAW'} is copied to a new file. This also copies any
+header information, so is usually preferred to using \htmlref{\myverb{IMG\_NEW}}{IMG_NEWnx}.
+
+% 3
+\item
+The individual pointers are now passed to a subroutine so that the
+\myverb{'BIAS'}, \myverb{'FLAT'} and \myverb{'RAW'} images together
+with the copy of \myverb{'RAW'} can be accessed.
+
+% 4
+\item
+The image arrays are declared as normal.
+\end{enumnotes}
+
+There are two advantages to accessing multiple images in one call in
+this way:
+\begin{enumerate}
+\item
+All the images are made available to the program as if they were the
+same size, regardless of their actual sizes (the largest region that
+is common to all the images is selected).
+
+\item
+All the images are made available with the same data type
+(\myverb{REAL} in this case).
+\end{enumerate}
+This means that corresponding values in each of the images can be
+directly inter-compared by your program, even if the images themselves
+have different sizes or data types.
+
+\subsubsection{Creating multiple images}
+IMG can \latexonly{also} create more than one image using a single
+subroutine call. Some possibilities are:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_NEW( 'MODEL1,MODEL2', 1024, 1024, IP, ISTAT )  [1]
+      CALL IMG_OUT( 'TEMPLATE', 'OUT1,OUT2', IP, ISTAT )      [2]
+      CALL IMG_TMP( 'T1,T2,T3,T4', NX, NY, IP, ISTAT )        [3]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEWnx} creates two new images with size
+1024~$\times$~1024. The variable \myverb{IP} should be declared as
+an \myverb{INTEGER} array of size 2.
+
+% 2
+\item The image associated with parameter \myverb{'TEMPLATE'} is
+copied to two new images \myverb{'OUT1'} and \myverb{'OUT2'}.
+Again, the pointers are returned in an array \myverb{IP(2)}.
+
+%3
+\item Four temporary images of the same size and type are created.
+\end{enumnotes}
+
+\subsubsection{Handling \label{IMGBADDATA}``bad'' data}
+
+In practice, astronomical images will often contain values that are
+unreliable (or unknown) and should be ignored. For example, you might
+not be able to compute a result for every element of an image array
+(say where a divide by zero would occur), or your detector system may
+not generate sensible values everywhere.  These missing data are
+usually flagged by setting them to a unique number that allows them to
+be recognised, and this is known as the ``bad'' data
+value.\footnote{It may also be known as the ``invalid'', ``flagged''
+or even ``magic'' value, but the meaning is the same.}
+
+Unfortunately, unless you have complete control over your data, you
+cannot usually ignore the possibility that an image may contain some
+of these ``bad'' values.  If you did, and processed the numbers as if
+they were valid data, you would at best get the wrong answer. More
+probably, your program would crash.
+
+To prevent you being baffled by this pitfall, IMG will normally check
+whether your input images contain any bad values and will issue a
+warning if any are found. Then at least you know {\em why} your
+program crashed!
+
+You can deal with bad data values in one of two ways. The simplest is
+to use a suitable program to detect them and replace them with a
+sensible alternative value (for example, the KAPPA -
+\xref{SUN/95}{sun95}{} - program \xref{NOMAGIC}{sun95}{NOMAGIC} will
+do this). Alternatively, you can modify your IMG program to take
+proper account of them.
+
+If you decide to modify your program, you'll probably want to inhibit
+the checks that IMG makes. This is done by appending an exclamation
+mark (!) to the parameter name of each affected image. So, for
+instance:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_IN( 'BIAS!,FLAT!,RAW!', NX, NY, IP, ISTAT )
+\end{verbatim}
+\end{code}
+inhibits bad data value checking for all the input images.
+
+The following example is a version of the
+\htmlref{\myverb{mean.f}}{IMGMEAN} program \latexonly{(see
+\S\ref{IMGMEAN})} that shows the sort of changes needed to deal with
+bad data:
+\begin{code}
+\begin{verbatim}
+      SUBROUTINE MEAN( ISTAT )
+
+*  Access an input image. Inhibit checks for bad pixels.
+      CALL IMG_IN( 'IN!', NX, NY, IP, ISTAT )                 [1]
+
+*  Derive the mean and write it out.
+      CALL DOSTAT( %VAL( IP ), NX, NY, ISTAT )
+
+*  Free the input image.
+      CALL IMG_FREE( 'IN', ISTAT )
+      END
+
+      SUBROUTINE DOSTAT( IMAGE, NX, NY, ISTAT )
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'                                       [2]
+      REAL IMAGE( NX, NY )
+
+      IF ( ISTAT .NE. SAI__OK ) RETURN
+
+*  Initialise the sum and loop over all elements of the image, checking
+*  that every data value is not bad.
+      SUM = 0.0
+      N = 0
+      DO 1 J = 1, NY
+         DO 2 I = 1, NX
+            IF ( IMAGE( I, J ) .NE. VAL__BADR ) THEN          [3]
+               SUM = SUM + IMAGE( I, J )
+               N = N + 1
+            END IF
+ 2       CONTINUE
+ 1    CONTINUE
+
+*  Write out the mean value.
+      IF ( N .GT. 0 ) THEN
+         WRITE( *, * ) 'Mean of ', N, ' values = ', SUM / REAL( N )
+      ELSE
+         WRITE( *, * ) 'Error: all data values are bad'
+      END IF
+      END
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+%1
+\item
+An input image is accessed without performing any checks for the
+presence of bad data.
+
+%2
+\item
+The file `\myverb{PRM\_PAR}' is included. This defines Fortran
+parameters for the values used to flag bad data (it should be used by
+all programs that handle bad data). The parameter names are
+type-dependent and have the form \myverb{VAL\_\_BAD[x]}, where
+\myverb{[x]} is replaced by the character code for the data type
+you're processing. These codes are the same as those used when
+accessing images of different data types -- see
+\hyperref{here}{\S}{}{IMGDIFFERENTDATATYPES}.  So, for instance, with
+\myverb{REAL} data you would use \myverb{VAL\_\_BADR}, while with
+\myverb{INTEGER} data you would use \myverb{VAL\_\_BADI}, etc. Before
+compiling a program that includes this file you should execute the
+command \myverb{prm\_dev}, which creates a soft link to the include
+file.
+
+%3
+\item
+Since every input value may now potentially be bad, each one must be
+checked before use. As the data type being processed is \myverb{REAL},
+the bad data value we test against is \myverb{VAL\_\_BADR}.
+\end{enumnotes}
+
+If your program accesses more than one input image, you must be
+careful to check each of them. For instance if you were adding two
+images together you'd need to do something like the following:
+\begin{code}
+\begin{verbatim}
+      DO 1 I = 1, NX
+         IF ( A( I ) .NE. VAL__BADI .AND. B( I ) .NE. VAL__BADI ) THEN
+            C( I ) = A( I ) + B( I )
+         ELSE
+            C( I ) = VAL__BADI
+         END IF
+ 1    CONTINUE
+\end{verbatim}
+\end{code}
+
+Where \myverb{A} and \myverb{B} are the ``images'' to be added and
+\myverb{C} is the image to store the result (in this case the images
+are really 1-D \myverb{INTEGER} spectra).
+Note how a bad value is assigned to the output image if we are unable
+to calculate a result.
+
+If you need to know more about how to handle bad data you should
+consult \xref{SUN/33}{sun33}{bad_pixels}.
+
+\subsection{More advanced header access}
+\subsubsection{Accessing header items using different data types}
+Header items can come in more than one data type, so extended HDR
+subroutines (as for IMG) are provided to access them. If the item
+isn't of the type you want, then a format conversion will be
+attempted. The way you specify the type you require is similar to
+that used for IMG routines -- you just append the necessary character
+code to the routine name:
+\begin{small}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Character code & Fortran-77 data type      &  Description      \\
+\hline
+ \myverb{C}    & \myverb{CHARACTER}        &  Character string \\
+ \myverb{D}    & \myverb{DOUBLE PRECISION} &  Double precision \\
+ \myverb{I}    & \myverb{INTEGER}          &  Integer          \\
+ \myverb{L}    & \myverb{LOGICAL}          &  Logical          \\
+ \myverb{R}    & \myverb{REAL}             &  Single precision \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+Since all header item values can be converted to a character
+representation, this is the safest method to access an item of unknown
+type (which is why it is the method used by the ordinary
+\htmlref{\myverb{HDR\_IN}}{HDR_INx} subroutine). Some of the possible calls are:
+\begin{code}
+\begin{verbatim}
+     CALL HDR_INR( 'IN', ' ', 'BSCALE', 1, BSCALE, ISTAT )    [1]
+     CALL HDR_INI( 'IN', ' ', 'BINNED', 1, IBFACT, ISTAT )    [2]
+     CALL HDR_OUTL( 'OUT', ' ', 'CHECKED',                    [3]
+     :              'Data checked for C/Rs', .TRUE., ISTAT )
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item This example reads in a \myverb{REAL} value \myverb{BSCALE}.
+
+% 2
+\item This example reads in an \myverb{INTEGER} value \myverb{BINNED}.
+
+% 1
+\item This example writes out a \myverb{LOGICAL} value
+\myverb{CHECKED} with the comment \myverb{'Data checked for C/Rs'}.
+\end{enumnotes}
+
+\subsubsection{Using \label{IMGNAMEDEXTENSIONS}header items from different sources}
+So far, header items have been assumed to originate only from one
+source (FITS). In reality, an image may have more than one
+set of header information, and these are distinguished by giving them
+different names. FITS headers are normally used for storing
+information that may be widely distributed, perhaps to people using
+different data reduction systems, whereas more private collections of
+header information may be created by using a name of your own
+choice. Private header information has the advantage that it is
+unlikely to be trampled on by other software (that believes it knows
+what the headers mean -- rightly or wrongly) and is typically used for
+information needed only within a particular software
+package.\footnote{The Starlink application packages CCDPACK
+(\xref{SUN/139}{sun139}{}) and SPECDRE (\xref{SUN/140}{sun140}{}) make
+extensive use of these facilities.}
+
+Using header items from other sources is achieved simply by replacing
+\myverb{' '} (which is a synonym for 'FITS') with the appropriate
+name.  Storing information in a named source solely used by your
+programs is encouraged. This is better than trusting other programs
+not to modify values that you have set. \myverb{'MYSOURCE'} is used in
+the following examples:
+\begin{code}
+\begin{verbatim}
+*  Write a new header item.
+      CALL HDR_OUT( 'OUT', 'MYSOURCE', ITEM, ' ', VALUE, ISTAT )
+      ...
+*  Read back the value.
+      CALL HDR_IN( 'IN', 'MYSOURCE', ITEM, 1, VALUE, ISTAT )
+\end{verbatim}
+\end{code}
+
+\subsubsection{Accessing header items by index \label{HDRINDEXING}}
+There are two HDR routines that allow you to access header items using
+an index number. Header item index numbers run from 1 through to the
+maximum number of items available. These facilities can be used to
+list all the header items, or to test for the existence of items with
+particular names.
+
+The following program snippet shows how to list all the header items
+associated with an image.
+It uses the \htmlref{\myverb{HDR\_NUMB}}{HDR_NUMB} subroutine to query the number of
+items. The complete example is called
+\htmladdnormallink{\myverb{hdrlist.f}}
+{../../bin/examples/img/hdrlist.f}\latexonly{ -- see \S \ref{USINGIMG}}.
+\begin{code}
+\begin{verbatim}
+*  See how many header items are available.
+      CALL HDR_NUMB( 'IN', ' ', '*', N, ISTAT )               [1]
+      DO 1 I = 1, N
+
+*  Get the name of the I'th header item.
+         CALL HDR_NAME( 'IN', ' ', I, ITEM, ISTAT )        [2]
+
+*  Get its value.
+         CALL HDR_IN( 'IN', ' ', ITEM, 1, VALUE, ISTAT )   [3]
+
+*  And write it out.
+         WRITE( *, '( 1X, 3A )' ) ITEM ,' = ', VALUE       [4]
+ 1    CONTINUE
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item
+The subroutine \htmlref{\myverb{HDR\_NUMB}}{HDR_NUMB} counts the number of header items
+or the number of occurrences of an item. The \myverb{'*'} argument indicates
+that all the header items are to be counted. If an
+item name was given the number of occurrences of that item would be
+returned (zero if none exist).
+
+% 2
+\item
+Item names may be queried by using an index number. This provides a
+method of getting all the names when the exact contents of a header
+item source are not known.
+
+% 3
+\item
+\htmlref{\myverb{HDR\_IN}}{HDR_INx} returns the value of the header item as a
+character string.
+
+% 4
+\item
+The name and value of the header item are written out.
+\end{enumnotes}
+
+\subsubsection{Special behaviour of FITS headers}
+A complication that we have glossed over so far is the fact that
+certain FITS header items can occur more than once within an image.
+Strictly, this is limited to the keywords \myverb{COMMENT},
+\myverb{HISTORY} and \myverb{' '} (blank) which are often used to
+construct multi-line descriptions of the contents or history of a FITS
+file. To handle this, various of the HDR subroutines are ``FITS
+occurrence aware''. For instance, the fourth argument of the
+\htmlref{\myverb{HDR\_IN}}{HDR_INx} subroutine specifies the
+occurrence of the item to be read, and
+\htmlref{\myverb{HDR\_OUT}}{HDR_OUTx} will append (rather than
+overwriting) items with these special names.
+
+FITS items can also have a comment associated with them (to be read by
+the recipient when a FITS file is sent to another astronomical
+institution). The comment string is given by the fourth argument of
+the \myverb{HDR\_OUT} subroutine, but this facility isn't available
+for non-FITS header sources where this argument will simply be
+ignored.
+
+
+\subsubsection{Hierarchical header items}
+
+Header items can be stored in hierarchical structures.\footnote{ {\em
+Warning:} you should not write hierarchical FITS header items as this
+violates the FITS standard (although data from outside sources may
+sometimes contain them).}  What this actually means is that a header
+item can be used as a ``container'' to store other items (which are
+known as components). Hierarchical items are distinguished by using a
+period sign in the name to separate their various components. So, for
+instance, if you had a series of values that described a useful region
+on an image you might write these out using something like:
+\begin{code}
+\begin{verbatim}
+*  Store the useful region of this image.
+      CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MINX', ' ',IXLOW, ISTAT )
+      CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MAXX', ' ',IXHIGH, ISTAT )
+      CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MINY', ' ',IYLOW, ISTAT )
+      CALL HDR_OUTI( 'OUT', 'MYSOURCE', 'USEFUL.MAXY', ' ',IYHIGH, ISTAT )
+\end{verbatim}
+\end{code}
+The number of sub-components and the level of hierarchy isn't
+restricted, so more elaborate structures are possible (but not
+necessarily desirable).
+
+You can examine the header items in an image by using the HDSTRACE program
+(\xref{SUN/102}{sun102}{}). If your image file is called
+\myverb{image} then you would use the command:
+\begin{code}
+\begin{verbatim}
+%  hdstrace image.more.mysource
+\end{verbatim}
+\end{code}
+to see the contents of the source \myverb{'MYSOURCE'}. To list the
+contents of a FITS source the most convenient method is to use the
+KAPPA program \xref{FITSLIST}{sun95}{FITSLIST}
+(\xref{SUN/95}{sun95}{}).
+
+If you have any hierarchical FITS headers (these were once used
+extensively by UK observatories), then they should look something
+like:
+\begin{code}
+\begin{verbatim}
+        ING DETHEAD = 'CCD-RCA2'       /Type of detector head
+\end{verbatim}
+\end{code}
+when examined by \xref{FITSLIST}{sun95}{FITSLIST}.  To access this
+item using IMG you should call it \myverb{'ING.DETHEAD'}.
+The value of this item is shown being read by the example
+program
+\htmladdnormallink{\myverb{hdrread.f}}{../../bin/examples/img/hdrread.f}
+\latexonly{(see \S \ref{USINGIMG})} next:
+\begin{code}
+\begin{verbatim}
+% hdrread
+ITEM - Header item > ING.DETHEAD
+IN - Input image > image
+The header item 'ING.DETHEAD' has a value of CCD-RCA2.
+%
+\end{verbatim}
+\end{code}
+Hierarchical items are processed as normal by the HDR
+\htmlref{indexing
+routines}{HDRINDEXING}\latexonly{ (\S\ref{HDRINDEXING})}. Each
+component item counts only once and no significance is attached to the
+fact it may be part of a hierarchy. When retrieving an indexed header
+item, its name is returned in full, including all the necessary
+periods.
+
+\section{USING THE NDF LIBRARY TO DO MORE}
+IMG is really just a simplified interface to the NDF library
+(\xref{SUN/33}{sun33}{}), so all the facilities of the NDF format and
+library can be used along with IMG (and HDR) routines, if
+required. The following outlines some of the more important
+facilities this provides.
+
+\subsection{Using \label{IMGREGIONS}regions and slices of images}
+The NDF library allows you to specify that a rectangular region or
+slice of an image should be used, rather than the whole. You identify
+the part you want by appending a comma separated list of ranges, in
+parentheses, to the name of the image.  For instance if you wanted to
+access a square region of an image, you might use (the program running
+here is the \htmlref{\myverb{mean}}{IMGMEAN} example\latexonly{ from
+\S\ref{IMGMEAN}}):
+\begin{code}
+\begin{verbatim}
+   % mean
+   IN - Input image > image(100:200,100:200)
+\end{verbatim}
+\end{code}
+and the square that covers the region from \myverb{100} to
+\myverb{200} pixels in both dimensions will be used. The rest of the image is
+ignored. Another way that you could get a similar effect would be to
+use:
+\begin{code}
+\begin{verbatim}
+   % mean
+   IN - Input image > image(155~100,375~100)
+\end{verbatim}
+\end{code}
+which selects a square of side \myverb{100} centred on
+\myverb{155,375}.
+
+Missing out a ``range'' results in the whole of that dimension being
+used:
+\begin{code}
+\begin{verbatim}
+   % mean
+   IN - Input image > image(,100:200)
+\end{verbatim}
+\end{code}
+This uses a rectangle that extends from \myverb{100} to \myverb{200} in the
+second dimension and that spans the whole of the first dimension.
+
+If you had a data cube and you wanted to process a plane from it,
+you might use:
+\begin{code}
+\begin{verbatim}
+   IN - Input image > cube(,,10)
+\end{verbatim}
+\end{code}
+This would use the 2-D image stored in the tenth plane of the cube.
+
+If the region of the image that you specify doesn't exist, then the
+program will still be supplied with an image array of the requested
+size, but the ``non-existent'' parts will be set to the bad value (see
+\hyperref{elsewhere}{\S}{}{IMGBADDATA}).  A complete description of
+how to use image ``sections'' (as they are called by the NDF library)
+is given in \xref{SUN/33}{sun33}{}.
+
+\subsection{Accessing \label{IMGFOREIGNDATAFORMATS} foreign data formats}
+IMG can be used to access data in formats other than NDF by using the
+NDF library's `on-the-fly' data conversion capabilities.  If you have
+the CONVERT package (\xref{SUN/55}{sun55}{}) available on your system,
+you can use it to give your IMG programs access to several important
+\xref{additional astronomical data formats}{sun55}{sect_auto}
+(including IRAF, disk FITS and FIGARO). All you need to do is issue
+the package startup command:
+\begin{code}
+\begin{verbatim}
+% convert
+\end{verbatim}
+\end{code}
+before running your IMG program. It will then be able to access these other
+formats in the same way as its ``native'' NDF format.
+
+If you have copies of the same image in more than one format, you may
+need to add the appropriate file type extension -- \myverb{.imh},
+\myverb{.fit} and \myverb{.dst} for the IRAF, FITS and FIGARO formats
+respectively -- as part of the image name, in order to distinguish
+them.  So a typical session in which an IRAF data frame is read might
+be (the program is the \htmlref{\myverb{mean}}{IMGMEAN}
+example\latexonly{ from \S\ref{IMGMEAN}}):
+\begin{code}
+\begin{verbatim}
+% convert
+% mean
+IN - Input image > myimage.imh
+Mean = 108.3154
+%
+\end{verbatim}
+\end{code}
+
+One point of particular relevance to IMG is the transfer of header
+information between the different data formats. Unless you take
+special action, only FITS headers will generally be transferred. So,
+unless you intend to make sole use of the NDF format, having sources
+of header information other than FITS may cause problems and is
+probably best avoided for the sake of simplicity.
+
+If you want to process data in formats other than those provided by
+CONVERT, then you can define your own conversions. You should consult
+\xref{SSN/20}{ssn20}{} about how to do this.
+
+\subsection{Using the NDF library directly}
+When all else fails, the full power of the NDF library
+(\xref{SUN/33}{sun33}{}) can be made available using the call:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_INDF( 'IN', ID, ISTAT )
+\end{verbatim}
+\end{code}
+This returns an NDF identifier (\myverb{ID}) to your image dataset
+(this shouldn't be confused with the pointers to images which we have
+used so far). This allows you to get at the other components of the
+NDF (our ``images'' are really the main NDF data array) such as its
+variance, quality and axes. It also allows you to access NDF
+extensions (our ``sources'' of header information) in more
+sophisticated ways.  As a very simple example the next program snippet
+shows how to write out the name of an image dataset:
+\begin{code}
+\begin{verbatim}
+      CALL IMG_INDF( 'IN', ID, ISTAT )                        [1]
+      CALL NDF_MSG( 'NAME', ID )                              [2]
+      CALL MSG_OUT( ' ', 'Name of image = ^NAME', ISTAT )     [3]
+      CALL NDF_ANNUL( ID, ISTAT )                             [4]
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item
+\htmlref{\myverb{IMG\_INDF}}{IMG_INDF} returns an NDF identifier \myverb{ID}.
+
+% 2
+\item
+The NDF subroutine \myverb{NDF\_MSG} sets a message token \myverb{'NAME'}
+(see \xref{SUN/104}{sun104}{}).
+
+% 3
+\item
+The name is written out.
+
+% 4
+\item
+The NDF identifier is annulled. It is important that you remember to
+do this once the identifier has been finished with.
+\end{enumnotes}
+
+\section{COMPILING \label{IMGCOMPILING}AND RUNNING PROGRAMS}
+Compiling and linking a simple program is very straight-forward. If
+your program source file is named \myverb{prog.f}, then the commands:
+\begin{code}
+\begin{verbatim}
+% star_dev
+% alink prog.f -L/star/lib `img_link_adam`
+\end{verbatim}
+\end{code}
+will compile the source and link it against IMG (you should replace
+the \myverb{/star} with where your system is installed on non-Starlink
+machines). The final product is an executable called \myverb{prog},
+that you run by typing:
+\begin{code}
+\begin{verbatim}
+% prog
+\end{verbatim}
+\end{code}
+(note the \myverb{\%} is the shell-prompt and should not be typed, and
+the \myverb{``} are grave signs that execute the command
+\myverb{img\_link\_adam}).  If you have a program that has several
+modules that are compiled independently then you could use a
+command like:
+\begin{code}
+\begin{verbatim}
+% alink prog.f mysub1.o mysub2.o `img_link_adam`
+\end{verbatim}
+\end{code}
+The \myverb{star\_dev} command only needs to be run once, as it creates
+a permanent soft link for accessing the include file \myverb{SAE\_PAR}.
+The \xref{\myverb{alink}}{sun144}{ADAM_link_scripts}
+command is described more fully in \xref{SUN/144}{sun144}{}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\appendix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\xlabel{appendix}
+
+\begin{latexonly}
+  \newpage
+  \latexonlysection{ALPHABETICAL LIST OF FORTRAN SUBROUTINES}
+
+% List of subroutines:
+% =================
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+  \newcommand{\noteroutine}[3]{\item {\small \tt #1#2} \nopagebreak \\
+                                \hspace*{3em} {\em #3 } }
+  {\small
+  \latexonlysubsection{IMG Fortran Subroutines}
+  \begin{description}
+    \noteroutine{IMG\_CANCL} {( PARAM, STATUS )}
+       {Cancel an image/parameter association}
+    \noteroutine{IMG\_DELET} {( PARAM, STATUS )}
+       {Delete an image}
+    \noteroutine{IMG\_FREE} {( PARAM, STATUS )}
+       {Free an image}
+    \noteroutine{IMG\_IN[n][x]} {( PARAM, NX, [NY], [NZ], IP, STATUS )}
+       {Access an existing image for reading}
+    \noteroutine{IMG\_INDF} {( PARAM, INDF, STATUS )}
+       {Obtain an NDF identifier for an image}
+    \noteroutine{IMG\_MOD[n][x]} {( PARAM, NX, [NY], [NZ], IP, STATUS )}
+       {Access an image for modification}
+    \noteroutine{IMG\_NAME} {( PARAM, VALUE, STATUS )}
+       {Return the image name}
+    \noteroutine{IMG\_NEW[n][x]} {( PARAM, NX, [NY], [NZ], IP, STATUS )}
+       {Create a new image}
+    \noteroutine{IMG\_OUT[x]} {( PARAM1, PARAM2, IP, STATUS )}
+       {Create an output image}
+    \noteroutine{IMG\_TMP[n][x]} {( PARAM, NX, [NY], [NZ], IP, STATUS )}
+       {Create a temporary image}
+  \end{description}
+
+  \latexonlysubsection{HDR Fortran Subroutines}
+  \begin{description}
+    \noteroutine{HDR\_DELET}{( PARAM, XNAME, ITEM, COMP, STATUS )}
+       {Delete a header item}
+    \noteroutine{HDR\_IN[x]}{( PARAM, XNAME, ITEM, COMP, VALUE, STATUS )}
+       {Read a header item}
+    \noteroutine{HDR\_MOD}{( PARAM, STATUS )}
+       {Open an image allowing modification of any header items}
+    \noteroutine{HDR\_NAME}{( PARAM, XNAME, N, ITEM, STATUS )}
+       {Return a header item name}
+    \noteroutine{HDR\_NUMB}{( PARAM, XNAME, ITEM, N, STATUS )}
+       {Return a header item count}
+    \noteroutine{HDR\_OUT[x]}{( PARAM, XNAME, ITEM, COMMEN, VALUE, STATUS )}
+       {Write a header item}
+  \end{description}
+  } % end of \small
+\end{latexonly}
+
+\newpage
+\section{FULL \label{IMGDESCRIPTIONS} FORTRAN SUBROUTINE DESCRIPTIONS}
+
+
+% +
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty
+%     on your TEXINPUTS path (and including the name as part of the
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+% -
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\newfont{\ssttt}{cmtt10 scaled 1095}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
+%  sstroutine.
+   \renewcommand{\sstroutine}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \renewcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstusage
+   \renewcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  sstinvocation
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  sstarguments
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstreturnedvalue
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstparameters
+   \renewcommand{\sstparameters}[1]{
+      \item[Parameters:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstexamples
+   \renewcommand{\sstexamples}[1]{
+      \item[Examples:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstsubsection
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+
+%  sstnotes
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstdiytopic
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
+
+%  sstimplementationstatus
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+   }
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+% .
+% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+
+
+\subsection{IMG Fortran Subroutines}
+
+\sstroutine{IMG\_CANCL}{
+   Cancel an image/parameter association
+}{
+   \sstdescription{
+      This subroutine may be used to free the resources associated with
+      an image. Its behaviour is similar to that of
+      \htmlref{IMG\_FREE}{IMG\_FREE}, except
+      that it also removes the association between an image and a
+      parameter. If the same parameter is later used to access an
+      image, then a new image will be obtained (whereas if
+      IMG\_FREE is used the original image will be re-accessed).
+   }
+   \sstinvocation{
+      CALL IMG\_CANCL( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name, specifying either the individual
+         image/parameter association to be cancelled, or \qs{$*$},
+         indicating that all such associations should be cancelled.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine attempts to execute even if STATUS is set on entry,
+         although no further error report will be made if it subsequently
+         fails under these circumstances.
+
+         \sstitem
+         It is possible to cancel more than one association per call
+         using multiple parameter names. Multiple parameter names are
+         specified using a comma separated list of names (i.e.
+         \qs{IMAGE1,IMAGE2}), or by using \qt{wild-card}
+         characters as part of a parameter name. In this context, a
+         \qs{$*$} will match any set of characters, while
+         \qs{\%} will match any single character.  Note that
+         only those parameter names previously used to access images
+         via IMG subroutines are considered as potential matches.
+      }
+   }
+}
+\sstroutine{IMG\_DELET}{
+   Delete an image
+}{
+   \sstdescription{
+      This subroutine deletes an image and frees any resources associated
+      with it. It should be used as an alternative to
+      \htmlref{IMG\_FREE}{IMG\_FREE} for any image which is not to be kept.
+
+   }
+   \sstinvocation{
+      CALL IMG\_DELET( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name specifying the image to be deleted.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+         \sstitem Only output or images accessed for modification
+         may be deleted.
+
+         \sstitem
+         It is possible to delete more than one image per call using
+         multiple parameter names. Multiple parameter names are
+         specified using a comma separated list of names (i.e.
+         \qs{IMAGE1,IMAGE2}). A wildcard capability is not
+         supplied for this subroutine.
+
+      }
+   }
+}
+\sstroutine{IMG\_FREE}{
+   Free an image
+}{
+   \sstdescription{
+      This subroutine should be used to free the resources associated
+      with an image when it has been finished with. This should
+      always be done before the end of a program.
+   }
+   \sstinvocation{
+      CALL IMG\_FREE( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name, specifying either the individual image to be
+         freed or \qs{$*$}, indicating that all images should be
+         freed.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine attempts to execute even if STATUS is set on entry,
+         although no further error report will be made if it subsequently
+         fails under these circumstances.
+
+         \sstitem
+         It is possible to free more than one image per call using
+         multiple parameter names. Multiple parameter names are
+         specified using a comma separated list of names (i.e.
+         \qs{IMAGE1,IMAGE2}), or by using \qt{wild-card}
+         characters as part of a parameter name. In this context, a
+         \qs{$*$} will match any set of characters, while
+         \qs{\%} will match any single character.  Note that
+         only those parameter names previously used to access images
+         via IMG subroutines are considered as potential matches.
+      }
+   }
+}
+\sstroutine{IMG\_IN[n][x]}{
+   Access an existing image for reading
+}{
+   \sstdescription{
+      This subroutine accesses an input image for reading. It returns
+      the size of the image and a pointer to its data.
+
+      The [n] and [x] parts of the name are optional. If used [n]
+      indicates the number of dimensions of the data (1 to 3, the
+      default is 2) and [x] the data type (one of R, D, I, W, UW, B or
+      UB, the default is R). So for instance if you wanted to use 1-D
+      data with a data type of DOUBLE PRECISION, the subroutine that you
+      should call is IMG\_IN1D.
+   }
+   \sstinvocation{ \vspace{1ex} \\
+      CALL IMG\_IN( PARAM, NX, NY, IP, STATUS ) \\
+      CALL IMG\_IN1[x]( PARAM, NX, IP, STATUS ) \\
+      CALL IMG\_IN2[x]( PARAM, NX, NY, IP, STATUS ) \\
+      CALL IMG\_IN3[x]( PARAM, NX, NY, NZ, IP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name (case insensitive).
+      }
+      \sstsubsection{
+         NX = INTEGER (Returned)
+      }{
+         First dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NY = INTEGER (Returned)
+      }{
+         Second dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NZ = INTEGER (Returned)
+      }{
+         Third dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         IP = INTEGER (Returned)
+      }{
+         Pointer to image data.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is possible to access more than one image per call
+         using multiple parameter names. Multiple parameter names are
+         specified by supplying a comma separated list of names
+         (i.e. \qs{DATA,BIAS,FLAT}).  A pointer to the data
+         of each image is then returned (in this case the IP argument
+         should be passed as an array of size at least the number of
+         parameter names). The advantage of obtaining a sequence of
+         images in this manner is that the images are guaranteed to
+         have the same shape and the same data type.
+
+         \sstitem
+         The message which complains when \qt{bad} (undefined) pixels
+         are present in the input data can be stopped by following each
+         parameter name by the character \qt{!},
+         i.e. \qs{DATA!,BIAS!,FLAT} will inhibit checking the images
+         associated with parameters \qs{DATA} and \qs{BIAS},
+         but will check the image \qs{FLAT}. \qt{Bad} pixels
+         have the symbolic values VAL\_\_BAD[x] which are defined
+         in the include file PRM\_PAR.
+      }
+   }
+}
+\sstroutine{IMG\_INDF}{
+   Return an image NDF identifier
+}{
+   \sstdescription{
+      This subroutine returns an NDF identifier for an image. This
+      identifier may be passed to subroutines from the NDF library
+      (see \xref{SUN/33}{sun33}{}) to perform lower-level operations on the data which
+      cannot be done using IMG subroutines.
+   }
+   \sstinvocation{
+      CALL IMG\_INDF( PARAM, INDF, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name (case insensitive).
+      }
+      \sstsubsection{
+         INDF = INTEGER (Returned)
+      }{
+         NDF identifier for the image.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The NDF identifier returned by this subroutine should be annulled
+         (e.g. using NDF\_ANNUL) when it is no longer required.  The IMG
+         system will not perform this operation itself.
+
+         \sstitem
+         If this subroutine is called with STATUS set, then a value of
+         NDF\_\_NOID will be returned for the INDF argument, although no
+         further processing will occur. The same value will also be
+         returned if the subroutine should fail for any reason.  The
+         NDF\_\_NOID constant is defined in the NDF\_PAR include file.
+      }
+   }
+}
+\sstroutine{IMG\_MOD[n][x]}{
+   Access an image for modification
+}{
+   \sstdescription{
+      This routine provides access to an input image. It returns the
+      size of the image and a pointer to its data. Existing values in
+      the image may be modified.
+
+      The [n] and [x] parts of the name are optional. If used [n]
+      indicates the number of dimensions of the data (1 to 3, the
+      default is 2) and [x] the data type (one of R, D, I, W, UW, B or
+      UB, the default is R). So for instance if you wanted to use 3-D
+      data with a data type of DOUBLE PRECISION, the subroutine that you
+      should call is IMG\_MOD3D.
+   }
+   \sstinvocation{ \vspace{1ex} \\
+      CALL IMG\_MOD( PARAM, NX, NY, IP, STATUS ) \\
+      CALL IMG\_MOD1[x]( PARAM, NX, IP, STATUS ) \\
+      CALL IMG\_MOD2[x]( PARAM, NX, NY, IP, STATUS ) \\
+      CALL IMG\_MOD3[x]( PARAM, NX, NY, NZ, IP, STATUS ) \\
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name (case insensitive).
+      }
+      \sstsubsection{
+         NX = INTEGER (Returned)
+      }{
+         First dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NY = INTEGER (Returned)
+      }{
+         Second dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NZ = INTEGER (Returned)
+      }{
+         Third dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         IP = INTEGER (Returned)
+      }{
+         Pointer to image data.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+\newpage
+   \sstnotes{
+      \sstitemlist{
+         \sstitem
+         Access to multiple image data can also be provided by this
+         routine. Multiple parameter names are specified by supplying a
+         comma separated list of names (i.e. \qs{DATA,BIAS,FLAT}). A pointer
+         to the data of each image is then returned (in this case the IP
+         argument should be passed as an array of size at least the number
+         of parameter names). The advantage of obtaining a sequence of
+         images in this manner is that the images are guaranteed to have
+         the same shape and the same data type.
+
+         \sstitem
+         The message which complains when \qt{bad} (undefined) pixels are
+         present in the input data can be stopped by following each
+         parameter name by the character \qt{!}, i.e. \qs{DATA!,BIAS!,FLAT}
+         will
+         inhibit checking the images associated with parameters
+         \qs{DATA} and
+         \qs{BIAS}, but will check the image \qs{FLAT}.
+         \qt{Bad} pixels have the
+         symbolic value VAL\_\_BAD[x] which is defined in the include file
+         PRM\_PAR.
+
+         \sstitem
+         The input image is accessed in the type that you ask for
+         regardless of its storage type. This may occasionally cause
+         problems if these two types differ. This arises because when
+         the image is converted to and from its storage type it is
+         not always possible to guarantee that a valid value will result
+         (for instance many numbers that you may store in a REAL
+         variable cannot be stored in an INTEGER variable). When an
+         image element cannot be converted it is assigned the
+         appropriate bad value.
+      }
+   }
+}
+
+\sstroutine{
+   IMG\_NAME
+}{
+   Return the image name
+}{
+   \sstdescription{
+      This subroutine returns the name of the input image as a character
+      string.
+   }
+   \sstinvocation{
+      CALL IMG\_NAME( PARAM, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         VALUE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The name of the image.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The character string VALUE should be made large enough to
+           contain the full name of the image.
+
+         \sstitem
+         This subroutine will directly access an image if an association
+           has not already been made. Note that it will be opened for
+           read-only access and you will not be able to write or delete any
+           header items. If you need to be able to do this then access the
+           image first, either with one of the 
+           \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]} subroutines
+           (if you intend to process the image data), or the
+           \htmlref{HDR\_MOD}{HDR\_MOD} subroutine.
+      }
+   }
+}
+
+
+\sstroutine{IMG\_NEW[n][x]}{
+   Create a new image
+}{
+   \sstdescription{
+      This subroutine creates a new image and returns a pointer to its data.
+
+      The [n] and [x] parts of the name are optional. If used [n]
+      indicates the number of dimensions of the data (1 to 3, the
+      default is 2) and [x] the data type (one of R, D, I, W, UW, B or
+      UB, the default is R). So for instance if you wanted to use 3-D
+      data with a data type of INTEGER, the subroutine that you should call
+      is IMG\_NEW3I.
+
+   }
+   \sstinvocation{ \vspace{1ex} \\
+      CALL IMG\_NEW( PARAM, NX, NY, IP, STATUS ) \\
+      CALL IMG\_NEW1[x]( PARAM, NX, IP, STATUS ) \\
+      CALL IMG\_NEW2[x]( PARAM, NX, NY, IP, STATUS ) \\
+      CALL IMG\_NEW3[x]( PARAM, NX, NY, NZ, IP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name (case insensitive).
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         First dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Second dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NZ = INTEGER (Given)
+      }{
+         Third dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         IP = INTEGER (Returned)
+      }{
+         Pointer to the image data.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is possible to create more than one image per call using
+         multiple parameter names. Multiple names are specified by
+         supplying a comma separated list (i.e. \qs{NEW1,NEW2}).
+         A pointer to the data of each image is then returned (in
+         this case the IP argument must be passed as an array of size
+         at least the number of parameter names). An advantage of this
+         method is that multiple images can be made using a single
+         invocation of this subroutine.
+      }
+   }
+}
+\sstroutine{IMG\_OUT[x]}{
+   Create an output image
+}{
+   \sstdescription{
+      This subroutine creates a new output image by duplicating an input
+      image.  A pointer is returned to the output image data.
+
+      The [x] part of the name is optional. If used [x] indicates the
+      data type (one of R, D, I, W, UW, B or UB, the default is R). So for
+      instance if you wanted to make an output image with type REAL, the
+      subroutine which you should call would be IMG\_OUT.
+   }
+   \sstinvocation{
+      CALL IMG\_OUT[x]( PARAM1, PARAM2, IP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name for the input image (case insensitive).
+      }
+      \sstsubsection{
+         PARAM2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name for the new output image (case insensitive).
+      }
+      \sstsubsection{
+         IP = INTEGER (Returned)
+      }{
+         Pointer to the mapped output data.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is possible to copy the input image to more than one
+         output image using multiple parameter names. Multiple
+         parameter names are specified by supplying a comma separated
+         list of names (i.e. \qs{OUT1,OUT2}). A pointer to
+         the data of each image is then returned (in this case the IP
+         argument must be passed as an array of size at least the
+         number of parameter names). The advantage of using this
+         method is that multiple copies of an input image can be made
+         using a single invocation of this subroutine. Multiple input
+         image names are not allowed.
+
+         \sstitem
+         The input image must have already been associated with a parameter
+         before calling this subroutine.
+
+         \sstitem
+         The output image is created with the storage data type of the
+         input image and is then accessed in the type that you ask for
+         (\qt{[x]}). This may occasionally cause problems if these two
+         types differ. This arises because when the output image is
+         converted to and from its storage type it is not always
+         possible to guarantee that a valid value will result (for
+         instance many numbers that you may store in a REAL variable
+         cannot be stored in an INTEGER variable). When an image
+         element cannot be converted it is assigned the appropriate
+         bad value.
+      }
+   }
+}
+\sstroutine{IMG\_TMP[n][x]}{
+   Create a temporary image
+}{
+   \sstdescription{
+      This subroutine creates a temporary image for use as workspace
+      and returns a pointer to its data. The image will be deleted
+      automatically when it is freed later (e.g. by calling
+      \htmlref{IMG\_FREE}{IMG\_FREE}).
+
+      The [n] and [x] parts of the name are optional. If used [n]
+      indicates the number of dimensions of the data (1 to 3, the
+      default is 2) and [x] the data type (one of R, D, I, W, UW, B or
+      UB, the default is R). So for instance if you wanted to use 3-D
+      data with a data type of INTEGER, the subroutine that you should call
+      is IMG\_TMP3I.
+   }
+   \sstinvocation{ \\
+      CALL IMG\_TMP( PARAM, NX, NY, IP, STATUS )\\
+      CALL IMG\_TMP1[x]( PARAM, NX, IP, STATUS )\\
+      CALL IMG\_TMP2[x]( PARAM, NX, NY, IP, STATUS )\\
+      CALL IMG\_TMP3[x]( PARAM, NX, NY, NZ, IP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name (case insensitive).
+      }
+      \sstsubsection{
+         NX = INTEGER (Given)
+      }{
+         First dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NY = INTEGER (Given)
+      }{
+         Second dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         NZ = INTEGER (Given)
+      }{
+         Third dimension of the image (in pixels).
+      }
+      \sstsubsection{
+         IP = INTEGER (Returned)
+      }{
+         Pointer to the image data.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         It is possible to create more than one temporary image per
+         call using multiple parameter names. These are specified by
+         supplying a comma separated list of names (i.e.
+         \qs{WORK1, WORK2, WORK3}). A pointer to the data of each
+         image is then returned (in this case the IP argument should
+         be passed as an array of size at least the number of
+         parameter names).
+      }
+   }
+}
+
+\newpage
+\subsection{HDR Fortran Subroutines}
+
+\sstroutine{HDR\_DELET}{
+   Delete a header item
+}{
+   \sstdescription{
+      This subroutine deletes a header item.
+   }
+   \sstinvocation{
+      CALL HDR\_DELET( PARAM, XNAME, ITEM, COMP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         XNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Source of the header information
+         (\qs{FITS} or \qs{ } for FITS headers).
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the header item.
+      }
+      \sstsubsection{
+         COMP = INTEGER (Given)
+      }{
+         The component of a multiple FITS header item which is to be
+         deleted, usually 1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Only header items in output images or those accessed for
+         modification will be deleted by this routine.
+
+         \sstitem
+         This subroutine will directly access an image if an
+         association has not already been made.
+
+         \sstitem The FITS items \qs{HISTORY}, \qs{COMMENT}
+         and \qs{ } can have more than one occurrence. These can be deleted
+         one-by-one by repetitive calls to this routine with a value of
+         1 for the COMP argument (since if you delete the first component
+         what was the second component now becomes the first). A specific
+         occurrence can be deleted by giving the correct component number.
+         The number of occurrences may be queried using the
+         \htmlref{HDR\_NUMB}{HDR\_NUMB} subroutine.
+
+         \sstitem
+         Item names from any source may be hierarchical
+         (i.e. ING.DETHEAD deletes the FITS header item \qt{ING
+         DETHEAD}; BOUNDS.MAXX deletes the MAXX component of BOUNDS in
+         a non-FITS source).
+
+         \sstitem
+         This subroutine may be used to delete an item in the same
+         source of more than one image dataset at a time by using
+         multiple parameter names. Multiple parameter names are
+         provided as a comma separated list (i.e. \qs{IN1,IN2,IN3}).
+      }
+   }
+}
+\sstroutine{HDR\_IN[x]}{
+   Read a header item
+}{
+   \sstdescription{
+      This subroutine returns the value of a header item.
+
+      The [x] part of the name is optional. If used [x] indicates the
+      data type (one of R, D, I, L or C, the default is C) the
+      item is to be returned in. So for instance if you want an item
+      with type REAL, the subroutine that you should call is HDR\_INR.
+   }
+   \sstinvocation{
+      CALL HDR\_IN[x]( PARAM, XNAME, ITEM, COMP, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         XNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Source of the header information
+         (\qs{FITS} or \qs{ } for FITS headers).
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Name of the header item.
+      }
+      \sstsubsection{
+         COMP = INTEGER (Given)
+      }{
+         The component of a multiple FITS header item (\qs{HISTORY} and
+         \qs{COMMENT} items often have many occurrences). The number of
+         occurrences may be queried using the \htmlref{HDR\_NUMB}{HDR\_NUMB}
+         subroutine.
+      }
+      \sstsubsection{
+         VALUE = ? (Given and Returned)
+      }{
+         The value. This is unmodified if the item doesn't exist.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine will directly access an image if an
+         association has not already been made. Note that it will be
+         opened for read-only access and you will not be able to write
+         or delete any header items. If you need to be able to do this
+         then access the image first, either with one of the
+         \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]} subroutines
+         (if you intend to process the image data), or the
+         \htmlref{HDR\_MOD}{HDR\_MOD} subroutine.
+
+         \sstitem
+         Item names from any source may be hierarchical
+         (i.e. ING.DETHEAD gets the value of the FITS header
+         \qt{ING DETHEAD}; BOUNDS.MAXX gets the value of the
+         MAXX component of BOUNDS in a non-FITS source).
+
+         \sstitem
+         This subroutine may be used to read the value of an item from
+         the same source of more than one image dataset at a time by
+         using multiple parameter names. Multiple parameter names are
+         provided as a comma separated list (i.e. \qs{IN1,IN2,IN3}).
+         The header source specified by XNAME must exist in all images
+         and the argument VALUE must be declared as a dimension of
+         size at least the number of parameters in the list; if this
+         option is used.
+
+         \sstitem
+         If a header item is not found its associated element of the
+         VALUE argument will remain unchanged. It is therefore important
+         that suitable defaults are assigned to VALUE before calling this
+         subroutine. The source must exist.
+      }
+   }
+}
+
+\sstroutine{HDR\_MOD}{
+   Open an image allowing modification of any header items
+}{
+   \sstdescription{
+      This subroutine opens an image and allows the header information
+      to be modified by other HDR routines.
+   }
+   \sstinvocation{
+      CALL HDR\_MOD( PARAM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine may be used to obtain modification access to more
+         than one image at a time by using multiple parameter
+         names. Multiple parameter names are provided as a comma separated
+         list (i.e. \qs{IN1,IN2,IN3}).
+
+         \sstitem
+         This subroutine should only be used in programs that only
+         modify header items. If you intend to also modify the image
+         data  then use an \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]}
+         subroutine.
+
+      }
+   }
+}
+
+\sstroutine{HDR\_NAME}{
+   Return a header item name
+}{
+   \sstdescription{
+      This subroutine returns the name of a header item using an index
+      of its relative position within a named source. By incrementing
+      index N all the names in a source may be queried.
+   }
+   \sstinvocation{
+      CALL HDR\_NAME( PARAM, XNAME, N, ITEM, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         XNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Source of the header information
+         (\qs{FITS} or \qs{ } for FITS headers).
+      }
+      \sstsubsection{
+         N = INTEGER (Given)
+      }{
+         The index of the item.
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The name of the header item (blank when no item with the
+         given index exists).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine will directly access an image if an
+         association has not already been made. Note that it will be
+         opened for read-only access and you will not be able to write
+         or delete any header items. If you need to be able to do this
+         then access the image first, either with one of the
+         \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]} subroutines
+         (if you intend to process the image data), or the
+         \htmlref{HDR\_MOD}{HDR\_MOD} subroutine.
+
+         \sstitem
+         The order in which header item names are returned may change if
+         the source is modified (by deletion or by writing).
+
+         \sstitem
+         The header item name will be returned in a hierarchical format
+         if necessary.
+
+         \sstitem
+         The total number of items from a source can be found using
+         \htmlref{HDR\_NUMB}{HDR\_NUMB}.
+      }
+   }
+}
+\sstroutine{HDR\_NUMB}{
+   Return a header item count
+}{
+   \sstdescription{
+      This subroutine returns the number of header items or the number
+      of occurrences of a specific item.  The numbers returned can be
+      used as limits when indexing using \htmlref{HDR\_NAME}{HDR\_NAME} or when
+      deleting/reading items with more than one occurrence (such as
+      FITS \qs{HISTORY} or \qs{COMMENTS}) or to test the existence of
+      an item.
+   }
+   \sstinvocation{
+      CALL HDR\_NUMB( PARAM, XNAME, ITEM, N, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         XNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Source of the header information
+         (\qs{FITS} or \qs{ } for FITS headers).
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of an item or \qs{$*$}. If this is \qs{$*$} then a
+         count of all the items is returned, otherwise the
+         number of occurrences of the named item is returned.
+      }
+      \sstsubsection{
+         N = INTEGER (Returned)
+      }{
+         The number of header items or occurrences  of an item.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine will directly access an image if an
+         association has not already been made. Note that it will be
+         opened for read-only access and you will not be able to write
+         or delete any header items. If you need to be able to do this
+         then access the image first, either with one of the
+         \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]} subroutines
+         (if you intend to process the image data), or the
+         \htmlref{HDR\_MOD}{HDR\_MOD} subroutine.
+
+         \sstitem
+         This subroutine may be used to query the number of items or
+         occurrences of an item in the same source of more than one
+         image dataset at a time by using multiple parameter names.
+         Multiple parameter names are provided as a comma separated list
+         (i.e. \qs{IN1,IN2,IN3}). The source must exist in all images and
+         the argument N will be returned as the maximum number of header
+         items or occurrences located (from each source).
+
+         \sstitem
+         If the number of header items is zero then this will be
+         returned, no error will be reported.
+
+         \sstitem
+         The number of occurrences of an item will usually be 1, except
+         for the special FITS items \qs{COMMENT}, \qs{HISTORY} and
+         \qs{ }. This ability is therefore most useful for testing the
+         existence of items (0 is returned if an item isn't found) or
+         for manipulation of the occurrences of the special FITS items.
+      }
+   }
+}
+\sstroutine{HDR\_OUT[x]}{
+   Write a header item
+}{
+   \sstdescription{
+      This subroutine writes a header item.
+
+      The [x] part of the name is optional. If used [x] indicates the
+      data type (one of R, D, I, L or C, the default is C) of
+      the item. So for instance if you want an item with type REAL,
+      the subroutine that you should call is HDR\_OUTR.
+   }
+   \sstinvocation{
+      CALL HDR\_OUT[x]( PARAM, XNAME, ITEM, COMMEN, VALUE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image (case insensitive).
+      }
+      \sstsubsection{
+         XNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Source of the header information
+         (\qs{FITS} or \qs{ } for FITS headers).
+      }
+      \sstsubsection{
+         ITEM = CHARACTER $*$ ( $*$ ) (Given)
+      } {
+         Name of the header item.
+      }
+      \sstsubsection{
+         COMMEN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         If XNAME is \qs{FITS} then this is used as a comment, otherwise
+         it is not used.
+      }
+      \sstsubsection{
+         VALUE = ? (Given)
+      }{
+         The value.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This subroutine will directly access an image if an
+         association has not already been made. If an association has
+         already been made then the image must be opened for write or
+         modification access (by \htmlref{IMG\_MOD[n][x]}{IMG\_MOD[n][x]}
+         or \htmlref{IMG\_OUT[x]}{IMG\_OUT[x]}, if you also
+         want to process the image data and \htmlref{HDR\_MOD}{HDR\_MOD}
+         otherwise).
+
+         \sstitem
+         Item names from any source may be hierarchical
+         (i.e. ING.DETHEAD writes the FITS header \qt{ING DETHEAD};
+         BOUNDS.MAXX the value of the MAXX component of BOUNDS in a
+         non-FITS source). Writing hierarchical records in FITS
+         records is strongly discouraged (as it violates the standard).
+
+         \sstitem
+         This subroutine may be used to write the value of items in
+         the same source of more than one image dataset at a time by
+         using multiple parameter names. Multiple parameter names are
+         provided as a comma separated list (i.e. \qs{IN1,IN2,IN3}). Note
+         that the argument VALUE must be declared as a dimension of size
+         at least the number of parameters in the list, if this option is
+         used.
+      }
+   }
+}
+
+\newpage
+
+\section{USING \xlabel{IMGCinterface}IMG FROM C\label{IMGCinterface}}
+
+C functions, that are equivalent to the Fortran subroutines, are
+available for those who prefer this language (indeed using IMG from C
+can seem more natural as IMG returns pointers to data).  The major
+changes in the interface (compared with the Fortran specifications)
+are that the names of functions change from \myverb{img\_something} or
+\myverb{hdr\_something} to \myverb{imgSomething} and
+\myverb{hdrSomething} and that ``strings'' which are returned or can
+be passed as arrays also have a length argument.
+
+\newcommand{\cnoteroutine}[4]{
+   \item {\small \tt #1~#2 #3} \nopagebreak \\ {\em #4 }
+}
+\subsection{IMG C Functions}
+\begin{latexonly}
+{\small
+\begin{description}
+  \cnoteroutine{void}{imgCancl}{(char *param, int *status)}
+     {Cancel an image/parameter association}
+  \cnoteroutine{void}{imgDelet}{(char *param, int *status)}
+     {Delete an image}
+  \cnoteroutine{void}{imgFree}{(char *param, int *status)}
+     {Free an image}
+  \cnoteroutine{void}{imgIn[N][X]}
+     {(char *param, int *nx, [int *ny,] [int *nz,] TYPE **ip, int *status)}
+     {Access an existing image for reading}
+  \cnoteroutine{void}{imgIndf}{(char *param, int *indf, int *status)}
+     {Obtain an NDF identifier for an image}
+  \cnoteroutine{void}{imgMod[N][X]}
+     {(char *param, int *nx, [int *ny,] [int nz,] TYPE **ip, int *status)}
+     {Access an image for modification}
+  \cnoteroutine{void}{imgName[N][X]}
+     {(char *param, char *value, int value\_length, int *status)}
+     {Return the image name}
+  \cnoteroutine{void}{imgNew[N][X]}
+     {(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)}
+     {Create a new image}
+  \cnoteroutine{void}{imgOut[X]}
+     {(char *param1, char *param2, TYPE **ip, int *status)}
+     {Create an output image}
+  \cnoteroutine{void}{imgTmp[N][X]}
+     {(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status)}
+     {Create a temporary image}
+\end{description}
+}
+\end{latexonly}
+\begin{rawhtml}
+<PRE>
+<A NAME="xref_imgCancl"></A>
+  void <B>imgCancl</B>(char *param, int *status) 
+     Cancel an image/parameter association 
+<A NAME="xref_imgDelet"></a>
+  void <B>imgDelet</B>(char *param, int *status) 
+     Delete an image 
+<A NAME="xref_imgFree"></A>
+  void <B>imgFree</B>(char *param, int *status) 
+     Free an image 
+<A NAME="xref_imgIn[N][X]"></A>
+  void <B>imgIn[N][X]</B>(char *param, int *nx, [int *ny,] [int *nz,] TYPE **ip, int *status) 
+     Access an existing image for reading 
+<A NAME="xref_imgIndf"></A>
+  void <B>imgIndf</B>(char *param, int *indf, int *status) 
+     Obtain an NDF identifier for an image 
+<A NAME="xref_imgMod[N][X]"></A>
+  void <B>imgMod[N][X]</B>(char *param, int *nx, [int *ny,] [int nz,] TYPE **ip, int *status) 
+     Access an image for modification 
+<A NAME="xref_imgNew[N][X]"></A>
+  void <B>imgNew[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status) 
+     Create a new image 
+<A NAME="xref_imgName"></A>
+  void <B>imgName</B>(char *param, char *value, int value_length, int *status) 
+     Return the image name
+<A NAME="xref_imgOut[X]"></A>
+  void <B>imgOut[X]</B>(char *param1, char *param2, TYPE **ip, int *status) 
+     Create an output image 
+<A NAME="xref_imgTmp[N][X]"></A>
+  void <B>imgTmp[N][X]</B>(char *param, int nx, [int ny,] [int nz,] TYPE **ip, int *status) 
+     Create a temporary image 
+</PRE>
+\end{rawhtml}
+
+Where the parts in {\tt "[]"} are optional or not always available.
+{\tt [N]} indicates the number of dimensions of the data you want to access
+and the necessary {\tt nx}, {\tt ny} and {\tt nz} arguments should be passed.
+\begin{small}
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+Number of dimensions {\tt [N]}    &    {\tt nx}, {\tt ny} \& {\tt nz} required \\
+\hline
+     {\tt 1}                      &    {\tt nx}       \\
+     {\tt 2}                      &    {\tt nx} \& {\tt ny} \\
+     {\tt 3}                      &    {\tt nx}, {\tt ny} \& {\tt nz} \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+The default number of dimensions are two (in which case do not replace
+{\tt [N]} by anything). 
+
+The ordering of array dimensions is different in C to Fortran, so for
+instance the Fortran array \myverb{ARRAY(NX,NY,NZ)} is equivalent to
+the C array \myverb{ARRAY[NZ][NY][NX]}, but usually this is of little
+importance since images are not of fixed sizes (so you're unlikely to
+hard code any array dimensions) and you're far more likely to use the
+data via a pointer to the first element. Since C arrays also always start
+at 0 (rather than 1 as is the default in Fortran) the index of an
+element say {\tt [y][x]} is
+{\tt nx}~$\times$~{\tt y}~$+$~{\tt x}. In 3-D this becomes 
+{\tt [z][y][x]} --- 
+{\tt nx}~$\times$~{\tt ny}~$\times$~{\tt z}~$+$~{\tt nx}~$\times$~{\tt y}~$+$~{\tt x}.
+
+\label{IMGCdatatypes}
+The data type of the image is specified by replacing the {\tt [X]} part
+of the name by one of the following character codes:
+\begin{small}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Character code {\tt [X]} & C data type ({\tt TYPE}) &  Description \\
+\hline
+ {\tt F}       & {\tt float}          &   \\
+ {\tt D}       & {\tt double}         &  \\
+ {\tt I}       & {\tt int}            &  \\
+ {\tt S}       & {\tt short}          &  \\
+ {\tt US}      & {\tt unsigned short} &  \\
+ {\tt B}       & {\tt signed char}    &  Signed byte      \\
+ {\tt UB}      & {\tt unsigned char}  &  Unsigned byte    \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+You will also need to replace {\tt TYPE} by the related data type.
+The default data type is {\tt float} (in which case do not replace
+{\tt [X]} by anything and set {\tt TYPE} to {\tt float}).
+
+\subsection{HDR C Functions}
+\begin{latexonly}
+{\small
+\begin{description}
+  \cnoteroutine{void}{hdrDelet}
+     {(char *param, char *xname, char *item, int comp, int *status)}
+     {Delete a header item}
+  \cnoteroutine{void}{hdrIn}
+     {(char *param, char *xname, char *item, int comp, char *value,
+       \\ \hspace*{3em} int~value\_length, int~*status)}
+     {Read a character header item}
+  \cnoteroutine{void}{hdrInC}
+     {(char *param, char *xname, char *item, int comp, char *value,
+       \\ \hspace*{3em} int~value\_length, int~*status)}
+     {Read a character header item}
+  \cnoteroutine{void}{hdrIn[X]}
+     {(char *param, char *xname, char *item, int comp, TYPE *value,
+       \\ \hspace*{3em} int *status)}
+     {Read a header item}
+  \cnoteroutine{void}{hdrMod}
+     {(char *param, int *status)}
+     {Open an image allowing modification of any header items}
+  \cnoteroutine{void}{hdrName}
+     {(char *param, char *xname, int n, char *item, int item\_length,
+       \\ \hspace*{3em} int *status)}
+     {Return a header item name}
+  \cnoteroutine{void}{hdrNumb}
+     {(char *param, char *xname, char *item, int *n, int *status)}
+     {Return a header item count}
+  \cnoteroutine{void}{hdrOut}
+     {(char *param, char *xname, char *item, char *commen,
+       char *value, \\ \hspace*{3em} int~value\_length, int~*status)}
+     {Write a character header item}
+  \cnoteroutine{void}{hdrOutC}
+     {(char *param, char *xname, char *item, char *commen,
+       char *value, \\ \hspace*{3em} int~value\_length, int~*status)}
+     {Write a character header item}
+  \cnoteroutine{void}{hdrOut[X]}
+     {(char *param, char *xname, char *item, char *commen,
+       TYPE *value, \\ \hspace*{3em} int *status)}
+     {Write a header item}
+\end{description}
+}
+\end{latexonly}
+\begin{rawhtml}
+<PRE>
+<A NAME="xref_hdrDelet"></A>
+  void <B>hdrDelet</B>(char *param, char *xname, char *item, int comp, int *status) 
+     Delete a header item 
+<A NAME="xref_hdrIn"></A>
+  void <B>hdrIn</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status) 
+     Read a character header item 
+<A NAME="xref_hdrInc"></A>
+  void <B>hdrInC</B>(char *param, char *xname, char *item, int comp, char *value, int value_length, int *status) 
+     Read a character header item 
+<A NAME="xref_hdrIn[X]"></A>
+  void <B>hdrIn[X]</B>(char *param, char *xname, char *item, int comp, TYPE *value, int *status) 
+     Read a header item 
+<A NAME="xref_hdrMod"></A>
+  void <B>hdrMod</B>(char *param, int *status) 
+     Open an image allowing modification of any header items 
+<A NAME="xref_hdrName"></A>
+  void <B>hdrName</B>(char *param, char *xname, int n, char *item, int item_length, int *status) 
+     Return a header item name 
+<A NAME="xref_hdrNumb"></A>
+  void <B>hdrNumb</B>(char *param, char *xname, char *item, int *n, int *status) 
+     Return a header item count 
+<A NAME="xref_hdrOut"></A>
+  void <B>hdrOut</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status) 
+     Write a character header item 
+<A NAME="xref_hdrOutC"></A>
+  void <B>hdrOutc</B>(char *param, char *xname, char *item, char *commen, char *value,   int value_length, int *status) 
+     Write a character header item 
+<A NAME="xref_hdrOut[X]"></A>
+  void <B>hdrOut[X]</B>(char *param, char *xname, char *item, char *commen, TYPE *value,   int *status) 
+     Write a header item 
+</PRE>
+\end{rawhtml}
+\label{HDRCdatatypes}
+Where the {\tt "[X]"} indicate the data type of the header items. 
+The possible values of {\tt [X]} are:
+\begin{small}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Character code[X] & C data type ({\tt TYPE)} &  Description      \\
+\hline
+ {\tt C}          & {\tt char}               &  Character string \\
+ {\tt D}          & {\tt double}             &  \\
+ {\tt I}          & {\tt int}                &  \\
+ {\tt L}          & {\tt int}                &  Boolean          \\
+ {\tt F}          & {\tt float}              &  \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+
+\subsection{Examples of using IMG from C}
+\subsubsection{Accessing an existing image}
+This section shows a C version of the \myverb{mean} program from
+\hyperref{elsewhere}{\S}{}{IMGMEAN}.
+\begin{code}
+\begin{verbatim}
+#include <stdio.h>
+#include "img.h"                                              [1]
+
+void mean_(int *istat)                                        [2]
+{
+  /* Local variables: */
+  float *ip, sum;
+  int nx, ny, i;
+
+  /*  Access the input image. */
+  imgIn( "in", &nx, &ny, &ip, istat );
+
+  /*  Derive the mean and write it out. */
+  sum = 0.0f;
+  for( i=0; i < nx*ny; i++ ) sum += ip[i];
+  printf ("Mean value = %f\n", sum/(nx*ny) );
+
+  /*  Free the input image. */
+  imgFree( "in", istat );
+}
+\end{verbatim}
+\end{code}
+
+\mynote
+
+\begin{enumnotes}
+% 1
+\item The file \myverb{img.h} contains prototypes of all the IMG
+and HDR functions.
+% 2
+\item As in the Fortran case this program needs to be created as a
+function with an \myverb{int *} argument. This is a replacement for
+the \myverb{main} function. Note that the function is named the same
+as the eventual program {\em except} for the trailing underscore. The
+underscore is required as this function will be called from a Fortran
+subroutine (you should also note that this ``trick'' may not be the
+same from machine to machine, to do this portably you should use the
+\xref{CNF}{sun209}{} (SUN/209) macros as in the full example of
+\htmladdnormallink{\myverb{mean.c}}{../../bin/examples/img/mean.c}).
+\end{enumnotes}
+
+As before an interface file -
+\htmladdnormallink{\myverb{mean.ifl}}{../../bin/examples/img/mean.ifl}
+- is also required to complete the program.
+
+\subsubsection{Creating a new image}
+
+This example
+(\htmladdnormallink{\myverb{flat.c}}{../../bin/examples/img/flat.c})
+shows how to create a new image. It also sets all the elements of the
+image to 1.0.
+
+\begin{code}
+\begin{verbatim}
+#include <stdio.h>
+#include "img.h"
+
+void flat_(int *istat)
+{
+
+
+  /*  Local variables: */
+  float *ip;
+  int i;
+
+  /*  Create a new image. */
+  imgNew( "out", 416, 578, &ip, istat );
+
+  /*  Set all its elements to the value 1.0. */
+  for( i=0; i < 416*578; i++ ) {
+    ip[i] = 1.0f;
+  }
+
+  /*  Free the new image. */
+  imgFree( "out", istat );
+}
+\end{verbatim}
+\end{code}
+
+\subsubsection{Modifying an image}
+This example shows how to access an existing image and modify
+its values.
+\begin{code}
+\begin{verbatim}
+   /* Access an existing image. */
+   imgMod( "in", &nx, &ny, &ip, istat );
+
+   /* Set all elements with a value above 32000 to 32000. */
+   for( i=0; i <nx*ny; i++ ) {
+       if ( ip[i] > 32000.0f ) {
+          ip[i] = 32000.0f;
+       }
+   }
+
+   /* Free the image */
+   imgFree( "in", istat );
+\end{verbatim}
+\end{code}
+
+\subsubsection{Modifying a copy of an image}
+This example
+(\htmladdnormallink{\myverb{add.c}}{../../bin/examples/img/add.c})
+copies the input image and then modifies the copy.
+\begin{code}
+\begin{verbatim}
+  /*  Access an existing image */
+  imgIn( "in", &nx, &ny, &ptrIn, status );
+
+  /*  Copy this to an output image */
+  imgOut( "in", "out", &ptrOut, status );
+
+  /*  Get the value to add. */
+  printf("Value to add to image: ");
+  scanf( "%f", &value );
+
+  /*  And do the work. */
+  for( i=0; i <nx*ny; i++ ) {
+    ptrOut[i] = value + ptrIn[i];
+  }
+
+  /*  Free the input and output images. */
+  imgFree( "*", status );
+\end{verbatim}
+\end{code}
+
+\subsubsection{Getting images as workspace}
+This example
+(\htmladdnormallink{\myverb{shadow.c}}{../../bin/examples/img/shadow.c})
+shows how to create temporary images.
+The \xref{HDS}{sun92}{} (SUN/92) manual describes
+\xref{some reasons}{sun92}{HDS_MAP_tuning_parameter}
+why you might consider using temporary images rather than
+``malloc'd'' memory in your programs.
+\begin{code}
+\begin{verbatim}
+  /*  Access the input image. */
+  imgIn( "in", &nx, &ny, &ipin, istat );
+
+  /*  Get a same sized temporary image as workspace. */
+  imgTmp( "temp", nx, ny, &iptemp, istat );
+
+  /*  Free all images (this deletes the temporary image). */
+  imgFree( "*", istat );
+\end{verbatim}
+\end{code}
+
+\subsubsection{Using ``images'' which are not 2-dimensional}
+This section just shows some example calls that access spectra and
+data-cubes.
+\begin{code}
+\begin{verbatim}
+   imgIn1( "spectrum", &nx, &ip, istat );
+   imgIn3( "cube", &nx, &ny, &nz, &ip, istat );
+\end{verbatim}
+\end{code}
+
+\subsubsection{Accessing images using different data types}
+So far all the example shown access the image data assuming a type of
+\myverb{float}. IMG can also access data in other useful types. A list
+of these is shown \hyperref{elsewhere}{in \S}{}{IMGCdatatypes}. Among
+the possible calls are:
+\begin{code}
+\begin{verbatim}
+   double *dPtr;
+   imgInD( "image", &nx, &ny, &dPtr, istat );
+   float *fPtr;
+   imgInF( "image", &nx, &ny, &fPtr, istat );
+   short *sPtr;
+   imgInS( "image", &nx, &ny, &sPtr, istat );
+   int *iPtr;
+   imgInI( "image", &nx, &ny, &iPtr, istat );
+\end{verbatim}
+\end{code}
+
+Requirements for data types and dimensionalities can be mixed as in:
+\begin{code}
+\begin{verbatim}
+   imgIn1D( 'spectrum', &nx, &ip, istat )
+   imgMod2I( 'image', &nx, &ny, &ip, istat )
+   imgNew3S( 'cube', &nx, &ny, &nz, ip, istat )
+   imgIn2F( 'image', &nx, &ny, &ip, istat )
+\end{verbatim}
+\end{code}
+
+\subsubsection{Accessing multiple images}
+This example
+(\htmladdnormallink{\myverb{proc.c}}{../../bin/examples/img/proc.c})
+shows how IMG can access more than one image per function call:
+\begin{code}
+\begin{verbatim}
+   /*  Declare pointers for images. */
+   float *ip[3], *ipproc, *ipbias, *ipflat, *ipraw ;              [1]
+   int nx, ny, i;
+
+   /*  Access input images. */
+   imgIn( "bias,flat,raw", &nx, &ny, ip, istat );                 [2]
+   ipbias = ip[0];
+   ipflat = ip[1];
+   ipraw = ip[2];
+
+   /*  Create a new output image by copying the raw input image. */
+   imgOut( "raw", "proc", &ipproc, istat );
+
+   /*  Debias and flatfield data. */
+   for( i=0; i <nx*ny; i++ ) {
+      *ipproc++ = ( *ipraw++ - *ipbias++ ) / *ipflat++;
+   }
+
+   /*  Free all the images.*/
+   imgFree( "*", istat );
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item Note that the variable \myverb{ip} is declared as an array of
+pointers to \myverb{float}.
+%2
+\item After this call each of the elements of \myverb{ip} is set to
+point to a different image. The advantage of such a call is that all
+the images are guaranteed to be the same shape and data type.
+\end{enumnotes}
+
+\subsubsection{Handling ``bad'' data}
+The way that you handle ``bad'' values in your data is similar to that
+used in Fortran, see
+\hyperref{here}{\S}{}{IMGBADDATA},
+however, the bad data values themselves are now defined in the
+\myverb{img.h} file and have names to reflect the C data types.
+\begin{small}
+\begin{center}
+\begin{tabular}{||l|l|l||}
+\hline
+Bad value macro  & C data type          \\
+\hline
+ {\tt VAL\_\_BADF}   & {\tt float}          \\
+ {\tt VAL\_\_BADD}   & {\tt double}         \\
+ {\tt VAL\_\_BADI}   & {\tt int}            \\
+ {\tt VAL\_\_BADS}   & {\tt short}          \\
+ {\tt VAL\_\_BADUS}  & {\tt unsigned short} \\
+ {\tt VAL\_\_BADB}   & {\tt signed char}    \\
+ {\tt VAL\_\_BADUB}  & {\tt unsigned char}  \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+
+\subsection{Examples of using HDR from C}
+
+\subsubsection{Reading header items}
+
+This example
+(\htmladdnormallink{\myverb{hdrread.c}}{../../bin/examples/img/hdrread.c})
+shows how to read the value of a header item.
+\begin{code}
+\begin{verbatim}
+
+  /*  Local Variables: */
+  char item[] = "OBSERVER";
+  char value[40];                                 [1]
+
+  /*  Try to read the value. */
+  hdrIn( "in", " ", item, 1, value, 40, istat );  [2]
+
+  /*  And write it out */
+  printf( "This data was taken by %s.\n", value);
+
+  /*  Free the image */
+  imgFree( "in", istat );
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item A character ``string'' is declared to contain the value of the
+header item.
+% 2
+\item The size of the string is passed as an additional argument when
+calling \myverb{hdrIn} 
+(this argument is not present in the Fortran version).
+\end{enumnotes}
+
+\subsubsection{Writing header items}
+This example
+(\htmladdnormallink{\myverb{hdrwrite.c}}{../../bin/examples/img/hdrwrite.c})
+shows how to write a header item to an image.
+\begin{code}
+\begin{verbatim}
+  /*  Write the header item. */
+  hdrOut( "out", " ", "OBSERVER", "The observer.", "Fred Bloggs", 0, istat ); [1]
+
+  /*  Free the image. */
+  imgFree( "out", istat );
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item Note the extra argument which is set to 0. This indicates that a
+single string (\myverb{"Fred Bloggs"}) has been passed. This could also
+have been set to the value 12, the string length. This argument is of
+more significance when dealing with multiple images.
+\end{enumnotes}
+
+\subsubsection{Accessing header items using different data types}
+All the possible types of header items that can be accessed are
+described \hyperref{here}{in \S}{}{HDRCdatatypes}. Among the
+possible calls are:
+\begin{code}
+\begin{verbatim}
+   float bscale;
+   hdrInF( "in", " ", "bscale", 1, &bscale, istat );
+   int ibfact;
+   hdrInI( "in", " ", "binned", 1, &ibfact, istat );
+   #define TRUE 1
+   hdrOutL( "out", " ", "checked",  "Data checked for C/Rs", TRUE, istat );
+\end{verbatim}
+\end{code}
+
+\subsubsection{Accessing header items by index}
+This example
+(\htmladdnormallink{\myverb{hdrlist.c}}{../../bin/examples/img/hdrlist.c})
+shows how to access header items by index.
+\begin{code}
+\begin{verbatim}
+  /*  Local Variables: */
+  char value[80], item[30];
+  int nitem, i;
+
+  /*  See how many items are present (this also accesses the image). */
+  hdrNumb( "in", " ", "*", &nitem, istat );
+  for( i=1; i<=nitem; i++ ) {
+
+    /*  Get the name of the I'th header item. */
+    hdrName( "in", source, i, item, 30, istat );                     [1]
+
+    /*  Get its value and print out the item name and value. */
+    hdrInC( "in", source, item, 1, value, 80, istat );               [1]
+    printf( "%s = %s \n", item, value );
+  }
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item Note the extra arguments ({\tt 30} \& {\tt 80}) that pass the
+      maximum length of the output strings.
+\end{enumnotes}
+
+\subsubsection{Reading and writing header items from/to many images}
+It is possible to read and write header items from/to many images in
+one call and some examples follow. Note that arrays of strings can
+only be passed using fixed string length. It is not possible to use
+arrays of pointers to {\tt char} forming a ragged array. When
+using a character array you should pass a pointer to the first element
+not the actual array (as the HDR routines expect to see {\tt char *}).
+
+This example shows how to read the same header item from two images
+at the same time.
+\begin{code}
+\begin{verbatim}
+   char RA[2][80];
+   char DEC[2][80];
+   hdrIn( "IN1,IN2", " ", "RA", 1, (char *) RA, 80, status );         [1]
+   hdrIn( "IN1,IN2", " ", "DEC", 1, (char *) DEC, 80, status );       [1]
+   printf( "The RA and DEC of IN1 are: %s, %s\n", RA[0], DEC[0] );
+   printf( "and the RA and DEC of IN2 are: %s, %s\n", RA[1], DEC[1] );
+   imgFree( "*", status );
+\end{verbatim}
+\end{code}
+\mynote
+\begin{enumnotes}
+% 1
+\item The address to the first element of the {\tt RA} and {\tt DEC}
+arrays is passed. This could have been written as 
+{\tt \&RA[0][0]} and {\tt \&DEC[0][0]}.
+\end{enumnotes}
+
+This example shows how to write values to the same header item of two images.
+\begin{code}
+\begin{verbatim}
+   char obstype[2][5] = {"BIAS","FLAT"};
+   hdrOut( "BIAS,FLAT", " ", "OBSTYPE", "Type of observation", 
+           (char *) obstype, 5, istat );
+   imgFree( "*", istat );
+\end{verbatim}
+\end{code}
+
+\subsection{Compiling and linking C programs}
+Compiling and linking a C program is very similar to the methods
+described 
+(\hyperref{in the Fortran section}{in \S}{}{IMGCOMPILING}), except
+that you must compile the source code before the linking stage. 
+
+If your program source file is named \myverb{prog.c}, and it only
+depends on IMG, then the commands:
+\begin{code}
+\begin{verbatim}
+% cc -c -I/star/include prog.c 
+% alink prog.o -L/star/lib `img_link_adam`
+\end{verbatim}
+\end{code}
+will compile the source and link the program.
+
+\section{Changes in release (1.1)}
+
+This version introduces and documents the C interface.
+
+\section{Changes this release (1.2)}
+
+In this release several bugs in the Linux version of IMG have been
+corrected. These affected the release of headers when using the
+\htmlref{IMG\_CANCL}{IMG\_CANCL} routine and counting of header items by 
+\htmlref{HDR\_NUMB}{HDR\_NUMB}. A new routine has also been added --
+\htmlref{IMG\_NAME}{IMG\_NAME}. This returns the name of the 
+image data file for use when producing logfile information etc.
+
+\end{document}
+% $Id$

@@ -1,0 +1,121 @@
+      SUBROUTINE IMG_TMP<T>( PARAM, NX, NY, IP, STATUS )
+*+
+*  Name:
+*     IMG_TMPx
+
+*  Purpose:
+*     Creates a temporary image of a specific type.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL IMG_TMPx( PARAM, NX, NY, IP, STATUS )
+
+*  Description:
+*     This routine creates a temporary 2-dimensional image, with a
+*     specified numeric type, for use as workspace and returns a
+*     pointer to its data, mapped using the same numeric type.  The
+*     image will be deleted automatically when it is later released
+*     (e.g. by calling IMG_FREE).
+
+*  Arguments:
+*     PARAM = CHARACTER * ( * ) (Given)
+*        Parameter name (case insensitive).
+*     NX = INTEGER (Given)
+*        Size of image first dimension (in pixels).
+*     NY = INTEGER (Given)
+*        Size of image second dimension (in pixels).
+*     IP = INTEGER (Returned)
+*        Pointer to the image data.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - There is a version of this routine for each numeric type,
+*     obtained by replacing the "x" in the routine name by D, R, I, W,
+*     UW, B or UB as appropriate.
+*
+*     - Access to more than one piece of temporary image data is
+*     possible using multiple parameter names. These are specified by
+*     supplying a comma separated list of names
+*     (i.e. 'WORK1,WORK2,WORK3'). A pointer to the data of each image
+*     is then returned (in this case the IP argument should be passed
+*     as an array of size at least the number of parameter names).
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     21-FEB-1992 (RFWS):
+*        Original version.
+*     18-AUG-1994 (PDRAPER):
+*        Extended to use multiple parameter names.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'IMG_CONST'        ! IMG_ private constants
+
+*  Arguments Given:
+      CHARACTER * ( * ) PARAM
+      INTEGER NX
+      INTEGER NY
+
+*  Arguments Returned:
+      INTEGER IP( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER NDIM               ! Number of NDF dimensions
+      PARAMETER ( NDIM = 2 )
+
+*  Local Variables:
+      CHARACTER * ( 16 ) COMM    ! Numeric type description
+      INTEGER DIM( NDIM )        ! NDF dimension sizes
+
+*.
+
+*  Set an initial null value for the first returned pointer.
+      IP( 1 ) = IMG__NOPTR
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Assign the NDF dimensions.
+      DIM( 1 ) = NX
+      DIM( 2 ) = NY
+
+*  Create temporary NDF(s).
+      CALL IMG1_TPNDF( PARAM, '<HTYPE>', NDIM, DIM, IP, STATUS )
+
+*  If an error occurred, then report a contextual message.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         COMM = '<COMM>'
+         CALL CHR_LCASE( COMM )
+         CALL MSG_SETC( 'COMM', COMM )
+         IF ( INDEX( PARAM, ',' ) .NE. 0 ) THEN 
+            CALL ERR_REP( 'IMG_TMP<T>_ERR',
+     :           'IMG_TMP<T>: Error creating temporary images with ' //
+     :           'a numeric type of ^COMM.', STATUS )
+         ELSE
+            CALL ERR_REP( 'IMG_TMP<T>_ERR',
+     :           'IMG_TMP<T>: Error creating a temporary image with ' //
+     :           'a numeric type of ^COMM.', STATUS )
+         END IF
+      END IF
+
+      END
+* $Id$

@@ -1,0 +1,8 @@
+interface FLAT
+   parameter OUT
+      access  'WRITE'
+      type    'NDF'
+      prompt  'Output image'
+   endparameter
+endinterface
+# $Id$
