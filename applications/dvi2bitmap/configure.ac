@@ -57,7 +57,7 @@ dnl   automatically checked for, and the corresponding HAVE_ macros
 dnl   defined).  Check if we've got sstream; if not, hope we have the
 dnl   older strstream.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sys/wait.h signal.h sstream strstream)
+AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sys/wait.h signal.h)
 AC_HEADER_STAT
 
 dnl   Checks for library functions
@@ -82,6 +82,11 @@ AC_CHECK_FUNCS(getopt)
 AC_CHECK_DECLS([getopt,getsubopt,getopt_long,setenv,putenv])
 AC_REPLACE_FUNCS(getopt_long getsubopt)
 
+
+dnl   Now switch to doing header checks with C++, for those headers
+dnl   which are specific to C++
+AC_LANG([C++])
+AC_CHECK_HEADERS(sstream strstream)
 
 dnl   What type of system are we on?
 dnl   The alpha cxx compiler currently (v6.0) needs to be invoked with 
