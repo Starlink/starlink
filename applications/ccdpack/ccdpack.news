@@ -1,90 +1,21 @@
-1 CCDPACK_major_update
+1 CCDPACK_minor_update
 
-  Release 3.0-2 improves efficiency and removes some bugs from DRIZZLE.
-  It improves behaviour of IDICURS, PAIRNDF and CCDALIGN on PseudoColor
-  visuals (causes them to note a problem not just crash).
+  Release 3.1-0 is a minor update of CCDPACK, and incorporates the
+  following changes:
 
-  Release 3.0-1 makes a few non-user-visible code modifications and minor
-  documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
-  parameter of MAKEMOS is also withdrawn, and the defaults of the CORRECT
-  parameters in MAKEMOS and DRIZZLE correspondingly modified.
+  - As of this release, the handling of group parameters is done using
+    the GRP and NDG libraries as in some other Starlink packages, notably
+    KAPPA.  For most purposes behaviour will be unchanged,
+    but now when specifying a list of images, the name of an HDS container
+    file holding several NDFs may be given, and each of the contained NDFs
+    will be processed as a separate image.  This affects almost all the
+    CCDPACK tasks.
 
-  Version 3.0 is a major update to CCDPACK.
+  - DRIZZLE has been substantially speeded up and some bugs removed.
 
-  * CCDPACK has been revised to be aware of, and use, the World Coordinate
-    System (WCS) components of NDFs - see SUN/95 and SUN/210.  This has 
-    the following effects on the package:
-
-     - Some new applications have been introduced.
-          New tasks:
-             ASTEXP - Exports AST frameset information from NDFs to file
-             ASTIMP - Imports AST frameset information from file to NDFs
-             WCSEDIT - Modifies and examines frames in WCS component
-             WCSREG - Aligns NDFs using multiple WCS component frames
-          New script:
-             WCSEXERCISE - test WCS-related functionality (not IRAF)
-
-     - Coordinate transformations are now stored using AST coordinate
-       frames in the WCS components of NDFs, rather than using 
-       TRANSFORM structures stored in the .MORE.CCDPACK extension.
-       For backward compatibility however all applications retain their 
-       old ability to read TRANFORM structures.
-
-       The position list coordinates dealt with by FINDOFF and 
-       REGISTER are now by default converted from pixel coordinates to
-       the Current coordinate system before use (USEWCS parameter).  
-       In addition FINDOFF can optionally restrict attempted object
-       matches to regions expected to overlap (RESTRICT parameter).
-          Affected tasks:
-             FINDOFF   (new parameters MAXDISP, RESTRICT, USEWCS)
-             REGISTER  (new parameters OUTDOMAIN, SIMPFI, SIMPIF, USEWCS,
-                                       WCSFILE)
-             TRANLIST  (new parameters FRAMEIN, EPOCHIN, FRAMEOUT, 
-                                       EPOCHOUT, WCSFILE)
-             TRANNDF   (new parameter  USEWCS)
-             MAKEMOS   (new parameters CORRECT, WRITESZ)
-          Affected script:
-             CCDEXERCISE
-
-     - All applications now propagate WCS components where appropriate.
-          Affected tasks:
-             CALCOR
-             DEBIAS
-             FLATCOR
-             MAKEBIAS
-             MAKECAL
-             MAKEFLAT
-
-     - The package now requires AST 1.4 to build.
-
-
-  * A new application, DRIZZLE, has been introduced.  This resamples and
-    combines images in one step, optionally normalising them at the same
-    time.  It uses the variable-pixel linear reconstruction, or 
-    'drizzling' algorithm, which is well suited for combination of
-    multiple dithered undersampled images.
-
-
-  * FINDOFF will now deal with position lists having as few as one object
-    in common.  This capability will principally be of use in conjunction
-    with the new WCS awareness of the package.
-
-
-  * The package will no longer attempt to make use of NAG routines where
-    present.
-
-     - Withdrawn routine:
-          NAGMAKEMOS - MAKEMOS can be used instead.
-  
-
-  * There are some minor changes in behaviour:
-
-     - Some routines fail differently when objects cannot be matched:
-          FINDOFF erases the associated position list of NDFs which
-             cannot be matched instead of leaving the previously 
-             associated list.
-          REGISTER ignores NDFs without associated position lists 
-             instead of exiting.
-
-     - REGISTER: output to screen has changed slightly for readability.
+  - The behaviour of IDICURS, PAIRNDF and CCDALIGN on TrueColor visuals 
+    (typically newer Linux X displays) has been improved; they now signal 
+    an error rather than just crashing.  In a future release these 
+    applications will be replaced by ones which run properly on these 
+    visuals.
 

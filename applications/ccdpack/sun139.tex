@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {139.12}
+\newcommand{\stardocnumber}    {139.13}
 \newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {3 February 2000}
+\newcommand{\stardocdate}      {1 July 2000}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
-\newcommand{\stardocversion}   {Version 3.0}
+\newcommand{\stardocversion}   {Version 3.1}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {
 CCDPACK is a package of programs for reducing CCD-like data. They
@@ -3680,6 +3680,22 @@ possibilities include specifications such as:
 \end{verbatim}
 \end{myquote}
 
+If any of the image names you specify is an HDS container file
+holding more than one NDF structure, then each NDF contained directly 
+within that file is processed as a separate image.  
+If the data product you are using is supplied in this form, 
+which for instance is sometimes the case for a set of frames 
+from one exposure of a mosaic camera, 
+this makes it much easier to process a group of images at once.
+So if you had an 
+appropriate container file \text{expos1234.sdf}, then just supplying:
+\begin{myquote}
+\begin{verbatim}
+   IN > expos1234
+\end{verbatim}
+\end{myquote}
+would allow processing of a whole set of related images.
+
 The names of images given to programs (except for \xroutine{XREDUCE})
 do not normally require the addition of the file extension. This
 is only necessary when there is some ambiguity over which files to
@@ -3766,7 +3782,7 @@ rules --- but if a wildcard is used in the file this must be the only
 entry --- and of course explicit names can be always be given for the
 output images in response to a prompt or on the command line.
 
-When image names include the directories too, only the image name itself may
+When image names include the directories too, only the file name itself may
 be modified. Changing the directory of the output images (which otherwise
 will always be the same as the input images) is achieved by commands
 like:
@@ -3782,7 +3798,8 @@ occurrences of the string
 `\text{\_ccd}' with `\text{-pr}'. {\em Remember the
 `\text{*}' in output expressions represents only the names of
 the input images not the directory or any other information (such as
-the extension)}, these are only used if no `preferences' are shown
+the extension or the NDF's name within an HDS container file)}, 
+these are only used if no `preferences' are shown
 in the output expression. To keep images from other directories
 in the current directory use commands like:
 \begin{myquote}
@@ -3791,6 +3808,20 @@ IN > elsewhere/*
 OUT > ./*
 \end{verbatim}
 \end{myquote}
+
+If the input group was a set of images in an HDS container file,
+the output group will have the same structure.
+So if the file \text{expo1234.sdf} 
+contains two NDFs called I1 and I2, then specifying
+\begin{myquote}
+\begin{verbatim}
+IN > expo1234
+OUT > *-out
+\end{verbatim}
+\end{myquote}
+will write a new container file \text{expo1234-out.sdf}
+holding the output images as NDFs called I1 and I2.
+
 In general the same rules apply for non-image output names (such as
 when position list access routines are not using image association to
 supply the name of the appropriate file), the only real difference is
@@ -16009,11 +16040,28 @@ This is a major update to CCDPACK.
   the CORRECT parameters in \xroutine{MAKEMOS} and \xroutine{DRIZZLE} 
   correspondingly modified.
 
-\subsection{This release 3.0-2}
+\subsection{This release 3.1-0}
 
-  Release 3.0-2 improves efficiency and removes some bugs from DRIZZLE.
-  It improves behaviour of IDICURS, PAIRNDF and CCDALIGN on PseudoColor
-  visuals (causes them to note a problem not just crash).
+  This is a minor update of CCDPACK, and incorporates the following changes:
+\begin{itemize}
+\item
+  As of this release, the handling of group parameters is done using
+  the GRP and NDG libraries as in some other Starlink packages, notably 
+  \xref{KAPPA}{sun95}{}.  
+  For most purposes behaviour will be unchanged, 
+  but now when specifying a list of images, the name of an HDS container
+  file holding several NDFs may be given, and each of the contained NDFs 
+  will be processed as a separate image.  This affects almost all the
+  CCDPACK tasks.
+\item
+  \xroutine{DRIZZLE} has been substantially speeded up and some bugs removed.
+\item
+  The behaviour of \xroutine{IDICURS}, \xroutine{PAIRNDF} and 
+  \xroutine{CCDALIGN} on TrueColor visuals (typically newer Linux X displays)
+  has been improved; they now signal an error rather than just crashing.
+  In a future release these applications will be replaced by ones which
+  run properly on these visuals.
+\end{itemize}
 
 
 \begin{latexonly}

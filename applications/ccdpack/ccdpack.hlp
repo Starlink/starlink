@@ -158,94 +158,24 @@
      XREDUCE: Starts the automated CCD data reduction GUI.
 
 1 Changes_this_release
+ Release 3.1-0 is a minor update of CCDPACK, and incorporates the
+ following changes:
 
-  Release 3.0-2 improves efficiency and removes some bugs from DRIZZLE.
-  It improves behaviour of IDICURS, PAIRNDF and CCDALIGN on PseudoColor
-  visuals (causes them to note a problem not just crash).
+ - As of this release, the handling of group parameters is done using
+   the GRP and NDG libraries as in some other Starlink packages, notably
+   KAPPA.  For most purposes behaviour will be unchanged,
+   but now when specifying a list of images, the name of an HDS container
+   file holding several NDFs may be given, and each of the contained NDFs
+   will be processed as a separate image.  This affects almost all the
+   CCDPACK tasks.
 
-  Release 3.0-1 makes a few non-user-visible code modifications and minor
-  documentation bugfixes to the beta test release 3.0-0b.  The WRITESZ
-  parameter of MAKEMOS is also withdrawn and the defaults of the CORRECT
-  parameters in MAKEMOS and DRIZZLE correspondingly modified.
+ - DRIZZLE has been substantially speeded up and some bugs removed.
 
-  Version 3.0 is a major update to CCDPACK.
-
-  * CCDPACK has been revised to be aware of, and use, the World Coordinate
-    System (WCS) components of NDFs - see SUN/95 and SUN/210.  This has 
-    the following effects on the package:
-
-     - Some new applications have been introduced.
-          New tasks:
-             ASTEXP - Exports AST frameset information from NDFs to file
-             ASTIMP - Imports AST frameset information from file to NDFs
-             WCSEDIT - Modifies and examines frames in WCS component
-             WCSREG - Aligns NDFs using multiple WCS component frames
-          New script:
-             WCSEXERCISE - test WCS-related functionality (not IRAF)
-
-     - The default way of handling coordinate mappings is now using 
-       frames in the WCS components of NDFs, rather than using 
-       TRANSFORM structures stored in the .MORE.CCDPACK extension.
-       All applications retain the option of using the previous
-       functionality for backwards compatibility however.
-
-       The position list coordinates dealt with by FINDOFF and 
-       REGISTER are now by default converted from pixel coordinates to
-       the Current coordinate system before use (USEWCS parameter).  
-       In addition FINDOFF can optionally restrict attempted object
-       matches to regions expected to overlap (RESTRICT parameter).
-          Affected tasks:
-             FINDOFF   (new parameters MAXDISP, RESTRICT, USEWCS)
-             REGISTER  (new parameters OUTDOMAIN, SIMPFI, SIMPIF, USEWCS,
-                                       WCSFILE)
-             TRANLIST  (new parameters FRAMEIN, EPOCHIN, FRAMEOUT, 
-                                       EPOCHOUT, WCSFILE)
-             TRANNDF   (new parameter  USEWCS)
-             MAKEMOS   (new parameters CORRECT, WRITESZ)
-          Affected script:
-             CCDEXERCISE
-
-     - All applications now propagate WCS components where appropriate.
-          Affected tasks:
-             CALCOR
-             DEBIAS
-             FLATCOR
-             MAKEBIAS
-             MAKECAL
-             MAKEFLAT
-
-     - The package now requires AST 1.4 to build.
-
-
-  * A new application, DRIZZLE, has been introduced.  This resamples and
-    combines images in one step, optionally normalising them at the same
-    time.  It uses the variable-pixel linear reconstruction, or 
-    'drizzling' algorithm, which is well suited for combination of
-    multiple dithered undersampled images.
-
-
-  * FINDOFF will now deal with position lists having as few as one object
-    in common.  This capability will principally be of use in conjunction
-    with the new WCS awareness of the package.
-
-
-  * The package will no longer attempt to make use of NAG routines where
-    present.
-
-     - Withdrawn routine:
-          NAGMAKEMOS - MAKEMOS can be used instead.
-  
-
-  * There are some minor changes in behaviour:
-
-     - Some routines fail differently when objects cannot be matched:
-          FINDOFF erases the associated position list of NDFs which
-             cannot be matched instead of leaving the previously 
-             associated list.
-          REGISTER ignores NDFs without associated position lists 
-             instead of exiting.
-
-     - REGISTER: output to screen has changed slightly for readability.
+ - The behaviour of IDICURS, PAIRNDF and CCDALIGN on TrueColor visuals 
+   (typically newer Linux X displays) has been improved; they now signal 
+   an error rather than just crashing.  In a future release these 
+   applications will be replaced by ones which run properly on these 
+   visuals.
 
 1 ASTEXP
 Exports coordinate system information from images to an AST file
@@ -9831,9 +9761,31 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
       IN > NGC2261_?         (all images whose names begin with NGC2261_
                               followed by one extra character)
 
- If you are processing foreign data formats (i.e. non-NDF ones) then
- you can also wildcard these files, which may or may not include the
- file extension.
+ If any of the image names you specify is an HDS container file
+ holding more than one NDF structure, then each NDF contained directly
+ within that file is processed as a separate image.
+ If the data product you are using is supplied in this form,
+ which for instance is sometimes the case for a set of frames
+ from one exposure of a mosaic camera, this makes it much easier to 
+ process a group of images at once.  So if you had an appropriate 
+ container file expos1234.sdf, then just supplying:
+
+    IN > expos1234
+
+ would allow processing of a whole set of related images.
+
+ The names of images given to programs (except for XREDUCE)
+ do not normally require the addition of the file extension. This
+ is only necessary when there is some ambiguity over which files to
+ use (when for instance several images of the same name, but of
+ different types are available). However, the file extension will
+ be accepted if given. So for instance repeating the last examples
+ for IRAF data frames could look like:
+
+    IN > bias/*.imh
+    IN > rdata/*.imh,bdata/*.imh
+    IN > ffr*.imh
+    IN > NGC2261_?.imh
 
 2 Indirection
  Names can also be stored in ordinary text files. Indirection through a
@@ -9887,7 +9839,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  entry --- and of course explicit names can be always be given for the
  output images in response to a prompt or on the command line.
 
- When image names include the directories too, only the image name
+ When image names include the directories too, only the file name
  itself may be modified. Image names always exclude the `.sdf' file type
  extension (or whatever your foreign data format extension is). Changing
  the directory of the output images (which otherwise will always be the
@@ -9906,6 +9858,16 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
 
       IN > elsewhere/*
       OUT > ./*
+
+ If the input group was a set of images in an HDS container file, the 
+ output group will have the same structure.  So if the file expo1234.sdf
+ contains two NDFs called I1 and I2, then specifying:
+ 
+      IN > expo1234
+      OUT > *-out
+
+ will write a new container file expo1234-out.sdf holding the output 
+ images as NDFs called I1 and I2.
 
  In general the same rules apply for non-image output names (such as
  when position list access routines are not using images to supply the
