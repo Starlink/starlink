@@ -1,3 +1,6 @@
+.libs
+*.lo
+*.la
 tra_putx.f
 acinclude.m4
 libtool
