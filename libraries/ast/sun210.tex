@@ -24715,7 +24715,13 @@ Object            - Base class for all AST Objects
          Border: The Plot border drawn using AST\_BORDER or AST\_GRID
 
          \sstitem
-         Grid: Grid lines drawn using AST\_GRIDLINE or AST\_GRID
+         Grid: Grid lines drawn using AST\_GRIDLINE or AST\_GRID (provides
+
+         \sstitem
+         Grid1: Grid lines which cross axis 1, drawn using AST\_GRIDLINE or AST\_GRID
+
+         \sstitem
+         Grid2: Grid lines which cross axis 2, drawn using AST\_GRIDLINE or AST\_GRID
 
          \sstitem
          Curves: Geodesic curves drawn using AST\_CURVE, AST\_GENCURVE or AST\_POLYCURVE
@@ -25996,12 +26002,12 @@ current version):
 
 \begin{enumerate}
 
-\item The \htmlref{Plot}{Plot} class defines new graphical elements Axis1, Axis2, 
-NumLabs1, NumLabs2, TextLab1, TextLab2, Ticks1 and Ticks2. These allow
-graphical attributes (colour, width, etc) to be set for each axis
-individually. Previously, graphical attributes could only be set for both
-axes together, using graphical elements Axes, NumLabs, TextLabs and
-Ticks.
+\item The \htmlref{Plot}{Plot} class defines new graphical elements Axis1, Axis2,
+Grid1, Grid2, NumLabs1, NumLabs2, TextLab1, TextLab2, Ticks1 and Ticks2.
+These allow graphical attributes (colour, width, etc) to be set for each
+axis individually. Previously, graphical attributes could only be set for
+both axes together, using graphical elements Axes, \htmlref{Grid}{Grid}, NumLabs,
+TextLabs and Ticks.
 
 \end{enumerate}
 
