@@ -405,8 +405,6 @@ itcl::class gaia::GaiaSextractor {
          delete object $this
       } else {
          wm withdraw $w_
-         #  Remove the grid.
-         catch {remove_grid_}
       }
    }
 

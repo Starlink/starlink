@@ -13,7 +13,7 @@
 //     Allan Brighton, ESO (ALLAN)
 //
 //  Copyright:
-//     Copyright (C) 1997 Central Laboratory of the Research Councils
+//     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
 //
 //  History:
 //     15-FEB-1996 (PWD):
@@ -94,7 +94,8 @@
 //     13-JAN-1999 (PWD):
 //        Merged Allan Brighton's GAIA plugins changes (see history above).
 //     06-APR-1999 (PWD):
-//        Added contour command. 
+//        Added contour command. Lots of restructuring of gridplot
+//        command.
 //-
 
 #include <string.h>
@@ -114,6 +115,7 @@
 #include "NDFIO.h"
 #include "ImageData.h"
 #include "StarRtdImage.h"
+#include "Contour.h"
 #include "HTTP.h"
 #include "ast.h"
 #include "grf_tkcan.h"
@@ -170,7 +172,7 @@ public:
   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
   { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
   { "clone",         &StarRtdImage::cloneCmd,        1, 2 },
-  { "contour",       &StarRtdImage::contourCmd,      0, 2 },
+  { "contour",       &StarRtdImage::contourCmd,      1, 5 },
   { "dump",          &StarRtdImage::dumpCmd,         1, 2 },
   { "foreign",       &StarRtdImage::foreignCmd,      2, 2 },
   { "origin",        &StarRtdImage::originCmd,       2, 2 },
@@ -548,13 +550,15 @@ int StarRtdImage::loadFile()
 //-
 StarWCS* StarRtdImage::getStarWCSPtr(ImageData* image)
 {
-    if (!image)
-	image = image_;
-    WCSRep* p = image->wcs().rep();
-    if (p && strcmp(p->classname(), "StarWCS") == 0)
-	return (StarWCS*)p;
-    error("internal error: expected class StarWCS, not ", p->classname());
-    return NULL;
+  if (!image) {
+    image = image_;
+  }
+  WCSRep* p = image->wcs().rep();
+  if (p && strcmp(p->classname(), "StarWCS") == 0) {
+    return (StarWCS*)p;
+  }
+  error("internal error: expected class StarWCS, not ", p->classname());
+  return NULL;
 }
 
 
@@ -676,7 +680,8 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
     int result = image_->write(argv[0]);
     if ( result == TCL_OK ) {
       if ( ! saved && native ) {
-        return error( "WCS could only be saved as an AST native representation");
+        return error( "information: WCS could only be saved"
+                      " as an AST native representation");  
       } else if ( !saved && !native ) {
         return error( "Failed to save WCS information");
       }
@@ -964,7 +969,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
   int listArgc = 0;
   char **coordArgv;
   int coordArgc = 0;
-  double pbox[4];
+  double region[4];
   int showpixels = 0;
   if ( argc != 0 ) {
     if ( argc > 2 ) {
@@ -972,7 +977,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
       inerror = 1;
     } else {
       if ( Tcl_SplitList( interp_, argv[0], &listArgc, &listArgv ) != TCL_OK ) {
-        error( "failed to interpret options as a list" );
+        error( "sorry: failed to decode plotting options (check format)" );
         inerror = 1;
       } else {
         char *string = NULL;
@@ -1003,7 +1008,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
       //  Get the canvas coordinate display range if given.
       if ( argc == 2 ) {
         if ( Tcl_SplitList( interp_, argv[1], &coordArgc, &coordArgv ) != TCL_OK ) {
-          error( "failed to interpret canvas coordinates as a list" );
+          error( "sorry: failed to decode region of image to grid" );
           coordArgc = 0;
           inerror = 1;
         } else {
@@ -1013,82 +1018,54 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
           } else {
             for ( int index = 0; index < coordArgc; index++ ) {
               if ( Tcl_GetDouble(interp_, coordArgv[index],
-                                 &pbox[index] ) != TCL_OK ) {
+                                 &region[index] ) != TCL_OK ) {
                 error( coordArgv[index], "is not a valid number");
                 inerror = 1;
                 break;
               }
             }
 
-            // Reorganise these coordinates to the expected order
-            // (bottom-left, top-right of screen, not canvas).
-            swap( pbox[1], pbox[3] );
+            //  Reorganise these coordinates to the expected order
+            //  (bottom-left, top-right of screen, not canvas).
+            swap( region[1], region[3] );
           }
         }
       }
     }
   }
 
-  //  Now see if a copy of the current WCS frameset is available (we
-  //  use a copy so we can  modify without changing any other elements).
-  StarWCS* wcsp = getStarWCSPtr();
-  if (!wcsp)
+  //  If just showing pixels, then just get a suitable FrameSet.
+  AstFrameSet *wcs = (AstFrameSet *) NULL;
+  if ( showpixels ) {
+    wcs = makePixelWCS();
+  } else {
+    
+    //  See if a copy of the current WCS frameset is available (we
+    //  use a copy so we can  modify without changing any other elements).
+    StarWCS* wcsp = getStarWCSPtr();
+    if ( ! wcsp ) {
       return TCL_ERROR;
-  AstFrameSet *wcs = wcsp->astWCSCopy();
-  if ( wcs == (AstFrameSet *) NULL && showpixels ) {
+    }
+    wcs = wcsp->astWCSCopy();
+    if ( wcs == (AstFrameSet *) NULL ) {
 
-    //  No WCS, but we've been asked to show pixel coordinates. Make a
-    //  Frame for just pixel indices. Put this into a FrameSet for use
-    //  later.
-    AstFrame *indexfrm  = astFrame( 2, "Title=Pixel Indices" );
-    wcs = astFrameSet( indexfrm, "" );
-    indexfrm = (AstFrame *) astAnnul( indexfrm );
+      //  No WCS, give up. 
+      error( "sorry: unable to plot a grid as no world coordinates"
+             " are available, select the system 'pixels' or add a WCS" );
+      inerror = 1;
+    }
   }
   if ( wcs != (AstFrameSet *) NULL ) {
-
-    // Define the limits of the canvas plotting "area" in canvas
-    // coordinates and sky coordinates (the same positions). Use the
-    // image position on the canvas for this. Note that this also
-    // reorients the image to the canvas (so any scales, flips, offset
-    // etc. are corrected for here, but not any axes interchange).
-    // XXX double pbox[4];
-    float gbox[4];
-    if ( coordArgc == 0 ) {
-      double rw = reqWidth_, rh = reqHeight_;
-      if ( rw == 0 ) rw = (double) image_->width();  // Zero when whole image is
-      if ( rh == 0 ) rh = (double) image_->height(); // displayed.
-      doTrans(rw, rh, 1);
-      gbox[0] = pbox[0] = 0.0;
-      gbox[1] = pbox[1] = rh;
-      gbox[2] = pbox[2] = rw;
-      gbox[3] = pbox[3] = 0.0;
-    } else {
-      gbox[0] = pbox[0];
-      gbox[1] = pbox[1];
-      gbox[2] = pbox[2];
-      gbox[3] = pbox[3];
-    }
-    int rotated = image_->rotate();             // Record if rotated
-    if ( rotated ) {                            // and switch off while
-      image_->rotate(0);                        // getting graphics mapping
-    }
-    canvasToImageCoords( pbox[0], pbox[1], 0 );
-    canvasToImageCoords( pbox[2], pbox[3], 0 );
-    if ( rotated ) {
-      image_->rotate(1);                           // Restore rotation.
-    }
 
     //  If we have an equinox, epoch or system then create a skyframe
     //  and set this up as the current system (rather than the wcs
     //  system). Note we create a new skyframe so that we can ensure
     //  the correct defaults, i.e. anything not set equals the default
     //  for that system, rather than the existing value.
-    //
-    //  Also note that we need to deal with the special case of
-    //  a request for pixel indices to be displayed.
+    AstSkyFrame *newsky = NULL;
     if ( equinox || epoch || system ) {
       if ( ! showpixels ) {
-        AstSkyFrame *newsky = astSkyFrame( "" );
+        newsky = astSkyFrame( "" );
         if ( equinox ) {
           astSet( newsky, equinox );
         }
@@ -1098,80 +1075,20 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
         if ( system ) {
           astSet( newsky, system) ;
         }
-        if ( !astOK ) {
-
-          // If any of the above failed, then report the error.
-          more_error ( "failed to establish new system coordinates system");
-          inerror = 1;
-        } else {
-
-          // Get a mapping to convert to the new system and add this
-          // to the plot frameset. Note we convert from BASE frame to
-          // the new skyframe to force AST to retain all the current
-          // frameset mappings.
-          astSetI( wcs, "Current", AST__BASE );
-          AstFrameSet *cvt = (AstFrameSet *) astConvert( wcs, newsky, "" );
-          if ( !astOK || cvt == (AstFrameSet *) NULL ) {
-            more_error ( "cannot find a way to convert your existing "
-                         "coordinates to the requested system");  
-            inerror = 1;
-            if ( cvt != (AstFrameSet *) NULL ) {
-              cvt = (AstFrameSet *) astAnnul( cvt );
-            }
-          } else {
-
-            // New frameset replaces old frameset.
-            wcs = (AstFrameSet *) astAnnul( wcs );
-            wcs = cvt;
-          }
-          newsky = (AstSkyFrame *) astAnnul( newsky );
-        }
-      } else {
-
-        // Just displaying a pixel coordinates based grid. Create a
-        // pixel coordinates frame and mapping and add these to the
-        // current FrameSet as being related to the current base
-        // frame.
-        AstFrame *coordfrm  = astFrame( 2, "Title=Pixel Coordinates" );
-        double ina[2], inb[2], outa[2], outb[2];
-        double width = image_->width();
-        double height = image_->height();
-
-        // Define limits of window in pixel indices.
-        ina[0] = ina[1] = 1.0;
-        inb[0] = width;
-        inb[1] = height;
-
-        // Get the NDF origin information and set up the limits of the
-        // same window as above in pixel coordinates.
-        char *xori = image_->image().get("LBOUND1");
-        if ( xori ) {
-          outa[0] = atof( xori );
-        } else {
-          outa[0] = 1;
-        }
-        outa[0] -= 0.5;
-        outb[0] = outa[0] + width;
-        char *yori = image_->image().get("LBOUND2");
-        if ( yori ) {
-          outa[1] = atof( yori );
-        } else {
-          outa[1] = 1;
-        }
-        outa[1] -= 0.5;
-        outb[1] = outa[1] + height;
-
-        // Create the pixel indices to pixel coordinates mapping.
-        AstMapping *pixmap = (AstMapping *)
-                                astWinMap( 2, ina, inb, outa, outb,"");
-
-        // Add all these to the FrameSet. Assumes that the current
-        // base frame is the pixel index frame.
-        astAddFrame( wcs, AST__BASE, pixmap, coordfrm );
-        coordfrm = (AstFrame *) astAnnul( coordfrm );
-        pixmap = (AstMapping *) astAnnul( pixmap );
       }
     }
+
+    //  Create an AstPlot that selects the displayed region, or the
+    //  whole of the image. It also incorporates the additional
+    //  SkyFrame that describes a system we want to add. Note wcs is
+    //  inverted so that the conversion goes through the appropriate
+    //  route (SKY to SKY to GRAPHICS, without inversion we just get
+    //  SKY to SKY, as conversion is between the current frames).
+    if ( newsky != (AstSkyFrame *) NULL ) {
+      astInvert( wcs );
+    }
+    AstPlot *plot = createPlot( wcs, (AstFrameSet *) newsky, (coordArgc == 0), region );
+    inerror = ( inerror || plot == (AstPlot *) NULL );
     if ( ! inerror ) {
 
       //  Initialise the interpreter and canvas name for the Tk plotting
@@ -1181,78 +1098,62 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
       //  Define a tag for all items created in the plot.
       astTk_Tag( grid_tag() );
 
-      //  Create the plot frameset.
-      AstPlot *plot = astPlot( wcs, gbox, pbox, "" );
-      if ( astOK ) {
-
-        //  If we have the values gap1 and gap2 then these are
-        //  actually divisors of the default value which we can only
-        //  actually find out now.
-        float fact;
-        float value;
-        if ( gap1 != NULL ) {
-          sscanf( gap1, "gap(1)=%f", &fact );
-          if ( fact < FLT_EPSILON ) fact = 1.0f;
-          value = astGetF( plot, "gap(1)" );
-          if ( astOK ) {
-            value /= fact;
-            astSetF( plot, "gap(1)", value );
-          }
+      //  If we have the values gap1 and gap2 then these are
+      //  actually divisors of the default value which we can only
+      //  actually find out now.
+      float fact;
+      float value;
+      if ( gap1 != NULL ) {
+        sscanf( gap1, "gap(1)=%f", &fact );
+        if ( fact < FLT_EPSILON ) fact = 1.0f;
+        value = astGetF( plot, "gap(1)" );
+        if ( astOK ) {
+          value /= fact;
+          astSetF( plot, "gap(1)", value );
         }
-        if ( gap2 != NULL ) {
-          sscanf( gap2, "gap(2)=%f", &fact );
-          if ( fact < FLT_EPSILON ) fact = 1.0f;
-          value = astGetF( plot, "gap(2)" );
-          if ( astOK ) {
-            value /= fact;
-            astSetF( plot, "gap(2)", value );
-          }
+      }
+      if ( gap2 != NULL ) {
+        sscanf( gap2, "gap(2)=%f", &fact );
+        if ( fact < FLT_EPSILON ) fact = 1.0f;
+        value = astGetF( plot, "gap(2)" );
+        if ( astOK ) {
+          value /= fact;
+          astSetF( plot, "gap(2)", value );
         }
+      }
 
-        //  If the X and Y axes are interchanged then we need to
-        //  correct the mapping between the pixel frame (image
-        //  coordinates) and the graphics frame.
-        if ( image_->rotate() ) {
-          int inperm[] = {2,1};
-          int outperm[] = {2,1};
-          AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
-                                         (double *) NULL, "" );
-          astRemapFrame( plot, AST__BASE, perm );
-          perm = (AstPermMap *) astAnnul( perm );
-        }
+      // Unset the number of digits used in the plot. These are set
+      // elsewhere in GAIA (for WCS decoding) and are not sensible
+      // for this occasion (too much precision leads to bad default
+      // labelling).
+      astClear( plot, "digits(1)" );
+      astClear( plot, "digits(2)" );
 
-        // Unset the number of digits used in the plot. These are set
-        // elsewhere in GAIA (for WCS decoding) and are not sensible
-        // for this occasion (too much precision leads to bad default
-        // labelling).
-        astClear( plot, "digits(1)" );
-        astClear( plot, "digits(2)" );
+      // Set all plot attributes to control the plot appearance.
+      if ( listArgc > 0 ) {
+        char *string = NULL;
+        for ( int index = 0; index < listArgc; index++ ) {
+          string = listArgv[index];
 
-        // Set all plot attributes to control the plot appearance.
-        if ( listArgc > 0 ) {
-          char *string = NULL;
-          for ( int index = 0; index < listArgc; index++ ) {
-            string = listArgv[index];
-
-            //  Check for "epoch", "equinox", "system", "gap(1)" and
-            //  "gap(2)" and ignore these.
-            if ( string != equinox && string != epoch &&
-                 string != system && string != gap1 &&
-                 string != gap2 ) {
-              astSet( plot, string );
-              if ( !astOK ) {
-                (void) error( string, " is not a valid attribute" );
-                inerror = 1;
-                break;
-              }
+          //  Check for "epoch", "equinox", "system", "gap(1)" and
+          //  "gap(2)" and ignore these.
+          if ( string != equinox && string != epoch &&
+               string != system && string != gap1 &&
+               string != gap2 ) {
+            astSet( plot, string );
+            if ( !astOK ) {
+              (void) error( string, " is not a valid attribute "
+                                    "(check format)" );
+              inerror = 1;
+              break;
             }
           }
         }
+      }
 
-        //  Draw the grid.
-        if ( astOK && ! inerror ) {
-          astGrid( plot );
-        }
+      //  Draw the grid.
+      if ( astOK && ! inerror ) {
+        astGrid( plot );
       }
 
       //  Free the plot.
@@ -3218,9 +3119,6 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
   return TCL_OK;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-
-
 //+
 //   StarRtdImage::contourCmd
 //
@@ -3231,15 +3129,40 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
 //       TCL status and result. Plots contours.
 //
 //    Notes:
-//       The first parameter to this routine is a list that contains
-//       all of the line attributes (see the AST documentation) in a
-//       pre-formatted manner (such as can be used by as astSet
-//       routine). This allows maximum flexibility in the options
-//       that can be set, but imposes an obligation on the user of
-//       this member function to format and control the attributes
-//       correctly.
+//       The first parameter passed to this routine should be a list
+//       of contour levels, i.e. {1.0 2.0 3.0 4.0 5.0}.
 //
-//       The second parameter passed to this member should be a list of
+//       The second parameter is some reference to an image that is
+//       displayed elsewhere, and which will actually be contoured.
+//       If not given (shown by its absence or by being set to "")
+//       then the image associated with this object will be contoured.
+//
+//       The third parameter is a boolean indicating whether to use
+//       the careful drawing scheme (using geodesics, essential for
+//       complex astrometries) or not.
+//
+//       The fourth parameter to this routine is a list that contains
+//       strings of the curve attributes (see the AST documentation) in
+//       a pre-formatted manner (such as can be passed directly to the
+//       astSet routine). This allows maximum flexibility in the
+//       options that can be set, but imposes an obligation on the
+//       user of this member function to format and control the
+//       attributes correctly. If the number of elements of this list
+//       are less than the number of contour levels then the first
+//       element is used for all remaining contours. If omitted then
+//       the default preferences are used. A typical response to this
+//       parameter might be:
+//
+//	   { {colour(curve)=2,width(curve)=0.015}
+//           {colour(curve)=3,width(curve)=0.012}
+//           {colour(curve)=4,width(curve)=0.010}
+//           {colour(curve)=5,width(curve)=0.008}
+//           {colour(curve)=6,width(curve)=0.005} }
+//       
+//       For 5 contours. Note that the style attribute is currently
+//       ignored by the Tk canvas AST interface.
+//
+//       The fifth parameter passed to this member should be a list of
 //       the bounds, in canvas coordinates, of the region to be
 //       drawn. If NULL then the whole canvas is used.
 //
@@ -3255,90 +3178,147 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     return error("no image loaded");
   }
 
-  // Do the initial split of the input list.
-  char **listArgv;
-  int listArgc = 0;
-  char **coordArgv;
-  int coordArgc = 0;
-  double pbox[4];
-  if ( argc != 0 ) {
-    if ( argc > 2 ) {
-      error( "wrong # args: contour options_list canvas_area" );
+  // Do the initial split of the input lists.
+  char **levelsArgv;
+  int nlevels = 0;
+  double *levels;
+  if ( argc > 5 || argc == 0 ) {
+    error( "wrong # args: contour levels [rtdimage] [careful] [options_list] [canvas_area]" );
+    inerror = 1;
+  } else {
+    if ( Tcl_SplitList( interp_, argv[0], &nlevels, &levelsArgv ) != TCL_OK ) {
+      error( "sorry: failed to decode the contour levels (check format)" );
       inerror = 1;
-    } else {
-      if ( Tcl_SplitList( interp_, argv[0], &listArgc, &listArgv ) != TCL_OK ) {
-        error( "failed to interpret options as a list" );
+    }
+    
+    //  Convert these into doubles.
+    levels = new double[nlevels];
+    for ( int index = 0; index < nlevels; index++ ) {
+      if ( Tcl_GetDouble( interp_, levelsArgv[index], 
+                          &levels[index] ) != TCL_OK ) {
+        error( levelsArgv[index], "is not a valid number");
+        inerror = 1;
+        break;
+      }
+    }
+  }
+
+  //  Get the rtdimage that contains the image we want to contour
+  //  really.
+  StarRtdImage *rtdimage = (StarRtdImage *) NULL;
+  if ( argc >= 2 ) {
+    if ( *argv[1] != '\0' ) {
+      rtdimage = (StarRtdImage *) getView( argv[1] );
+      if ( rtdimage == (StarRtdImage *) NULL ) {
+        more_error( "; cannot find the contour image -- is it still displayed?" );
         inerror = 1;
       }
     }
+  }
 
-    //  Get the canvas coordinate display range if given.
-    if ( argc == 2 ) {
-      if ( Tcl_SplitList( interp_, argv[1], &coordArgc, &coordArgv ) != TCL_OK ) {
-	error( "failed to interpret canvas coordinates as a list" );
-	coordArgc = 0;
-	inerror = 1;
-      } else {
-	if ( coordArgc != 4 ) {
-	  error( "wrong # of args, should be 4 canvas coordinates" );
-	  inerror = 1;
-	} else {
-	  for ( int index = 0; index < coordArgc; index++ ) {
-	    if ( Tcl_GetDouble(interp_, coordArgv[index],
-			       &pbox[index] ) != TCL_OK ) {
-	      error( coordArgv[index], "is not a valid number");
-	      inerror = 1;
-	      break;
-	    }
-	  }
+  //  Get whether plotting is careful, or fast.
+  int careful = 1;
+  if ( argc >= 3 ) {
+    if ( Tcl_GetBoolean(interp_, argv[2], &careful)  != TCL_OK ) {
+      error( "sorry: failed to decode careful preference" );
+      inerror = 1;
+    }
+  }
 
-	  // Reorganise these coordinates to the expected order
-	  // (bottom-left, top-right of screen, not canvas).
-	  swap( pbox[1], pbox[3] );
-	}
-      }
+  //  Get the preferences, if given
+  char **prefs;
+  int nprefs = 0;
+  if ( argc >= 4 ) {
+    if ( Tcl_SplitList( interp_, argv[3], &nprefs, &prefs ) != TCL_OK ) {
+      error( "sorry: failed to decode line attributes" );
+      nprefs = 0;
+      inerror = 1;
     }
   }
   
-  // Define the limits of the canvas plotting "area" in canvas
-  // coordinates and sky coordinates (the same positions). Use the
-  // image position on the canvas for this. Note that this also
-  // reorients the image to the canvas (so any scales, flips, offset
-  // etc. are corrected for here, but not any axes interchange).
-  // XXX double pbox[4];
-  float gbox[4];
-  if ( coordArgc == 0 ) {
-    double rw = reqWidth_, rh = reqHeight_;
-    if ( rw == 0 ) rw = (double) image_->width();  // Zero when whole image is
-    if ( rh == 0 ) rh = (double) image_->height(); // displayed.
-    doTrans(rw, rh, 1);
-    gbox[0] = pbox[0] = 0.0;
-    gbox[1] = pbox[1] = rh;
-    gbox[2] = pbox[2] = rw;
-    gbox[3] = pbox[3] = 0.0;
-  } else {
-    gbox[0] = pbox[0];
-    gbox[1] = pbox[1];
-    gbox[2] = pbox[2];
-    gbox[3] = pbox[3];
-  }
-  int rotated = image_->rotate();             // Record if rotated
-  if ( rotated ) {                            // and switch off while
-    image_->rotate(0);                        // getting graphics mapping
-  }
-  canvasToImageCoords( pbox[0], pbox[1], 0 );
-  canvasToImageCoords( pbox[2], pbox[3], 0 );
-  if ( rotated ) {
-    image_->rotate(1);                           // Restore rotation.
+  //  Get the region coordinates. Note just use Contour native
+  //  facilities for this, not the plot (this potentially much 
+  //  more efficient).
+  char **coordArgv;
+  int ncoords = 0;
+  double region[4];
+  if ( argc == 5 ) {
+    if ( Tcl_SplitList( interp_, argv[4], &ncoords, &coordArgv ) != TCL_OK ) {
+      error( "sorry: failed to decode region of image to contour" );
+      ncoords = 0;
+      inerror = 1;
+    } else {
+      if ( ncoords != 4 ) {
+        error( "wrong # of args, should be 4 canvas coordinates"
+               " for contouring region " );
+        inerror = 1;
+      } else {
+        for ( int index = 0; index < ncoords; index++ ) {
+          if ( Tcl_GetDouble(interp_, coordArgv[index],
+                             &region[index] ) != TCL_OK ) {
+            error( coordArgv[index], "is not a valid number");
+            inerror = 1;
+            break;
+          }
+        }
+        
+        //  Reorganise these coordinates to the expected order
+        //  (bottom-left, top-right of screen, not canvas).
+        swap( region[1], region[3] );
+      }
+    }
   }
 
   //  Now see if a copy of the current WCS frameset is available (we
   //  use a copy so we can  modify without changing any other elements).
   StarWCS* wcsp = getStarWCSPtr();
-  if (!wcsp)
+  if ( ! wcsp ) {
     return TCL_ERROR;
+  }
   AstFrameSet *wcs = wcsp->astWCSCopy();
-  if ( ! inerror ) {
+  if ( wcs == (AstFrameSet *) NULL ) {
+
+    //  If no WCS is available then we need to create a suitable AST
+    //  frameset. This just maps GRID coordinates to themselves, or to
+    //  pixel coordinates.
+    wcs = makePixelWCS();
+  }
+
+  //  See if another image is to be used for contouring. If so then
+  //  this is related to the image displayed by some AST based
+  //  transformation (which may be pixel coordinates or a sky-based
+  //  system). This is also the image we want to contour, so get its
+  //  ImageIO object.
+  ImageIO imageIO = image_->image();
+  AstFrameSet *farwcs = NULL;
+  if ( rtdimage != (StarRtdImage *) NULL ) {
+
+    //  OK, attempt to locate a WCS for this image.
+    ImageData *farimagedata = rtdimage->image();
+    imageIO = farimagedata->image();
+    StarWCS* wcsp = getStarWCSPtr( farimagedata );
+    if ( ! wcsp ) {
+      return TCL_ERROR;
+    }
+    farwcs = wcsp->astWCSCopy();
+    if ( farwcs == (AstFrameSet *) NULL ) {
+
+      //  If no WCS is available then we need to create a suitable AST
+      //  frameset. This just maps GRID coordinates to themselves, or to
+      //  pixel coordinates.
+      farwcs = rtdimage->makePixelWCS();
+    }
+  }
+  if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
+
+    //  Current frame is the GRID coordinates of the image to be
+    //  contoured. XXX - second image???
+    astSetI( wcs, "Current", AST__BASE );
+
+    //  Create an AstPlot that incorporates an additional FrameSet
+    //  that describes an system we want to add.
+    AstPlot *plot = createPlot( wcs, (AstFrameSet *) farwcs, 1, region );
+    inerror = ( inerror || plot == (AstPlot *) NULL );
 
     //  Initialise the interpreter and canvas name for the Tk plotting
     //  routines.
@@ -3346,53 +3326,20 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     
     //  Define a tag for all items created in the plot.
     astTk_Tag( grid_tag() );
-
-    //  Current frame is the GRID coordinates of the image to be
-    //  contoured (when plotting ... XXX this could be another
-    //  image...). So set the Current frame to be the base frame.
-    astSetI( wcs, "Current", AST__BASE );
     
-    //  Create the plot frameset.
-    AstPlot *plot = astPlot( wcs, gbox, pbox, "" );
-    if ( astOK ) {
+    if ( astOK && !inerror ) {
+
+      //  Create a contour object, setting the contour levels, and
+      //  line attributes.
+      Contour contour( imageIO, plot, levels, nlevels, prefs, nprefs );
       
-      //  If the X and Y axes are interchanged then we need to
-      //  correct the mapping between the pixel frame (image
-      //  coordinates) and the graphics frame.
-      if ( image_->rotate() ) {
-	int inperm[] = {2,1};
-	int outperm[] = {2,1};
-	AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
-				       (double *) NULL, "" );
-	astRemapFrame( plot, AST__BASE, perm );
-	perm = (AstPermMap *) astAnnul( perm );
-      }
-      
-      // Set all plot attributes to control the plot appearance.
-      if ( listArgc > 0 ) {
-	char *string = NULL;
-	for ( int index = 0; index < listArgc; index++ ) {
-	  string = listArgv[index];
-	  astSet( plot, string );
-	  if ( !astOK ) {
-	    (void) error( string, " is not a valid attribute" );
-	    inerror = 1;
-	    break;
-	  }
-	}
-      }
+      //  Establish if plotting is careful or fast.
+      contour.setCareful( careful );
 
       //  Draw the contour.
-      if ( astOK && ! inerror ) {
-	double levels[3] = {1000.0, 1500.0, 2000.0};
-	char *props[] = { "colour(curve)=2,width(curve)=0.02", 
-			  "colour(curve)=3,width(curve)=0.01",
-			  "colour(curve)=4,width(curve)=0.005" };
-	ImageIO imageIO = image_->image();
-	float *image = (float *)imageIO.dataPtr();
-	gaiaContour( image, image_->width(), image_->height(), 
-                     levels, 3, plot, props, 3, 1, 1, image_->width(),
-                     image_->height(), 0 );
+      if ( ! contour.drawContours() ) {
+        more_error ("sorry: failed to plot contours" );
+        inerror = 1;
       }
     }
 
@@ -3403,15 +3350,26 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     astTk_Tag( NULL );
   }
 
-  // Free the list.
-  if ( listArgc > 0 ) {
-    Tcl_Free( (char *) listArgv );
+  //  Free the lists.
+  if ( ncoords > 0 ) {
+    Tcl_Free( (char *) coordArgv );
   }
-  
-  // Free the WCS copy.
+  if ( nprefs > 0 ) {
+    Tcl_Free( (char *) prefs );
+  }
+  if ( nlevels > 0 ) {
+    Tcl_Free( (char *) levelsArgv );
+  }
+
+  //  Free the WCS copy.
   wcs = (AstFrameSet *) astAnnul( wcs );
 
-  // Tidy up.
+  //  Free the contours.
+  if ( nlevels > 0 ) {
+    delete [] levels;
+  }
+
+  //  Tidy up.
   if ( inerror || ! astOK ) {
     if ( !astOK ) {
       astClearStatus;
@@ -3419,4 +3377,192 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     return TCL_ERROR;
   }
   return TCL_OK;
+}
+
+//+
+//   StarRtdImage::makePixelWCS
+//
+//   Purpose:
+//       Create a pseudo WCS that describes the GRID coordinates of
+//       an image.
+//
+//    Return:
+//       Basic AstFrameSet.
+//
+//    Notes:
+//       If the image is derived from an NDF then a pixel coordinates
+//       Frame will be added.
+//
+//-
+AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image )
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::makePixelWCS" << endl;
+#endif
+
+  //  If no image is given then use the default.
+  if ( ! image ) {
+    image = image_;
+  }
+
+  //  Create the GRID domain Frame.
+  AstFrame *grid = astFrame( 2, "Domain=GRID,Title=Grid Coordinates" );
+
+  //  Create the FrameSet, adding the GRID domain.
+  AstFrameSet *set = astFrameSet( grid, "" );
+  grid = (AstFrame *) astAnnul( grid );
+
+  //  Need to add a pixel coordinates based Frame.
+  AstFrame *coordfrm  = astFrame( 2, "Domain=PIXEL,Title=Pixel Coordinates" );
+  double ina[2], inb[2], outa[2], outb[2];
+  double width = image_->width();
+  double height = image_->height();
+
+  //  Define limits of window in pixel indices.
+  ina[0] = ina[1] = 1.0;
+  inb[0] = width;
+  inb[1] = height;
+
+  //  Get the NDF origin information and set up the limits of the
+  //  same window as above in pixel coordinates.
+  char *xori = image_->image().get("LBOUND1");
+  if ( xori ) {
+    outa[0] = atof( xori );
+  } else {
+    outa[0] = 1;
+  }
+  outa[0] -= 0.5;
+  outb[0] = outa[0] + width;
+  char *yori = image_->image().get("LBOUND2");
+  if ( yori ) {
+    outa[1] = atof( yori );
+  } else {
+    outa[1] = 1;
+  }
+  outa[1] -= 0.5;
+  outb[1] = outa[1] + height;
+
+  //  Create the pixel indices to pixel coordinates mapping.
+  AstMapping *pixmap = (AstMapping *)
+                           astWinMap( 2, ina, inb, outa, outb,"");
+
+  //  Add all these to the FrameSet. Assumes that the current
+  //  base frame is the pixel index frame.
+  astAddFrame( set, AST__BASE, pixmap, coordfrm );
+  coordfrm = (AstFrame *) astAnnul( coordfrm );
+  pixmap = (AstMapping *) astAnnul( pixmap );
+
+  return set;
+}
+
+//+
+//   StarRtdImage::createPlot
+//
+//   Purpose:
+//       Create an AST plot.
+//
+//   Description:
+//       This member creates an AST plot that reflects the current
+//       image orientation, is either the whole or a displayed
+//       part and that adds in an additional FrameSet (or Frame) to
+//       the plot.
+//
+//       The part of the plot that is valid is determined by the
+//       "region" argument. If full is false, then this should be an
+//       array of 4 canvas positions that define the actual area to be
+//       drawn, rather than the full canvas, otherwise this parameter
+//       will not be used.
+//
+//    Return:
+//       An AstPlot, or NULL if failed.
+//
+//
+//-
+AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
+                                   AstFrameSet *extraset,
+                                   int full, double region[] )
+{
+#ifdef _DEBUG_
+  cout << "Called StarRtdImage::createPlot" << endl;
+#endif
+  //  Define the limits of the canvas plotting "area" in canvas
+  //  coordinates and current coordinates (the same positions). Use
+  //  the image position on the canvas for this. Note that this also
+  //  reorients the image to the canvas (so any scales, flips, offset
+  //  and interchange are accounted).
+  float gbox[4];
+  double pbox[4];
+  if ( full ) {
+
+    //  Using whole of canvas/image.
+    double rw = reqWidth_, rh = reqHeight_;
+    if ( rw == 0 ) rw = (double) image_->width();  // Zero when whole image is
+    if ( rh == 0 ) rh = (double) image_->height(); // displayed.
+    doTrans( rw, rh, 1 );
+    gbox[0] = pbox[0] = 0.0;
+    gbox[1] = pbox[1] = rh;
+    gbox[2] = pbox[2] = rw;
+    gbox[3] = pbox[3] = 0.0;
+  } else {
+
+    //  Just using part of the canvas.
+    gbox[0] = pbox[0] = region[0];
+    gbox[1] = pbox[1] = region[1];
+    gbox[2] = pbox[2] = region[2];
+    gbox[3] = pbox[3] = region[3];
+  }
+  int rotated = image_->rotate();             // Record if rotated
+  if ( rotated ) {                            // and switch off while
+    image_->rotate(0);                        // getting graphics mapping
+  }
+  canvasToImageCoords( pbox[0], pbox[1], 0 );
+  canvasToImageCoords( pbox[2], pbox[3], 0 );
+  if ( rotated ) {
+    image_->rotate(1);                        // Restore rotation.
+  }
+
+  //  If an extra FrameSet has been given then try to get a conversion
+  //  which goes from its CURRENT frame to the BASE frame of the WCS
+  //  system. For this reason we need to invert the new FrameSet.
+  AstFrameSet *plotset = NULL;
+  if ( extraset != (AstFrameSet *) NULL ) {
+    astInvert( extraset );
+    plotset = (AstFrameSet *) astConvert( wcs, extraset, "SKY,AXIS,PIXEL,GRID,," );
+    astInvert( extraset );
+    if ( ! astOK || plotset == (AstFrameSet *) NULL ) {
+      more_error ( "sorry: cannot find a way to convert your existing "
+                   "coordinates to the requested system");
+      if ( plotset != (AstFrameSet *) NULL ) {
+        plotset = (AstFrameSet *) astAnnul( plotset );
+      }
+      return (AstPlot *) NULL;
+    }
+  } else {
+
+    //  Just using plain WCS.
+    plotset = wcs;
+  }
+
+  //  Create the plot frameset.
+  AstPlot *plot = astPlot( plotset, gbox, pbox, "" );
+  if ( extraset != (AstFrameSet *) NULL ) {
+    plotset = (AstFrameSet *) astAnnul( plotset );
+  }
+
+  //  If the X and Y axes are interchanged then we need to
+  //  correct the mapping between the pixel frame (image
+  //  coordinates) and the graphics frame.
+  if ( image_->rotate() ) {
+    int inperm[] = {2,1};
+    int outperm[] = {2,1};
+    AstPermMap *perm = astPermMap( 2, inperm, 2, outperm,
+                                   (double *) NULL, "" );
+    astRemapFrame( plot, AST__BASE, perm );
+    perm = (AstPermMap *) astAnnul( perm );
+  }
+  if ( astOK ) {
+    return plot;
+  } else {
+    return (AstPlot *) NULL;
+  }
 }

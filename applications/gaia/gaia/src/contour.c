@@ -264,16 +264,16 @@ int gaiaContour( const DATA_TYPE *image, int nx, int ny,
                                             from the old cell */
 
   /*  Check that the current frame in the supplied plot is a "GRID" */
-  if ( strcmp( astGetC( plot, "Domain" ), "GRID" ) != 0 ) {
-    return 1;
-  }
+/*   if ( strcmp( astGetC( plot, "Domain" ), "GRID" ) != 0 ) { */
+/*     return 1; */
+/*   } */
 
   astShow( plot );
 
 
   /*  Get some workspace for locating pixels that have already been
       "done" */
-  done = (unsigned char *) malloc( xsize * ysize );
+  done = (unsigned char *) malloc( xsize * ysize * sizeof( unsigned char ));
 
   /*  Simplify the Plot. This adds a new Current Frame into the Plot,
       so note the index of the original Current Frame so that it can
@@ -321,7 +321,7 @@ int gaiaContour( const DATA_TYPE *image, int nx, int ny,
     }
 
     /*  Initialise the store of cells done. */
-    memset( done, '\0', xsize * ysize );
+    memset( done, '\0', xsize * ysize * sizeof( unsigned char ) );
 
     /*  Initialise counter for number of x-y co-ordinates to plot. */
     npts = -1;
@@ -543,5 +543,4 @@ void gaiaContPlot( AstPlot *plot, int fast, int npts, double *x, double *y) {
 
   /*  Draw the Poly-curve. */
   astPolyCurve( plot, npts, 2, MAXPTS, (const double(*)[]) xydata );
-  astGFlush;
 }

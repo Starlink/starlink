@@ -332,7 +332,7 @@ int astGFlush( void ){
   }
 }
 
-int astGLine( int n, const float *x, const float *y ){
+int astGLine( int n, const float *x, const float *y ) {
 /*
  *+
  *  Name:

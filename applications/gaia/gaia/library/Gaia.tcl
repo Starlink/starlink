@@ -465,6 +465,12 @@ itcl::class gaia::Gaia {
 	 -accelerator {Control-j}
       bind $w_ <Control-j> [code $this make_toolbox sextractor]
 
+      add_menuitem $m command "Contouring...  " \
+         {Contour this or another image over the displayed image...} \
+	 -command [code $this make_toolbox contour] \
+	 -accelerator {Control-h}
+      bind $w_ <Control-h> [code $this make_toolbox contour]
+
       if { $itk_option(-demo_mode) } {
 	 add_menuitem $m command "Demonstration mode..." \
 	       {See a demonstration of GAIA (needs an empty directory)} \
@@ -544,6 +550,7 @@ itcl::class gaia::Gaia {
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
+            -grid_tag "grid_${this}" \
             -clone_cmd [code $this make_toolbox astgrid 1] \
             -really_die $cloned
       }
@@ -675,6 +682,21 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Make a contour toolbox.
+   public method make_contour_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaContour .\#auto \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -rtdimage [$image_ get_image]\
+            -contour_tag "contour_${this}" \
+            -image $image_ \
+            -filter_types $itk_option(-file_types) \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox contour 1]
+      }
+   }
 
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {

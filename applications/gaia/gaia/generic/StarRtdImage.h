@@ -36,6 +36,8 @@
 //    13-JAN-1999 (PWD):
 //       Merged in changes from Allan Brighton's GAIA plugin (see
 //       history above).
+//    14-PAR-1999 (PWD):
+//       Added contour command and related changes.
 //
 //-
 
@@ -47,7 +49,7 @@ extern "C" {
 }
 
 //
-// Image options (used for image configuration).
+//  Image options (used for image configuration).
 //
 class StarRtdImageOptions : public RtdImageOptions {
 public:
@@ -61,9 +63,9 @@ public:
     {}
 };
 
-// define the Tk config options here so that derived classes can add more
-// options. The definition "inherits" the Rtd options (skycat does not
-// define any new options) (allan).
+//  Define the Tk config options here so that derived classes can add
+//  more options. The definition "inherits" the Rtd options (skycat
+//  does not define any new options) (allan).
 #define GAIA_OPTION(x) Tk_Offset(StarRtdImageOptions, x)
 #define GAIA_OPTIONS \
   RTD_OPTIONS, \
@@ -76,88 +78,88 @@ class StarRtdImage : public Skycat {
 
 public:
 
-  // Constructor
+  //  Constructor
   StarRtdImage(Tcl_Interp*, const char* instname, int argc, char** argv,
 	     Tk_ImageMaster master, const char* imageType,
 	     Tk_ConfigSpec* specs = (Tk_ConfigSpec*)NULL,
 	     RtdImageOptions* options = (RtdImageOptions*)NULL);
 
-  // Destructor
+  //  Destructor
   ~StarRtdImage();
 
-  // Entry point from tcl to create a image.
+  //  Entry point from tcl to create a image.
   static int CreateImage( Tcl_Interp *, char *, int, char **, Tk_ImageType *,
                           Tk_ImageMaster, ClientData * );
 
-  // Run a foreign procedure.
+  //  Run a foreign procedure.
   int foreignCmd( int argc, char *argv[] );
 
-  // Get the NDF origin information.
+  //  Get the NDF origin information.
   int originCmd( int argc, char *argv[] );
 
-  // Plot an astrometry grid.
+  //  Plot an astrometry grid.
   int plotgridCmd( int argc, char *argv[] );
 
-  // Return if we are really using X shared memory
+  //  Return if we are really using X shared memory
   int usingxshmCmd( int argc, char *argv[] );
 
-  // Return the value of an AST attribute of the main AstFrameSet.
+  //  Return the value of an AST attribute of the main AstFrameSet.
   int astgetCmd( int argc, char *argv[] );
 
-  // Create a new FITS channel
+  //  Create a new FITS channel
   int astcreateCmd( int argc, char *argv[] );
 
-  // Replace the existing WCS FrameSet.
+  //  Replace the existing WCS FrameSet.
   int astreplaceCmd( int argc, char *argv[] );
 
-  // Restore an old WCS FrameSet.
+  //  Restore an old WCS FrameSet.
   int astrestoreCmd( int argc, char *argv[] );
 
-  // Delete a FITS channel.
+  //  Delete a FITS channel.
   int astdeleteCmd( int argc, char *argv[] );
 
-  // Store a FITS card in a FITS channel.
+  //  Store a FITS card in a FITS channel.
   int aststoreCmd( int argc, char *argv[] );
 
-  // Clear a FITS channel.
+  //  Clear a FITS channel.
   int astresetCmd( int argc, char *argv[] );
 
-  // Read a FITS channel.
+  //  Read a FITS channel.
   int astreadCmd( int argc, char *argv[] );
 
-  // Refine the image mapping to include a transform to a new set of
-  // positions.
+  //  Refine the image mapping to include a transform to a new set of
+  //  positions.
   int astrefineCmd( int argc, char *argv[] );
 
-  // Write out local FrameSet using given encoding.
+  //  Write out local FrameSet using given encoding.
   int astwriteCmd( int argc, char *argv[] );
 
-  // Get a copy of the WCS from another file.
+  //  Get a copy of the WCS from another file.
   int astcopyCmd( int argc, char *argv[] );
 
-  // Assign a linear transform to a WCS.
+  //  Assign a linear transform to a WCS.
   int astassignCmd( int argc, char *argv[] );
 
-  // Fix the original WCS to be the current image WCS (which may
-  // be a replacement one).
+  //  Fix the original WCS to be the current image WCS (which may
+  //  be a replacement one).
   int astfixCmd( int argc, char *argv[] );
 
-  // Straight-forward conversion from WCS position to X,Y.
+  //  Straight-forward conversion from WCS position to X,Y.
   int astwcs2pixCmd( int argc, char *argv[] );
 
-  // Straight-forward conversion from X,Y position to WCS.
+  //  Straight-forward conversion from X,Y position to WCS.
   int astpix2wcsCmd( int argc, char *argv[] );
 
-  // Derive simple statistics for creating WCS systems from scratch.
+  //  Derive simple statistics for creating WCS systems from scratch.
   int astbootstatsCmd( int argc, char *argv[] );
 
-  // Set the celestial coordinate system.
+  //  Set the celestial coordinate system.
   int astsystemCmd( int argc, char *argv[] );
 
-  // Write the current image and if new WCS (if modified) to a file.
+  //  Write the current image and if new WCS (if modified) to a file.
   int dumpCmd( int argc, char *argv[] );
 
-  // Create a clone of a real GAIA widget.
+  //  Create a clone of a real GAIA widget.
   int cloneCmd( int argc, char *argv[] );
 
   //  Draw a Skycat-like ellipse and rotbox
@@ -195,66 +197,66 @@ public:
 
 protected:
 
-  // Pointer to structure that holds the image configuration options.
+  //  Pointer to structure that holds the image configuration options.
   StarRtdImageOptions *staroptionsPtr_;
 
-  // Redefined from parent class to check configuration options.
+  //  Redefined from parent class to check configuration options.
   virtual int configureImage(int argc, char* argv[], int flags);
 
-  // Call a named member function.
+  //  Call a named member function.
   virtual int call( const char*, int, int, char** );
 
-  // Return an ImageData object, given an ImageIO object reference.
+  //  Return an ImageData object, given an ImageIO object reference.
   virtual ImageData* makeImage(ImageIO);
 
-  // Load an image file and return a pointer to the ImageData object for it.
+  //  Load an image file and return a pointer to the ImageData object for it.
   virtual ImageData* getStarImage(const char* filename, const char* slice);
 
-  // Load an image.
+  //  Load an image.
   virtual int loadFile();
 
-  // Return the grid items tag.
+  //  Return the grid items tag.
   char *grid_tag() const { return staroptionsPtr_->grid_tag; }
 
-  // Return the NDF component displayed.
+  //  Return the NDF component displayed.
   char *component() const { return staroptionsPtr_->component; }
 
-  // Return whether to scale and orient plotting symbols using the WCS
+  //  Return whether to scale and orient plotting symbols using the WCS
   int plot_wcs() const { return staroptionsPtr_->plot_wcs; }
 
-  // Test if file extension is known to NDF.
+  //  Test if file extension is known to NDF.
   int isNDFtype( const char *);
 
-  // Pointer to the original FrameSet.
+  //  Pointer to the original FrameSet.
   AstFrameSet *origset_;
 
-  // Pointer to a new FrameSet (during manipulation).
+  //  Pointer to a new FrameSet (during manipulation).
   AstFrameSet *newset_;
 
-  // Pointer to the old WCS FrameSet (used to restore existing system).
+  //  Pointer to the old WCS FrameSet (used to restore existing system).
   AstFrameSet *oldset_;
 
-  // Pointers to available FITS channels.
+  //  Pointers to available FITS channels.
   enum {MAX_CHANNELS = 8};
   AstFitsChan *channels_[MAX_CHANNELS];
 
-  // Determine a linear mapping between two sets of positions.
+  //  Determine a linear mapping between two sets of positions.
   int mapPositions( int iframe, AstFrameSet *fset,
                     int fittype, double *xold,
                     double *yold, double *xnew,
                     double *ynew, int npoints );
 
-  // Add a linear mapping to a Frame in a FrameSet
+  //  Add a linear mapping to a Frame in a FrameSet
   int addLinear( int iframe, AstFrameSet *fset, double *tr, int fittype=5 );
 
-  // Create and store a FITS card in a FITS channel.
+  //  Create and store a FITS card in a FITS channel.
   void storeCard( AstFitsChan *channel, char *keyword, char *value,
                   char *comment, int overwrite = 1 );
 
-  // Create and initialise a new FITS channel.
+  //  Create and initialise a new FITS channel.
   void initChannel( int slot );
 
-  // Decode a linear transformation into parts.
+  //  Decode a linear transformation into parts.
   void decodeLinear( double tr[6], double &xz, double &yz,
                     double &xs, double &ys, double &perp,
                     double &orient );
@@ -266,9 +268,15 @@ protected:
                   double& cx, double& cy, double& nx, double& ny,
                   double& ex, double& ey);
 
-  // Return a pointer to the StarWCS object for the image, or NULL on error
+  //  Return a pointer to the StarWCS object for the image, or NULL on error
   StarWCS* getStarWCSPtr(ImageData* image = (ImageData*)NULL);
 
+  //  Create a basic GRID-Pixel coordinates domain FrameSet.
+  AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image = NULL );
+
+  //  Create AST plot for drawing grids and contours to canvas.
+  AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset, 
+                       int full, double pbox[] );
  private:
 
   // Copy constructor -- not defined.

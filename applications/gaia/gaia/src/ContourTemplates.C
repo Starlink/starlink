@@ -1,0 +1,254 @@
+//+
+//  Define members of Contour.C that are data type dependent. 
+//
+//  The types used by these overloaded members is controlled by the macro
+//  "DATA_TYPE".
+//  
+//-
+
+//
+//   Detect and draw a single contour.
+//
+int Contour::scanImage( const DATA_TYPE *image, const int nx,
+                        const int ny, const AstPlot *plot, 
+                        const double cval, const int xlower,  
+                        const int ylower, const int xsize, 
+                        const int ysize, char *done )
+{
+  //  Number of pixels in a cell.
+  const int NCELL = 4;
+
+  //  X coordinates of the cell corners.
+  const double cx[] = { 0.0, 1.0, 1.0, 0.0 }; 
+
+  //  Y coordinates of the cell corners.
+  const double cy[] = { 0.0, 0.0, 1.0, 1.0 }; 
+
+  //  Differential x coordinates of cell corners.
+  const double dx[] = { 1.0, 0.0, -1.0, 0.0 }; 
+
+  //  Differential y coordinates of cell corners.
+  const double dy[] = { 0.0, 1.0, 0.0, -1.0 }; 
+
+  //  X directions to move from the cell side where a contour leaves.
+  const int imove[] =  { 0, 1, 0, -1 };  
+
+  //  Y directions to move from the cell side where a contour leaves.
+  const int jmove[] =  { -1, 0, 1, 0 };  
+
+  //  Side of entry in the new cell from the side of exit from the old
+  //  cell.
+  const int newsid[] = { 2, 3, 0, 1 };  
+
+  //  Local variables:
+  double b[NCELL+1];  // Storage of the pixel values
+  double bmax;        // Maximum pixel value in the cell
+  double bmin;        // Minimum pixel value in the cell
+  double fract;       // Fractional position of contour from linear
+                      // iterpolation
+  double x[MAXPTS];   // X positions of the contour
+  double xtemp;       // Dummy for swapping x position of contour
+  double y[MAXPTS];   // Y positions of the contour
+  double ytemp;       // Dummy for swapping y position of contour
+  int above;          // Next cell pixel's value is greater than
+                      // contour level?
+  int anote;          // Reference cell pixel's value is greater than
+                      // contour level?
+  int confus = 0;     // Cell is confused?
+  int i;              // Loop counter through columns
+  int ii;             // X element numbers of current pixel in sub-array
+  int ix;             // X element numbers of current pixel in
+                      // full-size array
+  int iy;             // Y element numbers of current pixel in
+                      // full-size array
+  int j;              // Loop counter through lines
+  int jj;             // Y element numbers of current pixel in sub-array
+  int l;              // General variable
+  int lin;            // Current entrance side of new cell
+  int linend;         // At end of a line?
+  int lside = 0;      // Current exit side of cell
+  int nexit;          // Number of cell exits for current cell
+
+  //  Initialise counter for number of x-y co-ordinates to plot.
+  int npts = -1;
+
+  // Scan the image, looking for a cell containing the current contour
+  // level.
+  for ( j = 0; j < ysize - 1; j++ ) {
+    for ( i = 0; i < xsize - 1; i++ ) {
+
+      //  If he cell has already been contoured, omit it.
+      if ( ! arrayVal( done, xsize, i, j ) ) {
+
+        //  Note this cell has been looked at.
+        setArrayVal( done, xsize, i, j, 1 );
+
+        //  Find the position of the current pixel in the full
+        //  two-dimensional array.
+        ix = i + xlower - 1;
+        iy = j + ylower - 1;
+
+        //  Don't use this cell if there is a bad pixel adjacent.
+        if ( ! badpix( image, nx, ix, iy ) ) {
+
+          // Extract data values and test if they contain the contour.
+          b[0] = arrayVal( image, nx, ix, iy );
+          b[1] = arrayVal( image, nx, ix + 1, iy );
+          b[2] = arrayVal( image, nx, ix + 1, iy + 1 );
+          b[3] = arrayVal( image, nx, ix, iy + 1 );
+          bmax = max( max( b[0], b[1] ), max( b[2], b[3] ) );
+          bmin = min( min( b[0], b[1] ), min( b[2], b[3] ) );
+
+          if ( cval < bmax && cval > bmin ) {
+            b[4] = b[0];
+
+            //  Initialise the pointers to the cells on this contour.
+            ii = i;
+            jj = j;
+
+            //  Initialise the cell side where the contour enters the cell.
+            lin = -1;
+            linend = 0;
+            while ( ! linend ) {
+              nexit = 0;
+
+              //  Scan the cell sides, searching for intersections
+              //  with the contour.
+              anote = ( b[0] >= cval );
+              for ( l = 0; l < 4; l++ ) {
+                above = ( b[l+1] >= cval );
+
+                // Don't count contour exits from the same side as it
+                // entered.
+                if ( ( above != anote ) && ( l != lin ) ) {
+                  lside = l;
+                  nexit++;
+                  npts++;
+
+                  //  Calculate the co-ordinates of the contour exit
+                  //  point from the cell by linear interpolation, and
+                  //  store them in X and Y.
+                  fract = ( cval - b[l] ) / ( b[l+1] - b[l] );
+                  x[npts] = 1.0 + ix + cx[l] + dx[l] * fract;
+                  y[npts] = 1.0 + iy + cy[l] + dy[l] * fract;
+
+                }
+                anote = above;
+              }
+
+              // The cell is confused if the number of contour exits
+              // does not match the number of entries. 
+              if ( lin == -1 ) {
+                confus = ( nexit != 2 );
+              } else {
+                confus = ( nexit != 1 );
+              }
+
+              // Find the co-ordinates of the next cell which the
+              // contour enters.
+              ii += imove[lside];
+              jj += jmove[lside];
+              ix += imove[lside];
+              iy += jmove[lside];
+
+              //  Find the side of the new cell through which it enters.
+              lin = newsid[lside];
+
+              //  It is the end of current contour line if the:
+              //    o  contour goes off the edge of the image,
+              //    o  hits an invalid pixel,
+              //    o  enters a cell already contoured,
+              //    o  leaves a confused cell, or
+              //    o  exceeds the storage space for the X and Y arrays.
+              //
+              if ( offimg( xsize, ysize, ii, jj ) ) {
+                linend = 1;
+              } else {
+                linend =
+                  badpix( image, nx, ix, iy ) ||
+                  confus ||
+                  arrayVal( done, xsize, ii, jj ) ||
+                  ( npts >= MAXPTS - 1 );
+              }
+
+              //  If we are continuing on this contour, extract the
+              //  data for next cell and mark the cell done. 
+              if ( ! linend ) {
+                b[0] = arrayVal( image, nx, ix, iy );
+                b[1] = arrayVal( image, nx, ix + 1, iy );
+                b[2] = arrayVal( image, nx, ix + 1, iy + 1 );
+                b[3] = arrayVal( image, nx, ix, iy + 1 );
+                b[4] = b[0];
+                setArrayVal( done, xsize, ii, jj, 1 );
+              }
+            }  //  End while (!linend) return to analyse the new cell.
+            
+            //  If the last cell on a contour was confused, all four
+            //  cell sides will be crossed by a contour. The crossing
+            //  points must be correctly paired. There are three
+            //  possible pairing combinations which leave the first
+            //  point in its original position. 
+            if ( confus ) {
+
+              //  Check if the current pairing causes contour lines to
+              //  cross.  If so, swap the appropriate pair of points
+              //  so they no longer cross.
+              if ( ( max( x[npts], x[npts-1] ) >
+                     max( x[npts-2], x[npts-3] ) &&
+                     min( x[npts], x[npts-1] ) <
+                     min( x[npts-2], x[npts-3] )
+                     ) ||
+                   ( max( x[npts], x[npts-1] ) <
+                     max( x[npts-2], x[npts-3] ) &&
+                     min( x[npts], x[npts-1] ) >
+                     min( x[npts-2], x[npts-3] )
+                     )
+                   ) {
+                xtemp = x[npts-1];
+                ytemp = y[npts-1];
+                x[npts-1] = x[npts-2];
+                y[npts-1] = y[npts-2];
+                x[npts-2] = xtemp;
+                y[npts-2] = ytemp;
+              }
+              
+              //  Make a further swap if necessary, to find the
+              //  pairing (out of the two which remain) which produces
+              //  the shorter total length of contour line.
+              if ( dist( x, y, npts, npts-1 ) +
+                   dist( x, y, npts-2, npts-3 )
+                   >
+                   dist( x, y, npts-1, npts-2 ) +
+                   dist( x, y, npts-3, npts ) ) {
+                
+                //  Swap the pairing if necessary.
+                xtemp = x[npts];
+                ytemp = y[npts];
+                x[npts] = x[npts-2];
+                y[npts] = y[npts-2];
+                x[npts-2] = xtemp;
+                y[npts-2] = ytemp;
+              }
+              npts -= 2;
+            } //  End of confusion check.
+
+            //  Plot the stored contour.
+            npts++;
+            contPlot( plot, npts, x, y );
+
+            //  Plot the segment of the other contour found in the
+            //  confused cell. 
+            if ( confus ) {
+              contPlot( plot, 2, &x[npts], &y[npts] );
+            }
+
+            // Reset the number of points to plot.
+            npts = -1;
+            
+          } //  End of contour-lies-between-pixels check.
+        } // End of bad-pixel check.
+      } //  End of already contoured-pixel check.
+    } // End of the loop through the columns.
+  } //  End of the loop through the lines.
+  return 1;
+}
