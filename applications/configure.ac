@@ -5,7 +5,7 @@ dnl    Following sanity-check isn't terribly helpful...
 AC_CONFIG_SRCDIR(bootstrap)
 
 dnl    The following list must be kept up-to-date by hand
-dnl    (and keep it on one line, so that ./bootstrap can grok it)
+dnl    (must be kept on one line)
 AC_CONFIG_SUBDIRS(messgen)
 
 AC_OUTPUT
