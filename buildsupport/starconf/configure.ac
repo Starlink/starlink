@@ -34,11 +34,14 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PATH_PROG(PERL, perl)
 
+PACKAGE_VERSIONINT=`echo $PACKAGE_VERSION | sed 's/[^0-9][^0-9]*/ /g' | awk '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`
+AC_SUBST(PACKAGE_VERSIONINT)
+
 dnl   Note that the make-starconf.in file is _not_ to be
 dnl   substituted by this command -- since it involves the
 dnl   installation directory variables, it should have them replaced
 dnl   at `make' time, not configure time.  See Makefile.am for details.
-AC_CONFIG_FILES(Makefile starconf.m4 Makefile.starconf)
+AC_CONFIG_FILES(Makefile starconf.m4 Makefile.starconf bootstrap.installed)
 AC_CONFIG_FILES(starconf-validate, [chmod +x starconf-validate])
 
 AC_OUTPUT
