@@ -48,13 +48,16 @@
 #
 #  Authors:
 #     AJC: A.J.Chipperfield (STARLINK)
+#     MJC: Malcolm J. Currie (STARLINK)
 #     {enter_new_authors_here}
 #
 #  History:
 #     1995 October 30 (AJC):
-#        Original version
+#        Original version.
 #     1995 November 30 (AJC):
-#        Added TIFF and GIF
+#        Added TIFF and GIF.
+#     1996 August 22 (MJC):
+#        Switched the FMTCNV flag in FITSDIN to TRUE, as documented.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -77,7 +80,7 @@ FITS)
    case $1 in
    from)
       appl=FITSDIN
-      $KAPPA_DIR/fitsdin files=$3$4$5 out=$6 FMTCNV=F $NDF_FROM_FITS_PARS \
+      $KAPPA_DIR/fitsdin files=$3$4$5 out=$6 FMTCNV=T $NDF_FROM_FITS_PARS \
       </dev/null 2>&1 | \
       sed 's/^\!\!/\! /' | \
       awk -f $CONVERT_DIR/convertawk fmt="from $2 to NDF using $appl"
