@@ -53,7 +53,7 @@
                              # Use initial position list?
             type _LOGICAL
             access READ
-            vpath CURRENT DEFAULT
+            vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Use initial position list?}
@@ -64,7 +64,7 @@
                           # Get initial position list from extension?
             type _LOGICAL
             access READ
-            vpath CURRENT PROMPT
+            vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default FALSE
             prompt {Get initial position list from NDF extension?}
@@ -78,7 +78,7 @@
             vpath PROMPT CURRENT DEFAULT
             ppath CURRENT DEFAULT
             default !
-            prompt {Input position list (! means associated list)}
+            prompt {Input position list}
             helpkey *
          }
 
