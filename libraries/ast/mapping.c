@@ -291,25 +291,44 @@ double MapFunction( const MapData *mapdata, const double in[], int *ncall ) {
 }
 
 static double NewVertex( const MapData *mapdata, double fac, int hi,
-                         double xx[], double xcent[], double f[], int *ncall,
+                         double xx[], double f[], int *ncall,
                          double xnew[] ) {
-   double fac1;
-   double fac2;
    double fnew;
    int coord;
    int ncoord;
+   int nvertex;
+   double xface;
+   int vertex;
 
    ncoord = mapdata->nin;
-   fac1 = ( 1.0 - fac );
-   fac2 = ( fac1 / ncoord ) - fac;
+   nvertex = ncoord + 1;
+
    for ( coord = 0; coord < ncoord; coord++ ) {
-      xnew[ coord ] = xcent[ coord ] * fac1 * ( ncoord + 1 ) / ncoord - xx[ hi * ncoord + coord ] * fac2;
+      xface = 0.0;
+      for ( vertex = 0; vertex < nvertex; vertex++ ) {
+         if ( vertex != hi ) xface += xx[ vertex * ncoord + coord ] /
+                                                              ( nvertex - 1 );
+      }
+      xnew[ coord ] = xface + ( xx[ hi * ncoord + coord ] - xface ) * fac;
+#if 0
+printf( "%.20g ", xnew[ coord ] );
+#endif
    }
    fnew = MapFunction( mapdata, xnew, ncall );
+#if 0
+printf( "--> %.20g", fnew );
+ {int newlo = 1;
+ for ( vertex = 0; vertex < nvertex; vertex++ ) {
+   if ( fnew >= f[ vertex ] ) { newlo = 0; break; }
+ }
+ if ( newlo ) printf( " * " );
+ }
+printf( "\n" ); 
+#endif
+ 
    if ( astOK && ( fnew < f[ hi ] ) ) {
       f[ hi ] = fnew;
       for ( coord = 0; coord < ncoord; coord++ ) {
-         xcent[ coord ] += ( xnew[ coord ] - xx[ hi * ncoord + coord ] ) / ( ncoord + 1 );
          xx[ hi * ncoord + coord ] = xnew[ coord ];
       }
    }
@@ -319,7 +338,6 @@ static double NewVertex( const MapData *mapdata, double fac, int hi,
 static double DownhillSimplex( const MapData *mapdata, double acc, int maxcall,
                                double dx[], double x[], int *ncall ) {
    double *f;
-   double *xcent;
    double result;
    double tmp;
    double fsave;
@@ -334,12 +352,12 @@ static double DownhillSimplex( const MapData *mapdata, double acc, int maxcall,
    int vertex;
    double *xnew;
    double *xx;
+   double offset;
 
    ncoord = mapdata->nin;
    nvertex = ncoord + 1;
    f = astMalloc( sizeof( double ) * (size_t) nvertex );
    xx = astMalloc( sizeof( double ) * (size_t) ( ncoord * nvertex ) );
-   xcent = astMalloc( sizeof( double ) * (size_t) ncoord );
    xnew = astMalloc( sizeof( double ) * (size_t) ncoord );
 
    *ncall = 0;
@@ -353,10 +371,6 @@ static double DownhillSimplex( const MapData *mapdata, double acc, int maxcall,
       f[ vertex ] = MapFunction( mapdata, &xx[ vertex * ncoord ], ncall );
    }
    ncall1 += ncoord;
-
-   for ( coord = 0; coord < ncoord; coord++ ) {
-      xcent[ coord ] = x[ coord ] + dx[ coord ] / nvertex;
-   }
 
    while( 1 ) {
       lo = 0;
@@ -381,40 +395,40 @@ static double DownhillSimplex( const MapData *mapdata, double acc, int maxcall,
          break;
       }
 
-      fnew = NewVertex( mapdata, -1.0, hi, xx, xcent, f, ncall, xnew );
+      fnew = NewVertex( mapdata, -1.0, hi, xx, f, ncall, xnew );
       ncall1 += 1;
       if ( fnew <= f[ lo ] ) {
-         fnew = NewVertex( mapdata, 2.0, hi, xx, xcent, f, ncall, xnew );
+         fnew = NewVertex( mapdata, 2.0, hi, xx, f, ncall, xnew );
          ncall1 += 1;
       } else if ( fnew >= f[ inhi ] ) {
          fsave = f[ hi ];
-         fnew = NewVertex( mapdata, 0.5, hi, xx, xcent, f, ncall, xnew );
+         fnew = NewVertex( mapdata, 0.5, hi, xx, f, ncall, xnew );
          ncall1 += 1;
          if ( fnew >= fsave ) {
             for ( vertex = 0; vertex < nvertex; vertex++ ) {
                if ( vertex != lo ) {
                   for ( coord = 0; coord < ncoord; coord++ ) {
-                     xx[ vertex * ncoord + coord ] =
-                        0.5 * ( xx[ vertex * ncoord + coord ] +
-                                xx[ lo * ncoord + coord ] );
+                     offset = xx[ vertex * ncoord + coord ] -
+                              xx[ lo * ncoord + coord ];
+                     if ( fabs( offset ) <=
+                          fabs( xx[ lo * ncoord + coord ] ) * DBL_EPSILON ) {
+                        xx[ vertex * ncoord + coord ] =
+                          xx[ lo * ncoord + coord ];
+                     } else {
+                        xx[ vertex * ncoord + coord ] =
+                           xx[ lo * ncoord + coord ] + 0.5 * offset;
+                        }
                   }
                   f[ vertex ] = MapFunction( mapdata, &xx[ vertex * ncoord ], ncall );
                }
             }
             ncall1 += ncoord;
 
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               xcent[ coord ] = 0.0;
-               for ( vertex = 0; vertex < nvertex; vertex++ ){
-                  xcent[ coord ] += xx[ vertex * ncoord + coord ] / nvertex;
-               }
-            }
          }
       }
    }
    xx = astFree( xx );
    f = astFree( f );
-   xcent = astFree( xcent );
    xnew = astFree( xnew );
    return result;
 }
@@ -429,10 +443,10 @@ static double SimplexMinimum( const MapData *mapdata, double x[], double fract,
    double ubnd;
    double middle;
    int coord;
-   int point;
    double minimum;
    int iter;
-   const int maxiter = 4;
+   const int maxiter = 10;
+   int done;
 
    result = AST__BAD;
 
@@ -454,12 +468,13 @@ printf( "minimum %d = %.20g, fract = %g, ncall = %d\n", iter, minimum, fract, *n
       if ( result == AST__BAD ) {
          result = minimum;
       } else if ( minimum < result ) {
+         done = ( ( result - minimum ) <= acc );
          result = minimum;
-         if ( ( result - minimum ) <= acc ) break;
+         if ( done ) break;
       } else {
          break;
       }
-      fract /= 2.0;
+      fract /= 100.0;
    }
 
    
@@ -469,6 +484,40 @@ printf( "minimum %d = %.20g, fract = %g, ncall = %d\n", iter, minimum, fract, *n
 
 
 #if 1
+static double PdfWeight( int ndim, const double x[],
+                         const double lbnd[], const double ubnd[],
+                         int npoint, const double x1[], const double x2[] ) {
+   double wt;
+   int point;
+   int dim;
+   double wt1;
+   double wt2;
+   double dxu;
+   double dxl;
+   double dx;
+   double delta;
+  
+   wt = 1.0;
+   for ( point = 0; point < npoint; point++ ) {
+      wt1 = wt2 = 0.0;
+      for ( dim = 0; dim < ndim; dim++ ) {
+         dxl = fabs( x1[ point * ndim + dim ] - lbnd[ dim ] );
+         dxu = fabs( ubnd[ dim ] - x1[ point * ndim + dim ] );
+         dx = ( dxu > dxl ) ? dxu : dxl;
+         delta = fabs( x[ dim ] - x1[ point * ndim + dim ] ) / dx;
+         wt1 = ( wt1 > delta ) ? wt1 : delta;
+
+         dxl = fabs( x2[ point * ndim + dim ] - lbnd[ dim ] );
+         dxu = fabs( ubnd[ dim ] - x2[ point * ndim + dim ] );
+         dx = ( dxu > dxl ) ? dxu : dxl;
+         delta = fabs( x[ dim ] - x2[ point * ndim + dim ] ) / dx;
+         wt2 = ( wt2 > delta ) ? wt2 : delta;
+      }
+      wt *= wt1 * wt2;
+   }
+   return wt;
+}
+
 void astBoxBound( AstMapping *this,
                   const double lbnd_in[], const double ubnd_in[],
                   int coord_out, double lbnd_out[], double ubnd_out[] ) {
@@ -479,24 +528,25 @@ void astBoxBound( AstMapping *this,
    long int irand = 77665544;
    double random;
    int ncall;
-   double *x;
+   double *x_in;
+   double *x_out;
    int iter;
    int coord;
-   double lbnd;
-   double ubnd;
    int limit;
    double minimum;
    double new_minimum;
-   const int maxiter = 5;
-   double *x_opt;
    int reject;
-   double delta;
    double wt;
-   double distance;
+   int nreject;
    int i;
-   double dx1;
-   double dx2;
-   double dx;
+   double wtmax;
+   double wtsum;
+   const int nsamp = 50;
+   const int maxiter = 50;
+   const int miniter = 5;
+   int nsame;
+   const double acc = DBL_EPSILON;
+   int iopt;
    
    nin = astGetNin( this );
    nout = astGetNout( this );
@@ -513,57 +563,75 @@ void astBoxBound( AstMapping *this,
    mapdata.ptr_in = astGetPoints( mapdata.pset_in );
    mapdata.ptr_out = astGetPoints( mapdata.pset_out );
  
-   x_opt = astMalloc( sizeof( double ) * (size_t) nin );
-
    for ( limit = 0; limit < 2; limit++ ) {
       mapdata.negate = limit;
       minimum = DBL_MAX;
 
-      x = NULL;
-      for ( iter = 0; iter < 5; iter++ ) {
-         x = astGrow( x, nin * ( iter + 1 ), sizeof( double ) );
+      x_in = x_out = NULL;
+      nsame = 0;
+      iopt = 0;
+      for ( iter = 0; iter < maxiter; iter++ ) {
+         x_in = astGrow( x_in, nin * ( iter + 1 ), sizeof( double ) );
+         x_out = astGrow( x_out, nin * ( iter + 1 ), sizeof( double ) );
+
+         wtsum = wtmax = 0.0;
+         for ( i = 0; i < nsamp; i++ ) {
+            for ( coord = 0; coord < nin; coord++ ) {
+               random = Random( &irand );
+                 x_in[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+                                            lbnd_in[ coord ] * ( 1.0 - random );
+            }
+            wt = PdfWeight( nin, &x_in[ iter * nin ], lbnd_in, ubnd_in,
+                            iter, x_in, x_out );
+            wtsum += wt;
+            wtmax = ( wt > wtmax ) ? wt : wtmax;
+         }
+         if ( wtsum < wtmax ) wtmax = wtsum;
          reject = 1;
+         nreject = 0;
          while ( reject ) {
             for ( coord = 0; coord < nin; coord++ ) {
                random = Random( &irand );
-               x[ iter * nin + coord ] = ubnd_in[ coord ] * random +
-                                         lbnd_in[ coord ] * ( 1.0 - random );
+               x_out[ iter * nin + coord ] =
+                 x_in[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+                                            lbnd_in[ coord ] * ( 1.0 - random );
             }
             wt = 1.0;
-            for ( i = 0; i < iter; i++ ) {
-               distance = 0.0;
-               for ( coord = 0; coord < nin; coord++ ) {
-                  dx1 = fabs( x[ i * nin + coord ] - lbnd_in[ coord ] );
-                  dx2 = fabs( ubnd_in[ coord ] - x[ i * nin + coord ] );
-                  dx = dx1 > dx2 ? dx1 : dx2;
-                  delta = fabs( ( x[ i * nin + coord ] -
-                                  x[ iter * nin + coord ] ) / dx );
-                  distance = ( distance > delta ) ? distance : delta;
-               }
-               wt *= distance;
+            if ( wtmax > 0.0 ) {
+              wt = PdfWeight( nin, &x_in[ iter * nin ], lbnd_in, ubnd_in,
+                              iter, x_in, x_out ) / wtmax;
             }
-            random = Random( &irand );
-            reject = ( random > wt );
-            printf( "wt, reject = %g %d\n", wt, reject );
+            reject = ( Random( &irand ) > wt );
+            if ( reject ) nreject++;
          }
+         printf( "nreject = %d\n", nreject );
 
+printf( "X minimising (limit=%d, iter=%d) starting at:\n", limit, iter );
          for ( coord = 0; coord < nin; coord ++ ) {
-printf( "%g ", x[ iter * nin + coord ] );
+printf( "%g ", x_in[ iter * nin + coord ] );
          }
 printf( "\n" );
-         new_minimum = SimplexMinimum( &mapdata, &x[ iter * nin ],
-                                       0.1, 0.001, &ncall );
+         new_minimum = SimplexMinimum( &mapdata, &x_out[ iter * nin ],
+                                       0.1, acc, &ncall );
          printf( "minimum found at " );
          for ( coord = 0; coord < nin; coord++ ) {
-            printf( "%g ", x[ iter * nin + coord ] );
+            printf( "%.20g ", x_out[ iter * nin + coord ] );
          }
          printf( "\n\n" );
          if ( new_minimum < minimum ) {
-            minimum = new_minimum;
-            for ( coord = 0; coord < nin; coord ++ ) {
-               x_opt[ coord ] = x[ iter * nin + coord ];
+            if ( ( minimum - new_minimum ) > acc ) {
+               nsame = 0;
+            } else {
+               nsame++;
             }
+            minimum = new_minimum;
+            iopt = iter;
+         } else {
+            nsame++;
          }
+printf( "nsame, iopt = %d %d\n", nsame, iopt );
+         if ( ( ( iter + 1 ) >= miniter ) &&
+              ( nsame >= ( 0.3 * ( iter + 1 ) ) ) ) break;
       }
       if ( !limit ) {
          *lbnd_out = minimum;
@@ -572,12 +640,12 @@ printf( "\n" );
       }
       printf( "best limit = %g at ", minimum );
       for ( coord = 0; coord < nin; coord++ ) {
-         printf( "%g ", x_opt[ coord ] );
+         printf( "%g ", x_out[ iopt * nin + coord ] );
       }
       printf( "\n\n" );
-      x = astFree( x );
+      x_in = astFree( x_in );
+      x_out = astFree( x_out );
    }
-   x_opt = astFree( x_opt );
 }
 
 #else
