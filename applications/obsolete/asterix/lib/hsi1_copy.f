@@ -65,7 +65,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
+*     HSI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/hsi.html
 
 *  Keywords:
 *     package:hsi, usage:private

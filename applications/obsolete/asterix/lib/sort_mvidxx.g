@@ -62,7 +62,7 @@
 *     {routine_deficiencies}...
 
 *  References:
-*     SORT Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/sort.html
+*     SORT Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/sort.html
 
 *  Keywords:
 *     package:sort, usage:public
