@@ -10,9 +10,11 @@ libdtask_adam_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(FPP_ROUTINES) \
 	$(C_ROUTINES)
+# We use ../subpar/SUBPAR_SYS
+libdtask_adam_la_FCFLAGS = -I../subpar
 
 include_HEADERS = $(PUBLIC_INCLUDES)
-include_MESSAGES = DTASK_ERR dtask_err.h ACT_ERR act_err.h
+include_MESSAGES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
 
 staretc_DATA = dtask_main.txt
 
@@ -20,36 +22,13 @@ PUBLIC_INCLUDES = DTASK_PAR
 
 PRIVATE_INCLUDES = DTASK_CMN DTASK_SYS
 
-F_ROUTINES = \
-	dts_actshut.f \
-	dts_act_sched.f \
-	dts_addlst.f \
-	dts_asthdlr.f \
-	dts_astint.f \
-	dts_cancel.f \
-	dts_cantim.f \
-	dts_comshut.f \
-	dts_dcltask.f \
-	dts_dtask.f \
-	dts_dumpast.f \
-	dts_esetk.f \
-	dts_get.f \
-	dts_getpath.f \
-	dts_gsoc.f \
-	dts_gtcmd.f \
-	dts_init.f \
-	dts_kick.f \
-	dts_obey.f \
-	dts_obeydcl.f \
-	dts_prcnam.f \
-	dts_remlst.f \
-	dts_resched.f \
-	dts_set.f \
-	dts_setdump.f \
-	dts_srchkey.f \
-	dts_srchlst.f \
-	dts_subsid.f \
-	dts_timeout.f
+F_ROUTINES = dts_actshut.f dts_act_sched.f dts_addlst.f dts_asthdlr.f	\
+	dts_astint.f dts_cancel.f dts_cantim.f dts_comshut.f		\
+	dts_dcltask.f dts_dtask.f dts_dumpast.f dts_esetk.f dts_get.f	\
+	dts_getpath.f dts_gsoc.f dts_gtcmd.f dts_init.f dts_kick.f	\
+	dts_obey.f dts_obeydcl.f dts_prcnam.f dts_remlst.f		\
+	dts_resched.f dts_set.f dts_setdump.f dts_srchkey.f		\
+	dts_srchlst.f dts_subsid.f dts_timeout.f
 
 FPP_ROUTINES = \
 	dts_control.fpp
@@ -62,7 +41,7 @@ C_ROUTINES = \
 
 EXTRA_DIST = alink.in ilink.in
 
-BUILT_SOURCES = ACT_ERR act_err.h DTASK_ERR dtask_err.h
+BUILT_SOURCES = $(include_MESSAGES)
 
 CLEANFILES = alink alink.in ilink ilink.in dtask_libtool
 
@@ -116,5 +95,7 @@ $(srcdir)/ilink.in: $(srcdir)/ailink.in.m4
 	    && mv ilink.in.tmp $@
 # The installed dtask_libtool is just the libtool we configured for our.
 # own use -- it's specific to this configuration, not this directory.
-dtask_libtool: libtool
-	$(LN_S) libtool dtask_libtool
+# Note that libtool is located in $(top_builddir) (not part of the
+# automake interface, but unlikely to change)
+dtask_libtool: $(top_builddir)/libtool
+	$(LN_S) $(top_builddir)/libtool dtask_libtool
