@@ -1,5 +1,5 @@
 *+  ARX_WRITEF - write ARD text from group to given file
-      SUBROUTINE ARX_APPEND(GRPID,FID,STATUS)
+      SUBROUTINE ARX_WRITEF(GRPID,FID,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
