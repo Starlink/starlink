@@ -1,0 +1,62 @@
+## DESPIKE2 - Despike SCAN/MAP data.
+ 
+#+
+#  Name:
+#     DESPIKE2.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1997 July 22 (JFL)
+#        Original Version
+#     {enter_further_changes_here}
+ 
+#-
+
+
+   INTERFACE DESPIKE2
+
+      HELPLIB 'SURF_HELP:'
+
+     PARAMETER   NSIGMA
+        POSITION 3
+        PROMPT   'Minimum nsigma of spikes from mean '
+        TYPE     '_REAL'
+        RANGE    0, 1000.0
+        HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER IN
+         POSITION  1
+         TYPE     'FILENAME'
+         PROMPT   'Name of input file containing demodulated data'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         POSITION 2
+         TYPE     'FILENAME'
+         PROMPT   'Name of file to contain restored data'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+   ENDINTERFACE

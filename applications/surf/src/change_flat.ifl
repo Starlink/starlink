@@ -1,0 +1,59 @@
+## CHANGE_FLAT - Modify flatfield
+ 
+#+
+#  Name:
+#     CHANGE_FLAT.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     1997 April 30 (TIMJ)
+#	 Add MSG_FILTER
+#     {enter_further_changes_here}
+ 
+#-
+
+
+   INTERFACE CHANGE_FLAT
+
+      HELPLIB 'SURF_HELP:'
+
+      PARAMETER IN
+	 POSITION 1
+         TYPE    'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+	 ASSOCIATION '<->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of input file containing demodulated map data'
+	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER NEW_FLAT
+	 POSITION 2
+         TYPE   '_CHAR'
+         PROMPT 'The name of the file containing the new flat-field'
+	HELPKEY '*'
+      ENDPARAMETER
+
+   ENDINTERFACE
+

@@ -1,0 +1,60 @@
+## REDUCE_NOISE - Process noise observations
+
+#+
+#  Name:
+#     SCUPHOT.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1998 Nov 18 (TIMJ)
+#        Original Version
+
+#-
+
+  INTERFACE REDUCE_NOISE
+
+     HELPLIB 'SURF_HELP:'
+
+      PARAMETER IN
+	 POSITION 1
+         TYPE    'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+         PROMPT  'Name of input file containing demodulated data'
+	 HELPKEY '*'
+      ENDPARAMETER
+
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         POSITION 2
+         TYPE    '_CHAR'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of container file to hold map and time-sequence data'
+	 HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER FILE
+         POSITION 3
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PROMPT  'Name of ASCII file to contain results summary'
+         PPATH   'DYNAMIC'
+	 HELPKEY '*'
+      ENDPARAMETER
+
+   ENDINTERFACE

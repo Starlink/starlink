@@ -1,0 +1,81 @@
+## CHANGE_POINTING - Modify pointing
+ 
+#+
+#  Name:
+#     CHANGE_POINTING.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     1997 March 19 (TIMJ)
+#	 Becomes CHANGE_POINTING.IFL
+#     1997 April 30 (TIMJ)
+#        Add MSG_FILTER
+#     1997 May 30 (TimJ)
+#	 Change default for POINT_LST to null
+#     {enter_further_changes_here}
+ 
+#-
+
+
+   INTERFACE CHANGE_POINTING
+
+      HELPLIB 'SURF_HELP:'
+
+      PARAMETER CHANGE_POINT
+         TYPE    '_LOGICAL'
+         PROMPT  'Do you want to change the pointing correction data'
+	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER IN
+	 POSITION 1
+         TYPE    'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+	 ASSOCIATION '<->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of input file containing demodulated map data'
+	HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER POINT_DAZ
+         TYPE    '_REAL'
+         PROMPT  'The azimuth pointing correction to be added (arcsec)'
+	HELPKEY '*'
+      ENDPARAMETER
+ 
+      PARAMETER POINT_DEL
+         TYPE    '_REAL'
+         PROMPT  'The elevation pointing correction to be added (arcsec)'
+	HELPKEY '*'
+      ENDPARAMETER
+ 
+      PARAMETER POINT_LST
+         TYPE    '_CHAR'
+         PROMPT  'The sidereal time of the pointing offset (hh mm ss.ss)'
+	DEFAULT !
+	HELPKEY '*'
+      ENDPARAMETER
+ 
+   ENDINTERFACE
+

@@ -1,0 +1,78 @@
+## SCUMAKEWT - Make FT weights for REMDBM
+ 
+#+
+#  Name:
+#     SCUMAKEWT 
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+ 
+#  History:
+#     {enter_further_changes_here}
+ 
+#-
+ 
+   INTERFACE SCUMAKEWT
+ 
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER CHOP
+         TYPE    '_REAL'
+        POSITION 1
+        PPATH 'Current' 
+        PROMPT  'Chop throw in arcsec'
+      ENDPARAMETER
+
+      PARAMETER PA
+         POSITION 2
+         TYPE    '_REAL'
+        PPATH 'Current' 
+         PROMPT  'Chop position angle (degrees)'
+      ENDPARAMETER
+ 
+   
+
+      PARAMETER PIXSIZE
+         TYPE    '_REAL'
+        POSITION 3
+        PPATH 'Current' 
+         PROMPT  'Pixel size in arcsec'
+      ENDPARAMETER
+ 
+      PARAMETER SIZE
+        POSITION 4
+         TYPE    '_INTEGER'
+        PPATH 'Current' 
+         PROMPT  'Dimension of each axis'
+      ENDPARAMETER
+ 
+      PARAMETER FTCHOP
+         TYPE    NDF
+         POSITION 5
+         ACCESS   'WRITE'
+         VPATH    'PROMPT'
+         PPATH 'Current' 
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of file to contain deconvolution multiplier'
+         HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER WTCHOP
+         TYPE    NDF
+         POSITION 6
+         ACCESS   'WRITE'
+         PPATH 'Current' 
+         VPATH    'PROMPT'
+         PROMPT  'Name of file to contain deconvolution weight'
+         HELPKEY  '*'
+      ENDPARAMETER
+ 
+   ENDINTERFACE
