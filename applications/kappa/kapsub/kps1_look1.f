@@ -99,7 +99,6 @@
       INTEGER GFRM               ! AST pointer to mask grid coords Frame 
       INTEGER I                  ! Loop count
       INTEGER ICURR              ! Index of original current Frame
-      INTEGER IGRID              ! Index of mask grid coords Frame within JWCS
       INTEGER INDF2              ! NDF section identifier
       INTEGER IPIN               ! Pointer to mapped NDF array component
       INTEGER IPMASK             ! Pointer to mask array
@@ -184,9 +183,6 @@
          WINMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
          CALL AST_ADDFRAME( JWCS, AST__BASE, WINMAP, GFRM, STATUS )
 
-*  Note the index of the ARDGRIDCO Frame. 
-         IGRID = AST_GETI( JWCS, 'CURRENT', STATUS )       
-
 *  Create a new Frame representing pixel coords within the work array. 
 *  Give it the Domain ARDPIXCO so that it can be distinguished from 
 *  any PIXEL Frame already in the FrameSet.
@@ -229,7 +225,7 @@
          XP( 2 ) = DBLE( UBNDI( 1 ) + 1 )
          YP( 1 ) = DBLE( LBNDI( 2 ) - 2 )
          YP( 2 ) = DBLE( UBNDI( 2 ) + 1 )
-         CALL AST_TRAN2( MAP, 1, XP, YP, .TRUE., XP, YP, STATUS )
+         CALL AST_TRAN2( MAP, 2, XP, YP, .TRUE., XP, YP, STATUS )
 
 *  Convert these into pixel indices in the NDF.
          WLBND( 1 ) = NINT( XP( 1 ) ) + LBND( SDIM( 1 ) ) - 1
@@ -276,8 +272,9 @@
      :              STATUS )
 
 *  Copy the masked NDF array into the returned array.
-      CALL KPS1_LOOK2( RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), RUBND( 2 ), 
+      CALL KPS1_LOOK2( WLBND( 1 ), WUBND( 1 ), WLBND( 2 ), WUBND( 2 ), 
      :                 %VAL( IPMASK ), ( VAL__MAXD - 1.0D0 ), 
+     :                 RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), RUBND( 2 ), 
      :                 %VAL( IPIN ), %VAL( IPDAT ), STATUS )
 
 *  Free resources.
