@@ -35,7 +35,8 @@ dnl    within STAR_DEFAULTS
 AC_CHECK_LIB(cc_dynamic, restFP)
 
 dnl dependances on starlink packages
-STAR_DECLARE_DEPENDENCIES(build, [ard fio grp ndf agi sgs pgp gns gks])
+STAR_DECLARE_DEPENDENCIES([build],[ard fio grp ndf agi sgs shl pgp gns gks],
+                          [link])
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
