@@ -82,6 +82,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
       
 *  Arguments Given:
       INTEGER FSET
@@ -99,13 +100,17 @@
       REAL RBBOX( 4 )            ! Base frame bounding box (real)
       INTEGER DIM( DAT__MXDIM )  ! Shape of array
       INTEGER CHAN               ! AST identifier for Channel
+      INTEGER CLEN               ! Length of mapped character array strings
       INTEGER CNV                ! AST identifier for alignment frameset
+      INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position in string
+      INTEGER IPWCS              ! Pointer to mapped character array
       INTEGER JBASF              ! Base frame index in FSET
       INTEGER JBASP              ! Base frame index in PLOT
       INTEGER JCURF              ! Current frame index in FSET
       INTEGER MAP                ! AST identifier for alignment mapping
       INTEGER NDIM               ! Number of dimensions
+      INTEGER NEL                ! Number of elements in mapped array
       INTEGER NWRITE             ! Items written to Channel (dummy)
       LOGICAL THERE              ! Is HDS component present?
       CHARACTER * ( DAT__SZTYP ) TYPE ! HDS Data type
@@ -115,6 +120,7 @@
       CHARACTER * ( AST__SZCHR ) DMN ! Frame domain
       CHARACTER * ( AST__SZCHR ) DMNLST ! List of alignment domains
       CHARACTER * ( AST__SZCHR ) MATDMN ! Domain in which alignment occurred
+      CHARACTER * ( CCD1__BLEN ) LINE ! Character buffer
       DOUBLE PRECISION BBOX( 4 ) ! Base frame bounding box (double precision)
       
 *.
@@ -287,13 +293,32 @@
 *  Create an AST Channel to write to the DATA component.
       CALL CCD1_HCHAN( WCSLOC, 'WRITE', CHAN, STATUS )
 
+*  Specify that only essential information be written through the Channel
+*  (this is not very likely to be read by humans).
+      CALL AST_SET( CHAN, 'Full=-1,Comment=0', STATUS )
+
 *  Write the Plot into the Channel.
       NWRITE = AST_WRITE( CHAN, PLOT, STATUS )
+
+*  The mapped HDS _CHAR array in which the the Plot has been stored 
+*  may have (possibly many) unused blank lines at the end, so we will 
+*  truncate it.  Unmap the array and remap it to get a pointer, 
+*  find the last non-empty line, and resize it.
+      CALL DAT_UNMAP( WCSLOC, STATUS )
+      CALL DAT_CLEN( WCSLOC, CLEN, STATUS )
+      CALL DAT_MAPV( WCSLOC, '_CHAR', 'READ', IPWCS, NEL, STATUS )
+      NEL = NEL + 1
+ 1    CONTINUE
+      NEL = NEL - 1
+      CALL CCD1_CA2C( %VAL( IPWCS ), NEL, LINE, STATUS, %VAL( CLEN ) )
+      IF ( LINE .EQ. ' ' .AND. NEL .GT. 1 ) GO TO 1
+      CALL DAT_UNMAP( WCSLOC, STATUS )
+      CALL DAT_ALTER( WCSLOC, 1, NEL, STATUS )
 
 *  If there has been an error in writing the Plot to the AGI database,
 *  note the fact but do not return error status.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_ANNUL( STATUS )
+c        CALL ERR_ANNUL( STATUS )
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', '   Warning: Failed to store new ' //
      :   'coordinate information in DATA picture.', STATUS )
