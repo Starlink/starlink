@@ -221,7 +221,6 @@
       CHARACTER           	TSTR*80         	! Temporary storage
       CHARACTER*80		TYPE_DATA		! Output object type
       CHARACTER*80		UNITS_DATA		! Output object units
-      CHARACTER*80		VRNT_DATA		! Output object variant
 
       REAL                DATAROW(MAX_DESCS)! The values read from a data line
       REAL                LASTROW(MAX_DESCS)! Last values read from a data line
@@ -272,7 +271,6 @@
       LOGICAL			TITLE_OK		! Output title ok?
       LOGICAL			TYPE_OK			! Output type ok?
       LOGICAL			UNITS_OK		! Output units ok?
-      LOGICAL			VRNT_OK			! Output variant ok?
       LOGICAL                   LOLIM                   ! LOLIM instead of LOERROR ?
       LOGICAL                   UPLIM                   ! UPLIM instead of UPERROR ?
 
@@ -327,6 +325,7 @@
       LOLIM = .FALSE.
       UPLIM = .FALSE.
       NAXES = 0
+      TYPE_DATA = 'BinDS'
 
 *  Enable comment buffering
       CMT_BUF = .TRUE.
@@ -359,18 +358,13 @@
 *      See if the TOPLEVEL line contains a TYPE specifier
           CALL IMPORT_EXTQSYM( 'TYPE', TYPE_DATA, TYPE_OK, STATUS )
 
-          IF ( TYPE_OK ) THEN
-            CALL CHR_UCASE( TYPE_DATA )
-          ELSE
-            TYPE_DATA = 'DATASET'
+          IF ( .NOT. TYPE_OK ) THEN
+            TYPE_DATA = 'BinDS'
             TYPE_OK = .TRUE.
           END IF
 
 *      See if the TOPLEVEL line contains a TITLE specifier
           CALL IMPORT_EXTQSYM( 'TITLE', TITLE_DATA, TITLE_OK, STATUS )
-
-*      See if the TOPLEVEL line contains a VARIANT specifier
-          CALL IMPORT_EXTQSYM( 'VARIANT', VRNT_DATA, VRNT_OK, STATUS )
 
 *      Tell user if any garbage on command line
           EXTRA = .FALSE.
