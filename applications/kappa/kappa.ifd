@@ -1587,26 +1587,6 @@ package kappa {
             helpkey *
           }
 
-         parameter dvalue {
-            type _DOUBLE
-           keyword cvalue
-				 # the user
-            vpath PROMPT
-            ppath DYNAMIC CURRENT
-            prompt {Component value}
-            helpkey *
-          }
-
-         parameter ivalue {
-            type _INTEGER
-           keyword cvalue
-				 # the user
-            vpath PROMPT
-            ppath DYNAMIC CURRENT
-            prompt {Component value}
-            helpkey *
-          }
-
          parameter loop {
 				 # SETEXT is to operate in looping
 				 # mode, accepting more that one option
@@ -1619,16 +1599,6 @@ package kappa {
             vpath DEFAULT NOPROMPT
             prompt {Run in looping mode?}
             default TRUE
-            helpkey *
-          }
-
-         parameter lvalue {
-            type _LOGICAL
-           keyword cvalue
-				 # the user
-            vpath PROMPT
-            ppath DYNAMIC CURRENT
-            prompt {Component value}
             helpkey *
           }
 
@@ -1670,16 +1640,6 @@ package kappa {
             vpath PROMPT
             ppath DYNAMIC CURRENT
             prompt {Option to modify or examine the extension}
-            helpkey *
-          }
-
-         parameter rvalue {
-            type _REAL
-           keyword cvalue
-				 # the user
-            vpath PROMPT
-            ppath DYNAMIC CURRENT
-            prompt {Component value}
             helpkey *
           }
 

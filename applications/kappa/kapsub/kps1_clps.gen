@@ -62,9 +62,10 @@
 *        The output variance values. Only accessed if VAR is .TRUE.
 *     WORK1( NEL2, * ) = <TYPE> (Returned)
 *        Work array. The second axis should have at least (HI-LO+1) elements.
+*        Only accessed if AXIS is not equal to NDIM1.
 *     WORK2( NEL2, * ) = <TYPE> (Returned)
 *        Work array. The second axis should have at least (HI-LO+1) elements.
-*        Only accessed if VAR is .TRUE.
+*        Only accessed if VAR is .TRUE., and AXIS is not equal to NDIM1.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 

@@ -39,7 +39,7 @@ demo v0.16 {
       pause 8
 
       command {Obey kapview gdclear ""}
-      command {Obey kapview display "in=$KAPPA_DIR/m57 lut=$KAPPA_DIR/warm_lut axes=no mode=perc percentiles=\[10,99\] accept"}
+      command {Obey kapview display "in=$KAPPA_DIR/m57 lut=$KAPPA_DIR/warm_lut axes=no mode=perc percentiles=\[10,99\] style=def accept"}
 
       text "A new command called <command lutwarm> has been added. It
       loads a colour table which goes from black to white, passing

@@ -178,6 +178,11 @@
 *     3-SEP-1999 (DSB):
 *        Corrected description of DELETE option. Do not cancel parameters 
 *        when not looping.
+*     31-OCT-2000 (DSB):
+*        Corrected use of trailing character string length arguments
+*        passed by value in the "loop=no option=put ctype=_char" case for
+*        non-scalars. Also changed DAT_PUTVL to DAT_PUTVC in the same case.
+*        Also removed references to unused parameter RVALUE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -844,11 +849,13 @@
 
 *  Obtain the requested number of values.
                         CALL PAR_EXACC( 'CVALUE', EL, %VAL( CPNTR ),
-     :                                  STATUS, %VAL( CLEN ) )
+     :                                  STATUS, %VAL( 6 ), 
+     :                                  %VAL( CLEN ) )
 
 *  Write the array to the component.
-                        CALL DAT_PUTVL( CLOC, EL, %VAL( CPNTR ),
-     :                                  STATUS, %VAL( CLEN ) )
+                        CALL DAT_PUTVC( CLOC, EL, %VAL( CPNTR ),
+     :                                  STATUS, %VAL( DAT__SZLOC ),
+     :                                  %VAL( CLEN ) )
 
 *  Free the workspace.
                         CALL AIF_ANTMP( WKLOC, STATUS )
@@ -1021,7 +1028,6 @@
                CALL PAR_CANCL( 'CNAME', STATUS )
                CALL PAR_CANCL( 'CTYPE', STATUS )
                CALL PAR_CANCL( 'CVALUE', STATUS )
-               CALL PAR_CANCL( 'RVALUE', STATUS )
                CALL PAR_CANCL( 'SHAPE', STATUS )
                CALL PAR_CANCL( 'OK', STATUS )
                CALL PAR_CANCL( 'NEWNAME', STATUS )
