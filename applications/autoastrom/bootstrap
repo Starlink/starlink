@@ -1,0 +1,25 @@
+#! /bin/sh -
+
+# Run this script in a freshly checked-out directory to bring the
+# system to the point where you can just type ./configure;make
+#
+# The configuration script here work with automake 1.7.5 and autoconf
+# 2.57, and probably not much that's significantly older than those.
+
+# autoastrom is not currently configured using the autotools, but its
+# subdirectories -- moggy and the module astrom -- are.  So omit this
+# autotools setup for the moment.
+#
+#echo "aclocal..."
+#  aclocal || exit 1
+#echo "automake --add-missing..."
+#  automake --add-missing --foreign || exit 1
+#echo "autoconf..."
+#  autoconf || exit 1
+
+for d in moggy astrom; do
+    echo "Bootstrapping $d..."
+    (cd $d; sh bootstrap)
+done
+
+exit 0
