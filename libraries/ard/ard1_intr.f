@@ -190,7 +190,7 @@
 *  the 1st axis, along a geodesic which is at the given angle to the 1st
 *  axis.
             A1 = AST_OFFSET2( FRM, PAR, ARD__DTOR*( 90.0 - PAR( 5 ) ),
-     :                        0.5*PAR( 3 ), P1, STATUS )
+     :                        PAR( 3 ), P1, STATUS )
          END IF
 
 *  Find the distance of the test point to the ellipse centre.
@@ -210,7 +210,7 @@
 *  Do the test.
             ARD1_INTR = ( ( COS( U )/PAR( 3 ) )**2 + 
      :                    ( SIN( U )/PAR( 4 ) )**2 .LE. 
-     :                    0.25/R**2 )
+     :                    1.0/R**2 )
          END IF
 
 *  Report an error and abort for any other keyword.
