@@ -118,23 +118,11 @@ demo_wish = bin/gaia_wish
 #  Command-line interpretor.
 demo_tcl = bin/gaia_tcl
 
-# ARDSTAT
-ardstat = bin/ardstat
+#  GAIA monolith
+gaia_mon = bin/gaia_mon
 
-# AUTOCROP
-autocrop = bin/autocrop
-
-# CAT2TAB
-cat2tab = bin/cat2tab
-
-# TAB2CAT
-tab2cat = bin/tab2cat
-
-# ASC2TAB
-asc2tab = bin/asc2tab
-
-# TAB2ASC
-tab2asc = bin/tab2asc
+#  Tasks in GAIA monolith.
+GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab
 
 INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
 

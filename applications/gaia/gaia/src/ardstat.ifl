@@ -1,0 +1,155 @@
+interface ARDSTAT
+
+   parameter IN
+      position 1
+      type   'NDF'
+      access 'READ'
+      prompt 'Name of input image'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter REGION
+      position 2
+      type   'LITERAL'
+      access 'READ'
+      prompt 'Region of image to process'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter SIMPLE
+      type   '_LOGICAL'
+      access 'READ'
+      prompt 'Use simple scaled regions'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default TRUE
+   endparameter
+
+   parameter SHAPE
+      type   '_CHAR'
+      access 'READ'
+      prompt 'Shape of region to patch'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 'CIRCLE'
+   endparameter
+
+   parameter XCENTRE
+      type   '_REAL'
+      access 'READ'
+      prompt 'X centre of region'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 0.0
+   endparameter
+
+   parameter YCENTRE
+      type   '_REAL'
+      access 'READ'
+      prompt 'Y centre of region'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 0.0
+   endparameter
+
+   parameter SIDE1
+      type   '_REAL'
+      access 'READ'
+      prompt 'Length of first side of box'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 1.0
+   endparameter
+
+   parameter SIDE2
+      type   '_REAL'
+      access 'READ'
+      prompt 'Length of second side of box'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 1.0
+   endparameter
+
+   parameter RADIUS
+      type   '_REAL'
+      access 'READ'
+      prompt 'Radius of circle'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 1.0
+   endparameter
+
+   parameter SEMIMAJOR
+      type   '_REAL'
+      access 'READ'
+      prompt 'Length of ellipse semimajor axis'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 1.0
+   endparameter
+
+   parameter SEMIMINOR
+      type   '_REAL'
+      access 'READ'
+      prompt 'Length of ellipse semiminor axis'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 1.0
+   endparameter
+
+   parameter ANGLE
+      type   '_REAL'
+      access 'READ'
+      prompt 'Position angle'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 1.0
+   endparameter
+
+   parameter VERTICES
+      type   '_REAL'
+      access 'READ'
+      prompt 'Positions (X and Y) of polygon vertices'
+      ppath  'CURRENT'
+      vpath  'PROMPT,CURRENT'
+   endparameter
+
+   parameter XRANGE
+      type   '_REAL'
+      access 'READ'
+      prompt 'Range in X of rectangle'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 0,1
+   endparameter
+
+   parameter YRANGE
+      type   '_REAL'
+      access 'READ'
+      prompt 'Range in Y of rectangle'
+      ppath  'CURRENT,DEFAULT'
+      vpath  'PROMPT,CURRENT,DEFAULT'
+      default 0,1
+   endparameter
+
+   parameter ONELINE
+      type   '_LOGICAL'
+      access 'READ'
+      prompt 'Output results on one-line'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT'
+      default FALSE
+   endparameter
+
+   parameter FIXORIGIN
+      type   '_LOGICAL'
+      access 'READ'
+      prompt 'Ignore origin information (GAIA)'
+      ppath  'DEFAULT'
+      vpath  'DEFAULT,NOPROMPT'
+      default FALSE
+   endparameter
+
+endinterface
