@@ -1,7 +1,5 @@
 ## Process this file with automake to produce Makefile.in
 
-include $(srcdir)/Makefile.starconf
-
 bin_SCRIPTS = atimer_link atimer_link_adam
 
 lib_LTLIBRARIES = libatimer.la
@@ -20,4 +18,4 @@ PUBLIC_INCLUDES = atimer.h atimer_par.h atimer_err.h
 
 PRIVATE_INCLUDES = atimer_static.h 
 
-BUILT_SOURCES = atimer_err.h @BUILT_SOURCES@
+BUILT_SOURCES = atimer_err.h
