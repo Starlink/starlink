@@ -447,7 +447,7 @@ PKG_VERS = 0.19
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
                kappa_sub.tar kapsub_sub.tar kappa_ccdpack.tar kapview_sub.tar \
-               ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
+               kapgks_sub.tar ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                $(PKG_NAME)_data.tar
 
 #  List of public script files.  These are scripts which form part of
@@ -507,23 +507,27 @@ EXTERNAL_INCLUDES = HLPCMD PRM_PAR NUM_DEF_D MSG_PAR DAT_ERR AST_PAR \
 
 F_ROUTINES = $(CCDPACK_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPPA_F2_ROUTINES) $(KAPSUB_F_ROUTINES) \
-             $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
-             $(NDFPACK_F_ROUTINES) $(KAPVIEW_MONO_SOURCE) \
+             $(KAPVIEW_F_ROUTINES) $(KAPGKS_F_ROUTINES) $(MEM_F_ROUTINES) \
+             $(NDFPACK_F_ROUTINES) $(KAPVIEW_MONO_SOURCE) $(KAPGKS_MONO_SOURCE) \
              $(KAPPA_MONO_SOURCE) $(NDFPACK_MONO_SOURCE)
 
 KAPVIEW_F_ROUTINES = \
 ardplot.f colcomp.f contour.f \
-crelut.f cursor.f drawsig.f display.f elprof.f \
-gdclear.f gdnames.f gdset.f gdstate.f \
+cursor.f drawsig.f display.f elprof.f \
+gdclear.f gdset.f gdstate.f \
 idclear.f \
-idinvisible.f idpazo.f idset.f idstate.f \
-linplot.f lutable.f lutflip.f luthilite.f \
-lutrot.f lutsave.f luttweak.f lutview.f \
+idset.f idstate.f \
+linplot.f lutable.f \
+lutsave.f lutview.f \
 mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
 palread.f palsave.f piccur.f picdef.f \
 picempty.f picentire.f picin.f piclabel.f \
 piclist.f picsel.f pictrans.f picvis.f \
 scatter.f vecplot.f 
+
+KAPGKS_F_ROUTINES = \
+crelut.f gdnames.f idinvisible.f idpazo.f lutflip.f luthilite.f \
+lutrot.f luttweak.f 
 
 # Special kappa f routines for commands which clash with the C 
 # run-time-library. These are separate because the names of the atask
@@ -677,9 +681,10 @@ wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f wcsshow.f \
 chain.f reshape.f 
 
 MONO_SOURCE = $(KAPPA_MONO_SOURCE) $(KAPVIEW_MONO_SOURCE) \
-              $(NDFPACK_MONO_SOURCE)
+              $(KAPGKS_MONO_SOURCE) $(NDFPACK_MONO_SOURCE)
 
 KAPVIEW_MONO_SOURCE = kapview_mon.f
+KAPGKS_MONO_SOURCE = kapgks_mon.f
 KAPPA_MONO_SOURCE = kappa_mon.f
 NDFPACK_MONO_SOURCE = ndfpack_mon.f
 
@@ -701,7 +706,7 @@ C_ROUTINES =
 
 #  Define the set of all interface files.
 
-IFL_FILES = $(KAPPA_IFL_FILES) $(KAPVIEW_IFL_FILES) $(NDFPACK_IFL_FILES) \
+IFL_FILES = $(KAPPA_IFL_FILES) $(KAPVIEW_IFL_FILES) $(KAPGKS_IFL_FILES) $(NDFPACK_IFL_FILES) \
             $(MEM_IFL) 
 
 #  Define the interface files required for compilation.
@@ -709,6 +714,8 @@ IFL_FILES = $(KAPPA_IFL_FILES) $(KAPVIEW_IFL_FILES) $(NDFPACK_IFL_FILES) \
 KAPPA_IFL_FILES = $(KAPPA_F_ROUTINES:.f=.ifl) $(KAPPA_F2_IFLS)
 
 KAPVIEW_IFL_FILES = $(KAPVIEW_F_ROUTINES:.f=.ifl)
+
+KAPGKS_IFL_FILES = $(KAPGKS_F_ROUTINES:.f=.ifl)
 
 NDFPACK_IFL_FILES = $(NDFPACK_F_ROUTINES:.f=.ifl)
 
@@ -774,7 +781,7 @@ IRAF_PKG_PAR = $(PKG_NAME).par
 
 IRAF_PAR_FILES = $(KAPPA_F1_ROUTINES:.f=.par) $(KAPPA_F2_IFLS:.ifl=.par) \
                  $(KAPVIEW_F_ROUTINES:.f=.par) $(NDFPACK_F_ROUTINES:.f=.par) \
-                 $(MEM_F_ROUTINES:.f=.par)
+                 $(MEM_F_ROUTINES:.f=.par) $(KAPGKS_F_ROUTINES:.f=.par) 
 
 #  Name the ADAM executables to be run under IRAF
 #  This assumes there are no IRAF-specific versions of the executables
@@ -966,6 +973,11 @@ $(KAPVIEW_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
+$(KAPGKS_F_ROUTINES) :
+	$(TAR_OUT) kapgks_sub.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
 $(NDFPACK_F_ROUTINES) :
 	$(TAR_OUT) ndfpack_sub.tar $@
 	@ if test -f $@; then :;\
@@ -1004,7 +1016,7 @@ $(IRAF_DEMO) :
 #  for performing the compilations.
 
 OBJECT_FILES = $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) $(CCDPACK_OBJECT_FILES) \
-               $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
+               $(KAPVIEW_OBJECT_FILES) $(KAPGKS_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
 KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(KAPPA_F2_ROUTINES:.f=.o) $(MEM_F_ROUTINES:.f=.o)
 
@@ -1013,6 +1025,8 @@ KAPSUB_OBJECT_FILES = $(KAPSUB_F_ROUTINES:.f=.o)
 CCDPACK_OBJECT_FILES = $(CCDPACK_F_ROUTINES:.f=.o)
 
 KAPVIEW_OBJECT_FILES = $(KAPVIEW_F_ROUTINES:.f=.o)
+
+KAPGKS_OBJECT_FILES = $(KAPGKS_F_ROUTINES:.f=.o)
 
 NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 
@@ -1026,7 +1040,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 #  them.
 
 OBJECT_LIBRARIES = \
-libkappa.a libkapview.a libndfpack.a libkapsub.a libccdpack.a
+libkappa.a libkapview.a libkapgks.a libndfpack.a libkapsub.a libccdpack.a
 
 #
 libkappa.a: $(KAPPA_OBJECT_FILES)
@@ -1045,6 +1059,10 @@ libkapview.a: $(KAPVIEW_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
+libkapgks.a: $(KAPGKS_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
 libndfpack.a: $(NDFPACK_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
@@ -1053,13 +1071,14 @@ libndfpack.a: $(NDFPACK_OBJECT_FILES)
 
 KAPPA_MON = kappa_mon
 KAPVIEW_MON = kapview_mon
+KAPGKS_MON = kapgks_mon
 NDFPACK_MON = ndfpack_mon
 
 #  List of monoliths, applications/tasks in the monoliths.
 
 MONOLITH = $(MONO_SOURCE:.f=)
 MEMTASKS = $(MEM_F_ROUTINES:.f=)
-TASKS = $(KAPPA_TASKS) $(KAPVIEW_TASKS) $(NDFPACK_TASKS)
+TASKS = $(KAPPA_TASKS) $(KAPVIEW_TASKS) $(KAPGKS_TASKS) $(NDFPACK_TASKS)
 
 monoliths:	$(MONOLITH)
 
@@ -1068,6 +1087,8 @@ monoliths:	$(MONOLITH)
 KAPPA_TASKS = $(KAPPA_F_ROUTINES:.f=) $(KAPPA_F2_IFLS:.ifl=)
 
 KAPVIEW_TASKS = $(KAPVIEW_F_ROUTINES:.f=)
+
+KAPGKS_TASKS = $(KAPGKS_F_ROUTINES:.f=)
 
 NDFPACK_TASKS = $(NDFPACK_F_ROUTINES:.f=)
 
@@ -1090,6 +1111,10 @@ $(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 
 $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
+	         $(ADDLIBS) `./$(LINK_SCRIPT) -nogks` 
+
+$(KAPGKS_MON) : $(KAPGKS_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
+	$(ALINK) $(KAPGKS_MONO_SOURCE:.f=.o) -o $(KAPGKS_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
@@ -1152,7 +1177,7 @@ $(INSTALL_DIRS):
 #  created and updated(?).
 
 archive: $(PKG_NAME)_source.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
-         ndfpack_sub.tar $(PKG_NAME)_ifls.tar kappa_ccdpack.tar \
+         kapgks_sub.tar ndfpack_sub.tar $(PKG_NAME)_ifls.tar kappa_ccdpack.tar \
          $(PKG_NAME)_data_alpha_OSF1.tar $(PKG_NAME)_data_sun4_Solaris.tar
 #
 	@ echo "   Build of the $(PACK_NAME) tar files is complete."
@@ -1371,6 +1396,13 @@ install:
 	for f in $(KAPVIEW_TASKS) ""; do \
            if test -n "$$f"; then \
               $(LINK) ./$(KAPVIEW_MON) $(INSTALL_BIN)/$$f ;\
+           else :; fi;\
+        done
+#
+#  Create the KAPGKS application/task name soft links.
+	for f in $(KAPGKS_TASKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) ./$(KAPGKS_MON) $(INSTALL_BIN)/$$f ;\
            else :; fi;\
         done
 #
@@ -2165,6 +2197,9 @@ kappa_ccdpack.tar:
 kapview_sub.tar:
 	$(TAR_IN) kapview_sub.tar $(KAPVIEW_F_ROUTINES)
 
+kapgks_sub.tar:
+	$(TAR_IN) kapgks_sub.tar $(KAPGKS_F_ROUTINES)
+
 ndfpack_sub.tar:
 	$(TAR_IN) ndfpack_sub.tar $(NDFPACK_F_ROUTINES)
 
@@ -2349,6 +2384,7 @@ kaphelp.o:	 SAE_PAR PAR_ERR
 kappa_mon.o:	 SAE_PAR
 kapversion.o:	 SAE_PAR PAR_ERR
 kapview_mon.o:	 SAE_PAR
+kapgks_mon.o:	 SAE_PAR
 kps1_agnch.o:	 SAE_PAR GRP_PAR
 kps1_agncm.o:	 SAE_PAR GRP_PAR
 kps1_agncp.o:	 SAE_PAR
