@@ -49,6 +49,7 @@ EXTRA_libdvi2bitmap_la_SOURCES = \
 EXTRALO=@EXTRALO@
 libdvi2bitmap_la_LIBADD = $(EXTRALO) $(LTLIBOBJS)
 libdvi2bitmap_la_DEPENDENCIES = $(EXTRALO) $(LTLIBOBJS)
+libdvi2bitmap_la_LDFLAGS = -version-info @libdvi2bitmap_la_version_info@
 
 bin_PROGRAMS = dvi2bitmap dvireport
 dvi2bitmap_SOURCES = dvi2bitmap.cc
