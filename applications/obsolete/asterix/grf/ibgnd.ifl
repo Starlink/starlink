@@ -41,6 +41,14 @@ interface IBGND
     prompt 'Sampling mode'
     help 'WHOLE, ANNULAR or BOXES'
   endparameter
+
+  parameter SAMPFIT
+    type '_CHAR'
+    default 'MEAN'
+    prompt 'Method of fitting sample distribution'
+    help 'MEAN, POLY, SPLINE, NONE'
+  endparameter
+
   parameter XCENT
     type '_REAL'
     vpath 'INTERNAL,NOPROMPT'
