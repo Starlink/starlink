@@ -47,7 +47,7 @@
 #     18-NOV-1997 (RFWS):
 #        Adapted prologue for document extraction.
 #     13-JUN-2001 (DSB):
-*        Added GRF_PAR.
+#        Added GRF_PAR.
 #     {enter_changes_here}
 
 #  Bugs:
