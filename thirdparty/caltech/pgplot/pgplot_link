@@ -59,6 +59,8 @@
 #        Add -star switch to enable Starlink drivers
 #     15-JUL-2004 (TIMJ):
 #        Forgot to include -lgwm
+#      9-AUG-2004 (TIMJ):
+#        Include err_link
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -76,8 +78,8 @@
 
 #  -star - Requests linking with Starlink extensions
          -star)
-            star=`gwm_link`
-            star="$star -lpgplot_star"
+            star="`gwm_link` `err_link`"
+            star="-lpgplot_star $star"
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
