@@ -276,8 +276,8 @@ C Queue introduces a knee
       CHARACTER*(*) REQUEST		! 'ALL' or one of 'ROSAT_TO_ROST',
 				! 'WFC_TO_ST','ROSAT_TO_WFC','WFC_TO_FOV'
 *   Returns structure CAL containing Euler angles
-      INCLUDE 'CALLIB(CIN_ALIGN_LOW)'
-      INCLUDE 'CALLIB(CIN_ALIGN)'
+      INCLUDE 'CIN_ALIGN_LOW'
+      INCLUDE 'CIN_ALIGN'
 
       INTEGER STATUS
 * Original M.J. Ricketts
@@ -287,7 +287,7 @@ C Queue introduces a knee
 
 *  Local Variables
 
-      INCLUDE 'CALLIB(CIN_ALIGN_TYPES)'
+      INCLUDE 'CIN_ALIGN_TYPES'
 
       RECORD /ALIGN_REC/ AREC(2)
         INCLUDE 'DAT_PAR'
@@ -1329,7 +1329,7 @@ C Interpolate
       REAL*8 REQUEST_MJD
       CHARACTER*20 REL_DATE
 
-      INCLUDE 'CALLIB(CIN_ALIGN_LOW)'
+      INCLUDE 'CIN_ALIGN_LOW'
       RECORD /ALIGN_REC/ AREC(2),ALIGNMENT
 * Original M.J. Ricketts
 * Modified for CALLIB M. Denby
@@ -1374,7 +1374,7 @@ C Interpolate
 *+CIN_ALIGN_GETSET Gets an alignment set in the master Cal File
       SUBROUTINE CIN_ALIGN_GETSET(ALIGN,CELL,STATUS)
 
-      INCLUDE 'CALLIB(CIN_ALIGN_LOW)'
+      INCLUDE 'CIN_ALIGN_LOW'
 
       RECORD/ALIGN_REC/ ALIGN
         INCLUDE 'DAT_PAR'

@@ -1616,7 +1616,6 @@
       REAL			MAXR			! Extreme radii
       REAL			XW, YW			! World coords
       REAL			R			! Off-axis angle
-      REAL			RBIN			! Radial bin size
 
       INTEGER			I, J			! Sample data
 *.
@@ -1660,8 +1659,8 @@
         I_BGM_NSAMP =  INT(MAXR / I_BGM_RBIN) + 1
 
 *    Compute sample index
-        CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, I_BGM_X0, I_BGM_Y0, RBIN,
-     :                           %VAL(I_BGM_SAMIDX), STATUS )
+        CALL IBGND_SETSAMP_RIDX( I_NX, I_NY, I_BGM_X0, I_BGM_Y0,
+       :                I_BGM_RBIN, %VAL(I_BGM_SAMIDX), STATUS )
 
       ELSE IF ( AREA(1:3) .EQ. 'BOX' ) THEN
       END IF
@@ -1806,9 +1805,7 @@
             XW = I_XBASE + (I-1)*I_XSCALE
             R = SQRT( (XW-X0)**2 + Y2 ) / RBIN
             IDX(I,J) = INT(R) + 1
-	PRINT *,I,J,' ok ',idx(i,j)
 	ELSE
-	PRINT *,I,J,' bad ',idx(i,j)
           END IF
         END DO
       END DO
