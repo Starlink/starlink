@@ -1,0 +1,5 @@
+Instructions for building the NDF module on Sun Solaris systems
+----------------------------------------------------------------------
+
+The NDF perl module can be built as a shareable module or an
+ndfperl binary on Solaris.

@@ -1,0 +1,107 @@
+Installation instructions for the perl NDF module
+-------------------------------------------------
+
+Requirements
+------------
+
+This module has been tested with perl5.003 and 5.004 but should work with
+perl5.002.
+
+The Starlink NDF library distribution (version 1.3 or higher) must be
+available.  The NDF library (libndf.a) is dependent on many other
+libraries in the Starlink distribution. If you have the Starlink
+software collection all these libraries should be available, if not
+the libraries must be downloaded from the Starlink Software Store
+(http://star-www.rl.ac.uk/cgi-store/storetop).
+
+As of 5th November 1996, the following libraries are required in order
+to use the NDF module (via the Starlink ndf_link command):
+
+-lndf -lpsx -lary -lhds -lcnf -lerr -lerr_standalone -lems -lchr -lprm -lprm_a
+
+It is also necessary to have dat_par.h and sae_par.h. Optionally
+this software can use err_err.h, ems_err.h and msg_par.h if they
+are installed.
+
+Luckily Starlink distribute ALL necessary libraries in one package if
+the NDF library is requested. Pre-built libraries can be obtained for
+Alpha/OSF1, Linux and Sun Solaris.
+
+Since the libraries are in Fortran a Fortran library is also necessary.
+I use the ExtUtils::F77 module to determine which Fortran libraries
+to use. (I have distributed this with the module for ease of use. The 
+F77 module was written by Karl Glazebrook).
+
+If you wish to use the PDL::NDF extension you will also need PDL,
+available from CPAN. The PDL module works with version 1.11 of Perl DL.
+
+
+
+Building and Installation
+-------------------------
+
+0) Read the associated machine dependent README file (README.dec_osf,
+   README.solaris or README.linux) for known problems on your 
+   architecture.
+
+1) If the optional Starlink include files are available then you may want
+   to remove the comments from NDF.xs.
+
+2) Edit Makefile.PL.
+	Makefile.PL should work for Solaris 2.5, Linux ELF and Alpha
+        Digital Unix 4.0.
+
+   You may need to edit the location of the Starlink include files
+   if they are not in the standard location ($starinc). 
+
+   If you are installing the ndfperl binary then you may also want to
+   change $install so that it points to eg. /star/bin. 
+
+
+3) Installation should now be a case of:
+
+	% perl Makefile.PL
+	% make
+	% make test
+	% make install
+
+to build a shareable module, or
+
+        % perl Makefile.PL
+        % make ndfperl
+        % make test_static
+        % make -f Makefile.aperl inst_perl MAP_TARGET=ndfperl
+
+to build the ndfperl binary. You will probably have to copy
+NDF.pm into your perl module area manually for the static install
+(this is usually /usr/local/lib/perl5/site_perl).
+
+
+Using the array packing code
+----------------------------
+
+It is also possible to link the array handling code separately. This may 
+be necessary if you wish to use this code yourself or if you are trying
+to compile a perl program which includes two modules that use the same
+array handling code.
+
+To do this the following is necessary:
+
+	% cd arrays
+	% make
+
+This will create libarrays.a. You must then uncomment the libarrays line
+in Makefile.PL and comment out the '#include "arrays/arrays.c"' line in
+NDF.xs.
+
+Copyright
+---------
+
+This module is copyright (C) 1996 Tim Jenness.  All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The NDF module itself is copyrighted by the Starlink Project, RAL.
+
+The array handling code (arrays.c) and the ExtUtils::F77 module were
+written by Karl Glazebrook (kgb@aaoepp.aao.gov.au).

@@ -1,0 +1,29 @@
+1998-02-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Add ndf_size (somehow this had been left out earlier)
+
+	* NDF.pm (par_get): Fix the use of ADAM_USER in par_get.
+
+Tue Nov 25 21:12:43 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.pm (fits_construct_string): add fits_read_header command to
+	read all the FITS keywords.
+
+NDF and PDL::NDF modules
+------------------------
+
+8th June 1997
+
+1.20    - Add support for DEC Digital Unix and Linux in Makefile.PL
+	- include my own version of the fortran getarg_ routine
+	  Now arguments are correctly written when history is updated.
+
+27th November 1996:
+
+1.01     -  Add 'fits_construct_string'
+	    Add comment support in FITS commands.
+	    Update PDL::NDF to v1.0
+
+20th November 1996:
+
+1.00     -  First release version

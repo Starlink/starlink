@@ -1,0 +1,38 @@
+
+This is version 1.20 of the perl NDF module
+-------------------------------------------
+
+The extensible N-dimensional data format (NDF) is a format for storing
+bulk data in the form of N-dimensional arrays of numbers. It is
+typically used for storing spectra, images and similar datasets with
+higher dimensionality. The NDF format is based on the Hierarchical
+Data System (HDS) and is extensible; not only does it provide a 
+comprehensive set of standard ancillary items to describe the data,
+it can also be extended indefinitely to handle additional user-defined
+information of any type.
+
+NDF is the data format of choice for software distributed by the
+Starlink Project (Rutherford Appleton Laboratory,
+http://star-www.rl.ac.uk/). It is widely used in the United Kingdom
+astronomical community (for example in the Figaro data reduction
+package).
+
+This module provides a perl interface to the Fortran NDF libraries
+that are supplied with the standard Starlink software distribution.
+
+		Tim Jenness (timj@jach.hawaii.edu)
+			8th June  1997
+
+PDL
+---
+
+The PDL module requires v1.11 of perldl.
+
+Copyright
+---------
+
+This module is copyright (C) 1996 Tim Jenness.  All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+The NDF module itself is copyrighted by the Starlink Project, RAL.
