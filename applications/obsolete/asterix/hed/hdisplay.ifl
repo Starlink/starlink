@@ -2,7 +2,6 @@
     PARAMETER INP                
        TYPE 'UNIV'               
        POSITION 1                
-       KEYWORD 'INP'             
        PPATH 'GLOBAL'       
        PROMPT 'Object name'
        help 'Full path name of object to be displayed'

@@ -1,9 +1,8 @@
- INTERFACE HDELETE
-   parameter INP  
-     type 'UNIV'  
-     position 1   
-     keyword 'INP'
-     prompt 'Object to be deleted'
-     help 'Name of object to be deleted e.g. TOP.NEXT.BOTTOM'
-   endparameter
- endinterface  
+INTERFACE HDELETE
+  PARAMETER INP
+    TYPE 	'UNIV'
+    POSITION 	1
+    PROMPT	'Object to be deleted'
+    HELP	'Name of object to be deleted e.g. top.next.bottom'
+  ENDPARAMETER
+ENDINTERFACE
