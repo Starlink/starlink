@@ -44,24 +44,24 @@ postline='^^^^^^^^^^^^^^^^^^^^'
 
 # Find out what was enabled in dvi2bitmap,
 # by parsing the output with the -V option
-eval `$d2bpath -V | sed -n '/^ENABLE/s/$/=1/p'`
+eval `$d2bpath -V | sed -n '/^ENABLE/s/ \+/=/p'`
 
-if [ -z "$ENABLE_FONT_GEN" ]; then
-    echo "Font generation ... disabled"
-else
+if [ "$ENABLE_FONT_GEN" = yes ]; then
     echo "Font generation ... enabled"
-fi
-if [ -z "$ENABLE_KPATHSEA" ]; then
-    echo "Kpathsea .......... disabled"
 else
+    echo "Font generation ... disabled"
+fi
+if [ "$ENABLE_KPATHSEA" = yes ]; then
     echo "Kpathsea .......... enabled"
+else
+    echo "Kpathsea .......... disabled"
 fi
 echo
 
-if [ -n "$ENABLE_KPATHSEA" ]; then
+if [ "$ENABLE_KPATHSEA" = yes ]; then
 
     echo
-    if [ -n "$ENABLE_FONT_GEN" ]; then
+    if [ "$ENABLE_FONT_GEN" = yes ]; then
 	echo "You have enabled both the kpathsea library and"
 	echo "font generation.  I will attempt to process the test file."
 	echo "This should simply Work, and you don't have to do anything"
@@ -81,7 +81,7 @@ if [ -n "$ENABLE_KPATHSEA" ]; then
 else
 	
     # no kpathsea
-    if [ -n "$ENABLE_FONT_GEN" ]; then
+    if [ "$ENABLE_FONT_GEN" = yes ]; then
 	echo
 	echo "You have enabled font-generation.  Either you have disabled"
 	echo "use of the kpathsea library, or else it is not available."
