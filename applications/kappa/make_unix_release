@@ -82,6 +82,21 @@
 #  Generate the ifl files, and the icl and csh start-up scripts. 
       ifd2star kappa
 
+#  Do any necessary post processing of the generated files to overcome 
+#  deficiencies in ifd2star
+      sed -e "s#picgrid 'picdef mode=array fraction=1.0#picgrid 'picdef array 1.0#g" kappa.csh > temp
+      mv temp kappa.csh
+      sed -e "s#picxy 'picdef mode=xy fraction=1.0#picxy 'picdef xy 1.0#g" kappa.csh > temp
+      mv temp kappa.csh
+
+      sed -e "s#picg(rid) picdef mode=array fraction=1.0#picg(rid) picdef array 1.0#g" kappa.icl > temp
+      mv temp kappa.icl
+      sed -e "s#picx(y) picdef mode=xy fraction=1.0#picx(y) picdef xy 1.0#g" kappa.icl > temp
+      mv temp kappa.icl
+            
+      sed -e 's#prefix=""#prefix=\\"\\"#g' kappa.csh > temp
+      mv temp kappa.csh
+
 #  Generate the IRAF files.
       ifd2iraf kappa
 

@@ -214,3 +214,4 @@
 
      - NDFTRACE: corrected the value written to the WCS output parameter.
 
+     - PICGRID and PICXY now correctly access their positional parameters.
