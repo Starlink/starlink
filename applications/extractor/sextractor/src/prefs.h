@@ -6,15 +6,16 @@
 *	Part of:	SExtractor
 *
 *	Author:		E.BERTIN (IAP)
-*                       P.W.DRAPER (STARLINK, Durham University)
 *
 *	Contents:	Keywords for the configuration file.
 *
-*	Last modify:	14/10/2000
-*                       20/03/00 (PWD): Added RAD_THRESH and RAD_TYPE.
+*	Last modify:	15/12/2002
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
+
+#ifndef _PREFS_H_
+#define _PREFS_H_
 
 /*----------------------------- Internal constants --------------------------*/
 
@@ -23,161 +24,183 @@
 /* NOTES:
 One must have:	MAXLIST >= 1 (preferably >= 16!)
 */
-/*-------------------------------- initialization ---------------------------*/
-int	idummy;
+/*------------------------------- preferences -------------------------------*/
+typedef struct
+  {
+  char		prefs_name[MAXCHAR];			/* prefs filename*/
+  char		*(image_name[2]);			/* image filenames */
+  int		nimage_name;				/* nb of params */
+  char		cat_name[MAXCHAR];			/* catalog filename*/
+/*----- thresholding */
+  double	dthresh[2];				/* detect. threshold */
+  int		ndthresh;				/* (1 or 2 entries) */
+  double	thresh[2];				/* analysis thresh. */
+  int		nthresh;				/* (1 or 2 entries) */
+  enum	{THRESH_RELATIVE, THRESH_ABSOLUTE}
+					thresh_type[2];	/* bkgnd type */
+  int		nthresh_type;				/* nb of params */
+/*----- extraction */
+  int		dimage_flag;				/* detect. image ? */
+  int		ext_minarea;				/* min area in pix. */
+  int		deb_maxarea;				/* max deblend. area */
+  int		filter_flag;				/* smoothing on/off */
+  char		filter_name[MAXCHAR];			/* mask filename */
+  double	filter_thresh[2];			/* Filter thresholds */
+  int		nfilter_thresh;				/* nb of params */
+  int		deblend_nthresh;			/* threshold number */
+  double	deblend_mincont;			/* minimum contrast */
+  double	satur_level;				/* saturation level */
+  enum	{CCD, PHOTO}			detect_type;	/* detection type */
+/*----- Flagging */
+  char		*(fimage_name[MAXFLAG]);		/* flagmap filenames */
+  int		nfimage_name;				/* nb of params */
+  enum	{FLAG_OR, FLAG_AND, FLAG_MIN, FLAG_MAX, FLAG_MOST}
+				flag_type[MAXFLAG];	/* flag combination */
+  int		imaflag_size;				/* requested iso nb1 */
+  int		imanflag_size;				/* requested iso nb2 */
+  int		nimaisoflag;				/* effective iso nb */
+  int		nimaflag;				/* effective ima nb */
+/*----- cleaning */
+  int		clean_flag;				/* allow cleaning ? */
+  double	clean_param;				/* cleaning effic. */
+/*----- Weighting */
+  char		*(wimage_name[2]);       		/* weight filenames */
+  int		nwimage_name;				/* nb of params */
+  weightenum	weight_type[2];				/* weighting scheme */
+  int		nweight_type;				/* nb of params */
+  int		weight_flag;				/* do we weight ? */
+  int		dweight_flag;				/* detection weight? */
+  int		weightgain_flag;			/* weight gain? */
+/*----- photometry */
+  enum	{CAT_NONE, ASCII, ASCII_HEAD, ASCII_SKYCAT,
+	FITS_LDAC, FITS_BINIMHEAD, FITS_NOIMHEAD, FITS_10}
+		cat_type;				/* type of catalog */
+  enum	{PNONE, FIXED, AUTO}		apert_type;	/* type of aperture */
+  double	apert[MAXNAPER];			/* apert size (pix) */
+  int		naper;					/* effective apert. */
+  int		flux_apersize, fluxerr_apersize;	/* requested apert. */
+  int		mag_apersize, magerr_apersize;		/* requested apert. */
+  double	autoparam[2];				/* Kron parameters */
+  int		nautoparam;				/* nb of Kron params */
+  double	autoaper[2];				/* minimum apertures */
+  int		nautoaper;				/* nb of min. aperts */
+  double	mag_zeropoint;				/* magnitude offsets */
+  double	mag_gamma;				/* for emulsions */
+  double	gain;					/* only for CCD */
+/*----- S/G separation */
+  double	pixel_scale;				/* in arcsec */
+  double	seeing_fwhm;				/* in arcsec */
+  char		nnw_name[MAXCHAR];			/* nnw filename */
+/*----- background */
+  enum	{IMAGE, AFILE}			back_origin;	/* origin of bkgnd */
+  char		back_name[MAXCHAR];			/* bkgnd filename */
+  backenum	back_type[2];				/* bkgnd type */
+  int		nback_type;				/* nb of params */
+  double	back_val[2];				/* user-def. bkg */
+  int		nback_val;				/* nb of params */
+  int		backsize[2];				/* bkgnd mesh size */
+  int		nbacksize;				/* nb of params */
+  int		backfsize[2];				/* bkgnd filt. size */
+  int		nbackfsize;				/* nb of params */
+  double	backfthresh;				/* bkgnd fil. thresh */
+  enum	{GLOBAL, LOCAL}			pback_type;	/* phot. bkgnd type */
+  int		pback_size;				/* rect. ann. width */
+/*----- memory */
+  int		clean_stacksize;			/* size of buffer */
+  int		mem_pixstack;				/* pixel stack size */
+  int		mem_bufsize;				/* strip height */
+/*----- catalog output */
+  char		param_name[MAXCHAR];			/* param. filename */
+/*----- miscellaneous */
+  int		pipe_flag;				/* allow piping ? */
+  enum	{QUIET, NORM, WARN, FULL}      	verbose_type;	/* display type */
+/*----- CHECK-images */
+  int		check_flag;				/* CHECK-image flag */
+  checkenum    	check_type[MAXCHECK];		       	/* check-image types */
+  int		ncheck_type;				/* nb of params */
+  char		*(check_name[MAXCHECK]);       		/* check-image names */
+  int		ncheck_name;				/* nb of params */
+  struct structcheck	*(check[MAXCHECK]);		/* check-image ptrs */
+/*----- ASSOCiation */
+  int		assoc_flag;				/* ASSOCiation flag */
+  char		assoc_name[MAXCHAR];			/* ASSOC-list name */
+  int		assoc_param[3];				/* ASSOC param cols */
+  int		nassoc_param;				/* nb of params */
+  int		assoc_data[MAXNASSOC];		       	/* ASSOC data cols */
+  int		nassoc_data;				/* nb of params */
+  enum	{ASSOC_FIRST, ASSOC_NEAREST, ASSOC_MEAN, ASSOC_MAGMEAN,
+	 ASSOC_SUM, ASSOC_MAGSUM, ASSOC_MIN, ASSOC_MAX}
+		assoc_type;				/* type of assoc. */
+  enum	{ASSOCSELEC_ALL, ASSOCSELEC_MATCHED, ASSOCSELEC_NOMATCHED}
+		assocselec_type;		       	/* type of assoc. */
+  double	assoc_radius;				/* ASSOC range */
+  int		assoc_size;				/* nb of parameters */
+  char		retina_name[MAXCHAR];			/* retina filename */
+  int		vignetsize[2];				/* vignet size */
+  int		vigshiftsize[2];			/* shift-vignet size */
+  int		cleanmargin;				/* CLEANing margin */
+  char		som_name[MAXCHAR];			/* SOM filename */
+  int		somfit_flag;				/* ASSOCiation flag */
+  int		somfit_vectorsize;			/* SOMfit vec. size */
+/*----- masking */
+  enum {MASK_NONE, MASK_BLANK, MASK_CORRECT}
+		mask_type;				/* type of masking */
+  int		blank_flag;				/* BLANKing flag */
+  double	weight_thresh[2];      			/* weight threshlds */
+  int		nweight_thresh;				/* nb of params */
+/*----- interpolation */
+  enum	{INTERP_NONE, INTERP_VARONLY, INTERP_ALL}
+		interp_type[2];				/* interpolat. type */
+  int		ninterp_type;				/* nb of params */
+  int		interp_xtimeout[2];   			/* interp. x timeout */
+  int		ninterp_xtimeout;       	        /* nb of params */
+  int		interp_ytimeout[2];   			/* interp. y timeout */
+  int		ninterp_ytimeout;       		/* nb of params */
+/*----- astrometry */
+  int		world_flag;				/* WORLD required */
+/*----- growth curve */
+  int		growth_flag;				/* gr. curve needed */
+  int		flux_growthsize;       			/* number of elem. */
+  int		mag_growthsize;       			/* number of elem. */
+  int		flux_radiussize;       			/* number of elem. */
+  double	growth_step;				/* step size (pix) */
+  double	flux_frac[MAXNAPER];			/* for FLUX_RADIUS */
+  int		nflux_frac;       			/* number of elem. */
+/*----- PSF-fitting */
+  int		psf_flag;				/* PSF-fit needed */
+  char		psf_name[MAXCHAR];			/* PSF filename */
+  int		psf_npsfmax;				/* Max # of PSFs */
+  enum	{PSFDISPLAY_SPLIT, PSFDISPLAY_VECTOR}
+		psfdisplay_type;			/* PSF display type */
+  int		psf_xsize,psf_ysize;			/* nb of params */
+  int		psf_xwsize,psf_ywsize;			/* nb of params */
+  int		psf_alphassize,psf_deltassize;		/* nb of params */
+  int		psf_alpha2000size,psf_delta2000size;	/* nb of params */
+  int		psf_alpha1950size,psf_delta1950size;	/* nb of params */
+  int		psf_fluxsize;				/* nb of params */
+  int		psf_fluxerrsize;			/* nb of params */
+  int		psf_magsize;				/* nb of params */
+  int		psf_magerrsize;				/* nb of params */
+  int		pc_flag;				/* PC-fit needed */
+  int		pc_vectorsize;				/* nb of params */
+/*----- customize */
+  double	mama_corflex;
+  int		fitsunsigned_flag;			/* Force unsign FITS */
+  int		next;			     /* Number of extensions in file */
 
-pkeystruct key[] =
- {
-  {"ANALYSIS_THRESH", P_FLOATLIST, prefs.thresh, 0,0, -BIG, BIG,
-    {""}, 1, 2, &prefs.nthresh},
-  {"ASSOC_DATA", P_INTLIST, prefs.assoc_data, 0, 1000000,0.0,0.0,
-    {""}, 1,MAXLIST, &prefs.nassoc_data},
-  {"ASSOC_NAME", P_STRING, prefs.assoc_name},
-  {"ASSOC_PARAMS", P_INTLIST, prefs.assoc_param, 1, 1000000,0.0,0.0,
-    {""}, 2,3, &prefs.nassoc_param},
-  {"ASSOC_RADIUS", P_FLOAT, &prefs.assoc_radius, 0,0, 1e-10,1e+10},
-  {"ASSOC_TYPE", P_KEY, &prefs.assoc_type, 0,0, 0.0,0.0,
-   {"FIRST", "NEAREST", "MEAN", "MAG_MEAN", "SUM", "MAG_SUM",
-   "MIN", "MAX", ""}},
-  {"ASSOCSELEC_TYPE", P_KEY, &prefs.assocselec_type, 0,0, 0.0,0.0,
-   {"ALL","MATCHED","-MATCHED",""}},
-  {"BACK_FILTERSIZE", P_INTLIST, prefs.backfsize, 1,11, 0.0,0.0,
-    {""}, 1,2, &prefs.nbackfsize},
-  {"BACK_FILTTHRESH", P_FLOAT, &prefs.backfthresh, 0,0, 0.0,BIG},
-  {"BACKPHOTO_THICK", P_INT, &prefs.pback_size, 1, 256},
-  {"BACKPHOTO_TYPE", P_KEY, &prefs.pback_type, 0,0, 0.0,0.0,
-   {"GLOBAL","LOCAL",""}},
-  {"BACK_SIZE", P_INTLIST, prefs.backsize, 1,2000000000, 0.0,0.0,
-    {""}, 1,2, &prefs.nbacksize},
-  {"BACK_TYPE", P_KEYLIST, prefs.back_type, 0,0, 0.0,0.0,
-   {"AUTO","MANUAL",""},
-    1, 2, &prefs.nback_type},
-  {"BACK_VALUE", P_FLOATLIST, prefs.back_val, 0,0, -BIG,BIG,
-   {""}, 1, 2, &prefs.nback_val},
-  {"CATALOG_NAME", P_STRING, prefs.cat_name},
-  {"CATALOG_TYPE", P_KEY, &prefs.cat_type, 0,0, 0.0,0.0,
-   {"NONE", "ASCII","ASCII_HEAD", "ASCII_SKYCAT", "FITS_LDAC",
-	"FITS_BINIMHEAD","FITS_NOIMHEAD","FITS_1.0",""}},
-  {"CHECKIMAGE_NAME", P_STRINGLIST, prefs.check_name, 0,0,0.0,0.0,
-    {""}, 0, MAXCHECK, &prefs.ncheck_name},
-  {"CHECKIMAGE_TYPE", P_KEYLIST, prefs.check_type, 0,0, 0.0,0.0,
-   {"NONE", "IDENTICAL",
-   "BACKGROUND", "BACKGROUND_RMS", "MINIBACKGROUND",
-   "MINIBACK_RMS", "-BACKGROUND",
-   "FILTERED", "OBJECTS", "APERTURES", "SEGMENTATION", "ASSOC",
-   "-OBJECTS", "-PSF_PROTOS", "PSF_PROTOS",
-   "-PC_CONVPROTOS", "PC_CONVPROTOS", "PC_PROTOS", ""},
-   0, 17, &prefs.ncheck_type},
-  {"CLEAN", P_BOOL, &prefs.clean_flag},
-  {"CLEAN_PARAM", P_FLOAT, &prefs.clean_param, 0,0, 0.1,10.0},
-  {"DEBLEND_MINCONT", P_FLOAT, &prefs.deblend_mincont, 0,0, 0.0,1.0},
-  {"DEBLEND_NTHRESH", P_INT, &prefs.deblend_nthresh, 1,64},
-  {"DETECT_MINAREA", P_INT, &prefs.ext_minarea, 1,1000000},
-  {"DETECT_THRESH", P_FLOATLIST, prefs.dthresh, 0,0, -BIG, BIG,
-   {""}, 1, 2, &prefs.ndthresh},
-  {"DETECT_TYPE", P_KEY, &prefs.detect_type, 0,0, 0.0,0.0,
-   {"CCD","PHOTO",""}},
-  {"FILTER", P_BOOL, &prefs.filter_flag},
-  {"FILTER_NAME", P_STRING, prefs.filter_name},
-  {"FILTER_THRESH", P_FLOATLIST, prefs.filter_thresh, 0,0,-BIG,BIG,
-   {""}, 0, 2, &prefs.nfilter_thresh},
-  {"FITS_UNSIGNED", P_BOOL, &prefs.fitsunsigned_flag},
-  {"FLAG_IMAGE", P_STRINGLIST, prefs.fimage_name, 0,0,0.0,0.0,
-    {""}, 0, MAXFLAG, &prefs.nfimage_name},
-  {"FLAG_TYPE",  P_KEYLIST, prefs.flag_type, 0,0, 0.0,0.0,
-   {"OR","AND","MIN", "MAX", "MOST",""}, 0, MAXFLAG, &idummy},
-  {"GAIN", P_FLOAT, &prefs.gain, 0,0, 0.0, 1e+30},
-  {"INTERP_MAXXLAG", P_INTLIST, prefs.interp_xtimeout, 1,1000000, 0.0,0.0,
-   {""}, 1, 2, &prefs.ninterp_xtimeout},
-  {"INTERP_MAXYLAG", P_INTLIST, prefs.interp_ytimeout, 1,1000000, 0.0,0.0,
-   {""}, 1, 2, &prefs.ninterp_ytimeout},
-  {"INTERP_TYPE", P_KEYLIST, prefs.interp_type, 0,0, 0.0,0.0,
-   {"NONE","VAR_ONLY","ALL",""}, 1, 2, &prefs.ninterp_type},
-  {"MAG_GAMMA", P_FLOAT, &prefs.mag_gamma, 0,0, 1e-10,1e+30},
-  {"MAG_ZEROPOINT", P_FLOAT, &prefs.mag_zeropoint, 0,0, -100.0, 100.0},
-  {"MAMA_CORFLEX", P_FLOAT, &prefs.mama_corflex, 0,0, -1.0,1.0},
-  {"MASK_TYPE", P_KEY, &prefs.mask_type, 0,0, 0.0,0.0,
-   {"NONE","BLANK","CORRECT",""}},
-  {"MEMORY_BUFSIZE", P_INT, &prefs.mem_bufsize, 8, 65534},
-  {"MEMORY_OBJSTACK", P_INT, &prefs.clean_stacksize, 16,65536},
-  {"MEMORY_PIXSTACK", P_INT, &prefs.mem_pixstack, 1000, 10000000},
-  {"RAD_THRESH", P_FLOATLIST, prefs.rad, 0,0, -BIG, BIG,
-   {""}, 0, 3, &prefs.nrad, 1},
-  {"RAD_TYPE", P_KEY, &prefs.rad_type, 0, 0, 0.0, 0.0,
-   {"SB","INT",""}, 0, 1, &prefs.nrad_type, 1},
-  {"PARAMETERS_NAME", P_STRING, prefs.param_name},
-  {"PHOT_APERTURES", P_FLOATLIST, prefs.apert, 0,0, 0.0,2*MAXPICSIZE,
-   {""}, 1, MAXNAPER, &prefs.naper},
-  {"PHOT_AUTOPARAMS", P_FLOATLIST, prefs.autoparam, 0,0, 0.0,10.0,
-   {""}, 2,2, &prefs.nautoparam},
-  {"PHOT_AUTOAPERS", P_FLOATLIST, prefs.autoaper, 0,0, 0.0,1e6,
-   {""}, 2,2, &prefs.nautoaper},
-  {"PHOT_FLUXFRAC", P_FLOATLIST, prefs.flux_frac, 0,0, 1e-6, 1.0,
-   {""}, 1, MAXNAPER, &prefs.nflux_frac},
-  {"PIXEL_SCALE", P_FLOAT, &prefs.pixel_scale, 0,0, 0.0, 1e+10},
-  {"PSF_NAME", P_STRING, prefs.psf_name},
-  {"PSF_NMAX", P_INT, &prefs.psf_npsfmax, 1, PSF_NPSFMAX},
-  {"PSFDISPLAY_TYPE", P_KEY, &prefs.psfdisplay_type, 0,0, 0.0,0.0,
-   {"SPLIT","VECTOR",""}},
-  {"SATUR_LEVEL", P_FLOAT, &prefs.satur_level, 0,0, -1e+30, 1e+30},
-  {"SEEING_FWHM", P_FLOAT, &prefs.seeing_fwhm, 0,0, 1e-10, 1e+10},
-  {"SOM_NAME", P_STRING, prefs.som_name},
-  {"STARNNW_NAME", P_STRING, prefs.nnw_name},
-  {"THRESH_TYPE", P_KEYLIST, prefs.thresh_type, 0,0, 0.0,0.0,
-   {"RELATIVE","ABSOLUTE"},
-    1, 2, &prefs.nthresh_type},
-  {"VERBOSE_TYPE", P_KEY, &prefs.verbose_type, 0,0, 0.0,0.0,
-   {"QUIET","NORMAL", "EXTRA_WARNINGS", "FULL",""}},
-  {"WEIGHT_GAIN", P_BOOL, &prefs.weightgain_flag},
-  {"WEIGHT_IMAGE", P_STRINGLIST, prefs.wimage_name, 0,0,0.0,0.0,
-    {""}, 0, MAXIMAGE, &prefs.nwimage_name},
-  {"WEIGHT_THRESH", P_FLOATLIST, prefs.weight_thresh, 0,0, 0.0, BIG,
-   {""}, 0, 2, &prefs.nweight_thresh},
-  {"WEIGHT_TYPE", P_KEYLIST, prefs.weight_type, 0,0, 0.0,0.0,
-   {"NONE","BACKGROUND", "MAP_RMS", "MAP_VAR","MAP_WEIGHT", ""},
-   0, MAXIMAGE, &prefs.nweight_type},
-  {""}
- };
+  enum	{RAD_SB, RAD_INT}
+		rad_type;				/* PWD: radii units */
+  int           nrad_type;
+  double        rad[3];                                 /* PWD: radii specs */
+  int           nrad;                                   /* PWD: nb of params */
+  }	prefstruct;
 
-char		keylist[sizeof(key)/sizeof(pkeystruct)][16];
+  prefstruct		prefs;
 
-char *default_prefs[] =
- {
-  "ASSOC_DATA   	2,3,4",
-  "ASSOC_NAME		sky.list",
-  "ASSOC_PARAMS 	2,3,4",
-  "ASSOC_RADIUS		2.0",
-  "ASSOC_TYPE		MAG_SUM",
-  "ASSOCSELEC_TYPE	MATCHED",
-  "BACK_FILTTHRESH	0.0",
-  "BACK_TYPE		AUTO",
-  "BACK_VALUE		0.0",
-  "BACKPHOTO_THICK	24",
-  "BACKPHOTO_TYPE	GLOBAL",
-  "CHECKIMAGE_NAME	check.fits",
-  "CHECKIMAGE_TYPE	NONE",
-  "DETECT_TYPE		CCD",
-  "FILTER_THRESH	",
-  "FITS_UNSIGNED	N",
-  "FLAG_IMAGE		flag.fits",
-  "FLAG_TYPE		OR",
-  "INTERP_MAXXLAG	16",
-  "INTERP_MAXYLAG	16",
-  "INTERP_TYPE		ALL",
-  "MAMA_CORFLEX		3.3e-5",
-  "MASK_TYPE		CORRECT",
-  "PHOT_AUTOAPERS	0.0,0.0",
-  "PHOT_FLUXFRAC	0.5",
-  "PSF_NAME		default.psf",
-  "PSF_NMAX		11",
-  "PSFDISPLAY_TYPE	SPLIT",
-  "SOM_NAME		default.som",
-  "THRESH_TYPE		RELATIVE",
-  "VERBOSE_TYPE		NORMAL",
-  "WEIGHT_GAIN		Y",
-  "WEIGHT_IMAGE		weight.fits",
-  "WEIGHT_TYPE      	NONE",
-  "WEIGHT_THRESH	",
-  ""
- };
+/*-------------------------------- protos -----------------------------------*/
+extern int	cistrcmp(char *cs, char *ct, int mode);
 
+extern void	dumpprefs(void),
+		readprefs(char *filename,char **argkey,char **argval,int narg),
+		useprefs(void);
+#endif
