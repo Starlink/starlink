@@ -85,22 +85,10 @@ gurec.f guwk.f gwitm.f
 
 
 # These are the routines that were in the machines directory but
-# require CPP processing and configure checks
+# require FPP/CPP processing and configure checks
 
-FPP_ROUTINES = gkdate.fpp gkdfop.fpp gkiobi.fpp gkiobo.fpp \
-	gkioci.fpp gkioco.fpp gkiofo.fpp gklor.fpp gkland.fpp \
-	gktime.fpp getfd.fpp
-
-gkdate.f: gkdate.fpp
-gkdfop.f: gkdfop.fpp 
-gkiobi.f: gkiobi.fpp 
-gkiobo.f: gkiobo.fpp
-gkioci.f: gkioci.fpp
-gkioco.f: gkioco.fpp
-gkiofo.f: gkiofo.fpp 
-gklor.f: gklor.fpp 
-gkland.f: gkland.fpp
-gktime.f: gktime.fpp 
-getfd.f: getfd.fpp
+FPP_ROUTINES = gkdate.F gkdfop.F gkiobi.F gkiobo.F \
+	gkioci.F gkioco.F gkiofo.F gklor.F gkland.F \
+	gktime.F getfd.F
 
 C_ROUTINES = gktset.c gkgtsp.c gkiosb.c
