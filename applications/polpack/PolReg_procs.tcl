@@ -2378,7 +2378,6 @@ proc DrawGwm {} {
 # Combine the transformed image with the required section identifier.
    append data $SECTION_REQ
 
-
 # Get a string describing the pixel coordinates to put at at the centre
 # of the display. This is just the centre of the supplied section. Report
 # an error if the centre cannot be found.
@@ -9599,14 +9598,14 @@ proc ScreenSec {section} {
 # If the width is smaller than the height, adjust the x bounds to make
 # the section square.
       if { $width < $height } {
-         set xl [expr floor( $xc - 0.5 * $height ) ]
-         set xu [expr $xl + $height - 1 ]
+         set xl [expr int( floor( $xc - 0.5 * $height ) ) ]
+         set xu [expr int( floor( $xl + $height - 1 ) ) ]
 
 # Otherwise, if the width is greater than the height, adjust the y bounds 
 # to make the section square.
       } elseif { $width > $height } {
-         set yl [expr floor( $yc - 0.5 * $width ) ]
-         set yu [expr $yl + $width - 1 ]
+         set yl [expr int( floor( $yc - 0.5 * $width ) ) ]
+         set yu [expr itn( floor( $yl + $width - 1 ) ) ]
       }
 
 # Construct a new section string.
