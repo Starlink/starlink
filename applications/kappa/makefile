@@ -517,7 +517,7 @@ ira1_lamb.f ira1_orth.f ira1_prec.f ira_annul.f ira_close.f ira_convt.f \
 ira_creat.f ira_ctod.f ira_ctod1.f ira_dtoc.f ira_dtoc1.f ira_exprt.f \
 ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
-ira_write.f
+ira_write.f ira_read.f
 
 IRM_F_ROUTINES = \
 irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
@@ -2738,6 +2738,11 @@ ira_trans.o:	   SAE_PAR
 ira_trans.o:	   DAT_PAR
 ira_trans.o:	   IRA_PAR
 ira_trans.o:	   IRA_COM
+ira_read.o:	   SAE_PAR
+ira_read.o:	   DAT_PAR
+ira_read.o:	   IRA_PAR
+ira_read.o:	   IRA_ERR
+ira_read.o:	   IRA_COM
 ira_write.o:	   SAE_PAR
 ira_write.o:	   DAT_PAR
 ira_write.o:	   IRA_PAR
