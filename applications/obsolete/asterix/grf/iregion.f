@@ -712,13 +712,8 @@
 *    Description :
 *     Defines the rib region on a PSPC image in an ARD spatial file.
 *    Method :
-*     Works in either AUTO or non-AUTO mode.
-*     non-AUTO:
 *       The user is asked to define two opposite points on the image
 *       where the inner circle and ribs intersect.
-*     AUTO:
-*       Uses the roll angle contained in an attitude file, supplied
-*       by the user, to calculate the position of the spokes.
 *    Deficiencies :
 *    Bugs :
 *    Authors :
@@ -737,6 +732,7 @@
 *                 roll angle on. 0 roll is now valid.
 *      20-Jun-94: (v1.7-3)workaround for bug in CHR_RTOC (uses DTOC)
 *      27-Jan-95: incorporated into IREGION (RJV)
+*      10-Jun-96: auto mode removed (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -745,7 +741,6 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Structure definitions :
-      INCLUDE 'INC_XRTHEAD'
 *    Import :
       CHARACTER*(*) MODE
       LOGICAL EXCLUDE
@@ -757,13 +752,7 @@
       DOUBLE PRECISION PI
         PARAMETER (PI=3.1415926535)
 *    Local variables :
-      RECORD /XRT_HEAD/ HEAD          ! Header structure for subsequent use
       CHARACTER CH
-      CHARACTER*132 ATTFIL               ! Attitude file
-      CHARACTER*132 ROOTNAME            ! rootname of datafiles
-      CHARACTER*20 EXT                  ! Extension name
-      CHARACTER*20 ROLL                 ! column name
-      CHARACTER*20 TIME                 ! column name
       CHARACTER*80 TEXT
       CHARACTER*(DAT__SZLOC) ALOC       ! Locator to attitude file
       REAL X1,Y1,X2,Y2,XC,YC
@@ -786,111 +775,40 @@
       INTEGER TPNTR                     ! pointer to the time array
       INTEGER NVALS                     ! number of time/roll values
       INTEGER LP
-      LOGICAL AUTO
 *-
-*  see if user wants to define the pixels interactively or automatically
-      CALL USI_GET0L('AUTO', AUTO, STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 999
-
-*  automatic mode - need to use the cal. files
-      IF (AUTO) THEN
-
-*  find the name for the attitude file
-        CALL USI_GET0C('ROOTNAME', ROOTNAME, STATUS)
-        IF (STATUS .NE. SAI__OK) GOTO 999
-
-*  open the header file to get the origins of the data
-        CALL RAT_GETXRTHEAD(ROOTNAME,HEAD,STATUS)
-
-*  build the attitude file name
-        CALL RAT_HDLOOKUP(HEAD,'ASPDATA','EXTNAME',EXT,STATUS)
-        ATTFIL = ROOTNAME(1:CHR_LEN(ROOTNAME))//EXT
-
-*  set the default filename
-        CALL USI_DEF0C('ATTFIL', ATTFIL, STATUS)
-        CALL USI_GET0C('ATTFIL', ATTFIL, STATUS)
-        IF (STATUS .NE. SAI__OK) GOTO 999
-
-
-        CALL HDS_OPEN(ATTFIL, 'READ', ALOC, STATUS)
-
-        IF (STATUS .NE. SAI__OK) THEN
-          CALL MSG_PRNT('AST_ERR: error opening attitude file')
-          CALL MSG_PRNT(' - try running again in non-auto mode')
-          GOTO 999
-        ENDIF
-*
-*  get the mean roll angle and times from the system
-        CALL RAT_HDLOOKUP(HEAD,'ASPDATA','ROLL',ROLL,STATUS)
-        CALL CMP_MAPV(ALOC,ROLL,'_REAL','READ',RPNTR,NVALS,STATUS)
-        IF (STATUS .NE. SAI__OK) THEN
-          CALL MSG_PRNT('AST_ERR: error accessing ROLL angle data')
-          CALL MSG_PRNT(' - try running again in non-auto mode')
-          GOTO 999
-        ENDIF
-        CALL RAT_HDLOOKUP(HEAD,'ASPDATA','TIME',TIME,STATUS)
-        CALL CMP_MAPV(ALOC,TIME,'_DOUBLE','READ',TPNTR,NVALS,STATUS)
-        IF (STATUS .NE. SAI__OK) THEN
-          CALL MSG_SETC('ARR',TIME)
-          CALL MSG_PRNT('** Error accessing TIME array ^ARR **')
-          CALL MSG_PRNT(' - try running again in non-auto mode')
-          GOTO 999
-        ENDIF
-
-*  find the mean roll angle - file is often corrupted so need to
-*  ignore zeroes in the file (this could of course bias the result if
-*  the roll angle is actually close to zero).
-        CALL IREGION_XSPOKES_MEANROLL(HEAD, NVALS, %val(TPNTR),
-     :                                %val(RPNTR),RMEAN, STATUS)
-
-        IF (STATUS .NE. SAI__OK) GOTO 999
-
-        THETA = (RMEAN * PI) / 180.0
-        CALL MSG_SETR('ANG', RMEAN)
-        CALL MSG_PRNT('Rotation angle = ^ANG degrees')
-
-
-*  set the various standard values  -  radius of the circle seems to be
-*  about 21 arcmins.
-        RAD = 21.0 / 60.0  ! degrees
-        XC = 0.0
-        YC = 0.0
-
-      ELSE 		! non-auto mode
 
 *  get first intersection
-        CALL MSG_BLNK()
-        CALL MSG_PRNT('Select an intersection of a '/
+      CALL MSG_BLNK()
+      CALL MSG_PRNT('Select an intersection of a '/
      &                 /'spoke and the central ring...')
-        CALL PGCURSE(X1,Y1,CH)
-        CALL PGPOINT(1,X1,Y1,2)
+      CALL PGCURSE(X1,Y1,CH)
+      CALL PGPOINT(1,X1,Y1,2)
 
 *  get second intersection
-        CALL MSG_PRNT(' ')
-        CALL MSG_PRNT('Select the intersection of the opposite '/
+      CALL MSG_PRNT(' ')
+      CALL MSG_PRNT('Select the intersection of the opposite '/
      &                 /'spoke and the central ring...')
-        CALL PGCURSE(X2,Y2,CH)
-        CALL PGPOINT(1,X2,Y2,2)
+      CALL PGCURSE(X2,Y2,CH)
+      CALL PGPOINT(1,X2,Y2,2)
 
 *  calculate radius
-        RAD = SQRT( (X2 - X1)**2 + (Y2 - Y1)**2 ) / 2
+      RAD = SQRT( (X2 - X1)**2 + (Y2 - Y1)**2 ) / 2
 
 *  calculate centre of ring
-        XC = (X1 + X2) / 2.0
-        YC = (Y1 + Y2) / 2.0
+      XC = (X1 + X2) / 2.0
+      YC = (Y1 + Y2) / 2.0
 
 *  calculate the angle to south of the first spoke  (Terrestial west
 *  is +90 degs). Find the angle from the centre with the largest
 *  Y value
-        IF (Y1 .GT. Y2) THEN
-          XANG = X1
-        ELSE
-          XANG = X2
-        ENDIF
-
-        THETA = ASIN((XANG-XC)/RAD)
-
+      IF (Y1 .GT. Y2) THEN
+        XANG = X1
+      ELSE
+        XANG = X2
       ENDIF
+
+      THETA = ASIN((XANG-XC)/RAD)
+
 
 *  Allow the user to add a constant onto the width value
       CALL USI_GET0R('EXTRA', EXTRA, STATUS)
@@ -1023,8 +941,6 @@
         CALL IMG_SETINV(STATUS)
       ENDIF
 
-*  Close attitude file
-      IF (AUTO) CALL HDS_CLOSE(ALOC, STATUS)
 
 999   CONTINUE
 
@@ -1033,90 +949,6 @@
       ENDIF
 
       END
-
-*+ IREGION_XSPOKES_MEANROLL - calculates the mean roll angle
-      SUBROUTINE IREGION_XSPOKES_MEANROLL(HEAD,NVALS,TIME,ROLL,
-     :                                          MEANROLL,STATUS)
-*    Description :
-*    Method :
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-*    Structure definitions:
-      INCLUDE 'INC_XRTHEAD'
-*    Import :
-      RECORD /XRT_HEAD/ HEAD
-      INTEGER NVALS
-      DOUBLE PRECISION TIME(NVALS)
-      REAL ROLL(NVALS)
-*    Import-Export :
-*    Export :
-      REAL MEANROLL                ! Degrees
-*    Status :
-      INTEGER STATUS
-*    Local constants :
-      INTEGER MXTIME
-      PARAMETER (MXTIME = 500)
-*    Local variables :
-      CHARACTER*132 TIMSTRING
-      CHARACTER*20 C1,C2
-      INTEGER LP,CNT,TP,NTIME,K1,K2
-      REAL RTOT,TOFFSET
-      REAL TMIN(MXTIME),TMAX(MXTIME)
-      DOUBLE PRECISION START,STOP
-*    Local data :
-*-
-      RTOT = 0.0
-      CNT = 0
-*
-*     Time range may be input as either a string of start and stop
-*     times or a text file of times. The times may be expressed as offsets
-*     from time zero or as MJDs in which case they are prefixed wih an 'M'.
-      START = HEAD.TSTART(1)
-      STOP = HEAD.TEND(HEAD.NTRANGE)
-      CALL CHR_DTOC(START, C1, K1)
-      CALL CHR_DTOC(STOP, C2, K2)
-      TIMSTRING = C1(1:K1) // ':' // C2(1:K2)
-      CALL USI_DEF0C('TIMRANGE', TIMSTRING, STATUS)
-      CALL USI_GET0C('TIMRANGE',TIMSTRING,STATUS)
-*
-*     Decode the timestring into a sequence of start and stop times
-      CALL UTIL_TDECODE(TIMSTRING, HEAD.BASE_MJD, MXTIME,
-     &                      NTIME, TMIN, TMAX, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-
-      DO LP = 1, NVALS
-         DO TP = 1, NTIME
-            TOFFSET = TIME(LP) - HEAD.BASE_SCTIME
-            IF ((TOFFSET.GT.TMIN(TP)).AND.(TOFFSET.LT.TMAX(TP))) THEN
-               RTOT = RTOT + ROLL(LP)
-               CNT = CNT + 1
-            ENDIF
-         ENDDO
-      ENDDO
-*
-      IF (CNT .GE. 1) THEN
-         MEANROLL = RTOT / CNT
-*  convert mean roll to degrees and to the convention of west=+90.
-         IF (HEAD.ORIGIN.EQ.'RDF')
-     &      MEANROLL = (MEANROLL + 180.0) * 7200.0     ! degrees to Arcmin/2
-         MEANROLL = 270. - (MEANROLL / 7200.0)         ! Arcmin/2 to degrees
-         IF (MEANROLL.LT.0.0) MEANROLL = MEANROLL + 360.0
-         IF (MEANROLL.GT.360.0) MEANROLL = MEANROLL - 360.0
-      ELSE
-         CALL MSG_PRNT('Warning: No valid roll angles, using default')
-         MEANROLL = 0.0
-      ENDIF
-
-999   CONTINUE
-
-      END
-
-
-
 
 
 
