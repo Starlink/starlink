@@ -275,6 +275,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     PMA: Peter Allan (University of Manchester)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -369,6 +370,9 @@
 *     1996 June 11 (MJC):
 *        Added REWIND parameter to control initial rewinding.  Linux
 *        usage enabled.
+*     18-FEB-1998 (DSB):
+*        Call to FTS1_GKEYL had arguments THERE and NOCCUR swapped, causing 
+*        a segmentation violation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -990,7 +994,7 @@
 
                   IF ( SUBFIL .EQ. 1 ) THEN
                      CALL FTS1_GKEYL( WHDIM( 1 ), %VAL( HPNTR( 1 ) ),
-     :                                HSTART( 1 ), 'EXTEND', THERE, 1,
+     :                                HSTART( 1 ), 'EXTEND', 1, THERE,
      :                                GEXTND, COMENT, NKC, STATUS,
      :                                %VAL( 1 ) )
                      GEXTND = GEXTND .AND. THERE
