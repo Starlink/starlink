@@ -45,6 +45,8 @@ $!
 $! History:
 $!    1992 September 7 (MJC):
 $!       Original version based on MAKE_KAPPA.
+$!    1992 September 29 (MJC):
+$!       Added IRAF libraries and used released FIO.
 $!    {enter_further_changes_here}
 $!
 $!-
@@ -56,13 +58,16 @@ $ MLINK CONVERT.OBJ,-
 CONVERT_DIR:CONVERT/LIB,-
 CONVERT_DIR:CONLIB/LIB,-
 INTERIM/LIB/INCLUDE=(STL_DATA),-
-DISK$RLSVS2B:[PMA.SOFT_DEV.FIO.RELEASE]FIO/LIB,-
 PRM_LINK/OPT,-
 FIGARO_LIBS:DTA/LIB,-
 DYN/LIB,-
 CNV/LIB,-
 KAPPA_DIR:AIF/LIB,-
 CONVERT_DIR:PART/LIB,-
+CONVERT_DIR:LIBIMFORT/LIB,-
+CONVERT_DIR:LIBSYS/LIB,-
+CONVERT_DIR:LIBVOPS/LIB,-
+CONVERT_DIR:LIBOS/LIB,- 
 SYS$LIBRARY:VAXCRTL/L 'P1'
 $!
 $!  Purge old versions of the executable file.
