@@ -1,10 +1,10 @@
 *+  SCULIB_SET_QUAL - set quality bits in a subset of a quality array
       SUBROUTINE SCULIB_SET_QUAL (USE_SECT, QUALITY, N_BOLS, N_POS, 
-     :     N_BEAM, BOL_S, POS_S, BIT_POS, BIT_VALUE, STATUS)
+     :     N_BEAM, BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
 *    Description :
 *    Invocation :
 *     CALL SCULIB_SET_QUAL (QUALITY, N_BOLS, N_POS, N_BEAM, 
-*    :  BOL_S, POS_S, BIT_POS, BIT_VALUE, STATUS)
+*    :  BOL_S, POS_S, BIT_POS, BIT_SWITCH, STATUS)
 *    Parameters :
 *     USE_SECT                = LOGICAL (Given)
 *           am I changing SECTION or not SECTION
@@ -25,8 +25,9 @@
 *           changed
 *     BIT_POS                 = INTEGER (Given)
 *           position of bit ot be set (0 - 7)
-*     BIT_VALUE               = INTEGER (Given)
-*           value to which bit is to be set (0 if zero, 1 otherwise)
+*     BIT_SWITCH               = LOGICAL (Given)
+*           If .TRUE. we set the bit using SCULIB_BITON. If .FALSE.
+*           we unset the bit with SCULIB_BITOFF
 *     STATUS                  = INTEGER (Given and returned)
 *           global status
 *    Method :
@@ -47,7 +48,7 @@
       INTEGER BOL_S (N_BOLS)
       INTEGER POS_S (N_POS)
       INTEGER BIT_POS
-      INTEGER BIT_VALUE
+      LOGICAL BIT_SWITCH
       LOGICAL USE_SECT
 *    Import-Export :
       BYTE QUALITY (N_BOLS, N_POS, N_BEAM)
@@ -73,7 +74,7 @@
 
       IF (USE_SECT) THEN
 
-         IF (BIT_VALUE .NE. 0) THEN
+         IF (BIT_SWITCH) THEN
 
             DO POS = 1, N_POS
                IF (POS_S(POS) .EQ. 1) THEN
@@ -117,7 +118,7 @@
       ELSE
 *     This is the inverse section
 
-         IF (BIT_VALUE .NE. 0) THEN
+         IF (BIT_SWITCH) THEN
 *     Setting the bit
             DO POS = 1, N_POS
 
