@@ -126,7 +126,6 @@
       CHARACTER FLAT * ( FIO__SZFNM ) ! Name of master flat file.
       CHARACTER KLOCS( MAXKEY ) * ( DAT__SZLOC ) ! Locators for keyed values
       CHARACTER KSTRS( MAXKEY ) * ( 80 ) ! String representation of keyed params
-      CHARACTER LOGNAM * ( FIO__SZFNM ) ! Name of logfile
       CHARACTER MSKNAM * ( FIO__SZFNM ) ! Name of mask file.
       CHARACTER ULOC * ( DAT__SZLOC ) ! Locator for unkeyed parameter value
       CHARACTER USTR * ( 80 )    ! String representation of unkeyed parameter
@@ -630,6 +629,7 @@
          GOTONE = .TRUE.
          CALL DAT_GET0C( ULOC, LOGTO, STATUS )
          CALL DAT_ANNUL( ULOC, STATUS )
+         CALL CHR_UCASE( LOGTO )
          IF ( LOGTO .EQ. 'BOTH' ) THEN
             CALL CCD1_MSG( ' ', 
      :'  Log information will be written to log file and terminal',
@@ -653,7 +653,7 @@
          GOTLGN = QUNKEY
          IF ( GOTLGN ) THEN
             GOTONE = .TRUE.
-            CALL DAT_GET0C( ULOC, LOGNAM, STATUS )
+            CALL DAT_GET0C( ULOC, USTR, STATUS )
             CALL DAT_ANNUL( ULOC, STATUS )
             CALL CCD1_KPOP( 'Name of log file',
      :                      QUNKEY, USTR, NK, KEYS, KSTRS, STATUS )
