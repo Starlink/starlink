@@ -19,6 +19,12 @@ dnl    Include defaults for Starlink configurations
 dnl    Need to find out whether we need this
 STAR_DEFAULTS(per-package-dirs)
 
+dnl    Disable shared libraries: this prevents a couple of the figaro
+dnl    libraries being installed as shared libraries (since we don't
+dnl    really want them to be installed at all it seems a good idea
+dnl    to prevent dependencies from lingering after the build).
+AC_DISABLE_SHARED
+
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_FPP
