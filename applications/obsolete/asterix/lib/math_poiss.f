@@ -9,6 +9,7 @@
 *      9 Mar 90:  Original (BHVAD::SRD)
 *     25 Oct 93 : Don't make assumption that LAMB>15 is Gaussian. Use new NAG
 *                 routine in release 15. (DJA)
+*     11 Jun 97 : Convert to PDA (RB)
 *
 *    Type definitions :
 *
@@ -20,12 +21,12 @@
 *
 *    Functions :
 *
-      REAL MATH_RND
-c     INTEGER G05DRF
+      EXTERNAL PDA_RNPOI
+      INTEGER PDA_RNPOI
 *
 *    Local variables :
 *
-      INTEGER IFAIL
+      INTEGER SEED, TICKS, STATUS
       LOGICAL INITIALISE
 *
 *    Local Data :
@@ -35,15 +36,15 @@ c     INTEGER G05DRF
 
 *    Initialise random number generator
       IF ( INITIALISE ) THEN
-c       CALL G05CCF(NINT(MATH_RND()))
+        STATUS = 0
+        CALL PSX_TIME( TICKS, STATUS )
+        SEED = ( TICKS / 4 ) * 4 + 1
+        CALL PDA_RNSED( SEED )
         INITIALISE=.FALSE.
       END IF
 
 *    Poisson distribution
-      IFAIL = 0
-      MATH_POISS = INT( LAMB )
-c     MATH_POISS = G05DRF( DBLE(LAMB), IFAIL )
-      CALL MSG_PRNT( '*** WARNING: no PDA replacement for G05DRF' )
+      MATH_POISS = PDA_RNPOI( LAMB )
 
       END
 
