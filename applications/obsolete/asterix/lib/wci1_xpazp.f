@@ -151,7 +151,7 @@
 
 *    Convert linear x,y to native sphericals
         UNPROJ(1) = ATAN2( PROJ(1), - PROJ(2) )
-        UNPROJ(2) = ATAN2( 1.0, RHO ) -
+        UNPROJ(2) = ATAN2( 1D0, RHO ) -
      :                    ASIN( RHO*MU / SQRT(RHO**2+1.0) )
 
       END IF
