@@ -24,7 +24,7 @@
       commercial products being freely available on all Starlink
       machines. </p></abstract>
   <dependencies >
-    <build>parsecon</build><build>dtask</build><build>pcs</build><build>chr</build><build>fio</build><build>mers</build><build>par</build><build>psx</build><build>sae</build><build>hds</build><build>hlp</build><build option='use'>dtask</build><sourceset>star2html</sourceset>
+    <build>parsecon</build><build>dtask</build><build>chr</build><build>fio</build><build>mers</build><build>par</build><build>psx</build><build>sae</build><build>hds</build><build>hlp</build><build>task</build><build>dtask</build><build option='use'>dtask</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
