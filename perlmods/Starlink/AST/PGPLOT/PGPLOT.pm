@@ -6,6 +6,7 @@ use constant R2D     => 57.29578;        # Radians to degrees factor
 use constant FLT_MAX => 3.40282347e+38;  # Maximum float on ix86 platform
 
 use PGPLOT;
+use Starlink::AST;
 use Carp;
 
 '$Revision$ ' =~ /.*:\s(.*)\s\$/ && ($VERSION = $1);
@@ -25,7 +26,9 @@ are shown below,
    $status = _GLine( \@x, \@y );
    $status = _GMark( \@x, \@y, $type );
    $status = _GText( $text, $x, $y, $just, $upx, $upy );
-   $status = _GTxtExt( $text, $x, $y, $just, $upx, $upy, $xb, $yb );
+   ( $status, $xb, $yb ) = _GTxtExt( $text, $x, $y, $just, $upx, $upy );
+   ( $status, $chv, $chh ) = _GQch();
+   ( $status, $old_value ) = _GAttr( $attr, $value, $prim );
 
 The following helper methods are also provided,
 
@@ -208,7 +211,7 @@ sub _GText {
          # Find the height of the text above the base-line. Note, the PGPLOT  
          # manual is not clear about the order of the corners returned by
          # pgqtxt, so we have to find the largest distance between the corners 
-         # in the direction of the supplied up-vector. */
+         # in the direction of the supplied up-vector. 
          my $hu = 0.0;
          for my $i ( 0 ... 4 ) {
             my $test = $upx*( $xbox[$i] - $x ) + $upy*( $ybox[$i] - $y );
@@ -216,7 +219,7 @@ sub _GText {
          }
 
          # Adjust the vertical position of the reference point, since PGPLOT
-         # requires it to be at the bottom of the text. */
+         # requires it to be at the bottom of the text. 
          if( $just1 eq 'T' ) { 
             $x -= $upx*$hu;
             $y -= $upy*$hu;
@@ -277,7 +280,7 @@ This function returns the corners of a box which would enclose the
 supplied character string if it were displayed using astGText. The 
 returned box INCLUDES any leading or trailing spaces.
 
-   my $status = _GTxtExt( $text, $x, $y, $just, $upx, $upy, $xb, $yb );
+   my ( $status, $xb, $yb ) = _GTxtExt( $text, $x, $y, $just, $upx, $upy);
 
 where $x is the reference x coordinate, $y is the reference y coordinate, 
 and where $justification is a character string which specifies the
@@ -317,12 +320,13 @@ Notes:
 =cut
 
 sub _GTxtEx {
-   my ( $text, $x, $y, $just, $upx, $upy, $xb, $yb ) = @_;
+   my ( $text, $x, $y, $just, $upx, $upy ) = @_;
    
    # initalise @$xb and @$yb
+   my ( @xb, @yb );
    foreach my $i ( 0 ... 4 ) {
-      $$xb[$i] = 0.0;
-      $$yb[$i] = 0.0;
+      $xb[$i] = 0.0;
+      $yb[$i] = 0.0;
    }   
    
    # check we have a string to print
@@ -398,7 +402,7 @@ sub _GTxtEx {
       # point is on the text base-line which is not usually at the bottom of
       # the bounding box (some letters - like "y" - extend below the base-line).
       # Find the distance from the base-line to the top (hu) and bottom (hd)
-      # of the bounding box. */
+      # of the bounding box. 
       my $hu = -(FLT_MAX);
       my $hd = FLT_MAX;
       foreach my $i ( 0 ... 4 ) {
@@ -476,25 +480,25 @@ sub _GTxtEx {
       my $udy = 0.5*$uyu;
 
       # Bottom left corner... 
-      $$xb[ 0 ] = $xc - $vdx - $udx + $uxd;
-      $$yb[ 0 ] = $yc - $vdy - $udy + $uyd;
+      $xb[ 0 ] = $xc - $vdx - $udx + $uxd;
+      $yb[ 0 ] = $yc - $vdy - $udy + $uyd;
 
       # Bottom right corner...
-      $$xb[ 1 ] = $xc + $vdx - $udx + $uxd;
-      $$yb[ 1 ] = $yc + $vdy - $udy + $uyd;
+      $xb[ 1 ] = $xc + $vdx - $udx + $uxd;
+      $yb[ 1 ] = $yc + $vdy - $udy + $uyd;
 
       # Top right corner... 
-      $$xb[ 2 ] = $xc + $vdx + $udx;
-      $$yb[ 2 ] = $yc + $vdy + $udy;
+      $xb[ 2 ] = $xc + $vdx + $udx;
+      $yb[ 2 ] = $yc + $vdy + $udy;
 
       # Top left corner... 
-      $$xb[ 3 ] = $xc - $vdx + $udx;
-      $$yb[ 3 ] = $yc - $vdy + $udy;
+      $xb[ 3 ] = $xc - $vdx + $udx;
+      $yb[ 3 ] = $yc - $vdy + $udy;
 
    }
    
    # Return
-   return 1;     
+   return (1, \@xb, \@yb );     
       
 }          
 
@@ -514,7 +518,45 @@ drawn with a horizontal baseline. This will be an increment in the Y axis.
 =cut
 
 sub _GQch {
-   croak( "_GQch: Not yet implemented.");
+   
+   # return variables
+   my ( $status, $chv, $chh );
+   
+   # local variables
+   my ( $vx1, $vx2, $vy1, $vy2, $wx1, $wx2, $wy1, $wy2);
+
+   # Get the character height in normalised device coordinates 
+   pgqcs( 0, $chv, $chh );
+
+   # Get the bounds of the PGPLOT viewport in normalised device
+   # coordinates. 
+   pgqvp( 0, $vx1, $vx2, $vy1, $vy2 );
+
+   # Get the bounds of the PGPLOT window in world coordinates. 
+   pgqwin( $wx1, $wx2, $wy1, $wy2 );
+
+   # Convert the text height from normalised device coordinates into world 
+   # coordinates for vertical text. Print an error message if the viewport 
+   # has zero size. 
+   if( $vx1 != $vx2 ){
+      $chv *= ( $wx2 - $wx1 )/( $vx2 - $vx1 );
+   } else {
+      print "_GQch: The graphics viewport has zero size in the X direction.";
+      return 0;
+   }   
+
+   # Convert the text height from normalised device coordinates into world 
+   # coordinates for horizontal text. Print an error message if the viewport 
+   # has zero size. 
+   if( $vy1 != $vy2 ){
+      $chh *= ( $wy2 - $wy1 )/( $vy2 - $vy1 );
+   } else {
+      print "_GQch: The graphics viewport has zero size in the Y direction.";
+      return 0;
+   }   
+
+   # Return. 
+   return ( 1, $chv, $chh );   
 }   
 
 
@@ -525,7 +567,7 @@ attribute, and optionally establishes a new value. The supplied
 value is converted to an integer value if necessary before use.
 
 
-   my $status = _GAttr( $attr, $value, $old_value, $prim );
+   my ( $status, $old_value ) = _GAttr( $attr, $value, $prim );
 
 Where $attr is an integer value identifying the required attribute. 
 The following symbolic values are defined in the AST grf.h:
@@ -538,7 +580,7 @@ The following symbolic values are defined in the AST grf.h:
 
 $value is a new value to store for the attribute. If this is 
 AST__BAD no value is stored, and $old_value is a scalar containing
-th eold attribute value, if this is NULL no value is returned. 
+the old attribute value, if this is NULL no value is returned. 
  
 Finally $prim is the sort of graphics primitive to be drawn with 
 the new attribute. Identified by the following values defined in 
@@ -551,7 +593,108 @@ AST's grf.h:
 =cut
 
 sub _GAttr {
-   croak( "_GAttr: Not yet implemented.");
+   my $attr = shift;
+   my $value = shift;
+   my $prim = shift;
+   
+   my ( $ival, $rval, $dx, $dy, $deflw, $x1, $x2, $y1, $y2 );
+   my $old_value = undef;
+
+   # If required retrieve the current line style, and set a new line style. 
+   if( $attr == Starlink::AST::Grf::GRF__STYLE() ){
+      pgqls( $ival );
+      $old_value = $ival;
+
+      if( $value != Starlink::AST::AST__BAD() ){
+         $ival = int( $value + 0.5 );
+         $ival -= 1 if $value < 0.0;
+
+         $ival = ( $ival - 1 ) % 5;
+         $ival += ( $ival < 0 ) ? 6 : 1;
+
+         pgsls( $ival );
+      }
+
+   # If required retrieve the current line width, and set a new line width. 
+   # Line width is stored in Plot as a scale factor (1.0 for the default line
+   # width which is a fixed fraction of the diagonal of the view surface), but 
+   # pgplot stores it in units of 0.005 of an inch. 
+   } elsif( $attr == Starlink::AST::Grf::GRF__WIDTH() ){
+
+      # Get the bounds of the view surface in inches. 
+      pgqvsz( 1, $x1, $x2, $y1, $y2 );
+
+      # Find the default line width in inches (i.e. 0.0005 of the length
+      # of the view surface diagonal). 
+      $dx = ( $x1 - $x2 );
+      $dy = ( $y1 - $y2 );
+      $deflw = 0.0005*sqrt( $dx*$dx + $dy*$dy );
+
+      # Get the current pgplot line width in units of 0.005 of an inch. 
+      pgqlw( $ival );
+
+      # If required, return the factor by which this exceeds the default line
+      # width found above. 
+      $old_value = $ival/( 200.0 * $deflw );
+
+      # If a new line width has been provided, the pgplot line width needs to
+      # be set to the corresponding absolute value. 
+      if( $value != Starlink::AST::AST__BAD() ){
+         $ival = 200.0*$value*$deflw;
+         if( $ival < 1 ) {
+            $ival = 1;
+         } elsif( $ival > 201 ){
+            $ival = 201;
+         } 
+         pgslw( $ival );
+      }
+
+   # If required retrieve the current character size, and set a new size. 
+   # The attribute value should be a factor by which to multiply the
+   # default character size. 
+   } elsif( $attr == Starlink::AST::Grf::GRF__SIZE() ){
+      pgqch( $rval );
+      $old_value = $rval;
+
+      if( $value != Starlink::AST::AST__BAD() ){
+         pgsch( $value );
+      }
+
+   # If required retrieve the current character font, and set a new font. 
+   } elsif( $attr == Starlink::AST::Grf::GRF__FONT() ){
+      pgqcf( $ival );
+      $old_value = $ival;
+
+      if( $value != Starlink::AST::AST__BAD() ){
+         $ival = int( $value + 0.5 );
+         $ival -= 1 if $value < 0.0;
+
+         $ival = ( $ival - 1 ) % 4;
+         $ival += ( $ival < 0 ) ? 5 : 1;
+         pgscf( $ival );
+      }
+
+   # If required retrieve the current colour index, and set a new colour
+   # index. 
+   } elsif( $attr == Starlink::AST::Grf::GRF__COLOUR() ){
+      pgqci( $ival );
+      $old_value = $ival;
+
+      if( $value != Starlink::AST::AST__BAD() ){
+         $ival = int( $value + 0.5 );
+         $ival = 1 if $ival < 0;
+         pgsci( $ival );
+      }
+
+   # Give an error message for any other attribute value. 
+   } else {     
+      print "_GAttr: Unknown graphics attribute $attr requested.";
+      return ( 0, $old_value );
+   }
+
+   # Return. 
+   return ( 1, $old_value );
+
 }   
 
 =head1 COPYRIGHT

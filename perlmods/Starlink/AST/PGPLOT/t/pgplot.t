@@ -1,9 +1,10 @@
 #!perl
 
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 15;
 
 require_ok("PGPLOT");
+require_ok("Starlink::AST");
 require_ok("Starlink::AST::PGPLOT");
 
 # pgbegin( $unit, $file, $nxsub, $nysub );
@@ -28,17 +29,41 @@ is( Starlink::AST::PGPLOT::_GText( "Testing", 2, 4, "CC", 0, 1),
     1, "Calling _GText()" );
 
 # _GTxtEx( $text, $x, $y, $justification, $upx, $upy, $xb, $yb );
-is( Starlink::AST::PGPLOT::_GTxtEx( "Testing", 2, 4, "CC", 0, 1, \@x, \@y), 
-    1, "Calling _GTxtEx()" );
+my ( $status, $xb, $yb );
+($status, $xb, $yb ) =
+      Starlink::AST::PGPLOT::_GTxtEx( "Testing", 2, 4, "CC", 0, 1 );
+is( $status, 1, "Calling _GTxtEx()" );
 
-$x[4] = $x[0]; $y[4] = $y[0];
-PGPLOT::pgline( $#x+1, \@x, \@y );
+$$xb[4] = $$xb[0]; $$yb[4] = $$yb[0];
+PGPLOT::pgline( $#$xb+1, $xb, $yb );
+
+# _GQch()
+my ( $chv, $chh );
+( $status, $chv, $chh ) = Starlink::AST::PGPLOT::_GQch();
+is( $status, 1, "Calling _GQch()" );
+is( $chv, 0.224459261126449, "Height of characters from vertical baseline" );
+is( $chh, 0.316722930654433, "Height of characters from horizontal baseline" );
+
+# _GAttrb
+my $old_value;
+( $status, $old_value ) = 
+  Starlink::AST::PGPLOT::_GAttr( Starlink::AST::Grf::GRF__COLOUR(), 3, undef );
+
+is( $status, 1, "Calling _GAttr()" );
+
+$x[0] = 5; $y[0] = 5;
+$x[1] = 6; $y[1] = 6;
+$x[2] = 7; $y[2] = 7;
+$x[3] = 8; $y[3] = 8;
+
+# _Gline( \@x, \@y );
+is( Starlink::AST::PGPLOT::_GLine( \@x, \@y ), 1, "Calling _GLine()" );
+
+# _GMark( \@x, \@y, $type );
+is( Starlink::AST::PGPLOT::_GMark( \@x, \@y, 6 ), 1, "Calling _GMark()" );
 
 # _GFlush();
 is( Starlink::AST::PGPLOT::_GFlush(), 1, "Calling _GFlush()" );
-
-
-
 
 # Done!
 exit;
