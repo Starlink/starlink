@@ -52,7 +52,7 @@
 *    Status :
       INTEGER STATUS 
 *    Data structures for ADAM:
-      INCLUDE 'DDMSG'
+      INCLUDE 'MESSYS_DD'
 *-
 
       IF ( STATUS .NE. SAI__OK ) THEN
