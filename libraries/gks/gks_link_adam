@@ -1,0 +1,49 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     gks_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against adam gks.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use gks in order to generate the correct arguments for the 
+#     compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        alink program.f -L/star/lib `gks_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     DLT:  D.L. Terrett (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-JUL-1995 (DLT):
+#        Original version created from template.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lgkspar_adam `gns_link_adam` `gks1_link_adam` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
