@@ -248,6 +248,8 @@
 *  Initialise logicals
       IN1_UERR = .FALSE.
       IN2_UERR = .FALSE.
+      IN1_VOK = .FALSE.
+      IN2_VOK = .FALSE.
 
 *  Overwrite existing input?
       CALL USI_GET0L( 'OVER', OVER, STATUS )
@@ -452,15 +454,21 @@
           END DO
         END IF
 
-*    Select basis of output
-        IF ( .NOT. IN1_PRIM ) THEN
+*    Output is scalar if both inputs are scalar
+        IF ( IN1_SCALAR .AND. IN2_SCALAR ) THEN
+          OUT_TYPE = 'Scalar'
+
+*    Output is primitive if both inputs are primitive
+        ELSE IF ( OUT_PRIM ) THEN
+          OUT_TYPE = 'Array'
+
+*    Otherwise choose class of best input
+        ELSE IF ( .NOT. IN1_PRIM ) THEN
           CALL ADI_TYPE( FID1, OUT_TYPE, STATUS )
+
         ELSE IF ( .NOT. IN2_PRIM ) THEN
           CALL ADI_TYPE( FID2, OUT_TYPE, STATUS )
-        ELSE IF ( IN1_PRIM ) THEN
-          CALL ADI_TYPE( FID1, OUT_TYPE, STATUS )
-        ELSE IF ( IN2_PRIM ) THEN
-          CALL ADI_TYPE( FID2, OUT_TYPE, STATUS )
+
         END IF
 
 *    Create output interface object
