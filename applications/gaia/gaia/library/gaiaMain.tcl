@@ -39,6 +39,34 @@ global ::env ::tcl_version ::gaia_library ::gaia_dir
 #  Withdraw the . window as this cannot be controlled as a metawidget.
 wm withdraw .
 
+# XXX workaround for bug in KDM window manager. Get 2 second freeze of
+# some top-level windows without this.
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Save a reference to the original raise command (which is builtin).
+rename raise raise_orig
+
+#  Set a binding to record the visibility state of all windows.
+#  The <Map> binding assumes that when a window is mapped it comes up
+#  fully visible.  This seems reasonable, but perhaps there are window
+#  managers which do not guarantee this?
+bind all <Visibility> {set ::visibilityState(%W) %s}
+bind all <Map> { if {!%o} {set ::visibilityState(%W) VisibilityUnobscured} }
+bind all <Destroy> { catch {unset ::visibilityState(%W)} }
+
+#  Redefine the raise command
+proc raise { window { above "" } } {
+   if { $above == "" } {
+      if { ! [ info exists ::visibilityState($window) ] || \
+              $::visibilityState($window) != "VisibilityUnobscured" } {
+         raise_orig $window
+      }
+   } else {
+      raise_orig $window $above
+   }
+}
+
+# ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 #  Set the place for locating all external files.
 if { [info exists env(GAIA_DIR)] } { 
    set gaia_dir $env(GAIA_DIR)
