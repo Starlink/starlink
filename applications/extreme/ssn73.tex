@@ -322,9 +322,9 @@ acquired from a C routine such as {\tt malloc(3)},
 in a variable.
 In C this will be taken care of automatically because the compiler
 will ensure that a pointer type is long enough to hold memory addresses.
-In Fortran however there is no pointer type an INTEGERs, which are
-normally 32 bits, have been used.
-The solution to this, explained in \xref{SUN/209}{sun209}{pointers}
+In Fortran however there is no pointer type so that INTEGERs, which are
+normally 32 bits, have to be used.
+The solution to this, explained in \xref{SUN/209}{sun209}{pointers},
 is to use the \xref{CNF\_PVAL}{sun209}{CNF\_PVAL} function.
 
 This package provides some tools and instructions for 
@@ -337,8 +337,8 @@ All of the changes discussed in this document
 are intended to be backwardly compatible, 
 so that packages thus modified should, eventually, 
 continue to work unchanged in 32-bit environments.
-Because of the difficulties of handling the changeover of all 
-Starlink packages simultaneously however, conversion of a package
+However, because of the difficulties of handling the changeover of all 
+Starlink packages simultaneously, conversion of a package
 to work properly in 64 bits should be considered effectively as
 a port to a new platform.  
 When the entire USSC is properly in 64 bits it will be possible
@@ -363,12 +363,14 @@ should be wrapped in a call to
 the \xref{CNF\_PVAL}{sun209}{CNF\_PVAL} function.
 
 The program {\tt inscnf} is provided to add such calls automatically
-to Fortran source code.  It is invoked as a filter, so may take zero,
+to Fortran source code.  
+It also inserts a line including the required header file CNF\_PAR for
+affected routines.  It is invoked as a filter, so may take zero,
 one or two arguments, using standard input and standard output for 
 unsupplied filenames as appropriate.  It makes an attempt to abide by
 conventions of case usage and spacing in the source code, and to
 break lines where necessary at reasonable places.  For files,
-and for source lines, which does not contain any invocations of \%VAL, 
+and for source lines, which do not contain any invocations of \%VAL, 
 the output will be identical to the input.  Hence a pipeline like
 \begin{quote}
 \begin{verbatim}
@@ -380,19 +382,63 @@ will show up any differences the utility has made.
 The utility should be pretty robust, but it may be possible to
 confuse it with some illegal/deprecated things like 
 `\verb+\r+' or `\verb+\t+' 
-characters, using columns 73--80 for comments, or splitting the string
-`\%VAL' between source lines.  If it believes
+characters, using columns 73--80 for comments, or embedding whitespace
+in Fortran reserved words.
+If it believes
 that it might have got into serious trouble (that is, that it may
 have corrupted the meaning of the source code), then {\tt inscnf}
 will write a warning on standard error, or terminate with error
 status, or both.
 
+The CNF\_PAR header file must be included to declare the CNF\_PVAL
+function.  {\tt inscnf} therefore tries to insert the line
+\begin{quote}
+\begin{verbatim}
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+\end{verbatim}
+\end{quote}
+after  other INCLUDE lines in the relevant routine.  
+If there are no INCLUDE lines in the routine, {\tt inscnf} will
+complain and you will have to add this line by hand.
+
+{\tt inscnf} wraps {\it all\/} occurrences of \%VAL in a call to CNV\_PVAL,
+unless they are already so wrapped.
+This is not always the correct thing to do; sometimes, when communicating
+with a C routine, you want to pass non-pointer arguments by value,
+so that the \%VAL invocations should be left alone.
+In particular this arises when passing a string argument from fortran
+to C --- in this case the lengths of all the passed strings are passed
+as trailing arguments and, depending on the declaration of the arguments
+in the C function, may need to be passed by value.
+In general, it is impossible for {\tt inscnf} to spot these reliably.
+However, if it finds a \%VAL which looks suspicious, it will output
+a warning to this effect --- in this case you should look at the 
+indicated call and remove the unwanted CNF\_PVAL if required.
+A ``suspicious'' use of \%VAL is one of the following:
+\begin{itemize}
+\item
+\%VAL is the last argument in the argument list (this suggests it might
+be a trailing string length, especially since the last argument in a 
+Starlink subroutine call is normally STATUS).
+\item
+The argument of \%VAL looks like an integer constant (obviously this can't
+be a pointer)
+\item
+The argument of \%VAL looks like it contains a Starlink-style 
+symbolic constant, i.e.\ a token containing two consecutive underscores
+(this too suggests a constant value).
+\end{itemize}
+The parsing which leads to these messages is not very watertight and
+may throw up false alarms.
+Equally, the argument of \%VAL could be not a pointer and none of 
+these alarms would ring.
+
 A shell script, {\tt do\_inscnf}, gives an example of applying the filter
-to all the Fortran files in a directory.  This can be used as is,
-or taken as an example.  It defines the location of the input and
-output files, writes a log file of changes made and writes messages 
-to standard error for files which may have generated problems.
-Only files which have been modified are written to the output directory.
+to all the Fortran files in a directory.  This can be used as is
+or modified.
+It runs the filter on a list of files, places any which were changed
+in a subdirectory {\tt ./changed}, outputs warnings to standard
+output, and writes a log file {\tt inscnf.log}.
 It also performs some crude checks of its own on the input and output
 files to see if it looks like erroneous changes have been made:
 \begin{itemize}
@@ -404,10 +450,15 @@ should have made any changes.
 Where {\tt inscnf} has made changes it performs a crude comparison of
 the input and output files to see if they look the same apart from
 insertion of {\tt CNF\_PVAL} invocations.
+\item
+It checks that no modified lines are longer than 72 characters.
+This shouldn't happen (barring strange antics with carriage return
+or tab characters), but it doesn't hurt to have another check.
 \end{itemize}
-If either of these checks produces a surprising result it writes a 
-message to standard error; this does not mean that {\tt inscnf} has
-made an error, but it is probably worth checking this by hand.
+If any of these checks produces a surprising result it writes a 
+message to standard error; this does not mean for sure 
+that {\tt inscnf} has made an error, 
+but it is probably worth checking this by hand.
 
 
 
