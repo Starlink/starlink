@@ -9,6 +9,7 @@
 
 #include "asterix.h"                    /* Asterix definitions */
 #include "ems.h"
+#include "sae_par.h"
 
 #include "aditypes.h"
 #include "adimem.h"

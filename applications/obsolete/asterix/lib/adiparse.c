@@ -11,6 +11,7 @@
 #include "io.h"
 #endif
 #include "asterix.h"                    /* Asterix definitions */
+#include "sae_par.h"
 
 #include "adi_err.h"
 #include "aditypes.h"

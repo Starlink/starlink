@@ -108,16 +108,26 @@
 *  Initialise
       OARG = ADI__NULLID
 
-*  Write data to primary HDU
-      CALL DCI2_WRITE1( NARG, ARGS, ' ', STATUS )
-
 *  Write to SPECTRUM too
       CALL ADI2_GKEY0C( ARGS(1), ' ', 'CONTENT', .FALSE., .FALSE.,
      :                  CONTNT, ' ', STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
+
+*    OGIP spectrum?
         IF ( CONTNT .EQ. 'SPECTRUM' ) THEN
+
+*      Write data to primary HDU and SPECTRUM extension
+          CALL DCI2_WRITE1( NARG, ARGS, ' ', STATUS )
           CALL DCI2_WRITE1( NARG, ARGS, 'SPECTRUM', STATUS )
+
+*    OGIP response matrix?
+        ELSE IF ( CONTNT .EQ. 'MATRIX' ) THEN
+
+          CALL DCI2_WRITE1( NARG, ARGS, 'MATRIX', STATUS )
+
         END IF
+
+*  Write data to primary HDU if CONTENT not defined
       ELSE
         CALL ERR_ANNUL( STATUS )
       END IF

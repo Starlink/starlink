@@ -20,6 +20,7 @@
 
 #include "asterix.h"                    /* Asterix definitions */
 #include "ems.h"
+#include "sae_par.h"
 
 #include "adi_err.h"
 #include "aditypes.h"
