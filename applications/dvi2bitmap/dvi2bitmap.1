@@ -3,10 +3,12 @@
 .SH NAME
 dvi2bitmap
 .SH SYNOPSIS
-.B dvi2bitmap
-[\-f font-path] [\-r resolution] [\-m magnification] [\-P[bt]]
-[\-s scalefactor] [\-t gif|xbm] [\-o output] [-b(h|w) size] [\-lLnqQV]
-dvi-file
+.B dvi2bitmap 
+    [\-f font-path] [\-r resolution] [\-m magnification] 
+    [\-P[bt]] [\-s scalefactor] [\-t gif|xbm] [\-o output]
+    [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
+    [\-nqQV] [\-L[L]] [\-p num] [\-l num] [\-pp ranges]
+    dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
 system, converting each page to a single bitmap.
@@ -30,17 +32,56 @@ you'll need to specify a bitmap size.  The numbers
 are the coordinates of the top-left and
 bottom-right of the bitmap: in this case 
 .I "\-bh 6300 \-bw 4200"
-would suffice.  Note that the `h' in
+would suffice.  Note that the `h' in 
 .I "\-bh"
-stands for height, not horizontal!
+stands for height, not horizontal!  At some point, I'd like to make the bitmap
+`expandable', obviating the need for these options.
+.TP
+.I "\-c[edge] dimen, \-C[edge] dimen"
+The 
+.I "\-c"
+and
+.I "\-C"
+options allow you to control how the
+generated bitmaps are cropped before they are written.  The
+.I "[edge]"
+may be one of `l', `r', `t' or `b', referring to the
+left, right, top and bottom edge of the bitmap, or be missing, in
+which case it refers to all four sides.  In the case of the 
+.I "\-c"
+option, this sets the crop to be
+.I "dimen"
+points from the specified edge of the
+bounding box of the blackened pixels; in the case of the 
+.I "\-C"
+option, it sets it to be 
+.I "dimen"
+points from the left or top of
+the `page'.  The specification 
+.I "\-C dimen"
+, which would set all
+the crops to the same position, is silly, and so is forbidden.
+.PP
+The conversion from points to pixels takes account of the
+magnification set in the 
+.I "\-m"
+option, if that's been specified
+already, but it doesn't notice if that's set after this option, and it
+takes no account of any magnification in the DVI file. 
+.P{
+See below for TeX 
+.I "\especial"
+commands which set this within the TeX file.
 .TP
 .I "\-f font-path"
 Specifies the path to the PK fonts which dvi2bitmap will use.  See
-also the 
-.B DVI2BITMAP_PK_PATH
-environment variable.
+also the discussion of font searching below.
 .TP
-.I "\-l"
+.I "-l pagenum"
+See option 
+.I "\-p"
+.TP
+.I "\-L"
 Show missing fonts.
 The program writes on standard output one line per missing font, with
 five fields: the 
@@ -49,11 +90,11 @@ the magnification factor, and a dummy metafont mode.
 This output can 
 be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
 generate the required fonts.
-.TP
-.I "\-L"
-Show all fonts in the DVI file.  The output is as for the 
-.I "\-l"
-option, except that found fonts are also listed, prefixed by a % character.
+.PP
+If the option is
+.I "\-LL"
+, then do the same, 
+except that found fonts are also listed, prefixed by a % character.
 .TP
 .I "\-m magnification"
 The TeX magnification parameter which is used when processing the DVI
@@ -65,30 +106,84 @@ will search for PK files at 200 dpi.
 .I "\-n"
 Do not actually process the DVI file, but read the DVI pre- and
 postamble.  Useful in conjunction with the 
-.I "\-l"
+.I "\-L"
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 .TP
+.I "\-nf"
+Do process the DVI file, but don't generate missing fonts.
+.TP
 .I "\-o output"
 Choose the output filename pattern.  The value is a 
-.B printf
-formatting string, with a single 
-.B %d
-formatting string, which will be replaced in output filenames
+`printf' formatting string, with a single
+.I "%d"
+formatting descriptor, which will be replaced in output filenames
 with the page number.  This can be overridden on a per-page basis by
-a TeX \\special embedded in the DVI file (see below).  If there is no
+a TeX
+.I "\especial"
+embedded in the DVI file (see below).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
 .TP
+.I "\-p p-spec, \-l l-spec, \-pp pp-spec"
+These select page ranges, using a slight extension of the notation
+used by
+.I "dvips"
+(and the same option letters).  The
+.I "p-spec"
+and
+.I "l-spec"
+are single page numbers; if either of these are
+given, then the program will process pages from page
+.I "p-spec"
+to page
+.I "l-spec"
+, and if either is missing, it implies the
+corresponding extreme.  The
+.I "pp-spec"
+consists of a sequence of
+page numbers and ranges
+.I "(number1-number2)"
+; only those pages,
+and the pages falling in those ranges (inclusive of the end pages) are
+processed.  Any of these may be prefixed by either
+.I =
+or
+.I ":n,"
+In the former case, DVI page numbers are used rather
+than TeX
+.I "\ecount"
+registers; in the latter case, the program examines the
+.I "\ecountn"
+register rather than the default
+.I "\ecount0"
+You can specify both of these prefixes in one or more options, and the
+program will respect only the last one, but you cannot mix
+.I "\-p"
+and
+.I "\-l"
+options with the
+.I "\-pp"
+option.  There may be no
+spaces in the
+.I "pp-spec."
+The page numbers may be negative.
+.TP
 .I "\-P[bt]"
 Specifies processing of the output bitmap.
-.B "\-Pb" 
+.I "\-Pb"
 blurs the bitmap, making a half-hearted attempt to make a
-low-resolution bitmap look better.
-.B "\-Pt" 
+low-resolution bitmap look better.  This really isn't up to much -- if
+you have the fonts available, or are prepared to wait for them to be
+generated, a better way is to use the
+.I "\-m"
+option to magnify the DVI file, and then the
+.I "\-s"
+option to scale it back down to the correct size.
+.I "\-Pt"
 makes the output bitmap have a transparent background, if
 that's supported by the particular format you choose using option
-.B "\-t"
+.I "\-t"
 .TP
 .I "\-q"
 Quiet mode -- suppress some chatter.
@@ -102,25 +197,92 @@ when deciding which PK files to use. The default is 72.
 .TP
 .I "\-s scalefactor"
 Reduces the linear size of the output bitmap by a factor
-.B scalefactor
+.I "scalefactor"
 (default 1).
 .TP
-.I "\-t xbm|gif"
-Choose the output format.  The program generates XBM bitmaps by
+.I "\-t type"
+Choose the output format, which can be
+.I "xbm"
+or
+.I "gif"
+. The program generates XBM bitmaps by 
 default.  The GIF option may not be available if it wasn't selected
 when the program was configured.
 .TP
 .I "\-V"
 Display the version number, and exit.
 .SH "DVI specials"
-dvi2bitmap recognises a single DVI special command, and emits a
+dvi2bitmap recognises several DVI special commands, and emits a
 warning if it finds any others.
 .PP
-If the TeX file contains a special command:
-"\\special {dvi2bitmap outputfile thispage}"
-then the output file used for the current page will be 
-.I thispage.gif
-(the extension will depend on the output type selected).
+The syntax of the special commands is 
+.PP
+\especial{dvi2bitmap <special-command>+ }
+.PP
+There may be one or more
+.I "<special-command>"
+sequences within a single special.
+.PP
+The
+.I "<special-command>"
+which the program recognises are:
+.TP
+.I "default"
+Makes other special-commands in this same special affect
+defaults.  See those commands for details.
+.TP
+.I "outputfile my_filename"
+The output file used for the current page will be named
+.I "my_filename.gif"
+A filename extension will be added if none is
+present, or if it does not match the output type selected.  If the
+.I "default"
+command has been given, then this instead specifies the
+default filename pattern, and the `filename' should contain a single
+.I "#"
+-sign.
+.TP
+.I "absolute"
+Affects the
+.I "crop"
+command.
+.TP
+.I "crop <side> <dimen>"
+Crop the bitmap on the current page so that the specified edge of
+the bitmap is
+.I "<dimen>"
+points away from the bounding box of the blackened pixels.  
+.I "<side>"
+may be one of `left',
+`right', `top', `bottom' or `all', referring to the corresponding
+edge, or all four edges at once.  If the
+.I "default"
+command has been given in this special, then this pattern of cropping is
+additionally made the default for subsequent pages.  If the
+.I "absolute"
+command has been given, then the crop position is set at
+.I "<dimen>"
+points from the appropriate edge of the `paper'.
+.PP
+The
+.I "-c"
+and
+.I "-C"
+command-line options have the effect of setting initial defaults.
+In the absence of either of these, the initial crop is exactly at the
+bounding box.
+.PP
+For example, the pair of commands
+.PP
+\especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
+\especial{dvi2bitmap absolute crop left 0}
+.PP
+will change the output filename pattern for the rest of the DVI file,
+and set a 5pt margin round the bounding box.  The current page,
+however, will have a left-hand crop zero points in from the left hand
+side.  Remember that TeX's origin is one inch from the left and the
+top of the paper, and it is with respect to this origin that the
+program reckons the absolute distances for the cropping.
 .SH "EXIT VALUE"
 Exits with a non-zero status if there were any processing errors.  See
 also the 
@@ -134,7 +296,7 @@ magnification factor to 2, so that the program uses a double-size font
 (eg, .../cmr10.220pk), then scales the bitmap down by a factor of 2 to
 obtain a bitmap of the correct size.
 .PP
-% dvi2bitmap -n -l -r 110 -m 1.5 -q hello.dvi
+% dvi2bitmap -n -L -r 110 -m 1.5 -q hello.dvi
 .br
 cmr10 165 110 1.5 localfont
 .PP
@@ -190,13 +352,14 @@ This variable is overridden by the
 option.
 .PP
 If the program was compiled with support for the kpathsea library,
-then it will use that library to find fonts.  For this to work, the
-.I dvi2bitmap
-program must either be installed with the other TeXware, or else the 
-.B TEXMFCNF
-environment variable must be defined to point to the directory which
-contains the kpathsea configuration file.  You can find this location
-with the command
+then it will use that library to find fonts.  If you did
+not install dvi2bitmap along with other TeXware, or if the the
+program was not told where they live at configuration time, then you might
+additionally have to specify the
+.I "TEXMFCNF"
+environment variable:
+set it to the directory which contains the main TeX configuration
+file, which you can find using the command
 .I "kpsewhich cnf texmf.cnf"
 .SH "SEE ALSO"
 DVItype and PKtoPX: Knuth programs intended as model DVI and PK file
