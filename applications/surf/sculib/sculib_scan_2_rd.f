@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_SCAN_2_RD(VERSION, CENTRE_COORDS, RA_CEN, 
-     :     DEC_CEN, LONG, LAT, LST, MJD, RA_APP, DEC_APP,
+     :     DEC_CEN, LONG, LAT, LST, MJD, LAT_OBS, RA_APP, DEC_APP,
      :     STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL SCULIB_SCAN_2_RD(VERSION, CENTRE_COORDS, RA_CEN, DEC_CEN, 
-*    :     LONG, LAT, LST, MJD, RA_APP, DEC_APP,
+*    :     LONG, LAT, LST, MJD, LAT_OBS, RA_APP, DEC_APP,
 *    :     STATUS )
 
 *  Description:
@@ -42,6 +42,8 @@
 *     MJD = DOUBLE (Given)
 *       Modified Julian data of observation (should be the MJD of the
 *       time for which lst = LST).
+*     LAT_OBS                = DOUBLE PRECISION (Given)
+*           Latitude of observatory in radians. West is positive.
 *     RA_APP                 = DOUBLE PRECISION (Returned)
 *           Apparent RA of point at date (radians)
 *     DEC_APP                = DOUBLE PRECISION (Returned)
@@ -69,6 +71,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/07/13 06:27:15  timj
+*     Pass LAT_OBS in as a argument
+*
 *     Revision 1.2  1998/02/05 19:41:36  timj
 *     Change VERSION to REAL
 *
@@ -88,6 +93,7 @@
       DOUBLE PRECISION DEC_CEN
       DOUBLE PRECISION RA_CEN
       DOUBLE PRECISION LAT
+      DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION LONG
       CHARACTER*(*)    CENTRE_COORDS
       DOUBLE PRECISION LST
@@ -177,7 +183,7 @@
 *     Convert map centre from apparent to our new 'local' coords
 
             CALL SCULIB_APPARENT_2_MP(RA_CEN, DEC_CEN, STEMP,
-     :           LST, MJD, MYLONG, MYLAT, STATUS)
+     :           LST, MJD, LAT_OBS, MYLONG, MYLAT, STATUS)
 
 *     Add on our offsets
             CALL SCULIB_CALC_APPARENT(MYLONG, MYLAT, 0.0D0,

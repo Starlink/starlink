@@ -1,5 +1,5 @@
       SUBROUTINE SCULIB_APPARENT_2_MP(RA_APP, DEC_APP, OUT_COORDS,
-     :     LST, MJD, LONG, LAT,
+     :     LST, MJD, LAT_OBS, LONG, LAT,
      :     STATUS )
 *+
 *  Name:
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL SCULIB_APPARENT_2_MP(RA_APP, DEC_APP, OUT_COORDS,
-*    :     LST, MJD, LONG, LAT,
+*    :     LST, MJD, LAT_OBS, LONG, LAT,
 *    :     STATUS )
 
 *  Description:
@@ -33,6 +33,9 @@
 *           LST for requested coordinates (for AZ and HA)
 *     MJD                    = DOUBLE PRECISION (Given)
 *           Modified Julian date of observation
+*     LAT_OBS                = DOUBLE PRECISION (Given)
+*           Latitude of observatory in radians. West is positive.
+*           For JCMT this value is 3.46026051751D-1
 *     LONG                   = DOUBLE PRECISION (Returned)
 *           longitude of centre in input coord system (radians)
 *     LAT                    = DOUBLE PRECISION (Returned)
@@ -46,6 +49,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/07/13 06:27:03  timj
+*     Pass LAT_OBS in as a argument
+*
 *     Revision 1.2  1997/11/19 02:24:36  timj
 *     Fix calculation of Azimuth.
 *
@@ -64,6 +70,7 @@
       DOUBLE PRECISION RA_APP
       DOUBLE PRECISION DEC_APP
       CHARACTER*(*)    OUT_COORDS
+      DOUBLE PRECISION LAT_OBS
       DOUBLE PRECISION LST
       DOUBLE PRECISION MJD
       
@@ -75,8 +82,6 @@
       INTEGER          STATUS
 
 *  Local Constants:
-      DOUBLE PRECISION LAT_OBS
-      PARAMETER       (LAT_OBS = 3.46026051751D-1)
 
 *  Local Variables:
       DOUBLE PRECISION COS_LONG             ! cos(az)
