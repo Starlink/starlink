@@ -8409,7 +8409,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/TitleControls.jav
 U java/source/splat/src/main/uk/ac/starlink/splat/retired_code/XMLEncodeAndDecode.java
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/util
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AbstractFunctionFitter.java
-U java/source/splat/src/main/uk/ac/starlink/splat/util/AsciiFileParser.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AvailableLocales.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/AverageFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/CmpFitter.java
@@ -9181,6 +9180,7 @@ cvs checkout: Updating java/source/util/src/main/uk
 cvs checkout: Updating java/source/util/src/main/uk/ac
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util
+U java/source/util/src/main/uk/ac/starlink/util/AsciiFileParser.java
 U java/source/util/src/main/uk/ac/starlink/util/AuxClassLoader.java
 U java/source/util/src/main/uk/ac/starlink/util/Compression.java
 U java/source/util/src/main/uk/ac/starlink/util/DOMUtils.java

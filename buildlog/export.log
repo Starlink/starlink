@@ -234,6 +234,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 create_archives:
       [zip] Building zip: /apps/cvsbuild/export/diva-0.3.zip
@@ -931,47 +932,27 @@ prepare:
 check_packages:
 
 build:
+    [javac] Compiling 99 source files to /apps/cvsbuild/java/source/frog/build/classes
+    [javac] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteUtilities.java:24: cannot resolve symbol
+    [javac] symbol  : class AsciiFileParser 
+    [javac] location: package util
+    [javac] import uk.ac.starlink.splat.util.AsciiFileParser;
+    [javac]                                  ^
+    [javac] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteUtilities.java:124: cannot resolve symbol
+    [javac] symbol  : class AsciiFileParser 
+    [javac] location: class uk.ac.starlink.frog.util.RemoteUtilities
+    [javac]         AsciiFileParser reader = new AsciiFileParser( contactFile );
+    [javac]         ^
+    [javac] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/util/RemoteUtilities.java:124: cannot resolve symbol
+    [javac] symbol  : class AsciiFileParser 
+    [javac] location: class uk.ac.starlink.frog.util.RemoteUtilities
+    [javac]         AsciiFileParser reader = new AsciiFileParser( contactFile );
+    [javac]                                      ^
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+    [javac] 3 errors
 
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../frog_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
-     [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
+BUILD FAILED
+file:/apps/cvsbuild/java/source/frog/build.xml:388: Compile failed; see the compiler error output for details.
 
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/frog-0.6.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
-     [gzip] Building: /apps/cvsbuild/export/frog-0.6.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/frog-0.6.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
-
-BUILD SUCCESSFUL
-Total time: 13 minutes 12 seconds
+Total time: 19 minutes 53 seconds
