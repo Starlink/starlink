@@ -22,15 +22,24 @@
 *  Notes:
 *     This routine is not seen by the user
 
-*    Authors :
+*  Authors:
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: Tim Jenness (JACH)
 
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.33  1999/08/03 20:01:35  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.32  1999/05/15 01:45:18  timj
 *     Add call to surf_set_app_name
 *
@@ -135,17 +144,17 @@ c
 
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_PAR'
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
+*  Local variables:
       CHARACTER*(PAR__SZNAM) NAME        ! name of action
 *.
 

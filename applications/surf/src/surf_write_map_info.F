@@ -84,12 +84,21 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 April 08 (TIMJ)
 *        Extract from reds_wtfn_rebin.f
 *     1997 May 12 (TIMJ)
 *        Remove FITS from input arguments
 * $Log$
+* Revision 1.14  1999/08/03 20:01:44  timj
+* Add copyright message to header.
+* Minor fixes to header style.
+*
 * Revision 1.13  1999/07/14 19:20:49  timj
 * Pass TELESCOPE and INSTRUMENT in from above.
 *
@@ -141,7 +150,7 @@
       REAL             WPLATE
       LOGICAL          WRITE_CHOP
 
-*  Status
+*  Status:
       INTEGER STATUS
 
 *  External References:

@@ -120,6 +120,11 @@
 *        Finally, the IN and OUT files are closed and all virtual memory
 *     freed.
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     24-JUL-1995: original version.
@@ -127,6 +132,10 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.29  1999/08/03 20:01:38  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.28  1999/05/15 01:48:40  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -210,25 +219,25 @@ c
  
 *-
 
-*  Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-*  Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx
       INCLUDE 'NDF_PAR'                ! for NDF__NOID
       INCLUDE 'MSG_PAR'                ! MSG__ constants
       INCLUDE 'SURF_PAR'               ! REDS constants
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    External references :
 
-*    Global variables :
-*    Local Constants :
+*  Status:
+      INTEGER STATUS
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       BYTE BADBIT                      ! Bad bits mask
@@ -236,7 +245,7 @@ c
       CHARACTER * 15 TSKNAME           ! Name of task
       PARAMETER (TSKNAME = 'REDUCE_SWITCH')
 
-*    Local variables :
+*  Local variables:
       LOGICAL      ABORTED             ! .TRUE. if observation was aborted
       REAL         AV_DATA(SCUBA__MAX_SUB, SCUBA__MAX_MEAS) ! Average skydip
       BYTE         AV_QUAL(SCUBA__MAX_SUB,SCUBA__MAX_MEAS) ! Quality of AV_QUAL
@@ -369,9 +378,10 @@ c
       INTEGER      UBND (MAXDIM)       ! upper bounds of array
       LOGICAL      USE_CALIBRATOR      ! .TRUE. if internal calibrator signal
                                        ! is be divided into the data
-*    Internal References :
-*    Local data :
-*-
+*  Internal References:
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -1382,11 +1392,9 @@ c
       INCLUDE 'SAE_PAR'
 
 *  Global status:
-
       INTEGER STATUS
 
 *  Arguments Given:
-
       INTEGER N_BOL
       INTEGER N_POS
       INTEGER N_BEAM
@@ -1397,13 +1405,11 @@ c
       BYTE    IN_QUAL(N_BOL, N_POS, N_BEAM)
 
 *  Arguments returned:
-
       REAL    OUT_DATA(N_BOL, OUT_POS, N_BEAM)
       REAL    OUT_VAR (N_BOL, OUT_POS, N_BEAM)
       BYTE    OUT_QUAL(N_BOL, OUT_POS, N_BEAM)
 
 *  Local Variables:
-
       INTEGER I  ! Loop counter
       INTEGER J  ! Loop counter
       INTEGER K  ! Loop counter

@@ -19,7 +19,7 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
-*  Description :
+*  Description:
 *     This task removes sky noise and constant offsets from SCUBA jiggle
 *     data. It does this by requesting `sky' bolometers, calculating some
 *     average value for each jiggle and then subtracts this off the
@@ -128,10 +128,19 @@
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *     {enter_new_authors_here}
  
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.17  1999/08/03 20:01:39  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.16  1999/05/15 01:48:41  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -164,22 +173,22 @@
  
 *-
 
-*  Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE                     ! No implicit typing
 
-*  Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'SURF_PAR'                ! REDS constants
       INCLUDE 'MSG_PAR'                 ! MSG__ constants
 
-*  Status :
+*  Status:
       INTEGER STATUS
 
-*  External references :
+*  External references:
 
-*  Local Constants :
+*  Local Constants:
       INTEGER          LLEN             ! Length of output line
       PARAMETER (LLEN = 78)
       INTEGER          MAX__BOL         ! max number of bolometers
@@ -189,7 +198,7 @@
       CHARACTER * 10   TSKNAME          ! Name of task
       PARAMETER (TSKNAME = 'REMSKY')
 
-*  Local variables :
+*  Local variables:
       LOGICAL          ADD_BACK         ! Add on the mean sky level
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop

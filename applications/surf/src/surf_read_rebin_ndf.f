@@ -144,10 +144,19 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.19  1999/08/03 20:01:36  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.18  1999/07/14 20:13:29  timj
 *     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
 *     a parameter.

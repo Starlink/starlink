@@ -151,10 +151,19 @@
 *     TIMJ: Tim Jenness (JACH)
 *     {enter_new_authors_here}
  
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.28  1999/08/03 20:01:43  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.27  1999/05/16 03:48:55  timj
 *     Check PHOT_BB before freeing memory
 *
@@ -248,10 +257,10 @@ c
 
 *-
 
-*    Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'DAT_PAR'                ! Data-system constants
       INCLUDE 'MSG_PAR'                ! Add MSG__ constants
@@ -260,13 +269,13 @@ c
       INCLUDE 'SURF_PAR'               ! REDS constants
       INCLUDE 'PAR_ERR'                ! PAR__ constants
 
-*    Status :
+*  Status:
       INTEGER STATUS
 
-*    External references :
+*  External references:
       INTEGER CHR_LEN                  ! CHR used-string-length function
 
-*    Local Constants :
+*  Local Constants:
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       BYTE        OUTBAD               ! Output bad pixel mask
@@ -274,7 +283,7 @@ c
       CHARACTER * 10 TSKNAME           ! Name of task
       PARAMETER (TSKNAME = 'SCUPHOT')
 
-*    Local variables :
+*  Local variables:
       LOGICAL          ABORTED         ! .TRUE. if the observation was
                                        ! aborted
       INTEGER          ALL             ! Beam to use for ALLBOLS

@@ -159,6 +159,11 @@
 *     TIMJ: Tim Jenness (JACH)
 *     JFL: John Lightfoot (RoE)
 
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f

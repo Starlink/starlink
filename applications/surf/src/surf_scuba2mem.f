@@ -107,8 +107,17 @@
 *  Authors:
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
  
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
 *  History:
 *     $Log$
+*     Revision 1.11  1999/08/03 20:01:41  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.10  1999/07/14 20:39:10  timj
 *     Add documentation for NBEAMS for SCUBA2MEM
 *
@@ -276,9 +285,8 @@
 * Local data:
  
       DATA SUFFIX_STRINGS /'!_mem','m','_mem'/
- 
- 
-*-
+
+*.
  
       IF (STATUS .NE. SAI__OK) RETURN
  

@@ -60,7 +60,7 @@
 *      Analysis mode         : AVERAGE or PARABOLA
 *    
 
-*    Parameters:
+*  Arguments:
 *     ODF                    = CHARACTER*(*) (Given)
 *           the name of the observation definition file
 *     OBS_DATE               = CHARACTER*(*) (Given)
@@ -113,13 +113,26 @@
 *           File descriptor of output file
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+*  Deficiencies:
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+*     T.Jenness (JAC)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
+*     $Log$
+*     Revision 1.5  1999/08/03 20:01:45  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     13-MAR-1996: original version
 *    endhistory
 
@@ -128,12 +141,12 @@
 *  Type Definitions:
       IMPLICIT NONE
 
-*  Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'SURF_PAR'               ! SURF constants
 
-*    Import :
+*  Arguments Given:
       CHARACTER*(*) ODF
       CHARACTER*(*) OBS_DATE
       CHARACTER*(*) OBS_TIME
@@ -156,22 +169,31 @@
       REAL          SAMPLE_PA
       LOGICAL       SKY_SUBTRACTION
 
-*    Import-Export :
-*    Export :
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
       INTEGER            FD              ! FIO file identifier
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+
+*  Global variables:
+
+*  Local Constants:
       INTEGER RECLEN                     ! length of record written to file
       PARAMETER (RECLEN = 80)            !
-*    Local variables :
+
+*  Local variables:
       INTEGER            ITEMP           ! scratch integer
       CHARACTER*(RECLEN) LINE            ! line to be written to file
       INTEGER            NTICKS          ! number of ticks since some date
-*    Internal References :
-*    Local data :
+
+*  Internal References:
+
+*  Local data:
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN

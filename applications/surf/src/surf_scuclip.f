@@ -69,10 +69,19 @@
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *     {enter_new_authors_here}
  
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     3 Nov 1996: TIMJ
 *        Original version (in REMSKY)
 *     $Log$
+*     Revision 1.5  1999/08/03 20:01:42  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.4  1999/05/15 01:48:43  timj
 *     Finalise support for POLMAP/POLPHOT observing modes.
 *     Only check first few characters of history app name
@@ -96,23 +105,23 @@
  
 *-
 
-*  Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE                     ! No implicit typing
 
-*  Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'SURF_PAR'                ! REDS constants
       INCLUDE 'MSG_PAR'                 ! MSG__ constants
 
-*  Status :
+*  Status:
       INTEGER STATUS
 
-*  External references :
+*  External references:
       BYTE    SCULIB_BITON              ! Turn on skybit
 
-*  Local Constants :
+*  Local Constants:
       INTEGER          MAX__BOL                  ! max number of bolometers
       PARAMETER (MAX__BOL = 100)                 ! that can be specified
       INTEGER          MAXDIM
@@ -120,7 +129,7 @@
       CHARACTER * 10   TSKNAME          ! Name of task
       PARAMETER (TSKNAME = 'SCUCLIP')
 
-*  Local variables :
+*  Local variables:
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)

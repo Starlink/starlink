@@ -86,11 +86,21 @@
 *     KAPPA: DISPLAY, GDSET
 *     FIGARO: IMAGE
 
-*  Authors :
+*  Authors:
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
 
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
+*     $Log$
+*     Revision 1.14  1999/08/03 20:01:42  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     1996 December 17 (TIMJ)
 *        Original version
 *     {note_history_here}
@@ -100,10 +110,10 @@
  
 *-
 
-* Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-* Global constants :
+*  Global constants:
       INCLUDE 'AST_PAR'                ! AST__ constants
       INCLUDE 'DAT_PAR'                ! DAT__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
@@ -115,13 +125,14 @@
       INCLUDE 'GKS_PAR'                ! GKS constants (e.g. GSET)
       INCLUDE 'MSG_PAR'                ! MSG__ constants
 
-*  Status :
+*  Status:
       INTEGER STATUS
-*  External references :
+
+*  External references:
       INTEGER CHR_LEN                  ! CHR used-string-length function
       DOUBLE PRECISION SLA_EPJ2D       ! Convert from Julian Epoch to MJD
 
-*  Local Constants :
+*  Local Constants:
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       INTEGER MPEN                     ! SGS pen number used to draw graphics
@@ -131,7 +142,7 @@
       CHARACTER * 7 TSKNAME            ! SCUOVER name
       PARAMETER (TSKNAME = 'SCUOVER')
 
-*  Local variables :
+*  Local variables:
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
       REAL AR0                         ! Text aspect ratio on entry
@@ -336,7 +347,8 @@
       REAL YU0                         ! Y comp. of text up-vector on entry
       INTEGER ZONEO                    ! SGS zone of the displayed image
       INTEGER ZONEOV                   ! SGS zone of the input picture
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

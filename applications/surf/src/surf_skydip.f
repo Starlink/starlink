@@ -134,12 +134,21 @@
 *     model data are then written to NDFs for plotting in KAPPA-LINPLOT. (The
 *     model data is calculated with SCULIB_J_THEORETICAL.
 
-*  Authors :
+*  Authors:
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
 
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     $Log$
+*     Revision 1.31  1999/08/03 20:01:43  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.30  1999/07/15 07:59:19  timj
 *     Correct types for some MSG_ calls
 *
@@ -257,25 +266,32 @@ c
 *-
 
 
-*  Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-*  Global constants :
+*  Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'MSG_PAR'                 ! MSG__ constants
       INCLUDE 'PAR_ERR'                 ! for PAR__ constants
       INCLUDE 'PRM_PAR'                 ! for VAL__ constants
       INCLUDE 'SURF_PAR'                ! SURF  constants
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
+
+*  Arguments Given:
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       INTEGER CHR_LEN
-*    Global variables :
-*    Local Constants :
+
+*  Global variables:
+
+*  Local Constants:
       REAL    ARCSEC                    ! 1 arcsec in radians
       PARAMETER (ARCSEC = 4.8481368E-6)
       BYTE    BADBIT                    ! Bad bit mask
@@ -295,7 +311,7 @@ c
       INTEGER MAX_FIT_DATA              ! Max number of points
       PARAMETER (MAX_FIT_DATA = SCUBA__MAX_MEAS) ! allowed in input data
 
-*    Local variables :
+*    Local variables:
       LOGICAL ABORTED                   ! Was the observation aborted
       REAL    AIR_MODEL(N_MODEL)        ! Airmass values for MODEL
       REAL    AIRMASS(MAX_FIT_DATA)     ! Array of AIRMASS data
@@ -446,7 +462,7 @@ c
       REAL    WAVE                      ! Selectred wavelength
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC ! Locator to EXTENSIONS
 
-*    External functions:
+*  External functions:
       INCLUDE 'NDF_FUNC'
 
 

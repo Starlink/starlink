@@ -11,7 +11,7 @@
 *  Purpose:
 *     Routine to output ASCII results of PHOTOM reduction
 
-*    Description :
+*  Description:
 *     This routine writes out the results for 1 sub-instrument of a PHOTOM
 *     observation.
 *     For each bolometer that measured the source:-
@@ -29,14 +29,14 @@
 *                    <peak>   <variance>                             <quality>
 *
 
-*    Invocation :
+*  Invocation:
 *      CALL SURF_WRITE_PHOTOM (FD, MAX_BEAM, 
 *     :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_MEASUREMENTS,
 *     :  N_INTEGRATIONS,PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
 *     :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
 *     :  MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
 
-*    Parameters:
+*  Arguments:
 *     FD                     = INTEGER (Given)
 *           ASCII file descriptor
 *     MAX_BEAM               = INTEGER (Given)
@@ -97,21 +97,39 @@
 *           the quality on MEAS_2_D
 *     STATUS                 = INTEGER (Given and returned)
 *           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
+
+*  Method:
+*  Deficiencies:
+*  Bugs:
+
+*  Authors:
 *     J.Lightfoot (jfl@roe.ac.uk)
-*    History :
+*     Tim Jenness (JACH)
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
+*     $Log$
+*     Revision 1.9  1999/08/03 20:01:45  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     13-MAR-1996: original version
 *    endhistory
-*    Type Definitions :
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
-*    Import :
+
+*  Arguments Given:
       INTEGER       MAX_BEAM
       INTEGER       N_BOLS
       INTEGER       BOL_CHAN (N_BOLS)
@@ -135,16 +153,21 @@
       REAL          MEAS_2_D (MAX_BEAM)
       REAL          MEAS_2_V (MAX_BEAM)
       BYTE          MEAS_2_Q (MAX_BEAM)
-*    Import-Export :
-*    Export :
-*    Status :
+
+*  Arguments Given & Returned:
+
+*  Arguments Returned:
+
+*  Status:
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
+*  External references:
+*  Global variables:
+*  Local Constants:
       INTEGER RECLEN                     ! length of record written to file
       PARAMETER (RECLEN = 80)            !
-*    Local variables :
+
+*  Local variables:
       INTEGER            BEAM            ! beam index
       INTEGER            COUNT           ! Loop counter
       REAL               ERROR           ! SQRT variance
@@ -155,9 +178,11 @@
       INTEGER            M               ! Measurement counter
       CHARACTER*15       STEMP           ! scratch string
       REAL               STON            ! Signal to noise
-*    Internal References :
-*    Local data :
-*-
+
+*  Internal References:
+*  Local data:
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -233,14 +233,23 @@
 *     SURF: SCUQUICK, EXTRACT_DATA
 
 
-*  Authors :
+*  Authors:
 *     JFL: J.Lightfoot (ROE)
 *     TIMJ: T. Jenness (timj@jach.hawaii.edu)
 
-*  History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.72  1999/08/03 20:01:36  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.71  1999/07/26 20:35:40  timj
 *     Check for planet coordinate frame for model.
 *
@@ -463,10 +472,10 @@ c
  
 *-
 
-* Type Definitions :
+*  Type Definitions:
       IMPLICIT NONE
 
-* Global constants :
+*  Global constants:
       INCLUDE 'DAT_PAR'                ! DAT__ constants
       INCLUDE 'MSG_PAR'                ! MSG__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
@@ -476,12 +485,13 @@ c
       INCLUDE 'SURF_PAR'               ! REDS definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
 
-* Arguments Given:
+*  Arguments Given:
       CHARACTER * (*)  TSKNAME
 
-* Status:
+*  Status:
       INTEGER STATUS
-* External references:
+
+*  External references:
       INTEGER CHR_LEN                  ! CHR used-string-length function
       BYTE    SCULIB_BITON             ! Turn on bit
 
@@ -499,8 +509,7 @@ c
       BYTE BADBIT                      ! Bad bit mask
       PARAMETER (BADBIT = 3)
       
-*    Local variables:
-
+*  Local variables:
       INTEGER          ABOL_DATA_END(MAX_FILE)
                                        ! Pointer to bolometer data end
       INTEGER          ABOL_DATA_PTR(MAX_FILE)
@@ -748,12 +757,11 @@ c
      :     WTFNRES * WTFNRES + 1)
                                        ! Weighting function
 
-* Local data:
-
+*  Local data:
       DATA SUFFIX_STRINGS /'!_dsp','d','_dsp'/ ! Used for DESPIKE
       DATA REB_SUFFIX_STR /'!_reb','b','_reb'/ ! Used for REBIN
 
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 

@@ -111,10 +111,19 @@
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *     {enter_new_authors_here}
 
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     21-SEP-1995: original version.
 *     $Log$
+*     Revision 1.12  1999/08/03 20:01:40  timj
+*     Add copyright message to header.
+*     Minor fixes to header style.
+*
 *     Revision 1.11  1999/06/16 21:08:18  timj
 *     Add SECTIONing
 *
@@ -126,22 +135,22 @@
 *-
 
 
-*    Type Definitions:
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants:
+*  Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'SURF_PAR'                ! REDS constants
       INCLUDE 'MSG_PAR'                 ! for MSG__ constants
 
-*    Status:
+*  Status:
       INTEGER STATUS
 
 *  External References:
       INTEGER CHR_LEN
 
-*    Local Constants:
+*  Local Constants:
       INTEGER MAXDIM
       PARAMETER (MAXDIM = 4)
       CHARACTER * 10 TSKNAME            ! Name of task
@@ -150,7 +159,7 @@
       PARAMETER (NEGCHAR = '-') ! 
 
 
-*    Local variables:
+*  Local variables:
       LOGICAL      ABORTED              ! .TRUE. if observation was
                                         ! aborted
       BYTE         BADBIT               ! Bad bit mask

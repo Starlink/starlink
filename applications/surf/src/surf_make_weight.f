@@ -82,7 +82,12 @@
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
 *     {enter_new_authors_here}
 
-*    History :
+
+*  Copyright:
+*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Research Council. All Rights Reserved.
+
+*  History:
 *     $Id$
 *     {enter_further_changes_here}
  
@@ -92,10 +97,10 @@
 *-
 
 
-*    Type Definitions:
+*  Type Definitions:
       IMPLICIT NONE
 
-*    Global constants:
+*  Global constants:
       INCLUDE 'SAE_PAR'                 ! SSE global definitions
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'SURF_PAR'                ! SURF constants
@@ -103,14 +108,14 @@
       INCLUDE 'PRM_PAR'                 ! for VAL__BAD
       INCLUDE 'PAR_ERR'                 ! For PAR__ constants
 
-*    Status:
+*  Status:
       INTEGER STATUS
 
-*    Local Constants:
+*  Local Constants:
       CHARACTER * 10 TSKNAME            ! Name of task
       PARAMETER (TSKNAME = 'SCUMAKEWT')
 
-*    Local variables:
+*  Local variables:
       REAL         CHOP_THROW           ! chop throw in arcsec
       REAL         CHOP_PA              ! Position angle of chop
       CHARACTER * 80 FITS ( SCUBA__MAX_FITS ) ! FITS header
