@@ -4,16 +4,20 @@
 
 buildsupportonly=false
 dryrun=false
-force_starconf=false
 need_gnu_m4=false
 
-USAGE="Usage: $0 [--buildsupport-only | --force-starconf | --dry-run | -n | --help]"
+USAGE="Usage: $0 [--buildsupport | --dry-run | -n | --help]"
 
 while test $# -gt 0
 do
     case $1 in
 
+    --buildsupport)
+        buildsupportonly=true
+        ;;
+
     --buildsupport-only)
+        echo "Use --buildsupport rather than --buildsupport-only" >&2
         buildsupportonly=true
         ;;
 
@@ -22,7 +26,8 @@ do
         ;;
 
     --force-starconf)
-        force_starconf=true
+        echo "Option --force-starconf is redundant: use --buildsupport" >&2
+        exit 1
         ;;
 
     --help)
@@ -30,14 +35,13 @@ cat <<EOD
 Usage: $0 [options]
 
 Available options:
-    --buildsupport-only     Build and install the buildsupport tools, and
-                            nothing else.
-    -n, --dry-run           Show the installation locations which the
+    --buildsupport      Build and install the buildsupport tools, and
+                            nothing else.  Deletes any preexisting
+                            buildsupport manifest files, to force all of
+                            these tools to be rebuilt.
+    -n, --dry-run       Show the installation locations which the
                             script works out, but don't actually do anything.
-    --force-starconf        Force the starconf component to be rebuilt,
-                            which is useful if you have changed STARCONF_...
-                            and are _re_bootstrapping the checkout.
-    --help                  Show this help.
+    --help              Show this help.
 EOD
         exit 0
         ;;
@@ -108,6 +112,9 @@ echo "    STARCONF_DEFAULT_STARLINK  = $STARCONF_DEFAULT_STARLINK"
 echo "    STARCONF_DEFAULT_PREFIX    = $STARCONF_DEFAULT_PREFIX"
 echo "    BUILDSUPPORT_PREFIX        = $BUILDSUPPORT_PREFIX"
 echo "    Do we need to build GNU m4?  $need_gnu_m4"
+if $buildsupportonly; then
+    echo "    Buildsupport only -- deleting buildsupport manifests"
+fi
 
 # Test whether important paths have spaces in them
 # (this is a natural thing to do on OSX or Windows boxes).
@@ -174,9 +181,18 @@ sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakef
     # The commands run within makefiles must use the correct buildsupport tools
     export PATH
 
-    if $force_starconf; then
-        test -f $STAR_MANIFEST_DIR/starconf \
-            && rm -f $STAR_MANIFEST_DIR/starconf
+    # If the option --buildsupport was given, then delete all of
+    # the buildsupport manifests, to force the tools to be rebuilt.
+    # This probably does more than is strictly necessary, but that
+    # does no harm.
+    if $buildsupportonly; then
+        echo "Cleaning buildsupport:"
+        echo "    make -f $tempmakefile \\"
+        echo "        MANIFEST=$STAR_MANIFEST_DIR \\"
+        echo "        clean-buildsupport"
+        make -f $tempmakefile \
+            MANIFEST=$STAR_MANIFEST_DIR \
+            clean-buildsupport
     fi
 
     if $need_gnu_m4; then
