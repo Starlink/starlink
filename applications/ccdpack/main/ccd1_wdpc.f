@@ -204,6 +204,10 @@
 *  Get a name for the indirection file.
          CALL CCD1_TMPNM( PROG, TEMP( 2: ), STATUS )
 
+*  Get required GRP control characters.
+         CALL GRP_GETCC( GIDIN, 'COMMENT', COMC, STATUS )
+         CALL GRP_GETCC( GIDIN, 'INDIRECTION', INDC, STATUS )
+
 *  Open the file.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          OPEN = .FALSE.
@@ -212,10 +216,6 @@
          IF ( STATUS .EQ. SAI__OK ) OPEN = .TRUE.
          MESS = COMC // ' List of names used by ' // PROG
          CALL FIO_WRITE( FDTMP, MESS( :CHR_LEN( MESS ) ), STATUS )
-
-*  Get required GRP control characters.
-         CALL GRP_GETCC( GIDIN, 'COMMENT', COMC, STATUS )
-         CALL GRP_GETCC( GIDIN, 'INDIRECTION', INDC, STATUS )
 
 *  Now extract the name of the NDFs and write these into the file.
          DO 3 I = 1, NFRAME
