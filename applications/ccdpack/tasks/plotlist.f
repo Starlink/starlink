@@ -247,6 +247,7 @@
 *  Local Variables:
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for readind data lines
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list 
+      CHARACTER * ( AST__SZCHR ) STYELS ! Plot style elements
       INTEGER CI1                ! Minimum allowed colour index
       INTEGER CI2                ! Maximum allowed colour index
       INTEGER FDIN               ! FIO system file descriptor
@@ -268,6 +269,7 @@
       INTEGER NVAL               ! Number of values in input data
       INTEGER PICID              ! AGI picture identifier
       INTEGER PLOT               ! AST identifier for Plot object
+      INTEGER STYELL             ! Number of characters in STYELS string
       INTEGER THICK              ! Marker pen width
       LOGICAL CLEAR              ! True if device is to be cleared
       LOGICAL NDFS               ! True if position list names in NDFs
@@ -335,7 +337,7 @@
          CALL AGP_ASSOC( 'DEVICE', 'WRITE', 'DATA', .FALSE., PICID,
      :                    STATUS )
       ELSE
-         CALL AGP_ASSOC( 'DEVICE', 'UPDATE', 'DATA', .FALSE., PICID,
+         CALL AGP_ASSOC( 'DEVICE', 'READ', 'DATA', .FALSE., PICID,
      :                    STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
@@ -361,6 +363,15 @@
       THICK = MAX( 1, MIN( THICK, 21 ) )
       CALL PGSLW( THICK )
 
+*  Construct a list of style elements based on the ADAM parameter values.
+      CALL MSG_SETR( 'MSIZE', MSIZE )
+      CALL MSG_SETI( 'PALNUM', IPEN )
+      CALL MSG_SETI( 'THICK', THICK )
+      CALL MSG_LOAD( ' ', 'Size(markers)=^MSIZE,' //
+     :               'Colour(markers)=^PALNUM,' //
+     :               'Colour(strings)=^PALNUM,' //
+     :               'Width(markers)=^THICK', STYELS, STYELL, STATUS )
+
 *  If we are not using NDFs construct a default AST Plot object aligned
 *  with the current AGI picture to do the plotting into.  Its Current 
 *  frame will be in the PIXEL domain.
@@ -369,6 +380,7 @@
          FSET = AST_FRAMESET( FRM, ' ', STATUS )
          CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
          CALL CCD1_PLSTY( PLOT, ' ', STATUS )
+         CALL AST_SET( PLOT, STYELS( 1:STYELL ), STATUS )
       END IF
 
 *  Now loop opening each position list then plotting its positions.
@@ -425,6 +437,7 @@
 
 *  Apply default and user-selected style settings to the plot.
             CALL CCD1_PLSTY( PLOT, ' ', STATUS )
+            CALL AST_SET( PLOT, STYELS( 1:STYELL ), STATUS )
          END IF
 
 *  Find out how many entries it has.
