@@ -284,10 +284,11 @@
 *        Format(1) and/or Format(2) are assigned values in the description 
 *        of the current Frame stored in the positions list.
 *     listshow s.txt plot=marker marker=3 style="colour(marker)=red,size=2"
-*        This lists the positions in s.txt on the screen in their 
-*        original co-ordinate Frame, and also marks them on the currently 
-*        selected graphics device using PGPLOT marker 3 (an asterisk). The 
-*        markers are red and are twice the default size. 
+*        This marks the positions in s.txt on the currently selected graphics 
+*        device using PGPLOT marker 3 (an asterisk). The positions are aligned
+*        with the most recent DATA picture in the current picture. The markers 
+*        are red and are twice the default size. The positions are not 
+*        reported on the screen.
 
 *  Notes:
 *     -  This application uses the conventions of the CURSA package (SUN/190)

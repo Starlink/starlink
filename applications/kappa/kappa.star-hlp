@@ -17336,18 +17336,35 @@ STRINGS = LITERAL (Read)
    new lines as well as commas.
 3 STYLE
 STYLE = LITERAL (Read)
-   The name of a text file containing a description of a plotting
-   style. It is used only to control the labels and format for the
-   displayed axis values, by specifying suitable values for Frame
-   attributes (eg  Digits(1), Digits(2), Symbol(1), Symbol(2), etc).
+   A group of attribute settings describing the style to use when
+   formatting the co-ordinate values displayed on the screen, and 
+   when drawing the graphics specified by parameter PLOT. 
 
-   Each line in the file should contain a string of the form
-   <name>=<value>, in which <name> is the name of an attribute,
-   and <value> is the value to assign to the attribute. The file may
-   contain blank lines and comment lines starting with a hash (#) sign.
-   Default values will be used for any unspecified attributes. All
-   attributes will be defaulted if a null value (!) is supplied.
-   [Current value]
+   A comma-separated list of strings should be given in which each
+   string is either an attribute setting, or the name of a text file
+   preceded by an up-arrow character "^". Such text files should
+   contain further comma-separated lists which will be read and 
+   interpreted in the same manner. Attribute settings are applied in 
+   the order in which they occur within the list, with later settings
+   over-riding any earlier settings given for the same attribute.
+   Each individual attribute setting should be of the form:
+
+      <name>=<value>
+
+   where <name> is the name of a plotting attribute, and <value> is
+   the value to assign to the attribute. Default values will be
+   used for any unspecified attributes. All attributes will be
+   defaulted if a null value (!) is supplied. See section "Plotting
+   Attributes" in SUN/95 for a description of the available
+   attributes. Any unrecognised attributes are ignored (no error is
+   reported). 
+
+   In addition to the attributes which control the appearance of
+   the graphics (Colour, Font, etc), the following attributes may
+   be set in order to control the appearance of the formatted axis 
+   values reported on the screen: Format, Digits, Symbol, Unit. These
+   may be suffixed with an axis number (eg "Digits(2)") to refer to 
+   the values displayed for a specific axis. [current value]
 2 Examples
 listshow stars pixel
    This displays the pixel co-ordinates of all the positions
@@ -17368,11 +17385,12 @@ listshow stars_2.txt style="digits(1)=5,digits(2)=7"
    Format(1) and/or Format(2) are assigned values in the description
    of the current Frame stored in the positions list.
 
-listshow stars_2.txt plot=3 style="colour=red,size=2"
-   This lists the positions in stars_2.txt on the screen in their
-   original co-ordinate Frame, and also marks them on the currently
-   selected graphics device using PGPLOT marker 3 (an asterisk). The
-   markers are red and are twice the default size.
+listshow s.txt plot=mark marker=3 style="colour(marker)=red,size=2"
+   This marks the positions in s.txt on the currently selected graphics 
+   device using PGPLOT marker 3 (an asterisk). The positions are aligned
+   with the most recent DATA picture in the current picture. The markers 
+   are red and are twice the default size. The positions are not reported 
+   on the screen.
 2 Notes
 -  This application uses the conventions of the CURSA package (SUN/190)
 for determining the formats of input and output catalogues. If a file
