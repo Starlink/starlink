@@ -187,6 +187,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.12  2005/03/18 06:27:21  timj
+*     Protect some calls with STATUS checks
+*
 *     Revision 1.11  2004/09/08 02:03:33  timj
 *     Add CNF_PVAL where appropriate
 *
@@ -876,7 +879,8 @@
      :              RTEMP, IERR, NERR, STATUS)
 
 *       Skip if zero (but not if we are using an external model)
-               IF (RTEMP .NE. 0.0 .OR. HAVE_MODEL) THEN
+               IF (STATUS .EQ. SAI__OK .AND.
+     :              RTEMP .NE. 0.0 .OR. HAVE_MODEL) THEN
                   CALL VEC_RTOR(.FALSE., 1, RTEMP,
      :                 %VAL(CNF_PVAL(SCRATCH2_PTR) + NGOOD*VAL__NBR),
      :                 IERR, NERR, STATUS)
@@ -953,36 +957,39 @@
          END IF
 
 *     Loop over positions
-         DO J = 1, N_POS(I)
+         IF (STATUS .EQ. SAI__OK) THEN
+            DO J = 1, N_POS(I)
 
 *     Determine start and end of box
-            ISTART = MAX(1, J - BOX_DIV)
-            ISTOP  = MIN(N_POS(I), J + BOX_DIV)
+               ISTART = MAX(1, J - BOX_DIV)
+               ISTOP  = MIN(N_POS(I), J + BOX_DIV)
 
 *     Now find stats of this section
-            NGOOD = ISTOP - ISTART + 1
+               NGOOD = ISTOP - ISTART + 1
 
-            CALL SCULIB_STATR(NGOOD, -1.0,
-     :           %VAL(CNF_PVAL(SCRATCH_PTR) + (ISTART - 1)*VAL__NBR),
-     :           %VAL(CNF_PVAL(SCRATCHUB_PTR) + (ISTART - 1)*VAL__NBUB),
-     :           BTEMP, ITEMP, MEAN, MEDIAN, SUM, SUMSQ,
-     :           STDEV, %VAL(CNF_PVAL(SCRATCH2_PTR)), STATUS)
+               CALL SCULIB_STATR(NGOOD, -1.0,
+     :              %VAL(CNF_PVAL(SCRATCH_PTR) + (ISTART - 1)*VAL__NBR),
+     :              %VAL(CNF_PVAL(SCRATCHUB_PTR)
+     :                            + (ISTART - 1)*VAL__NBUB),
+     :              BTEMP, ITEMP, MEAN, MEDIAN, SUM, SUMSQ,
+     :              STDEV, %VAL(CNF_PVAL(SCRATCH2_PTR)), STATUS)
 
 *     Copy result to output file
 *     Copy this value to the SKY_PTR array
-            CALL VEC_DTOR(.TRUE., 1, MEAN, 
-     :           %VAL(CNF_PVAL(SKY_PTR(I)) + (J-1) * VAL__NBR),
-     :           IERR, NERR, STATUS)
+               CALL VEC_DTOR(.TRUE., 1, MEAN, 
+     :              %VAL(CNF_PVAL(SKY_PTR(I)) + (J-1) * VAL__NBR),
+     :              IERR, NERR, STATUS)
 *     Copy in the error if the status was good
 *     if not (eg bin was 1 pixel wide). Just keep the variance
 *     from the earlier calculation
-            IF (STDEV .NE. VAL__BADD) THEN
-               CALL VEC_DTOR(.TRUE., 1, STDEV, 
-     :              %VAL(CNF_PVAL(SKY_ERR(I)) + (J-1) * VAL__NBR),
-     :              IERR, NERR, STATUS)
-            END IF
+               IF (STDEV .NE. VAL__BADD) THEN
+                  CALL VEC_DTOR(.TRUE., 1, STDEV, 
+     :                 %VAL(CNF_PVAL(SKY_ERR(I)) + (J-1) * VAL__NBR),
+     :                 IERR, NERR, STATUS)
+               END IF
 
-         END DO
+            END DO
+         END IF
 
 *     Free the scratch space
          CALL SCULIB_FREE('SCRAT_SM', SCRATCH_PTR, SCRATCH_END, STATUS)
