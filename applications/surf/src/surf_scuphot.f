@@ -155,6 +155,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.22  1998/06/09 21:57:34  timj
+*     Propogate Units to IPEAK rather than setting it.
+*
 *     Revision 1.21  1998/04/29 00:54:19  timj
 *     Add ANALYSIS=SAMPLES to simply propogate the data. Propogate input NDF to
 *     output NDFs so that FITS extension and HISTORY are copied automatically.
@@ -1150,7 +1153,9 @@ c
 
                   CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
 
-                  CALL NDF_SCOPY(SEC_NDF, 'NOEXTENSION(SCUBA,SCUCD)',
+*     Propogate units
+                  CALL NDF_SCOPY(SEC_NDF, 
+     :                 'UNITS,NOEXTENSION(SCUBA,SCUCD)',
      :                 PLACE, IPEAK, STATUS)
 
                   CALL NDF_ANNUL(SEC_NDF, STATUS)
@@ -1202,7 +1207,6 @@ c
 
 *     Put on some axis information and labels
 
-                  CALL NDF_CPUT('Volts',IPEAK,'UNITS',STATUS)
                   CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
 
                   IF (WRITEMAP) THEN
