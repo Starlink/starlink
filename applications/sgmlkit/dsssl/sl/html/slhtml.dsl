@@ -107,13 +107,13 @@ depending on whether the element is to be chunked.
 
 <routine>
 <routinename>href-to
-<purpose>Return the HTML HREF for the given node.  If chunking has been
-turned off, just return the fragment identifier.
-<description>Return the HTML HREF for the given node.  If chunking has been
-turned off, just return the fragment identifier.
+<purpose>Return the HTML HREF for the given node.
+<description>Return the HTML HREF for the given node.  If chunking has
+been turned off, just return the fragment identifier.
 <p>There can be a number of special cases in the determination of the fragid.
 Each one of these at present consists of a call to a function 
-<funcname>href-to-fragid-giname</>, which returns a fragment not prefixed by `#'.
+<funcname>href-to-fragid-giname</>, which returns a fragment not
+prefixed by `#'.
 <p>HTTP hrefs are described in
 <webref url='http://sunsite.org.uk/rfc/rfc1945.txt'
 >RFC 1945</webref> and
@@ -151,25 +151,39 @@ returns <code>#f</>.
 			      (force-frag #f))
   (let* ((exportatt (attribute-string (normalize "export") target))
          (idatt (attribute-string (normalize "id") target))
-         (id (cond 
+         (id (cond
+	      ;; First, a couple of special cases.
+	      ;;
+	      ;; `codecollection' elements have special (and
+	      ;; complicated) rules for linking.  See slroutines.dsl
 	      ((equal? (gi target) (normalize "codecollection"))
 	       #f			; no fragment identifier
 	       )
+	      ;; `mlabel' elements can't be exported.  Also, the
+	      ;; href-to-fragid-mlabel function can deal with
+	      ;; equations inside programcode documents.
+	      ((equal? (gi target) (normalize "mlabel"))
+	       (href-to-fragid-mlabel target))
+	      ;; Everything else: use an xref target suitable for
+	      ;; later processing with HTX.
 	      (idatt 
 	       (if exportatt
 		   (string-append "xref_" idatt)
 		   idatt))
+	      ;; Following ones aren't used when referring to targets
+	      ;; with IDs -- used instead for generating
+	      ;; HTX-compatible `name' attributes for certain special
+	      ;; elements.
 	      ((node-list=? target (document-element)) 
 	       "xref_")
 	      ((equal? (gi target) (normalize "abstract"))
 	       "xref_abstract")
+	      ;; `routine' elements
 	      ;((equal? (gi target) (normalize "routine"))
 	      ; (href-to-fragid-routine target))
-	      ((member (gi target) (section-element-list))
-	       (string-append "_ID" 
-			      (number->string (all-element-number target))))
-	      ((equal? (gi target) (normalize "mlabel"))
-	       (href-to-fragid-mlabel target))
+	      ;((member (gi target) (section-element-list))
+	      ; (string-append "_ID" 
+	      ;	      (number->string (all-element-number target))))
 	      (else #f)))
 	 (entfile (and (not frag-only)
 		       (html-file target_nd: target)))

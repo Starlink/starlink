@@ -49,7 +49,7 @@ immediately resolve the indirection.
 	     (member (gi target) (ref-target-element-list)))
 	(make element
 	  gi: "a"
-	  attributes: (list (list "href" (href-to target)))
+	  attributes: `(("href" ,(href-to target)))
 	  ;(with-mode section-reference
 	  ;  (process-node-list target))
 	  (if (string=? linktext "")
