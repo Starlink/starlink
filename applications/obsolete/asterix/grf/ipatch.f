@@ -93,6 +93,7 @@
       INTEGER STATUS
 *    Function declarations :
       BYTE BIT_ANDUB,BIT_ORUB,BIT_NOTUB
+      LOGICAL IMG_INREG
 *    Local constants :
 *    Local variables :
       INTEGER I,J,II,JJ,I1,I2,J1,J2
@@ -116,12 +117,13 @@
         MASK1=BIT_ORUB(I_MASK_W,QUAL__PATCHED)
         MASK2=BIT_ANDUB(I_MASK_W,BIT_NOTUB(QUAL__PATCHED))
 
-*  scan current box for bad pixels
+*  scan current box for bad pixels within current region
         DO J=I_IY1,I_IY2
           DO I=I_IX1,I_IX2
 
 *  found one
-            IF (BIT_ANDUB(Q(I,J),MASK2).NE.QUAL__GOOD) THEN
+            IF (IMG_INREG(I,J).AND.
+     :            BIT_ANDUB(Q(I,J),MASK2).NE.QUAL__GOOD) THEN
 
 *  see how many in each direction
               I1=I
