@@ -6,8 +6,11 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 /**
  *  Read GSD file from disk and map data array.
@@ -160,7 +163,7 @@ public final class GSDObject {
  */
     public Date getDateObs() {
         Double dayObj;
-        double hour;
+        double dechour;
 
         // Need to get the three items relating to the DATE-OBS
         try {
@@ -172,16 +175,45 @@ public final class GSDObject {
             Double hourObj = (Double)hourItem.getData();
             Double ut1cObj = (Double)ut1cItem.getData();
 
+            // correction converted to hours
+            double ut1c = ut1cObj.doubleValue() * 24.0;
+
             // Correct the hour to UTC = UT1 - UT1C
-            hour = hourObj.doubleValue() - ut1cObj.doubleValue();
+            dechour = hourObj.doubleValue() - ut1c;
 
         } catch (GSDException e) {
             throw new IllegalStateException("Error extracting date related fields from GSDObject: " + e);
         }
         // Now need to extract the Year month and day
         int year = dayObj.intValue();
+        int month = (int)(100 *(dayObj.doubleValue()-(double)year));
+        // Handle rounding errors
+        int day = (int)( 0.5 + 10000*( (dayObj.doubleValue()) - (double)year) ) 
+                             - 100*month;
+        int hour = (int)dechour;
+        int min = (int)(60*(dechour - hour));
+        int sec = (int)(0.5+3600*(dechour-hour)) - 60*min;
 
-        return new Date();
+        // correct for 0 offset
+        month--;
+
+        // Need the GMT time zone
+        String[] ids = TimeZone.getAvailableIDs(0);
+        if (ids.length == 0) {
+            // Must have one match at least
+            throw new IllegalStateException("Error retrieving GMT time zone");
+        }
+
+        // Create a TimeZone
+        SimpleTimeZone ut = new SimpleTimeZone(0, ids[0]);
+
+        // and a new calendar object for this time zone
+        GregorianCalendar cal = new GregorianCalendar(ut);
+
+        // and set the actual date
+        cal.set(year, month, day, hour,min , sec);        
+
+        return cal.getTime();
     }
 
 	/**
@@ -277,6 +309,7 @@ public final class GSDObject {
 		System.out.println(" GSD version    : " + getGsdVersion());
 		System.out.println(" Label          : " + getLabel());
 		System.out.println(" Number of items: " + getNumItems());
+        System.out.println(" Date of Observation:" + getDateObs());
 		System.out.println("");
 		System.out.println("");
 		System.out.println("");
