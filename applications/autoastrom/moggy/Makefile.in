@@ -137,7 +137,7 @@ moggy_LDADD = $(LIBOBJS) -lm -lcnf
 EXTRA_DIST = moggy-doc.txt LICENCE t
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = t/Makefile t/runtests
 bin_PROGRAMS = moggy$(EXEEXT)
@@ -151,7 +151,7 @@ moggy_DEPENDENCIES = @LIBOBJS@
 moggy_LDFLAGS =
 
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
-depcomp = $(SHELL) $(top_srcdir)/config/depcomp
+depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 @AMDEP_TRUE@DEP_FILES = $(DEPDIR)/glsfwd.Po $(DEPDIR)/slaDeuler.Po \
 @AMDEP_TRUE@	./$(DEPDIR)/AstHandler.Po \
@@ -168,9 +168,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 DIST_SOURCES = $(moggy_SOURCES)
-DIST_COMMON = Makefile.am Makefile.in aclocal.m4 config.h.in \
-	config/config.guess config/config.sub config/depcomp \
-	config/install-sh config/missing config/mkinstalldirs configure \
+DIST_COMMON = Makefile.am Makefile.in aclocal.m4 config.h.in configure \
 	configure.ac depcomp glsfwd.c install-sh missing mkinstalldirs \
 	slaDeuler.c
 SOURCES = $(moggy_SOURCES)
@@ -377,7 +375,7 @@ distcleancheck_listfiles = find . -type f -print
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkinstalldirs) $(distdir)/config $(distdir)/t
+	$(mkinstalldirs) $(distdir)/t
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
