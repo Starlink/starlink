@@ -32,6 +32,8 @@ fragments into GIFs (or JPEGs or PNGs, or whatever -- this code doesn't depend o
 file by a Perl script -- we use this extra step so that the Perl can try to
 reuse equations wherever possible, the logic for which is probably rather
 difficult in DSSSL.
+<p>If there is nothing to write out, the code does not write an
+empty output file. 
 <p>The `interface' is the same as for the <code/tth/ version below.
 <p>Changes here might need corresponding changes in make-manifest-mode in
 sl.dsl
@@ -118,28 +120,6 @@ appropriate arguments
 %%imgmath " eqn-type " " (img-eqnref) "
 "))))
 
-<func>
-<routinename>img-eqnref
-<description>Returns a unique reference to an equation.  If the element does
-  not have one of MEQUATION or MEQNARRAY in its ancestry (for example because
-  it is an M element), then we won't need to refer to this label.  It must,
-  however, be generated and be unique.
-<returnvalue type=string>String usable as an ID attribute value.
-<parameter optional default='(current-node)'>nd
-  <type>node-list
-  <description>A singleton node-list containing the element which is
-  to be referred to.
-<codebody>
-(define (img-eqnref #!optional (nd (current-node)))
-  (let ((refable-ancestor (ancestor-member nd '("MEQUATION" "MEQNARRAY"))
-			  ))
-    (if (node-list-empty? refable-ancestor)
-	(string-append "DUMMYEQ" (gi nd) (number->string (element-number nd)))
-	(string-append "EQ" (gi refable-ancestor)
-		       (number->string (element-number refable-ancestor)))
-	)
-    ))
-
 <misccode>
 <description>
 <p>Handle the maths elements in the normal run of text.
@@ -148,7 +128,8 @@ appropriate arguments
   (let ((sid (img-equation-sysid)))
     (if sid
 	(make empty-element gi: "img"
-	      attributes: (list (list "src" sid)))
+	      attributes: (list (list "src" sid)
+				(list "align" "middle")))
 	(make element gi: "em"
 	      (literal "Equation not found")))))
 
@@ -227,7 +208,8 @@ the file doesn't exist) then signal an error.
 (define (get-img-equations)
   (let* ((mfile ($maths-extfile$ #f))
 	 (mroot (sgml-parse mfile))
-	 (rde (document-element mroot)))
+	 (rde (and mroot
+		   (document-element mroot))))
     (or rde
 	(error (string-append "Can't find equations file: " mfile)))))
 
