@@ -22,6 +22,7 @@
 *  Authors:
 *     NE: Nick Eaton (University of Durham)
 *     DLT: David Terrett (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -29,6 +30,8 @@
 *        Original version.
 *     27-FEB-1992 (DLT):
 *        Create stand-alone version
+*     28-JUN-2004 (TIMJ):
+*        Autoconf version. Add test for EXIT and SLEEP
 *     {enter_changes_here}
 
 *  Bugs:
@@ -60,6 +63,8 @@
 *   Get a device name to run the test on
       PRINT *, 'Enter name of  graphic device with GKS and IDI support'
       READ (*,'(A)') DEVICE
+
+      CALL ERR_BEGIN(STATUS)
 
 *   Open up the AGI database for the specified device
       CALL AGI_OPEN( DEVICE, 'WRITE', PID( 1 ), STATUS )
@@ -166,6 +171,19 @@
 
 *   Close down
       CALL AGI_CLOSE( STATUS )
+
+#if HAVE_INTRINSIC_EXIT
+*   Exit with bad error status to shell if we have an error
+*   so that the test system knows we have failed
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_FLUSH( STATUS )
+         CALL ERR_END( STATUS )
+         CALL EXIT( 1 )
+      ELSE
+         print *, 'Test pass'
+         CALL EXIT( 0 )
+      END IF
+#endif
 
       END
 

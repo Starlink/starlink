@@ -25,7 +25,7 @@ AC_PROG_LIBTOOL
 dnl    Other options here, such as
 dnl STAR_HAVE_FC_OPEN_READONLY
 STAR_CNF_COMPATIBLE_SYMBOLS
-AC_FC_CHECK_INTRINSICS([SLEEP])
+AC_FC_CHECK_INTRINSICS([SLEEP EXIT])
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [cnf psx gks sae hds par])
