@@ -7,9 +7,9 @@ SEARCHTOOLS = kapform.html kapresults.html search.html search.js
 
 # The names of all the tar files containing system-independant files:
 TAR_FILES_A = kaplibs_source ira_source aif_source fts_source kpg_source \
-kapgrf_source
+kapgrf_source irq_source
 
-# The contents of the ira_source.tar file:
+# The contents of the kaplibs_source.tar file:
 KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch \
 kaplibs_test.f kaplibs_test.ifl 
 
@@ -207,22 +207,37 @@ ira_dtoc1.f ira_exprt.f ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f \
 ira_gtscs.f ira_init.f ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f \
 ira_seteq.f ira_trans.f ira_write.f ira_read.f ira_com ira_par ira_err 
 
+# The contents of the irq_source.tar file:
+IRQ_SOURCE = irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f \
+irq1_cmqm.f irq1_count.f irq1_evstk.f irq1_get.f irq1_gtidq.f \
+irq1_iannu.f irq1_indf.f irq1_init.f irq1_islot.f irq1_mod.f \
+irq1_ndtov.f irq1_nulop.f irq1_opcin.f irq1_opand.f irq1_qcnt.f \
+irq1_qlst2.f irq1_qlst.f irq1_qmsk.f irq1_qset.f irq1_rbit.f \
+irq1_reset.f irq1_rslot.f irq1_sbad1.f irq1_searc.f irq1_simpl.f \
+irq1_sorti.f irq1_space.f irq1_temp.f irq1_vtofx.f irq_addqn.f \
+irq_annul.f irq_chkqn.f irq_close.f irq_cmo irq_cntq.f irq_comp.f \
+irq_com irq_err irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f \
+irq_opc irq_pao irq_par irq_remqn.f irq_resql.f irq_resqm.f irq_resq.f \
+irq_rlse.f irq_sbad.f irq_setqm.f irq_setql.f irq_setq.f irq_syntx.f \
+irq_test.f
+
 # A group of all the generic source files.
 GENERIC_SOURCES = $(KPG_GEN)
 
 # The other files which need to be extracted from the source code
 # repository and which end up in kaplibs.tar.
-UNIX_OTHERS = makefile mk sun238.tex kaplibs.news KAPLIBS_CONDITIONS
+UNIX_OTHERS = makefile mk sun238.tex id6.tex kaplibs.news KAPLIBS_CONDITIONS
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) \
+UNIX_RELEASE =  $(UNIX_OTHERS) $(KAPLIBS_SOURCE) $(IRA_SOURCE) $(IRQ_SOURCE) \
 $(AIF_SOURCE) $(FTS_SOURCE) $(KPG_SOURCES) $(SEARCHTOOLS) $(KAPGRF_SOURCE)
 
 #  The contents of kaplibs.tar.
 UNIX_TOTAL = kaplibs_source.tar makefile mk sun238.tex sun238.htx_tar \
 kaplibs.news ira_source.tar fts_source.tar aif_source.tar ctg_source.tar \
-kpg_source.tar lpg_source.tar kapgrf_source.tar KAPLIBS_CONDITIONS
+irq_source.tar kpg_source.tar lpg_source.tar kapgrf_source.tar \
+KAPLIBS_CONDITIONS
 
 #  Target for use by the grp command.
 $(action)

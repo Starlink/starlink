@@ -425,7 +425,7 @@ LIB_VERS = 1.1
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
 ira_source.tar aif_source.tar fts_source.tar ctg_source.tar kpg_source.tar \
-lpg_source.tar kapgrf_source.tar
+irq_source.tar lpg_source.tar kapgrf_source.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -446,16 +446,18 @@ STARTUP_SCRIPT = $(PKG_NAME)_dev
 #  part of the package and may be required by users of it.  They will be
 #  installed in the $(INSTALL_INC) directory.
 
+IRQ_PUBLIC_INCLUDES = irq_err irq_par
 IRA_PUBLIC_INCLUDES = ira_err ira_par
 CTG_PUBLIC_INCLUDES = ctg_err 
 KPG_PUBLIC_INCLUDES = ctm_par kpg_ast hlpcmd
-PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES) $(KPG_PUBLIC_INCLUDES) 
+PUBLIC_INCLUDES = $(IRA_PUBLIC_INCLUDES) $(IRQ_PUBLIC_INCLUDES) $(CTG_PUBLIC_INCLUDES) $(KPG_PUBLIC_INCLUDES) 
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
 IRA_PRIVATE_INCLUDES = ira_com
+IRQ_PRIVATE_INCLUDES = irq_com irq_cmo irq_opc irq_pao
 CTG_PRIVATE_INCLUDES = ctg_const 
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
@@ -463,7 +465,8 @@ KPG_PRIVATE_INCLUDES = kpg_par ctm_com
 KAPGRF_PRIVATE_INCLUDES = grf.h
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
-                   $(KPG_PRIVATE_INCLUDES) $(KAPGRF_PRIVATE_INCLUDES) 
+                   $(KPG_PRIVATE_INCLUDES) $(KAPGRF_PRIVATE_INCLUDES) \
+                   $(IRQ_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -513,6 +516,18 @@ ira_creat.f ira_ctod.f ira_ctod1.f ira_dtoc.f ira_dtoc1.f ira_exprt.f \
 ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
 ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
 ira_write.f ira_read.f
+
+IRQ_F_ROUTINES = \
+irq1_add.f irq1_altrp.f irq1_antmp.f irq1_check.f irq1_cmqm.f \
+irq1_count.f irq1_evstk.f irq1_get.f irq1_gtidq.f irq1_iannu.f \
+irq1_indf.f irq1_init.f irq1_islot.f irq1_mod.f irq1_ndtov.f irq1_nulop.f \
+irq1_opand.f irq1_qcnt.f irq1_qlst.f irq1_qlst2.f irq1_qmsk.f irq1_qset.f \
+irq1_rbit.f irq1_reset.f irq1_rslot.f irq1_sbad1.f irq1_searc.f \
+irq1_simpl.f irq1_sorti.f irq1_space.f irq1_temp.f irq1_vtofx.f \
+irq_addqn.f irq_annul.f irq_chkqn.f irq_close.f irq_cntq.f irq_comp.f \
+irq_find.f irq_getqn.f irq_new.f irq_numqn.f irq_nxtqn.f irq_remqn.f \
+irq_resq.f irq_resql.f irq_resqm.f irq_rlse.f irq_sbad.f irq_setq.f \
+irq_setql.f irq_setqm.f irq_syntx.f
 
 KPG_F_ROUTINES = bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
 bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f chvalr.f \
@@ -668,14 +683,16 @@ lpg_assoc.f lpg_creat.f lpg_start.f lpg1_tidy.f lpg_catassoc.f lpg_crep.f \
 lpg_state.f
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) \
-             $(LPG_F_ROUTINES) $(FTS_F_ROUTINES) $(KPG_F_ROUTINES) 
+             $(LPG_F_ROUTINES) $(FTS_F_ROUTINES) $(KPG_F_ROUTINES) \
+             $(IRQ_F_ROUTINES)
 
 #  List of Fortran BLOCK DATA routines.
 
+IRQ_BLOCK_DATA = irq1_opcin.f
 IRA_BLOCK_DATA = ira1_init.f
 KPG_BLOCK_DATA = ctm_xcols.f
 LPG_BLOCK_DATA = lpg1_init.f
-BLOCK_DATA = $(IRA_BLOCK_DATA) $(KPG_BLOCK_DATA) $(LPG_BLOCK_DATA) 
+BLOCK_DATA = $(IRA_BLOCK_DATA) $(IRQ_BLOCK_DATA) $(KPG_BLOCK_DATA) $(LPG_BLOCK_DATA) 
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -743,15 +760,23 @@ $(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS)
 #  code.
 
 IRA_INCLUDE_LINKS = IRA_ERR IRA_PAR IRA_COM 
+IRQ_INCLUDE_LINKS = IRQ_COM IRQ_CMO IRQ_OPC IRQ_PAO IRQ_ERR IRQ_PAR
 CTG_INCLUDE_LINKS = CTG_ERR CTG_CONST
 LPG_INCLUDE_LINKS = LPG_CONST LPG_COM
 FTS_INCLUDE_LINKS = FTS_PAR
 KPG_INCLUDE_LINKS = KPG_PAR KPG_AST HLPCMD CTM_PAR CTM_COM
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(IRA_INCLUDE_LINKS) $(CTG_INCLUDE_LINKS) \
-                $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) $(KPG_INCLUDE_LINKS) 
+                $(LPG_INCLUDE_LINKS) $(FTS_INCLUDE_LINKS) $(KPG_INCLUDE_LINKS) \
+                $(IRQ_INCLUDE_LINKS) 
 
 #  Rules to set up links to locate each of the above include files.
 
+IRQ_COM:     irq_com;             $(LINK) $? $@
+IRQ_CMO:     irq_cmo;             $(LINK) $? $@
+IRQ_OPC:     irq_opc;             $(LINK) $? $@
+IRQ_PAO:     irq_pao;             $(LINK) $? $@
+IRQ_ERR:     irq_err;             $(LINK) $? $@
+IRQ_PAR:     irq_par;             $(LINK) $? $@
 IRA_ERR:     ira_err;             $(LINK) $? $@
 IRA_COM:     ira_com;             $(LINK) $? $@
 IRA_PAR:     ira_par;             $(LINK) $? $@
@@ -822,6 +847,12 @@ $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) $(IRA_C_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in ira_source.tar; exit 1; fi
 
+$(IRQ_PUBLIC_INCLUDES) $(IRQ_PRIVATE_INCLUDES) \
+$(IRQ_F_ROUTINES) $(IRQ_BLOCK_DATA):
+	$(TAR_OUT) irq_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in irq_source.tar; exit 1; fi
+
 $(CTG_PUBLIC_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
 $(CTG_F_ROUTINES) $(CTG_C_ROUTINES):
 	$(TAR_OUT) ctg_source.tar $@
@@ -877,6 +908,8 @@ AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o)
 IRA_OBJECT_FILES = $(IRA_BLOCK_DATA:.f=.o) $(IRA_F_ROUTINES:.f=.o) \
                   $(IRA_PLATFORM_F:.f=.o) $(IRA_C_ROUTINES:.c=.o)
 
+IRQ_OBJECT_FILES = $(IRQ_BLOCK_DATA:.f=.o) $(IRQ_F_ROUTINES:.f=.o) 
+
 FTS_OBJECT_FILES = $(FTS_F_ROUTINES:.f=.o) \
                    $(FTS_PLATFORM_F:.f=.o) $(FTS_C_ROUTINES:.c=.o)
 
@@ -891,7 +924,7 @@ LPG_OBJECT_FILES = $(LPG_BLOCK_DATA:.f=.o) $(LPG_F_ROUTINES:.f=.o) \
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
                $(LPG_OBJECT_FILES) $(FTS_OBJECT_FILES) $(KPG_OBJECT_FILES) \
-               $(KAPGRF_OBJECT_FILES)
+               $(KAPGRF_OBJECT_FILES) $(IRQ_OBJECT_FILES)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $<
@@ -902,7 +935,7 @@ OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
 #  them.
 
 OBJECT_LIBRARIES = libaif.a libira.a libctg.a liblpg.a libfits.a \
-                   libkapgen.a libkapgrf.a
+                   libkapgen.a libkapgrf.a libirq.a
 
 libaif.a: $(AIF_OBJECT_FILES)
 	$(AR_IN) $@ $?
@@ -913,6 +946,10 @@ libkapgrf.a: $(KAPGRF_OBJECT_FILES)
 	$(RANLIB) $@
 
 libira.a: $(IRA_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+
+libirq.a: $(IRQ_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 
@@ -1708,6 +1745,60 @@ grf_kaplibs.o:   grf.h
 gthlpi.o:	 SAE_PAR HLPCMD
 icmmm.o:	 SAE_PAR PRM_PAR
 inset.o:	 SAE_PAR
+irq1_add.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_altrp.o: IRQ_ERR IRQ_OPC IRQ_PAR PRM_PAR SAE_PAR
+irq1_antmp.o: DAT_PAR SAE_PAR
+irq1_check.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_cmqm.o: IRQ_OPC IRQ_PAR SAE_PAR
+irq1_count.o: PRM_PAR SAE_PAR
+irq1_evstk.o: IRQ_OPC IRQ_PAR SAE_PAR
+irq1_get.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_gtidq.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq1_iannu.o: DAT_PAR IRQ_COM IRQ_PAR SAE_PAR
+irq1_indf.o: IRQ_ERR SAE_PAR
+irq1_init.o: DAT_PAR IRQ_COM IRQ_PAR SAE_PAR
+irq1_islot.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_mod.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_ndtov.o: SAE_PAR
+irq1_nulop.o: IRQ_OPC IRQ_PAR SAE_PAR
+irq1_opand.o: IRQ_ERR IRQ_OPC IRQ_PAR SAE_PAR
+irq1_opcin.o: IRQ_CMO IRQ_PAO IRQ_PAR
+irq1_qcnt.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+irq1_qlst.o: DAT_PAR SAE_PAR
+irq1_qlst2.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+irq1_qmsk.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+irq1_qset.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
+irq1_rbit.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_reset.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq1_rslot.o: DAT_PAR IRQ_PAR SAE_PAR
+irq1_sbad1.o: IRQ_ERR IRQ_PAR PRM_PAR SAE_PAR
+irq1_searc.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq1_simpl.o: IRQ_OPC IRQ_PAR SAE_PAR
+irq1_sorti.o: SAE_PAR
+irq1_space.o: IRQ_ERR IRQ_OPC IRQ_PAR SAE_PAR
+irq1_temp.o: DAT_PAR SAE_PAR
+irq1_vtofx.o: IRQ_OPC IRQ_PAR SAE_PAR
+irq_addqn.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq_annul.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_chkqn.o: DAT_PAR IRQ_PAR SAE_PAR
+irq_close.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_cntq.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq_comp.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_find.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq_getqn.o: DAT_PAR IRQ_PAR SAE_PAR
+irq_new.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq_numqn.o: SAE_PAR
+irq_nxtqn.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq_remqn.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR
+irq_resq.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq_resql.o: IRQ_ERR IRQ_PAR NDF_PAR SAE_PAR
+irq_resqm.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq_rlse.o: DAT_PAR IRQ_PAR SAE_PAR
+irq_sbad.o: DAT_PAR IRQ_COM IRQ_ERR IRQ_PAR SAE_PAR
+irq_setq.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq_setql.o: IRQ_ERR IRQ_PAR NDF_PAR SAE_PAR
+irq_setqm.o: IRQ_ERR IRQ_PAR SAE_PAR
+irq_syntx.o: DAT_PAR IRQ_PAR SAE_PAR
 ira1_aito.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira1_ascre.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR
 ira1_asdef.o:	 SAE_PAR IRA_PAR

@@ -6,7 +6,7 @@ which provide general purpose algorithms required by the KAPPA package,
 and which may be of use to anyone developing their own KAPPA-like 
 applications (see SUN/238).
 
-Version 1.1. includes the following changes:
+Version 2.0. includes the following changes:
 
    - The kaplibs_link_adam script now has an optional switch, "-nogks",
    which allows applications to be linked with the native version of
@@ -19,3 +19,5 @@ Version 1.1. includes the following changes:
    should update this file by calling new routine KPG1_LTSAV to save
    the current colour table in the file.
 
+   - The IRAS90 IRQ library has been included. IRQ is used to manage
+   textual representations of NDF Quality bits.
