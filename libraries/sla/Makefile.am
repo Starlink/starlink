@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 dist_bin_SCRIPTS = sla_link sla_link_adam
+dist_pkgdata_DATA = SLA_CONDITIONS
 
 lib_LTLIBRARIES = libsla.la
 
