@@ -804,9 +804,9 @@ if ($PK_GENERATION) {
 sub check_for_dots {
     local($file) = @_;
     if ($file =~ /\.[^.]*\./) {
-	die "\n\n\n *** Fatal Error --- but easy to fix ***\n"
-	    . "\nCannot have '.' in file-name prefix, else dvips fails on images"
-	    . "\nChange the name from  $file  and try again.\n\n";
+	print "\n\n\n *** Potentially Fatal Error --- but easy to fix ***\n"
+	. "\nCannot have '.' in file-name prefix, else dvips may fail on images"
+	. "\nChange the name from $file and try again.\n\n";
     }
 }
 
