@@ -2023,7 +2023,8 @@ known to you in a non-machine-readable form.
 \item[Mosaic camera geometry:]
 If the instrument is a mosaic camera in which several CCD chips
 are adjacently positioned on the focal plane,
-their relative positions may be known.
+then one observation will comprise a set of related image files,
+whose relative positions may be known.
 \item[Multiple exposures:]
 If multiple exposures are taken without moving the telescope
 or otherwise altering the observational setup,
@@ -2044,10 +2045,10 @@ an associated coordinate system and a {\em domain}\footnote{
 Frames also have a number of other attributes which we won't describe
 here; see \xref{SUN/210}{sun210}{Frame} for more detail.}\/,
 which is a label by which the frame can be referred to.
-At any time just one of these frames, known as the {\em current\/} frame,
+At any time just one of these frames, known as the {\em Current\/} frame,
 has a special status and is used by certain commands; 
-for instance KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} labels 
-axes in the coordinates of the current frame.
+for instance KAPPA's \xref{DISPLAY}{sun95}{DISPLAY} can label 
+axes in the coordinates of the Current frame.
 The WCS component also contains {\em mappings\/} which 
 encode the rules for transforming between any two frames in
 the WCS component.
@@ -2058,7 +2059,7 @@ a frame representing the same coordinate system
 is contained in the WCS component of each one.
 Once this is done, each image can be resampled to the new 
 coordinate system (so that pixel-by-pixel alignment is achieved)
-and combined to form a mosaic.
+and combined or compared.
 If there is only one kind of information about the relative 
 positioning of images then attaching this common coordinate 
 system may be done in a single step,
@@ -2094,13 +2095,13 @@ Use of instrument-type-based geometry information:
 Direct manipulation of WCS components:
 \routine{WCSEDIT}
 \item
-Sorting through existing frames:
+Combining information from existing frames:
 \routine{WCSREG}
 \end{itemize}
-The rest of this subsection explains the use of these methods
-(and a schematic illustration of how they fit together is contained
-in \hyperref{this figure }{Figure }{}{registration}).
-
+The use of these methods is explained in the following 
+sections, and
+a schematic illustration of how they fit together is contained
+in \hyperref{this figure }{Figure }{}{registration}.
 There is also a discussion of the \xref{TRANSFORM}{sun61}{}-based
 approach used by previous versions of CCDPACK, which is still
 available, but on the whole deprecated.
@@ -2120,7 +2121,7 @@ and what you can do with them (including using them for NDF display)
 in the ``\xref{Using World Coordinate Systems}{sun95}{se_wcsuse}''
 section of the KAPPA document, \xref{SUN/95}{sun95}{},
 and more detailed description of the underlying AST system in 
-\xref{SUN/210}{sun210}.
+\xref{SUN/210}{sun210}{}.
 
 In general CCDPACK conforms to the normal rules about AST
 objects and WCS components, so other applications, for instance
@@ -2149,8 +2150,8 @@ like an automatically generated one.
 
 
 
-\subsection{Object matching and position lists}
-
+\subsection{\xlabel{objectmatching}\label{object_matching}Object matching 
+            and position lists}
 
 In CCDPACK three methods for determining image feature correspondence
 are provided. Two of these rely on the transformations being
@@ -2159,13 +2160,15 @@ automated and semi-automated processing. The third method relies on
 considerable interaction but can deal with transformations of scale,
 magnification and shear as well as offsets (i.e.\ general linear
 transformations).
-% The fourth method is undefined -- do-it-yourself --
-% and consists of making any use of the basic tools provided. Using the
-% CCDPACK applications it is possible to determine transformations
-% between datasets using completely general functions.
-%   (this refers to CCDEDIT)
+If images are well modelled by simple offsets apart from a 
+{\em known} transformation, for instance a rotation of the
+instrument between observations, then a frame describing the known
+transformation can be added using \xroutine{WCSEDIT} 
+or the ROT or FITSROT parameters of \xroutine{ASTIMP},
+and the automated methods still used.
 
-\subsubsection{\xlabel{registration}Transformation parameter determination}
+
+\subsubsection{\xlabel{registration}Determining transformation parameters}
 
 The routine which determines the transformations between labelled
 position lists is called:
@@ -2265,7 +2268,7 @@ given as it is used when deciding which positions match or as the bin
 size when forming histograms.
 
 Which algorithm you should use depends on the number of points your
-positions lists contain and the expected number of objects in the
+position lists contain and the expected number of objects in the
 overlaps. Obviously it is much easier to detect a match between  two
 lists which have most of their positions in common. With small overlaps
 a serious concern is the likelihood of finding a `false' match. False
@@ -2333,9 +2336,10 @@ that the error box used when comparing objects will include
 corresponding positions.  It will also work when all terms
 (say plate distortions) except the offset are known. 
 In this case it is just necessary to add to the image's WCS component 
-(or apply to the position list directly using \routine{TRANLIST})
 a coordinate frame taking account of the known transformations
-before the offsets are determined.
+before the offsets are determined;
+alternatively the position list can be transformed directly using
+\xroutine{TRANLIST}.
 
 Invoking \xroutine{FINDOBJ}, \xroutine{FINDOFF} and
 \xroutine{REGISTER} is trivial:
@@ -2355,7 +2359,7 @@ parameters seems mysterious.
 
 FINDOFF's other parameters are detailed in
 \hyperref{a later section}{\S}{}{FINDOFF} and some of its internals are
-explained in, P.W. Draper, {\bf 1993}, `Preparing multiple CCD frames for the
+explained in P.W. Draper, {\bf 1993}, `Preparing multiple CCD frames for the
 photometry of extended fields', Proceedings of the 5th ESO/ST-ECF Data
 Analysis Workshop.
 
@@ -2366,8 +2370,8 @@ Analysis Workshop.
 When datasets are offset only by X and Y translations,
 but contain insufficient objects for the fully automated registration
 described in the previous section, 
-semi-automated registration may be used.
-This uses the applications:
+registration may be done in a semi-automated way,
+using the programs:
 \begin{itemize}
 \item \xroutine{PAIRNDF}
 \item \xroutine{REGISTER}
@@ -2478,15 +2482,15 @@ positions of identified image features in the pixel coordinates
 of the NDF with which they are associated (that is, the coordinates
 of the frame with the `PIXEL' domain).  However, for the purposes
 of offset determination they usually get mapped automatically
-to the NDF's current coordinate frame.
+to the NDF's Current coordinate frame.
 That is to say that when \routine{FINDOFF} determines X and Y offsets,
 or \routine{REGISTER} determines the parameters of a transformation
 between two sets of objects, 
 the coordinates used are those in the position lists transformed into
-the current coordinate frame of their associated NDFs (though this
+the Current coordinate frame of their associated NDFs (though this
 transformation can be inhibited 
 by setting the USEWCS parameter in either case).
-Thus as long as the current frame in the WCS component of the NDF in question
+Thus as long as the Current frame in the WCS component of the NDF in question
 is selected appropriately, CCDPACK can keep implicit track of
 transformations which have to be applied to position list coordinates.
 
@@ -2563,11 +2567,12 @@ of the image.
 \item \xroutine{TRANLIST} now transforms the positions from pixel 
 coordinates to the current frame coordinate system of \text{newimg}.
 \end{enumerate}
-
 The final command is more complex as the mapping to be used is not
 associated with the image with which the position list to be transformed
 is associated, so it is necessary to give the location of the WCS
-component.
+component.  This exemplifies why storing the transformations in 
+a standard way that all the CCDPACK applications know about is 
+such a good idea.
 
 Using linear coefficients is a quick way of applying offsets, scales and
 rotations to data. The linear transform form is:
@@ -2581,7 +2586,7 @@ The \text{TR(1-6)} correspond to the coefficients you give to
 \routine{TRANLIST}.
 The identity transformation is \text{[0,1,0,0,0,1]} which corresponds
 to the coefficients \text{[TR(1),TR(2),TR(3),TR(4),TR(5),TR(6)]}.
-So an offset in X and Y would be \text{[TR(1),1,0,TR(2),0,1]}.
+So an offset in X and Y would be \text{[TR(1),1,0,TR(4),0,1]}.
 Scaling uses the \text{TR(2,3,5, \& 6)} coefficients.
 Rotation uses the coefficients:
 \begin{myquote}
@@ -2622,6 +2627,7 @@ component using \xroutine{WCSEDIT}.
 
 
 
+
 \subsection{\xlabel{transformregistration}\label{transformreg}Registration 
             using TRANSFORM structures}
 
@@ -2644,7 +2650,7 @@ with files which have already been partially processed by CCDPACK.
 Use of the old methods
 is also necessary for certain nonlinear kinds of transformations
 which cannot currently be handled by the \xref{AST}{sun210}{}
-library which underlies the processing of WCS components.
+library underlying the processing of WCS components.
 
 The applications 
 \routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, \routine{TRANNDF} 
@@ -2776,14 +2782,353 @@ objects are present in the data) may be entered directly into the images
 (see their entries in appendix \S\ref{app:description}).
 
 
+\subsection{Handling the WCS component directly}
+
+CCDPACK provides the routine
+\begin{itemize}
+\item \routine{WCSEDIT}
+\end{itemize}
+for direct manipulation of the WCS component of one or a group of NDFs.
+It can make current, add, remove or modify coordinate frames.
+When making current or removing
+a frame only the NDF name and the
+frame in question need to be specified.
+When modifying 
+a frame an additional parameter of the form
+`\text{attribute=value [, attribute=value]}'
+must be given.
+One useful application of this is to change the domain of an existing
+frame: for instance
+\begin{myquote}
+\begin{verbatim}
+wcsedit file1 mode=set set="domain=obs1"
+\end{verbatim}
+\end{myquote}
+For more sophisticated use of this feature, see the documentation
+of \xroutine{WCSEDIT} in appendix \S\ref{app:description}, and of
+the \xref{AST\_SET}{sun210}{AST\_SET} routine in \xref{SUN/210}{sun210}{}.
+
+When adding a new 
+frame one must give the mapping which connects it 
+to one of the previously existing frames.  
+The mapping may be one of the following types:
+\begin{description}
+\item[UNIT:]
+No coordinate transformation is performed in this case.
+A frame with a new domain, but the same coordinates as an existing
+one, can thus be added in this way.
+\item[LINEAR:]
+A general linear tranformation can be specified by giving six
+coefficients:
+\begin{eqnarray*}
+   x^\prime & = & C_1 + C_2 x + C_3 y \\
+   y^\prime & = & C_4 + C_5 x + C_6 y
+\end{eqnarray*}
+\item[PINCUSHION:]
+A pincushion-type transformation,
+which is a common optical distortion,
+can be specified by giving three coefficients: 
+the first is the magnitude of the distortion
+and the other two are the coordinates of its centre:
+\begin{eqnarray*}
+   x^\prime = x ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] ) \\
+   y^\prime = y ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] )
+\end{eqnarray*}
+A positive $C_1$ corresponds to a pincushion distortion and 
+a negative $C_1$ corresponds to a barrel distortion.
+\end{description}
+Thus the following command would 
+add a new frame, with domain `SQUASHED', 
+representing a barrel distortion
+of the pixel coordinates with a magnitude of $7\times 10^{-10}$ 
+and an optical
+centre at coordinates (1000,1000):
+\begin{myquote}
+\begin{verbatim}
+wcsedit image* add frame=pixel domain=squashed
+        maptype=pincushion coeffs=[-7e-10,0,0]
+\end{verbatim}
+\end{myquote}
+
+Specifying the frame to add, remove, make current
+or act as the base for adding a new frame 
+is done using the FRAME parameter, which can take one of four types
+of value:
+\begin{itemize}
+\item
+A domain name
+\item
+An integer value giving the index of the frame within the WCS component
+\item
+A \qt{Sky Co-ordinate System} (SCS) value such as EQUAT(J2000)
+(see section \xref{`Sky Co-ordinate Systems'}{sun95}{se_scs} in 
+\xref{SUN/95}{sun95}{}).
+\item
+The null value (`{\tt !}'), indicating the NDF's Current frame.
+\end{itemize}
+When run, \routine{WCSEDIT} will log what it has done, 
+giving the domain of the altered frame where appropriate
+(even if it was specified in some other way).
+If it could not perform the requested action on any of the NDFs
+in the list, an appropriate message will be written, but this
+does not consitute a fatal error.
+However, to find out which NDFs were successfully modified, the
+ADAM output parameter MODIFIED can be examined using the
+KAPPA program \xref{PARGET}{sun95}{PARGET}, as in
+the following example:
+\begin{myquote}
+\begin{verbatim}
+% wcsedit 'data?' current ccd_gen
+
+    WCSEDIT
+    =======
+  4 NDFs accessed using parameter IN
+
+data1: Current frame set to domain CCD_GEN
+
+data2: Basis frame 'ccd_gen' not found
+       NDF not modified
+
+data3: Current frame set to domain CCD_GEN
+
+data4: Current frame set to domain CCD_GEN
+
+% parget modified wcsedit
+data1,data3,data4
+\end{verbatim}
+\end{myquote}
+
+To examine the WCS component of an NDF,
+use the command
+\begin{myquote}
+\tt ndftrace \it filename \tt fullwcs
+\end{myquote}
+For more detail, which is unlikely to be of much use unless you
+are quite familiar with the \xref{AST}{sun210}{} system,
+you could try
+\begin{myquote}
+\tt wcsshow \it filename
+\end{myquote}
+or
+\begin{myquote}
+\tt hdstrace \it filename \tt nlines=all eachline
+\end{myquote}
+The \xref{KAPPA}{sun95}{} command \xref{NDFTRACE}{sun95}{NDFTRACE} is 
+documented in \xref{SUN/95}{sun95}{}, 
+and \xref{HDSTRACE}{sun102}{HDSTRACE} 
+is documented in \xref{SUN/102}{sun102}{}.
+
+
+\subsection{Re-use of frames with AST files}
+
+Coordinate frame information can be exported from and imported to
+image files using the commands:
+\begin{itemize}
+\item \routine{ASTEXP}
+\item \routine{ASTIMP}
+\end{itemize}
+
+Sometimes the coordinate transformations which must be applied
+to one set of observations are the same as those
+required for many other sets.
+One example of this is the observations from a mosaic
+CCD camera, in which multiple CCD chips are fixed adjacently 
+in the same focal plane to avoid needing a single very large device;
+the relative position of each chip to the others 
+will not change as a function of pointing direction.
+Another example is when the optical distortion of an instrument
+(at a given wavelength) is known; if this can be applied
+correctly to one observation it can be applied to many.
+A third example, which is common because the large focal planes
+implied by use of a mosaic camera often leads to significant
+optical distortions, is the combination of these two.
+
+CCDPACK allows this kind of coordinate transformation information to 
+be written to (using \routine{ASTEXP}), 
+and read back from (using \routine{ASTIMP}),
+an external file called an AST file.
+This effectively stores a new frame with a given domain for each
+image in a related set, and enough information to graft it 
+on to the image's existing WCS component.  
+Thus applying the AST file to a set of NDFs adds a new frame to
+each of them, which can be used for the registration process.
+Where there are several images in a set, as in the case of 
+a mosaic camera, \routine{ASTIMP} can determine which frame to
+use for which image either by the order in which they are presented,
+or by usng FITS headers in the file, 
+according to how the AST file was constructed by \routine{ASTEXP}.
+
+It is not essential to understand the details of the process
+in order to use it, but for the interested reader:
+what the AST file contains is a set of framesets, each
+containing a Base frame, a Current frame, and a mapping between the
+two.  All the Base frames in the file should have the same domain,
+and so should all the Current frames.  The Base frame domain should
+be one which the raw NDFs can be expected to contain, for instance
+`PIXEL'.  The action of ASTEXP is simply to save these pairs,
+with information about how to identify which to use for any 
+given NDF.
+The action of ASTIMP is, having identified which of the framesets
+applies to a given NDF, to add the Current frame of the frameset 
+to the WCS component using the mapping from the frameset's Base to
+Current frames as the mapping between the frame in the WCS component
+which corresponds to the frameset's Base, and the newly added frame.
+
+Full details on how to use \xroutine{ASTIMP} and \routine{ASTEXP}
+can be found in appendix \S\ref{app:description},
+but the following gives an example.
+\begin{myquote}
+\begin{verbatim}
+astexp reg_data* astfile=int.ast idtype=fitsid fitsid=chipname
+astimp new_data* astfile=int.ast
+\end{verbatim}
+\end{myquote}
+The first command takes a set of images which has been fully registered
+and constructs a file \text{int.ast} from them;
+the parameters `\text{idtype=fitsid fitsid=chipname}' 
+mean that the AST file labels each coordinate frame with the
+value of the `CHIPNAME' FITS header from the \text{reg\_data*} NDFs,
+since this dentifies which CCD is which in the mosaic camera.
+The second command applies the file \text{int.ast}
+to a set of images from the same source which have not yet been registered;
+for each one \routine{ASTIMP} works out which coordinate frame to 
+add by matching the `CHIPNAME' FITS header in the image with one of 
+the ones in the AST file.
+
+If a previously prepared AST file for the instrument you are using
+exists, then the \routine{ASTEXP} step can be avoided.
+In any case, once a suitable AST file is available, 
+it can be applied to many sets of images from the same instrument,
+as long as its characteristics remain the same.
+
+
+
+\subsection{Combining coordinate frames}
+
+To combine registration information from different sources,
+use the routine
+\begin{itemize}
+\item \routine{WCSREG}
+\end{itemize}
+
+It is not always possible to register a set of images in a single
+step, using one kind of procedure.
+Suppose that you have two observations from a mosaic camera,
+which were taken on the sky in roughly the positions
+shown in \hyperref{the figure}{Figure }{}{fig:overlap}.
+\myfig{sun139mos.eps}{}{mos.gif}{fig:overlap}{Overlapping observations
+taken using a mosaic camera.}
+There is overlap between the images 
+\text{1b}, \text{1c}, \text{2b} and \text{2c},
+so that the object matching methods of 
+\hyperref{a previous section}{section \S}{}{object_matching}
+can be used to apply a common coordinate system to these.
+Furthermore, the geometry of the CCD chips in the instrument
+is known and stored in an AST file,
+so that a common coordinate system applies to 
+images \text{1a}, \text{1b} and \text{1c},
+and another to images \text{2a}, \text{2b} and \text{2c}.
+As we have seen, embedding multiple images within the same
+coordinate system is done by adding a new frame,
+sharing a common domain, to the WCS component of each.
+We can use a set of commands like:
+\begin{myquote}
+\begin{verbatim}
+astimp in='1a,1b,1c' astfile=instrument.ast indomain=obs1
+astimp in='2a,2b,2c' astfile=instrument.ast indomain=obs2
+wcsedit in='2a,2b,2c' add obs2 domain=obs2-rot 
+        maptype=linear coeffs=[0,-1,0,0,0,-1]
+\end{verbatim}
+\end{myquote}
+The \xroutine{WCSEDIT} command is necessary because the focal plane
+of the instrument was rotated between the two observations.
+In fact since this is quite a common occurrence the \xroutine{ASTIMP}
+command has a parameter for adding rotations, so that the last
+two commands could be replaced by:
+\begin{myquote}
+\begin{verbatim}
+astimp in='2a,2b,2c' astfile=instrument.ast indomain=obs2rot rot=180
+\end{verbatim}
+\end{myquote}
+--- this step can also be automated under some circumstances by using 
+\routine{ASTIMP}'s FITSROT parameter.
+Since all the images now have the same orientation, they are related
+by a simple offset so that the automatic object matching routines
+can be applied to the overlapping frames:
+\begin{myquote}
+\begin{verbatim}
+findobj in='1b,1c,2b,2c' outlist=*.find
+findoff in='1b,1c,2b,2c' outlist=*.off
+register inlist='1b,1c,2b,2c' fittype=1
+\end{verbatim}
+\end{myquote}
+Now the WCS components of the NDFs 
+contain (amongst others) the following frames:
+\begin{myquote}
+\begin{tabular}{lcccc}
+\text{1a}: & OBS1 &      &          &          \\
+\text{1b}: & OBS1 &      &          & CCD\_REG \\
+\text{1c}: & OBS1 &      &          & CCD\_REG \\
+\text{2a}: &      & OBS2 & OBS2-ROT &          \\
+\text{2b}: &      & OBS2 & OBS2-ROT & CCD\_REG \\
+\text{2c}: &      & OBS2 & OBS2-ROT & CCD\_REG  
+\end{tabular}
+\end{myquote}
+This is not yet sufficient to perform the resampling,
+since there is no single domain in which all the images share a frame.
+To add an extra frame representing a single coordinate system
+in which all the images are embedded, the application \routine{WCSREG}
+is used.
+A list of domains to use for alignment, and a reference NDF
+(by default the first) must be specified.
+A new coordinate frame, equivalent (i.e. connected by a unit mapping)
+to its Current frame, is first added to the reference NDF.
+For each of the other NDFs, if it shares a domain in the given
+list with the reference NDF, a new frame is added using those coordinates.
+If not, \routine{WCSREG} tries to hop from it to the reference NDF
+via other NDFs: formally, it constructs a graph in which the nodes
+are NDFs and edges exist between NDFs which have frames with a common
+domain, and tries to find a connected subgraph from the NDF it is
+processing to the reference NDF.  
+If such a subgraph exists, it and the mappings between frames in the
+intermediate NDFs can be used to add a new frame.
+All the frames added are given the same domain (by default CCD\_WCSREG).
+So in the above example, after executing a command like:
+\begin{myquote}
+\begin{verbatim}
+wcsedit 1a current pixel
+wcsreg '1a,1b,1c,2a,2b,2c' domains='ccd_reg,obs1,obs2'
+\end{verbatim}
+\end{myquote}
+all of the listed NDFs will have a new common coordinate frame with 
+domain `CCD\_WCSREG', which can be used for resampling.
+The \routine{WCSEDIT} command here is just a precaution to make
+sure that the new frame is a suitable one for resampling,
+since it uses the same coordinate system as the Current frame 
+of the reference NDF (the first one in the list).
+
+To see this sort of procedure in action you can run the WCSEXERCISE
+script.
+Change to an empty directory and issue the command ``\text{wcsexercise}''.
+You should delete any files produced by this script.
+
+
+
 \subsection{Data resampling}
+
 Data resampling is performed by the application:
 \begin{itemize}
 \item \routine{TRANNDF}
 \end{itemize}
-This uses the transformation information produced by the \xroutine{REGISTER} or
-\xroutine{CCDEDIT} routines and resamples a list of images. \routine{TRANNDF} will use any
-transform structure and hence has the capability of `rubber-sheeting'.
+This resamples an image from its pixel coordinates to the
+coordinates of its Current frame,
+so by adding a frame representing the same coordinate system to
+all of a list of NDFs as described in the preceding sections,
+making sure it is the Current frame of each,
+and resampling them all using \routine{TRANNDF}, 
+the resulting images can be compared or combined pixel for pixel.
+The transformation represented by these frames can be of any kind,
+so the program has the capability of `rubber-sheeting'.
 A restriction is that both the forward and the inverse transformations
 must be available. This will only cause problems when using general
 transformations; a tractable inverse doesn't often exist.
@@ -2817,6 +3162,7 @@ the output image, interpolate using nearest neighbour and conserve flux.
 TRANSFORMER if \routine{TRANNDF} does not supply the capabilities you require.
 
 \subsection{Controlling extension information}
+
 The contents of an NDF's CCDPACK extension may be examined at any time
 using the \xref{HDSTRACE utility (SUN/102)}{sun102}{}. The CCDPACK extension
 is always stored in:
@@ -2825,12 +3171,14 @@ is always stored in:
 ndf_name.more.ccdpack
 \end{verbatim}
 \end{myquote}
-CCDPACK `items' are stored under this object using fixed names i.e.\
-transform structures are always stored as `\text{TRANSFORM}'. An example
-trace of a transform structure is shown in
-\hyperref{``handling transforms''}{\S}{}{handling_transforms}.  Another
-useful item is `\text{CURRENT\_LIST}', which stores the name of the position
-list currently associated with an image.
+CCDPACK `items' are stored under this object using fixed names:
+in particular the name of the position list currently associated
+with an image is stored under the item `\text{CURRENT\_LIST}'.
+If transformation information is stored as an old style TRANSFORM structure
+rather than as coordinate frames in the WCS component 
+it is stored under the item `\text{TRANSFORM}' --
+an example trace of a transform structure is shown in
+\hyperref{``handling transforms''}{\S}{}{handling_transforms}.
 
 Controlling the contents of NDF CCDPACK extensions is performed by the:
 \begin{itemize}
@@ -2844,7 +3192,7 @@ If you are using a foreign data format then the extension information
 is actually stored with the general image headers (using a special
 namespace reserved for CCDPACK, examine the files
 \text{\$CCDPACK\_DIR/export.table} and
-\text{\$CCDPACK\_DIR/export.table} to see how the names used throughout
+\text{\$CCDPACK\_DIR/import.table} to see how the names used throughout
 this document map into the names used in this case) and these will be
 modified as required. However, you will not be able to delete these
 and must use the facilities provided by the environment that you are
@@ -2885,7 +3233,7 @@ the data values of the input datasets so that their values are
 normalised (this may be combined with producing a mosaic or not using
 the \text{out} parameter). A full description of \routine{MAKEMOS}
 is given in appendix \S\ref{MAKEMOS}, some of the philosophy of
-its algorithms are explained in, R.F. Warren-Smith, {\bf 1993},
+its algorithms are explained in R.F. Warren-Smith, {\bf 1993},
 `The Calibration of Large-Field Mosaics', Proceedings of the 5th
 ESO/ST-ECF Data Analysis Workshop.
 
@@ -2893,9 +3241,9 @@ ESO/ST-ECF Data Analysis Workshop.
 
 \subsection{Schematic registration sequences}
 The order in which the various application should be used are shown in
-schematic form in \hyperref{the following figure}{figure}{}{registration}.
+schematic form in \hyperref{the following figure}{Figure }{}{registration}.
 
-\myfig{sun139reg.eps}{height=0.85\textheight}{reg.gif}{registration}
+\myfig{sun139reg.eps}{}{reg.gif}{registration}
 {A schematic of the standard sequences of commands used to perform
 registration, resampling and mosaicing.}
 
@@ -3994,7 +4342,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             <frameset 1> \\
             <frameset 1 modifiers> \\
             (blank line) \\
-            <frameset 1> \\
+            <frameset 2> \\
             <frameset 2 modifiers> \\
             (blank line) \\
               \ldots \\
@@ -4264,7 +4612,7 @@ The CCDPACK routine descriptions are contained in the following pages.
             <frameset 1> \\
             <frameset 1 modifiers> \\
             (blank line) \\
-            <frameset 1> \\
+            <frameset 2> \\
             <frameset 2 modifiers> \\
             (blank line) \\
               \ldots \\
@@ -7022,7 +7370,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       } {
          In this example all the images in the current directory are
          processed. It is assumed that the images are associated with
-         positions lists of inaccurate positions (via the item
+         position lists of inaccurate positions (via the item
          CURRENT\_LIST in the image CCDPACK extensions). These position
          lists are accessed and centroided with the appropriate images.
          On exit the new lists are named $*$.cent and are associated with
@@ -7917,7 +8265,7 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       size when forming histograms.
 
       Which algorithm you should use depends on the number of points
-      your positions lists contain and the expected size of the overlaps
+      your position lists contain and the expected size of the overlaps
       between the datasets. Obviously it is much easier to detect two
       lists with most of their positions in common. With small overlaps
       a serious concern is the likelihood of finding a `false' match.
@@ -10786,7 +11134,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       } {
         In this routine the positional nature of the parameters is
         shown. All the images in the current directory are displayed.
-        Their output positions lists have the same name as the images
+        Their output position lists have the same name as the images
         except that they have a file type of .dat. The images are
         displayed using the percentile limits 1,99 which shows bright
         detail well.
@@ -11966,7 +12314,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          FITTYPE = \_INTEGER (Read)
       } {
          The type of fit which should be used when determining the
-         transformation between the input positions lists. This may take
+         transformation between the input position lists. This may take
          the values
          \sstitemlist{
 
@@ -12085,9 +12433,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          NDFNAMES = \_LOGICAL (Read)
       } {
          This parameter specifies whether the names of the input
-         positions lists are stored in the CCDPACK extensions of NDFs.
+         position lists are stored in the CCDPACK extensions of NDFs.
          If TRUE then the INLIST parameter accesses a list of NDFs
-         which are used to get the associated positions lists. If FALSE
+         which are used to get the associated position lists. If FALSE
          then INLIST just accesses the position list names directly.
 
          If the names of the lists are stored in the CCDPACK NDF
@@ -12313,7 +12661,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          register inlist=\qs{\qt{one,two}} fittype=6
          xfor=\qs{pa$+$pb$*$x} yfor=\qs{pa$+$pb$*$y}
       } {
-         In this example the positions lists associated with the NDFs
+         In this example the position lists associated with the NDFs
          one and two are said to be related by the algebraic
          expressions \qt{pa$+$pb$*$x} and \qt{pa$+$pb$*$y}, which
          indicates that a
@@ -13690,8 +14038,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
             \sstitem
                PINCUSHION -- Three values $C_1 \ldots C_3$ are required:
                \begin{eqnarray*}
-                  x^\prime = x * ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] ) \\
-                  y^\prime = y * ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] )
+                  x^\prime = x ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] ) \\
+                  y^\prime = y ( 1 + C_1  [ (x - C_2)^2 + (y - C_3)^2 ] )
                \end{eqnarray*}
          }
       }
@@ -14044,10 +14392,12 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          REFPOS = \_INTEGER (Read)
       } {
          The position within the IN list which corresponds to the
-         reference NDF.  For each domain in DOMAINS, alignment will
-         be attempted with the reference NDF first, and the mapping
-         between the output frame and the first matching name in
-         DOMAINS is a unit mapping.
+         reference NDF.  The registration frame is a copy of (and  
+         unitmapped to) the Current frame of the reference NDF,
+         and for each other NDF the program tries to find a path from
+         it to the reference NDF going from one NDF to another only
+         when they both have frames in the same one of the entries in
+         the DOMAINS list.
          [1]
       }
    }
