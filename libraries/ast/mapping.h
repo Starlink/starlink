@@ -235,6 +235,12 @@ typedef struct AstMapping {
    int tran_inverse;             /* Inverse transformation defined? */
 } AstMapping;
 
+typedef int (* AstInterpolate)( int, const int *, const int *, const double *,
+                                int, const int *, double *, int, double,
+                                double * );
+#define AST__NEAREST ( (AstInterpolate) 1 )
+#define AST__LINEAR ( (AstInterpolate) NULL )
+
 /* Virtual function table. */
 /* ----------------------- */
 /* This table contains all information that is the same for all
@@ -258,6 +264,7 @@ typedef struct AstMappingVtab {
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
+   int (* Resample)( AstMapping *, int, const int *, const int *, const double *, AstInterpolate, double, int, double, int, const int *, const int *, const int *, const int *, double * );
    int (* TestInvert)( AstMapping * );
    int (* TestReport)( AstMapping * );
    void (* ClearInvert)( AstMapping * );
@@ -298,6 +305,7 @@ AstMapping *astLoadMapping_( void *, size_t, int, AstMappingVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 AstMapping *astSimplify_( AstMapping * );
+int astResample_( AstMapping *, int, const int *, const int *, const double *, AstInterpolate, double, int, double, int, const int *, const int *, const int *, const int *, double * );
 void astInvert_( AstMapping * );
 void astTran1_( AstMapping *, int, const double [], int, double [] );
 void astTran2_( AstMapping *, int, const double [], const double [], int, double [], double [] );
@@ -367,6 +375,8 @@ astINVOKE(O,astLoadMapping_(mem,size,init,vtab,name,astCheckChannel(channel)))
    pointer to the wrong sort of object is supplied. */
 #define astInvert(this) \
 astINVOKE(V,astInvert_(astCheckMapping(this)))
+#define astResample(this,ndim_in,lbnd_in,ubnd_in,in,method,acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out) \
+astINVOKE(V,astResample_(astCheckMapping(this),ndim_in,lbnd_in,ubnd_in,in,method, acc,usebad,badflag,ndim_out,lbnd_out,ubnd_out,lbnd,ubnd,out))
 #define astSimplify(this) astINVOKE(O,astSimplify_(astCheckMapping(this)))
 #define astTran1(this,npoint,xin,forward,xout) \
 astINVOKE(V,astTran1_(astCheckMapping(this),npoint,xin,forward,xout))

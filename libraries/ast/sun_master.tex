@@ -16573,16 +16573,27 @@ were previously synonymous when used with the ``ast\_link'' and
 (which uses GKS to generate its output), while ``$-$pgplot'' links
 with the standard (or ``native'') version of PGPLOT.
 
-f+
-\item A bug has been fixed which could occasionally cause AST\_CONVERT
-to think that conversion between a CmpFrame and another Frame was
-possible when, in fact, it wasn't.
-f-
 c+
 \item A bug has been fixed which could occasionally cause astConvert
 to think that conversion between a CmpFrame and another Frame was
 possible when, in fact, it wasn't.
 c-
+f+
+\item A bug has been fixed which could occasionally cause AST\_CONVERT
+to think that conversion between a CmpFrame and another Frame was
+possible when, in fact, it wasn't.
+f-
+
+c+
+\item The function astMapBox has been changed to execute more quickly,
+although this has been achieved at the cost of some loss of robustness
+when used with difficult Mappings.
+c-
+f+
+\item The routine AST\_MAPBOX has been changed to execute more
+quickly, although this has been achieved at the cost of some loss of
+robustness when used with difficult Mappings.
+f-
 \end{enumerate}
 
 Programs which are statically linked will need to be re-linked in
