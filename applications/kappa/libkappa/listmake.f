@@ -36,7 +36,7 @@
 *     data sets.
 *
 *     If no NDF is specified, then the user must indicate the co-ordinate 
-*     Frame in which the positions will be supplied using parameter DOMAIN.
+*     Frame in which the positions will be supplied using parameter FRAME.
 *     A description of this Frame will be written to the output positions
 *     list for use by subsequent applications.
 *
@@ -60,17 +60,6 @@
 *     DIM = _INTEGER (Read)
 *        The number of axes for each position. Only accessed if a null
 *        value is supplied for parameter NDF.
-*     DOMAIN = LITERAL (Read)
-*        Specifies the Domain of the positions supplied using parameter 
-*        POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string 
-*        such as EQUAT(J2000) is supplied (see SUN/163), then the positions 
-*        are assumed to be 2-dimensional celestial co-ordinates in the
-*        specified system. Otherwise, the given Domain name is used without
-*        any interpretation. Any string may be supplied, but normally one
-*        of the standard Domain names such as GRID, PIXEL, GRAPHICS, etc,
-*        should be given. Parameter DIM is used to determine the number
-*        of axes in the Frame. This parameter is only accessed if the
-*        parameter NDF is given a null value.
 *     EPOCH = DOUBLE PRECISION (Read)
 *        If an IRAS90 Sky Co-ordinate System specification is supplied
 *        (using parameter DOMAIN) for a celestial co-ordinate system, 
@@ -84,11 +73,23 @@
 *        positions list. Each line should contain the formatted axis values 
 *        for a single position, separated by white space. Only accessed if
 *        parameter MODE is given the value "File".
+*     FRAME = LITERAL (Read)
+*        Specifies the co-ordinate Frame of the positions supplied using parameter 
+*        POSITION or FILE. If an IRAS90 Sky Co-ordinate System (SCS) string 
+*        such as EQUAT(J2000) is supplied (see SUN/163), then the positions 
+*        are assumed to be 2-dimensional celestial co-ordinates in the
+*        specified system. Otherwise, the given string is used as a Domain 
+*        name without
+*        any interpretation. Any string may be supplied, but normally one
+*        of the standard Domain names such as GRID, PIXEL, GRAPHICS, etc,
+*        should be given. Parameter DIM is used to determine the number
+*        of axes in the Frame. This parameter is only accessed if the
+*        parameter NDF is given a null value.
 *     INCAT = FILENAME (Read)
 *        A catalogue containing an existing positions list which is to be
 *        included at the start of the output positions list. These positions 
 *        are mapped into the current co-ordinate Frame of the supplied
-*        NDF, or into the Frame specified by parameter DOMAIN if no NDF was
+*        NDF, or into the Frame specified by parameter FRAME if no NDF was
 *        supplied. A message is displayed indicating the Frame in which 
 *        alignment occurred. They are then stored in the output list before 
 *        any further positions are added. A null value may be supplied
@@ -114,7 +115,7 @@
 *        the current co-ordinate Frame of the NDF, and the WCS component 
 *        of the NDF is copied to the output positions list. If a null
 *        value is supplied, the single co-ordinate Frame defined by parameter
-*        DOMAIN is stored in the output positions list, and supplied
+*        FRAME is stored in the output positions list, and supplied
 *        positions are assumed to be in the same Frame. [!]
 *     OUTCAT = FILENAME (Write)
 *        The catalogue holding the output positions list. 
@@ -134,13 +135,13 @@
 *        LISTMAKE". []
 
 *  Examples:
-*     listmake newlist domain=pixel dim=2 
+*     listmake newlist frame=pixel dim=2 
 *        This creates a FITS binary catalogue called newlist.FIT containing a 
 *        list of positions, together with a description of a single
 *        2-dimensional pixel co-ordinate Frame. The positions are supplied as 
 *        a set of space-separated pixel co-ordinates in response to repeated 
 *        prompts for the parameter POSITION.
-*     listmake stars.txt domain=equat(B1950) epoch=1962.3
+*     listmake stars.txt frame=equat(B1950) epoch=1962.3
 *        This creates a catalogue called stars.txt containing a list of 
 *        positions, together with a description of a single FK4 equatorial 
 *        RA/DEC co-ordinate Frame (referenced to the B1950 equinox). The
@@ -158,7 +159,7 @@
 *        as co-ordinates within the current co-ordinate Frame of the NDF.
 *        Application WCSFRAME can be used to find out what this Frame is.
 *        The positions are supplied in a text file called stars. 
-*     listmake out.txt incat=old.fit domain=gal
+*     listmake out.txt incat=old.fit frame=gal
 *        This creates an STL format catalogue stored in a text file called 
 *        out.txt containing a list of positions, together with a description 
 *        of a single galactic co-ordinate Frame. The positions contained in 
@@ -310,7 +311,7 @@
          FRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
          NAX = AST_GETI( FRM, 'NAXES', STATUS )
 
-*  If no NDF was supplied, annul the error, and use parameters DOMAIN
+*  If no NDF was supplied, annul the error, and use parameters FRAME
 *  and DIM to define the (single) available Frame.
       ELSE IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -324,7 +325,7 @@
          END IF
 
 *  Get the required Frame.
-         CALL KPG1_ASFGT( 'DOMAIN', 'DIM', 'EPOCH', FRM, NAX, STATUS )
+         CALL KPG1_ASFGT( 'FRAME', 'DIM', 'EPOCH', FRM, NAX, STATUS )
 
 *  Create a FrameSet holding this single Frame.
          IWCS = AST_FRAMESET( FRM, ' ', STATUS )
