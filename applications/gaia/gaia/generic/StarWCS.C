@@ -442,7 +442,7 @@ void StarWCS::setEquinox()
     if ( !astOK ) {
         astClearStatus;
         ok = 0;
-    } 
+    }
     else if ( system ) {
 
         //  Make sure system should have an equinox associated with it.
@@ -507,14 +507,14 @@ double StarWCS::epoch() const
 //  Convert the given x,y image coordinates to world coordinates, if
 //  possible, and write the result to the given buffer as a list of
 //  the form "RA DEC EQUINOX".
-//  If no conversion can be done, buf will contain an empty list. 
+//  If no conversion can be done, buf will contain an empty list.
 //  This (compatibility) version requires that the x,y position is on
-//  the image. 
+//  the image.
 //
 //  If hms_flag is 1, the result is always in H:M:S D:M:S, otherwise
 //  the result is returned in decimal degrees.
 //
-char* StarWCS::pix2wcs( double x, double y, char* buf, int bufsz, 
+char* StarWCS::pix2wcs( double x, double y, char* buf, int bufsz,
                         int hms_flag ) const
 {
     pix2wcs( x, y, 0, buf, bufsz, hms_flag );
@@ -533,8 +533,8 @@ char* StarWCS::pix2wcs( double x, double y, char* buf, int bufsz,
 //
 //  The behaviour with hms_flag may not be the same after moving to AST.
 //
-char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf, 
-                        int bufsz, int hms_flag ) const 
+char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
+                        int bufsz, int hms_flag ) const
 {
     buf[0] = '\0';
     int onimage = x > 0 && y > 0 && x < nxpix_ && y < nypix_;
@@ -544,7 +544,7 @@ char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
         oldx[0] = x;
         oldy[0] = y;
         astTran2( wcs_, 1, oldx, oldy, 1, newx, newy );
-        
+
         //  Normalize the result into the correct range.
         point[0] = newx[0];
         point[1] = newy[0];
@@ -553,7 +553,7 @@ char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
         if ( raIndex_ == 1 ) {
             ra = point[0];
             dec = point[1];
-        } 
+        }
         else {
             dec = point[0];
             ra = point[1];
@@ -565,9 +565,9 @@ char* StarWCS::pix2wcs( double x, double y, int notbound, char* buf,
                 if ( rastr && decstr ) {
                     sprintf (buf, "%s %s %s", rastr, decstr, equinoxStr_);
                 }
-            } 
+            }
             else {
-                
+
                 // If hms_flag is not set then return the result in degrees.
                 sprintf (buf, "%.12g %.12g %s", ra * r2d_, dec * r2d_, equinoxStr_);
             }
@@ -606,7 +606,7 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
     if ( ! astOK ) {
         astClearStatus;
         return error("can't convert world coordinates: out of range");
-    } 
+    }
     else {
 
         // Return values are in degrees and swapped if necessary.
@@ -662,12 +662,13 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
 
 //
 //  Convert the given world coordinates to x,y image coordinates and
-//  put the results in x and y. The input coordinates are assumed to 
-//  be in the correct units, unless the current frame is celestial, in
-//  which case they are assumed to be in degrees.
+//  put the results in x and y. The input coordinates are assumed to
+//  be in the correct units, unless the current frame is celestial,
+//  and notcelestial is false, in which case they are assumed to be in
+//  degrees.
 //
 
-int StarWCS::anyWcs2pix( double inx, double iny, 
+int StarWCS::anyWcs2pix( double inx, double iny, int notcelestial, 
                          double &outx, double &outy ) const
 {
     outx = outy = 0.0;
@@ -676,7 +677,7 @@ int StarWCS::anyWcs2pix( double inx, double iny,
         return error( "image does not support world coords" );
     }
 
-    if ( issky_ ) {
+    if ( issky_ && ! notcelestial ) {
         return wcs2pix( inx, iny, outx, outy );
     }
 
@@ -1303,7 +1304,7 @@ int StarWCS::make2D()
                         low = high;
                         high = i;
                     }
-                    
+
                     // Initialisation while in loop.
                     out1[i][0] = 0.0;
                     out2[i][0] = 0.0;

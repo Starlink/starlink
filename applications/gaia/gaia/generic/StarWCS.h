@@ -134,7 +134,8 @@ public:
   int wcs2pix(double ra, double dec, double &x, double &y) const;
 
   //  Get the image coordinates for the given world coords
-  int anyWcs2pix(double inx, double iny, double &outx, double &outy) const;
+  int anyWcs2pix(double inx, double iny, int notcelestial, 
+                 double &outx, double &outy) const;
 
   //  Get the image coordinates distance for the given world coords distance in deg
   int wcs2pixDist(double ra, double dec, double &x, double &y) const;

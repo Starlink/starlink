@@ -68,6 +68,8 @@
 #        Finally renamed GaiaBlink from StarBlink. Now uses a single
 #        canvas with many rtdimages, provides alignment by origin
 #        information.
+#     07-OCT-2003 (PWD):
+#        Alignment by WCS origins.
 #     {enter_further_changes_here}
 
 #-
@@ -408,7 +410,7 @@ itcl::class gaia::GaiaBlink {
       bind $canvas_ <Return>  [code $this view_next]
 
       #  <1> in canvas area gives it focus
-      bind $canvas_ <1> [code $canvas_ focus]
+      bind $canvas_ <1> [code focus $canvas_]
 
       #  Set canvas movements to change scrollbars.
       $canvas_ configure -xscrollcommand "$itk_component(Hscroll) set"
@@ -446,7 +448,7 @@ itcl::class gaia::GaiaBlink {
 
          #  Select and move the image.
          $canvas_ bind $image_($n_) <1> \
-            [code eval $this mark_image_ $n_ $canvasX_ $canvasY_ ]
+            [code eval $this mark_image_ $n_ $canvasX_ $canvasY_]
          $canvas_ bind $image_($n_) <B1-Motion> \
             [code eval $this move_image_ $n_ $canvasX_ $canvasY_]
          $canvas_ bind $image_($n_) <ButtonRelease-1> \
@@ -767,32 +769,32 @@ itcl::class gaia::GaiaBlink {
    protected method set_ndf_origins_ {} {
       catch {
          if { [info exists clones_(0)] } {
-            
+
             #  Place mobile image at 0 0 and get image coordinates of
             #  upper left.
             $canvas_ coords $image_($mobile_) 0 0
             $image_($mobile_) origin bxo byo
             set byo [expr $byo+[$image_($mobile_) height]-1]
-            
+
             set_scroll_region_
             for { set i 0 } { $i < $n_ } { incr i } {
-               
+
                #  Origin of upper left of this image (image coordinates).
                $image_($i) origin xo yo
                set yo [expr $yo+[$image_($i) height]-1]
-               
+
                # Pixel shift from mobile image upper left to this one.
                set dx [expr $xo-$bxo]
                set dy [expr $byo-$yo]
-               
+
                # Equivalent canvas shift.
                $image_($mobile_) convert dist $dx $dy image dx dy canvas
-               
+
                #  Apply shift
                $canvas_ coords $image_($i) 0 0
                $canvas_ move $image_($i) $dx $dy
             }
-            
+
             #  Final scrollregion encompasses positions of all images.
             set_scroll_region_
          }
@@ -809,40 +811,40 @@ itcl::class gaia::GaiaBlink {
             #  Place mobile image at 0 0.
             $canvas_ coords $image_($mobile_) 0 0
             set_scroll_region_
-            
+
+            #  Record orientation of the mobile image. This is also
+            #  after any orientation changes.???
+
             #  Loop over other images asking for the grid coordinates of
             #  the mobile image that correspond to the WCS coordinates of
             #  the upper left corner.
             for { set i 0 } { $i < $n_ } { incr i } {
-               
+
+               #  Orient images.
+               match_orientation_ $mobile_ $i
+
                #  Origin of upper left of this image (grid coordinates).
                set xo 0.0
                set yo [expr [$image_($i) height]-1.0]
-               
+
                #  Convert to WCS.
-               lassign [$image_($i) astpix2wcs $xo $yo 1] wcs1 wcs2
-               #  Undo fudge that returns these in "degrees", the natural
-               #  units are radians. We don't use astpix2cur as this may
-               #  not return decimal values (if WCS is RA/Dec).
-               set wcs1 [expr $wcs1*$d2r_]
-               set wcs2 [expr $wcs2*$d2r_]
-               
+               lassign [pix2wcs_ $image_($i) $xo $yo] wcs1 wcs2
+
                #  Back to pixels, but of mobile image.
-               #lassign [$image_($mobile_) astwcs2pix $wcs1 $wcs2] xo yo
-               lassign [$image_($mobile_) astcur2pix $wcs1 $wcs2] xo yo
-               
+               lassign [$image_($mobile_) astcur2pix $wcs1 $wcs2 0] xo yo
+
                # Pixel shift from mobile image upper left to this one.
                set dx $xo
                set dy [expr [$image_($mobile_) height]-1.0-$yo]
-               
+
                # Equivalent canvas shift.
                $image_($mobile_) convert dist $dx $dy image dx dy canvas
-               
+
                #  Apply shift
                $canvas_ coords $image_($i) 0 0
                $canvas_ move $image_($i) $dx $dy
             }
-            
+
             #  Final scrollregion encompasses positions of all images.
             set_scroll_region_
          }
@@ -851,7 +853,7 @@ itcl::class gaia::GaiaBlink {
          info_dialog $msg
       }
    }
-      
+
    #  Set the origins for FITS using CRPIX values.
    protected method set_fits_origins_ { {crpix 1} } {
       catch {
@@ -860,7 +862,7 @@ itcl::class gaia::GaiaBlink {
             #  Place mobile image at 0 0 and get image coordinates of
             #  upper left.
             $canvas_ coords $image_($mobile_) 0 0
-            
+
             set bxo [$image_($mobile_) fits get $CRPIX1]
             if { $bxo == {} } {
                set bxo 1
@@ -870,10 +872,10 @@ itcl::class gaia::GaiaBlink {
                set byo 1
             }
             set byo [expr $byo+[$image_($mobile_) height]-1]
-            
+
             set_scroll_region_
             for { set i 0 } { $i < $n_ } { incr i } {
-               
+
                #  Origin of upper left of this image (image coordinates).
                set xo [$image_($i) fits get $CRPIX1]
                if { $xo == {} } {
@@ -884,25 +886,233 @@ itcl::class gaia::GaiaBlink {
                   set yo 1
                }
                set yo [expr $yo+[$image_($i) height]-1]
-               
+
                # Pixel shift from mobile image upper left to this one.
                set dx [expr $xo-$bxo]
                set dy [expr $byo-$yo]
-               
+
                # Equivalent canvas shift.
                $image_($mobile_) convert dist $dx $dy image dx dy canvas
-               
+
                #  Apply shift
                $canvas_ coords $image_($i) 0 0
                $canvas_ move $image_($i) $dx $dy
             }
-            
+
             #  Final scrollregion encompasses positions of all images.
             set_scroll_region_
          }
       } msg
-      if { $msg != "" } { 
+      if { $msg != "" } {
          info_dialog $msg
+      }
+   }
+
+   #  Convert image coordinates to wcs coordinates in native units.
+   protected method pix2wcs_ {image xo yo} {
+      lassign [$image astpix2wcs $xo $yo 1] wcs1 wcs2
+      #  Undo fudge that returns these in "degrees", the natural
+      #  units are "radians". We don't use astpix2cur as this may
+      #  not return decimal values (if WCS is RA/Dec may get
+      #  sexagesimal).
+      set wcs1 [expr $wcs1*$d2r_]
+      set wcs2 [expr $wcs2*$d2r_]
+      return "$wcs1 $wcs2"
+   }
+
+   #  Determine the directions that the axes of the WCS increase
+   #  (different from image axes, which are always left and up).
+   #  The return is a pair of values from "top", "down", "left" and
+   #  "right".
+   protected method get_axis_moves_ {image} {
+
+      #  Get centre of image.
+      set xc [expr [$image width]/2]
+      set yc [expr [$image height]/2]
+
+      #  Corresponding WCS coordinates (in non sexagesimal units).
+      lassign [pix2wcs_ $image $xc $yc] wcs1 wcs2
+
+      #  Get a step size. One pixel along image X axis.
+      lassign [pix2wcs_ $image [expr $xc+1] $yc] wcs3 wcs4
+      set d1 [expr $wcs3 - $wcs1]
+      set d2 [expr $wcs4 - $wcs2]
+      set step [expr max(abs($d1),abs($d2))]
+
+      #  Increment axes to get directions.
+      set wcss [expr $wcs1+$step]
+      lassign [$image astcur2pix $wcss $wcs2 1] xs ys
+
+      set d1 [expr $xs - $xc]
+      set d2 [expr $ys - $yc]
+
+      if { [expr abs($d1)] > [expr abs($d2)] } {
+         # left or right
+         if { $d1 >= 0.0 } {
+            set xmoves "right"
+         } else {
+            set xmoves "left"
+         }
+      } else {
+         # top or bottom
+         if { $d2 >= 0.0 } {
+            set xmoves "up"
+         } else {
+            set xmoves "down"
+         }
+      }
+
+      set wcss [expr $wcs2+$step]
+      lassign [$image astcur2pix $wcs1 $wcss 1] xs ys
+      set d1 [expr $xs - $xc]
+      set d2 [expr $ys - $yc]
+
+      if { [expr abs($d1)] > [expr abs($d2)] } {
+         # left or right
+         if { $d1 >= 0.0 } {
+            set ymoves "right"
+         } else {
+            set ymoves "left"
+         }
+      } else {
+         # top or bottom
+         if { $d2 >= 0.0 } {
+            set ymoves "up"
+         } else {
+            set ymoves "down"
+         }
+      }
+      puts "moves = $xmoves $ymoves"
+      return "$xmoves $ymoves"
+   }
+
+   #  Match the orientation of one image to another. Identify images
+   #  by index.
+   protected method match_orientation_ {ref target} {
+      
+      set refimage $image_($ref)
+      set targetimage $image_($target)
+      
+      lassign [get_axis_moves_ $refimage] xrefori yrefori
+      lassign [get_axis_moves_ $targetimage] xtarori ytarori
+      puts "reference ori: $xrefori $yrefori"
+      puts "target ori: $xtarori $ytarori"
+
+      set ops ""
+      set x 0
+
+      #  Match X orientations.
+      switch $xrefori {
+         "up" - "down" {
+            switch $xtarori {
+               "up" - "down" {
+                  if { $xrefori != $xtarori } {
+                     append ops "udf "
+                  }
+               }
+               "left" - "right" {
+                  lassign $interchanges_("$xtarori,$ytarori") xtarori ytarori
+                  append ops "x "
+                  set x 1
+               }
+            }
+         }
+         "left" - "right" {
+            switch $xtarori {
+               "up" - "down" {
+                  lassign $interchanges_("$xtarori,$ytarori") xtarori ytarori
+                  append ops "x "
+                  set x 1
+               }
+               "left" - "right" {
+                  if { $xrefori != $xtarori } {
+                     append ops "lrf "
+                  }
+               }
+            }
+         }
+      }
+
+      # If we interchanged, then still need to orient X axis.
+      if { $x } {
+         switch $xrefori {
+            "up" - "down" {
+               if { $xrefori != $xtarori } {
+                  append ops "udf "
+               }
+            }
+            "left" - "right" {
+               if { $xrefori != $xtarori } {
+                  append ops "lrf "
+               }
+            }
+         }
+      }
+
+      #  Y axis must be a flip.
+      switch $yrefori {
+         "up" - "down" {
+            if { $yrefori != $ytarori } {
+               append ops "udf "
+            }
+         }
+         "left" - "right" {
+            if { $yrefori != $ytarori } {
+               append ops "lrf "
+            }
+         }
+      }
+      puts "reorient action: $ops"
+
+      #  Gather orientation of reference image. This is applied to the
+      #  image after the changes above. XXX could work in canvas coords?
+      if { [$refimage flip x] } {
+         append ops "lrf "
+      }
+      if { [$refimage flip y] } {
+         append ops "udf "
+      }
+      if { [$refimage rotate] } {
+         append ops "x "
+      }
+      puts "final reorient action: $ops"
+
+      #  Remove any current orientation.
+      set rtdimage $target_($target)
+      $rtdimage rotate 0
+      $rtdimage flip x 0
+      $rtdimage flip y 0
+      $clones_($target).panel.info.trans update_trans
+
+      #  Twice to really reset.
+      $rtdimage rotate 0
+      $rtdimage flip x 0
+      $rtdimage flip y 0
+      $clones_($target).panel.info.trans update_trans
+      
+      #  Apply the new orientation.
+      if { $ops != {} } {
+         foreach op $ops {
+            switch $op {
+               "x" {
+                  puts "$targetimage rotate 1"
+                  $rtdimage rotate 1
+               }
+               "lrf" {
+                  puts "$targetimage flip x 1"
+                  $rtdimage flip x 1
+               }
+               "udf" {
+                  puts "$targetimage flip y 1"
+                  $rtdimage flip y 1
+               }
+            }
+         }
+         
+         #  Nasty hack... to get panel buttons updated.
+         $clones_($target).panel.info.trans update_trans
+      } else {
+         puts "No orientation changes required"
       }
    }
 
@@ -1013,6 +1223,21 @@ itcl::class gaia::GaiaBlink {
 
    #  Degrees to radians factor.
    common d2r_ 0.017453292
+
+   #  Interchange mappings.
+   common interchanges_
+
+   set interchanges_("left,up")    "up left"
+   set interchanges_("left,down")  "up right"
+
+   set interchanges_("right,up")   "down left"
+   set interchanges_("right,down") "down right"
+
+   set interchanges_("down,left")  "right up"
+   set interchanges_("down,right") "right down"
+
+   set interchanges_("up,left")    "left up"
+   set interchanges_("up,right")   "left down"
 
 #  End of class definition.
 }

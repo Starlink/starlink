@@ -229,7 +229,7 @@ public:
     { "astcelestial",  &StarRtdImage::astcelestialCmd, 0, 0 },
     { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
     { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
-    { "astcur2pix",    &StarRtdImage::astcur2pixCmd,   2, 2 },
+    { "astcur2pix",    &StarRtdImage::astcur2pixCmd,   2, 3 },
     { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
     { "astdomains",    &StarRtdImage::astdomainsCmd,   0, 0 },
     { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
@@ -2621,7 +2621,9 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
 //     convert it to pixel coordinates.
 //
 //  Input:
-//     Pair of double precision coordinates.
+//     Pair of double precision coordinates, plus option flag. The
+//     flag if set, indicates that the coordinates should not be considered
+//     as possibly celestial (input in degrees).
 //
 //  Result:
 //     Pair of pixel coordinates.
@@ -2645,11 +2647,19 @@ int StarRtdImage::astcur2pixCmd( int argc, char *argv[] )
         return TCL_ERROR;
     }
 
+    //  Check for do not assumed celestial coordinates flag.
+    int notcelestial = 0;
+    if ( argc == 3 ) {
+        if ( *argv[2] == '1' ) {
+            notcelestial = 1;
+        }
+    }
+
     //  Convert to pixel coordinates.
     StarWCS* wcsp = getStarWCSPtr();
     double outx;
     double outy;
-    if ( wcsp->anyWcs2pix( inx, iny, outx, outy ) == 0 ) { 
+    if ( wcsp->anyWcs2pix( inx, iny, notcelestial, outx, outy ) == 0 ) { 
 
         //  Set the result and return.
         set_result( outx, outy );
