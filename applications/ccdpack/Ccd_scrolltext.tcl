@@ -98,6 +98,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -108,6 +109,8 @@
 #        longer needed.
 #     11-AUG-1995 (PDRAPER):
 #        Added option for horizontal scrollbar (Tk 4 enhancement).
+#     15-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -128,12 +131,12 @@
          Ccd_base::constructor
 
 #  Create text widget.
-         text $oldthis.text
+         CCDTkWidget Text text text $oldthis.text
 
 #  Define sub-component widgets for configuration via the wconfig
 #  and focus method.
-         set widgetnames($oldthis:text) $oldthis.text
-         set widgetfocus($oldthis:text) $oldthis.text
+         set widgetnames($Oldthis:text) $Text
+         set widgetfocus($Oldthis:text) $Text
 
 #  Check options database for values to override widget defaults. Look for more
 #  specific option of having a class specified, if this fails try for less
@@ -158,20 +161,20 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Insert line of text method.
       method insert { index args } {
-         eval $oldthis.text insert $index $args
+         eval $Text insert $index $args
 	 
 #  Make sure that the text is visible.
-         set textlen [expr int([$oldthis.text index end])]
-         $oldthis.text see $index
+         set textlen [expr int([$Text index end])]
+         $Text see $index
 #         update idletasks
       }
       
 #  Clear range of lines of text method.
       method clear { args } {
          if { [lindex $args 0 ] != "all" } {
-            eval $oldthis.text delete $args
+            eval $Text delete $args
          } else {
-            $oldthis.text delete 0 end
+            $Text delete 0 end
          }
       }
 
@@ -179,11 +182,11 @@
       method get { index } {
          set contents ""
          if { $index != "all" } {
-            set contents [$oldthis.text get $index]
+            set contents [$Text get $index]
          } else {
-            set size [$oldthis.text size]
+            set size [$Text size]
             for { set i 0 } { $i < $size } { incr i } {
-               lappend contents [$oldthis.text get $i]
+               lappend contents [$Text get $i]
             }
          }
          return $contents
@@ -195,33 +198,42 @@
 #  First remove all scrollbars and packing frames, make the text widget
 #  forget any scrolling commands.
          foreach side "left right" {
-            if { [ winfo exists $oldthis.scroll$side ] } {
-               pack forget $oldthis.scroll$side
-               destroy $oldthis.scroll$side
-               $oldthis.text configure -yscrollcommand {}
+            if { [ info exists Scrolls($side) ] } {
+               set scroll [CCDPathOf $Scrolls($side)]
+               pack forget $scroll
+               destroy $scroll
+               unset Scrolls($side)
+               $Text configure -yscrollcommand {}
             }
          }
          foreach side "top bottom" {
-            if { [ winfo exists $oldthis.$side.scroll$side ] } {
-               pack forget $oldthis.$side.scroll$side
-               destroy $oldthis.$side.scroll$side
-               destroy $oldthis.$side
-               $oldthis.text configure -xscrollcommand {}
+            if { [ info exists Scrolls($side) ] } {
+               set scroll [CCDPathOf $Scrolls($side)]
+               pack forget $scroll
+               destroy $scroll
+               destroy [CCDPathOf $Frames($side)]
+               unset Scrolls($side)
+               unset Frames($side)
+               $Text configure -xscrollcommand {}
             }
 
 #  Destroy any packing frames.
-            if { [ winfo exists $oldthis.$side.left ] } {
-               pack forget $oldthis.$side.left
-               destroy $oldthis.$side.left
+            if { [ info exists Frames($side.left) ] } {
+               set frame [CCDPathOf $Frames($side.left)]
+               pack forget $frame
+               destroy $frame
+               unset Frames($side.left)
             }
-            if { [ winfo exists $oldthis.$side.right ] } {
-               pack forget $oldthis.$side.right
-               destroy $oldthis.$side.right
+            if { [ info exists Frames($side.right) ] } {
+               set frame [CCDPathOf $Frames($side.right)]
+               pack forget $frame
+               destroy $frame
+               unset Frames($side.left)
             }
          }
 
 #  And unpack the text widget itself (so that rearrangement is easy).
-         pack forget $oldthis.text
+         pack forget $text
 
 #  Find out if any packing frames are required (this fill the corners of
 #  the base frame so that scrollbars look natural).
@@ -233,69 +245,96 @@
 #  Create the necessary scrollbars. Append any names etc. to the
 #  sub-widget control variables.
          if { $haveleft } {
-            scrollbar $oldthis.scrollleft \
-               -orient vertical \
-               -command "$oldthis.text yview"
-            $oldthis.text configure -yscrollcommand "$oldthis.scrollleft set"
-            set widgetnames($oldthis:scrollleft) $oldthis.scrollleft
+            CCDTkWidget Scroll scroll \
+               scrollbar $oldthis.scrollleft \
+                  -orient vertical \
+                  -command "$Text yview"
+            $Text configure -yscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrollleft) $Scroll
+            set Scrolls(left) $Scroll
          }
 
          if { $haveright } {
-            scrollbar $oldthis.scrollright \
-               -orient vertical \
-               -command "$oldthis.text yview"
-            $oldthis.text configure -yscrollcommand "$oldthis.scrollright set"
-            set widgetnames($oldthis:scrollright) $oldthis.scrollright
+            CCDTkWidget Scroll scroll \
+               scrollbar $oldthis.scrollright \
+                  -orient vertical \
+                  -command "$Text yview"
+            $Text configure -yscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrollright) $Scroll
+            set Scrolls(right) $Scroll
          }
 
          if { $havetop } { 
-            frame $oldthis.top -borderwidth 0
+            CCDTkWidget Frame frame frame $oldthis.top -borderwidth 0
             if { $haveleft } {
-               frame $oldthis.top.left -width [winfo reqwidth $oldthis.scrollleft]
-               pack $oldthis.top.left -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.left \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(left)]]
+               pack $frame1 -side left
+               set Frames(top.left) $Frame1
             }
-            scrollbar $oldthis.top.scrolltop \
-               -orient horizontal \
-               -command "$oldthis.text xview"
-            pack $oldthis.top.scrolltop -side left -fill x -expand true
-            $oldthis.text configure -xscrollcommand "$oldthis.top.scrolltop set"
-            set widgetnames($oldthis:scrolltop) $oldthis.top.scrolltop
+            CCDTkWidget Scroll scroll \
+               scrollbar $frame.scrolltop \
+                  -orient horizontal \
+                  -command "$Text xview"
+            pack $scroll -side left -fill x -expand true
+            $Text configure -xscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrolltop) $Scroll
+            set Scrolls(top) $Scroll
             if { $haveright } {
-               frame $oldthis.top.right -width [winfo reqwidth $oldthis.scrollright]
-               pack $oldthis.top.right -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $oldthis.top.right \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(right)]]
+               pack $frame1 -side left
+               set Frames(top.right) $Frame1
             }
          }
 
          if { $havebottom } { 
-            frame $oldthis.bottom -borderwidth 0
+            CCDTkWidget Frame frame frame $oldthis.bottom -borderwidth 0
             if { $haveleft } {
-               frame $oldthis.bottom.left -width [winfo reqwidth $oldthis.scrollleft]
-               pack $oldthis.bottom.left -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.left \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(left)]]
+               pack $frame1 -side left
+               set Frames(bottom.left) $Frame1
             }
-            scrollbar $oldthis.bottom.scrollbottom \
-               -orient horizontal \
-               -command "$oldthis.text xview"
-            pack $oldthis.bottom.scrollbottom -side left -fill x -expand true
-            $oldthis.text configure -xscrollcommand "$oldthis.bottom.scrollbottom set"
-            set widgetnames($oldthis:scrollbottom) $oldthis.top.scrollbottom
+            CCDTkWidget Scroll scroll \
+               scrollbar $frame.scrollbottom \
+                  -orient horizontal \
+                  -command "$Text xview"
+            pack $scroll -side left -fill x -expand true
+            $Text configure -xscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrollbottom) $Scroll
             if { $haveright } {
-               frame $oldthis.bottom.right -width [winfo reqwidth $oldthis.scrollright]
-               pack $oldthis.bottom.right -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.right \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(right)]]
+               pack $frame1 -side left
+               set Frames(bottom.right) $Frame1
             }
          }
 
 #  Perform packing of main elements (need to do this now to get into
 #  correct places.
-         if { $havetop }    { pack $oldthis.top         -side top    -fill x }
-         if { $havebottom } { pack $oldthis.bottom      -side bottom -fill x }
-         if { $haveleft }   { pack $oldthis.scrollleft  -side left   -fill y }
-         if { $haveright }  { pack $oldthis.scrollright -side right  -fill y }
+         if { $havetop }    { 
+            pack [CCDPathOf $Frames(top)]         -side top    -fill x 
+         }
+         if { $havebottom } { 
+            pack [CCDPathOf $Frames(bottom)]      -side bottom -fill x 
+         }
+         if { $haveleft }   { 
+            pack [CCDPathOf $Scrolls(left)]       -side left   -fill y 
+         }
+         if { $haveright }  { 
+            pack [CCDPathOf $Scrolls(right)]      -side right  -fill y 
+         }
          pack $oldthis.text -expand true -fill both
       }
 
 #  Method to return the name of the text widget.
       method textname {} {
-         return $oldthis.text
+         return $Text
       }
    
 #  Method to return the names of the scrollbar widgets
@@ -306,8 +345,8 @@
             }
          }
          foreach side $places {
-            if { [ winfo exists $oldthis.scroll$side ] } {
-               lappend barnames $oldthis.scroll$side
+            if { [ info exists Scrolls($side) ] } {
+               lappend barnames $Scrolls($side)
             }
          }
          if { [ info exists barnames ] } { 
@@ -339,16 +378,17 @@
       public label {} {
          if { $label != {} } {
             if $exists {
-               label $oldthis.label -text "$label"
-               pack $oldthis.label -side top -anchor w
+               CCDTkWidget Labelwidget labelwidget \
+                  label $oldthis.label -text "$label"
+               pack $labelwidget -side top -anchor w
                _repack $scrollbarplaces
             }
          } else {
 
 #  Remove existing label.
-            if { [ winfo exists $oldthis.label ] } {
-               pack forget $oldthis.label
-	       destroy $oldthis.label
+            if { [ winfo exists $labelwidget ] } {
+               pack forget $labelwidget
+	       destroy $labelwidget
 	    }
          }
       }
@@ -356,28 +396,36 @@
 #  Is the selection exportable? If not may have more than one selection
 #  (one for each instance), otherwise the selection is the X11 one.
       public exportselect 1 {
-         if { [ winfo exists $oldthis.text ] } {
-            $oldthis.text configure -exportselection $exportselect
+         if { [ winfo exists $text ] } {
+            $Text configure -exportselection $exportselect
          }
       }
 
 #  Height of text widget.
       public height 20 {
          if $exists {
-            $oldthis.text configure -width $width -height $height
+            $Text configure -width $width -height $height
          }
       }
 
 #  Width of text widget.
       public width 80 {
          if $exists {
-            $oldthis.text configure -width $width -height $height
+            $Text configure -width $width -height $height
          }
       }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Protected variables: visible to only this instance.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Names of widgets
+      protected Text
+      protected text ""
+      protected Labelwidget
+      protected labelwidget ""
+      protected Frames
+      protected Scrolls
+
       protected lastupdate 0
 
 #  End of class defintion.

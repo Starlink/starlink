@@ -144,6 +144,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -158,6 +159,8 @@
 #     2-FEB-1996 (PDRAPER):
 #        Added fixed for -modified beig passed to Fitsfunc instead
 #        of Fitstable when import table read in.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -187,76 +190,88 @@
 #  Widget creation.
 #--------------------------------------------------------------------------
 #  Top-level window for this form.
-      Ccd_toplevel $Top -title {Create Import Table}
-      wm withdraw $Top
+      CCDCcdWidget Topwin topwin \
+         Ccd_toplevel $Top -title "Create Import Table"
+      wm withdraw $topwin
 
 #  Menubar.
-      set Menu [Ccd_helpmenubar $Top.menubar]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Topwin.menubar
 
 #  Main frame for containing FITS item stuff.
-      set Frametop [frame $Top.fits]
+      CCDTkWidget Frametop frametop frame $topwin.fits
 
 #  Left part.
-      set Lefttop [frame $Frametop.left]
+      CCDTkWidget Lefttop lefttop frame $frametop.left
 
 #  Labelled entry for reference NDF name.
-      set Refndf [Ccd_labent $Lefttop.refndf -text {Reference frame:} \
-                     -placelabel left]
+      CCDCcdWidget Refndf refndf \
+         Ccd_labent $Lefttop.refndf -text "Reference frame:" -placelabel left
 
 #  Create scrollbox for names extracted from NDF FITS structure. This
 #  has a button above it which filters the output from a list of the
 #  .more.fits structure of an NDF and enters the names of the fits
 #  items found therein. Make sure that only a single selection is
 #  possible in listbox.
-      set Fitsbox [Ccd_scrollbox $Lefttop.fitsbox -singleselect true]
-      set Fitsextract [Ccd_choice $Lefttop.extract -standard 0]
+      CCDCcdWidget Fitsbox fitsbox \
+         Ccd_scrollbox $Lefttop.fitsbox -singleselect true
+      CCDCcd_choice Fitsextract fitsextract \
+         Ccd_choice $Lefttop.extract -standard 0
 
 #  Right frame for fits extension items (and types).
-      set Righttop [frame $Frametop.right]
+      CCDTkWidget Righttop righttop frame $frametop.right
 
 #  Labelled entry for fits ITEM name.
-      set Fitsname [Ccd_labent $Righttop.name -text {FITS item:}]
+      CCDCcdWidget Fitsname fitsname \
+         Ccd_labent $Righttop.name -text "FITS item:"
 
 #  Option widget with a pop-up menu in the entry window and a
 #  menubutton which will show the possible options for the HDS-type.
-      set Fitstype [Ccd_option $Righttop.type -text {HDS type:} -constrain 1]
+      CCDCcdWidget Fitstype fitstype \
+         Ccd_option $Righttop.type -text "HDS type:" -constrain 1
 
 #  Choice buttons for adding the HDS item and type, removing the current
 #  selection and sorting/making unique (by item name).
-      set Fitschoice [Ccd_choice $Righttop.choice -standard 0]
+      CCDCcdWidget Fitschoice fitschoice \
+         Ccd_choice $Righttop.choice -standard 0
 
 #  Table for showing the selected and typed FITS items.
-      set Fitstable [Ccd_table $Righttop.table -columns 2 -flushright 0]
+      CCDCcdWidget Fitstable fitstable \
+         Ccd_table $Righttop.table -columns 2 -flushright 0
 
 #  Frame for containing the CCDPACK extension item and FITS functions
 #  region.
-      set Framebot [frame $Top.exten]
+      CCDTkWidget Framebot framebot frame $topwin.exten
 
 #  Frame for list of all known CCDPACK extension items. Make listbox
 #  have only one active selection at a time.
-      set Knownbox [Ccd_scrollbox $Framebot.known \
-                       -singleselect true -label {Known extension items:}]
+      CCDCcdWidget Knownbox knownbox \
+         Ccd_scrollbox $Framebot.known -singleselect true \
+                                        -label "Known extension items:"
 
 #  Frame for right side of lower box. This contains the selected
 #  extension item and the function (of FITS items) to use when
 #  deriving a value.
-      set Rightbot [frame $Framebot.right]
+      CCDTkWidget Rightbot rightbot frame $framebot.right
 
 #  Labelled entry box for the extension item name.
-      set Extname [Ccd_labent $Rightbot.name -text {Extension item:}]
+      CCDCcdWidget Extname extname \
+         Ccd_labent $Rightbot.name -text "Extension item:"
 
 #  Labelled entry box for the FITS function.
-      set Fitsfunc [Ccd_labent $Rightbot.func -text {FITS function:}]
+      CCDCcdWidget Fitsfunc fitsfunc \
+         Ccd_labent $Rightbot.func -text "FITS function:"
 
 #  Choice bar buttons for adding the extension item, type and function,
 #  for removing the current selection and for sorting/making unique.
-      set Extchoice [Ccd_choice $Rightbot.choice -standard 0]
+      CCDCcdWidget Extchoice extchoice \
+         Ccd_choice $Rightbot.choice -standard 0
 
 #  Table for the extension transformations.
-      set Transtable [Ccd_table $Rightbot.table -columns 2 -flushright 0]
+      CCDCcdWidget Transtable transtable \
+         Ccd_table $Rightbot.table -columns 2 -flushright 0
 
 #  Choice widget for OK and Cancel buttons.
-      set Choice [Ccd_choice $Top.bot]
+      CCDCcdWidget Choice choice Ccd_choice $Topwin.bot
 
 #--------------------------------------------------------------------------
 #  Widget configuration.
@@ -281,11 +296,11 @@
           } else {
              set importfile {}
           }
-          CCDGetFileName $Top.refndf \"Select reference frame\"
+          CCDGetFileName $Topwin.refndf \"Select reference frame\"
           if { \$CCDimportexists } {
-             set refndf \[CCDFileToNDFName \"\$CCDimportfile\" \]
+             set rndf \[CCDFileToNDFName \"\$CCDimportfile\" \]
              $Refndf clear 0 end
-             $Refndf insert 0 \$refndf
+             $Refndf insert 0 \$rndf
              $Fitsextract invoke {Extract FITS items}
           }
           set CCDimportfile \$importfile
@@ -300,7 +315,7 @@
           global CCDimportfilter
           global ict_modified
           set CCDimportfilter \"*.DAT\"
-          CCDGetFileName $Top.restore {Read import table file}
+          CCDGetFileName $Topwin.restore {Read import table file}
           if { \$CCDimportexists } {
              CCDRestoreFromImportFile \$CCDimportfile $Fitstable $Transtable
              set ict_modified 0
@@ -316,7 +331,7 @@
           global ict_modified
           global CCDimportfilter
           set CCDimportfilter \"*.DAT\"
-          CCDNewFileName $Top.savefile \"Save import table in file\"
+          CCDNewFileName $Topwin.savefile \"Save import table in file\"
           if { \$CCDimportavail } {
              set ok \[CCDSaveImportTable \
                          \"\$CCDimportfile\" \
@@ -482,7 +497,7 @@
 
 #  Only exit if a filename has been given.
           if { \$CCDimportavail } {
-             $Top kill $Top
+             $Topwin kill $Topwin
           } else {
              CCDIssueInfo {A filename is required before exit}
 	  }
@@ -494,13 +509,13 @@
           global CCDimportfile
           set CCDimportexists 0
 	  set CCDimportfile {}
-          $Top kill $Top
+          $Topwin kill $Topwin
 	 "
 
 #--------------------------------------------------------------------------
 #  Set the window help (pretty minimalist context wise).
 #--------------------------------------------------------------------------
-      $Top sethelp ccdpack CCDCreateImportTableWindow
+      $Topwin sethelp ccdpack CCDCreateImportTableWindow
       $Menu sethelpitem {On Window} ccdpack CCDCreateImportTableWindow
       $Menu sethelp all ccdpack CCDCreateImportTableMenu
 
@@ -525,38 +540,38 @@
 #  Widget packing.
 #--------------------------------------------------------------------------
 #  Pack the top left-hand frame.
-      pack $Refndf -fill x
-      pack $Fitsextract
-      pack $Fitsbox -fill both -expand true
+      pack $refndf -fill x
+      pack $fitsextract
+      pack $fitsbox -fill both -expand true
 
 #  Pack the top right-hand frame.
-      pack $Fitsname -side top -fill x
-      pack $Fitstype -side top -fill x
-      pack $Fitschoice -side top -fill x
-      pack $Fitstable -expand true -fill both
+      pack $fitsname -side top -fill x
+      pack $fitstype -side top -fill x
+      pack $fitschoice -side top -fill x
+      pack $fitstable -expand true -fill both
 
 #  Pack top frame.
-      pack $Lefttop -side left -fill both
-      pack $Righttop -side right -expand true -fill both
+      pack $lefttop -side left -fill both
+      pack $righttop -side right -expand true -fill both
 
 #  Pack bottom right-hand frame
-      pack $Extname -fill x
-      pack $Fitsfunc -fill x
-      pack $Extchoice -fill x
-      pack $Transtable -side bottom -expand true -fill both
+      pack $extname -fill x
+      pack $fitsfunc -fill x
+      pack $extchoice -fill x
+      pack $transtable -side bottom -expand true -fill both
 
 #  Pack bottom frame.
-      pack $Knownbox -side left -fill both
-      pack $Rightbot -side right -expand true -fill both
+      pack $knownbox -side left -fill both
+      pack $rightbot -side right -expand true -fill both
 
 #  Now pack major frames into top-level widget.
-      pack $Menu -fill x
-      pack $Choice -side bottom -fill x
-      pack $Frametop -fill both
-      pack $Framebot -expand true -fill both
+      pack $menu -fill x
+      pack $choice -side bottom -fill x
+      pack $frametop -fill both
+      pack $framebot -expand true -fill both
 
 #  Now reveal window.
-      wm deiconify $Top
+      wm deiconify $topwin
 
 #---------------------------------------------------------------------------
 #  Initialisation of form.
@@ -571,7 +586,7 @@
 
 #  And wait for this window to be destroyed, which indicates completion
 #  of the task.
-      CCDWindowWait $Top
+      CCDWindowWait $Topwin
       return 
 
 #  End of procedure.

@@ -27,6 +27,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -37,6 +38,8 @@
 #     13-MAY-1999 (PDRAPER):
 #        Changed window control policy to just transient (explicit
 #        raising causes problems with some WMs).
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -46,51 +49,51 @@
 #.
 
 #  Widget creation.
-      Ccd_toplevel $Top -title "$title"
-      set Frame [frame $Top.f]
+      CCDCcdWidget Topwin topwin Ccd_toplevel $Top -title "$title"
+      CCDTkWidget Frame frame frame $topwin.f
       if { $bitmap != "" } {
-         set Bitmap [label $Frame.label -bitmap $bitmap]
+         CCDTkWidget Bitmapwin bitmapwin label $frame.label -bitmap $bitmap
       }
-      set Message [message $Frame.message \
-                      -text "$text" -width 14c -justify center]
-      set Button [Ccd_choice $Top.button -standard 0]
+      CCDTkWidget Message message \
+         message $frame.message -text "$text" -width 14c -justify center
+      CCDCcdWidget Button button Ccd_choice $Topwin.button -standard 0
 
 #  Configure widgets.
-      $Button addbutton OK "$Top kill $Top"
+      $Button addbutton OK "$Topwin kill $Topwin"
 
 #  Pack widgets.
-      pack $Button -side bottom -fill x
-      pack $Frame -side top -fill both -expand true
+      pack $button -side bottom -fill x
+      pack $frame -side top -fill both -expand true
       if { $bitmap != "" } {
-         pack $Bitmap -side left -fill y -padx 0.5c -pady 0.5c
+         pack $bitmapwin -side left -fill y -padx 0.5c -pady 0.5c
       }
-      pack $Message -side right -fill both -expand true
+      pack $message -side right -fill both -expand true
 
 #  Make sure this window is on top and reasonable prominent
 #  (centre of screen of parent top-level).
-      wm withdraw $Top
+      wm withdraw $topwin
       update idletasks
-      set Wtop [winfo toplevel $Top]
-      if { $Wtop != $Top } {
-         set x [expr [winfo rootx $Wtop] + [winfo reqwidth $Wtop]/2 \
-                   -[winfo reqwidth $Top]/2]
-         set y [expr [winfo rooty $Wtop] + [winfo reqheight $Wtop]/2 \
-                   -[winfo reqheight $Top]/2]
+      set wtop [winfo toplevel $topwin]
+      if { $wtop != $topwin } {
+         set x [expr [winfo rootx $wtop] + [winfo reqwidth $wtop]/2 \
+                   -[winfo reqwidth $topwin]/2]
+         set y [expr [winfo rooty $wtop] + [winfo reqheight $wtop]/2 \
+                   -[winfo reqheight $topwin]/2]
       } else {
-         set x [expr [winfo screenwidth $Top]/2 - [winfo reqwidth $Top]/2]
-         set y [expr [winfo screenheight $Top]/2 - [winfo reqheight $Top]/2]
+         set x [expr [winfo screenwidth $topwin]/2 - [winfo reqwidth $topwin]/2]
+         set y [expr [winfo screenheight $topwin]/2 - [winfo reqheight $topwin]/2]
       }
-      wm geometry $Top +$x+$y
-      wm deiconify $Top
+      wm geometry $topwin +$x+$y
+      wm deiconify $topwin
 
 #  Try to make sure this window stays on Top.
-      wm transient $Top [winfo parent $Top]
+      wm transient $topwin [winfo parent $topwin]
 
 #  Make OK the focus
       $Button focus OK
 
 #  Wait for the acknowledgement.
-      CCDWindowWait $Top
+      CCDWindowWait $Topwin
 
 #  End of procedure.
    }

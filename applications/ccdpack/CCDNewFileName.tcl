@@ -1,4 +1,4 @@
-   proc CCDNewFileName { Top title } {
+   proc CCDNewFileName { Topwin title } {
 #+
 #  Name:
 #     CCDNewFileName
@@ -17,7 +17,7 @@
 #     exist.
 
 #  Arguments:
-#     Top = window (read)
+#     Topwin = window (read)
 #        The name of the top-level window to contain form.
 #     title = string (read)
 #        The title for top-level widget.
@@ -31,6 +31,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -42,6 +43,8 @@
 #        Removed built-in keyboard traversal.
 #     21-AUG-1995 (PDRAPER):
 #        Converted to new coding style.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -58,17 +61,17 @@
 #  Widget creation.
 #----------------------------------------------------------------------------
 #  Top-level window for form.
-      Ccd_toplevel $Top -title $title
+      CCDCcdWidget Top top Ccd_toplevel $Topwin -title "$title"
 
 #  Menubar. This will allow selection from existing files and supply
 #  help.
-      set Menu [Ccd_helpmenubar $Top.menubar]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
 
 #  Labelled entry widget for getting name of file.
-      set Name [Ccd_labent $Top.labent -text {Filename:}]
+      CCDCcdWidget Name name Ccd_labent $Top.labent -text {Filename:}
 
 #  Choice bar for control.
-      set Choice [Ccd_choice $Top.choice]
+      CCDCcdWidget Choice choice Ccd_choice $Top.choice
 
 #----------------------------------------------------------------------------
 #  Widget configuration.
@@ -109,9 +112,9 @@
 #--------------------------------------------------------------------------
 #  Packing.
 #--------------------------------------------------------------------------
-      pack $Menu -fill x
-      pack $Name -expand true -fill x
-      pack $Choice -fill x
+      pack $menu -fill x
+      pack $name -expand true -fill x
+      pack $choice -fill x
 
 #--------------------------------------------------------------------------
 #  Real-time setup and wait for response section.

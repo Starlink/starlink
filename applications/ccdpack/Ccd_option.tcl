@@ -71,6 +71,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -90,6 +91,8 @@
 #        value for both fields. Removed popup behaviour when in entry
 #        field. This behaviour should now be asked for explicitly
 #        via the constrain option.
+#     12-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -106,26 +109,26 @@
       constructor { config } {
 
 #  Add a menubutton for displaying the options and bitmap.
-         menubutton $oldthis.mb \
-            -indicatoron 1 \
-	    -menu $oldthis.mb.m \
-	    -relief raised
+         CCDTkWidget Mb mb menubutton $oldthis.mb \
+                              -indicatoron 1 \
+	                      -menu $oldthis.mb.m \
+	                      -relief raised
 
 #  And create the menu.
-         menu $oldthis.mb.m -tearoff 0
+         CCDTkWidget Menu menu menu $mb.m -tearoff 0
 
 #  Configuration only allows label on left.
          configure -placelabel $placelabel
          configure -constrain $constrain
 
 #  Pack sub-widgets.
-         pack $oldthis.mb -side left
+         pack $mb -side left
 
 #  Define sub-component widgets for configuration via the basic
 #  configuration methods.
-         set widgetnamess($oldthis:menubutton) $oldthis.mb
-         set widgetfocus($oldthis:menubutton) $oldthis.mb
-         set widgetnames($oldthis:menu) $oldthis.mb.m
+         set widgetnames($Oldthis:menubutton) $Mb
+         set widgetfocus($Oldthis:menubutton) $Mb
+         set widgetnames($Oldthis:menu) $Menu
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -135,24 +138,24 @@
       method addoption { label args } {
          switch [llength $args] {
             0 {
-               $oldthis.mb.m add command \
+               $Menu add command \
                   -label $label \
-                  -command "$oldthis clear 0 end
-                            $oldthis insert 0 \"$label\"
+                  -command "$Oldthis clear 0 end
+                            $Oldthis insert 0 "$label"
                            "
             }
             1 {
-               $oldthis.mb.m add command \
+               $Menu add command \
                   -label $label \
-                  -command "$oldthis clear 0 end
-                            $oldthis insert 0 \"$args\"
+                  -command "$Oldthis clear 0 end
+                            $Oldthis insert 0 "$args"
                            "
             }
             2 {
-               $oldthis.mb.m add command \
+               $Menu add command \
                   -label $label \
-                  -command "$oldthis clear 0 end
-                            $oldthis insert 0 \"[lindex $args 0]\"
+                  -command "$Oldthis clear 0 end
+                            $Oldthis insert 0 "[lindex $args 0]"
                             [lindex $args 1]
                            "
             }
@@ -161,7 +164,7 @@
 
 #  Control menu posting method.
       method postmenu { x y } {
-	 tk_popup $oldthis.mb.m $x $y
+	 tk_popup $menu $x $y
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -189,6 +192,16 @@
             bind entry <1> {}
          }
       }
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Common and protected variables.  Common are visible to all instances
+#  of this class, protected to just this instance (both are available
+#  anywhere in the scope of this class and in derived classes).
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      protected Mb
+      protected mb ""
+      protected Menu
+      protected menu ""
 
 #  End of class defintion.
    }

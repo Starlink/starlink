@@ -1,4 +1,4 @@
-proc CCDReduce { Top } {
+proc CCDReduce { Topwin } {
 
 #+
 #  Name:
@@ -24,6 +24,7 @@ proc CCDReduce { Top } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -33,6 +34,8 @@ proc CCDReduce { Top } {
 #        Removed built-in keyboard traversal.
 #     23-AUG-1995 (PDRAPER):
 #        Re-coded to new style.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -90,29 +93,32 @@ proc CCDReduce { Top } {
 #----------------------------------------------------------------------------
 
 #  Top-level widget.
-   Ccd_toplevel $Top -title {Perform Reduction}
+   CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Perform Reduction"
 
 #  Menubar.
-   set Menu [Ccd_helpmenubar $Top.menubar -standard 1]
+   CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar 
 
 #  Radioarray for getting the debiassing type.
-   set Debiastype [Ccd_radioarray $Top.debiastype \
-                      -label {Debias using:} \
-                      -variable CCDglobalpars(DEBIASTYPE)]
+   CCDCcdWidget Debiastype debiastype \
+      Ccd_radioarray $Top.debiastype \
+                      -label "Debias using:" \
+                      -variable CCDglobalpars(DEBIASTYPE)
 
 #  Radioarray for the interpolation method. Only used if the
 #  debiassing type is "interpolation".
-   set Interp [Ccd_radioarray $Top.interp \
-                  -label {Interpolation method:} \
-                  -variable CCDglobalpars(INTERPTYPE)]
+   CCDCcdWidget Interp interp \
+      Ccd_radioarray $Top.interp \
+                  -label "Interpolation method:" \
+                  -variable CCDglobalpars(INTERPTYPE)
    
 #  Radioarray for deciding the type of disk space savings we want.
-   set Spacesave [Ccd_radioarray $Top.spacesave \
-                     -label {Save how much disk space:} \
-                     -variable CCDglobalpars(SPACESAVE)]
+   CCDCcdWidget Spacesave spacesave \
+      Ccd_radioarray $Top.spacesave \
+                     -label "Save how much disk space:" \
+                     -variable CCDglobalpars(SPACESAVE)
 
 #  Choice bar for controlling interface.
-   set Choice [Ccd_choice $Top.choice -standard 0]
+   CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
 
 #----------------------------------------------------------------------------
 #  Widget configuration.
@@ -136,39 +142,39 @@ proc CCDReduce { Top } {
 
 #  Debiastype.
 #  Add options for the different types of debiassing we can use.
-   set debiastype 0
+   set dbtype 0
    if { $BIAS(debias,1) } {
       $Debiastype addbutton {zeroed master bias, offsetting to bias strips} \
          {1} "$Interp state all disabled"
-      set debiastype 1
+      set dbtype 1
    }
    if { $BIAS(debias,2) } {
       $Debiastype addbutton {unzeroed master bias} {2} \
          "$Interp state all disabled"
-      if { $debiastype == 0 } { set debiastype 2 }
+      if { $dbtype == 0 } { set dbtype 2 }
    }
    if { $BIAS(debias,3) } {
       $Debiastype addbutton {interpolate using bias strips} {3} \
          "$Interp state all normal"
-      if { $debiastype == 0 } { set debiastype 3 }
+      if { $dbtype == 0 } { set dbtype 3 }
    }
    if { $BIAS(debias,4) } {
       $Debiastype addbutton {single constant} {4} \
          "$Interp state all disabled"
-      if { $debiastype == 0 } { set debiastype 4 }
+      if { $dbtype == 0 } { set dbtype 4 }
    }
    
 #  If no default type exists set one and make sure if it does exist
 #  that it is sensible.
    if { ![info exists CCDglobalpars(DEBIASTYPE)] } {
-      set CCDglobalpars(DEBIASTYPE) $debiastype
+      set CCDglobalpars(DEBIASTYPE) $dbtype
    } else {
       if { [regexp {[1-4]} $CCDglobalpars(DEBIASTYPE)] } { 
          if { !$BIAS(debias,$CCDglobalpars(DEBIASTYPE)) } {
-            set CCDglobalpars(DEBIASTYPE) $debiastype
+            set CCDglobalpars(DEBIASTYPE) $dbtype
          }
       } else {
-         set CCDglobalpars(DEBIASTYPE) $debiastype
+         set CCDglobalpars(DEBIASTYPE) $dbtype
       }
    }
 
@@ -243,11 +249,11 @@ proc CCDReduce { Top } {
 #----------------------------------------------------------------------------
 #  Pack all widgets.
 #----------------------------------------------------------------------------
-   pack $Menu -fill x
-   pack $Choice -side bottom -fill x
-   pack $Debiastype -fill x
-   if { $haveinterp } { pack $Interp -fill x }
-   pack $Spacesave -fill x
+   pack $menu -fill x
+   pack $choice -side bottom -fill x
+   pack $debiastype -fill x
+   if { $haveinterp } { pack $interp -fill x }
+   pack $spacesave -fill x
    
 #  Wait for interaction in this window to end.
       CCDWindowWait $Top

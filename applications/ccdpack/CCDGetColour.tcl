@@ -1,4 +1,4 @@
-proc CCDGetColour { Top element } {
+proc CCDGetColour { Topwin element } {
 #+
 #  Name:
 #
@@ -15,7 +15,7 @@ proc CCDGetColour { Top element } {
 #     to be selected from RBG space.
 
 #  Arguments:
-#     Top = window (read)
+#     Topwin = window (read)
 #        A name for the top-level widget created by this routine.
 #        This routine will wait until the interaction is finished
 #        before proceeding.
@@ -25,11 +25,14 @@ proc CCDGetColour { Top element } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     26-SEP-1995 (PDRAPER):
 #     	 Original version.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -62,21 +65,25 @@ proc CCDGetColour { Top element } {
 #-----------------------------------------------------------------------------
 #  Widget creation.
 #-----------------------------------------------------------------------------
-   Ccd_toplevel $Top -title "Choose a colour"
+   CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Choose a colour"
    if { $uselist } {
-      set List [Ccd_scrollbox $Top.list -label "Colour List:"]
+      CCDCcdWidget List list Ccd_scrollbox $Top.list -label "Colour list:"
    }
-   set Frame1 [frame $Top.frame1 -borderwidth 0]
-   set Rslide [scale $Frame1.red -label "Red" -showvalue 0 \
-                  -to 65535 -orient horizontal -variable RGB(red)]
-   set Gslide [scale $Frame1.green -label "Green" -showvalue 0 \
-                  -to 65535  -orient horizontal -variable RGB(green)]
-   set Bslide [scale $Frame1.blue -label "Blue" -showvalue 0 \
-                  -to 65535 -orient horizontal -variable RGB(blue)]
-   set Choice [Ccd_choice $Top.choice]
-   set Frame2 [frame $Top.frame2 -borderwidth 0]
-   set Thislabel [label $Frame2.label -text "Colour:              "]
-   set Thiscolour [frame $Frame2.colour]
+   CCDTkWidget Frame1 frame1 frame $top.frame1 -borderwidth 0
+   CCDTkWidget Rslide rslide \
+      scale $frame1.red -label "Red" -showvalue 0 \
+                  -to 65535 -orient horizontal -variable RGB(red)
+   CCDTkWidget Gslide gslide \
+      scale $frame1.green -label "Green" -showvalue 0 \
+                  -to 65535  -orient horizontal -variable RGB(green)
+   CCDTkWidget Bslide bslide \
+      scale $frame1.blue -label "Blue" -showvalue 0 \
+                  -to 65535 -orient horizontal -variable RGB(blue)
+   CCDCcdWidget Choice choice Ccd_choice $Top.choice
+   CCDTkWidget Frame2 frame $top.frame2 -borderwidth 0
+   CCDTkWidget Thislabel thislabel \
+      label $frame2.label -text "Colour:              "
+   CCDTkWidget Thiscolour thiscolour frame $frame2.colour
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.
@@ -117,15 +124,15 @@ proc CCDGetColour { Top element } {
 #-----------------------------------------------------------------------------
 #  Packing.
 #-----------------------------------------------------------------------------
-   pack $Choice -side bottom -fill x
-   if { $uselist } { pack $List -side left -fill y }
-   pack $Frame1 -side left -fill both
-   pack $Frame2 -side left -fill both -expand true
+   pack $choice -side bottom -fill x
+   if { $uselist } { pack $list -side left -fill y }
+   pack $frame1 -side left -fill both
+   pack $frame2 -side left -fill both -expand true
 
-   pack $Thislabel -fill x -side top
-   pack $Thiscolour -fill both -expand true
+   pack $thislabel -fill x -side top
+   pack $thiscolour -fill both -expand true
 
-   pack $Rslide $Gslide $Bslide -side top -fill x
+   pack $rslide $gslide $bslide -side top -fill x
 
 #-----------------------------------------------------------------------------
 #  Activation.
@@ -146,7 +153,7 @@ proc CCDGetColour { Top element } {
 
 #  Set the display to the current colour.
    $Thiscolour configure -background $CCDprefs($element)
-   set rgblist [winfo rgb $Thiscolour $CCDprefs($element)]
+   set rgblist [winfo rgb $thiscolour $CCDprefs($element)]
    set RGB(red) [lindex $rgblist 0]
    set RGB(green) [lindex $rgblist 1]
    set RGB(blue) [lindex $rgblist 2]

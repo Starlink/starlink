@@ -110,6 +110,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -128,6 +129,8 @@
 #        Added buttonwidth configuration option.
 #     7-NOV-1995 (PDRAPER):
 #        Added focus method.
+#     12-MAY-2000 (MBT):
+#        Upgraded to Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -174,33 +177,35 @@
          }
          incr nbutton
          if { $args == {} } {
-            button $oldthis.button$nbutton \
-               -text "$name" -width $buttonwidth
+            CCDTkWidget Button button \
+               button $oldthis.button$nbutton \
+                      -text "$name" -width $buttonwidth
          } else {
 
 #  Descend into "quoting hell".
-            eval button \$oldthis.button$nbutton \
-               -text \"$name\" -width $buttonwidth \
-               -command "$args"
+            CCDTkWidget Button button \
+               button $oldthis.button$nbutton \
+                      -text "$name" -width $buttonwidth \
+                      -command [join $args]
          }
-         set buttonnames($name) $nbutton
+         set Buttons($name) $Button
+         lappend Buttonlist $Button
 
 #  And repack buttons.
          _repack
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:$name) $oldthis.button$nbutton
-         set widgetfocus($oldthis:$name) $oldthis.button$nbutton
+         set widgetnames($Oldthis:$name) $Button
+         set widgetfocus($Oldthis:$name) $Button
       }
 
 #  Method to add a command to a button.
       method addcommand { name command } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Add the command.
-            $oldthis.button$buttonnames($name) configure \
-               -command "$command"
+            $Buttons($name) configure -command "$command"
          } else {
             error "No choice button of name \"$name\""
          }
@@ -216,27 +221,27 @@
 
 #  First unpack buttons to make sure label is in the correct place.
          if { $nbutton > 0 } {
-            for { set i 1 } { $i <= $nbutton } { incr i } {
-               pack forget $oldthis.button$i
+            foreach Button $Buttonlist {
+               pack forget [CCDPathOf $Button]
             }
          }
 
 #  Pack label first.
          if { $havelabel } {
             if { $side == "top" } {
-               pack $oldthis.label -side left -expand true -fill x
+               pack $labelwidget -side left -expand true -fill x
             } else {
-               pack $oldthis.label -side top -expand true -fill x
+               pack $labelwidget -side top -expand true -fill x
             }
          }
          if { $nbutton > 0 } {
-            for { set i 1 } { $i <= $nbutton } { incr i } {
+            foreach Button $Buttonlist {
 
 #  See if buttons need resizing before packing
                if { $resize } {
-                  $oldthis.button$i configure -width $buttonwidth
+                  $Button configure -width $buttonwidth
                }
-               pack $oldthis.button$i -side $side -expand true
+               pack [CCDPathOf $Button] -side $side -expand true
             }
             set resize 0
          }
@@ -244,8 +249,8 @@
 
 #  Method for setting focus to a button.
       method focus name {
-         if { [info exists buttonnames($name)] } {
-            ::focus $oldthis.button$buttonnames($name)
+         if { [info exists Buttons($name)] } {
+            ::focus [CCDPathOf $Buttons($name)]
          } else {
             error "No choice button of name \"$name\""
          }
@@ -253,10 +258,10 @@
 
 #  Method for invoking named button.
       method invoke name {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Invoke the button.
-            $oldthis.button$buttonnames($name) invoke
+            $Buttons($name) invoke
          } else {
             error "No choice button of name \"$name\""
          }
@@ -268,16 +273,14 @@
 
 #  Request to bind all elements to this help.
             if { $nbutton > 0 } {
-               foreach oneof [ array names buttonnames ] {
-                  Ccd_base::sethelp \
-                     $oldthis.button$buttonnames($oneof) $docname $label
+               foreach oneof [ array names Buttons ] {
+                  Ccd_base::sethelp $Buttons($oneof) $docname $label
                }
             }
-            Ccd_base::sethelp $oldthis $docname $label
+            Ccd_base::sethelp $Oldthis $docname $label
          } else {
-            if { [ info exists buttonnames($name) ] } {
-               Ccd_base::sethelp \
-                  $oldthis.button$buttonnames($name) $docname $label
+            if { [ info exists Buttons($name) ] } {
+               Ccd_base::sethelp $Buttons($name) $docname $label
             }
          }
       }
@@ -286,13 +289,13 @@
       method state {name status} {
          if { $name == "all" } {
             if { $nbutton > 0 } {
-               foreach oneof [ array names buttonnames ] {
-                  $oldthis.button$buttonnames($oneof) configure -state $status
+               foreach oneof [ array names Buttons ] {
+                  $Buttons($oneof) configure -state $status
                }
             }
          } else {
-            if { [ info exists buttonnames($name) ] } {
-               $oldthis.button$buttonnames($name) configure -state $status
+            if { [ info exists Buttons($name) ] } {
+               $Buttons($name) configure -state $status
             }
          }
       }
@@ -322,16 +325,17 @@
          if $exists {
             if { $label != "" } {
                if { $havelabel } {
-                  $oldthis.label configure -text "$label"
+                  $Labelwidget configure -text "$label"
                } else {
-                  label $oldthis.label -text "$label" \
-                                    -justify center -anchor center
+                  CCDTkWidget Labelwidget labelwidget \
+                     label $oldthis.label -text "$label" \
+                            -justify center -anchor center
                }
                set havelabel 1
                _repack
             } else {
                if { $havelabel } {
-                  destroy $oldthis.label
+                  destroy $labelwidget
                   _repack
                }
                set havelabel 0
@@ -343,7 +347,7 @@
       public width 0 {
          if $exists {
             if { $label != "" } {
-               $oldthis.label configure -width $width
+               $Labelwidget configure -width $width
             }
          }
       }
@@ -366,13 +370,18 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #   Number of buttons in the menubar and their names.
       protected nbutton 0
-      protected buttonnames
+      protected Buttons
+      protected Buttonlist
 
-#   Notice if buttons need resizing.
+#  Notice if buttons need resizing.
       protected resize 0
 
 #  Presence of label.
       protected havelabel 0
+
+#  Name of label widget.
+      protected Labelwidget
+      protected labelwidget ""
 
 #  End of class defintion.
    }

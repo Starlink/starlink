@@ -106,6 +106,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -120,6 +121,8 @@
 #        longer needed.
 #     23-AUG-1995 (PDRAPER):
 #        Added addseparator method.
+#     12-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -137,7 +140,7 @@
 
 #  Create a frame so that real menu options are not confused by
 #  tk_ procedures with those of this class instance.
-         frame $oldthis.menubar
+         CCDTkWidget Menubar menubar frame $oldthis.menubar
 
 #  Check options database for values to override widget defaults. Look for more
 #  specific option of having a class specified, if this fails try for less
@@ -156,7 +159,7 @@
          configure -standard        $standard
 
 #  Pack the menubar
-         pack $oldthis.menubar -fill x -expand true
+         pack $menubar -fill x -expand true
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -172,31 +175,32 @@
 #  integer.
       method addbutton { name underline } {
          incr nbutton
-         menubutton $oldthis.menubar.button$nbutton \
-            -menu $oldthis.menubar.button$nbutton.m \
-            -text "$name" \
-            -underline $underline
-         menu $oldthis.menubar.button$nbutton.m
-         set buttonnames($name) $nbutton
+         CCDTkWidget Button button \
+            menubutton $menubar.button$nbutton \
+               -menu $menubar.button$nbutton.m \
+               -text "$name" \
+               -underline $underline
+         CCDTkWidget Buttonmenu buttonmenu menu $button.m
+         set Buttons($name) $Button
+         set Buttonmenus($name) $Buttonmenu
+         lappend Buttonlist $Button
 
 #  Catch the creation of Help buttons (want to pack these on right).
-         if { $name == "Help" } {  set helpbutton $nbutton  }
+         if { $name == "Help" } {  set Helpbutton $Button  }
          _repack
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:$name) $oldthis.menubar.button$nbutton
-         set widgetfocus($oldthis:$name) $oldthis.menubar.button$nbutton
+         set widgetnames($Oldthis:$name) $Button
+         set widgetfocus($Oldthis:$name) $Button
       }
 
 #  Method to add a checkbutton to a menu button.
       method addcheckbutton { name label args } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Add the command.
-            set curbut button$buttonnames($name)
-            eval $oldthis.menubar.$curbut.m add checkbutton \
-	         -label {$label} $args
+            eval $Buttonmenus($name) add checkbutton -label {$label} $args
 	 } else {
             error "No menubutton of name \"$name\""
 	 }
@@ -204,11 +208,10 @@
 
 #  Method to add a command to a menu button.
       method addcommand { name label command } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Add the command.
-            set curbut button$buttonnames($name)
-            $oldthis.menubar.$curbut.m add command \
+            $Buttonmenus($name) add command \
                -label   "$label" \
                -command "$command"
 	 } else {
@@ -219,11 +222,10 @@
 
 #  Method to add a separator to a menu.
       method addseparator { name } {
-         if { [info exists buttonnames($name)] } {
+         if { [info exists Buttons($name)] } {
 
 #  Add the separator
-            set curbut button$buttonnames($name)
-            $oldthis.menubar.$curbut.m add separator
+            $Buttonmenus($name) add separator
 	 } else {
             error "No menubutton of name \"$name\""
 	 }
@@ -233,27 +235,25 @@
 #  and packs on right.
       method _repack {} {
          if { $nbutton > 0 } {
-            for { set i 1 } { $i <= $nbutton } { incr i } {
-               pack $oldthis.menubar.button$i -side left
-               lappend items $oldthis.menubar.button$i
+            foreach Button $Buttonlist {
+               set button [CCDPathOf $Button]
+               pack $button -side left
+               lappend items $button
 	    }
 
 #  Deal with a help button
-            if { $helpbutton != 0 } {
-               pack $oldthis.menubar.button$helpbutton -side right
+            if { [info exists Helpbutton] } {
+               pack [CCDPathOf $Helpbutton] -side right
             }
-
-#  Register menubar with Tk.
-            eval tk_menuBar $oldthis.menubar $items
          }
       }
 
 #  Invoke a named entry in a menu.
       method invoke { name index } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Invoke the menu item.
-            $oldthis.menubar.button$buttonnames($name).m invoke $index
+            $Buttonmenus($name) invoke $index
 	 } else {
             error "No menubutton of name \"$name\""
 	 }
@@ -261,10 +261,10 @@
 
 #  Method to enable a command in a menu button.
       method enable { name index } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Enable the menu item.
-            $oldthis.menubar.button$buttonnames($name).m entryconfigure $index -state normal
+            $Buttonmenus($name) entryconfigure $index -state normal
 	 } else {
             error "No menubutton of name \"$name\""
 	 }
@@ -272,10 +272,10 @@
 
 #  Method to disable a command in a menu button.
       method disable { name index } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Disable the menu item.
-            $oldthis.menubar.button$buttonnames($name).m entryconfigure $index -state disabled
+            $Buttonmenus($name) entryconfigure $index -state disabled
 	 } else {
             error "No menubutton of name \"$name\""
 	 }
@@ -284,10 +284,10 @@
 #  Method for assigning context help.
       method sethelp { name docname label} {
          if { "$name" == "all" } {
-            Ccd_base::sethelp $oldthis $docname $label
+            Ccd_base::sethelp $Oldthis $docname $label
          } else {
-            if { [ info exists buttonnames($name) ] } {
-               Ccd_base::sethelp $oldthis.menubar.button$buttonnames($name) $docname $label
+            if { [ info exists Buttons($name) ] } {
+               Ccd_base::sethelp $Buttons($name) $docname $label
             } else {
                error "No menubutton of name \"$name\""
             }
@@ -299,28 +299,28 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  The menubar relief.
       public relief raised {
-         if { [ winfo exists $oldthis.menubar ] } {
-            $oldthis.menubar configure -relief $relief
+         if { [ winfo exists $menubar ] } {
+            $Menubar configure -relief $relief
 	 }
       }
 
 #  Its borderwidth.
       public borderwidth 2 {
-         if { [ winfo exists $oldthis.menubar ] } {
-            $oldthis.menubar configure -borderwidth $borderwidth
+         if { [ winfo exists $menubar ] } {
+            $Menubar configure -borderwidth $borderwidth
 	 }
       }
 
 #  Its background colour
       public background {} {
-         if { [ winfo exists $oldthis.menubar ] } {
-            $oldthis.menubar configure -background $background
+         if { [ winfo exists $menubar ] } {
+            $Menubar configure -background $background
 	 }
       }
 
 #  Whether the standard menubar should be created.
       public standard 1 {
-         if { ! [catch {winfo exists $oldthis.menubar}] } {
+         if { ! [catch {winfo exists $menubar}] } {
             if { $standard } {
                addbutton File 0
                addbutton Options 0
@@ -336,8 +336,14 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #   Number of buttons in the menubar.
       protected nbutton 0
-      protected buttonnames
-      protected helpbutton 0
+      protected Buttons
+      protected Buttonmenus
+      protected Buttonlist
+      protected Helpbutton
+
+#  Names of widgets.
+      protected Menubar
+      protected menubar ""
 
 #  End of class defintion.
    }

@@ -1,4 +1,4 @@
-   proc CCDWindowWait { w } {
+   proc CCDWindowWait { W } {
 #+
 #  Name:
 #     CCDWindowWait
@@ -17,11 +17,12 @@
 #     waiting for this window to proceed.
 
 #  Arguments:
-#     w = window (read)
+#     W = window (read)
 #        The name of the window to wait on.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -32,10 +33,15 @@
 #     30-JUN-1995 (PDRAPER):
 #        Now relies on focus setting (default) of Tk, rather than
 #        defining own.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
 #.
+
+#  Get window name from command name passed.
+      set w [CCDPathOf $W]
 
 #  Now set the grab. Use a catch as modal operation can fail.
       set old_grab [ grab current ]
@@ -44,7 +50,7 @@
 #  Make all other windows use the "busy" cursor if using mega-widgets.
 #  These are released automatically when $w is destroyed.
       if { [ winfo class $w ] == "Ccd_toplevel" } { 
-         $w busy hold 0
+         $W busy hold 0
       }
 
 #  Wait for this procedure to exit (by destroying the main window).

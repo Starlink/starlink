@@ -109,6 +109,7 @@ itcl_class Ccd_multitem {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -125,6 +126,8 @@ itcl_class Ccd_multitem {
 #     21-JUL-1995 (PDRAPER):
 #        Fixed bindtags to use top-level ancestor rather than ., dot
 #        was picking up binding from adamtask (and destroying everything).
+#     12-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -154,21 +157,21 @@ itcl_class Ccd_multitem {
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Method to manage the scroll of listboxes so that they scroll together
 #  and are followed by the scrollbar too.
-      method _managelists { window scrollbars listboxes type direction args } {
+      method _managelists { Window Scrollbars Listboxes type direction args } {
          switch $type {
             listbox {
                if { $args != "" } {
-                  foreach oneof $scrollbars {
+                  foreach oneof $Scrollbars {
                      eval $oneof set $args
                   }
                }
 
 #  Create list of windows without the providing the instructions.
-               set selfat [ lsearch -exact $listboxes $window ]
-               set noself [ lreplace $listboxes $selfat $selfat ]
+               set selfat [ lsearch -exact $Listboxes $Window ]
+               set noself [ lreplace $Listboxes $selfat $selfat ]
 
 #  Make all other lists have the same position.
-               set index [ $window index @0,0 ]
+               set index [ $Window index @0,0 ]
                switch $direction {
                   x {
                      foreach oneof $noself {
@@ -186,7 +189,7 @@ itcl_class Ccd_multitem {
                }
 
 #  Now make sure selections are the same.
-               set selfsel [ $window curselection ]
+               set selfsel [ $Window curselection ]
                if { $selfsel != "" } {
                   foreach oneof $noself {
                      $oneof selection clear 0 end
@@ -205,12 +208,12 @@ itcl_class Ccd_multitem {
             scrollbar {
                switch $direction {
                   x {
-                     foreach oneof $listboxes {
+                     foreach oneof $Listboxes {
                         eval $oneof xview $args
                      }
                   }
                   y {
-                     foreach oneof $listboxes {
+                     foreach oneof $Listboxes {
                         eval $oneof yview $args
                      }
                   }
@@ -315,41 +318,42 @@ itcl_class Ccd_multitem {
 #  Need names of all the actual listboxes and scrollbar which will
 #  manage the scroll between them.
             if { $hand != {} } {
-               set listnames [ listnames ]
-               set scrollbar [ scrollbarnames $hand ]
+               set Listnames [ listnames ]
+               set Scrollbar [ scrollbarnames $hand ]
 
 #  Set up the management of the scrollbar to control all listboxes in
 #  the multiscrollbox.
-               foreach box $listnames {
-                  $box configure -yscrollcommand \
-      "$oldthis _managelists $box [list $scrollbar] [list $listnames] listbox y"
+               foreach Box $Listnames {
+                  $Box configure -yscrollcommand \
+      "$Oldthis _managelists $Box [list $Scrollbar] [list $Listnames] listbox y"
                }
-               foreach bar $scrollbar {
-                  $bar configure -command \
-      "$oldthis _managelists $scrollbar [list $scrollbar] [list $listnames] scrollbar y"
+               foreach Bar $Scrollbar {
+                  $Bar configure -command \
+      "$Oldthis _managelists $Scrollbar [list $Scrollbar] [list $Listnames] scrollbar y"
                }
 
 #  Now add enhanced bindings as well.
-               bind <1>  "$oldthis _managelists %W [list $scrollbar] \
-                                [list $listnames] listbox y"
-               bind <B1-Motion> "$oldthis _managelists %W [list $scrollbar] \
-                                       [list $listnames] listbox y"
-               bind <Shift-1>   "$oldthis _managelists %W [list $scrollbar] \
-                                       [list $listnames] listbox y"
-               bind <Shift-B1-Motion> "$oldthis _managelists %W [list $scrollbar] \
-                                             [list $listnames] listbox y"
-               bind <Any-Up> "$oldthis _managelists %W [list $scrollbar] \
-                                    [list $listnames] listbox y"
-               bind <Any-Down> "$oldthis _managelists %W [list $scrollbar] \
-                                      [list $listnames] listbox y"
+               bind <1>  "$Oldthis _managelists %W [list $Scrollbar] \
+                                [list $Listnames] listbox y"
+               bind <B1-Motion> "$Oldthis _managelists %W [list $Scrollbar] \
+                                       [list $Listnames] listbox y"
+               bind <Shift-1>   "$Oldthis _managelists %W [list $Scrollbar] \
+                                       [list $Listnames] listbox y"
+               bind <Shift-B1-Motion> "$Oldthis _managelists %W [list $Scrollbar] \
+                                             [list $Listnames] listbox y"
+               bind <Any-Up> "$Oldthis _managelists %W [list $Scrollbar] \
+                                    [list $Listnames] listbox y"
+               bind <Any-Down> "$Oldthis _managelists %W [list $Scrollbar] \
+                                      [list $Listnames] listbox y"
 #  Clear selections.
-               bind <3>       "$oldthis select clear 0 end"
+               bind <3>       "$Oldthis select clear 0 end"
 
 #  Need to reorder the bindtags to make Class bindings work before
 #  these ones (Class bindings do scroll & selections, need to happen
 #  before we update). Note use top-level of this object not ".".
                set topanc [winfo toplevel $oldthis]
-               foreach box $listnames {
+               foreach Box $Listnames {
+                  set box [CCDPathOf $Box]
                   bindtags $box "Listbox $box $topanc all"
                }
             }
@@ -381,7 +385,7 @@ itcl_class Ccd_multitem {
 #  Set label of a scrollbox.
       method label { listno text } {
          if { $listno <= $haveboxes } {
-            $oldthis.list$listno configure -label $text
+            $Lists($listno) configure -label $text
 
 #  Now need to restablish the scrollbar commands (these are destroyed by a 
 #  repack).

@@ -1,4 +1,4 @@
-   proc CCDCopyListbox { from to mode args } {
+   proc CCDCopyListbox { From To mode args } {
 #+
 #  Name:
 #     CCDCopyListbox
@@ -41,6 +41,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -48,6 +49,8 @@
 #     	 Original version.
 #     15-MAR-1994 (PDRAPER):
 #     	 Added prepend and append capability.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -82,15 +85,15 @@
 	       set prepend {}
 	       set append {}
 	    }
-	    if { "$finish" == "end" } { set finish [ $from size ] }
+	    if { "$finish" == "end" } { set finish [ $From size ] }
 	    for { } { $index < $finish } { incr index } {
-	       $to insert end "${prepend}[ $from get $index ]${append}"
+	       $To insert end "${prepend}[ $From get $index ]${append}"
 	    }
 	 }
       } else {
 
 #  Mode is assumed to be selection. Check that some values are selected.
-         set indices [ $from curselection ]
+         set indices [ $From curselection ]
 	 if { $indices != {} } {
 
 #  Look for prepend and append arguments.
@@ -108,7 +111,7 @@
 
 #  Get the selection indices and copy the entries.
             foreach index $indices {
-	       $to insert end "${prepend}[ $from get $index ]${append}"
+	       $To insert end "${prepend}[ $From get $index ]${append}"
             }
          }
       }

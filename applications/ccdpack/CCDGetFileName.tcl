@@ -1,4 +1,4 @@
-   proc CCDGetFileName { Top title } {
+   proc CCDGetFileName { Topwin title } {
 
 #+
 #  Name:
@@ -19,7 +19,7 @@
 #     may be made by double clicking on it, or a new name may be entered.
 
 #  Parameters:
-#     Top = string (read)
+#     Topwin = string (read)
 #        The name of the top-level widget which contains the form.
 #     title = string (read)
 #        The title of the window (use this to indicate the context).
@@ -38,6 +38,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (Starlink - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -58,6 +59,8 @@
 #        Make sure that full path name is used.
 #     15-APR-1997 (PDRAPER):
 #        Converted to use a list of filters.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -75,13 +78,14 @@
 #  Widget creation.
 #----------------------------------------------------------------------------
 #  Create the top-level widget.
-      Ccd_toplevel $Top -title $title
+      CCDCcdWidget Top top Ccd_toplevel $Topwin -title "$title"
 
 #  Menubar.
-      set Menu [Ccd_helpmenubar $Top.menubar]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
 
 #  Labelled entry widget for current directory name.
-      set Directory [Ccd_labent $Top.direct -text {Directory:}]
+      CCDCcdWidget Directory directory \
+         Ccd_labent $Top.direct -text {Directory:}
 
 #  Labelled entry widget for the file filter. If CCDimportfilter
 #  is a list of length greater than 1 then need an option widget.
@@ -89,24 +93,27 @@
          set CCDimportfilter ""
       }
       if { [llength $CCDimportfilter] > 1 } { 
-         set Filefilter [Ccd_option $Top.filter -text {File Filter:}]
+         CCDCcdWidget Filefilter filefilter \
+            Ccd_option $Top.filter -text "File Filter:"
       } else {
-         set Filefilter [Ccd_labent $Top.filter -text {File Filter:}]
+         CCDCcdWidget Filefilter filefilter \
+            Ccd_labent $Top.filter -text "File Filter:"
       }
 
 #  Scrollbox for directory names.
-      set Directbox [Ccd_scrollbox $Top.directbox]
+      CCDCcdWidget Directbox directbox Ccd_scrollbox $Top.directbox
 
 #  Scrollbox for names in current directory.
-      set Filebox [Ccd_scrollbox $Top.filebox]
+      CCDCcdWidget Filebox filebox Ccd_scrollbox $Top.filebox
 
 #  Labelled entry widget for name of selected file.
-      set Selected [Ccd_labent $Top.select \
-                       -text {Name of selected file:} \
-                       -placelabel top]
+      CCDCcdWidget Selected selected \
+         Ccd_labent $Top.select \
+                       -text "Name of selected file:" \
+                       -placelabel top
 
 #  Choice bar for control of form.
-      set Choice [Ccd_choice $Top.choice -standard 0]
+      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
 
 #----------------------------------------------------------------------------
 #  Widget configuration.
@@ -180,11 +187,11 @@
          "$Selected clear 0 end
           set index \[%W nearest %y\]
           set filename \[ %W get \$index \]
-          set directory \$CCDcurrentdirectory
-          if { \$directory == \"/\" } {
+          set dir \$CCDcurrentdirectory
+          if { \$dir == \"/\" } {
              $Selected insert 0 \"/\$filename\"
           } else {
-             $Selected insert 0 \"\$directory/\$filename\"
+             $Selected insert 0 \"\$dir/\$filename\"
           }
 	  %W selection clear 0 end
          "
@@ -192,11 +199,11 @@
          "$Selected clear 0 end
           set index \[%W nearest %y\]
           set filename \[ %W get \$index \]
-          set directory \$CCDcurrentdirectory
-          if { \$directory == \"/\" } {
+          set dir \$CCDcurrentdirectory
+          if { \$dir == \"/\" } {
              $Selected insert 0 \"/\$filename\"
           } else {
-             $Selected insert 0 \"\$directory/\$filename\"
+             $Selected insert 0 \"\$dir/\$filename\"
           }
 	  %W selection clear 0 end
           set gotfilename 1
@@ -241,13 +248,13 @@
 #----------------------------------------------------------------------------
 #   Pack all widgets.
 #----------------------------------------------------------------------------
-      pack $Menu       -side top -fill x
-      pack $Choice     -side bottom -fill x
-      pack $Selected   -side bottom -fill x
-      pack $Directory  -side top -fill x
-      pack $Filefilter -side top -fill x
-      pack $Directbox  -side left -expand true -fill both
-      pack $Filebox    -side right -expand true -fill both
+      pack $menu       -side top -fill x
+      pack $choice     -side bottom -fill x
+      pack $selected   -side bottom -fill x
+      pack $directory  -side top -fill x
+      pack $filefilter -side top -fill x
+      pack $directbox  -side left -expand true -fill both
+      pack $filebox    -side right -expand true -fill both
 
 #----------------------------------------------------------------------------
 #  Now set options and show file names.

@@ -65,6 +65,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -73,6 +74,8 @@
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
+#     12-MAY-2000 (MBT):
+#        Upgraded to Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -96,10 +99,10 @@
 
 #  Add the basic items to the Help and add commands to invoke
 #  them. "On Window" isn't generic.
-         addcommand Help {On Context} "$oldthis showhelpitem {On Context}"
-         addcommand Help {On Window}  "$oldthis showhelpitem {On Window}"
-         addcommand Help {On Version} "$oldthis showhelpitem {On Version}"
-         addcommand Help {On CCDPACK} "$oldthis showhelpitem {On CCDPACK}"
+         addcommand Help {On Context} "$Oldthis showhelpitem {On Context}"
+         addcommand Help {On Window}  "$Oldthis showhelpitem {On Window}"
+         addcommand Help {On Version} "$Oldthis showhelpitem {On Version}"
+         addcommand Help {On CCDPACK} "$Oldthis showhelpitem {On CCDPACK}"
          sethelpitem {On Context} ccdpack OnContext
          sethelpitem {On Version} ccdpack OnVersion
          sethelpitem {On CCDPACK} sun139 {}
@@ -108,7 +111,7 @@
          sethelp Help ccdpack OnHelp
 
 #  And on the File menu.
-         if { [info exists buttonnames(File)] } { 
+         if { [info exists Buttons(File)] } { 
             sethelp File ccdpack OnFile
          }
       }
@@ -121,17 +124,17 @@
 #  pseudo widget .mlabel as need to distinguish between these not just
 #  set help for menu as whole. Care needs to be taken not to winfo this!
       method sethelpitem {name docname label} {
-         if { [ info exists buttonnames(Help) ] } {
-            set menulabel $oldthis.menubar.button$buttonnames(Help).m$name
-	    Ccd_base::sethelp $menulabel $docname $label
+         if { [ info exists Buttons(Help) ] } {
+            set menulabel $Buttonmenus(Help)$name
+            Ccd_base::sethelp $menulabel $docname $label
 	 }
       }
 
 #  Invoke help method. This differs from the base class method in that
 #  the help is invoked by name rather than position.
       method showhelpitem {name} {
-         if { [ info exists buttonnames(Help) ] } {
-            set menulabel $oldthis.menubar.button$buttonnames(Help).m$name
+         if { [ info exists Buttons(Help) ] } {
+            set menulabel $Buttonmenus(Help)$name
 	    if { [info exists helpinfo($menulabel)] } {
 
 #  Search for help and issue command.

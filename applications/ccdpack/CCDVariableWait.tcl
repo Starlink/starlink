@@ -34,6 +34,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -41,6 +42,8 @@
 #     	 Original version.
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4.
+#     16-MAY-2000 (MBT):
+#        Upgraded to Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -60,19 +63,22 @@
 	 focus $focus
       }
 
+#  Get the window name from the command name.
+      set top [CCDPathOf $Top]
+
 #  Now set the grab
       set old_grab [ grab current ]
-      grab set $Top
+      grab set $top
 
 #  Make all other windows use the "busy" cursor.
       $Top busy hold 0
 
 #  Make sure we exit cleanly if the user wants the window where this
 #  is all happening destroyed.
-      set oldproto [wm protocol $Top WM_DELETE_WINDOW]
-      wm protocol $Top WM_DELETE_WINDOW "global gotfilename;set gotfilename 0"
-      set oldbind [bind $Top <Destroy>]
-      bind $Top <Destroy> "+ global gotfilename;set gotfilename 0"
+      set oldproto [wm protocol $top WM_DELETE_WINDOW]
+      wm protocol $top WM_DELETE_WINDOW "global gotfilename;set gotfilename 0"
+      set oldbind [bind $top <Destroy>]
+      bind $top <Destroy> "+ global gotfilename;set gotfilename 0"
 
 #  Wait for variable to be modified.
       tkwait variable $variable
@@ -82,10 +88,10 @@
 #  catch any errors and ignore.
       catch {
                focus $old_focus
-               grab release $topwin
+               grab release $top
                grab set $old_grab
-               bind $Top <Destroy> "$oldbind"
-               wm protocol $Top WM_DELETE_WINDOW "$oldproto"
+               bind $top <Destroy> "$oldbind"
+               wm protocol $top WM_DELETE_WINDOW "$oldproto"
             }
 
 #  End of procedure.

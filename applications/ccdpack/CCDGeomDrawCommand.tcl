@@ -30,6 +30,7 @@ proc CCDGeomDrawCommand { Top Canvas } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -40,6 +41,8 @@ proc CCDGeomDrawCommand { Top Canvas } {
 #     24-MAR-1999 (PDRAPER):
 #        Removed the xmagn & ymagn changes, no longer needed. Stopped
 #        KAPPA drawing axes.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -52,12 +55,8 @@ proc CCDGeomDrawCommand { Top Canvas } {
    global NDF
    global TASK
    global XDEVICE
-   global tcl_precision
    global PERCENTILES
 #.
-
-#  Up tcl precision to pretty good.
-   set tcl_precision 9
 
 #  Redraw the image.
    if { [info exists NDF] } {

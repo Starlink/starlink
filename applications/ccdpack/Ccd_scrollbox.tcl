@@ -127,6 +127,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -139,6 +140,8 @@
 #        Now uses Tk4 select modes.
 #     21-JUL-1995 (PDRAPER):
 #        Added sethelp method.
+#     15-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -155,12 +158,12 @@
       constructor { config } {
 
 #  Create listbox.
-         listbox $oldthis.list
+         CCDTkWidget List list listbox $oldthis.list
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:list) $oldthis.list
-         set widgetfocus($oldthis:list) $oldthis.list
+         set widgetnames($Oldthis:list) $List
+         set widgetfocus($Oldthis:list) $List
 
 #  Check options database for values to override widget defaults. Look for more
 #  specific option of having a class specified, if this fails try for less
@@ -183,7 +186,7 @@
          configure -singleselect    $singleselect
 
 #  Pack listbox
-         pack $oldthis.list -expand true -fill both
+         pack $list -expand true -fill both
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -191,30 +194,30 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Insert line of text method.
       method insert { index args } {
-         eval $oldthis.list insert $index $args
+         eval $List insert $index $args
       }
 
 #  Clear range of lines of text method.
       method clear { args } {
          if { [lindex $args 0 ] != "all" } {
-            eval $oldthis.list delete $args
+            eval $List delete $args
          } else {
-            $oldthis.list delete 0 end
+            $List delete 0 end
          }
       }
 
 #  Return the range of lines with current selection.
       method curselection {} {
-         return [$oldthis.list curselection]
+         return [$List curselection]
       }
 
 #  Get information back from the listbox.
       method get { args } {
          if { [lindex $args 0 ] == "all" } {
-            set value [$oldthis.list get 0 end]
+            set value [$List get 0 end]
             return $value
          } else {
-            set value [$oldthis.list get $args]
+            set value [$List get $args]
             return $value
          }
       }
@@ -225,10 +228,11 @@
 
 #  Rather than work out which configuration setting we're using, just
 #  extract all the possible widget names and check that they exist.
-            foreach oneof [array names widgetnames "$oldthis:*"] {
-               set name $widgetnames($oneof)
+            foreach oneof [array names widgetnames "$Oldthis:*"] {
+               set Name $widgetnames($oneof)
+               set name [CCDPathOf $Name]
                if [winfo exists $name] {
-                  Ccd_base::sethelp $name $docname $label
+                  Ccd_base::sethelp $Name $docname $label
                }
             }
          }
@@ -236,7 +240,7 @@
 
 #  Size of listbox contents.
       method size {} {
-         return [$oldthis.list size]
+         return [$List size]
       }
 
 #  Internal method for creating and or re-packing scrollbars
@@ -245,37 +249,47 @@
 #  First remove all scrollbars and packing frames, make the listbox
 #  forget any scrolling commands.
          foreach side "left right" {
-            if { [ winfo exists $oldthis.scroll$side ] } {
-               pack forget $oldthis.scroll$side
-
+            if { [ info exists Scrolls($side) ] } {
+               set scroll [CCDPathOf $Scrolls($side)]
+               pack forget $scroll
+               
 #  Destroy the scrollbar and make the listbox forget about the scrollcommand.
-               destroy $oldthis.scroll$side
-               $oldthis.list configure -yscrollcommand {}
+               destroy $scroll
+               $List configure -yscrollcommand {}
+               unset Scrolls($side)
             }
          }
          foreach side "top bottom" {
-            if { [ winfo exists $oldthis.$side.scroll$side ] } {
-               pack forget $oldthis.$side.scroll$side
+            if { [ info exists Scrolls($side) ] } {
+               set scroll [CCDPathOf $Scrolls($side)]
+               set frame [CCDPathOf $Frames($side)]
+               pack forget $scroll
 
 #  Destroy the scrollbar and make the listbox forget about the scrollcommand.
-               destroy $oldthis.$side.scroll$side
-               destroy $oldthis.$side
-               $oldthis.list configure -xscrollcommand {}
+               destroy $scroll
+               destroy $frame
+               $List configure -xscrollcommand {}
+               unset Scrolls($side)
+               unset Frames($side)
             }
 
 #  Destroy any packing frames.
-            if { [ winfo exists $oldthis.$side.left ] } {
-               pack forget $oldthis.$side.left
-               destroy $oldthis.$side.left
+            if { [ info exists Frames($side.left) ] } {
+               set frame [CCDPathOf $Frames($side.left)]
+               pack forget $frame
+               destroy $frame
+               unset Frames($side.left)
             }
-            if { [ winfo exists $oldthis.$side.right ] } {
-               pack forget $oldthis.$side.right
-               destroy $oldthis.$side.right
+            if { [ info exists Frames($side.right) ] } {
+               set frame [CCDPathOf $Frames($side.right)]
+               pack forget $frame
+               destroy $frame
+               unset Frames($side.right)
             }
          }
 
 #  And unpack the listbox itself (so that rearrangement is easy).
-         pack forget $oldthis.list
+         pack forget $list
 
 #  Find out if any packing frames are required (this fill the corners of
 #  the base frame so that scrollbars look natural).
@@ -287,64 +301,94 @@
 #  Create the necessary scrollbars. Append any names etc. to the
 #  sub-widget control variables.
          if { $haveleft } {
-            scrollbar $oldthis.scrollleft \
-               -orient vertical \
-               -command "$oldthis.list yview"
-            $oldthis.list configure -yscrollcommand "$oldthis.scrollleft set"
-            set widgetnames($oldthis:scrollleft) $oldthis.scrollleft
+            CCDTkWidget Scroll scroll \
+               scrollbar $oldthis.scrollleft \
+                  -orient vertical \
+                  -command "$List yview"
+            set Scrolls(left) $Scroll
+            $List configure -yscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrollleft) $Scroll
          }
 
          if { $haveright } {
-            scrollbar $oldthis.scrollright \
-               -orient vertical \
-               -command "$oldthis.list yview"
-            $oldthis.list configure -yscrollcommand "$oldthis.scrollright set"
-            set widgetnames($oldthis:scrollright) $oldthis.scrollright
+            CCDTkWidget Scroll scroll \
+               scrollbar $oldthis.scrollright \
+                  -orient vertical \
+                  -command "$List yview"
+            set Scrolls(right) $Scroll
+            $List configure -yscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrollright) $Scroll
          }
 
          if { $havetop } {
-            frame $oldthis.top -borderwidth 0
+            CCDTkWidget Frame frame frame $oldthis.top -borderwidth 0
+            set Frames(top) $Frame
             if { $haveleft } {
-               frame $oldthis.top.left -width [winfo reqwidth $oldthis.scrollleft]
-               pack $oldthis.top.left -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.left \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(left)]]
+               pack $frame1 -side left
+               set Frames(top.left) $Frame1
             }
-            scrollbar $oldthis.top.scrolltop \
-               -orient horizontal \
-               -command "$oldthis.list xview"
-            pack $oldthis.top.scrolltop -side left -fill x -expand true
-            $oldthis.list configure -xscrollcommand "$oldthis.top.scrolltop set"
-            set widgetnames($oldthis:scrolltop) $oldthis.top.scrolltop
+            CCDTkWidget Scroll scroll \
+               scrollbar $frame.scrolltop \
+                  -orient horizontal \
+                  -command "$List xview"
+            pack $scroll -side left -fill x -expand true
+            $List configure -xscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrolltop) $Scroll
+            set Scrolls(top) $Scroll
             if { $haveright } {
-               frame $oldthis.top.right -width [winfo reqwidth $oldthis.scrollright]
-               pack $oldthis.top.right -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.right \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(right)]]
+               pack $frame1 -side left
+               set Frames(top.right) $Frame1
             }
          }
 
          if { $havebottom } {
-            frame $oldthis.bottom -borderwidth 0
+            CCDTkWidget Frame frame frame $oldthis.bottom -borderwidth 0
+            set Frames(bottom) $Frame
             if { $haveleft } {
-               frame $oldthis.bottom.left -width [winfo reqwidth $oldthis.scrollleft]
-               pack $oldthis.bottom.left -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.left \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(left)]]
+               pack $frame1 -side left
+               set Frames(bottom.left) $Frame1
             }
-            scrollbar $oldthis.bottom.scrollbottom \
-               -orient horizontal \
-               -command "$oldthis.list xview"
-            pack $oldthis.bottom.scrollbottom -side left -fill x -expand true
-            $oldthis.list configure -xscrollcommand "$oldthis.bottom.scrollbottom set"
-            set widgetnames($oldthis:scrollbottom) $oldthis.top.scrollbottom
+            CCDTkWidget Scroll scroll \
+               scrollbar $frame.scrollbottom \
+                  -orient horizontal \
+                  -command "$List xview"
+            pack $scroll -side left -fill x -expand true
+            $List configure -xscrollcommand "$Scroll set"
+            set widgetnames($Oldthis:scrollbottom) $Frame
+            set Scrolls(bottom) $Scroll
             if { $haveright } {
-               frame $oldthis.bottom.right -width [winfo reqwidth $oldthis.scrollright]
-               pack $oldthis.bottom.right -side left
+               CCDTkWidget Frame1 frame1 \
+                  frame $frame.right \
+                         -width [winfo reqwidth [CCDPathOf $Scrolls(right)]]
+               pack $frame1 -side left
+               set Frames(bottom.right) $frame1
             }
          }
 
 #  Perform packing of main elements (need to do this now to get into
 #  correct places.
-         if { $havetop }    { pack $oldthis.top         -side top    -fill x }
-         if { $havebottom } { pack $oldthis.bottom      -side bottom -fill x }
-         if { $haveleft }   { pack $oldthis.scrollleft  -side left   -fill y }
-         if { $haveright }  { pack $oldthis.scrollright -side right  -fill y }
-         pack $oldthis.list -expand true -fill both
+         if { $havetop }    { 
+            pack [CCDPathOf $Frames(top)]         -side top    -fill x 
+         }
+         if { $havebottom } { 
+            pack [CCDPathOf $Frames(bottom)]      -side bottom -fill x 
+         }
+         if { $haveleft }   { 
+            pack [CCDPathOf $Scrolls(left)]       -side left   -fill y 
+         }
+         if { $haveright }  { 
+            pack [CCDPathOf $Scrolls(right)]      -side right  -fill y 
+         }
+         pack $list -expand true -fill both
       }
 
 #  Method to return the name of the listbox widget.
@@ -355,7 +399,7 @@
 #  Method to control selection. This has the same options as the listbox
 #  selection.
       method select { option args } {
-         eval $oldthis.list selection $option $args
+         eval $List selection $option $args
       }
 
 #  Method to return the names of the scrollbar widgets
@@ -366,8 +410,8 @@
             }
          }
          foreach side $places {
-            if { [ winfo exists $oldthis.scroll$side ] } {
-               lappend barnames $oldthis.scroll$side
+            if { [ info exists Scrolls($side) ] } {
+               lappend barnames $Scrolls($side)
             }
          }
          if { [ info exists barnames ] } {
@@ -400,20 +444,21 @@
       public label {} {
          if { $label != {} } {
             if $exists {
-               label $oldthis.label -text "$label"
-               pack $oldthis.label -side top -anchor $anchor
-               set widgetnames($oldthis:label) $oldthis.label
-               set widgetfocus($oldthis:label) $oldthis.label
+               CCDTkWidget Labelwidget labelwidget \
+                  label $oldthis.label -text "$label"
+               pack $labelwidget -side top -anchor $anchor
+               set widgetnames($Oldthis:label) $Labelwidget
+               set widgetfocus($Oldthis:label) $Labelwidget
                _repack $scrollbarplaces
             }
          } else {
 
 #  Remove existing label.
-            if { [ winfo exists $oldthis.label ] } {
-               pack forget $oldthis.label
-	       destroy $oldthis.label
-               unset widgetnames($oldthis:label)
-               unset widgetfocus($oldthis:label)
+            if { [ winfo exists $labelwidget ] } {
+               pack forget $labelwidget
+	       destroy $labelwidget
+               unset widgetnames($Oldthis:label)
+               unset widgetfocus($Oldthis:label)
 	    }
          }
       }
@@ -427,9 +472,9 @@
       public singleselect 1 {
          if $exists {
             if { $singleselect } {
-               $oldthis.list configure -selectmode browse
+               $List configure -selectmode browse
             } else {
-               $oldthis.list configure -selectmode extended
+               $List configure -selectmode extended
             }
          }
       }
@@ -438,23 +483,37 @@
 #  (one for each instance), otherwise the selection is the X11 one.
       public exportselect 1 {
          if $exists {
-            $oldthis.list configure -exportselection $exportselect
+            $List configure -exportselection $exportselect
          }
       }
 
 #  Height of listbox.
       public height 10 {
          if $exists {
-            $oldthis.list configure -height $height
+            $List configure -height $height
          }
       }
 
 #  Width of listbox.
       public width 20 {
          if $exists {
-            $oldthis.list configure -width $width
+            $List configure -width $width
          }
       }
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Common and protected variables.  Common are visible to all instances
+#  of this class, protected to just this instance (both are available
+#  anywhere in the scope of this class and in derived classes).
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Names of widgets
+      protected List
+      protected list ""
+      protected Scrolls
+      protected Frames
+      protected Labelwidget
+      protected labelwidget ""
+     
 
 #  End of class defintion.
    }

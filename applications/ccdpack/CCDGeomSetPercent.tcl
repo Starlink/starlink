@@ -22,11 +22,14 @@ proc CCDGeomSetPercent { Top args } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     24-OCT-1995 (PDRAPER):
 #     	 Original version.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -47,20 +50,24 @@ proc CCDGeomSetPercent { Top args } {
 #-----------------------------------------------------------------------------
 #  Widget creation.
 #-----------------------------------------------------------------------------
-   Ccd_toplevel $Top -title {Select display percentiles}
-   set Label [label $Top.label -text {Select display percentiles}]
-   set Sep [frame $Top.sep -height 3]
-   set Low  [scale $Top.low -from 0 -to 100 -label {Lower} -showvalue 1 \
-		-variable PERCENTILES(low) -orient hori -resolution 0.25]
-   set High [scale $Top.high -from 0 -to 100 -label {Upper} -showvalue 1 \
-		-variable PERCENTILES(high) -orient hori -resolution 0.25]
-   set Choice [Ccd_choice $Top.choice]
+   CCDCcdWidget Topwin topwin \
+      Ccd_toplevel $Top -title "Select display percentiles"
+   CCDTkWidget Label label \
+      label $topwin.label -text "Select display percentiles"
+   CCDTkWidget Sep sep frame $topwin.sep -height 3
+   CCDTkWidget Low low \
+      scale $topwin.low -from 0 -to 100 -label Lower -showvalue 1 \
+             -variable PERCENTILES(low) -orient hori -resolution 0.25
+   CCDTkWidget High high \
+      scale $topwin.high -from 0 -to 100 -label Upper -showvalue 1 \
+             -variable PERCENTILES(high) -orient hori -resolution 0.25
+   CCDCcdWidget Choice choice Ccd_choice $Topwin.choice
 	      
 #-----------------------------------------------------------------------------
 #  Extra configuration.
 #-----------------------------------------------------------------------------
    $Choice addcommand  OK \
-      "$Top kill $Top
+      "$Topwin kill $Topwin
        global PERCENTILES
        if { $PERCENTILES(low) != \$PERCENTILES(low) || \
             $PERCENTILES(high) != \$PERCENTILES(high) } { 
@@ -68,7 +75,7 @@ proc CCDGeomSetPercent { Top args } {
        }
       "
    $Choice addcommand  Cancel \
-      "$Top kill $Top
+      "$Topwin kill $Topwin
        global PERCENTILES
        set PERCENTILES(low)  $PERCENTILES(low)
        set PERCENTILES(high) $PERCENTILES(high)
@@ -77,11 +84,11 @@ proc CCDGeomSetPercent { Top args } {
 #------------------------------------------------------------------------------
 #  Widget packing.
 #------------------------------------------------------------------------------
-   pack $Choice -side bottom -fill x
-   pack $Label -side top -fill x
-   pack $Sep -side top -fill x
-   pack $High -side top -fill x
-   pack $Low -side top -fill x
+   pack $choice -side bottom -fill x
+   pack $label -side top -fill x
+   pack $sep -side top -fill x
+   pack $high -side top -fill x
+   pack $low -side top -fill x
 
 #  End of procedure.
 }

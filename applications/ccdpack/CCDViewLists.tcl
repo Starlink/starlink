@@ -1,4 +1,4 @@
-   proc CCDViewLists { Top description args } {
+   proc CCDViewLists { Topwin description args } {
 #+
 #  Name:
 #     CCDViewLists
@@ -26,6 +26,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -34,8 +35,10 @@
 #     11-MAY-1995 (PDRAPER):
 #        Updated to Tk4.0 (array size now returns 0, rather than an
 #        error).
-#     24-AUG-1995 (PDRAPER:
+#     24-AUG-1995 (PDRAPER):
 #        Converted to new style.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -52,13 +55,13 @@
 #  Widget creation
 #-----------------------------------------------------------------------------
 #  Top-level widget to contain the list.
-         Ccd_toplevel $Top -title "$description"
+         CCDCcdWidget Top top Ccd_toplevel $Topwin -title "$description"
 
 #  Scrollable listbox for the contents.
-         set Box [Ccd_scrollbox $Top.scrollbox]
+         CCDCcdWidget Box box Ccd_scrollbox $Top.scrollbox
 
 #  Choice bar for window control
-         set Choice [Ccd_choice $Top.choice -standard 0]
+         CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.
@@ -70,8 +73,8 @@
 #-----------------------------------------------------------------------------
 #  Packing
 #-----------------------------------------------------------------------------
-         pack $Choice -side bottom -fill x
-         pack $Box -fill both -expand true
+         pack $choice -side bottom -fill x
+         pack $box -fill both -expand true
 
 #-----------------------------------------------------------------------------
 #  Fill the listbox with the names 

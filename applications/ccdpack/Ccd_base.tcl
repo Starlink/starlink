@@ -19,20 +19,23 @@
 
 #  Invocations:
 #
-#        Ccd_base window
+#        Ccd_base name
 #
 #     This form of the command creates a frame widget. This form should
 #     not normally be used directly. The Ccd_base::constructor command
 #     should be used to create a base frame widget for compounds.
 #
-#        window configure -configuration_options value
+#        name configure -configuration_options value
 #
 #     Applies any of the configuration options (after the widget
 #     instance has been created).
 #
-#        window method arguments
+#        name method arguments
 #
-#     Performs the given method on this widget.
+#     Performs the given method on this object.  Note that 'name' is
+#     the name/command for this Ccd_base object, and not the pathname
+#     of the widget itself.  The pathname may be obtained by using the
+#     'pathname' method.
 
 #  Configuration options:
 #
@@ -91,14 +94,14 @@
 #
 #           widgetnames()
 #
-#        Widgetnamess is an array is indexed by names of the form
-#        "$oldthis:widget" where widget is a shortened name within the
+#        Widgetnames is an array is indexed by names of the form
+#        "$Oldthis:widget" where widget is a shortened name within the
 #        context of the class. The value of this element is the
 #        fullname of the widget. So for instance if an entry widget
-#        $oldthis.something.entry was  created in a class the entries
+#        $Oldthis.something.entry was  created in a class the entries
 #        would be.
 #
-#           set widgetnames($oldthis:entry) $oldthis.something.entry
+#           set widgetnames($Oldthis:entry) $Oldthis.something.entry
 #
 #        The class library builder can then invoke a configuration of a
 #        primitive widget using commands like.
@@ -144,6 +147,9 @@
 #        Registers a metawidget, if it is not created via the
 #        constructor method.
 #
+#     pathname
+#        Returns the pathname of the widget controlled by this object.
+#
 #     sethelp widget docname label
 #        Sets up bindings to provide context sensitive help for the named
 #        component widget. The name of the document and label are
@@ -164,6 +170,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -185,6 +192,10 @@
 #     30-JUN-1995 (PDRAPER):
 #        Reorganised the sub-widget registration and made destruction
 #        via the kill method a instance responsibility (for speed).
+#     10-MAY-2000 (MBT):
+#        Modified for Tcl/Tk8.  The object command can no longer be the
+#        same as the widget pathname, so change the latter and make it
+#        available via a new method.
 #     {enter_further_changes_here}
 
 #-
@@ -199,15 +210,21 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       constructor { config } {
 
+#  Construct a pathname for the frame/toplevel widget.  This cannot be
+#  identical with the name of this object, because widget names install
+#  themselves in the global namespace.
+#  This variable is called 'oldthis' for historical reasons.
+         set Oldthis [CCDNameTail $this]
+         regsub {^\.} $Oldthis .- oldthis
+
 #  Create a frame widget for containing the derived widget. This must
 #  have the same class as the object.
-         set oldthis [info namespace tail $this]
          if { ! [ winfo exists $oldthis ] } {
-            set class [info namespace tail [info class]]
+            set class [CCDNameTail [info class]]
             if { $class == "Ccd_toplevel" } {
-               toplevel  $oldthis          -class $class
+               toplevel  $oldthis  -class $class
             } else {
-               frame  $oldthis          -class $class
+               frame  $oldthis     -class $class
             }
          }
          set exists 1
@@ -267,8 +284,9 @@
       method wconfig { option basewidget value } {
 
 #  Check for known sub-widgets.
-         if { [info exists widgetnames($oldthis:$basewidget)] } {
-            set widget $widgetnames($oldthis:$basewidget)
+         if { [info exists widgetnames($Oldthis:$basewidget)] } {
+            set Widget $widgetnames($Oldthis:$basewidget)
+            set widget [CCDPathOf $Widget]
             if { [ winfo exists $widget ] } {
                $widget configure $option $value
             }
@@ -284,7 +302,7 @@
          if { $names != {} } {
 
 #  Use class based option.
-            set class [info namespace tail [info class]]
+            set class [CCDNameTail [info class]]
             foreach oneof $names {
                set value [option get $oldthis $oneof $class]
                if { $value != {} } {
@@ -311,8 +329,9 @@
          if $exists {
 
 #  Check for known sub-widgets.
-            if { [info exists widgetnames($oldthis:$basewidget)] } {
-               set widget $widgetnames($oldthis:$basewidget)
+            if { [info exists widgetnames($Oldthis:$basewidget)] } {
+               set Widget $widgetnames($Oldthis:$basewidget)
+               set widget [CCDPathOf $Widget]
                if { [ winfo exists $widget ] } {
                   ::bind $widget "$event" "$proc"
                }
@@ -364,8 +383,9 @@
             }
 
 #  Check for known sub-widgets.
-            if { [info exists widgetnames($oldthis:$basewidget)] } {
-               set widget $widgetfocus($oldthis:$basewidget)
+            if { [info exists widgetnames($Oldthis:$basewidget)] } {
+               set Widget $widgetfocus($Oldthis:$basewidget)
+               set widget [CCDPathOf $Widget]
                if { [ winfo exists $widget ] } {
                   if { $command != {} } {
                      ::focus $command $widget
@@ -385,22 +405,29 @@
 #  may be availble in this namespace (if they are metawidgets created by
 #  other metawidgets!) so use catch and leave destructors
 #  the real job of deleting these.
-      method kill topwin {
+      method kill Topwin {
+         set topwin [CCDPathOf $Topwin]
          for { set i $nobjects } { $i > 0 } { incr i -1 } {
-            set widget $metawidgets($i)
-	    set window [info namespace tail $widget]
+            set Widget $metawidgets($i)
+            set widget [CCDPathOf $Widget]
+	    set window [CCDPathOf [CCDNameTail $widget]]
             if { [ winfo exists $window ] } {
                if { [ winfo toplevel $window ] == "$topwin"} {
-                  catch {::delete object $widget}
+                  catch {::delete object $Widget}
                }
             }
          }
       }
 
 #  Define method to add new object to metawidget register.
-      method _register object {
+      method _register Object {
          incr nobjects
-         set metawidgets($nobjects) $object
+         set metawidgets($nobjects) $Object
+      }
+
+#  Method to return pathname of the frame widget.
+      method pathname {} {
+         return $oldthis
       }
 
 #  Define method for setting the document elements associated with a
@@ -410,37 +437,38 @@
 #  the Class or widget specific levels. Always record helpinfo even if
 #  widget doesn't exist at this stage (it might later or may be a name
 #  for storing help for use in some other methods).
-      method sethelp { widget docname label } {
-         if { [winfo exists $widget] } {
-            ::bind $widget <Any-F1>   "CCDContextHelp %X %Y;break"
-            ::bind $widget <Any-F2>   "CCDContextHelp %X %Y;break"
-            ::bind $widget <Any-Help> "CCDContextHelp %X %Y;break"
+      method sethelp { Widg docname label } {
+         set widg [CCDPathOf $Widg]
+         if { [winfo exists $widg] } {
+            ::bind $widg <Any-F1>   "CCDContextHelp %X %Y;break"
+            ::bind $widg <Any-F2>   "CCDContextHelp %X %Y;break"
+            ::bind $widg <Any-Help> "CCDContextHelp %X %Y;break"
             ::bind all <Any-F1>   "CCDContextHelp %X %Y"
             ::bind all <Any-F2>   "CCDContextHelp %X %Y"
             ::bind all <Any-Help> "CCDContextHelp %X %Y"
          }
-         set helpinfo($widget) "$docname $label"
+         set helpinfo($Widg) "$docname $label"
       }
 
 #  Method to locate and return any help information about a named
 #  component widget.
-      method showhelp { widget } {
-         if { [info exists helpinfo($widget)] } {
-            return "$helpinfo($widget)"
+      method showhelp { Widg } {
+         if { [info exists helpinfo($Widg)] } {
+            return "$helpinfo($Widg)"
          } else {
 
 #  No help for this widget. Is it covered by help about the
 #  meta-widget that it is part of? Or failing this is there help
 #  at the top-level?
-            if { [info exists helpinfo($oldthis)] } {
-               return "$helpinfo($oldthis)"
+            if { [info exists helpinfo($Oldthis)] } {
+               return "$helpinfo($Oldthis)"
             } else {
 
 #  Look for top-level help (default for this form).
                set top [winfo toplevel $oldthis]
                if { $top != "" } {
-                  if { [info exists helpinfo($top)] } {
-                     return "$helpinfo($top)"
+                  if { [info exists helpinfo($Top)] } {
+                     return "$helpinfo($Top)"
                   }
                }
 
@@ -508,6 +536,7 @@
       common helpinfo
 
 #  Old name of widget (pre itcl2.0).
+      protected Oldthis
       protected oldthis
 
 #  End of class definition.

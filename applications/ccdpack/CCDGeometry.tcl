@@ -35,6 +35,7 @@ proc CCDGeometry { Top {surekill 1} } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -42,6 +43,8 @@ proc CCDGeometry { Top {surekill 1} } {
 #     	 Original version.
 #     15-APR-1997 (PDRAPER):
 #        Added CCDimagefilters to support foreign data formats.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -81,41 +84,44 @@ proc CCDGeometry { Top {surekill 1} } {
 #-----------------------------------------------------------------------------
 
 #  Top level.
-   Ccd_toplevel $Top -title {Determine CCD Geometry}
-   wm withdraw $Top
+   CCDCcdWidget Topwin topwin \
+      Ccd_toplevel $Top -title "Determine CCD Geometry"
+   wm withdraw $topwin
 
 #  Canvas for putting gwm item into add a graphic redrawn context.
-   set Canvas [Ccd_gwm $Top.canvas -tags Gwm -redraw 0 -gwmname $GWMDEVICE \
-                  -drawcommand "CCDGeomDrawCommand $Top $Top.canvas"]
-   if { ! [winfo exists $Top.canvas] } { 
+   CCDCcdWidget Canvas canvas \
+      Ccd_gwm $Topwin.canvas -tags Gwm -redraw 0 -gwmname $GWMDEVICE \
+                  -drawcommand "CCDGeomDrawCommand $Topwin $Topwin.canvas"
+   if { ! [winfo exists $canvas] } { 
 
 #  Creation failed (probably lack of colours).
       CCDIssueInfo "Cannot inspect CCD geometries. Release some display       
 colours (by closing any colour hogging applications) then try again."
-      $Top kill $Top
+      $Topwin kill $Topwin
       return
    }
 
 #  Help menubar.
-   set Menu [Ccd_helpmenubar $Top.menubar]
+   CCDCcdWidget Menu menu Ccd_helpmenubar $Topwin.menubar
 
 #  Display name of NDF that is being shown.
-   set Label [Ccd_labent $Top.label \
-                 -textvariable NDF -text "Current image:"]
+   CCDCcdWidget Label label \
+      Ccd_labent $Topwin.label -textvariable NDF -text "Current image:"
 
 #  Action to define bias strip1, strip2 or extent.
-   set Action [Ccd_radioarray $Top.action \
-                  -label "Define:" -stack horizontal -variable ITEM]
+   CCDCcdWidget Action action \
+      Ccd_radioarray $Topwin.action \
+                  -label "Define:" -stack horizontal -variable ITEM
 
 #  Options of various kinds.
-   set Options [Ccd_choice $Top.options -standard false]
+   CCDCcdWidget Options options Ccd_choice $Topwin.options -standard false
 
 #  Create rules
-   set Rule1 [frame $Top.rule1 -height 3]
-   set Rule2 [frame $Top.rule2 -height 3]
+   CCDTkWidget Rule1 rule1 frame $topwin.rule1 -height 3
+   CCDTkWidget Rule2 rule2 frame $topwin.rule2 -height 3
 
 #  And get out choices.
-   set Choice [Ccd_choice $Top.choice]
+   CCDCcdWidget Choice choice Ccd_choice $Topwin.choice
 
 #-----------------------------------------------------------------------------
 #  Configure widgets.
@@ -135,13 +141,13 @@ colours (by closing any colour hogging applications) then try again."
    $Menu addcommand Options {Set outline colour...} \
       "global ITEM
        if { \[info exists ITEM\] } {
-          CCDGetColour $Top.colour outline
+          CCDGetColour $Topwin.colour outline
        }
       "
    $Menu addcommand Options {Set stipple colour...} \
       "global ITEM
        if { \[info exists ITEM\] } {
-          CCDGetColour $Top.colour stipple
+          CCDGetColour $Topwin.colour stipple
        }
       "
 
@@ -165,15 +171,15 @@ colours (by closing any colour hogging applications) then try again."
       } else {
          set CCDimportfilter {*.sdf}
       }
-      CCDGetFileName $Top.restore {Select an image}
+      CCDGetFileName $Topwin.restore {Select an image}
       if { \$CCDimportexists } {
          set NDF \"\$CCDimportfile\"
-         CCDGeomDrawCommand $Top $Canvas 
+         CCDGeomDrawCommand $Topwin $Canvas 
       } else {
          if { \[info exists DISPLAYED\] } {
             set NDF \$DISPLAYED
          } else {
-            if {\[winfo exists $Choice\] } {
+            if {\[winfo exists $choice\] } {
                $Choice invoke Cancel
             }
          }
@@ -182,7 +188,7 @@ colours (by closing any colour hogging applications) then try again."
 
 #  Change the display percentiles.
    $Menu addcommand Options {Change display range...} \
-      "CCDGeomSetPercent $Top.percent CCDGeomDrawCommand $Top $Canvas"
+      "CCDGeomSetPercent $Topwin.percent CCDGeomDrawCommand $Topwin $Canvas"
 
 
 #  <Return> in the NDF name entry changes the value of NDF and redisplays.
@@ -190,7 +196,7 @@ colours (by closing any colour hogging applications) then try again."
       "global NDF
        global DISPLAYED
        if { \[file readable \$NDF\] } {
-          CCDGeomDrawCommand $Top $Canvas
+          CCDGeomDrawCommand $Topwin $Canvas
        } else {
           set NDF \$DISPLAYED
        }
@@ -228,9 +234,9 @@ colours (by closing any colour hogging applications) then try again."
 
 #  Colour map. Offer grey and colour.
    $Options addbutton "Grey" "CCDRunTask lutable \
-          \"device=$XDEVICE mapping=linear coltab=grey\" 3 $Top"
+          \"device=$XDEVICE mapping=linear coltab=grey\" 3 $Topwin"
    $Options addbutton "Colour" "CCDRunTask lutable \
-          \"device=$XDEVICE mapping=linear coltab=colour\" 3 $Top"
+          \"device=$XDEVICE mapping=linear coltab=colour\" 3 $Topwin"
 
 #  Bind button press to a new region.
    $Canvas bind canvas <ButtonPress-1> \
@@ -283,21 +289,21 @@ colours (by closing any colour hogging applications) then try again."
       "
 
 #  Get out.
-   $Choice addcommand Cancel "$Top kill $Top"
+   $Choice addcommand Cancel "$Topwin kill $Topwin"
 
 #  Accept the chosen regions. Want to be a bit clever about this and check
 #  that the bias strips are parallel and that regions are within the bounds
 #  of the image.
    $Choice addcommand OK \
       "if { \[CCDGeomCheckandExit\] } {
-          $Top kill $Top
+          $Topwin kill $Topwin
        }
       "
 
 #----------------------------------------------------------------------------
 #  Define help.
 #----------------------------------------------------------------------------
-   $Top sethelp ccdpack CCDGeometryWindow
+   $Topwin sethelp ccdpack CCDGeometryWindow
    $Menu sethelpitem {On Window} ccdpack CCDGeometryWindow
    $Menu sethelp all ccdpack CCDGeometryMenu
    $Canvas sethelp ccdpack CCDGeometryGwm
@@ -306,14 +312,14 @@ colours (by closing any colour hogging applications) then try again."
 #-----------------------------------------------------------------------------
 #  Pack widgets.
 #-----------------------------------------------------------------------------
-   pack $Menu -fill x
-   pack $Choice -side bottom -fill x
-   pack $Label -fill x
-   pack $Action -fill x
-   pack $Rule2 -fill x
-   pack $Options -fill x -side bottom
-   pack $Canvas -fill both -expand true
-   pack $Rule2 -fill x
+   pack $menu -fill x
+   pack $choice -side bottom -fill x
+   pack $label -fill x
+   pack $action -fill x
+   pack $rule2 -fill x
+   pack $options -fill x -side bottom
+   pack $canvas -fill both -expand true
+   pack $rule2 -fill x
 
 #-----------------------------------------------------------------------------
 #  Set interface to existing config.
@@ -359,7 +365,7 @@ colours (by closing any colour hogging applications) then try again."
    $Options invoke Grey
 
 #  And reveal window
-   wm deiconify $Top
+   wm deiconify $topwin
 
 #  If no NDF has been chosen then get one now.
    if { ! [info exists NDF] } {
@@ -370,12 +376,12 @@ colours (by closing any colour hogging applications) then try again."
    } else {
 
 #  Issue the draw command for this NDF.
-      CCDGeomDrawCommand $Top $Canvas
+      CCDGeomDrawCommand $Topwin $Canvas
    }
 
 #  And wait for interaction to end.
-   if { [winfo exists $Top] } {
-      CCDWindowWait $Top
+   if { [winfo exists $topwin] } {
+      CCDWindowWait $Topwin
    }
 
 #  End of procedure.

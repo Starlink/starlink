@@ -122,11 +122,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
-#     {15-JUN-1995} (PDRAPER):
+#     15-JUN-1995 (PDRAPER):
 #     	 Original version.
+#     15-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -147,7 +150,7 @@
          Ccd_base::constructor
 
 #  Create the radioarray bar for the containing the buttons.
-         Ccd_radioarray $oldthis.bar
+         CCDCcdWidget Bar bar Ccd_radioarray $oldthis.bar
 
 #  Set default configurations.
          configure -placebar          $placebar
@@ -157,7 +160,7 @@
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:bar) $oldthis.bar
+         set widgetnames($Oldthis:bar) $Bar
       }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -166,55 +169,58 @@
 #  Add a button to the choice bar.
       method addbutton { text args } {
          if { $args == "" } {
-            $oldthis.bar addbutton $text [list $text]
+            $Bar addbutton $text [list $text]
          } else {
-            $oldthis.bar addbutton $text [list $text] "$oldthis seewindow $args"
+            $Bar addbutton $text [list $text] "$Oldthis seewindow $args"
             set lastwin $args
          }
       }
 
 #  Change/add window to be revealed.
-      method addwindow { text window } {
-         $oldthis.bar addcommand $text "$oldthis seewindow $window"
+      method addwindow { text Window } {
+         $Bar addcommand $text "$Oldthis seewindow $Window"
       }
 
 #  Change the revealed window (use the last window if none given).
-      method seewindow { window } {
-         if { $window == "" } {
-            if { $lastwin != "" } {
-               set window $lastwin
+      method seewindow { Window } {
+         set window [CCDPathOf $Window]
+         if { $Window == "" } {
+            if { $Lastwin != "" } {
+               set Window $Lastwin
             }
          }
-         if { $packed != $window } {
-            if { $packed != "" } {
+         if { $Packed != $Window } {
+            if { $Packed != "" } {
+               set packed [CCDPathOf $Packed]
                pack forget $packed
             }
+            set inwin [CCDPathOf $in]
             switch -exact $placebar {
                top {
-                  pack $window -in $in -side bottom -fill both -expand true
-                  pack $oldthis.bar -side top -fill x
+                  pack $window -in $inwin -side bottom -fill both -expand true
+                  pack $bar -side top -fill x
                }
                bottom {
-                  pack $window -in $in -side top -fill both -expand true
-                  pack $oldthis.bar -side bottom -fill x
+                  pack $window -in $inwin -side top -fill both -expand true
+                  pack $bar -side bottom -fill x
                }
                left {
-                  pack $window -in $in -side right -fill both -expand true
-                  pack $oldthis.bar -side left -fill y
+                  pack $window -in $inwin -side right -fill both -expand true
+                  pack $bar -side left -fill y
                }
                right {
-                  pack $window -in $in -side left -fill both -expand true
-                  pack $oldthis.bar -side right -fill y
+                  pack $window -in $inwin -side left -fill both -expand true
+                  pack $bar -side right -fill y
                }
             }
-            set packed $window
+            set Packed $Window
          }
       }
 
 #  Return the name of the currently select window.
       method current {} {
-         if { $packed != "" } {
-            return $packed
+         if { $Packed != "" } {
+            return $Packed
          } else {
             return ""
          }
@@ -223,13 +229,13 @@
 #  Invoke the button associated with a window.
       method invoke name {
          if { $name != "" } {
-            $oldthis.bar invoke $name
+            $Bar invoke $name
          }
       }
 
 #  Set a button text string to a new value.
       method resettext { name text } {
-         $oldthis.bar resettext $name $text
+         $Bar resettext $name $text
       }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -238,17 +244,17 @@
 #  Where to place the array of radio buttons.
       public placebar {top} {
          if $exists {
-            if { $packed != "" } {
-               set window $packed
-               set packed ""
-               seewindow $window
+            if { $Packed != "" } {
+               set Window $Packed
+               set Packed ""
+               seewindow $Window
             } else {
                switch -regexp $placebar {
                   (top|bottom) {
-                     pack $oldthis.bar -side $placebar -fill x
+                     pack $bar -side $placebar -fill x
                   }
                   (left|right) {
-                     pack $oldthis.bar -side $placebar -fill y
+                     pack $bar -side $placebar -fill y
                   }
                }
             }
@@ -258,28 +264,28 @@
 #  Label for the radiobuttons.
       public label {} {
          if $exists {
-            $oldthis.bar configure -label $label
+            $Bar configure -label $label
          }
       }
 
 #  Stack method for the radiobuttons.
       public stack {array} {
          if $exists {
-            $oldthis.bar configure -stack $stack
+            $Bar configure -stack $stack
          }
       }
 
 #  Number of columns used when stacking in an array.
       public columns 5 {
          if $exists {
-            $oldthis.bar configure -columns $columns
+            $Bar configure -columns $columns
          }
       }
 
 #  Window to parent the windows that are controlled.
       public in {} {
          if { $in == "" } {
-            set in $oldthis
+            set in $Oldthis
          }
       }
 
@@ -288,11 +294,15 @@
 #  of this class, protected to just this instance (both are available
 #  anywhere in the scope of this class and in derived classes).
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Names of widgets.
+      protected Bar
+      protected bar ""
+
 #  Name of currently packed window.
-      protected packed ""
+      protected Packed ""
 
 #  Name of last window
-      protected lastwin ""
+      protected Lastwin ""
 
 #  End of class defintion.
    }

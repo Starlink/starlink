@@ -1,4 +1,4 @@
-   proc CCDNDFDoImport { Top args } {
+   proc CCDNDFDoImport { Topwin args } {
 #+
 #  Name:
 #     CCDNDFDoImport
@@ -18,7 +18,7 @@
 #     required etc.
 
 #  Arguments:
-#     Top = window (read)
+#     Topwin = window (read)
 #        Name of the top-level window which is created.
 #     args = list (read)
 #        If present this should be a command to run if the NDF import
@@ -80,6 +80,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -91,6 +92,8 @@
 #        Complete rewrite for new look (all NDFs accessed from one window).
 #     12-NOV-1995 (PDRAPER):
 #        Added masters import.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -130,25 +133,31 @@
 #------------------------------------------------------------------------------
 #  Widget creation.
 #------------------------------------------------------------------------------
-      set Top        [Ccd_toplevel $Top -title "Organize NDFs into types"]
-      wm withdraw    $Top
-      set Menu       [Ccd_helpmenubar $Top.m]
-      set Frame1     [frame $Top.f1]
-      set Frame11    [frame $Frame1.f1]
-      set Directory  [Ccd_labent $Frame11.l1 -text {Directory:}]
+      CCDCcdWidget Top top \
+         Ccd_toplevel $Topwin -title "Organize NDFs into types"
+      wm withdraw $top
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.m
+      CCDTkWidget Frame1 frame1 frame $top.f1
+      CCDTkWidget Frame11 frame11 frame $frame1.f1
+      CCDCcdWidget Directory directory Ccd_labent $Frame11.l1 -text Directory:
       if { [llength $CCDimagefilters] > 1 } { 
-         set FileFilter [Ccd_option $Frame11.l2 -text {File Filter:}]
+         CCDCcdWidget FileFilter fileFilter \
+            Ccd_option $Frame11.l2 -text "File Filter:"
       } else {
-         set FileFilter [Ccd_labent $Frame11.l2 -text {File Filter:}]
+         CCDCcdWidget FileFilter fileFilter \
+            Ccd_labent $Frame11.l2 -text "File Filter:"
       }
-      set Directbox  [Ccd_scrollbox $Frame1.s1 -label {Directories:}]
-      set Filesbox   [Ccd_scrollbox $Frame1.s2 \
-                         -label {Files in directory:} -singleselect 0]
-      set Control    [Ccd_choice $Frame1.c -standard 0 -stack vertical]
-      set Choice     [Ccd_choice $Top.c1 -standard 0]
-      set Frame2     [frame $Top.f2]
-      set Switch     [Ccd_reveal $Top.r -label {Data type:} -stack array \
-                         -columns 5 -in $Frame2]
+      CCDCcdWidget Directbox directbox \
+         Ccd_scrollbox $Frame1.s1 -label {Directories:}
+      CCDCcdWidget Filesbox filesbox \
+         Ccd_scrollbox $Frame1.s2 -label "Files in directory:" -singleselect 0
+      CCDCcdWidget Control control \
+         Ccd_choice $Frame1.c -standard 0 -stack vertical
+      CCDCcdWidget Choice choice Ccd_choice $Top.c1 -standard 0
+      CCDTkWidget Frame2 frame2 frame $top.f2
+      CCDCcdWidget Switch switch \
+         Ccd_reveal $Top.r -label "Data type:" -stack array \
+                         -columns 5 -in $Frame2
 
 #------------------------------------------------------------------------------
 #  Create the necessary table/scrollbox widgets and configure according to
@@ -162,43 +171,46 @@
 
 #  Only need scrollboxes.
             foreach f $Fnames {
-               set Target($f) [Ccd_scrollbox $Frame2.t$f \
-                                  -singleselect 0 -label {Files selected:}]
+               CCDCcdWidget Targ targ \
+                  Ccd_scrollbox $Frame2.t$f -singleselect 0 \
+                                             -label "Files selected:"
                if { $f != "NONE" } {
                   set label "TARGET $f"
                } else {
                   set label "TARGET"
                }
-               $Switch addbutton $label $Target($f)
-               bind $Target($f) <Unmap> \
-                  "CCDUpdateLabelCount $Switch \"$label\" $Target($f)"
+               $Switch addbutton $label $Targ
+               bind $targ <Unmap> \
+                  "CCDUpdateLabelCount $Switch \"$label\" $Targ"
+               set Target($f) $Targ
             }
          } else {
 
 #  Need tables with editable exposures.
             foreach f $Fnames {
-               set Target($f) [Ccd_table $Frame2.t$f \
-                                  -singleselect 0 -padvalue 1]
+               CCDCcdWidget Targ targ \
+                  Ccd_table $Frame2.t$f -singleselect 0 -padvalue 1
                if { $f != "NONE" } {
                   set label "TARGET $f"
                } else {
                   set label "TARGET"
                }
-               $Switch addbutton $label $Target($f)
-               bind $Target($f) <Unmap> \
-                  "CCDUpdateLabelCount $Switch \"$label\" $Target($f)"
-               $Target($f) setlabel 0 {Files Selected:}
+               $Switch addbutton $label $Targ
+               bind $targ <Unmap> \
+                  "CCDUpdateLabelCount $Switch \"$label\" $Targ"
+               $Targ setlabel 0 {Files Selected:}
                set cols 1
                if { ! $CCDsame(darks) } {
                   incr cols
-                  $Target($f) configure -columns $cols
-                  $Target($f) setlabel [expr $cols -1] {Dark Time:}
+                  $Targ configure -columns $cols
+                  $Targ setlabel [expr $cols -1] {Dark Time:}
                }
                if { ! $CCDsame(flashes) } {
                   incr cols
-                  $Target($f) configure -columns $cols
-                  $Target($f) setlabel [expr $cols -1] {Flash Time:}
+                  $Targ configure -columns $cols
+                  $Targ setlabel [expr $cols -1] {Flash Time:}
                }
+               set Target($f) $Targ
             }
          }
       }
@@ -209,54 +221,57 @@
 
 #  Only need scrollboxes.
             foreach f $Fnames {
-               set Flat($f) [Ccd_scrollbox $Frame2.f$f \
-                                -singleselect 0 -label {Files Selected:}]
+               CCDCcdWidget Fl fl \
+                  Ccd_scrollbox $Frame2.f$f -singleselect 0 \
+                                             -label "Files Selected:"
                if { $f != "NONE" } {
                   set label "FLAT $f"
 
                } else {
                   set label "FLAT"
                }
-               $Switch addbutton $label $Flat($f)
-               bind $Flat($f) <Unmap> \
-                  "CCDUpdateLabelCount $Switch \"$label\" $Flat($f)"
+               $Switch addbutton $label $Fl
+               bind $fl <Unmap> \
+                  "CCDUpdateLabelCount $Switch \"$label\" $Fl"
+               set Flat($f) $Fl
             }
          } else {
 
 #  Need tables with editable exposures.
             foreach f $Fnames {
-               set Flat($f) [Ccd_table $Frame2.f$f \
-                                -singleselect 0 -padvalue 0]
+               CCDCcdWidget Fl fl \
+                  Ccd_table $Frame2.f$f -singleselect 0 -padvalue 0
                if { $f != "NONE" } {
                   set label "FLAT $f"
                } else {
                   set label "FLAT"
                }
-               $Switch addbutton $label $Flat($f)
-               bind $Flat($f) <Unmap> \
-                  "CCDUpdateLabelCount $Switch \"$label\" $Flat($f)"
-               $Flat($f) setlabel 0 {Files Selected:}
+               $Switch addbutton $label $Fl
+               bind $fl <Unmap> \
+                  "CCDUpdateLabelCount $Switch \"$label\" $Fl"
+               $Fl setlabel 0 {Files Selected:}
                set cols 1
                if { ! $CCDsame(darks) } {
                   incr cols
-                  $Flat($f) configure -columns $cols
-                  $Flat($f) setlabel [expr $cols -1] {Dark Time:}
+                  $Fl configure -columns $cols
+                  $Fl setlabel [expr $cols -1] {Dark Time:}
                }
                if { ! $CCDsame(flashes) } {
                   incr cols
-                  $Flat($f) configure -columns $cols
-                  $Flat($f) setlabel [expr $cols -1] {Flash Time:}
+                  $Fl configure -columns $cols
+                  $Fl setlabel [expr $cols -1] {Flash Time:}
                }
+               set Flat($f) $Fl
             }
          }
       }
 
 #  Biases.
       if { $CCDhaveframe(biases) } {
-         set Bias [Ccd_scrollbox $Frame2.b -singleselect 0 \
-                      -label {Files Selected:}]
+         CCDCcdWidget Bias bias \
+            Ccd_scrollbox $Frame2.b -singleselect 0 -label "Files Selected:"
          $Switch addbutton "BIAS" $Bias
-         bind $Bias <Unmap> "CCDUpdateLabelCount $Switch {BIAS} $Bias"
+         bind $bias <Unmap> "CCDUpdateLabelCount $Switch {BIAS} $Bias"
       }
 
 #  Darks.
@@ -264,10 +279,12 @@
 
 #  Need a table if exposures are not the same.
          if { $CCDsame(darks) } {
-            set Dark [Ccd_scrollbox $Frame2.d -singleselect 0 \
-                         -label {Files Selected:}]
+            CCDCcdWidget Dark dark \
+               Ccd_scrollbox $Frame2.d -singleselect 0 \
+                         -label "Files Selected:"
          } else {
-            set Dark [Ccd_table $Frame2.d -singleselect 0 -padvalue 1]
+            CCDCcdWidget Dark dark \
+               Ccd_table $Frame2.d -singleselect 0 -padvalue 1
             $Dark setlabel 0 {Files Selected:}
 
 #  Configure number of columns (do this now as this keeps the frames
@@ -276,7 +293,7 @@
             $Dark setlabel 1 {Dark Time:}
          }
          $Switch addbutton "DARK" $Dark
-         bind $Dark <Unmap> "CCDUpdateLabelCount $Switch {DARK} $Dark"
+         bind $dark <Unmap> "CCDUpdateLabelCount $Switch {DARK} $Dark"
       }
 
 #  Flashes.
@@ -284,24 +301,26 @@
 
 #  Need a table if exposures are not the same.
          if { $CCDsame(flashes) } {
-            set Flash [Ccd_scrollbox $Frame2.l -singleselect 0 \
-                          -label {Files Selected:}]
+            CCDCcdWidget Flash flash \
+               Ccd_scrollbox $Frame2.l -singleselect 0 \
+                          -label "Files Selected:"
          } else {
-            set Flash [Ccd_table $Frame2.l -singleselect 0 -padvalue 1]
+            CCDCcdWidget Flash flash \
+               Ccd_table $Frame2.l -singleselect 0 -padvalue 1
             $Flash setlabel 0 {Files Selected:}
             $Flash configure -columns 2
             $Flash setlabel 1 {Flash Time:}
          }
          $Switch addbutton "FLASH" $Flash
-         bind $Flash <Unmap> "CCDUpdateLabelCount $Switch {FLASH} $Flash"
+         bind $flash <Unmap> "CCDUpdateLabelCount $Switch {FLASH} $Flash"
       }
 
 #  Master biases.
       if { $CCDhaveframe(master_biases) } {
-         set Masterbias [Ccd_scrollbox $Frame2.mb -singleselect 1 \
-                      -label {File Selected:}]
+         CCDCcdWidget Masterbias masterbias \
+            Ccd_scrollbox $Frame2.mb -singleselect 1 -label "File Selected:"
          $Switch addbutton "MASTER BIAS" $Masterbias
-         bind $Masterbias <Unmap> \
+         bind $masterbias <Unmap> \
             "CCDUpdateLabelCount $Switch {MASTER BIAS} $Masterbias"
       }
 
@@ -310,34 +329,35 @@
 
 #  Only need scrollboxes.
          foreach f $Fnames {
-            set Masterflat($f) [Ccd_scrollbox $Frame2.mf$f \
-                             -singleselect 1 -label {File Selected:}]
+            CCDCcdWidget Mflat mflat \
+               Ccd_scrollbox $Frame2.mf$f \
+                             -singleselect 1 -label "File Selected:"
             if { $f != "NONE" } {
                set label "MASTER FLAT $f"
                
             } else {
                set label "MASTER FLAT"
             }
-            $Switch addbutton $label $Masterflat($f)
-            bind $Masterflat($f) <Unmap> \
-               "CCDUpdateLabelCount $Switch \"$label\" $Masterflat($f)"
+            $Switch addbutton $label $Mflat
+            bind $mflat <Unmap> "CCDUpdateLabelCount $Switch \"$label\" $Mflat"
+            set Masterflat($f) $Mflat
          }
       }
 #  Master dark.
       if { $CCDhaveframe(master_darks) } {
-         set Masterdark [Ccd_scrollbox $Frame2.md -singleselect 1 \
-                      -label {File Selected:}]
+         CCDCcdWidget Masterdark masterdark \
+            Ccd_scrollbox $Frame2.md -singleselect 1 -label "File Selected:"
          $Switch addbutton "MASTER DARK" $Masterdark
-         bind $Masterdark <Unmap> \
+         bind $masterdark <Unmap> \
             "CCDUpdateLabelCount $Switch {MASTER DARK} $Masterdark"
       }
 
 #  Master flash.
       if { $CCDhaveframe(master_flashes) } {
-         set Masterflash [Ccd_scrollbox $Frame2.mf -singleselect 1 \
-                      -label {File Selected:}]
+         CCDCcdWidget Masterflash masterflash \
+            Ccd_scrollbox $Frame2.mf -singleselect 1 -label "File Selected:"
          $Switch addbutton "MASTER FLASH" $Masterflash
-         bind $Masterflash <Unmap> \
+         bind $masterflash <Unmap> \
             "CCDUpdateLabelCount $Switch {MASTER FLASH} $Masterflash"
       }
 
@@ -416,11 +436,11 @@
          global CCDcurrentdirectory
          set index \[ %W nearest %y\]
          set filename \[ %W get \$index \]
-         set directory \$CCDcurrentdirectory
-         if { \$directory == \"/\" } {
+         set dir \$CCDcurrentdirectory
+         if { \$dir == \"/\" } {
             \[$Switch current\] insert end \"/\$filename\"
          } else {
-            \[$Switch current\] insert end \"\$directory/\$filename\"
+            \[$Switch current\] insert end \"\$dir/\$filename\"
          }
          $Filesbox select clear 0 end
          $Filesbox select anchor \$index
@@ -431,11 +451,11 @@
          global CCDcurrentdirectory
          set index \[ lindex \[ %W curselection \] 0\]
          set filename \[ %W get \$index \]
-         set directory \$CCDcurrentdirectory
-         if { \$directory == \"/\" } {
+         set dir \$CCDcurrentdirectory
+         if { \$dir == \"/\" } {
             \[$Switch current\] insert end \"/\$filename\"
          } else {
-            \[$Switch current\] insert end \"\$directory/\$filename\"
+            \[$Switch current\] insert end \"\$dir/\$filename\"
          }
          $Filesbox select clear 0 end
          $Filesbox select anchor \$index
@@ -449,25 +469,25 @@
       $Control addbutton Add \
          "global CCDcurrentdirectory
           if { \$CCDcurrentdirectory == \"/\" } {
-             set directory \"/\"
+             set dir \"/\"
           } else {
-             set directory \"\${CCDcurrentdirectory}/\"
+             set dir \"\${CCDcurrentdirectory}/\"
           }
           CCDCopyListbox $Filesbox \
                          \[$Switch current\] \
-                         select \$directory
+                         select \$dir
          "
 
       $Control addbutton "Add \n all" \
          "global CCDcurrentdirectory
           if { \$CCDcurrentdirectory == \"/\" } {
-             set directory \"/\"
+             set dir \"/\"
           } else {
-             set directory \"\${CCDcurrentdirectory}/\"
+             set dir \"\${CCDcurrentdirectory}/\"
           }
           CCDCopyListbox $Filesbox \
                          \[$Switch current\] \
-                         range 0 end \$directory
+                         range 0 end \$dir
          "
 
       $Control addbutton Remove \
@@ -529,17 +549,17 @@
 #------------------------------------------------------------------------------
 #  Pack widgets.
 #------------------------------------------------------------------------------
-      pack $Menu    -side top -fill x
-      pack $Choice  -side bottom -fill x
-      pack $Switch  -side top -fill x
-      pack $Frame1  -side left -fill both
-      pack $Frame11 -side top -fill x
-      pack $Directory -side top -fill x
-      pack $FileFilter -side top -fill x
-      pack $Directbox -side left -fill both
-      pack $Filesbox -side left -fill both
-      pack $Control -side left -fill both
-      pack $Frame2 -side right -fill both -expand true
+      pack $menu    -side top -fill x
+      pack $choice  -side bottom -fill x
+      pack $switch  -side top -fill x
+      pack $frame1  -side left -fill both
+      pack $frame11 -side top -fill x
+      pack $directory -side top -fill x
+      pack $fileFilter -side top -fill x
+      pack $directbox -side left -fill both
+      pack $filesbox -side left -fill both
+      pack $control -side left -fill both
+      pack $frame2 -side right -fill both -expand true
 
 #------------------------------------------------------------------------------
 #  Use widgets.
@@ -792,7 +812,7 @@
 
 
 #  Cause a wait for this window.
-      wm deiconify $Top
+      wm deiconify $top
       CCDWindowWait $Top
 
 #  End of procedure.

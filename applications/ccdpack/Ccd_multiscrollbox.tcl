@@ -147,6 +147,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -160,6 +161,8 @@
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
+#     12-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -190,7 +193,7 @@
 #  as of itcl2.0, are no longer available in the namespace for Ccd_base.tcl.
       destructor {
          for { set i $haveboxes; incr i } { $i <= $nboxes } { incr i } {
-            $oldthis.list$i delete
+            $Lists($i) delete
          }
       }
 
@@ -202,16 +205,16 @@
       method insert { listno index text } {
          if { $listno != "all" } {
             if { $listno <= $haveboxes } {
-               $oldthis.list$listno insert $index $text
+               $Lists($listno) insert $index $text
 
 	       if { $seealltext } {
 
 #  Get the length of the text and reset the preferred width of the
 #  listbox, if this is now larger.
-		  set curwidth [$oldthis.list$listno info public width -value]
+		  set curwidth [$Lists($listno) info public width -value]
 		  set newwidth [string length $text]
 		  if { $newwidth > $curwidth } {
-		     $oldthis.list$listno configure -width $newwidth
+		     $Lists($listno) configure -width $newwidth
 		  }
 	       }
             } else {
@@ -219,7 +222,7 @@
             }
          } else {
             for { set i 1 } { $i <= $haveboxes } { incr i } { \
-               $oldthis.list$i insert $index $text
+               $Lists($i) insert $index $text
             }
          }
       }
@@ -228,13 +231,13 @@
       method clear { listno args } {
          if { $listno != "all" } {
             if { $listno <= $haveboxes } {
-               eval $oldthis.list$listno clear $args
+               eval $Lists($listno) clear $args
             } else {
                error "No multiscrollbox with index \"$listno\" "
             }
          } else {
             for { set i 1 } { $i <= $haveboxes } { incr i } { \
-               eval $oldthis.list$i clear $args
+               eval $Lists($i) clear $args
             }
          }
       }
@@ -243,13 +246,13 @@
       method get { listno index } {
          if { $listno != "all" } {
             if { $listno <= $haveboxes } {
-               return [$oldthis.list$listno get $index]
+               return [$Lists($listno) get $index]
             } else {
                error "No multiscrollbox with index \"$listno\" "
             }
          } else {
             for { set i 1 } { $i <= $haveboxes } { incr i } { \
-               lappend getlist [$oldthis.list$i get $index]
+               lappend getlist [$Lists($i) get $index]
             }
             return $getlist
          }
@@ -258,7 +261,7 @@
 #  Return the range of lines with current selection.
       method curselection { listno } {
          if { $listno <= $haveboxes } {
-            return [$oldthis.list$listno curselection]
+            return [$Lists($listno) curselection]
          } else {
             error "No multiscrollbox with index \"$listno\" "
          }
@@ -268,14 +271,14 @@
       method size { listno }  {
          if { $listno != "all" } {
             if { $listno <= $haveboxes } {
-               return [$oldthis.list$listno size]
+               return [$Lists($listno) size]
             } else {
                error "No multiscrollbox with index \"$listno\" "
             }
          } else {
             set indices ""
             for { set i 1 } { $i <= $haveboxes } { incr i } { \
-               lappend indices [$oldthis.list$i size]
+               lappend indices [$Lists($i) size]
             }
             return [$indices]
          }
@@ -285,13 +288,13 @@
       method bind { listno args } {
          if { $listno != "all" } {
             if { $listno <= $haveboxes } {
-               eval $oldthis.list$listno bind list $args
+               eval $Lists($listno) bind list $args
             } else {
                error "No multiscrollbox with index \"$listno\" "
             }
          } else {
             for { set i 1 } { $i <= $haveboxes } { incr i } { \
-               eval $oldthis.list$i bind list $args
+               eval $Lists($i) bind list $args
             }
          }
       }
@@ -301,7 +304,7 @@
 
 #  For each scrollbox name ask for the listbox name.
          for { set i 1 } { $i <= $haveboxes } { incr i } {
-            lappend scrollboxes $oldthis.list$i
+            lappend scrollboxes $Lists($i)
          }
          if { [ info exists scrollboxes ] } {
             return "$scrollboxes"
@@ -315,7 +318,7 @@
 
 #  For each scrollbox name ask for the listbox name.
          for { set i 1 } { $i <= $haveboxes } { incr i } {
-            lappend listnames [$oldthis.list$i listname]
+            lappend listnames [$Lists($i) listname]
          }
          if { [ info exists listnames ] } {
             return "$listnames"
@@ -329,7 +332,7 @@
 
 #  For each scrollbox name ask for scrollbars name(s)
          for { set i 1 } { $i <= $haveboxes } { incr i } {
-            set newnames [$oldthis.list$i scrollbarnames $places]
+            set newnames [$Lists($i) scrollbarnames $places]
             if { $newnames != {} } {
                lappend barnames $newnames
             }
@@ -345,14 +348,14 @@
       method select { listno args } {
          if { $listno != "all" } {
             if { $listno <= $haveboxes } {
-               eval $oldthis.list$listno select $args
+               eval $Lists($listno) select $args
             } else {
                error "No multiscrollbox with index \"$listno\" "
             }
          } else {
             if { ! $exportselect } {
                for { set i 1 } { $i <= $haveboxes } { incr i } {
-                  eval $oldthis.list$i select $args
+                  eval $Lists($i) select $args
                 }
             } else {
                error "Cannot select \"all\" when the selection is to be exported"
@@ -364,11 +367,11 @@
       method wconfig { listno option widget value } {
          if { $listno == "all" } {
             for { set i 1 } { $i <= $haveboxes } { incr i } {
-               $oldthis.list$i wconfig $option $widget $value
+               $Lists($i) wconfig $option $widget $value
    	     }
    	 } else {
             if { $listno <= $haveboxes } {
-               $oldthis.list$listno wconfig $option $widget $value
+               $Lists($listno) wconfig $option $widget $value
    	    } else {
                error "No multiscrollbox with index \"$listno\""
             }
@@ -384,11 +387,11 @@
       method scrollbarplaces { listno places } {
          if { $listno == "all" } {
             for { set i 1 } { $i <= $haveboxes } { incr i } {
-               $oldthis.list$i configure -scrollbarplaces $places
+               $Lists($i) configure -scrollbarplaces $places
    	     }
    	 } else {
             if { $listno <= $haveboxes } {
-               $oldthis.list$listno configure -scrollbarplaces $places
+               $Lists($listno) configure -scrollbarplaces $places
    	    } else {
                error "No multiscrollbox with index \"$listno\""
             }
@@ -398,7 +401,7 @@
 #  Set label of a scrollbox.
       method label { listno text } {
          if { $listno <= $haveboxes } {
-            $oldthis.list$listno configure -label $text
+            $Lists($listno) configure -label $text
          } else {
             error "No multiscrollbox with index \"$listno\""
          }
@@ -412,15 +415,16 @@
          if $exists {
             if { $haveboxes < $nboxes } {
                for { set i $haveboxes; incr i } { $i <= $nboxes } { incr i } {
-                  Ccd_scrollbox $oldthis.list$i
-                  set widgetnames($oldthis:list$i) $oldthis.list$i
+                  CCDCcdWidget List list Ccd_scrollbox $oldthis.list$i
+                  set Lists($i) $List
+                  set widgetnames($Oldthis:list$i) $List
                }
             } else {
 
 #  Need to lose some boxes?
                if { $haveboxes > $nboxes } {
                   for { set i $haveboxes } { $i > $nboxes } { incr i -1 } {
-                     $oldthis.list$i delete
+                     $Lists($i) delete
                   }
                }
             }
@@ -449,8 +453,9 @@
                }
             }
             for { set i 1 } { $i <= $haveboxes } { incr i } {
-               if { $packedboxes } { pack forget $oldthis.list$i }
-                  pack $oldthis.list$i -side $side -expand true -fill both
+               set list [CCDPathOf $Lists($i)]
+               if { $packedboxes } { pack forget $list }
+                  pack $list -side $side -expand true -fill both
 	    }
 	 }
          set packedboxes 1
@@ -460,7 +465,7 @@
       public singleselect 0 {
          if $exists {
             for { set i 1 } { $i <= $haveboxes } { incr i } {
-               $oldthis.list$i configure -singleselect $singleselect
+               $Lists($i) configure -singleselect $singleselect
             }
          }
       }
@@ -470,7 +475,7 @@
       public exportselect 1 {
          if $exists {
             for { set i 1 } { $i <= $haveboxes } { incr i } {
-               $oldthis.list$i configure -exportselect $exportselect
+               $Lists($i) configure -exportselect $exportselect
             }
          }
       }
@@ -489,6 +494,9 @@
 #                    restacks them.
       protected haveboxes 0
       protected packedboxes 0
+
+#  Names of widgets.
+      protected Lists
 
 #  End of class definition.
    }

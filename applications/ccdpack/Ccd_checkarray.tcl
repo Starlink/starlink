@@ -98,6 +98,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -112,6 +113,8 @@
 #     4-MAY-1995 (PDRAPER):
 #        Started move to Tk4. Commented out ::rename in destructor, no
 #        longer needed.
+#     12-MAY-2000 (MBT):
+#        Upgraded to Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -153,38 +156,30 @@
             set resize 1
          }
          incr nbutton
-         if { $args == {} } {
+         eval CCDTkWidget Button button \
             checkbutton $oldthis.button$nbutton \
-               -text "$name" \
-	       -width $buttonwidth \
-	       -anchor w \
-         } else {
-
-#  Descend into "quoting hell".
-            eval checkbutton \$oldthis.button$nbutton \
-               -text \"$name\" \
-	       -width $buttonwidth \
-	       -anchor w \
-               "$args"
-	 }
-         set buttonnames($name) $nbutton
+                  -text "$name" \
+	          -width $buttonwidth \
+	          -anchor w \
+                  $args
+         set Buttons($name) $Button
+         lappend Buttonlist $Button
 
 #  And repack buttons.
          _repack
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:$name) $oldthis.button$nbutton
-         set widgetfocus($oldthis:$name) $oldthis.button$nbutton
+         set widgetnames($Oldthis:$name) $Button
+         set widgetfocus($Oldthis:$name) $Button
       }
 
 #  Method to add a command to a button.
       method addcommand { name command } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Add the command.
-            $oldthis.button$buttonnames($name) configure \
-	       -command "$command"
+            $Buttons($name) configure -command "$command"
 	 } else {
             error "No checkbutton of name \"$name\""
 	 }
@@ -198,12 +193,13 @@
             set side "top"
          }
          if { $nbutton > 0 } {
-            for { set i 1 } { $i <= $nbutton } { incr i } {
+            foreach Button $Buttonlist {
 
 #  See if buttons need resizing before packing
-               if { $resize } { $oldthis.button$i configure -width $buttonwidth }
-               pack forget $oldthis.button$i
-               pack $oldthis.button$i -side $side -anchor w
+               if { $resize } { $Button configure -width $buttonwidth }
+               set button [CCDPathOf $Button]
+               pack forget $button
+               pack $button -side $side -anchor w
 	    }
             set resize 0
          }
@@ -211,10 +207,10 @@
 
 #  Method for invoking named button.
       method invoke name {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Invoke the button.
-            $oldthis.button$buttonnames($name) invoke
+            $Button invoke
 	 } else {
             error "No checkbutton of name \"$name\""
 	 }
@@ -222,7 +218,7 @@
 
 #  Method to add a variables with optional on and off values to a button.
       method addvariable { name variable args } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  See if on and off values have been given.
             set on [lindex $args 0]
@@ -230,13 +226,12 @@
 	    if { $on != {} && $off != {} } {
 
 #  Add the variable.
-               $oldthis.button$buttonnames($name) configure \
+               $Buttons($name) configure \
                   -variable "$variable" -onvalue "$on" -offvalue "$off"
             } else {
 
 #  Variable has existing on and off values (0 and 1).
-               $oldthis.button$buttonnames($name) configure \
-                  -variable "$variable"
+               $Buttons($name) configure -variable "$variable"
             }
 	 } else {
             error "No checkbutton of name \"$name\""
@@ -245,11 +240,10 @@
 
 #  Set the state of a named button.
       method state { name state } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Set the button state.
-               $oldthis.button$buttonnames($name) configure \
-                  -state $state
+               $Buttons($name) configure -state $state
 	 } else {
             error "No checkbutton of name \"$name\""
 	 }
@@ -257,10 +251,10 @@
 
 #  Toggle the selection state of a named button.
       method toggle { name } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Toggle the button selection state.
-               $oldthis.button$buttonnames($name) toggle
+               $Buttons($name) toggle
 	 } else {
             error "No checkbutton of name \"$name\""
 	 }
@@ -268,8 +262,8 @@
 
 #  Select a named button.
       method select { name } {
-         if { [ info exists buttonnames($name) ] } {
-               $oldthis.button$buttonnames($name) select
+         if { [ info exists Buttons($name) ] } {
+               $Buttons($name) select
 	 } else {
             error "No checkbutton of name \"$name\""
 	 }
@@ -277,8 +271,8 @@
 
 #  De-select a named button.
       method deselect { name } {
-         if { [ info exists buttonnames($name) ] } {
-               $oldthis.button$buttonnames($name) deselect
+         if { [ info exists Buttons($name) ] } {
+               $Buttons($name) deselect
 	 } else {
             error "No checkbutton of name \"$name\""
 	 }
@@ -290,19 +284,18 @@
 
 #  Request to bind all elements to this help.
 	    if { $nbutton > 0 } { 
-               foreach oneof [ array names buttonnames ] {
+               foreach oneof [ array names Buttons ] {
 		  Ccd_base::sethelp \
-		     $oldthis.button$buttonnames($oneof) $docname $label
+		     $Buttons($oneof) $docname $label
 	       }
 	    }
-	    Ccd_base::sethelp $oldthis $docname $label
-            if { [winfo exists $oldthis.label] } {
-	       Ccd_base::sethelp $oldthis.label $docname $label
+	    Ccd_base::sethelp $Oldthis $docname $label
+            if { [ winfo exists $labelwidget ] } {
+	       Ccd_base::sethelp $Labelwidget $docname $label
             }
 	 } else {
-	    if { [ info exists buttonnames($name) ] } {
-	       Ccd_base::sethelp \
-		  $oldthis.button$buttonnames($name) $docname $label
+	    if { [ info exists Buttons($name) ] } {
+	       Ccd_base::sethelp $Buttons($name) $docname $label
 	    }
 	 }
       }
@@ -321,16 +314,17 @@
       public label {} {
          if $exists {
             if { $label != {} } {
-               label $oldthis.label -text $label
+               CCDTkWidget Labelwidget labelwidget \
+                  label $oldthis.label -text "$label"
                if { $stack == "vertical" } {
-                  pack $oldthis.label -side left -anchor w
+                  pack $labelwidget -side left -anchor w
                } else {
-                  pack $oldthis.label -side top -anchor w
+                  pack $labelwidget -side top -anchor w
 	       }
                _repack
             } else {
-               if { [ winfo exists $oldthis.label ] } {
-                  destroy $oldthis.label
+               if { [ winfo exists $labelwidget ] } {
+                  destroy $labelwidget
                }
             }
          }
@@ -341,15 +335,20 @@
 #  of this class, protected to just this instance (both are available
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#   Number of buttons in the menubar and their names.
+#  Number of buttons in the menubar and their names.
       protected nbutton 0
-      protected buttonnames
+      protected Buttons
+      protected Buttonlist
+
+#  Widget for label.
+      protected Labelwidget
+      protected labelwidget ""
 
 #  The widths of the buttons. The actual width is never less than this
 #  and all buttons are the same width.
       protected buttonwidth 12
       protected resize 0
 
-#  End of class defintion.
+#  End of class definition.
    }
 # $Id$

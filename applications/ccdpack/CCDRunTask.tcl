@@ -89,6 +89,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -111,6 +112,8 @@
 #        Added wait option 3.
 #     11-OCT-1995 (PDRAPER):
 #        Changed to use new task & application controls.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -148,8 +151,9 @@ this interface (probably programming error)."
 
 #  Set the names of the variable top-level widgets.
       set Btop [lindex $args 0]
-      set Otop ".taskoutput"
-      set Itop ".taskwait"
+      set btop [CCDPathOf $Btop]
+      set otopwin ".taskoutput"
+      set itopwin ".taskwait"
 
 #------------------------------------------------------------------------------
 #  Create a top-level widget for looking at the task output if needed, and/or
@@ -158,19 +162,21 @@ this interface (probably programming error)."
       if { $CCDseetasks } {
 
 #  Check if output window already exists, if not create one.
-         if { ! [winfo exists .taskoutput] } {
+         if { ! [winfo exists $otopwin] } {
 
 #  Top level widget.
-            Ccd_toplevel $Otop -title "Output from applications"
+            CCDCcdWidget Otop otop \
+               Ccd_toplevel $otopwin -title "Output from applications"
 
 #  Menubar.
-            set Menubar [Ccd_helpmenubar $Otop.menubar -standard 1]
+            CCDCcdWidget Menubar menubar \
+               Ccd_helpmenubar $Otop.menubar -standard 1
 
 #  Scrolled text widget for the output.
-            set Output [Ccd_scrolltext $Otop.output]
+            CCDCcdWidget Output output Ccd_scrolltext $Otop.output
 
 #  Choice bar to get rid of the top-level.
-            set Choice [Ccd_choice $Otop.choice -standard 0]
+            CCDCcdWidget Choice choice Ccd_choice $Otop.choice -standard 0
 
 #  Add an option to switch off future task output.
             $Menubar addcheckbutton Options \
@@ -185,51 +191,54 @@ this interface (probably programming error)."
             $Menubar addcommand File {Exit} CCDExit
 
 #  Packing.
-            pack $Menubar -fill x
-            pack $Choice -side bottom -fill x
-            pack $Output -fill both -expand true
+            pack $menubar -fill x
+            pack $choice -side bottom -fill x
+            pack $output -fill both -expand true
          }
       }
       if { $wait == 1 || $wait == 2 } {
 
 #  Use an information window about status.
-         Ccd_toplevel $Itop -title {Information...}
-         wm withdraw $Itop
-         set Frame1 [frame $Itop.frame1]
-         set Frame2 [frame $Itop.frame2]
+         CCDCcdWidget Itop itop Ccd_toplevel $itopwin -title {Information...}
+         wm withdraw $itop
+         CCDTkWidget Frame1 frame1 frame $itop.frame1
+         CCDTkWidget Frame2 frame2 frame $itop.frame2
          set descript [lindex $args 1]
          if { $descript == "" } {set descript " Processing -- please wait. "}
-         set Message [label $Frame2.message -text "$descript" -anchor center]
+         CCDTkWidget Message message \
+            label $frame2.message -text "$descript" -anchor center
          if { $wait == 1 } {
-            set Animate [label $Frame1.animate -bitmap @$Bitmaps(1)]
-            pack $Frame1 -side right -fill both
-            pack $Frame2 -side left -fill both -expand true -ipadx 15
+            CCDTkWidget Animate animate \
+               label $frame1.animate -bitmap @$Bitmaps(1)
+            pack $frame1 -side right -fill both
+            pack $frame2 -side left -fill both -expand true -ipadx 15
          } else {
-            set Animate [scale $Frame1.animate -orient horizontal \
+            CCDTkWidget Animate animate \
+               scale $frame1.animate -orient horizontal \
                             -from 0 -to 100 \
-                            -sliderlength 0 -state disabled -showvalue 0 \
-                            -takefocus 0 -variable TASK($app,progress)]
-            pack $Frame1 -side bottom -fill both -expand true
-            pack $Frame2 -side top -fill both -expand true -ipadx 15
+                            -sliderlength 8 -state disabled -showvalue 0 \
+                            -takefocus 0 -variable TASK($app,progress)
+            pack $frame1 -side bottom -fill both -expand true
+            pack $frame2 -side top -fill both -expand true -ipadx 15
          }
-         pack $Animate -fill both -expand true
-         pack $Message -fill both -expand true
+         pack $animate -fill both -expand true
+         pack $message -fill both -expand true
 
 #  Make sure that this can be seen and position it prominently.
          update idletasks
          if { $CCDseetasks } {
-            set x [expr [winfo rootx $Otop] + [winfo reqwidth $Otop]/2 \
-                      -[winfo reqwidth $Itop]/2]
-            set y [expr [winfo rooty $Otop] + [winfo reqheight $Otop]/2 \
-                      -[winfo reqheight $Itop]/2]
+            set x [expr [winfo rootx $otop] + [winfo reqwidth $otop]/2 \
+                      -[winfo reqwidth $itop]/2]
+            set y [expr [winfo rooty $otop] + [winfo reqheight $otop]/2 \
+                      -[winfo reqheight $itop]/2]
          } else {
-            set x [expr [winfo rootx $Btop] + [winfo reqwidth $Btop]/2 \
-                      -[winfo reqwidth $Itop]/2]
-            set y [expr [winfo rooty $Btop] + [winfo reqheight $Btop]/2 \
-                      -[winfo reqheight $Itop]/2]
+            set x [expr [winfo rootx $btop] + [winfo reqwidth $btop]/2 \
+                      -[winfo reqwidth $itop]/2]
+            set y [expr [winfo rooty $btop] + [winfo reqheight $btop]/2 \
+                      -[winfo reqheight $itop]/2]
          }
-         wm geometry $Itop +$x+$y
-         wm deiconify $Itop
+         wm geometry $itop +$x+$y
+         wm deiconify $itop
 
 #  And animate it with the appropriate function.
          if { $wait == 1 } {
@@ -248,7 +257,7 @@ this interface (probably programming error)."
 #------------------------------------------------------------------------------
       set TASK($app,error) ""
       set TASK($app,output) ""
-      set TASK(window) .taskoutput.output
+      set TASK(window) $otopwin.output
       set TASK($app,progress) 0
       if { $wait == 2 } { set seeprogress 1 } else { set seeprogress 0 }
 
@@ -268,7 +277,7 @@ this interface (probably programming error)."
 
 #  And destroy the informational window.
          if { $wait == 1 } {
-            CCDAnimateBitmap $Itop.frame1.animate stop
+            CCDAnimateBitmap $Frame1.animate stop
             $Itop kill $Itop
          } elseif { $wait == 2 } {
             $Itop kill $Itop

@@ -31,11 +31,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     21-MAR-1995 (PDRAPER):
 #     	 Original version.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -46,7 +49,8 @@
 
 #  Get the name of the window that the event occurred over.
       set seehelp 1
-      set eventwindow [winfo containing $X $Y]
+      set eventwindow [winfo containing [CCDPathOf $X] [CCDPathOf $Y]]
+      set Eventwindow [CCDCmdOf $eventwindow]
       if { "$eventwindow" != "" } { 
 
 #  Traverse widget tree until we meet a Meta-widget.
@@ -61,7 +65,8 @@
 	 if { $seehelp } { 
 
 #  Now query Meta-widget about any help it might have.
-            set doclabel [$window showhelp $eventwindow]
+            set Window [CCDCmdOf $window]
+            set doclabel [$Window showhelp $Eventwindow]
 	    if { "$doclabel" == "" } {
                set seehelp 0
             } else { 

@@ -1,4 +1,4 @@
-   proc CCDViewFile { Top file } {
+   proc CCDViewFile { Topwin file } {
 #+
 #  Name:
 #     CCDViewFile
@@ -15,7 +15,7 @@
 #     when finished.
 
 #  Arguments:
-#     Top = window (read)
+#     Topwin = window (read)
 #        Name of a top-level window to parent this window. A uniquish
 #        name is generated for the actual form so that many instances
 #        of this may be created.
@@ -24,11 +24,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     14-SEP-1995 (PDRAPER):
 #     	 Original version.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -53,26 +56,27 @@
 #-----------------------------------------------------------------------------
 
 #  Toplevel
-      set This $Top.view$Viewcount
+      set Thiswin $Topwin.view$Viewcount
       incr Viewcount
-      Ccd_toplevel $This -title "Contents of file $file"
+      CCDCcdWidget Thisw thisw \
+         Ccd_toplevel $Thiswin -title "Contents of file $file"
 
 #  Text widget
-      set Text [Ccd_scrolltext $This.text]
+      CCDCcdWidget Text text Ccd_scrolltext $Thisw.text
 
 #  Choice bar to remove window.
-      set Choice [Ccd_choice $This.choice -standard 0]
+      CCDCcdWidget Choice choice Ccd_choice $Thisw.choice -standard 0
 
 #-----------------------------------------------------------------------------
 #  Widget configuration
 #-----------------------------------------------------------------------------
-      $Choice addbutton {Remove from screen} "$This kill $This"
+      $Choice addbutton {Remove from screen} "$Thisw kill $Thisw"
 
 #-----------------------------------------------------------------------------
 #  Packing
 #-----------------------------------------------------------------------------
-      pack $Text -side top -fill both -expand true
-      pack $Choice -fill x
+      pack $text -side top -fill both -expand true
+      pack $choice -fill x
 
 #-----------------------------------------------------------------------------
 #  Interface activation.

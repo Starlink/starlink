@@ -115,11 +115,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     26-SEP-1995 (PDRAPER):
 #     	 Original version.
+#     12-MAY-2000 (MBT):
+#        Upgraded to Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -140,16 +143,17 @@
          Ccd_base::constructor
 
 #  Create the canvas widget to hold the gwm widget.
-         canvas $oldthis.canvas -takefocus true -borderwidth 0
-         set widgetnames($oldthis:canvas) $oldthis.canvas
+         CCDTkWidget Canvas canvas \
+            canvas $oldthis.canvas -takefocus true -borderwidth 0
+         set widgetnames($Oldthis:canvas) $Canvas
 
 #  Create the gwm widget. This needs to be the same size as the canvas.
-         if { [catch {$oldthis.canvas create gwm 0 0 -tags $tags \
+         if { [catch {$Canvas create gwm 0 0 -tags $tags \
 	                 -gwmname $gwmname \
                          -colours $colours -mincolours $mincolours}] } {
 
 #  Failed to create Gwm widget.
-	       destroy $oldthis.canvas
+	       destroy $canvas
                $this delete
 	       return
          }
@@ -164,14 +168,14 @@
 
 #  Add bindings to control scroll & drag.
          set state(afterId) {}
-         ::bind $oldthis.canvas <ButtonRelease-1> "$oldthis _cancelrepeat"
-         ::bind $oldthis.canvas <B1-Leave> "$oldthis _autoscan"
-         ::bind $oldthis.canvas <B1-Enter> "$oldthis _cancelrepeat"
-         ::bind $oldthis.canvas <2> "$oldthis.canvas scan mark %x %y"
-         ::bind $oldthis.canvas <B2-Motion> "$oldthis.canvas scan dragto %x %y"
+         ::bind $canvas <ButtonRelease-1> "$Oldthis _cancelrepeat"
+         ::bind $canvas <B1-Leave> "$Oldthis _autoscan"
+         ::bind $canvas <B1-Enter> "$Oldthis _cancelrepeat"
+         ::bind $canvas <2> "$Canvas scan mark %x %y"
+         ::bind $canvas <B2-Motion> "$Canvas scan dragto %x %y"
 
 #  Binding to catch and update from reconfiguration.
-         ::bind $oldthis.canvas <Configure> "$oldthis _reconfigure %w %h"
+         ::bind $canvas <Configure> "$Oldthis _reconfigure %w %h"
 
       }
 
@@ -182,14 +186,14 @@
 #  Access to canvas methods.
       method do { args } {
          if $exists {
-            eval $oldthis.canvas $args
+            eval $Canvas $args
          }
       }
 
 #  Zoom method. This reconfigures the actual width and height (not the viewed
 #  width and height). Assumes a redraw command has been registered.
       method zoom scale {
-         set size [$oldthis.canvas cget -scrollregion]
+         set size [$Canvas cget -scrollregion]
          set x [expr [lindex $size 2] - [lindex $size 0]]
          set x [expr $x * $scale]
          set y [expr [lindex $size 3] - [lindex $size 1]]
@@ -203,7 +207,7 @@
 #  Set the help to show for the whole canvas.
       method sethelp { docname label } { 
          if $exists {
-            Ccd_base::sethelp $oldthis $docname $label
+            Ccd_base::sethelp $Oldthis $docname $label
          }
       }
 
@@ -215,7 +219,7 @@
          if $exists {
             if { $bounds == "" } {
                update idletasks
-               set bounds [eval $oldthis.canvas bbox $tags]
+               set bounds [eval $Canvas bbox $tags]
                if { $width == "" } {
                   set width [expr [lindex $bounds 2] -[lindex $bounds 0]]
                   incr width
@@ -227,7 +231,7 @@
                   configure -height $height
                }
             }
-            $oldthis.canvas configure -scrollregion "$bounds"
+            $Canvas configure -scrollregion "$bounds"
          }
       }
 
@@ -237,13 +241,14 @@
          if { $drawcommand != "" && $redraw } {
 
 #  Destroy the gwm item.
-            $oldthis.canvas delete Gwm
+            $Canvas delete 1
+            $Canvas delete Gwm
 
 #  Resize the canvas.
             _scrollregion "0 0 $newwidth $newheight"
 
 #  Recreate the gwm widget.
-            $oldthis.canvas create gwm 0 0 -width $newwidth \
+            $Canvas create gwm 0 0 -width $newwidth \
                -height $newheight -tags $tags -gwmname $gwmname
 
 #  and redraw it.
@@ -256,29 +261,29 @@
 
 #  Control the autoscan when dragged outside the window.
       method _autoscan {} {
-         set xlow [winfo rootx $oldthis.canvas]
-         set ylow [winfo rooty $oldthis.canvas]
+         set xlow [winfo rootx $canvas]
+         set ylow [winfo rooty $canvas]
          set xhigh [expr $xlow + $width]
          set yhigh [expr $ylow + $height]
-         set y [winfo pointery $oldthis.canvas]
-         set x [winfo pointerx $oldthis.canvas]
+         set y [winfo pointery $canvas]
+         set x [winfo pointerx $canvas]
          set ok 0
          if {$y >= $yhigh} {
-            $oldthis.canvas yview scroll 1 units
+            $Canvas yview scroll 1 units
             set ok 1
          } elseif {$y < $ylow} {
-            $oldthis.canvas yview scroll -1 units
+            $Canvas yview scroll -1 units
             set ok 1
          }
          if {$x >= $xhigh} {
-            $oldthis.canvas xview scroll 2 units
+            $Canvas xview scroll 2 units
             set ok 1
          } elseif {$x < $xlow} {
-            $oldthis.canvas xview scroll -2 units
+            $Canvas xview scroll -2 units
             set ok 1
          }
          if { $ok } {
-            set state(afterId) [after 50 $oldthis _autoscan]
+            set state(afterId) [after 50 $Oldthis _autoscan]
          }
       }
       
@@ -314,10 +319,10 @@
       public width {} {
          if $exists {
             if { $width != "" } {
-               $oldthis.canvas configure -width $width
+               $Canvas configure -width $width
             }
             if { $width == "" } {
-               set bbox [$oldthis.canvas bbox $tags]
+               set bbox [$Canvas bbox $tags]
                configure -width [lindex $bbox 2]
             }
          }
@@ -325,9 +330,9 @@
       public height {} {
          if $exists {
             if { $height != "" } {
-               $oldthis.canvas configure -height $height
+               $Canvas configure -height $height
             } else {
-               set bbox [$oldthis.canvas bbox $tags]
+               set bbox [$Canvas bbox $tags]
                configure -height [lindex $bbox 3]
             }
          }
@@ -348,64 +353,65 @@
 #  been invoked).
          if $exists {
 
-
 #  Unpack the canvas widet, as needs to be packed last.
-            pack forget $oldthis.canvas
+            pack forget $canvas
 
 #  Delete all existing scrollbars and padding frames.
-            if { [ winfo exists $oldthis.pad.hscroll ] } {
-               destroy $oldthis.pad.hscroll
-               destroy $oldthis.pad.bit
-               destroy $oldthis.pad
-               $oldthis.canvas configure -xscrollcommand {}
+            if { [ winfo exists $hscroll ] } {
+               destroy $hscroll
+               destroy $bit
+               destroy $pad
+               $Canvas configure -xscrollcommand {}
             }
-            if { [ winfo exists $oldthis.vscroll ] } {
-               destroy $oldthis.vscroll
-               $oldthis.canvas configure -yscrollcommand {}
+            if { [ winfo exists $vscroll ] } {
+               destroy $vscroll
+               $Canvas configure -yscrollcommand {}
             }
             set vert [lsearch -regexp $scrollbarplaces (right|left)]
             set hori [lsearch -regexp $scrollbarplaces (top|bottom)]
 
 #  Vertical scrollbar is just created.
             if { $vert != -1 } {
-               scrollbar $oldthis.vscroll \
-                  -command "$oldthis.canvas yview" -orient vertical
-               set widgetnames($oldthis:vscroll) $oldthis.vscroll
-               $oldthis.canvas configure -yscrollcommand "$oldthis.vscroll set"
+               CCDTkWidget Vscroll vscroll \
+                  scrollbar $oldthis.vscroll \
+                     -command "$Canvas yview" -orient vertical
+               set widgetnames($Oldthis:vscroll) $Vscroll
+               $Canvas configure -yscrollcommand "$Vscroll set"
             }
 
 #  Horizontal scrollbar requires packing frames for indentation at corners.
             if { $hori != -1 } {
-               frame $oldthis.pad
+               CCDTkWidget Pad pad frame $oldthis.pad
 
 #  Get width of vertical scrollbar. Make corner frame same width.
                if { $vert != -1 } {
-                  set padwidth [$oldthis.vscroll cget -width]
-                  frame $oldthis.pad.bit -width $padwidth
+                  set padwidth [$vscroll cget -width]
+                  CCDTkWidget Bit bit frame $pad.bit -width $padwidth
                   set padside [lindex $scrollbarplaces $vert]
                } else {
-                  frame $oldthis.pad.bit
+                  CCDTkWidget Bit bit frame $pad.bit
                   set padside right
                }
 
-               scrollbar $oldthis.pad.hscroll \
-                  -command "$oldthis.canvas xview" -orient horizontal
-               set widgetnames($oldthis:hscroll) $oldthis.pad.hscroll
-               $oldthis.canvas configure -xscrollcommand "$oldthis.pad.hscroll set"
+               CCDTkWidget Hscroll hscroll \
+                  scrollbar $pad.hscroll \
+                             -command "$Canvas xview" -orient horizontal
+               set widgetnames($Oldthis:hscroll) $Hscroll
+               $Canvas configure -xscrollcommand "$Hscroll set"
                set side [lindex $scrollbarplaces $hori]
             }
 
 #  Now do packing. Place horizontal first to fill extent and get
 #  padding frames to take up extra.
             if { $hori != -1 } {
-               pack $oldthis.pad -fill x -side $side
-               pack $oldthis.pad.bit -side $padside
-               pack $oldthis.pad.hscroll -fill x -side $side
+               pack $pad -fill x -side $side
+               pack $bit -side $padside
+               pack $hscroll -fill x -side $side
             }
             if { $vert != -1 } {
-               pack $oldthis.vscroll -side [lindex $scrollbarplaces $vert] -fill y
+               pack $vscroll -side [lindex $scrollbarplaces $vert] -fill y
             }
-            pack $oldthis.canvas  -expand true -fill both
+            pack $canvas  -expand true -fill both
          }
       }
 
@@ -425,6 +431,17 @@
 #  State of the autoscan.
    protected state
 
+#  Names of widgets.
+   protected Canvas
+   protected canvas ""
+   protected Pad
+   protected pad ""
+   protected Hscroll
+   protected hscroll ""
+   protected Vscroll
+   protected vscroll ""
+   protected Bit
+   protected bit ""
 
 #  End of class defintion.
    }

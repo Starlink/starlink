@@ -1,4 +1,4 @@
-   proc CCDSetCCDGlobals { Top args } {
+   proc CCDSetCCDGlobals { Topwin args } {
 
 #+
 #  Name:
@@ -37,6 +37,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -55,6 +56,8 @@
 #     19-OCT-1995 (PDRAPER):
 #        Added bias level entry. This was seen a reduce option 
 #        but not available here.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -73,61 +76,71 @@
 #------------------------------------------------------------------------------
 
 #  Top-level widget.
-      Ccd_toplevel $Top -title {CCD characteristic parameters}
+      CCDCcdWidget Top top \
+         Ccd_toplevel $Topwin -title "CCD characteristic parameters"
 
 #  Menubar.
-      set Menu [Ccd_helpmenubar $Top.menubar]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
 
 #  Frame for containing the parameter regions.
-      set Frame [frame $Top.center]
+      CCDTkWidget Frame frame frame $top.center
 
 #  Labelled entry for EXTENT value.
-      set Extent [Ccd_labent $Frame.extent \
-                     -text {Extent of useful detector area:} \
-                     -textvariable {CCDglobalpars(EXTENT)}]
+      CCDCcdWidget Extent extent \
+         Ccd_labent $Frame.extent \
+                     -text "Extent of useful detector area:" \
+                     -textvariable CCDglobalpars(EXTENT)
 
 #  Radioarray for DIRECTION value.
-      set Direct [Ccd_radioarray $Frame.direction \
-                     -label {Readout direction:} \
-                     -variable {CCDglobalpars(DIRECTION)}]
+      CCDCcdWidget Direct direct \
+         Ccd_radioarray $Frame.direction \
+                     -label "Readout direction:" \
+                     -variable CCDglobalpars(DIRECTION)
 
 #  Labelled entry for BOUNDS value.
-      set Bounds [Ccd_labent $Frame.bounds  \
-                     -text {Bounds of bias strips (1 or 2 pairs):} \
-                     -textvariable {CCDglobalpars(BOUNDS)}]
+      CCDCcdWidget Bounds bounds \
+         Ccd_labent $Frame.bounds \
+                     -text "Bounds of bias strips (1 or 2 pairs):" \
+                     -textvariable CCDglobalpars(BOUNDS)
 
 #  Labelled entry for ADC value.
-      set Adc [Ccd_labent $Frame.adc \
-                  -text {Analogue-to-digital conversion factor:} \
-                  -textvariable {CCDglobalpars(ADC)}]
+      CCDCcdWidget Adc adc \
+         Ccd_labent $Frame.adc \
+                  -text "Analogue-to-digital conversion factor:" \
+                  -textvariable CCDglobalpars(ADC)
 
 #  Labelled entry for RNOISE value.
-      set Rnoise [Ccd_labent $Frame.rnoise \
-                     -text {Readout noise (ADUs):} \
-                     -textvariable {CCDglobalpars(RNOISE)}]
+      CCDCcdWidget Rnoise rnoise \
+         Ccd_labent $Frame.rnoise \
+                     -text "Readout noise (ADUs):" \
+                     -textvariable CCDglobalpars(RNOISE)
 
 #  Labelled entry for MASK value.
-      set Mask [Ccd_labent $Frame.mask \
-                   -text {Defect mask:} \
-                   -textvariable {CCDglobalpars(MASK)}]
+      CCDCcdWidget Mask mask \
+         Ccd_labent $Frame.mask \
+                   -text "Defect mask:" \
+                   -textvariable CCDglobalpars(MASK)
 
 #  Labelled entry for DEFERRED value.
-      set Deferred [Ccd_labent $Frame.deferred \
-                       -text {Deferred charge (usually zero):} \
-                       -textvariable {CCDglobalpars(DEFERRED)}]
+      CCDCcdWidget Deferred deferred \
+         Ccd_labent $Frame.deferred \
+                       -text "Deferred charge (usually zero):" \
+                       -textvariable CCDglobalpars(DEFERRED)
 
 #  Labelled entry for SATURATION value.
-      set Satur [Ccd_labent $Frame.saturation \
-                    -text {Saturated pixel value (ADUs):} \
-                    -textvariable {CCDglobalpars(SATURATION)}]
+      CCDCcdWidget Satur satur \
+         Ccd_labent $Frame.saturation \
+                    -text "Saturated pixel value (ADUs):" \
+                    -textvariable CCDglobalpars(SATURATION)
 
 #  Labelled entry for bias level.
-      set Zero [Ccd_labent $Frame.bias \
-                   -text {Bias level (ADUs):} \
-                   -textvariable {CCDglobalpars(ZERO)}]
+      CCDCcdWidget Zero zero \
+         Ccd_labent $Frame.bias \
+                   -text "Bias level (ADUs):" \
+                   -textvariable CCDglobalpars(ZERO)
 
 #  Choice bar for OK etc.
-      set Choice [Ccd_choice $Top.choice -standard 0]
+      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
 
 #------------------------------------------------------------------------------
 #  Widget configuration
@@ -229,18 +242,18 @@
 #------------------------------------------------------------------------------
 #  Pack all widgets.
 #------------------------------------------------------------------------------
-      pack $Extent    -fill x
-      pack $Direct    -fill x
-      pack $Bounds    -fill x
-      pack $Adc       -fill x
-      pack $Rnoise    -fill x
-      pack $Mask      -fill x
-      pack $Deferred  -fill x
-      pack $Satur     -fill x
-      pack $Zero      -fill x
-      pack $Menu      -fill x
-      pack $Choice    -side bottom -fill x
-      pack $Frame     -fill x -expand true
+      pack $extent    -fill x
+      pack $direct    -fill x
+      pack $bounds    -fill x
+      pack $adc       -fill x
+      pack $rnoise    -fill x
+      pack $mask      -fill x
+      pack $deferred  -fill x
+      pack $satur     -fill x
+      pack $zero      -fill x
+      pack $menu      -fill x
+      pack $choice    -side bottom -fill x
+      pack $frame     -fill x -expand true
 
 #  Wait for this procedure to exit.
       CCDWindowWait $Top

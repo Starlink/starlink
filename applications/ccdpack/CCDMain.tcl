@@ -26,6 +26,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -40,6 +41,8 @@
 #     15-APR-1997 (PDRAPER):
 #        Added tests and storage for foreign data formats. Netscape
 #        now the default help browser (same as HTX).
+#     11-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -175,61 +178,68 @@ set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
 #-----------------------------------------------------------------------------
 
 #  Create top-level widget for main window.
-   set Top [Ccd_toplevel .topwin -title {CCDPACK reduction GUI}]
+   CCDCcdWidget Top top Ccd_toplevel .topwin -title {CCDPACK reduction GUI}
 
 #  Record this for use everywhere.
    set MAIN(window) $Top
    set MAIN(name) XREDUCE
 
 #  Menubar
-   set Menubar [Ccd_helpmenubar $Top.menubar]
+   CCDCcdWidget Menubar menubar Ccd_helpmenubar $Top.menubar
 
 #  Frame to contain description and bitmaps.
-   set Separate1 [frame $Top.s1 -height 3]
-   set Frame [frame $Top.top -borderwidth 0]
+   CCDTkWidget Separate1 separate1 frame $top.s1 -height 3
+   CCDTkWidget Frame frame frame $top.top -borderwidth 0
 
 #  Description of interface.
 #  Bitmaps with CCDPACK "logo".
-   set Bitmapl [label $Frame.bitl -bitmap @$CCDdir/ccdbitmap64 -anchor center ]
-   set Bitmapr [label $Frame.bitr -bitmap @$CCDdir/ccdbitmap64 -anchor center ]
+   CCDTkWidget Bitmapl bitmapl \
+      label $frame.bitl -bitmap @$CCDdir/ccdbitmap64 -anchor center
+   CCDTkWidget Bitmapr bitmapr \
+      label $frame.bitr -bitmap @$CCDdir/ccdbitmap64 -anchor center
 
 #  Textual message.
-   set Label [label $Frame.label -anchor center \
-      -text "xreduce \n\n An X interface to automated CCDPACK reductions."]
+   CCDTkWidget Label label \
+      label $frame.label -anchor center \
+      -text "xreduce \n\n An X interface to automated CCDPACK reductions."
 
 #  Buttons for the main choices.
 #  Configuration of package and CCD characteristics.
-   set Separate2 [frame $Top.s2 -height 3]
-   set Config [Ccd_choice $Top.configure \
+   CCDTkWidget Separate2 separate2 frame $top.s2 -height 3
+   CCDCcdWidget Config config \
+      Ccd_choice $Top.configure \
                   -standard false \
                   -label "\nConfiguration\n" \
                   -stack horizontal \
                   -width 30 \
-                  -buttonwidth 18]
+                  -buttonwidth 18
 
 #  NDF import (FITS and by hand).
-   set Separate3 [frame $Top.s3 -height 3]
-   set Import [Ccd_choice $Top.imprt \
+   CCDTkWidget Separate3 separate3 frame $top.s3 -height 3
+   CCDCcdWidget Import import \
+      Ccd_choice $Top.imprt \
                   -standard false \
                   -label "\nData Import\n" \
                   -stack horizontal \
                   -width 30 \
-                  -buttonwidth 18]
+                  -buttonwidth 18
 
 #  Create & Run reduction script.
-   set Separate4 [frame $Top.s4 -height 3]
-   set Run [Ccd_choice $Top.run \
+   CCDTkWidget Separate4 separate4 frame $top.s4 -height 3
+   CCDCcdWidget Run run \
+      Ccd_choice $Top.run \
                -standard false \
                -label "\nReduction\n" \
                -stack horizontal \
                -width 30 \
-               -buttonwidth 18]
+               -buttonwidth 18
 
 #  Scrollbox for showing names (and types?) of current NDFs.
-   set Names [Ccd_scrollbox $Top.names -label "\nKnown Data Files\n" -anchor c]
+   CCDCcdWidget Names names \
+      Ccd_scrollbox $Top.names -label "\nKnown Data Files\n" -anchor c
 
 #  Exit and Update NDF listbox.
-   set Control [Ccd_choice $Top.control -standard false]
+   CCDCcdWidget Control control Ccd_choice $Top.control -standard false
 
 #-----------------------------------------------------------------------------
 #  Configure widgets.
@@ -237,7 +247,7 @@ set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
 
 #  Override trap of destruction by window manager of top-level, making
 #  sure that . is destroyed too.
-   wm protocol $Top WM_DELETE_WINDOW CCDExit
+   wm protocol $top WM_DELETE_WINDOW CCDExit
 
 #  Add file item to exit.
    $Menubar addcommand File Exit CCDExit
@@ -323,20 +333,20 @@ set CCDimagefilters {{NDF\(.sdf\) "*.sdf"}}
 #------------------------------------------------------------------------------
 #  Pack all widgets.
 #------------------------------------------------------------------------------
-   pack $Control -fill x -side bottom
-   pack $Menubar -fill x -side top
-   pack $Bitmapl -side left
-   pack $Label -side left -fill x -expand true
-   pack $Bitmapr -side left
-   pack $Frame -side top -fill x
-   pack $Separate1 -fill x
-   pack $Config  -fill x -side top
-   pack $Separate2 -fill x
-   pack $Import -fill x -side top
-   pack $Separate3 -fill x
-   pack $Run -fill x -side top
-   pack $Separate4 -fill x
-   pack $Names -fill both -expand true
+   pack $control -fill x -side bottom
+   pack $menubar -fill x -side top
+   pack $bitmapl -side left
+   pack $label -side left -fill x -expand true
+   pack $bitmapr -side left
+   pack $frame -side top -fill x
+   pack $separate1 -fill x
+   pack $config  -fill x -side top
+   pack $separate2 -fill x
+   pack $import -fill x -side top
+   pack $separate3 -fill x
+   pack $run -fill x -side top
+   pack $separate4 -fill x
+   pack $names -fill both -expand true
 
 
 # $Id$

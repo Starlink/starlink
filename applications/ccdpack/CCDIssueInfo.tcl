@@ -18,6 +18,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -28,9 +29,14 @@
 #     13-MAY-1999 (PDRAPER):
 #        Modified to use a window that is a child of .topwin (needed
 #        to control transient behaviour).
+#     16-MAY (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
+
+#  Global variables.
+   global MAIN
 
 #  See if this is a Tk application or not.
    global tk_version
@@ -45,10 +51,12 @@
 
 #  Check that informational window doesn't already exist, if it does
 #  wait for it to go away before proceeding.
-      if { [winfo exists .topwin.ccdissueinfo] } { 
-         tkwait window .topwin.ccdissueinfo
+      set Issueinfo $MAIN(window).ccdissueinfo
+      set issueinfo [CCDPathOf $Issueinfo]
+      if { [winfo exists $issueinfo] } {
+         tkwait window $issueinfo
       }
-      CCDDialog .topwin.ccdissueinfo "Information" "$message" info
+      CCDDialog $Issueinfo Information "$message" info
    } else {
       puts "Error. $dialogmess"
    }

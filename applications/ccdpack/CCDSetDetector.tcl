@@ -1,4 +1,4 @@
-   proc CCDSetDetector { Top } {
+   proc CCDSetDetector { Topwin } {
 #+
 #  Name:
 #     CCDSetDetector
@@ -32,6 +32,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -39,6 +40,8 @@
 #     	 Original version.
 #     13-MAY-1999 (PDRAPER):
 #        Modified width of toplevel window.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -55,26 +58,28 @@
 #-----------------------------------------------------------------------------
 
 #  Top-level widget.
-      Ccd_toplevel $Top -title "Choose known detector setup"
-      wm geometry $Top 50x10
+      CCDCcdWidget Top top \
+         Ccd_toplevel $Topwin -title "Choose known detector setup"
+      wm geometry $top 50x10
 
 #  Menubar
-      set Menu [Ccd_helpmenubar $Top.menubar]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
 
 #  Descriptive label.
-      set Label [label $Top.label -anchor center \
-          -text "Choose from the known \n detector/telescope combinations"]
-      set S1 [frame $Top.s1 -height 3]
+      CCDTkWidget Label label \
+         label $top.label -anchor center \
+          -text "Choose from the known \n detector/telescope combinations"
+      CCDTkWidget S1 s1 frame $top.s1 -height 3
 
 #  Multitem for names and descriptions.
-      set Box [Ccd_multitem $Top.box -nboxes 2 \
-		  -singleselect 1 -seealltext 0]
+      CCDCcdWidget Box box \
+         Ccd_multitem $Top.box -nboxes 2 -singleselect 1 -seealltext 0
 
 #  Labelled entry for name of selected file.
-      set Name [Ccd_labent $Top.labent -text {File:}]
+      CCDCcdWidget Name name Ccd_labent $Top.labent -text {File:}
 
 #  Choice bar for control.
-      set Choice [Ccd_choice $Top.choice -standard 1]
+      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 1
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.
@@ -200,12 +205,12 @@
 #-----------------------------------------------------------------------------
 #  Packing
 #-----------------------------------------------------------------------------
-      pack $Menu -side top -fill x
-      pack $Choice -side bottom -fill x
-      pack $Label -side top -fill x
-      pack $S1 -side top -fill x
-      pack $Box -side top -fill both -expand true
-      pack $Name -side top -fill x
+      pack $menu -side top -fill x
+      pack $choice -side bottom -fill x
+      pack $label -side top -fill x
+      pack $s1 -side top -fill x
+      pack $box -side top -fill both -expand true
+      pack $name -side top -fill x
 
 #-----------------------------------------------------------------------------
 #  Activate interface

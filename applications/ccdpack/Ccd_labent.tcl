@@ -98,6 +98,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -110,6 +111,8 @@
 #        longer needed.
 #     30-JUN-1995 (PDRAPER):
 #        Added -state configuration option.
+#     12-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -124,8 +127,8 @@
       constructor { config } {
 
 #  Now add the label and entry widgets
-         label $oldthis.label
-	 entry $oldthis.entry
+         CCDTkWidget Labelwidget labelwidget label $oldthis.label
+	 CCDTkWidget Entrywidget entrywidget entry $oldthis.entry
 
 #  Check options database for values to override widget defaults. Look for more
 #  specific option of having a class specified, if this fails try for less 
@@ -140,9 +143,9 @@
          configure -state $state
 
 #  Define sub-component widgets for configuration via the wconfig and bind.
-         set widgetnames($oldthis:label) $oldthis.label
-         set widgetnames($oldthis:entry) $oldthis.entry
-         set widgetfocus($oldthis:entry) $oldthis.entry
+         set widgetnames($Oldthis:label) $Labelwidget
+         set widgetnames($Oldthis:entry) $Entrywidget
+         set widgetfocus($Oldthis:entry) $Entrywidget
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -150,24 +153,24 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Insert text into the entry widget.
       method insert { args } {
-         eval $oldthis.entry insert $args
+         eval $Entrywidget insert $args
       }
 
 #  Delete text in entry widget.
       method clear { args } {
-         eval $oldthis.entry delete $args
+         eval $Entrywidget delete $args
       }
 
 #  Return the text in the entry widget.
       method get {} {
-         return [$oldthis.entry get]
+         return [$Entrywidget get]
       }
 
 #  Method for assigning context help.
       method sethelp {docname label} {
-	 Ccd_base::sethelp $oldthis $docname $label
-	 Ccd_base::sethelp $oldthis.entry $docname $label
-         Ccd_base::sethelp $oldthis.label $docname $label
+	 Ccd_base::sethelp $Oldthis $docname $label
+	 Ccd_base::sethelp $Entrywidget $docname $label
+         Ccd_base::sethelp $Labelwidget $docname $label
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -175,7 +178,7 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       public text "label" {
          if $exists {
-            $oldthis.label configure -text $text
+            $Labelwidget configure -text $text
 	 }
       }
 
@@ -185,11 +188,11 @@
             if { [ regexp (left|right|top|bottom) $placelabel] } {
 
 #  Unpack the widgets in preparation for re-packing.
-               pack forget $oldthis.label $oldthis.entry
+               pack forget $labelwidget $entrywidget
 
 #  Do the actions necessary to pack the label and entry.
-               pack $oldthis.label -side $placelabel -fill x
-               pack $oldthis.entry -side $placelabel -expand true -fill both
+               pack $labelwidget -side $placelabel -fill x
+               pack $entrywidget -side $placelabel -expand true -fill both
 
 #  Not a recognised option.
             } else {
@@ -203,9 +206,9 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
       public textvariable {} {
          if $exists {
             if { $textvariable != {} } {
-               $oldthis.entry configure -textvariable $textvariable
+               $Entrywidget configure -textvariable $textvariable
             } else {
-               $oldthis.entry configure -textvariable {}
+               $Entrywidget configure -textvariable {}
             }
          }
       }
@@ -214,9 +217,9 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
       public width {} {
          if $exists {
             if { $width != {} } { 
-               $oldthis.entry configure -width $width 
+               $Entrywidget configure -width $width 
             } else {
-               set realwidth [ $oldthis.entry configure -width ]
+               set realwidth [ $Entrywidget configure -width ]
                return [ lindex $realwidth 4 ]
 	    }
 	 }
@@ -225,9 +228,19 @@ one of \"left\", \"right\", \"top\" or \"bottom\""
 #  Set state of entry widget.
       public state normal {
          if $exists  { 
-            $oldthis.entry configure -state $state
+            $Entrywidget configure -state $state
          }
       }
+
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Common and protected variables.  Common are visible to all instances
+#  of this class, protected to just this instance (both are available
+#  anywhere in the scope of this class and in derived classes).
+#+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      protected Labelwidget
+      protected labelwidget ""
+      protected Entrywidget
+      protected entrywidget ""
   
 #  End of class definition.
    }

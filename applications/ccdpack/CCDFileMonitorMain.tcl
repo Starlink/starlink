@@ -18,19 +18,21 @@
 #     wish CCDFileMonitorMain file
 
 #  Notes:
-#     This interface requires that the extensions [incr Tcl] version
-#     2.2, BLT 2.1 and TclADAM are available (built into the wish
-#     executable that invokes this file) as well as Tcl7.6 and
-#     Tk4.2. It is not known to work with any other combinations and
-#     will not work with earlier versions of Tcl and Tk and [incr Tcl].
+#     This interface requires that the extensions [incr Tcl], BLT and
+#     TclADAM are availabel (built into the wish executable that 
+#     invokes this file).  It is tested with Tcl/Tk8.0, and [incr Tcl] 
+#     3.0.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     16-NOV-1995 (PDRAPER):
 #        Original version
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -119,24 +121,25 @@
 #------------------------------------------------------------------------------
 
 #  Create top-level widget for main window.
-   set Top [Ccd_toplevel .topwin -title {CCDPACK File contents monitor}]
+   CCDCcdWidget Top top \
+      Ccd_toplevel .topwin -title "CCDPACK File contents monitor"
 
 #  Record this for use everywhere.
    set MAIN(window) $Top
    set MAIN(name) FILEMONITOR
 
 #  Menubar
-   set Menubar [Ccd_helpmenubar $Top.menubar -standard 0]
+   CCDCcdWidget Menubar menubar Ccd_helpmenubar $Top.menubar -standard 0
 
 #  Textual message.
-   set Label [label $Top.label -anchor center \
-                 -text "Monitoring file \"$file\""]
+   CCDTkWidget Label label \
+      label $top.label -anchor center -text "Monitoring file '$file'"
 
 #  Text area for displaying contents.
-   set Contents [Ccd_scrolltext $Top.text]
+   CCDCcdWidget Contents contents Ccd_scrolltext $Top.text
 
 #  Exit button
-   set Control [Ccd_choice $Top.control -standard false]
+   CCDCcdWidget Control control Ccd_choice $Top.control -standard false
 
 #-----------------------------------------------------------------------------
 #  Configure widgets.
@@ -144,7 +147,7 @@
 
 #  Override trap of destruction by window manager of top-level, making
 #  sure that . is destroyed too.
-   wm protocol $Top WM_DELETE_WINDOW \
+   wm protocol $top WM_DELETE_WINDOW \
       "catch {exec kill $pipeproc}
        catch {close $pipe}
        CCDExit
@@ -173,10 +176,10 @@
 #------------------------------------------------------------------------------
 #  Pack all widgets.
 #------------------------------------------------------------------------------
-   pack $Control -fill x -side bottom
-   pack $Menubar -fill x -side top
-   pack $Label -side top -fill x -ipady 10
-   pack $Contents -fill both -side bottom -expand true
+   pack $control -fill x -side bottom
+   pack $menubar -fill x -side top
+   pack $label -side top -fill x -ipady 10
+   pack $contents -fill both -side bottom -expand true
 
 #------------------------------------------------------------------------------
 #  Interface activation.
@@ -189,7 +192,7 @@
    }
 
 #  Set the fileevent handler.
-   tkwait visibility $Top
+   tkwait visibility $top
    fileevent $pipe readable [list CCDReadLogFile $Contents $pipe $file]
    
 # $Id$

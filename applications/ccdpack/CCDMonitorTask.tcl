@@ -1,4 +1,4 @@
-   proc CCDMonitorTask { textwindow watch task output } {
+   proc CCDMonitorTask { Textwindow watch task output } {
 #+
 #  Name:
 #     CCDMonitorTask
@@ -21,7 +21,7 @@
 #     value of the global variable TASK($task,progress) as a percentage.
 
 #  Arguments:
-#     textwindow = window (write)
+#     Textwindow = window (write)
 #        Name of a text-like widget for writing the task output to.
 #     watch = boolean (read)
 #        If watch is set true then the task output is monitored for
@@ -44,6 +44,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -56,6 +57,8 @@
 #     30-AUG-1995 (PDRAPER):
 #        Added watch argument to allow progress feedback in a scale
 #        type widget.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -67,11 +70,12 @@
 #.
 
 #  Check for an error.
-      if { [string range $output 0 1 ] == "!!" } {
+      if { [string range $output 0 0 ] == "!!" } {
          CCDTaskError $task $output
       }
 
 #  Write output from task into window if required.
+      set textwindow [CCDPathOf $Textwindow]
       if { $CCDseetasks } {
          if [winfo exists $textwindow] {
             $textwindow insert end "$output\n"

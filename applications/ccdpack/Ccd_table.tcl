@@ -214,11 +214,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
-#     {1-JUN-1995} (PDRAPER):
+#     1-JUN-1995 (PDRAPER):
 #        Original version.
+#     15-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -240,8 +243,9 @@
 
 #  Create the canvas widget to hold the frames. Stop it from taking
 #  the focus and confine the scrollable region.
-         canvas $oldthis.canvas -takefocus 0 -confine 1
-         set widgetnames($oldthis:canvas) $oldthis.canvas
+         CCDTkWidget Canvas canvas \
+            canvas $oldthis.canvas -takefocus 0 -confine 1
+         set widgetnames($Oldthis:canvas) $Canvas
 
 #  Initialise the minimum width of a column on the canvas.
          entry $oldthis.e
@@ -277,7 +281,7 @@
          set state(0) 0
 
 #  Finally set binding to control resizing of the entry widget widths.
-         ::bind $oldthis.canvas <Configure> "$oldthis _reconfigure %w"
+         ::bind $canvas <Configure> "$Oldthis _reconfigure %w"
       }
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -285,8 +289,8 @@
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Set column label.
       method setlabel {col label} {
-         if { [winfo exists $oldthis.canvas.frame$col.label] } {
-            $oldthis.canvas.frame$col.label configure -text $label
+         if { [info exists Framelabels($col)] } {
+            $Framelabels($col) configure -text $label
          }
       }
 
@@ -366,10 +370,10 @@
          if { $col >= $columns } {
             configure -columns [expr $col +1]
          }
-         $oldthis.canvas.frame$col.entry$row delete 0 end
-         $oldthis.canvas.frame$col.entry$row insert 0 $value
+         $Entries($col,$row) delete 0 end
+         $Entries($col,$row) insert 0 $value
          if { $flushright } {
-            $oldthis.canvas.frame$col.entry$row xview end
+            $Entries($col,$row) xview end
          }
       }
 
@@ -379,7 +383,7 @@
          set row [_index $row 0 0 ]
          set values ""
          for { set i 0 } { $i < $columns } { incr i } {
-            lappend values [$oldthis.canvas.frame$i.entry$row get]
+            lappend values [$Entries($i,$row) get]
          }
          return $values
       }
@@ -388,7 +392,7 @@
       method getcol { col } {
          set values ""
          for { set i 0 } { $i < $rows } { incr i } {
-            lappend values [$oldthis.canvas.frame$col.entry$i get]
+            lappend values [$Entries($col,$i) get]
          }
          return $values
       }
@@ -396,7 +400,7 @@
 #  Get value from a cell.
       method getcell { row col } {
          set row [_index $row 0 0]
-         return [$oldthis.canvas.frame$row.entry$col get]
+         return [$Entreis($row,$col) get]
       }
 
 #  Enable insertion state for methods for rows, columns and cells.
@@ -406,12 +410,12 @@
          if { $istate == "normal" || $istate == "disabled" } {
             if { $istate != "" } {
                for { set i 0 } { $i < $rows } { incr i } {
-                  $oldthis.canvas.frame$col.entry$i configure -state $istate
+                  $Entries($col,$i) configure -state $istate
                }
             } else {
                set istate ""
                for { set i 0 } { $i < $rows } { incr i } {
-                  set cellstate [$oldthis.canvas.frame$col.entry$i cget -state]
+                  set cellstate [$Entries($col,$i) cget -state]
                   if { $i == 0 } {
                      set istate $cellstate
                   } else {
@@ -432,12 +436,12 @@
          if { $istate == "normal" || $istate == "disabled" } {
             if { $istate != "" } {
                for { set i 0 } { $i < $columns } { incr i } {
-                  $oldthis.canvas.frame$i.entry$row configure -state $istate
+                  $Entries($i,$row) configure -state $istate
                }
             } else {
                set istate ""
                for { set i 0 } { $i < $columns } { incr i } {
-                  set cellstate [$oldthis.canvas.frame$i.entry$row cget -state]
+                  set cellstate [$Entreis($i,$row) cget -state]
                   if { $i == 0 } {
                      set istate $cellstate
                   } else {
@@ -457,9 +461,9 @@
          set row [_index $row 0 0]
          if { $istate == "normal" || $istate == "disabled" } {
             if { $istate != "" } {
-               $oldthis.canvas.frame$col.entry$row configure -state $istate
+               $Entries($col,$row) configure -state $istate
             } else {
-               return [$oldthis.canvas.frame$col.entry$row cget -state]
+               return [$Entries($col,$row) cget -state]
             }
          } else {
             error "Unknown state \"$istate\" must one of \"normal\" or \"disabled\""
@@ -506,8 +510,8 @@
          set k $first
          for { set i $last } { $i < $rows } { incr i } {
             for { set j 0 } { $j < $columns } { incr j } {
-               set Entryi $oldthis.canvas.frame$j.entry$i
-               set Entryk $oldthis.canvas.frame$j.entry$k
+               set Entryi $Entries($j,$i)
+               set Entryk $Entries($j,$k)
                $Entryk delete 0 end
                $Entryk insert 0 [$Entryi get]
                $Entryi delete 0 end
@@ -538,8 +542,8 @@
          set k $first
          for { set i $last } { $i < $columns } { incr i } {
             for { set j 0 } { $j < $rows } { incr j } {
-               set Entryi $oldthis.canvas.frame$i.entry$j
-               set Entryk $oldthis.canvas.frame$k.entry$j
+               set Entryi $Entries($i,$j)
+               set Entryk $Entries($k,$j)
                $Entryk delete 0 end
                $Entryk insert 0 [$Entryi get]
                $Entryi delete 0 end
@@ -551,8 +555,8 @@
 
 #  Clear a cell.
       method clearcell { row col } {
-         if [winfo exists $oldthis.frame$col.entry$row] {
-            $oldthis.frame$col.entry$row clear 0 end
+         if [info exists Entries($col,$row)] {
+            $Entries($col,$row) clear 0 end
          }
       }
 
@@ -596,7 +600,7 @@
 #  Method to set active row.
       method activate {row col} {
          set active [_index $row 0 0]
-         ::focus $oldthis.canvas.frame$col.entry$active
+         ::focus [CCDPathOf $Entries($col,$active)]
       }
 
 #  Method to make sure can "see" a particular row.
@@ -605,21 +609,21 @@
          if { $newvalue == -1 } {
             return
          } elseif {$newvalue == 0} {
-            $oldthis.canvas yview moveto 0
+            $Canvas yview moveto 0
          } else {
-            set y [winfo y $oldthis.canvas.frame0.entry$newvalue]
-            set s [$oldthis.canvas cget -scrollregion]
+            set y [winfo y $Entries(0,$newvalue)]
+            set s [$Canvas cget -scrollregion]
             set h [lindex $s 3]
             set viewfrac [expr double($y)/double($h)]
-            set current [$oldthis.canvas yview]
+            set current [$Canvas yview]
             set low [lindex $current 0]
             set high [lindex $current 1]
             if { $viewfrac < $low } {
-               $oldthis.canvas yview moveto $viewfrac
+               $Canvas yview moveto $viewfrac
             } elseif {$viewfrac > $high } {
                set top [expr $y - $height + $eheight]
                set viewfrac [expr double($top)/double($h)]
-               $oldthis.canvas yview moveto $viewfrac
+               $Canvas yview moveto $viewfrac
             }
          }
       }
@@ -639,7 +643,7 @@
 #  Set the context help for this widget (as a whole).
       method sethelp { docname label } { 
          if $exists { 
-            Ccd_base::sethelp $oldthis $docname $label
+            Ccd_base::sethelp $Oldthis $docname $label
          }
       }
 
@@ -651,7 +655,7 @@
          if $exists {
             if { $bounds == "" } {
                update idletasks
-               set bounds [eval $oldthis.canvas bbox $tags]
+               set bounds [eval $Canvas bbox $tags]
                if { $width == "" } {
                   set width [expr [lindex $bounds 2] -[lindex $bounds 0]]
                   incr width
@@ -663,7 +667,7 @@
                   configure -height $height
                }
             }
-            $oldthis.canvas configure -scrollregion "$bounds"
+            $Canvas configure -scrollregion "$bounds"
          }
       }
 
@@ -711,7 +715,7 @@
          for { set j $bot } { $j <= $top } { incr j } {
             if { ! $state($j) } {
                for { set i 0 } { $i < $columns } { incr i } {
-                  $oldthis.canvas.frame$i.entry$j configure -background $select
+                  $Entries($i,$j) configure -background $select
                }
                set state($j) 1
             }
@@ -730,7 +734,7 @@
             if { [info exists state($j)] } {
                if { $state($j) } {
                   for { set i 0 } { $i < $columns } { incr i } {
-                     $oldthis.canvas.frame$i.entry$j configure -background $notselect
+                     $Entries($i,$j) configure -background $notselect
                   }
                   set state($j) 0
                }
@@ -803,27 +807,27 @@
       }
 
       method _autoscan {w row col} {
-         set xlow [winfo rootx $oldthis.canvas]
-         set ylow [winfo rooty $oldthis.canvas]
+         set xlow [winfo rootx $canvas]
+         set ylow [winfo rooty $canvas]
          set xhigh [expr $xlow + $width]
          set yhigh [expr $ylow + $height]
          set state(y) [winfo pointery $w]
          set state(x) [winfo pointerx $w]
          if { $state(y) > $yhigh } {
-           $oldthis.canvas yview scroll 1 units
+           $Canvas yview scroll 1 units
          } elseif { $state(y) < $ylow } {
-            $oldthis.canvas yview scroll -1 units
+            $Canvas yview scroll -1 units
          }
          if { $state(x) > $xhigh } {
-            $oldthis.canvas xview scroll 1 units
+            $Canvas xview scroll 1 units
          } elseif { $state(x) < $xlow } {
-            $oldthis.canvas xview scroll -1 units
+            $Canvas xview scroll -1 units
          }
 
          set curwin [winfo containing $state(x) $state(y)]
          set row ""
          if { $curwin != "" } {
-            scan $curwin "$oldthis.canvas.frame%d.entry%d" coldum row
+            regsub {[0-9]*$} $curwin row
          } else {
             set cy [winfo y $oldthis.canvas]
             if { $state(y) < $cy } {
@@ -836,7 +840,7 @@
             set row $state(prev)
          }
          _motion $row $col
-         set state(afterId) [after 25 $oldthis _autoscan $w $row $col]
+         set state(afterId) [after 25 $Oldthis _autoscan $w $row $col]
       }
 
       method _updown {row col amount} {
@@ -886,8 +890,8 @@
 #  And make changes.
             set xoff 0
             for { set j 0 } { $j < $columns } { incr j } {
-               $oldthis.canvas coords c$j $xoff 0
-               $oldthis.canvas itemconfigure c$j -width $columnwidth
+               $Canvas coords c$j $xoff 0
+               $Canvas itemconfigure c$j -width $columnwidth
                set xoff [expr $xoff + $columnwidth]
             }
 
@@ -897,13 +901,13 @@
                update
                for { set j 0 } { $j < $columns } { incr j } {
                   for { set i 0 } { $i < $rows } { incr i } {
-                     $oldthis.canvas.frame$j.entry$i xview end
+                     $Entries($j,$i) xview end
                   }
                }
             }
          }
-         set height [winfo height $oldthis.canvas]
-         set width  [winfo width $oldthis.canvas]
+         set height [winfo height $canvas]
+         set width  [winfo width $canvas]
       }
 
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -915,25 +919,27 @@
             for { set j 0 } { $j < $columns } { incr j } {
                if { $havrows($j) < $rows } {
                   for { set i $havrows($j) } { $i < $rows } { incr i } {
-                     set ent [entry $oldthis.canvas.frame$j.entry$i \
+                     CCDTkWidget Ent ent \
+                        entry $Frames($j).entry$i \
                                  -background $notselect \
-                                 -highlightbackground $notselect]
-                     set widgetnames($oldthis:entry$i) $ent
+                                 -highlightbackground $notselect
+                     set widgetnames($Oldthis:entry$i) $Ent
+                     set Entries($j,$i) $Ent
 
 #  Set bindings for controlling selection.
-                     ::bind $ent <1>         "$oldthis _beginselect $i $j %X %Y"
-                     ::bind $ent <B1-Leave>  "$oldthis _autoscan $ent $i $j"
-                     ::bind $ent <ButtonRelease-1> "$oldthis _cancelrepeat %X %Y"
-                     ::bind $ent <Shift-1>   "$oldthis _beginextend $i $j"
-                     ::bind $ent <Control-1> "$oldthis _begintoggle $i $j"
-                     ::bind $ent <B1-Enter>  "$oldthis _cancelrepeat %X %Y"
-                     ::bind $ent <Up>        "$oldthis _updown $i $j -1"
-                     ::bind $ent <Down>      "$oldthis _updown $i $j 1"
-                     ::bind $ent <Shift-Up>  "$oldthis _extendupdown $i $j -1"
-                     ::bind $ent <Shift-Down> "$oldthis _extendupdown $i $j 1"
+                     ::bind $ent <1>         "$Oldthis _beginselect $i $j %X %Y"
+                     ::bind $ent <B1-Leave>  "$Oldthis _autoscan $ent $i $j"
+                     ::bind $ent <ButtonRelease-1> "$Oldthis _cancelrepeat %X %Y"
+                     ::bind $ent <Shift-1>   "$Oldthis _beginextend $i $j"
+                     ::bind $ent <Control-1> "$Oldthis _begintoggle $i $j"
+                     ::bind $ent <B1-Enter>  "$Oldthis _cancelrepeat %X %Y"
+                     ::bind $ent <Up>        "$Oldthis _updown $i $j -1"
+                     ::bind $ent <Down>      "$Oldthis _updown $i $j 1"
+                     ::bind $ent <Shift-Up>  "$Oldthis _extendupdown $i $j -1"
+                     ::bind $ent <Shift-Down> "$Oldthis _extendupdown $i $j 1"
 
 #  And watch for potential modifications.
-                     ::bind $ent <KeyPress>   "$oldthis configure -modified 1"
+                     ::bind $ent <KeyPress>   "$Oldthis configure -modified 1"
 
 #  Pack entry widget into frame.
                      pack $ent -fill x
@@ -944,7 +950,8 @@
 
 #  Need to delete some.
                   for { set i $rows } { $i < $havrows($j) } { incr i } {
-                     destroy $oldthis.canvas.frame$j.entry$i
+                     destroy [CCDPathOf $Entries($j,$i)]
+                     unset $Entries($j,$i)
                      set state($i) 0
                   }
                   set havrows($j) $rows
@@ -967,15 +974,18 @@
 #  Need more columns, so create the frame/label pairs. Once created
 #  place onto the canvas.
                for { set i $havcols } { $i < $columns } { incr i } {
-                  set f [frame $oldthis.canvas.frame$i \
-                            -background $notselect ]
-                  label $f.label -text "Column [expr $i +1]"
-                  $oldthis.canvas create window $xoff 0 \
+                  CCDTkWidget F f \
+                     frame $canvas.frame$i -background $notselect
+                  set Frames($i) $F
+                  CCDTkWidget Labelwidget labelwidget \
+                     label $f.label -text "Column [expr $i +1]"
+                  set Framelabels($i) $Labelwidget
+                  $Canvas create window $xoff 0 \
                      -window $f -anchor nw -tag c$i -width $columnwidth
-                  pack $f.label -fill x
+                  pack $labelwidget -fill x
                   lappend tags c$i
                   set xoff [expr $xoff +$columnwidth]
-                  set widgetnames($oldthis:canvas) $f.label
+                  set widgetnames($Oldthis:canvas) $Labelwidget
 
 #  No rows created in this column yet.
                   set havrows($i) 0
@@ -986,7 +996,8 @@
 
 #  Need to delete some.
                for { set i $columns } { $i < $havcols } { incr i } {
-                  destroy $oldthis.canvas.frame$i
+                  destroy [CCDPathOf $Frames($i)]
+                  unset Frames($i)
 
 #  No rows in this column.
                   set havrows($i) 0
@@ -1005,14 +1016,14 @@
       public width {} {
          if $exists {
             if { $width != "" } {
-               $oldthis.canvas configure -width $width
+               $Canvas configure -width $width
             }
          }
       }
       public height {} {
          if $exists {
             if { $height != "" } {
-               $oldthis.canvas configure -height $height
+               $Canvas configure -height $height
             }
          }
       }
@@ -1034,62 +1045,68 @@
 
 
 #  Unpack the canvas widet, as needs to be packed last.
-            pack forget $oldthis.canvas
+            pack forget $canvas
 
 #  Delete all existing scrollbars and padding frames.
-            if { [ winfo exists $oldthis.pad.hscroll ] } {
-               destroy $oldthis.pad.hscroll
-               destroy $oldthis.pad.bit
-               destroy $oldthis.pad
-               $oldthis.canvas configure -xscrollcommand {}
+            if { [ winfo exists $hscroll ] } {
+               destroy $hscroll
+               destroy $bit
+               destroy $pad
+               set hscroll ""
+               set bit ""
+               set pad ""
+               $Canvas configure -xscrollcommand {}
             }
-            if { [ winfo exists $oldthis.vscroll ] } {
-               destroy $oldthis.vscroll
-               $oldthis.canvas configure -yscrollcommand {}
+            if { [ winfo exists $vscroll ] } {
+               destroy $vscroll
+               set vscroll ""
+               $Canvas configure -yscrollcommand {}
             }
             set vert [lsearch -regexp $scrollbarplaces (right|left)]
             set hori [lsearch -regexp $scrollbarplaces (top|bottom)]
 
 #  Vertical scrollbar is just created.
             if { $vert != -1 } {
-               scrollbar $oldthis.vscroll \
-                  -command "$oldthis.canvas yview" -orient vertical
-               set widgetnames($oldthis:vscroll) $oldthis.vscroll
-               $oldthis.canvas configure -yscrollcommand "$oldthis.vscroll set"
+               CCDTkWidget Vscroll vscroll \
+                  scrollbar $oldthis.vscroll \
+                     -command "$Canvas yview" -orient vertical
+               set widgetnames($Oldthis:vscroll) $Vscroll
+               $Canvas configure -yscrollcommand "$Vscroll set"
             }
 
 #  Horizontal scrollbar requires packing frames for indentation at corners.
             if { $hori != -1 } {
-               frame $oldthis.pad
+               CCDTkWidget Pad pad frame $oldthis.pad
 
 #  Get width of vertical scrollbar. Make corner frame same width.
                if { $vert != -1 } {
-                  set padwidth [$oldthis.vscroll cget -width]
-                  frame $oldthis.pad.bit -width $padwidth
+                  set padwidth [$Vscroll cget -width]
+                  CCDTkWidget Bit bit frame $Pad.bit -width $padwidth
                   set padside [lindex $scrollbarplaces $vert]
                } else {
-                  frame $oldthis.pad.bit
+                  CCDTkWidget Bit bit frame $Pad.bit
                   set padside right
                }
 
-               scrollbar $oldthis.pad.hscroll \
-                  -command "$oldthis.canvas xview" -orient horizontal
-               set widgetnames($oldthis:hscroll) $oldthis.pad.hscroll
-               $oldthis.canvas configure -xscrollcommand "$oldthis.pad.hscroll set"
+               CCDTkWidget Hscroll hscroll \
+                  scrollbar $Pad.hscroll \
+                             -command "$Canvas xview" -orient horizontal
+               set widgetnames($Oldthis:hscroll) $Hscroll
+               $Canvas configure -xscrollcommand "$Hscroll set"
                set side [lindex $scrollbarplaces $hori]
             }
 
 #  Now do packing. Place horizontal first to fill extent and get
 #  padding frames to take up extra.
             if { $hori != -1 } {
-               pack $oldthis.pad -fill x -side $side
-               pack $oldthis.pad.bit -side $padside
-               pack $oldthis.pad.hscroll -fill x -side $side
+               pack $pad -fill x -side $side
+               pack $bit -side $padside
+               pack $hscroll -fill x -side $side
             }
             if { $vert != -1 } {
-               pack $oldthis.vscroll -side [lindex $scrollbarplaces $vert] -fill y
+               pack $vscroll -side [lindex $scrollbarplaces $vert] -fill y
             }
-            pack $oldthis.canvas  -expand true -fill both
+            pack $canvas  -expand true -fill both
          }
       }
 
@@ -1107,6 +1124,21 @@
 #  of this class, protected to just this instance (both are available
 #  anywhere in the scope of this class and in derived classes).
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+#  Names of widgets.
+      protected Canvas
+      protected canvas ""
+      protected Frames
+      protected Framelabels
+      protected Entries
+      protected Hscroll
+      protected hscroll ""
+      protected Vscroll
+      protected vscroll ""
+      protected Bit
+      protected bit ""
+      protected Pad
+      protected pad ""
+
 #  Number of rows and columns already created. Notes havrows is an
 #  array index by column number as the creation of rows and columns
 #  happen in separate parts (so a column can be created and is later

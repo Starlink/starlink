@@ -1,4 +1,4 @@
-proc CCDSetGenGlobals { Top args } {
+proc CCDSetGenGlobals { Topwin args } {
 
 #+
 #  Name:
@@ -35,6 +35,7 @@ proc CCDSetGenGlobals { Top args } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -51,6 +52,8 @@ proc CCDSetGenGlobals { Top args } {
 #        Removed built-in keyboard traversal.
 #     21-OCT-1995 (PDRAPER):
 #        No longer runs any application so just use OK to exit.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -89,50 +92,57 @@ proc CCDSetGenGlobals { Top args } {
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #  Top-level widget.
-   Ccd_toplevel $Top -title {General reduction parameters}
+   CCDCcdWidget Top top \
+      Ccd_toplevel $Topwin -title "General reduction parameters"
 
 #  Menubar.
-   set Menu [Ccd_helpmenubar $Top.menubar]
+   CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
 
 #  Frame for containing all entries.
-   set Frame [frame $Top.center]
+   CCDTkWidget Frame frame frame $top.center
 
 #  Radioarray for KEEPLOG value.
-   set Keeplog [Ccd_radioarray $Frame.keeplog \
-                   -label {Keep application log:} \
-                   -variable {CCDglobalpars(LOGTO)}]
+   CCDCcdWidget Keeplog keeplog \
+      Ccd_radioarray $Frame.keeplog \
+                   -label "Keep application log:" \
+                   -variable CCDglobalpars(LOGTO)
 
 #  Labelled entry for LOGFILE value.
-   set Logfile [Ccd_labent $Frame.logfile \
-                   -text {Name of logfile:} \
-                   -textvariable {CCDglobalpars(LOGFILE)}]
+   CCDCcdWidget Logfile logfile \
+      Ccd_labent $Frame.logfile \
+                   -text "Name of logfile:" \
+                   -textvariable CCDglobalpars(LOGFILE)
 
 #  Radioarray for SATURATE value.
-   set Satur [Ccd_radioarray $Frame.saturate \
-                 -label {Look for saturated pixels:} \
-                 -variable {CCDglobalpars(SATURATE)}\
-                 -standard 1 -adampars 1]
+   CCDCcdWidget Satur satur \
+      Ccd_radioarray $Frame.saturate \
+                 -label "Look for saturated pixels:" \
+                 -variable CCDglobalpars(SATURATE) \
+                 -standard 1 -adampars 1
 
 #  Radioarray for SETSAT value.
-   set Setsat [Ccd_radioarray $Frame.setsat\
-                  -label {Flag saturated pixels using BAD value:} \
-                  -variable {CCDglobalpars(SETSAT)} \
-                  -standard 1 -adampars 1]
+   CCDCcdWidget Setset setsat \
+      Ccd_radioarray $Frame.setsat\
+                  -label "Flag saturated pixels using BAD value:" \
+                  -variable CCDglobalpars(SETSAT) \
+                  -standard 1 -adampars 1
 
 #  Radioarray for GENVAR value.
-   set Genvar [Ccd_radioarray $Frame.genvar \
-                  -label {Generate data errors:} \
-                  -variable {CCDglobalpars(GENVAR)} \
-                  -standard 1 -adampars 1]
+   CCDCcdWidget Genvar genvar \
+      Ccd_radioarray $Frame.genvar \
+                  -label "Generate data errors:" \
+                  -variable CCDglobalpars(GENVAR) \
+                  -standard 1 -adampars 1
 
 #  Radioarray for PRESERVE value.
-   set Preserve [Ccd_radioarray $Frame.preserve \
-                    -label {Preserve data types:} \
-                    -variable {CCDglobalpars(PRESERVE)} \
-                    -standard 1 -adampars 1]
+   CCDCcdWidget Preserve preserve \
+      Ccd_radioarray $Frame.preserve \
+                    -label "Preserve data types:" \
+                    -variable CCDglobalpars(PRESERVE) \
+                    -standard 1 -adampars 1
 
 #  Add choice bar for getting out etc.
-   set Choice [Ccd_choice $Top.choice -standard 0]
+   CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Widget configuration.
@@ -205,15 +215,15 @@ proc CCDSetGenGlobals { Top args } {
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #  Pack all widgets.
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-   pack $Menu       -fill x
-   pack $Choice     -side bottom -fill x
-   pack $Keeplog    -fill x
-   pack $Logfile    -fill x
-   pack $Satur      -fill x
-   pack $Setsat     -fill x
-   pack $Genvar     -fill x
-   pack $Preserve   -fill x
-   pack $Frame      -fill x -expand true
+   pack $menu       -fill x
+   pack $choice     -side bottom -fill x
+   pack $keeplog    -fill x
+   pack $logfile    -fill x
+   pack $satur      -fill x
+   pack $setsat     -fill x
+   pack $genvar     -fill x
+   pack $preserve   -fill x
+   pack $frame      -fill x -expand true
 
 #  Wait for this procedure to exit.
    CCDWindowWait $Top

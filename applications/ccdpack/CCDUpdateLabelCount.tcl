@@ -30,11 +30,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     29-AUG-1995 (PDRAPER):
 #     	 Original version.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -44,8 +47,8 @@
 #.
 
 #  Get the number of entries in the listbox-like widget.
-      if { [winfo exists $Reveal] } { 
-         if { [winfo exists $Box] } { 
+      if { [winfo exists [CCDPathOf $Reveal]] } { 
+         if { [winfo exists [CCDPathOf $Box]] } { 
             set size [$Box size]
             $Reveal resettext $name "$name ($size)"
          }

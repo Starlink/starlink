@@ -1,4 +1,4 @@
-proc CCDNDFOrganize { Top args } {
+proc CCDNDFOrganize { Topwin args } {
 #+
 #  Name:
 #     CCDNDFOrganize
@@ -26,7 +26,7 @@ proc CCDNDFOrganize { Top args } {
 #     this point and can only be re-created by another CCDNDFOrganize call.
 
 #  Arguments:
-#     Top = window (read)
+#     Topwin = window (read)
 #        The top-level window name.
 #     args = list (read)
 #        If present this should be a command to run if the NDF import
@@ -68,6 +68,7 @@ proc CCDNDFOrganize { Top args } {
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -83,6 +84,8 @@ proc CCDNDFOrganize { Top args } {
 #     13-NOV-1995 (PDRAPER):
 #        Added support for masters and using targets as possible
 #        flatfields (IR usage).
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -155,57 +158,64 @@ proc CCDNDFOrganize { Top args } {
 #  Create widgets and associate any help.
 #------------------------------------------------------------------------------
 #  Create top-level object.
-   Ccd_toplevel $Top -title {Organize NDFs}
-   wm withdraw $Top
+   CCDCcdWidget Top top Ccd_toplevel $Topwin -title "Organize NDFs"
+   wm withdraw $top
 
 #  Add standard menubar.
-   set Menu [Ccd_helpmenubar $Top.menu -standard 0]
+   CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menu -standard 0
 
 #  Create frame for central part.
-   set Centre [frame $Top.centre]
+   CCDTkWidget Centre centre frame $top.centre
 
 #  Array of checkbuttons for indicating frames types.
-   set Frames [Ccd_checkarray $Centre.ftypes -label {Frame types present:}]
+   CCDCcdWidget Frames frames \
+      Ccd_checkarray $centre.ftypes -label "Frame types present:"
 
 #  Boolean for indicating more than one filter.
-   set Filter [Ccd_radioarray $Centre.filter \
+   CCDCcdWidget Filter filter \
+      Ccd_radioarray $Centre.filter \
                   -standard 1 \
-                  -label {Data have same filter type:} \
-                  -variable CCDsame(filter)]
+                  -label "Data have same filter type:" \
+                  -variable CCDsame(filter)
 
 #  Names of filters if used.
-   set Filternames [Ccd_labent $Centre.filters \
-                       -text {Filter names:} \
-                       -textvariable CCDfilternames]
+   CCDCcdWidget Filternames filternames \
+      Ccd_labent $Centre.filters \
+                       -text "Filter names:" \
+                       -textvariable CCDfilternames
 
 #  Boolean for use targets as flatfields (uses adam TRUE and FALSE).
-   set Irflats [Ccd_radioarray $Centre.irflats \
+   CCDCcdWidget Irflats irflats \
+      Ccd_radioarray $Centre.irflats \
                    -standard 1 \
                    -adampars 1 \
-                   -label {Use targets as possible flatfields:} \
-                   -variable CCDirflats]
+                   -label "Use targets as possible flatfields:" \
+                   -variable CCDirflats
 
 #  Boolean for master bias state (zeroed or not).
-   set Mbiasstate [Ccd_radioarray $Centre.mbiasstate \
+   CCDCcdWidget Mbiasstate mbiasstate \
+      Ccd_radioarray $Centre.mbiasstate \
                    -standard 1 \
                    -adampars 1 \
-                   -label {Master bias has mean of zero:} \
-                   -variable CCDglobalpars(ZEROED)]
+                   -label "Master bias has mean of zero:" \
+                   -variable CCDglobalpars(ZEROED)
 
 #  Boolean for dark times same.
-   set Darks [Ccd_radioarray $Centre.darkexpose \
+   CCDCcdWidget Darks darks \
+      Ccd_radioarray $Centre.darkexpose \
                  -standard 1 \
-                 -label {Dark times are all the same:} \
-                 -variable CCDsame(darks)]
+                 -label "Dark times are all the same:" \
+                 -variable CCDsame(darks)
 
 #  Boolean for flash times same.
-   set Flashes [Ccd_radioarray $Centre.flashexpose \
+   CCDCcdWidget Flashes flashes \
+      Ccd_radioarray $Centre.flashexpose \
                    -standard 1 \
-                   -label {Flash times are all the same:} \
-                   -variable CCDsame(flashes)]
+                   -label "Flash times are all the same:" \
+                   -variable CCDsame(flashes)
 
 #  Choice for final action.
-   set Choice [Ccd_choice $Top.choice]
+   CCDCcdWidget Choice choice Ccd_choice $Top.choice
 
 #------------------------------------------------------------------------------
 #  Configure widgets.
@@ -359,17 +369,17 @@ proc CCDNDFOrganize { Top args } {
 #------------------------------------------------------------------------------
 #  Pack all widgets.
 #------------------------------------------------------------------------------
-   pack $Menu -fill x
-   pack $Choice -side bottom -fill x
-   pack $Centre -fill both
-   pack $Frames -fill both
-   pack $Filter -fill x
-   pack $Filternames -fill x
-   pack $Irflats -fill x
-   pack $Mbiasstate -fill x
-   pack $Darks -fill x
-   pack $Flashes -fill x
-   wm deiconify $Top
+   pack $menu -fill x
+   pack $choice -side bottom -fill x
+   pack $centre -fill both
+   pack $frames -fill both
+   pack $filter -fill x
+   pack $filternames -fill x
+   pack $irflats -fill x
+   pack $mbiasstate -fill x
+   pack $darks -fill x
+   pack $flashes -fill x
+   wm deiconify $top
 
 #------------------------------------------------------------------------------
 #  Wait for interaction to finish.

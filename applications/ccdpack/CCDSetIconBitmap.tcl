@@ -1,4 +1,4 @@
-   proc CCDSetIconBitmap { topwin } {
+   proc CCDSetIconBitmap { Topwin } {
 #+
 #  Name:
 #     CCDSetIconBitmap
@@ -21,11 +21,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     2-MAR-1994 (PDRAPER):
 #     	 Original version.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -35,6 +38,7 @@
 #.
 
 #  Set the icon bitmap.
+      set topwin [CCDPathOf $Topwin]
       wm iconbitmap $topwin @$CCDdir/ccdbitmap
       }
 # $Id$

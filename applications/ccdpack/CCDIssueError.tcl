@@ -46,7 +46,7 @@
       if { [winfo exists .topwin.ccdissueerror] } { 
          tkwait window .topwin.ccdissueerror
       }
-      CCDDialog .topwin.ccdissueerror "Error..." "$message" error
+      CCDDialog [CCDCmdOf .topwin.ccdissueerror] "Error..." "$message" error
    } else {
       puts "Error. $message"
    }

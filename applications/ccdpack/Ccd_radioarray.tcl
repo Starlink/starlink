@@ -129,6 +129,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -143,6 +144,8 @@
 #        longer needed.
 #     29-AUG-1995 (PDRAPER):
 #        Added resettext method.
+#     12-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 
 #-
@@ -191,41 +194,43 @@
          }
          incr nbutton
          if { $args == {} } {
-            radiobutton $oldthis.button$nbutton \
-               -text "$name" \
-               -width $buttonwidth \
-               -anchor w \
-               -variable $variable \
-               -value $value
+            CCDTkWidget Button button \
+               radiobutton $oldthis.button$nbutton \
+                  -text "$name" \
+                  -width $buttonwidth \
+                  -anchor w \
+                  -variable $variable \
+                  -value $value
          } else {
 
 #  Descend into "quoting hell".
-            eval radiobutton \$oldthis.button$nbutton \
-               -text \"$name\" \
-               -width $buttonwidth \
-               -command "$args" \
-               -anchor w \
-               -variable $variable \
-               -value $value
+            CCDTkWidget Button button \
+               radiobutton $oldthis.button$nbutton \
+                  -text "$name" \
+                  -width $buttonwidth \
+                  -command [join $args] \
+                  -anchor w \
+                  -variable $variable \
+                  -value $value
          }
-         set buttonnames($name) $nbutton
+         set Buttons($name) $Button
+         lappend Buttonlist $Button
 
 #  And repack buttons.
          _repack
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:$name) $oldthis.button$nbutton
-         set widgetfocus($oldthis:$name) $oldthis.button$nbutton
+         set widgetnames($Oldthis:$name) $Button
+         set widgetfocus($Oldthis:$name) $Button
       }
 
 #  Method to add a command to a button.
       method addcommand { name command } {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Add the command.
-            $oldthis.button$buttonnames($name) configure \
-               -command "$command"
+            $Buttons($name) configure -command "$command"
          } else {
             error "No radiobutton of name \"$name\""
          }
@@ -235,7 +240,7 @@
 #  the "name" of the button used internal and for access via methods, remains
 #  the same.
       method resettext {name text} {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
             set newwidth [ string length $text ]
             if { $newwidth > $buttonwidth } {
                if { $newwidth <= $maxwidth || $maxwidth == 0 } {
@@ -244,7 +249,7 @@
                   _repack
                }
             }
-            $oldthis.button$buttonnames($name) configure -text "$text"
+            $Buttons($name) configure -text "$text"
          }
       }
 
@@ -255,18 +260,19 @@
 #  Buttons in a stack, $columns wide.
             if { $nbutton > 0 } {
                set incol 0
-               for { set i 1 } { $i <= $nbutton } { incr i } {
+               foreach Button $Buttonlist {
+                  set button [CCDPathOf $Button]
                   if { $resize } {
-                     $oldthis.button$i configure -width $buttonwidth
+                     $Button configure -width $buttonwidth
                   }
-                  pack forget $oldthis.button$i
-                  pack $oldthis.button$i -in $oldthis.frame$incol -anchor w -side top
-                  raise $oldthis.button$i
+                  pack forget $button
+                  pack $button -in $Frames($incol) -anchor w -side top
+                  raise $button
                   incr incol
                   if { $incol == $columns } { set incol 0 }
                }
                for { set i 0 } { $i < $columns } { incr i } {
-                  pack $oldthis.frame$i -side left -fill y
+                  pack $Frames($i) -side left -fill y
                }
             }
          } else {
@@ -276,12 +282,13 @@
                set side "top"
             }
             if { $nbutton > 0 } {
-               for { set i 1 } { $i <= $nbutton } { incr i } {
+               foreach Button $Buttonlist {
+                  set button [CCDPathOf $Button]
 
 #  See if buttons need resizing before packing
-                  if { $resize } { $oldthis.button$i configure -width $buttonwidth }
-                  pack forget $oldthis.button$i
-                  pack $oldthis.button$i -side $side -anchor w
+                  if { $resize } { $Button configure -width $buttonwidth }
+                  pack forget $button
+                  pack $button -side $side -anchor w
                }
                set resize 0
             }
@@ -290,10 +297,10 @@
 
 #  Method for invoking named button.
       method invoke name {
-         if { [ info exists buttonnames($name) ] } {
+         if { [ info exists Buttons($name) ] } {
 
 #  Invoke the button.
-            $oldthis.button$buttonnames($name) invoke
+            $Buttons($name) invoke
          } else {
             error "No radiobutton of name \"$name\""
          }
@@ -302,19 +309,18 @@
 #  Set the state of a named button.
       method state { name state } {
          if { $name != "all" } {
-            if { [ info exists buttonnames($name) ] } {
+            if { [ info exists Buttons($name) ] } {
 
 #  Set the button state.
-               $oldthis.button$buttonnames($name) configure \
-                  -state $state
+               $Buttons($name) configure -state $state
             } else {
                error "No radiobutton of name \"$name\""
             }
          } else {
-            foreach oneof [ array names buttonnames ] {
+            foreach Button $Buttonlist {
 
 #  Set the button state.
-               $oldthis.button$buttonnames($oneof) configure -state $state
+               $Button configure -state $state
             }
          }
       }
@@ -322,18 +328,18 @@
 #  Toggle the selection state of a named button.
       method toggle { name } {
          if { $name != "all" } {
-            if { [ info exists buttonnames($name) ] } {
+            if { [ info exists Buttons($name) ] } {
 
 #  Toggle the button selection state.
-               $oldthis.button$buttonnames($name) toggle
+               $Buttons($name) toggle
             } else {
                error "No radiobutton of name \"$name\""
             }
          } else {
-            foreach oneof [ array names buttonnames ] {
+            foreach Button $Buttonlist {
 
 #  Toggle the button selection state.
-               $oldthis.button$buttonnames($oneof) toggle
+               $Button toggle
             }
          }
       }
@@ -343,14 +349,13 @@
 
 #  Request to bind all elements to help.
          if { $nbutton > 0 } {
-            foreach oneof [ array names buttonnames ] {
-               Ccd_base::sethelp \
-                  $oldthis.button$buttonnames($oneof) $docname $label
+            foreach Button $Buttonlist {
+               Ccd_base::sethelp $Button $docname $label
             }
          }
-         Ccd_base::sethelp $oldthis $docname $label
-         if { [winfo exists $oldthis.label] } {
-            Ccd_base::sethelp $oldthis.label $docname $label
+         Ccd_base::sethelp $Oldthis $docname $label
+         if { [winfo exists $labelwidget ] } {
+            Ccd_base::sethelp $Labelwidget $docname $label
          }
       }
 
@@ -388,11 +393,13 @@
          if $exists {
             if { $availcols > $columns } {
                for { set i $availcols } { $i > $columns } { incr i -1 } {
-                  destroy $oldthis.frame$i
+                  set frame [CCDPathOf $Frames($i)]
+                  destroy $frame
                }
             } elseif { $availcols < $columns } {
                for { set i $availcols } { $i < $columns } { incr i } {
-                  frame $oldthis.frame$i
+                  CCDTkWidget Frame frame frame $oldthis.frame$i
+                  set Frames($i) $Frame
                }
             }
             set availcols $columns
@@ -404,12 +411,13 @@
       public label {} {
          if $exists  {
             if { $label != {} } {
-               label $oldthis.label -text $label
-	       pack $oldthis.label -side left -anchor w
+               CCDTkWidget Labelwidget labelwidget \
+                  label $oldthis.label -text "$label"
+	       pack $labelwidget -side left -anchor w
                _repack
             } else {
-               if { [ winfo exists $oldthis.label ] } {
-                  destroy $oldthis.label
+               if { [ winfo exists $labelwidget ] } {
+                  destroy $labelwidget
                }
             }
          }
@@ -419,8 +427,8 @@
       public variable { $oldthis } {
          if $exists {
             if { $nbutton > 0 } {
-               for { set i 1 } { $i <= $nbutton } { incr i } {
-                  $oldthis.button$i configure -variable $variable
+               foreach Button $Buttonlist {
+                  $Button configure -variable $variable
                }
             }
          }
@@ -444,7 +452,11 @@
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #   Number of buttons in the menubar and their names.
       protected nbutton 0
-      protected buttonnames
+      protected Buttons
+      protected Buttonlist ""
+      protected Frames
+      protected Labelwidget
+      protected labelwidget ""
 
 #  The widths of the buttons. The actual width is never less than this
 #  and all buttons are the same width.

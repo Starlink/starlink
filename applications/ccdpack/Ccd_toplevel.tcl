@@ -97,6 +97,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -115,6 +116,8 @@
 #        Changed stacking behaviour to more WM friendly "wm
 #        transient". Explicit raises cause problems with some window
 #        managers performance.
+#     15-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -158,14 +161,14 @@
 
 #  Define sub-component widgets for configuration via the wconfig
 #  method.
-         set widgetnames($oldthis:toplevel) $oldthis
+         set widgetnames($Oldthis:toplevel) $Oldthis
 
 #  Remember all the names of top-level widgets.
-         set twidgets($tcount) $oldthis
+         set twidgets($tcount) $Oldthis
          incr tcount
 
 #  Trap window manager based destruction.
-         wm protocol $oldthis WM_DELETE_WINDOW "$oldthis kill $oldthis"
+         wm protocol $oldthis WM_DELETE_WINDOW "$Oldthis kill $Oldthis"
 
 #  Re-establish the stacking order.
          configure -stacked $stacked
@@ -191,8 +194,8 @@
 #  And remove this widget from lists.
          if { $tcount > 0 } {
             for { set i [expr $tcount -1]} { $i > -1 } { incr i -1 } {
-               set widget $twidgets($i)
-               if { "$widget" == "$oldthis" } {
+               set Widget $twidgets($i)
+               if { "$Widget" == "$Oldthis" } {
                   set twidgets($i) ""
                   if { $i != [expr $tcount -1] } {
                      set newcount 0
@@ -229,14 +232,15 @@
          switch $option {
             hold {
                for { set i 0 } { $i < $tcount } { incr i } {
-                  set widget $twidgets($i)
+                  set Widget $twidgets($i)
+                  set widget [CCDPathOf $Widget]
                   if { [ winfo exists $widget ] } {
                      if { $widget != $also } {
 
 #  If the widget is already busy then do nothing.
-                        if { ! [ info exists widgetbusy($widget) ] } {
+                        if { ! [ info exists widgetbusy($Widget) ] } {
                            blt::busy hold $widget
-                           set widgetbusy($widget) $oldthis
+                           set widgetbusy($Widget) $Oldthis
                         }
                      }
                   }
@@ -244,15 +248,16 @@
 	    }
 	    forget {
                for { set i 0 } { $i < $tcount } { incr i } {
-                  set widget $twidgets($i)
+                  set Widget $twidgets($i)
+                  set widget [CCDPathOf $Widget]
                   if { [ winfo exists $widget ] } {
                      if { $widget != $also } {
 
 #  Only remove the busy flag if this is the correct window to do this.
-                        if { [ info exists widgetbusy($widget) ] } {
-                           if { $widgetbusy($widget) == $oldthis } {
+                        if { [ info exists widgetbusy($Widget) ] } {
+                           if { $widgetbusy($Widget) == $Oldthis } {
                               blt::busy forget $widget
-                              unset widgetbusy($widget)
+                              unset widgetbusy($Widget)
                            }
                         }
 		     }
@@ -266,7 +271,7 @@
 #  Set the default help for the window.
       method sethelp { docname label } {
          if $exists {
-            Ccd_base::sethelp $oldthis $docname $label
+            Ccd_base::sethelp $Oldthis $docname $label
          }
       }
 
@@ -280,7 +285,7 @@
             if { $CCDbitmap == "ccdbitmap" } {
 
 #  Standard bitma, so use standard routine.
-               CCDSetIconBitmap $oldthis
+               CCDSetIconBitmap $Oldthis
             } else {
 
 #  Non-standard bitmap, assume path name is complete.
@@ -299,7 +304,7 @@
       public width {} {
          if { $width != "" } {
             if $exists {
-               $oldthis configure -width $width
+               $Oldthis configure -width $width
             }
          }
       }
@@ -307,7 +312,7 @@
       public height {} {
          if { $height != "" } {
             if $exists {
-               $oldthis configure -height $height
+               $Oldthis configure -height $height
             }
          }
       }
@@ -316,7 +321,7 @@
 #  Do not make the main window (.topwin) a transient.
       public stacked 1 { 
          if { $exists && $stacked } {
-            if { $oldthis != ".topwin" } {
+            if { $Oldthis != ".topwin" } {
                wm transient $oldthis [winfo parent $oldthis]
             }
          }

@@ -32,6 +32,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -41,6 +42,8 @@
 #        Removed built-in keyboard traversal.
 #     18-AUG-1995 (PDRAPER):
 #        Recoded to new standards.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
 
 #-
@@ -61,53 +64,62 @@
 #------------------------------------------------------------------------------
 
 #  Top-level widget for this form.
-      Ccd_toplevel $Top -title {Import FITS information into NDFs}
+      CCDCcdWidget Topwin topwin \
+         Ccd_toplevel $Top -title "Import FITS information into NDFs"
 
 #  Menubar.
-      set Menu [Ccd_helpmenubar $Top.menubar]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Topwin.menubar
 
 #  Labelled entry for name of import table.
-      set Frame0 [frame $Top.frame0]
-      set Table [Ccd_labent $Frame0.table -text {Import Control Table:} \
-                    -textvariable CCDimporttable]
+      CCDTkWidget Frame0 frame0 frame $topwin.frame0
+      CCDCcdWidget Table table \
+         Ccd_labent $Frame0.table -text "Import Control Table:" \
+                     -textvariable CCDimporttable
 
 #  Frames for containing the current directory and file filters and the
 #  scrollboxes for directories and files.
-      set Frame1  [frame $Top.frame1]
-      set Frame11 [frame $Frame1.frame1]
+      CCDTkWidget Frame1 frame1 frame $topwin.frame1
+      CCDTkWidget Frame11 frame11 frame $frame1.frame1
 
 #  Labelled entry for current directory.
-      set Directory [Ccd_labent $Frame11.direct -text {Directory:}]
+      CCDCcdWidget Directory directory \
+         Ccd_labent $Frame11.direct -text Directory:
 
 #  Labelled entry for file filter
       if { [llength $CCDimagefilters] > 1 } { 
-         set Filefilter [Ccd_option $Frame11.filter -text {File Filter:}]
+         CCDCcdWidget Filefilter filefilter \
+            Ccd_option $Frame11.filter -text "File Filter:"
       } else {
-         set Filefilter [Ccd_labent $Frame11.filter -text {File Filter:}]
+         CCDCcdWidget Filefilter filefilter \
+            Ccd_labent $Frame11.filter -text "File Filter:"
       }
 
 #  List of directories scrollbox.
-      set Directbox [Ccd_scrollbox $Frame1.directbox \
-                        -singleselect 1 -label {Directories:} \
-                        -exportselect 0]
+      CCDCcdWidget Directbox directbox \
+         Ccd_scrollbox $Frame1.directbox \
+                        -singleselect 1 -label Directories: \
+                        -exportselect 0
 
 #  List of files in current directory scrollbox.
-      set Filebox [Ccd_scrollbox $Frame1.filebox \
-                      -label {Files in directory:} -singleselect 0 \
-                      -exportselect 0]
+      CCDCcdWidget Filebox filebox \
+         Ccd_scrollbox $Frame1.filebox \
+                      -label "Files in directory:" -singleselect 0 \
+                      -exportselect 0
 
 #  Selected files scrollbox.
-      set Frame2 [frame $Top.frame2]
-      set Selectbox [Ccd_scrollbox $Frame2.selectbox \
-                        -label {Files selected:} -singleselect 0 \
-                        -exportselect 0]
+      CCDTkWidget Frame2 frame2 frame $topwin.frame2
+      CCDCcdWidget Selectbox selectbox \
+         Ccd_scrollbox $Frame2.selectbox \
+                        -label "Files selected:" -singleselect 0 \
+                        -exportselect 0
 
 #  Options for adding and removing entries from the list of selected names.
-      set Options [Ccd_choice $Frame1.options -standard 0 -stack vertical]
+      CCDCcdWidget Options options \
+         Ccd_choice $Frame1.options -standard 0 -stack vertical
 
 
 #  Add choice bar for control (OK, Cancel etc.).
-      set Choice [Ccd_choice $Top.choice]
+      CCDCcdWidget Choice choice Ccd_choice $Topwin.choice
 
 #-----------------------------------------------------------------------------
 #  Widget configuration.
@@ -126,7 +138,7 @@
 	  global CCDimportfilter 
           set CCDimportexists 0
 	  set CCDimportfilter \"*.DAT\"
-          CCDGetFileName $Top.getnames {Select import control table}
+          CCDGetFileName $Topwin.getnames {Select import control table}
           if { \$CCDimportexists } {
              $Table clear 0 end
              $Table insert end \$CCDimportfile
@@ -138,7 +150,7 @@
          "global CCDimportexists
           global CCDimportfile
           set CCDimportexists 0
-          CCDCreateImportTable $Top.create \[$Table get\]
+          CCDCreateImportTable $Topwin.create \[$Table get\]
           if { \$CCDimportexists } {
              $Table clear 0 end
              $Table insert end \$CCDimportfile
@@ -211,24 +223,24 @@
          global CCDcurrentdirectory
          set index \[ %W nearest %y\]
          set filename \[ %W get \$index \]
-         set directory \$CCDcurrentdirectory
-         if { \$directory == \"/\" } {
+         set dir \$CCDcurrentdirectory
+         if { \$dir == \"/\" } {
             $Selectbox insert end \"/\$filename\"
          } else {
-            $Selectbox insert end \"\$directory/\$filename\"
+            $Selectbox insert end \"\$dir/\$filename\"
          }
 	 $Filebox select clear 0 end
       "
       $Filebox bind list <Return> "
          global CCDcurrentdirectory
 	 set indices \[ %W curselection \]
-         set directory \$CCDcurrentdirectory
+         set dir \$CCDcurrentdirectory
          foreach i \"\$indices\" {
             set filename \[ %W get \$i \]
-            if { \$directory == \"/\" } {
+            if { \$dir == \"/\" } {
                $Selectbox insert end \"/\$filename\"
             } else {
-               $Selectbox insert end \"\$directory/\$filename\"
+               $Selectbox insert end \"\$dir/\$filename\"
             }
          }
 	 $Filebox select clear 0 end
@@ -239,20 +251,20 @@
       $Options addbutton {Add} \
 	 "global CCDcurrentdirectory
           if { \$CCDcurrentdirectory == \"/\" } {
-             set directory \"/\"
+             set dir \"/\"
           } else {
-             set directory \"\${CCDcurrentdirectory}/\"
+             set dir \"\${CCDcurrentdirectory}/\"
           }
-          CCDCopyListbox $Filebox $Selectbox select \$directory
+          CCDCopyListbox $Filebox $Selectbox select \$dir
          "
       $Options addbutton {Add all} \
 	 "global CCDcurrentdirectory
           if { \$CCDcurrentdirectory == \"/\" } {
-             set directory \"/\"
+             set dir \"/\"
           } else {
-             set directory \"\${CCDcurrentdirectory}/\"
+             set dir \"\${CCDcurrentdirectory}/\"
           }
-          CCDCopyListbox $Filebox $Selectbox range 0 end \$directory
+          CCDCopyListbox $Filebox $Selectbox range 0 end \$dir
          "
       $Options addbutton {Remove} "CCDRemoveFromList $Selectbox clear"
       $Options addbutton {Remove all} "$Selectbox clear 0 end"
@@ -264,10 +276,10 @@
          "set size \[$Selectbox size\]
           if { \$size != 0 } {
              set CCDallndfs \[$Selectbox get all\]
-             set table \[$Table get\]
-             if { \$table != \"\" } {
-                CCDFITSDoImport $Top \[$Table get\] $args
-                $Top kill $Top
+             set tab \[$Table get\]
+             if { \$tab != \"\" } {
+                CCDFITSDoImport $Topwin \[$Table get\] $args
+                $Topwin kill $Topwin
              } else {
                 CCDIssueInfo {You must supply the name of an import control table}
              }
@@ -285,12 +297,12 @@
              \[$Directory get\] $Directory $Choice Filter
          "
 
-      $Choice addcommand {Cancel} "$Top kill $Top"
+      $Choice addcommand {Cancel} "$Topwin kill $Topwin"
 
 #------------------------------------------------------------------------------
 #  Set help for window and widgets.
 #------------------------------------------------------------------------------
-      $Top sethelp ccdpack CCDFITSImportWindow
+      $Topwin sethelp ccdpack CCDFITSImportWindow
       $Menu sethelpitem {On Window} ccdpack CCDFITSImportWindow
       $Menu sethelp all ccdpack CCDFITSImportMenu
       $Directory sethelp ccdpack CCDFITSImportDirectory
@@ -301,21 +313,21 @@
 #------------------------------------------------------------------------------
 #  Pack all widgets.
 #------------------------------------------------------------------------------
-      pack $Menu       -side top -fill x
-      pack $Choice     -side bottom -fill x
+      pack $menu       -side top -fill x
+      pack $choice     -side bottom -fill x
 
-      pack $Frame11    -side top -fill x
-      pack $Directory  -side top -fill x
-      pack $Filefilter -side top -fill x
-      pack $Directbox  -side left -fill both
-      pack $Filebox    -side left -fill both
-      pack $Options    -side left -fill both
-      pack $Selectbox  -side top  -fill both -expand true
-      pack $Table      -side top -fill x
+      pack $frame11    -side top -fill x
+      pack $directory  -side top -fill x
+      pack $filefilter -side top -fill x
+      pack $directbox  -side left -fill both
+      pack $filebox    -side left -fill both
+      pack $options    -side left -fill both
+      pack $selectbox  -side top  -fill both -expand true
+      pack $table      -side top -fill x
 
-      pack $Frame0     -side top -fill x
-      pack $Frame1     -side left -fill both
-      pack $Frame2     -side right -fill both -expand true
+      pack $frame0     -side top -fill x
+      pack $frame1     -side left -fill both
+      pack $frame2     -side right -fill both -expand true
 
 
 #------------------------------------------------------------------------------
@@ -343,7 +355,7 @@
       $Choice invoke Filter
 
 #  Wait for interaction to end.
-      CCDWindowWait $Top
+      CCDWindowWait $Topwin
 
 #  End of procedure.
    }

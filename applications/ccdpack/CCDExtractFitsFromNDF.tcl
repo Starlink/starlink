@@ -71,10 +71,10 @@ proc CCDExtractFitsFromNDF { Top From To } {
 
                   if { [ regexp $xy12_rx $value ] } {
                      regsub { *$} $key "" key
-                     $To insert end "${key}<X1>"
-                     $To insert end "${key}<X2>"
-                     $To insert end "${key}<Y1>"
-                     $To insert end "${key}<Y2>"
+                     $To insert end "${key}(X1)"
+                     $To insert end "${key}(X2)"
+                     $To insert end "${key}(Y1)"
+                     $To insert end "${key}(Y2)"
                   }
                }
             }

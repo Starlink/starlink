@@ -27,6 +27,7 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -44,6 +45,8 @@
 #        tk_focusFollowsMouse option.
 #     26-MAY-1995 (PDRAPER):
 #        Removed strict Motif directive.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_further_changes_here}
 #-
 
@@ -126,7 +129,6 @@
             foreground                 $CCDprefs(fg) \
             highlightBackground        $CCDprefs(bg) \
             selectBackground           $CCDprefs(select1_bg) \
-            selectBorderWidth          $CCDprefs(border) \
             selectColor                $CCDprefs(selector) \
             selectForeground           $CCDprefs(select_fg) \
             troughColor                $CCDprefs(bg) \

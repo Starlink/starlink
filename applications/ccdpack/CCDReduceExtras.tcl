@@ -1,4 +1,4 @@
-   proc CCDReduceExtras { Top } {
+   proc CCDReduceExtras { Topwin } {
 #+
 #  Name:
 #     CCDReduceExtras
@@ -16,7 +16,7 @@
 #     the script to use and its type.
 
 #  Arguments:
-#     Top = window (read)
+#     Topwin = window (read)
 #        The name of the top-level window for this form.
 
 #  Global parameters:
@@ -25,6 +25,7 @@
    
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  Notes:
@@ -40,6 +41,8 @@
 #        Removed built-in keyboard traversal.
 #     23-AUG-1995 (PDRAPER):
 #        Converted to coding style.
+#     16-MAY-2000 (MBT):
+#        Upgraded for Tcl8.
 #     {enter_changes_here}
    
 #-
@@ -53,69 +56,81 @@
 #----------------------------------------------------------------------------
    
 #  Create a top-level window.
-      Ccd_toplevel $Top -title "Reduce additional parameters"
+      CCDCcdWidget Top top \
+         Ccd_toplevel $Topwin -title "Reduce additional parameters"
 
 #  Add a menubar.
-      set Menu [Ccd_helpmenubar $Top.menubar -standard 1]
+      CCDCcdWidget Menu menu Ccd_helpmenubar $Top.menubar
 
 
 #  Intermediary frame extensions. Extension to debiassed NDF names.
-      set Debext [Ccd_labent $Top.debext \
-                     -text {Extension of debiassed frames:} \
-                     -textvariable CCDglobalpars(DEBIASEXT)]
+      CCDCcdWidget Debext debext \
+         Ccd_labent $Top.debext \
+                     -text "Extension of debiassed frames:" \
+                     -textvariable CCDglobalpars(DEBIASEXT)
 
 #  Extension to dark corrected NDF names.
-      set Darkext [Ccd_labent $Top.darkext \
-                      -text {Extension of dark corrected frames:} \
-                      -textvariable CCDglobalpars(DARKEXT)]
+      CCDCcdWidget Darkext darkext \
+         Ccd_labent $Top.darkext \
+                      -text "Extension of dark corrected frames:" \
+                      -textvariable CCDglobalpars(DARKEXT)
 
 #  Extension to flash corrected NDF names.
-      set Flashext [Ccd_labent $Top.flashext \
-                       -text {Extension of flash corrected frames:} \
-                       -textvariable CCDglobalpars(FLASHEXT)]
+      CCDCcdWidget Flashext flashext \
+         Ccd_labent $Top.flashext \
+                       -text "Extension of flash corrected frames:" \
+                       -textvariable CCDglobalpars(FLASHEXT)
 
 #  Extension to flatfielded NDF names.
-      set Flatext [Ccd_labent $Top.flatext \
-                      -text {Extension of flatfielded frames:} \
-                      -textvariable CCDglobalpars(FLATEXT)]
+      CCDCcdWidget Flatext flatext \
+         Ccd_labent $Top.flatext \
+                      -text "Extension of flatfielded frames:" \
+                      -textvariable CCDglobalpars(FLATEXT)
 
 #  Names of the master NDFs: Bias.
-      set Masterbias [Ccd_labent $Top.masterbias \
-                         -text {Name of master bias:} \
-                         -textvariable CCDglobalpars(MASTERBIAS)]
+      CCDCcdWidget Masterbias masterbias \
+         Ccd_labent $Top.masterbias \
+                         -text "Name of master bias:" \
+                         -textvariable CCDglobalpars(MASTERBIAS)
 
 #  Dark
-      set Masterdark [Ccd_labent $Top.masterdark \
-                         -text {Name of master dark:} \
-                         -textvariable CCDglobalpars(MASTERDARK)]
+      CCDCcdWidget Masterdark masterdark \
+         Ccd_labent $Top.masterdark \
+                         -text "Name of master dark:" \
+                         -textvariable CCDglobalpars(MASTERDARK)
 
 #  Flash.
-      set Masterflash [Ccd_labent $Top.masterflash \
-                          -text {Name of master flash:} \
-                          -textvariable CCDglobalpars(MASTERFLASH)]
+      CCDCcdWidget Masterflash masterflash \
+         Ccd_labent $Top.masterflash \
+                          -text "Name of master flash:" \
+                          -textvariable CCDglobalpars(MASTERFLASH)
 
 #  Flat prefix.
-      set Masterflat [Ccd_labent $Top.masterflat \
-                         -text {Prefix name for master flatfields:} \
-                         -textvariable CCDglobalpars(MASTERFLAT)]
+      CCDCcdWidget Masterflat masterflat \
+         Ccd_labent $Top.masterflat \
+                         -text "Prefix name for master flatfields:" \
+                         -textvariable CCDglobalpars(MASTERFLAT)
 
 #  Get the name of the script.
-      set Scriptname [Ccd_labent $Top.scriptname \
-                         -text {Name of script:} \
-                         -textvariable CCDglobalpars(SCRIPTNAME)]
+      CCDCcdWidget Scriptname scriptname \
+         Ccd_labent $Top.scriptname \
+                         -text "Name of script:" \
+                         -textvariable CCDglobalpars(SCRIPTNAME)
 
 #  Get the type of script.
-      set Scripttype [Ccd_radioarray $Top.scripttype \
-                         -label {Script type:} \
-                         -variable CCDglobalpars(SCRIPTTYPE)]
+      CCDCcdWidget Scripttype scripttype \
+         Ccd_radioarray $Top.scripttype \
+                         -label "Script type:" \
+                         -variable CCDglobalpars(SCRIPTTYPE)
 
 #  Get the name of the logfile for the reduce job.
-      set Exelogfile [Ccd_labent $Top.exelogfile \
-                         -text {Name of log file for background job:} \
-                         -textvariable CCDglobalpars(EXELOGFILE)]
+      CCDCcdWidget Exelogfile exelogfile \
+         Ccd_labent $Top.exelogfile \
+                         -text "Name of log file for background job:" \
+                         -textvariable CCDglobalpars(EXELOGFILE)
 
 #  Add choice bar for getting out.
-      set Choice [Ccd_choice $Top.choice -standard 0]
+      CCDCcdWidget Choice choice Ccd_choice $Top.choice -standard 0
 
 #----------------------------------------------------------------------------
 #  Widget configuration.
@@ -151,12 +166,12 @@
 #----------------------------------------------------------------------------
 #  Pack all widgets.
 #----------------------------------------------------------------------------
-      pack $Menu -fill x
-      pack $Choice -side bottom -fill x
-      pack $Debext $Darkext $Flashext $Flatext -fill x
-      pack $Masterbias $Masterdark $Masterflash $Masterflat -fill x
-#      pack $Scriptname $Scripttype $Exelogfile -fill x
-      pack $Scriptname $Exelogfile -fill x
+      pack $menu -fill x
+      pack $choice -side bottom -fill x
+      pack $debext $darkext $flashext $flatext -fill x
+      pack $masterbias $masterdark $masterflash $masterflat -fill x
+#      pack $scriptname $scripttype $exelogfile -fill x
+      pack $scriptname $exelogfile -fill x
 
 #  End of procedure.
    }
