@@ -152,8 +152,40 @@ Starlink programcode architecture.
 which should be processed (not currently implemented).
 
 <element gi='colspec'>
-<p>The colspec element controls the layout of a column in a table (not
-implemented).
+<p>The colspec element controls the default layout of a column in a table.
+The attributes here take their defaults from attributes with the same
+names in <elemref gi='tabular'> and <elemref gi='tgroup'>, and provide
+the default for individual <elemref gi='entry'> elements.
+
+<p>You do not have to have a <elemref gi='colspec' self> element for
+each column in the table.  If all of the columns in a table are to be
+left-aligned except the third one, say, then you would specify left
+alignment in the <elemref gi='tgroup'> start-tag, and give a <elemref
+gi='colspec' self> element like <code>&lt;colspec colnum=3
+align=center></code>.
+
+<attribute name='align'>
+Default alignment of entries in cells.
+<attribute name='char'>
+Alignment character (<em/not supported/).
+<attribute name='charoff'>
+Alignment character (<em/not supported/).
+<attribute name='colname'>
+A name for this column.  An <elemref gi='entry'> element may refer to
+a column by name in a `colname' or `namest' attribute.
+<attribute name='colnum'>
+This column's number.  If this is omitted, the column's number is
+taken to be one greater than the previous column, with the first
+column being taken to be number 1.
+<attribute name='colsep'>
+The default value of the colsep attribute for entries in this <elemref
+gi='tgroup'>. 
+<attribute name='colwidth'>
+The width of this column (<em/not supported/).
+<attribute name='rowsep'>
+The default value of the rowsep attribute for entries in this <elemref
+gi='tgroup'>.
+
 
 <element gi='copyright'>
 <p>Specifies a copyright declaration for the document.
@@ -259,7 +291,52 @@ don't really count as authoring contributions.
 <p>Emphasised text.
 
 <element gi='entry'>
-<p>A single cell in a table row.
+<p>A single cell in a table row.  You need not supply all the entries
+for a row.  If an <elemref gi='entry'> element supplies the `colname'
+or `namest' attributes, then that attribute refers to a <elemref
+gi='colspec'> element in the same <elemref gi='tgroup'>, and this
+entry is taken to have the column number corresponding to that
+<elemref gi='colspec'>.  If you wish an entry to span more than one
+column, then supply both the `namest' and `nameend' attributes.  It is
+an error if the `colname' or `namest' attributes are inconsistent with
+the number of <elemref gi='entry'> elements actually supplied.
+<example><![CDATA[
+<tgroup cols=4>
+<colspec colname=second colnum=2>
+<colspec colname=last colnum=4 align=right>
+<row>
+<entry colname=second>two<entry>three<entry>four
+<row>
+<entry>uno<entry namest=second nameend=last>due a quattro
+]]>
+</example>
+
+<attribute name='align'>
+Alignment of this entry (<em/not supported/).
+<attribute name='char'>
+Character to align on (<em/not supported/).
+<attribute name='charoff'>
+Offset for character alignment (<em/not supported/).
+<attribute name='colname'>
+Identifies which column this entry corresponds to.
+<attribute name='colsep'>
+If present and non-zero, then this column will have a line separator
+following it (<em/not supported/).
+<attribute name='morerows'>
+If present and non-zero, this indicates the number of rows deep this
+entry is to be.  That is, this indicates vertical spanning where the
+`namest' and `nameend' attributes indicate horizontal spanning
+(<em/not supported/).
+<attribute name='nameend'>
+Indicates the end of the horizontal span.
+<attribute name='namest'>
+Indicates the start of a horizontal span.
+<attribute name='rowsep'>
+If present and non-zero, this indicates that there should be a line
+separating this row from the next (<em/not supported/).
+<attribute name='valign'>
+Controls the vertical alignment of the entry's contents (<em/not supported/).
+
 
 <element gi='figure'>
 <p>A figure.  The content of the figure, in the <elemref
@@ -365,8 +442,9 @@ The usual JPEG, GIF and encapsulated postscript formats.
 <p><code/metapost/:
 Metapost source code.  This is a text-based drawing package.  That
 sounds odd, but it is in fact very flexible, and useful for drawing
-certain types of diagrams.  It's described at
-<code>http://cm.bell-labs.com/who/hobby/MetaPost.html</code>.
+certain types of diagrams.  It's described in detail on the
+<webref url='http://cm.bell-labs.com/who/hobby/MetaPost.html'
+>MetaPost home page</webref>.
 
 <p><code/latexgraphics/:
 This is a flexible notation, which refers to any LaTeX code you
@@ -600,7 +678,11 @@ rather than generating it based on the target.
 which link this document to the source code it explains.
 
 <element gi='row'>
-<p>A row of a <elemref gi='table'>
+<p>A row of a <elemref gi='tabular'>
+<attribute name='rowsep'>
+If present and non-zero, then this row will have a line after it.
+<attribute name='valign'>
+Vertical alignment of entries in this row (<em/not supported/).
 
 <element gi='softwareversion'>
 <p>This element contains text indicating the version of the software
@@ -700,20 +782,35 @@ its current location.
 <element gi='tabular'>
 <p>The Starlink General DTD incorporates the Oasis Exchange Table
 Model, which is a restricted, and hence portable, subset of the full
-CALS table model.  The model is documented at
-<code>http://www.oasis-open.org/html/techpubs.htm/a503.htm</code>.
+CALS table model.
 
-<p>At present, the Oasis table model is not fully supported by the
-Starlink SGML system.  
-All of the elements in the model are supported, but most of the 
-attributes are ignored.  You may mark up your document using all the
-features in the Oasis model.
-I will progressively add support for these attributes
-as time permits.
+<p>The model is documented in detail in the 
+<webref url='http://www.oasis-open.org/html/techpubs.htm/a503.htm'
+>CALS Exchange Table Standard</webref>.
 
+<p>At present, the Oasis table model is not <em/fully/ supported by
+the Starlink SGML system.  All of the elements in the model are
+supported, but some of the lesser-used attributes are ignored.  You
+may mark up your document using all the features in the Oasis model.
+I will progressively add support for missing attributes as time
+permits.
+
+<attribute name='colsep'>
+If given and non-zero, then separate columns with lines (rightmost
+spec ignored, as it is controlled by the `frame' attribute).
+<attribute name='frame'>
+Controls the production of a frame around the table
+<attribute name='pgwide'>
+If given and non-zero, forces the table to be a full page width
+(<em/not supported/).
+<attribute name='rowsep'>
+If given and non-zero, then separate columns by lines (bottom spec
+ignored, since it is controlled by the `frame' attribute).
 
 <element gi='tbody'>
 <p>A table body.  This contains a series of table rows.
+<attribute name='valign'>
+Controls vertical alignment of entries (<em/not supported/).
 
 <element gi='tgroup'>
 <p>This element is an enclosure for a table body (the <elemref
@@ -723,9 +820,17 @@ specified by this element.
 <attribute name='cols'>
 <p>The number of columns in the enclosed <elemref gi=thead> and
 <elemref gi=tbody> elements.
+<attribute name='align'>
+The default alignment of columns
+<attribute name='colsep'>
+If given and non-zero, then separate columns with lines (default taken
+from <elemref gi=tabular> element).
+<attribute name='rowsep'>
+If given and non-zero, then separate rows with lines (default taken
+from <elemref gi=tabular> element).
 
 <element gi='thead'>
-<p>Encloses one or more heading rows prefixed to a <elemref gi=tbody>.
+<p>Encloses one or more heading rows prefixed to a <elemref gi=tbody> (qv)..
 
 <element gi='title'>
 <p>This element may enclose either the document title, or a section
