@@ -1361,7 +1361,7 @@ hds_machine.txt: hds_machine
 
           <p>A <em>few</em> components have extra options on the
             <code>./configure</code> command.  For example, the
-            component <code>docs/ssn78</code> (the component which
+            component <code>docs/ssn/078</code> (the component which
             holds this document) has a <code>--with-pstoimg</code>
             option, the value of which must be the full path to a copy
             of the <code>pstoimg</code> program, to help in the cases
@@ -1623,6 +1623,83 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           <code>component.xml.in</code> should both be
           checked in.</p>
 
+        <subsubsect id="components" indexkey="components">
+          <subhead>
+            <title>Components</title>
+          </subhead>
+
+          <p>Throughout this documentation, the term `component' is
+            used rather than `package'.  The distinction is that the
+            components are the units of organisation within the CVS
+            tree, and the packages are the units which are distributed
+            as tarballs.  These will generally overlap, but the
+            mapping may not be one-to-one, so that the components
+            within the CVS tree might not be reflected in ultimately
+            distributed packages.</p>
+
+          <p>A `component directory' is a directory which has a
+            <code>component.xml.in</code> file in it.  All component
+            directories will have a manifest file created and
+            installed in <code>.../manifests</code>; non-component
+            directories will not have manifest files.  Everything
+            that's installed must be installed as part of some
+            component or other.  This helps when you want to remove a
+            component (a <em>very</em> primitive de-installer is
+            therefore <code>rm -f `sed
+            '1,/&lt;files&gt;/d;/&lt;\/files&gt;/,$d'
+            .../manifests/XXX`</code>), and packaging for distribution
+            should be easy.</p>
+
+          <p>The starconf <code>./bootstrap</code> scripts, which are
+            installed by the starconf application, recurse into the
+            directories listed in a <code>configure.ac</code> file's
+            <code>AC_CONFIG_SRCDIR</code> macro, and will stop recursing
+            when they find a <code>component.xml.in</code> file.
+            They'll warn if they find a <code>component.xml.in</code>
+            file in any <code>AC_CONFIG_SUBDIRS</code> directory, but
+            ignore it, and exit with an error if they do not find a
+            <code>component.xml.in</code> file and there are no
+            <code>AC_CONFIG_SUBDIRS</code> directories in which to
+            search further.  That is, the tree of directories which
+            the top-level bootstrap traverses should have
+            <code>component.xml.in</code> files at or above all its
+            leaves.</p>
+
+          <p>This further implies that a component `owns' all the tree
+            beneath the component directory, and thus that you cannot
+            have one component located within another.</p>
+
+          <p>This means that bootstrap files only have to appear
+            within component directories, but not their children, and
+            starconf/autoreconf and starconf-validate only have to be
+            run in component directories.  Macros like
+            <code>STAR_DEFAULTS</code> are still usable in the
+            subdirectories' component.ac files (because auto(re)conf
+            in the parent handles those macros when it remakes the
+            child configures).</p>
+
+          <p>Automake spots <code>component.xml.in</code> files and
+            will only arrange to install a component manifest if it
+            does fine a <code>component.xml.in</code> file.  It also
+            demands that the <code>STAR_SPECIAL_INSTALL_COMMAND</code>
+            macro (see <ref id="macro-special-install-command"/>)
+            appear only in configure.ac files in a component directory
+            (that macro is a sufficiently magic blunt instrument that
+            it shouldn't be allowed to lurk where it can't have an eye
+            kept on it).</p>
+
+          <p>The <code>starconf-validate</code> script checks these
+            various assertions.  As usual,
+            <code>starconf-validate</code> should be regarded as
+            pickily authoritative about how things are ideally
+            configured, and if it objects to something, that means
+            either that the the directory in question is non-ideally
+            configured (and should be fixed), or the part of SSN/78
+            that suggested you set things up that way is out-of-date
+            or unclear and should be clarified.</p>
+
+        </subsubsect>
+
         <subsubsect id='templates'>
           <subhead>
             <title>File templates</title>
@@ -1651,11 +1728,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
           </subhead>
 
           <p>The meaning of the elements in the component.xml DTD is
-            as follows<index>component.xml!format</index>.  The term
-            `component' is used here rather
-            than `package': no great distinction is being drawn
-            here, except that the components within the CVS tree
-            might not be reflected in ultimately distributed packages.
+            as follows<index>component.xml!format</index>.  
             <dl>
               <dt>component/id</dt>
               <dd>
@@ -2419,7 +2492,8 @@ autoconf (GNU Autoconf) 2.59
 
       </subsect>
 
-      <subsect id="buildingcomponents" export="export">
+      <subsect id="buildingcomponents" export="export"
+        indexkey="components!building">
         <subhead>
           <title>Building a single component</title>
         </subhead>
@@ -4961,8 +5035,9 @@ file.f: file.$(FPP_SRC_EXT)
           <p>Sets up the defaults for Starlink
             <code>configure.ac</code> files.  The optional
             <code>OPTIONS</code> argument holds a space-separated list
-            of option keywords, of which the only one defined at
-            present is <code>per-package-dirs</code></p>
+            of option keywords, of which the only ones defined at
+            present are <code>per-package-dirs</code> and
+            <code>docs-only</code>.</p>
 
           <p>The option
             <code>per-package-dirs</code><index>per-package-dirs</index>,
@@ -4989,6 +5064,13 @@ file.f: file.$(FPP_SRC_EXT)
             </ol>
             See also <ref id="developments"/>.
           </p>
+
+          <p>The <code>docs-dir</code> option declares that this
+            component contains only documentation (or at least, no
+            code).  This triggers mild changes in the behaviour of the
+            <code>STAR_DEFAULTS</code> macro which should make
+            configuration somewhat faster in this case.  Certain other
+            macros, such as <code>STAR_MESSGEN</code>, are disabled.</p>
 
           <p>As part of its initialisation, this macro does the following:
             <ul>
@@ -5613,7 +5695,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
             </li>
 
             <li>
-              <p>There is only one option to
+              <p>There are only two options to
                 <code>STAR_DEFAULTS</code> -- the set will likely expand.</p>
             </li>
 
