@@ -293,7 +293,7 @@
       IF ( GETS .AND. GETZ ) MXWT = 2
 
 *  Origins are zero for GETZ and GETS only.
-      DO 16 I = 1, 16
+      DO 16 I = 1, NIN
          ORIG( I ) = 0.0D0
  16   CONTINUE
 
