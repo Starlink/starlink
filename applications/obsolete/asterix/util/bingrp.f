@@ -310,7 +310,7 @@
         END IF
         SPARR(1) = 1.0
         SPARR(2) = 1.0
-        CALL BDI_AXPUT1R( OFID, 1, 'Data', 2, SPARR, STATUS )
+        CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
         CALL BDI_COPY( IFID, 'Label,Units,Title', OFID, ' ', STATUS )
         CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Group number', STATUS )
 

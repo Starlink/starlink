@@ -107,7 +107,13 @@
       CHARACTER*20		ITEM
       CHARACTER*(DAT__SZLOC)	TLOC			! Top level object
 
+      INTEGER			IPTR			! Input data pointer
+      INTEGER			ITID			! Invented data
+      INTEGER			NELM			! # mapped elements
       INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model dimensions
+      INTEGER			PTR			! Output data pointer
+      INTEGER			PSID			! Private storage
+      INTEGER			WBPTR			! Write back function
 
       LOGICAL			STRUC			! Object is a structure
 *.
@@ -171,6 +177,41 @@
 
 *    Release HDS item
         CALL DAT_ANNUL( CLOC, STATUS )
+
+*  Logical quality?
+      ELSE IF ( ITEM .EQ. 'LogicalQuality' ) THEN
+
+*    Try to invent the object
+        CALL BDI1_INVNT( ARGS(1), ARGS(2), ITEM, 'LOGICAL', 'WRITE',
+     :                   ITID, NDIM, DIMS, WBPTR, STATUS )
+
+*    Successful?
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Store the object as a component of the BinDS object
+          CALL BDI0_STOINV( ARGS(1), ITEM, ITID, STATUS )
+
+*      Locate the BDI private storage for the item, creating if required
+          CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
+
+*      Map the invented object
+          CALL ADI_MAPL( ITID, 'WRITE', PTR, STATUS )
+
+*      Store mapping details
+          CALL BDI1_STOMAP( PSID, 'inv', DAT__NOLOC, ITID, PTR,
+     :                      NDIM, DIMS, WBPTR, 'LOGICAL',
+     :                      'WRITE', STATUS )
+
+*      Copy data
+          CALL ADI_MAPL( ARGS(4), 'READ', IPTR, STATUS )
+          CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+          CALL ARR_COP1L( NELM, %VAL(IPTR), %VAL(PTR), STATUS )
+          CALL ADI_UNMAP( ARGS(4), IPTR, STATUS )
+
+*      Release storage
+          CALL BDI1_UNMAP_INT( ARGS(1), ARGS(2), PSID, STATUS )
+
+        END IF
 
 *  All other items
       ELSE
