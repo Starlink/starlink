@@ -33,13 +33,12 @@
 #-
 
 
-###### Change the following assignments to configure the script ######
+#  Get name of filter.
+      filter=`echo $0 | sed 's%.*/%%; s%do_%%'`
 
-#  Set up source and destination directories, and logfile.
-      destdir="./inscnf.changed"
-      logfile="./inscnf.log"
-
-###### Nothing after this line needs to be changed for normal configuration ###
+#  Set up destination directory and logfile.
+      destdir="./$name.changed"
+      logfile="./$name.log"
 
 #  Check command line arguments.
       if [ ! "$*" ] 
