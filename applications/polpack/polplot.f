@@ -366,6 +366,9 @@
 *  Status:
       INTEGER STATUS
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Constants:
       INTEGER CUNITS             ! Maximum number of characters in units
       PARAMETER( CUNITS = 30 )   ! string

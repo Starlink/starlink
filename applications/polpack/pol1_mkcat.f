@@ -107,7 +107,8 @@
 
 *  If required, set the TITLE parameter.
       IF( TITLE .NE. ' ' ) THEN
-         CALL CAT_PPTSC( CI, 'TITLE', TITLE, 'Catalogue title', QI, STATUS )
+         CALL CAT_PPTSC( CI, 'TITLE', TITLE, 'Catalogue title', QI, 
+     :                   STATUS )
          CALL CAT_TRLSE( QI, STATUS )
       END IF
 
