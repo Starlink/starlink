@@ -263,10 +263,10 @@ may be no spaces in the
 The page numbers may be negative.
 .IP
 Examples:
-    dvi2bitmap \--page-range=3,6\-10 ...
+    \f(CRdvi2bitmap \--page-range=3,6\-10 ...\fP
 .br
 processes only the specified pages, and
-    dvi2bitmap \--page-range=:2:1 ...
+    \f(CRdvi2bitmap \--page-range=:2:1 ...\fP
 .br
 processes only pages where
 .I "\ecount2"
@@ -486,9 +486,8 @@ recognises several DVI special commands, and emits a
 warning if it finds any others.
 .PP
 The syntax of the special commands is 
-.PP
-\especial{dvi2bitmap <special-command>+ }
-.PP
+  \f(CR\especial{dvi2bitmap <special-command>+ }\fP
+.br
 There may be one or more
 .I "<special-command>"
 sequences within a single special.
@@ -605,19 +604,19 @@ position in the file where this special appears, 2pt to the right,
 10pt above and 2.5pt below.
 .IP
 A useful bit of TeX magic is:
-  {\ecatcode`p=12 \ecatcode`t=12 \egdef\eDB@PT#1pt{#1}}
+  \f(CR{\ecatcode`p=12 \ecatcode`t=12 \egdef\eDB@PT#1pt{#1}}
    \edef\eDBstrut{%
      \estrut\especial{dvi2bitmap strut 0 0 
        \eexpandafter\eDB@PT\ethe\eht\estrutbox
-       \espace\eexpandafter\eDB@PT\ethe\edp\estrutbox}}
+       \espace\eexpandafter\eDB@PT\ethe\edp\estrutbox}}\fP
 .br
 Once you've done that, the command 
 .I "\eDBstrut"
 will put an appropriate strut in the output.
 .PP
 As an example, the pair of commands
-  \especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
-  \especial{dvi2bitmap absolute crop left 0}
+  \f(CR\especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
+  \especial{dvi2bitmap absolute crop left 0}\fP
 .br
 will change the output filename pattern for the rest of the DVI file,
 and set a 5pt margin round the bounding box.  The current page,
@@ -677,17 +676,17 @@ would have executed the command
 .I ".../kpsewhich pk cmr10.330pk"
 , which would have returned with a suitable font path.
 .SH EXAMPLES
-    % dvi2bitmap --resolution=110 --magnification=2 \e
-        --scale=2 --output-type=gif hello.dvi
+    \f(CR% dvi2bitmap --resolution=110 --magnification=2 \e
+        --scale=2 --output-type=gif hello.dvi\fP
 .br
 This converts the file hello.dvi to a GIF bitmap.  It first sets the
 magnification factor to 2, so that the program uses a double-size font
 (eg, .../cmr10.220pk), then scales the bitmap down by a factor of 2 to
 obtain a bitmap of the correct size.
 .PP
-    % dvi2bitmap -n --query=missing-fonts --resolution=110 \e
+    \f(CR% dvi2bitmap -n --query=missing-fonts --resolution=110 \e
         --magnification=1.5 --verbose=quiet hello.dvi
-    Qmissing-fonts cmr10 165 110 1.5 localfont
+    Qmissing-fonts cmr10 165 110 1.5 localfont\fP
 .br
 This reads the DVI file to find out what fonts are required, but does
 not process it further.  It then tries to find the fonts, fails, and
@@ -718,10 +717,10 @@ which has been tweaked to be readable at small resolutions.  See the file
 somewhere in your metafont distribution for the list of possibilities.
 .PP
 If you're using the TeXLive distribution, the command would be:
-    % mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10
+    \f(CR% mktexpk --mfmode ibmvga --mag 1.5 --bdpi 110 --dpi 165 cmr10\fP
 .PP
 Then try giving the command
-    % kpsewhich pk cmr10.165pk
+    \f(CR% kpsewhich pk cmr10.165pk\fP
 .br
 to confirm that TeX and friends can find the new fonts, and that your 
 dvi2bitmap environment variable is set correctly.
