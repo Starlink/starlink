@@ -203,7 +203,7 @@
         END IF
 
 *    Write the flag
-        CALL ADI_CCA2HL( ARGS(4), ' ', DLOC, 'BAD_PIXEL', STATUS )
+        CALL ADI1_CCA2HL( ARGS(4), ' ', DLOC, 'BAD_PIXEL', STATUS )
 
 *    Release HDS item
         CALL DAT_ANNUL( CLOC, STATUS )

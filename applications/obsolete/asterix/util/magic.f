@@ -212,23 +212,28 @@
       LOGICAL FLAG
       INTEGER I
 *-
-      IF (STATUS.EQ.SAI__OK) THEN
 
-        FLAG=.FALSE.
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-        DO I=1,LEN
-          IF (BIT_ANDUB(Q(I),MASK).NE.QUAL__GOOD) THEN
-            D(I) = MAGIC
-            FLAG = .TRUE.
-          ENDIF
-        ENDDO
+*  No bad values yet
+      FLAG=.FALSE.
 
-        IF (FLAG) THEN
-          CALL BDA_PUT0L(FID,'MagicFlag',FLAG,STATUS)
-        ENDIF
+      DO I = 1, LEN
+        IF ( BIT_ANDUB(Q(I),MASK) .NE. QUAL__GOOD ) THEN
+          D(I) = MAGIC
+          FLAG = .TRUE.
+        END IF
+      END DO
 
-        IF (STATUS.NE.SAI__OK) THEN
-          CALL AST_REXIT('MAGIC_WRITE',STATUS)
-        ENDIF
-      ENDIF
+*  Write magic flag if required
+      IF ( FLAG ) THEN
+        CALL BDI_PUT0L( FID, 'MagicFlag', FLAG, STATUS )
+      END IF
+
+*  Tidy up
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'MAGIC_WRITE', STATUS )
+      END IF
+
       END
