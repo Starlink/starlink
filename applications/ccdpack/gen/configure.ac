@@ -8,4 +8,5 @@ AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_CHECK_PROGS(generic)
 AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(dgeneric, [chmod +x dgeneric])
 AC_OUTPUT

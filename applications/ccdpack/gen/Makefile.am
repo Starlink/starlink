@@ -43,7 +43,7 @@ SUFFIXES = .o .c .gen .grd .glrdi .glrdic .gln .dgen .f .h
 	$(RM) $(<:.gln=.gen)
 
 .dgen.f:
-	./dgeneric $< n
+	$(srcdir)/dgeneric $< n
 
 
 #  Normal generic routines.
