@@ -16,7 +16,7 @@
 *  Description:
 *     This routine adds the character components, axis structure and
 *     FITS extension to an NDF.  It searches a buffer containing the
-*     FITS header card images for the OBJECT keyword whose value
+*     FITS header card images for the TITLE keyword whose value
 *     becomes the NDF title if present.  Similarly BUNIT is mapped to
 *     the NDF units.  The supplied header structure is copied to the
 *     FITS extension if requested.
@@ -101,8 +101,8 @@
 *  Obtain other top-level components.
 *  ==================================
 *
-*  First obtain the title from the OBJECT keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'OBJECT', THERE, TITLE,
+*  First obtain the title from the TITLE keyword in the header.
+      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'TITLE', THERE, TITLE,
      :                NKC, STATUS )
 
 *  If it is present set the NDF title, truncating unnecessary blanks.
