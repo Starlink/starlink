@@ -145,6 +145,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.19  1997/09/04 19:04:03  timj
+*     Automatically supply default for 'OUT'. Also fix null response to 'OUT'
+*
 *     Revision 1.18  1997/07/22 17:50:47  timj
 *     Remove reference to IN_CENTRE_COORDS (should be CENTRE_COORDS)
 *
@@ -262,6 +265,7 @@ c
       CHARACTER*15     FILTER          ! the name of the filter being used
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
 				       ! array of FITS keywords
+      CHARACTER*132    FNAME           ! Input filename
       CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
       INTEGER          I               ! DO loop index
       INTEGER          IBEAM           ! ndf identifier
@@ -404,6 +408,7 @@ c
       CHARACTER*(DAT__SZLOC) OUT_LOC   ! locator of HDS container file for
 				       ! output
       CHARACTER*132    OUT             ! name of output HDS container file
+      CHARACTER*132    OUTFILE         ! Default name for out
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
                                        ! locator to FITS extension in output
       INTEGER          OUT_OFFSET      ! offset in output array
@@ -450,6 +455,7 @@ c
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       INTEGER          TEMP_PTR        ! temporary array pointer
       INTEGER          UBND (2)        ! pixel indices of top right corner
                                        ! of output image
@@ -464,6 +470,9 @@ c
       REAL             YMAX            ! maximum y jiggle offset
       REAL             YMIN            ! minimum y jiggle offset
       REAL             YSPACE          ! spacing between y jiggle offsets
+
+*  Local Data:
+      DATA SUFFIX_STRINGS /'_pht','p'/
 
 *.
 
@@ -480,6 +489,11 @@ c
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', IN_NDF, STATUS)
+
+*     Get the name of the filename associated with 'IN'
+
+      CALL SCULIB_GET_FILENAME('IN', FNAME, STATUS)
+
 
 *     Get bad bit mask
       CALL NDF_BB(IN_NDF, BADBIT, STATUS)
@@ -875,6 +889,12 @@ c
          ANALYSIS = 'AVERAGE'
       END IF
 
+*     Generate a default name for the output file
+      CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
+     :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
+
+*     set the default
+      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
 
 *     create the output file that will contain the reduced data in NDFs
 
@@ -1287,7 +1307,7 @@ c
 
 *       Open a file and write header if this is first time through
 
-         IF (USEFILE .AND. COUNT .EQ. 1) THEN
+         IF (USEFILE .AND. COUNT .EQ. 1 .AND. STATUS .EQ. SAI__OK) THEN
 
             CALL SURF_WRITE_PHOTOM_HEADER(ODF_NAME, UTDATE, UTSTART, 
      :           ANALYSIS, RUN_NUMBER, OBJECT, SUB_INSTRUMENT, FILTER, 
