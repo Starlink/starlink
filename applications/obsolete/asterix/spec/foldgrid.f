@@ -181,7 +181,7 @@
 
 *  Make copy of input. The output is a lot smaller so do it piecemeal
       CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
-      CALL BDI_LINK( 'BinDS', NDIM, ODIMS, 'READ', OFID, STATUS )
+      CALL BDI_LINK( 'BinDS', NDIM, ODIMS, 'REAL', OFID, STATUS )
       CALL ADI1_GETLOC( IFID, ILOC, STATUS )
       CALL ADI1_GETLOC( OFID, OLOC, STATUS )
       CALL DAT_NCOMP( ILOC, NCOMP, STATUS )
