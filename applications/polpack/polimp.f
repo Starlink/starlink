@@ -57,9 +57,18 @@
 *        The name of the file containing the table describing how FITS
 *        keyword values are to be translated into POLPACK extension
 *        items. See the topic "Table Format" for information on how to
-*        create a translation table. The run-time default control table 
-*        is "$POLPACK_DIR/polimp.tab" which corresponds to the FITS
-*        keywords written by POLEXP. [$POLPACK_DIR/polimp.tab]
+*        create a translation table. If a null value (!) is supplied,
+*        then a default table is used which corresponds to the FITS
+*        keywords written by POLEXP:
+*
+*           ANGROT      PPCKANGR
+*           FILTER      PPCKFILT
+*           IMGID       PPCKIMID
+*           WPLATE      PPCKWPLT
+*           RAY?        PPCKRAY 
+*           ROTATION?   PPCKROT 
+*           YROTATION?  PPCKYROT
+*        [!]
 
 *  Table Format:
 *     The import control (translation) table is an ordinary text file
@@ -308,14 +317,19 @@
       CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            NNDF, STATUS )
 
+*  Check the error status.
+      IF( STATUS .NE. SAI__OK ) GO TO 99
+
 *  Access the control table for items in the FITS block. 
       CALL CCD1_ASFIO( 'TABLE', 'READ', 'LIST', 0, FDIN, TOPEN, STATUS )
+
+*  If succesful, get the file name.
       FNAME = '<unknown>'
-      CALL FIO_FNAME( FDIN, FNAME, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL FIO_FNAME( FDIN, FNAME, STATUS )
 
 *  Transform the input table into word separated GRP groups (dynamic
 *  string allocation is performed using this method).
-      IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CCD1_CFGRP( FDIN, 3, 2, .FALSE., WRDGRP, LINGRP, STATUS )
 
 *  Translate these groups into groups which contain the keyword and
@@ -343,21 +357,27 @@
      :      '  Error processing FITS control table: ^FNAME', STATUS )
          END IF
 
+*  If a null parameter value was given for TABLE, annul the error and set 
+*  up groups representing the default table.
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL POL1_DEFTB( FITGRP, DESGRP, STATUS )
+      END IF
+
 *  Get the number of entries in the FITS groups. Need this to allocate
 *  memory for FITS values. Ensure that wqe do not try to allocate zero
 *  memory.
-         CALL GRP_GRPSZ( FITGRP( 1 ), NLINES, STATUS )
-         IF( NLINES .EQ. 0 ) NLINES = 1
+      CALL GRP_GRPSZ( FITGRP( 1 ), NLINES, STATUS )
+      IF( NLINES .EQ. 0 ) NLINES = 1
 
 *  Allocate memory for _INTEGER, _REAL, _DOUBLE and _LOGICAL types,
 *  plus pointers for CHARACTER memory.
-         CALL CCD1_MALL( NLINES, '_INTEGER', IPINT, STATUS )
-         CALL CCD1_MALL( NLINES, '_REAL', IPREAL, STATUS )
-         CALL CCD1_MALL( NLINES, '_DOUBLE', IPDBLE, STATUS )
-         CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
-         CALL CCD1_MALL( NLINES, '_LOGICAL', IPGOT, STATUS )
-         CALL CCD1_MALL( NLINES, '_INTEGER', IPCHR, STATUS )
-      END IF
+      CALL CCD1_MALL( NLINES, '_INTEGER', IPINT, STATUS )
+      CALL CCD1_MALL( NLINES, '_REAL', IPREAL, STATUS )
+      CALL CCD1_MALL( NLINES, '_DOUBLE', IPDBLE, STATUS )
+      CALL CCD1_MALL( NLINES, '_LOGICAL', IPLOG, STATUS )
+      CALL CCD1_MALL( NLINES, '_LOGICAL', IPGOT, STATUS )
+      CALL CCD1_MALL( NLINES, '_INTEGER', IPCHR, STATUS )
 
 *  Create a group to hold the names of the NDFs which were processed
 *  succesfully.

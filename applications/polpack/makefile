@@ -423,7 +423,7 @@ ccd1_cmprr.f ccd1_qntlr.f ccd1_qsrtr.f ccd1_skysr.f ccg1_cmltr.f ccg1_is2r.f \
 ccg1_is3r.f ccg1_mdr1r.f ccg1_mdr3r.f ccg1_wtm2r.f ccg1_wtm3r.f ccd1_asfio.f \
 ccd1_cfgrp.f ccd1_mall.f ccd1_ftgrp.f ccd1_mfree.f ccd1_rdlin.f ccd1_nxwrd.f \
 ccd1_rmcom.f ccd1_hvcon.f pol1_imfit.f pol1_lnam.f pol1_chkex.f \
-pol1_knext.f polimp.f ccd1_iscom.f 
+pol1_knext.f polimp.f ccd1_iscom.f pol1_deftb.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -487,7 +487,7 @@ HELP_SOURCES = polpack.hlp
 #  List of ancilliary data files.
 
 DATA_FILES = blank.bit feature.bit vertex.bit rfeature.bit rvertex.bit \
-left_arrow.bit right_arrow.bit tick.bit polimp.tab
+left_arrow.bit right_arrow.bit tick.bit
 
 #  Name of test script.
 
