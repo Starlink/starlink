@@ -31,7 +31,7 @@
 *	$arg = createPerlObject(\"${ntype}\", (void*)$var);
 
 *  Copyright:
-*     Copyright (C) 2004 Tim Jenness.
+*     Copyright (C) 2004-2005 Tim Jenness.
 *     All Rights Reserved.
  
 *  Authors:

@@ -64,7 +64,7 @@ AUTHOR
 Tim Jenness <tjenness@cpan.org> with help from Alasdair Allan
 (especially the PGPLOT and Tk plotting backends) and Brad Cavanagh.
 
-Copyright (C) 2004 Tim Jenness. All Rights Reserved.
+Copyright (C) 2004-2005 Tim Jenness. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software

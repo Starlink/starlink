@@ -18,7 +18,7 @@
 
 *  Copyright:
 *     Copyright (C) 2004 Central Laboratory of the Research Councils
-*     Perl code Copyright (C) 2004 Particle Physics and Research Council.
+*     Perl code Copyright (C) 2004-2005 Particle Physics and Research Council.
 *     All Rights Reserved.
 
 *  Authors:
