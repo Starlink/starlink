@@ -1,3 +1,19 @@
+<subsect id=rn-0.10 export>Release 0.10???
+
+<p>Slight changes in functionality (enough that scripts might
+break):
+<ul>
+
+<li>Options <code/-fg> and <code/-fG> have swapped functions (so that
+<code/-fG> switches off font-generation).  This is to be consistent
+with the <code/-P> option.
+<li>Option <code/-nf> has disappeared, since it was redundant with
+(new) <code/-fG>.
+<li>Option <code/-nn> has been added.  It's necessary since, for
+consistency, option <code/-Qt> no longer automatically exits.
+
+</ul>
+
 <subsect id=rn-0.9-5 export>Release 0.9-5
 
 <p>Added some functionality, but more importantly corrected two nasty

@@ -133,12 +133,12 @@ make things a little clearer.</update>
 <p>Synopsis:
 <verbatim>
 dvi2bitmap 
-    [-f font-path] [-r resolution] [-m magnification] [-P[BbTtCc]]
-    [-s scalefactor] [-t pbm|gif|xbm] [-o output]
-    [-b(h|w) size] [-bp a4|a4l|usletter...]
-    [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqV] [-Q[fFgGtbp]]
-    [-R[fb] int,int,int]
-    [-p num] [-l num] [-pp ranges]
+        [-b(h|w) size] [-bp a4|a4l|usletter...]
+        [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]
+        [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]
+        [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]
+        [-r resolution] [-R[fb] int,int,int] [-s scale-factor]
+        [-t xbm|gif|png] [-V]
     dvi-file
 </verbatim>
 
@@ -256,9 +256,13 @@ will search for PK files at 200 dpi.
 
 <dt><code>-n</code>
 <dd>Do not actually process the DVI file, but read the DVI pre- and
-postamble.  Useful in conjunction with the <code>-Qf</code>
-option.  If this option is present, then the program returns non-zero
-if any fonts were missing.
+postamble.  Useful in conjunction with the <code/-Qf> and <code/-Qg>
+options.  If this option is present, then the program returns non-zero
+if any fonts were missing (see also <ref id=usage.exit/>).
+
+<dt><code/-nn>
+<dd>Do not process a DVI file at all, and do not require one to be
+present on the command line.  Useful with some of options <code/-Q>.
 
 <dt><code>-o output</code>
 <dd>Choose the output filename pattern.  The value is a 
@@ -352,16 +356,28 @@ follows.  Each of these lines is printed on a line by itself, prefixed
 by the option letters and a space, so that, for example, each of the
 lines produced by the <code/-QF> option would start <code/QF cmbx10
 110 ...>.
+
+<p>Some of these options (<code/-Qf>, <code/-Qg>) are probably most
+useful with the <code/-n> option, to investigate a DVI file before
+processing.  Others (<code/-Qt>, <code/-Qp>) are probably useful only
+with <code/-nn>.  <code/-Qb> is only useful if you do actually
+generate bitmaps.  For consistency (and so you don't have to remember which
+ones do which), neither <code/-n> nor <code/-nn> is implied in any of
+them, and you have to give it explicitly.
   <dl>
+  <dt><code/-Qb>
+  <dd>Prints on stdout a line for each bitmap it generates, giving the
+  filename, horizontal size, and vertical size, in pixels.
+
   <dt><code>-Qf</code>
   <dd>Show missing fonts.
   The program writes on standard output one line per missing font,
   starting with `<code/Qf>', then five fields: the 
-  font name, the DPI value it was looking for, the base-DPI of the font,
-  the magnification factor, and a dummy metafont mode.
-  This output can 
-  be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
-  generate the required fonts.
+  font name, the DPI value it was looking for, the base-DPI of the
+  font, the magnification factor, and a dummy metafont mode.  This
+  output might be massaged for use with the mktexpk (TeXLive) or
+  MakeTeXPK (teTeX) scripts to generate the required fonts, but
+  <code/-Qg> is more straightforward.
 
   <dt><code/-QF>
   <dd>As for <code/-Qf>, except that found fonts are also listed,
@@ -378,18 +394,13 @@ lines produced by the <code/-QF> option would start <code/QF cmbx10
   <code/-Qf>, <code/-QF>, <code/-Qg> and <code/-QG> should be specified
   -- if more than one appears, only the last one is respected.
 
-  <dt><code/-Qt>
-  <dd>List the output image formats which the program can generate, on
-  stdout, separated by whitespace.  The first output format is the default.
-  The program then exits.
-
-  <dt><code/-Qb>
-  <dd>Prints on stdout a line for each bitmap it generates, giving the
-  filename, horizontal size, and vertical size, in pixels.
-
   <dt><code/-Qp>
   <dd>Show the list of paper sizes which are predefined for the
   <code/-bp> option.
+
+  <dt><code/-Qt>
+  <dd>List the output image formats which the program can generate, on
+  stdout, separated by whitespace.  The first output format is the default.
 
   </dl>
 
@@ -551,12 +562,16 @@ program reckons the absolute distances for the cropping.
 <subsect id=usage.exit export>Exit value
 
 <p>Exits with a non-zero status if there were any processing errors.
-Having <em/no> fonts present counts as a processing error; if there is
-at least one font present, then missing fonts will be replaced by a
-more-or-less randomly chosen alternative, and the program will produce a
-warning if the <code/-Q> option is not present, but it will return
-with a zero (success) status.
-See also the <code/-n> option in <ref id=usage.options/>.
+Having <em/no> fonts present counts as a processing error.
+
+<p>If there is at least one font present, then missing fonts will be
+replaced by the first <code/cmr10> font it finds, or a more-or-less
+randomly chosen alternative if that font is not used at all.  The
+program will produce a warning if the <code/-q> option is not present,
+but it will return with a zero (success) status.
+
+<p>Exception: If the <code/-n> option (see <ref id=usage.options/>) is
+present, then the program returns success only if <em/all> fonts are present.
 
 <subsect id=usage.examples export>Examples
 
@@ -569,7 +584,7 @@ magnification factor to 2, so that the program uses a double-size font
 factor of 2 to obtain a bitmap of the correct size.
 
 <p><verbatim>
-% dvi2bitmap -n -Qf -r 110 -m 1.5 -Q hello.dvi
+% dvi2bitmap -n -Qf -r 110 -m 1.5 -q hello.dvi
 Qf cmr10 165 110 1.5 localfont
 </verbatim>
 This reads the DVI file to find out what fonts are required, but does

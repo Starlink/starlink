@@ -4,12 +4,14 @@
 dvi2bitmap
 .SH SYNOPSIS
 .B dvi2bitmap 
-    [\-fp font-path] [\-r resolution] [\-m magnification] 
-    [\-P[BbTtCc]] [\-s scalefactor] [\-t pbm|gif|xbm]
-    [\-o output] [\-b(h|w) size] [\-bp a4|a4l|usletter...]
-    [\-c[lrtb] dimen] [\-C[lrtb] dimen] [\-nqV]
-    [\-Q[fFgGtbp]] [\-R[fb] int,int,int]
-    [\-p num] [\-l num] [\-pp ranges]
+    [\-b(h|w) size] [\-bp a4|a4l|usletter...]
+    [\-[Cc][lrtb] size]
+    [\-fp PKpath ] [\-fm mfmode] [\-fg] [\-fG]
+    [\-g[dpribmg]] [\-m magmag ] [\-n[n]]
+    [\-l num] [\-p num] [\-pp ranges] [\-o outfile-pattern]
+    [\-P[bBtTcC]] [\-q[q]] [\-Q[FfGgtbp]]
+    [\-r resolution] [\-R[fb] int,int,int] [\-s scale-factor]
+    [\-t xbm|gif|png] [\-V]
     dvi-file
 .SH DESCRIPTION
 dvi2bitmap processes a DVI file produced by the TeX typesetting
@@ -129,6 +131,11 @@ postamble.  Useful in conjunction with the
 .I "\-Qf"
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
+.TP
+.I "\-nn"
+Do not process a DVI file at all, and do not require one to be
+present on the command line.  Useful with some of options
+.I "\-Q."
 .TP
 .I "\-o output"
 Choose the output filename pattern.  The value is a 
@@ -276,6 +283,33 @@ lines produced by the
 .I "\-QF"
 option would start
 .I "QF cmbx10 110 ..."
+.IP
+Some of these options (
+.I "\-Qf"
+and
+.I "\-Qg"
+) are probably most
+useful with the
+.I "\-n"
+option, to investigate a DVI file before processing.  Others (
+.I "\-Qt"
+and 
+.I "\-Qp"
+) are probably useful only
+with
+.I "\-nn."
+.I "\-Qb"
+is only useful if you do actually generate bitmaps.
+For consistency (and so you don't have to remember which
+ones do which), neither
+.I "\-n"
+nor
+.I "\-nn"
+is implied in any of them, and you have to give it explicitly.
+.TP
+.I "\-Qb"
+Prints on stdout a line for each bitmap it generates, giving the
+filename, horizontal size, and vertical size, in pixels.
 .TP
 .I "\-Qf"
 Show missing fonts.
@@ -285,9 +319,10 @@ starting with
 , then five fields: the 
 font name, the DPI value it was looking for, the base-DPI of the font,
 the magnification factor, and a dummy metafont mode.
-This output can 
-be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
-generate the required fonts.
+This output might be massaged for use with the mktexpk (TeXLive) or
+MakeTeXPK (teTeX) scripts to generate the required fonts, but
+.I "\-Qg"
+is more straightforward.
 .TP
 .I "\-QF"
 As for
@@ -322,19 +357,14 @@ and
 should be specified -- if more than one appears, only the last
 one is respected.
 .TP
-.I "\-Qt"
-List the output image formats which the program can generate, on
-stdout, separated by whitespace.  The first output format is the default.
-The program then exits.
-.TP
-.I "\-Qb"
-Prints on stdout a line for each bitmap it generates, giving the
-filename, horizontal size, and vertical size, in pixels.
-.TP
 .I "\-Qp"
 Show the list of paper sizes which are predefined for the
 .I "\-bp"
 option.
+.TP
+.I "\-Qt"
+List the output image formats which the program can generate, on
+stdout, separated by whitespace.  The first output format is the default.
 .TP
 .I "\-r resolution"
 Specifies the output resolution, in pixels-per-inch.  This is used
@@ -523,10 +553,26 @@ side.  Remember that TeX's origin is one inch from the left and the
 top of the paper, and it is with respect to this origin that the
 program reckons the absolute distances for the cropping.
 .SH "EXIT VALUE"
-Exits with a non-zero status if there were any processing errors.  See
-also the 
+Exits with a non-zero status if there were any processing errors.
+Having
+.I no
+fonts present counts as a processing error.
+.PP
+If there is at least one font present, then missing fonts will be
+replaced by the first
+.I cmr10
+font it finds, or a more-or-less
+randomly chosen alternative if that font is not used at all.  The
+program will produce a warning if the
+.I "\-q"
+option is not present,
+but it will return with a zero (success) status.
+.PP
+Exception: If the
 .I "\-n"
-option.
+option is present, then the program returns success only if
+.I all
+fonts are present.
 .SH EXAMPLES
 % dvi2bitmap -r 110 -m 2 -s 2 -t gif hello.dvi
 .PP

@@ -5,6 +5,13 @@
 static const char RCSID[] =
 	"$Id$";
 
+// FIXME: at several points in the option processing below, I've noted
+// sensible changes to the behaviour.  These, and the corresponding
+// documentation, should be changed come the next minor version update
+// (but not between bugfix releases).  At the same time, check that
+// the documentation (SGML and roff), and the usage message at the
+// bottom of this file, are consistent with the new options.
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -98,16 +105,14 @@ int main (int argc, char **argv)
     double magmag = 1.0;	// magnification of file magnification factor
     unsigned int show_font_list = 0;
     bitmap_info bm;
-    bool do_process_file = true; // if true, then process DVI file
-    bool process_options_only = false; // if true, exit after options
+    // Usual processing is process_dvi.  preamble_only exits after
+    // checking the preamble (and thus checking fonts).  options_only
+    // merely processes the options and then exits.
+    enum { process_dvi, preamble_only, options_only } processing_ =process_dvi;
     bool all_fonts_present = true;
     bool no_font_present = true;
     PageRange PR;
 
-    //DviFile::verbosity(2);
-    //PkFont::verbosity(2);
-    //PkRasterdata::verbosity(2);
-    //Bitmap::verbosity(2);
 
 #define MM oneInch * 0.03937
     struct {
@@ -217,10 +222,6 @@ int main (int argc, char **argv)
 		      if (absCrop) // don't want this!
 			  Usage();
 		      Bitmap::cropDefault(Bitmap::All,	  cropmargin, false);
-		      //Bitmap::cropDefault(Bitmap::Left,   cropmargin, false);
-		      //Bitmap::cropDefault(Bitmap::Right,  cropmargin, false);
-		      //Bitmap::cropDefault(Bitmap::Top,    cropmargin, false);
-		      //Bitmap::cropDefault(Bitmap::Bottom, cropmargin, false);
 		      break;
 		    default:
 		      Usage();
@@ -302,8 +303,11 @@ int main (int argc, char **argv)
 		switch (*++*argv)
 		{
 		  case '\0':
-		    do_process_file = false; // ...just the pre/postamble
+		    processing_ = preamble_only;
 		    PkFont::setMakeFonts (false);
+		    break;
+		  case 'n':	// do nothing -- don't even look for a DVI file
+		    processing_ = options_only;
 		    break;
 		  case 'f':
 		    // FIXME: remove this option in the next version
@@ -401,7 +405,10 @@ int main (int argc, char **argv)
 				ft = BitmapImage::otherBitmapImageFormat();
 			    }
 			    cout << '\n';
-			    process_options_only = true;
+			    // FIXME: remove the following line at the
+			    // next version change.  Change behaviour
+			    // so that -Qt does not automatically exit.
+			    processing_ = options_only;
 			    break;
 			}
 
@@ -500,7 +507,7 @@ int main (int argc, char **argv)
 #endif
 
 		cout << RCSID << '\n';
-		process_options_only = true; // ...and exit
+		processing_ = options_only; // ...and exit
 		break;
 
 	      default:
@@ -513,9 +520,10 @@ int main (int argc, char **argv)
 	    dviname = *argv;
 	}
 
-    if (process_options_only)
+    if (processing_ == options_only)
 	exit (0);
 
+    // Insist we have a DVI file specified.
     if (dviname.length() == 0)
 	Usage();
 
@@ -610,32 +618,10 @@ int main (int argc, char **argv)
 			}
 			cout << '\n';
 		    }
-#if 0
-		if (show_font_list > 1 || !f->loaded())
-		{
-		    if (f->loaded()) // show_font_list is >1
-			cout << "QF ";
-		    else
-			cout << "Qf ";
-		    // write out font name, dpi, base-dpi, mag and MF mode
-		    cout << f->name() << ' '
-			 << f->dpiBase() << ' '
-			 << f->dpi() << ' '
-			 << magmag
-			 << " localfont";
-		    if (f->loaded())
-		    {
-			string fn = f->fontFilename();
-			string unk = "unknown";
-			cout << ' ' << (fn.length() > 0 ? fn : unk);
-		    }
-		    cout << '\n';
-		}
-#endif
 	}
 
 
-	if (do_process_file)
+	if (processing_ == process_dvi)
 	{
 	    if (no_font_present) // give up!
 	    {
@@ -659,8 +645,11 @@ int main (int argc, char **argv)
     }
 
     // Exit non-zero if we were just checking the pre- and postambles,
-    // and we found some missing fonts
-    if (no_font_present || (!do_process_file && !all_fonts_present))
+    // and we found some missing fonts.
+    // Or put another way: exit zero if (a) we were processing the DVI
+    // file normally and we found at least one font, or (b) we were
+    // just checking the preamble and we found _all_ the fonts.
+    if (no_font_present || (processing_==preamble_only && !all_fonts_present))
 	exit (1);
     else
 	exit (0);
@@ -1208,7 +1197,7 @@ void Usage (void)
 {
     cerr << "Usage: " << progname << " [-b(h|w) size] [-bp a4|a4l|usletter...]\n\
         [-[Cc][lrtb] size] [-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
-        [-g[dpribmg]] [-l num] [-m magmag ] [-n] [-o outfile-pattern]\n\
+        [-g[dpribmg]] [-l num] [-m magmag ] [-n[n]] [-o outfile-pattern]\n\
         [-p num] [-pp ranges] [-P[bBtTcC]] [-q[q]] [-Q[FfGgtbp]]\n\
         [-r resolution] [-R[fb] int,int,int] [-s scale-factor]\n\
         [-t xbm"
@@ -1222,11 +1211,11 @@ void Usage (void)
 	dvifile" << "\n\n\
   -bh, -bw  page height and width in pixels    -bp  bitmap <-- papersize\n\
   -c   crop margins left, right, top, bottom   -C   crop absolute\n\
-  -fp  set font-path (DVI2BITMAP_PK_PATH)\n\
+  -fp  set font-path (DVI2BITMAP_PK_PATH)      -fg  switch off (-fG=on) fontgen\n\
   -fm  Metafont mode (must match -r)           -r   Metafont resolution\n\
   -m   DVI file magnification                  -s   scale-down of bitmap\n\
-  -fg  switch off (-fG=on) font-generation     -g   debugging of sections\n\
-  -n   only process DVI file preamble          -o   set output file pattern \n\
+  -o   set output file pattern, including %d   -g   debugging of sections\n\
+  -n   only process DVI file preamble          -nn  only process-options\n\
   -q   switch off chatter and warnings         -qq  switch off errors, too\n\
   -R   set foreground/background colour (RGB)  -V   version+features then exit\n\
   -l num, -p num, -pp ranges  select pages to process (l--p, or ranges pp)\n\
