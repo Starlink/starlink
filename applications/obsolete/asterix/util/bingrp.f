@@ -458,6 +458,9 @@
 *  How many elements in grouped axes
       CALL ARR_SUMDIM( NOPAX, DIMS, NGELM )
 
+*  Range of group numbers in sub-array
+      CALL ARR_RANG1I( NGELM, %VAL(GPTR), IGMIN, IGMAX, STATUS )
+
 *  Duplicate the selected sub-array through the grouping array
       IGPTR = GPTR
       DO K = 1, INELM/NGELM - 1
@@ -466,7 +469,7 @@
         IGPTR = IGPTR + NGELM*VAL__NBI
 
 *    Add offset to distinguish slices
-        CALL ARR_ADD1I( NGELM, %VAL(GPTR), K*NGELM,
+        CALL ARR_ADD1I( NGELM, %VAL(GPTR), K*(IGMAX-IGMIN+1),
      :                  %VAL(IGPTR), STATUS )
 
       END DO
