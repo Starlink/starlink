@@ -142,7 +142,6 @@
 
 *  First function argument is the identifier
       ARGS(1) = ID
-      ARGS(3) = 0
 
 *  Second is the linked file object
       CALL ADI_GETLINK( ID, ARGS(2), STATUS )
