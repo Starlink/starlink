@@ -1,0 +1,6 @@
+file,f,a,,,,"(FIle) Name of file in which FITS keyword is to be set"
+keyword,s,a,,,,"(KEYword) FITS keyword to set or modify"
+value,s,a,,,,"(VALue) New value of FITS keyword"
+comment,s,a,,,,"(COMment) Comment associated with FITS keyword"
+logical,b,h,n,,,"(LOGical) Treat keyword as a logical value?"
+string,b,h,n,,,"(STRing) Treat keyword value as a literal string?"

@@ -1,0 +1,131 @@
+Interface MSPLOT
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter HARDCOPY
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HArdcopy) Produce plot as a hard copy?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHOLE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHole) Plot all of spectrum?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SAMESCALE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SAmescale) Use same scale for each spectrum?'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X-value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X-value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter NSPECT
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NSpect) Number of spectra per page'
+      helpkey '*'
+   EndParameter
+
+   Parameter XRANGE
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XRange) Range in X for each spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter LABEL
+      Position  6
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LABel) Label for plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter COLOUR
+      Position  7
+      Type 'LITERAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      helpkey '*'
+   EndParameter
+
+   Parameter THICKNESS
+      Position  8
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.THICKNESS'
+      Prompt '(THickness) Plotted line width'
+      helpkey '*'
+   EndParameter
+
+   parameter NEXT
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Ready for next page'
+      helpkey '*'
+   endparameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+
+EndInterface

@@ -1,0 +1,45 @@
+#+
+#  Name:
+#     Q2BAD.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     JM: Jo Murray (STARLINK)
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAY-1990 (JM):
+#        Original version.
+#     03-JUL-1991 (HME):
+#        Help library added.
+#     07-OCT-1992 (HME):
+#        Help library and help keys removed.
+#        Global association removed.
+#     {enter_changes_here}
+
+#-
+
+interface Q2BAD
+
+   helplib 'FIG_HELP:'
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access 'READ'
+      prompt      'Input NDF data structure'
+      help        '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access 'WRITE'
+      prompt      'Output NDF'
+      help        '*'
+   endparameter
+
+endinterface

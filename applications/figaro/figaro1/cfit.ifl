@@ -1,0 +1,92 @@
+Interface CFIT
+
+   helplib 'FIG_HELP:'
+
+   Parameter OUTPUT
+      Position  1
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Output file for interpolated data'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHANGE
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Modify points'
+      helpkey '*'
+   EndParameter
+
+   Parameter REDRAW
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Redraw original spectrum'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter TVXST
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVXST'
+   endparameter
+
+   parameter TVXEN
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVXEN'
+   endparameter
+
+   parameter TVLOW
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVLOW'
+   endparameter
+
+   parameter TVHIGH
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVHIGH'
+   endparameter
+
+   parameter TVFILE
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.TVFILE'
+   endparameter
+
+   parameter TVCOLOR
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVCOLOR'
+   endparameter
+
+EndInterface

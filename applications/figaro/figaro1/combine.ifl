@@ -1,0 +1,36 @@
+Interface COMBINE
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Name of first Spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPECTRUM1
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPECTRUM1) Name of second spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting spectrum'
+      helpkey '*'
+   EndParameter
+
+EndInterface

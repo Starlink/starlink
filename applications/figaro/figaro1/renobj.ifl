@@ -1,0 +1,39 @@
+#+
+#  Name:
+#     RENOBJ.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     01-OCT-1992 (HME):
+#        Original version.
+#     27-SEP-1996 (MJC):
+#        Added positional information.
+#     {enter_changes_here}
+
+#-
+
+interface RENOBJ
+
+   helplib 'FIG_HELP:'
+
+   parameter SOURCE
+      type     'HDSOBJECT'
+      position 1
+      prompt   'HDS object to be renamed'
+      helpkey  '*'
+   endparameter
+
+   parameter DESTIN
+      type     'HDSOBJECT'
+      position 2
+      prompt   'Destination of renamed HDS object'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,35 @@
+Interface MASK
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to generate mask from'
+      helpkey '*'
+   EndParameter
+
+   Parameter TABLE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TAble) Table file giving regions to be masked'
+      helpkey '*'
+   EndParameter
+
+   Parameter MASK
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MAsk) Name of mask to be generated'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,5 @@
+image,f,a,,,,"(IMage) Image whose X values are to be set"
+wstart,r,a,,,,"(WStart) Wavelength of center of first bin"
+wend,r,a,,,,"(WEnd) Wavelength of center of last bin"
+output,f,a,,,,"(OUtput) Name of modified image"
+log,b,a,n,,,"(LOg) Bin into logarithmic wavelength bins?"

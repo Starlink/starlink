@@ -1,0 +1,3 @@
+standard,f,a,,,,"(STAndard) Absolute continuum standard spectrum"
+spectrum,f,a,,,,"(SPEctrum) Observed spectrum of standard"
+output,f,a,,,,"(OUTput) Output instrumental response spectrum"

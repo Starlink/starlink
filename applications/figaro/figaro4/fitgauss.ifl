@@ -1,0 +1,255 @@
+#+
+#  Name:
+#     FITGAUSS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     acd; Clive Davenhall (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     02 May 1991 (hme):
+#        Original version (SPECFIT).
+#     03 May 1991 (hme):
+#        Split MASK into MASK1 and MASK2 and use ppath 
+#        'DYNAMIC,DEFAULT'. For fit parameters TYPE, CONT, CFLAGS,
+#        CENTRE etc. use ppath 'CURRENT,DEFAULT'.
+#     08 May 1991 (hme):
+#        Change CFLAGS, PFLAGS, SFLAGS to CF, PF, WF.
+#        Replace SIGMA by FWHM.
+#     31 May 1991 (hme):
+#        Try a different way to deal with array parameters.
+#        Restrict number of Gauss components to 6.
+#     28 Jun 1991 (hme):
+#        VARUSE, MSKUSE, INFO, ROW.
+#        Use token for messages.
+#     05 Jul 1991 (hme):
+#        SPECDRE help library.
+#     17 Jul 1991 (hme):
+#        Set the Gaussian parameters' and fit flags' ppath to
+#        'DYNAMIC,CURRENT,DEFAULT' instead of 'DYNAMIC,CURRENT'. Supply
+#        defaults for these. Supply a default for LOGFIL.
+#     22 Jul 1991 (hme):
+#        MENUE -> MENU. Scrap XTOL, MSKUSE. Sort out messages and error 
+#        reports.
+#     23 Jul 1991 (hme):
+#        ITER, FITCENT, FITPEAK, FITFWHM parameters.
+#     20 Nov 1991 (hme):
+#        Global: INFO, IN, OUT. SSETX oblivious. Rename to FITGAUSS.
+#     27 Nov 1991 (hme):
+#        Make MODE's ppath CURRENT,DEFAULT.
+#     23 Apr 1992 (hme):
+#        Major review of FITGAUSS.
+#     30 Jun 1993 (hme):
+#        DIALOG is _CHAR for 3-value logic.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     23 Oct 2001 (acd):
+#        Added output parameters FCENTRE, FPEAK and FFWHM.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITGAUSS
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter REPAIR
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Update spectroscopic axis number'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      ptype    'DEVICE'
+#     vpath    'GLOBAL,PROMPT'
+#     ppath    'GLOBAL,CURRENT,DEFAULT'
+#     association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  !
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK1
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval lower bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK2
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval upper bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter NCOMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 6
+      prompt   'Number of components'
+      helpkey  '*'
+   endparameter
+
+   parameter CONT
+      type     '_REAL'
+      ppath    'CURRENT,DEFAULT'
+      default  0.
+      prompt   'Continuum level'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Gauss positions'
+      helpkey  '*'
+   endparameter
+
+   parameter PEAK
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,1,1,1,1,1
+      prompt   'Gauss heights'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,1,1,1,1,1
+      prompt   'Gauss widths (FWHM)'
+      helpkey  '*'
+   endparameter
+
+   parameter CF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line centres'
+      helpkey  '*'
+   endparameter
+
+   parameter PF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line peaks'
+      helpkey  '*'
+   endparameter
+
+   parameter WF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line widths'
+      helpkey  '*'
+   endparameter
+
+   parameter REMASK
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve mask intervals'
+      helpkey  '*'
+   endparameter
+
+   parameter REGUESS
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve component guesses'
+      helpkey  '*'
+   endparameter
+
+   parameter FITGOOD
+      type     '_LOGICAL'
+      default  YES
+      prompt   'Fit acceptable'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Component numbers for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for result output'
+      helpkey  '*'
+   endparameter
+
+   parameter FCENTRE
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0,0,0,0,0,0
+      Association '->GLOBAL.FITGAUSS_FCENTRE'
+   endparameter
+
+   parameter FPEAK
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1,1,1,1,1,1
+      Association '->GLOBAL.FITGAUSS_FPEAK'
+   endparameter
+
+   parameter FFWHM
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1,1,1,1,1,1
+      Association '->GLOBAL.FITGAUSS_FFWHM'
+   endparameter
+
+endinterface

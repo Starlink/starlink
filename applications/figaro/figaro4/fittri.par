@@ -1,0 +1,28 @@
+in,f,a,,,,"Input NDF"
+info,b,a,y,,,"*! Issue informational messages"
+varuse,b,h,y,,,"Use input variances if available"
+dialog,s,a,"T",,,"*! Allow extensive interaction"
+repair,b,a,n,,,"Update spectroscopic axis number"
+device,f,a,!,,,"Graphics device"
+mask1,r,a,,,,"Mask interval lower bound(s)"
+mask2,r,a,,,,"Mask interval upper bound(s)"
+ncomp,i,a,1,1,6,"Number of components"
+cont,r,a,0.,,,"Continuum level"
+centre,struct,a,,,,"Triangle positions"
+0 0 0 0 0 0
+peak,struct,a,,,,"Triangle heights"
+1 1 1 1 1 1
+fwhm,struct,a,,,,"Triangle widths (FWHM)"
+1 1 1 1 1 1
+cf,struct,a,,,,"Fit flags for line centres"
+0 0 0 0 0 0
+pf,struct,a,,,,"Fit flags for line peaks"
+0 0 0 0 0 0
+wf,struct,a,,,,"Fit flags for line widths"
+0 0 0 0 0 0
+remask,b,a,n,,,"Improve mask intervals"
+reguess,b,a,n,,,"Improve component guesses"
+fitgood,b,a,y,,,"Fit acceptable"
+comp,struct,a,,,,"Component numbers for storage"
+1 2 3 4 5 6
+logfil,f,a,!,,,"ASCII file name for result output"

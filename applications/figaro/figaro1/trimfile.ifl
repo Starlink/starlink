@@ -1,0 +1,37 @@
+#+
+#  Name:
+#     TRIMFILE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     30-SEP-1992 (HME):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface TRIMFILE
+
+   helplib 'FIG_HELP:'
+
+   parameter IN
+      position 1
+      type     'HDSOBJECT'
+      prompt   'Input HDS file'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     '_CHAR'
+      prompt   'Name of clean copy of HDS file'
+      helpkey  '*'
+   endparameter
+
+endinterface

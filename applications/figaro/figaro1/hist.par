@@ -1,0 +1,5 @@
+image,f,a,,,,"(IMage) Name of data to be histogrammed"
+minval,r,a,,,,"(MInval) Minimum data value to be used"
+maxval,r,a,,,,"(MAXval) Maximum data value to be used"
+bins,r,a,512.0,,,"(BIns) Number of histogram bins"
+spectrum,s,a,,,,"(SPectrum) Name of resulting histogram"

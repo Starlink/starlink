@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Name of image to be corrected"
+output,f,a,,,,"(OUTput) Name of resulting image"
+alpha,r,h,3.16E-6,,,"(ALpha) Linearity constant"
+cbias,r,h,180.0,,,"(CBias) Bias value to be used"

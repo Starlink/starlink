@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Image with X data to be subtracted from"
+factor,r,a,,,,"(FACtor) Constant to be subtracted from data"
+output,f,a,,,,"(OUTput) Name of resulting image"

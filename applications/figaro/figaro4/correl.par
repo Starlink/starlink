@@ -1,0 +1,5 @@
+inlist,s,a,,,,"List of 2 or 3 input NDFs"
+out,f,a,!,,,"ASCII table output file"
+logfil,f,a,,,,"Log file"
+info,b,a,y,,,"*! Issue informational messages"
+varuse,b,h,y,,,"Use input variances if available"

@@ -1,0 +1,125 @@
+Interface FOTO
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter RA1
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RA1) Inner radius of sky aperture'
+      helpkey '*'
+   EndParameter
+
+   Parameter RA2
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RA2) Outer radius of sky aperture'
+      helpkey '*'
+   EndParameter
+
+   Parameter NRADII
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NRadii) Number of apertures to use'
+      helpkey '*'
+   EndParameter
+
+   Parameter RADII
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RADii) Aperture radii'
+      helpkey '*'
+   EndParameter
+
+   Parameter BAD
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BAD) Bad pixel rejection threshold'
+      helpkey '*'
+   EndParameter
+
+   Parameter PHOTONS
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PHotons) Number of photons per ADU'
+      helpkey '*'
+   EndParameter
+
+   Parameter READNS
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(REadns) Readout noise'
+      helpkey '*'
+   EndParameter
+
+   Parameter MZERO
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MZero) Magnitude offset'
+      helpkey '*'
+   EndParameter
+
+   Parameter DISHIST
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      Prompt 'Display sky histogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter CONFIRM
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      Prompt 'Sky value and Sigma OK'
+      helpkey '*'
+   EndParameter
+
+   Parameter SKYVAL
+      Type '_REAL'
+      Vpath 'PROMPT'
+      Prompt 'Sky value'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMA
+      Type '_REAL'
+      Vpath 'PROMPT'
+      Prompt 'Sigma'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+   
+EndInterface

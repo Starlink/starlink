@@ -1,0 +1,7 @@
+image,f,a,,,,"(IMage) name of image containing spectra"
+mask,f,a,,,,"(MAsk) name of mask image"
+mlow,r,a,1.0,,,"(MLow) Lowest order number to extract"
+mhigh,r,a,1000.0,,,"(MHigh) Highest order number to extract"
+subord,r,a,0.0,,,"(SUBord) Sub-order to extract (0 => all)"
+reverse,b,h,y,,,"(REVerse) Create output with order numbers reversed?"
+output,f,a,,,,"(OUTput) Name of resulting set of spectra"

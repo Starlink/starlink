@@ -1,0 +1,30 @@
+
+      Interface IGCONV
+
+         Parameter IMAGE
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(IMage) Name of file to be convolved with an array'
+         EndParameter
+
+         Parameter CONVOL
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(COnvol) Text file that defines the convolution array'
+         EndParameter
+
+         Parameter OUTPUT
+            Position  3
+            Type 'NDF'       
+            Access 'WRITE'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(OUTput) Name of resulting image file'
+         EndParameter
+
+      EndInterface

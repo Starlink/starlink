@@ -1,0 +1,7 @@
+image,f,a,,,,"(IMage) The file containing the spectra"
+xstart,r,a,,,,"*! (XStart) First X-value to use in calculating means"
+xend,r,a,,,,"*! (XEnd) Last X-value to use in calculating means"
+crsig,r,a,5.0,,,"(CRSig) Cosmic ray sigma rejection level"
+wmean,b,a,n,,,"(WMean) Produce spectrum consisting of mean values?"
+mspect,f,a,,,,"(MSpect) Name of mean value spectrum to be generated"
+output,f,a,,,,"(OUtput) The file containing the corrected spectra"

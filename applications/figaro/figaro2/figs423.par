@@ -1,0 +1,4 @@
+hcube,f,a,,,,"(HCube) Name of FIGS image mode raw hypercube"
+cystart,r,a,1.0,,,"(CYStart) First cycle number to be included"
+cyend,r,a,,,,"(CYEnd) Last cycle number to be included"
+cube,f,a,,,,"(CUbe) Name of resulting cube"

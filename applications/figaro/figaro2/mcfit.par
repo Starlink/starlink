@@ -1,0 +1,4 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to be fitted"
+mask,f,a,,,,"(MAsk) Data to be used as a mask for the fit"
+points,r,a,10.0,,,"(POints) Number of splines to use in the fit"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

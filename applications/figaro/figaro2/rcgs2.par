@@ -1,0 +1,5 @@
+file,s,a,,,,"(FIle) Name of container file to be read"
+obs,r,a,1.0,,,"(OBS) Observation number"
+twod,b,a,n,,,"(TWOD) Create 2-D file?"
+scan,r,a,0.0,,,"(SCAN) Scan number (0 for coadded data)"
+output,f,a,,,,"(OUTPUT) Figaro file to be created"

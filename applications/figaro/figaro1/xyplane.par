@@ -1,0 +1,4 @@
+cube,f,a,,,,"(CUbe) Name of data cube to extract image from"
+tstart,r,a,,,,"(TStart) first t-value to be used"
+tend,r,a,,,,"(TEnd) last t-value to be used"
+image,f,a,,,,"(IMage) name of image to be created"

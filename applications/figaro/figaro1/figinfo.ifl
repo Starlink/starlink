@@ -1,0 +1,36 @@
+
+      Interface FIGINFO
+
+         Parameter INPUT
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(INput) Name of file to examine'
+         EndParameter
+
+         Parameter CHECK_FLAGS
+            Type '_LOGICAL'      
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(CHeck_flags) Check for flagged values by reading data?'
+         EndParameter
+
+         Parameter CLEAR_FLAG
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(CLEAR_FLAG) Clear "may contain flagged data flag" anyway?'
+         EndParameter
+
+         Parameter SET_FLAG
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(SET_FLAG) Set "may contain flagged data flag"?'
+         EndParameter
+
+      EndInterface

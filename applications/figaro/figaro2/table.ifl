@@ -1,0 +1,30 @@
+Interface TABLE
+
+   helplib 'FIG_HELP:'
+
+   Parameter FILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(File) SPICA Memory file to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter PRINT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PRINT) Print table?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DELETE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DELete) Delete table after display/printing?'
+      helpkey '*'
+   EndParameter
+
+EndInterface

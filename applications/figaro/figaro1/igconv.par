@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Name of file to be convolved with an array"
+convol,s,a,,,,"(COnvol) Text file that defines the convolution array"
+output,f,a,,,,"(OUTput) Name of resulting image file"

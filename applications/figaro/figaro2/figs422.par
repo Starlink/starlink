@@ -1,0 +1,7 @@
+hcube,f,a,,,,"(HCube) Name of FIGS image mode raw hypercube"
+xstart,r,a,,,,"(XStart) First wavelength value to be included"
+xend,r,a,,,,"(XEnd) Last wavelength value to be included"
+cystart,r,a,1.0,,,"(CYStart) First cycle number to be included"
+cyend,r,a,,,,"(CYEnd) Last cycle number to be included"
+image,f,a,,,,"(IMage) Name of resulting image"
+split,b,a,n,,,"(SPLit) Split separate cycles into separate images?"

@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Name of data to be rotated in X"
+pixels,r,a,,,,"(PIXels) Number of pixels to rotate data"
+output,f,a,,,,"(OUtput) Name of resulting rotated data"

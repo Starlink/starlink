@@ -1,0 +1,38 @@
+
+      Interface MEDFILTR
+
+         Parameter IMAGE
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(IMage) Name of image to be smoothed'
+         EndParameter
+
+         Parameter XBOX
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(XBox) X-dimension of box for median calculations'
+         EndParameter
+
+         Parameter YBOX
+            Position  3
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(YBox) Y-dimension of box for median calculations'
+         EndParameter
+
+         Parameter OUTPUT
+            Position  4
+            Type 'NDF'       
+            Access 'WRITE'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(OUTput) Name of resulting image'
+         EndParameter
+
+      EndInterface

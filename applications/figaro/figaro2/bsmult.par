@@ -1,0 +1,4 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to be B-star calibrated"
+bstar,f,a,,,,"(BStar) B-star calibration spectrum"
+output,f,a,,,,"(OUTput) Resulting spectrum"
+beta,r,h,0.55,,,"(BEta) Power to which airmass ratio is raised"

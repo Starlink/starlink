@@ -1,0 +1,4 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to use for seeing data"
+ndet,r,a,1.0,,,"(NDet) Number of detectors to use"
+detectors,r,a,,,,"(DEtectors) Detectors to use"
+output,f,a,,,,"(OUTput) Name of resulting seeing ripple data"

@@ -1,0 +1,2 @@
+input,s,a,,,,"(INput) Name of file to have the quality array removed"
+output,f,a,,,,"(OUTput) Name of resulting file"

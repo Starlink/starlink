@@ -1,0 +1,3 @@
+cdata,f,a,,,,"(CData) Name of first complex structure"
+cdata1,f,a,,,,"(CDATA1) Name of second complex structure"
+output,f,a,,,,"(OUTput) Name of resulting complex structure"

@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) File requiring X data"
+arc,f,a,,,,"(ARc) File containing X data"
+output,f,a,,,,"(OUTput) Name of resulting file"

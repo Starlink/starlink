@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Image to convolve with filter"
+center,r,a,1.0,,,"(Center) Central value for 3x3 convolution kernel"
+edge,r,a,1.0,,,"(Edge) Edge value for 3x3 convolution kernel"
+output,f,a,,,,"(OUTput) The resulting filtered image"

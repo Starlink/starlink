@@ -1,0 +1,357 @@
+Interface GAUSS
+
+   helplib 'FIG_HELP:'
+
+   Parameter TOL
+      Position  1
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt ''
+      helpkey '*'
+   EndParameter
+
+   Parameter SPECTRUM
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to be analysed'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FILE) Are fit results to be recorded on file?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILNAM
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FILENAME) Name of data file for results'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHOLE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHole) Use whole of spectrum for line analysis?'
+      helpkey '*'
+   EndParameter
+
+   Parameter AUTOSCALE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(AUtoscale) Scale so all of spectrum fits?'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X-value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X-value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.HIGH'
+      Prompt '(HIgh) Maximum data value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.LOW'
+      Prompt '(LOw) Minimum data value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter BIAS
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.BIAS'
+      Prompt '(BIas) Bias value to be added to data'
+      helpkey '*'
+   EndParameter
+
+   Parameter LABEL
+      Position  9
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LABel) Label for plot and results file'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORD
+      Position 10
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ORD) Order of polynomial fit to continuum'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIG
+      Position 11
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIG) Factor * sigma for continuum point rejection'
+      helpkey '*'
+   EndParameter
+
+   Parameter ERR
+      Position 12
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ERR) Factor * error for continuum point rejection'
+      helpkey '*'
+   EndParameter
+
+   Parameter ITN
+      Position 13
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ITN) Number of iterations for continuum point rejection'
+      helpkey '*'
+   EndParameter
+
+   Parameter INDEX
+      Position 14
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(IND) Index number of Gaussian to alter'
+      helpkey '*'
+   EndParameter
+
+   Parameter DELE
+      Position 15
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DELE) Index number of Gaussian to delete'
+      helpkey '*'
+   EndParameter
+
+   Parameter PN_HN_WN_S
+      Position 16
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(P/H/W/S) Alter Position, Height, Width or Stop'
+      helpkey '*'
+   EndParameter
+
+   Parameter CONSTR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CONSTR) Want to constrain any Gaussian parameters ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SINCON
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SINCON) Any single constraints on Guassian parameters'
+      helpkey '*'
+   EndParameter
+
+   Parameter NPCON
+      Position 17
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NPCON) n followed by P,H or W (-1 to end)'
+      helpkey '*'
+   EndParameter
+
+   Parameter MULTCON
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MULTiple CONstraints) Any Gaussians to be chained ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter NCHAIN
+      Position 18
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NCHAIN) Number of Gaussians to chain (-1 to end)'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHAIN
+      Position 19
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CHAIN) Gaussian parameter to be chained P/H/W'
+      helpkey '*'
+   EndParameter
+
+   Parameter ICHAIN
+      Position 20
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ICHAIN) Index number of Gaussian to chain'
+      helpkey '*'
+   EndParameter
+
+   Parameter RCHAIN
+      Position 21
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RCHAIN) Line peak seperation, height or width ratio'
+      helpkey '*'
+   EndParameter
+
+   Parameter WGHT
+      Position 22
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WeiGHTing) for residuals - None, by Value or by Error'
+      helpkey '*'
+   EndParameter
+
+   Parameter MAN
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MANual) Want to accept manual fit to profile'
+      helpkey '*'
+   EndParameter
+
+   Parameter RECNAME
+      Position 23
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RECNAME) Name of data file to be recalled'
+      helpkey '*'
+   EndParameter
+
+   Parameter GAUFIT
+      Position 24
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(GAUFIT) Fitted spectrum to be saved'
+      helpkey '*'
+   EndParameter
+
+   Parameter CCMD
+      Type 'LITERAL'
+      Vpath 'PROMPT'
+      Prompt 'Cur,Ord,Sig,Err,Itn,Fit,Gau,Help'
+      helpkey '*'
+   EndParameter
+
+   Parameter GCMD
+      Type 'LITERAL'
+      Vpath 'PROMPT'
+      Prompt 'Lim,Sin,New,Nex,Inch,Lis,Sel,Del,Opt,Recal,Hard,Save,Cont,Quit,Help'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+
+   parameter TVXST
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVXST'
+   endparameter
+
+   parameter TVXEN
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVXEN'
+   endparameter
+
+   parameter TVLOW
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVLOW'
+   endparameter
+
+   parameter TVHIGH
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVHIGH'
+   endparameter
+
+   parameter TVFILE
+      type '_CHAR'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default ' '
+      association '->GLOBAL.TVFILE'
+   endparameter
+
+EndInterface

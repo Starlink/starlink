@@ -1,0 +1,36 @@
+Interface ADJOIN
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) First of the two spectra to be adjoined'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPECTRUM1
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPECTRUM1) 2nd of the two spectra to be adjoined'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting spectrum'
+      helpkey '*'
+   EndParameter
+
+EndInterface

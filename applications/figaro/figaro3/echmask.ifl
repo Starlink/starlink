@@ -1,0 +1,104 @@
+Interface ECHMASK
+
+   helplib 'FIG_HELP:'
+
+   Parameter COFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COFile) Name of file containing order fit coeffs'
+      helpkey '*'
+   EndParameter
+
+   Parameter PERISCOPE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PERIscope) Is the star / sky periscope fitted?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBJWIDTH
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBJWidth) Number of rows of object to extract per order'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBJOFFSET
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBJOffset) Offset from order centre of object centre'
+      helpkey '*'
+   EndParameter
+
+   Parameter S1WIDTH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S1Width) Number of rows of region 1 sky to extract'
+      helpkey '*'
+   EndParameter
+
+   Parameter S1OFFSET
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S1Offset) Offset from object centre of region 1 sky centre'
+      helpkey '*'
+   EndParameter
+
+   Parameter S2WIDTH
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S2Width) Number of rows of region 2 sky to extract'
+      helpkey '*'
+   EndParameter
+
+   Parameter S2OFFSET
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S2Offset) Offset from object centre of region 2 sky centre'
+      helpkey '*'
+   EndParameter
+
+   Parameter MSTART
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MStart) Number of the first order fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter MDELTA
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MDelta) Order number increment (-1 or +1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter MASK
+      Position 10
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MASk) Name of mask image showing order positions'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Name of image to subset"
+ystart,r,a,,,,"(YStart) First Y value for subset"
+yend,r,a,,,,"(YEnd) Last Y value for subset"
+xstart,r,a,,,,"(XStart) First X value for subset"
+xend,r,a,,,,"(XEnd) Last X value for subset"
+output,f,a,,,,"(OUTput) Name of resulting image"

@@ -1,0 +1,72 @@
+#+
+#  Name:
+#     CORREL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     TDCA: Tim Ash (RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-APR-1991 (HME):
+#        Original version.
+#     05-JUL-1991 (HME):
+#        Error reporting. INFO. SPECDRE help library.
+#     27-NOV-1991 (HME):
+#        Make INFO global.
+#     05-JUN-1992 (HME):
+#        Port to NDF and Unix.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP
+#     {enter_further_changes_here}
+
+#-
+
+interface CORREL
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter INLIST
+      position 1
+      type     'LITERAL'
+      prompt   'List of 2 or 3 input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII table output file'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      position 3
+      type     'FILENAME'
+      prompt   'Log file'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,29 @@
+#  History:
+#     09 Mar 1993 (HME):
+#        Individual review of parameters.
+
+Interface COLOUR
+
+   helplib 'FIG_HELP:'
+
+   Parameter TABLE
+      Position  1
+      Type '_CHAR'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TABLE) Name of the colour lookup table'
+      helpkey '*'
+   EndParameter
+
+   parameter IDEV
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.IDEV'
+   endparameter
+
+EndInterface
+

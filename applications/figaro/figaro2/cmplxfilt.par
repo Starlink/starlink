@@ -1,0 +1,4 @@
+cdata,f,a,,,,"(CData) Template complex data structure"
+lowcut,r,a,0.1,,,"(LOwcut) Low cutoff point for filter"
+hicut,r,a,0.5,,,"(HIcut) High cutoff point for filter"
+output,f,a,,,,"(OUTput) Resulting complex filter"

@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Name of image"
+spectrum,f,a,,,,"(SPectrum) Name of spectrum"
+output,f,a,,,,"(OUTput) Name of resulting image"

@@ -1,0 +1,8 @@
+output,s,a,,,,"(OUTPUT) Name of output file"
+image,f,a,,,,"(IMAGE) Name of input frame"
+opt,s,a,,,,"(OPT) Type option"
+low,r,a,,,,"(LOW) Low data value for 2-d plot"
+high,r,a,,,,"(HIGH) High data value for 2-d plot"
+radius,r,a,1.0,,,"(RADIUS) Radius of circle"
+ok,b,q,y,,,"Hit <return> to restore 2-d plot"
+idev,s,a,"xw",,,"*! (idev) Device to use for image display"

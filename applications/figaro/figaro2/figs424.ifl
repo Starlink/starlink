@@ -1,0 +1,25 @@
+Interface FIGS424
+
+   helplib 'FIG_HELP:'
+
+   Parameter HCUBE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HCube) Name of FIGS image mode raw hypercube'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of processed FIGS image mode hypercube'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,5 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to be set"
+xstart,r,a,,,,"(XStart) First X-value to be set to constant"
+xend,r,a,,,,"(XEnd) Last X-value to be set to constant"
+value,r,a,1.0,,,"(Value) Constant value to set region to"
+output,f,a,,,,"(OUtput) Output file for modified data"

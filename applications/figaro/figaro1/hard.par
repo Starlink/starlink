@@ -1,0 +1,5 @@
+harddev,s,a,"ps_1",,,"(harddev) Device to use for hardcopy plots"
+options,b,h,n,,,"(OPtions) List possible device names?"
+force,b,h,n,,,"(FOrce) Force use of an unrecognised device ?"
+draw,b,h,n,,,"(DRaw) Output a test plot to the device?"
+hard,s,h," ",,,"(hard) Device specified for hardcopy plots"

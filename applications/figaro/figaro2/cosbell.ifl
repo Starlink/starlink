@@ -1,0 +1,35 @@
+Interface COSBELL
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Template to base cosine bell data upon'
+      helpkey '*'
+   EndParameter
+
+   Parameter BELLPC
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BEllpc) Percentage of data covered by cosine bell'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting data'
+      helpkey '*'
+   EndParameter
+
+EndInterface

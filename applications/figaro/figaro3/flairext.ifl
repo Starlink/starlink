@@ -1,0 +1,80 @@
+## FLAIREXT - Optimally extracts spectra from a FLAIR NDF to form a new NDF.
+
+#+
+#  Name:
+#     FLAIREXT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 April 7 (MJC):
+#     	 Original version.
+#     1998 October 16 (MJC):
+#        TITLE defaults to !.  Default NFIBRES to 92.
+#     1998 November 9 (ACD)
+#        Added entry for help library.
+#     {enter_changes_here}
+
+#-
+
+interface FLAIREXT
+
+   helplib 'FIG_HELP:'
+
+   parameter      FIBRES         # Number of fibres to extract
+      position    4
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Number of fibres to extract'
+      default     92
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    3
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFILE        # Profile NDF
+      position    2
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'NDF containing profile (weights)'
+      helpkey     '*'
+   endparameter
+
+   parameter      TITLE          # Output NDF title
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     !
+      prompt      'Output title'
+      helpkey     '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,36 @@
+Interface EXTIN
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to be corrected for extinction'
+      helpkey '*'
+   EndParameter
+
+   Parameter COEFF
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COeff) Extinction coefficient spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Resulting spetcrum'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,8 @@
+image,f,a,,,,"(IMage) The 2D data to be reduced to a spectrum"
+tstart,r,a,,,,"(TStart) first t-value to be used"
+tend,r,a,,,,"(TEnd) last t-value to be used"
+ystart,r,a,,,,"(YStart) first y-value to be used"
+yend,r,a,,,,"(YEnd) last y-value to be used"
+cutoff,r,a,1E38,,,"(CUToff) value to exclude data point"
+spectrum,f,a,,,,"(SPectrum) Name of resulting spectrum"
+norm,b,a,n,,,"(NOrm) Normalize Each Cycle?"

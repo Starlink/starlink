@@ -1,0 +1,4 @@
+spectrum,f,a,,,,"(SPectrum) Name of spectrum to be fitted"
+order,r,a,5.0,,,"(ORder) Order of fitted polynomial"
+logs,b,a,n,,,"(LOgs) Fit to logarithms of data"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

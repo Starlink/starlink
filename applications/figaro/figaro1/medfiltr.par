@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Name of image to be smoothed"
+xbox,s,a,"5.0",,,"(XBox) X-dimension of box for median calculations"
+ybox,s,a,"5.0",,,"(YBox) Y-dimension of box for median calculations"
+output,f,a,,,,"(OUTput) Name of resulting image"

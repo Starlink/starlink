@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Name of image to be smoothed"
+fraction,r,a,0.5,,,"(FRaction) Fraction of pixel data for redistribution"
+repeat,r,a,1.0,,,"(REpeat) Number of times to repeat basic smoothing"
+output,f,a,,,,"(OUTput) Name of resulting image"

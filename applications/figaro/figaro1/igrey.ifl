@@ -1,0 +1,182 @@
+Interface IGREY
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of image to be grey-scaled'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YStart) First Y value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Last Y value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.LOW'
+      Prompt '(Low) Lowest data level used (black level)'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.HIGH'
+      Prompt '(High) Highest data level used (white level)'
+      helpkey '*'
+   EndParameter
+
+   Parameter LABEL
+      Position  8
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LABel) Label for plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter ADJUST
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ADjust) Adjust scales so as to fill display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter HARDCOPY
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HArdcopy) Generate a hardcopy plot?'
+      helpkey '*'
+   EndParameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter PGENVARG
+      type   '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.PGENVARG'
+   endparameter
+
+   parameter IMFILE
+      type   '_CHAR'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default ' '
+      association '->GLOBAL.IMFILE'
+   endparameter
+
+   parameter TVXST
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVXST'
+   endparameter
+
+   parameter TVXEN
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVXEN'
+   endparameter
+
+   parameter TVYST
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVYST'
+   endparameter
+
+   parameter TVYEN
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVYEN'
+   endparameter
+
+   parameter TVLOW
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVLOW'
+   endparameter
+
+   parameter TVHIGH
+      type '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVHIGH'
+   endparameter
+
+EndInterface

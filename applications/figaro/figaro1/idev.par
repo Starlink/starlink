@@ -1,0 +1,5 @@
+imagdev,s,a,"xw",,,"(imagdev) Device to use for image display"
+options,b,h,n,,,"(OPtions) List possible device names?"
+force,b,h,n,,,"(FOrce) Force use of an unrecognised device ?"
+draw,b,h,y,,,"(DRaw) Output a test plot to the device?"
+idev,s,h," ",,,"(idev) Device specified for soft plots"

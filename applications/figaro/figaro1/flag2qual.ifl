@@ -1,0 +1,37 @@
+
+      Interface FLAG2QUAL
+
+         Parameter INPUT
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(INput) Name of file to have flagged values removed'
+         EndParameter
+
+         Parameter OUTPUT
+            Position  2
+            Type 'NDF'       
+            Access 'WRITE'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(OUTput) Name of resulting file'
+         EndParameter
+
+         Parameter FIXED
+            Type '_LOGICAL'      
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(FIxed) Replace flagged values with one fixed value?'
+         EndParameter
+
+         Parameter VALUE
+            Position  3
+            Type '_REAL'         
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(VAlue) Fixed value to use to replace flagged values'
+         EndParameter
+
+      EndInterface

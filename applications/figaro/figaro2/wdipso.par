@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) File to be converted to Dipso format"
+code,r,a,0.0,,,"(Code) Data format code for output file (0,1,2)"
+file,s,a,,,,"(FIle) Name of DIPSO format file to be created"

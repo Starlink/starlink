@@ -1,0 +1,2 @@
+table,s,a,"grey",,,"(TABLE) Name of the colour lookup table"
+idev,s,a,"xw",,,"*! (idev) Device to use for image display"

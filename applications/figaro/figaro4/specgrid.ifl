@@ -1,0 +1,317 @@
+#+
+#  Name:
+#     SPECGRID.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     21 Sep 1994 (hme):
+#        Original version.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface SPECGRID
+
+   helplib 'FIG_HELP:'
+
+   parameter CLEAR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Clear the active part of screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERLAY
+      type     '_LOGICAL'
+      default  FALSE
+      prompt   'Overlay on existing data'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter LIN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Line-style connections'
+      helpkey  '*'
+   endparameter
+
+   parameter BIN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Bin-style connections'
+      helpkey  '*'
+   endparameter
+
+   parameter MARK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0
+      range    0, 6
+      prompt   'Marker symbol'
+      helpkey  '*'
+   endparameter
+
+   parameter ERROR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Error bars'
+      helpkey  '*'
+   endparameter
+
+   parameter WIDTH
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Pixel width bars'
+      helpkey  '*'
+   endparameter
+
+   parameter FRAME
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Frame for each cell'
+      helpkey  '*'
+   endparameter
+
+   parameter FILL
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Fill area available'
+      helpkey  '*'
+   endparameter
+
+   parameter ROMAN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use nicer font'
+      helpkey  '*'
+   endparameter
+
+   parameter HEIGHT
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1.
+      range    0.01 40.
+      prompt   'Character height (marker size)'
+      helpkey  '*'
+   endparameter
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 255
+      prompt   'Colour index'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 21
+      prompt   'Line thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter DASH
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 5
+      prompt   'Dash pattern code'
+      helpkey  '*'
+   endparameter
+
+   parameter AXES
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Draw axes'
+      helpkey  '*'
+   endparameter
+
+   parameter TICK
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '----'
+      prompt   'Draw ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter NUML
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++00'
+      prompt   'Write numerical labels'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '+++0'
+      prompt   'Write text labels'
+      helpkey  '*'
+   endparameter
+
+   parameter MAJOR
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0., 0.
+      prompt   'Interval between major ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter MINOR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0, 0
+      prompt   'No. of minor intervals per major interval'
+      helpkey  '*'
+   endparameter
+
+   parameter BOTTOM
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for bottom axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LEFT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for left axis'
+      helpkey  '*'
+   endparameter
+
+   parameter TOP
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for top axis'
+      helpkey  '*'
+   endparameter
+
+   parameter RIGHT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for right axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LABSPC
+      type     '_REAL'
+      ppath    'DEFAULT'
+      default  0.1, 0.1, 0.05, 0.05
+      prompt   'Space for labelling'
+      helpkey  '*'
+   endparameter
+
+   parameter CWORLD
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'World coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter LEGEND
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Position of legend cell'
+      helpkey  '*'
+   endparameter
+
+   parameter CELLSZ
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1., 1.
+      prompt   'Size of spectral cells'
+      helpkey  '*'
+   endparameter
+
+   parameter SWORLD
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'World coordinates within cells'
+      helpkey  '*'
+   endparameter
+
+   parameter XLEGEND
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for bottom of legend cell'
+      helpkey  '*'
+   endparameter
+
+   parameter YLEGEND
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for left of legend cell'
+      helpkey  '*'
+   endparameter
+
+endinterface

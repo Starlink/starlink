@@ -1,0 +1,6 @@
+in,f,a,,,,"The input NDF"
+order,i,a,2,1,7,"Polynomial order for dispersion curve"
+dialog,s,a,"G",,,"*! Allow extensive graphical interaction"
+fdb,f,a,,,,"Feature data base NDF"
+device,f,a,,,,"*! Graphics device"
+wrange,r,a,,,,"Laboratory value range for this row"

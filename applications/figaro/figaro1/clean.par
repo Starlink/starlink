@@ -1,0 +1,12 @@
+image,f,a,,,,"(IMage) Name of image to be grey-scaled"
+output,f,a,,,,"(OUTput) Name of resulting image"
+idev,s,a,"xw",,,"*! (idev) Device to use for image display"
+imarray,struct,h,,,,""
+0.
+imfile,s,h," ",,,""
+quit,b,q,n,,,"Terminate cleaning process"
+deg,r,a,2.0,,,"Degree of fit to use for interpolation"
+xsize,r,a,5.0,,,"Side of box deleted by \"X\" and \"Y\", in X"
+ysize,r,a,5.0,,,"Side of box deleted by \"X\" and \"Y\", in Y"
+high,r,a,,,,"Highest displayed data value"
+low,r,a,,,,"Lowest displayed data value"

@@ -1,0 +1,149 @@
+#  History:
+#     11 Mar 1993 (hme):
+#        Individual review of parameters.
+#     27 Jul 1993 (hme):
+#        Disuse PAR_Q*, add four parameters instead.
+
+Interface FINDSP
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to generate polynomial list from'
+      helpkey '*'
+   EndParameter
+
+   Parameter BLACK
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BLack) Black level for display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHITE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHite) White level for display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter NUMFIB
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NUMFib) Number of fibres (spectra) in the frame'
+      helpkey '*'
+   EndParameter
+
+   Parameter NORDER
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NORDer) Order of polynomials to fit along spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter NPTS
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NPts) Number of points along spectra required'
+      helpkey '*'
+   EndParameter
+
+   Parameter FWCENT
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FWcent) Full-width centroiding range in Y direction'
+      helpkey '*'
+   EndParameter
+
+   Parameter CFW
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CFW) Centroid following weight'
+      helpkey '*'
+   EndParameter
+
+   Parameter YFIRST
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YFirst) Central Y height of first spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSEP
+      Position 10
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YSep) Average separation between fibre spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter PFILE
+      Position 11
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PFile) Name of file to write polynomial fits to'
+      helpkey '*'
+   EndParameter
+
+   Parameter ADJUST
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Adjust start centroids'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHGPAR
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Repeat with new parameters'
+      helpkey '*'
+   EndParameter
+
+   Parameter REJECT
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Reject which fibre number - zero for no more'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHGREJ
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Repeat selection of rejections'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface

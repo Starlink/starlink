@@ -1,0 +1,15 @@
+in,f,a,,,,"ASCII input file"
+lines,struct,a,,,,"Line number range"
+1 9999
+info,b,a,y,,,"*! Issue informational messages"
+tol,r,h,0.2,0.,.5,"Table/pixel coordinate mismatch tolerance"
+bad,r,h,-999999.,,,"Bad value as used in table"
+colaxes,struct,a,,,,"Columns to read axis data from"
+1 2
+colwidth,i,h,0,,,"Column to read pixel width from"
+coldata,struct,a,,,,"Columns to read data and errors from"
+3 0
+start,r,a,,,,"Data start values"
+step,r,a,,,,"Pixel step values"
+end,r,a,,,,"Data end values"
+out,f,a,,,,"Output NDF"

@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Image with X data to be added to"
+factor,r,a,,,,"(FACtor) Additive constant"
+output,f,a,,,,"(OUTput) Name of resulting image"

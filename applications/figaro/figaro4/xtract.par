@@ -1,0 +1,5 @@
+in,f,a,,,,"Input NDF"
+colaps,i,a,,,,"For each axis: 0 (retain) or 1 (collapse)"
+out,f,a,,,,"Output NDF"
+info,b,a,y,,,"*! Issue informational messages"
+varuse,b,h,y,,,"Use input variances if available"

@@ -1,0 +1,34 @@
+Interface WDIPSO
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) File to be converted to Dipso format'
+      helpkey '*'
+   EndParameter
+
+   Parameter CODE
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Code) Data format code for output file (0,1,2)'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Name of DIPSO format file to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface

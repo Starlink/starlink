@@ -1,0 +1,5 @@
+image,f,a,,,,"(IMage) Image containing fibre data"
+pfile,s,a,,,,"(PFile) Polynomial file to be used to find spectra"
+dfile,s,a,,,,"(DFile) File listing dud fibres"
+extwidth,r,a,6.0,,,"(EXtwidth) Width of spectra in pixels"
+output,f,a,,,,"(OUTput) Fibre image to be created"

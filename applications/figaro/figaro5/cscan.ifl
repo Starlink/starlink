@@ -1,0 +1,84 @@
+Interface CSCAN
+
+   Parameter       CUBE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of CUBE for input'
+   EndParameter
+
+   Parameter       YSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display upper limit'
+   EndParameter
+
+   Parameter       TSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display lower limit'
+   EndParameter
+
+   Parameter       TEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display upper limit'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     6
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'use hard graphics device for display'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

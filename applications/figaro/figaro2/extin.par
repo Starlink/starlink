@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to be corrected for extinction"
+coeff,f,a,,,,"(COeff) Extinction coefficient spectrum"
+output,f,a,,,,"(OUTput) Resulting spetcrum"

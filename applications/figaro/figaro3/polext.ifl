@@ -1,0 +1,53 @@
+Interface POLEXT
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image containing fibre data'
+      helpkey '*'
+   EndParameter
+
+   Parameter PFILE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PFile) Polynomial file to be used to find spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter DFILE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DFile) File listing dud fibres'
+      helpkey '*'
+   EndParameter
+
+   Parameter EXTWIDTH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(EXtwidth) Width of spectra in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  5
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Fibre image to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface

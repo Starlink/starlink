@@ -1,0 +1,180 @@
+Interface HCROSS
+
+   Helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Name of spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter TEMPLATE
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TEmplate) Name of template spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter VELOCITIES
+      Type '_LOGICAL'      
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Default FALSE
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      helpkey '*'
+   EndParameter
+
+   Parameter BASERED
+      Position  3
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(BASEred) Redshift of template spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter BASERR
+      Position  4
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(BASERR) Redshift error of template spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter BASEVEL
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(BASEVel) Velocity (km/s) of template spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter BASEVERR
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(BASEVERR) Velocity error (km/s) of template spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  5
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  6
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter FITCONT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default TRUE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FICONT) Fit continuum?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CBPC
+      Position  7
+      Type '_REAL'         
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CBpc) Percentage of spectrum covered by cosine bell'
+      helpkey '*'
+   EndParameter
+
+   Parameter RECORD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RECord) Create file to record cross-correlation?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CROSS
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CRoss) Name of cross-correlation data?'
+      helpkey '*'
+   EndParameter
+
+   parameter SHIFT
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.SHIFT'
+   endparameter
+
+   parameter REDSHIFT
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.REDSHIFT'
+   endparameter
+  
+   parameter REDERR
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.REDERR'
+   endparameter
+
+   parameter VELOCITY
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.VELOCITY'
+   endparameter
+        
+   parameter VELERR
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.VELERR'
+   endparameter
+
+   parameter CONF
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.CONFIDENCE'
+   endparameter
+
+   parameter WARN
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.IWARN'
+   endparameter
+
+EndInterface

@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Name of image to be equalised"
+minval,r,a,,,,"(MINval) Minimum data value to be used"
+maxval,r,a,,,,"(MAXval) Maximum data value to be used"
+equalise,b,a,n,,,"(EQualise) Generate equalised output data?"
+output,f,a,,,,"(OUTput) Name of resulting image"
+soft,s,a,"xw",,,"*! "

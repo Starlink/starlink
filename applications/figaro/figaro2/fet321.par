@@ -1,0 +1,7 @@
+cube,f,a,,,,"(CUbe) The FIGS data cube to be reduced to a spectrum"
+detector,r,a,1.0,,,"(DETector) Detector number to use"
+spectrum,f,a,,,,"(SPectrum) Name of resulting spectrum"
+cutoff,r,h,1E38,,,"(CUToff) value to exclude data point"
+add,b,h,n,,,"(ADd) Add all data rather than subtracting background?"
+back,b,h,n,,,"(BAck) Return background spectrum only?"
+norm,b,h,n,,,"(NOrm) Normalize Each Cycle?"

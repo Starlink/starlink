@@ -1,0 +1,71 @@
+Interface FIGS422
+
+   helplib 'FIG_HELP:'
+
+   Parameter HCUBE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HCube) Name of FIGS image mode raw hypercube'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First wavelength value to be included'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last wavelength value to be included'
+      helpkey '*'
+   EndParameter
+
+   Parameter CYSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CYStart) First cycle number to be included'
+      helpkey '*'
+   EndParameter
+
+   Parameter CYEND
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CYEnd) Last cycle number to be included'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMAGE
+      Position  6
+      Type '_CHAR'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(IMage) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPLIT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPLit) Split separate cycles into separate images?'
+      helpkey '*'
+   EndParameter
+
+EndInterface

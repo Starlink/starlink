@@ -1,0 +1,116 @@
+#+
+#  Name:
+#     BBODY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     TDCA: Tim Ash (RAL)
+#     VGG: Vito Graffagnino (RAL)
+#     ACD: Clive Davenhall (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1991 (HME):
+#        Original version.
+#     28-MAR-1991 (HME):
+#        Help library.
+#     11-APR-1991 (HME):
+#        Changed some parameter names. Use "Angstrom" instead of "Ang".
+#     28-JUN-1991 (HME):
+#        Error reporting.
+#     28-OCT-1991 (HME):
+#        Do away with FAIL message. Range of XPOWER -99 to +99.
+#     27-NOV-1991 (HME):
+#        Make IN and OUT global.
+#     18-JUN-1992 (HME):
+#        Port to NDF and Unix.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP.
+#     05-JUL-2001 (VGG):
+#        Introduced ERRTEMP parameter to include errors on the input
+#        temperature. 
+#     07-JUL-2001 (ACD):
+#        Added vpath for ERRTEMP.
+#     {enter_further_changes_here}
+#-
+
+interface BBODY
+
+   helplib 'FIG_HELP:'
+
+   parameter LOGAR
+      type     '_LOGICAL'
+      default  NO
+      vpath    'DEFAULT'
+      prompt   'Write logarithms of intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter TEMP
+      position 1
+      type     '_REAL'
+      range    1E-35, 1E+35
+      prompt   'Black body temperature in K'
+      helpkey  '*'
+   endparameter
+
+   parameter ERRTEMP
+      type     '_REAL'
+      range    1E-35, 1E+35
+      default  !      
+      vpath    'DYNAMIC,DEFAULT'
+      prompt   'Error on the Black body temperature in K'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      type     'NDF'
+      default  !
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter XSTART
+      type     '_REAL'
+      prompt   'Spectroscopic axis start value'
+      helpkey  '*'
+   endparameter
+
+   parameter XSTEP
+      type     '_REAL'
+      prompt   'Spectroscopic axis increment'
+      helpkey  '*'
+   endparameter
+
+   parameter XEND
+      type     '_REAL'
+      prompt   'Spectroscopic axis end value'
+      helpkey  '*'
+   endparameter
+
+   parameter XLABEL
+      type     '_CHAR'
+      default  'wavelength'
+      in       'wavelength', 'frequency'
+      prompt   'Label for spectroscopic axis'
+      helpkey  '*'
+   endparameter
+
+   parameter XUNIT
+      type     '_CHAR'
+      prompt   'Unit for spectroscopic axis'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Image to be corrected for S-distortion"
+ystart,r,a,,,,"*! (YStart) First Y value in range to be corrected"
+yend,r,a,,,,"*! (YEnd) Last Y value in range to be corrected"
+output,f,a,,,,"(OUTput) Name of resulting image"
+maxdegy,r,a,5.0,,,"(MAXdegy) Maximum degree polynomial to be used"
+rotate,b,h,n,,,"(ROTate) Try to minimise paging by prior rotation?"

@@ -1,0 +1,8 @@
+in,f,a,,,,"The input NDF"
+fwhm,r,a,,2.,1E30,"Feature width"
+thresh,r,a,,1E-30,1E30,"Minimum feature strength"
+info,b,a,y,,,"*! Issue informational messages"
+dialog,s,a,"G",,,"*! Allow extensive graphical interaction"
+mode_,s,h,"Gauss",,,"Gauss or triangle features"
+device,f,a,,,,"*! Graphics device"
+rownum,i,a,,,,"Number of row to work on next"

@@ -1,0 +1,122 @@
+#+
+#  Name:
+#     movie.ifl
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     19 May 1994 (hme):
+#        Original version.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface MOVIE
+
+   helplib 'FIG_HELP:'
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y','g','G'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     '_CHAR'
+      vpath    'CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  'Fast'
+      prompt   'Operation mode (fast/square/fill)'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter AXIS
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  3
+      prompt   'Frame-counting axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LOW
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Minimum data for display'
+      helpkey  '*'
+   endparameter
+
+   parameter HIGH
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Maximum data for display'
+      helpkey  '*'
+   endparameter
+
+   parameter DELAY
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  0.
+      prompt   'Delay in seconds between frames'
+      helpkey  '*'
+   endparameter
+
+   parameter MENU
+      type     '_CHAR'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      in       'F','B','I','P','N','Q','?','f','b','i','p','n','q'
+      default  'F'
+      prompt   'Display option (FBIPNQ)'
+      helpkey  '*'
+   endparameter
+
+   parameter FRAME
+      type     '_INTEGER'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Frame number to display'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,40 @@
+Interface RDFITS
+
+   helplib 'FIG_HELP:'
+
+   Parameter FILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Name of "Disk FITS" format file'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMAGE
+      Position  2
+      Type '_CHAR'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(IMage) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+   Parameter SWAP
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SWap) Swap byte order?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FLOAT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FLoat) Convert data to floating point?'
+      helpkey '*'
+   EndParameter
+
+EndInterface

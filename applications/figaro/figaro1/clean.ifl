@@ -1,0 +1,97 @@
+#  History:
+#     09 Mar 1993 (HME):
+#        Individual review of parameters.
+
+Interface CLEAN
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<-GLOBAL.IMAGE'
+      Prompt '(IMage) Name of image to be grey-scaled'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+   parameter IDEV
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.IDEV'
+   endparameter
+
+   parameter IMARRAY
+      type   '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.IMARRAY'
+   endparameter
+
+   parameter IMFILE
+      type   '_CHAR'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default ' '
+      association '->GLOBAL.IMFILE'
+   endparameter
+
+   Parameter QUIT
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Terminate cleaning process'
+      helpkey '*'
+   EndParameter
+
+   Parameter DEG
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Degree of fit to use for interpolation'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSIZE
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Side of box deleted by "X" and "Y", in X'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSIZE
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Side of box deleted by "X" and "Y", in Y'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Highest displayed data value'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Lowest displayed data value'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,68 @@
+#+
+#  Name:
+#     ASCOUT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     TDCA: Tim Ash (RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-APR-1991 (HME):
+#        Original version.
+#     05-JUL-1991 (HME):
+#        Error reporting. INFO. SPECDRE help library.
+#     19-NOV-1991 (HME):
+#        ODIM, SSETX oblivious.
+#        AXIS.
+#     06-MAY-1992 (HME):
+#        Using NDF and the Extension makes most parameters obsolete.
+#     22 Feb 1994 (hme):
+#        Remove the unused INFO parameter.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface ASCOUT
+
+   helplib 'FIG_HELP:'
+
+   parameter WIDTH
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  NO
+      prompt   'Write also the pixel widths'
+      helpkey  '*'
+   endparameter
+
+   parameter BAD
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  -999999.0
+      prompt   'Table value to replace bad values'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'FILENAME'
+      ppath    'CURRENT'
+      prompt   'Output ASCII file'
+      helpkey  '*'
+   endparameter
+
+endinterface

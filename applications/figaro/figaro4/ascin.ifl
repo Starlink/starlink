@@ -1,0 +1,126 @@
+#+
+#  Name:
+#     ASCIN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     TDCA: Tim Ash (RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-MAY-1991 (HME):
+#        Original version.
+#     05-JUL-1991 (HME):
+#        Error reporting. SPECDRE help library.
+#     22-NOV-1991 (HME):
+#        Change to N-D version. Modify message and error reporting.
+#     18-MAY-1992 (HME):
+#        Port to NDF and Unix.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface ASCIN
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter TOL
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  0.2
+      range    0., .5
+      prompt   'Table/pixel coordinate mismatch tolerance'
+      helpkey  '*'
+   endparameter
+
+   parameter BAD
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  -999999.
+      prompt   'Bad value as used in table'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'FILENAME'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'ASCII input file'
+      helpkey  '*'
+   endparameter
+
+   parameter LINES
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,9999
+      prompt   'Line number range'
+      helpkey  '*'
+   endparameter
+
+   parameter COLAXES
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2
+      prompt   'Columns to read axis data from'
+      helpkey  '*'
+   endparameter
+
+   parameter COLWIDTH
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0
+      prompt   'Column to read pixel width from'
+      helpkey  '*'
+   endparameter
+
+   parameter COLDATA
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  3,0
+      prompt   'Columns to read data and errors from'
+      helpkey  '*'
+   endparameter
+
+   parameter START
+      type     '_REAL'
+      prompt   'Data start values'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      type     '_REAL'
+      prompt   'Pixel step values'
+      helpkey  '*'
+   endparameter
+
+   parameter END
+      type     '_REAL'
+      prompt   'Data end values'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     'NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,94 @@
+Interface CSET
+
+   helplib 'FIG_HELP:'
+
+   Parameter VALUE
+      Position  1
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Value) Constant value to set selected regions to'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Output file for modified data'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUIT
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Terminate region selection'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter TVXST
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVXST'
+   endparameter
+
+   parameter TVXEN
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVXEN'
+   endparameter
+
+   parameter TVLOW
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVLOW'
+   endparameter
+
+   parameter TVHIGH
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVHIGH'
+   endparameter
+
+   parameter TVFILE
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.TVFILE'
+   endparameter
+
+   parameter TVCOLOR
+      type '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.TVCOLOR'
+   endparameter
+
+EndInterface

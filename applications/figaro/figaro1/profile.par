@@ -1,0 +1,8 @@
+image,f,a,,,,"(IMage) The input 2D data"
+ystart,r,a,,,,"(YStart) Y start for window"
+yend,r,a,,,,"(YEnd) Y end for window"
+degree,r,a,5.0,,,"(DEGree) Degree of polynomial"
+nreject,r,a,10.0,,,"(NREJect) Number of points to reject"
+profile,f,a,,,,"(PROFile) Name of resulting profile image"
+residual,f,a,,,,"(RESIDual) Name of image containing residuals"
+weight,b,a,y,,,"(WEIght) Use errors to weight fit?"

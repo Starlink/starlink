@@ -1,0 +1,85 @@
+Interface SPIED
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPIKETRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPIketrum) Spiketrum to be edited'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting spiketrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter COLOUR
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COLour) Plot colour (Bl,Wh,R,G,B,Cy,Ma,Y)'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUIT
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Terminate spiketrum editing'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Maximum Y value to plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Minimum Y value to plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Maximum X value to plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Minimum X value to plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDER
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Order for polynomial fit'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+   
+EndInterface

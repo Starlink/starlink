@@ -1,0 +1,27 @@
+in,f,a,,,,"Input NDF"
+info,b,a,y,,,"*! Issue informational messages"
+varuse,b,h,y,,,"Use input variances if available"
+dialog,s,a,"T",,,"*! Allow extensive interaction"
+repair,b,a,n,,,"Update spectroscopic axis number"
+device,f,a,!,,,"Graphics device"
+mask1,r,a,,,,"Mask interval lower bound(s)"
+mask2,r,a,,,,"Mask interval upper bound(s)"
+ncomp,i,a,1,1,6,"Number of components"
+theta,struct,a,,,,"Scaling constants"
+0. 0. 0. 0. 0. 0.
+alpha,struct,a,,,,"Emissivity exponents"
+0. 0. 0. 0. 0. 0.
+lgtemp,struct,a,,,,"Common logarithm of colour temperatures [K]"
+0. 0. 0. 0. 0. 0.
+sf,struct,a,,,,"Fit flags for scaling constants"
+0 0 0 0 0 0
+af,struct,a,,,,"Fit flags for emissivity exponents"
+1 2 3 4 5 6
+tf,struct,a,,,,"Fit flags for colour temperatures"
+0 0 0 0 0 0
+remask,b,a,n,,,"Improve mask intervals"
+reguess,b,a,n,,,"Improve component guesses"
+fitgood,b,a,y,,,"Fit acceptable"
+comp,struct,a,,,,"Component numbers for storage"
+1 2 3 4 5 6
+logfil,f,a,!,,,"ASCII file name for result output"

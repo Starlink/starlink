@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to be calibrated"
+calspect,f,a,,,,"(CALspect) Calibration spectrum"
+output,f,a,,,,"(OUTput) Resulting calibrated spectrum"

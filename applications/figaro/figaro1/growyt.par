@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Image to grow into planes of cube"
+cube,f,a,,,,"(Cube) Cube into which image is to be grown"
+xstart,r,a,,,,"(XStart) First plane to copy image into"
+xend,r,a,,,,"(XEnd) Last plane to copy image into"
+new,b,a,n,,,"(NEw) Force creation of a new cube?"
+xsize,r,a,,,,"(XSIze) X-dimension of new image"

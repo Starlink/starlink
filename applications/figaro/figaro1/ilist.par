@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Name of image to be listed"
+ystart,r,a,,,,"(YStart) First Y value for list"
+yend,r,a,,,,"(YEnd) Last Y value for list"
+xstart,r,a,,,,"(XStart) First X value for list"
+xend,r,a,,,,"(XEnd) Last X value for list"
+hardcopy,b,a,n,,,"(HArdcopy) Produce a file containing list?"

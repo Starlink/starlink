@@ -1,0 +1,7 @@
+image,f,a,,,,"(IMage) The 1D or 2D data"
+whole,b,a,y,,,"(WHole) Plot all of spectrum?"
+xstart,r,a,,,,"(XStart) First X-value to be plotted"
+xend,r,a,,,,"(XEnd) Last X-value to be plotted"
+output,f,a,,,,"(OUTput) Name of resulting edited data"
+yvalue,r,a,,,,"Y value to plot"
+soft,s,a,"xw",,,"*! "

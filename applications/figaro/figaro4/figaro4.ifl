@@ -1,0 +1,3023 @@
+monolith figaro4
+#+
+#  Name:
+#     ARCDISP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     18 Jun 1993 (hme):
+#        Original version.
+#     30 Jun 1993 (hme):
+#        DIALOG global.
+#     {enter_further_changes_here}
+
+#-
+
+interface ARCDISP
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','g','n','t','y','F','G','N','T','Y'
+      default  'G'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive graphical interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter ORDER
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  2
+      range    1, 7
+      prompt   'Polynomial order for dispersion curve'
+      helpkey  '*'
+   endparameter
+
+   parameter FDB
+      type     'NDF'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Feature data base NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter WRANGE
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Laboratory value range for this row'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ARCGENDB.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     09 Jun 1993 (hme):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface ARCGENDB
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'FILENAME'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Input file with ASCII line list'
+      helpkey  '*'
+   endparameter
+
+   parameter FDB
+      position 2
+      type     'NDF'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Output NDF for feature data base'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ARCIDENT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     03 Jun 1993 (hme):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface ARCIDENT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association <->GLOBAL.SPECDRE_INFO
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter ECHELLE
+      type     '_LOGICAL'
+      vpath    'DYNAMIC,DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  NO
+      prompt   'Split WRANGE, assuming orders of echellogram'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter FDB
+      position 3
+      type     'NDF'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Feature data base NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter WRANGE
+      type     '_REAL'
+      prompt   'Approximate lab value range'
+      helpkey  '*'
+   endparameter
+
+   parameter DRANGE
+      type     '_REAL'
+      vpath    'DYNAMIC'
+      ppath    'DYNAMIC'
+      prompt   'Safe dispersion interval'
+      helpkey  '*'
+   endparameter
+
+   parameter STRENGTH
+      type     '_REAL'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  50.
+      range    1., 1E30
+      prompt   'Maximum strength ratio'
+      helpkey  '*'
+   endparameter
+
+   parameter THRESH
+      type     '_REAL'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.03
+      range    0.01, 0.2
+      prompt   'Distance ratio match tolerance'
+      helpkey  '*'
+   endparameter
+
+   parameter MAXLOC
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  30
+      prompt   'Maximum number of features used for identification'
+      helpkey  '*'
+   endparameter
+
+   parameter MINIDS
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  9
+      prompt   'Minimum number of feature identifications to accept solution'
+      helpkey  '*'
+   endparameter
+
+   parameter NEIGHB
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  3,6
+      prompt   'Start and maximum number of neighbours considered'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ARCLOCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     08 Jun 1993 (hme):
+#     	 Original version.
+#     30 Jun 1993 (hme):
+#        DIALOG global.
+#     {enter_changes_here}
+
+#-
+
+interface ARCLOCAT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','g','n','t','y','F','G','N','T','Y'
+      default  'G'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive graphical interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     '_CHAR'
+      vpath    'CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  'Gauss'
+      prompt   'Gauss or triangle features'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      position 2
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      range    2., 1E30
+      prompt   'Feature width'
+      helpkey  '*'
+   endparameter
+
+   parameter THRESH
+      position 3
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      range    1E-30, 1E30
+      prompt   'Minimum feature strength'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter ROWNUM
+      type     '_INTEGER'
+      prompt   'Number of row to work on next'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ASCIN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-MAY-1991 (HME):
+#        Original version.
+#     05-JUL-1991 (HME):
+#        Error reporting. SPECDRE help library.
+#     22-NOV-1991 (HME):
+#        Change to N-D version. Modify message and error reporting.
+#     18-MAY-1992 (HME):
+#        Port to NDF and Unix.
+#     {enter_further_changes_here}
+
+#-
+
+interface ASCIN
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter TOL
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  0.2
+      range    0., .5
+      prompt   'Table/pixel coordinate mismatch tolerance'
+      helpkey  '*'
+   endparameter
+
+   parameter BAD
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  -999999.
+      prompt   'Bad value as used in table'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'FILENAME'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'ASCII input file'
+      helpkey  '*'
+   endparameter
+
+   parameter LINES
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,9999
+      prompt   'Line number range'
+      helpkey  '*'
+   endparameter
+
+   parameter COLAXES
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2
+      prompt   'Columns to read axis data from'
+      helpkey  '*'
+   endparameter
+
+   parameter COLWIDTH
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0
+      prompt   'Column to read pixel width from'
+      helpkey  '*'
+   endparameter
+
+   parameter COLDATA
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  3,0
+      prompt   'Columns to read data and errors from'
+      helpkey  '*'
+   endparameter
+
+   parameter START
+      type     '_REAL'
+      prompt   'Data start values'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      type     '_REAL'
+      prompt   'Pixel step values'
+      helpkey  '*'
+   endparameter
+
+   parameter END
+      type     '_REAL'
+      prompt   'Data end values'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     'NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     ASCOUT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-APR-1991 (HME):
+#        Original version.
+#     05-JUL-1991 (HME):
+#        Error reporting. INFO. SPECDRE help library.
+#     19-NOV-1991 (HME):
+#        ODIM, SSETX oblivious.
+#        AXIS.
+#     06-MAY-1992 (HME):
+#        Using NDF and the Extension makes most parameters obsolete.
+#     22 Feb 1994 (hme):
+#        Remove the unused INFO parameter.
+#     {enter_further_changes_here}
+
+#-
+
+interface ASCOUT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter WIDTH
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  NO
+      prompt   'Write also the pixel widths'
+      helpkey  '*'
+   endparameter
+
+   parameter BAD
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  -999999.0
+      prompt   'Table value to replace bad values'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'FILENAME'
+      ppath    'CURRENT'
+      prompt   'Output ASCII file'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     BBODY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     TDCA: Tim Ash (RAL)
+#     VGG: Vito Graffagnino (RAL)
+#     ACD: Clive Davenhall (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-MAR-1991 (HME):
+#        Original version.
+#     28-MAR-1991 (HME):
+#        Help library.
+#     11-APR-1991 (HME):
+#        Changed some parameter names. Use "Angstrom" instead of "Ang".
+#     28-JUN-1991 (HME):
+#        Error reporting.
+#     28-OCT-1991 (HME):
+#        Do away with FAIL message. Range of XPOWER -99 to +99.
+#     27-NOV-1991 (HME):
+#        Make IN and OUT global.
+#     18-JUN-1992 (HME):
+#        Port to NDF and Unix.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP.
+#     05-JUL-2001 (VGG):
+#        Introduced ERRTEMP parameter to include errors on the input
+#        temperature. 
+#     07-JUL-2001 (ACD):
+#        Added vpath for ERRTEMP.
+#     {enter_further_changes_here}
+#-
+
+interface BBODY
+
+   helplib 'FIG_HELP:'
+
+   parameter LOGAR
+      type     '_LOGICAL'
+      default  NO
+      vpath    'DEFAULT'
+      prompt   'Write logarithms of intensity'
+      helpkey  '*'
+   endparameter
+
+   parameter TEMP
+      position 1
+      type     '_REAL'
+      range    1E-35, 1E+35
+      prompt   'Black body temperature in K'
+      helpkey  '*'
+   endparameter
+
+   parameter ERRTEMP
+      type     '_REAL'
+      range    1E-35, 1E+35
+      default  !      
+      vpath    'DYNAMIC,DEFAULT'
+      prompt   'Error on the Black body temperature in K'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      type     'NDF'
+      default  !
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter XSTART
+      type     '_REAL'
+      prompt   'Spectroscopic axis start value'
+      helpkey  '*'
+   endparameter
+
+   parameter XSTEP
+      type     '_REAL'
+      prompt   'Spectroscopic axis increment'
+      helpkey  '*'
+   endparameter
+
+   parameter XEND
+      type     '_REAL'
+      prompt   'Spectroscopic axis end value'
+      helpkey  '*'
+   endparameter
+
+   parameter XLABEL
+      type     '_CHAR'
+      default  'wavelength'
+      in       'wavelength', 'frequency'
+      prompt   'Label for spectroscopic axis'
+      helpkey  '*'
+   endparameter
+
+   parameter XUNIT
+      type     '_CHAR'
+      prompt   'Unit for spectroscopic axis'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     CORREL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     11-APR-1991 (HME):
+#        Original version.
+#     05-JUL-1991 (HME):
+#        Error reporting. INFO. SPECDRE help library.
+#     27-NOV-1991 (HME):
+#        Make INFO global.
+#     05-JUN-1992 (HME):
+#        Port to NDF and Unix.
+#     {enter_further_changes_here}
+
+#-
+
+interface CORREL
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter INLIST
+      position 1
+      type     'LITERAL'
+      prompt   'List of 2 or 3 input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII table output file'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      position 3
+      type     'FILENAME'
+      prompt   'Log file'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     EDITEXT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-FEB-1992 (HME):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface EDITEXT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter REQUEST
+      position 1
+      type     '_CHAR'
+      default  'List'
+      prompt   'What kind of action required'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for list output'
+      helpkey  '*'
+   endparameter
+
+#   [parameter_specification]...
+
+#   [message_specification]...
+
+endinterface
+#+
+#  Name:
+#     EVALFIT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     24 Jul 1992 (hme):
+#        Original version.
+#     30 Jun 1993 (hme):
+#        DIALOG is _CHAR for 3-value logic.
+#     {enter_changes_here}
+
+#-
+
+interface EVALFIT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow repeated prompts'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Component(s) to evaluate'
+      helpkey  '*'
+   endparameter
+
+   parameter REPLY
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Evaluate another set of components'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FILLCUBE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     14 May 1993 (hme):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface FILLCUBE
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter TOL
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  0.2
+      range    0., .5
+      prompt   'Pixel coordinate mismatch tolerance'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FITBB.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     27 Jan 1993 (hme):
+#        Adapted from FITTRI.
+#     30 Jun 1993 (hme):
+#        DIALOG is _CHAR for 3-value logic.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITBB
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter REPAIR
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Update spectroscopic axis number'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      ptype    'DEVICE'
+#     vpath    'GLOBAL,PROMPT'
+#     ppath    'GLOBAL,CURRENT,DEFAULT'
+#     association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  !
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK1
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval lower bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK2
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval upper bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter NCOMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 6
+      prompt   'Number of components'
+      helpkey  '*'
+   endparameter
+
+   parameter THETA
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0.,0.,0.,0.,0.,0.
+      prompt   'Scaling constants'
+      helpkey  '*'
+   endparameter
+
+   parameter ALPHA
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0.,0.,0.,0.,0.,0.
+      prompt   'Emissivity exponents'
+      helpkey  '*'
+   endparameter
+
+   parameter LGTEMP
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0.,0.,0.,0.,0.,0.
+      prompt   'Common logarithm of colour temperatures [K]'
+      helpkey  '*'
+   endparameter
+
+   parameter SF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for scaling constants'
+      helpkey  '*'
+   endparameter
+
+   parameter AF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Fit flags for emissivity exponents'
+      helpkey  '*'
+   endparameter
+
+   parameter TF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for colour temperatures'
+      helpkey  '*'
+   endparameter
+
+   parameter REMASK
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve mask intervals'
+      helpkey  '*'
+   endparameter
+
+   parameter REGUESS
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve component guesses'
+      helpkey  '*'
+   endparameter
+
+   parameter FITGOOD
+      type     '_LOGICAL'
+      default  YES
+      prompt   'Fit acceptable'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Component numbers for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for result output'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FITGAUSS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     acd; Clive Davenhall (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     02 May 1991 (hme):
+#        Original version (SPECFIT).
+#     03 May 1991 (hme):
+#        Split MASK into MASK1 and MASK2 and use ppath 
+#        'DYNAMIC,DEFAULT'. For fit parameters TYPE, CONT, CFLAGS,
+#        CENTRE etc. use ppath 'CURRENT,DEFAULT'.
+#     08 May 1991 (hme):
+#        Change CFLAGS, PFLAGS, SFLAGS to CF, PF, WF.
+#        Replace SIGMA by FWHM.
+#     31 May 1991 (hme):
+#        Try a different way to deal with array parameters.
+#        Restrict number of Gauss components to 6.
+#     28 Jun 1991 (hme):
+#        VARUSE, MSKUSE, INFO, ROW.
+#        Use token for messages.
+#     05 Jul 1991 (hme):
+#        SPECDRE help library.
+#     17 Jul 1991 (hme):
+#        Set the Gaussian parameters' and fit flags' ppath to
+#        'DYNAMIC,CURRENT,DEFAULT' instead of 'DYNAMIC,CURRENT'. Supply
+#        defaults for these. Supply a default for LOGFIL.
+#     22 Jul 1991 (hme):
+#        MENUE -> MENU. Scrap XTOL, MSKUSE. Sort out messages and error 
+#        reports.
+#     23 Jul 1991 (hme):
+#        ITER, FITCENT, FITPEAK, FITFWHM parameters.
+#     20 Nov 1991 (hme):
+#        Global: INFO, IN, OUT. SSETX oblivious. Rename to FITGAUSS.
+#     27 Nov 1991 (hme):
+#        Make MODE's ppath CURRENT,DEFAULT.
+#     23 Apr 1992 (hme):
+#        Major review of FITGAUSS.
+#     30 Jun 1993 (hme):
+#        DIALOG is _CHAR for 3-value logic.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     23 Oct 2001 (acd):
+#        Added output parameters FCENTRE, FPEAK and FFWHM.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITGAUSS
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter REPAIR
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Update spectroscopic axis number'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      ptype    'DEVICE'
+#     vpath    'GLOBAL,PROMPT'
+#     ppath    'GLOBAL,CURRENT,DEFAULT'
+#     association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  !
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK1
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval lower bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK2
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval upper bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter NCOMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 6
+      prompt   'Number of components'
+      helpkey  '*'
+   endparameter
+
+   parameter CONT
+      type     '_REAL'
+      ppath    'CURRENT,DEFAULT'
+      default  0.
+      prompt   'Continuum level'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Gauss positions'
+      helpkey  '*'
+   endparameter
+
+   parameter PEAK
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,1,1,1,1,1
+      prompt   'Gauss heights'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,1,1,1,1,1
+      prompt   'Gauss widths (FWHM)'
+      helpkey  '*'
+   endparameter
+
+   parameter CF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line centres'
+      helpkey  '*'
+   endparameter
+
+   parameter PF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line peaks'
+      helpkey  '*'
+   endparameter
+
+   parameter WF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line widths'
+      helpkey  '*'
+   endparameter
+
+   parameter REMASK
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve mask intervals'
+      helpkey  '*'
+   endparameter
+
+   parameter REGUESS
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve component guesses'
+      helpkey  '*'
+   endparameter
+
+   parameter FITGOOD
+      type     '_LOGICAL'
+      default  YES
+      prompt   'Fit acceptable'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Component numbers for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for result output'
+      helpkey  '*'
+   endparameter
+
+   parameter FCENTRE
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0,0,0,0,0,0
+      Association '->GLOBAL.FITGAUSS_FCENTRE'
+   endparameter
+
+   parameter FPEAK
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1,1,1,1,1,1
+      Association '->GLOBAL.FITGAUSS_FPEAK'
+   endparameter
+
+   parameter FFWHM
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  1,1,1,1,1,1
+      Association '->GLOBAL.FITGAUSS_FFWHM'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FITPOLY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     21 Nov 1995 (hme):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface FITPOLY
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter REPAIR
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Update spectroscopic axis number'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      ptype    'DEVICE'
+   #  vpath    'GLOBAL,PROMPT'
+   #  ppath    'GLOBAL,CURRENT,DEFAULT'
+   #  association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  !
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK1
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval lower bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK2
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval upper bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter ORDER
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 7
+      prompt   'Polynomial order'
+      helpkey  '*'
+   endparameter
+
+   parameter REMASK
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve mask intervals'
+      helpkey  '*'
+   endparameter
+
+   parameter REGUESS
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve polynomial order'
+      helpkey  '*'
+   endparameter
+
+   parameter FITGOOD
+      type     '_LOGICAL'
+      default  YES
+      prompt   'Fit acceptable'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 2000000
+      prompt   'Component number for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for result output'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     FITTRI.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     23 Jul 1992 (hme):
+#        Adapt from FITGAUSS.
+#     30 Jun 1993 (hme):
+#        DIALOG is _CHAR for 3-value logic.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITTRI
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter REPAIR
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Update spectroscopic axis number'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      ptype    'DEVICE'
+#     vpath    'GLOBAL,PROMPT'
+#     ppath    'GLOBAL,CURRENT,DEFAULT'
+#     association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  !
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK1
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval lower bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK2
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval upper bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter NCOMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 6
+      prompt   'Number of components'
+      helpkey  '*'
+   endparameter
+
+   parameter CONT
+      type     '_REAL'
+      ppath    'CURRENT,DEFAULT'
+      default  0.
+      prompt   'Continuum level'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Triangle positions'
+      helpkey  '*'
+   endparameter
+
+   parameter PEAK
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,1,1,1,1,1
+      prompt   'Triangle heights'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,1,1,1,1,1
+      prompt   'Triangle widths (FWHM)'
+      helpkey  '*'
+   endparameter
+
+   parameter CF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line centres'
+      helpkey  '*'
+   endparameter
+
+   parameter PF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line peaks'
+      helpkey  '*'
+   endparameter
+
+   parameter WF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for line widths'
+      helpkey  '*'
+   endparameter
+
+   parameter REMASK
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve mask intervals'
+      helpkey  '*'
+   endparameter
+
+   parameter REGUESS
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve component guesses'
+      helpkey  '*'
+   endparameter
+
+   parameter FITGOOD
+      type     '_LOGICAL'
+      default  YES
+      prompt   'Fit acceptable'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Component numbers for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for result output'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     GROW.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     26 Mar 1991 (hme):
+#        Original version.
+#     11 Apr 1991 (hme):
+#        NOINFO added, NEW hidden.
+#     28 Jun 1991 (hme):
+#        INFO. Error reporting.
+#     26 Nov 1991 (hme):
+#        Global parameters, change reporting.
+#     13 Jun 1992 (hme):
+#        Port to NDF and Unix.
+#     21 May 1993 (hme):
+#        Add EXPAND parameter.
+#     {enter_further_changes_here}
+
+#-
+interface   GROW
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter NEW
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  NO
+      prompt   'Create a new output file'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter EXPAND
+      type     '_INTEGER'
+      position 2
+      prompt   'For each axis: expanded or old    (0 for old axis)'
+      helpkey  '*'
+   endparameter
+
+   parameter STAPIX
+      type     '_INTEGER'
+      position 3
+      prompt   'For each axis: target start pixel (0 for old axis)'
+      helpkey  '*'
+   endparameter
+
+   parameter ENDPIX
+      type     '_INTEGER'
+      position 4
+      prompt   'For each axis: target end pixel   (0 for old axis)'
+      helpkey  '*'
+   endparameter
+
+   parameter SIZE
+      type     '_INTEGER'
+      prompt   'For each axis: output axis length   (0 for old axis)'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     moments.ifl
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     01 Mar 1994 (hme):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface MOMENTS
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  0
+      prompt   'Component number for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter BIAS
+      type     '_REAL'
+      ppath    'CURRENT,DEFAULT'
+      default  0.
+      prompt   'Continuum level'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     movie.ifl
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     19 May 1994 (hme):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface MOVIE
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y','g','G'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     '_CHAR'
+      vpath    'CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  'Fast'
+      prompt   'Operation mode (fast/square/fill)'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter AXIS
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  3
+      prompt   'Frame-counting axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LOW
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Minimum data for display'
+      helpkey  '*'
+   endparameter
+
+   parameter HIGH
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Maximum data for display'
+      helpkey  '*'
+   endparameter
+
+   parameter DELAY
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  0.
+      prompt   'Delay in seconds between frames'
+      helpkey  '*'
+   endparameter
+
+   parameter MENU
+      type     '_CHAR'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      in       'F','B','I','P','N','Q','?','f','b','i','p','n','q'
+      default  'F'
+      prompt   'Display option (FBIPNQ)'
+      helpkey  '*'
+   endparameter
+
+   parameter FRAME
+      type     '_INTEGER'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Frame number to display'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     RESAMP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     06-FEB-1992 (HME):
+#        Original version.
+#     07-FEB-1992 (HME):
+#        Replace ASCII list of input NDFs by re-prompting for next name.
+#     18-MAR-1992 (HME):
+#        Switch to Dave Berry's NDF groups. INLIST replaces IN, but we keep the
+#        specification of the IN parameter. IN is unused, but the relevant
+#        routine SPAAA can be quickly changed to switch back to RESAMPLE using
+#        a re-prompted IN parameter.
+#     08-JUL-1992 (HME):
+#        Replace SIZE with STEP.
+#     {enter_further_changes_here}
+
+#-
+
+interface RESAMP
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter MODE
+      position 1
+      type     '_CHAR'
+      default  'Cube'
+      prompt   'Average SPECTRA or resample rows in CUBE (S/C)'
+      helpkey  '*'
+   endparameter
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances and ignore input without variance'
+      helpkey  '*'
+   endparameter
+
+   parameter INLIST
+      position 2
+      type     'LITERAL'
+      prompt   'Group of input NDFs'
+      helpkey  '*'
+   endparameter
+
+#  parameter IN
+#     position 1
+#     type     'NDF'
+#     prompt   'Next input NDF'
+#     helpkey  '*'
+#  endparameter
+
+   parameter OUT
+      position 3
+      type     'NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter START
+      position 4
+      type     '_DOUBLE'
+      prompt   'Output start coordinate'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      position 5
+      type     '_DOUBLE'
+      prompt   'Output coordinate step'
+      helpkey  '*'
+   endparameter
+
+   parameter END
+      position 6
+      type     '_DOUBLE'
+      prompt   'Output end coordinate'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SPECCONT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     22 Jun 1994 (hme):
+#        Original version.
+#     21 Apr 1995 (hme):
+#        Add STYLE and NMINOR, CONTOURS removed.
+#     {enter_further_changes_here}
+
+#-
+
+interface SPECCONT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter CLEAR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Clear the active part of screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERLAY
+      type     '_LOGICAL'
+      default  FALSE
+      prompt   'Overlay on existing data'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter FILL
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Ignore image aspect ratio'
+      helpkey  '*'
+   endparameter
+
+   parameter ROMAN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use nicer font'
+      helpkey  '*'
+   endparameter
+
+   parameter HEIGHT
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1.
+      range    0.01 40.
+      prompt   'Character height (marker size)'
+      helpkey  '*'
+   endparameter
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 255
+      prompt   'Colour index'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 21
+      prompt   'Line thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter DASH
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 5
+      prompt   'Dash pattern code'
+      helpkey  '*'
+   endparameter
+
+   parameter AXES                # Box layout
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Draw axes'
+      helpkey  '*'
+   endparameter
+
+   parameter TICK
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '----'
+      prompt   'Draw ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter NUML
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++00'
+      prompt   'Write numerical labels'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Write text labels'
+      helpkey  '*'
+   endparameter
+
+   parameter MAJOR
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0., 0.
+      prompt   'Interval between major ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter MINOR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0, 0
+      prompt   'No. of minor intervals per major interval'
+      helpkey  '*'
+   endparameter
+
+   parameter BOTTOM
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for bottom axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LEFT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for left axis'
+      helpkey  '*'
+   endparameter
+
+   parameter TOP
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for top axis'
+      helpkey  '*'
+   endparameter
+
+   parameter RIGHT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for right axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LABSPC
+      type     '_REAL'
+      ppath    'DEFAULT'
+      default  0.1, 0.1, 0.05, 0.05
+      prompt   'Space for labelling'
+      helpkey  '*'
+   endparameter
+
+   parameter WORLD
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'World coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Linear'
+      prompt   'Contour stepping (linear/free)'
+      helpkey  '*'
+   endparameter
+
+   parameter START
+      type     '_REAL'
+      prompt   'First contour value'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      type     '_REAL'
+      prompt   'Step between contours'
+      helpkey  '*'
+   endparameter
+
+   parameter END
+      type     '_REAL'
+      prompt   'Last contour value'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SPECGRID.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     21 Sep 1994 (hme):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface SPECGRID
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter CLEAR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Clear the active part of screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERLAY
+      type     '_LOGICAL'
+      default  FALSE
+      prompt   'Overlay on existing data'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter LIN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Line-style connections'
+      helpkey  '*'
+   endparameter
+
+   parameter BIN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Bin-style connections'
+      helpkey  '*'
+   endparameter
+
+   parameter MARK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0
+      range    0, 6
+      prompt   'Marker symbol'
+      helpkey  '*'
+   endparameter
+
+   parameter ERROR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Error bars'
+      helpkey  '*'
+   endparameter
+
+   parameter WIDTH
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Pixel width bars'
+      helpkey  '*'
+   endparameter
+
+   parameter FRAME
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Frame for each cell'
+      helpkey  '*'
+   endparameter
+
+   parameter FILL
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Fill area available'
+      helpkey  '*'
+   endparameter
+
+   parameter ROMAN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use nicer font'
+      helpkey  '*'
+   endparameter
+
+   parameter HEIGHT
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1.
+      range    0.01 40.
+      prompt   'Character height (marker size)'
+      helpkey  '*'
+   endparameter
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 255
+      prompt   'Colour index'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 21
+      prompt   'Line thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter DASH
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 5
+      prompt   'Dash pattern code'
+      helpkey  '*'
+   endparameter
+
+   parameter AXES
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Draw axes'
+      helpkey  '*'
+   endparameter
+
+   parameter TICK
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '----'
+      prompt   'Draw ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter NUML
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++00'
+      prompt   'Write numerical labels'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '+++0'
+      prompt   'Write text labels'
+      helpkey  '*'
+   endparameter
+
+   parameter MAJOR
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0., 0.
+      prompt   'Interval between major ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter MINOR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0, 0
+      prompt   'No. of minor intervals per major interval'
+      helpkey  '*'
+   endparameter
+
+   parameter BOTTOM
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for bottom axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LEFT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for left axis'
+      helpkey  '*'
+   endparameter
+
+   parameter TOP
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for top axis'
+      helpkey  '*'
+   endparameter
+
+   parameter RIGHT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for right axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LABSPC
+      type     '_REAL'
+      ppath    'DEFAULT'
+      default  0.1, 0.1, 0.05, 0.05
+      prompt   'Space for labelling'
+      helpkey  '*'
+   endparameter
+
+   parameter CWORLD
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'World coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter LEGEND
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Position of legend cell'
+      helpkey  '*'
+   endparameter
+
+   parameter CELLSZ
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1., 1.
+      prompt   'Size of spectral cells'
+      helpkey  '*'
+   endparameter
+
+   parameter SWORLD
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'World coordinates within cells'
+      helpkey  '*'
+   endparameter
+
+   parameter XLEGEND
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for bottom of legend cell'
+      helpkey  '*'
+   endparameter
+
+   parameter YLEGEND
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for left of legend cell'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SPECPLOT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     21-SEP-1991 (HME):
+#        Original version.
+#     23-SEP-1991 (HME):
+#        Replace BOXPOS by LABSPC
+#     24-JUN-1992 (HME):
+#        Port to NDF and Unix.
+#     17-MAR-1993 (HME):
+#        Remove "X" from WORLD prompt.
+#     {enter_further_changes_here}
+
+#-
+
+interface SPECPLOT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO                # Information policy
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Data access and subset
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERLAY             # Use recent data as inner box?
+      type     '_LOGICAL'
+      default  FALSE
+      prompt   'Overlay on existing data'
+      helpkey  '*'
+   endparameter
+
+   parameter LIN                 # Data layout
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  TRUE
+      prompt   'Line-style connections'
+      helpkey  '*'
+   endparameter
+
+   parameter BIN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Bin-style connections'
+      helpkey  '*'
+   endparameter
+
+   parameter MARK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0
+      range    0, 6
+      prompt   'Marker symbol'
+      helpkey  '*'
+   endparameter
+
+   parameter ERROR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Error bars'
+      helpkey  '*'
+   endparameter
+
+   parameter WIDTH
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Pixel width bars'
+      helpkey  '*'
+   endparameter
+
+   parameter CLEAR               # Attributes
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Clear the active part of screen'
+      helpkey  '*'
+   endparameter
+
+   parameter ROMAN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use nicer font'
+      helpkey  '*'
+   endparameter
+
+   parameter HEIGHT
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1.
+      range    0.01 40.
+      prompt   'Character height (marker size)'
+      helpkey  '*'
+   endparameter
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 255
+      prompt   'Colour index'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 21
+      prompt   'Line thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter DASH
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 5
+      prompt   'Dash pattern code'
+      helpkey  '*'
+   endparameter
+
+   parameter AXES                # Box layout
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Draw axes'
+      helpkey  '*'
+   endparameter
+
+   parameter TICK
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '----'
+      prompt   'Draw ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter NUML
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++00'
+      prompt   'Write numerical labels'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '+++0'
+      prompt   'Write text labels'
+      helpkey  '*'
+   endparameter
+
+   parameter NORTHO
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1.
+      prompt   'Expected length of orthogonal numeric labels'
+      helpkey  '*'
+   endparameter
+
+   parameter MAJOR
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0., 0.
+      prompt   'Interval between major ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter MINOR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0, 0
+      prompt   'No. of minor intervals per major interval'
+      helpkey  '*'
+   endparameter
+
+   parameter BOTTOM
+      type     '_CHAR'
+      prompt   'Label for bottom axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LEFT
+      type     '_CHAR'
+      prompt   'Label for left axis'
+      helpkey  '*'
+   endparameter
+
+   parameter TOP
+      type     '_CHAR'
+      prompt   'Label for top axis'
+      helpkey  '*'
+   endparameter
+
+   parameter RIGHT
+      type     '_CHAR'
+      prompt   'Label for right axis'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE              # Graphics device
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter LABSPC
+      type     '_REAL'
+      prompt   'Space for labelling'
+      helpkey  '*'
+   endparameter
+
+   parameter WORLD
+      type     _REAL
+      prompt   'World coordinates'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     SUBSET.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     07-JUN-1991 (HME):
+#        Original version.
+#     28-JUN-1991 (HME):
+#        Error reporting.
+#     05-JUL-1991 (HME):
+#        SPECDRE help library.
+#     27-NOV-1991 (HME):
+#        Make IN, OUT, INFO global. Change reporting.
+#     13-JUN-1992 (HME):
+#        Routine rewritten using NDF.
+#     {enter_further_changes_here}
+
+#-
+
+interface SUBSET
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+#+
+#  Name:
+#     XTRACT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-MAR-1991 (HME):
+#         Original version.
+#     11-APR-1991 (HME):
+#         NOINFO and NOVAR added.
+#     28-JUN-1991 (HME):
+#         On-the-fly subset. INFO, VARUSE. Error reporting.
+#     25-NOV-1991 (HME):
+#         Some parameters global. Errors and messages.
+#     13-JUN-1992 (HME):
+#         Port to NDF and Unix.
+#     {enter_further_changes_here}
+
+#-
+
+interface XTRACT
+
+   helplib 'SPECDRE_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter COLAPS
+      type     '_INTEGER'
+      position 2
+      prompt   'For each axis: 0 (retain) or 1 (collapse)'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 3
+      type     'NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface
+endmonolith

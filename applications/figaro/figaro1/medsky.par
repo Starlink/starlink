@@ -1,0 +1,5 @@
+files,s,a,"files.dat",,,"(FILE) File containing list of images or spectra"
+output,f,a,,,,"(OUTput) The file containing the medians of the inputs"
+imglog,f,a,,,,"(IMGlog) Image to contain median origin values?"
+scaled,b,a,n,,,"(SCale) Scale input images relative to the first?"
+log,b,h,n,,,"(LOG) Create an image showing origins of median values?"

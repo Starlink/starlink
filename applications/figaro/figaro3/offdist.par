@@ -1,0 +1,3 @@
+infile,s,a,"sdist.dat",,,"(INfile) Name of distortion file to be modified"
+offset,r,a,0.0,,,"(OFfset) Offset in Y to be applied"
+outfile,s,a,"sdist.dat2",,,"(OUtfile) Name of new distortion file to be created"

@@ -1,0 +1,43 @@
+Interface FIGS423
+
+   helplib 'FIG_HELP:'
+
+   Parameter HCUBE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HCube) Name of FIGS image mode raw hypercube'
+      helpkey '*'
+   EndParameter
+
+   Parameter CYSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CYStart) First cycle number to be included'
+      helpkey '*'
+   EndParameter
+
+   Parameter CYEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CYEnd) Last cycle number to be included'
+      helpkey '*'
+   EndParameter
+
+   Parameter CUBE
+      Position  4
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CUbe) Name of resulting cube'
+      helpkey '*'
+   EndParameter
+
+EndInterface

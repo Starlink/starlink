@@ -1,0 +1,3 @@
+request,s,a,"List",,,"What kind of action required"
+in,f,a,,,,"Input NDF"
+logfil,f,a,!,,,"ASCII file name for list output"

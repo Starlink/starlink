@@ -1,0 +1,118 @@
+Interface ELSPLOT
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSIZE
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XSIze) Plot length in metres'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSIZE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YSIze) Height of plot in metres'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHOLE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHole) Plot all of spectrum?'
+      helpkey '*'
+   EndParameter
+
+   Parameter AUTOSCALE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(AUtoscale) Scale so all of spectrum fits?'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X-value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X-value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.HIGH'
+      Prompt '(HIgh) Maximum data value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.LOW'
+      Prompt '(LOw) Minimum data value to be plotted'
+      helpkey '*'
+   EndParameter
+
+   Parameter BIAS
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.BIAS'
+      Prompt '(BIas) Bias value to be added to data'
+      helpkey '*'
+   EndParameter
+
+   Parameter LABEL
+      Position  9
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LABel) Label for plot'
+      helpkey '*'
+   EndParameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+
+EndInterface

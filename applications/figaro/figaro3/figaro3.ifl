@@ -1,0 +1,2228 @@
+monolith figaro3
+Interface ARC
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Arc spectrum to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARCTYPE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARctype) Type of arc'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMA
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIgma) Arc line half width in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDER
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ORder) Polynomial order for 1st fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter PREVIOUS
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PREvious) Use arc lines from previous fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARFILE
+      Position  5
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARFile) Name of file giving previous fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter XCORR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XCorr) Determine relative shift & redetermine centers?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Resulting arc file with wavelength fit'
+      helpkey '*'
+   EndParameter
+
+   parameter WRITEARC
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Create and output file using this fit'
+      helpkey '*'
+   endparameter
+
+   parameter HARDARC
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do a hard plot of the arc'
+      helpkey '*'
+   endparameter
+
+   parameter HARDISP
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do a hard plot of the dispersion curve'
+      helpkey '*'
+   endparameter
+
+   parameter QUITSEL
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Quit line selection'
+      helpkey '*'
+   endparameter
+
+   parameter DISNCHAN
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Length of displayed sections'
+      helpkey '*'
+   endparameter
+
+   parameter MOVETOX
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'X-value'
+      helpkey '*'
+   endparameter
+
+   parameter LINEOK
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Correct?'
+      helpkey '*'
+   endparameter
+
+   parameter CMD
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Fit,Order,Disp,Help,Edit,Reselect,Quit,Print,Auto,Xauto,Modify'
+      helpkey '*'
+   endparameter
+
+   parameter LINENO
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Edit which line, zero to end edit'
+      helpkey '*'
+   endparameter
+
+   parameter WAVELEN
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Wavelength, blank to cancel line'
+      helpkey '*'
+   endparameter
+
+   parameter RESOLVE
+      type 'LITERAL'
+      vpath 'PROMPT'
+      in 'N','O','S','n','o','s'
+      prompt 'How is double ID to be resolved (N/O/S)'
+      helpkey '*'
+   endparameter
+
+   parameter CHFACT
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'New value for CHFACT'
+      helpkey '*'
+   endparameter
+
+   parameter SIGFACT
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'New value for SIGFACT'
+      helpkey '*'
+   endparameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+
+EndInterface
+Interface CDIST
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be corrected for S-distortion'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YStart) First Y value in range to be corrected'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Last Y value in range to be corrected'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  4
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+   Parameter MAXDEGY
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MAXdegy) Maximum degree polynomial to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter ROTATE
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ROTate) Try to minimise paging by prior rotation?'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface ECHARC
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Collapsed echelle arc image to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARCTYPE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARctype) Type of arc'
+      helpkey '*'
+   EndParameter
+
+   Parameter INTERACTIVE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INTeractive) Number of orders to fit interactively'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDERS
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ORDERS) Order numbers'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMA
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIgma) Arc line half width in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDERFIT
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ORDERFit) Polynomial order for 1st fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter PREVIOUS
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PREvious) Use arc lines from previous fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter MONITOR
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MONitor) ECHARC autofitting on device "PGPLOT" ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARFILE
+      Position  7
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARFile) Name of file giving previous fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter DOWAVES
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DOWaves) Write wavelength information to separate file?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WAVES
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WAves) Name of wavelength output image'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  9
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WAves) Name input copy with fitted wavelength'
+      helpkey '*'
+   EndParameter
+
+   parameter HARDARC
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do a hard plot of the last order arc'
+      helpkey '*'
+   endparameter
+
+   parameter HARDISP
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do a hard plot of the last order dispersion curve'
+      helpkey '*'
+   endparameter
+
+   parameter CONTINUE
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Continue,Repeat,Start,Quit'
+      helpkey '*'
+   endparameter
+
+   parameter HLINEMAP
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do hardcopy plot of arc line map'
+      helpkey '*'
+   endparameter
+
+   parameter HATLAS
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do hardcopy atlas of entire arc fit'
+      helpkey '*'
+   endparameter
+
+   parameter ORDPPAG
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Number of sub-order panels per page'
+      helpkey '*'
+   endparameter
+
+   parameter ANALYSIS
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Save a detailed line by line analysis'
+      helpkey '*'
+   endparameter
+
+   parameter QUITSEL
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Quit line selection in this order'
+      helpkey '*'
+   endparameter
+
+   parameter DISNCHAN
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Length of displayed sections'
+      helpkey '*'
+   endparameter
+
+   parameter MOVETOX
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'X-value'
+      helpkey '*'
+   endparameter
+
+   parameter LINEOK
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Correct?'
+      helpkey '*'
+   endparameter
+
+   parameter CMD
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Fit,O_fit,Disp,Help,Edit,Reselect,Cont,Print,Auto,Xauto,Modify'
+      helpkey '*'
+   endparameter
+
+   parameter LINENO
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Edit which line, zero to end edit'
+      helpkey '*'
+   endparameter
+
+   parameter WAVELEN
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Wavelength, blank to cancel line'
+      helpkey '*'
+   endparameter
+
+   parameter RESOLVE
+      type 'LITERAL'
+      vpath 'PROMPT'
+      in 'N','O','S','n','o','s'
+      prompt 'How is double ID to be resolved (N/O/S)'
+      helpkey '*'
+   endparameter
+
+
+   parameter CHFACT
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'New value for CHFACT'
+      helpkey '*'
+   endparameter
+
+   parameter SIGFACT
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'New value for SIGFACT'
+      helpkey '*'
+   endparameter
+   
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+   
+   parameter HARD
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+   
+   parameter THICKNESS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.THICKNESS'
+   endparameter
+
+EndInterface
+Interface ECHFIND
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) name of echelle image in which to search'
+      helpkey '*'
+   EndParameter
+
+   Parameter PERISCOPE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PERIscope) Is the periscope fitted?'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YSTart) Y value to start search for orders'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Y value to stop search for orders'
+      helpkey '*'
+   EndParameter
+
+   Parameter MSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MStart) number of the first order in range'
+      helpkey '*'
+   EndParameter
+
+   Parameter MDELTA
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MDelta) order number increment (-1 or +1) ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SDIST
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SDIst) write output file SDIST.DAT in SDIST format?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTFILE
+      Position  6
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTFile) name of output report file'
+      helpkey '*'
+   EndParameter
+
+   Parameter THRESH
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(THResh) threshold above which orders are deemed to exist'
+      helpkey '*'
+   EndParameter
+
+   Parameter MINHW
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MINHw) minimum half-width of orders'
+      helpkey '*'
+   EndParameter
+
+   Parameter DOMASK
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DOMask) create an output mask image?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  9
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) name of mask image showing order positions'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface ECHMASK
+
+   helplib 'FIG_HELP:'
+
+   Parameter COFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COFile) Name of file containing order fit coeffs'
+      helpkey '*'
+   EndParameter
+
+   Parameter PERISCOPE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PERIscope) Is the star / sky periscope fitted?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBJWIDTH
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBJWidth) Number of rows of object to extract per order'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBJOFFSET
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBJOffset) Offset from order centre of object centre'
+      helpkey '*'
+   EndParameter
+
+   Parameter S1WIDTH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S1Width) Number of rows of region 1 sky to extract'
+      helpkey '*'
+   EndParameter
+
+   Parameter S1OFFSET
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S1Offset) Offset from object centre of region 1 sky centre'
+      helpkey '*'
+   EndParameter
+
+   Parameter S2WIDTH
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S2Width) Number of rows of region 2 sky to extract'
+      helpkey '*'
+   EndParameter
+
+   Parameter S2OFFSET
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(S2Offset) Offset from object centre of region 2 sky centre'
+      helpkey '*'
+   EndParameter
+
+   Parameter MSTART
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MStart) Number of the first order fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter MDELTA
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MDelta) Order number increment (-1 or +1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter MASK
+      Position 10
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MASk) Name of mask image showing order positions'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface ECHMERGE
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of first image'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMAGE1
+      Position  2
+      Type '_CHAR'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(IMAGE1) Name of second image'
+      helpkey '*'
+   EndParameter
+
+   Parameter BOX
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Box) Size of box for median filter'
+      helpkey '*'
+   EndParameter
+
+   Parameter CUTOFF
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CUToff) Max ratio of data that permits contrib from weaker'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  5
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface ECHSELECT
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of distortion-corrected echellogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter PREVIOUS
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PREvious) Read in the previous selection?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHOLE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHole) Sum all cross-sections to give cut through image'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First x-axis value for collapse of image'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last x-axis value for collapse of image'
+      helpkey '*'
+   EndParameter
+
+   Parameter MSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MStart) Number of the first order fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter MDELTA
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MDelta) Order number increment (-1 or +1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBJOUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBJout) Name of created object echellogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter SKYOUT
+      Position  7
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SKYout) Name of created sky echellogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter DISNCHAN
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Length of displayed sections in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter MOVETOX
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Move to which X-axis value'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDER
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Set order number'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Minimum value for display'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Maximum value for display'
+      helpkey '*'
+   EndParameter
+
+   Parameter ADD
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Add to object cross-sections already selected'
+      helpkey '*'
+   EndParameter
+
+   Parameter CLEAR
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Clear all settings for this order'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUITSEL
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Quit selection'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface
+#  History:
+#     11 Mar 1993 (hme):
+#        Individual review of parameters.
+#     27 Jul 1993 (hme):
+#        Disuse PAR_Q*, add four parameters instead.
+
+Interface FINDSP
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to generate polynomial list from'
+      helpkey '*'
+   EndParameter
+
+   Parameter BLACK
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BLack) Black level for display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHITE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHite) White level for display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter NUMFIB
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NUMFib) Number of fibres (spectra) in the frame'
+      helpkey '*'
+   EndParameter
+
+   Parameter NORDER
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NORDer) Order of polynomials to fit along spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter NPTS
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NPts) Number of points along spectra required'
+      helpkey '*'
+   EndParameter
+
+   Parameter FWCENT
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FWcent) Full-width centroiding range in Y direction'
+      helpkey '*'
+   EndParameter
+
+   Parameter CFW
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CFW) Centroid following weight'
+      helpkey '*'
+   EndParameter
+
+   Parameter YFIRST
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YFirst) Central Y height of first spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSEP
+      Position 10
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YSep) Average separation between fibre spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter PFILE
+      Position 11
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PFile) Name of file to write polynomial fits to'
+      helpkey '*'
+   EndParameter
+
+   Parameter ADJUST
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Adjust start centroids'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHGPAR
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Repeat with new parameters'
+      helpkey '*'
+   EndParameter
+
+   Parameter REJECT
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Reject which fibre number - zero for no more'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHGREJ
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Repeat selection of rejections'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface
+## FLAIRCOMP - Compresses a FLAIR frame to give a weight vector.
+
+#+
+#  Name:
+#     FLAIRCOMP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 April 5 (MJC):
+#     	 Original version.
+#     1998 October 16 (MJC):
+#        TITLE defaults to !.
+#     1998 November 9 (ACD)
+#        Added entry for help library.
+#     {enter_further_changes_here}
+
+#-
+
+interface FLAIRCOMP
+
+   helplib 'FIG_HELP:'
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    2
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      TITLE          # Output NDF title
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     !
+      prompt      'Output title'
+      helpkey     '*'
+   endparameter
+
+endinterface
+## FLAIREXT - Optimally extracts spectra from a FLAIR NDF to form a new NDF.
+
+#+
+#  Name:
+#     FLAIREXT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1993 April 7 (MJC):
+#     	 Original version.
+#     1998 October 16 (MJC):
+#        TITLE defaults to !.  Default NFIBRES to 92.
+#     1998 November 9 (ACD)
+#        Added entry for help library.
+#     {enter_changes_here}
+
+#-
+
+interface FLAIREXT
+
+   helplib 'FIG_HELP:'
+
+   parameter      FIBRES         # Number of fibres to extract
+      position    4
+      type        '_INTEGER'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Number of fibres to extract'
+      default     92
+      helpkey     '*'
+   endparameter
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    3
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      PROFILE        # Profile NDF
+      position    2
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'NDF containing profile (weights)'
+      helpkey     '*'
+   endparameter
+
+   parameter      TITLE          # Output NDF title
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     !
+      prompt      'Output title'
+      helpkey     '*'
+   endparameter
+
+endinterface
+Interface IARC
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image containing 2D arc to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter RSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RSTart) Central row at which to start fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter RWIDTH
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RWidth) Number of rows to sum for each fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Text file used for results'
+      helpkey '*'
+   EndParameter
+
+   Parameter RSIGMA
+      Position  5
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RSIgma) Sigma to use for fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPREAD
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPRead) Perform initial search with increased sigma?'
+      helpkey '*'
+   EndParameter
+
+   Parameter GAP
+      Position  6
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Gap) Max times old position used for missing line'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMIN
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIGmin) Minimum sigma for locked lines'
+      helpkey '*'
+   EndParameter
+
+   Parameter XCORR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XCorr) Analyse successive spectra for shifts?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DETAIL
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DEtail) Output full details of each fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOCK
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOck) Automatic search for lines to help lock fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEIGHT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEight) Weight the fit with the line strengths?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHANSHIFT
+      Type '_REAL'       
+      Vpath 'DEFAULT'
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Default '1005.0'
+      Prompt 'Enter the constant shift to be added to all channel positions.'
+      helpkey '*'
+   EndParameter
+
+#
+# Output parameters.
+   
+   parameter IARC_WMAX
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0
+      association '->GLOBAL.IARC_WMAX'
+   endparameter
+   
+   parameter IARC_WMIN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0
+      association '->GLOBAL.IARC_WMIN'
+   endparameter
+
+   parameter NOFITS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0
+      Association '->GLOBAL.IARC_NOFITS'
+   endparameter
+
+   parameter ORDER
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0
+      Association '->GLOBAL.IARC_ORDER'
+   endparameter
+
+   parameter RMSMAX
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0.0
+      Association '->GLOBAL.IARC_RMSMAX'
+   endparameter
+
+EndInterface
+Interface ISCRUNCH
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be scrunched'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) File containing results of 2D arc fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter WSTART
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WStart) Wavelength of center of first bin'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEND
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEnd) Wavelength of center of last bin (or increment)'
+      helpkey '*'
+   EndParameter
+
+   Parameter BINS
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BIns) Number of bins for scrunched image'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Name of resulting scrunched image'
+      helpkey '*'
+   EndParameter
+
+   Parameter INCREMENT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INCrement) Treat WEND value as an increment value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FINAL
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FInal) Treat WEND as a final wavelength value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOG
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOg) Bin into logarithmic wavelength bins?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LINEAR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LInear) Use linear interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUAD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Quad) Use quadratic interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DENSITY
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DENsity) Treat data as flux per unit wavelength?'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface ISCRUNI
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be scrunched'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) File containing results of 1st 2D arc fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE2
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FILE2) File containing results of 2nd 2D arc fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter FRACTION
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FRaction) Used = FILE+(FILE2-FILE)*FRACTION'
+      helpkey '*'
+   EndParameter
+
+   Parameter WSTART
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WStart) Wavelength of center of first bin'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEND
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEnd) Wavelength of center of last bin (or increment)'
+      helpkey '*'
+   EndParameter
+
+   Parameter BINS
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BIns) Number of bins for scrunched image'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Name of resulting scrunched image'
+      helpkey '*'
+   EndParameter
+
+   Parameter INCREMENT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INCrement) Treat WEND value as an increment value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FINAL
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FInal) Treat WEND as a final wavelength value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOG
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOg) Bin into logarithmic wavelength bins?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LINEAR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LInear) Use linear interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUAD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Quad) Use quadratic interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DENSITY
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DENsity) Treat data as flux per unit wavelength?'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface MASKEXT
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) name of image containing spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter MASK
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MAsk) name of mask image'
+      helpkey '*'
+   EndParameter
+
+   Parameter MLOW
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MLow) Lowest order number to extract'
+      helpkey '*'
+   EndParameter
+
+   Parameter MHIGH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MHigh) Highest order number to extract'
+      helpkey '*'
+   EndParameter
+
+   Parameter SUBORD
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SUBord) Sub-order to extract (0 => all)'
+      helpkey '*'
+   EndParameter
+
+   Parameter REVERSE
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(REVerse) Create output with order numbers reversed?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting set of spectra'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface OFFDIST
+
+   helplib 'FIG_HELP:'
+
+   Parameter INFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INfile) Name of distortion file to be modified'
+      helpkey '*'
+   EndParameter
+
+   Parameter OFFSET
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OFfset) Offset in Y to be applied'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTFILE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtfile) Name of new distortion file to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface OVERPF
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be overlayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter BLACK
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BLack) Black level for display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHITE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHite) White level for display?'
+      helpkey '*'
+   EndParameter
+
+   Parameter PFILE
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PFile) Name of file containing polynomial fits'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YStart) First Y value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Last Y value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter EXTWID
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(EXtwid) Extraction full width in pixels to be overlayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter REPEAT
+      Position 10
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(REpeat) ?'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface
+Interface POLEXT
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image containing fibre data'
+      helpkey '*'
+   EndParameter
+
+   Parameter PFILE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PFile) Polynomial file to be used to find spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter DFILE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DFile) File listing dud fibres'
+      helpkey '*'
+   EndParameter
+
+   Parameter EXTWIDTH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(EXtwidth) Width of spectra in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  5
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Fibre image to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface SDIST
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image containing distortion spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter COLUMNS
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COLumns) Number of cols to average to get peaks'
+      helpkey '*'
+   EndParameter
+
+   Parameter TRACE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TRace) Trace mode - G(aussian) B(al) C(OG) or E(dge)'
+      helpkey '*'
+   EndParameter
+
+   Parameter WIDTH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WIdth) Half width of spectra - in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter MAXDEG
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MAXdeg) Maximum degree polynomial to use'
+      helpkey '*'
+   EndParameter
+
+#  Parameter DISPLAY
+#     Type '_LOGICAL'      
+#     Vpath 'PROMPT'                        
+#     Ppath 'CURRENT,DYNAMIC,DEFAULT'
+#     Prompt '(DIsplay) Use image display to show fit results?'
+#     Help   'For more details, use "HELP SDIST" and select topic "DISPLAY"'
+#  EndParameter
+
+   Parameter SOFTD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SOftd) Display results on graphics device?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DIAGNOSE
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DIAgnose) Output details of trace failures?'
+      helpkey '*'
+   EndParameter
+
+   Parameter NEXT
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Ready for next spectrum'
+      helpkey '*'
+   EndParameter
+
+   parameter NPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.NPIXELS'
+   endparameter
+
+   parameter XPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.XPIXELS'
+   endparameter
+
+   parameter YPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.YPIXELS'
+   endparameter
+   
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface
+## SKYLINER - Removes a sky spectrum normalised by the height of the 5577 [OI] emission line.
+
+#+
+#  Name:
+#     SKYLINER.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     1994 October 14 (MJC):
+#     	 Original version.
+#     1998 November 9 (ACD)
+#        Added entry for help library.
+#     {enter_changes_here}
+
+#-
+
+interface SKYLINER
+
+   helplib 'FIG_HELP:'
+
+   parameter      IN             # Input NDF
+      position    1
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.DATA_ARRAY'
+      prompt      'Input NDF'
+      helpkey     '*'
+   endparameter
+
+   parameter      SKY            # Input sky-spectrum NDF
+      position    2
+      type        'NDF'
+      access      'READ'
+      vpath       'PROMPT'
+      ppath       'CURRENT'
+      prompt      'Sky spectrum'
+      helpkey     '*'
+   endparameter
+
+   parameter      OUT            # Output NDF
+      position    3
+      type        'NDF'
+      access      'WRITE'
+      vpath       'PROMPT'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt      'Output NDF'
+      helpkey     '*'
+   endparameter
+
+endinterface
+Interface VACHEL
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image whose X values are to be converted'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Name of modified image'
+      helpkey '*'
+   EndParameter
+
+   Parameter VEL
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(VElocity) Recession velocity (Km/s)?'
+      helpkey '*'
+   EndParameter
+
+   Parameter VAC
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(VAc) Apply air to vacuum wavelength correction?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DPLR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DPlr) Is a correction for recession velocity required?'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface XCOPI
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) File requiring X data'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARC
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARc) File containing X data'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARC2
+      Position  3
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARC2) Second file containing X data'
+      helpkey '*'
+   EndParameter
+
+   Parameter FRACTION
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FRaction) X data OUTPUT=ARC+(ARC2-ARC1)*FRACTION'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  5
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting file'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+Interface XCOPY
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) File requiring X data'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARC
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARc) File containing X data'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting file'
+      helpkey '*'
+   EndParameter
+
+EndInterface
+endmonolith

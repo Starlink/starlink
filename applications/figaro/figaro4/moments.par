@@ -1,0 +1,5 @@
+in,f,a,,,,"Input NDF"
+comp,i,a,0,,,"Component number for storage"
+info,b,a,y,,,"*! Issue informational messages"
+varuse,b,h,y,,,"Use input variances if available"
+bias,r,a,0.,,,"Continuum level"

@@ -1,0 +1,22 @@
+
+      Interface QUAL2FLAG
+
+         helplib 'FIG_HELP:'
+
+         Parameter INPUT
+            Position  1
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(INput) Name of file to have the quality array removed'
+         EndParameter
+
+         Parameter OUTPUT
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(OUTput) Name of resulting file'
+         EndParameter
+
+      EndInterface

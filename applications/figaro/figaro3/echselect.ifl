@@ -1,0 +1,155 @@
+Interface ECHSELECT
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of distortion-corrected echellogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter PREVIOUS
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PREvious) Read in the previous selection?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WHOLE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WHole) Sum all cross-sections to give cut through image'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First x-axis value for collapse of image'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last x-axis value for collapse of image'
+      helpkey '*'
+   EndParameter
+
+   Parameter MSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MStart) Number of the first order fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter MDELTA
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MDelta) Order number increment (-1 or +1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBJOUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBJout) Name of created object echellogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter SKYOUT
+      Position  7
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SKYout) Name of created sky echellogram'
+      helpkey '*'
+   EndParameter
+
+   Parameter DISNCHAN
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Length of displayed sections in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter MOVETOX
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Move to which X-axis value'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDER
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Set order number'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Minimum value for display'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Maximum value for display'
+      helpkey '*'
+   EndParameter
+
+   Parameter ADD
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Add to object cross-sections already selected'
+      helpkey '*'
+   EndParameter
+
+   Parameter CLEAR
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Clear all settings for this order'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUITSEL
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Quit selection'
+      helpkey '*'
+   EndParameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface

@@ -1,0 +1,247 @@
+#  History:
+#     09 Mar 1993 (HME):
+#        Individual review of parameters.
+
+Interface IMAGE
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of image to be grey-scaled'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YStart) First Y value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Last Y value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X value to be displayed'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.LOW'
+      Prompt '(Low) Lowest data level used (black level)'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.HIGH'
+      Prompt '(High) Highest data level used (white level)'
+      helpkey '*'
+   EndParameter
+
+   Parameter OPTIMIZE
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OPTimize) Amount of histogram optimisation (0 to 1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter XPLACES
+      Position  9
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XPlaces) Number of sub-displays across screen in X'
+      helpkey '*'
+   EndParameter
+
+   Parameter YPLACES
+      Position 10
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YPlaces) Number of sub-displays across screen in Y'
+      helpkey '*'
+   EndParameter
+
+   Parameter ATX
+      Position 11
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ATX) Sub-display position in X to use'
+      helpkey '*'
+   EndParameter
+
+   Parameter ATY
+      Position 12
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ATY) Sub-display position in Y to use'
+      helpkey '*'
+   EndParameter
+
+   Parameter XORIGIN
+      Position 13
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XOrigin) Origin of display in X in display pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter YORIGIN
+      Position 14
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YOrigin) Origin of display in Y in display pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter XPIXELS
+      Position 15
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XPIxels) Number of display pixels to use in X'
+      helpkey '*'
+   EndParameter
+
+   Parameter YPIXELS
+      Position 16
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YPIxels) Number of display pixels to use in X'
+      helpkey '*'
+   EndParameter
+
+   Parameter AUTOSCALE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(AUtoscale) Calculate display limits automatically'
+      helpkey '*'
+   EndParameter
+
+   Parameter NEGATIVE
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NEgative) Set limits to give a negative image'
+      helpkey '*'
+   EndParameter
+
+   Parameter ASPECT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ASpect) Maintain correct aspect ratio for image?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOG
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOG) Display using logarithmic scaling'
+      helpkey '*'
+   EndParameter
+
+   Parameter ERASE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ERASE) Erase screen before display'
+      helpkey '*'
+   EndParameter
+
+   Parameter HARDCOPY
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HARDCOPY) Use "hard" devices rather than imaging device'
+      helpkey '*'
+   EndParameter
+
+   parameter IDEV
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.IDEV'
+   endparameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.HARD'
+   endparameter
+
+   parameter IMARRAY
+      type   '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.IMARRAY'
+   endparameter
+
+   parameter IMFILE
+      type   '_CHAR'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default ' '
+      association '->GLOBAL.IMFILE'
+   endparameter
+
+EndInterface
+

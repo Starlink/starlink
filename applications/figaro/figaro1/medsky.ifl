@@ -1,0 +1,51 @@
+Interface MEDSKY
+
+   helplib 'FIG_HELP:'
+
+   Parameter FILES
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FILE) File containing list of images or spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) The file containing the medians of the inputs'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMGLOG
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(IMGlog) Image to contain median origin values?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SCALED
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SCale) Scale input images relative to the first?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOG
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOG) Create an image showing origins of median values?'
+      helpkey '*'
+   EndParameter
+
+EndInterface

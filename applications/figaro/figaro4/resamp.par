@@ -1,0 +1,8 @@
+mode_,s,a,"Cube",,,"Average SPECTRA or resample rows in CUBE (S/C)"
+inlist,s,a,,,,"Group of input NDFs"
+out,f,a,,,,"Output NDF"
+start,r,a,,,,"Output start coordinate"
+step,r,a,,,,"Output coordinate step"
+end,r,a,,,,"Output end coordinate"
+info,b,a,y,,,"*! Issue informational messages"
+varuse,b,h,y,,,"Use input variances and ignore input without variance"

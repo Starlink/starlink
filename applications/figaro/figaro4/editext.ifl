@@ -1,0 +1,54 @@
+#+
+#  Name:
+#     EDITEXT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     TDCA: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-FEB-1992 (HME):
+#        Original version.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP
+#     {enter_changes_here}
+
+#-
+
+interface EDITEXT
+
+   helplib 'FIG_HELP:'
+
+   parameter REQUEST
+      position 1
+      type     '_CHAR'
+      default  'List'
+      prompt   'What kind of action required'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for list output'
+      helpkey  '*'
+   endparameter
+
+#   [parameter_specification]...
+
+#   [message_specification]...
+
+endinterface

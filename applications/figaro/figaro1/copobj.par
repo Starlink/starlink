@@ -1,0 +1,2 @@
+source,f,a,,,,"HDS object to be copied"
+object,f,a,,,,"HDS object to be created or modified"

@@ -1,0 +1,4 @@
+spectrum,f,a,,,,"(SPectrum) Name of Star spectrum"
+standard,f,a,,,,"(STandard) Name of Standard spectrum"
+kmag,r,a,,,,"(Kmag) K magnitude of standard star"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

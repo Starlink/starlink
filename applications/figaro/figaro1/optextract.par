@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) The 2D data to be reduced to a spectrum"
+profile,f,a,,,,"(PROFile) The normalized spatial profile"
+spectrum,f,a,,,,"(SPectrum) Name of resulting spectrum"
+weight,b,a,y,,,"(WEIght) Use errors to weight data?"

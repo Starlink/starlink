@@ -1,0 +1,165 @@
+Interface IARC
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image containing 2D arc to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter RSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RSTart) Central row at which to start fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter RWIDTH
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RWidth) Number of rows to sum for each fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Text file used for results'
+      helpkey '*'
+   EndParameter
+
+   Parameter RSIGMA
+      Position  5
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RSIgma) Sigma to use for fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPREAD
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPRead) Perform initial search with increased sigma?'
+      helpkey '*'
+   EndParameter
+
+   Parameter GAP
+      Position  6
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Gap) Max times old position used for missing line'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMIN
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIGmin) Minimum sigma for locked lines'
+      helpkey '*'
+   EndParameter
+
+   Parameter XCORR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XCorr) Analyse successive spectra for shifts?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DETAIL
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DEtail) Output full details of each fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOCK
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOck) Automatic search for lines to help lock fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEIGHT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEight) Weight the fit with the line strengths?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CHANSHIFT
+      Type '_REAL'       
+      Vpath 'DEFAULT'
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Default '1005.0'
+      Prompt 'Enter the constant shift to be added to all channel positions.'
+      helpkey '*'
+   EndParameter
+
+#
+# Output parameters.
+   
+   parameter IARC_WMAX
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0
+      association '->GLOBAL.IARC_WMAX'
+   endparameter
+   
+   parameter IARC_WMIN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0
+      association '->GLOBAL.IARC_WMIN'
+   endparameter
+
+   parameter NOFITS
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0
+      Association '->GLOBAL.IARC_NOFITS'
+   endparameter
+
+   parameter ORDER
+      type     '_INTEGER'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0
+      Association '->GLOBAL.IARC_ORDER'
+   endparameter
+
+   parameter RMSMAX
+      type     '_REAL'
+      access   WRITE
+      vpath    'DEFAULT'
+      default  0.0
+      Association '->GLOBAL.IARC_RMSMAX'
+   endparameter
+
+EndInterface

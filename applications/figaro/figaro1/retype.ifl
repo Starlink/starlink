@@ -1,0 +1,32 @@
+Interface RETYPE
+
+   helplib 'FIG_HELP:'
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INput) Name of file for which data type is to be changed'
+      helpkey '*'
+   EndParameter
+
+   Parameter TYPE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TYpe) New type for data array'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting data file'
+      helpkey '*'
+   EndParameter
+
+EndInterface

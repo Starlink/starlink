@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Image to be written out in \"disk FITS\" format"
+file,s,a,,,,"(FIle) Name of \"Disk Fits\" file to be created"
+bit16,b,h,n,,,"(BIT16) Force real data to be output as 16bit numbers?"

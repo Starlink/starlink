@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Image to be supersetted"
+xsize,r,a,,,,"(XSize) X-dimension of superset image"
+ysize,r,a,,,,"(YSize) Y-dimension of superset image"
+xpixel,r,a,,,,"(XPixel) X-Position in output of input pixel (1,1)"
+ypixel,r,a,,,,"(YPixel) Y-Position in output of input pixel (1,1)"
+output,f,a,,,,"(OUTput) Name of resulting superset image"

@@ -1,0 +1,70 @@
+#+
+#  Name:
+#     GOODVAR.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-JUL-1991 (HME):
+#        Original version.
+#     27-NOV-1991 (HME):
+#        Make IN and OUT global.
+#     05-JUN-1992 (HME):
+#        Port to NDF and Unix.
+#     07-OCT-1992 (HME):
+#        Move from Specdre to Figaro, help library and keys removed.
+#        Global association removed.
+#     {enter_further_changes_here}
+
+#-
+
+interface GOODVAR
+
+   helplib 'FIG_HELP:'
+
+   parameter IN
+      position 1
+      type     'NDF'
+      access 'READ'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'NDF'
+      access 'WRITE'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter BAD
+      position 3
+      type     '_REAL'
+      default  !
+      prompt   'Value to replace bad variances'
+      helpkey  '*'
+   endparameter
+
+   parameter NEG
+      position 4
+      type     '_REAL'
+      default  !
+      prompt   'Value to replace negative variances'
+      helpkey  '*'
+   endparameter
+
+   parameter ZERO
+      position 5
+      type     '_REAL'
+      default  !
+      prompt   'Value to replace zero variances'
+      helpkey  '*'
+   endparameter
+
+endinterface

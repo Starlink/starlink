@@ -1,0 +1,88 @@
+Interface POLYSKY
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) The input 2D data'
+      helpkey '*'
+   EndParameter
+
+   Parameter YS1
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YS1) Y start for first sky region'
+      helpkey '*'
+   EndParameter
+
+   Parameter YE1
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YE1) Y end for first sky region'
+      helpkey '*'
+   EndParameter
+
+   Parameter YS2
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YS2) Y start for second sky region'
+      helpkey '*'
+   EndParameter
+
+   Parameter YE2
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YE2) Y end for second sky region'
+      helpkey '*'
+   EndParameter
+
+   Parameter DEGREE
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DEGree) Degree of polynomial'
+      helpkey '*'
+   EndParameter
+
+   Parameter NREJECT
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NREJect) Number of points to reject from each column'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting sky subtracted data'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEIGHT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEIght) Use errors to weight fit?'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,15 @@
+Interface FITSKEYS
+
+   helplib 'FIG_HELP:'
+
+   Parameter INPUT
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INput) Structure whose FITS items are to be listed'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,7 @@
+screen,b,h,n,,,"(Screen) Use screen formatting for terminal?"
+soft,s,a,"xw",,,"*! "
+tvxst,r,a,,,,"*! "
+tvxen,r,a,,,,"*! "
+tvlow,r,a,,,,"*! "
+tvhigh,r,a,,,,"*! "
+tvfile,s,a,,,,"*! "

@@ -1,0 +1,76 @@
+#+
+#  Name:
+#     XTRACT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE)
+#     TDCA: Tim Ash (RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-MAR-1991 (HME):
+#         Original version.
+#     11-APR-1991 (HME):
+#         NOINFO and NOVAR added.
+#     28-JUN-1991 (HME):
+#         On-the-fly subset. INFO, VARUSE. Error reporting.
+#     25-NOV-1991 (HME):
+#         Some parameters global. Errors and messages.
+#     13-JUN-1992 (HME):
+#         Port to NDF and Unix.
+#     03-MAR-1999 (TDCA):
+#         Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface XTRACT
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter COLAPS
+      type     '_INTEGER'
+      position 2
+      prompt   'For each axis: 0 (retain) or 1 (collapse)'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 3
+      type     'NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface

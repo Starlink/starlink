@@ -1,0 +1,54 @@
+Interface ECHMERGE
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of first image'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMAGE1
+      Position  2
+      Type '_CHAR'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(IMAGE1) Name of second image'
+      helpkey '*'
+   EndParameter
+
+   Parameter BOX
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Box) Size of box for median filter'
+      helpkey '*'
+   EndParameter
+
+   Parameter CUTOFF
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CUToff) Max ratio of data that permits contrib from weaker'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  5
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+EndInterface

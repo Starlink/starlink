@@ -1,0 +1,35 @@
+Interface CMPLXDIV
+
+   helplib 'FIG_HELP:'
+
+   Parameter CDATA
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CData) Name of first complex structure'
+      helpkey '*'
+   EndParameter
+
+   Parameter CDATA1
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CDATA1) Name of complex divisor structure'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting complex structure'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,242 @@
+#+
+#  Name:
+#     ABLINE.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     {date} ({author_identifier}):
+#        Original version.
+#     22 Jul 1993 (hme):
+#        Disuse PAR_Q*, CMD, LINENAME, HARDCOPY, COMMENT added.
+#     {enter_further_changes_here}
+
+#-
+
+Interface ABLINE
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum with lines to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter OLDCONT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OLDcont) Use precomputed continuum?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CONTIN
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COntin) File containing precomputed continuum'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIG
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIG) Multiple of sigma for continuum point rejection'
+      helpkey '*'
+   EndParameter
+
+   Parameter ITN
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ITN) Number of iterations for continuum point rejection'
+      helpkey '*'
+   EndParameter
+
+   Parameter DEG
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DEG) Degree of polynomial for continuum fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter LIMIT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LImit) Set line limits at indicated points?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WIDTH
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WIdth) Wavelength range to display at one time'
+      helpkey '*'
+   EndParameter
+
+   Parameter NEWCONT
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NEWcont) Output continuum to file?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CONTOUT
+      Position  7
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CONTout) Output continuum file name'
+      helpkey '*'
+   EndParameter
+
+   Parameter CMD                      # help is in abline.txt
+      Type 'LITERAL'
+      Vpath 'PROMPT'
+      prompt '123.4,Sig,Deg,Itn,(No)Limit,Width,Cont,Fit,Recont,Quit,Help'
+      helpkey '*'
+   EndParameter
+
+   Parameter LINENAME
+      Type 'LITERAL'
+      Vpath 'PROMPT'
+      prompt 'Name of this line'
+      helpkey '*'
+   EndParameter
+
+   Parameter HARDCOPY
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Produce hardcopy plot'
+      helpkey '*'
+   EndParameter
+
+   Parameter COMMENT
+      Type 'LITERAL'
+      Vpath 'PROMPT'
+      prompt 'Comment for hardcopy'
+      helpkey '*'
+   EndParameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+
+   parameter SOFT
+      type '_CHAR'
+      access 'READ'
+      vpath 'GLOBAL'
+      ppath 'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+   parameter TVXST
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVXST'
+   endparameter
+
+   parameter TVXEN
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVXEN'
+   endparameter
+
+   parameter TVHIGH
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVHIGH'
+   endparameter
+
+   parameter TVLOW
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVLOW'
+   endparameter
+
+   parameter XSTART
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.XSTART'
+   endparameter
+
+   parameter XEND
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.XEND'
+   endparameter
+
+   parameter HIGH
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.HIGH'
+   endparameter
+
+   parameter LOW
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.LOW'
+   endparameter
+
+   parameter TVFILE
+      type '_CHAR'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association '->GLOBAL.TVFILE'
+   endparameter
+
+   parameter TVCOLOR
+      type '_REAL'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default 0.
+      association '->GLOBAL.TVCOLOR'
+   endparameter
+
+EndInterface

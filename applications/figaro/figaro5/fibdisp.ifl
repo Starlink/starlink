@@ -1,0 +1,268 @@
+Interface FIBDISP
+
+   Parameter       CUBE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Cube for display'
+   EndParameter
+
+   Parameter       YSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis x-sect width'
+   EndParameter
+
+   Parameter       TSTART
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       TEND
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       TBLOCK
+      Position     7
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis blocking width in 3rd dimension'
+   EndParameter
+
+   Parameter       DEVICE
+      Position     8
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Device for display'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of itteration'
+   EndParameter
+
+   Parameter       OUTABLE
+      Position     10
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name for EXTATIC file'
+   EndParameter
+
+   Parameter       VCORR
+      Position     11
+      Type         '_REAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'correction to apply to radial velocities'
+   EndParameter
+
+   Parameter       TOLS
+      Position     12
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       FITRAT
+      Position     13
+      Type         '_REAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of widths, heights, or separation, for double fits'
+   EndParameter
+
+   Parameter       CALRAT
+      Position     14
+      Type         '_INTEGER'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of number of iteration to default'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     15
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name for output file'
+   EndParameter
+
+   Parameter       FIT_MODEL
+      Position     16
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Model of fit to perform'
+   EndParameter
+
+   Parameter       LOW
+      Position     17
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Minimum value for display'
+   EndParameter
+
+   Parameter       HIGH
+      Position     18
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum value for display'
+   EndParameter
+
+   Parameter       ABSORPTION
+      Position     19
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Allow fitting of absorption lines'
+   EndParameter
+
+   Parameter       BOUNDS
+      Position     20
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Perform bounded fits to lines (in batch)'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     21
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce hardcopy plots of fits from cube'
+   EndParameter
+
+   Parameter       TABLE
+      Position     22
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce table of fits from cube'
+   EndParameter
+
+   Parameter       PRINT
+      Position     23
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Produce print out of rotation curves'
+   EndParameter
+
+   Parameter       SHAPE
+      Position     24
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Carry out shape analysis'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     25
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Keep itteration files'
+   EndParameter
+
+   Parameter       FIT
+      Position     26
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'perform fitting'
+   EndParameter
+
+   Parameter       AIC
+      Position     27
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use Akiakes information criterion for fitting'
+   EndParameter
+
+   Parameter       WEIGHTS
+      Position     28
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use weights for fitting'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     29
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       FULL
+      Position     30
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out full details of fits in table'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

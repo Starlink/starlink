@@ -1,0 +1,48 @@
+#+
+#  Name:
+#     CREOBJ.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     01-OCT-1992 (HME):
+#        Original version.
+#     06-APR-1993 (HME):
+#        Rename from CROBJ, use positions.
+#     {enter_changes_here}
+
+#-
+
+interface CREOBJ
+
+   helplib 'FIG_HELP:'
+
+   parameter TYPE
+      type     '_CHAR'
+      position 1
+      default  '_REAL'
+      prompt   'HDS-type of object to be created'
+      helpkey  '*'
+   endparameter
+
+   parameter DIMS
+      type     '_INTEGER'
+      position 2
+      default  0
+      prompt   'Dimensions of HDS object to be created'
+      helpkey  '*'
+   endparameter
+
+   parameter OBJECT
+      type     'HDSOBJECT'
+      position 3
+      prompt   'HDS object to be created'
+      helpkey  '*'
+   endparameter
+
+endinterface

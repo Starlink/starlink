@@ -1,0 +1,53 @@
+
+      Interface FITSET
+
+         Parameter FILE
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(FIle) Name of file in which FITS keyword is to be set'
+         EndParameter
+
+         Parameter KEYWORD
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(KEYword) FITS keyword to set or modify'
+         EndParameter
+
+         Parameter VALUE
+            Position  3
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(VALue) New value of FITS keyword'
+         EndParameter
+
+         Parameter COMMENT
+            Position  4
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(COMment) Comment associated with FITS keyword'
+         EndParameter
+
+         Parameter LOGICAL
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(LOGical) Treat keyword as a logical value?'
+         EndParameter
+
+         Parameter STRING
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(STRing) Treat keyword value as a literal string?'
+         EndParameter
+
+      EndInterface

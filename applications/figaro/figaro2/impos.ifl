@@ -1,0 +1,52 @@
+#+
+#  Name:
+#     IMPOS.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Edinburgh)
+#  History:
+#     9/6/00   (ACD): Original version.
+#     31/10/01 (ACD): Changed to access the Figaro help library.
+#-
+
+interface IMPOS
+
+   helplib 'FIG_HELP:'
+
+   parameter INPFLE          # Name of the input file.
+      position 1
+      keyword  INPFLE
+      type     _CHAR
+      access   READ
+      prompt   'Input file:'
+#      help     'Give the name of the file containing the list of positions.'
+      helpkey '*'
+   endparameter
+
+   parameter XPIXELS         # List of X coordinates.
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.XPIXELS'
+   endparameter
+
+   parameter YPIXELS         # List of Y coordinates.
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.YPIXELS'
+   endparameter
+
+   parameter NPIXELS         # Number of points.
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.NPIXELS'
+   endparameter
+
+endinterface

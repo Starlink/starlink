@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) File containing peak to be analysed"
+shift,r,h,0.,,,""
+width,r,h,0.,,,""

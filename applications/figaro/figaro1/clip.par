@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Name of image to be clipped"
+lowclip,r,a,,,,"(LOwclip) Low threshold"
+highclip,r,a,,,,"(HIghclip) High threshold"
+output,f,a,,,,"(OUTput) Name of resulting image"

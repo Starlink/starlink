@@ -1,0 +1,7 @@
+in,f,a,,,,"Input NDF"
+out,f,a,,,,"Output NDF"
+info,b,a,y,,,"*! Issue informational messages"
+dialog,s,a,"T",,,"*! Allow repeated prompts"
+comp,struct,a,,,,"Component(s) to evaluate"
+1 2 3 4 5 6
+reply,b,a,n,,,"Evaluate another set of components"

@@ -1,0 +1,32 @@
+Interface OFFDIST
+
+   helplib 'FIG_HELP:'
+
+   Parameter INFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INfile) Name of distortion file to be modified'
+      helpkey '*'
+   EndParameter
+
+   Parameter OFFSET
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OFfset) Offset in Y to be applied'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTFILE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtfile) Name of new distortion file to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface

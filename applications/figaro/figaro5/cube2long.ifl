@@ -1,0 +1,84 @@
+Interface CUBE2LONG
+
+   Parameter       CUBE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of cubefor input'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTput Name of output file'
+   EndParameter
+
+   Parameter       YPOINT
+      Position     3
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Y point on slit'
+   EndParameter
+
+   Parameter       XPOINT
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'X point on slit'
+   EndParameter
+
+   Parameter       ANGLE
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'pa of slit'
+   EndParameter
+
+   Parameter       PIXLEN
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Pixel length'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

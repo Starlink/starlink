@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Image with X data to be divided"
+factor,r,a,,,,"(FACtor) Constant"
+output,f,a,,,,"(OUTput) Name of resulting image"

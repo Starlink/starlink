@@ -1,0 +1,193 @@
+Interface ISTAT
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of image to examine'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YStart) First Y value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Last Y value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter PASS2
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PAss2) Pass twice through data for better sigma value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter MEDIAN
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MEDian) Calculate median as well as other statistics?'
+      helpkey '*'
+   EndParameter
+   
+   parameter STAT_TOTAL
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_TOTAL'
+   endparameter
+   
+   parameter STAT_MAX
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_MAX'
+   endparameter
+   
+   parameter STAT_MIN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_MIN'
+   endparameter
+   
+   parameter STAT_MEAN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_MEAN'
+   endparameter
+   
+   parameter STAT_SIGMA
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_SIGMA'
+   endparameter
+   
+   parameter STAT_SIZE
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_SIZE'
+   endparameter
+   
+   parameter STAT_XMAX
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_XMAX'
+   endparameter
+   
+   parameter STAT_XMIN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_XMIN'
+   endparameter
+   
+   parameter STAT_YMAX
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_YMAX'
+   endparameter
+   
+   parameter STAT_YMIN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_YMIN'
+   endparameter
+   
+   parameter STAT_XSTART
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_XSTART'
+   endparameter
+   
+   parameter STAT_XEND
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_XEND'
+   endparameter
+   
+   parameter STAT_YSTART
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_YSTART'
+   endparameter
+   
+   parameter STAT_YEND
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_YEND'
+   endparameter
+   
+   parameter STAT_MEDIAN
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.STAT_MEDIAN'
+   endparameter
+
+EndInterface

@@ -1,0 +1,44 @@
+Interface FIGSEE
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to use for seeing data'
+      helpkey '*'
+   EndParameter
+
+   Parameter NDET
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NDet) Number of detectors to use'
+      helpkey '*'
+   EndParameter
+
+   Parameter DETECTORS
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DEtectors) Detectors to use'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  4
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting seeing ripple data'
+      helpkey '*'
+   EndParameter
+
+EndInterface

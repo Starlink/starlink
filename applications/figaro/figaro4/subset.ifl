@@ -1,0 +1,52 @@
+#+
+#  Name:
+#     SUBSET.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     TDCA: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     07-JUN-1991 (HME):
+#        Original version.
+#     28-JUN-1991 (HME):
+#        Error reporting.
+#     05-JUL-1991 (HME):
+#        SPECDRE help library.
+#     27-NOV-1991 (HME):
+#        Make IN, OUT, INFO global. Change reporting.
+#     13-JUN-1992 (HME):
+#        Routine rewritten using NDF.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface SUBSET
+
+   helplib 'FIG_HELP:'
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT
+      position 2
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface

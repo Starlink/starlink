@@ -1,0 +1,3 @@
+file,s,a,,,,"(File) SPICA Memory file to be used"
+print,b,a,n,,,"(PRINT) Print table?"
+delete,b,a,y,,,"(DELete) Delete table after display/printing?"

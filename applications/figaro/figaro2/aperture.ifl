@@ -1,0 +1,70 @@
+
+Interface APERTURE
+
+   Parameter OUTPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTPUT) Name of output file'
+   EndParameter
+
+   Parameter IMAGE
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMAGE) Name of input frame'
+   EndParameter
+
+   Parameter OPT
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OPT) Type option'
+   EndParameter
+
+   Parameter LOW
+      Position  4
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOW) Low data value for 2-d plot'
+   EndParameter
+
+   Parameter HIGH
+      Position  5
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HIGH) High data value for 2-d plot'
+   EndParameter
+
+   Parameter RADIUS
+      Position  6
+      Type '_REAL'         
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RADIUS) Radius of circle'
+   EndParameter
+
+   parameter OK
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      ppath 'DEFAULT'
+      prompt 'Hit <return> to restore 2-d plot'
+   endparameter
+
+   parameter IDEV
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.IDEV'
+   endparameter
+
+EndInterface

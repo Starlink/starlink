@@ -1,0 +1,38 @@
+
+      Interface EXTLIST
+
+         Parameter IMAGE
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(IMage) name of image to extract data from'
+         EndParameter
+
+         Parameter NROWS
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(NRows) How many rows to be added'
+         EndParameter
+
+         Parameter SECTIONS
+            Position  3
+            Type '_REAL'         
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(SECtions) List of rows'
+         EndParameter
+
+         Parameter SPECTRUM
+            Position  4
+            Type 'NDF'       
+            Access 'WRITE'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(SPectrum) name of spectrum to be generated'
+         EndParameter
+
+      EndInterface

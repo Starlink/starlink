@@ -1,0 +1,5 @@
+image,f,a,,,,"(IMage) Name of first image"
+image1,f,a,,,,"(IMAGE1) Name of second image"
+box,r,a,5.0,,,"(Box) Size of box for median filter"
+cutoff,r,a,4.0,,,"(CUToff) Max ratio of data that permits contrib from weaker"
+output,f,a,,,,"(OUTput) Name of resulting image"

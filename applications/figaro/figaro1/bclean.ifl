@@ -1,0 +1,148 @@
+Interface BCLEAN
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be cleaned'
+      helpkey '*'
+   EndParameter
+
+   Parameter CRSIG
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CRSig) Cosmic ray sigma cutoff'
+      helpkey '*'
+   EndParameter
+
+   Parameter CRFACT
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CRFact) Cosmic ray fractional cutoff'
+      helpkey '*'
+   EndParameter
+
+   Parameter CRMINV
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CRMinv) Cosmic ray minimum excess value'
+      helpkey '*'
+   EndParameter
+
+   Parameter CRSHARPNESS
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CRSharpness) Cosmic ray minimum sharpness value'
+      helpkey '*'
+   EndParameter
+
+   Parameter BRFACT
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BRFact) Bad row fractional cutoff'
+      helpkey '*'
+   EndParameter
+
+   Parameter BRPASS
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BRPass) Number of passes in bad row search'
+      helpkey '*'
+   EndParameter
+
+   Parameter DEGFIX
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DEGfix) Polynomial degree for interpolation'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  9
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of cleaned image'
+      helpkey '*'
+   EndParameter
+
+   Parameter NBROWS
+      Position 10
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(NBRows) Number of bad rows to be cleaned'
+      helpkey '*'
+   EndParameter
+
+   Parameter AUTOROW
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(AUTOrow) Perform automatic search for bad lines?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FIX
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIx) Fix up the bad lines and cosmic rays?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SHARPNESS
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SHarpness) Perform sharpness test on cosmic rays?'
+      helpkey '*'
+   EndParameter
+
+   Parameter TEXTFILE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TExtfile) Produce a text file of cosmic ray results?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DIRECTION
+      Type '_REAL'
+      Vpath 'PROMPT'
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DIRECTion) Interp. direction (-1=rows, 1=columns, 0=best)'
+      helpkey '*'
+   EndParameter
+
+   Parameter BROWS   # prompted in the beginning, set at the end.
+      Position 11
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.BROWS'
+      Prompt '(BRows) Bad rows'
+      helpkey '*'
+   EndParameter
+
+EndInterface

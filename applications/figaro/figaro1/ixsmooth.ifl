@@ -1,0 +1,44 @@
+Interface IXSMOOTH
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of data to be smoothed'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMA
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIgma) Gaussian half width in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter WIDTH
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WIdth) Pixels over which gaussian is calculated'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  4
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting data'
+      helpkey '*'
+   EndParameter
+
+EndInterface

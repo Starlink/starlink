@@ -1,0 +1,2 @@
+cdata,f,a,,,,"(CData) Complex data from which to take real array"
+output,f,a,,,,"(OUTput) Resulting (non-complex) data"

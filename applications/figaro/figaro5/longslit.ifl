@@ -1,0 +1,358 @@
+Interface LONGSLIT
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       ARC_OPTS
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Fit option'
+   EndParameter
+
+   Parameter       YSTART
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Analysis x-sect blocking width'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of iteration'
+   EndParameter
+
+   Parameter       MAXLINES
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of lines to allow room for'
+   EndParameter
+
+   Parameter       CLFILE
+      Position     8
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for cloning from'
+   EndParameter
+
+   Parameter       OUTABLE
+      Position     9
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name for EXTATIC file'
+   EndParameter
+
+   Parameter       VCORR
+      Position     10
+      Type         '_REAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'correction to apply to radial velocities'
+   EndParameter
+
+   Parameter       TOLS
+      Position     11
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       INHERIT
+      Position     12
+      Type         '_INTEGER'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Number to control inheritance of previous fits'
+   EndParameter
+
+   Parameter       DEVICE
+      Position     13
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Device to use for plotting'
+   EndParameter
+
+   Parameter       FITRAT
+      Position     14
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of widths, heights, or separation, for double fits'
+   EndParameter
+
+   Parameter       CALRAT
+      Position     15
+      Type         '_INTEGER'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of number of iteration to default'
+   EndParameter
+
+   Parameter       WHITE
+      Position     16
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Level to be recorded as white'
+   EndParameter
+
+   Parameter       BLACK
+      Position     17
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Level to be recorded as black'
+   EndParameter
+
+   Parameter       MAXGAUSS
+      Position     18
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of Gaussians to allow room for'
+   EndParameter
+
+   Parameter       TSTART
+      Position     19
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       TEND
+      Position     20
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       TBLOCK
+      Position     21
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Analysis blocking width in T direction'
+   EndParameter
+
+   Parameter       FIT_MODEL
+      Position     22
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Model of fit to perform'
+   EndParameter
+
+   Parameter       PLOTLIM
+      Position     23
+      Type         'ERROR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Limits of plot (world coordinates)'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     24
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTPut Name of output file'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     25
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce hardcopy plots of fits from cube'
+   EndParameter
+
+   Parameter       TABLE
+      Position     26
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce table of fits from cube'
+   EndParameter
+
+   Parameter       PLOT
+      Position     27
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce plots of rotation curves'
+   EndParameter
+
+   Parameter       PRINT
+      Position     28
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce print out of rotation curves'
+   EndParameter
+
+   Parameter       SHAPE
+      Position     29
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'carry out shape analysis'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     30
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'keep iteration files'
+   EndParameter
+
+   Parameter       FIT
+      Position     31
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'perform fitting'
+   EndParameter
+
+   Parameter       COPY
+      Position     32
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'copy previous fits'
+   EndParameter
+
+   Parameter       ABSORPTION
+      Position     33
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Allow fitting of absorption lines'
+   EndParameter
+
+   Parameter       BOUNDS
+      Position     34
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Perform bounded fits to lines (in batch)'
+   EndParameter
+
+   Parameter       LABEL
+      Position     35
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Label graphs (velocity plots and profile plots'
+   EndParameter
+
+   Parameter       CONTOUR
+      Position     36
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Create contour plot(s)'
+   EndParameter
+
+   Parameter       GREY
+      Position     37
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Create greyscale plot(s)'
+   EndParameter
+
+   Parameter       LOG
+      Position     38
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use logarithmic scale'
+   EndParameter
+
+   Parameter       WEIGHTS
+      Position     39
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use weights for fitting'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     40
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       FULL
+      Position     41
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out full details of fits in table'
+   EndParameter
+
+   Parameter       CHECK
+      Position     42
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot array of line profiles'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

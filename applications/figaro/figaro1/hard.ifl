@@ -1,0 +1,49 @@
+Interface HARD
+
+   helplib 'FIG_HELP:'
+
+   Parameter HARDDEV
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HArddev) Device to use for hardcopy plots'
+      helpkey '*'
+   EndParameter
+
+   Parameter OPTIONS
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OPtions) List possible device names?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FORCE
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FOrce) Force use of an unrecognised device ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DRAW
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DRaw) Output a test plot to the device?'
+      helpkey '*'
+   EndParameter
+
+   parameter HARD
+      type '_CHAR'
+      access 'WRITE'
+      vpath 'DEFAULT'
+      default ' '
+      association '->GLOBAL.HARD'
+   endparameter
+
+EndInterface

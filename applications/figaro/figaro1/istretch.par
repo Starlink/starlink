@@ -1,0 +1,8 @@
+image,f,a,,,,"(IMage) Name of image to be stretched"
+xstretch,r,a,1.0,,,"(XSTretch) Stretch factor in X"
+ystretch,r,a,1.0,,,"(YSTretch) Stretch factor in Y"
+xshift,r,a,0.0,,,"(XSHift) Shift in X"
+yshift,r,a,0.0,,,"(YSHift) Shift in Y"
+xsplit,r,a,1.0,,,"(XSPlit) Subdivision of X pixels"
+ysplit,r,a,1.0,,,"(YSPlit) Subdivision of Y pixels"
+output,f,a,,,,"(OUTput) Name of resulting image"

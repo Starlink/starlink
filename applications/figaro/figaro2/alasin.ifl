@@ -1,0 +1,25 @@
+Interface ALASIN
+
+   helplib 'FIG_HELP:'
+
+   Parameter ALASFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ALASfile)  Name of input ALAS format file'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPECTRUM
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPECtrum) Figaro format output spectrum'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,25 @@
+Interface CMPLXCONJ
+
+   helplib 'FIG_HELP:'
+
+   Parameter CDATA
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CData) Name of complex structure'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting complex conjugate'
+      helpkey '*'
+   EndParameter
+
+EndInterface

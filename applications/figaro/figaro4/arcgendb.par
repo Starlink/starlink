@@ -1,0 +1,3 @@
+in,f,a,,,,"Input file with ASCII line list"
+fdb,f,a,,,,"Output NDF for feature data base"
+info,b,a,y,,,"*! Issue informational messages"

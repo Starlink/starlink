@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Name of image to calculate errors for"
+factor,r,a,1.0,,,"(FACtor) Factor where Error=SQRT(Data/FACTOR)"
+output,f,a,,,,"(OUTput) Name of resulting image"

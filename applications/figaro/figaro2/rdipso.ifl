@@ -1,0 +1,34 @@
+Interface RDIPSO
+
+   helplib 'FIG_HELP:'
+
+   Parameter FILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Name of DIPSO format file to be read'
+      helpkey '*'
+   EndParameter
+
+   Parameter CODE
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Code) Data format code for input file (0,1,2)'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPECTRUM
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Figaro file to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface

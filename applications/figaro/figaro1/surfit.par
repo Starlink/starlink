@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Name of image to be fitted"
+xknots,r,a,,,,"(XKnots) Number of interior knots in X"
+yknots,r,a,,,,"(YKnots) Number of interior knots in Y"
+vmode,s,a,,,,"(VMode) \"Median\" or \"Average\" for panel values?"
+mosaic,b,h,n,,,"(MOsaic) Generate mosaic instead of fitted data?"
+output,f,a,,,,"(OUTput) Name of resulting image"

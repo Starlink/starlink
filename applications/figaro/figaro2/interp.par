@@ -1,0 +1,4 @@
+spiketrum,f,a,,,,"(SPIketrum) Name of \"spiketrum\" to be interpolated"
+spectrum,f,a,,,,"(SPEctrum) Name of spectrum to be generated"
+log,b,h,n,,,"(Log) Fit to the log of the data?"
+linend,b,h,n,,,"(LInend) Use linear interpolation at ends?"

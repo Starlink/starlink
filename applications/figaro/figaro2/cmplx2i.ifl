@@ -1,0 +1,25 @@
+Interface CMPLX2I
+
+   helplib 'FIG_HELP:'
+
+   Parameter CDATA
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CData) Complex data containing the imaginary array'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Resulting (non-complex) data'
+      helpkey '*'
+   EndParameter
+
+EndInterface

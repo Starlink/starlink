@@ -1,0 +1,126 @@
+Interface HIMAGE
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to be displayed '
+   EndParameter
+
+   Parameter       YSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First Y value to be displayed '
+   EndParameter
+
+   Parameter       YEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last Y value to be displayed '
+   EndParameter
+
+   Parameter       XSTART
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First X value to be displayed '
+   EndParameter
+
+   Parameter       XEND
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last X value to be displayed '
+   EndParameter
+
+   Parameter       LOW
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Minimum count level for display '
+   EndParameter
+
+   Parameter       HIGH
+      Position     7
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum count level for display '
+   EndParameter
+
+   Parameter       PLOTDEV
+      Position     8
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plotting device'
+   EndParameter
+
+   Parameter       ASPECT
+      Position     9
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio X/Y for plot (excluding any key)'
+   EndParameter
+
+   Parameter       SHRINK
+      Position     10
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Shrink image to display with wide margins'
+   EndParameter
+
+   Parameter       LOG
+      Position     11
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Display using logarithmic scaling '
+   EndParameter
+
+   Parameter       KEY
+      Position     12
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot a key beside the data'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

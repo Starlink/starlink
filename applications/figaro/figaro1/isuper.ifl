@@ -1,0 +1,62 @@
+Interface ISUPER
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be supersetted'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSIZE
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XSize) X-dimension of superset image'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSIZE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YSize) Y-dimension of superset image'
+      helpkey '*'
+   EndParameter
+
+   Parameter XPIXEL
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(XPixel) X-Position in output of input pixel (1,1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter YPIXEL
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(YPixel) Y-Position in output of input pixel (1,1)'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting superset image'
+      helpkey '*'
+   EndParameter
+
+EndInterface

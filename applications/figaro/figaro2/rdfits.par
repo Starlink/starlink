@@ -1,0 +1,4 @@
+file,s,a,,,,"(FIle) Name of \"Disk FITS\" format file"
+image,s,a,,,,"(IMage) Name of resulting image"
+swap,b,a,y,,,"(SWap) Swap byte order?"
+float,b,a,y,,,"(FLoat) Convert data to floating point?"

@@ -1,0 +1,8 @@
+in,f,a,,,,"Input NDF"
+expand,i,a,,,,"For each axis: expanded or old    (0 for old axis)"
+stapix,i,a,,,,"For each axis: target start pixel (0 for old axis)"
+endpix,i,a,,,,"For each axis: target end pixel   (0 for old axis)"
+info,b,a,y,,,"*! Issue informational messages"
+new,b,h,n,,,"Create a new output file"
+size,i,a,,,,"For each axis: output axis length   (0 for old axis)"
+out,f,a,,,,"Output NDF"

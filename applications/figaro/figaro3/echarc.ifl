@@ -1,0 +1,263 @@
+Interface ECHARC
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Collapsed echelle arc image to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARCTYPE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARctype) Type of arc'
+      helpkey '*'
+   EndParameter
+
+   Parameter INTERACTIVE
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INTeractive) Number of orders to fit interactively'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDERS
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ORDERS) Order numbers'
+      helpkey '*'
+   EndParameter
+
+   Parameter SIGMA
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SIgma) Arc line half width in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter ORDERFIT
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ORDERFit) Polynomial order for 1st fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter PREVIOUS
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PREvious) Use arc lines from previous fit?'
+      helpkey '*'
+   EndParameter
+
+   Parameter MONITOR
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MONitor) ECHARC autofitting on device "PGPLOT" ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter ARFILE
+      Position  7
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ARFile) Name of file giving previous fit'
+      helpkey '*'
+   EndParameter
+
+   Parameter DOWAVES
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DOWaves) Write wavelength information to separate file?'
+      helpkey '*'
+   EndParameter
+
+   Parameter WAVES
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WAves) Name of wavelength output image'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  9
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WAves) Name input copy with fitted wavelength'
+      helpkey '*'
+   EndParameter
+
+   parameter HARDARC
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do a hard plot of the last order arc'
+      helpkey '*'
+   endparameter
+
+   parameter HARDISP
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do a hard plot of the last order dispersion curve'
+      helpkey '*'
+   endparameter
+
+   parameter CONTINUE
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Continue,Repeat,Start,Quit'
+      helpkey '*'
+   endparameter
+
+   parameter HLINEMAP
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do hardcopy plot of arc line map'
+      helpkey '*'
+   endparameter
+
+   parameter HATLAS
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Do hardcopy atlas of entire arc fit'
+      helpkey '*'
+   endparameter
+
+   parameter ORDPPAG
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Number of sub-order panels per page'
+      helpkey '*'
+   endparameter
+
+   parameter ANALYSIS
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Save a detailed line by line analysis'
+      helpkey '*'
+   endparameter
+
+   parameter QUITSEL
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Quit line selection in this order'
+      helpkey '*'
+   endparameter
+
+   parameter DISNCHAN
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Length of displayed sections'
+      helpkey '*'
+   endparameter
+
+   parameter MOVETOX
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'X-value'
+      helpkey '*'
+   endparameter
+
+   parameter LINEOK
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Correct?'
+      helpkey '*'
+   endparameter
+
+   parameter CMD
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Fit,O_fit,Disp,Help,Edit,Reselect,Cont,Print,Auto,Xauto,Modify'
+      helpkey '*'
+   endparameter
+
+   parameter LINENO
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Edit which line, zero to end edit'
+      helpkey '*'
+   endparameter
+
+   parameter WAVELEN
+      type 'LITERAL'
+      vpath 'PROMPT'
+      prompt 'Wavelength, blank to cancel line'
+      helpkey '*'
+   endparameter
+
+   parameter RESOLVE
+      type 'LITERAL'
+      vpath 'PROMPT'
+      in 'N','O','S','n','o','s'
+      prompt 'How is double ID to be resolved (N/O/S)'
+      helpkey '*'
+   endparameter
+
+
+   parameter CHFACT
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'New value for CHFACT'
+      helpkey '*'
+   endparameter
+
+   parameter SIGFACT
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'New value for SIGFACT'
+      helpkey '*'
+   endparameter
+   
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+   
+   parameter HARD
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.HARD'
+   endparameter
+   
+   parameter THICKNESS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.THICKNESS'
+   endparameter
+
+EndInterface

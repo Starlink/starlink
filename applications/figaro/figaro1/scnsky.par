@@ -1,0 +1,5 @@
+image,f,a,,,,"(IMage) name of image to obtain sky from"
+section,r,a,,,,"(SECtion) Length of each Y-section"
+spectrum,f,a,,,,"(SPectrum) name of spectrum to be generated"
+limit,b,h,n,,,"(LImit) Ignore pixels below a minimum value?"
+minimum,r,h,0.0,,,"(MINimum) Minimum valid pixel value"

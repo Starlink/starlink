@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Name of data to be smoothed"
+sigma,r,a,1.0,,,"(SIgma) Gaussian half width in pixels"
+width,r,a,,,,"(WIdth) Pixels over which gaussian is calculated"
+output,f,a,,,,"(OUTput) Name of resulting data"

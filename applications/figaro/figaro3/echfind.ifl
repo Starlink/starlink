@@ -1,0 +1,115 @@
+Interface ECHFIND
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) name of echelle image in which to search'
+      helpkey '*'
+   EndParameter
+
+   Parameter PERISCOPE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PERIscope) Is the periscope fitted?'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YSTART'
+      Prompt '(YSTart) Y value to start search for orders'
+      helpkey '*'
+   EndParameter
+
+   Parameter YEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.YEND'
+      Prompt '(YEnd) Y value to stop search for orders'
+      helpkey '*'
+   EndParameter
+
+   Parameter MSTART
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MStart) number of the first order in range'
+      helpkey '*'
+   EndParameter
+
+   Parameter MDELTA
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MDelta) order number increment (-1 or +1) ?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SDIST
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SDIst) write output file SDIST.DAT in SDIST format?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTFILE
+      Position  6
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTFile) name of output report file'
+      helpkey '*'
+   EndParameter
+
+   Parameter THRESH
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(THResh) threshold above which orders are deemed to exist'
+      helpkey '*'
+   EndParameter
+
+   Parameter MINHW
+      Position  8
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MINHw) minimum half-width of orders'
+      helpkey '*'
+   EndParameter
+
+   Parameter DOMASK
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DOMask) create an output mask image?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  9
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) name of mask image showing order positions'
+      helpkey '*'
+   EndParameter
+
+EndInterface

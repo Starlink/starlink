@@ -1,0 +1,4 @@
+cube,f,a,,,,"(CUbe) Name of data cube to extract image from"
+ystart,r,a,,,,"(YStart) first y-value to be used"
+yend,r,a,,,,"(YEnd) last y-value to be used"
+image,f,a,,,,"(IMage) name of image to be created"

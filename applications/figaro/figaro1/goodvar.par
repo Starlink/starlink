@@ -1,0 +1,5 @@
+in,f,a,,,,"Input NDF"
+out,f,a,,,,"Output NDF"
+bad,r,a,INDEF,,,"Value to replace bad variances"
+neg,r,a,INDEF,,,"Value to replace negative variances"
+zero,r,a,INDEF,,,"Value to replace zero variances"

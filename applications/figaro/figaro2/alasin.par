@@ -1,0 +1,2 @@
+alasfile,s,a,,,,"(ALASfile)  Name of input ALAS format file"
+spectrum,f,a,,,,"(SPECtrum) Figaro format output spectrum"

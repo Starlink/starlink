@@ -1,0 +1,3 @@
+spiketrum,f,a,,,,"(SPIketrum) Spiketrum generated from standard table"
+spectrum,f,a,,,,"(SPEctrum) Observed spectrum of standard"
+output,f,a,,,,"(OUTput) Output instrumental response spiketrum"

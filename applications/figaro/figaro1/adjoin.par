@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) First of the two spectra to be adjoined"
+spectrum1,f,a,,,,"(SPECTRUM1) 2nd of the two spectra to be adjoined"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

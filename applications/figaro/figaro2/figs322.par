@@ -1,0 +1,4 @@
+cube,f,a,,,,"(CUbe) The FIGS data cube to be reduced to an image"
+image,f,a,,,,"(IMage) Name of resulting image"
+add,b,h,n,,,"(ADd) Add all data rather than subtracting background?"
+back,b,h,n,,,"(BAck) Return background spectrum only?"

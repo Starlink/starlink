@@ -1,0 +1,34 @@
+Interface WDFITS
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image to be written out in "disk FITS" format'
+      Helpkey '*'
+   EndParameter
+
+   Parameter FILE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Name of "Disk Fits" file to be created'
+      Helpkey '*'
+   EndParameter
+
+   Parameter BIT16
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(BIT16) Force real data to be output as 16bit numbers?'
+      Helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,9 @@
+soft,s,a,"xw",,,"*! "
+pgenvarg,struct,a,,,,"*! "
+0.
+imfile,s,a,,,,"*! "
+xpixels,struct,h,,,,""
+0.
+ypixels,struct,h,,,,""
+0.
+npixels,r,h,0.,,,""

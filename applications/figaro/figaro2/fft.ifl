@@ -1,0 +1,25 @@
+Interface FFT
+
+   helplib 'FIG_HELP:'
+
+   Parameter CDATA
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CData) Data to be Fourier transformed'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Resulting transformed data'
+      helpkey '*'
+   EndParameter
+
+EndInterface

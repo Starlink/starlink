@@ -1,0 +1,4 @@
+spectrum,f,a,,,,"(SPECtrum)  Spectrum to be converted to ALAS format"
+xstart,r,a,,,,"(XSTart) First X value to be converted"
+xend,r,a,,,,"(XEnd) Last X value to be converted"
+alasfile,s,a,,,,"(ALASfile) Name of output ALAS format file"

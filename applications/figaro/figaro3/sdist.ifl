@@ -1,0 +1,120 @@
+Interface SDIST
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Image containing distortion spectra'
+      helpkey '*'
+   EndParameter
+
+   Parameter COLUMNS
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(COLumns) Number of cols to average to get peaks'
+      helpkey '*'
+   EndParameter
+
+   Parameter TRACE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TRace) Trace mode - G(aussian) B(al) C(OG) or E(dge)'
+      helpkey '*'
+   EndParameter
+
+   Parameter WIDTH
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WIdth) Half width of spectra - in pixels'
+      helpkey '*'
+   EndParameter
+
+   Parameter MAXDEG
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MAXdeg) Maximum degree polynomial to use'
+      helpkey '*'
+   EndParameter
+
+#  Parameter DISPLAY
+#     Type '_LOGICAL'      
+#     Vpath 'PROMPT'                        
+#     Ppath 'CURRENT,DYNAMIC,DEFAULT'
+#     Prompt '(DIsplay) Use image display to show fit results?'
+#     Help   'For more details, use "HELP SDIST" and select topic "DISPLAY"'
+#  EndParameter
+
+   Parameter SOFTD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SOftd) Display results on graphics device?'
+      helpkey '*'
+   EndParameter
+
+   Parameter DIAGNOSE
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(DIAgnose) Output details of trace failures?'
+      helpkey '*'
+   EndParameter
+
+   Parameter NEXT
+      Type '_LOGICAL'
+      Vpath 'PROMPT'
+      prompt 'Ready for next spectrum'
+      helpkey '*'
+   EndParameter
+
+   parameter NPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.NPIXELS'
+   endparameter
+
+   parameter XPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.XPIXELS'
+   endparameter
+
+   parameter YPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.YPIXELS'
+   endparameter
+   
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+
+EndInterface

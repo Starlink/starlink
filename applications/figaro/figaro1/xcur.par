@@ -1,0 +1,7 @@
+soft,s,a,"xw",,,"*! (SOFT) Device to use for soft plots"
+tvxst,r,a,,,,"*! "
+tvxen,r,a,,,,"*! "
+tvlow,r,a,,,,"*! "
+tvhigh,r,a,,,,"*! "
+xstart,r,h,0.,,,""
+xend,r,h,0.,,,""

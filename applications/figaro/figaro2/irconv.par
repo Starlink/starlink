@@ -1,0 +1,2 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to convert to W/m**2/um"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

@@ -1,0 +1,30 @@
+#+
+#  Name:
+#     DELOBJ.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     01-OCT-1992 (HME):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface DELOBJ
+
+   helplib 'FIG_HELP:'
+
+   parameter OBJECT
+      position 1
+      type     'HDSOBJECT'
+      prompt   'HDS object to be deleted'
+      helpkey  '*'
+   endparameter
+
+endinterface

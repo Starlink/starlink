@@ -1,0 +1,3 @@
+file,s,a,,,,"(FIle) Name of DIPSO format file to be read"
+code,r,a,0.0,,,"(Code) Data format code for input file (0,1,2)"
+spectrum,f,a,,,,"(SPectrum) Figaro file to be created"

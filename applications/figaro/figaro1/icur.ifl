@@ -1,0 +1,60 @@
+#  History:
+#     04 Mar 1993 (HME):
+#        Individual review of parameters.
+
+Interface ICUR
+
+   helplib 'FIG_HELP:'
+
+   parameter IDEV
+      type '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.IDEV'
+   endparameter
+
+   parameter IMARRAY
+      type   '_REAL'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default 0.
+      association '<-GLOBAL.IMARRAY'
+   endparameter
+
+   parameter IMFILE
+      type   '_CHAR'
+      access 'READ'
+      vpath  'GLOBAL'
+      ppath  'GLOBAL'
+      default ' '
+      association '<-GLOBAL.IMFILE'
+   endparameter
+
+   parameter XPIXELS
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.XPIXELS'
+   endparameter
+
+   parameter YPIXELS
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.YPIXELS'
+   endparameter
+
+   parameter NPIXELS
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.NPIXELS'
+   endparameter
+
+EndInterface

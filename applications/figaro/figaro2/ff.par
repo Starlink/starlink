@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMAGE) Name of data to be flat fielded"
+flat,f,a,,,,"(FLAT) Name of flat field to be used"
+order,r,a,2.0,,,"(ORDER) Order for flat field profile fit"
+output,f,a,,,,"(OUTPUT) Name of result of operation"

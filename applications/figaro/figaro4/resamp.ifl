@@ -1,0 +1,104 @@
+#+
+#  Name:
+#     RESAMP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     TDCA: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     06-FEB-1992 (HME):
+#        Original version.
+#     07-FEB-1992 (HME):
+#        Replace ASCII list of input NDFs by re-prompting for next name.
+#     18-MAR-1992 (HME):
+#        Switch to Dave Berry's NDF groups. INLIST replaces IN, but we keep the
+#        specification of the IN parameter. IN is unused, but the relevant
+#        routine SPAAA can be quickly changed to switch back to RESAMPLE using
+#        a re-prompted IN parameter.
+#     08-JUL-1992 (HME):
+#        Replace SIZE with STEP.
+#     03-MAR-1999 (TDCA):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface RESAMP
+
+   helplib 'FIG_HELP:'
+
+   parameter MODE
+      position 1
+      type     '_CHAR'
+      default  'Cube'
+      prompt   'Average SPECTRA or resample rows in CUBE (S/C)'
+      helpkey  '*'
+   endparameter
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances and ignore input without variance'
+      helpkey  '*'
+   endparameter
+
+   parameter INLIST
+      position 2
+      type     'LITERAL'
+      prompt   'Group of input NDFs'
+      helpkey  '*'
+   endparameter
+
+#  parameter IN
+#     position 1
+#     type     'NDF'
+#     prompt   'Next input NDF'
+#     helpkey  '*'
+#  endparameter
+
+   parameter OUT
+      position 3
+      type     'NDF'
+      association '->GLOBAL.DATA_ARRAY'
+      prompt   'Output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter START
+      position 4
+      type     '_DOUBLE'
+      prompt   'Output start coordinate'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      position 5
+      type     '_DOUBLE'
+      prompt   'Output coordinate step'
+      helpkey  '*'
+   endparameter
+
+   parameter END
+      position 6
+      type     '_DOUBLE'
+      prompt   'Output end coordinate'
+      helpkey  '*'
+   endparameter
+
+endinterface

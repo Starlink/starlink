@@ -1,0 +1,25 @@
+Interface R2CMPLX
+
+   helplib 'FIG_HELP:'
+
+   Parameter RDATA
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RData) Data to become real part of complex data'
+      helpkey '*'
+   EndParameter
+
+   Parameter CDATA
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CData) Resulting complex data'
+      helpkey '*'
+   EndParameter
+
+EndInterface

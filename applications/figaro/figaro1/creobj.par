@@ -1,0 +1,3 @@
+type,s,a,"_REAL",,,"HDS-type of object to be created"
+dims,i,a,0,,,"Dimensions of HDS object to be created"
+object,f,a,,,,"HDS object to be created"

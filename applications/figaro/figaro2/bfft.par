@@ -1,0 +1,2 @@
+cdata,f,a,,,,"(CData) Data to be Fourier transformed"
+output,f,a,,,,"(OUtput) Resulting transformed data"

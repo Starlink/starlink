@@ -1,0 +1,4 @@
+cube,f,a,,,,"(CUbe) Name of data cube to extract image from"
+xstart,r,a,,,,"(XStart) first x-value to be used"
+xend,r,a,,,,"(XEnd) last x-value to be used"
+image,f,a,,,,"(IMage) name of image to be created"

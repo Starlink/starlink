@@ -1,0 +1,50 @@
+Interface RCGS2
+
+   helplib 'FIG_HELP:'
+
+   Parameter FILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FIle) Name of container file to be read'
+      helpkey '*'
+   EndParameter
+
+   Parameter OBS
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OBS) Observation number'
+      helpkey '*'
+   EndParameter
+
+   Parameter TWOD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TWOD) Create 2D file'
+      helpkey '*'
+   EndParameter
+
+   Parameter SCAN
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SCAN) Scan number (0 for coadded data)'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  4
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTPUT) Figaro file to be created'
+      helpkey '*'
+   EndParameter
+
+EndInterface

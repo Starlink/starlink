@@ -1,0 +1,35 @@
+Interface GSPIKE
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPEctrum) Template spectrum for wavelength range'
+      helpkey '*'
+   EndParameter
+
+   Parameter TABLE
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Table) Table giving wavelength and data values'
+      helpkey '*'
+   EndParameter
+
+   Parameter SPIKETRUM
+      Position  3
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SPIketrum) Name of "spiketrum" to be generated'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,90 @@
+Interface SCROSS
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Name of spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter TEMPLATE
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TEmplate) Name of template spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) First X value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) Last X value to be used'
+      helpkey '*'
+   EndParameter
+
+   Parameter FITCONT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FItcont) Fit continuum to data prior to cosine bell?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CBPC
+      Position  5
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CBpc) Percentage of spectrum covered by cosine bell'
+      helpkey '*'
+   EndParameter
+
+   Parameter RECORD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(RECord) Create file to record cross-correlation?'
+      helpkey '*'
+   EndParameter
+
+   Parameter CROSS
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CRoss) Name of cross-correlation data?'
+      helpkey '*'
+   EndParameter
+   
+   parameter SHIFT
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.SHIFT'
+   endparameter
+
+EndInterface

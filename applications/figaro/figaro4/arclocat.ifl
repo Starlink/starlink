@@ -1,0 +1,101 @@
+#+
+#  Name:
+#     ARCLOCAT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     08 Jun 1993 (hme):
+#     	 Original version.
+#     30 Jun 1993 (hme):
+#        DIALOG global.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_changes_here}
+
+#-
+
+interface ARCLOCAT
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      default  YES
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','g','n','t','y','F','G','N','T','Y'
+      default  'G'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive graphical interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     '_CHAR'
+      vpath    'CURRENT,DYNAMIC,DEFAULT'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  'Gauss'
+      prompt   'Gauss or triangle features'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM
+      position 2
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      range    2., 1E30
+      prompt   'Feature width'
+      helpkey  '*'
+   endparameter
+
+   parameter THRESH
+      position 3
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      range    1E-30, 1E30
+      prompt   'Minimum feature strength'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter ROWNUM
+      type     '_INTEGER'
+      prompt   'Number of row to work on next'
+      helpkey  '*'
+   endparameter
+
+endinterface

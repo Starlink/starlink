@@ -1,0 +1,5 @@
+spectrum,f,a,,,,"(SPectrum) File requiring X data"
+arc,f,a,,,,"(ARc) File containing X data"
+arc2,f,a,,,,"(ARC2) Second file containing X data"
+fraction,r,a,0.5,,,"(FRaction) X data OUTPUT=ARC+(ARC2-ARC1)*FRACTION"
+output,f,a,,,,"(OUTput) Name of resulting file"

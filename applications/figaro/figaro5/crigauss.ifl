@@ -1,0 +1,196 @@
+Interface CRIGAUSS
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to be created'
+   EndParameter
+
+   Parameter       YDIM
+      Position     2
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Y dimension of data'
+   EndParameter
+
+   Parameter       XDIM
+      Position     3
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'X dimension of data"'
+   EndParameter
+
+   Parameter       XSTART
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First X value '
+   EndParameter
+
+   Parameter       XEND
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last X value '
+   EndParameter
+
+   Parameter       WIDTH1
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH1 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE1
+      Position     7
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE1 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT1
+      Position     8
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT1 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH2
+      Position     9
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH2 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE2
+      Position     10
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE2 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT2
+      Position     11
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT2 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH3
+      Position     12
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH3 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE3
+      Position     13
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE3 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT3
+      Position     14
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT3 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH4
+      Position     15
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH4 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE4
+      Position     16
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE4 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT4
+      Position     17
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT4 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH5
+      Position     18
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH5 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE5
+      Position     19
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE5 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT5
+      Position     20
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT5 of gaussian'
+   EndParameter
+
+   Parameter       BASE
+      Position     21
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'BASE for gaussian'
+   EndParameter
+
+   Parameter       NCOMP
+      Position     22
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'NCOMP Number of componants'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

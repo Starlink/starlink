@@ -1,0 +1,127 @@
+Interface SCRUNCH
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum to be scrunched'
+      helpkey '*'
+   EndParameter
+
+   Parameter WSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WStart) Wavelength of center of first bin'
+      helpkey '*'
+   EndParameter
+
+   Parameter WEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WEnd) Wavelength of center of last bin (or increment)'
+      helpkey '*'
+   EndParameter
+
+   Parameter BINS
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BIns) Number of bins for scrunched spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  5
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUtput) Name of scrunched spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter INCREMENT
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(INCrement) Treat WEND value as an increment value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FINAL
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FInal) Treat WEND as a final wavelength value?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOG
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOg) Bin into logarithmic wavelength bins?'
+      helpkey '*'
+   EndParameter
+
+   Parameter LINEAR
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LInear) Use linear interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter QUAD
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Quad) Use quadratic interpolation for data?'
+      helpkey '*'
+   EndParameter
+
+   Parameter FLUX
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Flux) Conserve flux (as opposed to mean value)?'
+      helpkey '*'
+   EndParameter
+
+   Parameter MEAN
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Mean) Conserve mean value (as opposed to flux)?'
+      helpkey '*'
+   EndParameter
+   
+   parameter SCRUNCH_INC
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.SCRUNCH_INC'
+   endparameter
+   
+   parameter SCRUNCH_END
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.SCRUNCH_END'
+   endparameter
+
+EndInterface

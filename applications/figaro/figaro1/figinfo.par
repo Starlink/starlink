@@ -1,0 +1,4 @@
+input,f,a,,,,"(INput) Name of file to examine"
+check_flags,b,a,n,,,"(CHeck_flags) Check for flagged values by reading data?"
+clear_flag,b,h,n,,,"(CLEAR_FLAG) Clear \"may contain flagged data flag\" anyway?"
+set_flag,b,h,n,,,"(SET_FLAG) Set \"may contain flagged data flag\"?"

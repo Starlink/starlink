@@ -1,0 +1,2 @@
+rdata,f,a,,,,"(RData) Data to become real part of complex data"
+cdata,f,a,,,,"(CData) Resulting complex data"

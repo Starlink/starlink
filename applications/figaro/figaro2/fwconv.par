@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum for flux unit conversion"
+flux_unit,s,a,,,,"(FLux_unit) Flux units for output spectrum"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

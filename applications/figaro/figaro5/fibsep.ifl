@@ -1,0 +1,133 @@
+Interface FIBSEP
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to be displayed '
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to create'
+   EndParameter
+
+   Parameter       FILE
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of file for positions of fibres'
+   EndParameter
+
+   Parameter       YSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First Y value to be displayed '
+   EndParameter
+
+   Parameter       YEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last Y value to be displayed '
+   EndParameter
+
+   Parameter       XSTART
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First X value to be displayed '
+   EndParameter
+
+   Parameter       XEND
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last X value to be displayed '
+   EndParameter
+
+   Parameter       LOW
+      Position     8
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Minimum count level for display '
+   EndParameter
+
+   Parameter       HIGH
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum count level for display '
+   EndParameter
+
+   Parameter       DEVICE
+      Position     10
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'DEVICE plotting device'
+   EndParameter
+
+   Parameter       NFIB
+      Position     11
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Approximate number of fibres expected'
+   EndParameter
+
+   Parameter       LOG
+      Position     12
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Display using logarithmic scaling '
+   EndParameter
+
+   Parameter       OLD
+      Position     13
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use previous results to extract data'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

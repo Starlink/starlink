@@ -1,0 +1,42 @@
+#+
+#  Name:
+#     SETOBJ.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     02-OCT-1992 (HME):
+#        Original version.
+#     06-APR-1993 (HME):
+#        Split away from LET.
+#     15-APR-1993 (HME):
+#        Add CURRENT for VALUE.
+#     {enter_changes_here}
+
+#-
+
+interface SETOBJ
+
+   helplib 'FIG_HELP:'
+
+   parameter VALUE
+      type     'LITERAL'
+      position 1
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'New value for HDS scalar'
+      helpkey  '*'
+   endparameter
+
+   parameter OBJECT
+      type     'HDSOBJECT'
+      position 2
+      prompt   'HDS object to be assigned a value'
+      helpkey  '*'
+   endparameter
+
+endinterface

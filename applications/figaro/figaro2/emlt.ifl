@@ -1,0 +1,138 @@
+Interface EMLT
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Spectrum containing lines to be fitted'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSTART
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XSTART'
+      Prompt '(XStart) X-value at which analysis starts'
+      helpkey '*'
+   EndParameter
+
+   Parameter XEND
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      ppath 'CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.XEND'
+      Prompt '(XEnd) X-value at which analysis ends'
+      helpkey '*'
+   EndParameter
+
+   Parameter LINES
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LInes) Number of lines to fit (0 -> all lines)'
+      helpkey '*'
+   EndParameter
+
+   Parameter FWHM
+      Position  5
+      Type '_REAL'       
+      Vpath 'CURRENT,DYNAMIC,DEFAULT'               
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Fwhm) Forced FWHM for fitted lines'
+      helpkey '*'
+   EndParameter
+
+   Parameter MOMENTS
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MOMents) Include center of moment analysis?'
+      helpkey '*'
+   EndParameter
+
+   Parameter SYNTH
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(SYnth) Generate a synthetic spectrum from the fits?'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  6
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting synthetic spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter EMLT_LINES
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_LINES'
+   EndParameter
+
+   Parameter EMLT_BIN
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_BIN'
+   EndParameter
+
+   Parameter EMLT_POS
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_POS'
+   EndParameter
+
+   Parameter EMLT_FWHM_BIN 
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_FWHM_BIN'
+   EndParameter
+
+   Parameter EMLT_FWHM_ANG 
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_FWHM_ANG'
+   EndParameter
+
+   Parameter EMLT_STREN
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_STREN'
+   EndParameter
+
+   Parameter EMLT_PEAK 
+      Type '_REAL'
+      Access 'WRITE'
+      Vpath 'DEFAULT'
+      Default 0.0
+      Association '->GLOBAL.EMLT_PEAK'
+   EndParameter
+
+EndInterface

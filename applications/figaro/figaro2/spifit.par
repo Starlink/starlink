@@ -1,0 +1,4 @@
+spiketrum,f,a,,,,"(SPIketrum) Name of \"spiketrum\" to be interpolated"
+order,r,a,10.0,,,"(ORder) Order of polynomial to be fitted"
+spectrum,f,a,,,,"(SPEctrum) Name of spectrum to be generated"
+log,b,h,n,,,"(Log) Fit to the log of the data?"

@@ -1,0 +1,3 @@
+image,f,a,,,,"(IMage) Name of image to be multiplied"
+factor,r,a,,,,"(FACtor) Multiplicative constant"
+output,f,a,,,,"(OUTput) Name of resulting image"

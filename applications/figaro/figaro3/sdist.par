@@ -1,0 +1,14 @@
+image,f,a,,,,"(IMage) Image containing distortion spectra"
+columns,r,a,3.0,,,"(COLumns) Number of cols to average to get peaks"
+trace,s,a,"Gaussian",,,"(TRace) Trace mode - G(aussian) B(al) C(OG) or E(dge)"
+width,r,a,2.0,,,"(WIdth) Half width of spectra - in pixels"
+maxdeg,r,a,10.0,,,"(MAXdeg) Maximum degree polynomial to use"
+softd,b,a,n,,,"(SOftd) Display results on graphics device?"
+diagnose,b,h,n,,,"(DIAgnose) Output details of trace failures?"
+next,b,a,,,,"Ready for next spectrum"
+npixels,r,a,0.,,,"*! "
+xpixels,struct,a,,,,"*! "
+0.
+ypixels,struct,a,,,,"*! "
+0.
+soft,s,a,"xw",,,"*! (SOFT) Device to use for soft plots"

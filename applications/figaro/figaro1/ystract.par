@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) name of image to extract data from"
+xstart,r,a,,,,"(XStart) first x-value to be used"
+xend,r,a,,,,"(XEnd) last x-value to be used"
+spectrum,f,a,,,,"(SPectrum) name of spectrum to be generated"

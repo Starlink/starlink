@@ -1,0 +1,190 @@
+#+
+#  Name:
+#     FITBB.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     27 Jan 1993 (hme):
+#        Adapted from FITTRI.
+#     30 Jun 1993 (hme):
+#        DIALOG is _CHAR for 3-value logic.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface FITBB
+
+   helplib 'FIG_HELP:'
+
+   parameter INFO
+      type     '_LOGICAL'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  YES
+      association '<->GLOBAL.SPECDRE_INFO'
+      prompt   'Issue informational messages'
+      helpkey  '*'
+   endparameter
+
+   parameter VARUSE
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  YES
+      prompt   'Use input variances if available'
+      helpkey  '*'
+   endparameter
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','n','t','y','F','N','T','Y'
+      default  'T'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter REPAIR
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Update spectroscopic axis number'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      ptype    'DEVICE'
+#     vpath    'GLOBAL,PROMPT'
+#     ppath    'GLOBAL,CURRENT,DEFAULT'
+#     association '<->GLOBAL.GRAPHICS_DEVICE'
+      default  !
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK1
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval lower bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK2
+      type     '_REAL'
+      ppath    'DYNAMIC,DEFAULT'
+      prompt   'Mask interval upper bound(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter NCOMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 6
+      prompt   'Number of components'
+      helpkey  '*'
+   endparameter
+
+   parameter THETA
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0.,0.,0.,0.,0.,0.
+      prompt   'Scaling constants'
+      helpkey  '*'
+   endparameter
+
+   parameter ALPHA
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0.,0.,0.,0.,0.,0.
+      prompt   'Emissivity exponents'
+      helpkey  '*'
+   endparameter
+
+   parameter LGTEMP
+      type     '_REAL'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0.,0.,0.,0.,0.,0.
+      prompt   'Common logarithm of colour temperatures [K]'
+      helpkey  '*'
+   endparameter
+
+   parameter SF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for scaling constants'
+      helpkey  '*'
+   endparameter
+
+   parameter AF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Fit flags for emissivity exponents'
+      helpkey  '*'
+   endparameter
+
+   parameter TF
+      type     '_INTEGER'
+      ppath    'DYNAMIC,CURRENT,DEFAULT'
+      default  0,0,0,0,0,0
+      prompt   'Fit flags for colour temperatures'
+      helpkey  '*'
+   endparameter
+
+   parameter REMASK
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve mask intervals'
+      helpkey  '*'
+   endparameter
+
+   parameter REGUESS
+      type     '_LOGICAL'
+      default  NO
+      prompt   'Improve component guesses'
+      helpkey  '*'
+   endparameter
+
+   parameter FITGOOD
+      type     '_LOGICAL'
+      default  YES
+      prompt   'Fit acceptable'
+      helpkey  '*'
+   endparameter
+
+   parameter COMP
+      type     '_INTEGER'
+      ppath    'CURRENT,DEFAULT'
+      default  1,2,3,4,5,6
+      prompt   'Component numbers for storage'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFIL
+      type     'FILENAME'
+      default  !
+      prompt   'ASCII file name for result output'
+      helpkey  '*'
+   endparameter
+
+endinterface

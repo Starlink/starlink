@@ -1,0 +1,2 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to convert to Ergs/sec/cm**2/A"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

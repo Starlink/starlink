@@ -1,0 +1,85 @@
+Interface IRFLUX
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) Name of Source spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter STANDARD
+      Position  2
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(STandard) Name of Standard spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter TEMP
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(TEMP) Temperature of standard'
+      helpkey '*'
+   EndParameter
+
+   Parameter CALTYPE
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CALtype) Type of calibration data'
+      helpkey '*'
+   EndParameter
+
+   Parameter MAG
+      Position  5
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(MAG) magnitude of standard star'
+      helpkey '*'
+   EndParameter
+
+   Parameter FLUX
+      Position  6
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(FLux) Flux of standard star at calib wavelength (mJy)'
+      helpkey '*'
+   EndParameter
+
+   Parameter WAVE
+      Position  7
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(WAve) Calibration wavelength (microns)'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  8
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting spectrum'
+      helpkey '*'
+   EndParameter
+
+   Parameter KMAG
+      Type '_REAL'       
+   EndParameter
+
+EndInterface

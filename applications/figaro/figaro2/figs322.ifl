@@ -1,0 +1,44 @@
+Interface FIGS322
+
+   helplib 'FIG_HELP:'
+
+   Parameter CUBE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CUbe) The FIGS data cube to be reduced to an image'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMAGE
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+   Parameter ADD
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(ADd) Add all data rather than subtracting background?'
+      helpkey '*'
+   EndParameter
+
+   Parameter BACK
+      Type '_LOGICAL'      
+      Vpath 'DYNAMIC,DEFAULT'               
+      Default FALSE   
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(BAck) Return background spectrum only?'
+      helpkey '*'
+   EndParameter
+
+EndInterface

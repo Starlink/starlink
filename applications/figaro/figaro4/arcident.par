@@ -1,0 +1,13 @@
+in,f,a,,,,"Input NDF"
+out,f,a,,,,"Output NDF"
+fdb,f,a,,,,"Feature data base NDF"
+info,b,a,y,,,"*! Issue informational messages"
+echelle,b,h,n,,,"Split WRANGE, assuming orders of echellogram"
+wrange,r,a,,,,"Approximate lab value range"
+drange,r,h,,,,"Safe dispersion interval"
+strength,r,h,50.,1.,1E30,"Maximum strength ratio"
+thresh,r,h,0.03,0.01,0.2,"Distance ratio match tolerance"
+maxloc,i,h,30,,,"Maximum number of features used for identification"
+minids,i,h,9,,,"Minimum number of feature identifications to accept solution"
+neighb,struct,h,,,,"Start and maximum number of neighbours considered"
+3 6

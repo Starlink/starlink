@@ -1,0 +1,7 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum containing  data"
+xstart,r,a,,,,"(XStart) Start X value of region"
+xend,r,a,,,,"(XEnd) End X value of region"
+period,r,a,2.0,,,"(PERiod) Period of Ripple (pixels)"
+more,b,q,n,,,"(MORE) Include additional ranges?"
+cgs2,b,h,n,,,"CGS2 mode?"
+output,f,a,,,,"(OUTput) Name of resulting ripple spectrum"

@@ -1,0 +1,122 @@
+Interface CENTERS
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.IMAGE'
+      Prompt '(IMage) Name of Image data'
+      helpkey '*'
+   EndParameter
+
+   Parameter APERTURE
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(APerture) Size of aperture for centroiding'
+      helpkey '*'
+   EndParameter
+
+   Parameter XOFF
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Xoff) Offset in X to add to positions'
+      helpkey '*'
+   EndParameter
+
+   Parameter YOFF
+      Position  4
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(Yoff) Offset in Y to add to positions'
+      helpkey '*'
+   EndParameter
+
+   Parameter PFILE
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(PFile) Record radial profiles in a listing file?'
+      helpkey '*'
+   EndParameter
+
+   parameter DISPROF
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Display radial profile'
+      helpkey '*'
+   endparameter
+
+   parameter CHGPROF
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      prompt 'Change profile display parameters'
+      helpkey '*'
+   endparameter
+
+   parameter PROFBOX
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Size of profile "box"'
+      helpkey '*'
+   endparameter
+
+   parameter PROFMIN
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Minimum displayed value'
+      helpkey '*'
+   endparameter
+
+   parameter PROFMAX
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Maximum displayed value'
+      helpkey '*'
+   endparameter
+
+   parameter NPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.NPIXELS'
+   endparameter
+
+   parameter XPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.XPIXELS'
+   endparameter
+
+   parameter YPIXELS
+      type    '_REAL'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default 0.
+      association '<-GLOBAL.YPIXELS'
+   endparameter
+
+   parameter SOFT
+      type    '_CHAR'
+      access  'READ'
+      vpath   'GLOBAL'
+      ppath   'GLOBAL'
+      default ' '
+      association '<-GLOBAL.SOFT'
+   endparameter
+   
+EndInterface

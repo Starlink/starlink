@@ -1,0 +1,2 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to convert to AB magnitudes"
+output,f,a,,,,"(OUTput) Name of resulting spectrum"

@@ -1,0 +1,43 @@
+Interface CMPLXFILT
+
+   helplib 'FIG_HELP:'
+
+   Parameter CDATA
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(CData) Template complex data structure'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOWCUT
+      Position  2
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(LOwcut) Low cutoff point for filter'
+      helpkey '*'
+   EndParameter
+
+   Parameter HICUT
+      Position  3
+      Type '_REAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(HIcut) High cutoff point for filter'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  4
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Resulting complex filter'
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,82 @@
+#+
+#  Name:
+#     ARCDISP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     18 Jun 1993 (hme):
+#        Original version.
+#     30 Jun 1993 (hme):
+#        DIALOG global.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface ARCDISP
+
+   helplib 'FIG_HELP:'
+
+   parameter DIALOG
+      type     '_CHAR'
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      in       'f','g','n','t','y','F','G','N','T','Y'
+      default  'G'
+      association '<->GLOBAL.SPECDRE_DIALOG'
+      prompt   'Allow extensive graphical interaction'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter ORDER
+      position 2
+      type     '_INTEGER'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      default  2
+      range    1, 7
+      prompt   'Polynomial order for dispersion curve'
+      helpkey  '*'
+   endparameter
+
+   parameter FDB
+      type     'NDF'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Feature data base NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter WRANGE
+      type     '_REAL'
+      ppath    'CURRENT,DYNAMIC,DEFAULT'
+      prompt   'Laboratory value range for this row'
+      helpkey  '*'
+   endparameter
+
+endinterface

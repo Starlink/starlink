@@ -1,0 +1,2 @@
+spectrum,f,a,,,,"(SPectrum) Name of file with percentage errors"
+output,f,a,,,,"(OUTput) Name of file with absolute errors"

@@ -1,0 +1,143 @@
+Interface ARCSDI
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       ARC_OPTS
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter arc fit option'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of output file'
+   EndParameter
+
+   Parameter       YSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis x-sect width'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of iteration'
+   EndParameter
+
+   Parameter       ORDER
+      Position     8
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'order for polynomial fitting'
+   EndParameter
+
+   Parameter       MAXLINES
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of lines to allow room for'
+   EndParameter
+
+   Parameter       CLFILE
+      Position     10
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for cloning from'
+   EndParameter
+
+   Parameter       TOLS
+      Position     11
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     12
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'keep itteration files'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     13
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       PLOTCORR
+      Position     14
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot correction?'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface

@@ -1,0 +1,4 @@
+input,f,a,,,,"(INput) Name of file to have flagged values removed"
+output,f,a,,,,"(OUTput) Name of resulting file"
+fixed,b,a,n,,,"(FIxed) Replace flagged values with one fixed value?"
+value,r,a,0.0,,,"(VAlue) Fixed value to use to replace flagged values"

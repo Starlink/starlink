@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) Template to base cosine bell data upon"
+bellpc,r,a,10.0,,,"(BEllpc) Percentage of data covered by cosine bell"
+output,f,a,,,,"(OUTput) Name of resulting data"

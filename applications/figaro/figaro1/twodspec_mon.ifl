@@ -1,0 +1,2201 @@
+monolith twodspec_mon
+Interface ARC2D
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       ARC_OPTS
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter arc fit option'
+   EndParameter
+
+   Parameter       YSTART
+      Position     3
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis x-sect width'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of iteration'
+   EndParameter
+
+   Parameter       ORDER
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'order for polynomial fitting'
+   EndParameter
+
+   Parameter       MAXLINES
+      Position     8
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of lines to allow room for'
+   EndParameter
+
+   Parameter       CLFILE
+      Position     9
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for cloning from'
+   EndParameter
+
+   Parameter       TOLS
+      Position     10
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     11
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'keep itteration files'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     12
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface ARCSDI
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       ARC_OPTS
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter arc fit option'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of output file'
+   EndParameter
+
+   Parameter       YSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis x-sect width'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of iteration'
+   EndParameter
+
+   Parameter       ORDER
+      Position     8
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'order for polynomial fitting'
+   EndParameter
+
+   Parameter       MAXLINES
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of lines to allow room for'
+   EndParameter
+
+   Parameter       CLFILE
+      Position     10
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for cloning from'
+   EndParameter
+
+   Parameter       TOLS
+      Position     11
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     12
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'keep itteration files'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     13
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       PLOTCORR
+      Position     14
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot correction?'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface CADD
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTput Name of output file'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface CHANGED
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       IMAGE2
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface COMB
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       ARC_OPTS
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter arc fit option'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of output file'
+   EndParameter
+
+   Parameter       XSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       XEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       XBLOCK
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter averaging width in channels'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of iteration'
+   EndParameter
+
+   Parameter       LEVEL
+      Position     8
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Level of edge of tooth'
+   EndParameter
+
+   Parameter       ORDER
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'order for polynomial fitting'
+   EndParameter
+
+   Parameter       MAXLINES
+      Position     10
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of lines to allow room for'
+   EndParameter
+
+   Parameter       CLFILE
+      Position     11
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for cloning from'
+   EndParameter
+
+   Parameter       TOLS
+      Position     12
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     13
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'keep itteration files?'
+   EndParameter
+
+   Parameter       QUICK
+      Position     14
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Centriod rather than fit gaussians?'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     15
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       PLOTCORR
+      Position     16
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot correction?'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface CRIGAUSS
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to be created'
+   EndParameter
+
+   Parameter       YDIM
+      Position     2
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Y dimension of data'
+   EndParameter
+
+   Parameter       XDIM
+      Position     3
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'X dimension of data"'
+   EndParameter
+
+   Parameter       XSTART
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First X value '
+   EndParameter
+
+   Parameter       XEND
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last X value '
+   EndParameter
+
+   Parameter       WIDTH1
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH1 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE1
+      Position     7
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE1 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT1
+      Position     8
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT1 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH2
+      Position     9
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH2 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE2
+      Position     10
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE2 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT2
+      Position     11
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT2 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH3
+      Position     12
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH3 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE3
+      Position     13
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE3 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT3
+      Position     14
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT3 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH4
+      Position     15
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH4 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE4
+      Position     16
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE4 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT4
+      Position     17
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT4 of gaussian'
+   EndParameter
+
+   Parameter       WIDTH5
+      Position     18
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'WIDTH5 of gaussian (fwhm)'
+   EndParameter
+
+   Parameter       CENTRE5
+      Position     19
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'CENTRE5 of gaussian'
+   EndParameter
+
+   Parameter       HEIGHT5
+      Position     20
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'HEIGHT5 of gaussian'
+   EndParameter
+
+   Parameter       BASE
+      Position     21
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'BASE for gaussian'
+   EndParameter
+
+   Parameter       NCOMP
+      Position     22
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'NCOMP Number of componants'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface CSCAN
+
+   Parameter       CUBE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of CUBE for input'
+   EndParameter
+
+   Parameter       YSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display upper limit'
+   EndParameter
+
+   Parameter       TSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display lower limit'
+   EndParameter
+
+   Parameter       TEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display upper limit'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     6
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'use hard graphics device for display'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface CSUB
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       OLD
+      Position     2
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OLD - old coefficients are to be used for correction'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTput Name of output file'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface CUBE2LONG
+
+   Parameter       CUBE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of cubefor input'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTput Name of output file'
+   EndParameter
+
+   Parameter       YPOINT
+      Position     3
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Y point on slit'
+   EndParameter
+
+   Parameter       XPOINT
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'X point on slit'
+   EndParameter
+
+   Parameter       ANGLE
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'pa of slit'
+   EndParameter
+
+   Parameter       PIXLEN
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Pixel length'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface FIB2CUBE
+
+   Parameter       IMAGE1
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Input image 1'
+   EndParameter
+
+   Parameter       IMAGE2
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Input image 2'
+   EndParameter
+
+   Parameter       IMAGE3
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Input image 3'
+   EndParameter
+
+   Parameter       IMAGE4
+      Position     4
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Input image 4'
+   EndParameter
+
+   Parameter       IMAGE5
+      Position     5
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Input image 5'
+   EndParameter
+
+   Parameter       CUBE
+      Position     6
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Output data cube'
+   EndParameter
+
+   Parameter       FILE
+      Position     7
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of file with coordinates for output cube'
+   EndParameter
+
+   Parameter       MAXGAUSS
+      Position     8
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of Gaussians to allow room for'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface FIBDISP
+
+   Parameter       CUBE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Cube for display'
+   EndParameter
+
+   Parameter       YSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis x-sect width'
+   EndParameter
+
+   Parameter       TSTART
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       TEND
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       TBLOCK
+      Position     7
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter analysis blocking width in 3rd dimension'
+   EndParameter
+
+   Parameter       DEVICE
+      Position     8
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Device for display'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of itteration'
+   EndParameter
+
+   Parameter       OUTABLE
+      Position     10
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name for EXTATIC file'
+   EndParameter
+
+   Parameter       VCORR
+      Position     11
+      Type         '_REAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'correction to apply to radial velocities'
+   EndParameter
+
+   Parameter       TOLS
+      Position     12
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       FITRAT
+      Position     13
+      Type         '_REAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of widths, heights, or separation, for double fits'
+   EndParameter
+
+   Parameter       CALRAT
+      Position     14
+      Type         '_INTEGER'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of number of iteration to default'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     15
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name for output file'
+   EndParameter
+
+   Parameter       FIT_MODEL
+      Position     16
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Model of fit to perform'
+   EndParameter
+
+   Parameter       LOW
+      Position     17
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Minimum value for display'
+   EndParameter
+
+   Parameter       HIGH
+      Position     18
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum value for display'
+   EndParameter
+
+   Parameter       ABSORPTION
+      Position     19
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Allow fitting of absorption lines'
+   EndParameter
+
+   Parameter       BOUNDS
+      Position     20
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Perform bounded fits to lines (in batch)'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     21
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce hardcopy plots of fits from cube'
+   EndParameter
+
+   Parameter       TABLE
+      Position     22
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce table of fits from cube'
+   EndParameter
+
+   Parameter       PRINT
+      Position     23
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Produce print out of rotation curves'
+   EndParameter
+
+   Parameter       SHAPE
+      Position     24
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Carry out shape analysis'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     25
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Keep itteration files'
+   EndParameter
+
+   Parameter       FIT
+      Position     26
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'perform fitting'
+   EndParameter
+
+   Parameter       AIC
+      Position     27
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use Akiakes information criterion for fitting'
+   EndParameter
+
+   Parameter       WEIGHTS
+      Position     28
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use weights for fitting'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     29
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       FULL
+      Position     30
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out full details of fits in table'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface FIBSEP
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to be displayed '
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to create'
+   EndParameter
+
+   Parameter       FILE
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of file for positions of fibres'
+   EndParameter
+
+   Parameter       YSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First Y value to be displayed '
+   EndParameter
+
+   Parameter       YEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last Y value to be displayed '
+   EndParameter
+
+   Parameter       XSTART
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First X value to be displayed '
+   EndParameter
+
+   Parameter       XEND
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last X value to be displayed '
+   EndParameter
+
+   Parameter       LOW
+      Position     8
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Minimum count level for display '
+   EndParameter
+
+   Parameter       HIGH
+      Position     9
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum count level for display '
+   EndParameter
+
+   Parameter       DEVICE
+      Position     10
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'DEVICE plotting device'
+   EndParameter
+
+   Parameter       NFIB
+      Position     11
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Approximate number of fibres expected'
+   EndParameter
+
+   Parameter       LOG
+      Position     12
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Display using logarithmic scaling '
+   EndParameter
+
+   Parameter       OLD
+      Position     13
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use previous results to extract data'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface FITCONT
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       XSECT
+      Position     2
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'value to extract from for first fit'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface HIMAGE
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image to be displayed '
+   EndParameter
+
+   Parameter       YSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First Y value to be displayed '
+   EndParameter
+
+   Parameter       YEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last Y value to be displayed '
+   EndParameter
+
+   Parameter       XSTART
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'First X value to be displayed '
+   EndParameter
+
+   Parameter       XEND
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Last X value to be displayed '
+   EndParameter
+
+   Parameter       LOW
+      Position     6
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Minimum count level for display '
+   EndParameter
+
+   Parameter       HIGH
+      Position     7
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum count level for display '
+   EndParameter
+
+   Parameter       PLOTDEV
+      Position     8
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plotting device'
+   EndParameter
+
+   Parameter       ASPECT
+      Position     9
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio X/Y for plot (excluding any key)'
+   EndParameter
+
+   Parameter       SHRINK
+      Position     10
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Shrink image to display with wide margins'
+   EndParameter
+
+   Parameter       LOG
+      Position     11
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Display using logarithmic scaling '
+   EndParameter
+
+   Parameter       KEY
+      Position     12
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot a key beside the data'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface ISCAN
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       XSTART
+      Position     2
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display lower limit'
+   EndParameter
+
+   Parameter       XEND
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display upper limit'
+   EndParameter
+
+   Parameter       YSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'display upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Enter display x-sect width'
+   EndParameter
+
+   Parameter       SCAN
+      Position     7
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Scan through data'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     8
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'use hard graphics device for display'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface LONGSLIT
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       ARC_OPTS
+      Position     2
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Fit option'
+   EndParameter
+
+   Parameter       YSTART
+      Position     3
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       YEND
+      Position     4
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       YBLOCK
+      Position     5
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Analysis x-sect blocking width'
+   EndParameter
+
+   Parameter       ITERATION
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'New value of iteration'
+   EndParameter
+
+   Parameter       MAXLINES
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of lines to allow room for'
+   EndParameter
+
+   Parameter       CLFILE
+      Position     8
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for cloning from'
+   EndParameter
+
+   Parameter       OUTABLE
+      Position     9
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name for EXTATIC file'
+   EndParameter
+
+   Parameter       VCORR
+      Position     10
+      Type         '_REAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'correction to apply to radial velocities'
+   EndParameter
+
+   Parameter       TOLS
+      Position     11
+      Type         '_CHAR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'For use in batch only'
+   EndParameter
+
+   Parameter       INHERIT
+      Position     12
+      Type         '_INTEGER'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Number to control inheritance of previous fits'
+   EndParameter
+
+   Parameter       DEVICE
+      Position     13
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Device to use for plotting'
+   EndParameter
+
+   Parameter       FITRAT
+      Position     14
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of widths, heights, or separation, for double fits'
+   EndParameter
+
+   Parameter       CALRAT
+      Position     15
+      Type         '_INTEGER'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Ratio of number of iteration to default'
+   EndParameter
+
+   Parameter       WHITE
+      Position     16
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Level to be recorded as white'
+   EndParameter
+
+   Parameter       BLACK
+      Position     17
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Level to be recorded as black'
+   EndParameter
+
+   Parameter       MAXGAUSS
+      Position     18
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Maximum number of Gaussians to allow room for'
+   EndParameter
+
+   Parameter       TSTART
+      Position     19
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis lower limit'
+   EndParameter
+
+   Parameter       TEND
+      Position     20
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'analysis upper limit'
+   EndParameter
+
+   Parameter       TBLOCK
+      Position     21
+      Type         '_REAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Analysis blocking width in T direction'
+   EndParameter
+
+   Parameter       FIT_MODEL
+      Position     22
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Model of fit to perform'
+   EndParameter
+
+   Parameter       PLOTLIM
+      Position     23
+      Type         'ERROR'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Limits of plot (world coordinates)'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     24
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTPut Name of output file'
+   EndParameter
+
+   Parameter       HARDCOPY
+      Position     25
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce hardcopy plots of fits from cube'
+   EndParameter
+
+   Parameter       TABLE
+      Position     26
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce table of fits from cube'
+   EndParameter
+
+   Parameter       PLOT
+      Position     27
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce plots of rotation curves'
+   EndParameter
+
+   Parameter       PRINT
+      Position     28
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'produce print out of rotation curves'
+   EndParameter
+
+   Parameter       SHAPE
+      Position     29
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'carry out shape analysis'
+   EndParameter
+
+   Parameter       KEEP_ITT
+      Position     30
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'keep iteration files'
+   EndParameter
+
+   Parameter       FIT
+      Position     31
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'perform fitting'
+   EndParameter
+
+   Parameter       COPY
+      Position     32
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'copy previous fits'
+   EndParameter
+
+   Parameter       ABSORPTION
+      Position     33
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Allow fitting of absorption lines'
+   EndParameter
+
+   Parameter       BOUNDS
+      Position     34
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Perform bounded fits to lines (in batch)'
+   EndParameter
+
+   Parameter       LABEL
+      Position     35
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Label graphs (velocity plots and profile plots'
+   EndParameter
+
+   Parameter       CONTOUR
+      Position     36
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Create contour plot(s)'
+   EndParameter
+
+   Parameter       GREY
+      Position     37
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Create greyscale plot(s)'
+   EndParameter
+
+   Parameter       LOG
+      Position     38
+      Type         '_LOGICAL'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use logarithmic scale'
+   EndParameter
+
+   Parameter       WEIGHTS
+      Position     39
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Use weights for fitting'
+   EndParameter
+
+   Parameter       PRFITS
+      Position     40
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out details of fitting'
+   EndParameter
+
+   Parameter       FULL
+      Position     41
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Print out full details of fits in table'
+   EndParameter
+
+   Parameter       CHECK
+      Position     42
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Plot array of line profiles'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+Interface VIG
+
+   Parameter       IMAGE
+      Position     1
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'Name of image for input'
+   EndParameter
+
+   Parameter       OLD
+      Position     2
+      Type         '_LOGICAL'
+      Vpath        'DYNAMIC'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OLD - old coefficients are to be used for correction'
+   EndParameter
+
+   Parameter       OUTPUT
+      Position     3
+      Type         '_CHAR'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'OUTput Name of output file'
+   EndParameter
+
+   Parameter       YSTART
+      Position     4
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'start value to extract in channel direction'
+   EndParameter
+
+   Parameter       YEND
+      Position     5
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'end value to extract in channel direction'
+   EndParameter
+
+   Parameter       XSTART
+      Position     6
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'start value to extract in x-sect direction'
+   EndParameter
+
+   Parameter       XEND
+      Position     7
+      Type         '_INTEGER'
+      Ppath        'CURRENT,DYNAMIC,DEFAULT'
+      Prompt       'end value to extract in x-sect direction'
+   EndParameter
+   Parameter    LOGICAL_VALUE
+      Type      '_LOGICAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NUMERIC_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    NO_DEF_VALUE
+      Type      '_REAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_VALUE
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter    CHARACTER_INPUT
+      Type      'LITERAL'
+      Vpath     'PROMPT'
+   EndParameter
+
+   Parameter SOFT
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Default ' '
+      Association '<-GLOBAL.SOFT'
+   Endparameter
+
+   Parameter HARD
+      Type '_CHAR'
+      Vpath  'GLOBAL'
+      Ppath  'GLOBAL'
+      Association '<-GLOBAL.HARD'
+   Endparameter
+
+EndInterface
+endmonolith

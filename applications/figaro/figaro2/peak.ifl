@@ -1,0 +1,32 @@
+Interface PEAK
+
+   helplib 'FIG_HELP:'
+
+   Parameter SPECTRUM
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<->GLOBAL.SPECTRUM'
+      Prompt '(SPectrum) File containing peak to be analysed'
+      helpkey '*'
+   EndParameter
+   
+   parameter SHIFT
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.SHIFT'
+   endparameter
+   
+   parameter WIDTH
+      type    '_REAL'
+      access  'WRITE'
+      vpath   'DEFAULT'
+      default 0.
+      association '->GLOBAL.WIDTH'
+   endparameter
+
+EndInterface

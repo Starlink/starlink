@@ -1,0 +1,250 @@
+#+
+#  Name:
+#     SPECCONT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tdca: Tim Ash (RAL, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     22 Jun 1994 (hme):
+#        Original version.
+#     21 Apr 1995 (hme):
+#        Add STYLE and NMINOR, CONTOURS removed.
+#     03 Mar 1999 (tdca):
+#        Changed helplib to FIG_HELP.
+#     {enter_further_changes_here}
+
+#-
+
+interface SPECCONT
+
+   helplib 'FIG_HELP:'
+
+   parameter CLEAR
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Clear the active part of screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OVERLAY
+      type     '_LOGICAL'
+      default  FALSE
+      prompt   'Overlay on existing data'
+      helpkey  '*'
+   endparameter
+
+   parameter IN
+      position 1
+      type     'NDF'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'Input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE
+      type     'GRAPHICS'
+      ptype    'DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      prompt   'Graphics device'
+      helpkey  '*'
+   endparameter
+
+   parameter FILL
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Ignore image aspect ratio'
+      helpkey  '*'
+   endparameter
+
+   parameter ROMAN
+      type     '_LOGICAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  FALSE
+      prompt   'Use nicer font'
+      helpkey  '*'
+   endparameter
+
+   parameter HEIGHT
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1.
+      range    0.01 40.
+      prompt   'Character height (marker size)'
+      helpkey  '*'
+   endparameter
+
+   parameter COLOUR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    0, 255
+      prompt   'Colour index'
+      helpkey  '*'
+   endparameter
+
+   parameter THICK
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 21
+      prompt   'Line thickness'
+      helpkey  '*'
+   endparameter
+
+   parameter DASH
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  1
+      range    1, 5
+      prompt   'Dash pattern code'
+      helpkey  '*'
+   endparameter
+
+   parameter AXES                # Box layout
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Draw axes'
+      helpkey  '*'
+   endparameter
+
+   parameter TICK
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '----'
+      prompt   'Draw ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter NUML
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++00'
+      prompt   'Write numerical labels'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  '++++'
+      prompt   'Write text labels'
+      helpkey  '*'
+   endparameter
+
+   parameter MAJOR
+      type     '_REAL'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0., 0.
+      prompt   'Interval between major ticks'
+      helpkey  '*'
+   endparameter
+
+   parameter MINOR
+      type     '_INTEGER'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  0, 0
+      prompt   'No. of minor intervals per major interval'
+      helpkey  '*'
+   endparameter
+
+   parameter BOTTOM
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for bottom axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LEFT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for left axis'
+      helpkey  '*'
+   endparameter
+
+   parameter TOP
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for top axis'
+      helpkey  '*'
+   endparameter
+
+   parameter RIGHT
+      type     '_CHAR'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'Label for right axis'
+      helpkey  '*'
+   endparameter
+
+   parameter LABSPC
+      type     '_REAL'
+      ppath    'DEFAULT'
+      default  0.1, 0.1, 0.05, 0.05
+      prompt   'Space for labelling'
+      helpkey  '*'
+   endparameter
+
+   parameter WORLD
+      type     _REAL
+      ppath    'DEFAULT'
+      default  !
+      prompt   'World coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE
+      type     '_CHAR'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Linear'
+      prompt   'Contour stepping (linear/free)'
+      helpkey  '*'
+   endparameter
+
+   parameter START
+      type     '_REAL'
+      prompt   'First contour value'
+      helpkey  '*'
+   endparameter
+
+   parameter STEP
+      type     '_REAL'
+      prompt   'Step between contours'
+      helpkey  '*'
+   endparameter
+
+   parameter END
+      type     '_REAL'
+      prompt   'Last contour value'
+      helpkey  '*'
+   endparameter
+
+endinterface

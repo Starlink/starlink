@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPEctrum) Template spectrum for wavelength range"
+table,s,a,,,,"(Table) Table giving wavelength and data values"
+spiketrum,f,a,,,,"(SPIketrum) Name of \"spiketrum\" to be generated"

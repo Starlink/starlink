@@ -1,0 +1,161 @@
+#  History:
+#     09 Mar 1993 (HME):
+#        Individual review of parameters.
+#     28 Jul 1998 (MBT):
+#        Name change and additional parameters added for use with SCLEAN.
+#     11 Nov 1998 (ACD):
+#        Added missing position keywords, so that the position is given
+#        explicitly for every parameter.
+
+
+Interface SCLEAN
+
+   helplib 'FIG_HELP:'
+
+   Parameter IMAGE
+      Position  1
+      Type 'NDF'       
+      access 'READ'
+      Vpath 'PROMPT'                        
+      ppath 'GLOBAL,CURRENT,DYNAMIC,DEFAULT'
+      association '<-GLOBAL.IMAGE'
+      Prompt '(IMage) Name of image to be cleaned'
+      helpkey '*'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'NDF'       
+      access 'WRITE'
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC,DEFAULT'
+      Prompt '(OUTput) Name of resulting image'
+      helpkey '*'
+   EndParameter
+
+   Parameter IDEV
+      Position  3
+      type '_CHAR'
+      access 'READ'
+      prompt 'Device for image display'
+      vpath  'DYNAMIC,GLOBAL'
+      ppath  'DYNAMIC,GLOBAL,DEFAULT'
+      default 'xwindows'
+      association '<-GLOBAL.IDEV'
+      helpkey '*'
+   EndParameter
+
+   Parameter IMARRAY
+      Position  4
+      type   '_REAL'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default 0.
+      association '->GLOBAL.IMARRAY'
+   EndParameter
+
+   Parameter IMFILE
+      Position  5
+      type   '_CHAR'
+      access 'WRITE'
+      vpath  'DEFAULT'
+      default ' '
+      association '->GLOBAL.IMFILE'
+   EndParameter
+
+   Parameter QUIT
+      Position  6
+      Type '_LOGICAL'
+      Vpath 'NOPROMPT'
+      prompt 'Terminate cleaning process'
+      default FALSE
+      helpkey '*'
+   EndParameter
+
+   Parameter DEG
+      Position  7
+      Type '_INTEGER'
+      Vpath 'DEFAULT,PROMPT'
+      Default 2
+      Range 0, 7
+      prompt 'Degree of fit to use for interpolation'
+      helpkey '*'
+   EndParameter
+
+   Parameter XSIZE
+      Position  8
+      Type '_INTEGER'
+      Vpath 'DEFAULT,PROMPT'
+      Default 5
+      Range 1, 20
+      prompt 'Side of box deleted by "X" and "Y", in X'
+      helpkey '*'
+   EndParameter
+
+   Parameter YSIZE
+      Position  9
+      Type '_INTEGER'
+      Vpath 'DEFAULT,PROMPT'
+      Default 5
+      Range 1, 20
+      prompt 'Side of box deleted by "X" and "Y", in Y'
+      helpkey '*'
+   EndParameter
+
+   Parameter HIGH
+      Position  10
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Highest displayed data value'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOW
+      Position  11
+      Type '_REAL'
+      Vpath 'PROMPT'
+      prompt 'Lowest displayed data value'
+      helpkey '*'
+   EndParameter
+
+   Parameter LOGFILE
+      Position  12
+      Type 'FILENAME'
+      Ppath 'DEFAULT'
+      Vpath 'DEFAULT'
+      Default !
+      Prompt 'Log file'
+      helpkey '*'
+   EndParameter
+
+   Parameter BATCHFILE
+      Position  13
+      Type 'FILENAME'
+      Vpath 'DEFAULT'
+      Default !
+      Prompt 'File containing commands for batch operation (!=interactive)'
+      Helpkey '*'
+   EndParameter
+
+   Parameter BITNUM
+      Position  14
+      Type '_INTEGER'
+      Ppath 'DYNAMIC,DEFAULT'
+      Vpath 'DYNAMIC,DEFAULT'
+      Default 4
+      Prompt 'Bit number of quality mask to modify for bad pixels'
+      Range 0,7
+      helpkey '*'
+   EndParameter
+
+   Parameter ZOOM
+      Position  15
+      Type '_INTEGER'
+      Vpath 'DEFAULT'
+      Default 6
+      Prompt 'Pixel magnification factor in Expanded and SCUBA modes'
+      Range 1,24
+      helpkey '*'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,3 @@
+in,f,a,,,,"Input NDF"
+sky,f,a,,,,"Sky spectrum"
+out,f,a,,,,"Output NDF"

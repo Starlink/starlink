@@ -1,0 +1,3 @@
+spectrum,f,a,,,,"(SPectrum) Spectrum to generate mask from"
+table,s,a,,,,"(TAble) Table file giving regions to be masked"
+mask,f,a,,,,"(MAsk) Name of mask to be generated"

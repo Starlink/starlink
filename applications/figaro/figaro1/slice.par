@@ -1,0 +1,7 @@
+image,f,a,,,,"(IMage) Image from which slice is taken"
+ystart,r,a,,,,"(YStart) Y value of start of slice"
+yend,r,a,,,,"(YEnd) Y value of end of slice"
+xstart,r,a,,,,"(XStart) X value for start of slice"
+xend,r,a,,,,"(XEnd) X value of end of slice"
+elements,r,a,,,,"(ELements) Number of pixels in resulting spectrum"
+spectrum,f,a,,,,"(SPectrum) Resulting spectrum"

@@ -1,0 +1,54 @@
+
+      Interface SURFIT
+
+         Parameter IMAGE
+            Position  1
+            Type 'NDF'       
+            Access 'READ'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(IMage) Name of image to be fitted'
+         EndParameter
+
+         Parameter XKNOTS
+            Position  2
+            Type '_REAL'         
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(XKnots) Number of interior knots in X'
+         EndParameter
+
+         Parameter YKNOTS
+            Position  3
+            Type '_REAL'         
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(YKnots) Number of interior knots in Y'
+         EndParameter
+
+         Parameter VMODE
+            Position  4
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(VMode) "Median" or "Average" for panel values?'
+         EndParameter
+
+         Parameter MOSAIC
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(MOsaic) Generate mosaic instead of fitted data?'
+         EndParameter
+
+         Parameter OUTPUT
+            Position  5
+            Type 'NDF'       
+            Access 'WRITE'
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(OUTput) Name of resulting image'
+         EndParameter
+
+      EndInterface

@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) Name of image to be rescaled"
+lowfact,r,a,0.0,,,"(LOWfact) lower limit of rescaling"
+highfact,r,a,1.0,,,"(HIGHfact) upper limit of rescaling"
+output,f,a,,,,"(OUTput) Name of resulting image"

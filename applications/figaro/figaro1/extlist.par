@@ -1,0 +1,4 @@
+image,f,a,,,,"(IMage) name of image to extract data from"
+nrows,s,a,"2.0",,,"(NRows) How many rows to be added"
+sections,r,a,0.0,,,"(SECtions) List of rows"
+spectrum,f,a,,,,"(SPectrum) name of spectrum to be generated"

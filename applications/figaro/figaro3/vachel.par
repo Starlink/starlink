@@ -1,0 +1,5 @@
+image,f,a,,,,"(IMage) Image whose X values are to be converted"
+output,f,a,,,,"(OUtput) Name of modified image"
+vel,r,a,0.0,,,"(VElocity) Recession velocity (Km/s)?"
+vac,b,a,y,,,"(VAc) Apply air to vacuum wavelength correction?"
+dplr,b,a,y,,,"(DPlr) Is a correction for recession velocity required?"

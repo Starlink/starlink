@@ -1,0 +1,6 @@
+image,f,a,,,,"(IMage) Image to grow into planes of cube"
+cube,f,a,,,,"(Cube) Cube into which image is to be grown"
+tstart,r,a,,,,"(TStart) First plane to copy image into"
+tend,r,a,,,,"(TEnd) Last plane to copy image into"
+new,b,a,n,,,"(NEw) Force creation of a new cube?"
+tsize,r,a,,,,"(TSIze) T-dimension of new image"

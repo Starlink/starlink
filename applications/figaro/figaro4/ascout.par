@@ -1,0 +1,4 @@
+in,f,a,,,,"Input NDF"
+out,f,a,,,,"Output ASCII file"
+width,b,h,n,,,"Write also the pixel widths"
+bad,r,h,-999999.0,,,"Table value to replace bad values"

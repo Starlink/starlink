@@ -1,0 +1,5 @@
+in,f,a,,,,"Input NDF"
+profile,f,a,,,,"NDF containing profile (weights)"
+out,f,a,,,,"Output NDF"
+fibres,i,h,92,,,"Number of fibres to extract"
+title,s,h,INDEF,,,"Output title"

@@ -1,0 +1,16 @@
+image,f,a,,,,"(IMage) Name of Image data"
+aperture,r,a,5.0,,,"(APerture) Size of aperture for centroiding"
+xoff,r,a,0.0,,,"(Xoff) Offset in X to add to positions"
+yoff,r,a,0.0,,,"(Yoff) Offset in Y to add to positions"
+pfile,b,a,n,,,"(PFile) Record radial profiles in a listing file?"
+disprof,b,a,,,,"Display radial profile"
+chgprof,b,q,n,,,"Change profile display parameters"
+profbox,r,a,,,,"Size of profile \"box\""
+profmin,r,a,,,,"Minimum displayed value"
+profmax,r,a,,,,"Maximum displayed value"
+npixels,r,a,0.,,,"*! "
+xpixels,struct,a,,,,"*! "
+0.
+ypixels,struct,a,,,,"*! "
+0.
+soft,s,a,"xw",,,"*! (SOFT) Device to use for soft plots"
