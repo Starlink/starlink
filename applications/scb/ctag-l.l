@@ -14,86 +14,87 @@ void count();
 %}
 
 %%
-^#include[ \t]+		{ include(); }
+^#include{S}		{ include(); }
+^#define{S}		{ cpp(); }
 ^#			{ cpp(); }
 
 "/*"			{ comment(); }
 
-"auto"			{ count(); return(AUTO); }
-"break"			{ count(); return(BREAK); }
-"case"			{ count(); return(CASE); }
-"char"			{ count(); return(CHAR); }
-"const"			{ count(); return(CONST); }
-"continue"		{ count(); return(CONTINUE); }
-"default"		{ count(); return(DEFAULT); }
-"do"			{ count(); return(DO); }
-"double"		{ count(); return(DOUBLE); }
-"else"			{ count(); return(ELSE); }
-"enum"			{ count(); return(ENUM); }
-"extern"		{ count(); return(EXTERN); }
-"float"			{ count(); return(FLOAT); }
-"for"			{ count(); return(FOR); }
-"goto"			{ count(); return(GOTO); }
-"if"			{ count(); return(IF); }
-"int"			{ count(); return(INT); }
-"long"			{ count(); return(LONG); }
-"register"		{ count(); return(REGISTER); }
-"return"		{ count(); return(RETURN); }
-"short"			{ count(); return(SHORT); }
-"signed"		{ count(); return(SIGNED); }
-"sizeof"		{ count(); return(SIZEOF); }
-"static"		{ count(); return(STATIC); }
-"struct"		{ count(); return(STRUCT); }
-"switch"		{ count(); return(SWITCH); }
-"typedef"		{ count(); return(TYPEDEF); }
-"union"			{ count(); return(UNION); }
-"unsigned"		{ count(); return(UNSIGNED); }
-"void"			{ count(); return(VOID); }
-"volatile"		{ count(); return(VOLATILE); }
-"while"			{ count(); return(WHILE); }
+"auto"{S}		{ count(); return(AUTO); }
+"break"{S}		{ count(); return(BREAK); }
+"case"{S}		{ count(); return(CASE); }
+"char"{S}		{ count(); return(CHAR); }
+"const"{S}		{ count(); return(CONST); }
+"continue"{S}		{ count(); return(CONTINUE); }
+"default"{S}		{ count(); return(DEFAULT); }
+"do"{S}			{ count(); return(DO); }
+"double"{S}		{ count(); return(DOUBLE); }
+"else"{S}		{ count(); return(ELSE); }
+"enum"{S}		{ count(); return(ENUM); }
+"extern"{S}		{ count(); return(EXTERN); }
+"float"{S}		{ count(); return(FLOAT); }
+"for"{S}		{ count(); return(FOR); }
+"goto"{S}		{ count(); return(GOTO); }
+"if"{S}			{ count(); return(IF); }
+"int"{S}		{ count(); return(INT); }
+"long"{S}		{ count(); return(LONG); }
+"register"{S}		{ count(); return(REGISTER); }
+"return"{S}		{ count(); return(RETURN); }
+"short"{S}		{ count(); return(SHORT); }
+"signed"{S}		{ count(); return(SIGNED); }
+"sizeof"{S}		{ count(); return(SIZEOF); }
+"static"{S}		{ count(); return(STATIC); }
+"struct"{S}		{ count(); return(STRUCT); }
+"switch"{S}		{ count(); return(SWITCH); }
+"typedef"{S}		{ count(); return(TYPEDEF); }
+"union"{S}		{ count(); return(UNION); }
+"unsigned"{S}		{ count(); return(UNSIGNED); }
+"void"{S}		{ count(); return(VOID); }
+"volatile"{S}		{ count(); return(VOLATILE); }
+"while"{S}		{ count(); return(WHILE); }
 
-F77_SUBROUTINE{S}\(	{ count(); return(F77_SUBROUTINE_OPEN); }
-F77_[A-Z]+_FUNCTION{S}\(	{ count(); return(F77_FUNCTION_OPEN); }
-F77_EXTERNAL_NAME{S}\(	{ count(); return(F77_EXTERNAL_OPEN); }
+F77_SUBROUTINE/{S}\({S}		{ count(); return(F77_SUBROUTINE_NAME); }
+F77_[A-Z]+_FUNCTION/{S}\({S}	{ count(); return(F77_FUNCTION_NAME); }
+F77_EXTERNAL_NAME/{S}\({S}	{ count(); return(F77_EXTERNAL_NAME); }
 
-{L}({L}|{D})*{S}\(	{ count(); return(FUNC_OPEN); }
-{L}({L}|{D})*		{ count(); return(identifier()); }
+{L}({L}|{D})*/{S}\({S}	{ count(); return(FUNC_NAME); }
+{L}({L}|{D})*{S}	{ count(); return(identifier()); }
 
-0[xX]{H}+{IS}?		{ count(); return(CONSTANT); }
-0{D}+{IS}?		{ count(); return(CONSTANT); }
-{D}+{IS}?		{ count(); return(CONSTANT); }
-'(\\.|[^\\'])+'		{ count(); return(CONSTANT); }
+0[xX]{H}+{IS}?{S}	{ count(); return(CONSTANT); }
+0{D}+{IS}?{S}		{ count(); return(CONSTANT); }
+{D}+{IS}?{S}		{ count(); return(CONSTANT); }
+'(\\.|[^\\'])+'{S}		{ count(); return(CONSTANT); }
 
-{D}+{E}{FS}?		{ count(); return(CONSTANT); }
-{D}*"."{D}+({E})?{FS}?	{ count(); return(CONSTANT); }
-{D}+"."{D}*({E})?{FS}?	{ count(); return(CONSTANT); }
+{D}+{E}{FS}?{S}			{ count(); return(CONSTANT); }
+{D}*"."{D}+({E})?{FS}?{S}	{ count(); return(CONSTANT); }
+{D}+"."{D}*({E})?{FS}?{S}	{ count(); return(CONSTANT); }
 
-\"(\\.|[^\\"])*\"	{ count(); return(STRING_LITERAL); }
+\"(\\.|[^\\"])*\"{S}	{ count(); return(STRING_LITERAL); }
 
-";"                     { count(); return(';'); }
-"{"                     { count(); return('{'); }
-"}"                     { count(); return('}'); }
-","                     { count(); return(','); }
-":"                     { count(); return(':'); }
-"="                     { count(); return('='); }
-"("                     { count(); return('('); }
-")"                     { count(); return(')'); }
-"["                     { count(); return('['); }
-"]"                     { count(); return(']'); }
-"."                     { count(); return('.'); }
-"&"                     { count(); return('&'); }
-"!"                     { count(); return('!'); }
-"~"                     { count(); return('~'); }
-"-"                     { count(); return('-'); }
-"+"                     { count(); return('+'); }
-"*"                     { count(); return('*'); }
-"/"                     { count(); return('/'); }
-"%"                     { count(); return('%'); }
-"<"                     { count(); return('<'); }
-">"                     { count(); return('>'); }
-"^"                     { count(); return('^'); }
-"|"                     { count(); return('|'); }
-"?"                     { count(); return('?'); }
+";"{S}			{ count(); return(';'); }
+"{"{S}			{ count(); return('{'); }
+"}"{S}			{ count(); return('}'); }
+","{S}			{ count(); return(','); }
+":"{S}			{ count(); return(':'); }
+"="{S}			{ count(); return('='); }
+"("{S}			{ count(); return('('); }
+")"{S}			{ count(); return(')'); }
+"["{S}			{ count(); return('['); }
+"]"{S}			{ count(); return(']'); }
+"."{S}			{ count(); return('.'); }
+"&"{S}			{ count(); return('&'); }
+"!"{S}			{ count(); return('!'); }
+"~"{S}			{ count(); return('~'); }
+"-"{S}			{ count(); return('-'); }
+"+"{S}			{ count(); return('+'); }
+"*"{S}			{ count(); return('*'); }
+"/"{S}			{ count(); return('/'); }
+"%"{S}			{ count(); return('%'); }
+"<"{S}			{ count(); return('<'); }
+">"{S}			{ count(); return('>'); }
+"^"{S}			{ count(); return('^'); }
+"|"{S}			{ count(); return('|'); }
+"?"{S}			{ count(); return('?'); }
 
 [ \t\v\n\f]		{ count(); }
 .                       { count(); return(ILLEGALCHAR); }

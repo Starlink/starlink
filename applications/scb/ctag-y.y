@@ -6,13 +6,15 @@
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%token F77_FUNCTION_OPEN F77_SUBROUTINE_OPEN F77_EXTERNAL_OPEN ILLEGALCHAR
-%token FUNC_OPEN
-
-%token SIZEOF_OPEN IF_OPEN WHILE_OPEN FOR_OPEN SWITCH_OPEN
-
+%token F77_FUNCTION_NAME F77_SUBROUTINE_NAME F77_EXTERNAL_NAME FUNC_NAME
+%token ILLEGALCHAR
 
 %start file
+
+%{
+#define YYSTYPE char *
+%}
+
 %%
 
 file
@@ -21,12 +23,12 @@ file
 	;
 
 external_definition
-	: f77_macro_open identifier ')' '(' nonexecutable_code ')' function_body
-	| f77_macro_open identifier ')' '(' nonexecutable_code ')' ';'
-	| FUNC_OPEN nonexecutable_code ')' function_body
-	| FUNC_OPEN nonexecutable_code ')' ';'
-	| FUNC_OPEN ')' function_body
-	| FUNC_OPEN ')' ';'
+	: f77_macro_name '(' identifier ')' '(' nonexecutable_code ')' function_body
+	| f77_macro_name '(' identifier ')' '(' nonexecutable_code ')' ';'
+	| FUNC_NAME '(' nonexecutable_code ')' function_body
+	| FUNC_NAME '(' nonexecutable_code ')' ';'
+	| FUNC_NAME '(' ')' function_body
+	| FUNC_NAME '(' ')' ';'
 	| declaration_word
 	| ';'
 	;
@@ -62,16 +64,9 @@ nonexecutable_code
 	;
 
 nonexecutable_item
-	: reserved
-	| identifier
-	| CONSTANT
-	| STRING_LITERAL
-	| '{' nonexecutable_code '}'
-	| '(' nonexecutable_code ')'
-	| FUNC_OPEN nonexecutable_code ')'
-	| SIZEOF_OPEN nonexecutable_code ')'
+	: declaration_word
+	| FUNC_NAME '(' nonexecutable_code ')'
 	| ';'
-	| otherchar
 	;
 
 executable_code
@@ -80,24 +75,23 @@ executable_code
 	;
 
 executable_item
-	: f77_macro_open identifier ')' 
-	| FUNC_OPEN executable_code ')'
-	| FUNC_OPEN ')'
+	: f77_macro_name '(' identifier ')' 
+	| FUNC_NAME '(' executable_code ')'
+	| FUNC_NAME '(' ')'
 	| reserved
 	| identifier
 	| CONSTANT
 	| STRING_LITERAL
 	| '{' executable_code '}'
 	| '(' executable_code ')'
-	| reserved_open executable_code ')'
 	| ';'
 	| otherchar
 	;
 
-f77_macro_open
-	: F77_FUNCTION_OPEN
-	| F77_SUBROUTINE_OPEN
-	| F77_EXTERNAL_OPEN
+f77_macro_name
+	: F77_FUNCTION_NAME
+	| F77_SUBROUTINE_NAME
+	| F77_EXTERNAL_NAME
 	;
 
 otherchar
@@ -116,10 +110,6 @@ reserved
 	| IF | INT | LONG | REGISTER | RETURN | SHORT | SIGNED 
 	| SIZEOF | STATIC | STRUCT | SWITCH | TYPEDEF | UNION 
 	| UNSIGNED | VOID | VOLATILE | WHILE
-	;
-
-reserved_open
-	: SIZEOF_OPEN | IF_OPEN | WHILE_OPEN | FOR_OPEN | SWITCH_OPEN
 	;
 
 identifier
