@@ -1,3 +1,48 @@
+/*+
+ * Name:
+ *    ctag-y.y
+ *
+ * Type of module:
+ *    yacc grammar
+ *
+ * Purpose:
+ *    Specify minimal grammar of C source.
+ *
+ * Description:
+ *    This grammar specification provides enough understanding of C source
+ *    code, as tokenized by the corresponding lexical analyser, to be
+ *    able to identify and tag function definitions and invocations.
+ *
+ *    It is impossible to do a proper parse of the C, since we don't
+ *    walk the include files so that we can't know about what identifiers
+ *    have been typedef'd and what preprocessor substitutions should be
+ *    made.  We therefore deliberately use a very basic model of how 
+ *    the C fits together.  In most (the large majority of) cases this 
+ *    should be adequate to spot the function definitions and 
+ *    invocations.
+ *
+ *    Note that comments and preprocessor directives are dealt with 
+ *    by the lexical analyser, so that we can pretend here as far as
+ *    the token stream is concerned that they do not exist.
+ *
+ *    The yylval values returned by the lexical analyser are all pointers
+ *    to char, which must be output in order.  These contain, as well
+ *    as the text of the tokens in question, all intervening whitespace,
+ *    comments, preprocessor directives etc.
+ *
+ * Authors:
+ *    MBT: Mark Taylor (STARLINK)
+ *
+ * History:
+ *    23-NOV-1999 (MBT):
+ *       Initial version.
+ *-
+ */
+
+
+
+
+
 %token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
 
 %token TYPEDEF EXTERN STATIC AUTO REGISTER
@@ -223,7 +268,7 @@ extern int column;
 #include <stdlib.h>
 #include <ctype.h>
 
-      char *snew( char *str ) {
+   char *snew( char *str ) {
 /*+
  * Name:
  *    snew
@@ -286,12 +331,13 @@ extern int column;
  *
  * Description:
  *    This routine returns a newly malloc'd string which is the concatenation
- *    of all the strings supplied to it as argument.  Each of those arguments
+ *    of all the strings supplied to it as arguments.  Each of those arguments
  *    gets free'd by this routine, so they must have been malloc'd (probably
  *    by this routine) in the past, and must not be referred to again after
  *    calling this routine.
  *-
  */
+
 /* Local variables. */
       va_list ap;
       int len, i;
@@ -344,14 +390,19 @@ extern int column;
  *       Gives the string to be used both as the contents of the tag,
  *       and of the value of the attribute of the A tag.  This will be
  *       free'd by the routine, so must previously have been malloc'd.
+ *       The argument may consist of any amount of text, but only the
+ *       identifier right at the end will be used as the attribute value
+ *       and tagged text.  Any leading text will be output preceding
+ *       the tag.
  *
  * Return Value:
- *    Text tagged with an SGML A tag: 
- *    "leading text<a attrib='fname'>fname</a>".
+ *    Text tagged with an SGML A tag, such that if fname points to text
+ *    "leading text identifier" then the returned value will be 
+ *    "leading text<a attrib='identifier'>identifier</a>".
  *    This is malloc'd by this routine so should subsequently be free'd.
  *
  * Description:
- *    This routine generates an SGML tag surrounding the text given,
+ *    This routine generates an SGML tag surrounding the text given
  *    by the fname argument.  The value of the attribute named by the
  *    attrib argument is also fname.  The valid part of fname is supposed
  *    to start at the first character and go on for as long as it 
@@ -360,6 +411,8 @@ extern int column;
  *    attribute value.  The memory used by fname is free'd by this routine.
  *-
  */
+
+/* Local variables. */
       char *string, *vname, *fend;
       
 /* Find the start of the identifier itself, which is assumed to be right
@@ -391,7 +444,6 @@ extern int column;
    }
       
 
-   
 
    
 /* $Id$ */
