@@ -17,12 +17,16 @@ TCL_VERSION=8.2
 ITCL_VERSION=3.1
 IWIDGETS_VERSION=3.0.0
 
+AC_PATH_XTRA
+
 AC_SUBST(TCL_VERSION)
 AC_SUBST(ITCL_VERSION)
 AC_SUBST(IWIDGETS_VERSION)
 
+LD_LIBRARY_PATH="${STARLINK}/lib:${LD_LIBRARY_PATH}"
+
 AC_CHECK_LIB(tcl$TCL_VERSION,Tcl_Init)
-AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init)
+AC_CHECK_LIB(tk$TCL_VERSION,Tk_Init,,,[$X_LIBS $X_EXTRA_LIBS $X_PRE_LIBS -lX11])
 
 # Check availability of [incr Tcl].  This is declared as a build dependency,
 # but we'll get along without it if it's not there because it couldn't
