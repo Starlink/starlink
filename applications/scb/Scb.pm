@@ -14,12 +14,30 @@ package libscb;
 require Exporter;
 @ISA = qw/Exporter/;
 
-#  Names of routines defined here to be exported.
+#  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf popd pushd module_name/;
+@EXPORT = qw/tarxf popd pushd module_name incdir srcdir indexfile taskfile/;
+
+########################################################################
+#  Global variables.
+########################################################################
+
+#  Directory locations.
+
+$main::srcdir = "/local/scratch/sources";  # head of source tree
+$main::incdir = "/star/include";           # include directory
+
+#  Index file locations.
+
+$main::indexfile = "/local/devel/scb/index";
+$main::taskfile  = "/local/devel/scb/tasks";
+
 
 
 ########################################################################
+#  Subroutines.
+########################################################################
+
 sub error {
    main::error (@_);
 }
