@@ -110,8 +110,9 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
                                            + RE_length
                                            + strlen( "' " )  
                                            + strlen( infile_name ) 
-                                           + strlen( " >& " )  
+                                           + strlen( " 1>" )  
                                            + strlen( outfile_name ) 
+                                           + strlen( " 2>&1" )  
                                            + 1 ) );
       if( !script ) {
          *STATUS = SAI__ERROR;
@@ -124,14 +125,15 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
          strncpy( script + 8, RE, RE_length );
          strcpy( script + 8 + RE_length, "' " );
          strcpy( script + 10 + RE_length, infile_name );
-         strcpy( script + strlen( script ), " >& " );
+         strcpy( script + strlen( script ), " 1>" );
          strcpy( script + strlen( script ), outfile_name );
+         strcpy( script + strlen( script ), " 2>&1" );
 
 /* Execute the command, sending standard out and error to the output file. */
          istat = system( script );
 
 /* Remove the input file. */
-         remove( infile_name ); 
+         remove( infile_name );  
 
 /* Deallocate the command string. */
          free( script );
