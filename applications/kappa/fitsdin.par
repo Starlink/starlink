@@ -1,3 +1,4 @@
+encodings,s,a,!,,,"FITS keywords to use when creating NDF WCS components"
 files,s,a,,,,"Give a list of the FITS files to be processed"
 out,f,a,,,,"Output image"
 auto,b,h,n,,,"Automatic mode?"
