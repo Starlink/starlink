@@ -57,6 +57,8 @@
 *        Use FIO to get unit number
 *     4 Oct 2004 (TIMJ):
 *        Use SHL_PAGRST to initialise common block
+*     19 Oct 2004 (TIMJ):
+*        Over zealous with WIDTH removal. Fix things.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,6 +105,7 @@
      :  LUHLP,                   ! Logical unit for reading the help
                                  ! library
      :  KWRDLN,                  ! Length of the keyword
+     :  LBOT,                    ! Dummy variable
      :  WIDTH                    ! Width of the screen in characters
 
 *.
@@ -131,6 +134,10 @@
       ELSE
          HFLAGS = 0
       END IF
+
+*  We need the screen width
+      CALL ONE_SCRSZ( WIDTH, LBOT, STATUS )
+      IF (STATUS .NE. SAI__OK) RETURN
 
 *  Initiate interactive help session.
       ISTAT = HLP_HELP( SHL_PTHLPO, WIDTH, KEYWRD( 1:KWRDLN ), LUHLP,
