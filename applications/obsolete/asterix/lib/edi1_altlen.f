@@ -164,6 +164,7 @@
             CALL MSG_SETC( 'L', NAME )
             CALL ERR_REP( 'EDI1_ALTLEN_2', 'Unable to alter length'/
      :         /' of list ^L quantum because it is mapped', STATUS )
+            GOTO 99
           END IF
 
 *      Alter length of array
