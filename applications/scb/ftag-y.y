@@ -1,3 +1,49 @@
+/*+
+*  Name:
+*     ftag-y.y
+*
+*  Type of module:
+*     yacc grammar
+*
+*  Purpose:
+*     Specify minimal grammar of Fortran 77 source for tagging.
+*
+*  Description:
+*     This grammar specification provides enough understanding of Fortran
+*     77 source code, as tokenized by the corresponding lexical analyser,
+*     to be able to identify and tag subroutine/function definitions
+*     and invocations, and INCLUDE'd files.
+*
+*     We do not attempt to do a full parse of the source, but enough to
+*     be able to spot:
+*        - Subroutine/function declaration
+*        - Subroutine call
+*        - Function call
+*        - INCLUDE file
+*        - Array declaration
+*
+*     It's necessary to spot array declarations, because the only way of
+*     deciding whether something which looks like a function invocation
+*     is in fact one, or is an array element reference, is to see whether
+*     the part that would be the array name has been dimensioned.
+*     Dimensions which have been done in include files are missed of 
+*     course, so some things will look like function invocations which
+*     are in fact array references.
+*     The yylval values returned by the lexical analyser are all pointers
+*     to char, which must be output in order.  These contain, as well
+*     as the text of the tokens in question, all intervening whitespace,
+*     comments, preprocessor directives etc.
+*
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+*
+*  History:
+*     29-NOV-1999 (MBT):
+*        Initial version.
+*-
+*/
+
+
 
 %token LINE_START LINE_END COMMENT_LINE BLANK_LINE
 %token SUBROUTINE ENTRY BLOCKDATA PROGRAM FUNCTION
@@ -22,7 +68,6 @@ char *scat( int, ... );
 
 %%
 
-
 file
 	: unit
 	| file unit
@@ -35,7 +80,8 @@ unit
 
 line
 	: LINE_START module_start_line LINE_END
-			{ $$ = scat( 3, $1, $2, $3 ); }
+			{ module_start();
+			  $$ = scat( 3, $1, $2, $3 ); }
 	| LINE_START declaration_line LINE_END
 			{ $$ = scat( 3, $1, $2, $3 ); }
 	| LINE_START statement LINE_END
@@ -125,26 +171,52 @@ var_dec_list
 	;
 
 var_dec_item
-	: token_brac '(' othertext ')' opt_size_decl
+	: token_brac '(' array_bound_list ')' opt_size_decl
 			{ array_declare( $1 ); 
 			  $$ = scat( 5, $1, $2, $3, $4, $5 ); }
-	| token_brac '(' othertext ':' othertext ')' opt_size_decl
-			{ array_declare( $1 );
-			  $$ = scat( 7, $1, $2, $3, $4, $5, $6, $7 ); }
 	| token opt_size_decl
 			{ $$ = scat( 2, $1, $2 ); }
 	;
 
+array_bound_list
+	: array_bound_item
+			{ $$ = $1; }
+	| array_bound_list ',' array_bound_item
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	;
+
+array_bound_item
+	: declaration_constant
+			{ $$ = $1; }
+	| '*'
+			{ $$ = $1; }
+	| declaration_constant ':' declaration_constant
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	;
+
+
 opt_size_decl
 	: /* empty */
 			{ $$ = scat( 0 ); }
-	| '*' INTEGER_CONSTANT
+	| '*' declaration_constant
 			{ $$ = scat( 2, $1, $2 ); }
-	| '*' '(' othertext ')'
-			{ $$ = scat( 4, $1, $2, $3, $4 ); }
-	| '*' token
-			{ $$ = scat( 2, $1, $2 ); }
-	; 
+	;
+
+declaration_constant
+	: declaration_term
+			{ $$ = $1; }
+	| declaration_constant otherchar declaration_term
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	;
+
+declaration_term
+	: INTEGER_CONSTANT
+			{ $$ = $1; }
+	| token
+			{ $$ = $1; }
+	| '(' othertext ')'
+			{ $$ = scat( 3, $1, $2, $3 ); }
+	;
 
 statement
 	: if '(' expression ')' THEN
@@ -167,7 +239,7 @@ statement
 	| CALL token
 			{ $$ = scat( 2, $1, fanchor( "href", $2 ) ); }
 	| token_brac '(' expression ')' opt_expression
-			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+			{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
 	| token opt_expression
 			{ $$ = scat( 2, $1, $2 ); }
 	;
@@ -181,7 +253,7 @@ if
 
 expression_term
 	: token_brac '(' opt_expression ')'
-			{ $$ = scat( 4, $1, $2, $3, $4 ); }
+			{ $$ = scat( 4, function_call( $1 ), $2, $3, $4 ); }
 	| token_brac '(' string_subscript ')'
 			{ $$ = scat( 4, $1, $2, $3, $4 ); }
 	| '(' string_subscript ')'
@@ -235,6 +307,8 @@ text_term
 			{ $$ = $1; }
 	| otherchar
 			{ $$ = $1; }
+	| ','
+			{ $$ = $1; }
 	| token '='
 			{ $$ = scat( 2, $1, $2 ); }
 	;
@@ -253,13 +327,12 @@ opt_othertext
 			{ $$ = $1; }
 	;
 
-otherchar  /*  Everything except alphanumerics, colon, equals, parentheses  */
+otherchar  /*  All except alphanumerics, colon, equals, parentheses, comma.  */
 	: '+'		{ $$ = $1; }
 	| '-'		{ $$ = $1; }
 	| '*'		{ $$ = $1; }
 	| '/'		{ $$ = $1; }
 	| '.'		{ $$ = $1; }
-	| ','		{ $$ = $1; }
 	| '$'		{ $$ = $1; }
 	| '\''		{ $$ = $1; }
 	| '%'		{ $$ = $1; }
@@ -278,6 +351,7 @@ token_brac
 
 %%
 
+/* Include the lexical analyser source code directly into this file. */
 #include "ftag-l.c"
 
 #include <stdio.h>
@@ -290,15 +364,48 @@ token_brac
    }
 
 
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 
-#define BLENG 1024
-
-   char buffer[ BLENG ];
 
    char *refname( char *name ) {
-      int i, j, leng;
+/*
+*+
+*  Name:
+*     refname
+*
+*  Purpose:
+*     Normalise routine name.
+*
+*  Description:
+*     This routine removes extraneous whitespace from a string and folds
+*     it to lower case so that the resulting string is suitable for use
+*     as the name of a fortran routine to be referenced in an anchor
+*     tag attribute value.  No underscore is appended however.
+*
+*  Arguments:
+*     name = char *
+*        The unstripped text to get the name from.
+*
+*  Return value:
+*     buffer = char *
+*        The stripped text to use as an attribute value.  Note that this
+*        is a pointer to a single static location, so that subsequent
+*        calls to this routine will overwrite this value.
+*-
+*/
 
+/* Local variables. */
+#define BLENG 1024
+      int i, j, leng;
+      static char buffer[ BLENG ];
+
+/* Get length of input string. */
       leng = strlen( name );
+
+/* Go through string a character at a time.  Whitespace is skipped in 
+   appropriate ways, other characters are folded to lower case. */
       for ( i = j = 0; i < leng && j < BLENG - 1; i++ ) {
          switch( name[ i ] ) {
             case ' ':
@@ -312,43 +419,359 @@ token_brac
                i += 6;
                break;
             default:
-               buffer[ j++ ] = name[ i ];
+               buffer[ j++ ] = tolower( name[ i ] );
          }
       }
+
+/* Write terminating null. */
       buffer[ j++ ] = '\0';
+
+/* Return. */
       return( buffer );
    }
 
-   char *fanchor( char *attrib, char *name ) {
-      char *string, *rname;
-      int leng, i;
 
+   char *fanchor( char *attrib, char *name ) {
+/*
+*+
+*  Name:
+*     fanchor
+*
+*  Purpose:
+*     Generates an HTML-like anchor tag around a string.
+*
+*  Arguments:
+*     attrib = const char *
+*        Gives the name of the attribute to be set to name.  The sensible
+*        values would be "href" and "name".
+*     fname = char *
+*        Gives the string to be used both as the contents of the tag,
+*        and of the value of the attribute of the A tag.  This will be
+*        free'd by the routine, so must previously have been malloc'd.
+*        The argument may consist of any amount of text, but only the
+*        identifier right at the start will be used as the attribute value
+*        and tagged text.  Any trailing text will be output following
+*        the tag.
+*
+*  Return Value:
+*     string = char *
+*        Text tagged with an SGML A tag, such that if name points to text
+*        "text trailing-spaces" then the returned value will be
+*        "<a attrib='refname( text )'>text</a> trailing-spaces".
+*        This is malloc'd by this routine so should subsequently be free'd.
+*
+*  Description:
+*     This routine generates an SGML tag surrounding the text given
+*     by the name argument.  The value of the attribute named by the
+*     attrib argument is also name.  The valid part of name is got by
+*     calling the refname() function.  Any trailing characters are
+*     appended after the tag, but don't form part of the tagged text or
+*     attribute value.  The memory used by name is free'd by this routine.
+*
+*     If the routine looks like a generic one (has '&lt;T&gt;' in it)
+*     and attrib is "name", then tags for each of the possible values
+*     for "<T>" will be output.
+*-
+*/
+
+/* Local variables. */
+      char *string, *rname, *genpos;
+      char *gencode[] = { "i", "r", "d", "l", "c", "b", "ub", "w", "uw", "" };
+      int i, l, leng, nspace;
+
+/* Get the significant part of the name of the module to be tagged. */ 
       rname = refname( name );
-      leng = strlen( attrib ) + strlen( rname ) + strlen( name ) + 13;
+
+/* Find out if we need to tag it as a generic function.  We only need to
+   worry about this if attrib is "name" (an href does not need multiple
+   tags). */
+      genpos = strcmp( attrib, "name" ) 
+                  ? NULL : strstr( rname, "&lt;t&gt;" );
+
+/* Work out how much space is needed for the final string and allocate it. */
+      leng = strlen( attrib ) + strlen( rname ) + strlen( name ) + 13
+           + ( ( genpos != NULL ) ? ( ( strlen( rname ) + 8 ) * 9 + 2 ) : 0 );
       string = malloc( leng );
+
+/* Write the start tag and the tagged text. */
       sprintf( string, "<a %s=\"%s_\">%s", attrib, rname, name );
+
+/* Work out how much of the text at the end is trailing whitespace. */
       for ( i = strlen( name ); i >= 0 && isspace( name[ i - 1 ] ); i-- );
-      sprintf( string + leng - strlen( name ) - 5 + i, "</a>%s", name + i );
+      nspace = strlen( name ) - i;
+
+/* Print the end tag before any trailing whitespace. */
+      sprintf( string + 8 + strlen( attrib ) + strlen( rname ) 
+                      + strlen( name ) - nspace, "</a>" );
+
+/* If it's a generic function, add all the tags for the specific ones. */
+      if ( genpos != NULL ) {
+         l = strlen( string );
+         for ( i = 0; *( gencode[ i ] ) != '\0'; i++ ) {
+            sprintf( string + l, "<a name=\"%s", rname );
+            l += ( genpos - rname ) + 9;
+            sprintf( string + l, "%s%s_\"></a>", gencode[ i ], genpos + 9 );
+            l += strlen( genpos ) - 9 + strlen( gencode[ i ] ) + 7;
+         }
+      }
+
+/* Append any trailing whitespace after the last tag. */
+      strcat( string, name + strlen( name ) - nspace );
+
+/* Return. */
       return( string );
    }
 
+
    char *fanchor_inc( char *attrib, char *name ) {
+/*
+*+
+*  Name:
+*     fanchor_inc
+*
+*  Purpose:
+*     Generate an HTML-like anchor tag for an include file.
+*
+*  Arguments:
+*     attrib = char *
+*        Name of the attribute, presumably "href".
+*     name = char *
+*        Text to be tagged.  Must include two "'" characters.  The text
+*        between these will be the contents of the tag.
+*
+*  Return value:
+*     string = char *
+*        Text tagged with an SGML A tag.  This is malloc'd by this 
+*        routine so should subsequently be free'd.
+*-
+*/
+
+/* Local variables. */
       char *string, *rname;
       int leng, nleng, i;
 
+/* Get the stripped value of the name. */
       rname = refname( name );
+
+/* Find out how many characters we need and allocate it. */
       leng = strlen( attrib ) + strlen( name ) + strlen( rname ) + 20;
       string = malloc( leng );
+
+/* Write any text up to and including the first quote. */
       i = strcspn( name, "'" ) + 1;
       strncpy( string, name, i );
       string[ i ] = '\0';
+
+/* Write start tag, contents and the remainder. */
       sprintf( string + i, "<a %s=\"INCLUDE-%s\">%s", attrib, rname, name + i );
       i += strcspn( name + i, "'" );
       sprintf( string + leng - strlen( name ) - 5 + i, "</a>%s", name + i );
+
+/* Return. */
       return( string );
    }
 
-   void array_declare( char *name ) {
+
+   int isreserved( char *name ) {
+/*
+*+
+*  Name:
+*     isreserved
+*
+*  Purpose:
+*     Find out whether the word is a fortran reserved word.
+*
+*  Return value:
+*     found = int
+*        True (1) if the name is a reserved word, false (0) if it's not.
+*-
+*/
+
+/* Local variables. */
+      int i, found;
+
+/* Reserved words.  These are supposed to be all the words which might
+   turn up in fortran source followed by an opening parenthesis, which
+   ought not to be interpreted as potential function calls. */
+      static char *reserved[] = {
+         "%val", "%loc",
+         "read", "write", "backspace", "close", "open", "endfile", "format", 
+         "inquire", "while", "print", "return",
+         "int", "ifix", "idint", "real", "float", "sngl", 
+         "dble", "cmplx", "ichar", "", "char", "aint", "dint", "anint", 
+         "dnint", "nint", "idnint", "abs", "iabs", "dabs", "cabs", "mod", 
+         "amod", "dmod", "sign", "isign", "dsign", "dim", "idim", "ddim",
+         "dprod", "max", "max0", "amax1", "dmax1", "amax0", "max1", "min",
+         "min0", "amin1", "dmin1", "amin0", "min1", "len", "index", "aimag",
+         "congj", "sqrt", "dsqrt", "csqrt", "exp", "dexp", "cexp", "log",
+         "alog", "dlog", "clog", "log10", "alog10", "dlog10", "sin", "dsin",
+         "csin", "cos", "dcos", "ccos", "tan", "dtag", "asin", "dasin",
+         "acos", "dacos", "atan", "datan", "atan2", "datan2", "sinh",
+         "dsinh", "cosh", "dcosh", "tanh", "dtanh", 
+         ""
+      };
+
+/* Go through the list of words, seeing if name matches any of them. */
+      found = 0;
+      for ( i = 0; ( ! found ) && ( *( reserved[ i ] ) != '\0' ); i++ )
+         found |= ( strcmp( name, reserved[ i ] ) == 0 );
+
+/* Return. */
+      return( found );
    }
 
 
+
+/* Set up list structure, base elements, and pointers for list of 
+   declared arrays. */
+   struct element {
+      char *name;
+      struct element *next;
+   };
+   typedef struct element ELEMENT;              /* Linked list element struct */
+   ELEMENT listbase = { "", (ELEMENT *) NULL }; /* Zero'th element of list. */
+   ELEMENT *listfirst = &listbase;              /* Pointer to list start.   */
+   ELEMENT *listlast = &listbase;               /* Pointer to list end.     */
+
+
+   int inlist( char *name, ELEMENT *list ) {
+/*
+*+
+*  Name:
+*     inlist
+*
+*  Purpose:
+*     Check whether a name is in a linked list.
+*
+*  Parameters:
+*     name = char *
+*        The name to be matched.
+*     list = ELEMENT *
+*        A pointer to the first element of the linked list to be checked.
+*
+*  Return value:
+*     found = int
+*        True (1) if name is in the list, or false (0) if it is not.
+*-
+*/
+
+/* Local variables. */
+      int found;
+
+/* Walk through the list an item at a time. */
+      found = 0;
+      while ( ! found && ( list = list->next ) != NULL )
+         found |= ( strcmp( name, list->name ) == 0 );
+
+/* Return. */
+      return( found );
+   }
+
+
+   void array_declare( char *name ) {
+/*
+*+
+*  Name:
+*     array_declare
+*
+*  Purpose:
+*     Assert that a word is the name of an array.
+*
+*  Description:
+*     This routine should be called when an array declaration is
+*     encountered.  The name of the array will be added to the list
+*     of arrays that we know about, so that if it is encountered
+*     followed by an opening parenthesis it will not be mistaken
+*     for a function invocation.
+*-
+*/
+
+/* Local variables. */
+      char *rname;
+
+/* Get the normalised array name. */
+      rname = refname( name );
+
+/* Add the normalised name to the end of the linked list of array names. */
+      listlast->next = (ELEMENT *) malloc( sizeof( ELEMENT ) );
+      listlast = listlast->next;
+      listlast->next = NULL;
+      listlast->name = (char *) malloc( strlen( rname ) + 1 );
+      strcpy( listlast->name, rname );
+   }
+
+
+   char *function_call( char *name ) {
+/*
+*+
+*  Name:
+*     function_call
+*
+*  Purpose:
+*     Tag a word as a function call if it needs it.
+*
+*  Description:
+*     If the passed value appears to be a function call, then a tagged
+*     version of it is returned.  If it appears to be a fortran reserved 
+*     word or a predeclared array then it is returned unchanged.
+*-
+*/
+
+/* Local variables. */
+      char *rname, *retval;
+
+/* Get normalised function name. */
+      rname = refname( name );
+
+/* If the name is a previously declared array name, or a fortran reserved
+   word, then the returned value is the same as the input value. */
+      if ( inlist( rname, listfirst ) || isreserved( rname ) ) {
+         retval = name;
+      }
+
+/* Otherwise, tag the name as a function call. */
+      else {
+         retval = fanchor( "href", name );
+         free( name );
+      }
+
+/* Return. */
+      return( retval );
+   }
+
+
+   void module_start() {
+/*
+*+
+*  Name:
+*     module_start
+*
+*  Purpose:
+*     Assert that a new program part is being started.
+*
+*  Description:
+*     This function should be called when the start of a subroutine or
+*     function is encountered.  The effect is to reset the list of
+*     declared arrays.
+*-
+*/
+
+/* Local variables. */
+      ELEMENT *i, *j;
+
+/* Go through the linked list of array elements freeing the memory used
+   for each one. */
+      i = listfirst->next;
+      while ( i != NULL ) {
+         j = i->next;
+         free( i );
+         i = j;
+      }
+
+/* Reset the pointers to each end of the linked list. */
+      listfirst = listlast = &listbase;
+      listfirst->next = (ELEMENT *) NULL;
+   }
+
+
+/* $Id$ */
