@@ -23,7 +23,7 @@
 *    Functions :
 *    Local Constants :
 *    Local variables :
-      CHARACTER*20 OPTION
+      CHARACTER*12 OPTION
       INTEGER OID,NB
       LOGICAL ENTER,SEL,SHOW
 *    Global Variables :
@@ -46,14 +46,14 @@
         IF (I_GUI) THEN
           CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
           CALL NBS_GET_CVALUE(OID,0,OPTION,NB,STATUS)
-          IF (OPTION.EQ.'TRACK') THEN
+          IF (OPTION(1:1).EQ.'T') THEN
             CALL IPOSIT_GUI(STATUS)
           ENDIF
         ELSE
           OPTION=' '
         ENDIF
 
-        IF (OPTION.NE.'TRACK') THEN
+        IF (OPTION(1:1).NE.'T') THEN
 
 *  see if dealing with multiple positions
           CALL USI_GET0L('ENTER',ENTER,STATUS)

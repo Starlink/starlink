@@ -305,6 +305,9 @@
         CALL ARR_ELEM1R( AXPTR(AXLP), DIMS(AXLP), DIMS(AXLP),
      :                   AMAX(AXLP), STATUS )
         ASCALE(AXLP) = ABS( AMAX(AXLP) - AMIN(AXLP))/REAL(DIMS(AXLP)-1)
+        IF ( AMIN(AXLP) .GT. AMAX(AXLP) ) THEN
+          ASCALE(AXLP) = - ASCALE(AXLP)
+        END IF
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
