@@ -115,6 +115,7 @@
       CHARACTER*3		RADECSYS		! Coord system name
       CHARACTER*3		SYS			! Coord system name
       CHARACTER*40		UNITS(2)		! X,Y axis units
+      CHARACTER*72		CMNT			! (rb)
 
       DOUBLE PRECISION		EPOCH			! Epoch
       DOUBLE PRECISION		LONGPOLE		!
@@ -174,10 +175,10 @@
       END IF
 
 *  Locate main HDU
-      CALL ADI2_FNDHDU( ARGS(2), ' ', PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE., PHDU, STATUS )
 
 *  Look for the RADECSYS keyword
-      CALL ADI2_HGKYC( PHDU, 'RADECSYS', RADECSYS, STATUS )
+      CALL ADI2_HGKYC( PHDU, 'RADECSYS', RADECSYS, CMNT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IF ( RADECSYS .EQ. 'FK4' ) THEN
           SYS = 'FK4'
@@ -194,11 +195,10 @@
       ELSE
         RADECSYS = ' '
         CALL ERR_ANNUL( STATUS )
-
       END IF
 
 *  Epoch of observation?
-      CALL ADI2_HGKYD( PHDU, 'MJD-OBS', MJD, STATUS )
+      CALL ADI2_HGKYD( PHDU, 'MJD-OBS', MJD, CMNT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         EPOCH = SLA_EPJ( MJD )
         EPOK = .TRUE.
@@ -207,7 +207,7 @@
       END IF
 
 *  Equinox of coordinates
-      CALL ADI2_HGKYR( PHDU, 'EQUINOX', EQNX, STATUS )
+      CALL ADI2_HGKYR( PHDU, 'EQUINOX', EQNX, CMNT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         EQOK = .TRUE.
         IF ( .NOT. EPOK ) THEN
@@ -220,7 +220,7 @@
 
 *  Look for old EPOCH keyword if epoch not defined
       IF ( .NOT. EPOK ) THEN
-        CALL ADI2_HGKYD( PHDU, 'EPOCH', EPOCH, STATUS )
+        CALL ADI2_HGKYD( PHDU, 'EPOCH', EPOCH, CMNT, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           EPOK = .TRUE.
         ELSE
@@ -232,7 +232,7 @@
       NPRJP = 0
       IP = 1
       DO WHILE ( (STATUS .EQ. SAI__OK) .AND. (IP.LE.MAXPP) )
-        CALL ADI2_HGKYIR( PHDU, 'PROJP', IP, PPARS(IP), STATUS )
+        CALL ADI2_HGKYIR( PHDU, 'PROJP', IP, PPARS(IP), CMNT, STATUS )
         IF ( STATUS .EQ. SAI__OK ) THEN
           NPRJP = NPRJP + 1
           IP = IP + 1
@@ -240,8 +240,8 @@
       END DO
       CALL ERR_ANNUL( STATUS )
 
-*  Look at CTYPEi to determinate projection, and possibly system too
-      CALL ADI2_HGKYC( PHDU, 'CTYPE1', CTYPE, STATUS )
+*  Look at CTYPE1 to determinate projection, and possibly system too
+      CALL ADI2_HGKYC( PHDU, 'CTYPE1', CTYPE, CMNT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Projection defined?
@@ -271,7 +271,7 @@
         CALL ERR_ANNUL( STATUS )
       END IF
 
-      CALL ADI2_HGKYC( PHDU, 'CTYPE2', CTYPE, STATUS )
+      CALL ADI2_HGKYC( PHDU, 'CTYPE2', CTYPE, CMNT, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *    Projection defined?
@@ -303,13 +303,13 @@
       END IF
 
 *  Extract axis info
-      CALL ADI2_HGKYD( PHDU, 'CRVAL1', SPOINT(1), STATUS )
+      CALL ADI2_HGKYD( PHDU, 'CRVAL1', SPOINT(1), CMNT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
       ELSE
         RAOK = .TRUE.
       END IF
-      CALL ADI2_HGKYD( PHDU, 'CRVAL2', SPOINT(2), STATUS )
+      CALL ADI2_HGKYD( PHDU, 'CRVAL2', SPOINT(2), CMNT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
       ELSE
@@ -333,10 +333,10 @@
       END IF
 
 *  Try to get position angle
-      CALL ADI2_HGKYD( PHDU, 'CROTA2', PA, STATUS )
+      CALL ADI2_HGKYD( PHDU, 'CROTA2', PA, CMNT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-        CALL ADI2_HGKYD( PHDU, 'DROLLANG', PA, STATUS )
+        CALL ADI2_HGKYD( PHDU, 'DROLLANG', PA, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
         ELSE
@@ -365,6 +365,7 @@
       IF ( HASPIX ) THEN
         IF ( .NOT. PAOK ) PA = 0D0
         CALL WCI_NEWPX( DIMS, BASE, SCALE, UNITS, PA, PIXID, STATUS )
+        STATUS = SAI__OK
       END IF
 
 *  Create the output structure

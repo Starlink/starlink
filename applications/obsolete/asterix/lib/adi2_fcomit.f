@@ -307,11 +307,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     2 Feb 1995 (DJA):
 *        Original version.
+*     18 Dec 1996 (RB):
+*        Add code to output data for bintable extensions too.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -393,6 +396,23 @@
 *      Table or image?
           CALL ADI_CGET0L( HDUID, 'IsTable', ISTABLE, STATUS )
           IF ( ISTABLE ) THEN
+
+*        Shall we add some code here too? - rb
+            CALL FTPKYS( OLUN, 'XTENSION', 'BINTABLE', 'binary table extension', FSTAT )
+            CALL ADI2_IMGTSHP( HDUID, .TRUE., BITPIX, NDIM, DIMS, STATUS )
+            CALL FTPKYJ( OLUN, 'BITPIX', BITPIX, 'bits per pixel', FSTAT )
+            CALL FTPKYJ( OLUN, 'NAXIS', NDIM, '2-dimensional binary table', FSTAT)
+            CALL FTPKYJ( OLUN, 'NAXIS1', DIMS(1), 'width of table in bytes', FSTAT)
+            CALL FTPKYJ( OLUN, 'NAXIS2', DIMS(2), 'number of rows in table', FSTAT)
+c           CALL FTPKYJ( OLUN, 'PCOUNT', 0, 'size of special data  area', FSTAT)
+c           CALL FTPKYJ( OLUN, 'GCOUNT', 1, 'one data group (required keyword)', FSTAT)
+
+*        Define the data size
+            CALL FTPDEF( OLUN, BITPIX, NDIM, DIMS, PCOUNT, GCOUNT,
+     :                   FSTAT )
+
+*        Write remaining header cards
+            CALL ADI2_FCOMIT_CARDS( OLUN, HDUID, NDIM + 1, STATUS )
 
 *      Image HDU
           ELSE

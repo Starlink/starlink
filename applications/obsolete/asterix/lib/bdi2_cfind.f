@@ -135,7 +135,7 @@
 
       LOGICAL			DIDCRE			! Did we create cache
 							! object?
-      LOGICAL			ISBIND			! Binned dataset
+c     LOGICAL			ISBIND			! Binned dataset
       LOGICAL			THERE			! Object exists?
 *.
 
@@ -359,7 +359,26 @@
             CRECOM = 'Axis '//CAX//' label'
           END IF
 
-*    Axis normalisation flag
+* added for BDI_AXCHK in GDRAW (start rb)
+*    Axis scalling
+        ELSE IF ( ITEM(8:) .EQ. 'Data' ) THEN
+
+*      Access keyword
+          CALL ADI2_CFIND( FITID, ' ', '.CDELT'//CAX, ' ', CREATE,
+     :                     DELETE, RTYPE, 0, 0, DIDCRE, CACHEID,
+     :                     STATUS )
+
+*      Add extra info if we created the keyword
+          IF ( DIDCRE ) THEN
+            CREOBJ = 'CDELT'
+            IF ( CAX .EQ. '1' ) THEN
+              CRECOM = 'X degrees per pixel'
+            ELSE IF (CAX .EQ. '2') THEN
+              CRECOM = 'Y degrees per pixel'
+            END IF
+          END IF
+
+*    Axis normalisation flag (end rb)
         ELSE IF ( ITEM(8:) .EQ. 'Normalised' ) THEN
 
 *      Access keyword
@@ -376,7 +395,7 @@
         ELSE
           STATUS = SAI__ERROR
           CALL MSG_SETC( 'IT', ITEM )
-          CALL ERR_REP( 'BDI1_CFIND_1', 'Unrecognised BDI axis data '/
+          CALL ERR_REP( 'BDI2_CFIND', 'Unrecognised BDI axis data '/
      :                  /'item ^IT', STATUS )
         END IF
 
@@ -384,7 +403,7 @@
       ELSE
         STATUS = SAI__ERROR
         CALL MSG_SETC( 'IT', ITEM )
-        CALL ERR_REP( 'BDI1_CFIND_1', 'Unrecognised BDI data item '/
+        CALL ERR_REP( 'BDI2_CFIND', 'Unrecognised BDI data item '/
      :                /'^IT', STATUS )
 
       END IF

@@ -103,20 +103,23 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate HDU
-      CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
+*  Locate HDU (old call - rb)
+c     CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
+      CALL ADI2_FNDHDU( FID, HDU, .TRUE., HID, STATUS )
 
 *  Get logical unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
 
-*  Set the heap size
+*  Set the heap size (my way! - rb)
       FSTAT = 0
-      CALL FTMKYJ( LUN, 'PCOUNT', NBYTES, '&', FSTAT )
-      CALL FTRDEF( LUN, FSTAT )
+c     CALL FTMKYJ( LUN, 'PCOUNT', NBYTES, '&', FSTAT )
+      CALL ADI2_PKEY0I( FID, HDU, 'PCOUNT', NBYTES,
+     :                  'size of special data area', STATUS )
+c     CALL FTRDEF( LUN, FSTAT )
       IF ( FSTAT .NE. 0 ) CALL ADI2_FITERP( FSTAT, STATUS )
 
 *  Flag HDU as defined and release it
-      CALL ADI_CPUT0L( HID, 'DefEnd', .TRUE., STATUS )
+c     CALL ADI_CPUT0L( HID, 'DefEnd', .TRUE., STATUS )
       CALL ADI_ERASE( HID, STATUS )
 
 *  Report any errors

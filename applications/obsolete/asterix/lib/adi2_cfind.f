@@ -193,10 +193,11 @@
 
       END IF
 
-*  Does the HDU exist?
+*  Does the HDU exist? (if HDUID=-1 then what !?!)
       CALL ADI2_CFIND_HDU( FITID, LHDU(:HLEN), CREATE, HDUID,
      :                     DIDCRE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+      if ( hduid .eq. adi__nullid ) goto 99
 
 *  Did we just create the primary HDU?
       IF ( DIDCRE .AND. (LHDU(:HLEN).EQ.'PRIMARY') ) THEN
@@ -261,7 +262,7 @@
         ELSE IF ( CNAME(1:1) .EQ. '#' ) THEN
 
 *    Image extension data?
-        ELSE IF ( CNAME .EQ. '@' ) THEN
+        ELSE IF ( CNAME(1:1) .EQ. '@' ) THEN
 
 *      Does image data exist?
           DIDCRE = .FALSE.
@@ -631,10 +632,10 @@
           CALL ADI2_CFIND_CREC( HCID, 'Hdu', HDU, 'FITShduCache',
      :                          HDUID, STATUS )
 
-*      Write name of extension
-          IF ( HDU .NE. 'PRIMARY' ) THEN
-            CALL ADI2_HPKYC( HDUID, 'EXTNAME', HDU, '~', STATUS )
-          END IF
+*      Write name of extension (bad news? -rb)
+c         IF ( HDU .NE. 'PRIMARY' ) THEN
+c           CALL ADI2_HPKYC( HDUID, 'EXTNAME', HDU, '~', STATUS )
+c         END IF
 
 *      Mark as created
           DIDCRE = .TRUE.
@@ -939,7 +940,16 @@
         CALL ADI2_CHKDEL( ID, STATUS )
 
 *  Not in container...
+c     ELSE
+c       STATUS = SAI__ERROR
       END IF
+
+c     IF ( STATUS .NE. SAI__OK ) THEN
+c       CALL MSG_SETC( 'E', NAME )
+c       CALL ERR_REP( ' ', 'Unable to find entry ^E '/
+c    :                  /'in table', STATUS )
+c       CALL AST_REXIT( 'ADI2_CFIND_NAM', STATUS )
+c     END IF
 
       END
 
@@ -1210,7 +1220,7 @@
           CALL ADI2_DEFIMG( HDUID, TYPE, NDIM, DIMS, .FALSE.,
      :                      IMID, STATUS )
 
-*      Write logical unit number in case data is to bread later
+*      Write logical unit number in case data is to be read later
           CALL ADI_CPUT0I( IMID, 'Lun', LUN, STATUS )
 
 *      Release object

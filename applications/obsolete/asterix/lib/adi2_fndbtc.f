@@ -99,6 +99,7 @@
 *  Local Variables:
       CHARACTER*20		COLNAM			! Column name
       CHARACTER*8		KEYWRD			! Keyword name
+      CHARACTER*72		CMNT			! (rb)
 
       INTEGER			IFLD			! Loop over columns
       INTEGER			NFLD			! # columns in table
@@ -111,13 +112,13 @@
       ICOL = 0
 
 *  Get number of fields
-      CALL ADI2_HGKYI( HDUID, 'TFIELDS', NFLD, STATUS )
+      CALL ADI2_HGKYI( HDUID, 'TFIELDS', NFLD, CMNT, STATUS )
       IFLD = 1
       DO WHILE ( (IFLD.LE.NFLD) .AND. (ICOL.EQ.0)
      :           .AND. (STATUS.EQ.SAI__OK) )
 
 *    Get value of column name
-        CALL ADI2_HGKYIC( HDUID, 'TTYPE', IFLD, COLNAM, STATUS )
+        CALL ADI2_HGKYIC( HDUID, 'TTYPE', IFLD, COLNAM, CMNT, STATUS )
 
 *    Does it match?
         IF ( (STATUS.EQ.SAI__OK) .AND. (COLNAM.EQ.COLUMN) ) THEN

@@ -102,15 +102,16 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate file via reference
-      CALL ADI_CGETREF( HDUID, '.File', FID, STATUS )
+*  Locate file via reference (more like adi2_getlun? - rb)
+c     CALL ADI_CGETREF( HDUID, '.File', FID, STATUS )
+c     CALL ADI_GETFILE( HDUID, FID, STATUS )
 
 *  Read logical unit
-      CALL ADI_CGET0I( FID, 'Lun', LUN, STATUS )
+      CALL ADI_CGET0I( HDUID, 'Lun', LUN, STATUS )
 
 *  Extract HDU number and move to it
-      CALL ADI_CGET0I( HDUID, 'Ihdu', IHDU, STATUS )
-      CALL ADI2_MVAHDU( FID, LUN, IHDU, HDUTYP, STATUS )
+c     CALL ADI_CGET0I( HDUID, 'Ihdu', IHDU, STATUS )
+c     CALL ADI2_MVAHDU( FID, LUN, IHDU, HDUTYP, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_HDULUN', STATUS )

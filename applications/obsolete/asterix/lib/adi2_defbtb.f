@@ -119,6 +119,8 @@
       INTEGER			KCID			! Keyword container
       INTEGER			LUN			! Logical unit
       INTEGER			NKEY			! Number of keywords
+
+      LOGICAL			DIDCRE
 *.
 
 *  Check inherited global status.
@@ -127,28 +129,33 @@
 *  Initialise
       FSTAT = 0
 
-*  Locate the HDU buffer
-      CALL ADI2_MOVHDU( FID, HDU, HID, STATUS )
+*  Locate the HDU buffer (old call - rb)
+c     CALL ADI2_MOVHDU( FID, HDU, HID, STATUS )
+      CALL ADI2_FNDHDU( FID, HDU, .TRUE., HID, STATUS )
 
 *  Get logical unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
 
-*  Reserve space for keywords
-      CALL ADI_FIND( HID, 'Keys', KCID, STATUS )
-      CALL ADI_NCMP( KCID, NKEY, STATUS )
-      IF ( NKEY .GT. 0 ) THEN
-        CALL FTHDEF( LUN, NKEY, FSTAT )
-      END IF
-      CALL ADI_ERASE( KCID, STATUS )
+*  Reserve space for keywords (what to do with this? - rb)
+c     CALL ADI_FIND( HID, 'Keys', KCID, STATUS )
+c     CALL ADI_NCMP( KCID, NKEY, STATUS )
+c     IF ( NKEY .GT. 0 ) THEN
+c       CALL FTHDEF( LUN, NKEY, FSTAT )
+c     END IF
+c     CALL ADI_ERASE( KCID, STATUS )
 
-*  Define BINTABLE extension
+*  Define BINTABLE extension (writes keywords into wrong extension - rb)
       FSTAT = 0
       CALL ADI_CGET0C( HID, 'Name', EXTNAME, STATUS )
-      CALL FTPHBN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, EXTNAME,
-     :             VARIDAT, FSTAT )
+      CALL ADI_CPUT0L( HID, 'IsTable', .TRUE., STATUS )
+c     CALL FTPHBN( LUN, NROWS, NFLDS, NAMES, TYPES, UNITS, EXTNAME,
+c    :             VARIDAT, FSTAT )
+c     CALL FTPKYS( LUN, 'TEST', 'foo', 'hello mum', FSTAT )
+
+* (and what to do with this? - rb)
       IF ( FSTAT .EQ. 0 ) THEN
-        CALL ADI_CPUT0L( HID, 'DefStart', .TRUE., STATUS )
-        CALL ADI_CPUT0L( HID, 'DefEnd', (VARIDAT.EQ.0), STATUS )
+c       CALL ADI_CPUT0L( HID, 'DefStart', .TRUE., STATUS )
+c       CALL ADI_CPUT0L( HID, 'DefEnd', (VARIDAT.EQ.0), STATUS )
       ELSE
         CALL ADI2_FITERP( FSTAT, STATUS )
       END IF

@@ -10,8 +10,8 @@
 *
 *    Global constants :
 *
-       INCLUDE 'SAE_PAR'
-       INCLUDE 'DAT_PAR'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
 *
 *    Import :
       CHARACTER*(*) RADEC

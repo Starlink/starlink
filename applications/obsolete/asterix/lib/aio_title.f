@@ -26,7 +26,7 @@
 *
 *    Global constants :
 *
-      INCLUDE			'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *
 *    Import :
 *

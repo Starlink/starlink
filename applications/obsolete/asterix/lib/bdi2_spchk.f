@@ -116,10 +116,10 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate the SPECTRUM hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', SPHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', .FALSE., SPHDU, STATUS )
 
 *  Switch on the various items
-*  Primary data
+*  Primary data (FITS *.pha files don't work here - rb)
       IF ( ITEM .EQ. 'Data' ) THEN
         CALL ADI2_FNDBTC( SPHDU, 'COUNTS', BCOL, STATUS )
         IF ( BCOL .EQ. 0 ) THEN
@@ -134,6 +134,11 @@
 
 *  Data error
       ELSE IF ( ITEM .EQ. 'Error' ) THEN
+        CALL ADI2_FNDBTC( SPHDU, 'STAT_ERR', BCOL, STATUS )
+        OK = (BCOL.GT.0)
+
+*  Data variance (does ast2xsp get this wrong? -rb)
+      ELSE IF ( ITEM .EQ. 'Variance' ) THEN
         CALL ADI2_FNDBTC( SPHDU, 'STAT_ERR', BCOL, STATUS )
         OK = (BCOL.GT.0)
 

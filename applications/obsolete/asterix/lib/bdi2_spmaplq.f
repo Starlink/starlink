@@ -123,7 +123,7 @@
       IF ( MODE .EQ. 'READ' ) THEN
 
 *    Locate the SPECTRUM hdu
-        CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', SPHDU, STATUS )
+        CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', .FALSE., SPHDU, STATUS )
 
 *    Find quality column
         CALL ADI2_FNDBTC( SPHDU, 'QUALITY', BCOL, STATUS )
@@ -139,7 +139,7 @@
         IF ( BCOL .GT. 0 ) THEN
 
 *      Map the column
-          CALL ADI2_MAPCOL( SPHDU, BCOL, 1, NELM, 'INTEGER', 'READ',
+          CALL ADI2_MAPCOL( ARGS(1), SPHDU, BCOL, 1, NELM, 'INTEGER', 'READ',
      :                      PSID, QPTR, STATUS )
 
 *      Create dynamic array

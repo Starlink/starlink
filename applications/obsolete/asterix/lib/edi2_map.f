@@ -102,6 +102,7 @@
       CHARACTER*20		LIST
       CHARACTER*6		MODE
       CHARACTER*7		TYPE
+      CHARACTER*72		CMNT			! (rb)
 
       INTEGER			BCOL			! Column number
       INTEGER			EVHDU			! HDU containing events
@@ -119,7 +120,7 @@
 
 *  Locate the hdu containing the events
       CALL ADI_CGET0C( ARGS(2), '.Etable', ETABLE, STATUS )
-      CALL ADI2_FNDHDU( ARGS(2), ETABLE, EVHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ETABLE, .FALSE., EVHDU, STATUS )
 
 *  Extract the arguments
       CALL ADI_GET0C( ARGS(3), LIST, STATUS )
@@ -140,9 +141,9 @@
 *  Map the column
       IF ( LBND .EQ. 0 ) THEN
         LBND = 1
-        CALL ADI2_HGKYI( EVHDU, 'NAXIS2', UBND, STATUS )
+        CALL ADI2_HGKYI( EVHDU, 'NAXIS2', UBND, CMNT, STATUS )
       END IF
-      CALL ADI2_MAPCOL( EVHDU, BCOL, LBND, UBND-LBND+1, TYPE,
+      CALL ADI2_MAPCOL( ARGS(1), EVHDU, BCOL, LBND, UBND-LBND+1, TYPE,
      :                  MODE, PSID, PTR, STATUS )
 
 *  Free storage

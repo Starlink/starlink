@@ -27,7 +27,7 @@
 *
 *    Global constants :
 *
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *
 *    Import :
 *
@@ -150,7 +150,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER*(*) STR
 *    Export :
@@ -195,7 +195,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER*(*) STR
 *    Export :
@@ -225,7 +225,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER*(*) STR
 *    Export :
@@ -309,7 +309,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER*(*) STR
       CHARACTER*1 DELIM
@@ -389,7 +389,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER*(*) STR
 *    Export :
@@ -486,7 +486,7 @@
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
       CHARACTER*(*) STR
       CHARACTER*1 DELIM

@@ -116,7 +116,7 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate the RATE hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'RATE', TIHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'RATE', .FALSE., TIHDU, STATUS )
 
 *  Switch on the various items
 *  Primary data

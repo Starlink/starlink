@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_MAPCOL( HDUID, BCOL, FROW, NELEM, TYPE, MODE,
+      SUBROUTINE ADI2_MAPCOL( FID, HDUID, BCOL, FROW, NELEM, TYPE, MODE,
      :                        PSID, PTR, STATUS )
 *+
 *  Name:
@@ -11,13 +11,15 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_MAPCOL( HDUID, BCOL, FROW, NELM, TYPE, MODE, PSID,
+*     CALL ADI2_MAPCOL( FID, HDUID, BCOL, FROW, NELM, TYPE, MODE, PSID,
 *                       PTR, STATUS )
 
 *  Description:
 *     {routine_description}
 
 *  Arguments:
+*     FID = INTEGER (given)
+*        ADI indefnifier of FITSfile object
 *     HDUID = INTEGER (given)
 *        ADI identifier of FITShdu object
 *     BCOL = INTEGER (given)
@@ -100,7 +102,7 @@
       INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
-      INTEGER			HDUID, BCOL, FROW, NELEM, PSID
+      INTEGER			FID, HDUID, BCOL, FROW, NELEM, PSID
       CHARACTER*(*)		TYPE, MODE
 
 *  Arguments Returned:
@@ -113,6 +115,8 @@
       INTEGER			FSTAT			! FITSIO status code
       INTEGER			LUN			! Logical i/o unit
       INTEGER			NVAL			! # accessed values
+      INTEGER			DIMS(1)
+      INTEGER			WBPTR			! WriteBack procedure?
 
       LOGICAL			ANYF			! Any null values?
 *.
@@ -123,12 +127,13 @@
 *  Number of values should be number of elements per field element times
 *  number of elements
       NVAL = NELEM
+      DIMS(1) = NVAL
 
 *  Map some memory workspace
       CALL DYN_MAPT( 1, NVAL, TYPE, PTR, STATUS )
 
-*  Locate logical unit
-      CALL ADI2_HDULUN( HDUID, LUN, STATUS )
+*  Locate logical unit (hduid is now fid/args(1), so getlun will work - rb)
+      CALL ADI2_GETLUN( FID, LUN, STATUS )
 
 *  Read column data into workspace
       FSTAT = 0
@@ -158,7 +163,9 @@
       END IF
 
 *  Store the pointer and the column number in the private storage
-      CALL ADI2_STOMAP( PSID, HDUID, 'BC', PTR, TYPE, MODE, STATUS )
+c     CALL ADI2_STOMAP( PSID, HDUID, 'BC', PTR, TYPE, MODE, STATUS )
+      CALL ADI2_STOMAP( PSID, HDUID, 'inv', FID, PTR, 1, DIMS,
+     :                  FROW, NVAL, WBPTR, TYPE, MODE, STATUS )
 
 *  Store additional stuff needed by column mapping
       CALL ADI_CPUT0I( PSID, 'Column', BCOL, STATUS )

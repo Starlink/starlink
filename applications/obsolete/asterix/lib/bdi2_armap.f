@@ -101,6 +101,7 @@
       CHARACTER*20		COLNAM			! Column name
       CHARACTER*6		MODE			! Mapping mode
       CHARACTER*8		TYPE			! Mapping type
+      CHARACTER*72		CMNT			! (rb)
 
       INTEGER			BCOL			! Column number
       INTEGER			CLEN			! Column length
@@ -118,7 +119,7 @@
       CALL ADI_GET0C( ARGS(5), MODE, STATUS )
 
 *  Locate the primary hdu
-      CALL ADI2_FNDHDU( ARGS(2), ' ', PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE., PHDU, STATUS )
 
 *  Locate the BDI private storage for the item, creating if required
       CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
@@ -133,7 +134,7 @@
         CALL ADI2_FNDBTC( PHDU, COLNAM, BCOL, STATUS )
 
 *    Get length of array
-        CALL ADI2_HGKYI( PHDU, 'NAXIS2', CLEN, STATUS )
+        CALL ADI2_HGKYI( PHDU, 'NAXIS2', CLEN, CMNT, STATUS )
 
 *    Map it
         CALL ADI2_MAPCOL( PHDU, BCOL, 1, CLEN, TYPE, MODE, PSID,

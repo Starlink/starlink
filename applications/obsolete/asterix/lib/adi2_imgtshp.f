@@ -115,10 +115,26 @@
 *  Gather keywords for image extension
       IF ( WMRK ) THEN
         CALL ADI2_HGKYI( HDUID, '>BITPIX', BITPIX, CMNT, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          BITPIX = 8
+          CALL ERR_ANNUL( STATUS )
+        END IF
         CALL ADI2_HGKYI( HDUID, '>NAXIS', NDIM, CMNT, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          NDIM = 0
+          CALL ERR_ANNUL( STATUS )
+        END IF
       ELSE
         CALL ADI2_HGKYI( HDUID, 'BITPIX', BITPIX, CMNT, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          BITPIX = 8
+          CALL ERR_ANNUL( STATUS )
+        END IF
         CALL ADI2_HGKYI( HDUID, 'NAXIS', NDIM, CMNT, STATUS )
+        IF ( STATUS .NE. SAI__OK ) THEN
+          NDIM = 0
+          CALL ERR_ANNUL( STATUS )
+        END IF
       END IF
       DO IAX = 1, NDIM
         WRITE( AXKEY, '(A,I1.1)' ) 'NAXIS', IAX

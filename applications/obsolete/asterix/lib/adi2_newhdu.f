@@ -120,17 +120,31 @@
 *  Locate file's HDU container
       CALL ADI_FIND( FID, 'Hdus', HCID, STATUS )
 
-*  Create named component & locate it
-      CALL ADI_CNEW0( HCID, LHDU(:HLEN), 'FITShdu', STATUS )
+*  Create named component & locate it (HCID -> FID and FITShdu -> FITShduCache - rb)
+      CALL ADI_CNEW0( HCID, LHDU(:HLEN), 'FITSfile', STATUS )
       CALL ADI_FIND( HCID, LHDU(:HLEN), HID, STATUS )
+      print*, hid, status
+      status=0
+      CALL ADI_CNEW0( HCID, LHDU(:HLEN), 'Hdus', STATUS )
+      CALL ADI_FIND( HCID, LHDU(:HLEN), HID, STATUS )
+      print*, hid, status
+      status=0
+      CALL ADI_CNEW0( FID, LHDU(:HLEN), 'FITSfile', STATUS )
+      CALL ADI_FIND( FID, LHDU(:HLEN), HID, STATUS )
+      print*, hid, status
+      status=0
+      CALL ADI_CNEW0( FID, LHDU(:HLEN), 'Hdus', STATUS )
+      CALL ADI_FIND( FID, LHDU(:HLEN), HID, STATUS )
+      print*, hid, status
+      status=0
 
-*  Set the HDU counter
-      CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
+*  Set the HDU counter (FID -> HCID and Nhdu -> HduCount - rb)
+      CALL ADI_CGET0I( HCID, 'HduCount', NHDU, STATUS )
       NHDU = NHDU + 1
-      CALL ADI_CPUT0I( FID, 'Nhdu', NHDU, STATUS )
+      CALL ADI_CPUT0I( HCID, 'HduCount', NHDU, STATUS )
 
-*  Store the HDUs self reference number
-      CALL ADI_CPUT0I( HID, 'Ihdu', NHDU, STATUS )
+*  Store the HDUs self reference number (doesn't exist? - rb)
+c     CALL ADI_CPUT0I( HID, 'Ihdu', NHDU, STATUS )
 
 *  Write property name so that ADI can do number -> HDU name mapping
       CALL CHR_ITOC( NHDU, STR, NDIG )

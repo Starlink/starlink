@@ -113,68 +113,27 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			HID			! HDU identifier
-      INTEGER			KID			! Keyword identifier
-      INTEGER			KSID			! Keyword structure id
+      CHARACTER*72		CMNT2
 
-      LOGICAL			THERE			! Object exists?
+      INTEGER			HID			! HDU identifier
+
+      LOGICAL			DIDCRE
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Locate the HDU structure to contain the keyword
-      CALL ADI2_LOCHDU( FID, HDU, HID, STATUS )
+*  Locate the HDU structure that contains the keyword
+      CALL ADI2_CFIND( FID, HDU, ' ', ' ', .FALSE., .FALSE.,
+     :                 '<HTYPE>', 0, 0, DIDCRE, HID, STATUS )
 
-*  Locate the HDU's keyword list
-      CALL ADI_FIND( HID, 'Keys', KSID, STATUS )
+* Read the value and comment from the keyword
+      CALL ADI2_HGKY<T>( HID, KEY, VALUE, CMNT2, STATUS)
 
-*  Does the keyword already exist?
-      CALL ADI_THERE( KSID, KEY, THERE, STATUS )
-      IF ( THERE ) THEN
-
-*    Get the value
-        CALL ADI_CGET0<T>( KSID, KEY, VALUE, STATUS )
-
-*    Need to locate the key object?
-        IF ( MARK .OR. GETCOM ) THEN
-
-*      Locate the keyword
-          CALL ADI_FIND( KSID, KEY, KID, STATUS )
-
-*      Mark as committed?
-          IF ( MARK ) THEN
-            CALL ADI_CPUT0L( KID, '.COMMITTED', .TRUE., STATUS )
-          END IF
-
-*      User wants the comment?
-          IF ( GETCOM ) THEN
-            CALL ADI_THERE( KID, '.COMMENT', THERE, STATUS )
-            IF ( THERE ) THEN
-              CALL ADI_CGET0C( KID, '.COMMENT', COMNT, STATUS )
-            ELSE
-              CALL ADI2_STDCMT( KEY, COMNT, STATUS )
-            END IF
-          END IF
-
-*      Release the keyword
-          CALL ADI_ERASE( KID, STATUS )
-
-        END IF
-
-*  Do some checks here? Committed to disk? Same value etc?
-      ELSE
-        CALL MSG_SETC( 'KEY', KEY )
-        CALL ERR_REP( ' ', 'Keyword ^KEY has not been defined', STATUS )
-
-      END IF
-
-*  Free the identifiers
-      CALL ADI_ERASE( KSID, STATUS )
-      CALL ADI_ERASE( HID, STATUS )
+      IF ( GETCOM ) COMNT = CMNT2
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK )
-     :        CALL AST_REXIT( 'ADI2_PKEY0<T>', STATUS )
+     :        CALL AST_REXIT( 'ADI2_GKEY0<T>', STATUS )
 
       END

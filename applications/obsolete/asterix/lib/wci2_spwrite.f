@@ -102,13 +102,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Write the keywords
-      CALL WCI2_WRITE_HDU( ARGS(2), 'SPECTRUM', ARGS(3), ARGS(4),
+      CALL WCI2_WRITE_HDU( ARGS(2), ' ', ARGS(3), ARGS(4),
      :                     ARGS(5), STATUS )
 
 *  Result is null
       OARG = ADI__NULLID
 
-*  Invoke base method
+*  Invoke base method (??? - rb)
       CALL ADI_CALNXT( STATUS )
 
       END

@@ -117,8 +117,8 @@
 *  Look for keyword
       CALL ADI2_CFIND_KEY( HDUID, KEY, .FALSE., KID, .FALSE., STATUS )
 
-*  Does our keyword exist?
-      IF ( KVID .NE. ADI__NULLID ) THEN
+*  Does our keyword exist? (changed from KVID - rb)
+      IF ( KID .NE. ADI__NULLID ) THEN
 
 *    Locate the value
         CALL ADI_FIND( KID, 'Value', KVID, STATUS )
@@ -126,8 +126,8 @@
 *    Make a copy
         CALL ADI_COPY( KVID, MVID, STATUS )
 
-*    Release keyword value
-        CALL ADI_ERASE( KID, STATUS )
+*    Release keyword value (changed from KID - rb)
+        CALL ADI_ERASE( KVID, STATUS )
 
 *    Write object component
         IF ( MEMBER .GT. ' ' ) THEN

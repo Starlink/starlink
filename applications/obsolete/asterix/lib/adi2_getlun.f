@@ -67,11 +67,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     28 Feb 1995 (DJA):
 *        Original version.
+*     24 Jan 1997 (RB):
+*        Test for putaway
 *     {enter_changes_here}
 
 *  Bugs:

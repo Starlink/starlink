@@ -122,7 +122,7 @@
       IF ( NHDU .EQ. 0 ) THEN
 
 *    Find a non-existant HDU which will force them to be counted
-        CALL ADI2_FNDHDU( FID, '________', HDUID, STATUS )
+        CALL ADI2_FNDHDU( FID, '________', .FALSE., HDUID, STATUS )
 
         CALL ADI_CGET0I( FID, 'Nhdu', NHDU, STATUS )
 

@@ -119,7 +119,7 @@
       CALL ADI_GET0C( ARGS(5), MODE, STATUS )
 
 *  Locate the primary hdu
-      CALL ADI2_FNDHDU( ARGS(2), ' ', PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE., PHDU, STATUS )
 
 *  Locate the BDI private storage for the item, creating if required
       CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )

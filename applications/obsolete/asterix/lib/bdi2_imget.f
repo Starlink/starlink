@@ -100,6 +100,7 @@
 *  Local Variables:
       CHARACTER*20		ITEM
       CHARACTER*40		UNIT			! Unit string
+      CHARACTER*72		CMNT			! (rb)
 
       INTEGER			IMHDU			! IMAGE hdu id
 *.
@@ -129,7 +130,7 @@
 
 *  X axis units
       ELSE IF ( ITEM .EQ. 'Axis_1_Units' ) THEN
-        CALL ADI2_HGKYC( IMHDU, 'CUNIT1', UNIT, STATUS )
+        CALL ADI2_HGKYC( IMHDU, 'CUNIT1', UNIT, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           UNIT = 'degrees'
@@ -138,7 +139,7 @@
 
 *  Y axis units
       ELSE IF ( ITEM .EQ. 'Axis_2_Units' ) THEN
-        CALL ADI2_HGKYC( IMHDU, 'CUNIT2', UNIT, STATUS )
+        CALL ADI2_HGKYC( IMHDU, 'CUNIT2', UNIT, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           UNIT = 'degrees'

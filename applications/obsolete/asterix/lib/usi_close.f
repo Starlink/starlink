@@ -4,8 +4,8 @@
 *    History :
 *    Type definitions :
       IMPLICIT NONE
-      INCLUDE  'SAE_PAR'
-      INCLUDE  'USI_CMN'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'USI_CMN'
 *-
 
       CALL USI0_EXIT()

@@ -95,7 +95,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*6		MODE			! Mapping mode
+      CHARACTER*6		MODE, TYPE		! Mapping mode
 
       INTEGER			WB_CB			! WriteBack function
 

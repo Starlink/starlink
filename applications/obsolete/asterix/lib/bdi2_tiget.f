@@ -105,6 +105,7 @@
 *  Local Variables:
       CHARACTER*20		ITEM
       CHARACTER*40		UNIT			! Unit string
+      CHARACTER*72		CMNT
 
       INTEGER			BCOL			! Binary table column
       INTEGER			TIHDU			! RATE hdu id
@@ -120,7 +121,7 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate the RATE hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'RATE', TIHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'RATE', .FALSE., TIHDU, STATUS )
 
 *  Switch on the various items
 *  Time axis label
@@ -131,7 +132,7 @@
       ELSE IF ( ITEM .EQ. 'Axis_1_Units' ) THEN
 
         CALL ADI2_FNDBTC( TIHDU, 'TIME', BCOL, STATUS )
-        CALL ADI2_HGKYIC( TIHDU, 'TUNIT', BCOL, UNIT, STATUS )
+        CALL ADI2_HGKYIC( TIHDU, 'TUNIT', BCOL, UNIT, CMNT, STATUS )
         CALL ADI_NEWV0C( UNIT, OARG, STATUS )
 
 *  Intensity label
@@ -143,7 +144,7 @@
 
 *    Identify the intensity column
         CALL ADI2_FNDBTC( TIHDU, 'RATE', BCOL, STATUS )
-        CALL ADI2_HGKYIC( TIHDU, 'TUNIT', BCOL, UNIT, STATUS )
+        CALL ADI2_HGKYIC( TIHDU, 'TUNIT', BCOL, UNIT, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           UNIT = 'count/s'

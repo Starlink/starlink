@@ -105,6 +105,7 @@
 *  Local Variables:
       CHARACTER*20		ITEM
       CHARACTER*40		UNIT			! Unit string
+      CHARACTER*72		CMNT
 
       INTEGER			BCOL			! Binary table column
       INTEGER			SPHDU			! SPECTRUM hdu id
@@ -122,7 +123,7 @@
       CALL ADI_GET0C( ARGS(3), ITEM, STATUS )
 
 *  Locate the SPECTRUM hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', SPHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', .FALSE., SPHDU, STATUS )
 
 *  Switch on the various items
 *  Channel axis label
@@ -160,7 +161,7 @@
         END IF
 
 *    Generate intensity unit keyword name
-        CALL ADI2_HGKYIC( SPHDU, 'TUNIT', BCOL, UNIT, STATUS )
+        CALL ADI2_HGKYIC( SPHDU, 'TUNIT', BCOL, UNIT, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           IF ( ISRATE ) THEN

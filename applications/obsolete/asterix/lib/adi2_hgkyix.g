@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_HGKYI<T>( HDUID, KEY, INDEX, VALUE, STATUS )
+      SUBROUTINE ADI2_HGKYI<T>( HDUID, KEY, INDEX, VALUE, CMNT, STATUS )
 *+
 *  Name:
 *     ADI2_HGKYI<T>
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_HGKYI<T>( HDUID, KEY, INDEX, VALUE, STATUS )
+*     CALL ADI2_HGKYI<T>( HDUID, KEY, INDEX, VALUE, CMNT, STATUS )
 
 *  Description:
 *     Get value of keyword from specified HDU, where the keyword consists
@@ -26,6 +26,8 @@
 *        The index of the keyword
 *     VALUE = <TYPE> (returned)
 *        The keyword value
+*     CMNT = CHARACTER*(*) (returned)
+*        The keyword comment value
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -98,12 +100,12 @@
 
 *  Arguments Returned:
       <TYPE>			VALUE
+      CHARACTER*72		CMNT			! Keyword comment
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*72		CMNT			! Keyword comment
       CHARACTER*8		LKEY			! Local keyword name
       CHARACTER*7		STR			! Index encoded
 

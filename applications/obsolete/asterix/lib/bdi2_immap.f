@@ -101,6 +101,7 @@
       CHARACTER*20		ITEM
       CHARACTER*6		MODE			! Mapping mode
       CHARACTER*8		TYPE			! Mapping type
+      CHARACTER*72		CMNT
 
       DOUBLE PRECISION		BASE			! SGP/38 style base
       DOUBLE PRECISION 		CDELT, CRPIX		! Axis keywords
@@ -121,7 +122,7 @@
       CALL ADI_GET0C( ARGS(5), MODE, STATUS )
 
 *  Locate the IMAGE hdu
-      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE.,IMHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), ' ', .FALSE., IMHDU, STATUS )
 
 *  Locate the BDI private storage for the item, creating if required
       CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
@@ -140,8 +141,8 @@
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
 
 *    Do standard keywords exist?
-        CALL ADI2_HGKYID( IMHDU, 'CRPIX', IAX, CRPIX, STATUS )
-        CALL ADI2_HGKYID( IMHDU, 'CDELT', IAX, CDELT, STATUS )
+        CALL ADI2_HGKYID( IMHDU, 'CRPIX', IAX, CRPIX, CMNT, STATUS )
+        CALL ADI2_HGKYID( IMHDU, 'CDELT', IAX, CDELT, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           CRPIX = DBLE(DIM)/2.0D0 + 0.5D0
@@ -152,7 +153,7 @@
         BASE = (1.0D0-CRPIX) * CDELT
 
 *    Get axis size
-        CALL ADI2_HGKYII( IMHDU, 'NAXIS', IAX, DIM, STATUS )
+        CALL ADI2_HGKYII( IMHDU, 'NAXIS', IAX, DIM, CMNT, STATUS )
 
 *    Create dynamic array
         CALL DYN_MAPT( 1, DIM, TYPE, PTR, STATUS )
@@ -171,14 +172,14 @@
         CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
 
 *    Does standard keywords exist?
-        CALL ADI2_HGKYID( IMHDU, 'CDELT', IAX, CDELT, STATUS )
+        CALL ADI2_HGKYID( IMHDU, 'CDELT', IAX, CDELT, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           CDELT = 1.0D0
         END IF
 
 *    Get axis size
-        CALL ADI2_HGKYII( IMHDU, 'NAXIS', IAX, DIM, STATUS )
+        CALL ADI2_HGKYII( IMHDU, 'NAXIS', IAX, DIM, CMNT, STATUS )
 
 *    Create dynamic array
         CALL DYN_MAPT( 1, DIM, TYPE, PTR, STATUS )

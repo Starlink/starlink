@@ -108,7 +108,7 @@
       CALL ADI_NEW0( 'MissionStrings', OARG, STATUS )
 
 *  Locate main HDU
-      CALL ADI2_FNDHDU( ARGS(1), ' ', PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(1), ' ', .FALSE.,  PHDU, STATUS )
 
 *  Copy selected keywords
       CALL ADI2_KCF2A( PHDU, 'INSTRUME', OARG, 'Instrument',

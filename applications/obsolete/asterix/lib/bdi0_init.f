@@ -196,18 +196,21 @@
      :       'FileItemMap(_TimeSeries,_FITSfile,_CHAR,_CHAR,_CHAR)',
      :                   BDI2_TIMAP, DID, STATUS )
 
-*    FITS image interface
+*    FITS image interface (rb - try mapping to correctly called BDI2_MAP)
         CALL ADI_DEFFUN(
      :       'FileItemChk(_XYimage,_FITSfile,_CHAR)',
-     :                   BDI2_IMCHK, DID, STATUS )
+     :                   BDI2_CHK, DID, STATUS )
+c    :                   BDI2_IMCHK, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemGet(_XYimage,_FITSfile,_CHAR)',
-     :                   BDI2_IMGET, DID, STATUS )
+     :                   BDI2_GET, DID, STATUS )
+c    :                   BDI2_IMGET, DID, STATUS )
 
         CALL ADI_DEFFUN(
      :       'FileItemMap(_XYimage,_FITSfile,_CHAR,_CHAR,_CHAR)',
-     :                   BDI2_IMMAP, DID, STATUS )
+     :                   BDI2_MAP, DID, STATUS )
+c    :                   BDI2_IMMAP, DID, STATUS )
 
 *    FITS general binned interface
         CALL ADI_DEFFUN(

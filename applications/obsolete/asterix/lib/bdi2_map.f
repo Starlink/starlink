@@ -148,7 +148,7 @@
         CALL ADI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *    Map the array
-        CALL ADI2_DMAP( ARGS(1), CACHEID, TYPE, MODE, NDIM, DIMS,
+        CALL ADI2_DMAP( ARGS(1), ARGS(2), CACHEID, TYPE, MODE, NDIM, DIMS,
      :                  PSID, PTR, NELM, STATUS )
 
 *  Object doesn't exist?

@@ -159,7 +159,7 @@
           CALL ADI_MAP( ITID, TYPE, 'WRITE', PTR, STATUS )
 
 *      Store mapping details
-          CALL ADI2_STOMAP( PSID, 'inv', ADI__NULLID, ITID, PTR,
+          CALL ADI2_STOMAP( PSID, ADI__NULLID, 'inv', ITID, PTR,
      :                      CNDIM, CDIMS, 0, 0, WBPTR, TYPE,
      :                      'WRITE', STATUS )
 

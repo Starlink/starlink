@@ -100,6 +100,7 @@
       CHARACTER*20		ITEM
       CHARACTER*6		MODE			! Mapping mode
       CHARACTER*8		TYPE			! Mapping type
+      CHARACTER*72		CMNT			! (rb)
 
       INTEGER			BCOL			! Binary table column
       INTEGER			DIM			! Size of spectrum
@@ -117,7 +118,7 @@
       CALL ADI_GET0C( ARGS(5), MODE, STATUS )
 
 *  Locate the SPECTRUM hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', SPHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'SPECTRUM', .FALSE., SPHDU, STATUS )
 
 *  Switch on the various items
       IF ( ITEM .EQ. 'Data' ) THEN
@@ -134,8 +135,8 @@
 *    Map column data
         CALL ADI2_FNDBTC( SPHDU, 'CHANNEL', BCOL, STATUS )
 
-*  Data error
-      ELSE IF ( ITEM .EQ. 'Error' ) THEN
+*  Data error (this okay? - rb)
+      ELSE IF ( ITEM .EQ. 'Error' .OR. ITEM .EQ. 'Variance' ) THEN
 
 *    Map column data
         CALL ADI2_FNDBTC( SPHDU, 'STAT_ERR', BCOL, STATUS )
@@ -161,11 +162,16 @@
         CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *    Number of elements to map
-        CALL ADI2_HGKYI( SPHDU, 'NAXIS2', DIM, STATUS )
+        CALL ADI2_HGKYI( SPHDU, 'NAXIS2', DIM, CMNT, STATUS )
 
-*    Map the column
-        CALL ADI2_MAPCOL( SPHDU, BCOL, 1, DIM, TYPE, MODE, PSID,
+*    Map the column (sphdu -> args(1) - rb)
+        CALL ADI2_MAPCOL( ARGS(1), SPHDU, BCOL, 1, DIM, TYPE, MODE, PSID,
      :                    PTR, STATUS )
+
+*   Fudge! (rb)
+        if (item.eq.'Variance') then
+          call fudge_it(%val(ptr), dim)
+        end if
 
 *    Release storage
         CALL ADI_ERASE( PSID, STATUS )
@@ -182,3 +188,12 @@
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI2_SPMAP', STATUS )
 
       END
+
+
+	subroutine fudge_it(arr, dim)
+	real arr(*)
+	integer dim, i
+	do i = 1, dim
+		arr(i) = arr(i) * arr(i)
+	end do
+	end

@@ -96,6 +96,7 @@
 
 *  Local Variables:
       CHARACTER*20		TYPE			! Column type
+      CHARACTER*72		CMNT
 
       INTEGER			IC			! Character ptr
       INTEGER			TPOS			! Type code index
@@ -105,7 +106,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Read table item describing the type of the data stored
-      CALL ADI2_HGKYIC( HDUID, 'TFORM', BCOL, TYPE, STATUS )
+      CALL ADI2_HGKYIC( HDUID, 'TFORM', BCOL, TYPE, CMNT, STATUS )
 
 *  Translate type string to dimensions and ADI type. The format is
 *  [<dims>]<tcode> where <dims> is some number and <tcode> is one of

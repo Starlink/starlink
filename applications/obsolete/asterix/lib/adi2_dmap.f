@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_DMAP( MODID, CACHEID, TYPE, MODE, ENDIM, EDIMS,
+      SUBROUTINE ADI2_DMAP( MODID, FITID, CACHEID, TYPE, MODE, ENDIM, EDIMS,
      :                      PSID, PTR, NELM, STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_DMAP( MODID, CACHEID, TYPE, MODE, ENDIM, EDIMS, PSID,
+*     CALL ADI2_DMAP( MODID, FITID, CACHEID, TYPE, MODE, ENDIM, EDIMS, PSID,
 *                     PTR, NELM, STATUS )
 
 *  Description:
@@ -20,6 +20,8 @@
 *  Arguments:
 *     MODID = INTEGER (given)
 *        Abstract data model
+*     FITID = INTEGER (given)
+*        FITS file id
 *     CACHEID = INTEGER (given)
 *        FITS data object to map
 *     TYPE = CHARACTER*(*) (given)
@@ -100,7 +102,7 @@
       INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER			MODID, CACHEID, ENDIM, EDIMS(*), PSID
+      INTEGER			MODID, CACHEID, ENDIM, EDIMS(*), PSID, FITID
       CHARACTER*(*)		TYPE, MODE
 
 *  Arguments Returned:
@@ -123,6 +125,11 @@
       INTEGER			PARENT			! Parent of cache obj
 
       LOGICAL			THERE			! Object exists?
+
+      INTEGER			IAX, I
+      INTEGER			AXID, AXPTR
+      REAL			BASE, DELTA
+      LOGICAL			ISAXDAT
 *.
 
 *  Check inherited global status.
@@ -131,10 +138,24 @@
 *  Expected number of data elements
       CALL ARR_SUMDIM( ENDIM, EDIMS, ENELM )
 
+*  Are we getting axis data? (mega fudge - rb)
+      CALL ADI_NAME( PSID, ITEM, STATUS )
+      ISAXDAT = .FALSE.
+      IF ( ITEM(1:4) .EQ. 'Axis' .AND. ITEM(8:11) .EQ. 'Data' ) THEN
+        ISAXDAT = .TRUE.
+      END IF
+
 *  Get array shape and total number of elements
-      CALL ADI_CGET0C( CACHEID, 'TYPE', ATYPE, STATUS )
-      CALL ADI_CGET1I( CACHEID, 'SHAPE', ADI__MXDIM, DIMS, NDIM,
-     :                 STATUS )
+      IF ( ISAXDAT ) THEN
+        NDIM = ENDIM
+        DO I = 1, ENDIM
+          DIMS(I) = EDIMS(I)
+        END DO
+      ELSE
+        CALL ADI_CGET0C( CACHEID, 'TYPE', ATYPE, STATUS )
+        CALL ADI_CGET1I( CACHEID, 'SHAPE', ADI__MXDIM, DIMS, NDIM,
+     :                   STATUS )
+      END IF
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *  If number of elements differ we report an error
@@ -150,11 +171,23 @@
 
 *  FITS mapping always works by creating the data array in the cache
 *  object. Map that data if it exists, otherwise read it from the file
-      CALL ADI_THERE( CACHEID, 'Value', THERE, STATUS )
-      IF ( THERE ) THEN
-        CALL ADI_CMAP( CACHEID, 'Value', TYPE, MODE, PTR, STATUS )
+      IF ( ISAXDAT ) THEN
+        CALL CHR_CTOI( ITEM(6:6), IAX, STATUS )
+        CALL ADI2_GKEY0R( FITID, ' ', 'CRPIX'//ITEM(6:6), .FALSE.,
+     :                    .FALSE., BASE, ' ', STATUS )
+        CALL ADI2_GKEY0R( FITID, ' ', 'CDELT'//ITEM(6:6), .FALSE.,
+     :                    .FALSE., DELTA, ' ', STATUS )
+        CALL ADI_NEW( TYPE, 1, DIMS(IAX), AXID, STATUS )
+        CALL ADI_MAP( AXID, TYPE, 'WRITE', AXPTR, STATUS )
+        CALL ADI2_AXINV ( BASE, DELTA, DIMS(IAX), %VAL(AXPTR), STATUS )
+        PTR = AXPTR
       ELSE
-        CALL ADI2_DCOP_IN( CACHEID, PTR, NELM, STATUS )
+        CALL ADI_THERE( CACHEID, 'Value', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL ADI_CMAP( CACHEID, 'Value', TYPE, MODE, PTR, STATUS )
+        ELSE
+          CALL ADI2_DCOP_IN( CACHEID, PTR, NELM, TYPE, STATUS )
+        END IF
       END IF
 
 *  Store mapping details
@@ -175,5 +208,24 @@
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'ADI2_DMAP', STATUS )
       END IF
+
+      END
+
+
+      SUBROUTINE ADI2_AXINV( BASE, DELTA, NELM, AXDAT, STATUS )
+
+      REAL			BASE
+      REAL			DELTA
+      INTEGER			NELM
+      REAL			AXDAT(*)
+      INTEGER			STATUS
+
+      INTEGER			I
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DO I = 1, NELM
+        AXDAT(I) = (I - BASE) * DELTA
+      END DO
 
       END

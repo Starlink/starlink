@@ -77,9 +77,9 @@
 *       PAR_NAME                     Dummy name of parameter for filename
 * Global:
         IMPLICIT NONE
-        INCLUDE 'SAE_PAR'
-        INCLUDE 'DAT_PAR'
-        INCLUDE 'PAR_ERR'
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PAR_ERR'
 *
 * Import :
 	CHARACTER*(*) FNAME          !input: file-name, default extn is .SDF

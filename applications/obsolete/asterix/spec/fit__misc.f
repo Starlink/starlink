@@ -8,7 +8,7 @@
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
-       INCLUDE 'SAE_PAR'
+      INCLUDE 'SAE_PAR'
 *    Import :
 	INTEGER NDAT			! No of values in dataset
         LOGICAL QOK, QUAL(NDAT)

@@ -105,6 +105,7 @@ C      {data_type} {external_name} ! [external_description]
       CHARACTER*20		ITEM
       CHARACTER*6		MODE			! Mapping mode
       CHARACTER*8		TYPE			! Mapping type
+      CHARACTER*72		CMNT			! (rb)
 
       INTEGER			BCOL			! Binary table column
       INTEGER			DIM			! Bins in series
@@ -122,7 +123,7 @@ C      {data_type} {external_name} ! [external_description]
       CALL ADI_GET0C( ARGS(5), MODE, STATUS )
 
 *  Locate the RATE hdu
-      CALL ADI2_FNDHDU( ARGS(2), 'RATE', TIHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(2), 'RATE', .FALSE., TIHDU, STATUS )
 
 *  Switch on the various items
       IF ( ITEM .EQ. 'Data' ) THEN
@@ -151,10 +152,10 @@ C      {data_type} {external_name} ! [external_description]
         CALL BDI0_LOCPST( ARGS(1), ITEM, .TRUE., PSID, STATUS )
 
 *    Length of time series
-        CALL ADI2_HGKYI( TIHDU, 'NAXIS2', DIM, STATUS )
+        CALL ADI2_HGKYI( TIHDU, 'NAXIS2', DIM, CMNT, STATUS )
 
 *    Map the column
-        CALL ADI2_MAPCOL( TIHDU, BCOL, 1, DIM, TYPE, MODE, PSID,
+        CALL ADI2_MAPCOL( ARGS(1), TIHDU, BCOL, 1, DIM, TYPE, MODE, PSID,
      :                    PTR, STATUS )
 
 *    Release storage

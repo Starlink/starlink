@@ -157,7 +157,7 @@
       DO ILIST = 1, NLIST
 
 *    Read keyword containing name and description of field
-        CALL ADI2_HGKYIC( EVHDU, 'TTYPE', ILIST, NAME, STATUS )
+        CALL ADI2_HGKYIC( EVHDU, 'TTYPE', ILIST, NAME, CMNT, STATUS )
         L = CHR_LEN(NAME)
 
 *    Translate type string to dimensions and ADI type
@@ -169,20 +169,20 @@
         END IF
 
 *    Now the optional items
-        CALL ADI2_HGKYIC( EVHDU, 'TUNIT', ILIST, UNITS, STATUS )
+        CALL ADI2_HGKYIC( EVHDU, 'TUNIT', ILIST, UNITS, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           UNITS = ' '
         END IF
 
-        CALL ADI2_HGKYID( EVHDU, 'TLMIN', ILIST, DMIN, STATUS )
+        CALL ADI2_HGKYID( EVHDU, 'TLMIN', ILIST, DMIN, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           GOTMIN = .FALSE.
         ELSE
           GOTMIN = .TRUE.
         END IF
-        CALL ADI2_HGKYID( EVHDU, 'TLMAX', ILIST, DMAX, STATUS )
+        CALL ADI2_HGKYID( EVHDU, 'TLMAX', ILIST, DMAX, CMNT, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
           GOTMAX = .FALSE.

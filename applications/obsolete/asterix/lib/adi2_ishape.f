@@ -98,6 +98,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*72		CMNT			! (rb)
       INTEGER			IAX			! Loop over axes
 *.
 
@@ -105,7 +106,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Get dimensionality
-      CALL ADI2_HGKYI( HDUID, 'NAXIS', NDIM, STATUS )
+      CALL ADI2_HGKYI( HDUID, 'NAXIS', NDIM, CMNT, STATUS )
 
 *  Trap buffer overflow
       IF ( NDIM .GT. MAXDIM ) THEN
@@ -114,7 +115,7 @@
      :                STATUS )
       ELSE
         DO IAX = 1, NDIM
-          CALL ADI2_HGKYII( HDUID, 'NAXIS', IAX, DIMS(IAX), STATUS )
+          CALL ADI2_HGKYII( HDUID, 'NAXIS', IAX, DIMS(IAX), CMNT, STATUS )
         END DO
 
       END IF
