@@ -139,7 +139,7 @@
 *    Global constants :
 
       INCLUDE  'SAE_PAR'       ! SSE global definitions
-      INCLUDE  'BAD_PAR'       ! Magic-value definitions
+      INCLUDE 'PRM_PAR'        ! PRIMDAT public constants
 
 *    Import :
 
