@@ -39,8 +39,10 @@
 #        Add LOOP parameter
 #     1997 June 19 (TIMJ)
 #        Remove USE_SECTION
-#     1997 Spetember 4 (TIMJ)
+#     1997 September 4 (TIMJ)
 #        Change message in DUMMY
+#     1998 January 20 (TIMJ)
+#        Add the SIZE parameter
 #     {enter_further_changes_here}
 
 #-
@@ -126,6 +128,12 @@
          PROMPT  'Y shift to be applied to input dataset on output map (arcsec)'
          DEFAULT 0.0
 	 HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER SIZE
+         TYPE '_INTEGER'
+         PROMPT 'Number of pixels in output map (NX,NY)'
+         HELPKEY '*'
       ENDPARAMETER
 
       PARAMETER OUT_OBJECT
