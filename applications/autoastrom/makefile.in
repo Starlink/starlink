@@ -1222,7 +1222,6 @@ build-subdirs: moggy/Makefile $(CATLIBINSTALLDIR)/lib/libcat.a \
 	cd moggy && $(CONFENVS) RUN_LOCAL_AUTOTOOLS=false make
 	cd astrom && ./mk build
 	cd $(MATCHPROG) && $(CONFENVS) make
-#	cd $(MATCHPROG) && unset INSTALL LINK RANLIB CFLAGS; make
 
 # Creating moggy/Makefile configures the moggy package
 moggy/Makefile: moggy/Makefile.in  $(CATLIBINSTALLDIR)/lib/libcat.a
