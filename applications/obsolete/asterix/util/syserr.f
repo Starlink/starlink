@@ -66,8 +66,8 @@
       INTEGER		 	NDIM	        ! Dimensionality of data
       INTEGER		 	NDIMV	        ! Dimensionality of variance
       INTEGER			NELM		! No of data/variance values
-      INTEGER                   NREC            ! No. of history records
-      INTEGER		  	OFID			! Output dataset
+      INTEGER                   NREC            ! # of history records
+      INTEGER		  	OFID		! Output dataset
       INTEGER                   USE             ! History records no.
       INTEGER 			VPTR		! Pointer to variance array
 
@@ -77,7 +77,7 @@
       LOGICAL			OK		! General test
       LOGICAL 			NEWVARA		! New VARIANCE created?
       LOGICAL			PRIM            ! Is primitive input?
-      LOGICAL                   OVERWRITE       ! Overwriting?
+      LOGICAL                   OVER       	! Overwriting?
 *
 *    Version id :
 *
@@ -95,10 +95,10 @@
       CALL AST_INIT()
 
 *    See whether we're going to overwrite
-      CALL USI_GET0L( 'OVER', OVERWRITE, STATUS )
+      CALL USI_GET0L( 'OVER', OVER, STATUS )
 
 *    Obtain data object, access and check it
-      IF ( OVERWRITE ) THEN
+      IF ( OVER ) THEN
          CALL USI_TASSOCI( 'INP', '*', 'UPDATE', OFID, STATUS )
          CALL BDI_PRIM( OFID, PRIM, STATUS )
       ELSE
@@ -115,8 +115,7 @@
 
       IF ( PRIM ) THEN
 	 STATUS = SAI__ERROR
-	 CALL ERR_REP( ' ', 'ERROR : Cannot use primitive object.',
-     :                 STATUS )
+	 CALL ERR_REP( ' ', 'Cannot use primitive object.', STATUS )
 
       ELSE
 	 CALL BDI_CHKDATA( OFID, OK, NDIM, DIMS, STATUS )
@@ -133,7 +132,7 @@
       END IF
 
 *    Obtain size of systematic error
-      CALL USI_GET0R( 'ERR', PERCERR, STATUS )
+      CALL USI_GET0R( 'ERROR', PERCERR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       SERR = 0.01 * PERCERR
 
@@ -161,7 +160,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
       CALL MSG_SETR( 'PCERR', PERCERR )
-      IF ( .NOT. OVERWRITE ) THEN
+      IF ( .NOT. OVER ) THEN
          ACTION(1) = 'Input dataset {INP}'
          USE = 2
       ELSE
