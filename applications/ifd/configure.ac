@@ -18,7 +18,8 @@ AC_CONFIG_FILES([Makefile component.xml])
 dnl    Make substitutions in some of the script files. 
 dnl    The ones which require maketime-sensitive substitutions are handled
 dnl    by the Makefile.
-AC_CONFIG_FILES([ifd2irafifl ifd_irafhlpgen ifl2ifd],
-                [chmod +x ifd2iraf.ifl ifd_irafhlpgen ifl2ifd])
+AC_CONFIG_FILES([ifd2irafifl],[chmod +x ifd2irafifl])
+AC_CONFIG_FILES([ifd_irafhlpgen],[chmod +x ifd_irafhlpgen])
+AC_CONFIG_FILES([ifl2ifd],[chmod +x ifl2ifd])
 
 AC_OUTPUT
