@@ -864,6 +864,20 @@ itcl::class gaia::GaiaImageCtrl {
       after 0 [code $w_.draw delete_object $id]
    }
 
+   #  Camera post command. This method is called whenever a new image
+   #  has been received from the camera and displayed.  Update the
+   #  widgets that need to display new values The frameid will be 0 for
+   #  the main image and non-zero for a rapid frame. Override so that
+   #  GAIA tools may be informed of these events.
+   protected method camera_post_command {frameid} {
+      RtdImage::camera_post_command $frameid
+      if { $frameid == 0 } {
+         if { $itk_option(-real_time_command) != {} } {
+            eval $itk_option(-real_time_command)
+         }
+      }
+   }
+
    #  Configuration options.
    #  ======================
 
@@ -929,6 +943,9 @@ itcl::class gaia::GaiaImageCtrl {
    #  Command to re-draw the astrometry grid.
    itk_option define -grid_command grid_command Grid_Command {}
 
+   #  Command to that can be used to get notification of a real-time event.
+   itk_option define -real_time_command real_time_command Real_Time_Command {}
+
    #  Component of the NDF that is displayed.
    itk_option define -component component Component data
 
@@ -939,7 +956,7 @@ itcl::class gaia::GaiaImageCtrl {
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
 
    #  The application name as used in window titles (can be changed
-   #  for UKIRT mods). 
+   #  for UKIRT mods).
    itk_option define -appname appname AppName GAIA::Skycat
 
    #  Protected variables:

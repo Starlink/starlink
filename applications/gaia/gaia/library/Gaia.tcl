@@ -960,6 +960,9 @@ itcl::class gaia::Gaia {
             -clone_cmd [code $this make_toolbox xyprofile 1] \
             -rect_id $rect_id
       }
+
+      #  Trap real-time events for this tool.
+      $image_ configure -real_time_command [code $this real_time_event_]
    }
 
    #  Make polarimetry toolbox.
@@ -1019,6 +1022,19 @@ itcl::class gaia::Gaia {
            [winfo exists $itk_component(positions) ] } {
          $itk_component(positions) redraw
       }
+   }
+
+   #  A real time event has been issued by the camera. Some tools may
+   #  want to respond to these. If so do that here.
+   protected method real_time_event_ {} {
+      if { [info exists itk_component(xyprofile) ] &&
+           [winfo exists $itk_component(xyprofile) ] } {
+         $itk_component(xyprofile) notify_cmd
+      } else {
+
+         #  Failed so remove the command (only way to trap this).
+         $image_ configure -real_time_command {}
+      }   
    }
 
    #  Image has been cleared so reset any toolboxes that require it
