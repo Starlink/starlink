@@ -22,6 +22,7 @@ proc cgs4drExit {taskname cmd} {
     if {$bv==0} {
       cgs4drCursor watch red white
 
+      cgs4drKillPack $taskname
       global QmanTask
       global P4Task
       global Red4Task
@@ -73,6 +74,7 @@ proc cgs4drExit {taskname cmd} {
     if {$bv==0} {
       cgs4drCursor watch red white
 
+      cgs4drKillPack $taskname
       if {[string match $QmanTask $local_task]} {
         if {[file exists $env(HOME)/cgs4dr_configs/default.qman]==1} {exec /usr/bin/rm -rf $env(HOME)/cgs4dr_configs/default.qman}
         $taskname obey save "$QmanAccess file=$env(HOME)/cgs4dr_configs/default.qman" -inform "cgs4drInform $taskname %V"
