@@ -243,7 +243,9 @@ bool InputByteStream::bindToFileDescriptor(int fileno,
 #endif	/* ! (HAVE_MMAP && HAVE_SYS_STAT_H) */
 
 	buflen_ = S.st_size;
-	buf_ = static_cast<Byte*>(mmap(0, buflen_, PROT_READ, 0, fd_, 0));
+	buf_ = static_cast<Byte*>(mmap(0, buflen_,
+                                       PROT_READ, MAP_SHARED,
+                                       fd_, 0));
 	if (buf_ == MAP_FAILED) {
 	    string errmsg = strerror(errno);
 	    throw InputByteStreamError
