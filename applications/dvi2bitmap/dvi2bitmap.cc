@@ -367,17 +367,20 @@ int main (int argc, char **argv)
 #if ENABLE_KPATHSEA
 		cout << "ENABLE_KPATHSEA\n";
 #endif
-#ifdef MKTEXPK
-		cout << "  MKTEXPK=" << MKTEXPK << '\n';
-#endif
-#ifdef MAKETEXPK
-		cout << "  MAKETEXPK=" << MAKETEXPK << '\n';
-#endif
 #ifdef DEFAULT_TEXMFCNF
 		cout << "  DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
 #endif
 #ifdef FAKE_PROGNAME
 		cout << "  FAKE_PROGNAME=" << FAKE_PROGNAME << '\n';
+#endif
+#ifdef ENABLE_FONT_GEN
+		cout << "ENABLE_FONT_GEN\n";
+#endif
+#ifdef MKTEXPK
+		cout << "  MKTEXPK=" << MKTEXPK << '\n';
+#endif
+#ifdef MAKETEXPK
+		cout << "  MAKETEXPK=" << MAKETEXPK << '\n';
 #endif
 #ifdef DEFAULT_MFMODE
 		cout << "  DEFAULT_MFMODE=" << DEFAULT_MFMODE << '\n';
