@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL MATH_INTRP<T>( [p]... )
+*     CALL MATH_INTRP<T>( N, XIN, YIN, XOUT, DEG, YOUT, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -122,10 +122,10 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that supplied X value lies inside user range
-      IF ( XOUT .LE. X(1) ) THEN
+      IF ( XOUT .LE. XIN(1) ) THEN
         YOUT = Y(1)
 
-      ELSE IF ( XOUT .GE. X(N) ) THEN
+      ELSE IF ( XOUT .GE. XIN(N) ) THEN
         YOUT = Y(N)
 
       ELSE
