@@ -5,6 +5,7 @@
        BKM: Brian McIlwrath (STARLINK)
        AJC: Alan Chipperfield (STARLINK)
        DLT: David Terrett (STARLINK)
+       TIMJ: Tim Jenness (JAC, Hawaii)
     History :
       Created: irj 15/6/92
       Tidied : irj, skr 16/6/92
@@ -19,8 +20,11 @@
       Dimension transfree MESSYS__MXTRANS not MXPATH: AJC 15/11/94
       Remove diagnostic printfs in ams_raccept and ams_receive: AJC 8/2/96
       Enable initialization without exit handler: DLT 14/9/99
+      Fix compiler warnings due to lack of include files: TIMJ 3/9/04
 */
 
+#include <stdlib.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <time.h>
 #include <sys/types.h>

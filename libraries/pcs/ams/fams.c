@@ -8,6 +8,7 @@
  * Authors:
  *    BDK: B.D.Kelly (ROE)
  *    AJC: A.J.Chipperfield (AJC)
+ *    TIMJ: Tim Jenness (JAC, Hawaii)
  *
  * History:
  *    xx-xxx-1994 (BDK):
@@ -16,6 +17,8 @@
  *       Test used length of imported Fortran strings
  *     5-DEC-1994 (AJC):
  *       Remove path from includes
+ *     3-SEP-2004 (TIMJ):
+ *       Fix compiler warning from undefined strlen
  *
  * Description:
  *    Uses the CNF interfaces to provide a portable interface for the
@@ -43,6 +46,7 @@
 #  include "cnf.h"
 #  include "f77.h"
 
+#include <string.h>
 #include "sae_par.h"
 #include "ams.h"
 #include "messys_par.h"
