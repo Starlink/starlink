@@ -1,7 +1,7 @@
 INTERFACE BSUB
   parameter INP
     position 1
-    TYPE 'UNIV'
+    TYPE 'LITERAL'
     vpath 'prompt'
     ppath 'global'
     association '<-global.binds'
@@ -9,12 +9,12 @@ INTERFACE BSUB
   endparameter
   parameter OUT
     position 2
-    TYPE 'UNIV'
+    TYPE 'LITERAL'
     association '->global.binds'
     prompt 'Background subtracted image'
   endparameter
   parameter BGND
-    TYPE 'UNIV'
+    TYPE 'LITERAL'
     association '->global.model'
     default !
     ppath 'default'
