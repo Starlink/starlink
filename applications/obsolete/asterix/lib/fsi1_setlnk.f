@@ -140,7 +140,8 @@
         DO ICOMP = 1, NCOMP
           CALL DAT_INDEX( LOC, ICOMP, CLOC, STATUS )
           CALL DAT_TYPE( CLOC, TYP, STATUS )
-          IF ( TYP .EQ. 'REFERENCE_OBJ' ) THEN
+          IF ( (TYP .EQ. 'REFERENCE_OBJ') .OR.
+     :         (TYP .EQ. 'ADI_REF') ) THEN
             NFILE = NFILE + 1
           END IF
           CALL DAT_ANNUL( CLOC, STATUS )
