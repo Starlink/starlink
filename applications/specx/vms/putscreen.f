@@ -22,7 +22,7 @@ C  Include files:
 *     IF (IDEV.LT.10) THEN
 *       CALL LIB$PUT_SCREEN (LINE,ROW,COLUMN,TYPE)
 *     ELSE
-        TYPE *,LINE
+        PRINT *,LINE
 *     END IF
 
       RETURN
