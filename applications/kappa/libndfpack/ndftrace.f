@@ -992,6 +992,10 @@
                END DO
                CALL AST_ANNUL( MAP, STATUS )
 
+*  Normalise the two positions for display.
+               CALL AST_NORM( IWCS, LBOUT, STATUS )
+               CALL AST_NORM( IWCS, UBOUT, STATUS )
+
 *  If this is the current Frame, write the bounds to the output
 *  parameters.
                IF( IFRAME .EQ. ICURR ) THEN 
