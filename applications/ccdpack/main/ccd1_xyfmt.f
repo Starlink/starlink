@@ -42,6 +42,9 @@
 *  History:
 *     1-NOV-1999 (MBT):
 *        Original version.
+*     25-APR-2001 (MBT):
+*        Modified to take account of whether each SkyFrame axis should
+*        be represented as a time or not.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +71,7 @@
 
 *  Local Variables:
       INTEGER FRM                ! AST frame to use for formatting
+
 *.
 
 *  Check inherited global status.
@@ -87,8 +91,16 @@
       ELSE
          FRM = AST_COPY( FRAME, STATUS )
          IF ( AST_ISASKYFRAME( FRM, STATUS ) ) THEN
-            CALL AST_SETC( FRM, 'Format(1)', '+zidmst.3', STATUS )
-            CALL AST_SETC( FRM, 'Format(2)', '+zidmst.3', STATUS )
+            IF ( AST_GETI( FRM, 'AsTime(1)', STATUS ) .NE. 0 ) THEN
+               CALL AST_SETC( FRM, 'Format(1)', '+ihmst.3', STATUS )
+            ELSE
+               CALL AST_SETC( FRM, 'Format(1)', '+idmst.2', STATUS )
+            END IF
+            IF ( AST_GETI( FRM, 'AsTime(2)', STATUS ) .NE. 0 ) THEN
+               CALL AST_SETC( FRM, 'Format(2)', '+ihmst.3', STATUS )
+            ELSE
+               CALL AST_SETC( FRM, 'Format(2)', '+idmst.2', STATUS )
+            END IF
          ELSE 
             CALL AST_SETC( FRM, 'Format(1)', '%+14.6f', STATUS )
             CALL AST_SETC( FRM, 'Format(2)', '%+14.6f', STATUS )
