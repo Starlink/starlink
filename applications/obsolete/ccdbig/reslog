@@ -1,7 +1,12 @@
-#!/bin/csh -f
+#!/bin/csh
 
 # Set up variables
-set logfile = ccdbig.log
+set logfile = test.log
+set interval = 10
+
+# Print out header
+set format = "%10s %10s %10s %10s\n"
+printf "$format" "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
 
 # Classify operating system 
 # (currently works for Red Hat Linux, Solaris, Digital Unix) 
@@ -19,18 +24,27 @@ alias getfield awk "'\\
    NR>3 && s_i {if ("\$"s_i > out) out="\$"f_i;} \\
    END {print out}'"
 
+# Set up alias for converting from hh:mm:ss to seconds
+alias tosec awk -F: "'\\
+   {mult=1; for (i=NF;i>0;i--) {sec += "\$"i * mult; mult *= 60} print sec }'"
+
+# Some initialisation
+set dirent = "`ls -l $logfile`"
+set size_max = 0
+set rss_max = 0
+onintr SIGNAL
 
 # Work out parent's PID
 if ("$pstype" == "BSD") then
-   set pscmd = 'ps l $$'
+   set pscmd = "ps l $$"
 else 
-   set pscmd = 'ps -lp $$'
+   set pscmd = "ps -lp $$"
 endif
 set ppid = `$pscmd | getfield field=PPID`
 if ("$ppid" == "") then
    echo "${0:r}:  No parent process - aborting"
    exit 1
-end if
+endif
 if ("$pstype" == "BSD") then
    set parent_pscmd = "ps $ppid"
 else
@@ -43,26 +57,28 @@ while (`$parent_pscmd | getfield field=PID`)
    # the same parent as this one, and then selecting the one with the 
    # largest (total virtual) memory size.
    if ("$pstype" == "BSD") then
-      set pscmd = 'ps ux'
+      set pscmd = "ps ux"
    else
       set pscmd = "ps -oppid,vsz='         VSZ'"
    endif 
-   set pid = `$pscmd | grep " $ppid " | getfield field=PID sortby=VSZ`
+   # The mucky grep here is to stop it finding the grep process
+   set pid = `$pscmd | grep '[ ]'$ppid' ' | getfield field=PID sortby=VSZ`
+
    
    # Find out the stats we want (cpu, elapsed, size, rss)
    if ("$pstype" == "BSD") then
       set pscmd = "ps u $pid"
-      set cpu     = `$pscmd | getfield field=TIME`
+      set cpu     = `$pscmd | getfield field=TIME | tosec`
       set size    = `$pscmd | getfield field=SIZE`
       set rss     = `$pscmd | getfield field=RSS`
       set percent = `$pscmd | getfield field=%CPU`
-      @ elapsed = ( $cpu * 100 ) / percent
+      set elapsed = `echo $cpu $percent | awk '{print ($2>0) ? 100.*$1/$2 : 0}'`
    else
       set pscmd = "ps -p $pid -otime=TIME,etime=ETIME,vsz='       VSZ',rss='        RSS'"
-      set cpu     = `$pscmd | getfield field=TIME`
+      set cpu     = `$pscmd | getfield field=TIME | tosec`
       set size    = `$pscmd | getfield field=VSZ`
       set rss     = `$pscmd | getfield field=RSS`
-      set elapsed = `$pscmd | getfield field=ETIME`
+      set elapsed = `$pscmd | getfield field=ETIME | tosec`
    endif
    
    # Update maxima (times are monotonic so they take care of themselves)
@@ -72,20 +88,30 @@ while (`$parent_pscmd | getfield field=PID`)
    
    # See if log file has been altered since last time we did it
    set dirent_last = "$dirent"
-   set dirent = `ls -l $logfile`
+   set dirent = "`ls -l $logfile`"
    set lines = `printf "%s\n%s\n" "$dirent_last" "$dirent" | uniq | wc -l`
    
    if ("$lines" == "2") then
    # File has been written to.  Write our summary and reset values.
-      set buf = `printf "$format" "$elapsed" "$time" "$rss_max" "$size_max"`
+      set buf = `printf "$format" "$elapsed" "$cpu" "$rss_max" "$size_max"`
       echo $buf >> $logfile
+      ps u $$ >> $logfile
       set rss_max = 0
       set size_max = 0
+      set dirent = "`ls -l $logfile`"
    endif
+
+   # Go back to sleep for a while
+   sleep $interval
    
 end
 
 echo "${0:r}: Logging terminated"
 
+exit
+
+SIGNAL:
+   echo "${0:r}: Caught a signal.  Logging terminated"
+   exit
    
 
