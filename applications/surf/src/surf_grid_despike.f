@@ -118,6 +118,9 @@
 *  History:
 *     Original version: Timj, 1997 Oct 20
 *     $Log$
+*     Revision 1.2  1998/05/12 20:56:48  timj
+*     Free the memory allocated for STATS
+*
 *     Revision 1.1  1997/11/12 00:13:37  timj
 *     Initial revision
 *
@@ -506,5 +509,7 @@
       CALL SCULIB_FREE('BIN_PTR', BIN_PTR, BIN_PTR_END, STATUS)
       CALL SCULIB_FREE('BIN_POS', BIN_POS_PTR, BIN_POS_END, STATUS)
 
+*     Free Statistics
+      CALL SCULIB_FREE('STATS_PTR', STATS_PTR, STATS_END, STATUS)
 
       END
