@@ -1,0 +1,248 @@
+      SUBROUTINE CON_OAFF<T>( FD, EL, A, FIXED, NCPVAL, NOVPRE, RECL,
+     :                        STATUS )
+*+
+*  Name:
+*     CON_OAFFx
+
+*  Purpose:
+*     Writes an array to an ASCII file.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL CON_OAFFx( FD, EL, A, FIXED, NCPVAL, NOVPRE, RECL, STATUS )
+
+*  Description:
+*     This routine converts a numeric array into character form, and
+*     writes it to an output ASCII file either in free or fixed
+*     format.  At least a single space separates each data value in the
+*     output file.  It is only one space in the free-format case.
+
+*  Arguments:
+*     FD = INTEGER (Given)
+*        File descriptor of the output ASCII file.
+*     EL = INTEGER (Given)
+*        Number of array elements to process.
+*     A( EL ) = ? (Given)
+*        Input array.
+*     FIXED = LOGICAL (Given)
+*        If true, the data values are in fixed format, using NCPVAL
+*        characters per value and NOVPRE values per record.  When FIXED 
+*        is false, data values are packed as efficiently as possible
+*        within each record.
+*     NCPVAL = INTEGER (Given)
+*        The number of characters per data value when FIXED is .TRUE..
+*        It should be adequate to store the data value.  Smaller values
+*        may be used but this will result in a loss of precision in the 
+*        output file.  The product of NOVPRE and NCPVAL must not exceed
+*        the recordlength, RECL.  NCPVAL must also be in the range 1 to
+*        22.
+*     NOVPRE = INTEGER (Given)
+*        The number of data values per record of the output file, when
+*        FIXED is .FALSE..  It should be in the range 1 to 16383.
+*        The product of NOVPRE and NCPVAL must not exceed the 
+*        recordlength, RECL.
+*     RECL = INTEGER (Write)
+*        The record length in bytes of the output file.  This
+*        must be greater or equal to the product of NOVPRE and NCPVAL,
+*        When fixed is true. When FIXED is FALSE this must be
+*        between 32 and 32766.  
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  There is a routine for integer and floating-point data types:
+*     replace "x" in the routine name by I, D, or R as appropriate.  The
+*     array supplied to the routine must have the data type specified.
+*     The limitation on other integer types is because there are no
+*     conversion routines between them and character in the CHR library.
+
+*  Prior Requirements:
+*     The ASCII file must be open for write access.
+
+*  Implementation Deficiencies:
+*     There are some missing CHR conversion routines and so there is
+*     a conditional statement for every data value.
+      
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 January 28 (MJC):
+*        Original version.
+*     1992 September 15 (MJC):
+*        Added control of the formatting.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! Data-storage constants
+
+*  Arguments Given:
+      INTEGER FD
+      INTEGER EL
+      <TYPE> A( EL )
+      LOGICAL FIXED
+      INTEGER NCPVAL
+      INTEGER NOVPRE
+      INTEGER RECL
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Length of a character string
+                                 ! excluding trailing blanks
+
+*  Local Variables:
+      CHARACTER * ( 32766 ) BUFFER ! Buffer for output records.
+      INTEGER CFREE              ! Number of free characters within
+                                 ! buffer
+      INTEGER COFF               ! Character offset within buffer
+      INTEGER COLD               ! Previous character offset within
+                                 ! buffer
+      CHARACTER * ( 23 ) CVAL    ! Character version of a data value
+      CHARACTER * ( 9 ) FORMAT   ! Format to initialise buffer by
+                                 ! writing
+      INTEGER I                  ! Loop counter for file records
+      INTEGER J                  ! Loop counter for values per record
+      INTEGER K                  ! Index of the array element
+      INTEGER NC                 ! Number of characters in value
+      INTEGER NCV                ! Number of characters in value
+                                 ! excluding blanks
+      INTEGER NREC               ! Number of records
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise buffer.  Since the buffer is large, just reset the 
+*  required number of characters to be blank.
+      WRITE( FORMAT, '(''('',I5,''X)'')' ) RECL 
+      WRITE( BUFFER, FMT=FORMAT )
+
+*  Method of outputting values depends on the fixed flag.
+      IF ( FIXED ) THEN
+
+*  Copy values using a fixed format.
+*  =================================
+
+*  Find the number of records to write.
+         NREC = ( EL - 1 ) / NOVPRE + 1
+
+*  Loop for each record.
+         K = 0
+         DO  I = 1, NREC
+
+*  Initialise the insertion offset.
+            COFF = 0
+
+*  Loop for each value.
+            DO  J = 1, NOVPRE
+
+*  Increment the array index. 
+               K = K + 1
+
+*  Append data when there are more values to change.  This could be done
+*  more efficiently with a DO WHILE.
+               IF ( K .LE. EL ) THEN
+
+*  Convert the value to a character string.
+                  CALL CHR_<T>TOC( A( K ), CVAL( :NCPVAL ), NC )
+
+*  Remember the last offset, since the spacing is required.
+                  COLD = COFF
+
+*  Write the data values to a buffer.
+                  CALL CHR_APPND( CVAL( :NCPVAL ), BUFFER, COFF )
+
+*  Increment the column offset allowing for the space.
+                  COFF = COLD + NCPVAL + 1
+               END IF
+            END DO
+
+*  Write to output file.
+            CALL FIO_WRITE( FD, BUFFER( :RECL ), STATUS )
+
+*  Initialise the buffer.
+            WRITE( BUFFER, FMT=FORMAT )
+
+         END DO
+
+      ELSE
+
+*  Copy values using a free format.
+*  ================================
+
+*  Initialise the insertion offset and the number of free characters
+*  in the current buffer.
+         COFF = 0
+         CFREE = RECL
+
+*  Loop for each data value.
+         DO  I = 1, EL
+
+*  Convert the value to a character string.
+            CALL CHR_<T>TOC( A( I ), CVAL, NC )
+
+*  Remove leading spaces.
+            CALL CHR_LDBLK( CVAL )
+
+*  Find the length of the string.
+            NCV = CHR_LEN( CVAL )
+
+*  Determine whether there is room to output the value in the current
+*  record.  Remember to allow for the space delimiter.
+            IF ( NCV + 1 .LT. CFREE ) THEN
+
+*  Append the value to the buffer.
+               CALL CHR_APPND( CVAL( :NCV ), BUFFER, COFF )
+               COFF = COFF + 1
+
+*  Decrement the number of free characters in the record.
+               CFREE = CFREE - NCV - 1
+            ELSE
+
+*  Write out the current buffer as it is full.
+               CALL FIO_WRITE( FD, BUFFER( :RECL ), STATUS )
+
+*  Initialise the buffer.
+               WRITE( BUFFER, FMT=FORMAT )
+
+*  Initialise the insertion offset and the number of free characters
+*  in the current buffer.
+               COFF = 0
+               CFREE = RECL
+
+*  Append the value to the buffer.
+               CALL CHR_APPND( CVAL( :NCV ), BUFFER, COFF )
+               COFF = COFF + 1
+
+*  Decrement the number of free characters in the record.
+               CFREE = CFREE - NCV - 1
+            END IF
+         END DO
+
+*  Write out a partially filled buffer.
+         IF ( COFF .GT. 1 ) THEN
+            CALL FIO_WRITE( FD, BUFFER( :RECL ), STATUS )
+         END IF
+
+      END IF
+
+      END
