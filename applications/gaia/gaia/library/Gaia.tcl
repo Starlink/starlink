@@ -84,9 +84,11 @@ Bug reports and suggestions to: ussc@star.rl.ac.uk
 set about_skycat ""
 
 set gaia_usage {
-Usage: gaia ?fitsFile? ?-option value ...?
+Usage: gaia ?NDF/fitsFile? ?-option value ...?
 
 Options:
+ -cat <bool>              - Include ESO/Archive catalog extensions (default).
+ -catalog <name>          - Open a window for the given catalog on startup.
  -colorramp_height <n>    - height of colorramp window (default: 12).
  -component <component>   - NDF component to display (one of: data, variance)
  -debug <bool>            - debug flag: run bg processes in fg.
@@ -100,6 +102,7 @@ Options:
  -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
  -port <port>             - Listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - Use existing skycat process, if available, with Tk send.
+ -rtd <bool>              - Include ESO/VLT Real-Time Features.
  -scrollbars <bool>       - Display scrollbars (not displayed by default).
  -shm_data <bool>         - Put image data in sysV shared memory.
  -shm_header <bool>       - Put image header in sysV shared memory.
@@ -108,6 +111,7 @@ Options:
  -verbose <bool>          - Print diagnostic messages.
  -with_colorramp <bool>   - Display the color bar (default).
  -with_pan_window <bool>  - Display the pan window (default).
+ -with_warp <bool>        - add bindings to move mouse ptr with arrow keys (default: 1).
  -with_zoom_window <bool> - Display the zoom window (default).
  -zoom_factor <n>         - zooming factor (default: 4).
 }
@@ -139,44 +143,13 @@ itcl::class gaia::Gaia {
    destructor {
    }
 
-   #  Remove a window, if this is the last then remove . well.
-   public method remove { kill } {
-
-      #  Remove all top-level widgets associated with this object.
-      #  These are not always cleared up by itk...
-      foreach w [array name itk_component] {
-         if { [winfo exists $itk_component($w)] &&
-              [winfo toplevel $itk_component($w)] != "$w_" } {
-            destroy $itk_component($w)
-         }
-      }
-
-      #  Now destroy the main window.
-      destroy $w_
-      incr clone_cnt -1
-      if { $clone_cnt < 0 || $kill } {
-         destroy .
-      }
-   }
-
    #  Called after the options have been evaluated. Add GAIA menu and
    #  extra items for other menus.
    public method init {} {
       SkyCat::init
 
-      #  Override top-level names.
-      wm title $w_ "GAIA/SkyCat ($clone_)"
-      wm iconname $w_ "GAIA/SkyCat ($clone_)"
-
-      #  Intercept window manager delete and close down correctly
-      #  (as in the Exit option).
-      wm protocol $w_ WM_DELETE_WINDOW [code $this remove 0]
-
       #  Get the clone number for this window.
       set clone_ $itk_option(-number)
-
-      #  Set the application name.
-      tk appname GAIA
 
       #  On openwindows iconwindows are displayed but do not
       #  redirect events, so add a fake deiconify binding.
@@ -208,22 +181,22 @@ itcl::class gaia::Gaia {
    #  in user's .Xdefaults file.
    protected method setXdefaults {} {
       util::setXdefaults
-      rtd::setXdefaults
-      cat::setXdefaults
-      skycat::setXdefaults
+      SkyCat::setXdefaults
       gaia::setXdefaults
    }
-
 
    #  Display a window while the application is starting up, overriden
    #  to remove skycat logo. Put back for plugin?
    protected method make_init_window {} {
-      global ::about_skycat ::skycat_library
-      set w [util::TopLevelWidget $w_.init -center 1]
+      global ::about_skycat ::gaia_library
+      set gaia_logo [image create pixmap -file $gaia_library/gaia_logo.xpm]
+      set w [util::TopLevelWidget $w_.init -center 1 -cursor watch]
       rtd_set_cmap $w
       wm title $w " "
+#      wm overrideredirect $w 1
       wm withdraw $w_
       pack \
+         [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
          [message $w.msg -text $about_skycat \
              -width 6i \
              -justify center \
@@ -634,7 +607,7 @@ itcl::class gaia::Gaia {
 
    #  Blink any displayed images.
    public method make_blink_toolbox {name {cloned 0}} {
-      if { $clone_cnt > 0 } {
+      if { [llength [SkyCat::get_skycat_images] ] > 1 } {
          itk_component add $name {
             StarBlink .\#auto \
                -transient $itk_option(-transient_tools) \
@@ -710,9 +683,14 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Make a new main window, named either the next in sequence
-   #  or using a given name.
-   public method gaia_clone {{clone ""} {file ""} args} {
+   #  Make a new main window, named either the next in sequence or
+   #  using a given name. This version does not use the
+   #  TopLevelWidget::start command as this blocks (stopping the
+   #  possibility of remotely determining when the clone has been
+   #  created. It also provides the ability to specify the file name
+   #  directly (thus replacing the command-line version) and to gain
+   #  access to an existing clone (by number).
+   public method noblock_clone {{clone ""} {file ""} args} {
 
       #  If given the file replaces the one in the command-line args or
       #  is added to the list.
@@ -731,14 +709,14 @@ itcl::class gaia::Gaia {
 
       #  If clone exists just return the name and display the image.
       if { "$clone" != "" } {
-         if { [winfo exists .rtd$clone] } {
+         if { [winfo exists ${prefix_}$clone] } {
             if { $file != "" } {
-               .rtd$clone open $file
+               ${prefix_}$clone open $file
             }
             if { $args != "" } {
                eval configure $args
             }
-            return .rtd$clone
+            return ${prefix_}$clone
          }
          if { $clone > $clone_max_ } {
             set clone_max_ $clone
@@ -748,17 +726,16 @@ itcl::class gaia::Gaia {
          set clone [incr clone_max_]
       }
 
-      incr clone_cnt
+      incr clone_cnt_
 
       #  Do not use TopLevelWidget::start as this blocks with a tkwait
       #  which means we can never detect when the clone is complete.
-      # after 0 [code TopLevelWidget::start Gaia "-file" {} .rtd$clone]
       global argv
-      eval Gaia ::.rtd$clone $argv $args
+      eval gaia::Gaia ::${prefix_}$clone $argv $args
 
       #  Wait until clone window appears.
-      tkwait visibility .rtd$clone
-      return .rtd$clone
+      tkwait visibility ${prefix_}$clone
+      return ${prefix_}$clone
    }
 
    #  "Usual" clone method.
@@ -769,7 +746,7 @@ itcl::class gaia::Gaia {
       set argv $args
       set argc [llength $argv]
       # use the -noop option to avoid reloading the main image (part of $argv list)
-      after 0 [code util::TopLevelWidget::start Gaia "-file"]
+      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file"]
       return $prefix_[expr $clone_+1]
    }
 
@@ -827,42 +804,49 @@ itcl::class gaia::Gaia {
    public proc startGaia {} {
       global ::rtd_library ::skycat_library ::gaia_usage ::tk_strictMotif \
          ::argv0 ::argv ::argc ::env
-      
       if {! [info exists rtd_library]} {
          set rtd_library .
       }
       
+      #  Check for a plugin or binary installation, third option is
+      #  GAIA running in a proper Starlink distribution. Need to
+      #  detect this and act appropriately (environment is established
+      #  by script that creates this application).
+      if { ! [ info exists env(NATIVE_GAIA)] } {
+         set native 0
+      } else {
+         set native 1
+      }
+
       #  Where to look for catalog config file:
       #  use ~/.skycat/skycat.cfg if it exists, since it may contain user's
-      #  preferences, otherwise use $SKYCAT_CONFIG if set, or $CATLIB_CONFIG.
+      #  preferences, otherwise use $SKYCAT_CONFIG if set, or
+      #  $CATLIB_CONFIG (note native implimentation ignores
+      #  SKYCAT_CONFIG as this may be set by CURSA, which is bad).
       set config_file $env(HOME)/.skycat/skycat.cfg
       if {[file exists $config_file]} {
          set env(CATLIB_CONFIG) "file:$config_file"
-      } elseif {[info exists env(SKYCAT_CONFIG)]} {
+      } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
          set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
       }
-
-      #  Check for a plugin or binary installation, third option is
-      #  GAIA running in a proper Starlink distribution. Need to 
-      #  detect this and act appropriately (environment is established 
-      #  by script that creates this application).
-      if { ! [ info exists env(NATIVE_GAIA)] } {
+      if { ! $native } {
          setup_starlink_env [file dirname [info nameofexecutable]]
       }
 
       # set some application options
-      tk appname Gaia
-      set tk_strictMotif 0
+      tk appname GAIA
+      set tk_strictMotif 1
       tk_focusFollowsMouse
-      
+      set tcl_precision 17
+
       # insert some default options
       set argv [linsert $argv 0 -disp_image_icon 1]
       set argc [llength $argv]
-      
+
       # start the application
       util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
    }
-   
+
    #  Set up the STARLINK environment based on the given
    #  directory. PLUGIN SPECIFIC.
    public proc setup_starlink_env {dir} {
@@ -1063,12 +1047,9 @@ itcl::class gaia::Gaia {
 
    # -- Common variables --
 
-   # number of clones of this window
-   common clone_cnt 0
-
    # maximum clone number so far
    common clone_max_ 0
 
-   # prefix to use to create new main windows (.gaia in the PLUGIN).
-   common prefix_ ".rtd"
+   # prefix to use to create new main windows.
+   common prefix_ ".gaia"
 }

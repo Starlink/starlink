@@ -62,11 +62,11 @@
 
 itk::usual StarDemo {}
 
-class gaia::StarDemo {
+itcl::class gaia::StarDemo {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------
@@ -859,7 +859,7 @@ class gaia::StarDemo {
  other.
       }
       show_image_ frame.sdf 90 1
-      set clone [::$itk_option(-gaiamain) clone "" "$demo_dir_/frame.sdf(5:,5:)"]
+      set clone [::$itk_option(-gaiamain) noblock_clone "" "$demo_dir_/frame.sdf(5:,5:)"]
       set cloneimg [[$clone get_image] get_image]
       update
       $clone make_toolbox blink
@@ -1407,10 +1407,10 @@ $catlist
    protected variable running_ 0
 
    #  List of all known demos.
-   protected variable demolist_ \
-      "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
-       blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
-       skycat_ archives_"
+    protected variable demolist_ \
+       "basic_ scroll_ slice_ annotate_ photom_ regions_ patch_ \
+        blink_ grid_ astdefine_ astreference_ astrefine_ astcopy_\
+        skycat_ archives_"
 
    #  Interval to wait while reading text
    protected variable readtime_ 15000

@@ -54,7 +54,7 @@
 
 itk::usual GaiaImageCtrl {}
 
-class gaia::GaiaImageCtrl {
+itcl::class gaia::GaiaImageCtrl {
    inherit skycat::SkyCatCtrl
 
    #  Constructor: create a new instance of this class.
@@ -95,156 +95,6 @@ class gaia::GaiaImageCtrl {
       }
    }
 
-   #  Display the toolbox window (override to use StarCanvasDraw,
-   #  instead of CanvasDraw).
-   protected method make_toolbox {} {
-      itk_component add draw {
-         gaia::StarCanvasDraw $w_.draw \
-            -canvas $canvas_ \
-            -transient 1 \
-            -center 0 \
-            -withdraw 1 \
-            -clipping 0 \
-            -shorthelpwin $itk_option(-shorthelpwin) \
-            -withtoolbox $itk_option(-withtoolbox) \
-            -defaultcursor $itk_option(-cursor) \
-            -show_object_menu $itk_option(-show_object_menu) \
-            -rtdimage $image_ \
-            -lowestitem $imageId_ \
-            -regioncommand $itk_option(-regioncommand) \
-            -ignore_tag $itk_option(-grid_tag)
-      }
-
-      set_drawing_area
-
-      # Clicking on the image or image background deselects other objects.
-      $canvas_ bind $image_ <1> [code $itk_component(draw) deselect_objects]
-   }
-
-   #  Toggle rotation of the image and canvas items. Extended to add
-   #  astrometry grid update.
-   method rotate {bool} {
-      if {$bool != [$image_ rotate]} {
-         RtdImage::rotate $bool
-
-         #  Notify the astrometry grid to re-display itself if
-         #  asked.
-         if { $itk_option(-grid_command) != {} } {
-            eval $itk_option(-grid_command)
-         }
-      }
-   }
-
-   #  Flip or unflip the image and canvas items about the
-   #  x or y axis, as given by $xy. Extended to add astrometry grid
-   #  update.
-   method flip {xy bool} {
-      if {$bool != [$image_ flip $xy]} {
-         RtdImage::flip $xy $bool
-
-         #  Notify the astrometry grid to re-display itself if
-         #  asked.
-         if { $itk_option(-grid_command) != {} } {
-            eval $itk_option(-grid_command)
-         }
-      }
-   }
-
-   #  Arrange to interactively create a spectrum line to display
-   #  a graph of the image values along a given line. Changed to not
-   #  prompt when wanted.
-   method spectrum {{showinfo 1}} {
-      if {[$image_ isclear]} {
-         warning_dialog "No image is currently loaded" $w_
-         return
-      }
-
-      if {[winfo exists $w_.spectrum]} {
-         $w_.spectrum quit
-      }
-
-      if { $showinfo} {
-         set ok [action_dialog \
-                    "Press OK and then drag out a line over the image with button 1" \
-                    $w_]
-      } else {
-         set ok 1
-      }
-      if { $ok } {
-         $itk_component(draw) set_drawing_mode line [code $this make_spectrum]
-      }
-   }
-
-   #  Make a hard copy of the image display, just override to remove 
-   #  ESO references and reduce the page width slightly (not A4?).
-   method print {} {
-        if {[$image_ isclear]} {
-            warning_dialog "No image is currently loaded" $w_
-            return
-        }
-        set object [$image_ object]
-        set file [file tail $itk_option(-file)]
-        set center [$image_ wcscenter]
-        set user [id user]
-        set app [lindex [winfo name .] 0]
-        set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
-        utilReUseWidget RtdImagePrint $w_.print \
-            -image $this \
-            -show_footer 1 \
-            -whole_canvas 0 \
-            -transient 1 \
-            -pagewidth 8.1i \
-            -top_left "GAIA/Skycat\n$object" \
-            -top_right "$file\n$center" \
-            -bot_left "$user" \
-            -bot_right "$date"
-   }
-
-   #  Create a graph to display the image data values along the line
-   #  just created.
-   #  "line_id" is the canvas id of the line.
-   #  Extended to call derived class that also saves slice as an
-   #  image.
-   method make_spectrum {line_id x0 y0 x1 y1} {
-      if {[winfo exists $w_.spectrum]} {
-         $w_.spectrum quit
-      }
-      gaia::GaiaImageSpectrum $w_.spectrum \
-         -x0 [expr int($x0)] \
-         -y0 [expr int($y0)] \
-         -x1 [expr int($x1)] \
-         -y1 [expr int($y1)] \
-         -image $this \
-         -transient 1 \
-         -shorthelpwin $itk_option(-shorthelpwin) \
-         -line_id $line_id
-   }
-
-   #  Methods to deal with the autoscroll when dragging off canvas.
-   method start_autoscan_ {x y} {
-      set movex 0
-      set movey 0
-      if { $y >= [winfo height $canvas_]} {
-         set movey 10
-      } elseif {$y < 0} {
-         set movey -10
-      } elseif { $x >= [winfo width $canvas_]} {
-         set movex 10
-      } elseif {$x < 0} {
-         set movex -10
-      }
-      autoscan_ $movex $movey
-   }
-   method autoscan_ {movex movey} {
-      $canvas_ yview scroll $movey units
-      $canvas_ xview scroll $movex units
-      set after_id_ [after 50 [code $this autoscan_ $movex $movey]]
-   }
-   method cancelrepeat_ {} {
-      after cancel $after_id_
-      set after_id_ {}
-   }
-
    #  Make the panel info subwindow. Override to use GaiaImagePanel,
    #  rather than RtdImagePanel. Also remove the make_grid_item capability.
    protected method make_panel_info {panel} {
@@ -274,8 +124,171 @@ class gaia::GaiaImageCtrl {
       if { $itk_option(-float_panel) } {
          wm protocol $panel WM_DELETE_WINDOW [code $this do_nothing_]
       }
+
+      #  Make sure that the $panel.zoom.dozoom variable is always set
+      #  (if switch off as a option then this isn't the case which
+      #  causes problems with hide_control_panel).
+      global ::$itk_component(panel).zoom.dozoom
+      set $itk_component(panel).zoom.dozoom $itk_option(-dozoom)
    }
    private method do_nothing_ {} {
+   }
+
+   #  Display the toolbox window (override to use StarCanvasDraw,
+   #  instead of CanvasDraw).
+   protected method make_toolbox {} {
+      itk_component add draw {
+         gaia::StarCanvasDraw $w_.draw \
+            -canvas $canvas_ \
+            -transient 1 \
+            -center 0 \
+            -withdraw 1 \
+            -clipping 0 \
+            -shorthelpwin $itk_option(-shorthelpwin) \
+            -withtoolbox $itk_option(-withtoolbox) \
+            -defaultcursor $itk_option(-cursor) \
+            -show_object_menu $itk_option(-show_object_menu) \
+            -rtdimage $image_ \
+            -lowestitem $imageId_ \
+            -regioncommand $itk_option(-regioncommand) \
+            -ignore_tag $itk_option(-grid_tag)
+      }
+
+      set_drawing_area
+
+      # Clicking on the image or image background deselects other objects.
+      $canvas_ bind $image_ <1> [code $itk_component(draw) deselect_objects]
+   }
+
+   #  This method is redefined here to also rescale pixel-width
+   #  objects correctly.
+   public method scale {x y} {
+      RtdImageCtrl::scale $x $y
+      $itk_component(draw) pixel_width_changed
+   }
+
+   #  Toggle rotation of the image and canvas items. Extended to add
+   #  astrometry grid update.
+   public method rotate {bool} {
+      if {$bool != [$image_ rotate]} {
+         RtdImage::rotate $bool
+
+         #  Notify the astrometry grid to re-display itself if
+         #  asked.
+         if { $itk_option(-grid_command) != {} } {
+            eval $itk_option(-grid_command)
+         }
+      }
+   }
+
+   #  Flip or unflip the image and canvas items about the
+   #  x or y axis, as given by $xy. Extended to add astrometry grid
+   #  update.
+   public method flip {xy bool} {
+      if {$bool != [$image_ flip $xy]} {
+         RtdImage::flip $xy $bool
+
+         #  Notify the astrometry grid to re-display itself if
+         #  asked.
+         if { $itk_option(-grid_command) != {} } {
+            eval $itk_option(-grid_command)
+         }
+      }
+   }
+
+   #  Arrange to interactively create a spectrum line to display
+   #  a graph of the image values along a given line. Changed to not
+   #  prompt when wanted.
+   public method spectrum {{showinfo 1}} {
+      if {[$image_ isclear]} {
+         warning_dialog "No image is currently loaded" $w_
+         return
+      }
+
+      if {[winfo exists $w_.spectrum]} {
+         $w_.spectrum quit
+      }
+
+      if { $showinfo} {
+         set ok [action_dialog \
+                    "Press OK and then drag out a line over the image with button 1" \
+                    $w_]
+      } else {
+         set ok 1
+      }
+      if { $ok } {
+         $itk_component(draw) set_drawing_mode line [code $this make_spectrum]
+      }
+   }
+
+   #  Make a hard copy of the image display, just override to remove 
+   #  ESO references and reduce the page width slightly (not A4?).
+   public method print {} {
+        if {[$image_ isclear]} {
+            warning_dialog "No image is currently loaded" $w_
+            return
+        }
+        set object [$image_ object]
+        set file [file tail $itk_option(-file)]
+        set center [$image_ wcscenter]
+        set user [id user]
+        set app [lindex [winfo name .] 0]
+        set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
+        utilReUseWidget RtdImagePrint $w_.print \
+            -image $this \
+            -show_footer 1 \
+            -whole_canvas 0 \
+            -transient 1 \
+            -pagewidth 8.1i \
+            -top_left "GAIA/Skycat\n$object" \
+            -top_right "$file\n$center" \
+            -bot_left "$user" \
+            -bot_right "$date"
+   }
+
+   #  Create a graph to display the image data values along the line
+   #  just created.
+   #  "line_id" is the canvas id of the line.
+   #  Extended to call derived class that also saves slice as an
+   #  image.
+   public method make_spectrum {line_id x0 y0 x1 y1} {
+      if {[winfo exists $w_.spectrum]} {
+         $w_.spectrum quit
+      }
+      gaia::GaiaImageSpectrum $w_.spectrum \
+         -x0 [expr int($x0)] \
+         -y0 [expr int($y0)] \
+         -x1 [expr int($x1)] \
+         -y1 [expr int($y1)] \
+         -image $this \
+         -transient 1 \
+         -shorthelpwin $itk_option(-shorthelpwin) \
+         -line_id $line_id
+   }
+
+   #  Methods to deal with the autoscroll when dragging off canvas.
+   protected method start_autoscan_ {x y} {
+      set movex 0
+      set movey 0
+      if { $y >= [winfo height $canvas_]} {
+         set movey 10
+      } elseif {$y < 0} {
+         set movey -10
+      } elseif { $x >= [winfo width $canvas_]} {
+         set movex 10
+      } elseif {$x < 0} {
+         set movex -10
+      }
+      autoscan_ $movex $movey
+   }
+   protected method autoscan_ {movex movey} {
+      $canvas_ yview scroll $movey units
+      $canvas_ xview scroll $movex units
+      set after_id_ [after 50 [code $this autoscan_ $movex $movey]]
+   }
+   protected method cancelrepeat_ {} {
+      after cancel $after_id_
+      set after_id_ {}
    }
 
    #  Update the toplevel window header and icon name to include the name
@@ -283,37 +296,14 @@ class gaia::GaiaImageCtrl {
    protected method update_title {} {
       set file "[file tail $itk_option(-file)]"
       set w [winfo toplevel $w_]
-      wm title $w "Gaia/Skycat: $file ([$w cget -number])"
+      wm title $w "GAIA::Skycat: $file ([$w cget -number])"
       wm iconname $w $file
-   }
-
-   #  Toggle the visibility of the control panel
-   #  (argument is the name of the checkbutton variable to use).
-   method hide_control_panel {variable} {
-      global ::$variable ::$itk_component(panel).zoom.dozoom
-
-      if {[set $variable]} {
-         #  Hide the panel, turn off the zoom window, keep the canvas width.
-         if { $itk_option(-with_zoom_window) } {
-            set zoom_state_ [set $itk_component(panel).zoom.dozoom]
-            set $itk_component(panel).zoom.dozoom 0
-         }
-         set w [winfo width $canvas_]
-         pack forget $itk_component(panel)
-         $canvas_ config -width $w
-      } else {
-         #  Show the panel, restore the zoom window.
-         if { $itk_option(-with_zoom_window) } {
-            set $itk_component(panel).zoom.dozoom $zoom_state_
-         }
-         pack $itk_component(panel) -side top -fill x -before $w_.imagef
-      }
    }
 
    #  Add a generated image to display the colors in the colormap
    #  (this is packed differently from the main method so the colour
    #  map remains visible more often).
-   method make_colorramp {} {
+   public method make_colorramp {} {
       itk_component add colorramp {
          rtd::RtdImageColorRamp $w_.colorramp \
             -height $itk_option(-colorramp_height) \
@@ -323,46 +313,9 @@ class gaia::GaiaImageCtrl {
          -before $itk_component(imagef)
    }
 
-   # This method is redefined here to update the scale display.
-   # resize the image and the canvas graphics by the given integer factors
-   # and to add the ability to rescale pixel-width objects correctly.
-   # (1 is no scale, -2 = 50%, 2 = 200% etc...)
-   method scale {x y} {
-      RtdImage::scale $x $y
-      $itk_component(draw) pixel_width_changed
-      if {[info exists itk_component(zoom)]} {
-         $itk_component(zoom) scale
-      }
-      $itk_component(info).trans update_trans
-   }
-
    #  This method is called by the image code whenever a new image is loaded.
-   method new_image_cmd {} {
-
-      rtd::RtdImage::new_image_cmd
-      if {[info exists itk_component(zoom)]} {
-         $itk_component(zoom) zoom
-         $itk_component(zoom) scale
-      }
-      if {! [$image_ isclear]} {
-         $itk_component(info) config -state normal
-      }
-      $itk_component(info) updateValues
-      if {[winfo exists $w_.cut]} {
-         $w_.cut update_graph
-      }
-
-      if {[winfo exists $w_.spectrum]} {
-         destroy $w_.spectrum
-      }
-
-      if {[winfo exists $w_.draw]} {
-         $w_.draw set_menu_state normal
-      }
-
-      if {[winfo exists $w_.wcs_info]} {
-         $w_.wcs_info configure -values [$image_ wcsset]
-      }
+   public method new_image_cmd {} {
+      skycat::SkyCatCtrl::new_image_cmd
 
       #  Remove old temporary file, if not already done.
       maybe_delete_
@@ -375,7 +328,7 @@ class gaia::GaiaImageCtrl {
    #  Open and load a new image file via file name dialog. Added the
    #  ability to deal with a list of possible file extensions and a
    #  possible image slice to this method.
-   method open {{dir "."} {pattern "*.*"}} {
+   public method open {{dir "."} {pattern "*.*"}} {
 
       set file [get_file_ $dir $pattern $itk_option(-file_types)]
 
@@ -403,10 +356,23 @@ class gaia::GaiaImageCtrl {
       }
    }
 
+   
+   #  Reload the image file, if there is one
+   #  (redefined from parent class, since we use different mmap flags here
+   #  that cause the inherited version to not work).
+   public method reopen {} {
+       set file [$image_ cget -file]
+       if {"$file" != ""} {
+	   $image_ configure -file $file
+       } else {
+	   $image_ update
+       }
+   }
+
    #  Save the current image to a file in FITS format chosen from a
    #  file name dialog (added file patterns and .fit as default
    #  extension and update to temporary status).
-   method save_as {{dir "."} {pattern "*.*"}} {
+   public method save_as {{dir "."} {pattern "*.*"}} {
       if {[$image_ isclear]} {
          warning_dialog "No image is currently loaded" $w_
          return
@@ -460,7 +426,7 @@ class gaia::GaiaImageCtrl {
    }
 
    #  Set the cut levels.
-   method set_cut_levels {} {
+   public method set_cut_levels {} {
       if {[$image_ isclear]} {
          warning_dialog "No image is currently loaded" $w_
          return
@@ -475,7 +441,7 @@ class gaia::GaiaImageCtrl {
    #  Clear the current image display and remove an windows that
    #  access it (extend parent class version to also deal with 
    #  temporary images).
-   method clear {} {
+   public method clear {} {
 
       #  If this window this previously displayed a temporary image
       #  then delete it.
@@ -483,12 +449,12 @@ class gaia::GaiaImageCtrl {
       delete_temporary_
 
       #  Really clear.
-      rtd::RtdImageCtrl::clear
+      rtd::SkyCatCtrl::clear
    }
 
    #  Load a FITS file (internal version: use -file option/public
    #  variable), modified to deal with image slices.
-   method load_fits_ {} {
+   public method load_fits_ {} {
       #  Deal with any slice specification.
       set image $itk_option(-file)
       set i1 [string last {(} $image]
@@ -517,12 +483,12 @@ class gaia::GaiaImageCtrl {
          set w [$image_ dispwidth]
          set h [$image_ dispheight]
          set_scrollregion 0 0 $w $h
-         update_title
       } else {
          error_dialog "'$itk_option(-file)' does not exist" $w_
          set file ""
          clear
       }
+      update_title
    }
 
    #  Check if any other instance of this class is displaying the
@@ -578,7 +544,7 @@ class gaia::GaiaImageCtrl {
    }
 
    #  Display a popup window with information about this application,
-   #  override to remove SkyCat splash logo (must merge GAIA sometime!).
+   #  override to remove SkyCat splash logo.
    public method about {} {
       global ::about_skycat
       DialogWidget $w_.about \
@@ -591,7 +557,7 @@ class gaia::GaiaImageCtrl {
    #  Center the image in the canvas window. Override to switch off
    #  when attempting to load a new image (preserves scroll position,
    #  which is often what is really required).
-   method center {} {
+   public method center {} {
       if { $center_ok_ } {
          RtdImage::center
       }

@@ -27,6 +27,8 @@
 #  History:
 #     21-NOV-1996 (PDRAPER):
 #        Original version
+#     12-MAR-1999 (PDRAPER):
+#        Updated to work with GAIA plugin.
 #     {enter_changes_here}
 
 #-
@@ -47,20 +49,6 @@ lappend auto_path $gaia_library $skycat_library $rtd_library
 if {[info exists env(BLT_LIBRARY)]} {
     lappend auto_path $env(BLT_LIBRARY)
 }
-
-#  Add any required namespaces to the import list.
-import add ::blt
-import add ::rtd
-namespace ::gaia {}
-import add ::gaia
-namespace ::iwidgets {}
-import add ::iwidgets
-
-#  Set interface for strict Motif compliance.
-set tk_strictMotif 1
-
-#  Decent precision is nice.
-set tcl_precision 17
 
 #  Check any command-line arguments that we've been passed. The first
 #  one is the name of the image and any others are configuration
@@ -112,21 +100,11 @@ lappend argv "-file_types"
 lappend argv $file_types
 incr argc 2
 
-#  Where to look for catalog config file: use ~/.skycat/skycat.cfg if
-# it exists, since it may contain user's preferences, otherwise use
-# $CATLIB_CONFIG (do not use SKYCAT_CONFIG, this also set by
-# CURSA).
-set config_file $env(HOME)/.skycat/skycat.cfg
-if {[file exists $config_file]} {
-   set env(CATLIB_CONFIG) "file:$config_file"
-} 
-
-#  Start up the main window.
-#eval Gaia .rtd0 $argv
-
-#  This is a native GAIA installation when started by this route.
+#  This is a native GAIA installation when started by this route
+#  (i.e. not the plugin).
 set env(NATIVE_GAIA) 1
 
+#  Start up the main window.
 gaia::Gaia::startGaia
 
 #----------------------------------------------
