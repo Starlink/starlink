@@ -83,6 +83,8 @@
 *     5-OCT-1998 (DSB):
 *        Fixed bug which caused NDF AXIS structure to be erroneously
 *        deleted if the FITS header has no WCS information of any sort.
+*     9-DEC-1998 (DSB):
+*        Modified to include references to the FITS-IRAF encoding.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,7 +112,7 @@
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of non-native AST encodings.
-      PARAMETER ( DEFNCD = 2 )
+      PARAMETER ( DEFNCD = 3 )
 
 *  External References:
       LOGICAL FTS1_WCSDF
@@ -139,7 +141,7 @@
       INTEGER TMPF               ! Template 2D Frame
 
 *  Store names of non-native AST encodings to use.
-      DATA ASTCOD / 'DSS', 'FITS-WCS' /
+      DATA ASTCOD / 'DSS', 'FITS-IRAF', 'FITS-WCS' /
 *.
 
 *  Check inherited global status.
@@ -152,7 +154,7 @@
 *  AST FrameSet is the prefered origin for Axis information. Note,
 *  we look for cards starting with "BEGAST" (instead of using the ENCODING
 *  attribute), since since a header with no WCS information will have a 
-*  default ENCOIDNG value of NATIVE. In these cases we do NOT want to
+*  default ENCODING value of NATIVE. In these cases we do NOT want to
 *  delete the AXIS structures!
       CALL AST_CLEAR( FC, 'CARD', STATUS )
       IF( AST_FINDFITS( FC, 'BEGAST%0f', CARD, .FALSE., STATUS ) ) THEN
@@ -160,7 +162,7 @@
       END IF
 
 *  First, read a FrameSet from the supplied FitsChan. If the FitsChan
-*  contains more than encoding we need to be careful about out choice
+*  contains more than one encoding we need to be careful about out choice
 *  of encoding because the available encodings may be inconsistent (eg
 *  if foreign software has modified one encoding without modifying all
 *  the others.
@@ -280,7 +282,7 @@
 *  If we have managed to read a FrameSet from the FitsChan, insert it into
 *  the NDFs FrameSet. The base Frames of the two FrameSets are assume to
 *  be equivalent.
-*=========================================================================
+*  =========================================================================
       IF ( OBJ .NE. AST__NULL ) THEN
 
 *  Get the dimensionality of the NDF.
