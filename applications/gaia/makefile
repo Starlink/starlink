@@ -541,7 +541,7 @@ LICENCE = COPYING README TODO $(PACK_NAME)_CONDITIONS
 
 GAIA_LIB_FILES =  \
    skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
-   gaiaremote.sh adamMessageRelay displaycat
+   gaiaremote.sh adamMessageRelay displaycat gaiacut zoomcutandflip
 
 GAIA_BIN_FILES = \
  gaia_swish gaia_stcl gaiaMon gaiaMon.ifc ardstat.ifc autocrop.ifc \
