@@ -160,7 +160,7 @@
       END IF
 
 *  Is data defined?
-      CALL ADI_CTHERE( AID, 'Values', THERE, STATUS )
+      CALL ADI_THERE( AID, 'Values', THERE, STATUS )
       IF ( THERE ) THEN
 
 *    Count total number of elements
@@ -183,8 +183,8 @@
           CALL FTPPRE( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         ELSE IF ( FKEY .EQ. 'D' ) THEN
           CALL FTPPRD( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
-        ELSE IF ( FKEY .EQ. 'L' ) THEN
-          CALL FTPPRL( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
+c        ELSE IF ( FKEY .EQ. 'L' ) THEN
+c          CALL FTPPRL( LUN, 1, 1, NELM, %VAL(DPTR), STATUS )
         END IF
 
 *    Unmap
