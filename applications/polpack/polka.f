@@ -83,7 +83,7 @@
 *     descriptions below are the initial default values.
 
 *  Usage:
-*     polka in out_s [skyframes]
+*     polka in out_s 
 
 *  ADAM Parameters:
 *     BADCOL = LITERAL (Update)
@@ -153,11 +153,6 @@
 *        output (usually the screen). If a null (!) value is supplied, then 
 *        no log file will be created. Note, this parameter cannot be set 
 *        from the GUI's "Options" menu. [!]
-*     MODE = LITERAL (Read)
-*        The type of polarization being measured; Linear or Circular. This 
-*        parameter is only accessed if an output cube holding Stokes
-*        parameters is being created (i.e. if OUT_S is not given a null (!) 
-*        value). [Linear]
 *     NEWCOLMAP = _LOGICAL (Read)
 *        If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
 *        its own private X colour map. Otherwise it will share the standard 
@@ -211,6 +206,11 @@
 *        The percentiles that define the scaling limits for the displayed
 *        images. For example, [25,75] would scale between the quartile 
 *        values. [5,95]
+*     PMODE = LITERAL (Read)
+*        The type of polarization being measured; Linear or Circular. This 
+*        parameter is only accessed if an output cube holding Stokes
+*        parameters is being created (i.e. if OUT_S is not given a null (!) 
+*        value). [Linear]
 *     POL = _LOGICAL (Read)
 *        Indicates the nature of the input Frames. Input frames containing 
 *        non-polarimeter data may be aligned and sky subtracted using POLKA 
@@ -285,7 +285,6 @@
 *           the new image just fills the image display area in at least one 
 *           dimension. 
 *        [ZOOMED]
-*
 *     XHAIR = _LOGICAL (Update)
 *        If a TRUE value is supplied, then a cross hair will be used
 *        instead of a pointer while the mouse is over the image display
@@ -352,6 +351,8 @@
 *     22-JUN-1998 (DSB):
 *        Only save final value of MODE if polarimetric data has been
 *        processed.
+*     3-JUL-1998 (DSB):
+*        Change parameter MODE to PMODE. 
 *     {enter_changes_here}
 
 *  Bugs:
@@ -515,8 +516,8 @@
             END IF
 
 *  See if linear or circular polarization is being measured.
-            CALL PAR_CHOIC( 'MODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
-     :                      MODE, STATUS )
+            CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', 
+     :                      .TRUE., MODE, STATUS )
 
 *  Check that all of the input object frames have POLPACK extensions 
 *  containing WPLATE values. Also check the image is 2d.

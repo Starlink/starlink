@@ -15,6 +15,8 @@
 #  History:
 #     18-APR-1997 (DSB):
 #     	 Original version.
+#     3-JUL-1998 (DSB):
+#        Change MODE to PMODE. Take POSITION away from SKYFRAMES.
 #     {enter_changes_here}
 
 #-
@@ -114,16 +116,6 @@ interface POLKA
       helpkey  '*'
    endparameter
 
-   parameter MODE
-      type     LITERAL
-      access   UPDATE
-      vpath    'CURRENT,DEFAULT'
-      ppath    'CURRENT,DEFAULT'
-      default  'Linear'
-      prompt   'Type of polarisation being measured'
-      helpkey  '*'
-   endparameter
-
    parameter NEWCOLMAP
       type     _LOGICAL
       access   READ
@@ -193,6 +185,16 @@ interface POLKA
       helpkey  '*'
    endparameter
 
+   parameter PMODE
+      type     LITERAL
+      access   UPDATE
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  'Linear'
+      prompt   'Type of polarisation being measured'
+      helpkey  '*'
+   endparameter
+
    parameter POL
       type     _LOGICAL
       access   READ
@@ -234,7 +236,6 @@ interface POLKA
    endparameter
 
    parameter SKYFRAMES
-      position 3
       type     NDF
       access   READ
       vpath    'DEFAULT '
