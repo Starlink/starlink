@@ -85,6 +85,22 @@ emsErrno( token, errval )
  CODE:
   emsErrno(token, errval);
 
+# Note that we return the answer
+
+char *
+emsExpnd( msg, status )
+  char * msg
+  int status
+ PREINIT:
+  char result[EMS__SZTOK];
+  int actual_length;
+ CODE:
+  RETVAL = result;
+  emsExpnd(msg, RETVAL, EMS__SZTOK, &actual_length, &status);
+ OUTPUT:
+  RETVAL
+
+
 void
 emsFacer( token, facerr )
   char * token
@@ -109,8 +125,9 @@ emsFmtc(token, format, value)
  PREINIT:
   int maxchar;
  CODE:
-  maxchar = EMS__SZTOK;
-  emsFmtc(token, format, value, maxchar);
+  Perl_croak("emsFmtc no longer supported. Use sprintf instead\n");
+  /* maxchar = EMS__SZTOK;
+     emsFmtc(token, format, value, maxchar);*/
 
 void
 emsFmtd(token, format, value)
@@ -120,7 +137,8 @@ emsFmtd(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmtd = 2
  CODE:
-  emsFmtd(token, format, value);
+  Perl_croak("emsFmtd no longer supported. Use sprintf instead\n");
+  /* emsFmtd(token, format, value);*/
 
 void
 emsFmti(token, format, value)
@@ -130,7 +148,8 @@ emsFmti(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmti = 2
  CODE:
-  emsFmti(token, format, value);
+  Perl_croak("emsFmti no longer supported. Use sprintf instead\n");
+  /* emsFmti(token, format, value); */
 
 void
 emsFmtl(token, format, value)
@@ -140,7 +159,8 @@ emsFmtl(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmtl= 2
  CODE:
-  emsFmtl(token, format, value);
+  Perl_croak("emsFmtl no longer supported. Use sprintf instead\n");
+  /* emsFmtl(token, format, value);*/
 
 void
 emsFmtr(token, format, value)
@@ -150,7 +170,8 @@ emsFmtr(token, format, value)
  ALIAS:
   Starlink::EMS::ems_fmtr = 2
  CODE:
-  emsFmtr(token, format, value);
+  Perl_croak("emsFmtr no longer supported. Use sprintf instead\n");
+  /* emsFmtr(token, format, value); */
 
 
 # Note that we return ems_level rather than use a variable
@@ -228,11 +249,8 @@ emsSetc(token, value)
   char * value
  ALIAS:
   Starlink::EMS::ems_setc = 2
- PREINIT:
-  int maxchar;
  CODE:
-  maxchar = EMS__SZTOK;
-  emsSetc(token, value, maxchar);
+  emsSetc(token, value);
 
 void
 emsSetd(token, value)
@@ -292,6 +310,16 @@ emsSyser( token, systat )
   Starlink::EMS::ems_syser = 2
  CODE:
   emsSyser(token, systat);
+
+void
+emsTune( key, value, status )
+  char * key
+  int value
+  int &status
+ ALIAS:
+  Starlink::EMS::ems_tune = 2
+ OUTPUT:
+  status
 
 
 # Get facility error information

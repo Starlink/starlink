@@ -1,5 +1,7 @@
 #!/usr/local/bin/perl -w
 
+# Basic test of tokens
+
 use strict;
 use Test;
 BEGIN { plan tests => 4 }
@@ -14,14 +16,14 @@ ok($status, $ok);
 
 # Copy some values into some tokens and retrieve them
 ems_setl('LOG', 1);
-my $mstr = ems_mload("","^LOG", $status);
+my $mstr = emsExpnd("^LOG", $status);
 
 ok($mstr, 'TRUE');
 
-ems_fmtr('FLT', 'F5.2', 3.141592654);
-$mstr = ems_mload("",'^FLT', $status);
+ems_setc('FLT', '3.141592654');
+$mstr = emsExpnd('^FLT', $status);
 
-ok($mstr, ' 3.14');
+ok($mstr, '3.141592654');
 
 # End ems
 ems_end( $status );

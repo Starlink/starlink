@@ -1,7 +1,7 @@
 #!perl
 use strict;
 use Test;
-BEGIN { plan tests => 20 }
+BEGIN { plan tests => 15 }
 use Starlink::EMS qw/:Ems/;
 
 # Test EMS -- essentially a combination of the msg.t and err.t
@@ -39,36 +39,16 @@ my %tokans = (
 	     );
 
 foreach my $tok (keys %tokens) {
+  print "# emsSet$tok('$tok', '$tokens{$tok}');\n";
   eval "emsSet$tok('$tok', '$tokens{$tok}');";
   die "Error processing emsSet$tok : $@" if $@;
-  my $opstr = emsMload($tok, "^$tok", $status);
+  my $opstr = emsExpnd("^$tok", $status);
   ok($opstr, $tokans{$tok});
 }
 
-# Now try the formatted equivalent
-# Specify yhre format
-my %tokfmt = (
-	      c => "a10",
-	      d => 'F4.2',   # 3.141592654 => 3.14
-              i => 'I5.4',
-	      r => 'E10.3E3',
-	      l => 'I3',
-	     );
+# This test used to make sure that the formatting worked
+# but now you have to use sprintf as an arg to msgSetx
 
-%tokans = (
-	   c => '     hello',
-	   d => '3.14',
-	   i => '-0052',
-	   r => '0.163E+003',
-	   l => '  1',
-	  );
-
-foreach my $tok (keys %tokens) {
-  eval "emsFmt$tok('$tok', '$tokfmt{$tok}','$tokens{$tok}');";
-  die "Error processing emsFmt$tok : $@" if $@;
-  my $opstr = emsMload($tok, "^$tok", $status);
-  ok($opstr, $tokans{$tok});
-}
 
 #--------------
 #  Test error reporting

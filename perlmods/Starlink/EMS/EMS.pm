@@ -17,20 +17,20 @@ require DynaLoader;
 %EXPORT_TAGS = (
 		'ems' => [qw/
 			  ems_annul ems_begin ems_eload ems_end
-			  ems_errno ems_facer
-			  ems_fmtc ems_fmtd ems_fmti ems_fmtl ems_fmtr
+			  ems_errno ems_facer ems_expnd
 			  ems_level ems_mark ems_mload
 			  ems_renew ems_rep ems_rlse
 			  ems_setc ems_setd ems_seti ems_setl ems_setr
-			  ems_stat ems_syser
+			  ems_stat ems_syser ems_tune
 			  get_facility_error
 			  /],
 		'Ems' => [qw/
-			  emsAnnul emsBegin emsEload emsEnd
+			  emsAnnul emsBegin emsEload emsEnd emsExpnd
 			  emsErrno emsFacer emsFmtc emsFmtd emsFmti
 			  emsFmtl emsFmtr emsLevel emsMark emsMload
 			  emsRenew emsRep emsRlse emsSetc emsSetd
 			  emsSeti emsSetl emsSetr emsStat emsSyser
+			  emsTune
 			  /],
 		'emserr' => [qw/
 			     EMS__NOMSG
@@ -69,17 +69,17 @@ Starlink::EMS - Perl extension for Starlink EMS library
 
   $ok = SAI__OK;
 
-  ems_begin($status = $ok);
+  emsBegin($status = $ok);
 
   $status = SAI__ERROR;
 
-  ems_setc('TOKEN', $string);
-  ems_rep($par, $error, $status);
+  emsSetc('TOKEN', $string);
+  emsRep($par, $error, $status);
 
-  ($par, $str, $status) = ems_eload;
-  $level = ems_level;
+  ($par, $str, $status) = emsEload;
+  $level = emsLevel;
 
-  ems_end( $status );
+  emsEnd( $status );
 
 
   ems1_get_facility_error($status, $facility, $ident, $text);
@@ -96,13 +96,18 @@ The ems function can be imported using the 'ems' tag:
 
  use Starlink::EMS qw( :ems );
 
+for the Fortran-style names or 'Ems' for the C-style names:
+
+ use Starlink::EMS qw/ :Ems /;
+
 The following routines are available:
 
-ems_annul(), ems_begin(), ems_eload(), ems_end(), ems_errno(),
-ems_facer(), ems_fmtc(), ems_fmtd(), ems_fmti(), ems_fmtl(), ems_fmtr()
-ems_level(), ems_mark(), ems_mload(), ems_renew(), ems_rep(), ems_rlse(),
-ems_setc(), ems_setd(), ems_seti(), ems_setl(), ems_setr(), ems_stat(),
-ems_syser().
+emsAnnul(), emsBegin(), emsEload(), emsEnd(), emsErrno(), emsExpnd(),
+emsFacer(), emsLevel(), emsMark(), emsRenew(), emsRep(),
+emsRlse(), emsSetc(), emsSetd(), emsSeti(), emsSetl(), emsSetr(),
+emsStat(), emsSyser(), emsTune().
+
+The C-style names are preferred in new code.
 
 These routines are explained in SSN/4. One difference between the
 perl implementation and the C/Fortran version described in SSN/4
@@ -110,9 +115,9 @@ concerned return values. Routines with arguments that contain pure return
 values (as opposed to modifications of an existing variable) return the
 values as a perl list. The routines are:
 
-  ($par, $str, $status) = ems_load();
-  $level = ems_level();
-  $string = ems_mload($par, $str, $status);
+  ($par, $str, $status) = emsLoad();
+  $level = emsLevel();
+  $string = emsExpnd( $str, $status );
 
 Use the ERR_ calls (available from the C<NDF> perl module) for a
 higher level interface to the error message system.
@@ -132,6 +137,14 @@ implementation, the other provides the values as a perl array:
   ems1_get_facility_error($status, $facility, $ident, $text);
   ($facility, $ident, $text) = get_facility_error($status);
 
+=head1 DEPRECATED ROUTINES
+
+As of version 2.0 of EMS the C<emsMload> function has been
+deprecated. It is still available in this module although
+new code should use C<emsExpnd> rather than C<emsMload>.
+
+  $string = emsMload( "", $str, $status );
+  $string = emsExpnd( $str, $status );
 
 =head1 CONSTANTS
 

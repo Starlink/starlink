@@ -4,9 +4,6 @@ use ExtUtils::MakeMaker;
 
 use Config;
 
-# Location of Fortran libraries
-use ExtUtils::F77;
-
 # For location of Starlink libraries and incs
 eval "use Starlink::Config;";
 if ($@) {
@@ -22,12 +19,9 @@ $emslibs = qx/ems_link/;
 
 die "No EMS libraries were found.\n This may imply that the
 ems_link command is not in your path." if $emslibs !~ /./;
- 
+
 # Libs requires the location of the Starlink libraries 
 $libs = "-L$StarConfig{Star_Lib} $emslibs ";
-
-# Fortran libs - required for some of the routines
-$libs .= ExtUtils::F77->runtime;
 
 # Write the makefile....
 WriteMakefile(
