@@ -2,7 +2,6 @@
  *
  *  adix_bb_init        - Initialise BB control structure
  *  adix_bb_new         - Allocate and initialise a new BB
- *  adix_bb_alloc       - Allocate a unit from a basic block
  *  adix_bb_nalloc      - Allocate N units from a basic block
  *  adix_bb_free	- Free a unit in a basic block
  */
@@ -128,9 +127,7 @@ void adix_bb_init( ADIblockCtrlPtr ctrl, int code, size_t size,
       ctrl->cdef->selfid = clsid;
       }
     else
-      {
       ctrl->cdef = NULL;
-      }
 
     ctrl->size = size;
     ctrl->nunit = nunit;
@@ -156,6 +153,8 @@ ADIblockID adix_bb_new( ADIblockCtrl *ctrl, int nunit, ADIstatus status )
       size_t	bbytes;			/* Number of bytes in block */
 
       newb->ctrl = ctrl;
+      newb->cdef = ctrl->cdef;
+      newb->size = ctrl->size;
       newb->nunit = _MAX(nunit,ctrl->nunit);
       newb->nfree = newb->nunit;
 
@@ -195,8 +194,7 @@ ADIblockID adix_bb_new( ADIblockCtrl *ctrl, int nunit, ADIstatus status )
   }
 
 
-ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIlogical scalar,
-                       int nval, ADIstatus status )
+ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, int nval, ADIstatus status )
   {
   ADIblockPtr      	bptr;
   ADIlogical            found = ADI__false;
@@ -286,7 +284,7 @@ ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIlogical scalar,
     obno = i8*CHAR_BIT;
 
     for( j8=0; j8<(nval/CHAR_BIT);     /* Loop over whole used slots */
-         i8++, j8++ )
+	 i8++, j8++ )
       bptr->used[j8] = 0xFF;
 
     if ( nval % CHAR_BIT )             /* Number allocated not divisible */
@@ -302,20 +300,9 @@ ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIlogical scalar,
 
   bptr->nfree -= nval;                  /* Decrease free count */
 
-  _FORM_ID(newid,iblk,obno);            /* Form identifier */
-
-  if ( (ctrl->clas > KT_CODE_han)       /* Non-kernel scalar object? */
-                      && scalar )
-    newid = adix_newhan( newid,
-	  ADI__false, status );
-
+/* Form identifier and return it */
+  _FORM_ID(newid,iblk,obno);
   return newid;
-  }
-
-
-ADIobj adix_bb_alloc( ADIblockCtrl *ctrl, ADIstatus status )
-  {
-  return adix_bb_nalloc( ctrl, ADI__true, 1, status );
   }
 
 

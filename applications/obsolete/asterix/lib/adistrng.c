@@ -14,16 +14,15 @@
  */
 #include <string.h>                     /* String stuff from RTL */
 #include <ctype.h>
-#include <stdio.h>
 
 #include "asterix.h"                    /* Asterix definitions */
 
 #include "aditypes.h"
 #include "adikrnl.h"                    /* Internal ADI kernel */
 #include "adimem.h"                     /* Allocation routines */
-#include "adistrng.h"                   /* Prototypes for this sub-package */
-
+#include "adicface.h"
 #include "adierror.h"                   /* ADI error handling */
+#include "adistrng.h"                   /* Prototypes for this sub-package */
 
 
 #ifndef __MSDOS__
@@ -147,7 +146,7 @@ void strx_free( char *ptr, ADIstatus status )
       }
     }
   else
-    printf( "Not found\n" );
+    adic_setecs( ADI__FATAL, "String memory segment not found", status );
   }
 
 
@@ -162,23 +161,6 @@ void strx_init( ADIstatus status )
   adix_def_destruc( UT_ALLOC_c,         /* Install the string destructor */
 		 strx_dstrc,
 		 status );
-  }
-
-
-void strx_putnc( char *str, int nc )
-  {
-  int i;
-  char *lstr = str;
-
-  for( i=0; i<nc; i++ )
-    putchar( *lstr++ );
-  }
-
-void strx_put( ADIobj str )
-  {
-  ADIsegmentPtr         sptr = _seg_data(str);
-
-  strx_putnc( sptr->data, sptr->len );
   }
 
 

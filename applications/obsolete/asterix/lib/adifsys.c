@@ -536,21 +536,15 @@ void adix_locrcb( ADIobj rid, char *name, int nlen,
 
 void ADIfsysInit( ADIstatus status )
   {
-  static struct
-    {
-    char      *string;
-    ADIobj    *obj;
-    }
-  stable[] =
-    {
-    {"Around",        &DnameAround},
-    {"After",         &DnameAfter},
-    {"Before",        &DnameBefore},
-    {"Primary",       &DnamePrimary},
-    {"NewLink",       &DnameNewLink},
-    {"SetLink",       &DnameSetLink},
-    {"UnLink",        &DnameUnLink},
-    {NULL,NULL}};
+  DEFINE_CSTR_TABLE(stringtable)
+    DEFINE_CSTR_TABLE_ENTRY(DnameAround, "Around"),
+    DEFINE_CSTR_TABLE_ENTRY(DnameAfter,	 "After"),
+    DEFINE_CSTR_TABLE_ENTRY(DnameBefore, "Before"),
+    DEFINE_CSTR_TABLE_ENTRY(DnamePrimary,"Primary"),
+    DEFINE_CSTR_TABLE_ENTRY(DnameNewLink,"NewLink"),
+    DEFINE_CSTR_TABLE_ENTRY(DnameSetLink,"SetLink"),
+    DEFINE_CSTR_TABLE_ENTRY(DnameUnLink, "UnLink"),
+  END_CSTR_TABLE;
 
   static struct
     {
@@ -577,16 +571,12 @@ void ADIfsysInit( ADIstatus status )
     {"UnLink(ADIbase,ADIbase)",        (ADIcMethodCB) adix_base_UnLink},
     {NULL,NULL}};
 
-  int           i;
+  int i;
 
   _chk_stat;
 
-/* Put some strings in common table. These are referenced */
-/* table. These are referenced the code */
-  for( i=0; stable[i].string; i++ )
-    *(stable[i].obj) =
-      adix_cmnC( stable[i].string,
-		 status );
+/* Add our common strings to the system */
+  ADIkrnlAddCommonStrings( stringtable, status );
 
   adic_defcls( "FileRepresentation",
 	       "", "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN",

@@ -7,6 +7,7 @@
 #include "aditable.h"                   /* Prototypes for this sub-package */
 #include "adilist.h"                    /* List manipulations */
 #include "adistrng.h"                   /* String manipulations */
+#include "adiparse.h"
 #include "adicface.h"                   /* C interface */
 
 #include "adierror.h"                   /* ADI error handling */
@@ -15,7 +16,7 @@
 ADIobj UT_ALLOC_tbl = ADI__nullid;
 
 
-void tblx_prnt( ADIobj tbl, ADIstatus status )
+void tblx_prnt( ADIobj stream, ADIobj tbl, ADIstatus status )
   {
   ADIobj        *heads = _tbl_hash(tbl);
   ADIinteger    i;
@@ -24,9 +25,7 @@ void tblx_prnt( ADIobj tbl, ADIstatus status )
 
   for( i=_tbl_htsize(tbl); i>0; i--, heads++ )
     if ( ! _null_q(*heads) )
-      {
-      adic_print( *heads, status );
-      }
+      adix_print( stream, *heads, ADI__true, status );
   }
 
 
@@ -34,8 +33,7 @@ void tblx_init( ADIstatus status )
   {
   _chk_stat;                            /* Check status on entry */
 
-  adic_defcls( "_HashTable", "",
-               "htsize,flags,head",
+  adic_defcls( "_HashTable", "", "htsize,flags,head",
                &UT_ALLOC_tbl, status );
 
   adix_def_prnt( UT_ALLOC_tbl, tblx_prnt, status );
@@ -116,9 +114,8 @@ ADIobj tblx_new( int size,
   if ( !_ok(status) )			/* Check status */
     return ADI__nullid;
 
-  table = adix_cls_alloc(               /* Create a new table */
-              _cdef_ctrl(UT_ALLOC_tbl),
-                        0, 0, status );
+/* Create new table object */
+  table = adix_cls_alloc( _cdef_data(UT_ALLOC_tbl), status );
 
   if ( _ok(status) )			/* Check status */
     {

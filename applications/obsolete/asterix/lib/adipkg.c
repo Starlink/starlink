@@ -29,7 +29,7 @@ char		*ADI_G_ldpath = NULL;
 size_t          ADI_G_ldpath_len = 0;
 ADIlogical	ADI_G_getenv = ADI__false;
 
-ADIobj adix_prs_defcls( ADIstreamPtr pstream, ADIstatus status )
+ADIobj adix_prs_defcls( ADIobj pstream, ADIstatus status )
   {
   int		oflags;			/* Old stream flags */
 
@@ -38,23 +38,23 @@ ADIobj adix_prs_defcls( ADIstreamPtr pstream, ADIstatus status )
 /* Tell parser that end-of-lines can be ignored */
   oflags = ADIsetStreamAttr( pstream, ADI_STREAM__EOLISP, status );
 
-  ADInextTokenFromStream( pstream, status );
+  ADInextToken( pstream, status );
 
 /* Get new class name from stream */
   cargs[0] = prsx_symname( pstream, status );
-  ADInextTokenFromStream( pstream, status );
+  ADInextToken( pstream, status );
 
 /* Parse superclass list. This updates both the superclass list and the */
 /* members list (due to inherited members) */
-  if ( pstream->ctok.t == TOK__SYM )
+  if ( ADIcurrentToken(pstream) == TOK__SYM )
     ADIparseClassSupers( pstream, cargs+1, cargs+2, status );
 
 /* Parse the class member list */
-  if ( ADImatchTokenFromStream( pstream, TOK__LBRACE, status ) ) {
+  if ( ADIifMatchToken( pstream, TOK__LBRACE, status ) ) {
     ADIparseClassMembers( pstream, cargs+2, status );
 
-    if ( pstream->ctok.t == TOK__RBRACE )
-      ADInextTokenFromStream( pstream, status );
+    if ( ADIcurrentToken(pstream) == TOK__RBRACE )
+      ADInextToken( pstream, status );
     else {
       adic_setecs( ADI__INVARG, "Closing brace expected", status );
       }
@@ -68,33 +68,33 @@ ADIobj adix_prs_defcls( ADIstreamPtr pstream, ADIstatus status )
   }
 
 
-void adix_prs_cmd( ADIstreamPtr pstream, ADIstatus status )
+void adix_prs_cmd( ADIobj pstream, ADIstatus status )
   {
   ADIobj	sdat = ADI__nullid;
 
-  if ( pstream->ctok.t == TOK__SYM ) {
+  if ( ADIcurrentToken(pstream) == TOK__SYM ) {
     if ( ADIisTokenCstring( pstream, "defclass", status ) ) {
       sdat = adix_prs_defcls( pstream, status );
       }
     else {
-      adic_setetc( "CMD", pstream->ctok.dat, pstream->ctok.nc );
+      ADIetokToken( "CMD", pstream );
       adic_setecs( ADI__INVARG, "Unknown command name /^CMD/", status );
       }
     }
 
-  else if ( pstream->ctok.t == TOK__END )
-    ADInextTokenFromStream( pstream, status );
+  else if ( ADIcurrentToken(pstream) == TOK__END )
+    ADInextToken( pstream, status );
 
   if( _ok(status) && _valid_q(sdat) )
     adic_print( sdat, status );
   }
 
 
-void adix_prs_cmds( ADIstreamPtr pstream, ADIstatus status )
+void adix_prs_cmds( ADIobj pstream, ADIstatus status )
   {
   _chk_stat;
 
-  while ( _ok(status) && (pstream->ctok.t != TOK__NOTATOK) )
+  while ( _ok(status) && (ADIcurrentToken(pstream) != TOK__NOTATOK) )
     adix_prs_cmd( pstream, status );
   }
 
@@ -103,9 +103,8 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   {
   char			fname[200];
   FILE			*fp;
-  ADIstream     	stream;
   char			*pptr;
-  ADIstreamPtr  	pstream = &stream;
+  ADIobj		pstream;
   int			ulen = 0, flen;
 
   if ( ! ADI_G_getenv ) {		/* Not got ADI_LOAD_PATH yet */
@@ -148,14 +147,18 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   while ( pptr && (ulen<flen) && ! fp );
 
   if ( fp ) {
-    ADIclearStream( pstream, status );    /* Set up a parser stream */
-    ADIextendStreamFile( pstream, fp, status );
 
-    ADInextTokenFromStream( pstream, status );
+/* Set up parser stream */
+    pstream = ADIstrmNew( status );
+    ADIstrmExtendFile( pstream, fp, status );
+
+    ADInextToken( pstream, status );
 
     adix_prs_cmds( pstream, status );
 
-    ADIclearStream( pstream, status );    /* Set up a parser stream */
+/* Close stream and file */
+    adic_erase( &pstream, status );
+    fclose( fp );
     }
   else {
     adic_setetc( "PKG", name, nlen );

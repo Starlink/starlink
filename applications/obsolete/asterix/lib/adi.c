@@ -72,7 +72,10 @@
  *
  *    To be done :
  *
- *     token setting not ok on UNIX?
+ *     remove vector behaviour from destructors
+ *     construct call in cls_alloc rather than wdata?
+ *     parser grammar should be loadable
+ *     instantiate member constants in cls_alloc
  *     dodgy putting kernel objects as data members - can't erase
  *     support C and Fortran array indexing
  *     checks to prevent illegal conversion <-> pointer type
@@ -110,11 +113,11 @@
 #include "adifsys.h"
 #include "adisyms.h"
 #include "adierror.h"
+#include "adiarray.h"
 
 /*  Forward definitions
  *
  */
-void adix_delary( ADIobj id, int nval, ADIstatus status );
 void adix_delgen( ADIobj id, int nval, ADIstatus status );
 void adix_delhan( ADIobj id, int nval, ADIstatus status );
 void adix_delmapctrl( ADIobj id, int nval, ADIstatus status );
@@ -137,7 +140,6 @@ _DEF_STATIC_CDEF("_ExternalProcedure",eprc,48,NULL,NULL);
 _DEF_STATIC_CDEF("_SuperclassRecord",pdef,48,NULL,NULL);
 _DEF_STATIC_CDEF("_MemberRecord",mdef,48,NULL,NULL);
 _DEF_STATIC_CDEF("_MemoryTransfer",mta,8,NULL,NULL);
-_DEF_STATIC_CDEF("_Array",ary,16,adix_delary,NULL);
 _DEF_STATIC_CDEF("_ClassDeclaration",cdef,16,NULL,NULL);
 _DEF_STATIC_CDEF("_ObjectHandle",han,512,adix_delhan,NULL);
 _DEF_STATIC_CDEF("_ObjectReference",obj,512,adix_delobj,NULL);
@@ -168,8 +170,7 @@ typedef
   struct ADIctxTag *ADIctxPtr;
 
 typedef
-  struct ADIctxTag
-    {
+  struct ADIctxTag {
     ADIobj              onexitlist;
     ADIctxPtr           last;
     }
@@ -179,8 +180,8 @@ typedef
  * holds the address of the first class definition structure. Subsequent
  * links are stored in the class structures.
  */
-static KT_CTYPE_cdef  *ADI_G_firstcdef = NULL;
-static KT_CTYPE_cdef  **ADI_G_cdeflink = &ADI_G_firstcdef;
+static ADIclassDef    *ADI_G_firstcdef = NULL;
+static ADIclassDef    **ADI_G_cdeflink = &ADI_G_firstcdef;
 
 /* ...and for method combination forms
  */
@@ -224,30 +225,13 @@ ADIobj DnameNewLink     = ADI__nullid;
 ADIobj DnameSetLink     = ADI__nullid;
 ADIobj DnameUnLink      = ADI__nullid;
 
+ADIobj ADIcvFalse	= ADI__nullid;
+ADIobj ADIcvTrue	= ADI__nullid;
+ADIobj ADIcvNulCons	= ADI__nullid;
+ADIobj ADIcvStdOut	= ADI__nullid;
 
 static ADIobj   ADI_G_stdmcf = ADI__nullid;
 
-
-/*
- * Data access codes. Can be OR'ed together
- */
-
-#define DA__DEFAULT      0x0000 	/* Default settings */
-#define DA__SET		 0x0001		/* Data must be set */
-#define DA__CREATE       0x0002		/* Create access is required */
-#define DA__ARRAY        0x0004		/* Object must be an array */
-
-int adix_sumdim( int ndim, int dims[] )
-  {
-  int           idim;
-  int           nelm = 1;
-
-  if ( ndim )
-    for( idim = 0; idim<ndim; idim++ )
-      nelm *= dims[idim];
-
-  return nelm;
-  }
 
 /*
  * Adjust name length variable to ignore trailing white space
@@ -280,99 +264,6 @@ void adix_acc2tok( char *tok, ADIacmode mode )
   adic_setetc( tok, aname, 99 );
   }
 
-void adix_aryidx( int ndim, int dims[], int offset, int index[],
-		  ADIstatus status )
-  {
-  int		loff = offset,idim,nelm;
-
-  _chk_stat;				/* Check status on entry */
-
-  nelm = adix_sumdim( ndim, dims );	/* Count elements */
-
-  for( idim=ndim-1; idim>=0; idim-- ) {	/* Count though dimensions */
-    nelm /= dims[idim];
-    index[idim] = (loff / nelm) + 1;
-    loff %= nelm;
-    }
-  }
-
-/*
- *  Given an array object and index array, return the base index,
- *  address of the base dimensions and the base data object
- */
-void adix_aryoind( ADIarrayPtr ary, int indices[],
-		   int orig[], int **bdims, ADIobj *bdata, ADIstatus status )
-  {
-  int		i;			/* Loop over dimensions */
-  ADIarrayPtr	lastary = ary;
-  int		offset;
-
-  _chk_stat;				/* Check status on entry */
-
-/* Locate base data object */
-  while ( _valid_q(lastary->parent) )
-    lastary = _ary_data(_han_id(lastary->parent));
-
-/* Offset in data units from beginning of base array to slice origin */
-  offset = _ID_SLOT(ary->data) - _ID_SLOT(lastary->data);
-
-/* Find indices of slice origin point in base coordinates */
-  adix_aryidx( lastary->ndim, lastary->dims, offset, orig, status );
-
-/* Add in user indices if supplied */
-  if ( indices )
-    for( i=0; i<ary->ndim; i++ )
-      orig[i] += indices[i] - 1;
-
-/* Store the address of the base array dimensions */
-  *bdims = lastary->dims;
-
-/* Store the base data object */
-  *bdata = lastary->data;
-  }
-
-
-int adix_idx2off( int ndim, int dims[], int index[] )
-  {
-  int		idim;
-  int		nplane;
-  int		offset = 0;
-
-  nplane = adix_sumdim( ndim-1, dims );
-
-  for( idim=ndim-1; idim>=0; idim-- ) {
-    offset += (index[idim]-1) * nplane;
-    nplane /= dims[idim];
-    }
-
-  return offset;
-  }
-
-
-/*
- * Index an array assuming Fortran indexing
- */
-ADIobj adix_arycell( ADIarrayPtr ary, int index[], ADIstatus status )
-  {
-  ADIobj	bdata;			/* Base data handle */
-  int		*bdims;			/* Dimensions of base array */
-  int		offset = 0;		/* Scalar offset from base array */
-  int		origind[ADI__MXDIM];	/* Indices in base array */
-  ADIobj	rval;			/* Handle of returned object */
-
-  _chk_stat_ret(ADI__nullid);		/* Check status on entry */
-
-/* Locate base indices, base dimensions and base data */
-  adix_aryoind( ary, index, origind, &bdims, &bdata, status );
-
-/* Calculate the offset of the used origin with respect to the dimensions */
-  offset = adix_idx2off( ary->ndim, bdims, origind );
-
-/* Construct new block address from base data address and offset */
-  _FORM_ID( rval, _ID_IBLK(bdata), _ID_SLOT(bdata)+offset);
-
-  return rval;				/* Return new block/slot address */
-  }
 
 /*
  *  Allocate a block of objects. Note that the object constructor is not
@@ -381,8 +272,9 @@ ADIobj adix_arycell( ADIarrayPtr ary, int index[], ADIstatus status )
  *  contains pointers. If however the type is primitive, and a data
  *  initialiser has been supplied, then that will be copied.
  */
-ADIobj adix_cls_alloc( ADIblockCtrlPtr actrl, int ndim, int dims[], ADIstatus status )
+ADIobj adix_cls_nalloc( ADIclassDef *cdef, int ndim, int dims[], ADIstatus status )
   {
+  ADIblockCtrlPtr	actrl = &cdef->alloc;
   ADIobj                data;           /* Raw data block id */
   int                   nelm = 1;       /* Total number of elements needed */
   ADIobj                rval = ADI__nullid;
@@ -390,79 +282,90 @@ ADIobj adix_cls_alloc( ADIblockCtrlPtr actrl, int ndim, int dims[], ADIstatus st
   _chk_stat_ret(ADI__nullid);           /* Check status on entry */
 
   if ( ! actrl->size ) {                /* Zero size? Must be abstract */
-    adic_setetc( "CLS", actrl->cdef->name, _CSM );
+    adic_setetc( "CLS", cdef->name, _CSM );
     adic_setecs( ADI__ILLOP, "Pure abstract class ^CLS cannot be instantiated", status );
     }
 
-  else if ( ndim )                      /* Array? */
-    {
-    nelm = adix_sumdim( ndim, dims );   /* Get number of elements */
-
-    data = adix_bb_nalloc( actrl,       /* Allocate data segment */
-	     ADI__false, nelm, status );
-
-    rval = adix_newhan(                 /* Create array descriptor and */
-	adix_newary( ndim, dims, data,  /* and wrap it in a handle */
-		ADI__nullid, status ),
-	ADI__false,
-	status );
-    }
   else {
-    rval = adix_bb_nalloc( actrl,       /* Get element from BB allocator */
-		 ADI__true, 1, status );
+
+/* Array of items? */
+    if ( ndim ) {
+
+/* Count number of elements */
+      nelm = ADIaryCountNelm( ndim, dims );
+
+/* Allocate the data segment */
+      data = adix_bb_nalloc( actrl, nelm, status );
+
+/* Create array descriptor and wrap it in a handle */
+      rval = ADIaryNew( ndim, dims, data, ADI__nullid, status );
+      }
+    else {
+
+/* Allocate single element */
+      rval = adix_bb_nalloc( actrl, 1, status );
+      }
+
+/* Wrap in handle if non-kernel */
+    if ( ! cdef->kernel )
+      rval = adix_newhan( rval, ADI__false, status );
     }
 
-  if ( _ok(status) )                    /* Allocation went ok? */
-    {
-    if ( actrl->cdef != NULL )          /* Non-kernel type */
-      {
-      if ( actrl->cdef->prim &&		/* Primitive and initialiser there? */
-	   actrl->cdef->pdata )
-	{
-	int	  i,j;
-	char	  *dat = (char *) _DTDAT(rval);
+/* Allocation went ok? */
+  if ( _ok(status) ) {
 
-	for( i=nelm; i; i-- ) {
-	  char *pdata = actrl->cdef->pdata;
+/* Primitive and initialiser there? */
+    if ( cdef->prim && cdef->pdata ) {
+      int	  i,j;
+      char	  *dat = (char *) _DTDAT(rval);
 
-	  for( j=actrl->size; j; j-- )
-	    *dat++ = *pdata++;
-	  }
+      for( i=nelm; i; i-- ) {
+	char *pdata = cdef->pdata;
 
-/*	_han_set(rval) = ADI__true;     *//* Initialised objects are "set" */
+	for( j=actrl->size; j; j-- )
+	  *dat++ = *pdata++;
 	}
-      else if ( ! actrl->cdef->prim )   /* Class instance? */
-	{
-	int       i;
-	ADIobj    *optr = (ADIobj *) _DTDAT(rval);
+
+/*    _han_set(rval) = ADI__true;     *//* Initialised objects are "set" */
+      }
+
+/* Class instance? */
+    else if ( ! (cdef->kernel || cdef->prim ) ) {
+      int       i;
+      ADIobj    *optr = (ADIobj *) _DTDAT(rval);
 
 /* Member initialisations to be performed? */
-        if ( actrl->cdef->meminit ) {
-          ADIobj 	curmem = actrl->cdef->members;
+      if ( cdef->meminit ) {
+	ADIobj 	curmem = cdef->members;
 
-	  for( i=0; i<actrl->cdef->nslot*nelm; i++, optr++ ) {
-            ADIobj cmem = _mdef_defcls(curmem);
+	for( i=0; i<cdef->nslot*nelm; i++, optr++ ) {
+	  ADIobj cmem = _mdef_defcls(curmem);
 
-            if ( _valid_q(cmem) )
-              *optr = adix_cls_alloc( &_cdef_data(cmem)->alloc, 0, NULL, status );
-            else
-	      *optr = ADI__nullid;
+	  if ( _valid_q(cmem) )
+	    *optr = adix_cls_alloc( _cdef_data(cmem), status );
+	  else
+	    *optr = ADI__nullid;
 
-            curmem = _mdef_next(curmem);
-            }
-          }
-	else if ( actrl->cdef->nslot )
-	  for( i=actrl->cdef->nslot*nelm; i; i-- )
-	    *optr++ = ADI__nullid;
-
-	_han_set(rval) = ADI__true;     /* Class instance is always set */
+	  curmem = _mdef_next(curmem);
+	  }
 	}
+
+      else if ( cdef->nslot )
+	for( i=cdef->nslot*nelm; i; i-- )
+	  *optr++ = ADI__nullid;
+
+/* Class instance is always set */
+      _han_set(rval) = ADI__true;
       }
     }
 
   return rval;                          /* Return new object */
   }
 
+ADIobj adix_cls_alloc( ADIclassDef *cdef, ADIstatus status )
+  {
+  return adix_cls_nalloc( cdef, 0, NULL, status );
+  }
 
 void adix_erase( ADIobj *id, int nval, ADIstatus status )
   {
@@ -546,65 +449,13 @@ void adix_delhan( ADIobj id, int nval, ADIstatus status )
   }
 
 
-void adix_delary( ADIobj id, int nval, ADIstatus status )
-  {
-  int           ia;
-  int           naval;
-  KT_CTYPE_ary  *adata = _ary_data(id);
-
-  for( ia=0; ia<nval; ia++, adata++ )
-    {
-    naval = adix_sumdim( adata->ndim,   /* How many objects to free */
-			adata->dims );
-
-    if ( _valid_q(adata->parent) )
-      adix_erase( &adata->parent, 1,	/* Remove parent object */
-		  status );
-    else
-      adix_erase( &adata->data, naval,  /* Remove array elements */
-		  status );
-    }
-  }
-
-
-ADIobj adix_newary( int ndim, int dims[], ADIobj dataobj, ADIobj parent,
-		    ADIstatus status )
-  {
-  ADIarrayPtr   adata;                  /* Pointer to array data */
-  int           i;
-  ADIobj    newa = ADI__nullid;
-
-  _chk_ndim(ndim);                      /* Validate arguments */
-  _chk_dims(ndim,dims);
-
-  newa = adix_bb_alloc( &KT_ALLOC_ary,  /* Allocate new array block */
-			status );
-
-  if ( _ok(status) )                    /* Allocated ok? */
-    {
-    adata = _ary_data(newa);            /* Locate data block */
-
-    adata->ndim = ndim;                 /* Copy dimensionality */
-
-    for( i=0; i<ndim; i++ )             /* Copy dimensions */
-      adata->dims[i] = dims[i];
-
-    adata->data = dataobj;              /* Data object id */
-
-    adata->parent = parent;		/* Parent object */
-    }
-
-  return newa;
-  }
-
-
 ADIobj adix_newhan( ADIobj id, ADIlogical slice, ADIstatus status )
   {
   ADIobjHanPtr  hdata;                  /* Pointer to handle data */
   ADIobj newh = ADI__nullid;
 
-  newh = adix_bb_alloc( &KT_ALLOC_han,  /* Allocate new handle */
-			status );
+/* Allocate new handle */
+  newh = adix_cls_alloc( &KT_DEFN_han, status );
 
   if ( _ok(status) ) {                  /* Allocated ok? */
     hdata = _han_data(newh);            /* Locate data block */
@@ -647,30 +498,25 @@ ADIclassDefPtr adix_dtdef( ADIobj id )
   ADIarrayPtr           ad;
   ADIobjHanPtr          hd;
   ADIclassDefPtr        allc;
+  ADIclassDef		*bcls = _ID_BLOCK(id)->cdef;
 
-  switch( _ID_BLOCK(id)->ctrl->clas )
-    {
-    case KT_CODE_han:
-      hd = _han_data(id);
-      allc = _DTDEF(hd->id);
-      break;
-    case KT_CODE_ary:
-      ad = _ary_data(id);
-      allc = _DTDEF(ad->data);
-      break;
-    default:
-      allc = _ID_TYPE(id);
-      break;
+  if ( bcls == &KT_DEFN_han ) {
+    hd = _han_data(id);
+    allc = _DTDEF(hd->id);
     }
+  else if ( bcls == &KT_DEFN_ary ) {
+    ad = _ary_data(id);
+    allc = _DTDEF(ad->data);
+    }
+  else
+    allc = _ID_TYPE(id);
 
   return allc;
   }
 
 
-ADIobj adix_new_cdef( char *name, int nlen,
-		      ADIlogical checkonly,
-		      ADIclassCode *t,
-		      ADIstatus status )
+ADIobj adix_new_cdef( char *name, int nlen, ADIlogical checkonly,
+		      ADIclassCode *t, ADIstatus status )
   {
   ADIclassDefPtr        tdef;           /* New definition */
   ADIobj                typid;          /* Object identifier */
@@ -680,8 +526,8 @@ ADIobj adix_new_cdef( char *name, int nlen,
 
   _GET_NAME(name,nlen);               	/* Import string */
 
-  typid = adix_bb_alloc(                /* New class definition structure */
-	&KT_ALLOC_cdef, status );
+/* New class definition structure */
+  typid = adix_cls_alloc( &KT_DEFN_cdef, status );
 
   if ( checkonly )                      /* Type number externally defined ? */
     ADI_G_ntyp = _MAX(ADI_G_ntyp,*t);
@@ -691,8 +537,6 @@ ADIobj adix_new_cdef( char *name, int nlen,
     }
 
   tdef = _cdef_data(typid);             /* Allocate memory for definition */
-
-  tdef->self = *t;                      /* Self reference */
 
   tdef->name = strx_dupl( name, nlen ); /* Duplicate name */
 
@@ -727,8 +571,9 @@ ADIobj adix_neweprc( ADIlogical is_c, ADICB func, ADIstatus status )
   ADIobj        newid = ADI__nullid;    /* The new object */
 
   if ( func ) {                         /* Function is defined? */
-    newid = adix_bb_alloc(              /* New class definition structure */
-	  &KT_ALLOC_eprc, status );
+
+/* New external procedure object */
+    newid = adix_cls_alloc( &KT_DEFN_eprc, status );
 
     if ( _ok(status) ) {                /* Fill in data slots */
       _eprc_prc(newid) = func;
@@ -999,8 +844,7 @@ ADIobj adix_defgen_i( ADIobj name, int narg, ADIobj args, ADIobj mcomb,
 
   _chk_stat_ret(ADI__nullid);
 
-  newid = adix_bb_alloc( &KT_ALLOC_gnrc,
-			 status );
+  newid = adix_cls_alloc( &KT_DEFN_gnrc, status );
 
   if ( _ok(status) ) {               	/* Set generic record fields */
     _gnrc_name(newid) = name;
@@ -1029,49 +873,43 @@ void adix_defgen( char *spec, int slen, char *options, int olen,
   ADIobj        mcomb = ADI_G_stdmcf;   /* Method combination form */
   int           narg = 0;               /* Number of generic arguments */
   ADIobj        newid;                  /* The new generic function */
-  ADIstream     pstream;                /* Parse stream */
+  ADIobj        pstream;                /* Parse stream */
 
   _chk_stat;                            /* Check status on entry */
 
   _GET_NAME(spec,slen);               	/* Import strings used in this rtn */
   _GET_NAME(options,olen);
 
-  ADIclearStream( &pstream, status );   /* Clear the parsing stream */
+/* Put specification into parse stream */
+  pstream = ADIstrmExtendC( ADIstrmNew( status ), spec, slen, status );
 
-  ADIextendStreamC( &pstream, spec,     /* Put specification into */
-		    slen, status );     /* parse stream */
+  ctok = ADInextToken( pstream, status );
 
-  ctok = ADInextTokenFromStream( &pstream, status );
+  if ( ctok == TOK__SYM ) {             /* Must be generic name */
 
-  if ( ctok == TOK__SYM )               /* Must be generic name */
-    {
-    gname = prsx_symname( &pstream,     /* Get common string identifier */
-			  status );
+/* Get identifier for generic name in common table */
+    gname = prsx_symname( pstream, status );
 
-    ctok = ADInextTokenFromStream( &pstream, status );
+    ctok = ADInextToken( pstream, status );
 
-    if ( ctok == TOK__LPAREN )
-      {
-      ctok = ADInextTokenFromStream(
-		 &pstream, status );
+    if ( ctok == TOK__LPAREN ) {
+      ctok = ADInextToken( pstream, status );
 
-      while ( (ctok==TOK__SYM) &&       /* While more arguments */
-	       _ok(status) )
-	{
-	aname = prsx_symname( &pstream, /* Get common string identifier */
-			      status );
+/* While more generic arguments */
+      while ( (ctok==TOK__SYM) && _ok(status) ) {
+
+/* Locate argument name in table */
+	aname = prsx_symname( pstream, status );
 	narg++;
 
 	_LST_APPEND(ainsert,aname);     /* Insert into argument list */
 
-	ctok = ADInextTokenFromStream(
-			&pstream, status );
+	ctok = ADInextToken( pstream, status );
 
 /*     Comma delimits argument names */
 	if ( ctok == TOK__COMMA )
-	  ctok = ADInextTokenFromStream( &pstream, status );
-	else if ( ctok != TOK__RPAREN )
-	  {
+	  ctok = ADInextToken( pstream, status );
+	else if ( ctok != TOK__RPAREN ) {
 	  adic_setecs( ADI__INVARG, "Syntax error in generic argument list", status );
 	  }
 	}
@@ -1079,6 +917,9 @@ void adix_defgen( char *spec, int slen, char *options, int olen,
     }
   else
     adic_setecs( ADI__INVARG, "Generic name expected", status );
+
+/* Free the parsing stream */
+  adic_erase( &pstream, status );
 
   if ( _ok(status) ) {                  /* Parsing went ok? */
     newid = adix_defgen_i( gname, narg,	/* Allocate space for new generic */
@@ -1104,18 +945,16 @@ void adix_defmth( char *spec, int slen,
   ADIobj        mform = DnamePrimary; /* Method form */
   int           narg = 0;               /* Number of generic arguments */
   ADIobj        newid;                  /* The new generic function */
-  ADIstream     pstream;                /* Parse stream */
+  ADIobj     	pstream;                /* Parse stream */
 
   _chk_stat;                            /* Check status on entry */
 
   _GET_NAME(spec,slen);               	/* Import strings used in this rtn */
 
-  ADIclearStream( &pstream, status );   /* Clear the parsing stream */
+/* Put specification into parse stream */
+  pstream = ADIstrmExtendC( ADIstrmNew( status ), spec, slen, status );
 
-  ADIextendStreamC( &pstream, spec,     /* Put specification into */
-		    slen, status );     /* parse stream */
-
-  ctok = ADInextTokenFromStream( &pstream, status );
+  ctok = ADInextToken( pstream, status );
 
 /* Check for prefix character denoting non-primary method forms */
   if ( ctok == TOK__PLUS )
@@ -1125,33 +964,30 @@ void adix_defmth( char *spec, int slen,
   else if ( ctok == TOK__AT )
     mform = DnameAround;
   if ( mform != DnamePrimary )
-    ctok = ADInextTokenFromStream( &pstream, status );
+    ctok = ADInextToken( pstream, status );
 
   if ( ctok == TOK__SYM ) {             /* Must be method name */
-    gname = prsx_symname( &pstream,     /* Get common string identifier */
+    gname = prsx_symname( pstream,     /* Get common string identifier */
 			  status );
 
-    ctok = ADInextTokenFromStream( &pstream, status );
+    ctok = ADInextToken( pstream, status );
 
-    if ( ctok == TOK__LPAREN )
-      {
-      ctok = ADInextTokenFromStream(
-		 &pstream, status );
+    if ( ctok == TOK__LPAREN ) {
+      ctok = ADInextToken( pstream, status );
 
       while ( (ctok==TOK__SYM) &&       /* While more arguments */
 	       _ok(status) ) {
-	aname = prsx_symname( &pstream, /* Get common string identifier */
+	aname = prsx_symname( pstream, /* Get common string identifier */
 			      status );
 	narg++;
 
 	_LST_APPEND(ainsert,aname);     /* Insert into argument list */
 
-	ctok = ADInextTokenFromStream(
-			&pstream, status );
+	ctok = ADInextToken( pstream, status );
 
 /*     Comma delimits argument names */
 	if ( ctok == TOK__COMMA )
-	  ctok = ADInextTokenFromStream( &pstream, status );
+	  ctok = ADInextToken( pstream, status );
 	else if ( ctok != TOK__RPAREN )
 	  adic_setecs( ADI__INVARG,
 		       "Syntax error in method argument list", status );
@@ -1161,8 +997,10 @@ void adix_defmth( char *spec, int slen,
   else
     adic_setecs( ADI__INVARG, "Method name expected", status );
 
-  if ( _ok(status) )                    /* Parsing went ok? */
-    {
+/* Release the parse stream */
+  adic_erase( &pstream, status );
+
+  if ( _ok(status) ) {                  /* Parsing went ok? */
     ADIobj	gnid;			/* Generic function identifier */
 
     gnid = adix_locgen( gname, narg,	/* Look for generic function */
@@ -1172,8 +1010,7 @@ void adix_defmth( char *spec, int slen,
 		 ADI__nullid,		/* with null argument names and */
 		 ADI_G_stdmcf, status );/* standard method combination */
 
-    newid = adix_bb_alloc( &KT_ALLOC_mthd,
-			 status );
+    newid = adix_cls_alloc( &KT_DEFN_mthd, status );
 
     _mthd_name(newid) = gname;          /* Set method record fields */
     _mthd_args(newid) = args;
@@ -1193,7 +1030,7 @@ void adix_defmth( char *spec, int slen,
 
 
 ADIobj ADIdefClassLocMember( ADIobj memlist, char *name, int nlen,
-                             ADIstatus status )
+			     ADIstatus status )
   {
   ADIobj	curm = memlist;
   ADIobj	found = ADI__false;
@@ -1220,7 +1057,7 @@ ADIobj ADIdefClassCopyMember( ADIobj pmem, ADIobj *members,
   _chk_stat_ret(ADI__nullid);           /* Check status on entry */
 
 /* Allocate storage for new member */
-  newid = adix_cls_alloc( &KT_ALLOC_mdef, 0, 0, status );
+  newid = adix_cls_alloc( &KT_DEFN_mdef, status );
 
 /* Store name and length in characters */
   _mdef_name(newid) = strx_dupl( pdata->name, pdata->nlen );
@@ -1245,7 +1082,7 @@ ADIobj ADIdefClassCopyMember( ADIobj pmem, ADIobj *members,
   }
 
 
-ADIobj ADIdefClassNewMember( ADIstreamPtr pstr, ADIobj *members,
+ADIobj ADIdefClassNewMember( ADIobj pstr, ADIobj *members,
 			     ADIobj **ipoint, ADIstatus status )
   {
   ADIobj      	emem = ADI__nullid;	/* Existing member definition */
@@ -1269,17 +1106,23 @@ ADIobj ADIdefClassNewMember( ADIstreamPtr pstr, ADIobj *members,
 
 /* Get the next token. If it too is TOK__SYM then the first symbol is */
 /* interpreted as a class name, and the second name is the member name */
-    if ( ADInextTokenFromStream( pstr, status ) == TOK__SYM ) {
+    if ( ADInextToken( pstr, status ) == TOK__SYM ) {
       memtype = memname;
 
 /* Locate the member class definition */
-      memclsid = adix_findclsi( memtype, status );
+      memclsid = ADIkrnlFindClsI( memtype, status );
+
+/* Validate class name */
+    if ( _null_q(memclsid) ) {
+      strx_tok( "MCLASS", memtype );
+      adic_setecs( ADI__INVARG, "Unknown class name /^MCLASS/ in member specification", status );
+      }
 
 /* Parse the member name */
       memname = prsx_symname( pstr, status );
 
 /* Advance to token after member name */
-      ADInextTokenFromStream( pstr, status );
+      ADInextToken( pstr, status );
       }
 
 /*   Locate data for name string. Check not already present */
@@ -1289,7 +1132,7 @@ ADIobj ADIdefClassNewMember( ADIstreamPtr pstr, ADIobj *members,
     }
 
   else {
-    name = pstr->ctok.dat; nlen = pstr->ctok.nc;
+    name = _strm_data(pstr)->ctok.dat; nlen = _strm_data(pstr)->ctok.nc;
     }
 
 /* Look for member name in existing list */
@@ -1299,7 +1142,7 @@ ADIobj ADIdefClassNewMember( ADIstreamPtr pstr, ADIobj *members,
   if ( _null_q(emem) ) {
 
 /* Allocate storage for new member */
-    newid = adix_cls_alloc( &KT_ALLOC_mdef, 0, 0, status );
+    newid = adix_cls_alloc( &KT_DEFN_mdef, status );
 
 /* Store name and length in characters */
     _mdef_name(newid) = strx_dupl( name, nlen );
@@ -1319,16 +1162,16 @@ ADIobj ADIdefClassNewMember( ADIstreamPtr pstr, ADIobj *members,
 /* same type or derived from the existing member type */
   else {
     if ( memclsid != _mdef_defcls(emem) &&
-        _valid_q(memclsid) && _valid_q(_mdef_defcls(emem)) ) {
+	_valid_q(memclsid) && _valid_q(_mdef_defcls(emem)) ) {
       KT_CTYPE_cdef	*c1 = _cdef_data(memclsid);
       KT_CTYPE_cdef	*c2 = _cdef_data(_mdef_defcls(emem));
 
       if ( ! adix_chkder( c1, c2, status ) ) {
-        adic_setetc( "MEM", name, nlen );
-        adic_setetc( "SMEM", c2->name, 99 );
-        adic_setecs( ADI__INVARG,
+	adic_setetc( "MEM", name, nlen );
+	adic_setetc( "SMEM", c2->name, 99 );
+	adic_setecs( ADI__INVARG,
 "The initialisation class of member ^MEM must be derived from ^SMEM", status );
-        }
+	}
       }
 
 /* Overrides are ok? */
@@ -1340,13 +1183,13 @@ ADIobj ADIdefClassNewMember( ADIstreamPtr pstr, ADIobj *members,
 
 /* Advance to token after member name */
   if ( _null_q(ADI_G_commonstrings) )
-    ADInextTokenFromStream( pstr, status );
+    ADInextToken( pstr, status );
 
   return newid;
   }
 
 
-void ADIdefClassNewMemberData( ADIstreamPtr pstr, ADIobj member,
+void ADIdefClassNewMemberData( ADIobj pstr, ADIobj member,
 			       ADIstatus status )
   {
   ADImemberDef	*memb = _mdef_data(member);
@@ -1358,7 +1201,7 @@ void ADIdefClassNewMemberData( ADIstreamPtr pstr, ADIobj member,
     adic_erase( &memb->cdata, status );
 
 /* Skip over the assignment token */
-  ADInextTokenFromStream( pstr, status );
+  ADInextToken( pstr, status );
 
 /* Read a constant value from the stream */
   memb->cdata = prsx_cvalue( pstr, status );
@@ -1368,10 +1211,9 @@ void ADIdefClassNewMemberData( ADIstreamPtr pstr, ADIobj member,
   }
 
 
-void ADIparseClassMembers( ADIstreamPtr pstream,
+void ADIparseClassMembers( ADIobj pstream,
 			   ADIobj *members, ADIstatus status )
   {
-  ADItokenType	ctok = pstream->ctok.t;
   ADIlogical	defmem = ADI__false;
   ADIobj	*mnext = members;
   ADIlogical	more = ADI__true;
@@ -1390,29 +1232,27 @@ void ADIparseClassMembers( ADIstreamPtr pstream,
 /* Add member to list */
     newm = ADIdefClassNewMember( pstream, members, &mnext, status );
 
-/* Get current token */
-    ctok = pstream->ctok.t;
-
 /* This is the default member? */
-    if ( ctok == TOK__MUL ) {
+    if ( ADIcurrentToken(pstream) == TOK__MUL ) {
       if ( ! defmem ) {
 	defmem = ADI__true;
 	_mdef_nlen(newm) = - _mdef_nlen(newm);
-	ctok = ADInextTokenFromStream( pstream, status );
+	ADInextToken( pstream, status );
 	}
       else
 	adic_setecs( ADI__INVARG, "Default member already defined", status );
       }
 
 /* Definition supplies initial data? */
-    if ( pstream->ctok.t == TOK__ASSIGN )
+    if ( ADIcurrentToken(pstream) == TOK__ASSIGN )
       ADIdefClassNewMemberData( pstream, newm, status );
 
-/* Comma delimits member names, otherwise at end of list */
-    if ( pstream->ctok.t == TOK__COMMA ) {
-      ctok = ADInextTokenFromStream( pstream, status );
-      while ( ctok == TOK__END )
-	ctok = ADInextTokenFromStream( pstream, status );
+/* Comma delimits member names, otherwise at end of list. Shouldn't need */
+/* TOK__END soak as parsing either from constant string or from EOL free */
+/* stream?? */
+    if ( ADIifMatchToken( pstream, TOK__COMMA, status ) ) {
+      while ( ADIcurrentToken( pstream ) == TOK__END )
+	ADInextToken( pstream, status );
       }
     else
       more = ADI__false;
@@ -1420,54 +1260,56 @@ void ADIparseClassMembers( ADIstreamPtr pstream,
   }
 
 
-void ADIparseClassSupers( ADIstreamPtr pstream, ADIobj *supers,
+void ADIparseClassSupers( ADIobj pstream, ADIobj *supers,
 			  ADIobj *members, ADIstatus status )
   {
-  ADItokenType	ctok = pstream->ctok.t;
+  ADItokenType	ctok;
   ADIobj	curp;			/* Loop over superclasses */
   ADIobj	*mnext = members;	/* Member list insertion point */
   ADIlogical	more = ADI__true;	/* More classes in list? */
+  ADIobj	sname;			/* Superclass name string */
   ADIobj	*snext = supers;	/* Superclass list insertion point */
-  ADIblockCtrlPtr	stid;           /* Address of superclass definition */
+  ADIobj	stid;			/* Superclass definition object */
   ADIobj	newpar;			/* New superclass record */
 
   _chk_init;			/* Check status on entry */
 
 /* Trap empty stream */
-  more = (pstream->ctok.t == TOK__SYM);
+  more = (ADIcurrentToken(pstream) == TOK__SYM);
 
 /* While more superclass names to parse */
   while ( more && _ok(status) ) {
 
+/* Locate superclass name in common table */
+    sname = prsx_symname( pstream, status );
+
 /* Locate superclass by name */
-    adix_findcls( pstream->ctok.dat, pstream->ctok.nc, &stid, status );
+    stid = ADIkrnlFindClsI( sname, status );
 
 /* Error if not found */
-    if ( ! stid ) {
-      adic_setetc( "SCLASS", pstream->ctok.dat, pstream->ctok.nc );
+    if ( _null_q(stid) ) {
+      strx_tok( "SCLASS", sname );
       adic_setecs( ADI__INVARG, "Unknown class name /^SCLASS/ in superclass specification", status );
       }
     else {
 
 /* Allocate storage for new superclass */
-      newpar = adix_cls_alloc( &KT_ALLOC_pdef, 0, 0, status );
+      newpar = adix_cls_alloc( &KT_DEFN_pdef, status );
       *snext = newpar;
 
-/* Locate by name in common string table */
-      _pdef_name(newpar) = prsx_symname( pstream, status );
-
 /* Store attributes */
-      _pdef_clsid(newpar) = stid->cdef->selfid;
+      _pdef_name(newpar) = sname;
+      _pdef_clsid(newpar) = stid;
       _pdef_next(newpar) = ADI__nullid;
 
 /* Get next token */
-      ctok = ADInextTokenFromStream( pstream, status );
+      ctok = ADInextToken( pstream, status );
 
 /* Comma delimits superclass names, otherwise end */
       if ( ctok == TOK__COMMA ) {
-	ctok = ADInextTokenFromStream( pstream, status );
+	ctok = ADInextToken( pstream, status );
 	while ( ctok == TOK__END )
-	  ctok = ADInextTokenFromStream( pstream, status );
+	  ctok = ADInextToken( pstream, status );
 	if ( ctok != TOK__SYM )
 	  adic_setecs( ADI__INVARG,
 		       "Syntax error in superclass specification", status );
@@ -1566,7 +1408,7 @@ void ADIdefClass_e( char *name, int nlen, char *parents, int plen,
 					/* Arguments for internal routine */
 					/* These are name, supers, members */
   ADIobj		cid;		/* New class identifier */
-  ADIstream             pstream;        /* Parse stream */
+  ADIobj             pstream = ADI__nullid;        /* Parse stream */
 
   _chk_stat;
 
@@ -1578,31 +1420,33 @@ void ADIdefClass_e( char *name, int nlen, char *parents, int plen,
 
 /* Parse parent specification if the string isn't empty. */
   if ( parents && (plen>0) ) {
-    ADIclearStream( &pstream, status );
 
-    ADIextendStreamC( &pstream, parents,/* Put parents specification into */
-			plen, status ); /* parse stream */
+/* Put parents specification into parse stream */
+    pstream = ADIstrmExtendC( ADIstrmNew( status ), parents, plen, status );
 
-    ADInextTokenFromStream( &pstream, status );
+    ADInextToken( pstream, status );
 
-    ADIparseClassSupers( &pstream, args+1, args+2, status );
-
-    ADIclearStream( &pstream, status ); /* Reset the parse stream */
+    ADIparseClassSupers( pstream, args+1, args+2, status );
     }
 
 /* Parse member specification if the string isn't empty */
   if ( members && (mlen>0) ) {
-    ADIclearStream( &pstream, status );
+    if ( _null_q(pstream) )
+      pstream = ADIstrmNew( status );
+    else
+      ADIclearStream( pstream, status );
 
-    ADIextendStreamC( &pstream, members,/* Put parents specification into */
-			mlen, status ); /* parse stream */
+/* Put parents specification into parse stream */
+    ADIstrmExtendC( pstream, members, mlen, status );
 
-    ADInextTokenFromStream( &pstream, status );
+    ADInextToken( pstream, status );
 
-    ADIparseClassMembers( &pstream, args+2, status );
-
-    ADIclearStream( &pstream, status ); /* Reset the parse stream */
+    ADIparseClassMembers( pstream, args+2, status );
     }
+
+/* Erase the parse stream if defined */
+  if ( _valid_q(pstream) )
+    adic_erase( &pstream, status );
 
 /* Make new class definition */
   cid = ADIdefClass_i( 3, args, status );
@@ -1656,7 +1500,7 @@ void adix_def_mcon( ADIobj clsid, void (*rtn)(ADIobj,ADImtaPtr,ADIstatus),
   _cdef_mcon(clsid) = rtn;              /* Store MTA constructor pointer */
   }
 
-void adix_def_prnt( ADIobj clsid, void (*rtn)( ADIobj, ADIstatus),
+void adix_def_prnt( ADIobj clsid, void (*rtn)( ADIobj, ADIobj, ADIstatus),
 		    ADIstatus status )
   {
   _chk_stat;                            /* Check status on entry */
@@ -1665,96 +1509,128 @@ void adix_def_prnt( ADIobj clsid, void (*rtn)( ADIobj, ADIstatus),
   }
 
 
-void adix_prnt_b( ADIobj id, ADIstatus status )
+void adix_prnt_b( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%d", (int) *((ADIbyte *) _DTDAT(id)) );
+  char	buf[5];
+  int   nc;
+
+  nc = sprintf( buf, "%d", (int) *((ADIbyte *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_ub( ADIobj id, ADIstatus status )
+void adix_prnt_ub( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%d", (int) *((ADIubyte *) _DTDAT(id)) );
+  char	buf[5];
+  int   nc;
+
+  nc = sprintf( buf, "%d", (int) *((ADIubyte *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_w( ADIobj id, ADIstatus status )
+void adix_prnt_w( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%d", (int) *((ADIword *) _DTDAT(id)) );
+  char	buf[7];
+  int   nc;
+
+  nc = sprintf( buf, "%d", (int) *((ADIword *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_uw( ADIobj id, ADIstatus status )
+void adix_prnt_uw( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%d", (int) *((ADIuword *) _DTDAT(id)) );
+  char	buf[7];
+  int   nc;
+
+  nc = sprintf( buf, "%d", (int) *((ADIuword *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_i( ADIobj id, ADIstatus status )
+void adix_prnt_i( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%ld", *((ADIinteger *) _DTDAT(id)) );
+  char	buf[11];
+  int   nc;
+
+  nc = sprintf( buf, "%ld", *((ADIinteger *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_r( ADIobj id, ADIstatus status )
+void adix_prnt_r( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%f", *((ADIreal *) _DTDAT(id)) );
+  char	buf[20];
+  int   nc;
+
+  nc = sprintf( buf, "%f", *((ADIreal *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_d( ADIobj id, ADIstatus status )
+void adix_prnt_d( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%f", *((ADIdouble *) _DTDAT(id)) );
+  char	buf[30];
+  int   nc;
+
+  nc = sprintf( buf, "%f", *((ADIdouble *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_l( ADIobj id, ADIstatus status )
+void adix_prnt_l( ADIobj stream, ADIobj id, ADIstatus status )
   {
+  static char *tstr = "True";
+  static char *fstr = "False";
+
   UT_CTYPE_l    val = *((ADIlogical *) _DTDAT(id));
-  _chk_stat;
-  if ( val )
-    printf( "TRUE" );
-  else
-    printf( "FALSE" );
+
+  ADIstrmPutStr( stream, val ? tstr : fstr, _CSM, status );
   }
 
-void adix_prnt_c( ADIobj id, ADIstatus status )
+void adix_prnt_c( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  int   i;
   int   len = _str_len(id);
   char *dat = _str_dat(id);
 
-  _chk_stat;
-
-  putchar( '"' );
-  for( i=0; i<len; i++ )
-    putchar( *dat++ );
-  putchar( '"' );
+  ADIstrmPutCh( stream, '"', status );
+  ADIstrmPutStr( stream, dat, len, status );
+  ADIstrmPutCh( stream, '"', status );
   }
 
-void adix_prnt_p( ADIobj id, ADIstatus status )
+void adix_prnt_p( ADIobj stream, ADIobj id, ADIstatus status )
   {
-  _chk_stat;
-  printf( "%p", *((UT_CTYPE_p *) _DTDAT(id)) );
+  char	buf[20];
+  int   nc;
+
+  nc = sprintf( buf, "%p", *((UT_CTYPE_p *) _DTDAT(id)) );
+
+  ADIstrmPutStr( stream, buf, nc, status );
   }
 
-void adix_prnt_struc( ADIobj id, ADIstatus status )
+void adix_prnt_struc( ADIobj stream, ADIobj id, ADIstatus status )
   {
   ADIobj  sid = *_struc_data(id);
   ADIsegmentPtr sptr;
 
   _chk_stat;
 
-  putchar( '{' );
+  ADIstrmPutCh( stream, '{', status );
+
   while ( _valid_q(sid) ) {
     sptr = _seg_data(_CAAR(sid));
-    strx_putnc( sptr->data, sptr->len );
-    printf( "=" );
-    adix_print( _CDAR(sid), ADI__true, status );
+    ADIstrmPutStr( stream, sptr->data, sptr->len, status );
+    ADIstrmPutCh( stream, '=', status );
+    adix_print( stream, _CDAR(sid), ADI__true, status );
     sid = _CDR(sid);
-    if ( _valid_q(sid) )
-      printf( ", " );
+    if ( _valid_q(sid) ) {
+      ADIstrmPutCh( stream, ',', status );
+      ADIstrmPutCh( stream, ' ', status );
+      }
     }
-  putchar( '}' );
+
+  ADIstrmPutCh( stream, '}', status );
   }
 
 
@@ -1818,7 +1694,7 @@ void adi_init( ADIstatus status )
       ADIclassCode      clas;
       size_t            size;
       ADIobj            *avar;
-      void              (*prnt)(ADIobj,ADIstatus);
+      void              (*prnt)(ADIobj,ADIobj,ADIstatus);
       }
     ttable[] =
       {
@@ -1880,8 +1756,7 @@ void adi_init( ADIstatus status )
 
 /* Mark as initialised - must happen before any objects created or ADI
    will enter a recursive loop (which is trapped, but is fatal) */
-    if ( _ok(status) )
-      {
+    if ( _ok(status) ) {
       ADI_G_init = ADI__true;
 
 /*  Establish the ADI exit handler. Frees all dynamic memory */
@@ -1898,7 +1773,6 @@ void adi_init( ADIstatus status )
     strx_init( status );
     lstx_init( status );
     tblx_init( status );
-    prsx_init( status );
 
 /* Create common string table to hold property names, class member names
    and any other common strings */
@@ -1919,6 +1793,21 @@ void adi_init( ADIstatus status )
       ADIdefClassMakeDlist( _cdef_data(UT_ALLOC_list), status );
       ADIdefClassMakeDlist( _cdef_data(UT_ALLOC_tbl), status );
       }
+
+/* Create constant objects */
+    adic_newv0l( ADI__false, &ADIcvFalse, status );
+    _han_readonly(ADIcvFalse) = ADI__true;
+    adic_newv0l( ADI__true, &ADIcvTrue, status );
+    _han_readonly(ADIcvTrue) = ADI__true;
+    ADIcvNulCons = lstx_cell( ADI__nullid, ADI__nullid, status );
+    _han_readonly(ADIcvNulCons) = ADI__true;
+
+/* Install sub-systems which depend on common string table etc */
+    prsx_init( status );
+
+/* Create the constant stream object pointing to standard output */
+    ADIcvStdOut = ADIstrmExtendFile( ADIstrmNew( status ), stdout, status );
+/*    _han_readonly(ADIcvStdOut) = ADI__true; */
 
 /* Install "Standard" method combination */
     adic_defmcf( "Standard", adix_stdmcf, &ADI_G_stdmcf, status );
@@ -2349,92 +2238,109 @@ void adix_caste_c2( ADIlogical is_adi, int clen, ADIclassCode type,
 #undef _do_next
   }
 
-
-void adix_findcls( char *cls, int clen, ADIblockCtrlPtr *tid, ADIstatus status )
+/*
+ *  Locate the allocator block for the named class
+ */
+ADIclassDef *ADIkrnlFindClsInt( char *cls, int clen, ADIstatus status )
   {
-  *tid = NULL;                          /* Default return value */
+  ADIlogical            found = ADI__false;
+  ADIclassDefPtr        tdef = ADI_G_firstcdef;       /* Cursor */
 
-  _chk_stat;                            /* Check status on entry */
+/* Entry status is ok? */
+  if ( _ok(status) ) {
 
-  if ( (*cls == '*') && (clen==1) ) {   /* The universal type */
-    *tid = &KT_ALLOC_obj;
-    }
-  else
-    {
-    ADIlogical            found = ADI__false;
-    ADIclassDefPtr        tdef = ADI_G_firstcdef;       /* Cursor */
-
-    while ( tdef && ! found )
-      {
+/* Loop over classes comparing class name string with that supplied */
+    while ( tdef && ! found ) {
       if ( ! strncmp( cls, tdef->name, clen ) )
 	found = ADI__true;
       else
 	tdef = tdef->link;
       }
-
-    if ( found )
-      *tid = &tdef->alloc;
     }
+
+/* Set function return value */
+  return found ? tdef : NULL;
   }
 
-ADIobj adix_findclsi( ADIobj name, ADIstatus status )
+ADIclassDef *ADIkrnlFindClsC( char *cls, int clen, ADIstatus status )
   {
-  ADIblockCtrlPtr tid;
+  ADIclassDef	*tdef = NULL;           /* Default return value */
 
-  adix_findcls( _str_dat(name), _str_len(name), &tid, status );
+  if ( (*cls == '*') && (clen==1) )     /* The universal type */
+    tdef = &KT_DEFN_obj;
+  else
+    tdef = ADIkrnlFindClsInt( cls, clen, status );
 
-  return tid->cdef->selfid;
+  return tdef;
+  }
+
+ADIobj ADIkrnlFindClsI( ADIobj name, ADIstatus status )
+  {
+  ADIclassDef	*tdef;
+
+  tdef = ADIkrnlFindClsC( _str_dat(name), _str_len(name), status );
+
+  return tdef ? tdef->selfid : ADI__nullid;
   }
 
 
 /*
  * Allocate object(s) of user named class
  */
-void adix_newn( ADIobj pid, char *name, int nlen,
-		char *cls, int clen, int ndim, int dims[],
-		ADIobj *id, ADIstatus status )
+void adix_newn( ADIobj pid, char *name, int nlen, char *cls, int clen,
+		int ndim, int dims[], ADIobj *id, ADIstatus status )
   {
-  ADIblockCtrlPtr      alloc;       	/* Type allocator */
+  ADIclassDef		*tdef;		/* Class definition */
 
   _chk_stat;                            /* Standard checks */
 
   _GET_NAME(cls,clen);                	/* Import string */
 
-  adix_findcls( cls, clen,              /* Locate allocator object */
-		&alloc, status );
+/* Locate the class allocator */
+  tdef = ADIkrnlFindClsC( cls, clen, status );
 
-  adix_new_n( ADI__true, pid, name, 	/* Invoke creator function */
-	      nlen, ndim, dims, NULL,	/* with null data values */
-	      alloc, 0, id, status );
+/* Invoke creator function with null data values */
+  if ( tdef ) {
+    adix_new_n( ADI__true, pid, name, nlen, ndim, dims, NULL,
+		tdef, 0, id, status );
+    }
   }
 
 
-ADIobj adix_cmn( char *str, int len, ADIstatus status )
+ADIobj adix_cmn_i( char *str, int len, ADIlogical dstatic, ADIstatus status )
   {
   ADIobj        dpair;                  /* name.value pair in table */
   ADIobj        name;
 
   _GET_STRING(str,len);                 /* Handle C string marker */
 
-  dpair = tblx_sadd(                    /* Find or insert in string table */
-	     &ADI_G_commonstrings,
-	     str, len, ADI__nullid, status );
+/* Find or insert in string table */
+  dpair = tblx_sadd( &ADI_G_commonstrings, str, len, ADI__nullid, status );
 
-  name = _CAR(dpair);                   /* Extract name from dotted pair */
-  adix_refadj( name, 1, status );       /* Bump up reference count and */
-  _han_readonly(name) = ADI__true;      /* and mark name as non-writeable */
+/* Clone the identifier from the name of the dotted pair */
+  name = adix_clone( _CAR(dpair), status );
 
-  if ( _ok(status) )
-    return name;
-  else
-    return ADI__nullid;
+/* Mark string as read-only */
+  _han_readonly(name) = ADI__true;
+
+/* Set return value */
+  return _ok(status) ? name : ADI__nullid;
   }
 
+/*
+ * Common string, length specified, not static data
+ */
+ADIobj adix_cmn( char *str, int len, ADIstatus status )
+  {
+  return adix_cmn_i( str, len, ADI__false, status );
+  }
 
+/*
+ * Common string, nul terminated, not static data
+ */
 ADIobj adix_cmnC( char *str, ADIstatus status )
   {
-  return adix_cmn( str, strlen(str),    /* Find or insert in table */
-		   status );
+  return adix_cmn_i( str, strlen(str), ADI__false, status );
   }
 
 
@@ -2603,12 +2509,10 @@ void adix_indprp( ADIobj id, int index, ADIobj *pid, ADIstatus status )
     plist = _han_pl(id);		/* Locate the property list */
 
     if ( _valid_q(plist) ) {		/* Not an empty list */
-      pslot = lstx_nth( plist,
-			index, status );
+      pslot = lstx_nth( plist, index, status );
 
       if ( pslot )			/* Valid list item? */
-	*pid = adix_clone( _CDR(*pslot),
-			   status );
+	*pid = adix_clone( _CDR(*pslot), status );
       else
 	adic_setecs( ADI__NOPROP, "Property index is too large", status );
       }
@@ -2616,8 +2520,6 @@ void adix_indprp( ADIobj id, int index, ADIobj *pid, ADIstatus status )
       adic_setec( ADI__NOPROP, status );
     }
   }
-
-
 
 
 /*
@@ -2646,8 +2548,7 @@ void adix_delcmp( ADIobj id, char *cname, int clen, ADIstatus status )
 
   adix_erase( &tstr, 1, status );       /* Free temporary string */
 
-  if ( there )                          /* Present in list? */
-    {
+  if ( there ) {                        /* Present in list? */
     old_dp = *lentry;                   /* The dotted pair to be deleted */
 
     *lentry = _CDR(*lentry);            /* By-pass old list element */
@@ -2668,8 +2569,8 @@ void adix_loccmp( ADIobj id, char *cname, int clen, ADIobj *cid,
 
   _chk_stat;				/* Has to be a handled object */
 
-  adix_pl_find( _struc_data(id), cname,
-		clen, ADI__false,
+/* Find object address */
+  adix_pl_find( _struc_data(id), cname, clen, ADI__false,
 		&vaddr, NULL, status );
 
   if ( vaddr )
@@ -2825,7 +2726,7 @@ ADIobj adix_new_mta( ADIclassCode type, ADIstatus status )
   ADImtaPtr  mdata;                  /* Pointer to transfer data */
   ADIobj newm = ADI__nullid;
 
-  newm = adix_bb_alloc( &KT_ALLOC_mta,  /* Allocate new MTA */
+  newm = adix_cls_alloc( &KT_DEFN_mta,  /* Allocate new MTA */
 			status );
 
   if ( _ok(status) )                    /* Allocated ok? */
@@ -3011,8 +2912,8 @@ void adix_mtacop( ADImtaPtr ind, ADImtaPtr outd, ADIstatus status )
 
 /* Calculate offsets from start of each declared sub-space to the origin */
 /* of the section to be copied */
-    ioffset = adix_idx2off( ind->ndim, ind->ddims, ind->uorig );
-    ooffset = adix_idx2off( outd->ndim, outd->ddims, outd->uorig );
+    ioffset = ADIaryOffset( ind->ndim, ind->ddims, ind->uorig );
+    ooffset = ADIaryOffset( outd->ndim, outd->ddims, outd->uorig );
     }
 
 /* Initialise pointers to input and output data. These step through the */
@@ -3119,15 +3020,15 @@ void adix_mtaid( ADIobj id, ADImtaPtr mta, ADIstatus status )
     ADIobj      hid = _han_id(id);
     tdef = _DTDEF(id);                  /* Locate class definition block */
 
-    mta->type = tdef->self;             /* Set the transfer type */
+    mta->type = tdef->alloc.clas;       /* Set the transfer type */
+    mta->tdef = tdef;
 
     mta->contig = ADI__true;            /* Some defaults */
     mta->trunc = ADI__false;
 
     mta->id = id;                       /* Store object being transferred */
 
-    if ( _ary_q(hid) )                  /* Array object? */
-      {
+    if ( _ary_q(hid) ) {                /* Array object? */
       ADIarrayPtr       adata = _ary_data(hid);
       int               i;
       int		*bdims;
@@ -3140,7 +3041,7 @@ void adix_mtaid( ADIobj id, ADImtaPtr mta, ADIstatus status )
 	mta->udims[i] = adata->dims[i];
 
 /* Find origin in the base array, its dimensions and its data address */
-      adix_aryoind( adata, NULL, mta->uorig, &bdims, &bdata, status );
+      ADIaryBaseInfo( adata, NULL, mta->uorig, &bdims, &bdata, status );
 
 /* Store the base dimensions */
       for( i=0; i<mta->ndim; i++ )
@@ -3227,13 +3128,12 @@ void adix_chkget( ADIobj *id, ADIobj **lid, ADIstatus status )
       adic_setec( ADI__NOTSET, status );
       }
 
-    else if ( tdef->prim )              /* Object is primitive? */
-      {
-      ADIclassCode cc = tdef->self;
+    else if ( tdef->prim ) {            /* Object is primitive? */
+      ADIclassCode cc = tdef->alloc.clas;
 
       if ( cc < UT_CODE_b ||            /* Primitive but not an ADI built */
 	   cc > UT_CODE_c ) {           /* in type */
-	adic_setetc( "CLS", _DTDEF(*id)->name, 99 );
+	adic_setetc( "CLS", tdef->name, 99 );
 	adic_setecs( ADI__ISPRIM, "Cannot GET data of type ^CLS", status );
 	}
       else
@@ -3270,11 +3170,11 @@ void adix_chkput( ADIobj *id, ADIobj **lid, ADIstatus status )
       }
 
     else if ( tdef->prim ) {            /* Object is primitive? */
-      ADIclassCode cc = tdef->self;
+      ADIclassCode cc = tdef->alloc.clas;
 
       if ( cc < UT_CODE_b ||            /* Primitive but not an ADI built */
 	   cc > UT_CODE_c ) {           /* in type */
-	adic_setetc( "CLS", _DTDEF(*id)->name, 99 );
+	adic_setetc( "CLS", tdef->name, 99 );
 	adic_setecs( ADI__ILLKOP, "Cannot PUT to object of type ^CLS", status );
 	}
       else
@@ -3359,9 +3259,8 @@ ADIlogical adix_there( ADIobj id, char *name, int nlen, ADIstatus status )
    {
   ADIobj	*lid;
 
-  adix_locdat( &id, name, nlen,		/* Find data insertion point */
-	       DA__DEFAULT, &lid,
-	       NULL, status );
+/* Find data insertion point */
+  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, status );
 
   if ( _ok(status) ) {			/* Status good if component exists */
     if ( lid )
@@ -3382,9 +3281,8 @@ ADIobj adix_find( ADIobj id, char *name, int nlen, ADIstatus status )
   {
   ADIobj	*lid;
 
-  adix_locdat( &id, name, nlen,		/* Find data insertion point */
-	       DA__DEFAULT, &lid,
-	       NULL, status );
+/* Find data insertion point */
+  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, status );
 
   if ( _ok(status) ) {
 /* Bump up reference count unless it's a kernel object */
@@ -3425,9 +3323,9 @@ void adix_slice( ADIobj id, char *name, int nlen, int ndim,
       adic_setecs( ADI__INVARG, "Slice dimensionality exceeds that of object",
 		   status );
     else {
-      for( idim=0;			/* Check slice bounds validity */
-	   idim<ndim && _ok(status);
-	   idim++ ) {
+
+/* Check slice bounds validity */
+      for( idim=0; idim<ndim && _ok(status); idim++ ) {
 	if ( (diml[idim] < 1) )
 	  adic_setecs( ADI__INVARG, "Slice lower bound is less than one",
 		   status );
@@ -3449,11 +3347,11 @@ void adix_slice( ADIobj id, char *name, int nlen, int ndim,
 	  dims[idim] = dimu[idim] - diml[idim] + 1;
 
 /*     Locate the array cell specified by indices supplied */
-	fdid = adix_arycell( ary, diml, status );
+	fdid = ADIaryCell( ary, diml, status );
 
 /*     Construct new array block, and increment reference count on */
 /*     parent object */
-	newid = adix_newary( ndim, dims, fdid,
+	newid = ADIaryNew( ndim, dims, fdid,
 			 adix_clone(id,	status), status );
 
 /*     Wrap the new array block in a handle */
@@ -3474,9 +3372,8 @@ void adix_cell( ADIobj id, char *name, int nlen, int ndim,
   {
   ADIobj      	*lid;
 
-  adix_locdat( &id, name, nlen,		/* Find data address */
-	       DA__ARRAY|DA__SET, &lid,
-	       NULL, status );
+/* Find data address */
+  adix_locdat( &id, name, nlen, DA__ARRAY|DA__SET, &lid, NULL, status );
 
   /* Check not accessed */
 
@@ -3505,8 +3402,8 @@ void adix_cell( ADIobj id, char *name, int nlen, int ndim,
 	ADIobj	fdid;
 	ADIobj  newid;
 
-	fdid = adix_arycell( ary,	/* Locate the array cell */
-			index, status );
+/* Locate the array cell */
+	fdid = ADIaryCell( ary,	index, status );
 
 	newid = adix_newhan( fdid,	/* Construct new handle */
 	      ADI__true, status );
@@ -3521,77 +3418,13 @@ void adix_cell( ADIobj id, char *name, int nlen, int ndim,
   }
 
 
-void adix_alter( ADIobj id, char *name, int nlen,
-		 int ndim, int dims[], ADIstatus status )
-  {
-  ADIobj      	*lid;
-
-  adix_locdat( &id, name, nlen,		/* Find data address */
-	       DA__ARRAY, &lid,
-	       NULL, status );
-
-  /* Check not accessed, not a slice */
-
-  if ( _ok(status) ) {
-    ADIobj 	hid = _han_id(*lid);	/* Locate handled object */
-
-    if ( _ary_q(hid) ) {              	/* Array object? */
-      ADIarrayPtr	ary;
-      int		idim;
-      int		onelm,nnelm;
-
-      ary = _ary_data(hid);		/* Locate array data block */
-
-      onelm = adix_sumdim(ary->ndim,	/* Find old and new # of elements */
-                          ary->dims);
-      nnelm = adix_sumdim(ndim,dims);
-
-      if ( nnelm != onelm ) {		/* Space requirement has changed? */
-        ADIblockCtrlPtr	actrl;
-        ADIobj		newid;
-
-        actrl = &_DTDEF(hid)->alloc;	/* Locate block allocator */
-
-        newid = adix_cls_alloc( actrl,	/* Allocate new data object */
-              ndim, dims, status );
-
-        memcpy( (char *) _DTDAT(newid),	/* Simple block memory copy */
-                (char *) _DTDAT(ary->data),
-                _MAX(onelm,nnelm)*actrl->size );
-
-        if ( onelm > nnelm ) {		/* Old objects being lost? */
-          /* Delete them! */
-          }
-
-        ary->data = ADI__nullid;	/* Zero this so we can delete it */
-
-        adic_erase( &hid, status );	/* Erase the old array block */
-
-        _han_id(id) = newid;		/* Attach the new array block */
-        }
-      else {				/* Only dimensions have changed */
-        ary->ndim = ndim;
-        for( idim=0; idim<ndim; idim++ )
-          ary->dims[idim] = dims[idim];
-
-        for( ; idim<ADI__MXDIM; idim++ )
-          ary->dims[idim] = 0;
-        }
-      }
-    else
-      adic_setecs( ADI__INVARG, "Object is not an array", status );
-    }
-  }
-
-
 void adix_shape( ADIobj id, char *name, int nlen, int mxndim, int dims[],
 		 int *ndim, ADIstatus status )
   {
   ADIobj      	*lid;
 
-  adix_locdat( &id, name, nlen,		/* Find data address */
-	       DA__DEFAULT, &lid,
-	       NULL, status );
+/* Find data address */
+  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, status );
 
   if ( _ok(status) ) {
     ADIobj      	hid = _han_id(*lid);
@@ -3601,9 +3434,9 @@ void adix_shape( ADIobj id, char *name, int nlen, int mxndim, int dims[],
       ADIarrayPtr       adata = _ary_data(hid);
 
       if ( adata->ndim <= mxndim ) {
-        *ndim = adata->ndim;
+	*ndim = adata->ndim;
 
-        for( idim=0; idim<adata->ndim; idim++ )
+	for( idim=0; idim<adata->ndim; idim++ )
 	  dims[idim] = adata->dims[idim];
 
         for( ; mxndim; idim++ )
@@ -3633,12 +3466,10 @@ void adix_get_n( int clang, ADIobj id, char *name, int nlen,
   ADIobj        *lid;                   /* Object to be accessed */
   ADImta        omta = _DEF_1D_MTA;     /* Output value MTA */
 
-  adix_locdat( &id, name, nlen,		/* Find data insertion point */
-	       DA__SET, &lid, NULL,
-	       status );
+/* Find data insertion point */
+  adix_locdat( &id, name, nlen, DA__SET, &lid, NULL, status );
 
-  if ( _ok(status) )
-    {
+  if ( _ok(status) ) {
     adix_mtaid( *lid, &imta, status );  /* Set input channel */
 
     omta.type = vtype;                  /* Set output channel */
@@ -3653,7 +3484,7 @@ void adix_get_n( int clang, ADIobj id, char *name, int nlen,
 
     if ( nactdims )			/* User wants actuals back? */
       for( idim=0; idim<ndim; idim++ )
-        nactdims[idim] = omta.udims[idim];/* Actual data used */
+	nactdims[idim] = omta.udims[idim];/* Actual data used */
     }
   }
 
@@ -3743,7 +3574,7 @@ ADIobj adix_add_mapctrl( ADIobj id, ADIacmode mode, ADIclassCode mtype,
     }
 
   if ( ! mctrl ) {
-    newm = adix_bb_alloc( &KT_ALLOC_mapctrl,  /* Allocate new map control */
+    newm = adix_cls_alloc( &KT_DEFN_mapctrl,  /* Allocate new map control */
 			status );
 
     mctrl = _mapctrl_data(newm);
@@ -3813,7 +3644,7 @@ void adix_map_n( int clang, ADIobj id, char *name, int nlen,
 /* non-contiguous in memory */
     if ( (vtype!=imta.type) || ! imta.contig ) {
       dynamic = ADI__true;
-      nbyte = vsize * adix_sumdim( imta.ndim, imta.udims );
+      nbyte = vsize * ADIaryCountNelm( imta.ndim, imta.udims );
       }
 
 /* Create the mapping control object */
@@ -3844,18 +3675,18 @@ void adix_map_t( int clang, ADIobj id, char *name, int nlen,
 		 char *cls, int clen, char *mode, int mlen,
 		 void **vptr, ADIstatus status )
   {
-  ADIblockCtrlPtr      alloc;       	/* Type allocator */
+  ADIclassDef		*tdef;		/* Class definition */
 
   _chk_stat;                            /* Standard checks */
 
   _GET_NAME(cls,clen);                	/* Import string */
 
-  adix_findcls( cls, clen,              /* Locate allocator object */
-		&alloc, status );
+/* Locate the allocator object */
+  tdef = ADIkrnlFindClsC( cls, clen, status );
 
-  if ( _ok(status) )
-    adix_map_n( clang, id, name, nlen, mode, mlen, alloc->clas,
-		alloc->size, vptr, status );
+  if ( tdef )
+    adix_map_n( clang, id, name, nlen, mode, mlen, tdef->alloc.clas,
+		tdef->alloc.size, vptr, status );
   }
 
 void adix_unmap_n( ADIobj id, char *name, int nlen,
@@ -3865,9 +3696,8 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
   ADIobj        *lid;                   /* Object to be accessed */
   ADIobj	lobj;			/* The object lock */
 
-  adix_locdat( &id, name, nlen,		/* Find data insertion point */
-	       DA__DEFAULT, &lid, NULL,
-	       status );
+/* Find data address */
+  adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, status );
 
   lobj = adix_loc_mapctrl( id, 0, vptr, &ipoint, status );
 
@@ -3927,23 +3757,23 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
  *    ENDIF
  *
  */
-void adix_wdata( ADIobj *id, ADImtaPtr mta,
-		 ADIblockCtrlPtr dctrl, ADIstatus status )
+void adix_wdata( ADIobj *id, ADImtaPtr mta, ADIstatus status )
   {
-  ADIblockCtrlPtr actrl = dctrl;
+  ADIclassDef	  *ddef = mta->tdef;
+  ADIclassDef     *adef = ddef;
   ADImta          omta;                 /* MTA for the object */
 
-  if ( _null_q(*id) )                   /* Slot is empty? */
-    *id = adix_cls_alloc( actrl,        /* Create new object */
-		mta->ndim, mta->ddims,
-		status );
-  else					/* Use class control for slot data */
-    actrl = &_DTDEF(*id)->alloc;
+/* If the data slot is empty create the data object using the class */
+/* definition supplied, otherwise locate the class definition of the */
+/* existing data */
+  if ( _null_q(*id) )
+    *id = adix_cls_nalloc( adef, mta->ndim, mta->ddims, status );
+  else
+    adef = _DTDEF(*id);
 
-  if ( actrl->cdef->mcon &&             /* Constructor defined and data unset */
-       ! _han_set(*id) ) {
-    (*actrl->cdef->mcon)( *id, mta,     /* Invoke the constructor */
-			  status );
+/* Constructor exists, and data not set? */
+  if ( adef->mcon && ! _han_set(*id) ) {
+    (*adef->mcon)( *id, mta, status );  /* Invoke the constructor */
 
     if ( _ok(status) && mta->data )     /* Set dataset bit if data and ok */
       _han_set(*id) = ADI__true;
@@ -3964,7 +3794,7 @@ void adix_wdata( ADIobj *id, ADImtaPtr mta,
  */
 void adix_new_n( ADIlogical clang, ADIobj pid, char *name, int nlen,
 		 int ndim, int dims[], void *value,
-		 ADIblockCtrlPtr actrl, int vsize,
+		 ADIclassDef *tdef, int vsize,
 		 ADIobj *id, ADIstatus status )
   {
   int           idim;                   /* Loop over dimensions */
@@ -3983,14 +3813,15 @@ void adix_new_n( ADIlogical clang, ADIobj pid, char *name, int nlen,
 
   imta.data = value;                    /* Set input channel */
   imta.size = vsize;
-  imta.type = actrl->clas;
+  imta.tdef = tdef;
+  imta.type = tdef->alloc.clas;
   imta.ndim = ndim;
   for( idim=0; idim<ndim; idim++ )
     imta.ddims[idim] = imta.udims[idim] = dims[idim];
   imta.nulterm = clang;
 
 /* Write the data */
-  adix_wdata( newid, &imta, actrl, status );
+  adix_wdata( newid, &imta, status );
 
 /* Everything went ok? */
   if ( _ok(status) ) {
@@ -4009,7 +3840,7 @@ void adix_new_n( ADIlogical clang, ADIobj pid, char *name, int nlen,
 /* Put value of object, or object component
  */
 void adix_put_n( int clang, ADIobj id, char *name, int nlen,
-		 int ndim, int dims[], ADIblockCtrlPtr actrl,
+		 int ndim, int dims[], ADIclassDef *tdef,
 		 int vsize, void *value, ADIstatus status )
   {
   int           idim;                   /* Loop over dimensions */
@@ -4025,12 +3856,13 @@ void adix_put_n( int clang, ADIobj id, char *name, int nlen,
     imta.ndim = ndim;
     for( idim=0; idim<ndim; idim++ )
       imta.ddims[idim] = imta.udims[idim] = dims[idim];
-    imta.type = actrl->clas;
+    imta.tdef = tdef;
+    imta.type = tdef->alloc.clas;
     imta.size = vsize;
     imta.nulterm = clang;
 
 /* Write the data */
-    adix_wdata( lid, &imta, actrl, status );
+    adix_wdata( lid, &imta, status );
 
 /* Evrything went ok? */
     if ( _ok(status) ) {
@@ -4050,7 +3882,7 @@ void adix_put_n( int clang, ADIobj id, char *name, int nlen,
 /* Set value of object, or object component
  */
 void adix_set_n( int clang, ADIobj id, char *name, int nlen,
-		 int ndim, int dims[], ADIblockCtrlPtr actrl,
+		 int ndim, int dims[], ADIclassDef *tdef,
 		 int vsize, void *value, ADIstatus status )
   {
   ADImta        imta = _DEF_1D_MTA;     /* Input value MTA */
@@ -4068,12 +3900,13 @@ void adix_set_n( int clang, ADIobj id, char *name, int nlen,
     imta.ndim = ndim;
     for( idim=0; idim<ndim; idim++ )
       imta.ddims[idim] = imta.udims[idim] = dims[idim];
-    imta.type = actrl->clas;
+    imta.tdef = tdef;
+    imta.type = tdef->alloc.clas;
     imta.size = vsize;
     imta.nulterm = clang;
 
-    adix_wdata( lid, &imta, actrl,      /* Write the data */
-		status );
+/* Write the data */
+    adix_wdata( lid, &imta, status );
 
     if ( _ok(status) &&                 /* Set parent object */
 	 _valid_q(parid) )
@@ -4095,20 +3928,19 @@ ADIobj adix_copy( ADIobj id, ADIstatus status )
     else
       {
       ADIobj    hid = _han_id(id);      /* Object pointed to by handle */
-      ADIclassDefPtr    tdef;
+      ADIclassDef    *tdef;
 
       tdef = _DTDEF(hid);               /* Locate object class definition */
 
       if ( _ary_q(hid) ) {              /* Array kernel object */
 	adata = _ary_data(hid);
 
-	temp = adix_cls_alloc(          /* Create new object */
-	  &tdef->alloc, adata->ndim,
-	      adata->dims, status );
+	temp = adix_cls_nalloc( tdef,         /* Create new object */
+	  adata->ndim, adata->dims, status );
 	}
       else if ( tdef->prim ) {          /* Primitive (ie. non-class) data? */
-	temp = adix_cls_alloc(          /* Create new object */
-	  &tdef->alloc, 0, 0, status );
+	temp = adix_cls_alloc( tdef,         /* Create new object */
+	   status );
 
 	if ( tdef->mcon ) {             /* Constructor defined? */
 	  ADImta        imta;
@@ -4118,8 +3950,7 @@ ADIobj adix_copy( ADIobj id, ADIstatus status )
 	  (*tdef->mcon)( temp, &imta, status );
 	  }
 	else
-	  memcpy( _DTDAT(temp),
-	     _DTDAT(id), tdef->alloc.size );
+	  memcpy( _DTDAT(temp), _DTDAT(id), tdef->alloc.size );
 
 	if ( _ok(status) ) {
 	  _han_set(temp) = ADI__true;
@@ -4130,8 +3961,8 @@ ADIobj adix_copy( ADIobj id, ADIstatus status )
 	int     i;
 	ADIobj  *iobj,*oobj;
 
-	temp = adix_cls_alloc(          /* Create new object */
-	  &tdef->alloc, 0, 0, status );
+/* Create the new object */
+	temp = adix_cls_alloc( tdef, status );
 
 	iobj = _class_data(id);
 	oobj = _class_data(temp);
@@ -4149,81 +3980,79 @@ ADIobj adix_copy( ADIobj id, ADIstatus status )
   }
 
 
-void adix_print( ADIobj id, ADIlogical value_only, ADIstatus status )
+void adix_print( ADIobj stream, ADIobj id, ADIlogical value_only,
+		 ADIstatus status )
   {
   ADIobj                curmem;
   ADIobj                *iobj;
-  ADIclassDefPtr        tdef;
+  ADIclassDef           *tdef;
 
   _chk_stat;
 
   if ( id == ADI__nullid )
-    printf( "<null>" );
+    ADIstrmPutStr( stream, "<null>", _CSM, status );
   else if ( _han_q(id) ) {
     ADIobj      hid = _han_id(id);
 
     if ( ! value_only )
-      printf( "< {%d:%d->%d:%d}, nref=%d, ",
+      ADIstrmPrintf( stream, "< {%d:%d->%d:%d}, nref=%d, ", status,
 	    _ID_IBLK(id), _ID_SLOT(id),
 	    _ID_IBLK(hid), _ID_SLOT(hid),
 	    _han_ref(id) );
 
     if ( _krnl_q(hid) )
-      adix_print( hid, ADI__false, status );
-    else
-      {
+      adix_print( stream, hid, ADI__false, status );
+    else {
       tdef = _DTDEF(hid);               /* Locate class definition block */
 
       if ( ! value_only )
-	printf( "%s", tdef->name );
+	ADIstrmPutStr( stream, tdef->name, _CSM, status );
 /*      if ( ! _han_set(id) )
 	{
 	if ( ! value_only )
 	  printf( ", " );
 	printf( "not set" );
 	}
-      else */ if ( tdef->prnt )
-	{
+      else */ if ( tdef->prnt ) {
 	if ( ! value_only )
-	  printf( ", " );
-	(*tdef->prnt)( id, status );
+	  ADIstrmPrintf( stream, ", ", status );
+	(*tdef->prnt)( stream, id, status );
 	}
-      else if ( ! _prim_q(hid) )
-	{
+      else if ( ! _prim_q(hid) ) {
 	iobj = _class_data(id);
 	for( curmem = tdef->members; _valid_q(curmem);
-	     curmem = _mdef_next(curmem), iobj++ )
-	  {
-	  printf( "\n  " );
-	  strx_put( _mdef_aname(curmem) );
-	  printf( " = " );
-	  adix_print( *iobj, ADI__true, status );
+	     curmem = _mdef_next(curmem), iobj++ ) {
+	  ADIstrmPrintf( stream, "\n  ", status );
+	  adix_prnt_c( stream, _mdef_aname(curmem), status );
+	  ADIstrmPrintf( stream, " = ", status );
+	  adix_print( stream, *iobj, ADI__true, status );
 	  }
-	printf( "\n" );
+	ADIstrmPrintf( stream, "\n", status );
 	}
       }
     if ( _valid_q(_han_pl(id)) ) {
       ADIobj curp = _han_pl(id);
-      printf( ", props = {" );
+      ADIstrmPutStr( stream, ", props = {", _CSM, status );
       do {
-	adix_prnt_c( _CAAR(curp), status );
-	printf( "=" );
-	adix_print( _CDAR(curp), ADI__true, status );
+	adix_prnt_c( stream, _CAAR(curp), status );
+	ADIstrmPutCh( stream, '=', status );
+	adix_print( stream, _CDAR(curp), ADI__true, status );
 	curp = _CDR(curp);
-	putchar( (curp==ADI__nullid) ? '}' : ',' );
+	ADIstrmPutCh( stream, (curp==ADI__nullid) ? '}' : ',', status );
 	}
       while ( _valid_q(curp) && _ok(status) );
       }
 
     if ( ! value_only )
-      putchar( '>' );
+      ADIstrmPutCh( stream, '>', status );
     }
   else if ( _cdef_q(id) ) {
     ADIclassDefPtr  tdef = _cdef_data(id);
 
-    printf( "< Class definition %s", tdef->name );
+    ADIstrmPrintf( stream, "< Class definition %s", status, tdef->name );
     if ( tdef->prim ) {
-      printf( ", primitive, size = %d bytes", tdef->alloc.size );
+      ADIstrmPrintf( stream, ", primitive, size = %d bytes",
+		     status, tdef->alloc.size );
       }
     else {
       ADIobj            cmem = tdef->members;
@@ -4231,61 +4060,63 @@ void adix_print( ADIobj id, ADIlogical value_only, ADIstatus status )
       int               imem;
 
       if ( _null_q(cpar) )
-	printf( ", base class" );
+	ADIstrmPutStr( stream, ", base class", _CSM, status );
       else {
-	printf( ", superclasses {" );
+	ADIstrmPutStr( stream, ", superclasses {", _CSM, status );
 	for( ; _valid_q(cpar); cpar = _pdef_next(cpar) ) {
-	  adix_print( _pdef_name(cpar), ADI__true, status );
-	  printf( " " );
+	  adix_print( stream, _pdef_name(cpar), ADI__true, status );
+	  if ( _valid_q(cpar) )
+	    ADIstrmPutCh( stream, ' ', status );
 	  }
-	printf( "}" );
+	ADIstrmPutCh( stream, '}', status );
 	}
-      printf( ",\n" );
+      ADIstrmPrintf( stream, ",\n", status );
 
       for( imem=0; _valid_q(cmem); cmem = _mdef_next(cmem), imem++ ) {
-	printf( "  " );
+	ADIstrmPutStr( stream, "  ", _CSM, status );
 	if ( _valid_q(_mdef_defcls(cmem) ))
-	  printf( "%s ",_cdef_data(_mdef_defcls(cmem))->name );
-	strx_put( _mdef_aname(cmem) );
-        putchar( ' ' );
-	putchar( (imem==tdef->defmem) ? '*' : ' ' ) ;
+	  ADIstrmPrintf( stream, "%s ", status,
+		_cdef_data(_mdef_defcls(cmem))->name );
+	adix_prnt_c( stream, _mdef_aname(cmem), status );
+	if ( imem == tdef->defmem )
+	  ADIstrmPutCh( stream, '*', status );
+	ADIstrmPutCh( stream, ' ', status );
 	if ( _valid_q(_mdef_cdata(cmem) )) {
-	  printf( "= " );
-          adix_print( _mdef_cdata(cmem), ADI__true, status );
-          }
-	printf( "\n");
+	  ADIstrmPutStr( stream, "= ", _CSM, status );
+	  adix_print( stream, _mdef_cdata(cmem), ADI__true, status );
+	  }
+	ADIstrmPrintf( stream, "\n", status );
 	}
       }
-    printf( "  >" );
+    ADIstrmPutStr( stream, "  >", _CSM, status );
     }
   else if ( _ary_q(id) ) {
     ADIarrayPtr ary = _ary_data(id);
     int         i;
 
     if ( _krnl_q(ary->data) )
-      printf( "generic array" );
+      ADIstrmPutStr( stream, "generic array", _CSM, status );
     else
-      printf( "%s", _DTDEF(ary->data)->name );
-    printf("[");
+      ADIstrmPutStr( stream, _DTDEF(ary->data)->name, _CSM, status );
+    ADIstrmPutCh( stream, '[', status );
     for( i=0; i<ary->ndim; i++ )
-      printf( "%d%c", ary->dims[i], ((i+1)==ary->ndim) ? ']' : ',' );
+      ADIstrmPrintf( stream, "%d%c", status,
+		ary->dims[i], ((i+1)==ary->ndim) ? ']' : ',' );
     }
   else {
     tdef = _DTDEF(id);               /* Locate class definition block */
 
     if ( tdef->prnt )
-      (*tdef->prnt)( id, status );
+      (*tdef->prnt)( stream, id, status );
     else
-      printf( "<%s %d:%d, nref=%d> ",
-	    tdef->name,
-	    _ID_IBLK(id), _ID_SLOT(id),
-	    _han_ref(id) );
+      ADIstrmPrintf( stream, "<%s %d:%d, nref=%d> ", status, tdef->name,
+	    _ID_IBLK(id), _ID_SLOT(id), _han_ref(id) );
 
     value_only = ADI__true;
     }
 
   if ( ! value_only )
-    printf( "\n" );
+    ADIstrmPrintf( stream, "\n", status );
   }
 
 
@@ -4324,55 +4155,6 @@ ADIobj adix_fdsp_vo( ADICB *rtn, int *narg, ADIobj args[], ADIstatus status )
   (*((ADIfoCB) *rtn))( args+1, status );
 
   return ADI__nullid;
-  }
-
-
-ADIobj adix_plist_int( ADIstreamPtr pstream, ADIstatus status )
-  {
-  ADIobj        newobj = ADI__nullid;
-  ADIobj        *ipoint = &newobj;
-
-  if ( ADImatchTokenFromStream( pstream, TOK__LBRACE, status ) )
-    {
-    while ( (pstream->ctok.t==TOK__LBRACE) || (pstream->ctok.t==TOK__SYM) && _ok(status) )
-      {
-      *ipoint = lstx_cell(
-		adix_plist_int( pstream, status ),
-		ADI__nullid, status );
-      ipoint = &_CDR(*ipoint);
-
-/*   Comma delimits superclass names */
-      if ( pstream->ctok.t == TOK__COMMA )
-	(void) ADInextTokenFromStream( pstream, status );
-      else if ( ! ADImatchTokenFromStream( pstream, TOK__RBRACE, status ) )
-	{
-	adic_setecs( ADI__INVARG, "Syntax error in superclass specification", status );
-	}
-      }
-    }
-  else if ( pstream->ctok.t == TOK__SYM ) {
-    newobj = prsx_symname( pstream,     /* Put symbol in common string */
-			   status );    /* table */
-
-    (void) ADInextTokenFromStream( pstream, status );
-    }
-
-  return newobj;
-  }
-
-
-ADIobj adix_plist( char *spec, ADIstatus status )
-  {
-  ADIstream pstream;
-
-  ADIclearStream( &pstream, status );
-
-  ADIextendStreamC( &pstream, spec,/* Put parents specification into */
-		    strlen(spec), status );     /* parse stream */
-
-  (void) ADInextTokenFromStream( &pstream, status );
-
-  return adix_plist_int( &pstream, status );
   }
 
 
@@ -4503,7 +4285,7 @@ ADIobj adix_newmco( ADIobj name, ADIobj cexec, ADIstatus status )
   {
   ADIobj        newid;                  /* New mco object */
 
-  newid = adix_bb_alloc( &KT_ALLOC_mco, /* Allocate new array block */
+  newid = adix_cls_alloc( &KT_DEFN_mco, /* Allocate new array block */
 			 status );
 
   if ( _ok(status) )                    /* Allocation went ok? */
@@ -4590,8 +4372,7 @@ KT_CTYPE_cdef *adix_loccls( ADIobj name, ADIstatus status )
 /*
  * Does the class c2 exist in the inheritance list of c1?
  */
-ADIlogical adix_chkder( KT_CTYPE_cdef *c1, KT_CTYPE_cdef *c2,
-						      ADIstatus status )
+ADIlogical adix_chkder( ADIclassDef *c1, ADIclassDef *c2, ADIstatus status )
   {
   ADIlogical    derived = ADI__true;    /* True by default */
 
@@ -4601,7 +4382,7 @@ ADIlogical adix_chkder( KT_CTYPE_cdef *c1, KT_CTYPE_cdef *c2,
     ADIobj curp = c1->superclasses;
 
     while ( _valid_q(curp) ) {          /* Loop over superclasses */
-      KT_CTYPE_cdef *ptdef;
+      ADIclassDef *ptdef;
 
       ptdef = _cdef_data(               /* Locate parent class definition */
 		_pdef_clsid(curp));
@@ -4671,7 +4452,7 @@ void adix_primth( int narg, int farg, int nmth,
 	  cura = _CDR(cura);
 
 /* Locate class definition object */
-	acls = adix_findclsi( _CAR(cura), status );
+	acls = ADIkrnlFindClsI( _CAR(cura), status );
 
 /* Add the direct-superclass list to our list of such */
 	adslist = _cdef_data(acls)->dslist;
@@ -5094,4 +4875,13 @@ void adix_id_link( ADIobj id, char *grp, int glen, ADIstatus status )
     adic_setetc( "GRP", grp, glen );
     adic_setecs( ADI__INVARG, "Invalid identifier group /^GRP/", status );
     }
+  }
+
+void ADIkrnlAddCommonStrings( ADIcstrTableEntry stable[], ADIstatus status )
+  {
+  int		i;
+
+  for( i=0; stable[i].string; i++ )
+    *(stable[i].saddr) =
+      adix_cmnC( stable[i].string, status );
   }

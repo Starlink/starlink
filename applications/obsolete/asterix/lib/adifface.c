@@ -195,8 +195,10 @@
 #include "adicface.h"
 #include "adierror.h"
 #include "adikrnl.h"
+#include "adiarray.h"
 #include "adimem.h"
 #include "adipkg.h"
+#include "adisyms.h"
 #include "adifsys.h"
 #include "adifface.h"                   /* Prototypes for this module */
 
@@ -593,7 +595,7 @@ F77_SUBROUTINE(adifn(print))( INTEGER(id), INTEGER(status) )
 
   _chk_init_err; _chk_stat;
 
-  adix_print( *id, ADI__false, status );
+  adix_print( ADIcvStdOut, *id, ADI__false, status );
 
   _ERR_OUT;
   }
@@ -697,7 +699,7 @@ F77_SUBROUTINE(_TM_fname(new,_t))( INTEGER(ndim), INTEGER_ARRAY(dims), INTEGER(i
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(new,_t)); \
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, *ndim, dims, NULL, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
 	      0, (ADIobj *) id, status );\
   _ERR_OUT;}
 
@@ -713,7 +715,7 @@ F77_SUBROUTINE(_TM_fname(new0,_t))( INTEGER(id), INTEGER(status) ) \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(new0,_t)); \
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 0, NULL, NULL, \
-	     _cdef_ctrl(_TM_alloc(_t)), \
+	     _cdef_data(_TM_alloc(_t)), \
 	     0, (ADIobj *) id, status ); \
   _ERR_OUT;}
 
@@ -730,7 +732,7 @@ F77_SUBROUTINE(_TM_fname(new1,_t))( INTEGER(nval), INTEGER(id), INTEGER(status) 
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(new1,_t)); \
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 1, nval, NULL, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
 	      0, (ADIobj *) id, status );\
   _ERR_OUT;}
 
@@ -749,7 +751,7 @@ F77_SUBROUTINE(_TM_fname(newv,_t))( INTEGER(ndim), INTEGER_ARRAY(dims), _TM_ftyp
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(newv,_t)); \
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, *ndim, dims, value, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
 	      sizeof(_TM_ftype(_t)), \
 	      (ADIobj *) id, status );\
   _ERR_OUT;}
@@ -773,7 +775,7 @@ F77_SUBROUTINE(adifn(newvc))( INTEGER(ndim), INTEGER_ARRAY(dims),
   _ERR_IN("ADI_NEWVC");			/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, *ndim, dims, value,
-	      _cdef_ctrl(_TM_alloc(c)),
+	      _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      (ADIobj *) id, status );
 
@@ -788,7 +790,7 @@ F77_SUBROUTINE(_TM_fname(newv0,_t))( _TM_ftype(_t) *value, INTEGER(id), INTEGER(
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(newv0,_t)); \
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 0, NULL, value, \
-	     _cdef_ctrl(_TM_alloc(_t)), \
+	     _cdef_data(_TM_alloc(_t)), \
 	     sizeof(_TM_ftype(_t)), \
 	     (ADIobj *) id, status ); \
   _ERR_OUT;}
@@ -809,10 +811,8 @@ F77_SUBROUTINE(adifn(newv0c))( CHARACTER(value), INTEGER(id),
   _ERR_IN("ADI_NEWV0C");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 0, NULL,
-              (void *) &value,
-	      _cdef_ctrl(_TM_alloc(c)),
-	      value_length,
-	      (ADIobj *) id, status );
+	      (void *) &value, _cdef_data(_TM_alloc(c)),
+	      value_length, (ADIobj *) id, status );
 
   _ERR_OUT;
   }
@@ -826,7 +826,7 @@ F77_SUBROUTINE(_TM_fname(newv1,_t))( INTEGER(nval), _TM_ftype(_t) value[], INTEG
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(newv1,_t)); \
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 1, nval, value, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
 	      sizeof(_TM_ftype(_t)), \
 	      (ADIobj *) id, status );\
   _ERR_OUT;}
@@ -848,8 +848,7 @@ F77_SUBROUTINE(adifn(newv1c))( INTEGER(nval), CHARACTER_ARRAY(value),
   _ERR_IN("ADI_NEWV1C");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, ADI__nullid, NULL, 0, 1, nval, value,
-	      _cdef_ctrl(_TM_alloc(c)),
-	      value_length,
+	      _cdef_data(_TM_alloc(c)), value_length,
 	      (ADIobj *) id, status );
 
   _ERR_OUT;
@@ -1020,7 +1019,7 @@ F77_SUBROUTINE(_TM_fname(put,_t))( INTEGER(id), INTEGER(ndim), \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_fnames(put,_t)); \
   adix_put_n( 0, (ADIobj) *id, NULL, 0, *ndim, dims, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
               sizeof(_TM_ftype(_t)), \
 	      value, status );\
   _ERR_OUT;}
@@ -1043,7 +1042,7 @@ F77_SUBROUTINE(adifn(putc))( INTEGER(id), INTEGER(ndim), INTEGER_ARRAY(dims),
   _ERR_IN("ADI_PUTC");			/* Mark routine for error reporting */
 
   adix_put_n( 0, (ADIobj) *id, NULL, 0, *ndim, dims,
-	      _cdef_ctrl(_TM_alloc(c)),
+	      _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      value, status );
 
@@ -1058,7 +1057,7 @@ F77_SUBROUTINE(_TM_fname(put0,_t))( INTEGER(id), _TM_ftype(_t) *value, INTEGER(s
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_fnames(put0,_t)); \
   adix_put_n( 0, (ADIobj) *id, \
-	      NULL, 0, 0, NULL, _cdef_ctrl(_TM_alloc(_t)),\
+	      NULL, 0, 0, NULL, _cdef_data(_TM_alloc(_t)),\
 	      sizeof(_TM_ftype(_t)),\
 	      value, status );\
   _ERR_OUT;}
@@ -1078,7 +1077,7 @@ F77_SUBROUTINE(adifn(put0c))( INTEGER(id), CHARACTER(value), INTEGER(status) TRA
   _ERR_IN("ADI_PUT0C");		/* Mark routine for error reporting */
 
   adix_put_n( 0, (ADIobj) *id, NULL, 0,
-	      0, NULL, _cdef_ctrl(_TM_alloc(c)),
+	      0, NULL, _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      (void *) &value, status );
   _ERR_OUT;
@@ -1094,7 +1093,7 @@ F77_SUBROUTINE(_TM_fname(put1,_t))( INTEGER(id), INTEGER(nval), \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_fnames(put1,_t)); \
   adix_put_n( 0, (ADIobj) *id, NULL, 0, 1, nval, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
               sizeof(_TM_ftype(_t)), \
 	      value, status );\
   _ERR_OUT;}
@@ -1116,7 +1115,7 @@ F77_SUBROUTINE(adifn(put1c))( INTEGER(id), INTEGER(nval),
   _ERR_IN("ADI_PUT1C");			/* Mark routine for error reporting */
 
   adix_put_n( 0, (ADIobj) *id, NULL, 0, 1, nval,
-	      _cdef_ctrl(_TM_alloc(c)),
+	      _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      value, status );
 
@@ -1216,8 +1215,7 @@ F77_SUBROUTINE(_TM_fname(cnew,_t))( INTEGER(pid), CHARACTER(name), \
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(cnew,_t)); \
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, *ndim, dims, NULL, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
-	      0, NULL, status );\
+	      _cdef_data(_TM_alloc(_t)), 0, NULL, status );\
   _ERR_OUT;}
 
 _genproc(b)	_genproc(w)	_genproc(i)	_genproc(r)
@@ -1233,8 +1231,7 @@ F77_SUBROUTINE(_TM_fname(cnew0,_t))( INTEGER(pid), CHARACTER(name), INTEGER(stat
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(cnew0,_t)); \
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 0, NULL, NULL, \
-	     _cdef_ctrl(_TM_alloc(_t)), \
-	     0, NULL, status ); \
+	     _cdef_data(_TM_alloc(_t)), 0, NULL, status ); \
   _ERR_OUT;}
 
 _genproc(b)	_genproc(w)	_genproc(i)	_genproc(r)
@@ -1251,8 +1248,7 @@ F77_SUBROUTINE(_TM_fname(cnew1,_t))( INTEGER(pid), CHARACTER(name), INTEGER(nval
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(cnew1,_t)); \
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 1, nval, NULL, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
-	      0, NULL, status );\
+	      _cdef_data(_TM_alloc(_t)), 0, NULL, status );\
   _ERR_OUT;}
 
 _genproc(b)	_genproc(w)	_genproc(i)	_genproc(r)
@@ -1271,8 +1267,7 @@ F77_SUBROUTINE(_TM_fname(cnewv,_t))( INTEGER(pid), CHARACTER(name), INTEGER(ndim
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(cnewv,_t)); \
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, *ndim, dims, value, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
-	      sizeof(_TM_ftype(_t)), \
+	      _cdef_data(_TM_alloc(_t)), sizeof(_TM_ftype(_t)), \
 	      NULL, status );\
   _ERR_OUT;}
 
@@ -1296,9 +1291,7 @@ F77_SUBROUTINE(adifn(cnewvc))( INTEGER(pid), CHARACTER(name), INTEGER(ndim),
   _ERR_IN("ADI_CNEWVC");			/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, *ndim, dims, value,
-	      _cdef_ctrl(_TM_alloc(c)),
-	      value_length,
-	      NULL, status );
+	      _cdef_data(_TM_alloc(c)), value_length, NULL, status );
 
   _ERR_OUT;
   }
@@ -1312,8 +1305,7 @@ F77_SUBROUTINE(_TM_fname(cnewv0,_t))( INTEGER(pid), CHARACTER(name), _TM_ftype(_
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(cnewv0,_t)); \
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 0, NULL, value, \
-	     _cdef_ctrl(_TM_alloc(_t)), \
-	     sizeof(_TM_ftype(_t)), \
+	     _cdef_data(_TM_alloc(_t)), sizeof(_TM_ftype(_t)), \
 	     NULL, status ); \
   _ERR_OUT;}
 
@@ -1334,10 +1326,8 @@ F77_SUBROUTINE(adifn(cnewv0c))( INTEGER(pid), CHARACTER(name), CHARACTER(value),
   _ERR_IN("ADI_CNEWV0C");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 0, NULL,
-              (void *) &value,
-	      _cdef_ctrl(_TM_alloc(c)),
-	      value_length,
-	      NULL, status );
+	      (void *) &value, _cdef_data(_TM_alloc(c)),
+	      value_length, NULL, status );
 
   _ERR_OUT;
   }
@@ -1352,8 +1342,7 @@ F77_SUBROUTINE(_TM_fname(cnewv1,_t))( INTEGER(pid), CHARACTER(name), INTEGER(nva
   _chk_init; _chk_stat; \
   _ERR_IN(_TM_fnames(cnewv1,_t)); \
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 1, nval, value, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
-	      sizeof(_TM_ftype(_t)), \
+	      _cdef_data(_TM_alloc(_t)), sizeof(_TM_ftype(_t)), \
 	      NULL, status );\
   _ERR_OUT;}
 
@@ -1376,8 +1365,7 @@ F77_SUBROUTINE(adifn(cnewv1c))( INTEGER(pid), CHARACTER(name), INTEGER(nval),
   _ERR_IN("ADI_CNEWV1C");		/* Mark routine for error reporting */
 
   adix_new_n( ADI__false, (ADIobj) *pid, name, name_length, 1, nval, value,
-	      _cdef_ctrl(_TM_alloc(c)),
-	      value_length,
+	      _cdef_data(_TM_alloc(c)), value_length,
 	      NULL, status );
 
   _ERR_OUT;
@@ -1565,7 +1553,7 @@ F77_SUBROUTINE(_TM_fname(cput,_t))( INTEGER(id), CHARACTER(name), \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_fnames(cput,_t)); \
   adix_put_n( 0, (ADIobj) *id, name, name_length, *ndim, dims, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
               sizeof(_TM_ftype(_t)), \
 	      value, status );\
   _ERR_OUT;}
@@ -1590,7 +1578,7 @@ F77_SUBROUTINE(adifn(cputc))( INTEGER(id), CHARACTER(name), INTEGER(ndim),
 
   adix_put_n( 0, (ADIobj) *id, name,
 	      name_length, *ndim, dims,
-	      _cdef_ctrl(_TM_alloc(c)),
+	      _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      value, status );
 
@@ -1607,7 +1595,7 @@ F77_SUBROUTINE(_TM_fname(cput0,_t))( INTEGER(id), CHARACTER(name), \
   _ERR_IN(_TM_fnames(cput0,_t)); \
   _chk_init_err; _chk_stat; \
   adix_put_n( 0, (ADIobj) *id, name, name_length, \
-	      0, NULL, _cdef_ctrl(_TM_alloc(_t)),\
+	      0, NULL, _cdef_data(_TM_alloc(_t)),\
 	     sizeof(_TM_ftype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1629,7 +1617,7 @@ F77_SUBROUTINE(adifn(cput0c))( INTEGER(id), CHARACTER(name),
   _ERR_IN("ADI_CPUT0C");		/* Mark routine for error reporting */
 
   adix_put_n( 0, (ADIobj) *id, name, name_length,
-	      0, NULL, _cdef_ctrl(_TM_alloc(c)),
+	      0, NULL, _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      (void *) &value, status );
   _ERR_OUT;
@@ -1647,7 +1635,7 @@ F77_SUBROUTINE(_TM_fname(cput1,_t))( INTEGER(id), CHARACTER(name), \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_fnames(cput1,_t)); \
   adix_put_n( 0, (ADIobj) *id, name, name_length, 1, nval, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
               sizeof(_TM_ftype(_t)), \
 	      value, status );\
   _ERR_OUT;}
@@ -1671,7 +1659,7 @@ F77_SUBROUTINE(adifn(cput1c))( INTEGER(id), CHARACTER(name), INTEGER(nval),
 
   adix_put_n( 0, (ADIobj) *id, name,
 	      name_length, 1, nval,
-	      _cdef_ctrl(_TM_alloc(c)),
+	      _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      value, status );
 
@@ -1688,7 +1676,7 @@ F77_SUBROUTINE(_TM_fname(cset0,_t))( INTEGER(id), CHARACTER(name), \
   _ERR_IN(_TM_fnames(cset0,_t)); \
   _chk_init_err; _chk_stat; \
   adix_set_n( 0, (ADIobj) *id, name, name_length, \
-	      0, NULL, _cdef_ctrl(_TM_alloc(_t)),\
+	      0, NULL, _cdef_data(_TM_alloc(_t)),\
 	     sizeof(_TM_ftype(_t)), \
 	     value, status ); \
   _ERR_OUT;}
@@ -1710,7 +1698,7 @@ F77_SUBROUTINE(adifn(cset0c))( INTEGER(id), CHARACTER(name),
   _ERR_IN("ADI_CSET0C");		/* Mark routine for error reporting */
 
   adix_set_n( 0, (ADIobj) *id, name, name_length,
-	      0, NULL, _cdef_ctrl(_TM_alloc(c)),
+	      0, NULL, _cdef_data(_TM_alloc(c)),
 	      value_length,
 	      (void *) &value, status );
   _ERR_OUT;
@@ -1728,7 +1716,7 @@ F77_SUBROUTINE(_TM_fname(cset1,_t))( INTEGER(id), CHARACTER(name), \
   _chk_init_err; _chk_stat; \
   _ERR_IN(_TM_fnames(cset1,_t)); \
   adix_set_n( 0, (ADIobj) *id, name, name_length, 1, nval, \
-	      _cdef_ctrl(_TM_alloc(_t)), \
+	      _cdef_data(_TM_alloc(_t)), \
 	      sizeof(_TM_ftype(_t)), \
 	      value, status );\
   _ERR_OUT;}
@@ -1750,11 +1738,8 @@ F77_SUBROUTINE(adifn(cset1c))( INTEGER(id), CHARACTER(name), INTEGER(nval),
 
   _ERR_IN("ADI_CSET1C");		/* Mark routine for error reporting */
 
-  adix_set_n( 0, (ADIobj) *id, name,
-	      name_length, 1, nval,
-	      _cdef_ctrl(_TM_alloc(c)),
-	      value_length,
-	      value, status );
+  adix_set_n( 0, (ADIobj) *id, name, name_length, 1, nval,
+	      _cdef_data(_TM_alloc(c)), value_length, value, status );
 
   _ERR_OUT;
   }
@@ -1932,15 +1917,15 @@ F77_SUBROUTINE(adifn(alter))( INTEGER(id), INTEGER(ndim), INTEGER_ARRAY(dims),
 
   _ERR_IN("ADI_ALTER");			/* Mark routine for error reporting */
 
-  adix_alter( (ADIobj) *id, NULL, 0,    /* Invoke kernel routine */
-              *ndim, dims, status );
+  ADIaryAlter( (ADIobj) *id, NULL, 0,    /* Invoke kernel routine */
+	      *ndim, dims, status );
 
   _ERR_OUT;
   }
 
 F77_SUBROUTINE(adifn(calter))( INTEGER(id), CHARACTER(name), INTEGER(ndim),
-                               INTEGER_ARRAY(dims),
-                               INTEGER(status) TRAIL(name) )
+			       INTEGER_ARRAY(dims),
+			       INTEGER(status) TRAIL(name) )
   {
   GENPTR_INTEGER(id)
   GENPTR_CHARACTER(name)
@@ -1952,9 +1937,8 @@ F77_SUBROUTINE(adifn(calter))( INTEGER(id), CHARACTER(name), INTEGER(ndim),
 
   _ERR_IN("ADI_CALTER");		/* Mark routine for error reporting */
 
-  adix_alter( (ADIobj) *id, name, 	/* Invoke kernel routine */
-              name_length,
-              *ndim, dims, status );
+  ADIaryAlter( (ADIobj) *id, name, 	/* Invoke kernel routine */
+	       name_length, *ndim, dims, status );
 
   _ERR_OUT;
   }

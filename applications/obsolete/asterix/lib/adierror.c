@@ -64,7 +64,7 @@ void adix_setetc( char *tok, char *val, int vlen )
   }
 
 
-void adix_seteti( char *tok, int val )
+void adix_seteti( char *tok, ADIinteger val )
   {
 #ifndef NOEMS
   ems_seti_c( tok, val );
@@ -249,6 +249,7 @@ char *adix_errmsg( ADIstatype code, char *buf, int buflen )
       {ADI__MAPPED,	"Object is already mapped"},
       {ADI__NOTMAP,	"Object is not mapped at this address"},
       {ADI__RDONLY,	"Object is readonly"},
+      {ADI__SYNTAX,	"Syntax error"},
       {SAI__ERROR,	"Error"},
       {SAI__OK,		""}
       };

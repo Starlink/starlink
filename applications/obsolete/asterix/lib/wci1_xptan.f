@@ -74,7 +74,7 @@
 *     package:wci, usage:private
 
 *  Copyright:
-*     {routine_copyright}
+*     Copyright (C) University of Birmingham, 1995
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)

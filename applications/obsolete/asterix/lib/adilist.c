@@ -35,12 +35,13 @@
 #include "adikrnl.h"                    /* Kernel code */
 #include "adicface.h"                   /* C programmer interface */
 #include "adilist.h"                    /* Prototypes for this sub-package */
+#include "adiparse.h"
 #include "adierror.h"                   /* ADI error handling */
 
 
 ADIobj       UT_ALLOC_list;             /* _List object allocator */
 
-void lstx_print( ADIobj id, ADIstatus status )
+void lstx_print( ADIobj stream, ADIobj id, ADIstatus status )
   {
   ADIobj        curp = id;
 
@@ -49,23 +50,23 @@ void lstx_print( ADIobj id, ADIstatus status )
   if ( _valid_q(id) ) {
     ADIobj	cdr = _CDR(id);
 
-    putchar( '{' );
+    ADIstrmPutCh( stream, '{', status );
     if ( _null_q(cdr) ? 1 : _list_q(cdr) ) { /* This is a standard list? */
       do {
-	adix_print( _CAR(curp), ADI__true, status );
+	adix_print( stream, _CAR(curp), ADI__true, status );
 
 	curp = _CDR(curp);
 	if ( _valid_q(curp) )
-	  printf( ", " );
+	  ADIstrmPutStr( stream, ", ", _CSM, status );
 	}
       while ( _valid_q(curp) );
       }
     else {				/* It's a dotted pair */
-      adix_print( _CAR(curp), ADI__true, status );
-      putchar( '.' );
-      adix_print( _CDR(curp), ADI__true, status );
+      adix_print( stream, _CAR(curp), ADI__true, status );
+      ADIstrmPutCh( stream, '.', status );
+      adix_print( stream, _CDR(curp), ADI__true, status );
       }
-    putchar( '}' );
+    ADIstrmPutCh( stream, '}', status );
     }
   }
 
@@ -74,12 +75,9 @@ void lstx_init( ADIstatus status )
   {
   _chk_stat;                            /* Check status on entry */
 
-  adic_defcls( "_List", "",
-         "first,rest",
-         &UT_ALLOC_list, status );
+  adic_defcls( "_List", "", "first,rest", &UT_ALLOC_list, status );
 
-  adix_def_prnt( UT_ALLOC_list,
-	 lstx_print, status );
+  adix_def_prnt( UT_ALLOC_list, lstx_print, status );
   }
 
 
@@ -158,10 +156,9 @@ ADIobj lstx_cell( ADIobj aid, ADIobj bid, ADIstatus status )
   if ( !_ok(status) )                   /* Check status on entry */
     return ADI__nullid;
 
-  lid = adix_cls_alloc( _cdef_ctrl(UT_ALLOC_list), 0, 0, status );
+  lid = adix_cls_alloc( _cdef_data(UT_ALLOC_list), status );
 
-  if ( _ok(status) )
-    {
+  if ( _ok(status) ) {
     _CAR(lid) = aid; _CDR(lid) = bid;
     }
 
