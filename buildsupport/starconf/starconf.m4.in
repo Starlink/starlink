@@ -605,9 +605,8 @@ dnl  and Fink on OSX
         res="_star_tcldir=$tcldir;"
 
         # Make the TCL version number available.
-        eval "V=\"$TCL_VERSION\""
-        res="$res TCL_VERSION=\"$V\";"
-        
+        res="$res TCL_VERSION=\"$TCL_VERSION\";"
+
         # These envs include $TCL_DBGX -- expand this out.
         eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
         res="$res TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\"; TCLSH=\"$tclsh_loc\";"
