@@ -29,8 +29,8 @@ STAR_DECLARE_DEPENDENCIES([link], [fio sla jpl mers])
 
 dnl    No use dependencies
 
-STAR_LATEX_DOCUMENTATION(sun213)
-STAR_DOC_FILES(sun213_fig1.eps)
+dnl Documentation
+STAR_LATEX_DOCUMENTATION(sun213/ )
 
 AC_CONFIG_FILES(Makefile component.xml)
 
