@@ -84,6 +84,7 @@ class PkFont {
     PkGlyph *glyph (unsigned int i) const { return glyphs_[i]; }
     static debug (bool sw) { debug_ = sw; }
     static void setFontPath(string fp) { fontpath_ = fp; }
+    static void setFontPath(char  *fp) { fontpath_ = fp; }
  private:
     unsigned int checksum_, scalefactor_, designsize_;
     string name_;
