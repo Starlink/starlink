@@ -1446,13 +1446,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/GraphLogger.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:23: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/toolbox/TypedNodeRenderer.java:44: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "A typed node renderer with the given node renderer
-  [javadoc]  as its default (i.e. how to render a node if it
-  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Channel.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Delta.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Generator.java:31: warning - @rating is an unknown tag.
@@ -1461,6 +1454,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Transmitter.java:43: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/View.java:37: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/Protocol.java:29: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/toolbox/TypedNodeRenderer.html...
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "A typed node renderer with the given node renderer
+  [javadoc]  as its default (i.e. how to render a node if it
+  [javadoc]  has a type that is not understood by this renderer)."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWEdge.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWNode.java:18: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/lwgraph/LWPort.java:18: warning - @rating is an unknown tag.
@@ -1529,4 +1529,4 @@ javadoc-sources:
   [javadoc] 575 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 38 seconds
+Total time: 1 minute 13 seconds
