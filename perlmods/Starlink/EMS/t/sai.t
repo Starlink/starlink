@@ -27,5 +27,6 @@ my $err = $fac . "__$ident";
 if ($err eq 'SAI__ERROR') {
   print "ok 2\n";
 } else {
+  print "Error is $err - expecting SAI__ERROR\n";
   print "not ok 2\n";
 }
