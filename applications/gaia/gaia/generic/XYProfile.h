@@ -48,7 +48,8 @@ public:
   virtual ~XYProfile();
 
   //  Extract and return XYProfiles.
-  void extractProfiles( double *xVector, double *yVector, int numValues[2] );
+  void extractProfiles( double *xCoords, double *xVector, 
+                        double *yCoords, double *yVector, int numValues[2] );
 
   //  Set the region of the image to be profiled.
   void setRegion( const int x0, const int y0, const int x1, const int y1 );

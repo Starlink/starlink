@@ -558,7 +558,7 @@ itcl::class gaia::Gaia {
          {Select or identify object positions and properties} \
          -command [code $this make_toolbox positions] \
 
-      add_menuitem $m command "Show XY profile...  " \
+      add_menuitem $m command "Mean X & Y profiles...  " \
          {Show X and Y averaged profiles of a rectangular region} \
          -command [code $this make_toolbox xyprofile] \
 
@@ -842,8 +842,7 @@ itcl::class gaia::Gaia {
    }
 
    #  Make XY profiles toolbox. Slightly different as need to get
-   #  rectangle on canvas first. Move this to GaiaImageCtrl after
-   #  testing. 
+   #  rectangle on canvas first.
    public method make_xyprofile_toolbox {name {cloned 0}} {
       if {[$image_ isclear]} {
          warning_dialog "No image is currently loaded" $w_

@@ -16,7 +16,7 @@
 #     rectangle that can be dragged around the image. The profiles are
 #     updated when the rectangle is dragged around the image.
 #
-#     When creating an instance of this class you must supply a canvas 
+#     When creating an instance of this class you must supply a canvas
 #     rectangle object (rect_id).
 
 #  Invocations:
@@ -81,6 +81,10 @@ itcl::class gaia::GaiaXYProfile {
       set File [add_menubutton "File" left]
       configure_menubutton File -underline 0
 
+      #  Add the option menu.
+      set Options [add_menubutton "Options" left]
+      configure_menubutton Options -underline 0
+
       #  Add window help.
       global gaia_dir
       add_help_button $gaia_dir/GaiaXYProfile.hlp "On Window..."
@@ -102,65 +106,100 @@ itcl::class gaia::GaiaXYProfile {
          -accelerator {Control-c}
       bind $w_ <Control-c> [code $this close]
 
+      #  Add toggle for continuous updates.
+      $Options add checkbutton -label {Continuous updates} \
+         -variable [scope itk_option(-continuous_updates)] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this add_notify_]
+      $short_help_win_ add_menu_short_help $Options \
+         {Continuous updates} \
+         {Change profiles during rectangle motion}
+
       #  Set the initial corner coordinates of the rectangle.
       lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0 y0 x1 y1
 
       #  Create the BLT graphs that display the profiles.
       make_graphs_
 
+      #  Add the control panel and buttons.
+      make_buttons_
    }
 
    #  Destructor:
    #  -----------
    destructor  {
-      
+
       #  Remove BLT vectors.
-      blt::vector destroy $xxVector_ $xyVector_ $yxVector_ $yyVector_
+      blt::vector destroy $xxVector_ $xiVector_ $xdVector_
+      blt::vector destroy $yyVector_ $yiVector_ $ydVector_
 
       #  Remove rectangle.
-      $itk_option(-canvasdraw) remove_notify_cmd $itk_option(-rect_id)
-      $itk_option(-canvasdraw) delete_object $itk_option(-rect_id)
-
+      catch {
+         $itk_option(-canvasdraw) remove_notify_cmd $itk_option(-rect_id)
+         $itk_option(-canvasdraw) delete_object $itk_option(-rect_id)
+      }
    }
 
    #  Methods:
    #  --------
 
-   #  Close the window. 
+   #  Close the window.
    public method close {} {
       destroy $w_
    }
 
+   #  Create a clone of this window.
+   protected method clone_me_ {} {
+      if { $itk_option(-clone_cmd) != {} } {
+         eval $itk_option(-clone_cmd)
+      }
+   }
+
    #  Create the BLT graphs and vectors for displaying the profiles.
    protected method make_graphs_ {} {
-      global ::tcl_version
 
-      #  Add the X and Y graphs.
+      #  Create a panedwindow to display the two graphs.
+      itk_component add pane {
+         iwidgets::panedwindow $w_.pane -width 5i -height 6i
+      }
+      pack $itk_component(pane) -fill both -expand 1 -padx 1m -pady 1m
+      $itk_component(pane) add "X"
+      set xpane [$itk_component(pane) childsite "X"]
+      $itk_component(pane) add "Y"
+      set ypane [$itk_component(pane) childsite "Y"]
+
+      #  Create the X graph and add it to the upper pane.
       itk_component add xgraph {
-         blt::graph $w_.xgraph \
+         blt::graph $xpane.xgraph \
             -width 5i \
             -height 3i \
             -borderwidth 3 \
             -relief groove \
-            -title "X Profile"
+            -title "Mean X Profile"
       } {}
       set xgraph_ $itk_component(xgraph)
       pack $itk_component(xgraph) -fill both -expand 1 -padx 1m -pady 1m
       add_short_help $itk_component(xgraph) \
          {Graph: average values along X, {bitmap dragb1} = zoom, {bitmap b2} = restore}
 
+      #  Create the Y graph and add it to the lower pane.
       itk_component add ygraph {
-         blt::graph $w_.ygraph \
-            -width 5i \
-            -height 3i \
+         blt::graph $ypane.ygraph \
+            -width 3i \
+            -height 5i \
             -borderwidth 3 \
             -relief groove \
-            -title "Y Profile"
+            -title "Mean Y Profile" \
+            -invertxy 1
       } {}
       set ygraph_ $itk_component(ygraph)
       pack $itk_component(ygraph) -fill both -expand 1 -padx 1m -pady 1m
       add_short_help $itk_component(ygraph) \
          {Graph: average values along Y, {bitmap dragb1} = zoom, {bitmap b2} = restore}
+
+      #  Split pane evenly between the two graphs.
+      $itk_component(pane) fraction 50 50
 
       #  Set axes labels.
       $xgraph_ yaxis configure -title {}
@@ -171,24 +210,27 @@ itcl::class gaia::GaiaXYProfile {
       #  Create vectors that contain profile coordinates.
       #  Vector names must start with a letter.
       regsub -all {\.} v$xgraph_.xxVector _ xxVector_
-      regsub -all {\.} v$xgraph_.xyVector _ xyVector_
-      regsub -all {\.} v$ygraph_.yxVector _ yxVector_
+      regsub -all {\.} v$xgraph_.xiVector _ xiVector_
+      regsub -all {\.} v$xgraph_.xdVector _ xdVector_
+
       regsub -all {\.} v$ygraph_.yyVector _ yyVector_
+      regsub -all {\.} v$ygraph_.yiVector _ yiVector_
+      regsub -all {\.} v$ygraph_.ydVector _ ydVector_
 
       $xgraph_ legend config -hide 1
       $ygraph_ legend config -hide 1
-      if { ! [info exists $xxVector_] && ! [info exists $xyVector_] &&
-           ! [info exists $yxVector_] && ! [info exists $yyVector_] } {
-         blt::vector create $xxVector_ $xyVector_
-         blt::vector create $yxVector_ $yyVector_
+      if { ! [info exists $xxVector_] && ! [info exists $xiVector_] &&
+           ! [info exists $xdVector_] && ! [info exists $yyVector_] &&
+           ! [info exists $yiVector_] && ! [info exists $ydVector_] } {
+         blt::vector create $xxVector_ $xiVector_ $xdVector_
+         blt::vector create $yyVector_ $yiVector_ $ydVector_
       }
       set symbol {}
-      $xgraph_ element create elem -xdata $xxVector_ -ydata $xyVector_ -symbol $symbol
-      $ygraph_ element create elem -xdata $yxVector_ -ydata $yyVector_ -symbol $symbol
+      $xgraph_ element create elem -xdata $xiVector_ -ydata $xdVector_ -symbol $symbol
+      $ygraph_ element create elem -xdata $yiVector_ -ydata $ydVector_ -symbol $symbol
 
       #  Do the initial profile plot.
-      $itk_option(-canvasdraw) add_notify_cmd $itk_option(-rect_id) \
-         [code $this notify_cmd] 1
+      add_notify_
       notify_cmd
 
       #  Add BLT features.
@@ -196,107 +238,140 @@ itcl::class gaia::GaiaXYProfile {
       ::Blt_ActiveLegend $xgraph_
       ::Blt_Crosshairs $xgraph_
       ::Blt_ClosestPoint $xgraph_
-      bind bltCrosshairs <Any-Motion> [code $this dispXY %x %y]
+      bind bltCrosshairs <Any-Motion> [code $this dispXY %W %x %y]
 
       ::Blt_ZoomStack $ygraph_
       ::Blt_ActiveLegend $ygraph_
       ::Blt_Crosshairs $ygraph_
       ::Blt_ClosestPoint $ygraph_
-      bind bltCrosshairs <Any-Motion> [code $this dispXY %x %y]
+      bind bltCrosshairs <Any-Motion> [code $this dispXY %W %x %y]
 
-      # X graph components: Tk frame for X,Y positions.
-      itk_component add xfpos {
-         frame $w_.xfpos -relief flat
+      # Tk frame for position and data value readout.
+      itk_component add fpos {
+         frame $w_.fpos -relief flat
       }
 
-      # Tk label for X position.
-      itk_component add xxpos {
-         label $itk_component(xfpos).xxpos -width 15 -anchor w
+      # Tk label for coordinate position.
+      itk_component add coord {
+         label $itk_component(fpos).coord -width 15 -anchor w
       }
 
-      # Tk label for Y position.
-      itk_component add xyval {
-         label $itk_component(xfpos).xyval -width 15 -anchor w
+      # Tk label for data value.
+      itk_component add value {
+         label $itk_component(fpos).value -width 15 -anchor w
       }
 
-      # Tk frame for Value positions.
-      itk_component add xval {
-         label $itk_component(xfpos).xval -width 15 -anchor w
-      }
-      pack $itk_component(xxpos) $itk_component(xyval) $itk_component(xval) \
+      pack $itk_component(coord) $itk_component(value) \
          -fill x -expand 1 -side left
-      pack $itk_component(xfpos) -fill none -expand 0
+      pack $itk_component(fpos) -fill none -expand 0
+   }
 
-      # Ygraph components: Tk frame for X,Y positions.
-      itk_component add yfpos {
-         frame $w_.yfpos -relief flat
-      }
-
-      # Tk label for X position.
-      itk_component add yxpos {
-         label $itk_component(yfpos).yxpos -width 15 -anchor w
-      }
-
-      # Tk label for Y position.
-      itk_component add yyval {
-         label $itk_component(yfpos).yyval -width 15 -anchor w
-      }
-
-      # Tk frame for Value positions.
-      itk_component add yval {
-         label $itk_component(yfpos).yval -width 15 -anchor w
-      }
-      pack $itk_component(xxpos) $itk_component(yyval) $itk_component(yval) \
-         -fill x -expand 1 -side left
-      pack $itk_component(yfpos) -fill none -expand 0
+   #  Set/reset the notification call back on the rectangle.
+   protected method add_notify_ {} {
+      $itk_option(-canvasdraw) remove_notify_cmd $itk_option(-rect_id)
+      $itk_option(-canvasdraw) add_notify_cmd $itk_option(-rect_id) \
+         [code $this notify_cmd] $itk_option(-continuous_updates)
    }
 
    #  Deal with notification that rectangle has changed position.
    public method notify_cmd {{op update}} {
-      puts "notification of rectangle change"
       if { "$op" == "delete" } {
          destroy $w_
          return 0
       }
       lassign [$itk_option(-canvas) coords $itk_option(-rect_id)] x0 y0 x1 y1
-      
+
       #  Get the X and Y profile distributions.
       set nvals [$itk_option(-rtdimage) xyprofile $xgraph_ $ygraph_ elem \
                     $x0 $y0 $x1 $y1 canvas \
-                    $xxVector_ $xyVector_ $yxVector_ $yyVector_]
-      puts "nvals = $nvals"
+                    $xxVector_ $xiVector_ $xdVector_ \
+                    $yyVector_ $yiVector_ $ydVector_]
       set numXValues_ [lindex $nvals 0]
       set numYValues_ [lindex $nvals 1]
-      
+
       $xgraph_ xaxis configure -max $numXValues_
       $ygraph_ xaxis configure -max $numYValues_
       return 0
    }
 
    #  Display the X and Y position.
-   method dispXY {x y} {
+   method dispXY {w x y} {
+      if { $w == $xgraph_ } {
 
-      #  Update crosshair position.
-      $xgraph_ crosshairs configure -position @$x,$y
-      $ygraph_ crosshairs configure -position @$x,$y
+         #  Update crosshair position.
+         $xgraph_ crosshairs configure -position @$x,$y
 
-      #  Now update the readout.
-      set ret 0
-      if { ![$xgraph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
-         return
+         #  Now update the readout.
+         set ret 0
+         if { ![$xgraph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
+            return
+         }
+         lassign [$xgraph_ invtransform $x $y] index value
+         set index [expr int(round($index))]
+         if {$index < 0 || $index >= $numXValues_} {
+            return
+         }
+         catch {
+            set x [$xxVector_ range $index $index]
+            set y [$xdVector_ range $index $index]
+            $itk_component(coord) config -text "X: $x"
+            $itk_component(value) config -text "Data: $y"
+         }
+      } else {
+
+         #  Update crosshair position.
+         $ygraph_ crosshairs configure -position @$x,$y
+
+         #  Now update the readout.
+         set ret 0
+         if { ![$ygraph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
+            return
+         }
+         lassign [$ygraph_ invtransform $x $y] index value
+         set index [expr int(round($index))]
+         if {$index < 0 || $index >= $numYValues_} {
+            return
+         }
+         catch {
+            set x [$yyVector_ range $index $index]
+            set y [$ydVector_ range $index $index]
+            $itk_component(coord) config -text "Y: $x"
+            $itk_component(value) config -text "Data: $y"
+         }
       }
-      lassign [$xgraph_ invtransform $x $y] index value
-      set index [expr int(round($index))]
-      if {$index < 0 || $index >= $numXValues_} {
-         return
+   }
+
+   #  Add buttons to close window and make a hardcopy of the profiles.
+   protected method make_buttons_ {} {
+      itk_component add bframe {
+         frame $w_.buttons -borderwidth 2 -relief groove
       }
-      puts "X: $x, Y: $y"
-      catch {
-         set x [$xxVector_ range $index $index]
-         set y [$xyVector_ range $index $index]
-         $itk_component(xxpos) config -text "X: $x"
-         $itk_component(xyval) config -text "Y: $y"
+      itk_component add print {
+         button $itk_component(bframe).print -text "Print..." \
+            -command [code $this print]
       }
+      add_short_help $itk_component(print) \
+         {Print mean profiles to a printer or disk file}
+      #itk_component add save {
+      #   button $itk_component(bframe).save -text "Save as..." \
+      #      -command [code $this save_as]
+      #}
+      itk_component add close {
+         button $itk_component(bframe).close -text "Close" \
+            -command [code $this close]
+      }
+      add_short_help $itk_component(close) \
+         {Close window}
+
+      pack $itk_component(print) $itk_component(close) \
+         -side left -expand 1 -padx 2m -pady 2m
+      pack $itk_component(bframe) -side bottom -fill x
+   }
+
+   #  Make a postscript copy of the profiles.
+   public method print {} {
+      utilReUseWidget gaia::MultiGraphPrint $w_.print \
+         -graphs [list $xgraph_ $ygraph_]
    }
 
    #  Configuration options: (public variables)
@@ -324,15 +399,19 @@ itcl::class gaia::GaiaXYProfile {
 
    #  Canvas coordinate of the upper left-hand corner.
    itk_option define -x0 x0 X0 0
-   
+
    #  Canvas coordinate of the upper left-hand corner.
    itk_option define -y0 y0 Y0 0
-   
+
    #  Canvas coordinate of the lower right-hand corner.
    itk_option define -x1 x1 X1 0
-   
+
    #  Canvas coordinate of the lower right-hand corner.
    itk_option define -y1 y1 Y1 0
+
+   #  Whether changes in position of rectangle are continuous.
+   itk_option define -continuous_updates continuous_updates \
+      Continuous_updates 1
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -341,11 +420,15 @@ itcl::class gaia::GaiaXYProfile {
    protected variable xgraph_ {}
    protected variable ygraph_ {}
 
-   #  BLT vectors.
+   #  X profile BLT vectors.
    protected variable xxVector_ {}
-   protected variable xyVector_ {}
-   protected variable yxVector_ {}
+   protected variable xiVector_ {}
+   protected variable xdVector_ {}
+
+   # Y profile BLT vectors.
    protected variable yyVector_ {}
+   protected variable yiVector_ {}
+   protected variable ydVector_ {}
 
    #  Number of positions in X and Y vectors.
    protected variable numXValues_ 0

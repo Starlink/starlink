@@ -155,6 +155,7 @@
 #include <sys/stat.h>
 #include <float.h>
 #include "tcl.h"
+#include "blt.h"
 #include <netinet/in.h>
 
 #include "define.h"
@@ -234,7 +235,7 @@ public:
    { "slice",         &StarRtdImage::sliceCmd,       11, 11},
    { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
    { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 },
-   { "xyprofile",     &StarRtdImage::xyProfileCmd,   12, 12}
+   { "xyprofile",     &StarRtdImage::xyProfileCmd,   14, 14}
 };
 
 //+
@@ -3187,14 +3188,14 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
    }
 
    //  Convert the index/value and x/y pairs into Blt vectors.
-   if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
-                        ivvalues, argv[7], argv[8]) != TCL_OK) {
+   if ( Blt_GraphElement( interp_, argv[0], argv[1], numValues*2,
+                          ivvalues, argv[7], argv[8]) != TCL_OK ) {
       delete xyvalues;
       delete ivvalues;
       return TCL_ERROR;
    }
-   if (Blt_GraphElement(interp_, argv[0], argv[1], numValues*2,
-                        xyvalues, argv[9], argv[10]) != TCL_OK) {
+   if ( Blt_GraphElement( interp_, argv[0], argv[1], numValues*2,
+                          xyvalues, argv[9], argv[10] ) != TCL_OK ) {
       delete xyvalues;
       delete ivvalues;
       return TCL_ERROR;
@@ -5287,7 +5288,9 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
    int h = abs( y1 - y0 ) + 1;
 
    //  Allocate space for results.
+   double* xcoords = new double[w];
    double* xvalues = new double[w*2];
+   double* ycoords = new double[h];
    double* yvalues = new double[h*2];
 
    //  And get the profile information. Do this by creating a suitable 
@@ -5319,25 +5322,88 @@ int StarRtdImage::xyProfileCmd(int argc, char *argv[])
 
    //  Get the profiles.
    int numValues[2];
-   xyProfile.extractProfiles( xvalues, yvalues, numValues );
+   xyProfile.extractProfiles( xcoords, xvalues, ycoords, yvalues, numValues );
 
-   //  Convert the index/value pairs into BLT vectors.
-   if ( Blt_GraphElement( interp_, argv[0], argv[2], numValues[0]*2 ,
-                          xvalues, argv[8], argv[9]) != TCL_OK ) {
-       delete xvalues;
-       delete yvalues;
-       return TCL_ERROR;
+   //  Copy into BLT vectors.
+   int status = TCL_OK;
+   if ( numValues[0] > 0 && numValues[1] > 0 ) {
+
+       //  Transfer X index and data value array into two BLT vectors.
+       status = Blt_GraphElement( interp_, argv[0], argv[2],
+                                  numValues[0]*2, xvalues, argv[9],
+                                  argv[10] ); 
+       
+       //  Transfer X coordinates into BLT vector.
+       if ( status == TCL_OK ) {
+           status = resetBltVector( numValues[0], xcoords, argv[8] );
+       }
+
+       //  Transfer Y index and data value array into two BLT vectors.
+       if ( status == TCL_OK ) {
+           status = Blt_GraphElement( interp_, argv[1], argv[2],
+                                      numValues[1]*2, yvalues,
+                                      argv[12], argv[13] ); 
+       }
+       
+       //  Transfer X coordinates into BLT vector.
+       if ( status == TCL_OK ) {
+           status = resetBltVector( numValues[1], ycoords, argv[11] );
+       }
    }
-   if (Blt_GraphElement( interp_, argv[1], argv[2], numValues[1]*2,
-                         yvalues, argv[10], argv[11]) != TCL_OK ) {
-       delete xvalues;
-       delete yvalues;
-       return TCL_ERROR;
-   }
+   delete xcoords;
+   delete ycoords;
    delete xvalues;
    delete yvalues;
-   
+
    set_result( numValues[0] );
    append_element( numValues[1] );
-   return TCL_OK;
+   return status;
 }
+
+//+
+//  Name:
+//     StarRtdImage::resetBltVector
+//
+//  Purpose:
+//     Reset data of a BLT vector to new values.
+//-
+int StarRtdImage::resetBltVector( const int num, const double *valueArr, 
+                                  char *vecName ) 
+{
+    int i;
+    int nbytes = sizeof(double) * num;
+    
+    /*  Note: Blt_Vector::arraySize is the number of bytes! */
+    Blt_Vector *vecPtr;
+    double *vecArray;
+
+    /*  Get pointer to existing data area */
+    if ( Blt_GetVector( interp_, vecName, &vecPtr) != 0 ) {
+        return TCL_ERROR;
+    }
+
+    /*  Allocate space for the new vector, if needed */
+    if ( vecPtr->arraySize < nbytes ) {
+        vecArray = (double *) Tcl_Alloc( nbytes );
+        if ( vecArray == NULL ) {
+            return error( "failed to allocate memory" );
+        }
+    } else {
+
+        /*  Reuse existing array. */
+        vecArray = vecPtr->valueArr;
+        nbytes = vecPtr->arraySize;
+    }
+
+    /*  Write the data into the vector */
+    for ( i = 0; i < num; i++ ) {
+        vecArray[i] = valueArr[i];
+    }
+    
+    if ( Blt_ResetVector( vecPtr, vecArray, num, nbytes, TCL_DYNAMIC ) 
+         != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+

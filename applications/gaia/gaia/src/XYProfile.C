@@ -85,7 +85,8 @@ void XYProfile::getRegion( int& x0, int& y0, int& x1, int& y1 )
 //  returned in packed vectors. The number of values entered into the
 //  vectors is the result.
 //
-void XYProfile::extractProfiles( double *xVector, double *yVector, 
+void XYProfile::extractProfiles( double *xCoords, double *xVector,
+                                 double *yCoords, double *yVector,  
                                  int numValues[2] )
 {
 
@@ -109,62 +110,68 @@ void XYProfile::extractProfiles( double *xVector, double *yVector,
     case BYTE_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (char *) image, nx, ny, bscale, bzero, 
-                              x0, y0, x1, y1, xVector, yVector, numValues );
+                              x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues );
         } else {
             extractNativeImage( (char *) image, nx, ny, bscale, bzero,
-                                x0, y0, x1, y1, xVector, yVector, numValues );
+                                x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues );
         }
         break;
     case X_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (unsigned char *) image, nx, ny, bscale, 
-                              bzero, x0, y0, x1, y1, xVector, yVector,
-                              numValues ); 
+                              bzero, x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues ); 
         } else {
             extractNativeImage( (unsigned char *) image, nx, ny,
                                 bscale, bzero, x0, y0,
-                                x1, y1, xVector, yVector, numValues );
+                                x1, y1, xCoords, xVector, yCoords, 
+                                yVector, numValues );
         }
         break;
     case USHORT_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (ushort *) image, nx, ny, bscale, bzero, 
-                              x0, y0, x1, y1, xVector, yVector, numValues );
+                              x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues );
         } else {
             extractNativeImage( (ushort *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, xVector,
-                                yVector, numValues ); 
+                                bzero, x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues ); 
         }
         break;
     case SHORT_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (short *) image, nx, ny, bscale, bzero, x0, y0,
-                              x1, y1, xVector, yVector, numValues );
+                              x1, y1, xCoords, xVector, yCoords, 
+                              yVector, numValues );
         } else {
             extractNativeImage( (short *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, xVector,
-                                yVector, numValues ); 
+                                bzero, x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues ); 
         }
         break;
     case LONG_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (FITS_LONG *) image, nx, ny, bscale,
-                              bzero, x0, y0, x1, y1, xVector, yVector,
-                              numValues ); 
+                              bzero, x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues ); 
         } else {
             extractNativeImage( (FITS_LONG *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, xVector,
-                                yVector, numValues ); 
+                                bzero, x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues ); 
         }
         break;
     case FLOAT_IMAGE:
         if ( swap_ ) {
             extractSwapImage( (float *) image, nx, ny, bscale, bzero, 
-                              x0, y0, x1, y1, xVector, yVector, numValues );
+                              x0, y0, x1, y1, xCoords, xVector,
+                              yCoords, yVector, numValues );
         } else {
             extractNativeImage( (float *) image, nx, ny, bscale,
-                                bzero, x0, y0, x1, y1, xVector,
-                                yVector, numValues ); 
+                                bzero, x0, y0, x1, y1, xCoords, xVector,
+                                yCoords, yVector, numValues ); 
         }
         break;
     default:

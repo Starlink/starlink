@@ -56,8 +56,8 @@ class StarRtdImageOptions : public RtdImageOptions {
    char *ast_tag;          // Canvas tag for all ast graphics
    char *component;        // NDF component to display
    int plot_wcs;           // Scale and orient plot symbols using WCS
-                           // system if available 
-   
+                           // system if available
+
    StarRtdImageOptions()
       : ast_tag(NULL), component(NULL), plot_wcs(1)
       {}
@@ -333,7 +333,11 @@ class StarRtdImage : public Skycat {
 
    //  Get list of NDF properties.
    int ndfCmdList( int argc, char *argv[], NDFIO *ndf );
-   
+
+   //  Change the data of a BLT vector.
+   int resetBltVector( const int num, const double *valueArr,
+                       char *vecName );
+
   private:
 
    // Copy constructor -- not defined.
