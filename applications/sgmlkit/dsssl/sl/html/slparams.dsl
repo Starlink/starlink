@@ -1,5 +1,7 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
 
+<![ ignore [ $Id$ ]]>
+
 <docblock>
 <title>HTML stylesheet parameters
 
@@ -29,7 +31,7 @@ variable/ is given on the command line, then that variable is set to
 <codebody>
 (define %html-pubid%
   "-//W3C//DTD HTML 3.2 Final//EN")
-</codebody></func>
+
 
 <func>
 <routinename>%body-attr%
@@ -41,8 +43,6 @@ text colour, and the like.
 (define %body-attr%
   (list (list "bgcolor" "#FFFFFF")
 	(list "text" "#000000")))
-</codebody>
-</func>
 
 
 <func>
@@ -55,8 +55,6 @@ stylesheet will be written to the file named by '%html-manifest%'.
 (define %html-manifest%
 	#f; "HTML.manifest"
 	)
-</codebody>
-</func>
 
 <func>
 <routinename>nochunks
@@ -69,8 +67,6 @@ Jade command line).
 <argumentlist none>
 <codebody>
 (define nochunks #f)
-</codebody>
-</func>
 
 <func>
 <routinename>stream-output
@@ -106,7 +102,7 @@ HyTime A.6.1, for example, or
 
 <misccode>
 <description><p>The rest of the parameters in this group are
-miscellaneous tweaking parameters, which don't need much exrta
+miscellaneous tweaking parameters, which don't need much extra
 documentation
 <codebody>
 (define %html-ext%

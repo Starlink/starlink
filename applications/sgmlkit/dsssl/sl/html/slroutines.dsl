@@ -26,14 +26,14 @@ $Id$
 
 
 ;; Routinelist is simple
-(element routinelist ($section$))
+(element routinelist ($html-section$))
 
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
 ;; document.  We have to do it rather more by hand, therefore.
 ;; Don't yet support the IDS attribute.
 (element codecollection
-  ($section$ (with-mode routine-ref
+  ($html-section$ (with-mode routine-ref
 	      (process-codecollection (attribute-string (normalize "doc"))))))
 
 (define (process-codecollection docent)
@@ -132,7 +132,7 @@ $Id$
     (let ((auth-id (attribute-string (normalize "author")))
 	  (date-str (attribute-string (normalize "date"))))
       (make sequence
-	(make element gi: "dl"
+	(make element gi: "dt"
 	      (literal (string-append (data (element-with-id auth-id))
 				      ", "
 				      (format-date date-str))))

@@ -157,35 +157,6 @@ Returns the filename of the html file that contains elemnode
     (string-append base %html-ext%)))
 
 <func>
-<routinename>root-file-name
-<description>
-Returns the filename to be used for the root HTML file, based on
-document type and DOCNUMBER if present (which need not be the case for
-all document types). Another way to set this might be through a
-processing-instruction.
-<returnvalue type=string>Complete filename for the `entry-point' HTML file.
-<argumentlist>
-<parameter optional default='(current-node)'>
-  nd<type>node-list<description>Node which identifies the grove 
-  we want the root file name of
-<codebody>
-(define (root-file-name #!optional (nd (current-node)))
-  (let* ((dn (getdocinfo 'docnumber nd))
-	 (docelemtype (if dn
-			  (if (attribute-string (normalize "documenttype") dn)
-			      (attribute-string (normalize "documenttype") dn)
-			      (error "DOCNUMBER has no DOCUMENTTYPE"))
-			  (gi (document-element))))
-	 (docref (if dn
-		     (if (attribute-string "UNASSIGNED" dn)
-			 "unassigned"	; is there a better alternative?
-			 (trim-data dn))
-		     (trim-data (getdocinfo 'docdate nd))
-		 )))
-    (string-append docelemtype ;(gi (document-element))
-		   (if docref (string-append "-" docref) ""))))
-
-<func>
 <routinename>chunk-parent
 <description>
 Return the node-list for the element whose chunk nd is in, or an
@@ -440,19 +411,9 @@ generated HTML documents.
 					   (make empty-element gi: "BR"))))
 				      (empty-sosofo))
 		    (literal (format-date (car rel)))
-		    ;(literal (append-strings rel "[" "==" "]"))
 		    )))
       )))
 
-;; Quickie function to collapse a list of strings into one
-(define (append-strings sl begin-string link end-string)
-  (let loop ((l sl)
-	     (res begin-string))
-    (if (null? l)
-	res
-	(loop (cdr l)
-	      (string-append res (if (car l) (car l) "#f")
-			     (if (null? (cdr l)) end-string link))))))
 
 
 ;(define (nav-footer elemnode)

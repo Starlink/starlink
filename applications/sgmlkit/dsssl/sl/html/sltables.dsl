@@ -11,7 +11,7 @@ texts).
 
 <p>The Exchange Table Model can be customised.  The only such
 customisations at present are: replace the optional TITLE element with
-a required CAPTION, and add an implied ID attribute to the TABLE.
+a required CAPTION; add implied ID and EXPORT attributes to the TABLE.
 
 
 <authorlist>
@@ -75,8 +75,17 @@ first.
   (process-children))
 
 (element row
-  (make element gi: "tr"
-	(process-children)))
+  (let ((colno (table-colno))
+	(actual-elements (node-list-length (children (current-node)))))
+    (if (<= actual-elements (cadr colno))
+	(make element gi: "tr"
+	      (process-children))
+	(error (string-append
+		"Row "
+		(number->string (child-number (current-node)))
+		" of table has more than "
+		(number->string (cadr colno))
+		" rows, as declared")))))
 
 (element entry
   (make element gi: "td"
@@ -87,34 +96,3 @@ first.
     (make element gi: "th"
 	  (process-children))))
 
-<func>
-<routinename>table-colno
-<purpose>Return a list of numbers, indicating the current column number and the
-total number of columns.
-<description>Checks only the <code/ENTRY/ and <code/TGROUP/ elements,
-the first to find the column number, and the second to find the total
-number of columns.
-<returnvalue type='list of numbers'><p>A list of numbers, where
-  the <code/car/ is the current column number, 
-  and the <code/cadr/ is the total number of columns.
-  <p>If the argument is not for an <code/ENTRY/ element,
-  then the current column number will be returned as zero.
-  <p>If the node doesn't have a <code/TABLE/ in its ancestry,
-  then return <code/#f/.
-<parameter optional default='(current-node)'>nd
-  <type>singleton node-list<description>Node we want the column number of.
-  If this is not an <code/ENTRY/ element, then the column number will be
-  returned as zero.
-<codebody>
-(define (table-colno #!optional (nd (current-node)))
-  (let ((isentry (string=? (gi nd) (normalize "entry")))
-	(tgroup-cols (inherited-element-attribute-string (normalize "tgroup")
-							 (normalize "cols")
-							 nd)))
-    (if tgroup-cols
-	(list (if isentry
-		   (child-number (current-node))
-		   0)
-	       (string->number tgroup-cols))
-	#f				; we're not in a table
-	)))
