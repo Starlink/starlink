@@ -1,0 +1,22 @@
+define   bdf2ndf      convert_dir:convert
+define   dipso2ndf    convert_dir:convert
+define   dst2ndf      convert_dir:convert
+define   ndf2bdf      convert_dir:convert
+define   ndf2dipso    convert_dir:convert
+define   ndf2dst      convert_dir:convert
+
+defhelp  bdf2ndf      convert_dir:convert
+defhelp  dipso2ndf    convert_dir:convert
+defhelp  dst2ndf      convert_dir:convert
+defhelp  ndf2bdf      convert_dir:convert
+defhelp  ndf2dipso    convert_dir:convert
+defhelp  ndf2dst      convert_dir:convert
+
+{ print CONVERT initialisation message }
+
+print  " "
+print  " --    Initialised for Convert    -- "
+print  " --  Version 0.4, 1992 September  -- "
+print  " "
+print  " " Type HELP CONVERT for CONVERT help   "
+print  " "
