@@ -100,8 +100,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*10		MPROPN			! Name of property
-        PARAMETER		( MPROPN = '.MORE_LOC' )
+      CHARACTER*12		MPROPN			! Name of property
+        PARAMETER		( MPROPN = '.MORElocator' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Object locator

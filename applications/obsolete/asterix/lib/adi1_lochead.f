@@ -99,7 +99,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*10		HPROPN			! Name of property
+      CHARACTER*11		HPROPN			! Name of property
         PARAMETER		( HPROPN = '.HEADER_LOC' )
 
 *  Local Variables:

@@ -100,7 +100,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*10		APROPN			! Name of property
+      CHARACTER*12		APROPN			! Name of property
         PARAMETER		( APROPN = '.ASTERIX_LOC' )
 
 *  Local Variables:

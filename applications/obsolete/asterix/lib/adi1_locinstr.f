@@ -100,8 +100,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Constants:
-      CHARACTER*10		IPROPN			! Name of property
-        PARAMETER		( IPROPN = '.INSTRUMENT_LOC' )
+      CHARACTER*13		IPROPN			! Name of property
+        PARAMETER		( IPROPN = '.INSTRlocator' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ALOC			! Object locator

@@ -2618,6 +2618,7 @@ void adix_locdat( ADIobj *id, char *name, int nlen, int flgs,
     if ( *name == '.' ) {               /* Property name preceded by period */
       mode = ADI__AC_PROPERTY;
       lname++;
+      if ( lnlen > 0 ) lnlen--;
       }
     else if ( *name )                   /* Don't allow null strings */
       mode = ADI__AC_MEMBER;
