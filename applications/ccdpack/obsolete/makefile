@@ -568,8 +568,13 @@ ICL_STARTUP_SCRIPT = $(PKG_NAME).icl
 #  Link script.  This script does not form part of the package but is
 #  required for building it.  It will not be installed.
 
-LINK_SCRIPT1 = $(PKG_NAME)_link_adam
-LINK_SCRIPT2 = $(PKG_NAME)_graphics_link_adam
+LINK_SCRIPT = $(PKG_NAME)_link_adam
+
+#  Normal graphics flag for link script.  This should be '-pgp' for 
+#  Starlink PGPLOT or '-pgplot' for Native PGPLOT.  It affects only
+#  those monoliths which are able to use either implementation.
+
+LINK_SCRIPT_GFLAG = -pgp
 
 #  Private scripts required to build the package.
 
@@ -870,7 +875,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PUBLIC_SCRIPTS) \
+BUILT_FILES = $(LINK_SCRIPT) $(PUBLIC_SCRIPTS) \
  $(TCL_SUPPORT_EXE) $(TCL_SUPPORT_NOEXE) $(TCL_SUPPORT_MSGRLY) \
  $(WISH) $(TCL_INDEX) $(OBJECT_LIBRARIES) $(MONOLITHS) \
  $(IFC_FILES) $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
@@ -949,8 +954,7 @@ $(WISH_SOURCE) $(GRF_SOURCE) $(IFD_FILES):
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-$(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
-$(TCL_SCRIPTS) :
+$(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(LINK_SCRIPT) $(TCL_SCRIPTS) :
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	chmod 755 $@
 	@ if test -f $@; then :;\
@@ -1045,7 +1049,7 @@ RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
            $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) $(HELP_SOURCES) \
            $(WISH_SOURCE) $(GRF_SOURCE) $(IFD_FILES) \
            $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) \
-           $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
+           $(LINK_SCRIPT) $(PRIVATE_SCRIPTS) \
            $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
            $(GENLRDICSRC) $(GENLRDISRC) $(TASKSRC) \
            $(DATA_FILES) $(IRAF_SCRIPTS) $(IRAF_HELP)
@@ -1093,22 +1097,19 @@ $(PKG_NAME)_source.tar :
                   $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(IFD_FILES)
 	co $(PUBLIC_SCRIPTS)
 	co $(TCL_SCRIPTS)
-	co $(LINK_SCRIPT1)
-	co $(LINK_SCRIPT2)
-	chmod 700 $(LINK_SCRIPT1) $(LINK_SCRIPT2)
+	co $(LINK_SCRIPT)
+	chmod 700 $(LINK_SCRIPT)
 	chmod 755 $(PUBLIC_SCRIPTS)
 	chmod 644 $(TCL_SCRIPTS)
 	co $(PRIVATE_SCRIPTS)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(PKG_INCLUDE) \
 	   $(MONO_SOURCE) $(WISH_SOURCE) $(GRF_SOURCE) \
            $(HELP_SOURCES) $(IFD_FILES) \
-           $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
-           $(PRIVATE_SCRIPTS)
+           $(PUBLIC_SCRIPTS) $(TCL_SCRIPTS) $(LINK_SCRIPT) $(PRIVATE_SCRIPTS)
 	@- $(RM) $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) \
                 $(WISH_SOURCE) $(GRF_SOURCE) \
                 $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
-		$(TCL_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
-                $(PRIVATE_SCRIPTS)
+		$(TCL_SCRIPTS) $(LINK_SCRIPT) $(PRIVATE_SCRIPTS)
 
 $(PKG_NAME)_tasks.tar:
 	co $(TASKSRC)
@@ -1273,33 +1274,30 @@ lib$(HELPTASK).a : $(HELPOBJ)
 
 #  Rule and dependencies for building the monoliths.
 
-$(MONOLITH1): $(PKG_NAME)_red.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
-              $(LINK_SCRIPT2)
+$(MONOLITH1): $(PKG_NAME)_red.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(PKG_NAME)_red.o -o $(PKG_NAME)_red \
 	        $(ADDLIBS) $(OBJECT_LIBRARIES) \
-                `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+                `./$(LINK_SCRIPT)` \
 		$(OBJECT_LIBRARIES) -lpda
 
-$(MONOLITH2): $(PKG_NAME)_reg.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
-              $(LINK_SCRIPT2) $(GRF_OBJECT)
+$(MONOLITH2): $(PKG_NAME)_reg.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT) \
+$(GRF_OBJECT)
 	$(ALINK) $(PKG_NAME)_reg.o -o $(PKG_NAME)_reg \
 	        $(ADDLIBS) $(OBJECT_LIBRARIES) \
-                `ast_link_adam -mygrf` $(GRF_OBJECT) \
-                `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+                `./$(LINK_SCRIPT) $(LINK_SCRIPT_GFLAG)` \
 		$(OBJECT_LIBRARIES) -lpda
 
-$(MONOLITH3): $(PKG_NAME)_res.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
-              $(LINK_SCRIPT2)
+$(MONOLITH3): $(PKG_NAME)_res.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT) \
+$(GRF_OBJECT)
 	$(ALINK) $(PKG_NAME)_res.o -o $(PKG_NAME)_res \
 	         $(ADDLIBS) $(OBJECT_LIBRARIES) \
-                `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+                `./$(LINK_SCRIPT) $(LINK_SCRIPT_GFLAG)` \
 		$(OBJECT_LIBRARIES) -lpda
 
-$(MONOLITH4): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
-              $(LINK_SCRIPT2)
+$(MONOLITH4): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 	$(ALINK) $(PKG_NAME)_scr.o -o $(PKG_NAME)_scr \
 	         $(ADDLIBS) $(OBJECT_LIBRARIES) \
-                `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+                `./$(LINK_SCRIPT)` \
 		$(OBJECT_LIBRARIES)
 
 #  Versions of Tcl and [incr Tcl] to use.
@@ -1318,14 +1316,16 @@ TCL_LIBRARIES = -litcl$(ITCL_VERS) -litk$(ITCL_VERS) \
 STARTCL_OBJ = $(STAR_LIB)/tkGwm.o $(STAR_LIB)/tkGwmCanv.o \
               $(STAR_LIB)/tkGwmPrint.o $(STAR_LIB)/tclAdam.o
 
-#  Rule for building the Tcl shell.
+#  Rule for building the Tcl shell.  It must be linked with Native, not
+#  Starlink, PGPLOT since it needs the C interface which is not provided
+#  by the Starlink version.
 
-$(WISH): $(OBJECT_LIBRARIES) $(WISH).o
+$(WISH): $(OBJECT_LIBRARIES) $(WISH).o $(LINK_SCRIPT) $(GRF_OBJECT) \
+$(STARTCL_OBJ)
 	$(FC) $(FFLAGS) -o $(WISH) $(WISH).o \
               $(ADDLIBS) -L$(STAR_LIB) $(OBJECT_LIBRARIES) \
               $(STARTCL_OBJ) $(TCL_LIBRARIES) $(LDFLAGS) \
-              -lcpgplot `agp_link_adam` `ast_link -pgplot` \
-              `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+              `./$(LINK_SCRIPT) -pgplot` \
               $(OBJECT_LIBRARIES) \
               -lpar_adam `dtask_link_adam`
 
