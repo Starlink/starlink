@@ -1,35 +1,43 @@
-*+   ELNMB<T> - Write a range of element numbers into an array
 
       SUBROUTINE ELNMB<T>( X1, X2, ODIM, OUTARR, STATUS )
-*
-*    Description :
-*
+*+
+*  Name:
+*     KPG_$ELNMB<T>
+
+*  Purpose:
+*     Write a range of element numbers into an array.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation
+*     CALL KPG_$ELNMBx( X1, X2, ODIM, OUTARR, STATUS )
+
+*  Description:
 *     This routine writes numbers sequentially to a <COMM> 1-d
 *     array, where the numbers are between defined integer limits and
-*     are stepped by 1 from one pixel to the next.  In other words
-*     the array value takes the element number plus an offset.
+*     are stepped by 1 (or -1) from one pixel to the next.  In other
+*     words the array value takes the element number plus an offset.
 *     Only the first %ODIM elements can be accommodated in the output
 *     array, should the section be larger than this.
-*
-*    Invocation :
-*
-*     CALL ELNMB<T>( X1, X2, ODIM, OUTARR, STATUS )
-*
-*    Arguments :
-*
-*     X1 = INTEGER( READ )
-*         The first value to be written to the output array
-*     X2 = INTEGER( READ )
-*         The last value to be written to the output array
-*     ODIM = INTEGER( READ )
-*         The number of elements in the output array
-*     OUTARR( ODIM ) = <TYPE>( WRITE )
-*         The array into which the sub-array is copied.
-*     STATUS = INTEGER( READ )
-*         The status value on entry to this routine.
-*
-*    Method :
-*
+
+*  Arguments:
+*     X1 = INTEGER (Given)
+*        The first value to be written to the output array.  If this
+*        is larger than %X2 the values will decrease by 1 for each
+*        element.
+*     X2 = INTEGER (Given)
+*        The last value to be written to the output array, provided
+*        there are sufficient elements to accommodate it.  If not
+*        only %ODIM values will be stored.
+*     ODIM = INTEGER (Given)
+*        The number of elements in the output array.
+*     OUTARR( ODIM ) = ? (Returned)
+*        The array into which the sub-array is copied.
+*     STATUS = INTEGER (Given)
+*        The status value on entry to this routine.
+
+*  Algorithm:
 *     Check for error on entry - return if not o.k.
 *     The maximum and minimum extents of the sub-array are found
 *        and the maximum is constrained by the dimension of the output
@@ -37,74 +45,94 @@
 *     The values are written to the output array, converting to the
 *       appropriate type
 *     End
-*
-*    Authors :
-*
-*     Malcolm J. Currie STARLINK ( RAL::CUR )
-*
-*    History :
-*
-*     1988 Oct 25 : Original ( RAL::CUR )
-*
-*    Type Definitions :
 
+*  Authors:
+*     MJC: Malcolm J. Currie  (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1988 Oct 25 (MJC):
+*        Original version.
+*     1990 Jul 29 (MJC):
+*        Allowed the element value to decrease with increasing element
+*        number.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE            ! No assumed typing
 
-*    Global Constants :
-
+*  Global Constants:
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
 
-*    Import :
-
+*  Arguments Given:
       INTEGER
      :    ODIM,
      :    X1,
      :    X2
 
-*    Export :
-
+*  Arguments Returned:
       <TYPE> OUTARR( ODIM )
 
-*    External references :
-
-      INCLUDE 'DCV_EXT'       ! Data-conversion external functions
-
-*    Status :
-
+*  Status:
       INTEGER STATUS
 
-*    Local variables :
-
+*  Local Variables:
       INTEGER
      :  I, J,                  ! Counters
      :  LOWER,                 ! Lower bound of the sub-array
      :  UPPER                  ! Upper bound of the sub-array
 
-*    Internal references :
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
+      INCLUDE 'NUM_DEF_CVT'    ! NUM definitions for conversions
 
-      INCLUDE 'DCV_FUN'       ! Data-conversion statement functions
+*.
 
-*-
 
-*    If status value is bad, then return immediately
+*    If status value is bad, then return immediately.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Copy input co-ordinates in case they are transposed
+*    Forward or reverse?
 
-      LOWER = MIN( X1, X2 )
-      UPPER = MAX( X1, X2 )
+      IF ( X2. GE. X1 ) THEN
 
-*    Only store as many values as can be accommodated
+*       Forward
+*       =======
+*
+*       Only store as many values as can be accommodated.
 
-      UPPER = MIN( UPPER, ODIM + LOWER - 1 )
+         UPPER = MIN( X2, ODIM + X1 - 1 )
 
-*    Copy the elements of the sub-array
+*       Copy the elements of the sub-array.
 
-      J = 0
-      DO  I = LOWER, UPPER, 1
-         J = J + 1
-         OUTARR( J ) = DCV_ITO<T>( I )
-      END DO
+         J = 0
+         DO  I = X1, UPPER, 1
+            J = J + 1
+            OUTARR( J ) = NUM_ITO<T>( I )
+         END DO
+
+      ELSE
+
+*      Reverse
+*      =======
+
+*       Only store as many values as can be accommodated.
+
+         LOWER = MAX( X2, X1 - ODIM + 1 )
+
+*       Copy the elements of the sub-array.
+
+         J = 0
+         DO  I = X1, LOWER, -1
+            J = J + 1
+            OUTARR( J ) = NUM_ITO<T>( I )
+         END DO
+      END IF
 
       END
