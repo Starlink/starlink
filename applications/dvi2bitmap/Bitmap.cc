@@ -216,9 +216,10 @@ void Bitmap::clear()
 
 /**
  * Declares that a routine is about to draw in the rectangle with
- * corners <em>(ulx, uly)</em> to <em>(lrx, lry)</em> (inclusive).  If
- * the bitmap is expandable, this should do any reallocations which
- * are necessary or possible, and adjust W and H accordingly.
+ * corners <em>(ulx, uly)</em> to <em>(lrx, lry)</em>
+ * (<em>inclusive</em>).  If the bitmap is expandable, this should do
+ * any reallocations which are necessary or possible, and adjust W and
+ * H accordingly.
  *
  * <p>This does not (currently) allow any expansion towards negative
  * coordinates.
@@ -383,13 +384,20 @@ void Bitmap::rule(const int x, const int y, const int w, const int h)
     if (frozen_)
 	throw BitmapError ("rule() called after freeze()");
 
-    usesBitmapArea_(x, y-h+1, x+w-1, y+h-1);
+    // OR everything in a block between [row1,row2-1] and
+    // [col1,col2-1], inclusive
+    int col1 = x;
+    int col2 = x+w;
+    int row1 = y+1-h;
+    int row2 = y+1;
 
-    // OR everything in a block between [row1,row2-1] and [col1,col2-1]
-    int row2 = y+1;   if (row2 > H) row2 = H;
-    int row1 = y+1-h; if (row1 < 0) row1 = 0;
-    int col1 = x;     if (col1 < 0) col1 = 0;
-    int col2 = x+w;   if (col2 > W) col2 = W;
+    usesBitmapArea_(col1, row1, col2-1, row2-1);
+
+    if (col1 < 0) col1 = 0;
+    if (col2 > W) col2 = W;
+    if (row1 < 0) row1 = 0;
+    if (row2 > H) row2 = H;
+
 
     for (int row=row1; row<row2; row++)
 	for (int col=col1; col<col2; col++)
@@ -412,9 +420,13 @@ void Bitmap::rule(const int x, const int y, const int w, const int h)
  * Draws a `strut' on the master bitmap.  This is essentially the same
  * as the <code>rule()</code> method, except that it doesn't draw in
  * any pixels.  Its only effect is to make sure that the boundingbox
- * includes at least the <em>x</em>-values <em>[x-l,x+r]</em>, and the
- * <em>y</em>-values <em>[y-t,y+b]</em>.  The parameters l, r, t, and
- * b must all be non-negative.
+ * includes at least the <em>x</em>-values <em>[x-l,x+r-1]</em>, and the
+ * <em>y</em>-values <em>[y-t+1,y+b]</em>.  That is, the area
+ * indicated by the strut is <code>l+r</code> pixels wide by
+ * <code>t+b</code> pixels deep.  The parameters l, r, t, and
+ * b must all be non-negative.  This implies that the call
+ * <code>rule(x, y, w, h)</code> has the same effect on the bounding
+ * box as <code>rule(x, y, 0, w, h, 0)</code>.
  *
  * @param x the x-coordinate of the reference point of the strut
  * @param y the y-coordinate of the reference point of the strut
@@ -425,9 +437,9 @@ void Bitmap::rule(const int x, const int y, const int w, const int h)
  * @throws BitmapError if this is called after method
  * <code>freeze()</code>, or if one of l, r, t, b is negative
  */
-void Bitmap::strut (const int x, const int y,
-		    const int l, const int r,
-		    const int t, const int b)
+void Bitmap::strut(const int x, const int y,
+		   const int l, const int r,
+		   const int t, const int b)
     throw (BitmapError)
 {
     if (frozen_)
@@ -437,22 +449,35 @@ void Bitmap::strut (const int x, const int y,
 	throw BitmapError
 		("Bitmap::strut all of l, r, t, b must be non-negative");
 
-    usesBitmapArea_(x-l, y-t, x+r, y+b);
-
     if (verbosity_ > normal)
 	cerr << "Bitmap::strut @ (" << x << ',' << y << "): (x-"
 	     << l << ",x+" << r << ")/(y-"
-	     << r << ",y+" << b << "):"
+	     << t << ",y+" << b << "):"
 	     << "BB was [" << bbL << ':' << bbR << "), ["
-	     << bbT << ':' << bbB << ").";
+	     << bbT << ':' << bbB << ")" << endl;
 
-    if (bbL > bbR) bbL = bbR = x; // nothing on canvas before
-    if (x-l < bbL) bbL = x-l;
-    if (x+r > bbR) bbR = x+r;
+    // Mimic logic of rule() method: the pixels with coordinates
+    // [row1..row2-1] and [col1..col2-1] would be blackened by rule().
+    int col1 = x-l;
+    int col2 = x+r;
+    int row1 = y-t+1;
+    int row2 = y+b+1;
 
-    if (bbT > bbB) bbT = bbB = y;
-    if (y-t < bbT) bbT = y-t;
-    if (y+b > bbB) bbB = y+b;
+    // the following is identical to rule...
+
+    usesBitmapArea_(col1, row1, col2-1, row2-1);
+
+    if (col1 < 0) col1 = 0;
+    if (col2 > W) col2 = W;
+    if (row1 < 0) row1 = 0;
+    if (row2 > H) row2 = H;
+
+    // ...except that we don't actually draw anything
+
+    if (col1 < bbL) bbL = col1;
+    if (col2 > bbR) bbR = col2;
+    if (row1 < bbT) bbT = row1;
+    if (row2 > bbB) bbB = row2;
 
     if (verbosity_ > normal)
 	cerr << "Bitmap:: ...BB now [" << bbL << ':' << bbR << "), ["
@@ -737,7 +762,7 @@ bool Bitmap::overlaps ()
  * <code>overlaps()</code> before any call to <code>freeze()</code>.
  * It is never bigger than the bitmap after the bitmap is frozen.
  *
- * <p>Note that the order of the four dimensions is not that of
+ * <p>Note that the order of the four dimensions is <em>not</em> that of
  * the Postscript BoundingBox, which is (llx, lly, urx, ury)
  * rather than here, effectively, (ulx, uly, lrx, lry).  This is
  * because the position of the upper-left corner (ulx, uly) is
@@ -1037,10 +1062,29 @@ void Bitmap::write(const string filename, const string format)
     bi->write (outfilename);
 
     if (logBitmapPrefix_ != 0) {
-	cout << logBitmapPrefix_ << outfilename << ' ' << hsize << ' ' << vsize;
+	cout << logBitmapPrefix_ << outfilename
+	     << ' ' << hsize << ' ' << vsize;
         if (mark_ != 0) {
             BitmapMark *m = getMark();
-            cout << ' ' << m->x << ' ' << m->y;
+	    // Add one to the reported y-coordinate of the mark.  This
+	    // appears ill-motivated, but it's ultimately caused by
+	    // the observation that, though the underlying coordinate
+	    // system has the y-axis pointing downwards, things like
+	    // characters and rules (and to some extent struts) are
+	    // positioned with reference to their bottom-left corner,
+	    // rather than their top-left, and what's actually
+	    // positioned at the specified is the _centre_ of the
+	    // bottom-left pixel, rather than, really, the corner.
+	    // This has the effect that everything ends up one pixel
+	    // down from where one feels it ought to be.  However,
+	    // this doesn't matter, since we don't actually care
+	    // about the absolute position on the bitmap.  This
+	    // apparently gratuitous +1 is the clearest
+	    // manifestation of the asymmetry, but adding it means
+	    // that if, for example, you have a page with only a 10x10
+	    // rule on it, and the mark immediately afterwards, the
+	    // mark is reported as being at (x=10,y=10), rather than (10,9).
+            cout << ' ' << m->x << ' ' << m->y+1;
         }
         cout << endl;
     }
