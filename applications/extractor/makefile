@@ -452,7 +452,7 @@ I_SUB1 = assoc.h astrom.h back.h bpro.h check.h clean.h define.h \
          fitshead.h fitsutil.h flag.h globals.h growth.h \
          interpolate.h key.h mydefs.h neurro.h param.h photom.h \
          plist.h poly.h prefs.h psf.h retina.h sexhead.h sexhead1.h \
-         sexheadsc.h som.h types.h weight.h image.h
+         sexheadsc.h som.h types.h weight.h image.h userradii.h
 
 I_SUB2 =
 
@@ -494,7 +494,7 @@ C_SUB1 = adamprint.c analyse.c assoc.c astrom.c back.c bpro.c catout.c \
          fitsutil.c fitswrite.c flag.c graph.c growth.c image.c interpolate.c \
          makeit.c manobjlist.c misc.c neurro.c photom.c plist.c poly.c \
          prefs.c psf.c readimage.c refine.c retina.c scan.c som.c \
-         weight.c pc.c
+         weight.c pc.c userradii.c
 
 C_SUB2 =
 
