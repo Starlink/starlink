@@ -10,6 +10,13 @@
                HELP 'Enter dataset name without an extension'
             ENDPARAMETER
 
+     PARAMETER AUX
+               TYPE    'UNIV'
+               PROMPT  'Dataset which was searched to produce source list'
+               VPATH   'PROMPT'
+               HELP 'Enter dataset name without an extension'
+            ENDPARAMETER
+
             PARAMETER MODE
                POSITION 2
                TYPE    '_CHAR'
