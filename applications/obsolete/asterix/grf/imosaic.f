@@ -219,11 +219,7 @@
      :  TDIMS(ADI__MXDIM),     ! dimensions of input DATA_ARRAY
      :  DDIMS(ADI__MXDIM),     ! dimensions of temporary space
      :  INDIMS,                ! number of dimensions of input array
-     :  VNDIMS,                ! number of dimensions of input variance
-     :  QNDIMS,                ! number of dimensions of input quality
      :  IDIMS( ADI__MXDIM, MXFRAM ),! array of dimensions of input DATA_ARRAYs
-     :  VDIMS( ADI__MXDIM ),   ! array of dimensions of input VARIANCE
-     :  QDIMS( ADI__MXDIM ),   ! array of dimensions of input QUALITY
      :  PNTRA,                 ! pointer to input DATA_ARRAY
      :  PNTRB,                 ! pointer to input VARIANCE
      :  PNTRC                  ! pointer to input QUALITY ARRAY
@@ -260,6 +256,7 @@ c                              ! rebinning to new frame
       REAL			PCORN(2,2,2)		! Pixel posn fn (x,y)
       REAL			PPOS1(2)		! 1st i/p pix pos'n
       REAL			PPOSN(2)		! Nth i/p pix pos'n
+      REAL			SPARR(2)		! Spaced array data
 
       INTEGER			IFID(MXFRAM)		! Input dataset ids
       INTEGER                	IPTRD,IPTRV,IPTRQ  	! Loops over input slices
@@ -314,7 +311,7 @@ c                              ! axis units
 *    Version id :
 *
       CHARACTER*30		VERSION
-        PARAMETER  		( VERSION = 'IMOSAIC version 1.8-0' )
+        PARAMETER  		( VERSION = 'IMOSAIC version 2.0-0' )
 *-
 
 *    Show version number
@@ -359,7 +356,7 @@ c                              ! axis units
 *    Initialise data ok flags
       CALL ARR_INIT1L( .FALSE., MXFRAM, GOODAT, STATUS )
 
-*    Now get the required number of DATA_ARRAYs
+*  Now get the required number of input files
       FIRSTG = 1
       ONSLICE = 1
       DO  I  =  1, NUMBER
@@ -373,7 +370,8 @@ c                              ! axis units
         CALL MSG_PRNT( 'Input frame number ^FRAMENO' )
 
 *      Get a locator to an IMAGE-type data structure then cancel parameter
-        CALL USI_TASSOCI( PARM(:LPARM), '*', 'READ', IFID(I), STATUS )
+        CALL USI_IASSOC( 'INP', I, 'BinDS|Array', 'READ',
+     :                   IFID(I), STATUS )
 
 *      Report error including frame number
         IF ( STATUS .NE. SAI__OK ) THEN
@@ -401,21 +399,22 @@ c                              ! axis units
 
         ELSE
 
-*        Map in its DATA_ARRAY component
-          CALL BDI_CHKDATA( IFID(I), OK, INDIMS, TDIMS, STATUS )
+*      Map in its main data component
+          CALL BDI_CHK( IFID(I), 'Data', OK, STATUS )
+          CALL BDI_GETSHP( IFID(I), ADI__MXDIM, TDIMS, INDIMS, STATUS )
           ONDIM = INDIMS
           DO J = 3, ONDIM
             ODIMS(J) = TDIMS(J)
           END DO
           CALL ARR_SUMDIM( INDIMS, TDIMS, INELM )
 
-*        Given warning if not at least 2-d
+*      Given warning if not at least 2-d
           IF ( INDIMS .LT. 2 ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Error, input frames must be at least'/
      :                                     /' 2 dimensional', STATUS )
 
-*        If greater than 2-d we process datasets as stacks of 2-d images
+*      If greater than 2-d we process datasets as stacks of 2-d images
           ELSE IF ( INDIMS .GT. 2 ) THEN
 
 *          First time through?
@@ -445,21 +444,21 @@ c                              ! axis units
 
           END IF
 
-*        Number of elements in spatial dimensions
+*      Number of elements in spatial dimensions
           ISPNELM(I) = TDIMS(1) * TDIMS(2)
 
-*        Map the data
-          CALL BDI_MAPDATA( IFID(I), 'READ', PNTRA, STATUS )
+*      Map the data
+          CALL BDI_MAPR( IFID(I), 'Data', 'READ', PNTRA, STATUS )
 
-*        Check for an error
+*      Check for an error
           IF ( STATUS .NE. SAI__OK ) THEN
 
-*          Tidy current frame
+*        Tidy current frame
             CALL USI_CANCL( PARM(:LPARM), STATUS )
 
             IF ( STATUS .NE. PAR__ABORT ) THEN
 
-*            Report error and set flag for bad data
+*          Report error and set flag for bad data
               CALL MSG_SETI( 'FRAMENO', I )
               CALL ERR_REP( 'ERR_IMOSAIC_NOMPI',
      :              'AST_ERR: Error occurred whilst trying to map '/
@@ -467,8 +466,8 @@ c                              ! axis units
 
               GOODAT(I) = .FALSE.
 
-*            Increment number of the first good array if current
-*            value is not to be included in the calculations
+*          Increment number of the first good array if current
+*          value is not to be included in the calculations
               IF ( I .EQ. FIRSTG ) FIRSTG = FIRSTG + 1
 
             ELSE
@@ -483,14 +482,14 @@ c                              ! axis units
 *          have contained variances
             IF ( LVAR ) THEN
 
-              CALL BDI_CHKVAR( IFID(I), LVAR, VNDIMS, VDIMS, STATUS )
+              CALL BDI_CHK( IFID(I), 'Variance', LVAR, STATUS )
 
 *            Check that variance is ok and compatible with data array
-              IF ( LVAR .AND. VNDIMS .EQ. INDIMS .AND. VDIMS(1)
-     :               .EQ. TDIMS(1) .AND. VDIMS(2) .EQ. TDIMS(2) ) THEN
+              IF ( LVAR ) THEN
 
 *              Map the input variance array
-                CALL BDI_MAPVAR( IFID(I), 'READ', PNTRB, STATUS)
+                CALL BDI_MAPR( IFID(I), 'Variance', 'READ', PNTRB,
+     :                         STATUS )
                 IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_REP( ' ', 'Error mapping input variance',
      :                                                      STATUS )
@@ -502,28 +501,28 @@ c                              ! axis units
               END IF
             END IF
 
-*          If variances haven't been mapped then make the variance pointer
-*          point to the data. This is done purely to ensure that the pointer
-*          can be passed correctly to lower level code. The data is not
-*          accessed through this pointer provided LVAR is FALSE.
+*        If variances haven't been mapped then make the variance pointer
+*        point to the data. This is done purely to ensure that the pointer
+*        can be passed correctly to lower level code. The data is not
+*        accessed through this pointer provided LVAR is FALSE.
             IF ( .NOT. LVAR ) PNTRB = PNTRA
 
-*          Attempt to map the QUALITY array.
-            CALL BDI_CHKQUAL( IFID(I), LQUAL, QNDIMS, QDIMS, STATUS )
+*        Attempt to map the QUALITY array.
+            CALL BDI_CHK( IFID(I), 'Quality', LQUAL, STATUS )
 
-*          Check that quality is ok and compatible with data array
-            IF ( LQUAL .AND. QNDIMS .EQ. INDIMS .AND. QDIMS(1)
-     :           .EQ. TDIMS(1) .AND. QDIMS(2) .EQ. TDIMS(2) ) THEN
+*        Check that quality is ok
+            IF ( LQUAL ) THEN
 
 *            Map the input quality array
-              CALL BDI_MAPQUAL( IFID(I), 'READ', PNTRC, STATUS)
+              CALL BDI_MAPUB( IFID(I), 'Quality', 'READ', PNTRC, STATUS)
               IF ( STATUS .NE. SAI__OK ) THEN
                 CALL MSG_PRNT('Error mapping quality array')
                 GOTO 99
               END IF
 
-*            Get quality mask
-              CALL BDI_GETMASK( IFID(I), BADBITS(I), STATUS)
+*          Get quality mask
+              CALL BDI_GET0UB( IFID(I), 'QualityMask', BADBITS(I),
+     :                         STATUS )
 
 *          Otherwise map a temporary array
             ELSE
@@ -665,23 +664,23 @@ c                              ! axis units
 
                 END DO
 
-*              Unmap data arrays
-                CALL BDI_UNMAPDATA( IFID(I), STATUS )
+*            Unmap data arrays
+                CALL BDI_UNMAP( IFID(I), 'Data', PNTRA, STATUS )
                 IF ( LVAR ) THEN
-                  CALL BDI_UNMAPVAR( IFID(I), STATUS )
+                  CALL BDI_UNMAP( IFID(I), 'Variance', PNTRB, STATUS )
                 END IF
                 IF ( LQUAL ) THEN
-                  CALL BDI_UNMAPQUAL( IFID(I), STATUS )
+                  CALL BDI_UNMAP( IFID(I), 'Quality', PNTRC, STATUS )
                 END IF
 
-*              Calculate the X,Y offsets of the rebinned rotated frame from
-*              the first frame in units of integer output pixels.
-*              XOFSET is here defined as positive pixels to the right.
+*            Calculate the X,Y offsets of the rebinned rotated frame from
+*            the first frame in units of integer output pixels.
+*            XOFSET is here defined as positive pixels to the right.
                 XOFSET(I) = XMIN
                 YOFSET(I) = YMIN
 
-*              The data array and offsets are all in order so set
-*              the good data flag for this frame
+*            The data array and offsets are all in order so set
+*            the good data flag for this frame
                 GOODAT(I) = .TRUE.
 
               ELSE
@@ -833,21 +832,20 @@ c                              ! axis units
         END IF
       END DO
 
-*    Now get the output array
-      CALL USI_TASSOCO( 'OUT', 'IMAGE', OFID, STATUS )
+*  Now get the output file
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
+      CALL BDI_LINK( 'BinDS', ONDIM, ODIMS, 'REAL', OFID, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Map the output DATA_ARRAY component
-        CALL BDI_CREDATA( OFID, ONDIM, ODIMS, STATUS )
-        CALL BDI_MAPDATA( OFID, 'WRITE', PNTROD, STATUS )
+*    Map the output data
+        CALL BDI_MAPR( OFID, 'Data', 'WRITE', PNTROD, STATUS )
         CALL ARR_INIT1R( 0.0, ONELM, %VAL(PNTROD), STATUS )
 
 *      Create and map the output variance array if required
         IF ( LVAR ) THEN
 
-          CALL BDI_CREVAR( OFID, ONDIM, ODIMS, STATUS )
-          CALL BDI_MAPVAR( OFID, 'WRITE', PNTROV, STATUS )
+          CALL BDI_MAPR( OFID, 'Variance', 'WRITE', PNTROV, STATUS )
           CALL ARR_INIT1R( 0.0, ONELM, %VAL(PNTROV), STATUS )
 
         ELSE
@@ -859,16 +857,15 @@ c                              ! axis units
 
         END IF
 
-*      Map output quality array
-        CALL BDI_CREQUAL( OFID, ONDIM, ODIMS, STATUS )
-        CALL BDI_MAPQUAL( OFID, 'WRITE', PNTROQ, STATUS )
+*    Map output quality array
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', PNTROQ, STATUS )
         CALL ARR_INIT1B( QUAL__GOOD, ONELM, %VAL(PNTROQ), STATUS )
 
-*      Test if any of these have failed
+*    Test if any of these have failed
         IF ( STATUS .EQ. SAI__OK ) THEN
 
-*        Create some temporary workspace to hold the array mask. Only big
-*        enough to hold first 2 dimensions
+*      Create some temporary workspace to hold the array mask. Only big
+*      enough to hold first 2 dimensions
           CALL DYN_MAPR( 2, ODIMS, PNTRT, STATUS )
 
           IF ( STATUS .EQ. SAI__OK ) THEN
@@ -948,66 +945,58 @@ c                              ! axis units
       END IF
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Copy the MORE box from the first file into the output file
-      CALL BDI_COPMORE( IFID(FIRSTG), OFID, STATUS )
+*  Copy ancillaries
+      CALL UDI_COPANC( IFID(FIRSTG), 'grf', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT( 'Error copying MORE box into output file' )
         CALL ERR_ANNUL( STATUS )
       END IF
 
-*    Write output axes if astrometry info was sufficient in first file
+*  Write output axes if astrometry info was sufficient in first file
       IF ( LRADEC_1 ) THEN
 
-*      Create output spatial axes
-        CALL BDI_CREAXES( OFID, ONDIM, STATUS )
-        CALL BDI_CREAXVAL( OFID, 1, .TRUE., ODIMS(1), STATUS )
-        CALL BDI_CREAXVAL( OFID, 2, .TRUE., ODIMS(2), STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_PRNT( 'Error creating output axes' )
-          GOTO 99
-        END IF
+*    Calculate base values of the output axes
+        CALL BDI_AXGET1R( OFID, 1, 'SpacedData', 2, SPARR, IDUM,
+     :                    STATUS )
+        XSTART = SPARR(1) + MINX * XPIX_1
+        CALL BDI_AXGET1R( OFID, 2, 'SpacedData', 2, SPARR, IDUM,
+     :                    STATUS )
+        YSTART = SPARR(1) + MINY * YPIX_1
 
-*      Extra axes just get copied
+*    Write values axes
+        SPARR(1) = XSTART
+        SPARR(2) = XPIX_1
+        CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+        SPARR(1) = YSTART
+        SPARR(2) = YPIX_1
+        CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
+
+*    Copy axis text from 1st input to output
+        CALL BDI_AXCOPY( IFID(FIRSTG), 1, 'Label,Units', OFID, 1,
+     :                   STATUS )
+        CALL BDI_AXCOPY( IFID(FIRSTG), 2, 'Label,Units', OFID, 2,
+     :                   STATUS )
+
+*    Extra axes just get copied
         IF ( ONDIM .GT. 2 ) THEN
           DO I = 3, ONDIM
-            CALL BDI_COPAXIS( IFID(FIRSTG), OFID, I, I, STATUS )
+            CALL BDI_AXCOPY( IFID(FIRSTG), I, ' ', OFID, I, STATUS )
           END DO
-        END IF
-
-*      Calculate base values of the output axes
-        CALL BDI_GETAXVAL( IFID(FIRSTG), 1, XSTART, XPIX, IDUM, STATUS )
-        CALL BDI_GETAXVAL( IFID(FIRSTG), 2, YSTART, YPIX, IDUM, STATUS )
-        XSTART = XSTART + MINX * XPIX_1
-        YSTART = YSTART + MINY * YPIX_1
-
-*      Write values to axis structure
-        CALL BDI_PUTAXVAL( OFID, 1, XSTART, XPIX_1, ODIMS(1), STATUS )
-        CALL BDI_PUTAXVAL( OFID, 2, YSTART, YPIX_1, ODIMS(2), STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_PRNT('Error writing output axes')
-          GOTO 99
-        END IF
-
-*      Copy axis text from 1st input to output
-        CALL BDI_COPAXTEXT( IFID(FIRSTG), OFID, 1, 1, STATUS )
-        CALL BDI_COPAXTEXT( IFID(FIRSTG), OFID, 2, 2, STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL MSG_PRNT('Error writing axis labels and units')
-          GOTO 99
         END IF
 
       END IF
 
-*    Copy history structure from first file into the output file
+*  Copy history structure from first file into the output file
       CALL HSI_COPY( IFID(FIRSTG), OFID, STATUS )
 
-*    Add standard record to new history structure
+*  Add standard record to new history structure
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Put names of input datafiles used into history
+*  Put names of input datafiles used into history
       CALL USI_NAMEI( NLINES, PATH, STATUS )
       CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
 
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 

@@ -263,6 +263,14 @@
 *  Masked quality
       ELSE IF ( ITEM .EQ. 'MaskedQuality' ) THEN
 
+*    Not allowed in non-read modes
+        IF ( .NOT. RMODE ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Cannot invent MaskedQuality for update'/
+     :                  /' or write modes', STATUS )
+          GOTO 59
+        END IF
+
 *    Get dimensions of BinDS
         CALL BDI_GETSHP( BDID, ADI__MXDIM, DIMS, NDIM, STATUS )
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
