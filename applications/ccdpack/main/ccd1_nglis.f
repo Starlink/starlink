@@ -111,6 +111,7 @@
                CALL CCD1_MSG( ' ', '  ^I)  ^NAME', STATUS )
             END IF 
          END DO
+         IF ( ECHO ) CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Close the text file.
          CALL FIO_CLOSE( FD, STATUS )
