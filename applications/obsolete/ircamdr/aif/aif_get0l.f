@@ -96,7 +96,11 @@
             IF( STATUS .EQ. SAI__OK ) THEN
  
 *             check for value is within specified range
-               IF( ( VALUE .LT. MIN ) .OR. ( VALUE .GT. MAX ) ) THEN
+*             Note that a logical can only have two values
+*             Note also that this is generic-generated and 
+*             is not used so should not be generated if we 
+*             every try to regenerate from generic source
+               IF( ( VALUE .EQV. MIN ) .OR. ( VALUE .EQV. MAX ) ) THEN
  
 *                report as an error
                   STATUS = SAI__ERROR

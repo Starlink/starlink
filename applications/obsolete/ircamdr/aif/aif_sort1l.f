@@ -68,24 +68,27 @@
 *   check for error on entry
       IF ( STATUS .EQ. SAI__OK ) THEN
  
+*   make FALSE come before TRUE
+         CURVAL = .TRUE.
+
 *      loop through the array
          DO TEST = 1,DIM
  
 *         initialise index to current element and current value
             CURR   = TEST
-            CURVAL = ARRAY( TEST )
  
 *         compare all ARRAY elements after test element
 *         against current value
  
             DO INDEX = TEST+1, DIM
- 
-               IF( ARRAY( INDEX ) .LT. CURVAL ) THEN
+
+*         Sorting LOGICAL array makes no sense
+*         Just put FALSE before TRUE
+               IF( .NOT. ARRAY( INDEX ) ) THEN
  
 *               have found a value in list which is less than current
 *               smallest value, this element becomes new current element
                   CURR   = INDEX
-                  CURVAL = ARRAY( INDEX )
  
                ENDIF
  

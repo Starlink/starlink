@@ -60,16 +60,10 @@
 *-
  
 *   check for error on entry
-      IF ( STATUS .EQ. SAI__OK ) THEN
- 
-*      loop through the array
-         DO I = 1,DIM
- 
-*         apply the formula
-            ARRAY (I) = BIAS + ( SCALE * ARRAY (I) )
- 
-         ENDDO
- 
-      ENDIF
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      STATUS = SAI__ERROR
+      CALL ERR_REP('LOG_ERR','Makes no sense to scale a LOGICAL'//
+     :     ' array', STATUS)
  
       END

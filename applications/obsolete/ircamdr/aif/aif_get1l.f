@@ -79,8 +79,9 @@
                CALL AIF_MMVL( NVALS, VALUES, VRANGE, STATUS )
  
 *             check if values are within specified range
-               IF( ( VRANGE(1) .LT. MIN ) .OR.
-     :             ( VRANGE(2) .GT. MAX ) ) THEN
+*             See notes in aif_get0l.f
+               IF( ( VRANGE(1) .EQV. MIN ) .OR.
+     :             ( VRANGE(2) .EQV. MAX ) ) THEN
  
 *                report as an error
                   STATUS = SAI__ERROR
