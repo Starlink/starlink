@@ -3,7 +3,7 @@
 
       CHARACTER*80		AIO_FILE			! Output file
       CHARACTER*7   		AIO_TYPE			! Channel type
-      CHARACTER*(PAR__SZNAM) 	AIO_PARNAM			! ADAM par name
+      CHARACTER*15 		AIO_PARNAM			! ADAM par name
       CHARACTER*132		AIO_IPATH			! Input path
       CHARACTER*132		AIO_DEFEXT			! Input default
 								! extension
