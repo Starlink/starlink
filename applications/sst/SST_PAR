@@ -1,0 +1,41 @@
+*+
+*  Name:
+*     SST_PAR
+
+*  Purpose:
+*     Define global constants used by the SST routines.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This include file defines the values of global constants used by
+*     the SST routines and applications which call them. Its main
+*     purpose is to define the size of arrays held in common.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-AUG-1990 (RFWS):
+*        Original version.
+*     {enter_changes_here}
+
+*-
+
+*  Global Constants:
+
+*  Maximum length of a line in the internal source code buffer.
+      INTEGER SST__SZLIN
+      PARAMETER ( SST__SZLIN = 132 )
+
+*  Maximum number of lines in the internal source code buffer.
+      INTEGER SST__MXLIN
+      PARAMETER ( SST__MXLIN = 5000 )
+
+*.
+* @(#)sst_par   1.1   94/12/05 11:38:25   96/07/05 10:28:45

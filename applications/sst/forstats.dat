@@ -1,0 +1,144 @@
+Key:
+===
+
+PrgUnit:
+-------
+Name of the program unit. This will be flagged if any of the unit's statistics
+(in other columns of the table) lie outside their expected range. The total
+number of program units analysed is given at the bottom of the table.
+
+Type:
+----
+Type of program unit:  B ==> block data
+                       F ==> function
+                       P ==> main program
+                       S ==> subroutine
+                       ? ==> unknown
+
+Lines:
+-----
+Total number of lines read from the input file for each program unit. The sum
+and average over all program units is given at the bottom of the table. 
+
+Blank:
+-----
+Number of lines in the program unit which are blank (this includes any lines
+which contain just a single comment character). In the interests of making the
+code fit easily on a terminal screen the density of blank lines should not be
+too high. This value is flagged if it exceeds 40% of the total lines in the
+program unit, unless the total number of lines is particularly small. The sum
+and average over all program units is given at the bottom of the table.
+
+NonBl:
+-----
+Number of non-blank lines in the program unit (this excludes any lines which
+contain just a single comment character). This is a rough estimate of how much
+work has gone into writing it. The sum and average over all program units is
+given at the bottom of the table.
+
+Code:
+----
+Number of lines of code in the program unit (this excludes all blank lines and
+comment lines). To make programs easily supportable, they should be broken into
+separate program units which are not too large. This value is flagged if it
+exceeds 250, although there are some circumstances (large tables of data or
+routines with straightforward logic) where larger values may be acceptable. The
+sum and average over all program units is given at the bottom of the table.
+
+Comm:
+----
+Number of non-blank comment lines in the program unit (this excludes any lines
+which contain only a single comment character). It indicates the extent to which
+the author has anticipated the needs of a subsequent support programmer. The sum
+and average over all program units is given at the bottom of the table.
+
+N_Blk:
+-----
+Number of separate blocks of contiguous uncommented code lines in the program
+unit (contiguous means not separated by any comment lines or by end-of-line
+comments, although there may be blank lines interspersed). This is a crude
+measure of the number of logical "chunks" in the code, although it has to be
+assessed along with the following entries in the table. The sum and average over
+all program units is given at the bottom of the table. 
+
+AvBlk:
+-----
+Average length in lines of the blocks of contiguous code in the program unit
+(see above). It is a simple measure of the size of the individual logical chunks
+which the author has thought fit to comment. A high value here may indicate that
+commenting has been skimped, or that the author has assumed that a subsequent
+support programmer can deduce more information from the code (as opposed to the
+comments) than is justified. This value is flagged if it exceeds 7. The average
+over all program units is given at the bottom of the table.
+
+MxBlk:
+-----
+Maximum length in lines of a block of contiguous code in the program unit (see
+above). A high value here may result from a completely undocumented section of
+the code, perhaps the result of "quick fixes" added after the original code was
+written. Alternatively, the original author may have omitted to document all or
+part of the code. This is likely to result in a significant problem for a
+support programmer although there are circumstances (e.g. tables of data) where
+lack of comments may be acceptable. This value is flagged if it exceeds 20. The
+maximum taken over all program units is given at the bottom of the table.
+
+N_Pro:
+-----
+Number of "prologues" (i.e. comment headers) in the program unit (prologues are
+delimited by comment lines containing '+' or '-' in the second column). The
+expected number of prologues is, of course 1, and any other value is flagged.
+This value is also flagged if a prologue appears to extend to the end of the
+program unit, which is usually an indication that the end-of-prologue comment
+line is missing, or that a '+' or '-' appears unintentionally in the second
+column of a comment line. The total number and percentage of program units which
+contain a prologue is given at the bottom of the table.
+
+PrLin:
+-----
+Number of comment lines lying within the prologue (this excludes the
+comment-delimiting lines themselves and any lines which contain only a single
+comment character). It indicates roughly how much prologue information there is.
+It is flagged if it is less than 20, unless the program unit is particularly
+small. The sum and average over all program units is given at the bottom of the
+table.
+
+N_Com:
+-----
+Number of non-blank comment lines found in the body of the code (as opposed to
+the prologue). It indicates whether the code has been commented (end-of-line
+comments are not counted). A value of zero will be flagged. The sum and average
+over all program units is given at the bottom of the table. 
+
+AvLin:
+-----
+Average number of non-blank comment lines in each comment block within the body
+of the code (a comment block is a sequence of comment lines without intervening
+code lines). It indicates roughly how terse or verbose the in-code commenting
+is. The average over all program units is given at the bottom of the table. 
+
+AvChr:
+-----
+Average number of alphanumeric characters in each non-blank comment line within
+the body of the code. A small value probably indicates that comment lines
+consist largely of white space or delimiting symbols, rather than actual
+information. The average over all program units is given at the bottom of the
+table. 
+
+ComFr:
+-----
+Average in-code commenting fraction as a percentage. This value is the ratio of
+the amount of in-code commentary measured in "effective comment lines" to the
+corresponding total number of non-blank lines (i.e. comments + code). The number
+of "effective comment lines" is assessed by assuming that a full comment line
+contains 50 alphanumeric characters, and assigning an appropriate fractional
+weight to lines which fall short of this. End-of-line comments are also included
+in this sum. The result is a good overall measure of the adequacy of in-code
+commenting. If entries in the other columns of the table are OK, then values
+here of above 30% usually represent excellently commented code, whereas values
+below 10% may be inadequate and are flagged. The average over all program units
+is given at the bottom of the table. 
+
+File:
+----
+Name of the file from which the program unit was read. The total number of files
+processed is given at the bottom of the table.

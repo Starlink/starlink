@@ -1,0 +1,53 @@
+*+
+*  Name:
+*     SST_SCB
+
+*  Purpose:
+*     Define the SST internal source code buffer.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     This file defines the global variables which constitute the SST
+*     system's internal source code buffer, in which a copy of an input
+*     file is held for analysis.
+
+*  Prior Requirements:
+*     -  The file SST_PAR must be included before this file.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     10-AUG-1990 (RFWS):
+*        Original version.
+*     5-DEC-1994 (PDRAPER):
+*        Removed dollars from common block names.
+*     {enter_further_changes_here}
+
+*-
+
+*  I/O units attached to input/output files.
+      INTEGER SCB_IN
+      INTEGER SCB_OUT
+
+*  Buffer to hold source code lines.
+      CHARACTER * ( SST__SZLIN ) SCB_LINE( SST__MXLIN )
+
+*  Number of lines in buffer.
+      INTEGER SCB_NLINE
+
+*  First and last character positions in each line.
+      INTEGER SCB_FC( SST__MXLIN )
+      INTEGER SCB_LC( SST__MXLIN )
+
+      COMMON /SST_SCB1/ SCB_IN, SCB_OUT, SCB_NLINE, SCB_FC, SCB_LC
+      COMMON /SST_SCB2/ SCB_LINE
+
+*.
+* @(#)sst_scb   1.1   94/12/05 11:38:34   96/07/05 10:28:51

@@ -1,0 +1,157 @@
+      SUBROUTINE SST_STLAT( STATUS )
+*+
+*  Name:
+*     SST_STLAT
+
+*  Purpose:
+*     Start a Latex document.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SST_STLAT( STATUS )
+
+*  Description:
+*     The routine writes the commands necessary to start a Latex
+*     document to the output file. If a full Latex document is being
+*     produced, then this routine should be called before processing any
+*     input prologues. It uses the standard Latex preamble
+*     $SST_DIR/sun.tex then transfers the contents of the file
+*     $SST_DIR/sst.tex to the output file. This contains definitions of
+*     the SST layout commands.
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     13-AUG-1990 (RFWS):
+*        Original version.
+*     14-AUG-1990 (RFWS):
+*        Added missing call to FIO_SERR.
+*     12-SEP-1990 (RFWS):
+*        Added Latex command to produce a centred underscore.
+*     28-SEP-1990 (RFWS):
+*        Added calls to ERR_MARK and ERR_RLSE.
+*     5-DEC-1994 (PDRAPER):
+*        Added double \\ for UNIX port.
+*     7-JUL-1996 (PDRAPER):
+*        Fixed to use external file for document start information.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'SST_PAR'          ! SST_ constants
+      INCLUDE 'FIO_ERR'          ! FIO_ error codes
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      EXTERNAL CHR_LEN
+      INTEGER CHR_LEN            ! Used length of string
+
+*  Local Variables:
+      CHARACTER * ( SST__SZLIN ) LINE ! I/O buffer
+      CHARACTER * ( 132 ) FILE   ! Full name of file to open
+      INTEGER FD                 ! File descriptor
+      INTEGER DEFNS              ! I/O unit for layout definitions
+      INTEGER F                  ! First character position
+      INTEGER IOERR              ! I/O error status
+      INTEGER L                  ! Last character position
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Open the Latex preamble.
+      CALL PSX_GETENV( 'SST_DIR', FILE, STATUS )
+      CALL CHR_APPND( '/sun.tex', FILE, CHR_LEN( FILE ) )
+      CALL FIO_OPEN( FILE, 'READ', 'list', 0, FD, STATUS )
+      CALL FIO_UNIT( FD, DEFNS, STATUS )
+      
+*  If an error occurred, then construct a message and report it.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETI( 'UNIT', DEFNS )
+         CALL ERR_REP( 'SST_STLAT_OPEN',
+     :   'Error opening file $SST_DIR/sun.tex for reading on ' //
+     :   'Fortran unit ^UNIT.', STATUS )
+         GO TO 99
+      END IF
+
+*  Loop to read the definitions file.
+      CALL ERR_MARK
+ 1    CONTINUE                  ! Start of 'DO WHILE' loop
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL SST_GET( DEFNS, LINE, STATUS )
+         CALL CHR_FANDL( LINE, F, L )
+
+*  If the line is blank, then output a blank line. Otherwise, send the
+*  input line to the output file, preserving its indentation.
+         IF ( F .GT. L ) THEN
+            CALL SST_PUT( 0, ' ', STATUS )
+         ELSE
+            CALL SST_PUT( F - 1, LINE( F : L ), STATUS )
+         END IF
+         GO TO 1
+      END IF
+
+*  Annul the end-of-file error and close the file.
+      IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+      CALL ERR_RLSE
+      CALL FIO_CLOSE( FD, STATUS )
+
+*  Now open the layout definitions file.
+      CALL PSX_GETENV( 'SST_DIR', FILE, STATUS )
+      CALL CHR_APPND( '/sst.tex', FILE, CHR_LEN( FILE ) )
+      CALL FIO_OPEN( FILE, 'READ', 'list', 0, FD, STATUS )
+      CALL FIO_UNIT( FD, DEFNS, STATUS )
+
+*  If an error occurred, then construct a message and report it.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETI( 'UNIT', DEFNS )
+         CALL ERR_REP( 'SST_STLAT_OPEN',
+     :   'Error opening file $SST_DIR/sst.tex for reading on ' //
+     :   'Fortran unit ^UNIT.', STATUS )
+         GO TO 99
+      END IF
+
+*  Loop to read the definitions file.
+      CALL ERR_MARK
+ 2    CONTINUE                  ! Start of 'DO WHILE' loop
+      IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL SST_GET( DEFNS, LINE, STATUS )
+         CALL CHR_FANDL( LINE, F, L )
+
+*  If the line is blank, then output a blank line. Otherwise, send the
+*  input line to the output file, preserving its indentation.
+         IF ( F .GT. L ) THEN
+            CALL SST_PUT( 0, ' ', STATUS )
+         ELSE
+            CALL SST_PUT( F - 1, LINE( F : L ), STATUS )
+         END IF
+         GO TO 2
+      END IF
+
+*  Annul the end-of-file error and close the file.
+      IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
+      CALL ERR_RLSE
+      CALL FIO_CLOSE( FD, STATUS )
+99    CONTINUE
+      END
+* @(#)sst_stlat.f   1.9   96/07/05 10:26:47   96/07/05 10:27:31

@@ -1,0 +1,120 @@
+      SUBROUTINE SST_FORP( INDENT, FIRST, LAST, STATUS )
+*+
+*  Name:
+*     SST_FORP
+
+*  Purpose:
+*     Output the body of a section formatted in "paragraph" mode as
+*     Fortan prologue lines.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL SST_FORP( INDENT, FIRST, LAST, STATUS )
+
+*  Description:
+*     The routine sends all the lines in the body of a prologue section
+*     formatted in paragraph mode to the output file as Fortran
+*     prologue (i.e. comment) lines, with indentation adjusted to the
+*     specified amount. The body of the section is identified by its
+*     first and last line numbers in the internal source code buffer.
+*     Relative indentation within the section is preserved, but the
+*     "base" level is set by the routine argument INDENT, which
+*     specifies the number of leading columns to be skipped.
+
+*  Arguments:
+*     INDENT = INTEGER (Given)
+*        Level of indentation required.
+*     FIRST = INTEGER (Given)
+*        First line number.
+*     LAST = INTEGER (Given)
+*        Last line number.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine compresses multiple blank lines into single blank
+*     lines.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     28-FEB-1990 (RFWS):
+*        Original, derived from the SST_PUTP routine.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'SST_PAR'          ! SST_ constants
+
+*  Global Variables:
+      INCLUDE 'SST_SCB'          ! SST_ Source Code Buffer
+
+*  Arguments Given:
+      INTEGER INDENT
+      INTEGER FIRST
+      INTEGER LAST
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER BASE               ! Base level of indentation
+      INTEGER I                  ! Loop counter for output lines
+      LOGICAL PREVBL             ! Previous output line was blank?
+
+*  Internal References:
+      LOGICAL BLANK              ! Whether line is blank
+      INTEGER LINE               ! Dummy argument for BLANK
+      BLANK( LINE ) = SCB_FC( LINE ) .GT. SCB_LC( LINE )
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the base level of indentation.
+      BASE = SST__SZLIN
+
+*  Find the minimum level of indentation within the body of the section.
+      DO 1 I = FIRST, LAST
+         IF ( .NOT. BLANK( I ) ) THEN
+            BASE = MIN( BASE, SCB_FC( I ) )
+         END IF
+1     CONTINUE
+
+*  Initialise flag indicating whether the previous line was blank.
+      PREVBL = .TRUE.
+
+*  Loop to output the lines in the section. Blank lines simply result in
+*  a blank output line, unless the previous line was blank anyway.
+      DO 2 I = FIRST, LAST
+         IF ( BLANK( I ) ) THEN
+            IF ( .NOT. PREVBL ) THEN
+               CALL SST_FOR( 0, ' ', STATUS )
+               PREVBL = .TRUE.
+            END IF
+
+*  Non-blank lines are output with the base level of indentation
+*  adjusted to equal INDENT.
+         ELSE
+            CALL SST_FOR( INDENT + SCB_FC( I ) - BASE,
+     :                    SCB_LINE( I )( SCB_FC( I ) : SCB_LC( I ) ),
+     :                    STATUS )
+            PREVBL = .FALSE.
+         END IF
+2     CONTINUE
+
+      END
+* @(#)sst_forp.f   1.1   94/12/05 11:31:24   96/07/05 10:27:28

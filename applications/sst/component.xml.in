@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/sst</path>
+  <description>SST - A Simple Software Tools Package</description>
+  <abstract><p>SST is now considered obsolete; it is included to
+      support those applications which currently use it, but it should
+      not be used for new code.</p>
+    <p>The Simple Software Tools package (SST) is a package of
+      applications designed to help with the production of software
+      and documentation, with particular emphasis on ADAM programming
+      using Fortran 77.</p>
+    <p>As its name suggests, SST is intended for performing fairly
+      simple manipulation of software, but it aims to tackle some of
+      the commonly encountered problems which are not catered for in
+      more sophisticated commercial software tools (such as FORCHECK
+      and VAXset) which are available on Starlink. In future, SST may
+      also duplicate a few of the simpler facilities which commercial
+      products offer in order to avoid the cost (and generally much
+      higher overheads, such as disk space) which prevent the
+      commercial products being freely available on all Starlink
+      machines. </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>R. F. Warren-Smith</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
