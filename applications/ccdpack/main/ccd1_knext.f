@@ -123,7 +123,7 @@
 
 *  Get length of NAME.
       NAMLEN = CHR_LEN( NAME )
-      IF ( NAMLEN .LT. 20 ) THEN
+      IF ( NAMLEN .LT. 15 ) THEN
          DO 1 I = 1, 19
             IF ( NAMES( I )( 1 : NAMLEN) .EQ. NAME( 1 : NAMLEN ) ) THEN
 
