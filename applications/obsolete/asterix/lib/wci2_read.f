@@ -71,11 +71,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     14 Feb 1995 (DJA):
 *        Original version.
+*      8 May 1997 (RB):
+*        Get correct value of EQQNX from EPOCH if possible
 *     {enter_changes_here}
 
 *  Bugs:
@@ -374,6 +377,15 @@
       END IF
 
 *  Create the CoordSystem object. Define suitable defaults for missing data
+*  Lets make sure things are ok (RB)
+      IF ( EQOK .AND. .NOT. EPOK) THEN
+        EPOCH = DBLE(EQNX)
+        EPOK = .TRUE.
+      END IF
+      IF ( EPOK .AND. .NOT. EQOK) THEN
+        EQNX = REAL(EPOCH)
+        EQOK = .TRUE.
+      END IF
       IF ( .NOT. SYSOK ) SYS = 'FK5'
       IF ( .NOT. EQOK ) EQNX = 2000.0
       IF ( .NOT. EPOK ) EPOCH = WCI__FLAG
