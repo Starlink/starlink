@@ -86,13 +86,18 @@ Flow-object constructors for the document body
 information from the docinfo element, then doing <funcname/process-children/
 to format the document content.
 
+<p>Need to have a think about exactly what dates and release information
+are shown at the top of the document.
+
 <codebody>
 (element docbody
   (let* ((tsosofo (process-node-list (getdocinfo 'title)))
 	 (authors (children (getdocinfo 'authorlist)))
 	 (rel (document-release-info))
-	 (vers (car (cdr (cdr rel))))
-	 (date (format-date (car rel)))
+	 ;(vers (car (cdr (cdr rel))))
+	 ;(date (format-date (car rel)))
+	 (vers (car (cdr (cdr (cdr rel)))))
+	 (date (format-date (car (cdr rel))))
 	 (docref (getdocnumber))
 	 )
     (make sequence
