@@ -336,7 +336,7 @@ C              CALL BDA_INIT()
 ***         check if this is a new file/extension
             FNEW = .NOT.(SAME.AND.JOIN.AND.(EXTNAME.EQ.S_EXTNAME))
             S_EXTNAME = EXTNAME
-
+	print*,fnew,same,join
 ***         Create an output HDS fIle
 	    CALL AOPENHDS(HNAME,EXTNAME,FILENO,FNEW,LOC,STATUS)
             IF (STATUS.NE.SAI__OK) goto 999
