@@ -81,6 +81,7 @@
       endif
 
       if( "$makesun" == "yes" ) then
+         echo "Creating a new kplsearch script"
          $KAPLIBS_DEV/bin/make_kplsearch.csh
       endif
 
@@ -97,10 +98,12 @@
 
 #  Create the documentation in the current directory
       if( "$makesun" == "yes" ) then
+         echo "Creating new sun238 files"
          $KAPLIBS_DEV/bin/make_sun238.csh 
       else
+         echo "Copying existing sun238 files"
          cp $KAPLIBS_SYS/sun238.htx_tar ./
-         cp $KAPLIBS_REF/sun238.tex ./
+         cp $KAPLIBS_SYS/sun238.tex ./
       endif
 
 #  Tar up all the release files and then remove them.
