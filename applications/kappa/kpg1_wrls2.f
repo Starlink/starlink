@@ -247,7 +247,7 @@
          IAT = IAT + 1
          CALL CHR_APPND( AST_GETC( IWCS, 'CLASS', STATUS ), BUFFER, 
      :                   IAT )
-         CALL GRP_PUT( IGRP, 1, BUFFER( : 70 ), 0, STATUS ) 
+         CALL GRP_PUT( IGRP, 1, BUFFER( : IAT ), 0, STATUS ) 
          CALL GRP_PUT( IGRP, 1, ' ', 0, STATUS ) 
 
 *  Create an AST Channel which can be used to write the FrameSet description

@@ -100,10 +100,30 @@
 
 *  Status:
       INTEGER STATUS
+
+*  Local Variables:
+      INTEGER IPIC
+
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Attempt to get the AGI identifier for the current picture.
+      CALL AGI_ICURP( IPIC, STATUS )      
+
+*  If this failed, annul the error and report a more appropriate error.
+      IF( STATUS .NE. SAI__OK ) THEN 
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_ASAGD_ERR', 'The mapping to the '//
+     :                 'requested co-ordinate Frame uses information '//
+     :                 'which is only available in the AGI graphics '//
+     :                 'database.', STATUS )
+         CALL ERR_REP( 'KPG1_ASAGD_ERR', 'This application does not '//
+     :                 'have any graphics capabilities and so the '//
+     :                 'requested co-ordinate Frame cannot be used.', 
+     :                 STATUS )
+      END IF
 
 *  Forward transformation. 
       IF ( FORWARD ) THEN

@@ -742,7 +742,7 @@ moscdv.f namsrv.f nmplot.f opus.f otstsb.f peepsb.f setcr.f setknt.f \
 shifts.f shiftx.f shifty.f slc2t1.f slc2t3.f sqshs.f sqshx.f sqshy.f \
 stat3d.f statsb.f statv.f strx.f stry.f thrsr.f trgscl.f trigsb.f \
 tropus.f uput.f uget.f kps1_cpbd.f kps1_cpbr.f kps1_cpbi.f kps1_cpbw.f \
-kps1_cpbb.f kps1_cpbuw.f kps1_cpbub.f 
+kps1_cpbb.f kps1_cpbuw.f kps1_cpbub.f kps1_curfm.f
 
 MEM_F_ROUTINES = mem2d.f
 
@@ -783,14 +783,17 @@ IRA_BLOCK_DATA = ira1_init.f
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
 
-C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(NDG_C_ROUTINES)
+C_ROUTINES = $(FITS_C_ROUTINES) $(KAPGEN_C_ROUTINES) $(NDG_C_ROUTINES) \
+             $(OTHER_C_ROUTINES)
 
 FITS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
 
-KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c grf_kappa.c \
+KAPGEN_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c \
                     kpg1_tkast.c
 
 NDG_C_ROUTINES = ndg1_wild.c 
+
+OTHER_C_ROUTINES = grf_kappa.c
 
 #  Define the set of all interface files.
 
@@ -912,7 +915,7 @@ LATEX_DOCS = sun95.tex \
              sun95_agi1.eps sun95_agi2.eps sun95_agi3.eps sun95_agi4.eps \
              sun95_agi5.eps sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps \
              sun221.tex
-HYPERTEXT_DOCS = sun95.htx sun221.htx
+HYPERTEXT_DOCS = 
 
 #  List of documentation files.
 
@@ -1059,7 +1062,8 @@ $(IRM_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(KAPGEN_F_ROUTINES) $(KAPGEN_C_ROUTINES) $(KAPGEN_BLOCK_DATA) :
+$(KAPGEN_F_ROUTINES) $(KAPGEN_C_ROUTINES) $(KAPGEN_BLOCK_DATA) \
+$(OTHER_C_ROUTINES):
 	$(TAR_OUT) kapgen_sub.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1118,7 +1122,7 @@ $(IRAF_DEMO) :
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(NDG_OBJECT_FILES) \
                $(IRA_OBJECT_FILES) $(IRM_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
-               $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
+               $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) $(OTHER_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
 AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
@@ -1133,6 +1137,8 @@ NDG_OBJECT_FILES = $(NDG_F_ROUTINES:.f=.o) $(NDG_C_ROUTINES:.c=.o)
 
 KAPGEN_OBJECT_FILES = $(KAPGEN_F_ROUTINES:.f=.o) $(KAPGEN_BLOCK_DATA:.f=.o) \
                       $(KAPGEN_C_ROUTINES:.c=.o)
+
+OTHER_OBJECT_FILES = $(OTHER_C_ROUTINES:.c=.o)
 
 KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(MEM_F_ROUTINES:.f=.o)
 
@@ -1228,20 +1234,20 @@ $(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o \
 
 #  Give dependencies and rule for building the pseudo-monoliths.
 
-$(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
+$(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPPA_MONO_SOURCE:.f=.o) -o $(KAPPA_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)`
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o
 
-$(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
+$(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
-	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o
 
-$(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) lsfun1.o $(LINK_SCRIPT)
+$(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
 	         lsfun1.o $(OBJECT_LIBRARIES) \
-	         $(ADDLIBS) $(TCLLIBS) `./$(LINK_SCRIPT)` $(LDFLAGS)
+	         $(ADDLIBS) `./$(LINK_SCRIPT)` grf_kappa.o $(TCLLIBS) $(LDFLAGS)
 
 #  List of the interface files to be built and rules for compiling them.
 
@@ -2349,7 +2355,7 @@ ira_sub.tar:
 
 kapgen_sub.tar:
 	$(TAR_IN) kapgen_sub.tar $(KAPGEN_F_ROUTINES) \
-                  $(KAPGEN_C_ROUTINES) $(KAPGEN_BLOCK_DATA)
+                  $(KAPGEN_C_ROUTINES) $(OTHER_C_ROUTINES) $(KAPGEN_BLOCK_DATA)
 
 kappa_sub.tar:
 	$(TAR_IN) kappa_sub.tar $(KAPPA_F_ROUTINES) $(MEM_F_ROUTINES)

@@ -263,6 +263,9 @@
 
 *  Read the FrameSet from the positions list.
 *  ==========================================
+*  Ensure all KAPPA AST IntraMaps are registered.
+      CALL KPG1_ASREG( STATUS )
+
 *  Create an AST Channel which can be used to read AST Objects from the 
 *  comments group. Set the Skip attribute non-zero so that non-AST data which 
 *  occur between AST Objects are ignored.

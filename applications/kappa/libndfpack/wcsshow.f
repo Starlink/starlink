@@ -57,19 +57,21 @@
 *        specified AST Object. If a null (!) value is supplied, no log
 *        file is created. If a log file is given, the Tk browser window
 *        is not produced. [!]
-*     NDF = NDF (Update)
+*     NDF = NDF (Read or Update)
 *        If an NDF is supplied, then its WCS FrameSet is displayed. If a
 *        null (!) value is supplied, then the parameter OBJECT is used to
-*        specify the AST Object to display.
+*        specify the AST Object to display. Update access is required to
+*        the NDF if a value is given for parameter NEWWCS. Otherwise, only
+*        read access is required.
 *     NEWWCS = GROUP (Read)
 *        A group expression giving a dump of an AST FrameSet which
 *        is to be stored as the WCS component in the NDF given by parameter 
 *        NDF. The existing WCS component is unchanged if a null value is
-*        supplied. This parameter is only accessed if a non-null value is
-*        supplied for parameter NDF. The Base Frame in the FrameSet is
-*        assumed to be the GRID Frame. If a value is given for this
-*        parameter, then the log file or Tk browser will display the new 
-*        FrameSet (after being stored in the NDF and retrieved). [!]
+*        supplied. The value supplied for this parameter is ignored if a 
+*        null value is supplied for parameter NDF. The Base Frame in the 
+*        FrameSet is assumed to be the GRID Frame. If a value is given for 
+*        this parameter, then the log file or Tk browser will display the 
+*        new FrameSet (after being stored in the NDF and retrieved). [!]
 *     OBJECT = LITERAL (Read)
 *        The HDS object containing the AST Object to display. Only
 *        accessed if parameter NDF is null. It must have an HDS type 
@@ -138,6 +140,7 @@
       EXTERNAL KPG1_ASGFW        ! Sink function for AST Channel
 
 *  Local Variables:
+      CHARACTER ACCESS*6
       CHARACTER LOC*(DAT__SZLOC)
       CHARACTER LOGFNM*(GRP__SZFNM)
       CHARACTER TITLE*255
@@ -156,6 +159,20 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
+*  Attempt to get a group expression using parameter NEWWCS.
+      IGRP = GRP__NOID
+      CALL KPG1_GTGRP( 'NEWWCS', IGRP, SIZE, STATUS )
+
+*  Annul the error if a null value was supplied for NEWWCS. Also
+*  set up the access required to the NDF.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         ACCESS = 'UPDATE'
+
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         ACCESS = 'READ'
+      END IF
+
 *  Get the degree of detail required in the output.
       CALL PAR_GET0I( 'FULL', FULL, STATUS )
 
@@ -165,21 +182,15 @@
 *  Initially assume that the Object should be displayed in the GUI.
       QUIET = .FALSE.
 
-*  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
-
 *  Get an NDF identifier.
-      CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
+      CALL NDF_ASSOC( 'NDF', ACCESS, INDF, STATUS )
 
 *  If succesful...
       IF( STATUS .EQ. SAI__OK ) THEN
 
-*  Attempt to get a group expression using parameter NEWWCS.
-         IGRP = GRP__NOID
-         CALL KPG1_GTGRP( 'NEWWCS', IGRP, SIZE, STATUS )
-
-*  If succesful, assume the th eObject is not to be displayed.
-         IF( STATUS .EQ. SAI__OK ) THEN
+*  If a value was given for NEWWCS, assume the the Object is not to be 
+*  displayed.
+         IF( IGRP .NE. GRP__NOID ) THEN
             QUIET = .TRUE.
 
 *  Create an AST Channel which can be used to read AST Objects from the 

@@ -115,7 +115,7 @@
 *        [centre of the image]
 *     CLEAR = _LOGICAL (Read)
 *        TRUE if the current picture is to be cleared before the image is 
-*        displayed. [FALSE]
+*        displayed. [current value]
 *     COMP = LITERAL (Read)
 *        The NDF array component to be displayed.  It may be "Data",
 *        "Quality", "Variance", or "Error" (where "Error" is an
