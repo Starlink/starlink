@@ -458,11 +458,6 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 *  any coordinate Frame included in the above WCS FrameSet.
       CALL ARD_WCS( IWCS, STATUS )                              [11]
 
-*  Indicate that we are handling WCS information using the system 
-*  introduced by ARD version 2 (as opposed to the restricted linear
-*  system used prior to version 2).
-      TRCOEF( 1 ) = VAL__BADR                                   [12]
-                                                              
 *  Indicate that the value 2 should be used to represent      
 *  pixels specified by the first keyword in the ARD           
 *  description.                                               
@@ -471,30 +466,30 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 *  Call ARD_WORK to store positive values at all mask pixels  
 *  specified by the ARD description, and zero at all other    
 *  pixels.                                                    
-      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,   [13]
+      CALL ARD_WORK( IGRP, NDIM, LBND, UBND, TRCOEF, .FALSE.,   [12]
      :               REGVAL, %VAL( IPMASK ), LBNDI, UBNDI,    
      :               LBNDE,  UBNDE, STATUS )                  
                                                               
 *  Call a subroutine to sum the data in the specified regions.
       CALL SUMIT( EL, %VAL( IPDATA ), %VAL( IPMASK ), SUM,    
-     :            STATUS )                                      [14]
+     :            STATUS )                                      [13]
                                                               
 *  Display the data sum.                                      
       CALL MSG_SETR( 'SUM', SUM )                             
-      CALL MSG_OUT( 'ARD_TEST_MSG1', '  Data sum: ^SUM',        [15]
+      CALL MSG_OUT( 'ARD_TEST_MSG1', '  Data sum: ^SUM',        [14]
      :               STATUS )                                 
                                                               
 *  Release the work space used to hold the pixel mask.        
-      CALL PSX_FREE( IPMASK, STATUS )                           [16]
+      CALL PSX_FREE( IPMASK, STATUS )                           [15]
                                                               
 *  Delete the group used to hold the ARD description.         
-      CALL GRP_DELET( IGRP, STATUS )                            [17]
+      CALL GRP_DELET( IGRP, STATUS )                            [16]
                                                               
 *  Annul the AST FrameSet identifier.                                  
-      CALL AST_ANNUL( IWCS, STATUS )                            [18]
+      CALL AST_ANNUL( IWCS, STATUS )                            [17]
                                                               
 *  Annul the NDF identifier.                                  
-      CALL NDF_ANNUL( INDF, STATUS )                            [19]
+      CALL NDF_ANNUL( INDF, STATUS )                            [18]
                                                               
       END                                                     
 \end{verbatim}
@@ -580,20 +575,13 @@ calling ARD\_WCS, positions within the ARD description can be supplied in
 any coordinate system which can be related to any of the coordinate
 systems in the NDF's WCS FrameSet.
 
-\item This application expects the user to supply positions and distances in
-one of the co-ordinate systems stored in the WCS component of the NDF
-({\em i.e.} one of the coordinate Frames in the FrameSet obtained above).
-It indicates this by assigning the ``special'' value given by the
-symbolic constant VAL\_\_BADR to the first element of the TRCOEF array.
-Version 1 of the ARD library did not include support for general WCS
-information. Instead, it allowed a single ``user coordinate system'' to
-be defined which was linearly related to pixel coordinates. In this case
-TRCOEF would be used to store the co-efficients of a linear transformation. 
-See Section \ref{SEC:COORD}.
-
-\item The subroutine \htmlref{ARD\_WORK}{ARD_WORK} is now called to create the pixel mask
-identifying the pixels specified by the ARD description. Positive values are
-stored in the mask for such pixels, and zero is stored for all other pixels. 
+\item The subroutine \htmlref{ARD\_WORK}{ARD_WORK} is now called to create 
+the pixel mask identifying the pixels specified by the ARD description.
+Positive values are stored in the mask for such pixels, and zero is
+stored for all other pixels. Note, no value need be assigned to the TRCOEF 
+argument since it will be ignored anyway. This is because of the earlier call 
+to ARD\_WCS which specifies the WCS information, and makes the TRCOEF
+argument redundant. 
 
 \item A subroutine is now called to add up the pixel values in the regions
 specified by the ARD description. The pointer values returned by NDF\_MAP and
@@ -1454,9 +1442,10 @@ routine is used instead of simply passing the information to ARD\_WORK as
 an argument. This was done so that existing application which use ARD
 version 1 would continue to work without modification.}. This FrameSet is
 known as the ``Application FrameSet'', and encapsulates knowledge of all
-the co-ordinate systems known to the application. If ARD\_WCS is not
-used, then a default application FrameSet containing a single Frame
-describing pixel coordinates is generated automatically.
+the co-ordinate systems known to the application. 
+
+If ARD\_WCS is not used, then a default application FrameSet containing a
+single Frame describing pixel coordinates is generated automatically.
 
 The ARD description must then include statements describing the 
 coordinate system in which positions are given. This can be done in one
@@ -1493,13 +1482,25 @@ ARDAPP. The highest priority Frame found within this list is used as the
 common Frame.
 
 \item If there is neither a WCS nor a COFRAME statement in the ARD
-description, then it is assumed that positions are supplied in the
-current Frame of the application FrameSet (so the calling application
-should make sure that the FrameSet has an appropriate current Frame
-before calling ARD\_WORK). The exception to this is if any of the
-depracated statements COEFFS, OFFSET, TWIST, STRETCH, SCALE are included
-in the ARD description, in which case positions are interpreted according
-to the old, version 1 system described below.
+description, then it is assumed that positions are supplied in a default
+coordinate system. This default is determined as follows:
+
+\begin{itemize}
+\item If an application FrameSet has been specified using ARD\_WCS, then 
+the default coordinate system is the current Frame of the application 
+FrameSet. In this case, the $TR$ argument for routine ARD\_WORK is ignored.
+
+\item If no application FrameSet has been specified using ARD\_WCS, then 
+the default coordinate system is obtained by transforming the pixel
+coordinate system according to the values supplied for argument $TR$ when
+calling ARD\_WORK. This is the system which was used prior to ARD version
+2 (see the next section for more details).
+\en{itemize}
+
+In addition, the depracated version 1 statements COEFFS, OFFSET, TWIST,
+STRETCH, SCALE can be used to modify the relationship between the
+coordinate system used within the ARD description and the default
+coordinate system describe above.
 
 \end{enumerate}
 
