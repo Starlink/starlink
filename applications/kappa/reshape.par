@@ -1,0 +1,6 @@
+in,f,a,,,,"NDF to be reshaped"
+out,f,a,,,,"Reshaped NDF"
+shape,struct,a,,,,"Shape of the output NDF"
+
+title,s,h,INDEF,,,"Title for output NDF"
+vectorize,b,h,n,,,"Vectorize the arrays?"
