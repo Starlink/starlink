@@ -42,18 +42,6 @@ PUBLIC_INCLUDES = PSX_ERR
 
 PRIVATE_INCLUDES = psx1.h psx_err.h
 
-TEST_ROUTINES = psx_test.f \
-	test_alloc.f \
-	test_cuserid.f \
-	test_getenv.f \
-	test_getpid.f \
-	test_getuid.f \
-	test_putenv.f \
-	test_rand.f \
-	test_term.f \
-	test_time.f \
-	test_uname.f
-
 BUILT_SOURCES = psx_err.h
 
 # Tests
