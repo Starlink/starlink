@@ -36,8 +36,6 @@ png_infop PNGBitmap::info_ptr_ = 0;
 png_color *PNGBitmap::palettes_[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 png_byte *PNGBitmap::trans_[]     = { 0, 0, 0, 0, 0, 0, 0, 0, 0  };
 
-static void png_error_fn (png_structp png_ptr, png_const_charp error_msg);
-static void png_warning_fn (png_structp png_ptr, png_const_charp warning_msg);
 static void png_invert_greyscale (png_structp png_ptr,
 				  png_row_infop row_info,
 				  png_bytep data);
