@@ -200,6 +200,9 @@
 *        Fixed bug for 1-dimensional data with axes.  It now uses the
 *        the actual dimensionality as opposed to 2, as needed by the
 *        resampling tasks.
+*     9-DEC-1999 (DSB):
+*        Corrected propagation of WCS (an erroneous shift was previously
+*        introduced if the lower bounds of the input NDF were not (1,1) ).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -719,7 +722,7 @@
       END DO
 
       DO J = 1, NDIMI
-         OFFSET( J ) = DBLE( 1 - LBND( J ) ) / DBLE( COMPRS( J ) )
+         OFFSET( J ) = 0.0
          MATRIX( NDIMI * ( J - 1 ) + J ) = 1.0D0 / DBLE( COMPRS( J ) )
       END DO
 

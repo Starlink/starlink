@@ -68,3 +68,6 @@
 
      - PIXDUPE and ROTATE no longer discards pixel origin information.   
 
+     - COMPAVE and COMPADD used to produce incorrect WCS co-ordinates in the
+     output NDF if the lower bounds of the input NDF were not (1,1). This
+     has been fixed.

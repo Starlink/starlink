@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun95.15}
 \newcommand{\stardocnumber}    {95.15}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2 December 1999}
+\newcommand{\stardocdate}      {9 December 1999}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {0.14-3}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -44304,6 +44304,16 @@ The following applications have been modified:
 
                \end{description}
          \end{itemize}
+
+      \item [\htmlref{COMPADD}{COMPADD}] \mbox{}
+         A bug has been fixed which could produce incorrect WCS
+	 co-ordinates in the output NDF if the lower bounds of the input
+	 NDF were not (1,1).
+
+      \item [\htmlref{COMPAVE}{COMPAVE}] \mbox{}
+         A bug has been fixed which could produce incorrect WCS
+	 co-ordinates in the output NDF if the lower bounds of the input
+	 NDF were not (1,1).
 
       \item [\htmlref{CONTOVER}{CONTOVER}] \mbox{}
          CONTOVER has been scheduled for withdrawl at the next release of
