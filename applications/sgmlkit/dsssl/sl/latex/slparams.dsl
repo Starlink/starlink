@@ -125,10 +125,6 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 
      The Verbatimlines* environment differs by ignoring leading spaces.
      -->
-<!--
-\\def\\my@centrecr{\\ifhmode\\unskip\\else\\hbox{}\\fi \\vskip-\\parskip}
--->
-\\def\\my@centrecr{\\ifhmode\\unskip \\vskip-\\parskip\\else\\relax\\fi}
 <!-- \SpaceSpaceSkip skips by \fontdimen2 (interword space) in the
      current font, which will typically be \verbatim@font
      -->
@@ -137,17 +133,28 @@ on the verso of the titlepage.  It may then call <code>\\TableOfContents</>.
 {\\obeyspaces\\global\\let =\\space}
 \\def\\Verbatimlines{\\let\\SpaceSkip\\SpaceSpaceSkip\\Verbatim@lines}
 \\@namedef{Verbatimlines*}{\\let\\SpaceSkip\\space\\Verbatim@lines}
-<!-- Careful: no stray spaces or line ends in the following definition -->
-{\\catcode`\\^^M=\\active %
-\\obeyspaces%
-\\gdef\\Verbatim@lines{\\par%
-\\obeyspaces\\let =\\SpaceSkip%
-\\catcode`\\^^M=\\active\\let^^M\\my@centrecr%
-\\@rightskip=\\@flushglue\\rightskip=\\@rightskip%
-\\leftskip=4em%
-\\parindent\\z@%
-\\verbatim@font}}
-\\let\\endVerbatimlines=\\relax
+<!-- Following is LaTeX {verbatim} env, with non-zero leftskip, 
+     minus the \dospecials, and plus the Verbatim@space -->
+{\\obeyspaces\\gdef\\Verbatim@space{\\let =\\SpaceSkip}}
+\\def\\Verbatim@lines{\\trivlist \\item\\relax
+  \\if@minipage\\else\\vskip\\parskip\\fi
+  \\leftskip=4em
+  \\rightskip\\z@skip
+  \\parindent\\z@\\parfillskip\\@flushglue\\parskip\\z@skip
+  \\@@par
+  \\@tempswafalse
+  \\def\\par{%
+    \\if@tempswa
+      \\leavevmode \\null \\@@par\\penalty\\interlinepenalty
+    \\else
+      \\@tempswatrue
+      \\ifhmode\\@@par\\penalty\\interlinepenalty\\fi
+    \\fi}%
+  \\obeylines \\verbatim@font \\@noligs
+  \\everypar \\expandafter{\\the\\everypar \\unpenalty}%
+  \\obeyspaces\\Verbatim@space%
+}
+\\def\\endVerbatimlines{\\if@newlist \\leavevmode\\fi\\endtrivlist}
 \\@namedef{endVerbatimlines*}{\\endVerbatimlines}
 <!-- I may make \DTitem more sophisticated about linebreaking -->
 \\def\\DTitem#1{\\item[#1]}
