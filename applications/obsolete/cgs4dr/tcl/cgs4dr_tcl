@@ -13,7 +13,7 @@
     set tclAdamLib       STAR_LIB/tk/adam
     set cgs4drTclLib     $env(CGS4DR_ROOT)/tcl
     set cgs4drBitmaps    $env(CGS4DR_ROOT)/tcl
-    set cgs4drHtml       STAR_DOCS/sun27.htx
+    set cgs4drHtml       STAR_DOCS/sun27.thx
     set cgs4drWebBrowser /usr/local/bin/netscape
 
 # Set up library search path
@@ -43,7 +43,7 @@
     cgs4drGetArgs [lindex $argv 0] [lindex $argv 1] [lindex $argv 2]
     wm deiconify .
 
-# Set global task variables
+# Set global task and noticeboard variables
     global QmanTask
     set QmanTask "cgs4dr error : No such task"
     global P4Task
@@ -52,6 +52,14 @@
     set Cred4Task "cgs4dr error : No such task"
     global Red4Task
     set Red4Task "cgs4dr error : No such task"
+    global P4NoticeBoard
+    set P4NoticeBoard p$env(PID)_plotnb
+    global Cred4NoticeBoard
+    set Cred4NoticeBoard c$env(PID)_ctrlnb
+    global P4UserNb
+    set P4UserNb p$env(PID)_plotnb
+    global C4UserNb
+    set C4UserNb c$env(PID)_ctrlnb
 
 # Use the top level for `traffic light' task load status
     frame .tq4 -relief sunken -bd 2
@@ -154,8 +162,6 @@
 
 # CASE: p4
     if {[string first cgs4dr $cmd]!=-1 || [string first p4_tcl $cmd]!=-1} {
-      global P4NoticeBoard
-      set P4NoticeBoard p$env(PID)_plotnb
       set P4Task [cgs4drLoadTask p4]
 
 # Create frame for p4
@@ -185,8 +191,8 @@
       .p4.mb.options.menu add cascade -underline 7 -label "Colour Manipulation" -menu .p4.mb.options.menu.colours
       .p4.mb.options.menu.colours add command -underline 4 -label "Set Look-Up-Table" -command "p4Lut $P4Task"
       .p4.mb.options.menu.colours add command -underline 4 -label "Set Widget Colours" -command "p4Colours $P4Task"
-      .p4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $P4Task $P4NoticeBoard"
-      .p4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $P4Task $P4NoticeBoard"
+      .p4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $P4Task"
+      .p4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $P4Task"
       .p4.mb.options.menu add separator
       .p4.mb.options.menu add checkbutton -underline 0 -label "Reset Autoplot" -variable P4Widgets(RESETPLOT)
       .p4.mb.options.menu add separator
@@ -199,7 +205,6 @@
       .p4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $P4Task author"
       .p4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $P4Task tcl/tk"
       .p4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $P4Task cgs4dr"
-      .p4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
       .p4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $P4Task file://$cgs4drHtml/sun27.html"
     
 # Build the p4 interface widget tree and bind actions to task
@@ -263,7 +268,6 @@
       .red4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $Red4Task author"
       .red4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Red4Task tcl/tk"
       .red4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Red4Task cgs4dr"
-      .red4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
       .red4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $Red4Task file://$cgs4drHtml/sun27.html"
     
 # Build the red4 interface widget tree and bind actions to task
@@ -288,8 +292,6 @@
 
 # CASE: cred4
     if {[string first cgs4dr $cmd]!=-1 || [string first c4_tcl $cmd]!=-1} {
-      global Cred4NoticeBoard
-      set Cred4NoticeBoard c$env(PID)_ctrlnb
       set Cred4Task [cgs4drLoadTask cred4]
 
 # Create cred4 frame
@@ -314,8 +316,8 @@
       .cred4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $Cred4Task $cmd"
       .cred4.mb.file.menu add command -underline 0 -label Print -command "cgs4drPrint $Cred4Task"
       .cred4.mb.options.menu add command -underline 0 -label "List Masks" -command "cred4ListMasks $Cred4Task"
-      .cred4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $Cred4Task $Cred4NoticeBoard"
-      .cred4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $Cred4Task $Cred4NoticeBoard"
+      .cred4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $Cred4Task"
+      .cred4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $Cred4Task"
       .cred4.mb.options.menu add checkbutton -underline 9 -label "Pause on Error" -variable Cred4Widgets(POE)
       .cred4.mb.options.menu add separator
       .cred4.mb.options.menu add command -underline 11 -label "Load Demo #1" -command "cgs4drDemo"
@@ -330,7 +332,6 @@
       .cred4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $Cred4Task author"
       .cred4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Cred4Task tcl/tk"
       .cred4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Cred4Task cgs4dr"
-      .cred4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
       .cred4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $Cred4Task file://$cgs4drHtml/sun27.html"
     
 # Build the cred4 interface widget tree and bind actions to task
