@@ -65,7 +65,7 @@
 *     {routine_references}...
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:wci, usage:public
 
 *  Copyright:
 *     {routine_copyright}
