@@ -4,8 +4,7 @@
 *     DRIZZLE
 
 *  Purpose:
-*     Mosaics a list of NDFs using the drizzling algorithm and (optionally)
-*     normalises them
+*     Mosaics and (optionally) normalises NDFs using the drizzling algorithm.
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,15 +20,19 @@
 *        The global status.
 
 *  Description:
-*     Transforms a list of NDFs by resampling the input pixel grid onto
-*     a finer output grid, taking account of shifts and rotations. The 
-*     user is allowed to shrink the input pixels to smaller size (drops),
-*     the given input image only affects the output image under the drops.
+*     This routine transforms a set of NDFs from their PIXEL-domain
+*     frame coordinates to the coordinates of the Current frame in their
+*     WCS component.  The resulting images are combined together onto
+*     a single output grid, which can therefore form a mosaic of 
+*     the input images.  Normalisation of the images can optionally 
+*     be carried out so that in overlapping regions the scaling and
+*     zero point values of the images are consistent with each other.
 *
-*     Fruchter et al., "A package for the reduction of dithered undersampled
-*     images", in Casertano et al. (eds), HST Calibration Workshop, STSCI, 
-*     1997, pp. 518-528
-*     
+*     The algorithm used for combining the images on the output grid
+*     is Variable-Pixel Linear Reconstruction, or so-called 'drizzling'.
+*     The user is allowed to shrink the input pixels to a smaller size
+*     (drops) so that each pixel of the input image only affects pixels
+*     in the output image under the corresponding drop.
 
 *  Usage:
 *     drizzle in out
@@ -333,6 +336,7 @@
 
 *  Authors:
 *     AA: Alasdair Allan (STARLINK, Keele University)
+*     MBT: Mark Taylor (STARLINK, IoA)
 *     {enter_new_authors_here}
 
 *  History:
@@ -360,6 +364,9 @@
 *        Added weighting by inverse variance map to code (MAPVAR parameter)
 *     07-SEP-1999 (AA):
 *        Renamed some KPG1_* routines and propogated changes
+*     23-SEP-1999 (MBT):
+*        Cosmetic changes, replaced some calls with standard CCDPACK ones,
+*        initialised output array with BAD value.
 *     {enter_further_changes_here}
 
 *  Bugs:
