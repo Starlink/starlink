@@ -219,6 +219,14 @@ using the following format:
 
 1 Release_notes
 
+2 New_in_version_1_6_10
+
+Two minor bug fixes:
+
+  - Fix problem in BOLREBIN on linux (unintialized pointer)
+
+  - Fix REMIP problem with aborted polarimeter observations
+
 2 New_in_version_1_6_9
 
 This is a bug fix release. Main changes are:

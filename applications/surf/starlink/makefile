@@ -495,7 +495,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.6-9
+PKG_VERS = 1.6-10
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
