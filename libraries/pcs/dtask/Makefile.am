@@ -31,9 +31,7 @@ F_ROUTINES = dts_actshut.f dts_act_sched.f dts_addlst.f dts_asthdlr.f	\
 	dts_srchlst.f dts_subsid.f dts_timeout.f
 
 FPP_ROUTINES = \
-	dts_control.fpp
-
-dts_control.f: dts_control.fpp
+	dts_control.F
 
 C_ROUTINES = \
 	dts_chdlr.c \

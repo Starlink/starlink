@@ -15,9 +15,7 @@ libsubpar_convenience_la_SOURCES =	\
 	$(PRIVATE_INCLUDES)
 libsubpar_convenience_la_FCFLAGS = $(AM_FCFLAGS) -I../lex -I../adam -I../messys
 
-FPP_ROUTINES = sup_openifc.fpp
-
-sup_openifc.f: sup_openifc.fpp
+FPP_ROUTINES = sup_openifc.F
 
 F_ROUTINES = sup_accpt.f \
              sup_accpt1.f \

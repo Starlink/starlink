@@ -18,9 +18,7 @@ PRIVATE_INCLUDES = \
 	SUBPAR_CMN
 
 FPP_ROUTINES = \
-	pcn_openifl.fpp
-
-pcn_openifl.f: pcn_openifl.fpp
+	pcn_openifl.F
 
 F_ROUTINES = \
 	pcn_actend.f pcn_actlist.f pcn_actres.f pcn_arrchar.f		\
