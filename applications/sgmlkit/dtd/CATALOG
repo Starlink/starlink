@@ -39,25 +39,17 @@ system "img-eqlist"					"img-eqlist.dtd"
 	   See http://www.oasis-open.org/html/a503.htm
 	   and http://www.oasis-open.org/html/publtext.htm
 	--
-public "-//OASIS//DTD Exchange Table Model 19960430//EN"
-						"oasis-exchange-table.dtd"
+public "-//OASIS//DTD Exchange Table Model 19960430//EN"	"oasis-exchange-table.dtd"
 
 	-- ISO latin 1 entity set for HTML and LaTeX -- 
-PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"   
-						ISOent/ISOlat1-html.ent
-PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"  
-						ISOent/ISOlat1-latex.ent
-PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"    
-						ISOent/ISOlat1.sdata
-PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//ENT"    
-						ISOent/ISOlat1-ent.ent
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"   	ISOent/ISOlat1-html.ent
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"  	ISOent/ISOlat1-latex.ent
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"  	ISOent/ISOlat1.sdata
+PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//ENT"    	ISOent/ISOlat1-ent.ent
 
-public "-//Starlink//ENTITIES Additional entities//EN//HTML" 
-						entities-html.ent
-public "-//Starlink//ENTITIES Additional entities//EN//LATEX" 
-						entities-latex.ent
-public "-//Starlink//ENTITIES Additional entities//EN//PLAIN" 
-						entities-plain.ent
+public "-//Starlink//ENTITIES Additional entities//EN//HTML"	entities-html.ent
+public "-//Starlink//ENTITIES Additional entities//EN//LATEX"	entities-latex.ent
+public "-//Starlink//ENTITIES Additional entities//EN//PLAIN"	entities-plain.ent
 
 	-- DSSSL DTDs, added from Jade1.1.1 --
 PUBLIC "-//James Clark//DTD DSSSL Flow Object Tree//EN" "dsssl/fot.dtd"
@@ -81,27 +73,19 @@ PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" 	"dsssl/style-sheet.dtd"
   not sure what's the best way to get round this, short of fiddling
   with the HyTime DTD (which is what I've still done).
 --
-PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD
-         Hypermedia/Time-based Structuring Language (HyTime)//EN'	
-						'hytime/hi2mdhyt.sgm-mod'
-PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD Property Set//EN'
-						'hytime/hi2mdps.sgm'
-PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD General Architecture//EN'
-						'hytime/hi2mdga.sgm'
-PUBLIC	'ISO/IEC 10744:1997//NONSGML LEXTYPES HyTime Lexical Types//EN'
-						'hytime/hytime-lextypes.sgm'
+PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD Hypermedia/Time-based Structuring Language (HyTime)//EN'		'hytime/hi2mdhyt.sgm-mod'
+PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD Property Set//EN'	'hytime/hi2mdps.sgm'
+PUBLIC	'ISO/IEC 10744:1997//DTD AFDR Meta-DTD General Architecture//EN' 'hytime/hi2mdga.sgm'
+PUBLIC	'ISO/IEC 10744:1997//NONSGML LEXTYPES HyTime Lexical Types//EN'	'hytime/hytime-lextypes.sgm'
 	-- The following is *not* the public identifier suggested in --
 	-- the file (the one above is).  However, the HyTime meta-DTD --
 	-- appears to want this file, but refers to it by this --
 	-- following entity name.  So add it, and hope for the best! --
-PUBLIC	'ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES HyTime Lexical Types//EN'
-						'hytime/hytime-lextypes.sgm'
-PUBLIC	'ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES SGML Lexical Types//EN'
-						'hytime/sgml-lextypes.sgm'
+PUBLIC	'ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES HyTime Lexical Types//EN' 'hytime/hytime-lextypes.sgm'
+PUBLIC	'ISO/IEC 10744:1997//NONSGML LTDR LEXTYPES SGML Lexical Types//EN' 'hytime/sgml-lextypes.sgm'
 
 	-- Notations --
 	-- What is supposed to go in this entity? --
 --
-PUBLIC 'ISO/IEC 10744:1997//NOTATION Hypermedia/Time-based Structuring Language (HyTime)//EN'
-						'hytime/hytime.notation'
+PUBLIC 'ISO/IEC 10744:1997//NOTATION Hypermedia/Time-based Structuring Language (HyTime)//EN'	'hytime/hytime.notation'
 --
