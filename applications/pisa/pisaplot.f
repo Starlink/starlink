@@ -733,7 +733,8 @@
 *          Now finally this is the part that plots the ellipses.
 *          =====================================================
 
-*          Find the semi-major and semi-minor axes.
+*          Find the semi-major and semi-minor axes (this is based
+*          on the geometric formula for the area of an ellipse).
             EA = SQRT( REAL( NPIX ) /
      :            MAX( ( PI * ( 1.0 - ELL ) ) , ALMOST ) )
             EA = MIN( EA, 0.5 * REAL( NPIX ) )

@@ -592,7 +592,7 @@ $(HELPSRC) : pisahelp.tar
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-#  Personal rules for building source code archives from SCCS and
+#  Personal rules for building source code archives from RCS and
 #  other places.
 
 check_source: $(PKG_NAME)_source.tar $(PKG_NAME)_tasks.tar \
@@ -600,19 +600,19 @@ check_source: $(PKG_NAME)_source.tar $(PKG_NAME)_tasks.tar \
 	$(DOCUMENTATION) $(DATA_FILES)
 
 $(PKG_NAME)_tasks.tar:
-	sccs get $(TASKSRC)
+	co $(TASKSRC)
 	chmod 644 $(TASKSRC)
 	$(TAR_IN) pisa_tasks.tar $(TASKSRC)
 	@- rm -f $(TASKSRC)
 
 $(PKG_NAME).tar:
-	sccs get $(SUBSRC)
+	co $(SUBSRC)
 	chmod 644 $(SUBSRC)
 	$(TAR_IN) pisa_subs.tar $(SUBSRC)
 	@- rm -f $(SUBSRC)
 
 $(PKG_NAME)help.tar:
-	sccs get $(HELPSRC)
+	co $(HELPSRC)
 	chmod 644 $(HELPSRC)
 	$(TAR_IN) pisahelp.tar $(HELPSRC)
 	@- rm -f $(HELPSRC)
@@ -623,7 +623,7 @@ MAIN_SOURCE = $(PUBLIC_SCRIPTS) $(PRIVATE_INCLUDES) $(LINK_SCRIPT) \
 
 $(PKG_NAME)_source.tar:
 	@- rm -f $(PKG_NAME)_source.tar
-	sccs get $(MAIN_SOURCE)
+	co $(MAIN_SOURCE)
 	chmod 644 $(MAIN_SOURCE)
 	chmod 755 $(PUBLIC_SCRIPTS) $(LINK_SCRIPT)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(MAIN_SOURCE)
@@ -632,15 +632,15 @@ $(PKG_NAME)_source.tar:
 $(DOCUMENTATION):
 	cp $(HOME)/pisa/extras/$(HYPERTEXT_DOCS:.htx=.htx_tar).gz ./
 	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar)
-	sccs get $(LATEX_DOCS)
-	sccs get $(PKG_NAME).news
+	co $(LATEX_DOCS)
+	co $(PKG_NAME).news
 	chmod 644 $(LATEX_DOCS) $(PKG_NAME).news
 
 $(DATA_FILES):
 	cp $(HOME)/pisa/extras/frame.sdf.gz ./
 	gunzip frame.sdf.gz
-	sccs get frame_stars.acc clustan.dat findinfo.dat \
-	         sizeinfo.dat peakinfo.dat
+	co frame_stars.acc clustan.dat findinfo.dat \
+	   sizeinfo.dat peakinfo.dat
 	chmod 644 frame_stars.acc clustan.dat findinfo.dat \
 	         sizeinfo.dat peakinfo.dat
 

@@ -525,17 +525,30 @@ ell = \frac{a-b}{a}
 Where $a$ and $b$ are the semimajor and semiminor axes:
 \begin{center}
 \begin{math}
-a = 2\,(SXX + SYY) +2\,\sqrt{(SXX - SYY)^{2} +4\,SXY^{2}}
+a^{2} = 2\,(SXX + SYY) +2\,\sqrt{(SXX - SYY)^{2} +4\,SXY^{2}}
 \end{math}
 \end{center}
 \begin{center}
 \begin{math}
-b = 2\,(SXX + SYY) -2\,\sqrt{(SXX - SYY)^{2} +4\,SXY^{2}}
+b^{2} = 2\,(SXX + SYY) -2\,\sqrt{(SXX - SYY)^{2} +4\,SXY^{2}}
+\end{math}
+\end{center}
+Note that these are intensity weighted rms-like distances. If you 
+want to calculate values that go out to say the detection isophote
+then you should use the geometric formulae:
+\begin{center}
+\begin{math}
+a = \sqrt{\frac{NPIX}{(\pi\,(1-ELLIPT))}}
+\end{math}
+\end{center}
+\begin{center}
+\begin{math}
+b = a\,(1-ELLIPT)
 \end{math}
 \end{center}
 
-The results of areal thresholding analysis are written to the second
-file whose  name is defined by the SIZES parameter.  There are nine
+The results of the areal thresholding analysis are written to the
+file whose name is given by the SIZES parameter.  There are nine
 columns in the output file, the last seven contain the number of pixels
 within the intensity thresholds : -
 \begin{center}
@@ -3152,7 +3165,7 @@ this package.
         produced incorrect orientations for the ellipses.
 \end{itemize}
 
-\section{Changes this release: 2.4-0}
+\section{Changes in release: 2.4-0}
 
 \begin{itemize}
    \item PISA no longer relies on any NAG routines. This changes the 
@@ -3164,6 +3177,16 @@ this package.
     \item SUN/109 has been changed to show the
      \htmlref{formulae}{RESULTS} involved in the calculation of the 
      image moments and ellipticity.
+\end{itemize}
+
+\section{Changes in release: 2.4-1}
+
+\begin{itemize}
+    \item SUN/109 has been changed to show the correct formulae
+    for the calculation of the semi-major and semi-minor axes of the
+    object ellipse (these were incorrectly shown as $a$ and $b$,
+    rather than $a^{2}$ and $b^{2}$). Formulae have also been added 
+    showing how to calculate these values out to the detection isophote.
 \end{itemize}
 
 \end{document}
