@@ -144,7 +144,7 @@
 *        to process lists not paired left-right lists.
 *     12-JUL-1993 (PDRAPER):
 *        Added numeric handler for rms sums.
-*     4-oct-1996 (PDRAPER):
+*     4-OCT-1996 (PDRAPER):
 *        Changed LIB$ calls to NUM_.
 *     {enter_further_changes_here}
 
@@ -207,31 +207,31 @@
 *  Local Variables:
       CHARACTER BUFFER * ( MSG__SZMSG ) ! Buffer for output information
       DOUBLE PRECISION CHANGE, TARGET ! change on last iteration and
-                                      ! target
-      DOUBLE PRECISION RMSSUM    ! sum for RMS error
-      DOUBLE PRECISION TR1( 6 )  ! identity transformation
+                                ! target
+      DOUBLE PRECISION RMSSUM   ! sum for RMS error
+      DOUBLE PRECISION TR1( 6 ) ! identity transformation
       DOUBLE PRECISION TRINV( 6 ) ! inverse transformation
-      DOUBLE PRECISION TRS( 6 )  ! Spare transformation buffer
-      DOUBLE PRECISION XX, YY    ! transformed positions
-      INTEGER I, J, K            ! loop counters
-      INTEGER IAT                ! Position in string
-      INTEGER IIFIT              ! fit type
-      INTEGER IP                 ! pointer into lists
-      INTEGER ITER               ! iteration counter
-      INTEGER NCHAR              ! Number of characters inserted into
-                                 ! line
-      INTEGER NMTCH              ! number of matched positions
-      INTEGER NSUM               ! for calculating RMS error
-      LOGICAL ALDONE             ! transformations have been calculated
-                                 ! for all the lists?
-      LOGICAL CONVRG             ! the iterations to refine the
-                                 ! transformations have converged?
-      LOGICAL FAILED             ! the routine has failed because one
-                                 ! of the lists could not be aligned?
-      LOGICAL FITOK              ! a transformation has been
-                                 ! calculated for this list?
-      LOGICAL STOP               ! Stop processing numeric error has
-                                 ! occurred
+      DOUBLE PRECISION TRS( 6 ) ! Spare transformation buffer
+      DOUBLE PRECISION XX, YY   ! transformed positions
+      INTEGER I, J, K           ! loop counters
+      INTEGER IAT               ! Position in string
+      INTEGER IIFIT             ! fit type
+      INTEGER IP                ! pointer into lists
+      INTEGER ITER              ! iteration counter
+      INTEGER NCHAR             ! Number of characters inserted into
+                                ! line
+      INTEGER NMTCH             ! number of matched positions
+      INTEGER NSUM              ! for calculating RMS error
+      LOGICAL ALDONE            ! transformations have been calculated
+                                ! for all the lists?
+      LOGICAL CONVRG            ! the iterations to refine the
+                                ! transformations have converged?
+      LOGICAL FAILED            ! the routine has failed because one
+                                ! of the lists could not be aligned?
+      LOGICAL FITOK             ! a transformation has been
+                                ! calculated for this list?
+      LOGICAL STOP              ! Stop processing numeric error has
+                                ! occurred
 
 
 *  Local Data:
