@@ -131,8 +131,13 @@
             CALL FIO_SERR( IOERR, STATUS )
             CALL MSG_SETI( 'UNIT', UNIT )
             CALL ERR_FIOER( 'MESSAGE', IOERR )
+            IF ( SYSNAM .EQ. 'VMS' ) THEN
+               CALL MSG_SETC( 'TF', VMS )
+            ELSE
+               CALL MSG_SETC( 'TF', UNIX )
+            ENDIF
             CALL ERR_REP( 'SST_FWILD_OPEN',
-     :      'Error opening file ''sst.tmp'' on Fortran unit ^UNIT '//
+     :      'Error opening file ''^TF'' on Fortran unit ^UNIT '//
      :           '- ^MESSAGE.', STATUS )
          END IF
       END IF
