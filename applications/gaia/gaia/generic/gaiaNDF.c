@@ -732,9 +732,11 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
          datClone( tmploc, baseloc, &status );
       }
 
-      /*  If all this well, cancel pending error message */
-      if ( status != SAI__OK ) {
+      /*  If all is well, cancel pending error message (from initial
+          attempt to open) */
+      if ( status == SAI__OK ) {
          free( emess );
+         emess = NULL;
       }
       free( filename );
 
