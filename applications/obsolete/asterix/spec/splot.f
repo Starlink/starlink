@@ -236,6 +236,7 @@ c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
       INTEGER 			SIGNS(MAXCOMP)		! Sign of each term
       INTEGER 			SSCALE			! Statistic scaling
       INTEGER 			TERMS(MAXCOMP,MAXCOMP)	! Individual terms
+      INTEGER			I, IDIM(FIT__MXDIM)
 
       LOGICAL 			ACTIVE			! Graphics device active
       LOGICAL 			CHANGE			! Plot mode has changed
@@ -274,7 +275,7 @@ c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
 *    Get observed data and response
         CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
         CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', 1, .FALSE.,
-     :                   .FALSE., NDS, NGOOD, SSCALE, INSTR, STATUS )
+     :                   .FALSE., NDS, NGOOD, SSCALE, STATUS )
         NDMAX = DATASET_NDAT(1)
         NFMAX = PREDICTION_NMDAT(1)
 
@@ -513,7 +514,10 @@ c     RECORD /MODEL_SPEC/ 	TMODEL			! Term model spec
           IF ( QOK ) THEN
             CALL BDI_MAPUB( DSID, 'Quality', 'READ', QPTR, STATUS )
             CALL DYN_MAPB( 1, NEL, DQPTR, STATUS )
-            CALL ARR_SLCOPB( DATASET_NDIM(N), DATASET_IDIM(N),
+            DO I = 1, DATASET_NDIM(N)
+              IDIM(I) = DATASET_IDIM(N, I)
+            END DO
+            CALL ARR_SLCOPB( DATASET_NDIM(N), IDIM,
      :                       %VAL(QPTR), LDIM, UDIM, %VAL(DQPTR),
      :                       STATUS )
             CALL BDI_GET0UB( DSID, 'QualityMask', MASK, STATUS )
@@ -1414,8 +1418,8 @@ c     RECORD /PREDICTION/ PREDDAT
       CALL SPLOT_DIVWID(NVAL,%val(DWPTR),%val(DFDPTR),STATUS)
 
 *  Get fit data
-      CALL ADI_CGET1R( INSTR.R_ID, 'Energy', NFIT, %val(PFXPTR),
-     :                 NACT, STATUS )
+      CALL ADI_CGET1R( INSTR_RESP_R_ID(IRESP), 'Energy', NFIT,
+     :                 %val(PFXPTR), NACT, STATUS )
       CALL SPLOT_NORM( NFIT, %val(PREDICTION_MPTR(IPRED)),
      :      %val(PREDICTION_MLBNDPTR(IPRED)),
      :      %val(PREDICTION_MUBNDPTR(IPRED)),Z,%val(PFDPTR),STATUS)
@@ -1424,8 +1428,9 @@ c     RECORD /PREDICTION/ PREDDAT
 
 
 *     look for channel bound information
-      CALL ADI_CSIZE( INSTR.R_ID, 'Channels', NACT, STATUS )
-      CALL ADI_CMAPR( INSTR.R_ID, 'Channels', 'READ', CBPTR, STATUS )
+      CALL ADI_CSIZE( INSTR_RESP_R_ID(IRESP), 'Channels', NACT, STATUS )
+      CALL ADI_CMAPR( INSTR_RESP_R_ID(IRESP), 'Channels', 'READ', CBPTR,
+     :                STATUS )
 
       IF(STATUS.NE.SAI__OK)THEN
         CALL ERR_ANNUL(STATUS)
@@ -1440,7 +1445,8 @@ c     RECORD /PREDICTION/ PREDDAT
 *     derive centres and widths from bounds
         CALL SPLOT_CHEN(NVAL,%val(CBPTR),%val(PXPTR),
      :                                     %val(PWPTR),STATUS)
-        CALL ADI_CUNMAP( INSTR.R_ID, 'Channels', CBPTR, STATUS )
+        CALL ADI_CUNMAP( INSTR_RESP_R_ID(IRESP), 'Channels', CBPTR,
+     :                   STATUS )
 
       END IF
 
@@ -1462,9 +1468,11 @@ c     RECORD /PREDICTION/ PREDDAT
      :                  %VAL(RPTR), %val(PFXPTR), %val(PXPTR),
      :                                   %val(PWPTR), STATUS )
 
-        CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelIndices', CIPTR, STATUS )
-        CALL ADI_CUNMAP( INSTR.R_ID, 'EnergyIndices', EIPTR, STATUS )
-        CALL ADI_CUNMAP( INSTR.R_ID, 'RMF', RPTR, STATUS )
+        CALL ADI_CUNMAP( INSTR_RESP_R_ID(IRESP), 'ChannelIndices',
+     :                   CIPTR, STATUS )
+        CALL ADI_CUNMAP( INSTR_RESP_R_ID(IRESP), 'EnergyIndices',
+     :                   EIPTR, STATUS )
+        CALL ADI_CUNMAP( INSTR_RESP_R_ID(IRESP), 'RMF', RPTR, STATUS )
 
       END IF
 
@@ -1563,8 +1571,9 @@ c     RECORD /PREDICTION/ PREDDAT
       CALL GCB_SETC('XLABEL_TEXT',LABEL,STATUS)
 
       CALL GCB_SETR('YLABEL_SIZE',TXTSCALE,STATUS)
-      CALL GCB_SETC('YLABEL_TEXT','count s\u-1\d channel\u-1\d',
-     :                                                  STATUS)
+      CALL GCB_SETC('YLABEL_TEXT',
+     :              'count s\\u-1\\d channel\\u-1\\d',
+     :              STATUS)
 
       IF (LOGAX) THEN
         CALL GCB_SETL('XAXIS_LOG',.TRUE.,STATUS)
@@ -2010,7 +2019,8 @@ c     RECORD /PREDICTION/ PREDDAT
       CALL GCB_SETC('XLABEL_TEXT','Energy (keV)',STATUS)
       CALL GCB_SETR('XLABEL_SIZE',TXTSCALE,STATUS)
       CALL GCB_SETC('YLABEL_TEXT',
-     :            'photon cm\u-2\d s\u-1\d keV\u-1\d',STATUS)
+     :            'photon cm\\u-2\\d s\\u-1\\d keV\\u-1\\d',
+     :            STATUS)
       CALL GCB_SETR('YLABEL_SIZE',TXTSCALE,STATUS)
 
       CALL GCB_SET1C('TITLE_TEXT',1,2,TITLE,STATUS)
@@ -2478,7 +2488,7 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
       CALL GCB_SETC('XLABEL_TEXT',TEXT,STATUS)
 
       CALL GCB_SETR('YLABEL_SIZE',TXTSCALE,STATUS)
-      TEXT='photon s\u-1\d cm\u-2\d keV\u-1\d'
+      TEXT='photon s\\u-1\\d cm\\u-2\\d keV\\u-1\\d'
       CALL GCB_SETC('YLABEL_TEXT',TEXT,STATUS)
 
 *  Title lines
@@ -2505,7 +2515,7 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
 *    Structure definitions :
 *    Import :
       INTEGER OFID,NCHAN,NTERM
-      CHARACTER*(*) COMPSPEC(*)
+      CHARACTER*(20) COMPSPEC(*)
       LOGICAL SAVE
 *    Import-Export :
 *    Export :
@@ -2671,7 +2681,8 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
 *    Import :
       LOGICAL	SAVE
       INTEGER   MGID, N, NDAT, DPTR, VPTR, QPTR, XPTR, WPTR
-      CHARACTER*(*) ANCE,NAME
+      CHARACTER*(20) ANCE
+      CHARACTER*(*) NAME
 *    Export:
       INTEGER GFID
 *  Global Variables:
