@@ -65,3 +65,281 @@ Total Estimated Cost to Develop                           = $ 110,721,729
 SLOCCount is Open Source Software/Free Software, licensed under the FSF
 GPL. Please credit this data as "generated using David A. Wheeler's
 'SLOCCount'."
+
+
+
+From b.cavanagh@jach.hawaii.edu Tue Nov 16 21:08:02 2004
+Return-path: <b.cavanagh@jach.hawaii.edu>
+Envelope-to: norman@astro.gla.ac.uk
+Delivery-date: Tue, 16 Nov 2004 21:08:02 +0000
+Received: from mailhost.jach.hawaii.edu ([128.171.90.17])
+	by othello.physics.gla.ac.uk with esmtp (Exim 4.14)
+	id 1CUAYS-0001nA-Vo
+	for norman@astro.gla.ac.uk; Tue, 16 Nov 2004 21:08:01 +0000
+Date: Tue, 16 Nov 2004 11:07:49 -1000
+From: Brad Cavanagh <b.cavanagh@jach.hawaii.edu>
+To: Norman Gray <norman@astro.gla.ac.uk>
+Cc: d.l.giaretta@rl.ac.uk,mjc@star.rl.ac.uk,t.jenness@jach.hawaii.edu,
+	aa@astro.ex.ac.uk,dsb@ast.man.ac.uk,p.w.draper@durham.ac.uk,m.b.taylor@bristol.ac.uk
+Subject: Re: ADASS paper P2.1.10
+Message-Id: <20041116110749.41cbb6df.b.cavanagh@jach.hawaii.edu>
+In-Reply-To: <8886064A-3751-11D9-9F93-000D93C1FC1C@astro.gla.ac.uk>
+References: <16C85854-344D-11D9-8C21-000D93C1FC1C@astro.gla.ac.uk>
+	<Pine.OSF.4.53.0411121417530.466578@rlsaxps.bnsc.rl.ac.uk>
+	<0A4F8584-3712-11D9-9F93-000D93C1FC1C@astro.gla.ac.uk>
+	<Pine.LNX.4.58.0411151059010.3628@yncnxv>
+	<Pine.OSF.4.53.0411152123290.20277@rlsaxps.bnsc.rl.ac.uk>
+	<8886064A-3751-11D9-9F93-000D93C1FC1C@astro.gla.ac.uk>
+Organization: Joint Astronomy Centre
+X-Mailer: Sylpheed version 0.7.8claws (GTK+ 1.2.10; )
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Score: 1.1 (+)
+X-Scanner: exiscan for exim4 (http://duncanthrax.net/exiscan/) *1CUAYS-0001nA-Vo*ox99N68ALpo*
+
+On 15 Nov 2004 Norman Gray wrote:
+
+> Brad, would you have a chance to run the thing again, in 
+> some way which could give us a current figure with and without 
+> `obsolete' subtrees?
+
+Here you are, broken into the whole CVS tree, applications/,
+applications/obsolete/, and libraries/. Let me know if there are any further
+breakdowns you want. 
+
+everything:
+SLOC    Directory       SLOC-by-Language (Sorted)
+1535564 applications    fortran=690676,ansic=489831,tcl=195355,cpp=61478,
+                        perl=47876,sh=28879,csh=10652,lisp=3183,
+                        python=2955,yacc=1915,lex=1811,pascal=480,
+                        awk=289,cs=150,java=18,sed=16
+664435  thirdparty      ansic=482134,tcl=65043,fortran=50233,sh=35180,cpp=13983,
+                        perl=11847,yacc=4623,lex=512,lisp=347,
+                        asm=284,pascal=233,csh=16
+510291  libraries       fortran=324627,ansic=183629,csh=652,tcl=585,perl=341,
+                        sh=261,pascal=196
+375788  java            java=355970,ansic=8950,perl=8074,sh=1808,jsp=604,
+                        csh=174,haskell=81,tcl=73,python=54
+2895    docs            csh=1159,perl=570,lisp=524,ansic=495,fortran=124,
+                        sh=23
+1028    buildsupport    java=643,perl=210,sh=175
+432     etc             csh=412,sh=20
+204     top_dir         sh=204
+0       buildlog        (none)
+0       CVS             (none)
+0       CVSROOT         (none)
+0       pubs            (none)
+
+Totals grouped by language (dominant language first):
+ansic:      1165039 (37.70%)
+fortran:    1065660 (34.48%)
+java:        356631 (11.54%)
+tcl:         261056 (8.45%)
+cpp:          75461 (2.44%)
+perl:         68918 (2.23%)
+sh:           66550 (2.15%)
+csh:          13065 (0.42%)
+yacc:          6538 (0.21%)
+lisp:          4054 (0.13%)
+python:        3009 (0.10%)
+lex:           2323 (0.08%)
+pascal:         909 (0.03%)
+jsp:            604 (0.02%)
+awk:            289 (0.01%)
+asm:            284 (0.01%)
+cs:             150 (0.00%)
+haskell:         81 (0.00%)
+sed:             16 (0.00%)
+
+Total Physical Source Lines of Code (SLOC)                = 3,090,637
+Development Effort Estimate, Person-Years (Person-Months) = 923.81 (11,085.66)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 7.17 (86.09)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 128.77
+Total Estimated Cost to Develop                           = $ 124,793,517
+ (average salary = $56,286/year, overhead = 2.40).
+SLOCCount, Copyright (C) 2001-2004 David A. Wheeler
+SLOCCount is Open Source Software/Free Software, licensed under the GNU GPL.
+SLOCCount comes with ABSOLUTELY NO WARRANTY, and you are welcome to
+redistribute it under certain conditions as specified by the GNU GPL license;
+see the documentation for details.
+Please credit this data as "generated using David A. Wheeler's 'SLOCCount'."
+
+
+applications/:
+SLOC    Directory       SLOC-by-Language (Sorted)
+647014  gaia            ansic=418403,tcl=155828,cpp=50670,sh=11943,fortran=8452,
+                        yacc=762,awk=273,perl=265,csh=176,cs=150,lisp=92
+219939  obsolete        fortran=212513,ansic=4191,csh=2755,pascal=480
+141880  figaro          fortran=140074,lisp=703,ansic=598,tcl=458,csh=47
+79187   kappa           fortran=75151,tcl=3029,csh=620,ansic=371,awk=16
+75802   ccdpack         fortran=45434,tcl=21736,ansic=6197,csh=1907,lisp=454,
+                        sh=74
+45620   echomop         fortran=44350,csh=748,ansic=499,sh=23
+37199   extractor       ansic=29991,sh=7178,csh=30
+30642   star2html       perl=30575,sh=67
+27434   convert         fortran=22401,ansic=4844,csh=150,sh=39
+26423   esp             fortran=26278,sh=73,csh=72
+25166   polpack         fortran=16179,tcl=7144,ansic=1514,csh=329
+24919   cursa           fortran=16275,tcl=6424,perl=1508,ansic=590,csh=104,
+                        java=18
+22331   dipso           fortran=22102,ansic=183,csh=46
+14832   icl             ansic=13740,lex=550,yacc=480,fortran=62
+14267   sgmlkit         perl=10506,python=2955,sh=782,sed=16,csh=8
+11899   dvi2bitmap      cpp=8907,sh=1882,ansic=849,perl=261
+10548   autoastrom      sh=5451,perl=3009,cpp=1901,ansic=122,fortran=65
+10133   kaprh           fortran=10133
+9059    pisa            fortran=9031,tcl=28
+8503    pongo           fortran=6541,lisp=1926,ansic=23,tcl=13
+8394    photom          fortran=8354,csh=40
+7947    daophot         fortran=7939,csh=8
+5279    startcl         ansic=4339,sh=512,tcl=428
+4531    sst             fortran=4531
+3633    hdstools        fortran=3340,ansic=293
+3613    datacube        csh=3142,fortran=471
+3172    atools          fortran=3093,perl=62,ansic=15,sh=2
+2822    scb             perl=1175,lex=692,yacc=673,ansic=229,sh=38,fortran=15
+2690    astrom          fortran=2214,ansic=279,sh=197
+2619    extreme         ansic=1456,lex=569,sh=463,perl=131
+2448    echwind         fortran=2415,csh=33
+1588    coco            fortran=1588
+1205    hdstrace        fortran=1204,sh=1
+498     messgen         ansic=498
+494     rv              fortran=471,csh=23
+479     news            perl=366,sh=113
+346     spt             ansic=248,csh=98
+316     psmerge         ansic=316
+296     ifd             tcl=267,sh=21,lisp=8
+266     generic         csh=266
+50      xdisplay        csh=50
+43      starx           ansic=43
+20      top_dir         sh=20
+18      findcoords      perl=18
+0       CVS             (none)
+0       docfind         (none)
+0       htx             (none)
+
+Totals grouped by language (dominant language first):
+fortran:     690676 (44.98%)
+ansic:       489831 (31.90%)
+tcl:         195355 (12.72%)
+cpp:          61478 (4.00%)
+perl:         47876 (3.12%)
+sh:           28879 (1.88%)
+csh:          10652 (0.69%)
+lisp:          3183 (0.21%)
+python:        2955 (0.19%)
+yacc:          1915 (0.12%)
+lex:           1811 (0.12%)
+pascal:         480 (0.03%)
+awk:            289 (0.02%)
+cs:             150 (0.01%)
+java:            18 (0.00%)
+sed:             16 (0.00%)
+
+Total Physical Source Lines of Code (SLOC)                = 1,535,564
+Development Effort Estimate, Person-Years (Person-Months) = 443.21 (5,318.54)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 5.43 (65.12)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 81.67
+Total Estimated Cost to Develop                           = $ 59,871,886
+ (average salary = $56,286/year, overhead = 2.40).
+
+
+applications/obsolete/:
+SLOC    Directory       SLOC-by-Language (Sorted)
+69922   starman         fortran=64665,ansic=4191,csh=616,pascal=450
+54753   ircamdr         fortran=54696,csh=57
+52696   iras90          fortran=52572,csh=124
+13923   catpac          fortran=13428,csh=465,pascal=30
+13149   ndprogs         fortran=13057,csh=92
+6445    chart           fortran=6388,sh=57
+4640    repack          fortran=3923,csh=717
+4468    ircampack       fortran=3784,csh=684
+0       CVS             (none)
+0       email           (none)
+0       top_dir         (none)
+
+Totals grouped by language (dominant language first):
+fortran:     212513 (96.60%)
+ansic:         4191 (1.91%)
+csh:           2755 (1.25%)
+pascal:         480 (0.22%)
+sh:              57 (0.03%)
+
+Total Physical Source Lines of Code (SLOC)                = 219,996
+Development Effort Estimate, Person-Years (Person-Months) = 57.62 (691.43)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 2.50 (29.99)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 23.05
+Total Estimated Cost to Develop                           = $ 7,783,540
+ (average salary = $56,286/year, overhead = 2.40).
+
+
+libraries/:
+SLOC    Directory       SLOC-by-Language (Sorted)
+101951  ast             ansic=97294,fortran=4114,perl=341,csh=102,sh=100
+66299   gks             fortran=51400,ansic=14897,sh=2
+49570   kaplibs         fortran=48059,ansic=778,tcl=585,csh=148
+33937   ndf             fortran=28425,ansic=5512
+33211   cat             fortran=33135,pascal=63,csh=13
+28919   pcs             fortran=19872,ansic=9047
+25532   prm             fortran=24619,ansic=913
+23094   pda             fortran=23094
+19307   hds             ansic=15988,fortran=3319
+14941   idi             ansic=12170,fortran=2771
+12318   sla             fortran=12310,ansic=8
+11288   pgp             fortran=11042,pascal=133,sh=113
+10365   ary             fortran=10365
+8836    img             fortran=5145,ansic=3691
+7829    par             ansic=4093,fortran=3736
+7218    ard             fortran=7218
+7187    agi             fortran=6886,csh=244,sh=57
+5460    chr             fortran=5370,ansic=90
+5248    trn             fortran=5248
+4870    sx              ansic=3056,fortran=1695,csh=119
+4007    nbs             ansic=4007
+3833    grp             fortran=3833
+2976    gsd             ansic=2608,fortran=368
+2952    ndg             fortran=2689,ansic=250,csh=13
+2949    gwm             ansic=2906,fortran=43
+2812    mag             fortran=2496,ansic=271,sh=45
+2368    fio             fortran=1412,ansic=956
+2325    mers            fortran=1548,ansic=777
+2310    sgs             fortran=2310
+2037    ems             ansic=2008,fortran=29
+1712    gns             fortran=1712
+1490    hlp             fortran=1477,csh=13
+1404    psx             ansic=1009,fortran=395
+1247    graphpar        fortran=1247
+1218    cnf             ansic=994,fortran=224
+1082    jpl             fortran=1082
+940     snx             fortran=939,sh=1
+411     ref             fortran=411
+399     shl             fortran=311,ansic=88
+337     one             ansic=263,fortran=74
+20      top_dir         sh=20
+3       sae             ansic=3
+0       CVS             (none)
+
+Totals grouped by language (dominant language first):
+fortran:     330423 (64.01%)
+ansic:       183677 (35.58%)
+csh:            652 (0.13%)
+tcl:            585 (0.11%)
+perl:           341 (0.07%)
+sh:             338 (0.07%)
+pascal:         196 (0.04%)
+
+Total Physical Source Lines of Code (SLOC)                = 516,212
+Development Effort Estimate, Person-Years (Person-Months) = 141.09 (1,693.09)
+ (Basic COCOMO model, Person-Months = 2.4 * (KSLOC**1.05))
+Schedule Estimate, Years (Months)                         = 3.51 (42.15)
+ (Basic COCOMO model, Months = 2.5 * (person-months**0.38))
+Estimated Average Number of Developers (Effort/Schedule)  = 40.16
+Total Estimated Cost to Develop                           = $ 19,059,483
+ (average salary = $56,286/year, overhead = 2.40).

@@ -97,6 +97,14 @@ MBT,
 
 \authormark{Gray, Jenness, Allan, Berry, Currie, Draper, Taylor \& Cavanagh}
 
+% Brad's SLOCCount estimate of 16 November:
+% applications/           1536 kSLOC
+% applications/obsolete/   220 kSLOC
+% libraries/               516 kSLOC
+% thirdparty/              664 kSLOC
+%
+% non-obsolete SL code    1832 kSLOC
+% So total, inc 3rd party 2496 kSLOC
 
 
 \keywords{Starlink, autoconf, automake}
@@ -104,7 +112,7 @@ MBT,
 \begin{abstract}
 The Starlink software collection currently runs on three different
 Unix platforms and contains around 100 separate software items,
-totalling 2.3~million lines of code, in a mixture of languages.  We
+totalling 2.5~million lines of code, in a mixture of languages.  We
 have changed the build system from a hand-maintained collection of
 makefiles with hard-wired OS variants to a scheme involving
 feature-discovery via GNU Autoconf.
@@ -167,15 +175,15 @@ accessible as possible.
 
 The biggest problem with the software was that there was an awful lot
 of it!  Even with ongoing pruning, we have ended up with about 100
-components, totalling around 1700\,kSLOC written by the project or
+components, totalling around 1800\,kSLOC written by the project or
 curated by it, in various languages
 including Fortran, C, C++, Perl and Tcl/Tk.  We add to this another
-600\,kSLOC of thirdparty code, some tweaked, and all built at the same
+700\,kSLOC of thirdparty code, some tweaked, and all built at the same
 time.  Not included in this total is about 300\,kSLOC of Java,
 built separately.  Just to put this in context, David A
 Wheeler's \texttt{SLOCCount} would have us believe that that's worth
-\$110M and, according to his analysis of the RH7.1 distribution
-(Wheeler 2001), it appears that 1.7\,MSLOC is larger than anything in
+over \$100M and, according to his analysis of the RH7.1 distribution
+(Wheeler 2001), it appears that 1.8\,MSLOC is larger than anything in
 that distribution except the kernel, Mozilla and XFree86.  Busy types,
 aren't we?
 
@@ -239,7 +247,7 @@ and the latter adapted with new logic.  Because we are using automake,
 the amount of text we have to put into a \texttt{Makefile.am} is
 substantially reduced, with very little cut-and-pasted boilerplate.
 
-As a result of using the autotools, the entire 2.3\,MSLOC collection
+As a result of using the autotools, the entire 2.5\,MSLOC collection
 now builds successfully on Linux (RHEL is our current test platform), Solaris,
 Windows (using Cygwin), and Mac\,OS\,X, even though the latter two
 were not explicit goals of this porting project.  It should work on
