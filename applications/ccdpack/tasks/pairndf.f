@@ -23,17 +23,22 @@
 *     This routine accepts a list of NDFs which may be aligned using
 *     simple offsets in their Current coordinate frames.
 *     By making use of a graphical user interface you
-*     can indicate how pairs of NDFs are aligned with respect
+*     can indicate how pairs of images are aligned with respect
 *     to each other, and mark image features to allow accurate
 *     alignments.  Once enough pairings have been specified to register
 *     all frames completely a global merger of all the positions
-*     for each NDF takes place. This results in the output of one list
+*     for each image takes place. This results in the output of one list
 *     of uniquely labelled positions for each NDF. These position lists
 *     can then be used in a routine such as REGISTER to produce the
 *     actual transformation between the NDFs.
 *
+*     If NDFs have been grouped into Sets for alignment purposes by 
+*     using MAKESET, and the USESET parameter is true, then the 
+*     program will treat each Set of NDFs as a single image to be
+*     aligned.
+*
 *     The graphical interface consists of two parts: a chooser which
-*     allows you to inspect pairs of NDFs to see whether they are 
+*     allows you to inspect pairs of images to see whether they are 
 *     able to be paired, and an aligner which allows you to move 
 *     a pair of images around so that they are registered, and to
 *     mark points in the overlapping region where the same centroidable 
@@ -44,7 +49,7 @@
 *     Use the tabs at either side of the screen to pick the image to
 *     appear on that side.  You can use the "Show FITS" button to
 *     select one or more FITS headers to be displayed alongside
-*     each NDF if this will make it easier to identify which is which.
+*     each image if this will make it easier to identify which is which.
 *     You can use the "Display cutoff" menu to select the percentiles
 *     controlling the brightness of each pixel; alignment is easier if
 *     the same features are of a similar brightness in different images.
@@ -60,6 +65,10 @@
 *     an overlapping region which you wish to align, and click the 
 *     "Use this pair" button.  The aligner window will then appear, 
 *     displaying the two images which you have selected.
+*     The images will appear in their correct orientation in the chooser
+*     window, but each is scaled to fill half of the panel, so if
+*     they are a different shapes or sizes from each other then
+*     the scales may not match.
 *
 *     In the aligner window you can drag either of these images around
 *     the display region by holding down mouse button 1 (usually the 
@@ -83,7 +92,7 @@
 *     You will then be returned to the chooser window to select another
 *     pair and repeat the process.  After the first time however, 
 *     you will only be allowed to select a pair of images to align
-*     if at least one of them has already been aligned already.  Those
+*     if at least one of them has already been aligned.  Those
 *     which have already been done are marked with a `+' sign on their
 *     selection tabs.
 *
@@ -140,7 +149,7 @@
 *        necessary to give values for all the attributes; missing ones
 *        will be given sensible defaults.
 *        [""]
-*     MAXCANV = INTEGER (Read and Write)
+*     MAXCANV = _INTEGER (Read and Write)
 *        A value in pixels for the maximum initial X or Y dimension of 
 *        the region in which the image is displayed.  Note this is the      
 *        scrolled region, and may be much bigger than the sizes given
@@ -153,7 +162,7 @@
 *        the program attempting to display an enormous viewing region.
 *        If set to zero, then no limit is in effect.
 *        [1280]
-*     OVERRIDE = LOGICAL (Read)
+*     OVERRIDE = _LOGICAL (Read)
 *        This parameter controls whether to continue and create an
 *        incomplete solution. Such solutions will result when only a
 *        subset of the input position lists have been paired.
@@ -206,21 +215,36 @@
 *        brightnesses.  Must be in the range 0 <= PERCENTILES( 1 ) 
 *        <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
-*     PREVX = INTEGER (Read and Write)
+*     PREVX = _INTEGER (Read and Write)
 *        The initial width in pixels of the preview display for each image;
 *        two images will be displayed side by side at any one time at
 *        this size in the chooser window.  This can be effectively changed
 *        by resizing the entire chooser window in the normal way using
 *        the window manager while the program is running.
 *        [350]
-*     PREVY = INTEGER (Read and Write)
+*     PREVY = _INTEGER (Read and Write)
 *        The initial height in pixels of the preview display for each image;
 *        two images will be displayed side by side at any one time at
 *        this size in the chooser window.  This can be effectively changed
 *        by resizing the entire chooser window in the normal way using
 *        the window manager while the program is running.
 *        [350]
-*     WINX = INTEGER (Read and Write)
+*     USESET = _LOGICAL (Read)
+*        This parameter determines whether Set header information should
+*        be used in the object matching.  If USESET is true,
+*        PAIRNDF will try to group images according to their Set Name
+*        attribute.  All NDFs which share the same (non-blank) Set
+*        Name attribute, and which have a CCD_SET coordinate frame
+*        in their WCS component, will be grouped together and treated
+*        as a single image for alignment.  In the graphical part of
+*        the program you will view and position this group of 
+*        images as a single item.
+*
+*        If the input NDFs have no Set headers, or if they have no
+*        CCD_SET frame in their WCS components, the setting of USESET
+*        will make no difference.
+*        [TRUE]
+*     WINX = _INTEGER (Read and Write)
 *        The initial width in pixels of the aligner window, which contains
 *        a space for dragging around a pair of images and associated
 *        controls.  If the region required for the images is larger 
@@ -228,7 +252,7 @@
 *        around within the window.  The window can be resized in the 
 *        normal way using the window manager while the program is running.
 *        [800]
-*     WINY = INTEGER (Read and Write)
+*     WINY = _INTEGER (Read and Write)
 *        The initial height in pixels of the aligner window, which contains
 *        space for dragging around a pair of images and associated
 *        controls.  If the region required for the images is larger 
@@ -236,7 +260,7 @@
 *        around within the window.  The window can be resized in the 
 *        normal way using the window manager while the program is running.
 *        [400]
-*     ZOOM = DOUBLE (Read and Write)
+*     ZOOM = _DOUBLE (Read and Write)
 *        A factor giving the initial level to zoom in to the images
 *        displayed in the aligner window, that is the number of screen 
 *        pixels to use for one image pixel.  It will be rounded to one 
@@ -344,6 +368,8 @@
 *        Added OVERRIDE parameter.
 *     29-JAN-2001 (MBT):
 *        Changed call parameters for modified CCD1_GMMP.
+*     7-MAR-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -372,20 +398,25 @@
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for .MORE.CCDPACK ext
       CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       DOUBLE PRECISION PERCNT( 2 ) ! Percentile values for display
+      DOUBLE PRECISION XLO      ! Lower acceptable bound for X coordinate
+      DOUBLE PRECISION XHI      ! Upper acceptable bound for X coordinate
       DOUBLE PRECISION XOFF( CCD1__MXNDF * CCD1__MXNDF ) ! Initial X offsets
       DOUBLE PRECISION XOFFN( CCD1__MXNDF * CCD1__MXNDF ) ! Absolute X offsets
+      DOUBLE PRECISION YLO      ! Lower acceptable bound for Y coordinate
+      DOUBLE PRECISION YHI      ! Upper acceptable bound for Y coordinate
       DOUBLE PRECISION YOFF( CCD1__MXNDF * CCD1__MXNDF ) ! Initial Y offsets
       DOUBLE PRECISION YOFFN( CCD1__MXNDF * CCD1__MXNDF ) ! Absolute Y offsets
       DOUBLE PRECISION ZOOM     ! Zoom factor for display
       INTEGER COUNT             ! Current intercomparison level
-      INTEGER FDO( CCD1__MXNDF ) ! Output FIO descriptors
+      INTEGER FDO               ! Output FIO descriptor
       INTEGER FRM( CCD1__MXNDF ) ! AST pointers to current frames
       INTEGER I                 ! Loop variable
       INTEGER IMAP              ! AST pointer to mapping
-      INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers
+      INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers for each NDF
       INTEGER IPBEEN            ! Pointer to workspace
       INTEGER IPGRA             ! Pointer to graph
       INTEGER IPID( CCD1__MXNDF ) ! Pointer to output identifiers
+      INTEGER IPIQ              ! Pointer to index values of chosen points
       INTEGER IPQUE             ! Pointer to workspace
       INTEGER IPRAN( CCD1__MXNDF ) ! Pointer to workspace
       INTEGER IPRAN1( CCD1__MXNDF * CCD1__MXNDF ) ! Pointer to workspace
@@ -395,14 +426,21 @@
       INTEGER IPX2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to X position lists
       INTEGER IPXO( CCD1__MXNDF ) ! Pointers to output X positions
       INTEGER IPXP              ! Pointer to X pixel coordinate list
+      INTEGER IPXQ              ! Pointer to X pixels of chosen points
       INTEGER IPYP              ! Pointer to Y pixel coordinate list
+      INTEGER IPYQ              ! Pointer to Y pixels of chosen points
       INTEGER IPY1( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to Y position lists
       INTEGER IPY2( CCD1__MXNDF * CCD1__MXNDF ) ! Pointers to Y position lists
       INTEGER IPYO( CCD1__MXNDF ) ! Pointers to output Y positions
-      INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS framesets
+      INTEGER IS                ! Set under consideration
+      INTEGER ISET( CCD1__MXNDF ) ! Which Set each NDF is part of
+      INTEGER IWCS( CCD1__MXNDF ) ! AST pointers to WCS frameset for each NDF
       INTEGER JPIX              ! Frame index of pixel frame
+      INTEGER LBND( 2 )         ! Lower bounds of NDF
       INTEGER MAXCNV            ! Initial maximum dimension of display region
+      INTEGER NCOUT             ! Number of chosen points
       INTEGER NDFGR             ! Input NDF group identifier
+      INTEGER NDIM              ! Number of dimensions of NDF
       INTEGER NEDGES            ! Number of edges in graph
       INTEGER NEWED             ! Number of edges in spanning graph
       INTEGER NMAT( CCD1__MXNDF * CCD1__MXNDF ) ! Number of position selected
@@ -410,15 +448,19 @@
       INTEGER NODES( 2, CCD1__MXNDF * CCD1__MXNDF ) ! Original node numbers
       INTEGER NOUT( CCD1__MXNDF ) ! Numbers of output positions
       INTEGER NRET              ! Dummy variable
+      INTEGER NSET              ! Number of Sets
       INTEGER OFFS( CCD1__MXNDF+ 1 ) ! Offsets into extended lists
       INTEGER OUTGRP            ! Output group identifier
       INTEGER PRVDIM( 2 )       ! Preview image dimensions for display
+      INTEGER SNAMGR            ! GRP identifier for Set Names
       INTEGER TOTNOD            ! Total number of nodes in graph
+      INTEGER UBND( 2 )         ! Upper bounds of NDF
       INTEGER WINDIM( 2 )       ! Window dimensions for display
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
       LOGICAL OVERRD            ! True if continue with incomplete graph
-                            
+      LOGICAL USESET            ! True if we are grouping NDFs by Set
+                           
 *.                             
                                
 *  Check inherited global status.
@@ -446,33 +488,27 @@
       CALL CCD1_NDFGL( 'IN', 2, CCD1__MXNDF, NDFGR, NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
+*  See if we are using Sets.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
 *  Get the percentage histogram range for image display.
       CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
-
-*  Get NDF identifiers.
-      DO I = 1, NNDF
-         CALL NDG_NDFAS( NDFGR, I, 'UPDATE', INDF( I ), STATUS )
-      END DO
 
 *  See if we should continue with registration if only a few of the
 *  datasets have been paired.
       CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
 
-*  Write the Name of the positions lists and labels into the log.
-      CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_MSG( ' ', '    Input NDFs:', STATUS )
-      CALL CCD1_MSG( ' ', '    -----------', STATUS )
-      DO I = 1, NNDF
-         CALL NDF_MSG( 'NAME', INDF( I ) )
-         CALL MSG_SETI( 'N', I )
-         CALL CCD1_MSG( ' ', '  ^N) ^NAME', STATUS )
-      END DO
+*  Group the NDFs into Sets.
+      CALL CCD1_SETSW( NDFGR, NNDF, USESET, ISET, NSET, SNAMGR, STATUS )
 
 *  Call the routine which does all the user interaction and obtains a
 *  list of pairings with associated offsets.
-      CALL CCD1_PNDF( NDFGR, PERCNT, ZOOM, MAXCNV, WINDIM, PRVDIM,
-     :                MSTYLE, COUNT, NODES, NMAT, XOFF, YOFF,
-     :                IPX1, IPY1, IPX2, IPY2, STATUS )
+      CALL CCD1_PNDF( NDFGR, NNDF, ISET, NSET, SNAMGR, PERCNT, ZOOM,
+     :                MAXCNV, WINDIM, PRVDIM, MSTYLE, COUNT, NODES,
+     :                NMAT, XOFF, YOFF, IPX1, IPY1, IPX2, IPY2, STATUS )
+
+*  Release resources.
+      CALL CCD1_GRDEL( SNAMGR, STATUS )
 
 *=======================================================================
 *  Spanning graph determination section
@@ -484,10 +520,10 @@
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Get workspace for the graph testing sections.
-      CALL CCD1_MALL( NNDF * NNDF * 4, '_INTEGER', IPGRA, STATUS )
-      CALL CCD1_MALL( NNDF * NNDF * 4, '_INTEGER', IPSUB, STATUS )
-      CALL CCD1_MALL( NNDF * NNDF, '_INTEGER', IPQUE, STATUS )
-      CALL CCD1_MALL( NNDF, '_LOGICAL', IPBEEN, STATUS )
+      CALL CCD1_MALL( NSET * NSET * 4, '_INTEGER', IPGRA, STATUS )
+      CALL CCD1_MALL( NSET * NSET * 4, '_INTEGER', IPSUB, STATUS )
+      CALL CCD1_MALL( NSET * NSET, '_INTEGER', IPQUE, STATUS )
+      CALL CCD1_MALL( NSET, '_LOGICAL', IPBEEN, STATUS )
 
 *  Use a graph of all the connections given by the user. The first stage
 *  is to change the format into one which is a recognisable graph with
@@ -508,9 +544,10 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99 
       IF ( COMPL ) THEN
          IF ( TOTNOD .EQ. 0 ) THEN
+            STATUS = SAI__ERROR
             CALL CCD1_ERREP( 'PAIRNDF_NONE',
      :'  No pairings were made.', STATUS )
-         ELSE IF ( TOTNOD .LT. NNDF ) THEN
+         ELSE IF ( TOTNOD .LT. NSET ) THEN
             IF ( OVERRD ) THEN
                CALL CCD1_MSG( ' ', ' ', STATUS )
                CALL CCD1_MSG( ' ',
@@ -535,22 +572,42 @@
 *  `complete' solution.  Find the offsets of all positions to the 
 *  `reference' set (first node of first edge of spanning graph is 
 *  assumed to be the reference set).
-      CALL CCD1_GROFF( %VAL( IPSUB ), NEWED, XOFF, YOFF,
-     :                 NNDF, %VAL( IPBEEN ), %VAL( IPQUE ),
-     :                 XOFFN, YOFFN, STATUS )
+      CALL CCD1_GROFF( %VAL( IPSUB ), NEWED, XOFF, YOFF, NSET,
+     :                 %VAL( IPBEEN ), %VAL( IPQUE ), XOFFN, YOFFN,
+     :                 STATUS )
 
-*  Get the WCS frameset and the current frame for each NDF.
+*  Initialise list of Set current Frame objects.
+      DO I = 1, NSET
+         FRM( I ) = AST__NULL
+      END DO
+
+*  Get NDF identifiers for each NDF and current Frame objects for each
+*  Set.  The one for each Set is the Current frame of the WCS component
+*  of the first NDF in the Set; for any sensible invocation of this
+*  program, it will be similar to that for the other members of the 
+*  same Set.
       DO I = 1, NNDF
+         IS = ISET( I )
+
+*  Get the NDF identifier.
+         CALL NDG_NDFAS( NDFGR, I, 'UPDATE', INDF( I ), STATUS )
+
+*  Get the WCS component.
          CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
-         FRM( I ) = AST_GETFRAME( IWCS( I ), AST__CURRENT, STATUS )
+
+*  If this is the first member of this Set encountered so far, store the
+*  current frame.
+         IF ( FRM( IS ) .EQ. AST__NULL ) THEN
+            FRM( IS ) = AST_GETFRAME( IWCS( I ), AST__CURRENT, STATUS )
+         END IF
       END DO
 
 *  Output offset information to the user.
-      CALL CCD1_PROFF( NNDF, %VAL( IPBEEN ), XOFFN, YOFFN, FRM,
+      CALL CCD1_PROFF( NSET, %VAL( IPBEEN ), XOFFN, YOFFN, FRM,
      :                 .TRUE., STATUS )
 
 *  Initialise number of matched points.
-      DO I = 1, NNDF
+      DO I = 1, NSET
          NOUT( I ) = 0
       END DO
 
@@ -563,11 +620,16 @@
       END DO
 
 *  Generate the ID's for the output lists. Matching positions between
-*  the lists and final merging all positions for each node.
+*  the lists and finally merging all positions for each node.
       CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPRAN1,
      :                IPX2, IPY2, IPRAN2, NMAT, OFFS, IPXO, IPYO, IPRAN,
      :                IPID, NOUT, STATUS )
 
+*  Release some memory.
+      DO I = 1, COUNT
+         CALL CCD1_MFREE( IPRAN1( I ), STATUS )
+         CALL CCD1_MFREE( IPRAN2( I ), STATUS )
+      END DO
 
 *=======================================================================
 *   Writing output lists and updating NDF extensions
@@ -579,37 +641,61 @@
      :                 STATUS )
 
 *  Write a position list and store its name in the .MORE.CCDPACK
-*  extension for each NDF.
+*  extension for each NDF, if it has any entries.
       DO 12 I = 1, NNDF
 
-*  Check whether there are any points to write in the list.
-         IF ( NOUT( I ) .GT. 0 ) THEN 
+*  Check whether there are any points in the Set to which this NDF
+*  belongs.
+         NCOUT = 0
+         IS = ISET( I )
+         IF ( NOUT( IS ) .GT. 0 ) THEN 
 
-*  Get temporary storage for list of points in pixel coordinates.
-            CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPXP, STATUS )
-            CALL CCD1_MALL( NOUT( I ), '_DOUBLE', IPYP, STATUS )
+*  Get temporary storage for list of all points in pixel coordinates,
+*  and list of selected points in pixel coordinates.
+            CALL CCD1_MALL( NOUT( IS ), '_DOUBLE', IPXP, STATUS )
+            CALL CCD1_MALL( NOUT( IS ), '_DOUBLE', IPYP, STATUS )
+            CALL CCD1_MALL( NOUT( IS ), '_INTEGER', IPIQ, STATUS )
+            CALL CCD1_MALL( NOUT( IS ), '_DOUBLE', IPXQ, STATUS )
+            CALL CCD1_MALL( NOUT( IS ), '_DOUBLE', IPYQ, STATUS )
 
 *  Convert the positions to Pixel coordinates.
             CALL CCD1_FRDM( IWCS( I ), 'Pixel', JPIX, STATUS )
             IMAP = AST_GETMAPPING( IWCS( I ), AST__CURRENT, JPIX,
      :                             STATUS )
-            CALL AST_TRAN2( IMAP, NOUT( I ), %VAL( IPXO( I ) ), 
-     :                      %VAL( IPYO( I ) ), 1, %VAL( IPXP ),
+            CALL AST_TRAN2( IMAP, NOUT( IS ), %VAL( IPXO( IS ) ),
+     :                      %VAL( IPYO( IS ) ), 1, %VAL( IPXP ),
      :                      %VAL( IPYP ), STATUS )
+
+*  Get the bounds of the NDF.
+            CALL NDF_BOUND( INDF( I ), 2, LBND, UBND, NDIM, STATUS )
+            XLO = DBLE( LBND( 1 ) - 1 )
+            YLO = DBLE( LBND( 2 ) - 1 )
+            XHI = DBLE( UBND( 1 ) )
+            YHI = DBLE( UBND( 2 ) )
+
+*  Pick out only those points which fall in the area of the data array
+*  of this NDF.
+            CALL CCD1_CHUSB( %VAL( IPID( IS ) ), %VAL( IPXP ), 
+     :                       %VAL( IPYP ), NOUT( IS ), XLO, XHI,
+     :                       YLO, YHI, %VAL( IPIQ ), %VAL( IPXQ ),
+     :                       %VAL( IPYQ ), NCOUT, STATUS )
+         END IF
+
+*  Check whether there are any points to write to this position list.
+         IF ( NCOUT .GT. 0 ) THEN
 
 *  Open the position list file.
             CALL GRP_GET( OUTGRP, I, 1, FNAME, STATUS )
-            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDO( I ),
-     :                     STATUS )
-            CALL CCD1_FIOHD( FDO( I ), 'Output from PAIRNDF', STATUS )
+            CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FDO, STATUS )
+            CALL CCD1_FIOHD( FDO, 'Output from PAIRNDF', STATUS )
 
 *  Write the data.
-            CALL CCD1_WRIXY( FDO( I ), %VAL( IPID( I ) ), %VAL( IPXP ),
-     :                       %VAL( IPYP ), NOUT( I ), LINE, CCD1__BLEN,
+            CALL CCD1_WRIXY( FDO, %VAL( IPIQ ), %VAL( IPXQ ),
+     :                       %VAL( IPYQ ), NCOUT, LINE, CCD1__BLEN,
      :                       STATUS )
 
 *  Close the file.
-            CALL FIO_CLOSE( FDO( I ), STATUS )
+            CALL FIO_CLOSE( FDO, STATUS )
 
 *  Store the names of the position lists in the NDF extensions
             CALL CCG1_STO0C( INDF( I ), 'CURRENT_LIST', FNAME, STATUS )
@@ -638,6 +724,15 @@
             END IF
             CALL ERR_RLSE
          END IF
+
+*  Release some resources.
+         IF ( NOUT( IS ) .GT. 0 ) THEN
+            CALL CCD1_MFREE( IPXP, STATUS )
+            CALL CCD1_MFREE( IPYP, STATUS )
+            CALL CCD1_MFREE( IPIQ, STATUS )
+            CALL CCD1_MFREE( IPXQ, STATUS )
+            CALL CCD1_MFREE( IPYQ, STATUS )
+         END IF
  12   CONTINUE
 
 *  Write display preference parameters back to the parameter system.
@@ -655,7 +750,6 @@
 
 *  Release all memory
       CALL CCD1_MFREE( -1, STATUS )
-      CALL CCD1_FRTMP( -1, STATUS )
 
 *  Release group resources.
       CALL CCD1_GRDEL( NDFGR, STATUS )
