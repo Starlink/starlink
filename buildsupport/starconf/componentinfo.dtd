@@ -1,3 +1,12 @@
+<!-- This DTD is designed so that each of the elements <componentset>, 
+     <component> and <manifest> may be used as a top-level element.
+     The intention is that each component maintains an XML file which
+     is a valid instance of the <component> element; these can be
+     simply concatenated into the content of a valid instance of the
+     <componentset> element; and when components are installed, they
+     will additionally install an XML file which is a valid instance
+     of this DTD with the <manifest> element at the top level. -->
+
 <!-- A list of components -->
 <!ELEMENT componentset (component+, manifest*)>
 
