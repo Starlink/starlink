@@ -1560,7 +1560,6 @@ astPickAxes( this, axes )
  OUTPUT:
   RETVAL
 
-# Need to think about astResolve  XXXXX
 # Returns reference to array [point4], plus two distances
 
 void
@@ -1716,9 +1715,12 @@ astDecompose( this )
   int invert2;
  PPCODE:
   Perl_croak(aTHX_ "astDecompose not yet implemented\n");
+  /* May want to restrict this to CmpMap and CmpFrame classes
+     explicitly */
   ASTCALL(
    astDecompose(this, &map1, &map2, &series, &invert1, &invert2);
   )
+
 
 void
 astInvert( this )
@@ -1731,7 +1733,39 @@ astInvert( this )
 # astMapBox  XXXX
 
 
-# astRate    XXXXX
+# astRate
+#  Returns the rate and ref to array of derivatives
+#  Returns empty list if astRate returns AST__BAD
+
+void
+astRate( this, at, ax1, ax2 )
+  AstMapping * this
+  AV* at
+  int ax1
+  int ax2
+ PREINIT:
+  int nin;
+  int len;
+  double * cat;
+  double RETVAL;
+  double d2;
+ PPCODE:
+  nin = astGetI( this, "Nin");
+  len = av_len( at ) + 1;
+  if (nin != len)
+      Perl_croak(aTHX_ "Must supply Nin coordinates to astRate [%d != %d]",
+                        nin, len);
+  cat = pack1D( newRV_noinc((SV*)at), 'd');
+
+  ASTCALL(
+    RETVAL = astRate( this, cat, ax1, ax2, &d2 );
+  )
+  if ( RETVAL != AST__BAD ) {
+     XPUSHs(sv_2mortal(newSVnv(RETVAL)));
+     XPUSHs(sv_2mortal(newSVnv(d2)));
+  } else {
+     XSRETURN_EMPTY;
+  }
 
 
 # astResample XXXX
