@@ -44,6 +44,8 @@
 #        Use pgplot_adam library and include png
 #     08-JUL-2004 (TIMJ):
 #        Now get pgplot libraries using pgplot_link script
+#      9-AUG-2004 (TIMJ):
+#        Do not get libraries from pgplot_link and add err_link_adam
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -51,8 +53,8 @@
 
 #-
 
-      echo -lpgppar_adam  `pgplot_link -star` `gwm_link_adam` \
-           `psx_link_adam` `chr_link_adam`   \
+      echo -lpgppar_adam  -lpgplot_star `gwm_link_adam` \
+           `psx_link_adam` `chr_link_adam` `err_link_adam`  \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
