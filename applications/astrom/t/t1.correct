@@ -62,7 +62,7 @@ END
 
 
       Plate scale (in measuring units):            0.3321 arcsec
-                           Orientation:          +88.865  deg and laterally inverted
+                           Orientation:          -88.865  deg and laterally inverted
 
 
  Reference stars:
@@ -98,8 +98,8 @@ END
      Plate scales (in measuring units):      X     0.3313 arcsec
                                              Y     0.3315 arcsec
                                           mean     0.3314 arcsec
-                   Nonperpendicularity:           +0.345  deg
-                           Orientation:          +88.828  deg and laterally inverted
+                   Nonperpendicularity:           -0.345  deg
+                           Orientation:          -88.828  deg and laterally inverted
 
 
  Reference stars:
@@ -239,7 +239,7 @@ PV2_17  =        0.0000000E+00 / b_17 y^5  = 3q^2
 PV2_21  =        0.0000000E+00 / b_21 yx^4 = 3q^2                               
 PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3                             
 PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
-MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01)        
+MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01:00)     
 END                                                                             
 !!!- tmp1-fits01.fits
 !!!+ tmp1-fits02.fits
@@ -279,6 +279,6 @@ PV2_17  =        0.0000000E+00 / b_17 y^5  = 3q^2
 PV2_21  =        0.0000000E+00 / b_21 yx^4 = 3q^2                               
 PV2_31  =       -0.0000000E+00 / b_31 y^7  = -12q^3                             
 PV2_37  =       -0.0000000E+00 / b_37 yx^6 = -12q^3                             
-MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01)        
+MJD-OBS =        50985.6675000 / Obs. start J1998.470 (1998-06-21T16:01:00)     
 END                                                                             
 !!!- tmp1-fits02.fits
