@@ -117,9 +117,9 @@
             tar -cvh -f ${TEMPDIR}/${file}.tar `grp ${file}`
             rm -f `grp ${file}`
             mv ${TEMPDIR}/${file}.tar ${REL_DIR}
-         } else {
+         else 
             cp $HOME/kappa/dev/${file}.tar ${REL_DIR}
-         }
+         endif
       end
 
 #  Make the ctg and lpg source tar files.
