@@ -383,6 +383,7 @@
       CHARACTER DOMAIN*30        ! Domain containing vector positions
       CHARACTER JUST*6           ! Vector justification: CENTRE or START
       CHARACTER NAME*(CAT__SZCMP)! CAT column name
+      CHARACTER TITLE*80         ! Title from input catalogue
       CHARACTER UNITS1*( CUNITS )! Units of the data
       CHARACTER UNITS2*( CUNITS )! Units of the data
       DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
