@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_SCUOVER (STATUS)
+      SUBROUTINE SURF_SCUOVER (STATUS)
 *+
 *  Name:
 *     SCUOVER
@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL REDS_SCUOVER ( STATUS )
+*     CALL SURF_SCUOVER ( STATUS )
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -25,12 +25,14 @@
 *     unless a command line value is given. In order to calculate the bolometer
 *     positions it is also necessary to read in the extinction corrected
 *     data file that was used to regrid the data (in fact any extinction
-*     corrected file can be used and strange results may be the result for the
-*     unwary). The position of the bolometers at the start of the first 
-*     integration and zero jiggle offset is plotted.
+*     corrected file can be used, possible with strange results).
+*     By default the position of the bolometers at the start of 
+*     the first integration and zero jiggle offset is plotted. Optionally,
+*     it is possible to plot the bolometer positions at any point during
+*     the observation (still with zero jiggle offset).
 
 *  Usage:
-*     scuover [NDF] [DEVICE] EXT [COL] [NAME]
+*     scuover
 
 *  ADAM parameters:
 *     COL = LITERAL (Read)
@@ -40,13 +42,25 @@
 *        The graphics device on which the bolometers are to be drawn.
 *        The global default (set with Kappa GDSET) will be used unless
 *        specified otherwise.
+*     EXPOSURE = INTEGER (Read)
+*        Ues the bolometer positions at the specified exposure within the
+*        specified INTEGRATION and MEASUREMENT. For SCAN/MAP data the
+*        middle of an exposure (ie scan) is used. Default is exposure 1.
 *     EXT = NDF (Read)
 *        The name of the extinction corrected data from which the bolometer
 *        positions should be taken.
+*     INTEGRATION = INTEGER (Read)
+*        Use the bolometer positions at the specified integration. Default
+*        is measuremnt 1.
+*     MEASUREMENT = INTEGER (Read)
+*        Use the bolometer positions at the specified exposure. Default
+*        is measurement 1.
+*     MSG_FILTER = CHAR (Read)
+*        Message filter level. Default is NORM.
 *     NDF = NDF (Read)
 *        The name of the regridded data set (taken from the AGI graphics
 *        database).
-*     NAME = _LOGICAL (Read)
+*     NAME = LOGICAL (Read)
 *        Label with bolometer name if true, else bolometer number. The default
 *        is true.
 
@@ -55,19 +69,17 @@
 *        The bolometer names will be overlaid using the default colour.
 *     scuover col=red name=false
 *        This command will overlay bolometer numbers over the image in red.
+*     scuover integration=2
+*        Overlay the bolometer integrations at the start of the second
+*        integration.
 
 *  Notes: 
 *     - An image must have already been displayed before using SCUOVER.
-*     - The array position is that of the first integration with zero
-*     jiggle offset. Images containing many integrations will not match
-*     correctly to the drawn array position.
+*     - The array position is always shown with zero jiggle offset.
 *     - This routine does not take into account the use of SHIFT_DX or
 *     SHIFT_DY in REBIN. (the relevant information is not stored in the
 *     rebinned image).
 *     - Pointing shifts are taken into account.
-
-
-*  Implementation status:
 
 *  Authors :
 *     JFL: J.Lightfoot (ROE)
@@ -92,9 +104,10 @@
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'PAR_ERR'                ! for PAR__ constants
       INCLUDE 'PAR_PAR'                ! for PAR__ constants
-      INCLUDE 'REDS_SYS'               ! REDS definitions
+      INCLUDE 'SURF_PAR'               ! SURF definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'GKS_PAR'                ! GKS constants (e.g. GSET)
+      INCLUDE 'MSG_PAR'                ! MSG__ constants
 
 *  Status :
       INTEGER STATUS
@@ -108,8 +121,12 @@
       PARAMETER ( MPEN = 3 )
       REAL AR                          ! A `normal' text aspect ratio
       PARAMETER ( AR = 0.66667 )
+      CHARACTER * 7 TSKNAME            ! SCUOVER name
+      PARAMETER (TSKNAME = 'SCUOVER')
 
 *  Local variables :
+      LOGICAL          ABORTED         ! .TRUE. if an observation has been
+                                       ! aborted
       REAL AR0                         ! Text aspect ratio on entry
       CHARACTER*(1)    B1              ! Name of bolometer (1 char)
       CHARACTER*(2)    B2              ! Name of bolometer (2 char)
@@ -141,27 +158,16 @@
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
-      REAL             CENTRE_DU3      ! dU3 Nasmyth coordinate of point on
-                                       ! focal plane that defines telescope axis
-      REAL             CENTRE_DU4      ! dU4 Nasmyth coordinate of point on
-                                       ! focal plane that defines telescope axis
-      INTEGER          CHR_STATUS      ! status from CHR routines
+      CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
+                                       ! bolometer types
       INTEGER          CI              ! Colour index required for graphics
       INTEGER          COLI            ! Original colour index of current pen
-      INTEGER          DATA_OFFSET     ! offset within data array
-      REAL             DEC_START       ! Dec offset of scan start (arcsec)
-      REAL             DEC_VEL         ! Dec velocity of scan (arcsec/sec)
       LOGICAL          DEVCAN          ! The device parameter is to be cancelled?
       INTEGER          DIM (MAX_DIM)   ! array dimensions
-      INTEGER          DIMX (MAX_DIM)  ! expected array dimensions
-      DOUBLE PRECISION DTEMP           ! scratch double
-      INTEGER          EXPOSURE        ! exposure index in DO loop
-      INTEGER          EXP_END         ! end index of data for an exposure
-      DOUBLE PRECISION EXP_LST         ! sidereal time at which exposure
-                                       ! started (radians)
-      INTEGER          EXP_START       ! start index of data for an exposure
-      REAL             EXP_TIME        ! exposure time per measurement in an
-                                       ! input file (seconds)
+      DOUBLE PRECISION ELEVATION       ! Elevation of observation
+      INTEGER          END_EXP         ! Last exposure
+      INTEGER          END_INT         ! Last integration
+      INTEGER          END_MEAS        ! Last measurement
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
       INTEGER          EXT_NDF         ! NDF id of extinction file
@@ -178,22 +184,13 @@
       REAL             HGT             ! Height for key text
       REAL             HT0             ! Text height on entry
       INTEGER          I               ! DO loop index
-      INTEGER          ID              ! day of an input observation
-      INTEGER          IEND            ! index of end of sub-string
       INTEGER          IERR            ! Position of error from VEC_
-      INTEGER          IHOUR           ! hour in which observation started
-      INTEGER          IM              ! month in which observation started
-      INTEGER          IMIN            ! minute at which observation started
-      INTEGER          INTEGRATION     ! integration index in DO loop
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
       DOUBLE PRECISION IN_DEC_CEN      ! apparent Dec of input file map centre
                                        ! (radians)
-      INTEGER          IN_DEC_STRT_ARY ! array identifier to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_STRT_PTR ! pointer to .SCUCD.DEC_STRT
-      INTEGER          IN_DEC_VEL_ARY  ! array identifier to .SCUCD.DEC_VEL
-      INTEGER          IN_DEC_VEL_PTR  ! array pointer to .SCUCD.DEC_VEL
-      INTEGER          IN_DEM_PNTR_ARY ! array identifier to .SCUBA.DEM_PNTR
+      INTEGER          IN_DEC1_PTR     ! pointer to .SCUCD.DEC1
+      INTEGER          IN_DEC2_PTR     ! pointer to .SCUCD.DEC2
       INTEGER          IN_DEM_PNTR_PTR ! pointer to .SCUBA.DEM_PNTR
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
@@ -206,7 +203,6 @@
                                        ! input file (radians)
       DOUBLE PRECISION IN_LONG2_RAD    ! longitude of telescope centre at MJD2
                                        ! (radians)
-      INTEGER          IN_LST_STRT_ARY ! array identifier to .SCUBA.LST_STRT
       INTEGER          IN_LST_STRT_PTR ! pointer to .SCUBA.LST_STRT
       DOUBLE PRECISION IN_MJD1         ! modified Julian day at which object
                                        ! was at IN_LAT,IN_LONG for PLANET centre
@@ -216,10 +212,8 @@
                                        ! centre coordinate system
       DOUBLE PRECISION IN_RA_CEN       ! apparent RA of input file map centre
                                        ! (radians)
-      INTEGER          IN_RA_STRT_ARY  ! array identifier to .SCUCD.RA_STRT
-      INTEGER          IN_RA_STRT_PTR  ! pointer to .SCUCD.RA_STRT
-      INTEGER          IN_RA_VEL_ARY   ! array identifier to .SCUCD.RA_VEL
-      INTEGER          IN_RA_VEL_PTR   ! pointer to .SCUCD.RA_VEL
+      INTEGER          IN_RA1_PTR      ! pointer to .SCUCD.RA1
+      INTEGER          IN_RA2_PTR      ! pointer to .SCUCD.RA2
       CHARACTER*(DAT__SZLOC) IN_REDSX_LOC
                                        ! locator to REDS extension in input
                                        ! file
@@ -233,11 +227,8 @@
                                        ! file
       DOUBLE PRECISION IN_UT1          ! UT1 at start of an input observation,
                                        ! expressed as modified Julian day
-      INTEGER          ISTART          ! index of start of sub-string
       INTEGER          ITEMP           ! scratch integer
       INTEGER          IWKID           ! GKS workstation identifier
-      INTEGER          IY              ! year in which input observation started
-      INTEGER          JIGGLE          ! jiggle index
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH ! number of jiggles per switch
       INTEGER          JIGGLE_REPEAT   ! number of times jiggle pattern is
@@ -246,18 +237,14 @@
                                        ! x jiggle offsets (arcsec)
       REAL             JIGGLE_Y (SCUBA__MAX_JIGGLE)
                                        ! y jiggle offsets (arcsec)
-      DOUBLE PRECISION LAT_OBS         ! latitude of observatory (radians)
       INTEGER          LNTYPE          ! Line type to be used
       INTEGER          LNTYPI          ! Initial line type for current SGS pen
       CHARACTER * ( DAT__SZLOC ) LOCI  ! Locator for input data structure
-      DOUBLE PRECISION LST             ! sidereal time at which measurement
-                                       ! made (radians)
       REAL             LWIDTH          ! The width of the current SGS pen
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
-      INTEGER          MEASUREMENT     ! measurement index in DO loop
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs of all
                                        ! measured positions are calculated
       INTEGER          NDIM            ! the number of dimensions in an array
@@ -282,11 +269,8 @@
                                        ! input file
       CHARACTER*40     OBJECT          ! name of object
       CHARACTER*40     OBSERVING_MODE  ! observing mode of input file
-      CHARACTER*15     OFFSET_COORDS   ! coord system of OFFSET_X and OFFSET_Y
-      REAL             OFFSET_X        ! x offset of measurement
-      REAL             OFFSET_Y        ! y offset of measurement
-      CHARACTER*40     OUTCRDS         ! dummy coord system of output map
-      CHARACTER*3      OUT_COORDS      ! coordinate system of output map
+      CHARACTER*10     OUT_COORDS      ! coordinate system of output map
+      CHARACTER*10     OUTCRDS         ! Dummy output coords variable
       DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
                                        ! (radians)
       DOUBLE PRECISION OUT_LAT         ! longitude of output map centre 
@@ -297,6 +281,7 @@
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
+      DOUBLE PRECISION PAR_ANGLE       ! Parallactic angle
       INTEGER PEN                      ! Current SGS pen
       INTEGER PICID                    ! Input picture identifier
       INTEGER PICIDI                   ! Data image picture identifier 
@@ -307,8 +292,6 @@
                                        ! (radians)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                        ! LST of pointing corrections (radians)
-      REAL             RA_START        ! RA offset of scan start (arcsec)
-      REAL             RA_VEL          ! RA velocity of scan (arcsec/sec)
       LOGICAL          REBIN           ! .TRUE. if REBIN application has 
                                        ! been run on input file
       LOGICAL          REDUCE_SWITCH   ! .TRUE. if REDUCE_SWITCH application
@@ -322,7 +305,6 @@
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
-      DOUBLE PRECISION SEC             ! second at which observation started
       LOGICAL SETPLR                   ! Polyline representation to be reset?
       REAL             SHIFT_DX
                                        ! x shift to be applied to component map
@@ -331,17 +313,19 @@
                                        ! y shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
       REAL SP0                         ! Space between characters on entry
+      CHARACTER*80     STATE           ! 'state' of SCUCD at the end of
+                                       ! the observation
+      INTEGER          START_EXP       ! First exposure
+      INTEGER          START_INT       ! First integration
+      INTEGER          START_MEAS      ! First measurement
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER * ( 2 ) TXJ0           ! Text justification on entry
-      CHARACTER*15     UTDATE          ! date of input observation
-      CHARACTER*15     UTSTART         ! UT of start of input observation
       REAL XTEMP(2)                    ! X pos of first two bols
       REAL XU0                         ! X comp. of text up-vector on entry
       REAL YTEMP(2)                    ! Y pos of first two bols
       REAL YU0                         ! Y comp. of text up-vector on entry
       INTEGER ZONEO                    ! SGS zone of the displayed image
       INTEGER ZONEOV                   ! SGS zone of the input picture
-
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -352,6 +336,9 @@
       DEVCAN = .FALSE.
       GOTNAM = .FALSE.
       GOTLOC = .FALSE.
+
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
 
 *     Obtain an SGS zone for the last DATA picture.
 *     =============================================
@@ -409,7 +396,8 @@
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: input '//
+            CALL MSG_SETC('TASK',TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input '//
      :           'file contains too many FITS items', STATUS)
          END IF
       END IF
@@ -490,7 +478,8 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. EXTINCTION) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ','REDS_BESSEL_REBIN: '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ','^TASK: '//
      :              'the input data has not been corrected for '//
      :              'EXTINCTION. Please try again.', STATUS)
             END IF
@@ -522,72 +511,11 @@
          END IF
       END IF
 
+*  get the bolometer description arrays
 
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_DU3', NDIM, DIMX,
-     :     BOL_DU3, DIM, STATUS)
-      
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)                 .OR.
-     :        (DIM(1) .NE. SCUBA__NUM_CHAN) .OR.
-     :        (DIM(2) .NE. SCUBA__NUM_ADC)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_SCUOVER: '//
-     :           '.SCUBA.BOL_DU3 array has bad dimensions - '//
-     :           '(^NDIM) ^DIM1 ^DIM2', STATUS)
-         END IF
-      END IF
-      
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_DU4', NDIM, DIMX,
-     :     BOL_DU4, DIM, STATUS)
-      
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF ((NDIM .NE. 2)                 .OR.
-     :        (DIM(1) .NE. SCUBA__NUM_CHAN) .OR.
-     :        (DIM(2) .NE. SCUBA__NUM_ADC)) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL MSG_SETI ('DIM1', DIM(1))
-            CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_SCUOVER: '//
-     :           '.SCUBA.BOL_DU4 array has bad dimensions - '//
-     :           '(^NDIM) ^DIM1 ^DIM2', STATUS)
-         END IF
-      END IF
-      
-      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
-     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :     BOL_CHAN, ITEMP, STATUS)
-      
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (ITEMP .NE. N_BOL) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SCUOVER: dimension '//
-     :           'of .SCUBA.BOL_CHAN does not match main data '//
-     :           'array', STATUS)
-         END IF
-      END IF
-      
-      CALL CMP_GET1I(IN_SCUBAX_LOC, 'BOL_ADC', 
-     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP,
-     :     STATUS)
-      
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (ITEMP .NE. N_BOL) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SCUOVER: dimension '//
-     :           'of .SCUBA.BOL_ADC does not match main data '//
-     :           'array', STATUS)
-         END IF
-      END IF
+      CALL SCULIB_GET_BOL_DESC(IN_SCUBAX_LOC, SCUBA__NUM_CHAN,
+     :     SCUBA__NUM_ADC, N_BOL, BOL_TYPE, BOL_DU3,
+     :     BOL_DU4, BOL_ADC, BOL_CHAN, STATUS)
 
 *     Read in FITS header from EXT
 *     ============================
@@ -599,7 +527,8 @@
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: input '//
+            CALL MSG_SETC('TASK',TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input '//
      :           'file contains too many FITS items', STATUS)
          END IF
       END IF
@@ -619,28 +548,23 @@
      :     'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
       
-*     Get centre offset
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'CNTR_DU3', CENTRE_DU3, STATUS)
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'CNTR_DU4', CENTRE_DU4, STATUS)
-      CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'LAT-OBS', LAT_OBS, STATUS)
-      LAT_OBS = LAT_OBS * PI / 180.0D0
-
-*  get some other FITS items that will be needed
- 
-      CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'EXP_TIME', EXP_TIME, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_CRDS', SAMPLE_COORDS, STATUS)
-      CALL CHR_UCASE (SAMPLE_COORDS)
-
 *     coords of telescope centre
 
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'CENT_CRD', IN_CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (IN_CENTRE_COORDS)
+
+
+      IF (OUT_COORDS .EQ. 'PL' .AND. 
+     :     IN_CENTRE_COORDS .NE. 'PLANET') THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC('TASK', TSKNAME)
+         CALL ERR_REP(' ', '^TASK: The image was rebinned with '//
+     :        'PL coordinates but the extinction corrected file '//
+     :        'does not have a moving coordinate system.',
+     :        STATUS)
+      END IF
+
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'LAT', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LAT_RAD, STATUS)
@@ -663,7 +587,8 @@
       END IF
 
       IF ((IN_CENTRE_COORDS .NE. 'AZ') .AND.
-     :     (IN_CENTRE_COORDS .NE. 'GA')) THEN
+     :     (IN_CENTRE_COORDS .NE. 'GA') .AND.
+     :     (IN_CENTRE_COORDS .NE. 'NA')) THEN
          IN_LONG_RAD = IN_LONG_RAD * 15.0D0
          IN_LONG2_RAD = IN_LONG2_RAD * 15.0D0
       END IF
@@ -679,65 +604,7 @@
 
 *     the UT of the observation expressed as modified Julian day
 
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'UTDATE', UTDATE, STATUS)
-      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'UTSTART', UTSTART, STATUS)
-
-      IF (STATUS .EQ. SAI__OK) THEN
-         CHR_STATUS = SAI__OK
-
-         ISTART = 1
-         IEND = INDEX (UTDATE,':')
-         IEND = MAX (ISTART,IEND)
-         CALL CHR_CTOI (UTDATE (ISTART:IEND-1), IY, CHR_STATUS)
-         UTDATE (IEND:IEND) = ' '
-         ISTART = IEND + 1
-         IEND = INDEX (UTDATE,':')
-         IEND = MAX (ISTART,IEND)
-         CALL CHR_CTOI (UTDATE (ISTART:IEND-1), IM, CHR_STATUS)
-         UTDATE (IEND:IEND) = ' '
-         ISTART = IEND + 1
-         IEND = MAX (ISTART,CHR_LEN(UTDATE))
-         CALL CHR_CTOI (UTDATE (ISTART:IEND), ID, CHR_STATUS)
-
-         ISTART = 1
-         IEND = INDEX (UTSTART,':')
-         IEND = MAX (ISTART,IEND)
-         CALL CHR_CTOI (UTSTART (ISTART:IEND-1), IHOUR, 
-     :        CHR_STATUS)
-         UTSTART (IEND:IEND) = ' '
-         ISTART = IEND + 1
-         IEND = INDEX (UTSTART,':')
-         IEND = MAX (ISTART,IEND)
-         CALL CHR_CTOI (UTSTART (ISTART:IEND-1), IMIN,
-     :        CHR_STATUS)
-         UTSTART (IEND:IEND) = ' '
-         ISTART = IEND + 1
-         IEND = MAX (ISTART,CHR_LEN(UTSTART))
-         CALL CHR_CTOD (UTSTART (ISTART:IEND), SEC, CHR_STATUS)
-
-         IF (CHR_STATUS .EQ. SAI__OK) THEN
-            CALL SLA_CLDJ (IY, IM, ID, IN_UT1, STATUS)
-            IN_UT1 = IN_UT1 + 
-     :           ((SEC/60.0D0 + DBLE(IMIN)) / 60.0D0 +
-     :           DBLE(IHOUR)) / 24.0D0
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL MSG_SETI ('SLA', STATUS)
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error '//
-     :              'returned by SLA_CLDJ - status = ^SLA', STATUS)
-            END IF
-         ELSE
-            STATUS = SAI__ERROR
-            CALL MSG_SETC ('UTDATE', UTDATE)
-            CALL MSG_SETC ('UTSTART', UTSTART)
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: error '//
-     :           'converting UTDATE=^UTDATE and UTSTART=^UTSTART '//
-     :           'to UT1', STATUS)
-         END IF
-      END IF
-
+      CALL SCULIB_GET_MJD(N_FITS, FITS, IN_UT1, RTEMP, STATUS)
 
 *     search for pointing correction structure in the REDS extension, if there
 *     is one read in the corrections
@@ -759,101 +626,52 @@
 
 *     Find the start LST
 *     map the DEM_PNTR and LST arrays and check their dimensions
-      
-      CALL ARY_FIND (IN_SCUBAX_LOC, 'DEM_PNTR', IN_DEM_PNTR_ARY,
-     :     STATUS)
-      CALL ARY_DIM (IN_DEM_PNTR_ARY, MAX_DIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (IN_DEM_PNTR_ARY, '_INTEGER', 'READ',
-     :     IN_DEM_PNTR_PTR, ITEMP, STATUS)
-      
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (NDIM .NE. 3) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :           '.SCUBA.DEM_PNTR array has bad number of '//
-     :           'dimensions', STATUS)
-         ELSE
-            IF (DIM(1) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM1',DIM(1))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUBA.DEM_PNTR array contains bad number '//
-     :              'of exposures - ^DIM1', STATUS)
-            END IF
-            IF (DIM(2) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM2',DIM(2))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUBA.DEM_PNTR array contains bad number '//
-     :              'of integrations - ^DIM2', STATUS)
-            END IF
-            IF (DIM(3) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM3',DIM(3))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUBA.DEM_PNTR array contains bad number '//
-     :              'of measurements - ^DIM3', STATUS)
-            END IF
-         END IF
-      END IF
-      
-      N_EXPOSURES = DIM (1)
-      N_INTEGRATIONS = DIM (2)
-      N_MEASUREMENTS = DIM (3)
 
-      CALL ARY_FIND (IN_SCUCDX_LOC, 'LST_STRT', 
-     :     IN_LST_STRT_ARY, STATUS)
-      CALL ARY_DIM (IN_LST_STRT_ARY, MAX_DIM, DIM, NDIM, STATUS)
-      CALL ARY_MAP (IN_LST_STRT_ARY, '_DOUBLE', 'READ', 
-     :     IN_LST_STRT_PTR, ITEMP, STATUS)
+      CALL SCULIB_GET_DEM_PNTR(3, IN_SCUBAX_LOC,
+     :     IN_DEM_PNTR_PTR, ITEMP, N_EXPOSURES, N_INTEGRATIONS, 
+     :     N_MEASUREMENTS, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         IF (NDIM .NE. 4) THEN
-            STATUS = SAI__ERROR
-            CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :           '.SCUCD.LST_STRT array has bad number of '//
-     :           'dimensions - ^NDIM', STATUS)
-         ELSE
-            IF (DIM(1) .LE. 0) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('DIM1', DIM(1))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUCD.LST_STRT array contains bad '//
-     :              'number of switch(es) - ^DIM1', STATUS)
-            END IF
-            IF (DIM(2) .NE. N_EXPOSURES) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NEXP', N_EXPOSURES)
-               CALL MSG_SETI ('DIM2', DIM(2))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              'there is a mismatch between the number of '//
-     :              'exposures in .SCUBA.DEM_PNTR (^NEXP) and '//
-     :              'in .SCUCD.LST_STRT (^DIM2)', STATUS)
-            END IF
-            IF (DIM(3) .NE. N_INTEGRATIONS) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NINT', N_INTEGRATIONS)
-               CALL MSG_SETI ('DIM3', DIM(3))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              'there is a mismatch between the number of '//
-     :              'integrations in .SCUBA.DEM_PNTR (^NINT) '//
-     :              'and in .SCUCD.LST_STRT (^DIM3)', STATUS)
-            END IF
-            IF (DIM(4) .NE. N_MEASUREMENTS) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NMEAS', N_MEASUREMENTS)
-               CALL MSG_SETI ('DIM4', DIM(4))
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              'there is a mismatch between the number of '//
-     :              'measurements in .SCUBA.DEM_PNTR (^NMEAS) '//
-     :              'and in .SCUCD.LST_STRT (^DIM4)', STATUS)
-            END IF
-         END IF
+*  Check LST_STRT
+      CALL SCULIB_GET_LST_STRT(IN_SCUCDX_LOC, IN_LST_STRT_PTR,
+     :     N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,
+     :     N_MEASUREMENTS, STATUS)
+
+*  see if the observation completed normally or was aborted
+ 
+      CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
+     :  STATE, STATUS)
+      CALL CHR_UCASE (STATE)
+      ABORTED = .FALSE.
+      IF (INDEX(STATE,'ABORTING') .NE. 0) THEN
+         ABORTED = .TRUE.
       END IF
 
-      N_SWITCHES = DIM (1)
+*     Write out the standard info concerning number of int/meas/exp
+* Print out information on observation
+ 
+      IF (ABORTED) THEN
+
+*  get the exposure, integration, measurement numbers at which the abort
+*  occurred
+ 
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'EXP_NO', N_EXPOSURES, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'INT_NO', N_INTEGRATIONS, STATUS)
+         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'MEAS_NO', N_MEASUREMENTS, STATUS)
+
+      END IF
+
+      CALL MSG_SETI ('N_E', N_EXPOSURES)
+      CALL MSG_SETI ('N_I', N_INTEGRATIONS)
+      CALL MSG_SETI ('N_M', N_MEASUREMENTS)
+
+      CALL MSG_SETC ('PKG', PACKAGE)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: file contains data for ^N_E '//
+     :     'exposure(s) in ^N_I integration(s) in '//
+     :     '^N_M measurement(s)', STATUS)
 
 
 *     calculate the apparent RA and Dec of the map centre at IN_UT1
@@ -867,411 +685,121 @@
 *     now read in data specific to the sample mode of the observation
 
       IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
-         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'JIGL_CNT', JIGGLE_COUNT, STATUS)
-         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'J_REPEAT', JIGGLE_REPEAT, STATUS)
-         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'J_PER_S', JIGGLE_P_SWITCH, STATUS)
 
-*     the jiggle pattern itself
+         CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
+     :        N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :        JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
+     :        JIGGLE_Y, STATUS)
 
-         CALL CMP_GET1R (IN_SCUCDX_LOC, 'JIGL_X',
-     :        SCUBA__MAX_JIGGLE, JIGGLE_X, ITEMP, STATUS)
-
-         IF (ITEMP .NE. JIGGLE_COUNT) THEN
-            IF (STATUS .EQ. SAI__OK) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              'mismatch between JIGGLE_COUNT and number '//
-     :              'of X jiggle offsets read', STATUS)
-            END IF
-         END IF
-
-         CALL CMP_GET1R (IN_SCUCDX_LOC, 'JIGL_Y',
-     :        SCUBA__MAX_JIGGLE, JIGGLE_Y, ITEMP, STATUS)
-
-         IF (ITEMP .NE. JIGGLE_COUNT) THEN
-            IF (STATUS .EQ. SAI__OK) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              'mismatch between JIGGLE_COUNT and number '//
-     :              'of Y jiggle offsets read', STATUS)
-            END IF
-         END IF
-
-*     the rotation of the jiggle coordinate system
-
-         CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :        'SAM_PA', SAMPLE_PA, STATUS)
+*     Actually don't want any jiggling for the overlay so
+         DO I = 1, JIGGLE_COUNT
+            JIGGLE_X(I) = 0.0
+            JIGGLE_Y(I) = 0.0
+         END DO
 
 *     likewise for raster maps
 
       ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-*     CALL NDF_XIARY (INDF, 'SCUCD', 'RA_STRT', 'READ',
-*     :           IN_RA_STRT_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'RA_STRT', IN_RA_STRT_ARY,
+
+         CALL SCULIB_GET_RASTER(IN_SCUCDX_LOC, N_SWITCHES,
+     :        N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+     :        IN_RA1_PTR, IN_RA2_PTR, IN_DEC1_PTR, IN_DEC2_PTR,
      :        STATUS)
-         CALL ARY_DIM (IN_RA_STRT_ARY, MAX_DIM, DIM, NDIM, STATUS)
-         CALL ARY_MAP (IN_RA_STRT_ARY, '_REAL', 'READ',
-     :        IN_RA_STRT_PTR, ITEMP, STATUS)
 
-         IF (STATUS .EQ. SAI__OK) THEN
-            IF (NDIM .NE. 4) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUCD.RA_STRT array has bad number of '//
-     :              'dimensions - ^NDIM', STATUS)
-            ELSE
-               IF (DIM(1) .NE. N_SWITCHES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_SWITCHES)
-                  CALL MSG_SETI ('D', DIM(1))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_STRT (^D)', STATUS)
-               END IF
-               IF (DIM(2) .NE. N_EXPOSURES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_EXPOSURES)
-                  CALL MSG_SETI ('D', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_STRT (^D)', STATUS)
-               END IF
-               IF (DIM(3) .NE. N_INTEGRATIONS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_INTEGRATIONS)
-                  CALL MSG_SETI ('D', DIM(3))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_STRT (^D)', STATUS)
-               END IF
-               IF (DIM(4) .NE. N_MEASUREMENTS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_MEASUREMENTS)
-                  CALL MSG_SETI ('D', DIM(4))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_STRT (^D)', STATUS)
-               END IF
-            END IF
-         END IF
-
-*     CALL NDF_XIARY (INDF, 'SCUCD', 'RA_VEL', 'READ',
-*     :           IN_RA_VEL_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'RA_VEL', IN_RA_VEL_ARY,
-     :        STATUS)
-         CALL ARY_DIM (IN_RA_VEL_ARY, MAX_DIM, DIM, NDIM, STATUS)
-         CALL ARY_MAP (IN_RA_VEL_ARY, '_REAL', 'READ',
-     :        IN_RA_VEL_PTR, ITEMP, STATUS)
-
-         IF (STATUS .EQ. SAI__OK) THEN
-            IF (NDIM .NE. 4) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUCD.RA_VEL array has bad number of '//
-     :              'dimensions - ^NDIM', STATUS)
-            ELSE
-               IF (DIM(1) .NE. N_SWITCHES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_SWITCHES)
-                  CALL MSG_SETI ('D', DIM(1))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_VEL (^D)', STATUS)
-               END IF
-               IF (DIM(2) .NE. N_EXPOSURES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_EXPOSURES)
-                  CALL MSG_SETI ('D', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_VEL (^D)', STATUS)
-               END IF
-               IF (DIM(3) .NE. N_INTEGRATIONS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_INTEGRATIONS)
-                  CALL MSG_SETI ('D', DIM(3))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_VEL (^D)', STATUS)
-               END IF
-               IF (DIM(4) .NE. N_MEASUREMENTS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_MEASUREMENTS)
-                  CALL MSG_SETI ('D', DIM(4))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.RA_VEL (^D)', STATUS)
-               END IF
-            END IF
-         END IF
-
-*     CALL NDF_XIARY (INDF, 'SCUCD', 'DEC_STRT', 'READ',
-*     :           IN_DEC_STRT_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC_STRT', 
-     :        IN_DEC_STRT_ARY, STATUS)
-         CALL ARY_DIM (IN_DEC_STRT_ARY, MAX_DIM, DIM, NDIM, 
-     :        STATUS)
-         CALL ARY_MAP (IN_DEC_STRT_ARY, '_REAL', 'READ',
-     :        IN_DEC_STRT_PTR, ITEMP, STATUS)
-
-         IF (STATUS .EQ. SAI__OK) THEN
-            IF (NDIM .NE. 4) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUCD.DEC_STRT array has bad number of '//
-     :              'dimensions - ^NDIM', STATUS)
-            ELSE
-               IF (DIM(1) .NE. N_SWITCHES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_SWITCHES)
-                  CALL MSG_SETI ('D', DIM(1))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_STRT (^D)', STATUS)
-               END IF
-               IF (DIM(2) .NE. N_EXPOSURES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_EXPOSURES)
-                  CALL MSG_SETI ('D', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_STRT (^D)', STATUS)
-               END IF
-               IF (DIM(3) .NE. N_INTEGRATIONS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_INTEGRATIONS)
-                  CALL MSG_SETI ('D', DIM(3))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_STRT (^D)', STATUS)
-               END IF
-               IF (DIM(4) .NE. N_MEASUREMENTS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_MEASUREMENTS)
-                  CALL MSG_SETI ('D', DIM(4))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_STRT (^D)', STATUS)
-               END IF
-            END IF
-         END IF
-
-*     CALL NDF_XIARY (INDF, 'SCUCD', 'DEC_VEL', 'READ',
-*     :           IN_DEC_VEL_ARY, STATUS)
-         CALL ARY_FIND (IN_SCUCDX_LOC, 'DEC_VEL', 
-     :        IN_DEC_VEL_ARY, STATUS)
-         CALL ARY_DIM (IN_DEC_VEL_ARY, MAX_DIM, DIM, NDIM, 
-     :        STATUS)
-         CALL ARY_MAP (IN_DEC_VEL_ARY, '_REAL', 'READ',
-     :        IN_DEC_VEL_PTR, ITEMP, STATUS)
-
-         IF (STATUS .EQ. SAI__OK) THEN
-            IF (NDIM .NE. 4) THEN
-               STATUS = SAI__ERROR
-               CALL MSG_SETI ('NDIM', NDIM)
-               CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :              '.SCUCD.DEC_VEL array has bad number of '//
-     :              'dimensions - ^NDIM', STATUS)
-            ELSE
-               IF (DIM(1) .NE. N_SWITCHES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_SWITCHES)
-                  CALL MSG_SETI ('D', DIM(1))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of switches in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_VEL (^D)', STATUS)
-               END IF
-               IF (DIM(2) .NE. N_EXPOSURES) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_EXPOSURES)
-                  CALL MSG_SETI ('D', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of exposures in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_VEL (^D)', STATUS)
-               END IF
-               IF (DIM(3) .NE. N_INTEGRATIONS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_INTEGRATIONS)
-                  CALL MSG_SETI ('D', DIM(3))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of integrations in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_VEL (^D)', STATUS)
-               END IF
-               IF (DIM(4) .NE. N_MEASUREMENTS) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETI ('N', N_MEASUREMENTS)
-                  CALL MSG_SETI ('D', DIM(4))
-                  CALL ERR_REP (' ', 'REDS_BESSEL_REBIN: '//
-     :                 'there is a mismatch between the number '//
-     :                 'of measurements in .SCUCD.DEM_PNTR (^N) '//
-     :                 'and in .SCUCD.DEC_VEL (^D)', STATUS)
-               END IF
-            END IF
-         END IF
       END IF
 
+*     If I am doing a AZ/NA raster overlay I need to get the output
+*     longitude and latitude from the extinction FITS header
+*     Note that I rebin in tangent plane centred on RD coordinates.
 
+      IF (SAMPLE_MODE .EQ. 'RASTER' .AND. 
+     :     (OUT_COORDS .EQ. 'NA' .OR. OUT_COORDS .EQ. 'AZ')) THEN
 
-*     calculate position of each bolometer at each measurement
-      N_POS = 1
+         OUTCRDS = 'RD'
+         CALL SCULIB_CALC_OUTPUT_COORDS (IN_RA_CEN, IN_DEC_CEN, 
+     :        MJD_STANDARD, OUTCRDS, OUT_LONG, OUT_LAT, STATUS)
+
+      END IF
+
+*     Ask for the integration, exposure, and measurement
+
+      START_MEAS = 1
+      START_EXP = 1
+      START_INT = 1
+
+      IF (N_MEASUREMENTS .GT. 1) THEN
+         CALL PAR_DEF0I('MEASUREMENT', START_MEAS, STATUS)
+         CALL PAR_MINI('MEASUREMENT', 1, STATUS)
+         CALL PAR_MAXI('MEASUREMENT', N_MEASUREMENTS, STATUS)
+         CALL PAR_GET0I('MEASUREMENT', START_MEAS, STATUS)
+      END IF
+      IF (N_INTEGRATIONS .GT. 1) THEN
+         CALL PAR_DEF0I('INTEGRATION', START_INT, STATUS)
+         CALL PAR_MINI('INTEGRATION', 1, STATUS)
+         CALL PAR_MAXI('INTEGRATION', N_INTEGRATIONS, STATUS)
+         CALL PAR_GET0I('INTEGRATION', START_INT, STATUS)
+      END IF
+      IF (N_EXPOSURES .GT. 1) THEN
+         CALL PAR_DEF0I('EXPOSURE', START_EXP, STATUS)
+         CALL PAR_MINI('EXPOSURE', 1, STATUS)
+         CALL PAR_MAXI('EXPOSURE', N_EXPOSURES, STATUS)
+         CALL PAR_GET0I('EXPOSURE', START_EXP, STATUS)
+      END IF
+
+      END_MEAS = START_MEAS
+      END_EXP = START_EXP
+      END_INT = START_INT
+
+*     Allocate some memory
+      BOL_RA_PTR = 0
+      BOL_RA_END = 0
+      BOL_DEC_PTR = 0
+      BOL_DEC_END = 0
+
       CALL SCULIB_MALLOC (N_BOL * VAL__NBD,
      :     BOL_RA_PTR, BOL_RA_END, STATUS)
       CALL SCULIB_MALLOC (N_BOL * VAL__NBD,
      :     BOL_DEC_PTR, BOL_DEC_END, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
+*     Dont need to get array for elevation and parallactic angle since
+*     I only need the parallactic angle for one exposure.
 
-*     now go through the various exposures of the observation calculating the
-*     observed positions
+      ELEVATION = VAL__BADD
+      PAR_ANGLE = VAL__BADD
 
-         MEASUREMENT = 1
-         INTEGRATION = 1
-         EXPOSURE    = 1
+*     Only want position for first exposure, integration and measurement
+*     calculate position of each bolometer at first measurement
 
-*     calculate mean LST for the switch sequence making up the exposure
-
-         EXP_LST = 0.0D0
-         DO I = 1, N_SWITCHES
-            DATA_OFFSET = (((MEASUREMENT-1) *
-     :           N_INTEGRATIONS + INTEGRATION - 1) *
-     :           N_EXPOSURES + EXPOSURE - 1) *
-     :           N_SWITCHES + I - 1
-            CALL VEC_DTOD(.FALSE., 1,
-     :           %val(IN_LST_STRT_PTR + DATA_OFFSET *
-     :           VAL__NBD), DTEMP, IERR, NERR, STATUS)
-            EXP_LST = EXP_LST + DTEMP
-         END DO
-         EXP_LST = EXP_LST / DBLE (N_SWITCHES)
-
-*     get the scan parameters for a raster map
-
-         IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-            CALL VEC_RTOR(.FALSE., 1,
-     :           %val(IN_RA_STRT_PTR + DATA_OFFSET *
-     :           VAL__NBR), RA_START, IERR, NERR, STATUS)
-            CALL VEC_RTOR(.FALSE., 1,
-     :           %val(IN_RA_VEL_PTR + DATA_OFFSET *
-     :           VAL__NBR), RA_VEL, IERR, NERR, STATUS)
-            CALL VEC_RTOR(.FALSE., 1,
-     :           %val(IN_DEC_STRT_PTR + DATA_OFFSET *
-     :           VAL__NBR), DEC_START, IERR, NERR,STATUS)
-            CALL VEC_RTOR(.FALSE., 1,
-     :           %val(IN_DEC_VEL_PTR + DATA_OFFSET *
-     :           VAL__NBR), DEC_VEL, IERR, NERR, STATUS)
-         END IF
-         
-*     find where the exposure starts and finishes in the data array
-
-         CALL SCULIB_FIND_SWITCH (
-     :        %val(IN_DEM_PNTR_PTR), 1, N_EXPOSURES,
-     :        N_INTEGRATIONS, N_MEASUREMENTS,N_POS,
-     :        1, EXPOSURE, INTEGRATION, MEASUREMENT,
-     :        EXP_START, EXP_END, STATUS)
-         
-*     cycle through the measurements in the exposure
-
-         I = EXP_START
-
-*     calculate the LST at which the measurement was made (hardly worth the
-*     bother because it's averaged over the switches anyway)
-
-         LST = EXP_LST + DBLE(I - EXP_START) *
-     :        DBLE(EXP_TIME) * 1.0027379D0 * 
-     :        2.0D0 * PI / (3600.0D0 * 24.0D0)
-         
-*     work out the pointing offset at which the measurement was made,
-*     remembering that for the `raster' mode the RA offset increases towards
-*     decreasing RA
-
-         IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
-            IF (JIGGLE_REPEAT .EQ. 1) THEN
-               JIGGLE = (EXPOSURE-1) *
-     :              JIGGLE_P_SWITCH +
-     :              I - EXP_START + 1
-            ELSE
-               JIGGLE = MOD (I - EXP_START,
-     :              JIGGLE_COUNT) + 1
-            END IF
-            
-            OFFSET_X = 0.0
-            OFFSET_Y = 0.0
-            OFFSET_COORDS = SAMPLE_COORDS
-         ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-            OFFSET_X = - RA_START - RA_VEL *
-     :           (REAL(I - EXP_START) + 0.5) *
-     :           EXP_TIME
-            OFFSET_Y = DEC_START + DEC_VEL *
-     :           (REAL(I - EXP_START) + 0.5) *
-     :           EXP_TIME
-            OFFSET_COORDS = 'RD'
-         END IF
-         
-*     now call a routine to work out the apparent RA,Dec of the measured
-*     bolometers at this position
-
-         DATA_OFFSET = (I - 1) * N_BOL
-
-         IF (OUT_COORDS.EQ.'NA'.OR.
-     :        OUT_COORDS.EQ.'AZ') THEN
-            OUTCRDS = OUT_COORDS
-         ELSE
-            OUTCRDS = 'RA'
-         END IF
-         
-         CALL SCULIB_CALC_BOL_COORDS (OUTCRDS, 
-     :        IN_RA_CEN, IN_DEC_CEN, LST, LAT_OBS,
-     :        OFFSET_COORDS, OFFSET_X, OFFSET_Y,
-     :        IN_ROTATION, N_POINT,
-     :        SCUBA__MAX_POINT,
-     :        POINT_LST, POINT_DAZ, POINT_DEL, 
-     :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
-     :        N_BOL, BOL_CHAN,
-     :        BOL_ADC, BOL_DU3, BOL_DU4,
-     :        CENTRE_DU3, CENTRE_DU4,
-     :        %val(BOL_RA_PTR + DATA_OFFSET *
-     :        VAL__NBD),
-     :        %val(BOL_DEC_PTR + DATA_OFFSET*
-     :        VAL__NBD),
-     :        STATUS)
-
-*     convert the coordinates to apparent RA,Dec on MJD_STANDARD
-         IF (OUTCRDS .EQ. 'RA') THEN
-
-            CALL SCULIB_STANDARD_APPARENT (N_BOL,
-     :           %val(BOL_RA_PTR + DATA_OFFSET * VAL__NBD),
-     :           %val(BOL_DEC_PTR + DATA_OFFSET * VAL__NBD),
-     :           IN_UT1, MJD_STANDARD, STATUS)
-         END IF
-      END IF
-
+      CALL SCULIB_PROCESS_BOLS(.FALSE., .TRUE., 0, N_BOL,
+     :     N_POS,N_SWITCHES, N_EXPOSURES, N_INTEGRATIONS,N_MEASUREMENTS,
+     :     START_EXP, END_EXP, START_INT, END_INT, START_MEAS, END_MEAS,
+     :     0, N_FITS, FITS,
+     :     %VAL(IN_DEM_PNTR_PTR), %VAL(IN_LST_STRT_PTR),
+     :     IN_ROTATION, SAMPLE_MODE,
+     :     SAMPLE_COORDS, OUT_COORDS, JIGGLE_REPEAT,
+     :     JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y, JIGGLE_P_SWITCH,
+     :     IN_RA_CEN, IN_DEC_CEN,
+     :     %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
+     :     %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), MJD_STANDARD,
+     :     IN_UT1,IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
+     :     IN_LONG2_RAD, IN_LAT2_RAD, 
+     :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
+     :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
+     :     BOL_DU3, BOL_DU4, .FALSE., 0.0, 0.0, 0.0, 0.0,
+     :     %VAL(BOL_DEC_PTR), %VAL(BOL_RA_PTR),
+     :     0.0, 0.0, STATUS)
 
 *     annul locators and array identifiers and close the file
 
-      CALL ARY_ANNUL (IN_DEM_PNTR_ARY, STATUS)
-      CALL ARY_ANNUL (IN_LST_STRT_ARY, STATUS)
+      CALL CMP_UNMAP (IN_SCUBAX_LOC, 'DEM_PNTR', STATUS)
+      CALL CMP_UNMAP (IN_SCUCDX_LOC, 'LST_STRT', STATUS)
 
- 1    CONTINUE                  ! Jump here if error before mapping ARY
+      IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+         CALL CMP_UNMAP(IN_SCUCDX_LOC, 'RA1', STATUS)
+         CALL CMP_UNMAP(IN_SCUCDX_LOC, 'RA2', STATUS)
+         CALL CMP_UNMAP(IN_SCUCDX_LOC, 'DEC1', STATUS)
+         CALL CMP_UNMAP(IN_SCUCDX_LOC, 'DEC2', STATUS)
+      END IF
 
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUCDX_LOC, STATUS)
@@ -1291,7 +819,8 @@
 
 *     Nasmyth rebin doesn't need a coordinate frame
 
-      IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ') THEN
+      IF (OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ'.AND.
+     :     OUT_COORDS .NE. 'PL') THEN
 
 *     calculate the apparent RA,Dec of the selected output centre
 
@@ -1303,124 +832,135 @@
 *     convert the RA,Decs of the observed points to tangent plane offsets
 *     from the chosen output centre
 
+         SHIFT_DX = 0.0         ! dont support shift yet
+         SHIFT_DX = 0.0
+
          IF (STATUS .EQ. SAI__OK) THEN
-               CALL SCULIB_APPARENT_2_TP (N_BOL, 
-     :              %val(BOL_RA_PTR), %val(BOL_DEC_PTR), 
-     :              OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
-     :              DBLE(SHIFT_DX), DBLE(SHIFT_DY), STATUS)
+            CALL SCULIB_APPARENT_2_TP (N_BOL, 
+     :           %val(BOL_RA_PTR), %val(BOL_DEC_PTR), 
+     :           OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, 
+     :           DBLE(SHIFT_DX), DBLE(SHIFT_DY), STATUS)
          END IF
 
       END IF
 
-*  Get information on line style and colour.
-*  =========================================
- 
-*  Inquire the workstation identifier for GKS inquiries.
-      CALL SGS_ICURW( IWKID )
-      SETPLR = .FALSE.
- 
-*  Obtain the colour index for the desired colour of the lines.
-*  Do not restrict the colours to the palette.
-      CALL KPG1_IVCI( 'DEVICE', 'COL', .FALSE., CI, STATUS )
- 
-*   Can now start plotting these on the graph     
+      IF (STATUS .EQ. SAI__OK) THEN
 
-*  Inquire the current colour index of this pen (it will be restored
-*  after all plotting is complete).
-      CALL GQPLR( IWKID, MPEN, GSET, IERR, LNTYPI, LWIDTH, COLI )
- 
+*     Get information on line style and colour.
+*     =========================================
+         
+*     Inquire the workstation identifier for GKS inquiries.
+         CALL SGS_ICURW( IWKID )
+         SETPLR = .FALSE.
+         
+*     Obtain the colour index for the desired colour of the lines.
+*     Do not restrict the colours to the palette.
+         CALL KPG1_IVCI( 'DEVICE', 'COL', .FALSE., CI, STATUS )
+         
+*     Can now start plotting these on the graph     
+
+*     Inquire the current colour index of this pen (it will be restored
+*     after all plotting is complete).
+         CALL GQPLR( IWKID, MPEN, GSET, IERR, LNTYPI, LWIDTH, COLI )
+         
 *     Need to find half distance between bolometers
-      CALL VEC_DTOR(.FALSE., 2, %val(BOL_RA_PTR),
-     :     XTEMP, IERR, NERR, STATUS)
-      CALL VEC_DTOR(.FALSE., 2, %val(BOL_DEC_PTR),
-     :     YTEMP, IERR, NERR, STATUS)
-      
-      BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 + (YTEMP(2)-YTEMP(1))**2)
-      BOL_DIST = BOL_DIST * REAL(R2AS) * 0.5
+         CALL VEC_DTOR(.FALSE., 2, %val(BOL_RA_PTR),
+     :        XTEMP, IERR, NERR, STATUS)
+         CALL VEC_DTOR(.FALSE., 2, %val(BOL_DEC_PTR),
+     :        YTEMP, IERR, NERR, STATUS)
+         
+         BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 +(YTEMP(2)-YTEMP(1))**2)
+         BOL_DIST = BOL_DIST * REAL(R2AS) * 0.5
 
 *     Now calculate (half) this distance in World coordinates
-*       (I am assuming dx=dy for simplicity)
+*     (I am assuming dx=dy for simplicity)
 
-      CALL AGI_TDTOW(PICIDI, 1, 0., 0., XTEMP(1), YTEMP(1), STATUS)
-      CALL AGI_TDTOW(PICIDI, 1, 0., BOL_DIST,XTEMP(2), YTEMP(2), STATUS)
+         CALL AGI_TDTOW(PICIDI, 1, 0., 0., XTEMP(1), YTEMP(1), STATUS)
+         CALL AGI_TDTOW(PICIDI, 1, 0., BOL_DIST,XTEMP(2), YTEMP(2), 
+     :        STATUS)
 
-      BOL_DIST_WORLD = ABS(YTEMP(2) - YTEMP(1))
+         BOL_DIST_WORLD = ABS(YTEMP(2) - YTEMP(1))
 
-*   Text attributes
+*     Text attributes
 
-      LNTYPE = 1
-      LWIDTH = 1
+         LNTYPE = 1
+         LWIDTH = 1
 
-*  Get the current text attributes.
-      CALL SGS_ITXA( NF, NPR, HT0, AR0, XU0, YU0, SP0, TXJ0 )
+*     Get the current text attributes.
+         CALL SGS_ITXA( NF, NPR, HT0, AR0, XU0, YU0, SP0, TXJ0 )
 
-      CALL SGS_SARTX( AR )
-      CALL SGS_SUPTX( 0.0, 1.0 )
-      CALL SGS_STXJ( 'CC' )
-      CALL SGS_SSPTX( 0.0 )
+         CALL SGS_SARTX( AR )
+         CALL SGS_SUPTX( 0.0, 1.0 )
+         CALL SGS_STXJ( 'CC' )
+         CALL SGS_SSPTX( 0.0 )
 
 *     Convert bolometer separation to world coordinates for textht
-      HGT = 0.55 * BOL_DIST_WORLD
-      CALL SGS_SHTX (HGT)
+         HGT = 0.55 * BOL_DIST_WORLD
+         CALL SGS_SHTX (HGT)
 
-*  Store the new colour index and line style for this pen.
-      CALL GSPLR( IWKID, MPEN, LNTYPE, LWIDTH, CI )
-      SETPLR = .TRUE.
- 
-*  See if a GKS error has occurred.
-      CALL GKS_GSTAT( STATUS )
- 
-*  Inquire the current SGS pen, and then select the pen used to draw
-*  markers.
-      CALL SGS_IPEN( PEN )
-      CALL SGS_SPEN( MPEN )
+*     Store the new colour index and line style for this pen.
+         CALL GSPLR( IWKID, MPEN, LNTYPE, LWIDTH, CI )
+         SETPLR = .TRUE.
+         
+*     See if a GKS error has occurred.
+         CALL GKS_GSTAT( STATUS )
+         
+*     Inquire the current SGS pen, and then select the pen used to draw
+*     markers.
+         CALL SGS_IPEN( PEN )
+         CALL SGS_SPEN( MPEN )
 
 *     Which type of label do we want
-      CALL PAR_GET0L('NAME', BOLNAME, STATUS)
- 
+         CALL PAR_GET0L('NAME', BOLNAME, STATUS)
+         
 *     Loop through all bolometers
-      DO I = 1, N_BOL
+         DO I = 1, N_BOL
 
-         CALL VEC_DTOR(.FALSE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
-     :        RTEMP, IERR,
-     :        NERR, STATUS)
-         CALL VEC_DTOR(.FALSE., 1, %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
-     :        RDTEMP, IERR,
-     :        NERR, STATUS)
+            CALL VEC_DTOR(.FALSE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
+     :           RTEMP, IERR, NERR, STATUS)
+            CALL VEC_DTOR(.FALSE., 1, %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
+     :           RDTEMP, IERR, NERR, STATUS)
 
-         RTEMP = RTEMP * REAL(R2AS)
-         RDTEMP = RDTEMP * REAL(R2AS)
+            RTEMP = RTEMP * REAL(R2AS)
+            RDTEMP = RDTEMP * REAL(R2AS)
 
 *     Transform to world coordinates
-         CALL AGI_TDTOW(PICIDI, 1, RTEMP, RDTEMP, RTEMP,RDTEMP,STATUS)
+            CALL AGI_TDTOW(PICIDI, 1, RTEMP, RDTEMP,RTEMP,RDTEMP,STATUS)
 
 *     Convert to proper bol name if necessary
-         IF (BOLNAME) THEN
-            CALL SCULIB_BOLNAME(BOL_ADC(I), BOL_CHAN(I), BOL, STATUS)
-         ELSE 
-            CALL CHR_ITOC(I, BOL, ITEMP)
-         END IF
+            IF (BOLNAME) THEN
+               CALL SCULIB_BOLNAME(BOL_ADC(I), BOL_CHAN(I), BOL, STATUS)
+            ELSE 
+               CALL CHR_ITOC(I, BOL, ITEMP)
+            END IF
 
-*       Now plot on map (Need to call 3 times depending on length of string)
-         ITEMP = CHR_LEN(BOL)
-         IF (ITEMP .EQ. 1) THEN
-            B1 = BOL
-            CALL SGS_TX(RTEMP, RDTEMP, B1)
-         ELSE IF (ITEMP .EQ. 2) THEN
-            B2 = BOL
-            CALL SGS_TX(RTEMP, RDTEMP, B2)
-         ELSE
-            CALL SGS_TX(RTEMP, RDTEMP, BOL)
-         END IF
+*     Now plot on map (Need to call 3 times depending on length of string)
+            ITEMP = CHR_LEN(BOL)
+            IF (ITEMP .EQ. 1) THEN
+               B1 = BOL
+               CALL SGS_TX(RTEMP, RDTEMP, B1)
+            ELSE IF (ITEMP .EQ. 2) THEN
+               B2 = BOL
+               CALL SGS_TX(RTEMP, RDTEMP, B2)
+            ELSE
+               CALL SGS_TX(RTEMP, RDTEMP, BOL)
+            END IF
 
-         CALL SGS_CIRCL(RTEMP, RDTEMP, BOL_DIST_WORLD * 0.85)
-      END DO
+            CALL SGS_CIRCL(RTEMP, RDTEMP, BOL_DIST_WORLD * 0.85)
+         END DO
 
-*  If necessary, re-instate the original colour index for the marker
-*  pen, and reinstate the original pen.
-      CALL SGS_SPEN( PEN )
-      IF ( SETPLR ) CALL GSPLR( IWKID, MPEN, LNTYPI, LWIDTH, COLI )
+*     If necessary, re-instate the original colour index for the marker
+*     pen, and reinstate the original pen.
+         CALL SGS_SPEN( PEN )
+         IF ( SETPLR ) CALL GSPLR( IWKID, MPEN, LNTYPI, LWIDTH, COLI )
 
+      END IF
+
+* Free
+
+      CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR, BOL_RA_END, STATUS)
+      CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR, BOL_DEC_END, STATUS)
+ 
  980  CONTINUE
 
 *  Need to tidy up the graphics database before exiting.
