@@ -89,6 +89,7 @@ proc buildRed4Widgets w {
     $Red4Widgets(LB) insert end NOT_an_image
     $Red4Widgets(LB) insert end open_engineering_log 
     $Red4Widgets(LB) insert end OR_two_images
+    $Red4Widgets(LB) insert end polysky_reduced_observation_or_group
     $Red4Widgets(LB) insert end read_an_emlt_observation_file
     $Red4Widgets(LB) insert end report_emlt_analysis
     $Red4Widgets(LB) insert end reset_engineering_functions

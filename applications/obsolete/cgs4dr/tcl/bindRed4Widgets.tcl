@@ -442,6 +442,14 @@ proc red4DoSomething {taskname dowhat inputs} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4IarithBox6.html
        }
       }
+    polysky_reduced_observation_or_group
+      {
+       if {$dowhat=="action"} {
+         red4Polysky $taskname
+       } elseif {$dowhat=="help"} {
+         cgs4drHelpDialog .helpDialog $cgs4drHtml/red4PolyskyBox1.html
+       }
+      }
     read_an_emlt_observation_file
       {
        if {$dowhat=="action"} {
