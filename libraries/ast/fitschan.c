@@ -240,6 +240,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        The Domain name GRID is now given to the Base Frame in any FrameSets
 *        created by astRead when using FitsChans with DSS, FITS-WCS or
 *        FITS-IRAF encodings.
+*     18-DEC-1998 (DSB):
+*        Check for "D" exponents in floating point keyword strings.
 *class--
 */
 
@@ -10197,6 +10199,33 @@ int astSplit_( const char *card, char **name, char **value,
                          ( 1 == sscanf( v, " %lf%n", &fr, &nch ) ) &&
                          ( nch >= len ) ) {
                         type = AST__FLOAT;
+                     }
+
+/* If both the above failed, it could be because the string contains a
+   "D" exponent (which is probably valid FITS) instead of an "E" exponent.
+   Replace any "D" in the string with "e" and try again. */
+                     if( type == AST__COMMENT && astOK ) {
+
+/* Replace "d" and "D" by "e" (if this doesn't produce a readable floating
+   point value then the value string will not be used, so it is safe to
+   do the replacement in situ). */
+                        for( i = 0; i < len; i++ ) {
+                           if( v[ i ] == 'd' || v[ i ] == 'D' ) v[ i ] = 'e';
+                        }
+
+/* Attempt to read two doubles from the edited string (separated by white
+   space). */
+                        if( nch = 0, 
+                          ( 2 == sscanf( v, " %lf %lf%n", &fr, &fi, &nch ) ) &&
+                          ( nch >= len ) ) {
+                           type = AST__COMPLEXF;
+
+/* If that failed, attempt to read a single double from the edited string. */
+                        } else if( nch = 0, 
+                            ( 1 == sscanf( v, " %lf%n", &fr, &nch ) ) &&
+                            ( nch >= len ) ) {
+                           type = AST__FLOAT;
+                        }
                      }
                   }
                }
