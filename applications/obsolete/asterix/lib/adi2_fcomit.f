@@ -91,52 +91,17 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*8		HDU			! HDU name
-      CHARACTER*20		HDUTYPE			! HDU type
-
-      INTEGER			EID			! EXTENSIONS object
-      INTEGER			FSTAT			! FITSIO status
-      INTEGER			HID			! HDU object
-      INTEGER			IHDU			! Loop over HDUs
-      INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU count
-
-      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract logical unit
-      CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
+      CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
 
-*  Write the other keywords
-      CALL ADI2_LOCHDU( FID, ' ', HID, STATUS )
-      CALL FTGHDN( LUN, IHDU )
-      IF ( IHDU .NE. 1 ) THEN
-        CALL FTMAHD( LUN, 1, HDUTYPE, FSTAT )
-      END IF
-      CALL ADI2_FCOMIT_HDU( FID, HID, ' ', STATUS )
-      CALL ADI_ERASE( HID, STATUS )
-
-*  Loop over extensions
-      CALL ADI_THERE( FID, 'EXTENSIONS', THERE, STATUS )
-      IF ( THERE ) THEN
-        CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
-        CALL ADI_NCMP( EID, NHDU, STATUS )
-
-        DO IHDU = 1, NHDU
-          CALL FTCRHD( LUN, FSTAT )
-          CALL FTMAHD( LUN, IHDU + 1, HDUTYPE, FSTAT )
-          CALL ADI_INDCMP( EID, IHDU, HID, STATUS )
-          CALL ADI_NAME( HID, HDU, STATUS )
-          CALL ADI2_FCOMIT_HDU( FID, HID, HDU, STATUS )
-          CALL ADI_ERASE( HID, STATUS )
-        END DO
-
-        CALL ADI_ERASE( EID, STATUS )
-
-      END IF
+*  Commit units and keywords
+      CALL ADI2_CHKPRV( FID, NHDU, .TRUE., STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_FCOMIT', STATUS )
@@ -144,7 +109,7 @@
       END
 
 
-      SUBROUTINE ADI2_FCOMIT_HDU( FID, HID, HDU, STATUS )
+      SUBROUTINE ADI2_FCOMIT_HDU( FID, HID, STATUS )
 *+
 *  Name:
 *     ADI2_FCOMIT_HDU
@@ -156,7 +121,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_FCOMIT_HDU( FID, HID, HDU, STATUS )
+*     CALL ADI2_FCOMIT_HDU( FID, HID, STATUS )
 
 *  Description:
 *     Commit any changes to keywords or data to the FITS file on disk. The
@@ -233,7 +198,6 @@
 *  Arguments Given:
       INTEGER			FID			! FITSfile identifier
       INTEGER			HID			! HDU identifier
-      CHARACTER*(*)		HDU			! HDU name
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -264,21 +228,6 @@
 
 *  Extract logical unit
       CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
-
-*  Primary HDU
-      CALL ADI2_GKEY0I( FID, HDU, 'NAXIS', .TRUE., .FALSE.,
-     :                  NAXIS, CMT, STATUS )
-
-*  If NAXIS not present then write a null header
-      IF ( STATUS .NE. SAI__OK ) THEN
-        CALL ERR_ANNUL( STATUS )
-        NAXIS = 0
-      END IF
-
-*  Define the header
-      FSTAT = 0
-      CALL FTPHPR( LUN, .TRUE., 8, NAXIS, NAXES, 0, 1, .TRUE., FSTAT )
-      CALL FTRDEF( LUN, FSTAT )
 
 *  Get number of keywords
       CALL ADI_NCMP( HID, NKEY, STATUS )

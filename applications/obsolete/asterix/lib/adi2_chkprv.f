@@ -91,7 +91,7 @@
 *  Arguments Given:
       INTEGER			FID			! FITSfile identifier
       INTEGER			CHDU			! Current HDU
-      LOGICAL			WKEYS			! Write keywords?
+      LOGICAL			WRKEYS			! Write keywords?
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -187,7 +187,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Write keywords?
-          IF ( WKEYS ) THEN
+          IF ( WRKEYS ) THEN
 
 *        Move to HDU unless already there
             IF ( .NOT. MOVED ) THEN
