@@ -12,6 +12,9 @@
 # Allan Brighton  01 Jun 95  Created
 #                 16 Sep 96  added code from P. Biereichel to clear
 #                            zoom win when leaving window
+# Peter W. Draper 11 Dec 01  Stopped zoom window retaining a reference
+#                            to an image that has been closed in the
+#                            main window (i.e. keep the view master current).
 
 itk::usual RtdImageZoomView {}
 
@@ -207,8 +210,8 @@ itcl::class rtd::RtdImageZoomView {
     # clear out the zoom image.
     
     public method leave_image {image} {
-	$image_ clear ximage
-	zoom 1
+        #$image_ clear ximage
+        zoom 1
     }
 
 
@@ -228,9 +231,18 @@ itcl::class rtd::RtdImageZoomView {
 	    }
 	    scale
 	} else {
-	    $target_image_ zoomview stop
-	    $image_ clear ximage
-	    catch {$target_image_ view remove $image_}
+            $target_image_ zoomview stop
+            $image_ clear ximage
+            # PWD: remove this line. This removes the zoom image as a
+            # view of the main image, which is fine in principle,
+            # however this doesn't clear the zoom image, which
+            # therefore retains a copy of the image displayed in the
+            # main image, until it receives a new image or is
+            # cleared. This is bad for NDF access, as we need to
+            # really close the file when the main image is
+            # closed. Otherwise reloading files of the same name can
+            # be very bad.
+            #catch {$target_image_ view remove $image_}
 	}
     }
 
