@@ -124,7 +124,7 @@ if <code>docnumber</> isn't defined.
 	(string-append docelemtype
 		       (if (attribute-string "UNASSIGNED" dn)
 			   "??"
-			   (trim-string (data dn))))
+			   (normalize-string (data dn))))
 	#f	
 	)))
 
@@ -582,76 +582,52 @@ the char-property whitespace test has to be replaced by the
 brute-force version:
 <code>(not (or (equal? firstchar #\space)
 	       (equal? firstchar #\&#TAB)
-	       (equal? firstchar #\&#RE)))</code>.
+	       (equal? firstchar #\&#RE)))</code>
+However this doesn't appear to work within openjade, for some reason
+I don't fully undertand, to do with parentheses and ampersands, I think.
 
 <codebody>
+<!--
 ;; jade-1.2.1 version:
-(define (trim-leading-whitespace charlist)
-  (if (null? charlist)
-      charlist
-      (let loop ((cl charlist))
- 	(let ((firstchar (car cl)))
- 	  (if (not (or (equal? firstchar #\space)
- 		       (equal? firstchar #\&#TAB)
- 		       (equal? firstchar #\&#RE)))
-	      cl
- 	      (loop (cdr cl)))))))
+(define (*is-whitespace* c)
+  (or (equal? c #\space)
+      (equal? c #\&#TAB;)
+      (equal? c #\&#RE;)
+      (equal? c #\&#RS;)))
+-->
 ;; openjade version:
-;(define (trim-leading-whitespace charlist)
-;  (if (null? charlist)
-;      charlist
-;      (let loop ((cl charlist))
-;	(if (not (char-property 'input-whitespace? (car cl)))
-;	    cl
-;	    (loop (cdr cl))))))
+(define (*is-whitespace* c)
+  (char-property 'input-whitespace? c))
 
-;; Trim both ends of a string by converting it to a list, trimming
-;; leading whitespace, then reversing it and doing it again, then
-;; reversing it.
-(define (trim-string s)
+
+;; Remove any leading and trailing space, and collapse intermediate
+;; whitespace to a single space character
+(define (*normalize-character-list* l seen-space seen-nonspace)
+  (if (null? l)
+      '()
+      (let ((firstchar (car l)))
+        (cond ((*is-whitespace* firstchar)
+               (*normalize-character-list* (cdr l) #t seen-nonspace))
+              ((and seen-space seen-nonspace)
+               (cons #\space
+                     (cons firstchar
+                           (*normalize-character-list* (cdr l) #f #t))))
+              (else
+               (cons firstchar
+                     (*normalize-character-list* (cdr l) #f #t)))))))
+
+(define (normalize-string s)
   (list->string
-   (reverse
-    (trim-leading-whitespace
-     (reverse
-      (trim-leading-whitespace
-       (string->list s)))))))
-;(define (trim-string s)
-;  (let* ((cl (string->list s))
-;	 (rl (reverse (trim-leading-whitespace cl))))
-;    (list->string (reverse (trim-leading-whitespace rl)))))
+   (*normalize-character-list* (string->list s) #f #f)))
 
 ;; Shorthand: return trimmed data, or false if argument is false
-;; (ie, don't just fail in this second case)
+;; (ie, don't just fail in this second case).  This would be better called
+;; (normalize-data), but it isn't.
 (define (trim-data nd)
   (if nd
-      (trim-string (data nd))
+      (normalize-string (data nd))
       #f))
 
-;; Normalise a list of characters by replacing non-space whitespace by
-;; space.
-(define (normalise-character-list cl)
-   (let loop ((l cl) (result '()))
-     (if (null? l)
-	 result
-	 (let* ((fc (car l))
-		(replacement (cond ((equal? fc #\&#TAB) #\space)
-				   ((equal? fc #\&#RE)  #\space)
-				   (else fc))))
-	   (loop (cdr l) (append result (list replacement)))))))
-
-(define (normalise-string s)
-  (list->string
-   (normalise-character-list
-    (reverse
-     (trim-leading-whitespace
-      (reverse
-       (trim-leading-whitespace
-	(string->list s))))))))
-;(define (normalise-string s)
-;  (let* ((cl (string->list s))
-;	 (rl (reverse (trim-leading-whitespace cl)))
-;	 (rrl (reverse (trim-leading-whitespace rl))))
-;    (list->string (normalise-character-list rrl))))
 
 <routine>
 <routinename>index-file-name
@@ -1815,11 +1791,11 @@ there is no `media' attribute, return <code>#f</>.
   (let ((medstr (attribute-string (normalize "media") nd)))
     (if medstr
 	(map (lambda (s)
-	       (let ((l (tokenise-string (trim-string s) max: 1)))
+	       (let ((l (tokenise-string (normalize-string s) max: 1)))
 		 (cons (car l) (if (> (length l) 1)
 				   (cadr l)
 				   #f))))
-	     (tokenise-string (normalise-string medstr)
+	     (tokenise-string (normalize-string medstr)
 			      boundary-char?: (lambda (c) (char=? c #\,))))
 	#f)))
 
