@@ -6,7 +6,7 @@ prologues := 1;
 defaultfont := "rptmr";
 
 u := 1.5cm;
-vu := 16pt;  % vertical unit
+vu := 32pt;  % vertical unit
 
 def starttool(expr toolname) =
   z0 = (0,0);
@@ -98,4 +98,46 @@ beginfig(4);
   label.rt("...others...", z0o);
 endfig;
 
+% see metapost manual, example 52
+vardef cuta(suffix a,b) expr p =
+  drawarrow p cutbefore bpath.a cutafter bpath.b;
+  point .5*length p of p
+enddef;
+
+beginfig(5);
+  numeric hsep, vsep;
+  vsep = 2cm;
+
+  y1 = y2 = (y3+y4)/2;
+  y3-y4 = y5-y6 = vsep;
+  y4 = (y5+y6)/2;
+  x2-x1 = x4-x2 = x6-x4 = hsep;
+  x3 = x4;
+  x5 = x6;
+  x6-x1 = 10cm;                 % specifies hsep
+
+  boxit.a("c:r:a");
+  boxit.b("c:r+1:a");
+  boxit.c("c+1:0:a+1");
+  boxit.d("c+1:0:0");
+
+  circleit.qa("i/f unchanged?");  qa.dx=qa.dy;
+  circleit.qb("i/f compatible?"); qb.dx=qb.dy;
+
+  a.c = z1;
+  qa.c = z2;
+  b.c = z3;
+  qb.c = z4;
+  c.c = z5;
+  d.c = z6;
+
+  drawboxed(a,b,c,d,qa,qb);
+
+  drawarrow a.c..qa.c cutbefore bpath.a cutafter bpath.qa;
+  label.top("yes", cuta(qa,b)  qa.c..b.c);
+  label.bot("no",  cuta(qa,qb) qa.c..qb.c);
+  label.top("yes", cuta(qb,c)  qb.c..c.c);
+  label.bot("no",  cuta(qb,d)  qb.c..d.c);
+endfig;
+    
 end
