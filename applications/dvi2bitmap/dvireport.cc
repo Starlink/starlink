@@ -213,7 +213,9 @@ int main (int argc, char **argv)
 	    } else if (DviFileSpecial *special
 		       = dynamic_cast<DviFileSpecial*>(ev)) {
 		if (show_features.test(feature_specials)) {
-		    cout << "s " << special->specialString << endl;
+		    cout << "s \"" << special->specialString << "\"";
+                    show_position(dvi, unitlist);
+                    cout << endl;
 		}
 
 	    } else if (DviFilePostamble *post
