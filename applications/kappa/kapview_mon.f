@@ -185,6 +185,10 @@
          ELSE IF ( NAME .EQ. 'LUTABLE' ) THEN
             CALL LUTABLE ( STATUS )
 
+*  Edit or create a colour table for an image-display device in an NDF.
+         ELSE IF ( NAME .EQ. 'LUTEDIT' ) THEN
+            CALL LUTEDIT ( STATUS )
+
 *  Saves the current colour table of an image-display device in an NDF.
          ELSE IF ( NAME .EQ. 'LUTSAVE' ) THEN
             CALL LUTSAVE ( STATUS )
