@@ -448,8 +448,8 @@
 
 *  Cancel the previous values of NEWVAL and INDEX for the loop.
             ELSE IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
-               CALL PAR_CANCL( 'INDEX', STATUS )
-               CALL PAR_CANCL( 'NEWVAL', STATUS )
+               CALL NDG_CANCL( 'INDEX', STATUS )
+               CALL NDG_CANCL( 'NEWVAL', STATUS )
             END IF
 
 *  End of the do-while loop for the elements.

@@ -285,7 +285,7 @@
 
 *  Cancel the parameter if looping.
                IF ( LOOP .AND. STATUS .EQ. SAI__OK ) THEN
-                  CALL PAR_CANCL( 'COMMENT', STATUS )
+                  CALL NDG_CANCL( 'COMMENT', STATUS )
 
 *  Increment the number of lines in the paragraph.
                   PLINES = PLINES + 1

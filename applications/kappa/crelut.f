@@ -1927,7 +1927,7 @@
      :            CDIMS( 1 )
          CALL PAR_GDR0I( 'PALNUM', DEFPNM, CDIMS( 1 ), NBLOCK - 1,
      :                   .FALSE., PALNUM, STATUS )
-         CALL PAR_CANCL( 'PALNUM', STATUS )
+         CALL NDG_CANCL( 'PALNUM', STATUS )
 
 *       Inquire the current seetings in case the user just wishes to
 *       tweak the colour slightly.
@@ -1945,7 +1945,7 @@
 *       Get one colour for the palette number.
 
          CALL KPG1_GPCOL( 'COLOUR', GKSCOL, STATUS )
-         CALL PAR_CANCL( 'COLOUR', STATUS )
+         CALL NDG_CANCL( 'COLOUR', STATUS )
       
 *       If the colour is alright then try it out, and see if it is
 *       to be kept, otherwise leave the loop.
@@ -1991,7 +1991,7 @@
 
 *          Annul parameter OK.
 
-            CALL PAR_CANCL( 'OK', STATUS )
+            CALL NDG_CANCL( 'OK', STATUS )
 
 *          If the colour is liked then save it.
 
@@ -2103,7 +2103,7 @@
 
             CALL PAR_GDRVD( 'VALRANGE', 2, DBLE( PVLO ),
      :                      DBLE( PVHI ), VALRNG, NVAL, STATUS )
-            CALL PAR_CANCL( 'VALRANGE', STATUS )
+            CALL NDG_CANCL( 'VALRANGE', STATUS )
 
 *          Convert the data-value range to a pen range.
 
@@ -2122,7 +2122,7 @@
             CALL PAR_GDRVI( 'PENRANGE', 2, 0, ANINTS-1, PENRNG, NVAL,
      :                      STATUS )
             IF ( NVAL .EQ. 1 ) PENRNG( 2 ) = PENRNG( 1 )
-            CALL PAR_CANCL( 'PENRANGE', STATUS )
+            CALL NDG_CANCL( 'PENRANGE', STATUS )
          END IF
 
 *       Get a range of palette colours.  However, a single value may
@@ -2139,7 +2139,7 @@
 
 *       Cancel the parameter to enable further values to be obtained.
 
-         CALL PAR_CANCL( 'COLRANGE', STATUS )
+         CALL NDG_CANCL( 'COLRANGE', STATUS )
 
 *       Provided there was no error in the input, the lookup table is
 *       updated.

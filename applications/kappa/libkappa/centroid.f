@@ -319,9 +319,6 @@
 *        Report an error if an even value is supplied for SEARCH.
 *     25-JUN-1999 (DSB):
 *        Many major changes to make use of AST/PGPLOT.
-*     25-AUG-1999 (DSB):
-*        Changed calls to PAR_STATE to NDG_STATE to allow for multiple
-*        invocation of the application to process a list of NDFs.
 *     {enter_further_changes_here}
 
 *  Bugs:

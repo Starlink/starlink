@@ -684,8 +684,8 @@
 
 *  Cancel the parameters for the loop.
             IF ( LOOP ) THEN
-               CALL PAR_CANCL( 'SHADE', STATUS )
-               CALL PAR_CANCL( 'PERCENTILES', STATUS )
+               CALL NDG_CANCL( 'SHADE', STATUS )
+               CALL NDG_CANCL( 'PERCENTILES', STATUS )
             END IF
 
 *  Create and map workspace arrays.
@@ -877,7 +877,7 @@
 *  there is no parameter to cancel.  Use a new error context to store
 *  and purge any error that arises.
                   CALL ERR_MARK
-                  CALL PAR_CANCL( 'LUT', STATUS )
+                  CALL NDG_CANCL( 'LUT', STATUS )
                   IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
                   CALL ERR_RLSE
                END IF
@@ -922,7 +922,7 @@
 
 *  We are not looping so tidy up and abort.  We do not want to record
 *  this LUT in the parameter system.  This is taken care of by the bad
-*  status rather than an explicit PAR_CANCL call.
+*  status rather than an explicit NDG_CANCL call.
                   ELSE
                      CALL NDF_VALID( NDFL, VALID, STATUS )
                      IF ( VALID ) CALL NDF_ANNUL( NDFL, STATUS )
@@ -978,8 +978,8 @@
 
 *  Cancel the parameters if there is a loop.
          IF ( LOOP ) THEN
-            CALL PAR_CANCL( 'MAPPING', STATUS )
-            CALL PAR_CANCL( 'COLTAB', STATUS )
+            CALL NDG_CANCL( 'MAPPING', STATUS )
+            CALL NDG_CANCL( 'COLTAB', STATUS )
          END IF
 
 *  End of the cycle to adjust lookup table and mapping.
