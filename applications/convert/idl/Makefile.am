@@ -37,7 +37,7 @@ ENTRY_PREFIX=
 getdlname = grep 'dlname=' convert_idl.la | sed -e 's:dlname=::' -e s:\'::g
 
 edit = sed \
-        -e 's,@bindir\@,$(bindir),g' \
+        -e 's,@libdir\@,$(libdir),g' \
         -e "s,@DLNAME\@,$$DLNAME,g" \
 	-e 's,@ENTRY_PREFIX\@,$(ENTRY_PREFIX),g'
 

@@ -2,10 +2,10 @@
 
 SUBDIRS = @subdirs@
 
-## We need the internal Figaro libraries. These are not currently available so
-## this is a terrible hack. Ideally all packages should probably put their
-## useful libraries in libpkgdir
-FIGLIBS = ../figaro/dta/libdta.la ../figaro/ich/libich.la
+## We need the internal Figaro libraries. These are not currently generally
+## available so this separation is a reminder this dependency will generally
+## fail. 
+FIGLIBS = -ldta -lich
 
 ## The IRAF libraries are platform dependent, so we must be prepared to deal
 ## with their absence.
@@ -40,6 +40,7 @@ HELP_FILES = convert.hlp
 
 edit = sed \
         -e 's,@bindir\@,$(bindir),g' \
+        -e 's,@STARLINK\@,$(STARLINK),g' \
         -e 's,@PPMTOGIF\@,$(PPMTOGIF),g' \
         -e 's,@GIFTOPNM\@,$(GIFTOPNM),g' \
         -e 's,@PPMTOPGM\@,$(PPMTOPGM),g' \

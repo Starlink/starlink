@@ -62,8 +62,14 @@
 { Define environment variables.
 {
 { The actual INSTALL_[BIN/HELP] directories get inserted at install time.
-setenv CONVERT_DIR INSTALL_BIN
-setenv CONVERT_HELP INSTALL_HELP/convert
+if getenv("CONVERT_DIR") <> ""
+   echo "You have not define the environment variable CONVERT_DIR."
+   echo "You should do this by sourcing the Starlink initialisation scripts:"
+   echo "   @STARLINK@/etc/login"
+   echo "and"
+   echo "   @STARLINK@/etc/cshrc"
+   exit
+endif
 
 { Define the CONVERT commands.
 { ============================

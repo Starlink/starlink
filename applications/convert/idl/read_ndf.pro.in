@@ -90,7 +90,7 @@
 ;;	CALL_EXTERNAL function. These are edited in when during make.
 
         ENTRY_PREFIX = '@ENTRY_PREFIX@'
-        LIB_NAME = '@bindir@/@DLNAME@'
+        LIB_NAME = '@libdir@/@DLNAME@'
 
 ;;	Ensure that the library file exists
 	DUM = findfile(LIB_NAME, COUNT=CNT)

@@ -79,16 +79,21 @@ else
       mkdir $HOME/adam
    endif
 endif
+
 #
-#  Define environment variables.
-#  =============================
+#  Define symbols for the applications. Relies on CONVERT_DIR which is defined
+#  by the init package.
+#  ===========================================================================
 #
-setenv CONVERT_DIR INSTALL_BIN
-setenv CONVERT_HELP INSTALL_HELP/convert
-#
-#  Define symbols for the applications.
-#  ====================================
-#
+if ( ! $?CONVERT_DIR ) then
+   echo "You have not define the environment variable CONVERT_DIR."
+   echo "You should do this by sourcing the Starlink initialisation scripts:"
+   echo "   @STARLINK@/etc/login"
+   echo "and"
+   echo "   @STARLINK@/etc/cshrc"
+   exit
+endif
+
 alias ascii2ndf  $CONVERT_DIR/ascii2ndf
 alias ast2ndf    $CONVERT_DIR/ast2ndf
 alias conhelp    $CONVERT_DIR/conhelp
