@@ -156,6 +156,9 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.25  2005/03/18 06:27:33  timj
+*     initialise some variables
+*
 *     Revision 1.24  2004/11/18 20:37:14  timj
 *     initialise some more pointers
 *
@@ -447,6 +450,11 @@
       QUALITY_END = 0
       FILE_DATA_PTR = 0
       FILE_VARIANCE_PTR = 0
+      IN_RA1_PTR = 0
+      IN_RA2_PTR = 0
+      IN_DEC1_PTR = 0
+      IN_DEC2_PTR = 0
+
       
 *     get some general descriptive parameters of the observation
 
@@ -528,6 +536,8 @@
 
 *     check that the history of the file is OK
 
+      RESTORE = .FALSE.
+
       IF (STATUS .EQ. SAI__OK) THEN
          CALL NDF_HNREC (IN_NDF, NREC, STATUS)
          IF (STATUS .NE. SAI__OK) THEN
@@ -539,7 +549,6 @@
          EXTINCTION = .FALSE.
          FLATFIELD = .FALSE.
          REBIN = .FALSE.
-         RESTORE = .FALSE.
 
          IF (NREC .GT. 0) THEN
             DO I = 1, NREC
