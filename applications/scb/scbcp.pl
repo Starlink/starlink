@@ -11,7 +11,7 @@
 #     Perl 5
 
 #  Invocation:
-#     scbcp.pl $dir1 $dir2
+#     scbcp.pl dir1 dir2
 
 #  Description:
 #     This utility copies all the index files used by the SCB package
@@ -29,13 +29,15 @@
 #     sparse can be determined by comparing the output of 'ls -l' and 
 #     'ls -s'.
 #
+#     During operation, the utility reports the copies being carried out.
+#
 #     This utility is not required for normal operation of the package,
 #     it is provided for optional use.
 
 #  Arguments:
-#     $dir1
+#     dir1
 #        Source directory containing SCB indices.
-#     $dir2
+#     dir2
 #        Target directory into which SCB indices are to be copied.
 
 #  Notes:
