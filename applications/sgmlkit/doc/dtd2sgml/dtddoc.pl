@@ -14,13 +14,15 @@
 #     This takes email messages on stdin, and writes them out as a
 #     fragment of XML, corresponding to the `commentary' part of the
 #     dtddescription DTD.  It expects to receive mail addressed to
-#     something like `prefix+docxref@...', possibly more than one,
+#     something like `addressprefix+suffix@...', possibly more than one,
 #     possibly mixed in with an arbitrary number of other addresses.
-#     It takes such mail, and appends it to a file `prefix/docxref' in
+#
+#     The script appends the fragments to files `addressprefix/suffix' in
 #     the target directory.
 #
 #  Arguments:
-#     addressprefix (required): Prefix to be stripped from target addresses.
+#     addressprefix (required): Prefix to be recognised in, and
+#     stripped from, target addresses.
 #
 #  Authors:
 #     NG: Norman Gray (Starlink, Glasgow)
@@ -38,7 +40,9 @@
 
 $#ARGV == 0 || die "Usage: $0 addressprefix\n";
 
-$addressroot = shift (@ARGV);
+$addressprefix = shift (@ARGV);
+
+$debug = 0;
 
 @otherheader = ();
 @othervalue = ();
@@ -100,7 +104,7 @@ while (<>) {
 	# A further message: process the current one and reinitialise
 	if (/^From /) {
 	    # beginning of the next message -- process the body and reset
-	    process_body (\@body);
+	    process_body();
 	    
 	    @otherheader = ();
 	    @othervalue = ();
@@ -114,19 +118,21 @@ while (<>) {
     }
 }
 
-process_body (\@body);
+process_body ();
 
 exit 0;
 
 
 sub process_body {
 
-    # gobble the rest of the message body, and escape problematic characters
-    $bodyref = $_[0];
-    foreach $line (@$bodyref) {
-	$line =~ s/&/&amp;/g;
-	$line =~ s/</&lt;/g;
-    }
+    # process the message body, and escape problematic characters
+    $bodytext = join ('',@body);
+    $bodytext =~ s/&/&amp;/g;
+    $bodytext =~ s/</&lt;/g;
+    $bodytext =~ s/>/&gt;/g;
+
+    # Pick out URLs in the body text
+    $bodytext =~ s=(http://\S+)=<url>$1</url>=g;
 
     # Now go through the list of destination addresses, extracting
     # addresses in any of the forms `address', `"name" address', and `name
@@ -143,53 +149,55 @@ sub process_body {
 	} else {
 	    $targetaddr = $addr;
 	}
-	if ($targetaddr =~ /^$addressroot\+([a-zA-Z0-9-]+)@/) {
+	if ($targetaddr =~ /^$addressprefix\+([a-zA-Z0-9-]+)@/) {
 	    push (@destfiles, "$1");
-	} elsif ($targetaddr =~ /^$addressroot/) {
+	} elsif ($targetaddr =~ /^$addressprefix/) {
 	    push (@destfiles, "general-comments");
 	}
-	#print "addr=$addr --> $targetaddr\n";
+	print "addr=$addr --> $targetaddr\n" if $debug;
     }
     if ($#destfiles < 0) {
 	# Can't think of where else to put it: just bung it in general-comments
 	push (@destfiles, "general-comments");
     }
-    #print "destfiles=@destfiles\n";
+    print "destfiles=@destfiles\n" if $debug;
 
     # Make the destination directory, if it doesn't already exist
     # Remember that this script will generally be run as the mail user,
     # which will probably _not_ have permission to create files in
     # the target directory.  This might very well fail, therefore, unless
     # the directory is created appropriately beforehand.
-    (-d "$dir/$addressroot") ||
-	mkdir ("$dir/$addressroot", 0755) ||
-	    die "Can't create directory $addressroot\n";
+    (-d "$dir/$addressprefix") ||
+	mkdir ("$dir/$addressprefix", 0755) ||
+	    die "Can't create directory $addressprefix\n";
 
     # Dump the headers and body to each of the files in the array @destfiles
     while ($#destfiles >= 0) {
 	$destfile = shift (@destfiles);
-	$destfilename = "$dir/$addressroot/$destfile";
-	#print "destfilename=$destfilename\n";
+	$destfilename = "$dir/$addressprefix/$destfile";
+	print "destfilename=$destfilename\n" if $debug;
 	open (OP, ">>$destfilename") || die "Can't open $destfilename";
 
 	print OP "<commentary>\n";
 	print OP "<from>$from</from>\n" if (defined($from));
 	print OP "<email>$email</email>\n" if (defined($email));
 	print OP "<date>$date</date>\n" if (defined($date));
+	$subject =~ s/&/&amp;/g;
+	$subject =~ s/</&lt;/g;
+	$subject =~ s/>/&gt;/g;
 	print OP "<subject>$subject</subject>\n" if (defined ($subject));
 	while ($#otherheader >= 0) {
 	    $t = shift (@othervalue);
 	    $t =~ s/&/&amp;/g;
 	    $t =~ s/</&lt;/g;
+	    $t =~ s/>/&gt;/g;
 	    print OP "<otherheader name='",
 	    shift (@otherheader), "'>$t</otherheader>\n";
 	}
-	print OP "<body>\n";
-	print OP @$bodyref;
-	print OP "</body>\n</commentary>\n";
+
+	print OP "<body>\n$bodytext\n</body>\n</commentary>\n";
 	
 	close OP;
-	#chmod (0666, "$destfilename");
     }
 }
 
