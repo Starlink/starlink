@@ -65,6 +65,10 @@
 *  History:
 *     19-AUG-1998 (DSB):
 *        Original version.
+*     25-JUN-1999 (DSB):
+*        Increase the accuracy of the formatted default value so that
+*        it accurately represents the supplied default values. Normalize
+*        the supplied default position. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,6 +85,7 @@
       INCLUDE 'AST_ERR'          ! AST error constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
@@ -105,9 +110,13 @@
       CHARACTER FMT*100          ! List of axis format strings
       CHARACTER LAB( NDF__MXDIM )*30 ! Axis labels
       CHARACTER NEXT*1           ! Next character to be read
+      CHARACTER OLDFMT( NDF__MXDIM )*100 ! Original Format strings
       CHARACTER POS*255          ! Position string
       CHARACTER SYM( NDF__MXDIM )*10 ! Axis symbols
+      DOUBLE PRECISION TEST      ! Result of unformatting default string
       INTEGER BASFRM             ! Pointer to the Base Frame
+      INTEGER CURFRM             ! Pointer to the Current Frame
+      INTEGER DIGS               ! Frame Digits value to be used
       INTEGER F                  ! Index of first non-blank character
       INTEGER FIAT               ! No. of characters in string FMT
       INTEGER I                  ! Axis index
@@ -119,6 +128,7 @@
       INTEGER NBAXES             ! No. of axes in base Frame
       INTEGER NC                 ! No. of characters read from string
       INTEGER NCAXES             ! No. of axes in current Frame
+      INTEGER OLDDIG             ! Original Frame Digits value
       LOGICAL GOOD               ! Is position good?
       LOGICAL GOTFS              ! Was a FrameSet supplied?
       LOGICAL LOOP               ! Get a new parameter value?
@@ -131,9 +141,11 @@
 *  See if a FrameSet has been supplied.
       GOTFS = AST_ISAFRAMESET( IWCS, STATUS )
 
-*  If so, get a pointer to the Base Frame, and get the number of axes in
-*  the Base Frame. Also get a simplified Mapping for the FrameSet.
+*  If so, get a pointer to the Current and Base Frames, and get the 
+*  number of axes in the Base Frame. Also get a simplified Mapping for 
+*  the FrameSet.
       IF( GOTFS ) THEN
+         CURFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )         
          BASFRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )         
          NBAXES = AST_GETI( BASFRM, 'NAXES', STATUS )
          CALL AST_ANNUL( BASFRM, STATUS )
@@ -141,10 +153,14 @@
          MAP = AST_GETMAPPING( IWCS, AST__BASE, AST__CURRENT, STATUS )
          MAP = AST_SIMPLIFY( MAP, STATUS )
 
+*  If a Frame was supplied, use a clone of the Frame as the "Current
+*  Frame".
+      ELSE
+         CURFRM = AST_CLONE( IWCS, STATUS )
       END IF
 
 *  Get the number of axes in the Current Frame.
-      NCAXES = AST_GETI( IWCS, 'NAXES', STATUS )
+      NCAXES = AST_GETI( CURFRM, 'NAXES', STATUS )
 
 *  See if a good position has been supplied in CC. At the same time,
 *  save the axis labels and symbols for use in messages. Also, form a comma
@@ -162,7 +178,7 @@
          IAT = 6
          CALL CHR_PUTI( I, ATT, IAT )
          CALL CHR_APPND( ')', ATT, IAT )
-         LAB( I ) = AST_GETC( IWCS, ATT( : IAT ), STATUS )
+         LAB( I ) = AST_GETC( CURFRM, ATT( : IAT ), STATUS )
          CALL CHR_LCASE( LAB( I ) )
          CALL KPG1_PGESC( LAB( I ), STATUS )
 
@@ -170,7 +186,7 @@
          IAT = 7
          CALL CHR_PUTI( I, ATT, IAT )
          CALL CHR_APPND( ')', ATT, IAT )
-         SYM( I ) = AST_GETC( IWCS, ATT( : IAT ), STATUS )
+         SYM( I ) = AST_GETC( CURFRM, ATT( : IAT ), STATUS )
          CALL KPG1_PGESC( SYM( I ), STATUS )
          IF( SYM( I ) .EQ. ' ' ) SYMOK = .FALSE.
 
@@ -180,7 +196,7 @@
          IAT = 7
          CALL CHR_PUTI( I, ATT, IAT )
          CALL CHR_APPND( ')', ATT, IAT )
-         CALL CHR_APPND( AST_GETC( IWCS, ATT( : IAT ), STATUS ), FMT, 
+         CALL CHR_APPND( AST_GETC( CURFRM, ATT( : IAT ), STATUS ), FMT, 
      :                   FIAT )
 
       END DO
@@ -189,18 +205,105 @@
 *  default for the parameter.
       IF( GOOD ) THEN
 
+*  Normalize it.
+         CALL AST_NORM( CURFRM, CC, STATUS )
+
+*  Temporarily clear any Digits attributes for the current Frame. Save 
+*  any set value so that it can be re-instated later.
+         IF( AST_TEST( CURFRM, 'DIGITS', STATUS ) ) THEN
+            OLDDIG = AST_GETI( CURFRM, 'DIGITS', STATUS )
+            CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
+         ELSE
+            OLDDIG = -1
+         END IF
+
+*  Temporarily clear any Format attributes for the Axes within the 
+*  current Frame. Save any set values so that they can be re-instated 
+*  later.
+         DO I = 1, NCAXES
+
+            ATT = 'FORMAT('
+            IAT = 7
+            CALL CHR_PUTI( I, ATT, IAT )
+            CALL CHR_APPND( ')', ATT, IAT )
+
+            IF( AST_TEST( CURFRM, ATT, STATUS ) ) THEN
+               OLDFMT( I ) = AST_GETC( CURFRM, ATT, STATUS )
+               CALL AST_CLEAR( CURFRM, ATT, STATUS )
+            ELSE
+               OLDFMT( I ) = ' '
+            END IF
+
+         END DO
+
+*  Loop round increasing Digits until the supplied default values can
+*  be formatted and unformatted with no significant change in value.
+         DIGS = 4
+         LOOP = .TRUE.
+         DO WHILE( LOOP .AND. STATUS .EQ. SAI__OK )
+
+*  Set the current Digits value.
+            CALL AST_SETI( CURFRM, 'DIGITS', DIGS, STATUS )
+
+*  Assume the current Digits value is OK.
+            LOOP = .FALSE.
+
+*  Check each axis.
+            DO I = 1, NCAXES
+
+*  Format this axis value.
+               POS = AST_FORMAT( CURFRM, I, CC( I ), STATUS )
+
+*  Unformat it.
+               NC = AST_UNFORMAT( CURFRM, I, POS, TEST, STATUS ) 
+
+*  If the recovered value is significantly different to the supplied value,
+*  increase Digits and break out of the loop to try again.
+               IF( ABS( CC( I ) - TEST ) .GT. 
+     :             ABS( 10000.0*VAL__EPSD*CC( I ) ) ) THEN
+                  DIGS = DIGS + 1
+                  LOOP = .TRUE.             
+                  GO TO 10                                 
+               END IF
+
+            END DO
+
+ 10         CONTINUE
+
+         END DO
+
 *  Construct a string holding the default position (a comma separated
-*  list of formatted axis values).
-         POS = AST_FORMAT( IWCS, 1, CC( 1 ), STATUS )
+*  list of formatted axis values) using the Digits value set above.
+         POS = AST_FORMAT( CURFRM, 1, CC( 1 ), STATUS )
          IAT = CHR_LEN( POS )
          DO I = 2, NCAXES
             IAT = IAT + 1
-            CALL CHR_APPND( AST_FORMAT( IWCS, I, CC( I ), STATUS ),
+            CALL CHR_APPND( AST_FORMAT( CURFRM, I, CC( I ), STATUS ),
      :                      POS, IAT )
          END DO
 
 *  Use this string as the dynamic default for the parameter.
          CALL PAR_DEF0C( PARAM, POS, STATUS )
+
+*  Clear the Digits value.
+         CALL AST_CLEAR( CURFRM, 'DIGITS', STATUS )
+
+*  Re-instate any previous Digits value.
+         IF( OLDDIG .NE. -1 ) CALL AST_SETI( CURFRM, 'DIGITS', OLDDIG, 
+     :                                       STATUS )
+
+*  Re-instate any previous Format values. Do each axis in turn.
+         DO I = 1, NCAXES
+            IF( OLDFMT( I ) .NE. ' ' ) THEN
+
+               ATT = 'FORMAT('
+               IAT = 7
+               CALL CHR_PUTI( I, ATT, IAT )
+               CALL CHR_APPND( ')', ATT, IAT )
+
+               CALL AST_SETC( CURFRM, ATT, OLDFMT( I ), STATUS )
+            END IF
+         END DO
 
 *  Otherwise, use PAR_UNSET to ensure any previous dynamic default is 
 *  cancelled.
@@ -209,7 +312,7 @@
       END IF
 
 *  Note the Domain of the Current Frame for use in messages.
-      DOM = AST_GETC( IWCS, 'DOMAIN', STATUS )
+      DOM = AST_GETC( CURFRM, 'DOMAIN', STATUS )
 
 *  Loop until a valid position has been obtained from the user, or an 
 *  error occurs.
@@ -232,7 +335,7 @@
 *  Otherwise, if the supplied string is just a colon, display a description 
 *  of the Current Frame, and the default format.
          ELSE IF( POS( F : L ) .EQ. ':' ) THEN
-            CALL KPG1_DSFRM( IWCS, 'A position is required in the '//
+            CALL KPG1_DSFRM( CURFRM, 'A position is required in the '//
      :                       'following co-ordinate frame:', STATUS )
 
             CALL MSG_SETC( 'FMT', FMT )
@@ -272,7 +375,7 @@
 *  Read the value for the next axis. NC is the number of characters#
 *  read by AST_UNFORMAT including trailing spaces.
                I = I + 1
-               NC = AST_UNFORMAT( IWCS, I, POS( IPOS:IEND ), CC( I ), 
+               NC = AST_UNFORMAT( CURFRM, I, POS( IPOS:IEND ), CC( I ), 
      :                            STATUS ) 
 
 *  Get the last character read by AST_UNFORMAT. If there are no characters 
@@ -420,6 +523,9 @@
          END IF
 
       END DO
+
+*  Annul the pointer to the current Frame.
+      CALL AST_ANNUL( CURFRM, STATUS )
 
 *  If an error has occurred, return AST__BAD values.
       IF( STATUS .NE. SAI__OK ) THEN
