@@ -197,6 +197,7 @@
       INTEGER          I                ! DO loop variable
       INTEGER          ID               ! day of observation
       INTEGER          IEND             ! index of end of sub-string
+      INTEGER          IERR             ! Pos of errors in VEC copt
       INTEGER          IHOUR            ! hour in which observation started
       INTEGER          IM               ! month of observation
       INTEGER          IMIN             ! minute in which observation started
@@ -278,6 +279,7 @@
                                         ! was at LAT2,LONG2 for PLANET centre
                                         ! coordinate system
       INTEGER          NDIM             ! the number of dimensions in an array
+      INTEGER          NERR             ! number of errors in VEC copy
       INTEGER          NINTS            ! Number of whole ints (+1 if abort)
       INTEGER          NJIGGLE          ! Number of jiggles in an aborted int
       INTEGER          NREC             ! number of history records in file
@@ -1376,8 +1378,9 @@
                      DATA_OFFSET = (((MEASUREMENT-1) * N_INTEGRATIONS +
      :                 INTEGRATION - 1) * N_EXPOSURES + 
      :                 EXPOSURE - 1) * N_SWITCHES + I - 1
-                     CALL SCULIB_COPYD (1, %val(IN_LST_STRT_PTR +
-     :                 DATA_OFFSET * VAL__NBD), DTEMP)
+                     CALL VEC_DTOD(.FALSE., 1,
+     :                    %val(IN_LST_STRT_PTR + DATA_OFFSET *VAL__NBD),
+     :                    DTEMP, IERR, NERR, STATUS)
                      EXP_LST = EXP_LST + DTEMP
                   END DO
                   EXP_LST = EXP_LST / DBLE (N_SWITCHES)
@@ -1385,14 +1388,18 @@
 *  get the scan parameters for a raster map
 
                   IF (SAMPLE_MODE .EQ. 'RASTER') THEN
-                     CALL SCULIB_COPYR (1, %val(IN_RA1_PTR +
-     :                 DATA_OFFSET * VAL__NBR), RA_START)
-                     CALL SCULIB_COPYR (1, %val(IN_RA2_PTR +
-     :                 DATA_OFFSET * VAL__NBR), RA_END)
-                     CALL SCULIB_COPYR (1, %val(IN_DEC1_PTR +
-     :                 DATA_OFFSET * VAL__NBR), DEC_START)
-                     CALL SCULIB_COPYR (1, %val(IN_DEC2_PTR +
-     :                 DATA_OFFSET * VAL__NBR), DEC_END)
+                     CALL VEC_RTOR (.FALSE., 1, %val(IN_RA1_PTR +
+     :                    DATA_OFFSET * VAL__NBR), RA_START,
+     :                    IERR, NERR, STATUS)
+                     CALL VEC_RTOR (.FALSE., 1, %val(IN_RA2_PTR +
+     :                    DATA_OFFSET * VAL__NBR), RA_END,
+     :                    IERR, NERR, STATUS)
+                     CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC1_PTR +
+     :                    DATA_OFFSET * VAL__NBR), DEC_START,
+     :                    IERR, NERR, STATUS)
+                     CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC2_PTR +
+     :                    DATA_OFFSET * VAL__NBR), DEC_END,
+     :                    IERR, NERR, STATUS)
                   END IF
 
 *  find where the exposure starts and finishes in the data array
