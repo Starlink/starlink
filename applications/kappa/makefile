@@ -174,6 +174,16 @@
 #        trn
 #           Transform routines.
 #
+#  For use from IRAF CL, you will also need
+#        irafstar
+#           The IRAF/Starlink inter-operability infrastructure
+#        convert
+#           Conversion utilities
+#        startcl
+#           Starlink extensions to Tcl
+#        tclsys
+#           The Starlink distribution of Tcl.
+#
 #  Notes:
 #     This makefile uses the presence/absence of the hidden files
 #     .BUILT, .INSTALLED_$(SYSTEM) and .TESTED_$(SYSTEM) to record the
@@ -207,6 +217,11 @@
 #     1997 June 2 (MJC):
 #        V0.10 update.  No NAG.  Corrected some include-file dependencies.
 #        Changed mem2d linking to include uput and uget explicitly.
+#     1997 December 18 (AJC):
+#        Version 0.11 
+#        Add IRAF inter-operability
+#     1998 March 9 (AJC):
+#        Add links to lookup tables for IRAF
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -312,7 +327,13 @@ STAR_HELP = $(STARLINK)/help
 STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
 STAR_SHARE = $(STARLINK)/share
+STAR_IRAF = $(STARLINK)/iraf
 IRAS_LIB = $(STARLINK)/iras90
+
+#  Pathname of the directory containing the IRAF inter-operability
+#  infrastructure
+
+IRAFSTAR_BIN = $(STAR_IRAF)/irafstar
 
 #  Pathname of the root directory beneath which the built files for
 #  this package should be installed for use. This defaults to the
@@ -335,6 +356,10 @@ FFLAGS = -O
 #  Command for forming a link to a file.
 
 LINK = ln
+
+#  Operator for test if file is a symbolic link.
+
+LINK_TEST = -h
 
 #  Command for "randomizing" an object library.  The default acts as a
 #  null command.
@@ -385,7 +410,7 @@ PKG_LINK = :
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.10
+PKG_VERS = 0.11
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -395,7 +420,7 @@ PKG_VERS = 0.10
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
                aif_sub.tar fts_sub.tar irm_sub.tar kapgen_sub.tar \
                kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
-               ndfpack_sub.tar $(PKG_NAME)_ifls.tar \
+               ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                $(PKG_NAME)_data_alpha_OSF1.tar \
                $(PKG_NAME)_data_ix86_Linux.tar \
                $(PKG_NAME)_data_sun4_Solaris.tar
@@ -442,14 +467,14 @@ PRIVATE_INCLUDES = c1_com me_com irm_com ctm_com ctm_par fts_par \
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR AGI_ERR AST_PAR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
+EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
                     FIO_PAR GKS_PAR GNS_PAR GRP_PAR IDI_ERR IDI_PAR \
                     IRA_PAR MAG_ERR MSG_PAR NDF_ERR NDF_PAR NUM_CMN \
                     NUM_DEC NUM_DEC_CVT NUM_DEC_B NUM_DEC_D NUM_DEC_I \
                     NUM_DEC_R NUM_DEC_UB NUM_DEC_UW NUM_DEC_W \
                     NUM_DEF NUM_DEF_CVT NUM_DEF_B NUM_DEF_D NUM_DEF_I \
                     NUM_DEF_R NUM_DEF_UB NUM_DEF_UW NUM_DEF_W PAR_PAR \
-                    PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR 
+                    PAR_ERR PRM_PAR SUBPAR_PAR TRN_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -547,7 +572,7 @@ kpg1_ivci.f kpg1_iwcg.f kpg1_keyzo.f kpg1_kgodr.f kpg1_lasto.f \
 kpg1_lgtrn.f kpg1_listc.f kpg1_litnd.f kpg1_litnr.f \
 kpg1_litrd.f kpg1_litrr.f kpg1_lltrd.f kpg1_lltrr.f kpg1_loctb.f \
 kpg1_loctd.f kpg1_locti.f kpg1_loctr.f kpg1_loctub.f kpg1_loctuw.f \
-kpg1_loctw.f kpg1_ludcd.f kpg1_ludcr.f kpg1_lutin.f kpg1_gtcol.f \
+kpg1_loctw.f kpg1_ludcd.f kpg1_ludcr.f kpg1_lutin.f \
 kpg1_macol.f kpg1_mdetd.f kpg1_mdetr.f kpg1_meanb.f kpg1_meand.f \
 kpg1_meani.f kpg1_meanr.f kpg1_meanub.f kpg1_meanuw.f kpg1_meanw.f \
 kpg1_medub.f kpg1_medud.f \
@@ -805,12 +830,84 @@ ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf
 
 TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf
 
+##  Files required for the IRAF installation.
+
+#  IRAF package startup script
+
+IRAF_STARTUP = $(PKG_NAME).cl
+
+#  IRAF package parameter file
+
+IRAF_PKG_PAR = $(PKG_NAME).par
+
+#  IRAF tasks
+
+IRAF_PAR_FILES = $(KAPPA_F_ROUTINES:.f=.par) $(KAPVIEW_F_ROUTINES:.f=.par) \
+             $(NDFPACK_F_ROUTINES:.f=.par) $(MEM_F_ROUTINES:.f=.par)
+
+#  Name the ADAM executables to be run under IRAF
+#  This assumes there are no IRAF-specific versions of the executables
+
+IRAF_EXECUTABLES = $(MONO_SOURCE:.f=) $(MEM_F_ROUTINES:.f=)
+
+#  Name the ADAM interface files. We distinguish between those which
+#  can be links to the Starlink versions and those which are IRAF-
+#  special versions. The default assumes no IRAF-special versions.
+
+IRAF_IFC_LINKS = $(MONO_SOURCE:.f=.ifc) $(MEM_F_ROUTINES:.f=.ifc)
+
+#  Specify the IRAF-special source interface file names
+#  The install and deinstall targets assume names of the form
+#  <executable>_iraf.ifl where <executable> is the name of the 
+#  corresponding executable. This is required to distinguish
+#  them from the Starlink version <executable>.ifl.
+
+IRAF_IFL_FILES = 
+
+#  Derive the compiled interface file name
+
+IRAF_IFC_FILES = $(IRAF_IFL_FILES:.ifl=.ifc)
+
+#  IRAF output parameter files
+
+IRAF_OUTPAR_FILES = $(MONO_SOURCE:.f=.tcl) $(MEM_F_ROUTINES:.f=.tcl)
+
+#  IRAF Help files
+
+IRAF_HELP_FILES = _$(PKG_NAME).hd $(PKG_NAME).hd $(PKG_NAME).men \
+                  root.hd helpdb.mip doc
+
+#  Auxiliary CL scripts
+
+IRAF_AUX_SCRIPTS = fitsexist.cl fitsval.cl fitswrite.cl \
+                   lutbgyrw.cl lutcol.cl lutcont.cl lutfc.cl lutgrey.cl \
+                   lutheat.cl lutikon.cl lutneg.cl lutramps.cl lutread.cl \
+                   lutspec.cl lutzebra.cl \
+                   picbase.cl picdata.cl picframe.cl picgrid.cl piclast.cl \
+                   picxy.cl
+
+#  Parameter files for auxiliary scripts
+IRAF_AUX_PARFILES = fitsexist.par fitsval.par fitswrite.par \
+                    lutread.par \
+                    picgrid.par picxy.par
+
+#  Package demo under IRAF
+
+IRAF_DEMO = 
+
+#  Data file for IRAF demo
+
+IRAF_DATA = 
+
+## end of IRAF file definitions
+
 #  Lists of Latex and hypertext documents.
 
 LATEX_DOCS = sun95.tex \
              sun95_agi1.eps sun95_agi2.eps sun95_agi3.eps sun95_agi4.eps \
-             sun95_agi5.eps sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps
-HYPERTEXT_DOCS = sun95.htx
+             sun95_agi5.eps sun95_agi6.eps sun95_agi7.eps sun95_ardwork.eps \
+             sun221.tex
+HYPERTEXT_DOCS = sun95.htx sun221.htx
 
 #  List of documentation files.
 
@@ -838,7 +935,11 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) $(PKG_NAME).news
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
               $(MONOLITH) $(MONO_IFL) $(IFC_FILES) $(HELP_FILES) \
-              $(ICL_SCRIPT) $(STARTUP_SCRIPT) $(DATA_FILES)
+              $(ICL_SCRIPT) $(STARTUP_SCRIPT) $(DATA_FILES) \
+              $(IRAF_STARTUP) $(IRAF_PKG_PAR) $(IRAF_IFC_FILES) \
+              $(IRAF_OUTPAR_FILES) $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) \
+              $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
+              $(IRAF_DEMO) $(IRAF_DATA)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -852,7 +953,6 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
 #  Rules to set up links to locate each of the above include files.
 #
 AGI_ERR:     $(STAR_INC)/agi_err;     $(LINK) $? $@
-AST_PAR:     $(STAR_INC)/ast_par;     $(LINK) $? $@
 C1_COM:      c1_com;                  $(LINK) $? $@
 CHR_ERR:     $(STAR_INC)/chr_err;     $(LINK) $? $@
 CTM_COM:     ctm_com;                 $(LINK) $? $@
@@ -974,6 +1074,17 @@ $(PLATFORM_F) dummy_target1:
 	@ if test -f $@_$(SOURCE_VARIANT); then :;\
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
 	mv $@_$(SOURCE_VARIANT) $@
+
+## Rules for extracting IRAF package source files from the source archive.
+#  -r is used to test as some items are directories
+
+$(IRAF_STARTUP) $(IRAF_PKG_PAR) $(IRAF_IFL_FILES) $(IRAF_OUTPAR_FILES) \
+$(IRAF_PAR_FILES) $(IRAF_HELP_FILES) $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
+$(IRAF_DEMO) :
+	$(TAR_OUT) $(PKG_NAME)_iraf.tar $@
+	@ if test -r $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+## End of rules for extracting IRAF package source files
 
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
@@ -1151,11 +1262,13 @@ INSTALL_BIN = $(INSTALL)/bin/$(PKG_NAME)
 INSTALL_DATES = $(INSTALL)/dates
 INSTALL_DOCS = $(INSTALL)/docs
 INSTALL_HELP = $(INSTALL)/help/$(PKG_NAME)
+INSTALL_IRAF = $(INSTALL)/iraf/$(PKG_NAME)
 
 #  List of directories actually used for installation (selected from
 #  those above) and rules to create them.
 
-INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) $(INSTALL_HELP)
+INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_DATES) $(INSTALL_DOCS) \
+               $(INSTALL_HELP) $(INSTALL_IRAF)
 
 $(INSTALL_DIRS):
 	mkdir -p $@
@@ -1470,6 +1583,140 @@ install:
            chmod 755 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
         else :; fi
 #
+## Install IRAF bits
+#
+#  Install the links to Starlink executables
+#  Link to the installed file in INSTALL_BIN.
+	for f in $(IRAF_EXECUTABLES) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) $(INSTALL_BIN)/$$f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF .e files (links to the adaptor)
+#  Note that this step requires IRAFSTAR_BIN to be defined and contain the
+#  aitclsh program.
+	for f in $(IRAF_EXECUTABLES) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) $(IRAFSTAR_BIN)/aitclsh $(INSTALL_IRAF)/$$f.e;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF output parameter (.tcl) files
+	for f in $(IRAF_OUTPAR_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_IRAF);\
+              chmod 744 $(INSTALL_IRAF)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_IRAF)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF .par files giving them world read permission.
+	for f in $(IRAF_PAR_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_IRAF);\
+              chmod 744 $(INSTALL_IRAF)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_IRAF)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Note that some special applications have to be `renamed' to avoid C
+#  run-time library clashes.  To save listing the tasks more than once
+#  the same operation must be applied to their .par files too.
+	$(LINK) ./kap_div.par $(INSTALL_BIN)/div.par
+	$(LINK) ./kap_log10.par $(INSTALL_BIN)/log10.par
+	$(LINK) ./kap_pow.par $(INSTALL_BIN)/pow.par
+#
+#  Install the IRAF-special interface files giving them world read permission.
+#  Leave the original in position.
+	for f in $(IRAF_IFC_FILES) ""; do \
+           if test -n "$$f"; then \
+              g=`basename $$f _iraf.ifc`.ifc;\
+              cp -p $$f $(INSTALL_IRAF)/$$g;\
+              chmod 744 $(INSTALL_IRAF)/$$g;\
+           else :; fi;\
+        done
+#
+#  Install the interface file links for IRAF.
+#  Link to the installed file in INSTALL_BIN.
+	for f in $(IRAF_IFC_LINKS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) $(INSTALL_BIN)/$$f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF auxiliary scripts and associated .par files
+#  giving them world read permission.
+	for f in $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_IRAF);\
+              chmod 744 $(INSTALL_IRAF)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_IRAF)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Install the lookup table links links for IRAF.
+#  Link to the installed file in INSTALL_BIN.
+	for f in $(LUTS) ""; do \
+           if test -n "$$f"; then \
+              $(LINK) $(INSTALL_BIN)/$$f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF demo data files, giving them world read permission.
+	for f in $(IRAF_DATA) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_IRAF);\
+              chmod 744 $(INSTALL_IRAF)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_IRAF)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF demo scripts
+	for f in $(IRAF_DEMO) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_IRAF);\
+              chmod 744 $(INSTALL_IRAF)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_IRAF)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Install the IRAF help files, giving them world read permission
+	for f in $(IRAF_HELP_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p -r $$f $(INSTALL_IRAF);\
+              chmod 644 $(INSTALL_IRAF)/$$f;\
+              rm -f -r $$f;\
+              $(LINK) $(INSTALL_IRAF)/$$f $$f;\
+           else :; fi;\
+        done
+#  Note that doc is directory - wants execute permission too.
+	chmod 755 doc
+#
+#  Install the IRAF package startup script.  
+#  This is not modified as ADAM startup scripts are.
+	if test -n "$(IRAF_STARTUP)"; then \
+           cp -p $(IRAF_STARTUP) $(INSTALL_IRAF);\
+           chmod 744 $(INSTALL_IRAF)/$(IRAF_STARTUP);\
+           rm -f $(IRAF_STARTUP);\
+           $(LINK) $(INSTALL_IRAF)/$(IRAF_STARTUP) $(IRAF_STARTUP);\
+        else :; fi
+#
+#  Install the IRAF package parameter file. 
+#  The package version number may need editing into this.
+#  Leave the original file in place.
+	if test -n "$(IRAF_PKG_PAR)"; then \
+           sed -e s#PKG_VERS#$(PKG_VERS)# \
+              $(IRAF_PKG_PAR) >$(INSTALL_IRAF)/$(IRAF_PKG_PAR) ;\
+           chmod 644 $(INSTALL_IRAF)/$(IRAF_PKG_PAR) ;\
+        else :; fi
+## End of install IRAF bits
+#
 #  Install the Latex documentation, giving it world-read permission,
 #  leaving the source copy in place.
 	for f in $(LATEX_DOCS) ""; do \
@@ -1647,6 +1894,128 @@ do_deinstall:
            else :; fi ;\
            $(MAKE) $(ICL_SCRIPT);\
         else :; fi
+#
+## Deinstall IRAF bits
+#
+#  Deinstall the executable links, if installed versions exist
+	- for f in $(IRAF_EXECUTABLES) ""; do \
+           if test -n "$$f" -a $(LINK_TEST) $(INSTALL_IRAF)/$$f; then \
+              rm -f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF .e links, if installed versions exist
+	- for f in $(IRAF_EXECUTABLES) ""; do \
+           if test -n "$$f" -a $(LINK_TEST) $(INSTALL_IRAF)/$$f.e; then \
+              rm -f $(INSTALL_IRAF)/$$f.e;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF output parameter files if installed versions exist
+	- for f in $(IRAF_OUTPAR_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_IRAF)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_IRAF)/$$f .;\
+              rm -f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF .par files, if installed versions exist.
+	- for f in $(IRAF_PAR_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_IRAF)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_IRAF)/$$f .;\
+              rm -f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Remove the links to the .par files of applications whose name clashes 
+#  with the C run-time library.
+	-rm -f $(INSTALL_BIN)/div.par
+	-rm -f $(INSTALL_BIN)/log10.par
+	-rm -f $(INSTALL_BIN)/pow.par
+#
+#  Deinstall the IRAF-special interface files, if installed versions exist.
+	- for f in $(IRAF_IFC_FILES) ""; do \
+           g=`basename $$f _iraf.ifc`.ifc;\
+           if test -n "$$g" -a -f $(INSTALL_IRAF)/$$g; then \
+              rm -f $(INSTALL_IRAF)/$$g;\
+              $(MAKE) $$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the interface file links for IRAF, if installed versions exist
+	- for f in $(IRAF_IFC_LINKS) ""; do \
+           if test -n "$$f" -a $(LINK_TEST) $(INSTALL_IRAF)/$$f; then \
+              rm -f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF auxiliary scripts and associated .par files, if 
+#  installed versions exist.
+	- for f in $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_IRAF)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_IRAF)/$$f .;\
+              rm -f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF demo data files, if installed versions exist.
+	- for f in $(IRAF_DATA) ""; do \
+           if test -n "$$f" -a $(LINK_TEST) $(INSTALL_IRAF)/$$f; then \
+              rm -f -r $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF lookup table links if installed versions exist.
+	- for f in $(LUTS) ""; do \
+           if test -n "$$f" -a $(LINK_TEST) $(INSTALL_IRAF)/$$f; then \
+              rm -f -r $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF demo scripts if installed versions exist
+	- for f in $(IRAF_DEMO) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_IRAF)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_IRAF)/$$f .;\
+              rm -f $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF help files, if installed versions exist.
+	- for f in $(IRAF_HELP_FILES) ""; do \
+           if test -n "$$f" -a -r $(INSTALL_IRAF)/$$f; then \
+              rm -f $$f;\
+              cp -p -r $(INSTALL_IRAF)/$$f .;\
+              rm -f -r $(INSTALL_IRAF)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the IRAF package startup file.  
+	- if test -n "$(IRAF_STARTUP)"; then \
+           if test -f $(INSTALL_IRAF)/$(IRAF_STARTUP); then\
+              rm $(IRAF_STARTUP);\
+              cp $(INSTALL_IRAF)/$(IRAF_STARTUP) .;\
+              rm -f $(INSTALL_IRAF)/$(IRAF_STARTUP);\
+           else :; fi ;\
+        else :; fi
+#
+#  Deinstall the IRAF package parameter file.  Since it will have been
+#  edited during installation, we remove the installed copy, if present,
+#  and then ensure that the original exists.
+	- if test -n "$(IRAF_PKG_PAR)"; then \
+           if test -f $(INSTALL_IRAF)/$(IRAF_PKG_PAR); then\
+              rm -f $(INSTALL_IRAF)/$(IRAF_PKG_PAR);\
+           else :; fi ;\
+           $(MAKE) $(IRAF_PKG_PAR);\
+        else :; fi
+#
+#  Now remove the INSTALL_IRAF directory if there is nothing in it
+#  ignore any failure - assuming INSTALL_IRAF is used for something else.
+	- rmdir $(INSTALL_IRAF) 
+## End of install IRAF bits
 #
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
@@ -1864,6 +2233,7 @@ clean:
               $(C_ROUTINES) $(LINK_SCRIPT) 1>/dev/null 2>/dev/null
 	@- rm -f $(F_ROUTINES) 1>/dev/null 2>/dev/null
 	@- rm -f $(OBJECT_FILES) $(MONO_SOURCE:.f=.o) 1>/dev/null 2>/dev/null
+	@- rm -f $(IRAF_IFL_FILES) 1>/dev/null 2>/dev/null
 	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
@@ -1875,7 +2245,7 @@ clean:
 #  package is no longer built or tested.
 
 unbuild: clean
-	@- rm -f $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
+	@- rm -rf $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
 
@@ -1896,6 +2266,14 @@ $(PKG_NAME)_source.tar:
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) \
                   $(LINK_SCRIPT) $(ICL_SCRIPT) $(PRIVATE_INCLUDES) \
                   $(PLATFORM_F) $(HELP_SOURCES) $(MONO_SOURCE)
+
+$(PKG_NAME)_iraf.tar: 
+	$(TAR_IN) $(PKG_NAME)_source.tar $(IRAF_STARTUP) $(IRAF_PKG_PAR) \
+           $(IRAF_PAR_FILES) $(IRAF_IFL_FILES) \
+           $(IRAF_OUTPAR_FILES) \
+           $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
+           $(IRAF_HELP_FILES) \
+           $(IRAF_DEMO) $(IRAF_DATA)
 
 aif_sub.tar:
 	$(TAR_IN) aif_sub.tar $(AIF_F_ROUTINES)
@@ -2395,7 +2773,6 @@ kpg1_loctw.o:      SAE_PAR PRM_PAR NDF_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_ludcd.o:      SAE_PAR PRM_PAR
 kpg1_ludcr.o:      SAE_PAR PRM_PAR
 kpg1_lutin.o:      SAE_PAR
-kpg1_gtcol.o:      SAE_PAR
 kpg1_macol.o:      SAE_PAR
 kpg1_mdetd.o:      SAE_PAR PRM_PAR
 kpg1_mdetr.o:      SAE_PAR PRM_PAR
@@ -2983,7 +3360,7 @@ ncraxs.o:          SAE_PAR
 ncrbck.o:          SAE_PAR
 ncropn.o:          SAE_PAR PAR_ERR
 ndfcopy.o:         SAE_PAR PAR_ERR NDF_PAR
-ndftrace.o:        SAE_PAR DAT_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT AST_PAR
+ndftrace.o:        SAE_PAR DAT_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 nmplot.o:          SAE_PAR PRM_PAR
 noglobals.o:       SAE_PAR DAT_PAR DAT_ERR
 nomagic.o:         SAE_PAR NDF_PAR PAR_ERR MSG_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT

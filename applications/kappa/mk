@@ -155,6 +155,9 @@
 #           by any form of link, then a copy command could be
 #           substituted (e.g. 'cp -p'), at some cost in file space.
 #
+#        LINK_TEST (-h)
+#           The flag to use with `test' for a link
+#
 #        SOURCE_VARIANT ($SYSTEM)
 #           The name used to distinguish between platform-specific
 #           files.  Using the default ($SYSTEM) implies that multiple
@@ -226,6 +229,8 @@
 #        Linux case added.
 #     22-AUG-1997 (BLY):
 #        Adapted for KAPPA as part of Autumn CD-ROM preparations.
+#     18-DEC-1997 (AJC):
+#        Add LINK_TEST
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -240,6 +245,7 @@
       export FC
       export FFLAGS
       export LINK
+      export LINK_TEST
       export SOURCE_VARIANT
       export RANLIB
       export TAR_IN
@@ -331,6 +337,7 @@
                FC='g77'
                FFLAGS='-fno-second-underscore -O2'
                LINK='ln -s'
+               LINK_TEST='-L'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
