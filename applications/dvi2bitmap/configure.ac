@@ -6,13 +6,14 @@ dnl       of the Research Councils
 dnl   See file LICENCE for conditions.
 
 
-AC_INIT(dvi2bitmap, 0.13b1, norman@astro.gla.ac.uk)
+AC_INIT(dvi2bitmap, 0.13b2, norman@astro.gla.ac.uk)
 # Version-info specifications.  See SSN/78 for guidelines, and update the table
 # below for ANY change of version number.
 #
 # Release    libdvi2bitmap.la
 #  0.13b1         1:0:0
-AC_SUBST(libdvi2bitmap_la_version_info, 1:0:0)
+#  0.13b2         1:1:0
+AC_SUBST(libdvi2bitmap_la_version_info, 1:1:0)
 
 AM_INIT_AUTOMAKE
 AC_REVISION($Revision$)
