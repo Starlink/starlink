@@ -275,9 +275,11 @@
      :                   STATUS )
 
 *    Add extra info if we created the keyword
+*    And also assing a value of '11111111' to the mask (RB).
         IF ( DIDCRE ) THEN
           CREOBJ = 'QMASK'
           CRECOM = 'Data quality mask'
+          CALL ADI_CPUT0I( CACHEID, 'Value', 255, STATUS )
         END IF
 
 *  Top level title
