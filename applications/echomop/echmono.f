@@ -63,6 +63,7 @@
       INTEGER IFROM
 
       LOGICAL STARTED
+      LOGICAL VERSIONONLY
 
       CHARACTER*16 ACTION
 
@@ -85,11 +86,17 @@
          I = I + 1
       END DO
       ACTION = ACTION( IFROM : I - 1 )
-
-*  If menu task, issue welcome.
+      
+*  If menu task, issue welcome, and display the version number.
       IF ( ACTION .EQ. 'ECHMENU' ) THEN
-         CALL ECH_REPORT( 0, 'This is ECHOMOP Version 3.3-0.' )
+*      %%VERSION%%
+         CALL ECH_REPORT( 0, 'This is ECHOMOP Version 3.3-6' )
       END IF
+      
+*   If the VERSION parameter was present and true, then exit, 
+*   .having displayed the version number
+      CALL PAR_GET0L( 'VERSION', VERSIONONLY, STATUS )
+      IF ( VERSIONONLY ) GO TO 999
 
 *  Initialise common areas.
       IF ( .NOT. STARTED ) THEN
