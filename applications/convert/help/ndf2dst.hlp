@@ -150,3 +150,10 @@ MJC: Malcolm J. Currie (STARLINK)
  1996 July 17 (MJC):
     Transfers the DATA_ARRAY.IMAGINARY_DATA component to
     .Z.IMAGINARY
+
+ 1997 April 24 (MJC):
+    Fixed bug that could result in .OBS and .Z structures of the
+    FIGARO extension being lost.  This occurred when FIGARO
+    extension components SECZ or TIME (for OBS), and MAGFLAG or
+    RANGE (for Z) are present and are physically stored following
+    their respective structure.
