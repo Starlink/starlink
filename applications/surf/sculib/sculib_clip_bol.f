@@ -74,7 +74,7 @@
       PARAMETER (SKYBIT = 4)  
 
 *  Local Variables:
-      INTEGER CLIP                 ! Number of points to drop from mean
+      REAL    CLIP                 ! Number of sigma to clip at
       DOUBLE PRECISION CLIPMAX     ! Max clipping level
       DOUBLE PRECISION CLIPMIN     ! Min clipping level
       INTEGER I                    ! Loop counter
@@ -95,7 +95,7 @@
 
 *  Find the statistics (Mean and standard deviation
 
-      CLIP = 0
+      CLIP = -1.0
 
       CALL SCULIB_STATR(N_POS, CLIP, SCUDATA, SCUQUAL, BADBIT, NGOOD,
      :     MEAN, MEDIAN, SUM, SUMSQ, STDEV, %val(SPNTR), STATUS)
