@@ -65,6 +65,11 @@
 *     1997 November 10 (MJC):
 *        Added FILENAME to the FIELD structure.  Used latest version of
 *        the OBJECT structure.
+*     1998 January 8 (MJC):
+*        Corrected null value for double-precision columns to NaN.
+*        Set null value (as opposed to TNULLn) keywords for integer
+*        columns.  Added TDISP cards for position, magnitude and
+*        programme identification columns.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -109,6 +114,7 @@
       CHARACTER * ( DAT__SZNAM ) CTYPE ! Component type
       CHARACTER * ( 8 ) CRDNAM   ! Header-card name to insert TNULLn
       CHARACTER * 80 CVALUE      ! Character value
+      CHARACTER * ( 4 ) DSPFMT   ! TDISPn display format
       DOUBLE PRECISION DVALUE    ! D.p. value
       INTEGER EL                 ! Number of elements in mapped array
       CHARACTER * ( 68 ) EXTNAM  ! Name of the component
@@ -236,19 +242,13 @@
          CRDNAM = 'TNULL'
          CALL CHR_APPND( CN, CRDNAM, NC )
 
-*  Process by data type.
+*  Process by data type.  Note that the _DOUBLE bad values are replaced
+*  by NaNs and don't have TNULLn cards.
          IF ( I .EQ. 1  .OR. I .EQ. 9 .OR. I .EQ. 13 .OR.
      :        I .EQ. 14 .OR. I .EQ. 15 ) THEN
 
 *  Insert the TNULLn card.
             CALL FTIKYS( FUNIT, CRDNAM, ' ', 'String null value',
-     :                   FSTAT )
-
-         ELSE IF ( I .EQ. 2 .OR. I .EQ. 3 .OR.
-     :             I .EQ. 8 .OR. I .EQ. 11 ) THEN
-
-*  Insert the TNULLn card.
-            CALL FTIKYS( FUNIT, CRDNAM, -999.0D0, 0, 'Null value',
      :                   FSTAT )
 
          ELSE IF ( I .EQ. 4 .OR. I .EQ. 5 .OR. I .EQ. 12 ) THEN
@@ -259,8 +259,11 @@
          ELSE IF ( I .EQ. 6 .OR. I. EQ. 7 .OR.
      :             I .EQ. 10 .OR. I .EQ. 16 ) THEN
 
-*  Insert the TNULLn card.
-            CALL FTIKYJ( FUNIT, CRDNAM, VAL__BADW, 'Null value', FSTAT )
+*  Insert the TNULLn card.  There is no FTIKYI routine so equate the
+*  word bad value to an integer and create an integer-valued card.
+            IVALUE = VAL__BADW
+            CALL FTIKYJ( FUNIT, CRDNAM, IVALUE, 'Null value', FSTAT )
+
          END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
@@ -271,6 +274,37 @@
             CALL COF_FIOER( FSTAT, 'COF_2DFEX_ERR3', 'FTIKYx',
      :                      BUFFER, STATUS )
             GOTO 999
+         END IF
+
+*  Write the TDISPn cards for table viewers.
+*  =========================================
+
+*  In most cases default display formats are likely to be fine.  Only 
+*  the following certainly look wrong using CURSA.
+         IF ( I .EQ. 4 .OR. I .EQ. 5 .OR.
+     :        I .EQ. 11 .OR. I .EQ. 12 ) THEN
+
+*  Form the name of the keyword which will immediately precede the
+*  inserted TNULLn card.
+            NC = 5
+            CRDNAM = 'TDISP'
+            CALL CHR_APPND( CN, CRDNAM, NC )
+
+*  These are the positions in microns.
+            IF ( I .EQ. 4 .OR. I .EQ. 5 ) THEN
+               DSPFMT = 'I7'
+
+*  The magnitudes.
+            ELSE IF ( I .EQ. 11 ) THEN
+               DSPFMT = 'F6.2'
+
+            ELSE IF ( I .EQ. 12 ) THEN
+               DSPFMT = 'I9'
+            END IF
+
+*  Insert the TDISPn card with values appropriate for the columns.
+            CALL FTIKYS( FUNIT, CRDNAM, DSPFMT, 'Display format',
+     :                   FSTAT )
          END IF
       END DO
 
@@ -544,20 +578,30 @@
             IF ( THERE ) THEN
 
 *  Map the values of the component.
-                CALL DAT_MAPV( CLOC, CTYPE, 'READ', OPNTR, EL, STATUS )
+                CALL DAT_MAPV( CLOC, '_DOUBLE', 'READ', OPNTR, EL,
+     :                         STATUS )
 
-*  Transfer the values to the binary-table column.
-                CALL FTPCLD( FUNIT, I, 1, 1, EL, %VAL( OPNTR ), FSTAT )
+*  Transfer the values to the binary-table column.  Replace Starlink bad
+*  values with NaNs.
+                CALL FTPCND( FUNIT, I, 1, 1, EL, %VAL( OPNTR ),
+     :                       VAL__BADD, FSTAT )
 
 *  Unmap the component.
                 CALL DAT_UNMAP( CLOC, STATUS )
 
-*  Fill the array by calling the FITSIO routine for every element,
-*  instead of getting workspace and filling it with a constant.
+*  Need to create a column of null values.  First fill a work array with
+*  bad values.  
              ELSE
-                DO LEL = 1, EL
-                   CALL FTPCLD( FUNIT, I, LEL, 1, 1, -999.0D0, FSTAT )
-                END DO
+                CALL PSX_CALLOC( EL, '_DOUBLE', OPNTR, STATUS )
+                CALL CON_CONSD( VAL__BADD, EL, %VAL( OPNTR ), STATUS )
+
+*  Transfer the bad values to the binary-table column.  Replace
+*  Starlink bad values with NaNs.
+                CALL FTPCND( FUNIT, I, 1, 1, EL, %VAL( OPNTR ),
+     :                       VAL__BADD, FSTAT )
+
+*  Release the workspace.
+                CALL PSX_FREE( OPNTR, STATUS )
              END IF
              ROUTIN = 'FTPCLD'
 
@@ -568,7 +612,8 @@
             IF ( THERE ) THEN
 
 *  Map the values of the component.
-                CALL DAT_MAPV( CLOC, CTYPE, 'READ', OPNTR, EL, STATUS )
+                CALL DAT_MAPV( CLOC, '_INTEGER', 'READ', OPNTR, EL,
+     :                         STATUS )
 
 *  Transfer the values to the binary-table column.
                 CALL FTPCLJ( FUNIT, I, 1, 1, EL, %VAL( OPNTR ), FSTAT )
@@ -593,7 +638,8 @@
             IF ( THERE ) THEN
 
 *  Map the values of the component.
-                CALL DAT_MAPV( CLOC, CTYPE, 'READ', OPNTR, EL, STATUS )
+                CALL DAT_MAPV( CLOC, '_WORD', 'READ', OPNTR, EL,
+     :                         STATUS )
 
 *  Transfer the values to the binary-table column.
                 CALL FTPCLI( FUNIT, I, 1, 1, EL, %VAL( OPNTR ), FSTAT )
