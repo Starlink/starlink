@@ -117,6 +117,7 @@
 *    Global constants :
 
       INCLUDE 'SAE_PAR'        ! Global SSE definitions
+      INCLUDE 'PRM_PAR'        ! PRIMDAT public constants
 
 *    Import :
 
@@ -172,7 +173,7 @@
                                 ! for fit
 
       INTEGER
-     :    I, J, K, L,           ! general variables
+     :    I, J, K,              ! general variables
      :    LOWER,                ! Lowest part of the cumulative
                                 ! frequency chart to which the
                                 ! polynomial will be fitted.
@@ -397,7 +398,7 @@
 
 *    Even distribution.
 
-      IF ( SHADE .EQ. 0.0 ) THEN
+      IF ( ABS( SHADE ) .LT. VAL__EPSD ) THEN
 
 *       Assign colours to the pens in such a way that they are
 *       used in equal amounts in the displayed image.
