@@ -17,8 +17,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -106,7 +104,6 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) SLOC
       CHARACTER*(DAT__SZLOC) RLOC
       CHARACTER*(DAT__SZLOC) DLOC
       CHARACTER*40 FILENAME
@@ -118,6 +115,7 @@
       INTEGER NPOS
       INTEGER RAPTR,DECPTR
       INTEGER LUN
+      INTEGER SFID
       LOGICAL EXIST
       LOGICAL DAT
       LOGICAL POK
@@ -166,20 +164,21 @@
             CALL FIO_CLOSE(LUN,STATUS)
 *  otherwise assume HDS file in PSS format
           ELSE
-            CALL HDS_OPEN( FILENAME,'READ',SLOC,STATUS )
+            CALL ADI_FOPEN( FILENAME, '*', 'READ', SFID, STATUS )
+
             IF (STATUS.EQ.SAI__OK) THEN
 
 *  check if sources
               CALL SSO_INIT( STATUS )
-              CALL SSO_VALID( SLOC, POK, STATUS )
-              CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+              CALL SSI_VALID( SFID, POK, STATUS )
+              CALL SSI_GETNSRC( SFID, NSRC, STATUS )
               IF (.NOT. POK .OR.NSRC.EQ.0 ) THEN
                 CALL MSG_PRNT('AST_ERR: No sources in this SSDS')
               ELSE
 *  get RA DEC of sources
-                CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ',
+                CALL SSI_MAPFLD( SFID, 'RA', '_DOUBLE', 'READ',
      :                                        RAPTR, STATUS )
-                CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ',
+                CALL SSI_MAPFLD( SFID, 'DEC', '_DOUBLE', 'READ',
      :                                        DECPTR, STATUS )
                 CALL IEXCLUDE_SOURCE_REM(NSRC,%VAL(RAPTR),%VAL(DECPTR),
      :                                     RAD,DAT,DVAL,%VAL(I_DPTR_W),
@@ -187,8 +186,8 @@
 
               ENDIF
 
-              CALL SSO_RELEASE(SLOC,STATUS)
-              CALL HDS_CLOSE(SLOC,STATUS)
+              CALL SSI_RELEASE(SFID,STATUS)
+              CALL ADI_FCLOSE(SFID,STATUS)
 
             ENDIF
 
@@ -230,7 +229,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -324,7 +322,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -368,7 +365,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -440,8 +436,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -532,7 +526,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -641,8 +634,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -892,7 +883,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Global Variables :
 *
@@ -944,7 +934,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Global Variables :
 *
@@ -992,8 +981,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -1070,7 +1057,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'

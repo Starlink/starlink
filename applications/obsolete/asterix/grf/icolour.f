@@ -20,8 +20,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -155,8 +153,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Import :
 *    Function declarations :
@@ -198,7 +194,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
 *    Import :
       INTEGER TAB
@@ -298,8 +293,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
 *    Import :
 *    Status :
       INTEGER STATUS
@@ -348,7 +341,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       LOGICAL NEG
@@ -378,7 +370,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Import :
       LOGICAL RGB
@@ -415,7 +406,6 @@
       ENDSTRUCTURE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
 *    Status :
       INTEGER STATUS
@@ -572,7 +562,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'TSM_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       RECORD /SMG/ SCREEN
 *    Import-export :
@@ -944,7 +933,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *    Global variables :
 *    Status :
@@ -1037,7 +1025,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *    Status :
       INTEGER STATUS
@@ -1154,7 +1141,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1198,7 +1184,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1248,7 +1233,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1293,7 +1277,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
