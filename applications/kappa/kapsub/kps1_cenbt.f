@@ -138,6 +138,9 @@
 *  History:
 *     30-JUN-1999 (DSB):
 *        Original version.
+*     4-DEC-2001 (DSB):
+*        Retain error messages if only a single position is being
+*        centroided.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -365,23 +368,29 @@
                GO TO 999
             END IF
 
-*  If the position could not be found, cancel the error so that any
-*  remaining positions can be processed.
+*  If the position could not be found...
             IF( STATUS .NE. SAI__OK ) THEN
+
+*  If we are processing more than one position, cancel the error so that 
+*  remaining positions can be processed. For a single position, we retian
+*  the error status.
+               IF( NPOS .GT. 1 ) THEN
 
 *  If we are in verbose mode, add a context report and flush the message.
 *  Otherwise, just annul the message.
-               IF( VERB ) THEN
-                  IF( GOTID ) THEN 
-                     CALL MSG_SETI( 'ID', ID( I ) )
+                  IF( VERB ) THEN
+                     IF( GOTID ) THEN 
+                        CALL MSG_SETI( 'ID', ID( I ) )
+                     ELSE
+                        CALL MSG_SETI( 'ID', I )
+                     END IF
+                     CALL ERR_REP( 'KPS1_CENBT_ERR4', 'No centroid '//
+     :                             'found for position ^ID.', STATUS )
+                     CALL ERR_FLUSH( STATUS )
                   ELSE
-                     CALL MSG_SETI( 'ID', I )
+                     CALL ERR_ANNUL( STATUS )
                   END IF
-                  CALL ERR_REP( 'KPS1_CENBT_ERR4', 'No centroid found'//
-     :                          ' for position ^ID.', STATUS )
-                  CALL ERR_FLUSH( STATUS )
-               ELSE
-                  CALL ERR_ANNUL( STATUS )
+
                END IF
 
 *  Store a bad position.

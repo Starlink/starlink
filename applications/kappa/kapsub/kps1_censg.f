@@ -137,6 +137,9 @@
 *        Added NULL argument to KPG1_GTPOS call.
 *     15-FEB-2000 (DSB):
 *        KPG1_PGCUR argument list changed.
+*     4-DEC-2001 (DSB):
+*        Retain error messages if only a single position is being
+*        centroided.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -488,13 +491,13 @@
                GO TO 999
             END IF
 
-*  If the position could not be found, cancel the error so that any
-*  remaining positions can be processed.
+*  If the position could not be found...
             IF( STATUS .NE. SAI__OK ) THEN
                OK = .FALSE.
 
-*  Flush the message.
-               CALL ERR_FLUSH( STATUS )
+*  If multiple positions are being supplied, flush the error so that
+*  remaining positions can be processed.
+               IF( .NOT. SINGLE ) CALL ERR_FLUSH( STATUS )
 
 *  If a good centroid was found, transform it to the reporting Frame.
             ELSE
