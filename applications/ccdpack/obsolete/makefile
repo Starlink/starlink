@@ -488,8 +488,8 @@ TCL_SCRIPTS = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDTaskQuery.tcl CCDGeomSetPercent.tcl CCDExit.tcl \
  CCDFileMonitorMain.tcl CCDDoPresent.tcl \
  CCDTkWidget.tcl CCDCcdWidget.tcl CCDNameTail.tcl CCDPathOf.tcl CCDCmdOf.tcl \
- Buttoncontrol.tcl \
- Ccdtop.tcl Control.tcl Gwmview.tcl Marknumcontrol.tcl Ndfalign.tcl \
+ Buttoncontrol.tcl Ccdtop.tcl Control.tcl Gwmview.tcl \
+ Helpcontrol.tcl Marknumcontrol.tcl Ndfalign.tcl \
  Ndfchoose.tcl Ndfview.tcl Percentilecontrol.tcl Stylecontrol.tcl \
  Vectordialog.tcl Waiter.tcl Wcsframecontrol.tcl Zoomcontrol.tcl \
  raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
@@ -594,7 +594,7 @@ PKG_INCLUDE = ccd1_par
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = AST_PAR CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR \
+EXTERNAL_INCLUDES = AST_PAR AST_ERR CHR_ERR DAT_PAR DAT_ERR TRN_PAR TRN_ERR \
  FIO_ERR FIO_PAR MSG_PAR NDF_ERR NDF_PAR NUM_CMN NUM_DEC_B \
  NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_DEC_UW \
  NUM_DEC_W NUM_DEF_B NUM_DEF_CVT NUM_DEF_D NUM_DEF_I NUM_DEF_R \
@@ -713,7 +713,7 @@ GENSRC = ccg1_add.gen ccg1_bext.gen ccg1_bl.gen ccg1_bmd1.gen \
  ccg1_smd3.gen ccg1_smr3.gen ccg1_fmr1.gen ccg1_fmr2.gen \
  ccg1_fmr3.gen ccg1_fmd1.gen ccg1_fmd2.gen ccg1_fmd3.gen \
  ccg1_kthx.gen ccg1_asli.gen ccg1_dodiz.gen ccg1_frac.gen \
- ccg1_ghst.gen
+ ccg1_ghst.gen ccg1_iblk.gen
 
 #  Routines which may be real or double precision
 GENRDSRC = ccg1_ffrj.grd kpg1_bloc.grd ccg1_axin.grd \
@@ -747,7 +747,7 @@ C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE)
 
 CSUBSRC = ccd1_exec.c slv.c find_file.c \
  tcltalk.c tclbg.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdputs.c \
- intersect.c ccdAppInit.c \
+ ccdAppInit.c \
  ccd1_tcurs.c ccd1_algn.c ccd1_pndf.c
 
 #  List of applications/tasks in monoliths.
@@ -884,6 +884,7 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CCD1_FDCM CCD1_FITCM CCD1_MEMCM \
 #  Rules to set up links to locate each of the above include files.
 
 AST_PAR:	$(STAR_INC)/ast_par;	  $(LINK) $? $@
+AST_ERR:	$(STAR_INC)/ast_err;	  $(LINK) $? $@ 
 CCD1_FDCM:	ccd1_fdcm;	          $(LINK) $? $@
 CCD1_FITCM:	ccd1_fitcm;	          $(LINK) $? $@
 CCD1_MEMCM:	ccd1_memcm;	          $(LINK) $? $@
@@ -1306,7 +1307,7 @@ STARTCL_OBJ = $(STAR_LIB)/tkGwm.o $(STAR_LIB)/tkGwmCanv.o \
 
 $(WISH): $(OBJECT_LIBRARIES) $(WISH).o
 	$(FC) $(FFLAGS) -o $(WISH) $(WISH).o \
-              -L$(STAR_LIB) $(ADDLIBS) $(OBJECT_LIBRARIES) \
+              $(ADDLIBS) -L$(STAR_LIB) $(OBJECT_LIBRARIES) \
               $(STARTCL_OBJ) $(TCL_LIBRARIES) $(LDFLAGS) \
               -lcpgplot `agp_link_adam` `ast_link -pgplot` \
               `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
@@ -2527,6 +2528,7 @@ ccg1_frac.o: NUM_DEC_B NUM_DEC_CVT NUM_DEC_D NUM_DEC_I NUM_DEC_R NUM_DEC_UB NUM_
 ccg1_ghst.o: NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_gpl.o: NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
 ccg1_gvar.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
+ccg1_iblk.o: SAE_PAR AST_PAR AST_ERR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 ccg1_irhg.o: DAT_PAR FIO_ERR PAR_ERR SAE_PAR GRP_PAR
 ccg1_irhl.o: DAT_PAR FIO_ERR PAR_ERR SAE_PAR GRP_PAR
 ccg1_is2.o: SAE_PAR
