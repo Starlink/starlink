@@ -1,5 +1,5 @@
-      SUBROUTINE CCD1_NDFAB( CNAME, USEEXT, NDFNAM, ACCESS, MAXNDF,
-     :                       FACNAM, STACK, NNDF, FACTS, STATUS )
+      SUBROUTINE CCD1_NDFAB( CNAME, USEEXT, NDFNAM, MAXNDF, FACNAM,
+     :                       INGRP, FACTS, NNDF, STATUS )
 *+
 *  Name:
 *     CCD1_NDFAB
@@ -11,13 +11,13 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_NDFAB( CNAME, USEEXT, NDFNAM, ACCESS, MAXNDF,
-*                      FACNAM, STACK, NNDF, FACTS, STATUS )
+*     CALL CCD1_NDFAB( CNAME, USEEXT, NDFNAM, MAXNDF, FACNAM,
+*                      INGRP, FACTS, NNDF, STATUS )
 
 *  Description:
-*     The routine accesses a sequence of NDFs, using the IRG system
-*     whose ADAM parameter name NDFNAM. The NDF identifiers are written
-*     to the array STACK. A maximum number of NDFs MAXNDF may be
+*     The routine accesses a sequence of NDFs, using the NDG system
+*     whose ADAM parameter name NDFNAM.  An NDG group is returned 
+*     containing the NDF names.  A maximum number of NDFs MAXNDF may be
 *     returned. The actual number of NDFs is returned in NNDF.  After
 *     the NDFs have been accessed an attempt is made to get associated
 *     "exposure" factors. These may be looked for in the NDF extensions
@@ -41,24 +41,23 @@
 *         Whether to attempt to get the relative factors from the NDF 
 *     NDFNAM = CHARACTER * ( * ) (Given)
 *        The ADAM parameter name used to prompt for the NDFs.
-*     ACCESS = CHARACTER * ( * ) (Given)
-*        The NDF access type. Should be one of 'READ' or 'UPDATE'.
 *     MAXNDF = INTEGER (Given)
 *        The maxiumum number of NDFs allowed.
 *     FACNAM = CHARACTER * ( * ) (Given)
 *        The associated factor name.
-*     STACK( MAXNDF ) = INTEGER (Returned)
-*        The stack of NDF identifiers returned from user.
+*     INGRP = INTEGER (Returned)
+*        An NDG identifier for the group of NDFs selected by the user.
+*     FACTS( MAXNDF ) = DOUBLE PRECISION (Returned)
+*        The factors returned from the user (defaults to one).
 *     NNDF = INTEGER (Returned)
 *        The number of NDF identifiers returned from user ( less than
 *        MAXNDF)
-*     FACTS( MAXNDF ) = DOUBLE PRECISION (Returned)
-*        The factors returned from the user (defaults to one).
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +69,8 @@
 *        Added facility to get factors from NDF extensions
 *     2-FEB-1994 (PDRAPER):
 *        Added ACCESS argument.
+*     13-FEB-2001 (MBT):
+*        Modified to work with Sets.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -89,13 +90,12 @@
       LOGICAL USEEXT
       INTEGER MAXNDF
       CHARACTER NDFNAM * ( * )
-      CHARACTER ACCESS * ( * )
       CHARACTER FACNAM * ( * )
 
 *  Arguments Returned:
-      INTEGER STACK( MAXNDF )
-      INTEGER NNDF
+      INTEGER INGRP
       DOUBLE PRECISION FACTS( MAXNDF )
+      INTEGER NNDF
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -103,6 +103,7 @@
 *  Local Variables:
       INTEGER SIZE               ! Number of factors returned
       INTEGER I                  ! Loop variable
+      INTEGER INDF               ! NDF identifier
       LOGICAL OK                 ! Extension value ok
       LOGICAL ALLOK              ! Got all extension values
 
@@ -112,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Access a list of NDFs, up to a maximum of MAXNDF.
-      CALL CCD1_NDFAC( NDFNAM, ACCESS, 1, MAXNDF, NNDF, STACK, STATUS )
+      CALL CCD1_NDFGL( NDFNAM, 1, MAXNDF, INGRP, NNDF, STATUS )
 
 *  If we're to get the names of the NDFs from the extension then
 *  try to do this.
@@ -122,8 +123,10 @@
 
 *  Loop reading the values from the NDF extensions.
             DO 1 I = 1, NNDF
-               CALL CCG1_FCH1D( STACK ( I ), 'TIMES', CNAME, 1,
+               CALL NDG_NDFAS( INGRP, I, 'READ', INDF, STATUS )
+               CALL CCG1_FCH1D( INDF, 'TIMES', CNAME, 1,
      :                          FACTS( I ), OK, STATUS )
+               CALL NDF_ANNUL( INDF, STATUS )
                ALLOK = ALLOK .AND. OK
  1          CONTINUE
          END IF
