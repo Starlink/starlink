@@ -92,6 +92,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     26-APR-1996 (RFWS):
@@ -100,6 +101,10 @@
 *        Added external interface and I/O facilities.
 *     23-MAY-1997 (RFWS):
 *        Over-ride the astMapMerge method.
+*     15-OCT-2002 (DSB):
+*        Added astSTPConv, astSTPConv1, and STP coordinate system macros.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitSlaMapVtab method.
 *-
 */
 
@@ -119,6 +124,32 @@
 #if defined(astCLASS)            /* Protected */
 #include <stddef.h>
 #endif
+
+
+/* Macros */
+/* ====== */
+#if defined(astCLASS)            /* Protected */
+#define AST__NOSTP -1 /* An invalid value for an STP coordinate system */
+#define AST__HAE  0   /* Heliocentric-aries-ecliptic spherical coordinates */
+#define AST__HAEC 1   /* Heliocentric-aries-ecliptic cartesian coordinates */
+#define AST__HAQ  2   /* Heliocentric-aries-equatorial spherical coordinates */
+#define AST__HAQC 3   /* Heliocentric-aries-equatorial cartesian coordinates */
+#define AST__HG	  4   /* Heliographic spherical coordinates */
+#define AST__HGC  5   /* Heliographic cartesian coordinates */
+#define AST__HPC  6   /* Helioprojective-cartesian spherical coordinates */
+#define AST__HPCC 7   /* Helioprojective-cartesian cartesian coordinates */
+#define AST__HPR  8   /* Helioprojective-radial spherical coordinates */
+#define AST__HPRC 9   /* Helioprojective-radial cartesian coordinates */
+#define AST__GSE  10  /* Geocentric-solar-ecliptic spherical coordinates */
+#define AST__GSEC 11  /* Geocentric-solar-ecliptic cartesian coordinates */
+#endif
+
+/* One IAU astronomical unit, in metres. */
+#define AST__AU 1.49597870E11
+
+/* One solar radius (top of photosphere?), in metres (from "The Explanatory
+   Supplement to the Astronomical Almanac"). */
+#define AST__SOLRAD 6.96E8 
 
 /* SlaMap structure. */
 /* ----------------- */
@@ -173,9 +204,17 @@ AstSlaMap *astSlaMapId_( int, const char *, ... );
 AstSlaMap *astInitSlaMap_( void *, size_t, int, AstSlaMapVtab *,
                            const char *, int );
 
+/* Vtab initialiser. */
+void astInitSlaMapVtab_( AstSlaMapVtab *, const char * );
+
 /* Loader. */
-AstSlaMap *astLoadSlaMap_( void *, size_t, int, AstSlaMapVtab *,
+AstSlaMap *astLoadSlaMap_( void *, size_t, AstSlaMapVtab *,
                            const char *, AstChannel * );
+
+/* Other functions. */
+void astSTPConv1_( double, int, double[3], double[3], int, double[3], double[3] );
+void astSTPConv_( double, int, int, double[3], double *[3], int, double[3], double *[3] );
+
 #endif
 
 /* Prototypes for member functions. */
@@ -214,9 +253,11 @@ void astSlaAdd_( AstSlaMap *, const char *, const double[] );
 #define astInitSlaMap(mem,size,init,vtab,name,flags) \
 astINVOKE(O,astInitSlaMap_(mem,size,init,vtab,name,flags))
 
+/* Vtab Initialiser. */
+#define astInitSlaMapVtab(vtab,name) astINVOKE(V,astInitSlaMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadSlaMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadSlaMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadSlaMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadSlaMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */
@@ -226,5 +267,10 @@ astINVOKE(O,astLoadSlaMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 #define astSlaAdd(this,cvt,args) \
 astINVOKE(V,astSlaAdd_(astCheckSlaMap(this),cvt,args))
+
+#if defined(astCLASS)            /* Protected */
+#define astSTPConv astSTPConv_
+#define astSTPConv1 astSTPConv1_
+#endif
 
 #endif

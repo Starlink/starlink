@@ -134,7 +134,9 @@ f     The WcsMap class does not define any new routines beyond those
 *        if a defaultable latitude projection parameter has not been set.
 *        - A number of changes needed to support WcsLib v2.9.
 *        - Added AST__TPN projection.
-
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitWcsMapVtab
+*        method.
 *class--
 */
 
@@ -645,7 +647,6 @@ static void Delete( AstObject *obj );
 static void Dump( AstObject *, AstChannel * );
 static void FreePV( AstWcsMap * );
 static void InitPrjPrm( AstWcsMap * );
-static void InitVtab( AstWcsMapVtab * );
 static void LongRange( const PrjData *, struct AstPrjPrm *, double *, double *);
 static void PermGet( AstPermMap *, int **, int **, double ** );
 static void SetAttrib( AstObject *, const char * );
@@ -1635,23 +1636,24 @@ static void InitPrjPrm( AstWcsMap *this ) {
    }
 }
 
-static void InitVtab( AstWcsMapVtab *vtab ) {
+void astInitWcsMapVtab_(  AstWcsMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitWcsMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a WcsMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     void InitVtab( AstWcsMapVtab *vtab )
+*     void astInitWcsMapVtab( AstWcsMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     WcsMap member function.
+*     WcsMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -1660,7 +1662,14 @@ static void InitVtab( AstWcsMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -1669,6 +1678,10 @@ static void InitVtab( AstWcsMapVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAWcsMap) to determine if an object belongs
@@ -4304,6 +4317,9 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitWcsMapVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
 
@@ -4348,13 +4364,10 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
 /* Initialise a Mapping structure (the parent class) as the first component
    within the WcsMap structure, allocating memory if necessary. Specify that
    the Mapping should be defined in both the forward and inverse directions. */
-      new = (AstWcsMap *) astInitMapping( mem, size, init,
+      new = (AstWcsMap *) astInitMapping( mem, size, 0,
                                           (AstMappingVtab *) vtab, name,
                                           ncin, ncin, 1, 1 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
       if ( astOK ) {
 
 /* Initialise the WcsMap data. */
@@ -4394,7 +4407,7 @@ AstWcsMap *astInitWcsMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
+AstWcsMap *astLoadWcsMap_( void *mem, size_t size,
                            AstWcsMapVtab *vtab, const char *name,
                            AstChannel *channel ) {
 /*
@@ -4410,7 +4423,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "wcsmap.h"
-*     AstWcsMap *astLoadWcsMap( void *mem, size_t size, int init,
+*     AstWcsMap *astLoadWcsMap( void *mem, size_t size,
 *                               AstWcsMapVtab *vtab, const char *name,
 *                               AstChannel *channel )
 
@@ -4427,6 +4440,7 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a WcsMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -4445,14 +4459,6 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstWcsMap) is used instead.
-*     init
-*        A boolean flag indicating if the WcsMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the WcsMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new WcsMap. If this is NULL, a pointer
@@ -4500,26 +4506,23 @@ AstWcsMap *astLoadWcsMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstWcsMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "WcsMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitWcsMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built WcsMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

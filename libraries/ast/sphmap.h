@@ -105,6 +105,8 @@
 *           Validate class membership.
 *        astInitSphMap
 *           Initialise a SphMap.
+*        astInitSphMapVtab
+*           Initialise the virtual function table for the SphMap class.
 *        astLoadSphMap
 *           Load a SphMap.
 
@@ -141,6 +143,8 @@
 *        Override the astMapMerge method.
 *     4-SEP-1998 (DSB):
 *        Added UnitRadius attribute.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitSphMapVtab method.
 *-
 */
 
@@ -217,8 +221,11 @@ AstSphMap *astSphMapId_( const char *, ... );
 AstSphMap *astInitSphMap_( void *, size_t, int, AstSphMapVtab *,
                            const char * );
 
+/* Vtab initialiser. */
+void astInitSphMapVtab_( AstSphMapVtab *, const char * );
+
 /* Loader. */
-AstSphMap *astLoadSphMap_( void *, size_t, int, AstSphMapVtab *,
+AstSphMap *astLoadSphMap_( void *, size_t, AstSphMapVtab *,
                            const char *, AstChannel * );
 #endif
 
@@ -264,9 +271,11 @@ void astSetUnitRadius_( AstSphMap *, int );
 astInitSphMap(mem,size,init,vtab,name) \
 astINVOKE(O,astInitSphMap_(mem,size,init,vtab,name))
 
+/* Vtab Initialiser. */
+#define astInitSphMapVtab(vtab,name) astINVOKE(V,astInitSphMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadSphMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadSphMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadSphMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadSphMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

@@ -36,6 +36,7 @@ f     The ZoomMap class does not define any new routines beyond those
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     1-FEB-1996 (RFWS):
@@ -47,6 +48,9 @@ f     The ZoomMap class does not define any new routines beyond those
 *     4-JUN-1997 (RFWS):
 *        Over-ride the MapMerge method to provide ZoomMap
 *        simplification facilities.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitZoomMapVtab
+*        method.
 *class--
 */
 
@@ -115,7 +119,6 @@ static int TestZoom( AstZoomMap * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearZoom( AstZoomMap * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstZoomMapVtab * );
 static void SetAttrib( AstObject *, const char * );
 static void SetZoom( AstZoomMap *, double );
 
@@ -268,23 +271,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
-static void InitVtab( AstZoomMapVtab *vtab ) {
+void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitZoomMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a ZoomMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     void InitVtab( AstZoomMapVtab *vtab )
+*     void astInitZoomMapVtab( AstZoomMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     ZoomMap member function.
+*     ZoomMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -293,7 +297,14 @@ static void InitVtab( AstZoomMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -302,6 +313,10 @@ static void InitVtab( AstZoomMapVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAZoomMap) to determine if an object belongs
@@ -1420,6 +1435,9 @@ AstZoomMap *astInitZoomMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitZoomMapVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
 
@@ -1434,13 +1452,10 @@ AstZoomMap *astInitZoomMap_( void *mem, size_t size, int init,
 /* Initialise a Mapping structure (the parent class) as the first component
    within the ZoomMap structure, allocating memory if necessary. Specify that
    the Mapping should be defined in both the forward and inverse directions. */
-      new = (AstZoomMap *) astInitMapping( mem, size, init,
+      new = (AstZoomMap *) astInitMapping( mem, size, 0,
                                            (AstMappingVtab *) vtab, name,
                                            ncoord, ncoord, 1, 1 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
       if ( astOK ) {
 
 /* Initialise the ZoomMap data. */
@@ -1457,7 +1472,7 @@ AstZoomMap *astInitZoomMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstZoomMap *astLoadZoomMap_( void *mem, size_t size, int init,
+AstZoomMap *astLoadZoomMap_( void *mem, size_t size,
                              AstZoomMapVtab *vtab, const char *name,
                              AstChannel *channel ) {
 /*
@@ -1473,7 +1488,7 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "zoommap.h"
-*     AstZoomMap *astLoadZoomMap( void *mem, size_t size, int init,
+*     AstZoomMap *astLoadZoomMap( void *mem, size_t size,
 *                                 AstZoomMapVtab *vtab, const char *name,
 *                                 AstChannel *channel )
 
@@ -1490,6 +1505,7 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a ZoomMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -1508,14 +1524,6 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstZoomMap) is used instead.
-*     init
-*        A boolean flag indicating if the ZoomMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the ZoomMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new ZoomMap. If this is NULL, a pointer
@@ -1555,26 +1563,23 @@ AstZoomMap *astLoadZoomMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstZoomMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "ZoomMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitZoomMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built ZoomMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

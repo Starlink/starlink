@@ -32,6 +32,9 @@
 *        Added SLA_DBEAR, SLA_DVDV.
 *     23-AUG-2001 (DSB):
 *        Added SLA_SVD and SLA_SVDSOL
+*     11-NOV-2002 (DSB):
+*        Added SLA_RVEROT, SLA_GMST, SLA_EQEQX, SLA_RVLSRK, SLA_RVLSRD, 
+*        SLA_RVLG, SLA_RVGALC.
 */
 
 /* Macros */
@@ -599,6 +602,16 @@ double slaEpj2d ( double epj ) {
    return result;
 }
 
+F77_DOUBLE_FUNCTION(sla_eqeqx)( DOUBLE(DATE) );
+
+double slaEqeqx ( double date ) {
+   DECLARE_DOUBLE(DATE);
+   double result;
+   DATE = date; 
+   result = F77_CALL(sla_eqeqx)( DOUBLE_ARG(&DATE) );
+   return result;
+}
+
 F77_SUBROUTINE(sla_eqgal)( DOUBLE(DR),
                            DOUBLE(DD),
                            DOUBLE(DL),
@@ -718,6 +731,16 @@ void slaGalsup ( double dl, double db, double *dsl, double *dsb ) {
    *dsb = DSB;
 }
 
+F77_DOUBLE_FUNCTION(sla_gmst)( DOUBLE(UT1) );
+
+double slaGmst ( double ut1 ) {
+   DECLARE_DOUBLE(UT1);
+   double result;
+   UT1 = ut1;
+   result = F77_CALL(sla_gmst)( DOUBLE_ARG(&UT1) );
+   return result;
+}
+
 F77_SUBROUTINE(sla_mappa)( DOUBLE(EQ),
                            DOUBLE(DATE),
                            DOUBLE_ARRAY(AMPRMS) );
@@ -800,6 +823,85 @@ void slaPrec ( double ep0, double ep1, double rmatp[3][3] ) {
       for ( j = 0; j < 3; j++ ) rmatp[ i ][ j ] = RMATP[ i + 3 * j ];
    }
 }
+
+F77_REAL_FUNCTION(sla_rverot)( REAL(PHI),
+                               REAL(RA),
+                               REAL(DEC),
+                               REAL(ST) );
+
+float slaRverot ( float phi, float ra, float dec, float st ) {
+   DECLARE_REAL(PHI);
+   DECLARE_REAL(RA);
+   DECLARE_REAL(DEC);
+   DECLARE_REAL(ST);
+   float result;
+   PHI = phi;
+   RA = ra;
+   DEC = dec;
+   ST = st;
+   result = F77_CALL(sla_rverot)( REAL_ARG(&PHI),
+                                  REAL_ARG(&RA),
+                                  REAL_ARG(&DEC),
+                                  REAL_ARG(&ST) );
+   return result;
+}
+
+F77_REAL_FUNCTION(sla_rvgalc)( REAL(RA),
+                               REAL(DEC) );
+
+float slaRvgalc ( float ra, float dec ) {
+   DECLARE_REAL(RA);
+   DECLARE_REAL(DEC);
+   float result;
+   RA = ra;
+   DEC = dec;
+   result = F77_CALL(sla_rvgalc)( REAL_ARG(&RA),
+                                  REAL_ARG(&DEC) );
+   return result;
+}
+
+F77_REAL_FUNCTION(sla_rvlg)( REAL(RA),
+                             REAL(DEC) );
+
+float slaRvlg ( float ra, float dec ) {
+   DECLARE_REAL(RA);
+   DECLARE_REAL(DEC);
+   float result;
+   RA = ra;
+   DEC = dec;
+   result = F77_CALL(sla_rvlg)( REAL_ARG(&RA),
+                                REAL_ARG(&DEC) );
+   return result;
+}
+
+F77_REAL_FUNCTION(sla_rvlsrd)( REAL(RA),
+                               REAL(DEC) );
+
+float slaRvlsrd ( float ra, float dec ) {
+   DECLARE_REAL(RA);
+   DECLARE_REAL(DEC);
+   float result;
+   RA = ra;
+   DEC = dec;
+   result = F77_CALL(sla_rvlsrd)( REAL_ARG(&RA),
+                                  REAL_ARG(&DEC) );
+   return result;
+}
+
+F77_REAL_FUNCTION(sla_rvlsrk)( REAL(RA),
+                               REAL(DEC) );
+
+float slaRvlsrk ( float ra, float dec ) {
+   DECLARE_REAL(RA);
+   DECLARE_REAL(DEC);
+   float result;
+   RA = ra;
+   DEC = dec;
+   result = F77_CALL(sla_rvlsrk)( REAL_ARG(&RA),
+                                  REAL_ARG(&DEC) );
+   return result;
+}
+
 
 F77_SUBROUTINE(sla_subet)( DOUBLE(RC),
                            DOUBLE(DC),
@@ -994,4 +1096,41 @@ void slaSvdsol ( int m, int n, int mp, int np,
    WORK = astFree( WORK );
    X = astFree( X );
 }
+
+
+
+F77_SUBROUTINE(sla_evp)( DOUBLE(DATE), 
+                         DOUBLE(DEQX),
+                         DOUBLE_ARRAY(DVB),
+                         DOUBLE_ARRAY(DPB),
+                         DOUBLE_ARRAY(DVH),
+                         DOUBLE_ARRAY(DPH) );
+
+void slaEvp ( double date, double deqx, double dvb[3], double dpb[3], 
+              double dvh[3], double dph[3] ) {
+   DECLARE_DOUBLE(DATE);
+   DECLARE_DOUBLE(DEQX);
+   DECLARE_DOUBLE_ARRAY(DVB,3);
+   DECLARE_DOUBLE_ARRAY(DPB,3);
+   DECLARE_DOUBLE_ARRAY(DVH,3);
+   DECLARE_DOUBLE_ARRAY(DPH,3);
+
+   int i;
+   DATE = date;
+   DEQX = deqx;
+   F77_CALL(sla_evp)( DOUBLE_ARG(&DATE),
+                      DOUBLE_ARG(&DEQX),
+                      DOUBLE_ARRAY_ARG(DVB),
+                      DOUBLE_ARRAY_ARG(DPB),
+                      DOUBLE_ARRAY_ARG(DVH),
+                      DOUBLE_ARRAY_ARG(DPH) );
+   for ( i = 0; i < 3; i++ ) {
+      dvb[ i ] = DVB[ i ];
+      dpb[ i ] = DPB[ i ];
+      dvh[ i ] = DVH[ i ];
+      dph[ i ] = DPH[ i ];
+   }
+
+}
+
 

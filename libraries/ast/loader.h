@@ -20,7 +20,7 @@
 
 #if defined(astCLASS)            /* Protected */
 
-typedef AstObject *(AstLoaderType)( void *, size_t, int, AstObjectVtab *,
+typedef AstObject *(AstLoaderType)( void *, size_t, AstObjectVtab *,
                                     const char *, AstChannel * );
 
 AstLoaderType *astGetLoader( const char * );

@@ -65,6 +65,8 @@
 *           Validate class membership.
 *        astInitUnitMap
 *           Initialise a UnitMap.
+*        astInitUnitMapVtab
+*           Initialise the virtual function table for the UnitMap class.
 *        astLoadUnitMap
 *           Load a UnitMap.
 
@@ -93,12 +95,15 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     7-FEB-1996 (RFWS):
 *        Original version.
 *     13-DEC-1996 (RFWS):
 *        Over-ride the astMapMerge method.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitUnitMapVtab method.
 *-
 */
 
@@ -174,8 +179,11 @@ AstUnitMap *astUnitMapId_( int, const char *, ... );
 AstUnitMap *astInitUnitMap_( void *, size_t, int, AstUnitMapVtab *,
                              const char *, int );
 
+/* Vtab initialiser. */
+void astInitUnitMapVtab_( AstUnitMapVtab *, const char * );
+
 /* Loader. */
-AstUnitMap *astLoadUnitMap_( void *, size_t, int, AstUnitMapVtab *,
+AstUnitMap *astLoadUnitMap_( void *, size_t, AstUnitMapVtab *,
                              const char *, AstChannel * );
 #endif
 
@@ -215,9 +223,11 @@ AstUnitMap *astLoadUnitMap_( void *, size_t, int, AstUnitMapVtab *,
 #define astInitUnitMap(mem,size,init,vtab,name,ncoord) \
 astINVOKE(O,astInitUnitMap_(mem,size,init,vtab,name,ncoord))
 
+/* Vtab Initialiser. */
+#define astInitUnitMapVtab(vtab,name) astINVOKE(V,astInitUnitMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadUnitMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadUnitMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadUnitMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadUnitMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

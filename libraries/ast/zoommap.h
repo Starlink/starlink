@@ -84,6 +84,8 @@
 *           Validate class membership.
 *        astInitZoomMap
 *           Initialise a ZoomMap.
+*        astInitZoomMapVtab
+*           Initialise the virtual function table for the ZoomMap class.
 *        astLoadZoomMap
 *           Load a ZoomMap.
 
@@ -120,6 +122,8 @@
 *        Updated to provide an external interface.
 *     10-SEP-1996 (RFWS):
 *        Added I/O facilities.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitZoomMapVtab method.
 *-
 */
 
@@ -195,8 +199,11 @@ AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 AstZoomMap *astInitZoomMap_( void *, size_t, int, AstZoomMapVtab *,
                              const char *, int, double );
 
+/* Vtab initialiser. */
+void astInitZoomMapVtab_( AstZoomMapVtab *, const char * );
+
 /* Loader. */
-AstZoomMap *astLoadZoomMap_( void *, size_t, int, AstZoomMapVtab *,
+AstZoomMap *astLoadZoomMap_( void *, size_t, AstZoomMapVtab *,
                              const char *, AstChannel * );
 #endif
 
@@ -241,9 +248,11 @@ void astSetZoom_( AstZoomMap *, double );
 #define astInitZoomMap(mem,size,init,vtab,name,ncoord,zoom) \
 astINVOKE(O,astInitZoomMap_(mem,size,init,vtab,name,ncoord,zoom))
 
+/* Vtab Initialiser. */
+#define astInitZoomMapVtab(vtab,name) astINVOKE(V,astInitZoomMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadZoomMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadZoomMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadZoomMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadZoomMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

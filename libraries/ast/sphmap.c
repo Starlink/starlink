@@ -50,6 +50,9 @@ f     The SphMap class does not define any new routines beyond those
 *        Override the astMapMerge method.
 *     4-SEP-1998 (DSB):
 *        Added UnitRadius attribute.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitSphMapVtab
+*        method.
 *class--
 */
 
@@ -122,7 +125,6 @@ static void ClearAttrib( AstObject *, const char * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstSphMapVtab * );
 static void SetAttrib( AstObject *, const char * );
 
 /* Member functions. */
@@ -267,23 +269,24 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
-static void InitVtab( AstSphMapVtab *vtab ) {
+void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitSphMapVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a SphMap.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "sphmap.h"
-*     void InitVtab( AstSphMapVtab *vtab )
+*     void astInitSphMapVtab( AstSphMapVtab *vtab, const char *name )
 
 *  Class Membership:
-*     SphMap member function.
+*     SphMap vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -292,7 +295,14 @@ static void InitVtab( AstSphMapVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -301,6 +311,10 @@ static void InitVtab( AstSphMapVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsASphMap) to determine if an object belongs
@@ -1328,19 +1342,19 @@ AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitSphMapVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
 
 /* Initialise a Mapping structure (the parent class) as the first component
    within the SphMap structure, allocating memory if necessary. Specify that
    the Mapping should be defined in both the forward and inverse directions. */
-   new = (AstSphMap *) astInitMapping( mem, size, init,
+   new = (AstSphMap *) astInitMapping( mem, size, 0,
                                        (AstMappingVtab *) vtab, name,
                                        3, 2, 1, 1 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the SphMap data. */
@@ -1356,7 +1370,7 @@ AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
    return new;
 }
 
-AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
+AstSphMap *astLoadSphMap_( void *mem, size_t size,
                            AstSphMapVtab *vtab, const char *name,
                            AstChannel *channel ) {
 /*
@@ -1372,7 +1386,7 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "sphmap.h"
-*     AstSphMap *astLoadSphMap( void *mem, size_t size, int init,
+*     AstSphMap *astLoadSphMap( void *mem, size_t size,
 *                               AstSphMapVtab *vtab, const char *name,
 *                               AstChannel *channel )
 
@@ -1389,6 +1403,7 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a SphMap at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -1407,14 +1422,6 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstSphMap) is used instead.
-*     init
-*        A boolean flag indicating if the SphMap's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the SphMap class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new SphMap. If this is NULL, a pointer
@@ -1456,26 +1463,23 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstSphMap );
-      init = !class_init;
       vtab = &class_vtab;
       name = "SphMap";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitSphMapVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built SphMap. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

@@ -69,6 +69,8 @@
 *           Validate class membership.
 *        astInitWinMap
 *           Initialise a WinMap.
+*        astInitWinMapVtab
+*           Initialise the virtual function table for the WinMap class.
 *        astLoadWinMap
 *           Load a WinMap.
 
@@ -101,6 +103,9 @@
 *  History:
 *     23-OCT-1996 (DSB):
 *        Original version.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitWinMapVtab
+*        method.
 *-
 */
 
@@ -178,8 +183,11 @@ AstWinMap *astInitWinMap_( void *, size_t, int, AstWinMapVtab *,
                            const char *, int, const double *, const double *, 
                            const double *, const double * );
 
+/* Vtab initialiser. */
+void astInitWinMapVtab_( AstWinMapVtab *, const char * );
+
 /* Loader. */
-AstWinMap *astLoadWinMap_( void *, size_t, int, AstWinMapVtab *,
+AstWinMap *astLoadWinMap_( void *, size_t, AstWinMapVtab *,
                            const char *, AstChannel * );
 #endif
 
@@ -222,9 +230,11 @@ int astWinTerms_( AstWinMap *, double **, double ** );
 astInitWinMap(mem,size,init,vtab,name,ncoord,c1_in,c2_in,c1_out,c2_out) \
 astINVOKE(O,astInitWinMap_(mem,size,init,vtab,name,ncoord,c1_in,c2_in,c1_out,c2_out))
 
+/* Vtab Initialiser. */
+#define astInitWinMapVtab(vtab,name) astINVOKE(V,astInitWinMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadWinMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadWinMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadWinMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadWinMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

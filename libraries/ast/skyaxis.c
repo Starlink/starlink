@@ -61,7 +61,9 @@ f     only within textual output (e.g. from AST_WRITE).
 *        Over-ride the astGetAxisTop and astGetAxisBottom methods so that a 
 *        SkyAxis with the IsLatitude attribute set is legal between plus
 *        and minus 90 degrees.
-
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitSkyAxisVtab
+*        method.
 *class--
 */
 
@@ -143,11 +145,11 @@ static double AxisGap( AstAxis *, double, int * );
 static double AxisDistance( AstAxis *, double, double );
 static double AxisOffset( AstAxis *, double, double );
 static double DHmsGap( const char *, double, int * );
+static double GetAxisTop( AstAxis * );
+static double GetAxisBottom( AstAxis * );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisAsTime( AstSkyAxis * );
 static int GetAxisDirection( AstAxis * );
-static double GetAxisTop( AstAxis * );
-static double GetAxisBottom( AstAxis * );
 static int GetAxisIsLatitude( AstSkyAxis * );
 static int TestAttrib( AstObject *, const char * );
 static int TestAxisAsTime( AstSkyAxis * );
@@ -162,7 +164,6 @@ static void ClearAxisIsLatitude( AstSkyAxis * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstSkyAxisVtab * );
 static void ParseDHmsFormat( const char *, char *, int *, int *, int *, int *, int *, int *, int * );
 static void SetAttrib( AstObject *, const char * );
 static void SetAxisAsTime( AstSkyAxis *, int );
@@ -943,7 +944,7 @@ static const char *DHmsFormat( const char *fmt, double value ) {
    if ( value == AST__BAD ) {
       result = "<bad>";
 
-/* Otherwise.. */
+/* Otherwise... */
    } else {
 
 /* Parse the format specifier. */
@@ -1868,7 +1869,7 @@ static double GetAxisTop( AstAxis *this_axis ) {
 /* Return the result. */
    return result;
 }
-
+ 
 static int GetAxisDirection( AstAxis *this_axis ) {
 /*
 *  Name:
@@ -2306,23 +2307,24 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
    return result;
 }
 
-static void InitVtab( AstSkyAxisVtab *vtab ) {
+void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitSkyAxisVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a SkyAxis.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void InitVtab( AstSkyAxisVtab *vtab )
+*     void astInitSkyAxisVtab( AstSkyAxisVtab *vtab, const char *name )
 
 *  Class Membership:
-*     SkyAxis member function.
+*     SkyAxis vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -2331,7 +2333,14 @@ static void InitVtab( AstSkyAxisVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -2341,6 +2350,10 @@ static void InitVtab( AstSkyAxisVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitAxisVtab( (AstAxisVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsASkyAxis) to determine if an object belongs
@@ -3791,14 +3804,14 @@ AstSkyAxis *astInitSkyAxis_( void *mem, size_t size, int init,
 /* Check the global error status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitSkyAxisVtab( vtab, name );
+
 /* Initialise an Axis structure (the parent class) as the first component
    within the SkyAxis structure, allocating memory if necessary. */
-   new = (AstSkyAxis *) astInitAxis( mem, size, init, (AstAxisVtab *) vtab,
+   new = (AstSkyAxis *) astInitAxis( mem, size, 0, (AstAxisVtab *) vtab,
                                      name );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the SkyAxis data. */
@@ -3816,7 +3829,7 @@ AstSkyAxis *astInitSkyAxis_( void *mem, size_t size, int init,
    return new;
 }
 
-AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size, int init,
+AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size,
                              AstSkyAxisVtab *vtab, const char *name,
                              AstChannel *channel ) {
 /*
@@ -3832,7 +3845,7 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     AstSkyAxis *astLoadSkyAxis( void *mem, size_t size, int init,
+*     AstSkyAxis *astLoadSkyAxis( void *mem, size_t size,
 *                                 AstSkyAxisVtab *vtab, const char *name,
 *                                 AstChannel *channel )
 
@@ -3849,6 +3862,7 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a SkyAxis at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -3867,14 +3881,6 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstSkyAxis) is used instead.
-*     init
-*        A boolean flag indicating if the SkyAxis's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the SkyAxis class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new SkyAxis. If this is NULL, a pointer
@@ -3914,25 +3920,22 @@ AstSkyAxis *astLoadSkyAxis_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstSkyAxis );
-      init = !class_init;
       vtab = &class_vtab;
       name = "SkyAxis";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitSkyAxisVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built SkyAxis. */
-   new = astLoadAxis( mem, size, init, (AstAxisVtab *) vtab, name, channel );
+   new = astLoadAxis( mem, size, (AstAxisVtab *) vtab, name, channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */

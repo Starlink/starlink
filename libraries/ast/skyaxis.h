@@ -167,6 +167,8 @@
 *        Documented over-riding of the astGetAxisDirection method.
 *     26-FEB-1998 (RFWS):
 *        Over-ride the astAxisUnformat method.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitSkyAxisVtab method.
 *-
 */
 
@@ -238,8 +240,11 @@ AstSkyAxis *astSkyAxisId_( const char *, ... );
 AstSkyAxis *astInitSkyAxis_( void *, size_t, int, AstSkyAxisVtab *,
                              const char * );
 
+/* Vtab initialiser. */
+void astInitSkyAxisVtab_( AstSkyAxisVtab *, const char * );
+
 /* Loader. */
-AstSkyAxis *astLoadSkyAxis_( void *, size_t, int, AstSkyAxisVtab *,
+AstSkyAxis *astLoadSkyAxis_( void *, size_t, AstSkyAxisVtab *,
                              const char *, AstChannel * );
 #endif
 
@@ -288,9 +293,11 @@ void astSetAxisIsLatitude_( AstSkyAxis *, int );
 #define astInitSkyAxis(mem,size,init,vtab,name) \
 astINVOKE(O,astInitSkyAxis_(mem,size,init,vtab,name))
 
+/* Vtab Initialiser. */
+#define astInitSkyAxisVtab(vtab,name) astINVOKE(V,astInitSkyAxisVtab_(vtab,name))
 /* Loader. */
-#define astLoadSkyAxis(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadSkyAxis_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadSkyAxis(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadSkyAxis_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

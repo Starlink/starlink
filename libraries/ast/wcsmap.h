@@ -121,6 +121,8 @@
 *           Validate class membership.
 *        astInitWcsMap
 *           Initialise a WcsMap.
+*        astInitWcsMapVtab
+*           Initialise the virtual function table for the WcsMap class.
 *        astLoadWcsMap
 *           Load a WcsMap.
 
@@ -232,6 +234,8 @@
 *        Replaced wcsmap component projp by pointers p and np.
 *     20-OCT-2002 (DSB):
 *        Added astIsZenithal
+*     8-JAN-2003 (DSB):
+*        Added protected astInitWcsMapVtab method.
 *-
 */
 
@@ -372,8 +376,11 @@ AstWcsMap *astWcsMapId_( int, int, int, int, const char *, ... );
 AstWcsMap *astInitWcsMap_( void *, size_t, int, AstWcsMapVtab *,
                            const char *, int, int, int, int );
 
+/* Vtab initialiser. */
+void astInitWcsMapVtab_( AstWcsMapVtab *, const char * );
+
 /* Loader. */
-AstWcsMap *astLoadWcsMap_( void *, size_t, int, AstWcsMapVtab *,
+AstWcsMap *astLoadWcsMap_( void *, size_t, AstWcsMapVtab *,
                            const char *, AstChannel * );
 #endif
 
@@ -425,9 +432,11 @@ AstWcsMap *astLoadWcsMap_( void *, size_t, int, AstWcsMapVtab *,
 #define astInitWcsMap(mem,size,init,vtab,name,ncoord,type,lon,lat) \
 astINVOKE(O,astInitWcsMap_(mem,size,init,vtab,name,ncoord,type,lon,lat))
 
+/* Vtab Initialiser. */
+#define astInitWcsMapVtab(vtab,name) astINVOKE(V,astInitWcsMapVtab_(vtab,name))
 /* Loader. */
-#define astLoadWcsMap(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadWcsMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadWcsMap(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadWcsMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

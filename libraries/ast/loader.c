@@ -20,6 +20,8 @@
 #include "pointset.h"
 #include "skyaxis.h"
 #include "skyframe.h"
+#include "specframe.h"
+#include "specmap.h"
 #include "slamap.h"
 #include "sphmap.h"
 #include "unitmap.h"
@@ -39,6 +41,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     18-NOV-1997 (RFWS):
@@ -49,6 +52,8 @@
 *        Added the PcdMap class.
 *     17-AUG-1999 (RFWS):
 *        Added the MathMap class.
+*     8-JAN-2003 (DSB):
+*        Added the SpecMap and SpecFrame classes.
 *-
 */
 
@@ -79,6 +84,8 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(SkyAxis);
    LOAD(SkyFrame);
    LOAD(SlaMap);
+   LOAD(SpecFrame);
+   LOAD(SpecMap);
    LOAD(SphMap);
    LOAD(UnitMap);
    LOAD(WcsMap);
