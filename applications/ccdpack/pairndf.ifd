@@ -21,6 +21,8 @@
 #        Generated IFD file from IFL file.
 #     11-OCT-2000 (MBT):
 #        Modified to accommodate changes from IDI to Tcl GUI.
+#     16-JAN-2001 (MBT):
+#        Added OVERRIDE parameter and removed NAMELIST parameter.
 #     {enter_changes_here}
 
 #-
@@ -64,15 +66,6 @@
             size *
          }
 
-         parameter namelist {
-            type LITERAL
-            access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
-            default PAIRNDF.LIS
-            prompt {Output filenames list}
-          }
-
          parameter logto {
                           # Logging system interaction level
             type LITERAL
@@ -94,6 +87,16 @@
             association <-global.ccdpack_logfile
             prompt "Logfile name[ccd_global]"
             default CCDPACK.LOG
+            helpkey *
+          }
+
+         parameter override {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath DEFAULT
+            default TRUE
+            prompt {Continue if solution is incomplete}
             helpkey *
           }
 

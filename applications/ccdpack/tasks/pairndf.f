@@ -153,15 +153,19 @@
 *        the program attempting to display an enormous viewing region.
 *        If set to zero, then no limit is in effect.
 *        [1280]
-*     NAMELIST = LITERAL (Read)
-*        The name of a file to contain the names of the output
-*        position lists. The names written to this file are those
-*        generated using the expression given to the OUTLIST parameter.
-*        This file may be used in an indirection expression to input
-*        all the position lists output from this routine into another
-*        routine, if the associating position lists with NDFs option is
-*        not being used.
-*        [PAIRNDF.LIS]
+*     OVERRIDE = LOGICAL (Read)
+*        This parameter controls whether to continue and create an
+*        incomplete solution. Such solutions will result when only a
+*        subset of the input position lists have been paired.
+*
+*        In this case, any NDFs for which matching was not 
+*        achieved will have their associated position lists removed
+*        from their .MORE.CCDPACK extensions.  Thus after running 
+*        PAIRNDF with OVERRIDE set to TRUE, any position list associated
+*        with an NDF is guaranteed to be one which has been matched, and 
+*        not just one left over from the previously associated unmatched 
+*        list.
+*        [TRUE]
 *     OUTLIST = LITERAL (Read)
 *        An expression which is either a list of names or expands to a
 *        list of names for the output position lists.
@@ -336,6 +340,8 @@
 *        Replaced use of IRH/IRG with GRP/NDG.
 *     14-SEP-2000 (MBT):
 *        Rewrote to use Tcl for the GUI instead of IDI.
+*     16-JAN-2001 (MBT):
+*        Added OVERRIDE parameter.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -351,6 +357,8 @@
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameterisations
       INCLUDE 'MSG_PAR'         ! Message system parameterisations
       INCLUDE 'AST_PAR'         ! Standard AST system declarations
+      INCLUDE 'DAT_PAR'         ! Standard HDS constants
+      INCLUDE 'GRP_PAR'         ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -359,6 +367,8 @@
       CHARACTER * ( 80 ) FNAME  ! Filename
       CHARACTER * ( 132 ) MSTYLE ! Marker style string
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for writing output lines
+      CHARACTER * ( DAT__SZLOC ) LOCEXT ! HDS locator for .MORE.CCDPACK ext
+      CHARACTER * ( GRP__SZNAM ) NDFNAM ! Name of NDF
       DOUBLE PRECISION PERCNT( 2 ) ! Percentile values for display
       DOUBLE PRECISION XOFF( CCD1__MXNDF * CCD1__MXNDF ) ! Initial X offsets
       DOUBLE PRECISION XOFFN( CCD1__MXNDF * CCD1__MXNDF ) ! Absolute X offsets
@@ -392,7 +402,6 @@
       INTEGER NEWED             ! Number of edges in spanning graph
       INTEGER NMAT( CCD1__MXNDF * CCD1__MXNDF ) ! Number of position selected
       INTEGER NNDF              ! Number of input NDFs
-      INTEGER NNODE             ! Number of nodes in spanning graph
       INTEGER NODES( 2, CCD1__MXNDF * CCD1__MXNDF ) ! Original node numbers
       INTEGER NOUT( CCD1__MXNDF ) ! Numbers of output positions
       INTEGER NRET              ! Dummy variable
@@ -403,6 +412,7 @@
       INTEGER WINDIM( 2 )       ! Window dimensions for display
       LOGICAL COMPL             ! True if graph is complete
       LOGICAL CYCLIC            ! True if graph is cyclic
+      LOGICAL OVERRD            ! True if continue with incomplete graph
                             
 *.                             
                                
@@ -438,6 +448,10 @@
       DO I = 1, NNDF
          CALL NDG_NDFAS( NDFGR, I, 'UPDATE', INDF( I ), STATUS )
       END DO
+
+*  See if we should continue with registration if only a few of the
+*  datasets have been paired.
+      CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
 
 *  Write the Name of the positions lists and labels into the log.
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -483,43 +497,64 @@
       CALL CCD1_GRAPC( %VAL( IPGRA ), NEDGES, 1, %VAL( IPQUE ),
      :                 %VAL( IPBEEN ), COMPL, CYCLIC, %VAL( IPSUB ),
      :                 NEWED, TOTNOD, STATUS )
-      IF ( COMPL .AND. TOTNOD .EQ. NNDF ) THEN    
+
+*  Decide whether the calculated subgraph is sufficiently complete to
+*  continue, and bail out if not.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99 
+      IF ( COMPL ) THEN
+         IF ( TOTNOD .EQ. 0 ) THEN
+            CALL CCD1_ERREP( 'PAIRNDF_NONE',
+     :'  No pairings were made.', STATUS )
+         ELSE IF ( TOTNOD .LT. NNDF ) THEN
+            IF ( OVERRD ) THEN
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+               CALL CCD1_MSG( ' ',
+     :'  Warning - not all pairings were successfully made.'//
+     :'  Continuing with those that have.', STATUS) 
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+            ELSE
+               STATUS = SAI__ERROR
+               CALL CCD1_ERREP( 'PAIRNDF_NOTALL',
+     :'  Not all datasets were successfully paired.', STATUS )
+            END IF
+         END IF
+      ELSE
+         STATUS = SAI__ERROR
+         CALL CCD1_ERREP( 'PAIRNDF_NOTCOM',
+     :'  Intercomparison of positions does not produce a complete'//
+     :' registration of all frames -- graph incomplete', STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99 
                            
-*  Graph is complete -- all nodes connected.  Determine the `complete'
-*  solution.  Find the offsets of all positions to the `reference' set
-*  (first node of first edge of spanning graph is assumed to be the
-*  reference set).
-         CALL CCD1_GROFF( %VAL( IPGRA ), NEDGES, XOFF, YOFF,
-     :                    NNDF, %VAL( IPBEEN ), %VAL( IPQUE ),
-     :                    XOFFN, YOFFN, STATUS )
+*  The subgraph is complete -- all nodes connected.  Determine the 
+*  `complete' solution.  Find the offsets of all positions to the 
+*  `reference' set (first node of first edge of spanning graph is 
+*  assumed to be the reference set).
+      CALL CCD1_GROFF( %VAL( IPSUB ), NEWED, XOFF, YOFF,
+     :                 NNDF, %VAL( IPBEEN ), %VAL( IPQUE ),
+     :                 XOFFN, YOFFN, STATUS )
 
 *  Get the WCS frameset and the current frame for each NDF.
-         DO I = 1, NNDF
-            CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
-            FRM( I ) = AST_GETFRAME( IWCS( I ), AST__CURRENT, STATUS )
-         END DO
+      DO I = 1, NNDF
+         CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
+         FRM( I ) = AST_GETFRAME( IWCS( I ), AST__CURRENT, STATUS )
+      END DO
 
 *  Output offset information to the user.
-         CALL CCD1_PROFF( NNDF, %VAL( IPBEEN ), XOFFN, YOFFN, FRM,
-     :                    .TRUE., STATUS )
+      CALL CCD1_PROFF( NNDF, %VAL( IPBEEN ), XOFFN, YOFFN, FRM,
+     :                 .TRUE., STATUS )
+
+*  Initialise number of matched points.
+      DO I = 1, NNDF
+         NOUT( I ) = 0
+      END DO
 
 *  Generate the ID's for the output lists. Matching positions between
 *  the lists and final merging all positions for each node.
-         CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, NNODE, IPX1, IPY1, IPX2,
-     :                   IPY2, NMAT, OFFS, IPXO, IPYO, IPID, NOUT,
-     :                   STATUS )
+      CALL CCD1_GMMP( %VAL( IPSUB ), NEWED, TOTNOD, IPX1, IPY1, IPX2,
+     :                IPY2, NMAT, OFFS, IPXO, IPYO, IPID, NOUT,
+     :                STATUS )
 
-      ELSE
-
-*  Set STATUS and issue error (may change this to cope with error
-*  by forming most likely connection).
-         STATUS = SAI__ERROR
-         CALL CCD1_ERREP( 'PAIRNDF_NOTCON',
-     :'  Intercomparison of positions does not produce a complete'//
-     :' registration of all frames -- graph incomplete', STATUS )
-         GO TO 99
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GO TO 99 
 
 *=======================================================================
 *   Writing output lists and updating NDF extensions
@@ -530,8 +565,11 @@
       CALL CCD1_STRGR( 'OUTLIST', NDFGR, NNDF, NNDF, OUTGRP, NRET,
      :                 STATUS )
 
-*  Write a position list for each NDF.
+*  Write a position list and store its name in the .MORE.CCDPACK
+*  extension for each NDF.
       DO 12 I = 1, NNDF
+
+*  Check whether there are any points to write in the list.
          IF ( NOUT( I ) .GT. 0 ) THEN 
 
 *  Get temporary storage for list of points in pixel coordinates.
@@ -562,19 +600,32 @@
 
 *  Store the names of the position lists in the NDF extensions
             CALL CCG1_STO0C( INDF( I ), 'CURRENT_LIST', FNAME, STATUS )
+
+*  If there are no points to write, then remove any existing list name
+*  from the NDF extension, otherwise casual use of them by later 
+*  applications may give the impression that the original position
+*  lists are matched ones.
+         ELSE
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            CALL ERR_MARK
+            CALL CCD1_CEXT( INDF( I ), .FALSE., 'UPDATE', LOCEXT,
+     :                      STATUS )
+            CALL DAT_ERASE( LOCEXT, 'CURRENT_LIST', STATUS )
+
+*  If we succeeded, tell the user that the old list has been removed.
+*  If we failed, it is presumably because there was no old list, which
+*  is fine.
+            IF ( STATUS .EQ. SAI__OK ) THEN
+               CALL GRP_GET( NDFGR, I, 1, NDFNAM, STATUS )
+               CALL MSG_SETC( 'NDF', NDFNAM )
+               CALL CCD1_MSG( ' ', 
+     :'  Removing associated list for unpaired NDF ^NDF', STATUS )
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+            END IF
+            CALL ERR_RLSE
          END IF
  12   CONTINUE
-
-*  Write an output list of the names for other applications to use.
-      IF ( STATUS .EQ. SAI__OK ) THEN 
-         CALL CCD1_LNAM( 'NAMELIST', 1, NNDF,
-     :                   'PAIRNDF - output position lists',
-     :                   OUTGRP, .TRUE., STATUS )
-         IF ( STATUS .NE. SAI__OK ) THEN
-            CALL ERR_ANNUL( STATUS )
-            CALL CCD1_MSG( ' ', '  No namelist written ', STATUS )
-         END IF
-      END IF
 
 *  Write display preference parameters back to the parameter system.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
