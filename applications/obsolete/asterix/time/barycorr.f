@@ -167,10 +167,10 @@
       INTEGER			TIMID			! Timing info
       INTEGER			TAX			! Time axis number
 
-        INTEGER I
-        INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
+c     INTEGER I
+      INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
 
-      CHARACTER*80             POS_FILE       ! Name of orbit file
+c     CHARACTER*80             POS_FILE       ! Name of orbit file
       CHARACTER*80             HISTXT(10)     ! add to HISTORY
 
       DOUBLE PRECISION         BASE_UTC       !SECS since start of currentMJD
@@ -185,18 +185,18 @@
       INTEGER                  ITIMEPTR       !PTR to input time events/axis
       INTEGER                  LDIM(ADI__MXDIM) ! input dimensions
       INTEGER                  NDIMS          ! number of dimensions
-      INTEGER                  T_BINS         ! number of time bins
+c     INTEGER                  T_BINS         ! number of time bins
 
       INTEGER                  N_LINES        ! number of lines to HISTORY
-      INTEGER                  RECORD_SEP     ! The POS file update period (sec)
+c     INTEGER                  RECORD_SEP     ! The POS file update period (sec)
       INTEGER                  ACTVAL         ! LIST MAPV reads
       INTEGER                  NEVENT       ! No of events in list
-      INTEGER                  FILE_STATUS    ! IOSTAT for ATT POS SAT open
-      INTEGER                  FILE_START     !   "     "   "   "   " base key
-      INTEGER                  FILE_END       !   "     "   "   "   " end key
+c     INTEGER                  FILE_STATUS    ! IOSTAT for ATT POS SAT open
+c     INTEGER                  FILE_START     !   "     "   "   "   " base key
+c     INTEGER                  FILE_END       !   "     "   "   "   " end key
       INTEGER                  BASE_MJD       ! MJD whole part only
 
-      LOGICAL                  OK,OK1,OK2     ! various checks
+      LOGICAL                  OK             ! various checks
       LOGICAL                  VALID_ROSAT    ! file is a ROSAT file
       LOGICAL                  SATCORR        ! do satellite corrections ?
       LOGICAL                  POS_FILE_OK    ! ATT POS OPEN OK
@@ -333,8 +333,8 @@
       END IF
 
 *  Check that we haven't already applied the correction
-      CALL PRF_GET( OFID, 'BARY_CORR_DONE', OK2, STATUS )
-      IF ( OK2 ) THEN
+      CALL PRF_GET( OFID, 'BARY_CORR_DONE', OK, STATUS )
+      IF ( OK ) THEN
         CALL MSG_PRNT( 'This file has already been corrected, '/
      :                 /'exiting...')
         GOTO 99
@@ -1210,15 +1210,15 @@ c      RECORD /POS_REC/ POS
 
       DOUBLE PRECISION RMATRIX(6)            !XYZ & DX/DT DY/DT, DZ/DT
 
-        INTEGER UT
-        REAL SATGEO(3)           ! GEOGRAPHIC XYZ
-        REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
-        INTEGER*2 IXRT(3)        ! Restored XRT pointing RA DEC Roll (arcmin)
-        INTEGER*2 ILONG
-        INTEGER*2 ILAT
-        INTEGER KEY              ! Key for indexed read
-        INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
-        DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
+      INTEGER UT
+      REAL SATGEO(3)           ! GEOGRAPHIC XYZ
+      REAL SAT_GEOCENTRIC(3)   ! GEOCENTRIC XYZ
+      INTEGER*2 IXRT(3)        ! Restored XRT pointing RA DEC Roll (arcmin)
+c     INTEGER*2 ILONG
+c     INTEGER*2 ILAT
+c     INTEGER KEY              ! Key for indexed read
+      INTEGER LUN_POS          ! Log Unit for ATT_POS_SAT output (rosat specific)
+c     DOUBLE PRECISION BARY_HK2MJD !DP FUNCTION HK SECS TO MJD
 *    Import :
       INTEGER              BASE_MJD              ! whole part MJD only
 
@@ -1229,7 +1229,7 @@ c      RECORD /POS_REC/ POS
       DOUBLE PRECISION     EQUINOX               ! equinox of ra dec system
 
       LOGICAL              POS_FILE_OK           ! ATT_POS_SAT data fine
-      LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
+c     LOGICAL              IGNORE_POS            ! pos_sat info to be ignored
 *    Import-Export :
       DOUBLE PRECISION     TIME     ! timeTAG
 *    Export:
@@ -1243,9 +1243,9 @@ c      RECORD /POS_REC/ POS
       DOUBLE PRECISION     MJD_CURRENT           ! MJD for current event
       DOUBLE PRECISION     MJD_START,MJD_END     ! MJD for start/stop
 
-      REAL                 TRIGGER               !current trigger time
+c     REAL                 TRIGGER               !current trigger time
 
-      INTEGER              I,J,K                 ! DO loop variables
+      INTEGER              J                     ! DO loop variables
       INTEGER              CURRENT_KEY           ! for KEYed access to POS file
 *-
 
