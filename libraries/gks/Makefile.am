@@ -17,3 +17,13 @@ lib_LTLIBRARIES = libgks.la
 
 libgks_la_SOURCES = 
 libgks_la_LIBADD = base/libgks_base.la base/libgks_call.la
+
+include_HEADERS = $(PUBLIC_INCLUDES)
+
+#  List of public include files.  These are include files which form
+#  part of the package and may be required by users of it
+
+PUBLIC_INCLUDES = GKS_ERR
+
+
+BUILT_SOURCES = GKS_ERR
