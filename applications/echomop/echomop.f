@@ -574,6 +574,10 @@
                 preview = .true.
              end if
 
+*        write (report_string, '("DBG:2:option=",i2," suboption=",i3,
+*     :       " preview=",l1)') option, suboption, preview
+*        call ech_report (0, report_string)
+
           end if
 
         ELSE
@@ -606,8 +610,8 @@
           END IF
         END IF
        
-*        write (report_string, '("DBG:1:option=",i2," suboption=",i3,"
-*     :       subopt_module=",a," option_module()=",a)') 
+*        write (report_string, '("DBG:1:option=",i2," suboption=",i3,
+*     :       " subopt_module=",a," option_module()=",a)') 
 *     :       option, suboption, subopt_module, option_module(option)
 *        call ech_report (0, report_string)
 
