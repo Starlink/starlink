@@ -122,7 +122,7 @@
           ELSEIF (MODE.EQ.'IMP') THEN
             CALL IREGION_IMPORT(STATUS)
           ELSEIF (MODE.EQ.'INV') THEN
-            CALL IMG_SETINV(STATUS)
+            CALL IREGION_INVERT(STATUS)
           ENDIF
 
 
@@ -902,6 +902,55 @@
 
 
 
+
+
+*+
+      SUBROUTINE IREGION_INVERT(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+      LOGICAL EXCLUDE
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      INTEGER ID
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL IMG_SETINV(STATUS)
+
+        CALL ARX_OPEN('WRITE',ID,STATUS)
+        CALL ARX_PUT(ID,0,'.NOT.(',STATUS)
+        CALL ARX_COPY(I_ARD_ID,1,ID,0,STATUS)
+        CALL ARX_PUT(ID,0,')',STATUS)
+        CALL ARX_CLOSE(I_ARD_ID,STATUS)
+        I_ARD_ID=ID
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from IREGION_INVERT',STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
+
 *+
       SUBROUTINE IREGION_SHOW(STATUS)
 *    Description :
@@ -1220,15 +1269,16 @@ c        ENDIF
 *    Function declarations :
 *    Local constants :
       INTEGER NLINE
-      PARAMETER (NLINE=6)
+      PARAMETER (NLINE=7)
 *    Local variables :
       CHARACTER*79 TEXT(NLINE)
      :/' CIRcle  - circular region     BOX     - box parallel to axes',
-     : ' POLygon - irregular polygon   SLICE   - rectangular slice',
+     : ' POLygon - irregular polygon   SLIce   - rectangular slice',
      : ' ANNulus - annular region      ELLipse - elliptical region',
-     : ' CONTOUR - within contour      WHOle   - whole image',
+     : ' CONtour - within contour      WHOle   - whole image',
      : ' SHOw    - outline all regions LISt    - list ARD text',
-     : ' IMPort  - input ARD           EXPort  - output ARD'/
+     : ' IMPort  - input ARD           EXPort  - output ARD',
+     : ' INVert  - invert region'/
       INTEGER ILINE
 *-
 
