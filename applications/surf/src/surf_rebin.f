@@ -77,6 +77,7 @@
                                        ! pointer to scratch space holding
                                        ! apparent RA / x offset positions of
                                        ! measured points in input file (radians)
+      BYTE             BTEMP           !scratch BYTE
       REAL             CENTRE_DU3      ! dU3 Nasmyth coordinate of point on
                                        ! focal plane that defines telescope axis
       REAL             CENTRE_DU4      ! dU4 Nasmyth coordinate of point on
@@ -202,7 +203,6 @@
                                        ! data variance from input files
       INTEGER          ISTART          ! index of start of sub-string
       INTEGER          ITEMP           ! scratch integer
-      INTEGER          ITEMPB          ! Another scratch integer
       INTEGER          IY              ! year in which input observation started
       INTEGER          I_CENTRE        ! I index of central pixel in output
                                        ! map
@@ -737,18 +737,19 @@
            CALL NDF_STATE(IN_NDF, 'QUALITY', STATE, STATUS)
 
             IF (STATE) THEN
-                CALL NDF_MAP (IN_NDF, 'QUALITY', '_INTEGER', 'READ',
+                CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ',
      :              FILE_QUALITY_PTR, ITEMP, STATUS)
 
             ELSE
                CALL MSG_OUT(' ','WARNING! REDS_BESSEL_REBIN: '//
      :              'Quality array is missing. Unflagging all data',
      :              STATUS)
-               CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBI,
+               CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBUB,
      :              DUMMY_QUALITY_PTR(FILE), DUMMY_ENDQUAL_PTR(FILE),
      :              STATUS)
                ITEMP = DIM(1) * DIM(2)
-               CALL SCULIB_VFILLI(ITEMP, ITEMPB,
+               BTEMP = 0
+               CALL SCULIB_CFILLB(ITEMP, BTEMP,
      :              %VAL(DUMMY_QUALITY_PTR(FILE)))
                FILE_QUALITY_PTR = DUMMY_QUALITY_PTR(FILE)
             END IF
@@ -1249,7 +1250,7 @@
      :        IN_DATA_PTR(FILE), IN_DATA_END(FILE), STATUS)
             CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBR,
      :        IN_VARIANCE_PTR(FILE), IN_VARIANCE_END(FILE), STATUS)
-            CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBI,
+            CALL SCULIB_MALLOC (N_POS(FILE) * N_BOL(FILE) * VAL__NBUB,
      :        IN_QUALITY_PTR(FILE), IN_QUALITY_END(FILE), STATUS)
 
             IF (STATUS .EQ. SAI__OK) THEN
@@ -1259,7 +1260,7 @@
                CALL SCULIB_COPYR (N_POS(FILE) * N_BOL(FILE),
      :           %val(FILE_VARIANCE_PTR),
      :           %val(IN_VARIANCE_PTR(FILE)))
-               CALL SCULIB_COPYI (N_POS(FILE) * N_BOL(FILE),
+               CALL SCULIB_COPYB (N_POS(FILE) * N_BOL(FILE),
      :           %val(FILE_QUALITY_PTR),
      :           %val(IN_QUALITY_PTR(FILE)))
             END IF
@@ -1393,9 +1394,9 @@
 *  be ignored then set the data quality bad
 
                            IF (INT_QUALITY(INTEGRATION) .NE. 0) THEN
-                              CALL SCULIB_CFILLI (N_BOL(FILE),
+                              CALL SCULIB_CFILLB (N_BOL(FILE), 1
      :                          %val(IN_QUALITY_PTR(FILE) +
-     :                          DATA_OFFSET * VAL__NBI), 1)
+     :                          DATA_OFFSET * VAL__NBUB))
                            END IF
 
                         END DO
@@ -1638,11 +1639,11 @@
      :  OUT_DATA_PTR, ITEMP, STATUS)
       CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 'WRITE/ZERO',
      :  OUT_VARIANCE_PTR, ITEMP, STATUS)
-      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_INTEGER', 'WRITE',
+      CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
      :  OUT_QUALITY_PTR, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI (NX_OUT * NY_OUT, 1, 
+         CALL SCULIB_CFILLB (NX_OUT * NY_OUT, 1, 
      :     %val(OUT_QUALITY_PTR))
       END IF
 
