@@ -454,10 +454,10 @@
         FSYS(1) = FSYS(1) * MATH__DDTOR
         FSYS(2) = FSYS(2) * MATH__DDTOR
         CALL WCI_CNS2S( I_SYSID, FSYS, I_FK4SYS, LCEL, STATUS )
-
 *    And export
         RA = LCEL(1) * MATH__DRTOD
         DEC = LCEL(2) * MATH__DRTOD
+	print *,x,y,fsys(1),fsys(2),ra,dec
 
       ENDIF
 
