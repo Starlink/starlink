@@ -56,7 +56,7 @@ edit = sed \
 	-e 's,@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g' \
 	-e 's,@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g' \
 	-e 's,@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g'
-make-starconf: make-starconf.in
+make-starconf: make-starconf.in configure.ac
 	rm -f make-starconf.tmp make-starconf
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
 	mv make-starconf.tmp make-starconf
