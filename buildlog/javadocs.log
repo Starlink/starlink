@@ -2627,25 +2627,25 @@ javadocs:
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.html...
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DivaPlotGraphicsPane.java:36: Tag @see: Malformed: Plot, PlotConfigurator
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: warning - @copyright is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DragRegion.html...
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: Tag @see: Malformed: SelectionDragger, Plot
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:16: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureChangedEvent.java:31: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/FigureChangedEvent.html...
+  [javadoc] "Used when figure is changed (i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Used when figure is changed (i.e. transformed)."
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureProps.java:16: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureProps.java:16: warning - Tag @see: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/FigureProps.java:16: warning - Tag @see: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:63: warning - Tag @see: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:624: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:598: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/DragRegion.html...
-  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/DragRegion.java:28: Tag @see: Malformed: SelectionDragger, Plot
-  [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/FigureChangedEvent.html...
-  [javadoc] "Used when figure is changed (i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Used when figure is changed (i.e. transformed)."
   [javadoc] Generating /apps/cvsbuild/java/source/frog/docs/frog/javadocs/uk/ac/starlink/frog/plot/GramControl.html...
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the physical coordinate limits of the complete Plot (i.e. the whole
   [javadoc]  plot, including zoomed regions that you cannot see)."
+  [javadoc] /apps/cvsbuild/java/source/frog/src/main/uk/ac/starlink/frog/plot/GramControl.java:598: warning - The first sentence is interpreted to be:
   [javadoc] "Get the physical coordinates limits of the current view of the Plot
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2691,4 +2691,4 @@ javadocs:
   [javadoc] 199 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 21 seconds
+Total time: 3 minutes 19 seconds
