@@ -1,3 +1,27 @@
+<subsect id=rn-0.11b1 export>Release 0.11b1
+
+<p>Major developments:
+<ul>
+  <li>The program is a wrapper for libdvi2bitmap, a library which abstracts
+    DVI and PK files, Bitmaps, and various other objects supporting
+    these.  This is built as both a static and a shareable library.</li>
+
+  <li>Can read DVI files from a non-seekable stream such as a
+  pipe.</li>
+
+  <li>Internal bitmaps are now expandable (no more guessing the output
+  bitmap size)</li>
+
+  <li>Build system redone using automake and libtool</li>
+
+  <li>Released under the GPL.</li>
+
+  <li>A few minor option changes (hopefully the last ones) since the
+  previous version</li>
+</ul>
+</p>
+
+
 <subsect id=rn-0.10 export>Release 0.10b1
 
 <p><code>dvi2bitmap</code> is now GPLed!
