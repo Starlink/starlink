@@ -169,3 +169,12 @@ PRM_PAR prm_par.h: make-prm-par
 	./make-prm-par -fPRM_PAR -cprm_par.h
 
 BUILT_SOURCES = PRM_ERR prm_err.h PRM_PAR prm_par.h $(PLATFORM_INCLUDES)
+
+
+# Tests
+
+TESTS = prm_test
+check_PROGRAMS = prm_test
+
+prm_test_SOURCES = prm_test.f
+prm_test_LDADD = libprm.la libprm_a.la
