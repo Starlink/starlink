@@ -609,7 +609,10 @@
 
 <!ELEMENT copyright - O (p+)
 			-- Replace the copyright boilerplate with this
-			   text. -->
+			   text.  It's declared as a paragraph
+			   sequence instead of #PCDATA, in case we
+			   want it to include, for example, licence
+			   or distribution information. -->
 
 <!--========== Document body ==========-->
 <![ %Feature.Routinelist [
