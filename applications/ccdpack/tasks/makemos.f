@@ -661,6 +661,8 @@
 *        padded to match bounds (regions of BAD quality are introduced).
 *     18-NOV-1998 (PDRAPER):
 *        Added fastmed combination method.
+*     26-NOV-1998 (PDRAPER):
+*        Now propagates NDF WCS components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1052,11 +1054,13 @@
 
 *  Mark the error stack and attempt to create the output NDF by
 *  propagating from this section. Do NOT propagate QUALITY as this may
-*  be padded with BAD values and only applies to the first NDF.
+*  be padded with BAD values and only applies to the first
+*  NDF. Propagate the WCS component, this should be correct for all
+*  images, assuming they are aligned.
       CALL ERR_MARK
  10   CONTINUE
       DOOUT = .TRUE.
-      CALL NDF_PROP( NDFX, 'Units,Axis', 'OUT', NDFOUT, STATUS )
+      CALL NDF_PROP( NDFX, 'Units,Axis,WCS', 'OUT', NDFOUT, STATUS )
 
 *  If a null output NDF is given, and the input NDFs are being
 *  modified, then note that no output NDF has been given, annul the
