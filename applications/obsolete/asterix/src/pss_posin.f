@@ -33,6 +33,7 @@
       INCLUDE 'FIO_ERR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PSS_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Global variables :
 *
@@ -343,8 +344,8 @@
           JSRC = LI_ID(ISRC)
 
 *        Convert RA/DEC to radians
-          S_RA(JSRC) = S_RA(JSRC) * DTOR
-          S_DEC(JSRC) = S_DEC(JSRC) * DTOR
+          S_RA(JSRC) = S_RA(JSRC) * MATH__DDTOR
+          S_DEC(JSRC) = S_DEC(JSRC) * MATH__DDTOR
 
 *        Convert coordinates to image coordinates in axis units
           EQUPOS(1) = S_RA(JSRC)

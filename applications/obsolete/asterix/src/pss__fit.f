@@ -49,6 +49,7 @@
       INCLUDE 'FIT_PAR'
       INCLUDE 'PSS_PAR'
       INCLUDE 'USER_ERR'
+      INCLUDE 'MATH_PAR'
 *
 *    Structure definitions :
 *
