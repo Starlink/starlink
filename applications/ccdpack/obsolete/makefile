@@ -585,7 +585,8 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_gtwcs.f ccd1_hisp.f ccd1_hvcon.f \
  ccd1_hvusr.f ccd1_inply.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
  ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
- ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f ccd1_lnmap.f ccd1_locs2.f \
+ ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f ccd1_lnapx.f \
+ ccd1_lnmap.f ccd1_locs2.f \
  ccd1_locs3.f ccd1_ltest.f ccd1_ltrcm.f ccd1_lxyt.f \
  ccd1_lxyt2.f ccd1_lxyt3.f ccd1_mall.f ccd1_maskd.f \
  ccd1_match.f ccd1_mean.f ccd1_mfree.f ccd1_mkbc.f \
@@ -607,7 +608,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_sched.f ccd1_scrch.f ccd1_sngl.f ccd1_soff.f ccd1_spair.f \
  ccd1_stao.f ccd1_start.f ccd1_strgr.f \
  ccd1_stsat.f ccd1_stvb.f ccd1_subcs.f ccd1_szlsf.f \
- ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tcout.f ccd1_tfun.f \
+ ccd1_szlsm.f ccd1_szprd.f ccd1_szslv.f ccd1_tfun.f \
  ccd1_tmpnm.f ccd1_trout.f ccd1_tstb.f ccd1_untmp.f ccd1_vlin.f \
  ccd1_wdpc.f ccd1_wedge.f ccd1_wffc.f \
  ccd1_wgtrn.f ccd1_winad.f ccd1_windr.f ccd1_wlis.f \
@@ -2272,6 +2273,7 @@ ccd1_lcc.o: SAE_PAR
 ccd1_lext.o: SAE_PAR
 ccd1_linv.o: SAE_PAR
 ccd1_lmap.o: SAE_PAR
+ccd1_lnapx.o: AST_PAR SAE_PAR
 ccd1_lnmap.o: AST_PAR SAE_PAR
 ccd1_lnam.o: FIO_PAR IRH_PAR SAE_PAR
 ccd1_lnamm.o: FIO_PAR IRH_PAR SAE_PAR
@@ -2367,7 +2369,6 @@ ccd1_subcs.o: SAE_PAR
 ccd1_szlsf.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_szprd.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR
 ccd1_szslv.o: CCD1_MOSCM CCD1_MOSPR CCD1_PAR PRM_PAR SAE_PAR USER_ERR
-ccd1_tcout.o: AST_PAR PRM_PAR SAE_PAR
 ccd1_tmpnm.o: PRM_PAR SAE_PAR
 ccd1_trout.o: SAE_PAR MSG_PAR
 ccd1_touch.o: SAE_PAR
