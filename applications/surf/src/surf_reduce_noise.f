@@ -70,6 +70,9 @@
 *     November 1998
 *       Converted to SURF (TIMJ)
 *     $Log$
+*     Revision 1.2  1999/03/08 20:57:42  timj
+*     Initalise SCRATCH_PTR
+*
 *     Revision 1.1  1998/12/07 02:22:19  timj
 *     Initial revision
 *
@@ -402,6 +405,9 @@
 
 *     Create some scratch space for the averaging routine
 *     Easier to create here rather than inside SCULIB_NOISE_MEAN
+      SCRATCH_PTR = 0
+      SCRATCH_END = 0
+
       CALL SCULIB_MALLOC(N_BOLS * VAL__NBI, SCRATCH_PTR,
      :     SCRATCH_END, STATUS)
 
