@@ -43,31 +43,33 @@ starconf: starconf.in bootstrap.installed config.status
 	mv starconf.tmp starconf
 	chmod +x starconf
 
-
-# Magic: If there exists a bin directory at
-# @STARCONF_DEFAULT_PREFIX@/bin, then install links to the starconf
-# tools there; if not, do nothing.  Since the starconf tools are
-# typically but not necessarily installed in a different directory,
-# (usually $STARLINK/bin/../buildsupport/bin), this ends up putting
-# these in the main Starlink bin directory, but avoids losing if the
-# installation paths are in some way unexpected.  If the two
-# directories share a prefix, then make the link path relative, so
-# that we're free to move the tree later, if we want.
+# Magic: In the normal case (as controlled by <top>/bootstrap), the
+# installation directory for this component is
+# STARCONF_DEFAULT_PREFIX/../buildsupport/bin.  In this case, add a
+# relative soft link from STARCONF_DEFAULT_PREFIX/bin to bindir for
+# each of the scripts installed in bindir.  This will generally _not_
+# be the case, however, if the --buildsupport=xxx option was given to
+# <top>/bootstrap (since in that case we are deliberately installing
+# the buildsupport tools in a different place from the default prefix
+# location, which might be /usr/local, for example): in this case
+# we want to install nothing in that location, so we carefully do
+# nothing here.
 install-exec-local:
 ## If the directory exists...
 	if test -d @STARCONF_DEFAULT_PREFIX@/bin; then \
 	  (cd @STARCONF_DEFAULT_PREFIX@/bin && \
 	    thisdir=`pwd`; \
 	    parent=`cd ..; pwd`; \
-	    starconfbindir=`cd @bindir@; pwd`; \
-	    if test $$thisdir != $$starconfbindir; then \
-## ...and it's not the same directory, then make a link
-	      pathback=`echo $$starconfbindir | sed -n "s,$$parent,..,p"`; \
-	      test -n "$$pathback" || pathback=$$starconfbindir; \
-	      for f in starconf starconf-validate starconf-finder; do \
+	    bdgrandparent=`cd @bindir@/../..; pwd`; \
+	    if test "$$parent" = "$$bdgrandparent"; then \
+## ...and these are the same directory, then make a link.  Be
+## general, just in case we decide to change the string `buildsupport'.
+	      pathback=`echo @bindir@ | sed 's,.*\(/[^/]*/[^/]*\)$$,..\1,'`; \
+	      for f in $(bin_SCRIPTS); do \
 	        rm -f $$f; \
+		echo @LN_S@ $$pathback/$$f $$f; \
 		@LN_S@ $$pathback/$$f $$f; \
-		test -n "$$MANIFEST_FILE" && echo $$thisdir/$$f >>$$MANIFEST_FILE; \
+		test -n "$$MANIFEST_FD" && echo $$thisdir/$$f >&$${MANIFEST_FD-0}; \
 	      done; \
 	    fi ); \
 	fi; true
