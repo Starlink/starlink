@@ -93,10 +93,26 @@ typedef void AstTranMap;
 typedef void AstDSBSpecFrame;
 #endif
 
+#if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 5) || AST_MAJOR_VERS >= 4 )
+#define HASSETFITS
+#define HASRATEMAP
+#define HASKEYMAP
+#define HASFLUXFRAME
+#define HASSPECFLUXFRAME
+#define HASREGION
+#else
+typedef void AstRateMap;
+typedef void AstKeyMap;
+typedef void AstFluxFrame;
+typedef void AstSpecFluxFrame;
+typedef void AstRegion;
+#endif
+
 /* between v3.0 and v3.4 astRate returned the second derivative */
 #if ( AST_MAJOR_VERS == 3 && AST_MINOR_VERS < 5 )
 #define RATE_HAS_SECOND_DERIVATIVE 1
 #endif
+
 
 
 
@@ -1977,6 +1993,132 @@ astFindFits( this, name, card, inc )
  OUTPUT:
   RETVAL 
   card
+
+void
+astSetFitsCF( this, name, real, imag, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  double real
+  double imag
+  char * comment
+  int overwrite
+ PREINIT:
+  double value[2];
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  value[0] = real;
+  value[1] = imag;
+  ASTCALL(
+    astSetFitsCF( this, name, value, comment, overwrite );
+  )
+#endif
+
+void
+astSetFitsCI( this, name, real, imag, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  int real
+  int imag
+  char * comment
+  int overwrite
+ PREINIT:
+  int value[2];
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  value[0] = real;
+  value[1] = imag;
+  ASTCALL(
+    astSetFitsCI( this, name, value, comment, overwrite );
+  )
+#endif
+
+
+void
+astSetFitsF( this, name, value, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  double value
+  char * comment
+  int overwrite
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  ASTCALL(
+    astSetFitsF( this, name, value, comment, overwrite );
+  )
+#endif
+
+void
+astSetFitsI( this, name, value, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  int value
+  char * comment
+  int overwrite
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  ASTCALL(
+    astSetFitsI( this, name, value, comment, overwrite );
+  )
+#endif
+
+void
+astSetFitsL( this, name, value, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  bool value
+  char * comment
+  int overwrite
+ PREINIT:
+  int bval;
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  bval = ( value ? 1 : 0);
+  ASTCALL(
+    astSetFitsL( this, name, bval, comment, overwrite );
+  )
+#endif
+
+void
+astSetFitsS( this, name, value, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  char * value
+  char * comment
+  int overwrite
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  ASTCALL(
+    astSetFitsS( this, name, value, comment, overwrite );
+  )
+#endif
+
+void
+astSetFitsCN( this, name, value, comment, overwrite )
+  AstFitsChan * this
+  char * name
+  char * value
+  char * comment
+  int overwrite
+ CODE:
+#ifndef HASSETFITS
+  Perl_croak(aTHX_ "astSetFitsX: Please upgrade to AST v3.5 or newer");
+#else
+  ASTCALL(
+    astSetFitsCN( this, name, value, comment, overwrite );
+  )
+#endif
 
 MODULE = Starlink::AST   PACKAGE = Starlink::AST::SpecFrame PREFIX = ast
 
