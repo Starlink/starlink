@@ -392,7 +392,7 @@ PKG_LINK = AUTOASTROM
 #  not merit documentation changes.
 
 # %%VERSION%%
-PKG_VERS = 0.5-4
+PKG_VERS = 0.5-5
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1081,7 +1081,7 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
 $(PKG_NAME)_source.tar: unbuild
-	cd astrom && autoconf || echo "Need newer version of autoconf!" || false
+	cd astrom && make -f makefile.in configure || echo "Need newer version of autoconf!" || false
 	cd moggy && make -f Makefile.in configure
 	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
