@@ -14,6 +14,8 @@
 #  History:
 #     9-APR-1998 (DSB):
 #     	 Original version.
+#     12-APR-1999 (DSB):
+#        Added SHAPE.
 #     {enter_further_changes_here}
 
 #-
@@ -104,6 +106,15 @@ interface POLIMAGE
       ppath       'CURRENT,DEFAULT'
       default     1
       prompt      'Min. number of good input values per bin'
+      helpkey     '*'
+   endparameter
+
+   parameter      SHAPE
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     TRUE
+      prompt      'Use spatial information in the input catalogue?'
       helpkey     '*'
    endparameter
 

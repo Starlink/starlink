@@ -14,11 +14,11 @@ gaia2.eps gaia3.eps
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
-polvec.f polplot.f polbin.f polext.f polimage.f
+polvec.f polplot.f polbin.f polext.f polimage.f polsim.f
 
 #  The tasks visible within IRAF.
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext \
-polimage
+polimage polsim
 
 #  The contents of polpack_source.tar. 
 UNIX_SOURCE =  CCDShowHelp.tcl Polka.tcl Polka_procs.tcl adamMessageRelay \
