@@ -110,10 +110,12 @@
       INTEGER                NSPEC                    ! # file specifications
       INTEGER                OEPTR(MAXFLD)            ! Output field errors
       INTEGER                OIDPTR                   ! Output ID field
+      INTEGER			OFID			! Output file object
       INTEGER                ORIG(MAXFILE)            ! First BOOK comp per file
       INTEGER                OPTR(MAXFLD)             ! Output field data
       INTEGER                PLEN                     ! Used length of PAR
       INTEGER                SCONTEXT                 ! Search context
+      INTEGER			SFID			! Output data object
       INTEGER                SIZE(MAXFLD)             ! Bytes per field
       INTEGER                SLEN                     ! Useful length of SPEC
       INTEGER                TNCOMP                   ! Total # of comp files
@@ -279,7 +281,9 @@
       CALL MSG_PRNT( 'Will merge ^NF input files' )
 
 *    Get output file
-      CALL USI_ASSOCO( 'OUT', 'SSDS_SET', OLOC, STATUS )
+      CALL ADI_NEW0( 'SSDSset', SFID, STATUS )
+      CALL USI_CREAT( 'OUT', SFID, OFID, STATUS )
+      CALL ADI1_GETLOC( OFID, OLOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Create the book-keeping structure
