@@ -180,7 +180,7 @@
      code     : verbatim program code
      em       : emphasis
      url      : a URL - the stylesheet might make a link here
-     funcname : the name of a function, persumably in the same broad
+     funcname : the name of a function, presumably in the same broad
                 collection of code.  The stylesheet may make a link
                 here, if there's some clever way of finding the
                 referenced function.
@@ -284,6 +284,12 @@
 		id
 		#required
 	affiliation	-- where based --
+		cdata
+		#implied
+	email		-- author's email address --
+		cdata
+		#implied
+	webpage		-- author's URL --
 		cdata
 		#implied
 	-- etc... add further author details --
