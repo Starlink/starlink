@@ -445,12 +445,12 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/geom/InterpolatedCurve2D.java:403: warning - The first sentence is interpreted to be:
   [javadoc] "Return if the Interpolator is full, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1011,6 +1011,12 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:33: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:101: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/GraphModel.html...
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node, i.e. it can contain children."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphViewListener.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/MutableGraphModel.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/NodeController.java:59: warning - @rating is an unknown tag.
@@ -1018,12 +1024,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphController.java:31: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:22: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/BasicEdgeController.java:57: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graph/GraphModel.html...
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node, i.e. it can contain children."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/BasicNodeController.java:59: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/EdgeCreator.java:45: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/EdgeInteractor.java:22: warning - @rating is an unknown tag.
@@ -2226,7 +2226,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -2427,4 +2426,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 14 minutes 22 seconds
+Total time: 15 minutes 24 seconds
