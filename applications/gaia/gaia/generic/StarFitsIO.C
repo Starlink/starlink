@@ -353,9 +353,9 @@ int StarFitsIO::write( const char *filename )
        if ( getNumHDUs() > 1 && getHDUNum() != 1 ) {
 
            //  Need to save the merged version of the headers.
-           if ( mergedHeader_.ptr() == NULL ) {
-               mergeHeader();
-           }
+           //  Always re-merge at this point so that changes to the primary header
+           //  are seen on output (this may contain a new WCS).
+           mergeHeader();
            header_length = mergedHeader_.length();
            nextrec = (char *)mergedHeader_.ptr();
        }
