@@ -119,13 +119,13 @@
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of non-native AST encodings.
-      PARAMETER ( DEFNCD = 5 )
+      PARAMETER ( DEFNCD = 6 )
 
 *  External References:
       LOGICAL COF_WCSDF
 
 *  Local Variables:
-      CHARACTER ASTCOD( DEFNCD )*9 ! The non-native AST encoding names
+      CHARACTER ASTCOD( DEFNCD )*13 ! The non-native AST encoding names
       INTEGER DIM( NDF__MXDIM )  ! NDF dimensions
       INTEGER FC2                ! AST identifier for temporary FitsChan 
       INTEGER I                  ! Axis count
@@ -145,7 +145,7 @@
 
 *  Store names of non-native AST encodings to use.
       DATA ASTCOD / 'FITS-IRAF', 'FITS-WCS', 'DSS', 'FITS-AIPS', 
-     :              'FITS-PC' /
+     :              'FITS-AIPS++', 'FITS-PC' /
 *.
 
 *  Check inherited global status.

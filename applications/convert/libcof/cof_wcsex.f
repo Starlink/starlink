@@ -112,10 +112,10 @@
 
 *  Local Constants:
       INTEGER DEFNCD             ! Number of AST non-native encodings.
-      PARAMETER ( DEFNCD = 5 )
+      PARAMETER ( DEFNCD = 6 )
 
 *  Local Variables:
-      CHARACTER ASTCOD( DEFNCD )*9 ! The AST non-native encoding names
+      CHARACTER ASTCOD( DEFNCD )*13 ! The AST non-native encoding names
       CHARACTER ATTR*10          ! Attribute name
       CHARACTER AXLAB*30         ! Axis label
       CHARACTER CARD*80          ! The found FITS header card
@@ -160,7 +160,8 @@
       ASTCOD( 2 ) = 'FITS-WCS'
       ASTCOD( 3 ) = 'DSS'
       ASTCOD( 4 ) = 'FITS-AIPS'
-      ASTCOD( 5 ) = 'FITS-PC'
+      ASTCOD( 5 ) = 'FITS-AIPS++'
+      ASTCOD( 6 ) = 'FITS-PC'
 
 *  If we need to choose a default encoding, we need to decide on the
 *  order in which to use the available encodings. The first to be used 
