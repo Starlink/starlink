@@ -1011,7 +1011,7 @@ F77_SUBROUTINE(_TM_fname(map,_t))( INTEGER(id), CHARACTER(mode), \
   _chk_stat; \
   adix_map_n( 0, (ADIobj) *id, NULL, 0, mode, mode_length, \
 	      &_TM_alloc(_t), sizeof(_TM_ftype(_t)), \
-	      &Mptr, status );\
+	      &mptr, status );\
   _EXPORT_POINTER(mptr,vptr); \
   _ERR_REP( _TM_fnames(map,_t), Estr__MapObjDat );}
 
