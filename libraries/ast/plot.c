@@ -366,6 +366,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *       lines when (e.g.) plotting pixel coordins in Polar coords).
 *       - Modified Axlot so that SkyFrames positions which are out of
 *       their normal ranges are not rejected by Map1.
+*     10-OCT-2002 (DSB):
+*       grfAttrs:Modified to test element attributes explicitly using the
+*       relevant TestUse<attr> functions, instead of relying on the
+*       "GetUse<attr>" function returning the NO<attr> constant if not set.
 *class--
 */
 
@@ -13910,8 +13914,8 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
 
 /* See if a value has been set in the Plot for the line style attribute for 
    the specified object, If so, use the value. */
-      ival = GetUseStyle( this, id );      
-      if( ival != NOSTYLE ){
+      if( TestUseStyle( this, id ) ) {
+         ival = GetUseStyle( this, id );      
 
 /* Save the current value, and establish the new value. */
          GAttr( this, GRF__STYLE, (double) ival, attr++, prim, method,
@@ -13924,32 +13928,32 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
       }
 
 /* Do the same for the line width attribute. */
-      dval = GetUseWidth( this, id );      
-      if( dval != NOWIDTH ){
+      if( TestUseWidth( this, id ) ){
+         dval = GetUseWidth( this, id );      
          GAttr( this, GRF__WIDTH, dval, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the character size attribute. */
-      dval = GetUseSize( this, id );      
-      if( dval != NOSIZE ) {
+      if( TestUseSize( this, id ) ) {
+         dval = GetUseSize( this, id );      
          GAttr( this, GRF__SIZE, dval, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the character font attribute. */
-      ival = GetUseFont( this, id );      
-      if( ival != NOFONT ){
+      if( TestUseFont( this, id ) ){
+         ival = GetUseFont( this, id );      
          GAttr( this, GRF__FONT, (double) ival, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the colour attribute. */
-      ival = GetUseColour( this, id );      
-      if( ival != NOCOLOUR ) {
+      if( TestUseColour( this, id ) ) {
+         ival = GetUseColour( this, id );      
          GAttr( this, GRF__COLOUR, (double) ival, attr++, prim, method,
                 class );
       } else {
