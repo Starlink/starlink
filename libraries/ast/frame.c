@@ -164,6 +164,8 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     24-JAN-2004 (DSB):
 *        o  Added astFields.
 *        o  Added argument "fmt" to Abbrev.
+*     7-SEP-2004 (DSB):
+*        o  Modified SetUnit to exclude any trailing spaces
 *class--
 */
 
@@ -6856,34 +6858,47 @@ static void SetUnit( AstFrame *this, int axis, const char *unit ) {
 
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis object */
+   char *c;                      /* Copy of supplied string */
    const char *oldunit;          /* Pointer to old units string */
+   int l;                        /* Used length of supplied string */
 
 /* Check the global error status. */
    if ( !astOK ) return;
 
+/* Get a copy of the supplied string which excludes trailing spaces. */
+   l = astChrLen( unit );
+   c = astStore( NULL, unit, (size_t) (l + 1) );
+   if( astOK ) {
+      c[ l ] = 0;
+
 /* Validate the axis index and obtain a pointer to the required Axis. */
    (void) astValidateAxis( this, axis, "astSetUnit" );
-   ax = astGetAxis( this, axis );
+      ax = astGetAxis( this, axis );
 
 /* The new unit may require the Label and/or Symbol to be changed, but
    only if the Frames ActiveUnit flag is set. */
-   if( astGetActiveUnit( this ) ) {
+      if( astGetActiveUnit( this ) ) {
 
 /* Get the existing Axis unit, using the astGetUnit method (rather than
    astGetAxisUnit) in order to get any default value in the case where
    the Unit attribute is not set. */
-      oldunit = astGetUnit( this, axis );
+         oldunit = astGetUnit( this, axis );
 
 /* Assign the new Unit value. This modifies labels and/or Symbols if
    necessary. */
-      NewUnit( ax, oldunit, unit, "astSetUnit", astGetClass( this ) );
-   }
+         NewUnit( ax, oldunit, c, "astSetUnit", astGetClass( this ) );
+      }
 
 /* Set the Axis Unit attribute value. */
-   astSetAxisUnit( ax, unit );
+      astSetAxisUnit( ax, c );
 
 /* Annul the Axis pointer. */
-   ax = astAnnul( ax );
+      ax = astAnnul( ax );
+   }
+
+/* Free the string copy */
+   c = astFree( c );
+
 }
 
 static int SubFrame( AstFrame *target, AstFrame *template,
