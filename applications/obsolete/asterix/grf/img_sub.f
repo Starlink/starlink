@@ -4024,6 +4024,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       REAL D
       REAL XTR,YTR,XTL,YTL,XBR,YBR,XBL,YBL
       REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
+      REAL A,ASQ,B,BSQ,C,CSQ
       INTEGER LS
       LOGICAL LEFT,RIGHT
 *-
@@ -4088,11 +4089,13 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
           PHWID=MAX(0.5,PHWID)
           PWIDTH=PHWID*2.0
 *  calc width (world coords)
-          D=SQRT((XWID-XCENT)**2 + (YWID-YCENT)**2)
-          ALPHA=ASIN(ABS(XWID-XCENT)/D)
-          WIDTH=2.0*ABS(D*COS(ALPHA))
-
-	print *,xwid,ywid,d,alpha/dtor,width
+          ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
+          A=SQRT(ASQ)
+          BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
+          B=SQRT(BSQ)
+          CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
+          ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
+          WIDTH=A*SIN(ALPHA)
 
 *  keyboard mode
         ELSE
@@ -4144,7 +4147,6 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
       ENDIF
 
-	print *,length,width,angle/dtor
 
       END
 
