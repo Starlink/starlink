@@ -13,19 +13,19 @@ KAPRH_SOURCE = kaprh.csh kaprh_link_adam kaprh.icl kaprh.hlp kaprh_mon.f
 
 # The contents of the kaprh_iraf.tar file:
 KAPRH_IRAF = doc helpdb.mip kaprh.hd  kaprh.par kaprh_mon.ifl root.hd \
-_kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par contover.par \
+_kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl crelut.par greyplot.par contover.par \
 mosaic.par quilt.par snapshot.par turbocont.par inspect.par
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
-IRAF_DOCS = greyplot.hlp contover.hlp mosaic.hlp quilt.hlp snapshot.hlp turbocont.hlp \
+IRAF_DOCS = crelut.hlp greyplot.hlp contover.hlp mosaic.hlp quilt.hlp snapshot.hlp turbocont.hlp \
 inspect.hlp
 
 # The contents of the kaprh_ifls.tar file:
-KAPRH_IFLS = greyplot.ifl krhhelp.ifl kaprh_mon.ifl contover.ifl \
+KAPRH_IFLS = crelut.ifl greyplot.ifl krhhelp.ifl kaprh_mon.ifl contover.ifl \
 mosaic.ifl quilt.ifl snapshot.ifl turbocont.ifl inspect.ifl
 
 # The contents of the kaprh_sub.tar file:
-KAPRH_SUB = greyplot.f krhhelp.f contover.f mosaic.f quilt.f snapshot.f \
+KAPRH_SUB = crelut.f greyplot.f krhhelp.f contover.f mosaic.f quilt.f snapshot.f \
 turbocont.f inspect.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
@@ -33,17 +33,18 @@ KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
 
 # The contents of the kapsub_sub.tar file (including expanded generic
 # files and the generic source files):
-KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_dsclb.f kps1_dscld.f \
-kps1_dscli.f kps1_dsclr.f kps1_dsclw.f 
+KAPSUB_SUB = $(KAPSUB_SOURCES) kps1_dsclb.f kps1_dscld.f kps1_dscli.f \
+kps1_dsclr.f kps1_dsclw.f kps1_hstcb.f kps1_hstcr.f kps1_hstcw.f \
+kps1_hstcd.f kps1_hstcub.f kps1_hstci.f kps1_hstcuw.f
 
 # Generic source files needed for kapsub_sub.tar:
-KAPSUB_GEN = kps1_dscl.gen
+KAPSUB_GEN = kps1_dscl.gen kps1_hstc.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
 KAPSUB_NONGEN = cnthlt.f cntkey.f cntsbp.f gethlp.f kaprh_mon.f \
 kps1_cnser.f kps1_cntur.f kps1_faind.f kps1_fainb.f kps1_faini.f \
 kps1_fainw.f kps1_fainr.f kps1_imzbo.f kps1_ncuco.f lccell.f \
-ncraxs.f \
+kps1_clpal.f ncraxs.f \
 getv2.f   hstrep.f  inpe.f   insl.f     inxy.f    peepsb.f \
 hstdsp.f  imlst.f   inpol.f  linplt.f  slc2t1.f \
 hstlo.f   inhi.f    inre.f   inva.f     linset.f  thrsr.f \

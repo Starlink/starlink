@@ -446,7 +446,7 @@ PAR_ERR NUM_DEC_R SUBPAR_PAR NUM_DEF_R GKS_PAR
 F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(MONO_SOURCE) 
 
-KAPRH_F1_ROUTINES = greyplot.f contover.f snapshot.f turbocont.f inspect.f \
+KAPRH_F1_ROUTINES = crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f \
 mosaic.f quilt.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
@@ -459,11 +459,11 @@ KAPRH_F_ROUTINES = $(KAPRH_F1_ROUTINES) $(KAPRH_F2_ROUTINES)
 KAPSUB_F_ROUTINES = cnthlt.f cntsbp.f gethlp.f kps1_cnser.f kps1_cntur.f \
 kps1_dsclb.f kps1_dscli.f kps1_dsclr.f kps1_dscld.f kps1_dsclw.f \
 kps1_faind.f kps1_fainb.f kps1_fainw.f kps1_fainr.f kps1_faini.f \
-kps1_imzbo.f lccell.f ncraxs.f kps1_ncuco.f cntkey.f \
-getv2.f   hstrep.f  inpe.f   insl.f     inxy.f    peepsb.f \
-hstdsp.f  imlst.f   inpol.f  linplt.f  slc2t1.f \
-hstlo.f   inhi.f    inre.f   inva.f     linset.f  thrsr.f \
- mfnext.f  mfopen.f  moscad.f  moscdv.f
+kps1_imzbo.f lccell.f ncraxs.f kps1_ncuco.f kps1_clpal.f cntkey.f \
+kps1_hstcb.f kps1_hstcr.f kps1_hstcw.f kps1_hstcd.f kps1_hstcub.f \
+kps1_hstci.f kps1_hstcuw.f getv2.f hstrep.f inpe.f insl.f inxy.f peepsb.f \
+hstdsp.f imlst.f inpol.f linplt.f slc2t1.f hstlo.f inhi.f inre.f \
+inva.f linset.f thrsr.f mfnext.f mfopen.f moscad.f moscdv.f
 
 MONO_SOURCE = kaprh_mon.f
 
@@ -1675,6 +1675,7 @@ cntsbp.o:	 SAE_PAR
 contover.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR NDF_PAR NDF_ERR GKS_PAR
 gethlp.o:	 SAE_PAR HLPCMD
 getv2.o:	 SAE_PAR
+crelut.o:        SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR CTM_PAR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
 hstdsp.o:	 SAE_PAR
 hstlo.o:	 SAE_PAR
@@ -1689,6 +1690,14 @@ inspect.o:	 SAE_PAR DAT_PAR PRM_PAR SUBPAR_PAR PAR_ERR NDF_PAR NDF_ERR
 inva.o:	 SAE_PAR PRM_PAR PAR_ERR
 inxy.o:	 SAE_PAR PRM_PAR PAR_ERR FIO_PAR FIO_ERR
 kaprh_mon.o:	 SAE_PAR
+kps1_hstcb.f:    SAE_PAR
+kps1_hstcr.f:    SAE_PAR
+kps1_hstcw.f:    SAE_PAR
+kps1_hstcd.f:    SAE_PAR
+kps1_hstcub.f:   SAE_PAR
+kps1_hstci.f:    SAE_PAR
+kps1_hstcuw.f:   SAE_PAR
+kps1_clpal.o:	 SAE_PAR 
 kps1_cnser.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEF_CVT
 kps1_cntur.o:	 SAE_PAR PRM_PAR
 kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_R NUM_DEF_CVT NUM_DEF_R
