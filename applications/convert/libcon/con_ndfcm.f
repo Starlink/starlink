@@ -60,6 +60,7 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'       ! SSE global definitions
+      INCLUDE  'DAT_PAR'       ! Data-sytem constants
 
 *  Arguments Given:
       INTEGER NCARD            ! Total number of header cards

@@ -59,6 +59,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Data-system constants
 
 *  Arguments Given:
       CHARACTER * ( * ) LOC

@@ -45,6 +45,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Data-sytem constants
 
 *  Arguments Given:
       CHARACTER * ( * ) HDSTYP

@@ -71,6 +71,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
 
 *  Arguments Given:

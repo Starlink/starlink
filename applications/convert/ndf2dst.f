@@ -146,6 +146,7 @@
 
 *  Global constants:
       INCLUDE  'SAE_PAR'            ! Standard SAE constants
+      INCLUDE  'DAT_PAR'            ! Data-system constants
       INCLUDE  'FIO_PAR'            ! FIO constants
       INCLUDE  'NDF_PAR'            ! NDF symbolic constants
 
@@ -162,8 +163,6 @@
       PARAMETER( MAXHIS = 100 )
 
 *  Local Variables:
-      INTEGER                APC    ! Column of FITS card-image
-                                    ! containing an apostrophe
       CHARACTER*1 AXNAME(6)         ! Axis names
       INTEGER                AXPTR  ! Pointer to NDF axis data
       LOGICAL                AXDATA ! True if axis data exist
@@ -174,10 +173,6 @@
       LOGICAL                BADPIX ! True if bad values may be present
                                     ! in the main data array
       INTEGER                CLEN   ! String length
-      INTEGER                COMBEG ! Column of FITS card-image
-                                    ! containing the comment delimiter
-      CHARACTER*72 COMMEN( MAXCOM ) ! FITS comment card images
-      INTEGER                COMREC ! Number of FITS comment card images
       INTEGER                CSTAT  ! Status value in CHR calls
       INTEGER                DIM(NDF__MXDIM)  ! Dimensions
       CHARACTER*(DAT__SZTYP) EXTTYP ! Extension type
@@ -194,9 +189,6 @@
       CHARACTER*48           FITCOM ! FITS comment         
       CHARACTER*70           FITDAT ! FITS value
       CHARACTER*8            FITNAM ! FITS keyword          
-      INTEGER                FQPTR  ! Pointer to Figaro quality data
-      INTEGER                HISREC ! Number of FITS HISTORY card images
-      CHARACTER*72 HISTOR( MAXHIS ) ! FITS HISTORY card images
       INTEGER                I      ! Loop variable
       INTEGER                IAXIS  ! Axis number
       INTEGER                IERR   ! First numerical error
@@ -223,7 +215,6 @@
       CHARACTER*(DAT__SZLOC) LFZD   ! Figaro '.Z.DATA' locator
       CHARACTER*(DAT__SZLOC) LFZE   ! Figaro '.Z.ERRORS' locator
       CHARACTER*(DAT__SZLOC) LFZL   ! Figaro '.Z.LABEL' locator
-      CHARACTER*(DAT__SZLOC) LFZQ   ! Figaro '.Z.QUALITY' locator
       CHARACTER*(DAT__SZLOC) LFZU   ! Figaro '.Z.UNITS' locator
       CHARACTER*(DAT__SZLOC) LOCA   ! NDF axis-structure locator
       CHARACTER*(DAT__SZLOC) LOCAI  ! NDF axis element locator
@@ -251,7 +242,6 @@
       INTEGER                NELM   ! Number of elements
       INTEGER                NERR   ! Number of numerical errors
       INTEGER                NEXT   ! Counter for NDF extensions
-      INTEGER                NQPTR  ! Pointer to NDF quality data
       INTEGER                NVPTR  ! Pointer to NDF variance array
       CHARACTER*(DAT__SZLOC) NXFIG  ! NDF FIGARO extension locator
       CHARACTER*(DAT__SZLOC) NXFIGI ! NDF FIGARO.something locator

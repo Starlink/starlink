@@ -95,6 +95,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'           ! Standard SAE constants
+      INCLUDE 'DAT_PAR'           ! Data-system constants
       INCLUDE 'NDF_PAR'           ! NDF_ public constants
       INCLUDE 'PRM_PAR'           ! PRIMDAT symbolic constants
 
@@ -136,7 +137,7 @@
 *.
 
 *  Check inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN
+      IF ( STATUS .NE. SAI__OK ) RETURN
       
 *   First, get name and logical unit number for DIPSO file.
       CALL FIO_ASSOC ('IN', 'READ', 'UNFORMATTED', 0, FD, STATUS)

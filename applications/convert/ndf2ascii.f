@@ -177,6 +177,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
 
@@ -199,7 +200,6 @@
                                  ! comps.
       LOGICAL AXLFND             ! True if NDF contains axis label
       LOGICAL AXUFND             ! True if NDF contains axis units
-      LOGICAL BAD                ! Need to check for bad pixels?
       CHARACTER * ( DAT__SZLOC ) CLOC ! Locator to single FITS card
       LOGICAL CMPFND( NFLAGS )   ! True if certain special NDF
                                  ! components are present
@@ -232,7 +232,6 @@
                                  ! precision
       INTEGER NDF                ! Identifier for NDF
       INTEGER NUMPRE             ! Number of data values per record
-      LOGICAL OPEN               ! Output file opened successfully
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
       INTEGER RECL               ! Maximum recordlength of text file
                                  ! in bytes

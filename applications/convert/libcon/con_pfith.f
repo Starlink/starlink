@@ -67,7 +67,8 @@
       IMPLICIT  NONE             ! No default typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'         ! SSE global definitions
+      INCLUDE 'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'DAT_PAR'          ! Data-sytem constants
 
 *  Arguments Given:
       INTEGER FD                 ! File descriptor

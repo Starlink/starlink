@@ -132,6 +132,7 @@
 
 *  Global Constants:
       INCLUDE  'SAE_PAR'       ! SSE global definitions
+      INCLUDE  'DAT_PAR'       ! Data-sytem constants
       INCLUDE  'PRM_PAR'       ! Magic-value definitions
 
 *  Arguments Given:

@@ -177,6 +177,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Data-system constants
       INCLUDE 'NDF_PAR'          ! NDF_ public constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
 
@@ -211,7 +212,6 @@
       LOGICAL EXTEND             ! True if there is a FITS extension
                                  ! (XTENSION=T)
       INTEGER FD                 ! File descriptor
-      CHARACTER * ( DAT__SZLOC ) FLOC ! Locator to FITS extension
       LOGICAL HEADER             ! If true there will be FITS-like
                                  ! header
       INTEGER HDNUM( MAXHDR )    ! Number of headers cards in each
@@ -223,7 +223,6 @@
       INTEGER I                  ! Loop counter
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Implementation type for
                                  ! integer array
-      LOGICAL LABFND             ! True if NDF LABEL found
       INTEGER NCARD              ! Number of cards in the FITS-like
                                  ! header
       INTEGER NDF                ! Identifier for NDF
@@ -240,7 +239,6 @@
       INTEGER RECL               ! Maximum recordlength of input file
                                  ! in bytes
       INTEGER SKIP               ! Number of header records to skip
-      LOGICAL THERE              ! FITS extension is present
       CHARACTER * ( DAT__SZLOC ) TLOC ! Locator to workspace holding the
                                  ! FITS-like headers
       CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
