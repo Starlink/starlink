@@ -156,6 +156,8 @@
 *           Validate class membership.
 *        astInitChannel
 *           Initialise a Channel.
+*        astInitChannelVtab
+*           Initialise the virtual function table for the Channel class.
 *        astLoadChannel
 *           Load a Channel.
 
@@ -187,6 +189,10 @@
 *        Original version.
 *     12-DEC-1996 (RFWS):
 *        Added the astChannelFor function.
+*     11-NOV-2002 (DSB):
+*        Added astWriteInvocations.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitAxisVtab method.
 *-
 */
 
@@ -309,8 +315,11 @@ AstChannel *astInitChannel_( void *, size_t, int, AstChannelVtab *,
                              const char *(*)( void ),
                              void (*)( const char * ) );
 
+/* Vtab initialiser. */
+void astInitChannelVtab_( AstChannelVtab *, const char * );
+
 /* Loader. */
-AstChannel *astLoadChannel_( void *, size_t, int, AstChannelVtab *,
+AstChannel *astLoadChannel_( void *, size_t, AstChannelVtab *,
                              const char *, AstChannel *channel );
 #endif
 
@@ -344,6 +353,7 @@ void astWriteBegin_( AstChannel *, const char *, const char * );
 void astWriteDouble_( AstChannel *, const char *, int, int, double, const char * );
 void astWriteEnd_( AstChannel *, const char * );
 void astWriteInt_( AstChannel *, const char *, int, int, int, const char * );
+int astWriteInvocations_( void );
 void astWriteIsA_( AstChannel *, const char *, const char * );
 void astWriteObject_( AstChannel *, const char *, int, int, AstObject *, const char * );
 void astWriteString_( AstChannel *, const char *, int, int, const char *, const char * );
@@ -381,9 +391,11 @@ void astWriteString_( AstChannel *, const char *, int, int, const char *, const 
 #define astInitChannel(mem,size,init,vtab,name,source,sink) \
 astINVOKE(O,astInitChannel_(mem,size,init,vtab,name,source,sink))
 
+/* Vtab Initialiser. */
+#define astInitChannelVtab(vtab,name) astINVOKE(V,astInitChannelVtab_(vtab,name))
 /* Loader. */
-#define astLoadChannel(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadChannel_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadChannel(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadChannel_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to member functions. */
@@ -451,5 +463,8 @@ astINVOKE(V,astWriteIsA_(astCheckChannel(this),class,comment))
 astINVOKE(V,astWriteObject_(astCheckChannel(this),name,set,helpful,astCheckObject(value),comment))
 #define astWriteString(this,name,set,helpful,value,comment) \
 astINVOKE(V,astWriteString_(astCheckChannel(this),name,set,helpful,value,comment))
+
+#define astWriteInvocations astWriteInvocations_()
+
 #endif
 #endif

@@ -60,6 +60,13 @@ f     - AST_WRITE: Write an Object to a Channel
 *        Added support for foreign language source and sink functions.
 *     28-APR-1997 (RFWS):
 *        Prevent "-0" being written (use "0" instead).
+*     27-NOV-2002 (DSB):
+*        Added astWriteInvocations.
+*     8-JAN-2003 (DSB):
+*        - Changed private InitVtab method to protected astInitChannelVtab
+*        method.
+*        - Modified to use protected Vtab initialisation methods when
+*        loading an Object.
 *class--
 */
 
@@ -143,6 +150,9 @@ static int current_indent = 0;
    Objects when they contain other Objects. */
 static int nest = -1;
 
+/* The number of times astWrite has been invoked. */
+static int nWriteInvoc = 0;
+
 /***
    The following items are all pointers to dynamically allocated
    arrays (stacks) that grow as necessary to accommodate one element
@@ -212,7 +222,6 @@ static void ClearSkip( AstChannel * );
 static void ClearValues( AstChannel * );
 static void Dump( AstObject *, AstChannel * );
 static void GetNextData( AstChannel *, int, char **, char ** );
-static void InitVtab( AstChannelVtab * );
 static void OutputTextItem( AstChannel *, const char * );
 static void PutNextText( AstChannel *, const char * );
 static void ReadClassData( AstChannel *, const char * );
@@ -1291,14 +1300,15 @@ static AstChannel *Init( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitChannelVtab( vtab, name );
+
 /* Initialise an Object structure (the parent class) as the first
    component within the Channel structure, allocating memory if
    necessary. */
-   new = (AstChannel *) astInitObject( mem, size, init,
+   new = (AstChannel *) astInitObject( mem, size, 0,
                                        (AstObjectVtab *) vtab, name );
 
-/* If necessary, initialise the virtual function table. */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the Channel data. */
@@ -1323,23 +1333,24 @@ static AstChannel *Init( void *mem, size_t size, int init,
    return new;
 }
 
-static void InitVtab( AstChannelVtab *vtab ) {
+void astInitChannelVtab_(  AstChannelVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitChannelVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a Channel.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "channel.h"
-*     void InitVtab( AstChannelVtab *vtab )
+*     void astInitChannelVtab( AstChannelVtab *vtab, const char *name )
 
 *  Class Membership:
-*     Channel member function.
+*     Channel vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -1348,7 +1359,14 @@ static void InitVtab( AstChannelVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -1356,6 +1374,10 @@ static void InitVtab( AstChannelVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitObjectVtab( (AstObjectVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAChannel) to determine if an object belongs
@@ -1852,7 +1874,7 @@ f     is invoked with STATUS set to an error value, or if it should fail
    data stream and builds the Object. Supply NULL/zero values to the
    loader so that it will substitute values appropriate to its own
    class. */
-            new = (*loader)( NULL, (size_t) 0, 0, NULL, NULL, this );
+            new = (*loader)( NULL, (size_t) 0, NULL, NULL, this );
 
 /* Clear the values list for the current nesting level. If the list
    has not been read or any Values remain in it, an error will
@@ -3586,6 +3608,37 @@ static void WriteInt( AstChannel *this, const char *name, int set, int helpful,
 #undef BUFF_LEN
 }
 
+int astWriteInvocations_( void ){
+/*
+*+
+*  Name:
+*     astWriteInvocations
+
+*  Purpose:
+*     Returns the number of invocations of the astWrite method.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "channel.h"
+*     int astWriteInvocations
+
+*  Class Membership:
+*     Channel method.
+
+*  Description:
+*     This function returns the number of invocations of astWrite which
+*     have been made so far, excluding those made from within the
+*     astWriteObject method. An example of its use is to allow a Dump
+*     function to determine if a sub-object has already been dumped
+*     during the current invocation of astWrite. See the Dump method for
+*     the AstUnit class as an example.
+*-
+*/
+   return nWriteInvoc;
+}
+
 static void WriteIsA( AstChannel *this, const char *class,
                       const char *comment ) {
 /*
@@ -4791,7 +4844,7 @@ AstChannel *astInitChannel_( void *mem, size_t size, int init,
    return new;
 }
 
-AstChannel *astLoadChannel_( void *mem, size_t size, int init,
+AstChannel *astLoadChannel_( void *mem, size_t size,
                              AstChannelVtab *vtab, const char *name,
                              AstChannel *channel ) {
 /*
@@ -4807,7 +4860,7 @@ AstChannel *astLoadChannel_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "channel.h"
-*     AstChannel *astLoadChannel( void *mem, size_t size, int init,
+*     AstChannel *astLoadChannel( void *mem, size_t size,
 *                                 AstChannelVtab *vtab, const char *name,
 *                                 AstChannel *channel )
 
@@ -4824,6 +4877,7 @@ AstChannel *astLoadChannel_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a Channel at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -4842,14 +4896,6 @@ AstChannel *astLoadChannel_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstChannel) is used instead.
-*     init
-*        A boolean flag indicating if the Channel's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the Channel class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new Channel. If this is NULL, a pointer
@@ -4889,26 +4935,23 @@ AstChannel *astLoadChannel_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstChannel );
-      init = !class_init;
       vtab = &class_vtab;
       name = "Channel";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitChannelVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Channel. */
-   new = astLoadObject( mem, size, init, (AstObjectVtab *) vtab, name,
+   new = astLoadObject( mem, size, (AstObjectVtab *) vtab, name,
                         channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */
@@ -5006,10 +5049,6 @@ char *astReadString_( AstChannel *this, const char *name, const char *def ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Channel,ReadString))( this, name, def );
 }
-int astWrite_( AstChannel *this, AstObject *object ) {
-   if ( !astOK ) return 0;
-   return (**astMEMBER(this,Channel,Write))( this, object );
-}
 void astWriteBegin_( AstChannel *this, const char *class,
                      const char *comment ) {
    if ( !astOK ) return;
@@ -5035,15 +5074,31 @@ void astWriteIsA_( AstChannel *this, const char *class, const char *comment ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Channel,WriteIsA))( this, class, comment );
 }
-void astWriteObject_( AstChannel *this, const char *name, int set,
-                      int helpful, AstObject *value, const char *comment ) {
-   if ( !astOK ) return;
-   (**astMEMBER(this,Channel,WriteObject))( this, name, set, helpful, value,
-                                            comment );
-}
 void astWriteString_( AstChannel *this, const char *name, int set, int helpful,
                       const char *value, const char *comment ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Channel,WriteString))( this, name, set, helpful, value,
+                                            comment );
+}
+
+/* Count the number of times astWrite is invoked (excluding invocations
+   made from within the astWriteObject method - see below). The count is 
+   done here so that invocations of astWrite within a sub-class will be 
+   included. */
+int astWrite_( AstChannel *this, AstObject *object ) {
+   if ( !astOK ) return 0;
+   nWriteInvoc++;
+   return (**astMEMBER(this,Channel,Write))( this, object );
+}
+
+/* We do not want to count invocations of astWrite made from within the
+   astWriteObject method. So decrement the number of invocations first
+   (this assumes that each invocation of astWriteObject will only invoke
+   astWrite once). */
+void astWriteObject_( AstChannel *this, const char *name, int set,
+                      int helpful, AstObject *value, const char *comment ) {
+   if ( !astOK ) return;
+   nWriteInvoc--;
+   (**astMEMBER(this,Channel,WriteObject))( this, name, set, helpful, value,
                                             comment );
 }
