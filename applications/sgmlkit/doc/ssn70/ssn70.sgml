@@ -90,7 +90,9 @@ Time for few documentation updates.
 
 <distribution string="DR-0.6" date="31-Mar-2000" author="ng" versionid="v0.6">
 
-<px>RCS: $Id$
+<!-- Include the RCS Id corresponding to the current version (but
+     remove the dollars, so this isn't fiddled with again.
+<px>RCS: Id: ssn70.sgml,v 1.35 2000/03/31 14:35:38 norman Exp 
 
 <px>Added sgml2docs command.  Significant changes to programcode.
 Incorporates decisions from Durham, RAL and
