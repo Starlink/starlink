@@ -75,7 +75,7 @@ file
 
 unit
 	: line
-			{ printf( "%s", $1 ); uclear(); }
+			{ printf( "%s", $1 ); free( $1 ); uclear(); }
 	;
 
 line
@@ -93,7 +93,7 @@ line
 	| BLANK_LINE
 			{ $$ = $1; }
 	| error LINE_END
-			{ handle_error(); $$ = ""; }
+			{ handle_error(); $$ = scat( 0 ); }
 	;
 
 module_start_line
@@ -456,6 +456,13 @@ token_brac
 *        "<a attrib='refname( text )'>text</a> trailing-spaces".
 *        This is malloc'd by this routine so should subsequently be free'd.
 *
+*  Bugs:
+*     Since tokens are popped off the stack by yacc without offering us
+*     the chance of intervention, and processing the tokens is normally
+*     how we free up memory which has been allocated by inferior levels
+*     of token processing, there is a memory leak which occurs every
+*     time there is an error.
+*
 *  Description:
 *     This routine generates an SGML tag surrounding the text given
 *     by the name argument.  The value of the attribute named by the
@@ -516,6 +523,9 @@ token_brac
          }
       }
 
+/* Reclaim space from arguments, which may not be used after this call. */
+      free( name );
+
 /* Return. */
       return( string );
    }
@@ -535,7 +545,16 @@ token_brac
 *        Name of the attribute, presumably "href".
 *     name = char *
 *        Text to be tagged.  Must include two "'" characters.  The text
-*        between these will be the contents of the tag.
+*        between these will be the contents of the tag.  This variable
+*        will be free'd by this function, so must previously have been
+*        malloc'd.
+*
+*  Bugs:
+*     Since tokens are popped off the stack by yacc without offering us
+*     the chance of intervention, and processing the tokens is normally
+*     how we free up memory which has been allocated by inferior levels
+*     of token processing, there is a memory leak which occurs every
+*     time there is an error.
 *
 *  Return value:
 *     string = char *
@@ -569,6 +588,9 @@ token_brac
 /* Uppercase the attribute value. */
       for ( ; *rns != '>'; rns++ )
          *rns = toupper( *rns );
+
+/* Reclaim space from arguments, which may not be used after this call. */
+      free( name );
 
 /* Return. */
       return( string );
@@ -770,6 +792,9 @@ token_brac
       listfirst = listlast = &listbase;
       listfirst->next = (ELEMENT *) NULL;
    }
+
+
+   void tagwrap() { module_start(); }
 
 
    void handle_error() {

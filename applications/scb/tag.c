@@ -134,6 +134,7 @@ int yydebug;
       printf( "%s", text );
       free( text );
       uclear();
+      tagwrap();
 
 /* Return. */
       return( retval );
@@ -194,7 +195,8 @@ int yydebug;
 *
 *  Arguments:
 *     n = int
-*        The number of strings to be concatenated.
+*        The number of strings to be concatenated.  n may be zero, in 
+*        which case a newly allocated string of length zero is returned.
 *     sp1, sp2, ... = char *
 *        The other arguments are all strings, and there are n of them.
 *        free() is called on each of them, so they must have been malloc'd
@@ -222,7 +224,7 @@ int yydebug;
       char *string, *sp;
 
 /* Work out the length of the final string. */
-      len = 1;
+      len = 0;
       va_start( ap, n );
       for ( i = 0; i < n; i++ ) {
          sp = va_arg( ap, char * );
@@ -234,11 +236,13 @@ int yydebug;
       string = (char *) memok( malloc( len + 1 ) );
       *string = '\0';
 
-/* Copy the arguments into the allocated space .*/
+/* Copy the arguments into the allocated space.  We free the storage used
+   by each argument as we go along. */
       va_start( ap, n );
       for ( i = 0; i < n; i++ ) {
          sp = va_arg( ap, char * );
          strcat( string, sp );
+         free( sp );
       }
       va_end( ap );
 
@@ -274,7 +278,8 @@ int yydebug;
       ulast->next = (ELEMENT *) memok( malloc( sizeof( ELEMENT ) ) );
       ulast = ulast->next;
       ulast->next = NULL;
-      ulast->text = item;
+      ulast->text = (char *) memok( malloc( strlen( item ) + 1 ) );
+      strcpy( ulast->text, item );
    }
 
    char *ucontent() {

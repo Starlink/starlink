@@ -72,7 +72,7 @@ file
 
 unit
 	: external_definition
-		{ printf( "%s", $1 ); uclear(); }
+		{ printf( "%s", $1 ); free( $1 ); uclear(); }
 	;
 
 external_definition
@@ -91,7 +91,7 @@ external_definition
 	| ';'
 		{ $$ = $1; }
 	| error
-		{ handle_error(); $$ = ""; }
+		{ handle_error(); $$ = scat( 0 ); }
 	;
 
 bracket_sequence
@@ -276,6 +276,8 @@ identifier
 
    yyerror(char *s) { /* No action */ }
 
+   void tagwrap() { /* No action */ }
+
    char *canchor( char *attrib, char *fname, int f77flag ) {
 /*+
 *  Name:
@@ -343,9 +345,11 @@ identifier
 
 /* Overwrite the bare vname at the end with the tag. */
       sprintf( string + (int) (vname - fname), 
-               ( f77flag ? "<a %s='%s_'>%s</a>"
-                         : "<a %s='%s'>%s</a>" ), 
+               ( f77flag ? "<a %s='%s_'>%s</a>" : "<a %s='%s'>%s</a>" ), 
                attrib, vname, vname );
+
+/* Reclaim space from arguments, which may not be used after this call. */
+      free( fname );
 
 /* Return. */
       return( string );
@@ -384,6 +388,13 @@ identifier
 *     likely to be a good choice.  We can't get yacc to do the skipping
 *     forward itself because the lexer does not recognise and return
 *     blanks of any kind.
+*
+*  Bugs:
+*     Since tokens are popped off the stack by yacc without offering us
+*     the chance of intervention, and processing the tokens is normally
+*     how we free up memory which has been allocated by inferior levels
+*     of token processing, there is a memory leak which occurs every
+*     time there is an error.
 *-
 */
 
@@ -412,6 +423,4 @@ identifier
    }
 
 
-
-   
 /* $Id$ */
