@@ -180,8 +180,10 @@
       INTEGER UBND( 2, CCD1__MXNDF ) ! Bounds of NDF
       INTEGER WID1              ! Width of bias strip
       INTEGER WID2              ! Width of bias strip
+      LOGICAL BIAS              ! Create bias frames
       LOGICAL BOK               ! Bounds ok
       LOGICAL FOPEN             ! Input file is open
+      LOGICAL FLAT              ! Create flat fields
       
 *  Local data. This names follow the ING/WHT convention.
 
@@ -286,6 +288,10 @@
       CALL PAR_GET0C( 'TYPE', TYPE, STATUS )
       IF ( TYPE .EQ. '.sdf' .OR. TYPE .EQ. '.SDF' ) TYPE = ' '
 
+*  Get flags telling which frames to produce
+      CALL PAR_GET0L( 'BIAS', BIAS, STATUS )
+      CALL PAR_GET0L( 'FLAT', FLAT, STATUS )
+
 *  Create a sequence of frames.
       DO I = 1, NLOOP
 
@@ -298,91 +304,13 @@
          DIMS( 1 ) = UBND( 1, I ) - LBND( 1, I ) + 1
          DIMS( 2 ) = UBND( 2, I ) - LBND( 2, I ) + 1
 
-*  Workspace array.
-         CALL NDF_TEMP( PLACE, STATUS )
-         CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDW, STATUS )
-         CALL NDF_MAP( IDW, 'DATA', '_REAL', 'WRITE', IPWRK, EL,
-     :                 STATUS )
-
-*  Bias frame.
-         CALL CHR_ITOC( I, COUNT, NCHAR )
-         FNAME = 'bias'//COUNT( :NCHAR )//TYPE
-         CALL NDF_OPEN( DAT__ROOT, FNAME( :CHR_LEN( FNAME ) ),
-     :                  'WRITE', 'NEW', IDB, PLACE, STATUS )
-         CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
-C         CALL NDF_HCRE( IDB, STATUS )
-
-*  Map the data in.
-         CALL NDF_MAP( IDB, 'DATA', '_REAL', 'WRITE', IPBIA, EL,
-     :                 STATUS )
-
-*  Fill with noise.
-         CALL CCG1_STVR( 100.0, EL, %VAL( IPBIA ), STATUS )
-         CALL CCD1_ANOI( %VAL( IPBIA ), EL, 1.0, STATUS )
-
-*  Get the object frame.
-         CALL CHR_ITOC( I, COUNT, NCHAR )
-         FNAME = 'data'//COUNT( :NCHAR )//TYPE
-         CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
-     :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
-         CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
-C         CALL NDF_HCRE( IDO, STATUS )
-
-*  Map the data in.
-         CALL NDF_MAP( IDO, 'DATA', '_REAL', 'WRITE', IPOBJ, EL,
-     :                 STATUS )
-
-*  Create the objects.
-         CALL CCD1_OBJS( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
-     :                   LBND( 1, I ), LBND( 2, I ),
-     :                   %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ), NOBJ,
-     :                   3.0, 0.75, 0.8, %VAL( IPELL ),
-     :                   0.0, 500.0, 100000.0, 15.0, .FALSE., 1,
-     :                   STATUS )
-
-*  Add noise to it.
-         CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
-
-*  Create the corresponding flatfield.
-         CALL CHR_ITOC( I, COUNT, NCHAR )
-         FNAME = 'ff'//COUNT( :NCHAR )//TYPE
-         CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
-     :                  'WRITE', 'NEW', IDF, PLACE, STATUS )
-         CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
-C         CALL NDF_HCRE( IDF, STATUS )
-
-*  Map the data in.
-         CALL NDF_MAP( IDF, 'DATA', '_REAL', 'WRITE', IPFF, EL,
-     :                 STATUS )
-
-*  Create a flatfield.
-         CALL CCD1_CFF( %VAL( IPFF ), DIMS( 1 ), DIMS( 2 ), STATUS )
-
-*  Multiply data by the flatfield.
-         CALL VEC_MULR( .FALSE., EL, %VAL( IPFF ), %VAL( IPOBJ ),
-     :                 %VAL( IPWRK ), IERR, NERR, STATUS )
-
-*  Add bias to data.
-         CALL CCD1_ADDS( %VAL( IPWRK ), %VAL( IPBIA ), %VAL( IPOBJ ),
-     :                    DIMS( 1 ), DIMS( 2 ), WID1, WID2, STATUS )
-
-*  Scale flatfield and add noise.
-         CALL CCG1_CMLTR( .FALSE., EL, %VAL( IPFF ), 1000.0D0,
-     :                    %VAL( IPWRK ), NERR, STATUS )
-         CALL CCD1_ANOI( %VAL( IPWRK ), EL, 1.0, STATUS )
-
-*  Add bias to the flatfield.
-         CALL CCD1_ADDS( %VAL( IPWRK ), %VAL( IPBIA ), %VAL( IPFF ),
-     :                   DIMS( 1 ), DIMS( 2 ), WID1, WID2, STATUS )
-
-
-*  Set the FITS information.
+*  Set up generic FITS information.
          IAT = 10
          CALL CHR_PUTI( DIMS( 1 ), BLOCK( 2 ), IAT )
          IAT = 10
          CALL CHR_PUTI( DIMS( 2 ), BLOCK( 3 ), IAT ) 
          IAT = 10
-         CALL CHR_PUTI( ( DIMS( 1 ) - ( WID1 + WID2 ) ), BLOCK( 4 ), 
+         CALL CHR_PUTI( ( DIMS( 1 ) - ( WID1 + WID2 ) ), BLOCK( 4 ),
      :                  IAT )
          IAT = 10
          CALL CHR_PUTI( WID1, BLOCK( 5 ), IAT )
@@ -392,25 +320,117 @@ C         CALL NDF_HCRE( IDF, STATUS )
          CALL CHR_PUTI( DIMS( 2 ), BLOCK( 7 ), IAT )
          IAT = 10
          CALL CHR_PUTI( DIMS( 2 ), BLOCK( 9 ), IAT )
-         CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
-     :                  STATUS )
-         BLOCK( 13 ) = 'OBSTYPE = ''BIAS'''
-         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
-         CALL DAT_ANNUL( LOCEXT, STATUS )
 
+*  Object frame.
+
+*    Get the frame.
+         CALL CHR_ITOC( I, COUNT, NCHAR )
+         FNAME = 'data'//COUNT( :NCHAR )//TYPE
+         CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
+     :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
+         CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
+C         CALL NDF_HCRE( IDO, STATUS )
+
+*    Map the data in.
+         CALL NDF_MAP( IDO, 'DATA', '_REAL', 'WRITE', IPOBJ, EL,
+     :                 STATUS )
+
+*    Create the objects.
+         CALL CCD1_OBJS( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
+     :                   LBND( 1, I ), LBND( 2, I ),
+     :                   %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ), NOBJ,
+     :                   3.0, 0.75, 0.8, %VAL( IPELL ),
+     :                   0.0, 500.0, 100000.0, 15.0, .FALSE., 1,
+     :                   STATUS )
+
+*    Add noise to it.
+         CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
+
+*    Multiply data by the flatfield.
+         CALL VEC_MULR( .FALSE., EL, %VAL( IPFF ), %VAL( IPOBJ ),
+     :                 %VAL( IPWRK ), IERR, NERR, STATUS )
+
+*    Add bias to it.
+
+*    Include FITS block.
          CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
      :                  STATUS )
          BLOCK(13 ) = 'OBSTYPE = ''TARGET            '''
          CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
          CALL DAT_ANNUL( LOCEXT, STATUS )
 
-         CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
-     :                  STATUS )
-         BLOCK(13 ) = 'OBSTYPE = ''FLAT              '''
-         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
-         CALL DAT_ANNUL( LOCEXT, STATUS )
+*    Unmap and release.
+         CALL NDF_ANNUL ( IDO, STATUS )
 
-*  Release all NDFs - this pass.
+*  Bias frame (if required).
+         IF ( BIAS ) THEN
+
+*    Get the frame.
+            CALL CHR_ITOC( I, COUNT, NCHAR )
+            FNAME = 'bias'//COUNT( :NCHAR )//TYPE
+            CALL NDF_OPEN( DAT__ROOT, FNAME( :CHR_LEN( FNAME ) ),
+     :                     'WRITE', 'NEW', IDB, PLACE, STATUS )
+            CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
+C            CALL NDF_HCRE( IDB, STATUS )
+
+*    Map the data in.
+            CALL NDF_MAP( IDB, 'DATA', '_REAL', 'WRITE', IPBIA, EL,
+     :                    STATUS )
+
+*    Clear data.
+
+*    Add bias to it.
+         [  CALL CCG1_STVR( 100.0, EL, %VAL( IPBIA ), STATUS ) ]
+         [  CALL CCD1_ANOI( %VAL( IPBIA ), EL, 1.0, STATUS )   ]
+
+*    Include FITS block.
+            CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+     :                     STATUS )
+            BLOCK( 13 ) = 'OBSTYPE = ''BIAS'''
+            CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
+            CALL DAT_ANNUL( LOCEXT, STATUS )
+
+*    Unmap and release.
+            CALL NDF_ANNUL ( IDB, STATUS )
+
+         END IF
+
+*  Flat field frame (if required).
+         IF ( FLAT ) THEN
+            
+*    Get the frame.
+            CALL CHR_ITOC( I, COUNT, NCHAR )
+            FNAME = 'ff'//COUNT( :NCHAR )//TYPE
+            CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
+     :                     'WRITE', 'NEW', IDF, PLACE, STATUS )
+            CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
+C            CALL NDF_HCRE( IDF, STATUS )
+
+*    Map the data in.
+            CALL NDF_MAP( IDF, 'DATA', '_REAL', 'WRITE', IPFF, EL,
+     :                    STATUS )
+
+*    Assign a constant value to all elments.
+
+*    Multiply by flatfield.
+
+*    Add noise.
+
+*    Add bias to it.
+
+*    Include FITS block.
+            CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+     :                     STATUS )
+            BLOCK(13 ) = 'OBSTYPE = ''FLAT              '''
+            CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
+            CALL DAT_ANNUL( LOCEXT, STATUS )
+
+*    Unmap and release.
+            CALL NDF_ANNUL ( IFD, STATUS )
+
+         END IF
+
+*  End NDF context - should be unnecessary, but just to be safe.
          CALL NDF_END( STATUS )
       END DO
 
@@ -437,4 +457,4 @@ C         CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdgenerate.f,v 1.2 1997/11/13 16:42:42 pdraper Exp $
+* $Id: ccdgenerate.f,v 1.1 1998/06/15 09:53:31 mbt Exp mbt $
