@@ -8937,6 +8937,7 @@ U java/source/topcat/src/etc/demo/votable/vizier.xml.gz
 cvs checkout: Updating java/source/topcat/src/etc/demo/wdc
 U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
 cvs checkout: Updating java/source/topcat/src/lib
+U java/source/topcat/src/lib/acme_encoding.jar
 U java/source/topcat/src/lib/epsgraphics_classes.jar
 U java/source/topcat/src/lib/jel_g.jar
 cvs checkout: Updating java/source/topcat/src/main
@@ -9072,6 +9073,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/invert3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/matchOne2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/matchTwo2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/picture.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/selrows3.gif

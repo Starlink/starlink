@@ -2204,6 +2204,7 @@ jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
 
 javadoc_check:
@@ -2216,9 +2217,9 @@ dist:
 
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 188 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 78 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 79 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -2348,4 +2349,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 19 seconds
+Total time: 5 minutes 7 seconds

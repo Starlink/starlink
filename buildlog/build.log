@@ -379,11 +379,11 @@ build_demo:
 
 build:
     [javac] Compiling 75 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 55 files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 56 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 23 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
      [echo] Executing Treeview target: build
 
 prepare:

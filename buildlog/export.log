@@ -856,6 +856,7 @@ jars:
       [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
 
 javadoc_check:
@@ -1015,4 +1016,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 22 minutes 52 seconds
+Total time: 22 minutes 54 seconds
