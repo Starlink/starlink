@@ -191,6 +191,8 @@
 *  History:
 *     26-NOV-2001 (DSB):
 *        Original NDF version.
+*     24-NOV-2003 (DSB):
+*        Use 0.5*DIAM to create the ARD circle (previously used DIAM).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -348,8 +350,8 @@
      :                   IAT )
          CALL CHR_APPND( ',', TEXT, IAT )
          IAT = IAT + 1
-         CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, DIAM, STATUS ), TEXT,
-     :                   IAT )
+         CALL CHR_APPND( AST_FORMAT( CURFRM, DAX, 0.5*DIAM, STATUS ), 
+     :                   TEXT, IAT )
          CALL CHR_APPND( ' )', TEXT, IAT )
 
 *  Put this text into a GRP group.

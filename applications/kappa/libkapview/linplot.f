@@ -487,6 +487,8 @@
 *     9-JAN-2003 (DSB):
 *        Use the correct Mapping between new and old DATAPLOT pictures if
 *        ALIGN is TRUE (previously a UnitMap was always used).
+*     26-NOV-2003 (DSB):
+*        Report an error if any non-monotonic AXIS structures are found.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -774,6 +776,17 @@
 *  and one output (the 1-d GRID coordinate).
          AXMAP = AST_CMPMAP( PMAP, AXMAP, .TRUE., ' ', STATUS )
 
+      END IF
+
+* Check the axis map is defined in both directions. 
+      IF( .NOT. AST_GETL( AXMAP, 'TRANFORWARD', STATUS ) .OR.
+     :    .NOT. AST_GETL( AXMAP, 'TRANINVERSE', STATUS ) ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'LINPLOT_ERR', 'One or more of the input '//
+     :                    'AXIS arrays is non-monotonic.', STATUS )
+            GO TO 999
+         END IF
       END IF
 
 *  See if the Y axis is to display logged data values.
