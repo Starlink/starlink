@@ -1081,7 +1081,7 @@
       INCLUDE 'IMG_CMN'
 
 *  Arguments Given:
-      LOGICAL			RESID
+      INTEGER			PCODE
 
 *  Status:
       INTEGER			STATUS             	! Global status
