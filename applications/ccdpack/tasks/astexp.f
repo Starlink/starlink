@@ -20,14 +20,14 @@
 *        The global status.
 
 *  Description:
-*     This task exports coordinate system information from a set of NDFs
-*     and writes it to an AST file.  For each NDF a frameset is written 
-*     containing information about how to map between the NDF's Base
-*     and Current frames.  Each frameset is identified by a key which
-*     is derived from the NDF itself, and matches keys which can be
-*     derived from other NDFs to which similar framesets ought to apply.
-*     Currently the only way these keys can be generated is by use of
-*     the FITSID parameter.
+*     This task exports coordinate system information from a set of NDFs,
+*     writing it to an AST file.  For each NDF a frameset is written 
+*     containing information about how to map between a selected Base
+*     frame and the NDF's Current frame.  Each frameset is identified 
+*     by a key which is derived from the NDF itself, and matches keys 
+*     which can be derived from other NDFs to which similar framesets 
+*     ought to apply.  Currently the only way these keys can be generated 
+*     is by use of the FITSID parameter.
 *
 *     Used together, the framesets written out to an AST file can thus
 *     contain information about the relative positioning of different
@@ -41,18 +41,36 @@
 *     This "similar set" will typically be one from chips in the same 
 *     mosaic camera instrument.
 *
+*     A 2-frame frameset is output for each NDF.  The Base frame is one
+*     selected by the BASEDOMAIN parameter, and has the same name in 
+*     the exported frameset as in the original NDFs.  The Current frame
+*     in the exported frameset is the same as the Current frame in the
+*     original NDFs, but may be given a different name by the OUTDOMAIN
+*     parameter.
+*     
 *     Under normal circumstances, the Current frames of all the input
-*     NDFs should be the same, and the Base frames should all be the 
-*     same.  A warning will be issued if this is not the case.
-*     Warnings will also be issued the NDF identifiers are not all unique.
+*     NDFs should be the same  A warning will be issued if this is not 
+*     the case.  Warnings will also be issued if the NDF identifiers 
+*     are not all unique.
 
 *  Usage:
-*     ASTEXP in astfile outdomain fitsid
+*     ASTEXP in astfile outdomain basedomain fitsid
 
 *  ADAM Parameters:
 *     ASTFILE = LITERAL (Read)
 *        The name of the file to be written containing the sequence
 *        of framesets.
+*     BASEDOMAIN = LITERAL (Read)
+*        The name of the Base domain relative to which the Current domains
+*        will be defined in the output AST file.  Unlike OUTDOMAIN,
+*        these take the same name as the corresponding frames in the
+*        input NDFs.  To be useful, this domain name must be one which
+*        occurs in all the NDFs in the IN list, and can be expected to
+*        occur in any NDF to which the AST file will later be applied by
+*        ASTIMP.  AXIS is a good choice since this may still be
+*        applicable to frames which have been modified, e.g. by a 
+*        WCS-aware rebinning application such as COMPAVE.
+*        [AXIS]
 *     IN = LITERAL (Read)
 *        A list of NDFs from which framesets are to be extracted.
 *        The Current frame of each should be the same, and should be 
@@ -102,6 +120,12 @@
 *        good idea to use the same name as the Current domain of the 
 *        NDFs listed in the IN parameter.  A suitable value might be the
 *        name of the mosaic camera from which the NDFs are derived.
+*
+*        Note that the frames which are written to the AST file are the
+*        Current frames of the NDFs supplied; this parameter only gives
+*        the name that the frames will have in the AST file, and 
+*        consequently the name by which they will be known when the
+*        WCS information is imported into other NDFs using ASTIMP.
 *        [CCD_EXPORT]
 
 *  Examples:
@@ -114,7 +138,16 @@
 *        Before running this, the NDFs 'reg_data*' should be correctly
 *        aligned in their Current domain and each should have a value
 *        of the FITS header card 'CHIPNUM' which distinguishes which 
-*        chip it comes from.
+*        chip it comes from.  The mappings between the 'Axis' domain of
+*        the input NDFs and their current domains are recorded.
+*
+*     astexp data* astfile=camera.ast fitsid=ISEQ basedomain=PIXEL
+*        In this case the OUTDOMAIN parameter takes its default value
+*        of 'CCD_Export', but mappings are between the Current domains
+*        of the input NDFs and their 'Pixel' domains.  This would be 
+*        appropriate if these NDFs, or NDFs to which camera.ast will
+*        be applied in future, might have no valid 'Axis' domain frames
+*        in their WCS components.
 
 *  Notes:
 *     AST file format:
@@ -127,15 +160,14 @@
 *        are to be undertaken.  The format of the file is explained 
 *        here.
 *
-*        The ASTFILE file consists of a sequence of framesets.  Each frameset
-*        has an ID, and contains two frames (a Base frame and a Current
-*        frame) and a mapping between them.  The domain of each Base
-*        frame, and of each Current frame, is the same for each frameset.
-*        The domain of the Base frame should be present in the WCS 
-*        component of the NDFs to which the file is applied (probably 
-*        PIXEL, but maybe SKY or some other value), and the domain of 
-*        the Current frame is new to the WCS component (if a frame with 
-*        the same domain exists it will be overwritten by the new one).
+*        The ASTFILE file consists of a sequence of framesets.  Each 
+*        frameset has an ID, and contains two frames (a Base frame and 
+*        a Current frame) and a mapping between them.  The domain of each 
+*        Base frame, and of each Current frame, is the same for each 
+*        frameset.  For the NDFs to which the file will be applied,
+*        their WCS components should contain frames in the same domain
+*        as the AST file's Base frame, and should not contain frames
+*        in the same domain as the AST file's Current frame.
 *
 *        The ID of each frameset is used to determine, for each NDF,
 *        which of the framesets in the file should be applied to it.
@@ -183,6 +215,8 @@
 *  History:
 *     10-MAR-1999 (MBT):
 *        Original version.
+*     19-MAR-1999 (MBT):
+*        Added the BASEDOMAIN parameter and tidied up a bit.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -210,18 +244,17 @@
 *  Local Variables:
       CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
       CHARACTER * ( CCD1__BLEN ) BUF ! Buffer for output
-      CHARACTER * ( AST__SZCHR ) DMBAS ! Domain name of NDF Base frame
+      CHARACTER * ( AST__SZCHR ) BASDOM ! Name of base domain to use
       CHARACTER * ( AST__SZCHR ) DMCUR ! Domain name of NDF Current frame
-      CHARACTER * ( AST__SZCHR ) DMBAS1 ! Domain name of first NDF Base frame
       CHARACTER * ( AST__SZCHR ) DMCUR1 ! Domain name of first NDF Current frame
       CHARACTER * ( CCD1__BLEN ) FITSID ! FITS keyword to identify frameset
       CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
-      CHARACTER * ( AST__SZCHR ) OUTDOM ! Name of output domain
+      CHARACTER * ( AST__SZCHR ) OUTDOM ! Name of output current domain
       CHARACTER * ( AST__SZCHR ) TITLE ! Title of frame
       INTEGER CHEXP              ! AST pointer to export channel
       INTEGER FDAST              ! FIO file descriptor of frameset file
       INTEGER FRCUR              ! AST pointer to current frame
-      INTEGER FRBAS              ! AST pointer to Pixel domain frame
+      INTEGER FRBAS              ! AST pointer to base frame
       INTEGER FSEXP              ! AST pointer to export frameset
       INTEGER I                  ! Loop variable
       INTEGER IAT                ! Position in string
@@ -269,6 +302,19 @@
      :   'ASTEXP: No file opened for coordinate system output', STATUS )
       END IF
 
+*  Get the AST domain name for the Base frame from each frameset to use.
+*  This will also be the name of the Base domain output.
+      CALL PAR_GET0C( 'BASEDOMAIN', BASDOM, STATUS )
+      CALL CHR_UCASE( BASDOM )
+      IF ( INDEX( BASDOM, ',' ) .GT. 0 ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'BASDOM', BASDOM )
+         CALL CCD1_ERREP( 'ASTEXP_BADOUTDOM', 
+     :   'ASTEXP: BASEDOMAIN ("^BASDOM") must not contain a comma.',
+     :                    STATUS )
+         GO TO 99
+      END IF
+
 *  Get the AST domain name for the Current frame of each frameset when
 *  written.
       CALL PAR_GET0C( 'OUTDOMAIN', OUTDOM, STATUS )
@@ -303,7 +349,7 @@
       CALL CCD1_MSG( ' ', ' ', STATUS )
       CALL CCD1_MSG( ' ', 
      :'  All framesets will be written with domain names:', STATUS )
-      CALL MSG_SETC( 'OUTBASDOM', 'PIXEL' )
+      CALL MSG_SETC( 'OUTBASDOM', BASDOM )
       CALL CCD1_MSG( ' ', '       Base domain    = ^OUTBASDOM', STATUS )
       CALL MSG_SETC( 'OUTCURDOM', OUTDOM )
       CALL CCD1_MSG( ' ', '       Current domain = ^OUTCURDOM', STATUS )
@@ -312,14 +358,12 @@
 *  Output header for per-NDF information.
       BUF = ' '
       BUF( 6: ) = 'N'
-      BUF( 11: ) = 'NDF Base domain'
-      BUF( 31: ) = 'NDF Current domain'
-      BUF( 51: ) = 'Frameset ID'
+      BUF( 11: ) = 'NDF Current domain'
+      BUF( 31: ) = 'Frameset ID'
       CALL CCD1_MSG( ' ', BUF, STATUS )
       BUF( 6: ) = '--'
-      BUF( 11: ) = '---------------'
-      BUF( 31: ) = '------------------'
-      BUF( 51: ) = '-----------'
+      BUF( 11: ) = '------------------'
+      BUF( 31: ) = '-----------'
       CALL CCD1_MSG( ' ', BUF, STATUS )
 
 *  Loop over NDFs
@@ -360,38 +404,44 @@
 *  Get WCS component from NDF.
          CALL CCD1_GTWCS( INDF, IWCS, STATUS )
 
-*  Generate the frameset for output.  For the Base and Current frames of
-*  the exported frameset we use the Pixel-domain and Current frames of
-*  the input NDFs respectively.
+*  Get the indexes of the frames which will form the output frameset.  
+*  The Current frame of the output frameset is the Current frame of 
+*  the NDF, and the Base domain of the output frameset is the frame 
+*  in the domain BASDOM of the NDF.
          JCUR = AST_GETI( IWCS, 'Current', STATUS )
-         CALL CCD1_FRDM( IWCS, 'Pixel', JBAS, STATUS )
+         CALL CCD1_FRDM( IWCS, BASDOM, JBAS, STATUS )
+
+*  Report an error if a suitable Base domain cannot be found.
+         IF ( JBAS .EQ. 0 ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC( 'BASDOM', BASDOM )
+            CALL NDF_MSG( 'NDF', INDF )
+            CALL CCD1_ERREP( 'ASTEXP_NOBASDMN',
+     :'ASTEXP: No domain "^BASDOM" found in NDF ^NDF.', STATUS )
+            GO TO 99
+         END IF
 
 *  Get the frames themselves, their domain names, and the mapping between 
 *  them from the given NDF.
          MAP = AST_GETMAPPING( IWCS, JBAS, JCUR, STATUS )
          FRBAS = AST_GETFRAME( IWCS, JBAS, STATUS )
          FRCUR = AST_GETFRAME( IWCS, JCUR, STATUS )
-         DMBAS = AST_GETC( FRBAS, 'Domain', STATUS )
          DMCUR = AST_GETC( FRCUR, 'Domain', STATUS )
 
-*  First time round only, record Base and Current domain names of the 
-*  first NDF.  These should under most circumstances be the same for all 
+*  First time round only, record the Current domain name of the first
+*  NDF.  This should under most circumstances be the same for all 
 *  the NDFs read; if this is not the case a warning can be issued.
          IF ( I .EQ. 1 ) THEN
-            DMBAS1 = DMBAS
             DMCUR1 = DMCUR
          END IF
 
-*  Issue a warning if Base and Current domains of this NDF are not the
-*  same as those for the first one.
-         IF ( DMBAS .NE. DMBAS1 )
-     :      CALL CCD1_MSG( ' ',
-     :'  Warning: Base frame does not match first one', STATUS )
+*  Issue a warning if the Current domain of this NDF is not the same 
+*  as for the first one.
          IF ( DMCUR .NE. DMCUR1 )
      :      CALL CCD1_MSG( ' ',
-     :'	 Warning: Current frame does not match first one', STATUS )
+     :'	 Warning: Current frame does not match first one.', STATUS )
 
-*  Tweak the frames before putting them in the export frameset.
+*  Tweak the Current frame before putting it in the export frameset.
          CALL AST_SETC( FRCUR, 'Domain', OUTDOM, STATUS )
          TITLE = AST_GETC( FRCUR, 'Title', STATUS )
          TITLE( CHR_LEN( TITLE ) + 1: ) = ' (exported)'
@@ -407,9 +457,8 @@
 *  Output summary of frameset to be written.
          BUF = ' '
          CALL CHR_ITOC( I, BUF( 6: ), IAT )
-         BUF( 11: ) = DMBAS
-         BUF( 31: ) = DMCUR
-         BUF( 51: ) = LABEL
+         BUF( 11: ) = DMCUR
+         BUF( 31: ) = LABEL
          CALL CCD1_MSG( ' ', BUF, STATUS )
 
 *  Write the frameset to the file.

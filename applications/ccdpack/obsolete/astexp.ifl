@@ -1,3 +1,21 @@
+#+
+#  Name:
+#     ASTEXP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-MAR-1999 (MBT):
+#        Original version.
+#     {enter_further_changes_here}
+
+#-
+
 interface ASTEXP
 
    helplib 'CCDPACK_HELP:'
@@ -28,8 +46,19 @@ interface ASTEXP
       access      READ
       vpath       'PROMPT'
       ppath       'CURRENT,DEFAULT'
-      prompt      'Name for registration domain AST file (e.g. instrument name)'
+      prompt      'Registration domain name in AST file (e.g. instrument name)'
       default     'CCD_EXPORT'
+      helpkey     '*'
+   endparameter
+
+   parameter BASEDOMAIN
+      position 4
+      type        LITERAL
+      access      READ
+      vpath       'CURRENT,PROMPT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Base domain name in NDFs and AST file'
+      default     'AXIS'
       helpkey     '*'
    endparameter
 
