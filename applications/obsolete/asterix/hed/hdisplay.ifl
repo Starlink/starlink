@@ -1,8 +1,8 @@
- INTERFACE HDISPLAY              
-    PARAMETER INP                
-       TYPE 'LITERAL'
-       POSITION 1                
-       PPATH 'GLOBAL'       
+ INTERFACE HDISPLAY
+    PARAMETER INP
+       TYPE 'UNIV'
+       POSITION 1
+       PPATH 'GLOBAL'
        PROMPT 'Object name'
        help 'Full path name of object to be displayed'
        ASSOCIATION '<->GLOBAL.HDSOBJ'

@@ -37,6 +37,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *      5 May 95 : V1.8-1 Fixed bug in display of non _INTEGER integer
 *                        types (DJA)
+*     22 Mar 99 : V2.2-1 Get rid of ADI (rjv)
 *
 *    Type Definitions :
 *
@@ -64,14 +65,13 @@
       INTEGER			OCH			! Output channel id
       INTEGER RANGES(2,DAT__MXDIM)         ! Ranges to be output
       INTEGER WIDTH                        ! User supplied width
-      INTEGER OBJID
 
       LOGICAL OBJOK                        ! Whether valid data object
 *
 *    Version :
 *
       CHARACTER*40             VERSION
-        PARAMETER              ( VERSION = 'HDISPLAY Version 2.2-0' )
+        PARAMETER              ( VERSION = 'HDISPLAY Version 2.2-1' )
 *-
 
 *    Version id
@@ -81,8 +81,7 @@
       CALL AST_INIT()
 
 *    Get locator to data object and validate it
-      CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
-      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
+      CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
       CALL HDISPLAY_VALIDOBJ( OBJLOC, OBJOK, STATUS )
 
 *    If OK so far carry on

@@ -64,7 +64,7 @@
       CALL AST_INIT()
 
 *    Get parameter values
-      CALL DAT_ASSOC('INP','READ',OBJLOC,STATUS)
+      CALL USI_DASSOC('INP','READ',OBJLOC,STATUS)
 
 *    Connect output device
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
