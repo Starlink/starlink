@@ -142,6 +142,9 @@
 
 #  Process initial configuration options.
       eval itk_initialize $args
+
+#  Register initial size of window.
+      geomset
    }
 
 
