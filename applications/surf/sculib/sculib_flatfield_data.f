@@ -1,6 +1,6 @@
 *+  SCULIB_FLATFIELD_DATA - flatfield the data in an array
       SUBROUTINE SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
-     :  DATA, VARIANCE, QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, 
+     :  BDATA, VARIANCE, QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, 
      :  NUM_ADC, BOL_FLAT, BOL_QUALITY, STATUS)
 *    Description :
 *     This routine multiplies the data in the input array by the flatfield
@@ -8,7 +8,7 @@
 *     bad if input quality was bad or the quality of the flatfield for that
 *     bolometer was bad.
 *    Invocation :
-*     CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM, DATA, VARIANCE,
+*     CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM, BDATA, VARIANCE,
 *    :  QUALITY, BOL_CHAN, BOL_ADC, NUM_CHAN, NUM_ADC, BOL_FLAT,
 *    :  BOL_QUALITY, STATUS)
 *    Parameters :
@@ -18,15 +18,15 @@
 *           number of positions at which the bolometers were measured
 *     N_BEAM                 = INTEGER (Given)
 *           number of beams data have been reduced into
-*     DATA (N_BOL, N_POS, N_BEAM)
+*     BDATA (N_BOL, N_POS, N_BEAM)
 *                            = REAL (Given and returned)
 *           measured data
 *     VARIANCE (N_BOL, N_POS, N_BEAM)
 *                            = REAL (Given and returned)
-*           variance on DATA
+*           variance on BDATA
 *     QUALITY (N_BOL, N_POS, N_BEAM)
 *                            = BYTE (Given and returned)
-*           quality on DATA
+*           quality on BDATA
 *     BOL_CHAN (N_BOL)       = INTEGER (Given)
 *           the channel numbers of the measured bolometers
 *     BOL_ADC (N_BOL)        = INTEGER (Given)
@@ -56,6 +56,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
 *    Import :
       INTEGER N_BOL
       INTEGER N_POS
@@ -67,7 +68,7 @@
       REAL    BOL_FLAT (NUM_CHAN,NUM_ADC)
       INTEGER BOL_QUALITY (NUM_CHAN,NUM_ADC)
 *    Import-Export :
-      REAL    DATA (N_BOL,N_POS,N_BEAM)
+      REAL    BDATA (N_BOL,N_POS,N_BEAM)
       REAL    VARIANCE (N_BOL,N_POS,N_BEAM)
       BYTE QUALITY (N_BOL,N_POS,N_BEAM)
 *    Export :
@@ -100,11 +101,20 @@
                ADC = BOL_ADC (BOL)
 
                IF (BOL_QUALITY(CHAN,ADC) .EQ. 0) THEN
-                  DATA (BOL,POS,BEAM) = DATA (BOL,POS,BEAM) *
-     :                 BOL_FLAT (CHAN,ADC)
-                  VARIANCE (BOL,POS,BEAM) = 
-     :                 VARIANCE (BOL,POS,BEAM) *
-     :                 BOL_FLAT (CHAN,ADC)**2
+
+                  IF (BDATA(BOL,POS,BEAM) .NE. VAL__BADR) THEN
+                     BDATA (BOL,POS,BEAM) = BDATA (BOL,POS,BEAM) *
+     :                    BOL_FLAT (CHAN,ADC)
+
+                     IF (VARIANCE(BOL,POS,BEAM) .NE. VAL__BADR) THEN
+                        VARIANCE (BOL,POS,BEAM) = 
+     :                       VARIANCE (BOL,POS,BEAM) *
+     :                       BOL_FLAT (CHAN,ADC)**2
+                     END IF
+                  ELSE
+*     No point keeping a variance without a data point
+                     VARIANCE(BOL,POS,BEAM) = VAL__BADR
+                  END IF
                ELSE
                   QUALITY (BOL,POS,BEAM) = 
      :                 SCULIB_BITON(QUALITY(BOL,POS,BEAM),1)
