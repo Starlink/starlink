@@ -102,6 +102,10 @@
       INTEGER			FID			! File identifier
       CHARACTER*(*)		HDU			! HDU name
       CHARACTER*(*)		KEY			! Keyword name
+      LOGICAL			MARK			! Mark as committed
+      LOGICAL			GETCOM			! Retrieve comment?
+
+*  Arguments Returned:
       <TYPE>			VALUE			! Value of the keyword
       CHARACTER*(*)		COMNT			! Keyword comment
 
