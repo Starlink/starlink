@@ -532,6 +532,7 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
     char	*lbegin = NULL;
     char	lbuf[30];
     int		nb;
+    int		nitem;
     int		nlit = 0;
     int		npr;
     int		prec;
@@ -646,7 +647,7 @@ void ADIstrmVprintf( ADIobj stream, char *format, int flen,
 	      adix_print( stream, asp_arg++, 1, ADI__true, status );
               if ( nitem ) {
                 fct = ',';
-	        ADIstrmPutInt( dev, fct, 1, status );
+	        ADIstrmPutInt( dev, &fct, 1, status );
                 }
               }
 	    break;
