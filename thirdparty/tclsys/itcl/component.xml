@@ -8,7 +8,7 @@
   <description>[incr Tcl]</description>
   <!-- <abstract><p></p></abstract> -->
   <dependencies >
-    
+    <build>tcl</build><build>tk</build>
   </dependencies>
   <!--
   <developers>

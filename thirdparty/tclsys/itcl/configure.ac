@@ -16,6 +16,8 @@ AC_CONFIG_SRCDIR([tcl.m4])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+STAR_DECLARE_DEPENDENCIES([build], [tcl tk])
+
 dnl    Locate a suitable Tcl/Tk
 STAR_CHECK_PROGS(tcl,Tcl_AppInit)
 STAR_CHECK_PROGS(tk,Tk_Init)
