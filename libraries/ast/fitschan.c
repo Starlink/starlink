@@ -487,6 +487,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        any of the old IRAF keywords (RADECSYS, etc) then assume FITS-WCS
 *        encoding. This allows a FITS-WCS header to have both CDi_j *and*
 *        CROTA keywords.
+*     5-JAN-2004 (DSB):
+*        - SpecTrans: Use 1.0 (instead of the CDELT value) as the
+*        diagonal PCi_j term for non-celestial axes with associated CROTA 
+*        values.  
 *class--
 */
 
@@ -19767,8 +19771,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                   } else if( i == axlon ) {
                      dval = cosrota;
                   } else {
-                     GetValue2( ret, this, FormatKey( "CDELT", i + 1, -1, ' ' ),
-                               AST__FLOAT, (void *) &dval, 1, method, class );
+                     dval = 1.0;
                   }
 
                   SetValue( ret, FormatKey( "PC", i + 1, i + 1, ' ' ),
