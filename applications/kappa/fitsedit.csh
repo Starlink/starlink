@@ -108,7 +108,7 @@ if ( $#argv == 0 ) then
 #   Clear ADAM_EXIT unless it was already set.
 #
       if ( ! $adam_exit_set ) then
-         unset ADAM_EXIT
+         unsetenv ADAM_EXIT
       endif
 #
 #   Assume that the value will be fine unless we discover otherwise
