@@ -40,6 +40,7 @@
 *     24 Jul 91 : V1.5-0 Uses updated TAI definition (DJA)
 *     29 Jul 92 : V1.6-0 Explicitly create o/p axes structure (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1 New data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -48,7 +49,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -56,70 +57,72 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC                        ! Input dataset
-      CHARACTER*(DAT__SZLOC) OLOC                        ! Output dataset
-      CHARACTER*(DAT__SZLOC) HLOC                        ! Input HEADER
-      CHARACTER*(80)         EPHEMERIS(3)                ! History entry
+      CHARACTER*80         	EPHEMERIS(3)            ! History entry
 
-      DOUBLE PRECISION       BASE_TAI                    ! Start time of observation (days after 1st Jan 1972)
-      DOUBLE PRECISION       COEFF(3)                    ! Ephemeris coefficients
-      DOUBLE PRECISION       EPHEM_TAI                   ! Ephemeris reference
-                                                         ! in TAI
+      DOUBLE PRECISION       	BASE_TAI                ! Start time of observation (days after 1st Jan 1972)
+      DOUBLE PRECISION       	COEFF(3)                ! Ephemeris coefficients
+      DOUBLE PRECISION       	EPHEM_TAI               ! Ephemeris reference
+                                                        ! in TAI
 
-      INTEGER                INAXPTR                     ! Input time axis
-      INTEGER                OUTAXPTR                    ! Output phase axis
-      INTEGER                NPTS                        ! No of data poits
-      INTEGER                NDIMS                       ! Number of dimensions
-      INTEGER                LDIM(DAT__MXDIM)            ! Input dimensions
-      INTEGER                SKIP                        ! Used in copying
-      INTEGER                AXN1                        ! axes from input
-      INTEGER                AXN2                        ! to output
+      INTEGER			IFID			! Input dataset id
+      INTEGER                	INAXPTR                 ! Input time axis
+      INTEGER                	OUTAXPTR                ! Output phase axis
+      INTEGER                	NPTS                    ! No of data poits
+      INTEGER                	NDIMS                   ! Number of dimensions
+      INTEGER                	LDIM(ADI__MXDIM)        ! Input dimensions
+      INTEGER			OFID			! Output dataset id
+      INTEGER                	SKIP                    ! Used in copying
+      INTEGER                	AXN1                    ! axes from input
+      INTEGER                	AXN2                    ! to output
+      INTEGER			TIMID			! Timing info
 
-      INTEGER                TAXIS, XAXIS, YAXIS         ! Axis numbers
+      INTEGER                	TAXIS, XAXIS, YAXIS     ! Axis numbers
 
-      LOGICAL                OK                          ! Input data ok?
-      LOGICAL                INPRIM                      ! Input primitive?
-      LOGICAL                REG                         ! Input time axis regular?
+      LOGICAL                	OK                      ! Input data ok?
+      LOGICAL                	INPRIM                  ! Input primitive?
+      LOGICAL                	REG                     ! Input time axis regular?
 *
 *    Version :
 *
-      CHARACTER*22           VERSION
-        PARAMETER         ( VERSION = 'PHASE Version 1.8-0' )
+      CHARACTER*22		VERSION
+        PARAMETER         	( VERSION = 'PHASE Version 1.8-1' )
 *-
 
 *    Version Announcement
       CALL MSG_PRNT( VERSION )
 
-*    Initialize ASTERIX subroutines
+*    Initialize ASTERIX
       CALL AST_INIT()
 
 *    Associate input and output datasets
-      CALL USI_ASSOC2('INP', 'OUT', 'READ', ILOC, OLOC, INPRIM, STATUS)
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
       IF ( INPRIM ) THEN
-        CALL MSG_PRNT('FATAL ERROR: Input object must be a dataset')
         STATUS = SAI__ERROR
+        CALL ERR_REP(' ', 'ERROR: Input object must be a dataset',
+     :               STATUS )
         GOTO 99
       END IF
 
 *    Get dimensions of axis structure (from data array).
-      CALL BDA_CHKDATA(ILOC, OK, NDIMS, LDIM, STATUS)
+      CALL BDI_CHKDATA(IFID, OK, NDIMS, LDIM, STATUS)
       IF (.NOT. OK) THEN
-        CALL MSG_PRNT('FATAL ERROR: No data!')
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: No data!', STATUS )
         GOTO 99
       END IF
 
 *    Check time axis exists
-      CALL AXIS_FINDXYT( ILOC, NDIMS, XAXIS, YAXIS, TAXIS, STATUS )
+      CALL AXIS_TFINDXYT( IFID, NDIMS, XAXIS, YAXIS, TAXIS, STATUS )
       IF ( TAXIS .LE. 0 ) THEN
         CALL MSG_PRNT('FATAL ERROR: No time axis!')
         STATUS = SAI__ERROR
 
       ELSE
-        CALL BDA_CHKAXVAL(ILOC, TAXIS, OK, REG, NPTS,  STATUS )
+        CALL BDI_CHKAXVAL(IFID, TAXIS, OK, REG, NPTS,  STATUS )
 
         IF ( OK ) THEN
-          CALL BDA_MAPAXVAL(ILOC, 'READ', TAXIS, INAXPTR, STATUS )
+          CALL BDI_MAPAXVAL(IFID, 'READ', TAXIS, INAXPTR, STATUS )
 
         ELSE
           CALL MSG_PRNT('FATAL ERROR: Invalid time axis')
@@ -132,17 +135,15 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get observation start time
-      CALL BDA_LOCHEAD( ILOC, HLOC, STATUS )
-      CALL HDX_OK( HLOC, 'BASE_TAI', OK, STATUS )
-
+      CALL TCI_GETID( IFID, TIMID, STATUS )
+      CALL ADI_THERE( TIMID, 'TAIObs', OK, STATUS )
       IF ( OK ) THEN
-        CALL CMP_GET0D( HLOC, 'BASE_TAI', BASE_TAI, STATUS )
+        CALL ADI_CGET0D( TIMID, 'TAIObs', BASE_TAI, STATUS )
       ELSE
-        CALL MSG_PRNT( 'FATAL ERROR: No BASE_TAI in file header' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Unable to locate base atomic time in '/
+     :                /'input dataset', STATUS )
       END IF
-
-*    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Get parameters of ephemeris (units JD)
@@ -177,10 +178,10 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *    Write output file
-      CALL HDX_COPY( ILOC, OLOC, STATUS )
+      CALL ADI_FCOPY( IFID, OFID, STATUS )
 
 *    Delete output AXIS
-      CALL BDA_CREAXES( OLOC, NDIMS, STATUS )
+      CALL BDI_CREAXES( OFID, NDIMS, STATUS )
 
 *    Copy axes except time axis
       SKIP = 0
@@ -188,7 +189,7 @@
         DO AXN1 = 1, NDIMS
           IF (AXN1 .NE. TAXIS) THEN
             AXN2 = AXN1 - SKIP
-            CALL BDA_COPAXIS (ILOC, OLOC, AXN1, AXN2, STATUS)
+            CALL BDI_COPAXIS( IFID, OFID, AXN1, AXN2, STATUS )
           ELSE
             SKIP = 1
           END IF
@@ -196,23 +197,22 @@
       END IF
 
 *    Create & map output phase axis
-      CALL BDA_CREAXVAL( OLOC, NDIMS, .FALSE., NPTS, STATUS)
-      CALL BDA_MAPAXVAL( OLOC, 'WRITE', NDIMS, OUTAXPTR, STATUS)
+      CALL BDI_CREAXVAL( OFID, NDIMS, .FALSE., NPTS, STATUS)
+      CALL BDI_MAPAXVAL( OFID, 'WRITE', NDIMS, OUTAXPTR, STATUS)
 
 *    Write label & units
-      CALL BDA_PUTAXLABEL( OLOC, NDIMS, 'Phase',    STATUS )
-      CALL BDA_PUTAXUNITS( OLOC, NDIMS, 'Unitless', STATUS )
+      CALL BDI_PUTAXTEXT( OFID, NDIMS, 'Phase', 'Unitless', STATUS )
 
 *    Execute time-phase conversion
       CALL PHASE_DOIT( NPTS, %VAL(INAXPTR), COEFF, %VAL(OUTAXPTR),
      :                                                    STATUS )
 
 *    History
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
-      CALL HIST_PTXT( OLOC, 3, EPHEMERIS, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
+      CALL HSI_PTXT( OFID, 3, EPHEMERIS, STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
