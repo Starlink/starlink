@@ -6,7 +6,11 @@ include $(STARLINK_SGML_DIR)/lib/Makefile
 
 #SSN-unassigned.html: Notes.html
 
-Notes.stamp: Notes.sgml $(STARLINK_SGML_DIR)/dsssl/sl/html Notes2.summary
+Notes.html.stamp: Notes.sgml $(STARLINK_SGML_DIR)/dsssl/sl/html \
+		Notes2.summary Notes.maths.stamp
+
+index.html: Notes.html.stamp
+	ln -sf `awk -F: '{print $$1}' Notes.html.stamp`.html index.html
 
 Notes.single.html: Notes.sgml
 
