@@ -427,7 +427,7 @@ PKG_LINK = CONVERT
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.6U, 1995 November
+PKG_VERS = 0.6-1, 1996 March
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -511,7 +511,7 @@ con_cd2ir.f con_cd2iw.f \
 con_chvai.f con_chvar.f con_chvaw.f \
 con_ci2dr.f con_ci2dw.f \
 con_cnlim.f con_dst2n.f \
-con_ffrmt.f con_fill.f con_fitax.f con_ftype.f \
+con_ffrmt.f con_fill.f con_filld.f con_fitax.f con_ftype.f \
 con_gexch.f \
 con_ghelp.f con_ghlpi.f \
 con_gkeyc.f con_gkeyd.f con_gkeyi.f con_gkeyl.f con_gkeyr.f \
@@ -1520,6 +1520,7 @@ con_cnlim.o:       SAE_PAR PRM_PAR
 con_dst2n.o:       SAE_PAR DTACODES DYNAMIC_MEMORY NUM_DEC_CVT NUM_DEF_CVT
 con_ffrmt.o:       SAE_PAR
 con_fill.o:        SAE_PAR
+con_filld.o:       SAE_PAR
 con_fitax.o:       SAE_PAR DAT_PAR PRM_PAR
 con_ftype.o:       SAE_PAR
 con_gexch.o:       SAE_PAR
