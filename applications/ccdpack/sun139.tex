@@ -14983,7 +14983,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
    }
    \sstexamples{
       \sstexamplesubsection{
-         wcsreg $*$ \qt{ccd\_reg,sky}
+         wcsreg $*$ [ccd\_reg,sky]
       } {
          In this example all the NDFs in the current directory are
          being aligned.  All contain a frame in their WCS components
@@ -15004,7 +15004,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          \xroutine{TRANNDF} for resampling prior to making a mosaic.
       }
       \sstexamplesubsection{
-         wcsreg \qt{obs1\_$*$,obs2\_$*$} outdomain=final
+         wcsreg [obs1\_$*$,obs2\_$*$] outdomain=final
                 domains=\qt{ccd\_reg,inst\_obs1,inst\_obs2}
       } {
          NDFs with names starting \qt{obs1\_} and \qt{obs2\_} are aligned.
