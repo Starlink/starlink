@@ -45,6 +45,46 @@ Place,Suite 330, Boston, MA  02111-1307, USA
 
 =cut
 
+# Channels need a wrapper
+
+package Starlink::AST::Channel;
+
+sub new {
+  # This should work for FitsChan and Channel and XmlChan
+  my $class = shift;
+  my %args = @_;
+
+  my %processed;
+
+  # sink and source are special. All others are attributes
+  if (exists $args{sink} ) {
+    $processed{sink} = $args{sink};
+    delete $args{sink};
+  }
+  if (exists $args{source} ) {
+    $processed{source} = $args{source};
+    delete $args{source};
+  }
+
+  # Convert all remaining options to comma separated string
+  my @options;
+  for my $k (keys %args ) {
+    push(@options, "$k=$args{$k}");
+  }
+  $processed{options} = join(",",@options) if @options;
+
+  # Call the underlying routine
+  $class->_new( \%processed );
+
+}
+
+package Starlink::AST::FitsChan;
+use base qw/ Starlink::AST::Channel /;
+
+package Starlink::AST::XmlChan;
+use base qw/ Starlink::AST::Channel /;
+
+
 # Exception handling
 
 package Starlink::AST::Status;

@@ -75,6 +75,7 @@ char ** pack1Dchar( AV * avref ) {
   SV ** elem;
   char ** outarr;
   int len;
+  STRLEN linelen;
 
   /* number of elements */
   len  = av_len( avref ) + 1;
@@ -86,7 +87,7 @@ char ** pack1Dchar( AV * avref ) {
     if (elem == NULL ) {
       /* undef */
     } else {
-      outarr[i] = SvPV( *elem, PL_na );
+      outarr[i] = SvPV( *elem, linelen);
     }
   }
   return outarr;
@@ -96,7 +97,7 @@ char ** pack1Dchar( AV * avref ) {
 
 void astThrowException ( int status, AV* errorstack ) {
   dSP;
-  
+
   ENTER;
   SAVETMPS;
 
@@ -115,6 +116,69 @@ void astThrowException ( int status, AV* errorstack ) {
   LEAVE;
 
 }
+
+/* Callbacks */
+
+static char *sourceWrap( const char *(*source)() ) {
+  dSP;
+  SV * cb;
+  int count;
+  char * line;
+
+  /* Return directly if ast status is set. */
+  if ( !astOK ) return;
+
+  /* Need to cast the source argument to a SV*  */
+  cb = (SV*) source;
+
+  /* call the callback with the supplied line */
+  ENTER;
+  SAVETMPS;
+
+  count = perl_call_sv( cb, G_NOARGS | G_SCALAR );
+
+  SPAGAIN ;
+
+  if (count != 1) Perl_croak(aTHX_ "Returned more than one arg from channel source\n");
+
+  line = POPp;
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+  return line;
+}
+
+static void sinkWrap( void (*sink)(const char *), const char *line ) {
+  dSP;
+  SV * cb;
+
+  /* Return directly if ast status is set. */
+  if ( !astOK ) return;
+
+  /* Need to cast the sink argument to a SV*  */
+  cb = (SV*) sink;
+
+  /* call the callback with the supplied line */
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(sp);
+  XPUSHs( sv_2mortal( newSVpv( line, strlen(line) )));
+  PUTBACK;
+
+  perl_call_sv( SvRV(cb), G_DISCARD | G_VOID );
+
+  PUTBACK;
+  FREETMPS;
+  LEAVE;
+
+}
+
+
+
+
 
 /* Need to allocate a mutex to prevent threads accessing
    the AST simultaneously. May need to protect this from
@@ -326,17 +390,96 @@ new( class, map1, map2, series, options )
  OUTPUT:
   RETVAL
 
+MODULE = Starlink::AST  PACKAGE = Starlink::AST::Channel
+
+# Need to add proper support for the callbacks
+
+AstChannel *
+_new( class, hash )
+  char * class
+  HV * hash
+ PREINIT:
+  SV ** value;
+  SV * sink;
+  SV * source;
+  char * options;
+  STRLEN len;
+ CODE:
+  /* Callbacks are in source and sink keys */
+  value = hv_fetch( hash, "sink", 4, 0 );
+  if ( value == NULL ) {
+    /* undef callback */
+    sink = NULL;
+  } else {
+    sink = newSVsv(*value); /* memory leak XXXXX */
+  }
+  value = hv_fetch( hash, "source", 6, 0 );
+  if ( value == NULL ) {
+    /* undef callback */
+    source = NULL;
+  } else {
+    source = newSVsv(*value); /* memory leak XXXXX */
+  }
+  value = hv_fetch( hash, "options", 7, 0 );
+  if ( value == NULL ) {
+    /* undef options */
+    options = "";
+  } else {
+    options = SvPV( *value, len);
+  }
+  
+  /* Need to use astChannelFor interface so that we can register
+     a fixed callback and a reference to a CV */
+  ASTCALL(
+   RETVAL = astChannelFor( (const char *(*)()) source, sourceWrap,
+                            (void (*)( const char * )) sink, sinkWrap, options );
+  )
+ OUTPUT:
+  RETVAL
+
 MODULE = Starlink::AST  PACKAGE = Starlink::AST::FitsChan
 
 # Note that FitsChan inherits from AstChannelPtr
 
-# Need to add proper support for the callbacks
-
 AstFitsChan *
-new( ... )
+_new( class, hash )
+  char * class
+  HV * hash
+ PREINIT:
+  SV ** value;
+  SV * sink;
+  SV * source;
+  char * options;
+  STRLEN len;
  CODE:
+  /* Callbacks are in source and sink keys */
+  value = hv_fetch( hash, "sink", 4, 0 );
+  if ( value == NULL ) {
+    /* undef callback */
+    sink = NULL;
+  } else {
+    sink = newSVsv(*value); /* memory leak XXXXX */
+  }
+  value = hv_fetch( hash, "source", 6, 0 );
+  if ( value == NULL ) {
+    /* undef callback */
+    source = NULL;
+  } else {
+    source = newSVsv(*value); /* memory leak XXXXX */
+  }
+  value = hv_fetch( hash, "options", 7, 0 );
+  if ( value == NULL ) {
+    /* undef options */
+    options = "";
+  } else {
+    options = SvPV( *value, len);
+  }
+  
+  /* Need to use astFitsChanFor interface so that we can register
+     a fixed callback and a reference to a CV */
   ASTCALL(
-   RETVAL = astFitsChan( NULL, NULL, "");
+   RETVAL = astFitsChanFor( (const char *(*)()) source, sourceWrap,
+                            (void (*)( const char * )) sink, sinkWrap, options );
   )
  OUTPUT:
   RETVAL
@@ -344,18 +487,50 @@ new( ... )
 
 MODULE = Starlink::AST  PACKAGE = Starlink::AST::XmlChan
 
-# Need to add proper support for the callbacks
-
 AstXmlChan *
-new( ... )
+_new( class, hash )
+  char * class
+  HV * hash
+ PREINIT:
+  SV ** value;
+  SV * sink;
+  SV * source;
+  char * options;
+  STRLEN len;
  CODE:
+  /* Callbacks are in source and sink keys */
+  value = hv_fetch( hash, "sink", 4, 0 );
+  if ( value == NULL ) {
+    /* undef callback */
+    sink = NULL;
+  } else {
+    sink = newSVsv(*value); /* memory leak XXXXX */
+  }
+  value = hv_fetch( hash, "source", 6, 0 );
+  if ( value == NULL ) {
+    /* undef callback */
+    source = NULL;
+  } else {
+    source = newSVsv(*value); /* memory leak XXXXX */
+  }
+  value = hv_fetch( hash, "options", 7, 0 );
+  if ( value == NULL ) {
+    /* undef options */
+    options = "";
+  } else {
+    options = SvPV( *value, len);
+  }
+  
+  /* Need to use astXmlChanFor interface so that we can register
+     a fixed callback and a reference to a CV */
 #ifndef HASXMLCHAN   
    Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.x or greater");
 #else
   ASTCALL(
-   RETVAL = astXmlChan( NULL, NULL, "");
+   RETVAL = astXmlChanFor( (const char *(*)()) source, sourceWrap,
+                            (void (*)( const char * )) sink, sinkWrap, options );
   )
-#endif  
+#endif
  OUTPUT:
   RETVAL
 
@@ -917,6 +1092,7 @@ astDESTROY( this )
   char * pling;
   AV* local_err;
   char * s = CopFILE( PL_curcop );
+  STRLEN msglen;
  CODE:
   MUTEX_LOCK(&AST_mutex);
   My_astClearErrMsg();
@@ -931,7 +1107,7 @@ astDESTROY( this )
       elem = av_fetch( local_err, i, 0 );
       if (elem != NULL ) {
         PerlIO_printf( PerlIO_stderr(),  "%s %s\n", pling,
-		       SvPV( *elem, PL_na ));
+		       SvPV( *elem, msglen ));
       }
     }
     if (!s) s = "(none)";
