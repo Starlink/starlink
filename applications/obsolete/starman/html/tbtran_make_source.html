@@ -1,0 +1,236 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBTRAN_MAKE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBTRAN_MAKE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbtran_make_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbtran_make">
+t_tbtran_make  </a>  Calc transformation coefficents between posns in two tables       <br>
+<a href="#tbtrm_load">
+tbtrm_load  </a>  Load positions into work arrays       <br>
+<a href="#tbtran_make">
+tbtran_make  </a>  (Program) Calc transformation between positions in two tables       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C    TBTRAN_MAKE.FOR
+C
+C    Contains:-
+C
+C T_TBTRAN_MAKE  Calc transformation coefficents between posns in two tables
+C TBTRM_LOAD       Load positions into work arrays
+C TBTRM_DOIT       Orgainise for transformation calculations
+C TBTRM_LINTRAN    Calculate transformation
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbtran_make"> T_TBTRAN_MAKE  </a>-- Calc transformation coefficents between posns in two tables
+C
+C         A J Penny            RAL			1991 May
+
+      subroutine t_tbtran_make ()
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+C--
+      integer k, ierr, ip1, ip2, ktype, ipwk1, ipwk2, ipwk3, ngood
+      real    siglim, trc(6), sd
+      logical donames
+
+      integer nthelp
+      parameter ( nthelp=6 )
+      character*68 thelp(nthelp)
+      data (thelp(k),k=1,6) /
+     + 'Option        Function: Choose -' ,
+     + '------        ------------------' ,
+     + 'Full          Full 6 parameter fit',
+     + 'Magnrotshift  Magnify, Rotate, XY shift fit',
+     + 'Rotshift      Rotate, XY shift fit',
+     + 'Shift         XY shift fit' /
+CbegCbegin
+
+
+      call optabr ( 'IN1', ip1, TBVX1, TBY1, .false., ierr )		!Input 1st table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN2', ip2, TBVX2, TBY2, .false., ierr )		!Input 2nd table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         if ( ierr.eq.3 ) then
+            call printo ( 'ERROR: Cannot have just one file' )
+         endif
+         ST_FAILED = .true.
+         return
+      endif
+
+      call get_job ( 'TRTYPE', 'shift:rotshift:magnrotshift:full', 	!Get type of transformation
+     +                         ktype, 4, ' ', 0 )
+      if ( ST_FAILED ) return
+
+      call get1r ( 'SIGLIM', siglim, 2.5, 0.0, 1.0e20 )			!Get limit to mismatch for a star
+      if ( ST_FAILED ) return
+
+      call get1b ( 'NAMES', donames, .false. )				!Get if to do names or position in table
+      if ( ST_FAILED ) return
+
+      if ( .not.donames .and. (TBY1.ne.TBY2) ) then
+         call printo ( 'ERROR: Tables must be of same length' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      call gtwrkr ( 'WORK1', TBY1*2, ipwk1, ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrkr ( 'WORK2', TBY1*2, ipwk2, ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call tbtrm_load ( %val(ip1), %val(ip2), %val(ipwk1),
+     +                  %val(ipwk2), donames )
+      if ( ST_FAILED ) return
+      if ( TBYO.eq.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call gtwrkr ( 'WORK3', TBY1, ipwk3, ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+
+      call tran_doit ( %val(ipwk1), %val(ipwk2), TBY1, TBYO, ktype,	!Do the loading of the Output from the Input
+     +                siglim, %val(ipwk3), trc, ngood, sd )
+      if ( ST_FAILED ) return
+
+      call pargi ( ngood )						!Output results
+      call printd ( 'Number of points used = %d ' )
+      call pargr ( sd )
+      call printd ( 'Std Dev of points from fit = %f ' )
+      call pargr ( trc(1) )				
+      call pargr ( trc(2) )
+      call pargr ( trc(3) )
+      call printd ( 'X2 = %f + %f *X1 + %f *Y1 ')
+      call pargr ( trc(4) )
+      call pargr ( trc(5) )
+      call pargr ( trc(6) )
+      call printd ( 'Y2 = %f + %f *X1 + %f *Y1 ')
+
+      call put3r ( 'XCOEFF', trc(1), trc(2), trc(3) )			!Put in program parameters
+      call put3r ( 'YCOEFF', trc(4), trc(5), trc(6) )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtrm_load"> TBTRM_LOAD  </a>-- Load positions into work arrays
+C
+C    alan penny           RAL                  1991 May
+
+      subroutine tbtrm_load ( tb1, tb2, wk1, wk2, donames )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	tb1(TBVX1,TBY1)		!i: Input table 1
+      real	tb2(TBVX2,TBY2)		!i: Input table 2
+      real	wk1(TBY1,2)		!i: Work space 1
+      real	wk2(TBY1,2)		!i: Work space 2
+      logical   donames			!i: Use names or raw positions?
+C--
+      integer j, k, ka, kd
+      real temp(5)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.donames ) then
+         TBYO = TBY1
+         do k = 1, TBYO
+            wk1(k,1) = tb1(6,k)
+            wk1(k,2) = tb1(7,k)
+            wk2(k,1) = tb2(6,k)
+            wk2(k,2) = tb2(7,k)
+         enddo
+      else
+         ka = 0
+         do k = 1, TBY1
+            call amovr ( tb1(1,k), temp, 5 )
+            kd = 1
+            j = 0
+            do while ( j.lt.TBY2 .and. kd.eq.1 )
+               j = j + 1
+               call namechr ( tb2(1,j), temp, kd )
+            enddo
+            if ( kd.eq.0 ) then
+               ka = ka + 1
+               wk1(ka,1) = tb1(6,k)
+               wk1(ka,2) = tb1(7,k)
+               wk2(ka,1) = tb2(6,j)
+               wk2(ka,2) = tb2(7,j)
+            endif
+         enddo
+         TBYO = ka
+         if ( TBYO.eq.0 ) call printo ( 'ERROR: No matching names' )
+      endif
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtran_make"> TBTRAN_MAKE  </a>-- (Program) Calc transformation between positions in two tables
+C   See TBTRAN_MAKE.HLP for details
+C
+C         A.J.Penny                RGO                             83-8-14
+
+      subroutine tbtran_make ( ierradam )
+
+      implicit none
+
+      integer      ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbtran_make
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

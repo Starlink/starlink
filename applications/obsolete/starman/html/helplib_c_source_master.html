@@ -1,0 +1,111 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+Help library subroutines - (C)
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+Help library subroutines - (C)
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and conditions apply. <br>
+<hr>
+
+Go to <a href="source_top.html#helplib_c_source_back"> Starman Source Code </a> Page <p>
+
+<hr>
+Subroutines: <p>
+
+<a href="#sthe_trmsz">
+sthe_trmsz </a>  Get width and height of terminal screen or window <br>
+
+
+<HR>
+<pre>
+
+/* <a name="sthe_trmsz"> 
+*+
+*  Name:
+*     STHE_TRMSZ
+
+*  Purpose:
+*     Obtains the width and height of the terminal screen or window for
+*     UNIX.
+
+*  Language:
+*     ANSI C
+
+*  Invocation:
+*     CALL STHE_TRMSZ( WIDTH, HEIGHT )
+
+*  Description:
+*     This routine obtains the width and height of the terminal screen
+*     or window for UNIX.
+
+*  Arguments:
+*     WIDTH = INTEGER (Returned)
+*        The width of the screen in characters.
+*     HEIGHT = INTEGER (Returned)
+*        The height of the screen in lines.
+
+*  Building:
+*     -  On SUNs this should be compiled with gcc, but with cc on
+*     DECstations.  Use the switch "-I/star/include" on both systems.
+*     -  When linking add "-lcurses -ltermcap".
+
+*  [optional_subroutine_items]...
+*  Authors:
+*     AJC: Alan Chipperfield (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1992 June 17 (AJC):
+*        Original version.
+*     1992 June 22 (MJC):
+*        Renamed and modified for KAPPA use.  Converted to SST prologue.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*- */
+
+/* Global Constants: */
+#include <stdio.h>
+#include <curses.h>
+#include "f77.h"
+
+/*
+*.  */
+
+F77_INTEGER_FUNCTION(sthe_trmsz)(INTEGER(width),INTEGER(height))
+{
+
+/* Pointers to Arguments:						    */
+
+   GENPTR_INTEGER(width)
+   GENPTR_INTEGER(height)
+
+   if ((int)initscr() == ERR )
+     return 0;
+   else
+     {
+     *width = COLS; *height = LINES;
+     endwin();
+     return 1;
+     }
+}
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

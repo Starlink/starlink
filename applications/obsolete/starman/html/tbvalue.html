@@ -1,0 +1,158 @@
+<HTML> <HEAD>
+<TITLE> TBVALUE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBVALUE - Type a table value
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This takes the value of a single element in an input table, and types
+  out that value and also puts it out as a parameter of the program.
+<p>
+ 
+  The column the element is taken from may be defined either from the
+  number of the column or from the column's header.
+<p>
+ 
+  The row the element is taken from may be defined either from the
+  number of the row or from the row's name.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbvalue_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#column"> Column </a>
+<li> 1.2 <a href="#header"> Header </a>
+<li> 1.3 <a href="#in"> In </a>
+<li> 1.4 <a href="#name"> Name </a>
+<li> 1.5 <a href="#row"> Row </a>
+<li> 1.6 <a href="#usehead"> Usehead </a>
+<li> 1.7 <a href="#usename"> Usename </a>
+<li> 1.8 <a href="#value"> Value </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="column"> Column </h2> </a> <p>
+ 
+  (Default - 1           <br> Range - 1 to number of columns in table)
+<p>
+ 
+  The number of the desired column.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="header"> Header </h2> </a> <p>
+ 
+  (Default - ' '        <br> Choice - any)
+<p>
+ 
+  The (up to) 20 character string of the header of the desired
+  column.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The input file containing the input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="name"> Name </h2> </a> <p>
+ 
+  (Default - ' '        <br> Choice - any)
+<p>
+ 
+  The (up to) 20 character string of the name of the desired row.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="row"> Row </h2> </a> <p>
+ 
+  (Default - 1           <br> Range - 1 to number of rows in table)
+<p>
+ 
+  The number of the desired row.
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="usehead"> Usehead </h2> </a> <p>
+ 
+  (Default - 'no'    <br> Choice - 'yes:no')
+<p>
+ 
+  Define the column desired from its header ('yes'), or from the
+  the number of the column ('no')?
+<p>
+ 
+<hr>
+ <h2> 1.7 <a name="usename"> Usename </h2> </a> <p>
+ 
+  (Default - 'no'    <br> Choice - 'yes:no')
+<p>
+ 
+  Define the row desired from its name ('yes'), or from the
+  the number of the row ('no')?
+<p>
+ 
+<hr>
+ <h2> 1.8 <a name="value"> Value </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The value of the table element is put out into this program
+  parameter.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny                 RAL            1991 Dec
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

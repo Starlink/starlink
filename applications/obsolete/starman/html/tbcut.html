@@ -1,0 +1,144 @@
+<HTML> <HEAD>
+<TITLE> TBCUT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBCUT -  Cut out parts of a table
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This cuts out columns and rows of a table and ouputs those cut out
+   rows and columns to a new table in a new file.
+<p>
+ 
+   You can input up to 10 stretches of columns and up to 10 stretches
+   of rows to cut out and save.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbcut_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#col"> Col </a>
+<li> 1.2 <a href="#in"> In </a>
+<li> 1.3 <a href="#out"> Out </a>
+<li> 1.4 <a href="#row"> Row </a>
+<li> 1.5 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="col"> Col </h2> </a> <p>
+ 
+  (Default - 1,all (0,0 after 1st)     <br> Range - 0 to no of columns)
+<p>
+ 
+   The 1st section of columns to cut out and save. Thus '1,2' would cut
+   out and save the first two columns of the input table.
+<p>
+ 
+   If the first number is zero, then this entry is ignored
+   and no more column sections are requested.
+<p>
+ 
+   This help is applied to the up to 10 parameters, 'COL&#95 1', 'COL&#95 2',
+   'COL&#95 3', .... 'COL&#95 10', for the 10 possible different column sections.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain the output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="row"> Row </h2> </a> <p>
+ 
+  (Default - 1,all (0,0 after 1st)     <br> Range - 0 to no of rows)
+<p>
+ 
+   The 1st section of rows to cut out and save. Thus '1,2' would cut
+   out and save the first two rows of the input table.
+<p>
+ 
+   If the first number is zero, then this entry is ignored
+   and no more row sections are requested.
+<p>
+ 
+   This help is applied to the 10 parameters, 'ROW&#95 1', 'ROW&#95 2',
+   'ROW&#95 3', .... 'ROW&#95 10', for the 10 possible different row sections.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - 'Output from TBCUT'           <br> Choice - any)
+<p>
+ 
+  The keyword to be added to the output file as a 'Title'.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+      A J Penny            RAL                              1991 Feb
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

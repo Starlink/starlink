@@ -1,0 +1,991 @@
+<HTML> <HEAD>
+<TITLE> AVERAGE - Average different photometry estimates (especially from
+MEASURE)
+</TITLE>
+</HEAD> <BODY>
+ 
+<h1> AVERAGE - <br>
+Average different photometry estimates <br>
+(especially from MEASURE) </h1>
+ 
+ This takes the output tables created by the stellar photometry
+ program MEASURE (or any other program), and averages them to a table
+ with weighted mean magnitudes. It also makes a text file with the
+ details of the averaging.
+<p>
+ 
+ It can do this automatically, or the user can modify some of the
+ rejection and averaging procedures.
+<p>
+ 
+ 
+Go to <a href="intro.html#average_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#method"> Method </a>
+<ul>
+<li> 1.1 <a href="#making_means"> Making means </a>
+<ul>
+<li> 1.1.1 <a href="#use_of_weights"> Use of weights </a>
+<li> 1.1.2 <a href="#rejection_intrinsic"> Rejection intrinsic </a>
+<li> 1.1.3 <a href="#rejection_means"> Rejection means </a>
+<ul>
+<li> 1.1.3.1 <a href="#scatter_between_files"> Scatter between files </a>
+<li> 1.1.3.2 <a href="#theoretical_errors"> Theoretical errors </a>
+<li> 1.1.3.3 <a href="#which_is_better?"> Which is better? </a>
+</ul>
+</ul>
+<li> 1.2 <a href="#star_names"> Star names </a>
+</ul>
+<li> 2 <a href="#automatic_use"> Automatic use </a>
+<li> 3 <a href="#rejection_criteria"> Rejection criteria </a>
+<li> 4 <a href="#use_of_graphics_buttons"> Use of graphics buttons </a>
+<li> 5 <a href="#parameters"> Parameters </a>
+<li> 6 <a href="#author"> Author </a>
+</ul>
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+<ol>
+<li> Criteria for rejecting measures for intrinsic faults are input by
+    the user. Then in the rest of the calculations star measures which
+    violate these criteria are ignored.
+ 
+<p><li> The program calculates, for each (excluding the first) input
+    table, the mean difference in star magnitude of the measures in
+    the table from those in the first input table. This gives the
+    'zero-points' of the magnitudes in each table compared to the
+    first table.
+ 
+<p><li> Optionally, the user can refine the `zero-points'. The
+    program plots out, for each input table, the scatter of these
+    differences, relative to the 'zero-points'. The user can then put
+    (via cursor and/or keyboard) in more accurate values for the
+    'zero-points'.
+ 
+<p><li> These mean differences are subtracted from the magnitudes in
+    the tables, putting them all on the zero point of the first table.
+ 
+<p><li> The rejection criteria for discarding magnitude estimates are set
+    up. This is either done either interactively by setting discordance
+    limits at each magnitude range, or automatically, by calculating
+    these discordance limits or by using the input magnitude error
+    estimates.
+ 
+<p><li> Weighted means are made for each star of its magnitudes from the
+    input tables. At this point discordant input magnitudes may be
+    rejected.
+ 
+<p><li> Some of the other parameters in the input tables (See the help
+    on the input and output files to see which) are noted.
+ 
+<p><li> The results are then put to the output file.
+ 
+    A text file can also be made which gives some the details of the
+    actual star by star averaging and measure rejection.
+</ol>
+ 
+ 
+<hr>
+ <h2> 1.1 <a name="making_means"> Making means </h2> </a> <p>
+ 
+ 
+ A mean magnitude is made for a star by:-
+<p>
+ 
+<ol>
+<li> Taking all the magnitudes from the input tables.
+ 
+<p><li> Discarding those magnitudes where the fit parameters for the star in
+   that particular input table suggest the measure is 'bad'. This
+   method is here refered to as 'intrinsic' rejecting.
+ 
+<p><li> Taking all the good measures and calculating a weighted mean. This
+    is done in a complex way:-
+<p><ol>
+<li>  The weights are from the input error for the star in each table
+      (subject to a switch `usesigma' and a minimum limit- see
+       'sigmamin'). See the help below.
+ 
+<p><li>  A rejection method is used for discarding measures which lie
+      significantly away from the mean. This method is here refered to
+      as 'means' rejecting. This may be done in one of three ways
+ 
+</ol>
+</ol>
+ 
+<hr>
+ <h2> 1.1.1 <a name="use_of_weights"> Use of weights </h2> </a> <p>
+ 
+ 
+ The weights are from the input error for each star in each table.
+<p>
+ 
+ The weighting may be switched off and the unweighted means used (see
+ `usesigma'). A minimum error may be set, so that any input error less
+ than that minimum is set at that minimum (see `sigmamin').
+<p>
+ 
+ Whether to use weights or not, and if so, what value to give to
+ `sigmamin' will depend on your estimate of the validity or otherwise,
+ in each case, of the input error estimates.
+<p>
+ 
+ This method should only be used if the errors in the input magnitude
+ files are good estimates. MEASURE caclculates this error but it is
+ only correct if the correct noises and gains have been input to the
+ MEASURE runs, and there were no other contributory sources of error.
+ It is advisable to check on this, and you can do so by having a trial
+ run with the `means&#95 rejecting' method, when the input errors are
+ plotted against those found from the scatter between files.
+<p>
+ 
+<hr>
+ <h2> 1.1.2 <a name="rejection_intrinsic"> Rejection intrinsic </h2> </a> <p>
+ 
+ 
+ A star magnitude estimate from a particular input file can be
+ rejected by some of the other characteristics of the fit it was made
+ in. These are:-
+<p>
+ 
+ - star centering in fit <br>
+ - no of iterations taken in the fit <br>
+ - chi-squared of the fit <br>
+ - theoretical error estimate <br>
+ - important companions <br>
+ - invalid pixels in fit area <br>
+<p>
+ 
+ The extent to which these have to be 'good' is under the user's
+ control.
+<p>
+ 
+<hr>
+ <h2> 1.1.3 <a name="rejection_means"> Rejection means </h2> </a> <p>
+ 
+ 
+  The basic technique here is to look at the scatter of the
+  magnitude estimates, for a star, from the input tables. Then
+  estimates which diverge too much from the mean are rejected.
+<p>
+ 
+  There are three methods of 'means' rejecting, which are, in
+  essence, two ways of defining what is meant by 'too much':-
+<p>
+ 
+<dl>
+<dt>  (A) 'Default' method
+ 
+<p><dd>      An estimate is only rejected if it lies more than 0.5mag
+      from the mean.
+ 
+<p><dt> (B) Scatter between the different estimates.
+ 
+<p><dd>  For its magnitude, it differs from the mean by more than the
+      level set for the user (or a default 0.5mag) for that magnitude
+      value.
+ 
+<p><dt>   (C) Theoretical expected error in each magnitude estimate.
+ 
+<p><dd>  This method should only be used if the errors in the input
+      magnitude files are good estimates. MEASURE caclculates this
+      error but it is only correct if the correct noises and gains
+      have beeb input to the MEASURE runs, and there were no other
+      contributory sources of error. It is advisable to check on
+      this, and to look at the check plot described below.
+<p>
+ 
+      Use the error estimate from MEASURE for a star for each file:-
+<p>
+ 
+<ol>
+<li>   The weighted mean magnitude for this star from all the files
+         (after the zero point corrections) is calculated.
+<p><li>   The theoretical error in the mean (from taking all the input
+         errors for this star from all the files) is calculated. This
+         takes the input error estimates and does the proper
+         calculation - akin to sqrt(sum[sigma.sigma]/((n-1)(n-2))) - to
+         calculate what error in the mean magnitude should be expected
+         from magnitudes having those errors.
+<p><li>   This theoretical error expected for this star from this file
+         is noted.
+<p><li>   The difference of the magnitude for this star from this file
+         from the mean is calculated.
+<p><li>   The number of standard deviations (diff/theoretical error)
+         from the mean that this difference represents is calculated,
+         using the calculated errors in the mean and in this measure.
+<p><li>   If this number of std. devs. is larger than a (user input -
+         ERRMUL parameter) certain value, then that magnitude for that
+         star from that file is rejected.
+<p><li>   There is also a (user input - ERRLIM parameter) minimum value
+         below which the `calculated error' cannot fall. This stops
+         unrealistic error estimates causing false rejections.
+</ol>
+<p>
+      If this method is adopted, then a plot is displayed of the `found
+      error' (the difference of a single magnitude estimate from the
+      mean magnitude) versus the `calculated error' (the expected
+      value of this difference). The plot should show a linear
+      relation with a slope of one. The `found errors' should scatter
+      about the `calculated error'.
+<p>
+ 
+      If the plot looks OK, but the slope is not unity, then a
+      conversion factor is needed to convert the input error estimates
+      into true ones. Read this from the slope, and input it via the
+      `ERRFAC' parameter.
+<p>
+ 
+      If the plot looks strange, then there is probably something
+      strange about the input error estimates from MEASURE, and this
+      method should be viewed with suspicion.
+<p>
+</dl>
+ 
+<hr>
+ <h2> 1.1.3.1 <a name="scatter_between_files"> Scatter between files </h2> </a> <p>
+ 
+ 
+ This sets at each magnitude (on the zero point of the first table) a
+ maximum difference from the mean that is allowed, and then for each
+ star to reject all measures that exceed that difference for the star.
+<p>
+ 
+ A histogram is calculated of the differences from the means of
+ all the measures at each magnitude level.
+<p>
+ 
+ Then either an interactive selection of the rejection difference
+ made, by plotting the histogram and the user selecting via a cursor
+ the value, or automatically, by calculating the `width' of this
+ histogram and using the user input multiplier of this width to
+ select a value.
+<p>
+ 
+ The rejection is done star-by-star, with the most divergent star
+ (weighted inversely by a magnitudes tolerance level - remember
+ `Errlim') being rejected first. Then the mean is recalculated, and
+ the process started again, with all previously rejected stars not
+ used. This process continues until no more stars are rejected.
+<p>
+ 
+<hr>
+ <h2> 1.1.3.2 <a name="theoretical_errors"> Theoretical errors </h2> </a> <p>
+ 
+ 
+ This, for each star and each table, looks at the input calculated
+ theoretical error as given in the tables, and then to reject that
+ measure if it is farther from the mean by some constant times that
+ theoretical error. Thus one might want to reject all star measures
+ more than three input theoretical standard deviations from the mean of
+ all the measures.
+<p>
+ 
+ A problem is that the input theoretical errors may not be a good
+ indicator of the actual errors. To help in evaluating this, the
+ program, for each table, plots out the run of the theoretical error
+ of a measure in a list of a star versus the error calculated from the
+ scatter in the measures of that star in the all the tables. (This is
+ actually done in bins of the theoretical error levels.) The user can
+ then see if there is any systematic difference.
+<p>
+ 
+ If there is (say the difference errors are commonly twice the
+ theoretical ones) then the rejection criteria can be adjusted (in
+ this example by doubling the limit), if the user wants to believe the
+ difference errors.
+<p>
+ 
+ There is also the option to accept up to a certain limit, even if
+ the theoretical errors indicate a smaller limit. Thus for very
+ well-exposed stars, a theoretical error limit of 0.002mag may be
+ indicated, but the user might well feel that measures differing by
+ 0.01mag are realy ok.
+<p>
+ 
+ Thus after the plot is displayed, the user inputs via the keyboard the
+ factor to multiply the theoretical errors to get the rejection limit,
+ also the minimum rejection limit.
+<p>
+ 
+<hr>
+ <h2> 1.1.3.3 <a name="which_is_better?"> Which is better? </h2> </a> <p>
+ 
+ 
+ The scatter method is a good method when the input tables are all on
+ roughly the same zero point, as it shows and uses the actual errors
+ being encountered.
+<p>
+ 
+ However, if the tables have different zero points, then a measure from
+ a long exposure will have a smaller error than one from a short one,
+ and one would wish to use stricter criteria in rejecting it. Thus the
+ theoretical method is better. The trouble with using the theoretical
+ method is that the theoretical errors are not perfect indicators of
+ the actual errors, and so should only be used (as described above)
+ when the input errors are valid.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="star_names"> Star names </h2> </a> <p>
+ 
+ 
+ The files can either have the same stars in the same order (the
+ default assumption), in which case there is a simple one-to-one
+ correspondance between the stars in the input files and those in the
+ output file.
+<p>
+ 
+ Or the star names in each file can be matched up. Then the output file
+ has all the stars mentioned in all the input files. (Duplicate names
+ in any file but the first are to be avoided.) The output file
+ magnitudes are then means of those estimates in the input files that
+ have estimates for those stars.
+<p>
+ 
+ The order of stars in the output file in this case, is:-
+ 
+<p><ol>
+<li> The order of stars in the 1st input file
+<p><li> The order of any stars in the 2nd input file that were not in the
+       1st file
+<p><li> The order of any stars in the 3rd input file that were not in the
+       1st file or the 2nd file
+<p><li> etc
+</ol>
+ 
+<hr>
+ <h2> 2 <a name="automatic_use"> Automatic use </h2> </a> <p>
+ 
+ 
+<dl>
+<dt>  In automatic use:-
+ 
+<p><dd>    The program runs through on the parameters input by the user at
+    the start of the program.
+ 
+<p><dt>  In interactive use:-
+ 
+<p><dd>    The user interacts with the program, in addition to the input
+    parameters. The interactions are through graphs:-
+<p>
+ 
+<ol>
+<li>    to refine the `zero-point' differences between the files
+           calculated by the program.
+ 
+<p><li>    to select the rejection criteria (for each magnitude level)
+           in using the scatter between estimates of a star, to
+           reject estimates as being too far from the mean.
+ 
+<p><li>    If the user selects using the errors calculated by
+           MEASURE, then the program plots a graph using these
+           errors and those calculated by the scatter between
+           measures of each star. The user uses this to put in
+           a correction factor to make the input errors proper.
+          (As I have always felt doubtful of the MEASURE error
+          calculations.)
+</ol>
+</dl>
+ 
+<hr>
+ <h2> 3 <a name="rejection_criteria"> Rejection criteria </h2> </a> <p>
+ 
+ 
+ A star magnitude estimate from a particular input file can be
+ rejected by some of the characteristics of the MEASURE fit it
+ was made in. These are:-
+<p>
+ 
+<ol>
+<li> Star found far from input position, in terms of the stellar radii.
+<p><li> MEASURE took too many iterations to make the fit.
+<p><li> Too many INVALID pixels in the area fitted when fitting.
+<p><li> Chi squared value too high.
+<p><li> Too many 'companions' to fit.
+<p><li> The error calculated by MEASURE.
+</ol>
+ 
+ The extent to which these have to be 'good' is under the user's
+ control.
+<p>
+ 
+ A further rejection for each star can be done by the scatter of
+ the estimates from the input files. Any that are too far from the
+ mean can be rejected.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="use_of_graphics_buttons"> Use of graphics buttons </h2> </a> <p>
+ 
+ 
+  To mark a  point on a graph, place the cursor at the desired point,
+  and press any of the appropriate buttons.
+<p>
+ 
+  To end the selection of points, place to the left of the Y-axis and
+  press a button.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 5.1 <a href="#again"> Again </a>
+<li> 5.2 <a href="#cenacc"> Cenacc </a>
+<li> 5.3 <a href="#chiprin"> Chiprin </a>
+<li> 5.4 <a href="#errfac"> Errfac </a>
+<li> 5.5 <a href="#errlim"> Errlim </a>
+<li> 5.6 <a href="#errmul"> Errmul </a>
+<li> 5.7 <a href="#filenum"> Filenum </a>
+<li> 5.8 <a href="#fprint"> Fprint </a>
+<li> 5.9 <a href="#gtype"> Gtype </a>
+<li> 5.10 <a href="#in"> In </a>
+<li> 5.11 <a href="#inchi"> Inchi </a>
+<li> 5.12 <a href="#linecol"> Linecol </a>
+<li> 5.13 <a href="#meanrej"> Meanrej </a>
+<li> 5.14 <a href="#names"> Names </a>
+<li> 5.15 <a href="#newmean"> Newmean </a>
+<li> 5.16 <a href="#numinv"> Numinv </a>
+<li> 5.17 <a href="#numits"> Numits </a>
+<li> 5.18 <a href="#offcen"> Offcen </a>
+<li> 5.19 <a href="#out"> Out </a>
+<li> 5.20 <a href="#plhistx"> Plhistx </a>
+<li> 5.21 <a href="#plhisty"> Plhisty </a>
+<li> 5.22 <a href="#plotxlim"> Plotxlim </a>
+<li> 5.23 <a href="#plotylim"> Plotylim </a>
+<li> 5.24 <a href="#sigmalim"> Sigmalim </a>
+<li> 5.25 <a href="#sigmamin"> Sigmamin </a>
+<li> 5.26 <a href="#title"> Title </a>
+<li> 5.27 <a href="#use"> Use </a>
+<li> 5.28 <a href="#usechi"> Usechi </a>
+<li> 5.29 <a href="#usesigma"> Usesigma </a>
+</ul>
+ 
+<hr>
+ <h2> 5.1 <a name="again"> Again </h2> </a> <p>
+ 
+  (Default - 'No'   Choice - 'Yes/No')
+<p>
+ 
+   Flag for redisplaying plot and reusing cursor.
+<p>
+ 
+<hr>
+ <h2> 5.2 <a name="cenacc"> Cenacc </h2> </a> <p>
+ 
+  (Default - 'No'       Choice - 'Yes/No')
+<p>
+ 
+  Flag for accepting a star measure if its only fault is that it is
+  too far off centre.
+<p>
+ 
+<hr>
+ <h2> 5.3 <a name="chiprin"> Chiprin </h2> </a> <p>
+ 
+ (Default - 1.0     Range - 0.0 to 1.0e10)
+<p>
+ 
+ Factor for use on the printing of the matches. The Chi-squareds are
+ printed as integers. If they are small you may want them put out
+ multiplied by a factor so that they dont all look like '0's, '1's,
+ '2's, etc.
+<p>
+ 
+<hr>
+ <h2> 5.4 <a name="errfac"> Errfac </h2> </a> <p>
+ 
+  (Default - 1.0         Range - 0.0 to 1.0e9)
+<p>
+ 
+  When using the input magnitude error estimates to see which input
+  magnitudes for a star to reject, this is the factor to multiply
+  the input error estimates for a file to get 'true' estimates.
+<p>
+ 
+  You will already have used a graph to show the relationship
+  between the input estimates and the 'true' values, as found from
+  the scatter between the input magnitudes for this file and the mean
+  from all the input files. This will have then given you the
+  factor.
+<p>
+ 
+<hr>
+ <h2> 5.5 <a name="errlim"> Errlim </h2> </a> <p>
+ 
+  (Default - 0.01          Range - 0.0 to 1.0e9)
+<p>
+ 
+  Used when using the input magnitude error estimates to see which
+  input magnitudes for a star to reject.
+<p>
+ 
+  This is the value for the minimum tolerance level.
+<p>
+ 
+  This parameter says that this value is then checked to see if it
+  is at least as big as 'ERRLIM', and if not, then increased to that
+  value. This stops a number of unrealistically small input error
+  estimates setting a too stringent check level.
+<p>
+ 
+<hr>
+ <h2> 5.6 <a name="errmul"> Errmul </h2> </a> <p>
+ 
+  (Default - 3.0          Range - 0.0 to 1.0e9)
+<p>
+ 
+  Used when using the input magnitude error estimates to see which
+  input magnitudes for a star to reject.
+<p>
+ 
+  The number of standard deviations (of the input error estimates for
+  stars in this file) that an input magnitude can be and still be
+  accepted.
+<p>
+ 
+<hr>
+ <h2> 5.7 <a name="filenum"> Filenum </h2> </a> <p>
+ 
+  (Default - next             Range - 0 to number of input files)
+<p>
+ 
+  When calculating the relationship between input error estimates and
+  'true' errors, this calculation should be done for all files. This
+  parameter allows you to calculate it in any order and to recalculate
+  the factors for a file.
+<p>
+ 
+<hr>
+ <h2> 5.8 <a name="fprint"> Fprint </h2> </a> <p>
+ 
+  (Default - ' '            Choice - any)
+<p>
+ 
+  The name of the file to take the text version of the output. This
+  has much informative information that is not in the main table
+  output.
+<p>
+ 
+  A null response means that no such file is produced.
+<p>
+ 
+<hr>
+ <h2> 5.9 <a name="gtype"> Gtype </h2> </a> <p>
+ 
+  (Default - 'xwindows'            Choice - any)
+<p>
+ 
+  A character string giving the local name for the graphics
+  display type.
+<p>
+ 
+  'xwindows' will put it out on the screen of your X-window device,
+  if you are using one.
+<p>
+ 
+  If 'ask' is input, then the program asks a very similar question,
+  in a different way. A response here of '?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+ 
+<hr>
+ <h2> 5.10 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The names of the input files containing the star magnitude tables.
+<p>
+ 
+ These are Starman NDF Table format files.
+<p>
+ 
+ These parameters are actually IN1, IN2, IN3, ...., IN50.
+<p>
+ 
+ After the first one, you can end the repeated asking for input files
+ by responding with just the 'return' key, that is a null input.
+<p>
+ 
+<hr>
+ <h2> 5.11 <a name="inchi"> Inchi </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the file containing the table of Chi-squared values, at
+ 0.2mag steps, above which a star is rejected.
+<p>
+ 
+ These are Starman NDF Table format files.
+<p>
+ 
+ These parameters are actually INCHI1, INCHI2, INCHI3, ... INCHI50.
+<p>
+ 
+ These tables, if used, must have the Chi-squared value of the
+ faintest mag first, and be in steps of 0.2mags starting at the faint
+ mag.
+<p>
+ 
+ If there are less than 100 values in the table, then the
+ Chi-squared values are filled up to 100 values with the last value.
+ Values after the first 100 values are ignored.
+<p>
+ 
+ Such files are automatically produced by Chi (qv).
+<p>
+ 
+<hr>
+ <h2> 5.12 <a name="linecol"> Linecol </h2> </a> <p>
+ 
+   (Default - 'black'            Choice - (black:white)
+<p>
+ 
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+ 
+<hr>
+ <h2> 5.13 <a name="meanrej"> Meanrej </h2> </a> <p>
+ 
+  (Default - 'mag'      Choice - 'mag:error:default:ok')
+<p>
+ 
+  Method to reject a magnitude for a star from a particular file
+  because its value (after the file mean correction) differs too
+  much from the mean of the measures from all the files (including
+  the file itself).
+<p>
+ 
+  This defines the 'means' rejecting method.
+<p>
+ 
+  This is asked for repeatedly. At the start the 'default' of
+  0.5 mag is set up. You can then set up any of the three ways.
+  When you are happy, reply 'ok' to continue to the next step.
+<p>
+ 
+  This rejection can be done in one of three ways.
+<p>
+ 
+<dl>
+<dt>   'Default'
+<p><dd> If mag is more than 0.5 from the mean.
+ 
+<p><dt>   'Mag'
+<p><dd> For its magnitude, it differs from the mean by more than
+              the level set for the user for that magnitude value.
+<p>
+ 
+              The tolerance levels are user input by the program
+              calculating (at unit magnitude steps) histograms  of the
+              scatter of magnitude estimates from the mean. The user
+              then looks at these histograms and sets tolerance levels
+              where the outliers are rejected.
+ 
+<p><dt>   'Error'
+<p><dd>   SEE THE WARNING ABOUT THIS METHOD IN THE HIGHER LEVEL
+              HELP ON METHOD AND MAKING&#95 MEANS.
+<p>
+ 
+              This method should only be used if the errors in the input
+              magnitude files are good estimates. MEASURE caclculates
+              this error but it is only correct if the correct noises
+              and gains have beeb input to the MEASURE runs, and there
+              were no other contributory sources of error. It is
+              advisable to check on this, and to look at the check
+              plot described below.
+<p>
+ 
+              Use the error estimate from MEASURE for a star for each
+              file:-
+<p>
+<ol>
+<li>           The weighted mean magnitude for this star from all
+                  the files (after the zero point corrections) is
+                  calculated.
+<p><li>           The theoretical error in the mean (from taking all
+                  the input errors for this star from all the files) is
+                  calculated.
+<p><li>           This theoretical error expected for this star from
+                  this file is noted.
+<p><li>           The difference of the magnitude for this star from
+                  this file from the mean is calculated.
+<p><li>           The number of standard deviations (diff/theoretical
+                  error) from the mean that this difference represents
+                  is calculated, using the calculated errors in the
+                  mean and in this measure.
+<p><li>           If this number of std. devs. is larger than a (user
+                  input - ERRMUL parameter) certain value, then that
+                  magnitude for that
+                  star from that file is rejected.
+<p><li>           There is also a (user input - ERRLIM parameter)
+                  minimum value below which the `calculated error'
+                  cannot fall. This stops unrealistic error estimates
+                  causing false rejections.
+</ol>
+<p>
+               If this method is adopted, then a plot is
+               displayed of the `found error' (the difference of a
+               single magnitude estimate from the mean magnitude)
+               versus the `calculated error' (the expected value of
+               this difference). The plot should show a linear
+               relation with a slope of one. The `found errors' should
+               scatter about the `calculated error'.
+<p>
+ 
+               If the plot looks OK, but the slope is not unity, then
+               a conversion factor is needed to convert the input
+               error estimates into true ones. Read this from the slope,
+               and input it via the `ERRFAC' parameter.
+<p>
+ 
+               If the plot looks strange, then there is probably
+               something strange about the input error estimates from
+               MEASURE, and this method should be viewed with suspicion.
+<p>
+</dl>
+ 
+
+<hr>
+ <h2> 5.14 <a name="names"> Names </h2> </a> <p>
+ 
+  (Default - 'no'          Choice - 'yes:no')
+<p>
+ 
+  Take the individual measures from the input files by matching
+  up the names of the stars in the files.
+<p>
+ 
+  If 'no' is taken, then it is assumed that each file contains the
+  same stars in the same order.
+<p>
+ 
+<hr>
+ <h2> 5.15 <a name="newmean"> Newmean </h2> </a> <p>
+ 
+  (Default - default value        Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  After finding the new mean difference between file magnitude systems
+  by using the graph plot, the found value can be corrected by this
+  parameter.
+<p>
+ 
+<hr>
+ <h2> 5.16 <a name="numinv"> Numinv </h2> </a> <p>
+ 
+  (Default - 0          Range - 0 to 1000000)
+<p>
+ 
+ The maximum number of 'invalid' pixels noted in a star fit that will
+ be allowed for saying the star magnitude is acceptable.
+<p>
+ 
+<hr>
+ <h2> 5.17 <a name="numits"> Numits </h2> </a> <p>
+ 
+  (Default - 29         Range - 0 to 100)
+<p>
+ 
+ The maximum number of iterations done in a star fit that will be
+ allowed for saying the star magnitude is acceptable.
+<p>
+ 
+<hr>
+ <h2> 5.18 <a name="offcen"> Offcen </h2> </a> <p>
+ 
+   (Default - 2.0         Range - 0.0 to 1000.0)
+<p>
+ 
+ Distance, in multiples of the stellar radius, in X or Y that the star
+ position can be from the fit starting position for saying the star
+ magnitude is acceptable.
+<p>
+ 
+<hr>
+ <h2> 5.19 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the new output file containing the mean magnitude table.
+<p>
+ 
+ This is a Starman NDF Table format files.
+<p>
+ 
+<hr>
+ <h2> 5.20 <a name="plhistx"> Plhistx </h2> </a> <p>
+ 
+  (Default - 0.0,0.5         Range - 0.0 to 1.0e8)
+<p>
+ 
+ The range of differences of individual magnitude estimates from
+ the mean to plot out in the histogram of number of stars with
+ such differences.
+<p>
+ 
+<hr>
+ <h2> 5.21 <a name="plhisty"> Plhisty </h2> </a> <p>
+ 
+  (Default - 0.0,1.2*max number    Range - 0.0 to 1.0e8)
+<p>
+ 
+ The range of numbers of individual magnitude estimates with
+ values differing from the mean in certain ranges to plot out
+ in the histogram of number of stars with such differences.
+<p>
+ 
+<hr>
+ <h2> 5.22 <a name="plotxlim"> Plotxlim </h2> </a> <p>
+ 
+  (Default - -5%,+10% of actual range      Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  The range of magnitudes to plot out in the graph of differences,
+  of individual magnitudes from the means, versus magnitude.
+<p>
+ 
+<hr>
+ <h2> 5.23 <a name="plotylim"> Plotylim </h2> </a> <p>
+ 
+  (Default - -5%,+10% of actual range      Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  The range of differences to plot out in the graph of differences,
+  of individual magnitudes from the means, versus magnitude.
+<p>
+ 
+<hr>
+ <h2> 5.24 <a name="sigmalim"> Sigmalim </h2> </a> <p>
+ 
+  (Default - 0.5           Range - 0.0 to 100.0)
+<p>
+ 
+ Maximum overall value of the star error that will be allowed for
+ saying the star magnitude is acceptable.
+<p>
+ 
+<hr>
+ <h2> 5.25 <a name="sigmamin"> Sigmamin </h2> </a> <p>
+ 
+  (Default - 0.01          Range - 0.00001 to 100.0)
+<p>
+ 
+ The minimum `true' acceptable error value for a star. This is in
+ (+/-)magnitude.
+<p>
+ 
+ If a star in an input table has an error less than this, the error is
+ read in as though it were this minimum error.
+<p>
+ 
+ This is used as the errors are calculated as Poisson noise. This is,
+ for bright stars, often less than the real errors, which have error
+ sources such as flat-field errors, etc. Thus a bright star might have
+ such a low error that the weighted averaging would place undue weight
+ on that particular measure.
+<p>
+ 
+ Generally, if you are uncertain about whether the input error estimates
+ are valid, then a high value of `sigmamin', say 0.05mag, is a good idea
+ as this will weight all stars equally, except those that have a very
+ high error estimate (in this case above 0.05mag).
+<p>
+ 
+<hr>
+ <h2> 5.26 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - 'Output from Average')
+<p>
+ 
+ The Title to be added as a descriptor to the output file containing
+ the mean magnitude table.
+<p>
+ 
+<hr>
+ <h2> 5.27 <a name="use"> Use </h2> </a> <p>
+ 
+  (Default - 'inter'       Choice - 'auto:inter')
+<p>
+ 
+<dl>
+<dt>  In automatic use:-
+ 
+<p><dd>    The program runs through on the parameters input by the user at
+    the start of the program.
+ 
+<p><dt>  In interactive use:-
+ 
+<p><dd>    The user interacts with the program, in addition to the input
+    parameters. The interactions are through graphs:-
+<p>
+ 
+<ol>
+<li>    to refine the `zero-point' differences between the files
+           calculated by the program.
+ 
+<p><li>    to select the rejection criteria (for each magnitude level)
+           in using the scatter between estimates of a star, to
+           reject estimates as being too far from the mean.
+ 
+<p><li>    If the user selects using the errors calculated by
+           MEASURE, then the program plots a graph using these
+           errors and those calculated by the scatter between
+           measures of each star. The user uses this to put in
+           a correction factor to make the input errors proper.
+          (As I have always felt doubtful of the MEASURE error
+          calculations.)
+</ol>
+</dl>
+
+<hr>
+ <h2> 5.28 <a name="usechi"> Usechi </h2> </a> <p>
+ 
+  (Default - 'No'       Choice - 'Yes/No')
+<p>
+ 
+ Flag for testing the chi-squared value when deciding to use a
+ magnitude estimate.
+<p>
+ 
+<hr>
+ <h2> 5.29 <a name="usesigma"> Usesigma </h2> </a> <p>
+ 
+  (Default - 'No'       Choice - 'Yes/No')
+<p>
+ 
+ Flag for using the input magnitude error estimates to weight the
+ input magnitudes in calculating the mean.
+<p>
+ 
+ 
+<hr>
+ <h2> 6 <a name="author"> Author </h2> </a> <p>
+ 
+   A.J.Penny                RAL                          1994 December
+ 
+<hr>
+All rights reserved. &copy RAL 1995. Starlink conditions and disclaimers apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 18 </i>
+ 

@@ -1,0 +1,132 @@
+<HTML> <HEAD>
+<TITLE> TBCOMPS </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBCOMPS - <br>
+ Find stars within/not within an
+annulus of each other
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This takes a table and finds positions in it which are within a
+  given annulus of any other position in the table. Such positions are
+  output to an output table.
+<p>
+ 
+  Optionally, it can output those positions which are NOT within these
+  annulii.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbcomps_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in"> In </a>
+<li> 1.2 <a href="#limits"> Limits </a>
+<li> 1.3 <a href="#option"> Option </a>
+<li> 1.4 <a href="#out"> Out </a>
+<li> 1.5 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the input table
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="limits"> Limits </h2> </a> <p>
+ 
+  (Default - 0.0,20.0      <br> Range - 0.0 to 1.0e10)
+<p>
+ 
+  Annulus around every position which is either forbidden or
+  necessary for any other position in the table to be in, for it be
+  included in the output table of positions.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="option"> Option </h2> </a> <p>
+ 
+   (Default - 'in'       <br> Choices -  'in:not&#95 in')
+<p>
+ 
+   Find all positions within (in) or not within (not&#95 in)
+   annulus round any other position.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - 'Output from TBCOMPS'             <br> Choice - any)
+<p>
+ 
+    The Title to be added to the output file
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny                  RAL               1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

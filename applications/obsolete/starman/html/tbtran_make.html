@@ -1,0 +1,205 @@
+<HTML> <HEAD>
+<TITLE> TBTRAN&#95 MAKE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBTRAN&#95 MAKE - <br>
+ Calc transform eqn from two matched XY
+tables
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This takes two tables (whose entries in columns 1 and 2 are X,Y
+   positions of at least some same points) and calculates the
+   transformation between the coordinate systems of the two tables.
+<p>
+ 
+   The coordinates in the first table are taken as `X,Y', and those
+   in the second are taken as 'X&#95 1 ,Y&#95 1 ', and the transformation is:-
+<p>
+ 
+     Calculated   X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+     Calculated   Y&#95 1 = c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+   The coefficients are calculated so as to minimise the errors
+   between 'calculated positions in the second table' and
+   'actual positions in the second tables'. Points which are too
+   discordant are dropped from the calculation of the transformation.
+<p>
+ 
+   Four types of transformation may be calculated:-
+<p>
+<dl>
+<dt><strong> shift </strong> <dd>
+        Shift [c&#95 x(2)=1; c&#95 x(3)=0; c&#95 y(2)=0; c&#95 y(3)=1]
+<dt><strong> rotshift      </strong> <dd>
+   Shift and rotation
+<dt><strong> magnrotshift  </strong> <dd>
+   Shift, rotation and magnification
+<dt><strong> full </strong> <dd>
+   Shift, rotation, magnification and X/Y stretch
+</dl><p>
+ 
+ 
+  The input tables may either be taken as consisting of matching pairs,
+  or the program can look for rows with the same names to treat as the
+  matching pairs.
+<p>
+ 
+  The results are typed out, and also put into the program paramters.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbtran_make_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in1"> In1 </a>
+<li> 1.2 <a href="#in2"> In2 </a>
+<li> 1.3 <a href="#names"> Names </a>
+<li> 1.4 <a href="#siglim"> Siglim </a>
+<li> 1.5 <a href="#trtype"> Trtype </a>
+<li> 1.6 <a href="#xcoeff"> Xcoeff </a>
+<li> 1.7 <a href="#ycoeff"> Ycoeff </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in1"> In1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the 1st input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="in2"> In2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the 2nd input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="names"> Names </h2> </a> <p>
+ 
+  (Default - 'no'            <br> Choice - 'yes:no')
+<p>
+ 
+  Match up pairs of points in the 1st and 2nd tables by looking
+  for rows with the same names? If not, then assume entries
+  are the same order in the two tables.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="siglim"> Siglim </h2> </a> <p>
+ 
+  (Default - 2.5     <br> Range - 0.0 to 1.0e20)
+<p>
+ 
+  When calculating the transformations, discordant points are
+  rejected if their calculated positions in the 2nd table lie
+  more than 'SIGLIM' times the standard deviation away from the
+  2nd table positions.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="trtype"> Trtype </h2> </a> <p>
+ 
+  (Default - 'full'  <br> Choice - 'shift:rotshift:magnrotshift:full')
+<p>
+ 
+  The type of transformation to be calculated.
+<p>
+ 
+<dl>
+<dt><strong> shift </strong> <dd>
+        Shift [c&#95 x(2)=1; c&#95 x(3)=0; c&#95 y(2)=0; c&#95 y(3)=1]
+<dt><strong> rotshift      </strong> <dd>
+   Shift and rotation
+<dt><strong> magnrotshift  </strong> <dd>
+   Shift, rotation and magnification
+<dt><strong> full </strong> <dd>
+   Shift, rotation, magnification and X/Y stretch
+</dl><p>
+ 
+<hr>
+ <h2> 1.6 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+ 
+  (This is an output parameter)
+<p>
+ 
+  The three output cofficents for the X system
+<p>
+ 
+   Calculated  X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+<hr>
+ <h2> 1.7 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+ 
+  (This is an output parameter)
+<p>
+ 
+  The three output cofficents for the Y system
+<p>
+ 
+   Calculated  Y&#95 1 = c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny                  RAL               1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

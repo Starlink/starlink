@@ -1,0 +1,878 @@
+<HTML> <HEAD>
+<TITLE> SPRINKLE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> SPRINKLE - <br>  Make a table of field/cluster stars
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Makes a table of stars with random positions, magnitudes, colours and
+  heights. This table represents the stars in a star field. It can be
+  used with the `addstars' program to make an image of a `random' star
+  field, either as a uniform distribution, or as a cluster. The colours
+  and magnitudes can be set in a number of diverse ways.
+<p>
+ 
+  It thus outputs two types of stars, cluster stars and field stars.
+<p>
+ 
+  The cluster stars are distributed in position to mimic a cluster with
+  a King profile and in magnitude and colour to follow either an
+  input colour-magnitude diagram (specified by an input file designed to
+  model a cluster CMD) or one of randomly scattered magnitudes.
+<p>
+ 
+  The field stars have a random x,y distribution and a cmd of again
+  either an input CMD (designed in a different way to model a field
+  star distribution) or a random scatter in colour and magnitude.
+<p>
+ 
+  The range in position, colour and magnitude allowed can be specified.
+<p>
+ 
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#sprinkle_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#method"> Method </a>
+<ul>
+<li> 2.1 <a href="#cluster_stars"> Cluster stars </a>
+<li> 2.2 <a href="#field_stars"> Field stars </a>
+</ul>
+<li> 3 <a href="#input_cmds"> Input CMDs </a>
+<ul>
+<li> 3.1 <a href="#cluster_cmd"> Cluster CMD </a>
+<li> 3.2 <a href="#field_cmd"> Field CMD </a>
+</ul>
+<li> 4 <a href="#random_seeds"> Random seeds </a>
+<li> 5 <a href="#output"> Output </a>
+<li> 6 <a href="#hidden_parameters"> Hidden parameters </a>
+<li> 7 <a href="#parameters"> Parameters </a>
+<li> 8 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+ 
+<hr>
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+ 
+<ol>
+<li> Make a table of the cluster CMD and field star CMD. (See the help
+    on 'Cluster' and 'Field' on how to do this.) Or you can (for
+    either) decide to have a CMD with random magnitudes and colours
+    evenly scattered over a chosen mag and colour range.
+<p>
+ 
+<li> Decide :-
+<p>
+<ul>
+<li>    - What reddening and distance modulus you want them both to have.
+<li>     - Where in the field you want the cluster centre to be.
+<li>     - How large the field is (for both field and cluster stars).
+<li>     - What region of the CMD you want filled (for field/cluster stars).
+<li>     - On the cluster King core and tidal radii.
+<li>     - On the number of cluster and field stars to make.
+<li>     - On the random seed numbers.
+</ul><p>
+ 
+<li> Run the program.
+<p>
+ 
+<li> The output is a table of star positions, heights, magnitudes,
+    and colours.
+<p>
+</ol>
+ 
+<hr>
+ <h2> 2 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+<hr>
+ <h2> 2.1 <a name="cluster_stars"> Cluster stars </h2> </a> <p>
+ 
+ 
+  The selection of a random magnitude and colour
+  ----------------------------------------------
+<p>
+ 
+  The colour-magnitude diagram is input as lines in the CMD. Each line
+  is specified by [a start mag,col; an end mag,col; the number of stars
+  in that line]. The program then sums the total number of stars in all
+  the lines. To choose a random (mag,col), it selects a random number in
+  the range 0.0 to 1.0, and finds in which line segment the ratio of
+  (sum of stars in lines so far)/(total no of stars) is first greater
+  than the number chosen. Thus the lines are selected in proportion to
+  the number of stars in them. Then a (mag,col) is chosen from a uniform
+  random distribution along the chosen line.
+<p>
+ 
+  Thus the line segments do not have to be contiguous in the CMD, but
+  no smoothing in the number distribution from one line to the next is
+  made (which if they are not touching would be incorrect). Thus to
+  insure no falsely rapid changes in the number distribution are made,
+  the line segments must be short enough that in each one, a uniform
+  number distribution is suitable.
+<p>
+ 
+  After this the input distance modulus and reddening are applied (after
+  the table (m-M) and Eb-v (say) have been removed).
+<p>
+ 
+  Then the input limits on magnitude and colour are checked. If the
+  chosen mag,col lies within the limits, they are accepted; if not,
+  then the process is repeated.
+<p>
+ 
+<strong> Alternative </strong>
+<p>
+ 
+  No table is input, and the mag,cols are uniformly distributed within
+  the mag,col limits.
+<p>
+ 
+ 
+<strong>   The selection of a random X,Y Position </strong>
+<p>
+ 
+  The King core and tidal radii are used to make a random selection
+  of distance from the cluster centre, which results in the King
+  radial distribution. These are then uniformily distributed in
+  position angle around the cluster. They are accepted if they fall
+  within the input position limits.
+<p>
+ 
+  The core and tidal radii have thus to be input as 'pixel' values.
+<p>
+ 
+  The King distribution is that defined by Ivan King in:- AJ 67,471;
+  AJ 70,376; AJ 71,64
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="field_stars"> Field stars </h2> </a> <p>
+ 
+ 
+<strong> The selection of a random magnitude and colour </strong>
+<p>
+ 
+  The colour-magnitude diagram is input as numbers of stars in uniform
+  areas in a grid in the CMD.
+<p>
+ 
+  The table specifying the CMD gives the location of the top left hand
+  area and the area size. The table then contains the number of stars
+  in each area. The program then sums the total number of stars in all
+  the areas. To choose a random (mag,col), it selects a random number in
+  the range 0.0 to 1.0, and finds in which area the ratio of
+  (sum of stars in areas so far)/(total no of stars) is first greater
+  than the number chosen. Thus the areas are selected in proportion to
+  the number of stars in them. Then a (mag,col) is chosen from a uniform
+  random distribution within the chosen area.
+<p>
+ 
+  Thus no smoothing in the number distribution from one area to the
+  next is made. So to insure no falsely rapid changes in the number
+  distribution are made, the areas must be small enough that in each
+  one, a uniform number distribution is suitable.
+<p>
+ 
+  After this the input distance modulus and reddening are applied (after
+  the table (m-M) and Eb-v (say) have been removed).
+<p>
+ 
+  Then the input limits on magnitude and colour are checked. If the
+  chosen mag,col lies within the limits, they are accepted; if not,
+  then the process is repeated.
+<p>
+ 
+<strong>   Alternative </strong>
+<p>
+ 
+  No table is input, and the mag,cols are uniformly distributed within
+  the mag,col limits.
+<p>
+ 
+ 
+<strong>   The selection of a random X,Y Position </strong>
+<p>
+ 
+  A uniform random distribution within the input limits is made.
+<p>
+ 
+ 
+<hr>
+ <h2> 3 <a name="input_cmds"> Input CMDs </h2> </a> <p>
+ 
+ The star positions are selected from random field or cluster
+ positions. The magnitudes and colours of the stars can be
+ selected from a uniform distribution, or from a `CMD'.
+ 
+<hr>
+ <h2> 3.1 <a name="cluster_cmd"> Cluster CMD</h2> </a> <p>
+ 
+ 
+  Input table giving a cluster CMD. It contains rows describing line
+  segements of the cluster.
+<p>
+ 
+<dl>
+<dt>  (A)
+<dd>Each row of the table contains a description of a line segment of
+      the cluster CMD. It has, in order,:-
+<p>
+ 
+      Mag start, Col start, Mag end, Col end, Number of stars
+<p>
+ 
+ 
+<dt>  (B)
+<dd>  See the help on 'Method' as to how this is used.
+<p>
+ 
+ 
+<dt>  (C)
+<dd> The table also has, as descriptors, the reddening and distance
+      modulus of the CMD. Thus when the user inputs the desired
+      reddening and distance modulus, the table descriptor values are
+      first subtracted.
+<p>
+ 
+      Thus, for example, if the user puts in the same reddening and
+      distance modulus as the value in the cluster file, the values in
+      the cluster table for the stars are used unaltered.
+<p>
+ 
+      The table descriptors are:-
+<p>
+<pre>
+      Name     Content
+      ----     -------
+      RED      The reddening
+      DISMOD   The distance modulus
+</pre><p>
+ 
+ 
+<dt>  (D)
+<dd> The table can be made at the keyboard by the program `tbkey',
+     and the decriptors added with the program `tbdes'.
+<p>
+</dl>
+ 
+<hr>
+ <h2> 3.2 <a name="field_cmd"> Field CMD</h2> </a> <p>
+ 
+  The input table giving the field star CMD. It contains rows which
+  have the number of stars in areas in a CMD.
+<p>
+ 
+<dl>
+<dt> (A)
+<dd>The CMD (magnitude increasing down, colour increasing to right) may
+    be thought of being divided up into a rectangular grid of areas of
+    equal size. The CMD is then described by the number of stars in each
+    area. Each row of the input table then contains the numbers of stars
+    in the areas in one horizontal row of the grid, and the rows in toto
+    make up the whole CMD. The number of columns in a row gives the
+    horizontal number of areas in the grid and the number of rows gives
+    the vertical number. The size of each area is described in the table
+    descriptors, and the location of the grid in the CMD is also
+    described there.
+<p>
+ 
+<dt> (B)
+<dd> See the help on 'Method' for further description.
+<p>
+ 
+<dt> (C)
+<dd> The table also has, as descriptors, the reddening and distance
+    modulus of the CMD. Thus when the user inputs the desired reddening
+    and distance modulus, the table ones are first subtracted.
+<p>
+ 
+    Thus, for example, if the user puts in the same reddening and
+    distance modulus as the value in the field file, the values in the
+    field table for the stars are used unaltered.
+<p>
+ 
+    The table has descriptors:-
+<p>
+<pre>
+ 
+ Name     Content
+ ----     -------
+ RED      Reddening
+ DISMOD   Distance modulus
+ MSTART   Magnitude of tlh corner of the tlh area
+           in the CMD grid
+ MSTEP    Vertical (magnitude) size of the areas
+ CSTART   Colour of tlh corner of the tlh area
+           in the CMD grid
+ CSTEP    Horizontal (colour) size of the areas
+</pre><p>
+ 
+    MSTEP and CSTEP must be positive.
+<p>
+ 
+<dt> (D)
+<dd> The table can be made at the keyboard by the program TBKEY, and the
+    decriptors added with the program TBWRDES.
+ 
+</dl><p>
+ 
+ 
+<hr>
+ <h2> 4 <a name="random_seeds"> Random seeds </h2> </a> <p>
+ 
+ 
+  The choosing of the random values is done with the a simple
+  algorithm, which starts from an input seed and creates a pseudo-random
+  number form 0 to 1 from that and updates the seed.
+<p>
+ 
+  This seed number is fed in by the user.
+<p>
+ 
+  So if you feed in the same seed, you will get the same distribution
+  of star mag,col and positions. A different seed will give a different
+  pattern. These seeds have to be large (over a billion) to ensure
+  good randomising. There are separate seeds for the cluster and field
+  stars, so one pattern can be repeated, whilst holding the other
+  constant.
+<p>
+ 
+ 
+<hr>
+ <h2> 5 <a name="output"> Output </h2> </a> <p>
+ 
+ 
+   The table contains seven columns. For each star, the entry is:-
+<p>
+<pre>
+    column  header    content
+    ------  ------    -------
+     1      X         x posn
+     2      Y         y posn
+     3      HEIGHT1   height of star in the 1st colour
+                       band (e.g. 'V')
+     4      HEIGHT2   height of star in the 2nd colour
+                       band (e.g. 'B')
+     5      MAG1      1st colour band magnitude (e.g. 'V')
+     6      COL       colour (e.g. 'B-V')
+     7      MAG2      2nd colour band magnitude (e.g. 'B')
+ 
+</pre><p>
+ 
+     Thus from the input table(s) of (say) 'V' and 'B-V', an output
+     table of X, Y, V height, B height, V, B-V, and B is made.
+<p>
+ 
+     The stars are named as #1, #2, #3, etc.
+<p>
+ 
+ It is also possible, through the LOG parameter, to get a typing out as
+ the program goes.
+<p>
+ 
+<hr>
+ <h2> 6 <a name="hidden_parameters"> Hidden parameters </h2> </a> <p>
+ 
+ 
+<p>
+ 
+  The parameter LOG is `hidden', that is only accessible by putting
+  `SPRINKLE LOG=yes' on the command line or a previous LET command.
+<p>
+ 
+ 
+<hr>
+ <h2> 7 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+ 
+<ul>
+<li> 7.1 <a href="#ccrange"> Ccrange </a>
+<li> 7.2 <a href="#cdismod"> Cdismod </a>
+<li> 7.3 <a href="#ceven"> Ceven </a>
+<li> 7.4 <a href="#cluster"> Cluster </a>
+<li> 7.5 <a href="#cmrange"> Cmrange </a>
+<li> 7.6 <a href="#cnumber"> Cnumber </a>
+<li> 7.7 <a href="#credden"> Credden </a>
+<li> 7.8 <a href="#cseed"> Cseed </a>
+<li> 7.9 <a href="#cxrange"> Cxrange </a>
+<li> 7.10 <a href="#cxyposn"> Cxyposn </a>
+<li> 7.11 <a href="#cyrange"> Cyrange </a>
+<li> 7.12 <a href="#doclust"> Doclust </a>
+<li> 7.13 <a href="#dofield"> Dofield </a>
+<li> 7.14 <a href="#fcrange"> Fcrange </a>
+<li> 7.15 <a href="#fdismod"> Fdismod </a>
+<li> 7.16 <a href="#feven"> Feven </a>
+<li> 7.17 <a href="#field"> Field </a>
+<li> 7.18 <a href="#fmrange"> Fmrange </a>
+<li> 7.19 <a href="#fnumber"> Fnumber </a>
+<li> 7.20 <a href="#fredden"> Fredden </a>
+<li> 7.21 <a href="#fseed"> Fseed </a>
+<li> 7.22 <a href="#fxrange"> Fxrange </a>
+<li> 7.23 <a href="#fyrange"> Fyrange </a>
+<li> 7.24 <a href="#log"> Log </a>
+<li> 7.25 <a href="#m1fact"> M1fact </a>
+<li> 7.26 <a href="#m2fact"> M2fact </a>
+<li> 7.27 <a href="#out"> Out </a>
+<li> 7.28 <a href="#radcore"> Radcore </a>
+<li> 7.29 <a href="#radtide"> Radtide </a>
+<li> 7.30 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+ 
+<hr>
+ <h2> 7.1 <a name="ccrange"> Ccrange </h2> </a> <p>
+ 
+  (If there is a cluster file:- <br>
+     Default - bluest to reddest colour in cluster file <br>
+     Range - bluest to reddest colour in cluster file <p>
+   If the cluster is to have a uniform magnitude distribution:- <br>
+     Default - -20,20 <br>
+     Range - -20 to +20)
+<p>
+ 
+  Range in colour that cluster stars can have.
+<p>
+ 
+<hr>
+ <h2> 7.2 <a name="cdismod"> Cdismod </h2> </a> <p>
+ 
+  (Default- Value in cluster file, if any, or 0.0 <br>
+   Range -  -1.0e8 to 1.0e8)
+<p>
+ 
+  Cluster distance modulus. If there has been the input of a cluster
+  file with its own distance modulus, that distance modulus is first
+  subtracted.
+<p>
+ 
+<hr>
+ <h2> 7.3 <a name="ceven"> Ceven </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  Use a uniform cmd distribution instead of the cluster cmd for the
+  cluster stars.
+<p>
+ 
+<hr>
+ <h2> 7.4 <a name="cluster"> Cluster </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  Input table giving cluster CMD. It contains rows describing line
+  segements of the cluster.
+<p>
+ 
+<dl>
+<dt>  (A)
+<dd>Each row of the table contains a description of a line segment of
+      the cluster CMD. It has, in order,:-
+<p>
+ 
+      Mag start, Col start, Mag end, Col end, Number of stars
+<p>
+ 
+ 
+<dt>  (B)
+<dd>  See the help on 'Method' as to how this is used.
+<p>
+ 
+ 
+<dt>  (C)
+<dd> The table also has, as descriptors, the reddening and distance
+      modulus of the CMD. Thus when the user inputs the desired
+      reddening and distance modulus, the table descriptor values are
+      first subtracted.
+<p>
+ 
+      Thus, for example, if the user puts in the same reddening and
+      distance modulus as the value in the cluster file, the values in
+      the cluster table for the stars are used unaltered.
+<p>
+ 
+      The table descriptors are:-
+<p>
+<pre>
+      Name     Content
+      ----     -------
+      RED      The reddening
+      DISMOD   The distance modulus
+</pre><p>
+ 
+ 
+<dt>  (D)
+<dd> The table can be made at the keyboard by the program `tbkey',
+     and the decriptors added with the program `tbdes'.
+<p>
+</dl>
+ 
+<hr>
+ <h2> 7.5 <a name="cmrange"> Cmrange </h2> </a> <p>
+ 
+  (If there is a cluster file:- <br>
+     Default - brightest to faintest magnitude in cluster file <br>
+     Range - brightest to faintest magnitude in cluster file <p>
+   If the cluster is to have a uniform magnitude distribution:- <br>
+     Default - -50,50 <br>
+     Range - -50 to +50)
+<p>
+ 
+  Range in magnitude that cluster stars can have.
+<p>
+ 
+<hr>
+ <h2> 7.6 <a name="cnumber"> Cnumber </h2> </a> <p>
+ 
+  (Default - 1         <br> Range - 0 to 100000000)
+<p>
+ 
+  Number of cluster stars to make
+<p>
+ 
+<hr>
+ <h2> 7.7 <a name="credden"> Credden </h2> </a> <p>
+ 
+  (Default - Value in cluster file, if any, or 0.0 <br>
+   Range -  -1.0e8 to 1.0e8)
+<p>
+ 
+  Cluster reddening. If there has been the input of a cluster file
+  with its own reddening, that reddening is first subtracted.
+<p>
+ 
+<hr>
+ <h2> 7.8 <a name="cseed"> Cseed </h2> </a> <p>
+ 
+  (Default - 1234567891      <br> Range - 1200000001 to 1400000001)
+<p>
+ 
+  Random number to seed making of random cluster stars. Should
+  be an odd number
+<p>
+ 
+<hr>
+ <h2> 7.9 <a name="cxrange"> Cxrange </h2> </a> <p>
+ 
+  (Default - 1.0,100.0      <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  X start and end of acceptable area for cluster stars to lie in.
+<p>
+ 
+<hr>
+ <h2> 7.10 <a name="cxyposn"> Cxyposn </h2> </a> <p>
+ 
+  (Default - 50.0,50.0     <br> Range -1.0e8 to 1.0e8)
+<p>
+ 
+  X,Y position of the cluster
+<p>
+ 
+<hr>
+ <h2> 7.11 <a name="cyrange"> Cyrange </h2> </a> <p>
+ 
+  (Default - 1.0,100.0      <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  Y start and end of acceptable area for cluster stars to lie in.
+<p>
+ 
+<hr>
+ <h2> 7.12 <a name="doclust"> Doclust </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  Do the cluster stars?
+<p>
+ 
+<hr>
+ <h2> 7.13 <a name="dofield"> Dofield </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  Do the field stars?
+<p>
+ 
+<hr>
+ <h2> 7.14 <a name="fcrange"> Fcrange </h2> </a> <p>
+ 
+  (If there is a field file:- <br>
+     Default - bluest to reddest colour in field file <br>
+     Range - bluest to reddest colour in field file <p>
+   If the field is to have a uniform magnitude distribution:- <br>
+     Default - -20,20 <br>
+     Range - -20 to +20)
+<p>
+ 
+  Range in colour that field stars can have.
+<p>
+ 
+<hr>
+ <h2> 7.15 <a name="fdismod"> Fdismod </h2> </a> <p>
+ 
+  (Default - Value in field file, if any, or 0.0 <br>
+   Range -  -1.0e8 to 1.0e8)
+<p>
+ 
+  Field distance modulus. If there has been the input of a field file
+  with its own distance modulus, that distance modulus is first
+  subtracted.
+<p>
+ 
+<hr>
+ <h2> 7.16 <a name="feven"> Feven </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  Use a uniform cmd distribution instead of the field cmd for the
+  field stars.
+<p>
+ 
+<hr>
+ <h2> 7.17 <a name="field"> Field </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The input table giving the field star CMD. It contains rows which
+  have the number of stars in areas in a CMD.
+<p>
+ 
+<dl>
+<dt> (A)
+<dd>The CMD (magnitude increasing down, colour increasing to right) may
+    be thought of being divided up into a rectangular grid of areas of
+    equal size. The CMD is then described by the number of stars in each
+    area. Each row of the input table then contains the numbers of stars
+    in the areas in one horizontal row of the grid, and the rows in toto
+    make up the whole CMD. The number of columns in a row gives the
+    horizontal number of areas in the grid and the number of rows gives
+    the vertical number. The size of each area is described in the table
+    descriptors, and the location of the grid in the CMD is also
+    described there.
+<p>
+ 
+<dt> (B)
+<dd> See the help on 'Method' for further description.
+<p>
+ 
+<dt> (C)
+<dd> The table also has, as descriptors, the reddening and distance
+    modulus of the CMD. Thus when the user inputs the desired reddening
+    and distance modulus, the table ones are first subtracted.
+<p>
+ 
+    Thus, for example, if the user puts in the same reddening and
+    distance modulus as the value in the field file, the values in the
+    field table for the stars are used unaltered.
+<p>
+ 
+    The table has descriptors:-
+<p>
+<pre>
+ 
+ Name     Content
+ ----     -------
+ RED      Reddening
+ DISMOD   Distance modulus
+ MSTART   Magnitude of tlh corner of the tlh area
+           in the CMD grid
+ MSTEP    Vertical (magnitude) size of the areas
+ CSTART   Colour of tlh corner of the tlh area
+           in the CMD grid
+ CSTEP    Horizontal (colour) size of the areas
+</pre><p>
+ 
+    MSTEP and CSTEP must be positive.
+<p>
+ 
+<dt> (D)
+<dd> The table can be made at the keyboard by the program TBKEY, and the
+    decriptors added with the program TBWRDES.
+ 
+</dl><p>
+ 
+<hr>
+ <h2> 7.18 <a name="fmrange"> Fmrange </h2> </a> <p>
+ 
+  (If there is a field file:- <br>
+     Default - brightest to faintest magnitude in field file <br>
+     Range - brightest to faintest magnitude in field file <p>
+   If the field is to have a uniform magnitude distribution:- <br>
+     Default - -50, 50 <br>
+     Range - -50 to +50)
+<p>
+ 
+  Range in magnitude that field stars can have.
+<p>
+ 
+<hr>
+ <h2> 7.19 <a name="fnumber"> Fnumber </h2> </a> <p>
+ 
+  (Default - 1            <br> Range -  0 to 100000000)
+<p>
+ 
+  Number of field stars to make
+<p>
+ 
+<hr>
+ <h2> 7.20 <a name="fredden"> Fredden </h2> </a> <p>
+ 
+  (Default - Value in field file, if any, or 0.0 <br>
+   Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  Field reddening. If there has been the input of a field file
+  with its own reddening, that reddening is first subtracted.
+<p>
+ 
+<hr>
+ <h2> 7.21 <a name="fseed"> Fseed </h2> </a> <p>
+ 
+  (Default - 1234567891        <br> Range - 1200000001 to 1400000001)
+<p>
+ 
+  Random number to seed making of random field stars.
+<p>
+ 
+<hr>
+ <h2> 7.22 <a name="fxrange"> Fxrange </h2> </a> <p>
+ 
+  (Default - 1.0,100.0          <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  X start and end of acceptable area for field stars to lie in.
+<p>
+ 
+<hr>
+ <h2> 7.23 <a name="fyrange"> Fyrange </h2> </a> <p>
+ 
+  (Default - 1.0,100.0        <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  Y start andend of acceptable area for field stars to lie in
+<p>
+ 
+<hr>
+ <h2> 7.24 <a name="log"> Log </h2> </a> <p>
+ 
+  (Default - 'no'      <br> Choice - 'yes:no')
+<p>
+ 
+  This is a 'hidden' parameter, only accessable through the
+  command line or the interface file.
+<p>
+ 
+  Put out a log as the program goes?
+<p>
+ 
+<hr>
+ <h2> 7.25 <a name="m1fact"> M1fact </h2> </a> <p>
+ 
+  (Default - 1000.0       <br> Range - 1.0e-8 to 1.0e8)
+<p>
+ 
+  This is the scale conversion from magnitude to height for the first
+  colour band. You input the height  (linear flux equivalent) a star
+  of magnitude 20.0 in the input magnitude (e.g. 'V') should have.
+<p>
+ 
+  This is used in the conversion in the output table between the
+  magnitudes in column 5 (MAG1) and the heights of column 3 (HEIGHT1).
+<p>
+ 
+<hr>
+ <h2> 7.26 <a name="m2fact"> M2fact </h2> </a> <p>
+ 
+  (Default - M1fact     <br> Range - 1.0e-8 to 1.0e8)
+<p>
+ 
+  This is the scale conversion from magnitude to height for the second
+  colour band. You input the height  (linear flux equivalent) a star
+  of magnitude 20.0 in 'Mag' + 'Col' = 2nd magnitude band
+  (e.g. 'V' + 'B-V' = 'B') should have.
+<p>
+ 
+  This is used in the conversion in the output table between the
+  magnitudes in column 7 (MAG2) and the heights of column 4 (HEIGHT2).
+<p>
+ 
+<hr>
+ <h2> 7.27 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to conatin the output table.
+<p>
+ 
+<hr>
+ <h2> 7.28 <a name="radcore"> Radcore </h2> </a> <p>
+ 
+  (Default - 10.0       <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  King core radius of cluster ( in pixels )
+<p>
+ 
+<hr>
+ <h2> 7.29 <a name="radtide"> Radtide </h2> </a> <p>
+ 
+  (Default - 100.0       <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  King tidal radius of cluster ( in pixels )
+<p>
+ 
+<hr>
+ <h2> 7.30 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - 'Output from SPRINKLE')
+<p>
+ 
+  The Title to add to the output table
+<p>
+ 
+<hr>
+ <h2> 8 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+   A J Penny                  RAL                             1990-11-20
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

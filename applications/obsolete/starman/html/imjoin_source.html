@@ -1,0 +1,1825 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMJOIN
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMJOIN
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imjoin_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imjoin">
+imjoin  </a>  (Program) Load an image into another       <br>
+<a href="#t_imjoin">
+t_imjoin  </a>  Place images into an new or existing image       <br>
+<a href="#imj_type1">
+imj_type1  </a>  Place new images into (maybe) existing image       <br>
+<a href="#imj_setup">
+imj_setup  </a>  Set up program       <br>
+<a href="#imj_gcla">
+imj_gcla  </a>  Get user info - (A)       <br>
+<a href="#imj_gclb">
+imj_gclb  </a>  Get user info and input images - (B)       <br>
+<a href="#imj_opinout">
+imj_opinout  </a>  Open input/output       <br>
+<a href="#imj_getsize">
+imj_getsize  </a>  Get suggested size of new output image       <br>
+<a href="#imj_doit">
+imj_doit  </a>  Add images in       <br>
+<a href="#imj_out">
+imj_out  </a>  Output images       <br>
+<a href="#imj_loadro">
+imj_loadro  </a>  Output output real image       <br>
+<a href="#imj_loadso">
+imj_loadso  </a>  Output output int*2 image       <br>
+<a href="#imj_work1r">
+imj_work1r  </a>  Add image in, in nearest mode       <br>
+<a href="#imj_work1s">
+imj_work1s  </a>  Add int*2 image in, in nearest mode       <br>
+<a href="#imj_work2r">
+imj_work2r  </a>  Add real image in, in linear mode       <br>
+<a href="#imj_work2s">
+imj_work2s  </a>  Add int*2 image in, in linear mode       <br>
+<a href="#imj_work3r">
+imj_work3r  </a>  Add real image in, in uniform mode       <br>
+<a href="#imj_work3s">
+imj_work3s  </a>  Add int*2 image in, in uniform mode       <br>
+<a href="#imj_type2">
+imj_type2  </a>  Add two reference images       <br>
+<a href="#imj_xxdoit">
+imj_xxdoit  </a>  Do work of adding two reference images       <br>
+<a href="#imjoin.inc">
+imjoin.inc  </a>  Include file for IMJOIN       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imjoin"> IMJOIN  </a>-- (Program) Load an image into another
+C
+C  alan penny                       ral                       1991 march
+
+      subroutine imjoin ( ierradam )
+
+      implicit none
+
+      integer     ierradam           !o: ADAM error flag
+
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imjoin
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_IMJOIN.F
+C
+C   Contains:-
+C
+C T_IMJOIN      Place images into an new or existing image
+C IMJ_TYPE1     Place new images into (maybe) existing image
+C IMJ_SETUP     Set up program
+C IMJ_GCLA      Get user info - (A)
+C IMJ_GCLB      Get user info and input images - (B)
+C IMJ_OPINOUT   Open input/output
+C IMJ_GETSIZE   Get suggested size of new output image
+C IMJ_DOIT      Add images in
+C IMJ_OUT       Output images
+C IMJ_LOAD(RS)O Output output image
+C IMJ_WORK1(RS) Add image in, in nearest mode
+C IMJ_WORK2(RS) Add image in, in linear mode
+C IMJ_WORK3(RS) Add image in, in uniform mode
+C IMJ_TYPE2     Add two reference images
+C IMJ_XXDOIT    Do work of adding two reference images
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imjoin"> T_IMJOIN  </a>-- Place images into an new or existing image
+C
+C alan penny                    ral            1991 March
+
+      subroutine t_imjoin ( )
+
+      implicit none
+      include 'imjoin.inc'
+C---
+      integer nthelp, k
+      parameter ( nthelp=4 )
+      character*68 thelp(nthelp)
+      data (thelp(k),k=1,nthelp) /
+     + 'Option     Action' ,
+     + '------     ------' ,
+     + 'New        Load new images - maybe with input reference image',
+     + 'Reference  Add two reference images together' /
+Cbegin
+
+
+      call get_job ( 'OUTMODE', 'new:reference', k, 1, thelp, nthelp )	!Get type of loading
+
+      if ( k.eq.1 ) call imj_type1					!Load input images
+
+      if ( k.eq.2 ) call imj_type2					!Load 2 reference images
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_type1"> IMJ_TYPE1  </a>-- Place new images into (maybe) existing image
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_type1 ( )
+
+      implicit none
+C---
+Cbegin
+
+
+      call imj_setup							!Set up defaults
+
+      call imj_gcla							!Get user info
+
+      call imj_gclb							!Get user info
+
+      call imj_opinout							!Open input, output images
+
+      call imj_doit							!Add input images in
+
+      call imj_out							!Put out images
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_setup"> IMJ_SETUP  </a>-- Set up program
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_setup ( )
+
+      implicit none
+      include 'imjoin.inc'
+C---
+Cbegin
+
+
+      IPWR = 1
+      IPWL = 1
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_gcla"> IMJ_GCLA  </a>-- Get user info - (A)
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_gcla ( )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'STARMAN_INC'
+C---
+      integer k
+      integer nthelp
+      parameter ( nthelp=13 )
+      character*68 thelp(nthelp)
+      data (thelp(k),k=1,10) /
+     + 'Option    Action' ,
+     + '------    ------' ,
+     + 'Nearest   Take the nearest input image pixel' ,
+     + 'Linear    Make a linear combination of the four input image' ,
+     + '           pixels around the output image pixel' ,
+     + 'Uniform   Make a weighted mean of the nine adjacent input' ,
+     + '           image pixels (linearly combined), so that the ouput',
+     + '           image pixels have a constant noise value. (i.e., in',
+     + '           (Linear), an output pixel in the centre of four ' ,
+     + '           input pixels will be the mean of those, and thus ' /
+      data (thelp(k),k=11,nthelp) /
+     + '           have a lower noise than an output pixel on an input',
+     + '           pixel, in which case it would only have the mean ' ,
+     + '           of that single pixel.' /
+      integer nthelp1
+      parameter ( nthelp1=4 )
+      character*68 thelp1(nthelp1)
+      data (thelp1(k),k=1,nthelp1) /
+     + 'Option    Action' ,
+     + '------    ------' ,
+     + 'Full      Do a full shift with shift, rotation, stretch',
+     + 'Shift     Do a shift with just an XY shift'/
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'ZERO', DOZERO, .true. ) 				!Get if subtract median
+
+      call get_job ( 'METHOD', 'nearest:linear:uniform', KMETH, 2,	!Get transform coeffs
+     +                         thelp, nthelp )
+
+      call get_job ( 'SHIFT', 'full:xyshift', KSHIFT, 2, thelp1, 	!Get full transform or just XY shift
+     +               nthelp1 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_gclb"> IMJ_GCLB  </a>-- Get user info and input images - (B)
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_gclb ( )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'STARMAN_INC'
+      include 'image.inc'
+C---
+      integer istat, k, kk, px(4), py(4), pmx, pmy
+      real rv
+      logical more
+      character texta*3, textb*4, textc*7, textd*8, texte*6, textf*7
+      real atrc(6), btrc(6)
+      data atrc / 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = 0
+      more = .true.
+      do while ( more )
+
+         k = k + 1
+
+         if ( k.lt.10 ) then						!Input image
+            write ( texta, '(''IN'',i1)' ) k
+            call opimzr ( texta, IPI(k), NXI(k), NYI(k), IMTY(k),
+     +                    .true., istat )	
+         else
+            write ( textb, '(''IN'',i2)' ) k
+            call opimzr ( textb, IPI(k), NXI(k), NYI(k), IMTY(k),
+     +                    .true., istat )	
+         endif
+
+         if ( istat.eq.1 .or. istat.eq.3 ) then				!Check input image
+            ST_FAILED = .true.
+            call pargi ( k )
+            call printd ( 'ERROR: Error is in input image %d' )
+            return
+         elseif ( k.eq.1 .and. istat.eq.2 ) then
+            ST_FAILED = .true.
+            call printo ( 'ERROR: Must have at least one input image')
+            return
+         elseif ( istat.eq.2 ) then
+            NTOT = k - 1
+            return
+         endif
+
+         call pargi ( k )						!Give size
+         call pargi ( NXI(k) )
+         call pargi ( NYI(k) )
+         call printd ( '  Input image %d is size: %d x %d ' )
+
+         call amovr ( atrc, btrc, 6 )					!Get transform coords
+         if ( KSHIFT.eq.1 ) then
+            if ( k.lt.10 ) then
+               write ( textc, '(''XCOEFF'',i1)' ) k
+               call get3r ( textc, btrc(1), btrc(2), btrc(3), .true.,
+     +                      -1.0e8, 1.0e8 )
+               write ( textc, '(''YCOEFF'',i1)' ) k
+               call get3r ( textc, btrc(4), btrc(5), btrc(6), .true.,
+     +                      -1.0e8, 1.0e8 )
+            else
+               write ( textd, '(''XCOEFF'',i2)' ) k
+               call get3r ( textd, btrc(1), btrc(2), btrc(3), .true.,
+     +                      -1.0e8, 1.0e8 )
+               write ( textd, '(''YCOEFF'',i2)' ) k
+               call get3r ( textd, btrc(4), btrc(5), btrc(6), .true.,
+     +                      -1.0e8, 1.0e8 )
+            endif
+         else
+            if ( k.lt.10 ) then
+               write ( textc, '(''XYSHFT'',i1)' ) k
+               call get2r ( textc, btrc(1), btrc(4), .true., -1.0e8,
+     +                      1.0e8 )
+            else
+               write ( textd, '(''XYSHFT'',i2)' ) k
+               call get2r ( textd, btrc(1), btrc(4), .true., -1.0e8,
+     +                      1.0e8 )
+            endif
+         endif
+
+         rv = btrc(5)*btrc(3) - btrc(2)*btrc(6) 			!Check them
+         if ( abs(rv).lt.1.0e-20 ) then
+            call pargi ( k )
+            call printd ( 'ERROR: Transform Eqn for image %d is bad' )
+            ST_FAILED = .true.
+            return
+         endif
+
+         px(1) = btrc(1) + 1.0*btrc(2) + 1.0*btrc(3)			!Check if image goes to -ve posns
+         px(2) = btrc(1) + NXI(k)*btrc(2) + 1.0*btrc(3)
+         px(3) = btrc(1) + 1.0*btrc(2) + NYI(k)*btrc(3)
+         px(4) = btrc(1) + NYI(k)*btrc(2) + NYI(k)*btrc(3)
+         py(1) = btrc(4) + 1.0*btrc(5) + 1.0*btrc(6)
+         py(2) = btrc(4) + NXI(k)*btrc(5) + 1.0*btrc(6)
+         py(3) = btrc(4) + 1.0*btrc(5) + NYI(k)*btrc(6)
+         py(4) = btrc(4) + NXI(k)*btrc(5) + NYI(k)*btrc(6)
+         call pargi ( k )
+         do kk = 1, 4
+            call pargi ( px(kk) )
+            call pargi ( py(kk) )
+         enddo
+         call printd ( '  Image %d put into: %d,%d ; %d,%d ; '//
+     +                  '%d,%d ; %d,%d ' )
+         pmx = min(px(1),px(2),px(3),px(4))
+         pmy = min(py(1),py(2),py(3),py(4))
+         if ( pmx.lt.1 .or. pmy.lt.1 ) call printo ( ' ' )
+         if ( pmx.lt.1 ) then
+            call pargi ( k )
+            call pargi ( pmx )
+            call printd ( 'WARNING: Image %d has an X corner '//
+     +                     'at %d - Output image starts at 1,1' )
+         endif
+         if ( pmy.lt.1 ) then
+            call pargi ( k )
+            call pargi ( pmy )
+            call printd ( 'WARNING: Image %d has a Y corner '//
+     +                     'at %d - Output image starts at 1,1' )
+         endif
+         if ( pmx.lt.1 .or. pmy.lt.1 ) call printo ( ' ' )
+
+         call amovr ( btrc(1), ARC(1,k), 6 )				!Store then
+
+         TRC(1,k) = (btrc(1)*btrc(6)-btrc(3)*btrc(4))/rv		!Invert them
+         TRC(2,k) = -1.0*btrc(6)/rv
+         TRC(3,k) = btrc(3)/rv
+         TRC(4,k) = (btrc(2)*btrc(4)-btrc(5)*btrc(1))/rv
+         TRC(5,k) = btrc(5)/rv
+         TRC(6,k) = -1.0*btrc(2)/rv
+
+         if ( k.lt.10 ) then						!Get 'scale'
+            write ( texte, '(''SCALE'',i1)' ) k
+            call get1r ( texte, SCALE(k), 1.0, 0.0, 1.0e8 )
+         else
+            write ( textf, '(''SCALE'',i2)' ) k
+            call get1r ( textf, SCALE(k), 1.0, 0.0, 1.0e8 )
+         endif
+
+         if ( k.eq.MAXN ) then
+            more = .false.
+            call pargi ( MAXN )
+            call printd ( 'Maximum number of images - %d - reached' )
+         endif
+
+      enddo
+      NTOT = k
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_opinout"> IMJ_OPINOUT  </a>-- Open input/output
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_opinout ( )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C---
+      real rva, rvb, rvc, bsa, bza, rv
+      integer k, ka, istat, ivb, iv
+      logical first
+      character cv*1, texta*3, textb*4
+      character*70 titler, titlel, otitler, otitlel, title
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call opimrr ( 'INREF', IPR, NXR, NYR, .true., istat )		!Reference image
+      if ( istat.eq.1 ) then
+         ST_FAILED = .true.
+         call printo ( 'ERROR: Error is in input Reference image' )
+         return
+      elseif ( istat.eq.2 ) then
+         call imj_getsize
+         call get2i ( 'SIZE', NXR, NYR, .true., 1, 100000 )
+         NOREF = .true.
+      else
+         NOREF = .false.
+         call gtimrd ( 'INREF', rva, rvb, INVALREF, titler, istat )
+      endif
+
+      if ( .not.NOREF ) then						!Reference load image
+         call opimrr ( 'INLOAD', IPL, iv, ivb, .false., istat )
+         if ( istat.ne.0 ) then
+            ST_FAILED = .true.
+            call printo ( 'ERROR: Error is in input Load image' )
+            return
+         endif
+         if ( iv.ne.NXR .or. ivb.ne.NYR ) then
+            call printo (
+     +         'ERROR: Load image different size to reference image' )
+            ST_FAILED = .true.
+            return
+         endif
+         call gtimrd ( 'INLOAD', rva, rvb, rvc, titlel, istat )
+      endif
+
+      call opimrw ( 'OUTREF', IPOR, NXR, NYR, .true., istat )		!Open output reference image
+      DOUTREF = .true.
+      if ( istat.ne.0 ) DOUTREF = .false.
+
+      if ( .not.DOUTREF ) IPOR = 1
+      IPOL = 1
+      if ( DOUTREF ) then
+         if ( NOREF ) titler = ' ' 					!Add title
+         call get1c (  'TITLER', otitler, titler, .true. )	
+         call opimrw ( 'OUTLOAD', IPOL, NXR, NYR, .true., istat )	!Open output load image
+         if ( NOREF ) titlel = ' '					!Add title
+         call get1c (  'TITLEL', otitlel, titlel, .true. )			
+         if ( NOREF ) then						!Load descriptors
+            call ptdesr ( 'OUTREF',   'INVAL',   INT_INVALR )
+            call ptdesr ( 'OUTLOAD',  'INVAL',   INT_INVALR )
+         else
+            call icopdes ( 'INREF',  'OUTREF', istat )				
+            call icopdes ( 'INLOAD', 'OUTLOAD', istat )
+         endif
+         call ptdesc ( 'OUTREF',  'TITLE', otitler )
+         call ptdesc ( 'OUTLOAD', 'TITLE', otitlel )
+      endif
+
+      OUTTYPE = 'SHORT'							!Output image tye
+      first = .true.							! and scale,zero
+      do k = 1, NTOT
+         if ( k.lt.10 ) then
+            write ( texta, '(''IN'',i1)' ) k
+            call gtimzd ( texta, IMTY(k), bsa, bza, iv, rv, cv, istat)
+         else
+            write ( textb, '(''IN'',i2)' ) k
+            call gtimzd ( textb, IMTY(k), bsa, bza, iv, rv, cv, istat)
+         endif
+         if ( k.eq.1 ) IMTITLE = cv
+         if ( k.eq.1 .and. IMTY(k).eq.'SHORT' ) then
+            BSO = bsa
+            BZO = bza
+            INVALO = iv
+         endif
+         if ( IMTY(k).eq.'REAL' ) then
+            OUTTYPE = 'REAL'
+            if ( first ) then
+               first = .false.
+               RINVALO = rv
+            endif
+         endif
+      enddo
+
+      if ( OUTTYPE.eq.'REAL' ) then
+         BSO = 1.0
+         BZO = 0.0
+      endif
+
+      if ( OUTTYPE.eq.'SHORT' ) then
+         call printo ( 'Input images were SHORT' )
+         call get_job ( 'OUTTYPE', 'real:short', ka, 1, ' ', 0 )
+         if ( ka.eq.1 ) then
+            OUTTYPE = 'REAL'
+            BSO = 1.0
+            BZO = 0.0
+            RINVALO = INT_INVALR
+         endif
+      endif
+
+      if ( DOUTIM .and. OUTTYPE.eq.'SHORT' ) then
+         call get2r ( 'OUTSCALE', BSO, BZO, .true., -1.0e20, 1.0e20 )
+      endif
+
+      call opimzw ( 'OUT', OUTTYPE, IPO, NXR, NYR, .true., istat )	!Open output image
+      DOUTIM = .true.
+      if ( istat.ne.0 ) DOUTIM = .false.
+
+      if ( .not.DOUTIM ) IPO = 1
+      if ( DOUTIM ) then
+         call get1c (  'TITLE', title, IMTITLE, .true. )
+         call icopdes ( 'IN1',  'OUT', istat )				
+         call ptdesc ( 'OUT',  'TITLE', title )
+         call ptdesr ( 'OUT', 'BZERO', BZO )
+         call ptdesr ( 'OUT', 'BSCALE', BSO )
+         if ( OUTTYPE.eq.'SHORT' ) then
+            call ptdesi ( 'OUT', 'INVAL', INVALO )
+         else
+            call ptdesr ( 'OUT', 'INVAL', RINVALO )
+         endif
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_getsize"> IMJ_GETSIZE  </a>-- Get suggested size of new output image
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_getsize ( )
+
+      implicit none
+      include 'imjoin.inc'
+C--
+      integer k, kx, ky
+      real xa, xb, xc, xd, x, ya, yb, yc, yd, y
+Cbegin
+
+
+      NXR = 100
+      NYR = 100
+      if ( NTOT.ne.0 ) then
+         NXR = 1
+         NYR = 1
+         do k = 1, NTOT
+
+            xa = 1.0*ARC(2,k) + 1.0*ARC(3,k)
+            xb = 1.0*ARC(2,k) + real(NYI(k))*ARC(3,k)
+            xc = real(NXI(k))*ARC(2,k) + 1.0*ARC(3,k)
+            xd = real(NXI(k))*ARC(2,k) + real(NYI(k))*ARC(3,k)
+            x = max(xa,xb,xc,xd)
+            kx = x + ARC(1,k)
+            NXR = max(NXR,kx)
+
+            ya = 1.0*ARC(5,k) + 1.0*ARC(6,k)
+            yb = 1.0*ARC(5,k) + real(NYI(k))*ARC(6,k)
+            yc = real(NXI(k))*ARC(5,k) + 1.0*ARC(6,k)
+            yd = real(NXI(k))*ARC(5,k) + real(NYI(k))*ARC(6,k)
+            y = max(ya,yb,yc,yd)
+            ky = y + ARC(4,k)
+            NYR = max(NYR,ky)
+
+         enddo
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_doit"> IMJ_DOIT  </a>-- Add images in
+C  1) resample the input images over the entire area covered by the
+C     output image
+C  2) Scan the selected area of the output image (location x,y) and
+C     calculate the transformed position (xdash,ydash) in the input
+C     images
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_doit ( )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C--
+      integer istat, k
+      real std, v1, v2, v3, v4
+      character texta*3, textb*4, cv*1
+Cbegin
+
+
+      if ( ST_FAILED ) return						!Failed or no more images
+
+      call gtwrkr ( 'REF', NXR*NYR, IPWR, istat )			!Start reference/load arrays
+      if ( istat.ne.0 ) then						!Open work space
+         call printo ( 'ERROR: Cant open work space REF' )
+         ST_FAILED = .true.
+         return
+      endif
+      call gtwrkr ( 'LOAD', NXR*NYR, IPWL, istat )
+      if ( istat.ne.0 ) then
+         call printo ( 'ERROR: Cant open work space LOAD' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( NOREF ) then
+         call amovkr ( INT_INVALR, %val(IPWR), NXR*NYR )		!Zero them
+         call azeror ( %val(IPWL), NXR*NYR )
+      else
+         call amovr ( %val(IPR), %val(IPWR), NXR*NYR )			!Load input reference
+         call achvalr ( %val(IPWR), INVALREF, INT_INVALR, NXR*NYR )
+         call amovr ( %val(IPL), %val(IPWL), NXR*NYR )
+         if ( .not.NOREF ) call canpar  ( 'INREF' )
+         call canpar  ( 'INLOAD' )
+      endif
+
+      do k = 1, NTOT
+         if ( k.lt.10 ) then
+            write ( texta, '(''IN'',i1)' ) k
+            call gtimzd ( texta, IMTY(k), BS, BZ, INVALIS, INVALIR,
+     +                    cv, istat )
+         else
+            write ( textb, '(''IN'',i2)' ) k
+            call gtimzd ( textb, IMTY(k), BS, BZ, INVALIS, INVALIR,
+     +                    cv, istat )
+         endif
+
+         call printo ( ' ' )						!Tell user doing it
+         call pargi ( k )
+         call printd ( ' Doing image %d' )
+
+         ZERO = 0.0							!Get image zero
+         if ( DOZERO ) then
+            call sky_0 ( %val(IPI(k)), IMTY(k), NXI(k), NYI(k),
+     +                   INVALIS, INVALIR, ZERO, std )
+            ZERO = BS*ZERO + BZ
+            call pargr ( ZERO )
+            call printd ( ' Sky level subtracted = %f' )
+         else
+            call printo ( ' No sky subtraction' )
+         endif
+
+         v1 = ARC(1,k) + ARC(2,k)*1.0          + ARC(3,k)*1.0		!Image limits
+         v2 = ARC(1,k) + ARC(2,k)*1.0          + ARC(3,k)*real(NYI(k))
+         v3 = ARC(1,k) + ARC(2,k)*real(NXI(k)) + ARC(3,k)*1.0
+         v4 = ARC(1,k) + ARC(2,k)*real(NXI(k)) + ARC(3,k)*real(NYI(k))
+         KELIM(1,1,k) = min(NXR,max(1,int(min(v1,v2,v3,v4)-3.0)))
+         KELIM(2,1,k) = max(1,min(NXR,int(max(v1,v2,v3,v4)+3.0)))
+         v1 = ARC(4,k) + ARC(5,k)*1.0          + ARC(6,k)*1.0
+         v2 = ARC(4,k) + ARC(5,k)*1.0          + ARC(6,k)*real(NYI(k))
+         v3 = ARC(4,k) + ARC(5,k)*real(NXI(k)) + ARC(6,k)*1.0
+         v4 = ARC(4,k) + ARC(5,k)*real(NXI(k)) + ARC(6,k)*real(NYI(k))
+         KELIM(1,2,k) = min(NYR,max(1,int(min(v1,v2,v3,v4)-3.0)))
+         KELIM(2,2,k) = max(1,min(NYR,int(max(v1,v2,v3,v4)+3.0)))
+
+         if ( KMETH.eq.1 ) then						!Add image in
+            if ( IMTY(k).eq.'SHORT' ) then
+               call imj_work1s ( %val(IPI(k)), NXI(k), NYI(k),
+     +                           %val(IPWR), %val(IPWL), k )
+            else
+               call imj_work1r ( %val(IPI(k)), NXI(k), NYI(k),
+     +                           %val(IPWR), %val(IPWL), k )
+            endif
+         elseif ( KMETH.eq.2 ) then
+            if ( IMTY(k).eq.'SHORT' ) then
+               call imj_work2s ( %val(IPI(k)), NXI(k), NYI(k),
+     +                           %val(IPWR), %val(IPWL), k )
+            else
+               call imj_work2r ( %val(IPI(k)), NXI(k), NYI(k),
+     +                           %val(IPWR), %val(IPWL), k )
+            endif
+         elseif ( KMETH.eq.3 ) then
+            if ( IMTY(k).eq.'SHORT' ) then
+               call imj_work3s ( %val(IPI(k)), NXI(k), NYI(k),
+     +                           %val(IPWR), %val(IPWL), k )
+            else
+               call imj_work3r ( %val(IPI(k)), NXI(k), NYI(k),
+     +                           %val(IPWR), %val(IPWL), k )
+            endif
+         endif
+
+         if ( k.lt.10 ) then						!Free data access to image
+            call canpar ( texta )
+         else
+            call canpar ( textb )
+         endif
+
+         call pargi ( k )
+         call printd ( ' Done image %d' )
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_out"> IMJ_OUT  </a>-- Output images
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_out ( )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) then
+         call printo ( 'WARNING: Output images may be corrupted' )
+         return
+      endif
+
+      if ( DOUTREF ) then
+         call printo ( ' ' )
+         call printd ( ' Loading output reference and load images' )
+         call amovr ( %val(IPWR), %val(IPOR), NXR*NYR )	
+         call amovr ( %val(IPWL), %val(IPOL), NXR*NYR )
+         call printd ( ' Loaded output reference and load images' )
+      endif
+
+      if ( DOUTIM ) then
+         call printo ( ' ' )
+         call printd ( ' Loading output image' )
+         if ( OUTTYPE.eq.'SHORT' ) then
+            call imj_loadso ( %val(IPWR), %val(IPWL), %val(IPO),
+     +                       NXR*NYR, INT_INVALR, BSO, BZO, INVALO )
+         else
+            call imj_loadro ( %val(IPWR), %val(IPWL), %val(IPO),
+     +                  NXR*NYR, INT_INVALR, BSO, BZO, INT_INVALR )
+         endif
+         call printd ( ' Loaded output image' )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_loadro"> IMJ_LOADRO  </a>-- Output output real image
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_loadro ( ref, rlo, out, n, invali, bs, bz, rinvalo)
+
+      implicit none
+
+      integer    n		!i: Size of image
+      real       ref(n)		!i: Work image
+      real       rlo(n)		!i: Load image
+      real       out(n)		!o: Output image
+      integer    invali         !i: Flag value of invalid pixel
+      real       bs		!i: Scale of output
+      real       bz		!i: Zero of output
+      real       rinvalo	!i: Magic level of output
+C--
+      integer k
+Cbegin
+
+
+      do k = 1, n
+         if ( rlo(k).eq.0.0 .or. ref(k).eq.invali ) then
+            out(k) = rinvalo
+         else
+            out(k) = (ref(k)-bz)/bs
+         endif
+      enddo
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_loadso"> IMJ_LOADSO  </a>-- Output output int*2 image
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_loadso ( ref, rlo, out, n, invali, bs, bz, invalo )
+
+      implicit none
+
+      integer    n		!i: Size of image
+      real       ref(n)		!i: Work image
+      real       rlo(n)		!i: Load image
+      integer*2  out(n)		!o: Output image
+      integer    invali         !i: Flag value of invalid pixel
+      real       bs		!i: Scale of output
+      real       bz		!i: Zero of output
+      integer    invalo         !i: Magic level of output
+C--
+      integer k
+      real    rv
+Cbegin
+
+
+      do k = 1, n
+         if ( rlo(k).eq.0.0 .or. ref(k).eq.invali ) then
+            out(k) = invalo
+         else
+            rv = (ref(k)-bz)/bs
+            if ( rv.gt.32767.0 .or. rv.lt.-32768.0 ) then
+               out(k) = invalo
+            else
+               out(k) = rv
+            endif
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_work1r"> IMJ_WORK1R  </a>-- Add image in, in nearest mode
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_work1r ( im, nxc, nyc, wref, wload, kk )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'ST_LIMITS_INC'
+      include 'image.inc'
+
+      integer      nxc			!i: Input image X size
+      integer      nyc			!i: Input image Y size
+      real         im(nxc,nyc)		!i: Input image
+      real         wref(NXR,NYR)	!i/o: Working refernce image
+      real         wload(NXR,NYR)	!i/o: Working load image
+      integer      kk			!i: Input image number
+C--
+      integer ix, iy, jx, jy
+      real valr, ajx, ajy
+      real anumh, anuml
+      parameter ( anumh=32767.0*32767.0 )
+      parameter ( anuml=-1.0*32767.0*32767.0 )
+      real refi, rloadi, refim, rloadim, ovalr, ovall
+Cbegin
+
+
+      do iy = KELIM(1,2,kk), KELIM(2,2,kk)
+         do ix = KELIM(1,1,kk), KELIM(2,1,kk)
+
+            ajx = TRC(1,kk) + TRC(2,kk)*ix + TRC(3,kk)*iy		!Find nearest pixel location
+            ajy = TRC(4,kk) + TRC(5,kk)*ix + TRC(6,kk)*iy
+            jx = nint(min(anumh,max(anuml,ajx)))
+            jy = nint(min(anumh,max(anuml,ajy)))
+
+            if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
+               valr = INT_INVALR					!Input invalid?
+               if ( im(jx,jy).ne.INVALIR ) valr = BS*im(jx,jy) +BZ-ZERO
+
+               if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
+     +                wload(ix,iy).eq.0.0 ) ) then
+
+                  wref(ix,iy) = INT_INVALR				!If so load bad
+                  wload(ix,iy) = wload(ix,iy) + SCALE(kk)
+
+               else							!Good value
+
+                  refi = 0.0						!New pixel
+                  rloadi = 0.0
+                  if ( valr.ne.INT_INVALR ) then
+                     refi = valr
+                     rloadi = SCALE(kk)
+                  endif
+
+                  refim = 0.0						!Old pixel
+                  rloadim = 0.0
+                  if ( wref(ix,iy).ne.INT_INVALR ) then
+                     refim = wref(ix,iy)
+                     rloadim = wload(ix,iy)
+                  endif
+
+                  ovalr = refi*rloadi + refim*rloadim			!Add
+                  ovall = rloadi + rloadim
+                  if ( ovall.ne.0.0 ) then
+                     wref(ix,iy) = ovalr/ovall
+                  else
+                     wref(ix,iy) = 0.0
+                  endif
+                  wload(ix,iy) = ovall
+
+               endif
+
+            endif
+
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_work1s"> IMJ_WORK1S  </a>-- Add int*2 image in, in nearest mode
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_work1s ( im, nxc, nyc, wref, wload, kk )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'image.inc'
+      include 'ST_LIMITS_INC'
+
+      integer      nxc			!i: Input image X size
+      integer      nyc			!i: Input image Y size
+      integer*2    im(nxc,nyc)		!i: Input image
+      real         wref(NXR,NYR)	!i/o: Working refernce image
+      real         wload(NXR,NYR)	!i/o: Working load image
+      integer      kk			!i: Input image number
+C--
+      integer ix, iy, jx, jy
+      real valr, ajx, ajy
+      real anumh, anuml
+      parameter ( anumh=32767.0*32767.0 )
+      parameter ( anuml=-1.0*32767.0*32767.0 )
+      real refi, rloadi, refim, rloadim, ovalr, ovall
+Cbegin
+
+
+      do iy = KELIM(1,2,kk), KELIM(2,2,kk)
+         do ix = KELIM(1,1,kk), KELIM(2,1,kk)
+
+            ajx = TRC(1,kk) + TRC(2,kk)*ix + TRC(3,kk)*iy		!Find nearest pixel location
+            ajy = TRC(4,kk) + TRC(5,kk)*ix + TRC(6,kk)*iy
+            jx = nint(min(anumh,max(anuml,ajx)))
+            jy = nint(min(anumh,max(anuml,ajy)))
+
+            if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
+               valr = INT_INVALR					!Input invalid?
+               if ( im(jx,jy).ne.INVALIS ) valr = BS*im(jx,jy) +BZ-ZERO
+
+               if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
+     +                wload(ix,iy).eq.0.0 ) ) then
+
+                  wref(ix,iy) = INT_INVALR				!If so load bad
+                  wload(ix,iy) = wload(ix,iy) + SCALE(kk)
+
+               else							!Good value
+
+                  refi = 0.0						!New pixel
+                  rloadi = 0.0
+                  if ( valr.ne.INT_INVALR ) then
+                     refi = valr
+                     rloadi = SCALE(kk)
+                  endif
+
+                  refim = 0.0						!Old pixel
+                  rloadim = 0.0
+                  if ( wref(ix,iy).ne.INT_INVALR ) then
+                     refim = wref(ix,iy)
+                     rloadim = wload(ix,iy)
+                  endif
+
+                  ovalr = refi*rloadi + refim*rloadim			!Add
+                  ovall = rloadi + rloadim
+                  if ( ovall.ne.0.0 ) then
+                     wref(ix,iy) = ovalr/ovall
+                  else
+                     wref(ix,iy) = 0.0
+                  endif
+                  wload(ix,iy) = ovall
+
+               endif
+
+            endif
+
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_work2r"> IMJ_WORK2R  </a>-- Add real image in, in linear mode
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_work2r ( im, nxc, nyc, wref, wload, kk )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'ST_LIMITS_INC'
+      include 'image.inc'
+C--
+      integer      nxc			!i: Input image X size
+      integer      nyc			!i: Input image Y size
+      real         im(nxc,nyc)		!i: Input image
+      real         wref(NXR,NYR)	!i/o: Working refernce image
+      real         wload(NXR,NYR)	!i/o: Working load image
+      integer      kk			!i: Input image number
+Cbegin
+      integer ix, iy, jx, jy, i, j
+      real xdash, ydash, xref, yref, sum, wt, wtsum, dx, dy, valr
+      real anumh, anuml
+      parameter ( anumh=32767.0*32767.0 )
+      parameter ( anuml=-1.0*32767.0*32767.0 )
+      real refi, rloadi, refim, rloadim, ovalr, ovall
+Cbegin
+
+
+      do iy = KELIM(1,2,kk), KELIM(2,2,kk)
+         do ix = KELIM(1,1,kk), KELIM(2,1,kk)
+
+            xref = TRC(1,kk) + TRC(3,kk)*iy				!Set up transform
+            yref = TRC(4,kk) + TRC(6,kk)*iy
+            xdash = xref + TRC(2,kk)*ix
+            ydash = yref + TRC(5,kk)*ix
+
+            jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
+            jy = nint(min(anumh,max(anuml,ydash)))
+
+            if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
+
+               i = xdash						!Find shift from next lowest pixel,line location
+               j = ydash
+               dx = xdash - i
+               dy = ydash - j
+
+               sum = 0.0						!Initiallise sums for forming weighted mean
+               wtsum = 0.0
+
+               if ( j.ge.1 .and. j.le.nyc ) then			!Form weighted mean of adjacent 4 pixels,
+
+                  if ( i.ge.1 .and. i.le.nxc ) then			! checking that each lies
+                    if ( im(i,j).ne.INVALIR ) then			! within the input image and is not invalid
+                        wt = (1.0-dx)*(1.0-dy)				!Weight is calculated from the x,y
+                        sum = sum + im(i,j)*wt				!shift from integer pixel locations
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+                  if ( i+1.ge.1 .and. i+1.le.nxc ) then
+                     if ( im(i+1,j).ne.INVALIR ) then
+                        wt = dx*(1.0-dy)
+                        sum = sum + im(i+1,j)*wt
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+               endif
+
+               if ( j+1.ge.1 .and. j+1.le.nyc ) then
+
+                  if ( i.ge.1 .and. i.le.nxc ) then
+                     if (im(i,j+1).ne.INVALIR ) then
+                        wt = (1.0-dx)*dy
+                        sum = sum + im(i,j+1)*wt
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+                  if ( i+1.ge.1 .and. i+1.le.nxc ) then
+                     if ( im(i+1,j+1).ne.INVALIR ) then
+                        wt = dx*dy
+                        sum = sum + im(i+1,j+1)*wt
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+               endif
+
+               valr = INT_INVALR					!Load output
+               if ( wtsum.gt.0.001 ) then
+                  valr = sum/wtsum
+                  valr = BS*valr + BZ - ZERO
+               endif
+
+               if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
+     +                wload(ix,iy).eq.0.0 ) ) then
+
+                  wref(ix,iy) = INT_INVALR				!If so load bad
+                  wload(ix,iy) = wload(ix,iy) + SCALE(kk)
+
+               else							!Good value
+
+                  refi = 0.0						!New pixel
+                  rloadi = 0.0
+                  if ( valr.ne.INT_INVALR ) then
+                     refi = valr
+                     rloadi = SCALE(kk)
+                  endif
+
+                  refim = 0.0						!Old pixel
+                  rloadim = 0.0
+                  if ( wref(ix,iy).ne.INT_INVALR ) then
+                     refim = wref(ix,iy)
+                     rloadim = wload(ix,iy)
+                  endif
+
+                  ovalr = refi*rloadi + refim*rloadim			!Add
+                  ovall = rloadi + rloadim
+                  if ( ovall.ne.0.0 ) then
+                     wref(ix,iy) = ovalr/ovall
+                  else
+                     wref(ix,iy) = 0.0
+                  endif
+                  wload(ix,iy) = ovall
+
+               endif
+
+            endif
+
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_work2s"> IMJ_WORK2S  </a>-- Add int*2 image in, in linear mode
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_work2s ( im, nxc, nyc, wref, wload, kk )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'ST_LIMITS_INC'
+      include 'image.inc'
+C--
+      integer      nxc			!i: Input image X size
+      integer      nyc			!i: Input image Y size
+      integer*2    im(nxc,nyc)		!i: Input image
+      real         wref(NXR,NYR)	!i/o: Working refernce image
+      real         wload(NXR,NYR)	!i/o: Working load image
+      integer      kk			!i: Input image number
+Cbegin
+      integer ix, iy, jx, jy, i, j
+      real xdash, ydash, xref, yref, sum, wt, wtsum, dx, dy, valr
+      real anumh, anuml
+      parameter ( anumh=32767.0*32767.0 )
+      parameter ( anuml=-1.0*32767.0*32767.0 )
+      real refi, rloadi, refim, rloadim, ovalr, ovall
+Cbegin
+
+
+      do iy = KELIM(1,2,kk), KELIM(2,2,kk)
+         do ix = KELIM(1,1,kk), KELIM(2,1,kk)
+
+            xref = TRC(1,kk) + TRC(3,kk)*iy				!Set up transform
+            yref = TRC(4,kk) + TRC(6,kk)*iy
+            xdash = xref + TRC(2,kk)*ix
+            ydash = yref + TRC(5,kk)*ix
+
+            jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
+            jy = nint(min(anumh,max(anuml,ydash)))
+
+            if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
+
+               i = xdash						!Find shift from next lowest pixel,line location
+               j = ydash
+               dx = xdash - i
+               dy = ydash - j
+
+               sum = 0.0						!Initiallise sums for forming weighted mean
+               wtsum = 0.0
+
+               if ( j.ge.1 .and. j.le.nyc ) then			!Form weighted mean of adjacent 4 pixels,
+
+                  if ( i.ge.1 .and. i.le.nxc ) then			! checking that each lies
+                    if ( im(i,j).ne.INVALIS ) then			! within the input image and is not invalid
+                        wt = (1.0-dx)*(1.0-dy)				!Weight is calculated from the x,y
+                        sum = sum + im(i,j)*wt				!shift from integer pixel locations
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+                  if ( i+1.ge.1 .and. i+1.le.nxc ) then
+                     if ( im(i+1,j).ne.INVALIS ) then
+                        wt = dx*(1.0-dy)
+                        sum = sum + im(i+1,j)*wt
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+               endif
+
+               if ( j+1.ge.1 .and. j+1.le.nyc ) then
+
+                  if ( i.ge.1 .and. i.le.nxc ) then
+                     if (im(i,j+1).ne.INVALIS ) then
+                        wt = (1.0-dx)*dy
+                        sum = sum + im(i,j+1)*wt
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+                  if ( i+1.ge.1 .and. i+1.le.nxc ) then
+                     if ( im(i+1,j+1).ne.INVALIS ) then
+                        wt = dx*dy
+                        sum = sum + im(i+1,j+1)*wt
+                        wtsum = wtsum + wt
+                     endif
+                  endif
+
+               endif
+
+               valr = INT_INVALR					!Load output
+               if ( wtsum.gt.0.001 ) then
+                  valr = sum/wtsum
+                  valr = BS*valr + BZ - ZERO
+               endif
+
+               if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
+     +                wload(ix,iy).eq.0.0 ) ) then
+
+                  wref(ix,iy) = INT_INVALR				!If so load bad
+                  wload(ix,iy) = wload(ix,iy) + SCALE(kk)
+
+               else							!Good value
+
+                  refi = 0.0						!New pixel
+                  rloadi = 0.0
+                  if ( valr.ne.INT_INVALR ) then
+                     refi = valr
+                     rloadi = SCALE(kk)
+                  endif
+
+                  refim = 0.0						!Old pixel
+                  rloadim = 0.0
+                  if ( wref(ix,iy).ne.INT_INVALR ) then
+                     refim = wref(ix,iy)
+                     rloadim = wload(ix,iy)
+                  endif
+
+                  ovalr = refi*rloadi + refim*rloadim			!Add
+                  ovall = rloadi + rloadim
+                  if ( ovall.ne.0.0 ) then
+                     wref(ix,iy) = ovalr/ovall
+                  else
+                     wref(ix,iy) = 0.0
+                  endif
+                  wload(ix,iy) = ovall
+
+               endif
+
+            endif
+
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_work3r"> IMJ_WORK3R  </a>-- Add real image in, in uniform mode
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_work3r ( im, nxc, nyc, wref, wload, kk )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'ST_LIMITS_INC'
+      include 'image.inc'
+C--
+      integer      nxc			!i: Input image X size
+      integer      nyc			!i: Input image Y size
+      real         im(nxc,nyc)		!i: Input image
+      real         wref(NXR,NYR)	!i/o: Working refernce image
+      real         wload(NXR,NYR)	!i/o: Working load image
+      integer      kk			!i: Input image number
+Cbegin
+      integer ix, iy, jx, jy, jj, jshift, ii, ishift
+      real xdash, ydash, xref, yref, valr, dx, dy, r1, r2, wt, wtsum,
+     +     sum
+      real wx(-1:+1),wy(-1:+1)						!Weight arrays for constant noise interpolation
+      data wx(0)/1.0/,wy(0)/1.0/
+      real anumh, anuml
+      parameter ( anumh=32767.0*32767.0 )
+      parameter ( anuml=-1.0*32767.0*32767.0 )
+      real refi, rloadi, refim, rloadim, ovalr, ovall
+Cbegin
+
+
+      do iy = KELIM(1,2,kk), KELIM(2,2,kk)
+         do ix = KELIM(1,1,kk), KELIM(2,1,kk)
+
+            xref = TRC(1,kk) + TRC(3,kk)*iy				!Set up transform
+            yref = TRC(4,kk) + TRC(6,kk)*iy
+            xdash = xref + TRC(2,kk)*ix
+            ydash = yref + TRC(5,kk)*ix
+
+            jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
+            jy = nint(min(anumh,max(anuml,ydash)))
+
+            if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
+
+               dx = xdash - jx						!Shift from the nearest pixel
+               dy = ydash - jy
+
+               r1 = dx*dx + 0.25					!X and Y weight arrays (dependent on the phase dx,dy)
+               r2 = dy*dy + 0.25
+               wx(-1) = r1 - dx
+               wx(1)  = r1 + dx
+               wy(-1) = r2 - dy
+               wy(1)  = r2 + dy
+
+               sum = 0.0						!scan the 9 nearest pixels, forming
+               wtsum = 0.0						! a weighted sum of all the valid ones
+
+               do jshift = -1, 1
+                  jj = jy + jshift
+                  if ( jj.ge.1 .and. jj.le.nyc ) then			!Still in the image?
+                      do ishift = -1, 1
+                         ii = jx + ishift
+                         if ( ii.ge.1 .and. ii.le.nxc ) then
+                           if ( im(ii,jj).ne.INVALIR ) then		!Pixel Valid?
+                              wt = wx(ishift)*wy(jshift)
+                              sum = sum + im(ii,jj)*wt
+                              wtsum = wtsum + wt
+                           endif
+                        endif
+                     enddo
+                  endif
+               enddo
+
+               valr = INT_INVALR					!Load to output
+               if ( wtsum.gt.0.001 ) then
+                  valr = sum/wtsum
+                  valr = BS*valr + BZ - ZERO
+               endif
+
+               if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
+     +                wload(ix,iy).eq.0.0 ) ) then
+
+                  wref(ix,iy) = INT_INVALR				!If so load bad
+                  wload(ix,iy) = wload(ix,iy) + SCALE(kk)
+
+               else							!Good value
+
+                  refi = 0.0						!New pixel
+                  rloadi = 0.0
+                  if ( valr.ne.INT_INVALR ) then
+                     refi = valr
+                     rloadi = SCALE(kk)
+                  endif
+
+                  refim = 0.0						!Old pixel
+                  rloadim = 0.0
+                  if ( wref(ix,iy).ne.INT_INVALR ) then
+                     refim = wref(ix,iy)
+                     rloadim = wload(ix,iy)
+                  endif
+
+                  ovalr = refi*rloadi + refim*rloadim			!Add
+                  ovall = rloadi + rloadim
+                  if ( ovall.ne.0.0 ) then
+                     wref(ix,iy) = ovalr/ovall
+                  else
+                     wref(ix,iy) = 0.0
+                  endif
+                  wload(ix,iy) = ovall
+
+               endif
+
+            endif
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_work3s"> IMJ_WORK3S  </a>-- Add int*2 image in, in uniform mode
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_work3s ( im, nxc, nyc, wref, wload, kk )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'ST_LIMITS_INC'
+      include 'image.inc'
+C--
+      integer      nxc			!i: Input image X size
+      integer      nyc			!i: Input image Y size
+      integer*2    im(nxc,nyc)		!i: Input image
+      real         wref(NXR,NYR)	!i/o: Working refernce image
+      real         wload(NXR,NYR)	!i/o: Working load image
+      integer      kk			!i: Input image number
+Cbegin
+      integer ix, iy, jx, jy, jj, jshift, ii, ishift
+      real xdash, ydash, xref, yref, valr, dx, dy, r1, r2, wt, wtsum,
+     +     sum
+      real wx(-1:+1),wy(-1:+1)						!Weight arrays for constant noise interpolation
+      data wx(0)/1.0/,wy(0)/1.0/
+      real anumh, anuml
+      parameter ( anumh=32767.0*32767.0 )
+      parameter ( anuml=-1.0*32767.0*32767.0 )
+      real refi, rloadi, refim, rloadim, ovalr, ovall
+Cbegin
+
+
+      do iy = KELIM(1,2,kk), KELIM(2,2,kk)
+         do ix = KELIM(1,1,kk), KELIM(2,1,kk)
+
+            xref = TRC(1,kk) + TRC(3,kk)*iy				!Set up transform
+            yref = TRC(4,kk) + TRC(6,kk)*iy
+            xdash = xref + TRC(2,kk)*ix
+            ydash = yref + TRC(5,kk)*ix
+
+            jx = nint(min(anumh,max(anuml,xdash)))			!Find nearest pixel location
+            jy = nint(min(anumh,max(anuml,ydash)))
+
+            if( jx.ge.1.and.jx.le.nxc.and.jy.ge.1.and.jy.le.nyc ) then	!Inside image?
+
+               dx = xdash - jx						!Shift from the nearest pixel
+               dy = ydash - jy
+
+               r1 = dx*dx + 0.25					!X and Y weight arrays (dependent on the phase dx,dy)
+               r2 = dy*dy + 0.25
+               wx(-1) = r1 - dx
+               wx(1)  = r1 + dx
+               wy(-1) = r2 - dy
+               wy(1)  = r2 + dy
+
+               sum = 0.0						!scan the 9 nearest pixels, forming
+               wtsum = 0.0						! a weighted sum of all the valid ones
+
+               do jshift = -1, 1
+                  jj = jy + jshift
+                  if ( jj.ge.1 .and. jj.le.nyc ) then			!Still in the image?
+                      do ishift = -1, 1
+                         ii = jx + ishift
+                         if ( ii.ge.1 .and. ii.le.nxc ) then
+                           if ( im(ii,jj).ne.INVALIS ) then		!Pixel Valid?
+                              wt = wx(ishift)*wy(jshift)
+                              sum = sum + im(ii,jj)*wt
+                              wtsum = wtsum + wt
+                           endif
+                        endif
+                     enddo
+                  endif
+               enddo
+
+               valr = INT_INVALR					!Load to output
+               if ( wtsum.gt.0.001 ) then
+                  valr = sum/wtsum
+                  valr = BS*valr + BZ - ZERO
+               endif
+
+               if ( valr.eq.INT_INVALR .and.				!Check for both in, out bad
+     +              ( wref(ix,iy).eq.INT_INVALR .or.
+     +                wload(ix,iy).eq.0.0 ) ) then
+
+                  wref(ix,iy) = INT_INVALR				!If so load bad
+                  wload(ix,iy) = wload(ix,iy) + SCALE(kk)
+
+               else							!Good value
+
+                  refi = 0.0						!New pixel
+                  rloadi = 0.0
+                  if ( valr.ne.INT_INVALR ) then
+                     refi = valr
+                     rloadi = SCALE(kk)
+                  endif
+
+                  refim = 0.0						!Old pixel
+                  rloadim = 0.0
+                  if ( wref(ix,iy).ne.INT_INVALR ) then
+                     refim = wref(ix,iy)
+                     rloadim = wload(ix,iy)
+                  endif
+
+                  ovalr = refi*rloadi + refim*rloadim			!Add
+                  ovall = rloadi + rloadim
+                  if ( ovall.ne.0.0 ) then
+                     wref(ix,iy) = ovalr/ovall
+                  else
+                     wref(ix,iy) = 0.0
+                  endif
+                  wload(ix,iy) = ovall
+
+               endif
+
+            endif
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_type2"> IMJ_TYPE2  </a>-- Add two reference images
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_type2 ( )
+
+      implicit none
+      include 'imjoin.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C---
+      real    rva, rvb, rvc, bs1, bz1, rinval1, bs2, bz2, rinval2
+      integer istat, iv, ivb, ipr1, ipr2, ipl1, ipl2, ipoa
+      character*70 titler, titlel, otitler, otitlel, otitle
+      character*68 texth
+Cbegin
+
+
+      call opimrr ( 'INREF1', ipr1, NXR, NYR, .true., istat )		!Reference image
+      if ( istat.ne.0 ) then
+         call printo ( 'ERROR: Error is in first input Reference image')
+         ST_FAILED = .true.
+         return
+      endif
+      call gtimrd ( 'INREF1', bs1, bz1, rinval1, titler, istat )
+
+      call opimrr ( 'INLOAD1', ipl1, iv, ivb, .false., istat )
+      if ( istat.ne.0 ) then
+         call printo ( 'ERROR: Error is in first input Load image' )
+         ST_FAILED = .true.
+         return
+      endif
+      if ( iv.ne.NXR .or. ivb.ne.NYR ) then
+         call printo (
+     +    'ERROR: First Load image different size to reference image' )
+         ST_FAILED = .true.
+         return
+      endif
+      call gtimrd ( 'INLOAD1', rva, rvb, rvc, titlel, istat )
+
+      call opimrr ( 'INREF2', ipr2, iv, ivb, .true., istat )			!Reference image
+      if ( istat.ne.0 ) then
+         call printo ('ERROR: Error is in second input Reference image')
+         ST_FAILED = .true.
+         return
+      endif
+      if ( iv.ne.NXR .or. ivb.ne.NYR ) then
+         call printo ( 'ERROR: Second Reference image different '//
+     +                         'size to reference image' )
+         ST_FAILED = .true.
+         return
+      endif
+      call gtimrd ( 'INREF2', bs2, bz2, rinval2, titler, istat )
+
+      call opimrr ( 'INLOAD2', ipl2, iv, ivb, .false., istat )
+      if ( istat.ne.0 ) then
+         call printo ( 'ERROR: Error is in second input Load image' )
+         ST_FAILED = .true.
+         return
+      endif
+      if ( iv.ne.NXR .or. ivb.ne.NYR ) then
+         call printo (
+     +   'ERROR: Second Load image different size to reference image' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      call get1b ( 'DOOUT', DOUTIM, .true. )				!Open output image
+      IPO = 1
+      ipoa = 1
+      if ( DOUTIM ) then
+         call get_job ( 'OUTTYPE', 'real:short', iv, 2, texth, 0 )
+         OUTTYPE = 'REAL'
+         if ( iv.eq.2 ) OUTTYPE = 'SHORT'
+         call opimzw ( 'OUT', OUTTYPE, IPO, NXR, NYR, .true., istat )
+         if ( istat.ne.0 ) DOUTIM = .false.
+      endif
+
+      if ( DOUTIM ) then
+         if ( OUTTYPE.eq.'SHORT' ) call gtwrkr ( 'WORKO', NXR*NYR,
+     +                                            ipoa, istat )
+         BSO = bs1
+         BZO = bz1
+         call get2r ( 'OUTSCALE', BSO, BZO, .true., -1.0e20, 1.0e20 )
+         call get1c (  'TITLE', otitle, titler, .true. )		
+         call icopdes ( 'INREF1',  'OUT', istat )
+         call ptdesc ( 'OUT',  'TITLE',  otitle )
+         call ptdesr ( 'OUT',  'BZERO',  BZO    )
+         call ptdesr ( 'OUT',  'BSCALE', BSO    )
+         if ( OUTTYPE.eq.'SHORT' ) then
+            call ptdesi ( 'OUT',  'INVAL',  INVALO )
+         else
+            call ptdesr ( 'OUT',  'INVAL',  INT_INVALR )
+         endif
+      endif
+
+      call opimrw ( 'OUTREF', IPOR, NXR, NYR, .true., istat )		!Open output reference image
+      DOUTREF = .true.
+      if ( istat.ne.0 ) DOUTREF = .false.
+      if ( .not.DOUTREF ) IPOR = 1
+      IPOL = 1
+      if ( DOUTREF ) then
+         call get1c (  'TITLER', otitler, titler, .true. )		
+         call opimrw ( 'OUTLOAD', IPOL, NXR, NYR, .true., istat )	!Open output load image
+         call get1c (  'TITLEL', otitlel, titlel, .true. )			
+         call icopdes ( 'INREF1',  'OUTREF', istat )				
+         call icopdes ( 'INLOAD1', 'OUTLOAD', istat )
+         call ptdesc ( 'OUTREF',  'TITLE', otitler )
+         call ptdesc ( 'OUTLOAD', 'TITLE', otitlel )
+      endif
+
+      if ( OUTTYPE.eq.'REAL' ) then
+         ipoa = IPO
+      else
+         RINVALO = INT_INVALR
+      endif
+      call imj_xxdoit ( %val(ipr1), %val(ipl1), %val(ipr2),	 	!Load ouput images
+     +                  %val(ipl2), %val(IPOR), %val(IPOL), %val(ipoa),
+     +                  NXR, NYR, bs1, bz1, rinval1, bs2, bz2,
+     +                  rinval2, DOUTREF, DOUTIM, BSO, BZO, RINVALO )
+      if ( DOUTIM .and. OUTTYPE.eq.'SHORT' ) call azchtrs ( %val(ipoa),
+     +   INT_INVALR, INT_MINSR, INT_MAXSR, %val(IPO), INVALO, NXR*NYR )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imj_xxdoit"> IMJ_XXDOIT  </a>-- Do work of adding two reference images
+C
+C alan penny                    ral            1991 March
+
+      subroutine imj_xxdoit ( rim1, lim1, rim2, lim2, orim, olim, out,
+     +                        nx, ny, bs1, bz1, rinval1, bs2, bz2,
+     +                        rinval2, doutref, doutim, bso, bzo,
+     +                        rinvalo )
+
+      implicit none
+
+      integer   nx		!i: X size of images
+      integer   ny		!i: Y size of images
+      real      rim1(nx,ny)	!i: 1st input reference image
+      real      lim1(nx,ny)	!i: 1st input load image
+      real      rim2(nx,ny)	!i: 2nd input reference image
+      real      lim2(nx,ny)	!i: 2nd input load image
+      real      orim(nx,ny)	!o: Output reference image
+      real      olim(nx,ny)	!o: Output load image
+      real      out(nx,ny)	!o: Output image
+      real      bs1		!i: Scale of 1st reference image
+      real      bz1		!i: Zero of 1st reference image
+      real      rinval1		!i: 'INVAL' value of 1st reference image
+      real      bs2		!i: Scale of 1st reference image
+      real      bz2		!i: Zero of 1st reference image
+      real      rinval2		!i: 'INVAL' value of 1st reference image
+      logical   doutref		!i: Output reference image?
+      logical   doutim		!i: Output image?
+      real      bso		!i: Scale of output image
+      real      bzo		!i: Zero of output image
+      real      rinvalo		!i: Magic value of output image
+C--
+      integer j, k
+      logical fl1, fl2
+      real vr1, vl1, vr2, vl2, rro, rlo
+Cbegin
+
+
+      do k = 1 , ny
+         do j = 1, nx
+
+            vr1 = rim1(j,k) 						!Input values
+            vl1 = lim1(j,k)
+            vr2 = rim2(j,k)
+            vl2 = lim2(j,k)
+
+            if ( vr1.eq.rinval1 ) then					!Calc output
+               vr1 = 0.0
+               vl1 = 0.0
+               fl1 = .true.
+            else
+               fl1 = .false.	
+               vr1 = vr1*bs1 + bz1
+            endif
+
+            if ( vr2.eq.rinval2 ) then
+               vr2 = 0.0
+               vl2 = 0.0
+               fl2 = .true.
+            else
+               fl2 = .false.
+               vr2 = vr2*bs2 + bz2
+            endif
+
+            rlo = vl1 + vl2
+            if ( fl1 .and. fl2 ) then
+               rro = rinval1
+            else
+               rro = 0.0
+               if ( rlo.ne.0.0 ) then
+                  rro = (vr1*vl1+vr2*vl2)/rlo
+                  rro = (rro-bz1)/bs1
+               endif
+            endif
+
+            if ( DOUTREF ) then
+               orim(j,k) = rro						!Load output
+               olim(j,k) = rlo
+            endif
+
+            if ( DOUTIM ) then
+               if ( rlo.eq.0.0 ) then
+                  out(j,k) = rinvalo
+               else
+                  out(j,k) = (rro-bzo)/bso
+               endif
+            endif
+
+         enddo
+      enddo
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imjoin.inc"> IMJOIN.INC  </a>-- Include file for IMJOIN
+C
+C alan penny                  ral          1991 march
+
+      integer    maxn		 !Maximum number of input images
+      parameter ( maxn=10 )
+
+      character*6 imty(maxn)	 !Types (REAL,SHORT) of input images
+      character*6 outtype	 !Type (REAL,SHORT) of output image
+
+      integer    ipr		 !Input reference image pointer
+      integer    ipl		 !Input reference load image pointer
+      integer    ipi(maxn)	 !Input images pointer
+      integer    ipwr		 !Working reference image pointer
+      integer    ipwl		 !Working reference load image pointer
+      integer    ipor		 !Output reference image pointer
+      integer    ipol		 !Output reference load image pointer
+      integer    ipo		 !Output image pointer
+      integer    nxi(maxn)	 !X size of input images
+      integer    nyi(maxn)	 !Y size of input images
+      integer    nxr		 !X size of reference image
+      integer    nyr		 !Y size of reference image
+      real       bsr		 !Scale of reference image
+      real       bzr		 !Zero of reference image
+      real       invalref	 !'INVALID' flag of reference image
+      real       invalir	 !Invalid flag for real input image
+      integer    invalis	 !Invalid flag for int*2 input image
+      real       bso		 !Scale of output image
+      real       bzo		 !Zero of output image
+      integer    invalo		 !'INVALID' flag of int*2 output image
+      real       rinvalo	 !'INVALID' flag of real output image
+      integer    ntot		 !Number of input images
+
+      integer    kmeth		 !Interpolation method (1=nearest:2=linear:3=uniform)
+      integer    kshift		 !Shift method (1=full:2=xyshift)
+      real       arc(6,maxn)	 !Transformation coefficents: [input image=>ref im]
+      real       trc(6,maxn)	 !Transformation coefficents: [ref im =>
+				 ! input image], reverse of that input
+      real       scale(maxn)	 !Input images 'scale' (= 'exposure time')
+      integer    kelim(2,2,maxn) !Ends in ref image of input image areas
+      real       zero		 !Sky level found for input image
+
+      logical    dozero		 !Subtract median flag
+      logical    noref		 !No input reference image flag
+      logical    doutref	 !Output a reference image?
+      logical    doutim		 !Output an output image?
+
+CX      logical    imj_dum1
+CX      logical    imj_dum2
+CX      logical    imj_dum3
+
+
+      common / imjoina /    ipr,    ipl,     nxr,    nyr,   bsr,
+     +                      bzr,    trc,   scale,   ipol,   ipi,
+     +                     ipor,  kmeth,  kshift,   zero,  ipwr,
+     +                     ipwl,    nxi,     nyi,   ntot,  kelim,
+     +                      arc,    ipo,     bso,    bzo,
+     +                      invalref, invalir, invalis, invalo,
+     +                      rinvalo
+
+      common / imjoinb /   doutim,   dozero,   noref,  doutref
+
+      common /imjoinc / imty, outtype
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

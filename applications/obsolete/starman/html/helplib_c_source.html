@@ -1,0 +1,88 @@
+<HTML><HEAD>
+<TITLE> Source Code for HELPLIB - C routines
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+HELPLIB
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#helplib_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#sthe_trmsz">
+sthe_trmsz  </a>  Obtain width and height of the terminal screen or window       <br>
+
+<HR>
+<pre>
+
+/***************************************************
+ STHE_TRMSZ.C
+
+  Contains-
+-
+  STHE_TRMSZ   Obtain width and height of the terminal screen or window
+-
+*/
+
+/* Include files */
+
+#include <sys/termio.h>
+#include "f77.h"
+
+/***********************************************************************
+  <a name="sthe_trmsz"> STHE_TRMSZ  </a>-- Obtain width and height of the terminal screen or window
+
+  Building: On SUNs this should be compiled with gcc, with cc on DECstations
+  Use switch "-I/star/include" on both.
+
+   Alan Chipperfield (STARLINK) Malcolm J. Currie (STARLINK)
+   Alan Penny           RAL         1994 Dec
+*/
+
+F77_INTEGER_FUNCTION(sthe_trmsz)(INTEGER(width),INTEGER(height))
+{
+
+   GENPTR_INTEGER(width)	/* o: Width of the screen in characters*/
+   GENPTR_INTEGER(height)	/* o: Height of the screen in lines*/
+
+/* C-- */
+/* Cbegin */
+#ifdef TIOCGWINSZ
+	struct winsize s;
+
+/* this 1 is the file descriptor eqivalent of 'SYS$OUTPUT' on VMS. */
+	if (ioctl (1, TIOCGWINSZ, &s))
+		return 0;
+	*height = s.ws_row;
+	*width = s.ws_col;
+
+	return 1;
+#else
+	return 0;
+#endif
+}
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

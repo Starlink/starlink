@@ -1,0 +1,664 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBDES
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBDES
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbdes_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbdes">
+t_tbdes  </a>  List, write, delete, and/or copy descriptors of a table       <br>
+<a href="#tbd_list">
+tbd_list  </a>  List descriptors of a table       <br>
+<a href="#tbd_single">
+tbd_single  </a>  Put out wanted descriptors       <br>
+<a href="#tbd_all">
+tbd_all  </a>  Put out all descriptors       <br>
+<a href="#tbd_write">
+tbd_write  </a>  Write descriptors to table       <br>
+<a href="#tbd_delete">
+tbd_delete  </a>  Delete descriptors from a table/table       <br>
+<a href="#tbd_copy">
+tbd_copy  </a>  Copy descriptors from one table to another       <br>
+<a href="#tbd_getem">
+tbd_getem  </a>  Get existing descriptors in output table       <br>
+<a href="#tbdes">
+tbdes  </a>  (Program) List, Write, delete descriptors of a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_TBDES.FOR
+C
+C    Contains:-
+C
+C T_TBDES      List, write, delete descriptors of a table
+C TBD_LIST     List descriptors
+C TBD_SINGLE   Put out wanted descriptors
+C TBD_ALL      Put out all descriptors
+C TBD_WRITE    Write descriptors to table
+C TBD_DELETE   Delete descriptors from a table
+C TBD_COPY     Copy descriptors from one table to another
+C TBD_GETEM    Get existing descriptors in output table
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbdes"> T_TBDES  </a>-- List, write, delete, and/or copy descriptors of a table
+C   For a fuller description see TBDES.HLP
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_tbdes ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer kout
+
+      character*1000 topt
+      data topt / 'list:write:delete:copy:' /
+      integer nth
+      parameter ( nth=6 )
+      character*68 th(nth)
+      data th /
+     + 'Option    Function',
+     + '------    --------',
+     + 'Copy      Copy descriptors from one table to next',
+     + 'Delete    Delete descriptors from table',
+     + 'List      List descriptors of table',
+     + 'Write     Write descriptors to table' /
+Cbegin
+
+
+      call get_job ( 'OPTION', topt, kout, 1, th, nth )
+      if ( ST_FAILED ) return
+
+      if ( kout.eq.1 ) call tbd_list
+
+      if ( kout.eq.2 ) call tbd_write
+
+      if ( kout.eq.3 ) call tbd_delete
+
+      if ( kout.eq.4 ) call tbd_copy
+
+      call canpar ( 'IN' )
+      if ( kout.eq.4 ) call canpar ( 'OUT' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_list"> TBD_LIST  </a>-- List descriptors of a table
+C
+C   alan penny                     ral           1991 May
+
+      subroutine tbd_list ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ip, ierr
+      logical all, onlyone
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call get1b ( 'ALL_LIST', all, .true. )
+      if ( ST_FAILED ) return
+      if ( all ) then
+         call tbd_all
+      else
+         call get1b ( 'ONLYONE', onlyone, .false. )
+         if ( ST_FAILED ) return
+         call tbd_single ( onlyone )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_single"> TBD_SINGLE  </a>-- Put out wanted descriptors
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbd_single ( onlyone )
+
+      implicit none
+      include 'tbdes.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      logical   onlyone		!i:Do only one descriptor
+C--
+      logical more, amore, paging
+      integer k, nval, ierr, kout, iv
+      character descr*80, textb*80, name*20, blank*8
+      data blank / '        ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'PAGING', paging, .false. )
+      if ( ST_FAILED ) return
+
+      call pargi ( TBVX-5 )
+      call pargi ( TBY )
+      call printo ( ' ' )
+      call printd ( 'No of columns = %d :  No of rows = %d ' )
+      call gtdesn ( 'IN', 1, descr, ierr )
+      if ( ierr.ne.0 ) then
+         call printo ( 'No Headers or Descriptors' )
+         return
+      endif
+      call gtdesc ( 'IN', 'TITLE', textb, ' ', iv, ierr )
+      if ( ierr.ne.0 ) then
+         call printo ( 'No Title' )
+      else
+         call pargc ( textb )
+         call printd ( 'Title: %c ' )
+      endif
+      call printo ( ' ' )
+
+      amore = .true.
+      do while ( amore )
+         call get1c ( 'NAME', name, ' ', .true. )
+         if ( ST_FAILED ) return
+         if ( name.eq.' ' ) then
+            amore = .false.
+         else
+            call gtdesc ( 'IN', name, TEXTA, ' ', nval, ierr )
+            if ( TEXTA(1).eq.' ' .or. ierr.ne.0 ) then
+               call printo ( 'No such descriptor' )
+            else
+               k = 0
+               kout = 0
+               more = .true.
+               do while ( k.lt.nval .and. more )
+                  k = k + 1
+                  if ( k.eq.1 ) then
+                     textb = name(1:8)//'  '//TEXTA(k)(1:68)
+                  else
+                     textb = blank//'  '//TEXTA(k)(1:68)
+                  endif
+                  call printo ( textb )
+                  kout = kout + 1
+                  if ( .not.onlyone .and. kout.eq.21 ) then
+                      kout = 0
+                      if ( paging) call get1b ( 'MORE', more, .true. )
+                      if ( ST_FAILED ) return
+                  endif
+               enddo
+            endif
+         endif
+         if ( onlyone ) amore = .false.
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_all"> TBD_ALL  </a>-- Put out all descriptors
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbd_all ()
+
+      implicit none
+      include 'tbdes.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      logical more, first, paging
+      integer k, ncount, nval, ierr, kout, iv
+      character descr*80, text*80
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'PAGING', paging, .false. )
+      if ( ST_FAILED ) return
+
+      call pargi ( TBVX-5 )
+      call pargi ( TBY )
+      call printo ( ' ' )
+      call printd ( 'No of columns = %d :  No of rows = %d ' )
+      call gtdesn ( 'IN', 1, descr, ierr )
+      if ( ierr.ne.0 ) then
+         call printo ( 'No Headers or Descriptors' )
+         return
+      endif
+      call gtdesc ( 'IN', 'TITLE', text, ' ', iv, ierr )
+      if ( ierr.ne.0 ) then
+         call printo ( 'No Title' )
+      else
+         call pargc ( text )
+         call printd ( 'Title: %c ' )
+      endif
+
+      more = .true.							!Put out descriptors
+      first = .true.
+      kout = 0
+      ncount = 0
+      nval = 1
+      do while ( more )
+         ncount = ncount + nval
+         call gtdesn ( 'IN', ncount, descr, ierr )
+         if ( ierr.ne.0 ) then
+            more = .false.
+         else
+            if ( descr(1:4).eq.'HEAD' .and.
+     +            descr(5:5).ge.'0' .and. descr(5:5).le.'9' .and.
+     +            descr(6:6).ge.'0' .and. descr(6:6).le.'9' .and.
+     +            descr(7:7).ge.'0' .and. descr(7:7).le.'9'  ) then
+               call gtdesc ( 'IN', descr, TEXTA, ' ', nval, ierr )
+               if ( first ) then
+                  call printo ( ' ' )
+                  call printo ( 'Column Headers' )
+                  call printo ( '--------------' )
+                  call printo ( ' ' )
+                  first = .false.
+               endif
+               if ( ierr.eq.0 ) then
+                  k = 0
+                  more = .true.
+                  do while ( k.lt.nval .and. more )
+                     k = k + 1
+                     text = descr(1:8)//'  '//TEXTA(k)(1:68)
+                     call printo ( text )
+                     kout = kout + 1
+                     if ( kout.eq.21 ) then
+                        kout = 0
+                        if ( paging) call get1b ( 'MORE', more, .true. )
+                        if ( ST_FAILED ) return
+                      endif
+                  enddo
+               endif
+            endif
+         endif
+      enddo
+      if ( first ) then
+         call printo ( ' ' )
+         call printo ( 'No Column Headers' )
+         call printo ( ' ' )
+      endif
+
+      more = .true.							!Put out descriptors
+      first = .true.
+      kout = 0
+      ncount = 0
+      nval = 1
+      do while ( more )
+         ncount = ncount + nval
+         call gtdesn ( 'IN', ncount, descr, ierr )
+         if ( ierr.ne.0 ) then
+            more = .false.
+         else
+            if ( descr(1:4).ne.'HEAD' .or.
+     +            descr(5:5).lt.'0' .or. descr(5:5).gt.'9' .or.
+     +            descr(6:6).lt.'0' .or. descr(6:6).gt.'9' .or.
+     +            descr(7:7).lt.'0' .or. descr(7:7).gt.'9'  ) then
+               if ( first ) then
+                  call printo ( ' ' )
+                  call printo (
+     +                  'Descriptors that are not Column Headers' )
+                  call printo (
+     +                  '---------------------------------------' )
+                  call printo ( ' ' )
+                  first = .false.
+               endif
+               call gtdesc ( 'IN', descr, TEXTA, ' ', nval, ierr )
+               if ( ierr.eq.0 ) then
+                  k = 0
+                  more = .true.
+                  do while ( k.lt.nval .and. more )
+                     k = k + 1
+                     text = descr(1:8)//'  '//TEXTA(k)(1:68)
+                     call printo ( text )
+                     kout = kout + 1
+                     if ( kout.eq.21 ) then
+                        kout = 0
+                        if ( paging) call get1b ( 'MORE', more, .true. )
+                        if ( ST_FAILED ) return
+                      endif
+                  enddo
+               endif
+            endif
+         endif
+      enddo
+      if ( first ) then
+         call printo ( ' ' )
+                  call printo (
+     +               'No descriptors that are not Column Headers' )
+         call printo ( ' ' )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_write"> TBD_WRITE  </a>-- Write descriptors to table
+C
+C  p morris      leeds                   Jun 1992
+
+      subroutine tbd_write ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ierr, iv, ip
+      real rv
+      character desnam*20, desna*20, val*72, type*30, atype*30,
+     +          utype*30
+      logical bv, loop, first
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call get1b ( 'ONLYONE', bv, .false. )				!Loop needed?
+      if ( ST_FAILED ) return
+      loop = .not.bv
+
+      first = .true.
+      type = 'char'
+      do while ( loop .or. first )					!Get and write descriptor(s)
+         call get1c ( 'NAME', desna, ' ', .true. )
+         if ( ST_FAILED ) return
+         call uppcase ( desna, desnam )
+         if ( desnam.eq.' ' ) then
+            loop = .false.
+         else
+            atype = type
+            call get_option ( 'FORMAT', 'char:real:integer', 1, type,
+     +                        atype, ' ', 0 )
+            if ( ST_FAILED ) return
+            call uppcase ( type, utype )
+            if ( utype .eq. 'CHAR' ) then
+               call gtdesc ( 'IN', desnam, val, ' ', iv, ierr )
+               call get1c ( 'CVALUE', val, val, .true. )
+               if ( ST_FAILED ) return
+               call ptdesc ( 'IN', desnam, val )
+            elseif ( utype .eq. 'REAL' ) then
+               call gtdesr ( 'IN', desnam, rv, 0.0, ierr )
+               call get1r ( 'RVALUE', rv, rv, INT_MINRR, INT_MAXRR )
+               if ( ST_FAILED ) return
+               call ptdesr ( 'IN', desnam, rv  )
+            elseif ( utype .eq. 'INTEGER' ) then
+               call gtdesi ( 'IN', desnam, iv, 0, ierr )
+               call get1i ( 'IVALUE', iv, iv, INT_MINII, INT_MAXII )
+               if ( ST_FAILED ) return
+               call ptdesi ( 'IN', desnam, iv )
+            else
+               call printo ( 'Invalid type' )
+               ierr = 1
+            endif
+            if ( ierr.ne.0 ) return
+         endif
+         first = .false.
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_delete"> TBD_DELETE  </a>-- Delete descriptors from a table/table
+C
+C  p morris             leeds       jun 1992
+
+      subroutine tbd_delete ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ierr, ip
+      character desnam*20
+      logical bv, loop, first
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call get1b ( 'ONLYONE', bv, .false. )				!Loop needed?
+      if ( ST_FAILED ) return
+      loop = .not.bv
+
+      first = .true.
+      do while ( loop .or. first )					!Get and write descriptor(s)
+         call get1c ( 'NAME', desnam, ' ', .true. )
+         if ( ST_FAILED ) return
+         if ( desnam.eq.' ' ) then
+            loop = .false.
+         else
+            call dldes ( 'IN', desnam, ierr )
+         endif
+         if ( ierr .ne. 0 ) then
+            ST_FAILED = .false.
+            loop = .false.
+         endif
+         first = .false.
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_copy"> TBD_COPY  </a>-- Copy descriptors from one table to another
+C  Optionally you can choose to overwrite or not descriptors that
+C  already occur in the target file.
+C
+C   alan penny                ral      1990 jan
+
+      subroutine tbd_copy ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      character*80 text(16384)
+      character*60 atext(10000)
+      character*8  adescr(10000)
+      integer numdes(10000), ierr, j, k, ip1, ip2, nval, ntot, ncount
+      logical over, dele
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN', ip1, TBVX1, TBY1, .false., ierr )		!Get input
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call optabr ( 'OUT', ip2, TBVX2, TBY2, .false., ierr )		!Open output
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call get1b ( 'OVER', over, .true. )				!Get wether to overwrite
+      if ( ST_FAILED ) return
+
+      if ( over ) call get1b ('DELETE', dele, .true. )			!Get wether to delete before overwriting
+      if ( ST_FAILED ) return
+
+      if ( over ) then
+         if ( dele ) then
+            call tcopdes ( 'IN', 'OUT', ierr )
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+         else
+            call tbd_getem ( adescr, numdes, atext, ncount )
+            call tcopdes ( 'IN', 'OUT', ierr )
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+            ntot = 0
+            do k = 1, ncount
+               call gtdesc ( 'OUT', adescr(k), text, ' ', nval,
+     +                              ierr )
+               if ( ierr.ne.0 ) then
+                  do j = 1, numdes(k)
+                     text(j) = atext(ntot+j)
+                  enddo
+                  call ptdescn ( 'OUT', adescr(k), text, numdes(k) )
+               endif
+               ntot = ntot + numdes(k)
+            enddo
+         endif
+      else
+         call tbd_getem ( adescr, numdes, atext, ncount )
+         call tcopdes ( 'IN', 'OUT' ,ierr )
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+         ntot = 0
+         do k = 1, ncount
+            do j = 1, numdes(k)
+               text(j) = atext(ntot+j)
+            enddo
+            ntot = ntot + numdes(k)
+            call ptdescn ( 'OUT', adescr(k), text, numdes(k) )
+         enddo
+      endif
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbd_getem"> TBD_GETEM  </a>-- Get existing descriptors in output table
+C
+C   alan penny                ral         1990 jan
+
+      subroutine tbd_getem ( adescr, numdes, atext, ncount )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*8  adescr(10000)	!o: Names of descriptors
+      integer      numdes(10000)	!o: Number of values in descriptors
+      character*60 atext(10000)		!o: Contents of descriptors
+      integer      ncount		!o: Number of descriptors
+C--
+      character*80 text(16384)
+      character btext*60, descr*80
+      integer ierr, k, numtot, nval
+      logical more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      more = .true.
+      ncount = 0
+      numtot = 0
+      do while ( more )
+         ncount = ncount + 1
+         call gtdesn ( 'OUT', ncount, descr, ierr )
+         if ( ierr.eq.1 ) then
+            more = .false.
+         else
+            call gtdesc ( 'OUT', descr, text,' ', nval,ierr )
+            numtot = numtot + nval
+            if ( numtot.gt.10000 ) then
+               more = .false.
+              call printo('WARNING: Too much - only 10000 lines copied')
+            else
+               adescr(ncount) = descr(1:8)
+               numdes(ncount) = nval
+               do k = 1, nval
+                 btext = text(k)
+                 atext(ncount+k-1) = btext(1:60)
+               enddo
+            endif
+         endif
+      enddo
+      ncount = ncount - 1
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbdes"> TBDES  </a>-- (Program) List, Write, delete descriptors of a table
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine tbdes ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbdes
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBDES.INC for TBDES.F
+
+
+      character*80 texta(16384)
+
+      common / tbdesc / texta
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

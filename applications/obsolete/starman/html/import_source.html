@@ -1,0 +1,431 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMPORT
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMPORT
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#import_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#import">
+import  </a>  (Program) Port Extensions to/from Starman, FITS, Figaro others       <br>
+<a href="#t_import">
+t_import  </a>  Port Extensions to/from Starman, FITS, Figaro others       <br>
+<a href="#impo_input">
+impo_input  </a>  Input NDF       <br>
+<a href="#impo_dcop">
+impo_dcop  </a>  Port extensions       <br>
+<a href="#impo_doifits">
+impo_doifits  </a>  Deal with input FITS extensions       <br>
+<a href="#impo_doofits">
+impo_doofits  </a>  Deal with output FITS extensions       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="import"> IMPORT  </a>-- (Program) Port Extensions to/from Starman, FITS, Figaro others
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine import ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_import
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMPORT.FOR
+C
+C    Contains:-
+C
+C T_IMPORT      Port Extensions to/from Starman, FITS, Figaro others
+C IMPO_INPUT    Input image
+C IMPO_DCOP     Port Extensions
+C IMPO_DOIFITS  Deal with input FITS extensions
+C IMPO_DOOFITS  Deal with output FITS extensions
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_import"> T_IMPORT  </a>-- Port Extensions to/from Starman, FITS, Figaro others
+C   For a fuller description see IMPORT.HLP
+C
+C   pat morris    leeds     April 1994
+
+      subroutine t_import ()
+
+      implicit none
+      include 'STARMAN_INC'
+C--
+      integer kin, kout, ndf
+      logical dodel
+      character*40 istruct, ostruct
+
+      character*1000 topt1
+      data topt1 / 'figaro:fits:starman:other' /
+      integer nth1
+      parameter ( nth1=6)
+      character*68 th1(nth1)
+      data th1 /
+     + 'Option    Function',
+     + '------    --------',
+     + 'Figaro    From a Figaro NDF image',
+     + 'Fits      From an NDF image with a Fits Extension ',
+     + 'Other     From an NDF image with a user defined Extension',
+     + 'Starman   From an NDF image with a Starman Extension ' /
+
+      character*1000 topt2
+      data topt2 / 'figaro:fits:starman:other' /
+      integer nth2
+      parameter ( nth2=6)
+      character*68 th2(nth2)
+      data th2 /
+     + 'Option    Function',
+     + '------    --------',
+     + 'Figaro    From a Figaro NDF image',
+     + 'Fits      From an NDF image with a Fits Extension ',
+     + 'Other     From an NDF image with a user defined Extension',
+     + 'Starman   From an NDF image with a Starman Extension '/
+Cbegin
+
+
+      call impo_input ( ndf )
+      if ( ST_FAILED ) return
+
+      call get_job ( 'FROM', topt1, kin, 2, th1, nth1 )
+      if ( ST_FAILED ) return
+      if ( kin.eq.1 ) then
+         istruct = 'FIGARO'
+      elseif ( kin.eq.2 ) then
+         istruct = 'FITS'
+      elseif ( kin.eq.3 ) then
+         istruct = 'STARMAN'
+      else
+         call get1c ( 'IN_EXTEN', istruct, ' ', .true.)
+         if ( ST_FAILED ) return
+      endif
+
+      call get_job ( 'TO', topt2, kout, 3, th2, nth2 )
+      if ( ST_FAILED ) return
+
+      if ( kout.eq.kin .and. kout.ne.4 ) then
+         call printo ( 'No porting needed' )
+         return
+      endif
+
+      if ( kout.eq.1 ) then
+         ostruct = 'FIGARO'
+      elseif ( kout.eq.2 ) then
+         ostruct = 'FITS'
+      elseif ( kout.eq.3 ) then
+         ostruct = 'STARMAN'
+      else
+         call get1c ( 'OUT_EXTEN', ostruct, ' ', .true.)
+         if ( ST_FAILED ) return
+      endif
+
+      call get1b ( 'DELETE', dodel, .false. )				!Delete input extension?
+      if ( ST_FAILED ) return
+
+      call impo_dcop ( ndf, istruct, ostruct, dodel )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="impo_input"> IMPO_INPUT  </a>-- Input NDF
+C
+C   pat morris    leeds     April 1994
+
+      subroutine impo_input ( ndf )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'SAE_PAR'
+
+      integer          ndf		!o: Pointer to image
+C--
+      integer  status
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      status = SAI__OK
+      call ndf_assoc ( 'IN', 'UPDATE', ndf, status )        		!Input NDF
+      if ( status.ne.SAI__OK ) ST_FAILED = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="impo_dcop"> IMPO_DCOP  </a>-- Port extensions
+C
+C   pat morris    leeds     April 1994
+
+      subroutine impo_dcop ( ndf, istruct, ostruct, dodel )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'DAT_PAR'
+      include 'SAE_PAR'
+
+      integer          ndf		!i: Pointer to image
+      character*(*)    istruct		!i: Structure to copy from
+      character*(*)    ostruct		!i: Structure to copy to
+      logical          dodel		!i: Delete old extension?
+C--
+      integer status, ncomp, k, num, ipi
+      logical there
+      character*(DAT__SZNAM) name
+      character*(DAT__SZLOC) ieloc, oeloc, loc
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      status = SAI__OK
+
+      if ( ostruct.ne.' ' .and. ostruct.ne.'FITS' ) then		!Get locator to ouput extension - if it is not FITS
+
+         call ndf_xstat ( ndf, ostruct, there, status )			!Is the output structure there ?
+         if ( .not.there ) then 					! Create it
+            call ndf_xnew ( ndf, ostruct, 'EXT', 0, 0, oeloc, status)
+         else
+            call ndf_xloc ( ndf, ostruct, 'WRITE', oeloc, status )
+         endif
+
+      endif
+
+      if ( istruct.eq.'FITS' ) then
+
+         call ndf_xloc ( ndf, 'FITS', 'READ', ieloc, status )		!Obtain access to the input extension
+         call dat_mapv ( ieloc, '_CHAR*80', 'READ', ipi, num, status )
+         call impo_doifits ( %val(ipi), num, ndf, ostruct, status )
+         call dat_annul ( ieloc, status )
+         if ( dodel ) call ndf_xdel  ( ndf, istruct, status )		!Delete the old structure/extension
+
+      elseif ( ostruct.eq.'FITS' ) then
+
+         call ndf_xstat ( ndf, istruct, there, status )
+         if ( .not.there ) then
+            call pargc ( istruct )
+            call printd ( 'ERROR: Input image has no %c extension' )
+            return
+         endif
+         call ndf_xloc ( ndf, istruct, 'READ', ieloc, status )		!Obtain access to the input structure
+         call dat_ncomp ( ieloc, ncomp, status )			!Copy extension
+
+         call ndf_xstat ( ndf, 'FITS', there, status )
+         if (.not.there ) then
+            call ndf_xnew (ndf,'FITS','_CHAR*80',1,ncomp,oeloc,status)
+         else
+            call ndf_xloc ( ndf, 'FITS', 'WRITE', oeloc, status )
+         endif
+
+         call dat_mapv (oeloc,'_CHAR*80','WRITE',ipi,num,status )
+         call impo_doofits ( %val(ipi), num, ndf, ieloc, status )
+
+         call dat_annul ( oeloc, status )
+         if ( dodel ) call ndf_xdel  ( ndf, istruct, status )   	!Delete the old structure/extension
+
+      else
+
+         call ndf_xstat ( ndf, istruct, there, status )			!Check Input extensions is there
+         if ( .not.there ) then
+            call pargc ( istruct )
+            call printd ( 'ERROR: Input image has no %c extension' )
+            return
+         endif
+
+         call ndf_xloc ( ndf, istruct, 'READ', ieloc, status )		!Obtain access to the input structure
+         call dat_ncomp ( ieloc, ncomp, status )			!Copy extension
+         if (ncomp.ge.2) then
+          do k = 1, ncomp
+             call dat_index ( ieloc, k, loc, status )
+             call dat_name ( loc, name, status )
+             call dat_copy ( loc, oeloc, name, status )
+             call dat_annul ( loc, status )
+          enddo
+         endif
+
+         call dat_annul ( ieloc, status )
+         call dat_annul ( oeloc, status )
+
+         if ( dodel ) call ndf_xdel  ( ndf, istruct, status )   	!Delete the old structure/extension
+
+      endif
+
+      if ( status.ne.SAI__OK ) ST_FAILED = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="impo_doifits"> IMPO_DOIFITS  </a>-- Deal with input FITS extensions
+C
+C   pat morris    leeds     April 1994
+
+      subroutine impo_doifits ( ctext, num, ndf, ostruct, status )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'SAE_PAR'
+
+      integer          num              !i: Number of entries in array
+      character*80     ctext(num)	!i: Character array
+      integer          ndf		!i: Pointer to image
+      character*(*)    ostruct		!i: Structure to copy to
+      integer          status           !i: Status flag
+C--
+      integer j, k, iv, istat
+      real rv
+      character text*80, dtext*80, descr*8
+Cbegin
+
+
+      if ( status.ne.SAI__OK ) return
+      if ( ST_FAILED ) return
+
+      do k = 1, num
+
+         text = ctext(k)
+
+         descr = text(1:8)
+
+         j = index(text,'/')
+         if ( j.eq.0 ) then
+            dtext = text(10:)
+         else
+            dtext = text(10:j-1)
+         endif
+
+         istat = SAI__OK
+         call lbgone ( dtext )
+         if ( descr.ne.' ' ) then
+            if ( dtext.eq.' ' ) then
+               call ndf_xpt0c ( ' ', ndf, ostruct, descr, istat )
+            else
+               call chr_ctoi ( dtext, iv, istat )
+               if ( istat.eq.SAI__OK ) then
+                  call ndf_xpt0i ( iv, ndf, ostruct, descr, istat )
+               else
+                  istat = SAI__OK
+                  call chr_ctor ( dtext, rv, istat )
+                  if ( istat.eq.SAI__OK ) then
+                     call ndf_xpt0r ( rv, ndf, ostruct, descr, istat )
+                  else
+                     istat = SAI__OK
+                     call ndf_xpt0c ( dtext, ndf, ostruct,descr,istat)
+                  endif
+               endif
+            endif
+         endif
+
+      enddo
+
+      if ( status.ne.SAI__OK ) ST_FAILED = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="impo_doofits"> IMPO_DOOFITS  </a>-- Deal with output FITS extensions
+C
+C   pat morris    leeds     April 1994
+
+      subroutine impo_doofits ( ctext, num, ndf, ieloc, status )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'SAE_PAR'
+      include 'DAT_PAR'
+
+      integer          num              !i: Number of entries in array
+      character*80     ctext(num)	!i: Character array
+      integer          ndf		!i: Pointer to image
+      character*(DAT__SZLOC) ieloc	!i: Locator to input structure
+      integer          status           !i: Status flag
+C--
+      integer j, k, l,chr_len
+      character text*80, descr*8, dtext*70
+      character*(DAT__SZLOC) loc
+      character*(DAT__SZTYP) type
+      external chr_len
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call dat_ncomp ( ieloc, j, status )				!Copy extension
+
+      if ( j.ge.2 ) then
+        do k = 1, j
+         call dat_index ( ieloc, k, loc, status )
+         call dat_name ( loc, descr, status )
+         text = descr
+         text(9:9) = '='
+         call chr_term ( 70, text(10:) )
+         call dat_get0c ( loc, dtext, status )
+         call dat_type ( loc, type,  status )
+         if ( type(1:5).eq.'_CHAR' ) then
+            call chr_putc ( dtext, text, 12 )
+         else
+            l = chr_len (dtext)
+            l = 30 - l
+            call chr_putc ( dtext, text, l )
+         endif
+         ctext(k) = text
+         call dat_annul ( loc, status )
+        enddo
+      endif
+
+      call dat_annul ( ieloc, status )
+
+      if ( status.ne.SAI__OK ) ST_FAILED = .true.
+
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,211 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBVALUE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBVALUE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbvalue_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbvalue">
+t_tbvalue  </a>  Type out a tableelement       <br>
+<a href="#tbv_doit">
+tbv_doit  </a>  Do the work       <br>
+<a href="#tbvalue">
+tbvalue  </a>  (Program) Types out table element and puts out as parameter       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C    TBVALUE.FOR
+C
+C    Contains:-
+C
+C T_TBVALUE     Type out a tableelement
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbvalue"> T_TBVALUE  </a>-- Type out a tableelement
+C   For a fuller description see TBVALUE.HLP
+C
+C   alan penny                     ral           1991 Dec
+
+      subroutine t_tbvalue ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ip, ierr, iv
+      character text*80
+Cbegin
+
+
+      call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) return
+      TBX = TBVX - 5
+
+      call gtdesc ( 'IN', 'TITLE', text, ' ', iv, ierr ) 		!Type summary
+      call pargc ( text )
+      call printd ( 'Title is:  %c' )
+      call pargi ( TBX )
+      call pargi ( TBY )
+      call printd ( 'No of Columns - %d  ; No of Rows - %d' )
+      call printo ( ' ' )
+
+      call tbval_doit ( %val(ip) )					!Do the work
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbv_doit"> TBV_DOIT  </a>-- Do the work
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbval_doit ( tb )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      real         tb(TBVX,TBY)		!i: Input table
+C--
+      logical dohead, doname, found
+      character*20 head, inhead, name, inname
+      integer k, ncol, nrow, ierr
+      real    val
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'USEHEAD', dohead, .false. )				!Get column
+      if ( ST_FAILED ) return
+      if ( dohead ) then
+         call get1c ( 'HEADER', head, ' ', .false. )
+      else
+         call get1i ( 'COLUMN', ncol, 1, 1, TBX )
+      endif
+      if ( ST_FAILED ) return
+
+      call get1b ( 'USENAME',   doname, .false. )			!Get row
+      if ( ST_FAILED ) return
+      if ( doname ) then
+         call get1c ( 'NAME', name, ' ', .false. )
+      else
+         call get1i ( 'ROW', nrow, 1, 1, TBY )
+      endif
+      if ( ST_FAILED ) return
+
+      if ( dohead ) then						!Get column from header
+         found = .false.
+         k = 0
+         do while ( .not.found .and. k.lt.TBX )
+            k = k + 1
+            call gthead ( 'IN', k, inhead, ierr )
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+            if ( inhead.eq.head ) then
+               found = .true.
+               ncol = k
+            endif
+         enddo
+         if ( .not.found ) then
+            call printo ( 'ERROR: Header not found' )
+            ST_FAILED = .true.
+            return
+         endif
+      endif
+
+      if ( doname ) then						!Get column from header
+         found = .false.
+         k = 0
+         do while ( .not.found .and. k.lt.TBY )
+            k = k + 1
+            call namegt ( tb, TBVX, TBY, k, inname )
+            if ( inname.eq.name ) then
+               found = .true.
+               nrow = k
+            endif
+         enddo
+         if ( .not.found ) then
+            call printo ( 'ERROR: Name not found' )
+            ST_FAILED = .true.
+            return
+         endif
+      endif
+
+      val = tb(5+ncol,nrow)						!Get value
+
+      call pargbeg							!Type out results
+      call pargr ( val )
+      call printd ( 'Value is: %f' )
+      if ( .not.dohead ) call gthead ( 'IN', ncol, head, ierr )
+      if ( .not.doname ) call namegt ( tb, TBVX, TBY, nrow, name )
+      call pargi ( ncol )
+      call pargc ( head )
+      call printd ( 'Column is  - Number : %d : Header : %c ' )
+      call pargi ( nrow )
+      call pargc ( name )
+      call printd ( 'Row is     - Number : %d : Name : %c ' )
+
+      call put1r ( 'VALUE', val )					!Put value out
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbvalue"> TBVALUE  </a>-- (Program) Types out table element and puts out as parameter
+C   See TBVALUEM.HLP for details
+C
+C         A.J.Penny                ral               1991 Dec
+
+      subroutine tbvalue ( ierradam )
+
+      implicit none
+
+      integer      ierradam               !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbvalue
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

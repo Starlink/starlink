@@ -1,0 +1,378 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBKEY
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBKEY
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbkey_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbkey">
+t_tbkey  </a>  Input a table from the keyboard       <br>
+<a href="#tbke_gcl">
+tbke_gcl  </a>  Get command line info       <br>
+<a href="#tbke_doit">
+tbke_doit  </a>  Input all the lines of data       <br>
+<a href="#tbke_line">
+tbke_line  </a>  Input a line of data (with optional name)       <br>
+<a href="#tbke_getout">
+tbke_getout  </a>  Get ouput files       <br>
+<a href="#tbke_load">
+tbke_load  </a>  Load data into Get ouput file       <br>
+<a href="#tbkey">
+tbkey  </a>  Input numbers from keyboard into a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C   TBKEY.FOR
+C
+C   Contains:-
+C
+C T_TBKEY      Input a table from the keyboard
+C TBKE_GCL     Get command line info
+C TBKE_DOIT    Input all the lines of data
+C TBKE_LINE    Input a line of data (with optional name)
+C TBKE_GETOUT  Get output file
+C TBKE_LOAD    Load data into Get ouput file
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbkey"> T_TBKEY  </a>-- Input a table from the keyboard
+C  For a full description see TBKEY.HLP
+C
+C
+C         A J Penny            RAL                  1991 May
+
+      subroutine t_tbkey ()
+
+      implicit none
+      include 'tbkey.inc'
+C--
+Cbegin
+
+
+      call tbke_gcl
+
+      call tbke_doit ( %val(IPWKA), %val(IPWKB) )
+
+      call tbke_getout
+
+      call tbke_load ( %val(IPWKA), %val(IPWKB), %val(IPO) )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbke_gcl"> TBKE_GCL  </a>-- Get command line info
+C
+C  alan penny                      ral              1991 May
+
+      subroutine tbke_gcl ( )
+
+      implicit none
+      include 'tbkey.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1i ( 'NUMCOL', TBX, 2, 1, 20 )			!No of output columns
+      if ( ST_FAILED ) return
+      TBVX = TBX + 5
+
+      TBYMAX = 1000
+      call get1i ( 'MAXROW', TBYMAX, TBYMAX, 1, 1000000 )
+      if ( ST_FAILED ) return
+
+      call gtwrkr ( 'WORKA',    5*TBYMAX, IPWKA, istat )
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtwrkr ( 'WORKB', TBX*TBYMAX, IPWKB, istat )
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbke_doit"> TBKE_DOIT  </a>-- Input all the lines of data
+C
+C  alan penny                      ral              1991 May
+
+      subroutine tbke_doit ( names, table )
+
+      implicit none
+      include 'tbkey.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      byte    names(20,TBYMAX)		!o: Names
+      real    table(TBX,TBYMAX)		!o: Data
+C--
+      real data(201)
+      character*20 idbuf
+      integer j, k, ierr
+      logical more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = 0
+      more = .true.
+      do while ( more )
+         k = k + 1
+
+         call tbke_line ( idbuf, data, k, ierr )
+         if ( ST_FAILED ) return
+
+         if ( ierr.ne.0 ) then
+            k = k - 1
+            more = .false.
+         else
+            do j = 1, 20
+               names(j,k) = ichar(idbuf(j:j))
+            enddo
+            call amovr ( data, table(1,k), TBX )
+         endif
+
+         if ( k.ge.TBYMAX ) more = .false.
+
+      enddo
+
+      TBY = k
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbke_line"> TBKE_LINE  </a>-- Input a line of data (with optional name)
+C
+C  alan penny                      ral              1991 May
+
+      subroutine tbke_line ( idbuf, data, ndef, ierr )
+
+      implicit none
+      include 'tbkey.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      character*20   idbuf		!o: Name
+      real           data(201)		!o: Data
+      integer        ndef		!i: Default number in name
+      integer        ierr		!o: Error flag (0=ok:1=end of data)
+C--
+      character*80  inbuf(101)
+      character*4 text
+      integer j, k, istat, num, numval
+      logical more, allblank
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      num = TBX + 1							!Expected number of entries
+      more = .true.
+      k = 0
+      do while ( more .and. k.lt.3 )					!Try 3 times for correct data
+         k = k + 1
+         more = .false.
+
+         do j = 1, num							!Get data
+            inbuf(j) = ' '
+         enddo
+         call pargi ( ndef )
+         call printd ( 'Row Number: %d' )
+         call getnc ( 'DATA', inbuf, num, numval, .true. )
+
+         do j = 1, num							!Remove leading blanks
+            call lbgone ( inbuf(j) )
+         enddo
+
+         allblank = .true. 						!All blank entry?
+         if ( numval.gt.0 ) then					! If yes, flag and return
+            do j = 1, numval
+               if ( inbuf(j).ne.' ' ) allblank = .false.
+            enddo
+         endif
+         if ( allblank ) then
+            ierr = 1
+            return
+         endif
+
+         do j = 1, TBX							!Load numbers
+            call chartor ( inbuf(j), data(j), istat )
+            if ( istat.ne.0 ) then
+               write ( text, '(1x,i3)' ) j
+               call printd ( 'ERROR: Number '//
+     +                       text//' is not a real number' )
+               data(j) = 0.0
+               more = .true.
+            endif
+         enddo
+         if ( numval.ge.num ) then					!Load name or default
+            idbuf = inbuf(num)
+         else
+            idbuf(1:1) = '#'
+            write ( idbuf(2:), '(1x,i18)' ) ndef
+            call lbgone ( idbuf(2:) )
+         endif
+
+         if ( more ) then
+            if ( k.lt.3 ) call printo ( 'ERROR: Row repeated' )
+            if ( k.ge.3 ) call printo ( 'ERROR: Row set to zeros' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbke_getout"> TBKE_GETOUT  </a>-- Get ouput files
+C
+C  alan penny                      ral              1991 May
+
+      subroutine tbke_getout ( )
+
+      implicit none
+      include 'tbkey.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ierr, k
+      character head*20, cv*50, ihead*20
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabw ( 'OUT', IPO, TBVX, TBY, .false., ierr )
+      if ( ST_FAILED ) return
+
+      call get1c ( 'TITLE', cv, 'Output from TBKEY', .true. )
+      if ( ST_FAILED ) return
+
+      do k = 1, TBX							!Add new column headers
+         ihead = ' '
+         if ( k.eq.1 ) ihead = 'X'
+         if ( k.eq.2 ) ihead = 'Y'
+         if ( k.eq.3 ) ihead = 'MAGNITUDE'
+         call pargi ( k )
+         call printd ( 'Header for column %d ' )
+         call get1c ( 'HEADER', head, ihead, .true. )
+         if ( ST_FAILED ) return
+         call pthead ( 'OUT', k, head, ierr )
+      enddo
+
+      call ptdesc ( 'OUT', 'TITLE', cv )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbke_load"> TBKE_LOAD  </a>-- Load data into Get ouput file
+C
+C  alan penny                      ral              1991 May
+
+      subroutine tbke_load ( names, table, out )
+
+      implicit none
+      include 'tbkey.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      byte    names(20,TBYMAX)		!i: Names
+      real    table(TBX,TBYMAX)		!i: Data
+      real    out(TBVX,TBY)		!o: Output table
+C--
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, TBY
+         call amovz ( names(1,k), out(1,k), 20 )
+         call amovr ( table(1,k), out(6,k), TBX )
+      enddo
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbkey"> TBKEY  </a>-- Input numbers from keyboard into a table
+C   See TBKEY.HLP for details
+C
+C         A.J.Penny                RAL               1991 May
+
+      subroutine tbkey ( ierradam )
+
+      implicit none
+
+      integer        ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbkey
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBKEY.INC for TBKEY.F
+
+      integer    ipwka		!Work space A pointer
+      integer    ipwkb		!Work space B pointer
+      integer    ipo		!Output table pointer
+      integer    tbymax		!Output table max Y size
+
+      common / tbkeya / tbymax,  ipwka,  ipwkb,  ipo
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,466 @@
+<HTML> <HEAD>
+<TITLE> TBCALC </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBCALC - <br>
+ Calculate table elements
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+ Calculate table elements.
+<p>
+ 
+ This program allows arithmetic and mathematical functions to be
+ applied to a number of input tables and constants by means of a
+ FORTRAN-like expression which specifies the required functions. In
+ addition to the standard FORTRAN facilities, a number of special
+ functions are available (e.g. for adding noise).
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbcalc_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#method"> Method </a>
+<li> 2 <a href="#equations"> Equations </a>
+<li> 3 <a href="#input"> Input </a>
+<li> 4 <a href="#parameters"> Parameters </a>
+<li> 5 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ For up to 20 columns of the output table, the user inputs a
+ Fortran-like equation (through the parameters EQN1, EQN2, ...).
+ These equations can contain references to:-
+<p>
+<ul>
+<li> specified columns of specified tables (which must all have the
+     same number of rows, but mayhave different numbers of columns)
+<li> variables
+<li> constants
+<li> Fortran operators on these (e.g. '+', or 'cos()', ... )
+</ul><p>
+ 
+ (For more details on the structure of these equations ) see
+ the 'equation' sub-help.)
+<p>
+ 
+ For each specified output column, the relevant equation is
+ analysed and the operations are performed. Each row of that output
+ column contains the results of the equation, with the data for
+ the input tables coming from the matching row of those input tables.
+<p>
+ 
+ More specifically, the equations are analysed to identify the names
+ of tables and variables and to evaluate constants and are then
+ converted into reverse-Polish notation. The tables and variables are
+ prompted for in alphabetical order and the program then performs
+ simple 'stack-arithmetic' to evaluate the expression for each output
+ table element.
+<p>
+ 
+ The output table can be made by:-
+<p>
+<ul>
+<li>Imposing the calculated columns on a 'template' table - (which
+     must be one of the input tables, if there are any)
+<p><li> Imposing the calculated columns on a 'template' table - (which
+     must be one of the input tables, if there are any) - and zeroing
+     all the other columns.
+<p><li> Making a new table from scratch - whose total number of
+     columns is user defined, and whose columns that are not
+     calculated set to zero.
+</ul><p>
+ 
+ If a 'template' table is used, and any of the calculated columns
+ are 'beyond' the end of the template, then the output is extended
+ to hold those, with any columns missed out set to zero.
+<p>
+ 
+ The size of the output table is:-
+ 
+<ul>
+<li> That of the 'template' table, plus (optionally) some columns.
+<p><li> Or has a user defined number of columns with the number of rows
+    being the same as the number of rows in the input tables.
+<p><li> Or, if there are no input tables, the number or columns and rows
+    are user defined.
+</ul><p>
+ 
+<hr>
+ <h2> 2 <a name="equations"> Equations </h2> </a> <p>
+ 
+ 
+ An arithmetic expression of up to 80 characters which gives the
+ function to be evaluated for each output table element. The syntax
+ is similar to Fortran (same operator precedence, etc.) but with the
+ following differences:
+<p>
+<ol>
+<li>    Input tables are represented by any of the variables TAn1,
+        TBn2, ... to TZnm, where the 'A', 'B' etc., refer to the
+        table and the 'n1', 'n2', .. etc., refer the column number
+        in that table to use.
+
+<p><li> Numerical parameters by any of the variables variables A to Z
+
+<p><li> Constants by any numerical Fortran constant (real or integer,
+        including exponent if required).
+
+<p><li> Arithmetic is performed as though all values were real, The
+        actual calculations are performed in double precision, and
+        the results translated back to reals.
+
+<p><li> The standard Fortran functions are available and identified
+        by their generic names, i.e. SQRT, EXP, LOG10, LOG, SIN, COS,
+        TAN, ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH, ABS, AINT,
+        ANINT, MOD, SIGN, DIM, MIN & MAX. Note, however, that MIN
+        and MAX may take only 2 arguments.
+
+<p><li> To avoid problems with the way the Starlink environment
+        handles character parameters:-
+
+<ol>
+<p><li>  The comma ',' must be replaced with the colon ':',
+         for separating function arguments.
+
+<p><li>  The division sign '/' may be replaced by the percent sign '%',
+         although this latter substitution is not necessary when
+         replying to a prompt at the terminal.
+</ul><p>
+  
+
+<p><li> There are three extra functions available:-
+
+<p><dl>
+<dt><strong> CLIP(A,B,C)  </strong>
+<dd>                    This gives the value B so long as it lies in
+                     the interval A to C (inclusive). Otherwise it
+                     gives a zero result. It may be used to remove
+                     output values outside a certain range (e.g.
+                     if a division operation has resulted in very
+                     large output values).
+
+<p><dt><strong> GAUSS(X)     </strong>
+<dd>                     Gives gaussian noise with zero mean and
+                     standard deviation X (the value returned is
+                     different at each element and for each call
+                     of GAUSS).
+
+<p><dt><strong> RAN(X)     </strong>
+<dd>                     Gives uniform noise with a value between zero
+                     and X (the value returned is different at each
+                     element and for each call of RAN).
+</dl>
+<p><li> The equation can hold the characters 'RR' and 'CC'. These
+        denote the 'row number' and the 'column number'.
+
+</ul><p>
+ 
+  For example, an equation of the form:-
+<p>
+ 
+        TA2*3.3 + 0.5 + COS(TB1) + A + MOD(RR:10.0) + CC%3
+<p>
+ 
+  will fill each row of a specified output column with:-
+<p>
+ 
+    ( 3.3 times element in that row of column 2 of input table
+        specified through parameter 'INA' ) <br>
+  + ( 0.5 ) <br>
+  + ( cosine of element in that row of column 1 of input table
+        specified through parameter 'INB' ) <br>
+  + ( the user defined value of the variable 'A' ) <br>
+  + ( row number, modulo 10 ) <br>
+  + ( (column number)/3 ) <br>
+   
+
+<p>
+ 
+<hr>
+ <h2> 3 <a name="input"> Input </h2> </a> <p>
+ 
+ 
+  Only tables and variables used in the expressions are prompted for and
+  these are requested in alphabetical order, and only once each.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 4.1 <a href="#a"> A </a>
+<li> 4.2 <a href="#clear"> Clear </a>
+<li> 4.3 <a href="#column"> Column </a>
+<li> 4.4 <a href="#eqn"> Eqn </a>
+<li> 4.5 <a href="#head"> Head </a>
+<li> 4.6 <a href="#ina"> Ina </a>
+<li> 4.7 <a href="#inb"> Inb </a>
+<li> 4.8 <a href="#numcols"> Numcols </a>
+<li> 4.9 <a href="#numrows"> Numrows </a>
+<li> 4.10 <a href="#out"> Out </a>
+<li> 4.11 <a href="#seed"> Seed </a>
+<li> 4.12 <a href="#template"> Template </a>
+<li> 4.13 <a href="#title"> Title </a>
+<li> 4.14 <a href="#use_template"> Use&#95 template </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 4.1 <a name="a"> A </h2> </a> <p>
+ 
+  (Default - 0.0           <br> Range -1.0e37 to 1.0e37
+<p>
+ 
+  The value to be used in the expressions for the value of
+  the variable 'A'.
+<p>
+ 
+  [This help applies to any of the input variables from 'A', 'B',
+   'C' .... 'Z'.]
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="clear"> Clear </h2> </a> <p>
+ 
+  (Default - 'no'     <br> Choice - 'yes:no')
+<p>
+ 
+  Are the columns of the output table that have not been set by
+  the equations to be set to zeroes?
+<p>
+ 
+<hr>
+ <h2> 4.3 <a name="column"> Column </h2> </a> <p>
+ 
+  (Default - 1       <br> Range - 0 to 999 )
+<p>
+ 
+  The column number in the output table that the results of the
+  calculations from the equation are to be put into.
+<p>
+ 
+  A response of zero indicates that no more columns are to be
+  calculated.
+<p>
+ 
+  [This help applies to 'COLUMN1', 'COLUMN2', ... 'COLUMN20'
+   which apply to any of the up to 20 input equations.]
+<p>
+ 
+<hr>
+ <h2> 4.4 <a name="eqn"> Eqn </h2> </a> <p>
+ 
+  (Default - null          <br> Choice - as defined below)
+<p>
+ 
+  The FORTRAN-style expression that gives the elements in the
+  defined (by 'ColumnN') column in the output table.
+<p>
+ 
+  Its style is given the 'equation' section of this help.
+<p>
+ 
+  [This help applies to 'EQN1', 'EQN2', ... 'EQN20'
+   of any of the up to 20 input equations.]
+<p>
+ 
+<hr>
+ <h2> 4.5 <a name="head"> Head </h2> </a> <p>
+ 
+  (Default - see below          <br> Choice - any)
+<p>
+ 
+  The (up to) 20 character string giving the 'header' of the
+  column for the first equation.
+<p>
+ 
+  The default will be that of the template table or just blanks
+  if there is no template.
+<p>
+ 
+  [This help applies to 'HEAD1', and any of the other 'HEAD2',
+   'HEAD3', .... 'HEAD20', of the up to 20 input equations,
+   each with its own column from 'NCOLUMN1' , etc..]
+<p>
+ 
+<hr>
+ <h2> 4.6 <a name="ina"> Ina </h2> </a> <p>
+ 
+ (Default - null)
+<p>
+ 
+ The input table corresponding to 'TA' to be used in the arithmetic
+ expressions.
+<p>
+ 
+ If a template is used, and no tables are mentioned in the equation,
+ this will be used for the template file.
+<p>
+ 
+<hr>
+ <h2> 4.7 <a name="inb"> Inb </h2> </a> <p>
+ 
+ (Default - null)
+<p>
+ 
+ The input table corresponding to 'TB' to be used in the arithmetic
+ expressions.
+<p>
+ 
+ [This help is also used for the other input tables 'TC', ... 'TZ'.]
+<p>
+ 
+<hr>
+ <h2> 4.8 <a name="numcols"> Numcols </h2> </a> <p>
+ 
+  (Default - largest column number defined    <br> Range - that to 999)
+<p>
+ 
+  The number of columns in the output table. If a template table is
+  not being used, then this must be a user-defined value. This
+  number must be at least as large as the largest column number
+  defined for any of the equations.
+<p>
+ 
+<hr>
+ <h2> 4.9 <a name="numrows"> Numrows </h2> </a> <p>
+ 
+  (Default - 1             <br> Range - 1 to 100000)
+<p>
+ 
+  If there are no input tables, the user has the choice of how
+  many rows there are in the output table. Then all the rows will
+  have the same set of values for the columns. The names of the
+  rows will be '#1', '#2', etc..
+<p>
+ 
+<hr>
+ <h2> 4.10 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The output table to contain the result.
+<p>
+ 
+ This contains the defined columns. There may be other columns. These
+ other columns contain either the values from the input template table,
+ or are full of zeroes if there was;- no input tables, no input
+ template table, or the user decided to set those columns to zero.
+<p>
+ 
+ The size of the output table is:-
+<p>
+<ul>
+<li> That of the 'template' table, plus (optionally) some columns.
+<p><li> Or has a user defined number of columns with the number of rows
+    being the same as the number of rows in the input tables.
+<p><li> Or, if there are no input tables, the number or columns and rows
+    are user defined.
+</ul><p>
+ 
+  The names of the rows will either be those from the template table,
+  or will be '#1', '#2', etc..
+<p>
+ 
+  The table is stored as a standard Starman table in an ADAM .SDF image,
+  with `real' 32-bit real values.
+<p>
+ 
+<hr>
+ <h2> 4.11 <a name="seed"> Seed </h2> </a> <p>
+ 
+  (Default - 1234567891    <br> Range - 1200000001 to 1400000001)
+<p>
+ 
+  The seed number to be used in any random number generators.
+  This is used in the 'GAUSS()' and 'RAN()' operators. These
+  will provide the same pattern of numbers in the same
+  seed number is input.
+<p>
+ 
+  It has to be a large positive odd number.
+<p>
+ 
+<hr>
+ <h2> 4.12 <a name="template"> Template </h2> </a> <p>
+ 
+  (Default - 'none'      <br> Choice - 'none:ta:tb:tc:td:te:tf:tg:th:ti:tj:
+                                   tk:tl:tm:tn:to:tp:tq:tr:ts:tt:tu:
+                                   tv:tw:tx:ty:tz')
+<p>
+ 
+  The parameter that defines the input table to be used as the
+  template for the output table.
+<p>
+ 
+  If a template tables is used (selected from the 'TA', etc. parameters
+  that must come from those already used in the 'EQN1', etc.,
+  parameters), then the output table is a copy of the that template
+  table, except for the new columns values from the equations (with
+  the choice of zeroing all the other values).
+<p>
+ 
+  If a table is mention in the equations, then the first 'default's and
+  'choice's are used. If not, then the second are.
+<p>
+ 
+<hr>
+ <h2> 4.13 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - title of input template table or 'Output from Tbcalc'
+   Choice - any )
+<p>
+ 
+  The title for the output table.
+<p>
+ 
+<hr>
+ <h2> 4.14 <a name="use_template"> Use&#95 template </h2> </a> <p>
+ 
+  (Default - 'no'        <br> Choice - 'yes:no' )
+<p>
+ 
+  There are no input tables, so use a template table to provide
+  names, headers, number of rows and columns?
+<p>
+ 
+<hr>
+ <h2> 5 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny              RAL            1991 Dec
+   (adapted from MATHS of R.F.Warren-Smith)
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

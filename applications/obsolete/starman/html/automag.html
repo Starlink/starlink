@@ -1,0 +1,1276 @@
+<HTML> <HEAD>
+<TITLE> AUTOMAG - automatic aperture photometry on stars </TITLE>
+</HEAD> <BODY>
+ 
+<h1> AUTOMAG - automatic aperture photometry on stars </h1>
+ 
+ 
+<hr>
+ 
+  This does automatic simple aperture photometry on stars in an image.<p>
+ 
+  It finds them and does the aperture photometry.
+  It can also:-
+ 
+<ul>
+<li> Correct for exposure time
+<li> Find the Zenith distance (from the image or a standards file)
+<li> Find the Filter used
+<li> Apply the extinction correction
+<li> Use object name to find the stars standard magnitude from a file
+<li> Compare measured with standard magnitude
+<li> Output results to a text file as well as the terminal
+</ul>
+ 
+A density of one star per 100x100 pixel area is fine.<p>
+ 
+Go to <a href="intro.html#automag_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#automag"> Introduction </a>
+<li> 2 <a href="#method"> Method </a>
+<ul>
+<li> 2.1 <a href="#date"> Date </a>
+<li> 2.2 <a href="#error"> Error </a>
+<li> 2.3 <a href="#exposure"> Exposure </a>
+<li> 2.4 <a href="#star_ra_and_decs"> Star RAs and Decs </a>
+<li> 2.5 <a href="#sec_z"> Sec z </a>
+<li> 2.6 <a href="#sky_levels"> Sky levels </a>
+<li> 2.7 <a href="#sky_locations"> Sky locations </a>
+<li> 2.8 <a href="#star_finding"> Star finding </a>
+</ul>
+<li> 3 <a href="#use"> Use </a>
+<li> 4 <a href="#input"> Input </a>
+<li> 5 <a href="#output"> Output </a>
+<li> 6 <a href="#image_descriptors"> Image descriptors </a>
+<li> 7 <a href="#parameters"> Parameters </a>
+<li> 8 <a href="#author"> Author </a>
+</ul>
+ 
+Go to <a href="main.html"> Starman Help Main. </a>
+<p>
+ 
+ 
+<hr>
+ <h2> 1 <a name="automag"> Introduction </h2> </a> <p>
+ 
+ 
+  This does simple aperture photometry on stars in an image. It works
+  automatically, finding the stars, doing the aperture photometry and
+  outputting the results. It uses the (optional) presence of an
+  exposure time descriptor to correct the magnitude to that for a
+  1 second exposure.
+<p>
+ 
+  It can also, depending on the presence of the appropriate information
+  in the image descriptors and the users wish:-
+<p>
+ 
+<ul>
+<li> Find the Zenith distance (either from the image or a standards file)
+<li> Find the Filter used
+<li> Apply the extinction correction
+<li> Look up the object name in a file and find the appropriate
+      standard magnitude, which it then compares to the measured magnitude
+<li> Output results to a text file as well as the terminal
+</ul>
+ 
+  It works best if the stars are widely dispersed in the image.
+  A density of one star per 100x100 pixel area is fine, although
+  somewhat higher densities are acceptable.
+<p>
+ 
+ 
+<hr>
+ <h2> 2 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+  <h3> Measuring the stars </h3><p>
+ 
+  It finds stars as groups of pixels which are more than a certain value
+  above the sky level. It then finds the centre of these groups, and puts
+  an aperture round them, giving the flux in the aperture. It then
+  finds the sky level in up to four apertures located around the star,
+  finds the mean sky level, deducts that from the star aperture flux, to
+  give the star flux.
+<p>
+ 
+  This flux is then turned into a magnitude by the formula
+<p>
+ 
+<pre>
+               Magnitude = 30.0 - 2.5*log  (flux)
+                                         10
+</pre>
+ 
+  <h3> Correcting for exposure time </h3><p>
+ 
+  This magnitude is then corrected for the exposure time. The flux
+  is changed to that it would have had in a 1 second exposure, that is
+<p>
+ 
+<pre>
+               Magnitude = magnitude + 2.5*log (exp time)
+                                              10
+</pre>
+ 
+  <h3> Correcting for extinction </h3> <p>
+ 
+  If the user desires, then the magnitude can be corrected for extinction.
+<p>
+ 
+  This is done by taking the RA and Dec and Sidereal time from the image
+  descriptors, and working out the Sec Z of the exposure. Then the filter
+  that was used in the exposure is found from an image descriptor, and
+  used with the extinction input by the user for such a filter to work
+  out the extinction.
+<p>
+ 
+  The Sec Z is worked out in first order terms as:-
+<p>
+ 
+<pre>
+ 
+                                 1.0
+      SecZ =  ------------------------------------------
+              sin(lat)*sin(dec)+cos(lat)*cos(dec)*cos(ha)
+</pre>
+ 
+  A corrected magnitude is then worked out as:-
+<p>
+ 
+<pre>
+            Magnitude = magnitude - Extinction*(SecZ-1.0)
+</pre>
+ 
+ 
+  It is possible to get the image RA and Dec not from the image
+  descriptors, but from the standards file. In this case the
+  star name in the image descriptors is taken, and that name looked
+  for in the standards file.
+<p>
+ 
+ 
+<h3> Checking against a standard magnitude </h3> <p>
+ 
+  If the user desires, the standard magnitude of the star in the
+  waveband used may be found from the input standards file. In this
+  case, the star name in the image descriptors is taken, and that
+  name looked for in the standards file. The magnitude in the
+  waveband used, for that star is then output, together with the
+  difference between the `observed' magnitude and the standard
+  magnitude.
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="date"> Date </h2> </a> <p>
+ 
+ 
+ If a standard magnitude file is used, then the user has to input the
+ date of the exposure. This is because there is no standard format
+ for date formats. It should be input in format YYYY/MM/DD. A default
+ reply is acceptable.
+<p>
+ 
+ The date is used for the precession of the standard star positions
+ to the date of the observation.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="error"> Error </h2> </a> <p>
+ 
+ 
+ The error in the output magnitude is calculated.
+<p>
+ 
+ The calculations are done on the assumption that the pixel values in
+ the image are the result of a Poissonian noise signal. There are two
+ modifiers to this. First, that the numbers in the image have been scaled,
+ so that a gain is needed to reconstruct the original Poissonian values.
+ Second, that an extra source of noise has been added to each pixel. Thus
+ if a pixel has a raw value of k (and the image has scale of BSCALE, and
+ zero of BZERO), then the true pixel value is BSCALE.k + BZERO. Then if
+ the Poissonian gain is GAIN, and the extra noise is NOISE, the noise in
+ the pixel is:-
+<p>
+ 
+<pre>
+        square root[GAIN.(BSCALE.k+BZERO) + NOISE.NOISE]
+</pre>
+ 
+ Following on from this assumption, the error in the star magnitude
+ is calculated as:-
+<p>
+ 
+  The variance of the sky estimate is:-
+ 
+<pre>
+ varsky = [(BSCALE.skyfl+BZERO).GAIN + skypix.NOISE.NOISE]
+          ------------------------------------------------
+                               skypix
+</pre>
+ 
+ The variance of the star estimate is then:-
+ 
+<pre>
+ varstar = (BSCALE.starfl+BZERO).GAIN + starpix.NOISE.NOISE
+            + starpix.varsky
+</pre>
+ 
+  The RMS star error is then:-
+ 
+<pre>
+ err = sqrt(varstar)/((BSCALE.starfl+BZERO)*GAIN)
+ RMS = 2.5.alog10(1.0+err)
+ 
+ where   skyfl   = total flux in all used sky apertures
+         starfl  = total flux in star aperture
+         skypix  = total no of pixels in all used sky apertures
+         starpix = no of pixels in star aperture
+</pre>
+ 
+<hr>
+ <h2> 2.3 <a name="exposure"> Exposure </h2> </a> <p>
+ 
+ 
+ The exposure time is used for correcting the magnitude of the star.
+ This is done by calculating the flux that the star would have had
+ if the exposure had been 1 second long.
+<p>
+ 
+ The actual exposure time used in this calculation is not
+ necessarily that in the image descriptor. First of all the image
+ exposure time descriptor is read, and then offered to the user as
+ the default exposure time. The user can then accept this, or input
+ any value she likes. The point of allowing the user to do this is
+ that sometimes the time loaded in the exposure time descriptor is
+ missing or wrong.
+<p>
+ 
+ There is then added an extra time, input by the user via the 'EXPOFF'
+ parameter, to give the final adopted exposure time. This extra offset,
+ which is added to all the times of the images measured, is intended
+ to allow for shutter timing mechanisms which introduce an offset
+ between the actual and recorded exposure times.
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="star_ra_and_decs"> Star RAs and Decs </h2> </a> <p>
+ 
+ 
+ The program takes the position of the star either to be the
+ position in the standards file, precessed to the date of the
+ observation, or the RA, Dec of the image as noted in its header.
+ This second method depends on the telescope pointing being good
+ and the offset of the star in the image from the (RA,Dec)
+ reference point not to be too large.
+<p>
+ 
+ If both the standard file and image position descriptors are
+ present, then the user has the option of deciding which will
+ be used to determine the position.
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="sec_z"> Sec z </h2> </a> <p>
+ 
+ 
+  The Sec Z is worked out in first order terms as:-
+<p>
+<pre>
+ 
+                              1.0
+ SecZ =    -----------------------------------------------
+           sin(lat)*sin(dec)+cos(lat)*cos(dec)*cos(ra-sidt)
+</pre>
+ 
+<hr>
+ <h2> 2.6 <a name="sky_levels"> Sky levels </h2> </a> <p>
+ 
+ 
+  <hr> Level in a single aperture </h3><p>
+ 
+ The sky levels are calculated for each sky aperture. All 'good'
+ pixels are taken in the area, and the mean taken.
+<p>
+ 
+ It is important that this is the mean, because these sky levels
+ will be used to subtract a sky from the star aperture. If a
+ value was used which discarded high values (due to faint stars),
+ such as medians or other methods, then there will be a systematic
+ error introduced into the star magnitudes.
+<p>
+ 
+ This is because there will be faint stars in the star aperture
+ and these will be simply added in, so the same proceedure must
+ be used for the sky apertures.
+<p>
+ 
+ The problem of a bright star falling by chance in a sky aperture
+ is dealt with in the averaging described below.
+<p>
+ 
+<h3> Mean level used </h3><p>
+ 
+ When more than one sky aperture is used, then a mean level is
+ calculated. For the case of two apertures, a simple mean is
+ taken. For three or four apertures, the two apertures whose
+ levels are closest together is taken, and then any other
+ aperture whose level is within a user input fractional tolerance
+ of that level. The default value for this tolerance is 0.1 of the
+ star flux. The value used is input through AVLIM.
+<p>
+ 
+ Then the mean is made from the selected apertures.
+<p>
+ 
+<h3> Record of differences </h3><p>
+ 
+ To see if any of the apertures is contaminated (say by a bright
+ star), the magnitudes that would have been calculated if each
+ aperture in turn was taken as the sole sky level is calculated.
+ The differences of these from the actually calculated mean is
+ calculated and typed out (as the 'Sk1', 'Sk2', etc.). So the
+ user can see from these if there was any contamination that has
+ disturbed the mean.
+<p>
+ 
+ If there are more than two apertures, often only one is contaminated,
+ and this is thrown out by the averaging process described above. So
+ the mean may well be correct. A good indicator of this is that two or
+ three of the apertures show very good agreement with the mean, and
+ one is distant from it. This tells you that the mean was made without
+ the discordant aperture.
+<p>
+ 
+<hr>
+ <h2> 2.7 <a name="sky_locations"> Sky locations </h2> </a> <p>
+ 
+ 
+  The number and location of the sky apertures is defined by the
+  user. Up to four apertures may be used. These are distributed
+  in an X-Y frame around the star aperture, where the X-Y offsets
+  give the X-Y distances in pixels between the star aperture
+  centre and the sky aperture centres.
+<p>
+ 
+  The default is a star aperture diameter of 40 pixels, and four
+  sky apertures, each of 20 pixels diameter, located to the left
+  right, up and down from the star aperture with star-sky
+  centre distances of 40 pixels. Thus the sky apertures come within
+  10 pixels of the star aperture.
+<p>
+ 
+<hr>
+ <h2> 2.8 <a name="star_finding"> Star finding </h2> </a> <p>
+ 
+ 
+  The program finds stars by looking for blocks of pixels above the
+  sky level.
+<p>
+ 
+  The position found by the program is the centroid of the contiguous
+  pixels above the threshold level above the overall image sky level.
+  This centroid gives equal weight to all these pixels, regardless
+  of their pixel values. The search for contiguous pixels is only
+  done in a box of size which is input by the user (with a default of
+  side 100 pixels). This box is such that the first pixel found
+  (in a search along X lines, goin up in the Y direction line-by-line),
+  is centered in the box in the X direction, and at the bottom of
+  the box in the Y direction.
+<p>
+ 
+  If the star images are reasonably in focus, then it is possible
+  to refine this position by fitting a Gaussian with a variable
+  profile at that location.
+<p>
+ 
+  This gives a more accurate centering, but has the risk that the
+  star image may be so strange as to cause the Gaussian fitting
+  subroutine to fail catastrophically.
+<p>
+ 
+  Also if the stars are not in focus, then the fit may well fail
+  or give the wrong position.
+<p>
+ 
+  Stars with positions within a box of side 16 pixels centered on any
+  other star found are rejected.
+<p>
+ 
+  Up to 200 stars can be found. If there are more then they are
+  ignored. There is the possibility that this may result in less than
+  200 stars, as some of them may be close to others, and will thus
+  be ignored.
+<p>
+ 
+ 
+<hr>
+ <h2> 3 <a name="use"> Use </h2> </a> <p>
+ 
+ 
+  The program starts off by asking you what type of measuring
+  do you want to do:-
+<p>
+ 
+<ul>
+<li>    Measure one or a number of images with the same parameters
+<li>    Use the Gaussian centering after the centroid finding
+<li>    Make an output results file
+<li>    Calculate the zenith distance of the image
+<li>    Use the image filter to determine the extinction correction
+        (needs SecZ calculation)
+<li>    Use a standard position and magnitude file to calculate the
+        difference from the standard magnitude (needs SecZ and filter
+        calculation)
+</ul>
+ 
+  It then asks you for a number of parameters associated with the
+  the star finding and measuring process.
+<p>
+ 
+  Then there are a number of sections of parameter questions that are
+  asked depending on which of the measuring options you have chosen
+<p>
+ 
+<ul>
+<li> Output file
+<li> Zenith distance (Star position in RA and Dec and site latitude)
+<li> Use of filters for extinction calculations
+<li> Use of standard file for standard magnitude calculations
+</ul>
+ 
+  Then the name of the input image file is asked for, and then the user
+  is given the chance to correct the exposure time.
+<p>
+ 
+  The program then does the calculations and outputs the results to
+  the terminal and (optionally) the file.
+<p>
+ 
+  If the user is doing more than one image, the program loops back
+  to ask for the new image file name ( and the new corrected exposure
+  time), and does the new calculations. This loop is repeated until
+  a blank is input as the file name.
+<p>
+ 
+ 
+<hr>
+ <h2> 4 <a name="input"> Input </h2> </a> <p>
+ 
+ 
+  The input image is the standard Starman image file. It can have the
+  'BSCALE' and 'BZERO' pixel value scaling, and the bad pixel magic
+  value 'INVAL'.
+<p>
+ 
+  The optional standards file is a Starman table of the
+  positions and magnitudes of stars. It has to have:-
+ 
+<ul>
+<li> the standard Identifiers (star names)
+<li> the Right Ascension of the star (in radians)
+<li> the Declination of the star (in radians)
+<li> the Equinox of the position (Julian epoch - e.g. 1990.234)
+<li> at least one magnitude
+</ul>
+ 
+  The magnitudes of different colours must be as magnitudes, not colours.
+  I.e., a star with V=16.00 and B-V of 1.00 would have two entries, one
+  for V=16.00 and one for B=17.00.
+<p>
+ 
+  The columns containing the magnitudes must have descriptors telling
+  what waveband is in each column. In the example above, for example, the
+  V column could have a descriptor with 'V', and the B column one of 'B'.
+<p>
+ 
+  The column descriptors must be in the standard Starman table style, as
+  HEADxxx, where xxx = 001, 002, etc. Thus in the example above the
+  descriptors would be:-
+ 
+<pre>
+          name      content
+          ----      -------
+          HEAD001   RA
+          HEAD002   DEC
+          HEAD003   EQUINOX
+          HEAD004   V
+          HEAD005   B
+</pre>
+ 
+ 
+<hr>
+ <h2> 5 <a name="output"> Output </h2> </a> <p>
+ 
+ 
+ The output of the program is typed to the terminal, and can optionally
+ be output to a text ASCII file (with a .DAT modifier). The file contains
+ a copy of what is put out to the terminal, except that there is one line
+ of header information at the start.
+<p>
+ 
+ The listing below gives an example of the output:-
+<p>
+ 
+<pre>
+ -----------------------------------------------------------------------
+ Example Output of AUTOMAG
+ 
+ 
+ Image name is :-  fred_1
+  Star     X      Y        Top     Mag   Rms    Sk1   Sk2   Sk3   Sk4
+    1    100.0  100.0    1000.0  23.263 0.003 -0.001 0.002-0.003 0.003
+ 
+  Filter= V :Sec Z= 1.059  :Exp time= 101.000
+  Image:-    RA= 13  0 29   :Dec= +12 12 12   :Sid T= 12 34 56
+   File:-    RA= 12 13 23   :Dec= +11 27 30
+ 
+  Raw Mag    Sec Z Corrected     Std     Mag-Std
+      23.263    23.245          18.100   5.145
+ -----------------------------------------------------------------------
+</pre>
+ 
+  Comments:-<p>
+ 
+<ul>
+<li>  The 'Sk1', 'Sk2', etc., give the corrections that would have to be
+      added to the mean magnitude, if the sky level in the associated
+      sky aperture alone were to be used to estimate the sky level.
+<li>  In this particular case, the 'File' position was selected to be
+      used instead of the 'Image' position in calculating the SecZ.
+<li>  The final magnitude has been calculated using the mean sky
+      level from all four sky apertures, as they all lie with a
+      user input tolerance (default +/- 10%) of the mean.
+<li>  The exposure time put out is the image exposure time (perhaps
+      changed by the user) plus the offset input by the user via the
+      'EXPOFF' parameter. It is then time used in the calculations.
+</ul>
+ 
+<hr>
+ <h2> 6 <a name="image_descriptors"> Image descriptors </h2> </a> <p>
+ 
+ 
+  The image can contain much necessary ancillary information as
+  descriptors. This is used by the program. Unfortunately there is
+  no standard naming or format scheme. So the program is as flexible
+  as possible on the input. The user can define the names of the
+  descriptors carrying the relevant information.
+<p>
+ 
+  The user can even say where in some descriptor the information is.
+  This is because sometimes information, such as the object name, does
+  not take up the entire descriptor, but is placed within the descriptor.
+<p>
+ 
+<pre>
+  Descriptor Content      Default Name    Select Location?
+  ------------------      ------------    ----------------
+  Object name             OBJECT              yes
+  Right Ascension         RA                  no
+  Declination             DEC                 no
+  Exposure time           EXPOSURE            yes
+  Sidereal time           SIDTIME             yes
+  Filter name             FILTER              yes
+</pre>
+ 
+<hr>
+ <h2> 7 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 7.1 <a href="#avlim"> Avlim </a>
+<li> 7.2 <a href="#box"> Box </a>
+<li> 7.3 <a href="#date"> Date </a>
+<li> 7.4 <a href="#decname"> Decname </a>
+<li> 7.5 <a href="#docentre"> Docentre </a>
+<li> 7.6 <a href="#dofile"> Dofile </a>
+<li> 7.7 <a href="#dofilt"> Dofilt </a>
+<li> 7.8 <a href="#domult"> Domult </a>
+<li> 7.9 <a href="#dosecz"> Dosecz </a>
+<li> 7.10 <a href="#dostds"> Dostds </a>
+<li> 7.11 <a href="#exploc"> Exploc </a>
+<li> 7.12 <a href="#expname"> Expname </a>
+<li> 7.13 <a href="#expoff"> Expoff </a>
+<li> 7.14 <a href="#extinc"> Extinc </a>
+<li> 7.15 <a href="#filtloc"> Filtloc </a>
+<li> 7.16 <a href="#filtname"> Filtname </a>
+<li> 7.17 <a href="#fname"> Fname </a>
+<li> 7.18 <a href="#fsname"> Fsname </a>
+<li> 7.19 <a href="#gain"> Gain </a>
+<li> 7.20 <a href="#header"> Header </a>
+<li> 7.21 <a href="#in"> In </a>
+<li> 7.22 <a href="#latitude"> Latitude </a>
+<li> 7.23 <a href="#noise"> Noise </a>
+<li> 7.24 <a href="#nsky"> Nsky </a>
+<li> 7.25 <a href="#objloc"> Objloc </a>
+<li> 7.26 <a href="#objname"> Objname </a>
+<li> 7.27 <a href="#offset"> Offset </a>
+<li> 7.28 <a href="#out"> Out </a>
+<li> 7.29 <a href="#posntype"> Posntype </a>
+<li> 7.30 <a href="#raname"> Raname </a>
+<li> 7.31 <a href="#sidtloc"> Sidtloc </a>
+<li> 7.32 <a href="#sidtname"> Sidtname </a>
+<li> 7.33 <a href="#skydia"> Skydia </a>
+<li> 7.34 <a href="#stardia"> Stardia </a>
+<li> 7.35 <a href="#stdmast"> Stdmast </a>
+<li> 7.36 <a href="#stds"> Stds </a>
+<li> 7.37 <a href="#thresh"> Thresh </a>
+<li> 7.38 <a href="#time"> Time </a>
+</ul>
+ 
+<hr>
+ <h2> 7.1 <a name="avlim"> Avlim </h2> </a> <p>
+ 
+  (Default - 0.1              Range 0.0 - 1.0e8)
+<p>
+ 
+  When averaging the flux estimates of the star when subtracting
+  each of the (up to) four sky levels, how far away (in fractional terms
+  - roughly magnitudes) can a measure be from the mean of the two nearest
+  pair of estimates? If an estimate is more than 'avlim' times the mean
+  flux, it is rejected and the mean recalculated. This stops if none are
+  that far away of if only two estimates left.
+<p>
+ 
+<hr>
+ <h2> 7.2 <a name="box"> Box </h2> </a> <p>
+ 
+  (Default - 100              Range - 1 to 10000)
+<p>
+ 
+  Side of box within which to search for a star's pixels.
+<p>
+ 
+  The search for contiguous pixels above the threshold level which
+  denote a star is only done in a box of this size. This box is such
+  that the first pixel found (in a search along X lines, goin up in
+  the Y direction line-by-line), is centered in the box in the X
+  direction, and at the bottom of the box in the Y direction.
+<p>
+ 
+  If the box is too large, the search takes too long. If it is too
+  small (in relation to the star image size), then star pixels may be
+  missed, skewing the location of the centroid.
+<p>
+ 
+  The default is probably a good compromise for 'normal' images. However
+  for very out-of-focus images, the star 'size' may be larger than than
+  100 pixels, so you should select a larger box.
+<p>
+ 
+<hr>
+ <h2> 7.3 <a name="date"> Date </h2> </a> <p>
+ 
+  (Default - '2001/01/01'       Range - see below)
+<p>
+ 
+  The date of the observation. This is asumed to be the same for all
+  of the images to be used. It is input as Julian epoch number. The
+  month must be in the range 01 to 12, and the day 01 to the end of
+  the month input. The format must be as the default - 'YYYY/MM/DD'.
+<p>
+ 
+  This is used to precess the standards file positions to the date of
+  the observation, so it does not need to be very precise.
+<p>
+ 
+<hr>
+ <h2> 7.4 <a name="decname"> Decname </h2> </a> <p>
+ 
+  ( Default - 'DEC'        Choice - see below)
+<p>
+ 
+  The name of the descriptor in the image file where the Declination
+  of the exposure may be found.
+<p>
+ 
+   'none' is valid entry. The Declination will then be got from the
+   standards file, if this image has a star name and that name is in it.
+<p>
+ 
+<hr>
+ <h2> 7.5 <a name="docentre"> Docentre </h2> </a> <p>
+ 
+  (Default - 'No'             Choice - 'Yes/No')
+<p>
+ 
+  Should the position found by the program be refined by fitting
+  a Gaussian to the location?
+<p>
+ 
+  The position found by the program is a centroid of the contiguous
+  pixels above the threshold level above the overall image sky level.
+  (For details on this see the 'Method - Star Location' help section.)
+<p>
+ 
+  If the star images are reasonably in focus, then it is possible
+  to refine this position by fitting a Gaussian with a variable
+  profile at that location.
+<p>
+ 
+  This gives a more accurate centering, but has the risk that the
+  star image may be so strange as to cause the Gaussian fitting
+  subroutine to fail catastrophically.
+<p>
+ 
+  Also if the stars are not in focus, then the fit may well fail
+  or give the wrong position.
+<p>
+ 
+<hr>
+ <h2> 7.6 <a name="dofile"> Dofile </h2> </a> <p>
+ 
+  (Default - 'No'             Choice - 'Yes/No')
+<p>
+ 
+  Output a copy of the results, which are put on the output terminal,
+  to an output text ASCII file?
+<p>
+ 
+<hr>
+ <h2> 7.7 <a name="dofilt"> Dofilt </h2> </a> <p>
+ 
+  (Default - 'No'             Choice - 'Yes/No')
+<p>
+ 
+  Get the filter information in the image descriptors?
+<p>
+ 
+  This is used (together with the calculated SecZ and input extinction)
+  to calculate the extinction correction to be applied to the measured
+  magnitude.
+<p>
+ 
+<hr>
+ <h2> 7.8 <a name="domult"> Domult </h2> </a> <p>
+ 
+  (Default - 'No'             Choice - 'Yes/No')
+<p>
+ 
+  Do calculations on a number of input images ('Yes'), or on just one
+  ('No')?
+<p>
+ 
+<hr>
+ <h2> 7.9 <a name="dosecz"> Dosecz </h2> </a> <p>
+ 
+  (Default - 'No'             Choice - 'Yes/No')
+<p>
+ 
+  Calculate the zenith distance (as SecZ) of the exposure?
+<p>
+ 
+<hr>
+ <h2> 7.10 <a name="dostds"> Dostds </h2> </a> <p>
+ 
+  (Default - 'No'             Choice - 'Yes/No')
+<p>
+ 
+  Use the magnitudes in a standards file to calculate the difference
+  between the observed magnitude and the standard magnitude?
+<p>
+ 
+<hr>
+ <h2> 7.11 <a name="exploc"> Exploc </h2> </a> <p>
+ 
+  (Default - 1,79              Range - 1 to 256)
+<p>
+ 
+  The location in the image exposure time descriptor of the
+  characters which give the exposure time.
+<p>
+ 
+  If they are the only characters in the descriptor, then the
+  default can be taken.
+<p>
+ 
+<hr>
+ <h2> 7.12 <a name="expname"> Expname </h2> </a> <p>
+ 
+  ( Default - 'EXPOSED'        Choice - see below)
+<p>
+ 
+  The name of the descriptor in the image file where the exposure time
+  of the exposure may be found.
+<p>
+ 
+  If 'none' is input, then no descriptor is looked for, and the
+  time is set at 1.0 seconds.
+<p>
+ 
+<hr>
+ <h2> 7.13 <a name="expoff"> Expoff </h2> </a> <p>
+ 
+  (Default - 0.0           Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  The offset to add to the exposure time when doing all the
+  calculations that involve the exposure time.
+<p>
+ 
+  This time is added to the exposure time in the image descriptor
+  (possibly modified in the program by the user).
+<p>
+ 
+<hr>
+ <h2> 7.14 <a name="extinc"> Extinc </h2> </a> <p>
+ 
+  (Default - see below            Range - 0.0 to 1.0e8)
+<p>
+ 
+  The extinction at unit airmass for the filter input by the user.
+<p>
+ 
+  These are up to the nine parameters 'EXTINC1', 'EXTINC2', ... 'EXTINC9'
+  for the extinctions at unit airmass for the nine possible
+  filters whose names are input with the 'FNAME1', 'FNAME2', ...
+  'FNAME9' parameters. The matching is asked for each of the 'FNAME'
+  parameters input.
+<p>
+ 
+  The default extinctions for the first, second, third, ... filters are:-
+       0.68, 0.28, 0.15, 0.10, 0.07, 0.10, 0.04, 0.06, 0.06 -
+  which are designed for the UBVRIJHKL extinctions.
+<p>
+ 
+<hr>
+ <h2> 7.15 <a name="filtloc"> Filtloc </h2> </a> <p>
+ 
+  (Default - 1,79              Range - 1 to 256)
+<p>
+ 
+  The location in the image filter descriptor of the
+  characters which give the filter used.
+<p>
+ 
+  If they are the only characters in the descriptor, then the
+  default can be taken.
+<p>
+ 
+<hr>
+ <h2> 7.16 <a name="filtname"> Filtname </h2> </a> <p>
+ 
+  ( Default - 'FILTER'        Choice - see below)
+<p>
+ 
+  The name of the descriptor in the image file where the filter
+  of the exposure may be found.
+<p>
+ 
+<hr>
+ <h2> 7.17 <a name="fname"> Fname </h2> </a> <p>
+ 
+  (Default = ' '             Choice - see below)
+<p>
+ 
+  The name (character string) in the image filter descriptor that
+  will denote the nth filter name.
+<p>
+ 
+  This parameter is asked for repeatedly, until either all nine
+  names have been asked for, or until, a null entry is given, meaning
+  that there are no more filter names to enter.
+<p>
+ 
+  These are the up to nine parameters 'FNAME1', 'FNAME2', ... 'FNAME9'.
+<p>
+ 
+<hr>
+ <h2> 7.18 <a name="fsname"> Fsname </h2> </a> <p>
+ 
+  (Default = name of image nth filter name        Choice - see below)
+<p>
+ 
+  The name (character string) in a column header in the standards table
+  file that will denote the matching (to the 'FNAME' filter name) filter
+  name in the standards table.
+<p>
+ 
+  This parameter is asked for, for each of the 'FNAME1', 'FNAME2', ...
+  'FNAME9' entries that are input for possible 'filter name' names
+  in the images.
+<p>
+ 
+  These are the up to nine parameters 'FSNAME1', 'FSNAME2', ... 'FSNAME9'.
+<p>
+ 
+<hr>
+ <h2> 7.19 <a name="gain"> Gain </h2> </a> <p>
+ 
+  (Default - 1.0        Range - 1.0e8 to 1.0e8)
+<p>
+ 
+  The gain of the numbers in the image.
+<p>
+ 
+  This is the number of independent, Poissonian, events per pixel
+  value. Thus for a CCD it would be electrons/adu.
+<p>
+ 
+<hr>
+ <h2> 7.20 <a name="header"> Header </h2> </a> <p>
+ 
+  (Default - ' '       Choice - see below)
+<p>
+ 
+ The line of text to put at the top the output text file.
+<p>
+ 
+ This is used as a way of putting a comment into the output file.
+<p>
+ 
+<hr>
+ <h2> 7.21 <a name="in"> In </h2> </a> <p>
+ 
+ 
+  The name of the file containing the input image.
+<p>
+ 
+  The input image is a standard ADAM .sdf file.
+<p>
+ 
+  It must be either an `short', integer*2 16-bit, or `real', real  32-bit,
+  image. It can have the `BSCALE' and `BZERO' pixel value scaling, and
+  the bad pixel magic value `INVAL'.
+<p>
+ 
+<hr>
+ <h2> 7.22 <a name="latitude"> Latitude </h2> </a> <p>
+ 
+  (Default - '00 00 00'      Choice - see below)
+<p>
+ 
+  A character string giving the latitude of the observatory where
+  the exposure was made.
+<p>
+ 
+  This is used in calculating the zenith distance of the observation.
+  it must be in the default format. Thus possibilities are:-
+<p>
+ 
+<pre>
+    +90 00 00
+    +01 59 59
+    +00 01 23
+    -00 01 23
+    -30 00 00
+    -90 00 00
+</pre>
+ 
+  It is important that the negative sign should be in the right place.
+<p>
+ 
+<hr>
+ <h2> 7.23 <a name="noise"> Noise </h2> </a> <p>
+ 
+  (Default - 0.0              Range - 0.0 to 1.0e8)
+<p>
+ 
+  The extra Poisson noise that a pixel value of zero has.
+<p>
+ 
+  Thus after processing, an image pixel values will not be an exact
+  value of the input. So the calculations of the errors, which assume
+  on the pixel values being Poissonian noise woulf be wrong.
+<p>
+ 
+  This is the std. dev. the program should expect for a pixel value of
+  zero. Thus if a 'bias level' has been subtracted, this could be the
+  'bias noise' value.
+<p>
+ 
+<hr>
+ <h2> 7.24 <a name="nsky"> Nsky </h2> </a> <p>
+ 
+  (Default - 4                 Range - 1 to 4)
+<p>
+ 
+  The number of sky apertures to use for each star estimate.
+<p>
+ 
+  Four is best, but you might not have room for them around the stars.
+<p>
+ 
+<hr>
+ <h2> 7.25 <a name="objloc"> Objloc </h2> </a> <p>
+ 
+  (Default - 1,79              Range - 1 to 256)
+<p>
+ 
+  The location in the image object name descriptor of the
+  characters which give the object name.
+<p>
+ 
+  If they are the only characters in the descriptor, then the
+  default can be taken.
+<p>
+ 
+<hr>
+ <h2> 7.26 <a name="objname"> Objname </h2> </a> <p>
+ 
+  ( Default - 'OBJECT'        Choice - see below)
+<p>
+ 
+  The name of the descriptor in the image file where the object name
+  of the exposure may be found.
+<p>
+ 
+  If 'none' is input, then no descriptor is looked for, and the
+  name is given the value ' '.
+<p>
+ 
+<hr>
+ <h2> 7.27 <a name="offset"> Offset </h2> </a> <p>
+ 
+  (Default - (star aperture diameter),0.0      Range - 1.0 to 1.0e8)
+<p>
+ 
+  The offset in pixels in X,Y from the centre of the star aperture
+  to the centre of the nth sky aperture.
+<p>
+ 
+  These are the (up to) four XY offsets 'OFFSET1', 'OFFSET2', 'OFFSET2',
+  'OFFSET4' that are asked for the (up to) four sky spertures, where
+  the actual number used is input with the 'NSKY' parameter.
+<p>
+ 
+  The offset in pixels in X,Y from the centre of the star aperture
+  to the centre of the third sky aperture.
+<p>
+ 
+<hr>
+ <h2> 7.28 <a name="out"> Out </h2> </a> <p>
+ 
+ 
+  The name of the file into which a copy of the terminal output, giving
+  the results of the program, is to be written.
+<p>
+ 
+  This is a new text ASCII file. It will made with a .DAT modifier.
+<p>
+ 
+  The file contains a copy of what is put out to the terminal, except that
+  there is one line of header information at the start.
+<p>
+ 
+ The listing below gives an example of the output:-
+<p>
+ 
+<pre>
+ -----------------------------------------------------------------------
+ Example Output of AUTOMAG
+ 
+ 
+ 
+ Image name is :-  fred_1
+  Star     X      Y        Top     Mag   Rms    Sk1   Sk2   Sk3   Sk4
+    1    100.0  100.0    1000.0  23.263 0.003 -0.001 0.002-0.003 0.003
+ 
+  Filter= V :Sec Z= 1.059  :Exp time= 101.000
+  Image:-    RA= 13  0 29   :Dec= +12 12 12   :Sid T= 12 34 56
+   File:-    RA= 12 13 23   :Dec= +11 27 30
+ 
+  Raw Mag    Sec Z Corrected     Std     Mag-Std
+      23.263    23.245          18.100   5.145
+ -----------------------------------------------------------------------
+</pre>
+ 
+  Comments:-<p>
+ 
+<ul>
+<li>  The 'Sk1', 'Sk2', etc., give the corrections that would have to be
+      added to the mean magnitude, if the sky level in the associated
+      sky aperture alone were to be used to estimate the sky level.
+<li>  In this particular case, the 'File' position was selected to be
+      used instead of the 'Image' position in calculating the SecZ.
+<li>  The final magnitude has been calculated using the mean sky
+      level from all four sky apertures, as they all lie within a user
+      input tolerance (usually +/- 10%) of the mean.
+<li>  The exposure time put out is the image exposure time (perhaps
+      changed by the user) plus the offset input by the user via the
+      'EXPOFF' parameter. It is then time used in the calculations.
+</ul>
+ 
+<hr>
+ <h2> 7.29 <a name="posntype"> Posntype </h2> </a> <p>
+ 
+  (Default - 'degrees'          Choice - 'degrees/radians/string')
+<p>
+ 
+  The format that the RA and DEC entries have in the RA and DEC
+  descriptors.
+<p>
+ 
+  The 'degrees' and 'radians' choices are obvious. For the string
+  input:-
+ 
+<ul>
+<li>      the RA numbers must be in the HHxMMxSS.SS format
+<li>      the DEC numbers must be in the SDDxMMxSS.SS format
+</ul>
+ 
+   Where 'x' must not be 0-9, '+', '-', or '.'.
+   The decimal places are optional.
+<p>
+ 
+<hr>
+ <h2> 7.30 <a name="raname"> Raname </h2> </a> <p>
+ 
+  (Default - 'RA'        Choice - see below)
+<p>
+ 
+  The name of the descriptor in the image file where the Right Ascencion
+  of the exposure may be found.
+<p>
+ 
+   'none' is valid entry. The RA will then be got from the standards
+   file, if this image has a star name and that name is in it.
+<p>
+ 
+<hr>
+ <h2> 7.31 <a name="sidtloc"> Sidtloc </h2> </a> <p>
+ 
+  (Default - 1,79              Range - 1 to 256)
+<p>
+ 
+  The location in the image sidereal descriptor of the
+  characters which give the sidereal time.
+<p>
+ 
+  If they are the only characters in the descriptor, then the
+  default can be taken.
+<p>
+ 
+<hr>
+ <h2> 7.32 <a name="sidtname"> Sidtname </h2> </a> <p>
+ 
+  ( Default - 'STSTART'        Choice - see below)
+<p>
+ 
+  The name of the descriptor in the image file where the sidereal
+  time of the exposure may be found.
+<p>
+ 
+<hr>
+ <h2> 7.33 <a name="skydia"> Skydia </h2> </a> <p>
+ 
+  (Default - 1/2 the Star aperture diameter   Range - 1.0 to 1.0e8)
+<p>
+ 
+  The diameter of all the sky apertures in pixels.
+<p>
+ 
+<hr>
+ <h2> 7.34 <a name="stardia"> Stardia </h2> </a> <p>
+ 
+  (Default - 40.0            Range - 1.0 to 1.0e8)
+<p>
+ 
+  The diamter of the star aperture in pixels.
+<p>
+ 
+<hr>
+ <h2> 7.35 <a name="stdmast"> Stdmast </h2> </a> <p>
+ 
+  (Default - 'Yes'             Choice - 'Yes/No')
+<p>
+ 
+  If you are using the standard magnitudes file and there is
+  RA and DEC information in the image descriptors, you have two
+  ways of calculating the RA and DEC. In this case, do you want
+  to use the standards file positions ('Yes'), or the image
+  descriptor positions ('No') ?
+<p>
+ 
+<hr>
+ <h2> 7.36 <a name="stds"> Stds </h2> </a> <p>
+ 
+ 
+  The name of the file containing the input table of standard star
+  positions and magnitudes.
+<p>
+ 
+  The file is a Starman table of the positions and magnitudes of stars.
+<p>
+ 
+  It has to have:-
+ 
+<ul>
+<li> the standard Identifiers (star names)
+<li> the Right Ascension of the star (in radians)
+<li> the Declination of the star (in radians)
+<li> the Equinox of the position (Julian epoch - e.g. 1990.234)
+<li> at least one magnitude
+</ul>
+ 
+  The magnitudes of different colours must be as magnitudes, not colours.
+  I.e., a star with V=16.00 and B-V of 1.00 would have two entries, one
+  for V=16.00 and one for B=17.00.
+<p>
+ 
+  The columns containing the magnitudes must have descriptors telling
+  what waveband is in each column. In the example above, for example, the
+  V column could have a descriptor with 'V', and the B column one of 'B'.
+<p>
+ 
+  The column descriptors must be in the standard Starman table style, as
+  HEADxxx, where xxx = 001, 002, etc. Thus in the example above the
+  descriptors would be:-<p>
+ 
+<pre>
+          HEAD001   RA
+          HEAD002   DEC
+          HEAD003   EQUINOX
+          HEAD004   V
+          HEAD005   B
+</pre>
+ 
+<hr>
+ <h2> 7.37 <a name="thresh"> Thresh </h2> </a> <p>
+ 
+  (Default - 100.0              Range - 1.0e-8 to 1.0e8)
+<p>
+ 
+  The threshold, above the mean sky level for the entire image,
+  when a pixel which is above that value is considered to be part
+  of a star.
+<p>
+ 
+<hr>
+ <h2> 7.38 <a name="time"> Time </h2> </a> <p>
+ 
+  (Default - image exposure time           Range - 0.0 to 1.0e8)
+<p>
+ 
+  A chance to correct the exposure time read off the image.
+<p>
+ 
+  The actual time used in the calculations is this time plus the `exposure
+  time offset', input via the `EXPOFF' parameter.
+<p>
+ 
+ 
+<hr>
+ <h2> 8 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny        RAL             1991 Feb
+<p>
+ 
+ 
+<hr>
+All rights reserved. &copy 1995 RAL. Starlink conditions and disclaimers apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 17 </i>
+ 

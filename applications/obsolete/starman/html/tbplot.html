@@ -1,0 +1,569 @@
+<HTML> <HEAD>
+<TITLE> TBPLOT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBPLOT - <br>
+ 
+Plot table graph/histogram - <br> 
+or image picture/contour
+</h1>
+<hr>
+ 
+ 
+ This plots tables or images out onto a graph:-
+<p>
+
+<ol> 
+<li> The contents of two columns of one or two tables can be plotted
+        as X,Y points, or as a line joining those points.
+<li> An image may be plotted as a grey-scale image, or as a contour map.
+<li> Text and axes labels may be put onto the graph.
+<li> The contents of one table column can be plotted as a histogram (not
+        onto the graph of actions 1-3).
+<li> A cursor position can be read out.
+</ol>
+<p>
+ 
+ The program uses either an 'automatic' mode, where the input can be
+ done as a simple series of commands, or a menu-driven approach. In the
+ latter options from a menu can be repeatedly chosen either from a
+ 'panel-button' type of display, or via the keyboard.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbplot_back_tb"> Starman Help - (tables)</a><br>
+Go to <a href="intro.html#tbplot_back_im"> Starman Help - (images)</a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#menu"> Menu </a>
+<li> 2 <a href="#cursor_use"> Cursor use </a>
+<li> 3 <a href="#parameters"> Parameters </a>
+<li> 4 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="menu"> Menu </h2> </a> <p>
+ 
+ 
+  This is the menu of options open to you.
+<p>
+<pre> 
+   Option      Function
+   ------      --------
+   all_clear   Clear Display - data and axes
+   aspect      Select between graph having axes 
+                 on the same scale or
+                 being independantly scaled
+   clear       Clear Display - just data
+   close       Close Display
+   contour     Plot the counter map of the image
+   cursor      Get position in graph and nearest 
+                 table point, with cursor
+   display     Display the image as a picture
+   exit        Exit from program
+   get_image   Open an input image
+   get_table   Open an input table(s)
+   histogram   Plot histogram of values in a table 
+                 column
+   label       Plot axis labels on graph
+   line        Plot table data as line
+   open        Open (new) display device
+   panel       Toggle between keyboard and panel 
+                 option input
+   points      Plot table data as points
+   prange      Change limits on table X,Y acceptable 
+                 limits
+   psize       Change the size of the plot
+   text        Plot input text at a position on the 
+                 graph
+</pre><p>
+ 
+<hr>
+ <h2> 2 <a name="cursor_use"> Cursor use </h2> </a> <p>
+ 
+ 
+   To input cursor positions, position cursor at desired point
+   and press any key on the keyboard, or maybe press any
+   button on the cursor. End by locating cursor outside graph
+   and pressing a key.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 3.1 <a href="#aspect"> Aspect </a>
+<li> 3.2 <a href="#atype"> Atype </a>
+<li> 3.3 <a href="#contour"> Contour </a>
+<li> 3.4 <a href="#devlimx"> Devlimx </a>
+<li> 3.5 <a href="#devlimy"> Devlimy </a>
+<li> 3.6 <a href="#gtype"> Gtype </a>
+<li> 3.7 <a href="#hrange"> Hrange </a>
+<li> 3.8 <a href="#im"> Im </a>
+<li> 3.9 <a href="#imoffset"> Imoffset </a>
+<li> 3.10 <a href="#imxrange"> Imxrange </a>
+<li> 3.11 <a href="#imyrange"> Imyrange </a>
+<li> 3.12 <a href="#in1"> In1 </a>
+<li> 3.13 <a href="#in2"> In2 </a>
+<li> 3.14 <a href="#linecol"> Linecol </a>
+<li> 3.15 <a href="#lstyle"> Lstyle </a>
+<li> 3.16 <a href="#nbin"> Nbin </a>
+<li> 3.17 <a href="#ncol1"> Ncol1 </a>
+<li> 3.18 <a href="#ncol2"> Ncol2 </a>
+<li> 3.19 <a href="#numbutt"> Numbutt </a>
+<li> 3.20 <a href="#option"> Option </a>
+<li> 3.21 <a href="#position"> Position </a>
+<li> 3.22 <a href="#symbol"> Symbol </a>
+<li> 3.23 <a href="#text"> Text </a>
+<li> 3.24 <a href="#use"> Use </a>
+<li> 3.25 <a href="#vprange"> Vprange </a>
+<li> 3.26 <a href="#xlabel"> Xlabel </a>
+<li> 3.27 <a href="#xrange"> Xrange </a>
+<li> 3.28 <a href="#ylabel"> Ylabel </a>
+<li> 3.29 <a href="#yrange"> Yrange </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 3.1 <a name="aspect"> Aspect </h2> </a> <p>
+ 
+  (Default - 'yes' or last           <br> Choice - 'yes:no')
+<p>
+ 
+  Should the graph axes be scaled the same?
+<p>
+ 
+  If not, then the X range of the graph will fill the X size of
+  the window, whilst the Y range will fill the Y size. If yes, then
+  the graph will be plotted with X and Y scales the same (as is done
+  with maps).
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="atype"> Atype </h2> </a> <p>
+ 
+  (Default - `points'       <br> Choice - `points:line:hist:disp:cont')
+<p>
+ 
+  What type of graph do you want plotted?
+<p>
+<pre> 
+   Option   Result
+   ------   ------
+   Points   Plot symbols at table XY positions
+   Line     Plot of a line joining successive 
+              table XY positions
+   Hist     A histogram of table, where X = X 
+              and Y = number at X
+   Disp     Grey-scale display of image
+   Cont     Contour map of image
+</pre><p>
+ 
+<hr>
+ <h2> 3.3 <a name="contour"> Contour </h2> </a> <p>
+ 
+  (Default - see below         <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The lower and upper limits of image values that are plotted out
+  in the contour map, and the step between the contour levels.
+<p>
+ 
+  Thus an input of `10.0,100.0,20.0' would put out contour
+  levels of (10.0,30.0,50.0,70.0,90.0).
+<p>
+ 
+  The default is `(minimum of data),(maximum of data),(1/10th of range)'
+<p>
+ 
+<hr>
+ <h2> 3.4 <a name="devlimx"> Devlimx </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The X values of the start and end of the plotted graph.
+<p>
+ 
+<hr>
+ <h2> 3.5 <a name="devlimy"> Devlimy </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The Y values of the start and end of the plotted graph.
+<p>
+ 
+<hr>
+ <h2> 3.6 <a name="gtype"> Gtype </h2> </a> <p>
+ 
+  (Default - 'xwindows'            <br> Choice - any)
+<p>
+ 
+  A character string giving the local name for the graphics
+  display type.
+<p>
+ 
+  'xwindows' will put it out on the screen of your X-window deviice,
+  if you are using one.
+<p>
+ 
+  If 'ask' is input, then the program asks a very similar question,
+  in a different way. A response here of '?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+ 
+<hr>
+ <h2> 3.7 <a name="hrange"> Hrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The lower and upper limits of table data to be put into histogram.
+<p>
+ 
+<hr>
+ <h2> 3.8 <a name="im"> Im </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input image
+<p>
+ 
+  The table must be a standard Starman image format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real or 'short'
+  16-bit integer ones.
+<p>
+ 
+<hr>
+ <h2> 3.9 <a name="imoffset"> Imoffset </h2> </a> <p>
+ 
+  (Default - 0,0                      <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The X and Y offset from the (1,1) position in the graph of the
+  (1,1) position of the displayed points, line, image, or contour.
+<p>
+ 
+<hr>
+ <h2> 3.10 <a name="imxrange"> Imxrange </h2> </a> <p>
+ 
+  (Default - X size of image           <br> Range - 1 to X image size
+<p>
+ 
+  The X start and end of the X range of the image to be plotted.
+<p>
+ 
+<hr>
+ <h2> 3.11 <a name="imyrange"> Imyrange </h2> </a> <p>
+ 
+  (Default - Y size of image           <br> Range - 1 to Y image size)
+<p>
+ 
+  The Y start and end of the Y range of the image to be plotted.
+<p>
+ 
+<hr>
+ <h2> 3.12 <a name="in1"> In1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the first input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 3.13 <a name="in2"> In2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the second input table.
+<p>
+ 
+  If the second input table is the same as the first one, then
+  just press the 'carriage return' key.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 3.14 <a name="linecol"> Linecol </h2> </a> <p>
+ 
+   (Default - 'black'            <br> Choice - `black:white')
+<p>
+ 
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+ 
+<hr>
+ <h2> 3.15 <a name="lstyle"> Lstyle </h2> </a> <p>
+ 
+  (Default - 1       <br> Range - 1 to 5)
+<p>
+ 
+  Code for style line is to be plotted.
+<p>
+<pre> 
+  Number  Style
+  -----   -----
+    1     Full line
+    2     Long dashes
+    3     Dash-dot-dash
+    4     Dotted
+    5     Dash-dot-dot
+</pre><p>
+ 
+<hr>
+ <h2> 3.16 <a name="nbin"> Nbin </h2> </a> <p>
+ 
+  (Default - last chosen, first=40     <br> Range - 1 to 200)
+<p>
+ 
+  No of bins in histogram.
+<p>
+ 
+<hr>
+ <h2> 3.17 <a name="ncol1"> Ncol1 </h2> </a> <p>
+ 
+  (Default - 1     <br> Range - 1 to no of columns)
+<p>
+ 
+  Column in first table to take data from.
+<p>
+ 
+<hr>
+ <h2> 3.18 <a name="ncol2"> Ncol2 </h2> </a> <p>
+ 
+  (Default - 1     <br> Range - 1 to no of columns)
+<p>
+ 
+  Column in second table to take data from.
+<p>
+ 
+<hr>
+ <h2> 3.19 <a name="numbutt"> Numbutt </h2> </a> <p>
+ 
+  (Default - see below          <br> Range - 2 to 3)
+<p>
+ 
+  Number of `X-Window' buttons available on the mouse.
+<p>
+ 
+  Some devices have two and some have three buttons available. This
+  can depend both on their actual presence, and also on the X Windows
+  software that is being run.
+<p>
+ 
+  With three buttons, then the Starman programs use all three, with
+  the right-hand button being used mainly as the 'exit' button.
+<p>
+ 
+  With two buttons, then the third button is simulated by pressing
+  both of the buttons down, with the middle one being pressed slightly
+  BEFORE the left-hand one. Use of the middle button in its normal
+  way has to be modified, in that one has to pause for half a second
+  after using it.
+<p>
+ 
+  [This parameter is usally 'hidden', with the machine manager setting
+   it to the appropriate value for the local set-up. Sometimes it will
+   be left to the user to set, depending on his software configuartion.]
+<p>
+ 
+<hr>
+ <h2> 3.20 <a name="option"> Option </h2> </a> <p>
+ 
+  (Default - see below          <br> Choices - see below)
+<p>
+ 
+  This is the menu of options open to you.
+<p>
+ 
+<pre> 
+   Option      Function
+   ------      --------
+   all_clear   Clear Display - data and axes
+   aspect      Select between graph having axes 
+                 on the same scale or
+                 being independantly scaled
+   clear       Clear Display - just data
+   close       Close Display
+   contour     Plot the counter map of the image
+   cursor      Get position in graph and nearest 
+                 table point, with cursor
+   display     Display the image as a picture
+   exit        Exit from program
+   get_image   Open an input image
+   get_table   Open an input table(s)
+   histogram   Plot histogram of values in a table 
+                 column
+   label       Plot axis labels on graph
+   line        Plot table data as line
+   open        Open (new) display device
+   panel       Toggle between keyboard and panel 
+                 option input
+   points      Plot table data as points
+   prange      Change limits on table X,Y acceptable 
+                 limits
+   psize       Change the size of the plot
+   text        Plot input text at a position on the 
+                 graph
+</pre><p>
+ 
+ To input cursor positions, position cursor at desired point
+ and press any key, or maybe any cursor button. End by
+ locating cursor outside graph
+<p>
+ 
+<hr>
+ <h2> 3.21 <a name="position"> Position </h2> </a> <p>
+ 
+  (Default - b.l.h. corner of graph     <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  X,Y position to put into the graph the input text.
+<p>
+ 
+<hr>
+ <h2> 3.22 <a name="symbol"> Symbol </h2> </a> <p>
+ 
+  (Default - 2       <br> Range - 0 to 31)
+<p>
+ 
+  Code for style that the points to be plotted in the graph as.
+<p>
+ 
+  The full explanation of the symbols is given in the PGPLOT manual.
+<p>
+ 
+<hr>
+ <h2> 3.23 <a name="text"> Text </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+   The text to plot onto the graph.
+<p>
+ 
+<hr>
+ <h2> 3.24 <a name="use"> Use </h2> </a> <p>
+ 
+  (Default - `panel'                  <br> Choice - `auto:panel:key')
+<p>
+ 
+  Automatic (auto) or interactive (panel:key) mode?
+<p>
+ 
+  In the interactive mode, after you have input the X and Y
+  data, you can do any operations you like (although the
+  program suggests a route for the first few operations). You
+  then exit when you want.
+<p>
+ 
+  The 'panel' choice puts you straight into the 'panel' mode,
+  whereas 'key' selects the 'keyboard' entry.
+<p>
+ 
+  In the automatic mode, you choose the type of graph you
+  want plotted up, the program then asks you for the relevant
+  input, plots the graph and exits. This is useful if you have
+  a simple thing to do, and/or wnat to exit automatically.
+<p>
+ 
+  In either case, any graph left on the X-window at the end
+  remains displayed. It can be removed by closing the window
+  or by doing `xdestroy xwindows'.
+<p>
+ 
+<hr>
+ <h2> 3.25 <a name="vprange"> Vprange </h2> </a> <p>
+ 
+  (Default - -2/+3 std dev from mean in image  <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The minimum and maximum pixel values in the image that are plotted.
+  The grey-scale is scaled between these limits.
+<p>
+ 
+<hr>
+ <h2> 3.26 <a name="xlabel"> Xlabel </h2> </a> <p>
+ 
+  ( Default - null or Header of Column in table 1)
+<p>
+ 
+  Text to put onto X axis of graph.
+<p>
+ 
+<hr>
+ <h2> 3.27 <a name="xrange"> Xrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The X start and end of X range of positions in the table
+  that a data point can have and still be plotted.
+<p>
+ 
+<hr>
+ <h2> 3.28 <a name="ylabel"> Ylabel </h2> </a> <p>
+ 
+  ( Default - null or Header of Column in table 2)
+<p>
+ 
+  Text to put onto Y axis of graph.
+<p>
+ 
+<hr>
+ <h2> 3.29 <a name="yrange"> Yrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The Y start and end of Y range of positions in the table
+  that a data point can have and still be plotted.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny                    RAL             1995 October
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Oct 14 </i>
+ 

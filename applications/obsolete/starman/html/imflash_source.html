@@ -1,0 +1,160 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMFLASH
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMFLASH
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imflash_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imflash">
+imflash  </a>  (Program) Flash up an image on the display       <br>
+<a href="#t_imflash">
+t_imflash  </a>  Flash up an image on the display       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imflash"> IMFLASH  </a>-- (Program) Flash up an image on the display
+C
+C    alan penny             ral               1990 Jan
+
+      subroutine imflash ( ierradam )
+
+      implicit none
+
+      integer     ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imflash
+
+      call starman_end ( ierradam )
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C   IMFLASH.FOR
+C
+C   Contains:-
+C
+C T_IMFLASH   Flash up an image on the display
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imflash"> T_IMFLASH  </a>-- Flash up an image on the display
+C
+C   alan penny                ral          1990 Jan
+
+      subroutine t_imflash ()
+
+      implicit none
+
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+      include 'ST_DS_GEN_INC'
+C--
+      real amin, amax
+      integer ierr
+      logical enough
+Cbegin
+
+
+      call ds_sdef ( 1, 1 )						!Set Display defaults
+
+      BS     = 1.0							!Image value scales
+      BZ     = 0.0
+      INVAL  = INT_INVALSI
+      RINVAL  = INT_INVALR
+
+      call ds_gtype ( ierr )						!Get type of display
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         call printo ( 'ERROR: Forbidden answer' )
+         return
+      endif
+
+      call opimgr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )		!Get image
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( IMTYPE.ne.'REAL' .and. IMTYPE.ne.'SHORT' ) then
+         call printo ( 'ERROR: Image must be REAL or INTEGER*2' )
+         call pargc ( IMTYPE )
+         call printo ( 'ERROR: Image type is: %c ' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr)
+
+      DSNXS = 1								!Image size
+      DSNXE = NX
+      DSNYS = 1
+      DSNYE = NY
+      call ds_init ( IMTITLE, 1, ierr )					!Open display
+      if ( ierr.ne.0 ) then
+         call printo ( 'ERROR: Can not open that display device' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      call ds_gtcomf ( 0 )						!Get image display size
+
+      call ds_imgscl ( %val(IPIM), NX, NY, IMTYPE, 1, NX, 1, NY )	!Get display scale
+
+      call printo ( ' Title is: '//IMTITLE )				!Write title
+
+      amin = BS*DSVMIN + BZ						!Write display range
+      amax = BS*DSVMAX + BZ
+      call pargr ( amin )
+      call pargr ( amax )
+      call printd ( ' Display values: Min = %f  Max = %f' )
+      call pargi ( NX )							!Write size
+      call pargi ( NY )
+      call pargc ( IMTYPE )
+      call printd ( ' Size = %dx%d  :  Type = %c' )
+
+      call ds_disp ( %val(IPIM), NX, NY, IMTYPE, 0 )			!Display
+
+      enough = .false.
+      do while ( .not.enough )
+         call get1b ( 'ENOUGH', enough, .true. )
+      enddo
+
+      call ds_close ( ierr )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

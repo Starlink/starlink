@@ -1,0 +1,1620 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBCHART
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBCHART
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbchart_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbchart">
+t_tbchart  </a>  Plot out realistic-looking star map       <br>
+<a href="#tbch_option_setup">
+tbch_option_setup  </a>  Set up option choices       <br>
+<a href="#tbch_setup">
+tbch_setup  </a>  Load the default parameters       <br>
+<a href="#tbch_prange">
+tbch_prange  </a>  Get plot range       <br>
+<a href="#tbch_psize">
+tbch_psize  </a>  Get plot size       <br>
+<a href="#tbch_mrange">
+tbch_mrange  </a>  Get magnitude range       <br>
+<a href="#tbch_mscale">
+tbch_mscale  </a>  Get magnitude circle size scale       <br>
+<a href="#tbch_lsize">
+tbch_lsize  </a>  Get Labels size       <br>
+<a href="#tbch_getdata">
+tbch_getdata  </a>  Get Table       <br>
+<a href="#tbch_clear">
+tbch_clear  </a>  Clear display       <br>
+<a href="#tbch_open">
+tbch_open  </a>  Open device       <br>
+<a href="#tbch_close">
+tbch_close  </a>  Close device       <br>
+<a href="#tbch_plot">
+tbch_plot  </a>  Set up and start plotting       <br>
+<a href="#tbch_doplot">
+tbch_doplot  </a>  Plot points       <br>
+<a href="#tbch_circle">
+tbch_circle  </a>  Write/overwrite circles round stars       <br>
+<a href="#tbch_dolabel">
+tbch_dolabel  </a>  Plot labels       <br>
+<a href="#tbch_gcurse">
+tbch_gcurse  </a>  Get positions with cursor       <br>
+<a href="#tbch_datload">
+tbch_datload  </a>  Load input data       <br>
+<a href="#tbch_findcol">
+tbch_findcol  </a>  Find columns (x:y:mag:ht) is in       <br>
+<a href="#tbchart">
+tbchart  </a>  (Program) Plot out a realistic star map       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C This is T_TBCHART.FOR
+C
+C It contains:-
+C
+C T_TBCHART      Plot out realistic-looking star map
+C TBCH_OPTION_SETUP  Set up option choices
+C TBCH_SETUP     Load the default parameters
+C TBCH_PRANGE    Get plot range
+C TBCH_PSIZE     Get plot size
+C TBCH_MRANGE    Get magnitude range
+C TBCH_MSCALE    Get magnitude circle size scale
+C TBCH_LSIZE     Get Labels size
+C TBCH_GETDATA   Get Table
+C TBCH_CLEAR     Clear display
+C TBCH_OPEN      Open device
+C TBCH_CLOSE     Close device
+C TBCH_PLOT      Set up and start plotting
+C TBCH_DOPLOT    Plot points
+C TBCH_CIRCLE    Write/overwrite circles round stars
+C TBCH_DOLABEL   Plot labels
+C TBCH_GCURSE    Get positions with cursor
+C TBCH_DATLOAD   Load input data
+C TBCH_FINDCOL   Find columns (x:y:mag:ht) is in
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbchart"> T_TBCHART  </a>-- Plot out realistic-looking star map
+C
+C         A J Penny            RAL            1991 May
+
+      subroutine t_tbchart ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'ST_DS_PANEL_INC'
+      include 'STARMAN_INC'
+C--
+      integer istat
+      logical loop
+      character*12 ktopt
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbch_setup							!Set up parameters
+
+      call type_hchoice
+      call tbch_option_setup ( ktopt, 1, .true. )			!Do the work
+      loop = .true.
+      do while ( loop )
+
+         call tbch_option_setup ( ktopt, 1, .false. )			!Do the work
+         call get_choice ( ktopt, 1 )					!Get choice
+
+         if ( ktopt.eq.'getdata' ) call tbch_getdata			!Open a set of files
+
+         if ( ktopt.eq.'plot' ) call tbch_plot ( 1 )			!Display points
+
+         if ( ktopt.eq.'clear' ) call tbch_clear			!Clear display
+
+         if ( ktopt.eq.'open' ) call tbch_open				!Open device
+
+         if ( ktopt.eq.'mrange' ) call tbch_mrange ( %val(IPTAB) )	!Change magnitude limits
+
+         if ( ktopt.eq.'prange' ) call tbch_prange ( %val(IPTAB) )	!Allowed plot range
+
+         if ( ktopt.eq.'panel' ) call choice_panel_sw 			!Change panel/keyboard input choice
+
+         if ( ktopt.eq.'close' ) call tbch_close			!Close plot
+
+         if ( ktopt.eq.'lsize' ) call tbch_lsize 			!Set labels size
+
+         if ( ktopt.eq.'mscale' ) call tbch_mscale ( %val(IPTAB) )	!Labels and their size
+
+         if ( ktopt.eq.'label' ) call tbch_plot ( 2 ) 			!Plot labels
+
+         if ( ktopt.eq.'psize' ) call tbch_psize ( %val(IPTAB) )	!Labels and their size
+
+         if ( ktopt.eq.'cursor' ) call tbch_gcurse ( %val(IPTAB) )	!Get positions
+
+         if ( ktopt.eq.'ring' ) call tbch_circle ( %val(IPTAB), 1 )	!Write circles
+
+         if ( ktopt.eq.'ring_rem' ) call tbch_circle ( %val(IPTAB), 2 )	!Overwrite circles
+
+         if ( ktopt.eq.'exit' ) loop = .false. 				!Exit from program
+
+         if ( ST_FAILED ) return
+
+      enddo
+
+      if ( DOPANEL ) call ds_p_close ( istat )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_option_setup"> TBCH_OPTION_SETUP  </a>-- Set up option choices
+C
+C   alan penny                        ral              1990-01-31
+
+      subroutine tbch_option_setup ( ktopt, set_num, koutside )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_CHOICE_INC'
+
+      character*12   ktopt              !i: Chosen option
+      integer set_num                   !i: Code for set of options
+      logical  koutside                 !i: Is this called from outside loop?
+C--
+      integer j, k
+
+      integer opt_num
+      parameter ( opt_num=16 )
+
+      character*12 opt_text(opt_num)
+      character*68 opt_head(opt_num)
+      character*68 opt_help(6,opt_num)
+
+      data opt_text(1), opt_head(1), (opt_help(j,1),j=1,6) /
+     + 'clear', 'Clear plot',
+     + 'Clear the plotted chart (the programme does not forget about',
+     + 'the input table).',
+     + ' ', ' ', ' ', ' '/
+
+      data opt_text(2), opt_head(2), (opt_help(j,2),j=1,6) /
+     + 'open', 'Open the plot device ',
+     + 'Open a device for the plot. This uses the PGPLOT package. You',
+     + 'put in the GKS name of the device. A standard device is ',
+     + '-xwindows- for opening a window on an X-terminal. To find the',
+     + 'GKS name of a device, type -ask-.',
+     + 'For a device which makes a file, you must press the close',
+     + 'button to close the device, before plotting the file.' /
+
+      data opt_text(3), opt_head(3), (opt_help(j,3),j=1,6) /
+     + 'close', 'Close the graphical device ',
+     + 'One may need to close the plot output display. It is a',
+     + 'PGPLOT -device-, and one might want to swop between screen ',
+     + '(xwindows) and printer, or one might want to get the ',
+     + 'output from printer (this file only becomes available when',
+     + 'the device is -closed-). ',
+     + '[All plot options open a device, if it is closed.]'/
+
+      data opt_text(4), opt_head(4), (opt_help(j,4),j=1,6) /
+     + 'panel', 'Switch between panel and keyboard option selection',
+     + 'This returns you to using the keyboard for option choice.',
+     + '(In keyboard option entry mode, you can get back to -panel-',
+     + '  option entry mode, by choosing the -panel- option.',
+     + ' ', ' ', ' '/
+
+      data opt_text(5), opt_head(5), (opt_help(j,5),j=1,6) /
+     + 'exit', 'Exit from this program',
+     + 'Exit from this program. Any windows open are closed, and any',
+     + 'files open are closed.',
+     + ' ', ' ', ' ', ' '/
+
+      data opt_text(6), opt_head(6), (opt_help(j,6),j=1,6) /
+     + 'ring', 'Write rings round stars',
+     + ' ', 'Put a large ring round each solid circle.',
+     + ' ', 'This helps you to sort out stars which overlap each',
+     + 'other.', ' '/
+
+      data opt_text(7), opt_head(7), (opt_help(j,7),j=1,6) /
+     + 'cursor', 'Use cursor to get position and nearest star',
+     + 'Place the cursor at any point in the plot and press',
+     + 'any button. The XY position will be typed out, together',
+     + 'with (number, name, XY posn, mag) of the nearest star',
+     + 'Place the cursor outside the area of the plot (but still',
+     + 'in the window) and press for return. [Only give a quick',
+     + 'press on return, for you may work the panel again.]'/
+
+      data opt_text(8), opt_head(8), (opt_help(j,8),j=1,6) /
+     + 'label', 'Plot by each star its name from input table',
+     + 'The (up to) 20 character name for each star kept in the ',
+     + 'the first input table are plotted by the stars. If there',
+     + 'is no room by them, the names are plotted at the nearest',
+     + 'clear space and a line drawn connecting name and star.',
+     + ' ',
+     + 'Name sizes are set via the LSIZE option and parameter.'/
+
+      data opt_text(9), opt_head(9), (opt_help(j,9),j=1,6) /
+     + 'plot', 'Plot the stars as filled-in circles' ,
+     + 'The X,Y,Mag values of the stars are taken from input',
+     + 'table columns 6,7,8. These are plotted as filled circles',
+     + 'whose radii are - (magmin-magnitude)*magscale - . Thus',
+     + 'brighter stars are plotted bigger. The - magmin and  ',
+     + 'magscale factors are input via the MSCALE option. MRANGE',
+     + 'and PRANGE control the range in mag and posn plotted. '/
+
+      data opt_text(10), opt_head(10), (opt_help(j,10),j=1,6) /
+     + 'ring_rem', 'Remove rings written round stars',
+     + ' ', 'Remove the large ring round each solid circle.',
+     + ' ', 'This removes the rings which you have written to',
+     + 'help you to sort out stars which overlap each other.',
+     + ' '/
+
+      data opt_text(11), opt_head(11), (opt_help(j,11),j=1,6) /
+     + 'lsize', 'Set the size of the names written by the stars',
+     + ' ',
+     + 'If the star names are written by the stars, this controls',
+     + 'how large the type of the names is. The character size',
+     + 'is proportional to the number input via the LSIZE ',
+     + 'parameter. The default is 1.0.',
+     + ' '/
+
+      data opt_text(12), opt_head(12), (opt_help(j,12),j=1,6) /
+     + 'mrange', 'Set the magnitude range of stars to be plotted',
+     + ' ',
+     + 'This sets the range in magnitude that stars are can have',
+     + 'and be plotted. Stars falling outside the permitted',
+     + 'magnitude range will not be plotted.',
+     + ' ',
+     + 'The defaults are the minimum and maximum of all the data. '/
+
+      data opt_text(13), opt_head(13), (opt_help(j,13),j=1,6) /
+     + 'mscale', 'Set rate which stars get bigger with magnitude',
+     + 'The radii of the filled circles stars are plotted as is',
+     + 'set by the equation - radius=(magmin-magnitude)*magscale -',
+     + ' ',
+     + 'This option lets you change the values MAGMIN and ',
+     + 'MAGSCALE via the MMIN and MSCALE parameters. ',
+     + ' '/
+
+      data opt_text(14), opt_head(14), (opt_help(j,14),j=1,6) /
+     + 'prange', 'Set the range in X an Y of stars to be plotted',
+     + ' ',
+     + 'This sets the range in X and Y that stars are allowed to be',
+     + 'plotted in. Data points falling outside the permitted ',
+     + 'XY rectangle will not be plotted.',
+     + ' ',
+     + 'The defaults are the minimum and maximum of all the data. '/
+
+      data opt_text(15), opt_head(15), (opt_help(j,15),j=1,6) /
+     + 'psize', 'Set the range of the graph axes in X and Y',
+     + ' ',
+     + 'This sets the range of the scales on the X and Y axes of',
+     + 'the plot. ',
+     + ' ',
+     + 'The defaults are from a bit below the minimum of all the',
+     + 'stars positions to a bit above the maximum. '/
+
+      data opt_text(16), opt_head(16), (opt_help(j,16),j=1,6) /
+     + 'getdata', 'Get star posns and magns from an input table' ,
+     + ' ',
+     + 'The data are taken from a Starman table in a file. The',
+     + 'X, Y, and Magnitude are assumed to be in columns 6, 7, and',
+     + '8 of the table (the parameter IN is used). ',
+     + ' ',
+     + 'If a new table is input, the previous data are lost.'/
+
+      character*50 title, option
+      integer ncode
+      data title, option, ncode / 'Tbchart', 'OPTION', 1 /
+
+      integer def_x, def_y
+      parameter ( def_x=9 )
+      parameter ( def_y=1 )
+      character*12 def_text(def_x,def_y)
+      data def_text / ' ', 'getdata', 'prange', 'mrange', 'psize',
+     +                'open', 'plot', 'panel', 'cursor' /
+
+      integer sect_num
+      parameter ( sect_num=5 )
+      character*10 sect_head(sect_num)
+      data sect_head / 'ACTIONS', 'SETUP', 'FILE', 'GRAPH',
+     +                 'CONTROL' /
+      character*200 sect_text(sect_num)
+      data sect_text(1) / 'plot:label:cursor:ring:ring_rem' /
+      data sect_text(2) / 'mscale:lsize:mrange:prange:psize' /
+      data sect_text(3) / 'getdata' /
+      data sect_text(4) / 'clear:close:open' /
+      data sect_text(5) / 'panel:exit' /
+
+      integer help_num
+      parameter ( help_num=3 )
+      character*68 help_text(help_num)
+      data (help_text(k),k=1,help_num) /
+     + '             ' ,
+     + 'To input cursor positions, position cursor at desired point',
+     + 'and press any key. End by locating cursor outside graph' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call setup_option ( ktopt, set_num, koutside,
+     +                    sect_num, sect_text, sect_head,
+     +                    title, option, ncode,
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
+     +                    1, opt_help,
+     +                    1, help_num, help_text,
+     +                    1, def_x, def_y, def_text )
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_setup"> TBCH_SETUP  </a>-- Load the default parameters
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_setup ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call ds_sdef ( 2, 14 )
+
+      LSIZE = 1.0
+      GOTDATA = .false.
+      IPTAB = 1
+      IPWK = 1
+      GOTWORK = .false.
+      NEWWORK = .false.
+
+      PRX(1) = -1.0e10
+      PRX(2) = 1.0e10
+      PRY(1) = -1.0e10
+      PRY(2) = 1.0e10
+      GOTPLIMS  = .false.
+      PSX(1) = -1.0e10
+      PSX(2) = 1.0e10
+      PSY(1) = -1.0e10
+      PSY(2) = 1.0e10
+      GOTPSIZE = .false.
+
+      DML(1) = -1.0e10
+      DML(2) = 1.0e10
+      GOTMLIMS = .false.
+
+      MAGMIN = 25.0
+      MAGSC = 1.0
+      GOTMSCALE = .false.
+
+      GROPEN    = .false.
+      DONEAXIS = .false.
+      DONECIRCLE = .false.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_prange"> TBCH_PRANGE  </a>-- Get plot range
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_prange ( table )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real    table(TBVX,TBY)		!i: Input table
+C--
+      integer k
+      real  trunc_e
+      external trunc_e
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTDATA ) then
+         call printo ( 'WARNING: Need to have got table' )
+         return
+      endif
+
+      if ( .not.GOTPLIMS ) then
+         PRX(1) = table(6,1)
+         PRX(2) = table(6,1)
+         PRY(1) = table(7,1)
+         PRY(2) = table(7,1)
+         do k = 1, TBY
+            PRX(1) = min(PRX(1),table(6,k))
+            PRX(2) = max(PRX(2),table(6,k))
+            PRY(1) = min(PRY(1),table(7,k))
+            PRY(2) = max(PRY(2),table(7,k))
+         enddo
+         PRX(1) = trunc_e(PRX(1),1)
+         PRX(2) = trunc_e(PRX(2),1)
+         PRY(1) = trunc_e(PRY(1),1)
+         PRY(2) = trunc_e(PRY(2),1)
+      endif
+
+      if ( .not.GOTPSIZE ) then
+         PSX(1) = PRX(1)
+         PSX(2) = PRX(2)
+         PSY(1) = PRY(1)
+         PSY(2) = PRY(2)
+      endif
+
+      call get2r ( 'XRANGE', PRX(1), PRX(2), .true., -1.0e10, 1.0e10 )
+      if ( ST_FAILED ) return
+      call cswopr ( PRX(1), PRX(2) )
+
+      call get2r ( 'YRANGE', PRY(1), PRY(2), .true., -1.0e10, 1.0e10 )
+      if ( ST_FAILED ) return
+      call cswopr ( PRY(1), PRY(2) )
+
+      GOTPLIMS = .true.
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_psize"> TBCH_PSIZE  </a>-- Get plot size
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_psize ( table )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real    table(TBVX,TBY)		!i: Input table
+C--
+      real rv, oldx, oldy
+      integer k
+      real  trunc_e
+      external trunc_e
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTDATA ) then
+         call printo ( 'WARNING: Need to have got table' )
+         return
+      endif
+
+      if ( .not.GOTPSIZE ) then
+         PSX(1) = table(6,1)
+         PSX(2) = table(6,1)
+         PSY(1) = table(7,1)
+         PSY(2) = table(7,1)
+         do k = 1, TBY
+            PSX(1) = min(PSX(1),table(6,k))
+            PSX(2) = max(PSX(2),table(6,k))
+            PSY(1) = min(PSY(1),table(7,k))
+            PSY(2) = max(PSY(2),table(7,k))
+         enddo
+         rv = (PSX(2)-PSX(1))/20.0
+         PSX(1) = PSX(1) - rv
+         PSX(2) = PSX(2) + rv
+         rv = (PSY(2)-PSY(1))/20.0
+         PSY(1) = PSY(1) - rv
+         PSY(2) = PSY(2) + rv
+         PSX(1) = trunc_e(PSX(1),1)
+         PSX(2) = trunc_e(PSX(2),1)
+         PSY(1) = trunc_e(PSY(1),1)
+         PSY(2) = trunc_e(PSY(2),1)
+      endif
+
+      oldx = PSX(2) - PSX(1)
+      call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e10, 1.0e10 )
+      if ( ST_FAILED ) return
+      call cswopr ( PSX(1), PSX(2) )
+
+      oldy = PSY(2) - PSY(1)
+      call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e10, 1.0e10 )
+      if ( ST_FAILED ) return
+      call cswopr ( PSY(1), PSY(2) )
+
+      GOTPSIZE = .true.
+      if ( (PSX(2)-PSX(1)).ne.oldx .or.
+     +     (PSY(2)-PSY(1)).ne.oldy ) NEWWORK = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_mrange"> TBCH_MRANGE  </a>-- Get magnitude range
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_mrange ( table )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real    table(TBVX,TBY)		!i: Input table
+C--
+      integer k
+      real am, htmin, htmax
+      real trunc_e
+      external trunc_e
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTDATA ) then
+         call printo ( 'WARNING: Need to have got table' )
+         return
+      endif
+
+      if ( IN_MAG ) then
+         if ( .not.GOTMLIMS ) then
+            DML(1) = table(8,1)
+            DML(2) = table(8,1)
+            do k = 1, TBY
+               am = table(8,k)
+               if ( am.lt.49.0 ) then
+                  DML(1) = min(DML(1),am)
+                  DML(2) = max(DML(2),am)
+               endif
+            enddo
+            DML(1) = DML(1) - 1.0
+            DML(2) = DML(2) + 1.0
+            DML(1) = trunc_e(DML(1),2)
+            DML(2) = trunc_e(DML(2),2)
+         endif
+         call get2r ( 'MRANGE', DML(1), DML(2), .true.,-1.0e10,1.0e10 )
+         if ( ST_FAILED ) return
+      else
+         if ( .not.GOTMLIMS ) then
+            DML(1) = table(8,1)
+            DML(2) = table(8,1)
+            do k = 1, TBY
+               am = table(8,k)
+               if ( am.lt.49.0 ) then
+                  DML(1) = min(DML(1),am)
+                  DML(2) = max(DML(2),am)
+               endif
+            enddo
+         endif
+         htmax = 10.0**((30.0-DML(1))/2.5)
+         htmin = 10.0**((30.0-DML(2))/2.5)
+         call get2r ( 'HRANGE', htmin, htmax, .true., 1.0e-10, 1.0e20 )
+         if ( ST_FAILED ) return
+         DML(1) = 30.0 - 2.5*alog10(htmax)
+         DML(2) = 30.0 - 2.5*alog10(htmin)
+      endif
+
+      call cswopr ( DML(1), DML(2) )
+
+      GOTMLIMS = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_mscale"> TBCH_MSCALE  </a>-- Get magnitude circle size scale
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_mscale ( table )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real    table(TBVX,TBY)		!i: Input table
+C--
+      integer k
+      real rv, ht
+      real trunc_e
+      external trunc_e
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTDATA ) then
+         call printo ( 'WARNING: Need to have got table' )
+         return
+      endif
+
+      if ( IN_MAG ) then
+         if ( .not.GOTMSCALE ) then
+            MAGMIN = -100.0
+            do k = 1, TBY
+               rv = table(8,k)
+               if ( rv.lt.49.0 ) MAGMIN = max(rv,MAGMIN)
+            enddo
+            MAGMIN = MAGMIN + 1.0
+            MAGMIN = trunc_e(MAGMIN,2)
+         endif
+         call get1r ( 'MMIN', MAGMIN, MAGMIN, -1.0e10, 1.0e10 )
+         if ( ST_FAILED ) return
+      else
+         if ( .not.GOTMSCALE ) then
+            MAGMIN = -1000.0
+            do k = 1, TBY
+               rv = table(8,k)
+               if ( rv.lt.49.0 ) MAGMIN = max(rv,MAGMIN)
+            enddo
+         endif
+         ht = 10.0**((30.0-MAGMIN)/2.5)
+         call get1r ( 'HMIN', ht, ht, 1.0e-10, 1.0e20 )
+         if ( ST_FAILED ) return
+         MAGMIN = 30.0 - 2.5*alog10(ht)
+      endif
+
+      call get1r ( 'MSCALE', MAGSC, MAGSC, -1.0e10, 1.0e10 )
+      if ( ST_FAILED ) return
+
+      GOTMSCALE = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_lsize"> TBCH_LSIZE  </a>-- Get Labels size
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_lsize ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+C--
+      real old
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      old = LSIZE
+      call get1r ( 'LSIZE', LSIZE, LSIZE, 0.0, 1.0e10 )
+      if ( ST_FAILED ) return
+      if ( LSIZE.ne.old ) NEWWORK = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_getdata"> TBCH_GETDATA  </a>-- Get Table
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_getdata ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+C--
+      integer ierr, isok, istat, iptemp, kdo(4), khead(4), kwarn(4),
+     +        kbad(4)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( GOTDATA ) then
+         call wrkcan ( 'WORK' )
+         GOTDATA = .false.
+      endif
+
+      call optabr ( 'IN', iptemp, TBVX, TBY, .true., istat )
+      if ( ST_FAILED ) return
+      isok = 0
+      if ( istat.ne.0 ) then
+         isok = 1
+      elseif ( TBVX.lt.8 ) then
+         call printo ( 'ERROR: Table does not have 3 columns' )
+         isok = 1
+      elseif ( TBY.lt.1 ) then
+         call printo ( 'ERROR: Table has no entries' )
+         isok = 1
+      endif
+      if ( isok.eq.1 ) then
+         call canpar ( 'IN' )
+         return
+      endif
+
+      GOTDATA = .true.
+      kdo(1) = 1
+      kdo(2) = 1
+      kdo(3) = 1
+      kdo(4) = 0
+      kwarn(1) = 1
+      kwarn(1) = 1
+      kwarn(3) = 0
+      kwarn(4) = 0
+
+      call tbch_findcol ( 'IN', kdo, kwarn, TBVX-5, khead, kbad )
+      if ( kbad(3).eq.1 ) then
+         kdo(1) = 0
+         kdo(2) = 0
+         kdo(3) = 0
+         kdo(4) = 1
+         call tbch_findcol ( 'IN', kdo, kwarn, TBVX-5, khead, kbad )
+      endif
+      call pargi ( khead(1) )
+      call pargi ( khead(2) )
+      if ( kbad(3).eq.0 ) then
+         IN_MAG = .true.
+         call pargi ( khead(3) )
+         call printd ( '   X, Y, Magn are in columns %d , %d , %d ' )
+      else
+         if ( kbad(4).eq.0 ) then
+            IN_MAG = .false.
+            call pargi ( khead(4) )
+            call printd (
+     +                '   X, Y, Height are in columns %d , %d , %d ' )
+         else
+            IN_MAG = .true.
+            call printd (
+     +  '   X,Y are in columns %d , %d ; Column 3 is taken as magns' )
+            khead(3) = 3
+            kbad(3) = 0
+         endif
+      endif
+
+      call gtwrkr ( 'WORK', TBY*8, IPTAB, ierr )
+      call tbch_datload ( %val(iptemp), TBVX, TBY, khead, kbad,
+     +                    %val(IPTAB) )
+      TBVX = 8
+      call canpar ( 'IN' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_clear"> TBCH_CLEAR  </a>-- Clear display
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbch_clear ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GROPEN ) then						!Is device open?
+         call printo ( 'ERROR: Device not open' )
+         return
+      endif
+
+      NEWWORK = .true.
+      DONEAXIS = .false.
+      call pgpage
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_open"> TBCH_OPEN  </a>-- Open device
+C
+C   a j penny                       ral         1991 may
+
+      subroutine tbch_open ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+C--
+      integer istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( GROPEN ) then
+         call printo ( 'ERROR: Device already open' )
+      else
+         call gd_open ( istat )
+         if ( istat.eq.0 ) then
+            GROPEN = .true.
+            DONEAXIS = .false.
+         endif
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_close"> TBCH_CLOSE  </a>-- Close device
+C
+C   a j penny                  ral         1991 may
+
+      subroutine tbch_close ( )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GROPEN ) then
+         call printo ( 'ERROR: Device not open' )
+      else
+         call gd_close
+         GROPEN = .false.
+         DONEAXIS = .false.
+         NEWWORK = .true.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_plot"> TBCH_PLOT  </a>-- Set up and start plotting
+C
+C   a j penny                 ral                  1991 may
+
+      subroutine tbch_plot ( kopt )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      integer   kopt		!i: 1=plot points;2=plot labels
+C--
+      integer istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GROPEN ) call tbch_open					!Is device open?
+      if ( .not.GROPEN ) return
+
+      if ( .not.GOTDATA ) call tbch_getdata				!Loaded data?
+
+      if ( .not.GOTPLIMS ) call tbch_prange ( %val(IPTAB) )		!Get posn limits
+
+      if ( .not.GOTMLIMS ) call tbch_mrange ( %val(IPTAB) )		!Get mag limits
+
+      if ( .not.GOTMSCALE ) call tbch_mscale ( %val(IPTAB) )		!Get mag scale
+
+      if ( .not.GOTPSIZE ) call tbch_psize ( %val(IPTAB) )		!Get plot size
+
+      if ( .not.DONEAXIS ) call gd_dobox ( PSX(1), PSX(2), 'X', 	!Draw axes
+     +                             PSY(1), PSY(2), 'Y', ' ', 1 )
+      DONEAXIS = .true.
+
+      if ( kopt.eq.1 ) then
+         call tbch_doplot ( %val(IPTAB) )				!Plot the data
+      else
+         if ( GOTWORK .and. NEWWORK ) then				!Get work space for
+            call wrkcan ( 'WORKA' )					! modelling picture
+            GOTWORK = .false.
+         endif
+         if ( .not.GOTWORK ) then
+            NY = 100.0/max(0.01,LSIZE) + 1.0
+            NX = NY*abs(PSX(2)-PSX(1))/abs(PSY(2)-PSY(1)) + 1.0
+            call gtwrks ( 'WORKA', NX*NY, IPWK, istat )
+            call azeros ( %val(IPWK), NX*NY )
+            if ( istat.ne.0 ) then
+               call printo ( 'ERROR: Cant open work space WORKA' )
+               return
+            endif
+            GOTWORK = .true.
+            NEWWORK = .false.
+         endif
+         call tbch_dolabel ( %val(IPTAB), %val(IPWK) )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_doplot"> TBCH_DOPLOT  </a>-- Plot points
+C
+C   a j penny               ral                     1991 may
+
+      subroutine tbch_doplot ( table )
+
+      implicit none
+
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real        table(TBVX,TBY)	!i: Input data
+C--
+      real xd(32), yd(32), xp(32), yp(32), x, y, am, rv, r
+      integer j, k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do j = 1, 32
+         rv = real(j-1)*2.0*3.141593/32.0
+         xd(j) = cos(rv)
+         yd(j) = sin(rv)
+      enddo
+
+      do k = 1, TBY							!Plot stars
+         x = table(6,k)
+         y = table(7,k)
+         am = table(8,k)
+         if ( am.lt.MAGMIN .and. x.ge.PRX(1) .and. x.le.PRX(2) .and.
+     +        y.ge.PRY(1) .and. y.le.PRY(2) .and.
+     +        am.ge.DML(1) .and. am.le.DML(2) ) then
+
+            r = (MAGMIN-am)*MAGSC
+            do j = 1, 32
+               xp(j) = x + r*xd(j)
+               yp(j) = y + r*yd(j)
+            enddo
+            call pgpoly ( 32, xp, yp )
+
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_circle"> TBCH_CIRCLE  </a>-- Write/overwrite circles round stars
+C This is to be able to distinguish overlapping stars
+C
+C   a j penny              ral                       1991 may
+
+      subroutine tbch_circle ( table, kopt )
+
+      implicit none
+
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+      include 'ST_GRAPH_INC'
+
+      real        table(TBVX,TBY)	!i: Input data
+      integer     kopt			!i: Control flag (1=write/2=overwrite)
+C--
+      real xd(32), yd(32), xp(33), yp(33), x, y, am, rv, r
+      integer j, k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( kopt.eq.2 .and. .not.DONECIRCLE ) then
+         call printo ( 'ERROR: No circles written to overwrite' )
+         return
+      endif
+      if ( kopt.eq.1 ) then
+         DONECIRCLE = .true.
+      else
+         DONECIRCLE = .false.
+      endif
+
+      do j = 1, 32
+         rv = real(j-1)*2.0*3.141593/32.0
+         xd(j) = cos(rv)
+         yd(j) = sin(rv)
+      enddo
+
+      call gd_bbuf
+      if ( kopt.eq.2 ) call pgsci ( 0 )
+
+      do k = 1, TBY		
+         x = table(6,k)
+         y = table(7,k)
+         am = table(8,k)
+         if ( am.lt.MAGMIN .and. x.ge.PRX(1) .and. x.le.PRX(2) .and.
+     +        y.ge.PRY(1) .and. y.le.PRY(2) .and.
+     +        am.ge.DML(1) .and. am.le.DML(2) ) then
+
+            r = 1.0 + ((MAGMIN-am)*MAGSC)
+            do j = 1, 32
+               xp(j) = x + r*xd(j)
+               yp(j) = y + r*yd(j)
+            enddo
+            xp(33) = xp(1)
+            yp(33) = yp(1)
+            call pgline ( 33, xp, yp )
+
+         endif
+      enddo
+
+      call pgsci ( 1 )
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_dolabel"> TBCH_DOLABEL  </a>-- Plot labels
+C
+C   a j penny               ral                       1991 may
+
+      subroutine tbch_dolabel ( table, kdum )
+
+      implicit none
+
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real        table(TBVX,TBY)	!i: Input data
+      integer*2   kdum(NX,NY)		!i: Dummy map of plot
+C--
+      character*20 text
+      real x, y, am, r, rr, radl, xa, ya, ttsize, dx, dy, dd, plen,
+     +     clen, dda, ddb, ddc, ddd, xs, ys, ang, xd, yd,
+     +     oldsize, px, py
+      integer k, jx, jy, kxa, kxb, kya, kyb, len, kturn, kangle, kok
+      logical more
+      real xsh(8), ysh(8), fxsh(8), fysh(8)
+      data  xsh / 0.707, 1.0,  0.707,  0.0, -0.707, -1.0, -0.707, 0.0 /
+      data  ysh / 0.707, 0.0, -0.707, -1.0, -0.707,  0.0,  0.707, 1.0 /
+      data fxsh / 0.0,   0.0,  0.0,   -0.5, -1.0,   -1.0, -1.0,  -0.5 /
+      data fysh / 0.0,  -0.5, -1.0,   -1.0, -1.0,   -0.5,  0.0,   0.0 /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call pgqch ( oldsize )
+      call pgsch ( 0.6*LSIZE )
+
+      ttsize = abs(PSY(2)-PSY(1))/real(NY)
+
+      do k = 1, TBY							!Fill stars into dummy array
+         x = table(6,k)
+         y = table(7,k)
+         am = table(8,k)
+         if ( am.lt.MAGMIN .and. 					!Select only 'good' stars
+     +        x.ge.PRX(1) .and. x.le.PRX(2) .and.
+     +        y.ge.PRY(1) .and. y.le.PRY(2) .and.
+     +        x.ge.PSX(1) .and. x.le.PSX(2) .and.
+     +        y.ge.PSY(1) .and. y.le.PSY(2) .and.
+     +        am.ge.DML(1) .and. am.le.DML(2) ) then
+
+            xa = 1.0 + ((x-PSX(1))/ttsize)				!Posn in dummy array
+            ya = 1.0 + ((y-PSY(1))/ttsize)
+            r  = (MAGMIN-am)*MAGSC/ttsize
+
+            kxa = max(1,min(NX,nint(xa-r)))				!Load into dummy
+            kxb = max(1,min(NX,nint(xa+r)))
+            kya = max(1,min(NY,nint(ya-r)))
+            kyb = max(1,min(NY,nint(ya+r)))
+            rr = r*r
+            do jy = kya, kyb
+               do jx = kxa, kxb
+                  dx = xa - real(jx)
+                  dy = ya - real(jy)
+                  dd = dx*dx + dy*dy
+                  if ( dd.le.rr ) kdum(jx,jy) = 1
+               enddo
+            enddo
+
+         endif
+      enddo
+
+      do k = 1, TBY							!Plot labels
+
+         x = table(6,k)							!Only for 'good' stars
+         y = table(7,k)
+         am = table(8,k)
+         if ( am.lt.MAGMIN .and. x.ge.PRX(1) .and. x.le.PRX(2) .and.
+     +        y.ge.PRY(1) .and. y.le.PRY(2) .and.
+     +        am.ge.DML(1) .and. am.le.DML(2) ) then
+
+            xa  = 1.0 + ((x-PSX(1))/ttsize)
+            ya  = 1.0 + ((y-PSY(1))/ttsize)
+            r = (MAGMIN-am)*MAGSC/ttsize + 2.0
+            call namegt ( table, TBVX, TBY, k, text )
+            call charln ( text, len )
+
+            if ( len.ne.0 .and.						!Is label just '#',' ', or was this star too faint to plot?
+     +           .not.(len.eq.1.and.(text(1:1).eq.'#')) ) then
+               if (text(1:1).eq.'#') text(1:1)= ' '
+               call lbgone ( text )
+               call charln ( text, len )
+               if ( len.lt.20 ) text(len+1:20) = ' '
+               plen = real(len)*2.0*5.0/7.0
+               clen = anint((real(len)*2.0*5.0/7.0) + 0.5)
+
+               kturn = -1						!Set for 1st position
+               more = .true.
+               do while ( more )
+
+                  kturn = kturn + 1					!Find next position in dummy array coords
+                  kangle = mod(kturn,8) + 1
+                  radl = r + 2.0*real(int(kturn/8))
+                  xd = xa + radl*xsh(kangle) + clen*fxsh(kangle)
+                  yd = ya + radl*ysh(kangle) + 2.0*fysh(kangle)
+                  xd = anint(xd)
+                  yd = anint(yd)
+
+                  dda = (xa-1.0)**2.0      + (ya-1.0)**2.0		!See if tried all box
+                  ddb = (xa-1.0)**2.0      + (ya-real(NY))**2.0
+                  ddc = (xa-real(NX))**2.0 + (ya-1.0)**2.0
+                  ddd = (xa-real(NX))**2.0 + (ya-real(NY))**2.0
+                  dd = max(dda,ddb,ddc,ddd)
+                  if ( (radl*radl).gt.dd ) more = .false.
+
+                  if ( more ) then
+
+                     kxa = xd						!See if any of this
+                     kxb = xd + clen 					! position already occupied
+                     kya = yd
+                     kyb = yd + 2.0
+                     kok = 1
+                     do jy = kya, kyb
+                        do jx = kxa, kxb
+                           if ( jx.ge.2 .and. jx.le.(NX-1) .and.
+     +                          jy.ge.2 .and. jy.le.(NY-1) ) then
+                              if ( kdum(jx,jy).eq.1 ) then
+                                 kok = 0
+                              endif
+                           else
+                              kok = 0
+                           endif
+                        enddo
+                     enddo
+
+                     if ( kok.eq.1 ) then                               !If not and not stopped trying, put label
+
+                        px = xd*ttsize + PSX(1) - 1.0			!Put label
+                        py = yd*ttsize + PSY(1) - 1.0
+                        call pgtext ( px, py, text(1:len) )
+
+                        if ( kturn.ne.0 ) then				!Draw line if not in 1st posn
+                           xs = px - ttsize*plen*fxsh(kangle)
+                           ys = py - 2.0*ttsize*fysh(kangle)
+                           ang = atan2((ys-y),(xs-x))
+                           px = xs - 0.3*ttsize*cos(ang)
+                           py = ys - 0.3*ttsize*sin(ang)
+                           call pgmove ( px, py )
+                           px = x + (r+0.5)*ttsize*cos(ang)	
+                           py = y + (r+0.5)*ttsize*sin(ang)	
+                           call pgdraw ( px, py )
+                        endif
+
+                        do jy = kya, kyb				!Fill in dummy array area
+                           do jx = kxa, kxb
+                              kdum(jx,jy) = 1
+                           enddo
+                        enddo
+
+                        more = .false.
+
+                     endif
+
+                  endif
+
+               enddo
+            endif
+         endif
+      enddo
+
+      call pgsch ( oldsize )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_gcurse"> TBCH_GCURSE  </a>-- Get positions with cursor
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbch_gcurse ( table )
+
+      implicit none
+      include 'tbchart.inc'
+      include 'STARMAN_INC'
+
+      real    table(TBVX,TBY)		!i: Input table
+C--
+      real x, y, am, xa, ya, dx, dy, dd, ddmin, ax, ay, axa, aya,
+     +     ama
+      integer k, kmin, len
+      logical more
+      character ch*1, text*20, texta*79
+      real trunc
+      external trunc
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.DONEAXIS ) then
+         call printo ( 'WARNING: Need to have plotted area' )
+         return
+      endif
+
+      call printo ( '       X        Y   Number  Name      '//
+     +              '                  X        Y     Mag' )
+      more = .true.
+      do while ( more )
+
+         call pgcurse ( x, y, ch )
+
+         if ( x.gt.PSX(2) .or. x.lt.PSX(1) .or.
+     +        y.gt.PSY(2) .or. y.lt.PSY(1) ) then
+            more = .false.
+         else
+
+            kmin = 1
+            ddmin = 1.0e20
+            do k = 1, TBY
+               xa = table(6,k)						!Only for 'good' stars
+               ya = table(7,k)
+               am = table(8,k)
+               if ( am.lt.MAGMIN .and. x.ge.PRX(1) .and. x.le.PRX(2)
+     +              .and. y.ge.PRY(1) .and. y.le.PRY(2) .and.
+     +              am.ge.DML(1) .and. am.le.DML(2) ) then
+                  dx = x - xa
+                  dy = y - ya
+                  dd = dx*dx + dy*dy
+                  if ( dd.lt.ddmin ) then
+                     ddmin = dd
+                     kmin = k
+                  endif
+               endif
+            enddo
+
+            ax = trunc(x,5)
+            ay = trunc(y,5)
+            axa = trunc(table(6,kmin),5)
+            aya = trunc(table(7,kmin),5)
+            ama = trunc(table(8,kmin),2)
+            call namegt ( table, TBVX, TBY, kmin, text )
+            call charln ( text, len )
+            if ( len.ne.0 .and.						!Is label just '#',' ', or was this star too faint to plot?
+     +           .not.(len.eq.1.and.(text(1:1).eq.'#')) ) then
+               if (text(1:1).eq.'#') text(1:1)= ' '
+               call lbgone ( text )
+               call charln ( text, len )
+            else
+               len = 1
+               text = ' '
+            endif
+            write ( texta, '(1x,2f9.2,2x,i5,2x,a20,2x,2f9.2,f7.3)' )
+     +                     ax, ay, kmin, text, axa, aya, ama
+            call printo ( texta )
+         endif
+
+      enddo
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_datload"> TBCH_DATLOAD  </a>-- Load input data
+C
+C   alan penny          ral               1995 March
+
+      subroutine tbch_datload ( in, tbvx, tby, khead, kbad, table )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer    tbvx           !i: No of columns (inc 5 for names)
+      integer    tby            !i: No of rows
+      real       in(tbvx,tby)   !i:Input table
+      integer    khead(4)       !i: Column numbers for (x:y:mag:ht)
+      integer    kbad(4)        !i: Flags for columns (x:y:mag:ht) (0=ok;1=bad)
+      real       table(8,tby)   !o: Work table
+
+C--
+      integer j, ja, k
+      real ht
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, tby
+
+         do j = 1, 5
+            table(j,k) = in(j,k)
+         enddo
+
+         ja = 5 + khead(1)
+         table(6,k) = in(ja,k)
+         ja = 5 + khead(2)
+         table(7,k) = in(ja,k)
+         if ( kbad(3).eq.0 ) then
+            ja = 5 + khead(3)
+            table(8,k) = in(ja,k)
+         elseif ( kbad(4).eq.0 ) then
+            ja = 5 + khead(4)
+            ht = in(ja,k)
+            ht = max(1.0e-8,ht)
+            table(8,k) = 30.0 - 2.5*alog10(ht)
+         else
+            table(8,k) = in(8,k)
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbch_findcol"> TBCH_FINDCOL  </a>-- Find columns (x:y:mag:ht) is in
+C
+C   alan penny          ral               1995 March
+
+      subroutine tbch_findcol ( tfile, kdo, kwarn, ktbx, khead, kbad )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*(*) tfile       !i: Name of parameter with input file
+      integer       kdo(4)	!i: Do (x:y:mag:ht) search flag (0=no;1=yes)
+      integer       kwarn(4)	!i: Warn (x:y:mag:ht) error flag (0=no;1=yes)
+      integer       ktbx	!i: No of columns
+      integer       khead(4)	!o: Column (x:y:mag:ht) is in
+      integer       kbad(4)	!o: Error (x:y:mag:ht) flag (0=no;1=yes)
+C--
+      integer    k, ierr
+      character  ahead*20, thead*20
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( kdo(1).eq.1 ) then
+         khead(1) = 0
+         kbad(1) = 0
+         do k = ktbx, 1, -1
+            call gthead ( tfile, k, thead, ierr )
+            if ( ierr.eq.0 ) then
+               call lowcase ( thead, ahead )
+               call lbgone ( ahead )
+               if ( ahead.eq.'x' ) khead(1) = k
+            endif
+         enddo
+         if ( khead(1).eq.0 ) then
+            khead(1) = 1
+            kbad(2) = 1
+            if ( kwarn(1).eq.1 ) then
+               call printo (
+     +                ' WARNING: Header for X positions not found')
+               call printo ( '          Must be x or X')
+               call printo ( '          Assumed to be in column 1')
+               call gthead ( tfile, 1, thead, ierr )
+               call pargc ( thead )
+               call printd ( '          Header in column 1 is %c' )
+            endif
+         endif
+      endif
+
+      if ( kdo(2).eq.1 ) then
+         khead(2) = 0
+         kbad(2) = 0
+         do k = ktbx, 1, -1
+            call gthead ( tfile, k, thead, ierr )
+            if ( ierr.eq.0 ) then
+               call lowcase ( thead, ahead )
+               call lbgone ( ahead )
+               if ( ahead.eq.'y' ) khead(2) = k
+            endif
+         enddo
+         if ( khead(2).eq.0 ) then
+            khead(2) = 2
+            kbad(2) = 1
+            if ( kwarn(2).eq.1 ) then
+               call printo (
+     +               ' WARNING: Header for Y positions not found')
+               call printo ( '          Must be y or Y')
+               call printo ( '          Assumed to be in column 2')
+               call gthead ( tfile, 2, thead, ierr )
+               if ( ierr.eq.0 ) then
+                  call pargc ( thead )
+                  call printd ( '          Header in column 2 is %c' )
+               endif
+            endif
+         endif
+      endif
+
+      if ( kdo(3).eq.1 ) then
+         khead(3) = 0
+         kbad(3) = 0
+         do k = ktbx, 1, -1
+            call gthead ( tfile, k, thead, ierr )
+            if ( ierr.eq.0 ) then
+               call lowcase ( thead, ahead )
+               call lbgone ( ahead )
+               if ( ahead.eq.'mag' .or. ahead.eq.'mags' .or.
+     +              ahead.eq.'magn' .or. ahead.eq.'magns' .or.
+     +              ahead.eq.'magnitudes' .or. ahead.eq.'magnitudes' )
+     +              khead(3) = k
+             endif
+         enddo
+         if ( khead(3).eq.0 ) then
+            khead(3) = 3
+            kbad(3) = 1
+            if ( kwarn(3).eq.1 ) then
+               call printo (
+     +              ' WARNING: Header for magnitudes not found')
+               call printo (
+     +         '          Must be mag/mags/magn/magns/magnitude/s')
+               call printo ( '          (Case not important)')
+               call printo ( '          Assumed to be in column 3')
+               call gthead ( tfile, 3, thead, ierr )
+               if ( ierr.eq.0 ) then
+                  call pargc ( thead )
+                  call printd ( '          Header in column 3 is %c' )
+               endif
+            endif
+         endif
+      endif
+
+      if ( kdo(4).eq.1 ) then
+         khead(4) = 0
+         kbad(4) = 0
+         do k = ktbx, 1, -1
+            call gthead ( tfile, k, thead, ierr )
+            if ( ierr.eq.0 ) then
+               call lowcase ( thead, ahead )
+               call lbgone ( ahead )
+               if ( ahead.eq.'ht' .or. ahead.eq.'hts' .or.
+     +              ahead.eq.'height' .or. ahead.eq.'heights' )
+     +              khead(4) = k
+            endif
+         enddo
+         if ( khead(4).eq.0 ) then
+            khead(4) = 3
+            kbad(4) = 1
+            if ( kwarn(4).eq.1 ) then
+               call printo (
+     +                     ' WARNING: Header for heights not found')
+               call printo ( '          Must be ht/hts/height/heights')
+               call printo ( '          (Case not important)')
+               call printo ( '          Assumed to be in column 3')
+               call gthead ( tfile, 3, thead, ierr )
+               if ( ierr.eq.0 ) then
+                  call pargc ( thead )
+                  call printd ( '          Header in column 3 is %c' )
+               endif
+            endif
+         endif
+      endif
+
+
+      end
+
+
+
+
+
+
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbchart"> TBCHART  </a>-- (Program) Plot out a realistic star map
+C   See TBCHART.HLP for details
+C
+C         A.J.Penny                RAL                  1991 May
+
+      subroutine tbchart ( ierradam )
+
+      implicit none
+
+      integer      ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbchart
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C C_TBCHART.INC for TBCHART.F
+
+      logical    gotmlims	!Got table mag limits?
+      logical    gotplims	!Got table posn limits?
+      logical    gotwork 	!Got work space?
+      logical    newwork	!Need new work space?
+      logical    gotdata 	!Got table open?
+      logical    gotpsize	!Got plotting size?
+      logical    gotmscale 	!Got mag scaling?
+      logical    gropen		!Plot device open?
+      logical    doneaxis	!Plot device axis plotted?
+      logical    donecircle	!Written circles round star?
+      logical    in_mag         !Magnitides input, rather than heights?
+
+      integer    iptab		!Input table pointer
+      integer    ipwk		!Dummy array pointer
+      real       lsize		!Text size
+      real       prx(2)		!Table x plot limits
+      real       pry(2)		!Table y plot limits
+      real       dml(2)		!Table mag plot limits
+      real       psx(2)		!X plot limits
+      real       psy(2)		!Y plot limits
+      real       magmin		!Mag min for mag scaling
+      real       magsc	 	!Scale for mag scaling
+      integer    tbvx		!Input table X size
+      integer    tby		!Input table Y size
+      integer    nx		!Dummy array X size
+      integer    ny		!Dummy array Y size
+
+      logical    tbc_dum1	!Dummy for 4*n logicals
+CX      logical    tbc_dum2	!Dummy for 4*n logicals
+CX      logical    tbc_dum3	!Dummy for 4*n logicals
+
+      common / tbcharta / iptab,  ipwk,  lsize,     prx,    pry,
+     +                    dml,   psx,    psy,  magmin,  magsc,
+     +                    tbvx,   tby,     nx,      ny
+
+      common / tbchartb / gotmlims,  gotplims,    gotwork,   newwork,
+     +                    gotdata,   gotpsize,  gotmscale,   gropen,
+     +                    doneaxis,  donecircle,  in_mag,    tbc_dum1
+
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,110 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+STARMANGRIPE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+STARMANGRIPE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#starmangripe_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#starmangripe">
+starmangripe  </a>   Tells about comments and suggestions system for Starman       <br>
+<a href="#t_starmangripe">
+t_starmangripe  </a>  Tells about comments and suggestions system (name too long)       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="starmangripe"> STARMANGRIPE  </a>--  Tells about comments and suggestions system for Starman
+C
+C         a.j.penny                ral                   1994 Dec
+
+      subroutine starmangripe ( ierradam )
+
+      implicit none
+
+      integer    ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_starmangripe
+
+      call starman_end ( ierradam )
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_STARGRIPE.F  Tells about comments and suggestions system (name too long)
+C
+C  Contains:-
+C  T_STARMANGRIPE
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_starmangripe"> T_STARMANGRIPE  </a>-- Tells about comments and suggestions system (name too long)
+C
+C  alan penny                   ral            1994 Dec
+
+      subroutine t_starmangripe ( )
+
+      implicit none
+      include 'STARMAN_INC'
+C--
+      integer k
+      character*72 text(14)
+      data text /
+     + ' ',
+     + '   To make a comment on any aspect of Starman, or to report',
+     + '   a bug, or to make a suggestion for improvement, you can',
+     + '   send an e-mail to the author, Alan Penny at RAL, at the',
+     + '   address    alan.penny@rl.ac.uk     Or phone him up on',
+     + '   01235-445675 in the UK, or +44-1235-445675 from outside',
+     + '   You can also send a Fax, to 01235-446667.',
+     + ' ',
+     + '   You can also do this by using the hypertext version of ',
+     + '   this program - starmanhypergripe',
+     + ' ',
+     + '   Help is also available with starmanhelp and ',
+     + '   starmanhyperhelp.',
+     + ' '/
+
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, 14
+         call printo ( text(k) )
+      enddo
+
+
+      end
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

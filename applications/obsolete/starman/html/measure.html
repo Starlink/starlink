@@ -1,0 +1,1306 @@
+<HTML> <HEAD>
+<TITLE> MEASURE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> MEASURE -  Crowded field PSF photometry </h1>
+<hr>
+ 
+ 
+   This performs photometry of the stars in an image of a crowded star
+   field.
+<p>
+ 
+   A 2D Lorentz-Gaussian-empirical profile is fitted to the stars near
+   the positions given by an input position table. The magnitudes and
+   positions of the stars are found, and the fit details typed out and
+   stored.
+<p>
+ 
+   The profile is a full 2-D one and is a good match to typical star
+   images, so the program has a good S/N performance. It can also deal
+   with severe crowding and severe pixel under-sampling.
+<p>
+ 
+ 
+ 
+Go to <a href="intro.html#measure_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#algorithm"> Algorithm </a>
+<li> 2 <a href="#profile_variations"> Profile variations </a>
+<li> 3 <a href="#fitting"> Fitting </a>
+<ul>
+<li> 3.1 <a href="#profile_details"> Profile details </a>
+<li> 3.2 <a href="#fitting_details"> Fitting details </a>
+</ul>
+<li> 4 <a href="#input"> Input </a>
+<ul>
+<li> 4.1 <a href="#input_image"> Input image </a>
+<li> 4.2 <a href="#input_star_positions"> Input star positions </a>
+<li> 4.3 <a href="#input_profile"> Input profile </a>
+<li> 4.4 <a href="#other_inputs"> Other inputs </a>
+<ul>
+<li> 4.4.1 <a href="#before_table"> Before table </a>
+<li> 4.4.2 <a href="#extra_table"> Extra table </a>
+</ul>
+</ul>
+<li> 5 <a href="#output"> Output </a>
+<ul>
+<li> 5.1 <a href="#output_star_measures"> Output star measures </a>
+<li> 5.2 <a href="#output_cleaned_image"> Output cleaned image </a>
+</ul>
+<li> 6 <a href="#fitting_order"> Fitting order </a>
+<li> 7 <a href="#errors"> Errors </a>
+<li> 8 <a href="#tips"> Tips </a>
+<li> 9 <a href="#display"> Display </a>
+<li> 10 <a href="#hidden_parameters"> Hidden parameters </a>
+<li> 11 <a href="#parameters"> Parameters </a>
+<li> 12 <a href="#author"> Author </a>
+</ul>
+ 
+<p>
+ 
+ 
+<hr>
+ 
+ 
+ <h2> 1 <a name="algorithm"> Algorithm </h2> </a> <p>
+ 
+ 
+   <strong> What the program actually does </strong><p>
+
+<ol> 
+<li> A rough  estimate of the magnitude, height and position of each
+     star in the input list is made, looking for the peak pixel value
+     within one radius of the input position.
+<p>
+ 
+<li> These estimates are looked at for each star, to see if any of the
+    other stars (that is the stars in the input list) will
+    (given their distance in terms of the star profile and distance
+    and relative magnitude) affect the star. This is done as :-
+<p>
+ 
+   Go through the input star position table and find for each star its
+   importance according to the formula
+<p><pre>
+ 
+   Imp = mag(star) - mag(main star) - 6 + d/(star radius)
+</pre><p>
+ 
+   Thus the more important the star is the more -ve Imp is. If the
+   star is important enough to worry about (Imp less than 0) then the
+   star is noted with the more important stars first. Stars inside the
+   measuring box (width of about 10 radii) are also included.
+<p>
+ 
+   If more than fourteen stars are important enough to be noted, only
+   the fourteen most important are noted.
+<p>
+ 
+<li> This gives, for each star, a group of stars. A rectangular box is
+    drawn round the target star, large enough to take all of it in -
+    about 10 times the half height radius in X and Y, allowing for
+    the possible rotation of the star profile from the X-Y axes.
+    The group of stars are solved together (stars whose centres are
+    outside the box are fitted all the same, but their positions are not
+    allowed to vary).
+<p>
+ 
+    The result for the target star is typed out and also stored.
+<p>
+ 
+   Thus this is the stage at which the actual measurement occurs.
+<p>
+ 
+   It will be noted that stars, if any,  which are not in the input
+   list are neither fitted, nor taken into account when fitting other
+   stars.
+<p>
+ 
+<li> At the end, there is an option to clean the image by subtracting all
+    the stars that have had successful fits.
+<p>
+ 
+<li> Optionally it can then go over the cleaned image, trying to fit the
+    stars that it failed on before.
+<p>
+ 
+<li> Optionally, it can then look at close undone pairs and try to fit
+    one star between them.
+<p>
+ 
+<li> Optionally, it can repeat the entire process, using the new
+    estimates of posns and heights to deal better with large stars
+    adjacent to each target star. If on this redoing, an isolated star
+    has been previously fitted on the first loop, and its calculated
+    position was within 0.1 pixels of its input position, it is
+    assumed that the fit was good, and it is not recalculated.
+<p>
+ 
+<li> It types out each fit as it does it, as well as storing to file.
+<p>
+</ol> 
+
+
+<hr>
+<h2> 2 <a name="profile_variations"> Profile variations </h2> </a> <p>
+  
+   The program can deal with stars of different profiles. For each star
+   you can feed in a separate profile. ( If they all have the same
+   profile, as usual for many ground-based observations, this is done
+   automatically when inputting the standard profile.) This enables
+   you to deal with position and/or colour dependent profiles. Whilst
+   this option is fully functional, some helpful ancillary programs
+   are still being documented, so in the future dealing with differing
+   profiles will be easier than it is now.
+<p>
+
+<hr>
+ <h2> 3 <a name="fitting"> Fitting </h2> </a> <p>
+ 
+ 
+ The fit is done applying, to single stars or groups of stars, a proper
+ iterative least squares fitting proceedure with a function of a
+ sloping plane background and up to fourteen identical fully 2D star
+ profiles.
+<p>
+ 
+<hr>
+ <h2> 3.1 <a name="profile_details"> Profile details </h2> </a> <p>
+  
+ 
+ The profile that is fitted is one that has been found to give a good fit
+ to typical star images. It is an elliptical rotated Lorentzian sitting
+ on top of a wide low circular modified Gaussian, with an empirical
+ residuals map. The actual fitting is a scaling of this profile, added
+ onto a linear sloping background, which is fitted at the same time as
+ the star.  
+<p>
+
+ <strong> The mathematical expression of this is:- </strong>
+<p>
+<pre> 
+ 
+              -                                     -
+             l                          PQ           l
+             l        1              -dq             l
+ I(x,y) =  H.l  -------------  +  HQ.e     + F(x,y)  l
+             l        P(1+d2)                        l
+             l  1 + d1                               l
+              -                                     -
+ 
+           +  A  +  B.x  +  C.y
+ 
+  where 
+  
+  I(x,y)  = value of the star profile at pixel position x,y
+ 
+  H       = star peak Lorentz height (Gaussian and map are
+            an added fraction)
+ 
+  x0, y0  = the star centre position
+
+  A, B, C = the sloping background
+
+</pre> 
+ <strong> The Lorentz profile:- </strong>
+<pre> 
+   d1 = sqrt( (x1/Rmaj)**2 + (y1/Rmin)**2) )
+   d2 = sqrt( (x1/RPmaj)**2 + (y1/RPmin)**2) )
+ 
+   x1 = (x-x0).cos(theta) + (y-y0).sin(theta)
+   y1 = -(x-x0).sin(theta) + (y-y0).cos(theta)
+</pre><p> 
+ 
+   Rmaj and Rmin are the major and minor axes of the ellipse
+   which is rotated at theta degrees to the X axis. (Rmaj and Rmin
+   are often referred to in the code as RX and RY.)
+<p>
+ 
+   P is often about 2.2; the RPs are usually about 6*(the Rs)
+<p>
+ 
+ <strong> The circular modified Gaussian profile:- </strong>
+<p><pre>
+ 
+   dq = sqrt((x-X0)**2+(y-Y0)**2)/RQ
+</pre><p>
+ 
+   RQ is the radius, and PQ is the power of the modified Gaussian. HQ is
+   the fraction of the main Lorentz profile peak that the Gaussian has.
+   (HQ, RQ and PQ are often referred to in the code as QH, QR and QR.)
+<p>
+ 
+   HQ is often zero, and is always small, of the order of 0.01; <br>
+   RQ is usually greater than 5*(the Rs); <br>
+   PQ is often about 2. <br>
+<p>
+ 
+ <strong> The empirical map:-  </strong>
+<p>
+ 
+   F is an empirical function, the 'Profile Map'. This is expressed in
+   terms of a fraction of the main Lorentz profile. The map is
+   sampled on a grid which can be finer than the pixel
+   grid. The grid has a spacing of int((1 + 2.9/min(Rmaj,Rmin)))
+   times finer than the pixel grid. Thus the empirical
+   function is sampled at spacings better than the Nyquist frequency.
+   Unless the star is distorted, the values in this map are zero, and
+   even if the star is distorted, they are usually very
+   small, with peak values less than 1 percent of the
+   main profile. The map is not an empirical representation of the image
+   residuals from the analytical profile, but of those residuals averaged
+   over the pixels.
+<p>
+ 
+   Thus depending on the pixel size relative to the star radius, the map
+   values will change, unlike the analytical profile parameters.
+<p>
+ 
+ <strong> Pixel undersampling:-  </strong>
+<p>
+ 
+   In profiles where the radius is less than 3 pixels, full account
+   is taken of the pixel undersampling in the analytical part and (where
+   used) in the empirical part.
+<p>
+ 
+ <strong> Position, height and background:-  </strong>
+<p>
+ 
+   The parameters X0,Y0,A,B,C, and D are not parts of the profile, as
+   they can be different for each star.
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="fitting_details"> Fitting details </h2> </a> <p>
+  
+ 
+ The fitting is done by starting with trial values of the star heights
+ and positions and of the background, and then improving these by the
+ iterative linearised least squares method until an acceptable fit is
+ made, or until too many iterations have been done.
+<p>
+ 
+ Features of the fit are:-
+<p>
+<ol>
+<li> It can deal with close companions. <p>
+
+<li>  It can deal with areas of 'bad' pixels, in that such areas are
+     ignored in the fits. Again you have to define these areas. (Such
+     pixels can also be so flagged before entering the program - see
+     the Starman package help for the method of flagging invalid
+     pixels.)  <p>
+</ol>
+ 
+  The fitting takes account of pixel averaging, that is what happens
+  when the star radius is small, and there is significant change in
+  the profile across one pixel. As the profile is not a straight line,
+  the normal practice of taking the profile value at the centre of the
+  pixel will be wrong. The program subdivides the profile over the
+  pixel and calculates a more accurate average. So the bad effects of
+  a narrow profile and star centres being at different distances from
+  the pixel sides are minimised.
+<p>
+ 
+  The 'volume' of this profile, that is the numerical integration under
+  the 2-D profile out to a defined distance, can be calculated. (The
+  calculation is done with a fine mesh, so there is no effect from the
+  pixel averaging for small radii.) This enables the magnitudes of
+  stars with different profiles to be estimated.
+<p>
+ 
+  So each star has a height, A, and a position X0, Y0.
+<p>
+ 
+  The program also calculates a magnitude from the star height. This
+  is :-
+<p><pre>
+   Mag  =  30  -  2.5*log  (star height*profile volume)
+                         10
+</pre><p>
+
+  The profile volume is the numerical integration (on a fine grid)
+  over the standard profile for a star of unit height out to a large
+  distance. So (star height*profile volume) is an estimator of the
+  total flux in the target star.
+  The value 30 is an arbitrary constant to give magnitudes of a
+  comfortable level.
+<p>
+ 
+  The relative magnitudes of the stars in the image will be measured
+  correctly, and the absolute level will be roughly right (apart from
+  the arbitrary zero point), but for the best comparision with stars
+  in other images with different profiles, the zero point is best
+  determined by aperture photometry on the bright stars.
+<p>
+ 
+ 
+
+<hr>
+ <h2> 4 <a name="input"> Input </h2> </a> <p>
+ 
+  The input consists of an image, a table of star positions and
+   a profile. Optionally other star tables can be input for ease
+   of use
+<p>
+  
+<hr>
+ <h2> 4.1 <a name="input_image"> Input image </h2> </a> <p>
+ 
+  The input image can be any Starman .sdf image, without constraints.
+<p>
+
+   Input with parameter `IN'.
+<p>
+   
+<hr>
+ <h2> 4.2 <a name="input_star_positions"> Input star positions </h2> </a> <p>
+ 
+
+  The star positions are fed in through a Starman table.
+<p>
+
+   Input with parameter `INSTARS'.
+<p>
+
+  This must contain at least two columns for the X,Y positions. The
+  positions will be taken from those columns with headers `X' and `Y'.
+  If these headers are not present, then the X position will be taken
+  from the first column and/or the Y position forom the second column.
+<p>
+
+  It should be noted that the program cannot find stars for itself, or
+  decide if a star is actually a multiple one. It takes the stars in the
+  input position table as all the stars it has to know about. A consequence
+  of this is that the input positions have to be rather good, for two
+  reasons. First the program only looks a short way round each input
+  position for a star (this is to avoid trouble in crowded areas). Second
+  if stars are really crowded, the fitting tends to fail unless the
+  input positions are good. For the first case, the positions have to
+  be within a radius, and for the second even better.
+<p>
+
+  There may also be a `HEIGHT' column, which contains a value of
+  an estimate of the star height. Again this is in either the column with
+  the `HEIGHT' header or in column 3. This parameter is optional.
+<p>
+ 
+  This file may also contain the information for the profile to be
+  used for each star. As MEASURE can apply a different profile for
+  each star, this information has to be supplied to the program. In the
+  INSTARS file, each star may have the profile parameters given for
+  each star as columns in this input table. These parameters are taken
+  from columns with the appropriate header, or if that is not present, then
+  a default column. These headers are:-
+<p>
+
+<pre>
+  Parameter       Header      Default Column    Mandatory
+    ---------       ------      --------------    ---------
+    X posn          `X'             1                Y
+    Y posn          `Y'             2                Y
+    Height          `HEIGHT'        3                N
+    Maj Rad         `RX'            4                N
+    Min Rad         `RY'            5                N
+    Power           `P'             6                N
+    Pow Maj Rad     `PRX'           7                N
+    Pow Min Rad     `PRY'           8                N
+    Angle           `THETA'         9                N
+    Gauss Power     `QP'           10                N
+    Gauss Height    `QH'           11                N
+    Gauss Rad       `QR'           12                N
+    Map Number      `MAPNUM'       13                N
+    Map X Size      `MX'           14                N
+    Map Y Size      `MY'           15                N
+    Map Magnif      `MAGNIF'       16                N
+   
+</pre><p>
+
+   The `Map Number' gives the number of the empirical profile map
+   to use in the input file `PROFILE', with the MX and MY showing
+   the XY size of that particular map to use, and the `MAGNIF' showing the
+   `magnification' of that particular map. For a fuller explanation see
+   the help on `PROFILE'.
+<p>
+
+   If any of the non-mandatory columns are absent (i.e. there are less
+   than 16 columns in the input table, than the profile parameters
+   given in the input `PROFILE' file will be used for the missing
+   parameters.
+<p>
+
+   The parameters in the `PROFILE' file will override ALL profile
+   parameters (if any) in the `INSTARS' file, if the `PYES' parameter is
+   given as `yes' (its default value). Also in this case, the map number
+   is defined as `1'.
+<p>
+    
+<hr>
+ <h2> 4.3 <a name="input_profile"> Input profile </h2> </a> <p>
+
+ The star profile is fed in through an image made by the PROFILE (qv)
+  program.
+<p>
+
+   Input with parameter `PROFILE'.
+<p>
+
+  This can be just one profile or it can be the store of many profiles
+  empirical maps for when stars have differing profiles. In this
+  latter case, then the profiles parameters are input in the INSTARS
+  table in a manner explained elsewhere.
+<p>
+
+  This file is a 2-D image. It contains the parameters for one
+  profile as descriptors, and the image pixels contain the empirical
+  profile map for either one, or more than one profile.
+<p>
+
+  The descriptors are:-
+<p>
+
+<pre>
+    Parameter       Descriptor
+    ---------       ------
+    Maj Rad         `RX'
+    Min Rad         `RY'
+    Power           `P'
+    Pow Maj Rad     `PRX'
+    Pow Min Rad     `PRY'
+    Angle           `THETA'
+    Gauss Power     `QP'
+    Gauss Height    `QH'
+    Gauss Rad       `QR'
+    Map Magnif      `MAGNIF'
+    Profile Volume  `VOL'
+    Radius for Vol  `VOLRAD'
+    Gauss Base      `QBASE'
+    No of maps      `MAPMAX'
+    Map X space     `MAPX'      (optional)
+    Map Y space     `MAPY'      (optional)
+</pre>
+<p>
+
+ An empirical map covers a certain number of image pixels, with
+  a defined sub-division of the pixels (the `magnification'). Thus
+  a pixel map that covers a 10x10 image pixel area will have a
+  size of 20x20 if its `magnification' is 2.
+<p>
+
+  The pixel values are the values that that pixel (or sub-division of
+  a pixel) is scaled down from the Lorentzian profile. Thus if a
+  pixel should have 1/10th the value of the Lorentzian peak value,
+  then it will have a value of 0.1 (since the Lorentz central peak
+  has a value of 1.0).
+<p>
+
+  Often the image will have a `BSCALE' and `BZERO', so the pixel
+  values used are  that of (BS*[disk value] + BZ).
+<p>
+
+  (This `single' profile image is the one put out as the output of the
+  PROFILE programme.)
+<p>
+
+  If more than one empirical map is to be held in the image, then
+  this has to be made by the user, by making an image with the `MAPMAX'
+  parameter being more than one. In this case the maps are stored in
+  the image in a series of `boxes', of size MAPX by MAPY, stacked one
+  `above' in the other in the `Y' direction, with their `left-hand' sides
+  along the `left' of the image. Each map is kept with its
+  b.l.h. corner at the b.l.h corner of its `box'. If the MAPX and
+  MAPY parameters are missing, then the program assumes that MAPX is
+  the same as the X size of the image, and that MAPY is the Y size
+  of the image, divided by MAPMAX, the number of maps in the image.
+<p>
+
+  When a map is used, the program gets the map number, and actual
+  X,Y size of the map from the INSTARS input star position table,
+  finds the map location from the image as the `nth' box up, and
+  reads the map out of the box.
+<p>    
+
+<hr>
+ <h2> 4.4 <a name="other_inputs"> Other inputs </h2> </a> <p>
+ 
+  Optionally, two further tables of stars of stars can be input.
+<p>
+
+<hr>
+ <h2> 4.4.1 <a name="before_table"> Before table </h2> </a> <p>
+ 
+   A table which was the 'OUT' measures from a previous run of MEASURE.
+<p>
+
+   Input with parameter `BEFORE'.
+<p>
+
+   This table must contain the same stars with the same positions as
+   the main input star position table 'IN'. The purpose of this
+   is that if a run was interrupted, and only some stars solved, the
+   run can be repeated, but the stars done dont have to be redone.
+   If there is not such a file, just press 'return'.
+<p>
+    
+<hr>
+ <h2> 4.4.2 <a name="extra_table"> Extra table </h2> </a> <p>
+
+  Is there another table of stars, additional to the input table,
+   which should be solved for?
+<p>
+
+   Input with parameter `EXTRA'.
+<p>
+
+   The is for use when you have solved for a lot of stars in an image,
+   but you want to do a few more and these new stars could be crowded
+   by the old stars, as well as by themselves. Rather than redoing the
+   combined tables together, when all the stars would have to be
+   redone, the new ones are input here and the program works out which
+   stars of the old table have to be redone since stars of the new
+   table affect them and which stars of the new table are affected by
+   stars in the old table. The output table has the stars from the old
+   table and then those from the new table in it.
+<p>
+    
+<hr>
+ <h2> 5 <a name="output"> Output </h2> </a> <p>
+
+  The output consists of a table of star measures, and optionally
+  a copy of the input image, with the measured stars `removed'.
+<p>
+  
+<hr>
+ <h2> 5.1 <a name="output_star_measures"> Output Star Measures </h2> </a> <p>
+ 
+  The output star measures are put into a file in the Starman table format.
+<p>
+
+   Output with parameter `OUT'.
+<p>
+
+  The table has entries in the order:-
+<p>
+<pre>
+ 
+   Column  Identifier    Content
+   ------  ----------    -------
+     1       X           fitted X position
+     2       Y           fitted Y position
+     3       MAG         magnitude
+     4       DX          difference in fitted X posn from 
+                         input posn
+     5       DY          difference in fitted Y posn from 
+                         input posn
+     6       ITERATIONS  no of iterations done in the fitting
+     7       CHI         calculated Chi-squared value of the 
+                         fit
+     8       NUMINVAL    number of INVALID points in the 
+                         Chi-squared error estimating area
+     9       HEIGHT      height of the fitted star above sky
+    10       BASE        sky (or background) level
+    11       MAPNUMB     number of profile map used
+    12-20    as contents profile parameters:-  RX, RY, P, 
+                                 PRX, PRY, THETA, QR, QH, QP
+    21       NUMCOMPS    no of companion stars that have been
+                         fitted with thetarget star
+    22-28    COMP1, etc  numbers (as ranks in the input 
+                         table) of the first block of 
+                         companion stars, in order of 
+                         importance (as defined above) to the 
+                         target star
+    29       XBOX        X size of the box used for fitting
+    30       YBOX        Y size of the box used for fitting
+    31       IMPORTANCE  total importance of all companion 
+             OF COMPS    stars used
+    32       XSLOPE      X sky slope fitted
+    33       YSLOPE      Y sky slope fitted
+    34       FLAG1       Flag 1 for internal program use
+    35       FLAG2       Flag 2 for internal program use
+    36       VOLUME      'volume' of a star, with this 
+                         profile, of unit height
+    37       ORDER       order this star was done in the fit
+    38       MAPX        empirical map X size
+    39       MAPY        empirical map Y size
+    40       MAGNIF      empirical map magnification
+    41-47    COMP8, etc  22-28 for second block of stars
+    48       DIFF LAST   change in the magnitude estimate
+             ITS         between the final fit and the 
+                         iteration two before it
+    49       GUESS       temporary internal height estimates
+             HEIGHT
+    50       ERROR       Estimate of the star magnitude error
+    51       DAMPING     final value of the damping factor
+                         used in the star fit
+</pre><p>
+
+
+    The program stores output as it goes along, so a crash is not
+   fatal. You can also rerun the program using the part completed output as
+   input so it doesnt have to do those stars again, by use of the
+   BEFORE option.
+<p>
+  The output table may be inspected, plotted on the image, and
+  formatted for printing by using the program INTERACT, in the
+  `scrutiny' mode.
+<p>
+      
+<hr>
+ <h2> 5.2 <a name="output_cleaned_image"> Output Cleaned Image </h2> </a> <p>
+
+  Optionally, the input image can be copied to the output, with the
+  stars that have had actual fits `removed' from the image. This
+  enables you to see how good the fits were.
+<p>
+
+   Output with parameter `OUTIM'.
+<p>
+
+  There are a number of ways in the INTERACT program with the `scrutiny'
+  mode that this cleaned image can be looked at, especially in
+  conjunction with the table of star measures.
+<p>
+
+<hr>
+ <h2> 6 <a name="fitting_order"> Fitting order </h2> </a> <p>
+ 
+ 
+   The actual order of fitting is to start with the brightest star,
+   solve it, and go onto the next brightest. This is so that in
+   fitting the difficult faint stars, the any nearby bright stars will
+   already have more accurate psoitions and heights for use in setting
+   up the starting conditions of the fit, and thus make the fit will be
+   both more accurate and faster. Doing the stars in this way also means
+   that the bright easy stars are done first, and so monitoring of the
+   process at the beginning of running the program is more rewarding
+   in that the results come more quickly than later on, and also the
+   results for the most prominent stars become available first.
+<p>
+ 
+<hr>
+ <h2> 7 <a name="errors"> Errors </h2> </a> <p>
+ 
+ 
+   The program calculates two error parameters for each star. There
+   are:-
+<p>
+<ol> 
+<li>  The Chi-squared value from the difference between the fitted
+         (maybe multiple) profile and the actual data over a small
+         area around the fitted star position. The area is an
+         orthogonal rectangle of X size (2*RX+1) and Y size (2*RY+1),
+         and so no account here is taken of any rotation of the star
+         from the X-Y axes. The RX, RY are as defined in the profile
+         equation above. <p>
+
+<li> An estimate of the error of the star magnitude itself. This is
+         calculated from the goodness of the fit itself, made during
+         the least-squares fitting, falling out of the error matrix.
+<p>
+</ol> 
+
+<hr>
+ <h2> 8 <a name="tips"> Tips </h2> </a> <p>
+ 
+ 
+  The main decision is do you want to do the two refining options,
+  REDO and DOTWOS, and do you want to do the RECYCLE.
+<p>
+ 
+  The simplist and fastest, is NO to all of the above. Some
+  more difficult stars are done with the REDO and DOTWOS options,
+  and slightly more accurate results are given by RECYCLE. It depends
+  a lot on what your interest in the image is, and how much
+  computer time you want to spend.
+<p>
+ 
+  The default choice is a reasonable choice.
+<p>
+ 
+  The secondary decision is the OUTFIX1 and OUTFIX2 details about the
+  fits. See the help on them for more details, but again the default
+  is a reasonable choice.
+<p>
+ 
+  On both these matters, some experimentation by you will give you
+  an idea on the best combination to suit you.
+<p>
+ 
+
+ 
+<hr>
+ <h2> 9 <a name="display"> Display </h2> </a> <p>
+ 
+ 
+  There is a very pretty option. It shows how the fitting is getting
+  on, but slows the program down
+<p>
+ 
+  The whole image is displayed and then a little square dots round
+  removing the stars.
+<p>
+ 
+  It paints up a blue rectangle of the place where it is going to remove
+  the next star. Then it removes it, and paints a green rectangle where
+  the fit has used data from the image to make the fit. There is also a
+  red rectangle which shows the area out to where the subtraction of the
+  wings of the fitted star have had an effect, that is at a level of
+  0.2 pixel value.
+<p>
+ 
+<hr>
+ <h2> 10 <a name="hidden_parameters"> Hidden parameters </h2> </a> <p>
+ 
+ 
+  A number of input control parameters that the user can set to control
+  the way the program works are 'hidden' from the user. That is, the
+  default values are used unless overridden on the Command Line, or
+  in a local '.ifl' interface file.
+<p>
+ 
+  This is done because the parameters need only be changed for special
+  needs. The parameters are:-
+<p>
+<pre>
+ 
+  Name      Function                             Default
+  ----      --------                             -------
+  BOX       Set size of box round stars to       Appropriate
+            be fitted                            Size
+
+  DOTWOS    Fit close undone pairs as single     Yes
+            star on cleaned image
+
+  FIX       Fix all star positions at input      No
+            values
+
+  INFORM    Type of information output           Simplest
+
+  NUMBER    Number of stars to fit (brightest    All
+            first)
+
+  OFIX1     Fix posns and hts of stars some      Yes
+            distance from box at rough values,  
+            in first cycle
+
+  OFIX2     Fix posns and hts of stars some      Yes
+            distance from box at 1st cycle 
+            values, in second cycle
+
+  RADIUS    Radius out to which 'volume' under   30.0
+            profile is to be found to add to
+            mag zero point
+
+  RECYCLE   After the fits, repeat the entire    Yes
+            process, to get better estimates
+
+  REDOCL    After the first fit, image cleaned   Yes
+            and the failed stars fitted on the 
+            cleaned image.
+
+  SCREEN    Size of screen to open up if         Image
+            displaying image                     size
+</pre><p>
+ 
+  Further information is available in the individual helps on the
+  parameters.
+<p>
+
+<hr>
+ <h2> 11 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+ 
+   A guide to the input parameters, that is those parameters the user
+   inputs when running the program, or when entering responses into
+   the `.ifl' interface file.
+<p>
+<ul>
+<li> 11.1 <a href="#before"> Before </a>
+<li> 11.2 <a href="#box"> Box </a>
+<li> 11.3 <a href="#dodisp"> Dodisp </a>
+<li> 11.4 <a href="#domap"> Domap </a>
+<li> 11.5 <a href="#dotwos"> Dotwos </a>
+<li> 11.6 <a href="#extra"> Extra </a>
+<li> 11.7 <a href="#fix"> Fix </a>
+<li> 11.8 <a href="#gain"> Gain </a>
+<li> 11.9 <a href="#heights"> Heights </a>
+<li> 11.10 <a href="#in"> In </a>
+<li> 11.11 <a href="#inform"> Inform </a>
+<li> 11.12 <a href="#instars"> Instars </a>
+<li> 11.13 <a href="#noise"> Noise </a>
+<li> 11.14 <a href="#number"> Number </a>
+<li> 11.15 <a href="#ofix1"> Ofix1 </a>
+<li> 11.16 <a href="#ofix2"> Ofix2 </a>
+<li> 11.17 <a href="#oimtit"> Oimtit </a>
+<li> 11.18 <a href="#out"> Out </a>
+<li> 11.19 <a href="#outim"> Outim </a>
+<li> 11.20 <a href="#outtit"> Outtit </a>
+<li> 11.21 <a href="#profile"> Profile </a>
+<li> 11.22 <a href="#pyes"> Pyes </a>
+<li> 11.23 <a href="#radius"> Radius </a>
+<li> 11.24 <a href="#recycle"> Recycle </a>
+<li> 11.25 <a href="#redocl"> Redocl </a>
+<li> 11.26 <a href="#xcoeff"> Xcoeff </a>
+<li> 11.27 <a href="#ycoeff"> Ycoeff </a>
+</ul>
+ 
+<hr>
+ <h2> 11.1 <a name="before"> Before </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+   The name of a file containing the table which was the 'OUT' measures
+   from a previous run of MEASURE. if no such file is to be input,
+   enter the 'null' response.
+<p>
+ 
+   This table must contain the same stars with the same positions as
+   the main input star position table 'IN'. The purpose of this
+   is that if a run was interrupted, and only some stars solved, the
+   run can be repeated, but the stars done dont have to be redone.
+   If there is not such a file, just press 'return'.
+<p>
+ 
+<hr>
+ <h2> 11.2 <a name="box"> Box </h2> </a> <p>
+ 
+  (Default-  0,0              <br> Range -  0 to 200)
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  The X,Y size of the box round each star that is to be used in the
+  fitting. If either size is set at 0 (which is the default), then the
+  program calculates for each star what it thinks the best box size is.
+  This is done from the width of the profile for that star.
+<p>
+ 
+<hr>
+ <h2> 11.3 <a name="dodisp"> Dodisp </h2> </a> <p>
+ 
+  (Default - 'no'    <br> Choice - 'yes:no')
+<p>
+ 
+  Display the results as they are calculated?
+<p>
+ 
+  This is a very pretty option. It shows how the fitting is getting on.
+  on, but slows the program down
+<p>
+ 
+  The whole image is displayed and then a little square dots round removing
+  the stars.
+<p>
+ 
+  It paints up a blue rectangle of the place where it is going to remove
+  the next star. Then it removes it, and paints a green rectangle where
+  the fit has used data from the image to make the fit. There is also a
+  red rectangle which shows the area out to where the subtraction of the
+  wings of the fitted star have had an effect, that is at a level of
+  0.2 pixel value.
+<p>
+ 
+<hr>
+ <h2> 11.4 <a name="domap"> Domap </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+   If you have an empirical map in your profile file, do you want it
+   used?
+<p>
+ 
+<hr>
+ <h2> 11.5 <a name="dotwos"> Dotwos </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no') <p>
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  After the first fit (and any redo -see 'Redocl' parameter), do you
+  want the image cleaned and an attempt made to fit close undone
+  pairs as a single star.
+<p>
+ 
+<hr>
+ <h2> 11.6 <a name="extra"> Extra </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+   The name of a file with a table of extra star positions. If no
+   extra file is to be input, enter the 'null' response.
+<p>
+ 
+   Is there another table of stars, additional to the input table,
+   which should be solved for?
+<p>
+ 
+   The is for use when you have solved for a lot of stars in an image,
+   but you want to do a few more and these new stars could be crowded
+   by the old stars, as well as by themselves. Rather than redoing the
+   combined tables together, when all the stars would have to be
+   redone, the new ones are input here and the program works out which
+   stars of the old table have to be redone since stars of the new
+   table affect them and which stars of the new table are affected by
+   stars in the old table. The output table has the stars from the old
+   table and then those from the new table in it.
+<p>
+ 
+<hr>
+ <h2> 11.7 <a name="fix"> Fix </h2> </a> <p>
+ 
+  (Default - 'no'      <br> Choice - 'yes:no')
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  Option to fix the positions of all the stars at the input positions.
+  This can enable more accurate magnitudes to be calculated. Use of
+  this option should be done with care, as even a small inaccuracy in
+  the input position (say a 1/10th of the seeing diameter will result
+  in very poor fits.
+<p>
+ 
+<hr>
+ <h2> 11.8 <a name="gain"> Gain </h2> </a> <p>
+ 
+  (Default - 1.0        <br> Range - 1.0e-8 to 1.0e8)
+<p>
+ 
+  The gain of the original detector. in terms of counts stored in
+  a pixel for each independent event detected. Thus something like
+  counts/photon.
+<p>
+ 
+<hr>
+ <h2> 11.9 <a name="heights"> Heights </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+   If the input table of stars has a column called 'HEIGHTS', then this
+   is the choice for using the fitted heights in that file for the
+   program to use as first estimators of the star heights when looking
+   for important neighbours to allow for in the fitting. Say no only
+   when the numbers in the 'HEIGHTS' column are not the heights.
+<p>
+ 
+<hr>
+ <h2> 11.10 <a name="in"> In </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+   The name of the input image. This must be the name of a .sdf image
+   file.
+<p>
+ 
+<hr>
+ <h2> 11.11 <a name="inform"> Inform </h2> </a> <p>
+ 
+   (Default - 'standard'          <br> Choice - 'none:standard:more:full')
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+   Flag for outputting via the terminal to the user information about
+   the progress of the program.
+<p>
+<pre>
+ 
+    Flag       Terminal Output
+    ----       ---------------
+    none       Results only
+    standard   Results + stage reached
+    more       Results + stage reached + times at various 
+                 subroutine entries
+    full       Results + companion fits + stage reached + 
+                 times at various subroutine entries
+</pre><p>
+ 
+<hr>
+ <h2> 11.12 <a name="instars"> Instars </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+  The name of the file with the table of the star positions. This
+  must be the name of a Starman table format file, with two
+  columns containing the X,Y positions.
+<p>
+
+  This can be very complex. A full help is given in the `Input
+  Star Positions' section above.
+<p>
+ 
+<hr>
+ <h2> 11.13 <a name="noise"> Noise </h2> </a> <p>
+ 
+  (Default- 0.0                  <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  The additional noise per pixel present in a pixel if there was no
+  signal noise. An example of this is the read-out noise in a CCD.
+<p>
+ 
+  This should be in the std dev of the numbers in the image pixels.
+<p>
+ 
+  This is used when calculating the error in a measure.
+<p>
+ 
+<hr>
+ <h2> 11.14 <a name="number"> Number </h2> </a> <p>
+ 
+  (Default - All of them.        <br> Range - 0 to all)
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  The number of stars to be analysed. Remember that the stars are
+  done in rough order of brightness, so 'number' does not mean do
+  the first 'number' in the input table, but 'number' of the bright
+  stars, though not necessarily the brightest ones.
+<p>
+ 
+<hr>
+ <h2> 11.15 <a name="ofix1"> Ofix1 </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+  wanted)
+<p>
+ 
+  In the first loop, fix, for each star fit, the positions and heights
+  of those stars some distance outside the fitting  box at roughly found
+  values (or the input heights)?
+<p>
+ 
+  The advantage in fixing is that if you already have the right heights,
+  then the fit will be better. The danger is that if the heights are
+  wrong, then the fit might be inaccurate. If you are only doing one
+  loop, you have to let the stars vary as the input geusses are
+  just rough estimates. If doing two loops, then the error will not
+  be too large, and fixing them will speed things up.
+<p>
+ 
+  If you are doing once (RECYCLE=NO) then
+  say NO, otherwise the common answer is YES, but you might
+  to try otherwise and see what difference it makes to the results.
+<p>
+ 
+<hr>
+ <h2> 11.16 <a name="ofix2"> Ofix2 </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  In the second loop (if doing one), fix, for each star fit, the
+  positions and heights of those stars some distance outside the
+  fitting  box at the values found in the first loop?
+<p>
+ 
+  The advantage in fixing is that if you already have the right heights,
+  then the fit will be better. The danger is that if the heights are
+  wrong, then the fit might be inaccurate. By the second loop, the
+  fits from the first loop should be reasonable.
+<p>
+ 
+  The common answer is YES, but you might
+  try NO and see what difference it makes to the results.
+<p>
+ 
+<hr>
+ <h2> 11.17 <a name="oimtit"> Oimtit </h2> </a> <p>
+ 
+  (Default - 'Output from MEASURE'    <br> Choice - any)
+<p>
+ 
+  The title to be attached to the output cleaned OUTIM image.
+<p>
+ 
+<hr>
+ <h2> 11.18 <a name="out"> Out </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+  The name of the file to contain the output table of measurements.
+<p>
+ 
+  Its contents are described in the 'Misc' section of the help.
+<p>
+ 
+  This table can be looked at, and formatted for listing, by the
+  program 'INTERACT' in its 'SCRUTINY' section.
+<p>
+ 
+<hr>
+ <h2> 11.19 <a name="outim"> Outim </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+ 
+  If you want a copy of the input image, cleaned of the fitted stars,
+  then input here the name of a file to hold the cleaned image.
+<p>
+ 
+  If you do not want to have this stored, then just press return.
+<p>
+ 
+  This has no bearing on the option for fitting unfitted stars on a
+  cleaned image. The calculations are entirely separate.
+<p>
+ 
+<hr>
+ <h2> 11.20 <a name="outtit"> Outtit </h2> </a> <p>
+ 
+   (Default - 'Output from MEASURE'      <br> Choice -any)
+<p>
+ 
+  The title to be added as a descriptor to the 'Outstars' file.
+<p>
+ 
+<hr>
+ <h2> 11.21 <a name="profile"> Profile </h2> </a> <p>
+ 
+   (Default - null)
+<p>
+ 
+  The name of the image, usually  made by PROFILE (qv), which has the
+  image parameters. 
+
+<p>
+  This can be very complex. A full help is given in the `Input
+  Profile' section above.
+
+<p>
+ 
+<hr>
+ <h2> 11.22 <a name="pyes"> Pyes </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  If you have profiles in the star table, do you want the profile
+  parameters in the profile file to override the profiles in the table?
+<p>
+ 
+<hr>
+ <h2> 11.23 <a name="radius"> Radius </h2> </a> <p>
+ 
+   (Default - 30.0.              <br> Range - 1.0 to 1.0e8)
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  When calculating the magnitude, the volume under the profile has
+  to be calculated. How far out from the star (in pixels) shall this
+  be carried out? This is only important if you want to compare with
+  aperture photometry, or have stars with differing profiles in the
+  image.
+<p>
+ 
+<hr>
+ <h2> 11.24 <a name="recycle"> Recycle </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  After the fits has been done, repeat the entire process, to use the
+  better estimates of star heights and positions for starting input,
+  and for better fits where a star is affected by stars some distance
+  away.
+<p>
+ 
+<hr>
+ <h2> 11.25 <a name="redocl"> Redocl </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<br>
+  (Hidden parameter - not asked for, has to be set if default not
+   wanted)
+<p>
+ 
+  After the first fit, do you want the image cleaned and an attempt
+  made to fit the failed stars on the cleaned image.
+<p>
+ 
+<hr>
+ <h2> 11.26 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+ 
+  (Default - 0.0,1.0,0.0         <br> Range   -1.0e20 to 1.0e20)
+<p>
+ 
+  The coefficients used to transform the XY positions in the input table
+  of star positions to a new set of X positions.
+<p>
+<pre> 
+ 
+             X  =  C(1) + C(2)*X  +  C(3)*Y
+                                in         in
+</pre>
+
+<hr>
+ <h2> 11.27 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+ 
+  (Default - 0.0,0.0,1.0         <br> Range   -1.0e20 to 1.0e20)
+<p>
+ 
+  The coefficients used to transform the XY positions in the input table
+  of star positions to a new set of Y positions.
+<p>
+<pre> 
+ 
+             Y  =  C(1) + C(2)*X  +  C(3)*Y
+                                in         in
+</pre><p>
+ 
+ 
+<hr>
+ <h2> 12 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+   A.J.Penny                 RGO-STScI-RAL            1984-1994
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

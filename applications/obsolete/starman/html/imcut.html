@@ -1,0 +1,226 @@
+<HTML> <HEAD>
+<TITLE> IMCUT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMCUT - <br>
+ Cut an image out (sectioned,binned,inverted)
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Copies one image to another, with the options of:-
+<p>
+<ul>
+<li> Copying only a section of the input image
+<li> Binning that section down
+<li> Inverting the section in X and/or Y
+</ul><p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imcut_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+
+<ul> 
+<li> 1 <a href="#binning"> Binning </a>
+<li> 2 <a href="#inverting"> Inverting </a>
+<li> 3 <a href="#parameters"> Parameters </a>
+<li> 4 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="binning"> Binning </h2> </a> <p>
+ 
+ 
+  It can take rectangular groups of pixels (bins) in the input image
+  and output them as a single pixel to the output image. This is
+  known as `binning'. The reduction of a group can be done either
+  by taking the bottom left hand pixel of the group and outputting
+  that value, or taking the mean of all the pixels in the group.
+  If the average is taken, there is the choice of:-
+<p>
+<ol>
+<li> ignore any INVALID points in the bin
+<li> set the output to INVALID.
+</ol><p>
+ 
+  If this binning is used, and the chosen area of the input image cannot
+  be exactly sub-divided into an integral number of bins, then those
+  pixels at the right and top edges of the chosen area that fall
+  outside the binned area are ignored.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="inverting"> Inverting </h2> </a> <p>
+ 
+ 
+  The inverting is done by defining the section with the start and
+  stop locations inverted.
+<p>
+ 
+  Thus for example, if one wanted to take all the bottom half of
+  an image of size NX by NY, and invert in X, one would define the
+  section as:-
+<p>
+ 
+          (NX, 1) and (1, NY/2)
+<p>
+ 
+<hr>
+ <h2> 3 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 3.1 <a href="#bin"> Bin </a>
+<li> 3.2 <a href="#check"> Check </a>
+<li> 3.3 <a href="#in"> In </a>
+<li> 3.4 <a href="#out"> Out </a>
+<li> 3.5 <a href="#sample"> Sample </a>
+<li> 3.6 <a href="#title"> Title </a>
+<li> 3.7 <a href="#xrange"> Xrange </a>
+<li> 3.8 <a href="#yrange"> Yrange </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 3.1 <a name="bin"> Bin </h2> </a> <p>
+ 
+  (Default - 1,1       <br> Range - 1 to max size of image)
+<p>
+ 
+  The size of the groups of pixels that are to binned to make
+  the output image. If the default is taken, no binning is done.
+<p>
+ 
+  If the sampling step in both X and Y is not one, then either the 1st
+  (blh) pixel of the bin is output ('yes'), or the average of the bin
+  is output ('no').
+<p>
+ 
+  If the average is taken, there is the option to either ignore any
+  INVALID points in the bin, or to set the output to INVALID.
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="check"> Check </h2> </a> <p>
+ 
+  (Default - `no'        <br> Choice - `no:yes')
+<p>
+ 
+  In taking the average, ignore any INVALID points in the input bin
+  ('no'), or to set the output to INVALID ('yes').
+<p>
+ 
+<hr>
+ <h2> 3.3 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image file.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 3.4 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the new file containing the output image.
+<p>
+ 
+  The output image will be a standard Starman ADAM .SDF image. It
+  will have th same type as the input image, with either `real'
+  32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 3.5 <a name="sample"> Sample </h2> </a> <p>
+ 
+  (Default - `highest'        <br> Choice - `sample:highest:average')
+<p>
+ 
+  If the binning step in both X and Y is not one, then either the 1st
+  (blh) pixel of the bin is output ('sample'), or the highest pixel of
+  the bin (`highest'), or the average of the bin is output ('no').
+<p>
+ 
+  If the average is taken, there is the option to either ignore any
+  INVALID points in the bin, or to set the output to INVALID.
+<p>
+ 
+<hr>
+ <h2> 3.6 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title, or if null, `Output from IMCUT' <br>
+   Choice  - any)
+<p>
+ 
+  Title to add to output image
+<p>
+ 
+<hr>
+ <h2> 3.7 <a name="xrange"> Xrange </h2> </a> <p>
+ 
+  (Default - 1,input image X size     <br> Range - 1 to input image X size)
+<p>
+ 
+  X start and X end of the area of image to cut out and put in new image.
+<p>
+ 
+  If the X end is smaller than the X start, then the output image is
+  inverted in X.
+<p>
+ 
+<hr>
+ <h2> 3.8 <a name="yrange"> Yrange </h2> </a> <p>
+ 
+  (Default - 1,input image Y size     <br> Range - 1 to input image Y size)
+<p>
+ 
+  Y start and Y end of the area of image to cut out and put in new image.
+<p>
+ 
+  If the Y end is smaller than the Y start, then the output image is
+  inverted in Y.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1991 June
+<p>
+ 
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,1348 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBCALC
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBCALC
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbcalc_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbcalc">
+t_tbcalc  </a>  Do table calculations       <br>
+<a href="#tbca_gcl">
+tbca_gcl  </a>  Get input and output info from the command line       <br>
+<a href="#tbca_back">
+tbca_back  </a>  Load background       <br>
+<a href="#tbca_polish">
+tbca_polish  </a>  Decode equation and sort into reverse Polish       <br>
+<a href="#tbca_doit">
+tbca_doit  </a>  Combine the tables       <br>
+<a href="#tbca_tbdiff">
+tbca_tbdiff  </a>  Get number of diff input tables and point to stack       <br>
+<a href="#tbca_vardiff">
+tbca_vardiff  </a>  Get number of diff input variables and point to stack       <br>
+<a href="#tbca_load">
+tbca_load  </a>  Copy table into a 3-D stack       <br>
+<a href="#tbca_sort">
+tbca_sort  </a>  Sort identifiers to alphabetical order       <br>
+<a href="#tbcalc">
+tbcalc  </a>  Applies equations to columns in a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_TBCALC.F
+C
+C  Contains:-
+C
+C T_TBCALC      Do table maths
+C TBCA_GCL      Get input and output info from the command line
+C TBCA_BACk     Load background
+C TBCA_POLISH   Decode equation and sort into reverse Polish
+C TBCA_DOIT     Combine the tables
+C TBCA_TBDIFF   Get number of diff input tables and point to stack
+C TBCA_VARDIFF  Get number of diff input variables and point to stack
+C TBCA_LOAD     Copy table into a 3-D stack
+C TBCA_SORT     Sort identifiers to alphabetical order
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbcalc"> T_TBCALC  </a>-- Do table calculations
+C
+C  alan penny                  ral              1991 Dec
+
+      subroutine t_tbcalc ()
+
+      implicit none
+      include 'tbcalc.inc'
+      include 'STARMAN_INC'
+C--
+      integer k, ipstk, ipd, ierr, ierr1, ierr2
+Cbegin
+
+
+      call azeroi ( IMP, 70*20 )					!Zero locators for tables and varaibles
+      call azeroi ( IMPV, 70*20 )
+
+      call tbca_gcl							!Get input/output info
+      if ( ST_FAILED .or. NUMEQN.eq.0 ) return
+
+      if ( TBZ.eq.0 ) then						!Get work space
+         call gtwrki ( 'STACK', 1, ipstk, ierr1 )
+      else
+         call gtwrki ( 'STACK', TBXM*TBY*TBZ, ipstk, ierr1 )
+      endif
+      call gtwrkr ( 'COL', TBY, ipd, ierr2 )
+      if ( max(ierr1,ierr2).ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( TBZ.ne.0 ) then						!Load input tables into stack
+         do k = 1, TBZ
+            call tbca_load ( %val(IP(k)), TBVX(k), TBY, k, %val(ipstk),
+     +                       TBXM, TBY )
+            if ( ST_FAILED ) return
+         enddo
+      endif
+
+      call tbca_back							!Load background
+
+      do k = 1, NUMEQN							!Do the calculations
+         call tbca_doit ( %val(ipstk), TBXM, TBY, OPCODE(1,k),
+     +                    NOPCODE(k), IMP(1,k), IMPC(1,k), IMPV(1,k),
+     +                    VAR, CON(1,k), %val(ipd), KSEED, NCOL(k),
+     +                    ierr )
+         if ( ST_FAILED ) return
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+         call coprr ( %val(ipd), 1, TBY, 1, 1, 1, TBY,
+     +                %val(IPO), TBVXO, TBY, (NCOL(k)+5), 1 )
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_gcl"> TBCA_GCL  </a>-- Get input and output info from the command line
+C
+C  alan penny                         RAL                1991 Dec
+
+      subroutine tbca_gcl ( )
+
+      implicit none
+      include 'tbcalc.inc'
+      include 'STARMAN_INC'
+C--
+      logical more, gotit
+      integer j, k, kv, ierr, tbxmax, ny, kopt, kn1, kn2
+      character ntexta*7, ntextb*8, title*50, ctemp*2, texta*132,
+     +          textb*70, ineqna*4, ineqnb*5, intab*3, thelp*68,
+     +          inheada*5, inheadb*6, head*20, tempname*1
+      character*2 chnum(27)
+      character*1000 choice
+      data choice / 'NONE:TA:TB:TC:TD:TE:TF:TG:TH:TI:TJ:TK:TL:TM:
+     +                    TN:TO:TP:TQ:TR:TS:TT:TU:TV:TW:TX:TY:TZ' /
+      data chnum / 'NO', 'TA', 'TB', 'TC', 'TD', 'TE', 'TF', 'TG',
+     +             'TH', 'TI', 'TJ', 'TK', 'TL', 'TM', 'TN', 'TO',
+     +             'TP', 'TQ', 'TR', 'TS', 'TT', 'TU', 'TV', 'TW',
+     +             'TX', 'TY', 'TZ' /
+
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      more = .true.
+      k = 0
+      do while ( more )
+         k = k + 1
+         if ( k.lt.10 ) then
+            write ( ntexta, '(''COLUMN'',i1)' ) k
+            call get1i ( ntexta, NCOL(k), k, 0, 100000 )
+         else
+            write ( ntextb, '(''COLUMN'',i2)' ) k
+            call get1i ( ntextb, NCOL(k), k, 0, 100000 )
+         endif
+         if ( ST_FAILED ) return
+         if ( NCOL(k).ne.0 ) then
+            gotit = .false.						!Get equation
+            do while ( .not.gotit )
+               gotit = .true.
+               if ( k.lt.10 ) then
+                  write ( ineqna, '(''EQN'',i1)' ) k
+                  call get1c ( ineqna, texta, ' ', .false. )
+               else
+                  write ( ineqnb, '(''EQN'',i2)' ) k
+                  call get1c ( ineqnb, texta, ' ', .false. )
+               endif
+               if ( ST_FAILED ) return
+               textb = texta(1:70)
+               call uppcase ( textb, EXPRS(k) )
+               call tbca_polish ( EXPRS(k), OPCODE(1,k), NOPCODE(k),	!Translate it into reverse polish notation
+     +                            TBID(1,k), NTB(k), IMP(1,k),
+     +                            IMPC(1,k), VARID(1,k), NVAR(k),
+     +                            IMPV(1,k), CON(1,k), NCON(k), ierr )
+               if ( ST_FAILED ) return
+               if ( ierr.ne.0 ) gotit = .false.
+
+            enddo
+         endif
+
+         if ( NCOL(k).eq.0 ) then
+            k = k - 1
+            more = .false.
+         elseif ( k.eq.20 ) then
+            call printo ( 'No more columns accepted' )
+            more = .false.
+         endif
+
+      enddo
+      NUMEQN = k
+      if ( NUMEQN.eq.0 ) return
+
+      tbxmax = 0
+      do k = 1, NUMEQN
+         tbxmax = max(tbxmax,NCOL(k))
+      enddo
+
+      call tbca_tbdiff							!How many diff tables?
+      if ( ST_FAILED ) return
+
+      TBXM = 1								!Get tables
+      if ( TBZ.ne.0 ) then
+         TBXM = 0
+         TBY = 0
+         do k = 1, TBZ
+            intab = 'IN '
+            intab(3:3) = TBTOT(k)(2:2)
+            call optabr ( intab, IP(k), TBVX(k), ny, .false., ierr )
+            if ( ierr.ne.0 ) then
+               if ( ierr.eq.3 ) then
+                  call printo ( 'All input tables must come from'//
+     +                          'different files' )
+                  call printo ( 'To input a table more than once'//
+     +                         '- refer to it by only one parameter')
+               endif
+               ST_FAILED = .true.
+               return
+            endif
+            if ( (TBVX(k)-5).gt.999 ) then
+               call printo ('ERROR: Cannot have more than 999 columns')
+               ST_FAILED = .true.
+               return
+            endif
+            if ( k.eq.1 ) then
+               TBY = ny
+            elseif ( ny.ne.TBY ) then
+               call printo (
+     +                'ERROR: Tables must have same number of rows' )
+               ST_FAILED = .true.
+               return
+            endif
+            TBXM = max(TBXM,(TBVX(k)-5))
+         enddo
+      endif
+
+      call tbca_vardiff							!How many diff variables?
+      if ( ST_FAILED ) return
+
+      if ( NVARTOT.gt.0 ) then						!Get input variables
+         do k = 1, NVARTOT		
+            call get1r ( VARTOT(k), VAR(k), 0.0, -1.0e37, +1.0e37 )
+            if ( ST_FAILED ) return
+         enddo
+      endif
+
+      kv = 0								!Random generator seed
+      do k = 1, NUMEQN
+         if ( index(EXPRS(k),'RAN').ne.0 ) kv = 1
+         if ( index(EXPRS(k),'GAUSS').ne.0 ) kv = 1
+      enddo
+      KSEED = 1
+      if ( kv.eq.1 ) call get1i ( 'SEED', KSEED, 1234567891,
+     +                            1200000001, 1400000001 )
+      if ( ST_FAILED ) return
+
+      if ( TBZ.eq.0 ) then
+         call get_job ( 'USE_TEMPLATE', 'yes:no', kopt, 2, ' ', 0 )
+         if ( ST_FAILED ) return
+         if ( kopt.eq.1 ) then
+            call optabr ( 'INA', IP(1), TBVX(1), TBY, .false., ierr )
+            if ( ST_FAILED ) return
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+            if ( (TBVX(1)-5).gt.999 ) then
+               call printo ('ERROR: Cannot have more than 999 columns')
+               ST_FAILED = .true.
+               return
+            endif
+            tempname = 'A'
+            TBZ = 1
+            TBXM = TBVX(1) - 5
+            TBXO = TBVX(1) - 5
+            TBVXO = TBVX(1)
+            TEMPLATE = 1
+            call get1b ( 'CLEAR', CLEAR, .false. )
+            if ( ST_FAILED ) return
+         else
+            CLEAR = .true.
+            TEMPLATE = 0
+            call get1i ( 'NUMCOLS', TBXO, tbxmax, tbxmax, 999 )
+            if ( ST_FAILED ) return
+            TBVXO = TBXO + 5
+            call get1i ( 'NUMROWS', TBY, 1, 1, 100000 )
+            if ( ST_FAILED ) return
+         endif
+      else
+
+         call get_job ( 'TEMPLATE', choice, kopt, 2, thelp, 0 )
+         if ( ST_FAILED ) return
+         if ( kopt.eq.1 ) then
+            call get1i ( 'NUMCOLS', TBXO, tbxmax, tbxmax, 999 )
+            if ( ST_FAILED ) return
+            TBVXO = TBXO + 5
+            TEMPLATE = 0
+            CLEAR = .true.
+         else
+            ctemp = chnum(kopt)
+            tempname = ctemp(2:2)
+            kv = 0
+            do k = 1, TBZ
+               if ( ctemp.eq.TBTOT(k) ) kv = k
+            enddo
+            if ( kv.eq.0 ) then
+               call printo ( 'ERROR: That table input not found' )
+               ST_FAILED = .true.
+               return
+            endif
+            TBXO = TBVX(kv) - 5
+            TBVXO = TBVX(kv)
+            if ( tbxmax.gt.TBXO ) then
+               TBXO = tbxmax
+               TBVXO = TBXO + 5
+            endif
+            TEMPLATE = kv
+            CLEAR = .true.
+            kn1 = 1
+            k = 0
+            do while ( k.lt.TBXO .and. kn1.eq.1 )
+               k = k + 1
+               kn2 = 0
+               do j = 1, NUMEQN
+                  if ( k.eq.NCOL(j) ) kn2 = 1
+               enddo
+               if ( kn2.eq.0 ) kn1 = 0
+            enddo
+            if ( kn1.eq.0 ) call get1b ( 'CLEAR', CLEAR, .false. )
+            if ( ST_FAILED ) return
+         endif
+      endif
+
+      call optabw ( 'OUT', IPO, TBVXO, TBY, .true., ierr )		!Get output table
+      if ( ST_FAILED ) return
+      if ( ierr.eq.1 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( TEMPLATE.ne.0 ) intab = 'IN'//tempname			!Input table for headers, descriptors
+
+      if ( TEMPLATE.ne.0 ) then						!Copy descriptors
+         call tcopdes ( intab, 'OUT', ierr )
+         if ( ierr.eq.1 ) then
+            ST_FAILED = .true.
+            return
+         endif
+      endif
+
+      title = 'Output from TBCALC' 					!Output table title
+      if ( TEMPLATE.ne.0 ) call gtdesc ( intab, 'TITLE', title, title,
+     +                                   kv, ierr )
+      call get1c ( 'TITLE', title, title, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+      if ( TEMPLATE.eq.0 ) then						!Put blank headers
+         do k = 1, TBXO
+            call pthead ( 'OUT', k, ' ', ierr )
+         enddo
+      else
+         if ( TBVX(TEMPLATE).lt.TBVXO ) then
+            do k = TBVX(TEMPLATE)+1-5, TBXO
+               call pthead ( 'OUT', k, ' ', ierr )
+            enddo
+         endif
+      endif
+
+      do k = 1, NUMEQN							!New headers for working columns
+         kv = NCOL(k)
+         head = ' '
+         if ( TEMPLATE.ne.0 ) call gthead ( intab, kv, head, ierr )
+         if ( k.le.9 ) then
+            write ( inheada, '(''HEAD'',i1)' ) k
+            call get1c ( inheada, head, head, .true. )
+         else
+            write ( inheadb, '(''HEAD'',i2)' ) k
+            call get1c ( inheada, head, head, .true. )
+         endif
+         if ( ST_FAILED ) return
+         call pthead ( 'OUT', kv, head, ierr )
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_back"> TBCA_BACK  </a>-- Load background
+C
+C  alan penny                RAL                1991 Dec
+
+      subroutine tbca_back ()
+
+      implicit none
+      include 'tbcalc.inc'
+      include 'STARMAN_INC'
+C--
+      integer j, k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( TEMPLATE.eq.0 ) then						!Load background of output
+         call azeror ( %val(IPO), TBVXO*TBY )
+         call ident ( %val(IPO), TBVXO, TBY )
+      else
+         if ( CLEAR ) then
+            call azeror ( %val(IPO), TBVXO*TBY )
+            call coprr ( %val(IP(TEMPLATE)), TBVX(TEMPLATE), TBY,
+     +                   1, 5, 1, TBY, %val(IPO), TBVXO, TBY, 1, 1 )
+         else
+            call coprr ( %val(IP(TEMPLATE)), TBVX(TEMPLATE), TBY,
+     +                   1, TBVX(TEMPLATE), 1, TBY, %val(IPO), TBVXO,
+     +                   TBY, 1, 1 )
+            if ( TBVXO.gt.TBVX(TEMPLATE) ) then
+               do k = 1, TBY
+                  do j = TBVX(TEMPLATE)+1-5, TBXO
+                     call cop1r ( 0.0, %val(IPO), TBVXO, TBY, (j+5), k )
+                  enddo
+               enddo
+            endif
+         endif
+      endif
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_polish"> TBCA_POLISH  </a>-- Decode equation and sort into reverse Polish
+C
+C  alan penny                RAL                1991 Dec
+
+      subroutine tbca_polish ( exprs, opcode, noper, tbid, ntb, imp,
+     +                         impc, varid, nvar, impv, con, ncon, ierr)
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*70     exprs		!i: Equation to decode
+      character*6      opcode(70)	!o: Polish stack of commands
+      integer          noper		!o: No of operations
+      character*2      tbid(70)		!o: Tables identifiers
+      integer          ntb		!o: Number of different tables
+      integer          imp(70)		!o: Pointers to tables
+      integer          impc(70)		!o: Pointers to columns
+      character*1      varid(70)	!o: Variables identifiers
+      integer          nvar		!o: Number of variable
+      integer          impv(70)		!o: Pointers to variables
+      real             con(70)		!o: Constants
+      integer          ncon		!o: Number of constants
+      integer          ierr		!o: Error flag (0=ok;bad 2=;3=;4=)
+C--
+
+      character in*81, numchr*80, test*7, output*7, colid*3
+      integer j, k, tos, stk(0:80), symb(80), ll, ncin, nnum,
+     +        nsymb, iok, isymb, kextra, ndiff, istat
+      real    const
+      logical opnext, found, ischar, isnumb, issign, lmore, atend
+      external ischar, isnumb, issign
+
+      integer maxsym
+      parameter ( maxsym=38 )
+
+      character*7 oper(-3:maxsym), opsymb(-3:maxsym)
+      integer opl(-3:maxsym), opr(-3:maxsym), l(-3:maxsym),
+     +        prl(-3:maxsym), prr(-3:maxsym)
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),		!Set up table of operators,
+     +        prr(j),j=-3,10 ) /					! symbols and their priorities
+     +  '       ', 'LDCON  ', 1, 0, 0, 10, 10,
+     +  '       ', 'LDVAR  ', 1, 0, 0, 10, 10,
+     +  '       ', 'LDTB   ', 2, 0, 0, 10, 10,
+     +  '=      ', '=      ', 1, 1, 1,  0,  0,
+     +  ')      ', ')      ', 1, 1, 0,  2, 10,
+     +  '(      ', '(      ', 1, 0, 1, 10,  1,
+     +  '-      ', '-      ', 1, 1, 1,  4,  4,
+     +  '+      ', '+      ', 1, 1, 1,  4,  4,
+     +  '**     ', '**     ', 2, 1, 1,  9,  6,
+     +  '*      ', '*      ', 1, 1, 1,  5,  5,
+     +  '/      ', '/      ', 1, 1, 1,  5,  5,
+     +  ':      ', ':      ', 1, 1, 1,  2,  2,
+     +  '-      ', 'NEG    ', 1, 0, 1,  8,  7,
+     +  '+      ', 'POS    ', 1, 0, 1,  8,  7 /
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),
+     +        prr(j),j=11,20 ) /
+     +  'SQRT(  ', 'SQRT(  ', 5, 0, 1, 10,  1,
+     +  'EXP(   ', 'EXP(   ', 4, 0, 1, 10,  1,
+     +  'LOG10( ', 'LOG10( ', 6, 0, 1, 10,  1,
+     +  'LOG(   ', 'LOG(   ', 4, 0, 1, 10,  1,
+     +  'SIN(   ', 'SIN(   ', 4, 0, 1, 10,  1,
+     +  'COS(   ', 'COS(   ', 4, 0, 1, 10,  1,
+     +  'TAN(   ', 'TAN(   ', 4, 0, 1, 10,  1,
+     +  'ASIN(  ', 'ASIN(  ', 5, 0, 1, 10,  1,
+     +  'ACOS(  ', 'ACOS(  ', 5, 0, 1, 10,  1,
+     +  'ATAN(  ', 'ATAN(  ', 5, 0, 1, 10,  1 /
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),
+     +        prr(j),j=21,30 ) /
+     +  'ATAN2( ', 'ATAN2( ', 6, 0, 1, 10,  1,
+     +  'SINH(  ', 'SINH(  ', 5, 0, 1, 10,  1,
+     +  'COSH(  ', 'COSH(  ', 5, 0, 1, 10,  1,
+     +  'TANH(  ', 'TANH(  ', 5, 0, 1, 10,  1,
+     +  'ABS(   ', 'ABS(   ', 4, 0, 1, 10,  1,
+     +  'AINT(  ', 'AINT(  ', 5, 0, 1, 10,  1,
+     +  'ANINT( ', 'ANINT( ', 6, 0, 1, 10,  1,
+     +  'MOD(   ', 'MOD(   ', 4, 0, 1, 10,  1,
+     +  'SIGN(  ', 'SIGN(  ', 5, 0, 1, 10,  1,
+     +  'DIM(   ', 'DIM(   ', 4, 0, 1, 10,  1 /
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),
+     +       prr(j),j=31,maxsym ) /
+     +  'MIN(   ', 'MIN(   ', 4, 0, 1, 10,  1,
+     +  'MAX(   ', 'MAX(   ', 4, 0, 1, 10,  1,
+     +  'CLIP(  ', 'CLIP(  ', 5, 0, 1, 10,  1,
+     +  'GAUSS( ', 'GAUSS( ', 6, 0, 1, 10,  1,
+     +  'RAN(   ', 'RAN(   ', 4, 0, 1, 10,  1,
+     +  'RR     ', 'RR     ', 2, 0, 0, 10, 10,
+     +  'CC     ', 'CC     ', 2, 0, 0, 10, 10,
+     +  '%      ', '/      ', 1, 1, 1,  5,  5 /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+      ncin = 0
+
+      do k = 1, len(exprs)						!Remove embedded blanks
+         if ( exprs(k:k).ne.' ' .and. ncin.lt.80  ) then		!Count no of characters
+            ncin = ncin + 1
+            in(ncin:ncin) = exprs(k:k)
+         endif
+      enddo
+
+      exprs = in(1:ncin)						!Return the expression with blanks removed
+
+      ncin = ncin+1							!Append an '= ' operator to terminate the expression
+      in(ncin:) = '='
+
+      ntb = 0								!Initiallise counters
+      nvar = 0
+      ncon = 0
+      k = 1
+      j = 0
+
+      opnext = .false.							!Indicates if an operator is expected next
+									! first entity must not look like an operator
+
+      lmore = .true.							!Loop thru OPLs until '='found
+      do while ( lmore )
+
+         found = .false.						!Search through the list of symbols to
+         nsymb = -1							! identify which comes next
+         do while ( nsymb.lt.maxsym .and. .not.found )
+            nsymb = nsymb + 1
+            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like
+               test = in(k:min(k+l(nsymb)-1,81))			! an operator or operand from the left, as appropriate
+               if ( test.eq.oper(nsymb) ) found = .true.
+             endif
+         enddo
+
+         if ( .not.found ) then						!If symbol was not found: -
+            if ( opnext ) then						!Error if an operator expected
+               ierr = 3
+               call printo ( 'ERROR: Cant understand Equation - ' )
+               call printo ( 'ERROR: '//exprs )
+               return
+            else if ( in(k:k).eq.'T' .and. ischar(in(k+1:k+1)) .and.	!If an operand was expected, it may be
+     +               isnumb(in(k+2:k+2)) ) then				! a table, variable or const.
+               nsymb = -1						!If it is a table, add name to table stack
+               ntb = ntb + 1
+               tbid(ntb) = in(k:k+1)
+               colid = '000'
+               if ( .not.isnumb(in(k+3:k+3)) ) then
+                  colid(3:3) = in(k+2:k+2)
+                  kextra = 1
+               elseif ( .not.isnumb(in(k+4:k+4)) ) then
+                  colid(2:3) = in(k+2:k+3)
+                  kextra = 2
+               else
+                  colid = in(k+2:k+4)
+                  kextra = 3
+               endif
+               call chartoi ( colid, impc(ntb), istat )			!Add column to column stack
+               if ( istat.ne.0 .or. impc(ntb).eq.0 ) then
+                  ierr = 1
+                  call printo (
+     +            'ERROR: Bad column ID - '//tbid(ntb)//colid )
+                  call printo ( 'ERROR: '//exprs )
+                  return
+               endif
+            else if ( ischar(in(k:k)) ) then
+               nsymb = -2						!If it is a variable, add name to variable stack
+               nvar = nvar + 1
+               varid(nvar) = in(k:k)
+            else
+
+               nnum = 0							!Otherwise it may be a constant...
+               numchr = ' '						! extract contiguous numerical characters
+
+               atend = .false.						!Character may be part of a numerical constant
+               ll = k - 1						! if it is 0..9 or '.'
+               do while ( ll.lt.ncin .and. .not.atend )			! or if it is an 'e' following one of the above
+                  ll = ll + 1						! or if it is a sign following an 'e'
+                  if ( isnumb(in(ll:ll)) .or. (in(ll:ll).eq.'E') .or.
+     +           (issign(in(ll:ll)).and.(in(ll-1:ll-1).eq.'E')) ) then
+                     nnum = nnum + 1
+                     numchr(nnum:nnum) = in(ll:ll)
+                  else
+                     atend = .true.					!End of number as soon as one of the above tests fails
+                  endif
+               enddo
+               call chartor ( numchr(:nnum), const, iok )		!Try to read these characters as a constant
+
+               if ( iok.eq.0 .and. nnum.ne.0 ) then			!If successful, add constant to stack
+                  ncon = ncon + 1
+                  con(ncon) = const
+                  nsymb = -3
+                  l(nsymb) = nnum
+               else
+                  ierr = 2						!Otherwise there is a bad operand error
+                  call printo ( 'ERROR: Cant understand Equation -' )
+                  call printo ( 'ERROR: '//exprs )
+                  return
+               endif
+
+            endif
+         endif
+
+         j = j + 1							!Put the identified symbol into the output
+         symb(j) = nsymb						! array and move the input pointer to the
+         k = k + l(nsymb)						! next symbol
+         if ( nsymb.eq.-1 ) k = k + kextra
+
+         opnext = opr(nsymb).ne.1					!Decide whether an operator or operand follows
+         if ( opsymb(nsymb).eq.'=' ) lmore = .false.
+
+      enddo
+
+      call azeroi ( stk(0), j+1 )					!Zero operator stack for converting to reverse polish
+      tos = 0
+      isymb = 1
+      noper = 0
+
+      lmore = .true.
+      do while ( lmore )
+         lmore = .false.
+
+         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have
+     +        oper(symb(isymb)).eq.')' ) then				! matching parentheses, cancel them
+
+            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the
+ 									! opening parenthesis then send it to the output stream
+
+               output = opsymb(stk(tos))				!Remove the enclosed '(' from functions first
+               output(index(output,'('):index(output,'(')) = ' '
+               tos = tos - 1
+               isymb = isymb + 1
+             else
+               tos = tos - 1
+               isymb = isymb + 1
+               lmore = .true.
+             endif
+
+         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has
+            output = opsymb(stk(tos))					! a high enough priority, transfer it to
+            tos = tos - 1						! the output stream
+         else
+            tos = tos + 1						!Otherwise, transfer the next symbol to the stack
+            stk(tos) = symb(isymb)
+            isymb = isymb + 1
+            lmore = .true. 						!Return for next test
+         endif
+
+         if ( .not.lmore ) then
+
+            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output,
+               ierr = 4							! it results from unpaired parentheses
+               call printo ( 'ERROR: ) missing from Equation -' )	! in the input expression...quit qith error
+               call printo ( 'ERROR: '//exprs )
+               return
+            elseif ( index(output,')').ne.0 ) then
+               ierr = 4
+               call printo ( 'ERROR: (  missing from Equation -' )
+               call printo ( 'ERROR: '//exprs )
+               return
+            endif
+
+            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it
+               noper = noper + 1					! if it is unary + or a comma
+               opcode(noper) = output
+            endif
+
+            if ( output.ne.'=' ) lmore = .true.				!Return for next symbol if not the end
+
+         endif
+
+      enddo
+
+      if ( ntb.ge.1 ) then						!If tables or variables are referenced, sort
+         call tbca_sort ( tbid, ntb, imp, ndiff, symb )			! their names into alphabetical order and obtain
+         ntb = ndiff							! pointers to allow them to be accessed in their
+      endif								! original order
+      if ( nvar.ge.1 ) then
+         call tbca_sort ( varid, nvar, impv, ndiff, symb )
+         nvar = ndiff
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_doit"> TBCA_DOIT  </a>-- Combine the tables
+C
+C  alan penny                     RAL            1991 Dec
+
+      subroutine tbca_doit ( tb, tbx, tby, opcode, nopcode, imp, impc,
+     +                       impv, var, con, tbcol, kseed, kx, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+
+      integer      tbx			!i: Max X size of input tables
+      integer      tby			!i: Max Y size of input tables
+      real         tb(tbx,tby,*)	!i: Input tables
+      integer      nopcode		!i: Number of operations
+      character*6  opcode(nopcode)	!i: Code for operations
+      integer      imp(70)		!i: Number of table in (i)th posn
+      integer      impc(70)		!i: Number of column in (i)th posn
+      integer      impv(70)		!i: Number variable in (i)th posn
+      real         var(26)		!i: Variables
+      real         con(70)		!i: Constants
+      real         tbcol(tby)		!o: Output column
+      integer      kseed		!i/o: Random number seed
+      integer      kx                   !i: Column number
+      integer      ierr			!o: Error flag (0=ok;1=bad)
+C--
+      logical found, bad, more
+      integer j, k, tos, numitab, nvar, ncon, ib, nop
+      real    rv
+      double precision s(0:80), a, b, c, dib, dvmin, dvmax
+      integer opwhich(70)
+
+      integer nsymb
+      parameter ( nsymb=37 )
+
+      character opsymb(nsymb)*6						!Recognised operations
+      data opsymb /
+     + 'LDCON ','LDVAR ','LDTB  ','=     ',
+     + '-     ','+     ','**    ','*     ','/     ','NEG   ','SQRT  ',
+     + 'EXP   ','LOG10 ','LOG   ','SIN   ','COS   ','TAN   ','ASIN  ',
+     + 'ACOS  ','ATAN  ','ATAN2 ','SINH  ','COSH  ','TANH  ','ABS   ',
+     + 'AINT  ','ANINT ','MOD   ','SIGN  ','DIM   ','MIN   ','MAX   ',
+     + 'CLIP  ','GAUSS ','RAN   ','RR    ','CC    ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0								!Failure flag
+
+      dvmax = INT_MAXRR							!Set (dble precision) max and min vals
+      dvmin = INT_MINRR
+
+      do k = 1, nopcode							!Find `opcode' for each input operator
+         found = .false.
+         j = 0
+         do while ( j.lt.nsymb .and. .not.found )
+            j = j + 1
+            if ( opcode(k).eq.opsymb(j) ) then
+               opwhich(k) = j
+               found = .true.
+            endif
+         enddo
+         if ( .not.found ) then
+            ierr = 1
+            return
+         endif
+      enddo
+
+      do j = 1, tby							!Do for all rows in a column
+
+         tos = 0							!Initialise the arith, table,
+         numitab = 0							! variable, constant stack pointers
+         nvar = 0
+         ncon = 0
+
+         nop = 0							!Do the operations
+         more = .true.
+         bad = .false.
+
+         do while ( nop.lt.nopcode .and. more )
+            nop = nop + 1
+
+            go to ( 101,102,103,104,105,106,107,108,109,110,111,112,
+     +              113,114,115,116,117,118,119,120,121,122,123,124,
+     +              125,126,127,128,129,130,131,132,133,134,135,
+     +              136,137 ),
+     +            opwhich(nop)
+
+ 101        continue
+               tos = tos + 1						!Load constant on to stack
+               ncon = ncon + 1
+               s(tos) = con(ncon)
+            go to 100
+ 102        continue
+               tos = tos + 1						!Load variable onto stack
+               nvar = nvar + 1
+               s(tos) = var(impv(nvar))
+            go to 100
+ 103        continue
+               tos = tos + 1						!Load table on to stack
+               numitab = numitab + 1
+               s(tos) = tb(impc(numitab),j,imp(numitab))
+            go to 100
+ 104        continue
+               tbcol(j) = min(dvmax,max(dvmin,s(tos)))			!=  : end of calculation
+               more = .false.
+            go to 100
+ 105        continue
+               s(tos-1) = s(tos-1) - s(tos)				!- : subtract tos
+               tos = tos - 1
+            go to 100
+ 106        continue
+               s(tos-1) = s(tos-1) + s(tos)				!+ : add tos
+               tos = tos - 1
+            go to 100
+ 107        continue
+               a = s(tos-1)						!** : raise to power
+               b = s(tos)
+               if ( a.ge.0.0 ) then
+                  c = a**b
+               else
+                  ib = nint(b)
+                  dib = ib
+                  if ( abs(dib-b).le.1.0d-7 ) then
+                     c = a**ib
+                  else
+                     bad = .true.
+                  endif
+               endif
+               tos = tos - 1
+               s(tos) = c
+            go to 100
+ 108        continue
+               s(tos-1) = s(tos-1)*s(tos)				!* : multiply tos
+               tos = tos - 1
+            go to 100
+ 109        continue
+               a = s(tos)						!/ : Divide tos
+               if ( a.ne.0.0d0 ) then
+                  s(tos-1) = s(tos-1)/a
+                  tos = tos - 1
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 110        continue
+               s(tos) = -s(tos)						!NEG : Negate tos
+            go to 100
+ 111        continue
+              a = s(tos)						!SQRT : Square root tos
+               if ( a.ge.0.0d0 ) then
+                  s(tos) = sqrt(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 112        continue
+               a = s(tos)						!EXP : E to power tos
+               if ( a.le.100.0d0 ) then
+                  s(tos) = exp(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 113        continue
+               a = s(tos)						!LOG10 : Log tos base 10
+               if ( a.gt.0.0d0 ) then
+                  s(tos) = log10(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 114        continue
+               a = s(tos)						!LOG : Natural log of tos
+               if ( a.gt.0.0d0 ) then
+                  s(tos) = log(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 115        continue
+               s(tos) = sin(s(tos))					!SIN : Sine of tos
+            go to 100
+ 116        continue
+               s(tos) = cos(s(tos))					!COS : Cosine of tos
+            go to 100
+ 117        continue
+               a = s(tos)						!TAN : Tangent of tos
+               s(tos) = tan(a)
+            go to 100
+ 118        continue
+            a = s(tos)							!ASIN : Arcsine of tos
+               if ( abs(a).le.1.0d0 ) then
+                  s(tos) = asin(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 119        continue
+               a = s(tos)						!ACOS : Arccosine of tos
+               if ( abs(a).le.1.0d0 ) then
+                  s(tos) = acos(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 120        continue
+               s(tos) = atan(s(tos))					!ATAN : Arctangent of tos
+            go to 100
+ 121        continue
+               a = s(tos-1)						!ATAN2 : Arctangent of tos ratio
+               b = s(tos)
+               if ( a.ne.0.0d0 .or. b.ne.0.0d0 ) then
+                  tos = tos - 1
+                  s(tos) = atan2(a,b)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 122        continue
+               a = s(tos)						!SINH : Hyperbolic sine of tos
+               if ( abs(a).le.100.0d0 ) then
+                  s(tos) = sinh(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 123        continue
+               a = s(tos)						!COSH : Hyperbolic cosine of tos
+               if ( abs(a).le.100.0d0 ) then
+                  s(tos) = cosh(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 124        continue
+               s(tos) = tanh(s(tos))					!TANH : Hyperbolic tangent of tos
+            go to 100
+ 125        continue
+               s(tos) = abs(s(tos)) 					!ABS : Absolute value of tos
+            go to 100
+ 126        continue
+               s(tos) = aint(s(tos))					!AINT : Truncate tos
+            go to 100
+ 127        continue
+               s(tos) = anint(s(tos))					!ANINT : Nearest integer to tos
+            go to 100
+ 128        continue
+               a = s(tos-1)						!MOD : Modulo on two tos entries
+               b = s(tos)
+               if ( b.ne.0.0d0 ) then
+                  tos = tos - 1
+                  s(tos) = mod(a,b)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 129        continue
+               s(tos-1) = sign(s(tos-1),s(tos))				!SIGN : Transfer of sign between two tos entries
+               tos = tos - 1
+            go to 100
+ 130        continue
+               s(tos-1) = dim(s(tos-1),s(tos))				!DIM : Positive difference of two tos entries
+               tos = tos - 1
+            go to 100
+ 131        continue
+              s(tos-1) = min(s(tos-1),s(tos))				!MIN : Minimum of two tos entries
+               tos = tos - 1
+            go to 100
+ 132        continue
+               s(tos-1) = max(s(tos-1),s(tos))				!MAX : Maximum of two tos entries
+               tos = tos - 1
+            go to 100
+ 133        continue
+               a = s(tos-2)						!CLIP : Abort if tos lies outside window
+               b = s(tos-1)
+               c = s(tos)
+               if ( a.le.b .and. b.le.c ) then
+                  tos = tos - 2
+                  s(tos) = b
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 134        continue
+               call gasdev ( rv, kseed )				!GAUSS : Put gaussian noise on tos
+               s(tos) = s(tos)*dble(rv)
+            go to 100
+ 135        continue
+               call rano ( rv, kseed )					!RAN : Uniform random noise
+               s(tos) = s(tos)*dble(rv)
+            go to 100
+ 136        continue
+               tos = tos + 1                                            !RR : Row number
+               s(tos) = j
+            go to 100
+ 137        continue
+               tos = tos + 1                                            !CC : Column number
+               s(tos) = kx
+            go to 100
+
+ 100        continue
+
+            if ( bad ) then						!Invalid arithmetic operation done
+               tbcol(j) = 0.0
+               more = .false.
+            endif
+
+         enddo
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_tbdiff"> TBCA_TBDIFF  </a>-- Get number of diff input tables and point to stack
+C
+C  alan penny                         RAL                1991 Dec
+
+      subroutine tbca_tbdiff ( )
+
+      implicit none
+      include 'tbcalc.inc'
+      include 'STARMAN_INC'
+C--
+      integer j, k, kk
+      character ch*2
+      logical found
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      TBZ = 0
+      if ( NUMEQN.eq.0 ) return
+
+      do k = 1, NUMEQN
+         if ( NTB(k).ne.0 ) then
+            do j = 1, NTB(k)
+               if ( TBZ.eq.0 ) then
+                  TBZ = 1
+                  TBTOT(TBZ) = TBID(j,k)(1:2)
+               else
+                  found = .false.
+                  ch = TBID(j,k)(1:2)
+                  do kk = 1, TBZ
+                     if ( ch.eq.TBTOT(kk) ) found = .true.
+                  enddo
+                  if ( .not.found ) then
+                     TBZ = TBZ + 1
+                     TBTOT(TBZ) = TBID(j,k)(1:2)
+                  endif
+               endif
+            enddo
+         endif
+      enddo
+
+      do k = 1, NUMEQN
+         do j = 1, 70
+            if ( IMP(j,k).ne.0 ) then
+               ch = TBID(IMP(j,k),k)(1:2)
+               do kk = 1, TBZ
+                  if ( ch.eq.TBTOT(kk) ) IMP(j,k) = kk
+               enddo
+            endif
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_vardiff"> TBCA_VARDIFF  </a>-- Get number of diff input variables and point to stack
+C
+C  alan penny                         RAL                1991 Dec
+
+      subroutine tbca_vardiff ( )
+
+      implicit none
+      include 'tbcalc.inc'
+      include 'STARMAN_INC'
+C--
+      integer j, k, kk
+      character ch*1
+      logical found
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      NVARTOT = 0
+      if ( NUMEQN.eq.0 ) return
+
+      do k = 1, NUMEQN
+         if ( NVAR(k).ne.0 ) then
+            do j = 1, NVAR(k)
+               if ( NVARTOT.eq.0 ) then
+                  NVARTOT = 1
+                  VARTOT(NVARTOT) = VARID(j,k)(1:1)
+               else
+                  found = .false.
+                  ch = VARID(j,k)(1:1)
+                  do kk = 1, NVARTOT
+                     if ( ch.eq.VARTOT(kk) ) found = .true.
+                  enddo
+                  if ( .not.found ) then
+                     NVARTOT = NVARTOT + 1
+                     VARTOT(NVARTOT) = VARID(j,k)(1:1)
+                  endif
+               endif
+            enddo
+         endif
+      enddo
+
+      do k = 1, NUMEQN
+         do j = 1, 70
+            if ( IMPV(j,k).ne.0 ) then
+               ch = VARID(IMPV(j,k),k)(1:1)
+               do kk = 1, NVARTOT
+                  if ( ch.eq.VARTOT(kk) ) IMPV(j,k) = kk
+               enddo
+            endif
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_load"> TBCA_LOAD  </a>-- Copy table into a 3-D stack
+C
+C  alan penny                 ral                     1991 Dec
+
+      subroutine tbca_load ( tb, tbvx, tby, nin, tbs, tbxs, tbys )
+
+      implicit none
+
+      integer     tbvx			!i: X size (inc 5 for name) of input table
+      integer     tby			!i: Y size of input table
+      real        tb(tbvx,tby)		!i: Input table
+      integer     nin			!i: Plane to put it in
+      integer     tbxs			!i: X size of output table
+      integer     tbys			!i: Y size of output table
+      real        tbs(tbxs,tbys,*)	!i/o: Output table
+C--
+      integer j, k
+Cbegin
+
+
+      do k = 1, tbys
+         if ( k.le.tby ) then
+            do j = 1, tbxs
+               if (j.le.(tbvx-5) ) then
+                  tbs(j,k,nin) = tb((j+5),k)
+               else
+                  tbs(j,k,nin) = 0.0
+               endif
+            enddo
+         else
+            do j = 1, tbys
+               tbs((j+5),k,nin) = 0.0
+            enddo
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbca_sort"> TBCA_SORT  </a>-- Sort identifiers to alphabetical order
+C
+C  alan penny            ral                     1991 Dec
+
+      subroutine tbca_sort ( c, nc, imp, ndiff, iw )
+
+      implicit none
+
+      integer        nc		!i: Number of identifiers
+      character*(*)  c(nc)	!i/o: Identiers
+      integer        imp(nc)	!o: pointer to identifier place in stack
+      integer        ndiff	!o: Number of different identifiers
+      integer        iw(nc)	!o: Work space
+C--
+      integer k, nn, it
+      character*80 text
+      logical repeat
+Cbegin
+
+
+      ndiff = 1								!Only 1?
+      iw(1) = 1
+      imp(1) = 1
+      if ( nc.le.1 ) return
+
+      nn = min(80,len(c(1)))						!Length of input strings
+
+      do k = 1, nc							!Initiallise pointers in workspace
+         iw(k) = k
+      enddo
+
+      repeat = .true.							!Perform a bubble sort to put
+      do while ( repeat ) 						! character strings into alphabetical order
+         repeat = .false.
+         do k = 1, nc-1
+            if ( c(k+1).lt.c(k) ) then
+               repeat = .true.
+               text(:nn) = c(k+1)					!Swap pairs which are in the wrong order
+               c(k+1) = c(k)
+               c(k) = text(:nn)
+               it = iw(k+1)						!Permute the pointers in the same way
+               iw(k+1) = iw(k)
+               iw(k) = it
+            endif
+         enddo
+      enddo
+
+      ndiff = 1								!Pointers now point to original positions. scan list to
+      imp(iw(1)) = 1							! remove repeated entries and reverse the pointing direction
+      do k = 2, nc
+         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and
+            ndiff = ndiff + 1						! put it in the correct place in the list
+            c(ndiff) = c(k)
+         endif
+         imp(iw(k)) = ndiff						!Set the appropriate output pointer to its new location
+      enddo
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbcalc"> TBCALC  </a>-- Applies equations to columns in a table
+C
+C   For a description of this program see TBCALC.HLP
+C
+C
+C           A J Penny          RAL           1991 Dec
+
+      subroutine tbcalc ( ierradam )
+
+      implicit none
+
+      integer       ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbcalc
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBCALC.INC     for TBCALC.F
+C
+
+      character*70  exprs(20)		!Input Equations
+      character*6   opcode(70,20)	!(i)th operation in stack of (j)th equation
+      character*2   tbid(70,20)		!Identifiers of input tables
+      character*1   varid(70,20)	!Identifiers of input variables
+      character*2   tbtot(26)		!List of all unique table names
+      character*1   vartot(26)		!List of all unique variable names
+
+      integer       ip(26)		!Pointer to input tables
+      integer       ipo			!Pointer to output table
+      integer       tbvx(26)		!X size (inc 5 for names) of input tables
+      integer       tby			!Y size of input tbales
+      integer       tbxm		!Max X size of input tables
+      integer       tbz			!Number of different input tables
+      integer       tbvxo		!X size (inc 5 for names) of output table
+      integer       tbxo		!X size of output table
+      integer       numeqn		!Number of equations to process
+      integer       imp(70,20)		!Number of Table to use for (i)th op in stack of (j) equation
+      integer       impc(70,20)		!Number of Column to use for (i)th op in stack of (j) equation
+      integer       impv(70,20)		!Number of Variable to use for (i)th op in stack of (j) equation
+      integer       ntb(20)		!Number of input tables mentioned in (j)th eqn
+      integer       nvar(20)		!Number of input variables mentioned in (j)th eqn
+      integer       ncon(20)		!Number of constants mentioned in (j)th eqn
+      integer       nopcode(20)		!Number of operations in (j)th stack
+      integer       ncol(20)		!Column in output table to put results of (j)th eqn
+      integer       template		!No of table to use as template (0=dont use one)
+      integer       nvartot		!Total number of input variables
+      integer       kseed		!Random number generator seed
+
+      real          var(26)		!Input variables
+      real          con(70,20)		!Constant to use for (i)th op in stack of (j) equation
+
+      logical       clear		!Clear output table before load columns
+
+      logical    tbca_dum1, tbca_dum2, tbca_dum3	!$*n logicals
+
+
+      common / tbcalca /  nvartot,   tbvx,   tby,    tbz,   imp,
+     +                    nopcode,    con,  tbxm,  tbvxo,  ncon,
+     +                   template,    ipo,  tbxo,    ntb,  nvar,
+     +                     numeqn,   impc,   var,     ip,  ncol,
+     +                      kseed,   impv
+
+      common /tbcalcb / clear,  tbca_dum1,  tbca_dum2, tbca_dum3
+
+      common / tbcalcc / exprs,  opcode,  tbid,  varid,  tbtot,
+     +                   vartot
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

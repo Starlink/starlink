@@ -1,0 +1,256 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMROTATE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMROTATE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imrotate_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imrotate">
+imrotate  </a>  Rotate an image by 90/180/270 degrees       <br>
+<a href="#t_imrotate">
+t_imrotate  </a>  Rotate an image by 90/180/270 degrees       <br>
+<a href="#imr_doitr">
+imr_doitr  </a>  Rotate real image       <br>
+<a href="#imr_doits">
+imr_doits  </a>  Rotate int*2 image       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imrotate"> IMROTATE  </a>-- Rotate an image by 90/180/270 degrees
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine imrotate ( ierradam )
+
+      implicit none
+
+      integer     ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imrotate
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMROTATE.F
+C
+C    Contains:-
+C
+C T_IMROTATE   Rotate an image by 90/180/270 degrees
+C IMR_DOIT   Load the output image from the input image
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imrotate"> T_IMROTATE  </a>-- Rotate an image by 90/180/270 degrees
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_imrotate ( )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      integer ierr, ipo, nxo, nyo, k
+      character title*50, thelp*68
+Cbegin
+
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr )
+
+      call get_job ( 'DEGREES', '90:180:270', k, 1, thelp, 0 )
+
+      if ( k.eq.1 .or. k .eq.3 ) then
+         nxo = NY
+         nyo = NX
+      else
+         nxo = NX
+         nyo = NY
+      endif
+
+      call opimzw ( 'OUT', IMTYPE, ipo, nxo, nyo, .false., ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( IMTITLE.eq.' ' ) IMTITLE = 'Output from IMROTATE'
+      call get1c ( 'TITLE', title, IMTITLE, .true. )
+
+      if ( IMTYPE.eq.'SHORT' ) then
+         call imr_doits ( %val(IPIM), %val(ipo), nxo, nyo, k )
+      else
+         call imr_doitr ( %val(IPIM), %val(ipo), nxo, nyo, k )
+      endif
+
+      call icopdes ( 'IN', 'OUT', ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imr_doitr"> IMR_DOITR  </a>-- Rotate real image
+C
+C   alan penny                     ral           1991 May
+
+      subroutine imr_doitr ( in, out, nxo, nyo, kopt )
+
+      implicit none
+      include 'image.inc'
+C--
+      real        in(NX,NY)		!i: Input image
+      integer     nxo			!i: Output image X size
+      integer     nyo			!i: Output image Y size
+      real        out(nxo,nyo)		!o: Output image
+      integer     kopt                  !i: Rotation code (1,2,3=90,180,270)
+C--
+      integer j, ja, k, ka
+Cbegin
+
+
+      if ( kopt.eq.1 ) then
+         do k = 1, nyo
+            do j = 1, nxo
+               ja = nxo - j + 1
+               if ( k.lt.NX .and. ja.lt.NY ) then
+                  out(j,k) = in(k,ja)
+               else
+                  out(j,k) = RINVAL
+               endif
+            enddo
+         enddo
+      elseif ( kopt.eq.2 ) then
+         do k = 1, nyo
+            ka = nyo - k + 1
+            do j = 1, nxo
+               ja = nxo - j + 1
+               if ( ja.lt.NX .and. ka.lt.NY ) then
+                  out(j,k) = in(ja,ka)
+               else
+                  out(j,k) = RINVAL
+               endif
+            enddo
+         enddo
+      elseif ( kopt.eq.3 ) then
+         do k = 1, nyo
+            ka = nyo - k + 1
+            do j = 1, nxo
+               if ( ka.lt.NX .and. j.lt.NY ) then
+                  out(j,k) = in(ka,j)
+               else
+                  out(j,k) = RINVAL
+               endif
+            enddo
+         enddo
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imr_doits"> IMR_DOITS  </a>-- Rotate int*2 image
+C
+C   alan penny                     ral           1991 May
+
+      subroutine imr_doits ( in, out, nxo, nyo, kopt )
+
+      implicit none
+      include 'image.inc'
+C--
+      integer*2   in(NX,NY)		!i: Input image
+      integer     nxo			!i: Output image X size
+      integer     nyo			!i: Output image Y size
+      integer*2   out(nxo,nyo)		!o: Output image
+      integer     kopt                  !i: Rotation code (1,2,3=90,180,270)
+C--
+      integer j, ja, k, ka
+Cbegin
+
+
+      if ( kopt.eq.1 ) then
+         do k = 1, nyo
+            do j = 1, nxo
+               ja = nxo - j + 1
+               if ( k.lt.NX .and. ja.lt.NY ) then
+                  out(j,k) = in(k,ja)
+               else
+                  out(j,k) = INVAL
+               endif
+            enddo
+         enddo
+      elseif ( kopt.eq.2 ) then
+         do k = 1, nyo
+            ka = nyo - k + 1
+            do j = 1, nxo
+               ja = nxo - j + 1
+               if ( ja.lt.NX .and. ka.lt.NY ) then
+                  out(j,k) = in(ja,ka)
+               else
+                  out(j,k) = INVAL
+               endif
+            enddo
+         enddo
+      elseif ( kopt.eq.3 ) then
+         do k = 1, nyo
+            ka = nyo - k + 1
+            do j = 1, nxo
+               if ( ka.le.NX .and. j.le.NY ) then
+                  out(j,k) = in(ka,j)
+               else
+                  out(j,k) = INVAL
+               endif
+            enddo
+         enddo
+      endif
+
+
+      end
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

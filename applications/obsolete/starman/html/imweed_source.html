@@ -1,0 +1,269 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMWEED
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMWEED
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imweed_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imweed">
+imweed  </a>  Set a defined range of pixel values to INVALID       <br>
+<a href="#t_imweed">
+t_imweed  </a>  Set a defined range of pixel valueto INVALID       <br>
+<a href="#imwe_doitr">
+imwe_doitr  </a>  Weed real image       <br>
+<a href="#imwe_doitr">
+imwe_doitr  </a>  Weed real image       <br>
+<a href="#imwe_doits">
+imwe_doits  </a>  Weed short image       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imweed"> IMWEED  </a>-- Set a defined range of pixel values to INVALID
+C
+C         A J Penny                RAL             1995 Jan
+
+      subroutine imweed ( ierradam )
+
+      implicit none
+
+      integer     ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imweed
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMWEED.F
+C
+C    Contains:-
+C
+C T_IMWEED       Set a defined range of pixel value to INVALID
+C IMWE_GCL       Get command line
+C IMWE_DOIT(RS)  Do the weeding
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imweed"> T_IMWEED  </a>-- Set a defined range of pixel valueto INVALID
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_imweed ( )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      integer   ierr, ipo
+      real      bot, top
+      character title*50
+Cbegin
+
+
+      call imwe_gcl ( ipo, bot, top, title, ierr )
+      if ( ST_FAILED .or. ierr.ne.0 ) return
+
+      if ( IMTYPE.eq.'SHORT' ) then
+         call imwe_doits ( %val(IPIM), %val(ipo), bot, top )
+      else
+         call imwe_doitr ( %val(IPIM), %val(ipo), bot, top )
+      endif
+
+      call icopdes ( 'IN', 'OUT', ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imwe_doitr"> IMWE_DOITR  </a>-- Weed real image
+C
+C   alan penny                     ral           1995 Jan
+
+      subroutine imwe_gcl ( ipo, bot, top, title, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'image.inc'
+
+      integer       ipo		!o: Pointer to output array
+      real          bot		!o: Lower limit to INVALID range
+      real          top		!o: Lower limit to INVALID range
+      character*50  title	!o: Title for output image
+      integer       ierr	!o: Error flag (0=ok;1=bad)
+
+C--
+      integer istat
+      real    rv
+Cbegin
+
+
+      ierr = 0
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., istat )
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, istat)
+
+      bot = 0.0
+      top = 0.0
+      call get2r ( 'RANGE', bot, top, .true., -1.0e20, 1.0e20 )
+      if ( bot.gt.top ) then
+         rv = top
+         top = bot
+         bot = rv
+      endif
+
+      if ( IMTYPE.eq.'SHORT' ) then
+         rv = -32768.0*BS + BZ
+         if ( top.lt.rv ) then
+            call pargr ( rv )
+            call printo (
+     +      'WARNING: Upper limit below minimum possible value for' )
+            call printd ('         this 16-bit integer image of - %f')
+            call printo ( '         No pixels will need weeding' )
+         endif
+         rv = 32767.0*BS + BZ
+         if ( bot.gt.rv ) then
+            call printo (
+     +      'WARNING: Lower limit above maximum possible value for' )
+            call printd ('         this 16-bit integer image of - %f')
+            call printo ('         No pixels will need weeding' )
+         endif
+      endif
+      if ( ierr.ne.0 ) return
+
+      call opimzw ( 'OUT', IMTYPE, ipo, NX, NY, .false., istat )
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( IMTITLE.eq.' ' ) IMTITLE = 'Output from IMWEED'
+      call get1c ( 'TITLE', title, IMTITLE, .true. )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imwe_doitr"> IMWE_DOITR  </a>-- Weed real image
+C
+C   alan penny                     ral           1995 Jan
+
+      subroutine imwe_doitr ( in, out, bot, top )
+
+      implicit none
+      include 'image.inc'
+
+      real        in(NX*NY)	!i: Input image
+      real        out(NX*NY)	!o: Output image
+      real        bot		!i: Lower limit of invalid range
+      real        top		!i: Upper limit of invalid range
+C--
+      integer j
+      real rv
+Cbegin
+
+
+      bot = (bot-BZ)/BS
+      top = (top-BZ)/BS
+
+      do j = 1, NX*NY
+         rv = in(j)
+         if ( rv.eq.RINVAL ) then
+            out(j) = RINVAL
+         elseif ( rv.ge.bot .and. rv.le.top ) then
+            out(j) = RINVAL
+         else
+            out(j) = rv
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imwe_doits"> IMWE_DOITS  </a>-- Weed short image
+C
+C   alan penny                     ral           1995 Jan
+
+      subroutine imwe_doits ( in, out, bot, top )
+
+      implicit none
+      include 'image.inc'
+
+      integer*2   in(NX*NY)	!i: Input image
+      integer*2   out(NX*NY)	!o: Output image
+      real        bot		!i: Lower limit of invalid range
+      real        top		!i: Upper limit of invalid range
+C--
+      integer j, iv, kbot, ktop
+      real    rv
+Cbegin
+
+
+      rv = (bot-BZ)/BS
+      kbot = min(max(rv,-32768.0),32767.0)
+      rv = (top-BZ)/BS
+      ktop = min(max(rv,-32768.0),32767.0)
+
+      do j = 1, NX*NY
+         iv = in(j)
+         if ( iv.eq.INVAL ) then
+            out(j) = INVAL
+         elseif ( iv.ge.kbot .and. iv.le.ktop ) then
+            out(j) = INVAL
+         else
+            out(j) = iv
+         endif
+      enddo
+
+
+      end
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

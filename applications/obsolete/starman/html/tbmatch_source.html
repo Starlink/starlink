@@ -1,0 +1,456 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBMATCH
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBMATCH
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbmatch_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbmatch">
+t_tbmatch  </a>  Extract entries with matching names in two tables       <br>
+<a href="#tbma_checka">
+tbma_checka  </a>  Find number of output rows in output tables and posns       <br>
+<a href="#tbma_checkb">
+tbma_checkb  </a>  Find number of output rows in output tables and posns (same order)       <br>
+<a href="#tbma_transa">
+tbma_transa  </a>  Move entries from input tables to output tables       <br>
+<a href="#tbma_transb">
+tbma_transb  </a>  Move entries from input tables to output tables (same)       <br>
+<a href="#tbmatch">
+tbmatch  </a>  (Program) Extract entries with matching names in two tables       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C     TBMATCH.FOR
+C
+C     Contains:-
+C T_TBMATCH     Extract entries with matching names in two tables
+C TBMA_CHECKA   Find number of output rows in output tables and posns
+C TBMA_CHECKB   Find number of output rows in output tables and posns (same order)
+C TBMA_TRANSA   Move entries from input tables to output tables
+C TBMA_TRANSB   Move entries from input tables to output tables (same)
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbmatch"> T_TBMATCH  </a>-- Extract entries with matching names in two tables
+C  Take two tables lists and makes two new ones which are copies of the old ones,
+C  but only contain the entries which do (or optionally do not) have
+C  identifiers which occur in the other file. The new file entries are in
+C  the same order as in their old files, except if choosing the matching
+C  entries, the 2nd file entries are in the order they occur in the 1st file.
+C
+C         A J Penny            RAL                       1991 May
+
+      subroutine t_tbmatch ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      character title*50, text*72
+      logical same
+      integer ierr, ip1, ip2, kacc, ipo1, ipo2, iv, ipw1, ipw2, ipw3
+Cbegin
+
+
+      call optabr ( 'IN1', ip1, TBVX1, TBY1, .false., ierr )		!Get 1st input table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call optabr ( 'IN2', ip2, TBVX2, TBY2, .false., ierr )		!Get 2nd input table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call get_job ( 'OPTION', 'accept:reject', kacc, 1, text, 0 )	!Get whether accept or reject common stars
+      if ( ST_FAILED ) return
+
+      if ( kacc.eq.1 ) call get1b ( 'SAME', same, .true. )		!Get same output order?
+      if ( ST_FAILED ) return
+
+      call pargi ( TBY1 )						!Type numbers
+      call pargi ( TBY2 )
+      call printd ( 'Input:   No in 1st = %d ; No in 2nd = %d' )
+
+      call gtwrki ( 'WORK1', TBY1, ipw1, ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtwrki ( 'WORK2', TBY2, ipw2, ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      if ( kacc.eq.1 .and. same )  call gtwrkr ( 'WORK3', 5*(TBY1+TBY2),
+     +                                           ipw3, ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      if ( kacc.eq.2 .or. .not.same ) then
+         call tbma_checka ( %val(ip1), %val(ip2), %val(ipw1), 		!Find no of entries passed
+     +                     %val(ipw2), kacc )
+      else
+         call tbma_checkb ( %val(ip1), %val(ip2), %val(ipw1),
+     +                     %val(ipw2), %val(ipw3) )
+      endif
+
+      if ( TBYO1.eq.0 .and. TBYO2.eq.0 ) then
+         if ( kacc.eq.1 ) call printo ( 'No matching entries found' )
+         if ( kacc.eq.2 ) call printo ('No non-matching entries found')
+         return
+      endif
+
+      call pargi ( TBYO1 )
+      call pargi ( TBYO2 )
+      call printd ( 'Output:  No in 1st = %d ; No in 2nd = %d' )
+
+      ipo1 = 1
+      if ( TBYO1.ne.0 ) then						!Open output table 1
+         call optabw ( 'OUT1', ipo1, TBVX1, TBYO1, .false., ierr )
+         if ( ST_FAILED ) return
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+
+         call tcopdes ( 'IN1', 'OUT1', ierr )				!Get title to output list 	
+         call gtdesc ( 'IN1', 'TITLE', title, 'Output from Tbmatch',	! and store it and the descriptors
+     +                 iv, ierr )
+         if ( ierr.ne.0 ) title = 'Output from Tbmatch'
+         call get1c ( 'TITLE1', title, title, .true. )
+         if ( ST_FAILED ) return
+         call ptdesc ( 'OUT1', 'TITLE', title )
+      endif
+
+      ipo2 = 1
+      if ( TBYO2.ne.0 ) then						!Open output table 2
+         call optabw ( 'OUT2', ipo2, TBVX2, TBYO2, .false., ierr )
+         if ( ST_FAILED ) return
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+
+         call tcopdes ( 'IN2', 'OUT2', ierr )				!Get title to output list
+         call gtdesc ( 'IN2', 'TITLE', title, 'Output from Tbmatch',	! and store it and the descriptors
+     +                 iv, ierr )
+         if ( ierr.ne.0 ) title = 'Output from Tbmatch'
+         call get1c ( 'TITLE2', title, title, .true. )
+         if ( ST_FAILED ) return
+         call ptdesc ( 'OUT2', 'TITLE', title )
+      endif
+
+      if ( kacc.eq.1 .and. same ) then					!Do the loading of the
+         if ( TBYO1.ne.0 ) then						! the input to the output
+            call tbma_transb ( %val(ip1), TBVX1, TBY1, %val(ipo1),
+     +                        TBYO1, %val(ipw1) )
+            call tbma_transb ( %val(ip2), TBVX2, TBY2, %val(ipo2),
+     +                        TBYO2, %val(ipw2) )
+         endif
+      else
+         if ( TBYO1.ne.0 ) call tbma_transa ( %val(ip1), TBVX1, TBY1,
+     +                          %val(ipo1), TBYO1, %val(ipw1), kacc )
+         if ( TBYO2.ne.0 ) call tbma_transa ( %val(ip2), TBVX2, TBY2,
+     +                          %val(ipo2), TBYO2, %val(ipw2), kacc )	
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbma_checka"> TBMA_CHECKA  </a>-- Find number of output rows in output tables and posns
+C
+C    A J PENNY               RGO                      82-11-4
+
+      subroutine tbma_checka ( tb1, tb2, nd1, nd2, kacc )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      byte	tb1(TBVX1*4,TBY1)	!i: Table 1
+      byte	tb2(TBVX2*4,TBY2)	!i: Table 2
+      integer   nd1(TBY1)		!o: List of posns of 1 in 2
+      integer   nd2(TBY2)		!o: List of posns of 2 in 1
+      integer	kacc			!i: Flag (1=accept;2=reject)
+C--
+      byte btemp(20)
+      integer j, k, kd, mk
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      TBYO1 = 0
+      do k = 1, TBY1
+         call amovz ( tb1(1,k), btemp, 20 )
+         kd = 1
+         j = 0
+         do while ( j.lt.TBY2 .and. kd.eq.1 )
+            j = j + 1
+            kd = 0
+            mk = 1
+            do while ( mk.le.20 .and. kd.eq.0 )
+               if ( btemp(mk).ne.tb2(mk,j) ) kd = 1
+               mk = mk + 1
+            enddo
+         enddo
+         nd1(k) = 0
+         if ( kacc.eq.1 ) then
+            if ( kd.eq.0 ) then
+               TBYO1 = TBYO1 + 1
+               nd1(k) = TBYO1
+            endif
+         elseif ( kacc.eq.2 ) then
+            if ( kd.eq.1 ) then
+               TBYO1 = TBYO1 + 1
+            else
+               nd1(k) = 1
+            endif
+         endif
+      enddo
+
+      TBYO2 = 0
+      do k = 1, TBY2
+         call amovz ( tb2(1,k), btemp, 20 )
+         kd = 1
+         j = 0
+         do while ( j.lt.TBY1 .and. kd.eq.1 )
+            j = j + 1
+            kd = 0
+            mk = 1
+            do while ( mk.le.20 .and. kd.eq.0 )
+               if ( btemp(mk).ne.tb1(mk,j) ) kd = 1
+               mk = mk + 1
+            enddo
+         enddo
+         nd2(k) = 0
+         if ( kacc.eq.1 ) then
+            if ( kd.eq.0 ) then
+               TBYO2 = TBYO2 + 1
+               nd2(k) = TBYO2
+            endif
+         elseif ( kacc.eq.2 ) then
+            if ( kd.eq.1 ) then
+               TBYO2 = TBYO2 + 1
+            else
+               nd2(k) = 1
+            endif
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbma_checkb"> TBMA_CHECKB  </a>-- Find number of output rows in output tables and posns (same order)
+C
+C    A J PENNY               RGO                      82-11-4
+
+      subroutine tbma_checkb ( tb1, tb2, nd1, nd2, names )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      byte	tb1(TBVX1*4,TBY1)	!i: Table 1
+      byte	tb2(TBVX2*4,TBY2)	!i: Table 2
+      integer   nd1(TBY1)		!o: List of posns of 1 in 2
+      integer   nd2(TBY2)		!o: List of posns of 2 in 1
+      byte      names(20,(TBY1+TBY2))	!o: Output table names
+C--
+      byte btemp(20)
+      integer k, mk, j1, j2, kd1, kd2
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      TBYO1 = 0
+      do k = 1, TBY1
+
+         call amovz ( tb1(1,k), btemp, 20 )				!For each name in 1st table
+
+         kd1 = 1							!Check if already in output names table
+         if ( TBYO1.ne.0 ) then
+            j1 = 0
+            kd1 = 1
+            do while ( kd1.eq.1 .and. j1.lt.TBYO1 )
+               j1 = j1 + 1
+               kd1 = 0
+               mk = 1
+               do while ( mk.le.20 .and. kd1.eq.0 )
+                  if ( btemp(mk).ne.names(mk,j1) ) kd1 = 1
+                  mk = mk + 1
+               enddo
+            enddo
+         endif
+
+         j2 = 0								!Check if in 2nd table
+         kd2 = 1
+         do while ( kd2.eq.1 .and. j2.lt.TBY2 )
+            j2 = j2 + 1
+            kd2 = 0
+            mk = 1
+            do while ( mk.le.20 .and. kd2.eq.0 )
+               if ( btemp(mk).ne.tb2(mk,j2) ) kd2 = 1
+               mk = mk + 1
+            enddo
+         enddo
+
+         if ( kd1.eq.1 .and. kd2.eq.0 ) then				!If not already in names
+            TBYO1 = TBYO1 + 1						! and is in 2nd table, add to output list
+            nd1(TBYO1) = k						! and remember location in the two tables
+            nd2(TBYO1) = j2
+            call amovz ( tb1(1,k), names(1,TBYO1), 20 )
+         endif
+
+      enddo
+
+      TBYO2 = TBYO1
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbma_transa"> TBMA_TRANSA  </a>-- Move entries from input tables to output tables
+C
+C  alan penny            ral        1990-06-06
+
+      subroutine tbma_transa ( tbi, tbvx, tby, tbo, tbyo, nd, kacc )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer   tbvx			!i: No of input table columns + 5
+      integer   tby			!i: No of input table rows
+      real	tbi(tbvx,tby)		!i: Input table
+      integer   tbyo			!i: No of input table rows
+      real	tbo(tbvx,tbyo)		!o: Output table
+      integer   nd(tby)			!i: List of posns of input in output
+      integer	kacc			!i: Flag (1=accept; 2=reject)
+C--
+      integer k, kout
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( kacc.eq.1 ) then
+
+         do k = 1, tby
+            kout = nd(k)
+            if ( kout.ne.0 ) call amovr ( tbi(1,k), tbo(1,kout), tbvx )
+         enddo
+
+      elseif ( kacc.eq.2 ) then
+
+         kout = 0
+         do k = 1, tby
+            if ( nd(k).eq.0 ) then
+               kout = kout + 1
+               call amovr ( tbi(1,k), tbo(1,kout), tbvx )
+            endif
+         enddo
+
+      endif
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbma_transb"> TBMA_TRANSB  </a>-- Move entries from input tables to output tables (same)
+C
+C  alan penny            ral        1990-06-06
+
+      subroutine tbma_transb ( tbi, tbvx, tby, tbo, tbyo, nd )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer   tbvx			!i: No of input table columns + 5
+      integer   tby			!i: No of input table rows
+      real	tbi(tbvx,tby)		!i: Input table
+      integer   tbyo			!i: No of input table rows
+      real	tbo(tbvx,tbyo)		!o: Output table
+      integer   nd(tby)			!i: List of posns of input in output
+C--
+      integer k, ka
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, tbyo
+         ka = nd(k)
+         call amovr ( tbi(1,ka), tbo(1,k), tbvx )
+      enddo
+
+
+       end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbmatch"> TBMATCH  </a>-- (Program) Extract entries with matching names in two tables
+C   See TBMATCH.HLP for details
+C
+C         A.J.Penny                RGO                             83-8-14
+
+      subroutine tbmatch ( ierradam )
+
+      implicit none
+
+      integer     ierradam         !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbmatch
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

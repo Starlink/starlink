@@ -1,0 +1,201 @@
+<HTML> <HEAD>
+<TITLE> TBJOIN </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBJOIN - <br>
+ Join tables together
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Join tables.
+<p>
+ 
+  This program allows up to nine tables to be concatenated.
+<p>
+ 
+  It allows you to shift the data in the tables relative to each
+  other before joining.
+<p>
+ 
+  Thus if you have:-
+<p>
+<pre>
+ 
+    _______      __________
+    l     l      l        l
+    l     l      l        l
+    l     l      l        l
+    l  A  l      l  B     l
+    l     l      l        l
+    l     l      l        l
+    -------      ----------
+</pre><p>
+ 
+  you can join them
+<p>
+<pre>
+    _______
+    l     l
+    l  A  l
+    l  __________
+    l  l  l     l
+    l  l  l     l
+    l  l  l     l
+    -------     l
+       l   B    l
+       l        l
+       ----------
+</pre><p>
+ 
+   They do not even have to overlap.
+<p>
+ 
+   The 2nd (and optionally ) later table is written on top of the 1st
+   table data,identifiers, and headers deleting them. Parameters with no
+   entry are put to 0.0.
+<p>
+ 
+   To simply add one table onto the end of another, use the default
+   displacements.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbjoin_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#coloff"> Coloff </a>
+<li> 1.2 <a href="#in"> In </a>
+<li> 1.3 <a href="#out"> Out </a>
+<li> 1.4 <a href="#rowoff"> Rowoff </a>
+<li> 1.5 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="coloff"> Coloff </h2> </a> <p>
+ 
+ (Default - 0         <br> Range - -1000000 to 1000000)
+<p>
+ 
+  The number of columns that the columns in the table are to be
+  shifted left or right before the table is added, relative
+  to the first table.
+<p>
+ 
+  Can be +ve or -ve.
+<p>
+ 
+  [This help parameter applies to all tables except the first.
+  The parameters are 'COLOFF2', 'COLOFF3', ... 'COLOFF9'.]
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  One of the up to nine input tables.
+<p>
+ 
+  Put null (just 'return') to exit.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+  [This help parameter applies to all tables. The parameters are
+ 'IN1', 'IN2', ... 'IN9'.]
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="rowoff"> Rowoff </h2> </a> <p>
+ 
+ (Default - see below    <br> Range - -1000000 to 1000000)
+<p>
+ 
+  The number of rows that the rows in the table are to be shifted
+  up or down before the table is added, relative to the first input
+  table.
+<p>
+ 
+  The default is that value which will add this table to the end
+  of the previously input tables.
+<p>
+ 
+  Can be +ve or -ve.
+<p>
+ 
+  [This help parameter applies to all tables except the first.
+  The parameters are 'ROWOFF1', 'ROWOFF2', ... 'ROWOFF9'.]
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - That of 1st table or 'Output from TBJOIN'      <br> Choice - any)
+<p>
+ 
+      The title for the output table.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+  Alan Penny             RAL              1991 May
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

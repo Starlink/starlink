@@ -1,0 +1,1374 @@
+<HTML> <HEAD>
+<TITLE> UNCCD </TITLE>
+</HEAD> <BODY>
+ 
+<h1> UNCCD - <br>
+ Convert raw CCD frames to calibrated ones
+</h1>
+<hr>
+ 
+ 
+  This takes the raw image from a CCD and turns it into a clean image,
+  corrected for many of the CCD characteristics such as Bias, Flat
+  Field, etc.
+<p>
+ 
+  In effect it takes the CCD image which is a picture of the sky, with
+  CCD artifacts imposed, and undoes the effects of these artifacts to
+  restore the sky picture. It thus un-ccds the image, thus its name.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#unccd_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#guide"> Guide </a>
+<li> 3 <a href="#knowledge"> Knowledge </a>
+<li> 4 <a href="#details"> Details </a>
+<ul>
+<li> 4.1 <a href="#bad_areas"> Bad areas </a>
+<li> 4.2 <a href="#bad_pixel_lists"> Bad pixel lists </a>
+<li> 4.3 <a href="#bias_level"> Bias level </a>
+<li> 4.4 <a href="#fringe_exposures"> Fringe exposures </a>
+</ul>
+<li> 5 <a href="#general"> General </a>
+<li> 6 <a href="#calibration_frames"> Calibration frames </a>
+<li> 7 <a href="#input/output"> Input/output </a>
+<li> 8 <a href="#how_to_normalise"> How to normalise </a>
+<li> 9 <a href="#display"> Display </a>
+<li> 10 <a href="#parameters"> Parameters </a>
+<li> 11 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+ 
+ 
+  This is used for removing the CCD characteristics as far as possible
+  from the image and turning it into nice image.
+<p>
+ 
+  The program can do any or all of the following actions:-
+<p>
+ 
+<ul>
+<li>      Select an area in the image to be the output area
+<p><li>   Estimate a mean bias level from a bias area and subtract it
+<p><li>   Subtract a bias image
+<p><li>   Correct for non-linearity
+<p><li>   Subtract a dark image (scaled to the exposure time)
+<p><li>   Subtract a preflash image (scaled to the preflash time)
+<p><li>   Divide by a flat field image
+<p><li>   Subtract a night sky fringe pattern (scaled to the exposure time)
+<p><li>   Flag areas as `bad'
+<p><li>   Flag pixel values outside a given range as `bad'
+<p><li>   Normalise the output
+<p><li>   Display the output
+</ul><p>
+ 
+<hr>
+ <h2> 2 <a name="guide"> Guide </h2> </a> <p>
+ 
+ 
+ This is a brief guide on how to use `unccd' in calibrating CCD images.
+<p>
+ 
+<strong>  Background Knowledge </strong>
+<p>
+ 
+ You must have a general background knowledge of CCDs and Photometry:-
+ read the section on 'Knowledge'.
+<p>
+ 
+ 
+<strong>  Make the Master Calibration frames </strong>
+<p>
+ 
+ See the help on this in `Calibration_frames'.
+<p>
+ 
+<strong>  Use `unccd' to produce the processed exposures </strong>
+<p>
+ 
+ 
+<ol>
+<li>  Strip out the overscan area, and subtract its mean level
+<p><li> Subtract any useful BIAS frame
+<p><li> Subtract any useful PREFLASH frame
+<p><li> Subtract any useful, scaled, DARK frame
+<p><li> Divide by the FLAT frame
+<p><li> Subtract any useful, scaled, FRINGE frame
+<p><li> Flag bad areas with the bad pixel list
+</ol><p>
+ 
+ 
+<strong>  Comments </strong>
+<p>
+ 
+ The end result should be inspected to see if the FRINGE exposure
+ (if used) is appropriate in strength and pattern to the target
+ expoure
+<p>
+ 
+ The user should consider why `unccd' does it so that step 5 is done
+ AFTER steps 1 to 4, why it would be wrong to do step 5 before any of
+ the steps 1 to 4, and why is step 6 done after step 5?
+<p>
+ 
+<hr>
+ <h2> 3 <a name="Knowlegde"> Knowledge </h2> </a> <p>
+ 
+Before using this program, it will prove well worth your while to
+have a general background knowledge of CCDs and Photometry. This
+section will point to some areas worth learning about.
+<p>
+ 
+<strong> Understand the way a CCD works </strong>
+<p>
+ 
+ You can read all about the mechanics, the problems and the
+ possibilities CCDs in many books. Two good examples are:-
+<p>
+ 
+   1) Chapter 2 of The University of Leeds thesis of John Buttress <br>
+   2) McClean's book on Electronic Astronomy.
+<p>
+ 
+<strong>  Learn about Photometry in general </strong>
+<p>
+ 
+ See, for example, the University of Leeds thesis of Richard Noble.
+ There are also many other books and articles are general photometry,
+ such as Andrew Young's articles in `Methods in Experimental Physics',
+ or Welch in the JRAS Canada.
+<p>
+ 
+<strong>  Learn about `unccd' </strong>
+<p>
+ 
+ Read this `unccd' help.
+<p>
+ 
+ 
+<strong>  Learn about the Starman program 'imcalc' </strong>
+<p>
+ 
+ This enables you to add images together, divide by constants,
+ etc. (Useful in scaling to 1 second equivalents or to
+ mean levels of 1.0)
+<p>
+ 
+<strong>  Learn about the Starman program 'imstat' </strong>
+<p>
+ 
+ You can do this by:-
+<p>
+ 
+ This enables you to measure the mean and std dev in an area. It is
+ useful in determining levels so that `imcalc' can be used to make
+ 1.0 level mean exposures.
+<p>
+ 
+<strong>  Learn about the range of programs available </strong>
+<p>
+ 
+ Use the Help to browse through the Starman suite of programs, seeing
+ the range of tools available.
+<p>
+ 
+ 
+<strong>  Be methodical in your work </strong>
+<p>
+ 
+ Make a record of what you do, so you can go back over it later if
+ you think that will be useful. Be prepared to justify on scientific
+ grounds any decision you take (or fail to take).
+<p>
+ 
+ 
+<strong>  Make a list of the various categories of the exposures </strong>
+<p>
+ 
+ I.e., Bias; dark; preflash; flat field (called `sky', `dark sky',
+ `flat', etc); the different star fields; the E-region standard
+ exposures
+<p>
+ 
+<strong>  Look at all the images </strong>
+<p>
+ 
+ Use the Starman program `imflash' to display the images.
+<p>
+ 
+ Are they what you expect?
+<p>
+ 
+ Make a note of the mean and std dev. The display range is typed
+ out by `imflash', as (mean+3.std dev) to (mean-2.std dev). Or use
+ `imstat'. Are the mean and std dev what other similar images have?
+<p>
+ 
+ Make a rough note of the seeing on the star field exposures
+ (bad, average, good).
+<p>
+ 
+ Are there any funny effects in any exposure?
+<p>
+ 
+ 
+<hr>
+ <h2> 4 <a name="details"> Details </h2> </a> <p>
+ 
+ 
+  There are various details as to the use of the program which
+  the sub-helps here will tell you about.
+<p>
+ 
+<hr>
+ <h2> 4.1 <a name="bad_areas"> Bad areas </h2> </a> <p>
+ 
+ 
+  A 'magic value' bad pixel flagging scheme is used. This may result in
+  pixels being flagged as bad by the input of a 'bad pixel list' (qv),
+  or by any of the input calibration images containing 'bad' pixels. Any
+  pixel which is bad in the bad pixel list or any of the calibration
+  images is flagged as 'bad'
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="bad_pixel_lists"> Bad pixel lists </h2> </a> <p>
+ 
+ 
+  In the input image (both in the area that will be output and in the
+  bias level area), pixels may be flagged as bad by a 'bad pixel list'.
+  These pixels will be set to 'invalid' in the output image.
+<p>
+ 
+  The list is a table which consists of rows of data, each of
+  which describe a rectangular 'bad' area. Each row has 4 integers
+  giving x,y ranges. Thus if the first 'bad' area to be described has a
+  blh corner at x1,y1, and a trh corner at x2,y2, then the first row
+  in the table will be x1,x2,y1,y2. Then the second entry will have
+  the ranges for the second area, and so on.
+<p>
+ 
+  The coordinates are relative to the entire input image.
+<p>
+ 
+<hr>
+ <h2> 4.3 <a name="bias_level"> Bias level </h2> </a> <p>
+ 
+ 
+  Whether or not the subtraction of the mean bias level of the exposure
+  is done is controlled by the 'BIAS' parameter. If it is done, then an
+  area of the input image is selected (defined in the 'NBIAS'
+  parameter) and its mean calculated, with the non-use of pixels
+  defined by the, optional, bad pixel list file given via the
+  'BIASBAD' parameter.
+<p>
+ 
+  This mean value is then selected, and subtracted from the input.
+<p>
+ 
+<hr>
+ <h2> 4.4 <a name="fringe_exposures"> Fringe exposures </h2> </a> <p>
+ 
+ 
+ Sometimes on astronomical CCD exposures which have been flat fielded,
+ one can see a residual `fringe' pattern, looking like distorted
+ Newton's rings. This effect comes from emission lines in the night
+ sky interacting with the thickness of the CCD chip.
+<p>
+ 
+ What happens is that as chip are quite thin, a few light wavelengths
+ from the top surface to the base, any incident light can suffer an
+ interference effect. Thus the intensity of the light that falls on
+ the silicon detector gets affected by this interference. So the total
+ response of the chip depends not only on the response of the silicon
+ for an individual pixel, but also how much interference has taken
+ place. Normally, these two effects are not separated, and a `flat-field'
+ exposure will measure the combination of the two. However, as the
+ interference effect is a strong function of wavelength, the `flat'
+ will vary markedly with wavelength, giving a `fringe' effect in the
+ `flat', tracing out the variations in thickness of the chip over its
+ surface area. This effect is normally washed out over the wavelength
+ width of the filter response, and the fringing gets lost.
+<p>
+ 
+ If the night sky has emission lines in the part of its spectrum which
+ falls with the filter response, then that additional light, having
+ a narrow wavelength range, will have its own `flat', different from
+ the total `flat' with (possibly, depending on the pattern of chip
+ thickness variations) a `fringe' pattern. Thus using a normal
+ `flat-field' will not `flatten' the sky contribution correctly.
+<p>
+ 
+ This is got round by seeing what this difference is, and allowing for
+ it. One takes a long exposure of an area of sky where there are few
+ or no  stars or other objects. (Such areas are usually in front
+ of dark clouds.) Then after the standard processing, including
+ using the normal `flat-field', the mean level is subtracted. What
+ is left can be considered as the additional signal from the night
+ sky emission lines. It can now be subtracted, scaled appropriately
+ for exposure times, from other normal frames, after they have been
+ processed.
+<p>
+ 
+ There are a number of additional effects to consider:-
+<p>
+<ul>
+<li>  The mean level was used to subtract the other night-sky light,
+    as we wish to make the output sky level a correct match to the
+    total incoming flux.
+<p>
+ 
+<li>  Often, the night sky emission line spectrum will vary. A simple
+    scaling in strength may be allowed for by having a number of
+    fringe frames, scaled by varying amounts, and seeing which does
+    the best job in removing the fringe effect. A variation in the
+    relative strength of a number of emission lines in the filter
+    response wavelength coverage, will however mean making a totally
+    new `fringe' frame.
+<p>
+ 
+<li>  `Fringe' frames may also be made from normal exposures. A
+    large number of exposures, each containing a large proportion
+    of blank sky with the astronomical objects in them occupying
+    different positions, are taken. Then by averaging them with a
+    technique that throws away divergent pixels (say modal averaging),
+    the mean underlying night-sky `fringe' pattern may be seen.
+</ul><p>
+ 
+ 
+<hr>
+ <h2> 5 <a name="general"> General </h2> </a> <p>
+ 
+<ol>
+<li>    A non-linearity in the input can be dealt with.
+<p><li> Special corrections can be done. At present, these are:-
+<p>
+ 
+       - AAT 1988 RCA CCD band correction
+ 
+<p><li> The image can be normalised, either scaled so that the average
+      value in a selected area to be unity, or scaled by the exposure
+      time to an exposure time of 1 second, or having a mean value
+      subtracted.
+ 
+<p><li> The final image can be displayed on a image display.
+ 
+<p><li> The exposure time of the image is needed if an input calibration
+      'dark' image or 'fringe' image is used. This exposure time is
+      picked up from a descriptor, whose name is input by the user
+      with the 'EXPNAME' parameter.
+</ol><p>
+ 
+ 
+<hr>
+ <h2> 6 <a name="calibration_frames"> Calibration frames </h2> </a> <p>
+ 
+ 
+ This section describes how to make the master calibration frames which
+ `unccd' uses to calibrate the program exposures.
+<p>
+ 
+ (In these descriptions, refeerence is often made to averaging frames.
+  You should be aware of these various methods of averaging, their
+  strengths and weaknesses, and especially how they deal with
+  discordant pixels.)
+<p>
+ 
+<strong> Determine the bad pixel list </strong>
+<p>
+ 
+ Look at a variety of types of exposures - bias; flat field; star field;
+ standards. Are then any areas that look 'bad', i.e. the signal
+ is clearly wrong. Too high, too low, etc. (A common fault
+ is a part of a column can be significantly low.)
+<p>
+ 
+ Use `interact', with:- zoom, cvalues, area, inspect, etc, to determine
+ the location of such areas. Make a bad pixel list (use `tbkey'),
+ as described in the `unccd' help for the `bad' parameter.
+<p>
+ 
+ 
+<strong>  Determine the bias frame </strong>
+<p>
+<ol>
+<li>   Have a look
+<p>
+ 
+<li> Smooth a bias image with `imsmooth', on scales of 10x10, 50x50,
+    and 100x100 to see if there is any overall pattern.
+</ol><p>
+ 
+ If there is no pattern, ignore the bias frames. If there is one, then
+ make a mean bias frame with as little noise as possible consistent
+ with preserving any detectable pattern.
+<p>
+ 
+ Make the bias frame. First, strip out the overscan area, and then
+ subtract its mean level. Then average with other bias exposures
+ to make a mean bias frame.
+<p>
+ 
+ Then consider the output bias frame. Is it worthwhile using? Will
+ it actually correct the exposures to any significant degree, or
+ will it just add noise?
+<p>
+ 
+ 
+<strong>  Determine the 1 sec preflash frame </strong>
+<p>
+ 
+ Use `unccd' to make each individual preflash frame.
+<p>
+<ol>
+<li> Strip out the overscan area, and subtract its mean level
+<p>
+ 
+<li> Subtract any useful bias frame
+<p>
+ 
+<li> Flag bad areas with the bad pixel list
+</ol><p>
+ 
+ Then average other preflash exposures, each scaled to 1 sec, to make
+ a mean preflash frame,
+<p>
+ 
+ Is the output preflash frame worthwile? For the exposures will
+ it actually correct the exposures to any significant degree, or
+ will it just add noise?
+<p>
+ 
+ Why do we need to make a `1 second' master frame?
+<p>
+ 
+ 
+<strong>  Determine the 1 sec dark current frame </strong>
+<p>
+ 
+ Use `unccd' to make each individual dark frame:-
+<p>
+<ol>
+<li> Strip out the overscan area, and subtract its mean level
+<p>
+ 
+<li>  Subtract any useful bias frame
+<p>
+ 
+<li> Flag bad areas with the bad pixel list
+</ol><p>
+ 
+ Then average with other dark exposures to make a mean dark frame,
+ each scaled to 1 sec.
+<p>
+ 
+ Is the output dark frame worthwhile? For the Star field exposures will
+ it actually correct the exposures to any significant degree, or
+ will it just add noise?
+<p>
+ 
+ Why do we need to make a `1 second' master frame?
+<p>
+ 
+ 
+<strong>  Determine the master flat field frames </strong>
+<p>
+ 
+ Use `unccd' to make each individual flat frame.
+<p>
+<ol>
+<li> Strip out the overscan area, and subtract its mean level
+<p>
+ 
+<li> Subtract any useful bias frame
+<p>
+ 
+<li> Subtract any useful preflash frame
+<p>
+ 
+<li> Flag bad areas with the bad pixel list
+</ol><p>
+ 
+ Then take the individual ones and average them together to make
+ a mean.
+<p>
+ 
+ 
+<strong>  Determine the 1 sec fringe frame </strong>
+<p>
+ 
+ Use `unccd' to make each individual fringe frame:-
+<p>
+<ol>
+<li> Strip out the overscan area, and subtract its mean level
+<p>
+ 
+<li> Subtract any useful bias frame
+<p>
+ 
+<li> Flag bad areas with the bad pixel list
+<p>
+ 
+<li> Flag any areas contaminated by stars
+<p>
+ 
+<li> Divide by the flat field for the filter
+<p>
+ 
+<li> Subtract the mean level
+<p>
+ 
+<li> Divide by the exposure time in seconds
+</ol><p>
+ 
+ Then average a number of these individual fringe frames to make a
+ mean fringe frame. This is now scaled to 1 sec. The averaging technique
+ should be one that rejects pixels in individual frames which are
+ contaminated by stars or cosmic rays.
+<p>
+ 
+ Is the output fringe frame worthwhile? For the Star field exposures will
+ it actually correct the exposures to any significant degree, or
+ will it just add noise?
+<p>
+ 
+ Why do we need to make a `1 second' master frame?
+<p>
+ 
+<hr>
+ <h2> 7 <a name="input/output"> Input/output </h2> </a> <p>
+ 
+<ol>
+<li>  1)  The input image can be in one of a number of formats.
+<p>
+ 
+    The formats and the value of the 'DTYPE' parameter to select them
+    are:-
+<p>
+<pre>
+            Format                                 DTYPE
+            ------                                 -----
+ 
+    A) Signed 16-bit integer (-32768 to 32767)    'SIGNED'
+    B) Unsigned 16-bit integer (0-65535)          'UNSIGNED'
+    C) Which is flagged as signed but actually    'BADSIGNED'
+       contains unsigned numbers (0-65535)
+    D) Real 32-bit numbers                        'REAL'
+</pre><p>
+ 
+<li> The input calibration images are either `real' or `short'
+      images.
+<p>
+ 
+<li> All calculations inside the program are done in REAL*4 (32-bit)
+      precision.
+<p>
+ 
+<li> The final image can be output to file. This output is either
+      a `real' image, or a `short' image with
+      user-chosen BSCALE and BZERO  to deal with the 16-bit
+      resolution of the output pixel values.
+</ol><p>
+ 
+<hr>
+ <h2> 8 <a name="how_to_normalise"> How to normalise </h2> </a> <p>
+ 
+ 
+  The output image may be normalised (that is its mean level set to
+  1.0), before the final output if desired.
+<p>
+ 
+  Whether this is done, and if it is then how, is controlled by the
+  'NORM' parameter. The options are:-
+<p>
+<pre>
+     'NORM'          Method
+     ------          ------
+ 
+      Flux        Normalise average val to 1.0 (divide by mean)
+      Time        Norm values to what they would have been if the
+                  exposure time had been 1.0 seconds
+      None        No normalisations
+      Sub         Subtract mean
+</pre><p>
+ 
+  If normalisation is done, and 'Flux' or 'Sub' is chosen, then the
+  the mean has to calculated. The area of the image used to calculate
+  the  mean can be set by the 'NNORM' parameter.
+<p>
+ 
+  The 'NNORM' parameter defines the (X start, X end, Y start, Y end) of
+  the chosen area.
+<p>
+ 
+  The default is the whole of the area that will be stored as the
+  output image.
+<p>
+ 
+<hr>
+ <h2> 9 <a name="display"> Display </h2> </a> <p>
+ 
+ 
+  The output image may be displayed. This is controlled by the 'DISP'
+  parameter.
+<p>
+ 
+  If the display has been chosen, then the 'NDISP' parameter is used
+  to select an area of the image to display. The area is input as
+  (X start, X end, Y start, Y end of the input image area).
+<p>
+ 
+  The default is the entire output area.
+<p>
+ 
+  After the display the user is ask, via the 'ENOUGH' parameter, for
+  when the program should continue, as some displays remove the
+  picture when the program ends.
+<p>
+ 
+  The display is done with a pixel value contrast of +/- 3 std dev
+  about the mean, with high pixels values set as black, and low as
+  white.
+<p>
+ 
+<hr>
+ <h2> 10 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 10.1 <a href="#bad"> Bad </a>
+<li> 10.2 <a href="#bias"> Bias </a>
+<li> 10.3 <a href="#biasbad"> Biasbad </a>
+<li> 10.4 <a href="#correct"> Correct </a>
+<li> 10.5 <a href="#disp"> Disp </a>
+<li> 10.6 <a href="#dolims"> Dolims </a>
+<li> 10.7 <a href="#dtype"> Dtype </a>
+<li> 10.8 <a href="#enough"> Enough </a>
+<li> 10.9 <a href="#expname"> Expname </a>
+<li> 10.10 <a href="#exptime"> Exptime </a>
+<li> 10.11 <a href="#gain"> Gain </a>
+<li> 10.12 <a href="#im_b"> Im&#95 b </a>
+<li> 10.13 <a href="#im_d"> Im&#95 d </a>
+<li> 10.14 <a href="#im_fl"> Im&#95 fl </a>
+<li> 10.15 <a href="#im_fr"> Im&#95 fr </a>
+<li> 10.16 <a href="#im_p"> Im&#95 p </a>
+<li> 10.17 <a href="#in"> In </a>
+<li> 10.18 <a href="#lims"> Lims </a>
+<li> 10.19 <a href="#lin"> Lin </a>
+<li> 10.20 <a href="#linf"> Linf </a>
+<li> 10.21 <a href="#narea"> Narea </a>
+<li> 10.22 <a href="#nbias"> Nbias </a>
+<li> 10.23 <a href="#ndisp"> Ndisp </a>
+<li> 10.24 <a href="#nnorm"> Nnorm </a>
+<li> 10.25 <a href="#noise"> Noise </a>
+<li> 10.26 <a href="#norm"> Norm </a>
+<li> 10.27 <a href="#objname"> Objname </a>
+<li> 10.28 <a href="#offset"> Offset </a>
+<li> 10.29 <a href="#out"> Out </a>
+<li> 10.30 <a href="#outtype"> Outtype </a>
+<li> 10.31 <a href="#prefname"> Prefname </a>
+<li> 10.32 <a href="#preftime"> Preftime </a>
+<li> 10.33 <a href="#scale"> Scale </a>
+<ul>
+<li> 10.33.1 <a href="#bscale"> Bscale </a>
+<li> 10.33.2 <a href="#bzero"> Bzero </a>
+</ul>
+<li> 10.34 <a href="#tit"> Tit </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 10.1 <a name="bad"> Bad </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The table containing the bad pixel list of 'bad' areas (if none,
+  press 'return').
+<p>
+ 
+  These will be set to 'invalid' in the output image.
+<p>
+ 
+  The list is a table which consists of rows of data, each of
+  which describe a rectangular 'bad' area. Each row has 4 integers
+  giving x,y ranges. Thus if the first 'bad' area to be described has a
+  blh corner at x1,y1, and a trh corner at x2,y2, then the first row
+  in the table will be x1,x2,y1,y2. Then the second entry will have
+  the ranges for the second area, and so on.
+<p>
+ 
+  The coordinates are relative to the entire input image.
+<p>
+ 
+  The table is in the Starman table format of a real NDF file.
+<p>
+ 
+<hr>
+ <h2> 10.2 <a name="bias"> Bias </h2> </a> <p>
+ 
+  (Default - 'no'          <br> Choice - 'yes:no')
+<p>
+ 
+  Do you want to find a mean bias level from an `overscan' area?
+<p>
+ 
+  This mean will be subtracted from the image.
+<p>
+ 
+  The area is defined by the `NBIAS' input.
+<p>
+ 
+<hr>
+ <h2> 10.3 <a name="biasbad"> Biasbad </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The table containing the bad pixel list for the bias 'overscan'
+  area (if none, press `return').
+<p>
+ 
+  These will define the areas of the bias 'overscan' area not to use in
+  calculating the mean bias.
+<p>
+ 
+  The table consists of rows of data, each of
+  which describe a rectangular 'bad' area. Each row has 4 integers
+  giving x,y ranges. Thus if the first 'bad' area to be described has a
+  blh corner at x1,y1, and a trh corner at x2,y2, then the first row
+  in the table will be x1,x2,y1,y2. Then the second entry will have
+  the ranges for the second area, and so on.
+<p>
+ 
+  The coordinates are relative to the entire input image.
+<p>
+ 
+  The table is in the Starman table format of a real NDF file.
+<p>
+ 
+<hr>
+ <h2> 10.4 <a name="correct"> Correct </h2> </a> <p>
+ 
+  (Default - 'none'      <br> Choice - 'none:mode1')
+<p>
+ 
+  Do you want to correct the image for some type of fault?
+<p>
+<pre>
+  Choice    Result
+  ------    ------
+  None      No correction.
+  Mode1     The AAT type row/column fault.
+            In this, at present the high/low
+            adjacent rows are just averaged.
+</pre><p>
+ 
+<hr>
+ <h2> 10.5 <a name="disp"> Disp </h2> </a> <p>
+ 
+  (default - 'no'              <br> Choice - 'yes:no')
+<p>
+ 
+  Do you want the output image displayed on the screen?
+<p>
+ 
+<hr>
+ <h2> 10.6 <a name="dolims"> Dolims </h2> </a> <p>
+ 
+  (Default - 'no'      <br> Choice - 'yes:no')
+<p>
+ 
+  Do you want to flag values above and below certain values as `bad'?
+<p>
+ 
+  If you do, then you will be asked in the `lims' parameter what
+  limits to acceptable values you want to input.
+<p>
+ 
+<hr>
+ <h2> 10.7 <a name="dtype"> Dtype </h2> </a> <p>
+ 
+  (Default - 'signed'     <br> Choice  - 'unsigned:signed:badsigned:real')
+<p>
+ 
+  The input image is taken as made of Integer*2 16-bit numbers, or
+  as real 32-bit numbers. (The calculations inside the program use
+  real numbers.)
+<p>
+ 
+  The formats and the value of the 'DTYPE' parameter to select them
+  are:-
+<p>
+<pre>
+  Format                                     DTYPE
+  ------                                     ----
+ 
+  Signed 16-bit integer (-32768 to 32767)    'SIGNED'
+ 
+  Unsigned 16-bit integer (0-65535)          'UNSIGNED'
+ 
+  Which is flagged as signed but actually    'BADSIGNED'
+  contains unsigned numbers (0-65535)
+ 
+  Real 32-bit numbers                        'REAL'
+</pre><p>
+ 
+  The data is read in in the proper way. The input image may have
+  BSCALE and BZERO parameters, and these are applied, but any
+  magic value INVAL parameter is ignored.
+<p>
+ 
+<hr>
+ <h2> 10.8 <a name="enough"> Enough </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  Finished looking at screen?
+<p>
+ 
+<hr>
+ <h2> 10.9 <a name="expname"> Expname </h2> </a> <p>
+ 
+  (Default - 'exposed'          <br> Choice - any)
+<p>
+ 
+  The name of the descriptor in the input image giving the exposure
+  time. A choice of 'None' indicates there is no such descriptor.
+<p>
+ 
+<hr>
+ <h2> 10.10 <a name="exptime"> Exptime </h2> </a> <p>
+ 
+  (Default - 1.0      <br> Range - 0.0 to 1.0e8 )
+<p>
+ 
+  Length of exposure in seconds.
+<p>
+ 
+  This is only used if the exposure time cannot be found from the
+  input image header which the user has said contains the
+  exposure time.
+<p>
+ 
+<hr>
+ <h2> 10.11 <a name="gain"> Gain </h2> </a> <p>
+ 
+  (Default - 0.0    <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  The gain of the chip, in terms of electrons per adu. This is added
+  as information to the output image descriptors. If 0.0 (the default)
+  is input, then this is not added.
+<p>
+ 
+<hr>
+ <h2> 10.12 <a name="im_b"> Im&#95 b </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the bias frame to subtract from
+  the input image.
+<p>
+ 
+  This should be a standard Adam .NDF file.
+<p>
+ 
+  A null response means that no bias is to be input.
+<p>
+ 
+<hr>
+ <h2> 10.13 <a name="im_d"> Im&#95 d </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the dark frame to subtract from
+  the input image.
+<p>
+ 
+  This should be a standard Adam .NDF file.
+<p>
+ 
+  A null response means that no dark is to be input.
+<p>
+ 
+  It should be a dark frame scaled so as to be that which would
+  result from a 1 second dark exposure.
+<p>
+ 
+  This is scaled in the program to the actual exposure time of the
+  exposure.
+<p>
+ 
+<hr>
+ <h2> 10.14 <a name="im_fl"> Im&#95 fl </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the flat field frame to divide into the
+  processed (bias, preflash, dark) input image.
+<p>
+ 
+  This should be a standard Adam .NDF file.
+<p>
+ 
+  A null response means that no flat field is to be input.
+<p>
+ 
+  This should be the sensitivity function of the chip, thus a pixel
+  of high sensitivity will have a high value, and one with low
+  sensitivity will have a low value. It should have a mean level of
+  1.0.
+<p>
+ 
+<hr>
+ <h2> 10.15 <a name="im_fr"> Im&#95 fr </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the fringe frame to subtract from
+  the input image.
+<p>
+ 
+  This should be a standard Adam .NDF file.
+<p>
+ 
+  A null response means that no fringe is to be input.
+<p>
+ 
+  It should be a fringe frame scaled so as to be that which would
+  result from a 1 second exposure.
+<p>
+ 
+  This is scaled in the program to the actual exposure time of the
+  exposure.
+<p>
+ 
+<hr>
+ <h2> 10.16 <a name="im_p"> Im&#95 p </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the preflash frame to subtract from
+  the input image.
+<p>
+ 
+  This should be a standard Adam .NDF file.
+<p>
+ 
+  A null response means that no preflash is to be input.
+<p>
+ 
+  It should be a Preflash frame scaled so as to be that which would
+  result from a 1 second preflash exposure.
+<p>
+ 
+  This is scaled in the program to the actual preflash time of the
+  exposure.
+<p>
+ 
+<hr>
+ <h2> 10.17 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image file.
+<p>
+ 
+  This should be a standard Adam .NDF file, but can be in a number of
+  formats (real, signed 16-bit, unsigned 16-bit, badsigned 16-bit).
+<p>
+ 
+<hr>
+ <h2> 10.18 <a name="lims"> Lims </h2> </a> <p>
+ 
+  (Defaults -  0.0,32767.0 or 0.0,65535.0      <br> Range - -1.0e10 to 1.0e10 )
+<p>
+ 
+  The low and high limits to acceptable values in the input image.
+<p>
+ 
+  If you have answered 'YES' to the `dolims' query, then you are
+  asked this.
+<p>
+ 
+  The values wanted are those after scaling for BSIZE and BZERO of
+  the input image. Thus they are not the file storage 16-bit values,
+  but the true, proper values they should be if it were not for the
+  need to work with 16-bit images.
+<p>
+ 
+<hr>
+ <h2> 10.19 <a name="lin"> Lin </h2> </a> <p>
+ 
+  (Default - 'none'      <br> Choice - 'none:mode1')
+<p>
+ 
+  Do you want to correct the input data for non-linearity?
+<p>
+<pre>
+  Choice   Result
+  ------   ------
+  None     No linearity correction
+ 
+  Mode1    This correction is of the form:-
+           Raw-bias =
+           (Corrected-bias)*[1.0 + factor*(Corrected-bias)]
+</pre><p>
+ 
+<hr>
+ <h2> 10.20 <a name="linf"> Linf </h2> </a> <p>
+ 
+  (Default - 3.2*10-6      <br> Range - -1.0e8 to 1.0e8)
+<p>
+ 
+  The factor 'factor' in the linearisation equation to use in correcting
+  for the non-linearity of the CCD. (see paramater 'lin'.)
+<p>
+ 
+<hr>
+ <h2> 10.21 <a name="narea"> Narea </h2> </a> <p>
+ 
+  (Default - 1,nx,1,ny           <br> Range - 1 to 100000)
+<p>
+ 
+  This is the X start, X end, Y start, Y end of the image area to be
+  taken, processed and output.
+<p>
+ 
+  This is input as four integers, separated by commas.
+<p>
+ 
+<hr>
+ <h2> 10.22 <a name="nbias"> Nbias </h2> </a> <p>
+ 
+  (Default - 1,1,1,1          <br> Range - 1 to 100000)
+<p>
+ 
+  This is the X start, X end, Y start, Y end of the bias `overscan'
+  area to be used.
+<p>
+ 
+  This is input as four integers, separated by commas.
+<p>
+ 
+<hr>
+ <h2> 10.23 <a name="ndisp"> Ndisp </h2> </a> <p>
+ 
+  (Default  -  Output area         <br> Range - 1 to 100000)
+<p>
+ 
+  This is X start, X end, Y start, Y end of the input image area to be
+  displayed.
+<p>
+ 
+  This is only asked for if the query `disp' has been answered `YES'.
+<p>
+ 
+  This is input as four integers, separated by commas.
+<p>
+ 
+<hr>
+ <h2> 10.24 <a name="nnorm"> Nnorm </h2> </a> <p>
+ 
+  (Default  -  Output area        <br> Range - 1 to 100000)
+<p>
+ 
+  This is the X start, X end, Y start, Y end of the image area to be
+  used in calculating the normalising value for the scaling.
+<p>
+ 
+  This is only asked for if the query `norm' has been answered `FLUX,
+  or `SUB'.
+<p>
+ 
+  This is input as four integers, separated by commas.
+<p>
+ 
+<hr>
+ <h2> 10.25 <a name="noise"> Noise </h2> </a> <p>
+ 
+  (Default - 0.0        <br> Range -  -1.0e8 to 1.0e8)
+<p>
+ 
+  The read-out noise of the chip. This is added as information to the
+  output image descriptors. If 0.0 (the default) is input, then this
+  is not added.
+<p>
+ 
+<hr>
+ <h2> 10.26 <a name="norm"> Norm </h2> </a> <p>
+ 
+  (Default - 'none'    <br> Choice - see below)
+<p>
+ 
+  The method of normalising the image.
+<p>
+<pre>
+  Option     Result
+  ------     -------
+  flux       Normalise average val to 1.0
+             (divide by mean)
+ 
+  time       Norm values to what they would have
+             been if the exposure time had been
+             1.0 seconds
+ 
+  none       No normalisations
+ 
+  sub        Subtract mean
+</pre><p>
+ 
+<hr>
+ <h2> 10.27 <a name="objname"> Objname </h2> </a> <p>
+ 
+  (Default - 'OBJECT'     <br> Choice - any)
+<p>
+ 
+  The name of the descriptor in the input image giving the object
+  name. A choice of 'None' indicates there is no such descriptor.
+<p>
+ 
+<hr>
+ <h2> 10.28 <a name="offset"> Offset </h2> </a> <p>
+ 
+  (Default - 0,0     <br> Range - -10000 to 10000)
+<p>
+ 
+  The (X,Y) offset, relative to the entire raw input image, of the
+  pixels of the reference (dark, flat field, etc.) images and bad
+  pixel lists.
+<p>
+ 
+  Thus if the reference images were made in such a way that the (1,1)
+  pixel of the reference images should be applied to the (11,11) pixel
+  of the ENTIRE input image (not, that is, to the location of the
+  pixel in the area in the input image that will become the output
+  image), then the `offset' would be (10,10).
+<p>
+ 
+  The non-default option is mainly used for two cases:-
+<p>
+<ol>
+<li>     When a window of the normal CCD image has been used, so that only
+     a part of the CCD image is read out. In this case, then the
+     reference images will have normally been made for the `normal'
+     entire CCD area - a bigger area. In these cases, the `offset'
+     will always be two positive numbers, being the shift of the start
+     of the windowed small image from the start of the normal large
+     CCD image.
+<p>
+ 
+<li>     When an `overscan' bias area is at the left of the image, so that
+     the reference images and the bad pixel lists, while refering,
+     normally, to the de-biased image, thus start not at the (1,1)
+     pixel of the raw input image, even if it is a whole CCD image.
+</ol><p>
+ 
+  If, further, the output image blh has an offset from the (1,1) pixel
+  of the input image, then this does NOT affect the `offset'.
+<p>
+ 
+<hr>
+ <h2> 10.29 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The output file.
+<p>
+ 
+  This is a 'real' image or a 'short' Integer*2 image with
+  BZERO, BSCALE as chosen by the user. The default BZERO and BSCALE are
+  taken from the first input frame.
+<p>
+ 
+  It is a standard Starman ADAM NDF image.
+<p>
+ 
+  If you put a null response in, then the output image is not stored.
+<p>
+ 
+  It is a standard Starman ADAM NDF image.
+<p>
+ 
+<hr>
+ <h2> 10.30 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+  (Default - same as input          <br> Choice - 'real:short')
+<p>
+ 
+  Should the output image be:-
+<p>
+<dl>
+<dt>  'real'
+<dd>This is a 32-bit real image with a precision of about
+            1 in 10 million, nad values between +/- 10**38
+<p>
+ 
+<dt>  'short'
+<dd>This is a 16-bit integer image, with a precision of about
+            1 in 60000. The numbers are stored on disk as integers
+            between -32768 and +32767. They are used in the Starman
+            programs as real numbers, by the use of BSCALE and BZERO,
+            such that:-
+<p>
+ 
+                'used value' = BSACLE*'disk value' + BZERO
+<p>
+ 
+            The advantage of this is that if this precision is adequate
+            then the files are half the size of 'real' files. The
+            problem is that one has to be constantly aware of the
+            'digitisation' of the images when being stored on disk.
+            Also, many other program packages do not use the
+            BSCALE and BZERO, so cannot get the 'true' values.
+</dl><p>
+ 
+<hr>
+ <h2> 10.31 <a name="prefname"> Prefname </h2> </a> <p>
+ 
+  (Default - 'PREFLASH'       <br> Choice - any)
+<p>
+ 
+  The name of the header in the input image which holds the
+  length of the preflash exposure in seconds.
+<p>
+ 
+  If 'None' is entered, the user is asked for the preflash
+  time.
+<p>
+ 
+  This parameter is only asked for if a preflash frame is used.
+<p>
+ 
+<hr>
+ <h2> 10.32 <a name="preftime"> Preftime </h2> </a> <p>
+ 
+  (Default - 1.0      <br> Range - 0.0 to 1.0e8 )
+<p>
+ 
+  Length of preflash in seconds.
+<p>
+ 
+  This is only used if the user inputs that there is a prflash frame
+  and that the preflash time cannot be found from the input image
+  header.
+<p>
+ 
+<hr>
+ <h2> 10.33 <a name="scale"> Scale </h2> </a> <p>
+ 
+  (Default - as described below          <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+   The two output image constants of BSCALE and BZERO.
+<p>
+ 
+   The output image is Integer*2, and has BSCALE and BZERO headers so
+   that
+<p>
+<pre>
+ Real pixel value = BSCALE*(file pixel value)  + BZERO
+</pre><p>
+ 
+<hr>
+ <h2> 10.33.1 <a name="bscale"> Bscale </h2> </a> <p>
+ 
+  (Default - 1st input image BSCALE value, or if none, then 1.0)
+<p>
+ 
+   The BSCALE parameter for the output image.
+<p>
+ 
+   Thus normally this is 1.0, or that of the input image.
+<p>
+ 
+   If the output image has been scaled for averaging, then a
+   different scale may be appropriate.
+<p>
+ 
+   Thus for the flat field output, the pixels would all contain 1!
+   So in these cases the default scale is 0.0001, and so in the case
+   of the flat field the values would be about 10000, allowing for a
+   reasonable dynamic range. For the averaging of preflash, and bias,
+   a scale of 1.0 would be ok, but for dark and fringe, a scale of
+   0.0001 might be ok, as these are scaled to 1 second exposure times.
+   Anyway for these, have a look at the output, to see if the dynamic
+   range has been chosen ok.
+<p>
+ 
+<hr>
+ <h2> 10.33.2 <a name="bzero"> Bzero </h2> </a> <p>
+ 
+  (Default - 1st input image BZERO value, or if none, then 0.0 or
+   32766.0)
+<p>
+ 
+   The BZERO parameter for the output image.
+<p>
+ 
+   Normally this is 0.0 or the input value.
+<p>
+ 
+   However for UNSIGNED or BADSIGNED input (16-bit unsigned numbers),
+   the default is put at 32766, so the full range of numbers can be
+   dealt with in the output. The value is 32766, not 32767, and thus
+   a number of 65536 is put out as invalid (flagged with INVAL value).
+   The reason for so chopping the highest unsigned number, is that
+   -32768 is reserved as the INVAL number, and it was thought better
+   to loose the 65536s than the 0s.
+<p>
+ 
+<hr>
+ <h2> 10.34 <a name="tit"> Tit </h2> </a> <p>
+ 
+  (Default - see below                       <br> Choice - any)
+<p>
+ 
+  The Title to add to the output image. Default is the name in the
+  image 'objname' descriptor.
+<p>
+ 
+<hr>
+ <h2> 11 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1991 March
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

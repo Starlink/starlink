@@ -1,0 +1,260 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBCOMPS
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBCOMPS
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbcomps_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbcomps">
+t_tbcomps  </a>  Find stars within/not within a given annulus of other stars       <br>
+<a href="#tbco_check">
+tbco_check  </a>  Find number and locations of rows to output       <br>
+<a href="#tbco_trans">
+tbco_trans  </a>  Load selected rows into output       <br>
+<a href="#tbcomps">
+tbcomps  </a>  (Program) Find stars within/not within a given annulus of each other       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C    TBCOMPS.FOR
+C
+C    Contains:-
+C
+C T_TBCOMPS     Find stars within/not within a given annulus of other stars
+C TBCO_CHECK    Find number and locations of rows to output
+C TBCO_TRANS    Load selected rows into output
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbcomps"> T_TBCOMPS  </a>-- Find stars within/not within a given annulus of other stars
+C
+C         A J Penny            RAL			1991 May
+
+      subroutine t_tbcomps ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      character title*50
+      integer ierr, ipin, ipo, iv, ipk, kmeth, k
+      real topl, botl
+
+      integer nthelp
+      parameter ( nthelp=5 )
+      character*68 thelp(nthelp)
+      data (thelp(k),k=1,nthelp) /
+     + 'Option     Function' ,
+     + '------      --------' ,
+     + 'In          Find stars within annulus round any other star' ,
+     + 'Not_in      Find stars not within annulus round any other ' ,
+     + '             star' /
+
+Cbegin
+
+
+      call optabr ( 'IN', ipin, TBVX, TBY, .false., ierr )		!Input tbale
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+      TBX = TBVX - 5
+
+      call pargi ( TBY )						!Tell user table size
+      call pargi ( TBX )
+      call printd ( 'No of rows =  %d   No of columns = %d' )
+
+      call get_job ( 'OPTION', 'in:not_in', kmeth, 1, thelp, nthelp  )	!Get selection method
+      if ( ST_FAILED ) return
+
+      botl = 0.0							!Get annulus
+      topl = 20.0
+      call get2r ( 'LIMITS', botl, topl, .true., 0.0, 1.0e10 )
+      if ( ST_FAILED ) return
+
+      call gtwrki ( 'WORK', TBY, ipk, ierr )				!Open work space
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call tbco_check ( %val(ipin), botl, topl, kmeth, %val(ipk) )	!Find no of entries passed
+      if ( TBYO.eq.0 ) then
+         call printo ( 'No positions found' )
+         return
+      endif
+
+      call pargi ( TBYO )
+      call printd ( 'No of positions output = %d ' )
+
+      call optabw ( 'OUT', ipo, TBVX, TBYO, .false., ierr )		!Open output list
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call tcopdes ( 'IN', 'OUT', ierr )				!title to output list and store it and the descriptors
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbcomps', iv,
+     +              ierr )	
+      call get1c  ( 'TITLE', title, title, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+      call tbco_trans ( %val(ipin), %val(ipo), %val(ipk) )	 	!Do the loading of the Output from the Input
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbco_check"> TBCO_CHECK  </a>-- Find number and locations of rows to output
+C
+C    a j penny               rgo                      82-11-4
+
+
+      subroutine tbco_check ( tb, botl, topl, kmeth, klist )
+
+      implicit none
+      include 'ST_TABLE_INC'
+
+      real	tb(TBVX,TBY)	!i: Input table
+      real	botl		!i: Bottom limit
+      real	topl		!i: Top limit
+      integer   kmeth		!i: Flag for close (1) or far (2)
+      integer	klist(TBY)	!o: Flags for chosen (1) or not (0)		!i: Find numer (1) or load (2)
+C--
+      integer k, j
+      real rmin, rmax, d, xa, ya, xb, yb, rv
+Cbegin
+
+
+      rmin = botl*botl
+      rmax = topl*topl
+
+      if ( kmeth.eq.1 ) then
+
+         call azeroi ( klist, TBY )
+         do k = 1, TBY-1
+            xa = tb(6,k)
+            ya = tb(7,k)
+            do j = k+1, TBY
+               xb = tb(6,j)
+               yb = tb(7,j)
+               d = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               if ( d.ge.rmin .and. d.le.rmax ) then
+                  klist(j) = 1
+                  klist(k) = 1
+               endif
+            enddo
+         enddo
+
+      else
+
+         call amovki ( 1, klist, TBY )
+         do k = 1, TBY
+            xa = tb(6,k)
+            ya = tb(7,k)
+            do j = 1, TBY
+               if ( j.ne.k .and. klist(j).eq.1 ) then
+                  xb = tb(6,j)
+                  yb = tb(7,j)
+                  d = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+                  if ( d.ge.rmin .and. d.le.rmax ) klist(j) = 0
+               endif
+            enddo
+         enddo
+
+      endif
+
+      call asumi ( klist, TBY, rv )
+      TBYO = nint(rv)
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbco_trans"> TBCO_TRANS  </a>-- Load selected rows into output
+C
+C    a j penny               rgo                      82-11-4
+
+      subroutine tbco_trans ( tb, tbo, klist )
+
+      implicit none
+      include 'ST_TABLE_INC'
+
+      real	tb(TBVX,TBY)	!i: Input table
+      real	tbo(TBVX,TBYO)	!o: Output table
+      integer	klist(TBY)	!o: Flags for chosen (1) or not (0)
+C--
+      integer k, j
+Cbegin
+
+      j = 0
+      do k = 1, TBY
+         if ( klist(k).eq.1 ) then
+            j = j + 1
+            call amovr ( tb(1,k), tbo(1,j), TBVX )
+         endif
+      enddo
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbcomps"> TBCOMPS  </a>-- (Program) Find stars within/not within a given annulus of each other
+C   See TBCOMPS.HLP for details
+C
+C         A.J.Penny                RAL		1991 May
+
+      subroutine tbcomps ( ierradam )
+
+      implicit none
+
+      integer      ierradam              !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbcomps
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBCOMPS.INC for TBCOMPS.F
+
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

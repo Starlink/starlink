@@ -1,0 +1,130 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBTRAN_LOAD
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBTRAN_LOAD
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbtran_load_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbtran_load">
+t_tbtran_load  </a>  Load transformation coefficents from simple parametersE       <br>
+<a href="#tbtran_load">
+tbtran_load  </a>  (Program) Load transformation between positions       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C   T_TBTRAN_LOAD.F
+C
+C    Contains:-
+C
+C T_TBTRAN_LOAD Load transformation coefficents from simple parameters
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbtran_load"> T_TBTRAN_LOAD  </a>-- Load transformation coefficents from simple parametersE
+C
+C         A J Penny            RAL			1991 May
+
+      subroutine t_tbtran_load ()
+
+      implicit none
+      include 'STARMAN_INC'
+C--
+      real    cs, sn, cen(2), mag, rot, shift(2), trc(6)
+Cbegin
+
+
+      cen(1) = 0.0							!Get centre of rotn and magn
+      cen(2) = 0.0
+      call get2r ( 'CENTRE', cen(1), cen(2), .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+
+      call get1r ( 'MAGNIFY', mag, 1.0, 0.0, 1.0e20 )			!Get magnification
+      if ( ST_FAILED ) return
+
+      call get1r ( 'ROTATE', rot, 0.0, -1.0e20, 1.0e20 )		!Get rotation
+      if ( ST_FAILED ) return
+      rot = rot*1.745329e-2
+
+      shift(1) = 0.0							!Get shift
+      shift(2) = 0.0
+      call get2r ( 'SHIFT', shift(1), shift(2), .true.,-1.0e20,1.0e20)
+      if ( ST_FAILED ) return
+
+      cs = cos(rot)							!Calc transformation
+      sn = sin(rot)
+      trc(1) = shift(1) - cen(1)*mag*cs + cen(2)*mag*sn
+      trc(2) = mag*cs
+      trc(3) = -1.0*mag*sn
+      trc(4) = shift(2) - cen(1)*mag*sn - cen(2)*mag*cs
+      trc(5) = mag*sn
+      trc(6) = mag*cs
+
+      call pargr ( trc(1) )						!Output results
+      call pargr ( trc(2) )
+      call pargr ( trc(3) )
+      call printd ( 'X2 = %f + %f*X1 + %f*Y1')
+      call pargr ( trc(4) )
+      call pargr ( trc(5) )
+      call pargr ( trc(6) )
+      call printd ( 'Y2 = %f + %f*X1 + %f*Y1')
+
+      call put3r ( 'XCOEFF', trc(1), trc(2), trc(3) )			!Put in program parameters
+      call put3r ( 'YCOEFF', trc(4), trc(5), trc(6) )
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtran_load"> TBTRAN_LOAD  </a>-- (Program) Load transformation between positions
+C   See TBTRAN_LOAD.HLP for details
+C
+C         A.J.Penny             RAL                     1991 May
+
+      subroutine tbtran_load ( ierradam )
+
+      implicit none
+
+      integer      ierradam                !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbtran_load
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

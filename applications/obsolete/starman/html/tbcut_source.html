@@ -1,0 +1,357 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBCUT
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBCUT
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbcut_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbcut">
+t_tbcut  </a>  Cut out and output parts of a table       <br>
+<a href="#tbcu_check">
+tbcu_check  </a>  Get output size       <br>
+<a href="#tbcu_doit">
+tbcu_doit  </a>  Load ouput from cut input       <br>
+<a href="#tbcut">
+tbcut  </a>  (Program) Cut sections out of a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C   TBCUT.FOR
+C
+C   Contains:-
+C
+C T_TBCUT      Cut out and output parts of a table
+C TBCU_CHECK   Get output size
+C TBCU_DOIT    Load ouput from cut input
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbcut"> T_TBCUT  </a>-- Cut out and output parts of a table
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine t_tbcut ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      character title*50, tc*10
+      integer kc(2,20), kr(2,20), ipin, iv, i, ierr, k, ipo, k1, k2,
+     +        numr, numc, ipwr, ipwc, ipwv, ierr1
+      logical more
+Cbegin
+
+
+      call optabr ( 'IN', ipin, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+      TBX = TBVX - 5
+
+      call pargi ( TBX )						!Print out size
+      call pargi ( TBY )
+      call printd ( 'No of columns = %d : No of rows = %d' )
+      call printo ( ' ' )
+
+      more = .true.							!Columns to cut
+      numc = 0
+      do while ( more )
+         k = numc + 1
+         call pargi ( k )
+         call printd ( 'Column section number: %d ' )
+         k1 = 0
+         k2 = 0
+         if ( k.eq.1 ) then
+            k1 = 1
+            k2 = TBX
+         endif
+         if ( k.ge.10 ) then
+            write ( tc, '(''COL_'',i2)' ) k
+         else
+            write ( tc, '(''COL_'',i1)' ) k
+         endif
+         call get2i ( tc, k1, k2, .true., 0, TBX )
+         if ( ST_FAILED ) return
+         call cswopi ( k1, k2 )
+         if ( k1.eq.0 ) then
+            more = .false.
+         else
+            numc = numc + 1
+            kc(1,numc) = k1
+            kc(2,numc) = k2
+         endif
+         if ( numc.eq.10 ) more = .false.
+      enddo
+      if ( numc.eq.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call printo ( ' ' )
+      more = .true.							!Rows to cut
+      numr = 0
+      do while ( more )
+         k = numr + 1
+         call pargi ( k )
+         call printd ( 'Row section number: %d ' )
+         k1 = 0
+         k2 = 0
+         if ( k.eq.1 ) then
+            k1 = 1
+            k2 = TBY
+         endif
+         if ( k.ge.10 ) then
+            write ( tc, '(''ROW_'',i2)' ) k
+         else
+            write ( tc, '(''ROW_'',i1)' ) k
+         endif
+         call get2i ( tc, k1, k2, .true., 0, TBY )
+         if ( ST_FAILED ) return
+         call cswopi ( k1, k2 )
+         if ( k1.eq.0 ) then
+            more = .false.
+         else
+            numr = numr + 1
+            kr(1,numr) = k1
+            kr(2,numr) = k2
+         endif
+         if ( numr.eq.10 ) more = .false.
+      enddo
+      if ( numr.eq.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call gtwrki ( 'WORKR', TBY, ipwr, ierr )
+      call gtwrki ( 'WORKC', TBX, ipwc, ierr1 )
+      if ( ierr.ne.0 .or. ierr1.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call tbcu_check ( kc, numc, %val(ipwc), kr, numr, %val(ipwr) )	!Set up for output
+
+      if ( TBXO.lt.1 .or. TBYO.lt.1 ) then				!Check output size
+         if ( TBXO.lt.1 ) call printo ( 	
+     +      'WARNING: Output table has no columns - no file made' )
+         if ( TBYO.lt.1 ) call printo (
+     +      'WARNING: Output table has no rows - no file made' )
+         return
+      endif
+
+      call pargi ( TBXO )						!Inform size
+      call pargi ( TBYO )
+      call printd ( 'Output: columns = %d : rows = %d ' )
+
+      call optabw ( 'OUT', ipo, TBVXO, TBYO, .false., ierr )		!Open output list
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         call printo ( 'ERROR: Cant store output list' )
+         return
+      endif
+
+      call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and store it and the descriptors
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbcut', iv, i )
+      call get1c ( 'TITLE', title, title, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+      call gtwrkr ( 'WORKV', TBXO, ipwv, ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call tbcu_doit ( %val(ipwr), %val(ipwc), %val(ipin), %val(ipo),	!Load the output
+     +                 %val(ipwv) )
+
+      call wrkcan ( 'WORKC' )
+      call wrkcan ( 'WORKR' )
+      call wrkcan ( 'WORKV' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbcu_check"> TBCU_CHECK  </a>-- Get output size
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine tbcu_check ( kc, numc, colc, kr, numr, rowc )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      integer     kc(2,20)		!i: Column excisions
+      integer     numc			!i: Number of column excisions
+      integer     colc(TBX)		!o: Use a column? (0=no;1=yes)
+      integer     kr(2,20)		!i: Row excisions
+      integer     numr			!i: Number of column excisions
+      integer     rowc(TBY)		!o: Use a row? (0=no;1=yes)
+C--
+      integer k, j
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call azeroi ( colc, TBX )
+      if ( numc.gt.0 ) then
+         do k = 1, numc
+            do j = kc(1,k), kc(2,k)
+               colc(j) = 1
+            enddo
+         enddo
+      endif
+
+      TBXO = 0
+      do k = 1, TBX
+         if ( colc(k).eq.1 ) TBXO = TBXO + 1
+      enddo
+      TBVXO = TBXO + 5
+
+      call azeroi ( rowc, TBY )
+      if ( numr.gt.0 ) then
+         do k = 1, numr
+            do j = kr(1,k), kr(2,k)
+               rowc(j) = 1
+            enddo
+         enddo
+      endif
+
+      TBYO = 0
+      do k = 1, TBY
+         if ( rowc(k).eq.1 ) TBYO = TBYO + 1
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbcu_doit"> TBCU_DOIT  </a>-- Load ouput from cut input
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine  tbcu_doit ( rowc, colc, tb, tbo, rv )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      integer   rowc(TBY)		!i: Use a row? (0=no;1=yes)
+      integer   colc(TBX)		!i: Use a column? (0=no;1=yes)
+      real      tb(TBVX,TBY)		!i: Input table
+      real      tbo(TBVXO,TBYO)		!o: Output table
+      real      rv(TBXO)		!o: Work space for output rows
+C--
+      integer j, ja, k, ky, ierr
+      character head*20, ahead*7
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ky = 0
+      do k = 1, TBY
+         if ( rowc(k).eq.1 ) then
+
+            ky = ky + 1							!Move name
+            call amovr ( tb(1,k), tbo(1,ky), 5 )
+
+            ja = 0							!Move values
+            do j = 1, TBX
+               if ( colc(j).eq.1 ) then
+                  ja = ja + 1
+                  rv(ja) = tb((5+j),k)
+               endif
+            enddo
+            call amovr ( rv, tbo(6,ky), TBXO )
+
+         endif
+      enddo
+
+      ky = 0								!Load headers
+      do k = 1, TBX
+         if ( colc(k).eq.1 ) then
+            ky = ky + 1
+            head = ' '
+            call gthead ( 'IN', k, head, ierr )				
+            call pthead ( 'OUT', ky, head, ierr )
+         endif
+      enddo
+
+      if ( TBX.gt.TBXO ) then						!Delete extra headers
+         do k =  TBXO+1, TBX
+            call gthead ( 'IN', k, head, ierr )
+            if ( ierr.eq.0 ) then
+               write ( ahead, '(''HEAD'',i3.3)') k
+               call dldes ( 'OUT', ahead, ierr )
+            endif
+         enddo
+      endif
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbcut"> TBCUT  </a>-- (Program) Cut sections out of a table
+C   See TBCUT.HLP for details
+C
+C         A.J.Penny                RGO                             83-8-14
+
+      subroutine tbcut ( ierradam )
+
+      implicit none
+
+      integer      ierradam              !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbcut
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

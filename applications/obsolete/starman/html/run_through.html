@@ -1,0 +1,253 @@
+<HTML> <HEAD>
+<TITLE> Run through </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Run through </h1>
+ 
+<hr>
+Go to <a href="main.html"> Starman Help Main. </a>
+<hr>
+
+ Below is an annotated example of a Starman session invocated from the
+ command line. Explanations and commentary associated with each annotation is
+ given at the end.
+<p>
+<pre>
+
+ > starman                                                                {1}
+
+  ____________________________________________________________________  
+ |  Starman - Stellar Photometry               Version 2.0    Nov 94  | 
+ |            Image and Table Handling                                | 
+ |                                                                    | 
+ |1) Help:                         starmanhyperhelp / starmanhelp     | 
+ |2) Advice/Bug Reports:           starmanhypergripe / starmangripe   | 
+ |                                   - or - mail alan.penny@rl.ac.uk  | 
+ |3) Prompts in programs:          ? or ?? for help : !! to exit      | 
+ |4) Default data for a prompt:    $STARMAN_DATA/progam_parameter     | 
+ |                                    e.g. $STARMAN_DATA/measure_in   | 
+ |5) Demonstration:                starmandemo                        | 
+ |                                                                    | 
+ |All rights reserved. &copy 1995 RAL. Starlink copyright and disclaimer notices apply| 
+  --------------------------------------------------------------------  
+                                                             
+ >imcut                                                                   {2}
+ IN - Input image /!/ > $STARMAN_DATA/profile_in                          {3}
+ XRANGE - X range to cut out /[1,200]/ > ?                                {4}
+   Imcut                                                      
+                                                              
+    Parameters                                              
+                                                              
+    Xrange                                               
+                                                        
+    (Default - 1,input image X size  Range - 1 to input image X size)  
+
+    X start and X end of the area of image to cut out and put in 
+    new image. If the X end is smaller than the X start, then the 
+    output image is inverted in X.                                     
+                                                              
+ XRANGE - X range to cut out /[1,200]/ >                                  {5}
+ YRANGE - Y range to cut out /[1,200]/ > 21,180                           {6}
+ BIN - XY size of box for binning of pixels /[1,1]/ > 1,2                 {7}
+ SAMPLE - BLH pixel or average of bin box? (sample:average) /'average'/ > {8}
+ CHECK - If any box pixel invalid, output invalid? (yes:no) /NO/ >        {9}
+ OUT - Output image /!/ > fred                                           {10}
+ TITLE - Title to add to output image /'Profile_in'/ > fred title        {11}
+ >                                                           
+                                                             
+ >imcut                                                                  {12}
+ IN - Input image /!/ > !!                                               {13}
+ !! Application exit status Status value:148013867                       {14}
+ >                                                            
+                                                              
+ >imflash fred                                                           {15}
+ Title is: A trial run of Starman                                        {16}
+ Display values: Min =   3322.042  Max = 2420,425                        
+ Size = 200 by 90                                                        
+ ENOUGH/yes/:=                                                           {17}
+ >                                                            
+ >interact $STARMAN_DATA/profile_in                                      {18}
+ EASYSTART - Use the standard start sequence of operations? /YES/ >      {19}
+  Title is: Profile_in                                                   {20}
+  Display values: Min = 1531.723  Max = 528.4710         
+  Size = 200x200  :  Type = SHORT                        
+ 
+  The image is displayed, and a window with a `panel' of control    {21}-{25}
+  buttons and a window with help in it are displayed.
+
+</pre>
+<p>*******************************************************
+<p>
+
+<ol>
+ 
+<li> To run any Starman program, you must have loaded the `Starman' system.
+     The `Starman' command does this.  You can still use shell commands
+     in this mode.
+
+<p><li> Let's run a Starman application.  IMCUT cuts a section out of an
+     image. 
+
+<p><li> The input image is profile_in.sdf in the sub-directory 
+     $STARMAN_DATA (whose logical name was set up in the Starlink login).
+     You must omit the `.SDF' qualifier.  The image is a standard Starman ADAM 
+     .SDF image. These have either `real' 32-bit real values, or `short' 16-bit 
+     integer values, and can have the `BSCALE' and `BZERO' values, and 
+     `magic pixel values' indicating `bad' pixels.
+
+<p><li> The program now asks for the X range of pixels to be cut out,
+     and give the default start and end value. A question mark to any
+     Starman request will bring the help on that request, as it does here.
+
+<p><li> The request is now repeated, and you take the default, the whole
+     X range.
+
+<p><li> Now you are asked for the Y range. You want to select the range 
+     from 21 to 200. You enter 21. As you have put in only
+     one parameter, and two are asked for, the second parameter is
+     taken as the default value shown, in this case 200.
+
+<p><li> A request on how much to bin the output image. You tell it to
+     bin by a factor of x1 in X and x2 in Y.
+ 
+<p><li> How to make the average of the box. You choose one of the two
+     possible character strings `average' or `sample'. By just doing
+     `return' you accept the default `average'.
+
+<p><li> This is asks whether set `invalid' if any `invalid'.
+     Many questions will be in this `logical' mode, where the
+     acceptable answers are `yes', or `no'.
+       
+<p><li> The name of the new file to contain the output image is requested.
+     Do not include the `.sdf' qualifier. Never use the name of an existing
+     file, the programs do not deal with version numbers of files.
+
+<p><li> All images have a `TITLE' header, which can be used to contain
+     some information and the image.
+
+<p><li> You decide to do another `imcut'.
+
+<p><li> But you change your mind. At any request by any program for input,
+     if you type `!!', the program ends, loosing any output.
+
+<p><li> If a program ends in a non-normal way, you sometimes get a rather
+     strange ADAM error message. You can generally ignore these.
+ 
+<p><li> Now let's run look at the new image. IMFLASH displays the image with
+     a high contrast around the `sky' level. Notice that the parameters
+     qualifying IMFLASH are located on the command line, separated by spaces. 
+     Up to eight such parameters can be input on the command line. Parameter
+     values on the command line are not subsequently prompted for by the
+     application. Note also that the name of the image, `fred', has no 
+     parameter name in front of it. A later section of the manual will 
+     describe when the parameter name may be omitted. The display device will 
+     be the X window that user is using.
+
+<p><li> The program displays the image on your screen.
+     As you can see, the binning has `squished' the image in the Y direction.
+     The program also types out some information about the image and its
+     display.
+
+<p><li> Press `return' when you have seen enough. The image now disappears.
+     (To keep the image displayed, leave the program running, and open
+     another UNIX window to run a fresh \starman session to do your
+     work in.)
+  
+<p><li> Now let's look more closely at the `profile_in' image.
+     Note that the name of the image to work with for now is
+     input on the command line.
+
+<p><li> Select the suggested option of the standard way of inputting an image.
+
+<p><li> The image is displayed, some details typed out, and a window with
+     a `panel' of control buttons and a window with help in it are
+     displayed.
+
+<p><li> Control is now transferred to the panel, with the keyboard only 
+     being used to input information from time to time. When control has 
+     to be shifted between the keyboard, the panel, and the image, it is
+     sometimes necessary to click on those areas to shift attention to 
+     them before they can be used. We shall now have a short trip round
+     a few of the extensive capabilities of `Interact'.
+<p>
+      (`LHB' = click left-hand button on cursor when the 
+        cursor is placed at the  appropriate place. `MHB' = middle, `RHB' 
+        = right-hand button. `click' = press and release)
+<p>
+   
+   <strong> Action _____________ Further Action/Result </strong>
+<p>
+<dl>
+<dt> <strong>   LHB on `Zoom'     </strong><dd>    
+     Move cursor round image and watch the panel 
+                       display the pixel values. Place cursor in image
+                       centre and click twice (slight pause between
+                       clicks) the cursor middle 
+                       button. The image should zoom up by x2. Click
+                       once on cursor right-hand button to return to 
+                       panel control. 
+
+<p><dt> <strong>   LHB on `HELP'     </strong><dd>
+     The `help' for these buttons is typed out. Press 
+                       carriage return on the keyboard a number of times, 
+                       until control is returned to the panel. 
+
+<p><dt> <strong>   LHB on `Colour'   </strong><dd> 
+     Panel for affecting colour display appears. 
+
+<p><dt> <strong>   LHB on `Load'     </strong><dd> 
+     Load a new Look-Up Table, by replying `4' on 
+                       keyboard when asked `LUTNUM/1/:='. 
+
+<p><dt> <strong>   LHB on `Scale'    </strong><dd> 
+     Hold cursor left-hand button down and move about 
+                       image. 
+                       See how the LUT changes. Release button. 
+
+<p><dt> <strong>   LHB on `Load'     </strong><dd> 
+     Load the origional Look-Up Table, by replying `1' 
+                       on keyboard when asked `LUTNUM/1/:='. 
+
+<p><dt> <strong>   LHB on `RETURN'   </strong><dd> 
+     Go back to `Interact' panel buttons. 
+
+<p><dt> <strong>   LHB on `Aperture' </strong><dd> 
+     `Aperture' buttons loaded. This enables the
+                       aperture photometry options. You first have to
+                       choose whether `annulus' or `separate' 
+                       measuring mode. Choose the default with a 
+                       carriage return to the keyboard question 
+                       `METHOD/annulus/:='. Move the cursor to the
+                       screen, and shrink the `star' aperture by
+                       clicking the left-hand cursor button. Accept 
+                       the new size by clicking the right-hand button.
+                       Accept the present inner and outer radii of 
+                       the sky annulus by clicking the right-hand 
+                       button twice. Then LHB on `Measure' to select
+                       the option of measuring. Move the cursor to
+                       a star in the image. Click the cursor left-hand 
+                       button and see the measurement put out
+                       on the keyboard window. Click the cursor 
+                       right-hand button to return to the panel. 
+
+<p><dt> <strong>   LHB on `RETURN'   </strong><dd> 
+     Return to `Interact' buttons. The program
+                       will then ask you if you want to store the
+                       measurement in a file. As you do not, you
+                       reply `no' on the keyboard. 
+
+<p><dt> <strong>   LHB on `EXIT'     </strong><dd> 
+     Exit from the program. 
+</dl>
+
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Jan 4 </i>
+ 

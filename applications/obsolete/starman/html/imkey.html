@@ -1,0 +1,215 @@
+<HTML> <HEAD>
+<TITLE> IMKEY </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMKEY - <br>
+ Insert:change image pixel values from keyboard
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This program inputs pixel values into an image from the keyboard.
+<p>
+ 
+  The user inputs the following information on the keyboard:-
+<p>
+ 
+  Whether there is an input image to put data into, or whether an
+  entirely new image is to be made.
+<p>
+ 
+  The user then inputs the pixel values.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imkey_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in"> In </a>
+<li> 1.2 <a href="#invalxy"> Invalxy </a>
+<li> 1.3 <a href="#level"> Level </a>
+<li> 1.4 <a href="#out"> Out </a>
+<li> 1.5 <a href="#outscale"> Outscale </a>
+<li> 1.6 <a href="#outtype"> Outtype </a>
+<li> 1.7 <a href="#size"> Size </a>
+<li> 1.8 <a href="#title"> Title </a>
+<li> 1.9 <a href="#value"> Value </a>
+<li> 1.10 <a href="#xy"> Xy </a>
+</ul>
+ 
+ 
+<p>
+ 
+ 
+<hr>
+ <h2> 1.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input image. A null
+  response will mean that a new image is to be made.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="invalxy"> Invalxy </h2> </a> <p>
+ 
+  (Default - last (start 1,1)      <br> Range - 1 to max image side)
+<p>
+ 
+  Pixel XY position to put 'invaid' pixel magic value.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="level"> Level </h2> </a> <p>
+ 
+  (Default - 0.0                <br> range - -1.0e10 to 1.0e10)
+<p>
+ 
+  Level to add to all pixels in the new output image.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain the output image.
+<p>
+ 
+  The image will be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It will have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="outscale"> Outscale </h2> </a> <p>
+ 
+  (Default - 1.0,0.0 or input image scale, zero <br>
+   Range -  -1.0e20 to 1.0e20
+<p>
+ 
+ Input the BSCALE and BZERO of the output image.
+<p>
+ 
+    the 'true' value of a pixel = BSCALE*'value' + BZERO.
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+  (Default - same as input          <br> Choice - 'real:short')
+<p>
+ 
+  Should the output image be:-
+<p>
+<dl>
+<dt>  'real' <dd>   This is a 32-bit real image with a precision of about
+            1 in 10 million, nad values between +/- 10**38
+<p>
+ 
+<dt>  'short' <dd>  This is a 16-bit integer image, with a precision of about
+            1 in 60000. The numbers are stored on disk as integers
+            between -32768 and +32767. They are used in the Starman
+            programs as real numbers, by the use of BSCALE and BZERO,
+            such that:-
+<p>
+                'used value' = BSACLE*'disk value' + BZERO
+<p>
+ 
+            The advantage of this is that if this precision is adequate
+            then the files are half the size of 'real' files. The
+            problem is that one has to be constantly aware of the
+            'digitisation' of the images when being stored on disk.
+            Also, many other program packages do not use the
+            BSCALE and BZERO, so cannot get the 'true' values.
+</dl><p>
+ 
+<hr>
+ <h2> 1.7 <a name="size"> Size </h2> </a> <p>
+ 
+  (Default - 1,1               <br> Range - 1 to 100000)
+<p>
+ 
+   As there is no input image, you have to tell the program
+   how big an image you want.
+<p>
+ 
+<hr>
+ <h2> 1.8 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title, or if none, 'Output from IMKEY'
+   Choice - any)
+<p>
+ 
+  A character string (up to 50 characters) to be added to the output
+  file as its 'title'.
+<p>
+ 
+<hr>
+ <h2> 1.9 <a name="value"> Value </h2> </a> <p>
+ 
+  (Default - present value         <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  Pixel value to insert at this position?
+<p>
+ 
+<hr>
+ <h2> 1.10 <a name="xy"> Xy </h2> </a> <p>
+ 
+  (Default - last (start 1,1)     <br> Range - 0 to  max image side)
+<p>
+ 
+  Pixel XY position to put a value into?
+<p>
+ 
+  Respond 1,0 to input INVALID pixel, 0,1 to end.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+   Alan Penny            RAL       1994 July
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

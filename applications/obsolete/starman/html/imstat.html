@@ -1,0 +1,247 @@
+<HTML> <HEAD>
+<TITLE> IMSTAT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMSTAT - <br>
+ Get statistics of an image
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Calculates statistics of an area of the image
+<p>
+ 
+  Takes an input area of an image, and calculates the mean and
+  standard deviation, minimum and maximum pixel values (with their
+  locations), the number of valid and invalid pixels, and the sum
+  of the valid pixel values.
+<p>
+ 
+  The results are typed out, and also put as parameters of the
+  program
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imstat_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#output_parameters"> Output parameters </a>
+<li> 2 <a href="#parameters"> Parameters </a>
+<li> 3 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="output_parameters"> Output parameters </h2> </a> <p>
+ 
+ 
+   These are stored as parameters of the program. They are:-
+<p>
+ 
+   Max, Mean, Min, Nbad, Ngood, Stddev, Sum, Xmaxloc, Xminloc,
+   Ymaxloc, Yminloc
+<p>
+ 
+<hr>
+ <h2> 2 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 2.1 <a href="#in"> In </a>
+<li> 2.2 <a href="#xrange"> Xrange </a>
+<li> 2.3 <a href="#yrange"> Yrange </a>
+<li> 2.4 <a href="#output_parameters"> Output parameters </a>
+<ul>
+<li> 2.4.1 <a href="#max"> Max </a>
+<li> 2.4.2 <a href="#mean"> Mean </a>
+<li> 2.4.3 <a href="#min"> Min </a>
+<li> 2.4.4 <a href="#nbad"> Nbad </a>
+<li> 2.4.5 <a href="#ngood"> Ngood </a>
+<li> 2.4.6 <a href="#stddev"> Stddev </a>
+<li> 2.4.7 <a href="#sum"> Sum </a>
+<li> 2.4.8 <a href="#xmaxloc"> Xmaxloc </a>
+<li> 2.4.9 <a href="#xminloc"> Xminloc </a>
+<li> 2.4.10 <a href="#ymaxloc"> Ymaxloc </a>
+<li> 2.4.11 <a href="#yminloc"> Yminloc </a>
+</ul>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image file.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="xrange"> Xrange </h2> </a> <p>
+ 
+  (Default - 1,input image X size     <br> Range - 1 to input image X size)
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="yrange"> Yrange </h2> </a> <p>
+ 
+  (Default - 1,input image Y size     <br> Range - 1 to input image Y size)
+<p>
+ 
+  Y start and Y end of the area of image to analyse
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="output_parameters"> Output parameters </h2> </a> <p>
+ 
+ 
+<hr>
+ <h2> 2.4.1 <a name="max"> Max </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The maximum valid pixel value in the
+  selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.2 <a name="mean"> Mean </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The mean of the valid pixel values in the
+  selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.3 <a name="min"> Min </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The minimum valid pixel value in the
+  selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.4 <a name="nbad"> Nbad </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The number of invalid pixels in the selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.5 <a name="ngood"> Ngood </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The number of valid pixels in the selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.6 <a name="stddev"> Stddev </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The standard deviation of the valid pixel values in
+  the selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.7 <a name="sum"> Sum </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The sum of the values of the valid pixels in the
+  selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.8 <a name="xmaxloc"> Xmaxloc </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The X location of the pixel with the maximum value
+  in the selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.9 <a name="xminloc"> Xminloc </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The X location of the pixel with the minimum value
+  in the selected area.
+<p>
+ 
+  X start and X end of the area of image to analyse
+<p>
+ 
+<hr>
+ <h2> 2.4.10 <a name="ymaxloc"> Ymaxloc </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The Y location of the pixel with the maximum value
+  in the selected area.
+<p>
+ 
+<hr>
+ <h2> 2.4.11 <a name="yminloc"> Yminloc </h2> </a> <p>
+ 
+  (output parameter)
+<p>
+ 
+  Set by program. The Y location of the pixel with the minimum value
+  in the selected area.
+<p>
+ 
+ 
+<hr>
+ <h2> 3 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1991 November
+<p>
+ 
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,776 @@
+<HTML> <HEAD>
+<TITLE> IMJOIN </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMJOIN - <br>
+ Join a number of images together
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+ This program is used to merge several images into one new image.
+<p>
+ 
+ The key features are:-
+<p>
+<ul>
+<li> The addition of each image is done in such a way that the
+     each pixel in the output image has the `weighted' contribution
+     from each input image.
+<p>
+ 
+<li> The input images can be `transformed', that is given a
+     displacement, rotation, and stretch in the XY plane.
+<p>
+ 
+<li> For each image, the pixel values can have a zero level
+     subtracted and can be scaled before being added into the output
+     image.
+</ul><p>
+ 
+ The program can, less usually, combine two `reference' images.
+<p>
+ 
+ The output can be an `real' 32-bit image or a `short' 16-bit
+ integer image, or a real 32-bit `reference' image.
+<p>
+ 
+ The reference image can contain more information than the simple
+ output image, and is accompanied by a `load' image, which means it
+ can be input into IMJOIN again without loosing any information.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imjoin_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+
+<ul> 
+<li> 1 <a href="#method"> Method </a>
+<li> 2 <a href="#pixel_interpolation"> Pixel interpolation </a>
+<li> 3 <a href="#reference_image_adding"> Reference image adding </a>
+<li> 4 <a href="#transformation"> Transformation </a>
+<li> 5 <a href="#details"> Details </a>
+<li> 6 <a href="#warnings"> Warnings </a>
+<li> 7 <a href="#parameters"> Parameters </a>
+<li> 8 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ This program is intended for the purpose of making a large image from
+ a number of images.
+<p>
+ 
+ The input images can be placed in a normal output image or as an
+ output `reference' image. The reference image can either then be used
+ as a normal image (but see the comment in the `Details' help section),
+ or used as a further input to another run of IMJOIN.
+<p>
+ 
+ <strong> 1) A Simple Point </strong>
+<p>
+ 
+ If the input images were simply added in, then when images overlapped
+ the output pixels would have double inputs and be too high. This
+ problem is solved by some simple arithmetic.
+<p>
+ 
+ It works by adding image(s) into a `reference' image.
+<p>
+ 
+ The reference image has an accompanying `load' image which records for
+ each pixel how many input images have contributed to that pixel. Thus
+ a new input pixel value gets added in to give the output value as:-
+<p>
+<pre>
+ 
+            OUT_VAL.(Present number of inputs) + IN_VAL
+ OUT_VAL =  -------------------------------------------
+                  Present number of inputs + 1
+</pre><p>
+ 
+ 
+<strong>  2) Scaling the Input Images </strong>
+<p>
+ 
+ There is a further facility, in that the input images may have
+ different `scales'. Thus if there are two images which have different
+ exposure times, then simply adding them in together will result in
+ mismatched pixels.
+<p>
+ 
+ This is solved by applying a `scale' to each input image.
+<p>
+ 
+ When the new image is added in, each pixel that gets a value from the
+ new image is scaled by a factor. Each pixel is multiplied by this
+ scale factor. Then at the end the output pixel is divided by the sum
+ of the `scales'. Thus if the scaling were due, in fact, to different
+ exposure times, the `scale' could be inversely proportional to the
+ exposure times.
+<p>
+ 
+ Since the scale is multiplied into the pixel values, it is recommended
+ that the longest exposure have a `scale' of 1.0, and the others in
+ proportion. This avoids loosing accuracy when the output image (which
+ is real) is later converted back to a short integer one.
+<p>
+ 
+ Thus a pixel, from an input image of the `SCALE' parameter of IN&#95 SCALE,
+ with a pixel value of IN&#95 VAL will be added to a reference image pixel
+ of `scale SCALE&#95 VAL and value REF&#95 VAL so that the output pixel value
+ will be:-
+<p>
+<pre>
+ OUT_VAL = (REF_VAL.SCALE_VAL + IN_VAL)/(SCALE_REF + IN_SCALE)
+</pre><p>
+ 
+ and the output `scale' image will be:-
+<p>
+<pre>
+ OUT_SCALE = SCALE_VAL + IN_SCALE
+</pre><p>
+ 
+ 
+<strong>  3) Subtracting a Zero from the Images </strong>
+<p>
+ 
+ There is a facility for subtracting a mean `zero' level from each input
+ image before the process of scaling, transforming and inputting starts.
+<p>
+ 
+ This is useful when the input images have been taken under different
+ conditions of sky brightness and each has an extra, uniform,
+ contribution from the sky background. This level can be automatically
+ estimated and subtracted from the image.
+<p>
+ 
+ This is not a good idea when there is large scale structure truly
+ present in the imagea, as a mean level from this in each image will
+ also be subtracted, leading to strange effects.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="pixel_interpolation"> Pixel interpolation </h2> </a> <p>
+ 
+ 
+  As the transformation coefficents do not necessarily result in
+  each pixel in an input image corresponding exactly to the pixel
+  locations in the output image, it is necessary to interpolate
+  between the input pixels to see what value to put into the
+  output pixel.
+<p>
+ 
+  This interpolating from the grid of input image pixels onto the
+  output image can be done in one of three ways:-
+<p>
+<dl>
+<dt>  NEAREST  <dd>  Take the nearest input image pixel.
+<p><dt>  LINEAR   <dd>  Make a linear combination of the four input image
+              pixels around the output image pixel.
+<p><dt>  UNIFORM  <dd>  Make a weighted mean of the nine adjacent input image
+              pixels (linearly combined), so that the ouput image pixels
+              have a constant noise value.
+</dl><p>
+ 
+  The default is LINEAR.
+<p>
+ 
+ The NEAREST method is the simplest, and actually no interpolation is
+ done.
+<p>
+ 
+ All interpolation methods have the drawback that they will miss high
+ and low points `between' the pixels. Thus if there is structure on a
+ scale commensurate with the pixel sizes, there will tend to be a
+ smoothing of the high and low points. Thus, an image with stars in it
+ runs the risk that the star peaks will be smoothed down.
+<p>
+ 
+ A drawback with `LINEAR' is that an output pixel in the centre of four
+ input pixels will be the mean of those, and thus have a lower noise
+ than an output pixel on an input pixel, in which case it would only
+ have the mean of that single pixel. Thus the provision of the `UNIFORM'
+ mode.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="reference_image_adding"> Reference image adding </h2> </a> <p>
+ 
+ 
+ It sometimes happens that one has run IMJOIN twice, and one wants to
+ combine the two resultant `reference' and `load' images. This can be
+ done.
+<p>
+ 
+ The combining is done assuming that the images are already exactly
+ aligned. The output `reference' and `load' images are made, dealing
+ with the `weights' in the proper manner.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="transformation"> Transformation </h2> </a> <p>
+ 
+ 
+ The `transformation' of the input image pixel locations into the
+ output images pixel locations is done with a linear transformation.
+<p>
+ 
+ Thus:-
+<p>
+<pre>
+     x1 = c1 + c2.x + c3.y
+     y1 = c4 + c5.x + c6.y
+ 
+</pre>
+ where: <br>
+        (x,y) are the coordinates in the input image. <br>
+        (x1,y1) are the coordinates in the output `reference' image,
+<p>
+ 
+  The default is no translation, rotation or stretching:-
+<p>
+<pre>
+ 
+     x1 = 0.0 + 1.0*x + 0.0*y
+     y2 = 0.0 + 0.0*x + 1.0*y
+</pre><p>
+ 
+<hr>
+ <h2> 5 <a name="details"> Details </h2> </a> <p>
+ 
+ 
+ The input reference, input load, output reference, and output load
+ images are all `real' (32 bit). The input image, and the output image
+ can be either `real' or `short' 16-bit integer.
+<p>
+ 
+ If there is no input reference image, then a default null one is
+ assumed, with a default null load image.
+<p>
+ 
+ `Invalid' pixels in an input image are not transferred over to the
+ corresponding pixel in the output image, unless that pixel has had no
+ valid input data yet. If an output image pixel has had only `invalid'
+ input image pixels, and then a new input image delivers a valid
+ pixel value, that overwrites the `invalid' flag in the output pixel.
+<p>
+ 
+ Up to ten input images can be used. If it is desired to load more
+ than ten, then run the program again.
+<p>
+ 
+<hr>
+ <h2> 6 <a name="warnings"> Warnings </h2> </a> <p>
+ 
+ 
+  This program can seem very slow or inoperative, because of the
+  number and sizes of the files used/made. Also the size of the
+  output files may be larger than you expect.
+<p>
+ 
+<hr>
+ <h2> 7 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 7.1 <a href="#doout"> Doout </a>
+<li> 7.2 <a href="#in"> In </a>
+<li> 7.3 <a href="#inload"> Inload </a>
+<li> 7.4 <a href="#inload1"> Inload1 </a>
+<li> 7.5 <a href="#inload2"> Inload2 </a>
+<li> 7.6 <a href="#inref"> Inref </a>
+<li> 7.7 <a href="#inref1"> Inref1 </a>
+<li> 7.8 <a href="#inref2"> Inref2 </a>
+<li> 7.9 <a href="#method"> Method </a>
+<li> 7.10 <a href="#out"> Out </a>
+<li> 7.11 <a href="#outload"> Outload </a>
+<li> 7.12 <a href="#outmode"> Outmode </a>
+<li> 7.13 <a href="#outref"> Outref </a>
+<li> 7.14 <a href="#outscale"> Outscale </a>
+<li> 7.15 <a href="#outtype"> Outtype </a>
+<li> 7.16 <a href="#scale"> Scale </a>
+<li> 7.17 <a href="#shift"> Shift </a>
+<li> 7.18 <a href="#size"> Size </a>
+<li> 7.19 <a href="#title"> Title </a>
+<li> 7.20 <a href="#titlel"> Titlel </a>
+<li> 7.21 <a href="#titler"> Titler </a>
+<li> 7.22 <a href="#xcoeff"> Xcoeff </a>
+<li> 7.23 <a href="#ycoeff"> Ycoeff </a>
+<li> 7.24 <a href="#zero"> Zero </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 7.1 <a name="doout"> Doout </h2> </a> <p>
+ 
+  (Default - `yes'           <br> Choice - `yes:no')
+<p>
+ 
+  An output `reference' image will be made. Do you want the normal
+  output image as well?
+<p>
+ 
+<hr>
+ <h2> 7.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of a input image. This can be for the parameters:-
+  IN1, IN2, .... IN10.
+<p>
+ 
+ A null entry means that there are no more input images
+<p>
+ 
+ The input image must be a standard Starman ADAM .SDF image, with
+ either `real' 32-bit real values, or `short' 16-bit integer values.
+ It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+ indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 7.3 <a name="inload"> Inload </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the input `load' image.
+<p>
+ 
+ This is the image which contains for each pixel the `weight' of
+ the pixels values already added into the corresponding `reference'
+ image  pixel.
+<p>
+<ul>
+<li> This must be a `Real*4' image.
+<li> This is only asked for if a `reference' image has been input.
+<li> A null  response is invalid.
+</ul><p>
+ 
+  The image must be a standard \starman ADAM .SDF image,
+  `real' 32-bit real values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+
+<hr>
+ <h2> 7.4 <a name="inload1"> Inload1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the first input `load' image.
+<p>
+ 
+ This is the image which contains for each pixel the `weight' of
+ the pixels values already added into the corresponding first
+ `reference' image  pixel.
+<p>
+<ul>
+<li> This must be a `Real*4' image.
+<li> A null  response is invalid.
+</ul><p>
+ 
+  The image must be a standard \starman ADAM .SDF image,
+  `real' 32-bit real values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+
+<hr>
+ <h2> 7.5 <a name="inload2"> Inload2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the second input `load' image.
+<p>
+ 
+ This is the image which contains for each pixel the `weight' of
+ the pixels values already added into the corresponding second
+ `reference' image  pixel.
+<p>
+<ul>
+<li> This must be a `Real*4' image.
+<li> A null  response is invalid.
+</ul><p>
+ 
+  The image must be a standard \starman ADAM .SDF image,
+  `real' 32-bit real values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+
+<hr>
+ <h2> 7.6 <a name="inref"> Inref </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the input `reference' image.
+<p>
+ 
+ A null response indicates that the  user says that one does
+ not exist. If one does not exist, the program creates one with
+ all pixels set at the `BLANK' parameter value.
+<p>
+ 
+ This must be a `Real*4' image.
+<p>
+ 
+  The image must be a standard \starman ADAM .SDF image,
+  `real' 32-bit real values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+
+<hr>
+ <h2> 7.7 <a name="inref1"> Inref1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the first input `reference' image.
+<p>
+<ul>
+<li> A null response is invalid.
+<li> This must be a `Real*4' image.
+</ul><p>
+ 
+  The image must be a standard \starman ADAM .SDF image,
+  `real' 32-bit real values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 7.8 <a name="inref2"> Inref2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the second input `reference' image.
+<p>
+<ul>
+<li> A null response is invalid.
+<li> This must be a `Real*4' image.
+</ul><p>
+ 
+  The image must be a standard \starman ADAM .SDF image,
+  `real' 32-bit real values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+
+<hr>
+ <h2> 7.9 <a name="method"> Method </h2> </a> <p>
+ 
+  (Default - `linear'       <br> Choices - `linear:nearest:uniform')
+<p>
+ 
+  This interpolating from the grid of input image pixels onto the
+  output image can be done in one of three ways:-
+<p>
+<dl>
+<dt>  NEAREST  <dd>  Take the nearest input image pixel.
+<p><dt>  LINEAR  <dd>  Make a linear combination of the four input image
+              pixels around the output image pixel.
+<p><dt>  UNIFORM  <dd>  Make a weighted mean of the nine adjacent input image
+              pixels (linearly combined), so that the ouput image pixels
+              have a constant noise value.
+</dl><p>
+ 
+ For more information, see the `Pixel Interpolation' help at a higher
+ level in the IMJOIN help.
+<p>
+ 
+<hr>
+ <h2> 7.10 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain the output image. If this
+  is null, then no output image will be made.
+<p>
+ 
+  The image will be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It will have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 7.11 <a name="outload"> Outload </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the output reference `scale' image. This is only
+  asked for if an output reference image is made.
+<p>
+ 
+  This will be created as a `real' 32-bit image.
+<p>
+ 
+<hr>
+ <h2> 7.12 <a name="outmode"> Outmode </h2> </a> <p>
+ 
+  (Default - `new'       <br> Choices - `new:reference')
+<p>
+ 
+ The program can do two things:-
+<p>
+<ul>
+<li> The usual mosaicing in of new input images.
+<li> The less usual adding together of two `reference' images.
+</ul><p>
+ 
+ The two modes are described in the higher levels of the IMJOIN help.
+<p>
+ 
+ The program is usally used in the `New' mode.
+<p>
+ 
+<hr>
+ <h2> 7.13 <a name="outref"> Outref </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the output reference image. If this
+  is null, then no output image will be made.
+<p>
+ 
+  This will be created as a `real' 32-bit image.
+<p>
+ 
+<hr>
+ <h2> 7.14 <a name="outscale"> Outscale </h2> </a> <p>
+ 
+  (Default - input scale, zero
+   Range - 2 real numbers in the range -1.0e20 to 1.0e20)
+<p>
+ 
+  Input the BSCALE and BZERO of the output image.
+<p>
+ 
+  The `true value' of a pixel = BSCALE*`stored value' + BZERO
+<p>
+ 
+<hr>
+ <h2> 7.15 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+  (Default - same as input          <br> Choice - `real:short')
+<p>
+ 
+  Should the output image be:-
+<p>
+<dl>
+<dt>  `real' <dd>   This is a 32-bit real image with a precision of about
+            1 in 10 million, nad values between +/- 10**38
+<p>
+ 
+<dt>  `short' <dd>  This is a 16-bit integer image, with a precision of about
+            1 in 60000. The numbers are stored on disk as integers
+            between -32768 and +32767. They are used in the Starman
+            programs as real numbers, by the use of BSCALE and BZERO,
+            such that:-
+<p>
+                `used value' = BSACLE*'disk value' + BZERO
+<p>
+ 
+            The advantage of this is that if this precision is adequate
+            then the files are half the size of `real' files. The
+            problem is that one has to be constantly aware of the
+            `digitisation' of the images when being stored on disk.
+            Also, many other program packages do not use the
+            BSCALE and BZERO, so cannot get the `true' values.
+</dl><p>
+ 
+<hr>
+ <h2> 7.16 <a name="scale"> Scale </h2> </a> <p>
+ 
+  (Default - 1.0               <br> Range - 0.0 to 1.0e8)
+<p>
+ 
+ The scale you want the image to be put at. The image is
+ multiplied by this before adding into the output (after
+ subtracting any zero level).
+<p>
+ 
+ This is the help for `SCALE1', `SCALE2', ... `SCALE10',
+ the scales for the input images.
+<p>
+ 
+ This could, for a series of images of different exposure times,
+ be inversely proportional to the exposure times. Since the scale is
+ multiplied into the pixel values, it is recommended that the longest
+ exposure have a `scale' of 1.0, and the others in proportion. This
+ avoids loosing accuracy when the output image (which is real) is
+ later converted back to a short integer one.
+<p>
+ 
+<hr>
+ <h2> 7.17 <a name="shift"> Shift </h2> </a> <p>
+ 
+  (Default - 'xyshift'              <br> Choice - 'full:xyshift')
+<p>
+ 
+  What shift to apply to the input images?
+<p>
+<pre>
+   Option    Action
+   ------    ------
+   Full      Do a full shift with shift, rotation, stretch
+   Shift     Do a shift with just an XY shift
+</pre><p>
+ 
+  Of course, if no shift is to be applied, respond `xyshift' and
+  put `0,0' as the shift.
+<p>
+ 
+<hr>
+ <h2> 7.18 <a name="size"> Size </h2> </a> <p>
+ 
+  (Default - 100,100 or largest needed          <br> Range - 1 to 100000)
+<p>
+ 
+  If no reference image is input, then this is the size of
+  the one to make. The default will be just large enough to take
+  all the input images.
+<p>
+ 
+<hr>
+ <h2> 7.19 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - null         <br> Choice - any)
+<p>
+ 
+  The title to add to the output image.
+<p>
+ 
+<hr>
+ <h2> 7.20 <a name="titlel"> Titlel </h2> </a> <p>
+ 
+  (Default - null         <br> Choice - any)
+<p>
+ 
+  The title to add to the output reference load image.
+<p>
+ 
+<hr>
+ <h2> 7.21 <a name="titler"> Titler </h2> </a> <p>
+ 
+  (Default - null         <br> Choice - any)
+<p>
+ 
+  The title to add to the output reference image.
+<p>
+ 
+<hr>
+ <h2> 7.22 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+ 
+  (Defaults - 0.0,1.0,0.0      <br> Range -1.0e8 to 1.0e8)
+<p>
+ 
+ This is the help for `XCOEFF1', `XCOEFF2', ... `XCOEFF10',
+ the X coefficents for the input images.
+<p>
+ 
+ The X transformation coefficents of the set to transform the
+ input image coordinates to the reference image. These
+ are in the form:-
+<p>
+<pre>
+     x1 = c1 + c2.x + c3.y
+     y1 = c4 + c5.x + c6.y
+ 
+</pre>
+ where: <br>
+        (x,y) are the coordinates in the input image. <br>
+        (x1,y1) are the coordinates in the reference image,
+<p>
+ 
+  The default is no translation, rotation or stretching:-
+<pre>
+ 
+     x1 = 0.0 + 1.0*x + 0.0*y
+     y2 = 0.0 + 0.0*x + 1.0*y
+</pre><p>
+ 
+<hr>
+ <h2> 7.23 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+ 
+  (Defaults - 0.0,0.0,1.0      <br> Range -1.0e8 to 1.0e8)
+<p>
+ 
+ This is the help for `YCOEFF1', `YCOEFF2', ... `YCOEFF10',
+ the Y coefficents for the input images.
+<p>
+ 
+ The Y transformation coefficents of the set to transform the
+ first input image coordinates to the reference image. These
+ are in the form:-
+<p>
+<pre>
+ 
+     x1 = c1 + c2.x + c3.y
+     y1 = c4 + c5.x + c6.y
+ 
+</pre>
+ where: <br>
+        (x,y) are the coordinates in the input image. <br>
+        (x1,y1) are the coordinates in the reference image,
+<p>
+ 
+  The default is no translation, rotation or stretching:-
+<p><pre>
+ 
+     x1 = 0.0 + 1.0*x + 0.0*y
+     y2 = 0.0 + 0.0*x + 1.0*y
+</pre><p>
+ 
+<hr>
+ <h2> 7.24 <a name="zero"> Zero </h2> </a> <p>
+ 
+  (Default - `no'           <br> Choice - `yes:no')
+<p>
+ 
+  Do you want a `zero' level removed from the input image before
+  scaling and adding to the output image?
+<p>
+ 
+<hr>
+ <h2> 8 <a name="author"> Author </h2> </a> <p>
+ 
+        Alan Penny             RAL         1991 March
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

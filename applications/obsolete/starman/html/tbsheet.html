@@ -1,0 +1,1113 @@
+<HTML> <HEAD>
+<TITLE> TBSHEET </TITLE>
+</HEAD> <BODY>
+  
+<h1> TBSHEET - <br>
+ Spreadsheet operations on a table
+</h1>
+<hr>
+  
+  
+<p>
+  
+ TBSHEET is a spread-sheet program for the Starman tables.
+<p>
+  
+ An input table (or part of it) is displayed as a grid on your graphics
+ screen. You may perform various inspections, changes, and
+ manipulations on the table. Part of these are the ability to add up to
+ 200 columns and up to 2000 rows to the table. The resultant table may
+ be output to file.
+<p>
+  
+ The format of the displayed screen is to some extent under the control
+ of the user.
+<p>
+  
+ The input table may be omitted. In this case a table of a size defined
+ by the user, containing zeroes is set up for starting with.
+<p>
+  
+ The display of the spread sheet uses the 'PGPLOT' graphics
+ sub-routines, so you will need a terminal capable of graphics display,
+ capable of writing 'black' areas, for which a PGPLOT driver exists.
+<p>
+  
+  
+  
+<hr>
+Go to <a href="intro.html#tbsheet_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+  
+<hr>
+<h2> Index </h2>
+  
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#menu"> Menu </a>
+<li> 3 <a href="#data_entry"> Data entry </a>
+<li> 4 <a href="#calculations"> Calculations </a>
+<ul>
+<li> 4.1 <a href="#method"> Method </a>
+</ul>
+<li> 5 <a href="#cursor_use"> Cursor use </a>
+<li> 6 <a href="#description_of_screen"> Description of screen </a>
+<li> 7 <a href="#program_prompts"> Program prompts </a>
+<li> 8 <a href="#parameters"> Parameters </a>
+<li> 9 <a href="#author"> Author </a>
+</ul>
+  
+  
+<hr>
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+  
+  
+  The user starts the programs, inputs the input file name (or null),
+  and inputs the display type and whether it is monochrome or not.
+  The programs then puts up the table on the screen.
+<p>
+  
+  The user then chooses to replace a value or row name or column
+  header by clicking on them, or chooses one of the options. The option
+  choice is done by placing the cursor on an 'option' box and pressing
+  any key on the keyboard, or maybe cursor button. Then the program
+  performs that option (which may involve further user input either
+  from the cursor or from the keyboard - the 'prompt' message will
+  indicate this).
+<p>
+  
+  This process is then repeated, until the user chooses to exit.
+<p>
+  
+<hr>
+ <h2> 2 <a name="menu"> Menu </h2> </a> <p>
+  
+  
+ Numbers in the table are changed by clicking on them, and then
+ using the keyboard to replace the values. The same goes for the
+ row names and the column headers. For the other options, place
+ the cursor on the desired option in the menu panel displayed above
+ the table, and press a key on the keyboard or maybe use the
+ cursor button.
+<p>
+  
+ Menu of options available:-
+<p>
+<pre>
+  
+  
+ Name          Function
+ ----          --------
+ Add Cols      Add columns to the table. A column (or columns)
+                is added to the data, located after the
+                column picked by the cursor. (See below for
+                data entry.)
+ Add Rows      Add rows to the table. A row (or rows)
+                is added to the data, located after the
+                row picked by the cursor. (See below for
+                data entry.)
+ Calculate     Make the entries in a column from a FORTRAN-like equation
+ Command       Access the command line for help or exit
+ Correlate     Calculate the statistics of two columns
+                (picked by the cursor), first of themselves
+                then of the correlation between them.
+ Delete Col    Delete a column, picked by the cursor
+ Delete Cols   Delete a number of contiguous columns, defined
+                by user input
+ Delete Row    Delete a row, picked by the cursor
+ Delete Rows   Delete a number of contiguous rows, defined
+                by user input
+ Down          Move the displayed table so that the number
+                of the row displayed at the top increases
+                by one.
+ Down page     Move the displayed table so that the number
+                of the row displayed at the top increases
+                by the number of rows displayed.
+ Exit          Exit from the program.
+ Format        Change the format and colour of the display.
+ Help          Type out this help information.
+ Histogram     Histogram of a column is plotted by picking a
+                column with a cursor. The sheet is then
+                replaced by the histogram. When you wish
+                to return to the sheet, just answer question.
+ Input         Load a new table
+ Insert        Insert data into table. Select a range of rows
+                of columns by the cursor (t.l.h and b.r.h
+                corners). Keyboard enter data one at a time.
+ Insert Cols   Add columns to the table. A column (or columns)
+                is added to the data, located before the
+                column picked by the cursor. (See below for
+                data entry.)
+ Insert Rows   Add rows to the table. A row (or rows)
+                is added to the data, located before the
+                row picked by the cursor. )See below for
+                data entry.)
+ Left          Move the displayed table so that the number
+                of the column displayed at the left increases
+                by one.
+ Left page     Move the displayed table so that the number
+                of the column displayed at the left increases
+                by the number of columns displayed.
+ Plot          One column can be plotted against another, both
+                picked by cursor. Double click gives column
+                choice by keyboard. The sheet is then
+                replaced by the plot. When you wish
+                to return to the sheet, just answer question.
+ Position      Change the column/row shown at the top left
+                of the display to that demanded.
+ Renumber      Load the names of all the rows with numbers
+                in the format #n, where n is the number of
+                the row.
+ Right         Move the displayed table so that the number
+                of the column displayed at the left decreases
+                by one.
+ Right page    Move the displayed table so that the number
+                of the column displayed at the left decreases
+                by the number of columns displayed.
+ Sort Down     Sort the rows of the table by looking at the
+                values of entries in a column (picked by the
+                the cursor), and sorting so these are in
+                descending order.
+ Sort Up       Sort the rows of the table by looking at the
+                values of entries in a column (picked by the
+                the cursor), and sorting so these are in
+                ascending order.
+ Stats         Calculate the statistics of one or two columns
+                (picked by the cursor). Double click gives
+                column choice by keyboard.
+ Store         Store the present table in an output file
+ Title         Change the title of the table
+ Undo          Undo the last deletion or weed, if no sub-
+                sequent changes have been made in the table.
+ Up            Move the displayed table so that the number
+                of the row displayed at the top decreases
+                by one.
+ Up page       Move the displayed table so that the number
+                of the row displayed at the top decreases
+                by the number of rows displayed.
+ Weed          Delete rows of the table by looking at the
+                values of entries in a column (picked by the
+                the cursor), and seeing if they lie within
+                (or without) a chosen range.
+  
+</pre><p>
+  
+<hr>
+ <h2> 3 <a name="data_entry"> data entry </h2> </a> <p>
+  
+<dl>
+<p><dt> <strong> 1) </strong> <dd>
+    Click on (row,column)  position, and enter a value by the keyboard.
+  
+<p><dt> <strong>  2) </strong> <dd>
+    Click on the 'insert' option, choose an area of the table
+    to enter the data into, and then use the keyboard. <p>
+
+    Use the cursor to set top left hand row and column corner of
+    the set and then again to specify the bottom right hand corner. <p>
+
+    Then through the keyboard enter values, one at a time. The data are
+    entered from the top down. <p>
+
+    To stop, enter - !! - <p>
+   
+  
+<p><dt> <strong> 3) </strong> <dd>
+    Click one of the four the 'insert cols/rows' or 'add rows/cols' options.<p>
+
+<dl>
+<p><dt> <strong> Row Data Entry </strong> <dd>
+
+     Entering data for a row is done by typing in values for
+     the entries in the row, separated by commas. If you do not
+     enter all the values, the rest are given the value of zero.
+     If you enter all the row values, you may add the name. The
+     name must have no spaces (you may wish to use _ for a space)
+     If you do not input a name, the row is given the name #n
+     where n is the number of the row. You are then asked for the
+     values for the next row to be entered. A completely null
+     response ends the inputting of data. <p>
+    
+<p><dt> <strong> Column Data Entry </strong> <dd>
+
+     Entering data for columns is done by typing in values for
+     the entries in the first row of each column, separated by
+     commas. The number of entries you put in will be taken as
+     the number of columns to put into the table. All the rows
+     in each column are then given the value of that in the their
+     first row. The column header is set as a blank space. <p>
+    
+
+</dl><p>
+  
+<p><dt> <strong> 4) </strong> <dd>
+    Row names and columns headers can be input by clicking on them, and
+    entering values through the keyboard.<p>
+
+</dl><p>
+  
+<hr>
+ <h2> 4 <a name="calculations"> Calculations </h2> </a> <p>
+  
+  
+ There is an option when using this program to perform arithmetic
+ and mathematical functions to be applied to the values of column(s) in
+ the table ( and to, optionally, a number of input tables) and
+ constants by means of a FORTRAN-like expression which specifies the
+ required functions. The results are then loaded into the desired
+ column of the working table.
+<p>
+  
+ In addition to the standard FORTRAN facilities, a number of special
+ functions are available (e.g. for adding noise).
+<p>
+  
+<hr>
+ <h2> 4.1 <a name="method"> Method </h2> </a> <p>
+  
+  
+<strong>  General </strong>
+<p>
+  
+ The user inputs a Fortran-like equation (through the parameter
+ EQUATION).
+ These equations can contain references to:-
+<p>
+<ul>
+<li> specified columns of specified tables (which must all have the
+     same number of rows, but mayhave different numbers of columns)
+     The table presently in the spread-sheet can be refered to.
+<p><li> variables
+<p><li> constants
+<p><li> Fortran operators on these (e.g. '+', or 'cos()', ... )
+</ul><p>
+  
+ (For more details on the structure of these equations ) see below.
+<p>
+  
+ The equation is then analysed and the operations are performed.
+ Each row of the output column column contains the results of the
+ equation, with the data for the input tables coming from the matching
+ row of those input tables.
+<p>
+  
+ More specifically, the equation is analysed to identify the names
+ of tables and variables and to evaluate constants and are then
+ converted into reverse-Polish notation. The tables and variables are
+ prompted for in alphabetical order and the program then performs
+ simple 'stack-arithmetic' to evaluate the expression for each output
+ table element.
+<p>
+  
+ <strong> The Equation </strong>
+<p>
+  
+ An arithmetic expression of up to 80 characters which gives the
+ function to be evaluated for each output table element. The syntax
+ is similar to Fortran (same operator precedence, etc.) but with the
+ following differences:
+<p>
+<dl>
+<p><dt> <strong> a) </strong> <dd>
+    Input tables are represented by any of the variables TBn1, TCn2,...
+    to TZnm, where the 'B', 'C', etc., refer to the table and the 'n1',
+    'n2', .. etc., refer the column number in that table to use.
+  
+<p><dt> <strong> b) </strong> <dd>
+    The table presently displayed in the spread sheet is refered to
+    as 'TA'. The column numbers are refered to as normal.
+  
+<p><dt> <strong> b) </strong> <dd>
+    Numerical parameters by any of the variables variables A to Z
+  
+<p><dt> <strong> c) </strong> <dd>
+    Constants by any numerical Fortran constant (real or integer,
+    including exponent if required).
+  
+<p><dt> <strong> d) </strong> <dd>
+    Arithmetic is performed as though all values were real, The actual
+    calculations are performed in double precision, and the results
+    translated back to reals.
+  
+<p><dt> <strong> e) </strong> <dd>
+    The standard Fortran functions are available and identified
+    by their generic names, i.e. SQRT, EXP, LOG10, LOG, SIN, COS, TAN,
+    ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH, ABS, AINT, ANINT, MOD,
+    SIGN, DIM, MIN & MAX. Note, however, that MIN and MAX may take only
+    2 arguments.
+  
+<p><dt> <strong> f) </strong> <dd>
+    To avoid problems with the way the Starlink environment
+    handles character parameters:-
+<ol>
+<p><li>  The comma ',' must be replaced with the colon ':',
+         for separating function arguments.
+  
+<p><li>  The division sign '/' may be replaced by the percent sign '%',
+         although this latter substitution is not necessary when
+         replying to a prompt at the terminal.
+</ul><p>
+  
+<p><dt> <strong> g) </strong> <dd>
+  
+<p><dl>
+<dt><strong> CLIP(A,B,C)  </strong>
+<dd>                    This gives the value B so long as it lies in
+                     the interval A to C (inclusive). Otherwise it
+                     gives a zero result. It may be used to remove
+                     output values outside a certain range (e.g.
+                     if a division operation has resulted in very
+                     large output values).
+  
+<p><dt><strong> GAUSS(X)     </strong>
+<dd>                     Gives gaussian noise with zero mean and
+                     standard deviation X (the value returned is
+                     different at each element and for each call
+                     of GAUSS).
+  
+<p><dt><strong> RAN(X)     </strong>
+<dd>                     Gives uniform noise with a value between zero
+                     and X (the value returned is different at each
+                     element and for each call of RAN).
+</dl>
+  
+</dl><p>
+  
+  For example, an equation of the form:-
+<p>
+  
+        TA2*3.3 + 0.5 + COS(TB1) + A + MOD(RR:10.0) + CC%3
+  
+<p>
+  
+  will fill each row of a specified output column with:-
+<p>
+  
+    ( 3.3 times the element in that row of column 2 of the presently
+        displayed table ) <br>
+  + ( 0.5 ) <br>
+  + ( cosine of element in that row of column 1 of input table
+        specified through parameter 'INB' ) <br>
+  + ( the user defined value of the variable 'A' ) <br>
+  + ( row number, modulo 10 ) <br>
+  + ( (column number)/3 ) <br>
+  
+<p>
+  
+  <strong> Input </strong>
+<p>
+  
+  Only tables and variables used in the expressions are prompted for and
+  these are requested in alphabetical order, and only once each.
+  The table refered to as 'TA' is the table presently in the spread
+  sheet, and is thus not asked for.
+<p>
+  
+<hr>
+ <h2> 5 <a name="cursor_use"> Cursor use </h2> </a> <p>
+  
+  
+ Place the cursor on the desired location and press any key
+ on the keyboard, or maybe use the cursor button.
+<p>
+  
+<hr>
+ <h2> 6 <a name="description_of_screen"> Description of screen </h2> </a> <p>
+  
+  
+ When the table is displayed, the screen shows the table itself
+ and a number of other things.
+<p>
+  
+ To the left of the table, there are the row numbers and the names
+ attached to each row.
+<p>
+  
+ Above the table, there are the column numbers and the headers attached
+ to each row.
+<p>
+  
+ To the left and above the table, there is the program 'prompts', which
+ indicate the current state of the program.
+<p>
+  
+ Along the top of the screen, there are the 'option' boxes which the
+ user points to undertake an action.
+<p>
+  
+<hr>
+ <h2> 7 <a name="program_prompts"> Program prompts </h2> </a> <p>
+  
+  
+ In using the program, you may occaisionly be wondering if it is waiting
+ for input from you. It actually tells you what it is doing, with a
+ display to the top left of the table:-
+<p>
+<pre>
+ Displayed             Colour  Action desired of you
+ ---------             -----   ---------------------
+ `Waiting (Option)'    Red     Place cursor on Option box,
+                                press any key or maybe cursor
+                                button
+ `Waiting (Position)'  Red     Place cursor on the appropriate
+                                position. [This may be a
+                                table value, a table column or
+                                row, a row name or a column
+                                header.] Press any key or
+                                maybe the cursor button
+ `Waiting (Keyboard)'  Red     Input data via keyboard
+ `Working'             Green   Wait until program asks you
+</pre><p>
+  
+<hr>
+ <h2> 8 <a name="parameters"> Parameters </h2> </a> <p>
+  
+<ul>
+<li> 8.1 <a href="#a"> A </a>
+<li> 8.2 <a href="#aspect"> Aspect </a>
+<li> 8.3 <a href="#chnames"> Chnames </a>
+<li> 8.4 <a href="#colnum"> Colnum </a>
+<li> 8.5 <a href="#colours"> Colours </a>
+<li> 8.6 <a href="#cols"> Cols </a>
+<li> 8.7 <a href="#command"> Command </a>
+<li> 8.8 <a href="#data"> Data </a>
+<li> 8.9 <a href="#devlimx"> Devlimx </a>
+<li> 8.10 <a href="#devlimx"> Devlimx </a>
+<li> 8.11 <a href="#equation"> Equation </a>
+<li> 8.12 <a href="#gtype"> Gtype </a>
+<li> 8.13 <a href="#header"> Header </a>
+<li> 8.14 <a href="#hrange"> Hrange </a>
+<li> 8.15 <a href="#in"> In </a>
+<li> 8.16 <a href="#inb"> Inb </a>
+<li> 8.17 <a href="#limits"> Limits </a>
+<li> 8.18 <a href="#linecol"> Linecol </a>
+<li> 8.19 <a href="#lstyle"> Lstyle </a>
+<li> 8.20 <a href="#mono"> Mono </a>
+<li> 8.21 <a href="#more"> More </a>
+<li> 8.22 <a href="#name"> Name </a>
+<li> 8.23 <a href="#nbin"> Nbin </a>
+<li> 8.24 <a href="#numcols"> Numcols </a>
+<li> 8.25 <a href="#numrows"> Numrows </a>
+<li> 8.26 <a href="#ok"> Ok </a>
+<li> 8.27 <a href="#out"> Out </a>
+<li> 8.28 <a href="#position"> Position </a>
+<li> 8.29 <a href="#seed"> Seed </a>
+<li> 8.30 <a href="#size"> Size </a>
+<li> 8.31 <a href="#symbol"> Symbol </a>
+<li> 8.32 <a href="#title"> Title </a>
+<li> 8.33 <a href="#value"> Value </a>
+<li> 8.34 <a href="#weedopt"> Weedopt </a>
+<li> 8.35 <a href="#xrange"> Xrange </a>
+<li> 8.36 <a href="#yrange"> Yrange </a>
+</ul>
+  
+  
+<p>
+  
+<hr>
+ <h2> 8.1 <a name="a"> A </h2> </a> <p>
+  
+  (Default - 0.0                     <br> Range - -1.0e37 to 1.0e37)
+<p>
+  
+  The value to be used in the expressions for the value of
+  the variable 'A',  in the `calculations' option.
+<p>
+  
+ This help is repeated for the variables `B' to `Z'.
+<p>
+  
+<hr>
+ <h2> 8.2 <a name="aspect"> Aspect </h2> </a> <p>
+  
+  (Default - `no'   <br>           Choice - 'yes:no')
+<p>
+  
+  Plot the X and Y axes of the graph at the same scale?
+<p>
+  
+  If not, then the X and Y axes are scaled to fit the display
+  area.
+ <p>
+  
+<hr>
+ <h2> 8.3 <a name="chnames"> Chnames </h2> </a> <p>
+  
+  (Default - present value (starting value=10)   <br> Range - 2 to 20)
+<p>
+  
+  The number of characters of the row names to display.
+<p>
+  
+<hr>
+ <h2> 8.4 <a name="colnum"> Colnum </h2> </a> <p>
+  
+  (Default - present value (starting value=4)  <br> Range - 2 to 100)
+<p>
+  
+  The number of columns to display on the screen.
+<p>
+  
+  The number of rows displayed is automatically adjusted to fill the
+  screen.
+<p>
+  
+  Clearly, the more columns shown, the smaller the character size.
+<p>
+  
+<hr>
+ <h2> 8.5 <a name="colours"> Colours </h2> </a> <p>
+  
+  (Default - present value (starting value = '2,1,3,4,5') <br>
+   Range - 5 integers with values between 1 and 10)
+<p>
+  
+  The colour to give to each of five elements of the screen.
+<p>
+<pre>
+  Number   Element             Default
+  ------   -------             -------
+    1      Background          White
+    2      Numbers/names/      Black
+           table grid
+    3      Prompt - waiting    Red
+    4      Prompt - working    Green
+    5      Options box grid    Blue
+</pre><p>
+  
+  The colours that can be given instead to these are:-
+<p>
+<pre>
+   Number    1       2       3     4     5
+   Colour  Black   White    Red  Green  Blue
+  
+   Number    6       7       8     9      10
+   Colour   Cyan Magenta Yellow Orange Grn/Ylw
+</pre><p>
+  
+  (If the screen is monochrome, then the background is displayed
+  as white and the rest as black.)
+<p>
+  
+<hr>
+ <h2> 8.6 <a name="cols"> Cols </h2> </a> <p>
+  (Default - 1,2          <br> Range - 1 to X size of table)
+<p>
+  
+  The numbers of the two columns use.
+<p>
+  
+<hr>
+ <h2> 8.7 <a name="command"> Command </h2> </a> <p>
+  
+  (Default - 'no'           <br> Choice - 'yes:no')
+<p>
+  
+  This performs no operation. It merely gives the user a chance
+  access the CL command line for help
+<p>
+  
+  The user types '?' or '??', (without the 's) and gets access to
+  help system. Then do 'return' to get back.
+<p>
+  
+  '!!' will exit.
+<p>
+  
+<hr>
+ <h2> 8.8 <a name="data"> Data </h2> </a> <p>
+  
+  (Default - null        <br> Choice - any)
+<p>
+  
+  A character string giving the data to input to a column or row.
+  These are numbers (in the form (e.g.) 123 or -12.34 or -1.2e4),
+  and maybe a name, separated by commas or spaces. There should
+  be as many numbers as are needed to fill the column or row. If
+  there are more, then the first numbers filling up the table
+  are taken, and the next entry is taken as the column header or
+  row name. If there are fewer, then the remaining numbers are
+  filled up with zeroes. If there is no name at the end of the
+  entry, then the column header/row name is taken as '#n' where
+  n is the number of the column/row.
+<p>
+  
+  The name must be no more than 20 characters long
+<p>
+  
+  Numbers in a bad form, (e.g. 12j34) are taken as 0.0.
+<p>
+  
+  Thus for a table row entry for row number five, where there are
+  three columns, the character strings below would give the following
+  input:-
+<p>
+<pre>
+ Input                           Stored
+                 Column1    Column2   Column3    Name
+ -----           ------------------------------------
+ 1,2.1,-1.2e3    1.0       2.0       -1200.0    #5
+ 1,2,3,fred      1.0       2.0          3.0     fred
+ 1,2             1.0       2.0          0.0     #5
+ 1,2,3,4,fred    1.0       2.0          3.0     4
+ 1,2j2,3         1.0       0.0          3.0     #5
+</pre><p>
+  
+<hr>
+ <h2> 8.9 <a name="devlimx"> Devlimx </h2> </a> <p>
+  
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The X values of the start and end of the plotted graph.
+<p>
+  
+<hr>
+ <h2> 8.10 <a name="devlimy"> Devlimy </h2> </a> <p>
+  
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The Y values of the start and end of the plotted graph.
+<p>
+  
+<hr>
+ <h2> 8.11 <a name="equation"> Equation </h2> </a> <p>
+  
+  (Default - null                  <br> Choice - as defined below)
+<p>
+  
+  The FORTRAN-style expression that gives the elements to be loaded into the
+  desired column in the working table.
+<p>
+  
+  [For a more deatiled help than that given here,  look in the
+  `The Equation' part of the `calculations' help sections above.]
+<p>
+  
+  An arithmetic expression of up to 80 characters which gives the
+  function to be evaluated for each output table element. The syntax
+  is similar to Fortran (same operator precedence, etc.) but with the
+  following differences:
+<p>
+  
+<dl>
+<p><dt> <strong> a) </strong> <dd>
+    Input tables are represented by any of the variables TAn1, TBn2, ...
+    to TZnm, where the 'A', 'B' etc., refer to the table and the 'n1',
+    'n2', .. etc., refer the column number in that table to use.
+    The table presently in the spread sheet is refered to as 'TA'.
+<p><dt> <strong> b) </strong> <dd>
+    Numerical parameters by any of the variables variables A to Z
+<p><dt> <strong> c) </strong> <dd>
+    Constants by any numerical Fortran constant (real or integer,
+    including exponent if required).
+<p><dt> <strong> d) </strong> <dd>
+    Arithmetic is performed as though all values were real, The actual
+    calculations are performed in double precision, and the results
+    translated back to reals.
+<p><dt> <strong> e) </strong> <dd>
+    The standard Fortran functions are available and identified
+    by their generic names, i.e. SQRT, EXP, LOG10, LOG, SIN, COS, TAN,
+    ASIN, ACOS, ATAN, ATAN2, SINH, COSH, TANH, ABS, AINT, ANINT, MOD,
+    SIGN, DIM, MIN & MAX. Note, however, that MIN and MAX may take only
+    2 arguments.
+<p><dt> <strong> f) </strong> <dd>
+    To avoid problems with the way the Starlink environment
+    handles character parameters, the comma ',' must be replaced with
+    the colon ':' for separating function arguments. Similarly, the
+    division sign '/' may be replaced by the percent sign '%', although
+    this latter substitution is not necessary when replying to a prompt
+    at the terminal.
+<p><dt> <strong> g) </strong> <dd>
+   There are three extra funstions available:-
+    CLIP(A,B,C)  This gives the value B so long as it lies in the
+                 interval A to C (inclusive). Otherwise it gives a
+                 zero result. It may be used to remove output values
+                 outside a certain range (e.g. if a division operation
+                 has resulted in very large output values).
+    GAUSS(X)     Gives gaussian noise with zero mean and standard
+                 deviation X (the value returned is different at each
+                 element and for each call of GAUSS).
+    RAN(X)       Gives uniform noise with a value between zero and X
+                 (the value returned is different at each element and
+                 for each call of RAN).
+</dl><p>
+  
+  For example, an equation of the form:-
+<p>
+  
+        TA2*3.3+0.5+COS(TB1)+A
+<p>
+  
+  will fill each row of a specified output column with:-
+<p>
+  
+    ( 3.3 times the element in that row of column 2 of the present
+        table ) <br>
+  + ( 0.5 ) <br>
+  + ( cosine of the element in that row of column 1 of the input table
+        specified through parameter 'INB' ) <br>
+  + ( the user defined value of the variable 'A' ) <br>
+<p>
+  
+<hr>
+ <h2> 8.12 <a name="gtype"> Gtype </h2> </a> <p>
+  
+  (Default - 'xwindows'            <br> Choice - any)
+<p>
+  
+  A character string giving the local name for the graphics
+  display type.
+<p>
+  
+  'xwindows' will put it out on the screen of your X-window device,
+  if you are using one.
+<p>
+  
+  If 'ask' is input, then the program asks a very similar question,
+  in a different way. A response here of '?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+  
+<hr>
+ <h2> 8.13 <a name="header"> Header </h2> </a> <p>
+  
+  (Default - present value         <br> Choice - any)
+<p>
+  
+  The character string to replace the current column header with.
+<p>
+  
+  This must be no longer than 20 characters long.
+<p>
+  
+<hr>
+ <h2> 8.14 <a name="hrange"> Hrange </h2> </a> <p>
+  
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The lower and upper limits of data to be put into histogram.
+<p>
+  
+<hr>
+ <h2> 8.15 <a name="in"> In </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the file containing the input table, or that of a new
+  input table.
+<p>
+  
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+  
+  
+<hr>
+ <h2> 8.16 <a name="inb"> Inb </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+ When using the `calculation' mode to input data, then tables
+ can be accessed in the `EQUATION' parameter. This is the input
+ file containing the table corresponding to a 'TB' specfication
+ in the equation.
+<p>
+  
+ This is not to be confused with the `main' input table specified
+ via the `IN' parameter.
+<p>
+  
+ There can be up to 25 other tables accessed through the `TA' and
+ `TC' to `TZ' parameters in the equation.
+<p>
+  
+ All input tables must come from different files. To input a table
+ more than once in the equation - refer to it by only one parameter.
+<p>
+  
+ [This help is used for the `INC' to `INZ' parameters, accessed
+  through the `TC' to `TZ', too.]
+<p>
+  
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+  
+<hr>
+ <h2> 8.17 <a name="limits"> Limits </h2> </a> <p>
+  
+  (Default - 0.0,0.0          <br> Range - 2 real numbers in the
+                                      range -1.0e20 to 1.0e20)
+<p>
+  
+  If the value of a table entry (in the specified column) in a row
+  lies within this range of values, then the row will either be
+  accepted or rejected. (The choice of accept/reject is made with
+  the 'weedopt' parameter after this parameter.)
+<p>
+  
+<hr>
+ <h2> 8.18 <a name="linecol"> Linecol </h2> </a> <p>
+  
+   (Default - 'black'            <br> Choice - (black:white)
+<p>
+  
+   Colour of plot lines. Your choice should be determined by whether
+   you have a black or white background to your plots.
+<p>
+  
+<hr>
+ <h2> 8.19 <a name="lstyle"> Lstyle </h2> </a> <p>
+  
+ (Default - 1       <br> Range - 1 to 5)
+<p>
+  Code for style line is to be plotted.
+<p>
+  
+<pre>
+  Number  Style
+  -----   -----
+    1     Full line
+    2     Long dashes
+    3     Dash-dot-dash
+    4     Dotted
+    5     Dash-dot-dot
+  
+</pre><p>
+  
+<hr>
+ <h2> 8.20 <a name="mono"> Mono </h2> </a> <p>
+  
+  (Default - 'no'           <br> Choice - 'yes:no')
+<p>
+  
+  Is the display screen for the table, a monochrome display or not?
+  (If it is a colour display, then the display can be made a little
+   clearer than for a monochrome display.)
+<p>
+  
+<hr>
+ <h2> 8.21 <a name="more"> More </h2> </a> <p>
+  
+  (Default - 'yes'           <br> Choice - 'yes:no')
+<p>
+  
+  Do you want any more typing out of this help?
+<p>
+  
+<hr>
+ <h2> 8.22 <a name="name"> Name </h2> </a> <p>
+  
+  (Default - present value         <br> Choice - any)
+<p>
+  
+  The character string to replace the current row name with.
+<p>
+  
+  This must be no longer than 20 characters long.
+<p>
+  
+<hr>
+ <h2> 8.23 <a name="nbin"> Nbin </h2> </a> <p>
+  
+  (Default - last chosen, first=40     <br> Range - 1 to 200)
+<p>
+  
+  No of bins in histogram.
+<p>
+  
+<hr>
+ <h2> 8.24 <a name="numcols"> Numcols </h2> </a> <p>
+  
+  (Default - 0,end of current table    <br> Range - 2 integers between 0 and
+                                                 end of cureent table)
+<p>
+  
+  The range of columns to delete.
+<p>
+  
+  If either of the limits is `0', then no deletion takes place.
+<p>
+  
+<hr>
+ <h2> 8.25 <a name="numrows"> Numrows </h2> </a> <p>
+  
+  (Default - 0,end of current table    <br> Range - 2 integers between 0 and
+                                                 end of cureent table)
+<p>
+  
+  The range of rows to delete.
+<p>
+  
+  If either of the limits is `0', then no deletion takes place.
+<p>
+  
+<hr>
+ <h2> 8.26 <a name="ok"> Ok </h2> </a> <p>
+  
+  (Default - 'no'         <br> Choice - 'yes:no')
+<p>
+  
+  In choosing to exit from the program without having previously
+  stored the table since the last change, you will loose all the
+  changes made to the table since the start (or since you last
+  stored the then current state of the table).
+<p>
+  
+  If you want this, then answering 'yes' will result in the
+  program finishing. If on the other hand you do want to store the
+  current state of the table, then answer 'no' (the default) and you
+  will get back to the option choice. You can then store the table
+  and then exit.
+<p>
+  
+<hr>
+ <h2> 8.27 <a name="out"> Out </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the file to contain the output table.
+<p>
+  
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+  
+<hr>
+ <h2> 8.28 <a name="position"> Position </h2> </a> <p>
+  
+  (Default - present position          <br> Range - 1 to max of num of
+                                                 columns and rows)
+<p>
+  
+  The column position and row position of the table entry displayed
+  at the top left hand of the display.
+<p>
+  
+  This positions the display so that the specified entry is at the
+  top left of the display.
+<p>
+  
+<hr>
+ <h2> 8.29 <a name="seed"> Seed </h2> </a> <p>
+  
+  (Default - 1234567891     <br> Range - 1200000001 to 1400000001)
+<p>
+  
+  The seed number to be used in any random number generators.
+  This is used in the `GAUSS()' and `RAN()' operators. These
+  will provide the same pattern of numbers in the same
+  seed number is input. This is used  in the `calculations' option.
+<p>
+  
+  It has to be a large positive odd number.
+<p>
+  
+<hr>
+ <h2> 8.30 <a name="size"> Size </h2> </a> <p>
+  
+  (Default - 2,100             <br> Choice - 2 integers each between
+                                        1 and 10000)
+<p>
+  
+  As there is no input table, a blank one is made. This parameter
+  defines the size of the table - the number of columns and the
+  numbers of rows. The table will have zeroes in it and the `#n'
+  format entries for the names and headers.
+<p>
+  
+<hr>
+ <h2> 8.31 <a name="symbol"> Symbol </h2> </a> <p>
+  
+  (Default - 2       <br> Range - 0 to 31)
+<p>
+  
+  Code for style that the points to be plotted in the graph as.
+<p>
+  
+  The full explanation of the symbols is given in the PGPLOT manual.
+<p>
+  
+<hr>
+ <h2> 8.32 <a name="title"> Title </h2> </a> <p>
+  
+  (Default - the title of the input table    <br> Choice - any)
+<p>
+  
+  The title to give to the present table. This is a
+  character string, less than 50 characters long.
+<p>
+  
+<hr>
+ <h2> 8.33 <a name="value"> Value </h2> </a> <p>
+  
+  (Default - present value         <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The value to replace the current table entry value with.
+<p>
+  
+<hr>
+ <h2> 8.34 <a name="weedopt"> Weedopt </h2> </a> <p>
+  
+  (Default - 'accept'          <br> Choice - 'accept:reject')
+<p>
+  
+  Do you want to accept or reject those rows whose entries
+  in the specificed column lie within the limits specified?
+<p>
+  
+<hr>
+ <h2> 8.35 <a name="xrange"> Xrange </h2> </a> <p>
+  
+  (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The X start and end of X range of positions in the table
+  that a star can have to be plotted.
+<p>
+  
+<hr>
+ <h2> 8.36 <a name="yrange"> Yrange </h2> </a> <p>
+  
+ (Default - Min,max in table      <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The Y start and end of Y range of positions in the table
+  that a star can have to be plotted.
+<p>
+  
+<hr>
+ <h2> 9 <a name="author"> Author </h2> </a> <p>
+  
+  
+    Alan Penny                      RAL              1991 July
+  
+<hr>
+  
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+  
+<hr>
+  
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+  

@@ -1,0 +1,112 @@
+<HTML>
+<HEAD>
+<TITLE> Examples of running programs </TITLE>
+</HEAD>
+<BODY>
+
+<H1> Examples of running programs </H1>
+
+Back to Starman Help <a href="intro.html"> Intro </a>
+<hr>
+
+   
+<strong>Program name</strong><br> You run a program by typing its name 
+on the command line:- <p> <pre>
+    tblist
+</pre>
+
+The program then asks you for various parameters.<p>
+
+<strong>Parameter name</strong><br> You can also put some of the parameters 
+on the command line:-<p>
+
+<pre>
+    tblist in=$STARMAN_DATA/tblist_in
+</pre>
+
+There must be no gaps between the parameter name and the `equals' sign,
+or between the `equals' sign and the value.<p>
+
+Those parameters which are not specified on the command line,
+are asked for in the normal way when the program runs.<p>
+
+<strong>Parameter position</strong><br>
+Often the command line can take the parameters in order, without having
+to specify their name. Thus:-<p><pre>
+    tblist in=$STARMAN_DATA/tblist_in
+</pre>
+is equivalent to:-<p><pre>
+    tblist $STARMAN_DATA/tblist_in
+</pre>
+
+<strong>`in' and `out' parameters</strong><br>
+In most programs, there is a single `input' file and a single `output' file.
+These are then the first two parameters of a program. Thus:-<p><pre>
+    imcut in=$STARMAN_DATA/imcut_in out=fred
+</pre>
+is equivalent to:-
+<p><pre>
+    imcut $STARMAN_DATA/imcut_in fred
+</pre>
+
+
+
+<strong>Multi-variable parameter</strong><br> If a parameter has more than
+value, then these can be put in, grouped inside square brackets:-<p><pre>
+    imcut in=$STARMAN_DATA/imcut_in xrange=\[40,60\]
+</pre>
+
+<strong>More than one line</strong><br> You can also put some of the parameters
+on subsequent command lines:-<p> <pre>
+    imcut in=$STARMAN_DATA/imcut_in \
+          xrange=\[40,60\]
+</pre>
+
+<strong>Default values</strong><br> For default values, one can put an entry on
+the command line:-<p><pre>
+    imcut in=$STARMAN_DATA/imcut_in title=\\
+</pre>
+
+<strong>Default remaining parameters</strong><br> You can also put some of the
+parameters on the command line and tell it to take the default values for
+all other parameters:-<p><pre>
+    tblist in=$STARMAN_DATA/tblist_in \\
+</pre>
+
+If a parameter does not have a default, then you are asked for the
+value when the program runs.<p>
+
+<strong>Image sub-areas</strong><br> For images, you can define a sub-area on
+the command line:-<p><pre>
+    imflash in=$STARMAN_DATA/imflash_in\(1:100,1:100\)
+</pre>
+
+where this selects the b.l.h. 100x100 of the 300x300 image.
+
+There are different types of specifying a sub-area of the 300x300 image:-
+<pre>
+                               X range covered   Y range covered
+    imflash_in\(1:100,1:100\)      1 - 100           1 - 100   
+    imflash_in\(1:100,\)           1 - 100           1 - 300
+    imflash_in\(100~50,\)         75 - 124           1 - 300
+    imflash_in\(~50,\)           125 - 174           1 - 300
+</pre>
+<strong>Character strings</strong><br> For character strings, one can put
+entries on the command line within quotations marks:-<p><pre>
+    imcut in=$STARMAN_DATA/imcut_in title=\"Test output\"
+</pre>
+
+
+ 
+<HR>
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html"> Alan Penny </a>
+- <a href="http://www.rl.ac.uk/rutherford.html"> 
+Rutherford Appleton Laboratory </a> (RAL) </address>  
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 10 </i>
+
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,493 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMCUT
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMCUT
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imcut_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imcut">
+imcut  </a>  Cut, bin, and/or invert an area from an image to another       <br>
+<a href="#t_imcut">
+t_imcut  </a>  Cut, bin, and/or invert an area from an image to another       <br>
+<a href="#imc_doitr">
+imc_doitr  </a>  Load the output image from the real input image       <br>
+<a href="#imc_doits">
+imc_doits  </a>  Load the output image from the int*2 input image       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcut"> IMCUT  </a>-- Cut, bin, and/or invert an area from an image to another
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine imcut ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imcut
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  IMCUT.FOR
+C
+C    Contains:-
+C
+C T_IMCUT       Cut, bin, and/or invert an area from an image to another
+C IMC_DOIT(RS)  Load the output image from the input image
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imcut"> T_IMCUT  </a>-- Cut, bin, and/or invert an area from an image to another
+C   For a fuller description see IMCUT.HLP
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_imcut ( )
+
+      implicit none
+      include 'imcut.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C--
+      integer ierr, num, ipo, nxo, nyo, lim, k
+      character*50 title, cv
+      logical bv
+
+      integer nth
+      parameter ( nth=6 )
+      character*68 th(nth)
+      data th /
+     + 'Method of extracting output value from binning box',
+     + 'Option   Choice',
+     + '------   --------',
+     + 'Average  Take average of all pixels',
+     + 'Highest  Take highest pixel',
+     + 'Sample   Take value of bottom left hand pixel in box'/
+
+Cbegin
+
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr )
+      if ( ST_FAILED ) return
+
+      NXS = 1
+      NXE = NX
+      call get2i ( 'XRANGE', NXS, NXE, .true., 1, NX )
+      if ( ST_FAILED ) return
+      XREV = .false.
+      if ( NXS.gt.NXE ) XREV = .true.
+      call cswopi ( NXS, NXE )
+
+      NYS = 1
+      NYE = NY
+      call get2i ( 'YRANGE', NYS, NYE, .true., 1, NY )
+      if ( ST_FAILED ) return
+      YREV = .false.
+      if ( NYS.gt.NYE ) YREV = .true.
+      call cswopi ( NYS, NYE )
+
+      NXST = 1
+      NYST = 1
+      lim = max(NX,NY)
+      call get2i ( 'BIN', NXST, NYST, .true., 1, lim )
+      if ( ST_FAILED ) return
+      NXST = min(NXST,NX)
+      NYST = min(NYST,NY)
+
+      nxo = NXE - NXS + 1
+      nyo = NYE - NYS + 1
+      if ( NXST.ne.1 .or. NYST.ne.1 ) then
+         nxo = nxo/NXST
+         nyo = nyo/NYST
+         if ( nxo.lt.1 .or. nyo.lt.1 ) then
+            call printo ( 'ERROR: Bin size must less than image size' )
+            return
+         endif
+      endif
+
+      SAMPLE = 'sample '
+      if ( NXST.ne.1 .or. NYST.ne.1 ) then
+         call get_job ( 'SAMPLE', 'sample:highest:average', k, 2, th,
+     +                  nth )
+         if ( ST_FAILED ) return
+         SAMPLE = 'sample '
+         if ( k.eq.2 ) SAMPLE = 'highest'
+         if ( k.eq.3 ) SAMPLE = 'average'
+         if ( SAMPLE.eq.'average' ) then
+            call get1b ( 'CHECK', bv, .false. )
+            if ( ST_FAILED ) return
+            IGNORE = .not.bv
+         endif
+      endif
+
+      call opimzw ( 'OUT', IMTYPE, ipo, nxo, nyo, .false., ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+
+      call gtdesc ( 'IN', 'TITLE', cv, 'Output from Imcut', num, ierr )
+
+      call get1c ( 'TITLE', title, cv, .true. )
+
+      if ( ST_FAILED ) return
+      if ( IMTYPE.eq.'SHORT' ) then
+         call imc_doits ( %val(IPIM), %val(ipo), nxo, nyo )
+      else
+         call imc_doitr ( %val(IPIM), %val(ipo), nxo, nyo )
+      endif
+
+      call icopdes ( 'IN', 'OUT', ierr )
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imc_doitr"> IMC_DOITR  </a>-- Load the output image from the real input image
+C
+C   alan penny                     ral           1991 May
+
+      subroutine imc_doitr ( in, out, nxo, nyo )
+
+      implicit none
+      include 'image.inc'
+      include 'imcut.inc'
+C--
+      real        in(NX,NY)		!i: Input image
+      integer     nxo			!i: Output image X size
+      integer     nyo			!i: Output image Y size
+      real        out(nxo,nyo)		!o: Output image
+C--
+      integer j, jj, ja, jb, k, kk, ka, kb, jja, kka
+      real    rv, rvs, high
+      logical set
+Cbegin
+
+
+      if ( NXST.eq.1 .and. NYST.eq.1 .and. .not.XREV .and.
+     +     .not.YREV ) then
+
+         if ( NXS.eq.1 .and. NXE.eq.NX .and.
+     +        NYS.eq.1 .and. NYE.eq.NY ) then
+            call amovr ( in, out, NX*NY )
+         else
+            call coprr ( in, NX, NY, NXS, NXE, NYS, NYE,
+     +                   out, nxo, nyo, 1, 1 )
+         endif
+
+      else
+
+         if ( XREV ) then
+            k = NXS
+            NXS = NXE
+            NXE = k
+            NXST = -1*NXST
+         endif
+
+         if ( YREV ) then
+            k = NYS
+            NYS = NYE
+            NYE = k
+            NYST = -1*NYST
+         endif
+
+         if ( SAMPLE.eq.'sample ' ) then
+
+            ka = 0
+            do kka = 1, nyo
+               k = NYS + (kka-1)*NYST
+               ka = ka + 1
+               ja = 0
+               do jja = 1, nxo
+                  j = NXS + (jja-1)*NXST
+                  ja = ja + 1
+                  out(ja,ka) = in(j,k)
+               enddo
+            enddo
+
+         elseif ( SAMPLE.eq.'highest' ) then
+
+            ka = 0
+            do kka = 1, nyo
+               k = NYS + (kka-1)*NYST
+               ka = ka + 1
+               ja = 0
+               do jja = 1, nxo
+                  j = NXS + (jja-1)*NXST
+                  ja = ja + 1
+
+                  out(ja,ka) = RINVAL
+                  set = .false.
+                  do kk = 1, iabs(NYST)
+                     kb = k + (kk-1)*NYST/iabs(NYST)
+                     do jj = 1, iabs(NXST)
+                        jb = j + (jj-1)*NXST/iabs(NXST)
+                        if ( in(jb,kb).ne.RINVAL ) then
+                           if ( .not.set ) then
+                              high = in(jb,kb)
+                              set = .true.
+                           else
+                              if(in(jb,kb).gt.high)high=in(jb,kb)
+                           endif
+                        endif
+                     enddo
+                  enddo
+                  if ( set ) out(ja,ka) = high
+
+               enddo
+            enddo
+
+         elseif ( SAMPLE.eq.'average' ) then
+
+            ka = 0
+            do kka = 1, nyo
+               k = NYS + (kka-1)*NYST
+               ka = ka + 1
+               ja = 0
+              do jja = 1, nxo
+                 j = NXS + (jja-1)*NXST
+                 ja = ja + 1
+
+                  rv = 0.0
+                  rvs = 0.0
+                  set = .false.
+                  do kk = 1, iabs(NYST)
+                     kb = k + (kk-1)*NYST/iabs(NYST)
+                     do jj = 1, iabs(NXST)
+                        jb = j + (jj-1)*NXST/iabs(NXST)
+                        if ( in(jb,kb).ne.RINVAL ) then
+                           rv = rv + in(jb,kb)
+                           rvs = rvs + 1.0
+                        else
+                           if ( .not.IGNORE ) set = .true.
+                        endif
+                     enddo
+                  enddo
+
+                  if ( rvs.lt.0.5 .or.set ) then
+                     out(ja,ka) = RINVAL
+                  else
+                     out(ja,ka) = rv/rvs
+                  endif
+               enddo
+            enddo
+
+         endif
+
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imc_doits"> IMC_DOITS  </a>-- Load the output image from the int*2 input image
+C
+C   alan penny                     ral           1991 May
+
+      subroutine imc_doits ( in, out, nxo, nyo )
+
+      implicit none
+      include 'image.inc'
+      include 'imcut.inc'
+C--
+      integer*2   in(NX,NY)		!i: Input image
+      integer     nxo			!i: Output image X size
+      integer     nyo			!i: Output image Y size
+      integer*2   out(nxo,nyo)		!o: Output image
+C--
+      integer j, jj, ja, jb, k, kk, ka, kb, jja, kka
+      integer*2 high
+      real    rv, rvs
+      logical set
+Cbegin
+
+
+      if ( NXST.eq.1 .and. NYST.eq.1 .and. .not.XREV .and.
+     +     .not.YREV ) then
+
+         if ( NXS.eq.1 .and. NXE.eq.NX .and.
+     +        NYS.eq.1 .and. NYE.eq.NY ) then
+            call amovs ( in, out, NX*NY )
+         else
+            call copss ( in, NX, NY, NXS, NXE, NYS, NYE,
+     +                   out, nxo, nyo, 1, 1 )
+         endif
+
+      else
+
+         if ( XREV ) then
+            k = NXS
+            NXS = NXE
+            NXE = k
+            NXST = -1*NXST
+         endif
+
+         if ( YREV ) then
+            k = NYS
+            NYS = NYE
+            NYE = k
+            NYST = -1*NYST
+         endif
+
+         if ( SAMPLE.eq.'sample ' ) then
+
+            ka = 0
+            do kka = 1, nyo
+               k = NYS + (kka-1)*NYST
+               ka = ka + 1
+               ja = 0
+               do jja = 1, nxo
+                  j = NXS + (jja-1)*NXST
+                  ja = ja + 1
+                  out(ja,ka) = in(j,k)
+               enddo
+            enddo
+
+
+         elseif ( SAMPLE.eq.'highest' ) then
+
+            ka = 0
+            do kka = 1, nyo
+               k = NYS + (kka-1)*NYST
+               ka = ka + 1
+               ja = 0
+               do jja = 1, nxo
+                  j = NXS + (jja-1)*NXST
+                  ja = ja + 1
+
+                  out(ja,ka) = INVAL
+                  set = .false.
+                  do kk = 1, iabs(NYST)
+                     kb = k + (kk-1)*NYST/iabs(NYST)
+                     do jj = 1, iabs(NXST)
+                        jb = j + (jj-1)*NXST/iabs(NXST)
+                        if ( in(jb,kb).ne.INVAL ) then
+                           if ( .not.set ) then
+                              high = in(jb,kb)
+                              set = .true.
+                           else
+                              if(in(jb,kb).gt.high)high=in(jb,kb)
+                           endif
+                        endif
+                     enddo
+                  enddo
+                  if ( set ) out(ja,ka) = high
+
+               enddo
+            enddo
+
+         elseif ( SAMPLE.eq.'average' ) then
+
+            ka = 0
+            do kka = 1, nyo
+               k = NYS + (kka-1)*NYST
+               ka = ka + 1
+               ja = 0
+              do jja = 1, nxo
+                 j = NXS + (jja-1)*NXST
+                 ja = ja + 1
+
+                  rv = 0.0
+                  rvs = 0.0
+                  set = .false.
+                  do kk = 1, iabs(NYST)
+                     kb = k + (kk-1)*NYST/iabs(NYST)
+                     do jj = 1, iabs(NXST)
+                        jb = j + (jj-1)*NXST/iabs(NXST)
+                        if ( in(jb,kb).ne.INVAL ) then
+                           rv = rv + in(jb,kb)
+                           rvs = rvs + 1.0
+                        else
+                           if ( .not.IGNORE ) set = .true.
+                        endif
+                     enddo
+                  enddo
+
+                  if ( rvs.lt.0.5 .or.set ) then
+                     out(ja,ka) = INVAL
+                  else
+                     out(ja,ka) = rv/rvs
+                  endif
+               enddo
+            enddo
+
+         endif
+
+      endif
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C IMCUT.INC
+C
+C  Include file for IMCUT
+
+
+      integer   nxs		!X start of copy area
+      integer   nxe		!X end of copy area
+      integer   nxst		!X step in copy area
+      integer   nys		!Y start of copy area
+      integer   nye		!Y end of copy area
+      integer   nyst		!Y step in copy area
+
+      character*8  sample	!Sample method 'sample:highest:average'
+
+      logical   xrev		!Reverse X diecrtion?
+      logical   yrev		!Reverse Y diecrtion?
+      logical   ignore          !Ignore INVALID pixels (true) or set out to INVALID (false)
+
+      logical  imcut_dum1
+CX      logical  imcut_dum2, imcut_dum3
+
+      common / imcuta /   nxs,     nxe,  nxst,  nys,    nye,
+     +                    nyst
+
+      common /imcutb / xrev,  yrev,  ignore, imcut_dum1
+
+      common /imcutc / sample
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

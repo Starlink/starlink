@@ -1,0 +1,217 @@
+<HTML><HEAD><TITLE> 
+                      Starman Demonstrations 
+</TITLE></HEAD><BODY><h1> 
+                     Starman Demonstrations 
+</h1>
+ 
+<hr>
+
+<i> Starman </i> has a demonstration program that has four
+options whihc show simple use of a small section of the packages.<p>
+
+These are run by the <i> starmandemo</i> program (actually a
+C shell script). On entering this program you have the choice
+of four separate demonstrations. <p>
+
+
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+    <li> 1 <a href="#1"> Go from a test image to a mag list
+</a><li> 2 <a href="#2"> Go from 2 test images to a CMD diagram
+</a><li> 3 <a href="#3"> Go from a user image to a mag list
+</a><li> 4 <a href="#4"> Go from 2 user images to a CMD diagram
+</a><ul>
+</ul>
+<p>
+ 
+Go to <a href="main.html"> Starman Help Main. </a>
+<p>
+ 
+<hr><h3> 
+             1. <a name="1"> Go from a test image to a mag list
+</h3></a><p>
+
+
+This script will take an image of a star field
+and automatically find the stars, measure their PSFs, and measure 
+the stars. <p>
+  
+<IMG SRC="stars_v.gif"> produces a cleaned image 
+<IMG SRC="clean_stars_v.gif"> <p>
+
+
+The image is in file $STARMAN&#95 DATA/stars&#95 v.sdf. This is copied 
+into the present directory.<p>
+  
+A number of files called temp&#95 * are created and destroyed
+when running this demonstration.<p>
+  
+Files prof&#95 XXX1.sdf, mag&#95 XXX1.sdf, clean&#95 XXX1.sdf are created
+where XXX1 is the name of the input file, and
+the prof&#95  files conatin the profile (in Starman terms),
+the mag&#95  files contains Starman tables with the results, and
+the clean&#95  files contain copies of the cleaned images.<p>
+  
+Use tblist and tbsheet to look at the tables,
+imflash and interact to look at the images.<p>
+
+
+Instructions undertaken:- <p>
+
+<pre>
+
+echo "Starting - copying image from Starman test data directory"
+
+cp $STARMAN_DATA/stars_v.sdf ./stars_v.sdf
+
+echo "Doing starfind - to find all stars"
+
+starfind stars_v radius=2 out=temp_xy_1 \\
+
+echo "Doing tbsort - to sort with bright ones first"
+
+tbsort temp_xy_1 numcol=3 option='descending' out=temp_xy_1_a \\
+
+echo "Doing tbcut - to get brightest stars"
+
+tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,8\] out=temp_xy_1_b \\
+
+echo "Doing profile - to determine stellar point-spread-function"
+
+profile $file1 instars=temp_xy_1_b use='auto' out=prof_$file1 \\
+
+echo "Doing measure - to measure magnitudes of all stars"
+
+measure $file1 instars=temp_xy_1_a profile=prof_$file1 \
+                out=mag_$file1 outim=clean_$file1 \\
+
+rm temp_xy_1.sdf temp_xy_1_a.sdf temp_xy_1_b.sdf
+
+</pre>
+
+<hr><h3> 
+             2. <a name="2"> Go from 2 test images to a CMD diagram 
+</h3></a><p>
+
+This script will take two images (non-aligned) of a star field
+and automatically find the stars, work out the transformation 
+between the images, measure their PSFs, measure the stars, and 
+display a colour/magnitude diagram.<p>
+
+<IMG SRC="stars_v.gif"> produces a cleaned image 
+<IMG SRC="clean_stars_v.gif"> <p>
+
+<IMG SRC="stars_r_rotated.gif"> produces a cleaned image 
+<IMG SRC="clean_stars_r_rotated.gif"> <p>
+
+The star measures on these two produce a colour-magnitude diagram:-<p>
+
+<IMG SRC="cmd_r_v.gif"> <p>
+
+
+
+
+The two images are in files $STARMAN&#95 DATA/stars&#95 v.sdf  and
+$STARMAN&#95 DATA/stars&#95 r&#95 rotated.sdf. These are copied into  
+the present directory.<p>
+
+A number of files called temp&#95 * are created and destroyed"
+when running this demonstration."<p>
+
+Files prof&#95 XXX1.sdf, mag&#95 XXX1.sdf, clean&#95 XXX1.sdf,
+      prof&#95 XXX2.sdf, mag&#95 XXX2.sdf, clean&#95 XXX2.sdf,
+are created. <p>
+
+where XXX1 and XXX2 are the names of the input files, and
+  the prof&#95  files conatin the profile (in Starman terms),
+  the mag&#95  files contains Starman tables with the results, and
+  the clean&#95  files contain copies of the cleaned images.<p>
+
+Use tblist, tbsheet and diagram to look at the tables,
+    imflash and interact to look at the images.<p>
+
+<pre>
+echo "Starting - copying images from Starman test data directory"
+
+ cp $STARMAN_DATA/stars&#95 v.sdf ./stars_v.sdf
+ cp $STARMAN_DATA/stars&#95 r_rotated.sdf ./stars_r_rotated.sdf
+
+echo "Doing starfind - to find all stars"
+
+ starfind stars_v radius=2 out=temp_xy_1 \\
+
+echo "Doing tbsort - to sort with bright ones first"
+
+ tbsort temp_xy_1 numcol=3 option='descending' out=temp_xy_1_a \\
+
+echo "Doing tbcut - to get brightest stars"
+
+ tbcut temp_xy_1_a col_1=\[1,6\] row_1=\[1,8\] out=temp_xy_1_b \\
+
+echo "Doing profile - to determine stellar point-spread-function"
+
+ profile stars_v instars=temp_xy_1_b use='auto' out=prof_stars_v \\
+
+echo "Doing measure - to measure magnitudes of all stars"
+
+ measure stars_v instars=temp_xy_1_a profile=prof_stars_v \
+         out=mag_stars_v outim=clean_stars_v \\
+
+echo "Doing starfind on 2nd image - to get stars for profile "
+
+ starfind stars_r_rotated radius=2 out=temp_xy_2 \\
+
+echo "Doing tbsort on 2nd image - to sort with bright ones first"
+
+ tbsort temp_xy_2 numcol=3 option='descending' out=temp_xy_2_a \\
+
+echo "Doing tbcut on 2nd image - to get brightest stars"
+
+ tbcut temp_xy_2_a col_1=\[1,6\] row_1=\[1,8\] out=temp_xy_2_b \\
+
+echo "Doing profile on 2nd image - to determine stellar point-spread-function"
+
+ profile stars_r_rotated instars=temp_xy_2_b use='auto' \
+         out=prof_stars_r_rotated \\
+
+echo "doing tbtran_auto - to get 1st star list on 2nd image"
+
+ tbtran_auto mag_stars_v temp_xy_2_c temp_xy_2_a \\
+
+echo "Doing measure on 2nd image - to measure magnitudes of all stars"
+
+ measure stars_r_rotated instars=temp_xy_2_c profile=prof_stars_r_rotated \
+         out=mag_stars_r_rotated outim=clean_stars_r_rotated \\
+
+echo "Doing diagram  - to display colour/magnitude diagram"
+
+ diagram easycmd='yes' in2=mag_stars_r_rotated in3=mag_stars_v exit='yes' \\
+
+echo "DONE  DIAGRAM  - deleting temporary files "
+
+rm temp_xy_2.sdf temp_xy_2_a.sdf temp_xy_2_b.sdf temp_xy_2_c.sdf
+rm temp_xy_1.sdf temp_xy_1_a.sdf temp_xy_1_b.sdf temp_xy_1_c.sdf
+
+</pre>
+
+<hr><h3> 
+             3. <a name="1"> Go from a user image to a mag list
+</h3></a><p>
+
+<hr><h3> 
+             4. <a name="1"> Go from 2 user images to a CMD diagram 
+</h3></a><p>
+
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 3 </i>
+ 

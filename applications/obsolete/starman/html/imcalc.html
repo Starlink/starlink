@@ -1,0 +1,498 @@
+<HTML> <HEAD>
+<TITLE> IMCALC </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMCALC - <br>
+ Perform mathematical operations on
+image(s)
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+ Does mathematics on input images.
+<p>
+ 
+ Arithmetic and mathematical functions are applied to input images
+ and constants, by means of a FORTRAN-like equation.
+<p>
+ 
+ In addition to the standard FORTRAN facilities, a number of special
+ functions are available (e.g. for adding noise).
+<p>
+ 
+  A simple example would be
+<p>
+<pre>
+ imcalc  (fred+george)/2.2   arthur  'new sums'
+</pre><p>
+ 
+  This would add the images in the files `fred.sdf' and `george.sdf',
+  divide the result by 2.2, and store the output in file `arthur.sdf',
+  with the added title `new sums'.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imcalc_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#method"> Method </a>
+<li> 2 <a href="#equation"> Equation </a>
+<ul>
+<li> 2.1 <a href="#input_images"> Input images </a>
+<li> 2.2 <a href="#numerical_parameters"> Numerical parameters </a>
+<li> 2.3 <a href="#constants"> Constants </a>
+<li> 2.4 <a href="#real_typing"> Real typing </a>
+<li> 2.5 <a href="#fortran_functions"> Fortran functions </a>
+<li> 2.6 <a href="#extra_functions"> Extra functions </a>
+<li> 2.7 <a href="#example"> Example </a>
+</ul>
+<li> 3 <a href="#input"> Input </a>
+<li> 4 <a href="#parameters"> Parameters </a>
+<li> 5 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ The user inputs a Fortran-like equation (through the parameter EQN).
+ The equation can contain references to:-
+<p>
+ 
+<ul>
+<li> specified images
+<li> variables
+<li> constants
+<li> Fortran operators on these (e.g. `+', or `cos()', ... )
+<li> extra operators
+</ul><p>
+ 
+ (For more details on the structure of the equation see the
+ `equation' sub-help.)
+<p>
+ 
+ The equation is analysed and the operations are performed. Each
+ pixel of the output image contains the results of the equation,
+ with the data for the input images coming from the matching pixel
+ of those input images.
+<p>
+ 
+ More specifically, the equation is analysed to identify the names
+ of images and variables and to evaluate constants and isthen
+ converted into reverse-Polish notation. The images and variables are
+ prompted for in alphabetical order and the program then performs
+ simple `stack-arithmetic' to evaluate the expression for each output
+ image pixel.
+<p>
+ 
+ The output image is made by:-
+<p>
+ 
+  Making a new image from scratch - whose X and Y sizes are either
+  equal to the minimum X and Y sizes in the set of the input images
+  of, if there are no input images, defined by the user.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="equation"> Equation </h2> </a> <p>
+ 
+ 
+ An arithmetic expression of up to 132 characters which gives the
+ function to be evaluated for each output image pixel. The syntax
+ is similar to Fortran (same operator precedence, etc.) but with the
+ some differences, described in the lower help levels here.
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="input_images"> Input images </h2> </a> <p>
+ 
+ 
+  Input images can be represented in three ways:-
+<p>
+<pre>
+ 
+  Method   Example            Use
+  ------   -------            ---
+  Name     fred               Simple, easy
+ 
+  Marked   \!../fred-back\!   For when a file name contains
+  Name                        characters that would be confused
+                              with operators. The `\!' denote
+                              the start and end of the name.
+ 
+  Code     IA  or IB...IZ     These special symbols are taken
+                              as asking for images. The input
+                              parameters `INA', `INB', etc.
+                              will then be used to ask for the
+                              images. (Must be capitals, i.e.
+                              `ia' will be thought of as the
+                              file `ia.sdf'.
+</pre><p>
+ 
+  The input images must be standard Starman ADAM .SDF images, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  They can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="numerical_parameters"> Numerical parameters </h2> </a> <p>
+ 
+ 
+  Numerical parameters by any of the variables variables A to Z
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="constants"> Constants </h2> </a> <p>
+ 
+ 
+  Constants by any numerical Fortran constant (real or integer,
+  including exponent if required).
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="real_typing"> Real typing </h2> </a> <p>
+ 
+ 
+    Arithmetic is performed as though all values were real, The
+    input images are scaled by their (BSCALE and BZERO) scale/zero
+    images before use. The actual calculations are performed in
+    double precision, and the results translated back to the
+    real or integer*2 format of Starman NDF images.
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="fortran_functions"> Fortran functions </h2> </a> <p>
+ 
+ 
+    The standard Fortran functions are available and identified
+    by their generic names, i.e.
+<p>
+<pre>
+ -         +         **        *         /         NEG
+ SQRT      EXP       LOG10     LOG       SIN       COS
+ TAN       ASIN      ACOS      ATAN      ATAN2     SINH
+ COSH      TANH      ABS       AINT      ANINT     MOD
+ SIGN      DIM       MIN       MAX
+</pre><p>
+ 
+    Note, however, that MIN and MAX may take only 2 arguments.
+<p>
+ 
+    To avoid problems with the way the Starlink environment
+    handles character parameters, the comma `,' must be replaced with
+    the colon `:' for separating function arguments. Similarly, the
+    division sign `/' may be replaced by the percent sign `%', although
+    this latter substitution is not necessary for simple constructs or
+    when replying to a prompt at the terminal.
+<p>
+ 
+<hr>
+ <h2> 2.6 <a name="extra_functions"> Extra functions </h2> </a> <p>
+ 
+ 
+   There are five extra functions available:-
+<p>
+<dl>
+<dt>    XX <dd>          The `X' value of the pixel.
+<p><dt>    YY <dd>          The `Y' value of the pixel.
+<p><dt>    CLIP(A,B,C) <dd>  This gives the value B so long as it lies in the
+                 interval A to C (inclusive). Otherwise it gives a
+                 zero result. It may be used to remove output values
+                 outside a certain range (e.g. if a division operation
+                 has resulted in very large output values).
+<p><dt>    GAUSS(X)  <dd>   Gives gaussian noise with zero mean and standard
+                 deviation X (the value returned is different at each
+                 pixel and for each call of GAUSS).
+<p><dt>    RAN(X)  <dd>     Gives uniform noise with a value between zero and X
+                 (the value returned is different at each pixel and
+                 for each call of RAN).
+</dl><p>
+ 
+<hr>
+ <h2> 2.7 <a name="example"> Example </h2> </a> <p>
+ 
+ 
+  For example, an equation of the form:-
+<p>
+ 
+       IA*3.3 + 0.5 + COS(IB) + A + MOD(YY:10) + XX%3.0
+<p>
+ 
+  will fill each pixel with:-
+<p>
+    ( 3.3 times the pixel in the corresponding pixel of the input image
+        given through parameter `INA' ) <br>
+  + ( 0.5 ) <br>
+  + ( cosine of pixel in the corresponding pixel of the input image
+        given through parameter `INB' ) <br>
+  + ( the user defined value of the variable `A' ) <br>
+  + ( the `Y' value (not its actual value) of the pixel, modulo 10 ) <br>
+  + ( the `X' value (not its actual value) of the pixel divied by 3 )
+<p>
+ 
+  whilst
+<p>
+ 
+        fred*3.3+ 0.5 + COS(\!a1-b1\!) + A + MOD(YY:10) + XX%3.0
+<p>
+ 
+  will do the same for the images in the files `fred.sdf' and
+  `a1-b1.sdf'.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="input"> Input </h2> </a> <p>
+ 
+ 
+  Only images and variables used in the expressions are prompted for and
+  these are requested in alphabetical order, and only once each.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 4.1 <a href="#bchoice"> Bchoice </a>
+<li> 4.2 <a href="#bscale"> Bscale </a>
+<li> 4.3 <a href="#bzero"> Bzero </a>
+<li> 4.4 <a href="#eqn"> Eqn </a>
+<li> 4.5 <a href="#inim"> Inim </a>
+<li> 4.6 <a href="#invar"> Invar </a>
+<li> 4.7 <a href="#nxy"> Nxy </a>
+<li> 4.8 <a href="#out"> Out </a>
+<li> 4.9 <a href="#outtype"> Outtype </a>
+<li> 4.10 <a href="#seed"> Seed </a>
+<li> 4.11 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 4.1 <a name="bchoice"> Bchoice </h2> </a> <p>
+ 
+  (Default - `yes'            <br> Choice - `yes:no')
+<p>
+ 
+ Choose BSCALE and BZERO for the output `real' image to be 1.0, 0.0
+ rather than the values inherited from the input images.
+ For a `real' image, a value of 1.0,0.0 allows the image to be
+ properly processed by other packages.
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="bscale"> Bscale </h2> </a> <p>
+ 
+  (Default - 1.0 or input image value      <br> Range -  -1.0e10 to 1.0e10
+<p>
+ 
+  The output image has a (BSCALE/BZERO) scale and zero such that:-
+<p>
+ 
+    the `true' value of a pixel = BSCALE*'value' + BZERO.
+<p>
+ 
+  These scale and zero are defined by the user, with suggested values
+  of 1.0/0.0, or as those of the first input image, if any. This
+  parameter defines the `BSCALE' value.
+<p>
+ 
+<hr>
+ <h2> 4.3 <a name="bzero"> Bzero </h2> </a> <p>
+ 
+  (Default - 0.0 or input image value      <br> Range -  -1.0e10 to 1.0e10
+<p>
+ 
+  The output image has a (BSCALE/BZERO) scale and zero such that:-
+<p>
+ 
+    the `true' value of a pixel = BSCALE*'value' + BZERO.
+<p>
+ 
+  These scale and zero are defined by the user, with suggested values
+  of 1.0/0.0, or as those of the first input image, if any. This
+  parameter defines the `BZERO' value.
+<p>
+ 
+<hr>
+ <h2> 4.4 <a name="eqn"> Eqn </h2> </a> <p>
+ 
+  (Default - null          <br> Choice - as defined below)
+<p>
+ 
+  The FORTRAN-style expression that gives the elements in the
+  pixels of the output image.
+<p>
+ 
+  Its style is given the `equation' section of this help.
+<p>
+ 
+<hr>
+ <h2> 4.5 <a name="inim"> Inim </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The input image corresponding to one of the `IA' to `IZ' to be used
+ in the arithmetic expression.
+<p>
+ 
+ The `IA', `IB', ..., `IZ' in the equation pick up the images from
+ the parameters `INA', `INB', ..., `INZ'.
+<p>
+ 
+ The input images must be standard Starman ADAM .SDF images, with
+ either `real' 32-bit real values, or `short' 16-bit integer values.
+ They can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+ indicating `bad' pixels.
+<p>
+ 
+ The `help' for all these is kept here, for `inim'.
+<p>
+ 
+<hr>
+ <h2> 4.6 <a name="invar"> Invar </h2> </a> <p>
+ 
+  (Default - 0.0           <br> Range -1.0e37 to 1.0e37)
+<p>
+ 
+  The value to be used in the equation for the value of
+  the desired variable, from the range `A', `B', ..., `Z'.
+<p>
+ 
+  The `help' for all these is kept here, for `invar'.
+<p>
+ 
+<hr>
+ <h2> 4.7 <a name="nxy"> Nxy </h2> </a> <p>
+ 
+  (Default - 1,1             <br> Range - 1 to 100000)
+<p>
+ 
+  If there are no input images, the user has the choice of the size of
+  the output image.
+<p>
+ 
+  This parameter defines the `X' and 'Y' sizes of the output image.
+<p>
+ 
+ 
+<hr>
+ <h2> 4.8 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the file to contain the output image.
+<p>
+ 
+ The size of the output image is:-
+ 
+<ul>
+<li> That of the `template' image, plus (optionally) some columns.
+<li> Or has a user defined number of columns with the number of rows
+    being the same as the number of rows in the input images.
+<li> Or, if there are no input images, the number or columns and rows
+    are user defined.
+</ul><p>
+ 
+  This is a `real' 32-bit image or a `short' 16-bit integer image.
+<p>
+ 
+  It has a (BSCALE/BZERO) scale and zero
+  such that the `true' value of a pixel = BSCALE*'value' + BZERO.
+  These scale and zero are defined by the user, with suggested values
+  of 1.0/0.0, or as those of the first input image, if any.
+<p>
+ 
+  There is also a `magic value' to flag `bad' pixels. This is
+  either -32767 (for `short') or a v large number (for `real') or that
+  of the first input image, if any. or will be `#1', `#2', etc..
+<p>
+ 
+<hr>
+ <h2> 4.9 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+  (Default - same as input          <br> Choice - `real:short')
+<p>
+ 
+  Should the output image be:-
+<p>
+<dl>
+<dt>  `real' <dd>   This is a 32-bit real image with a precision of about
+            1 in 10 million, nad values between +/- 10**38
+<p>
+ 
+<dt>  `short' <dd>  This is a 16-bit integer image, with a precision of about
+            1 in 60000. The numbers are stored on disk as integers
+            between -32768 and +32767. They are used in the Starman
+            programs as real numbers, by the use of BSCALE and BZERO,
+            such that:-
+                `used value' = BSACLE*'disk value' + BZERO
+<p>
+ 
+            The advantage of this is that if this precision is adequate
+            then the files are half the size of `real' files. The
+            problem is that one has to be constantly aware of the
+            `digitisation' of the images when being stored on disk.
+            Also, many other program packages do not use the
+            BSCALE and BZERO, so cannot get the `true' values.
+</dl><p>
+ 
+<hr>
+ <h2> 4.10 <a name="seed"> Seed </h2> </a> <p>
+ 
+  (Default - 1234567891    <br> Range - 1200000001 to 1400000001)
+<p>
+ 
+  The seed number to be used in any random number generators.
+  This is used in the `GAUSS()' and `RAN()' operators. These
+  will provide the same pattern of numbers in the same
+  seed number is input.
+<p>
+ 
+  It has to be a large positive odd number.
+<p>
+ 
+<hr>
+ <h2> 4.11 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - title of first input image or `Output from Imcalc'
+   Choice - any )
+<p>
+ 
+  The title for the output image.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny              RAL            1992 Dec
+   (adapted from MATHS of R.F.Warren-Smith)
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

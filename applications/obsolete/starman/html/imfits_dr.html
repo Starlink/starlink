@@ -1,0 +1,298 @@
+<HTML> <HEAD>
+<TITLE> IMFITS&#95 DR </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMFITS&#95 DR -  Read simple FITS image on disk
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Reads a disk file with a simple FITS image in it, and produces
+  a Starman Adam SDF (NDF) format image, which the other Starman
+  programs can read.
+<p>
+ 
+  If the input is 16-bit, a 16-bit integer output image is suggested.
+  If it is 32-bit (integer or real), a 32-bit real output image is.
+<p>
+ 
+  A simple line of information about the image is typed out.
+<p>
+ 
+  A further line of reference may be typed out with entries for:-
+<p>
+ 
+  `File', `object name', `filter', `ra', `dec', `date',  `time', `exposure'.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imfits_dr_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#fits_format"> Fits format </a>
+<li> 2 <a href="#optional_line"> Optional line </a>
+<li> 3 <a href="#parameters"> Parameters </a>
+<li> 4 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="fits_format"> Fits format </h2> </a> <p>
+ 
+ 
+  The file must be a 16-bit integer or a 32-bit integer or real image.
+<p>
+
+  It wants a 2-D image.
+  If it has one dimension, it is treated as though the other is NY=1.
+  If it has more than two dimensions, only the first XY plane is taken.
+<p>
+ 
+  That is one that starts with a series of sets of 36 lines of 'headers',
+  with the last set containing the 'END'.
+<p>
+ 
+  The headers must start:-
+<p>
+<pre>
+ 
+ SIMPLE  =                    T  /  FITS STANDARD
+ BITPIX  =                    ?  /  FITS BITS/PIXEL
+ NAXIS   =                    2  /  NUMBER OF AXES
+ NAXIS1  =                    ?  /
+ NAXIS2  =                    ?  /
+</pre><p>
+ 
+    where '?' must be 16, 32, or -32 for BITPIX, and the size of the image
+    must be in NAXIS1 and NAXIS2. (The -32 is the FITS code for a 32-bit
+    real image.)
+<p>
+ 
+  The file must have consist of the FITS standard complete 2880 byte blocks.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="optional_line"> Optional line </h2> </a> <p>
+ 
+ 
+  In addition to the information about the size of the image typed out,
+  the program optionally can type out a line of astronomical information.
+<p>
+ 
+  This contains:-
+<p>
+ 
+  `File', `object name', `filter', `ra', `dec', `date',  `time', `exposure'.
+<p>
+ 
+  As the information for all except the first can be in arbitrarily
+  named descriptors, the user has to input the names of those descriptors.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 3.1 <a href="#date"> Date </a>
+<li> 3.2 <a href="#dec"> Dec </a>
+<li> 3.3 <a href="#do_info"> Do info </a>
+<li> 3.4 <a href="#exposure"> Exposure </a>
+<li> 3.5 <a href="#filter"> Filter </a>
+<li> 3.6 <a href="#in"> In </a>
+<li> 3.7 <a href="#object"> Object </a>
+<li> 3.8 <a href="#out"> Out </a>
+<li> 3.9 <a href="#outtype"> Outtype </a>
+<li> 3.10 <a href="#ra"> Ra </a>
+<li> 3.11 <a href="#time"> Time </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 3.1 <a name="date"> Date </h2> </a> <p>
+ 
+  (Default - `DATE'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the date that the exposure
+  was made on.
+<p>
+ 
+  This is only asked for if the second optional information line is
+  being put out.
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="dec"> Dec </h2> </a> <p>
+ 
+  (Default - `DEC'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the Declination of the exposure.
+<p>
+ 
+  This is only asked for if the second optional information line is
+  being put out.
+<p>
+ 
+<hr>
+ <h2> 3.3 <a name="do_info"> Do info </h2> </a> <p>
+ 
+  (Default - `no'               <br> Choice - `yes:no')
+<p>
+ 
+  Type out the optional information line, giving information on the
+  exposure.
+<p>
+ 
+  This line contains:-
+<p>
+ 
+  `File', `object name', `filter', `ra', `dec', `date',  `time', `exposure'.
+<p>
+ 
+<hr>
+ <h2> 3.4 <a name="exposure"> Exposure </h2> </a> <p>
+ 
+  (Default - `EXPOSED'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the Expsoure Time of the exposure.
+<p>
+ 
+  This is only asked for if the second optional information line is
+  being put out.
+<p>
+ 
+<hr>
+ <h2> 3.5 <a name="filter"> Filter </h2> </a> <p>
+ 
+  (Default - `FILTER'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the name of the Filter used in the
+  exposure.
+<p>
+ 
+  This is only asked for if the second optional information line is
+  being put out.
+<p>
+ 
+<hr>
+ <h2> 3.6 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input FITS file.
+<p>
+ 
+  Include the qualifier, if there is one. That is 'R001.fits', for
+  example.
+<p>
+ 
+<hr>
+ <h2> 3.7 <a name="object"> Object </h2> </a> <p>
+ 
+  (Default - `OBJECT'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the name of the Object of the exposure.
+<p>
+ 
+  This is asked for, to get what to put in the `title' of the output
+  image. It is also used for the second optional information line, if that
+  is being put out.
+<p>
+ 
+<hr>
+ <h2> 3.8 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the output NDF file.
+<p>
+ 
+  If the input is 16-bit, a 16-bit integer output image is suggested.
+  If it is 32-bit (integer or real), a 32-bit real output image is.
+<p>
+ 
+  The image will be a standard Starman ADAM .SDF image.
+  It will have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 3.9 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+  (Default - see below         <br> Choice - 'real:short')
+<p>
+ 
+  Is the output image to be a 16-bit integer image ('short'), or
+  a 32-bit real image ('real')?
+<p>
+ 
+  The program takes as default the number of bits per pixel in the
+  input FITS file (the BITPIX header).
+<p>
+ 
+<hr>
+ <h2> 3.10 <a name="ra"> Ra </h2> </a> <p>
+ 
+  (Default - `RA'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the Right Ascension of the exposure.
+<p>
+ 
+  This is only asked for if the second optional information line is
+  being put out.
+<p>
+ 
+<hr>
+ <h2> 3.11 <a name="time"> Time </h2> </a> <p>
+ 
+  (Default - `TIME'              <br> Choice - any)
+<p>
+ 
+  The name of the descriptor holding the Time (UT, Sid T, etc) of the
+  exposure.
+<p>
+ 
+  This is only asked for if the second optional information line is
+  being put out.
+<p>
+ 
+ 
+<hr>
+ <h2> 4 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1994 Dec
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

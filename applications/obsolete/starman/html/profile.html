@@ -1,0 +1,2818 @@
+<HTML> <HEAD>
+<TITLE> PROFILE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> PROFILE - <br>
+ Determine the stellar profile 
+</h1>
+<hr>
+ 
+ This program determines the mean stellar profile (the shape) of
+ stars in an image. It uses a number of stars to determine this mean.
+<p>
+ 
+ The user inputs the locations of a number of bright stars in an
+ image, and the program then (either automatically or interactively with
+ the user) determines the mean profile. It estimates the parameters of an
+ analytic profile and estimates a subsidary empirical map that
+ together give the best  mean fit for the profiles of these stars.
+<p>
+ 
+ The analytical profile is one which combines a Lorentz type profile
+ with a wide Gaussian type profile added. Usually, the
+ Lorentz component of the profile plus the empirical map gives an
+ adequate fit. This is what the program fits in its automatic mode.
+<p>
+ 
+
+<hr>
+ 
+Go to <a href="intro.html#profile_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#method"> Method </a>
+<ul>
+<li> 1.1 <a href="#automatic_mode"> Automatic mode </a>
+<li> 1.2 <a href="#interactive_mode"> Interactive mode </a>
+</ul>
+<li> 2 <a href="#run-through"> Run-through </a>
+<li> 3 <a href="#use"> Use </a>
+<li> 4 <a href="#tips"> Tips </a>
+<li> 5 <a href="#the_options"> The options </a>
+<ul>
+<li> 5.1 <a href="#main_options"> Main options </a>
+<li> 5.2 <a href="#fit_options"> Fit options </a>
+<li> 5.3 <a href="#map_options"> Map options </a>
+<li> 5.4 <a href="#residual_options"> Residual options </a>
+<li> 5.5 <a href="#wing_options"> Wing options </a>
+</ul>
+<li> 6 <a href="#fitting_details"> Fitting details </a>
+<li> 7 <a href="#profile_details"> Profile details </a>
+<ul>
+<li> 7.1 <a href="#nomencluture"> Nomencluture </a>
+</ul>
+<li> 8 <a href="#input_files"> Input files </a>
+<li> 9 <a href="#output_files"> Output files </a>
+<li> 10 <a href="#display"> Display </a>
+<ul>
+<li> 10.1 <a href="#fits_display"> Fits display </a>
+<li> 10.2 <a href="#residuals_display"> Residuals display </a>
+<li> 10.3 <a href="#profile_map_display"> Profile map display </a>
+</ul>
+<li> 11 <a href="#panel"> Panel </a>
+<li> 12 <a href="#cursor"> Cursor </a>
+<li> 13 <a href="#graphics"> Graphics </a>
+<li> 14 <a href="#parameters"> Parameters </a>
+<li> 15 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ The user inputs in the image which the stars are in, and a table
+ of (X,Y) star positions. The program takes a small area  round each
+ of those stars, and fits the data in the boxes with a  sloping sky
+ and a star profile. The sky and the profile are adjusted until there
+ is a good fit. The parameters of the profiles for each of the stars
+ are then averaged together to make a mean profile.
+<p>
+ 
+ At first, only the Lorentz part of the profile is used. Then, if it
+ is necessary, the empirical map of any remaining residuals may be
+ fitted, and then, for the rare occassions when suitable, the wide
+ Gaussian wing can be fitted.
+<p>
+ 
+ The resultant profile is then stored in a file (as an image with
+ the profile parameters as descriptors). This profile can then be used
+ as the input to MEASURE, ADDSTARS, or INTERACT.
+<p>
+ 
+ The program works by first asking you for the input image and the
+ table of star positions. It then goes either into the `automatic' mode,
+ or into the `interactive' mode.
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="automatic_mode"> Automatic mode </h2> </a> <p>
+ 
+ 
+ The program goes through these steps:-
+<p>
+<ol> 
+<li>Lists the input stars and default profile.
+<p>
+ 
+<li>Asks for any table of companions to stars or bad areas near them.
+In you wish to input such a table, look for further help in
+the `Inputs' section.
+<p>
+ 
+<li>Asks for any shift to be applied to all the X,Y coordinates.
+<p>
+ 
+<li>Gets positions and very rough profiles.
+<p>
+ 
+<li>Determines the size of the `box' around each star to do the
+fits in.
+<p>
+ 
+<li>Fits each star in full detail.
+<p>
+ 
+<li>Calculates the mean profile, by rejecting discordant stars, and
+taking the means of the parameters of the profile.
+<p>
+ 
+<li>Recalculate fits with mean profile.
+<p>
+ 
+<li>Calculate the residuals for each star from the fits.
+<p>
+ 
+<li>Use residuals to make profile map.
+<p>
+ 
+<li>Store profile (with its empirical map).
+<p>
+ 
+<li>Optionally, store table of fitted stars.
+<p>
+ 
+<li>Optionally, store any table of fitted companion stars and bad areas.
+</ol><p>
+ 
+ 
+<hr>
+ <h2> 1.2 <a name="interactive_mode"> Interactive mode </h2> </a> <p>
+ 
+ 
+ The program loops round, offering the repeated option
+ of performing functions. One can leave the `Main' section and
+ go into subsidary sections -- this is indeed needed for removing
+ stars and bad areas near to the target stars, for making the
+ empirical map, and for making the Gaussian wing.
+<p>
+ 
+ There are many other operations that can be done here.
+<p>
+ 
+ For further information, see the `Run&#95 through', `Use', `Tips',
+ `Options',  and `Fitting&#95 details', sections.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="run-through"> Run-through </h2> </a> <p>
+ 
+ 
+ This section describes the interactive use of Profile, with its
+ (nearly) infinite number of ways of using it. To give you some ides of
+ its use, the following `run-through' of one possible session is given.
+<p>
+ 
+ [For the `automatic' mode, see the `Method' section.]
+<p>
+ 
+ This run-through does not deal with the major features:- rejection of
+ companion stars; rejection of bad areas; fitting the empirical map.
+ There are also many minor features that are not explored.
+<p>
+ 
+ Explanations and commentary associated with each annotation are
+ given afterwards. The parts in san serif are abbreviated versions of
+ typed output or are comments on the display. The parts in italics are
+ instructions to you.
+<p>
+ 
+ It is assumed the user is at a colour X-windows display.
+<p>
+ 
+  Text in square brackets `[]' are comments on output and display
+  Text in curly brackets `{}' are instructions to the user.
+<p>
+ 
+    RUN-THROUGH:-
+<p>
+<pre>
+ 
+ > profile                                                     1
+ IN - Input image name /!/ > $STARMAN_DATA/profile_in          2
+ INSTARS - Input star list (posns,details) name /!/ >
+                              $STARMAN_DATA/profile_instar     3
+       [Star list typed out with default profile]
+ USE - Do automatic /interact (auto:inter)? /'inter'/ >        4
+       [Information on how to use typed out]
+ OPTION - Which option to perform? /'fit_rough'/ >             5
+       [Information on rough fits typed out]
+ OPTION - Which option to perform? /'box_size'/ >              6
+    Old X Y sides of box 20 20
+    Suggested X Y sides of box 22 20
+ SIZE - XY Lengths of sides of box /[22,20]/ >                 7
+    Old X Y sides of Profile Map 20 20
+    Suggested X Y sides of Profile Map 20 20
+ SIZE - XY Lengths of sides of box /[22,20]/ >                 8
+    Residuals zeroed
+
+    You may also wish to change the size of the box
+    for the profile map to match the measuring box
+    Old X Y sides of Profile Map   20   20
+    Suggested new sides of Profile Map    22   20
+ SIZE - XY Lengths of sides of box /[22,20]/ >                 9
+    Profile Map copied to new Map
+ OPTION - Which option to perform? /'fit_all'/ >              10
+ FITTYPE - Start values, fix:float -- fit type? /'old'/ >     11
+    Box  X length =   22  Y length =   20                     12
+    No  Height Its Rmaj  Rmin  P     PRmaj PRmin Theta
+     1  8978.2  8  2.151 1.855 2.199 10.00 17.80 26.21
+     2  3237.4 11  2.124 1.873 2.011 5.92  6.23  17.80
+     3  6114.1 17  2.223 1.893 2.320 7.56  18.47 20.31
+     4 31302.2  6  2.464 2.215 2.224 9.98  10.36 80.69
+ OPTION - Which option to perform? /'disp_fit_all'/ >         13
+ SCREEN - XY size of window to open for display /[420,496]/ > 14
+    [The raw and cleaned areas round each star are displayed]
+ OPTION - Which option to perform? /'panel'/ >                15
+    [The `push-buttons' and `help' are displayed]
+    {Click cursor on `mean' button in `Profile' section}      16
+    [Information on mean typed out]
+ FLIP - Star number to flip angle (0=none;- = flip -ve) /0/ > 17
+    Reject or accept nth star (n,-n,0) ?
+ REJECT - Star number to not use (0=none;- = accept) /0/ >    18
+    Had to zero residuals - profile changed
+    Present box size =   22  20
+    Suggested new box size =   21  22
+    {Click cursor on `res_calc' button in                     19
+     `Residuals' section}
+    {Click cursor on `res_interact' button in                 20
+     `Residuals' section}
+    {Click cursor on `clear' button in                        21
+     `Display' section}
+    {Click cursor on `display' button in                      22
+     `Display' section}
+    {Click cursor on `fill' button in                         23
+     `Load' section}
+    {Click cursor on `smooth' button in                       24
+     `Smooth' section}
+ SMSIZE - XY size of smoothing box /[3,3]/ >                  25
+    {Click cursor on `return' button in                       26
+     `Control' section}
+    {Click cursor on `map_add' button in                      27
+     `Map' section
+    {Click cursor on `store' button in                        28
+     `Files' section
+    Image to put profile parameters into
+ OUT - Output file for profile (an image) /!/ > fred          29
+ TITLE - Text to add to file /'Profile from PROFILE'/ >       30
+    File to put stars details into
+ OUTSTARS - Output file for details of fit stars /!/ >        31
+    {Click cursor on `exit' button in                         32
+     `Control' section}
+    !! Null NDF structure specified for the `OUTSTARS'        33
+    parameter.
+ >                                                            34
+</pre><p>
+ 
+ 
+ Comments on above run-through:-
+<p>
+ 
+<ol> 
+<li>Start the program.
+<p>
+ 
+<li>The input image.
+<p>
+ 
+<li>The input table of a list of four star positions.
+<p>
+ 
+<li>We want to use the interactive mode.
+<p>
+ 
+<li>We have now entered the looping part of the program. We 
+are at present in the `Main' section. For the first few 
+questions the program offers suggestions and we accept 
+them. Later on we go into the `panel' mode to choose 
+options. Here we are offered the default of making a 
+rough fit to the stars. (This gives us a check on their 
+quality). We accept this choice.
+<p>
+ 
+<li>We are offered the default of changing the size of the 
+box round each star which is used in the fitting. We 
+accept this choice.
+<p>
+ 
+<li>We set the size of the box to be fitted round each star.
+<p>
+ 
+<li>We set the size of the empirical map of the profile.
+<p>
+ 
+<li>We reset the size of the empirical map of the profile.
+<p>
+ 
+<li>We fit the Lorentz analytical profile for each star.
+<p>
+ 
+<li>We choose as the starting values of the parameters, 
+the last values they had.
+<p>
+ 
+<li>The program types out the results of the fits as it 
+goes along.
+<p>
+ 
+<li>We want to look at the data. We will see the original 
+areas and the areas after the central star has been 
+removed with the parameters of its own fit. If the fit 
+is good, the star should have disappeared cleanly.
+<p>
+ 
+<li>The program wants to know how large a window to open. 
+We take the suggested size.
+<p>
+ 
+<li>The program suggest entering the `push-button' mode of 
+option choosing. We take the suggestion.
+<p>
+ 
+<li>We like the fits, so we make a mean fit.
+<p>
+ 
+<li>We do not see any orientations of the fitted 
+elliptical profiles that have to be flipped by 
+180 degrees.
+<p>
+ 
+<li>We do not see any stars that have to be rejected.
+<p>
+ 
+<li>We now want to look at the average of the residuals 
+from the mean profile. So we calculate them.
+<p>
+ 
+<li>We now go into the group of options for dealing with 
+the residuals.
+<p>
+ 
+<li>We clear the screen.
+<p>
+ 
+<li>We display the residuals. On the left are the 
+rsiduals. On the right is the `fill-factor' map. This 
+shows not the pixels, but the sub-pixels.
+<p>
+ 
+As the pixels are sub-divided, not all the sub-divisions 
+have to have a residual. The `fill-factor' map shows the 
+sub-pixels which have at least one residual, and which 
+have none.
+<p>
+ 
+If we had more stars, then probably their random 
+off-pixel centre centres would rsult in a full coverage 
+of the sub-pixel plane, but that is not the case now.
+<p>
+ 
+<li>As some sub-pixels are empty, we `fill' them by 
+interpolation.
+<p>
+ 
+<li>We smooth the residuals.
+<p>
+ 
+<li>We take the suggested size of the `top-hat' box to 
+smooth with.
+<p>
+ 
+<li>We are happy with this, and do not wish to zero any 
+part of it. (In practice, we would avoid some of these.) 
+So we return to the `main' group of options.
+<p>
+ 
+<li>We load the `residuals' into the `empirical map'
+<p>
+ 
+<li>We now have the Lorentz analytical parameters, and 
+the empirical map. We decide we do not want to look at 
+any wide Gaussian wings, and we know that they were set 
+to zero on starting the program. So we now wish to store 
+the profile to a file. 
+<p>
+ 
+<li>We call the file `fred'.
+<p>
+ 
+<li>We accept the suggested title for the file.
+<p>
+ 
+<li>We enter a `null' response to the request for a 
+file to put the details of the fits for the stars. So 
+these are not stored.
+<p>
+ 
+<li>We decide to exit the program.
+<p>
+ 
+<li>The program insists on telling us that we put a 
+`null' name when asked for the `OUTSTARS' parameter. 
+This does no harm.
+<p>
+ 
+<li> The program returns us to the command line.
+</ol><p>
+ 
+<hr>
+ <h2> 3 <a name="use"> Use </h2> </a> <p>
+ 
+ 
+  WARNING -- Use only bright stars as the fit will blow up and/or give
+  a poor fit if used on noisy data.
+<p>
+ 
+   <strong> An explanation of the use of the program </strong>
+<p>
+
+<ol>
+ 
+<li>INPUT OF IMAGE AND LIST OF POSITIONS OF STARS TO DEFINE THE PROFILE
+<p>
+ 
+The image and a table of positions of the stars are fed in by you.
+It is recommended that the stars should be as isolated as possible,
+bright, but not so bright that their peaks are saturated. About 5
+to 10 stars are enough.
+<p>
+ 
+After this stage, you then enter the interactive part of the program.
+A recommended course of action is to do the following (and then
+repeat as needed some stages):-
+<p>
+ 
+<li>FIRST ROUGH PROFILE DERIVATION
+<p>
+ 
+You can use the `rough' option to make a rough profile estimate.
+Other options are:- If you do know the rough stellar radius, input
+it. If you don't, then choose a good (isolated) star, and make a
+fit on that, and make the mean (of one!). If you don't know which
+are the good stars, display them and look.
+<p>
+ 
+<li>ROUGH BOX SIZE
+<p>
+ 
+You can now set the fitting box size roughly right. In the course of
+the program, each time you calculate the Mean profile, the proper
+fitting box size is recalculated. If it differs from the size, you
+are using, then it is advisable to change to the recommended size
+and redo the fits.
+<p>
+ 
+<li>FITTING OF THE LORENTZIAN AND CALCULATION OF MEAN
+<p>
+ 
+Then fit a Lorentzian at each star. The program types out the fits.
+You can display the fits and look at them, then estimate the mean
+profile, rejecting bad fits.
+<p>
+ 
+<li>DEALING WITH COMPANIONS, FAINT COMPANIONS,AND BAD AREAS
+<p>
+ 
+You can then look at the stars and see if there are companions that
+need dealing with or if there are bad areas. These things are dealt
+with in three stages :-
+<p>
+<ol> 
+<li>Faint companions on the wings of the main star. These are
+iteratively subtracted during the fitting process. Thus they are
+allowed for, but do not really define the profile. Their positions
+are fed in by lists or by your using the cursor to point
+them out.
+<p>
+ 
+<li>Bright companions or companions close to the main star. These
+are fitted in the same process as the main star. Thus they are
+fully used to define the profile, along with the target star.
+Their positions are fed in by lists or by your using the
+cursor to point them out.
+<p>
+ 
+<li>Bad areas. These are ignored during the fit. Their
+positions are fed in by lists or by your using the cursor to
+point them out.
+</ol><p>
+ 
+In this stage, the area displayed round each star is roughly twice
+the linear size of the area actually used in the fit, so you need not
+worry about bad areas or faint stars near the edge, but stars whose
+profiles get near the central region should be marked.
+You can also mark and remove mistaken points using the cursor in the
+same way.
+<p>
+ 
+You can then re-estimate the fit.
+<p>
+ 
+<li>MAKING THE EMPIRICAL PROFILE MAP
+<p>
+ 
+If on inspection of the fits, you have a suspicion there is a systematic
+pattern to the residuals, you can confirm this by making a map
+of the mean residuals. If on smoothing (or not) you remain convinced
+then the empirical profile map can be loaded from this residual map.
+At this stage it is best to go back and refit the Lorentz, to see if
+the residuals map has really gone away, as it should.
+<p>
+ 
+If no pronounced pattern  can be seen it is safest  not to make these
+residuals, or if made, not to copy them over to the profile map. To
+do otherwise is merely to introduce noise.
+<p>
+ 
+It is also wise only to make the profile map where there is good
+signal to noise (usally at the centre of the image). Set the profile
+map to zero in the middle and outer regions where it is just sky
+noise.
+<p>
+ 
+<li>FITTING THE MODIFIED GAUSSIAN WINGS
+<p>
+ 
+If on inspection of the fits, you have a suspicion there is a systematic
+tendency for the profiles to have wide unfitted wings, then you
+can fit the wide low modified Gaussian wings of the profile. This is
+done by the program taking the current mean Lorentz/empirical fit,
+and fitting it to the accepted stars out to a distance of twice the
+box size previously used. You may have to add more companion stars
+and/or bad areas for the larger boxes.
+<p>
+ 
+The mean radial plot and radial fit around the star centre is then
+shown. You can then refine this by using the cursor to define a 
+fiducial set of points giving the proper profile as you see it, and the
+program will fit to them, rather than the data points.
+<p>
+ 
+At this stage, it may be necessary to refit the empirical map.
+<p>
+ 
+It is important to note that if no definite trend in the residuals
+can be seen, or it looks as though the wings are so wide that they
+do not go to zero within the plot, it is best to set the wings to
+zero. This avoids bright stars producing unrealistic wide wings in
+MEASURE (qv).
+<p>
+ 
+<li>INVALID PIXELS
+<p>
+ 
+If any of the pixels used are flagged as INVALID, they are ignored.
+<p>
+ 
+<li>STORAGE OF THE RESULTS
+<p>
+ 
+The profile is stored as an image containing the empirical map with
+the profile parameters as descriptors. The information of the fits
+to the stars and of the companions and bad areas is also stored in
+tables.
+</ol><p>
+ 
+ 
+<hr>
+ <h2> 4 <a name="tips"> Tips </h2> </a> <p>
+ 
+ 
+   Getting a good fit is still an art, although I am working on
+   making it a science, so it can be automated. But for now you
+   will have to suck it and see. It is a good idea to play around
+   for a while, trying the effects of various things on the fit
+   and displaying the fit residuals ( not the residuals map ).
+<p>
+ 
+   Various points:-
+<p>
+ 
+   Use bright stars (ESPECIALLY if making a profile map).
+<p>
+ 
+   Repeat the fit using `old' in the `fittype' parameter in
+   the `fit&#95 all' option, to see if the fit has converged.
+   This can be checked that only a few iterations are done.
+   (not the 30 allowed).
+<p>
+ 
+   The fit carries on till none of the parameters are changing
+   fractionally by more than 0.001. This can be changed with the
+   `controls&#95 fit' option - both for the normal fits and the wing fits.
+   This also enables you to change the damping factor to speed up
+   the fits, AT THE COST OF A RISK of edging AWAY from the right
+   answer, rather than towards it.
+<p>
+ 
+   Choose which stars you are going to use by the rejection in
+   the `mean' and `reject' options.
+<p>
+ 
+   It is often good to fix the angle once you have some idea what
+   it is.
+<p>
+ 
+   After you have decided on a fit, run the `fit&#95 all' option
+   with `fixmean' for the `fittype' parameter in the `fit&#95 all'
+   option, and look at the results with the `disp&#95 fit&#95 all'
+   option. Are you still happy?
+<p>
+ 
+   Remember, if you have rejected some stars, and then do the
+   `fit&#95 all' and `disp&#95 fit&#95 all' options, the display for the stars
+   not done shows the old fits.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="the_options"> The options </h2> </a> <p>
+ 
+ 
+ In the interactive mode, the program works in an `option' mode, where
+ you repeatedly select operations to do, until you are satisfied.
+<p>
+ 
+ On starting the program, you first have to input the image and
+ the table of star positions. Then you are asked whether to proceed
+ in the `automatic' or `interactive' modes.
+<p>
+ 
+<strong> Automatic mode:- </strong>
+<p>
+ 
+ If you select the `automatic' mode, no further input is needed,
+ apart from the names of the file to put the output into.
+<p>
+ 
+<strong> Interactive mode:- </strong>
+<p>
+ 
+ You now have the `main' list of options available to you. The program
+ suggests the first five selections, and then suggests going into to
+ the `panel' mode, where the options are available as buttons in a
+ `panel' window in the display.
+<p>
+ 
+ You can now select any sequence of otpions to determine the mean
+ profile in the best way from the actual image you are working on.
+<p>
+ 
+ From this `main' group four other groups of options are available:-
+<p>
+<pre>
+ 
+ Group     Panel Button   Type of options available
+               to press
+   -----     ------------   -------------------------
+   main        -            Main options
+   fit       interact_fit   Interaction with display of
+                            the fits
+   map       map_interact   Interaction with display of
+                            the profile map
+   residual  res_interact   Interaction with display of
+                            the residuals to mean fit
+   wing      wing           Calculation of wide Gaussian 
+                            wing
+</pre><p>
+ 
+ 
+<hr>
+ <h2> 5.1 <a name="main_options"> Main options </h2> </a> <p>
+ 
+<pre>
+ 
+ Option          Function
+ ------          --------
+ angle           Change Fix/Vary angle and/or angle
+ box_size        Change size of box round stars used for 
+                  fitting
+ clear           Clear the display window
+ close           Close the display screen
+ comp_zero       Delete all comp/faint comp/bad area list 
+                  entries
+ controls_fit    Change internal controls of fit 
+                  calculating
+ disp_fit_all    Display the areas + residuals to the fits
+ disp_fit_one    Display the areas + residuals to a single 
+                  fit
+ display         Display image
+ exit            Exit from this program
+ fit_all         Fit all the accepted stars
+ fit_changed     Fit only stars with changed circumstances
+ fit_one         Fit a certain star
+ fit_rough       Make rough estimate of posns, heights, 
+                  radii
+ fit_trial       Calculate the mean profile from one star
+ fix_set_xy      Set fixed/varying positions and/or the 
+                  posns
+ flip            Rotate profile ellipse of stars by 180 
+                  degrees
+ info_fits       List the present fits
+ info_fitting    Type intermediate step results in the 
+                  fitting
+ info_star       List the fit, comps, bads of a star
+ interact_fit    Interact with the display of fits
+ map_add         Add the Residuals array onto the Profile 
+                  Map
+ map_disp        Display the profile map
+ map_interact    Interact with the display of Profile Map
+ map_scale       Change Profile Map scale (mult/div its 
+                  values)
+ map_size        Change Profile Map size
+ map_use         Change whether to apply the Profile Map 
+                  or not
+ map_zero        Zero the Profile Map
+ mean            Decide which stars to use; find mean 
+                  weighted profile
+ new_cm_pr       Load some previous stuff (Comps, Bad 
+                  areas, Fit)
+ new_image       Input new image to replace the present 
+                  one
+ new_stars       Input list of star posns to replace 
+                  present ones
+ panel           Switch between panel and keyboard 
+                  option selection
+ prof_change     Change the mean profile parameters
+ prof_fix        Change fixed/variable control on 
+                  profile params
+ radial_plot     Put a radial plot of profile and fit 
+                  into file
+ reject          Change which stars are accepted/
+                  rejected
+ res_calc        Calculate the array of residuals
+ res_disp        Display the mean fit residuals array
+ res_fill        Fill any -empty- pixels in the residuals 
+                  array
+ res_interact    Interact with the display of residuals 
+                  array
+ shift_all       Shift XY positions of all the stars and 
+                  comps
+ show_reject     Put red border for rejected stars on 
+                  display
+ store           Save the profile and fits
+ volume          Calculate the profile volume
+ wing            Fit a broad Gaussian wing - zero broad 
+                  wing start
+</pre><p>
+ 
+ 
+ The `shift&#95 all' option shifts the X,Y positions of all the stars
+ and companions and faint companions. It leaves the bad areas unmoved.
+ This enables you to use the lists from one exposure on another where
+ the field centre is different, but where the detector bad areas are
+ at the same positions.
+<p>
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+<hr>
+ <h2> 5.2 <a name="fit_options"> Fit options </h2> </a> <p>
+ 
+ 
+ These options enable you to pan and zoom the display of
+ the stars and the residuals of the fits. You can also insert
+ and remove companion stars, faint companions, and bad areas;
+ get the values in the images or residuals; remove/replace the
+ coloured lines.
+<p>
+<pre>
+ 
+ Option          Function
+ ------          --------
+ blank           Remove an area from the calculations
+ box             Paint fitting box when displaying fits
+ clear           Clear the display window
+ close           Close the display screen
+ comp_br         Add a bright or close companion
+ comp_fa         Add a faint or distant companion
+ disp_all        Display the areas + residuals to the fits
+ disp_one        Display the areas + residuals to a single fit
+ im_values       Type values in main image in cursor given area
+ info_star       List the fit, comps, bads of a star
+ paint_box       Paint up fitting boxes
+ paint_comp      Paint up companions and bad areas
+ posntype        Change posn markers between spot and crosses
+ res_values      Type out residual values in cursor defined area
+ reset           Reset zoom/pan to unity and centre
+ return          Return to main program option list
+ shift           Reposition a main star
+ unblank         Restore an area to the calculations
+ uncomp_br       Remove a bright or close companion
+ uncomp_fa       Remove a faint or distant companion
+ zoom            Zoom and pan image by using mouse location
+ 
+ 
+ Buttons for Zoom work:  Button 1 twice        = zoom /2
+                         Button 2 twice        = zoom x2
+                         Button 1 and Button 2 = pan
+                         Button 3 twice        = exit
+</pre><p>
+ 
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+<hr>
+ <h2> 5.3 <a name="map_options"> Map options </h2> </a> <p>
+ 
+ 
+ These options enable you to look at the profile map closely and to
+ change it to some extent.
+<p>
+<pre>
+ 
+ Option          Function
+ ------          --------
+ clear           Clear the display window
+ display         Display the profile empirical map array
+ original        Load map as before entering this MAP option
+ reset           Reset zoom/pan to unity and centre
+ return          Return to main OPTION choice
+ smooth          Smooth profile map by >top hat> NxM box
+ spolyin         Define a polygon with cursor, smooth area inside
+ spolyout        Define a polygon with cursor, smooth area outside
+ values          Type out values for an area of the profile map
+ zero            Zero all profile map
+ zoom            Zoom and pan image by using mouse location
+ zpolyin         Define a polygon with cursor, zero area inside
+ zpolyout        Define a polygon with cursor, zero area outside
+ zrect           Define a rectangle with cursor, zero area inside
+</pre><p>
+ 
+ 
+ When defining the polygons, you use the cursor and the
+ buttons. Place the cursor at consecutive vertices of the
+ desired polygon, and press any button. To end the input of
+ vertices, do a repeat press, without moving the cursor, on
+ the last vertex. A line showing where the polygon lies is
+ output whilst you are doing this.
+<p>
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+<hr>
+ <h2> 5.4 <a name="residual_options"> Residual options </h2> </a> <p>
+ 
+ 
+ These options enable you to look at the residuals map
+ closely and to change it to some extent.
+<p>
+<pre>
+ 
+ Option          Function
+ ------          --------
+ calculate       Calculate the array of residuals
+ clear           Clear the display window
+ display         Display the mean fit residuals array
+ fill            Fill any -empty- pixels in the residuals array
+ original        Load original values from last fit calculations
+ reset           Reset zoom/pan to unity and centre
+ return          Return to main OPTION choice
+ smooth          Smooth profile map by >top hat> NxM box
+ spolyin         Define a polygon with cursor, smooth area inside
+ spolyout        Define a polygon with cursor, smooth area outside
+ values          Type out values for an area of the residual array
+ zero            Zero all residual array
+ zoom            Zoom and pan image by using mouse location
+ zpolyin         Define a polygon with cursor, zero area inside
+<p>
+</pre> 
+ 
+ When defining the polygons, you use the cursor and the
+ buttons. Place the cursor at consecutive vertices of the
+ desired polygon, and press any button. To end the input of
+ vertices, do a repeat press, without moving the cursor, on
+ the last vertex. A line showing where the polygon lies is
+ output whilst you are doing this.
+<p>
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+<hr>
+ <h2> 5.5 <a name="wing_options"> Wing options </h2> </a> <p>
+ 
+ 
+ These options enable you to estimate the parameters of the wide
+ Gaussian wing:-
+<p>
+ 
+ The `wing' options fits a low wide Gaussian wings to the profile.
+<p>
+ 
+ The program sums up all the accepted stars, subtracts the fitted fixed
+ Lorentzian profiles, folds the data round the centre and fits the
+ modified Gaussian. The program then plots
+ the data and draws the Gaussian it has fitted. If you have
+ chosen an interactive terminal, you can then modify the fit by marking
+ (via the cursor) points which you think best show the actual profile
+ and the program then fits the Gaussian to these points and draws the
+ fitted curve on the device. You can then redefine a new set of points
+ as often as you like until you are satisfied with the fit.
+<p>
+ 
+  You can:-
+<p>
+<ul> 
+<li>-Look at a larger area round each star to see if there are areas
+to be blanked off, or stars to be marked so that the fits can
+be redone.
+<p><li>-  Fit the stars. This does a fit, and calculates the residual
+radial distribution of data that is left.
+<p><li>-  Look at the 1-D distribution of residual data on a graph,
+and if it looks corrupted input your own residual distribution.
+<p><li>-  Fit the wing profile parameters to the 1-D residual profile,
+either by fitting to calculated points, or fitting to the
+hand input points.
+<p><li>-  Look at the wing profile parameter fit to the 1-D distribution.
+<p><li>-  Put in your own estimates of the wing profile parameters, and
+say if they should be fixed or not.
+</ul><p>
+ 
+ The point about the option for hand inputting is that sometimes
+ the raw points are disturbed by miscellaneous things in the large
+ areas used in determining the wing profile. You can thus use
+ some judgement and put the radial distribution where you think it
+ should be.
+<p>
+ 
+ In putting your own set of points of the radial distribution, be sure
+ to put in enough that the fit can make a good fit to them.
+<p>
+ 
+   A normal course might be to:-
+<p>
+<pre> 
+  Display      Display the x2 areas round the stars
+  Interact     Blank off or mark up the extra stars in
+               the large wing areas
+  Fit_stars    Fit the stars in the large wing area and calc
+               the distribution of wing data points
+  Gplot        Look at the wing data points
+  Gcursor      Put your own smoothly distributed wing data
+               points by using the graphics cursor
+  Fit_gcursor  Fit the wing parameters to your cursor input
+</pre><p>
+ 
+   After this you can loop round changing the cursor positions
+   and/or refining the fit. The fit is usally very delicate
+   and it is common to adjust the profile parameters by hand
+   before a number of fits to get a good fit
+<p>
+ 
+    Then:-
+<p>
+<pre> 
+        -Return-    back to the main option
+</pre><p>
+ 
+<pre>
+ 
+ Option          Function
+ ------          --------
+ display         Display the areas + residuals to the fits
+ fit_gcursor     Fit to wing points input by cursor
+ fit_graw        Fit to raw wing points as calculated
+ fit_stars       Fit stars in the large areas round each star
+ gclose          Close the graphics device
+ gcursor         Put -better- wing points in by cursor
+ gplot           Plot the wing points graphically
+ gshowfit        Plot fitted line
+ interact        Interact with the display of fits
+ return          Return to main option
+ set_param       Insert your own wing profile values
+ type_Param      Type present wing parameters
+</pre><p>
+ 
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+<hr>
+ <h2> 67 <a name="fitting_details"> Fitting details </h2> </a> <p>
+ 
+ 
+ The elliptical rotated Lorentz profile that is fitted is one that has
+ been found to give a good fit to typical star images.
+<p>
+ 
+ The actual fitting of a star in an image is a scaled (according to the
+ height of the star) version of this total profile, added onto a
+ linear sloping sky background. The fitting for the background is done
+ at the same time as the fitting for the star.
+<p>
+ 
+ The fitting is done by starting with trial values of the star heights
+ and positions and of the background, and then improving these by the
+ iterative linearised least squares method until an acceptable fit is
+ made, or until too many iterations have been done.
+<p>
+ 
+ Features of the fit are:-
+<p>
+
+<ol>
+<li>It can deal with close companions. You have to tell it where
+these stars are.
+<p>
+ 
+<li>It can deal with areas of `bad' pixels, in that such areas are
+ignored in the fits. Again you have to define these areas. (Such
+pixels can also be so flagged before entering the program - see
+other Starman programs for the method of flagging invalid
+pixels.)
+</ol><p>
+ 
+ The fitting takes account of pixel averaging, that is what happens
+ when the star radius gets small, and there is significant change in
+ the profile across one pixel. As the profile is not a straight line,
+ the normal practice of taking the profile value at the centre of the
+ pixel will be wrong. The program subdivides the profile over the
+ pixel and calculates a more accurate average. So the bad effects of
+ a narrow profile and star centres being at different distances from
+ the pixel sides are minimised.
+<p>
+ 
+ The `volume' of this profile, that is the numerical integration under
+ the 2-D profile out to a defined distance, can be calculated. (The
+ calculation is done with a fine mesh, so there is no effect from the
+ pixel averaging for small radii.) This enables the magnitudes of
+ stars with different profiles to be estimated.
+<p>
+ 
+ At the program start, the values of the profile parameters are:-
+      RX=2.0, RY=2.0, P=2.2, PRX=10.0, PRY=10.0, THETA=0.0
+      QH=0.0, QR=10.0, QP=2.0
+<p>
+ 
+ A note for people looking inside the program source:-
+<p>
+ 
+ Inside the program, the parameters have slightly different names,
+<p>
+<pre>
+ 
+ Here     RX    RY     P     PRX    PRY   THETA
+ Inside  Rmaj  Rmin  Power  PRmaj  PRmin  Angle
+ 
+ Here        QH           QR            QP
+ Inside  Wing Height  Wing Radius   Wing Power
+</pre><p>
+ 
+ 
+<hr>
+ <h2> 7 <a name="profile_details"> Profile details </h2> </a> <p>
+ 
+ 
+ The profile that is fitted is one that has been found to give a good fit
+ to typical star images. It is an elliptical rotated Lorentzian sitting
+ on top of a wide low circular modified Gaussian, with an empirical
+ residuals map. The actual fitting is a scaling of this profile, added
+ onto a linear sloping background, which is fitted at the same time as
+ the star.
+<p>
+ 
+ <strong> The mathematical expression of this is:- </strong>
+<pre>
+ 
+              -                                     -
+             l                          PQ           l
+             l        1              -dq             l
+ I(x,y) =  H.l  -------------  +  HQ.e     + F(x,y)  l
+             l        P(1+d2)                        l
+             l  1 + d1                               l
+              -                                     -
+
+ 
+           +  A  +  B.x  +  C.y
+
+ 
+  where   
+
+  I(x,y) = the value of the star profile at pixel 
+           position x,y
+
+  H      = the star peak Lorentz height (Gaussian and map
+           are an added fraction)
+
+  x0, y0  = the star centre position
+ 
+  A, B, C = the sloping background
+
+</pre> 
+ <strong> The Lorentz profile:- </strong>
+<pre>
+ 
+   d1 = sqrt( (x1/Rmaj)**2 + (y1/Rmin)**2) )
+   d2 = sqrt( (x1/RPmaj)**2 + (y1/RPmin)**2) )
+ 
+   x1 = (x-x0).cos(theta) + (y-y0).sin(theta)
+   y1 = -(x-x0).sin(theta) + (y-y0).cos(theta)
+</pre><p>
+ 
+   Rmaj and Rmin are the major and minor axes of the ellipse
+   which is rotated at theta degrees to the X axis. (Rmaj and Rmin
+   are often referred to in the code as RX and RY.)
+<p>
+ 
+   P is often about 2.2; the RPs are usually about 6*(the Rs)
+<p>
+ 
+ The circular modified Gaussian profile:-
+<p>
+<pre> 
+   dq = sqrt((x-X0)**2+(y-Y0)**2)/RQ
+</pre><p>
+ 
+   RQ is the radius, and PQ is the power of the modified Gaussian. HQ is
+   the fraction of the main Lorentz profile peak that the Gaussian has.
+   (HQ, RQ and PQ are often referred to in the code as QH, QR and QR.)
+<p>
+ 
+   HQ is often zero, and is always small, of the order of 0.01; <br>
+   RQ is usually greater than 5*(the Rs); <br>
+   PQ is often about 2. <br>
+<p>
+ 
+<strong> The empirical map:- </strong>
+<p>
+ 
+   F is an empirical function, the `Profile Map'. This is expressed in
+   terms of a fraction of the main Lorentz profile. The map is
+   sampled on a grid which can be finer than the pixel
+   grid. The grid has a spacing of int((1 + 2.9/min(Rmaj,Rmin)))
+   times finer than the pixel grid. Thus the empirical
+   function is sampled at spacings better than the Nyquist frequency.
+   Unless the star is distorted, the values in this map are zero, and
+   even if the star is distorted, they are usually very
+   small, with peak values less than 1 percent of the
+   main profile. The map is not an empirical representation of the image
+   residuals from the analytical profile, but of those residuals averaged
+   over the pixels.
+<p>
+ 
+   Thus depending on the pixel size relative to the star radius, the map
+   values will change, unlike the analytical profile parameters.
+<p>
+ 
+<strong> Pixel undersampling:- </strong>
+<p>
+ 
+   In profiles where the radius is less than 3 pixels, full account
+   is taken of the pixel undersampling in the analytical part and (where
+   used) in the empirical part.
+<p>
+ 
+<strong> Position, height and background:- </strong>
+<p>
+ 
+   The parameters X0,Y0,A,B,C, and D are not parts of the profile, as
+   they can be different for each star.
+<p>
+ 
+<hr>
+ <h2> 7.1 <a name="nomencluture"> Nomencluture </h2> </a> <p>
+ 
+<pre>
+ 
+ Word            Meaning
+ ----            -------
+ Profile         Usally the nine profile parameters and the 
+                 profile map. Sometimes just the nine 
+                 parameters.
+ Residuals map   The map of differences of the data from the 
+                 fits using the mean profile at the time the 
+                 `res_calc' option was run.
+ Profile Map     The empirical array,  F(x,y), described in 
+                 the method section. This can only be loaded 
+                 by adding in a processed residuals map.
+</pre><p>
+ 
+<hr>
+ <h2> 8 <a name="input_files"> Input files </h2> </a> <p>
+ 
+ 
+ The input is done by files containing images and tables.
+<p>
+ 
+ These are described in the parameter lists.
+<p>
+<pre>
+ 
+  Parameter   Contents
+  ---------   --------
+  IN          Input image
+ 
+  INSTARS     Input table of star positions
+ 
+  INCOMPS     Input table of companion stars and 
+              bad areas (optional)
+ 
+  INPROF      Input profile (optional - for use 
+              as default start)
+</pre>
+ 
+<hr>
+ <h2> 9 <a name="output_files"> Output files </h2> </a> <p>
+ 
+ 
+ The output is done by files containing images and tables.
+<p>
+ 
+ These are described in the parameter lists.
+<p>
+<pre>
+ 
+  Parameter   Contents
+  ---------   --------
+  OUT         Output profile (stored as image)
+ 
+  OUTSTARS    Output table of fitted stars (optional)
+ 
+  OUTCOMPS    Output table of companion stars and 
+              bad areas (optional)
+ 
+  OUTRADIAL   Output table of wing fit and its 
+              residuals (optional)
+ 
+</pre>
+ 
+<hr>
+ <h2> 10 <a name="display"> Display </h2> </a> <p>
+ 
+ 
+  In the interactive mode, you can display on an image display the
+  three types of data the program deals with. You are in fact encouraged
+  to do so, so as to understand the profile.
+<p>
+ 
+  In each case you can inspect and interact with the data displayed.
+<p>
+<pre>
+ 
+  Data Type   Description
+  ----------  -----------
+  Fits        Display of a) the image round each star
+                         b) the image minus the stars 
+                            fitted
+  Residuals   Display of a) the residuals to the mean 
+                            fit
+                         b) the filling of the residuals 
+                            array
+  Profile     Display of the profile map array
+  map
+</pre><p>
+ 
+  A fuller description of the types of data is given in the `Data'
+  help at this help level.
+<p>
+ 
+<hr>
+ <h2> 10.1 <a name="fits_display"> Fits display </h2> </a> <p>
+ 
+ 
+  When the fits are displayed on the image display, the display
+  consists of two parts. The top half contains the actual pictures round
+  each target star. The bottom half contains the residuals when the fits
+  are subtracted from the actual image.
+<p>
+ 
+  The displayed boxes have sides that are twice the actual fitting
+  boxes. (The edges of the fitting boxes are indicated by the purple
+  dots at the sides of the displays.) The reason for this is to help
+  you in marking the positions of stars just outside the fitting boxes
+  which are bright enough that they affect the data inside the fitting
+  boxes.
+<p>
+ 
+  The intensity scaling in the top half is uniform. In the bottom half,
+  each box has its own scaling to bring up the residuals as well as
+  possible. An idea of the relative scaling may be gained by looking at
+  the intensity variations in the sky background.
+<p>
+ 
+  You can inspect and interact with this data (see the OPTION
+  parameter).
+<p>
+ 
+<hr>
+ <h2> 10.2 <a name="residuals_display"> Residuals display </h2> </a> <p>
+ 
+ 
+  When the residuals are displayed, there is also shown the filling map
+  of the residuals. This filling map shows which pixels in the
+  residuals array actually have data.
+<p>
+ 
+  The residuals are displayed at the right size. The intensity scaling
+  is such as to show the residuals up as much as possible.
+<p>
+ 
+  The residuals map covers the same number of image pixels as the
+  fitting box. But the residuals map may well contain more pixels, and
+  thus be `larger', by an integral number factor, than the fitting box.
+  This happens when the profile is so small that pixel averaging
+  becomes important. In this case the residuals map is subdived, with
+  each pixel becoming a nxn box (where n=1+int[2.9/(min radius)] ).
+<p>
+ 
+  Then for each star, the residual from the profile at each pixel is
+  calculated and stored in the nearest subdivision. For example, if a
+  star with radius 1.5 had its centre at [100.2,100.8], the residual of
+  pixel [105,105] at distance (4.8,4.2), would be stored at the (1,3)
+  subdivision of the (4,4) pixel.
+<p>
+ 
+  Alongside the residuals, in a red box, are displayed the
+  filling factors, that is, which pixels (shown as white) have data,
+  and those that do not (shown as black).
+<p>
+ 
+  You can inspect and interact with this data (see the ROPTION
+  parameter).
+<p>
+ 
+<hr>
+ <h2> 10.3 <a name="profile_map_display"> Profile map display </h2> </a> <p>
+ 
+ 
+  The display of the profile map shows the current state of the
+  profile map.
+<p>
+ 
+  This is much like the residuals map, except that there is no filling
+  factor display, as the profile map can only be filled from a full
+  residuals map (one either naturally full, or smoothed full, or boxed
+  or polygoned so, or zeroed so).
+<p>
+ 
+  You can inspect and interact with this data (see the OPTION
+  parameter).
+<p>
+ 
+  The profile map does not have to be the same size as the fitting
+  area.
+<p>
+ 
+  Its size is the number of pixels of the image that the profile map
+  covers. This can be different than the computer storage size and the
+  size of the profile file image, since the profile map may map to
+  sub-divided image pixels, and thus contain more data points.
+<p>
+ 
+<hr>
+ <h2> 11 <a name="panel"> Panel </h2> </a> <p>
+ 
+ 
+ In the menu-driven mode of this program, there is the capability
+ to interact with this menu in a `windows' type mode. If you choose
+ the `Panel' option in the `Option' choice, then if you have an
+ X-window device a small panel appears on the screen. This has what look
+ like buttons with all the available options. You select these by
+ putting a cursor on the `button' and then pressing a cursor button.
+<p>
+ 
+ The panel has a `help' button which lists out one line
+ descriptions of the options. It also has a `command' button which
+ gives you access to no useful command in itself, but you can
+ then enter the full program help system.
+<p>
+ 
+<hr>
+ <h2> 12 <a name="cursor"> Cursor </h2> </a> <p>
+ 
+ 
+ In the interactive mode, a cursor is used to pick up positions, change
+ the zoom, and other miscellaneous purposes.
+<p>
+ 
+ The mouse moves the cursor. It is assumed that a 3 button
+ mouse is used. The mouse buttons are worked like this:-
+<p>
+ 
+   General position marking   Press any button
+<p>
+<pre>
+ 
+   Zoom work:  Button 1 twice        = zoom /2
+               Button 2 twice        = zoom x2
+               Button 1 and Button 2 = pan
+               Button 3 twice        = exit
+</pre><p>
+ 
+  If the cursor is outside a displayed area, often pressing the button
+  will result in no actions.
+<p>
+ 
+ 
+<hr>
+ <h2> 13 <a name="graphics"> Graphics </h2> </a> <p>
+ 
+ 
+  Graphics are done under the control of the Starlink
+  use of `GKS'. This opens a separate graphical window. This window
+  can only be removed outside the program by use of the `xdestroy'
+  program.
+<p>
+ 
+ 
+<hr>
+ <h2> 14 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+ 
+<ul>
+<li> 14.1 <a href="#angle"> Angle </a>
+<li> 14.2 <a href="#base"> Base </a>
+<li> 14.3 <a href="#cwidth"> Cwidth </a>
+<li> 14.4 <a href="#damp"> Damp </a>
+<li> 14.5 <a href="#doption"> Doption </a>
+<li> 14.6 <a href="#fitlim"> Fitlim </a>
+<li> 14.7 <a href="#fittype"> Fittype </a>
+<li> 14.8 <a href="#fixangle"> Fixangle </a>
+<li> 14.9 <a href="#fixem"> Fixem </a>
+<li> 14.10 <a href="#fixprof"> Fixprof </a>
+<li> 14.11 <a href="#flip"> Flip </a>
+<li> 14.12 <a href="#gtype"> Gtype </a>
+<li> 14.13 <a href="#height"> Height </a>
+<li> 14.14 <a href="#htlim"> Htlim </a>
+<li> 14.15 <a href="#in"> In </a>
+<li> 14.16 <a href="#incomps"> Incomps </a>
+<li> 14.17 <a href="#inprof"> Inprof </a>
+<li> 14.18 <a href="#instars"> Instars </a>
+<li> 14.19 <a href="#linecol"> Linecol </a>
+<li> 14.20 <a href="#moption"> Moption </a>
+<li> 14.21 <a href="#number"> Number </a>
+<li> 14.22 <a href="#numbutt"> Numbutt </a>
+<li> 14.23 <a href="#ok"> Ok </a>
+<li> 14.24 <a href="#option"> Option </a>
+<li> 14.25 <a href="#out"> Out </a>
+<li> 14.26 <a href="#outcomps"> Outcomps </a>
+<li> 14.27 <a href="#outradial"> Outradial </a>
+<li> 14.28 <a href="#outstars"> Outstars </a>
+<li> 14.29 <a href="#posn"> Posn </a>
+<li> 14.30 <a href="#postype"> Postype </a>
+<li> 14.31 <a href="#power"> Power </a>
+<li> 14.32 <a href="#radius"> Radius </a>
+<li> 14.33 <a href="#reject"> Reject </a>
+<li> 14.34 <a href="#roption"> Roption </a>
+<li> 14.35 <a href="#scale"> Scale </a>
+<li> 14.36 <a href="#screen"> Screen </a>
+<li> 14.37 <a href="#shiftxy"> Shiftxy </a>
+<li> 14.38 <a href="#size"> Size </a>
+<li> 14.39 <a href="#smsize"> Smsize </a>
+<li> 14.40 <a href="#title"> Title </a>
+<li> 14.41 <a href="#use"> Use </a>
+<li> 14.42 <a href="#usemap"> Usemap </a>
+<li> 14.43 <a href="#value"> Value </a>
+<li> 14.44 <a href="#volrad"> Volrad </a>
+<li> 14.45 <a href="#wdamp"> Wdamp </a>
+<li> 14.46 <a href="#wfitlim"> Wfitlim </a>
+<li> 14.47 <a href="#wfitok"> Wfitok </a>
+<li> 14.48 <a href="#whtlim"> Whtlim </a>
+<li> 14.49 <a href="#woption"> Woption </a>
+<li> 14.50 <a href="#xarea"> Xarea </a>
+<li> 14.51 <a href="#yarea"> Yarea </a>
+</ul>
+
+<hr>
+ <h2> 14.1 <a name="angle"> Angle </h2> </a> <p>
+ 
+ (Default - the present calculated value        <br> Range -90.0 to 90.0)
+<p>
+ 
+ Input the angle, in degrees, of the major axis of the profile,
+ anti-clockwise from +ve X direction.
+<p>
+ 
+ At the program start, the value is 0.0
+<p>
+ 
+ The first use is to change if needed the angle found by the
+ preliminary fit. Thereafter it is used only if the angle is to be
+ fixed.
+<p>
+ 
+ By inputting a suitable angle, you can speed the fit up, as it starts
+ from a value near its proper one. Also if you have said, via the
+ `FIXANGLE' parameter in the `angle' option, that the want the angle
+ fixed, then you need to say what you want it fixed at. Then both the
+ fit will go faster, and the angle will stay at a good value.
+<p>
+ 
+ This should be used in practice if you:-
+<p>
+<ul>
+<li>- want to start the fit near the proper angle.
+<p><li>- are sure of the angle.
+<p><li>- are sure the stars are round (in which case set the angle to
+zero).
+<p><li>- want to speed the fit up and do not care what the angle is.
+</ul><p>
+ 
+<hr>
+ <h2> 14.2 <a name="base"> Base </h2> </a> <p>
+ 
+  (Default - present value    <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The value of the base level that underlies the Gaussian wing fit.
+  Sometimes the fit does not do a very good fit to the base, and
+  this enables you to set (and perhaps fix with the `set&#95 param' option
+  in the `wing' options) this base level.
+<p>
+ 
+<hr>
+ <h2> 14.3 <a name="cwidth"> Cwidth </h2> </a> <p>
+ 
+  (Default  - present value          <br> Range - 1.0 to 1.0e10)
+<p>
+ 
+  The width in pixels of the crosses to be painted up to mark the
+  positions of the stars. The starting value is 3 pixels.
+<p>
+ 
+<hr>
+ <h2> 14.4 <a name="damp"> Damp </h2> </a> <p>
+ 
+  (Default - present value.    <br> Range - 0.0 to 100.)
+<p>
+ 
+  The damping factor in the fitting least squares method, whilst
+  doing the main Lorentz profile fitting.
+<p>
+ 
+  This controls the spize of the adjustments in the fitting. The
+  smaller the number, the less the internal damping, and so the
+  bigger the steps, the faster the fitting, and also the risk of
+  shooting out of the best `least squares' path and so mis-fitting.
+  In general, values are such that:-
+<p>
+<pre> 
+   0.0 = no damping, 0.5 = normal, 1.0 = a lot of damping.
+</pre>
+<p>
+ 
+<hr>
+ <h2> 14.5 <a name="doption"> Doption </h2> </a> <p>
+ 
+  (Default - last <br> choice    Choices - see below)
+<p>
+ 
+ Which of the following options, to do with looking at the fits
+ and modifying them, do you want to do?
+<p>
+ 
+ This is the interaction with the display of the raw images round
+ each star and those images after the fit made has been subtracted
+ from the image.
+<p>
+ 
+ Enables you to pan and zoom at the display of the stars and the
+ residuals of the fits. You can also insert and remove companion
+ stars, faint companions, and bad areas; get the values in the
+ images or residuals; remove/replace the coloured lines; display
+ star positions as spots or crosses.
+<p>
+<pre> 
+ 
+ Option          Function
+ ------          --------
+ blank           Remove an area from the calculations
+ box             Paint fitting box when displaying fits
+ clear           Clear the display window
+ close           Close the display screen
+ comp_br         Add a bright or close companion
+ comp_fa         Add a faint or distant companion
+ disp_all        Display the areas + residuals to the fits
+ disp_one        Display the areas + residuals to a single fit
+ im_values       Type values in main image in cursor given area
+ info_star       List the fit, comps, bads of a star
+ paint_box       Paint up fitting boxes
+ paint_comp      Paint up companions and bad areas
+ posntype        Change posn markers between spot and crosses
+ res_values      Type out residual values in cursor defined area
+ reset           Reset zoom/pan to unity and centre
+ return          Return to main program option list
+ shift           Reposition a main star
+ unblank         Restore an area to the calculations
+ uncomp_br       Remove a bright or close companion
+ uncomp_fa       Remove a faint or distant companion
+ zoom            Zoom and pan image by using mouse location
+ 
+ 
+ Buttons for Zoom work:  Button 1 twice        = zoom /2
+                         Button 2 twice        = zoom x2
+                         Button 1 and Button 2 = pan
+                         Button 3 twice        = exit
+</pre><p>
+ 
+<hr>
+ <h2> 14.6 <a name="fitlim"> Fitlim </h2> </a> <p>
+ 
+  (Default - present value     <br> Range - 0.0 to 100.0)
+<p>
+ 
+  The `limit' in the profile parameter changes when the fit is thought
+  to have settled, while doing the main Lorentz profile fit.
+<p>
+ 
+  It is the fractional change, at an iteration step in the least squares
+  fit, in each of the profile parameter values that are changing. Their
+  changes must be less than this before the least squares iterations
+  stop. Normal value = 0.001.
+<p>
+ 
+  See the `Htlim' parameter for the limit on the fractional change
+  in the star height.
+<p>
+ 
+<hr>
+ <h2> 14.7 <a name="fittype"> Fittype </h2> </a> <p>
+ 
+   (Default - `old'    <br> Choice - `fixmean:fixold:mean:none:old:update')
+<p>
+ 
+   Method of inputting starting values to the profile parameters
+   in the fit iterations
+<p>
+ 
+   This is done either to speed things up, or get better values out of
+   the fit. This can also provide a temporary override on the `fixing'of
+   the profile parameters, by fixing them for this go.
+<p>
+<pre>
+ 
+   Choices:-
+   Option      Function
+   ------      --------
+   Fixold      Fix profile at last fit of each 
+                star (no profile fitting)
+   Fixmean     Fix at the last calculated mean 
+                profile (no profile fitting)
+   Mean        Take last calculated mean profile
+   None        Do not do fit
+   Old         Take last fit for each star
+   Update      Take mean of fits made of previous 
+                stars in this list
+</pre><p>
+ 
+<hr>
+ <h2> 14.8 <a name="fixangle"> Fixangle </h2> </a> <p>
+ 
+ (Default - `no'      <br> Choice - `yes:no')
+<p>
+ 
+ Option for fixing the angle to the X axis of the major axis of the
+ Lorentzian component of the profile. (THETA in the profile equation.)
+ This is measured in an anti-clockwise direction, starting from the
+ +ve X axis direction.
+<p>
+ 
+ At the program start, it is not fixed.
+<p>
+ 
+ This should only be used if you are either certain of the angle, or
+ sure the stars are round (in which case set the angle to zero).
+<p>
+ 
+<hr>
+ <h2> 14.9 <a name="fixem"> Fixem </h2> </a> <p>
+ 
+  (Default - present values     <br> Choice - 0 or 1)
+<p>
+ 
+  This inputs four integer values, each either 0 or 1. These are input
+  as (say) `1,0,1,0'. These values are then switches as to whether the
+  wing parameters are fixed or varying when doing the wing fit.
+<p>
+ 
+<pre>
+  0 = Fix ;    1 = Free (varying)
+</pre><p>
+ 
+<hr>
+ <h2> 14.10 <a name="fixprof"> Fixprof </h2> </a> <p>
+ 
+ (Default - present value           <br> Choice - `yes:no')
+<p>
+ 
+ Option for whether to have the main profile parameter, that you are
+ being asked about, fixed or not.
+<p>
+ 
+ At the program start, none are fixed.
+<p>
+ 
+ You are asked about five of the parameters in the main profile
+ (Rmaj, Rmin, Power, PRmaj, PRmin) in turn. (The angle parameter is
+ then asked for with the control `FIXANGLE', but that is separate
+ to this particular bit of help.)
+<p>
+ 
+ The usual reason for fixing these parameters is that you are sure
+ of what they are, and/or you do not want them to change, and/or
+ you want to speed the fit up.
+<p>
+ 
+ The values of the profile can be input via the OPTION:PROFCHANGE
+ and then the `VALUE' input. But in this case, all the profile
+ parameters are asked for, the 6 of the Lorentzian and the 3 of the
+ Gaussian.
+<p>
+ 
+<hr>
+ <h2> 14.11 <a name="flip"> Flip </h2> </a> <p>
+ 
+ (Default - 0        <br> Choice -  -n to +n, n being the number of stars
+                               in list)
+<p>
+ 
+ The number of the star to have its fitted angle flipped by 180 degs.
+ If +n, then the nth star has its angle increased by 180deg, if -n
+ then the nth star has it decreased by 180. This sometimes helps
+ in the calculation of the mean.
+<p>
+ 
+ For no more changes, type 0.
+<p>
+ 
+<hr>
+ <h2> 14.12 <a name="gtype"> Gtype </h2> </a> <p>
+ 
+  (Default - `xwindows'            <br> Choice - any)
+<p>
+ 
+  A character string giving the local name for the graphics
+  display type.
+<p>
+ 
+  `xwindows' will put it out on the screen of your X-window device,
+  if you are using one.
+<p>
+ 
+  If `ask' is input, then the program asks a very similar question,
+  in a different way. A response here of `?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+ 
+<hr>
+ <h2> 14.13 <a name="height"> Height </h2> </a> <p>
+ 
+  (Default - present value     <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ Set the value of the `Wing height' parameter in the modified
+ Gaussian profile. This is the fractional height of the Gaussian
+ wing compared to the main Lorentz profile.
+<p>
+ 
+ It is usual to set this to more than 0.0. If it is less than
+ zero, then if the wing fit to determine the wing profile is done,
+ the result is unpredictable.
+<p>
+ 
+<hr>
+ <h2> 14.14 <a name="htlim"> Htlim </h2> </a> <p>
+ 
+  (Default - present value     <br> Range - 0.0 to 100.0)
+<p>
+ 
+  The `limit' in the height changes when the fit is thought to
+  have settled, while doing the main Lorentz profile fitting.
+<p>
+ 
+  It is the fractional change, at an iteration step in the least squares
+  fit, in the height of the main star that is  changing. Its changes
+  must be less than this before the least squares iterations stop.
+<p>
+ 
+  Normal value = 0.001.
+<p>
+ 
+  See the `Fitlim' parameter for the limit on the fractional change
+  in the profile values.
+<p>
+ 
+<hr>
+ <h2> 14.15 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the file containing a 2-D image which has the stars
+ in it whose profile it is desired to measure.
+<p>
+ 
+ A null `return' entry is not allowed.
+<p>
+ 
+ This image must be in either the `short' 16-bit integer or `real'
+ 32-bit real standard Starman NDF format.
+<p>
+ 
+<hr>
+ <h2> 14.16 <a name="incomps"> Incomps </h2> </a> <p>
+ 
+  (default - null)
+<p>
+ 
+ Input an existing table with the companions, faint companions and
+ bad areas in it.
+<p>
+ 
+ A `blank' entry of just typing `return' will result in no table being
+ input.
+<p>
+ 
+ The table must be in the format of the `OUTCOMPS' output of this
+ program, and may well may have been made from a previous run of
+ the program.
+<p>
+ 
+ A `Companion' is a star that is close and comparably bright
+ to the target star. A faint star in the fitting box is not a companion,
+ neither is a bright star on the edge of the box. (These are the faint
+ companions.) In the fitting, companion stars are fitted along with
+ the target stars, with their profiles being varied with the target
+ stars to minimise the total residuals of the joint fit. Up to seven
+ companion stars are allowed for each target star, and eight faint
+ companions. Up to sixteen bad areas can be marked near each target
+ star.
+<p>
+<pre>
+ 
+ Col  Header          Contents
+ ---  ------          --------
+  1   X OR XS         X posn of comp or X start of 
+                      bad area
+  2   Y OR YS         Y posn of comp or Y start of 
+                      bad area
+  3   HT OR XE        Height or X end of bad area
+  4   NULL OR YE      Null   or Y end of bad area
+  5   NULL            Empty
+  6   1:2:3=          Code for line (1:2:3=Comp:
+      COMP:FC:BAREA   faint comp:bad area)
+</pre><p>
+ 
+<hr>
+ <h2> 14.17 <a name="inprof"> Inprof </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ Input an existing image containing the profile.
+<p>
+ 
+ This image, contained in a file, holds the profile in the standard
+ Starman way, that is the profile parameters are the descriptors
+ of the image and the profile empirical map, if any, is contained
+ in the image itself.
+<p>
+ 
+ A `blank' entry of just typing `return' will result in no image being
+ input.
+<p>
+ 
+ The image must be in the standard format. It may have been produced via
+ the `OUT' output of PROFILE during this or a previous run, or
+ may have been generated by another means.
+<p>
+ 
+<hr>
+ <h2> 14.18 <a name="instars"> Instars </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the file containg the table of the positions of the stars
+ to be fitted.
+<p>
+ 
+ A null `return' entry is not allowed.
+<p>
+ 
+ This can be  either a simple (X,Y list), or it could contain more
+ information. For example, the output star table of the `OUTSTAR'
+ parameter of PROFILE can be fed in here, and all the PROFILE
+ information on the fitting to the stars would be available.
+<p>
+ 
+ Thus a run on PROFILE could take off from where it stopped.
+ (If other information on companion stars and bad areas is needed that
+ can also be input with the OPTION:FILELOAD command.) Also the output
+ table from MEASURE could be used as this input, and the profile and
+ height information would be taken as wellas the X,Y positions. Indeed,
+ for any table with `HEIGHT' as one ofthe descriptors, the heights would
+ be input. This kind of preliminary information is useful in speeding up
+ the fitting.
+<p>
+ 
+<hr>
+ <h2> 14.19 <a name="linecol"> Linecol </h2> </a> <p>
+ 
+   (Default - `black'            <br> Choice - (black:white)
+<p>
+ 
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+ 
+<hr>
+ <h2> 14.20 <a name="moption"> Moption </h2> </a> <p>
+ 
+ (Default - last option     <br> Choice - see below)
+<p>
+ 
+ Which of the following options, to do with looking at the empirical map
+ and modifying it, do you want to do?
+<p>
+ 
+ This enables you to look at the empirical profile map closely and to
+ modify it.
+<p>
+<pre>
+ 
+ Option          Function
+ ------          --------
+ clear           Clear the display window
+ display         Display the profile empirical map array
+ original        Load map as before entering this MAP option
+ reset           Reset zoom/pan to unity and centre
+ return          Return to main OPTION choice
+ smooth          Smooth profile map by >top hat> NxM box
+ spolyin         Define a polygon with cursor, smooth area inside
+ spolyout        Define a polygon with cursor, smooth area outside
+ values          Type out values for an area of the profile map
+ zero            Zero all profile map
+ zoom            Zoom and pan image by using mouse location
+ zpolyin         Define a polygon with cursor, zero area inside
+ zpolyout        Define a polygon with cursor, zero area outside
+ zrect           Define a rectangle with cursor, zero area inside
+</pre><p>
+ 
+ 
+ This enables you to look at the profile map closely and to
+ change it to some extent.
+<p>
+ 
+ When defining the polygons, you use the cursor and the
+ buttons. Place the cursor at consecutive vertices of the
+ desired polygon, and press any button. To end the input of
+ vertices, do a repeat press, without moving the cursor, on
+ the last vertex. A line showing where the polygon lies is
+ output whilst you are doing this.
+<p>
+ 
+<hr>
+ <h2> 14.21 <a name="number"> Number </h2> </a> <p>
+ 
+  (Default - see below       <br> Range - see below)
+<p>
+ 
+  This is asked for in a number of different contexts. It thus has
+  a number of various uses, depending on option in the `OPTION'
+  parameter that you have selected:-
+<p>
+ 
+<p>
+<pre> 
+  Option        Use
+  ------        ---
+  Info_star     Number of star you want the complete 
+                 fit details for.
+  Fix_set_xy    Number of star you whose position you 
+                 want fixed (Minus that number frees 
+                 the position; 0 exits from this 
+                 option).
+  Fit_one       Number of the star you want fitted.
+  Disp_fit_one  Number of the star you want displayed
+</pre><p>
+ 
+<hr>
+ <h2> 14.22 <a name="numbutt"> Numbutt </h2> </a> <p>
+ 
+  (Default - see below          <br> Range - 2 to 3)
+<p>
+ 
+  Number of `X-Window' buttons available on the mouse.
+<p>
+ 
+  Some devices have two and some have three buttons available. This
+  can depend both on their actual presence, and also on the X Windows
+  software that is being run.
+<p>
+ 
+  With three buttons, then the Starman programs use all three, with
+  the right-hand button being used mainly as the `exit' button.
+<p>
+ 
+  With two buttons, then the third button is simulated by pressing
+  both of the buttons down, with the middle one being pressed slightly
+  BEFORE the left-hand one. Use of the middle button in its normal
+  way has to be modified, in that one has to pause for half a second
+  after using it.
+<p>
+ 
+  [This parameter is usally `hidden', with the machine manager setting
+   it to the appropriate value for the local set-up. Sometimes it will
+   be left to the user to set, depending on his software configuartion.]
+<p>
+ 
+<hr>
+ <h2> 14.23 <a name="ok"> Ok </h2> </a> <p>
+ 
+  (Default - various, depending on use       <br> Choice - `yes:no')
+<p>
+ 
+ This can be demanded at various stages in the program,
+<p>
+ 
+ What is wanted here will be clear from the previous operation, or
+ information line just typed out. It generally gives you
+ a chance to agree or disagree with some question that the program
+ wants answering.
+<p>
+ 
+ Often the program will suggest the `usual' answer. For example, you
+ may have chosen to calculate the residuals map before you have
+ calculated a mean profile, which would be a silly thing to do.
+ The program checks if you really mean this. Then by typing NO, you
+ can escape back to the OPTION choice. (Of course, you may want to do
+ this for some reason, perhaps the default profile is usable, in which
+ case just type YES.)
+<p>
+ 
+<hr>
+ <h2> 14.24 <a name="option"> Option </h2> </a> <p>
+ 
+  (Default - see below   <br> Choices see below)
+<p>
+ 
+ What operation, from a menu of possible choices, to do next?
+<p>
+ 
+ It is the general option choice, which you repeatedly come back to
+ after performing operations. You select one of the menu operations.
+<p>
+ 
+ When you started the program, you were asked for the input image and
+ input star list. Then you started on this option choice. Generally the
+ default option is a repeat of the last option. However at the start,
+ a standard set of options is given as the default
+<p>
+ 
+ Your choices are:-
+<p>
+<pre> 
+ 
+ Option          Function
+ ------          --------
+ angle           Change Fix/Vary angle and/or angle
+ box_size        Change size of box round stars used for 
+                  fitting
+ clear           Clear the display window
+ close           Close the display screen
+ comp_zero       Delete all comp/faint comp/bad area 
+                  list entries
+ controls_fit    Change internal controls of fit 
+                  calculating
+ disp_fit_all    Display the areas + residuals to the 
+                  fits
+ disp_fit_one    Display the areas + residuals to a 
+                  single fit
+ display         Display image
+ exit            Exit from this program
+ fit_all         Fit all the accepted stars
+ fit_changed     Fit only stars with changed 
+                  circumstances
+ fit_one         Fit a certain star
+ fit_rough       Make rough estimate of posns, heights, 
+                  radii
+ fit_trial       Calculate the mean profile from one star
+ fix_set_xy      Set fixed/varying positions and/or 
+                  the posns
+ flip            Rotate profile ellipse of stars by 180 
+                  degrees
+ info_fits       List the present fits
+ info_fitting    Type intermediate step results in the 
+                  fitting
+ info_star       List the fit, comps, bads of a star
+ interact_fit    Interact with the display of fits
+ map_add         Add the Residuals array onto the Profile 
+                  Map
+ map_disp        Display the profile map
+ map_interact    Interact with the display of Profile Map
+ map_scale       Change Profile Map scale (mult/div its 
+                  values)
+ map_size        Change Profile Map size
+ map_use         Change whether to apply the Profile Map 
+                  or not
+ map_zero        Zero the Profile Map
+ mean            Decide which stars to use; find mean 
+                  weighted profile
+ new_cm_pr       Load some previous stuff (Comps, Bad 
+                  areas, Fit)
+ new_image       Input new image to replace the present 
+                  one
+ new_stars       Input list of star posns to replace 
+                  present ones
+ panel           Switch between panel and keyboard 
+                  option selection
+ prof_change     Change the mean profile parameters
+ prof_fix        Change fixed/variable control on 
+                  profile params
+ radial_plot     Put a radial plot of profile and fit 
+                  into file
+ reject          Change which stars are 
+                  accepted/rejected
+ res_calc        Calculate the array of residuals
+ res_disp        Display the mean fit residuals 
+                  array
+ res_fill        Fill any -empty- pixels in the 
+                  residuals array
+ res_interact    Interact with the display of 
+                  residuals array
+ shift_all       Shift XY positions of all the stars 
+                  and comps
+ show_reject     Put red border for rejected stars on 
+                  display
+ store           Save the profile and fits
+ volume          Calculate the profile volume
+ wing            Fit a broad Gaussian wing - zero broad 
+                  wing start
+</pre><p>
+ 
+ 
+ The `shift&#95 all' option shifts the X,Y positions of all the stars
+ and companions and faint companions. It leaves the bad areas unmoved.
+ This enables you to use the lists from one exposure on another where
+ the field centre is different, but where the detector bad areas are
+ at the same positions.
+<p>
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+ 
+<hr>
+ <h2> 14.25 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The name of the new output file containing the image into which the
+ present profile parameters and empirical profile map are to be written
+ into.
+<p>
+ 
+ A `blank' entry of just typing `return' will result in no file being
+ made.
+<p>
+ 
+ The parameters of the profile (RX,RY,P,PRX,PRY,THETA,QH,QR,QP,VOL)
+ are written as descriptors of this file, together with the
+ XMAG and YMAG descriptors which show the subdivision of the image
+ pixels into a finer spaced grid in which the profile mean residuals
+ are calculated. The size of this image is about 7*max(YMAG,XMAG)*RX,RY
+ with the precise factor depending on the angle of the
+ profile to the X-Y directions.
+<p>
+ 
+ The file is an Integer*2 (16bit) file and the residuals are stored
+ as the residuals that a star of peak height 10 000 would have (but
+ this is noted by the BSCALE factor, so other programs get the right
+ values.)
+<p>
+ 
+ This file can be used as input to MEASURE (qv), and can be re-input
+ into PROFILE, via (INPROF) at any time.
+<p>
+ 
+<hr>
+ <h2> 14.26 <a name="outcomps"> Outcomps </h2> </a> <p>
+ 
+ (Default - null)
+<p>
+ 
+ The name of the new output file containing the table with the
+ positions and fitted heights of the companions and faint companions,
+ and the positions of the boxes containing the bad areas near the stars.
+<p>
+ 
+ This file can be re-input into PROFILE, via (INCOMPS) at any time.
+<p>
+<pre>
+ 
+ Col  Header          Contents
+ ---  ------          --------
+  1   X OR XS         X posn of comp or X start of 
+                       bad area
+  2   Y OR YS         Y posn of comp or Y start of 
+                       bad area
+  3   HT OR XE        Height or X end of bad area
+  4   NULL OR YE      Null   or Y end of bad area
+  5   NULL            Empty
+  6   1:2:3=          Code for line (1:2:3=Comp:
+      COMP:FC:BAREA    faint comp:bad area)
+</pre><p>
+ 
+ The positions are absolute positions in the image.
+<p>
+ 
+<hr>
+ <h2> 14.27 <a name="outradial"> Outradial </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  Name of file to put the 1-D radial plot of the profile and fit into.
+<p>
+ 
+  This is output as a table, with rows given the values at
+  different radial distances from the centre. The columns
+  contain the data as:-
+<p>
+<pre>
+ 
+ Col   Header      Contents
+ ---   ------      --------
+  1    DISTANCE    Distance from centre
+  2    FIT         Value of fitted profile
+  3    DATA        Actual data values fitted 
+  4    RESIDUALS   Data - fit
+</pre><p>
+ 
+<hr>
+ <h2> 14.28 <a name="outstars"> Outstars </h2> </a> <p>
+ 
+ (Default - null)
+<p>
+ 
+ The name of the new output file containing the table with the details
+ of the present individual fits to the stars.
+<p>
+ 
+ This table can be re-input (via INSTARS) into PROFILE to carry on the
+ analysis when starting again.
+<p>
+ 
+<hr>
+ <h2> 14.29 <a name="posn"> Posn </h2> </a> <p>
+ 
+  (Default - present position.     <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  Position in image to fix star at.
+<p>
+ 
+<hr>
+ <h2> 14.30 <a name="postype"> Postype </h2> </a> <p>
+ 
+  (Default - see below         <br> Choice - `spot:cross')
+<p>
+ 
+  Mark the positions of the stars with spots ('spot') or crosses
+  ('cross'). The default is the opposite to what is being used at
+  the moment. At the start of the program the `cross' option is
+  set.
+<p>
+ 
+  If the `cross' option is chosen, then the length of the crosses
+  in pixels is asked for, via the `CWIDTH' parameter.
+<p>
+ 
+<hr>
+ <h2> 14.31 <a name="power"> Power </h2> </a> <p>
+ 
+ (Default - Present value      <br> Range - 0.1 to 100.0)
+<p>
+ 
+ Set the value of the `Wing power' parameter in the modified
+ Gaussian profile.
+<p>
+ 
+ It is usual to have it fixed, as this prevents low values of it being
+ found which give unrealistically high values of the profile at great
+ distances (which are not shown in the display of the fitting.)
+<p>
+ 
+<hr>
+ <h2> 14.32 <a name="radius"> Radius </h2> </a> <p>
+ 
+  (Default - `Present Value'       <br> Range -   1.0e-20 to 1.0e20.0)
+<p>
+ 
+  The Radius in the modified Gaussian wing part of the profile.
+<p>
+<pre> 
+ 
+  I  =  A.( Lorentz + QH.Gauss )  + Empirical
+ 
+                          QP
+                       -d3
+           Gauss = QH.e
+ 
+ where  A  = star height
+ 
+        d3 = sqrt(((x-X0)/QR)**2+((y-Y0)/QR)**2)
+ 
+ QH is usually small, of the order of 0.01
+ P and QP are usually about 2
+ the PRs are usually about 6*the Rs
+ QR is usually greater than 5*the Rs
+</pre><p>
+ 
+  For more details, see the above help section on the profile.
+<p>
+ 
+<hr>
+ <h2> 14.33 <a name="reject"> Reject </h2> </a> <p>
+ 
+ (Default - 0       <br> Range -  -n to +n, n being the number of stars in
+                             list)
+<p>
+ 
+ The number of the star to be rejected (+n), or to be accepted in spite
+ of having been rejected (-n). If any star has been rejected or
+ accepted, the mean fit is recalculated and another chance given for
+ the fit.
+<p>
+ 
+ If there are no more changes to be made, type 0.
+<p>
+ 
+<hr>
+ <h2> 14.34 <a name="roption"> Roption </h2> </a> <p>
+ 
+ (Default - last option     <br> Choice - see below)
+<p>
+ 
+ Which of the following options, to do with looking at the residuals
+ map closely and modifying it, do you want to do?
+<p>
+ 
+ This enables you to look at the residuals map closely and to
+ change it to some extent.
+<p>
+ 
+ These options enable you to look at the residuals map
+ closely and to change it to some extent.
+<p>
+<pre>
+ 
+ Option          Function
+ ------          --------
+ calculate       Calculate the array of residuals
+ clear           Clear the display window
+ display         Display the mean fit residuals array
+ fill            Fill any -empty- pixels in the residuals array
+ original        Load original values from last fit calculations
+ reset           Reset zoom/pan to unity and centre
+ return          Return to main OPTION choice
+ smooth          Smooth profile map by >top hat> NxM box
+ spolyin         Define a polygon with cursor, smooth area inside
+ spolyout        Define a polygon with cursor, smooth area outside
+ values          Type out values for an area of the residual array
+ zero            Zero all residual array
+ zoom            Zoom and pan image by using mouse location
+ zpolyin         Define a polygon with cursor, zero area inside
+</pre><p>
+ 
+ 
+ When defining the polygons, you use the cursor and the
+ buttons. Place the cursor at consecutive vertices of the
+ desired polygon, and press any button. To end the input of
+ vertices, do a repeat press, without moving the cursor, on
+ the last vertex. A line showing where the polygon lies is
+ output whilst you are doing this.
+<p>
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+<hr>
+ <h2> 14.35 <a name="scale"> Scale </h2> </a> <p>
+ 
+  (Default - last      <br> Range - 1.0e-8 to 1.0e8)
+<p>
+ 
+  Value to scale the standard empirical profile map by. (Not the
+  factor to multiply the last scaled map, but the absolute scale, i.e.
+  `scale=10, and then `scale=2' has the same effect as scale=2).
+<p>
+ 
+  This is not really useful.
+<p>
+ 
+<hr>
+ <h2> 14.36 <a name="screen"> Screen </h2> </a> <p>
+ 
+  (Default - see below        <br> Range - 1 to full size of device)
+<p>
+ 
+  This the size of the screen or window to use, input as two integers
+  for the X and Y size.
+<p>
+ 
+  The default is set large enough to take the display of the small
+  residual maps around each star, but you are advised to double this
+  at least, to allow for zooming in inspection.
+<p>
+ 
+<hr>
+ <h2> 14.37 <a name="shiftxy"> Shiftxy </h2> </a> <p>
+ 
+  (Default - 0.0,0.0      <br> Ranges - -1.0e20 to 1.0e20)
+<p>
+ 
+  Input as two real numbers as (say)  1.5,20.2
+<p>
+ 
+  The shift in X and Y on the input image to be applied to all the
+  star positions, with their companions, and the bad areas.
+<p>
+ 
+  This is useful when you are doing an image, and you have an input
+  list of star positions, which is displaced for this image.
+<p>
+ 
+<hr>
+ <h2> 14.38 <a name="size"> Size </h2> </a> <p>
+ 
+  (Default - present values     <br> Range - 1 to 200)
+<p>
+ 
+  Input two numbers as (say) 10,12.
+<p>
+ 
+  Input the X and Y size of the area of either of:-
+<p>
+<ul>
+<li>-  the fitting box (the area that the fits are done in, and
+which is displayed on the image display).
+<p><li>-  the profile map. This does not have to be the same size
+as the fitting area. The size is the number of pixels of
+the image that the profile map covers. This can be
+different than the computer storage size and the size
+of the profile file image, since the profile map may
+map to sub-divided image pixels, and thus contain more
+data points.
+</ul><p>
+ 
+<hr>
+ <h2> 14.39 <a name="smsize"> Smsize </h2> </a> <p>
+ 
+ (Default - 3        <br> Range - all +ve odd integers 3 to 32767)
+<p>
+ 
+  Input two number as (say)  `5,5'.
+<p>
+ 
+ These are the sizes of the sides of the box to be used in the
+ smoothing of the residuals or profile maps.
+<p>
+ 
+ The smoothing is done by replacing each pixel with the average
+ value of the pixels in the box surrounding that pixel. ('Top hat'
+ smoothing.) This is why the sides must have an odd number of
+ pixels.
+<p>
+ 
+ If the sides of the box are larger than the map to be smoothed
+ or if the area of the box is more than 32767 pixels, the
+ input wont work, and you are asked again.
+<p>
+ 
+<hr>
+ <h2> 14.40 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - various      <br> Choice -any)
+<p>
+ 
+  Title to add as a descriptor to the output file.
+<p>
+ 
+  The output file in question is the one you are opening and
+  writing to. It can be:-
+<p>
+<ul> 
+<li>- the profile image file
+<li>- the stars table file
+<li>- the companions/bad areas table file
+<li>- the Gaussian wing profile table file
+</ul><p>
+ 
+<hr>
+ <h2> 14.41 <a name="mode"> Mode </h2> </a> <p>
+ 
+  (Default - `inter'            <br> Choice - `auto:inter')
+<p>
+ 
+  Do the fitting interactively with the user, or do an automatic
+  fit, where a profile is derived without much sophistication?
+<p>
+ 
+<hr>
+ <h2> 14.42 <a name="usemap"> Usemap </h2> </a> <p>
+ 
+ (Default - present state     <br> Choice - `yes:no')
+<p>
+ 
+ A choice as to whether to use whatever Profile Map exists in the
+ fitting or residuals display. Generally any action that zeroes the
+ Profile Map, sets this option to no, and any that loads a non-zero
+ one sets it to yes.
+<p>
+ 
+<hr>
+ <h2> 14.43 <a name="value"> Value </h2> </a> <p>
+ 
+  ( Default -  present value        <br> Range -  -1.0e20 to 1.0e20)
+<p>
+ 
+  After the OPTION:PROFCHANGE choice, you are then asked for the values
+  of the 9 parameters of the entire profile. The 6 of the Lorentx
+  profile (Rmaj, Rmin, Power, PRmaj, PRmin, Angle) and the 3 of the
+  Gaussian wing (Fractional height, Radius, Power). The angle should
+  be input in degrees.
+<p>
+ 
+  At the program start, the values are:-
+     (2.0, 2.0, 2.2, 10.0, 10.0, 0.0; 0.0, 10.0, 2.0).
+<p>
+ 
+  (These can be changed as a result of doing the OPTION:ROUGH choice.)
+<p>
+ 
+  Depending on which of the parameters you have/have not fixed (at the
+  start none are fixed), these cannot/can vary during a fit.
+<p>
+ 
+<hr>
+ <h2> 14.44 <a name="volrad"> Volrad </h2> </a> <p>
+ 
+  (Default - present value      <br> Range - 1.0 to 1.0e6)
+<p>
+ 
+ If calculating profile volume, how many pixels out to carry
+ calculations.
+<p>
+ 
+ This is a rather minor parameter. The program will normally start
+ with a value of 30 pixels. This may be changed when a `profile' image
+ file is read in, as that file contains its own `volrad' parameter.
+<p>
+ 
+<hr>
+ <h2> 14.45 <a name="wdamp"> Wdamp </h2> </a> <p>
+ 
+  (Default - present value           <br> Range - 0.0 to 100.0 )
+<p>
+ 
+  The damping factor in the fitting least squares method, whilst
+  doing the 1-D Gaussian wing profile fitting.
+<p>
+ 
+  This controls the spize of the adjustments in the fitting. The
+  smaller the number, the less the internal damping, and so the
+  bigger the steps, the faster the fitting, and also the risk of
+  shooting out of the best `least squares' path and so mis-fitting.
+  In general, values are such that:-
+<p>
+ 
+        0.0 = no damping, 0.5 = normal, 1.0 = a lot of damping.
+<p>
+ 
+<hr>
+ <h2> 14.46 <a name="wfitlim"> Wfitlim </h2> </a> <p>
+ 
+  (Default - present value         <br> Range - 0.0 to 100.0)
+<p>
+ 
+  The `limit' in the profile parameter changes when the fit is thought
+  to have settled, while doing the 1-D Gaussian wing profile fitting.
+<p>
+ 
+  It is the fractional change, at an iteration step in the least squares
+  fit, in each of the profile parameter values that are changing. Their
+  changes must be less than this before the least squares iterations
+  stop. Normal value = 0.001.
+<p>
+ 
+  See the `Whtlim' parameter for the limit on the fractional change
+  in the star height.
+<p>
+ 
+<hr>
+ <h2> 14.47 <a name="wfitok"> Wfitok </h2> </a> <p>
+ 
+ (Default - `no'      <br> Choice - `yes:no')
+<p>
+ 
+  Have the good stars been fitted with a fixed profile to the present
+  data with the present companions and blank areas? By the present
+  data is meant the data in the normal `small' boxes, not that in the
+  `large', `wing' boxes round each star.
+<p>
+ 
+  If not, a fit will be done to the `small' boxes.
+<p>
+ 
+<hr>
+ <h2> 14.48 <a name="whtlim"> Whtlim </h2> </a> <p>
+ 
+  (Default - present value     <br> Range - 0.0 to 100.0)
+<p>
+ 
+  The `limit' in the height parameter changes when the fit is thought
+  to have settled, while doing the 1-D Gaussian wing profile fitting.
+<p>
+ 
+  It is the fractional change, at an iteration step in the least squares
+  fit, in the star fractional height parameter value that is changing.
+  Its changes must be less than this before the least squares
+  iterations stop. Normal value = 0.001.
+<p>
+ 
+  See the `Wfitlim' parameter for the limit on the fractional change
+  in the profile values.
+<p>
+ 
+<hr>
+ <h2> 14.49 <a name="woption"> Woption </h2> </a> <p>
+ 
+  (Default - last <br> choice     Choice - see below)
+<p>
+ 
+ Which of the following options, to do with looking at the wing
+ profile closely and modifying it, do you want to do?
+<p>
+ 
+ These options enable you to estimate the parameters of the wide
+ Gaussian wing:-
+<p>
+<pre>
+ 
+ Option          Function
+ ------          --------
+ display         Display the areas + residuals to the fits
+ fit_gcursor     Fit to wing points input by cursor
+ fit_graw        Fit to raw wing points as calculated
+ fit_stars       Fit stars in the large areas round each star
+ gclose          Close the graphics device
+ gcursor         Put -better- wing points in by cursor
+ gplot           Plot the wing points graphically
+ gshowfit        Plot fitted line
+ interact        Interact with the display of fits
+ return          Return to main option
+ set_param       Insert your own wing profile values
+ type_Param      Type present wing parameters
+</pre><p>
+ 
+ 
+ Further information on these options is given in the six line help
+ window that appears in the `panel' mode, and contains relevant help
+ when the cursor is placed on a button.
+<p>
+ 
+ 
+ The program sums up all the accepted stars, subtracts the fitted fixed
+ Lorentzian profiles, folds the data round the centre and fits the
+ modified Gaussian. The program then plots
+ the data and draws the Gaussian it has fitted. If you have
+ chosen an interactive terminal, you can then modify the fit by marking
+ (via the cursor) points which you think best show the actual profile
+ and the program then fits the Gaussian to these points and draws the
+ fitted curve on the device. You can then redefine a new set of points
+ as often as you like until you are satisfied with the fit.
+<p>
+ 
+  You can:-
+<p>
+<ul> 
+<li>-  Look at a larger area round each star to see if there are areas
+to be blanked off, or stars to be marked so that the fits can
+be redone.
+<p><li>-  Fit the stars. This does a fit, and calculates the residual
+radial distribution of data that is left.
+<p><li>-  Look at the 1-D distribution of residual data on a graph,
+and if it looks corrupted input your own residual distribution.
+<p><li>-  Fit the wing profile parameters to the 1-D residual profile,
+either by fitting to calculated points, or fitting to the
+hand input points.
+<p><li>-  Look at the wing profile parameter fit to the 1-D distribution.
+<p><li>-  Put in your own estimates of the wing profile parameters, and
+say if they should be fixed or not.
+</ul><p>
+ 
+ The point about the option for hand inputting is that sometimes
+ the raw points are disturbed by miscellaneous things in the large
+ areas used in determining the wing profile. You can thus use
+ some judgement and put the radial distribution where you think it
+ should be.
+<p>
+ 
+ In putting your own set of points of the radial distribution, be sure
+ to put in enough that the fit can make a good fit to them.
+<p>
+ 
+   A normal course might be to:-
+<p>
+<pre> 
+ Display      Display the x2 areas round the stars
+ Interact     Blank off or mark up the extra stars in
+              the large wing areas
+ Fit_stars    Fit the stars in the large wing area and calc
+              the distribution of wing data points
+ Gplot        Look at the wing data points
+ Gcursor      Put your own smoothly distributed wing data
+              points by using the graphics cursor
+ Fit_gcursor  Fit the wing parameters to your cursor input
+</pre><p>
+ 
+   After this you can loop round changing the cursor positions
+   and/or refining the fit. The fit is usally very delicate
+   and it is common to adjust the profile parameters by hand
+   before a number of fits to get a good fit
+<p>
+ 
+    Then:-
+<p>
+<pre> 
+        -Return-    back to the main option
+</pre><p>
+ 
+ 
+<hr>
+ <h2> 14.50 <a name="xarea"> Xarea </h2> </a> <p>
+ 
+ (Default - 1,X size       <br> Range - 1 to X size, 1 to X size)
+<p>
+ 
+ The X region of the profile or residuals map you want to type out.
+<p>
+ 
+<hr>
+ <h2> 14.51 <a name="yarea"> Yarea </h2> </a> <p>
+ 
+ (Default - 1,Y size      <br> Range -  1 to Y size, 1 to Y size)
+<p>
+ 
+ The Y region of the profile or residuals map you want to type out.
+<p>
+ 
+ 
+<hr>
+ <h2> 15 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+           A J Penny               RAL            1994 Jan
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,318 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBWEED
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBWEED
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbweed_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbweed">
+t_tbweed  </a>  Make a table with only those entries with parameters in ranges       <br>
+<a href="#tbwe_gcl">
+tbwe_gcl  </a>  Get weeding parameters       <br>
+<a href="#tbwe_check">
+tbwe_check  </a>  Find how many rows to output       <br>
+<a href="#tbwe_doit">
+tbwe_doit  </a>  Move 'good' rows from input table to output table       <br>
+<a href="#tbweed">
+tbweed  </a>  (Program) Weed from a table rows with values in forbidden ranges       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  TBWEED.FOR
+C
+C    Contains:-
+C
+C T_TBWEED   Make a table with only those entries with parameters in ranges
+C TBWE_GCL    Get weeding parameters
+C TBWE_CHECK  Find how many rows to output
+C TBWE_DOIT   Move 'good' rows from input table to output table
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbweed"> T_TBWEED  </a>-- Make a table with only those entries with parameters in ranges
+C This makes a new table which is a copy of the old table, but only those
+C rows whose defined parameters fall in (or outside )the assigned ranges are
+C copied over.
+C
+C         A J Penny            RAL                           1991 May
+
+      subroutine t_tbweed ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      character title*30
+      integer ierr, kacc, ip, ipo, iv, ncol(10), ntot
+      real toplim(10), botlim(10)
+Cbegin
+
+
+      call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbweed', iv, 	!Extract Title
+     +              ierr )
+      TBX = TBVX - 5
+
+      call pargc ( title )						!Type out info about table
+      call printd ( ' Title = %c' )
+      call pargi ( TBX )
+      call pargi ( TBY )
+      call printd ( ' No of columns = %d  No of rows = %d' )
+
+      call tbwe_gcl ( ncol, botlim, toplim, ntot, kacc )			!Get weeding factors
+
+      call tbwe_check ( %val(ip), ntot, ncol, botlim, toplim, kacc )	!Find no of entries passed
+
+      if ( ST_FAILED ) return
+
+      if ( TBYO.ne.0 ) then
+
+         call optabw ( 'OUT', ipo, TBVX, TBYO, .false., ierr )		!Open output list
+         if ( ierr.ne.0 ) ST_FAILED = .true.
+         if ( ST_FAILED ) return
+
+         call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and store it and the descriptors
+         if ( ierr.ne.0 ) ST_FAILED = .true.
+         call get1c  ( 'TITLE', title, title, .true. )
+         if ( ST_FAILED ) return
+         call ptdesc ( 'OUT', 'TITLE', title )
+
+         call tbwe_doit ( %val(ip), %val(ipo), ntot, ncol, botlim,	!Do the loading of the Output from the Input
+     +                   toplim, kacc )
+
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbwe_gcl"> TBWE_GCL  </a>-- Get weeding parameters
+C
+C    a j penny               rgo                      82-11-4
+
+      subroutine tbwe_gcl ( ncol, botlim, toplim, ntot, kacc )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      integer	ncol(10)	!o: Columns to select on
+      real	botlim(10)	!o: Bottom limits
+      real	toplim(10)	!o: Top limits
+      integer   ntot            !o: No of parameters to check
+      integer	kacc		!o: Accept or reject flag (a/r=1/2)
+C--
+      integer k, kk, ncolin
+      real    botlimin, toplimin
+      logical more
+      character text*72, namea*5, nameb*6
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call printo ( 'Accept or reject inside the limits ?' )		!Get wether accept or reject inside the limits
+      call get_job ( 'OPTION', 'accept:reject', kacc, 1, text, 0 )
+      if ( ST_FAILED ) return
+
+      more = .true.
+      ntot = 0
+      k = 0
+      do while ( more .and. k.lt.10 )
+
+         k = k + 1							!Get position of test parameter
+         kk = min(k,TBX)
+         if ( k.lt.10 ) then
+            write ( namea, '(''NCOL'',i1)' ) k
+            call get1i ( namea, ncolin, kk, 0, TBX )
+         else
+            write ( nameb, '(''NCOL'',i2)' ) k
+            call get1i ( nameb, ncolin, kk, 0, TBX )
+         endif
+         if ( ST_FAILED ) return
+         if ( ncolin.eq.0 ) then
+            more = .false.
+         else
+            botlimin = 0.0						!Get the limits
+            toplimin = 0.0
+            if ( k.lt.10 ) then					
+               write ( namea, '(''LIMS'',i1)' ) k
+               call get2r ( namea, botlimin, toplimin, .true.,
+     +                      -1.0e20, 1.0e20 )
+            else
+               write ( nameb, '(''LIMS'',i2)' ) k
+               call get2r ( nameb, botlimin, toplimin, .true.,
+     +                      -1.0e20, 1.0e20 )
+            endif
+            if ( ST_FAILED ) return
+            ntot = ntot + 1
+            ncol(ntot) = ncolin
+            botlim(ntot) = botlimin
+            toplim(ntot) = toplimin
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbwe_check"> TBWE_CHECK  </a>-- Find how many rows to output
+C
+C    a j penny               rgo                      82-11-4
+
+      subroutine tbwe_check ( tb, ntot, ncol, botlim, toplim, kacc )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	tb(TBVX,TBY)	!i: Input table
+      integer   ntot            !i: No of parameters to check
+      integer	ncol(10)	!i: Columns to select on
+      real	botlim(10)	!i: Bottom limits
+      real	toplim(10)	!i: Top limits
+      integer	kacc		!i: Accept or reject flag (a/r=1/2)
+C--
+      integer j, k, ka
+      real d
+      logical ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      TBYO = 0
+      do k = 1, TBY
+         ok = .true.
+         do j = 1, ntot
+            ka = 5 + ncol(j)
+            d = tb(ka,k)
+            if ( kacc.eq.1 ) then
+               if ( d.lt.botlim(j) .or. d.gt.toplim(j) ) ok = .false.
+            else
+               if ( d.ge.botlim(j) .and. d.lt.toplim(j) ) ok = .false.
+            endif
+         enddo
+         if ( ok ) TBYO = TBYO + 1
+      enddo
+
+      if ( TBYO.eq.0 ) then
+         call printo ('No entries in range(s) - no output table')
+         return
+      else
+         call pargi ( TBYO )
+         call printd ( 'Number of rows in output table = %d' )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbwe_doit"> TBWE_DOIT  </a>-- Move 'good' rows from input table to output table
+C
+C    alan penny              ral              1990-06-12
+
+      subroutine tbwe_doit ( tb, tbo, ntot, ncol, botlim, toplim, kacc)
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	tb(TBVX,TBY)		!i: Input table
+      real	tbo(TBVX,TBYO)		!o: Output table
+      integer   ntot            	!i: No of parameters to check
+      integer	ncol(10)		!i: Columns to select on
+      real	botlim(10)		!i: Bottom limits
+      real	toplim(10)		!i: Top limits
+      integer	kacc			!i: Accept or reject flag (a/r=1/2)
+C--
+      integer n, j, k, ka
+      real d
+      logical ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      n = 0
+      do k = 1, TBY
+         ok = .true.
+         do j = 1, ntot
+            ka = 5 + ncol(j)
+            d = tb(ka,k)
+            if ( kacc.eq.1 ) then
+               if ( d.lt.botlim(j) .or. d.gt.toplim(j) ) ok = .false.
+            else
+               if ( d.ge.botlim(j) .and. d.lt.toplim(j) ) ok = .false.
+            endif
+         enddo
+         if ( ok ) then
+            n = n + 1
+            call coprr ( tb, TBVX, TBY, 1, TBVX, k, k,
+     +                   tbo, TBVX, TBYO, 1, n )
+         endif
+      enddo
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbweed"> TBWEED  </a>-- (Program) Weed from a table rows with values in forbidden ranges
+C   See TBWEED.HLP for details
+C
+C         A.J.Penny                RAL                      1991 May
+
+      subroutine tbweed ( ierradam )
+
+      implicit none
+
+      integer      ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbweed
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

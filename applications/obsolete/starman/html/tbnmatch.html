@@ -1,0 +1,169 @@
+<HTML> <HEAD>
+<TITLE> TBNMATCH </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBNMATCH - <br>
+ Put tables in the same order of names
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Put tables in the same order of names.
+<p>
+ 
+  This takes up to 40 tables and reorders the numbers of the rows
+  so that the output tables all have the names of the rows in the
+  same order. As some tables may not have rows with names that
+  occur in other table(s), then dummy rows with zero entries are
+  added and/or inserted into the output tables. Such rows are
+  flagged with a user defined value set in a user defined column.
+<p>
+ 
+  If a table has more than one row with the same name, then of those
+  rows, only the last such row is copied over.
+<p>
+ 
+  The order of the output rows will be that of the first table,
+  then that of those rows in the second table which are not in
+  the first table, then that of the rows in the third table that
+  are not in the first two, and so on.
+<p>
+ 
+  Up to 40 tables may be input.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbnmatch_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#flagcol"> Flagcol </a>
+<li> 1.2 <a href="#flagval"> Flagval </a>
+<li> 1.3 <a href="#in"> In </a>
+<li> 1.4 <a href="#maximum"> Maximum </a>
+<li> 1.5 <a href="#out"> Out </a>
+<li> 1.6 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="flagcol"> Flagcol </h2> </a> <p>
+ 
+  (Default - 3          <br> Range - 1 to smallest number of columns in
+                                     input tables)
+<p>
+ 
+  Column in output tables to put a flag value into to indicate a
+  missing entry. The other entries in that row will be set at zero.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="flagval"> Flagval </h2> </a> <p>
+ 
+  (Default - 50.0              <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  Value to put in `flag' column to indicate a missing entry.
+  The other entries in that row will be set at zero.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The input file containing the input nth table.
+<p>
+ 
+  Put a null to end. (Must have at least one input table.)
+<p>
+ 
+  [This help refers to the up to 40 input tables, through the
+  parameters 'IN1', 'IN2', ... 'IN40'.]
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="maximum"> Maximum </h2> </a> <p>
+ 
+  (Default - 10000        <br> Range - 1 to 1000000)
+<p>
+ 
+  Maximum number of rows allowed to occur in output tables.
+  (This is limitedfor the sake of efficiency in the computing.)
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The output file containing the reordered (and possibly extended)
+  version of the corresponding input table.
+<p>
+ 
+  [This help refers to the up to 40 input tables, through the
+  parameters 'OUT1', 'OUT2', ... 'OUT40'.]
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="title"> Title </h2> </a> <p>
+ 
+ (Default - Input file title or `Output from Tbnmatch'     <br> Choice - any)
+<p>
+ 
+ The Title to be inserted in the Output file.
+<p>
+ 
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny                RAL                   1991 July
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,124 @@
+<HTML> <HEAD>
+<TITLE> TBSORT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBSORT - <br>
+ Sort entries in a table
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This takes a table and makes a new one with identical entries,
+   but sorted on the values in a user defined column, either in
+   ascending or descending order.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbsort_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in"> In </a>
+<li> 1.2 <a href="#numcol"> Numcol </a>
+<li> 1.3 <a href="#option"> Option </a>
+<li> 1.4 <a href="#out"> Out </a>
+<li> 1.5 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the input table
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="numcol"> Numcol </h2> </a> <p>
+ 
+  (Default - 1            <br> Range - 1 to last column)
+<p>
+ 
+  The  number of the column to do the sorting on.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="option"> Option </h2> </a> <p>
+ 
+   (Default - 'ascending'      <br> Choice - 'ascending:descending')
+<p>
+ 
+   Whether to sort into ascending or descending order.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file to contain the output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input table title or 'Output from Tbsort'    <br> Choice - any)
+<p>
+ 
+    The Title to be added to the output file
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny                  RAL               1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

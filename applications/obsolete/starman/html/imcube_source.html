@@ -1,0 +1,867 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMCUBE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMCUBE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imcube_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imcube">
+imcube  </a>  (Program) Cuts a 2-D plane out of a 3- or 4-D cube       <br>
+<a href="#t_imcube">
+t_imcube  </a>  Cut a plane out of a 3- or 4-D cube       <br>
+<a href="#imcb_start">
+imcb_start  </a>  Get parameters and Open input and output image       <br>
+<a href="#imcb_doit">
+imcb_doit  </a>  Copy data from input to output - base       <br>
+<a href="#imcb_doitr">
+imcb_doitr  </a>  Copy data from input to output - real       <br>
+<a href="#imcb_doiti">
+imcb_doiti  </a>  Copy data from input to output - integer       <br>
+<a href="#imcb_doits">
+imcb_doits  </a>  Copy data from input to output - short       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcube"> IMCUBE  </a>-- (Program) Cuts a 2-D plane out of a 3- or 4-D cube
+C
+C     a j penny               ral                      1991 April
+
+      subroutine imcube ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imcube
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMCUBE.F
+C
+C   Contains:-
+C
+C T_IMCUBE     Cut a plane out of a 3- or 4-D cube
+C IMCB_START   Get parameters and Open input and output image
+C IMCB_DOIT    Copy data from input to output - base
+C IMCB_DOITR   Copy data from input to output - real
+C IMCB_DOITI   Copy data from input to output - integer
+C IMCB_DOITS   Copy data from input to output - short
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imcube"> T_IMCUBE  </a>-- Cut a plane out of a 3- or 4-D cube
+C
+C   alan penny               ral                 1991 April
+
+      subroutine t_imcube ()
+
+      implicit none
+C--
+Cbegin
+
+
+      call imcb_start			!Get parameters and open images
+
+      call imcb_doit			!Do the conversion
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcb_start"> IMCB_START  </a>-- Get parameters and Open input and output image
+C
+C alan penny          ral                   1991 April
+
+      subroutine imcb_start ()
+
+      implicit none
+      include 'imcube.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+C--
+      integer i, j, nd(4), istat
+      character*80 cv, cva
+
+      character*6 tplane1(3), tplane2(6), tplane3(6)
+      data tplane1, tplane2, tplane3 / 'ZPLANE', 'YPLANE', 'XPLANE',
+     +   'ZPLANE', 'YPLANE', 'YPLANE', 'XPLANE', 'XPLANE', 'XPLANE',
+     +   'TPLANE', 'TPLANE', 'ZPLANE', 'TPLANE', 'ZPLANE', 'YPLANE' /
+      integer nd1(3), nd2(6), nd3(6)
+      data nd1, nd2, nd3 / 3, 2, 1, 3, 2, 2, 1, 1, 1,
+     +                              4, 4, 3, 4, 3, 2 /
+
+      integer nth2
+      parameter ( nth2=6 )
+      character*68 th2(nth2)
+      data th2 /
+     + 'Cut which plane out of 3-D (XYZ) cube? :- ',
+     + 'Option   Choice',
+     + '------   --------',
+     + 'XY       XY plane',
+     + 'XZ       XZ plane',
+     + 'YZ       YZ plane'/
+
+      integer nth3
+      parameter ( nth3=9 )
+      character*68 th3(nth3)
+      data th3 /
+     + 'Cut which plane out of 4-D (XYZT) cube? :- ',
+     + 'Option   Choice',
+     + '------   --------',
+     + 'XY       XY plane',
+     + 'XZ       XZ plane',
+     + 'XT       XT plane',
+     + 'YZ       YZ plane',
+     + 'YT       YT plane',
+     + 'TZ       TZ plane'/
+Cbegin
+
+
+      call opim4zr ( 'IN', IPIM, NX, NY, NZ, NT, NDIM, IMTYPE,		!Get input image
+     +               .false., i )
+      if ( i.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      if ( NDIM.lt.4 ) NT = 1
+      if ( NDIM.lt.3 ) NZ = 1
+
+      call pargi ( NX )							!Type out size of input image
+      call pargi ( NY )
+      if ( NDIM.eq.2 ) then
+         call printd ( ' Input image is 2-D (XY) : %d x %d' )
+      elseif ( NDIM.eq.3 ) then
+         call pargi ( NZ )
+         call printd ( ' Input image is 3-D (XYZ) : %d x %d x %d' )
+      else
+         call pargi ( NZ )
+         call pargi ( NT )
+         call printd(' Input image is 4-D (XYZT) : %d x %d x %d x %d')
+      endif
+      call pargc ( IMTYPE )
+      call printd ( ' Image type is: %c ' )
+      call printo ( ' ' )
+      NPLANE = 1							!Get plane to cut
+      if ( NDIM.le.2 ) then
+         call printo ( 'As input image is 2D, 2D output image is same')
+      elseif ( NDIM.eq.3 ) then
+         call printo ( 'Planes to choose from are: xy:xz:yz' )
+         call get_job ( 'PLANE3', 'xy:xz:yz', NPLANE, 1, th2, nth2 )
+      elseif ( NDIM.eq.4 ) then
+         call printo ( 'Planes to choose from are: xy:xz:xt:yz:yt:zt')
+         call get_job ( 'PLANE4', 'xy:xz:xt:yz:yt:zt', NPLANE, 1, th3,
+     +                  nth3 )
+      endif
+
+      nd(1) = NX							!Get which plane(s) to cut from
+      nd(2) = NY
+      nd(3) = NZ
+      nd(4) = NT
+      NP(1) = 1
+      NP(2) = NZ
+      NPP(1) = 1
+      NPP(2) = NT
+      if ( NDIM.eq.3 ) then
+         call get2i ( tplane1(NPLANE), NP(1), NP(2),
+     +                .true., 1, nd(nd1(NPLANE)) )
+      elseif ( NDIM.eq.4 ) then
+         call get2i ( tplane2(NPLANE), NP(1), NP(2),
+     +                .true., 1, nd(nd2(NPLANE)) )
+         call get2i ( tplane3(NPLANE), NPP(1), NPP(2),
+     +                .true., 1, nd(nd3(NPLANE)) )
+      endif
+
+      NXO = NX
+      if ( NPLANE.eq.3 .and. NDIM.eq.3 ) NXO = NY
+      if ( NPLANE.eq.4 ) NXO = NY
+      if ( NPLANE.eq.5 ) NXO = NY
+      if ( NPLANE.eq.6 ) NXO = NZ
+      NYO = NY
+      if ( NPLANE.eq.2 ) NYO = NZ
+      if ( NPLANE.eq.3 .and. NDIM.eq.3 ) NYO = NZ
+      if ( NPLANE.eq.3 .and. NDIM.eq.4 ) NYO = NT
+      if ( NPLANE.eq.4 ) NYO = NZ
+      if ( NPLANE.eq.5 ) NYO = NT
+      if ( NPLANE.eq.6 ) NYO = NT
+
+      if ( IMTYPE.eq.'REAL' )  call opimrw ( 'OUT', IPO, NXO, NYO, 	!Get output image
+     +                                       .false.,i)	
+      if ( IMTYPE.eq.'INT' )   call opimiw ( 'OUT', IPO, NXO, NYO,
+     +                                       .false.,i)	
+      if ( IMTYPE.eq.'SHORT' ) call opimsw ( 'OUT', IPO, NXO, NYO,
+     +                                       .false.,i)	
+      if ( i.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call icopdes (  'IN', 'OUT', i )					!Copy descriptors
+      call ptdesi ( 'OUT', 'NAXIS', 2 )
+      if ( NDIM.ge.3 ) call dldes ( 'OUT', 'NAXIS3', istat )
+      if ( NDIM.ge.4 ) call dldes ( 'OUT', 'NAXIS4', istat )
+
+      call gtdesc ( 'IN', 'TITLE', cv, ' ', j, i )			!Get output image title
+      call get1c ( 'TITLE', cva, cv, .true. )
+      call ptdesc ( 'OUT', 'TITLE', cva )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcb_doit"> IMCB_DOIT  </a>-- Copy data from input to output - base
+C
+C alan penny          ral                   1991 April
+
+      subroutine imcb_doit ( )
+
+      implicit none
+      include 'imcube.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( IMTYPE.eq.'REAL'  ) call imcb_doitr ( %val(IPIM), %val(IPIM),
+     +                                           %val(IPIM), %val(IPO) )
+      if ( IMTYPE.eq.'INT'   ) call imcb_doiti ( %val(IPIM), %val(IPIM),
+     +                                           %val(IPIM), %val(IPO) )
+      if ( IMTYPE.eq.'SHORT' ) call imcb_doits ( %val(IPIM), %val(IPIM),
+     +                                           %val(IPIM), %val(IPO) )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcb_doitr"> IMCB_DOITR  </a>-- Copy data from input to output - real
+C
+C alan penny          ral                   1991 April
+
+      subroutine imcb_doitr ( in2, in3, in4, out )
+
+      implicit none
+      include 'imcube.inc'
+      include 'ST_IMAGE_INC'
+
+      real       in2(NX,NY)		!i: Input 2-D data
+      real       in3(NX,NY,NZ)		!i: Input 3-D data
+      real       in4(NX,NY,NZ,NT)	!i: Input 4-D data
+      real       out(NXO,NYO)		!o: Output integer image
+C--
+      integer j, k, kk, kka, kkb, kf
+Cbegin
+
+
+      if ( NDIM.eq.2 ) then
+
+         do k = 1, NYO
+            do j = 1, NXO
+               out(j,k) = in2(j,k)
+            enddo
+         enddo
+
+      elseif ( NDIM.eq.3 ) then
+
+         if ( NPLANE.eq.1 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(j,k,kk).eq.RINVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(j,k,kk)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+         elseif ( NPLANE.eq.2 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(j,kk,k).eq.RINVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(j,kk,k)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+         else
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(kk,j,k).eq.RINVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(kk,j,k)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+         endif
+
+      elseif ( NDIM.eq.4 ) then
+
+        if ( NPLANE.eq.1 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,k,kka,kkb).eq.RINVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,k,kka,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.2 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,kka,k,kkb).eq.RINVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,kka,k,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.3 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,kka,kkb,k).eq.RINVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,kka,kkb,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.4 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,j,k,kkb).eq.RINVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,j,k,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.5 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,j,kkb,k).eq.RINVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,j,kkb,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+        else
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,kkb,j,k).eq.RINVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,kkb,j,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = RINVAL
+               enddo
+            enddo
+        endif
+
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcb_doiti"> IMCB_DOITI  </a>-- Copy data from input to output - integer
+C
+C alan penny          ral                   1991 April
+
+      subroutine imcb_doiti ( in2, in3, in4, out )
+
+      implicit none
+      include 'imcube.inc'
+      include 'ST_IMAGE_INC'
+
+      integer    in2(NX,NY)		!i: Input 2-D data
+      integer    in3(NX,NY,NZ)		!i: Input 3-D data
+      integer    in4(NX,NY,NZ,NT)	!i: Input 4-D data
+      integer    out(NXO,NYO)		!o: Output integer image
+C--
+      integer j, k, kk, kka, kkb, kf
+Cbegin
+
+
+      if ( NDIM.eq.2 ) then
+
+         do k = 1, NYO
+            do j = 1, NXO
+               out(j,k) = in2(j,k)
+            enddo
+         enddo
+
+      elseif ( NDIM.eq.3 ) then
+
+         if ( NPLANE.eq.1 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(j,k,kk).eq.INVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(j,k,kk)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+         elseif ( NPLANE.eq.2 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(j,kk,k).eq.INVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(j,kk,k)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+         else
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(kk,j,k).eq.INVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(kk,j,k)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+         endif
+
+      elseif ( NDIM.eq.4 ) then
+
+        if ( NPLANE.eq.1 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,k,kka,kkb).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,k,kka,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.2 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,kka,k,kkb).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,kka,k,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.3 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,kka,kkb,k).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,kka,kkb,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.4 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,j,k,kkb).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,j,k,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.5 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,j,kkb,k).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,j,kkb,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        else
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,kkb,j,k).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,kkb,j,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        endif
+
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imcb_doits"> IMCB_DOITS  </a>-- Copy data from input to output - short
+C
+C alan penny          ral                   1991 April
+
+      subroutine imcb_doits ( in2, in3, in4, out )
+
+      implicit none
+      include 'imcube.inc'
+      include 'ST_IMAGE_INC'
+
+      integer*2  in2(NX,NY)		!i: Input 2-D data
+      integer*2  in3(NX,NY,NZ)		!i: Input 3-D data
+      integer*2  in4(NX,NY,NZ,NT)	!i: Input 4-D data
+      integer*2  out(NXO,NYO)		!o: Output integer image
+C--
+      integer j, k, kk, kka, kkb, kf
+Cbegin
+
+
+      if ( NDIM.eq.2 ) then
+
+         do k = 1, NYO
+            do j = 1, NXO
+               out(j,k) = in2(j,k)
+            enddo
+         enddo
+
+      elseif ( NDIM.eq.3 ) then
+
+         if ( NPLANE.eq.1 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(j,k,kk).eq.INVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(j,k,kk)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+         elseif ( NPLANE.eq.2 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(j,kk,k).eq.INVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(j,kk,k)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+         else
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kk = NP(1), NP(2)
+                     if ( in3(kk,j,k).eq.INVAL ) then
+                        kf = 1
+                     else
+                        out(j,k) = out(j,k) + in3(kk,j,k)
+                     endif
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+         endif
+
+      elseif ( NDIM.eq.4 ) then
+
+        if ( NPLANE.eq.1 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,k,kka,kkb).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,k,kka,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.2 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,kka,k,kkb).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,kka,k,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.3 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(j,kka,kkb,k).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(j,kka,kkb,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.4 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,j,k,kkb).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,j,k,kkb)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        elseif ( NPLANE.eq.5 ) then
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,j,kkb,k).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,j,kkb,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        else
+            do k = 1, NYO
+               do j = 1, NXO
+                  kf = 0
+                  out(j,k) = 0.0
+                  do kkb = NPP(1), NPP(2)
+                     do kka = NP(1), NP(2)
+                        if ( in4(kka,kkb,j,k).eq.INVAL ) then
+                           kf = 1
+                        else
+                           out(j,k) = out(j,k) + in4(kka,kkb,j,k)
+                        endif
+                     enddo
+                  enddo
+                  if ( kf.eq.1 ) out(j,k) = INVAL
+               enddo
+            enddo
+        endif
+
+      endif
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  IMCUBE.INC
+
+
+      integer   ipo			!Output image pointer
+      integer   nz			!Image Z size
+      integer   nt			!Image T size
+      integer   ndim			!Image no of dimensions
+      integer   nplane			!Code for which plane to cut out
+      integer   np(2)			!Range in first ommitted plane to cut from
+      integer   npp(2)			!Range in second ommitted plane to cut from
+      integer   nxo			!Output Image X size
+      integer   nyo			!Output Image Y size
+
+CX      logical imcb_dum1			!Make logicals up to times 4
+CX      logical imcb_dum2			!Make logicals up to times 4
+CX      logical imcb_dum3			!Make logicals up to times 4
+
+
+
+      common / cubea / ipo,    nplane,  nz,    nt,  ndim,
+     +                  nxo,     nyo,   np,   npp
+
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,162 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBTRAN_DO
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBTRAN_DO
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbtran_do_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbtran_do">
+t_tbtran_do  </a>  Apply transformation       <br>
+<a href="#tbtrd_trans">
+tbtrd_trans  </a>  Load output with transformed input       <br>
+<a href="#tbtran_do">
+tbtran_do  </a>  (Program) Apply transformation to positions in a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C    TBTRAN_DO.FOR
+C
+C    Contains:-
+C
+C T_TBTRAN_DO      Apply transformation to positions
+C TBTRD_TRANS      Load output with transformed input
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbtran_do"> T_TBTRAN_DO  </a>-- Apply transformation
+C   For a fuller description see TBTRAN_DO.HLP
+C
+C   alan penny                     ral           1990-06-15
+
+      subroutine t_tbtran_do ()
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+C--
+      real trc(6)
+      integer ipin, ipo, ierr, iv
+      character title*50
+Cbegin
+
+
+      call optabr ( 'IN', ipin, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call azeror ( trc, 6 )						!Get transfomations
+      trc(2) = 1.0
+      trc(6) = 1.0
+      call get3r ( 'XCOEFF', trc(1), trc(2), trc(3), .true., -1.0e20,
+     +             1.0e20 )
+      if ( ST_FAILED ) return
+      call get3r ( 'YCOEFF', trc(4), trc(5), trc(6), .true., -1.0e20,
+     +             1.0e20 )
+      if ( ST_FAILED ) return
+
+      call optabw ( 'OUT', ipo, TBVX, TBY, .false., ierr )		!Open output table
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call tcopdes ( 'IN', 'OUT', ierr )				!Get title to output list and
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtdesc ( 'IN', 'TITLE', title, 'Output from Tbtran_do',	! store it and the descriptors
+     +              iv, ierr )
+      call get1c  ( 'TITLE', title, title, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+      call tbtrd_trans ( %val(ipin), trc, %val(ipo) )			!Load the Output from the Input
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtrd_trans"> TBTRD_TRANS  </a>-- Load output with transformed input
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbtrd_trans ( in, trc, out )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	in(TBVX,TBY)	!i: Input table
+      real	trc(6)		!i: Transformation table
+      real	out(TBVX,TBY)	!o: Output table
+C--
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call amovr ( in, out, TBVX*TBY )					!Transfer whole table
+
+      do k = 1, TBY							!Make new positions
+         out(6,k) = trc(1) + trc(2)*in(6,k) + trc(3)*in(7,k)
+         out(7,k) = trc(4) + trc(5)*in(6,k) + trc(6)*in(7,k)
+      enddo
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtran_do"> TBTRAN_DO  </a>-- (Program) Apply transformation to positions in a table
+C   See TBTRAN_DO.HLP for details
+C
+C         A.J.Penny                RGO                             83-8-14
+
+      subroutine tbtran_do ( ierradam )
+
+      implicit none
+
+      integer     ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbtran_do
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,158 @@
+<HTML> <HEAD>
+<TITLE> IMPORT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMPORT - <br>
+ Load descriptors from other packages
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  In the ADAM system, the image descriptors are kept in
+  separate sections, called `extensions'. Starman programs
+  access only the `Starman extension'.
+<p>
+ 
+  If you are using Adam NDF images which have not been made by
+  Starman, then if there are image descriptors in the one of the
+  other ADAM extensions, then you will need to copy the descriptors
+  into the STARMAN extension, where the Starman programs look for
+  them.
+<p>
+ 
+  An example of this would be CCD FITS images read in with the
+  KAPPA FITSIN program, when the descriptors would be in the FITS
+  extension. This is, in fact, set as the default, a copy from the
+  FITS extension to STARMAN extension.
+<p>
+ 
+  This program loads the contents on one 'extension' that contains a
+  set of 'descriptors' into another 'extension'. It does not create
+  a new image. Thus you need write access to the input image, as
+  well as the usual read access.
+<p>
+ 
+  It has some suggestions for extension names for reading from and
+  writing to, but you can copy between any extensions.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#import_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#delete"> Delete </a>
+<li> 1.2 <a href="#from"> From </a>
+<li> 1.3 <a href="#in"> In </a>
+<li> 1.4 <a href="#in_exten"> In&#95 exten </a>
+<li> 1.5 <a href="#out_exten"> Out&#95 exten </a>
+<li> 1.6 <a href="#to"> To </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="delete"> Delete </h2> </a> <p>
+ 
+  (Default - 'no'            <br> Choice - 'yes:no')
+<p>
+ 
+  Delete the contents of extension (and the extension itself) that you
+  are reading the descriptors from.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="from"> From </h2> </a> <p>
+ 
+  (Default - 'fits'    <br> Choice - 'fits:starman:figaro:other')
+<p>
+ 
+  The choice of extension to copy descriptors from.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input/output image.
+<p>
+ 
+  The image must be a standard ADAM .SDF image. It must have
+  both 'read' and 'write' permission.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="in_exten"> In&#95 exten </h2> </a> <p>
+ 
+  (Default - null             <br> Choice - any)
+<p>
+ 
+  The name of the extension to copy descriptors from.
+<p>
+ 
+  This is asked for if the input extension is not one of the
+  standard ones (starman:fits:figaro).
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="out_exten"> Out&#95 exten </h2> </a> <p>
+ 
+  (Default - null              <br> Choice - any)
+<p>
+ 
+  The name of the extension to copy descriptors to.
+<p>
+ 
+  This is asked for if the output extension is not one of the
+  standard ones (starman:fits:figaro).
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="to"> To </h2> </a> <p>
+ 
+  (Default - 'starman'    <br> Choice - 'fits:starman:figaro:other')
+<p>
+ 
+  The choice of extension to copy descriptors to.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny               RAL           1994 June
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,211 @@
+<HTML> <HEAD>
+<TITLE> TBKEY </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBKEY - <br>
+ Input numbers from keyboard into a table
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This program inputs data for a table from the keyboard.
+<p>
+ 
+  The user inputs the following information on the keyboard:-
+<p>
+<ol>
+<li> The number of columns the output table will have.
+<p>
+ 
+<li> The lines (rows) of data, in the format:-
+<p>
+ 
+<strong> r1,r2,r3,,,rn,name </strong>
+<p>
+ 
+     The `r1', `r2' ,,   are the input values. If less numbers than
+     the number of columns is input, the later ones will be assigned
+     the value zero. Up to 100 entries can be input in the line (up
+     to the maximum set by the `NUMCOL' parameter).
+<p>
+ 
+     The `name' is the identifier for the row. If this is ommitted
+     then the identifier will be "\#N', where `N' is the number of the
+     row. The identifier can have up to 20 characters.
+<p>
+ 
+     The total length of the character string must be less than or
+     equal to 256 characters.
+<p>
+ 
+<li> A null entry signifying the end of inputting data.
+<p>
+ 
+<li>  The name of the file to output the table to.
+<p>
+ 
+<li> A text string as the `title' to the table
+<p>
+ 
+<li> Text strings as `headers' for each column.
+</ol><p>
+ 
+ 
+   If more than 1000 lines are to be input, you must set the MAXROW
+   parameter accordingly, before entering the program.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbkey_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#data"> Data </a>
+<li> 1.2 <a href="#header"> Header </a>
+<li> 1.3 <a href="#numcol"> Numcol </a>
+<li> 1.4 <a href="#maxrow"> Maxrow </a>
+<li> 1.5 <a href="#out"> Out </a>
+<li> 1.6 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="data"> Data </h2> </a> <p>
+ 
+  ( Default - null        <br> Choice - see below)
+<p>
+ 
+  A character string giving the data to be input, in the format:-
+<p>
+ 
+<strong>        r1,r2,r3,,,rn,name </strong>
+<p>
+ 
+     The 'r1', 'r2' ,,   are the input values. If less numbers than
+     the number of columns is input, the later ones will be assigned
+     the value zero. Up to 100 entries can be input in the line (up
+     to the maximum set by the 'NUMCOL' parameter).
+<p>
+ 
+     The total length of the character string must be less than or
+     equal to 256 characters.
+<p>
+ 
+ 
+     Where 'name' is the identifier for the row. If this is ommitted
+     then the identifier will be "#N', where 'N' is the number of the
+     row. The identifier can have up to 20 characters.
+<p>
+ 
+  A null entry signifies the end of inputting data.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="header"> Header </h2> </a> <p>
+ 
+  (Default - see below   <br> Choice - see below)
+<p>
+ 
+  The character string to act as header for the column. This can
+  be up to 20 characters long. This is asked for each column.
+<p>
+ 
+  The defaults are:-
+<p>
+<pre>
+ 
+    Column Number     Default
+    -------------     -------
+         1               'X'
+         2               'Y'
+         3             'MAGNITUDE'
+    later ones           ' '
+</pre><p>
+ 
+<hr>
+ <h2> 1.3 <a name="numcol"> Numcol </h2> </a> <p>
+ 
+  (Default - 2    <br> Range - 1 to 20)
+<p>
+ 
+  The number of columns to input into the table. (The identifier
+  does not count as a column.)
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="maxrow"> Maxrow </h2> </a> <p>
+ 
+  (Default - 1000   <br> Range - 1 to 1000000)
+<p>
+ 
+  The maximum number of rows that can be input.
+<p>
+ 
+  This is a hidden parameter, and is not asked for. It can be set on the
+  command line or by setting outside.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain the output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - 'Output from TBKEY'    <br> Choice - any)
+<p>
+ 
+  A character string (up to 50 characters) to be added to the output
+  file as its 'title'.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+   Alan Penny            RAL       1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

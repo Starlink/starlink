@@ -1,0 +1,380 @@
+<HTML> <HEAD>
+<TITLE> TBTRAN_AUTO </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBTRAN_AUTO - <br>
+ Transform one XY table to another
+automatically
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This takes a table with X,Y positions and makes a new one with identical
+   entries, but with the positions transformed onto the same coordinate
+   system as another XY table.
+<p>
+ 
+   There have to be common stars in the two tables but they do not have to
+   be matched, or aligned, or complete. The two coordinate systems must be
+   related by (shift:rotation:magnification). Thus `shapes' in the two
+   coordinate systems must be  similar. The program will fail if there is
+   a shear, or a different scaling in and X and Y, or a distortion.
+<p>
+ 
+   It helps the program considerably if there are heights or magnitudes
+   of the stars available. This is looked for in column three. If there
+   is a header with `height' or 'mag', then this column is taken to
+   have those values. If there is no such header, the user is asked
+   if they are. If there is no column 3, or it does not contain heights
+   or magnitudes, then the stars are analysed as though there are
+   ordered by height, with the `brightest' first.
+<p>
+ 
+   The entries in columns 1 and 2 are taken as `X', `Y'. The output table
+   then has values `X&#95 1', `Y&#95 1' with:-
+<p>
+     X&#95 1 =  c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+     Y&#95 1 =  c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+  With the `X coefficents', c&#95 x(1), c&#95 x(2), c&#95 x(3) and the
+  `Y coefficents', c&#95 y(1), c&#95 y(2), c&#95 y(3), are calculated by
+  the program.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbtran_auto_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#method"> Method </a>
+<li> 2 <a href="#parameters"> Parameters </a>
+<li> 3 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+  The program works out the triangle between the three
+  brightest stars in each list. It then looks at the two
+  triangles, and sees if they are the same by comparing
+  the ratios in each triangle of the length of longest
+  side to the length of next longest, and to the length
+  of the shortest side. If the ratios are the same within
+  a chosen tolerance, then the triangle probably must have
+  been made with the same stars.
+<p>
+ 
+  If the triangles do not match, then this is repeated
+  with the four brightest in each list. The program works
+  out all the possible triangles between the stars in each
+  list. It then looks at each triangle in one list, and
+  sees if there is a matching triangle in the other list.
+  If there is no match, this is then repeated with the five
+  brightest stars, and so on, until a match is made.
+<p>
+ 
+  The precision of the matching needed, and the number of
+  matched triangles needed to confirm the right matching has
+  been done is at the users choice.
+<p>
+ 
+  After enough triangles have been matched, and for each of these
+  matched triangles they are enough like it, and enough such
+  well matched triangles have been found, the stars in these
+  triangles are assumed to be the same in the two lists.
+<p>
+ 
+  Then the transformation equation between them is calculated.
+<p>
+ 
+  The transform can either be the (shift:rotation:magnification)
+  transform described above or a simple XY shift without rotation,
+  magnification or squeezing.
+<p>
+ 
+  The first ('input') list is then transformed into the
+  coordinate system of the second ('master') list, using this
+  transformation equation.
+<p>
+ 
+ Column three of the Input and Master tables are assummed to have either
+ the heights or magnitudes of the stars in the tables. These are then
+ used so that the program searches amongst the bright stars first for
+ triangle matches. If there is no column three for a table, then the
+ stars are taken in the order they are in in the table.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 2.1 <a href="#ftol"> Ftol </a>
+<li> 2.2 <a href="#in"> In </a>
+<li> 2.3 <a href="#in_mags"> In&#95 mags </a>
+<li> 2.4 <a href="#ms_mags"> Ms&#95 mags </a>
+<li> 2.5 <a href="#master"> Master </a>
+<li> 2.6 <a href="#ntri"> Ntri </a>
+<li> 2.7 <a href="#out"> Out </a>
+<li> 2.8 <a href="#title"> Title </a>
+<li> 2.9 <a href="#tol"> Tol </a>
+<li> 2.10 <a href="#totntri"> Totntri </a>
+<li> 2.11 <a href="#type"> Type </a>
+<li> 2.12 <a href="#xcoeff"> Xcoeff </a>
+<li> 2.13 <a href="#ycoeff"> Ycoeff </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="ftol"> Ftol </h2> </a> <p>
+ 
+  (Default - 5.0 or 2.0      <br> Range - 0.0 to 1.0e7)
+<p>
+ 
+  The X or Y distance that a position calculated from the transform
+  made for one matched triangle may be off from the position calculated
+  from another matched triangle, and the two triangles still
+  considered to be on the same coordinate system.
+<p>
+ 
+  The positions are calculated at the four corners of the system of
+  stars that are in the matched triangles. Actually a bit outside the
+  corners.
+<p>
+ 
+  This should be set as small as you think reasonable. If too small
+  the program will reject real triangle matches. If too large,
+  it will accept false triangle matches.
+<p>
+ 
+  The default error allowed is set at 2.0, for a simple XY shift, and
+  at 5.0 for the more flexible full transform.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the input table, to be transformed.
+<p>
+ 
+  The first two columns must be X,Y. It helps if there is a third
+  column with either height or magnitude.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="in_mags"> In&#95 mags </h2> </a> <p>
+ 
+  (Default - 'heights'             <br> Choice - 'heights:mags:none')
+<p>
+ 
+ Are the values in column three of the Input table magnitudes or
+ heights? [If this is described in the table header for this
+ column, this question is not asked.]
+<p>
+ 
+ Column three is used so that the program searches amongst the
+ bright stars first for matches. If there is no column three, or the
+ answer to this is `none', then the stars are taken in the order
+ they are in in the table.
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="ms_mags"> Ms&#95 mags </h2> </a> <p>
+ 
+  (Default - 'heights'              <br> Choice - 'heights:mags:none')
+<p>
+ 
+ Are the values in column three of the Master table magnitudes or
+ heights? [If this is described in the table header for this
+ column, this question is not asked.]
+<p>
+ 
+ Column three is used so that the program searches amongst the
+ bright stars first for matches. If there is no column three, or the
+ reply `none' is given, then the stars are taken in the order they are
+ in in the table.
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="master"> Master </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the master table, to whose coordinate
+  system the `input' table will be transformed.
+<p>
+ 
+  The first two columns must be X,Y. It helps if there is a third
+  column with either height or magnitude.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 2.6 <a name="ntri"> Ntri </h2> </a> <p>
+ 
+  (Default - 4      <br> Range - 1 to 10000)
+<p>
+ 
+  For each matched triangle, this is the number of other matched
+  triangles that must be like it, for the matched triangle to count
+  as a 'good' matched triangle.
+<p>
+ 
+  If made larger, the program will do a better job of rejecting
+  false triangles, but will take longer.
+<p>
+ 
+  If the program finds matches from only a small number of triangles,
+  it automatically relaxes this criteria.
+<p>
+ 
+<hr>
+ <h2> 2.7 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 2.8 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - Input table title or `Output from TBTRAN&#95 AUTO'
+   Choice - any)
+<p>
+ 
+  The Title to be added to the output file.
+<p>
+ 
+<hr>
+ <h2> 2.9 <a name="tol"> Tol </h2> </a> <p>
+ 
+  (Default - 1.0      <br> Range - 0.0 to 1.0e7)
+<p>
+ 
+  The X or Y distance a vertex of one triangle may be off from
+  the system of another matched triangle, and the two triangles
+  still be recognised as a match.
+<p>
+ 
+  This should be set as small as you think reasonable. If too small
+  the program will reject real triangle matches. If too large,
+  it will accept false triangle matches.
+<p>
+ 
+<hr>
+ <h2> 2.10 <a name="totntri"> Totntri </h2> </a> <p>
+ 
+  (Default - 8      <br> Range - 1 to 10000)
+<p>
+ 
+  This is the number of 'good' matched triangles that must be found
+  for a fit to be considered sound and the calculations stopped.
+<p>
+ 
+  [The definition of 'good' is given in the help for the NTRI
+   parameter.]
+<p>
+ 
+  If made larger, the program will do a better job of rejecting
+  false triangles, but will take longer.
+<p>
+ 
+  If the program finds matches from only a small number of triangles,
+  it automatically relaxes this criteria.
+<p>
+ 
+<hr>
+ <h2> 2.11 <a name="type"> Type </h2> </a> <p>
+ 
+  (Default - 'full'                  <br> Choice - 'full:xyshift')
+<p>
+ 
+ Should the transformation equation determined be a full one
+ (xy shift, rotation, magnification), or just an xy shift?
+<p>
+ 
+ The fit cannot be one that changes the shape of objects.
+<p>
+ 
+<hr>
+ <h2> 2.12 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+ 
+  (This is an output parameter)
+<p>
+ 
+  The three output coefficents for the X transform.
+<p>
+ 
+  Calculated    X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+ 
+<hr>
+ <h2> 2.13 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+ 
+  (This is an output parameter)
+<p>
+ 
+  The three output coefficents for the Y transform.
+<p>
+ 
+  Calculated    Y&#95 1 = c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+<hr>
+ <h2> 3 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    P W Morris                 Leeds             1994 Jan
+    A J Penny                  RAL               1994 Nov
+ 
+<hr>
+ 
+All rights reserved. &copy RAL 1995.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,326 @@
+<HTML> <HEAD>
+<TITLE> TBLIST </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBLIST - <br>
+ Type and/or put in text file the contents of a
+table
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+ Make a text (ASCII) version of a table which can be typed out
+ on the user's console, and can be output to an ASCII text file.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tblist_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#modes"> Modes </a>
+<li> 2 <a href="#header"> Header </a>
+<li> 3 <a href="#parameters"> Parameters </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="modes"> Modes </h2> </a> <p>
+ 
+ 
+ There are four modes of formatting the output.
+<p>
+ 
+The following list gives the options and the consequent output from
+each row:-
+<p>
+<dl>
+<dt><strong>  'SHORT'  </strong>
+<dd>  The name and the values of the first three columns.
+               The values are output in a 12 character floating format.
+<p>
+ 
+<dt><strong>  FULL </strong>
+<dd>    The name (optionally), and all columns. The values are
+               output in a 12 character floating format, with four
+               values in each line of the output.
+<p>
+ 
+<dt><strong>  FIXFORM </strong>
+<dd>    The name (optionally) and up to 15 selected columns are
+               output. The number of characters output in the names is
+               defined. The values are output with each column having a
+               fixed format of having so many places before the
+               decimal point, and so many after.
+<p>
+ 
+<dt><strong>  FORM </strong>
+<dd>    Up to 15 selected columns may be chosen from the table.
+               These are output with (optionally) the name. The number
+               of characters output in the names is defined. The values
+               are output in a 12 character floating format, with four
+               values in each line of the output.
+<p>
+ 
+<dt><strong>  HEADER  </strong>
+<dd>    Just puts out the standard header (see below).
+</dl><p>
+ 
+<hr>
+ <h2> 2 <a name="header"> Header </h2> </a> <p>
+ 
+ 
+  There is an option to preceed the values by a standard header.
+  This gives the title and the headers for the columns.
+  This standard is useful, as TBLOAD can use it to input a similar
+  (perhaps edited) text file. Its format is:-
+<p>
+<pre>
+No  Contents           1st ten characters  Contents
+--  --------           ------------------  --------
+1   Title              'Title is: '        up to 50 characters
+2   No of columns      'Columns = '        Integer
+3   No of rows         'Rows =    '        Integer
+4   1st column header  'HEAD001   '        up to 20 characters
+5   2nd column header  'HEAD002   '        up to 20 characters
+etc   etc                etc               etc
+X   No of descriptors  'NumDes =  '        Integer
+Y   1st descriptor     name                value
+Y   2nd descriptor     name                value
+etc  etc               etc                 etc
+</pre><p>
+ 
+   There must be the same number of headers as there are columns.
+<p>
+ 
+   [The number of columns does not include the names.]
+<p>
+ 
+   The 'no of descriptors' line must be there. If there are no
+   descriptors, then the number should be '0'.
+<p>
+ 
+   [The table size and headers are, strictly speaking, descriptors
+    themselves, but they are not counted as such in this
+    descriptor count. It is only concerned with other, incidental,
+    descriptors.]
+<p>
+ 
+<hr>
+ <h2> 3 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 3.1 <a href="#header"> Header </a>
+<li> 3.2 <a href="#in"> In </a>
+<li> 3.3 <a href="#naft"> Naft </a>
+<li> 3.4 <a href="#nbef"> Nbef </a>
+<li> 3.5 <a href="#ncol"> Ncol </a>
+<li> 3.6 <a href="#numname"> Numname </a>
+<li> 3.7 <a href="#out"> Out </a>
+<li> 3.8 <a href="#outmode"> Outmode </a>
+<li> 3.9 <a href="#typing"> Typing </a>
+<li> 3.10 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 3.1 <a name="header"> Header </h2> </a> <p>
+ 
+  (Default - see below        <br> Choice - 'full:short:none')
+<p>
+ 
+ The type of the text lines that precede the table contents lines in the
+ output.
+<p>
+ 
+  The Choice of types is:-
+<p>
+<pre>
+   Choice    Contents of the Lines
+   ----      ---------------------
+   Full      A standard heading, which gives the
+             size, the title, the headers for the
+             columns, and the descriptors.
+ 
+   Short     Just the title and the headers in a
+             short form
+ 
+   None      Nothing
+</pre><p>
+ 
+  The standard heading is useful, as TBLOAD can use it to input a similar
+  (perhaps edited) text file.
+<p>
+
+  The default is 'short', or 'full' if 'full' chosen for the value
+  output mode.
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input table
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 3.3 <a name="naft"> Naft </h2> </a> <p>
+ 
+  (Default - 2           <br> Range - 0 to 100)
+<p>
+ 
+  The number of characters after the decimal point in the output
+  column.
+<p>
+ 
+  [This refers to the up to 15 output columns through the parameters
+   'NAFT1', 'NAFT2', ... 'NAFT15'.]
+<p>
+ 
+<hr>
+ <h2> 3.4 <a name="nbef"> Nbef </h2> </a> <p>
+ 
+  (Default - 4           <br> Range - 0 to 100)
+<p>
+ 
+  The number of characters before the decimal point in the output
+  column.
+<p>
+ 
+  [This refers to the up to 15 output columns through the parameters
+   'NBEF1', 'NBEF2', ... 'NBEF15'.]
+<p>
+ 
+<hr>
+ <h2> 3.5 <a name="ncol"> Ncol </h2> </a> <p>
+ 
+  (Default - next       <br> Range - 0 to no of columns in table)
+<p>
+ 
+  The number of the column in the table to be output in the output
+  column.
+<p>
+ 
+  If 0 is input, no more columns are asked for.
+<p>
+ 
+  [This refers to the up to 15 output columns through the parameters
+   'NCOL1', 'NCOL2', ... 'NCOL15'.]
+<p>
+ 
+<hr>
+ <h2> 3.6 <a name="numname"> Numname </h2> </a> <p>
+ 
+  (Default - 12             <br> Range - 0 to 20)
+<p>
+ 
+  The number of characters of the name of each row to output.
+<p>
+ 
+  If 0 is chosen, then the name is not output.
+<p>
+ 
+<hr>
+ <h2> 3.7 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null           <br> Choice - see below)
+<p>
+ 
+  The name of the file containing the output ASCII file. This
+  should have a descriptor, i.e. a simple choice would be
+  'tblist.lis'. If the descriptor is omitted, then '.dat' is
+  taken.
+<p>
+ 
+  If the default null response is made, then no file is output.
+<p>
+ 
+<hr>
+ <h2> 3.8 <a name="outmode"> Outmode </h2> </a> <p>
+ 
+  (Default - 'short'      <br> Choice - 'short:full:fixform:form')
+<p>
+ 
+ The mode of formatting the output.
+<p>
+ 
+ There are four modes of formatting the output:-
+<p>
+<dl>
+<dt><strong>  'SHORT'  </strong>
+<dd>  The name and the values of the first three columns.
+               The values are output in a 12 character floating format.
+<p>
+ 
+<dt><strong>  FULL </strong>
+<dd>    The name (optionally), and all columns. The values are
+               output in a 12 character floating format, with four
+               values in each line of the output.
+<p>
+ 
+<dt><strong>  FIXFORM </strong>
+<dd>    The name (optionally) and up to 15 selected columns are
+               output. The number of characters output in the names is
+               defined. The values are output with each column having a
+               fixed format of having so many places before the
+               decimal point, and so many after.
+<p>
+ 
+<dt><strong>  FORM </strong>
+<dd>    Up to 15 selected columns may be chosen from the table.
+               These are output with (optionally) the name. The number
+               of characters output in the names is defined. The values
+               are output in a 12 character floating format, with four
+               values in each line of the output.
+<p>
+ 
+<dt><strong>  HEADER  </strong>
+<dd>    Just puts out the standard header (see below).
+</dl><p>
+
+<hr>
+ <h2> 3.9 <a name="typing"> Typing </h2> </a> <p>
+ 
+  (Default - 'yes'              <br> Choice - 'yes:no')
+<p>
+ 
+  Type out the output to the user's console?
+<p>
+ 
+<hr>
+ <h2> 3.10 <a name="author"> Author </h2> </a> <p>
+ 
+   Alan Penny                  RAL             1991 November
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

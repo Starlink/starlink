@@ -1,0 +1,213 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBJOIN
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBJOIN
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbjoin_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbjoin">
+t_tbjoin  </a>  Join together up to nine tables       <br>
+<a href="#tbjoin">
+ tbjoin  </a>  (Program) Join together two tables       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBJOIN.FOR
+C
+C  Contains:-
+C
+C T_TBJOIN   Join together up to 9 tables
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbjoin"> T_TBJOIN  </a>-- Join together up to nine tables
+C  For a full help see TBJOIN.HLP
+C
+C  alan penny                   RAL                         1991 May
+
+      subroutine t_tbjoin
+
+      implicit none
+      include 'STARMAN_INC'
+C--
+      character text*70, texth*30, itext*3, iitext*7
+      logical more, ok
+      integer tbx(9), tby(9), tbvx(9), tbxo, tbyo, tbvxo, ipin(9),
+     +        ipout, kshx(9), kshy(9), j, ja, i, ierr, iv,
+     +        tbxst, tbxen, tbyst, tbyen, kn, kxd, kyd
+Cbegin
+
+
+      tbyen = 0								!Get input tables
+      j = 0
+      more = .true.
+      do while ( more )
+
+         j = j + 1
+         itext = 'IN'
+         write ( itext(3:3), '(i1)' ) j
+
+         ok = .true.
+         if ( j.eq.1 ) ok = .false.
+         call optabr ( itext, ipin(j), tbvx(j), tby(j), ok, i )
+         if ( ST_FAILED ) return
+         if ( j.eq.1 .and. i.eq.2 ) then
+            call printo ( 'ERROR: First file must be present' )
+            ST_FAILED = .true.
+            return
+         endif
+
+         tbx(j) = tbvx(j) - 5
+         if ( i.eq.2 ) then
+            j = j - 1
+            more = .false.
+         else
+
+            if ( i.ne.0 .or. tbx(j).lt.1 .or. tby(j).lt.1 ) then
+               call printo ( 'ERROR: Input file wrong' )
+               ST_FAILED = .true.
+               return
+            endif
+
+            if ( j.eq.1 ) then
+               tbyen = tby(1)
+               kshx(1) = 0
+               kshy(1) = 0
+            else
+
+               iitext = 'COLOFF'					!Get X table displacement of file from 1st
+               write ( iitext(7:7), '(i1)' ) j
+               call get1i ( iitext, kshx(j), 0, -1000000, 1000000 )
+               if ( ST_FAILED ) return
+
+               iitext = 'ROWOFF'					!Get Y table displacement of file from start of 1st
+               write ( iitext(7:7), '(i1)' ) j
+               call get1i ( iitext, kshy(j), tbyen, -1000000, 1000000 )
+               if ( ST_FAILED ) return
+               tbyen = max(tbyen,(tby(j)+kshy(j)))
+
+            endif
+         endif
+
+         if ( j.eq.9 ) then
+            call printo ( 'Only 9 input files allowed' )
+            more = .false.
+         endif
+
+      enddo
+      kn = j
+
+      tbxst = 1								!Open Output list
+      tbyst = 1
+      tbxen = tbx(1)
+      do j = 1, kn
+         tbxst = min(tbxst,(kshx(j)+1))
+         tbyst = min(tbyst,(kshy(j)+1))
+         tbxen = max(tbxen,(tbx(j)+kshx(j)))
+      enddo
+      tbxo = tbxen - tbxst + 1
+      tbvxo = tbxo + 5
+      tbyo = tbyen - tbyst + 1
+      call optabw ( 'OUT', ipout, tbvxo, tbyo, .false., ierr )
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         call printo ( 'ERROR: Error in opening output file' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      call azeror ( %val(ipout), tbvxo*tbyo )				!Clear output list and add default identifiers
+      call ident ( %val(ipout), tbvxo, tbyo )
+
+      do j = 1, kn							!Put in lists
+         kxd = 2 + kshx(j) - tbxst
+         kyd = 2 + kshy(j) - tbyst
+         call coprr ( %val(ipin(j)), tbvx(j), tby(j), 1, 5, 1, tby(j),
+     +                %val(ipout), tbvxo, tbyo, 1, kyd )
+         call coprr ( %val(ipin(j)), tbvx(j), tby(j), 6, tbvx(j),
+     +                1, tby(j), %val(ipout), tbvxo, tbyo, kxd+5, kyd )
+      enddo
+
+      more = .true.							!Put Title
+      j = 0
+      do while ( more .and. j.lt.kn )
+         j = j + 1
+         itext = 'IN'
+         write ( itext(3:3), '(i1)' ) j
+         call gtdesc ( itext, 'TITLE', text, ' ', iv, ierr )
+         if ( text.eq.' ' .or. ierr.ne.0 ) more = .false.
+      enddo
+      if ( ierr.ne.0 ) text = 'Output from Tbjoin'
+      call get1c ( 'TITLE', text, text, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT', 'TITLE', text )
+
+      do j = 1, tbxo							!Load Output Descriptors
+         call pthead ( 'OUT', j, ' ', ierr )
+      enddo
+      do j = 1, kn
+         itext = 'IN'
+         write ( itext(3:3), '(i1)' ) j
+         do ja = 1, tbx(j)
+            call gthead ( itext, ja, texth, i )
+            kxd = ja + 1 + kshx(j) - tbxst
+            if ( i.eq.0 ) call pthead ( 'OUT', kxd, texth, i )
+         enddo
+      enddo
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbjoin">  TBJOIN  </a>-- (Program) Join together two tables
+C   See TBJOIN.HLP for details
+C
+C         A.J.Penny                RGO                             83-8-14
+
+      subroutine tbjoin ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbjoin
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

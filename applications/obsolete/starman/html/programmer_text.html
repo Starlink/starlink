@@ -1,0 +1,372 @@
+<HTML> <HEAD>
+<TITLE> programmer </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Starman Help for:- programmer </h1>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#programmer"> Programmer </a>
+<li> 2 <a href="#use_of_the_adam_environmant"> Use of the ADAM environmant </a>
+<li> 3 <a href="#programming_style"> Programming style </a>
+<li> 4 <a href="#starman_general_sub-routines"> Starman general sub routines </a>
+<li> 5 <a href="#needed_outside_libraries"> Needed outside libraries </a>
+<li> 6 <a href="#directory_structure"> Directory structure </a>
+<li> 7 <a href="#making_the_programs"> Makingthe programs </a>
+<ul>
+<li> 7.1 <a href="#monolith_version"> Monolith version </a>
+</ul>
+</ul>
+ 
+Go to <a href="main.html"> Starman Help Main. </a>
+<p>
+ 
+ 
+<hr>
+ <h2> 1 <a name="programmer"> Programmer </h2> </a> <p>
+ 
+ 
+ A Programmer's Guide to Starman
+<p>
+ 
+ For the best guide, browse through the source code, with
+ `starmanhyperhelp'.
+ <p>
+ 
+ Starman has evolved from the Interim environment ASPIC GRASP suite
+ of programs, with the influence of the IRAF SPP programming language.
+ It now runs under the Starlink ADAM environment.
+<p>
+ 
+ The aim has been to produce readable code, and to protect against
+ future changes in the environment.
+<p>
+ 
+ Thus the code is written in what seems to me to be a nice and neat, but not
+ too curt, style. Sub-routine calls to the outside world are insulated
+ through subroutines, and all non-public domain libraries have been
+ excluded.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="use_of_the_adam_environmant"> Use of the ADAM environmant </h2> </a> <p>
+ 
+ 
+ To understand the basic rules of using the ADAM Environment, resd the
+ Starlink document - Starlink Guide/4.
+<p>
+ 
+ All communication with the ADAM system goes through the routines
+ in the `starflib&#95 adam.f' file. (Although IMPORT avoids this.) These
+ routines provide simple interface calls for the programmer.
+<p>
+ 
+ The ADAM use of the `.ifl' interface files for communication with the
+ outside world is normal.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="programming_style"> Programming style </h2> </a> <p>
+ 
+ 
+ The style generally follows the IRAF SPP style. Features are:-
+<p>
+
+<ul>
+ 
+<li> Use of include files with COMMON for passing numbers around the programs.
+ 
+<li> Use of `implicit none' to check on varaibles.
+ 
+<li> Use of a standard way of starting a subroutine -
+
+<pre> 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C s/r name -- one line description
+C    lines of description
+C
+C   author              institution              date
+ 
+      subroutine name ( param1, param2, etc. )
+ 
+      implicit none
+      include files
+ 
+      type       param1       !i: description
+      type       param2       !o: description
+C--
+      types    work variables
+Cbegin
+ 
+      s/r code
+</pre>
+ 
+<li> The use of the ``--'' double minus sign indicates the start and
+   end of the s/r description. So in no other location are two
+   minus signs to be used.
+ 
+<li> Extensive use of comments.
+ 
+<li> Use of comments to be restricted to after column 80, preceeded
+   by an exclamation mark. Sometimes comments starting from
+   line 1 (with a ``C'') have to be present for readability.
+ 
+<li> No sub-routine to extend over more than 200 lines (including
+   start and comment lines).
+ 
+<li> All programs to work as sub-routines to the ADAM system. Thus a
+   program should start with a special subroutine whose only
+   purposes are to be linked in with the ADAM `top' system, and in its
+   turn call the real program, which starts with a subroutine
+   of name `t&#95 PROGRAM', and to set up the Starman programming
+   start values, and to translate those back to the ADAM system
+   when leaving the programe
+
+<pre> 
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C `name' -- (Program) `one line description'
+C
+C   author              institution              date
+ 
+      subroutine `name' ( ierradam )
+ 
+      implicit none
+ 
+      integer    ierradam       !o: ADAM error flag
+C--
+Cbegin
+ 
+      call starman_start
+ 
+      call t_`name'
+ 
+      call starman_end ( ierradam )
+ 
+      end
+</pre>
+ 
+<li> Use of a common `ST&#95 FAILED' variable to show program failure.
+ 
+<li> Exit from s/rs on `ST&#95 FAILED' being set.
+ 
+<li> Code to be in lower case.
+ 
+<li> Indentation by three columns at each step.
+ 
+<li> Variables in COMMON to be in upper case.
+ 
+<li> Often used variables relating to images and tables to
+   be given standard names and be loaded by the use
+   of the `image.inc' and `table.inc' include files.
+ 
+<li> The top level sub-routine to be mainly just a small set of
+   calls to sub-routinesw which do the actual work.
+</ul>
+ 
+<hr>
+ <h2> 4 <a name="starman_general_sub-routines"> Starman general sub-routines </h2> </a> <p>
+ 
+ 
+ In the `/lib' sub-directory, there are a large number of subroutines
+ which are used by more than one program. The programmer should
+ browse through the files there.
+<p>
+ 
+ The routines which address the ADAM routines are kept in one file, the
+ `starflib&#95 adam.f' file. There is also a file which has routines that whilst
+ they are not too peculiar, do have some Unix specific calls and have
+ thus been separated to ease in porting, into the file `starflib&#95 unix.f'.
+<p>
+ 
+ Amongst the routines are a number of sets of sub-routines which are of
+ general use in writing programs. These general sets include:-
+<p>
+
+<dl> 
+<dt> Typing out:
+<dd>      There are two sr/s, printo which
+      types out a line of text, and printd which does the same, but can
+      insert variables in it, in the fashion of the C routine printf.
+      To make that work, you need to start the program with pargbeg
+      to set up the system. Then the routines parg(cilr) let you load
+      character strings, integers, logicals and reals, which are then
+      inserted in a printd s/r as
+ 
+       call printd ( ' text %c %d %l %f ' )
+ 
+<dt> Text:
+<dd>      There are useful s/rs for dealing with text strings. These
+      are lbgone, lens, charln, lowcase, uppcase.
+ 
+<dt> Vector Arithmetic:
+<dd>      Arrays of numbers may be simply manipulated with the routines found
+      in `starflibv.f'.
+      An example of this is call aaddr ( a, b, c, n ) which will add
+      the two real arrays, `a' and `b', to produce the array `c', doing it for
+      the first `n' items in the arrays. These routines do not deal with
+      `magic' values.
+ 
+<dt> Image I/O:
+<dd>      Opening images for reading and writing
+      is done with the opim(isur)(rw), opimz(rw),
+      opim4zr, and opim4(irs)w routines (these in turn use the
+      ADAM environment calls to do the actual work). Images are closed
+      with the canpar routine. There are also routines for
+      accessing descriptors of images, gtimzd, gtdes(cir),
+      gtdesn, gtdesn&#95 gen, gtim(irs)d, ptdes(cir),
+      gtdescn,
+ 
+<dt>Table I/O:
+<dd>      Opening tables for reading and writing
+      is done with the optab(rw) routines (these in turn use the
+      ADAM environment calls to do the actual work). Tables are closed
+      with the canpar routine. There are also a number of routines
+      for accessing names and headers in tables.
+ 
+<dt> Parameter I/O:
+<dd>       Getting parameters from the
+      user are done with the get1(bcir)  and
+      get(2345)(ir) routines. These
+      parameters are cancelled with the canpar routine. Putting
+      parameters is done with the put(123)(ir) routines. These
+      routines in turn call ADAM ones.
+ 
+<dt> Work Space:
+<dd>      Work space is opened with the gtwrk(irs) routines, and closed
+      with the wrkcan one.
+ 
+<dt> Image Display:
+<dd>     The image DS&#95  display routines work for X-windows.
+     One can also use the PGPLOT routines through GKS
+     to access other output devices
+ 
+<dt> Graphics:
+<dd>      There are routines which can be used
+      as an interface to some of the PGPLOT routines, These are mainly to
+      do with opening and closing devices, where it has been found
+      useful to have them in a standard form. There are some other packs of
+      PGPLOT routines that have been found useful.
+ 
+<dt> Copying Arrays:
+<dd>      There are a number of routines
+      that copy data between arrays in a number of useful fashions.
+ 
+<dt> Maths:
+<dd>      There are a number of useful mathematical routines. These have been
+      provided to escape from the straight-jacket of the NAG system, and
+      thus make the suite portable. There is a complete `sort' set in
+      these.
+</dl> 
+ 
+ 
+<hr>
+ <h2> 5 <a name="needed_outside_libraries"> Needed outside libraries </h2> </a> <p>
+ 
+ 
+ The needed libraries, outside of those of Starman, are:-
+<p>
+ 
+<dl>
+<dt> Graphics:
+<dd>     The graphics works through PGPLOT. For the Starlink implementation,
+     PGPLOT uses GKS and GNS libraries, and the EMS&#95  and CHR&#95  libraries.
+ 
+<dt> Image Display:
+<dd>     The image DS&#95  display routines work for X-windows. Thus the libraries for
+     X drivers are needed. The PGPLOT routines are needed for the GKS
+     calls in PGPLOT to access other output devices.
+ 
+<dt> Astrometry:
+<dd>      The Starlink SLALIB astrometry library.
+ 
+</dl> 
+ 
+<hr>
+ <h2> 6 <a name="directory_structure"> Directory structure </h2> </a> <p>
+ 
+ 
+ The main Starman directory contains Starman start script and the
+ help file.
+<p>
+ 
+ The sub-directories contain:-
+
+<dl>
+ 
+<dt> /bin 
+<dd> Executables and .ifl interface files
+ 
+<dt> /`program' 
+<dd>  Each sub-directory contains the code for one
+      of the Starman programs, together with its makefile. These are not
+      the general purpose image and table programs, which are in the
+      /image and /table  sub-directories.
+ 
+<dt> /image 
+<dd>  Code for the `image' programs, for example
+                       imcalc, imcut, etc.
+ 
+<dt> /table 
+<dd>  Code for the `table' programs, for example
+                        tbcalc, tbcut, etc.
+ 
+<dt> /lib 
+<dd>  General purpose subroutines and subroutines to
+                     access the ADAM environment.
+ 
+<dt> /disp 
+<dd>  Display subroutines.
+ 
+<dt>/docs /help /hyper 
+<dd>  Documentation
+ 
+<dt> /build 
+<dd> Package build under the Starlink system.
+ 
+<dt> /monolith 
+<dd>  Files for building the monolithic version.
+</dl> 
+ 
+ 
+<hr>
+ <h2> 7 <a name="making_the_programs"> Making the programs </h2> </a> <p>
+ 
+ 
+ Starman uses the normal Unix  make system. It has its top level
+ makefile.
+<p>
+ 
+ <h2> 7.1 <a name="monolith_version"> Monolith version </h2> </a> <p>
+ 
+
+ To enable things to load quickly, all programs are statically linked.
+ However, this does case problems in disk space, as each executable is large.
+ To save on this disk space, all the programs can be loaded into one
+ monolith, which is not much larger than a single executable.
+<p>
+
+ This does not mean that the programs can be used singly, as each program is
+ set up as a separate (small) file, which then points to the monolith.
+<p>
+
+ This is loaded from the `/monolith' sub-directory, together with
+ the `load&#95 monolith' script and the `mon&#95 link' in the `/bin'
+ sub-directory.
+<p>
+
+ This makes the `starman&#95 mon' executable, with the `starman&#95 mon.ifl'
+ interface file.
+<p>
+    
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Nov 5  </i>
+ 

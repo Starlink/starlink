@@ -1,0 +1,332 @@
+<HTML> <HEAD>
+<TITLE> TBDES </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBDES - <br>
+ List:write:copy:delete the descriptors of a table
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  List, copy, write or delete the descriptors of a table.
+<p>
+ 
+  Choose which one of the four options you wish to do, with
+  the `OPTION' parameter. Then do that option. The options are:-
+<p>
+<ul>
+<li>List some or all of the descriptors of a table
+<li> Copy all descriptors to another table
+<li> Write new descriptors from keyboard to table
+<li> Delete some of the descriptors of a table
+</ul><p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbdes_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+
+<ul> 
+<li> 1 <a href="#list_option"> List option </a>
+<li> 2 <a href="#copy_option"> Copy option </a>
+<li> 3 <a href="#write_option"> Write option </a>
+<li> 4 <a href="#delete_option"> Delete option </a>
+<li> 5 <a href="#parameters"> Parameters </a>
+<li> 6 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="list_option"> List option </h2> </a> <p>
+ 
+ 
+  It types the size; pixel value scale and zero; title.
+<p>
+ 
+  Then it asks whether you want all descriptors output or just specificied
+  ones. If you want all, it outputs them. If you want specific ones, it
+  asks for the name of a specific descriptor. You give it, and it types
+  out the descriptors value. It then repeats asking for names until you
+  reply with a null (' ` or <carriage return>).
+<p>
+ 
+  You can specify that the program looks at only one descriptor before
+  exiting. This mode is chosen with the `ALL&#95 LIST=no' and `ONLYONE=yes'
+  setting of the parameters.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="copy_option"> Copy option </h2> </a> <p>
+ 
+ 
+  This copies the descriptors of one table onto another.
+  Optionally you can choose to overwrite or not descriptors that
+  already occur in the output table. If you do overwrite, then
+  you can choose to delete existing descriptors before overwriting.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="write_option"> Write option </h2> </a> <p>
+ 
+ 
+  Allows descriptor items to be overwritten with new information, or
+  inserted if they were not present, into a table.
+<p>
+ 
+  If the `LOOP' parameter is not set (or set to `yes'), then the
+  program loops, asking for new descriptor names until a `null'
+  response is input. If it is set to `no' (in the command line),
+  then only one descriptor is asked for.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="delete_option"> Delete option </h2> </a> <p>
+ 
+ 
+  Allows descriptor items to be deleted from a table.
+<p>
+ 
+  If the `LOOP' parameter is not set (or set to `yes'), then the
+  program loops, asking for new descriptor names until a `null'
+  response is input. If it is set to `no' (in the command line),
+  then only one descriptor is asked for.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 5.1 <a href="#all_list"> All&#95 list </a>
+<li> 5.2 <a href="#cvalue"> Cvalue </a>
+<li> 5.3 <a href="#delete"> Delete </a>
+<li> 5.4 <a href="#format"> Format </a>
+<li> 5.5 <a href="#in"> In </a>
+<li> 5.6 <a href="#ivalue"> Ivalue </a>
+<li> 5.7 <a href="#more"> More </a>
+<li> 5.8 <a href="#name"> Name </a>
+<li> 5.9 <a href="#onlyone"> Onlyone </a>
+<li> 5.10 <a href="#option"> Option </a>
+<li> 5.11 <a href="#out"> Out </a>
+<li> 5.12 <a href="#over"> Over </a>
+<li> 5.13 <a href="#paging"> Paging </a>
+<li> 5.14 <a href="#rvalue"> Rvalue </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 5.1 <a name="all_list"> All&#95 list </h2> </a> <p>
+ 
+  (Default - `yes'          <br> Choice - `yes:no')
+<p>
+ 
+  Do you want all the descriptors output, or just specified one or ones?
+<p>
+ 
+<hr>
+ <h2> 5.2 <a name="cvalue"> Cvalue </h2> </a> <p>
+ 
+  (Default - null           <br> Choice - any)
+<p>
+ 
+  A character string to give the `value' to insert into
+  the descriptor.
+<p>
+ 
+  This is asked from when in the `write' mode, using descriptors
+  input from the keyboard and writing them to the table.
+<p>
+ 
+<hr>
+ <h2> 5.3 <a name="delete"> Delete </h2> </a> <p>
+ 
+  (Default - `yes'        <br> Choice - `yes:no')
+<p>
+ 
+  In copying descriptors, delete any previously existing descriptor
+  with the same name as any of the descriptors to be copied over.
+<p>
+ 
+  This is only asked for if you have already said you wish to
+  overwrite any existing decsriptor.
+<p>
+ 
+<hr>
+ <h2> 5.4 <a name="format"> Format </h2> </a> <p>
+ 
+  (Default - `char'           <br> Choice - `char:integer:real')
+<p>
+ 
+  The data format for the descriptor to have.
+<p>
+ 
+  This is asked from when in the `write' mode, using descriptors
+  input from the keyboard and writing them to the table.
+<p>
+ 
+<hr>
+ <h2> 5.5 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input table file.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+  In the `write' and `delete' options, this table is also written
+  to, and is thus also an `output' file.
+<p>
+ 
+<hr>
+ <h2> 5.6 <a name="ivalue"> Ivalue </h2> </a> <p>
+ 
+  (Default - 0                <br> Range -  to -2147483648 to 2147483647)
+<p>
+ 
+  The integer value to give the `value' to insert into
+  the descriptor.
+<p>
+ 
+  This is asked from when in the `write' mode, using descriptors
+  input from the keyboard and writing them to the table.
+<p>
+ 
+<hr>
+ <h2> 5.7 <a name="more"> More </h2> </a> <p>
+ 
+  (Default - `yes'      <br> Choice - `yes:no')
+<p>
+ 
+  Do you want any more typing out of these descriptors (if doing all of
+  them) or of this descriptor (if doing single specific descriptors)?
+<p>
+ 
+<hr>
+ <h2> 5.8 <a name="name"> Name </h2> </a> <p>
+ 
+  (Default - ` `       <br> Choice - any)
+<p>
+ 
+  Name of descriptor you want to have its value typed out.
+<p>
+ 
+  If you reply with a null (' ` or <carriage return>), it ceases
+  asking for descriptor names.
+<p>
+ 
+<hr>
+ <h2> 5.9 <a name="onlyone"> Onlyone </h2> </a> <p>
+ 
+  (Default - `no'      <br> Choice - `yes:no')
+<p>
+ 
+  Do you want the program to look at only one descriptor before
+  exiting?
+<p>
+ 
+  This option can only be chosen if the `ALL&#95 LIST=no' option has
+  previously been chosen.
+<p>
+ 
+<hr>
+ <h2> 5.10 <a name="option"> Option </h2> </a> <p>
+ 
+  (Default - `list'         <br> Choice - `copy:delete:list:write' )
+<p>
+ 
+  Choose one of the options.
+<p>
+<pre>
+  Option   Function
+  ------   --------
+  Copy     Copy descriptors from one table to another
+  Delete   Delete a descriptor(s) from a table
+  List     List descriptor(s) in a table
+  Write    Write descriptors from the keyboard into a table
+</pre><p>
+ 
+<hr>
+ <h2> 5.11 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The output table to copy descriptors from the input table into.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 5.12 <a name="over"> Over </h2> </a> <p>
+ 
+  (Default - `yes'        <br> Choice - `yes:no')
+<p>
+ 
+  In copying descriptors, overwrite existing values where there
+  is an existing descriptor of the same name.
+<p>
+ 
+<hr>
+ <h2> 5.13 <a name="paging"> Paging </h2> </a> <p>
+ 
+  (Default - `no'      <br> Choice - `yes:no')
+<p>
+ 
+  When listing out descriptors, should the listing halt every 20
+  descriptors to give you a chance to read them.? (You then
+  carry on with the `MORE' parameter.)
+<p>
+ 
+<hr>
+ <h2> 5.14 <a name="rvalue"> Rvalue </h2> </a> <p>
+ 
+  (Default - 0.0                <br> Range - -1.0e37 to 1.0e37)
+<p>
+ 
+  The real value to give the `value' to insert into
+  the descriptor.
+<p>
+ 
+  This is asked from when in the `write' mode, using descriptors
+  input from the keyboard and writing them to the table.
+<p>
+ 
+<hr>
+ <h2> 6 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1991 June
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

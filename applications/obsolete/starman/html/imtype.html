@@ -1,0 +1,239 @@
+<HTML> <HEAD>
+<TITLE> IMTYPE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMTYPE - <br>
+ Convert images between
+(real;integer;16-bit integer)
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This program converts an image whose pixel values are stored
+  in one type  into one whose pixel values are stored as another type.
+<p>
+ 
+  The types it can deal with are:-
+<p>
+<pre>
+     Type              Name
+     ----              ----
+     32-bit real       REAL
+     32-bit integer    INTEGER
+     16-bit integer    SHORT
+</pre><p>
+ 
+ It deals with values above and below the range of permitted values
+ in the output image, by truncating them at the edge of the permitted
+ ranges. Permitted ranges:- INTEGER -2147483648 to 2147483647
+                             SHORT   -327678 to 32767
+<p>
+ 
+ For the conversion from Real to Integer or Short, and from Integer
+ to Short, there is the possibility of overflow of the numbers, so
+ they may be scaled by the formula
+<p>
+ 
+            `stored value' = (`true value'-BZ)/BS
+<p>
+ 
+ where the `stored value' is the one that must not overflow the
+ output data format limits.
+<p>
+ 
+ It translates the 'INVAL' parameter to and from real and integer.
+<p>
+ 
+ If an 'INVAL' value lies outside the permitted output ranges, this
+ is dealt with by putting it at the format pixel value limits.
+<p>
+ 
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imtype_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#output_type"> Output type </a>
+<li> 2 <a href="#parameters"> Parameters </a>
+<li> 3 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="output_type"> Output type </h2> </a> <p>
+ 
+ 
+  The type of the output image can be:-
+<p>
+<dl>
+<dt><strong> real </strong>
+<dd>        This is a 32-bit real image with a precision of about
+            1 in 10 million, nad values between +/- 10**38
+<p>
+<dt><strong> short </strong>
+<dd>        This is a 16-bit integer image, with a precision of about
+            1 in 60000. The numbers are stored on disk as integers
+            between -32768 and +32767. They are used in the Starman
+            programs as real numbers, by the use of BSCALE and BZERO,
+            such that:-
+<p>
+ 
+                'used value' = BSACLE*'disk value' + BZERO
+<p>
+ 
+            The advantage of this is that if this precision is adequate
+            then the files are half the size of 'real' files. The
+            problem is that one has to be constantly aware of the
+            'digitisation' of the images when being stored on disk.
+            Also, many other program packages do not use the
+            BSCALE and BZERO, so cannot get the 'true' values.
+<p>
+ 
+<dt><strong> integer </strong>
+<dd>        This is a 32-bit integer image, with a precision of about
+            1 in 4 thousand million. The numbers are stored on disk as
+            integers between -2147483648 and +2147483647. Such images
+            cannot be accessed by Starman programs.
+<p>
+ 
+ 
+<hr>
+ <h2> 2 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 2.1 <a href="#auto"> Auto </a>
+<li> 2.2 <a href="#in"> In </a>
+<li> 2.3 <a href="#out"> Out </a>
+<li> 2.4 <a href="#outscale"> Outscale </a>
+<li> 2.5 <a href="#outtype"> Outtype </a>
+<li> 2.6 <a href="#range"> Range </a>
+<li> 2.7 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="auto"> Auto </h2> </a> <p>
+ 
+  (Default - 'no'              <br> Choice - 'yes:no')
+<p>
+ 
+  Get minimum and maximum of image, so that the program can suggest
+  'BSCALE' and 'BZERO' values that will make the 'short' or
+  'integer' output image retain the maximum precision, whilst still
+  not having values too large (-ve or +ve) to fit into the 16 or
+  32 bits.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  `real' 32-bit real values, or `integer' 32-bit integer values, or
+  `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the output image.
+<p>
+ 
+  The image will be a standard Starman ADAM .SDF image, with
+  `real' 32-bit real values, or `integer' 32-bit integer values, or
+  `short' 16-bit integer values.
+  It will have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="outscale"> Outscale </h2> </a> <p>
+ 
+  (Default - 1.0,0.0 or input image values
+   Range -  -1.0e10 to 1.0e10)
+<p>
+ 
+  The 'scale' and 'zero' of the pixel values in the output image.
+<p>
+ 
+  Where the 'true' value of a pixel = BSCALE*'disk value' + BZERO.
+<p>
+ 
+  These scale and zero are defined by the user, with suggested values
+  of 1.0/0.0, or as those of the input image.
+<p>
+ 
+  These numbers are put as descriptors to the output image as
+  'BSCALE' and 'BZERO'
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+  (Default - different from input type  <br> Choice - 'real:integer:short')
+<p>
+ 
+  The type of the output image. For a full description see the
+  section above.
+<p>
+ 
+<hr>
+ <h2> 2.6 <a name="range"> Range </h2> </a> <p>
+ 
+  (Default - 'no'          <br> Choice - 'yes:no')
+<p>
+ 
+  Calculate range of input data, i.e. its maximum and minimum
+  pixel value?
+<p>
+ 
+<hr>
+ <h2> 2.7 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title )
+<p>
+ 
+  The title to be attached as a header to the output image.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny               RAL           1991 April
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

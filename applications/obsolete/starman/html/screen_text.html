@@ -1,0 +1,190 @@
+<HTML> <HEAD>
+<TITLE> Screen </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Screen </h1>
+ 
+<hr>
+Go to <a href="main.html"> Starman Help Main. </a>
+<hr>
+
+ This gives help on various aspects of screen display
+<p>
+
+<strong>   Image Display </strong><p>
+
+
+ Images can be displayed on any X windows display.
+<p>
+
+ The display must have an 8-bit display (i.e. 256
+ colours available at any one time). It may not work on mono or 24-bit
+ displays.
+<p>
+
+ Also any device, including hardcopy, can be used to output a greyscale plot
+ of an image by using the image graphical output in the INSPECT option in
+ the INTERACT program. 
+<p>
+
+<strong>   Use of Pointer and Buttons </strong><p>
+
+
+ To mark a position, one puts the pointer on the desired position, and marks
+ that point by pressing one of the buttons on the mouse. Each button will
+ often have a different effect, and one should look at the `help' for the
+ program to see what the buttons actually do in any particular case.
+ Usually, the right-hand button denotes 'exit' from the particular function
+ being performed.  Starman can work with either two or three buttons
+ available for use on the mouse. If only two buttons can be used, then the
+ action of the third button is simulated by pressing the two buttons
+ together, with the middle one being pressed shortly before the left-hand
+ one. In this case also use of the middle button by itself has to followed
+ by a half-second pause.
+<p>
+ 
+ (To see how to set up for the actual number, look at the 'help' for
+ `Numbutt' in the desired program.)
+<p>
+
+<strong>   Look-Up Table </strong><p>
+
+
+ Starman can only be used to display images on devices that have 8-bit
+ colour displays. This nominally gives the use of 256 different colours.
+<p>
+
+ Starman allocates the first two colours to black and white, the next
+ eight to the 
+<p>
+
+ `red:green:blue:cyan:magenta:yellow:coral:palegreen'
+
+ colours of PGPLOT. The next five are then various shades of grey from
+ black to white for the `panel' and other uses.
+<p>
+
+ Images are then displayed using the next 150 colours. The default
+ when you run any of these programs is these colours are black to
+ white, going through shades of grey. An image is displayed by taking
+ the pixel values, translating them into numbers between 1 and 150,
+ and loading them in the display device. The display device then has
+ has a colour for corresponding to each of the numbers between 1 and
+ 150. These colours are linear combinations of (red, green and blue).
+ Thus white is (1.0,1.0,1.0), black is (0.0,0.0,0.0), blue is
+ (0.0,0.0,1.0), and so on.
+<p>
+ 
+ (When an image is displayed, the default is displayed so that high pixel
+ values are given low look-up table (LUT) values, and thus come out as
+ blacked than low pixel values. Thus images are generally shown as
+ `negatives'.) 
+<p>
+
+ When the LUT is altered, it is the colours that correspond to those 150
+ numbers that are changed, not the numbers themselves. Thus if a pixel value
+ has been loaded into the display as (say) 15, it will first of all be a
+ dark grey (colour - 0.1,0.1,0.1). If the LUT is changed, the colour could
+ now be anything (say pink - 0.7,0.5,0.5). 
+<p>
+ 
+ However, with X window devices, some or all of the 256 possible colours may
+ have already been allocated by another program, and thus be inaccessible to
+ the Starman program. In this case, the Starman program first of tries to
+ use only 75 LUT colours, and then only 50 LUT colours. If these are
+ available, it uses those, and has to make a coarser binning of the display.
+ If there are less than 50 colours available, then the program will use those
+ `default' colours available to all programs on the device. They may well be
+ very few of these, and thus the display may be very simplistic.
+<p>
+ 
+<strong>   Graphical User Interface </strong><p>
+
+
+ Starman has two modes whereby when inside some its programs, one can get
+ away from the old-fashioned interaction of typing in lines of commands.
+<p>
+
+   Macintosh-like_Interaction
+<p>
+
+ For a number of programs, to do with image and graph display the `OPTION'
+ parameters, where the program is repeatedly asking for different options,
+ one can set up a `panel' of `push-buttons' which you click on with the
+ cursor to choose the desired option. This is much like the way you use
+ a Macintosh.
+<p>
+ 
+ To do this you need to be at a workstation. The programs where this is
+ possible and the parameters where it can be done are:- 
+<p>
+
+<pre> 
+  Program    Option Parameter 
+  -------    ----------------
+  Diagram    `Option' 
+  Dustring   `Option' 
+  Interact   `Option' `Aloption' `Aoption' `Coption' `Goption' 
+             `Ioption' `Soption'
+  Profile    `Option' `Doption', `Moption', `Roption' `Woption' 
+  Tbchart    `Option' 
+  Tbplot     `Option' 
+</pre><p>
+
+ If, in response to a request for these parameters, one inputs `panel', then
+ a panel of the various options is put up on the workstation screen, and one
+ can choose the options by clicking on the `buttons' in the `panel'.
+<p>
+
+<strong>   Graph Display </strong><p>
+
+
+ Starman uses the PGPLOT/GKS packages to output graphs. This means that
+ nearly all graphical output devices, including hardcopy, on Starlink can be
+ used. When a graph is to be plotted, you are asked for the value of the
+ `GTYPE' parameter. You then input the GNS name of the device you want. If
+ you choose the default `ask', you then get another question and you can
+ then type `?'. This will give you the list of the names of the available
+ devices. You will have to consult your system manager to see which physical
+ device is attached to which name. 
+<p>
+ 
+ The usual names re `xwindows' and `ps', for X window devices and
+ Postcript printers.
+<p>
+
+<strong>   Use of Pointer and Buttons </strong><p>
+
+ With PGPLOT, one puts the pointer on the desired position, and marks that
+ point by pressing any key on the {\em keyboard}.
+<p>
+ 
+<strong>   Tables Spread-Sheet </strong><p>
+
+
+ There is a spread-sheet for interacting with tables, which works,
+ to a limited extent, like the spread-sheet programs on your PC.
+ This is the TBSHEET program. If you have a terminal that supports
+ graphics, however simply, then you can use this to inspect and
+ change the values in the table. Also simple applications like
+ SORTing and WEEDing may be done.
+<p>
+
+ The table is put up on the screen in a grid, and all the options
+ to inspect and/or change the table are put up as boxes. One uses
+ the cursor to click on values to change them, or on options to
+ undertake those options.
+<p>
+
+
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Jan 4 </i>
+ 

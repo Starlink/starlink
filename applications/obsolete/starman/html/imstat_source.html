@@ -1,0 +1,471 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMSTAT
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMSTAT
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imstat_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imstat">
+imstat  </a>  Calc statistics of an area of an image       <br>
+<a href="#ims_astat">
+ims_astat  </a>  Area statistics       <br>
+<a href="#ims_sumr">
+ims_sumr  </a>  Get sum of flagged area of real array       <br>
+<a href="#ims_sums">
+ims_sums  </a>  Get sum of flagged area of short array       <br>
+<a href="#ims_minmaxs">
+ims_minmaxs  </a>  Get max and min of flagged area of short array       <br>
+<a href="#ims_minmaxr">
+ims_minmaxr  </a>  Get max and min of flagged area of real array       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imstat"> IMSTAT  </a>-- Calc statistics of an area of an image
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine imstat ( ierradam )
+
+      implicit none
+
+      integer      ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imstat
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMSTAT.F
+C
+C    Contains:-
+C
+C T_IMSTAT       Calc statistics of an area of an image
+C IMS_ASTAT      Area statistics
+C IMS_SUM(RS)    Get sum of flagged area of array
+C IMS_MINMAX(RS) Get max and min of flagged area of array
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_IMSTAT   Calc statistics of an area of an image
+C   For a fuller description see IMSTAT.HLP
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_imstat ( )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      integer nxs, nxe, nys, nye, ierr
+Cbegin
+
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      if ( ST_FAILED ) return
+
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr )
+
+      nxs = 1
+      nxe = NX
+      call get2i ( 'XRANGE', nxs, nxe, .true., 1, NX )
+      if ( ST_FAILED ) return
+      call cswopi ( nxs, nxe )
+
+      nys = 1
+      nye = NY
+      call get2i ( 'YRANGE', nys, nye, .true., 1, NY )
+      if ( ST_FAILED ) return
+      call cswopi ( nys, nye )
+
+      call ims_astat ( nxs, nxe, nys, nye )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="ims_astat"> IMS_ASTAT  </a>-- Area statistics
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine ims_astat ( nxs, nxe, nys, nye )
+
+      implicit none
+      include 'image.inc'
+      include 'STARMAN_INC'
+
+      integer   nxs		!i: X start of area
+      integer   nxe		!i: X   end of area
+      integer   nys		!i: Y start of area
+      integer   nye		!i: Y   end of area
+C--
+      integer kx(2), ky(2), ngood, nbad, ierr, kp(4), iv
+      real am, std, amax, amin, sum, rv
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kx(1) = nxs
+      kx(2) = nxe
+      ky(1) = nys
+      ky(2) = nye
+      if ( IMTYPE.eq.'SHORT' ) then
+         call ranges ( %val(IPIM), NX, NY, kx, ky, INVAL, am, std, ierr)
+      else
+         call ranger ( %val(IPIM), NX, NY, kx, ky, RINVAL, am, std,ierr)
+      endif
+      am = BS*am + BZ
+      std = BS*std
+
+      if ( IMTYPE.eq.'SHORT' ) then
+         call ims_sums ( %val(IPIM), NX, NY, INVAL, kx, ky, sum )
+      else
+         call ims_sumr ( %val(IPIM), NX, NY, RINVAL, kx, ky, sum )
+      endif
+
+      if ( IMTYPE.eq.'SHORT' ) then
+         call ims_minmaxs ( %val(IPIM), NX, NY, INVAL, nxs, nxe,
+     +                      nys, nye, amin, amax, kp, ngood, nbad )
+      else
+         call ims_minmaxr ( %val(IPIM), NX, NY, RINVAL, nxs, nxe,
+     +                      nys, nye, amin, amax, kp, ngood, nbad )
+      endif
+
+      sum = BS*sum + real(ngood)*BZ
+
+      amin = BS*amin + BZ
+      amax = BS*amax + BZ
+      if ( amin.gt.amax ) then
+         rv = amin
+         amin = amax
+         amax = rv
+         iv = kp(3)
+         kp(3) = kp(1)
+         kp(1) = iv
+         iv = kp(4)
+         kp(4) = kp(2)
+         kp(2) = iv
+      endif
+
+      call pargc ( IMTYPE )
+      call printd ( ' Image type is: %c' )
+      call pargi ( nxs )
+      call pargi ( nxe )
+      call pargi ( nys )
+      call pargi ( nye )
+      call printd ( '       Area is: X = %d - %d ; Y = %d - %d ' )
+      call pargr ( am )
+      call pargr ( std )
+      call printd ( ' Mean = %f ; Std Dev = %f  ' )
+      call pargr ( amin )
+      call pargi ( kp(1) )
+      call pargi ( kp(2) )
+      call pargr ( amax )
+      call pargi ( kp(3) )
+      call pargi ( kp(4) )
+      call printd ( ' Min = %f at ( %d ,%d ) ; Max = %f at ( %d ,%d )' )
+
+      call pargi ( ngood )
+      call pargi ( nbad )
+      call printd ( ' Number of good pixels = %d ; '
+     +              //'of invalid pixels = %d' )
+
+      call pargr ( sum )
+      call printd ( ' Sum of good pixels = %f')
+
+      call put1r ( 'MEAN', am )
+      call put1r ( 'MAX', amax )
+      call put1i ( 'XMAXLOC', kp(1) )
+      call put1i ( 'YMAXLOC', kp(2) )
+      call put1r ( 'MIN', amin )
+      call put1i ( 'XMINLOC', kp(3) )
+      call put1i ( 'YMINLOC', kp(4) )
+      call put1r ( 'STDDEV', std )
+      call put1i ( 'NGOOD', ngood )
+      call put1i ( 'NBAD', nbad )
+      call put1r ( 'SUM', sum )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="ims_sumr"> IMS_SUMR  </a>-- Get sum of flagged area of real array
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine ims_sumr ( im, nx, ny, rinval, kx, ky, sum )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer	nx		!i: Image X size
+      integer	ny		!i: Image Y size
+      real      im(nx,ny)	!i: Image
+      real      rinval		!i: Image pixel value invalid flag
+      integer	kx(2)		!i: Area X start/end
+      integer	ky(2)		!i: Area Y start/end
+      real      sum		!o: Sum
+C--
+      integer j, k
+      double precision dv
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      dv = 0.0d0
+      do k = ky(1), ky(2)
+         do j = kx(1), kx(2)
+            if ( im(j,k).ne.rinval ) dv = dv + dble(im(j,k))
+         enddo
+      enddo
+      sum = real(dv)
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="ims_sums"> IMS_SUMS  </a>-- Get sum of flagged area of short array
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine ims_sums ( im, nx, ny, inval, kx, ky, sum )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer	nx		!i: Image X size
+      integer	ny		!i: Image Y size
+      integer*2 im(nx,ny)	!i: Image
+      integer	inval		!i: Image pixel value invalid flag
+      integer	kx(2)		!i: Area X start/end
+      integer	ky(2)		!i: Area Y start/end
+      real      sum		!o: Sum
+C--
+      integer j, k
+      double precision dv
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      dv = 0.0d0
+      do k = ky(1), ky(2)
+         do j = kx(1), kx(2)
+            if ( im(j,k).ne.inval ) dv = dv + dble(im(j,k))
+         enddo
+      enddo
+      sum = real(dv)
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="ims_minmaxs"> IMS_MINMAXS  </a>-- Get max and min of flagged area of short array
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine ims_minmaxs ( im, nx, ny, inval, nxs, nxe,
+     +                         nys, nye, amin, amax, kp, ngood, nbad )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+
+      integer	nx		!i: Image X size
+      integer	ny		!i: Image Y size
+      integer*2 im(nx,ny)	!i: Image
+      integer	inval		!i: Image pixel value invalid flag
+      integer	nxs		!i: Area X start
+      integer	nxe		!i: Area Y end
+      integer	nys		!i: Area X start
+      integer	nye		!i: Area Y end
+      real	amin		!o: Minimum value (scaled,zeroed)
+      real	amax		!o: Maximum value (scaled,zeroed)
+      integer   kp(4)		!o: Locations of min, max (x,y;x,y)
+      integer	ngood		!o: Number of valid pixels
+      integer	nbad		!o: Number of invalid pixels
+C--
+      integer j, k, iv
+      real    rv
+      double precision dgood, dbad
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      amax = -1.0e20
+      amin = 1.0e20
+      call azeroi ( kp, 4 )
+      dgood = 0.0d0
+      dbad = 0.0d0
+
+      do k = nys, nye
+         do j = nxs, nxe
+            iv = im(j,k)
+            if ( iv.ne.inval ) then
+               dgood = dgood + 1.0d0
+               if ( real(iv).gt.amax ) then
+                  amax = real(iv)
+                  kp(3) = j
+                  kp(4) = k
+               endif
+               if ( real(iv).lt.amin ) then
+                  amin = real(iv)
+                  kp(1) = j
+                  kp(2) = k
+               endif
+            else
+               dbad = dbad + 1.0d0
+            endif
+         enddo
+      enddo
+
+      ngood = min(real(dgood),int_maxir)
+      nbad  = min(real(dbad),int_maxir)
+
+      amax = amax
+      amin = amin
+      if ( amin.gt.amax ) then
+         rv = amin
+         amin = amax
+         amax = rv
+         iv = kp(3)
+         kp(3) = kp(1)
+         kp(1) = iv
+         iv = kp(4)
+         kp(4) = kp(2)
+         kp(2) = iv
+      endif
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="ims_minmaxr"> IMS_MINMAXR  </a>-- Get max and min of flagged area of real array
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine ims_minmaxr ( im, nx, ny, rinval, nxs, nxe,
+     +                         nys, nye, amin, amax, kp, ngood, nbad )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+
+      integer	nx		!i: Image X size
+      integer	ny		!i: Image Y size
+      real      im(nx,ny)	!i: Image
+      real      rinval		!i: Image pixel value invalid flag
+      integer	nxs		!i: Area X start
+      integer	nxe		!i: Area Y end
+      integer	nys		!i: Area X start
+      integer	nye		!i: Area Y end
+      real	amin		!o: Minimum value (scaled,zeroed)
+      real	amax		!o: Maximum value (scaled,zeroed)
+      integer   kp(4)		!o: Locations of min, max (x,y;x,y)
+      integer	ngood		!o: Number of valid pixels
+      integer	nbad		!o: Number of invalid pixels
+C--
+      integer j, k, iv
+      real    rv
+      double precision dbad, dgood
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      amax = -1.0e20
+      amin = 1.0e20
+      call azeroi ( kp, 4 )
+      dgood = 0.0d0
+      dbad = 0.0d0
+
+      do k = nys, nye
+         do j = nxs, nxe
+            rv = im(j,k)
+            if ( rv.ne.rinval ) then
+               dgood = dgood + 1.0d0
+               if ( rv.gt.amax ) then
+                  amax = rv
+                  kp(3) = j
+                  kp(4) = k
+               endif
+               if ( rv.lt.amin ) then
+                  amin = rv
+                  kp(1) = j
+                  kp(2) = k
+               endif
+            else
+               dbad = dbad + 1.0d0
+            endif
+         enddo
+      enddo
+
+      ngood = min(real(dgood),int_maxir)
+      nbad  = min(real(dbad),int_maxir)
+
+      if ( amin.gt.amax ) then
+         rv = amin
+         amin = amax
+         amax = rv
+         iv = kp(3)
+         kp(3) = kp(1)
+         kp(1) = iv
+         iv = kp(4)
+         kp(4) = kp(2)
+         kp(2) = iv
+      endif
+
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

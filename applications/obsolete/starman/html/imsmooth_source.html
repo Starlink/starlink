@@ -1,0 +1,673 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMSMOOTH
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMSMOOTH
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imsmooth_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imsmooth">
+imsmooth  </a>  (Program)       <br>
+<a href="#t_imsmooth">
+t_imsmooth  </a>  Smooth int*2/real image with gauss or rectangle mean/median box       <br>
+<a href="#imsm_gausss">
+imsm_gausss  </a>  Smooth a int*2 flagged array with gaussian       <br>
+<a href="#imsm_gaussr">
+imsm_gaussr  </a>  Smooth a real flagged array with gaussian       <br>
+<a href="#imsm_setvs">
+imsm_setvs  </a>  Get a replacement int*2 value for an INVALID pixel       <br>
+<a href="#imsm_setvr">
+imsm_setvr  </a>  Get a replacement real value for an INVALID pixel       <br>
+<a href="#imsm_medianr">
+imsm_medianr  </a>  Smooth a real flagged array with boxed median       <br>
+<a href="#imsm_medians">
+imsm_medians  </a>  Smooth an int*2 flagged array with boxed median       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsmooth"> IMSMOOTH  </a>-- (Program)
+C
+C         A.J.Penny                RAL                  1991 May
+
+      subroutine imsmooth ( ierradam )
+
+      implicit none
+
+      integer      ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imsmooth
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_IMSMOOTH.F  Smooth int*2/real image with gauss or rectangle mean/median box
+C
+C Contains:-
+C
+C T_IMSMOOTH      Smooth int*2/real image with gauss or rectangle mean/median box
+C IMSM_GAUSS(SR)  Smooth a int*2/real flagged array with gaussian
+C IMSM_SETV(SR)   Get a replacement int*2/real value for an INVALID pixel
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imsmooth"> T_IMSMOOTH  </a>-- Smooth int*2/real image with gauss or rectangle mean/median box
+C  Take account of invalid pixels.
+C
+C Alan Penny                       RAL               1994 Feb
+
+      subroutine t_imsmooth ( )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+C--
+      integer ierr, ipo, iv, nxb, nyb, ipwa, ipwb, ipwc, ipwd,
+     +        ipwe, kmeth, nxa, nya
+      real    rad
+      character*50 title
+Cbegin
+
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr )
+
+      call get_job ( 'METHOD', 'gauss:box:median', kmeth, 2, ' ', 0 )
+
+      if ( kmeth.eq.1 ) then
+         call get1r ( 'GRADIUS', rad, 2.0, 1.0e-5, 1.0e10 )
+         nxb = rad*10.0
+         nyb = rad*10.0
+         iv = max(NX,NY)
+         nxb = min(nxb,(NX-1))
+         nyb = min(nyb,(NY-1))
+         if ( nxb.eq.(2*(nxb/2)) ) nxb = nxb + 1
+         if ( nyb.eq.(2*(nyb/2)) ) nyb = nyb + 1
+         call get2i ( 'GBOX', nxb, nyb, .true., 1, iv )
+         if ( ST_FAILED ) return
+         if ( nxb.eq.(2*(nxb/2)) ) then
+            call printo ( 'ERROR: X Size of box must be odd' )
+            ST_FAILED = .true.
+         endif
+         if ( nyb.eq.(2*(nyb/2)) ) then
+            call printo ( 'ERROR: Y Size of box must be odd' )
+            ST_FAILED = .true.
+         endif
+         if ( ST_FAILED ) return
+      else
+         nxb = 3
+         nyb = 3
+         iv = max(NX,NY)
+         call get2i ( 'BOX', nxb, nyb, .true., 1, iv )
+         if ( ST_FAILED ) return
+      endif
+
+      call opimzw ( 'OUT', IMTYPE, ipo, NX, NY, .false., ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call get1c ( 'TITLE', title, IMTITLE, .true. )
+      if ( ST_FAILED ) return
+
+      if ( kmeth.eq.1 ) then
+
+         call gtwrkr ( 'WB', nxb*nyb, ipwb, ierr )
+
+         nxa = NX + 2*(nxb/2)
+         nya = NY + 2*(nyb/2)
+         if ( IMTYPE.eq.'SHORT' ) then
+            call gtwrks ( 'WA', nxa*nya, ipwa, ierr )
+            call gtwrks ( 'WC', nx*ny, ipwc, ierr )
+            call imsm_gausss ( %val(IPIM), NX, NY, INVAL, rad,
+     +                         %val(ipwa), nxa, nya,
+     +                         %val(ipwc), %val(ipwb), nxb, nyb )
+            call amovs ( %val(ipwc), %val(ipo), NX*NY )
+         else
+            call gtwrkr ( 'WA', nxa*nya, ipwa, ierr )
+            call gtwrkr ( 'WC', nx*ny, ipwc, ierr )
+            call imsm_gaussr ( %val(IPIM), NX, NY, RINVAL, rad,
+     +                         %val(ipwa), nxa, nya,
+     +                         %val(ipwc), %val(ipwb), nxb, nyb )
+            call amovr ( %val(ipwc), %val(ipo), NX*NY )
+         endif
+
+      elseif ( kmeth.eq.2 ) then
+
+         call gtwrkr ( 'WB', NX*NY, ipwb, ierr )
+         call gtwrkr ( 'WC', NX*NY, ipwc, ierr )
+         call gtwrkr ( 'WD', NX,    ipwd, ierr )
+         call gtwrkr ( 'WE', NX,    ipwe, ierr )
+
+         if ( IMTYPE.eq.'SHORT' ) then
+            call gtwrks ( 'WA', NX*NY, ipwa, ierr )
+            call amovs ( %val(IPIM), %val(ipwa), NX*NY )
+            call smoothbs ( %val(ipwa), NX, NY, INVAL, nxb, nyb,
+     +                      1, %val(ipwb), %val(ipwc), %val(ipwd),
+     +                      %val(ipwe) )
+            call amovs ( %val(ipwa), %val(ipo), NX*NY )
+         else
+            call gtwrkr ( 'WA', NX*NY, ipwa, ierr )
+            call amovr ( %val(IPIM), %val(ipwa), NX*NY )
+            call smoothbr ( %val(ipwa), NX, NY, RINVAL, nxb, nyb,
+     +                     1, %val(ipwb), %val(ipwc), %val(ipwd),
+     +                     %val(ipwe) )
+            call amovr ( %val(ipwa), %val(ipo), NX*NY )
+         endif
+
+      else
+
+         if ( IMTYPE.eq.'SHORT' ) then
+            call gtwrks ( 'WB', NX*NY, ipwb, ierr )
+            call gtwrki ( 'WC', nxb*nyb, ipwc, ierr )
+            call imsm_medians ( %val(IPIM), %val(ipwb), %val(ipwc),
+     +                          nxb, nyb )
+            call amovs ( %val(ipwb), %val(ipo), NX*NY )
+         else
+            call gtwrkr ( 'WB', NX*NY, ipwb, ierr )
+            call gtwrkr ( 'WC', nxb*nyb, ipwc, ierr )
+            call imsm_medianr ( %val(IPIM), %val(ipwb), %val(ipwc),
+     +                          nxb, nyb )
+            call amovr ( %val(ipwb), %val(ipo), NX*NY )
+         endif
+
+      endif
+
+      call icopdes ( 'IN', 'OUT', ierr )
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+
+      end
+
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsm_gausss"> IMSM_GAUSSS  </a>-- Smooth a int*2 flagged array with gaussian
+C  Take account of invalid pixels.
+C
+C  alan penny                  ral                  1994-05-26
+
+      subroutine imsm_gausss ( in, nx, ny, inval, rad,
+     +                         ia, nxa, nya, io, ee, nxb, nyb )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer   nx                      !i: X size of input array
+      integer   ny                      !i: Y size of input array
+      integer*2 in(nx,ny)              !i: Input array
+      integer   inval                   !i: Invalid pixel magic value flag
+      real      rad			!i: Gaussian radius
+      integer   nxa                     !i: X size of work array
+      integer   nya                     !i: Y size of work array
+      integer*2 ia(nxa,nya)             !o: Work array
+      integer*2 io(nx,ny)               !o: Output array
+      integer   nxb                     !i: X size of area to smooth
+      integer   nyb                     !i: Y size of area to smooth
+      real      ee(nxb,nyb)             !o: Smmoth work array
+C--
+      integer j, ja, jb, jx, jy, jdx, k, ka, kb, kdy, iv
+      real ex, ey, esum, rv
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call azeros ( ia, nxa*nya )
+      call azeros ( io, nx*ny )
+
+      jb = nxb/2
+      kb = nyb/2
+
+      do k = 1, ny
+         do j = 1, nx
+            ja = j + jb
+            ka = k + kb
+            ia(ja,ka) = in(j,k)
+         enddo
+      enddo
+
+      do k = 1, nya
+         do j = 1, nxa
+            if ( j.le.jb .or. j.gt.(nxa-jb) .or.
+     +           k.le.kb .or. k.gt.(nya-kb) ) then
+               ja = j - jb
+               if ( j.le.jb ) then
+                  ja = 1
+               elseif ( j.gt.(nxa-jb) ) then
+                  ja = nx
+               endif
+               ka = k - kb
+               if ( k.le.kb ) then
+                  ka = 1
+               elseif ( k.gt.(nya-kb) ) then
+                  ka = ny
+               endif
+               ia(j,k) = in(ja,ka)
+            endif
+         enddo
+      enddo
+
+
+      esum = 0.0
+      do k = 1, nyb
+         kdy = k - kb
+         ey = 1.0
+         if ( kdy.ne.0 ) ey = exp(-1.0*((real(kdy)/rad)**2.0))
+         do j = 1, nxb
+            jdx = j - jb
+            ex = 1.0
+            if ( jdx.ne.0 ) ex = exp(-1.0*((real(jdx)/rad)**2.0))
+            ee(j,k) = ex*ey
+            esum = esum + ee(j,k)
+         enddo
+      enddo
+      rv = 1.0/esum
+      do k = 1, nyb
+         do j = 1, nxb
+            ee(j,k) = rv*ee(j,k)
+         enddo
+      enddo
+
+      do k = 1, nya
+         do j = 1, nxa
+
+            iv = ia(j,k)
+            if (iv.eq.inval) call imsm_setvs(ia,nxa,nya,inval,j,k,iv)
+            do ka = 1, nyb
+               jy = k - kb + ka - kb
+               if ( jy.ge.1 .and. jy.le.ny ) then
+                  kdy = ka - kb
+                  do ja = 1, nxb
+                     jx = j - jb + ja - jb
+                     if ( jx.ge.1 .and. jx.le.nx ) io(jx,jy) =
+     +                                    io(jx,jy) + iv*ee(ja,ka)
+                  enddo
+               endif
+            enddo
+
+         enddo
+      enddo
+
+      do k = 1, ny
+         do j = 1, nx
+            if ( ia(j,k).eq.inval ) io(j,k) = inval
+         enddo
+      enddo
+
+
+      end
+
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsm_gaussr"> IMSM_GAUSSR  </a>-- Smooth a real flagged array with gaussian
+C  Take account of invalid pixels.
+C
+C  alan penny                  ral                  1994-05-26
+
+      subroutine imsm_gaussr ( rin, nx, ny, rinval, rad,
+     +                         ria, nxa, nya, rio, ee, nxb, nyb )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer   nx                      !i: X size of input array
+      integer   ny                      !i: Y size of input array
+      real      rin(nx,ny)              !i: Input array
+      real      rinval                  !i: Invalid pixel magic value flag
+      real      rad			!i: Gaussian radius
+      integer   nxa                     !i: X size of work array
+      integer   nya                     !i: Y size of work array
+      real      ria(nxa,nya)            !o: Work array
+      real      rio(nx,ny)              !o: Output array
+      integer   nxb                     !i: X size of area to smooth
+      integer   nyb                     !i: Y size of area to smooth
+      real      ee(nxb,nyb)             !o: Smmoth work array
+C--
+      integer j, ja, jb, jx, jy, jdx, k, ka, kb, kdy
+      real ex, ey, esum, rv
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call azeror ( ria, nxa*nya )
+      call azeror ( rio, nx*ny )
+
+      jb = nxb/2
+      kb = nyb/2
+
+      do k = 1, ny
+         do j = 1, nx
+            ja = j + jb
+            ka = k + kb
+            ria(ja,ka) = rin(j,k)
+         enddo
+      enddo
+
+      do k = 1, nya
+         do j = 1, nxa
+            if ( j.le.jb .or. j.gt.(nxa-jb) .or.
+     +           k.le.kb .or. k.gt.(nya-kb) ) then
+               ja = j - jb
+               if ( j.le.jb ) then
+                  ja = 1
+               elseif ( j.gt.(nxa-jb) ) then
+                  ja = nx
+               endif
+               ka = k - kb
+               if ( k.le.kb ) then
+                  ka = 1
+               elseif ( k.gt.(nya-kb) ) then
+                  ka = ny
+               endif
+               ria(j,k) = rin(ja,ka)
+            endif
+         enddo
+      enddo
+
+
+      esum = 0.0
+      do k = 1, nyb
+         kdy = k - kb
+         ey = 1.0
+         if ( kdy.ne.0 ) ey = exp(-1.0*((real(kdy)/rad)**2.0))
+         do j = 1, nxb
+            jdx = j - jb
+            ex = 1.0
+            if ( jdx.ne.0 ) ex = exp(-1.0*((real(jdx)/rad)**2.0))
+            ee(j,k) = ex*ey
+            esum = esum + ee(j,k)
+         enddo
+      enddo
+      rv = 1.0/esum
+      do k = 1, nyb
+         do j = 1, nxb
+            ee(j,k) = rv*ee(j,k)
+         enddo
+      enddo
+
+      do k = 1, nya
+         do j = 1, nxa
+
+            rv = ria(j,k)
+            if(rv.eq.rinval)call imsm_setvr(ria,nxa,nya,rinval,j,k,rv)
+            do ka = 1, nyb
+               jy = k - kb + ka - kb
+               if ( jy.ge.1 .and. jy.le.ny ) then
+                  kdy = ka - kb
+                  do ja = 1, nxb
+                     jx = j - jb + ja - jb
+                     if ( jx.ge.1 .and. jx.le.nx ) rio(jx,jy) =
+     +                                    rio(jx,jy) + rv*ee(ja,ka)
+                  enddo
+               endif
+            enddo
+
+         enddo
+      enddo
+
+      do k = 1, ny
+         do j = 1, nx
+            if ( ria(j,k).eq.rinval ) rio(j,k) = rinval
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsm_setvs"> IMSM_SETVS  </a>-- Get a replacement int*2 value for an INVALID pixel
+C  Take account of invalid pixels.
+C
+C  alan penny                  ral                  1994-05-26
+
+      subroutine imsm_setvs ( ia, nx, ny, inval, ja, ka, iv )
+
+      implicit none
+
+      integer   nx                      !i: X size of array
+      integer   ny                      !i: Y size of array
+      integer*2 ia(nx,ny)               !i: Input array
+      integer   inval                   !i: Invalid pixel magic value flag
+      integer   ja			!i: X Position
+      integer   ka			!i: Y Position
+      integer   iv			!o: replacement value
+C--
+      integer j, k, kn, kna, nsum
+      real sum
+      logical found, some
+Cbegin
+
+
+      found = .false.
+      some = .true.
+
+      kn = 1
+      do while ( .not.found .and. some )
+         kn = kn + 2
+         kna = kn/2
+         some = .false.
+         sum = 0.0
+         nsum = 0
+         do k = ka-kna, ka+kna
+            if ( k.ge.1 .and. k.le.ny ) then
+               do j = ja-kna, ja+kna
+                  if ( j.ge.1 .and. j.le.nx ) then
+                     some = .true.
+                     if ( ia(j,k).ne.inval ) then
+                        found = .true.
+                        sum = sum + ia(j,k)
+                        nsum = nsum + 1
+                     endif
+                  endif
+               enddo
+            endif
+         enddo
+
+         if ( .not.some ) then
+            iv = 0
+         elseif ( found ) then
+            iv = sum/real(nsum)
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsm_setvr"> IMSM_SETVR  </a>-- Get a replacement real value for an INVALID pixel
+C  Take account of invalid pixels.
+C
+C  alan penny                  ral                  1994-05-26
+
+      subroutine imsm_setvr ( ra, nx, ny, rinval, ja, ka, rv )
+
+      implicit none
+
+      integer   nx                      !i: X size of array
+      integer   ny                      !i: Y size of array
+      real      ra(nx,ny)               !i: Input array
+      real      rinval                  !i: Invalid pixel magic value flag
+      integer   ja			!i: X Position
+      integer   ka			!i: Y Position
+      real      rv			!o: replacement value
+C--
+      integer j, k, kn, kna, nsum
+      real sum
+      logical found, some
+Cbegin
+
+
+      found = .false.
+      some = .true.
+
+      kn = 1
+      do while ( .not.found .and. some )
+         kn = kn + 2
+         kna = kn/2
+         some = .false.
+         sum = 0.0
+         nsum = 0
+         do k = ka-kna, ka+kna
+            if ( k.ge.1 .and. k.le.ny ) then
+               do j = ja-kna, ja+kna
+                  if ( j.ge.1 .and. j.le.nx ) then
+                     some = .true.
+                     if ( ra(j,k).ne.rinval ) then
+                        found = .true.
+                        sum = sum + ra(j,k)
+                        nsum = nsum + 1
+                     endif
+                  endif
+               enddo
+            endif
+         enddo
+
+         if ( .not.some ) then
+            rv = 0.0
+         elseif ( found ) then
+            rv = sum/real(nsum)
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsm_medianr"> IMSM_MEDIANR  </a>-- Smooth a real flagged array with boxed median
+C  Take account of invalid pixels.
+C
+C  alan penny                  ral                  1994-05-26
+
+      subroutine imsm_medianr ( in, out, box, nxb, nyb )
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      real      in(NX,NY)              !i: Input array
+      real      out(NX,NY)             !o: Output array
+      integer   nxb                    !i: X size of box
+      integer   nyb                    !i: Y size of box
+      real      box(nxb,nyb)           !o: work array
+C--
+      integer kx(2), ky(2), ierr, kxl, kyl, j, k
+      real rm
+Cbegin
+
+
+
+      if ( ST_FAILED ) return
+
+      kxl = (nxb-1)/2
+      kyl = (nyb-1)/2
+      do k = 1, NY
+         ky(1) = k - kyl
+         ky(2) = k + kyl
+         ky(1) = min(NY,max(1,ky(1)))
+         ky(2) = min(NY,max(1,ky(2)))
+         do j = 1, NX
+            kx(1) = j - kxl
+            kx(2) = j + kxl
+            kx(1) = min(NX,max(1,kx(1)))
+            kx(2) = min(NX,max(1,kx(2)))
+            call medianr ( in, NX, NY, box, kx, ky, RINVAL,
+     +                     rm, ierr )
+            out(j,k) = rm
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imsm_medians"> IMSM_MEDIANS  </a>-- Smooth an int*2 flagged array with boxed median
+C  Take account of invalid pixels.
+C
+C  alan penny                  ral                  1994-05-26
+
+      subroutine imsm_medians ( in, out, box, nxb, nyb )
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      integer*2 in(NX,NY)              !i: Input array
+      integer*2 out(NX,NY)             !o: Output array
+      integer   nxb                    !i: X size of box
+      integer   nyb                    !i: Y size of box
+      integer   box(nxb,nyb)           !o: work array
+C--
+      integer kx(2), ky(2), ierr, kxl, kyl, j, k
+      real rm
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kxl = (nxb-1)/2
+      kyl = (nyb-1)/2
+      do k = 1, NY
+         ky(1) = k - kyl
+         ky(2) = k + kyl
+         ky(1) = min(NY,max(1,ky(1)))
+         ky(2) = min(NY,max(1,ky(2)))
+         do j = 1, NX
+            kx(1) = j - kxl
+            kx(2) = j + kxl
+            kx(1) = min(NX,max(1,kx(1)))
+            kx(2) = min(NX,max(1,kx(2)))
+            call medians ( in, NX, NY, box, kx, ky, INVAL,
+     +                     rm, ierr )
+            out(j,k) = min(32767.0,max(-32768.0,rm))
+         enddo
+      enddo
+
+
+      end
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

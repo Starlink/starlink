@@ -1,0 +1,157 @@
+<HTML> <HEAD>
+<TITLE> TBTRAN&#95 LOAD </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBTRAN&#95 LOAD - <br>
+ Calc transform eqn from a given magn, rotn, shift
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This calculates the transformation coefficents between two
+   coordinate systems, converting:-
+<p>
+ 
+     'magnification, rotation, shift'
+<p>
+ 
+     to a transformation matrix of the form:-
+<p>
+ 
+        X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+        Y&#95 1 = c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+    The input parameters are fed in, and the six transformation
+    coefficents are calculated.
+<p>
+ 
+    The input parameters are:-
+<p>
+<ul>
+<li> The centre of the old coordinate system.
+<p><li> The magnification to apply to the old coordinate system.
+<p><li> The anticlockwise rotation in degrees to apply to that
+            magnified coordinate system, about its old centre.
+<p><li> The shift to apply to that magnified, rotated coordinate system.
+</ul><p>
+ 
+  The results are typed out, and also put into the program paramters.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbtran_load_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#centre"> Centre </a>
+<li> 1.2 <a href="#magnify"> Magnify </a>
+<li> 1.3 <a href="#rotate"> Rotate </a>
+<li> 1.4 <a href="#shift"> Shift </a>
+<li> 1.5 <a href="#xcoeff"> Xcoeff </a>
+<li> 1.6 <a href="#ycoeff"> Ycoeff </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="centre"> Centre </h2> </a> <p>
+ 
+  (Default - 0.0,0.0       <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The old X,Y centre of the system.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="magnify"> Magnify </h2> </a> <p>
+ 
+  (Default - 1.0         <br> Range - 0.0 to 1.0e20)
+<p>
+ 
+  The magnification to apply to the old system.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="rotate"> Rotate </h2> </a> <p>
+ 
+  (Default - 0.0       <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The anticlockwise rotation (in degrees) to apply to
+  the magnified system, about the old cntre.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="shift"> Shift </h2> </a> <p>
+ 
+  (Default - 0.0,0.0       <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The X,Y shift to apply to the magnified, rotated system.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+ 
+  (This is an output parameter)
+<p>
+ 
+  The three output cofficents for the X system
+<p>
+ 
+        X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+ 
+  (This is an output parameter)
+<p>
+ 
+  The three output cofficents for the Y system
+<p>
+ 
+        Y&#95 1 = c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny                  RAL               1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

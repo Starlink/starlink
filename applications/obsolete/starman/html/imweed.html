@@ -1,0 +1,118 @@
+<HTML> <HEAD>
+<TITLE> IMWEED </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMWEED - <br>
+ Set range of pixel values to Invalid
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Set range of pixels values to `invalid'.
+<p>
+ 
+  Set those pixels to `invalid', whose values are within a range
+  of pixel values.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imweed_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in"> In </a>
+<li> 1.2 <a href="#out"> Out </a>
+<li> 1.3 <a href="#range"> Range </a>
+<li> 1.4 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  `real' 32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the output image.
+<p>
+ 
+  The image will be a standard Starman ADAM .SDF image, with the
+  type of the input image either `real' 32-bit real values, or `short'
+  16-bit integer values.
+  It will have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels, of the input image.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="range"> Range </h2> </a> <p>
+ 
+  (Default - 0.0,0.0          <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  Range of pixel values, such that if a pixel had a value within that
+  range, the pixel is set to `invalid'.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title )
+<p>
+ 
+  The title to be attached as a header to the output image.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny               RAL           1991 April
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

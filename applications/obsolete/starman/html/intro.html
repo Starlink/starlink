@@ -1,0 +1,309 @@
+<HTML>
+<HEAD>
+<TITLE> Starman - for all your photometric needs </TITLE>
+</HEAD>
+<BODY>
+
+<H1> Starman - A Hypertext help </H1>
+
+Starman is designed for the reduction of data from imaging systems.<p>
+
+This page has introductions to its components:-
+
+<ul>
+<li>Programs
+<ul> <li> <a href="#photometry">Stellar photometry programs </a>
+ <li> <a href="#images">Image handling programs </a>
+ <li> <a href="#tables">Table handling programs </a>
+ <li> <a href="#misc"> Help programs </a>
+ <li> <a href="#misc"> Gripe programs </a>
+ <li> <a href="#misc"> Demo programs </a>
+</ul>
+<li> <a href="guide_text.html"> Guide </a>
+<li> <a href="intro_text.html"> Introduction </a>
+<li> <a href="running_text.html"> Running the programs </a>
+<li> <a href="photometry_text.html"> How to do photometry </a>
+<li> <a href="run_through.html"> A basic run through </a>
+<li> <a href="photometry_run_through.html"> A basic photometry run through </a>
+<li> <a href="demonstrations_text.html"> Demonstrations </a> 
+<li> <a href="starting_text.html"> Starting the Starman package </a>
+<li> <a href="help_text.html"> On-line help available </a> 
+<li> <a href="examples_text.html"> Examples of running programs  </a>
+<li> <a href="parameters_text.html"> Parameters </a>
+<li> <a href="screen_text.html"> Screen </a>
+<li> <a href="batch_jobs_text.html"> Batch Jobs </a>
+<li> <a href="images_text.html">Use of Images </a>
+<li> <a href="tables_text.html">Use of Tables </a>
+<li> <a href="kappa_text.html"> Use of Kappa </a>
+<li> <a href="programmer_text.html"> Programmer's Guide </a>
+<li> <a href="version_text.html"> Version </a>
+<li> <a href="author_text.html"> Author </a>
+<li> <a href="#comparision"> Comparison with DAOPHOT and DoPHOT </a> 
+<li> <a href="#panel"> Use of push-buttons in programs </a> 
+<li> <a href="source_top.html"> Source Code </a> 
+<li> <a href="#name"> The <i>Starman</i> name </a> 
+</ul>
+
+Go to <a href="main.html"> Starman Help Main. </a> 
+<HR>      
+<H2> <a name="photometry"> Stellar photometry programs</a> </H2>
+
+Starman's photometry programs allows the user to carry out the following 
+tasks:- <p>
+
+
+<h4> Measuring </h4>  
+
+<a href="measure.html"> measure </a> 
+<a name="measure_back"> - </a> Crowded field PSF photometry <br>
+<a href="automag.html"> automag </a> 
+<a name="automag_back"> - </a> Automatic aperture photometry for
+              bright isolated stars  <br>
+<a href="simplemag.html"> simplemag </a> 
+<a name="simplemag_back"> - </a> Isolated stars photometry  <br>
+<a href="interact.html"> interact </a> 
+<a name="interact_back"> - </a> Interactive measuring <br>
+
+<h4> Preparation and Analysis </h4>  
+
+<a href="starfind.html"> starfind </a> 
+<a name="starfind_back"> - </a> Find star positions <br>
+<a href="profile.html"> profile </a> 
+<a name="profile_back"> - </a> Determine the stellar profile for
+     the <a href="measure.html"> measure </a> program <br>
+<a href="chi.html"> chi </a> 
+<a name="chi_back"> - </a> Reject stars with poor fits 
+        from  <a href="measure.html"> measure </a> program output <br>
+<a href="average.html"> average </a> 
+<a name="average_back"> - </a>  Average different photometry estimates 
+(especially from  <a href="measure.html"> measure </a>) <br>
+<a href="interact.html"> interact </a> - Inspect quality of 
+          <a href="measure.html"> measure </a> program output <br>
+<a href="diagram.html"> diagram </a> 
+<a name="diagram_back"> - </a> Plot CMDs and colour-colour diagrams <br>
+
+
+<h4> Other </h4>  
+
+<a href="addstars.html"> addstars </a> 
+<a name="addstars_back"> - </a> Add fake stars from a table to images <br>
+<a href="dustring.html"> dustring </a> 
+<a name="dustring_back"> - </a> Correct for dust rings <br>
+<a href="interact.html"> interact </a> Interactive inspection of image <br>
+<a href="sprinkle.html"> sprinkle </a> 
+<a name="sprinkle_back"> - </a> Make a table of field/cluster stars  <br>
+<a href="unccd.html"> unccd </a> 
+<a name="unccd_back"> - </a> Convert raw CCD frames to calibrated ones <br>
+<p>
+
+<HR>      
+<H2> <a name="images"> Image handling programs </a> -  </H2>
+
+<h4> Main interactive program </h4> 
+
+<a href="interact.html"> interact - </a> 
+Interactive image display <br>
+
+<h4> General programs </h4> 
+
+<a href="imcalc.html">  imcalc </a> 
+<a name="imcalc_back"> - </a> Perform mathematical operations on
+image(s)  <br>
+<a href="imcube.html"> imcube </a> 
+<a name="imcube_back"> - </a> Cut a 2-D image from a 3-D or 4-D one <br>
+<a href="imcut.html"> imcut </a> 
+<a name="imcut_back"> - </a> Cut an image out (sectioned,binned,inverted) <br>
+<a href="imdes.html"> imdes </a> 
+<a name="imdes_back"> - </a> View:copy:write:delete the descriptors of
+an image  <br>
+<a href="imfits_dr.html"> imfits&#95 dr </a> 
+<a name="imfits_dr_back"> - </a> Read simple FITS image on disk <br>
+<a href="imflash.html"> imflash </a> 
+<a name="imflash_back"> - </a> Simple display of image  <br>
+<a href="imjoin.html"> imjoin </a> 
+<a name="imjoin_back"> - </a> Join a number of images together <br>
+<a href="imkey.html"> imkey </a> 
+<a name="imkey_back"> - </a> Insert:change image pixel values from
+keyboard  <br>
+<a href="import.html"> import </a> 
+<a name="import_back"> - </a> Load descriptors from other packages <br>
+<a href="imrotate.html"> imrotate  </a> 
+<a name="imrotate_back"> - </a> Rotate an image anti-clockwise by
+90,180, or 270 degrees  <br>
+<a href="imsmooth.html"> imsmooth </a> 
+<a name="imsmooth_back"> - </a> Smooth an image <br>
+<a href="imstat.html"> imstat </a> 
+<a name="imstat_back"> - </a> Get statistics of an image <br>
+<a href="imtype.html"> imtype </a> 
+<a name="imtype_back"> - </a> Convert images between
+(real;integer;16-bit integer) <br>
+<a href="imweed.html"> imweed </a> 
+<a name="imweed_back"> - </a> Set range of pixel values to Invalid <br>
+<p>
+<p>
+<a href="tbplot.html"> tbplot </a> 
+<a name="tbplot_back_im"> - </a> 
+Plot table graph/histogram - image picture/contour <br>
+
+<HR>      
+<H2> <a name="tables"> Table handling programs </a> </H2>
+   
+<h4> Main interactive program </h4> 
+
+<a href="tbsheet.html"> tbsheet </a> 
+<a name="tbsheet_back"> - </a> Spreadsheet operations on a table <br>
+
+<h4> Calculator </h4>  
+
+<a href="tbcalc.html"> tbcalc </a> 
+<a name="tbcalc_back"> - </a> Calculate table elements <br>
+
+<h4> Input, Output and Listing </h4>  
+
+<a href="tbdes.html"> tbdes </a> 
+<a name="tbdes_back"> - </a> View:write:copy:delete the descriptors of a
+table <br>
+<a href="tbkey.html"> tbkey </a> 
+<a name="tbkey_back"> - </a> Input numbers from keyboard into a table <br>
+<a href="tblist.html"> tblist </a> 
+<a name="tblist_back"> - </a> Type and/or put in text file the contents of a
+table <br>
+<a href="tbload.html"> tbload </a> 
+<a name="tbload_back"> - </a> Input a text file into a table <br>
+<a href="tbvalue.html"> tbvalue </a> 
+<a name="tbvalue_back"> - </a> Type a table value <br>
+<a href="interact.html"> interact </a> Inspect quality of 
+          <a href="measure.html"> measure </a> program output <br>
+
+<h4> Joining </h4> 
+
+<a href="tbjoin.html"> tbjoin </a> 
+<a name="tbjoin_back"> - </a> Join tables together <br>
+
+<h4> Graphical plot and Star chart </h4>
+
+<a href="tbplot.html"> tbplot </a> 
+<a name="tbplot_back_tb"> - </a> 
+Plot table graph/histogram - image picture/contour <br>
+<a href="tbchart.html"> tbchart </a> 
+<a name="tbchart_back"> - </a> Plot out a realistic star map <br>
+
+<h4> General Programs </h4>
+
+<a href="tbcomps.html"> tbcomps </a> 
+<a name="tbcomps_back"> - </a> Find stars within/not within an
+annulus of each other <br>
+<a href="tbcut.html"> tbcut </a> 
+<a name="tbcut_back"> - </a> Cut out parts of a table  <br>
+<a href="tbmatch.html"> tbmatch </a> 
+<a name="tbmatch_back"> - </a> Extract entries with matching names in
+two tables <br>
+<a href="tbnative.html"> tbnative </a> 
+<a name="tbnative_back"> - </a> Convert table format from different machine 
+machine style <br>
+<a href="tbnmatch.html"> tbnmatch </a> 
+<a name="tbnmatch_back"> - </a> Put tables in the same order of names  <br>
+<a href="tbpmatch.html"> tbpmatch </a> 
+<a name="tbpmatch_back"> - </a> Extract entries with matching positions 
+in two tables  <br>
+<a href="tbrenum.html"> tbrenum </a> 
+<a name="tbrenum_back"> - </a> Renumber names in a table <br>
+<a href="tbsort.html"> tbsort </a> 
+<a name="tbsort_back"> - </a> Sort entries in a table   <br>
+<a href="tbstat.html"> tbstat </a> 
+<a name="tbstat_back"> - </a> Perform statistics on column(s) in tables(s) <br>
+<a href="tbtran_auto.html"> tbtran&#95 auto </a> 
+<a name="tbtran_auto_back"> - </a> Transform one XY table to another
+automatically <br>
+<a href="tbtran_do.html"> tbtran&#95 do </a> 
+<a name="tbtran_do_back"> - </a> Transform XY table positions using
+transform eqns <br>
+<a href="tbtran_load.html"> tbtran&#95 load </a> 
+<a name="tbtran_load_back"> - </a> Calc transform eqn from a given magn, rotn,
+shift <br>
+<a href="tbtran_make.html"> tbtran&#95 make </a> 
+<a name="tbtran_make_back"> - </a> Calc transform eqn from two matched XY
+tables <br>
+<a href="tbweed.html"> tbweed </a> 
+<a name="tbweed_back"> - </a> Make a table with only those entries with
+a parameter in a range <br>
+<p>
+
+
+<HR>      
+<H2> <a name="misc"> Help, gripe and demo programs </a> </H2>
+
+These are programs and scripts to help you to use and improve the Starman
+package.<p>
+
+Starmanhyperhelp  - Hypertext Help on the Starman package - This program!<br>
+<a href="misc_progs.html#pr_help"> Starmanhelp </a>
+<a name="pr_help_back"> - </a> Help on the Starman package <br>
+<a href="misc_progs.html#pr_gripe"> Starmangripe </a>
+<a name="pr_gripe_back"> - </a> Comment/complain/etc on the Starman package <br>
+<a href="misc_progs.html#pr_hypergripe"> Starmanhypergripe </a>
+<a name="pr_hypergripe_back"> - </a> Hypertext comment/complain/etc on the Starman
+package <br>
+<a href="misc_progs.html#pr_demo"> Starmandemo </a>
+<a name="pr_demo_back"> - </a> 4 demonstrations of the Starman package <br>
+<p>
+
+
+<HR>      
+<H2> <a name="comparision"> Comparision with DAOPHOT and DoPHOT </a> </H2>
+
+<i> Starman </i> has distinct advantages compared with DAOPHOT and
+DoPHOT. <p>
+
+It can deal with very-crowded fields well, with images where the star
+diamters are less than a pixel, and where the star profile variea across
+the image.<p>
+
+For example. here is a user comment - <i> "
+After 3 (find/measure/clean) runs Daophot still has undetected
+stars and quite a few stars are extremely dubious, especially when they
+start to appear in a grid like pattern.
+Starman however gets everything first time, and the cleaned images look
+quite nice!" </i><p>
+
+<HR>      
+<H2> <a name="panel"> Push Buttons - The Panel </a> </H2>
+
+Many of these programs have the option of opening a panel of push-buttons,
+from which selections are made using point and click devices (<it> ie </it>
+mice, trackballs and lightpens). A good example is the <a
+href="interact_aper.gif"> panel </a> in <a href="interact.html"> interact
+</a> for aperture photometry <p>
+
+By clicking again and again on the appropiate buttons
+different options can be done.<br>
+For example:- <br>
+click on <strong>image</strong> - a new image can
+be loaded into memory <br>
+click on <strong>flash</strong> - displays image,
+at the best contrast to see faint detail <br>
+click on <strong>cvalues</strong> - you can move the cursor over the 
+image and see the pixel values<p>
+
+<HR>
+<H2> <a name="name"> The <i>Starman</i> name </a> </H2>
+
+The name <i> Starman </i> is not an acronym - it comes from the title of the
+John Carpenter film. For information on the film, go to the <a
+href="http://www.cm.cf.ac.uk/Movies"> Cardiff database </a>, and search the
+titles for <i>Starman</i>. [The Cardiff database also has extensive
+information on many other films.] <p>
+
+ 
+<HR>
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html"> Alan Penny </a>
+- <a href="http://www.rl.ac.uk/rutherford.html"> 
+Rutherford Appleton Laboratory </a> (RAL) </address>  
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 10 </i>
+
+
+</BODY>
+</HTML>
+

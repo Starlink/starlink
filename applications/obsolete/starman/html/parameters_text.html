@@ -1,0 +1,296 @@
+<HTML> <HEAD>
+<TITLE> Parameters </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Parameters </h1>
+ 
+<hr>
+Go to <a href="main.html"> Starman Help Main. </a>
+<hr>
+
+
+<strong>       Introduction </strong><p>
+
+ Starman is a command-driven package.  Thus to run the program 
+ `imcut', you  type `imcut'. Commands in their turn have parameters
+ by which you can qualify their behaviour. Thus to tell the `imcut'
+ program that you want the first 50 pixels in X cut out, you
+ have to set the \verb|imcut| parameter `xrange' to `1,50'. The 
+ values of parameters are obtained by the programs in one of 
+ seven ways:-
+<p>
+
+<ol>
+<li> By your responses to a prompt
+<li> When you supply them on the command line when starting 
+      the program 
+<li> When there is a `\\' on the command line 
+<li> From `hidden' values
+<li> By using the `Advanced Interfacing' described elsewhere.
+<li> By making a new .ifl `interface' file 
+</ol>
+<p>
+
+ This is the ADAM parameter system which is described in the
+ ADAM SUN4 document. For convenience, the main aspects of this
+ parameter system as seen by a user of Starman are described below. 
+<p>
+
+ [Most of what follows is thus applicable to any ADAM application.] 
+<p>
+
+
+<strong>  Response to Prompts    </strong><p>
+
+ When a program is running, and wants to know the value of the
+ (say) `XXX' parameter, it will output a request in the format:-
+<p>
+
+<pre>
+      XXX - prompt/ >
+</pre><p>
+
+  or
+<p>
+<pre>
+      XXX - prompt/default/ >
+</pre><p>
+
+ You respond with the value that you want the parameter to have. If a single
+ value is needed, just input that. If more than one value is needed, input
+ them separated by commas. Character strings may have spaces. If you reply
+ with a `carriage return', then the default value, if any is taken. There
+ are rules on defaults, acceptable values, and on getting help.
+<p>
+
+
+<strong>      Command Line Setting </strong><p>
+
+ Parameters may be assigned values on the command line. Thus to run IMCUT
+ where you want the cut out first 50 pixels in X of the image, you could
+ type:-
+<p>
+
+<pre>
+  > imcut $STARMAN_DATA/imcut_in out=fred xrange=\[1,50\] 
+          yrange=\[1,99\] bin=\
+</pre><p>
+
+ or
+<p>
+
+<pre>
+  > imcut $STARMAN_DATA/imcut_in out=fred xrange=\[1,50\] \\
+</pre><p>
+
+ The first 50 pixels in X and the first 99 pixels in Y will be cut out with
+ no binning. In the first example. you will only now need the on-line input 
+ of the `TITLE' whilst running the program, 
+<p>
+ 
+ This example illustrates a number of facets of inputting parameter values on
+ the command line. The rules about command line input are:- You have to put
+ the parameter name and an equals sign before the parameter value. If you do
+ not, then that parameter value is taken to refer to the parameter which is
+ in the same position in the program `interface' file, the file which
+ Starman uses to access parameters. Generally, the first two
+ parameters in an interface file will be the `IN' and `OUT'  parameters, 
+ but this is not an iron-clad rule. If the parameter name and `>' are 
+ followed by a blank space, the default values are taken.
+<p>
+
+
+<strong>  `Hidden' Setting    </strong><p>
+
+ Some programs have parameter values that you cannot normally get at. The
+ program will automatically assign the default values to these parameters.
+ These parameters are known as `hidden' parameters. 
+<p>
+
+ These defaulted parameters enable programs to have many options, say for
+ controlling the appearance of some graphical output, without making routine
+ operations tedious because of a large number of prompts. These defaulted
+ values are described in the HELP for each program. 
+<p>
+
+ If you wish to change the values of these parameters, you may do so by
+ inputting them on the command line.
+<p>
+
+
+
+<strong>      Advanced Screen Interface Setting </strong><p>
+
+ For certain parameters in certain programs, one can use the flexible Advanced
+ Screen Interface described elsewhere.
+<p>
+
+<strong>      Interface Files </strong><p>
+
+
+ The Starman programs pick up information about the parameters from
+ the `interface' file. Thus there is an interface file for (say) 
+ the `imcut' program.
+<p>
+
+ This can be looked at:-
+<p>
+
+<pre>
+ > ls $STARMAN_BIN/bin/imcut.ifl
+
+                         (EXTRACT FROM)
+ #   
+ # IMCUT.IFL
+ #
+ interface IMCUT
+    helplib   '$STARMAN_HELP_A IMCUT parameters'
+    parameter IN
+       type    NDF
+       access  READ
+       helpkey 'IN'
+       ppath   'dynamic,default'
+       default !
+       position 1
+       prompt 'Input image'
+    endparameter
+    parameter OUT
+       type    NDF
+       access  WRITE
+       helpkey 'OUT'
+       ppath   'dynamic,default'
+       default !
+       position 2
+       prompt 'Output image'
+    endparameter
+    parameter XRANGE
+       type    '_INTEGER'
+       ppath   'dynamic'
+       position 3
+       helpkey 'XRANGE'
+       prompt 'X range to cut out'
+    endparameter
+    parameter CHECK
+       type    '_LOGICAL'
+       ppath   'dynamic'
+       position 7
+       helpkey 'CHECK'
+       prompt  'If any box pixel invalid, output invalid? (yes:no)'
+    endparameter
+    parameter TITLE
+       type    'LITERAL'
+       ppath   'dynamic'
+       position 8
+       helpkey 'TITLE'
+       prompt  'Title to add to output image'
+    endparameter
+ endinterface
+</pre><p>
+ 
+ You can set you own `permanent' parameter values by making your own
+ interface file. `cp' the file from the `starman' directory into the
+ directory you are working in (as `NAME'.ifl), and alter the lines. Thus to
+ set the XRANGE to `1,50', add into the XRANGE parameter part:-
+<p>
+
+<pre>
+     VPATH 'default'
+     DEFAULT '1,50'
+</pre><p>
+
+ Then every time you run IMCUT when you are in this directory,
+ the XRANGE parameter will be `hidden' and set at this value. This
+ will be true even if you exit from Starman and later re-enter. However
+ this only works if your default directory is this directory where your
+ new interface file is.
+<p>
+
+
+<strong>      Defaults </strong><p>
+
+ When you are inputting parameters by responding to a prompt, you may be
+ given a `default' value. Thus if you are using IMCUT, when you are asked
+ for the range in X pixels to cut out, for an input image with 100 pixels in 
+ X, you would get:-
+<p>
+
+<pre>
+    XRANGE - prompt/[1,100]/ >
+</pre><p>
+
+ Thus the default values are to take the entire X range. There are three 
+ types of responses you can make. You can:- input your own values to override
+ the defaults (in this case `2,99' would override); input some of your
+ own values. If there is more than one value to input, if you do not put
+ all the values in, the remaining ones are set at the default (in this 
+ example `2' would results in values of `2,100' being taken); you can
+ just press `carriage return', when the defaults are taken.
+<p>
+ 
+ Help on the defaults is given in the normal help system.
+<p>
+
+
+<strong>      Acceptable Inputs </strong><p>
+
+ For some parameters, there are checks on the input. Thus for the
+ `imcut' xrange| parameters, any input of X pixel range which would fall
+ outside the image would be refused.
+<p>
+
+ If an unacceptable value is input, a help on what is wrong is output,
+ and then either the parameter is asked for again, or the program will
+ take some other action.
+<p>
+
+ Help on acceptable values is given in the normal help system.
+<p>
+
+
+<strong>      Help on Parameters </strong><p>
+
+ Help on the parameters of a program is available via the normal help
+ for the program. Thus to get a list of all the parameters for the 
+ program `imcut', type:-
+<p>
+
+<pre>
+     > starmanhelp imcut param
+</pre><p>
+
+ You will then also be able to get the help on the individual 
+ parameters.
+<p>
+ 
+ When you are actually running the program, respond with `?', and the
+ help on the parameter will be given.
+<p>
+
+
+<strong>      Menus </strong><p>
+
+ Some Starman parameters are menus from which you select an option.
+ You do not have to enter the full option string, but merely a string 
+ that selects a choice unambiguously.  In many cases this can be as
+ little as a single character.  Here is an example from IMCUT:-
+<p>
+
+<pre>
+     SAMPLE - prompt/'yes'/ >
+</pre><p>
+
+ The acceptable values you could input now are `yes' or `no'. But `y' 
+ or `n' would also be acceptable. 
+<p>
+
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Jan 4 </i>
+ 

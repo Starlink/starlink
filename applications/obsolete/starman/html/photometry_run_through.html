@@ -1,0 +1,91 @@
+<HTML> <HEAD>
+<TITLE> Photometry run through </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Photometry run through </h1>
+ 
+<hr>
+Go to <a href="main.html"> Starman Help Main. </a>
+<hr>
+
+ The first goal of Starman is to provide tools for performing stellar 
+ photometry on images. To give an introduction on how to use these tools,
+ a list is given below of a basic run through of how to get from the
+ data on tape to the output astronomy.
+<p>
+
+<dl>
+
+<dt> <strong>      1) IMFITS_DR </strong><dd>
+  
+       Read the data from a FITS disk file into \starman format files.
+
+<p><dt> <strong>      2) UNCCD</strong><dd>
+  
+       Process your raw image into one without CCD effects.
+
+<p><dt> <strong>      3) INTERACT    </strong><dd>
+  
+       Make a table of the (X,Y) positions of about six bright
+       isolated stars.
+
+<p><dt> <strong>        4) PROFILE    </strong><dd>
+
+       Use those stars to define the mean star profile.
+
+<p><dt> <strong>        5) STARFIND (+INTERACT) or just INTERACT</strong><dd>
+
+       Make a table of the (X,Y) positions of all the stars in the image
+       you want to measure, and also all the stars that
+       affect them. If you are measuring stars on a series
+       of exposures to the same field, you should first make a
+       'deep' exposure by adding all the exposures together
+       with IMJOIN, and then marking the positions on that.
+       This will enable you to mark the very faintest stars.
+       Wether it is worth the effort if you have to align the
+       images first is another matter.
+ 
+<p><dt> <strong>        6) MEASURE   </strong><dd>
+
+       Do the fitting, using the profile and star position
+       list already made.
+ 
+<p><dt> <strong>        7) INTERACT    </strong><dd>
+
+       Have a look at the cleaned image and/or the places
+       stars fitted etc, to do a quality control check
+       You may at this stage wish to go back a number of steps.
+ 
+<p><dt> <strong>        8) CHI </strong><dd>
+
+       Take the magnitude list output of MEASURE and define
+       the Chi-squared values for an acceptable fit.
+ 
+<p><dt> <strong>        9) AVERAGE     </strong><dd>
+
+       Average all acceptable fits from several different
+       exposures measured using the same star list.
+ 
+<p><dt> <strong>       10) DIAGRAM    </strong><dd>
+
+       Combine the magnitudes to make a colour-magnitude
+       or colour-colour diagram.
+
+<p><dt> <strong>       11) AUTOMAG </strong><dd>
+
+       Perform automatic aperture photometry on the images
+       with the standard stars, and correct for atmospheric 
+       extinction.
+
+</dl>
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Jan 4 </i>
+ 

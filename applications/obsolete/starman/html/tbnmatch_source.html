@@ -1,0 +1,490 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBNMATCH
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBNMATCH
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbnmatch_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbnmatch">
+t_tbnmatch  </a>  Extract entries with matching names in a number of tables       <br>
+<a href="#tbnm_gtin">
+tbnm_gtin  </a>  Get input files       <br>
+<a href="#tbnm_names">
+tbnm_names  </a>  Get locations of stars in files       <br>
+<a href="#tbnm_loadn1">
+tbnm_loadn1  </a>  Get number of output rows and load output names       <br>
+<a href="#tbnm_loadn2">
+tbnm_loadn2  </a>  Load positions of names in file       <br>
+<a href="#tbnm_gtout">
+tbnm_gtout  </a>  Get output files       <br>
+<a href="#tbnm_move">
+tbnm_move  </a>  Move entries from input tables to output tables       <br>
+<a href="#tbnm_doit">
+tbnm_doit  </a>  Move entries from input tables to output tables       <br>
+<a href="#tbnmatch">
+tbnmatch  </a>  (Program) Extract entries with matching names in a number of tables       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C     TBNMATCH.FOR
+C
+C     Contains:-
+C T_TBNMATCH    Extract entries with matching names in a number of tables
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbnmatch"> T_TBNMATCH  </a>-- Extract entries with matching names in a number of tables
+C
+C         A J Penny            RAL                       1991 May
+
+      subroutine t_tbnmatch ()
+
+      implicit none
+C--
+Cbegin
+
+
+      call tbnm_gtin							!Get the input MEASURE files
+
+      call tbnm_names							!Get locations of stars in files
+
+      call tbnm_gtout							!Get output files
+
+      call tbnm_move							!Load output
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_gtin"> TBNM_GTIN  </a>-- Get input files
+C
+C  a j penny              ral                  1991 March
+
+      subroutine tbnm_gtin ( )
+
+      implicit none
+      include 'tbnmatch.inc'
+      include 'STARMAN_INC'
+C--
+      integer k, ierr, istat
+      logical loop, ok
+      character*4 itext
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1i ( 'MAXIMUM', KMAXR, 10000, 1, 1000000 )		!Maximum no of output rows
+      if ( ST_FAILED ) return
+
+      call gtwrki ( 'WORKN', KNUMF*KMAXR, IPNUMS, istat )		!Open array with file row posns
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call azeroi ( %val(IPNUMS), KNUMF*KMAXR )				!Set default to not found for all
+
+      call gtwrkr ( 'WORKR', 5*KMAXR, IPNAMES, istat )			!Open array with file row names
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call get1i ( 'FLAGCOL', NCOLO, 0, 0, 1000000 )			!Get flag columns and values
+      if ( ST_FAILED ) return
+      if ( NCOLO.ne.0 ) then
+         call get1r ( 'FLAGVAL', VALCOL, 50.0, -1.0e20, 1.0e20 )
+         if ( ST_FAILED ) return
+      endif
+
+      call printo ( ' ' )
+      k = 0
+      loop = .true.
+      do while ( loop )							!Loop getting files
+         k = k + 1
+         ok = .true.
+
+         write ( itext, '(''IN'',i2)' ) k
+         call lbgone ( itext(3:) )
+         call optabr ( itext, IPI(k), TBVXI(k), TBYI(k), .true., ierr )	!Get next file
+         if ( ST_FAILED ) return
+         if ( ierr.eq.2 ) then						!ok?
+            k = k - 1
+            ok = .false.
+            if ( k.ne.0 ) then						!Must have 1 file
+               loop = .false.
+            else
+               call printo ( 'ERROR: Must have at least one file' )
+            endif
+         elseif ( ierr.eq.1 ) then
+            ST_FAILED = .true.
+            return
+         endif
+
+         if ( NCOLO.ne.0 ) then
+            if ( TBVXI(k).lt.(NCOLO+5) ) then				!Too narrow
+               call printo (
+     +             'ERROR: Table too narrow for use of flag column' )
+               ST_FAILED = .true.
+               return
+            endif
+         endif
+
+         if ( ok .and. k.eq.KNUMF ) then				!Not too many
+            call printo ( 'No more input files allowed' )
+            loop = .false.
+         endif
+
+      enddo
+
+      KTOT = k								!Total no of input tables
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_names"> TBNM_NAMES  </a>-- Get locations of stars in files
+C
+C   a j penny                      ral              1991 March
+
+      subroutine tbnm_names ( )
+
+      implicit none
+      include 'tbnmatch.inc'
+      include 'STARMAN_INC'
+C--
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call printo ( 'Making sorting tables for files to match names' )
+
+      TBYO = 0
+      do k = 1, KTOT							!Load names from file 1 and 		
+         call tbnm_loadn1 ( %val(IPI(k)), TBVXI(k), TBYI(k), k, 	! add any extra names from other files
+     +                      %val(IPNAMES) )
+         if ( k.eq.1 ) then
+            call pargi ( TBYO )
+            call printd ( 'Loaded output names from file 1'//
+     +                    ' - total rows = %d' )
+         else
+            call pargi ( k )
+            call pargi ( TBYO )
+            call printd (
+     +      'Added extra output names from file %d - total rows = %d' )
+         endif
+      enddo
+
+      call pargi ( TBYO )
+      call printd ( 'Output files have %d rows' )
+
+      do k = 1, KTOT							!Load actual positions for those there
+         call tbnm_loadn2 ( %val(IPI(k)), TBVXI(k), TBYI(k),
+     +                      k, %val(IPNAMES), %val(IPNUMS)  )
+         call pargi ( k )
+         call printd ( 'Loaded sorting table for file %d' )
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_loadn1"> TBNM_LOADN1  </a>-- Get number of output rows and load output names
+C
+C   a j penny                      ral              1991 March
+
+      subroutine tbnm_loadn1 ( tb, tbvx, tby, kf, tbnames )
+
+      implicit none
+      include 'tbnmatch.inc'
+      include 'STARMAN_INC'
+
+      integer   tbvx			!i: Input file no of cols
+      integer   tby			!i: Input file no of rows
+      real	tb(tbvx,tby)		!i: Input file
+      integer   kf			!i: File number
+      real      tbnames(5,KMAXR)	!o: Output names
+C--
+      integer k, kk, kd
+      logical found, more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = 1
+      more = .true.
+      do while ( more )
+
+         kk = 1
+         found = .false.
+         do while ( kk.le.TBYO .and. .not.found .and. TBYO.gt.0 )
+            call namechr ( tbnames(1,kk), tb(1,k), kd )
+            if ( kd.eq.0 ) found = .true.
+            kk = kk + 1
+         enddo
+
+         if ( .not.found ) then
+            if ( TBYO.eq.KMAXR ) then
+               call pargi ( TBYO )
+               call printd (
+     +              'ERROR: Too many star names: there are over %d' )
+               ST_FAILED  = .true.
+            else
+               TBYO = TBYO + 1
+               call amovr ( tb(1,k), tbnames(1,TBYO), 5 )
+            endif
+         endif
+
+         if ( ST_FAILED .or. k.eq.tby ) more = .false.
+         k = k + 1
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_loadn2"> TBNM_LOADN2  </a>-- Load positions of names in file
+C
+C   a j penny                      ral              1991 March
+
+      subroutine tbnm_loadn2 ( tb, tbvx, tby, kf, tbnames, nums )
+
+      implicit none
+      include 'tbnmatch.inc'
+
+      integer    tbvx			!i: Input file no of cols
+      integer    tby			!i: Input file no of rows
+      real	 tb(tbvx,tby)		!i: Input file
+      integer    kf			!i: File number
+      real       tbnames(5,KMAXR)	!i: Output names
+      integer    nums(KNUMF,KMAXR)	!o: Positions array
+C--
+      integer k, kk, kd
+      logical found
+Cbegin
+
+
+      do kk = 1, TBYO
+
+         k = 1
+         found = .false.
+         do while ( k.le.tby .and. .not.found )
+            call namechr ( tbnames(1,kk), tb(1,k), kd )
+            if ( kd.eq.0 ) then
+               nums(kf,kk) = k
+               found = .true.
+            endif
+            k = k + 1
+         enddo
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_gtout"> TBNM_GTOUT  </a>-- Get output files
+C
+C   a j penny                      ral              1991 March
+
+      subroutine tbnm_gtout ( )
+
+      implicit none
+      include 'tbnmatch.inc'
+      include 'STARMAN_INC'
+C--
+      integer k, ierr, iv
+      logical loop, ok
+      character otext*5, itext*4, title*50
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call printo ( ' ' )
+      k = 0
+      loop = .true.
+      do while ( loop ) 						!Loop getting output files
+
+         k = k + 1
+         ok = .true.
+
+         write ( otext, '(''OUT'',i2)' ) k
+         call lbgone ( otext(4:) )
+         call optabw ( otext, IPO(k), TBVXI(k), TBYO, .false., ierr )	!Get next file
+         if ( ST_FAILED ) return
+         if ( ierr.eq.1 ) then						!ok?
+            k = k - 1
+            ok = .false.
+            call canpar ( otext )
+         endif
+
+         if ( ok ) then
+            write ( itext, '(''IN'',i2)' ) k
+            call lbgone ( itext(3:) )
+            call gtdesc ( itext, 'TITLE', title, 			!Lad title and descriptors
+     +                    'Output from Tbnmatch', iv, ierr )
+            call get1c ( 'TITLE', title, title, .true. )	
+            if ( ST_FAILED ) return
+            call tcopdes ( itext, otext, ierr )
+            call ptdesc ( otext, 'TITLE', title )
+         endif
+
+         if ( k.eq.KTOT ) loop = .false.
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_move"> TBNM_MOVE  </a>-- Move entries from input tables to output tables
+C
+C  alan penny            ral        1990-06-06
+
+      subroutine tbnm_move ( )
+
+      implicit none
+      include 'tbnmatch.inc'
+C--
+      integer k
+Cbegin
+
+
+      do k = 1, KTOT
+         call tbnm_doit ( %val(IPI(k)), TBVXI(k), TBYI(k), %val(IPO(k)),
+     +                    k, %val(IPNUMS) )
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnm_doit"> TBNM_DOIT  </a>-- Move entries from input tables to output tables
+C
+C  alan penny            ral        1990-06-06
+
+      subroutine tbnm_doit ( tbi, tbvx, tby, tbo, kf, nums )
+
+      implicit none
+      include 'tbnmatch.inc'
+      include 'STARMAN_INC'
+
+      integer   tbvx			!i: No of input table columns + 5
+      integer   tby			!i: No of input table rows
+      real	tbi(tbvx,tby)		!i: Input table
+      real	tbo(tbvx,TBYO)		!o: Output table
+      integer   kf			!i: File number
+      integer   nums(KNUMF,KMAXR)	!i: List of posns of input in output
+C--
+      integer k, nk
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call coprr ( %val(IPNAMES), 5, KMAXR, 1, 5, 1, TBYO, tbo, tbvx, 	!Copy names
+     +             TBYO, 1, 1 )
+
+      do k = 1, TBYO							!Load values
+         if ( nums(kf,k).eq.0 ) then
+            call azeror ( tbo(6,k), (tbvx-5) )
+            if ( NCOLO.ne.0 ) tbo((5+NCOLO),k) = VALCOL
+         else
+            nk = nums(kf,k)
+            call amovr ( tbi(6,nk), tbo(6,k), (tbvx-5) )
+         endif
+      enddo
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnmatch"> TBNMATCH  </a>-- (Program) Extract entries with matching names in a number of tables
+C   See TBNMATCH.HLP for details
+C
+C         A.J.Penny                RAL                      1994 May
+
+      subroutine tbnmatch ( ierradam )
+
+      implicit none
+
+      integer     ierradam         !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbnmatch
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  TBNMATCH.INC for TBNMATCH.F
+C
+
+      integer     knumf			!Max number of input files
+      parameter   (knumf=40 )
+
+      integer     kmaxr			!Max number of output rows
+      integer     ipnames		!Pointer to names array
+      integer     ipnums		!Pointer to numbers array
+      integer     ipi(knumf)		!Pointers to input files
+      integer     ipo(knumf)		!Pointers to output files
+      integer     tbvxi(knumf)		!Numbers of cols (+5) in input files
+      integer     tbyi(knumf)		!Numbers of rows in input files
+      integer     tbyo			!Numbers of rows in output files
+      integer     ncolo			!Column number of flag value
+      integer     ktot			!Number of input files
+
+      real        valcol		!Flag value for no data
+
+
+      common / tbnma /  kmaxr,  ipnames,  ipnums,    ipi,   ipo,
+     +                  tbvxi,     tbyi,    tbyo,  ncolo,  ktot,
+     +                 valcol
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

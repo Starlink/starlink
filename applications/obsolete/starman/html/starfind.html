@@ -1,0 +1,753 @@
+<HTML> <HEAD>
+<TITLE> STARFIND </TITLE>
+</HEAD> <BODY>
+ 
+<h1> STARFIND - Find stars
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This program finds stars in an image.
+<p>
+ 
+  It works by looking for boxes of roughly the seeing size which
+  are above (in a significant way) their surroundings. It is a good
+  searcher, but slow, although it can be sped up by setting the
+  search limits so it does not look for very improbable stars.
+<p>
+ 
+  It can deal with variations in the background level, but gets
+  thrown by very large galaxies. If it encounters small galaxies, it
+  gives them the benefit of the doubt and marks up a double star.
+<p>
+ 
+  It is not perfect, and the eye can do better in some cases. It is
+  very good on very faint isolated stars, finding (real) things you
+  wouldnt believe, but in very crowded fields or very overlapping
+  stars, it is good to run STARFIND and then delete and add the few
+  corrections to the star list produced. This can be done by INTERACT.
+<p>
+ 
+  The output file is not asked for until the very end of the program,
+  after it has found the stars. If you want to input the file name at
+  the beginning of the program, do so in the command line when running
+  the program, with OUT='name of file' and TITLE='title to add to file'.
+  This will then permit the program to access these when it needs them
+<p>
+ 
+  The program will not work on images smaller than 10x10.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#starfind_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#method"> Method </a>
+<ul>
+<li> 2.1 <a href="#u-map"> U-map </a>
+<li> 2.2 <a href="#peaks"> Peaks </a>
+<ul>
+<li> 2.2.1 <a href="#sky"> Sky </a>
+</ul>
+<li> 2.3 <a href="#ellipticity"> Ellipticity </a>
+<li> 2.4 <a href="#shoulders"> Shoulders </a>
+<li> 2.5 <a href="#weeding"> Weeding </a>
+<li> 2.6 <a href="#maximum number"> Maximum number </a>
+</ul>
+<li> 3 <a href="#output"> Output </a>
+<li> 4 <a href="#hidden_parameters"> Hidden parameters </a>
+<li> 5 <a href="#inform"> Inform </a>
+<li> 6 <a href="#parameters"> Parameters </a>
+<li> 7 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+ 
+<hr>
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+ 
+ 
+  First you must know very roughly the radius of the star images.
+<p>
+ <ol>
+<li> Start the program.
+<p><li> Input the control parameters
+<p><li> A list of star positions comes out.
+<p><li> Er - that's it.
+</ol><p>
+ 
+  There are two options to omit two parts of the searching to speed
+  things up. Use of these options will result in not finding a few of
+  the tricky stars.
+<p>
+ 
+  There are also two input paramaters to select the range of stars
+  found to differing probability limits.
+<p>
+ 
+  There is also a not very critical parameter, the size of the large
+  sky box the program uses. I suggest you adopt the computer suggested
+  size.
+<p>
+ 
+  If you are interested in the progress of the program you can set
+  the parameter INFORM to different levels to get different levels of
+  output on the terminal as you go along.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ 
+ The finding is done by:-
+<p>
+ 
+<dl>
+<dt> <strong> (A) </strong>
+<p><dd> Making a 'U-map' image of the input image. This is a map of the
+     probability that a pixel is significantly higher than its
+     surroundings, and so is likely to be near the peak of a star.
+     Thus a 'sharpened' image is made of star-sized objects above the
+     local levels.
+<p>
+ 
+<dt> <strong> (B) </strong>
+<p><dd> Looking in the U-map image for:-
+<p>
+<ol>
+<li> Star peaks and plateaus
+<p><li> Elliptical stars, and saying that is actually two stars
+<p><li> Shoulders running off from stars, and saying they are actually
+        stars
+</ol><p>
+ 
+<dt> <strong> (C) </strong>
+<p><dd> Weeding the stars found for spurious ones
+<p>
+ 
+ This process has been deliberately tuned to be reasonably generous
+ in finding stars, so it should find more than there are. The output
+ of this should be put into a proper star measuring program to
+ sort out the (small number of) false alarms.
+<p>
+ 
+ There is a limit on the number of stars that can be found.
+<p>
+ 
+ These matters are described more fully in the sub-headings below.
+<p>
+</dl>
+ 
+<hr>
+ <h2> 2.1 <a name="u-map"> U-map </h2> </a> <p>
+ 
+ 
+  The U-map is made by:-
+<p>
+ 
+ Running a non-parametric test (one tailed mann-whitney U test)
+ over every point in the image. At each point it takes a box
+ (roughly a seeing size) round that point and compares it with
+ an equal area around that box. It looks at the ranks of points
+ when all put together, and assigns a probability
+ (0-1 1=certain) to the chance that the ranks are NOT scattered
+ at random, and thus that the data in the box is different
+ AND higher from that in the annulus round it. This is then
+ repeated with the comparision area separated by 1 pixel from
+ the central box, and then with slices on each side,and then
+ with slice on top and bottom. The comparision which indicates
+ the most difference is taken.
+<p>
+ 
+ The U-map image of probabilities is a sharpened (on the scale
+ of the box used) copy of the input. Thus the background (sky,
+ large-scale effects such as galaxies, fringes, etc) is
+ automatically allowed for. The box size is 3x3 for radius less
+ than 1.75, 5x5 for radius less than 2.5 and then 7x7 up to 5.5,
+ and therafter  ( nbox = 1 + 2*int(1.0+(radius-1.5)/2.0) )
+<p>
+ 
+ 
+<hr>
+ <h2> 2.2 <a name="peaks"> Peaks </h2> </a> <p>
+ 
+ 
+ The peaks are found by searching the U-map for isolated images.
+<p>
+ 
+    This is done by lowering a threshold and looking for isolated
+    patches above those thresholds. The mean position of the largest
+    size patch before it merges in the lowering with another is taken
+    as the star position. The lowering continues until the U-map
+    probability level of 'x' is reached (i.e. their is a 'x' chance
+    that the values are not different from the surrounds). 'x' is
+    is a user input number. An 'x' value of 0.001 will result in
+    about 100 false detections in a 320 by 512 image. Thus
+    normally, a value of 0.01 is used.
+<p>
+ 
+    The lowering then continues down to the 'y' probablity level,
+    but only those patches which have values in the corresponding
+    real image significantly (2.25 std devs) above the local sky
+    level are found. This finds faint stars on the wings of bright
+    ones. 'y' is normally 0.05, but to speed the process up, can
+    be set to the 'x' level of step 3).
+<p>
+ 
+<hr>
+ <h2> 2.2.1 <a name="sky"> Sky </h2> </a> <p>
+ 
+ 
+ The local sky level referred to above has previously been
+ determined by the program.
+<p>
+ 
+ This is done by making a 'sky map', that is a temporary image the
+ same size as the input image, with its pixel values set to what the
+ program thinks is the value of the background sky at that pixel.
+<p>
+ 
+ It also determines another sky map, which have the local values of
+ (sky+scatter), where 'scatter' is the largest reasonable value the
+ sky noise could add to the sky level in a pixel.
+<p>
+ 
+ These are determined in one of three ways:-
+<p>
+ 
+<ol>
+<li> Subdividing the image into largeish (set by you, but suggested
+     at 64x64) boxes, finding local modes and scatters, and then
+     interpolating between these local modes by linear interpolation
+     between the box centres. The scatter about the mode of the lowest
+     mode is taken as the sky scatter.
+<p>
+ 
+<li> Taking the input image as having a uniform background. The mode of
+     the image is found, and the std dev about this mode found.
+<p>
+ 
+     This is the default way.
+<p>
+ 
+<li> Looking for the minimum pixel value and taking that as the sky
+     level. The noise is taken as the std dev about the mode level of
+     the whole image.
+<p>
+</ol>
+ 
+ The default should be chosen unless there is smooth and
+ significant change in the sky background (say from an elliptical
+ galaxy which covers most of the image). If the change in the sky
+ background is sharp, say from a globular cluster manifesting itself
+ over 50 pixels, choose the default anyway.
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="ellipticity"> Ellipticity </h2> </a> <p>
+ 
+ 
+ The found images are searched for ellipticity, an indication of 2
+ stars close together, merging to make one.
+<p>
+ 
+ The program looks at stars and sees if the U-test image shape of the
+ star is elliptical. For a star to qualify as elliptical, the
+ group of flagged pixels that make up the star (that is the number
+ of contiguous pixels flagged as being below the present
+ significance level) have to satisfy certain criteria:-
+<p>
+ 
+<ul>
+<li>    - the ellipticity has to be greater than a given limit, 0.35
+<li>     - the semi-major axis has to be larger than a given limit
+        (0.67 times the star image profile radius)
+<li>     - the area of the star has to be more than seven pixels
+<li>     - the area of the star must not touch the image edge
+<li>     - the area of the star does not contain other stars
+</ol><p>
+ 
+ This searching is only done when new stars are found in the main
+ program. On these occasions, all the stars are checked for
+ ellipticity. Now some of these will have already been found
+ to be elliptical when working at a higher contour level
+ significance. Such stars are rechecked regardless, as the lower
+ significance, larger, image may show up a better ellipticity. This
+ rechecking of 'existing' doubles is however only done five times.
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="shoulders"> Shoulders </h2> </a> <p>
+ 
+ 
+  Stars on the wings of brighter ones are searched for. These show up
+  in the U-map image as long, narrow projections from the patches. At
+  each lowering level, each image is searched for these projections.
+  These projections are allowed down to a 9.5% probability level.
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="weeding"> Weeding </h2> </a> <p>
+ 
+ 
+ The stars found are weeded before output to remove spurious
+ detections.
+<p>
+ 
+ This is done by:-
+<p>
+<ul>
+<li> The final list is searched for stars which are too close
+    to each other (separation less than 0.66*star radius). These
+    are replaced by one star at the mean position.
+<p>
+ 
+<li> For CCD images, bright stars have linearity problems and/or
+    saturated centres, and these centres should be marked by
+    INVALID flag levels for all pixels above some level. These
+    stars are then found to have a number of isolated patches
+    in the U-map (since the centre itself has all the same values),
+    and so a test is made for these saturated centres, and the
+    possibly more than 1 stars found there are reduced to one.
+<p>
+ 
+<li> If an image was trailed or by some other cause has elongated
+    images, then this program will tend to regard each image
+    as a double and mark it as so. If desired, the star list
+    is looked at for an excess of close doubles at the same
+    angle and separation, and these are reset to be single stars.
+</ol><p>
+ 
+<hr>
+ <h2> 2.6 <a name="maximum number"> Maximum number </h2> </a> <p>
+ 
+ 
+ There is a user defined computer found star storage work space.
+ This limits the number of stars that may be found. The default is
+ 10,000 stars. If more than this are found, the program stops.
+ If more than this are found, the program stops. The resulting star
+ list will have a non-complete and non-uniformly found content and
+ should not be used as an reliable list. Although all the stars
+ actually in it will be good ones, the found/not found distinction
+ may vary with position, brightness, ellipticity, sky background,
+ and presence of nearby stars in an unprdicatble way. If the
+ max number of stars is found, then because of the weeding of close
+ pairs and of multiple hits on large invalid areas, less than the
+ maximum may be put out. Beware of thus thinking that all was ok
+ just because of the fact that less than the maximum number were
+ output.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="output"> Output </h2> </a> <p>
+ 
+ 
+   The output table contains six columns. For each star, the entry is:-
+<p>
+<pre>
+  Column  Contents
+  ------  --------
+  1       x posn
+  2       y posn
+  3       height above sky
+  4       utest value as 100000.0*(1.0 - [u-test probablity])
+  5       flag for 'STARFIND' type:-
+           1:single 2:nipple 3:ellipse
+           4:weeded ellipse centre
+           11:single-inval 12:nip-inval 13:ell-inval
+  6       elliptical companion number (=0 if none)
+</pre><p>
+ 
+<hr>
+ <h2> 4 <a name="hidden_parameters"> Hidden parameters </h2> </a> <p>
+ 
+ 
+  The parameters MAXNUM, USAVE, OUTIM, PLIMIT and WLIMIT are 'hidden',
+  that is they are only accessible by putting 'STARFIND parameter=value'
+  on the command line or by using a previous LET command.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="inform"> Inform </h2> </a> <p>
+ 
+ 
+  The program can output progress information as it goes along.
+  What is output to the terminal device by the program is set by
+  the INFORM parameter. Thus:-
+<p>
+<pre>
+ 
+ INFORM   Output information
+ ------   ------------------
+ None     None
+ Some     Stages in the finding started and ended
+ Lots     As for `some', but also more detailed
+           information, such as the U-map level
+           being looked at, and stars found
+</pre><p>
+ 
+  In the typed-out information when INFORM = `lots', those lines relating to
+  star finds are similar to the rows in the output table. The
+  star number is however not the same as in the output, as there is a
+  sequence of finding which may affect earlier finds, and so disrupt the
+  star numbering. Thus a found star may later in the program be decided
+  to be:-
+<p><ul>
+<li>    - replaced by two stars since the found star is too elliptical
+<li>    - removed as one of a number of false finds in an 'invalid' peak
+<li>    - removed as being too close to another star
+</ul>
+<p>
+ 
+  These last two removal processes also have their process informed to
+  the terminal.
+<p>
+ 
+<hr>
+ <h2> 6 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+ 
+<ul>
+<li> 6.1 <a href="#ellipse"> Ellipse </a>
+<li> 6.2 <a href="#faint"> Faint </a>
+<li> 6.3 <a href="#in"> In </a>
+<li> 6.4 <a href="#inform"> Inform </a>
+<li> 6.5 <a href="#maxnum"> Maxnum </a>
+<li> 6.6 <a href="#out"> Out </a>
+<li> 6.7 <a href="#outim"> Outim </a>
+<li> 6.8 <a href="#plimit"> Plimit </a>
+<li> 6.9 <a href="#radius"> Radius </a>
+<li> 6.10 <a href="#skytype"> Skytype </a>
+<li> 6.11 <a href="#smear"> Smear </a>
+<li> 6.12 <a href="#title"> Title </a>
+<li> 6.13 <a href="#usave"> Usave </a>
+<li> 6.14 <a href="#wlimit"> Wlimit </a>
+<li> 6.15 <a href="#xskybox"> Xskybox </a>
+<li> 6.16 <a href="#yskybox"> Yskybox </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 6.1 <a name="ellipse"> Ellipse </h2> </a> <p>
+ 
+  (Default - 'yes'        <br> Choice -  'yes/no')
+<p>
+ 
+  After the first search, repeat, trying to see if any of the objects
+  were elliptical and thus maybe double stars. YES/NO will enable/
+  suppress this extra search.
+<p>
+ 
+<hr>
+ <h2> 6.2 <a name="faint"> Faint </h2> </a> <p>
+ 
+  (Default - 'yes'        <br> Choice -  'yes/no')
+<p>
+ 
+  After the first search, repeat, trying to see if any of the objects
+  were had faint companions that were missed. YES/NO will enable/supp-
+  ress this extra search.
+<p>
+ 
+<hr>
+ <h2> 6.3 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input image
+<p>
+ 
+  This can be either a `short' 16-bit integer or a `real' 32-bit real
+  Starman NDF image.
+<p>
+ 
+<hr>
+ <h2> 6.4 <a name="inform"> Inform </h2> </a> <p>
+ 
+  (Default - 'none'       <br> Choice - 'none:some:lots')
+<p>
+ 
+  Switch to enable monitoring of the progress.
+<p>
+ 
+  The program can output progress information as it goes along.
+  What is output to the terminal device by the program is set by
+  the INFORM parameter. Thus:-
+<p>
+<pre>
+ 
+ INFORM    Output information
+ ------    ------------------
+ none      None
+ some      Stages in the finding started and ended
+ lots      As for `some', but also more detailed
+            information, such as the U-map level
+            being looked at, and stars found
+</pre><p>
+ 
+  In the typed-out information when INFORM = `lots', those lines relating to
+  star finds are similar to the rows in the output table. The
+  star number is however not the same as in the output, as there is a
+  sequence of finding which may affect earlier finds, and so disrupt the
+  star numbering. Thus a found star may later in the program be decided
+  to be:-
+<p><ul>
+<li> - replaced by two stars since the found star is too elliptical
+<li> - removed as one of a number of false finds in an 'invalid' peak
+<li> - removed as being too close to another star
+</ul><p>
+ 
+  These last two removal processes also have their process informed to
+  the terminal.
+<p>
+ 
+<hr>
+ <h2> 6.5 <a name="maxnum"> Maxnum </h2> </a> <p>
+ 
+  (Default - 10000         <br> Range - 1 to  1 000 000)
+<p>
+ 
+  The maximum number of stars that can be found.
+<p>
+ 
+  Hidden variable, only accessible from command line.
+<p>
+ 
+  If more than this are found, the program stops. The resulting star
+  list will have a non-complete and non-uniformly found content and
+  should not be used as an reliable list. Although all the stars
+  actually in it will be good ones, the found/not found distinction
+  may vary with position, brightness, ellipticity, sky background, and
+  presence of nearby stars in an unprdicatble way. If the
+  max number of stars is found, then because of the weeding of close
+  pairs and of multiple hits on large invalid areas, less than the
+  maximum may be put out. Beware of thus thinking that all was ok
+  just because of the fact that less than the maximum number were
+  output.
+<p>
+ 
+<hr>
+ <h2> 6.6 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain the output table of star positions.
+<p>
+ 
+  The output file is not asked for until the very end of the program,
+  after it has found the stars. If you want to input the file name at
+  the beginning of the program, do so in the command line when running
+  the program, with OUT='name of file' and TITLE='title to add to file'.
+  This will then permit the program to access these when it needs them
+<p>
+ 
+<hr>
+ <h2> 6.7 <a name="outim"> Outim </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain output U-test image.
+<p>
+ 
+  This is only output, if 'YES' has been responded to 'Usave' (a hidden
+  parameter).
+<p>
+ 
+<hr>
+ <h2> 6.8 <a name="plimit"> Plimit </h2> </a> <p>
+ 
+  (Default - 0.001        <br> Range - 0.00001 to 1.0)
+<p>
+ 
+  Hidden variable, only accessible from command line.
+<p>
+ 
+  The limit of probability that the difference between the area inside
+  the search box and the area around it has arisen by chance and that
+  there is not really a star at this position. A value of 0.001 gives
+  roughly 10 false detections in a 100x100 pixel area.
+<p>
+ 
+<hr>
+ <h2> 6.9 <a name="radius"> Radius </h2> </a> <p>
+ 
+  (Default - 2.0         <br> Range - 0.2 to 20.0)
+<p>
+ 
+  The approximate Half Power Half Width of the star images. This is what
+  `profile' (qv) and `simplemag' find and what `measure' (qv) uses
+<p>
+ 
+<hr>
+ <h2> 6.10 <a name="skytype"> Skytype </h2> </a> <p>
+ 
+  (Default - 'local'            <br> Choice - 'local:mean:minimum')
+<p>
+ 
+  Method of making the sky map.
+<p>
+ 
+ The local sky level and sky level scatter has to be determined.
+<p>
+ 
+ This is done by making a 'sky map', that is a temporary image the
+ same size as the input image, with its pixel values set to what the
+ program thinks is the value of the background sky at that pixel.
+<p>
+ 
+ It also determines another sky map, which have the local values of
+ (sky+scatter), where 'scatter' is the largest reasonable value the
+ sky noise could add to the sky level in a pixel.
+<p>
+ 
+ These are determined in one of three ways:-
+<p>
+<dl>
+ 
+<dt> <strong> `local' </strong>
+<dd>  Subdividing the image into largeish (set
+         by you, but suggested at 64x64) boxes, finding local modes and scatters,
+          and then interpolating between these local modes by linear
+          interpolation between the box centres. The scatter about the
+          mode of the lowest mode is taken as the sky scatter.
+<p>
+ 
+          This is the default way.
+<p>
+ 
+<dt> <strong> `mean' </strong>
+<dd>   Taking the input image as having a uniform background. The
+          mode of the image is found, and the std dev about this mode
+          found.
+<p>
+ 
+<dt> <strong> `minimum' </strong>
+<dd>     Looking for the minimum pixel value and taking that as the
+          sky level. The noise is taken as the std dev about the mode
+          level of the whole image.
+</dl><p>
+ 
+ 
+ The default should be chosen unless there is smooth and
+ significant change in the sky background (say from an elliptical
+ galaxy which covers most of the image). If the change in the sky
+ background is sharp, say from a globular cluster manifesting itself
+ over 50 pixels, choose the default anyway.
+<p>
+ 
+<hr>
+ <h2> 6.11 <a name="smear"> Smear </h2> </a> <p>
+ 
+  (Default - 'yes'        <br> Choice -  'yes/no')
+<p>
+ 
+   If an image was trailed or by some other cause has elongated
+   images, then this program will tend to regard each image
+   as a double and mark it as so. If desired (YES), the star list
+   is looked at for an excess of close doubles at the same
+   angle and separation, and these are reset to be single stars.
+<p>
+ 
+<hr>
+ <h2> 6.12 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title or 'Output from STARFIND'    <br> Choice - any)
+<p>
+ 
+  The Title to add to file ( named with 'OUT') containing the output
+  star position table.
+<p>
+ 
+<hr>
+ <h2> 6.13 <a name="usave"> Usave </h2> </a> <p>
+ 
+  (Default - 'no'        <br> Choice -  'yes/no')
+<p>
+ 
+  Flag for saving the U-test image made in the calculations.
+<p>
+ 
+  Hidden variable, only accessible from command line.
+<p>
+ 
+<hr>
+ <h2> 6.14 <a name="wlimit"> Wlimit </h2> </a> <p>
+ 
+  (Default - 0.05        <br> Range - 0.0001 to 1.0)
+<p>
+ 
+  Hidden variable, only accessible from command line.
+<p>
+ 
+  The limit of probability that the difference between the area inside
+  the search box and the area around it has arisen by chance and that
+  there is not really a star at this position, FOR A POSITION WHICH HAS
+  A SIGNAL VALUE of 2.5 std dev above the local sky. This is used for
+  looking for stars on the wings of bright stars.
+<p>
+ 
+<hr>
+ <h2> 6.15 <a name="xskybox"> Xskybox </h2> </a> <p>
+ 
+  (Default - 64 (or 1/2 image X size, if less) <br>
+   Range - 10 to half X size of image)
+<p>
+ 
+  Suggested X size of the box the program uses to average the sky
+  values. Should be small compared to the scale of the sky variations.
+<p>
+ 
+  (This is only asked for if the 'SKYTYPE' parameter is set to 'local'.)
+<p>
+ 
+<hr>
+ <h2> 6.16 <a name="yskybox"> Yskybox </h2> </a> <p>
+ 
+  (Default - 64 (or 1/2 image Y size, if less) <br>
+   Range - 10 to half Y size of image)
+<p>
+ 
+  Suggested Y size of the box the program uses to average the sky
+  values. Should be small compared to the scale of the sky variations.
+<p>
+ 
+  (This is only asked for if the 'SKYTYPE' parameter is set to 'local'.)
+<p>
+ 
+ 
+<hr>
+ <h2> 7 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+   A J Penny                  RAL            1991 Jan
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

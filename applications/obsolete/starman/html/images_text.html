@@ -1,0 +1,345 @@
+<HTML> <HEAD>
+<TITLE> images </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Starman Help for:- images </h1>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#images"> Images </a>
+<li> 2 <a href="#formats"> Formats </a>
+<li> 3 <a href="#what_is_in_an_image"> What is in an image </a>
+<li> 4 <a href="#precision"> Precision </a>
+<ul>
+<li> 4.1 <a href="#real format"> Real format </a>
+<li> 4.2 <a href="#short format"> Short format </a>
+</ul>
+<li> 5 <a href="#coordinates"> Coordinates </a>
+<li> 6 <a href="#image_menu"> Menu </a>
+<li> 7 <a href="#image_display"> Image display </a>
+<li> 8 <a href="#conversion_from_other_systems"> Conversion from other systems </a>
+<li> 9 <a href="#conversion_to_other_systems"> Conversion to other systems </a>
+</ul>
+<p>
+ 
+Go to <a href="main.html"> Starman Help Main. </a>
+<p>
+ 
+<hr>
+ <h2> 1 <a name="images"> Images </h2> </a> <p>
+
+    
+ 
+  Starman has some image handlers ready for use. These are the
+  IM-programs, and they have their own help. There is also the
+  'Interact' program, the main image display interaction program.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="formats"> Formats </h2> </a> <p>
+
+In an ideal world you would not need to know how your data are stored. The
+storage mechanism would be transparent, and you would perceive your data
+directly through the programs.  However, for historical reasons there
+are numerous data formats in astronomical software, and at the moment you have
+to be aware how your data is stored. Starman is no exception to this.
+It uses the ADAM image format and you need to know a
+little bit about this to use the programs properly.
+<p>
+
+The Starman suite of programs uses a simple data format for storing images
+in. Images are stored on disk as `SDF' files. Thus an called 'fred' will be
+stored as 'fred.sdf' on disk. (As with the tables, inside any Starman
+program, you do not use the `.sdf' suffix in referring to the image.) 
+<p>
+
+Both 'real' format and 'short' format images can be used. The 'real'
+format uses 4 bytes per pixel, and the 'short' format only 2 bytes
+per pixel. However, the 'short' format needs care with handling.
+<p>
+ 
+It is important to understand the limitations of the precision. see
+the `Precision' help below.
+<p>
+ 
+There is some progress being made for a system whereby the programs
+can read images in a number of other formats (e.g. IRAF, FITS, etc.),
+but this is only just becominmg available. Check whether this is
+here by trying to read data in such formats.
+<p>   
+
+<hr>
+ <h2> 3 <a name="what_is_in_an_image"> What is in an image </h2> </a> <p>
+ 
+ 
+  An image is a 2-D array of numbers. The numbers in an image are
+  considered as stored in individual `pixels'. The coordinates are
+  called 'X' and 'Y'.
+<p>
+ 
+  The numbers are stored with a precision of about 1 in 10 million
+  for 'real' images, and with a precision of about 1 in 50000 for
+  'short' images, but see the `help' in `Starman images precision' for
+  more detail on this.
+<p>
+ 
+  Each image also has two descriptors, BSCALE and BZERO. These
+  are used so that the value of a pixel is:-
+<p>
+ 
+      Value = BSCALE*(disk value) + BZERO
+<p>
+ 
+  Generally you need not be aware of this, but again see the
+  `Starman images precision' help.
+<p>
+ 
+  Each image also has a pixel magic value descriptor, `INVAL'.
+  This is used to flag `bad' pixels. A pixel having this
+  value (its `stored' value, not necessarily its 'true' value)
+  will be considered by the programs as being a `bad' one
+  and dealt with specially.
+<p>
+ 
+  The image also has a descriptor 'TITLE', a 50 long character
+  string. It does not form any part of the image itself, but can
+  be accessed by the user as a source of additional personal
+  information about the image. Thus for example an image called
+  'VFLAT' (stored as vflat.sdf on disk), could have a title of:- 
+<p>
+       'This is a flat field for the V filter' 
+<p>
+  This title is then available for inspection by the user, say by
+  the program `Imdes', and may be put out to the user by some
+  programs to show the user something about the image.
+<p>
+ 
+  The image may also have any number of further descriptors,
+  added by the user, or input via `Imfits&#95 dr', or by some other
+  programs.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="precision"> Precision </h2> </a> <p>
+
+The numbers in an image can have any value, but there is an actual storage
+matter. On the disk (or on tape), the numbers are coded either into 16-bit
+integers (short format) or as 32-bit reals (real format).
+<p> 
+
+Each image has assigned a scale (BSCALE) and a zero (BZERO), which are
+applied to all the numbers in an image. Thus the number actually stored is:-
+<p>
+
+         Stored value = (true value-BZERO)/BSCALE
+<p>
+ 
+  Thus if an image has BZERO 900,000.0 and BSCALE 10.0, then
+  a value of 1,000,000 will be stored as 10,000.
+<p>
+ 
+  Similarly, when a program reads an image from disk or tape,
+  it will get the true value by:-
+<p>
+ 
+         True value = (Stored value)*BSCALE + BZERO
+<p>
+ 
+All calculations inside a program are done in real single precision
+arithmetic, accurate to about 1 part in 10 million.
+<p>
+ 
+<hr>
+ <h2> 4.1 <a name="real format"> Real format </h2> </a> <p>
+ 
+ 
+  Numbers are stored as 32-bit real numbers, with possible values
+  between +/- 10 to the 37. The accuracy is about 1 part in 10 million.
+<p>
+ 
+ 
+  In most real images, BSCALE is set at 1.0, and BZERO at 0.0.
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="short format"> Short format </h2> </a> <p>
+ 
+ 
+
+Numbers are stored into 16-bit integers.
+<p>
+
+Thus if a program wants to store a number of value (say) 1,000,000 it cannot
+do this directly, as a 16-bit number can only have a value between -32768
+and +32767. So each image often has to make use of the scale (BSCALE) and
+zero (BZERO) values, which are applied to all the numbers in an image.
+<p>
+
+The advantage of this is that images are generally half the
+size of a `real' image. This means that disk and tape
+storage problems are halved, and reading and writing images
+into and out of programs is faster.
+<p>
+ 
+A disadvantage of this is that the precision of stored values is
+only about 1 in 60000. This is however good enough for most
+astronomical work.
+<p>
+ 
+Another disadvantage is that one has to be careful about
+dynamic range. If one wanted to store an image whose values
+varied between 0.8 and 1.2, with a precision of 0.0001 (say a
+flat field), then it would be no good storing this with
+the common default of (BSCALE=1.0,BZERO=0.0), as the values
+would actually stored as the INTEGERS `0' and '1', and on
+reaccessing them, they would then only have the values
+of 0.0 and 1.0. They way round this is to put the BSCALE
+and BZERO appropriately. Thus for this example, a BSCALE of
+0.0001 and a BZERO of 0.0 would store the numbers as integers
+between 8000 and 12000, which would then be able to be
+accessed as values between 0.8 and 1.2 with steps of 0.0001,
+as is desired.
+<p>
+ 
+The programs deal with this generally without you having
+to think about it, but some programs (IMFITS&#95 DR for example in
+certain cases) will not do this, so you have to think before you
+use them.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="coordinates"> Coordinates </h2> </a> <p>
+
+The bottom-left-hand pixel in an image is called the (1,1) pixel. Each
+pixel is thought of stretching for one pixel coordinate wide. Thus the
+blh pixel is thought of as stretching from 0.0 to 0.9999.. in X and Y,
+with its centre at (0.5,0.5).
+
+ 
+<hr>
+ <h2> 6 <a name="image_menu"> Menu </h2> </a> <p>
+ 
+<pre> 
+  The general programs to deal with images as images are:-
+  ----------------------------------------------------------
+ 
+  Name          Function
+  ----          --------
+ 
+ imcalc         Apply maths to an image or to any combination of images
+ imcube         Cut a 2-D image out of a 3-D or 4-D image
+ imcut          Make another image (sectioned,binned,inverted)
+ imdes          Look at the descriptors (headers) of an image
+ imfits_dr      Simple FITS image into Starman NDF image format
+ imflash        Simple display of image
+ imjoin         Join a number of images together
+ imkey          Insert pixel values by keyboard into an image
+ import         Import descriptors from other extensions into 'Starman'
+ imrotate       Rotate image ant-clockwise by 90,180,or270 degrees
+ imsmooth       Apply 'top-hat' or Gaussian smoothing to an image
+ imstat         Calculate statistics for an image
+ imtype         Convert files between (real;integer;16-bit integer)
+ imweed         Set a range of pixel values to invalid
+ 
+ There are other programs which handle images. These are listed
+ in the other 'help' sections. Amongst these the most relevant here is:-
+ 
+  Name          Function
+  ----          --------
+ Interact       Interact with a displayed image
+ Tbplot         Plot table graph/histogram - image picture/contour
+</pre> 
+<p>
+ 
+ 
+<hr>
+ <h2> 7 <a name="image_display"> Image display </h2> </a> <p>
+ 
+ 
+  Images can be simply displayed on any X-device.
+<p>
+ 
+  Sometimes if you are on a remote device, you will need to do
+  the Starlink utility `xdisplay'.
+<p>
+ 
+  Also any device, including hardcopy, can be used to output a greyscle
+  plot of an image  by using the image graphical output in the INSPECT
+  option in the INTERACT program.
+<p>
+ 
+<hr>
+ <h2> 8 <a name="conversion_from_other_systems"> Conversion from other systems </h2> </a> <p>
+ 
+ 
+If you have images in the FITS/FIGARO formats, there are programs in
+Starman and Kappa which you can use to convert them to the .SDF format used
+by Starman.
+<p>
+
+<pre> 
+  Format                 Conversion program
+  ------                 --------------------
+  FITS (disk)            imfits_dr
+  ADAM (=HDS/NDF/SDF)    import 
+  Figaro (=DST)          dst2ndf in Kappa, then import
+  FITS                   fitsin in Kappa, then import
+</pre> 
+<p>
+
+As the ADAM and Figaro conversion programs usually give you `Real' images,
+you can then use IMTYPE to convert them to the 16-bit Integer*2 `Short'
+format optional use in Starman. (Remember the possible use of scaling to
+avoid under/overflow.)
+<p>
+ 
+The image made from Figaro or HDS may be 3-D or 4-D. You can use
+'imcube' to extract the desired 2-D plane out of the image.
+<p>
+ 
+If you are in real trouble, use those packages to write a FITS tape
+and read the files in with \verb|fitsin| in Kappa.
+<p>
+ 
+<hr>
+ <h2> 9 <a name="conversion_to_other_systems"> 
+ Conversion to other systems </h2> </a> <p>
+ 
+ 
+To put images into the FITS/ADAM/FIGARO formats, there
+programs in in ADAM and Figaro which you can use to convert them to
+the desired format from the .SDF format used by Starman.
+<p>
+<pre> 
+ 
+  Format                 Conversion program
+  ------                 --------------------
+  ADAM (=HDS/NDF/SDF)    import in Starman (converts descriptors)
+  Figaro (=DST)          dst2ndf2dst in Kappa, after import
+  FITS                   fitsout in Kappa, after import
+  FITS (disk)            dfitsout in Kappa, after import
+</pre> 
+<p>
+ 
+If your Starman images are in the `short' format, then as the ADAM
+and Figaro conversion programs usually work with `real'
+images, you will have to use 'imtype' to convert the normal Starman
+16-bit Integer*2 `short' formats to `real', before converting them.
+<p>
+ 
+You should then use 'import' to copy descriptors in the FITS or
+FIGARO extensions.
+<p>
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Jan 4 </i>
+ 

@@ -1,0 +1,352 @@
+<HTML> <HEAD>
+<TITLE> CHI </TITLE>
+</HEAD> <BODY>
+ 
+<h1> CHI - <br>
+ Reject stars with poor fits
+        from  <a href="measure.html"> measure </a> program output
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This takes the output from MEASURE and, using the Chi-squared
+  values and the magnitudes, makes a table of the maximum acceptable 
+  Chi-squared value versus magnitude. This can then be input to the 
+  AVERAGE program to reject stars with poor fits.
+<p>
+
+  This can be done either in the automatic mode, or in an interactive
+  mode.
+<p>
+
+  In the automatic mode, it is assumed that in each one-magnitude
+  step there are a number of stars with 'good' chi-squared values,
+  and a few with higher values. The spread of values is then used
+  to determine an upper limit.
+<p>
+
+  In the interactive mode, a graph of the Chi-squared value versus 
+  magnitude is plotted out for the stars. The user then uses the 
+  cursor to define a series of (Magnitude,Chi) pairs. These are then 
+  used to define a table defining the run of maximum acceptable 
+  Chi-squared values versus magnitude.
+<p>
+ 
+ 
+<hr>
+Go to <a href="intro.html#chi_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#base_level"> Base level </a>
+<li> 3 <a href="#parameters"> Parameters </a>
+<ul>
+<li> 3.1 <a href="#again"> Again </a>
+<li> 3.2 <a href="#allstars"> Allstars </a>
+<li> 3.3 <a href="#devlimx"> Devlimx </a>
+<li> 3.4 <a href="#devlimy"> Devlimy </a>
+<li> 3.5 <a href="#graph"> Graph </a>
+<li> 3.6 <a href="#gtype"> Gtype </a>
+<li> 3.7 <a href="#in"> In </a>
+<li> 3.8 <a href="#linecol"> Linecol </a>
+<li> 3.9 <a href="#numinv"> Numinv </a>
+<li> 3.10 <a href="#numits"> Numits </a>
+<li> 3.11 <a href="#offcen"> Offcen </a>
+<li> 3.12 <a href="#out"> Out </a>
+<li> 3.13 <a href="#title"> Title </a>
+<li> 3.14 <a href="#use"> Use </a>
+</ul>
+<li> 4 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+ 
+ 
+  This is used for deciding which stars in the output of MEASURE
+  have residuals which are significantly higher than the average for a
+  star of that magnitude and is thus probably a poor measure. It makes
+  a file with a table of max acceptable Chi values at different
+  magnitude levels levels for use in AVERAGE.
+<p>
+ 
+  Before entry, poor measures may be pre-secreened by saying putting
+  limits on three of the measure parameters (the number of invalid
+  pixels in the star image, the number of iterations taken to fit the
+  star, and the distance the star was found from its input position).
+<p>
+ 
+  In the interactive mode, the values of Magnitude vs Chi excess are 
+  plotted out, and the cursor
+  is then used to define the highest acceptable Chi value at any number
+  of Mag values (up to 1000 positions). The cursor is used to draw an
+  imaginary line cutting off the high bad Chis from the low accepetble
+  Chis. The line is not plotted out as you mark the points, but when
+  you finish, straight lines are drawn between the points displaying
+  the line.
+  After the Mag,Chi positions have been input by the cursor the program
+  interpolates between them and puts constant  values outside them to
+  get a smooth limit curve. This line is then plotted. The whole
+  display and cursor work can be repeated.
+<p>
+
+  In the automatic mode, this part is done automatically.
+<p>
+ 
+  The program then calculates the values at 0.2mag intervals from the
+  faintest mag up to 20mag brighter, and stores them in an output file
+  containing a table for use with the AVERAGE program.
+<p>
+ 
+  With some data, the chi-squared values increase significantly for
+  bright stars. The program looks for such a trend, and if it finds
+  it, subtracts a curving base level to make the use of the cursor
+  easy. See the HELP section on base level.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="base_level"> Base level </h2> </a> <p>
+ 
+ 
+  With some data, the chi-squared values increase significantly for
+  bright stars. The program looks for such a trend, and if it finds
+  it, subtracts a curving base level to make the use of the cursor
+  easy.
+<p>
+ 
+  In such a case, the Chi values plotted are ones scaled down at each
+  magnitude value to try and make some allowance for the fact that, for
+  bright stars that are perfectly OK, the Chi value is higher than for a
+  faint star.
+<p>
+ 
+  The value shown is an excess above an estimated typical minimum value
+  at each magnitude. The excess values are displayed by fitting to the
+  envelope of minimum Chi values  a line of the form
+<p>
+ 
+           Y = zero + sl.starflux
+<p>
+ 
+  and displaying the Chi values as
+<p>
+ 
+            Chi  = zero + (Chi-Y)/sqrt(error/zero)
+<p>
+ 
+  The true Chi values can be seen from the numbers plotted out when
+  using the cursor (or by inspection of the output file).
+<p>
+ 
+  This makes use of the cursor easy and gives a fair idea of the
+  importance of the relative Chi errors.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+ 
+ 
+ 
+<hr>
+ <h2> 3.1 <a name="again"> Again </h2> </a> <p>
+ 
+  (Default- 'no'      <br> Choice - 'yes:no')
+<p>
+ 
+   Do you want to put out the graph again and define a new upper limit
+   curve?
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="allstars"> Allstars </h2> </a> <p>
+ 
+   (Default - 'no'         <br> Choice - 'yes:no')
+<p>
+ 
+   Flag for accepting a star for plotting out, even if it could be
+   rejected. (i.e. as too far from starting posn, or too many fitting
+   iterations were taken, or image contained invalid points,  or
+   magnitude flagged as 0.0 or 50.0)
+<p>
+ 
+<hr>
+ <h2> 3.3 <a name="devlimx"> Devlimx </h2> </a> <p>
+ 
+   (Default - 1,X size        <br> Range - 1,X size)
+<p>
+ 
+  The X limits of the plots in Chi residuals and Magnitudes.
+  (NB. The Chi residuals are those above the allowance curve.)
+<p>
+ 
+  Use this to select the range of magnitudes you really want to use.
+<p>
+ 
+  The default is for the whole range of magnitudes.
+<p>
+ 
+  What you do is to plot the whole range, the first time round, look
+  at it, decide what limits you really want, exit from the graph and
+  replot using your new limits.
+<p>
+ 
+<hr>
+ <h2> 3.4 <a name="devlimy"> Devlimy </h2> </a> <p>
+ 
+   (Default - 1,Y size        <br> Range - 1,Y size)
+<p>
+ 
+  The Y limits of the plots in Chi residuals and Magnitudes.
+  (NB. The Chi residuals are those above the allowance curve.)
+<p>
+ 
+  Use this to select the range of residuals you really want to use.
+<p>
+ 
+  The default is for the whole range of residuals. This shows you the
+  overview, but usally you want to look at the residuals near unity,
+  and so you should plot just a restricted range.
+<p>
+ 
+  What you do is to plot the whole range, the first time round, look
+  at it, decide what limits you really want, exit from the graph and
+  replot using your new limits.
+<p>
+ 
+<hr>
+ <h2> 3.5 <a name="graph"> Graph </h2> </a> <p>
+ 
+  (Default - 'no'            <br> Choice - 'yes:no')
+<p>
+ 
+  When doing the automatic fitting, put out graph with plot of chi-squared
+  values versus magnitude, with rejection limit line?
+  <p>
+
+<hr>
+ <h2> 3.6 <a name="gtype"> Gtype </h2> </a> <p>
+ 
+  (Default - 'xwindows'            <br> Choice - any)
+<p>
+ 
+  A character string giving the local name for the graphics
+  display type.
+<p>
+ 
+  'xwindows' will put it out on the screen of your X-window device,
+  if you are using one.
+<p>
+ 
+  If 'ask' is input, then the program asks a very similar question,
+  in a different way. A response here of '?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+ 
+<hr>
+ <h2> 3.7 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containg the input table of fit results.
+<p>
+ 
+<hr>
+ <h2> 3.8 <a name="linecol"> Linecol </h2> </a> <p>
+ 
+   (Default - 'black'            <br> Choice - (black:white)
+<p>
+ 
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+ 
+<hr>
+ <h2> 3.9 <a name="numinv"> Numinv </h2> </a> <p>
+ 
+  (Default - 0         <br> Range - 0 to 1000000)
+<p>
+ 
+  If you are going to reject a star for plotting as having too
+  many invalid pixels, this is the limit to the number of
+  such pixels that is acceptable.
+<p>
+ 
+<hr>
+ <h2> 3.10 <a name="numits"> Numits </h2> </a> <p>
+ 
+  (Default - 35         <br> Range - 0 to 1000)
+<p>
+ 
+  If you are going to reject a star for plotting as having had
+  too many fitting iterations, this is the limit to the number of
+  iterations that are acceptable.
+<p>
+ 
+<hr>
+ <h2> 3.11 <a name="offcen"> Offcen </h2> </a> <p>
+ 
+   (Default - 2.0          <br> Range - 0.0 to 1.0e10)
+<p>
+ 
+   If going to reject a star for plotting as being too far from
+   the starting position in the fitting, this is the distance away
+   in X or Y that is the limit of acceptance
+<p>
+ 
+<hr>
+ <h2> 3.12 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+    The name of the file to contain the output table.
+<p>
+ 
+<hr>
+ <h2> 3.13 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input table title, or `Output from Chi'         <br> Choice -any)
+<p>
+ 
+  The charcter string to put into the output table as a title.
+<p>
+ 
+<hr>
+ <h2> 3.14 <a name="use"> Use </h2> </a> <p>
+ 
+   (Default - 'auto'            <br> Choice - 'auto:inter')
+<p>
+
+  Select the automatic mode of operation, or the interactive mode?
+<p>
+
+<hr>
+ <h2> 4 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny              RAL              1991 May
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,130 @@
+<HTML> <HEAD>
+<TITLE> TBSTAT </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBSTAT - <br>
+ Perform statistics on column(s) in tables(s)
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Calculate some statistics of one or two columns of data in a
+  table or tables.
+<p>
+ 
+  The input of the second column is optional.
+<p>
+ 
+  It calculates statistics for each column:- number of values,
+  minimum, maximum, mean, std dev, and std dev of mean.
+<p>
+ 
+  If there are two columns, it also calculates the regression line
+  fit of one on the other and the correlation.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbstat_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in1"> In1 </a>
+<li> 1.2 <a href="#in2"> In2 </a>
+<li> 1.3 <a href="#ncol1"> Ncol1 </a>
+<li> 1.4 <a href="#ncol2"> Ncol2 </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in1"> In1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the first input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="in2"> In2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the second input table.
+<p>
+ 
+  (optional)
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="ncol1"> Ncol1 </h2> </a> <p>
+ 
+  (Default - 1     <br> Range - 1 to no of columns)
+<p>
+ 
+  First column in first table to take data from.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="ncol2"> Ncol2 </h2> </a> <p>
+ 
+  (Default - 1     <br> Range - 1 to no of columns)
+<p>
+ 
+  Second column in same or another table to take data from.
+<p>
+ 
+  (optional)
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny                    RAL             1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

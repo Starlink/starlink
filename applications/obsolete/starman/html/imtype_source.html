@@ -1,0 +1,628 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMTYPE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMTYPE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imtype_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imtype">
+imtype  </a>  Convert type of image       <br>
+<a href="#t_imtype">
+t_imtype  </a>  Do the 'IMTYPE' program function       <br>
+<a href="#imt_opims">
+imt_opims  </a>  Open input and output image       <br>
+<a href="#imt_gcl">
+imt_gcl  </a>  Get control parameters       <br>
+<a href="#imt_doit">
+imt_doit  </a>  Copy data from input to output - base       <br>
+<a href="#imt_coprs">
+imt_coprs  </a>  Copy data from real input to short output       <br>
+<a href="#imt_copri">
+imt_copri  </a>  Copy data from real input to integer output       <br>
+<a href="#imt_copis">
+imt_copis  </a>  Copy data from integer input to short output       <br>
+<a href="#imt_range">
+imt_range  </a>  Get range of data       <br>
+<a href="#imt_auto">
+imt_auto  </a>  Suggest output scaling       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imtype"> IMTYPE  </a>-- Convert type of image
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine imtype ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imtype
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMTYPE.F
+C
+C   Contains:-
+C
+C T_IMTYPE       Do the IMTYPE program function
+C IMT_OPIMS      Open input and output image
+C IMT_GCL        Get options
+C IMT_DOIT       Do the conversion
+C IMT_COPIS      Copy data from integer input to short output
+C IMT_COPRI      Copy data from real input to integer output
+C IMT_COPRS      Copy data from real input to short output
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imtype"> T_IMTYPE  </a>-- Do the 'IMTYPE' program function
+C
+C   alan penny               ral                 1991 April
+
+      subroutine t_imtype ()
+
+      implicit none
+C--
+Cbegin
+
+
+      call imt_opims			!Open input and output images
+
+      call imt_doit			!Do the conversion
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_opims"> IMT_OPIMS  </a>-- Open input and output image
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_opims ()
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C--
+      integer istat, iv
+      character cv*80
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call opimgr ( 'IN', IPIM, NX, NY, IMTYPE, .false., istat )	!Get input image
+      if ( istat.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      if ( IMTYPE.eq.'REAL' ) then				
+         call printo ( 'Image Type is: REAL' )
+         call gtimrd ( 'IN', BS, BZ, RINVAL, IMTITLE, istat )
+      elseif ( IMTYPE.eq.'INT' ) then
+         call printo ( 'Image Type is: INTEGER' )
+         call gtimid ( 'IN', BS, BZ, INVAL, IMTITLE, istat )
+      elseif ( IMTYPE.eq.'SHORT' ) then
+         call printo ( 'Image Type is: INTEGER*2' )
+         call gtimsd ( 'IN', BS, BZ, INVAL, IMTITLE, istat )
+      else
+         call printo (
+     +   'ERROR: Can only deal with: REAL;INTEGER;SHORT type images' )
+         ST_FAILED = .true.
+         return
+      endif
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call imt_gcl
+
+      if ( RANGE ) call imt_range
+
+      BSO = BS
+      BZO = BZ
+      if ( AUTO ) call imt_auto
+
+      if ( (IMTYPE.eq.'REAL' .and. OUTTYPE.ne.'REAL') .or.
+     +     (IMTYPE.eq.'INT' .and. OUTTYPE.eq.'SHORT') ) then
+         call printo ( '  ' )
+         call printo ( '  The Output image may need to have a '//
+     +                 'different scale -' )
+         call printo ( '  as it has a smaller dynamic range.' )
+         call printo ('  Data are stored as ((value-BZERO)/BSCALE)')
+         call pargr ( BS )
+         call pargr ( BZ )
+         call printd ( '  The input image BSCALE and BZERO are:- %f '
+     +                 //'and %f' )
+         call pargr ( BSO )
+         call pargr ( BZO )
+         call printd ( '  The suggested output image BSCALE and'//
+     +                 ' BZERO are:- %f and %f' )
+         call get2r ( 'OUTSCALE', BSO, BZO, .true., -1.0e20, 1.0e20 )
+         if ( ST_FAILED ) return
+      endif
+
+      call get1c ( 'TITLE', cv, IMTITLE, .true. )			!Get output image title
+      if ( ST_FAILED ) return
+
+      call opimgw ( 'OUT', OUTTYPE, IPO, NX, NY, .false., istat ) 	!Get output image
+      if ( istat.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call icopdes (  'IN', 'OUT', istat )				!Copy descriptors
+
+      call ptdesr ( 'OUT', 'BSCALE', BSO )
+      call ptdesr ( 'OUT', 'BZERO', BZO )
+
+      if ( OUTTYPE.eq.'REAL' ) then
+         if ( IMTYPE.eq.'REAL' ) then
+            INVALOR = RINVAL
+         else
+            INVALOR = INT_INVALR
+         endif
+         call ptdesr ( 'OUT', 'INVAL', INVALOR )
+      elseif ( OUTTYPE.eq.'INT' ) then
+         if ( IMTYPE.eq.'INT' ) then
+            INVALOI = INVAL
+         else
+            INVALOI = INT_INVALI
+         endif
+         call ptdesi ( 'OUT', 'INVAL', INVALOI )
+       else
+         if ( IMTYPE.eq.'SHORT' ) then
+            INVALOS = INVAL
+            iv = INVAL
+         else
+            INVALOS = INT_INVALSI
+            iv = INT_INVALSI
+         endif
+         call ptdesi ( 'OUT', 'INVAL', iv )
+      endif
+
+      call ptdesc ( 'OUT', 'TITLE', cv )
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_gcl"> IMT_GCL  </a>-- Get control parameters
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_gcl ()
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+C--
+      integer kopt, kin
+      integer nth
+      parameter ( nth=6 )
+      character*68 th(nth)
+      data th /
+     + 'Are the output data ? :- ',
+     + 'Option   Choice',
+     + '------   --------',
+     + 'Integer  Signed 32-bit integer (-2**16 to +2**16 - 1)',
+     + 'Real     Real 32-bit numbers',
+     + 'Short    Signed 16-bit integer (-32768 to 32767)'/
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kin = 3
+      if ( IMTYPE.eq.'REAL' ) kin = 3
+      if ( IMTYPE.eq.'INT' ) kin = 2
+      if ( IMTYPE.eq.'SHORT') kin = 1
+
+      call get_job ('OUTTYPE', 'real:integer:short', kopt,kin,th,nth) 	!Get type of output image
+      if ( ST_FAILED ) return
+
+      OUTTYPE = 'REAL'
+      if ( kopt.eq.1 ) OUTTYPE = 'REAL'
+      if ( kopt.eq.2 ) OUTTYPE = 'INT'
+      if ( kopt.eq.3 ) OUTTYPE = 'SHORT'
+
+      call get1b ( 'RANGE', RANGE, .false. )				!Calc range of input data?
+      if ( ST_FAILED ) return
+
+      AUTO = .false.							!Use auto scaling?
+      if ( (IMTYPE.eq.'REAL' .and. (OUTTYPE.eq.'INT'.or.
+     +                              OUTTYPE.eq.'SHORT')) .or.
+     +     (IMTYPE.eq.'INT' .and. OUTTYPE.eq.'SHORT') ) then
+         call get1b ( 'AUTO', AUTO, .false. )
+         if ( ST_FAILED ) return
+         if ( AUTO ) RANGE = .true.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_doit"> IMT_DOIT  </a>-- Copy data from input to output - base
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_doit ( )
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C--
+      integer istat, iptmp
+      integer*2 ivs
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( ALLBAD ) then
+         if ( OUTTYPE.eq.'REAL' )  call amovkr ( INVALOR, %val(IPIM),
+     +                                           NX*NY )
+         if ( OUTTYPE.eq.'INT' )   call amovki ( INVALOI, %val(IPIM),
+     +                                           NX*NY )
+         if ( OUTTYPE.eq.'SHORT' ) call amovks ( INVALOS, %val(IPIM),
+     +                                           NX*NY )
+         return
+      endif
+
+      if ( IMTYPE.eq.'REAL' .and. OUTTYPE.eq.'INT' ) then
+         call gtwrkr ( 'TEMP', NX, iptmp, istat )
+         call imt_copri ( %val(IPIM), %val(IPO), %val(iptmp))
+         call wrkcan ( 'TEMP' )
+      elseif ( IMTYPE.eq.'REAL' .and. OUTTYPE.eq.'SHORT' ) then
+         call gtwrkr ( 'TEMP', NX, iptmp, istat )
+         call imt_coprs ( %val(IPIM), %val(IPO), %val(iptmp))
+         call wrkcan ( 'TEMP' )
+      elseif ( IMTYPE.eq.'INT' .and. OUTTYPE.eq.'SHORT' ) then
+         call gtwrkr ( 'TEMP', NX, iptmp, istat )
+         call imt_copis ( %val(IPIM), %val(IPO), %val(iptmp) )
+         call wrkcan ( 'TEMP' )
+      elseif ( IMTYPE.eq.'REAL' .and. OUTTYPE.eq.'REAL' ) then
+         call amovr ( %val(IPIM), %val(IPO), NX*NY )
+      elseif ( IMTYPE.eq.'INT' .and. OUTTYPE.eq.'REAL' ) then
+         call azchtir ( %val(IPIM), INVAL, %val(IPO), INVALOR, NX*NY )
+      elseif ( IMTYPE.eq.'INT' .and. OUTTYPE.eq.'INT' ) then
+         call amovi ( %val(IPIM), %val(IPO), NX*NY )
+      elseif ( IMTYPE.eq.'SHORT' .and. OUTTYPE.eq.'REAL' ) then
+         ivs = INVAL
+         call azchtsr ( %val(IPIM), ivs, %val(IPO), INVALOR, NX*NY )
+      elseif ( IMTYPE.eq.'SHORT' .and. OUTTYPE.eq.'INT' ) then
+         ivs = INVAL
+         call azchtsi ( %val(IPIM), ivs, %val(IPO), INVALOI, NX*NY )
+      elseif ( IMTYPE.eq.'SHORT' .and. OUTTYPE.eq.'SHORT' ) then
+         call amovs ( %val(IPIM), %val(IPO), NX*NY )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_coprs"> IMT_COPRS  </a>-- Copy data from real input to short output
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_coprs ( in, out, rv )
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'ST_LIMITS_INC'
+
+      real       in(NX,NY)	!i: Input data
+      integer*2  out(NX,NY)	!o: Output short integer image
+      real       rv(NX)		!o: Work space
+C--
+      integer j, k
+      real rva
+Cbegin
+
+
+      do k = 1, NY
+         do j = 1, NX
+            rva = in(j,k)
+            if ( rva.ne.RINVAL ) then
+               rva = rva*BS + BZ
+               rv(j) = (rva-BZO)/BSO
+            else
+               rv(j) = rva
+            endif
+         enddo
+         call azchtrs ( rv, RINVAL, INT_MINSR, INT_MAXSR,
+     +                  out(1,k), INVALOS, NX )
+      enddo
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_copri"> IMT_COPRI  </a>-- Copy data from real input to integer output
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_copri ( in, out, rv )
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'ST_LIMITS_INC'
+
+      real       in(NX,NY)	!i: Input data
+      integer    out(NX,NY)	!o: Output integer image
+      real       rv(NX)		!o: Work space
+C--
+      integer j, k
+      real rva
+Cbegin
+
+
+      do k = 1, NY
+         do j = 1, NX
+            rva = in(j,k)
+            if ( rva.ne.RINVAL ) then
+               rva = rva*BS + BZ
+               rv(j) = (rva-BZO)/BSO
+            else
+               rv(j) = rva
+            endif
+         enddo
+         call azchtri ( rv, RINVAL, INT_MINIR, INT_MAXIR,
+     +                  out(1,k), INVALOI, NX )
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_copis"> IMT_COPIS  </a>-- Copy data from integer input to short output
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_copis ( in, out, rv )
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'ST_LIMITS_INC'
+
+      integer    in(NX,NY)	!i: Input data
+      integer*2  out(NX,NY)	!o: Output short integer image
+      real       rv(NX)		!o: Work space
+C--
+      integer j, k
+      real rva
+Cbegin
+
+
+      do k = 1, NY
+         do j = 1, NX
+            if ( in(j,k).eq.INVAL ) then
+               rv(j) = INT_INVALR
+            else
+               rva = real(in(j,k))*BS + BZ
+               rv(j) = (rva-BZO)/BSO
+            endif
+         enddo
+         call azchtrs ( rv, INT_INVALR, INT_MINSR, INT_MAXSR,
+     +                  out(1,k), INVALOS, NX )
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_range"> IMT_RANGE  </a>-- Get range of data
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_range ( )
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'ST_LIMITS_INC'
+
+C--
+      real rmin, rmax
+      integer imin, imax, ierr
+      integer*2 ismin, ismax, ivs
+Cbegin
+
+
+      rmin = 0.0
+      rmax = 0.0
+      imin = 0
+      imax = 0
+      ismin = 0
+      ismax = 0
+
+      if ( IMTYPE.eq.'REAL' ) then
+         call azlimr ( %val(IPIM), NX*NY, RINVAL, rmin, rmax, ierr )
+         rmin = BS*rmin + BZ
+         rmax = BS*rmax + BZ
+      elseif ( IMTYPE.eq.'INT' ) then
+         call azlimi ( %val(IPIM), NX*NY, INVAL, imin, imax, ierr )
+         rmin = BS*real(imin) + BZ
+         rmax = BS*real(imax) + BZ
+      elseif ( IMTYPE.eq.'SHORT' ) then
+         ivs = INVAL
+         call azlims ( %val(IPIM), NX*NY, ivs, ismin, ismax,ierr)
+         rmin = BS*real(ismin) + BZ
+         rmax = BS*real(ismax) + BZ
+      endif
+
+      if ( ierr.eq.0 ) then
+         ALLBAD = .false.
+         RMINI = rmin
+         RMAXI = rmax
+         call pargr ( rmin )
+         call pargr ( rmax )
+         call printd ( 'Input image - Minimum = :  %f  Maximum =  %f ' )
+      else
+         ALLBAD = .true.
+         call printo ( 'WARNING: All pixels in image are INVALID' )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imt_auto"> IMT_AUTO  </a>-- Suggest output scaling
+C
+C alan penny          ral                   1991 April
+
+      subroutine imt_auto ( )
+
+      implicit none
+      include 'imtype.inc'
+      include 'image.inc'
+      include 'ST_LIMITS_INC'
+
+C--
+      double precision dva, dvb, dvc, dvd
+      real  outmin, outmax
+Cbegin
+
+
+      if ( ALLBAD ) return
+
+      if ( OUTTYPE.eq.'REAL' ) then
+         if ( RMAXI.ge.INT_MAXRR .or. RMINI.le.INT_MINRR ) then
+            dva = RMAXI
+            dvb = RMINI
+            dvc = INT_MAXRR
+            dvd = INT_MINRR
+            if ( (dva-dvb).ge.0.96d0*(dvc-dvd) ) then
+               outmin = dvd + 0.01d0*(dvc-dvd)
+               outmax = outmin + real(0.96d0*(dvc-dvd))
+               BSO = (outmax-outmin)/(RMAXI-RMINI)
+               BZO = outmax - BSO*RMAXI
+            else
+               BSO = 1.0
+               BZO = INT_MINRR + 0.01*(RMAXI-RMINI)
+            endif
+         endif
+      elseif( OUTTYPE.eq.'INT' ) then
+         if ( RMAXI.ge.INT_MAXIR .or. RMINI.le.INT_MINIR ) then
+            dva = RMAXI
+            dvb = RMINI
+            dvc = INT_MAXII
+            dvd = INT_MINII
+            if ( (dva-dvb).ge.0.96d0*(dvc-dvd) ) then
+               outmin = dvd + 0.01d0*(dvc-dvd)
+               outmax = outmin + real(0.96d0*(dvc-dvd))
+               BSO = (outmax-outmin)/(RMAXI-RMINI)
+               BZO = outmax - BSO*RMAXI
+            else
+               BSO = 1.0
+               BZO = INT_MINIR + 0.01*(RMAXI-RMINI)
+            endif
+         endif
+      elseif( OUTTYPE.eq.'SHORT' ) then
+         if ( RMAXI.ge.INT_MAXSR .or. RMINI.le.INT_MINSR ) then
+            dva = RMAXI
+            dvb = RMINI
+            dvc = INT_MAXSS
+            dvd = INT_MINSS
+            if ( (dva-dvb).ge.0.96d0*(dvc-dvd) ) then
+               outmin = dvd + 0.01d0*(dvc-dvd)
+               outmax = outmin + real(0.96d0*(dvc-dvd))
+               BSO = (outmax-outmin)/(RMAXI-RMINI)
+               BZO = outmax - BSO*RMAXI
+            else
+               BSO = 1.0
+               BZO = INT_MINSR + 0.01*(RMAXI-RMINI)
+            endif
+         endif
+      endif
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  IMTYPE.INC
+
+
+      integer   ipo			!Output image pointer
+      real      bso			!Image output pixel value scale
+      real      bzo			!Image output pixel value zero
+      real      rmaxi			!Input image maximum
+      real      rmini			!Input image minimum
+      integer   invaloi			!Output integer image invalid flag
+      integer*2 invalos			!Output integer*2 image invalid flag
+      real      invalor			!Output real image invalid flag
+
+      character*6  outtype		!Output type ('REAL','INT','SHORT','USHORT')
+
+      logical   range			!Calculate range of data?
+      logical   auto			!Autoscale data if to smaller data type?
+      logical   allbad			!All input image pixels are invalid
+
+      logical imt_dum1			!Make logicals up to times 4
+CX      logical imt_dum2			!Make logicals up to times 4
+CX      logical imt_dum3			!Make logicals up to times 4
+
+
+
+      common / imta / ipo,  bso,  bzo, rmini, rmaxi,
+     +                invaloi, invalor
+
+      common / imts / invalos
+
+      common / imtb / range,  auto, allbad, imt_dum1
+
+      common / imtc / outtype
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

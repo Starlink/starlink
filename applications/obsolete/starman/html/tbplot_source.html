@@ -1,0 +1,1628 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBPLOT
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBPLOT
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbplot_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbplot">
+t_tbplot  </a>  Plot out graph       <br>
+<a href="#tbpl_option_setup">
+tbpl_option_setup  </a>  Set up option choices       <br>
+<a href="#tbpl_setup">
+tbpl_setup  </a>  Load the default parameters       <br>
+<a href="#tbpl_prange">
+tbpl_prange  </a>  Get plot range       <br>
+<a href="#tbpl_hrange">
+tbpl_hrange  </a>  Get histogram range       <br>
+<a href="#tbpl_psize">
+tbpl_psize  </a>  Get plot size       <br>
+<a href="#tbpl_gettb">
+tbpl_gettb  </a>  Get Table       <br>
+<a href="#tbpl_getim">
+tbpl_getim  </a>  Get Image       <br>
+<a href="#tbpl_clear">
+tbpl_clear  </a>  Clear display       <br>
+<a href="#tbpl_open">
+tbpl_open  </a>  Open device       <br>
+<a href="#tbpl_close">
+tbpl_close  </a>  Close device       <br>
+<a href="#tbpl_hist">
+tbpl_hist  </a>  Set up and start histogram       <br>
+<a href="#tbpl_plot">
+tbpl_plot  </a>  Set up and start plotting       <br>
+<a href="#tbpl_doplot">
+tbpl_doplot  </a>  Plot points or line       <br>
+<a href="#tbpl_gcurse">
+tbpl_gcurse  </a>  Get positions with cursor       <br>
+<a href="#tbpl_contour">
+tbpl_contour  </a>  Put out contour plot to device       <br>
+<a href="#tbpl_image">
+tbpl_image  </a>  Put out image to device       <br>
+<a href="#tbpl_text">
+tbpl_text  </a>  Put out text       <br>
+<a href="#tbpl_label">
+tbpl_label  </a>  Put out labels       <br>
+<a href="#tbplot">
+tbplot  </a>  (Program) Plot out graph/histogram       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C This is T_TBPLOT.F
+C
+C It contains:-
+C
+C T_TBPLOT       Plot out a graph/histogram
+C TBPL_SETUP     Load the default parameters
+C TBPL_OPTION_SETUP Set up option choices
+C TBPL_PRANGE    Get plot range
+C TBPL_HRANGE    Get histogram range
+C TBPL_PSIZE     Get plot size
+C TBPL_GETTB     Get Table
+C TBPL_GETIM     Get Image
+C TBPL_CLEAR     Clear display
+C TBPL_OPEN      Open device
+C TBPL_CLOSE     Close device
+C TBPL_HIST      Set up and start histogram
+C TBPL_PLOT      Set up and start plotting
+C TBPL_DOPLOT    Plot - points or line
+C TBPL_GCURSE    Get positions with cursor
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbplot"> T_TBPLOT  </a>-- Plot out graph
+C
+C         A J Penny            RAL            1991 May
+
+      subroutine t_tbplot ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_DS_PANEL_INC'
+C--
+      integer k, ka, ktype, istat
+      logical loop, kab, kas
+      character*12 ktopt
+Cbegin
+
+
+      call tbpl_setup							!Set up parameters
+
+      call get_job ( 'USE', 'auto:panel:key', ktype, 2, ' ', 0 )
+      KMODE = 1
+      if ( ktype.eq.1 ) then
+         call get_job ( 'ATYPE', 'points:line:hist:disp:cont', ka, 1,
+     +                  ' ', 0 )
+         if ( ka.eq.1 ) KMODE = 2
+         if ( ka.eq.2 ) KMODE = 3
+         if ( ka.eq.3 ) then
+            KMODE = 4
+            ISHIST = .true.
+         endif
+         if ( ka.eq.4 ) KMODE = 5
+         if ( ka.eq.5 ) KMODE = 6
+      endif
+
+      if ( KMODE.ne.1 ) then
+         if ( KMODE.eq.2 .or. KMODE.eq.3 ) then
+            call tbpl_gettb
+            call tbpl_prange ( %val(IPTAB1), %val(IPTAB2), 1 )
+            call tbpl_psize  ( %val(IPTAB1), %val(IPTAB2), 1 )
+            if ( KMODE.eq.2 ) call tbpl_plot ( 1 )
+            if ( KMODE.eq.3 ) call tbpl_plot ( 2 )
+         elseif ( KMODE.eq.4 ) then
+            call tbpl_gettb
+            call tbpl_hist
+         elseif ( KMODE.eq.5 ) then
+            call tbpl_getim
+            call tbpl_image
+         elseif ( KMODE.eq.6 ) then
+            call tbpl_getim
+            call tbpl_contour
+         endif
+         return
+      endif
+
+
+      call type_hchoice							!Type option help
+      call tbpl_option_setup ( ktopt, 1, .true. )			!Do the work
+      if ( ktype.eq.2 ) call choice_panel_sw	
+
+      loop = .true.
+      do while ( loop )
+
+         call tbpl_option_setup ( ktopt, 1, .false.)			!Get choice
+         call get_choice ( ktopt, 1 )
+         if ( ST_FAILED ) return
+
+         if ( ktopt.eq.'get_table' ) call tbpl_gettb			!Open a set of files
+
+         if ( ktopt.eq.'get_image' ) call tbpl_getim			!Open an image
+
+         if ( ktopt.eq.'points' ) call tbpl_plot ( 1 )			!Display points
+
+         if ( ktopt.eq.'line' ) call tbpl_plot ( 2 )			!Display line
+
+         if ( ktopt.eq.'histogram' ) call tbpl_hist			!Display histogram
+
+         if ( ktopt.eq.'contour' ) call tbpl_contour			!Display contours
+
+         if ( ktopt.eq.'display' ) call tbpl_image			!Display image
+
+         if ( ktopt.eq.'text' ) call tbpl_text				!Display text
+
+         if ( ktopt.eq.'label' ) call tbpl_label			!Display graph labels
+
+         if ( ktopt.eq.'clear' ) call tbpl_clear ( 1 )			!Clear data in graph
+
+         if ( ktopt.eq.'all_clear' ) call tbpl_clear ( 2 )		!Clear display
+
+         if ( ktopt.eq.'open' ) call tbpl_open				!Open device
+
+         if ( ktopt.eq.'prange' ) call tbpl_prange ( %val(IPTAB1), 	!Allowed plot range
+     +                                               %val(IPTAB2), 1 )
+
+         if ( ktopt.eq.'panel' ) call choice_panel_sw			!Change panel/keyboard input choice
+
+         if ( ktopt.eq.'close' ) call tbpl_close			!Close plot
+
+         if ( ktopt.eq.'psize' ) call tbpl_psize ( %val(IPTAB1), 	!Plot size
+     +                                             %val(IPTAB2), 1 )
+
+         if ( ktopt.eq.'cursor' ) call tbpl_gcurse ( %val(IPTAB1),	!Get positions
+     +                                               %val(IPTAB2) )
+
+         if ( ktopt.eq.'aspect' ) then					!Change graph aspect ratio
+                                     kab = .true.
+                                     if ( KASPECT.eq.0 ) kab = .false.
+                                     call get1b ( 'ASPECT', kas, kab )
+                                     KASPECT = 1
+                                     if ( .not.kas ) KASPECT = 0
+                                     GOTASPECT = .true.
+                                  endif
+
+         if ( ktopt.eq.'exit' ) loop = .false. 				!Exit from program
+
+      enddo
+
+      if ( DOPANEL ) call ds_p_close ( istat )
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_option_setup"> TBPL_OPTION_SETUP  </a>-- Set up option choices
+C
+C   alan penny                        ral              1990-01-31
+
+      subroutine tbpl_option_setup ( ktopt, set_num, koutside )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'tbplot.inc'
+
+      character*12   ktopt              !i: Chosen option
+      integer set_num                   !i: Code for set of options
+      logical  koutside                 !i: Is this called from outside loop?
+C--
+      integer j, k
+
+      integer opt_num
+      parameter ( opt_num=19 )
+
+      character*12 opt_text(opt_num)
+      character*68 opt_head(opt_num)
+      character*68 opt_help(6,opt_num)
+
+      data opt_text(1),opt_head(1),(opt_help(j,1),j=1,6) /
+     + 'all_clear', 'Clear plot and axes',
+     + 'Clear the plotted data and axes.',
+     + 'The size and aspect of the graph are forgtten.',
+     + 'The input table(s) and/or image are not forgotten.',
+     + ' ', ' ', ' '/
+
+      data opt_text(2),opt_head(2),(opt_help(j,2),j=1,6) /
+     + 'open', 'Open the plot device ',
+     + 'Open a device for the plot. This uses the PGPLOT package. You',
+     + 'put in the GKS name of the device. A standard device is ',
+     + '-xwindows- for opening a window on an X-terminal. To find the',
+     + 'GKS name of a device, type -ask-.',
+     + 'For a device which makes a file, you must press the close',
+     + 'button to close the device, before plotting the file.' /
+
+      data opt_text(3),opt_head(3),(opt_help(j,3),j=1,6) /
+     + 'close', 'Close the plot device',
+     + 'One may need to close the plot output display. It is a',
+     + 'PGPLOT -device-, and one might want to swop between screen ',
+     + '(xwindows) and printer, or one might want to get the ',
+     + 'output from printer (this file only becomes available when',
+     + 'the device is -closed-). ',
+     + '[All plot options open a device, if it is closed.]'/
+
+      data opt_text(4), opt_head(4), (opt_help(j,4),j=1,6) /
+     + 'panel', 'Switch between panel and keyboard option selection',
+     + 'This returns you to using the keyboard for option choice.',
+     + '(In keyboard option entry mode, you can get back to -panel-',
+     + '  option entry mode, by choosing the -panel- option.',
+     + ' ', ' ', ' '/
+
+      data opt_text(5), opt_head(5), (opt_help(j,5),j=1,6) /
+     + 'exit', 'Exit from this program',
+     + 'Exit from this program. Any windows open are closed, and any',
+     + 'files open are closed.',
+     + ' ', ' ', ' ', ' '/
+
+      data opt_text(6), opt_head(6), (opt_help(j,6),j=1,6) /
+     + 'line', 'Plot a line joining the points on the graph ',
+     + 'A line joining the points already loaded is plotted on',
+     + 'the graph. (A plot device is opened if not open.)',
+     + 'The line may be displayed with an XY offset.',
+     + 'You set the type of the line (solid;dashed;',
+     + 'dot-dashed;fine dots;dot-dot-dot-dash) with this option',
+     + 'with the LSTYLE option. '/
+
+      data opt_text(7), opt_head(7), (opt_help(j,7),j=1,6) /
+     + 'cursor', 'Use cursor to get values at point in graph ',
+     + 'Place the cursor at any point in the graph and press',
+     + 'any button. The X,Y value will be typed out. If a table',
+     + 'has been input, the position of the nearest point is given.',
+     + 'Place the cursor outside the area of the plot (but still',
+     + 'in the window) and press for return. [Only give a quick',
+     + 'dab on the return button, or you may upset the -panel-.]'/
+
+      data opt_text(8), opt_head(8), (opt_help(j,8),j=1,6) /
+     + 'histogram', 'Calculate and plot a histogram of the X data',
+     + 'Take the X values of the loaded data points and calculate',
+     + 'their histogram, and plot it out. ',
+     + ' ',
+     + 'You are asked for the X range in X values to use (HRANGE ',
+     + 'parameter), and the number of bins (NBIN) in this range',
+     + 'to put values into. Plot scaling is done automatically. '/
+
+      data opt_text(9), opt_head(9), (opt_help(j,9),j=1,6) /
+     + 'points', 'Plot the points on the graph ',
+     + 'The points already loaded are plotted on the graph.',
+     + '(A plot device is opened if not open.)',
+     + 'The points may be displayed with an XY offset.',
+     + 'You set the type of the symbol used via the LSTYLE',
+     + 'parameter. This is the PGPLOT symbol code, from 0 to 31',
+     + ' ' /
+
+      data opt_text(10), opt_head(10), (opt_help(j,10),j=1,6) /
+     + 'aspect', 'Set type of scaling of axes of graph',
+     + 'This option allows you to choose between two styles for the',
+     + 'shape of the plot. The normal style is to have the graph',
+     + 'nearly fill the window and then scale the axes separately',
+     + 'to fill this shape. The second is to have both axes scaled',
+     + 'the same amount (say as for a map), and then the shape of the',
+     + 'plot depends on the relative X and Y plotted data ranges' /
+
+      data opt_text(11), opt_head(11), (opt_help(j,11),j=1,6) /
+     + 'prange', 'Set the range of data in X and Y to be plotted',
+     + ' ',
+     + 'This sets the range in X and Y that data are allowed to be',
+     + 'plotted in. Data points falling outside the permitted ',
+     + 'XY rectangle will not be plotted.',
+     + ' ',
+     + 'The defaults are -1.0*10^20 to +1.0.10^20.  '/
+
+      data opt_text(12), opt_head(12), (opt_help(j,12),j=1,6) /
+     + 'psize', 'Set the range of the graph axes in X and Y',
+     + ' ',
+     + 'This sets the range of the scales on the X and Y axes of',
+     + 'the plot. ',
+     + ' ',
+     + 'The defaults are from a bit below the minimum of all the',
+     + 'data to a bit above the maximum. '/
+
+      data opt_text(13), opt_head(13),(opt_help(j,13),j=1,6) /
+     + 'get_table', 'Get the file(s)s with the tables(s) to plot',
+     + 'The data are taken from Starman tables in files. X values',
+     + 'of points are taken from one column in one table, and Y ',
+     + 'values from a column in another (or the same) table. Input',
+     + 'parameters are IN1 NCOL1 IN2 NCOL2. If two tables are',
+     + 'used, then they must have the same number of rows. When ',
+     + 'data are input again, the previous data are lost.'/
+
+      data opt_text(14), opt_head(14),(opt_help(j,14),j=1,6) /
+     + 'get_image', 'Get the file with image to display or contour',
+     + 'The data are taken from a Starman image in a file.',
+     + 'When a new image is input, the previous image is lost.',
+     + ' ', ' ', ' ', ' ' /
+
+      data opt_text(15), opt_head(15), (opt_help(j,15),j=1,6) /
+     + 'contour', 'Plot the counter map of the image',
+     + 'The image already loaded is plotted as a contour map.',
+     + '(A plot device is opened if not open.)',
+     + ' ',
+     + 'A section of the image is chosen, and a contour map made,',
+     + 'and displayed at an offset position in the graph. The default',
+     + 'range is the min and max, with 10 steps between.' /
+
+      data opt_text(16), opt_head(16), (opt_help(j,16),j=1,6) /
+     + 'display', 'Display the image as a picture',
+     + 'The image already loaded is displayed as a picture.',
+     + '(A plot device is opened if not open.)',
+     + ' ',
+     + 'A section of the image is chosen, and is displayed at an',
+     + 'offset position in the graph, as a grey-scale image, with',
+     + 'default range +3/-2std dev of mean with black=highvalues ' /
+
+      data opt_text(17), opt_head(17), (opt_help(j,17),j=1,6) /
+     + 'text', 'Plot input text at a position on the graph',
+     + 'A line of text is asked for, and the position on the graph',
+     + 'asked for. The text is then plotted out.',
+     + '(A plot device is opened if not open.)',
+     + ' ', ' ', ' ' /
+
+      data opt_text(18), opt_head(18), (opt_help(j,18),j=1,6) /
+     + 'label', 'Plot axis labels on graph',
+     + 'Text for the two axes is asked for, and plotted on the graph',
+     + '(A plot device is opened if not open.)',
+     + ' ', ' ', ' ', ' ' /
+
+      data opt_text(19),opt_head(19),(opt_help(j,19),j=1,6) /
+     + 'clear', 'Clear plot and leave axes',
+     + 'Clear the plotted data in the graph only.',
+     + 'The size and aspect of the graph are not forgtten.',
+     + 'The input table(s) and/or image are not forgotten.',
+     + ' ', ' ', ' '/
+
+      character*50 title, option
+      integer ncode
+      data title, option, ncode / 'tbplot', 'OPTION', 1 /
+
+      integer def_x, def_y
+      parameter ( def_x=6 )
+      parameter ( def_y=1 )
+      character*12 def_text(def_x,def_y)
+      data def_text / ' ', 'psize', 'open',
+     +                 'points', 'panel', 'cursor' /
+
+      integer sect_num
+      parameter ( sect_num=8 )
+      character*10 sect_head(sect_num)
+      data sect_head / 'TABLES', 'IMAGES', 'OTHER', 'INPUT', 'ACTIONS',
+     +                 'SETUP', 'GRAPH', 'CONTROL' /
+      character*200 sect_text(sect_num)
+      data sect_text(1)/ 'points:line:histogram' /
+      data sect_text(2)/ 'contour:display' /
+      data sect_text(3)/ 'label:text' /
+      data sect_text(4)/ 'get_table:get_image' /
+      data sect_text(5)/ 'cursor' /
+      data sect_text(6)/ 'aspect:prange:psize' /
+      data sect_text(7)/ 'all_clear:clear:close:open' /
+      data sect_text(8)/ 'panel:exit' /
+
+      integer help_num
+      parameter ( help_num=4 )
+      character*68 help_text(help_num)
+      data (help_text(k),k=1,help_num) /
+     + '             ' ,
+     + 'To input cursor positions, position cursor at desired point' ,
+     + 'and press any key, or maybe any cursor button. End by ',
+     + 'locating cursor outside graph' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call setup_option ( ktopt, set_num, koutside,
+     +                    sect_num, sect_text, sect_head,
+     +                    title, option, ncode,
+     +                    1, opt_num, opt_text,
+     +                    1, opt_head,
+     +                    1, opt_help,
+     +                    1, help_num, help_text,
+     +                    1, def_x, def_y, def_text )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_setup"> TBPL_SETUP  </a>-- Load the default parameters
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_setup ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call ds_sdef ( 2, 17 )
+
+      GOTIM = .false.
+      GOTTABLE = .false.
+      GOTFILE2 = .false.
+      FILE2OK = .false.
+      ISHIST = .false.
+
+      IPIM = 1
+      IPTAB1 = 1
+      IPTAB2 = 1
+      NBIN = 40
+
+      GOTDLIMS = .false.
+
+      PRX(1) = -1.0e20
+      PRX(2) = 1.0e20
+      PRY(1) = -1.0e20
+      PRY(2) = 1.0e20
+      GOTPLIMS  = .true.
+
+      PSX(1) = -1.0e20
+      PSX(2) = 1.0e20
+      PSY(1) = -1.0e20
+      PSY(2) = 1.0e20
+      GOTPSIZE = .false.
+
+      PHX(1) = -1.0e20
+      PHX(2) = 1.0e20
+      GOTHLIMS  = .false.
+
+      KASPECT = 1
+      GOTASPECT = .false.
+      XHEAD = ' '
+      YHEAD = ' '
+
+      DONEAXIS = .false.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_prange"> TBPL_PRANGE  </a>-- Get plot range
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_prange ( table1, table2, kopt )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+
+      real        table1(TBVX1,TBY1)	!i: Input data
+      real        table2(TBVX2,TBY2)	!i: Input data
+      integer     kopt			!i: Definitely get new range (1)
+C--
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTTABLE ) then
+         call printo ( 'Need to have got table' )
+         return
+      endif
+
+      if ( .not.GOTDLIMS ) then
+         GOTDLIMS = .true.
+
+         XMIN = table1((NCOL1+5),1)
+         XMAX = table1((NCOL1+5),1)
+         do k = 1, TBY1
+            XMIN = min(XMIN,table1((NCOL1+5),k))
+            XMAX = max(XMAX,table1((NCOL1+5),k))
+         enddo
+
+         YMIN = table2((NCOL2+5),1)
+         YMAX = table2((NCOL2+5),1)
+         do k = 1, TBY2
+            YMIN = min(YMIN,table2((NCOL2+5),k))
+            YMAX = max(YMAX,table2((NCOL2+5),k))
+         enddo
+
+         PRX(1) = XMIN
+         PRX(2) = XMAX
+         PRY(1) = YMIN
+         PRY(2) = YMAX
+
+      endif
+
+      if ( kopt.eq.1 ) GOTPSIZE = .false.
+
+      if ( .not.GOTPLIMS ) then
+         PRX(1) = XMIN
+         PRX(2) = XMAX
+         PRY(1) = YMIN
+         PRY(2) = YMAX
+      endif
+
+      call get2r ( 'XRANGE', PRX(1), PRX(2), .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      call cswopr ( PRX(1), PRX(2) )
+
+      call get2r ( 'YRANGE', PRY(1), PRY(2), .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      call cswopr ( PRY(1), PRY(2) )
+
+      GOTPLIMS = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_hrange"> TBPL_HRANGE  </a>-- Get histogram range
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_hrange ( table1 )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+
+      real        table1(TBVX1,TBY1)	!i: Input data
+C--
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTTABLE ) then
+         call printo ( 'Need to have got table' )
+         return
+      endif
+
+      if ( .not.GOTDLIMS ) then
+         GOTDLIMS = .true.
+
+         XMIN = table1((NCOL1+5),1)
+         XMAX = table1((NCOL1+5),1)
+         do k = 1, TBY1
+            XMIN = min(XMIN,table1((NCOL1+5),k))
+            XMAX = max(XMAX,table1((NCOL1+5),k))
+         enddo
+
+         PHX(1) = XMIN
+         PHX(2) = XMAX
+
+      endif
+
+      if ( .not.GOTHLIMS ) then
+         PHX(1) = XMIN
+         PHX(2) = XMAX
+      endif
+
+      call get2r ( 'HRANGE', PHX(1), PHX(2), .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      call cswopr ( PHX(1), PHX(2) )
+
+      call get1i ( 'NBIN', NBIN, NBIN, 1, 200 )
+      if ( ST_FAILED ) return
+
+      GOTHLIMS = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_psize"> TBPL_PSIZE  </a>-- Get plot size
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_psize ( table1, table2, kopt )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+
+      real        table1(TBVX1,TBY1)	!i: Input data
+      real        table2(TBVX2,TBY2)	!i: Input data
+      integer     kopt			!i: Flag for get new size definitely (1)
+C--
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTTABLE ) then
+         call printo ( 'Need to have got table' )
+         return
+      endif
+
+      if ( .not.GOTDLIMS ) then
+         GOTDLIMS = .true.
+
+         XMIN = table1((NCOL1+5),1)
+         XMAX = table1((NCOL1+5),1)
+         do k = 1, TBY1
+            XMIN = min(XMIN,table1((NCOL1+5),k))
+            XMAX = max(XMAX,table1((NCOL1+5),k))
+         enddo
+
+         YMIN = table2((NCOL2+5),1)
+         YMAX = table2((NCOL2+5),1)
+         do k = 1, TBY2
+            YMIN = min(YMIN,table2((NCOL2+5),k))
+            YMAX = max(YMAX,table2((NCOL2+5),k))
+         enddo
+
+         PSX(1) = XMIN - 0.05*(XMAX-XMIN)
+         PSX(2) = XMAX + 0.05*(XMAX-XMIN)
+         PSY(1) = YMIN - 0.05*(YMAX-YMIN)
+         PSY(2) = YMAX + 0.05*(YMAX-YMIN)
+
+      endif
+
+      if ( kopt.eq.1 ) GOTPSIZE = .false.
+
+      if ( .not.GOTPSIZE ) then
+         PSX(1) = XMIN - 0.05*(XMAX-XMIN)
+         PSX(2) = XMAX + 0.05*(XMAX-XMIN)
+         PSY(1) = YMIN - 0.05*(YMAX-YMIN)
+         PSY(2) = YMAX + 0.05*(YMAX-YMIN)
+      endif
+
+      call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+
+      call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+
+      GOTPSIZE = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_gettb"> TBPL_GETTB  </a>-- Get Table
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_gettb ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+C--
+      integer istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( GOTTABLE ) then
+         call canpar ( 'IN1' )
+         GOTTABLE = .false.
+         if ( GOTFILE2 ) call canpar ( 'IN2' )
+         GOTFILE2 = .false.
+      endif
+
+      call optabr ( 'IN1', IPTAB1, TBVX1, TBY1, .true., istat )
+      if ( ST_FAILED ) return
+      if ( istat.ne.0 ) return
+
+      TBX1 = TBVX1 - 5
+      call get1i ( 'NCOL1', NCOL1, 1, 1, TBX1 )
+      if ( ST_FAILED ) return
+
+      GOTTABLE = .true.
+      GOTDLIMS = .false.
+
+      if ( .not.ISHIST ) then
+         call printo ( 'If same table, just enter -return-' )
+         call optabr ( 'IN2', IPTAB2, TBVX2, TBY2, .true., istat )
+         if ( ST_FAILED ) return
+
+         FILE2OK = .true.
+         if ( istat.eq.0 ) then
+            GOTFILE2 = .true.
+            TBX2 = TBVX2 - 5
+            call get1i ( 'NCOL2', NCOL2, 1, 1, TBX2 )
+            if ( ST_FAILED ) return
+            call gthead ( 'IN2', NCOL2, YHEAD, istat )
+         elseif ( istat.eq.2 .or. istat.eq.3 ) then
+            GOTFILE2 = .false.
+            IPTAB2 = IPTAB1
+            TBVX2 = TBVX1
+            TBY2 = TBY1
+            TBX2 = TBX1
+            call get1i ( 'NCOL2', NCOL2, 1, 1, TBX2 )
+            if ( ST_FAILED ) return
+            call gthead ( 'IN1', NCOL2, YHEAD, istat )
+         endif
+         if ( ST_FAILED ) return
+      endif
+
+      call gthead ( 'IN1', NCOL1, XHEAD, istat )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_getim"> TBPL_GETIM  </a>-- Get Image
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_getim ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+C--
+      integer ierr
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( GOTIM ) then
+         call canpar ( 'IM' )
+         GOTIM = .false.
+      endif
+
+      call opimgr ( 'IM', IPIM, NX, NY, IMTYPE, .false., ierr )
+      if ( ierr.ne.0 ) return
+      if ( ST_FAILED ) return
+
+      if ( IMTYPE.ne.'REAL' .and. IMTYPE.ne.'SHORT' ) then
+         call printo ( 'ERROR: Image must be REAL or INTEGER*2' )
+         call pargc ( IMTYPE )
+         call printo ( 'ERROR: Image type is: %c ' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      call gtimzd ( 'IM', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE, ierr)
+      if ( ST_FAILED ) return
+
+      GOTIM = .true.
+      XHEAD = 'X'
+      YHEAD = 'Y'
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_clear"> TBPL_CLEAR  </a>-- Clear display
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbpl_clear ( kopt )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'ST_GRAPH_INC'
+      include 'STARMAN_INC'
+
+      integer   kopt		!i: Option (1=just plotted data;2=all)
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GD_DISPOP ) then					!Is device open?
+         call printo ( 'ERROR: Device not open' )
+         return
+      endif
+
+      call pgpage
+
+      if ( kopt.eq.1 ) then
+         call gd_dobox ( PSX(1), PSX(2), ' ', PSY(1), PSY(2), 		!Draw axes
+     +                   ' ', ' ', KASPECT )
+      else
+         DONEAXIS = .false.
+         GOTASPECT = .false.
+         GOTPSIZE = .false.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_open"> TBPL_OPEN  </a>-- Open device
+C
+C   a j penny                       ral         1991 may
+
+      subroutine tbpl_open ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'ST_GRAPH_INC'
+      include 'STARMAN_INC'
+C--
+      integer istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( GD_DISPOP ) then
+         call printo ( 'ERROR: Device already open' )
+      else
+         call gd_open ( istat )
+         DONEAXIS = .false.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_close"> TBPL_CLOSE  </a>-- Close device
+C
+C   a j penny                  ral         1991 may
+
+      subroutine tbpl_close ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'ST_GRAPH_INC'
+      include 'STARMAN_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GD_DISPOP ) then
+         call printo ( 'ERROR: Device not open' )
+      else
+         call gd_close
+         DONEAXIS = .false.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_hist"> TBPL_HIST  </a>-- Set up and start histogram
+C
+C   a j penny                 ral                  1991 may
+
+      subroutine tbpl_hist ( )
+
+      implicit none
+
+      include 'tbplot.inc'
+      include 'ST_GRAPH_INC'
+      include 'STARMAN_INC'
+C--
+      integer istat, ipw
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ISHIST = .true.
+
+      if ( .not.GD_DISPOP ) call tbpl_open				!Is device open?
+      if ( .not.GD_DISPOP ) return
+
+      if ( .not.GOTTABLE ) call tbpl_gettb				!Loaded data?
+
+      call tbpl_hrange ( %val(IPTAB1) )					!Get hist limits
+
+      DONEAXIS = .false.
+
+      call gtwrkr ( 'WORK', TBY1, ipw, istat )
+
+      call copfrr ( %val(IPTAB1), TBVX1, TBY1, (NCOL1+5), 1,
+     +              %val(ipw), TBY1 )
+
+      call pghist ( TBY1, %val(ipw), PHX(1), PHX(2), NBIN, 0 )
+
+      call wrkcan ( 'WORK' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_plot"> TBPL_PLOT  </a>-- Set up and start plotting
+C
+C   a j penny                 ral                  1991 may
+
+      subroutine tbpl_plot ( kopt )
+
+      implicit none
+
+      include 'tbplot.inc'
+      include 'ST_GRAPH_INC'
+      include 'STARMAN_INC'
+
+      integer    kopt		!i: Option (1=points/2=line)
+C--
+      real dx, dy
+      logical kas, kab
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ISHIST = .false.
+
+      if ( .not.GD_DISPOP ) call tbpl_open				!Is device open?
+      if ( .not.GD_DISPOP ) return
+
+      if ( .not.GOTTABLE .or. .not.FILE2OK ) call tbpl_gettb		!Loaded data?
+
+      if ( .not.GOTTABLE ) then
+         call printo ( 'Must have got data' )
+         return
+      endif
+
+      if ( .not.GOTPLIMS ) call tbpl_prange ( %val(IPTAB1), 		!Get posn limits
+     +                                        %val(IPTAB2), 0 )
+
+      if ( .not.GOTPSIZE ) call tbpl_psize (%val(IPTAB1), %val(IPTAB2),	!Get plot size
+     +                                      0 )
+
+      if ( .not.GOTASPECT ) then
+         kab = .true.
+         if ( KASPECT.eq.0 ) kab = .false.
+         call get1b ( 'ASPECT', kas, kab )
+         KASPECT = 1
+         if ( .not.kas ) KASPECT = 0
+         GOTASPECT = .true.
+      endif
+
+      dx = 0.0
+      dy = 0.0
+      call get2r ( 'IMOFFSET', dx, dy, .true., -1.0e20, 1.0e20 )
+
+      if ( .not.DONEAXIS ) call gd_dobox ( PSX(1), PSX(2), ' ',		!Draw axes
+     +                          PSY(1), PSY(2), ' ', ' ', KASPECT )
+      DONEAXIS = .true.
+
+      call tbpl_doplot ( %val(IPTAB1), %val(IPTAB2), dx, dy, kopt )	!Plot the data
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_doplot"> TBPL_DOPLOT  </a>-- Plot points or line
+C
+C   a j penny               ral                     1991 may
+
+      subroutine tbpl_doplot ( table1, table2, dx, dy, kopt )
+
+      implicit none
+
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+
+      real        table1(TBVX1,TBY1)	!i: Input data
+      real        table2(TBVX2,TBY2)	!i: Input data
+      real        dx			!i: Offset in X to plot with
+      real        dy			!i: Offset in Y to plot with
+      integer     kopt			!i: option (1=points/2=line)
+C--
+      integer j, kch
+      real    x, y
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTTABLE ) then
+         call printo ( 'Must have loaded tables' )
+         return
+      endif
+
+      if ( kopt.eq.1 ) then
+         call get1i ( 'SYMBOL', kch, 2, 0, 31 )
+         if ( ST_FAILED ) return
+         j = 0
+         do while ( j.lt.TBY1 .and. j.lt.TBY2 )
+            j = j + 1
+            x = table1((NCOL1+5),j) + dx
+            y = table2((NCOL2+5),j) + dy
+            if ( x.ge.PRX(1) .and. x.le.PRX(2) .and. y.ge.PRY(1)
+     +           .and. y.le.PRY(2) ) call pgpoint ( 1, x, y, kch )
+         enddo
+      else
+         call get1i ( 'LSTYLE', kch, 1, 1, 5 )
+         if ( ST_FAILED ) return
+         call pgsls ( kch )
+         x = table1((NCOL1+5),1) + dx
+         y = table2((NCOL2+5),1) + dy
+         call pgmove ( x, y )
+         j = 1
+         do while ( j.lt.TBY1 .and. j.lt.TBY2 )
+            j = j + 1
+            x = table1((NCOL1+5),j) + dx
+            y = table2((NCOL2+5),j) + dy
+            call pgdraw ( x, y )
+         enddo
+         call pgsls ( 1 )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_gcurse"> TBPL_GCURSE  </a>-- Get positions with cursor
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbpl_gcurse ( table1, table2 )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+
+      real        table1(TBVX1,TBY1)	!i: Input data
+      real        table2(TBVX2,TBY2)	!i: Input data
+C--
+      real x, y, xa, ya, dd, ddmin
+      integer j, jmin
+      logical more
+      character ch*1, name*20
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.DONEAXIS ) then
+         call printo ( 'Need to have plotted area' )
+         return
+      endif
+
+      more = .true.
+      do while ( more )
+
+         call pgcurse ( x, y, ch )
+
+         if ( x.gt.max(PSX(1),PSX(2)) .or. x.lt.min(PSX(1),PSX(2)) .or.
+     +      y.gt.max(PSY(1),PSY(2)) .or. y.lt.min(PSY(1),PSY(2)) ) then
+            more = .false.
+         else
+            call pargr ( x )
+            call pargr ( y )
+            call printd ( 'X = %f : Y = %f' )
+            if ( GOTTABLE ) then
+               jmin = 1
+               ddmin = 1.0e30
+               j = 0
+               do while ( j.lt.TBY1 .and. j.lt.TBY2 )
+                  j = j + 1
+                  xa = table1((NCOL1+5),j)
+                  ya = table2((NCOL2+5),j)
+                  dd = (x-xa)*(x-xa) + (y-ya)*(y-ya)
+                  if ( dd.lt.ddmin ) then
+                     ddmin = dd
+                     jmin = j
+                  endif
+               enddo
+               xa = table1((NCOL1+5),jmin)
+               ya = table2((NCOL2+5),jmin)
+               call namegt ( table1, TBVX1, TBY1, jmin, name )
+               call pargi ( jmin )
+               call pargc ( name )
+               call pargr ( xa )
+               call pargr ( ya )
+               call printd (
+     +   'Nearest point is number %d : Name %c : X = %f : Y = %f ' )
+            endif
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_contour"> TBPL_CONTOUR  </a>-- Put out contour plot to device
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine tbpl_contour ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+      include 'ST_GRAPH_INC'
+C--
+      integer lx, ly, ierr, ipconr, ipcons, j, ja, ngood, nbad, ncon,
+     +        kl, lens, kp(4), istat, ia, ib
+      real alx, aly, c(200), tr(6), alo, ahi, astep
+      character*200 text
+      logical kas, kab
+      data tr / 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 /
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTIM ) then
+         call printo ( 'ERROR: No image got yet' )
+         return
+      endif
+
+      if ( .not.GD_DISPOP ) call tbpl_open				!Is device open?
+      if ( .not.GD_DISPOP ) return
+
+      ia = 1
+      ib = NX
+      call get2i ( 'IMXRANGE', ia, ib, .true., 1, NX )            	!Get X window
+      if ( ST_FAILED ) return
+      NXS = min(ia,ib)
+      NXE = max(ia,ib)
+
+      ia = 1								!Get Y window
+      ib = NY
+      call get2i ( 'IMYRANGE', ia, ib, .true., 1, NY )
+      if ( ST_FAILED ) return
+      NYS = min(ia,ib)
+      NYE = max(ia,ib)
+
+      if ( NXS.eq.NXE .or. NYS.eq.NYE ) then
+         call printo ( 'ERROR: Each side must be more than 1 pixel' )
+         return
+      endif
+
+      if ( .not.GOTPSIZE ) then
+         PSX(1) = NXS
+         PSX(2) = NXE
+         PSY(1) = NYS
+         PSY(2) = NYE
+         call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20,
+     +                1.0e20 )
+         if ( ST_FAILED ) return
+         call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20,
+     +                1.0e20 )
+         if ( ST_FAILED ) return
+         GOTPSIZE = .true.
+      endif
+
+      if ( .not.GOTASPECT ) then
+         kab = .true.
+         if ( KASPECT.eq.0 ) kab = .false.
+         call get1b ( 'ASPECT', kas, kab )
+         KASPECT = 1
+         if ( .not.kas ) KASPECT = 0
+         GOTASPECT = .true.
+      endif
+
+      if ( .not.DONEAXIS ) then						!Draw axes
+         call gd_dobox ( PSX(1), PSX(2), ' ',
+     +                   PSY(1), PSY(2), ' ', ' ', KASPECT )
+         DONEAXIS = .true.
+      endif
+
+      call get2r ( 'IMOFFSET', tr(1), tr(4), .true., -1.0e20, 1.0e20 )
+
+      lx = NXE - NXS + 1						!Get area into work space
+      ly = NYE - NYS + 1
+      call gtwrkr ( 'CONTR', lx*ly, ipconr, ierr )
+      if ( ierr.ne.0 ) return
+      call gtwrkr ( 'CONTS', lx*ly, ipcons, ierr )
+      if ( ierr.ne.0 ) then
+         call wrkcan ( 'CONTR' )
+         return
+      endif
+      if ( IMTYPE.eq.'SHORT' ) then
+         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
+     +                %val(ipcons), lx, ly, 1, 1 )
+         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL,
+     +                 %val(ipconr) )
+      else
+         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
+     +                %val(ipcons), lx, ly, 1, 1 )
+         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL,
+     +                 %val(ipconr) )
+      endif
+
+      call st_minmax ( %val(ipcons), lx, ly, BS, BZ, IMTYPE, INVAL, 	!Get contour values
+     +             RINVAL, 1, lx, 1, ly, alo, ahi, kp, ngood, nbad )
+      astep = (ahi-alo)/10.0
+      if ( astep.eq.0.0 ) astep = 1.0
+      call get3r ( 'CONTOUR', alo, ahi, astep, .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      ncon = 1 + int((ahi-alo)/astep)
+      ncon = min(200,ncon)
+      do j = 1, ncon
+         c(j) = alo + astep*(real(j)-1.0)
+      enddo
+
+      call pgcons ( %val(ipconr), lx, ly, 1, lx, 1, ly, c, ncon, tr )
+
+      call pgupdt
+
+      call wrkcan ( 'CONTR' )						!Close work areas
+      call wrkcan ( 'CONTS' )
+
+      call printo ( ' ' )
+      ia = tr(1)
+      ib = tr(4)
+      write ( text, '('' Image pixel ('',i6,'','',i6,'') is at plot'',
+     +      '' position ('',i6,'','',i6,'')'' )' ) NXS, NYS, ia, ib
+      j = index(text,'l (')
+      call lbgone(text(j+3:))
+      ja = index(text(j:),',')
+      call lbgone(text(j+ja:))
+      j = index(text,'n (')
+      call lbgone(text(j+3:))
+      ja = index(text(j:),',')
+      call lbgone(text(j+ja:))
+      kl = lens(text)
+      call printo ( text(1:kl) )
+      write ( text, '('' Contour levels start at '',f16.3,'' and '',
+     +               ''step by '',f16.3)' ) alo, astep
+      j = index(text,' at ')
+      call lbgone(text(j+4:))
+      j = index(text,' by ')
+      call lbgone(text(j+4:))
+      kl = lens(text)
+      call printo ( text(1:kl) )
+      text = ' Image title is: '//IMTITLE
+      kl = lens(text)
+      call printo ( text(1:kl) )
+      call printo ( ' ' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_image"> TBPL_IMAGE  </a>-- Put out image to device
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine tbpl_image ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+      include 'ST_GRAPH_INC'
+      include 'ST_DS_GEN_INC'
+C--
+      integer lx, ly, ierr, ipconr, ipcons, j, ja, ngood, nbad,
+     +        kl, lens, kp(4), istat, ia, ib
+      real alx, aly, tr(6), abot, atop
+      character*200 text
+      logical kas, kab
+      data tr / 0.0, 1.0, 0.0, 0.0, 0.0, 1.0 /
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GOTIM ) then
+         call printo ( 'ERROR: No image got yet' )
+         return
+      endif
+
+      if ( .not.GD_DISPOP ) call tbpl_open				!Is device open?
+      if ( .not.GD_DISPOP ) return
+
+      ia = 1
+      ib = NX
+      call get2i ( 'IMXRANGE', ia, ib, .true., 1, NX )            	!Get X window
+      if ( ST_FAILED ) return
+      NXS = min(ia,ib)
+      NXE = max(ia,ib)
+
+      ia = 1								!Get Y window
+      ib = NY
+      call get2i ( 'IMYRANGE', ia, ib, .true., 1, NY )
+      if ( ST_FAILED ) return
+      NYS = min(ia,ib)
+      NYE = max(ia,ib)
+
+      if ( NXS.eq.NXE .or. NYS.eq.NYE ) then
+         call printo ( 'ERROR: Each side must be more than 1 pixel' )
+         return
+      endif
+
+      if ( .not.GOTPSIZE ) then
+         PSX(1) = NXS
+         PSX(2) = NXE
+         PSY(1) = NYS
+         PSY(2) = NYE
+         call get2r ( 'DEVLIMX', PSX(1), PSX(2), .true., -1.0e20,
+     +                1.0e20 )
+         if ( ST_FAILED ) return
+         call get2r ( 'DEVLIMY', PSY(1), PSY(2), .true., -1.0e20,
+     +                1.0e20 )
+         if ( ST_FAILED ) return
+         GOTPSIZE = .true.
+      endif
+
+      if ( .not.GOTASPECT ) then
+         kab = .true.
+         if ( KASPECT.eq.0 ) kab = .false.
+         call get1b ( 'ASPECT', kas, kab )
+         KASPECT = 1
+         if ( .not.kas ) KASPECT = 0
+         GOTASPECT = .true.
+      endif
+
+      if ( .not.DONEAXIS ) then						!Draw axes
+         call gd_dobox ( PSX(1), PSX(2), ' ',
+     +                   PSY(1), PSY(2), ' ', ' ', KASPECT )
+         DONEAXIS = .true.
+      endif
+
+      call get2r ( 'IMOFFSET', tr(1), tr(4), .true., -1.0e20, 1.0e20 )
+
+      lx = NXE - NXS + 1						!Get area into work space
+      ly = NYE - NYS + 1
+      call gtwrkr ( 'CONTR', lx*ly, ipconr, ierr )
+      if ( ierr.ne.0 ) return
+      call gtwrkr ( 'CONTS', lx*ly, ipcons, ierr )
+      if ( ierr.ne.0 ) then
+         call wrkcan ( 'CONTR' )
+         return
+      endif
+      if ( IMTYPE.eq.'SHORT' ) then
+         call copss ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
+     +                %val(ipcons), lx, ly, 1, 1 )
+         call copssr ( %val(ipcons), lx, ly, BS, BZ, INVAL,
+     +                 %val(ipconr) )
+      else
+         call coprr ( %val(IPIM), NX, NY, NXS, NXE, NYS, NYE,
+     +                %val(ipcons), lx, ly, 1, 1 )
+         call coprrr ( %val(ipcons), lx, ly, BS, BZ, RINVAL,
+     +                 %val(ipconr) )
+      endif
+
+      call ds_imgscl ( %val(IPIM), NX, NY, IMTYPE, 1, NX, 1, NY )
+      atop = BS*DSVMIN + BZ
+      abot = BS*DSVMAX + BZ
+      call get2r ( 'VPRANGE', abot, atop, .true., -1.0e10, 1.0e10 )
+      if ( ST_FAILED ) return
+
+      call pggray ( %val(ipconr), lx, ly, 1, lx, 1, ly, atop, abot, tr)
+
+      call pgupdt
+
+      call wrkcan ( 'CONTR' )						!Close work areas
+      call wrkcan ( 'CONTS' )
+
+      call printo ( ' ' )
+      ia = tr(1)
+      ib = tr(4)
+      write ( text, '('' Image pixel ('',i6,'','',i6,'') is at plot'',
+     +      '' position ('',i6,'','',i6,'')'' )' ) NXS, NYS, ia, ib
+      j = index(text,'l (')
+      call lbgone(text(j+3:))
+      ja = index(text(j:),',')
+      call lbgone(text(j+ja:))
+      j = index(text,'n (')
+      call lbgone(text(j+3:))
+      ja = index(text(j:),',')
+      call lbgone(text(j+ja:))
+      kl = lens(text)
+      call printo ( text(1:kl) )
+      text = ' Image title is: '//IMTITLE
+      kl = lens(text)
+      call printo ( text(1:kl) )
+      call printo ( ' ' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_text"> TBPL_TEXT  </a>-- Put out text
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine tbpl_text ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_GRAPH_INC'
+C--
+      integer kl, lens
+      real x, y
+      character*200 text
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GD_DISPOP ) call tbpl_open				!Is device open?
+      if ( .not.GD_DISPOP ) return
+
+
+      call get1c ( 'TEXT', text, ' ', .true. )
+      x = PSX(1)
+      y = PSY(1)
+      call get2r ( 'POSITION', x, y, .true., -1.0e20, 1.0e20 )
+
+      call lbgone(text)
+      kl = lens(text)
+      call pgtext ( x, y, text(1:kl) )
+
+      call pgupdt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpl_label"> TBPL_LABEL  </a>-- Put out labels
+C
+C  alan penny                ral                      1990-06-15
+
+      subroutine tbpl_label ( )
+
+      implicit none
+      include 'tbplot.inc'
+      include 'STARMAN_INC'
+      include 'ST_GRAPH_INC'
+C--
+      integer klx, kly, lens
+      character*200 textx, texty
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.GD_DISPOP ) call tbpl_open				!Is device open?
+      if ( .not.GD_DISPOP ) return
+
+      if ( .not.DONEAXIS ) then
+         call printo ( 'Need to have plotted area' )
+         return
+      endif
+
+      call get1c ( 'XLABEL', textx, XHEAD, .true. )
+      call get1c ( 'YLABEL', texty, YHEAD, .true. )
+
+      call lbgone(textx)
+      klx = lens(textx)
+      call lbgone(texty)
+      kly = lens(texty)
+
+      call pglabel ( textx(1:klx), texty(1:kly), ' ' )
+
+      call pgupdt
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbplot"> TBPLOT  </a>-- (Program) Plot out graph/histogram
+C   See TBPLOT.HLP for details
+C
+C         A.J.Penny                RAL                  1991 May
+
+      subroutine tbplot ( ierradam )
+
+      implicit none
+
+      integer    ierradam                 !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbplot
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBPLOT.INC for TBPLOT.F
+
+      logical    gotplims	!Got table posn limits?
+      logical    gothlims	!Got hisogram limits?
+      logical    gotdlims	!Got table ranges?
+      logical    gotaspect	!Got plot aspect?
+      logical    gottable 	!Got table open?
+      logical    gotfile2 	!Got a second table open?
+      logical    file2ok 	!Got the equivalent of a second table?
+      logical    gotim	 	!Got image open?
+      logical    gotpsize	!Got plotting size?
+      logical    doneaxis	!Plot device axis plotted?
+      logical    ishist         !Plot is histogram?
+
+      integer    nxs            !X start of image area of interest
+      integer    nxe            !X end of image area of interest
+      integer    nys            !Y start of image area of interest
+      integer    nye            !Y end of imagearea of interest
+      integer    iptab1		!Input table 1 pointer
+      integer    iptab2		!Input table 2 pointer
+      real       prx(2)		!Table x plot limits
+      real       pry(2)		!Table y plot limits
+      real       psx(2)		!X plot limits
+      real       psy(2)		!Y plot limits
+      real       phx(2)		!Histogram plot limits
+      real       xmin		!'X' data minimum
+      real       xmax		!'X' data maximum
+      real       ymin		!'Y' data minimum
+      real       ymax		!'Y' data maximum
+      integer    tbvx1		!Input table 1 X size
+      integer    tby1		!Input table 1 Y size
+      integer    tbx1		!Input table 1 X size - 5
+      integer    tbvx2		!Input table 2X size
+      integer    tby2		!Input table 2Y size
+      integer    tbx2		!Input table 2X size - 5
+      integer    ncol1		!Column number in table 1
+      integer    ncol2		!Column number in table 2
+      integer    nbin		!Number of bins in histogram
+      integer    kaspect   	!Flag for graph aspect ratio same(1) or variable(0)
+      integer    kmode		!Flag for mode (1=interactve:2=auto points:
+				!               3=auto line:4=auto histogram)
+
+      logical    tbc_dum1	!Dummy for 4*n logicals
+CX      logical    tbc_dum2	!Dummy for 4*n logicals
+CX      logical    tbc_dum3	!Dummy for 4*n logicals
+
+      character*20  xhead	!Header for X axis
+      character*20  yhead	!Header for Y axis
+
+      common / tbplota / iptab1,  iptab2,    prx,    pry,   phx,
+     +                      psx,     psy,  tbvx1,   tby1,  tbx1,
+     +                    tbvx2,    tby2,   tbx2,   xmin,  xmax,
+     +                     ymin,    ymax,  ncol1,  ncol2,  nbin,
+     +                   kaspect,  kmode,    nxs,    nxe,   nys,
+     +                       nye
+
+      common / tbplotb / gotplims,  gottable,   gotpsize,  gotdlims,
+     +                   doneaxis,  gothlims,   gotfile2,    ishist,
+     +                    file2ok,     gotim,  gotaspect,  tbc_dum1
+
+      common / tbplotc / xhead, yhead
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

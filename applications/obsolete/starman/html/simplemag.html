@@ -1,0 +1,875 @@
+<HTML> <HEAD>
+<TITLE> SIMPLEMAG </TITLE>
+</HEAD> <BODY>
+ 
+<h1> SIMPLEMAG - Isolated stars photometry
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This program does three kinds of simple photometry. They are:-
+<p>
+ 
+   - Aperture photometry on isolated stars.
+<p>
+ 
+   - Simple Gaussian profile photometry on isolated stars.
+<p>
+ 
+   - Determination of mean Gaussian radii from isolated stars.
+<p>
+ 
+ The three kinds are executed by entirely different sections of
+ the program. These sections can be thought of as separate
+ programs, one of which is chosen after entering SIMPLEMAG.
+<p>
+ 
+ In all cases, an image and a list of star positions is input and
+ the work done using those inputs.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#simplemag_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#aperture_photometry"> Aperture photometry </a>
+<ul>
+<li> 1.1 <a href="#aperture_output"> Aperture output </a>
+</ul>
+<li> 2 <a href="#gaussian_photometry"> Gaussian photometry </a>
+<ul>
+<li> 2.1 <a href="#gaussian_method"> Gaussian method </a>
+<li> 2.2 <a href="#gaussian_output"> Gaussian output </a>
+</ul>
+<li> 3 <a href="#gaussian_radius"> Gaussian radius </a>
+<ul>
+<li> 3.1 <a href="#radius_method"> Radius method </a>
+<li> 3.2 <a href="#radius_output"> Radius output </a>
+</ul>
+<li> 4 <a href="#parameters"> Parameters </a>
+<li> 5 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="aperture_photometry"> Aperture photometry </h2> </a> <p>
+ 
+ 
+ Does aperture photometry on stars in an image.
+<p>
+ 
+ For each star in the input table of positions, the program does:-
+<p>
+ 
+ 1) Optionally, refine position before use by centering on the star
+    that near the table position.
+<p>
+ 
+ 2) Place an aperture of specified size at the position.
+<p>
+ 
+ 3) Calculate flux in an aperture at the position.
+<p>
+ 
+ 4) Calculate mean `sky' level with a circular annulus around the
+    position, with specified inner and outer radii,
+<p>
+ 
+ 5) Subtract sky level from the flux in the aperture.
+<p>
+ 
+ 6) Calculate star magnitude as:-
+<p>
+<pre>
+         Mag = 30 - 2.5*log  (star-(sky level)*area)
+                           10
+ 
+         where area = star aperture area
+</pre><p>
+ 
+ 7) Store result in output table.
+<p>
+ 
+ 8) Optionally, type out result to user.
+<p>
+ 
+ The error in the star magnitude and sky level are also calculated
+ from the pixel values. The pixels are presumed to be Poisson noised,
+ with a scale level put in by the user. This is a number such that
+ if the pixel values are multiplied by this number, then the pixels
+ would have proper Poisson noise. There is also a user input value
+ for an extra noise level that is added to each pixel. This noise can
+ be thought of as the noise that would be there if the pixel values
+ had a mean level of zero.
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="aperture_output"> Aperture output </h2> </a> <p>
+ 
+ 
+ The file output by this program uses the `OUT' parameter, and
+ is a table of results. The contents of the table are the parameters
+ measured for each star:-
+<p>
+<pre>
+ 
+ Col
+ Num   Header       Contents
+ ---   ------       --------
+   1   X            X position used (optionally centered)
+   2   Y            Y position used (optionally centered)
+   3   Magnitude    Magnitude
+   4   Error        Error (std dev) in magnitude
+   5   Peak         Maximum pixel value in star aperture
+   6   Dx           X distance from input to measured posn
+   7   Dy           Y distance from input to measured posn
+   8   Flux         Sum of pixel values in star aperture
+   9   Number       Numb of valid pixels in star aperture
+  10   Invalid      Numb of invalid pixels in star aperture
+  11   Sky          Sky level (mean)
+  12   Sky Error    Error (std dev) in sky level
+  13   Sky Number   Numb of valid pixels in sky annulus
+  14   Sky Invalid  Numb of invalid pixels in sky annulus
+ 
+  The magnitudes are calculated as:-
+ 
+         Mag = 30 - 2.5*log  (star-(sky level)*area)
+                           10
+ 
+         where area = star aperture area
+</pre><p>
+ 
+ If the star flux is negative, the magnitude is set to 50. It is
+ also set at that level if there are no good pixels in the star aperture
+ and/or none in the sky annulus.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="gaussian_photometry"> Gaussian photometry </h2> </a> <p>
+ 
+ 
+  Does photometry on isolated stars in an image, fitting a 2-D
+  Gaussian to stars whose positions are given in an input list.
+<p>
+ 
+  It estimates the flux of stars in an image, by taking a small area
+  around the star position and fitting a background and a 2-D Gaussian
+  profile to the data in that area. The star positions are taken from
+  an input table, and the results are (optionally) typed out and
+  stored in an output table.
+<p>
+ 
+  The Gaussian profile is an ellipse, orthogonal to the X and Y
+  axes.
+<p>
+ 
+  This program takes no account of sub-pixel variations. Thus a
+  profile whose value changes significantly inside a pixel will
+  be assumed to have the mean value as the value at the centre of
+  that pixel. For narrow profiles, this will introduce errors.
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="gaussian_method"> Gaussian method </h2> </a> <p>
+ 
+ 
+   The star profile is of the form:-
+<p><pre>
+ 
+                    2
+                -1.d
+          I =  e
+ 
+          Where d = sqrt((X/RX)**2+(Y/RY)**2)
+</pre><p>
+ 
+  Beware that, as stars are not exactly Gaussian, the fitted profile
+  will vary with box size.
+<p>
+ 
+  This program takes no account of sub-pixel variations. Thus a
+  profile whose value changes significantly inside a pixel will
+  be assumed to have the mean value as the value at the centre of
+  that pixel. For narrow profiles, this will introduce errors.
+<p>
+ 
+  Star profiles are not strictly Gaussian, so for stars with whose
+  profiles differ, there will be a small, systematic, error in their
+  relative magnitudes. That is the magnitude is not a `correct'
+  estimate from the `volume' of a star. However for stars with the
+  same profile, for example in many cases, stars in one image, this
+  error has the same fractional size, and so the relative magnitudes
+  are correct.
+<p>
+ 
+  For very faint stars, letting the profile radii vary can cause
+  significant errors.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="gaussian_output"> Gaussian output </h2> </a> <p>
+ 
+ 
+ The file output by this program uses the `OUT' parameter, and
+ is a table of results. The contents of the table are the parameters
+ measured for each star:-
+<p>
+<pre>
+ 
+ Col
+ Numb   Header       Contents
+ ----   ------       --------
+  1     X            X position
+  2     Y            Y position
+  3     Magnitude    Magnitude
+  4     Dx           X distance from input to measured posn
+  5     Dy           Y distance from input to measured posn
+  6     Iterations   Number of iterations taken in the
+                      fitting (the maximum allowed is 20)
+  7     Rms          The RMS of the residuals between the
+                      fit and the data, in an area around
+                      the star centre
+  8     Numinval     Number of `invalid' pixels in the area
+                      used in the fit
+  9     Height       The height of the Gaussian fitted
+ 10     Base         The `sky' level on which the star sits
+ 11     Rx           The fitted X radius of the profile
+ 12     Ry           The fitted Y radius of the profile
+ 
+ 
+  The magnitudes are calculated as:-
+ 
+ 
+        Mag = 30.0 - 2.5.log  (pi.height.rx.ry)
+                            10
+ 
+ 
+  where (pi.height.rx.ry) is the `volume' of a Gaussian.
+</pre><p>
+ 
+<hr>
+ <h2> 3 <a name="gaussian_radius"> Gaussian radius </h2> </a> <p>
+ 
+ 
+  Estimates the mean Gaussian Radii of stars in a table of
+  star positionss in an uncrowded image.
+<p>
+ 
+  It makes three estimates, by using three methods:-
+<p>
+ 
+<ul>
+<li> Fit each star individually and average the measured radii
+<p>
+ 
+<li> (Optional) Take the pixels round each star and add them
+      together to make one star, and then measure its radii. The
+      adding is done assuming that each star centre is at the b.l.h.
+      corner of the pixel in which it actually falls.
+<p>
+ 
+<li> (Optional) Take the pixels round each star and add them
+      together to make one star and then measure its radii. The
+      adding is done by taking the star centres to be at their
+      calculated positions and using an interpolation method to
+      put the best pixel values into the summed star.
+</ul><p>
+ 
+  This program takes no account of sub-pixel variations. Thus a
+  profile whose value changes significantly inside a pixel will
+  be assumed to have the mean value as the value at the centre of
+  that pixel. For narrow profiles, this will introduce errors.
+<p>
+ 
+  The profile is an ellipse, orthogonal to the X and Y axes.
+<p>
+ 
+<hr>
+ <h2> 3.1 <a name="radius_method"> Radius method </h2> </a> <p>
+ 
+ 
+   The position, radii, and height of each of the stars in the table
+   are found by taking a small box round each star in the image, and
+   fitting a single 2-D Gaussian (with different X and Y radii), but
+   no rotation. No allowance is made for the fact that there may be
+   contamination by nearby stars. The results may be typed out.
+<p>
+ 
+   Bad stars are then rejected, on the basis of 'invalid' pixels
+   in the fitting boxes, radii too large or small, heights too small.
+<p>
+ 
+   The mean of the fits is then calculated and typed out.
+<p>
+ 
+   The program then makes a 'grand' star by taking the data around
+   each individual good star centre and adding each pixel value into
+   a total array at its appropriate position. The radii of this mean
+   star are then calculated, typed, and stored as parameters of the
+   program.
+<p>
+ 
+   An even better radii is then calculated by doing the summing in a
+   better way, in which the program allows for the fact that the
+   stars are not centred at integral pixel values by interpolating
+   between pixels before adding into the mean array. The radii of
+   this mean star are then calculated, typed, and stored as parameters
+   of the program.
+<p>
+ 
+   The star profile is of the form:-
+<p><pre>
+ 
+                                     2
+                                 -1.d
+                           I =  e
+ 
+               Where d = sqrt((X/RX)**2+(Y/RY)**2)
+</pre><p>
+ 
+    Beware that, as stars are not exactly Gaussian, the fitted profile
+    will vary with box size.
+<p>
+ 
+  This program takes no account of sub-pixel variations. Thus a
+  profile whose value changes significantly inside a pixel will
+  be assumed to have the mean value as the value at the centre of
+  that pixel. For narrow profiles, this will introduce errors.
+<p>
+ 
+<hr>
+ <h2> 3.2 <a name="radius_output"> Radius output </h2> </a> <p>
+ 
+ 
+ The files output by this program are:-
+<p>
+ 
+<ol>
+<dt> <strong>   OUT1IM         </strong>
+<dd>    An image with the residuals after a fit has been to
+                   done to the array made by summing up all the areas
+                   round each star in the input table. <p>
+ 
+<dt> <strong>   OUT2IM         </strong>
+<dd>    An image with the residuals after a fit has been to
+                   done to the array made by summing up all the areas
+                   round each star in the input table, with the
+                   summing done using pixel interpolation when adding
+                   the data from an individual star into the array. <p>
+ 
+<dt> <strong>   OUT1TB        </strong>
+<dd>    A table with the radial plot of the fit and the data
+                   after a fit has been to done to the array made by
+                   summing up all the areas round each star in the
+                   input table. The table contains three columns, the
+                   first the distance from the centre of the fitted
+                   star, the second the summed data values, and the
+                   third the value of the fit at that point. <p>
+ 
+<dt> <strong>   OUT2TB        </strong>
+<dd>    A table with the radial plot of the fit and the data
+                   after a fit has been to done to the array made by
+                   summing up all the areas round each star in the
+                   input table, with the summing done using pixel
+                   interpolation when adding the data from an
+                   individual star into the array. The table contains
+                   three columns, the first the distance from the
+                   centre of the fitted star, the second the summed
+                   data values, and the third the value of the fit at
+                   that point. <p>
+</ol><p>
+ 
+<hr>
+ <h2> 4 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 4.1 <a href="#general"> General </a>
+<li> 4.2 <a href="#box"> Box </a>
+<li> 4.3 <a href="#in"> In </a>
+<li> 4.4 <a href="#instars"> Instars </a>
+<li> 4.5 <a href="#option"> Option </a>
+<li> 4.6 <a href="#out"> Out </a>
+<li> 4.7 <a href="#title"> Title </a>
+<li> 4.8 <a href="#typing"> Typing </a>
+<li> 4.9 <a href="#aperture_measure"> Aperture measure </a>
+<li> 4.10 <a href="#apdia"> Apdia </a>
+<li> 4.11 <a href="#centre"> Centre </a>
+<li> 4.12 <a href="#noise"> Noise </a>
+<li> 4.13 <a href="#poisv"> Poisv </a>
+<li> 4.14 <a href="#skydias"> Skydias </a>
+<li> 4.15 <a href="#gaussian_photometry"> Gaussian photometry </a>
+<li> 4.16 <a href="#parfix"> Parfix </a>
+<li> 4.17 <a href="#radii"> Radii </a>
+<li> 4.18 <a href="#gaussian_radius"> Gaussian radius </a>
+<li> 4.19 <a href="#doint"> Doint </a>
+<li> 4.20 <a href="#dosum"> Dosum </a>
+<li> 4.21 <a href="#out1im"> Out1im </a>
+<li> 4.22 <a href="#out2im"> Out2im </a>
+<li> 4.23 <a href="#out1tb"> Out1tb </a>
+<li> 4.24 <a href="#out2tb"> Out2tb </a>
+<li> 4.25 <a href="#radlims"> Radlims </a>
+<li> 4.26 <a href="#rx1"> Rx1 </a>
+<li> 4.27 <a href="#rx2"> Rx2 </a>
+<li> 4.28 <a href="#rx3"> Rx3 </a>
+<li> 4.29 <a href="#ry1"> Ry1 </a>
+<li> 4.30 <a href="#ry2"> Ry2 </a>
+<li> 4.31 <a href="#ry3"> Ry3 </a>
+<li> 4.32 <a href="#sumbox"> Sumbox </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 4.1 <a name="general"> General </h2> </a> <p>
+ 
+ 
+  The following parameters are used in more than one of the
+  three types of photometry done in this program.
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="box"> Box </h2> </a> <p>
+ 
+  (Default - 20,20       <br> Range - 2 to 200)
+<p>
+ 
+  The X and Y size of the box round each star to take when
+  making the individual fits.
+<p>
+ 
+<hr>
+ <h2> 4.3 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The input image.
+<p>
+ 
+  This can be either a `short' 16-bit integer of a `real' 32-bit
+  real Starman NDF image.
+<p>
+ 
+<hr>
+ <h2> 4.4 <a name="instars"> Instars </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The input list of star positions.
+<p>
+ 
+  This must be a Starman table format file.
+<p>
+ 
+<hr>
+ <h2> 4.5 <a name="option"> Option </h2> </a> <p>
+ 
+  (Default - 'aperture'      <br> Choice - 'aperture:gaussian:radius')
+<p>
+ 
+  Which of the three types of fit do you want to do?
+<p>
+<pre>
+ 
+  Choice     Function
+  ------     --------
+  Aperture   Aperture Photometry
+  Gaussian   Gaussian profile fitting photometry
+  Radius     Determine mean Gaussian radii
+ 
+</pre><p>
+ 
+<hr>
+ <h2> 4.6 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The output table of results.
+<p>
+ 
+  This can be either from the aperture measuring or from the
+  profile measuring. For the contents of the table, see the
+  help on the functions.
+<p>
+ 
+<hr>
+ <h2> 4.7 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - title of input table       <br> Choice - any)
+<p>
+ 
+  The title to add into the output table.
+<p>
+ 
+<hr>
+ <h2> 4.8 <a name="typing"> Typing </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no' )
+<p>
+ 
+  Do you want to have typed out the individual fits to each star?
+<p>
+ 
+<hr>
+ <h2> 4.9 <a name="aperture_measure"> Aperture measure </h2> </a> <p>
+ 
+ 
+  The following parameters are for the Aperture Photometry.
+<p>
+ 
+<hr>
+ <h2> 4.10 <a name="apdia"> Apdia </h2> </a> <p>
+ 
+  (Default - 20.0       <br> Range - 0.1 to 200.0)
+<p>
+ 
+  The diameter of the star aperture.
+<p>
+ 
+<hr>
+ <h2> 4.11 <a name="centre"> Centre </h2> </a> <p>
+ 
+  (Default - `no'      <br> Choice - 'yes:no')
+<p>
+ 
+  Do you want the input positions corrected before the measuring is
+  done?
+<p>
+ 
+  If so, then the program will fit a Gaussian to the data near the
+  input position, and take the fit centre as the new position.
+<p>
+ 
+<hr>
+ <h2> 4.12 <a name="noise"> Noise </h2> </a> <p>
+ 
+  (Default - 0.0      <br> Range - 0.0 to 1.0e10)
+<p>
+ 
+  In calculating the errors, is there a hidden source of noise, and
+  if so what is its level?
+<p>
+ 
+  If an image had a mean level of zero, what would be the std dev of the
+  pixel values? There might be such a source of noise from say the
+  removal, before the use of this program, of a mean level.
+<p>
+ 
+  A knowledge of such a hidden noise is necessary for the correct
+  estimate of the error in the calculated magnitudes.
+<p>
+ 
+<hr>
+ <h2> 4.13 <a name="poisv"> Poisv </h2> </a> <p>
+ 
+  (Default - 1.0           <br> Range - 1.0e-10 to 1.0e10)
+<p>
+ 
+  In calculating the errors, it is necessary to know if the pixel
+  values have a Poisson noise. Sometimes, the pixel values are
+  scaled values
+<p>
+ 
+<hr>
+ <h2> 4.14 <a name="skydias"> Skydias </h2> </a> <p>
+ 
+  (Default - 30.0,40.0         <br> Range - 0.1 to 200.0)
+<p>
+ 
+  The inner and outer diameters of the sky annulus.
+<p>
+ 
+ 
+<hr>
+ <h2> 4.15 <a name="gaussian_photometry"> Gaussian photometry </h2> </a> <p>
+ 
+ 
+  The following parameters are for the Gaussian Profile Photometry.
+<p>
+ 
+<hr>
+ <h2> 4.16 <a name="parfix"> Parfix </h2> </a> <p>
+ 
+  (Default - 'no'         <br> Choice - 'yes:no')
+<p>
+ 
+  Are fixed radii to be used in the fitting?
+<p>
+ 
+  Either the program can determine the best values of the
+  profile radii for each star, or it can keep those radii
+  fixed throughout the program with user-determined values.
+<p>
+ 
+  If they are allowed to vary, then the starting values, of the
+  iterative process in the fitting, are taken as 2.0,2.0.
+<p>
+ 
+<hr>
+ <h2> 4.17 <a name="radii"> Radii </h2> </a> <p>
+ 
+  (Default - 3.0,3.0            <br> Range - 0.1 to 200.0)
+<p>
+ 
+  X and Y radii of the star profile to be used in fitting the
+  stars. If the profile is fixed, then these are used. If it is
+  allowed to vary, then these are used as the starting points
+  of the iterative fitting.
+<p>
+ 
+<hr>
+ <h2> 4.18 <a name="gaussian_radius"> Gaussian radius </h2> </a> <p>
+ 
+ 
+  The following parameters are for the Determination of the
+  Mean Gaussian profile.
+<p>
+ 
+<hr>
+ <h2> 4.19 <a name="doint"> Doint </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no' )
+<p>
+ 
+  Do you want the make the grand star, amde  by summing the data round
+  the individual stars (using interpolation), for fiting?
+<p>
+ 
+<hr>
+ <h2> 4.20 <a name="dosum"> Dosum </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no' )
+<p>
+ 
+  Do you want the make the grand star, amde  by summing the data round
+  the individual stars, for fiting?
+<p>
+ 
+<hr>
+ <h2> 4.21 <a name="out1im"> Out1im </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the image to contain the summed star.
+<p>
+ 
+  The image is the residuals after a fit has been to done to the
+  array made by summing up all the areas round each star in the
+  input table.
+<p>
+ 
+  If a null repsonse is made, this image is not made.
+<p>
+ 
+  This is a `short' 16-bit integer Starman NDF image.
+<p>
+ 
+<hr>
+ <h2> 4.22 <a name="out2im"> Out2im </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the image to contain the summed star, with the
+  summing done using interpolation.
+<p>
+ 
+  The image is the residuals after a fit has been to done to the
+  array made by summing up all the areas round each star in the
+  input table, with the summing done using pixel interpolation
+  when adding the data from an individual star into the array.
+<p>
+ 
+  If a null repsonse is made, this image is not made.
+<p>
+ 
+  This is a `short' 16-bit integer Starman NDF image.
+<p>
+ 
+<hr>
+ <h2> 4.23 <a name="out1tb"> Out1tb </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the table to contain radial profile fitted and a
+  radial plot of the data of the data for the summed star. The fit
+  and the data are folded around the centre of the fit.
+<p>
+ 
+  No account is made of sub-pixel variations.
+<p>
+ 
+  The table contains three columns, the first the distance from
+  the centre of the fitted star, the second the summed data values,
+  and the third the value of the fit at that point.
+<p>
+ 
+  This is a table with the radial plot of the fit and the data
+  after a fit has been to done to the array made by summing up all
+  the areas round each star in the input table.
+<p>
+ 
+  If a null repsonse is made, this table is not made.
+<p>
+ 
+  This is a `real' 32-bit real Starman table format NDF file.
+<p>
+ 
+<hr>
+ <h2> 4.24 <a name="out2tb"> Out2tb </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the table to contain radial profile fitted and a
+  radial plot of the data of the data for the summed star, using
+  interpolation. The fit and the data are folded around the centre of
+  the fit.
+<p>
+ 
+  No account is made of sub-pixel variations.
+<p>
+ 
+  The table contains three columns, the first the distance from
+  the centre of the fitted star, the second the summed data values,
+  and the third the value of the fit at that point.
+<p>
+ 
+  This is a table with the radial plot of the fit and the data
+  after a fit has been to done to the array made by summing up all
+  the areas round each star in the input table, with the summing
+  done using pixel interpolation when adding the data from an
+  individual star into the array.
+<p>
+ 
+  If a null repsonse is made, this table is not made.
+<p>
+ 
+  This is a `real' 32-bit real Starman table format NDF file.
+<p>
+ 
+<hr>
+ <h2> 4.25 <a name="radlims"> Radlims </h2> </a> <p>
+ 
+  (Default - 0.5*fitted radius,1.5*fitted radius or 1.0,10.0
+   Range - 0.1 to 100.0)
+<p>
+ 
+  The lower and upper limits to the range of acceptable radius
+  (average of the X and Y radii) for a star.
+<p>
+ 
+  If an individual star has a fitted radius outside these limits,
+  it will not be used in making the mean radius, nor will the box
+  round it be used in making the grand summed star which is later
+  fitted.
+<p>
+ 
+<hr>
+ <h2> 4.26 <a name="rx1"> Rx1 </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The mean X radius, calculated from the mean of the individual
+  radii.
+<p>
+ 
+<hr>
+ <h2> 4.27 <a name="rx2"> Rx2 </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The mean X radius, calculated from fitting to the summed data of
+  the boxes round the indivual stars.
+<p>
+ 
+<hr>
+ <h2> 4.28 <a name="rx3"> Rx3 </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The mean X radius, calculated from fitting to the summed data of
+  the boxes round the indivual stars, with the summing done using
+  interpolation.
+<p>
+ 
+<hr>
+ <h2> 4.29 <a name="ry1"> Ry1 </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The mean Y radius, calculated from the mean of the individual
+  radii.
+<p>
+ 
+<hr>
+ <h2> 4.30 <a name="ry2"> Ry2 </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The mean Y radius, calculated from fitting to the summed data of
+  the boxes round the indivual stars.
+<p>
+ 
+<hr>
+ <h2> 4.31 <a name="ry3"> Ry3 </h2> </a> <p>
+ 
+  (Output parameter)
+<p>
+ 
+  The mean Y radius, calculated from fitting to the summed data of
+  the boxes round the indivual stars, with the summing done using
+  interpolation.
+<p>
+ 
+<hr>
+ <h2> 4.32 <a name="sumbox"> Sumbox </h2> </a> <p>
+ 
+  (Default - 6*X radius, 6*Y radius     <br> Range - 2 to 200)
+<p>
+ 
+  The X and Y size of the box round each star to take when
+  making summing up the data to make a grand star.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny                    RAL                      1991 Nov
+<p>
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy RAL 1995.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

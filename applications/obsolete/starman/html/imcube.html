@@ -1,0 +1,206 @@
+<HTML> <HEAD>
+<TITLE> IMCUBE </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMCUBE - <br>
+ Cut a 2-D image from a 3-D or 4-D image
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This program cuts a 2-D image out of a 3-D or 4-D image.
+<p>
+ 
+  It can squeeze down (add together) a range of planes in the
+  other directions.
+<p>
+ 
+  If in squeezing down, any of the 3-d or 4-d pixels, added in
+  to make the output 2-d pixel, is INVALID, then the output pixel
+  is INVALID.
+<p>
+ 
+  The input image types it can deal with are:-
+<p>
+<pre>
+     Type              Name
+     ----              ----
+     32-bit real       real
+     32-bit integer    integer
+     16-bit integer    short
+</pre><p>
+ 
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in"> In </a>
+<li> 1.2 <a href="#out"> Out </a>
+<li> 1.3 <a href="#plane3"> Plane3 </a>
+<li> 1.4 <a href="#plane4"> Plane4 </a>
+<li> 1.5 <a href="#title"> Title </a>
+<li> 1.6 <a href="#xplane"> Xplane </a>
+<li> 1.7 <a href="#yplane"> Yplane </a>
+<li> 1.8 <a href="#zplane"> Zplane </a>
+<li> 1.9 <a href="#tplane"> Tplane </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image.
+<p>
+ 
+  The input image must be a standard ADAM .SDF images, with
+  either `real' 32-bit real values, `integer' 32-bit integer,
+  or `short' 16-bit integer values.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the output image.
+<p>
+ 
+  The output image will be a standard ADAM .SDF images, with
+  the pixel types of the input image, with either `real' 32-bit
+  real values, `integer' 32-bit integer, or `short' 16-bit integer values.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="plane3"> Plane3 </h2> </a> <p>
+ 
+  (Default - 'xy'       <br> Choice - 'xy:xz:yz')
+<p>
+ 
+  The plane to cut out of a 3-D cube. The cube is considered
+  to have axes XYZ.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="plane4"> Plane4 </h2> </a> <p>
+ 
+  (Default - 'xy'       <br> Choice - 'xy:xz:xt:yz:yt:zt')
+<p>
+ 
+  The plane to cut out of a 4-D cube. The cube is considered
+  to have axes XYZT.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title )
+<p>
+ 
+  The title to be attached as a header to the output image.
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="xplane"> Xplane </h2> </a> <p>
+ 
+  (Default - 1, X size      <br> Range - 1 to X size of image)
+<p>
+ 
+  The range, along the X direction, of planes to squeeze down
+  (add together) to produce the plane to be cut out. A range of
+  1 (say 5,5) cuts out a single plane
+<p>
+ 
+  For this to be asked for, the cube has to be either a 3-D one
+ (XYZ), or a 4-D one (XYZT).
+<p>
+ 
+<hr>
+ <h2> 1.7 <a name="yplane"> Yplane </h2> </a> <p>
+ 
+  (Default - 1, Y size      <br> Range - 1 to Y size of image)
+<p>
+ 
+  The range, along the Y direction, of planes to squeeze down
+  (add together) to produce the plane to be cut out. A range of
+  1 (say 5,5) cuts out a single plane
+<p>
+ 
+  For this to be asked for, the cube has to be either a 3-D one
+ (XYZ), or a 4-D one (XYZT).
+<p>
+ 
+<hr>
+ <h2> 1.8 <a name="zplane"> Zplane </h2> </a> <p>
+ 
+  (Default - 1, Z size      <br> Range - 1 to Z size of image)
+<p>
+ 
+  The range, along the Z direction, of planes to squeeze down
+  (add together) to produce the plane to be cut out. A range of
+  1 (say 5,5) cuts out a single plane
+<p>
+ 
+  For this to be asked for, the cube has to be either a 3-D one
+ (XYZ), or a 4-D one (XYZT).
+<p>
+ 
+<hr>
+ <h2> 1.9 <a name="tplane"> Tplane </h2> </a> <p>
+ 
+  (Default - 1, T size      <br> Range - 1 to T size of image)
+<p>
+ 
+  The range, along the T direction, of planes to squeeze down
+  (add together) to produce the plane to be cut out. A range of
+  1 (say 5,5) cuts out a single plane
+<p>
+ 
+  For this to be asked for, the cube has to be either a 3-D one
+ (XYZ), or a 4-D one (XYZT).
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny               RAL           1991 November
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

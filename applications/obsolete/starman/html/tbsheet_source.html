@@ -1,0 +1,5188 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBSHEET
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBSHEET
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbsheet_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbsheet">
+t_tbsheet  </a>  Spread-sheet inspection and modification of a table       <br>
+<a href="#tbsh_setup">
+tbsh_setup  </a>  Set starting values       <br>
+<a href="#tbsh_setrc">
+tbsh_setrc  </a>  Set starting valid row/columns       <br>
+<a href="#tbsh_frame">
+tbsh_frame  </a>  Load sheet frame       <br>
+<a href="#tbsh_cwords">
+tbsh_cwords  </a>  Load command words       <br>
+<a href="#tbsh_setsize">
+tbsh_setsize  </a>  Set sheet format size parameters       <br>
+<a href="#tbsh_dload">
+tbsh_dload  </a>  Load sheet data       <br>
+<a href="#tbsh_nload">
+tbsh_nload  </a>  Load sheet names       <br>
+<a href="#tbsh_hload">
+tbsh_hload  </a>  Load sheet headers       <br>
+<a href="#tbsh_doit">
+tbsh_doit  </a>  Do the work       <br>
+<a href="#tbsh_exit">
+tbsh_exit  </a>  Exit if really wanted       <br>
+<a href="#tbsh_getopt">
+tbsh_getopt  </a>  Get option       <br>
+<a href="#tbsh_wmess">
+tbsh_wmess  </a>  Put up waiting message       <br>
+<a href="#tbsh_seepos">
+tbsh_seepos  </a>  Get column, row of given position       <br>
+<a href="#tbsh_getpos">
+tbsh_getpos  </a>  Get column, row of actual holes table       <br>
+<a href="#tbsh_help">
+tbsh_help  </a>  Output help       <br>
+<a href="#tbsh_input">
+tbsh_input  </a>  Get new input       <br>
+<a href="#tbsh_blank">
+tbsh_blank  </a>  Blank present display       <br>
+<a href="#tbsh_store">
+tbsh_store  </a>  Store output (part 1)       <br>
+<a href="#tbsh_storea">
+tbsh_storea  </a>  Store output (part 2)       <br>
+<a href="#tbsh_change">
+tbsh_change  </a>  Change data, name, header in table       <br>
+<a href="#tbsh_format">
+tbsh_format  </a>  Select and change format and colours of sheet       <br>
+<a href="#tbsh_formload">
+tbsh_formload  </a>  Load format of sheet       <br>
+<a href="#tbsh_setcol">
+tbsh_setcol  </a>  Change colours of sheet       <br>
+<a href="#tbsh_weed">
+tbsh_weed  </a>  Weed table on column       <br>
+<a href="#tbsh_convert">
+tbsh_convert  </a>  Convert a 'visible' row/column number to an actual holes one       <br>
+<a href="#tbsh_bconvert">
+tbsh_bconvert  </a>  Convert an actual holes row/column number to a 'visible' one       <br>
+<a href="#tbsh_wcheck">
+tbsh_wcheck  </a>  Find how many rows will survive       <br>
+<a href="#tbsh_wflagb">
+tbsh_wflagb  </a>  Flag 'bad' rows in table as not to be used       <br>
+<a href="#tbsh_calc">
+tbsh_calc  </a>  Do table calculations       <br>
+<a href="#tbsh_calcgcl">
+tbsh_calcgcl  </a>  Get calculator input info from the command line       <br>
+<a href="#tbsh_calcload">
+tbsh_calcload  </a>  Load present array into no 'holes' array       <br>
+<a href="#tbsh_polish">
+tbsh_polish  </a>  Decode equation and sort into reverse Polish       <br>
+<a href="#tbsh_docalc">
+tbsh_docalc  </a>  do the calculations       <br>
+<a href="#tbsh_load">
+tbsh_load  </a>  Copy table into a 3-D stack       <br>
+<a href="#tbsh_loada">
+tbsh_loada  </a>  Copy present work table into a 3-D stack       <br>
+<a href="#tbsh_loadb">
+tbsh_loadb  </a>  Load column to master and display       <br>
+<a href="#tbsh_sortc">
+tbsh_sortc  </a>  Sort identifiers to alphabetical order       <br>
+<a href="#tbsh_sort">
+tbsh_sort  </a>  Sort table       <br>
+<a href="#tbsh_stats">
+tbsh_stats  </a>  Calculate statistics of a column       <br>
+<a href="#tbsh_dostat1">
+tbsh_dostat1  </a>  Do the calcs for one column       <br>
+<a href="#tbsh_dostat2">
+tbsh_dostat2  </a>  Do the calcs for two columns       <br>
+<a href="#tbsh_insert">
+tbsh_insert  </a>  Insert a set of data       <br>
+<a href="#tbsh_hist">
+tbsh_hist  </a>  Plot histogram of a column       <br>
+<a href="#tbsh_hista">
+tbsh_hista  </a>  Set up and start histogram       <br>
+<a href="#tbsh_plot">
+tbsh_plot  </a>  Plot two columns       <br>
+<a href="#tbsh_plota">
+tbsh_plota  </a>  Set up and start plotting two columns       <br>
+<a href="#tbsh_compress">
+tbsh_compress  </a>  Remove 'holes' in array       <br>
+<a href="#tbsh_loadcol">
+tbsh_loadcol  </a>  Load a table column into a 'no-holes' vector       <br>
+<a href="#tbsh_sloadb">
+tbsh_sloadb  </a>  Reverse order of values in a real number vector       <br>
+<a href="#tbsh_trans">
+tbsh_trans  </a>  Load output with sorted input       <br>
+<a href="#tbsh_renum">
+tbsh_renum  </a>  Renumber names       <br>
+<a href="#tbsh_move">
+tbsh_move  </a>  Move table location on screen       <br>
+<a href="#tbsh_del">
+tbsh_del  </a>  Delete row(s)/col(s) from table       <br>
+<a href="#tbsh_add">
+tbsh_add  </a>  Add row(s)/col(s) to table       <br>
+<a href="#tbsh_addr">
+tbsh_addr  </a>  Add row(s) to a table - part 2       <br>
+<a href="#tbsh_addc">
+tbsh_addc  </a>  Add col(s) to a table - part 2       <br>
+<a href="#tbsh_getline">
+tbsh_getline  </a>  Input a line of data (with optional name at end)       <br>
+<a href="#tbsh_getvals">
+tbsh_getvals  </a>  Input a row of values       <br>
+<a href="#tbsh_unddo">
+tbsh_unddo  </a>  Restore last change (if possible)       <br>
+<a href="#tbsh_value">
+tbsh_value  </a>  Paint value up       <br>
+<a href="#tbsh_text">
+tbsh_text  </a>  Paint text up       <br>
+<a href="#tbsh_namclear">
+tbsh_namclear  </a>  Clear a character array       <br>
+<a href="#tbsh_line">
+tbsh_line  </a>  Plot a line       <br>
+<a href="#tbsh_box">
+tbsh_box  </a>  Plot a box       <br>
+<a href="#tbsh_chget">
+tbsh_chget  </a>  Get a 20 character string from 5 integers       <br>
+<a href="#tbsh_chput">
+tbsh_chput  </a>  Get 5 integers from a 20 character string       <br>
+<a href="#tbsheet">
+tbsheet  </a>  Spread sheet operation on a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C This is T_TBSHEET.F
+C
+C It contains:-
+C
+C T_TBSHEET       Spread-sheet inspection and modification of a table
+C TBSH_SETUP      Set starting values
+C TBSH_SETRC      Set starting valid row/columns
+C TBSH_FRAME      Load sheet frame
+C TBSH_CWORDS     Load command words
+C TBSH_SETSIZE    Set sheet format size parameters
+C TBSH_DLOAD      Load sheet data
+C TBSH_NLOAD      Load sheet names
+C TBSH_HLOAD      Load sheet headers
+C TBSH_DOIT       Do the work
+C TBSH_EXIT       Exit if really wanted
+C TBSH_GETOPT     Get option
+C TBSH_WMESS      Put up waiting message
+C TBSH_SEEPOS     Get column, row of given position
+C TBSH_GETPOS     Get column, row of actual holes table
+C TBSH_HELP       Output help
+C TBSH_INPUT      Get new input
+C TBSH_BLANK      Blank present display
+C TBSH_CALC       Calculate a column
+C TBSH_STORE      Store output (part 1)
+C TBSH_STOREA     Store output (part 2)
+C TBSH_CHANGE     Change data, name, header in table
+C TBSH_FORMAT     Select and change format and colours of sheet
+C TBSH_FORMLOAD   Load format of sheet
+C TBSH_SETCOL     Change colours of sheet
+C TBSH_WEED       Weed table on column
+C TBSH_CONVERT    Convert a 'visible' row/column number to an actual holes one
+C TBSH_BCONVERT   Convert an actual holes row/column number to a 'visible' one
+C TBSH_WCHECK     Find how many rows will survive
+C TBSH_WFLAGB     Flag 'bad' rows in table as not to be used
+C TBSH_CALCGCL    Get calculator input info from the command line
+C TBSH_CALCLOAD   Load present array into no 'holes' array
+C TBSH_POLISH     Decode equation and sort into reverse Polish
+C TBSH_DOCALC     Do the calculations
+C TBSH_LOAD       Copy table into a 3-D stack
+C TBSH_LOADA      Copy present work table into a 3-D stack
+C TBSH_LOADB      Load column to master and display
+C TBSH_SORTC      Sort identifiers to alphabetical order
+C TBSH_SORT       Sort table
+C TBSH_STATS      Calculate statistics of a column or two columns
+C TBSH_DOSTAT1    Do the calcs for one column
+C TBSH_DOSTAT2    Do the calcs for two columns
+C TBSH_INSERT     Insert a set of data
+C TBSH_HIST       Plot histogram of a column
+C TBSH_HISTA      Set up and start histogram
+C TBSH_PLOT       Plot two columns
+C TBSH_PLOTA      Set up and start plotting two columns
+C TBSH_COMPRESS   Remove 'holes' in array
+C TBSH_LOADCOL    Load a table column into a 'no-holes' vector
+C TBSH_SLOADB     Reverse order of values in a real number vector
+C TBSH_TRANS      Load output with sorted input
+C TBSH_RENUM      Renumber names
+C TBSH_MOVE       Move table location on screen
+C TBSH_DEL        Delete row(s)/col(s) from table
+C TBSH_ADD        Add row(s)/col(s) to table
+C TBSH_ADDR       Add row(s) to a table - part 2
+C TBSH_ADDC       Add col(s) to a table - part 2
+C TBSH_GETLINE    Input a line of data (with optional name at end)
+C TBSH_GETVALS    Input a row of values
+C TBSH_UNDDO      Restore last change (if possible)
+C TBSH_VALUE      Paint value up
+C TBSH_TEXT       Paint text up
+C TBSH_NAMCLEAR   Clear a character array
+C TBSH_LINE       Plot a line
+C TBSH_BOX        Plot a box
+C TBSH_CHGET      Get a 20 character string from 5 integers
+C TBSH_CHPUT      Get 5 integers from a 20 character string
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbsheet"> T_TBSHEET  </a>-- Spread-sheet inspection and modification of a table
+C
+C         A J Penny            RAL            1991 July
+
+      subroutine t_tbsheet ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbsh_input ( 1 )						!Get input and set up frame
+
+      call tbsh_cwords							!Load control words
+
+      call tbsh_doit 							!Do the work
+
+      call gd_close							!Close sheet
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_setup"> TBSH_SETUP  </a>-- Set starting values
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_setup ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      logical mono
+Cbegin
+
+      if ( ST_FAILED ) return
+
+      SNX = 1000.0
+      SNY = 1000.0
+      CHNAMES = 10
+      NUMX = 6
+      GOTIN = .false.
+
+      KCOL(1) = 2							!Colours
+      KCOL(2) = 1
+      KCOL(3) = 3
+      KCOL(4) = 4
+      KCOL(5) = 5
+      call get1b ( 'MONO', mono, .false. )
+      if ( ST_FAILED ) return
+      if ( mono ) then
+         KCOL(1) = 1
+         call amovki ( 2, KCOL(2), 4 )
+      endif
+      call tbsh_setcol
+
+      X_OLD = 500.0
+      Y_OLD = 500.0
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_setrc"> TBSH_SETRC  </a>-- Set starting valid row/columns
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_setrc ( tbi, tbvxi, tbyi, kcx, kcy, new, tbn,
+     +                        tbh )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   tbvxi			!i: Input table total X size
+      integer   tbyi			!i: Input table Y size
+      real      tbi(tbvxi,tbyi)		!i: Input table
+      integer   kcx(TBXM)		!o: Column checks
+      integer   kcy(TBYM)		!o: Row checks
+      logical   new			!i: New table, not an input one?
+      real      tbn(5,TBYM)		!i/o: Name table
+      integer   tbh(5,TBXM)		!i/o: Header table
+C--
+      character text*20
+      integer k, ierr
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call azeroi ( kcx, TBXM )					!Load valid row markers
+      call amovki ( 1, kcx, TBX )
+      call amovi ( kcx, %val(IPXA), TBXM )
+
+      call azeroi ( kcy, TBYM )					!Load valid column markers
+      call amovki ( 1, kcy, TBY )
+      call amovi ( kcy, %val(IPYA), TBYM )
+
+      call tbsh_namclear ( tbn, TBYM )				!Clear names and headers
+      call tbsh_namclear ( tbh, TBXM )
+      call azeror ( %val(IPD), TBXM*TBYM )			!Clear data
+
+      if ( new ) then
+         do k = 1, TBY						!If new table make new names
+            write ( text, '(i20)' ) k
+            text(1:1) = '#'
+            call lbgone(text(2:))
+            call tbsh_chput ( text, tbn(1,k) )
+         enddo
+      else
+         call coprr ( tbi, tbvxi, tbyi, 6, tbvxi, 1, tbyi,
+     +                %val(IPD), TBXM, TBYM, 1, 1 )
+         call coprr ( tbi, tbvxi, tbyi, 1, 5, 1, tbyi,
+     +                tbn, 5, TBYM, 1, 1 )
+         do k = 1, TBX
+            call gthead ( 'IN', k, text, ierr )
+            call tbsh_chput ( text, tbh(1,k) )
+         enddo
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_frame"> TBSH_FRAME  </a>-- Load sheet frame
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_frame ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      real xs, xe, ys, ye, x, y
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      call tbsh_wmess ( 4, 0 )						!Tell user program is working
+
+      xs = XDOFF							!Sheet box
+      xe = xs + real(NUMX)*XBOX
+      ys = 10.0
+      ye = 10.0 + real(NUMY)*YBOX
+      call tbsh_box ( xs, ys, xe, ye, 2 )
+
+      do k = 1, NUMX-1		
+        x = xs + real(k)*XBOX
+        call tbsh_line ( x, ye, x, ys, 2 )
+      enddo
+      do k = 1, NUMY-1
+        y = ys + real(k)*YBOX
+        call tbsh_line ( xs, y, xe, y, 2 )
+      enddo
+
+      xs = 10.0 							!Names box
+      xe = xs + (7.0+1.0+real(CHNAMES))*CHXSIZE
+      ys = 10.0
+      ye = 10.0 + real(NUMY)*YBOX
+      call tbsh_box ( xs, ys, xe, ye, 2 )
+
+      x = xs + 7.0*CHXSIZE
+      call tbsh_line ( x, ys, x, ye, 2 )
+      do k = 1, NUMY-1
+         y = ys + real(k)*YBOX
+         call tbsh_line ( xe, y, xs, y, 2 )
+      enddo
+
+      xs = XDOFF							!Header box
+      xe = xs + real(NUMX)*XBOX
+      ys = 10.0 + real(NUMY)*YBOX + 10.0
+      ye = ys + 2.0*YBOX
+      call tbsh_box ( xs, ys, xe, ye, 2 )
+
+      y = ys + YBOX
+      call tbsh_line ( xs, y, xe, y, 2 )
+      do k = 1, NUMX-1
+         x = xs + real(k)*XBOX
+         call tbsh_line ( x, ys, x, ye, 2 )
+      enddo
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_cwords"> TBSH_CWORDS  </a>-- Load command words
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_cwords ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      character*12 text(NCWORDS)
+      data text /     'Help',       'Input',      'Store',       'Exit',
+     +              'Format',     'Command',     'Insert',  'Calculate',
+     +                'Weed',    'Renumber',    'Sort Up',  'Sort Down',
+     +               'Stats',   'Correlate',       'Plot',  'Histogram',
+     +            'Position',        'Left',      'Right',
+     +                  'Up',        'Down',  'Left page', 'Right page',
+     +             'Up page',   'Down page',   'Add Cols',   'Add Rows',
+     +            'Insert Cols',  'Insert Rows',   'Delete Col',
+     +         'Delete Cols',
+     +          'Delete Row',  'Delete Rows',      'Title',    'Undo' /
+
+      integer j, k, ka
+      real x, y, xa, xs, xe, ys, ye
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      xs = 10.0								!Control box
+      xe = xs + real(NXCW)*XBOX
+      ys = 10.0 + real(NUMY)*YBOX + 10.0 + 2.0*YBOX + 10.0
+      ye = ys + real(NYCW)*YBOX
+      call tbsh_box ( xs, ys, xe, ye, 5 )
+
+      y = ye
+      do k = 1, NYCW-1
+         y = y - YBOX
+         call tbsh_line ( xs, y, xe, y, 5 )
+      enddo
+      do k = 1, NXCW-1
+         x = 10.0 + real(k)*XBOX
+         call tbsh_line ( x, ys, x, ye, 5 )
+      enddo
+
+      xa = 10.0 + 0.05*XBOX
+      y = 30.0 + real(NUMY+2+NYCW-1)*YBOX + 0.5*CHYSIZE
+      ka = 0
+      do k = 1, NYCW
+         do j = 1, NXCW
+            x = xa + (j-1)*XBOX
+            ka = ka + 1
+            if ( ka.le.NCWORDS ) call tbsh_text (x, y, text(ka), 12, 2)
+         enddo
+         y = y - YBOX
+      enddo
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_setsize"> TBSH_SETSIZE  </a>-- Set sheet format size parameters
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_setsize
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      real rv, x1, x2, y1, y2
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      NXCW = NUMX + int((7+1+CHNAMES)/10)
+      NYCW = 1 + (NCWORDS-1)/NXCW
+
+      CHXSIZE = (SNX-30.0)/(7.0+1.0+real(CHNAMES)+(12.0+1.0)*real(NUMX))
+
+      call pgqvp ( 2, x1, x2, y1, y2 )
+      rv = 1.0
+      if ( abs(y2-y1).gt.1.0e-6 ) rv = abs((x2-x1)/(y2-y1))
+      CHYSIZE = (8.0/5.0)*CHXSIZE*rv
+
+      NUMY = int((SNY-40.0)/(1.4*CHYSIZE)) - 2 - NYCW
+
+      XDOFF = 20.0 + CHXSIZE*(7.0+1.0+real(CHNAMES))
+
+      YBOX = 1.4*CHYSIZE
+      XBOX = (12.0+1.0)*CHXSIZE
+
+      CURX = SNX/2.0							!Cursor position
+      CURY = SNY/2.0
+
+      rv = CHYSIZE/28.0
+      call pgsch ( rv )
+
+      call gd_updt
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_dload"> TBSH_DLOAD  </a>-- Load sheet data
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_dload ( tb, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real    tb(TBXM,TBYM)	!i: Table
+      integer kcx(TBXM)		!i: X selection
+      integer kcy(TBYM)		!i: Y selection
+C--
+      integer j, k, ktx, kty, kxout, kyout
+      logical xmore
+      real val, x, y
+      character blank*20
+      data blank / '                    ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
+
+      kty = KYSTART
+      call tbsh_convert ( kty, 2, kcx, kcy )
+      kyout = 0
+      do while ( kty.le.TBY .and. kyout.lt.NUMY )
+
+         if ( kcy(kty).eq.1 ) then
+
+            x = XDOFF + 0.05*XBOX
+            ktx = KXSTART
+            call tbsh_convert ( ktx, 1, kcx, kcy )
+            ktx = KXSTART
+            xmore = .true.
+            kxout = 0
+            do while ( xmore .and. ktx.le.TBX .and. kxout.lt.NUMX )
+               if ( kcx(ktx).eq.1 ) then
+                  val = tb(ktx,kty)
+                  call tbsh_value ( x, y, val, 12, 2 )
+                  x = x + XBOX
+                  kxout = kxout + 1
+               endif
+               ktx = ktx + 1
+            enddo
+
+            y = y - YBOX
+            kyout = kyout + 1
+
+         endif
+         kty = kty + 1
+
+      enddo
+
+      if ( kxout.ne.NUMX ) then						!Blanks in rest of X
+         y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
+         do k = 1, NUMY
+            x = XDOFF + 0.05*XBOX + real(kxout)*XBOX
+            do j = kxout+1, NUMX
+               call tbsh_text ( x, y, blank, 12, 2 )
+               x = x + XBOX
+            enddo
+            y = y - YBOX
+         enddo
+      endif
+
+      if ( kyout.ne.NUMY ) then						!Blanks in rest of Y
+         y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX - real(kyout)*YBOX
+         do k = kyout+1, NUMY
+            x = XDOFF + 0.05*XBOX
+            do j = 1, NUMX
+               call tbsh_text ( x, y, blank, 12, 2 )
+               x = x + XBOX
+            enddo
+            y = y - YBOX
+         enddo
+      endif
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_nload"> TBSH_NLOAD  </a>-- Load sheet names
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_nload ( tbn, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real     tbn(5,TBYM)		!i: Names table
+      integer  kcy(TBYM)		!i: Y selection
+C--
+      integer k, kty, kyout, kn
+      real xa, xb, y
+      character text*20, blank*20
+      data blank / '                    ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      xa = 10.0 + 0.05*XBOX
+      xb = xa + 7.0*CHXSIZE
+      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
+
+      kty = KYSTART
+      call tbsh_convert ( kty, 2, %val(IPX), kcy )
+      kyout = 0
+      do while ( kty.le.TBY .and. kyout.lt.NUMY )
+
+         if ( kcy(kty).eq.1 ) then
+            kn = KYSTART + kyout
+            write ( text, '(i6)' ) kn
+            call tbsh_text ( xa, y, text, 6, 2 )
+            call tbsh_chget ( tbn(1,kty), text )
+            call tbsh_text ( xb, y, text(1:CHNAMES), CHNAMES, 2 )
+            y = y - YBOX
+            kyout = kyout + 1
+         endif
+         kty = kty + 1
+
+      enddo
+
+      if ( kyout.ne.NUMY ) then						!Blank rest of Y
+         y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX - real(kyout)*YBOX
+         do k = kyout+1, NUMY
+            call tbsh_text ( xa, y, blank, 6, 2 )
+            call tbsh_text ( xb, y, blank, CHNAMES, 2 )
+            y = y - YBOX
+         enddo
+      endif
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_hload"> TBSH_HLOAD  </a>-- Load sheet headers
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_hload ( tbh, kcx )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer      tbh(5,TBXM)		!i: Headers table
+      integer      kcx(TBXM)		!i: X selection
+C--
+      integer k, ktx, kxout, kn
+      real x, ya, yb
+      character text*20, texta*20, blank*10
+      data blank / '          ' /
+
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      x = XDOFF + 0.05*XBOX
+      ya = 20.0 + 0.5*CHYSIZE + real(NUMY)*YBOX
+      yb = ya + YBOX
+
+      ktx = KXSTART
+      call tbsh_convert ( ktx, 1, kcx, %val(IPY) )
+      kxout = 0
+      do while ( ktx.le.TBX .and. kxout.lt.NUMX )
+
+         if ( kcx(ktx).eq.1 ) then
+            kn = KXSTART + kxout
+            write ( text, '(i6)' ) kn
+            call tbsh_text ( x, yb, text, 10, 2 )
+            call tbsh_chget ( tbh(1,ktx), texta )
+            call tbsh_text ( x, ya, texta, 10, 2 )
+            x = x + XBOX
+            kxout = kxout + 1
+         endif
+         ktx = ktx + 1
+
+      enddo
+
+      if ( kxout.ne.NUMX ) then						!Blank rest of X
+         x = XDOFF + 0.05*XBOX + real(kxout)*XBOX
+         do k = kxout+1, NUMX
+            call tbsh_text ( x, yb, blank, 10, 2 )
+            call tbsh_text ( x, ya, blank, 10, 2 )
+            x = x + XBOX
+         enddo
+      endif
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_doit"> TBSH_DOIT  </a>-- Do the work
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_doit ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      integer kopt, kdef
+      logical loop, tlog
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kopt = 18								!Start choice
+
+      loop = .true.
+      do while ( loop )
+
+         kdef = kopt							!Get option
+         call tbsh_getopt ( kopt, kdef )
+
+         if ( kopt.eq.1 ) call tbsh_help				!Help option
+
+         if ( kopt.eq.2 ) call tbsh_input ( 2 )				!New table
+
+         if ( kopt.eq.3 ) call tbsh_store 				!Store output
+
+         if ( kopt.eq.4 ) call tbsh_exit ( loop )			!Exit from program
+
+         if ( kopt.eq.5 ) call tbsh_format				!Change format/colour
+
+         if ( kopt.eq.6 ) then						!Command option
+                          call printo ( ' ' )
+                          call printo ( 'Type ? for help: '//
+     +                     '!! for exit: <return> for return to sheet')
+                          call get1b ( 'COMMAND', tlog, .false. )
+                          endif
+
+         if ( kopt.eq.7 ) call tbsh_insert ( %val(IPD) )		!Insert a set of data
+
+         if ( kopt.eq.8 ) call tbsh_calc 				!Calculate a column
+
+         if ( kopt.eq.9 ) call tbsh_weed				!Weed on column
+
+         if ( kopt.eq.10 ) call tbsh_renum ( %val(IPN), %val(IPY) )	!Renumber names
+
+         if ( kopt.eq.11 .or. kopt.eq.12 ) call tbsh_sort ( kopt, 10 )	!Sort on column
+
+         if ( kopt.eq.13 .or. kopt.eq.14 ) call tbsh_stats ( %val(IPH),	!Calc stats of a column or two columns
+     +                                                       kopt, 12 )
+
+         if ( kopt.eq.15 ) call tbsh_plot ( %val(IPH) )			!Plot two columns
+
+         if ( kopt.eq.16 ) call tbsh_hist ( %val(IPH) )			!Plot histogram of a column
+
+         if ( kopt.ge.17 .and. kopt.le.25 ) call tbsh_move ( kopt, 16 )	!Change position in screen
+
+         if ( kopt.ge.26 .and. kopt.le.29 ) call tbsh_add ( kopt, 25 )	!Add/insert row(s)/col(s)
+
+         if ( kopt.ge.30 .and. kopt.le.33 ) call tbsh_del ( kopt, 	!Delete row(s)/col(s)
+     +                                      %val(IPX), %val(IPY), 29 )
+
+         if ( kopt.eq.34 ) call get1c ( 'TITLE', TITLE, TITLE, .true. )	!Change title
+
+         if ( kopt.eq.35 ) call tbsh_undo				!Reverse last change
+
+         if ( kopt.eq.(NCWORDS+1) ) call tbsh_change ( %val(IPD), 	!Change name, header, or value
+     +                                         %val(IPH), %val(IPN) )
+
+         if ( ST_FAILED ) return
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_exit"> TBSH_EXIT  </a>-- Exit if really wanted
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_exit ( loop )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      logical loop		!i/o: Continue looping for options?
+C--
+      logical ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( CHANGED ) then
+         call printo ( 'WARNING: You have not'//
+     +                 ' stored since the last change.' )
+         call printo ( ' Is this ok?' )
+         call get1b ( 'OK', ok, .false. )
+         if ( ST_FAILED ) return
+         if ( ok ) loop = .false. 	
+      else
+         loop = .false.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_getopt"> TBSH_GETOPT  </a>-- Get option
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_getopt ( kopt, kdef )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    kopt		!o: Option number
+      integer    kdef		!i: Default option number
+C--
+      real x, y, xa, ya, xb, yb, xs, xe, ys, ye
+      character*1 ch
+      integer ierr, j, k, ka
+      logical found
+      integer pgcurse
+      external pgcurse
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+CXA      if ( kdef.ne.29 ) then
+CXA         x = 10.0 + 0.05*XBOX
+CXA         y = 30.0 + real(NUMY+2+NYCW-1)*YBOX + 0.05*YBOX
+CXA         k = (kdef-1)/NXCW
+CXA         j = kdef - k*NXCW
+CXA         x = x + real(j)*XBOX + XBOX/2.0
+CXA         y = y - real(k)*YBOX + YBOX/2.0
+CXA      endif
+
+      x = X_OLD								!Put cursor at last request
+      y = Y_OLD
+      call tbsh_wmess ( 1, 0 )						!Put up waiting message
+
+      found = .false.							!Find where cursor placed
+      do while ( .not.found )
+
+         ierr = pgcurse ( x, y, ch )
+         X_OLD = x
+         Y_OLD = y
+
+         yb = 30.0 + real(NUMY+2+NYCW-1)*YBOX + 0.05*YBOX		!Look in commands
+         ka = 0
+         do k = 1, NYCW
+            ya = yb - real(k-1)*YBOX
+            xb = 10.0 + 0.05*XBOX
+            do j = 1, NXCW
+               xa = xb + real(j-1)*XBOX
+               ka = ka + 1
+               if ( ka.le.NCWORDS ) then
+                  xs = xa
+                  ys = ya
+                  xe = xs + 0.9*XBOX
+                  ye = ys + 0.9*YBOX
+                  if ( x.ge.xs .and. x.le.xe .and.
+     +                 y.ge.ys .and. y.le.ye ) then
+                     found = .true.
+                     kopt = ka
+                  endif
+               endif
+            enddo
+         enddo
+
+         if ( .not.found ) then				!Look in contents
+            call tbsh_seepos ( x, y, found )
+            if ( found ) kopt = NCWORDS + 1
+         endif
+
+      enddo
+
+      call tbsh_wmess ( 2, kopt )
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_wmess"> TBSH_WMESS  </a>-- Put up waiting message
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_wmess ( kf, kopt )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    kf		!i: Message flag (1=for choice;
+				!          2=work/for loc;3=for key;4=work)
+      integer    kopt		!i: Option doing
+C--
+      integer nc, k, ka
+      real xc, yc
+      integer kopta(NCWORDS+1)
+      data kopta / 3, 3, 2, 3, 3,
+     +             3, 2, 3, 3, 4,
+     +             2, 2, 2, 2, 2,
+     +             2, 2, 4, 4, 4,
+     +             4, 4, 4, 4, 4,
+     +             2, 2, 2, 2, 2,
+     +             3, 2, 3, 3, 3,
+     +             3 /
+      character*18 text(4)
+      data text / 'Waiting (Option)  ', 'Waiting (Position)',
+     +            'Waiting (Keyboard)', 'Working           ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      nc = min(18,(8+CHNAMES))
+      xc = 10.0 + 0.05*XBOX
+      yc= 20.0 + real(NUMY)*YBOX + 0.75*YBOX
+
+      k = kf
+      if ( kf.eq.2 ) then
+         k = 2
+         if ( kopt.ne.0 ) k = kopta(kopt)
+      endif
+
+      ka = 3
+      if ( k.eq.4 ) ka = 4
+      call tbsh_text ( xc, yc, text(k), nc, ka )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_seepos"> TBSH_SEEPOS  </a>-- Get column, row of given position
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_seepos ( x, y, found )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      x		!i: X posn
+      real      y		!i: Y posn
+      logical   found		!o: In reasonable box?
+C--
+      real xs, xe, ys, ye, xsa, xea, ysa, yea
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      KNCOL = -1							!Defaults
+      KNROW = -1
+
+      ys = 10.0 + 0.05*YBOX						!Outer limits
+      ye = 20.0 + (real(NUMY+2)-0.05)*YBOX				!Look for column
+      xs = 10.0 + 7.0*CHXSIZE + 0.05*XBOX
+      xe = XDOFF + (real(NUMX)-0.05)*XBOX
+      if ( x.ge.xs .and. x.le.xe .and. y.ge.ys .and. y.le.ye ) then
+
+         do k = 1, NUMX
+            xsa = XDOFF + (real(k-1)+0.05)*XBOX
+            xea = xsa + 0.9*XBOX
+            if ( x.ge.xsa .and. x.le.xea ) KNCOL = k
+         enddo
+
+         do k = 1, NUMY
+            ysa = 10.0 + (real(NUMY-k)+0.05)*YBOX
+            yea = ysa + 0.9*YBOX
+            if ( y.ge.ysa .and. y.le.yea ) KNROW = k
+         enddo
+
+         xsa = 10.0 + 7.0*CHXSIZE + 0.05*XBOX
+         xea = XDOFF - 10.0 - 0.05*XBOX
+         if ( x.ge.xsa .and. x.le.xea ) KNCOL = 0
+
+         ysa = 20.0 + (real(NUMY)+0.05)*YBOX
+         yea = ysa + 0.9*YBOX
+         if ( y.ge.ysa .and. y.le.yea ) KNROW = 0
+
+      endif
+
+      if ( KNCOL.eq.0 .and. KNROW.eq.0 ) then
+         KNCOL = -1
+         KNROW = -1
+      endif
+
+      if ( KNCOL.gt.0 .and. KNROW.gt.0 ) then
+         KNCOL = KNCOL + KXSTART - 1
+         KNROW = KNROW + KYSTART - 1
+      elseif ( KNCOL.gt.0 ) then
+         KNCOL = KNCOL + KXSTART - 1
+      elseif ( KNROW.gt.0 ) then
+         KNROW = KNROW + KYSTART - 1
+      endif
+
+      if ( KNCOL.gt.0 ) call tbsh_convert ( KNCOL, 1, %val(IPX),	!Convert input number to 'real'
+     +                                      %val(IPY) )
+      if ( KNROW.gt.0 ) call tbsh_convert ( KNROW, 2, %val(IPX),
+     +                                      %val(IPY) )	
+
+      if ( KNCOL.ge.0 .or. KNROW.ge.0 ) found = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_getpos"> TBSH_GETPOS  </a>-- Get column, row of actual holes table
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_getpos ( kopt, ncol, nrow )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    kopt		!i: Flag for choice (1=column;2=row;3=specific)
+      integer    ncol		!o: Column chosen (actual holes table number)
+				!         (-1=not found;0=in header)
+      integer    nrow		!o: Row chosen (actual holes table number)
+				!         (-1=not found;0=in name)
+C--
+      real x, y, xs, xe, ys, ye, xsa, xea, ysa, yea
+      character*1 ch
+      integer ierr, k
+      logical foundr, foundc
+      integer pgcurse
+      external pgcurse
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ncol = -1								!Defaults
+      nrow = -1
+      foundc = .false.
+      foundr = .false.
+
+      ys = 10.0 + 0.05*YBOX						!Outer limits
+      if ( kopt.eq.1 ) then
+         ye = 20.0 + (real(NUMY+2)-0.05)*YBOX
+         xs = XDOFF + 0.05*XBOX
+         xe = XDOFF + (real(NUMX)-0.05)*XBOX
+      elseif ( kopt.eq.2 ) then
+         ye = 10.0 + (real(NUMY)-0.05)*YBOX
+         xs = 10.0 + 0.05*XBOX
+         xe = XDOFF + (real(NUMX)-0.05)*XBOX
+      else
+         ye = 10.0 + (real(NUMY+1)-0.05)*YBOX
+         xs = 10.0 + 7.0*CHXSIZE + 0.05*XBOX
+         xe = XDOFF + (real(NUMX)-0.05)*XBOX
+      endif
+
+      call tbsh_wmess ( 2, 0 )
+      x = X_OLD
+      y = Y_OLD
+      ierr = pgcurse ( x, y, ch )					!Find where cursor placed
+      X_OLD = x
+      Y_OLD = y
+      call tbsh_wmess ( 4, 0 )
+
+      if ( x.ge.xs .and. x.le.xe .and. y.ge.ys .and. y.le.ye ) then
+
+         if ( kopt.eq.1 .or. kopt.eq.3 ) then
+            do k = 1, NUMX
+               xsa = XDOFF + (real(k-1)+0.05)*XBOX
+               xea = xsa + 0.9*XBOX
+               if ( x.ge.xsa .and. x.le.xea ) then
+                  ncol = k
+                  foundc = .true.
+               endif
+            enddo
+         endif
+
+         if ( kopt.eq.2 .or. kopt.eq.3 ) then
+            do k = 1, NUMY
+               ysa = 10.0 + (real(NUMY-k)+0.05)*YBOX
+               yea = ysa + 0.9*YBOX
+               if ( y.ge.ysa .and. y.le.yea ) then
+                  nrow = k
+                  foundr = .true.
+               endif
+            enddo
+         endif
+
+         if ( kopt.eq.3 ) then
+            xsa = 10.0 + 7.0*CHXSIZE + 0.05*XBOX
+            xea = XDOFF - 10.0 - 0.05*XBOX
+            if ( x.ge.xsa .and. x.le.xea ) then
+               ncol = 0
+               foundc = .true.
+            endif
+            ysa = 20.0 + (real(NUMY)+0.05)*YBOX
+            yea = ysa + 0.9*YBOX
+            if ( y.ge.ysa .and. y.le.yea ) then
+               nrow = 0
+               foundr = .true.
+            endif
+         endif
+
+      endif
+
+      if ( ( kopt.eq.1 .and. .not.foundc ) .or.
+     +     ( kopt.eq.2 .and. .not.foundr )  .or.
+     +     ( kopt.eq.3 .and. (.not.foundr .or. .not.foundc)) ) then
+         call printo ( 'Bad cursor position - Start again' )
+         ncol = -1
+         nrow = -1
+      endif
+
+      if ( ncol.gt.0 .and. nrow.gt.0 ) then
+         ncol = ncol + KXSTART - 1
+         nrow = nrow + KYSTART - 1
+      elseif ( ncol.gt.0 ) then
+         ncol = ncol + KXSTART - 1
+      elseif ( nrow.gt.0 ) then
+         nrow = nrow + KYSTART - 1
+      endif
+
+      if ( ncol.gt.0 ) call tbsh_convert (ncol, 1, %val(IPX),%val(IPY))	!Convert input number
+      if ( nrow.gt.0 ) call tbsh_convert (nrow, 2, %val(IPX),%val(IPY))	! actual holes
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_help"> TBSH_HELP  </a>-- Output help
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_help ( )
+
+      implicit none
+      include 'STARMAN_INC'
+C--
+      integer j, k
+      logical more
+
+      integer nt
+      parameter ( nt=147 )
+      character*74 text(nt)
+      data (text(j),j=1,10) /
+     + '           ' ,
+     + '           ' ,
+     + ' TBSHEET is a spread-sheet program for the tables.' ,
+     + ' For a full help, go back to the OPTIONS and select' ,
+     + ' the COMMAND, and in response to the COMMAND request' ,
+     + ' type ?' ,
+     + '           ' ,
+     + ' After getting the input table, you may add up to 200' ,
+     + ' columns and up to 2000 rows, as well as performing' ,
+     + ' various manipulations of the table.' /
+      data (text(j),j=11,20) /
+     + '                    ' ,
+     + '           ' ,
+     + ' Numbers in the table are changed by clicking on them, ' ,
+     + ' and then using the keyboard to replace the values. The ' ,
+     + ' same goes for the row names and the column headers. ',
+     + '           ' ,
+     + ' For the other options, click on the menu panel displayed',
+     + ' above the table. Often this will then involve choosing a',
+     + ' row or column. This is done by then clicking on wanted ',
+     + ' column or row.' /
+      data (text(j),j=21,30) /
+     + '   ',
+     + '   ' ,
+     + ' Menu of options available:-' ,
+     + '       ' ,
+     + ' Name          Function ',
+     + ' ----          -------- ' ,
+     + ' Add Cols      Add columns to the table. A column (or columns)',
+     + '                is added to the data, located after the ' ,
+     + '                column picked by the cursor. See below for ' ,
+     + '                data entry.' /
+      data (text(j),j=31,40) /
+     + ' Add Rows      Add rows to the table. A row (or rows)' ,
+     + '                is added to the data, located after the ' ,
+     + '                row picked by the cursor. See below for ' ,
+     + '                data entry.' ,
+     + ' Calculate     Calculate new entries for a column.' ,
+     + ' Command       Access the command line for help or exit.' ,
+     + ' Correlate     Calculate the statistics of two columns',
+     + '                (picked by the cursor), first of themselves',
+     + '                then of the correlation between them.',
+     + ' Delete Col    Delete a column, picked by the cursor' /
+      data (text(j),j=41,50) /
+     + ' Delete Cols   Delete a number of contiguous columns, defined',
+     + '                by user input' ,
+     + ' Delete Row    Delete a row, picked by the cursor' ,
+     + ' Delete Rows   Delete a number of contiguous rows, defined' ,
+     + '                by user input' ,
+     + ' Down          Move the displayed table so that the number' ,
+     + '                of the row displayed at the top increases' ,
+     + '                by one.' ,
+     + ' Down page     Move the displayed table so that the number' ,
+     + '                of the row displayed at the top increases' /
+      data (text(j),j=51,60) /
+     + '                by the number of rows seen.' ,
+     + ' Exit          Exit from the programme.' ,
+     + ' Format        Change the format and colour of the display.' ,
+     + ' Help          Type out this help information.' ,
+     + ' Histogram     Histogram of a column is plotted by picking a',
+     + '                column with a cursor. The sheet is then',
+     + '                replaced by the histogram. When you wish',
+     + '                to return to the sheet, just answer question.',
+     + ' Input         Put up a new input table.' ,
+     + ' Insert        Insert data into table. Select a range of rows'/
+       data (text(j),j=61,70) /
+     + '                of columns by the cursor (t.l.h and b.r.h',
+     + '                corners). Keyboard enter data one at a time.',
+     + ' Insert Cols   Add columns to the table. A column (or columns)',
+     + '                is added to the data, located before the ' ,
+     + '                column picked by the cursor. See below for ' ,
+     + '                data entry,' ,
+     + ' Insert Rows   Add rows to the table. A row (or rows)' ,
+     + '                is added to the data, located before the ',
+     + '                row picked by the cursor. See below for ' ,
+     + '                data entry,' /
+       data (text(j),j=71,80) /
+     + ' Left          Move the displayed table so that the number' ,
+     + '                of the column displayed at the left increases' ,
+     + '                by one.' ,
+     + ' Left Page     Move the displayed table so that the number' ,
+     + '                of the column displayed at the left increases' ,
+     + '                by the number  of columns seen.' ,
+     + ' Plot          One column can be plotted against another, both',
+     + '                picked by cursor. Double click gives column ',
+     + '                choice by keyboard. The sheet is then',
+     + '                replaced by the plot. When you wish' /
+       data (text(j),j=81,90) /
+     + '                to return to the sheet, just answer question.',
+     + ' Position      Change the column/row shown at the top left',
+     + '                of the display to that demanded.' ,
+     + ' Renumber      Load the names of all the rows with numbers' ,
+     + '                in the format #n, where n is the number of ' ,
+     + '                the row.' ,
+     + ' Right         Move the displayed table so that the number' ,
+     + '                of the column displayed at the left decreases' ,
+     + '                by one.',
+     + ' Right page    Move the displayed table so that the number' /
+       data (text(j),j=91,100) /
+     + '                of the column displayed at the left decreases',
+     + '                by the number  of columns seen.' ,
+     + ' Sort Down     Sort the rows of the table by looking at the' ,
+     + '                values of entries in a column (picked by the' ,
+     + '                the cursor), and sorting so these are in' ,
+     + '                descending order.' ,
+     + ' Sort Up       Sort the rows of the table by looking at the' ,
+     + '                values of entries in a column (picked by the' ,
+     + '                the cursor), and sorting so these are in',
+     + '                ascending order.' /
+       data (text(j),j=101,110) /
+     + ' Stats         Calculate the statistics of one or two columns',
+     + '                (picked by the cursor). Double click gives' ,
+     + '                column choice by keyboard' ,
+     + ' Store         Store the present table in an output file' ,
+     + ' Title         Change the title of the table' ,
+     + ' Undo          Undo the last deletion or weed, if no sub-' ,
+     + '                sequent changes have been made in the table.' ,
+     + ' Up            Move the displayed table so that the number' ,
+     + '                of the row displayed at the top decreases' ,
+     + '                by one.' /
+       data (text(j),j=111,120) /
+     + ' Up page       Move the displayed table so that the number' ,
+     + '                of the row displayed at the top decreases' ,
+     + '                by the number of rows seen.' ,
+     + ' Weed          Delete rows of the table by looking at the' ,
+     + '                values of entries in a column (picked by the',
+     + '                the cursor), and seeing if they lie within' ,
+     + '                (or without) a chosen range.' ,
+     + '                      ' ,
+     + '                      ' ,
+     + ' Cursor Use' /
+       data (text(j),j=121,130) /
+     + ' ----------' ,
+     + '           ' ,
+     + ' Place the cursor on the desired location and press any key' ,
+     + ' on the keyboard - or maybe the cursor button.' ,
+     + '                      ' ,
+     + ' Row Data Entry' ,
+     + ' ---------------------' ,
+     + '                      ' ,
+     + ' Entering data for a row is done by typing in values for' ,
+     + ' the entries in the row, separated by commas. If you do not ' /
+       data (text(j),j=131,140) /
+     + ' enter all the values, the rest are given the value of zero.',
+     + ' If you enter all the row values, you may add the name. The',
+     + ' name must have no spaces (you may wish to use _ for a space)',
+     + ' If you do not input a name, the row is given the name #n ' ,
+     + ' where n is the number of the row. You are then asked for the',
+     + ' values for the next row to be entered. A completely null ',
+     + ' response ends the inputting of data.',
+     + '                      ' ,
+     + ' Column Data Entry' ,
+     + ' ---------------------' /
+       data (text(j),j=141,nt) /
+     + '                      ' ,
+     + ' Entering data for columns is done by typing in values for' ,
+     + ' the entries in the first row of each column, separated by',
+     + ' commas. The number of entries you put in will be taken as',
+     + ' the number of columns to put into the table. All the rows',
+     + ' in each column are then given the value of that in the their',
+     + ' first row. The column header is set as a blank space.' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = 0
+      more = .true.
+      do while ( more .and. k.lt.nt )
+         k = k + 1
+         call printo ( text(k) )
+         j = k - (k/20)*20
+         if ( j.eq.0 ) call get1b ( 'MORE', more, .true. )
+         if ( ST_FAILED ) return
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_input"> TBSH_INPUT  </a>-- Get new input
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_input ( kopt )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    kopt		!i: First input (1), or not (2)?
+C--
+      integer ierr, tbvxi, tbyi, tbxi, ipi, iv
+      logical new
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( kopt.eq.2 ) then						!Forget any old table
+         call tbsh_wmess ( 4, 0 )					!Tell user program is working
+         call tbsh_blank						!Blank present display
+      endif
+
+      if ( kopt.eq.2 ) call tbsh_wmess ( 3, 0 )				!Tell user program is waiting
+      if ( kopt.eq.2 ) call canpar ( 'IN' )
+      call optabr ( 'IN', ipi, tbvxi, tbyi, .true., ierr )		!Get input table
+      if ( ierr.eq.1 ) then						!Bad input
+          GOTIN = .false.
+          return
+      elseif ( ierr.eq.2 ) then						!Null input, make new table
+         tbxi = 2
+         tbyi = 100
+         new = .true.
+         GOTIN = .false.
+         ipi = 1
+         call get2i ( 'SIZE', tbxi, tbyi, .true., 1, 10000 )
+         if ( ST_FAILED ) return
+         tbvxi = tbxi + 5
+         call get1c ( 'TITLE', TITLE, 'Output from TBSHEET', .true. )
+         if ( ST_FAILED ) return
+      else								!Good input
+         tbxi = tbvxi - 5
+         new = .false.
+         GOTIN = .true.
+         call gtdesc ( 'IN', 'TITLE', TITLE, ' ', iv, ierr )
+      endif
+      if ( kopt.eq.2 ) call tbsh_wmess ( 4, 0 )				!Tell user program is working
+
+      TBX = tbxi 							!Define work arrays
+      TBY = tbyi
+      TBXR = TBX
+      TBYR = TBY
+      TBXM = tbxi + 200
+      TBYM = tbyi + 2000
+
+      if ( kopt.eq.2) then
+         call wrkcan ( 'WORKD' )
+         call wrkcan ( 'WORKN' )
+         call wrkcan ( 'WORKH' )
+         call wrkcan ( 'WORKX' )
+         call wrkcan ( 'WORKY' )
+         call wrkcan ( 'WORKXA' )
+         call wrkcan ( 'WORKYA' )
+      endif
+
+      									!Get work spaces
+      call gtwrkr ( 'WORKD', TBXM*TBYM, IPD, ierr )			!Data
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrki ( 'WORKN', 5*TBYM, IPN, ierr )			!Names
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrki ( 'WORKH', 5*TBXM, IPH, ierr )			!Headers
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrki ( 'WORKX', TBXM, IPX, ierr )				!X usage
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrki ( 'WORKY', TBYM, IPY, ierr )				!Y usage
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrki ( 'WORKXA', TBXM, IPXA, ierr )			!X usage backup
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      call gtwrki ( 'WORKYA', TBYM, IPYA, ierr )			!Y usage backup
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      KXSTART = 1							!Starting display position
+      KYSTART = 1
+      CHANGED = .false.
+      RESTORE = .true.
+
+      if ( kopt.eq.1 ) then						!Open display
+         call gd_open ( ierr )
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+         call pgvport ( 0.0, 1.0, 0.0, 1.0 )
+         call pgwindow ( 1.0, 1000.0, 1.0, 1000.0 )
+         call tbsh_setup						!Set up spread sheet
+         call tbsh_setsize						!Get sheet size
+         call tbsh_frame						!Write sheet frame
+      endif
+
+      call tbsh_setrc ( %val(ipi), tbvxi, tbyi, %val(IPX), %val(IPY),	!Load arrays
+     +                  new, %val(IPN), %val(IPH) )
+
+      call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )		!Load numbers
+
+      call tbsh_nload ( %val(IPN), %val(IPY) )				!Load names
+
+      call tbsh_hload ( %val(IPH), %val(IPX) )				!Load headers
+
+      call gd_updt
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_blank"> TBSH_BLANK  </a>-- Blank present display
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_blank ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      integer j, k
+      real x, y, xa, xb, ya, yb
+      character blank*20
+      data blank / '                    ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX			!Blank data
+      do k = 1, NUMY
+         x = XDOFF + 0.05*XBOX
+         do j = 1, NUMX
+            call tbsh_text ( x, y, blank, 12, 2 )
+            x = x + XBOX
+         enddo
+         y = y - YBOX
+      enddo
+
+      xa = 10.0 + 0.05*XBOX						!Blank Names
+      xb = xa + 7.0*CHXSIZE
+      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX 	
+      do k = 1, NUMY
+         call tbsh_text ( xa, y, blank, 6, 2 )
+         call tbsh_text ( xb, y, blank, CHNAMES, 2 )
+         y = y - YBOX
+      enddo
+
+      x = XDOFF + 0.05*XBOX 						!Blank Headers
+      ya = 20.0 + 0.5*CHYSIZE + real(NUMY)*YBOX
+      yb = ya + YBOX
+      do k = 1, NUMX
+         call tbsh_text ( x, yb, blank, 10, 2 )
+         call tbsh_text ( x, ya, blank, 10, 2 )
+         x = x + XBOX
+      enddo
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_store"> TBSH_STORE  </a>-- Store output (part 1)
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_store ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      integer ipo, ierr
+      character*50 atitle
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabw ( 'OUT', ipo, TBXR+5, TBYR, .true., ierr )
+      if ( ierr.ne.0 ) return
+
+      call tbsh_wmess ( 4, 0 )
+
+      if ( GOTIN ) then
+         call tcopdes ( 'IN', 'OUT', ierr )
+         if ( ierr.ne.0 ) return
+      endif
+      call get1c ( 'TITLE', atitle, TITLE, .true. )
+      call ptdesc ( 'OUT', 'TITLE', atitle )
+
+      call tbsh_storea ( %val(IPD), %val(IPH), %val(IPN), %val(IPX),
+     +                   %val(IPY), %val(ipo) )
+
+      call canpar ( 'OUT' )
+      CHANGED = .false.
+
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_storea"> TBSH_STOREA  </a>-- Store output (part 2)
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_storea ( tb, tbh, tbn, kcx, kcy, tbo )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      tb(TBXM,TBYM)		!i: Data table
+      integer   tbh(5,TBXM)		!i: Headers table
+      real      tbn(5,TBYM)		!i: Names table
+      integer   kcx(TBXM)		!i: Column selection list
+      integer   kcy(TBYM)		!i: Row selection list
+      real      tbo(TBXR+5,TBYR)	!o: Output file
+C--
+      integer j, k, ka, ja, ierr
+      character*20 thead
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ka = 0
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            ka = ka + 1
+            call amovr ( tbn(1,k), tbo(1,ka), 5 )
+            ja = 0
+            do j = 1, TBX
+               if ( kcx(j).eq.1 ) then
+                  ja = ja + 1
+                  tbo(ja+5,ka) = tb(j,k)
+               endif
+            enddo
+         endif
+      enddo
+
+      ja = 0
+      do j = 1, TBX
+         if ( kcx(j).eq.1 ) then
+            ja = ja + 1
+            call tbsh_chget ( tbh(1,j), thead )
+            call pthead ( 'OUT', ja, thead, ierr )
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_change"> TBSH_CHANGE  </a>-- Change data, name, header in table
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_change ( tb, tbh, tbn )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      tb(TBXM,TBYM)	!i/o: Data table
+      integer   tbh(5,TBXM)	!i/o: Headers table
+      real      tbn(5,TBXM)	!i/o: Names table
+C--
+      integer ncol, nrow, kx, ky
+      character*20 text, texta
+      real rv, rva, x, y
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ncol = KNCOL
+      nrow = KNROW
+
+      if ( ncol.lt.0 .or. nrow.lt.0 ) return				!Not a change
+
+      if ( ncol.eq.0 ) then						!Name change
+         call tbsh_chget ( tbn(1,nrow), text )
+         call get1c ( 'NAME', texta, text, .true. )
+         if ( ST_FAILED ) return
+         call tbsh_chput ( texta, tbn(1,nrow) )
+         x = 10.0 + 0.05*XBOX + 7.0*CHXSIZE
+         ky = nrow
+         call tbsh_bconvert ( ky, 2, %val(IPX), %val(IPY) )
+         y = 10.0 + 0.5*CHYSIZE + real(NUMY-1-ky+KYSTART)*YBOX
+         call gd_bbuf
+         call tbsh_text ( x, y, texta(1:CHNAMES), CHNAMES, 2 )
+         call gd_ebuf
+         call gd_updt
+      elseif ( nrow.eq.0 ) then						!Header change
+         call tbsh_chget ( tbh(1,ncol), text )
+         call get1c ( 'HEADER', texta, text, .true. )
+         if ( ST_FAILED ) return
+         call tbsh_chput ( texta, tbh(1,ncol) )
+         x = XDOFF + 0.05*XBOX
+         y = 20.0 + 0.5*CHYSIZE + real(NUMY)*YBOX
+         kx = ncol
+         call tbsh_bconvert ( kx, 1, %val(IPX), %val(IPY) )
+         x = x + real(kx-KXSTART)*XBOX
+         call gd_bbuf
+         call tbsh_text ( x, y, texta(1:10), 10, 2 )
+         call gd_ebuf
+         call gd_updt
+      else								!Value change
+         rv = tb(ncol,nrow)
+         call get1r ( 'VALUE', rva, rv, -1.0e20, 1.0e20 )
+         if ( ST_FAILED ) return
+         tb(ncol,nrow) = rva
+         x = XDOFF + 0.05*XBOX
+         y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
+         kx = ncol
+         call tbsh_bconvert ( kx, 1, %val(IPX), %val(IPY) )
+         x = x + real(kx-KXSTART)*XBOX
+         ky = nrow
+         call tbsh_bconvert ( ky, 2, %val(IPX), %val(IPY) )
+         y = y - real(ky-KYSTART)*YBOX
+         call gd_bbuf
+         call tbsh_value ( x, y, rva, 10, 2 )
+         call gd_ebuf
+         call gd_updt
+      endif
+
+      call tbsh_wmess ( 4, 0 )
+
+      CHANGED = .true.
+      RESTORE  = .false.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_format"> TBSH_FORMAT  </a>-- Select and change format and colours of sheet
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_format ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      logical mono
+      integer iva, ivb, ivc, ivd, ive
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1i ( 'CHNAMES', CHNAMES, CHNAMES, 2, 20 )
+      if ( ST_FAILED ) return
+      call get1i ( 'COLNUM', NUMX, NUMX, 2, 100 )
+      if ( ST_FAILED ) return
+
+      call get1b ( 'MONO', mono, .false. )				!Set colour
+      if ( ST_FAILED ) return
+      if ( mono ) then
+         KCOL(1) = 1
+         call amovki ( 2, KCOL(2), 4 )
+      else
+         iva = KCOL(1)
+         ivb = KCOL(2)
+         ivc = KCOL(3)
+         ivd = KCOL(4)
+         ive = KCOL(5)
+         call get5i ( 'COLOURS', iva, ivb, ivc, ivd, ive, .true.,1,10)
+         if ( ST_FAILED ) return
+         KCOL(1) = iva
+         KCOL(2) = ivb
+         KCOL(3) = ivc
+         KCOL(4) = ivd
+         KCOL(5) = ive
+      endif
+
+      call tbsh_formload
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_formload"> TBSH_FORMLOAD  </a>-- Load format of sheet
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_formload ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      real xa(5), ya(5)
+      data xa, ya / 1.0,    1.0, 1000.0, 1000.0, 1.0,
+     +              1.0, 1000.0, 1000.0,    1.0, 1.0 /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gd_bbuf
+
+      call tbsh_setsize
+      call pgsci ( 0 )
+      call pgpoly ( 5, xa, ya )
+      call gd_updt
+
+      call tbsh_frame							!Write sheet frame
+
+      call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )		!Load numbers
+
+      call tbsh_nload ( %val(IPN), %val(IPY) )				!Load names
+
+      call tbsh_hload ( %val(IPH), %val(IPX) )				!Load headers
+
+      call tbsh_cwords							!Load control words
+
+      call tbsh_setcol
+
+      call tbsh_wmess ( 4, 0 )
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_setcol"> TBSH_SETCOL  </a>-- Change colours of sheet
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_setcol ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      integer j, k
+      real r(10), g(10), b(10)
+      data r / 0.0, 1.0, 1.0, 0.0, 0.0,
+     +         0.0, 1.0, 1.0, 1.0, 0.5 /
+      data g / 0.0, 1.0, 0.0, 1.0, 0.0,
+     +         1.0, 1.0, 1.0, 0.5, 1.0 /
+      data b / 0.0, 1.0, 0.0, 0.0, 1.0,
+     +         1.0, 1.0, 0.0, 0.0, 0.0 /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, 5
+         j = k - 1
+         call pgscr ( j, r(KCOL(k)), g(KCOL(k)), b(KCOL(k)) )
+      enddo
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_weed"> TBSH_WEED  </a>-- Weed table on column
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_weed ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      integer ncol, nrow, kacc, nout
+      real bot, top
+      character*70 text
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbsh_getpos ( 1, ncol, nrow )					!Get column number to weed on
+      if ( ncol.eq.-1 ) return
+
+      call tbsh_wmess ( 3, 0 )
+      bot = 0.0						
+      top = 0.0
+      call get2r ( 'LIMITS', bot, top, .true., -1.0e20, 1.0e20 )	!Get the limits
+      if ( ST_FAILED ) return
+      call cswopr ( bot, top )
+
+      call printo ( 'Accept or reject inside the limits ?' )		!Get wether accept or reject inside the limits
+      call get_job ( 'WEEDOPT', 'accept:reject', kacc, 1, text, 0 )
+
+      call tbsh_wmess ( 4, 0 )
+
+      call tbsh_wcheck ( %val(IPD), %val(IPY), ncol, bot, top, kacc, 	!Find no of entries passed
+     +                   nout )
+
+      if ( nout.eq.0 ) then						!Do the weeding
+         call printo ('No rows will survive this weed. Weed not done.')
+      else
+
+         call pargi ( nout )
+         call printd ( ' No of rows surviving = %d' )
+
+         call amovi ( %val(IPY), %val(IPYA), TBYM )			!Set restore
+
+         call tbsh_wflagb (%val(IPD), %val(IPY), ncol, bot, top, kacc )	!'Weed'
+
+         call tbsh_nload ( %val(IPN), %val(IPY) )			!Load screen
+         call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )
+
+         CHANGED = .true.
+         RESTORE = .true.
+         TBYR = nout
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_convert"> TBSH_CONVERT  </a>-- Convert a 'visible' row/column number to an actual holes one
+C
+C    a j penny               rgo                      82-11-4
+
+      subroutine tbsh_convert ( n, kopt, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   n		!i/o: Visible -> Real row/column number
+      integer   kopt		!i: Option [1=Column(X);2=Row(Y)]
+      integer   kcx(TBXM)	!i: Column selection list
+      integer   kcy(TBYM)	!i: Row selection list
+C--
+      integer k, j, na
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( kopt.eq.1 ) then
+         j = 1
+         do k = 1, TBX
+            if ( kcx(k).eq.1 .and. j.le.n ) then
+               na = k
+               j = j + 1
+            endif
+         enddo
+         n = na
+      endif
+
+      if ( kopt.eq.2 ) then
+         j = 1
+         do k = 1, TBY
+            if ( kcy(k).eq.1 .and. j.le.n ) then
+               na = k
+               j = j + 1
+            endif
+         enddo
+         n = na
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_bconvert"> TBSH_BCONVERT  </a>-- Convert an actual holes row/column number to a 'visible' one
+C
+C    a j penny               rgo                      82-11-4
+
+      subroutine tbsh_bconvert ( n, kopt, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   n		!i/o: Real row/column number -> Visible
+      integer   kopt		!i: Option [1=Column(X);2=Row(Y)]
+      integer   kcx(TBXM)	!i: Column selection list
+      integer   kcy(TBYM)	!i: Row selection list
+C--
+      integer k, j
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      j = 0
+      do k = 1, n
+         if ( kopt.eq.1 .and. kcx(k).eq.1 ) j = j + 1
+         if ( kopt.eq.2 .and. kcy(k).eq.1 ) j = j + 1
+      enddo
+      n = j
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_wcheck"> TBSH_WCHECK  </a>-- Find how many rows will survive
+C
+C    a j penny               rgo                      82-11-4
+
+      subroutine tbsh_wcheck ( tb, kcy, ncol, bot, top, kacc, nout )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real	tb(TBXM,TBYM)	!i: Input table
+      integer   kcy(TBYM)	!i: Row selection list
+      integer	ncol		!i: Column to select on
+      real	bot		!i: Bottom limit
+      real	top		!i: Top limit
+      integer	kacc		!i: Accept or reject flag (a/r=1/2)
+      integer   nout		!o: No of surviving rows
+C--
+      integer k
+      real d
+      logical ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      nout = 0
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            ok = .true.
+            d = tb(ncol,k)
+            if ( kacc.eq.1 ) then
+               if ( d.lt.bot .or. d.gt.top ) ok = .false.
+            else
+               if ( d.ge.bot .and. d.lt.top ) ok = .false.
+            endif
+            if ( ok ) nout = nout + 1
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_wflagb"> TBSH_WFLAGB  </a>-- Flag 'bad' rows in table as not to be used
+C
+C    alan penny              ral              1991 July
+
+      subroutine tbsh_wflagb ( tb, kcy, ncol, bot, top, kacc )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real	tb(TBXM,TBYM)		!i: Input table
+      integer   kcy(TBYM)		!i: Row selection list
+      integer	ncol			!i: Column to select on
+      real	bot			!i: Bottom limit
+      real	top			!i: Top limit
+      integer	kacc			!i: Accept or reject flag (a/r=1/2)
+C--
+      integer k
+      real d
+      logical ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            ok = .true.
+            d = tb(ncol,k)
+            if ( kacc.eq.1 ) then
+               if ( d.lt.bot .or. d.gt.top ) ok = .false.
+            else
+               if ( d.ge.bot .and. d.lt.top ) ok = .false.
+            endif
+            if ( .not.ok ) kcy(k) = 0
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_calc"> TBSH_CALC  </a>-- Do table calculations
+C
+C  alan penny                  ral              1991 Dec
+
+      subroutine tbsh_calc ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+      character*3 temp
+      integer ierr, k, ipstk, ipdd, ncol, nrow
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      USEDA = .false.							!Main array access flag
+      call tbsh_getpos ( 1, ncol, nrow )				!Get column number to sort on
+      if ( ncol.eq.-1 ) return
+
+      call tbsh_wmess ( 3, 0 )
+      call tbsh_calcgcl ( ierr )					!Get input info
+      call tbsh_wmess ( 4, 0 )
+      if ( ierr.ne.0 ) return
+
+      if ( TBZ.eq.0 ) then						!Get work space
+         call gtwrki ( 'STACKCALC', 1, ipstk, ierr )
+      else
+         call gtwrki ( 'STACKCALC', TBXMA*TBYA*TBZ, ipstk, ierr )
+      endif
+      if ( ierr.ne.0 ) return
+      call gtwrkr ( 'COLCALC', TBYA, ipdd, ierr )
+      if ( ierr.ne.0 ) return
+
+      if ( TBZ.ne.0 ) then						!Load input tables into stack
+         do k = 1, TBZ
+            if ( TBTOT(k)(2:2).eq.'9' ) then
+               call tbsh_loada (  %val(IPD), %val(IPX), %val(IPY),
+     +                            k, %val(ipstk), TBXMA, TBYA )
+            else
+               call tbsh_load ( %val(IPCA(k)), TBVX(k), TBYA, k,
+     +                          %val(ipstk), TBXMA, TBYA )
+            endif
+         enddo
+      endif
+
+      call tbsh_docalc ( %val(ipstk), TBXMA, TBYA, OPCODE, NOPCODE, 	!Do the calculations
+     +                   IMP, IMPC, IMPV, VAR, CON, %val(ipdd),
+     +                   KSEED, ncol, ierr )
+
+      call tbsh_loadb ( %val(ipdd), ncol, %val(IPD), %val(IPX),
+     +                  %val(IPY) )
+
+      call wrkcan ( 'STACKCALC' )
+      call wrkcan ( 'COLCALC' )
+      if ( USEDA ) call wrkcan ( 'MAIN' )
+      do k = 1, TBZ
+         if ( TBTOT(k).ne.'T9' .and. TBTOT(k).ne.'TA' ) then
+            temp = 'IN'//TBTOT(k)(2:2)
+            call canpar ( temp )
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_calcgcl"> TBSH_CALCGCL  </a>-- Get calculator input info from the command line
+C
+C  alan penny                         RAL                1991 Dec
+
+      subroutine tbsh_calcgcl ( ierro )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   ierro		!o: Error flag (0=ok;1=bad)
+C--
+      integer k, kv, ierr, ny
+      character texta*132, textb*70, intab*3
+
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierro = 0
+
+      call get1c ( 'EQUATION', texta, ' ', .false. )
+      if ( ST_FAILED ) return
+      textb = texta(1:70)
+      call uppcase ( textb, EXPRS )
+      call tbsh_polish ( EXPRS, OPCODE, NOPCODE, TBID, NTB, IMP, 	!Translate it into reverse polish notation
+     +                   IMPC, VARID, NVAR, IMPV, CON, NCON, ierr )
+      if ( ierr.ne.0 ) then
+         ierro = 1
+         return
+      endif
+
+      TBZ = NTB								!Translate into TBCALC names
+      TBXMA = 1								!Get tables
+      TBYA = TBYR
+      if ( TBZ.ne.0 ) then
+         TBXMA = 0
+         do k = 1, TBZ
+            TBTOT(k) = TBID(k)						!Translate into TBCALC names
+            if ( TBTOT(k)(1:2).eq.'T9' ) then
+               TBVX(k) = TBXR + 5
+               ny = TBYR
+            elseif ( TBTOT(k)(2:2).eq.'A' ) then
+                TBVX(k) = TBXR + 5
+                ny = TBYR
+                call gtwrkr ( 'MAIN', ny*TBVX(k), IPCA(k), ierr )
+                USEDA = .true.
+                call tbsh_calcload ( %val(IPD), %val(IPN), %val(IPX),
+     +                         %val(IPY), %val(IPCA(k)), TBVX(k), ny )
+            else
+               intab = 'IN '
+               intab(3:3) = TBTOT(k)(2:2)
+               call optabr ( intab, IPCA(k), TBVX(k), ny, .false.,
+     +                       ierr )
+               if ( ierr.ne.0 ) then
+                  if ( ierr.eq.3 ) then
+                     call printo ( 'All input tables must come '//
+     +                             'from different files' )
+                     call printo ( 'To input a table more than '//
+     +                  'once - refer to it by only one parameter')
+                  endif
+                    ierro = 1
+                  return
+               endif
+            endif
+            if ( (TBVX(k)-5).gt.999 ) then
+               call printo ('ERROR: Cannot have more than 999 columns')
+               ierro = 1
+               return
+            endif
+            if ( ny.ne.TBYA ) then
+               call printo (
+     +             'ERROR: Tables must have same number of rows' )
+               ierro = 1
+               return
+            endif
+            TBXMA = max(TBXMA,(TBVX(k)-5))
+         enddo
+      endif
+
+      NVARTOT = NVAR							!Translate into TBCALC names
+      if ( NVARTOT.gt.0 ) then						!Get input variables
+         do k = 1, NVARTOT		
+            VARTOT(k) = VARID(k)
+            call get1r ( VARTOT(k), VAR(k), 0.0, -1.0e37, +1.0e37 )
+            if ( ST_FAILED ) return
+         enddo
+      endif
+
+      kv = 0								!Random generator seed
+      if ( index(EXPRS,'RAN').ne.0 ) kv = 1
+      if ( index(EXPRS,'GAUSS').ne.0 ) kv = 1
+      KSEED = 1
+      if ( kv.eq.1 ) call get1i ( 'SEED', KSEED, 1234567891,
+     +                            1200000001, 1400000001 )
+      if ( ST_FAILED ) return
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_calcload"> TBSH_CALCLOAD  </a>-- Load present array into no 'holes' array
+C
+C  alan penny                 ral                1991 July
+
+      subroutine tbsh_calcload ( tb, tbn, kcx, kcy, out, nxo, nyo )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      tb(TBXM,TBYM)		!i: Data table
+      real      tbn(5,TBYM)		!i: Name table
+      integer   kcx(TBXM)		!i: Column checks
+      integer   kcy(TBYM)		!i: Row checks
+      integer   nxo			!i: No of columns in new array
+      integer   nyo			!i: No of rows (+5) in new array
+      real      out(nxo,nyo)		!o: New array
+C--
+      integer j, k, ja, ka, jc
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ka = 0
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            ka = ka + 1
+            ja = 0
+            do j = 1, TBX
+              if ( kcx(j).eq.1 ) then
+                 ja = ja + 1
+                 out(ja+5,ka) = tb(j,k)
+              endif
+            enddo
+            do jc = 1, 5
+               out(jc,ka) = tbn(jc,k)
+            enddo
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_polish"> TBSH_POLISH  </a>-- Decode equation and sort into reverse Polish
+C
+C  alan penny                RAL                1991 Dec
+
+      subroutine tbsh_polish ( exprs, opcode, noper, tbid, ntb, imp,
+     +                         impc, varid, nvar, impv, con, ncon,
+     +                         ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*130    exprs		!i: Equation to decode
+      character*6      opcode(70)	!o: Polish stack of commands
+      integer          noper		!o: No of operations
+      character*2      tbid(70)		!o: Tables identifiers
+      integer          ntb		!o: Number of different tables
+      integer          imp(70)		!o: Pointers to tables
+      integer          impc(70)		!o: Pointers to columns
+      character*1      varid(26)	!o: Variables identifiers
+      integer          nvar		!o: Number of variable
+      integer          impv(26)		!o: Pointers to variables
+      real             con(70)		!o: Constants
+      integer          ncon		!o: Number of constants
+      integer          ierr		!o: Error flag (0=ok;bad 2=;3=;4=)
+C--
+      character in*130, numchr*130, test*7, output*7, colid*3
+      integer j, k, tos, stk(0:130), symb(130), ll, ncin, nnum,
+     +        nsymb, iok, isymb, ndiff, kextra, istat
+      real    const
+      logical opnext, found, ischar, isnumb, issign, lmore, atend
+      external ischar, isnumb, issign
+
+      integer maxsym
+      parameter ( maxsym=38 )
+
+      character*7 oper(-4:maxsym), opsymb(-4:maxsym)
+      integer opl(-4:maxsym), opr(-4:maxsym), l(-4:maxsym),
+     +        prl(-4:maxsym), prr(-4:maxsym)
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),		!Set up table of operators,
+     +        prr(j),j=-4,10 ) /					! symbols and their priorities
+     +  '       ', 'LDCOL  ', 3, 0, 0, 10, 10,
+     +  '       ', 'LDCON  ', 1, 0, 0, 10, 10,
+     +  '       ', 'LDVAR  ', 1, 0, 0, 10, 10,
+     +  '       ', 'LDTB   ', 2, 0, 0, 10, 10,
+     +  '=      ', '=      ', 1, 1, 1,  0,  0,
+     +  ')      ', ')      ', 1, 1, 0,  2, 10,
+     +  '(      ', '(      ', 1, 0, 1, 10,  1,
+     +  '-      ', '-      ', 1, 1, 1,  4,  4,
+     +  '+      ', '+      ', 1, 1, 1,  4,  4,
+     +  '**     ', '**     ', 2, 1, 1,  9,  6,
+     +  '*      ', '*      ', 1, 1, 1,  5,  5,
+     +  '/      ', '/      ', 1, 1, 1,  5,  5,
+     +  ':      ', ':      ', 1, 1, 1,  2,  2,
+     +  '-      ', 'NEG    ', 1, 0, 1,  8,  7,
+     +  '+      ', 'POS    ', 1, 0, 1,  8,  7 /
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),
+     +        prr(j),j=11,20 ) /
+     +  'SQRT(  ', 'SQRT(  ', 5, 0, 1, 10,  1,
+     +  'EXP(   ', 'EXP(   ', 4, 0, 1, 10,  1,
+     +  'LOG10( ', 'LOG10( ', 6, 0, 1, 10,  1,
+     +  'LOG(   ', 'LOG(   ', 4, 0, 1, 10,  1,
+     +  'SIN(   ', 'SIN(   ', 4, 0, 1, 10,  1,
+     +  'COS(   ', 'COS(   ', 4, 0, 1, 10,  1,
+     +  'TAN(   ', 'TAN(   ', 4, 0, 1, 10,  1,
+     +  'ASIN(  ', 'ASIN(  ', 5, 0, 1, 10,  1,
+     +  'ACOS(  ', 'ACOS(  ', 5, 0, 1, 10,  1,
+     +  'ATAN(  ', 'ATAN(  ', 5, 0, 1, 10,  1 /
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),
+     +        prr(j),j=21,30 ) /
+     +  'ATAN2( ', 'ATAN2( ', 6, 0, 1, 10,  1,
+     +  'SINH(  ', 'SINH(  ', 5, 0, 1, 10,  1,
+     +  'COSH(  ', 'COSH(  ', 5, 0, 1, 10,  1,
+     +  'TANH(  ', 'TANH(  ', 5, 0, 1, 10,  1,
+     +  'ABS(   ', 'ABS(   ', 4, 0, 1, 10,  1,
+     +  'AINT(  ', 'AINT(  ', 5, 0, 1, 10,  1,
+     +  'ANINT( ', 'ANINT( ', 6, 0, 1, 10,  1,
+     +  'MOD(   ', 'MOD(   ', 4, 0, 1, 10,  1,
+     +  'SIGN(  ', 'SIGN(  ', 5, 0, 1, 10,  1,
+     +  'DIM(   ', 'DIM(   ', 4, 0, 1, 10,  1 /
+
+      data ( oper(j), opsymb(j), l(j), opl(j), opr(j), prl(j),
+     +       prr(j),j=31,maxsym ) /
+     +  'MIN(   ', 'MIN(   ', 4, 0, 1, 10,  1,
+     +  'MAX(   ', 'MAX(   ', 4, 0, 1, 10,  1,
+     +  'CLIP(  ', 'CLIP(  ', 5, 0, 1, 10,  1,
+     +  'GAUSS( ', 'GAUSS( ', 6, 0, 1, 10,  1,
+     +  'RAN(   ', 'RAN(   ', 4, 0, 1, 10,  1,
+     +  'RR     ', 'RR     ', 2, 0, 0, 10, 10,
+     +  'CC     ', 'CC     ', 2, 0, 0, 10, 10,
+     +  '%      ', '/      ', 1, 1, 1,  5,  5 /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+      ncin = 0
+
+      do k = 1, len(exprs)						!Remove embedded blanks
+         if ( exprs(k:k).ne.' ' .and. ncin.lt.130  ) then		!Count no of characters
+            ncin = ncin + 1
+            in(ncin:ncin) = exprs(k:k)
+         endif
+      enddo
+
+      exprs = in(1:ncin)						!Return the expression with blanks removed
+
+      ncin = ncin+1							!Append an '= ' operator to terminate the expression
+      in(ncin:) = '='
+
+      ntb = 0								!Initiallise counters
+      nvar = 0
+      ncon = 0
+      k = 1
+      j = 0
+
+      opnext = .false.							!Indicates if an operator is expected next
+									! first entity must not look like an operator
+
+      lmore = .true.							!Loop thru OPLs until '='found
+      do while ( lmore )
+
+         found = .false.						!Search through the list of symbols to
+         nsymb = -1							! identify which comes next
+         do while ( nsymb.lt.maxsym .and. .not.found )
+            nsymb = nsymb + 1
+            if ( opnext.eqv.(opl(nsymb).eq.1) ) then			!Symbol is only valid if it looks like
+               test = in(k:min(k+l(nsymb)-1,130))			! an operator or operand from the left, as appropriate
+               if ( test.eq.oper(nsymb) ) found = .true.
+             endif
+         enddo
+
+         if ( .not.found ) then						!If symbol was not found: -
+            if ( opnext ) then						!Error if an operator expected
+               ierr = 3
+               call printo ( 'ERROR: Cant understand Equation - ' )
+               call printo ( 'ERROR: '//exprs )
+               return
+            else if ( in(k:k).eq.'T' .and. ischar(in(k+1:k+1)) .and.	!If an operand was expected, it may be
+     +               isnumb(in(k+2:k+2)) ) then				! a table, variable or const.
+               nsymb = -1						!If it is a table, add name to table stack
+               ntb = ntb + 1
+               tbid(ntb) = in(k:k+1)
+               colid = '000'
+               if ( .not.isnumb(in(k+3:k+3)) ) then
+                  colid(3:3) = in(k+2:k+2)
+                  kextra = 1
+               elseif ( .not.isnumb(in(k+4:k+4)) ) then
+                  colid(2:3) = in(k+2:k+3)
+                  kextra = 2
+               else
+                  colid = in(k+2:k+4)
+                  kextra = 3
+               endif
+               call chartoi ( colid, impc(ntb), istat )			!Add column to column stack
+               if ( istat.ne.0 .or. impc(ntb).eq.0 ) then
+                  ierr = 1
+                  call printo (
+     +            'ERROR: Bad column ID - '//tbid(ntb)//colid )
+                  call printo ( 'ERROR: '//exprs )
+                  return
+               endif
+            elseif ( in(k:k+2).eq.'COL'.and.isnumb(in(k+3:k+3)) ) then 	!If an operand was expected, it may be
+               nsymb = -4						! a table, variable or const.
+               ntb = ntb + 1						!If it is a table, add name to table stack
+               tbid(ntb) = 'T9'
+               colid = '000'
+               if ( .not.isnumb(in(k+4:k+4)) ) then
+                  colid(3:3) = in(k+3:k+3)
+                  kextra = 1
+               elseif ( .not.isnumb(in(k+5:k+5)) ) then
+                  colid(2:3) = in(k+3:k+4)
+                  kextra = 2
+               else
+                  colid = in(k+3:k+5)
+                  kextra = 3
+               endif
+               call chartoi ( colid, impc(ntb), istat )			!Add column to column stack
+               if ( istat.ne.0 .or. impc(ntb).eq.0 ) then
+                  ierr = 1
+                  if ( tbid(ntb).eq.'T9' ) then
+                     call printo ( 'ERROR: Bad column ID for working'//
+     +                             ' table - '//colid )
+                  else
+                     call printo ( 'ERROR: Bad column ID - '//
+     +                             tbid(ntb)//colid )
+                  endif
+                  call printo ( 'ERROR: '//exprs )
+                  return
+               endif
+            else if ( ischar(in(k:k)) ) then
+               nsymb = -2						!If it is a variable, add name to variable stack
+               nvar = nvar + 1
+               varid(nvar) = in(k:k)
+            else
+
+               nnum = 0							!Otherwise it may be a constant...
+               numchr = ' '						! extract contiguous numerical characters
+
+               atend = .false.						!Character may be part of a numerical constant
+               ll = k - 1						! if it is 0..9 or '.'
+               do while ( ll.lt.ncin .and. .not.atend )			! or if it is an 'e' following one of the above
+                  ll = ll + 1						! or if it is a sign following an 'e'
+                  if ( isnumb(in(ll:ll)) .or. (in(ll:ll).eq.'E') .or.
+     +           (issign(in(ll:ll)).and.(in(ll-1:ll-1).eq.'E')) ) then
+                     nnum = nnum + 1
+                     numchr(nnum:nnum) = in(ll:ll)
+                  else
+                     atend = .true.					!End of number as soon as one of the above tests fails
+                  endif
+               enddo
+               call chartor ( numchr(:nnum), const, iok )		!Try to read these characters as a constant
+
+               if ( iok.eq.0 .and. nnum.ne.0 ) then			!If successful, add constant to stack
+                  ncon = ncon + 1
+                  con(ncon) = const
+                  nsymb = -3
+                  l(nsymb) = nnum
+               else
+                  ierr = 2						!Otherwise there is a bad operand error
+                  call printo ( 'ERROR: Cant understand Equation -' )
+                  call printo ( 'ERROR: '//exprs )
+                  return
+               endif
+
+            endif
+         endif
+
+         j = j + 1							!Put the identified symbol into the output
+         symb(j) = nsymb						! array and move the input pointer to the
+         k = k + l(nsymb)						! next symbol
+         if ( nsymb.eq.-1 .or. nsymb.eq.-4 ) k = k + kextra
+
+         opnext = opr(nsymb).ne.1					!Decide whether an operator or operand follows
+         if ( opsymb(nsymb).eq.'=' ) lmore = .false.
+
+      enddo
+
+      call azeroi ( stk(0), j+1 )					!Zero operator stack for converting to reverse polish
+      tos = 0
+      isymb = 1
+      noper = 0
+
+      lmore = .true.
+      do while ( lmore )
+         lmore = .false.
+
+         if ( index(oper(stk(tos)),'(').ne.0 .and.			!If the top of stack and input stream have
+     +        oper(symb(isymb)).eq.')' ) then				! matching parentheses, cancel them
+
+            if ( oper(stk(tos)).ne.'(' ) then				!If there is a function asssociated with the
+ 									! opening parenthesis then send it to the output stream
+
+               output = opsymb(stk(tos))				!Remove the enclosed '(' from functions first
+               output(index(output,'('):index(output,'(')) = ' '
+               tos = tos - 1
+               isymb = isymb + 1
+             else
+               tos = tos - 1
+               isymb = isymb + 1
+               lmore = .true.
+             endif
+
+         else if ( prr(stk(tos)).ge.prl(symb(isymb)) ) then		!If the symbol on the top of the stack has
+            output = opsymb(stk(tos))					! a high enough priority, transfer it to
+            tos = tos - 1						! the output stream
+         else
+            tos = tos + 1						!Otherwise, transfer the next symbol to the stack
+            stk(tos) = symb(isymb)
+            isymb = isymb + 1
+            lmore = .true. 						!Return for next test
+         endif
+
+         if ( .not.lmore ) then
+
+            if ( index(output,'(').ne.0 ) then				!If a bracket appears in the output,
+               ierr = 4							! it results from unpaired parentheses
+               call printo ( 'ERROR: ) missing from Equation -' )	! in the input expression...quit qith error
+               call printo ( 'ERROR: '//exprs )
+               return
+            elseif ( index(output,')').ne.0 ) then
+               ierr = 4
+               call printo ( 'ERROR: (  missing from Equation -' )
+               call printo ( 'ERROR: '//exprs )
+               return
+            endif
+
+            if ( output.ne.'POS'.and.output.ne.':' ) then		!If there is some output, disregard it
+               noper = noper + 1					! if it is unary + or a comma
+               opcode(noper) = output
+            endif
+
+            if ( output.ne.'=' ) lmore = .true.				!Return for next symbol if not the end
+
+         endif
+
+      enddo
+
+      if ( ntb.ge.1 ) then						!If tables or variables are referenced, sort
+         call tbsh_sortc ( tbid, ntb, imp, ndiff, symb )			! their names into alphabetical order and obtain
+         ntb = ndiff							! pointers to allow them to be accessed in their
+      endif								! original order
+      if ( nvar.ge.1 ) then
+         call tbsh_sortc ( varid, nvar, impv, ndiff, symb )
+         nvar = ndiff
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_docalc"> TBSH_DOCALC  </a>-- do the calculations
+C
+C  alan penny                     RAL            1991 Dec
+
+      subroutine tbsh_docalc ( tb, tbx, tby, opcode, nopcode, imp,
+     +                         impc, impv, var, con, tbcol, kseed,
+     +                         kx, ierr )
+
+      implicit none
+      include 'ST_LIMITS_INC'
+      include 'STARMAN_INC'
+
+      integer      tbx			!i: Max X size of input tables
+      integer      tby			!i: Max Y size of input tables
+      real         tb(tbx,tby,*)	!i: Input tables
+      integer      nopcode		!i: Number of operations
+      character*6  opcode(nopcode)	!i: Code for operations
+      integer      imp(70)		!i: Number of table in (i)th posn
+      integer      impc(70)		!i: Number of column in (i)th posn
+      integer      impv(70)		!i: Number variable in (i)th posn
+      real         var(26)		!i: Variables
+      real         con(70)		!i: Constants
+      real         tbcol(tby)		!o: Output column
+      integer      kseed		!i/o: Random number seed
+      integer      kx			!i: Column number
+      integer      ierr			!o: Error flag (0=ok;1=bad)
+C--
+      logical found, bad, more
+      integer j, k, tos, numitab, nvar, ncon, ib, nop
+      real    rv
+      double precision s(0:130), a, b, c, dib, dvmin, dvmax
+      integer opwhich(70)
+
+      integer nsymb
+      parameter ( nsymb=38 )
+
+      character opsymb(nsymb)*6						!Recognised operations
+      data opsymb /
+     + 'LDCOL ','LDCON ','LDVAR ','LDTB  ','=     ',
+     + '-     ','+     ','**    ','*     ','/     ','NEG   ','SQRT  ',
+     + 'EXP   ','LOG10 ','LOG   ','SIN   ','COS   ','TAN   ','ASIN  ',
+     + 'ACOS  ','ATAN  ','ATAN2 ','SINH  ','COSH  ','TANH  ','ABS   ',
+     + 'AINT  ','ANINT ','MOD   ','SIGN  ','DIM   ','MIN   ','MAX   ',
+     + 'CLIP  ','GAUSS ','RAN   ','RR    ','CC    ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0								!Failure flag
+
+      dvmax = INT_MAXRR							!Set (dble precision) max and min vals
+      dvmin = INT_MINRR
+
+      do k = 1, nopcode							!Find `opcode' for each input operator
+         found = .false.
+         j = 0
+         do while ( j.lt.nsymb .and. .not.found )
+            j = j + 1
+            if ( opcode(k).eq.opsymb(j) ) then
+               opwhich(k) = j
+               found = .true.
+            endif
+         enddo
+         if ( .not.found ) then
+            ierr = 1
+            return
+         endif
+      enddo
+
+      do j = 1, tby							!Do for all rows in a column
+
+         tos = 0							!Initialise the arith, table,
+         numitab = 0							! variable, constant stack pointers
+         nvar = 0
+         ncon = 0
+
+         nop = 0							!Do the operations
+         more = .true.
+         bad = .false.
+
+         do while ( nop.lt.nopcode .and. more )
+            nop = nop + 1
+
+            go to (  99,101,102,103,104,105,106,107,108,109,110,111,
+     +              112,113,114,115,116,117,118,119,120,121,122,123,
+     +              124,125,126,127,128,129,130,131,132,133,134,135,
+     +              136,137 ),
+     +            opwhich(nop)
+
+  99        continue
+               tos = tos + 1						!Load column on to stack
+               numitab = numitab + 1
+               s(tos) = tb(impc(numitab),j,imp(numitab))
+            go to 100
+ 101        continue
+               tos = tos + 1						!Load constant on to stack
+               ncon = ncon + 1
+               s(tos) = con(ncon)
+            go to 100
+ 102        continue
+               tos = tos + 1						!Load variable onto stack
+               nvar = nvar + 1
+               s(tos) = var(impv(nvar))
+            go to 100
+ 103        continue
+               tos = tos + 1						!Load table on to stack
+               numitab = numitab + 1
+               s(tos) = tb(impc(numitab),j,imp(numitab))
+            go to 100
+ 104        continue
+               tbcol(j) = min(dvmax,max(dvmin,s(tos)))			!=  : end of calculation
+               more = .false.
+            go to 100
+ 105        continue
+               s(tos-1) = s(tos-1) - s(tos)				!- : subtract tos
+               tos = tos - 1
+            go to 100
+ 106        continue
+               s(tos-1) = s(tos-1) + s(tos)				!+ : add tos
+               tos = tos - 1
+            go to 100
+ 107        continue
+               a = s(tos-1)						!** : raise to power
+               b = s(tos)
+               if ( a.ge.0.0 ) then
+                  c = a**b
+               else
+                  ib = nint(b)
+                  dib = ib
+                  if ( abs(dib-b).le.1.0d-7 ) then
+                     c = a**ib
+                  else
+                     bad = .true.
+                  endif
+               endif
+               tos = tos - 1
+               s(tos) = c
+            go to 100
+ 108        continue
+               s(tos-1) = s(tos-1)*s(tos)				!* : multiply tos
+               tos = tos - 1
+            go to 100
+ 109        continue
+               a = s(tos)						!/ : Divide tos
+               if ( a.ne.0.0d0 ) then
+                  s(tos-1) = s(tos-1)/a
+                  tos = tos - 1
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 110        continue
+               s(tos) = -s(tos)						!NEG : Negate tos
+            go to 100
+ 111        continue
+              a = s(tos)						!SQRT : Square root tos
+               if ( a.ge.0.0d0 ) then
+                  s(tos) = sqrt(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 112        continue
+               a = s(tos)						!EXP : E to power tos
+               if ( a.le.100.0d0 ) then
+                  s(tos) = exp(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 113        continue
+               a = s(tos)						!LOG10 : Log tos base 10
+               if ( a.gt.0.0d0 ) then
+                  s(tos) = log10(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 114        continue
+               a = s(tos)						!LOG : Natural log of tos
+               if ( a.gt.0.0d0 ) then
+                  s(tos) = log(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 115        continue
+               s(tos) = sin(s(tos))					!SIN : Sine of tos
+            go to 100
+ 116        continue
+               s(tos) = cos(s(tos))					!COS : Cosine of tos
+            go to 100
+ 117        continue
+               a = s(tos)						!TAN : Tangent of tos
+               s(tos) = tan(a)
+            go to 100
+ 118        continue
+            a = s(tos)							!ASIN : Arcsine of tos
+               if ( abs(a).le.1.0d0 ) then
+                  s(tos) = asin(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 119        continue
+               a = s(tos)						!ACOS : Arccosine of tos
+               if ( abs(a).le.1.0d0 ) then
+                  s(tos) = acos(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 120        continue
+               s(tos) = atan(s(tos))					!ATAN : Arctangent of tos
+            go to 100
+ 121        continue
+               a = s(tos-1)						!ATAN2 : Arctangent of tos ratio
+               b = s(tos)
+               if ( a.ne.0.0d0 .or. b.ne.0.0d0 ) then
+                  tos = tos - 1
+                  s(tos) = atan2(a,b)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 122        continue
+               a = s(tos)						!SINH : Hyperbolic sine of tos
+               if ( abs(a).le.100.0d0 ) then
+                  s(tos) = sinh(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 123        continue
+               a = s(tos)						!COSH : Hyperbolic cosine of tos
+               if ( abs(a).le.100.0d0 ) then
+                  s(tos) = cosh(a)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 124        continue
+               s(tos) = tanh(s(tos))					!TANH : Hyperbolic tangent of tos
+            go to 100
+ 125        continue
+               s(tos) = abs(s(tos)) 					!ABS : Absolute value of tos
+            go to 100
+ 126        continue
+               s(tos) = aint(s(tos))					!AINT : Truncate tos
+            go to 100
+ 127        continue
+               s(tos) = anint(s(tos))					!ANINT : Nearest integer to tos
+            go to 100
+ 128        continue
+               a = s(tos-1)						!MOD : Modulo on two tos entries
+               b = s(tos)
+               if ( b.ne.0.0d0 ) then
+                  tos = tos - 1
+                  s(tos) = mod(a,b)
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 129        continue
+               s(tos-1) = sign(s(tos-1),s(tos))				!SIGN : Transfer of sign between two tos entries
+               tos = tos - 1
+            go to 100
+ 130        continue
+               s(tos-1) = dim(s(tos-1),s(tos))				!DIM : Positive difference of two tos entries
+               tos = tos - 1
+            go to 100
+ 131        continue
+              s(tos-1) = min(s(tos-1),s(tos))				!MIN : Minimum of two tos entries
+               tos = tos - 1
+            go to 100
+ 132        continue
+               s(tos-1) = max(s(tos-1),s(tos))				!MAX : Maximum of two tos entries
+               tos = tos - 1
+            go to 100
+ 133        continue
+               a = s(tos-2)						!CLIP : Abort if tos lies outside window
+               b = s(tos-1)
+               c = s(tos)
+               if ( a.le.b .and. b.le.c ) then
+                  tos = tos - 2
+                  s(tos) = b
+               else
+                  bad = .true.
+               endif
+            go to 100
+ 134        continue
+               call gasdev ( rv, kseed )				!GAUSS : Put gaussian noise on tos
+               s(tos) = s(tos)*dble(rv)
+            go to 100
+ 135        continue
+               call rano ( rv, kseed )					!RAN : Uniform random noise
+               s(tos) = s(tos)*dble(rv)
+            go to 100
+ 136        continue
+               tos = tos + 1						!RR : Row number
+               s(tos) = j
+            go to 100
+ 137        continue
+               tos = tos + 1						!CC : Column number
+               s(tos) = kx
+            go to 100
+ 100        continue
+
+            if ( bad ) then						!Invalid arithmetic operation done
+               tbcol(j) = 0.0
+               more = .false.
+            endif
+
+         enddo
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_load"> TBSH_LOAD  </a>-- Copy table into a 3-D stack
+C
+C  alan penny                 ral                     1991 Dec
+
+      subroutine tbsh_load ( tb, tbvx, tby, nin, tbs, tbxs, tbys )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer     tbvx			!i: X size (inc 5 for name) of input table
+      integer     tby			!i: Y size of input table
+      real        tb(tbvx,tby)		!i: Input table
+      integer     nin			!i: Plane to put it in
+      integer     tbxs			!i: X size of output table
+      integer     tbys			!i: Y size of output table
+      real        tbs(tbxs,tbys,*)	!i/o: Output table
+C--
+      integer j, k, ja, ka
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call azeror ( tbs(1,1,nin), tbxs*tbys )
+
+      ja = min(tbxs,(tbvx-5))
+      ka = min(tbys,tby)
+      do k = 1, ka
+         do j = 1, ja
+            tbs(j,k,nin) = tb((j+5),k)
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_loada"> TBSH_LOADA  </a>-- Copy present work table into a 3-D stack
+C
+C  alan penny                 ral                     1991 Dec
+
+      subroutine tbsh_loada ( tb, kcx, kcy, nin, tbs, tbxs, tbys )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real        tb(TBXM,TBYM)		!i: Table
+      integer     kcx(TBXM)		!i: X selection
+      integer     kcy(TBYM)		!i: Y selection
+      integer     nin			!i: Plane to put it in
+      integer     tbxs			!i: X size of output table
+      integer     tbys			!i: Y size of output table
+      real        tbs(tbxs,tbys,*)	!i/o: Output table
+C--
+      integer j, k, kx, ky
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call azeror ( tbs(1,1,nin), tbxs*tbys )
+
+      ky = 1
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            kx = 1
+            do j = 1, TBX
+               if ( kcx(j).eq.1 ) then
+                  tbs(kx,ky,nin) = tb(j,k)
+                  kx = kx + 1
+               endif
+            enddo
+            ky = ky + 1
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_loadb"> TBSH_LOADB  </a>-- Load column to master and display
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_loadb ( tbin, ncol, tb, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real    tbin(*)		!i:   Column to load
+      integer ncol		!i:   'Visible' Column number to put in
+      real    tb(TBXM,TBYM)	!i/o: Table
+      integer kcx(TBXM)		!i:   X selection
+      integer kcy(TBYM)		!i:   Y selection
+C--
+      integer k, ktx, kty, kx, ky, kxout, kyout
+      logical xmore
+      real val, x, y
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ky = 0								!Load data
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            ky = ky + 1
+            tb(ncol,k) = tbin(ky)
+         else
+            tb(ncol,k) = 0.0
+         endif
+      enddo
+
+      call gd_bbuf							!Display
+
+      kx = ncol
+
+      y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
+
+      kty = KYSTART
+      call tbsh_convert ( kty, 2, kcx, kcy )
+      kyout = 0
+      do while ( kty.le.TBY .and. kyout.lt.NUMY )
+
+         if ( kcy(kty).eq.1 ) then
+
+            x = XDOFF + 0.05*XBOX
+            ktx = KXSTART
+            call tbsh_convert ( ktx, 1, kcx, kcy )
+            ktx = KXSTART
+            xmore = .true.
+            kxout = 0
+            do while ( xmore .and. ktx.le.TBX .and. kxout.lt.NUMX )
+               if ( kcx(ktx).eq.1 ) then
+                  if ( ktx.eq.kx ) then
+                     val = tb(ktx,kty)
+                     call tbsh_value ( x, y, val, 12, 2 )
+                     xmore = .false.
+                  endif
+                  x = x + XBOX
+                  kxout = kxout + 1
+               endif
+               ktx = ktx + 1
+            enddo
+
+            y = y - YBOX
+            kyout = kyout + 1
+
+         endif
+         kty = kty + 1
+
+      enddo
+
+      call gd_ebuf
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_sortc"> TBSH_SORTC  </a>-- Sort identifiers to alphabetical order
+C
+C  alan penny            ral                     1991 Dec
+
+      subroutine tbsh_sortc ( c, nc, imp, ndiff, iw )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer        nc		!i: Number of identifiers
+      character*(*)  c(nc)	!i/o: Identiers
+      integer        imp(nc)	!o: pointer to identifier place in stack
+      integer        ndiff	!o: Number of different identifiers
+      integer        iw(nc)	!o: Work space
+C--
+      integer k, nn, it
+      character*130 text
+      logical repeat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      nn = min(130,len(c(1)))						!Length of input strings
+
+      do k = 1, nc							!Initiallise pointers in workspace
+         iw(k) = k
+      enddo
+
+      repeat = .true.							!Perform a bubble sort to put
+      do while ( repeat ) 						! character strings into alphabetical order
+         repeat = .false.
+         do k = 1, nc-1
+            if ( c(k+1).lt.c(k) ) then
+               repeat = .true.
+               text(:nn) = c(k+1)					!Swap pairs which are in the wrong order
+               c(k+1) = c(k)
+               c(k) = text(:nn)
+               it = iw(k+1)						!Permute the pointers in the same way
+               iw(k+1) = iw(k)
+               iw(k) = it
+            endif
+         enddo
+      enddo
+
+      ndiff = 1								!Pointers now point to original positions. scan list to remove
+      imp(iw(1)) = 1							! repeated entries and reverse the pointing direction
+
+      do k = 2, nc
+         if ( c(k).ne.c(ndiff) ) then					!If a different character string is found, count it and put it
+            ndiff = ndiff + 1						! in the correct place in the list
+            c(ndiff) = c(k)
+         endif
+         imp(iw(k)) = ndiff						!Set the appropriate output pointer to its new location
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_sort"> TBSH_SORT  </a>-- Sort table
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_sort ( kopt, koptst )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    kopt		!i: Sort up (offset+1) or down (offset+2)?
+      integer    koptst		!i: Option offset
+C--
+      integer ncol, nrow, kacc, ipnum, ipval, ipda, ipna, ierr
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbsh_getpos ( 1, ncol, nrow )				!Get column number to sort on
+      if ( ncol.eq.-1 ) return
+
+      call tbsh_wmess ( 3, 0 )
+
+      kacc = kopt - koptst						!Ascending/descending sort?
+
+      call gtwrkr ( 'NUMBER', TBY, ipnum, ierr )			!Get working space for sort
+      if ( ierr.ne.0 ) return
+      call gtwrkr ( 'VALUES', TBY, ipval, ierr )
+      if ( ierr.ne.0 ) return
+
+      call tbsh_wmess ( 4, 0 )
+
+      call tbsh_compress ( %val(IPD), %val(IPN), %val(IPH), %val(IPX),	!Remove holes
+     +                     %val(IPY) )
+
+      call coprr ( %val(IPD), TBXM, TBYM, ncol, ncol, 1, TBY,		!Copy the sorting parameter into
+     +             %val(ipval), 1, TBY, 1, 1 )				! the working area and perform sort
+      call anumincr ( %val(ipnum), TBY )
+      call sort2r ( %val(ipval), %val(ipnum), TBY )
+      if ( kacc.eq.2 ) call tbsh_sloadb ( %val(ipnum), TBY )
+
+      call gtwrkr ( 'TBDA', TBXM*TBY, ipda, ierr )			!Load the new data and names
+      if ( ierr.ne.0 ) return
+      call gtwrkr ( 'TBNA', 5*TBY, ipna, ierr )
+      if ( ierr.ne.0 ) return
+      call tbsh_trans ( %val(IPD), %val(IPN), %val(ipda), %val(ipna),
+     +                  %val(ipnum) )
+
+      call tbsh_nload ( %val(IPN), %val(IPY) )				!Load screen
+      call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )
+
+      call wrkcan ( 'VALUES' )						!Free data area
+      call wrkcan ( 'NUMBER' )
+      call wrkcan ( 'TBDA' )
+      call wrkcan ( 'TBNA' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_stats"> TBSH_STATS  </a>-- Calculate statistics of a column
+C
+C   alan penny             RAL               1995 Aug
+
+      subroutine tbsh_stats ( tbh, kopt, koptst )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    tbh(5,TBXM)	!i: Header table
+      integer    kopt		!i: One column (offset+1) or two (offset+2)?
+      integer    koptst		!i: Option offset
+C--
+      integer ncol, nrow, ncol2, nrow2, ipa, ipb, ierr, kdo
+      character*20 text, text2
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kdo = kopt - koptst
+
+      call tbsh_getpos ( 1, ncol, nrow )				!Get column number to work on
+      if ( ncol.eq.-1 ) then
+         if ( kdo.eq.1 ) then
+            return
+         else
+            ncol = 1
+            ncol2 = 2
+            call get2i ( 'COLS', ncol, ncol2, .true., 1, TBX )
+            call tbsh_convert ( ncol, 1, %val(IPX), %val(IPY) )
+            call tbsh_convert ( ncol2, 1, %val(IPX), %val(IPY) )
+         endif
+      else
+         if ( kdo.eq.2 ) then
+            call tbsh_getpos ( 1, ncol2, nrow2 )			!Get 2nd column number to work on, if wanted
+            if ( ncol2.eq.-1 ) return
+         endif
+      endif
+
+      call tbsh_wmess ( 3, 0 )
+
+      call gtwrkr ( 'A', TBY, ipa, ierr )				!Get working space for sort
+      if ( ierr.ne.0 ) return
+
+      call tbsh_wmess ( 4, 0 )
+
+      call tbsh_loadcol ( %val(IPD), %val(IPX),	%val(IPY), ncol,	!Remove holes
+     +                    %val(ipa) )
+      call tbsh_chget ( tbh(1,ncol), text )
+
+      if ( kdo.eq.2 ) then
+         call gtwrkr ( 'B', TBY, ipb, ierr )
+         if ( ierr.ne.0 ) then
+            call wrkcan ( 'A' )
+            return
+         endif
+         call tbsh_loadcol ( %val(IPD), %val(IPX), %val(IPY), ncol2,	!Remove holes
+     +                      %val(ipb) )
+         call tbsh_chget ( tbh(1,ncol2), text2 )
+         call printo ( ' ' )
+         call pargi ( ncol )
+         call pargc ( text )
+         call printd ( '1st column - number %d : Header %c' )
+         call tbsh_dostat1 ( %val(ipa), TBY )
+         call pargi ( ncol2 )
+         call printo ( ' ' )
+         call pargc ( text2 )
+         call printd ( '2nd column - number %d : Header %c' )
+         call tbsh_dostat1 ( %val(ipb), TBY )
+         call printo ( ' ' )
+         call printo ( 'Combination of both' )
+         call tbsh_dostat2 ( %val(ipa), %val(ipb), TBY )
+         call printo ( ' ' )
+         call wrkcan ( 'A' )
+         call wrkcan ( 'B' )
+      else
+         call printo ( ' ' )
+         call pargi ( ncol )
+         call pargc ( text )
+         call printd ( 'Column - number %d : Header %c' )
+         call tbsh_dostat1 ( %val(ipa), TBY )
+         call printo ( ' ' )
+         call wrkcan ( 'A' )
+      endif
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_dostat1"> TBSH_DOSTAT1  </a>-- Do the calcs for one column
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbsh_dostat1 ( x, n )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer  n                !i: No of points
+      real     x(n)             !i: Input data
+C--
+      real av, std, stdm, amin, amax
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call alimr ( x, n, amin, amax )
+
+      call aavgr ( x, n, av, std )
+      stdm = 0.0
+      if ( n.ge.3 ) stdm = std/(real(n)-2.0)
+
+      call pargi ( n )
+      call pargr ( amin )
+      call pargr ( amax )
+      call pargr ( av )
+      call pargr ( std )
+      call pargr ( stdm )
+      call printd ('No of entries = %d : Minimum = %f : Maximum = %f ')
+      call printd ('Mean = %f : Std dev = %f : Std dev of mean = %f ')
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_dostat2"> TBSH_DOSTAT2  </a>-- Do the calcs for two columns
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbsh_dostat2 ( x, y, n )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer  n                !i: No of points
+      real     x(n)             !i: Input data
+      real     y(n)             !i: Input data
+C--
+      double precision an, sx, sy, ssx, ssy, sxy, tx, ty,
+     +                 a, b, c, sd, sda, sdb, corrl, ax, ay
+      real    rv
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      sx = 0.0d0
+      sy = 0.0d0
+      ssx = 0.0d0
+      ssy = 0.0d0
+      sxy = 0.0d0
+      tx = 0.0d0
+      ty = 0.0d0
+      an = n
+      if ( n.ge.1 ) then
+         do k = 1, n
+            tx = tx + x(k)
+            ty = ty + y(k)
+         enddo
+         ax = tx/an
+         ay = ty/an
+          do k = 1, n
+            sx = sx + (dble(x(k))-ax)
+            sy = sy + (dble(y(k))-ay)
+            ssx = ssx + (dble(x(k))-ax)*(dble(x(k))-ax)
+            ssy = ssy + (dble(y(k))-ay)*(dble(y(k))-ay)
+            sxy = sxy + (dble(x(k))-ax)*(dble(y(k))-ay)
+         enddo
+         b = sxy/ssx
+         a = ay - b*ax
+      else
+         a = 0.0d0
+         b = 0.0d0
+      endif
+
+      corrl = 0.0d0
+      if ( n.ge.2 ) then
+         if ( ssx.gt.0.0d0 .and. ssy.gt.0.0d0 ) then
+            corrl = sxy/sqrt(ssx*ssy)
+         endif
+      endif
+
+      sd = 0.0d0
+      sda = 0.0d0
+      sdb = 0.0d0
+      if ( n.ge.3 ) then
+         c = (ssy-((sxy*sxy)/ssx))/(an-2.0d0)
+         if ( c.gt.0.0d0 ) then
+            sd = sqrt(c)
+         else
+            sd = 0.0d0
+         endif
+         sdb = sd/sqrt(ssx)
+         sda = sd*((1.0d0/an)+((ax*ax)/ssx))
+      endif
+
+      call printo ( 'Y = A + BX  :assuming X errors = 0' )
+      rv = real(a)
+      call pargr ( rv )
+      rv = real(sda)
+      call pargr ( rv )
+      rv = real(b)
+      call pargr ( rv )
+      rv = real(sdb)
+      call pargr ( rv )
+      call printd  ( 'A = %f +/- %f : B = %f +/- %f ' )
+      rv = real(sd)
+      call pargr ( rv )
+      call printd ( 'Std dev of a Y value from line = %f ' )
+      rv = real(corrl)
+      call pargr ( rv )
+      call printd ( 'Correlation coefficent = %f ' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_insert"> TBSH_INSERT  </a>-- Insert a set of data
+C
+C   alan penny             RAL               1995 Aug
+
+      subroutine tbsh_insert ( data )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real    data(TBXM,TBYM)		!i/o: Table
+C--
+      integer nxs, nxe, nys, nye, kx, ky, j, k, ja, ka
+      real x, y, rv, rva
+      logical more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call printo ( '  ' )
+      call printo ( '  You can insert single numbers by clicking'//
+     +              ' on them directly.' )
+      call printo ( '  ' )
+      call printo ( '  This option lets you insert a set of '//
+     +               'numbers. Use cursor to')
+      call printo ( '  set top left hand row and column corner of '//
+     +               'the set and then ' )
+      call printo ( '  again to specify the bottom right hand '//
+     +               'corner. Then through the ' )
+      call printo ( '  keyboard enter values, one at a time' )
+      call printo ( '  ' )
+      call printo ( '  The data are entered from the top down. '//
+     +              'To stop, enter - !! -' )
+      call printo ( '  ' )
+
+      call tbsh_getpos ( 3, nxs, nys )					!Get 1st corner
+      if ( nxs.eq.-1 ) return
+
+      call tbsh_getpos ( 3, nxe, nye )				!Get 2nd corner
+      if ( nxe.eq.-1 ) return
+
+      call tbsh_wmess ( 3, 0 )
+
+      call cswopi ( nxs, nxe )
+      call cswopi ( nys, nye )
+
+      call tbsh_bconvert ( nxs, 1, %val(IPX), %val(IPY) )
+      call tbsh_bconvert ( nxe, 1, %val(IPX), %val(IPY) )
+      call tbsh_bconvert ( nys, 2, %val(IPX), %val(IPY) )
+      call tbsh_bconvert ( nye, 2, %val(IPX), %val(IPY) )
+
+      more = .true.
+      k = nys - 1
+      do while ( more .and. k.lt.nye )
+         k = k + 1
+         ka = k
+         call tbsh_convert ( ka, 2, %val(IPX), %val(IPY) )
+         j = nxs - 1
+         do while ( more .and. j.lt.nxe )
+            j = j + 1
+            call pargi ( j )
+            call pargi ( k )
+            call printd ( '  Column %d  : Row %d ' )
+
+            ja = j
+            call tbsh_convert ( ja, 1, %val(IPX), %val(IPY) )
+            rv = data(ja,ka)
+            call get1r ( 'VALUE', rva, rv, -1.0e20, 1.0e20 )
+            if ( ST_FAILED )  then
+               ST_FAILED = .false.
+               more = .false.
+               call printo ( 'Taken here as end of insertion, '//
+     +                       'not exit from program' )
+            endif
+            data(ja,ka) = rva
+
+            x = XDOFF + 0.05*XBOX
+            y = 10.0 + 0.5*CHYSIZE + real(NUMY-1)*YBOX
+            kx = ja
+            call tbsh_bconvert ( kx, 1, %val(IPX), %val(IPY) )
+            x = x + real(kx-KXSTART)*XBOX
+            ky = ka
+            call tbsh_bconvert ( ky, 2, %val(IPX), %val(IPY) )
+            y = y - real(ky-KYSTART)*YBOX
+            call gd_bbuf
+            call tbsh_value ( x, y, rva, 10, 2 )
+            call gd_ebuf
+            call gd_updt
+
+         enddo
+      enddo
+
+      call tbsh_wmess ( 4, 0 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_hist"> TBSH_HIST  </a>-- Plot histogram of a column
+C
+C   alan penny             RAL               1995 Aug
+
+      subroutine tbsh_hist ( tbh )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    tbh(5,TBXM)	!i: Header table
+C--
+      integer ncol, nrow, ipa, ipb, ierr
+      character head*20, cv*72
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbsh_getpos ( 1, ncol, nrow )				!Get column number to work on
+      if ( ncol.eq.-1 ) return
+
+      call tbsh_wmess ( 3, 0 )
+
+      call gtwrkr ( 'A', TBY, ipa, ierr )				!Get working space for sort
+      if ( ierr.ne.0 ) return
+
+      call tbsh_loadcol ( %val(IPD), %val(IPX),	%val(IPY), ncol,	!Remove holes
+     +                    %val(ipa) )
+      call tbsh_chget ( tbh(1,ncol), head )
+
+      call printo  ( ' ' )
+      call pargi ( ncol )
+      call pargc ( head )
+      call printd ( 'Column - number %d : Header %c' )
+      call printo  ( ' ' )
+
+      call tbsh_hista ( %val(ipa), TBY, head )
+
+      call wrkcan ( 'A' )
+
+      call tbsh_wmess ( 4, 0 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_hista"> TBSH_HISTA  </a>-- Set up and start histogram
+C
+C   a j penny                 ral                  1995 Aug
+
+      subroutine tbsh_hista ( data, nx, head )
+
+      implicit none
+
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer       nx		!i: No of data points
+      real          data(nx)	!i: Data
+      character*20  head	!i: Data header
+C--
+      integer k, nbin
+      real ymin, ymax
+      logical ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ymin = data(1)
+      ymax = data(1)
+      do k = 1, nx
+         ymin = min(ymin,data(k))
+         ymax = max(ymax,data(k))
+      enddo
+
+      call get2r ( 'HRANGE', ymin, ymax, .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      call cswopr ( ymin, ymax, )
+
+      nbin = 50
+      call get1i ( 'NBIN', nbin, nbin, 1, 20000 )
+      if ( ST_FAILED ) return
+
+      call pgsci ( 1 )
+      call pghist ( nx, data, ymin, ymax, nbin, 0 )
+      call pglabel ( head, 'Number', ' ' )
+      call gd_updt
+
+      call printo ( '  ' )
+      call printo ( 'If seen enough of plot, answer this question' )
+      call get1b ( 'OK', ok, .true. )					!Seen the histogram?
+
+      call pgpage
+
+      call pgvport ( 0.0, 1.0, 0.0, 1.0 )
+      call pgwindow ( 1.0, 1000.0, 1.0, 1000.0 )
+      call tbsh_formload
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_plot"> TBSH_PLOT  </a>-- Plot two columns
+C
+C   alan penny             RAL               1995 Aug
+
+      subroutine tbsh_plot ( tbh )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer    tbh(5,TBXM)	!i: Header table
+C--
+      integer ncol, nrow, ncol2, nrow2, ipa, ipb, ierr
+      character head*20, head2*20
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbsh_getpos ( 1, ncol, nrow )				!Get 1st column number to work on
+      if ( ncol.eq.-1 ) then
+         ncol = 1
+         ncol2 = 2
+         call get2i ( 'COLS', ncol, ncol2, .true., 1, TBX )
+         call tbsh_convert ( ncol, 1, %val(IPX), %val(IPY) )
+         call tbsh_convert ( ncol2, 1, %val(IPX), %val(IPY) )
+      else
+         call tbsh_getpos ( 1, ncol2, nrow2 )				!Get 2nd column number to work on, if wanted
+         if ( ncol2.eq.-1 ) return
+      endif
+
+      call tbsh_wmess ( 3, 0 )
+
+      call gtwrkr ( 'A', TBY, ipa, ierr )				!Get working space for sort
+      if ( ierr.ne.0 ) return
+
+      call gtwrkr ( 'B', TBY, ipb, ierr )				!Get working space for sort
+      if ( ierr.ne.0 ) then
+         call wrkcan ( 'A' )
+         return
+      endif
+
+      call tbsh_loadcol ( %val(IPD), %val(IPX),	%val(IPY), ncol,	!Remove holes
+     +                    %val(ipa) )
+      call tbsh_chget ( tbh(1,ncol), head )
+      call tbsh_loadcol ( %val(IPD), %val(IPX),	%val(IPY), ncol2,	!Remove holes
+     +                    %val(ipb) )
+      call tbsh_chget ( tbh(1,ncol2), head2 )
+
+      call printo  ( ' ' )
+      call pargi ( ncol )
+      call pargc ( head )
+      call printd ( '1st column - number %d : Header %c' )
+      call printo  ( ' ' )
+      call pargi ( ncol2 )
+      call pargc ( head2 )
+      call printd ( '2nd column - number %d : Header %c' )
+      call printo ( ' ' )
+
+      call tbsh_plota ( %val(ipa), %val(ipb), TBY, head, head2 )
+
+      call wrkcan ( 'A' )
+      call wrkcan ( 'B' )
+
+      call tbsh_wmess ( 4, 0 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_plota"> TBSH_PLOTA  </a>-- Set up and start plotting two columns
+C
+C   a j penny                 ral                  1995 Aug
+
+      subroutine tbsh_plota ( data, data2, nx, head, head2 )
+
+      implicit none
+
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer       nx		!i: No of data points
+      real          data(nx)	!i: Data
+      real          data2(nx)	!i: Data 2
+      character*20  head	!i: Data header
+      character*20  head2	!i: Data 2 header
+C--
+      integer j, kch, k, ka, kopt
+      real xmin, xmax, ymin, ymax, x, y, ysmin, ysmax, xsmin, xsmax
+      logical aspect, ok
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      xmin = data(1)
+      xmax = data(1)
+      do k = 1, nx
+         xmin = min(xmin,data(k))
+         xmax = max(xmax,data(k))
+      enddo
+      ymin = data2(1)
+      ymax = data2(1)
+      do k = 1, nx
+         ymin = min(ymin,data2(k))
+         ymax = max(ymax,data2(k))
+      enddo
+
+      call get2r ( 'XRANGE', xmin, xmax, .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      call cswopr ( xmin, xmax)
+
+      call get2r ( 'YRANGE', ymin, ymax, .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+      call cswopr ( ymin, ymax )
+
+      xsmin = xmin - 0.05*(xmax-xmin)
+      xsmax = xmax + 0.05*(xmax-xmin)
+      ysmin = ymin - 0.05*(ymax-ymin)
+      ysmax = ymax + 0.05*(ymax-ymin)
+
+      call get2r ( 'DEVLIMX', xsmin, xsmax, .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+
+      call get2r ( 'DEVLIMY', ysmin, ysmax, .true., -1.0e20, 1.0e20 )
+      if ( ST_FAILED ) return
+
+      call get1b ( 'ASPECT', aspect, .false. )
+      ka = 0
+      if ( aspect ) ka = 1
+
+      call pgsci ( 1 )
+
+      call gd_dobox ( xsmin, xsmax, head, ysmin, ysmax, head2, ' ', ka )
+
+      call get_job ( 'PTYPE', 'line:points', kopt, 2, ' ', 0 )
+
+      if ( kopt.eq.2 ) then
+         call get1i ( 'SYMBOL', kch, 2, 0, 31 )
+         if ( ST_FAILED ) return
+         j = 0
+         do while ( j.lt.nx )
+            j = j + 1
+            x = data(j)
+            y = data2(j)
+            if ( x.ge.xmin .and. x.le.xmax .and. y.ge.ymin
+     +           .and. y.le.ymax ) call pgpoint ( 1, x, y, kch )
+         enddo
+      else
+         call get1i ( 'LSTYLE', kch, 1, 1, 5 )
+         if ( ST_FAILED ) return
+         call pgsls ( kch )
+         x = data(1)
+         y = data2(1)
+         call pgmove ( x, y )
+         j = 1
+         do while ( j.lt.TBY )
+            j = j + 1
+            x = data(j)
+            y = data2(j)
+            call pgdraw ( x, y )
+         enddo
+         call pgsls ( 1 )
+      endif
+
+      call gd_updt
+
+      call printo ( '  ' )
+      call printo ( 'If seen enough of plot, answer this question' )
+      call get1b ( 'OK', ok, .true. )					!Seen the histogram?
+
+      call pgpage
+
+      call pgvport ( 0.0, 1.0, 0.0, 1.0 )
+      call pgwindow ( 1.0, 1000.0, 1.0, 1000.0 )
+      call tbsh_formload
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_compress"> TBSH_COMPRESS  </a>-- Remove 'holes' in array
+C
+C  alan penny                 ral                1991 July
+
+      subroutine tbsh_compress ( tb, tbn, tbh, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      tb(TBXM,TBYM)		!i/o: Data table
+      real      tbn(5,TBYM)		!i/o: Name table
+      integer   tbh(5,TBXM)		!i/o: Header table
+      integer   kcx(TBXM)		!i/o: Column checks
+      integer   kcy(TBYM)		!i/o: Row checks
+C--
+      integer j, ja, k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = TBY + 1							!Compress in Y
+      do while ( k.gt.1 )
+         k = k - 1
+         if ( kcy(k).eq.0 ) then
+            if ( k.ne.TBY ) then
+               do j = k, TBY-1
+                  do ja = 1, TBX
+                     tb(ja,j) = tb(ja,j+1)
+                  enddo
+                  do ja = 1, 5
+                     tbn(ja,j) = tbn(ja,j+1)
+                  enddo
+               enddo
+            endif
+            TBY = TBY - 1
+            if ( k.lt.(KYSTART-1) ) KYSTART = KYSTART - 1
+         endif
+      enddo
+
+      k = TBX + 1							!Compress in X
+      do while ( k.gt.1 )
+         k = k - 1
+         if ( kcx(k).eq.0 ) then
+            if ( k.ne.TBX ) then
+               do j = k, TBX-1
+                  do ja = 1, TBY
+                     tb(j,ja) = tb(j+1,ja)
+                  enddo
+                  do ja = 1, 5
+                     tbh(j,ja) = tbh(j+1,ja)
+                  enddo
+               enddo
+            endif
+            TBX = TBX - 1
+            if ( k.lt.(KXSTART-1) ) KXSTART = KXSTART - 1
+         endif
+      enddo
+
+      call azeroi ( kcx, TBXM )
+      call azeroi ( kcy, TBYM )
+      call amovki ( 1, kcx, TBX )
+      call amovki ( 1, kcy, TBY )
+
+      RESTORE = .false.							!Delete memory lost
+      CHANGED = .true.
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_loadcol"> TBSH_LOADCOL  </a>-- Load a table column into a 'no-holes' vector
+C
+C  alan penny                 ral                1991 July
+
+      subroutine tbsh_loadcol ( tb, kcx, kcy, ncol, out )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      tb(TBXM,TBYM)		!i: Data table
+      integer   kcx(TBXM)		!i: Column checks
+      integer   kcy(TBYM)		!i: Row checks
+      integer   ncol			!i: Column to load
+      real      out(TBY)		!o: Output vector
+C--
+      integer k, ka
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ka = 0
+      do k = 1, TBYM
+         if ( kcy(k).eq.1 ) then
+            ka = ka + 1
+            out(ka) = tb(ncol,k)
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_sloadb"> TBSH_SLOADB  </a>-- Reverse order of values in a real number vector
+C
+C  alan penny                 ral                1991 July
+
+      subroutine tbsh_sloadb ( data, num )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer   num             !i: Number of values
+      real	data(num)	!i/o: Array
+C--
+      integer k, ka, ks, ke
+      real va
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( num.le.1 ) return
+
+      ka = num/2
+      ks = 1
+      ke = num
+      do k = 1, ka
+         va = data(ke)
+         data(ke) = data(ks)
+         data(ks) = va
+         ke = ke - 1
+         ks = ks + 1
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_trans"> TBSH_TRANS  </a>-- Load output with sorted input
+C
+C  alan penny                 ral                1991 July
+
+      subroutine tbsh_trans ( tb, tbn, tba, tbna, num )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      tb(TBXM,TBYM)	!i: Data table
+      real      tbn(5,TBYM)	!i: Name table
+      real      tba(TBXM,TBY)	!i: Working Data table
+      real      tbna(5,TBY)	!i: Working Name table
+      real      num(TBY)	!i: Position in input table of a row in output table
+C--
+      integer j, k, ka
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, TBY
+         ka = nint(num(k))
+         do j = 1, TBXM
+            tba(j,k) = tb(j,ka)
+         enddo
+         do j = 1, 5
+            tbna(j,k) = tbn(j,ka)
+         enddo
+      enddo
+
+      call amovr ( tba, tb, TBXM*TBY )
+      call amovr ( tbna, tbn, 5*TBY )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_renum"> TBSH_RENUM  </a>-- Renumber names
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_renum ( tbn, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real       tbn(5,TBYM)		!i/o: Name table
+      integer    kcy(TBYM)		!i: Row checks
+C--
+      integer k, ka
+      character*20 id
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ka = 0
+      do k = 1, TBY
+         if ( kcy(k).eq.1 ) then
+            ka = ka + 1
+            write ( id, '(i20)' ) ka
+            id(1:1) = '#'
+            call lbgone(id(2:))
+            call tbsh_chput ( id, tbn(1,k) )
+         endif
+      enddo
+
+      call tbsh_nload ( tbn, kcy )
+
+      RESTORE = .false.
+      CHANGED = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_move"> TBSH_MOVE  </a>-- Move table location on screen
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_move ( kopt, koptst )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   kopt		!i: Move option (values=koptst-1 to koptst+7)
+      integer   koptst		!i: 1st move option
+C--
+      integer kxo, kyo, klim, kdo
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kxo = KXSTART
+      kyo = KYSTART
+      kdo = kopt - koptst
+
+      if ( kdo.eq.1 ) then
+         klim = max(TBXR,TBYR)
+         call get2i ( 'POSITION', KXSTART, KYSTART, .true., 1, klim )
+         if ( ST_FAILED ) return
+         call tbsh_wmess ( 4, 0 )
+      elseif ( kdo.eq.2 ) then
+         KXSTART = KXSTART - 1
+      elseif ( kdo.eq.3 ) then
+         KXSTART = KXSTART + 1
+      elseif ( kdo.eq.4 ) then
+         KYSTART = KYSTART - 1
+      elseif ( kdo.eq.5 ) then
+         KYSTART = KYSTART + 1
+      elseif ( kdo.eq.6 ) then
+         KXSTART = KXSTART - NUMX
+      elseif ( kdo.eq.7 ) then
+         KXSTART = KXSTART + NUMX
+      elseif ( kdo.eq.8 ) then
+         KYSTART = KYSTART - NUMY
+      elseif ( kdo.eq.9 ) then
+         KYSTART = KYSTART + NUMY
+      endif
+
+      KXSTART = max(1,min(KXSTART,TBXR))
+      KYSTART = max(1,min(KYSTART,TBYR))
+
+      if ( kxo.ne.KXSTART ) call tbsh_hload ( %val(IPH), %val(IPX) )
+      if ( kyo.ne.KYSTART ) call tbsh_nload ( %val(IPN), %val(IPY)  )
+      if ( kxo.ne.KXSTART .or. kyo.ne.KYSTART  ) call tbsh_dload (
+     +                                %val(IPD), %val(IPX), %val(IPY) )
+
+      CHANGED = .true.
+      RESTORE = .false.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_del"> TBSH_DEL  </a>-- Delete row(s)/col(s) from table
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_del ( kopt, kcx, kcy, koptst )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   kopt		!i: Option (23=col;24=cols;
+				!   25=row;26=rows)
+      integer   kcx(TBXM)	!i/o: Column use flags
+      integer   kcy(TBYM)	!i/o: Row use flags
+      integer   koptst		!i: Option offset
+C--
+      integer k, kk, ns, ne, nrow, ncol
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      kk = kopt - koptst
+
+      if ( kk.le.2 ) then						!Do for columns
+
+         if ( kk.eq.1 ) then
+            call tbsh_getpos ( 1, ns, nrow )
+            if ( ns.eq.-1 ) return
+            ne = ns
+         else
+            ns = 1
+            ne = TBXR
+            call tbsh_wmess ( 3, 0 )
+            call get2i ( 'NUMCOLS', ns, ne, .true., 0, TBXR )
+            if ( ST_FAILED ) return
+            call tbsh_wmess ( 4, 0 )
+            if ( ns.eq.0 .or. ne.eq.0 ) return
+            call cswopi ( ns, ne )
+            call tbsh_convert ( ns, 1, kcx, kcy )
+            call tbsh_convert ( ne, 1, kcx, kcy )
+         endif
+         call tbsh_wmess ( 4, 0 )
+
+         call amovki ( kcx, %val(IPXA), TBX )
+         do k = ns, ne
+            if ( kcx(k).eq.1 ) then
+               kcx(k) = 0
+               TBXR = TBXR - 1
+            endif
+         enddo
+         call tbsh_hload ( %val(IPH), kcx )				!Load screen
+         call tbsh_dload ( %val(IPD), kcx, kcy )
+      endif
+
+      if ( kk.gt.2 ) then						!Do for rows
+
+         if ( kk.eq.3 ) then
+            call tbsh_getpos ( 2, ncol, ns )
+            if ( ns.eq.-1 ) return
+            ne = ns
+         else
+            ns = 1
+            ne = TBYR
+            call tbsh_wmess ( 3, 0 )
+            call get2i ( 'NUMROWS', ns, ne, .true., 0, TBYR )
+            if ( ST_FAILED ) return
+            if ( ns.eq.0 .or. ne.eq.0 ) return
+            call cswopi ( ns, ne )
+            call tbsh_convert ( ns, 2, kcx, kcy )
+            call tbsh_convert ( ne, 2, kcx, kcy )
+         endif
+         call tbsh_wmess ( 4, 0 )
+
+         call amovki ( kcy, %val(IPYA), TBY )
+         do k = ns, ne
+            if ( kcy(k).eq.1 ) then
+               kcy(k) = 0
+               TBYR = TBYR - 1
+            endif
+         enddo
+         call tbsh_nload ( %val(IPN), kcy )				!Load screen
+         call tbsh_dload ( %val(IPD), kcx, kcy )
+      endif
+
+      CHANGED = .true.
+      RESTORE = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_add"> TBSH_ADD  </a>-- Add row(s)/col(s) to table
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_add ( kopt, koptst )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   kopt		!i: Add option
+      integer   koptst		!i: Offset to these options
+C--
+      logical addr, addc
+      integer k, nrow, ncol
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = kopt - koptst
+      addr = .false.
+      addc = .false.
+
+      if ( k.eq.2 .or. k.eq.4 ) addr = .true.
+      if ( k.eq.1 .or. k.eq.3 ) addc = .true.
+
+      if ( addr .and. TBY.eq.TBYM ) then
+         call printo ( 'Cannot add more rows, too big' )
+         call tbsh_wmess ( 4, 0 )
+         return
+      endif
+
+      if ( addc .and. TBX.eq.TBXM ) then
+         call printo ( 'Cannot add more columns, too big' )
+         call tbsh_wmess ( 4, 0 )
+         return
+      endif
+
+
+      if ( addr ) then
+         call tbsh_getpos ( 2, ncol, nrow )
+         if ( nrow.eq.-1 ) return
+         call tbsh_wmess ( 3, 0 )
+         call tbsh_addr ( k, nrow, %val(IPD), %val(IPN),
+     +                    %val(IPX), %val(IPY) )
+      endif
+
+      if ( addc ) then
+         call tbsh_getpos ( 1, ncol, nrow )
+         if ( ncol.eq.-1 ) return
+         call tbsh_wmess ( 3, 0 )
+         call tbsh_addc ( k, ncol, %val(IPD), %val(IPH),
+     +                    %val(IPX), %val(IPY) )
+      endif
+
+      call TBSH_wmess ( 4, 0 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_addr"> TBSH_ADDR  </a>-- Add row(s) to a table - part 2
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_addr ( kopt, nrow, tb, tbn, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   kopt			!i: Add(2)/Insert(4) flag
+      integer   nrow			!i: Row to place new data at
+      real      tb(TBXM,TBYM)		!i/o: Data table
+      real      tbn(5,TBYM)		!i/o: Name table
+      integer   kcx(TBXM)		!i/o: Column checks
+      integer   kcy(TBYM)		!i/o: Row checks
+C--
+      integer j, k, ierr, ja, jj, kk, klim
+      logical more
+      character name*20
+      real data(20)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      k = nrow								!Row location
+      if ( kopt.eq.4 ) k = k - 1
+
+      call printo ( ' ' )
+      call printo ( '    Up to 20 numbers can be specified')
+      call printo ( '    The rest will be set to 0.0' )
+      call printo ( '    If values for all the columns in the table')
+      call printo ( '      are entered, the name may be as well')
+      call printo ( '    Just input -return- for no entry' )
+      call printo ( ' ' )
+      more = .true.							!Insert lines, end with blank
+      do while ( more )
+         k = k + 1
+         klim = min(20,TBXR)
+         call tbsh_getline ( name, data, klim, k, ierr )
+         if ( ierr.eq.0 ) then
+            TBY = TBY + 1
+            TBYR = TBYR + 1
+            do kk = TBY, k+1, -1
+               if ( kk.ne.0 ) then
+                  do jj = 1, TBX
+                     tb(jj,kk) = tb(jj,kk-1)
+                  enddo
+                  do jj = 1, 5
+                     tbn(jj,kk) = tbn(jj,kk-1)
+                  enddo
+                  kcy(kk) = kcy(kk-1)
+               endif
+            enddo
+            kcy(k) = 1
+            call tbsh_chput ( name, tbn(1,k) )
+            ja = 0
+            do j = 1, TBX
+               if ( kcx(j).eq.1 ) then
+                  ja = ja + 1
+                  if ( ja.gt.20 ) then
+                     tb(j,k) = 0.0
+                  else
+                     tb(j,k) = data(ja)
+                  endif
+               endif
+            enddo
+CX            KYSTART = KYSTART + 1
+            call tbsh_dload ( tb, kcx, kcy )
+            call tbsh_nload ( tbn, kcy )
+         else
+            more = .false.
+         endif
+
+         if ( TBY.eq.TBYM .and. more ) then
+            call printo ( 'Cannot add more rows, too big' )
+            more = .false.
+         endif
+
+      enddo
+
+      CHANGED = .true.
+      RESTORE = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_addc"> TBSH_ADDC  </a>-- Add col(s) to a table - part 2
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_addc ( kopt, ncol, tb, tbh, kcx, kcy )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      integer   kopt			!i: Add(1)/Insert(3) flag
+      integer   ncol			!i: Column to place new data at
+      real      tb(TBXM,TBYM)		!i/o: Data table
+      integer   tbh(5,TBXM)		!i/o: Header table
+      integer   kcx(TBXM)		!i/o: Column checks
+      integer   kcy(TBYM)		!i/o: Row checks
+C--
+      integer nncol, num, ierr, ktbxo, j, k, ka, kd, ke
+      real data(20)
+      character*20 text
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( TBX.eq.TBXM ) then
+         call printo (
+     +        'ERROR: Cannot add more columns, table is too big' )
+         return
+      endif
+
+      nncol = ncol							!Column location
+      if ( kopt.eq.3 ) nncol = nncol - 1
+
+      call printo ( ' ' )
+      call printo ( '    Up to 20 numbers can be specified')
+      call printo ( '    The number of numbers entered will be ' )
+      call printo ( '       the number of columns added' )
+      call printo ( ' ' )
+
+      call tbsh_getvals ( data, 20, num, ierr )
+
+      if ( ierr.ne.0 .or. num.eq.0 ) then
+         return
+      endif
+
+      if ( (TBX+num).gt.TBXM ) then
+         call pargi ( num )
+         call printd ( 'Cannot add %d columns, table is too big' )
+         num = TBXM - TBX
+         call pargi ( num )
+         call printd ( 'Will add first %d columns' )
+      endif
+
+      ktbxo = TBX
+      TBX = TBX + num
+      TBXR = TBXR + num
+
+      if ( nncol.lt.ktbxo ) then						!shift columns
+         kd = ktbxo - nncol
+         ke = nncol + 1
+         do k = ktbxo, ke, -1
+            ka = k + num
+            do j = 1, TBY
+               tb(ka,j) = tb(k,j)
+            enddo
+            do j = 1, 5
+               tbh(j,ka) = tbh(j,k)
+            enddo
+            kcx(ka) = kcx(k)
+         enddo
+         text = ' '
+         do k = 1, num
+            ka = nncol + k
+            do j = 1, TBY
+               tb(ka,j) = 0.0
+            enddo
+            kcx(ka) = 1
+            call tbsh_chput ( text, tbh(1,ka) )
+         enddo
+         call tbsh_hload ( %val(IPH), %val(IPX) )
+         call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )
+      endif
+
+      do k = 1, num							!Load numbers
+         ka = nncol + k
+         do j = 1, TBY
+            tb(ka,j) = data(k)
+         enddo
+         kcx(ka) = 1
+      enddo
+      call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )
+
+      do k = 1, num							!Load headers
+         ka = nncol + k
+         call pargi ( ka )
+         call printd ( 'Header for column %d ' )
+         call get1c ( 'HEADER', text, ' ', .true. )
+         if ( ST_FAILED ) return
+         call tbsh_chput ( text, tbh(1,ka) )
+         call tbsh_hload ( %val(IPH), %val(IPX) )
+      enddo
+
+      CHANGED = .true.
+      RESTORE = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_getline"> TBSH_GETLINE  </a>-- Input a line of data (with optional name at end)
+C
+C  alan penny                      ral              1991 July
+
+      subroutine tbsh_getline ( name, data, msize, ndef, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*20   name		!o: Name
+      integer        msize		!i: Max number of entries (excl name
+      real           data(msize)	!o: Data
+      integer        ndef		!i: Default number in name
+      integer        ierr		!o: Error flag (0=ok:1=end of data)
+C--
+      character*80  inbuf(21)
+      character*4 text
+      integer j, k, istat, numval
+      logical more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      if ( msize.gt.20 ) then
+         call printo ( 'ERROR: Line too big in s/r TBSH_GETLINE' )
+         call printo ( 'ERROR:   Consult program author' )
+         return
+      endif
+
+      more = .true.
+      k = 0
+      do while ( more .and. k.lt.3 )					!Try 3 times for correct data
+         k = k + 1
+         more = .false.
+
+         do j = 1, msize+1						!Get data
+            inbuf(j) = ' '
+         enddo
+         call getnc ( 'DATA', inbuf, msize+1, numval, .true. )
+         if ( ST_FAILED ) return
+         do j = 1, msize+1							!Remove leading blanks
+            call lbgone ( inbuf(j) )
+         enddo
+
+         istat = 0							!All blank entry?
+         if ( numval.gt.0 ) then
+            do j = 1, numval
+               if ( inbuf(j).ne.' ' ) istat = 1
+            enddo
+         endif
+         if ( istat.eq.0 ) then
+            ierr = 1
+         else
+            do j = 1, min(numval,msize)					!Load numbers
+               call chartor ( inbuf(j), data(j), istat )
+               if ( istat.ne.0 ) then
+                  write ( text, '(1x,i3)' ) j
+                  call printo ( ' ERROR: Number '//
+     +                          text//' is not a real number' )
+                  data(j) = 0.0
+                  more = .true.
+               endif
+            enddo
+            if ( numval.lt.msize ) then
+               do j = numval+1, msize
+                  data(j) = 0.0
+               enddo
+            endif
+
+            if ( numval.gt.msize ) then				!Load name or default
+               name = inbuf(msize+1)
+            else
+               name(1:1) = '#'
+               write ( name(2:), '(1x,i18)' ) ndef
+               call lbgone ( name(2:) )
+            endif
+
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_getvals"> TBSH_GETVALS  </a>-- Input a row of values
+C
+C  alan penny                      ral              1991 July
+
+      subroutine tbsh_getvals ( data, msize, num, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer        msize		!i: Max number of values
+      real           data(msize)	!o: Data
+      integer        num		!o: Number of values
+      integer        ierr		!o: Error flag (0=ok:1=end of data)
+C--
+      character*80  inbuf(20)
+      character*4 text
+      integer j, k, istat, numval
+      logical more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      num = 0
+
+      if ( msize.gt.20 ) then
+         call printo ( 'ERROR: Line too big in s/r TBSH_GETVALS' )
+         call printo ( 'ERROR:   Consult your system manager' )
+         return
+      endif
+
+      do j = 1, msize							!Get data
+         inbuf(j) = ' '
+      enddo
+      call getnc ( 'DATA', inbuf, msize, num, .true. )
+      if ( ST_FAILED ) return
+      if ( num.eq.0 ) return
+
+      do j = 1, num							!Remove leading blanks
+         call lbgone ( inbuf(j) )
+      enddo
+
+      istat = 0								!All blank entry?
+      do j = 1, num
+         if ( inbuf(j).ne.' ' ) istat = 1
+      enddo
+      if ( istat.eq.0 ) then
+         ierr = 1
+      else
+         do j = 1, num							!Load numbers
+            call chartor ( inbuf(j), data(j), istat )
+            if ( istat.ne.0 ) then
+               write ( text, '(1x,i3)' ) j
+               call printo ( ' ERROR: Number '//
+     +                          text//' is not a real number' )
+               data(j) = 0.0
+               more = .true.
+            endif
+         enddo
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_unddo"> TBSH_UNDDO  </a>-- Restore last change (if possible)
+C
+C   alan penny             RAL               1991 July
+
+      subroutine tbsh_undo ( )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( .not.RESTORE ) then						!Chack if can do
+         call printo ( 'Cannot restore last change - '//
+     +                  'table changed in complex way' )
+         return
+      endif
+
+      call amovki ( %val(IPXA), %val(IPX), TBXM )			!Restore last setup
+      call amovki ( %val(IPYA), %val(IPY),  TBYM )
+
+      call tbsh_dload ( %val(IPD), %val(IPX), %val(IPY) )		!Load screen
+      call tbsh_nload ( %val(IPN), %val(IPY) )
+      call tbsh_hload ( %val(IPH), %val(IPX) )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_value"> TBSH_VALUE  </a>-- Paint value up
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_value ( x, y, val, len, kc )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real      x		!i: X posn
+      real      y		!i: Y posn
+      real      val		!i: Value to paint up
+      integer   len		!i: No of characters to put up
+      integer   kc		!i: Colour code
+C--
+      integer j, ja, k, kl, lens, jb, iv
+      real xa(5), ya(5), dval, rval
+      logical more
+      character text*70, atc*12
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      xa(1) = x - 0.1*CHXSIZE						!Write background
+      ya(1) = y - 0.2*CHYSIZE
+      xa(2) = xa(1)
+      ya(2) = ya(1) + 0.9*CHYSIZE
+      xa(3) = xa(1) + real(len)*CHXSIZE
+      ya(3) = ya(2)
+      xa(4) = xa(3)
+      ya(4) = ya(1)
+      xa(5) = xa(1)
+      ya(5) = ya(1)
+      call pgsci ( 0 )
+      call pgpoly ( 5, xa, ya )
+
+      rval = val
+
+      if ( rval.eq.0.0 ) then
+         text = '0.0'
+      elseif ( abs(rval).gt.1.0e10 .or. abs(rval).lt.1.0e-3 ) then
+         write ( text, '(g17.5)' ) rval
+      else
+         write ( text, '(f20.7)' ) rval
+         j = 15 + max(0.0,alog10(1000000.0/abs(rval)))
+         if ( rval.lt.10.0 ) j = j - 1
+         if ( j.lt.20 ) text(j:) = ' '
+      endif
+
+      call lbgone ( text )
+      kl = min(len,lens(text))
+      atc = text(1:kl)
+
+      jb = kl
+      ja = index ( atc(1:kl), 'E' )
+      if ( ja.ne.0 ) jb = ja - 1
+
+      if ( atc(jb-2:jb).eq.'999' .and. ja.eq.0 ) then			!Deal with (e.g.) 5.59999
+         iv = index(atc(1:jb),'.')
+         if ( iv.ne.0 .and. atc(iv+1:iv+1).ne.'9' ) then
+            dval = 0.5*sign(1.0,rval)*10.0**(iv-jb)
+            rval = rval + dval
+            write ( text, '(f20.7)' ) rval
+            j = 15 + max(0.0,alog10(1000000.0/abs(rval)))
+            if ( rval.lt.10.0 ) j = j - 1
+            if ( j.lt.20 ) text(j:) = ' '
+            call lbgone ( text )
+            kl = min(len,lens(text))
+            atc = text(1:kl)
+            jb = kl
+            ja = index ( atc(1:kl), 'E' )
+            if ( ja.ne.0 ) jb = ja - 1
+         endif
+      endif
+
+      j = jb								!Remove trailing '0's
+      more = .true.	
+      do while ( more )
+         if ( atc(j:j).eq.'0' .and. atc((j-1):(j-1)).ne.'.' ) then
+            atc(j:j) = ' '
+            j = j - 1
+            if ( ja.ne.0 ) then
+               do k = 1, 4
+                  atc(j+k:j+k) = atc(j+k+1:j+k+1)
+               enddo
+               atc(j+5:j+5) = ' '
+            endif
+         else
+            more = .false.
+         endif
+      enddo
+
+      call pgsci ( kc-1 )						!Write number
+      call pgtext ( x, y, atc )
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_text"> TBSH_TEXT  </a>-- Paint text up
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_text ( x, y, text, len, kc )
+
+      implicit none
+      include 'tbsheet.inc'
+      include 'STARMAN_INC'
+
+      real           x          !i: X posn
+      real           y          !i: Y posn
+      character*(*)  text	!i: Value to paint up
+      integer        len	!i: No of characters to put up
+      integer        kc		!i: Colour code
+C--
+      real xa(5), ya(5)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      xa(1) = x - 0.1*CHXSIZE
+      ya(1) = y - 0.3*CHYSIZE
+      xa(2) = xa(1)
+      ya(2) = ya(1) + CHYSIZE
+      xa(3) = xa(1) + real(len)*CHXSIZE
+      ya(3) = ya(2)
+      xa(4) = xa(3)
+      ya(4) = ya(1)
+      xa(5) = xa(1)
+      ya(5) = ya(1)
+      call pgsci ( 0 )
+      call pgpoly ( 5, xa, ya )
+
+      call pgsci ( kc-1 )
+      call pgtext ( x, y, text(1:len) )
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_namclear"> TBSH_NAMCLEAR  </a>-- Clear a character array
+C
+C a j penny             stsci                  1987-03-22
+
+      subroutine tbsh_namclear ( tb, n )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer	n		!i: No of characters in array
+      integer	tb(n/4)		!o: The array
+C--
+      integer k
+      byte asc(4)
+      integer kt
+      equivalence ( kt, asc(1) )
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      asc(1) = ichar(' ')
+      asc(2) = ichar(' ')
+      asc(3) = ichar(' ')
+      asc(4) = ichar(' ')
+      do k = 1, n/4
+         tb(k) = kt
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_line"> TBSH_LINE  </a>-- Plot a line
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_line ( xs, ys, xe, ye, kc )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      real    xs		!i: X start
+      real    ys		!i: Y start
+      real    xe		!i: X end
+      real    ye		!i: Y end
+      integer kc		!i: Colour code
+C--
+      real x(2), y(2)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      x(1) = xs
+      x(2) = xe
+      y(1) = ys
+      y(2) = ye
+      call pgsci ( kc-1 )
+      call pgline ( 2, x, y )
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_box"> TBSH_BOX  </a>-- Plot a box
+C
+C    alan penny                ral              1991 July
+
+      subroutine tbsh_box ( xs, ys, xe, ye, kc )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      real    xs		!i: X start
+      real    ys		!i: Y start
+      real    xe		!i: X end
+      real    ye		!i: Y end
+      integer kc		!i: Colour code
+C--
+      real x(5), y(5)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      x(1) = xs
+      x(2) = xs
+      x(3) = xe
+      x(4) = xe
+      x(5) = xs
+      y(1) = ys
+      y(2) = ye
+      y(3) = ye
+      y(4) = ys
+      y(5) = ys
+      call pgsci ( kc-1 )
+      call pgline ( 5, x, y )
+
+      call gd_updt
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_chget"> TBSH_CHGET  </a>-- Get a 20 character string from 5 integers
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_chget ( kin, text )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer        kin(5)	!i: Input
+      character*20   text	!o: Output
+C--
+      integer j, k, kt
+      byte kb(4)
+      equivalence ( kt, kb(1) )
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, 5
+         kt = kin(k)
+         j = 1 + (k-1)*4
+         text(j:j) = char(kb(1))
+         text(j+1:j+1) = char(kb(2))
+         text(j+2:j+2) = char(kb(3))
+         text(j+3:j+3) = char(kb(4))
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsh_chput"> TBSH_CHPUT  </a>-- Get 5 integers from a 20 character string
+C
+C    alan penny           ral                       1991 July
+
+      subroutine tbsh_chput ( text, kout )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*20   text	!i: Input
+      integer        kout(5)	!0: Output
+C--
+      integer j, k, kt
+      byte kb(4)
+      equivalence ( kb(1), kt )
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, 5
+         j = 1 + (k-1)*4
+         kb(1) = ichar(text(j:j))
+         kb(2) = ichar(text(j+1:j+1))
+         kb(3) = ichar(text(j+2:j+2))
+         kb(4) = ichar(text(j+3:j+3))
+         kout(k) = kt
+      enddo
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbsheet"> TBSHEET  </a>-- Spread sheet operation on a table
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine tbsheet ( ierradam )
+
+      implicit none
+
+      integer     ierradam             !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbsheet
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBSHEET.INC for TBSHEET.F
+C
+
+      integer    ncwords	!Number of command words
+      parameter ( ncwords=35 )
+
+      integer    tbxm		!Max X size of work table
+      integer    tbym		!Max Y size of work table
+      integer    tbx		!X size of current section of work table (inc holes)
+      integer    tby		!Y size of current section of work table (inc holes)
+      integer    tbxr		!X size of current section of work table (no holes)
+      integer    tbyr		!Y size of current section of work table (no holes)
+
+      integer    ipd		!Pointer to data    array
+      integer    iph		!Pointer to headers array
+      integer    ipn		!Pointer to names   array
+      integer    ipx		!Pointer to X use   array (0=no;1=yes)
+      integer    ipy		!Pointer to Y use   array (0=no;1=yes)
+      integer    ipxa		!Pointer to X use back array
+      integer    ipya		!Pointer to Y use back array
+
+      real       snx		!X screen size
+      real       sny		!Y screen size
+      integer    numx		!Number of columns
+      integer    numy		!Number of rows
+      integer    nxcw		!X size of command word array
+      integer    nycw		!Y size of command word array
+      real       xbox		!Width of columns
+      real       ybox		!Height of rows
+      real       curx		!X position of cursor
+      real       cury		!Y position of cursor
+      real       x_old		!Last X position of cursor
+      real       y_old		!Last Y position of cursor
+      integer    kxstart	!No ('real') of column at left of screen
+      integer    kystart	!No ('real') of row at top of screen
+      real       chysize	!Character height size
+      real       chxsize	!Character width size
+      integer    chnames	!No of characters in names
+      real       xdoff		!Screen X start of sheet data
+      integer    kncol		!No of column found for 'change'
+      integer    knrow		!No of row found for 'change'
+
+      integer    kcol(10)	!Writing colours
+
+      character*50 title	!Table title
+
+      logical    changed        !Has the sheet been changed since last
+				! store?
+      logical    restore	!Can the last delete be restored?
+      logical    gotin          !Opened an input file?
+      logical    useda          !made temporay version of present table
+
+CX      logical    tbs_dum1	!4*n logicals for common
+
+
+      common / sheeta /   tbx,      tby,   tbxm,     tbym,     nycw,
+     +                    snx,      sny,   numx,     numy,     xbox,
+     +                   ybox,     curx,   cury,  chxsize,  kxstart,
+     +                kystart,  chnames,  xdoff,  chysize,     nxcw,
+     +                    ipd,      iph,    ipn,      ipx,      ipy,
+     +                   ipxa,     ipya,   tbxr,     tbyr,     kcol,
+     +                  kncol,    knrow,  x_old,    y_old
+
+
+      common / sheetb / changed,  restore, gotin, useda
+
+      common / sheetc / title
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C (those bits for the calculator)
+
+
+      character*130 exprs		!Input Equations
+      character*6   opcode(70)		!(i)th operation in stack of equation
+      character*2   tbid(70)		!Identifiers of input tables
+      character*1   varid(70)		!Identifiers of input variables
+      character*2   tbtot(26)		!List of all unique table names
+      character*1   vartot(26)		!List of all unique variable names
+
+      integer       ipca(26)		!Pointer to input tables
+      integer       tbvx(26)		!X size (inc 5 for names) of input tables
+      integer       tbya		!Y size of input tbales
+      integer       tbxma		!Max X size of input tables
+      integer       tbz			!Number of different input tables
+      integer       imp(70)		!Number of Table to use for (i)th op in stack of equation
+      integer       impc(70)		!Number of Column to use for (i)th op in stack of equation
+      integer       impv(70)		!Number of Variable to use for (i)th op in stack of equation
+      integer       ntb			!Number of input tables mentioned in eqn
+      integer       nvar		!Number of input variables mentioned in eqn
+      integer       ncon		!Number of constants mentioned in eqn
+      integer       nopcode		!Number of operations in stack
+      integer       nvartot		!Total number of input variables
+      integer       kseed		!Random number generator seed
+
+      real          var(26)		!Input variables
+      real          con(70)		!Constant to use for (i)th op in stack of equation
+
+
+
+      common / tbscalca /  nvartot,   tbvx,   tbya,     tbz,   imp,
+     +                     nopcode,    con,   tbxma,   ncon,  impv,
+     +                         ntb,   nvar,   impc,     var,  ipca,
+     +                       kseed
+
+      common / tbscalcc / exprs,  opcode,  tbid,  varid,  tbtot,
+     +                    vartot
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

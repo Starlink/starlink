@@ -1,0 +1,8 @@
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBDES.INC for TBDES.F
+
+
+      character*80 texta(16384)
+
+      common / tbdesc / texta
+

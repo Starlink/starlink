@@ -1,0 +1,10 @@
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  IMDES.INC
+
+
+
+      character*80 texta(16384)
+
+
+      common / desc / texta
+

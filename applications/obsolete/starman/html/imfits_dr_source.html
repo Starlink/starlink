@@ -1,0 +1,1605 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMFITS_DR
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMFITS_DR
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imfits_dr_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imfits_dr">
+imfits_dr  </a>  (Program) Convert a simple FITS image to a Starman NDF       <br>
+<a href="#imfi_gcl">
+imfi_gcl  </a>  Get command line information       <br>
+<a href="#imfi_getfits">
+imfi_getfits  </a>  Reads a disk FITS file and returns header information.       <br>
+<a href="#imfi_puth">
+imfi_puth  </a>  Store header in NDF       <br>
+<a href="#imfi_putss">
+imfi_putss  </a>  Move image data values from input file to output       <br>
+<a href="#imfi_putsr">
+imfi_putsr  </a>  Move image data values from input file to output       <br>
+<a href="#imfi_putir">
+imfi_putir  </a>  Move image data values from input file to output       <br>
+<a href="#imfi_putis">
+imfi_putis  </a>  Move image data values from input file to output       <br>
+<a href="#imfi_putrr">
+imfi_putrr  </a>  Move image data values from input file to output       <br>
+<a href="#imfi_putrs">
+imfi_putrs  </a>  Move image data values from input file to output       <br>
+<a href="#imfi_fitshead">
+imfi_fitshead  </a>  Reads information from FITS header.       <br>
+<a href="#imfi_check">
+imfi_check  </a>  Check FITS Header start is OK       <br>
+<a href="#imfi_numgetir">
+imfi_numgetir  </a>  Gets real data from 32-bit integer FITS block       <br>
+<a href="#imfi_numgetis">
+imfi_numgetis  </a>  Gets int*2 data from 32-bit integer FITS block       <br>
+<a href="#imfi_numgetrr">
+imfi_numgetrr  </a>  Get real data from 32-bit real FITS block       <br>
+<a href="#imfi_numgetrs">
+imfi_numgetrs  </a>  Get int*2 data from 32-bit real FITS block       <br>
+<a href="#imfi_numgetss">
+imfi_numgetss  </a>  Gets short data from 16-bit integer FITS block       <br>
+<a href="#imfi_numgetsr">
+imfi_numgetsr  </a>  Gets real data from 16-bit integer FITS block       <br>
+<a href="#imfi_bswop">
+imfi_bswop  </a>  Swop bytes in character array       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfits_dr"> IMFITS_DR  </a>-- (Program) Convert a simple FITS image to a Starman NDF
+C
+C         A.J.Penny                RAL                  1991 May
+
+      subroutine imfits_dr ( ierradam )
+
+      implicit none
+
+      integer      ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imfits_dr
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_IMFITS_DR.F   Convert a simple FITS disk image into an NDF image
+C
+C Contains:-
+C
+C T_IMFITS_DR           Convert Fits disk file into an NDF File
+C IMFI_GETFITS          Read a disk FITS file header
+C IMFI_FITSHEAD         Read information from FITS header.
+C IMFI_PUTH             Store header in output array
+C IMFI_PUT(IRS)(RS)     Move image data values from input file to output
+C IMFI_NUMGET(IRS)(RS)  Gets data from FITS block into array
+C IMFI_BSWOP            Swop bytes in character array
+C IMFI_CHECK            Check FITS Header start is OK
+C
+C Alan Penny                       RAL               1994 Feb
+
+      subroutine t_imfits_dr ( )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+C--
+      character*57600 header			!Fits header
+      integer nbl				!Number of Fits blocks in header
+      character*6     intype			!Input type ('REAL','INT', 'SHORT',)
+      character*6     outtype			!Output type ('REAL','INT', 'SHORT',)
+      integer ierr, ipout
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call imfi_gcl ( header, nbl, intype, outtype, ipout )		!Get command line input
+
+      call imfi_puth ( header, intype, outtype )			!Get INVAL and put out headers
+
+      if     ( intype.eq.'SHORT' .and. outtype.eq.'REAL'  ) then	!Read in image
+         call imfi_putsr ( %val(ipout),  nbl, ierr )
+      elseif ( intype.eq.'INT'   .and. outtype.eq.'REAL'  ) then
+         call imfi_putir ( %val(ipout), nbl, ierr )
+      elseif ( intype.eq.'REAL'  .and. outtype.eq.'REAL'  ) then
+         call imfi_putrr ( %val(ipout), nbl, ierr )
+      elseif ( intype.eq.'SHORT' .and. outtype.eq.'SHORT' ) then
+         call imfi_putss ( %val(ipout), nbl, ierr )
+      elseif ( intype.eq.'INT'   .and. outtype.eq.'SHORT' ) then
+         call imfi_putis ( %val(ipout), nbl, ierr )
+      else
+         call imfi_putrs ( %val(ipout), nbl, ierr )
+      endif
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+
+      close ( 1 )
+      call canpar ( 'OUT' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_gcl"> IMFI_GCL  </a>-- Get command line information
+C
+C   alan penny                    ral            1994 Nov
+
+      subroutine imfi_gcl ( header, nbl, intype, outtype, ipout )
+
+      implicit none
+
+      include 'imfits_dr.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      character*57600 header	!o: Fits header
+      integer         nbl	!o: Number of Fits blocks in header
+      character*6     intype	!o: Input type ('REAL','INT', 'SHORT',)
+      character*6     outtype	!o: Output type ('REAL','INT', 'SHORT',)
+      integer         ipout
+C--
+      character infile*30, htext*8, line*240
+      integer ierr, ka, kopt
+
+      integer nth
+      parameter ( nth=5 )
+      character*68 th(nth)
+      data th /
+     + 'Are the output data ? :- ',
+     + 'Option   Choice',
+     + '------   --------',
+     + 'Real     Real 32-bit numbers',
+     + 'Short    Signed 16-bit integer (0 to 65636)'/
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1c ( 'IN', infile, ' ', .true. ) 				!Get file
+      if ( ST_FAILED ) return
+      if ( infile(1:1).eq.' ' ) return
+
+      call get1c ( 'OBJECT', htext, M_N_OBJECT, .true. )
+      call uppcase ( htext, N_OBJECT )
+      call get1b ( 'DO_INFO', DO_INFO, .false. )
+      if ( DO_INFO ) then
+         call get1c ( 'FILTER', htext, M_N_FILTER, .true. )
+         call uppcase ( htext, N_FILTER )
+         call get1c ( 'RA', htext, M_N_RA, .true. )
+         call uppcase ( htext, N_RA )
+         call get1c ( 'DEC', htext, M_N_DEC, .true. )
+         call uppcase ( htext, N_DEC )
+         call get1c ( 'EXPOSURE', htext, M_N_EXP, .true. )
+         call uppcase ( htext, N_EXP )
+         call get1c ( 'TIME', htext, M_N_TIME, .true. )
+         call uppcase ( htext, N_TIME )
+         call get1c ( 'DATE', htext, M_N_DATE, .true. )
+         call uppcase ( htext, N_DATE )
+      else
+         N_FILTER = M_N_FILTER
+         N_RA     = M_N_RA
+         N_DEC    = M_N_DEC
+         N_EXP    = M_N_EXP
+         N_TIME   = M_N_TIME
+         N_DATE   = M_N_DATE
+      endif
+
+      call imfi_getfits ( infile, header, nbl, intype, line, ierr )	!Read in header
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( NX.lt.1 .or. NY.lt.1 ) then
+         call printo ( 'ERROR: Both dimensions must be at least 1' )
+         ST_FAILED = .true.
+      endif
+      if ( ST_FAILED ) return
+
+      ka = 2
+      if ( intype.eq.'INT' .or. intype.eq.'REAL' ) ka = 1
+      call get_job ('OUTTYPE', 'real:short', kopt, ka, th, nth )	!Get type of output $
+      outtype = 'REAL'
+      if ( kopt.eq.1 ) outtype = 'REAL'
+      if ( kopt.eq.2 ) outtype = 'SHORT'
+
+      call opimgw ( 'OUT', outtype, ipout, NX, NY, .false., ierr )
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+
+      call printo ( ' ' )
+      if ( DO_INFO ) then
+         call printo ( line(1:80) )
+         call printo ( line(81:160) )
+      endif
+      call printo ( line(161:240) )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_getfits"> IMFI_GETFITS  </a>-- Reads a disk FITS file and returns header information.
+C
+C   alan penny                    ral            1994 Nov
+
+      subroutine imfi_getfits ( infile, header, nbl, intype, line,
+     +                          ierr )
+
+      implicit none
+
+      include 'imfits_dr.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      character*(*) infile	!i: File name
+      character*(*) header	!i: Header contents
+      integer       nbl		!o: No of blocks in header
+      character*6   intype	!o: 32-bit real/32-bit int/16-bit int/?
+				!    ('REAL', 'INT', 'SHORT',)
+      character*240 line	!o: Information lines
+      integer       ierr	!o: Error flag (0=ok; 1=bad)
+C--
+      character block*57600, tblock*2880, aline*80
+      integer k, kl, ja, nc, irec, ios, idot
+      logical endfound
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      irec = 2880/4
+      open ( unit=1, file=infile, access='direct', status='old',
+     +       recl=irec, form='unformatted', iostat=ios)
+
+      ierr = 0
+      if ( ios.ne.0 ) then
+         ierr = 1
+         call printo ( 'ERROR: Error in opening file' )
+         return
+      endif
+
+      nbl = 0								!Read header block(s)
+      endfound = .false.
+      do while ( .not.endfound .and. nbl.lt.20 )	
+
+         nbl = nbl + 1
+         read ( 1, rec=nbl, err=998 ) tblock(1:2880)
+
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nbl )
+            call printd (
+     +  ' WARNING: Error encountered in header block number: %d' )
+            call printo (
+     +      '          Setting contents of that block to null' )
+            call printo ( ' ' )
+            tblock = ' '
+  995    continue
+
+         ja = 1 + (nbl-1)*2880
+         block(ja:ja+2880-1) = tblock(1:2880)
+         do k = 1, 36
+            ja = 1 + (k-1)*80
+            if ( tblock(ja:ja+2).eq.'END' ) endfound = .true.
+         enddo
+
+      enddo
+
+      if ( .not.endfound .and. nbl.eq.20 ) then
+         ierr = 1
+         call printo ( 'ERROR: Can only deal with 20 header blocks' )
+         close ( 1 )
+         return
+      elseif ( .not.endfound ) then
+         ierr = 1
+         call printo ( 'ERROR: END line not found in header blocks' )
+         close ( 1 )
+         return
+      endif
+
+      call imfi_fitshead ( block, nbl, aline, intype, ierr )		!Decode header
+      if ( ierr.eq.1 ) then
+         close ( 1 )
+         return
+      endif
+
+      kl = 10
+      idot = index(infile(1:kl),'.')
+      if ( idot.ne.0 ) kl = idot - 1
+
+      if ( DO_INFO ) then
+         line(1:80) = ' File     Object      Filt     RA      '//
+     +       ' Dec       Date      Time    Exposure'
+         line(81:160) = aline(1:80)
+         line(81:80+kl) = infile(1:kl)
+      endif
+
+      write ( line(161:240),
+     +   '('' Dimension: '',i6,'' x'',i6,''  : Number of blocks'',
+     +    '' in header '',i2)' ) NX, NY, nbl
+
+      nc = nbl*2880
+      header(1:nc) = block(1:nc)
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_puth"> IMFI_PUTH  </a>-- Store header in NDF
+C
+C         A J Penny                RAL                     1994 Feb
+
+      subroutine imfi_puth ( header, intype, outtype )
+
+      implicit none
+
+      include 'imfits_dr.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+      include 'ST_IMAGE_INC'
+
+      character*57600  header		!i: Contents of headers (20 x 28880 byte blocks)
+      character*6      intype		!i: 'real' 'int' or 'short' for input image type
+      character*6      outtype		!i: 'real' or 'short' for output image type
+C--
+      integer   ka, kb, ja, jb, kk, kf, kl, k, ierr, i_inval
+      character ahead*80, bhead*80, name*8
+      real      rv
+      logical   more, g_bscale, g_bzero, g_inval, g_title, ison, found
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      g_title = .false.
+      more = .true.
+      k = 5
+      do while ( more )
+         k = k + 1
+
+         ka = 1 + (k-1)*80
+         kb = ka + 79
+         ahead = header(ka:kb)
+         name = ahead(1:8)
+
+         ison = .true.
+         found = .false.
+         kf = 80
+         do kk = 10, 80
+            if ( ahead(kk:kk).eq.char(39) ) ison = .not.ison
+            if ( .not.found .and. ison ) then
+               if ( ahead(kk:kk).eq.'/' ) then
+                  found = .true.
+                  kf = kk
+               endif
+            endif
+         enddo
+         bhead = ahead(10:kf-1)
+
+         call endstrip ( bhead, ja, jb )
+
+         if ( name.eq.'END') more = .false.
+         if ( name.eq.'TITLE' ) g_title = .true.
+
+      enddo
+
+      g_bscale = .false.
+      g_bzero  = .false.
+      g_inval  = .false.
+
+      more = .true.
+      k = 5
+      do while ( more )
+         k = k + 1
+
+         ka = 1 + (k-1)*80
+         kb = ka + 79
+         ahead = header(ka:kb)
+         name = ahead(1:8)
+
+         ison = .true.
+         found = .false.
+         kf = 80
+         do kk = 10, 80
+            if ( ahead(kk:kk).eq.char(39) ) ison = .not.ison
+            if ( .not.found .and. ison ) then
+               if ( ahead(kk:kk).eq.'/' ) then
+                  found = .true.
+                  kf = kk
+               endif
+            endif
+         enddo
+         bhead = ahead (10:kf-1)
+         call endstrip ( bhead, ja, jb )
+
+         if ( name.ne.'END') call ptdesc ( 'OUT', name, bhead(ja:jb) )
+
+         if ( name.eq.N_OBJECT ) then
+            if ( .not.g_title ) then
+               do kk = ja, jb
+                  if ( bhead(kk:kk).eq.char(39) ) bhead(kk:kk) = ' '
+               enddo
+               call lbgone ( bhead )
+               call charln ( bhead, kl )
+               call ptdesc ( 'OUT', 'TITLE', bhead(1:kl) )
+            endif
+         elseif ( name.eq.'BSCALE' ) then
+            g_bscale = .true.
+            call chartor ( bhead(ja:jb), BS, ierr )
+            if ( ierr.ne.0 ) call printo (
+     +         '  WARNING: BSCALE descriptor not a proper number' )
+         elseif ( name.eq.'BZERO' )  then
+            g_bzero  = .true.
+            call chartor ( bhead(ja:jb), BZ, ierr )
+            if ( ierr.ne.0 ) call printo (
+     +         '  WARNING: BZERO descriptor not a proper number' )
+         elseif ( name.eq.'INVAL' )  then
+            g_inval  = .true.
+            call chartor ( bhead(ja:jb), rv, ierr )
+            if ( ierr.ne.0 ) call printo (
+     +         '  WARNING: INVAL descriptor not a proper number' )
+            if ( outtype.eq.'REAL' ) then
+               RINVAL = rv
+            else
+               i_inval = nint(rv)
+               INVAL = max(-32768,min(32767,nint(rv)))
+            endif
+         endif
+
+         if ( name.eq.'END') more = .false.
+
+      enddo
+
+      if ( .not.g_inval ) then
+         if ( outtype.eq.'REAL' ) then
+            RINVAL = INT_INVALR
+         else
+            INVAL = INT_INVALSI
+         endif
+      endif
+      if ( .not.g_bzero ) BZ = 0.0
+      if ( .not.g_bscale ) BS = 1.0
+
+      call pargc ( intype )
+      call pargr ( BS )
+      call pargr ( BZ )
+      if ( g_inval ) then
+         if ( intype.eq.'REAL' ) then
+            call pargr ( RINVAL )
+            call printd (
+     +' Type %c : Bscale %f : Bzero %f : Inval flag %f' )
+         else
+            call pargi ( i_inval )
+            call printd (
+     +'   Type  %c  :   Bscale  %f  :  Bzero  %f  :  Inval flag  %d' )
+         endif
+      else
+         call printd ( ' Type %c : Bscale %f : Bzero %f ' )
+      endif
+
+      call ptdesr ( 'OUT', 'BZERO',  BZ )
+      call ptdesr ( 'OUT', 'BSCALE', BS )
+      if ( outtype.eq.'REAL' ) then
+         call ptdesr ( 'OUT', 'INVAL', RINVAL )
+      else
+         call ptdesi ( 'OUT', 'INVAL', INVAL )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_putss"> IMFI_PUTSS  </a>-- Move image data values from input file to output
+C
+C   alan penny                    ral            1994 Nov
+
+
+      subroutine imfi_putss ( im, nbl, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+      include 'ST_IMAGE_INC'
+
+      integer*2    im(NX,NY)	!o: Output image
+      integer      nbl		!i: No of FITS blocks in header
+      integer      ierr		!o: Error flag (0=ok;1=bad)
+C--
+      character block*2880
+      integer kx, ky, kok, jx, jy, mb, mx, nb, np
+      logical bswop
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      call isbswop ( bswop )
+
+      kx = 1
+      ky = 1
+      mx = 2*NX*NY
+      nb = nbl
+
+      do while ( mx.gt.0 )
+
+         nb = nb + 1
+         mb = min(2880,mx)
+         read ( 1, rec=nb, err=998 ) block(1:mb)
+
+         kok = 0
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nb )
+            call printo ( '  WARNING: Error encountered in image body')
+            call printd ( '           block (2880 bytes) number = %d' )
+            call pargi ( kx )
+            call pargi ( ky )
+            call printd ( '           Data start at X = %d ; Y = %d ' )
+            kok = 1
+            block = ' '
+  995    continue
+
+         mx = mx - 2880
+
+         if ( bswop ) call imfi_bswop ( block, mb, 2 )
+         np = mb/2
+         call imfi_numgetss ( block, np, im, kx, ky, kok )
+
+         if ( kok.eq.1 ) then
+            jx = kx - 1
+            jy = ky
+            if ( jx.eq.0 ) then
+               jx = NX
+               jy = jy - 1
+            endif
+            call pargi ( jx )
+            call pargi ( jy )
+            call printd ( '           Data   end at X = %d ; Y = %d ' )
+            call printo (
+     +    '           Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_putsr"> IMFI_PUTSR  </a>-- Move image data values from input file to output
+C
+C   alan penny                    ral            1994 Nov
+
+
+      subroutine imfi_putsr ( rim, nbl, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+      include 'ST_IMAGE_INC'
+
+      real         rim(NX,NY)	!o: Output image
+      integer      nbl		!i: No of FITS blocks in header
+      integer      ierr		!o: Error flag (0=ok;1=bad)
+C--
+      character block*2880
+      integer kx, ky, kok, jx, jy, mb, mx, nb, np
+      logical bswop
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      call isbswop ( bswop )
+
+      kx = 1
+      ky = 1
+      mx = 2*NX*NY
+      nb = nbl
+
+      do while ( mx.gt.0 )
+
+         nb = nb + 1
+         mb = min(2880,mx)
+         read ( 1, rec=nb, err=998 ) block(1:mb)
+         mx = mx - 2880
+
+         kok = 0
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nb )
+            call printo ( 'ERROR: Error encountered in image body' )
+            call printd ( '       block (2880 bytes) number = %d' )
+            call pargi ( kx )
+            call pargi ( ky )
+            call printd ( '       Data start at X = %d ; Y = %d ' )
+            call printo (
+     +     '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+            kok = 1
+            block = ' '
+  995    continue
+
+         if ( bswop ) call imfi_bswop ( block, mb, 2 )
+         np = mb/2
+         call imfi_numgetsr ( block, np, rim, kx, ky, kok )
+
+         if ( kok.eq.1 ) then
+            jx = kx - 1
+            jy = ky
+            if ( jx.eq.0 ) then
+               jx = NX
+               jy = jy - 1
+            endif
+            call pargi ( jx )
+            call pargi ( jy )
+            call printd ( '       Data   end at X = %d ; Y = %d ' )
+            call printo (
+     +      '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_putir"> IMFI_PUTIR  </a>-- Move image data values from input file to output
+C
+C   alan penny                    ral            1994 Nov
+
+
+      subroutine imfi_putir ( rim, nbl, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      real         rim(NX,NY)	!o: Output image
+      integer      nbl		!i: No of FITS blocks in header
+      integer      ierr		!o: Error flag (0=ok;1=bad)
+C--
+      character block*2880
+      integer kx, ky, kok, jx, jy, mb, mx, nb, np
+      logical bswop
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      call isbswop ( bswop )
+
+      kx = 1
+      ky = 1
+      mb = 2880
+      mx = 4*NX*NY
+      nb = nbl
+
+      do while ( mx.gt.0 )
+
+         nb = nb + 1
+         mb = min(2880,mx)
+         read ( 1, rec=nb, err=998 ) block(1:mb)
+         mx = mx - 2880
+
+         kok = 0
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nb )
+            call printo ( 'ERROR: Error encountered in image body' )
+            call printd ( '       block (2880 bytes) number = %d' )
+            call pargi ( kx )
+            call pargi ( ky )
+            call printd ( '       Data start at X = %d ; Y = %d ' )
+            call printo (
+     +     '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+            kok = 1
+            block = ' '
+  995    continue
+
+         if ( bswop ) call imfi_bswop ( block, mb, 4 )
+         np = mb/4
+         call imfi_numgetir ( block, np, rim, kx, ky, kok )
+
+         if ( kok.eq.1 ) then
+            jx = kx - 1
+            jy = ky
+            if ( jx.eq.0 ) then
+               jx = NX
+               jy = jy - 1
+            endif
+            call pargi ( jx )
+            call pargi ( jy )
+            call printd ( '       Data   end at X = %d ; Y = %d ' )
+            call printo (
+     +      '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_putis"> IMFI_PUTIS  </a>-- Move image data values from input file to output
+C
+C   alan penny                    ral            1994 Nov
+
+
+      subroutine imfi_putis ( im, nbl, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      integer*2    im(NX,NY)	!o: Output image
+      integer      nbl		!i: No of FITS blocks in header
+      integer      ierr		!o: Error flag (0=ok;1=bad)
+C--
+      character block*2880
+      integer kx, ky, kok, jx, jy, mb, mx, nb, np
+      logical bswop
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      call isbswop ( bswop )
+
+      kx = 1
+      ky = 1
+      mb = 2880
+      mx = 4*NX*NY
+      nb = nbl
+
+      do while ( mx.gt.0 )
+
+         nb = nb + 1
+         mb = min(2880,mx)
+         read ( 1, rec=nb, err=998 ) block(1:mb)
+         mx = mx - 2880
+
+         kok = 0
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nb )
+            call printo ( 'ERROR: Error encountered in image body' )
+            call printd ( '       block (2880 bytes) number = %d' )
+            call pargi ( kx )
+            call pargi ( ky )
+            call printd ( '       Data start at X = %d ; Y = %d ' )
+            call printo (
+     +     '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+            kok = 1
+            block = ' '
+  995    continue
+
+         if ( bswop ) call imfi_bswop ( block, mb, 4 )
+         np = mb/4
+         call imfi_numgetis ( block, np, im, kx, ky, kok )
+
+         if ( kok.eq.1 ) then
+            jx = kx - 1
+            jy = ky
+            if ( jx.eq.0 ) then
+               jx = NX
+               jy = jy - 1
+            endif
+            call pargi ( jx )
+            call pargi ( jy )
+            call printd ( '       Data   end at X = %d ; Y = %d ' )
+            call printo (
+     +      '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_putrr"> IMFI_PUTRR  </a>-- Move image data values from input file to output
+C
+C   alan penny                    ral            1994 Nov
+
+
+      subroutine imfi_putrr ( rim, nbl, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      real         rim(NX,NY)	!o: Output image
+      integer      nbl		!i: No of FITS blocks in header
+      integer      ierr		!o: Error flag (0=ok;1=bad)
+C--
+      character block*2880
+      integer kx, ky, kok, jx, jy, mb, mx, nb, np
+      logical bswop
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      call isbswop ( bswop )
+
+      kx = 1
+      ky = 1
+      mb = 2880
+      mx = 4*NX*NY
+      nb = nbl
+
+      do while ( mx.gt.0 )
+
+         nb = nb + 1
+         mb = min(2880,mx)
+         read ( 1, rec=nb, err=998 ) block(1:mb)
+         mx = mx - 2880
+
+         kok = 0
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nb )
+            call printo ( 'ERROR: Error encountered in image body' )
+            call printd ( '       block (2880 bytes) number = %d' )
+            call pargi ( kx )
+            call pargi ( ky )
+            call printd ( '       Data start at X = %d ; Y = %d ' )
+            call printo (
+     +     '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+            kok = 1
+            block = ' '
+  995    continue
+
+         if ( bswop ) call imfi_bswop ( block, mb, 4 )
+         np = mb/4
+         call imfi_numgetrr ( block, np, rim, kx, ky, kok )
+
+         if ( kok.eq.1 ) then
+            jx = kx - 1
+            jy = ky
+            if ( jx.eq.0 ) then
+               jx = NX
+               jy = jy - 1
+            endif
+            call pargi ( jx )
+            call pargi ( jy )
+            call printd ( '       Data   end at X = %d ; Y = %d ' )
+            call printo (
+     +      '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_putrs"> IMFI_PUTRS  </a>-- Move image data values from input file to output
+C
+C   alan penny                    ral            1994 Nov
+
+
+      subroutine imfi_putrs ( im, nbl, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      integer*2    im(NX,NY)	!o: Output image
+      integer      nbl		!i: No of FITS blocks in header
+      integer      ierr		!o: Error flag (0=ok;1=bad)
+C--
+      character block*2880
+      integer kx, ky, kok, jx, jy, mb, mx, nb, np
+      logical bswop
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ierr = 0
+
+      call isbswop ( bswop )
+
+      kx = 1
+      ky = 1
+      mb = 2880
+      mx = 4*NX*NY
+      nb = nbl
+
+      do while ( mx.gt.0 )
+
+         nb = nb + 1
+         mb = min(2880,mx)
+         read ( 1, rec=nb, err=998 ) block(1:mb)
+         mx = mx - 2880
+
+         kok = 0
+         goto 995
+  998       call printo ( ' ' )
+            call pargi ( nb )
+            call printo ( 'ERROR: Error encountered in image body' )
+            call printd ( '       block (2880 bytes) number = %d' )
+            call pargi ( kx )
+            call pargi ( ky )
+            call printd ( '       Data start at X = %d ; Y = %d ' )
+            call printo (
+     +      '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+            kok = 1
+            block = ' '
+  995    continue
+
+         if ( bswop ) call imfi_bswop ( block, mb, 4 )
+         np = mb/4
+         call imfi_numgetrs ( block, np, im, kx, ky, kok )
+
+         if ( kok.eq.1 ) then
+            jx = kx - 1
+            jy = ky
+            if ( jx.eq.0 ) then
+               jx = NX
+               jy = jy - 1
+            endif
+            call pargi ( jx )
+            call pargi ( jy )
+            call printd ( '       Data   end at X = %d ; Y = %d ' )
+            call printo (
+     +      '       Setting disk contents of that block to INVALID' )
+            call printo ( ' ' )
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_fitshead"> IMFI_FITSHEAD  </a>-- Reads information from FITS header.
+C
+C   alan penny                    ral            1994 Nov
+
+      subroutine imfi_fitshead ( block, nbl, aline, intype, ierr )
+
+      implicit none
+
+      include 'imfits_dr.inc'
+      include 'STARMAN_INC'
+      include 'ST_IMAGE_INC'
+
+      character*57600  block	!i: Header
+      integer          nbl	!i: No of blocks in header
+      character*80     aline	!o: Summry of headers
+      character*6      intype	!o: 32-bit real/32-bit int/16-bit int/?
+				!    ('REAL', 'INT', 'SHORT',)
+      integer          ierr	!o: Error flag (0=ok; 1=bad)
+C--
+      character qot*1, head*80, name*8
+      logical more, endfound, ison, found
+      integer i, ka, kb, kl, kk, kf
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      NX = 1
+      NY = 1
+      intype = 'REAL'
+      ierr = 0
+
+      qot = char(39)							!The ' character
+
+      aline = ' '
+
+      endfound = .false.
+      more = .true.
+      kb = 0
+      do while ( kb.lt.nbl*36 .and. more )
+         kb = kb + 1
+         i = (kb-1)*80
+
+         name = block(i+1:i+8)
+
+         head = ' '
+
+         ison = .true.
+         found = .false.
+         kf = 80
+         do kk = 10, 80
+            if ( block(i+kk:i+kk).eq.char(39) ) ison = .not.ison
+            if ( .not.found .and. ison ) then
+               if ( block(i+kk:i+kk).eq.'/' ) then
+                  found = .true.
+                  kf = kk
+               endif
+            endif
+         enddo
+         head = block(i+10:i+kf-1)
+
+         call lbgone ( head )
+         if ( head(1:1).eq.qot ) head(1:1) = ' '
+         call lbgone ( head )
+         ka = index(head,qot)
+         if ( ka.ne.0 ) head(ka:ka) = ' '
+         call lbgone ( head )
+         call charln ( head, kl )
+
+         call imfi_check ( kb, name, head, ierr )
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+
+         if ( name.eq.'BITPIX' ) then
+            read ( head(1:kl),'(i)' ) ka
+            if ( ka.eq.32 ) then
+               intype = 'INT'
+            elseif ( ka.eq.16 ) then
+               intype = 'SHORT'
+            elseif ( ka.eq.-32 ) then
+               intype = 'REAL'
+            endif
+         elseif ( name.eq.'NAXIS1' ) then
+            read ( head(1:kl),'(i)' ) NX
+	 elseif ( name.eq.'NAXIS2' ) then
+            read ( head(1:kl),'(i)' ) NY
+ 	 elseif ( name.eq.N_OBJECT ) then
+            ka = index(head(1:15),char(47))
+            if ( ka.ge.1 ) then
+               ka = ka - 1
+               if ( ka.gt.10 ) ka = 10
+            else
+               ka = 10
+            endif
+            aline(11:22) = head(1:ka)
+	 elseif ( name.eq.N_FILTER ) then				!Remove the / character
+            aline(23:26) = head(1:4)
+         elseif ( name.eq.N_RA )   then
+            aline(28:36) = head(1:8)
+	 elseif ( name.eq.N_DEC )  then
+            aline(38:47) = head(1:9)
+	 elseif ( name.eq.N_DATE ) then
+            aline(49:57) = head(1:8)
+	 elseif ( name.eq.N_TIME ) then
+            aline(59:67) = head(1:8)
+	 elseif ( name.eq.N_EXP ) then
+            aline(69:80) = head(1:11)
+         endif
+
+	 if ( name.eq.'END' ) then
+            endfound = .true.
+            more = .false.
+         endif
+
+      enddo
+
+      do i = 1, 80							!Remove ' characters
+          if ( aline(i:i).eq.qot ) aline(i:i) = ' '
+      enddo
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_check"> IMFI_CHECK  </a>-- Check FITS Header start is OK
+C
+C   alan penny                    ral            1994 Nov
+
+      subroutine imfi_check ( kb, name, head, ierr )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer     kb		!i: File line number
+      character   name*8	!i: Line name
+      character   head*80	!i: Line value
+      integer     ierr		!i/o: Error flag (1=bad)
+C--
+      integer ka, kl, nka
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call charln ( head, kl )
+
+      if ( kb.eq.1 ) then
+         if ( name.ne.'SIMPLE' ) then
+            call printo ( 'ERROR: First header must be SIMPLE' )
+            ierr = 1
+         else
+            call charln ( head, kl )
+            if ( kl.ne.1 .or. head(1:1).ne.'T' ) then
+               call printo ( 'ERROR: Image not FITS SIMPLE' )
+               ierr = 1
+            endif
+         endif
+      endif
+
+      if ( kb.eq.2 ) then
+         if ( name.ne.'BITPIX' ) then
+            call printo ( 'ERROR: Second header must be BITPIX')
+            ierr = 1
+         else
+            call charln ( head, kl )
+            read ( head(1:kl),'(i)' ) ka
+            if ( ka.ne.32 .and. ka.ne.16 .and. ka.ne.-32 ) then
+               call printo ( 'ERROR: Image must be 16 or 32 bit '//
+     +                        'integer or 32 bit real' )
+               ierr = 1
+            endif
+         endif
+      endif
+
+      if ( kb.eq.3 ) then
+         if ( name.ne.'NAXIS' ) then
+            call printo ( 'ERROR: Third header must be NAXIS')
+            ierr = 1
+         else
+            nka = 0
+            call charln ( head, kl )
+            read ( head(1:kl),'(i)' ) ka
+            if ( ka.eq.1 ) then
+               call printo ('WARNING: Image is 1-D: treated as 2-D')
+               call printo ( '         2nd axis = 1' )
+               nka = 1
+            elseif ( ka.gt.2 ) then
+               call pargi ( ka )
+             call printd ('WARNING: Image is %d -D; treated as 2-D')
+               call printo ( '         Only first plane read' )
+            endif
+         endif
+      endif
+
+      if ( kb.eq.4 ) then
+         if ( name.ne.'NAXIS1' ) then
+            call printo ( 'ERROR: Fourth header must be NAXIS1')
+            ierr = 1
+         endif
+      endif
+
+      if ( kb.eq.5 .and. nka.ne.1 ) then
+         if ( name.ne.'NAXIS2' ) then
+            call printo ( 'ERROR: Fifth header must be NAXIS2')
+            ierr = 1
+         endif
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_numgetir"> IMFI_NUMGETIR  </a>-- Gets real data from 32-bit integer FITS block
+C
+
+      subroutine imfi_numgetir ( block, np, rim, kx, ky, kok )
+
+      implicit none
+      include 'ST_IMAGE_INC'
+
+      character*(*) block	!i: Character FITS block array
+      integer       np		!i: No of pixels to read
+      real          rim(NX,NY)	!i/o: Data array
+      integer       kx		!i/o: Present X position
+      integer       ky		!i/o: Present Y position
+      integer       kok         !i: Block ok flag (0=ok;1=bad)
+C--
+      integer k, i, n1, n2, n3, n4, num
+Cbegin
+
+
+      do k = 1, np
+
+         if ( kok.eq.1 ) then
+            rim(kx,ky) = RINVAL
+         else
+            i = 1 + (k-1)*4
+            n4 = ichar(block(i:i))
+            n3 = ichar(block(i+1:i+1))
+            n2 = ichar(block(i+2:i+2))
+            n1 = ichar(block(i+3:i+3))
+            if ( n1.gt.127 ) then
+               n1 = 255 - n1
+               n2 = 255 - n2
+               n3 = 255 - n3
+               n4 = 255 - n4
+               num = 256*256*256*n1 +256*256*n2 + 256*n3 + n4 + 1
+               num = -num
+            else
+               num = 256*256*256*n1 +256*256*n2 + 256*n3 + n4
+            endif
+            rim(kx,ky) = num
+         endif
+
+         kx = kx + 1
+         if ( kx.gt.NX ) then
+            kx = 1
+            ky = ky + 1
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_numgetis"> IMFI_NUMGETIS  </a>-- Gets int*2 data from 32-bit integer FITS block
+C
+
+      subroutine imfi_numgetis ( block, np, im, kx, ky, kok )
+
+      implicit none
+      include 'ST_IMAGE_INC'
+
+      character*(*) block	!i: Character FITS block array
+      integer       np		!i: No of pixels to read
+      integer*2     im(NX,NY)	!i/o: Data array
+      integer       kx		!i/o: Present X position
+      integer       ky		!i/o: Present Y position
+      integer       kok         !i: Block ok flag (0=ok;1=bad)
+C--
+      integer k, i, n1, n2, n3, n4, num, kv
+Cbegin
+
+
+      do k = 1, np
+
+         if ( kok.eq.1 ) then
+            im(kx,ky) = INVAL
+         else
+            i = 1 + (k-1)*4
+            n4 = ichar(block(i:i))
+            n3 = ichar(block(i+1:i+1))
+            n2 = ichar(block(i+2:i+2))
+            n1 = ichar(block(i+3:i+3))
+            if ( n1.gt.127 ) then
+               n1 = 255 - n1
+               n2 = 255 - n2
+               n3 = 255 - n3
+               n4 = 255 - n4
+               num = 256*256*256*n1 +256*256*n2 + 256*n3 + n4 + 1
+               num = -num
+            else
+               num = 256*256*256*n1 +256*256*n2 + 256*n3 + n4
+            endif
+            kv = num
+            im(kx,ky) = min(32767,max(kv,-32768))
+         endif
+
+         kx = kx + 1
+         if ( kx.gt.NX ) then
+            kx = 1
+            ky = ky + 1
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_numgetrr"> IMFI_NUMGETRR  </a>-- Get real data from 32-bit real FITS block
+C
+
+      subroutine imfi_numgetrr ( block, np, rim, kx, ky, kok )
+
+      implicit none
+      include 'ST_IMAGE_INC'
+
+      real      block(720)	!i: Character FITS block array (read as real*4)
+      integer   np		!i: No of pixels to read
+      real      rim(NX,NY)	!i/o: Data array
+      integer   kx		!i/o: Present X position
+      integer   ky		!i/o: Present Y position
+      integer       kok         !i: Block ok flag (0=ok;1=bad)
+C--
+      integer k
+Cbegin
+
+
+      do k = 1, np
+
+         if ( kok.eq.1 ) then
+            rim(kx,ky) = RINVAL
+         else
+            rim(kx,ky) = block(k)
+         endif
+
+         kx = kx + 1
+         if ( kx.gt.NX ) then
+            kx = 1
+            ky = ky + 1
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_numgetrs"> IMFI_NUMGETRS  </a>-- Get int*2 data from 32-bit real FITS block
+C
+
+      subroutine imfi_numgetrs ( block, np, im, kx, ky, kok )
+
+      implicit none
+      include 'ST_IMAGE_INC'
+
+      real       block(720)	!i: Character FITS block array (read as real*4)
+      integer    np		!i: No of pixels to read
+      integer*2  im(NX,NY)	!i/o: Data array
+      integer    kx		!i/o: Present X position
+      integer    ky		!i/o: Present Y position
+      integer    kok            !i: Block ok flag (0=ok;1=bad)
+C--
+      integer k
+      real rv
+Cbegin
+
+
+      do k = 1, np
+
+         if ( kok.eq.1 ) then
+            im(kx,ky) = INVAL
+         else
+            rv = block(k)
+            im(kx,ky) = min(32767.0,max(-32768.0,rv))
+         endif
+
+         kx = kx + 1
+         if ( kx.gt.NX ) then
+            kx = 1
+            ky = ky + 1
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_numgetss"> IMFI_NUMGETSS  </a>-- Gets short data from 16-bit integer FITS block
+C
+
+      subroutine imfi_numgetss ( block, np, im, kx, ky, kok )
+
+      implicit none
+      include 'ST_IMAGE_INC'
+
+      character*(*) block	!i: Character FITS block array
+      integer       np		!i: No of pixels to read
+      integer*2     im(NX,NY)	!i/o: Data array
+      integer       kx		!i/o: Present X position
+      integer       ky		!i/o: Present Y position
+      integer       kok         !i: Block ok flag (0=ok;1=bad)
+C--
+      integer k, i, n1, n2, num
+Cbegin
+
+
+      do k = 1, np
+
+         if ( kok.eq.1 ) then
+            im(kx,ky) = INVAL
+         else
+            i = 1 + (k-1)*2
+            n2 = ichar(block(i:i))
+            n1 = ichar(block(i+1:i+1))
+            if ( n1.gt.127 ) then
+               n1 = 255 - n1
+               n2 = 255 - n2
+               num = 256*n1 + n2 + 1
+               num = -num
+            else
+               num = 256*n1 + n2
+            endif
+            im(kx,ky) = num
+         endif
+
+         kx = kx + 1
+         if ( kx.gt.NX ) then
+            kx = 1
+            ky = ky + 1
+         endif
+
+      enddo
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_numgetsr"> IMFI_NUMGETSR  </a>-- Gets real data from 16-bit integer FITS block
+C
+
+      subroutine imfi_numgetsr ( block, np, rim, kx, ky, kok )
+
+      implicit none
+      include 'ST_IMAGE_INC'
+
+      character*(*) block	!i: Character FITS block array
+      integer       np		!i: No of pixels to read
+      real          rim(NX,NY)	!i/o: Data array
+      integer       kx		!i/o: Present X position
+      integer       ky		!i/o: Present Y position
+      integer       kok         !i: Block ok flag (0=ok;1=bad)
+C--
+      integer k, i, n1, n2, num
+Cbegin
+
+
+      do k = 1, np
+
+         if ( kok.eq.1 ) then
+            rim(kx,ky) = RINVAL
+         else
+            i = 1 + (k-1)*2
+            n2 = ichar(block(i:i))
+            n1 = ichar(block(i+1:i+1))
+            if ( n1.gt.127 ) then
+               n1 = 255 - n1
+               n2 = 255 - n2
+               num = 256*n1 + n2+ 1
+               num = -num
+            else
+               num = 256*n1 + n2
+            endif
+            rim(kx,ky) = num
+         endif
+
+         kx = kx + 1
+         if ( kx.gt.NX ) then
+            kx = 1
+            ky = ky + 1
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imfi_bswop"> IMFI_BSWOP  </a>-- Swop bytes in character array
+C
+C  alan penny                     ral               1994 Dec
+
+      subroutine imfi_bswop ( block, mb, ns )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      character*(*) block	!i/o: Character block array
+      integer       mb		!i: No of characters to cover
+      integer       ns		!i: No of bytes to swop
+C--
+      integer k
+      character*1  cv1, cv2, cv3, cv4
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( ns.ne.2 .and. ns.ne.4 ) then
+         call printo ( ' ERROR: Programmer error in s/r imfi_bswop' )
+         call printo ( '        Code needs rewriting: Contact '//
+     +                 ' person who wrote the program' )
+         return
+      endif
+
+      if ( ns.eq.2 ) then
+         do k = 1, mb-ns+1, ns
+            cv1 = block(k:k)
+            cv2 = block(k+1:k+1)
+            block(k:k)     = cv2
+            block(k+1:k+1) = cv1
+         enddo
+      elseif ( ns.eq.4 ) then
+         do k = 1, mb-ns+1, ns
+            cv1 = block(k:k)
+            cv2 = block(k+1:k+1)
+            cv3 = block(k+2:k+2)
+            cv4 = block(k+3:k+3)
+            block(k:k)     = cv4
+            block(k+1:k+1) = cv3
+            block(k+2:k+2) = cv2
+            block(k+3:k+3) = cv1
+         enddo
+      endif
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C IMFITS_DR.INC
+C
+C  Include file for IMFITS_DR
+
+
+      logical do_info		!Print out exposure summary
+
+      character*8 n_object, n_filter, n_ra, n_dec, n_date,
+     +            n_time,   n_exp
+
+      character*8 m_n_object, m_n_filter, m_n_ra,  m_n_dec,
+     +            m_n_date,   m_n_time,   m_n_exp
+      data        m_n_object, m_n_filter, m_n_ra,  m_n_dec,
+     +            m_n_date,   m_n_time,   m_n_exp
+     +   / 'OBJECT  ', 'FILTER  ', 'RA      ', 'DEC     ',
+     +     'DATE    ', 'TIME    ', 'EXPOSED ' /
+
+
+      logical  imfi_dum1, imfi_dum2, imfi_dum3	!n*4 make-ups
+
+
+      common /imfits_drb/  do_info, imfi_dum1, imfi_dum2, imfi_dum3
+
+      common /imfits_drc/  n_object, n_filter, n_ra, n_dec,
+     +                     n_date,   n_time,   n_exp
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,418 @@
+<HTML> <HEAD>
+<TITLE> Addstars - Adds/subtracts stars into image </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Addstars - Adds/subtracts stars into image </h1>
+ 
+This program adds or subtracts stars into an image. <p>
+ 
+One can also add:-
+<dl>
+<dd> Noise to the stars.
+<dd> A sky (with noise).
+<dd> A separate noise level.
+<dd> A separate input image. <p>
+</dl>
+<p>
+ 
+Go to <a href="intro.html#addstars_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#addstars"> Introduction </a>
+<li> 2 <a href="#method"> Method </a>
+<li> 3 <a href="#use"> Use </a>
+<li> 4 <a href="#parameters"> Parameters </a>
+<li> 5 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+ 
+<hr>
+ <h2> 1 <a name="addstars"> Introduction </h2> </a> <p>
+ 
+ 
+ 
+ This program adds or subtracts stars into an image. Noise can
+ be added to these stars. A sky (with noise) can be added, as can a
+ separate noise level, and as can a separate input image.
+<p>
+ 
+ The stars are input via a file with a table of X,Y positions and
+ heights. A common star profile can be used to add the stars,
+ or they can all have individual profiles (which profiles are fed in
+ as extra parameters of the star table in addition to the normal
+ profile image file input).
+<p>
+ 
+ The program takes care of pixel averaging (for small radius stars) and
+ and calculates the profile out to the point where it has a value of 0.2.
+<p>
+ 
+ 
+<hr>
+ <h2> 2 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ Each star is given a profile, and an x,y position and a height. Then
+ for each pixel near the star, the mean intensity of the star is
+ calculated. If the radius is small, then when the profile is
+ changing rapidly the mean is made from calculations of sub-pixel
+ values in the pixel.
+<p>
+ 
+ Then this mean is then added or subtracted from each pixel.
+<p>
+ 
+ This is done for all pixels round the star, out to the place where
+ the star value is 0.2.
+<p>
+ 
+ 
+ The mathematical expression of this star value is given in
+ the <a href="formula.html"> profile. </a><p>
+ 
+ 
+ 
+   If noise is wanted in the star images, then each pixel can be looked
+   at and Poisson noise added. The pixel are treated as
+   scaled levels. Thus the Poisson noise is calculated as if each
+   pixel value is the photon counts divided by some scaling.
+<p>
+ 
+   The sky is added as a flat back ground with optional Poisson noise
+   (scaled as for the stars, but with a different scaling factor).
+<p>
+ 
+   A separate noise level (not scaled) can be added.
+<p>
+ 
+   An input image can be added.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="use"> Use </h2> </a> <p>
+ 
+<ul>
+<li> 1. Input an image to add to, or input the size of the new image to make.
+ 
+<p><li> 2. Feed the list of stars as a list of (X,Y star positions, and heights,
+    [and optionally profile]).
+ 
+<p><li> 3. Feed in a profile file.
+      If the list of star positions has profile parameters for each star,
+      then they are adopted for each star, otherwise the standard
+      profile is used for all the stars. The star heights must be the
+      actual heights.
+ 
+<p><li> 4. Choose whether or not to:-
+ 
+<p><ul>
+<li>     a) use the profile map
+<p><li>     b) use the profile file
+<p><li>     c) override any profile parameters in the input star position
+            table
+<p><li>     d) have the stars as positive or negative stars
+<p><li>     e) feed in any scaling for the star noise
+<p><li>     f) feed in any sky background, and any scaling for the sky noise
+<p><li>     g) feed in the standard deviation for any extra sky noise
+</ul>
+ 
+<p><li> 5. Specify the output image.
+</ul>
+ 
+<hr>
+ <h2> 4 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 4.1 <a href="#add"> Add </a>
+<li> 4.2 <a href="#domap"> Domap </a>
+<li> 4.3 <a href="#in"> In </a>
+<li> 4.4 <a href="#instars"> Instars </a>
+<li> 4.5 <a href="#out"> Out </a>
+<li> 4.6 <a href="#outtype"> Outtype </a>
+<li> 4.7 <a href="#pixnoise"> Pixnoise </a>
+<li> 4.8 <a href="#profile"> Profile </a>
+<li> 4.9 <a href="#pyes"> Pyes </a>
+<li> 4.10 <a href="#seed"> Seed </a>
+<li> 4.11 <a href="#size"> Size </a>
+<li> 4.12 <a href="#sky"> Sky </a>
+<li> 4.13 <a href="#skygain"> Skygain </a>
+<li> 4.14 <a href="#skypois"> Skypois </a>
+<li> 4.15 <a href="#stargain"> Stargain </a>
+<li> 4.16 <a href="#starpois"> Starpois </a>
+<li> 4.17 <a href="#title"> Title </a>
+</ul>
+ 
+ <hr>
+ <h2> 4.1 <a name="add"> Add </h2> </a> <p>
+ 
+  (Default - 'Add'       Choices - 'Add/Sub' )
+<p>
+ 
+  Do you want the stars to be added into, or subtracted from the
+  image?
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="domap"> Domap </h2> </a> <p>
+ 
+  (Default - 'Yes'    Choices - 'Yes/No')
+<p>
+ 
+  Whether to use the empirical profile map in the
+  the <a href="formula.html"> profile </a> file.
+<p>
+ 
+<hr>
+ <h2> 4.3 <a name="in"> In </h2> </a> <p>
+ 
+ 
+  (Default 'null'. )
+<p>
+ 
+  The name of the file containing the image to add stars to.
+<p>
+ 
+  The image has to be a .SDF file. Either a 16-bit integer*2 or a
+  32-bit real*4 one.
+<p>
+ 
+  If a null response is given, then no image is input and a new one of
+  a size defined by the user and having a given flat background is
+  used to add the stars to.
+<p>
+ 
+<hr>
+ <h2> 4.4 <a name="instars"> Instars </h2> </a> <p>
+ 
+ 
+  (Default - 'null')
+<p>
+ 
+  The name of the file containing the table of star positions
+  and heights, and optionally <a href="formula.html"> profiles. </a>
+<p>
+ 
+  The x, y, heights must either be the first three parameters, or
+  there must be pointers to them in the standard header format of
+  parameter 'HEAD00n' being X, Y, and HEIGHT for parameter being in
+  column n.
+<p>
+ 
+  If the profile parameters are there, then the list must have the
+  standard profile headers RX, RY, P, PRX, PRY, THETA, QH, QR, QP,
+  MAPNUM, MAPX, MAPY, MAGNIF.
+<p>
+ 
+<hr>
+ <h2> 4.5 <a name="out"> Out </h2> </a> <p>
+ 
+ 
+  The name of the new file to contain the output image.
+<p>
+ 
+ This will be an ADAM .SDF image. It will be 32-bit real (real) or
+  16-bit integer (short) format depending on the users choice -
+  through 'OUTTYPE'.
+<p>
+ 
+<hr>
+ <h2> 4.6 <a name="outtype"> Outtype </h2> </a> <p>
+ 
+ (Default - 'real'           Choice - 'real:short')
+<p>
+ 
+ Should the type of the output image be 'real', with 32-bit Reals
+ or 'short' with 16-bit integers?
+<p>
+ 
+<hr>
+ <h2> 4.7 <a name="pixnoise"> Pixnoise </h2> </a> <p>
+ 
+  (Default - 0.0       Range - 0.0 to 1.0e8)
+<p>
+ 
+  The standard deviation of any extra Poisson noise to be added
+  to the sky.
+<p>
+ 
+  This is = std dev of (true no of detected photons in pixel).
+<p>
+ 
+  This may not be the std dev of the actual sky counts, as the
+  `SKYGAIN' parameter, which is used to translate the actual pixel
+   counts into their Poisson equivalent, may not be 1.0.
+<p>
+ 
+  The Std dev of the actual pixel counts will be = `Pixnoise'/`Skygain'
+<p>
+ 
+  If 0.0 is entered, no extra noise is added
+<p>
+ 
+<hr>
+ <h2> 4.8 <a name="profile"> Profile </h2> </a> <p>
+ 
+ 
+  (Default - 'null')
+<p>
+ 
+  The name of the file containing the image with the
+  standard star <a href="formula.html"> profile. </a>
+<p>
+ 
+  This must not be null. (Although sometimtes its profile may never
+  be used, in the case if, for all the stars, it is overridden by
+  their own (optional) profiles contained in the 'INSTARS' file.)
+<p>
+ 
+ The image contains the parameters of the profile as its
+  descriptors, and the empirical map as its pixel values. It is
+  a 16-bit integer image, usually made as the output of the
+  'profile' program.
+<p>
+ 
+<hr>
+ <h2> 4.9 <a name="pyes"> Pyes </h2> </a> <p>
+ 
+  (Default - 'Yes'    Choices - 'Yes/No')
+<p>
+ 
+  Whether to have the <a href="formula.html"> profile </a>
+  parameters in the profile file override
+  any profile parameters in the star list.
+<p>
+ 
+<hr>
+ <h2> 4.10 <a name="seed"> Seed </h2> </a> <p>
+ 
+  (Default - 1234567891    Range - 1200000001 to 1400000001)
+<p>
+ 
+  The random number generator seed. This should be an odd number
+  between 1,200,000,001 and 1,240,000,001.
+<p>
+ 
+  This applies to the Star images or the sky background, depending
+  on the previous answer. It is only asked for if the stars or
+  sky are/is to be added with noise. The seed is only asked for
+  for the sky noise, if there is no star noise.
+<p>
+ 
+  The seed only has to supplied once, if at all, as the random
+  number generator is not reset after doing the stars.
+<p>
+ 
+<hr>
+ <h2> 4.11 <a name="size"> Size </h2> </a> <p>
+ 
+ 
+  (Default - 100,100.       Range - 1 to 4096)
+<p>
+ 
+  X and Y size of new image to add stars to.
+<p>
+ 
+  This is only asked for if there is no input image, and a  new
+  one is to be made.
+<p>
+ 
+<hr>
+ <h2> 4.12 <a name="sky"> Sky </h2> </a> <p>
+ 
+  (Default - 0.0 if input image, 100.0 if no input image.
+   Range - -1.0e9 to +1.0e9)
+<p>
+ 
+  Sky value to add to output image.
+<p>
+ 
+<hr>
+ <h2> 4.13 <a name="skygain"> Skygain </h2> </a> <p>
+ 
+  (Default - 1.0     Range - 0.0 to 1.0e8)
+<p>
+ 
+  The conversion, for the sky, between the numbers that go in
+  the image and the number of independant Poisson events.
+<p>
+ 
+  This is = (true no of detected photons in pixel)/(pixel counts).
+<p>
+ 
+  One way this can be is for a CCD, where it would be
+             = electrons/adu
+<p>
+ 
+  If 0.0 is entered, then no sky noise is added
+<p>
+ 
+<hr>
+ <h2> 4.14 <a name="skypois"> Skypois </h2> </a> <p>
+ 
+  (Default - 'yes'           Choice - 'yes:no')
+<p>
+ 
+  Add in noise coming from the Poisson nature of the sky flux?
+<p>
+ 
+<hr>
+ <h2> 4.15 <a name="stargain"> Stargain </h2> </a> <p>
+ 
+  (Default - 1.0         Range - 0.0 to 1.0e8)
+<p>
+ 
+  The conversion, for the stars, between the numbers that go in
+  the image and the number of independant Poisson events.
+<p>
+ 
+  This is = (true no of detected photons in pixel)/(pixel counts).
+<p>
+ 
+  One way this can be is for a CCD, where it would be
+             = electrons/adu
+<p>
+ 
+  If 0.0 is returned, then no noise is added.
+<p>
+ 
+<hr>
+ <h2> 4.16 <a name="starpois"> Starpois </h2> </a> <p>
+ 
+  (Default - 'yes'           Choice - 'yes:no')
+<p>
+ 
+  Add in noise coming from the Poisson nature of the star flux?
+<p>
+ 
+<hr>
+ <h2> 4.17 <a name="title"> Title </h2> </a> <p>
+ 
+ (Default - Input image title or 'Output from ADDSTARS')
+<p>
+ 
+  Title to add to the output image.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+           A J Penny               RAL		1990-11-19
+<hr>
+All rights reserved. &copy 1995 RAL. Starlink conditions and disclaimers apply.
+<hr>
+ 
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 10  </i>
+ 

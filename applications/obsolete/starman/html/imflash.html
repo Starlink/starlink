@@ -1,0 +1,112 @@
+<HTML> <HEAD>
+<TITLE> IMFLASH </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMFLASH -  Simple display of image
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  IMFLASH displays an image on an image display with a minimum
+  of interaction with the user. It 'flashes' an image up on the
+  screen. This stays displayed until the user inputs that it
+  should disappear.
+<p>
+ 
+  The program calculates the `best' contrast to display the image
+  at. This assumes that much of the image is sky with some noise.
+  The display is -2/+5 std dev about the mean. This brings up
+  faint features.
+<p>
+ 
+  The image is displayed in black and white, with black denoting
+  high values. `Invalid' pixels are displyed as white.
+<p>
+ 
+  If the image is too large to be displayed on the image, it is binned
+  down (with square bins), so that it does fit into the display.
+<p>
+ 
+  The image disappears when the user ends the program. Thus if you
+  want to have an image displayed, while you do something else, then
+  leave the image displayed, and start another window, start Starman
+  there, and do what you want to do there.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imflash_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#enough"> Enough </a>
+<li> 1.2 <a href="#in"> In </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="enough"> Enough </h2> </a> <p>
+ 
+  (Default - 'yes'      <br> Choice - 'yes:no')
+<p>
+ 
+  Have you had enough of looking at the image?
+<p>
+ 
+  If you have, then the program will exit, and the image will vaish
+  from the screen.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input image.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny               RAL             1991 July
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,213 @@
+<HTML> <HEAD>
+<TITLE> tables </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Starman Help for:- tables </h1>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#tables"> Tables </a>
+<li> 2 <a href="#what_is_in_a_table"> What is in a table </a>
+<li> 3 <a href="#menu"> Menu </a>
+<li> 4 <a href="#structure"> Structure </a>
+<li> 5 <a href="#the_onlie_begetter"> The Onlie Begetter </a>
+</ul>
+<p>
+ 
+Go to <a href="main.html"> Starman Help Main. </a>
+<p>
+ 
+<hr>
+ <h2> 1 <a name="tables"> Tables </h2> </a> <p>
+ 
+ 
+  The Starman suite of programs uses a simple table system for passing
+  tabular information back and forth between programs and to and
+  from the user.
+<p>
+ 
+  These tables are actually stored on disk as `SDF' files. Thus a
+  table called 'fred' will be stored as 'fred.sdf' on disk.
+  (As with the images, inside any Starman program, you do not
+  use the `.sdf' suffix in referring to the table.)
+<p>
+ 
+  Starman has some simple table handlers ready for use. These are the
+  TB-programs, and they have their own help.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="what_is_in_a_table"> What is in a table </h2> </a> <p>
+ 
+ 
+  A `table' may be considered as being made up of `rows', where a
+  row contains a name and set up numbers. Then the table itself
+  contains a number of these `rows'.
+<p>
+ 
+  The numbers in a row are set into `columns'. The information
+  in a particular column generally concerns the same `aspect' from
+  row to row.
+<p>
+ 
+  Each column can also have a name (its header).
+<p>
+ 
+  Thus, for example, if one wanted to make a table of the positions
+  of stars, one could put the `X' position in the first column and
+  the 'Y' position in the second column. So if one had three stars,
+  `fred', `george', and 'arthur', with X,Y positions of (1.2,2.3),
+   (3.4,4.5), and (5.6,6.7) respectively, and the columns are to
+   have the names `X' and 'Y', then the table would look like
+  this:-
+<p>
+<pre> 
+   --------------------------------------------
+  |           Name       Column 1    Column 2  |
+  |                                            |
+  |  Row 1    fred         1.2          2.3    |
+  |  Row 2    george       3.4          4.5    |
+  |  Row 3    arthur       5.6          6.7    |
+  |                                            |
+  |   Header               `X'          `Y'    |
+   --------------------------------------------
+</pre> 
+<p>
+ 
+  A table also has a 'title'. This is a character string which
+  can be added to the file containing the table. It does not
+  form any part of the table itself, but can be accessed by the
+  user as a source of additional personal information about the
+  table. Thus for example a table called 'BADPIXELS' (stored as
+  badpixels.sdf;1 on disk), could have a title of:- 
+<p><pre>
+       This is a list of bad areas on my CCD.
+</pre><p>
+  This title is then available for inspection by the user, say by
+  the program `Tblist', and may be put out to the user by some
+  programs to show the user something about the table.
+<p>
+ 
+  The `name' of a row may be up to 20 characters long. (A common
+  default usage is for them not to have names like 'arthur', but to
+  be in the form `#n', e.g.  '#201', `#1456'.
+<p>
+ 
+  The numbers in the columns are 32-bit real numbers, thus having
+  a precision of about 6 decimal places, and a possible range
+  of about -10**38 to + 10**38.
+<p>
+ 
+  The table may also have any number of further descriptors,
+  added by the user or some programs.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="menu"> Menu </h2> </a> <p>
+ 
+ 
+  A listing of the available table handling programs:-
+
+<pre> 
+
+  Name          Function
+  ----          --------
+ 
+ tbcalc         Calculate entries in table column(s)
+ tbchart        Plot out a realistic star map
+ tbcomps        Find stars within/not within an annulus of each other
+ tbcut          Cut out parts of a table
+ tbdes          List/write/copy/delete descriptors
+ tbjoin         Join tables together
+ tbkey          Input numbers from keyboard into a table
+ tblist         Type and/or put in file the contents of a table
+ tbload         Input an ASCII text file into a table
+ tbmatch        Extract entries with matching names in two tables
+ tbnative       Convert table format from different machine
+ tbnmatch       Order tables so they have their names in the same order
+ tbplot         Plot out graph/histogram
+ tbpmatch       Extract entries with matching positions in two tables
+ tbrenum        Renumber names in a table
+ tbsheet        Spread-sheet program for inspection/insertion/etc
+ tbsort         Sort entries in a table
+ tbstat         Perform statistics on column(s) in tables(s)
+ tbtran_auto    Transform one XY table to another automatically
+ tbtran_do      Transform XY table positions using transform eqn
+ tbtran_load    Calc transform eqn from a given magn, rotn, shift
+ tbtran_make    Calc transform eqn from two matched XY tables
+ tbvalue        Output the value of a table element
+ tbweed         Make a table with only those entries with a parameter
+                  in a range
+</pre> 
+<p>
+ 
+<hr>
+ <h2> 4 <a name="structure"> Structure </h2> </a> <p>
+ 
+ 
+  (Some of this information is for people who want to access the tables
+  directly via their own programs.)
+<p>
+ 
+  Data are stored in .SDF files as real*4 values. The first 5 values
+  in a row code a row name, and the data columns start after that.
+  Programs which ask for parameter number or column number start
+  their numbering from the first data column. Each file must have at
+  least two columns.
+<p>
+ 
+  There are also file 'descriptors' which can contain individual items
+  of information, in a way analogous to FITS descriptors.
+<p>
+ 
+  Some programs assign to each data column a header parameter and some
+  programs use these parameters to find the column containing the
+  desired data. Some programs just rely on the column positions. These
+  column header parameters are stored as descriptors of the SDF image.
+  The header for column 1 is stored as the value of paramter HEAD001,
+  that for 2 in HEAD002, and so on. The headers are character strings
+  up to 20 characters long.
+<p>
+ 
+  Although in actuality inside the computer the identifier is stored in
+  the same way as the columns, taking up five columns, it is not
+  thought of as occupying a column, and the data columns are numbered
+  from 1. The 'size' of a row in a file, given by the 'NITEM'
+  descriptor, is thus five more than the number of columns.
+<p>
+ 
+  The number of rows in a table is given by the 'LSTLEN' descriptor of
+  the file.
+<p>
+
+  The 'LABEL' of the file, that is the 'type', is 'XYLIST'.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="the_onlie_begetter"> The Onlie Begetter </h2> </a> <p>
+ 
+
+  (As a matter of interest to more sophisticated users and programmers ,
+  this is an enhanced version of the Starlink Interim Environment
+  EDRS table system, copyright R.F.Warren-Smith.)
+<p>
+ 
+ 
+<hr>
+ <h2> 5 <a name="other_programs"> Other programs </h2> </a> <p>
+ 
+ 
+  There are no other useful programs in Kappa.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Nov 5  </i>
+ 

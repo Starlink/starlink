@@ -1,0 +1,231 @@
+<HTML> <HEAD>
+<TITLE> Starting </TITLE>
+</HEAD> <BODY>
+ 
+<h1> Starting </h1>
+ 
+<hr>
+Go to <a href="main.html"> Starman Help Main. </a>
+<hr>
+
+ Getting started with Starman. This describes some of the various
+ parts of using Starman.
+<p>
+
+<strong> Quotas </strong><p>
+
+ Simple programs in Starman run correctly with normal the normal quotas
+ set for you by your Starlink node manager. 
+<p>
+
+<strong>    Setting Up Starman </strong><p>
+
+
+ Setting up your system to be able to use Starman.
+<p>
+  
+ On Starlink machines, when Starman has been set up by the system
+ manager, just type 'starman'. You will need to have already set
+ up the Starlink software with 'source /star/etc/login'.
+<p>
+
+ On other machines, find where the Starman programs are, and run the
+ shell script 'starman', for example:-
+<p>
+
+<pre>
+      'source /home/user1/ajp/snew1/starman' 
+</pre><p>
+
+<strong>    Running Starman</strong><p>
+
+
+ To run Starman from the shell just enter the command
+<p>
+
+<pre>
+     > starman
+</pre><p>
+
+ This executes a procedure which you stay in while executing Starman 
+ commands. It also defines some logical names. You now can
+ mix Starman commands with the familiar UNIX ones.
+ While setting up the names, some information about the current version
+ is given out.
+<p>
+
+ You can now run the Starman programs by just typing their names.
+<p>
+ 
+ So what do you get for your trouble?  There is a classified
+ list of the programs available. These are explained in more detail
+ elsewhere.
+<p>
+
+<strong>    Issuing Commands </strong><p>
+
+
+ To run an application you then can just give its name---you will be
+ prompted for any required parameters. Alternatively, you may enter
+ parameter values on the command line specified by position or by
+ keyword.  More on this elsewhere.
+<p>
+
+ Remember that UNIX is case sensitive, so keep the names in lower case.
+<p>
+
+<strong>    Answering Questions </strong><p>
+
+
+  Answering questions on the keyboard
+<p>
+
+  When running a program, it will generally ask you a series of
+  questions. These will come either as simple questions or
+  as questions with default choices.
+<p>
+
+  An example of a simple question is (say), when the program
+  wants the name of an input image. You will see appear on the
+  screen something like:-
+<p>
+
+<pre>
+      IN -  Input image file name? /!/ >
+</pre><p>
+
+  You should then type the name of file containing the image.
+  If you just press `return', then the program will take this
+  as the same as entering a `blank'. Such an input will have the
+  effect that the particular stage of the program desires.
+  Thus, for eaxmple, it may decide that you dont want any input
+  image. Or it may decide that, to continue, it needs this name,
+  and this case may either ask you again or it may just stop.
+<p>
+     
+  An example of a question with a default, is when the program
+  wants you to tell which of a list of options you want it do next.
+  It may have some idea of what you likely reponse should be, or
+  it may just guess (probably incorrectly). In this case, you
+  will see something like:-
+<p>
+
+<pre>
+      OPTION - Which action to perform? /'image/' >
+</pre><p>
+
+  In this case, again you would type in the name of the option
+  you want it to perform. However it is suggesting (correctly or
+  incorrectly) that you should want the `image' option. In this
+  case, if you press `return', then it assumes that the this
+  is the same as if you have typed `image', and will go and
+  perform the image option. This suggestion is referred to as the
+  `default' in the rest of the Starman help system.
+<p>
+
+<strong>    Obtaining Help </strong><p>
+
+
+ The Starman help system may be entered either whilst you are not 
+ running a program, or whilst you are running a program and 
+ inputting a parameter value.
+<p>
+
+ When you are not actually running a program, then an introduction to 
+ Starman can be obtained in hypertext with 
+<p>
+
+<pre>
+     >starmanhyperhelp 
+</pre><p>
+
+ or in line mode with
+<p>
+
+<pre>
+     > starmanhelp 
+</pre><p>
+
+ This puts you in the top level of the Starman help and you can 
+ explore all the sub-topics. There is a sub-topic for each program 
+ and then more general helps:-
+<p>
+
+<pre>
+ Author   Information on the Starman author 
+ Guide    A short run-through on using Starman 
+ Help     More information on the HELP system
+ Images   Information on Images 
+ Menu     A list of programs with a one line description
+ Starman  General information on the Starman package 
+ Tables   Information on Tables 
+</pre><p>
+
+ When you are inside a program, the help system is available every time 
+ you are asked by Starman for a parameter. Then by replying with a
+ question mark, you get the help on that particular parameter.
+<p>
+ 
+<pre>
+      IN -  Input image file name? /!/ > ?
+</pre><p>
+
+ If you want more general help on the program you are running, then
+ respond to the parameter query with:-
+<p>
+
+<pre>
+      IN -  Input image file name? /!/ > ??
+</pre><p>
+
+ which gets into the general Starman help.
+<p>
+
+<strong>    Upper and lower case </strong><p>
+
+
+ Generally, Starman does not mind if your typed in input is
+ in upper and/or lower case.
+<p>
+
+ Of course, in UNIX, file names are case sensitive, and so the
+ directory names, such as $STARMAN&$95 DATA, also are case
+ sensitive.
+<p>
+
+ However, some times you are asked for text input, for example
+ the `title' to add to an image. The case of the characters is
+ then preserved.
+<p>
+
+<strong>    Exiting a Program  </strong><p>
+
+
+ If you are inside a Starman program and wish to stop running it, 
+ then if you are putting in a parameter, just put in two 
+ exclamation marks (!!). If the program is running by itself 
+ either press the CTRLand C buttons or the CTRL  and Z  ones.
+<p>
+
+ If you have finished using Starman altogether, you need take no action,
+ unless you are in ICL, in which case type
+<p>
+
+<pre>
+     ICL> exit
+</pre><p>
+
+ which returns you to the shell.
+<p>
+
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1995 Jan 4 </i>
+ 

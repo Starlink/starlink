@@ -1,0 +1,448 @@
+<HTML>
+<HEAD>
+<TITLE> Starman - Include Files Source Code </TITLE>
+</HEAD>
+<BODY>
+
+<H1> Starman - Include Files Source Code </H1>
+
+<hr>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and conditions apply. <p>
+
+If you want to copy or use the code, make sure you have read these
+disclaimers and conditions. <p>
+
+Go to <a href="main.html"> Starman Main. </a> <br>
+Go to <a href="source_top.html#include_source_back"> Starman Source Code </a>
+Page <p>
+
+<hr>
+
+This page has the listing of the source code of 
+the general purpose <i> Starman</i> include files.<p>
+
+Many of the programs have their own include file, or files, which are
+attached to the pages of the source code. However, there are also a number
+of general include files. These are given in this page.<p>
+
+The include files are:-<p>
+
+starman.inc     <br>
+image.inc       <br>
+table.inc       <br>
+choice.inc      <br>
+graph.inc       <br>
+limits.inc      <br>
+st_adam.inc     <br>
+ds_gen.inc      <br>
+ds_panel.inc    <br>
+lut.inc         <br>
+virt.inc        <br>
+ 
+
+<hr><pre>
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C STARMAN.INC Include file for general Starman parameters
+C
+C  alan penny                   ral         1993 June
+
+
+      logical   st_failed			!Program failure
+
+      logical   st_dum1, st_dum2, st_dum3	!Make 4*n logicals
+
+      common / st_comb / st_failed, st_dum1, st_dum2, st_dum3
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C IMAGE.INC
+C
+C  alan penny                 ral                      1990-08-10
+
+      integer ipim		! Image pointer
+      integer nx		! Image X size
+      integer ny		! Image Y size
+      real    bs		! Image value scale
+      real    bz		! Image value zero
+      integer inval		! Image bad pixel value for 'INT' and 'SHORT' images
+      real    rinval		! Image bad pixel value for 'REAL' images
+
+      character*70  imtitle	! Image title
+      character*6   imtype	! Image type ('REAL':'INT':'SHORT')
+
+      common /imagecoma / ipim, nx, ny, bs, bz, inval, rinval
+
+      common /imagecomc / imtitle,  imtype
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TABLE.INC   General include file for table programs
+C
+
+      integer   tby		!Input table no of rows
+      integer   tbvx		!Input table no of columns (+5 for name)
+      integer   tbx		!Input table no of columns 
+
+      integer   tby1		!Input table 1 - no of rows
+      integer   tbvx1		!Input table 1 - no of columns (+5 for name)
+      integer   tbx1		!Input table 1 - no of columns 
+
+      integer   tby2		!Input table 2 - no of rows
+      integer   tbvx2		!Input table 2 - no of columns (+5 for name)
+      integer   tbx2		!Input table 2 - no of columns 
+
+      integer   tbyo		!Output table no of rows
+      integer   tbvxo		!Output table no of columns (+5 for name)
+      integer   tbxo		!Output table no of columns 
+
+      integer   tbyo1		!Output table 1 - no of rows
+      integer   tbvxo1		!Output table 1 - no of columns (+5 for name)
+      integer   tbxo1		!Output table 1 - no of columns 
+
+      integer   tbyo2		!Output table 2 - no of rows
+      integer   tbvxo2		!Output table 2 - no of columns (+5 for name)
+      integer   tbxo2		!Output table 2 - no of columns 
+
+
+      common / tbcoma /   tby,    tbvx,    tbx,   tby1,   tbvx1,  tbx1, 
+     +                   tby2,   tbvx2,   tbx2,   tbyo,   tbvxo,  tbxo,
+     +                  tbyo1,  tbvxo1,  tbxo1,  tbyo2,  tbvxo2,  
+     +                  tbxo2  
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C CHOICE.INC
+C
+C  Attributes for 'choice' s/rs
+C
+C   alan penny                  RAL                 1993 Oct
+
+      integer   KLEF_X				! No of times defaults asked for
+      integer   KLEF_Y				! Last Y Posn in defaults array
+      logical   LOOPT_HELP			!
+      logical   ISBHELP				! Was last button press the button-help?
+      logical   WASBHELP 			! Last button was help on
+      logical   CH_AUTOSTART			! Use a starting standard set of options automatically?
+
+      character*70 KTDEF_HELP			!
+      character*12 TBHELP			! Button help asked for
+
+      integer         CH_SECT_NUM		! No of sections
+      integer         CH_MAX_SECT_NUM
+      parameter       ( CH_MAX_SECT_NUM = 15 )
+      character*200   CH_SECT_TEXT(CH_MAX_SECT_NUM)	! Options in sections
+      character*10    CH_SECT_HEAD(CH_MAX_SECT_NUM)	! Section headers
+
+      integer         CH_NCODE         		! Number of Panel Option List
+                                        	!  (usually=1; if diff from
+                                        	!  previous entry, load new panel)
+      character*50    CH_TITLE         		! Title of panel
+      character*50    CH_OPTION			! Option parameter name
+
+      integer         CH_OPT_NUM            	! No of options
+      integer         CH_MAX_OPT_NUM
+      parameter       ( CH_MAX_OPT_NUM = 100 )
+      character*12    CH_OPT_TEXT(CH_MAX_OPT_NUM)
+      character*68    CH_OPT_HEAD(CH_MAX_OPT_NUM)
+      character*68    CH_OPT_HELP(6,CH_MAX_OPT_NUM)
+
+      integer         CH_HELP_NUM	 	! No of lines of help text
+      integer         CH_MAX_HELP_NUM
+      parameter       ( CH_MAX_HELP_NUM = 200 )
+      character*68    CH_HELP_TEXT(CH_MAX_HELP_NUM)
+
+      integer         CH_DEF_X            	! No of default options
+      integer         CH_DEF_Y            	! No of poss default paths
+      integer         CH_MAX_DEF_X
+      parameter       ( CH_MAX_DEF_X = 20 )
+      integer         CH_MAX_DEF_Y
+      parameter       ( CH_MAX_DEF_Y = 5 )
+      character*12    CH_DEF_TEXT(CH_MAX_DEF_X,CH_MAX_DEF_Y)
+
+C      logical         dum_cho_1, dum_cho_2, dum_cho_3		! to make 4*n logicals
+
+
+      common / xxchoice  / KLEF_X, KLEF_Y, CH_DEF_X, CH_DEF_Y, 
+     +                     CH_SECT_NUM, CH_NCODE, CH_OPT_NUM, 
+     +                     CH_HELP_NUM
+
+      common / xxchoiceb / LOOPT_HELP, ISBHELP, WASBHELP, CH_AUTOSTART
+
+      common / xxchoicec / KTDEF_HELP, TBHELP, CH_TITLE, CH_OPTION,
+     +                     CH_SECT_TEXT, CH_SECT_HEAD, 
+     +                     CH_DEF_TEXT, 
+     +                     CH_OPT_TEXT, CH_OPT_HEAD, CH_OPT_HELP, 
+     +                     CH_HELP_TEXT
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  GRAPH.INC
+C
+C   alan penny                    ral             1990 Apr
+
+      logical       gd_dispop       !Is device open?
+      character*256 gd_dev	    !Device type
+      integer       gd_devn         !Device type name length
+      integer       gd_bad          !=0 for good device, 1= bad
+      real          gd_xs           ! X start posn of graph
+      real          gd_xe           ! X end posn of graph
+      real          gd_ys           ! Y start posn of graph
+      real          gd_ye           ! Y end posn of graph
+      integer       gd_linecol      ! Colour of written line (1=black;2=white)
+
+      logical       gd_dum1
+      logical       gd_dum2
+      logical       gd_dum3
+
+      common /deva/ gd_xs, gd_xe, gd_ys, gd_ye, gd_bad, gd_devn,
+     +              gd_linecol
+
+      common /devb/ gd_dispop, gd_dum1, gd_dum2, gd_dum3
+
+      common /devc/ gd_dev
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C LIMITS.INC Include file for max, min and invalid values  
+C
+C  alan penny                   ral         1991 Dec
+
+
+      integer*2   int_invalss			!Bad pixel magic short value
+      parameter ( int_invalss = '8000'X )
+
+      integer     int_invalsi			!Bad pixel magic short 
+      parameter ( int_invalsi = -32768  )	! (integer*4) value
+
+      integer     int_invali			!Bad pixel magic integer value
+      parameter ( int_invali  = '80000000'X )
+
+      real        int_invalr			!Bad pixel magic real value
+      parameter ( int_invalr  = 'FF7FFFFF'X )
+
+      real        int_minrr			!Min 'real' value
+      parameter ( int_minrr   = 'FF7FFFFF'X )
+
+      real        int_maxrr			!Max 'real' value
+      parameter ( int_maxrr   = '7F7FFFFF'X )
+
+      real        int_minir			!Min 'int' value
+      parameter ( int_minir   = -2147483648.0 )
+
+      real        int_maxir			!Max 'int' value
+      parameter ( int_maxir   = 2147483647.0 )
+
+      integer     int_minii			!Min 'int' value
+      parameter ( int_minii   = '80000000'X )
+
+      integer     int_maxii			!Max 'int' value
+      parameter ( int_maxii   = '7FFFFFFF'X )
+
+      real        int_minsr			!Min 'short' value
+      parameter ( int_minsr   = -32768 )
+
+      real        int_maxsr			!Max 'short' value
+      parameter ( int_maxsr   = 32767 )
+
+      integer*2   int_minss			!Min 'short' value
+      parameter ( int_minss   = '8000'X )
+
+      integer*2   int_maxss			!Max 'short' value
+      parameter ( int_maxss   = '7FFF'X )
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C ST_ADAM.INC
+C
+C Include file to define common block for file and workspace s/routines
+C
+C  alan penny           ral         1994 Jul
+
+
+        integer                 WS_NSIZE		!
+        parameter               ( WS_NSIZE = 20 )
+        integer                 WORK_LIMIT		!
+        parameter               ( WORK_LIMIT = 100 )
+        character*(WS_NSIZE)	WS_NAME(WORK_LIMIT)	! name of workspace
+        integer                 CPNTR(WORK_LIMIT)	! pointer to workspace in char form
+        integer                 WS_COUNTER		!
+
+        integer                 NDF_LIMIT		!
+        parameter               ( NDF_LIMIT = 250 )
+        character*(WS_NSIZE)	NDF_NAME(NDF_LIMIT)     ! name of  NDF
+        integer                 SNDF(NDF_LIMIT)		! NDF identifier
+        integer                 NDF_COUNTER
+
+
+        common / sman_wscha / ws_name
+        common / sman_wsint / ws_counter, cpntr
+
+        common / sman_ndfcha / ndf_name
+        common / sman_ndfint / sndf, ndf_counter
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C DS_GEN.INC
+C
+C  The largest screen that can be supported is one that is less
+C  than 1.5kx1.5k.
+C
+C  The virtual arrays that are used, are filled up as X likes,
+C  that is the start is at [0,0] and at the top left hand of
+C  the picture.
+C
+C  The three coordinate systems used are 'image' 'virtual' and 
+C  'screen'. These all start at (1,1) from the bottom left hand.
+C
+C  Thus in filling the virtual arrays and in any action writing
+C  to the screen, coordinates have to be transformed.
+C
+C     screen x =  array x - 1
+C     screen y =  screen size - array y
+C
+
+
+      integer dscomfx		! Displayed X image compression factor to virtual image
+      integer dscomfy		! Displayed Y image compression factor to virtual image
+
+      integer dsnxs             ! Displayed image blh pixel X true image pixel number
+      integer dsnys             ! Displayed image blh pixel Y true image pixel number
+      integer dsnxe             ! Displayed image trh pixel X true image pixel number
+      integer dsnye             ! Displayed image trh pixel X true image pixel number
+
+      integer dsixs             ! Displayed image blh pixel X virtual image position
+      integer dsiys             ! Displayed image blh pixel Y virtual image position
+
+      integer dssnx		! Screen (and virtual image) X size
+      integer dssny		! Screen (and virtual image) Y size
+
+      integer dszm		! Screen zoom factor
+      integer dstype		! Display type (2=vws_vaxstation;3=ikon;4=x11_dec)
+
+      real    dsvmin		! Displayed image unscaled display min value
+      real    dsvmax		! Displayed image unscaled display max value
+
+      real    dscrsl		! Size of crosses to be painted
+
+      integer dszpx		! X position in virtual image that is at tlh of screen
+      integer dszpy		! Y position in virtual image that is at tlh of screen
+
+      integer dswindx		! x min offset of window edge from screen edge (cms)
+      integer dswindy		! y min offset of window edge from screen edge (cms)
+      integer dswindxm		! max x min offset of window edge from screen edge (cms)
+
+      real    dscurposx		! Cursor X screen position
+      real    dscurposy		! Cursor Y screen position
+      integer dskvrange		! image contrast scale got? (0=no;1=yes)
+
+      integer dszoommax		!Maximum zoom the display allows
+      integer numxbuttons	! Number of buttons on mouse with X windows (2 or 3)
+
+
+      common /ds_gen/ dscomfx,   dscomfy, dsnxs,    dsnys,     dsnxe,      
+     +                dsnye,
+     +                dsixs,    dsiys,    dssnx,     dssny,       dszm, 
+     +                dstype,  dsvmin,   dsvmax,    dscrsl,      dszpx,
+     +                dszpy,  dswindx,  dswindy,  dswindxm,  dscurposx,
+     +                dscurposy, dskvrange, dszoommax, numxbuttons
+
+      logical dswrap		! Displayed image wrap display values around min/max (t/f)?
+      logical dsscur		! Cursor started?
+      logical dsopen		! Display open?
+      logical dscurset		! Cursor placed?
+
+      common /ds_genb/ dswrap, dsscur, dsopen, dscurset
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! DS_PANEL.INC
+!
+
+      integer	pnsnx			! Panel X size
+      integer	pnsny			! Panel Y size
+      integer	pnnum			! Panel number of options
+      integer	pnjcon(200)		! Panel option order
+      integer	pnnrow			! Panel number of rows
+      integer	pnncol			! Panel number of columns
+      integer	pdstype			! Panel display type
+      integer	pdnuml			! Panel option list code number -
+					!  (which `option list' loaded at present)
+      integer	pnhposx			! Panel X location of help button
+      integer	pnhposy			! Panel Y location of help button
+      integer	pncposx			! Panel X location of command button
+      integer	pncposy			! Panel Y location of command button
+      integer	pnvposx			! Panel X location of Posn, Value box
+      integer	pnvposy			! Panel Y location of Posn, Value box 
+      integer	pnnums(200)		! Panel number of options (sections)
+      integer   pnx(200)		! Panel button X locations
+      integer   pny(200)		! Panel button Y locations
+      integer	pnbhposx		! Panel X location of button help button
+      integer	pnbhposy		! Panel Y location of button help button
+
+      logical	dopanel			! Panel use?
+      logical	dohpanel		! Help Panel use?
+      logical	pdsopen			! Panel opened?
+
+      logical   pds_dum1		! Dummy to make up 4
+
+      common /ds_panel/ pnsnx,   pnsny,   pnnum,    pnjcon,   pnnrow,
+     +                  pnncol,  pdstype, pdnuml,  pnhposx,  pnhposy,
+     +                  pncposx, pncposy, pnvposx, pnvposy,   pnnums,
+     +                     pnx,      pny, pnbhposx, pnbhposy
+
+      common /ds_panelb/ dopanel,  dohpanel,  pdsopen,   pds_dum1
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LUT.INC
+!
+!  Color tables copyright Smithsonian Astrophysical Observatory 1989
+
+      integer   numdcol			!No of colours in LUT
+      parameter (numdcol=150)
+      integer   nlent			!'Length' of a LUT storage table
+      parameter (nlent=25)
+
+      integer   numddcol		!No of colours in display for LUT colours 
+
+      integer   depth			! No of memory planes
+
+      integer	lut_stored 		! Number of stored LUTs
+      integer	lut_ends		! LUT end types (1=black/white;2=wh/bl;3=col/col;4=wrap
+      real	lut_val(NUMDCOL,3)	! RGB arrays
+      integer   lut_num			! Present LUT number
+      real	lut_sc			! LUT scale
+      real	lut_ze			! LUT zero
+
+      logical   lut_flipped		! Is LUT flipped?
+
+      logical   lut_dum1, lut_dum2, lut_dum3	!Make up to 4*n logicals
+
+
+
+
+      common /lutbcom/ lut_flipped, lut_dum1, lut_dum2, lut_dum3
+
+      common /lutacom/ lut_ends, lut_stored,  lut_val,  lut_num,   
+     +                 lut_sc,   lut_ze,   numddcol,    depth
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! VIRT.INC
+!
+      integer   maxvirt
+      parameter ( maxvirt=1536*1536 )
+      byte      vt_im(maxvirt)		! Display virtual image
+
+      common /virt/ vt_im
+
+
+
+</pre><HR>
+
+Go to <a href="main.html"> Starman Main. </a> <p>
+
+ 
+<HR>
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html"> Alan Penny </a>
+- <a href="http://www.rl.ac.uk/rutherford.html"> 
+Rutherford Appleton Laboratory </a> (RAL) </address>  
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 07 </i>
+
+
+</BODY>
+</HTML>
+

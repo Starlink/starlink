@@ -1,0 +1,151 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBNATIVE
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBNATIVE
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbnative_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbnative.f">
+t_tbnative.f  </a>  Converts Starman table between different machines.       <br>
+<a href="#tbnative">
+tbnative  </a>  (Program) Perform TBNATIVE program       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbnative.f"> T_TBNATIVE.F  </a>-- Converts Starman table between different machines.
+C   Table mapped as real, then as basic (bytes). This preserves the name
+C   info in which is held in the first five reals of each row, and which
+C   is thus corrupted if mapped as real on different machines
+C
+C   pat morris    leeds     May 1992
+
+
+      subroutine t_tbnative ( )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'SAE_PAR'
+      include 'DAT_PAR'
+      include 'NDF_PAR'
+C--
+      integer indf, outdf, num, iptr, optr, status,
+     +        ndim(2), num2, nx, ny
+      character*(DAT__SZLOC) loc, dloc, nloc
+      character*(NDF__SZFRM) form
+      character*60 frtype
+Cbegin
+
+
+      status = SAI__OK
+
+      call ndf_assoc ( 'IN', 'READ', indf, status )        		!Input NDF
+      call ndf_loc ( indf, 'READ', loc, status )           		!Get hds locator
+
+      call ndf_form ( indf, 'DATA', form, status )
+      if ( form.eq.'SIMPLE' ) then
+         call dat_find ( loc, 'DATA_ARRAY', nloc, status )		!find data array
+         call dat_find ( nloc, 'DATA', dloc, status )
+      else
+         call dat_find ( loc, 'DATA_ARRAY', dloc, status )
+      endif
+
+      call dat_basic ( dloc, 'READ', iptr, num2, status )		!Map as basic
+
+      call ndf_dim ( indf, 2, ndim, num, status )
+      nx = ndim(1)
+      ny = ndim(2)
+
+      call ndf_cget ( indf, 'LABEL', frtype, status )			!Check is a table
+      if ( frtype.ne.'XYLIST' .or. nx.lt.6 .or. ny.lt.1 ) then
+         call printo ('ERROR: Not a proper table - size wrong '//
+     +                    ' - Table could not be accessed' )
+         status = SAI__ERROR
+         ST_FAILED = .true.
+         return
+      endif
+
+      call ndf_prop ( indf, 'DATA', 'OUT', outdf, status )		!Propagate NDF
+
+      call ndf_map ( outdf, 'DATA', '_REAL', 'UPDATE', optr,
+     +               num, status )
+
+      if ( status.ne.SAI__OK ) then                       		!Exit if not okay
+         ST_FAILED = .true.
+         return
+      endif
+
+      call pargi ( ny )                                 		!Informational output
+      call pargi ( nx-5 )
+      call printd ( 'Table size:  %d rows  ; %d columns' )
+
+      call pargi ( nx*4 )	                             		!Check on conversion
+      call pargi ( ny )
+      call pargi ( num2 )
+      call printd ( 'Contents Check:  %d x %d bytes should'//
+     +              ' be = %d no. of byte elements' )
+
+      call copzz ( %val(iptr), nx*4, ny, 1, 20, 1, ny,			!Copy first 5 reals for each column across
+     +             %val(optr), nx*4, ny, 1, 1 )				! as bytes
+
+      call dat_annul ( dloc, status )
+      call dat_annul ( loc, status )
+      if ( form.eq.'SIMPLE' ) call dat_annul ( nloc, status )
+
+      call ndf_annul ( outdf, status )
+      call ndf_annul ( indf, status )
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbnative"> TBNATIVE  </a>-- (Program) Perform TBNATIVE program
+C   See TBNATIVE.HLP for details
+C
+C         A.J.Penny                RAL                      1994 May
+
+      subroutine tbnative ( ierradam )
+
+      implicit none
+
+      integer     ierradam         !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbnative
+
+      call starman_end ( ierradam )
+
+      end
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

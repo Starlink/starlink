@@ -1,0 +1,603 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMDES
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMDES
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imdes_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imdes">
+imdes  </a>  (Program) List, write, delete descriptors of image       <br>
+<a href="#t_imdes">
+t_imdes  </a>  List, copy, write, delete descriptors of an image       <br>
+<a href="#imd_slist">
+imd_slist  </a>  Put out wanted descriptors       <br>
+<a href="#imd_alist">
+imd_alist  </a>  Put out all descriptors       <br>
+<a href="#imd_write">
+imd_write  </a>  Write descriptors to image       <br>
+<a href="#imd_delete">
+imd_delete  </a>  Delete descriptors from an image/table       <br>
+<a href="#imd_copy">
+imd_copy  </a>  Copy descriptors from one image to another       <br>
+<a href="#imd_getem">
+imd_getem  </a>  Get existing descriptors in output image       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imdes"> IMDES  </a>-- (Program) List, write, delete descriptors of image
+C
+C         A J Penny                RAL             1991 June
+
+      subroutine imdes ( ierradam )
+
+      implicit none
+
+      integer     ierradam        !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imdes
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  T_IMDES.FOR
+C
+C    Contains:-
+C
+C T_IMDES      List, write, delete descriptors of an image
+C IMD_LIST     List descriptors
+C IMD_SINGLE   Put out wanted descriptors
+C IMD_ALL      Put out all descriptors
+C IMD_WRITE    Write descriptors to image
+C IMD_DELETE   Delete descriptors from an image
+C IMD_COPY     Copy descriptors from one image to another
+C IMD_GETEM    Get existing descriptors in output image
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imdes"> T_IMDES  </a>-- List, copy, write, delete descriptors of an image
+C   For a fuller description see IMDES.HLP
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_imdes ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      integer kout, ierr, ka
+      character*1000 topt
+      data topt / 'list:write:delete:copy' /
+      integer nth
+      parameter ( nth=6)
+      character*68 th(nth)
+      data th /
+     + 'Option    Function',
+     + '------    --------',
+     + 'Copy      Copy descriptors from on image to another',
+     + 'Delete    Delete descriptors from image',
+     + 'List      List descriptors of image',
+     + 'Write     Write descriptors to image' /
+Cbegin
+
+
+      call get_job ( 'OPTION', topt, kout, 1, th, nth )
+      if ( ST_FAILED ) return
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .false., ierr )		!Obtain input image
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE,ierr)	!Get scale,zero,title
+
+
+      if ( kout.eq.1 ) then
+                       call get_job ('ALL_LIST','all:some',ka,2,' ',0)
+                       if ( ST_FAILED ) return
+                       if ( ka.eq.1 ) then
+                          call imd_alist
+                       else
+                          call imd_slist
+                       endif
+                       endif
+
+      if ( kout.eq.2 ) call imd_write
+
+      if ( kout.eq.3 ) call imd_delete
+
+      if ( kout.eq.4 ) call imd_copy
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imd_slist"> IMD_SLIST  </a>-- Put out wanted descriptors
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine imd_slist ( )
+
+      implicit none
+      include 'imdes.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+C--
+      logical more, amore, paging, onlyone
+      integer k, nval, ierr, kout
+      character textb*80, name*20, blank*8
+      data blank / '        ' /
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'ONLYONE', onlyone, .true. )
+      if ( ST_FAILED ) return
+
+      call get1b ( 'PAGING', paging, .false. )
+      if ( ST_FAILED ) return
+
+      call pargc ( IMTYPE )						!Output main details
+      call printd ( ' Image type is: %c ' )
+      call pargi ( NX )
+      call pargi ( NY )
+      call printd ( ' Size:   %d x %d')
+      call pargc ( IMTITLE )
+      call printd ( ' Title:  %c' )
+      call pargr ( BS )
+      call pargr ( BZ )
+      if ( IMTYPE.eq.'SHORT' ) then
+         call pargi ( INVAL )
+         call printd ( ' Scale: %f   Zero: %f   Invalid flag:  %d' )
+      else
+         call pargr ( RINVAL )
+         call printd ( ' Scale: %f   Zero: %f   Invalid flag:  %f' )
+      endif
+      call printo ( ' ' )
+
+      amore = .true.
+      do while ( amore )
+         call get1c ( 'NAME', name, ' ', .true. )
+         if ( ST_FAILED ) return
+         if ( name.eq.' ' ) then
+            amore = .false.
+         else
+            call gtdesc ( 'IN', name, TEXTA, ' ', nval, ierr )
+            if ( TEXTA(1).eq.' ' .or. ierr.ne.0 ) then
+               call printo ( 'ERROR: No such descriptor' )
+            else
+               k = 0
+               kout = 0
+               more = .true.
+               do while ( k.lt.nval .and. more )
+                  k = k + 1
+                  if ( k.eq.1 ) then
+                     textb = name(1:8)//'  '//TEXTA(k)(1:68)
+                  else
+                     textb = blank//'  '//TEXTA(k)(1:68)
+                  endif
+                  call printo ( textb )
+                  kout = kout + 1
+                  if ( .not.onlyone .and. kout.eq.21 ) then
+                      kout = 0
+                      if ( paging ) call get1b ( 'MORE', more, .true. )
+                      if ( ST_FAILED ) return
+                  endif
+               enddo
+            endif
+         endif
+         if ( onlyone ) amore = .false.
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imd_alist"> IMD_ALIST  </a>-- Put out all descriptors
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine imd_alist ()
+
+      implicit none
+      include 'imdes.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+C--
+      logical more, paging, some
+      integer k, ncount, nval, ierr, kout
+      character descr*80, text*80
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'PAGING', paging, .false. )
+      if ( ST_FAILED ) return
+
+      call pargc ( IMTYPE )						!Output main details
+      call printd ( ' Image type is: %c ' )
+      call pargi ( NX )
+      call pargi ( NY )
+      call printd ( ' Size:   %d x %d')
+      call pargc ( IMTITLE )
+      call printd ( ' Title:  %c' )
+      call pargr ( BS )
+      call pargr ( BZ )
+      if ( IMTYPE.eq.'SHORT' ) then
+         call pargi ( INVAL )
+         call printd ( ' Scale: %f   Zero: %f   Invalid flag:  %d' )
+      else
+         call pargr ( RINVAL )
+         call printd ( ' Scale: %f   Zero: %f   Invalid flag:  %f' )
+      endif
+      call printo ( ' ' )
+
+      some = .false.
+      more = .true.							!Put out descriptors
+      kout = 0
+      ncount = 0
+      nval = 1
+      do while ( more )
+         ncount = ncount + nval
+         call gtdesn ( 'IN', ncount, descr, ierr )
+         if ( ierr.ne.0 ) then
+            more = .false.
+         else
+            if ( (descr(1:5).ne.'NAXIS') .and.
+     +           (descr(1:6).ne.'BSCALE') .and.
+     +           (descr(1:5).ne.'BZERO') .and.
+     +           (descr(1:5).ne.'INVAL') .and.
+     +           (descr(1:5).ne.'TITLE') ) then
+               some = .true.
+               call gtdesc ( 'IN', descr, TEXTA, ' ', nval, ierr )
+               if ( TEXTA(1).ne.' ' .and. ierr.eq.0 ) then
+                  k = 0
+                  more = .true.
+                  do while ( k.lt.nval .and. more )
+                     k = k + 1
+                     text = descr(1:8)//'  '//TEXTA(k)(1:68)
+                     call printo ( text )
+                     kout = kout + 1
+                     if ( kout.eq.21 ) then
+                        kout = 0
+                        if ( paging ) call get1b ( 'MORE', more, .true.)
+                        if ( ST_FAILED ) return
+                      endif
+                  enddo
+               endif
+            endif
+         endif
+      enddo
+
+      if ( .not.some ) call printo ( 'No descriptors' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imd_write"> IMD_WRITE  </a>-- Write descriptors to image
+C
+C  p morris      leeds                   Jun 1992
+
+      subroutine imd_write ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      integer ierr, iv, ka
+      real rv
+      character desnam*20, val*72
+      logical loop, first
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1b ( 'LOOP', loop, .true. )				!Loop needed?
+      if ( ST_FAILED ) return
+
+      first = .true.
+      do while ( loop .or. first )					!Get and write descriptor(s)
+         call get1c ( 'NAME', desnam, ' ', .true. )
+         if ( ST_FAILED ) return
+         if ( desnam.eq.' ' ) then
+            loop = .false.
+         else
+            call get_job ( 'FORMAT', 'char:int:real', ka,1,' ',0)
+            if ( ST_FAILED ) return
+            call get1c ( 'VALUE', val, val, .true. )
+            if ( ST_FAILED ) return
+            if ( ka.eq.1 ) then
+               call ptdesc ( 'IN', desnam, val )
+            elseif ( ka.eq.3 ) then
+               call chartor ( val, rv, ierr )
+               if ( ierr.eq.0 ) then
+                  call ptdesr ( 'IN', desnam, rv )
+               else
+                  call printo ( 'ERROR: Not a real value' )
+               endif
+            elseif ( ka.eq.2 ) then
+               call chartoi ( val, iv, ierr )
+               if ( ierr.eq.0 ) then
+                  call ptdesi ( 'IN', desnam, iv )
+               else
+                  call printo ( 'ERROR: Not an integer value' )
+               endif
+            else
+               call printo ( 'Invalid type' )
+               ierr = 1
+            endif
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+         endif
+         first = .false.
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imd_delete"> IMD_DELETE  </a>-- Delete descriptors from an image/table
+C
+C  p morris             leeds       jun 1992
+
+      subroutine imd_delete ()
+
+      implicit none
+      include 'imdes.inc'
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      integer ierr, ncount, nval, ka
+      character descr*20
+      logical loop, first, more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get_job ( 'ALL_DEL', 'all:some', ka, 1, ' ', 0 )
+      if ( ST_FAILED ) return
+
+      if ( ka.eq.1 ) then
+
+         more = .true.		
+         ncount = 0
+         nval = 1
+         do while ( more )
+
+            ncount = ncount + nval
+            call gtdesn ( 'IN', ncount, descr, ierr )
+            if ( descr.eq.' ' .or. ierr.ne.0 ) then
+               more = .false.
+            else
+               if ( descr(1:5).ne.'NAXIS' ) then
+                  call gtdesc ( 'IN', descr, TEXTA, ' ', nval, ierr )
+                  if ( TEXTA(1).ne.' ' .and. ierr.eq.0 ) then
+                     call dldes ( 'IN', descr, ierr )
+                  else
+                     ST_FAILED = .true.
+                     more = .false.
+                  endif
+               endif
+            endif
+
+         enddo
+
+      else
+
+         call get1b ( 'LOOP', loop, .true. )				!Loop needed?
+         if ( ST_FAILED ) return
+
+         first = .true.
+         do while ( loop .or. first )					!Get and write descriptor(s)
+            call get1c ( 'NAME', descr, ' ', .true. )
+            if ( ST_FAILED ) return
+            if ( descr.eq.' ' ) then
+               loop = .false.
+            else
+               call dldes ( 'IN', descr, ierr )
+            endif
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               loop = .false.
+            endif
+            first = .false.
+         enddo
+
+      endif
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imd_copy"> IMD_COPY  </a>-- Copy descriptors from one image to another
+C  Optionally you can choose to overwrite or not descriptors that
+C  already occur in the target file.
+C
+C   alan penny                ral      1990 jan
+
+      subroutine imd_copy ()
+
+      implicit none
+      include 'imdes.inc'
+      include 'STARMAN_INC'
+      include 'image.inc'
+C--
+      character*60 atext(10000)
+      character*8  adescr(10000)
+      integer numdes(10000), ierr, j, k, ip2, nx2, ny2, nval,
+     +        ntot, ncount
+      character*6 imt2
+      logical over, dele
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call opimgr ( 'OUT', ip2, nx2, ny2, imt2, .false., ierr )		!Open output
+      if ( ierr.ne.0 ) ST_FAILED = .true.
+
+      call get1b ( 'OVER', over, .true. )				!Get wether to overwrite
+
+      if ( over ) call get1b ('DELETE', dele, .true. )			!Get wether to delete before overwriting
+      if ( ST_FAILED ) return
+
+      if ( over ) then
+         if ( dele ) then
+            call icopdes ( 'IN', 'OUT', ierr )
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+         else
+            call imd_getem ( adescr, numdes, atext, ncount )
+            call icopdes ( 'IN', 'OUT', ierr )
+            if ( ierr.ne.0 ) then
+               ST_FAILED = .true.
+               return
+            endif
+            ntot = 0
+            do k = 1, ncount
+               call gtdesc ( 'OUT', adescr(k), TEXTA, ' ', nval,
+     +                              ierr )
+               if ( ierr.ne.0 ) then
+                  do j = 1, numdes(k)
+                     TEXTA(j) = atext(ntot+j)
+                  enddo
+                  call ptdescn ( 'OUT', adescr(k), TEXTA, numdes(k) )
+               endif
+               ntot = ntot + numdes(k)
+            enddo
+         endif
+      else
+         call imd_getem ( adescr, numdes, atext, ncount )
+         call icopdes ( 'IN', 'OUT' ,ierr )
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+         ntot = 0
+         do k = 1, ncount
+            do j = 1, numdes(k)
+               TEXTA(j) = atext(ntot+j)
+            enddo
+            ntot = ntot + numdes(k)
+            call ptdescn ( 'OUT', adescr(k), TEXTA, numdes(k) )
+         enddo
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imd_getem"> IMD_GETEM  </a>-- Get existing descriptors in output image
+C
+C   alan penny                ral         1990 jan
+
+      subroutine imd_getem ( adescr, numdes, atext, ncount )
+
+      implicit none
+      include 'imdes.inc'
+      include 'STARMAN_INC'
+
+      character*8  adescr(10000)	!o: Names of descriptors
+      integer      numdes(10000)	!o: Number of values in descriptors
+      character*60 atext(10000)		!o: Contents of descriptors
+      integer      ncount		!o: Number of descriptors
+C--
+      character btext*60, descr*80
+      integer ierr, k, numtot, nval
+      logical more
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      more = .true.
+      ncount = 0
+      numtot = 0
+      do while ( more )
+         ncount = ncount + 1
+         call gtdesn ( 'OUT', ncount, descr, ierr )
+         if ( ierr.eq.1 ) then
+            more = .false.
+         else
+            call gtdesc ( 'OUT', descr, TEXTA, ' ', nval, ierr )
+            numtot = numtot + nval
+            if ( numtot.gt.10000 ) then
+               more = .false.
+              call printo('WARNING: Too much - only 10000 lines copied')
+            else
+               adescr(ncount) = descr(1:8)
+               numdes(ncount) = nval
+               do k = 1, nval
+                 btext = TEXTA(k)
+                 atext(ncount+k-1) = btext(1:60)
+               enddo
+            endif
+         endif
+      enddo
+      ncount = ncount - 1
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  IMDES.INC
+
+
+
+      character*80 texta(16384)
+
+
+      common / desc / texta
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,4417 @@
+<HTML> <HEAD>
+<TITLE> INTERACT </TITLE>
+</HEAD> <BODY>
+  
+<h1> INTERACT - Looking at images </h1>
+<hr>
+  
+  This is the main Starman program for interacting with an image
+  or images displayed on a display device.
+<p>
+  
+  The Main functions are:-
+<p>
+  
+<dl>
+<li> Display of image(s)
+<li> Inspection of the image
+<li> Changing look up tables and use of colours
+<li> Inspection of pixel values in sub-areas in various ways
+<li> Altering the image in various ways
+<li> Plotting (X,Y) positions from an input table
+<li> Getting (X,Y) positions for storage in an output table
+<li> Aperture photometry including airmass
+<li> Scrutiny of the Starman MEASURE program output
+</ul>
+  
+ One gets into one of eight groups of options, and repeatedly
+ chooses options to perform. One can move between groups of
+ options
+<p>
+  
+  
+<hr>
+Go to <a href="intro.html#interact_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+  
+<hr>
+<h2> Index </h2>
+  
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#options"> Options </a>
+<ul>
+<li> 2.1 <a href="#simple_set"> Simple set </a>
+<li> 2.2 <a href="#alter"> Alter </a>
+<li> 2.3 <a href="#aperture"> Aperture </a>
+<ul>
+<li> 2.3.1 <a href="#aperture_general"> Aperture general </a>
+<li> 2.3.2 <a href="#aperture_photometry"> Aperture photometry </a>
+<li> 2.3.3 <a href="#aperture_options"> Aperture options </a>
+</ul>
+<li> 2.4 <a href="#colour"> Colour </a>
+<ul>
+<li> 2.4.1 <a href="#lut_bar"> Lut bar </a>
+<li> 2.4.2 <a href="#lut_standards"> Lut standards </a>
+<li> 2.4.3 <a href="#lut_storage"> Lut storage </a>
+<li> 2.4.4 <a href="#colour_options"> Colour options </a>
+</ul>
+<li> 2.5 <a href="#fit_magns"> Fit magns </a>
+<li> 2.6 <a href="#inspect"> Inspect </a>
+<li> 2.7 <a href="#positions"> Positions </a>
+<li> 2.8 <a href="#scrutiny"> Scrutiny </a>
+</ul>
+<li> 3 <a href="#panel"> Panel </a>
+<li> 4 <a href="#mouse_buttons"> Mouse buttons </a>
+<li> 5 <a href="#colour"> Colour </a>
+<li> 6 <a href="#grey_scale"> Grey scale </a>
+<li> 7 <a href="#cursor"> Cursor </a>
+<li> 8 <a href="#hard_copy"> Hard copy </a>
+<li> 9 <a href="#display"> Display </a>
+<li> 10 <a href="#input_files"> Input files </a>
+<li> 11 <a href="#output_files"> Output files </a>
+<ul>
+<li> 11.1 <a href="#alter_output"> Alter output </a>
+<li> 11.2 <a href="#aperture_output"> Aperture output </a>
+<li> 11.3 <a href="#colour_output"> Colour output </a>
+<li> 11.4 <a href="#fit_magns_output"> Fit magns output </a>
+<li> 11.5 <a href="#positions_output"> Positions output </a>
+<li> 11.6 <a href="#scrutiny_output"> Scrutiny output </a>
+</ul>
+<li> 12 <a href="#parameters"> Parameters </a>
+<li> 13 <a href="#author"> Author </a>
+</ul>
+  
+<hr>
+  
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+  
+  
+ As the use of Interact is interactive, there is an infinite number of ways
+ of using it. However, to give you some ides of its use, the following
+ `run-through' of one possible session is given. It is assumed you are at a
+ colour X-window device.
+<p>
+  
+ Where a '>' appears, you have to type the response, followed by a
+ 'return'. Where no response is shown, you just do the 'return'.
+ The parts in curly brackets are instructions for actions by you, and
+ not responses for you to type in. The parts in square brackets are
+ comments on the display.
+<p>
+  
+<pre>
+  
+ >interact $STARMAN_DATA/measure_in                          (1)
+ EASYSTART - Use standard start operations? /YES/>no         (2)
+          [information on use typed out]
+ OPTION - Which action to perform? /'image'/ >               (3)
+ OPTION - Which action to perform? /'flash'/ >               (4)
+ SCREEN - XY size of window to open? /[100,100]/ >200,200    (5)
+ Display contrast: low =   324.9188 ; high =   -19.3838
+          [display window opened and image displayed]
+ OPTION - Which action to perform? /'panel'/ >               (6)
+          [`buttons' and `help panel' windows opened]
+    {Click cursor on `cvalues' button}                       (7)
+    {Move cursor around image}                               (8)
+    {Click cursor right-hand button}                         (9)
+    {Click cursor on `inspect' button}                      (10)
+    {Click cursor on `slice' button}                        (11)
+    {Position cursor inside and near b.l.h. corner of       (12)
+      image and click}
+ X = 13  Y = 17
+    {Position cursor inside and near t.r.h. corner of       (13)
+      image and click}
+ X = 85  Y = 86
+ VPRANGE - Min and Max of values to plot? /[-364,4904]/ >   (14)
+ Input GKS name of device for graphs (-ask- if dont know)
+ GTYPE - GKS name of plot device ? /'xwindows'/             (15)
+          [graphical window opened]
+ LINECOL - Colour of plot lines? (black:white) /'black'/ >  (16)
+          [graph plotted in graphical window]
+    {Click cursor on `exit' button}                         (17)
+          [display, buttons and help windows closed]
+ >xdestroy xwindows                                         (18)
+          [graphical window closed]
+ >
+</pre>
+<p>
+  
+ Comments on above run-through:-
+<p>
+  
+<ol>
+<li>  By putting the target image file name on the command line, the
+      first time the name is asked for, it will be got from this
+      command line. (As the image parameter, (`IN'),is the first in
+      the Interact interface file, we do not have to say `IN=name'.)
+<p>
+  
+<li>  Interact has a `default' start. However, we avoid this to
+      demonstrate usage of the program
+<p>
+  
+<li>  We are now in the `main' group of options and have available all
+      the functions of this group. The choice of the option of
+      getting an image is suggested. By just doing `carriage return',
+      we get that option. (As we have put the image file name on the
+      command line, the name is not asked for again here.)
+<p>
+  
+<li>  We are now asked again for what option we want, and are
+      offered the default of displaying the image with standard display
+      settings. We take that default.
+<p>
+  
+<li>  What size of window is to be put up? The default is the size of
+      the image. We choose a window twice as large. The program opens
+      the window and displays the image at a contrast suitable for
+      images which are `normal' pictures of astronomical objects. It
+      types out the lower and upper pixel values that cover the range
+      from pure black to pure white.
+<p>
+  
+<li>  Again, what option? We choose the default, which is
+      to switch over from keyboard entry of the desired options to
+      `push-button' mode. A panel of push buttons and a separate help
+      window appears. The help window contents change as the
+      cursor moves over the buttons.
+<p>
+  
+<li>  We now have the options available to use in the `main' group,
+      via the buttons. We choose that which will let us look at the
+      pixel values.
+<p>
+  
+<li>  Note the change in display of cursor position and pixel values
+      in the panel, as the cursor is moved over the image.
+<p>
+  
+<li>  End this option and go back to the panel option selection.
+<p>
+  
+<li>  Leave the `main' group of functions and go to the `inspect'
+      group. See how the panel display changes.
+<p>
+  
+<li>  Select the option to get a graphical slice through the image.
+<p>
+  
+<li>  Choose the start of the `slice'. Note the cross marking your
+      position, and the typing out of the location.
+<p>
+  
+<li>  Choose the end of the `slice'. Note that the `slice' line is
+      drawn and the end location typed out.
+<p>
+  
+<li>  The program now asks you for the `Y' range of the graph
+      to display trhe results. The default is +/- 10 percent
+      larger than the actual range of pixel values in the slice.
+      We take the default.
+<p>
+  
+<li>  The program now has to display the slice. It does this
+      using the Starlink graphics system, GKS. It asks for the
+      name of the graphics device. We give it `xwindows', the
+      graphics name of one the four possible graphical windows
+      on our workstation. The program opens up the window.
+<p>
+  
+<li>  Depending on how you have set up your X-wondow device,
+      the background can be any colour. We thus need to choose
+      whether to have black or white lines drawn. We select
+      the default.
+<p>
+  
+<li>  We are again able to choose an `inspect' option. We select
+      the one to exit from the program.
+<p>
+  
+<li>  The graphics system leaves the graphics window displayed.
+      We could leave it there, ready for its next use. We choose
+      however to delete it. (See the Starlink SUN on GWM for more
+      about this.)
+<p>
+</ol>
+  
+<hr>
+ <h2> 2 <a name="options"> Options </h2> </a> <p>
+  
+  
+  There are eight groups of options available. At the
+  start of the program, one is in the base group, the `main'
+  group. From here one can access the other seven groups,
+  and also select from the simple set of options that all
+  groups give access to.
+<p>
+  
+  The eight groups are:-
+<p>
+  
+<pre>
+ Group         Type of options available
+               (all do `simple set' as well)
+ -----         -----------------------------
+ main          -
+ alter         change image
+ aperture      aperture photometry with airmass corrns
+ colour        change colour of displayed image
+ fit_magns     profile photometry
+ inspect       inspect image
+ positions     plot/get positions
+ scrutiny      look at MEASURE program output
+</pre>
+<p>
+  
+  The `simple set' includes:- accessing the other groups and exiting;
+  getting and displaying images; image zoom/pan, clearing;
+  accessing pixel values; selecting image area.
+<p>
+  
+  These groups can be accessed either by the keyboard, or by selecting
+  the `panel' option, when a `panel' is shown on the image display,
+  and the cursor can be used to push `buttons'. In this mode, a
+  six-line help is displayed when the cursor is over a button.
+<p>
+  
+<hr>
+ <h2> 2.1 <a name="simple_set"> Simple set </h2> </a> <p>
+  
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ alter         Functions for image altering in various ways
+ aperture      Functions for aperture photometry
+ colour        Functions for changing colour display of image
+ fit_magns     Functions to get star magnitudes with Gaussians
+ inspect       Functions for image inspection in various ways
+ main          Entry point for program
+ positions     Functions to get or plot a list of positions
+ scrutiny      Functions to look at Starman MEASURE output
+  
+ image         Input new image
+ im_get_flash  Input new image and display (flash) it
+  
+ area          Select area of image to display
+ clear         Clear screen
+ close         Close the display screen
+ compress      Compress image in either X or Y for display
+ cvalues       Show the cursor position and image pixel value
+ display       Display image
+ flash         Display image in standard way
+ open          Open the display screen
+ reset         Reset zoom/pan to unity and centre
+ zoom          Zoom and pan image by using mouse location
+  
+ panel         Switch between panel / keyboard option selection
+ exit          Exit from this program
+</pre>
+  
+<hr>
+ <h2> 2.2 <a name="alter"> Alter </h2> </a> <p>
+  
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ blank_c       Set areas to INVALID with cursor
+ blank_k       Set areas to INVALID with keyboar
+ cut_c         Cut out a new image with cursor
+ cut_k         Cut out a new image with keyboard
+ compress      Compress image in X and Y by integer factors
+ drange        Change pixel value display range
+ flipx         Flip image along x direction
+ flipy         Flip image along y direction
+ magnify       Magnify image in X and Y by real factors
+ rotate        Rotate image
+ smooth        Smooth image
+ store         Store present image to disk
+ transform     Transform image in X and Y
+ unsharp       Unsharp mask the image
+ value_k       Set the value of a pixel with keyboard
+ weed          Set a range of pixel values to INVALID flag
+  
+</pre><p>
+  
+  
+<hr>
+ <h2> 2.3 <a name="aperture"> Aperture </h2> </a> <p>
+  
+  
+  There are two basic modes, both of which use a star aperture, moveable
+  by the users with the mouse/cursor, one of which determines the sky
+  value, to be subtracted from the star aperture counts, from the
+  pixels in an annulus around the star aperture, and one which
+  determines the sky from a seperate sky aperture (which must have
+  previously been used to measure the sky).
+<p>
+  
+<hr>
+ <h2> 2.3.1 <a name="aperture_general"> Aperture general </h2> </a> <p>
+  
+  
+  In both modes, repeated measurements can be done. For the
+  `non-annulus' mode, when a sky level is determined, that level is
+  used for all subsequent star measures, until a new sky level
+  aperture location is chosen and a sky measure made.
+<p>
+  
+   The result is calculated as:-
+<p>
+<pre>
+  
+   Output magnitude = 30.0 + `Zero point'
+  
+                       - 2.5*log  [(Star flux)/(Exposure time)]
+                                10
+  
+   With
+  
+   Star flux = Flux in star aperture - (Sky level)*(Star ap area)
+  
+   Sky flux  = 1) (Flux in sky aperture)/(area of sky aperture)
+       OR    = 2) Median pixel value in sky aperture
+</pre><p>
+  
+   When making a star measure, the aperture can be centered on the star.
+   The default method is to have no centering, but just to take the
+   cursor position. A more accurate way is to fit a Gaussian to the
+   star aperture data and centre on the centre of the Gaussian.
+<p>
+  
+   There is an option, ('CENTRE'), which changes the method of
+   centering on a star before measuring. By toggling through `CENTRE',
+   you can choose one of the four ways:-
+<p>
+<pre>
+  
+    Option      Action
+    ------      ------
+    None        No centering
+    Max Pixel   Centre on the pixel with maximum value in
+                star aperture
+    Centroid    Centre on the centroid of the pixel values
+                in star aperture
+    Gauss       Fit a Gaussian to the star aperture pixels
+</pre><p>
+  
+   With the `Gauss' mode, one can set the Gauss radii to be fixed or
+   floating.
+<p>
+  
+<hr>
+ <h2> 2.3.2 <a name="aperture_photometry"> Aperture photometry </h2> </a> <p>
+  
+  
+   The whole subject of aperture photometry is not as simple as
+   it looks at first appearence. It is recommended that the
+   inexperienced user should read a book on astronomical photometry
+   to understand the problems and possibilities fully.
+<p>
+  
+   Some examples of the problems are:-
+<p>
+<ol>
+<li> The use of the `median' mode in determining the sky level
+     inside the sky aperture is better than using the `mean'
+     mode, as this rejects against stars better? No! The main
+     problem in aperture photometry is the presence of field stars
+     in the star and sky apertures. If you reject strongly against
+     the faint (ones you cant see by eye) stars in the sky
+     aperture by using the `median', then the similar faint stars
+     in the star aperture will not be balanced by those in the
+     sky aperture, and the star will be measured too bright.
+<p>
+  
+<li>  In choosing a location for the sky aperture, one should
+      choose a place that is entirely free from field star? No!
+      Again, such a place might be too free, compared to the star
+      aperture location, and the star might be measured too bright.
+<p>
+  
+<li>  When measuring a very faint star on a number of exposures,
+      then when the flux in the star aperture is less than the
+      sky level, so that one gets a negative flux, those exposures
+      should be ingnored? No! You must average everything together.
+<p>
+  
+<li>  When comparing a bright star and a faint star, it is better
+      to use a smaller aperture on the faint star to cut down the
+      sky noise? No! The profile of the bright and faint stars are
+      the same, and thus using a smaller aperture on the faint
+      star will cut out a greater fraction of the light of the
+      faint star compared to the bright one.
+<p>
+  
+<li>  When comparing stars in different exposures, one can use
+      different size apertures? No! For the same reason as for 4).
+<p>
+  
+<li>  When comparing stars in different exposures, one can use
+      the same size apertures as when doing a single exposure?
+      No! As the seeing will have varied between the different
+      exposures, then the apertures must be large ones, so that
+      the effect of the variable seeing does not cause a
+      significantly diffrent amount of light to be lost out of
+      the apertures in the different exposures. Typically apertures
+      less than 10 or 20 arcsec diameter will lead to bad photometry.
+</ol>
+  
+<hr>
+ <h2> 2.3.3 <a name="aperture_options"> Aperture options </h2> </a> <p>
+  
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ Exptim_im     Correct for exposure time from image descriptor
+ airmass       Correct for Airmass from image descriptor
+ centre        Toggle centre =>cursor/max pix/centroid/Gaussian
+ exptim_k      Change zeropoint by using keyboard exposure time
+ level         Toggle mean/median method for sky level
+ list          List the measures so far
+ measure       Measure star/sky flux via cursor and buttons
+ method        Sky determined from annulus/ from separate area
+ noise         Level of extra noise/pixel in pixel counts
+ poisson       Change the Poisson scaling factor for Error
+ recalc        A fresh calc for the last star and last sky
+ remove        Remove a measure from memory and the display
+ shape         Set via keyboard: aperture ellipticity, angle
+ show_ap       Show apertures when getting positions
+ size_key      Set via keyboard: X, Y size of oval apertures
+ size_sky      Cursor change the size of the sky aperture(s)
+ size_star     Cursor change the size of the star aperture
+ store         Store results in output file
+ zero_pt       Change the -base- magnitude zero point
+  
+  Mouse buttons
+  
+   Buttons from left:-  (1)           (2)          (3)
+   Aperture work:   pick star       pick sky      return
+     Remove work: remove circle    remove circle  return
+   p change work:  dec aperture    inc aperture   next aperture/
+                                                  return
+</pre><p>
+  
+ In the `measure' option:- Measure star/sky flux via cursor and aperture
+ size and star/sky choice. The star flux in the aperture is found (or
+ sky level in the aperture), and typed. If star, then the star
+ and last sky level (separate or annulus) is taken and the calc done
+ for the magnitude;
+<p>
+<pre>
+  
+             Mag = 30 + Z - 2.5*log  ((star-sky level)/Exp)
+                                   10
+</pre><p>
+  
+<hr>
+ <h2> 2.4 <a name="colour"> Colour </h2> </a> <p>
+  
+  
+  The standard image display uses a grey-scale display. However, by
+  use of the Colour group of functions, colour displays can be made.
+  There are eight standard LUT tables available, and others can be
+  read in from files.
+<p>
+  
+  Also the user can adjust the LUT table currently being applied. This
+  can be done:-
+<p>
+  
+<ul>
+<li> `Flip' the LUT.<p>
+  
+<li> Change display of values above and below ends of LUT. <p>
+  
+<li> Interactively using a cursor:- choose a colour from the
+     displayed colour bar with the cursor and `paint' this colour
+     over a range of the LUT. <p>
+  
+<li> Horizontal movement of the cursor (with a mouse button pressed) to
+     rotate the LUT <p>
+  
+<li> Use horizontal and vertical movement of the cursor (with a
+     mouse button pressed) to shift and scale the LUT. <p>
+</ul>
+  
+<hr>
+ <h2> 2.4.1 <a name="lut_bar"> Lut bar </h2> </a> <p>
+  
+  
+  There is an option to show the form of the Look&$95 Up&#95 Table. A
+  bar can be painted across the bottom of the screen, containing
+  from left to right the colours associated with the displays cells
+  from 1 to 150, which are used to code the image values to display
+  the image.
+<p>
+  
+<hr>
+ <h2> 2.4.2 <a name="lut_standards"> Lut standards </h2> </a> <p>
+  
+  
+  The eight standard LUT tables are:-
+<p>
+<ol>
+<li> Grey scale
+<li> Purple with light at top
+<li> Rainbow
+<li> Black/blue/green/yellow/purple/white
+<li> Black/blue/greeny-yellow/dark red
+<li> Black/blue/greeny-yellow/light red/white
+<li> Discrete steps
+        (black/blue/green/light blue/red/purple/yellow/white)
+<li> Inverted grey scale
+</ol>
+<p>
+  
+  
+<hr>
+ <h2> 2.4.3 <a name="lut_storage"> Lut storage </h2> </a> <p>
+  
+  
+  The LUTs can be output in one format, the `full' format, and input
+  in two formats, the `short' and `full' formats.
+<p>
+  
+  The `full' format is:-
+<p>
+  
+  This is a table containing the R,G,B fractional colour contributions
+  in columns 1,2,3 of the table (ignoring the 1st 5 for table row
+  names - which are not used). There are 150 rows in this table.
+  Starting from the first row, there is the R,G,B set for the lowest
+  location on the table, carrying onto the 150th row, where there is
+  the highest LUT entry.
+<p>
+  
+  There is also a scale `LUTSC', and a zero `LUTZE', in descriptors.
+  These scale the LUT. A given entry point, say RV, which is
+  bewteen 0.0 and 1.0, would normally go to the R,G,B set of the
+  RV*150th row in the input LUT. Where it actually goes is
+  the [(RV-LUTZE)/LUTSC]*150th entry. If this entry is below 1 or
+  above 150, then the entry is either, set at 1 or 150, or set at
+  its modulo 150 value.
+<p>
+  
+  The `short' format is:-
+<p>
+  
+  This is a way of making a simple table to input to the program.
+<p>
+  
+  It is a table with 6 rows, and between 3 and 25 columns.
+<p>
+<pre>
+  Each row is allocated to as:-
+  
+              1      2      3       4     5      6
+             Red   Red   Green   Green   Blue   Blue
+            Posn  Value   Posn   Value   Posn  Value
+</pre><p>
+  
+  The first column in a row indicated how many columns in that row are
+  active, excluding itself.
+<p>
+  
+  This is then converted into the LUT by:-
+<p>
+<ol>
+<li> Taking the proportion for each colour at a step in the LUT. This
+     is done by moving along the `Colour Posn' row until one reaches
+     the point that the step in the LUT table is. Thus if the step is
+     number 59 out of 150 steps, then its location is 0.252. In the
+     example below, this for red would be just after the 2nd (0.25)
+     Posn.
+<p>
+  
+<li> Calculating the corresponding `Colour Value'. In the example below,
+     this would be between the 2nd and 3rd values, so the Red fraction
+     would be :-
+<p>
+  
+<pre>
+ Red fraction = [2nd value] +
+                [3rd-2nd values]*
+                [fraction of step to 3rd `Colour Position']
+  
+   in this case:-
+  
+       fraction = 0.00  +
+                  (1.0-0.0)*{(0.252-0.25)/(0.5-0.25)}
+  
+  An example of this is the `short' LUT used for the
+  `rainbow' LUT, no 3 above. It is:-
+  
+     4.0, 0.0, 0.25,  0.5,  1.0,  0.0, 0.0
+     4.0, 0.0, 0.00,  1.0,  1.0,  0.0, 0.0
+     6.0, 0.0, 0.125, 0.5, 0.64, 0.77, 1.0
+     6.0, 0.0, 0.000, 1.0, 0.50, 0.00, 0.0
+     5.0, 0.0, 0.25,  0.5, 0.77,  1.0, 0.0
+     5.0, 0.0, 1.00,  0.0, 0.00,  1.0, 0.0
+</pre><p>
+</ol>
+  
+  
+<hr>
+ <h2> 2.4.4 <a name="colour_options"> Colour options </h2> </a> <p>
+  
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ bar_clear     Remove display of LUT table bar
+ bar_show      Display LUT bar
+ ends_bw       Values below/above LUT ends as black/white
+ ends_cc       Values below/above LUT ends as col/col
+ ends_wb       Values below/above LUT ends as white/black
+ ends_wrap     Values below/above LUT ends as wrapped
+ file_get      Read a full Look-Up Table from a file
+ file_put      Write the present Look-Up Table to file
+ file_sget     Read a short Look-Up Table from a file
+ flip          Flip LUT
+ load          Load LUT from store
+ paint         Pick colour from LUT bar/overwrite range of LUT
+ rotate        Rotate LUT by moving cursor
+ scale         Shift and scale LUT by moving cursor
+ wrap          Toggle how image values above/below limits shown
+</pre><p>
+  
+ ****  This colour system uses a Look-Up Table (LUT)  ****
+<p>
+  
+ The actual pixel values in the image are already displayed
+ by scaling and shifting so that a range of those values lies
+ between 0 and 255. To each of these 256 -values-, a colour
+ is now ascribed, by means of a Look-Up Table (LUT).
+ These options allow you to change the colours ascribed to
+ to each -value-, in a number of ways. Actual pixel values
+ which fell outside the original range, can never have a range
+ of colours, as they are all set at the end value. To change
+ that, redisplay the image. Likewise for fine gradations.
+<p>
+  
+  
+ How to change the colour LUT of the image display:-
+<p>
+<pre>
+  
+ Mouse buttons from left:-    (1)         (2)      (3)
+ --------------------------------------------------------
+   Rotate LUT          Operate when held down      Return
+                       Move cursor left/right
+   Scale  LUT          Operate when held down      Return
+                       Move cursor left/right
+                           and up/down
+</pre><p>
+  
+  
+ How to use the `Paint' Function:-
+<p>
+<ol>
+<li> Place cursor on displayed LUT bar <p>
+<li> Press left or centre mouse button <p>
+<li> Release <p>
+<li> Place cursor on displayed LUT bar <p>
+<li> Press left or centre mouse button <p>
+<li> Move cursor along LUT bar <p>
+<li> Release mouse button <p>
+<li> Repeat or press right mouse button to exit <p>
+</ol><p>
+  
+<hr>
+ <h2> 2.5 <a name="fit_magns"> Fit magns </h2> </a> <p>
+  
+  
+  This choice of options is the same as for `positions'. Having
+  two names for this group is just for clarity, as the options
+  tend to fall into two sub-groups.
+<p>
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ boxshow       Toggle showing/not the box round mag positions
+ cross         Change colour/size of plot/get cross
+ cur_magn      Use cursor to get Gauss positions + magnitudes
+ cur_posn      Use cursor to get positions
+ fit_params    Set:- radii; fix/vary radii in fit; box size
+ flush_magn    Forget all star Gauss positions + magnitudes
+ flush_posn    Forget all positions
+ list_magn     Type out Gauss positions and magnitudes
+ list_posn     Type out positions and pixel values
+ plot_file     Get positions from a file and plot them
+ review        Type out the present setups
+ store_magn    Put acquired Gauss magnitudes into a file
+ store_posn    Put acquired positions into a file
+  
+  
+  Mouse button operations when getting positions:-
+  
+      Left Button   = Get position
+      Centre Button = Go to zoom work
+      Right Button  = Return
+</pre><p>
+  
+<hr>
+ <h2> 2.6 <a name="inspect"> Inspect </h2> </a> <p>
+  
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ area_c        Choose (by cursor) new area for inspection
+ area_k        Choose (by keyboard) new area for inspection
+ blink         Blink present display
+ contour       Contour image area to device (poss hard)
+ controls      Type out present control parameters
+ descriptor    Type out a selected image descriptor
+ details       Type out the details of the image
+ gclose        Close graphical device
+ gdisplay      Display image area to device (poss hard)
+ histogram     Display area histogram
+ pvalues       Type out the look area values as a picture
+ radius        Get radius, height of star
+ slice         Plot a slice across the image
+ solid_tw      Display solid body plot - transparent
+ solid_w       Display solid body plot - hidden lines
+ stats         Calculate areas mean  std dev max min
+ steps         Change sampling steps in areas
+ typeform      Change format of typing out of values in area
+ values        Type out the values in the area
+  
+  
+      Mouse buttons for Blink work:-
+  
+               Left Button   = slow blink by x2
+               Centre Button = speed blink by x2,
+               Right Button  = switch to hand blink
+  
+      The hand blink is done using the keyboard.
+</pre><p>
+  
+<hr>
+ <h2> 2.7 <a name="positions"> Positions </h2> </a> <p>
+  
+  
+  This choice of options is the same as for `fit&#95 magns'. Having
+  two names for this group is just for clarity, as the options
+  tend to fall into two sub-groups.
+<p>
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ boxshow       Toggle showing/not the box round mag positions
+ cross         Change colour/size of plot/get cross
+ cur_magn      Use cursor to get Gauss positions + magnitudes
+ cur_posn      Use cursor to get positions
+ fit_params    Set:- radii; fix/vary radii in fit; box size
+ flush_magn    Forget all star Gauss positions + magnitudes
+ flush_posn    Forget all positions
+ list_magn     Type out Gauss positions and magnitudes
+ list_posn     Type out positions and pixel values
+ plot_file     Get positions from a file and plot them
+ review        Type out the present setups
+ store_magn    Put acquired Gauss magnitudes into a file
+ store_posn    Put acquired positions into a file
+  
+  
+  Buttons for measuring the Gaussian radii of stars:-
+  
+      Left Button   = Variable radius
+      Centre Button = Fixed radius
+      Right Button  = return
+</pre>
+  
+<hr>
+ <h2> 2.8 <a name="scrutiny"> Scrutiny </h2> </a> <p>
+  
+  
+  In addition to the `simple set', see the help above, the
+  following options are available:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ blink         Blink the displayed image
+ box           Put box in image outside the star -Remove- area
+ comps_all     Mark posn of a star and its companions in the fit
+ comps_dist    Mark posns for next list star with distant comp
+ list_in       Load a new star list (discard the old one)
+ list_out      Write to file the -Add- used (extra,removed) list
+ lselect       Select a portion of the list to look at
+ mark_new      Mark up on the display the -new- star list posns
+ mark_old      Mark up on the display the -old- star list posns
+ nearest       Give nearest list star to cursor position
+ printlist     Put a neat summary of the fits into an ascii file
+ profile_in    Load a new star profile (discard the old one)
+ remove        Clean an area round a list star with stars removed
+ replace       Replace -Remove- box by the original image data
+ reremove      Display the -Remove- box again
+ stars_add     Use cursor to add stars to star list
+ stars_rem     Use cursor to remove stars from star list
+ type_one      Type out all of a star fit (from number/name)
+ typelist      Put a neat summary of the fits onto the terminal
+  
+  
+   Mouse buttons for `Stars_Add/Rem' options:-
+  
+          Left   Button  =  Add/remove star from list
+          Centre Button  =      "       "    "    "
+          Right  Button  =  Return to Option Choice
+  
+   Mouse buttons for Blink work:-
+  
+          Left   Button  = slow blink by x2
+          Centre Button  = speed blink by x2,
+          Right  Button  = switch to hand blink
+  
+   The hand blink is done using the keyboard.
+</pre><p>
+  
+  
+<hr>
+ <h2> 3 <a name="panel"> Panel </h2> </a> <p>
+  
+  
+ In the menu-driven mode of this program, there is the capability
+ to interact with this menu in a `windows' type mode. If you choose
+ the `Panel' option in the `Option' choice, then if you have an
+ X-window device a small panel appears on the screen. This has what look
+ like buttons with all the available options. You select these by
+ putting a cursor on the `button' and then pressing a mouse button.
+<p>
+  
+ The panel has a `help' button which lists out one line
+ descriptions of all the options. This button also tells you what
+ the program is doing:- 'working', 'waiting', etc.
+<p>
+  
+  
+<hr>
+ <h2> 4 <a name="mouse_buttons"> Mouse buttons </h2> </a> <p>
+  
+  
+ The mouse buttons have many uses, and which button does what is
+ described in the six-line help displayed, when in the `panel'
+ mode.
+<p>
+  
+ The cursor must be in image window area for the cursor buttons
+ to work when in -WORKING- mode. The window also must be -active-
+ - that is the bar at the top must be set. Click on this bar if
+ it is not, before using the buttons.
+<p>
+  
+ If the cursor is outside a displayed area, often pressing the button
+ will result in no actions.
+<p>
+  
+ For many of the groups of functions, then when a cursor is being
+ used, the X,Y position and image pixel value are continuously
+ displayed on the `panel', if the panel mode is being used.
+<p>
+  
+ For a more detailed exposition on mouse cursor/button use when
+ in the various groups of options, see the sub-sections under
+ `options' in the top level help.
+<p>
+  
+  
+ Two examples of very common uses:-
+<p>
+<pre>
+   Mouse buttons for Zoom/Pan work:-
+  
+      Left Button twice              = zoom /2
+      Centre Button twice            = zoom x2
+      Left Button then Centre Button = pan
+      Right button once              = exit
+  
+</pre>
+  
+    Zoom means zoom around present position of cursor
+    Pan means set present position of cursor to screen centre
+<p><pre>
+  
+   Mouse buttons for Cvalues work:-
+  
+   The values are output continuously again on the panel, or
+   by request on the terminal if the panel is not being used.
+  
+      -Panel- mode?    Button actions
+      ------------     --------------
+         YES           all buttons exit
+          NO           Buttons Left,Centre give values
+                       Right Button 3 exits
+</pre>
+  
+<hr>
+ <h2> 5 <a name="colour"> Colour </h2> </a> <p>
+  
+  
+  The standard image display uses a grey-scale display. However, by
+  use of the `colour' group of functions, colour displays can
+  be made. There are eight standard LUT tables available, and others
+  can be read in from files.
+<p>
+  
+  Colour includes grey scale.
+<p>
+  
+  Also the user can adjust the LUT table currently being applied. This
+  can be done directly:- `flip' the LUT;Change display of values above
+  and below ends of LUT. It can also be done interactively using a
+  cursor:- with the use of the display of a colour bar, pick a colour
+  with the cursor and `paint' this colour over a range of the LUT; Use
+  horizontal movement of the cursor (with a mouse button pressed) to rotate
+  the LUT; Use horizontal and vertical movement of the cursor (with a
+  mouse button pressed) to shift and scale the LUT.
+<p>
+  
+<hr>
+ <h2> 6 <a name="grey_scale"> Grey scale </h2> </a> <p>
+  
+  
+  See under the `colour' help.
+<p>
+  
+<hr>
+ <h2> 7 <a name="cursor"> Cursor </h2> </a> <p>
+  
+  
+ The cursor is used to pick up positions, change the zoom, and other
+ miscellaneous purposes.
+<p>
+  
+ The mouse moves the cursor.
+<p>
+  
+  
+<hr>
+ <h2> 8 <a name="hard_copy"> Hard copy </h2> </a> <p>
+  
+  
+  Hard copy of an image can be made using the `gdisplay' option in
+  the `inspect' group of options.
+<p>
+  
+<hr>
+ <h2> 9 <a name="display"> Display </h2> </a> <p>
+  
+  
+  IMAGE DISPLAY
+<p>
+  
+  The program puts out the images for the display on X-window
+  devices.
+<p>
+  
+  There is also the option to use PGPLOT to do one single image
+  output to a device with a GKS driver. This is to output a
+  grey-scale picture of an area of the image. This has the use
+  that hard copies can be made, and unusal devices utilised to
+  look at the image.
+<p>
+  
+  GRAPHICAL DISPLAY
+<p>
+  
+  In the program, there are many different types of graphical
+  plotting. These are usually PGPLOT driven via GKS to any
+  device that has a GKS driver.
+<p>
+  
+  
+<hr>
+ <h2> 10 <a name="input_files"> Input files </h2> </a> <p>
+  
+  
+  The input files used by this program are:-
+<pre>
+  
+ Group      Parameter     Contents
+ -----      ---------     --------
+ General     `IN'         The input image
+ Colour      `INLUT'      Table of Starman:Interact Look-Up
+                            Table - either in `short' or
+                            `full' format.
+ Interact    `INTAB'      Table of X,Y positions for plotting
+ Scrutiny    `INSTARS'    Table of the Output of Starman:Measure
+ Scrutiny    `PROFILE'    Image with profile parameters and
+                            profile map in the normal Starman
+                            `Profile' image
+</pre><p>
+  
+   Images are in the normal Starman 'short' 16-bit integer or 'real'
+   32-bit real NDF format.
+<p>
+  
+   Tables are in the normal Starman `real' 32-bit real NDF format.
+<p>
+  
+   For more information on:-
+<pre>
+  
+      `INLUT'     - see the output:colour for Starman:Interact
+      `INSTARS'   - see the output for Starman:Measure
+      `PROFILE'   - see the output for Starman:Profile
+</pre>
+  
+<hr>
+ <h2> 11 <a name="output_files"> Output files </h2> </a> <p>
+  
+  
+  There may be output from this program. If there is, it is in the
+  form of one or more tables, and one image.
+<p>
+<pre>
+  
+  Function  Parameter    Table Contents
+  -----     ---------    ---------------
+  Aperture  `OUTMAGS'    Results of aperture photometry
+  Colour    `OUTLUT'     New colour Look-up Table
+  Fit_magns `OUTTAB'     Magnitude measures
+  Positions `OUTTAB'     X,Y Pixel value tables from cursor
+  Scrutiny  `OUTFILE'    Text file with a formatted selection
+                           of input Starman:Measure table
+  Scrutiny  `OUTSTARS'   Starman:Measure results table with
+                           `extra' stars
+  
+  
+  Function   Parameter    Image Contents
+  --------   ---------    --------------
+  Alter      `OUTIM'      New image - altered version of input
+  
+</pre>
+  
+ (Tables are in the normal Starman `real' 32-bit real NDF format.)
+<p>
+  
+<hr>
+ <h2> 11.1 <a name="alter_output"> Alter output </h2> </a> <p>
+  
+  
+ The `Alter' output, `OUTIM', is an image which is an altered version
+ of the input image. The alteration depends on which of the `alter'
+ options have been performed on the input image.
+<p>
+  
+ By default, it is a `real' real 32-bit Starman NDF image, but
+ optionally, it can also be a `short' 16-bit integer image. In this
+ latter case, the values can be scaled by the BSCALE, BZERO values
+ if the values are outside the range -32767 to +32767.
+<p>
+  
+<hr>
+ <h2> 11.2 <a name="aperture_output"> Aperture output </h2> </a> <p>
+  
+  
+  The `Aperture' output, `OUTMAGS', is a table of the aperture photometry
+  results.
+<p>
+  
+  It is has contents:-  (it may only have the name,X,Y,Magnitude
+  columns)
+<pre>
+  
+   Table column
+      Header            Contents
+   ------------         --------
+   Name               	Star name
+   X 			Star X position
+   Y			Star Y position
+   Magnitude		Star magnitude (see below)
+   Error		Estimate of std dev error in star
+                          magnitude
+   Flux			Flux (above sky) in star aperture
+   Flux error		Estimate of std dev error in star flux
+   Max Value 		Maximum pixel value in star aperture area
+   Area 		Area of star aperture (Straddles pixels)
+   Num Bad Pixels 	Number of `bad' pixels in star aperture
+   Total Flux		Total flux in star aperture
+   Sky level 		Sky level used for star magnitude
+   Sky flux 		Total flux in sky level aperture
+   Num sky bad pixels	Number of `bad' pixels in sky aperture
+                          area
+   Sky area 		Area of sky aperture (Straddles pixels)
+   Sky X 		X position of sky aperture
+   Sky Y  		Y position of sky aperture
+   Star ap maj dia 	Star aperture major axis diameter
+   Sky ap maj dia       Sky aperture major axis diameter
+   Sky inner annulus    If sky area is annulus, inner major axis
+     maj dia               diameter of annulus
+   Sky outer annulus    If sky area is annulus, outer major axis
+     maj dia               diameter of annulus
+   Aperture Angle       Angle in deg, counter-clock, from X-axis
+                           of major axis
+   Aperture Ellipticity Ellipticity of aperture
+   Annulus flag 	Sky area circle (0.0), or annulus around
+                           star(1.0)?
+   Centering flag 	Star position been none/max pixel/
+                           centroid/Gauss method (1/2/3/4)
+                           centered
+   Median flag 		Sky level taken as mean (0.0), or median
+                           (1.0)?
+   Extra noise 		Extra noise level assumed per pixel
+   Events/pixel values 	Square root[Flux*(this)] = effective
+                           Poisson noise
+   Exp time - Keyboard  Exposure time from keyboard
+   Exp time - Image	Exposure time from image descriptor
+   Air Mass             Air Mass of exposure
+   Air Corrn            Correction to magnitude from air mass
+   Zero point		Zero point applied to output mag
+  
+  
+   Where:-
+  
+  Output magnitude = 30.0 + `Zero point' -
+                      2.5*log  [(Star flux)/(Exposure time)]
+                             10
+  
+  Star flux = Flux in star aperture - (Sky level)*(Star ap area)
+  
+  Sky flux  = 1) (Flux in sky aperture)/(area of sky aperture)
+      OR    = 2) Median pixel value in sky aperture
+  
+</pre>
+  
+   In the annulus work, the sky area is taken as that between the
+   sky annulus inner ring and the sky annulus outer ring.
+   In non-annulus work, the sky aperture is a simple circle, placed
+   as specified.
+<p>
+  
+   `Bad pixels' are ignored. Thus in the sky estimates this should
+   not make much trouble, but in the Star estimates it will if the
+   relevant pixel has a value above the sky level.
+<p>
+  
+   The apertures have `smooth' edges. The circle that gives the
+   edge of the aperture will fall `through' the body of some of the
+   pixels at the edge of the aperture. What happens then is that these
+   `edge' pixels are subdivided into a 5x5 subarray, and each sub-pixel
+   is looked at to see if it is in or out of the aperture. The area of
+   the pixel, for the program purposes, is then (number/25.0). The
+   flux in the pixel is then scaled down to the same extent.
+<p>
+  
+   Errors:-
+<p>
+  
+   The errors are calculated assuming that the pixel values are due
+   to a source with Poisson noise (which has suffered scaling) and
+   an extra `magic' source of noise (with zero effect on the mean
+   pixel value).
+  
+<pre>
+   Thus the pixel variance = Flux*(`Poiss' value) +
+               (no of pixels)*(`Noise' value)*(`Noise' value)
+  
+   [Std dev = square root(variance)]
+</pre>
+  
+   The star error is then calculated assuming that noise in the star
+   flux, and noise due to the error in calculating the sky level.
+<p>
+  
+<hr>
+ <h2> 11.3 <a name="colour_output"> Colour output </h2> </a> <p>
+  
+  
+  The output of the Interact:Colour group, `OUTLUT', is a file
+  containing a table describing the Colour Look-Up Table made in the
+  group.
+<p>
+  
+  This is a table containing the R,G,B fractional colour contributions
+  in columns 1,2,3 of the table (ignoring the 1st 5 for table row
+  names - which are not used). There are 150 rows in this table.
+  Starting from the first row, there is the R,G,B set for the lowest
+  location on the table, carrying onto the 150th row, where there is
+  the highest LUT entry.
+<p>
+  
+  There is also a scale `LUTSC', and a zero `LUTZE', in descriptors.
+  These scale the LUT. A given entry point, say RV, which is
+  bewteen 0.0 and 1.0, would normally go to the R,G,B set of the
+  RV*150th row in the input LUT. Where it actually goes is
+  the [(RV-LUTZE)/LUTSC]*150th entry. If this entry is below 1 or
+  above 150, then the entry is either, set at 1 or 150, or set at
+  its modulo 150 value.
+<p>
+  
+<hr>
+ <h2> 11.4 <a name="fit_magns_output"> Fit magns output </h2> </a> <p>
+  
+  
+  The output of the Interact:fit&#95 magns group, `OUTTAB', is a file
+  containing a table of the magnitude measures.
+<p>
+  
+  The headers are:  `X', `Y', `Magnitude', `Dx', `Dy', `Iterations',
+                    `Rms', `Numinval', `Height', `Base', `Max pixel',
+                    `Rx', `Ry', `Xbox', `Ybox'
+<p>
+  
+<hr>
+ <h2> 11.5 <a name="positions_output"> Positions output </h2> </a> <p>
+  
+  
+  The output of the Interact:positions group, `OUTTAB', is a file
+  containing a table of either the X,Y positions and pixel values of the
+  locations chosen by the cursor. The headers are `X', `Y', and `VALUE'.
+<p>
+  
+<hr>
+ <h2> 11.6 <a name="scrutiny_output"> Scrutiny output </h2> </a> <p>
+  
+  
+  One output of the Interact:Scrutiny group, `OUTSTARS', is a file
+  containing a table in the format of the Starman:Measure program,
+  of that input Starman:measure table, but with (optionally) some stars
+  removed, and (optionally) some extra stars added. These extra stars
+  are picked up in the Interact:Scrutiny group of functions
+<p>
+  
+  The other output, `OUTFILE', is a text file containing a selection
+  of the input Starman:Measure table of fitted results. The user
+  selects the option to `print' the table in a defined format to
+  this file. The file is a normal ASCII text file
+<p>
+  
+<hr>
+ <h2> 12 <a name="parameters"> Parameters </h2> </a> <p>
+  
+  
+  The parameters in this help are put into groups - a general one for
+  parameters which are used by more than one of the program
+  groups, and then a group for each of the eight program groups themselves.
+<p>
+<pre>
+  
+     Group        Function
+     ----         --------
+     General      Disparate functions
+     Main         Entry level functions
+     Alter        Alter the image
+     Aperture     Aperture photometry in an interactive way
+     Colour       Changing the colour LUT of the image display
+     Fit_magns    Magnitudes with simple profile fitting
+     Inspect      Look at pixel values in different ways
+     Positions    Get/plot table of XY positions
+     Scrutiny     Look at the output of Starman:Measure
+</pre>
+  
+  
+<ul>
+<li> 12.1 <a href="#general:-"> GENERAL:- </a>
+<li> 12.2 <a href="#blink_ch"> Blink&#95 ch </a>
+<li> 12.3 <a href="#easystart"> Easystart </a>
+<li> 12.4 <a href="#gtype"> Gtype </a>
+<li> 12.5 <a href="#in"> In </a>
+<li> 12.6 <a href="#imcomp"> Imcomp </a>
+<li> 12.7 <a href="#imposn"> Imposn </a>
+<li> 12.8 <a href="#linecol"> Linecol </a>
+<li> 12.9 <a href="#numbutt"> Numbutt </a>
+<li> 12.10 <a href="#screen"> Screen </a>
+<li> 12.11 <a href="#title"> Title </a>
+<li> 12.12 <a href="#vrange"> Vrange </a>
+<li> 12.13 <a href="#wrap"> Wrap </a>
+<li> 12.14 <a href="#main:-"> MAIN:- </a>
+<li> 12.15 <a href="#option"> Option </a>
+<li> 12.16 <a href="#alter:-"> ALTER:- </a>
+<li> 12.17 <a href="#aloption"> Aloption </a>
+<li> 12.18 <a href="#area"> Area </a>
+<li> 12.19 <a href="#bin"> Bin </a>
+<li> 12.20 <a href="#box"> Box </a>
+<li> 12.21 <a href="#check"> Check </a>
+<li> 12.22 <a href="#doit"> Doit </a>
+<li> 12.23 <a href="#eqn"> Eqn </a>
+<li> 12.24 <a href="#fraction"> Fraction </a>
+<li> 12.25 <a href="#gbox"> Gbox </a>
+<li> 12.26 <a href="#gradius"> Gradius </a>
+<li> 12.27 <a href="#inim"> Inim </a>
+<li> 12.28 <a href="#invar"> Invar </a>
+<li> 12.29 <a href="#more"> More </a>
+<li> 12.30 <a href="#nxy"> Nxy </a>
+<li> 12.31 <a href="#outim"> Outim </a>
+<li> 12.32 <a href="#pixval"> Pixval </a>
+<li> 12.33 <a href="#range"> Range </a>
+<li> 12.34 <a href="#rotate"> Rotate </a>
+<li> 12.35 <a href="#sample"> Sample </a>
+<li> 12.36 <a href="#seed"> Seed </a>
+<li> 12.37 <a href="#smethod"> Smethod </a>
+<li> 12.38 <a href="#titleim"> Titleim </a>
+<li> 12.39 <a href="#xcoeff"> Xcoeff </a>
+<li> 12.40 <a href="#xmagnify"> Xmagnify </a>
+<li> 12.41 <a href="#ycoeff"> Ycoeff </a>
+<li> 12.42 <a href="#ymagnify"> Ymagnify </a>
+<li> 12.43 <a href="#aperture:-"> APERTURE:- </a>
+<li> 12.44 <a href="#airname"> Airname </a>
+<li> 12.45 <a href="#aoption"> Aoption </a>
+<li> 12.46 <a href="#apang"> Apang </a>
+<li> 12.47 <a href="#apdiam"> Apdiam </a>
+<li> 12.48 <a href="#apell"> Apell </a>
+<li> 12.49 <a href="#coordtype"> Coordtype </a>
+<li> 12.50 <a href="#decname"> Decname </a>
+<li> 12.51 <a href="#descrair"> Descrair </a>
+<li> 12.52 <a href="#descrfilt"> Descrfilt </a>
+<li> 12.53 <a href="#descrtime"> Descrtime </a>
+<li> 12.54 <a href="#expname"> Expname </a>
+<li> 12.55 <a href="#exptim"> Exptim </a>
+<li> 12.56 <a href="#extinc"> Extinc </a>
+<li> 12.57 <a href="#filtloc"> Filtloc </a>
+<li> 12.58 <a href="#filtname"> Filtname </a>
+<li> 12.59 <a href="#fixgrad"> Fixgrad </a>
+<li> 12.60 <a href="#fname"> Fname </a>
+<li> 12.61 <a href="#gradii"> Gradii </a>
+<li> 12.62 <a href="#keep"> Keep </a>
+<li> 12.63 <a href="#keytime"> Keytime </a>
+<li> 12.64 <a href="#latitude"> Latitude </a>
+<li> 12.65 <a href="#list"> List </a>
+<li> 12.66 <a href="#method"> Method </a>
+<li> 12.67 <a href="#noise"> Noise </a>
+<li> 12.68 <a href="#outmags"> Outmags </a>
+<li> 12.69 <a href="#outtype"> Outtype </a>
+<li> 12.70 <a href="#poiss"> Poiss </a>
+<li> 12.71 <a href="#raname"> Raname </a>
+<li> 12.72 <a href="#sidtname"> Sidtname </a>
+<li> 12.73 <a href="#zerop"> Zerop </a>
+<li> 12.74 <a href="#colour:-"> COLOUR:- </a>
+<li> 12.75 <a href="#coption"> Coption </a>
+<li> 12.76 <a href="#inlut"> Inlut </a>
+<li> 12.77 <a href="#lutnum"> Lutnum </a>
+<li> 12.78 <a href="#num_lut"> Num&#95 lut </a>
+<li> 12.79 <a href="#outlut"> Outlut </a>
+<li> 12.80 <a href="#fit_magns:-"> FIT MAGNS:- </a>
+<li> 12.81 <a href="#boxshow"> Boxshow </a>
+<li> 12.82 <a href="#boxsize"> Boxsize </a>
+<li> 12.83 <a href="#crcol"> Crcol </a>
+<li> 12.84 <a href="#crossl"> Crossl </a>
+<li> 12.85 <a href="#goption"> Goption </a>
+<li> 12.86 <a href="#intab"> Intab </a>
+<li> 12.87 <a href="#radfix"> Radfix </a>
+<li> 12.88 <a href="#radsize"> Radsize </a>
+<li> 12.89 <a href="#xrange"> Xrange </a>
+<li> 12.90 <a href="#yrange"> Yrange </a>
+<li> 12.91 <a href="#outtab"> Outtab </a>
+<li> 12.92 <a href="#inspect:-"> INSPECT:- </a>
+<li> 12.93 <a href="#base"> Base </a>
+<li> 12.94 <a href="#contour"> Contour </a>
+<li> 12.95 <a href="#decpl"> Decpl </a>
+<li> 12.96 <a href="#desname"> Desname </a>
+<li> 12.97 <a href="#extname"> Extname </a>
+<li> 12.98 <a href="#hrange"> Hrange </a>
+<li> 12.99 <a href="#igbox"> Igbox </a>
+<li> 12.100 <a href="#igradii"> Igradii </a>
+<li> 12.101 <a href="#ioption"> Ioption </a>
+<li> 12.102 <a href="#orient"> Orient </a>
+<li> 12.103 <a href="#scale"> Scale </a>
+<li> 12.104 <a href="#steps"> Steps </a>
+<li> 12.105 <a href="#vprange"> Vprange </a>
+<li> 12.106 <a href="#width"> Width </a>
+<li> 12.107 <a href="#window"> Window </a>
+<li> 12.108 <a href="#xarea"> Xarea </a>
+<li> 12.109 <a href="#xypplot"> Xypplot </a>
+<li> 12.110 <a href="#yarea"> Yarea </a>
+<li> 12.111 <a href="#positions:-"> POSITIONS:- </a>
+<li> 12.112 <a href="#scrutiny:-"> SCRUTINY:- </a>
+<li> 12.113 <a href="#bylist"> Bylist </a>
+<li> 12.114 <a href="#col_bad"> Col&#95 bad </a>
+<li> 12.115 <a href="#col_ok"> Col&#95 ok </a>
+<li> 12.116 <a href="#col_star"> Col&#95 star </a>
+<li> 12.117 <a href="#contrast"> Contrast </a>
+<li> 12.118 <a href="#doform"> Doform </a>
+<li> 12.119 <a href="#dopref"> Dopref </a>
+<li> 12.120 <a href="#domap"> Domap </a>
+<li> 12.121 <a href="#donew"> Donew </a>
+<li> 12.122 <a href="#doslope"> Doslope </a>
+<li> 12.123 <a href="#dospot"> Dospot </a>
+<li> 12.124 <a href="#instars"> Instars </a>
+<li> 12.125 <a href="#length"> Length </a>
+<li> 12.126 <a href="#listxy"> Listxy </a>
+<li> 12.127 <a href="#lrange"> Lrange </a>
+<li> 12.128 <a href="#lxrange"> Lxrange </a>
+<li> 12.129 <a href="#lyrange"> Lyrange </a>
+<li> 12.130 <a href="#name"> Name </a>
+<li> 12.131 <a href="#numaft"> Numaft </a>
+<li> 12.132 <a href="#numbef"> Numbef </a>
+<li> 12.133 <a href="#number"> Number </a>
+<li> 12.134 <a href="#numchar"> Numchar </a>
+<li> 12.135 <a href="#numcol"> Numcol </a>
+<li> 12.136 <a href="#outfile"> Outfile </a>
+<li> 12.137 <a href="#outstars"> Outstars </a>
+<li> 12.138 <a href="#prefix"> Prefix </a>
+<li> 12.139 <a href="#profile"> Profile </a>
+<li> 12.140 <a href="#seek"> Seek </a>
+<li> 12.141 <a href="#soption"> Soption </a>
+<li> 12.142 <a href="#wlist"> Wlist </a>
+</ul>
+  
+<hr>
+ <h2> 12.1 <a name="general:-"> GENERAL:- </h2> </a> <p>
+  
+  
+  The parameters that are used by more than one program group.
+<p>
+  
+<hr>
+ <h2> 12.2 <a name="blink_ch"> Blink&#95 ch </h2> </a> <p>
+  
+  (Default - last, start `under'    <br> Choice - `under:over:auto:exit')
+<p>
+  
+  Where to put the window for a `blink'. The blink is achieved by
+  putting the display window `under' or `over' any other window
+  that is in the same place. [Thus you should have used another
+  window to open up another display window with the image, and placed
+  it in the same position as the display window of this program.]
+<p>
+<pre>
+  Choice     Function
+  ------     --------
+  auto       Blink by alternatively putting it on top then under
+  exit       Return from this option
+  over       Place window on top of any other
+  under      Place window under any other
+</pre>
+  
+  In automatic blinking, then the displayed image is alternately
+  `popped' and `pushed'. The time interval starts of at 1/2 second,
+  and is lengthed or shortened by pressing keys on the mouse.
+<p>
+  
+  The keys have the functions:-
+<pre>
+  
+         Left Button   = slow blink by x2
+         Centre Button = speed blink by x2
+         Right Button  = switch to hand blink
+</pre>
+  
+<hr>
+ <h2> 12.3 <a name="easystart"> Easystart </h2> </a> <p>
+  
+  (Default - `yes'            <br> Choice - `yes:no')
+<p>
+  
+   Use the standard start sequence of operations?
+<p>
+  
+   This quickly gets an image, displays it in the standard way, sets
+   up the panel buttons, and gets you going.
+<p>
+  
+   The alternative is simply to go into the normal `OPTION'
+   method of the program asking you for instructions. You would want
+   to use this if you wished not to display the image at first, or
+   not use the panel buttons, or display the image in a non-standard
+   way.
+<p>
+  
+<hr>
+ <h2> 12.4 <a name="gtype"> Gtype </h2> </a> <p>
+  
+  (Default - `xwindows'            <br> Choice - any)
+<p>
+  
+  A character string giving the local name for the graphics
+  display type.
+<p>
+  
+  `xwindows' will put it out on the screen of your X-window device,
+  if you are using one.
+<p>
+  
+  If `ask' is input, then the program asks a very similar question,
+  in a different way. A response here of `?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+  
+<hr>
+ <h2> 12.5 <a name="in"> In </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+ The name of the file containing the input 2-D image.
+<p>
+  
+ A null `return' entry is not allowed at the very start of the
+ program. Later on, it may be, in which case the program
+ will continue. Sometimes four repeated `null' entries will be
+ needed to get to this continue.
+<p>
+  
+ This image can be either the `real' 32-bit real or the `short'
+ 16-bit integer' NDF format.
+<p>
+  
+<hr>
+ <h2> 12.6 <a name="imcomp"> Imcomp </h2> </a> <p>
+  
+  (Default - variable, usually 1,1     <br> Range  - 1 to 1000)
+<p>
+  
+  Factor in X and Y by which to compress the displayed image.
+<p>
+  
+<hr>
+ <h2> 12.7 <a name="imposn"> Imposn </h2> </a> <p>
+  
+  (Default - so as to centre image in screen
+    <br> Range  -  -100000 to 100000)
+<p>
+  
+  Place to put b.l.h. corner of displayed image onto the
+  screen. Thus an answer of `1,1' would put the b.l.h. pixel
+  of the displayed image at the b.l.h corner of the screen.
+<p>
+  
+<hr>
+ <h2> 12.8 <a name="linecol"> Linecol </h2> </a> <p>
+  
+   (Default - `black'            <br> Choice - (black:white)
+<p>
+  
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+  
+<hr>
+ <h2> 12.9 <a name="numbutt"> Numbutt </h2> </a> <p>
+  
+  (Default - see below          <br> Range - 2 to 3)
+<p>
+  
+  Number of `X-Window' buttons available on the mouse.
+<p>
+  
+  Some devices have two and some have three buttons available. This
+  can depend both on their actual presence, and also on the X Windows
+  software that is being run.
+<p>
+  
+  With three buttons, then the Starman programs use all three, with
+  the right-hand button being used mainly as the `exit' button.
+<p>
+  
+  With two buttons, then the third button is simulated by pressing
+  both of the buttons down, with the middle one being pressed slightly
+  BEFORE the left-hand one. Use of the middle button in its normal
+  way has to be modified, in that one has to pause for half a second
+  after using it.
+<p>
+  
+  [This parameter is usally `hidden', with the machine manager setting
+   it to the appropriate value for the local set-up. Sometimes it will
+   be left to the user to set, depending on his software configuartion.]
+<p>
+  
+<hr>
+ <h2> 12.10 <a name="screen"> Screen </h2> </a> <p>
+  
+  (Default - described below      <br> Range - 1 to size of device)
+<p>
+  
+  Size of window to open on image display.
+<p>
+  
+  Not asked for if not a windows type display.
+<p>
+  
+  This the size of the screen or window to use, input as two integers
+  for the X and Y size.
+<p>
+  
+  If the image is bigger than the screen, it will be binned down to
+  fit in.
+<p>
+  
+<hr>
+ <h2> 12.11 <a name="title"> Title </h2> </a> <p>
+  
+  (Default - various        <br> Choice - any character string)
+<p>
+  
+  The title to put into the `TITLE' descriptor of the output
+  file you are making at the moment. This deals with:-
+<pre>
+  
+ File
+ Parameter     Contents                        Default
+ ---------     --------                        -------
+ OUTLUT    Output Look-up Table         `Look-up Table'
+ OUTMAGS   Aperture Photometry results  `Results from
+                                            Interact:Aperture'
+ OUTSTARS  Table of stars in Scrutiny   `Stars from
+                                            Interact:Scrutiny'
+ OUTTAB    Magnitudes measured          `Magnitudes from
+                                            Interact:Fit_magns'
+ OUTTAB    X,Y Positions marked         `XY Positions from
+                                            Interact:Positions'
+</pre>
+  
+<hr>
+ <h2> 12.12 <a name="vrange"> Vrange </h2> </a> <p>
+  
+  (Default - suggested values      <br> Range -  -1.0e10 to 1.0e10)
+<p>
+  
+  The `contrast' of the screen display.
+<p>
+  
+  The lower and upper limits of the pixel value range that will
+  be shown as black to white on the display screen.
+<p>
+  
+  The display of pixel values above and below these limits is
+  controlled by the value of the `wrap' parameter. They are shown
+  as either:- <p>
+  
+     - Black below and white above <br>
+     - Modulo the `Vrange' display range <br>
+<p>
+  
+<hr>
+ <h2> 12.13 <a name="wrap"> Wrap </h2> </a> <p>
+  
+  (Default - Present value, start `No'       <br> Choice  `Yes/No')
+<p>
+  
+  Controls what happens in the display of pixel values that
+  are above the upper limit or below the lower limit of the
+  pixel value display range.
+<pre>
+  
+  They are shown as either:-
+    `Wrap'     Display
+    ------     -------
+     `no'      Black below and white above
+    `yes'      Modulo the `Vrange' display range
+</pre>
+  
+<hr>
+ <h2> 12.14 <a name="main:-"> MAIN:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Fit&#95 Magns' program group.
+<p>
+  
+<hr>
+ <h2> 12.15 <a name="option"> Option </h2> </a> <p>
+  
+  (Default - present value, start=see below   <br> Choices - see below)
+<p>
+  
+ What operation, from a menu of possible choices, to do next?
+<p>
+  
+ (Accessed in the `Main' group of options.)
+<p>
+  
+ It is the entry option choice. You repeatedly get asked for options.
+ You select one of the menu operations. A number of these - the
+ `functions' are themselves list of options.
+<p>
+  
+ When you started the program, you were asked for the input image and
+ input star table. Then you started on this option choice. Generally the
+ default option is a repeat of the last option. However at the start,
+ a standard set of options is given as the default.
+<p>
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<pre>
+  
+ Option        Function
+ ------        --------
+ alter         Functions for image altering in various ways
+ aperture      Functions for aperture photometry
+ colour        Functions for changing colour display of image
+ fit_magns     Functions to get star magnitudes with Gaussians
+ inspect       Functions for image inspection in various ways
+ main          Entry point for program
+ positions     Functions to get or plot a list of positions
+ scrutiny      Functions to look at Starman MEASURE output
+  
+ image         Input new image
+ im_get_flash  Input new image and display (flash) it
+  
+ area          Select area of image to display
+ clear         Clear screen
+ close         Close the display screen
+ compress      Compress image in either X or Y for display
+ cvalues       Show the cursor position and image pixel value
+ display       Display image
+ flash         Display image in standard way
+ open          Open the display screen
+ reset         Reset zoom/pan to unity and centre
+ zoom          Zoom and pan image by using mouse location
+  
+ panel         Switch between panel / keyboard option selection
+ exit          Exit from this program
+</pre>
+  
+  For X-window device use, the Cursor must be in image window area
+  for the cursor buttons to work when in `WORKING' mode. The window
+  also must be `active' - that is the bar at the top must be set.
+  Click on this bar if it is not before using the buttons.
+<pre>
+  
+  Buttons for Zoom/Pan work:
+  
+               Left Button twice              = zoom /2
+               Centre Button twice            = zoom x2
+               Left Button then Centre Button = pan
+               Right button once              = exit
+  
+</pre>
+    Zoom means zoom around present position of cursor
+    Pan means set present position of cursor to screen centre
+<p><pre>
+  
+  Buttons for Cvalues work:-
+  
+    The values are output continuously again on the panel, or by
+    request on the terminal if the panel is not being used.
+  
+            `Panel' mode?    Button actions
+            -------------     --------------
+               YES            All buttons exit
+               NO             Buttons Left,Centre give values
+                              Right Button 3 exits
+</pre>
+  
+<hr>
+ <h2> 12.16 <a name="alter:-"> ALTER:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Alter' program group.
+<p>
+  
+  
+<hr>
+ <h2> 12.17 <a name="aloption"> Aloption </h2> </a> <p>
+  
+  (Default - present value, start='size&#95 c'     <br> Choices - see below)
+<p>
+  
+  What operation, from a menu of possible choices, to do next?
+<p>
+  
+  It is the Alter option choice, which you repeatedly come  back to, after
+  performing operations. You select one of the menu  operations.
+<p>
+  
+  Generally the default option is a repeat of the last option.
+<pre>
+  
+  Option        Function
+  ------        --------
+  drange        Change pixel value display range
+  flipx         Flip image along x direction
+  flipy         Flip image along y direction
+  magnify       Magnify image in X and Y by real factors
+  rotate        Rotate image
+  smooth        Smooth image
+  store         Store present image to disk
+  transform     Transform image in X and Y
+  unsharp       Unsharp mask the image
+  weed          Set a range of pixel values to INVALID flag
+  
+</pre>
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<p><pre>
+  
+  Option        Function
+  ------        --------
+  alter         Functions for image altering in various ways
+  aperture      Functions for aperture photometry
+  colour        Functions for changing colour display of image
+  fit_magns     Functions to get star magnitudes with Gaussians
+  inspect       Functions for image inspection in various ways
+  main          Entry point for program
+  positions     Functions to get or plot a list of positions
+  scrutiny      Functions to look at Starman MEASURE output
+  
+  image         Input new image
+  im_get_flash  Input new image and display (flash) it
+  
+  area          Select area of image to display
+  clear         Clear screen
+  close         Close the display screen
+  compress      Compress image in either X or Y for display
+  cvalues       Show the cursor position and image pixel value
+  display       Display image
+  flash         Display image in standard way
+  open          Open the display screen
+  reset         Reset zoom/pan to unity and centre
+  zoom          Zoom and pan image by using mouse location
+  
+  panel         Switch between panel / keyboard option selection
+  exit          Exit from this program
+  
+ </pre>
+  For X-window device use, the Cursor must be in image window area
+  for the cursor buttons to work when in -WORKING- mode. The
+  window also must be -active- - that is the bar at the top
+  must be set. Click on this bar if it is not before using
+  the buttons.
+<p><pre>
+  
+  Buttons for Zoom/Pan work:-
+  
+     Left Button twice              = zoom /2
+     Centre Button twice            = zoom x2
+     Left Button then Centre Button = pan
+     Right button once             = exit
+  
+</pre>
+  Zoom means zoom around present position of cursor
+  Pan means set present position of cursor to screen centre
+<p><pre>
+  
+  Buttons for Cvalues work:-
+  
+  The values are output continuously again on the panel, or by
+  request on the terminal if the panel is not being used.
+  
+  
+        -Panel- mode?    Button actions
+        ------------     --------------
+           YES           All buttons exit
+            NO           Buttons Left,Centre give values
+                         Right Button 3 exits
+                         Right Button 3 exits
+</pre>
+  
+<hr>
+ <h2> 12.18 <a name="area"> Area </h2> </a> <p>
+  
+  (Default - 1,1,1,1 or last       <br> Range - 1 to max size of image)
+<p>
+  
+  The four integer values for the X and Y coords of the b.l.h.
+  corner and t.r.h. corner of the area of the image to be used.
+ <p>
+  
+ (input as x start, y start, x end, y end)
+<p>
+  
+  This be used to cut out that area or to set to INVALID.
+ <p>
+  
+<hr>
+ <h2> 12.19 <a name="bin"> Bin </h2> </a> <p>
+  
+  (Default - 1,1       <br> Range - 1 to max size of image)
+<p>
+  
+  The two integer values for the X and Y compressions.
+<p>
+  
+<hr>
+ <h2> 12.20 <a name="box"> Box </h2> </a> <p>
+  
+  (Default - 3,3        <br> Range - 1 to max size of image)
+<p>
+  
+  The two integer values for the X and Y sides of the box
+  to be used for the `top-hat' box averaging or the `median'
+  box averaging.
+<p>
+  
+<hr>
+ <h2> 12.21 <a name="check"> Check </h2> </a> <p>
+  
+  (Default - 'no'      <br> Choice - `yes:no')
+<p>
+  
+  When using the `top-hat' averaging, do we check for `bad'
+  (INVALID) pixels, and set the output average value for the box
+  that contains any such pixels as `bad'? In this case, the
+  answer is 'yes'.
+<p>
+  
+  Or do we just ignore such pixels, and make the average the
+  average of all the `good' pixels?  In this case, the
+  answer is 'no'.
+<p>
+  
+  (In both cases, a box that contains only `bad' pixels will be
+   set to `INVALID'.)
+<p>
+  
+  
+<hr>
+ <h2> 12.22 <a name="doit"> Doit </h2> </a> <p>
+  
+ (Default - 'no'      <br> Choice - `yes:no')
+<p>
+  
+  Perform, or not, a second smoothing in the unsharp masking.
+<p>
+  
+  This is often done so that signal can be removed at both long
+  and short scales. In this case, then in one of the smoothings,
+  a box with a small side is used, and in the other, one with a
+  large side.
+<p>
+  
+<hr>
+ <h2> 12.23 <a name="eqn"> Eqn </h2> </a> <p>
+  
+  (Default - null          <br> Choice - as defined below)
+<p>
+  
+  The FORTRAN-style expression that gives the elements in the
+  pixels of the output image.
+<p>
+  
+  Its style is given the `equation' section of this help.
+<p>
+  
+<hr>
+ <h2> 12.24 <a name="fraction"> Fraction </h2> </a> <p>
+  
+  (Default - 0.8        <br> Range - 0.0 to 1.0e20)
+<p>
+  
+ The fraction of the values of the smoothed image that are
+ to be subtracted from the original image.
+<p>
+  
+ A value of 0.8 often gives a nice removal of most of the unwanted
+ signal, whilst leaving enough to keep all values positive, and
+ also some indication of the original signal.
+<p>
+  
+ It will be a matter of experimentation what value is appropriate
+ to the actual image being unsharp-masked.
+<p>
+  
+ Thus after the subtraction is done and displayed, the user is
+ asked, via the `MORE' parameter, if a new value is to be tried.
+<p>
+  
+<hr>
+ <h2> 12.25 <a name="gbox"> Gbox </h2> </a> <p>
+  
+  (Default - 10 x X,Y star radii       <br> Range - 1 to max size of image)
+<p>
+  
+  The two integer values for the X and Y sides of the box
+  to be used for the `gaussian' box averaging.
+<p>
+  
+  Each value must be an odd number.
+<p>
+  
+<hr>
+ <h2> 12.26 <a name="gradius"> Gradius </h2> </a> <p>
+  
+ (Default - 2.0     <br> Range - 1.0e-5 to 1.0e10)
+<p>
+  
+  The radius of the circular Gaussian profile to be used in
+  doing theGaussian smoothing.
+<pre>
+  
+                                -1.0*(d/r)**2
+  The profile is taken as:-    e
+  
+  where   d = distance from profile centre in pixels,
+          r = GRADIUS
+</pre>
+  
+<hr>
+ <h2> 12.27 <a name="inim"> Inim </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+ The input image corresponding to one of the `IB' to `IZ' to be used
+ in the arithmetic expression.
+<p>
+  
+ The `IB', `IC', ..., `IZ' in the equation pick up the images from
+ the parameters `INB', `INC', ..., `INZ'.
+<p>
+
+ (`IA' is reserved to mean the presently displayed image.)
+<p>
+  
+ The input images must be standard Starman ADAM .SDF images, with
+ either `real' 32-bit real values, or `short' 16-bit integer values.
+ They can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+ indicating `bad' pixels.
+<p>
+  
+ The `help' for all these is kept here, for `inim'.
+<p>
+  
+<hr>
+ <h2> 12.28 <a name="invar"> Invar </h2> </a> <p>
+  
+  (Default - 0.0  <br>         Range -1.0e37 to 1.0e37)
+<p>
+  
+  The value to be used in the equation for the value of
+  the desired variable, from the range `A', `B', ..., `Z'.
+<p>
+  
+  The `help' for all these is kept here, for `invar'.
+<p>
+  
+<hr>
+ <h2> 12.29 <a name="more"> More </h2> </a> <p>
+  
+  (Default - 'yes'      <br> Choice - `yes:no')
+<p>
+  
+ In doing the unsharp masking, do you want to have another
+ go at subtracting the smoothed image from the original image?
+<p>
+  
+ This enables you to input a new value of the factor by which
+ the smoothed image is multiplied before being subtracted.
+<p>
+  
+ See the comments on the `FRACTION' parameter above for why
+ this is useful.
+<p>
+  
+<hr>
+ <h2> 12.29 <a name="nxy"> Nxy </h2> </a> <p>
+  
+  (Default - 1,1    <br>         Range - 1 to 100000)
+<p>
+  
+  If there are no input images, the user has the choice of the size of
+  the output image.
+<p>
+  
+  This parameter defines the `X' and 'Y' sizes of the output image.
+<p>
+  
+<hr>
+ <h2> 12.30 <a name="outim"> Outim </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the output file to contain the `Alter' output
+  image.
+<p>
+  
+  This is in the format of the Starman `short' 16-bit integer or
+  `real' real 32-bit NDF image.
+<p>
+  
+  A description is given above, in the `Alter Output' section.
+<p>
+  
+<hr>
+ <h2> 12.32 <a name="pixval"> Pixval </h2> </a> <p>
+  
+  (Default - 1,1,1.0     Range - -1.0e20 to  1.0e20)
+<p>
+  
+  The X,Y position of the pixel and the value to assign to it.
+<p>
+  
+  The X,Y numbers are input as real numbers, but the user can
+  put them in as integers. Thus - 10,10,3.4 -  will set the
+  value of pixel (10,10) to 3.4,
+<p>
+  
+<hr>
+ <h2> 12.33 <a name="range"> Range </h2> </a> <p>
+  
+  (Default - 0.0,0.0          <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  Range of pixel values, such that if a pixel had a value within that
+  range, the pixel is set to `invalid'.
+<p>
+  
+<hr>
+ <h2> 12.34 <a name="rotate"> Rotate </h2> </a> <p>
+  
+  (Default - 0.0     <br> Range - 1.0e-20 to 1.0e20)
+<p>
+  
+ The angle in degrees through which to rotate the image in a
+ counter-clockwise direction.
+<p>
+  
+ After rotation, if the image is not orthogonal to the X and Y axes,
+ it is placed within a larger image, so that the new `bottom' corner
+ is at the bottom of the image, and the new `left-hand' corner is
+ at the left of the image.
+<p>
+  
+<hr>
+ <h2> 12.35 <a name="sample"> Sample </h2> </a> <p>
+  
+  (Default - 'highest'       <br> Choice - 'sample:highest:average' )
+<p>
+  
+  Method of extracting output value from binning box:-
+<pre>
+  
+  Option    Choice
+  ------    ------
+  Average  Take average of all pixels
+  Highest  Take highest pixel
+  Sample   Take value of bottom left hand pixel in box
+</pre>
+  
+<hr>
+ <h2> 12.36 <a name="seed"> Seed </h2> </a> <p>
+  
+  (Default - 1234567891 <br>   Range - 1200000001 to 1400000001)
+<p>
+  
+  The seed number to be used in any random number generators.
+  This is used in the `GAUSS()' and `RAN()' operators. These
+  will provide the same pattern of numbers in the same
+  seed number is input.
+<p>
+  
+  It has to be a large positive odd number.
+<p>
+  
+<hr>
+ <h2> 12.37 <a name="smethod"> Smethod </h2> </a> <p>
+  
+  (Default - 'box' or `median'      <br> Choice - 'gauss:box:median')
+<p>
+  
+  Which smoothing method to use.
+<pre>
+  
+  Option    Choice
+  ------    ------
+  Gauss     Run a rectangular box over the whole image, taking
+            the average of the pixels using a weight given by
+            the value of a circular Gaussian profile centered
+            at the box centre.
+  
+  Box       Run a rectangular box over the whole image, taking
+            the average of the pixels within the box.
+  
+  Median    Run a rectangular box over the whole image, taking
+            the median of the pixels within the box.
+</pre>
+  
+  
+  For all three methods, the result is normalised, so that a flat
+  image would result in an identical output.
+<p>
+  
+  When the box overlaps the edges of the image, only the pixels
+  inside the image are taken.
+<p>
+  
+<hr>
+ <h2> 12.38 <a name="titleim"> Titleim </h2> </a> <p>
+  
+  (Default - ' '      <br> Choice - any)
+<p>
+  
+  Title to add as a descriptor of the output image of the `Alter'
+  group of options. The default is the title of the input image,
+  or ' ', if it has no title.
+<p>
+  
+<hr>
+ <h2> 12.39 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+  
+  (Default - 0.0,1.0,0.0     <br> Range - -1.0e8 to 1.0e8)
+<p>
+  
+  The coefficients used to calculate, for a pixel in the new image,
+  its X position in the old image.
+<pre>
+  
+             X  =  C(1) + C(2)*X  +  C(3)*Y
+              n                 o          o
+</pre>
+  
+<hr>
+ <h2> 12.40 <a name="xmagnify"> Xmagnify </h2> </a> <p>
+  
+  (Default - 1.0       <br> Range - 1.0 to 1.0e20)
+<p>
+  
+ The factor by which to stretch the image in the X direction.
+<p>
+  
+ The magnification is done by using this and the `YMAGNIFY'
+ parameter to load the coefficients of the transform values.
+<p>
+  
+ If one wishes to compress the image by integer steps, it is
+ better to use the `compress' option.
+<p>
+  
+<hr>
+ <h2> 12.41 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+  
+  (Default - 0.0,0.0,1.0     <br> Range - -1.0e8 to 1.0e8)
+<p>
+  
+  The coefficients used to calculate, for a pixel in the new image,
+  its X position in the old image.
+<pre>
+  
+             Y  =  C(1) + C(2)*X  +  C(3)*Y
+              n                 o          o
+</pre>
+  
+<hr>
+ <h2> 12.42 <a name="ymagnify"> Ymagnify </h2> </a> <p>
+  
+ (Default - 1.0       <br> Range - 1.0 to 1.0e20)
+<p>
+  
+ The factor by which to stretch the image in the Y direction.
+<p>
+  
+ The magnification is done by using this and the `YMAGNIFY'
+ parameter to load the coefficients of the transform values.
+<p>
+  
+ If one wishes to compress the image by integer steps, it is
+ better to use the `compress' option.
+<p>
+  
+  
+<hr>
+ <h2> 12.43 <a name="aperture:-"> APERTURE:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Aperture' program group.
+<p>
+  
+<hr>
+ <h2> 12.44 <a name="airname"> Airname </h2> </a> <p>
+  
+  (Default - `null')
+<p>
+  
+  Name of descriptor in the image which holds the airmass.
+<p>
+  
+<hr>
+ <h2> 12.45 <a name="aoption"> Aoption </h2> </a> <p>
+  
+  (Default - present value, start='size&#95 c'     <br> Choices - see below)
+<p>
+  
+ What operation, from a menu of possible choices, to do next?
+<p>
+  
+ It is the Aperture Photometry option choice, which you repeatedly come
+ back to, after performing operations. You select one of the menu
+ operations.
+<p>
+  
+ Generally the default option is a repeat of the last option. However
+ at the start of doing `Aperture', the default is `Size&#95 c'.
+<pre>
+  
+  
+ Option        Function
+ ------        --------
+ Exptim_im     Correct for exposure time from image descriptor
+ airmass       Correct for Airmass from image descriptor
+ centre        Toggle centre => cursor/max pix/centroid/Gaussian
+ exptim_k      Change zeropoint by using keyboard exposure time
+ level         Toggle mean/median method for sky level
+ list          List the measures so far
+ measure       Measure star/sky flux via cursor and buttons
+ method        Sky determined from annulus or from separate area
+ noise         Level of extra noise/pixel in pixel counts
+ poisson       Change the Poisson scaling factor for Error
+ recalc        A fresh calc for the last star and last sky
+ remove        Remove a measure from memory and the display
+ shape         Set via keyboard: aperture ellipticity, angle
+ show_ap       Show apertures when getting positions
+ size_key      Set via keyboard: X, Y size of the oval apertures
+ size_sky      Cursor change the size of the sky aperture(s)
+ size_star     Cursor change the size of the star aperture
+ store         Store results in output file
+ zero_pt       Change the -base- magnitude zero point
+  
+  Buttons
+  
+   Buttons from left:-  (1)           (2)          (3)
+   Aperture work:   pick star       pick sky      return
+     Remove work: remove circle    remove circle  return
+   Ap change work:  dec aperture    inc aperture  next aperture/
+                                                  return
+</pre>
+  
+ In the `measure' option:- Measure star/sky flux via cursor and aperture
+ size and star/sky choice. The star flux in the aperture is found (or
+ sky level in the aperture), and typed. If star, then the star
+ and last sky level (separate or annulus) is taken and the calc done
+ for the magnitude;
+<pre>
+  
+               Mag = 30 + Z - 2.5Log((star-sky level)/Exp)
+</pre>
+  
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<p><pre>
+  
+ Option        Function
+ ------        --------
+ alter         Functions for image altering in various ways
+ aperture      Functions for aperture photometry
+ colour        Functions for changing colour display of image
+ fit_magns     Functions to get star magnitudes with Gaussians
+ inspect       Functions for image inspection in various ways
+ main          Entry point for program
+ positions     Functions to get or plot a list of positions
+ scrutiny      Functions to look at Starman MEASURE output
+  
+ image         Input new image
+ im_get_flash  Input new image and display (flash) it
+  
+ area          Select area of image to display
+ clear         Clear screen
+ close         Close the display screen
+ compress      Compress image in either X or Y for display
+ cvalues       Show the cursor position and image pixel value
+ display       Display image
+ flash         Display image in standard way
+ open          Open the display screen
+ reset         Reset zoom/pan to unity and centre
+ zoom          Zoom and pan image by using mouse location
+  
+ panel         Switch between panel / keyboard option selection
+ exit          Exit from this program
+  
+</pre>
+ Zoom means zoom around present position of cursor
+ Pan means set present position of cursor to screen centre
+<p><pre>
+  
+ Buttons for Cvalues work:-
+  
+ The values are output continuously again on the panel, or by
+ request on the terminal if the panel is not being used.
+  
+             -Panel- mode?    Button actions
+             ------------     --------------
+                 YES           All buttons exit
+                  NO           Buttons Left,Centre give values
+                               Right Button 3 exits
+                               Right Button 3 exits
+</pre>
+<hr>
+ <h2> 12.46 <a name="apang"> Apang </h2> </a> <p>
+  
+  (Default - last (start=0.0)          <br> Range = -90.0 to +90.0)
+<p>
+  
+  Angle to X-axis, working counter-clockwise, that the major
+  axis makes, in degrees.
+<p>
+  
+  
+<hr>
+ <h2> 12.47 <a name="apdiam"> Apdiam </h2> </a> <p>
+  
+  (Default - present value, start=see below      <br> Range - 0.0 to 1.0e8)
+<p>
+  
+  The diameter in pixels of the apertures used in the measuring.
+<p>
+  
+  This is the diameter of the major axis, as the aperture may
+  be elliptical, and inclined to the X-axis.
+<pre>
+  
+ These are :-  the star aperture diameter   (start=20.0)
+               the sky aperture diameter for non-annulus work
+                                            (start=20.0)
+               the sky aperture inner diameter for annulus work
+                                            (start=30.0)
+               the sky aperture outer diameter for annulus work
+                                            (start=40.0)
+</pre>
+  
+  In the annulus work, the sky area is taken as that between the sky
+  inner annulus ring and the sky outer annulus ring.
+  In non-annulus work, the sky aperture is a simple circle or ellipse,
+  placed as specified.
+<p>
+  
+<hr>
+ <h2> 12.48 <a name="apell"> Apell </h2> </a> <p>
+  
+  (Default - last (start=0.0)               <br> Range - 0.0 to 1.0)
+<p>
+  
+  The ellipticity of the aperture.
+<p>
+  
+  The ellipticity is ((a-b)/a) where a = major axis diameter and
+  b = minor axis. a is the diameter you input for aperture size.
+  Thus a round aperture has ellipticity = 0.0, a line has = 1.0.
+<p>
+  
+<hr>
+ <h2> 12.49 <a name="coordtype"> Coordtype </h2> </a> <p>
+  
+  (Default - `radians'          <br> Choice - `degrees:radians:string')
+<p>
+  
+  Method by which the RA and Dec are stored in the descriptors.
+<pre>
+  
+   Method    Example
+   ------    -------
+   degrees    +40.234
+   radians    -0.445678
+   string     +12 34 45
+</pre>
+  
+<hr>
+ <h2> 12.50 <a name="decname"> Decname </h2> </a> <p>
+  
+  (Default - `null')
+<p>
+  
+  Name of descriptor in the image which holds the object Dec.
+<p>
+  
+<hr>
+ <h2> 12.51 <a name="descrair"> Descrair </h2> </a> <p>
+  
+  (Default - `airmass'         <br> Choice - `none:airmass:position')
+<p>
+  
+  Method of getting airmss of observation.
+<pre>
+  
+   Choice    Method
+   ------    ------
+   airmass   Get it from a descriptor in the image
+   none      Do not calculate airmass
+   position  Use the RA and Dec of the object, with the
+             Sidereal Time and site latitude
+</pre>
+  
+<hr>
+ <h2> 12.52 <a name="descrfilt"> Descrfilt </h2> </a> <p>
+  
+  (Default - last (start='no')        <br> Choice - `yes:no')
+<p>
+  
+  Use image descriptor to get filters from? If there is one
+  this is nice to use. If there isnt, you cant.
+<p>
+  
+<hr>
+ <h2> 12.53 <a name="descrtime"> Descrtime </h2> </a> <p>
+  
+  (Default - last (start='no')        <br> Choice - `yes:no')
+<p>
+  
+  Do you want to use an image descriptor to get the exposure time
+  from? If there is one this is nice to use. If there isnt, you cant.
+<p>
+  
+<hr>
+ <h2> 12.54 <a name="expname"> Expname </h2> </a> <p>
+  
+  (Default - `null')
+<p>
+  
+  Name of descriptor in the image which holds the exposure time.
+<p>
+  
+<hr>
+ <h2> 12.55 <a name="exptim"> Exptim </h2> </a> <p>
+  
+  (Default - present value, start=1.0          <br> Range - 1.0e-8 to 1.0e8)
+<p>
+  
+  The exposure time of the image. This is applied to the output
+  magnitude. It applies a correction of -2.5*log  (Exptim), and
+                                                10
+  thus the starting exposure time of 1 second applies a zero
+  correction.
+<p>
+  
+<hr>
+ <h2> 12.56 <a name="extinc"> Extinc </h2> </a> <p>
+  
+  (Default - see below               <br> Range - 0.0 to 10**8)
+<p>
+  
+  The extinction values to use with this filter.
+<p>
+  
+  The defaults assume that the filters are U,B,V,R,I,J,H,K,L and are
+  0.68, 0.28, 0.15, 0.10, 0.07, 0.10, 0.04, 0.06, 0.06 for the nine
+  possible filters.
+<p>
+  
+<hr>
+ <h2> 12.57 <a name="filtloc"> Filtloc </h2> </a> <p>
+  
+  (Default -1,79               <br> Range - 1 to 256)
+<p>
+  
+  Start and end location in the filter name descriptor of the
+  characters that have the filter name.
+<p>
+  
+<hr>
+ <h2> 12.58 <a name="filtname"> Filtname </h2> </a> <p>
+  
+  (Default - `null')
+<p>
+  
+  Name of descriptor in the image which holds the filter name.
+<p>
+  
+<hr>
+ <h2> 12.59 <a name="fixgrad"> Fixgrad </h2> </a> <p>
+  
+  (Default - `No'          <br> Choice - `Yes/No' )
+<p>
+  
+  Use fixed radii when doing Gauss centering with fixed radii ('Yes').
+  If floating radii are desired, use `No'.
+<p>
+  
+<hr>
+ <h2> 12.60 <a name="fname"> Fname </h2> </a> <p>
+  
+   (Default - `null')
+<p>
+  
+  Name of filter that can be looked for in the filter name descriptor.
+<p>
+  
+  Up to nine names can be input, via the `FNAME1', `FNAME1', ....,
+  `FNAME9' input.
+<p>
+  
+  Input is stopped by inputting a `null' entry (hit `return' key).
+<p>
+  
+<hr>
+ <h2> 12.61 <a name="gradii"> Gradii </h2> </a> <p>
+  
+  (Default - present value, start=2.0,2.0 <br> Range - 0.1 to 100.0)
+<p>
+  
+  Gaussian radii to use when doing Gauss centering with fixed radii.
+<p>
+  
+<hr>
+ <h2> 12.62 <a name="keep"> Keep </h2> </a> <p>
+  
+  (Default - `No'          <br> Choice - `Yes/No' )
+<p>
+  
+  If some aperture measures done have been `removed', then this
+  gives the user a chance to resurrect all such removed ones
+  when loading the output results table file.
+<p>
+  
+<hr>
+ <h2> 12.63 <a name="keytime"> Keytime </h2> </a> <p>
+  
+  (Default - last (start='no')          <br> Choice - `yes:no')
+<p>
+  
+  Do you want to correct the magnitudes by an `exposure time',
+  entered via the keyboard?
+<p>
+  
+<hr>
+ <h2> 12.64 <a name="latitude"> Latitude </h2> </a> <p>
+  
+  (Default - `+00 00 00')
+<p>
+  
+  Latitude of site.
+<p>
+  
+  This is input as a character string in the format `+00 00 00'
+<p>
+  
+<hr>
+ <h2> 12.65 <a name="list"> List </h2> </a> <p>
+  
+  (Default - `No'          <br> Choice - `Yes/No' )
+<p>
+  
+  If some aperture measures done have been `removed', then this
+  gives the user a chance to have them all output when doing the
+  the type-out of the results table.
+<p>
+  
+<hr>
+ <h2> 12.66 <a name="method"> Method </h2> </a> <p>
+  
+  (Default - present value, starting `annulus'
+   <br> Choice - `annulus:separate')
+<p>
+  
+  Method to determine the area used to get the sky level.
+<p>
+  
+  There are two ways of selecting areas the area to be used for
+  determining the sky level. These are an annulus round the star,
+  and a separate circular area elsewhere in the image.
+<p>
+  
+  The advantage of using an annulus is that this gives a good
+  estimate of the mean level at the star itself. The disadvantage
+  is that a significantly bright star may be present in that
+  annulus. With the use of a separate area, an area free of
+  significant stars can be chosen.
+<p>
+  
+  If the `separate' mode is used, then the sky level adopted
+  for each star is that determined from the last sky level
+  determination. Such determinations can be made as frequently as
+  desired.
+<p>
+  
+  In the `annulus' mode, the inner and outer radii of the annulus
+  can be set separately.
+<p>
+  
+  For a fuller discussion on the problems of determining sky levels,
+  see the `help' in `Options' - `Aperture Options'.
+<p>
+  
+<hr>
+ <h2> 12.67 <a name="noise"> Noise </h2> </a> <p>
+  
+  (Default - present value, start=0.0          <br> Range - 0.0 to 1.0e16)
+<p>
+  
+  The amount of extra noise that is actually present in each pixel,
+  above the amount the program can find.
+<p>
+  
+  The program thinks that the only source of noise is the Poisson
+  noise of the counts (scaled by the `Poiss' parameter input factor).
+  This `Noise' parameter allows you to put in another source of
+  noise. An example could be the `read-out' noise of a CCD.
+<p>
+  
+  The `Noise' is the standard deviation ofsuch an extra source of
+  noise.
+<p>
+  
+<hr>
+ <h2> 12.68 <a name="outmags"> Outmags </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the output file to contain the `Aperture' output results
+  table.
+<p>
+  
+  This is in the format of the Starman 'real' real 32-bit NDF file.
+<p>
+  
+  It is has contents:-  (it may only have the name,X,Y,Magnitude
+  columns)
+<pre>
+  
+   Table column
+      Header            Contents
+   ------------         --------
+   Name               	Star name
+   X 			Star X position
+   Y			Star Y position
+   Magnitude		Star magnitude (see below)
+   Error		Estimate of std dev error in star magn
+   Flux			Flux (above sky) in star aperture
+   Flux error		Estimate of std dev error in star flux
+   Max Value 		Maximum pix value in star aperture area
+   Area 		Area of star aperture (Straddles pixels)
+   Num Bad Pixels 	Number of `bad' pixels in star aperture
+   Total Flux		Total flux in star aperture
+   Sky level 		Sky level used for star magnitude
+   Sky flux 		Total flux in sky level aperture
+   Num sky bad pixels	Number of `bad' pixels in sky aperture
+   Sky area 		Area of sky aperture (Straddles pixels)
+   Sky X 		X position of sky aperture
+   Sky Y  		Y position of sky aperture
+   Star ap maj dia 	Star aperture major axis diameter
+   Sky ap maj dia       Sky aperture major axis diameter
+   Sky inner annulus    If sky area is annulus, inner major axis
+     maj dia               diameter of annulus
+   Sky outer annulus    If sky area is annulus, outer major axis
+     maj dia               diameter of annulus
+   Aperture Angle       Angle in deg, counter-clock, from X-axis
+                           of major axis
+   Aperture Ellipticity Ellipticity of aperture
+   Annulus flag 	Sky area circle (0.0), or annulus around
+                           star(1.0)?
+   Centering flag 	Star position been none/max pixel/
+                           centroid/ Gauss method (1/2/3/4)
+                           centered
+   Median flag 		Sky level taken as mean (0.0), or median
+                           (1.0)?
+   Extra noise 		Extra noise level assumed per pixel
+   Events/pixel values 	Square root[Flux*(this)] = effective
+                           Poisson noise
+   Exp time - Keyboard  Exposure time from keyboard
+   Exp time - Image	Exposure time from image descriptor
+   Air Mass             Air Mass of exposure
+   Air Corrn            Correction to magnitude from air mass
+   Zero point		Zero point applied to output mag
+  
+  
+   Where:-
+  
+   Output magnitude = 30.0 + `Zero point' -
+                        2.5*log  [(Star flux)/(Exposure time)]
+                               10
+  
+   Star flux = Flux in star aperture
+               - (Sky level)*(Star ap area)
+  
+   Sky flux  = 1) (Flux in sky aperture)/(area of sky aperture)
+       OR    = 2) Median pixel value in sky aperture
+  
+</pre>
+  
+  
+   In the annulus work, the sky area is taken as that between the sky
+   inner annulus ring and the sky outer annulus ring.
+   In non-annulus work, the sky aperture is a simple circle, placed
+   as specified.
+<p>
+  
+   `Bad pixels' are ignored. Thus in the sky estimates this should
+   not make much trouble, but in the Star estimates it will if the
+   relevant pixel has a value above the sky level.
+<p>
+  
+   The apertures have `smooth' edges. The circle that gives the
+   edge of the aperture will fall `through' the body of some of the
+   pixels at the edge of the aperture. What happens then is that these
+   `edge' pixels are subdivided into a 5x5 subarray, andeach sub-pixel
+   is looked at to see if it is in or out of the aperture. The area of
+   the pixel, for the program purposes, is then (number/25.0). The
+   flux in the pixel is then scaled down to the same extent.
+<p>
+  
+   Errors:-
+<p>
+  
+   The errors are calculated assuming that the pixel values are due
+   to a source with Poisson noise (which has suffered scaling) and
+   an extra `magic' source of noise (with zero effect on the mean
+   pixel value).
+<p>
+<pre>
+   Thus the pixel variance = Flux*(`Poiss' value) +
+               (no of pixels)*(`Noise' value)*(`Noise' value)
+  
+   [Std dev = square root(variance)]
+</pre>
+  
+   The star error is then calculated assuming that noise in the star
+   flux, and noise due to the error in calculating the sky level.
+<p>
+  
+<hr>
+ <h2> 12.69 <a name="outtype"> Outtype </h2> </a> <p>
+  
+  (Default - `full'          <br> Choice - `Short/Full')
+<p>
+  
+  Do you want the output `Aperture' results table file to contain
+  all the information, or just a shortened subset? The shortened
+  subset just has the X,Y positions and the measured magnitudes.
+<p>
+  
+<hr>
+ <h2> 12.70 <a name="poiss"> Poiss </h2> </a> <p>
+  
+  (Default - present value, start=1.0      <br> Range - 1.0e-8 to 1.0e16)
+<p>
+  
+ The scaling that would have to be applied to pixel values so that
+ their values would have a Poissonian distribution.
+<p>
+  
+ This is used to calculate the error on a flux level.
+<p>
+<pre>
+ The error used (squared) = Flux*(`Poiss' value) +
+            (no of pixels)*(`Noise' value)*(`Noise' value)
+</pre>
+  
+ This enables the output error estimates to be reasonably correct.
+<p>
+  
+<hr>
+ <h2> 12.71 <a name="raname"> Raname </h2> </a> <p>
+  
+  (Default - `null')
+<p>
+  
+  Name of descriptor in the image which holds the object RA.
+<p>
+  
+<hr>
+ <h2> 12.72 <a name="sidtname"> Sidtname </h2> </a> <p>
+  
+  (Default - `null')
+<p>
+  
+  Name of descriptor in the image which holds the Sidereal Time of the
+  exposure.
+<p>
+  
+<hr>
+ <h2> 12.73 <a name="zerop"> Zerop </h2> </a> <p>
+  
+  (Default - present value, start=0.0         <br> Range - -1.0e8 to 1.0e8)
+<p>
+  
+  The zero point to be added to the output star magnitudes.
+<p>
+  
+<hr>
+ <h2> 12.74 <a name="colour:-"> COLOUR:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Colour' program group.
+<p>
+  
+<hr>
+ <h2> 12.75 <a name="coption"> Coption </h2> </a> <p>
+  
+  (Default - present value,start='load'     <br> Choices - see below)
+<p>
+  
+  What operation, from a menu of possible choices, to do next?
+<p>
+  
+  The menu selection of options for changing the colour Look-up Table
+  of the image display.
+<p>
+  
+  You repeatedly come back to this parameter after performing `Colour'
+  operations. You select one of the menu operations. You return to the
+  main `Interact' group by entering the `return' option.
+<pre>
+  
+  
+  Option        Function
+  ------        --------
+  bar_clear     Remove display of LUT table bar
+  bar_show      Display LUT bar
+  ends_bw       Values below/above LUT ends as black/white
+  ends_cc       Values below/above LUT ends as col/col
+  ends_wb       Values below/above LUT ends as white/black
+  ends_wrap     Values below/above LUT ends as wrapped
+  file_get      Read a full Look-Up Table from a file
+  file_put      Write the present Look-Up Table to file
+  file_sget     Read a short Look-Up Table from a file
+  flip          Flip LUT
+  load          Load LUT from store
+  paint         Pick colour from LUT bar /overwrite range of LUT
+  rotate        Rotate LUT by moving cursor
+  scale         Shift and scale LUT by moving cursor
+  wrap          Toggle how image values above/below limits shown
+  
+</pre>
+  
+  ****  This colour system uses a Look-Up Table (LUT)  ****
+<p>
+  
+ The actual pixel values in the image are already displayed
+ by scaling and shifting so that a range of those values lies
+ between 0 and 255. To each of these 256 -values-, a colour
+ is now ascribed, by means of a Look-Up Table (LUT).
+ These options allow you to change the colours ascribed to
+ to each -value-, in a number of ways. Actual pixel values
+ which fell outside the original range, can never have a range
+ of colours, as they are all set at the end value. To change
+ that, redisplay the image. Likewise for fine gradations.
+<p>
+  
+ How to change the colour LUT of the image display:-
+<pre>
+  
+ Mouse buttons from left:-    (1)         (2)       (3)
+ --------------------------------------------------------
+   Rotate LUT          Operate when held down      Return
+                       Move cursor left/right
+   Scale  LUT          Operate when held down      Return
+                       Move cursor left/right
+                           and up/down
+</pre>
+  
+  
+ How to use the `Paint' Function:-
+<p>
+<ol>
+<li> Place cursor on displayed LUT bar <p>
+<li> Press left or centre mouse button <p>
+<li> Release <p>
+<li> Place cursor on displayed LUT bar <p>
+<li> Press left or centre mouse button <p>
+<li> Move cursor along LUT bar <p>
+<li> Release mouse button <p>
+<li> Repeat or press right mouse button to exit <p>
+</ol>
+<p>
+  
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<pre>
+  
+ Option        Function
+ ------        --------
+ alter         Functions for image altering in various ways
+ aperture      Functions for aperture photometry
+ colour        Functions for changing colour display of image
+ fit_magns     Functions to get star magnitudes with Gaussians
+ inspect       Functions for image inspection in various ways
+ main          Entry point for program
+ positions     Functions to get or plot a list of positions
+ scrutiny      Functions to look at Starman MEASURE output
+  
+ image         Input new image
+ im_get_flash  Input new image and display (flash) it
+  
+ area          Select area of image to display
+ clear         Clear screen
+ close         Close the display screen
+ compress      Compress image in either X or Y for display
+ cvalues       Show the cursor position and image pixel value
+ display       Display image
+ flash         Display image in standard way
+ open          Open the display screen
+ reset         Reset zoom/pan to unity and centre
+ zoom          Zoom and pan image by using mouse location
+  
+ panel         Switch between panel / keyboard option selection
+ exit          Exit from this program
+  
+</pre>
+ For X-window device use, the Cursor must be in image window area
+ for the cursor buttons to work when in -WORKING- mode. The
+ window also must be -active- - that is the bar at the top
+ must be set. Click on this bar if it is not before using
+ the buttons.
+<p><pre>
+  
+  Buttons for Zoom/Pan work:-
+  
+     Left Button twice              = zoom /2
+     Centre Button twice            = zoom x2
+     Left Button then Centre Button = pan
+     Right button once             = exit
+  
+</pre>
+ Zoom means zoom around present position of cursor
+ Pan means set present position of cursor to screen centre
+<p><pre>
+  
+ Buttons for Cvalues work:-
+  
+ The values are output continuously again on the panel, or by
+ request on the terminal if the panel is not being used.
+  
+             -Panel- mode?    Button actions
+             ------------     --------------
+                 YES           All buttons exit
+                  NO           Buttons Left,Centre give values
+                               Right Button 3 exits
+</pre>
+  
+<hr>
+ <h2> 12.76 <a name="inlut"> Inlut </h2> </a> <p>
+  
+  (Default = null)
+<p>
+  
+  The name of a file containing a LUT Table in the `full' format of the
+  Interact:Colour output `OUTLUT', or as a `short' LUT in a brief
+  form. In the later case the file is read into the internal program
+  storage, but not loaded to the display LUT. It may, of course, be
+  later read from the storage to be applied to the display LUT.
+<p>
+  
+  The formats are more fully described in the top-level help `colour'
+  section.
+<p>
+  
+  This enables you to input a new LUT.
+<p>
+  
+<hr>
+ <h2> 12.77 <a name="lutnum"> Lutnum </h2> </a> <p>
+  
+  (Default - 1         <br> Range - 1-15)
+<p>
+  
+  Choose the number of the stored LUT table you want to apply to the
+  display.
+<p>
+  
+  The program has eight standard LUT tables, numbered as 1-8. You
+  can input others, or store modified ones, and store them in numbers
+  9-15. These are then available for use. However these are not
+  kept when you exit from the program.
+<p>
+  
+  The eight standard LUT tables are:-
+<p>
+  
+<ol>
+<li> Grey scale
+<li> Purple with light at top
+<li> Rainbow
+<li> Black/blue/green/yellow/purple/white
+<li> Black/blue/greeny-yellow/dark red
+<li> Black/blue/greeny-yellow/light red/white
+<li> Discrete steps
+        (black/blue/green/light blue/red/purple/yellow/white)
+<li> Inverted grey scale
+</ol>
+<p>
+  
+<hr>
+ <h2> 12.78 <a name="num_lut"> Num&#95 lut </h2> </a> <p>
+  
+  (Default - 1st number not yet used              <br> Range - 9 to 15)
+<p>
+  
+  When reading in a file containing a `short' Look-up Table, this
+  is the storage number inside the program where it is kept.
+<p>
+  
+  You can put it in any of the 9 - 15 slots, but you may overwrite a
+  previously stored short LURT.
+<p>
+  
+<hr>
+ <h2> 12.79 <a name="outlut"> Outlut </h2> </a> <p>
+  
+  (Default = null)
+<p>
+  
+  The name of the new file, into which you wish to load the LUT
+  presently in use. This is stored as a `full' LUT, in a standard
+  format:-
+<p>
+  
+  This is a table containing the R,G,B fractional colour contributions
+  in columns 1,2,3 of the table (ignoring the 1st 5 for table row
+  names - which are not used). There are 150 rows in this table.
+  Starting from the first row, there is the R,G,B set for the lowest
+  location on the table, carrying onto the 150th row, where there is
+  the highest LUT entry.
+<p>
+  
+  There is also a scale `LUTSC', and a zero `LUTZE', in descriptors.
+  These scale the LUT. A given entry point, say RV, which is
+  bewteen 0.0 and 1.0, would normally go to the R,G,B set of the
+  RV*150th row in the input LUT. Where it actually goes is
+  the [(RV-LUTZE)/LUTSC]*150th entry. If this entry is below 1 or
+  above 150, then the entry is either, set at 1 or 150, or set at
+  its modulo 150 value.
+<p>
+  
+<hr>
+ <h2> 12.80 <a name="fit_magns:-"> FIT MAGNS:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Fit&#95 Magns' program group.
+<p>
+  
+  (They are also used by the `Positions' group, which access the same
+   options.)
+<p>
+  
+<hr>
+ <h2> 12.81 <a name="boxshow"> Boxshow </h2> </a> <p>
+  
+   (Default - last (start='yes')      <br> Choice - `yes:no')
+<p>
+  
+  After a star has been fitted, paint a rectangle round the
+  fitted area?
+<p>
+  
+<hr>
+ <h2> 12.82 <a name="boxsize"> Boxsize </h2> </a> <p>
+  
+   (Default - last (start=10,10)      <br> Range - 3 to 200)
+<p>
+  
+  Size of box around star input position that defines area to
+  be fitted for star posn and magnitude.
+  It should be some 3 to 5 times the star profile FWHM.
+<p>
+  
+<hr>
+ <h2> 12.83 <a name="crcol"> Crcol </h2> </a> <p>
+  
+  (Default - last (start='red' or `green' or `blue')
+   <br> Choice - `red:green:blue:cyan:magenta:yellow:coral:palegreen)
+<p>
+  
+  When painting star positions with a cross on the image,
+  this is the color of the cross.
+<p>
+  
+  There are three `types' of cross. Those for marking a cursor
+  input for star positions (default-'green'), those for marking a
+  cursor input for star magnitudes (default-'red'), and those for
+  marking star positions obtained from an input table (default-'red'),
+  Each type can have its own colour.
+<p>
+  
+<hr>
+ <h2> 12.84 <a name="crossl"> Crossl </h2> </a> <p>
+  
+   (Default - last (start=5.0)     <br> Range - 1 to 10**8)
+<p>
+  
+  When painting star positions with a cross on the image,
+  this is the length of cross in pixels to paint. Length is
+  distance between ends of an arm (i.e. twice the distance from
+  the centre to an end).
+<p>
+  
+<hr>
+ <h2> 12.85 <a name="goption"> Goption </h2> </a> <p>
+  
+  (Default - present value, start=''   <br> Choices - see below)
+<p>
+  
+  What operation, from a menu of possible choices, to do next?
+<p>
+  
+  (Accessed in the `Fit&#95 magns' and `Positions' groups of options.)
+<p>
+  
+  The menu selection of options for getting magns and positions from the
+  display. You repeatedly come back to this parameter after
+  performing `Getting Position' operations. You select one of the
+  menu operations.
+<pre>
+  
+  
+ Option        Function
+ ------        --------
+ boxshow       Toggle showing /not the box round mag positions
+ cross         Change colour/size of plot/get cross
+ cur_magn      Use cursor to get Gauss positions + magnitudes
+ cur_posn      Use cursor to get positions
+ fit_params    Set:- radii; fix/vary radii in fit; box size
+ flush_magn    Forget all star Gauss positions + magnitudes
+ flush_posn    Forget all positions
+ list_magn     Type out Gauss positions and magnitudes
+ list_posn     Type out positions and pixel values
+ plot_file     Get positions from a file and plot them
+ review        Type out the present setups
+ store_magn    Put acquired Gauss magnitudes into a file
+ store_posn    Put acquired positions into a file
+</pre>
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<p>
+<pre>
+  
+ Option        Function
+ ------        --------
+ alter         Functions for image altering in various ways
+ aperture      Functions for aperture photometry
+ colour        Functions for changing colour display of image
+ fit_magns     Functions to get star magnitudes with Gaussians
+ inspect       Functions for image inspection in various ways
+ main          Entry point for program
+ positions     Functions to get or plot a list of positions
+ scrutiny      Functions to look at Starman MEASURE output
+  
+ image         Input new image
+ im_get_flash  Input new image and display (flash) it
+  
+ area          Select area of image to display
+ clear         Clear screen
+ close         Close the display screen
+ compress      Compress image in either X or Y for display
+ cvalues       Show the cursor position and image pixel value
+ display       Display image
+ flash         Display image in standard way
+ open          Open the display screen
+ reset         Reset zoom/pan to unity and centre
+ zoom          Zoom and pan image by using mouse location
+  
+ panel         Switch between panel / keyboard option selection
+ exit          Exit from this program
+  
+  
+  Buttons for measuring the Gaussian radii of stars:-
+  
+      Left Button   = Variable radius
+      Centre Button = Fixed radius
+      Right Button  = return
+  
+</pre>
+ For X-window device use, the Cursor must be in image window area
+ for the cursor buttons to work when in -WORKING- mode. The
+ window also must be -active- - that is the bar at the top
+ must be set. Click on this bar if it is not before using
+ the buttons.
+<p><pre>
+  
+  Buttons for Zoom/Pan work:-
+  
+     Left Button twice              = zoom /2
+     Centre Button twice            = zoom x2
+     Left Button then Centre Button = pan
+     Right button once             = exit
+  
+</pre>
+ Zoom means zoom around present position of cursor
+ Pan means set present position of cursor to screen centre
+<p><pre>
+  
+ Buttons for Cvalues work:-
+  
+ The values are output continuously again on the panel, or by
+ request on the terminal if the panel is not being used.
+  
+             -Panel- mode?    Button actions
+             ------------     --------------
+                 YES          All buttons exit
+                  NO          Buttons Left,Centre give values
+                               Right Button exits
+</pre>
+  
+<hr>
+ <h2> 12.86 <a name="intab"> Intab </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  Name of the existing file with the input table of X,Y positions to
+  plot on the display.
+<p>
+  
+<hr>
+ <h2> 12.87 <a name="radfix"> Radfix </h2> </a> <p>
+  
+   (Default - last, first `no'        <br> Choice - `yes:no')
+<p>
+  
+   Fix the star X and Y radii, or not?
+<p>
+  
+   In the Gaussian fitting, keep the star radii fixed?
+<p>
+  
+<hr>
+ <h2> 12.88 <a name="radsize"> Radsize </h2> </a> <p>
+  
+   (Default - last (start=2.0,2.0)      <br> Range  - 0.2 to 100.0)
+<p>
+  
+   What X and Y radii to give to the star Gaussian profile?
+<p>
+  
+   These are the radii out at which the profile is 1/e of the
+   peak value. The profile is elliptical, but orthogonal to the
+   X and Y axes. If the radii are kept fixed (set through the RADFIX
+   parameter), then these are the radii used. If they are not
+   fixed, then these are the start values for the fitting, and they
+   get refined through the fitting to produce the best fit. In this
+   case, it is hepful to the fitting if these start values are close
+   to the actual values.
+<p>
+  
+<hr>
+ <h2> 12.89 <a name="xrange"> Xrange </h2> </a> <p>
+  
+  (Default - 1, X size if image     <br> Range - 1 to X size of image)
+<p>
+  
+  X limits of area of input image to use.
+<p>
+  
+<hr>
+ <h2> 12.90 <a name="yrange"> Yrange </h2> </a> <p>
+  
+  (Default - 1, Y size if image     <br> Range - 1 to Y size of image)
+<p>
+  
+  Y limits of area of input image to use.
+<p>
+  
+<hr>
+ <h2> 12.91 <a name="outtab"> Outtab </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  Name of the new file to load with the output table of X,Y positions
+  or measured magnitudes that have been obtained from the display.
+<p>
+  
+  Fit&#95 magns group of options:-
+<p>
+  
+  The output of the Interact:fit&#95 magns group, `OUTTAB', is a file
+  containing a table of the magnitude measures.
+<p>
+  
+  The headers are:  `X', `Y', `Magnitude', `Dx', `Dy', `Iterations',
+                    `Rms', `Numinval', `Height', `Base', `Max pixel',
+                    `Rx', `Ry', `Xbox', `Ybox'
+<p>
+  
+  
+  Positions group of options:-
+<p>
+  
+  The output of the Interact:positions group, `OUTTAB', is a file
+  containing a table of either the X,Y positions and pixel values of the
+  locations chosen by the cursor. The headers are `X', `Y', and `VALUE'.
+<p>
+  
+<hr>
+ <h2> 12.92 <a name="inspect:-"> INSPECT:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Inspect' program group.
+<p>
+  
+<hr>
+ <h2> 12.93 <a name="base"> Base </h2> </a> <p>
+  
+  (Default - present value, start=0.0       <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The base level that is applied to the values in the typing out of
+  pixel values.
+<p>
+  
+  A pixel value of(say) RV, is typed out as  (RV-BASE)/SCALE.
+<p>
+  
+  SCALE is the typing out scale, input by the user via the
+  `SCALE' parameter, and whose default is 1.0
+<p>
+  
+<hr>
+ <h2> 12.94 <a name="contour"> Contour </h2> </a> <p>
+  
+  (Default - see below         <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The lower and upper limits of values that are plotted out
+  in the contour map, and the step between the contour levels.
+<p>
+  
+  Thus an input of `10.0,100.0,20.0' would put out contour
+  levels of (10.0,30.0,50.0,70.0,90.0).
+<p>
+  
+  The default is `(minimum of data),(maximum of data),(1/10th of range)'
+<p>
+  
+<hr>
+ <h2> 12.95 <a name="decpl"> Decpl </h2> </a> <p>
+  
+  (Default - present value, start=0       <br> Range - 0 to 10000)
+<p>
+  
+  No of decimal places to show in the typing out of pixel values.
+<p>
+  
+  If = 0, then the decimal point is suppressed.
+<p>
+  
+<hr>
+ <h2> 12.96 <a name="desname"> Desname </h2> </a> <p>
+  
+  (Default = null)
+<p>
+  
+  The name of the descriptor that you want to get the value of.
+<p>
+  
+<hr>
+ <h2> 12.97 <a name="extname"> Extname </h2> </a> <p>
+  
+  (Default - `starnam')
+<p>
+  
+  Descriptors are held in separate groups (extensions) in
+  the image.
+<p>
+  
+  The name of the extension in the image that the descriptors that you
+  want to get the value of are stored in. This is usually the `STARMAN'
+  extension, but others include `FITS', `FIGARO'.
+<p>
+  
+  `starman' is the one that holds all the ones accepted by the
+  Starman programs. `fits' is an extension that often contains
+  relevant descriptors.
+<p>
+  
+<hr>
+ <h2> 12.98 <a name="hrange"> Hrange </h2> </a> <p>
+  
+  (Default - see below         <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The lower and upper limits of values whose number of pixels
+  having those values are plotted out in a histogram. Also the
+  width of the bins in the histogram.
+<p>
+  
+  Thus an input of `10.0,70.0,20.0' would put out a histogram
+  with bins of [(10.0-30.00,(30.0-50.0),(50.0-70.0)].
+<p>
+  
+  The default is `(minimum of data),(maximum of data),(1/10th of range)'
+<p>
+  
+<hr>
+ <h2> 12.99 <a name="igbox"> Igbox </h2> </a> <p>
+  
+  (Default - 20,20             <br> Range - 5 to 100)
+<p>
+  
+  X and Y size of box round the cursor position to be used
+  in measuring the Gaussian radius of a star.
+<p>
+  
+<hr>
+ <h2> 12.100 <a name="igradii"> Igradii </h2> </a> <p>
+  
+  (Default - 3.0,3.0          <br> Range - 0.2 to 60.0)
+<p>
+  
+  When using fixed Gaussian radii in measuring the Gaussian
+  radius of a star, these are the values to fit.
+<p>
+  
+<hr>
+ <h2> 12.101 <a name="ioption"> Ioption </h2> </a> <p>
+  
+  (Default - present value,start='area&#95 c'     <br> Choices - see below)
+<p>
+  
+  What operation, from a menu of possible choices, to do next?
+<p>
+  
+  The menu selection of options for inspecting the pixel values of
+  the image in various ways.
+<p>
+  
+  You repeatedly come back to this parameter after performing `Inspect'
+  operations. You select one of the menu operations. You return to the
+  main `Interact' group by entering the `return' option.
+<pre>
+  
+  Option        Function
+  ------        --------
+  area_c        Choose (by cursor) new area for inspection
+  area_k        Choose (by keyboard) new area for inspection
+  blink         Blink present display
+  contour       Contour image area to device (poss hard)
+  controls      Type out present control parameters
+  descriptor    Type out a selected image descriptor
+  details       Type out the details of the image
+  gclose        Close graphical device
+  gdisplay      Display image area to device (poss hard)
+  histogram     Display area histogram
+  pvalues       Type out the look area values as a picture
+  radius        Get radius, height of star
+  slice         Plot a slice across the image
+  solid_tw      Display solid body plot - transparent
+  solid_w       Display solid body plot - hidden lines
+  stats         Calculate areas mean  std dev max min
+  steps         Change sampling steps in areas
+  typeform      Change format of typing out of values in area
+  values        Type out the values in the area
+  
+  Mouse buttons for Blink work:-
+  
+          Left Button   = slow blink by x2
+          Centre Button = speed blink by x2,
+          Right Button  = switch to hand blink
+  
+  The hand blink is done using the keyboard.
+  
+</pre>
+ For X-window device use, the Cursor must be in image window area
+ for the cursor buttons to work when in -WORKING- mode. The
+ window also must be -active- - that is the bar at the top
+ must be set. Click on this bar if it is not before using
+ the buttons.
+<p>
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<pre>
+  
+ Option        Function
+ ------        --------
+ alter         Functions for image altering in various ways
+ aperture      Functions for aperture photometry
+ colour        Functions for changing colour display of image
+ fit_magns     Functions to get star magnitudes with Gaussians
+ inspect       Functions for image inspection in various ways
+ main          Entry point for program
+ positions     Functions to get or plot a list of positions
+ scrutiny      Functions to look at Starman MEASURE output
+  
+ image         Input new image
+ im_get_flash  Input new image and display (flash) it
+  
+ area          Select area of image to display
+ clear         Clear screen
+ close         Close the display screen
+ compress      Compress image in either X or Y for display
+ cvalues       Show the cursor position and image pixel value
+ display       Display image
+ flash         Display image in standard way
+ open          Open the display screen
+ reset         Reset zoom/pan to unity and centre
+ zoom          Zoom and pan image by using mouse location
+  
+ panel         Switch between panel / keyboard option selection
+ exit          Exit from this program
+  
+  
+  Buttons for Zoom/Pan work:-
+     Left Button twice              = zoom /2
+     Centre Button twice            = zoom x2
+     Left Button then Centre Button = pan
+     Right button once             = exit
+  
+</pre>
+ Zoom means zoom around present position of cursor
+ Pan means set present position of cursor to screen centre
+<p><pre>
+  
+ Buttons for Cvalues work:-
+  
+ The values are output continuously again on the panel, or by
+ request on the terminal if the panel is not being used.
+  
+             -Panel- mode?    Button actions
+             ------------     --------------
+                  YES         All buttons exit
+                  NO          Buttons Left,Centre give values
+                              Right Button 3 exits
+</pre>
+  
+<hr>
+ <h2> 12.102 <a name="orient"> Orient </h2> </a> <p>
+  
+  (Default - present value, start=1.0       <br> Range - 0.0 to 360.0)
+<p>
+  
+  Azimuth in degrees from which to view displyed `solid' plot of image
+  area.
+<p>
+  
+  The value input is internally used as though it was in steps of
+  30 degrees. Thus 330, 0, and 30 show three different views of the
+  `solid' looking at the XZ plane from the direction of -Y, but
+  from the left, straight on, and from the right respectively.
+<p>
+  
+  It is not a true viewpoint, but is pretty good.
+<p>
+  
+<hr>
+ <h2> 12.103 <a name="scale"> Scale </h2> </a> <p>
+  
+  (Default - present value, start=1.0       <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The scale that is applied to the values in the typing out of
+  pixel values.
+<p>
+  
+  A pixel value of(say) RV, is typed out as  (RV-BASE)/SCALE.
+<p>
+  
+  BASE is the typing out base, input by the user via the
+  `BASE' parameter, and whose default is 0.0.
+<p>
+  
+<hr>
+ <h2> 12.104 <a name="steps"> Steps </h2> </a> <p>
+  
+  (Default - present value, start=1,1       <br> Range - 1 to [max(nx,ny)-1])
+<p>
+  
+  The X and Y step between pixels that are selected to have their pixel
+  values output in the typing out of values.
+<p>
+  
+  The upper limit of the steps is the largest side of the image - 1.
+<p>
+  
+<hr>
+ <h2> 12.105 <a name="vprange"> Vprange </h2> </a> <p>
+  
+  (Default - 10% below/above data range     <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The minimum and maximum pixel values that are plotted. (PGPLOT is
+  used in this option.)
+<p>
+  
+  This can be asked for for:-
+  
+<ul>
+<li>        3-D plot (solid or transparent)
+<li>        Slice of pixel values along a pre-defined line
+<li>        A grey-scale plot of the image.
+</ul><p>
+  
+  The default is large enough to cover the actual range.
+<p>
+  
+  This can be a hard copy device
+<p>
+  
+<hr>
+ <h2> 12.106 <a name="width"> Width </h2> </a> <p>
+  
+  (Default - present value, start=8       <br> Range - 1 to 10000)
+<p>
+  
+  Width of the character string shown for a value in the typing out of
+  pixel values. This include any `-' sign and any decimal point. If
+  this width is wider than the number of charactes actually in the
+  number, then blanks are shown before.
+<p>
+  
+<hr>
+ <h2> 12.107 <a name="window"> Window </h2> </a> <p>
+  
+  (Default - present values, start=-1.0e20,1.0e20
+   <br> Range - -1.0e20 to 1.0e20)
+<p>
+  
+  The `window' that controls the values in the typing out of values.
+  Numbers that are above this value are typed out as `****' and
+  those below as `   `.
+<p>
+  
+<hr>
+ <h2> 12.108 <a name="xarea"> Xarea </h2> </a> <p>
+  
+  (Default - last (start=1,X size,1)   <br> Range - 1 to X size of image)
+<p>
+  
+  Three numbers that define the area inspected by the other
+  options of the `INSPECT' function.
+<p>
+  
+  The numbers are the X start of the area; the X end of the area;
+  the step between pixels that sampling is to be done at.
+<p>
+  
+<hr>
+ <h2> 12.109 <a name="xypplot"> Xypplot </h2> </a> <p>
+  
+  (Default - 0.8,0.8 scaled       <br> Range - 0.101 to 0.9)
+<p>
+  
+  X, Y fraction of graphical display physical window that will be
+  used in writing graph or image. The default sizes will result
+  in a correct shape being written out. (PGPLOT is used in this
+  output.)
+<p>
+  
+  The actual area covered will be:- (0.1 to X, 0.1 to Y) where
+  0.0-1.0 is the entire range in each direction.
+<p>
+  
+  This can be a hard copy device.
+<p>
+  
+<hr>
+ <h2> 12.110 <a name="yarea"> Yarea </h2> </a> <p>
+  
+  (Default - last (start=1,Y size,1)   <br> Range - 1 to Y size of image)
+<p>
+  
+  Three numbers that define the area inspected by the other
+  options of the `INSPECT' function.
+<p>
+  
+  The number s are the Y start of the area; the Y end of the area;
+  the step between pixels that sampling is to be done at.
+<p>
+  
+<hr>
+ <h2> 12.111 <a name="positions:-"> POSITIONS:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Positions' program group.
+<p>
+  
+  These are the same as the `Fit&#95 magns' program group parameters,
+  so are not repeated here.
+<p>
+  
+<hr>
+ <h2> 12.112 <a name="scrutiny:-"> SCRUTINY:- </h2> </a> <p>
+  
+  
+  The parameters that are used by the `Scrutiny' program group.
+<p>
+  
+<hr>
+ <h2> 12.113 <a name="bylist"> Bylist </h2> </a> <p>
+  
+  (Default - present value, start='Yes'      <br> Choice - `Yes/No')
+<p>
+  
+  In selecting stars from the input table to deal with, do you want
+  to select choosing only those stars that lie in a defined section
+  of the table? If not, then the selection will be only those stars
+  that lie in a defined rectangle in the image.
+<p>
+  
+<hr>
+ <h2> 12.114 <a name="col_bad"> Col&#95 bad </h2> </a> <p>
+  
+  (Default - `Green'       <br> Choices - see below)
+<p>
+  
+  Colour of spots or crosses to use when painting up stars which have
+  `bad' fits, that is fits that have failed in the Starman:Measure.
+<p>
+  
+  Choice is:- red:green:blue:cyan:magenta:yellow:coral:medspringgreen
+<p>
+  
+<hr>
+ <h2> 12.115 <a name="col_ok"> Col&#95 ok </h2> </a> <p>
+  
+  (Default - `Red'       <br> Choices - see below)
+<p>
+  
+  Colour of spots or crosses to use when painting up stars which have
+  `ok' fits, that is fits that have been done ok in the Starman:Measure.
+<p>
+  
+  Choice is:- red:green:blue:cyan:magenta:yellow:coral:medspringgreen
+<p>
+  
+<hr>
+ <h2> 12.116 <a name="col_star"> Col&#95 star </h2> </a> <p>
+  
+  (Default - `Red'       <br> Choices - see below)
+<p>
+  
+  Colour of spots or crosses to use when painting up stars which have
+  been added or removed from the star list.
+<p>
+  
+  Choice is:- red:green:blue:cyan:magenta:yellow:coral:medspringgreen
+<p>
+  
+<hr>
+ <h2> 12.117 <a name="contrast"> Contrast </h2> </a> <p>
+  
+  (Default - present value, start='No'      <br> Choice - `Yes/No')
+<p>
+  
+  When displaying the removal of a fitted star from the image, is
+  the effect to be shown at a `high' contrast, that is the contrast
+  suitable for the small area that is removed? If not, then it is
+  displayed at the contrast used in the display of the whole image.
+<p>
+  
+  For the `Yes' option, one can often see good detail about the
+  fit itself, whilst for the `No' option one sees best the quality
+  of the fit in relation to the whole image.
+<p>
+  
+<hr>
+ <h2> 12.118 <a name="doform"> Doform </h2> </a> <p>
+  
+  (Default - present value (start='no')      <br> Choice - `yes:no')
+<p>
+  
+  In typing out, to terminal or file, of the Starman:Measure table,
+  format the numbers in the way you want? If not, then the standard
+  format is used.
+<p>
+  
+  If you choose to format, you control which columns of the table
+  are output and the width of the field for each column, and the
+  number of decimal places of the number in the field.
+<p>
+  
+  The standard format is, depending on whether the X,Y positions are
+  output, :-
+<pre>
+  
+ Star  Mag  Height   Dx    Dy  Rms  Its Inval Comps Imp  Diff-2
+  
+ or
+  
+ Star  X     Y      Mag Height   Dx    Dy    Rms  Its Inval Imp
+</pre>
+  
+  
+<hr>
+ <h2> 12.119 <a name="dopref"> Dopref </h2> </a> <p>
+  
+  (Default - present value, start `Yes'    <br> Choice - `Yes/No')
+<p>
+  
+  When writing the output table of Interact:Scrutiny, this controls
+  how the names of the `new' stars are to be made.
+<p>
+  
+  If there have been no new stars input by the user then this
+  parameter is not asked for.
+<p>
+<dl>
+<dt>  If `Yes',
+<dd>then the input stars are output with their same names.
+            The new stars are output with names #'X'1, #'X'2, , ... ,
+            where `X' is a character string, input via the parameter
+            `Prefix'. `X' has a default of `A', and it is recommended
+            that only a short character string be used, since the
+            total name length is only 20.
+<p>
+  
+<dt>  If `No',
+<dd> then all the output stars are renamed as #1, #2, ...
+</dl><p>
+  
+  The names are the `identifiers', placed in the first 5 columns of
+  each row of the output table. They are 20 characters long, and
+  usually are in the form `#1', `#2', ...
+<p>
+  
+<hr>
+ <h2> 12.120 <a name="domap"> Domap </h2> </a> <p>
+  
+  (Default - `Yes'    <br> Choice - `Yes/No')
+<p>
+  
+  The profile map is non-zero. Do you want to use it in
+  Interact:Scrutiny?
+<p>
+  
+<hr>
+ <h2> 12.121 <a name="donew"> Donew </h2> </a> <p>
+  
+  (Default - `Yes'      <br> Choice - `Yes/No')
+<p>
+  
+  In marking up the positions of stars around the subject star
+  that were fitted along with it, should the starting positions
+  be used, or the `new' fitted ones?
+<p>
+  
+<hr>
+ <h2> 12.122 <a name="doslope"> Doslope </h2> </a> <p>
+  
+  (Default - present value, start='Yes'    <br> Choice - `Yes/No')
+<p>
+  
+  When subtracting fitted star from display, subtract the sloping
+  background as well. This is not the overall backgound but the
+  sloping component above (or below) the background value at the
+  b/l/h corner of the fitting box.
+<p>
+  
+<hr>
+ <h2> 12.123 <a name="dospot"> Dospot </h2> </a> <p>
+  
+  (Default - present value, start='Yes'      <br> Choice - `Yes/No')
+<p>
+  
+  In marking up the positions of stars in the Starman:Measure input
+  file table, should the positions be marked with a single pixel
+  spot? If not, then they will be marked with a cross of adjustable
+  length.
+<p>
+  
+<hr>
+ <h2> 12.124 <a name="instars"> Instars </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  Name of file containing the output of a run of the Starman:Measure
+  program.
+<p>
+  
+  This is a table in the format of a  Starman table file.
+<p>
+  
+<hr>
+ <h2> 12.125 <a name="length"> Length </h2> </a> <p>
+  
+  (Default - 2.0              <br> Range - 0.5 to 100.0 )
+<p>
+  
+  Length, in pixels,  across arms of the crosses that are to be
+  painted up.
+<p>
+  
+<hr>
+ <h2> 12.126 <a name="listxy"> Listxy </h2> </a> <p>
+  
+  (Default - present value, start='Yes'      <br> Choice - `Yes/No')
+<p>
+  
+  In typing out, to terminal or file, the table of the Starman:Measure
+  table input file in the standard format, do you want the X,Y
+  position of each star to be output?
+<p>
+  
+  The standard format is, depending on whether the X,Y positions are
+  output, :-
+<pre>
+  
+ Star  Mag  Height   Dx    Dy  Rms  Its Inval Comps Imp  Diff-2
+  
+ or
+  
+ Star  X     Y      Mag Height   Dx    Dy    Rms  Its Inval Imp
+</pre>
+  
+<hr>
+ <h2> 12.127 <a name="lrange"> Lrange </h2> </a> <p>
+  
+  (Default - present values, start=1,no of rows
+   <br> Range - 1 to no of rows)
+<p>
+  
+  This parameter is accessed when selecting which stars in the
+  input MEASURE table to use. It defines which ones by taking those
+  in the table  in the defined range of rows in the table.
+<p>
+  
+  This parameter defines the start and end row numbers to define that
+  range.
+<p>
+  
+<hr>
+ <h2> 12.128 <a name="lxrange"> Lxrange </h2> </a> <p>
+  
+  (Default - present values, start=-1.0e6,1.0e6
+   <br> Range - -1.0e10 to 1.0e10)
+<p>
+  
+  This parameter is accessed when selecting which stars in the
+  input MEASURE table to use. It defines which ones by taking those
+  in the table  which lie in a defined range of X positions.
+<p>
+  
+  This parameter defines the start and end of that X range.
+<p>
+  
+<hr>
+ <h2> 12.129 <a name="lyrange"> Lyrange </h2> </a> <p>
+  
+  (Default - present values, start=-1.0e6,1.0e6
+   <br> Range - -1.0e10 to 1.0e10)
+<p>
+  
+  This parameter is accessed when selecting which stars in the
+  input MEASURE table to use. It defines which ones by taking those
+  in the table  which lie in a defined range of Y positions.
+<p>
+  
+  This parameter defines the start and end of that Y range.
+<p>
+  
+<hr>
+ <h2> 12.130 <a name="name"> Name </h2> </a> <p>
+  
+  (Default null)
+<p>
+  
+  Name of star in input Starman:Measure table to put out all its
+  details for.
+<p>
+  
+<hr>
+ <h2> 12.131 <a name="numaft"> Numaft </h2> </a> <p>
+  
+  (Default - 2              <br> Range - 0 to 130)
+<p>
+  
+  When setting up format for typing out, to terminal or file, details
+  of fit of star, this is the number of decimal places to show in a
+  number. If `0' is replied, the decimal point itself is suppressed.
+<p>
+  
+<hr>
+ <h2> 12.132 <a name="numbef"> Numbef </h2> </a> <p>
+  
+  (Default - 4              <br> Range - 0 to 130)
+<p>
+  
+  When setting up format for typing out, to terminal or file, details
+  of fit of star, this is the number of characters to show before the
+  decimal point.
+<p>
+  
+<hr>
+ <h2> 12.133 <a name="number"> Number </h2> </a> <p>
+  
+  (Default - see below          <br> Range - see below)
+<p>
+  
+  A general request for a number. The possible occasions this can
+  be asked for are:-
+<pre>
+  
+  Default       Range         Remarks
+  -------       -----         -------
+  1          1-no of rows  Star in input Starman:Measure table
+                           to display the residuals to fit, in
+                           the displayed image.
+  
+  1          1-no of rows  Star in input Starman:Measure table
+                           to type out to terminal all details
+                           for.
+  
+  next not-  0-no of rows  When choosing stars to mark with
+  removed                  their companions in their fits,
+                           this is the number of the star to
+                           select. Replying `0' will stop the
+                           looping asking for next star.
+  
+  next not-  0-no of rows  When choosing stars to mark with
+  removed                  distant companions, the program will
+                           search through the list, from this
+                           star on, for such a star and output
+                           the details and mark up the star.
+                           Replying `0' will stop the looping
+                           asking for next star.
+</pre>
+  
+<hr>
+ <h2> 12.134 <a name="numchar"> Numchar </h2> </a> <p>
+  
+  (Default - 12      <br> Range - 1 to 20)
+<p>
+  
+  Number of characters in the star's name (identifier) to output in the
+  typing out, to terminal or file, of star details from the input
+  Starman:Measure table.
+<p>
+  
+<hr>
+ <h2> 12.135 <a name="numcol"> Numcol </h2> </a> <p>
+  
+  (Default - present value, start=1     <br> Range - 0 to No of columns)
+<p>
+  
+  The number of the column in the input Starman:Measure table that
+  is to be put in this typing out, to terminal or file, column.
+<p>
+  
+<hr>
+ <h2> 12.136 <a name="outfile"> Outfile </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the new file to contain the formatted version of a
+  selection of the input Starman:Measure table of fitted results. The
+  file is a normal ASCII text file
+<p>
+  
+<hr>
+ <h2> 12.137 <a name="outstars"> Outstars </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the new file to contain a table, in the format of the
+  Starman:Measure program, of that input Starman:measure table,
+  but with (optionally) some stars removed, and (optionally) some
+  extra stars added. These extra stars are picked up in the
+  Interact:Scrutiny group of functions
+<p>
+  
+<hr>
+ <h2> 12.138 <a name="prefix"> Prefix </h2> </a> <p>
+  
+  (Default - `A'     <br> Choice - any character string)
+<p>
+  
+  The character string to add to the names of new stars in the
+  `Outstars' output table file.
+<p>
+  
+  This is asked for if there have been new stars made for the
+  output in the `Outstars' table of the Interact:Scrutiny, and it
+  is desired (via the `Dopref' parameter) that the names of these new
+  stars are distinguished by having a character string between the `#'
+  that usually starts a star name and the number that ends it.
+<p>
+  
+  The new stars are output with names #'X'1, #'X'2, , ... ,
+  where `X' is a character string, input via this parameter.
+  `X' has a default of `A', and it is recommended that only a short
+  character string be used, since the total name length is only 20.
+<p>
+  
+  The names are the `identifiers', placed in the first 5 columns of
+  each row of the output table. They are 20 characters long, and
+  usually are in the form `#1', `#2', ...
+<p>
+  
+<hr>
+ <h2> 12.139 <a name="profile"> Profile </h2> </a> <p>
+  
+  (Default - null)
+<p>
+  
+  The name of the existing file containing the `profile' of the stars
+  to be used in Interact:Scrutiny.
+<p>
+  
+  It is an image with the profile parameters and profile map in the
+  normal Starman `Profile' format, in a Starman NDF file.
+<p>
+  
+<hr>
+ <h2> 12.140 <a name="seek"> Seek </h2> </a> <p>
+  
+  (Default - `Number'              <br> Choice - `Number/Name')
+<p>
+  
+  When typing out the full details of the fit for a star in the input
+  Starman:Measure table, select that star by name or number in the
+  table.
+<p>
+  
+<hr>
+ <h2> 12.141 <a name="soption"> Soption </h2> </a> <p>
+  
+  (Default - present value,start='list'     <br> Choices - see below)
+<p>
+  
+  What operation, from a menu of possible choices, to do next?
+<p>
+  
+  The menu selection of options for looking and adding to, the output
+  results table of the Starman:Measure program.
+<p>
+  
+  You repeatedly come back to this parameter after performing
+  `Scrutiny' operations. You select one of the menu operations.
+<pre>
+  
+  Option        Function
+  ------        --------
+  blink         Blink the displayed image
+  box           Put box in image outside the star -Remove- area
+  comps_all     Mark posn of a star and its companions in fit
+  comps_dist    Mark posns for next list star with distant comp
+  list_in       Load a new star list (discard the old one)
+  list_out      Write to file -Add- used (extra,removed) list
+  lselect       Select a portion of the list to look at
+  mark_new      Mark up on the display the -new- star list posns
+  mark_old      Mark up on the display the -old- star list posns
+  nearest       Give nearest list star to cursor position
+  printlist     Put a neat summary of fits into an ascii file
+  profile_in    Load a new star profile (discard the old one)
+  remove        Clean an area round list star with stars removed
+  replace       Replace -Remove- box by the original image data
+  reremove      Display the -Remove- box again
+  stars_add     Use cursor to add stars to star list
+  stars_rem     Use cursor to remove stars from star list
+  type_one      Type out all of a star fit (from number/name)
+  typelist      Put a neat summary of fits onto the terminal
+  
+  
+  Mouse buttons for `Stars_Add/Rem' options :-
+  
+          Left   Button  =  Add/remove star from list
+          Centre Button  =      "       "    "    "
+          Right  Button  =  Return to Option Choice
+  
+  Mouse buttons for Blink work:-
+  
+          Left   Button  = slow blink by x2
+          Centre Button  = speed blink by x2,
+          Right  Button  = switch to hand blink
+  
+   The hand blink is done using the keyboard.
+  
+</pre>
+ For X-window device use, the Cursor must be in image window area
+ for the cursor buttons to work when in -WORKING- mode. The
+ window also must be -active- - that is the bar at the top
+ must be set. Click on this bar if it is not before using
+ the buttons.
+<p>
+  
+  This is the `simple set' of options which are available in all
+  groups of options:-
+<pre>
+  
+  Option        Function
+  ------        --------
+  alter         Functions for image altering in various ways
+  aperture      Functions for aperture photometry
+  colour        Functions for changing colour display of image
+  fit_magns     Functions to get star magnitudes with Gaussians
+  inspect       Functions for image inspection in various ways
+  main          Entry point for program
+  positions     Functions to get or plot a list of positions
+  scrutiny      Functions to look at Starman MEASURE output
+  
+  image         Input new image
+  im_get_flash  Input new image and display (flash) it
+  
+  area          Select area of image to display
+  clear         Clear screen
+  close         Close the display screen
+  compress      Compress image in either X or Y for display
+  cvalues       Show the cursor position and image pixel value
+  display       Display image
+  flash         Display image in standard way
+  open          Open the display screen
+  reset         Reset zoom/pan to unity and centre
+  zoom          Zoom and pan image by using mouse location
+  
+  panel         Switch between panel / keyboard option selection
+  exit          Exit from this program
+  
+  
+   Buttons for Cvalues work:-
+  
+  The values are output continuously again on the panel, or by
+  request on the terminal if the panel is not being used.
+  
+           -Panel- mode?    Button actions
+           ------------     --------------
+              YES           All buttons exit
+               NO           Buttons Left,Centre give values
+                            Right Button 3 exits
+  
+   Buttons for Zoom/Pan work:
+                   Left Button twice              = zoom /2
+                   Centre Button twice            = zoom x2
+                   Left Button then Centre Button = pan
+                   Right button once              = exit
+  
+</pre>
+  Zoom means zoom around present position of cursor
+  Pan means set present position of cursor to screen centre
+<p>
+  
+<hr>
+ <h2> 12.142 <a name="wlist"> Wlist </h2> </a> <p>
+  
+  (Default - `New'            <br> Choice - `Old/New')
+<p>
+  
+  This deals with the removal of stars from the input Starman:Measure
+  star list.
+<p>
+  
+  The removal is done by the user using the cursor to mark a position
+  in the image and the program thens removes the `nearest' star in the
+  list to that position. This choice is whether the nearest star is
+  defined from the output positions of the Starman:Measure table (the
+  normal positions) or the positions that the Starman:Measure program
+  run had, as input, before it was run.
+<p>
+  
+<hr>
+ <h2> 13 <a name="author"> Author </h2> </a> <p>
+  
+  
+  Alan Penny                   RAL        1994 July
+  
+<hr>
+All rights reserved. &copy RAL 1995. Starlink conditions and disclaimers apply.
+  
+<hr>
+  
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+  

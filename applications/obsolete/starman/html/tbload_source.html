@@ -1,0 +1,440 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBLOAD
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBLOAD
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbload_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbload">
+t_tbload  </a>  Input an ASCII file to a table       <br>
+<a href="#tblo_check">
+tblo_check  </a>  Get size of output table       <br>
+<a href="#tblo_doit">
+tblo_doit  </a>  Load output table       <br>
+<a href="#tbload">
+tbload  </a>  Input an ASCII text file into a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C    TBLOAD.FOR
+C
+C    Contains:-
+C
+C T_TBLOAD     Input an ASCII file to a table
+C TBLO_CHECK    Get size of output table
+C TBLO_DOIT     Load output table
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbload"> T_TBLOAD  </a>-- Input an ASCII file to a table
+C   For a fuller description see TBLOAD.HLP
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_tbload ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ip, nlines, ierr, hlines
+      character file*80
+      logical dohead, doname
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1c ( 'IN', file, ' ', .true. )				!Get output file name
+      if ( ST_FAILED ) return
+      if ( file.eq.' ' ) return
+
+      call get1b ( 'HEADER', dohead, .false. )				!Header in input file
+      if ( ST_FAILED ) return
+
+      if ( .not.dohead ) call get1i ( 'HIGNORE', hlines, 0, 0, 10000 )	!No of lines at start of file to ignore?
+      if ( ST_FAILED ) return
+
+      call get1b ( 'NAMES', doname, .false. )				!Names in input file?
+      if ( ST_FAILED ) return
+
+      call get1i ( 'NLINES', nlines, 1, 1, 1000 )			!Number of input lines per row
+      if ( ST_FAILED ) return
+
+      open ( unit=1, file=file, status='OLD', form='FORMATTED' )	!Open file
+
+      call tblo_check ( dohead, doname, nlines, hlines  )		!Get size of file
+
+      call optabw ( 'OUT', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) return
+
+      call tblo_doit ( %val(ip), dohead, doname, nlines, hlines )	!Load the output table
+
+      close ( 1 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tblo_check"> TBLO_CHECK  </a>-- Get size of output table
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tblo_check ( dohead, doname, nlines, hlines )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      logical	     dohead		!i: Input file has file header?
+      logical	     doname		!i: Input file has names?
+      integer        nlines		!i: No of lines in input file per output row
+      integer        hlines		!i: No of lines at start of input file to ignore
+C--
+      integer j, k, ky, ks(1000), ke(1000), ndes
+      character text*1000, texta*50
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( dohead ) then
+
+         read ( 1, '(a1)', end=1, err=1 ) text				!Skip title
+         texta = text(1:50)
+         call pargc ( texta )
+         call printd ( '%c' )
+
+         read ( 1, '(a)', end=1, err=1 ) text				!Get no of columns and rows
+         call numel ( text, j, ks, ke )
+         if ( j.lt.3 ) goto 1
+         read ( text(ks(3):ke(3)), '(i)', end=1, err=1 ) TBX
+         read ( 1, '(a)', end=1, err=1 ) text
+         call numel ( text, j, ks, ke )
+         if ( j.lt.3 ) goto 1
+         read ( text(ks(3):ke(3)), '(i)', end=1, err=1 ) TBY
+         TBVX = TBX + 5
+
+         do k = 1, TBX							!Read over headers and descriptors
+            read ( 1, '(a1)', end=1, err=1 ) text
+         enddo
+         read ( 1, '(10x,i7)', end=1, err=1 ) ndes
+         if ( ndes.ne.0 ) then
+            do k = 1, ndes
+               read ( 1, '(a1)', end=1, err=1 )
+            enddo
+         endif
+
+      else
+
+         if ( hlines.ne.0 ) then
+            do k = 1, hlines
+               read ( 1, '(a1)', end=1,err=1 ) text
+            enddo
+         endif
+
+      endif
+
+      read ( 1, '(a)', end=1, err=1 ) text				!Get no of columns
+      call numel ( text, j, ks, ke )
+      TBX = j
+      if ( doname ) TBX = TBX - 1
+      if ( nlines.gt.1 ) then
+         do k = 2, nlines
+            read ( 1, '(a)', end=1, err=1 ) text
+            call numel ( text, j, ks, ke )
+            TBX = TBX + j
+         enddo
+      endif
+      TBVX = TBX + 5
+
+      ky = nlines							!Get number of rows
+      do while ( .true. )
+         read ( 1, '(a1)', end=2, err=1 ) text
+         ky = ky + 1
+      enddo
+    2 TBY = ky/nlines
+      if ( TBY*nlines.ne.ky ) then
+         call printo ( 'ERROR: Not correct number of lines' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      rewind ( 1 )
+
+      call pargi ( TBX )						!Put out size
+      call pargi ( TBY )
+      call printd ( 'Output: No of columns = %d : No of rows = %d ' )
+
+      if ( TBX.lt.1 .or. TBY.lt.1 ) then
+         call printo ( 'ERROR: Invalid table size' )
+         ST_FAILED = .true.
+         return
+      endif
+
+      return
+
+    1 call printo (
+     +        'ERROR: Error reading input file - getting table size' )
+      ST_FAILED = .true.
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tblo_doit"> TBLO_DOIT  </a>-- Load output table
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tblo_doit ( tb, dohead, doname, nlines, hlines )
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      real        tb(TBVX,TBY)		!o: Output table
+      logical	  dohead		!i: Input file has file header?
+      logical	  doname		!i: Input file has names?
+      integer     nlines		!i: No of lines in input file per output row
+      integer     hlines		!i: No of lines at start of input file to ignore
+C--
+      integer j, jj, k, kk, ierr, ks(1000), ke(1000), numc, ja, jb,
+     +        kd, kee, ndes, ka, iv, iverr
+      logical more
+      character text*1000, title*50, name*20, head*20, thead*7, tc*100,
+     +          descr*8, descrl*8, textb*68
+      character*68 texta(16384)
+      real   rva(5), rv(1000)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call ident ( tb, TBVX, TBY )					!Load default empty output file
+      do k = 1, TBY
+         call amovkr ( 0.0, tb(6,k), TBX )
+      enddo
+
+      call printo ( ' ' )
+      if ( dohead ) then						!Put header
+
+         read ( 1, '(10x,a)', end=1, err=1 ) text
+         j = index(text,'is:')
+         title = text(j+4:j+53)
+         read ( 1, '(a1)', end=1,err=1 )
+         read ( 1, '(a1)',end=1, err=1 )
+         call printo ( '[Title; column number; row number] - read' )
+
+         do k = 1, TBX							!Read headers
+            read ( 1, '(10x,a)',end=1, err=1 ) text
+            j = index(text,'HEAD')
+            head = text(j+10:j+29)
+            call pthead ( 'OUT', k, head, ierr )
+         enddo
+         call printo ( 'Headers - read' )
+
+         read ( 1, '(a)',end=1, err=1 ) text			!Read descriptors
+         call numel ( text, k, ks, ke )
+         read ( text(ks(3):ke(3)), '(i)', end=1, err=1 ) ndes
+         if ( ndes.ne.0 ) then
+            k = 0
+            descrl = ' '
+            do while ( k.lt.ndes )
+               more = .true.
+               ka = 0
+               do while ( more )
+                  k = k + 1
+                  ka = ka + 1
+                  read ( 1, '(a8,2x,a)', end=1, err=1 ) descr, textb
+                  if ( k.eq.1 ) descrl = descr
+                  if ( k.ne.1 .and. descr.ne.descrl ) then
+                     more = .false.
+                  else
+                     texta(ka) = textb
+                  endif
+                  if ( k.eq.ndes ) more = .false.
+               enddo
+               if ( k.ne.ndes .or. descrl.ne.descr ) ka = ka - 1
+               call ptdescn ( 'OUT', descrl, texta, ka )
+               if ( k.eq.ndes .and. descr.ne.descrl ) call ptdescn
+     +                      ( 'OUT', descr, textb, 1 )
+               descrl = descr
+               texta(1) = textb
+            enddo
+         endif
+         call printo ( 'Descriptors - read' )
+
+      else
+         call get1c ( 'TITLE', title, ' ', .true. )
+         if ( ST_FAILED ) return
+         do k = 1, TBX
+            call pargi ( k )
+            call printd ( 'Header for column %d' )
+            if ( k.gt.20 ) then
+               call get1c ( 'HEAD', head, ' ', .true. )
+            else
+               write ( thead, '(''HEAD'',i3.3)' ) k
+               call get1c ( thead, head, ' ', .true. )
+            endif
+            if ( ST_FAILED ) return
+            call pthead ( 'OUT', k, head, ierr )
+         enddo
+         if ( hlines.ne.0 ) then
+            do k = 1, hlines
+               read ( 1, '(a1)', end=1,err=1 )
+            enddo
+            call printo ( 'Starter lines - read' )
+         endif
+      endif
+
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+      do kk = 1, TBY
+
+         call amovkr ( 0.0, rv, TBX )
+         jj = 6
+         do k = 1, nlines						!Get info
+
+            iverr = 1
+            read ( 1, '(a)', end=2, err=2 ) text			!Read line
+            call numel ( text, numc, ks, ke )
+
+            if ( numc.eq.0 ) then
+               call printo ( 'ERROR: Blank line' )
+               iverr = 1
+               goto 2
+            endif
+
+            if ( k.eq.1 .and. numc.eq.1 .and. doname ) then
+               call printo ( 'ERROR: Line has only name' )
+               iverr = 1
+               goto 2
+            endif
+
+            ja = 1							!Get name
+            jb = 0
+            if ( k.eq.1. and. doname ) then
+                if ( ke(1).lt.ks(1) ) then
+                   name = ' '
+                else
+                   kd = ke(1) - ks(1) + 1
+                   kee = ks(1) + min(20,kd) - 1
+                   name = text(ks(1):kee)
+                endif
+                ja = 2
+                jb = 1
+            endif
+
+            do j = ja, numc						!Get values
+               if ( ke(j).lt.ks(j) ) then
+                  rv(j-jb) = 0.0
+               else
+                  tc = text(ks(j):ke(j))
+                  if ( ks(j).eq.ke(j) ) then
+                     if ( tc.eq.'.' ) then
+                        rv(j-jb) = 0.0
+                     else
+                        read ( tc, '(i1)', end=2, err=2 ) iv
+                        rv(j-jb) = iv
+                     endif
+                  else
+                     iv = ke(j) - ks(j) + 2
+                     if ( index(tc,'.').eq.0 ) tc(iv:iv) = '.'
+                     read ( tc, '(f100.1)', end=2, err=2 ) rv(j-jb)
+                  endif
+               endif
+            enddo
+
+            call amovr ( rv, tb(jj,kk), (numc-jb) )			!Put data
+            jj = jj + numc - jb
+
+            if ( k.eq.1 ) then						!Put name
+               call nametr ( name, rva )
+               call amovr ( rva, tb(1,kk), 5 )
+            endif
+
+         enddo
+      enddo
+      call printo ( 'Data - read' )
+
+
+      return								!Put out the input format
+    1 call printo ( 'ERROR: Error reading input file' )			! error messages
+      ST_FAILED = .true.
+      return
+
+    2 iv = (kk-1)*nlines + k
+      call pargi ( iv )
+      if ( iverr.eq.1 ) call printd (
+     +               'ERROR: Error in input: in data line no %d')
+      if ( iverr.eq.2 ) call printd (
+     +         'ERROR: Error in input: in format of data line no %d' )
+      call charln ( text, iv )
+      iv = min(70,iv)
+      if ( iv.lt.1 ) then
+         call printo ( ' ' )
+      else
+         call printo ( text(1:iv) )
+      endif
+      ST_FAILED = .true.
+      return
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbload"> TBLOAD  </a>-- Input an ASCII text file into a table
+C   See TBLOAD.HLP for details
+C
+C         A.J.Penny                RAL               1991 May
+
+      subroutine tbload ( ierradam )
+
+      implicit none
+
+      integer      ierradam          !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbload
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

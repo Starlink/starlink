@@ -1,0 +1,1166 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBTRAN_AUTO
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBTRAN_AUTO
+</h1>
+
+All rights reserved. &copy RAL 1995. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbtran_auto_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbtran_auto.f">
+t_tbtran_auto.f  </a>  Transform one XY table to another automatically       <br>
+<a href="#t_tbtran_auto">
+t_tbtran_auto  </a>  Transform one XY table to another automatically       <br>
+<a href="#tbtau_gcl">
+tbtau_gcl  </a>  Get command line input       <br>
+<a href="#tbtau_docalcs">
+tbtau_docalcs  </a>  Do the calculations       <br>
+<a href="#tbtau_tris">
+tbtau_tris  </a>  Calculate side lengths of triangles       <br>
+<a href="#tbtau_sort_tri">
+tbtau_sort_tri  </a>  Sort table into brightest first       <br>
+<a href="#tbtau_match">
+tbtau_match  </a>  Match triangles by sides ratios       <br>
+<a href="#tbtau_tcalc">
+tbtau_tcalc  </a>  Calc mean transform from matched triangles       <br>
+<a href="#tbtau_out">
+tbtau_out  </a>  Put out transformed input table       <br>
+<a href="#tbtau_loadxy">
+tbtau_loadxy  </a>  Load sorted positions       <br>
+<a href="#tbtau_mag">
+tbtau_mag  </a>  Convert heights to mags       <br>
+<a href="#tbtran_auto">
+tbtran_auto  </a>  (Program) Transform one XY table to another automatically       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbtran_auto.f"> T_TBTRAN_AUTO.F  </a>-- Transform one XY table to another automatically
+C
+C Contains:-
+C T_TBTRAN_AUTO   Transform one XY table to another automatically
+C TBTAU_GCL       Get command line input
+C TBTAU_DOCALCS   Do the calculations
+C TBTAU_TRIS      Calculate side lengths of triangles
+C TBTAU_SORT_TRI  Sort table into brightest first
+C TBTAU_MATCH     Match triangles by sides ratios
+C TBTAU_TCALC     Calc mean transform from matched triangles
+C TBTAU_OUT       Put out transformed input table
+C TBTAU_LOADXY    Load sorted positions
+C TBTAU_MAG       Convert heights to mags
+C
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbtran_auto"> T_TBTRAN_AUTO  </a>-- Transform one XY table to another automatically
+C
+C   Find which stars in one image match those in another
+C   when the images are not aligned (or even flipped or
+C   stretched).
+C
+C   The user inputs a list of star positions from each
+C   image.
+C
+C   The program works out the triangle between the three
+C   brightest stars in each list. It then looks at the two
+C   triangles, and sees if they are the same by comparing
+C   the ratios in each triangle of the length of longest
+C   side to the length of next longest, and to the length
+C   of the shortest side. If the ratios are the same within
+C   a chosen tolerance, then the triangle probably must have
+C   been made with the same stars.
+C
+C   If the triangles do not match, then this is repeated
+C   with the four brightest in each list. The program works
+C   out all the possible triangles between the stars in each
+C   list. It then looks at each triangle in one list, and
+C   sees if there is a matching triangle in the other list.
+C   If there is no match, this is then repeated with the five
+C   brightest stars, and so on, until a match is made.
+C
+C   The matched triangles gives a list of matching stars.
+C   These stars can then be used to calculate the
+C   transformation.
+C
+C   The first ('input') list is then transformed into the
+C   coordinate system of the second ('master') list.
+C
+C
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine t_tbtran_auto
+
+      implicit none
+
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer istat, ipmmag, ipimag, ipnm, ipni, ipmxy, ipixy
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call tbtau_gcl							!Get command line inputs
+      if ( ST_FAILED ) return
+
+      call gtwrkr ( 'MAS_NUM',   TBYM,    ipnm, istat )
+      call gtwrkr ( 'MAS_MAG',   TBYM,  ipmmag, istat )
+      call gtwrkr ( 'MAS_POS', 2*TBYM,   ipmxy, istat )
+      call gtwrkr (  'IN_NUM',    TBY,    ipni, istat )
+      call gtwrkr (  'IN_MAG',    TBY,  ipimag, istat )
+      call gtwrkr (  'IN_POS',  2*TBY,   ipixy, istat )
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         call printo( ' Workspace allocation in s/r t_tbtran_auto' //
+     +                'failed')
+         return
+      endif
+      if ( ST_FAILED ) return
+
+      call anumincr ( %val(ipnm), TBYM )				!Get order of brightness
+      if ( TBVXM.ge.8 .and. KW_MAS.ne.3 ) then
+         call copfrr ( %val(IPMAS), TBVXM, TBYM, 8, 1, %val(ipmmag),	! in master list
+     +                 TBYM )
+         if ( KW_MAS.eq.2 ) call tbtau_mag ( %val(ipmmag), TBYM )
+         call sort2r ( %val(ipmmag), %val(ipnm), TBYM )
+      endif
+
+      call tbtau_loadxy (%val(IPMAS),%val(ipmxy),%val(ipnm),TBVXM,TBYM)	!Load posn in order
+      if ( ST_FAILED ) return
+
+      call anumincr ( %val(ipni), TBY )					!Get order of brightness
+      if ( TBVX.ge.8 .and. KW_IN.ne.3 ) then
+         call copfrr ( %val(IPIN), TBVX, TBY, 8, 1, %val(ipimag), TBY )	! in input list
+         if ( KW_IN.eq.2 ) call tbtau_mag ( %val(ipimag), TBY )
+         call sort2r ( %val(ipimag), %val(ipni), TBY )
+      endif
+
+      call tbtau_loadxy ( %val(IPIN), %val(ipixy), %val(ipni),TBVX,TBY)	!Load posn in order
+      if ( ST_FAILED ) return
+
+      call tbtau_docalcs ( %val(ipmxy), %val(ipixy) )			!Do calcs
+      if ( ST_FAILED ) return
+
+      call wrkcan ( 'MAS_NUM' )
+      call wrkcan ( 'MAS_MAG' )
+      call wrkcan ( 'MAS_POS' )
+      call wrkcan ( 'IN_NUM' )
+      call wrkcan ( 'IN_MAG' )
+      call wrkcan ( 'IN_POS' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_gcl"> TBTAU_GCL  </a>-- Get command line input
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_gcl ()
+      implicit none
+
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer istat, k, kl
+      real rv
+      character*50 head, heada
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+
+      call optabr ( 'IN', IPIN, TBVX, TBY, .true., istat )
+      if ( ST_FAILED ) return
+      if ( istat.ne.0 ) then
+          ST_FAILED = .true.
+          return
+      elseif ( TBVX.lt.7 ) then
+          call printo ('ERROR: Input must have at least two columns')
+          ST_FAILED = .true.
+          return
+      endif
+
+      KW_IN = 3
+      if ( TBVX.ge.8 ) then
+         call printo ( 'Magnitude or height assumed to be in column 3')
+         call gthead ( 'IN', 3, head, istat )
+         if ( ST_FAILED ) return
+         call lbgone ( head )
+         call charln ( head, kl )
+         call lowcase ( head, heada )
+         if ( index(heada,'height').ne.0 .or.
+     +       (kl.eq.2 .and. heada(1:kl).eq.'ht') .or.
+     +       (kl.eq.3 .and. heada(1:kl).eq.'hts') ) then
+            KW_IN = 2
+         elseif ( index(heada,'magnitude').ne.0 .or.
+     +       (kl.eq.3 .and. heada(1:kl).eq.'mag') .or.
+     +       (kl.eq.4 .and. heada(1:kl).eq.'mags') .or.
+     +       (kl.eq.4 .and. heada(1:kl).eq.'magn') .or.
+     +       (kl.eq.5 .and. heada(1:kl).eq.'magns') ) then
+            KW_IN = 1
+         endif
+         k = KW_IN
+         call get_job ( 'IN_MAGS', 'mags:heights:none', KW_IN, k,' ',0)
+         if ( ST_FAILED ) return
+      endif
+
+      call optabr ( 'MASTER', IPMAS, TBVXM, TBYM, .true., istat )
+      if ( ST_FAILED ) return
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      elseif ( TBVXM.lt.7 ) then
+          call printo ('ERROR: Master must have at least two columns')
+          ST_FAILED = .true.
+          return
+      endif
+
+      KW_MAS = 3
+      if ( TBVXM.ge.8 ) then
+         call printo ( 'Magnitude or height assumed to be in column 3')
+         call gthead ( 'MASTER', 3, head, istat )
+         if ( ST_FAILED ) return
+         call lbgone ( head )
+         call charln ( head, kl )
+         call lowcase ( head, heada )
+         if ( index(heada,'height').ne.0 .or.
+     +       (kl.eq.2 .and. heada(1:kl).eq.'ht') ) then
+            KW_MAS = 2
+         elseif ( index(heada,'magnitude').ne.0 .or.
+     +       (kl.eq.3 .and. heada(1:kl).eq.'mag') .or.
+     +       (kl.eq.4 .and. heada(1:kl).eq.'magn') ) then
+            KW_MAS = 1
+         endif
+         k = KW_MAS
+         call get_job ( 'MS_MAGS', 'mags:heights:none',KW_MAS,k,' ',0)
+         if ( ST_FAILED ) return
+      endif
+
+      call get_job ( 'TYPE', 'full:xyshift', KFIT, 1, ' ', 0 )
+      if ( KFIT.eq.1 ) KFIT = 3
+      if ( KFIT.eq.2 ) KFIT = 1
+      if ( ST_FAILED ) return
+
+      call get1r ( 'TOL', TOLER, 1.0, 0.0, 1.0e7 )
+      if ( ST_FAILED ) return
+
+      rv = 5.0
+      if ( KFIT.eq.1 ) rv = 2.0
+      call get1r ( 'FTOL', FTOLER, rv, 0.0, 1.0e7 )
+      if ( ST_FAILED ) return
+
+      call get1i ( 'NTRI', NTMATCH, 4, 1, 10000 )
+      if ( ST_FAILED ) return
+
+      call get1i ( 'TOTNTRI', NTOTMATCH, 8, 1, 10000 )
+      if ( ST_FAILED ) return
+
+      SIGLIM = 2.5
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_docalcs"> TBTAU_DOCALCS  </a>-- Do the calculations
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_docalcs ( mdata, idata )
+
+      implicit none
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      real    mdata(2,TBYM)	!i: Master file sorted XY posns
+      real    idata(2,TBY)	!i: Input file sorted XY posns
+C--
+      integer level, ntriangs, nstars, istat, num, ipr_m,
+     +        ipn_m, ipr_i, ipn_i, ippi, ippm, ipuse, ipout, ntris
+      character*50 title, cv
+      logical found, ok
+
+      integer pair(2,NTMAX), tpair(2,3,NTMAX)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gtwrkr (  'PI', 2*TBYM,  ippi, istat ) 			!Open workspace for the x,y match positions
+      call gtwrkr (  'PM', 2*TBYM,  ippm, istat )
+      call gtwrkr ( 'USE',   TBYM, ipuse, istat )
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         call printo ( 'Workspace allocation 1 in s/r'//
+     +                 ' tbtau_docalcs failed' )
+         return
+      endif
+
+      found = .false.
+      ok = .true.
+      level = 0
+      do while ( .not.found .and. ok )					!Loop until find match or user aborts
+
+         level = level + 1
+         nstars = 2 + level       					!Use nstars brightest stars
+         ntriangs = (nstars*(nstars-1)*(nstars-2))/6			!Total number of triangles possible
+
+         if ( nstars.gt.TBYM .or. nstars.gt.TBY ) then
+            if ( nstars.gt.TBYM ) call printo ( 'Not enough '//
+     +                 'stars in master table for this level' )
+            if ( nstars.gt.TBY ) call printo ( 'Not enough '//
+     +                 'stars in input table for this level')
+            found = .false.
+            ok = .false.
+         else
+
+            call gtwrkr ( 'TR_MR', 3*ntriangs, ipr_m, istat )		!Load master file triangles
+            call gtwrki ( 'TR_MN', 3*ntriangs, ipn_m, istat )
+            call gtwrkr ( 'TR_IR', 3*ntriangs, ipr_i, istat )		!Load file triangles
+            call gtwrki ( 'TR_IN', 3*ntriangs, ipn_i, istat )
+
+            if ( istat.ne.0 ) then
+               ST_FAILED = .true.
+               call printo ( 'Workspace allocation 2 in s/r'//
+     +                       ' tbtau_docalcs failed' )
+               return
+            endif
+
+            call tbtau_tris ( mdata, TBYM, nstars, ntriangs,		!Calc trangle lengths - master list
+     +                        %val(ipr_m), %val(ipn_m) )
+
+            call tbtau_tris ( idata,  TBY, nstars, ntriangs,		!Calc trangle lengths - input list
+     +                        %val(ipr_i), %val(ipn_i) )
+
+            call tbtau_match ( %val(ipr_m), %val(ipn_m), %val(ipr_i),	!Look for matches
+     +                         %val(ipn_i), ntriangs, pair, num, tpair,
+     +                         ntris )
+
+            call tbtau_tcalc ( mdata, idata, pair, num, tpair, 		 !Calc transform from matches
+     +                         ntriangs, ntris, %val(ippm), %val(ippi),
+     +                         %val(ipuse), level, nstars, found )
+
+            call wrkcan ( 'TR_MR' )
+            call wrkcan ( 'TR_MN' )
+            call wrkcan ( 'TR_IR' )
+            call wrkcan ( 'TR_IN' )
+
+         endif
+
+         if ( ST_FAILED ) return
+      enddo								! Next level
+
+      if ( ok ) then
+         call optabw ( 'OUT', ipout, TBVX, TBY, .true., istat )
+         if ( ST_FAILED ) return
+         if ( istat.eq.0 ) then
+            call tbtau_out ( %val(IPIN), %val(ipout) )
+            call tcopdes ( 'IN', 'OUT', istat )
+            if ( ST_FAILED ) return
+            call gtdesc ( 'IN', 'TITLE', cv,
+     +                    'Output from TBTRAN_AUTO', num, istat )
+            call get1c ( 'TITLE', title, cv, .true. )
+            call ptdesc ( 'OUT', 'TITLE', title )
+           endif
+      endif
+
+      call wrkcan ( 'PI' )
+      call wrkcan ( 'PM' )
+      call wrkcan ( 'USE' )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_tris"> TBTAU_TRIS  </a>-- Calculate side lengths of triangles
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_tris ( data, ny, nstars, ntriangs, rtri,
+     +                        ntri )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer  ny			!i: Size of XY posn array
+      real     data(2,ny)		!i: XY posns
+      integer  nstars			!i: No of stars to do
+      integer  ntriangs			!i: Number of triangles
+      real     rtri(3,ntriangs)		!o: Triangle side lengths
+      integer  ntri(3,ntriangs)		!o: Star numbers in triangles
+C--
+      integer i, j, k, m, n
+      real dx, dy
+      real tarr(3,2)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( nstars.eq.-1 ) return
+
+      n = 0
+      do i = 1, nstars-2
+       do j = i+1, nstars-1
+        do k = j+1, nstars
+
+           dx = data(1,i) - data(1,j)					!i -> j opp vertex is k
+           dy = data(2,i) - data(2,j)
+           tarr(1,1) = max(sqrt(dx*dx+dy*dy),1.0e-7)
+           tarr(1,2) = k
+
+           dx = data(1,i) - data(1,k)					!i -> k opp vertex is j
+           dy = data(2,i) - data(2,k)
+           tarr(2,1) = max(sqrt(dx*dx+dy*dy),1.0e-7)
+           tarr(2,2) = j
+
+           dx = data(1,j) - data(1,k)					!j -> k opp vertex is i
+           dy = data(2,j) - data(2,k)
+           tarr(3,1) = max(sqrt(dx*dx+dy*dy),1.0e-7)
+           tarr(3,2) = i
+
+           call tbtau_sort_tri ( tarr )					!Sort into correct order - longest side first
+
+           n = n + 1							!Load ouput
+           do m = 1, 3
+              rtri(m,n) = tarr(m,1)
+              ntri(m,n) = nint(tarr(m,2))
+           enddo
+
+        enddo	
+       enddo	
+      enddo	
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_sort_tri"> TBTAU_SORT_TRI  </a>-- Sort table into brightest first
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_sort_tri ( tarr )
+
+      implicit none
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+
+      real tarr(3,2)		!i/o:
+C--
+      integer i
+      logical loop
+      real temp
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      loop = .true.
+      do while ( loop )						!Loop while positions changed last time
+         loop = .false.
+         do i = 1, 2
+            if ( tarr(i,1).lt.tarr(i+1,1) ) then
+               loop = .true.
+               temp = tarr(i,1)
+               tarr(i,1) = tarr(i+1,1)
+               tarr(i+1,1) = temp
+               temp = tarr(i,2)
+               tarr(i,2) = tarr(i+1,2)
+               tarr(i+1,2) = temp
+            endif
+         enddo
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_match"> TBTAU_MATCH  </a>-- Match triangles by sides ratios
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_match ( rtri_mas, ntri_mas, rtri_in, ntri_in,
+     +                         ntriangs, pair, num, tpair, ntris )
+
+      implicit none
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      integer  ntriangs			!i: Number of possible triangles
+      real     rtri_mas(3,ntriangs)	!i: Lengths of master triangles
+      integer  ntri_mas(3,ntriangs)	!i: Star numbers in master triangles
+      real     rtri_in(3,ntriangs)	!i: Lengths of input triangles
+      integer  ntri_in(3,ntriangs)	!i: Star numbers in input triangles
+      integer  pair(2,NTMAX)		!o: Star numbers in each list for
+					!    different stars matched
+      integer  num			!o: Number of different stars matched
+      integer  ntris			!o: Number of triangles matched
+      integer  tpair(2,3,NTMAX)		!o: Star numbers for all matched triangles
+C--
+      integer km, ki, k, m, m1, m2
+      real rv, dimin1, dimax1, dmmin1, dmmax1, dimin2, dimax2,
+     +     dmmin2, dmmax2
+      logical got, ok1, ok2
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      num = 0
+      ntris = 0
+
+      do km = 1, ntriangs						!For each master
+         do ki = km, ntriangs
+
+            ok1 = .false.						!Difference of ratios of first two sides
+            dmmin1 = (rtri_mas(2,km)-TOLER)/(rtri_mas(1,km)+TOLER)
+            rv = max(1.0e-7,(rtri_mas(1,km)-TOLER))
+            dmmax1 = (rtri_mas(2,km)+TOLER)/rv
+            dimin1 = (rtri_in(2,ki)-TOLER)/(rtri_in(1,ki)+TOLER)
+            rv = max(1.0e-7,(rtri_in(1,ki)-TOLER))
+            dimax1 = (rtri_in(2,ki)+TOLER)/rv
+            if ( dimin1.ge.dmmin1 .and. dimin1.le.dmmax1 ) ok1 = .true.
+            if ( dimax1.ge.dmmin1 .and. dimax1.le.dmmax1 ) ok1 = .true.
+            if ( dmmin1.ge.dimin1 .and. dmmin1.le.dimax1 ) ok1 = .true.
+            if ( dmmax1.ge.dimin1 .and. dmmin1.le.dimax1 ) ok1 = .true.
+
+            ok2 = .false.						!Difference of ratios of
+            dmmin2 = (rtri_mas(3,km)-TOLER)/(rtri_mas(1,km)+TOLER)	! first and third sides
+            rv = max(1.0e-7,(rtri_mas(1,km)-TOLER))
+            dmmax2 = (rtri_mas(3,km)+TOLER)/rv
+            dimin2 = (rtri_in(3,ki)-TOLER)/(rtri_in(1,ki)+TOLER)
+            rv = max(1.0e-7,(rtri_in(1,ki)-TOLER))
+            dimax2 = (rtri_in(3,ki)+TOLER)/rv
+            if ( dimin2.ge.dmmin2 .and. dimin2.le.dmmax2 ) ok2 = .true.
+            if ( dimax2.ge.dmmin2 .and. dimax2.le.dmmax2 ) ok2 = .true.
+            if ( dmmin2.ge.dimin2 .and. dmmin2.le.dimax2 ) ok2 = .true.
+            if ( dmmax2.ge.dimin2 .and. dmmin2.le.dimax2 ) ok2 = .true.
+
+CX            if ( ok1 .and. ok2 ) write
+CX     +        ( 6,'(1x,2i5,f10.1,8f6.3)')km,ki,rtri_mas(1,km),
+CX     +        dmmin1,dmmax1,dimin1,dimax1,dmmin2,dmmax2,dimin2,dimax2
+
+            if ( ok1 .and. ok2  ) then					!Is it within the tolerance limits ?
+
+               if ( ntris.lt.NTMAX ) then
+
+                  ntris = ntris + 1
+
+                  do m = 1, 3						!Load x,y position pairs
+                     m1 = ntri_mas(m,km)
+                     m2 = ntri_in(m,ki)
+
+                     tpair(1,m,ntris) = m1
+                     tpair(2,m,ntris) = m2
+
+                     got = .false.
+
+                     if ( num.ge.1 ) then				!Check we dont have match for either star already
+                        do k = 1, num
+                           if ( pair(1,k).eq.m1 .or.
+     +                          pair(2,k).eq.m2 ) got = .true.	
+                        enddo
+                     endif
+
+                     if ( .not.got ) then
+                        num = num + 1
+                        pair(1,num) = m1
+                        pair(2,num) = m2
+                     endif
+                  enddo
+
+               endif
+            endif
+
+         enddo								! Next j
+
+      enddo								! Next i
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_tcalc"> TBTAU_TCALC  </a>-- Calc mean transform from matched triangles
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_tcalc ( mdata, idata, pair,  num, tpair,
+     +                         ntriangs, ntris, pm, pi, use, level,
+     +                         nstars, found )
+
+      implicit none
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      real     mdata(2,TBYM)		!i: Master XY posns
+      real     idata(2,TBY)		!i: Input XY posns
+      integer  pair(2,NTMAX)		!i: List numbers in each list of matched stars
+      integer  num                      !i: Number of stars matched
+      integer  ntriangs			!i: Number of possible triangles
+      integer  tpair(2,3,NTMAX)		!i: List numbers in each list of triamgle stars
+      integer  ntris                    !i: Number of triangles matched
+      real     pm(TBYM,2)		!o: master positions (matches)
+      real     pi(TBYM,2)		!o: input positions (matches)
+      logical  use(TBYM)		!o: workspace for treansform fit
+      integer  level                    !i: Level working at
+      integer  nstars                   !i: Stars searched
+      logical  found			!o: Flag for found a match
+C--
+      integer j, k, ngood, kk, nok, kkgot, nmatch, nv, nch
+      real trc(6), sd, xmax, xmin, ymax, ymin, dx, dy, dds, rvc, rv,
+     +     otol, avc(6)
+      logical ok
+      character*80 text
+      real pos(2,4,NTMAX), atrc(6,NTMAX), rva(NTMAX)
+      integer npos(NTMAX), nstar(NTMAX)
+      real trunc
+      external trunc
+Cbegin
+
+      if ( ST_FAILED ) return
+
+      found = .false.
+      if ( ntris.eq.0 ) return						! got some matches
+
+      call printo ( '   ---------------------------------- ' )          !Print out status
+      call pargi ( level )
+      call pargi ( nstars )
+      call pargi ( ntris )
+      call printd (
+     +   'Level %d : Stars searched - %d : Triangles searched - %d' )
+
+      if ( ntris.eq.1 .and. (TBYM.eq.3 .or. TBY.eq.3) ) then
+
+         found = .true.
+         num = 0
+         do j = 1, 3
+            num = num + 1
+            pm(num,1) = mdata(1,tpair(1,j,1))
+            pm(num,2) = mdata(2,tpair(1,j,1))
+            pi(num,1) = idata(1,tpair(2,j,1))
+            pi(num,2) = idata(2,tpair(2,j,1))
+         enddo
+
+         call tran_doit ( pi, pm, TBYM, num, KFIT, SIGLIM, use,trc, 	!Do the transform
+     +                    ngood, sd )
+         if ( ST_FAILED ) return
+         do j = 1, 6                                               	!Check values O$
+            if ( abs(trc(j)).lt.1.0e-13 ) then
+               if ( trc(j).lt.0.0 ) trc(j) = -1.0e-13
+               if ( trc(j).gt.0.0 ) trc(j) =  1.0e-13
+            elseif ( abs(trc(j)).gt.1.0e13 ) then
+               if ( trc(j).lt.0.0 ) trc(j) = -1.0e13
+               if ( trc(j).gt.0.0 ) trc(j) =  1.0e13
+            endif
+         enddo
+
+         call pargi ( ngood )
+         call pargr ( sd )
+         call printd('   Stars used in fit - %d : Std dev of fit - %f')
+         call pargr ( trc(1) )
+         call pargr ( trc(2) )
+         call pargr ( trc(3) )
+         call printd ( '   X = %f + %f*Xin + %f *Yin ')
+         call pargr ( trc(4) )
+         call pargr ( trc(5) )
+         call pargr ( trc(6) )
+         call printd ( '   Y = %f + %f*Xin + %f *Yin ')
+         call printo ( ' ' )
+
+         call amovr ( trc(1), XEQN, 3 )
+         call amovr ( trc(4), YEQN, 3 )
+         call put3r ( 'XCOEFF', trc(1), trc(2), trc(3) )		!Put in output parameters
+         call put3r ( 'YCOEFF', trc(4), trc(5), trc(6) )
+
+         return
+
+      endif
+
+      if ( ntris.ge.2 ) then
+
+         xmax = idata(1,tpair(1,1,1))
+         xmin = xmax
+         ymax = idata(2,tpair(1,1,1))
+         ymin = ymax
+         do k = 1, ntris
+            do j = 1, 3
+               rv = idata(1,tpair(1,j,k))
+               ymax = max(ymax,rv)
+               ymin = min(ymin,rv)
+               rv = idata(2,tpair(1,j,k))
+               xmax = max(xmax,rv)
+               xmin = min(xmin,rv)
+            enddo
+         enddo
+         xmax = xmax + 0.5*(xmax-xmin)
+         xmin = xmin - 0.5*(xmax-xmin)
+         ymax = ymax + 0.5*(ymax-ymin)
+         ymin = ymin - 0.5*(ymax-ymin)
+
+         kkgot = 0
+         do k = 1, ntris
+            do j = 1, 3
+               pm(j,1) = mdata(1,tpair(1,j,k))
+               pm(j,2) = mdata(2,tpair(1,j,k))
+               pi(j,1) = idata(1,tpair(2,j,k))
+               pi(j,2) = idata(2,tpair(2,j,k))
+            enddo
+            call tran_doit ( pi, pm, TBYM, 3, KFIT, SIGLIM, use,
+     +                       trc, ngood, sd )
+            do j = 1, 6                                               	!Check values O$
+               if ( abs(trc(j)).lt.1.0e-13 ) then
+                  if ( trc(j).lt.0.0 ) trc(j) = -1.0e-13
+                  if ( trc(j).gt.0.0 ) trc(j) =  1.0e-13
+               elseif ( abs(trc(j)).gt.1.0e13 ) then
+                  if ( trc(j).lt.0.0 ) trc(j) = -1.0e13
+                  if ( trc(j).gt.0.0 ) trc(j) =  1.0e13
+               endif
+            enddo
+            call amovr ( trc, atrc(1,k), 6 )
+            pos(1,1,k) = trc(1) + xmin*trc(2) + ymin*trc(3)
+            pos(2,1,k) = trc(4) + xmin*trc(5) + ymin*trc(6)
+            pos(1,2,k) = trc(1) + xmin*trc(2) + ymax*trc(3)
+            pos(2,2,k) = trc(4) + xmin*trc(5) + ymax*trc(6)
+            pos(1,3,k) = trc(1) + xmax*trc(2) + ymin*trc(3)
+            pos(2,3,k) = trc(4) + xmax*trc(5) + ymin*trc(6)
+            pos(1,4,k) = trc(1) + xmax*trc(2) + ymax*trc(3)
+            pos(2,4,k) = trc(4) + xmax*trc(5) + ymax*trc(6)
+         enddo
+
+         nmatch = 0
+         do k = 1, ntris
+
+            npos(k) = 0
+            nok = 0
+            dds = atrc(2,k)*atrc(2,k) + atrc(5,k)*atrc(5,k)
+            otol = FTOLER*sqrt(dds)
+
+            j = 0
+            do while ( npos(k).eq.0 .and. j.lt.ntris )
+               j = j + 1
+               if ( j.ne.k ) then
+                  ok = .true.
+                  do kk = 1, 4
+                     dx = pos(1,kk,k) - pos(1,kk,j)
+                     dy = pos(2,kk,k) - pos(2,kk,j)
+                     if ( abs(dx).gt.otol ) ok = .false.
+                     if ( abs(dy).gt.otol ) ok = .false.
+                  enddo
+                  if ( abs(atrc(1,k)-atrc(1,j)).gt.otol ) ok = .false.
+                  if ( abs(atrc(4,k)-atrc(4,j)).gt.otol ) ok = .false.
+                  if ( ok ) nok = nok + 1
+               endif
+            enddo
+
+            nv = max(1,min(NTMATCH,(ntris-2)))
+            if ( npos(k).eq.0 .and. nok.ge.nv ) then
+               npos(k) = 1
+               nmatch = nmatch + 1
+            endif
+
+         enddo
+
+         nch = 0
+         do k = 1, ntris
+            if ( npos(k).eq.1 ) then
+               if ( nch.eq.0 ) then
+                  call printo ( ' Triangles matched:- ' )
+                  call printo (
+     +            '   Number            X fit coeffs     '//
+     +            '             Y fit coeffs' )
+               endif
+               nch = nch + 1
+               do j = 1, 6
+                  avc(j) = trunc ( atrc(j,k), 5 )
+               enddo
+               write ( text,'(4x,i5,5x,
+     +                2(f7.1,2f9.3,5x))') k, (avc(j),j=1,6)
+               call printo ( text )
+            endif
+         enddo
+         if ( nch.ne.0 ) call printo ( ' ' )
+
+         nv = max(1,min(NTOTMATCH,(ntris-2)))
+         if ( nmatch.gt.nv ) then
+
+            found = .true.
+            do j = 1, 6
+               kk = 0
+               do k = 1, ntris
+                  if ( npos(k).eq.1 ) then
+                     kk = kk + 1
+                     rva(kk) = atrc(j,k)
+                  endif
+               enddo
+               call amedianr ( rva, nmatch, trc(j) )
+            enddo
+
+            num = 0
+            do k = 1, ntris						!Load up (x,y) positions for matches
+               if ( npos(k).eq.1 ) then
+                  ok = .true.
+
+                  if ( abs(atrc(1,k)-trc(1)).gt.otol ) ok = .false.
+                  if ( abs(atrc(4,k)-trc(4)).gt.otol ) ok = .false.
+
+                  rvc = max(abs(trc(2)),abs(trc(3)))
+                  rv = abs((atrc(2,k)-trc(2))/rvc)
+                  if ( rv.gt.0.05 ) ok = .false.
+                  rv = abs((atrc(3,k)-trc(3))/rvc)
+                  if ( rv.gt.0.05 ) ok = .false.
+
+                  rvc = max(abs(trc(5)),abs(trc(6)))
+                  rv = abs((atrc(5,k)-trc(5))/rvc)
+                  if ( rv.gt.0.05 ) ok = .false.
+                  rv = abs((atrc(6,k)-trc(6))/rvc)
+                  if ( rv.gt.0.05 ) ok = .false.
+
+                  if ( ok ) then
+                     do j = 1, 3
+                        if ( num.lt.NTMAX ) then
+                           num = num + 1
+                           nok = .true.
+                           if ( num.ne.1 ) then
+                              do kk = 1, num-1
+                                 if ( nstar(kk).eq.tpair(1,j,k) )
+     +                                nok = .false.
+                              enddo
+                           endif
+                           if ( .not.nok ) then
+                              num = num - 1
+                           else
+                              nstar(num ) = tpair(1,j,k)
+                              pm(num,1) = mdata(1,tpair(1,j,k))
+                              pm(num,2) = mdata(2,tpair(1,j,k))
+                              pi(num,1) = idata(1,tpair(2,j,k))
+                              pi(num,2) = idata(2,tpair(2,j,k))
+                           endif
+                        endif
+                     enddo
+                  endif
+               endif
+            enddo
+
+            call tran_doit ( pi, pm, TBYM, num, KFIT, SIGLIM, use,trc, 	!Do the transform
+     +                       ngood, sd )
+            if ( ST_FAILED ) return
+            do j = 1, 6                                               	!Check values O$
+               if ( abs(trc(j)).lt.1.0e-13 ) then
+                  if ( trc(j).lt.0.0 ) trc(j) = -1.0e-13
+                  if ( trc(j).gt.0.0 ) trc(j) =  1.0e-13
+               elseif ( abs(trc(j)).gt.1.0e13 ) then
+                  if ( trc(j).lt.0.0 ) trc(j) = -1.0e13
+                  if ( trc(j).gt.0.0 ) trc(j) =  1.0e13
+               endif
+            enddo
+
+            call pargi ( ngood )
+            call pargr ( sd )
+            call printd(
+     +              '   Stars used in fit - %d : Std dev of fit - %f')
+            call printo ( '   These final coefficents should'//
+     +                    ' be a good sample of the fits above' )
+            call pargr ( trc(1) )
+            call pargr ( trc(2) )
+            call pargr ( trc(3) )
+            call printd ( '   X = %f + %f*Xin + %f *Yin ')
+            call pargr ( trc(4) )
+            call pargr ( trc(5) )
+            call pargr ( trc(6) )
+            call printd ( '   Y = %f + %f*Xin + %f *Yin ')
+            call printo ( ' ' )
+
+            call amovr ( trc(1), XEQN, 3 )
+            call amovr ( trc(4), YEQN, 3 )
+            call put3r ( 'XCOEFF', trc(1), trc(2), trc(3) )		!Put in output parameters
+            call put3r ( 'YCOEFF', trc(4), trc(5), trc(6) )
+
+         endif
+
+      endif
+
+
+      end
+
+
+CXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCXCCXCXCXCXCXCXCXCXCXCXCXCXCXCXC
+CX        real  adx(4), ady(4), rdd(4), fxdd(4), fydd(4), ddx(4), ddy(4)
+
+CX                     adx(kk) = dx
+CX                     ady(kk) = dy
+CX                if(ok)write(6,'(1x,''F '',2i5,2x,4(2f6.1,2x),f6.1,3x,
+CX     +          2f6.1)')k,j,((adx(kk),ady(kk)),kk=1,4),otol,atrc(1,k),
+CX     +          atrc(4,k)
+
+CX         if ( abs(trc(1)+35).lt.50 .and. abs(trc(2)-1.0).lt.0.2 .and.
+CX     +        abs(trc(3)+0.2).lt.0.2 .and. abs(trc(4)-35).lt.50 .and.
+CX     +        abs(trc(5)-0.2).lt.0.2 .and. abs(trc(6)-1.0).lt.0.2 )
+CX     +   then
+CX            if ( kkgot.eq.0 ) then
+CX               kkgot = 1
+CX               do kk = 1, 4
+CX                  fxdd(kk) = pos(1,kk,k)
+CX                  fydd(kk) = pos(2,kk,k)
+CX               enddo
+CX               write (6,'(1x, ''B '',i4, 1x, 2(f7.1,2f8.2,2x))' )
+CX     +           k, trc(1), trc(2), trc(3), trc(4), trc(5), trc(6)
+CX            else
+CX               do kk = 1, 4
+CX                  ddx(kk) = pos(1,kk,k) - fxdd(kk)
+CX                  ddy(kk) = pos(2,kk,k) - fydd(kk)
+CX               enddo
+CX           dds = atrc(2,k)*atrc(2,k) + atrc(5,k)*atrc(5,k)
+CX           otol = FTOLER*sqrt(dds)
+CX            write(6,'(1x,''B '',i4,1x,2(f7.1,2f8.2,2x),f4.1,8f4.0)')
+CX     +           k, trc(1), trc(2), trc(3), trc(4), trc(5), trc(6),
+CX     +                otol,(ddx(kk),ddy(kk),kk=1,4)
+CX            endif
+CX         endif
+CX
+CX      print*,'  '
+CX      write(6,'(1x,''A3   '',2(2f7.1,3x))')xmin,ymin,xmax,ymax
+CX      print*,'  '
+CX
+CX      do k = 1, num							!Load up (x,y) positions for matches
+CX         kxa = pi(k,1) - pm(k,1)
+CX         kya = pi(k,2) - pm(k,2)
+CX         write ( 6,'(''e5a '',i4,2i5,2f9.2,2i7)')k,pair(1,k),
+CX     +             pair(k,2),pi(k,1),pi(k,2),kxa,kya
+CX         enddo
+
+CX                            print*,'A1 ', num, pi(num,1),pi(num,2)
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_out"> TBTAU_OUT  </a>-- Put out transformed input table
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_out ( in, out )
+
+      implicit none
+      include 'tbtran_auto.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+
+      real  in(TBVX,TBY)	!i: Input table to be transformed
+      real  out(TBVX,TBY)	!o: Output table
+C--
+      integer i, n
+      real nx, ny
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do n = 1, TBY
+
+         call amovz ( in(1,n), out(1,n), 20 )
+         do i = 6, TBVX
+            out(i,n) = in(i,n)
+         enddo
+
+         nx = XEQN(1) + in(5+1,n)*XEQN(2) + in(5+2,n)*XEQN(3)
+         ny = YEQN(1) + in(5+1,n)*YEQN(2) + in(5+2,n)*YEQN(3)
+         out(5+1,n) = nx
+         out(5+2,n) = ny
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_loadxy"> TBTAU_LOADXY  </a>-- Load sorted positions
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_loadxy ( in, out, order, nx, ny )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer nx		!i:
+      integer ny		!i:
+      real    in(nx,ny)		!i:
+      real    out(2,ny)		!o:
+      real    order(ny)		!i:
+C--
+      integer k, kl
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, ny
+         kl = nint(order(k))
+         out(1,k) = in(6,kl)
+         out(2,k) = in(7,kl)
+      enddo
+
+
+      end
+
+
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtau_mag"> TBTAU_MAG  </a>-- Convert heights to mags
+C
+C        pat morris                  Leeds      1994 Jan
+C        alan penny                    ral      1994 Nov
+
+      subroutine tbtau_mag ( a, n )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer n			!i:
+      real    a(n)		!i/o:
+C--
+      integer k
+      real rv
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      do k = 1, n
+         rv = a(k)
+         if ( rv.gt.1.0e-7 ) then
+            a(k) = 30.0 - 2.5*alog10(rv)
+         else
+            a(k) = 1000.0
+         endif
+      enddo
+
+
+      end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbtran_auto"> TBTRAN_AUTO  </a>-- (Program) Transform one XY table to another automatically
+C
+C    Pat Morris             leeds             1994 Jan
+C    Alan Penny             ral               1994 Nov
+
+      subroutine tbtran_auto ( ierradam )
+
+      implicit none
+
+      integer    ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbtran_auto
+
+      call starman_end ( ierradam )
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBTRAN_AUTO.INC
+C
+C   alan penny                   ral         1994 Nov
+
+      integer  ntmax		! Max number of found triangles allowed
+      parameter (ntmax=300*300)
+
+      integer  ipin		! Pointer to input table
+      integer  ipmas		! Pointer to master table
+
+      integer  tbvxm		! No of cols in master (+5 for name)
+      integer  tbym		! No or rows in master
+      integer  kw_mas		! Type of mags/heights/none in MAS table
+      integer  kw_in		! Type of mags/heights/none in IN table
+      integer  kfit		! Transform type (1=xy shift;3=xyshift:rotn:magn)
+
+      real    toler		! distance allowed for posn fit
+      real    ftoler		! distance allowed for fit fit
+      integer ntmatch		! Min number of matches a triangle must have
+      integer ntotmatch		! Min number of triangle matches for answer
+      real    siglim		! Std devs of star from fit allowed
+      real    xeqn(3)		! X coeffs of transfromation
+      real    yeqn(3)		! Y coeffs of transfromation
+
+      logical  interact		!Fit is interactive/automatic (T/F)
+
+      logical  tbtau_dum1, tbtau_dum2, tbtau_dum3
+
+      common / tbtaucoma / siglim,   tbvxm,    tbym,     kw_in,
+     +                     kw_mas,    ipin,   ipmas,      xeqn, yeqn,
+     +                      toler,  ftoler, ntmatch, ntotmatch,
+     +                       kfit
+
+      common / tbtaucomb /  interact, tbtau_dum1, tbtau_dum2,
+     +                      tbtau_dum3
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

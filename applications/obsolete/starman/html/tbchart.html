@@ -1,0 +1,373 @@
+<HTML> <HEAD>
+<TITLE> TBCHART </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBCHART - <br>
+ Plot out a realistic star map
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+ This plots out a realistic looking star map, with filled circles,
+ bigger for brighter stars, at the positions of an input list of
+ star positions and magnitudes. The star identifications may be put
+ by the stars. Overlapping stars may be distinguished by having
+ circles round all stars. If used, these circles may be removed
+ (overwritten).
+<p>
+
+ The input file is a table with columns with headers showing the
+ 'X','Y' positions and 'MAGNITUDES' or 'HEIGHTS'. If these headers
+ are absent, it is assumed that columns 1,2,3 have X,Y,MAG.
+<p>
+ 
+ The program is worked using a menu-driven approach. You choose
+ various options from the menu. This menu can be driven through a
+ 'panel-button' type of display.
+<p>
+ 
+ With an interactive device, a cursor can be used to read out the
+ cursor position and the details of the nearest star read out.
+<p>
+ 
+ The user has control of the ranges of star positions and magnitudes
+ that are plotted out and the size of the area plotted. More than
+ one input list may be plotted.
+<p>
+ 
+ In a star identifier, a '#' as the 1st charcater is ignored, and a star
+ identifier consisting solely of '#' is not put out.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbchart_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#menu"> Menu </a>
+<li> 2 <a href="#cursor_use"> Cursor use </a>
+<li> 3 <a href="#panel_choice"> Panel choice </a>
+<li> 4 <a href="#parameters"> Parameters </a>
+<li> 5 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="menu"> Menu </h2> </a> <p>
+ 
+ 
+  This is the menu of options open to you.
+<p>
+<pre>
+  Option   Function
+  ------   --------
+  clear    Clear plot
+  close    Close the graphical device
+  cursor   Use cursor to get position and nearest star
+  exit     Exit from this program
+  getdata  Get star posns and magns from an input table
+  label    Plot by each star its name from input table
+  lsize    Set the size of the names written by the stars
+  mrange   Set the magnitude range of stars to be plotted
+  mscale   Set rate which stars get bigger with magnitude
+  open     Open the plot device
+  panel    Switch between panel and keyboard option selection
+  plot     Plot the stars as filled-in circles
+  prange   Set the range in X an Y of stars to be plotted
+  psize    Set the range of the graph axes in X and Y
+  ring     Write rings round stars
+  ring_rem Remove rings written round stars
+</pre><p>
+ 
+ To input cursor positions, position cursor at desired point
+ and press any key. End by locating cursor outside graph
+<p>
+ 
+<hr>
+ <h2> 2 <a name="cursor_use"> Cursor use </h2> </a> <p>
+ 
+ 
+   To input cursor positions, position cursor at desired point
+   and press any key. End by locating cursor outside graph
+<p>
+ 
+<hr>
+ <h2> 3 <a name="panel_choice"> Panel choice </h2> </a> <p>
+ 
+  In the menu-driven mode of this program, there is the capability
+ to interact with this menu in a `windows' type mode. If you choose
+ the `Panel' option in the `Option' choice, then if you have an
+ X-window device a small panel appears on the screen. This has what look
+ like buttons with all the available options. You select these by
+ putting a cursor on the `button' and then pressing a mouse button.
+<p>
+ 
+ The panel has a `help' button which lists out one line
+ descriptions of all the options. This button also tells you what
+ the program is doing:- 'working', 'waiting', etc.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 4.1 <a href="#devlimx"> Devlimx </a>
+<li> 4.2 <a href="#devlimy"> Devlimy </a>
+<li> 4.3 <a href="#gtype"> Gtype </a>
+<li> 4.4 <a href="#hmin"> Hmin </a>
+<li> 4.5 <a href="#hrange"> Hrange </a>
+<li> 4.6 <a href="#in"> In </a>
+<li> 4.7 <a href="#linecol"> Linecol </a>
+<li> 4.8 <a href="#lsize"> Lsize </a>
+<li> 4.9 <a href="#mmin"> Mmin </a>
+<li> 4.10 <a href="#mrange"> Mrange </a>
+<li> 4.11 <a href="#mscale"> Mscale </a>
+<li> 4.12 <a href="#numbutt"> Numbutt </a>
+<li> 4.13 <a href="#option"> Option </a>
+<li> 4.14 <a href="#xrange"> Xrange </a>
+<li> 4.15 <a href="#yrange"> Yrange </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 4.1 <a name="devlimx"> Devlimx </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The X start and end of the area to be plotted.
+<p>
+ 
+<hr>
+ <h2> 4.2 <a name="devlimy"> Devlimy </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The Y start and end of the area to be plotted.
+<p>
+ 
+<hr>
+ <h2> 4.3 <a name="gtype"> Gtype </h2> </a> <p>
+ 
+  (Default - 'xwindows'            <br> Choice - any)
+<p>
+ 
+  A character string giving the local name for the graphics
+  display type.
+<p>
+ 
+  'xwindows' will put it out on the screen of your X-window,
+  if you are using one.
+<p>
+ 
+  If 'ask' is input, then the program asks a very similar question,
+  in a different way. A response here of '?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+ 
+<hr>
+ <h2> 4.4 <a name="hmin"> Hmin </h2> </a> <p>
+ 
+  (Default - Minimum in table       <br> Range - 1.0e-10 to 1.0e10)
+<p>
+ 
+  The zero point in the scale for plotting the radii of the
+  circles to represent a star. These circles have radii
+  of:- (MMIN-mag)*MSCALE in terms of the plotted scale.
+<p>
+ 
+ MMIN is converted from 'Hmin' by (30.0-2.5*alog10(hmin))
+<p>
+
+ 
+<hr>
+ <h2> 4.5 <a name="hrange"> Hrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - 1.0e-10 to 1.0e10)
+<p>
+ 
+  The start and end of the range of heights in the table
+  that a star can have to be plotted.
+<p>
+
+  The heights are converted to magnitudes by the equation
+<p>
+
+  Mag = 30.0 - 2.5*alog10(ht).
+<p> 
+
+
+<hr>
+ <h2> 4.6 <a name="in"> In </h2> </a> <p>
+ 
+  (default - null)
+<p>
+ 
+  The name of the file containing the input (position, magnitude)
+  table. It must have at least three columns.
+<p>
+
+  The program looks for columns with headers 'X', 'Y', and 'MAGNITUDE'.
+  If it cant find 'MAGNITUDE', it will look for 'HEIGHT'. If it cant
+  find these, it will assume that Column 1 has 'X', Column 2 has 'Y'
+  and Column 3 has 'MAGNITUDE'. If 'HEIGHT' is used, these are
+  transformed into magnitudes by the equation:-<p>
+  
+  Mag = 30.0 - 2.5*alog10(ht)
+<p>
+
+  Abbreviations and lower case headers are accepted. 
+<p>
+
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+
+<hr>
+ <h2> 4.7 <a name="linecol"> Linecol </h2> </a> <p>
+ 
+   (Default - 'black'            <br> Choice - `black:white')
+<p>
+ 
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+ 
+<hr>
+ <h2> 4.8 <a name="lsize"> Lsize </h2> </a> <p>
+
+ (Default - 1.0               <br> Range - 0.0 to 1.0e10)
+<p>
+ 
+  The size of the text to be used when plotting the stars
+  identifiers. A size of 1.0 gives letters with heights of about
+  1/100th of the plotted Y range.
+<p>
+ 
+<hr>
+ <h2> 4.9 <a name="mmin"> Mmin </h2> </a> <p>
+ 
+  (Default - Maximum in table       <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The zero point in the scale for plotting the radii of the
+  circles to represent a star. These circles have radii
+  of:- (MMIN-mag)*MSCALE in terms of the plotted scale.
+<p>
+ 
+<hr>
+ <h2> 4.10 <a name="mrange"> Mrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The start and end of the range of magnitudes in the table
+  that a star can have to be plotted.
+<p>
+ 
+<hr>
+ <h2> 4.11 <a name="mscale"> Mscale </h2> </a> <p>
+ 
+  (Default - 1.0        <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The 'SCALE' in the scale for plotting the radii of the
+  circles to represent a star. These circles have radii
+  of:- (MMIN-mag)*MSCALE in terms of the plotted scale.
+<p>
+ 
+<hr>
+ <h2> 4.12 <a name="numbutt"> Numbutt </h2> </a> <p>
+ 
+  (Default - see below          <br> Range - 2 to 3)
+<p>
+ 
+  Number of `X-Window' buttons available on the mouse.
+<p>
+ 
+  Some devices have two and some have three buttons available. This
+  can depend both on their actual presence, and also on the X Windows
+  software that is being run.
+<p>
+ 
+  With three buttons, then the Starman programs use all three, with
+  the right-hand button being used mainly as the 'exit' button.
+<p>
+ 
+  With two buttons, then the third button is simulated by pressing
+  both of the buttons down, with the middle one being pressed slightly
+  BEFORE the left-hand one. Use of the middle button in its normal
+  way has to be modified, in that one has to pause for half a second
+  after using it.
+<p>
+ 
+  [This parameter is usally 'hidden', with the machine manager setting
+   it to the appropriate value for the local set-up. Sometimes it will
+   be left to the user to set, depending on his software configuartion.]
+<p>
+ 
+<hr>
+ <h2> 4.13 <a name="option"> Option </h2> </a> <p>
+ 
+  (Default - see below          <br> Choices - see below)
+<p>
+ 
+  This is the menu of options open to you.
+<p>
+  See the section on <a href="#menu"> Menu </a> above.
+<p>
+ 
+<hr>
+ <h2> 4.14 <a name="xrange"> Xrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The X start and end of X range of positions in the table
+  that a star can have to be plotted.
+<p>
+ 
+<hr>
+ <h2> 4.15 <a name="yrange"> Yrange </h2> </a> <p>
+ 
+  (Default - Min,max in table      <br> Range - -1.0e10 to 1.0e10)
+<p>
+ 
+  The Y start and end of Y range of positions in the table
+  that a star can have to be plotted.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+  Alan Penny                    RAL             1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

@@ -1,0 +1,264 @@
+<HTML> <HEAD>
+<TITLE> TBLOAD </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBLOAD - <br>
+ Input a text file into a table
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  This takes an ASCII text file, and loads the contents into a table.
+<p>
+ 
+  The input file may contain either just the numbers or both the names
+  and numbers. In the first case, then default names #1,#2,,,#n are
+  put into the table. In the second case, the name should be the first
+  entry in the line.
+<p>
+ 
+  The numbers for one row of the output table may take up more than one
+  line in the input file. In this case, all the lines of the input file
+  should be in the same format, that is a constant number of lines in
+  the input file are put into each row of the output table. Also in this
+  case, if names are being input, then the name for each row must occur
+  only once in the set of input lines (at the beginnning of the first
+  line).
+<p>
+ 
+  The numbers in a line in the input file must be separated by blanks
+  and/or commas.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbload_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#headers"> Headers </a>
+<li> 2 <a href="#parameters"> Parameters </a>
+<li> 3 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="headers"> Headers </h2> </a> <p>
+ 
+ 
+  The table title and headers may be input automatically, if they are
+  put in a standard format at the start of the input file. This format
+  is a series of lines with the first ten characters being a description
+  and the remainder the values. The order of these lines is fixed. It
+  is:-
+<p>
+<pre>
+No  Contents           1st ten characters  Contents
+--  --------           ------------------  --------
+1   Title              'Title is: '        up to 50 characters
+2   No of columns      'Columns = '        Integer
+3   No of rows         'Rows =    '        Integer
+4   1st column header  'HEAD001   '        up to 20 characters
+5   2nd column header  'HEAD002   '        up to 20 characters
+etc   etc                etc               etc
+N   No of descriptors  'NumDes =  '        Integer
+N+1 1st descriptor     name                value
+N+2 2nd descriptor     name                value
+etc  etc               etc                 etc
+</pre><p>
+ 
+   There must be the same number of headers as there are columns.
+<p>
+ 
+   [The number of columns does not include the names.]
+<p>
+ 
+   The 'no ofdescriptors' line must be there. If there are no
+   descriptors, then the number should be '0'.
+<p>
+ 
+   [The table size and headers are, strictly speaking, descriptors
+    themselves, but they are not counted as such in this
+    descriptor count. It is only concerned with other, incidental,
+    descriptors.]
+<p>
+ 
+ 
+  If this standard format is not chosen, then the headers are input by
+  hand, with the first 20 coming from individual program parameters, and
+  any remaining input on a single program parameter.
+<p>
+ 
+ 
+<hr>
+ <h2> 2 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 2.1 <a href="#head"> Head </a>
+<li> 2.2 <a href="#head001"> Head001 </a>
+<li> 2.3 <a href="#header"> Header </a>
+<li> 2.4 <a href="#hignore"> Hignore </a>
+<li> 2.5 <a href="#in"> In </a>
+<li> 2.6 <a href="#names"> Names </a>
+<li> 2.7 <a href="#nlines"> Nlines </a>
+<li> 2.8 <a href="#out"> Out </a>
+<li> 2.9 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="head"> Head </h2> </a> <p>
+ 
+  (Default - ' '          <br> Choice - see below)
+<p>
+ 
+  The character string to put as the header of the next column.
+  This may be up to 20 characters long
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="head001"> Head001 </h2> </a> <p>
+ 
+  (Default - ' '          <br> Choice - see below)
+<p>
+ 
+  The character string to put as the header of the 'nth' column.
+  This may be up to 20 characters long
+<p>
+ 
+  [This help applies to the up to 20 headers, 'HEAD001', 'HEAD002',
+  ..., 'HEAD020'.]
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="header"> Header </h2> </a> <p>
+ 
+  (Default - 'no'         <br> Choice - 'yes:no')
+<p>
+ 
+  Does the input file start of with the standard header format
+  information? If it does, then this format is:-
+<p>
+<pre>
+No  Contents           1st ten characters  Contents
+--  --------           ------------------  --------
+1   Title              'Title is: '        up to 50 characters
+2   No of columns      'Columns = '        Integer
+3   No of rows         'Rows =    '        Integer
+4   1st column header  'HEAD001   '        up to 20 characters
+5   2nd column header  'HEAD002   '        up to 20 characters
+etc   etc                etc               etc
+X   No of descriptors  'NumDes =  '        Integer
+Y   1st descriptor     name                value
+Y   2nd descriptor     name                value
+etc  etc               etc                 etc
+</pre><p>
+ 
+   There must be the same number of headers as there are columns.
+<p>
+ 
+   [The number of columns does not include the names.]
+<p>
+ 
+   The 'no of descriptors' line must be there. If there are no
+   descriptors, then the number should be '0'.
+<p>
+ 
+   [The table size and headers are, strictly speaking, descriptors
+    themselves, but they are not counted as such in this
+    descriptor count. It is only concerned with other, incidental,
+    descriptors.]
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="hignore"> Hignore </h2> </a> <p>
+ 
+  (Default - 0             <br> Range - 0 to 10000)
+<p>
+ 
+  As there is not the standard header start to the file, how many
+  lines at the start of the file shall be ignored?
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file containing the input text ASCII data.
+<p>
+ 
+<hr>
+ <h2> 2.6 <a name="names"> Names </h2> </a> <p>
+ 
+  (Default - 'no'         <br> Choice - 'yes:no')
+<p>
+ 
+  Does the input file contain a name for each row of
+  the output table?
+<p>
+ 
+<hr>
+ <h2> 2.7 <a name="nlines"> Nlines </h2> </a> <p>
+ 
+  (Default - 1            <br> Range - 1 to 1000)
+<p>
+ 
+  The number of lines in the input file that the data, for
+  each output table row, occupy.
+<p>
+ 
+<hr>
+ <h2> 2.8 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file to contain the output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 2.9 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - ' '            <br> Choice - any)
+<p>
+ 
+  The title to put into the output table. This can be
+  up to 50 characters long.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="author"> Author </h2> </a> <p>
+ 
+   alan penny                RAL          1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

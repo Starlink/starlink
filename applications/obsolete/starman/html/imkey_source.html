@@ -1,0 +1,442 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+IMKEY
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+IMKEY
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#imkey_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#imkey">
+imkey  </a>  (Program) Create/Amend an image by keyboard entry       <br>
+<a href="#t_imkey">
+t_imkey  </a>  Do image keyboard creation/amending       <br>
+<a href="#imke_gcl">
+imke_gcl  </a>  Get input and output info from the command line       <br>
+<a href="#imke_load">
+imke_load  </a>  Load work image with starter image       <br>
+<a href="#imke_doits">
+imke_doits  </a>  Put keyboard entry in       <br>
+<a href="#imke_doitr">
+imke_doitr  </a>  Put keyboard entry in       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imkey"> IMKEY  </a>-- (Program) Create/Amend an image by keyboard entry
+C
+C  alan penny                       ral                       1992 Dec
+
+      subroutine imkey ( ierradam )
+
+      implicit none
+
+      integer     ierradam           !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_imkey
+
+      call starman_end ( ierradam )
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C T_IMKEY.F
+C
+C  Contains:-
+C
+C T_IMKEY       Do image keyboard
+C IMKE_GCL      Get input and output info from the command line
+C IMKE_OUTT     Get output image type
+C IMKE_SPACE    Get work space for line stack and line
+C IMKE_DOIT(RS) Combine the lines from the stack of images into one line
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_imkey"> T_IMKEY  </a>-- Do image keyboard creation/amending
+C
+C  alan penny                  ral              1993 Dec
+
+      subroutine t_imkey ()
+
+      implicit none
+      include 'imkey.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+C--
+      integer istat
+Cbegin
+
+
+      call imke_gcl							!Get input/output info
+      if ( ST_FAILED ) return
+
+      if ( IMTYPE.eq.'REAL' ) then
+         call gtwrkr ( 'WORKA', NX*NY, IPIMA, istat )
+      else
+         call gtwrks ( 'WORKA', NX*NY, IPIMA, istat )
+      endif
+      if ( istat.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call imke_load							!Load base image
+      if ( ST_FAILED ) return
+
+      if ( IMTYPE.eq.'REAL' ) then					!Keyboard input of data
+         call imke_doitr ( %val(IPIMA), NX, NY )
+         call amovr ( %val(IPIMA), %val(IPO), NX*NY )
+      else
+         call imke_doits ( %val(IPIMA), NX, NY )
+         call amovs ( %val(IPIMA), %val(IPO), NX*NY )
+      endif
+
+
+      end
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imke_gcl"> IMKE_GCL  </a>-- Get input and output info from the command line
+C
+C  alan penny                         RAL                1991 Dec
+
+      subroutine imke_gcl ( )
+
+      implicit none
+      include 'imkey.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+      include 'ST_LIMITS_INC'
+C--
+      integer ierr
+      character title*50
+
+      integer kopt
+      integer nth
+      parameter ( nth=5 )
+      character*68 th(nth)
+      data th /
+     + 'Is the output image ? :- ',
+     + 'Option   Choice',
+     + '------   --------',
+     + 'Real     Real 32-bit ',
+     + 'Short    Signed 16-bit integer '/
+
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call opimzr ( 'IN', IPIM, NX, NY, IMTYPE, .true., ierr )
+      if ( ST_FAILED ) return
+
+      INIM = .true.
+      if ( ierr.eq.2 ) then
+         INIM = .false.
+         IPIM = 1
+         NX = 1
+         NY = 1
+         call get2i ( 'SIZE', NX, NY, .true., 1, 100000 )
+         if ( ST_FAILED ) return
+         IMTYPE = 'REAL'
+         call get_job ( 'OUTTYPE', 'real:short', kopt, 1, th, nth )
+         if ( ST_FAILED ) return
+         if ( kopt.eq.2 ) IMTYPE = 'SHORT'
+         if ( IMTYPE.eq.'SHORT' ) then
+            call printo ( ' ' )
+            call printo ( 'The pixel values are stored as 16-bit'//
+     +                     ' integers, as ((value-BZERO)/BSCALE)' )
+            call printo ( 'As these are integers in the range '//
+     +                    ' -32765 to +32767,' )
+            call printo ( 'you may wish to change the -scale and '//
+     +                    'zero-,' )
+            call printo ( 'either to prevent integer steps being'//
+     +                    ' important, or to store big numbers' )
+            BS = 1.0
+            BZ = 0.0
+            call get2r ( 'OUTSCALE', BS, BZ, .true., 1.0,
+     +                   -1.0e20, 1.0e20 )
+            if ( ST_FAILED ) return
+         else
+            BS = 1.0
+            BZ = 0.0
+         endif
+         call get1r ( 'LEVEL', RLEV, 0.0, -1.0e10, 1.0e10 )
+         if ( ST_FAILED ) return
+         IMTITLE = 'Output from IMKEY'
+         INVAL = INT_INVALSI
+         RINVAL = INT_INVALR
+      elseif ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      else
+         call pargi ( NX )
+         call pargi ( NY )
+         call printd ( 'Image size is: %d x %d' )
+         call pargc ( IMTYPE )
+         call printd ( 'Image type is: %c')
+         call gtimzd ( 'IN', IMTYPE, BS, BZ, INVAL, RINVAL, IMTITLE,
+     +                 ierr )
+         if ( ierr.ne.0 ) then
+            ST_FAILED = .true.
+            return
+         endif
+      endif
+
+      call opimzw ( 'OUT', IMTYPE, IPO, NX, NY, .true., ierr )       !Get output image
+      if ( ierr.eq.1 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+
+      call get1c  ( 'TITLE', title, IMTITLE, .true. )
+      if ( ST_FAILED ) return
+
+      if ( INIM ) then
+         call icopdes ( 'IN', 'OUT', ierr )
+         if ( ierr.eq.1 ) ST_FAILED = .true.
+      else
+         call ptdesr ( 'OUT', 'BSCALE', BS )
+         call ptdesr ( 'OUT', 'BZERO', BZ )
+         if ( IMTYPE.eq.'REAL' ) then
+            call ptdesr ( 'OUT', 'INVAL', RINVAL )
+         else
+            call ptdesi ( 'OUT', 'INVAL', INVAL )
+         endif
+      endif
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT', 'TITLE', title )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imke_load"> IMKE_LOAD  </a>-- Load work image with starter image
+C
+C  alan penny                RAL                1991 Dec
+
+      subroutine imke_load ( )
+
+      implicit none
+      include 'imkey.inc'
+      include 'image.inc'
+C--
+      real rv
+      integer*2 isv
+Cbegin
+
+
+      if ( INIM ) then
+         if ( IMTYPE.eq.'REAL' ) then
+            call amovr ( %val(IPIM), %val(IPIMA), NX*NY )
+         else
+            call amovs ( %val(IPIM), %val(IPIMA), NX*NY )
+         endif
+      else
+         rv = (RLEV-BZ)/BS
+         if ( IMTYPE.eq.'REAL' ) then
+            call amovkr ( rv, %val(IPIMA), NX*NY )
+         else
+            isv = min(32767.0,max(-32768.0,rv))
+            call amovks ( isv, %val(IPIMA), NX*NY )
+         endif
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imke_doits"> IMKE_DOITS  </a>-- Put keyboard entry in
+C
+C  alan penny                     RAL            1991 Dec
+
+      subroutine imke_doits ( in, nxa, nya )
+
+      implicit none
+      include 'imkey.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+
+      integer    nxa		!i:   X size of image
+      integer    nya		!i:   Y size of image
+      integer*2  in(nxa,nya)	!i/o: Work image
+C--
+      integer kx, ky, iv, nmax
+      real rv, rva
+      logical loop
+Cbegin
+
+
+      nmax = max(nxa,nya)
+      kx = 1
+      ky = 1
+
+      call printo ( ' ' )
+      call printo ( 'Respond 1,0 to input INVALID pixel, 0,1 to end ' )
+      call printo ( ' ' )
+
+      loop = .true.
+      do while ( loop )
+
+         call get2i ( 'XY', kx, ky, .true., 0, nmax )
+         if ( ST_FAILED ) return
+         if ( kx.lt.1 ) then
+            loop = .false.
+            call printo ( 'Input finished' )
+         elseif ( kx.gt.nxa .or. ky.gt.nya ) then
+            call printo ( 'ERROR: out of image' )
+         elseif ( ky.lt.1 ) then
+            call printo ( 'Next pixel to be marked as INVALID ' )
+            call get2i ( 'INVALXY', kx, ky, .true., 1, nmax )
+            if ( ST_FAILED ) return
+            in(kx,ky) = INVAL
+         else
+            if ( in(kx,ky).eq.INVAL ) then
+               call printo ( 'Pixel INVALID in input image' )
+               rv = 0.0
+            else
+               rv = in(kx,ky)
+               rv = rv*BS + BZ
+            endif
+            call get1r ( 'VALUE', rva, rv, -1.0e10, 1.0e10 )
+            if ( ST_FAILED ) return
+            rva = (rva-BZ)/BS
+            iv = min(32767.0,max(-32768.0,rva))
+            in(kx,ky) = iv
+         endif
+
+       enddo
+
+
+       end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="imke_doitr"> IMKE_DOITR  </a>-- Put keyboard entry in
+C
+C  alan penny                     RAL            1991 Dec
+
+      subroutine imke_doitr ( in, nxa, nya )
+
+      implicit none
+      include 'imkey.inc'
+      include 'image.inc'
+      include 'STARMAN_INC'
+
+      integer    nxa		!i:   X size of image
+      integer    nya		!i:   Y size of image
+      real       in(nxa,nya)	!i/o: Work image
+C--
+      integer kx, ky, nmax
+      real rv, rva
+      logical loop
+Cbegin
+
+
+      nmax = max(nxa,nya)
+      kx = 1
+      ky = 1
+
+      call printo ( ' ' )
+      call printo ( 'Respond 1,0 to input INVALID pixel, 0,1 to end ' )
+      call printo ( ' ' )
+
+      loop = .true.
+      do while ( loop )
+
+         call get2i ( 'XY', kx, ky, .true., 0, nmax )
+         if ( ST_FAILED ) return
+         if ( kx.lt.1 ) then
+            loop = .false.
+            call printo ( 'Input finished' )
+         elseif ( kx.gt.nxa .or. ky.gt.nya ) then
+            call printo ( 'ERROR: out of image' )
+         elseif ( ky.lt.1 ) then
+            call printo ( 'Next pixel to be marked as INVALID ' )
+            call get2i ( 'INVALXY', kx, ky, .true., 1, nmax )
+            if ( ST_FAILED ) return
+            in(kx,ky) = RINVAL
+         else
+            if ( in(kx,ky).eq.RINVAL ) then
+               call printo ( 'Pixel INVALID in input image' )
+               rv = 0.0
+            else
+               rv = in(kx,ky)
+               rv = rv*BS + BZ
+            endif
+            call get1r ( 'VALUE', rva, rv, -1.0e10, 1.0e10 )
+            if ( ST_FAILED ) return
+            in(kx,ky) = (rva-BZ)/BS
+         endif
+
+       enddo
+
+
+       end
+
+
+
+
+
+
+
+
+
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C  IMKEY.INC
+
+
+      integer   ipo			!Output image pointer
+      integer   ipima			!Work image pointer
+      real      rlev			!Background level
+
+      logical   inim			!Is there an input image?
+
+      logical imke_dum1			!Make logicals up to times 4
+      logical imke_dum2			!Make logicals up to times 4
+      logical imke_dum3			!Make logicals up to times 4
+
+
+
+      common / imkea / ipo,  ipima, rlev
+
+      common / imkeb / inim, imke_dum1, imke_dum2, imke_dum3
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

@@ -1,0 +1,446 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBPMATCH
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBPMATCH
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbpmatch_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbpmatch">
+t_tbpmatch  </a>  Extract entries with matching positions in two tables       <br>
+<a href="#tbpm_check">
+tbpm_check  </a>  Find size of output table       <br>
+<a href="#tbpm_doit">
+tbpm_doit  </a>  Load the output table       <br>
+<a href="#tbpmatch">
+tbpmatch  </a>  (Program) Extract entries with matching positions in two tables       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C   TBPMATCH.FOR
+C
+C  Contains:-
+C
+C T_TBPMATCH   Extract entries with matching positions in two tables
+C TBPM_CHECK   Find size of output table
+C TBPM_DOIT    Load the output table
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbpmatch"> T_TBPMATCH  </a>-- Extract entries with matching positions in two tables
+C
+C         A J Penny            RGO                                82-11-4
+
+      subroutine t_tbpmatch ()
+
+      implicit none
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      character title*50
+      integer ierr, ipin1, ipin2, ipo1, ipo2, kcol, kmeth, iv, ipnwk, k
+      real tolern
+
+      character*1000 topt
+      data topt / 'nearest:largest:smallest:alldup:allnodup' /
+      integer nthelp
+      parameter ( nthelp=11 )
+      character*68 thelp(nthelp)
+      data (thelp(k),k=1,10) /
+     + 'If the 2nd table has more than one star near enough to the' ,
+     + 'position of a star in the 1st table, then there are a number' ,
+     + 'of options for dealing with this' ,
+     + '   ',
+     + 'Option      Function: Choose -' ,
+     + '------      ------------------' ,
+     + 'Alldup      All such stars - each star as often as it appears ',
+     + 'Allnodup    All such stars - each star only once ',
+     + 'Largest     Only the star with the largest value in NUMCOL' ,
+     + 'Nearest     Only the nearest star' /
+      data (thelp(k),k=11,nthelp) /
+     + 'Smallest    Only the star with the smallest value in NUMCOL' /
+Cbegin
+
+
+      call optabr ( 'IN1', ipin1, TBVX1, TBY1, .false., ierr )		!Obtain 1st input table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call optabr ( 'IN2', ipin2, TBVX2, TBY2, .false., ierr )		!Obtain 2nd input table
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call get1r ( 'MISMATCH', tolern, 1.0, 0.0, 1.0e10 )		!Get distance tolerance
+      if ( ST_FAILED ) return
+
+      call get_job ( 'METHOD', topt, kmeth, 1, thelp, 0  )		!Get selection method
+      if ( ST_FAILED ) return
+      kcol = 1
+      if ( kmeth.eq.2 .or. kmeth.eq.3 ) then
+         call get1i ( 'NUMCOL', kcol, 1, 1, TBVX2-5 )
+         if ( ST_FAILED ) return
+      endif
+
+      call gtwrki ( 'WORK', TBY2, ipnwk, ierr )
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call tbpm_check ( %val(ipin1), %val(ipin2), %val(ipnwk), 		!Find no of entries passed
+     +                 kmeth, tolern )
+
+      if ( TBYO2.eq.0 ) then						!See if any found
+         call printo ( 'No matching positions - no output tables' )
+         return
+      else
+         if ( kmeth.eq.4 .or. kmeth.eq.5 ) then
+            call pargi ( TBYO1 )
+            call printd ( 'Number in first list matched = %d' )
+            call pargi ( TBYO2 )
+            call printd ( 'Number in second list matched = %d' )
+         else
+            call pargi ( TBYO1 )
+            call printd (
+     +              'Number of stars with matching positions = %d' )
+         endif
+      endif
+
+      call optabw ( 'OUT1', ipo1, TBVX1, TBYO1, .false.,ierr )		!Open output list
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call tcopdes ( 'IN1', 'OUT1', ierr )				!Get title to output list and store it and the descriptors
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtdesc ( 'IN1', 'TITLE', title, 'Output from Tbpmatch', iv,
+     +              ierr )
+      call get1c  ( 'TITLE1', title,    title, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT1',   'TITLE',  title )
+
+      call optabw ( 'OUT2', ipo2, TBVX2, TBYO2, .false., ierr )		!Open 2nd output list
+      if ( ST_FAILED ) return
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+
+      call tcopdes ( 'IN2', 'OUT2', ierr )				!Get title to output list and store it and the descriptors
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      call gtdesc ( 'IN2', 'TITLE', title, 'Output from Tbpmatch', iv,
+     +              ierr )
+      call get1c  ( 'TITLE2',  title,    title, .true. )
+      if ( ST_FAILED ) return
+      call ptdesc ( 'OUT2',    'TITLE',  title )
+
+      call tbpm_doit ( %val(ipin1), %val(ipin2), %val(ipo1), 		!Do the loading of the output from the input
+     +                 %val(ipo2), %val(ipnwk), tolern, kmeth, kcol )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpm_check"> TBPM_CHECK  </a>-- Find size of output table
+C
+C    A J PENNY               RGO                      82-11-4
+
+      subroutine tbpm_check ( tb1, tb2, ngot, kmeth, tolern )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	tb1(TBVX1,TBY1)		!i: 1st input table
+      real	tb2(TBVX2,TBY2)		!i: @nd input table
+      integer	ngot(TBY2)		!o:
+      integer   kmeth			!i:
+      real	tolern			!1:
+C--
+      integer k, j
+      logical found
+      real xa, ya, ttol, xb, yb, dd
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ttol = tolern*tolern
+
+      if ( kmeth.eq.5 ) then
+         call azeroi ( ngot, TBY2 )
+         TBYO1 = 0
+         TBYO2 = 0
+         do k = 1, TBY1
+            xa = tb1(6,k)
+            ya = tb1(7,k)
+            found = .false.
+            do j = 1, TBY2
+               xb = tb2(6,j)
+               yb = tb2(7,j)
+               dd = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               if ( dd.le.ttol ) then
+                  if ( .not.found ) then
+                     TBYO1 = TBYO1 + 1
+                     found = .true.
+                  endif
+                  if ( ngot(j).eq.0 ) TBYO2 = TBYO2 + 1
+                  ngot(j) = 1
+               endif
+            enddo
+         enddo
+      endif
+
+      if ( kmeth.eq.4 ) then
+         TBYO1 = 0
+         TBYO2 = 0
+         do k = 1, TBY1
+            xa = tb1(6,k)
+            ya = tb1(7,k)
+            found = .false.
+            do j = 1, TBY2
+               xb = tb2(6,j)
+               yb = tb2(7,j)
+               dd = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               if ( dd.le.ttol ) then
+                  if ( .not.found ) then
+                     TBYO1 = TBYO1 + 1
+                     found = .true.
+                  endif
+                  TBYO2 = TBYO2 + 1
+               endif
+            enddo
+         enddo
+      endif
+
+      if ( kmeth.eq.1 .or. kmeth.eq.2 .or. kmeth.eq.3 ) then
+         do k = 1, TBY1
+            xa = tb1(6,k)
+            ya = tb1(7,k)
+            found = .false.
+            j = 0
+            do while ( j.lt.TBY2 .and. .not.found )
+               j = j + 1
+               xb = tb2(6,j)
+               yb = tb2(7,j)
+               dd = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               if ( dd.le.ttol ) found = .true.
+            enddo
+            if ( found ) then
+               TBYO1 = TBYO1 + 1
+               TBYO2 = TBYO2 + 1
+            endif
+         enddo
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpm_doit"> TBPM_DOIT  </a>-- Load the output table
+C
+C alan penny                    ral           1990-06-06
+
+      subroutine tbpm_doit ( tb1, tb2, tbo1, tbo2, ngot, tolern,
+     +                       kmeth, kcol )
+
+      implicit none
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	tb1(TBVX1,TBY1)		!i:
+      real	tb2(TBVX2,TBY2)		!i:
+      real	tbo1(TBVX1,TBYO1)	!o:
+      real	tbo2(TBVX2,TBYO2)	!o:
+      integer	ngot(TBYO2)		!i:
+      real	tolern			!i:
+      integer	kmeth			!i:
+      integer	kcol			!i:
+C--
+      logical found
+      real ttol, xa, ya, xb, yb, dd, cv, cmin, cmax, dmin
+      integer k, j, ka, kout, kout1, kout2
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      ttol = tolern*tolern
+
+      if ( kmeth.eq.5 ) then
+         kout1 = 0
+         kout2 = 0
+         call amovki ( 0, ngot, TBYO2 )
+         do k = 1, TBY1
+
+            xa = tb1(6,k)
+            ya = tb1(7,k)
+            found = .false.
+            do j = 1, TBY2
+               xb = tb2(6,j)
+               yb = tb2(7,j)
+               dd = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               if ( dd.le.ttol ) then
+                  if ( .not.found ) then
+                     kout1 = kout1 + 1
+                     call coprr ( tb1, TBVX1, TBY1, 1, TBVX1, k, k,
+     +                            tbo1, TBVX1, TBYO1, 1, kout1 )
+                     found = .true.
+                  endif
+                  if ( ngot(j).eq.0 ) then
+                     ngot(j) = 1
+                     kout2 = kout2 + 1
+                     call coprr ( tb2, TBVX2, TBY2, 1, TBVX2, k, k,
+     +                            tbo2, TBVX2, TBYO2, 1, kout2 )
+                  endif
+               endif
+            enddo
+
+         enddo
+      endif
+
+      if ( kmeth.eq.4 ) then
+         kout1 = 0
+         kout2 = 0
+         do k = 1, TBY1
+
+            xa = tb1(6,k)
+            ya = tb1(7,k)
+            found = .false.
+            do j = 1, TBY2
+               xb = tb2(6,j)
+               yb = tb2(7,j)
+               dd = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               if ( dd.le.ttol ) then
+                  if ( .not.found ) then
+                     kout1 = kout1 + 1
+                     call coprr ( tb1, TBVX1, TBY1, 1, TBVX1, k, k,
+     +                            tbo1, TBVX1, TBYO1, 1, kout1 )
+                     found = .true.
+                  endif
+                  kout2 = kout2 + 1
+                     call coprr ( tb2, TBVX2, TBY2, 1, TBVX2, k, k,
+     +                            tbo2, TBVX2, TBYO2, 1, kout2 )
+               endif
+            enddo
+
+         enddo
+      endif
+
+      if ( kmeth.eq.1 .or. kmeth.eq.2 .or. kmeth.eq.3 ) then
+         kout = 0
+         do k = 1, TBY1
+
+            xa = tb1(6,k)
+            ya = tb1(7,k)
+            found = .false.
+            do j = 1, TBY2
+               xb = tb2(6,j)
+               yb = tb2(7,j)
+               dd = (xb-xa)*(xb-xa) + (yb-ya)*(yb-ya)
+               cv = tb2(kcol+5,j)
+               if ( dd.le.ttol ) then
+                  if ( .not.found ) then
+                     found = .true.
+                     dmin = dd
+                     cmin = cv
+                     cmax = cv
+                     ka = j
+                  else
+                     if ( kmeth.eq.1 .and. dd.lt.dmin ) then
+                        dmin = dd
+                        ka = j
+                     elseif ( kmeth.eq.2 .and. cv.gt.cmax ) then
+                        cmax = cv
+                        ka = j
+                     elseif ( kmeth.eq.3 .and. cv.lt.cmin ) then
+                        cmin = cv
+                        ka = j
+                     endif
+                  endif
+               endif
+            enddo
+
+            if ( found ) then
+               kout = kout + 1
+               call coprr ( tb1, TBVX1, TBY1, 1, TBVX1, k, k,
+     +                      tbo1, TBVX1, TBYO1, 1, kout )
+               call coprr ( tb2, TBVX2, TBY2, 1, TBVX2, ka, ka,
+     +                      tbo2, TBVX2, TBYO2, 1, kout )
+            endif
+
+         enddo
+
+      endif
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbpmatch"> TBPMATCH  </a>-- (Program) Extract entries with matching positions in two tables
+C   See TBPMATCH.HLP for details
+C
+C         A.J.Penny                RAL                      1991 May
+
+      subroutine tbpmatch ( ierradam )
+
+      implicit none
+
+      integer      ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbpmatch
+
+      call starman_end ( ierradam )
+
+      end
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

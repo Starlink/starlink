@@ -1,0 +1,190 @@
+<HTML> <HEAD>
+<TITLE> TBMATCH </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBMATCH - <br>
+ Extract entries with matching names in two tables
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This takes two tables and makes two new ones which are copies
+   of the old ones, but only contain the entries which do (or
+   optionally do not) have names which occur in the other table.
+<p>
+ 
+   If the choice is to have entries which do occur in both tables,
+   then there is the choice to have those entries occur in the
+   output tables either in the same order, or in the order that
+   they appeared in their input tables, If the same order is chosen,
+   the order is that of occurence in the first table. If there are
+   repeated entries with the same names, then only the last such
+   occurence is copied over. If the original order is chosen
+   however, then those entries occur in the output tables in the
+   same order as they occur in their respective input tables and
+   repeated entries of the same name are all copied over.
+<p>
+ 
+   If the choice is to have entries which do not occur in both
+   tables, then those entries occur in the output tables in the
+   same order as they occur in their respective input tables.
+   Repeated entries of the same name are all copied over.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbmatch_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in1"> In1 </a>
+<li> 1.2 <a href="#in2"> In2 </a>
+<li> 1.3 <a href="#option"> Option </a>
+<li> 1.4 <a href="#out1"> Out1 </a>
+<li> 1.5 <a href="#out2"> Out2 </a>
+<li> 1.6 <a href="#same"> Same </a>
+<li> 1.7 <a href="#title1"> Title1 </a>
+<li> 1.8 <a href="#title2"> Title2 </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in1"> In1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the 1st input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="in2"> In2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file with the 2nd input table.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="option"> Option </h2> </a> <p>
+ 
+   (Default - 'accept'            <br> Choice - 'accept:reject')
+<p>
+ 
+   Accept or reject entries who have names in common with the other
+   table.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="out1"> Out1 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file for the 1st output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="out2"> Out2 </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the file for the 2nd output table.
+<p>
+ 
+  The table will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.6 <a name="same"> Same </h2> </a> <p>
+ 
+  (Default - 'yes'       <br> Choice - 'yes:no')
+<p>
+ 
+  Are entries to be copied over in the same order ('yes'), or
+  not (when they are copied in the order they occur in their
+  repective input tables) ('no') ?
+<p>
+ 
+<hr>
+ <h2> 1.7 <a name="title1"> Title1 </h2> </a> <p>
+ 
+  (Default - Input 1st table title or 'Output from TBMATCH'
+   Choice - any)
+<p>
+ 
+   The Title to be added to the 1st output file.
+<p>
+ 
+<hr>
+ <h2> 1.8 <a name="title2"> Title2 </h2> </a> <p>
+ 
+  (Default - Input 2nd table title or 'Output from TBMATCH'
+   Choice - any)
+<p>
+ 
+   The Title to be added to the 2nd output file.
+<p>
+ 
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny            STScI         87-12-18
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

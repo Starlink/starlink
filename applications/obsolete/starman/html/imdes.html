@@ -1,0 +1,324 @@
+<HTML> <HEAD>
+<TITLE> IMDES </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMDES - <br>
+ View:copy:write:delete the descriptors of an image
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  List, write, delete or copy the descriptors of an image.
+<p>
+ 
+  Choose which one of the four options you wish to do, with
+  the `OPTION' parameter. Then do that option.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imdes_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#copy_option"> Copy option </a>
+<li> 2 <a href="#delete_option"> Delete option </a>
+<li> 3 <a href="#list_option"> List option </a>
+<li> 4 <a href="#write_option"> Write option </a>
+<li> 5 <a href="#parameters"> Parameters </a>
+<li> 6 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="copy_option"> Copy option </h2> </a> <p>
+ 
+ 
+  Copy all descriptors from `IN' image to `OUT' image.
+<p>
+ 
+  There are two options:-
+<p>
+<ul>
+<li>    If a descriptor to be copied from the input image exist in
+    the output image, should the descriptor from the input image
+    overwrite that already in the output image?
+<p>
+ 
+<li>    If this overwriting is to take place, should multi-line
+    descriptors which are overwritten be entirely deleted?
+</ul><p>
+ 
+<hr>
+ <h2> 2 <a name="delete_option"> Delete option </h2> </a> <p>
+ 
+ 
+  Allows all or some descriptor items to be deleted from an image.
+<p>
+ 
+  If only some are to be deleted, then the `LOOP' parameter is
+  set to `yes', then the program loops, asking for new descriptor
+  names until a `null' response is input. If it is set to `no',
+<p>
+ 
+<hr>
+ <h2> 3 <a name="list_option"> List option </h2> </a> <p>
+ 
+ 
+  It types the size; pixel value scale and zero; title.
+<p>
+ 
+  Then it asks whether you want all descriptors output or just specificied
+  ones. If you want all, it outputs them. If you want specific ones, it
+  asks for the name of a specific descriptor. You give it, and it types
+  out the descriptors value. It then repeats asking for names until you
+  reply with a null (' ` or <carriage return>).
+<p>
+ 
+  You can specify that the program looks at only one descriptor before
+  exiting. This mode is chosen with the `ALL&#95 LIST=no' and `ONLYONE=yes'
+  setting of the parameters.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="write_option"> Write option </h2> </a> <p>
+ 
+ 
+  Allows descriptor items to be overwritten with new information, or
+  inserted if they were not present, into an image.
+<p>
+ 
+  If the `LOOP' parameter is set to `yes', then the program loops,
+  asking for new descriptor names until a `null' response is input.
+  If it is set to `no', then only one descriptor is asked for.
+<p>
+ 
+<hr>
+ <h2> 5 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 5.1 <a href="#all_del"> All&#95 del </a>
+<li> 5.2 <a href="#all_list"> All&#95 list </a>
+<li> 5.3 <a href="#delete"> Delete </a>
+<li> 5.4 <a href="#format"> Format </a>
+<li> 5.5 <a href="#in"> In </a>
+<li> 5.6 <a href="#loop"> Loop </a>
+<li> 5.7 <a href="#more"> More </a>
+<li> 5.8 <a href="#name"> Name </a>
+<li> 5.9 <a href="#onlyone"> Onlyone </a>
+<li> 5.10 <a href="#option"> Option </a>
+<li> 5.11 <a href="#out"> Out </a>
+<li> 5.12 <a href="#over"> Over </a>
+<li> 5.13 <a href="#paging"> Paging </a>
+<li> 5.14 <a href="#value"> Value </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 5.1 <a name="all_del"> All&#95 del </h2> </a> <p>
+ 
+  (Default - `all'          <br> Choice - `all:some')
+<p>
+ 
+  In deleting descriptors, delete them all, or just some?
+<p>
+ 
+<hr>
+ <h2> 5.2 <a name="all_list"> All&#95 list </h2> </a> <p>
+ 
+  (Default - `some'          <br> Choice - `all:some')
+<p>
+ 
+  In the listing, do you want all the descriptors output (`all'),
+  or just specified one or ones (`some')?
+<p>
+ 
+<hr>
+ <h2> 5.3 <a name="delete"> Delete </h2> </a> <p>
+ 
+  (Default - `yes'          <br> Choice - `yes:no')
+<p>
+ 
+  In copying descriptors from input image to output image, and
+  if a descriptor to be copied from the input image exists in
+  the output image, the descriptor from the input image is to
+  overwrite that already in the output image, then:-
+<p>
+ 
+  Should multi-line descriptors which are overwritten be
+  entirely deleted?
+<p>
+ 
+<hr>
+ <h2> 5.4 <a name="format"> Format </h2> </a> <p>
+ 
+  (Default   - `char'       <br> Choice - `char:int:real')
+<p>
+ 
+  In writing a descriptor, what format should it be in?
+  A text string; an integer value; a real value?
+<p>
+ 
+<hr>
+ <h2> 5.5 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image file.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+<p>
+ 
+<hr>
+ <h2> 5.6 <a name="loop"> Loop </h2> </a> <p>
+ 
+  (Default - `yes'        <br> Choice - `yes:no')
+<p>
+ 
+  If `yes', then the program loops, asking for new descriptor names
+  until a `null' response is input. If `no', then only one
+  descriptor is asked for.
+<p>
+ 
+<hr>
+ <h2> 5.7 <a name="more"> More </h2> </a> <p>
+ 
+  (Default - `yes'      <br> Choice - `yes:no')
+<p>
+ 
+  Used listing descriptors, and splitting the listing into pages.
+<p>
+ 
+  Do you want any more output of these descriptors (if doing all of
+  them) or of this descriptor (if doing single specific descriptors)?
+<p>
+ 
+<hr>
+ <h2> 5.8 <a name="name"> Name </h2> </a> <p>
+ 
+  (Default - ` `       <br> Choice - any)
+<p>
+ 
+  Name of descriptor you want to use (list;write;delete).
+<p>
+ 
+  If you reply with a null (' ` or <carriage return>), it ceases
+  asking for descriptor names.
+<p>
+ 
+<hr>
+ <h2> 5.9 <a name="onlyone"> Onlyone </h2> </a> <p>
+ 
+  (Default - `yes'      <br> Choice - `yes:no')
+<p>
+ 
+  Do you want the program to look at only one descriptor before
+  exiting?
+<p>
+ 
+  This option is only asked for if you are listing descriptors, and
+  only listing some.
+<p>
+ 
+<hr>
+ <h2> 5.10 <a name="option"> Option </h2> </a> <p>
+ 
+  (Default - `list'         <br> Choice - `copy:delete:list:write' )
+<p>
+ 
+  Choose one of the options.
+<p>
+<pre>
+  Option   Function
+  ------   --------
+  Copy     Copy descriptors from one image to another
+  Delete   Delete a descriptor(s) from an image
+  List     List descriptor(s) in an image
+  Write    Write descriptors from keyboard into image
+</pre><p>
+ 
+<hr>
+ <h2> 5.11 <a name="out"> Out </h2> </a> <p>
+ 
+  (default - null)
+<p>
+ 
+  Output image for `copy' option. This image is actually both
+  input and output.
+<p>
+ 
+  The image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+<p>
+ 
+<hr>
+ <h2> 5.12 <a name="over"> Over </h2> </a> <p>
+ 
+  (Default - `yes'        <br> Choice - `yes:no')
+<p>
+ 
+  In copying descriptors, overwrite existing values where there
+  is an existing descriptor of the same name.
+<p>
+ 
+<hr>
+ <h2> 5.13 <a name="paging"> Paging </h2> </a> <p>
+ 
+  (Default - `no'      <br> Choice - `yes:no')
+<p>
+ 
+  When listing out descriptors, should the listing halt every 20
+  descriptors to give you a chance to read them.? (You then
+  carry on with the `MORE' parameter.)
+<p>
+ 
+<hr>
+ <h2> 5.14 <a name="value"> Value </h2> </a> <p>
+ 
+  (Default - null           <br> Choice - any)
+<p>
+ 
+  The character string containing the descriptor, when `writing'
+  descriptors.
+<p>
+ 
+  If you have input, via the `FORMAT' parameter, that the descriptor
+  is to have a character string, then this is put there.
+  If it is `real', then it is turned into a real number before
+  being put, and if an `integer', turned into an integer.
+<p>
+ 
+<hr>
+ <h2> 6 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1991 June
+<p>
+ 
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

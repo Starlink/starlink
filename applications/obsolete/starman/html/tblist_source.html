@@ -1,0 +1,1079 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBLIST
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBLIST
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tblist_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tblist">
+t_tblist  </a>  Make an ASCII file of a table       <br>
+<a href="#tbli_short">
+tbli_short  </a>  Short output of table       <br>
+<a href="#tbli_all">
+tbli_all  </a>  All columns floating formatted output of table       <br>
+<a href="#tbli_allhead">
+tbli_allhead  </a>  Put out all columns floating format header       <br>
+<a href="#tbli_wri">
+tbli_wri  </a>  Write to output channel number 1       <br>
+<a href="#tbli_form">
+tbli_form  </a>  Floating formatted output of table       <br>
+<a href="#tbli_formhead">
+tbli_formhead  </a>  Put out floating format header       <br>
+<a href="#tbli_dohead">
+tbli_dohead  </a>  Put header out in standard format       <br>
+<a href="#tbli_fixform">
+tbli_fixform  </a>  Fixed formatted output of table       <br>
+<a href="#tbli_fixhead">
+tbli_fixhead  </a>  Put out fixed format header       <br>
+<a href="#tbli_lintidy">
+tbli_lintidy  </a>  Tidy a line       <br>
+<a href="#tblist">
+tblist  </a>  Type and/or put in file the contents of a table       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C    TBLIST.FOR
+C
+C    Contains:-
+C
+C T_TBLIST       Make an ASCII file of a table
+C TBLI_SHORT     Short output of table
+C TBLI_ALL       All columns floating formatted output of table
+C TBLI_ALLHEAD   Put out all columns floating format header
+C TBLI_FORM      Floating formatted output of table
+C TBLI_WRI       Write to output channel number 1
+C TBLI_FORMHEAD  Put out floating format header
+C TBLI_DOHEAD    Put header out in standard format
+C TBLI_FIXFORM   Fixed formatted output of table
+C TBLI_FIXHEAD   Put out fixed format header
+C TBLI_LINTIDY   Tidy a line
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tblist"> T_TBLIST  </a>-- Make an ASCII file of a table
+C   For a fuller description see TBLIST.HLP
+C
+C   alan penny                     ral           1991 May
+
+      subroutine t_tblist ()
+
+      implicit none
+      include 'tblist.inc'
+      include 'STARMAN_INC'
+      include 'ST_TABLE_INC'
+C--
+      integer ip, ierr, iv, k, kmode
+      character file*80, text*80
+Cbegin
+
+
+      call optabr ( 'IN', ip, TBVX, TBY, .false., ierr )		!Obtain input table
+      if ( ierr.ne.0 ) then
+         ST_FAILED = .true.
+         return
+      endif
+      TBX = TBVX - 5
+
+      call gtdesc ( 'IN', 'TITLE', text, ' ', iv, ierr ) 		!Type summary
+      call pargc ( text )
+      call printd ( 'Title is:  %c' )
+      call pargi ( TBX )
+      call pargi ( TBY )
+      call printd ( 'No of Columns - %d  ; No of Rows - %d' )
+      call printo ( ' ' )
+
+      call get1c ( 'OUT', file, ' ', .true. )				!Get output file name
+      if ( ST_FAILED ) return
+      DOFILE = .true.
+      if ( file.eq.' ' ) DOFILE = .false.
+
+      call get1b ( 'TYPING', DOTYPE, .true. )				!Get if typing as well
+      if ( ST_FAILED ) return
+
+      if ( .not.DOFILE .and. .not.DOTYPE ) return
+
+      call get_job ( 'OUTMODE', 'short:full:fixform:form:header', 	!Get mode
+     +               kmode, 1, text, 0 )
+      if ( ST_FAILED ) return
+
+      k = 2
+      if ( kmode.eq.2 ) k = 1
+      if ( kmode.ne.5 ) call get_job ( 'HEADER', 'full:short:none', 	!Get header mode
+     +                                 DOHEAD, k, text, 0 )
+      if ( ST_FAILED ) return
+
+      if ( DOFILE ) open ( unit=1, file=file, status='NEW', 		!Open file
+     +                     form='FORMATTED' )
+
+      if ( kmode.eq.1 ) then						!Do the work
+         call tbli_short ( %val(ip) )
+      elseif ( kmode.eq.2 ) then
+         call tbli_all ( %val(ip) )
+      elseif ( kmode.eq.3 ) then
+         call tbli_fixform ( %val(ip) )
+      elseif ( kmode.eq.4 ) then
+         call tbli_form ( %val(ip) )
+      else
+         call tbli_dohead ( TBX, 2 )
+      endif
+
+      if ( DOFILE ) close ( 1 )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_short"> TBLI_SHORT  </a>-- Short output of table
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_short ( tb )
+
+      implicit none
+      include 'tblist.inc'
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real         tb(TBVX,TBY)		!i: Input table
+C--
+      real   rv(3)
+      integer j, k, n, iv, ierr, klen, lens, kn
+      character title*50, text*75, texta*75, name*20, textd*70,
+     +          head*20, textb*75
+      character*12 textc(3)
+      character*1 dash(20)
+      data dash / 20*'-' /
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      n = min(3,TBX)
+
+      if ( DOHEAD.eq.1 ) then						!Get headers
+         NCOL(1) = 1
+         NCOL(2) = 2
+         NCOL(3) = 3
+         call tbli_dohead ( n, 1 )
+      elseif ( DOHEAD.eq.2 ) then
+
+         call gtdesc ( 'IN', 'TITLE', title, ' ', iv, ierr ) 		!Get title
+         text = 'Title is:  '//title
+
+         texta = '      Name             '	
+         textb = '      ----             '
+         kn = 24
+         do k = 1, n
+            call gthead ( 'IN', k, head, ierr )
+            call lbgone ( head )
+            write ( texta(kn:), '(a20)' ) head
+            klen = lens(head)
+            write ( textb(kn:), '(20a1)' ) (dash(j),j=1,klen)
+            kn = kn + 16
+         enddo
+
+         if ( DOTYPE ) then
+            call printo ( text )
+            call printo ( ' ' )
+            call printo ( texta )
+            call printo ( textb )
+         endif
+         if ( DOFILE ) then
+            call tbli_wri ( text )
+            write ( 1, '(1x,'' '')' )
+            call tbli_wri ( texta )
+            call tbli_wri ( textb)
+         endif
+
+      endif
+
+      do k = 1, TBY							!Type out lines				
+         call namegt ( tb, TBVX, TBY, k, name )				! with names and up to 3 values
+         do j = 1, n
+            rv(j)= tb((5+j),k)
+            call valform ( rv(j), textc(j) )
+         enddo
+         write ( textd, '(1x,a20,3(2x,a12,2x))' ) name,(textc(j),j=1,n)
+         if ( DOTYPE ) call printo ( textd )
+         if ( DOFILE ) write ( 1, '(1x,a70)' ) textd
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_all"> TBLI_ALL  </a>-- All columns floating formatted output of table
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_all ( tb )
+
+      implicit none
+      include 'tblist.inc'
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	   tb(TBVX,TBY)		!i: Input table
+C--
+      integer k, j, jj, ka, kn
+      real    rv
+      character name*20, text*80, textc*12
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1i ( 'NUMNAME', NUMID, 12, 0, 20 )			!Get no of characters in name
+      if ( ST_FAILED ) return
+
+      if ( DOHEAD.eq.1 ) then						!Get headers
+         call tbli_dohead ( TBX, 2 )
+      elseif ( DOHEAD.eq.2 ) then
+         call tbli_allhead
+      endif
+
+      do k = 1, TBY							!Print entries
+
+         call namegt ( tb, TBVX, TBY, k, name )				!Load name
+         text  = ' '
+         if ( NUMID.ne.0 ) text = name(1:NUMID)
+         kn = 1 + NUMID + 2
+
+         do j = 1, min(4,TBX)						!Load values
+            rv = tb((5+j),k)
+            call valform ( rv, textc )
+            text(kn:) = textc
+            kn = kn + 14
+         enddo
+
+         if ( DOTYPE ) call printo ( text )				!Print line
+         if ( DOFILE ) call tbli_wri ( text )
+
+         text = ' '							!Other rows of values
+         jj = TBX - 4
+         j = 1
+         do while ( jj.gt.0 )
+            kn = 1 + NUMID + 2
+            do ka = 1, min(jj,4)
+               rv = tb((5+ka+j*4),k)
+               call valform ( rv, textc )
+               text(kn:) = textc
+               kn = kn + 14
+            enddo
+            if ( DOTYPE ) call printo ( text )
+            if ( DOFILE ) call tbli_wri ( text )
+
+            jj = jj - 4
+            j = j + 1
+         enddo
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_allhead"> TBLI_ALLHEAD  </a>-- Put out all columns floating format header
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_allhead ( )
+
+      implicit none
+      include 'tblist.inc'
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+C--
+      integer k, iv, ierr, j, jj, jk, ka, kn, klen, klena(4)
+      character head*20, title*70, text*80, atext*80, btext*80
+      character*1 dash(20)
+      data dash / 20*'-' /
+      integer lens
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gtdesc ( 'IN', 'TITLE', title, ' ', iv, ierr )		!Get title
+      text = 'Title is:  '//title
+
+      atext = ' '							!Type headers
+      if ( NUMID.ne.0 ) atext = 'Name'
+
+      kn = 1 + NUMID + 2						!1st row of headers
+      do ka = 1, min(TBX,4)
+         call gthead ( 'IN', ka, head, ierr )
+         call lbgone ( head )
+         write ( atext(kn:), '(a12)' ) head(1:12)
+         klena(ka) = lens(head(1:12))
+         kn = kn + 14
+      enddo
+      if ( DOTYPE ) then
+         call printo ( text )
+         call printo ( ' ' )
+         call printo ( atext )
+      endif
+      if ( DOFILE ) then
+         call tbli_wri ( text )
+         write ( 1, '(1x,'' '')' )
+         call tbli_wri ( atext )
+      endif
+
+      atext = ' '							!Other rows of headers
+      jj = TBX - 4
+      j = 1
+      do while ( jj.gt.0 )
+         kn = 1 + NUMID + 2
+         do ka = 1, min(jj,4)
+            k = ka + 4*j
+            call gthead ( 'IN', k, head, ierr )
+            call lbgone ( head )
+            write ( atext(kn:), '(a12)' ) head(1:12)
+            klen = lens(head(1:12))
+            klena(ka) = max(klena(ka),klen)
+            kn = kn + 14
+         enddo
+         if ( DOTYPE ) call printo ( atext )
+         if ( DOFILE ) call tbli_wri ( atext )
+
+         jj = jj - 4
+         j = j + 1
+      enddo
+
+      btext = ' '						!dashes delow headers
+      if ( NUMID.ne.0 ) btext = '----'
+
+      kn = 1 + NUMID + 2
+      do k = 1, min(TBX,4)
+         jk = klena(k)
+         write ( btext(kn:), '(12a1)' ) (dash(j),j=1,jk)
+         kn = kn + 14
+      enddo
+
+      if ( DOTYPE ) call printo ( btext )
+      if ( DOFILE ) call tbli_wri ( btext )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_wri"> TBLI_WRI  </a>-- Write to output channel number 1
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_wri ( text )
+
+      implicit none
+      include 'tblist.inc'
+      include 'STARMAN_INC'
+
+      character*80    text		!i: Text to output
+C--
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      if ( NUMID.le.12 ) then
+         write ( 1, '(1x,a72)' ) text(1:72)
+      else
+         write ( 1, '(1x,a80)' ) text
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_form"> TBLI_FORM  </a>-- Floating formatted output of table
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_form ( tb )
+
+      implicit none
+      include 'tblist.inc'
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	   tb(TBVX,TBY)		!i: Input table
+C--
+      integer      nmax
+      parameter    ( nmax=15 )
+
+      integer k, kx, j, jj, ka, kn
+      real    rv
+      logical more
+      character name*20, texta*1, textb*2, text*80, textc*12, ntext*10
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1i ( 'NUMNAME', NUMID, 12, 0, 20 )			!Get no of characters in name
+      if ( ST_FAILED ) return
+
+      kx = 0								!Get which columns and format of numbers
+      more = .true.
+      do while ( kx.lt.nmax .and. more )
+         kx = kx + 1
+
+         if ( kx.lt.10 ) then
+            write ( texta, '(i1)' ) kx
+            ntext = 'NCOL'//texta
+         else
+            write ( textb, '(i2)' ) kx
+            ntext = 'NCOL'//textb
+         endif
+         j = min(kx,TBX)
+         call get1i ( ntext, NCOL(kx), j, 0, TBX )
+         if ( ST_FAILED ) return
+         if ( NCOL(kx).eq.0 ) then
+            more = .false.
+            kx = kx - 1
+         else
+            call printo ( ' ' )
+         endif
+
+      enddo
+      if ( kx.lt.1 ) return
+
+      if ( DOHEAD.eq.1 ) then						!Get headers
+         call tbli_dohead ( kx, 1 )
+      elseif ( DOHEAD.eq.2 ) then
+         call tbli_formhead ( kx )
+      endif
+
+      do k = 1, TBY							!Print entries
+
+         call namegt ( tb, TBVX, TBY, k, name )				!Load name
+         text  = ' '
+         if ( NUMID.ne.0 ) text = name(1:NUMID)
+         kn = 1 + NUMID
+
+         do j = 1, min(4,kx)						!Load values
+            rv = tb((5+NCOL(j)),k)
+            call valform ( rv, textc )
+            text(kn:) = textc
+            kn = kn + 14
+         enddo
+
+         if ( DOTYPE ) call printo ( text )				!Print line
+         if ( DOFILE ) call tbli_wri ( text )
+
+         text = ' '							!Other rows of values
+         jj = kx - 4
+         j = 1
+         do while ( jj.gt.0 )
+            kn = 1 + NUMID + 2
+            do ka = 1, min(jj,4)
+               rv = tb((5+NCOL(ka+j*4)),k)
+               call valform ( rv, textc )
+               text(kn:) = textc
+               kn = kn + 14
+            enddo
+            if ( DOTYPE ) call printo ( text )
+            if ( DOFILE ) call tbli_wri ( text )
+
+            jj = jj - 4
+            j = j + 1
+         enddo
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_formhead"> TBLI_FORMHEAD  </a>-- Put out floating format header
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_formhead ( kx )
+
+      implicit none
+      include 'tblist.inc'
+      include 'STARMAN_INC'
+
+      integer     kx		!i: Number of columns to output
+
+C--
+      integer k, iv, ierr, j, jj, jk, ka, kn, klen, klena(4)
+      character title*70, head*20, text*80, atext*80, btext*80
+      character*1 dash(20)
+      data dash / 20*'-' /
+      integer lens
+      external lens
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gtdesc ( 'IN', 'TITLE', title, ' ', iv, ierr )		!Get title
+      text = 'Title is:  '//title
+
+      atext = ' '							!Type headers
+      if ( NUMID.ne.0 ) atext = 'Name'
+
+      kn = 1 + NUMID + 2						!1st row of headers
+      do ka = 1, min(kx,4)
+         k = NCOL(ka)
+         call gthead ( 'IN', k, head, ierr )
+         call lbgone ( head )
+         write ( atext(kn:), '(a12)' ) head(1:12)
+         klena(ka) = lens(head(1:12))
+         kn = kn + 14
+      enddo
+      if ( DOTYPE ) then
+         call printo ( text )
+         call printo ( ' ' )
+         call printo ( atext )
+      endif
+      if ( DOFILE ) then
+         call tbli_wri ( text )
+         write ( 1, '(1x,'' '')' )
+         call tbli_wri ( atext )
+      endif
+
+      atext = ' '							!Other rows of headers
+      jj = kx - 4
+      j = 1
+      do while ( jj.gt.0 )
+         kn = 1 + NUMID + 2
+         do ka = 1, min(jj,4)
+            k = NCOL(ka+4*j)
+            call gthead ( 'IN', k, head, ierr )
+            call lbgone ( head )
+            write ( atext(kn:), '(a12)' ) head(1:12)
+            klen = lens(head(1:12))
+            klena(ka) = max(klena(ka),klen)
+            kn = kn + 14
+         enddo
+         if ( DOTYPE ) call printo ( atext )
+         if ( DOFILE ) call tbli_wri ( atext )
+
+         jj = jj - 4
+         j = j + 1
+      enddo
+
+      btext = ' '							!Dashes delow headers
+      if ( NUMID.ne.0 ) btext = '----'
+
+      kn = 1 + NUMID + 2
+      do k = 1, min(kx,4)
+         jk = klena(k)
+         write ( btext(kn:), '(12a1)' ) (dash(j),j=1,jk)
+         kn = kn + 14
+      enddo
+
+      if ( DOTYPE ) call printo ( btext )
+      if ( DOFILE ) call tbli_wri ( btext )
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_dohead"> TBLI_DOHEAD  </a>-- Put header out in standard format
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_dohead ( kx, kopt )
+
+      implicit none
+      include 'tblist.inc'
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      integer      kx		!i: No of columns to output
+      integer      kopt		!i: Selected (1) or all (2) columns flag
+C--
+      integer iv, ierr, k, count, nval, nline
+      logical more
+      character text*80, title*50, head*20, descr*80
+      character*80 texta(16384)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gtdesc ( 'IN', 'TITLE', title, ' ', iv, ierr )		!Get title
+      text = 'Title is: '//title
+      if ( DOTYPE ) call printo ( text )
+      if ( DOFILE ) call tbli_wri ( text )
+
+      write ( text, '(''Columns = '',i7)' ) kx
+      if ( DOTYPE ) call printo ( text )
+      if ( DOFILE ) call tbli_wri ( text )
+
+      write ( text, '(''Rows =    '',i7)' ) TBY
+      if ( DOTYPE ) call printo ( text )
+      if ( DOFILE ) call tbli_wri ( text )
+
+      if ( kopt.eq.1 ) then
+         do k = 1, kx
+            call gthead ( 'IN', NCOL(k), head, ierr )
+            write ( text, '(''HEAD'',i3.3,''   '',a)' ) k, head
+            if ( DOTYPE ) call printo ( text )
+            if ( DOFILE ) call tbli_wri ( text )
+         enddo
+      else
+         do k = 1, TBX
+            call gthead ( 'IN', k, head, ierr )
+            write ( text, '(''HEAD'',i3.3,''   '',a)' ) k, head
+            if ( DOTYPE ) call printo ( text )
+            if ( DOFILE ) call tbli_wri ( text )
+         enddo
+      endif
+
+      more = .true.							!Get number of other descriptors
+      count = 0
+      nval = 1
+      nline = 0
+      do while ( more )
+         count = count + nval
+         call gtdesn ( 'IN', count, descr, ierr )
+         if ( ierr.ne.0 ) then
+            more = .false.
+         else
+            call chartoi ( descr(5:7), iv, ierr )
+            if ( (descr(1:5).ne.'NITEM') .and.
+     +           (descr(1:6).ne.'LSTLEN') .and.
+     +           (descr(1:5).ne.'TITLE') .and.
+     +           (descr(1:4).ne.'HEAD' .or. ierr.ne.0) ) then
+               call gtdesc ( 'IN', descr, texta, ' ', nval, ierr )
+               nline = nline + nval
+            endif
+         endif
+      enddo
+
+      write ( text, '(''DesNum  = '',i7)' ) nline			!Say how many descriptors
+      if ( DOTYPE ) call printo ( text )
+      if ( DOFILE ) call tbli_wri ( text )
+
+      more = .true.							!Put out descriptors
+      count = 0
+      nval = 1
+      do while ( more )
+         count = count + nval
+         call gtdesn ( 'IN', count, descr, ierr )
+         if ( ierr.ne.0 ) then
+            more = .false.
+         else
+            call chartoi ( descr(5:7), iv, ierr )
+            if ( (descr(1:5).ne.'NITEM') .and.
+     +           (descr(1:6).ne.'LSTLEN') .and.
+     +           (descr(1:5).ne.'TITLE') .and.
+     +           (descr(1:4).ne.'HEAD' .or. ierr.ne.0) ) then
+               call gtdesc ( 'IN', descr, texta, ' ', nval, ierr )
+               do k = 1, nval
+                  if ( k.eq.1 ) then
+                     text = descr(1:8)//'  '//texta(k)(1:68)
+                  else
+                     text = '        '//'  '//texta(k)(1:68)
+                  endif
+                  if ( DOTYPE ) call printo ( text )
+                  if ( DOFILE ) call tbli_wri ( text )
+               enddo
+            endif
+         endif
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_fixform"> TBLI_FIXFORM  </a>-- Fixed formatted output of table
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_fixform ( tb )
+
+      implicit none
+      include 'tblist.inc'
+      include 'ST_TABLE_INC'
+      include 'STARMAN_INC'
+
+      real	   tb(TBVX,TBY)		!i: Input table
+C--
+      integer k, kx, j, ka, klen, kk, knum, ks, ke, kl
+      real    rv
+      logical more
+      character*7 forcha(16), forchb(16)
+      character btext*10, atext*10, ntext*10, name*20, forin*7,
+     +          forinb*13, texta*4000, textb*200, text*80
+
+      integer      nmax
+      parameter    ( nmax=15 )
+      real         val(nmax)
+
+      real trunc
+      external trunc
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call get1i ( 'NUMNAME', NUMID, 12, 0, 20 )			!Get no of characters in name
+      if ( ST_FAILED ) return
+
+      kx = 0								!Get which columns and format of numbers
+      more = .true.
+      do while ( kx.lt.nmax .and. more )
+         kx = kx + 1
+
+         if ( kx.lt.10 ) then
+            write ( text, '(i1)' ) kx
+            ntext = 'NCOL'//text
+            btext = 'NBEF'//text
+            atext = 'NAFT'//text
+         else
+            write ( text, '(i2)' ) kx
+            ntext = 'NCOL'//text
+            btext = 'NBEF'//text
+            atext = 'NAFT'//text
+         endif
+         j = min(kx,TBX)
+         call get1i ( ntext, NCOL(kx), j, 0, TBX )
+         if ( ST_FAILED ) return
+         if ( NCOL(kx).eq.0 ) then
+            more = .false.
+            kx = kx - 1
+         else
+            call get1i ( btext, nbef(kx), 4, 0, 100 )
+            if ( ST_FAILED ) return
+            call get1i ( atext, naft(kx), 2, 0, 100 )
+            if ( ST_FAILED ) return
+            call printo ( ' ' )
+         endif
+
+      enddo
+      if ( kx.lt.1 ) return
+
+      if ( DOHEAD.eq.1 ) then						!Get headers
+         call tbli_dohead ( kx, 1 )
+      elseif ( DOHEAD.eq.2 ) then
+         call tbli_fixhead ( kx )
+      endif
+
+
+      forcha(1) = '(20a1,'						!Load format
+
+      do k = 1, kx
+         ka = nbef(k) + naft(k) + 2
+         write ( forin, '(''f'',i2,''.'',i2,'','')' ) ka, naft(k)
+         forcha(k+1) = forin
+      enddo
+      forcha(kx+1)(7:7) = ')'
+
+      forchb(1) = '(20a1,'
+      do k = 1, kx
+         ka = nbef(k) + naft(k) + 2
+         write ( forin, '(''f'',i2,''.'',i2,'','')' ) ka, naft(k)
+         forchb(k+1) = forin
+      enddo
+      forchb(kx+1)(7:7) = ')'
+
+      do k = 1, TBY							!Print entries
+
+         call namegt ( tb, TBVX, TBY, k, name )
+
+         do j = 1, kx
+            rv = tb((5+NCOL(j)),k)
+            val(j) = trunc(rv,nbef(j))
+         enddo
+
+         if ( dotype ) then
+            write ( texta, forcha ) (name(j:j),j=1,20), (val(j),j=1,kx)
+            call tbli_lintidy ( texta, 200, NUMID, naft, 1, textb, klen)
+            knum = 1 + ((klen-1)/70)
+            do kk = 1, knum
+               ks = 1 + (kk-1)*70
+               ke = min(klen,(ks+69))
+               kl = ke - ks + 1
+               write ( forinb, '(''(1h ,'',i3.3,''a1)'')' ) kl
+               write ( text, forinb ) (textb(j:j),j=ks,ke)
+               call printo ( text )
+            enddo
+         endif
+         if ( dofile ) then
+            write ( texta, forchb ) (name(j:j),j=1,20), (val(j),j=1,kx)
+            call tbli_lintidy ( texta, 200, NUMID, naft, 1, textb, klen)
+            write ( forinb, '(''(1h ,'',i3.3,''a1)'')' ) klen
+            write ( 1, forinb ) (textb(j:j),j=1,klen)
+         endif
+
+      enddo
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_fixhead"> TBLI_FIXHEAD  </a>-- Put out fixed format header
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_fixhead ( kx )
+
+      implicit none
+      include 'tblist.inc'
+      include 'STARMAN_INC'
+
+      integer     kx		!i: Number of columns to output
+
+C--
+      integer nmax
+      parameter ( nmax=15 )
+      integer j, k, ka, kb, kc, ke, kcc(nmax), kcd(nmax), klen, iv,
+     +        ierr, kk, knum, ks, kl
+      character*13 forchc(18), forchd(18), forina, forinb
+      character text*80, title*50, texta*4000, textb*200
+      character*20 head(nmax)
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      forchc(1) = '(5hIdent,'						!Load Header Formats
+      forchc(2) = '8hifier   ,'
+      if ( NUMID.lt.12 ) then
+         forchc(1) = '(5hName ,'
+         forchc(2) = '8h        ,'
+      endif
+      forchc(3) = '7h       ,'
+
+      do k = 1, kx
+         kc = nbef(k) + naft(k) + 1
+         if ( naft(k).eq.0 ) kc = kc -1
+         call gthead ( 'IN', k, head(k), ierr )
+         call lbgone ( head(k) )
+         call charln ( head(k), klen )
+         klen = max(1,klen)
+         kc = min(klen,kc)
+         kcc(k) = kc
+         kb = nbef(k) - kc + 1
+         kb = max(1,kb)
+         ke = nbef(k) + naft(k) + 2 - kb - kc
+         if ( naft(k).eq.0 ) ke = ke - 1
+
+         if ( ke.gt.0 ) then
+            write ( forina, '(i2,''x,'',i2,''a1,'',i2,''x,'')' ) kb,
+     +                                                        kc, ke
+         else
+            write ( forina, '(i2,''x,'',i2,''a1,'')' ) kb, kc
+         endif
+         forchc(k+3) = forina
+      enddo
+      ka = kx + 3
+      forchc(ka)(13:13) = ')'
+
+      forchd(1) = '(5hIdent,'
+      forchd(2) = '8hifier   ,'
+      if ( NUMID.lt.12 ) then
+         forchd(1) = '(5hName ,'
+         forchd(2) = '8h        ,'
+      endif
+      forchd(3) = '7h       ,'
+
+      do k = 1, kx
+         kc = nbef(k) + naft(k) + 1
+         if ( naft(k).eq.0 ) kc = kc - 1
+         call gthead ( 'IN', k, head(k), ierr )
+         call lbgone ( head(k) )
+         call charln ( head(k), klen )
+         klen = max(1,klen)
+         kc = min(klen,kc)
+         kcd(k) = kc
+         kb = nbef(k) - kc + 1
+         kb = max(1,kb)
+         ke = nbef(k) + naft(k) + 2 - kb - kc
+         if ( naft(k).eq.0 ) ke = ke - 1
+         if ( ke.gt.0 ) then
+            write ( forina, '(i2,''x,'',i2,''a1,'',i2,''x,'')' ) kb,
+     +                                                         kc, ke
+         else
+            write ( forina, '(i2,''x,'',i2,''a1,'')' ) kb, kc
+         endif
+         forchd(k+3) = forina
+      enddo
+      ka = kx + 3
+      forchd(ka)(13:13) = ')'
+
+      call gtdesc ( 'IN', 'TITLE', title, ' ', iv, ierr )		!Get title
+
+      if ( dotype ) then						!Write headers
+         call printo ( ' ' )
+         text = 'Title is:-   '//title
+         call printo ( text )
+         call printo ( ' ' )
+         write ( texta, forchc ) ((head(k)(j:j),j=1,kcc(k)),k=1,kx)
+         call tbli_lintidy ( texta, 200, NUMID, naft, 0, textb, klen )
+         knum = 1 + ((klen-1)/70)
+         do kk = 1, knum
+            ks = 1 + (kk-1)*70
+            ke = min(klen,(ks+69))
+            kl = ke - ks + 1
+            write ( forinb, '(''(1h ,'',i3.3,''a1)'')' ) kl
+            write ( text, forinb ) (textb(j:j),j=ks,ke)
+            call printo ( text )
+         enddo
+      endif
+
+      if ( dofile ) then
+         text = ' Title is:-   '//title
+         write ( 1, '(a)' ) text
+         write ( 1, '(a)' ) ' '
+         write ( texta, forchd ) ((head(k)(j:j),j=1,kcd(k)),k=1,kx)
+         call tbli_lintidy ( texta, 200, NUMID, naft, 0, textb, klen)
+         write ( forinb, '(''(1h ,'',i3.3,''a1)'')'  ) klen
+         write ( 1, forinb ) (textb(j:j),j=1,klen)
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbli_lintidy"> TBLI_LINTIDY  </a>-- Tidy a line
+C
+C  alan penny                 ral                1990-06-15
+
+      subroutine tbli_lintidy ( texta, n, numid, naft, kw, textb,klen)
+
+      implicit none
+
+      character*(*) texta	!i: Input string
+      integer       n		!i:
+      integer       numid	!i:
+      integer       naft(15)	!i:
+      integer       kw		!i:
+      character*(*) textb	!o:
+      integer       klen	!
+C--
+      integer j, ja, k, kk, kpos(15)
+Cbegin
+
+
+      do j = 1, n
+         textb(j:j) = texta(j:j)
+      enddo
+
+      if ( kw.eq.1 ) then						!Strip redundant decimals
+
+         kk = 0
+         do k = 21, n
+            if ( kk.lt.15 .and. textb(k:k).eq.'.' ) then
+               kk = kk + 1
+               kpos(kk) = k
+            endif
+         enddo
+         if ( kk.ne.0 ) then
+            do k = kk, 1, -1
+               if ( naft(k).eq.0 ) then
+                  do j = kpos(k), n-1
+                     ja = j + 1
+                     textb(j:j) = textb(ja:ja)
+                  enddo
+               endif
+            enddo
+         endif
+
+      endif
+
+      if ( numid.ne.20 ) then						!Strip unwanted Identifier characters
+         kk = 20 - numid
+         do j = numid+1, n-kk
+            ja = j + kk
+            textb(j:j) = textb(ja:ja)
+         enddo
+         do j = n-kk+1, n
+            textb(j:j) = ' '
+         enddo
+      endif
+
+      call charln ( textb, klen )					!Find length
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tblist"> TBLIST  </a>-- Type and/or put in file the contents of a table
+C   See TBLIST.HLP for details
+C
+C         A.J.Penny                RAL               1991 May
+
+      subroutine tblist ( ierradam )
+
+      implicit none
+
+      integer      ierradam       !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tblist
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBLIST.INC for TBLIST.F
+
+      integer     nbef(1000)		! Number after decimal point
+      integer     ncol(1000)		! Order of columns to output
+      integer     naft(1000)		! Number before decimal point
+      integer     numid			! Number of characters in name to output
+      integer     dohead		! Output heading: standard format(1);short(2);none(3)
+
+      logical	  dotype		! Output table to console?
+      logical	  dofile		! Output table to file?
+
+      logical     tbl_dum1		!Dummy for 4*n logicals
+      logical     tbl_dum2		!Dummy for 4*n logicals
+
+      common / tblista /  nbef, ncol, naft, numid, dohead
+
+      common / tblistc / dotype, dofile, tbl_dum1,  tbl_dum2
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

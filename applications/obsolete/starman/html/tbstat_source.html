@@ -1,0 +1,405 @@
+<HTML><HEAD>
+<TITLE> Source Code for
+TBSTAT
+</TITLE>
+</HEAD> <BODY>
+
+<h1> Source Code for
+TBSTAT
+</h1>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and
+conditions apply. <br>
+<hr>
+
+Go to the Starman <a href="source_top.html#tbstat_source_back"> Source Code </a> Page at the pointer to this page.
+<hr>
+Starman general purpose subroutines called by this program
+can be found via the subroutine libraries and general
+include files, pointed to at the top of the
+<a href="source_top.html"> Source Code page. </a>
+<hr>
+Any include files are the end of the page. <p>
+Subroutines for this program:- <p>
+
+<a href="#t_tbstat">
+t_tbstat  </a>  Get statistics for one or two columns in tables       <br>
+<a href="#tbst_setup">
+tbst_setup  </a>  Load the default parameters       <br>
+<a href="#tbst_getdata">
+tbst_getdata  </a>  Get Table       <br>
+<a href="#tbst_docalc">
+tbst_docalc  </a>  Set up the calcs       <br>
+<a href="#tbst_dostat1">
+tbst_dostat1  </a>  Do the calcs for one column       <br>
+<a href="#tbst_dostat2">
+tbst_dostat2  </a>  Do the calcs for two columns       <br>
+<a href="#tbstat">
+ tbstat  </a>  (Program) Calculate statistics on one or two columns       <br>
+
+<HR>
+<pre>
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C This is TBSTAT.F
+C
+C It contains:-
+C
+C T_TBSTAT       Get statistics for one or two columns in tables
+C TBST_SETUP     Load the default parameters
+C TBST_GETDATA   Get Table
+C TBST_DOCALC    Set up the calcs
+C TBST_DOSTAT1   Do the calcs for one column
+C TBST_DOSTAT2   Do the calcs for two columns
+
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="t_tbstat"> T_TBSTAT  </a>-- Get statistics for one or two columns in tables
+C
+C         A J Penny            RAL            1991 May
+
+      subroutine t_tbstat ( )
+
+      implicit none
+C--
+Cbegin
+
+
+      call tbst_setup						!Set up parameters
+
+      call tbst_getdata						!Open a set of files
+
+      call tbst_docalc 						!Do the calcs
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbst_setup"> TBST_SETUP  </a>-- Load the default parameters
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbst_setup ( )
+
+      implicit none
+      include 'tbstat.inc'
+C--
+Cbegin
+
+
+      IPTAB1 = 1
+      IPTAB2 = 1
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbst_getdata"> TBST_GETDATA  </a>-- Get Table
+C
+C     a j penny                 ral               1991 May
+
+      subroutine tbst_getdata ( )
+
+      implicit none
+      include 'tbstat.inc'
+      include 'STARMAN_INC'
+C--
+      integer istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN1', IPTAB1, TBVX1, TBY1, .true., istat )
+      if ( istat.ne.0 ) ST_FAILED = .true.
+      if ( ST_FAILED ) return
+      TBX1 = TBVX1 - 5
+
+      call pargi ( TBX1 )
+      call pargi ( TBY1 )
+      call printd ( 'No of columns = %d :  No of rows = %d ' )
+
+      call get1i ( 'NCOL1', NCOL1, 1, 1, TBX1 )
+      if ( ST_FAILED ) return
+
+      call optabr ( 'IN2', IPTAB2, TBVX2, TBY2, .true., istat )
+      if ( ST_FAILED ) return
+      if ( istat.eq.0 ) then
+         ISTWO = .true.
+         if ( TBY2.ne.TBY1 ) then
+            call printo ( 'ERROR: Tables must be same length' )
+            ST_FAILED = .true.
+            if ( ST_FAILED ) return
+         else
+            TBX2 = TBVX2 - 5
+            call pargi ( TBX2 )
+            call pargi ( TBY2 )
+            call printd ( 'No of columns = %d :  No of rows = %d ' )
+            call get1i ( 'NCOL2', NCOL2, 1, 1, TBX2 )
+            if ( ST_FAILED ) return
+         endif
+      elseif ( istat.eq.2 ) then
+         ISTWO = .false.
+         IPTAB2 = IPTAB1
+         TBVX2 = TBVX1
+         TBY2 =TBY1
+         TBX2 = TBX1
+         NCOL2 = NCOL1
+      elseif ( istat.eq.3 ) then
+         ISTWO = .true.
+         IPTAB2 = IPTAB1
+         TBVX2 = TBVX1
+         TBY2 =TBY1
+         TBX2 = TBX1
+         call pargi ( TBX2 )
+         call pargi ( TBY2 )
+         call printd ( 'No of columns = %d :  No of rows = %d ' )
+         call get1i ( 'NCOL2', NCOL2, 1, 1, TBX2 )
+         if ( ST_FAILED ) return
+      else
+         ST_FAILED = .true.
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbst_docalc"> TBST_DOCALC  </a>-- Set up the calcs
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbst_docalc ( )
+
+      implicit none
+      include 'tbstat.inc'
+      include 'STARMAN_INC'
+C--
+      integer ipwa, ipwb, istat
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call gtwrkr ( 'A', TBY1, ipwa, istat )
+      call copfrr ( %val(IPTAB1), TBVX1, TBY1, (NCOL1+5), 1,
+     +              %val(ipwa), TBY1 )
+      if ( ISTWO ) then
+         call gtwrkr ( 'B', TBY1, ipwb, istat )
+         call copfrr ( %val(IPTAB2), TBVX2, TBY1, (NCOL2+5), 1,
+     +                 %val(ipwb), TBY1 )
+         call printo ( ' ' )
+         call printo ( '1st column' )
+         call tbst_dostat1 ( %val(ipwa), TBY1 )
+         call printo ( ' ' )
+         call printo ( '2nd column' )
+         call tbst_dostat1 ( %val(ipwb), TBY1 )
+         call printo ( ' ' )
+         call printo ( 'Combination of both' )
+         call tbst_dostat2 ( %val(ipwa), %val(ipwb), TBY1 )
+         call printo ( ' ' )
+      else
+         call printo ( ' ' )
+         call tbst_dostat1 ( %val(ipwa), TBY1 )
+         call printo ( ' ' )
+      endif
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbst_dostat1"> TBST_DOSTAT1  </a>-- Do the calcs for one column
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbst_dostat1 ( x, n )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer  n		!i: No of points
+      real     x(n)		!i: Input data
+C--
+      real av, std, stdm, amin, amax
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      call alimr ( x, n, amin, amax )
+
+      call aavgr ( x, n, av, std )
+      stdm = 0.0
+      if ( n.ge.3 ) stdm = std/(real(n)-2.0)
+
+      call pargi ( n )
+      call pargr ( amin )
+      call pargr ( amax )
+      call pargr ( av )
+      call pargr ( std )
+      call pargr ( stdm )
+      call printd ('No of entries = %d : Minimum = %f : Maximum = %f ')
+      call printd ('Mean = %f : Std dev = %f : Std dev of mean = %f ')
+
+
+      end
+
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbst_dostat2"> TBST_DOSTAT2  </a>-- Do the calcs for two columns
+C
+C    a j penny                      ral                  1991 may
+
+      subroutine tbst_dostat2 ( x, y, n )
+
+      implicit none
+      include 'STARMAN_INC'
+
+      integer  n		!i: No of points
+      real     x(n)		!i: Input data
+      real     y(n)		!i: Input data
+C--
+      double precision an, sx, sy, ssx, ssy, sxy, tx, ty,
+     +                 a, b, c, sd, sda, sdb, corrl, ax, ay
+      real    rv
+      integer k
+Cbegin
+
+
+      if ( ST_FAILED ) return
+
+      sx = 0.0d0
+      sy = 0.0d0
+      ssx = 0.0d0
+      ssy = 0.0d0
+      sxy = 0.0d0
+      tx = 0.0d0
+      ty = 0.0d0
+      an = n
+      if ( n.ge.1 ) then
+         do k = 1, n
+            tx = tx + x(k)
+            ty = ty + y(k)
+         enddo
+         ax = tx/an
+         ay = ty/an
+          do k = 1, n
+            sx = sx + (dble(x(k))-ax)
+            sy = sy + (dble(y(k))-ay)
+            ssx = ssx + (dble(x(k))-ax)*(dble(x(k))-ax)
+            ssy = ssy + (dble(y(k))-ay)*(dble(y(k))-ay)
+            sxy = sxy + (dble(x(k))-ax)*(dble(y(k))-ay)
+         enddo
+         b = sxy/ssx
+         a = ay - b*ax
+      else
+         a = 0.0d0
+         b = 0.0d0
+      endif
+
+      corrl = 0.0d0
+      if ( n.ge.2 ) then
+         if ( ssx.gt.0.0d0 .and. ssy.gt.0.0d0 ) then
+            corrl = sxy/sqrt(ssx*ssy)
+         endif
+      endif
+
+      sd = 0.0d0
+      sda = 0.0d0
+      sdb = 0.0d0
+      if ( n.ge.3 ) then
+         c = (ssy-((sxy*sxy)/ssx))/(an-2.0d0)
+         if ( c.gt.0.0d0 ) then
+            sd = sqrt(c)
+         else
+            sd = 0.0d0
+         endif
+         sdb = sd/sqrt(ssx)
+         sda = sd*((1.0d0/an)+((ax*ax)/ssx))
+      endif
+
+      call printo ( 'Y = A + BX  :assuming X errors = 0' )
+      rv = real(a)
+      call pargr ( rv )
+      rv = real(sda)
+      call pargr ( rv )
+      rv = real(b)
+      call pargr ( rv )
+      rv = real(sdb)
+      call pargr ( rv )
+      call printd  ( 'A = %f +/- %f : B = %f +/- %f ' )
+      rv = real(sd)
+      call pargr ( rv )
+      call printd ( 'Std dev of a Y value from line = %f ' )
+      rv = real(corrl)
+      call pargr ( rv )
+      call printd ( 'Correlation coefficent = %f ' )
+
+
+      end
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C <a name="tbstat">  TBSTAT  </a>-- (Program) Calculate statistics on one or two columns
+C   See TBSTAT.HLP for details
+C
+C      alan penny               RAL               1991 May
+
+      subroutine tbstat  ( ierradam )
+
+      implicit none
+
+      integer     ierradam            !o: ADAM error flag
+C--
+Cbegin
+
+      call starman_start
+
+      call t_tbstat
+
+      call starman_end ( ierradam )
+
+      end
+
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+C TBSTAT.INC for TBSTAT.F
+
+      logical    istwo		!Is one (F) or two (T) columns?
+
+      integer    iptab1		!Input table 1 pointer
+      integer    iptab2		!Input table 2 pointer
+      integer    tbvx1		!Input table 1 X size
+      integer    tby1		!Input table 1 Y size
+      integer    tbx1		!Input table 1 X size - 5
+      integer    tbvx2		!Input table 2X size
+      integer    tby2		!Input table 2Y size
+      integer    tbx2		!Input table 2X size - 5
+      integer    ncol1		!Column number in table 1
+      integer    ncol2		!Column number in table 2
+
+
+      logical    tb_dum1	!Dummy for 4*n logicals
+      logical    tb_dum2	!Dummy for 4*n logicals
+      logical    tb_dum3	!Dummy for 4*n logicals
+
+      common / tbstata / iptab1,  iptab2,    tbvx1,   tby1,  tbx1,
+     +                    tbvx2,    tby2,     tbx2,  ncol1, ncol2
+
+      common / tbstatb / istwo, tb_dum1, tb_dum2, tb_dum3
+
+
+
+</pre>
+
+<HR>
+
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Oct 23  </i>
+

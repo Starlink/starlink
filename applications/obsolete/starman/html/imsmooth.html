@@ -1,0 +1,244 @@
+<HTML> <HEAD>
+<TITLE> IMSMOOTH </TITLE>
+</HEAD> <BODY>
+ 
+<h1> IMSMOOTH - <br>
+ Smooth an image
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+  Smooth an image to make a new image.
+<p>
+ 
+  Smoothing by:-
+<p>
+<ul>
+<li> 'top-hat' in a rectangular box
+<li> median in a rectangular box
+<li> circular Gaussian profile in a rectangular box
+</ul><p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#imsmooth_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+
+<ul> 
+<li> 1 <a href="#method"> Method </a>
+<li> 2 <a href="#parameters"> Parameters </a>
+<li> 3 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="method"> Method </h2> </a> <p>
+ 
+  Method of smoothing:-
+<p>
+<dl>
+<dt><strong>   box <dt></strong>
+<dd>     Applies a 'top-hat' smoothing, running a rectangular
+           box over the image, calculating the average of this box,
+           and applying that value at the pixel. Clearly the box
+           must have sides of an odd number of pixels, so that the
+           box is centered on the pixel.
+<p>
+ 
+<dt><strong>   median  <dt></strong>
+<dd>       Applies a median smoothing, running a rectangular
+           box over the image, calculating the median of this box,
+           and applying that value at the pixel. Clearly the box
+           must have sides of an odd number of pixels, so that the
+           box is centered on the pixel.
+<p>
+ 
+<dt><strong>   gauss   <dt></strong>
+<dd>       Applies a Gaussian smoothing, running a rectangular
+           box over the image, calculating for the pixel at the centre
+           of the box what contribution it makes to the individual
+           pixels in the box, if were spread by a Gaussian point-spread-
+           function. (This is scaled so that the total contributions
+           to all the pixels in the box sum to the original pixel
+           value. Thus a flat image would give an identical output image.)
+           Clearly the box must have sides of an odd number of pixels, so
+           that the box is centered on the pixel.
+</dl><p>
+ 
+  The problem of the edge of the image, for both methods is dealt with
+  by assuming that the input image 'spreads' out beyond its limits, with
+  the values at the edges.
+<p>
+ 
+  `Invalid' pixels in the rectangular box are ignored, unless they
+  are all invalid, in which case the output value is set as invalid.
+<p>
+ 
+<hr>
+ <h2> 2 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 2.1 <a href="#box"> Box </a>
+<li> 2.2 <a href="#gbox"> Gbox </a>
+<li> 2.3 <a href="#gradius"> Gradius </a>
+<li> 2.4 <a href="#in"> In </a>
+<li> 2.5 <a href="#method"> Method </a>
+<li> 2.6 <a href="#out"> Out </a>
+<li> 2.7 <a href="#title"> Title </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 2.1 <a name="box"> Box </h2> </a> <p>
+ 
+  (Default - 3,3        <br> Range - 1 to max side of image)
+<p>
+ 
+  The XY size of the rectangular box sued in 'top-hat'
+  smoothing. The sides must have an odd number of pixels.
+<p>
+ 
+<hr>
+ <h2> 2.2 <a name="gbox"> Gbox </h2> </a> <p>
+ 
+  (Default - 10*rad,10*rad    <br> Range - 1 to max side of image)
+<p>
+ 
+  The XY size of the rectangular box sued in 'gaussian'
+  smoothing. The sides must have an odd number of pixels.
+<p>
+ 
+  'rad' here is the Gaussian radius of the smoothing function.
+<p>
+ 
+<hr>
+ <h2> 2.3 <a name="gradius"> Gradius </h2> </a> <p>
+ 
+  (Default - 2.0              <br> range - 1.0e-5 to 1.0e5)
+<p>
+ 
+ Radius of the Gaussian to use in the Gaussian smoothing.
+<p>
+ 
+ This is radius at which the profile is 1/e of its peak height.
+<p>
+ 
+<hr>
+ <h2> 2.4 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the input image file.
+<p>
+ 
+  The input image must be a standard Starman ADAM .SDF image, with
+  either `real' 32-bit real values, or `short' 16-bit integer values.
+  It can have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels.
+<p>
+ 
+<hr>
+ <h2> 2.5 <a name="method"> Method </h2> </a> <p>
+ 
+  (Default - 'box'         <br> Choice - 'gauss:box:median')
+<p>
+ 
+  Method of smoothing.
+<p>
+<dl>
+<dt><strong>   box <dt></strong>
+<dd>     Applies a 'top-hat' smoothing, running a rectangular
+           box over the image, calculating the average of this box,
+           and applying that value at the pixel. Clearly the box
+           must have sides of an odd number of pixels, so that the
+           box is centered on the pixel.
+<p>
+ 
+<dt><strong>   median  <dt></strong>
+<dd>       Applies a median smoothing, running a rectangular
+           box over the image, calculating the median of this box,
+           and applying that value at the pixel. Clearly the box
+           must have sides of an odd number of pixels, so that the
+           box is centered on the pixel.
+<p>
+ 
+<dt><strong>   gauss   <dt></strong>
+<dd>       Applies a Gaussian smoothing, running a rectangular
+           box over the image, calculating for the pixel at the centre
+           of the box what contribution it makes to the individual
+           pixels in the box, if were spread by a Gaussian point-spread-
+           function. (This is scaled so that the total contributions
+           to all the pixels in the box sum to the original pixel
+           value. Thus a flat image would give an identical output image.)
+           Clearly the box must have sides of an odd number of pixels, so
+           that the box is centered on the pixel.
+</dl><p>
+ 
+  The problem of the edge of the image, for both methods is dealt with
+  by assuming that the input image 'spreads' out beyond its limits, with
+  the values at the edges.
+<p>
+ 
+  `Invalid' pixels in the rectangular box are ignored, unless they
+  are all invalid, in which case the output value is set as invalid.
+<p>
+ 
+<hr>
+ <h2> 2.6 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The name of the new file containing the output image.
+<p>
+ 
+  The output image will be a standard Starman ADAM .SDF image, with
+  the same type as the input image, either `real' 32-bit real values,
+  or `short' 16-bit integer values.
+  It will have the `BSCALE' and `BZERO' values, and `magic pixel values'
+  indicating `bad' pixels, of the input image
+<p>
+ 
+<hr>
+ <h2> 2.7 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - input image title, or if null, 'Output from Imsmooth'
+   Choice  - any)
+<p>
+ 
+  Title to add to output image
+<p>
+ 
+ 
+<hr>
+ <h2> 3 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny  RAL             1994 July
+<p>
+ 
+ 
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

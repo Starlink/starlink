@@ -1,0 +1,962 @@
+<HTML> <HEAD>
+<TITLE> DIAGRAM - Plot CMDs and colour-colour diagrams</TITLE>
+</HEAD> <BODY>
+ 
+<h1> 
+DIAGRAM - <br>
+Plot CMDs and colour-colour diagrams
+</h1>
+ 
+ This plots out an HR or Two-Colour diagram from tables containing
+ star magnitude data. It can also output a file containing the
+ plotted values.
+<p>
+ 
+ There can be up to 48 input files open at once (if your computer set
+ up allows this. Many systems will have lower limits).
+<p>
+ 
+ 
+Go to <a href="intro.html#diagram_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#use"> Use </a>
+<li> 2 <a href="#method"> Method </a>
+<li> 3 <a href="#options"> Options </a>
+<li> 4 <a href="#colour_equation_and_zero_point"> Colour equation and zero point </a>
+<li> 5 <a href="#cursor"> Cursor </a>
+<li> 6 <a href="#input"> Input </a>
+<li> 7 <a href="#input_controls"> Input controls </a>
+<li> 8 <a href="#option_input"> Option input </a>
+<li> 9 <a href="#plotting"> Plotting </a>
+<li> 10 <a href="#output table"> Output table </a>
+<li> 11 <a href="#parameters"> Parameters </a>
+<li> 12 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="use"> Use </h2> </a> <p>
+ 
+ 
+ There are two options when running 'diagram', selected by your
+ answer to the 'easycmd' parameter:-
+<p>
+
+<dl> 
+<dt> 1) Easycmd='yes'
+<p><dd>
+ 
+    Do a standard run through to plot a CMD: -
+<p>
+ 
+    The program asks for the input to take two tables and put a CMD
+    up on the x-windows window. The program then asks for further
+    options, expecting the answer - 'exit'.
+<p>
+ 
+    If you put the `\\` on the command line, the program will then
+    end, leaving the CMD displayed in its window.
+<p>
+ 
+    If you choose to continue, you will find yourself in the middle
+    of 'easycmd=no' mode, being repeatedly asked what you want to do
+    through the 'option' parameter. You should choose the 'panel'
+    option, and then interact with the program through the 'panel'.
+<p>
+ 
+<p><dt> 2) Easycmd='no'
+<p><dd>
+ 
+ 
+    Do what you want: -
+<p>
+ 
+    The program first asks you if you want to plot a CMD or a
+    colour-colour diagram. You choose, and then the program asks
+    for what are the 'codes' of which colours to plot.
+<p>
+ 
+    After this, the program goes in the looping 'options' mode,
+    repeatedly asking which option of action you want to do.
+<p>
+ 
+    It suggests a sequence of options which will normally get you
+    the inputs needed for making and displaying the plot. If you
+    accept these options all will go well. (You can, of course,
+    choose diferent options if you wish to.)
+<p>
+ 
+    After this, all options are open. The program will suggest
+    selecting the 'panel' option, where the options are available
+    by pressing 'buttons' on a window. This is quite handy, and
+    an in-screen help is displayed, as your cursor moves over the
+    different buttons.
+<p>
+</dl>
+ 
+<hr>
+ <h2> 2 <a name="method"> Method </h2> </a> <p>
+ 
+ 
+ The program works on 'sets' of tables. Each set is loaded with data
+ from (up to four) tables, each list of data of the magnitudes in a
+ particular colour comes from a column of data in one of the tables.
+ The tables with the data for an individual set must each contain the
+ same stars in the same  order. Each set can hold up to 10 000 stars.
+<p>
+ 
+ Up to twelve sets can be handled.
+<p>
+ 
+ Only the data from one set is plotted out (or written to file) at
+ any one time, but the other sets can accessed at will, and added
+ to the diagram. They would however, if stored, be output to different
+ files.
+<p>
+ 
+ The extent of the diagram (in the sense of the output values) is
+ under user control, and the diagram can be cleared and plotting
+ started again.
+<p>
+ 
+ The plotting and storing is done as 
+
+<pre>
+    CMDS               `col 'vs `col -col ' 
+                           2        3    4 
+
+    COLOUR_COLOUR:     `col -col  '  vs `col -col '
+                           1    2           3    4
+</pre>
+
+ For example, as :-
+
+<pre>
+    V vs  B-V    or     R  vs  R-I     or     U-B vs B-V 
+</pre>
+
+  -  or any other single character descriptors which are
+ assigned by you.
+<p>
+ 
+ Any single character descriptors may be assigned to the colours by the
+ user.
+<p>
+ 
+ The location of points can be found using the cursor.
+<p>
+ 
+ Lines can also be drawn on the diagram from keyboard, cursor or
+ file table posns.
+<p>
+ 
+<hr>
+ <h2> 3 <a name="options"> Options </h2> </a> <p>
+
+ The choice of action to do next is defined by the 'option'
+ chosen. These options are also available through the 'panel'
+ push-button mode, on choosing the 'panel' option.
+<p>
+
+<pre>
+ 
+  Option        Function
+  ------        --------
+  clear         Clear plot
+  close         Close the graphical device
+  colour_eqn    Change colour equation applied to input colours
+  cursor        Get XY positions from graph with cursor
+  dotnumber     Set whether numbers are plotted with points
+  exit          Exit from this program
+  getdata       Get the tables with the magnitudes in them
+  line          Put line onto graph.
+  mag_limits    Star Magnitude ranges allowed to be plotted
+  nearest       Get information on a star by putting cursor on it
+  numgood       Number of good measures for plotting a star
+  open          Open the plot device
+  panel         Switch between panel and keyboard option selection
+  plot          Plot the data as points on the graph
+  plot_limits   Set the range of the graph axes in X and Y
+  plot_range    Set the range of data in X and Y to be plotted
+  setnumber     Data set these setups apply to
+  store         Store the present plotted data set as a table file
+  symbol        Set the symbol plotted as points
+  zero_point    Change zero points applied to input colours
+</pre><p>
+ 
+  There is also the big 'HELP' button.
+<p>
+ 
+  When using the cursor to find magnitudes/colours of positions
+  on the graph, place the cursor on the desired location, and
+  press any keyboard key. To end, place the cursor to the left
+  of the origin and press any key.
+<p>
+ 
+<hr>
+ <h2> 4 <a name="colour_equation_and_zero_point"> Colour equation and zero point </h2> </a> <p>
+ 
+ 
+ Each set can have its input magnitudes corrected by the following
+ equation:-
+<p>
+<pre> 
+        Col1  = Zero  + Col  + K .(C -C )
+            n       n      n    n   3  4
+
+ 
+ Where Col1  is the corrected version of input colour Col  and the
+           n                                             n
+ values Zero  and K  are input by the user. `n' runs from 2 to 4
+            n      n
+ for an HR type diagram, and from 1 to 4 for a Two-colour type
+ diagram.
+ 
+ As you can see, the colour correction is in terms of the `raw'
+ magnitudes C  and C .
+             3      4
+</pre>
+
+ 
+
+<hr>
+ <h2> 5 <a name="cursor"> Cursor </h2> </a> <p>
+ 
+ 
+ The plotting software package, PGPLOT,  defines the cursor movement
+ and marking of position by the appropriate method for the device being
+ used. If you are uncertain about how to use the cursor, ask your
+ local computer expert.
+<p>
+ 
+<hr>
+ <h2> 6 <a name="input"> Input </h2> </a> <p>
+ 
+ 
+ If a waveband is required twice (i.e. V in V vs B-V) the table and
+ column with that waveband is only asked for once.
+<p>
+ 
+<hr>
+ <h2> 7 <a name="input_controls"> Input controls </h2> </a> <p>
+ 
+ 
+ Conditions may be imposed on which stars in a set are accepted
+ for plotting. All stars are stored, but have an acceptance/rejection
+ flag showing whether they would have been plotted.
+<p>
+ 
+ These are:-
+<p>
+
+<dl>
+ 
+<dt>Raw magnitudes:      
+
+<p><dd>  The acceptable range of input magnitudes in
+         each input waveband in a set can be specified.
+         (The default is 0.1 - 49.0.)
+
+<p><dt>  No of good measures:  
+
+<p><dd>  Sometimes a table containing a list of
+         magnitudes will for each stars have an entry
+         giving the number of estimates that made that
+         magnitude. (This is the case for the Starman
+         `Average' program output.) Optionally, a
+         magnitude can be rejected if this number is
+         less than a set limit for that waveband in
+         that set. (The default is no checking.)
+
+<p><dt>  Position in Diagram:  
+
+<p><dd>  The output (to plot or file) processed
+         magnitude/colour or colour/colour may be subject
+         to a test for location as lying in given
+         rectanglular region.
+</dl>
+ 
+<hr>
+ <h2> 8 <a name="option_input"> Option input </h2> </a> <p>
+ 
+ 
+  The options can be selected by responding at the keyboard to the
+  'OPTION' question, or, if you are working at a X-window device, using
+  a panel of buttons. These options are toggled by the 'panel'
+  choice in the option list.
+<p>
+ 
+<hr>
+ <h2> 9 <a name="plotting"> Plotting </h2> </a> <p>
+ 
+ 
+ The symbols used to plot the data are under user control, and any of
+ the standard PGPLOT symbols can be used.
+<p>
+ 
+ The graphical output is done using the PGPLOT package, and can
+ thus be sent to any device that has a PGPLOT or GKS driver.
+<p>
+ 
+<hr>
+ <h2> 10 <a name="output table"> Output table </h2> </a> <p>
+ 
+ 
+ The contents of a row in the output file are:-
+<p>
+ 
+  -  Identifier; <p>
+  -  X, Y;   (optionally) <p>
+  -  col(2) or col(1)-col(2); <p>
+  -  col(3)-col(4); <p>
+  -  input waveband magnitude <p>
+  -  number of good estimates in that magnitude <p>
+<p>
+ 
+ The first two columns (the 'x' and 'y') are optional. Their presence
+ is controlled by the 'storexy' parameter.
+<p>
+ 
+ The last two entries are repeated for each of the input magnitudes.
+<p>
+ 
+ This is a Starman NDF format table.
+<p>
+ 
+<hr>
+ <h2> 11 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 11.1 <a href="#all_sets"> All&#95 sets </a>
+<li> 11.2 <a href="#colcode"> Colcode </a>
+<li> 11.3 <a href="#colcor"> Colcor </a>
+<li> 11.4 <a href="#column"> Column </a>
+<li> 11.5 <a href="#devlimx"> Devlimx </a>
+<li> 11.6 <a href="#devlimy"> Devlimy </a>
+<li> 11.7 <a href="#easycmd"> Easycmd </a>
+<li> 11.8 <a href="#exit"> Exit </a>
+<li> 11.9 <a href="#gtype"> Gtype </a>
+<li> 11.10 <a href="#hilim"> Hilim </a>
+<li> 11.11 <a href="#intab"> Intab </a>
+<li> 11.12 <a href="#in"> In </a>
+<li> 11.13 <a href="#linecol"> Linecol </a>
+<li> 11.14 <a href="#lolim"> Lolim </a>
+<li> 11.15 <a href="#ncolumn"> Ncolumn </a>
+<li> 11.16 <a href="#numbutt"> Numbutt </a>
+<li> 11.17 <a href="#numgood"> Numgood </a>
+<li> 11.18 <a href="#offsets"> Offsets </a>
+<li> 11.19 <a href="#option"> Option </a>
+<li> 11.20 <a href="#out"> Out </a>
+<li> 11.21 <a href="#pcolumn"> Pcolumn </a>
+<li> 11.22 <a href="#set"> Set </a>
+<li> 11.23 <a href="#storexy"> Storexy </a>
+<li> 11.24 <a href="#symbol"> Symbol </a>
+<li> 11.25 <a href="#title"> Title </a>
+<li> 11.26 <a href="#tyline"> Tyline </a>
+<li> 11.27 <a href="#type"> Type </a>
+<li> 11.28 <a href="#xrange"> Xrange </a>
+<li> 11.29 <a href="#xykey"> Xykey </a>
+<li> 11.30 <a href="#yrange"> Yrange </a>
+<li> 11.31 <a href="#zerop"> Zerop </a>
+</ul>
+ 
+<hr>
+ <h2> 11.1 <a name="all_sets"> All&#95 sets </h2> </a> <p>
+ 
+ (Default - 'no'       Choice - 'yes:no')
+<p>
+ 
+ Apply these to all the sets (yes), or just to the present set (no).
+<p>
+ 
+<hr>
+ <h2> 11.2 <a name="colcode"> Colcode </h2> </a> <p>
+ 
+  (Default - one of 'U','B','V'      Choice - any single character)
+<p>
+ 
+ A single character for labelling each waveband input for dialogue,
+ plotting, and output. Reply `V' or `U', etc.
+<p>
+ 
+ This is used for `COLCOD1', `COLCOD2', `COLCOD3', `COLCOD4'.
+ refering to the (up to) four input tables.
+<p>
+ 
+<hr>
+ <h2> 11.3 <a name="colcor"> Colcor </h2> </a> <p>
+ 
+ (Default - 0.0 or previous value     Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ The real number in the colour equations to be applied to each input
+ magnitude.
+<p>
+ 
+ This is the `K' in the equation:-
+<p>
+<pre> 
+        Col1  = Zero  + Col  + K .(C -C )
+            n       n      n    n   3  4
+</pre><p>
+ 
+ See above for more information.
+<p>
+ 
+<hr>
+ <h2> 11.4 <a name="column"> Column </h2> </a> <p>
+ 
+ (Default - 3         Range - 1 to no of columns in table)
+<p>
+ 
+ The number of the column in the table that contains the magnitudes.
+<p>
+ 
+ This is used for `COLUMN1', `COLUMN2', `COLUMN3', `COLUMN4',
+ refering to the (up to) four input tables.
+<p>
+ 
+<hr>
+ <h2> 11.5 <a name="devlimx"> Devlimx </h2> </a> <p>
+ 
+ (Default - the minimum and maximum of the data    Range - -1.0e10 to
+                                                            1.0e10))
+<p>
+ 
+ The range of mags and cols for the plot which define the size of
+ the plotted area in the X direction.
+<p>
+ 
+ (This does not affect the output to a table.)
+<p>
+ 
+<hr>
+ <h2> 11.6 <a name="devlimy"> Devlimy </h2> </a> <p>
+ 
+ (Default - the minimum and maximum of the data    Range - -1.0e10 to
+                                                            1.0e10))
+<p>
+ 
+ For the plot the range of mags and cols to define the size of
+ the plotted area in the Y direction.
+<p>
+ 
+ (This does not affect the output to a table.)
+<p>
+ 
+<hr>
+ <h2> 11.7 <a name="easycmd"> Easycmd </h2> </a> <p>
+ 
+ (Default - 'yes'                 Choice - 'yes:no')
+<p>
+ 
+ There are two options when running 'diagram', selected by your
+ answer to the 'easycmd' parameter:-
+<p>
+ 
+<dl> 
+<dt> 1) Easycmd='yes'
+<p><dd>
+ 
+    Do a standard run through to plot a CMD: -
+<p>
+ 
+    The program asks for the input to take two tables and put a CMD
+    up on the x-windows window. The program then asks for further
+    options, expecting the answer - 'exit'.
+<p>
+ 
+    If you put the `\\` on the command line, the program will then
+    end, leaving the CMD displayed in its window.
+<p>
+ 
+    If you choose to continue, you will find yourself in the middle
+    of 'easycmd=no' mode, being repeatedly asked what you want to do
+    through the 'option' parameter. You should choose the 'panel'
+    option, and then interact with the program through the 'panel'.
+<p>
+ 
+<p><dt> 2) Easycmd='no'
+<p><dd>
+ 
+ 
+    Do what you want: -
+<p>
+ 
+    The program first asks you if you want to plot a CMD or a
+    colour-colour diagram. You choose, and then the program asks
+    for what are the 'codes' of which colours to plot.
+<p>
+ 
+    After this, the program goes in the looping 'options' mode,
+    repeatedly asking which option of action you want to do.
+<p>
+ 
+    It suggests a sequence of options which will normally get you
+    the inputs needed for making and displaying the plot. If you
+    accept these options all will go well. (You can, of course,
+    choose diferent options if you wish to.)
+<p>
+ 
+    After this, all options are open. The program will suggest
+    selecting the 'panel' option, where the options are available
+    by pressing 'buttons' on a window. This is quite handy, and
+    an in-screen help is displayed, as your cursor moves over the
+    different buttons.
+<p>
+</dl>
+ 
+<hr>
+ <h2> 11.8 <a name="exit"> Exit </h2> </a> <p>
+ 
+  (Default - 'yes'               Choice - 'yes:no')
+<p>
+ 
+  Do you want to exit from the program?
+<p>
+ 
+  This is asked for, if the program is in the 'easycmd=yes' mode,
+  and has plotted the CMD.
+<p>
+ 
+  This is defaulted to 'yes', so that if the command line has the
+  '\\' input giving that defaults be taken, then the program ends,
+  as it should.
+<p>
+ 
+  If the command line does not have this, then it is up to the
+  user whether to continue.
+<p>
+ 
+<hr>
+ <h2> 11.9 <a name="gtype"> Gtype </h2> </a> <p>
+ 
+  (Default - 'xwindows'            Choice - any)
+<p>
+ 
+  A character string giving the local name for the graphics
+  display type.
+<p>
+ 
+  'xwindows' will put it out on the screen of your X-window device,
+  if you are using one.
+<p>
+ 
+  If 'ask' is input, then the program asks a very similar question,
+  in a different way. A response here of '?' will bring up a listing
+  of all the possible names of graphics devices which are supported
+  on your machine, and you then input the appropriate name.
+<p>
+ 
+<hr>
+ <h2> 11.10 <a name="hilim"> Hilim </h2> </a> <p>
+ 
+ (Default - 49.0 or last value input    Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ Stars in this file with input magnitude  fainter than this
+ are not accepted.
+<p>
+ 
+<hr>
+ <h2> 11.11 <a name="intab"> Intab </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ If `file' is chosen in `TYLINE' parameter option, then a table with
+ the points defining the line is needed. This table should have two
+ columns with 'x' and 'y' values in it. The numbers of these columns
+ are input with the 'PCOLUMN' parameter.
+<p>
+ 
+ One can use the 'offsets' parameter to shift this line an x and y.
+<p>
+ 
+ This table must be in the Starman NDF table format.
+<p>
+ 
+<hr>
+ <h2> 11.12 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ An input file containing a table with one column having magnitudes.
+<p>
+ 
+ 
+ This can be one of 48 input files from IN1 to IN48.
+ They are used in sets of four (e.g. IN1,IN2,IN3,IN4) for a 'set'
+ of (up to) four tables of input colours to make an array of points for
+ the colour-magnitude or colour-colour diagram. If only two or three
+ input magnitudes are needed, then not all of (IN1,IN2,IN3,IN4) will
+ be used. The next set of data would then use the parameters (IN5,IN6,
+ IN7,IN8), and so on. Thus 12 sets in all can be input.
+<p>
+ 
+ This table must be in the Starman NDF table format.
+<p>
+ 
+ This is the help for the 'IN1', 'IN2', ... 'IN48' parameters.
+<p>
+ 
+<hr>
+ <h2> 11.13 <a name="linecol"> Linecol </h2> </a> <p>
+ 
+   (Default - 'black'            Choice - (black:white)
+<p>
+ 
+    Colour of plot lines. This is determined by whether you have a
+    black or white background to your plots.
+<p>
+ 
+<hr>
+ <h2> 11.14 <a name="lolim"> Lolim </h2> </a> <p>
+ 
+ (Default - 0.1 or last value input           Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ Stars in this file with  input mag brighter than this
+ are not accepted.
+<p>
+ 
+<hr>
+ <h2> 11.15 <a name="ncolumn"> Ncolumn </h2> </a> <p>
+ 
+ (Default - 0            Range - 1 to no of columns in table)
+<p>
+ 
+ The column in the table that contains the number of good estimates
+ of the star magnitudes. If no such column exists, or use of it is
+ not desired, input `0'.
+<p>
+ 
+ This is used for `NCOL1', `NCOL2', `NCOL3', `NCOL4'.
+ refering to the (up to) four input tables in the set.  (12 sets in
+ all allowed.)
+<p>
+ 
+<hr>
+ <h2> 11.16 <a name="numbutt"> Numbutt </h2> </a> <p>
+ 
+  (Default - see below          Range - 2 to 3)
+<p>
+ 
+  Number of `X-Window' buttons available on the mouse.
+<p>
+ 
+  Some devices have two and some have three buttons available. This
+  can depend both on their actual presence, and also on the X Windows
+  software that is being run.
+<p>
+ 
+  With three buttons, then the Starman programs use all three, with
+  the right-hand button being used mainly as the 'exit' button.
+<p>
+ 
+  With two buttons, then the third button is simulated by pressing
+  both of the buttons down, with the middle one being pressed slightly
+  BEFORE the left-hand one. Use of the middle button in its normal
+  way has to be modified, in that one has to pause for half a second
+  after using it.
+<p>
+ 
+  [This parameter is usally 'hidden', with the machine manager setting
+   it to the appropriate value for the local set-up. Sometimes it will
+   be left to the user to set, depending on his software
+   configuartion.]
+<p>
+ 
+<hr>
+ <h2> 11.17 <a name="numgood"> Numgood </h2> </a> <p>
+ 
+ (Default - 0 or last value input       Range - 1 to 100000)
+<p>
+ 
+ If using this input control, this is the minimum no of estimates
+ used in making the star mag for a star in the input file
+ that is acceptable. Any star with fewer that that for the
+ mag in this file is ignored.
+<p>
+ 
+<hr>
+ <h2> 11.18 <a name="offsets"> Offsets </h2> </a> <p>
+ 
+ (Default - 0.0,0.0             Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ The 'x' and 'y' offsets to be added to the data in the 'INTAB'
+ table for plotting.
+<p>
+ 
+<hr>
+ <h2> 11.19 <a name="option"> Option </h2> </a> <p>
+ 
+ (Default - last chosen in list below.  Choice  - see list below)
+<p>
+ 
+ The choice of action to do next is defined by the 'option'
+ chosen. These options are also available through the 'panel'
+ push-button mode, on choosing the 'panel' option.
+<p>
+
+<pre>
+ 
+  Option        Function
+  ------        --------
+  clear         Clear plot
+  close         Close the graphical device
+  colour_eqn    Change colour equation applied to input colours
+  cursor        Get XY positions from graph with cursor
+  dotnumber     Set whether numbers are plotted with points
+  exit          Exit from this program
+  getdata       Get the tables with the magnitudes in them
+  line          Put line onto graph.
+  mag_limits    Star Magnitude ranges allowed to be plotted
+  nearest       Get information on a star by putting cursor on it
+  numgood       Number of good measures for plotting a star
+  open          Open the plot device
+  panel         Switch between panel and keyboard option selection
+  plot          Plot the data as points on the graph
+  plot_limits   Set the range of the graph axes in X and Y
+  plot_range    Set the range of data in X and Y to be plotted
+  setnumber     Data set these setups apply to
+  store         Store the present plotted data set as a table file
+  symbol        Set the symbol plotted as points
+  zero_point    Change zero points applied to input colours
+</pre><p>
+ 
+  There is also the big 'HELP' button.
+<p>
+ 
+  When using the cursor to find magnitudes/colours of positions
+  on the graph, place the cursor on the desired location, and
+  press any keyboard key. To end, place the cursor to the left
+  of the origin and press any key.
+<p>
+ 
+<hr>
+ <h2> 11.20 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+ The Output table for storing the results.
+<p>
+ 
+ This is a Starman NDF format table
+<p>
+ 
+ The contents of a row in the output file are:-
+<p>
+ 
+  -  Identifier; <p>
+  -  X, Y;   (optionally) <p>
+  -  col(2) or col(1)-col(2); <p>
+  -  col(3)-col(4); <p>
+  -  input waveband magnitude <p>
+  -  number of good estimates in that magnitude <p>
+<p>
+ 
+ The first two columns (the 'x' and 'y') are optional. Their presence
+ is controlled by the 'storexy' parameter.
+<p>
+ 
+ The last two entries are repeated for each of the input magnitudes.
+<p>
+ 
+<hr>
+ <h2> 11.21 <a name="pcolumn"> Pcolumn </h2> </a> <p>
+ 
+ (Default - 1,2     Choice - 2 integers in the range 1 to no of columns)
+<p>
+ 
+  If `file' is chosen in `TYLINE' option, these  are the numbers of
+  the two columns in the table containing respectively the 'x' and the
+  'y' values which are to be plotted as a line.
+<p>
+ 
+<hr>
+ <h2> 11.22 <a name="set"> Set </h2> </a> <p>
+ 
+ (Default - present value    Range - 1 to No of sets input)
+<p>
+ 
+ The number defining which of the input sets of (up to) four
+ tables to deal with. Up to twelve sets can be kept.
+<p>
+ 
+<hr>
+ <h2> 11.23 <a name="storexy"> Storexy </h2> </a> <p>
+ 
+ (Default - 'yes'       Choice - 'yes:no')
+<p>
+ 
+  If yes, then the input file will contain in its first two columns,
+  the X and Y positions of the stars, and you desire that these should
+  be output to the output table.
+<p>
+ 
+<hr>
+ <h2> 11.24 <a name="symbol"> Symbol </h2> </a> <p>
+ 
+ (Default - 1 or last value input     Range - 1 to 128)
+<p>
+ 
+ The PGPLOT symbol code that defines the shape of the symbol
+ plotted.
+<p>
+ 
+<hr>
+ <h2> 11.25 <a name="title"> Title </h2> </a> <p>
+ 
+ (Default - Input file title or `Output from Diagram'     Choice - any)
+<p>
+ 
+ The content of the 'title' header in the output table.
+<p>
+ 
+<hr>
+ <h2> 11.26 <a name="tyline"> Tyline </h2> </a> <p>
+ 
+ (Default - 'return'     Choice - 'cursor:table:keyboard:return')
+<p>
+ 
+ Flag for method of putting line on diagram.
+<p>
+ 
+ When a method is chosen, the line is plotted, and this question is
+ asked again.
+<p>
+ 
+ Points given by the various inputs are plotted as joined together
+ with straight lines.
+<p>
+ 
+<pre>
+ Choice     Action
+ ------     ------
+ cursor     Line is drawn joining the successive locations 
+            marked with the cursor, until a location less than 
+            the minimum `x' value of the graph is chosen, when 
+            this cursor entry stops.
+ 
+ table      An input table of x and y positions is asked for, 
+            via the 'intab' parameter. These are plotted.
+ 
+ keyboard   The user types in pairs of 'x','y' positions, and 
+            these are plotted. This is stopped by the user 
+            inputting an 'x' position to the left of the graph 
+            edge.
+ 
+ return     Return to the 'options/'panel' mode.
+</pre><p>
+ 
+<hr>
+ <h2> 11.27 <a name="type"> Type </h2> </a> <p>
+ 
+ (Default - 'hr'   Choice - 'hr:twocol')
+<p>
+ 
+ Flag for choosing colour-magnitude (hr) or colour-colour (twocol)
+ diagram type output.
+<p>
+ 
+<hr>
+ <h2> 11.28 <a name="xrange"> Xrange </h2> </a> <p>
+ 
+ (Default - the range of the data     Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ The acceptable range of the value of the output 'x' colour,
+
+<pre>
+ (col1 - col1 )
+      3      4
+</pre>
+ 
+ that a star may have. If it lies outside this range,
+ then it will not be plotted, and it will be stored with a warning
+ flag.
+<p>
+ 
+<hr>
+ <h2> 11.29 <a name="xykey"> Xykey </h2> </a> <p>
+ 
+  (Default - X max and Y max or present values       Range - -1.0e10 to
+                                                              1.0e10)
+<p>
+ 
+ `x',`y' posn to make line plot to.
+<p>
+ 
+ (This is only used in the `keyboard' option of the `tyline' choice
+ in the 'line' option.input.
+<p>
+ 
+ If the 'x' value input is less than the minimum value that can be
+ displayed then the keyboard entry is halted, otherwise the next
+ position is asked for.
+<p>
+ 
+<hr>
+ <h2> 11.30 <a name="yrange"> Yrange </h2> </a> <p>
+ 
+ (Default - the range of the data         Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ The acceptable range of the value of the output 'y' colour,
+
+<pre>
+ col1 or (col1 - col1 )
+     2        1      2
+</pre><p>
+ 
+ that a star may have. If it lies outside this
+ range, then it will not be plotted, and it will be stored with a
+ warning flag.
+<p>
+ 
+<hr>
+ <h2> 11.31 <a name="zerop"> Zerop </h2> </a> <p>
+ 
+ (Default - 0.0               Range - -1.0e10 to 1.0e10)
+<p>
+ 
+ The zero point corrections to be added to the input magnitude.
+<p>
+ 
+ This is the `Zero' in the equation:-
+<p>
+<pre> 
+        Col1  = Zero  + Col  + K .(C -C )
+            n       n      n    n   3  4
+</pre><p>
+ 
+ See above for more information.
+<p>
+ 
+<hr>
+ <h2> 12 <a name="author"> Author </h2> </a> <p>
+ 
+         A.J.Penny                RAL                   1991 July
+
+<hr>
+All rights reserved. &copy 1995 RAL. Starlink conditions and disclaimers apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 20 </i>
+ 

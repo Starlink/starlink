@@ -1,0 +1,148 @@
+<HTML> <HEAD>
+<TITLE> TBTRAN&#95 DO </TITLE>
+</HEAD> <BODY>
+ 
+<h1> TBTRAN&#95 DO - <br>
+ Transform XY table positions using
+transform eqns
+</h1>
+<hr>
+ 
+ 
+<p>
+ 
+   This takes a table and makes a new one with identical entries,
+   but with the positions transformed through a transformation matrix.
+<p>
+ 
+   The entries in columns 1 and 2 are taken as 'X,Y'. The output table
+   then has values X&#95 1  and Y&#95 1  , where:-
+<p>
+ 
+        X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+        Y&#95 1 = c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+ 
+    The `X coefficents', c&#95 x(1), c&#95 x(2), c&#95 x(3), and the `Y coefficents'
+    c&#95 y(1), c&#95 y(2), c&#95 y(3), being input by the user.
+<p>
+ 
+ 
+ 
+<hr>
+Go to <a href="intro.html#tbtran_do_back"> Starman Help </a><br>
+Go to <a href="main.html"> Starman Help Main. </a>
+ 
+<hr>
+<h2> Index </h2>
+ 
+<ul>
+<li> 1 <a href="#parameters"> Parameters </a>
+<li> 2 <a href="#author"> Author </a>
+</ul>
+ 
+ 
+<hr>
+ <h2> 1 <a name="parameters"> Parameters </h2> </a> <p>
+ 
+<ul>
+<li> 1.1 <a href="#in"> In </a>
+<li> 1.2 <a href="#out"> Out </a>
+<li> 1.3 <a href="#title"> Title </a>
+<li> 1.4 <a href="#xcoeff"> Xcoeff </a>
+<li> 1.5 <a href="#ycoeff"> Ycoeff </a>
+</ul>
+ 
+ 
+<p>
+ 
+<hr>
+ <h2> 1.1 <a name="in"> In </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the input table. It must have the X,Y positions
+  in columns 1 and 2.
+<p>
+ 
+  The table must be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.2 <a name="out"> Out </h2> </a> <p>
+ 
+  (Default - null)
+<p>
+ 
+  The file containing the output table, with the transformed
+  positions.
+<p>
+ 
+  The will be a standard Starman table format file. It
+  is a Starman ADAM .SDF image, with `real' 32-bit real values,
+  with each column having a header of up to 20 characters, and
+  each row having a name of up to 20 characters.
+<p>
+ 
+<hr>
+ <h2> 1.3 <a name="title"> Title </h2> </a> <p>
+ 
+  (Default - Input table title or 'Output from TBTRAN&#95 DO'
+   Choice - any)
+<p>
+ 
+    The Title to be added to the output file.
+<p>
+ 
+<hr>
+ <h2> 1.4 <a name="xcoeff"> Xcoeff </h2> </a> <p>
+ 
+  (Default - 0.0,0.0,0.0              <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The three coefficents for the X transfomation.
+<p>
+ 
+        X&#95 1 = c&#95 x(1) + c&#95 x(2)*X  + c&#95 x(3)*Y
+<p>
+ 
+<hr>
+ <h2> 1.5 <a name="ycoeff"> Ycoeff </h2> </a> <p>
+ 
+  (Default - 0.0,0.0,0.0              <br> Range - -1.0e20 to 1.0e20)
+<p>
+ 
+  The three coefficents for the Y transfomation.
+<p>
+ 
+        Y&#95 1 =  c&#95 y(1) + c&#95 y(2)*X  + c&#95 y(3)*Y
+<p>
+ 
+<hr>
+ <h2> 2 <a name="author"> Author </h2> </a> <p>
+ 
+ 
+    A J Penny                  RAL               1991 May
+ 
+<hr>
+ 
+All rights reserved. &copy 1995 RAL.
+Starlink disclaimers and conditions apply.
+ 
+<hr>
+ 
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html">
+Alan J Penny </a>
+ - <a href="http://www.rl.ac.uk/rutherford.html">
+ Rutherford Appleton Laboratory </a> (RAL) </address>
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 28 </i>
+ 

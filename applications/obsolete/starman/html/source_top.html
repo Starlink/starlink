@@ -1,0 +1,259 @@
+<HTML>
+<HEAD>
+<TITLE> Starman - Source Code </TITLE>
+</HEAD>
+<BODY>
+
+<H1> Starman - Source Code </H1>
+
+<hr>
+
+All rights reserved. &copy 1995 RAL. <i>Starlink</i> disclaimers and conditions apply. <p>
+
+If you want to copy or use the code, make sure you have read these
+disclaimers and conditions. <p>
+
+<hr>
+
+This page has links for the listings of the source code of 
+<i> Starman</i>:- <br>
+<a href="#photometry"> Photometry programs </a> <br>
+<a href="#images"> Image handling programs </a> <br>
+<a href="#tables"> Table handling programs </a> <br>
+<a href="#help"> Help programs </a> <br>
+<a href="#demo"> Demonstration program </a> <br>
+<a href="#subroutine"> Subroutine libraries </a> <br>
+<a name="include_source_back"> </a> 
+<a href="include_source.html"> General Include files </a> <br>
+<a name="interface_source_back"> </a> 
+<a href="interface_source.html"> Interface files </a> <p>
+
+
+Go to <a href="main.html"> Starman Main. </a> <p>
+
+<hr><h3> 
+               <a name="photometry"> Photometry programs 
+</a></h3><ul>
+
+<h4> Measuring </h4>  
+
+<a href="measure_source.html"> measure </a> 
+<a name="measure_source_back"> - </a> Crowded field PSF photometry <br>
+<a href="automag_source.html"> automag </a> 
+<a name="automag_source_back"> - </a> Automatic aperture photometry for
+              bright isolated stars  <br>
+<a href="simplemag_source.html"> simplemag </a> 
+<a name="simplemag_source_back"> - </a> Isolated stars photometry  <br>
+<a href="interact_source.html"> interact </a> 
+<a name="interact_source_back"> - </a> Interactive measuring <br>
+
+<h4> Preparation and Analysis </h4>  
+
+<a href="starfind_source.html"> starfind </a> 
+<a name="starfind_source_back"> - </a> Find star positions <br>
+<a href="profile_source.html"> profile </a> 
+<a name="p[rofile_source_back"> - </a> Determine the stellar profile for
+     the <a href="measure_source.html"> measure </a> program <br>
+<a href="chi_source.html"> chi </a> 
+<a name="chi_source_back"> - </a> Reject stars with poor fits 
+        from  <a href="measure_source.html"> measure </a> program output <br>
+<a href="average_source.html"> average </a> 
+<a name="average_source_back"> - </a>  Average different photometry estimates 
+(especially from  <a href="measure_source.html"> measure </a>) <br>
+<a href="interact_source.html"> interact </a> - Inspect quality of 
+          <a href="measure_source.html"> measure </a> program output <br>
+<a href="diagram_source.html"> diagram </a> 
+<a name="diagram_source_back"> - </a> Plot CMDs and colour-colour diagrams <br>
+
+
+<h4> Other </h4>  
+
+<a href="addstars_source.html"> addstars </a> 
+<a name="addstars_source_back"> - </a> Add fake stars from a table to images <br>
+<a href="dustring_source.html"> dustring </a> 
+<a name="dustring_source_back"> - </a> Correct for dust rings <br>
+<a href="interact_source.html"> interact </a> - Interactive inspection of image <br>
+<a href="sprinkle_source.html"> sprinkle </a> 
+<a name="sprinkle_source_back"> - </a> Make a table of fake stars  <br>
+<a href="unccd_source.html"> unccd </a> 
+<a name="unccd_source_back"> - </a> Convert raw CCD frames to calibrated ones <br>
+<p>
+
+</ul><hr><h3> 
+           <a name="images"> Image handling programs 
+</a></h3><ul>
+
+<a href="interact_source.html"> interact </a> - Interactive image display <br>
+<a href="imcalc_source.html">  imcalc </a> 
+<a name="imcalc_source_back"> - </a> Perform mathematical operations on
+image(s)  <br>
+<a href="imcube_source.html"> imcube </a> 
+<a name="imcube_source_back"> - </a> Make a 2-D image from a 3-D or 4-D one <br>
+<a href="imcut_source.html"> imcut </a> 
+<a name="imcut_source_back"> - </a> -  Make another image 
+(sectioned,binned,inverted) <br>
+<a href="imdes_source.html"> imdes </a> 
+<a name="imdes_source_back"> - </a> List:copy:write:delete the descriptors of
+an image  <br>
+<a href="imfits_dr_source.html"> imfits&#95 dr </a> 
+<a name="imfits_dr_source_back"> - </a> Simple FITS image into Starman NDF image format <br>
+<a href="imflash_source.html"> imflash </a> 
+<a name="imflash_source_back"> - </a> Simple display of image  <br>
+<a href="imjoin_source.html"> imjoin </a> 
+<a name="imjoin_source_back"> - </a> Join a number of images together <br>
+<a href="imkey_source.html"> imkey </a> 
+<a name="imkey_source_back"> - </a> Insert:change image pixel values from
+keyboard  <br>
+<a href="import_source.html"> import </a> 
+<a name="import_source_back"> - </a> Load descriptors from other packages <br>
+<a href="imrotate_source.html"> imrotate  </a> 
+<a name="imrotate_source_back"> - </a> Rotate an image anti-clockwise by
+90,180, or 270 degrees  <br>
+<a href="imsmooth_source.html"> imsmooth </a> 
+<a name="imsmooth_source_back"> - </a> Smooth an image <br>
+<a href="imstat_source.html"> imstat </a> 
+<a name="imstat_source_back"> - </a> Get statistics of an image <br>
+<a href="imtype_source.html"> imtype </a> 
+<a name="imtype_source_back"> - </a> Convert images between
+(real;integer;16-bit integer) <br>
+<a href="imweed_source.html"> imweed </a> 
+<a name="imweed_source_back"> - </a> Set range of pixel values to invalid
+<p>
+
+</ul><hr><h3> 
+         <a name="tables"> Table handling programs 
+</a></h3><ul>
+   
+<h4> Calculator and Spreadsheet </h4> 
+
+<a href="tbcalc_source.html"> tbcalc </a> 
+<a name="tbcalc_source_back"> - </a> Calculate table elements <br>
+<a href="tbsheet_source.html"> tbsheet </a> 
+<a name="tbsheet_source_back"> - </a> Spreadsheet operations on a table <br>
+
+<h4> Input, Output and Listing </h4>  
+
+<a href="tbdes_source.html"> tbdes </a> 
+<a name="tbdes_source_back"> - </a> View:write:copy:delete the descriptors of a
+table <br>
+<a href="tbkey_source.html"> tbkey </a> 
+<a name="tbkey_source_back"> - </a> Input numbers from keyboard into a table <br>
+<a href="tblist_source.html"> tblist </a> 
+<a name="tblist_source_back"> - </a> Type and/or put in text file the contents of a
+table <br>
+<a href="tbload_source.html"> tbload </a> 
+<a name="tbload_source_back"> - </a> Input a text file into a table <br>
+<a href="tbvalue_source.html"> tbvalue </a> 
+<a name="tbvalue_source_back"> - </a> Type a table value <br>
+<a href="interact_source.html"> interact </a> - Inspect quality of 
+          <a href="measure_source.html"> measure </a> program output <br>
+
+<h4> Joining </h4> 
+
+<a href="tbjoin_source.html"> tbjoin </a> 
+<a name="tbjoin_source_back"> - </a> Join tables together <br>
+
+<h4> Graphical plot and Star chart </h4>
+
+<a href="tbplot_source.html"> tbplot </a> 
+<a name="tbplot_source_back"> - </a> Plot out graph/histogram <br>
+<a href="tbchart_source.html"> tbchart </a> 
+<a name="tbchart_source_back"> - </a> Plot out a realistic star map <br>
+
+<h4> General Programs </h4>
+
+<a href="tbcomps_source.html"> tbcomps </a> 
+<a name="tbcomps_source_back"> - </a> Find stars within/not within an
+annulus of each other <br>
+<a href="tbcut_source.html"> tbcut </a> 
+<a name="tbcut_source_back"> - </a> Cut out parts of a table  <br>
+<a href="tbmatch_source.html"> tbmatch </a> 
+<a name="tbmatch_source_back"> - </a> Extract entries with matching names in
+two tables <br>
+<a href="tbnative_source.html"> tbnative </a> 
+<a name="tbnative_source_back"> - </a> Convert table format from different
+machine <br>
+<a href="tbnmatch_source.html"> tbnmatch </a> 
+<a name="tbnmatch_source_back"> - </a> Put tables in the same order of names  <br>
+<a href="tbpmatch_source.html"> tbpmatch </a> 
+<a name="tbpmatch_source_back"> - </a> Extract entries with matching 
+positions in two tables  <br>
+<a href="tbrenum_source.html"> tbrenum </a> 
+<a name="tbrenum_source_back"> - </a> Renumber names in a table <br>
+<a href="tbsort_source.html"> tbsort </a> 
+<a name="tbsort_source_back"> - </a> Sort entries in a table   <br>
+<a href="tbstat_source.html"> tbstat </a> 
+<a name="tbstat_source_back"> - </a> Perform statistics on column(s) in
+tables(s) <br>
+<a href="tbtran_auto_source.html"> tbtran&#95 auto </a> 
+<a name="tbtran_auto_source_back"> - </a> 
+Transform one XY table to another automatically <br>
+<a href="tbtran_do_source.html"> tbtran&#95 do </a> 
+<a name="tbtran_do_source_back"> - </a> 
+Transform XY table positions using transform eqn <br>
+<a href="tbtran_load_source.html"> tbtran&#95 load </a> 
+<a name="tbtran_load_source_back"> - </a> 
+Calc transform eqn from a given magn, rotn, shift <br>
+<a href="tbtran_make_source.html"> tbtran&#95 make </a> 
+<a name="tbtran_make_source_back"> - </a> 
+Calc transform eqn from two matched XY tables <br>
+<a href="tbweed_source.html"> tbweed </a> 
+<a name="tbweed_source_back"> - </a> Make a table with only those entries with
+a parameter in a range <br>
+<p>
+
+
+</ul><hr><h3> 
+              <a name=help"> Help programs
+</a></h3><ul>
+
+<a href="starmangripe_source.html"> starmangripe </a> 
+<a name="starmangripe_source_back"> - </a> The non-hypertext version of the
+comments and suggestions system. <br>
+<a href="starmanhelp_source.html"> starmanhelp </a> 
+<a name="starmanhelp_source_back"> - </a> The non-hypertext version of the
+help system. <br>
+<p>
+
+</ul><hr><h3> 
+              <a name=demo"> Demonstration program
+</a></h3><ul>
+
+<a href="starmandemo_source.html"> starmandemo </a> 
+<a name="starmandemo_source_back"> - </a> The Starman demonstration
+program. <br>
+<p>
+
+</ul><hr><h3> 
+          <a name="subroutine"> Subroutine Libraries 
+</a></h3><ul>
+
+<a href="lib_source.html"> General subroutines </a> 
+<a name="lib_source_back"> </a>  <br>
+<a href="disp_f_source.html"> Display subroutines - (Fortan)</a> 
+<a name="disp_f_source_back"> </a> <br>
+<a href="disp_c_source.html"> Display subroutines - (C)</a> 
+<a name="disp_c_source_back"> </a> <br>
+<a href="helplib_c_source.html"> Help subroutines - (C)</a> 
+<a name="helplib_c_source_back"> </a>  <br>
+<p>
+
+</ul>
+
+<HR>
+
+Go to <a href="main.html"> Starman Main. </a> <p>
+
+ 
+<HR>
+<address>
+<a href="http://ast.star.rl.ac.uk/dev/ajp_page.html"> Alan Penny </a>
+- <a href="http://www.rl.ac.uk/rutherford.html"> 
+Rutherford Appleton Laboratory </a> (RAL) </address>  
+<i> a.j.penny@rl.ac.uk </i> -
+<i> This page last modified: 1994 Dec 07 </i>
+
+
+</BODY>
+</HTML>
+
