@@ -76,7 +76,7 @@
      there's no way to refer to data attributes in an element
      attribute.
      -->
-<![ %Full.SGML; [
+<![ %Full.SGML.Only; [
 <!ATTLIST #NOTATION latexgraphics
 	package		-- LaTeX packages required for this to be processed --
 		CDATA
