@@ -209,7 +209,7 @@ sub match_positions_match ($$$$$) {
 			  sprintf ("%s: match results skew (%.0f deg); but I'll use the matches anyway",
 				   $myname, $transcpts[4]));
 	    }
-	    
+
 	    $successfulmatch = 1;
 	} else {
 	    # Output of $matchprog wasn't what we were expecting
@@ -220,11 +220,11 @@ sub match_positions_match ($$$$$) {
     } elsif (defined($pid)) {
 	# $pid is defined but zero: we're in the child -- exec $matchprog
 	exec (@matchargs);
-	# We shouldn't get here
-	wmessage ('fatal',
-		  "plugin-match-match: Failed to exec $matchprog");
-	exit 1;			# belt _and_ braces,
-				# just in case wmessage is not defined to exit
+        # NOT REACHED
+
+        # Unlike execvp(3) and friends, Perl exec appears to guarantee
+        # never to return, therefore we needn't (and since we run with
+        # -w, we shouldn't) have any cleanup code here.
     } else {
 	# $pid was undefined -- we couldn't fork
 	wmessage ('fatal',
