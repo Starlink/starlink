@@ -459,7 +459,8 @@
         CALL MSG_SETR('YC',YC)
         CALL MSG_SETR('LN',LENGTH)
         CALL MSG_SETR('WD',WIDTH)
-        CALL MSG_SETR('AN',ANGLE*RTOD)
+        ANGLE=ANGLE*RTOD*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE)
+        CALL MSG_SETR('AN',ANGLE)
         CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN ',
      :                                                    TEXT,L)
         IF (EXCLUDE) THEN
