@@ -5,8 +5,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -72,7 +70,7 @@
         ENDIF
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_ATTACH',STATUS)
+          CALL AST_REXIT('GCB_ATTACH',STATUS)
         ENDIF
 
 
@@ -89,8 +87,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -118,7 +114,7 @@
         G_LOCAL=.TRUE.
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_ATTACH_LOCAL',STATUS)
+          CALL AST_REXIT('GCB_ATTACH_LOCAL',STATUS)
         ENDIF
 
       ENDIF
@@ -134,8 +130,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -239,8 +233,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -295,8 +287,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -355,8 +345,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
       INCLUDE 'GCB_CMN'
@@ -411,7 +399,6 @@ C        ENDIF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'NBS_PAR'
       INCLUDE 'GCB_PAR'
 *    Import :
@@ -457,7 +444,7 @@ C        ENDIF
 
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_CHKNB',STATUS)
+          CALL AST_REXIT('GCB_CHKNB',STATUS)
         ENDIF
 
       ENDIF
@@ -477,7 +464,6 @@ C        ENDIF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'NBS_PAR'
       INCLUDE 'GCB_PAR'
 *    Global variables :
@@ -522,7 +508,7 @@ C        ENDIF
         CALL GCB_PUTRELPTR(G_STARTLISTS,G_ENDSTRUC,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_CRENB',STATUS)
+          CALL AST_REXIT('GCB_CRENB',STATUS)
         ENDIF
 
       ENDIF
@@ -538,7 +524,6 @@ C        ENDIF
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -566,7 +551,7 @@ C        ENDIF
         NAME(3:) = 'CONTROL'			! For [C]ontrol block
 
         IF (STATUS.NE.SAI__OK) THEN
-          CALL ERR_REP(' ','from GCB_NBNAME',STATUS)
+          CALL AST_REXIT('GCB_NBNAME',STATUS)
         ENDIF
 
       ENDIF

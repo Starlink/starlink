@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GMD_PAR'
 *    Import :
 *    Import-export :
