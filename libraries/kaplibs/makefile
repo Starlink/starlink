@@ -644,8 +644,8 @@ F_ROUTINES = $(AIF_F_ROUTINES) $(IRA_F_ROUTINES) $(CTG_F_ROUTINES) \
 
 IRA_BLOCK_DATA = ira1_init.f
 KPG_BLOCK_DATA = ctm_xcols.f
-
-BLOCK_DATA = $(IRA_BLOCK_DATA) $(KPG_BLOCK_DATA) 
+LPG_BLOCK_DATA = lpg1_init.f
+BLOCK_DATA = $(IRA_BLOCK_DATA) $(KPG_BLOCK_DATA) $(LPG_BLOCK_DATA) 
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -803,7 +803,7 @@ $(FTS_PRIVATE_INCLUDES) $(FTS_F_ROUTINES) $(FTS_C_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in fts_source.tar; exit 1; fi
 
-$(LPG_PRIVATE_INCLUDES) $(LPG_F_ROUTINES) $(LPG_C_ROUTINES):
+$(LPG_PRIVATE_INCLUDES) $(LPG_F_ROUTINES) $(LPG_C_ROUTINES) $(LPG_BLOCK_DATA):
 	$(TAR_OUT) lpg_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in lpg_source.tar; exit 1; fi
@@ -850,7 +850,7 @@ KPG_OBJECT_FILES = $(KPG_F_ROUTINES:.f=.o) $(KPG_BLOCK_DATA:.f=.o) \
 
 GRF_OBJECT_FILES = $(GRF_C_ROUTINES:.c=.o)
 
-LPG_OBJECT_FILES = $(LPG_F_ROUTINES:.f=.o) \
+LPG_OBJECT_FILES = $(LPG_BLOCK_DATA:.f=.o) $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(IRA_OBJECT_FILES) $(CTG_OBJECT_FILES) \
