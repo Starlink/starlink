@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/prm</path>
+  <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
+  <abstract><p>This document describes the PRIMDAT package, which
+      is a collection of Fortran functions and subroutines providing
+      support for ``primitive data processing''.  Routines from this
+      package may be used to perform arithmetic, mathematical
+      operations, type conversion and inter-comparison of any of the
+      primitive numerical data types supported by the Starlink
+      Hierarchical Data System HDS (SUN/92). 
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>R.F. Warren-Smith (DUVAD::RFWS)</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
