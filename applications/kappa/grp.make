@@ -225,7 +225,9 @@ kappa_mon.tcl kapview_mon.tcl ndfpack_mon.tcl mem2d.tcl root.hd kappa.hd \
 _kappa.hd kappa.men helpdb.mip profile.par listshow.par listmake.par \
 wcsadd.par wcsalign.par wcsattrib.par wcscopy.par wcsframe.par \
 wcsremove.par wcsshow.par chain.par reshape.par copybad.par wcstran.par \
-scatter.par
+scatter.par lutcont.par lutheat.par lutramps.par picbase.par piclast.par \
+lutbgyrw.par lutfc.par lutikon.par lutspec.par picdata.par lutcol.par \
+lutgrey.par lutneg.par lutzebra.par picframe.par
 
 #  Contents of the doc/ directory in kappa_iraf.tar
 IRAF_DOCS = add.hlp aperadd.hlp ardgen.hlp ardmask.hlp axconv.hlp \
