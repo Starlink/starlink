@@ -1162,14 +1162,28 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/AttributeAdapter.java:41: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/AttributeProxy.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/AttributeProxy.java:58: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/AttributeProxy.html...
+  [javadoc] "Return true if this attribute is "visible." This tells
+  [javadoc]  attribute editors and so on whether or not to display
+  [javadoc]  this attribute."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if this attribute is "visible." "
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/EdgeAdapter.java:46: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeAdapter.java:49: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/EdgeController.java:78: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphController.java:68: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:47: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:257: warning - The first sentence is interpreted to be:
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/GraphModel.html...
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node in this model, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return true if the given object is a composite
+  [javadoc]  node in this model, i.e. it contains children."
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphUtilities.java:26: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeController.java:90: warning - @rating is an unknown tag.
+  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/NodeController.html...
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeController.java:268: Tag @see: Malformed: GraphController#rerenderSubgraph(Iterator);
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphException.java:21: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/interaction/EdgeCreator.java:44: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/interaction/EdgeInteractor.java:22: warning - @rating is an unknown tag.
@@ -1179,20 +1193,6 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/tutorial/SimpleGraphController.java:69: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/tutorial/SimpleNodeController.java:32: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/tutorial/SimpleTutorial.java:30: warning - @rating is an unknown tag.
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/AttributeProxy.html...
-  [javadoc] "Return true if this attribute is "visible." This tells
-  [javadoc]  attribute editors and so on whether or not to display
-  [javadoc]  this attribute."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if this attribute is "visible." "
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/GraphModel.html...
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node in this model, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return true if the given object is a composite
-  [javadoc]  node in this model, i.e. it contains children."
-  [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/graphx/NodeController.html...
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/NodeController.java:268: Tag @see: Malformed: GraphController#rerenderSubgraph(Iterator);
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/toolbox/DeletionPolicy.java:35: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/toolbox/BasicEdge.java:27: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/toolbox/BasicEdgeAdapter.java:27: warning - @rating is an unknown tag.
@@ -2344,4 +2344,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 17 seconds
+Total time: 5 minutes 10 seconds

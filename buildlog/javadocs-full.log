@@ -1179,14 +1179,14 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ContextView.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/Page.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/View.java:24: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/AbstractApplication.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
