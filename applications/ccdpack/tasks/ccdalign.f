@@ -239,13 +239,16 @@
          NULL = 'INDEF'
          NL = 5
       END IF
+      CCDRID = -1
+      CCDGID = -1
+      KAPVID = -1
 
 *  Startup any monoliths that we need to use.
 *  CCDPACK_RES (note hard-coded monolith).
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
       CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_res'
       CCDRES = 'ccdpack_res'//PID
-      CCDRID = SLV_LOADW( CCDRES, CMD, .FALSE., TIMOUT, STATUS )
+      CCDRID = SLV_LOADW( CCDRES, CMD, .TRUE., TIMOUT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'FAILED',
@@ -258,7 +261,7 @@
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
       CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_reg'
       CCDREG = 'ccdpack_reg'//PID
-      CCDGID = SLV_LOADW( CCDREG, CMD, .FALSE., TIMOUT, STATUS )
+      CCDGID = SLV_LOADW( CCDREG, CMD, .TRUE., TIMOUT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'FAILED',
@@ -271,7 +274,7 @@
       CALL PSX_GETENV( 'KAPPA_DIR', CMD, STATUS )
       CMD = CMD( :CHR_LEN( CMD ) )//'/kapview_mon'
       KAPVIE = 'kapview_mon'//PID
-      KAPVID = SLV_LOADW( KAPVIE, CMD, .FALSE., TIMOUT, STATUS )
+      KAPVID = SLV_LOADW( KAPVIE, CMD, .TRUE., TIMOUT, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL ERR_REP( 'FAILED',
@@ -688,6 +691,11 @@ C      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
 
 *  If an error occurred, then report a contextual message.
  99   CONTINUE
+
+*  Stop any detached processes.
+      IF ( CCDRID .GT. 0 ) CALL SLV_KILLW( CCDRID, STATUS )
+      IF ( CCDGID .GT. 0 ) CALL SLV_KILLW( CCDGID, STATUS )
+      IF ( KAPVID .GT. 0 ) CALL SLV_KILLW( KAPVID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'CCDALIGN_ERR',
      :                  'CCDALIGN: failed to align CCD frames.',
