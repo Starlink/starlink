@@ -1,0 +1,19 @@
+Stephane Arnouts <Stephane.Arnouts@oamp.fr>
+	Suggestions and extensive testing
+Mark Calabretta <mcalabre@atnf.csiro.au>
+	SExtractor makes use of his nice WCS library
+Jean-Paul Kneib <kneib@omp.fr>
+Ian Smail <Ian.Smail@durham.ac.uk>
+	Suggestions and spreading the software back in the early days! 
+Pascal Fouque <pfouque@eso.org>
+	Suggestions and testing
+Eric Aubourg <Eric.Aubourg@cea.fr>
+	Hints about how to optimize a C code
+Ville Laurikari	<vl@iki.fi>
+	For his VL_PROG_CC_WARNINGS (modified to ACX_PROG_CC_OPTIM)
+Benne Holwerda <holwerda@stsci.edu>
+	For making his cookbook available
+ESO
+	Financial support
+Too many people to list
+	Help in discovering bugs or bringing suggestions

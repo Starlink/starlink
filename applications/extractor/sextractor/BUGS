@@ -1,0 +1,4 @@
+V2.3 (2002-12-17)
+ASSOC options do not work properly with MEF images (this is not really a bug).
+
+				Emmanuel Bertin <bertin@iap.fr>
