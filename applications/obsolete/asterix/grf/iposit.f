@@ -253,9 +253,15 @@
               CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
               I_NPOS=I_NPOS+1
 
+*  if first one then make current position
+              IF (I_NPOS.EQ.1) THEN
+                CALL IMG_CELTOWORLD(RA,DEC,X,Y,STATUS)
+                CALL IMG_SETPOS(X,Y,STATUS)
+              ENDIF
+
               IF (REPEAT) THEN
                 CALL USI_CANCL('LIST',STATUS)
-                CALL USI_GET0L('LIST',TEXT,STATUS)
+                CALL USI_GET0C('LIST',TEXT,STATUS)
               ENDIF
 
             ENDDO
