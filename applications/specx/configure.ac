@@ -36,15 +36,21 @@ AC_CHECK_FUNCS([rindex index strchr strrchr])
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-dnl    Note that we readline currently depends on termcap
-dnl    so to build with readline we need to find something in termcap
-dnl    Do not know what happens if this all changes
-AC_CHECK_LIB([termcap],[tgetnum])
-
 dnl    Need to find readline library
-dnl    Could do with a --with-readline option
-AC_CHECK_LIB([readline],[readline])
-AC_CHECK_LIB([history],[add_history])
+dnl    Sometimes it also requires termcap so if readline does not
+dnl    work we try again with termcap first.
+dnl    The follow up test uses rl_set_prompt to get around caching
+dnl    issues. We need to pass this test to ensure that libreadline
+dnl    will be included when we do AC_CHECK_FUNCS
+AC_CHECK_LIB([readline],[readline], ,
+   [ AC_CHECK_LIB([termcap],[tgetnum]) 
+     AC_CHECK_LIB([readline],[rl_set_prompt])])
+
+dnl    See whether we really need to include libhistory
+AC_CHECK_LIB(readline, add_history, ,
+  [AC_CHECK_LIB(history, add_history)])
+
+dnl    A feel-good test
 AC_CHECK_FUNCS([readline add_history])
 
 
