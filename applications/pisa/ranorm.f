@@ -11,11 +11,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     RESULT = RANNORM( A, B, STATUS )
+*     RESULT = RANORM( A, B, STATUS )
 
 *  Description:
-*     The routine calls the NAG library function G05DDF to return the
-*     pseudo random number
+*     The routine calls the PDA_DRNOR pseudo random number generator
+*     with a random seed for each time the program starts.
 
 *  Arguments:
 *     A = REAL (Given)
@@ -40,6 +40,8 @@
 *     3-SEP-1996 (PDRAPER):
 *        Changed to use non-NAG routine PDA_DRNOR (not really a PDA
 *        routine. Need to replace with the correct version when released).
+*     23-OCT-2002 (PDRAPER):
+*        Added change to use a different seed for each initialization.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -66,18 +68,22 @@
                                  ! generator
 
 *  Local variables:
-      LOGICAL SEEDED            ! Whether generator seeded or not
-
+      INTEGER SEED              ! The seed value
 
 *  Local data:
-      DATA SEEDED /.FALSE./
-      SAVE SEEDED
+      DATA SEED / 0 /
+      SAVE SEED
 *.
 
 *  Set the generator seed if not already done.
-      IF ( .NOT. SEEDED ) THEN 
-         CALL PDA_DSTART( 1024 )
-         SEEDED = .TRUE. 
+      IF ( SEED .EQ. 0  ) THEN 
+*         CALL PSX_TIME( SEED, STATUS )
+*  Use PID rather than some tick measurement as ticks are seconds, which
+*  isn't always enough resolution to get a unique values, machines are
+*  getting fast... May not work for non-UNIX.
+         CALL PSX_GETPID( SEED, STATUS )
+         WRITE(*,*) SEED
+         CALL PDA_DSTART( SEED )
       END IF
 
 *  And generate the random number. Note this has a mean of zero and a
