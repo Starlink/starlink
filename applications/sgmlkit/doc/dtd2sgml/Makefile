@@ -20,6 +20,13 @@
 #
 #     This file is included in the distribution for information only.
 #
+#     NOTE (4 June 2000): The description+commentary->html magic has
+#       been stripped out of this file, into Makefile.sgml-mail,
+#       pending a better-designed long-term alternative.  The contents
+#       of this directory should now be buildable immediately after
+#       checkout form CVS, as long as you (a) override the directory
+#       paths below, (b) have perlSGML.
+#
 #
 #     Explanations:
 #
@@ -85,8 +92,8 @@
 PERLSGML_DIR=/home/norman/s/src/sgml/misc/lib
 DTDDIR=$(STARLINK_SGML_DIR)/dtd
 DECL=$(STARLINK_SGML_DIR)/dtd/xml.decl
-JAVA=/data/goedel/norman/packages/java/blackdown/jdk118_v1/bin/java
-CLASSPATH=/data/goedel/norman/s/src/sgml/java/classes/xp.jar:/data/goedel/norman/s/src/sgml/java/classes/xt.jar:/data/goedel/norman/s/src/sgml/java/classes/sax.jar
+#JAVA=/data/goedel/norman/packages/java/blackdown/jdk118_v1/bin/java
+#CLASSPATH=/data/goedel/norman/s/src/sgml/java/classes/xp.jar:/data/goedel/norman/s/src/sgml/java/classes/xt.jar:/data/goedel/norman/s/src/sgml/java/classes/sax.jar
 
 %.dtdsummary: $(DTDDIR)/%.dtd
 	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
@@ -136,79 +143,67 @@ starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 		$< >$@
 
 
-# Not only is the following target not buildable after distribution,
-# it is only buildable in a directory which has a file
-# `sgml-mail/sgml-starlink-0.7' (since there is no rule for building this as a
-# target).  That is, it's only usable in a directory which has been
-# set up to receive the result of the dtddoc.pl script.  See notes at top.
+# # Not only is the following target not buildable after distribution,
+# # it is only buildable in a directory which has a file
+# # `sgml-mail/sgml-starlink-0.7' (since there is no rule for building this as a
+# # target).  That is, it's only usable in a directory which has been
+# # set up to receive the result of the dtddoc.pl script.  See notes at top.
+# #
+# # NO -- this is bloody silly.  It's far too specific to my home
+# # machine's setup, so that you cannot build a set freshly checked out
+# # from CVS, even on my home machine.  Also, the Makefile goes crazy
+# # trying to keep to conceptually distinct systems working together.  The
+# # description->html route should be hived off somewhere else. It can
+# # be hacked around for the present (when building from a freshly
+# # checked-out copy) by creating, in order, directories and files:
+# #
+# #     mkdir sgml-mail
+# #     touch sgml-mail/sgml-{starlink,programcode}-0.7
+# #     mkdir sgml-{starlink,programcode}-0.7
+# #     touch {starlink,programcode}-0.7.description
+# #
+# # Sorry, Mark.
 #
-# NO -- this is bloody silly.  It's far too specific to my home
-# machine's setup, so that you cannot build a set freshly checked out
-# from CVS, even on my home machine.  Also, the Makefile goes crazy
-# trying to keep to conceptually distinct systems working together.  The
-# description->html route should be hived off somewhere else. It can
-# be hacked around for the present (when building from a freshly
-# checked-out copy) by creating, in order, directories and files:
 #
-#     mkdir sgml-mail
-#     touch sgml-mail/sgml-{starlink,programcode}-0.7
-#     mkdir sgml-{starlink,programcode}-0.7
-#     touch {starlink,programcode}-0.7.description
+# # Create the HTML file from the DTD description
+# %.html: %.description
+# 	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
+# 		$< dtddoc.xslt $@ listprefix=sgml-$(@:.html=)
 #
-# Sorry, Mark.
+# # Splice the DTD fragments in the directory sgml-starlink-0.7 into the
+# # description file starlink-0.7.description
+# %.description: sgml-%
+# 	for f in `./splice.pl $@ tmp-$@ $<`; do\
+# 		rm $$f; \
+# 	done
+# 	mv $@ $@.old
+# 	mv tmp-$@ $@
+#
+# # Following is slightly tricky, since we want to leave the input file
+# # (sgml-mail/sgml-%) existing and of zero size, but still older than
+# # the target.
+# sgml-%: sgml-mail/sgml-%
+# 	mv $< $(<)-temp
+# 	touch $<
+# 	./dtddoc.pl $@ < $(<)-temp
+# 	cat $(<)-temp >> $<-full-archive
+# 	rm $(<)-temp
+#
+#
+#
+# starlink-0.7.html: starlink-0.7.description starlink-0.7.dtdsummary
+#
+# starlink-0.7.description: sgml-starlink-0.7
+#
+# sgml-starlink-0.7: sgml-mail/sgml-starlink-0.7
+#
+# programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary
+#
+# programcode-0.7.description: sgml-programcode-0.7
+#
+# sgml-programcode-0.7: sgml-mail/sgml-programcode-0.7
 
 
-# Create the HTML file from the DTD description
-%.html: %.description
-	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
-		$< dtddoc.xslt $@ listprefix=sgml-$(@:.html=)
-
-# Splice the DTD fragments in the directory sgml-starlink-0.7 into the
-# description file starlink-0.7.description
-%.description: sgml-%
-	for f in `./splice.pl $@ tmp-$@ $<`; do\
-		rm $$f; \
-	done
-	mv $@ $@.old
-	mv tmp-$@ $@
-
-# Following is slightly tricky, since we want to leave the input file
-# (sgml-mail/sgml-%) existing and of zero size, but still older than
-# the target.
-sgml-%: sgml-mail/sgml-%
-	mv $< $(<)-temp
-	touch $<
-	./dtddoc.pl $@ < $(<)-temp
-	cat $(<)-temp >> $<-full-archive
-	rm $(<)-temp
-
-
-
-starlink-0.7.html: starlink-0.7.description starlink-0.7.dtdsummary
-
-starlink-0.7.description: sgml-starlink-0.7
-
-sgml-starlink-0.7: sgml-mail/sgml-starlink-0.7
-
-programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary
-
-programcode-0.7.description: sgml-programcode-0.7
-
-sgml-programcode-0.7: sgml-mail/sgml-programcode-0.7
-
-
-
-#programcode-0.7.html: programcode-0.7.description programcode-0.7.dtdsummary programcode-0.7
-#	if test programcode-0.7 -nt programcode-0.7.description; then \
-#		echo 'splicing programcode-0.7';\
-#		for f in `./splice.pl programcode-0.7.description tmp-programcode-0.7.description programcode-0.7`; do\
-#			rm -f $$f; \
-#		done; \
-#		mv programcode-0.7.description programcode-0.7.description.old; \
-#		mv tmp-programcode-0.7.description programcode-0.7.description; \
-#	fi
-#	CLASSPATH=$(CLASSPATH) $(JAVA) com.jclark.xsl.sax.Driver \
-#		programcode-0.7.description dtddoc.xslt $@ listprefix=programcode-0.7
 
 
 
@@ -216,43 +211,3 @@ sgml-programcode-0.7: sgml-mail/sgml-programcode-0.7
 
 clean:
 	rm -f *.sgmltext *.dtdsummary sgmltext.stamp
-
-
-# The way that I produce the documetation changed during the
-# preparations for release 0.6, and these following targets will
-# probably no longer work.
-#
-# starlink-0.5.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
-# 			$(DTDDIR)/starlink-0.5.dtd
-# 	SGML_SEARCH_PATH=$(DTDDIR) \
-# 	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
-# 			--descrip starlink-0.5.description \
-# 		$< >$@ 2>/dev/null
-#
-# starlink-0.4.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
-# 			$(DTDDIR)/starlink-0.4.dtd
-# 	SGML_SEARCH_PATH=$(DTDDIR) \
-# 	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
-# 			--descrip starlink-0.4.description \
-# 		$< >$@ 2>/dev/null
-#
-# starlink-0.3.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
-# 		$(DTDDIR)/starlink-0.3.dtd
-# 	SGML_SEARCH_PATH=$(DTDDIR) \
-# 	perl -I $(PERLSGML_DIR) dtd2sgml.pl --descrip starlink-0.3.description \
-# 		$< >$@ 2>/dev/null
-#
-# starlink-0.2.dtdsummary: $(DTDDIR)/starlink-everything.dtd $(DTDDIR)/starlink-0.2.dtd
-# 	SGML_SEARCH_PATH=$(DTDDIR) \
-# 	perl -I $(PERLSGML_DIR) dtd2sgml.pl --descrip starlink-0.2.description \
-# 		$< >$@ 2>/dev/null
-#
-# starlink-0.2.sgmltext: starlink-0.2.dtdsummary starlink-0.2.description
-#
-# starlink-0.3.sgmltext: starlink-0.3.dtdsummary starlink-0.3.description
-#
-# starlink-0.4.sgmltext: starlink-0.4.dtdsummary starlink-0.4.description
-#
-#starlink-0.5.sgmltext: starlink-0.5.dtdsummary starlink-0.5.description
-#
-# programcode-0.2.sgmltext: programcode-0.2.description programcode-0.2.dtdsummary
