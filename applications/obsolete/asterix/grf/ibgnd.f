@@ -2898,14 +2898,19 @@
 *        Which sample box does this point belong to
             S = IDX(I,J)
 
-*        Accumulate sum
-            WRK(S) = WRK(S) + DATA(I,J)
+*        Point is ok?
+            IF ( S .GT. 0 ) THEN
 
-*        Accumulate standard deviation. Assumed mean from existing sample mean
-            SAMEM(S) = SAMEM(S) + (DATA(I,J)-SAMM(S))**2
+*          Accumulate sum
+              WRK(S) = WRK(S) + DATA(I,J)
 
-*        Count pixel
-            SAMNP(S) = SAMNP(S) + 1
+*          Accumulate standard deviation. Assumed mean from existing sample mean
+              SAMEM(S) = SAMEM(S) + (DATA(I,J)-SAMM(S))**2
+
+*          Count pixel
+              SAMNP(S) = SAMNP(S) + 1
+
+            END IF
 
           END DO
         END DO
