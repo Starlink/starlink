@@ -28,6 +28,9 @@
 UsageString="$0 [--keep] [filename...]"
 deletetemp=true
 LS=/bin/ls
+# If the environment variable ECHONONL is defined, then eval it to
+# define a function echononl which echoes its argument without a
+# newline.  Otherwise define a default
 if test -n "$ECHONONL"; then
     eval ${ECHONONL}
 else
@@ -74,7 +77,6 @@ do
 	    echo "failed (exited with error status $testval)"
 	    nfailures=`expr $nfailures + 1`
 	    # Don't delete temporary files on failure
-	    # $deletetemp && rm -f $name.stdout $name.stderr $name*.tmp
 	elif [ -r "$name.correct" ]; then
 	    diff $name.correct $name.stdout >$name.diff
 	    rval=$?
