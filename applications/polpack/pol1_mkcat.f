@@ -207,10 +207,13 @@
          CALL CAT_TATTL( II, 'PRFDSP', .FALSE., STATUS )
       END IF
 
-*  Store ANGROT as a catalogue parameter.
-      CALL CAT_PPTSR( CI, 'ANGROT', ANGROT, 'ACW angle from X axis '//
-     :                'to ref. direction', QI, STATUS )
-      CALL CAT_TRLSE( QI, STATUS )
+*  Store ANGROT as a catalogue parameter if we are storing linear
+*  polarization.
+      IF( .NOT. CIRC ) THEN
+         CALL CAT_PPTSR( CI, 'ANGROT', ANGROT, 'ACW angle from X axis'//
+     :                   ' to ref. direction', QI, STATUS )
+         CALL CAT_TRLSE( QI, STATUS )
+      END IF
 
 *  Store the POLPACK version string as a catalogue parameter.
       CALL POL1_PTVRC( CI, STATUS )

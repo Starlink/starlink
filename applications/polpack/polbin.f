@@ -72,6 +72,15 @@
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
 
+*  Notes:
+*     -  An item named ANGROT is stored as a catalogue parameter in the
+*     output catalogue. It gives the anti-clockwise angle from the first 
+*     pixel axis (X) to the reference direction of the Stokes vectors and
+*     polarization vectors. The reference direction will be north if the 
+*     input catalogue has a celestial co-ordinate Frame within its WCS 
+*     information. Otherwise, the reference direction will be the second 
+*     pixel axis (i.e. ANGROT will be +90 degrees).
+
 *  Examples:
 *     polbin intab outtab 4
 *        Bins the Stokes parameters in catalogue "intab.FIT" and produces
@@ -95,6 +104,8 @@
 *        behaviour).
 *     10-NOV-1998 (DSB):
 *        Rename KPG1_GTCTW as POL1_GTCTW.
+*     6-APR-1999 (DSB):
+*        Changed reference direction scheme.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -215,7 +226,8 @@
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
       LOGICAL VAR                ! Producing variances?
-      REAL ANGROT                ! ACW angle from X pixel axis to analyser axis (degs)
+      REAL ANGROT                ! ACW angle from X axis to i/p ref dirn (degs)
+      REAL ANGRT                 ! ACW angle from X axis to o/p ref dirn (degs)
       REAL BOX( 2 )              ! Bin size
       REAL NSIGMA                ! No. of sigmas to clip at
       REAL RTOD                  ! Conversion factor; radians to degrees
@@ -356,7 +368,7 @@
       END IF
 
 *  If we are dealing with linear polarization, get the ACW angle from the
-*  X axis to the reference direction (ANGROT). 
+*  X axis to the input reference direction (ANGROT). 
       IF( .NOT. CIRC ) THEN
          CALL CAT_TIDNT( CIIN, 'ANGROT', GANG, STATUS )       
          CALL CAT_TIQAR( GANG, 'VALUE', ANGROT, STATUS )
@@ -684,6 +696,11 @@
          GO TO 999
       END IF
 
+*  Get the reference direction for the output catalogue. This may be
+*  different to the reference direction for the input cube.
+      CALL POL1_ANGRT( IWCS, 0.5*( SXLO + SXHI ), 0.5*( SYLO + SYHI ),
+     :                 ANGRT, STATUS )
+
 *  Get the units string from total intensity column of the input catalogue.
       UNITS = ' '
       CALL CAT_TIQAC( GI( I_ID ), 'UNITS', UNITS, STATUS) 
@@ -702,7 +719,7 @@
       END IF
 
 *  Create the output catalogue.
-      CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGROT, TITLE,
+      CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGRT, TITLE,
      :                 CIOUT, STATUS )
 
 *  Abort if an error has occured.
@@ -723,9 +740,9 @@
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IPI as a safe pointer.
       CALL POL1_PLVEC( TR2, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
-     :                 %VAL( IPVBIN ), ANGROT, STOKES, DEBIAS, VAR, 
-     :                 .FALSE., .FALSE., .FALSE., .FALSE., .FALSE., 
-     :                 .FALSE., .FALSE., .TRUE., CIOUT, 
+     :                 %VAL( IPVBIN ), STOKES, DEBIAS, VAR, ANGROT, 
+     :                 ANGRT, .FALSE., .FALSE., .FALSE., .FALSE.,
+     :                  .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
