@@ -1345,8 +1345,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         SCALE(2)=(HIGH-LOW)/REAL(MDIM(2))
         BASE(2)=LOW+SCALE(2)/2.0
       ELSE
-*  set resolution to 4 raw pixels to avoid gigantic array size
-        MRES=4.0
+*  set resolution to 8 raw pixels to avoid gigantic array size
+        MRES=8.0
         IF (HEAD.ORIGIN.EQ.'MPE') THEN
           MDIM(1)=INT(ABS(HEAD.XEND-HEAD.XSTART)/MRES)
           MDIM(2)=INT(ABS(HEAD.YEND-HEAD.YSTART)/MRES)
@@ -1362,8 +1362,11 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       UNITS(1)='degrees'
       UNITS(2)='degrees'
 *
+	print *,mdim(1),mdim(2)
       CALL DYN_MAPI(2,MDIM,SMPTR,STATUS)
+	print *,'masking'
       CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(SMPTR),STATUS)
+	print *,'done'
       IF (SRT.BCKGND) THEN
         CALL DYN_MAPI(2,MDIM,BMPTR,STATUS)
         CALL ARX_MASK(BSRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(BMPTR),
@@ -2202,16 +2205,16 @@ C            ENDIF
 *
       IF ( INDEX(BIN_AXES,'1') .NE. 0) THEN
 *
-* Tell user how many old pixels in axis
+* Tell user how many raw pixels in axis
          CALL MSG_SETI('XPIX',2*X_HWIDTH)
-         CALL MSG_OUT(' ',' There are ^XPIX old pixels within'//
+         CALL MSG_OUT(' ',' There are ^XPIX raw sky pixels within'//
      &                                 ' the X range selected',STATUS)
 *
          CALL USI_GET0I('NXBIN', NXBIN, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-* Calculate number of old pixels per new pixel
+* Calculate number of raw pixels per new pixel
          NREBINX=NINT(2.0*REAL(X_HWIDTH)/REAL(NXBIN))
 *
          SRT.MIN_X = SOURCE_X-INT(REAL(NREBINX)*REAL(NXBIN)/2.0 )
@@ -2246,14 +2249,14 @@ C            ENDIF
       IF ( INDEX(BIN_AXES,'2') .NE. 0) THEN
 *
          CALL MSG_SETI('YPIX',2*Y_HWIDTH)
-         CALL MSG_OUT(' ',' There are ^YPIX old pixels within'//
+         CALL MSG_OUT(' ',' There are ^YPIX raw sky pixels within'//
      &                                 ' the Y range selected',STATUS)
 *
          CALL USI_GET0I('NYBIN', NYBIN, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-* Calculate number of old pixels per new pixel
+* Calculate number of raw pixels per new pixel
          NREBINY=NINT(2.0*REAL(Y_HWIDTH)/REAL(NYBIN))
 *
          SRT.MIN_Y=SOURCE_Y-INT(REAL(NREBINY)*REAL(NYBIN)/2.0)
@@ -2312,16 +2315,16 @@ C     &                         '^RBIN degrees starting from ^SPIX')
 * Detector pixels
       IF ( INDEX(BIN_AXES,'3') .NE. 0) THEN
 *
-* Tell user how many old pixels in axis
+* Tell user how many raw pixels in axis
          CALL MSG_SETI('XDET',SRT.MAX_XD-SRT.MIN_XD+1)
-         CALL MSG_OUT(' ',' There are ^XDET old pixels within'//
+         CALL MSG_OUT(' ',' There are ^XDET raw pixels within'//
      &                      ' the X detector range selected',STATUS)
 *
          CALL USI_GET0I('NXDBIN', NXDBIN, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-* Calculate number of old pixels per new pixel
+* Calculate number of raw pixels per new pixel
          NREBXD=NINT((SRT.MAX_XD - SRT.MIN_XD + 1) / REAL(NXDBIN))
 *
          SRT.MIN_XD = (SRT.MAX_XD + SRT.MIN_XD)/2.0 -
@@ -2350,16 +2353,16 @@ C     &                         '^RBIN degrees starting from ^SPIX')
 * Y detector:
       IF ( INDEX(BIN_AXES,'4') .NE. 0) THEN
 *
-* Tell user how many old pixels in axis
+* Tell user how many raw pixels in axis
          CALL MSG_SETI('YDET',SRT.MAX_YD-SRT.MIN_YD+1)
-         CALL MSG_OUT(' ',' There are ^YDET old pixels within'//
+         CALL MSG_OUT(' ',' There are ^YDET raw pixels within'//
      &                      ' the Y detector range selected',STATUS)
 *
          CALL USI_GET0I('NYDBIN', NYDBIN, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-* Calculate number of old pixels per new pixel
+* Calculate number of raw pixels per new pixel
          NREBYD=NINT((SRT.MAX_YD - SRT.MIN_YD + 1) / REAL(NYDBIN))
 *
          SRT.MIN_YD = (SRT.MAX_YD + SRT.MIN_YD)/2.0 -
