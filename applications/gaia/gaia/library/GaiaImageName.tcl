@@ -80,6 +80,9 @@
 #        Original version.
 #     14-JUL-2000 (PWD):
 #        Added support for FITS extensions ([1] etc.).
+#     08-MAR-2001 (PWD):
+#        Added name support for FITS files with multiple periods in
+#        their names.
 #     {enter_further_changes_here}
 
 #-
@@ -256,22 +259,37 @@ itcl::class gaia::GaiaImageName {
 
    #  Get the file type. This is the string (minus any FITS extension
    #  or NDF slice) after the first "."  in the string after the last
-   #  directory separator. If no type is given then it defaults to ".sdf".
+   #  directory separator. If no type is given then it defaults to
+   #  ".sdf". A special case is files that have multiple periods in
+   #  their names, but refer to an actual disk file.
    protected method get_type_ {} {
-      set tail [file tail $imagename]
-      set i1 [string first {.} $tail]
-      if { $i1 > -1 } {
-         if { $fitsext_ != {} } {
-            set i2 [expr [string first $fitsext_ $tail] -1]
-            set type_ [string range $tail $i1 $i2]
-         } elseif { $slice_ != {} } {
-            set i2 [expr [string first $slice_ $tail] -1]
-            set type_ [string range $tail $i1 $i2]
-         } else {
+
+      #  Remove the FITS extension or slice and check for file existence.
+      set i1 "end"
+      if { $fitsext_ != {} } {
+         set i1 [expr [string first $fitsext_ $imagename] -1]
+         set type_ [string range $imagename $i1 end]
+      } elseif { $slice_ != {} } {
+         set i1 [expr [string first $slice_ $imagename] -1]
+         set type_ [string range $imagename $i1 end]
+      }
+      set diskname [string range $imagename 0 $i1]
+      if {  [ file exists $diskname ] } {
+         set type_ [file extension $diskname]
+         if { ! [check_type_] } {
+            #  Use type as after first period, not last.
+            set tail [file tail $imagename]
+            set i1 [string first {.} $tail]
             set type_ [string range $tail $i1 end]
          }
       } else {
-	 set type_ ".sdf"
+         set tail [file tail $diskname]
+         set i1 [string first {.} $tail]
+         if { $i1 > -1 } {
+            set type_ [string range $tail $i1 end]
+         } else {
+            set type_ ".sdf"
+         }
       }
    }
 
