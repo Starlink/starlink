@@ -13,7 +13,7 @@
     set tclAdamLib       STAR_LIB/tk/adam
     set cgs4drTclLib     $env(CGS4DR_ROOT)/tcl
     set cgs4drBitmaps    $env(CGS4DR_ROOT)/tcl
-    set cgs4drHtml       STAR_DOCS/sun27.thx
+    set cgs4drHtml       $env(CGS4DR_ROOT)/docs
     set cgs4drWebBrowser /usr/local/bin/netscape
 
 # Set up library search path
