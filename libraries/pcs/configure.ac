@@ -24,8 +24,8 @@ STAR_DEFAULTS
 
 dnl    Declare the build and use dependencies for this package
 dnl    The dependencies should expand to include each of the
-dnl    subpackage as they are added to the system
-STAR_DECLARE_BUILD_DEPENDENCIES(subpar)
+dnl    subpackages as they are added to the system
+STAR_DECLARE_BUILD_DEPENDENCIES(adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task)
 dnl STAR_DECLARE_USE_DEPENDENCIES()
 
 dnl    List the sun/ssn/... numbers which document this package and
@@ -34,7 +34,11 @@ STAR_LATEX_DOCUMENTATION(ssn29 ssn77 sun115 sun134 sun144 sun224 sun241)
 
 dnl    List the set of active subdirectories.
 dnl    This must be kept up-to-date by hand.
-AC_CONFIG_SUBDIRS(adam adamnet ams dtask hdspar lex messys misc msp parsecon sock string subpar task)
+dnl    The list is available as the substitution variable @subdirs@.
+dnl    (must be kept on one line)
+AC_CONFIG_SUBDIRS(adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task)
+dnl     Missing from above list:
+dnl         adamnet -- redundant, and may not work
 
 AC_CONFIG_FILES(Makefile component.xml)
 
