@@ -190,6 +190,16 @@ interface POLKA
       helpkey  '*'
    endparameter
 
+   parameter POL
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  YES
+      prompt   'Processing polarimetry data?'
+      helpkey  '*'
+   endparameter
+
    parameter PSFSIZE
       type     _INTEGER
       access   UPDATE
