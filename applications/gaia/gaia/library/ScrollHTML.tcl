@@ -119,7 +119,7 @@ itcl::class gaia::ScrollHTML {
       catch {focus $itk_component(html).x}
       bind HtmlClip <Motion> {
          set parent [winfo parent %W]
-         set url [$parent href %x %y] 
+         set url [$parent href %x %y]
          if {[string length $url] > 0} {
             $parent configure -cursor hand2
          } else {
@@ -175,7 +175,7 @@ itcl::class gaia::ScrollHTML {
       if { [info exists images_($imgsrc)] } {
          return $images_($imgsrc)
       }
-      
+
       #  Otherwise create the image. Failures (i.e. not available)
       #  return a small gray image.
       if {[catch {image create photo -file $imgsrc} img]} {
@@ -232,6 +232,12 @@ itcl::class gaia::ScrollHTML {
       }
    }
 
+   #  Clear the history.
+   public method clear_history {} {
+      catch {unset history_}
+      set nhist_ -1
+   }
+
    #  Read a file, returning the contents as the results.
    protected method readfile_ {url} {
       if { ![regexp {(.*)\#(.*)} $url dummy filename anchor] } {
@@ -249,12 +255,12 @@ itcl::class gaia::ScrollHTML {
       }
    }
 
-   #  Load a file into the HTML widget.
-   public method loadfile {url} {
+   #  Load a file into the HTML widget. Update history if needed.
+   public method loadfile {url {update 1} } {
       set html [readfile_ $url]
       if { $html == "" } return
       clear
-      happend_ $url
+      if { $update } {happend_ $url}
       set current_ $url
       $itk_component(html) configure -base $url
       $itk_component(html) parse $html
@@ -267,20 +273,16 @@ itcl::class gaia::ScrollHTML {
    }
 
    #  Refresh the current file.
-   public method refresh {.} {
-      if { $current == {} } return
+   public method refresh {} {
+      if { $current_ == {} } return
       loadfile $current_
    }
 
    #  Append a file to the history record. Do not append if this is
    #  the same as the current file.
    protected method happend_ {name} {
-      if { $name == $current_ } return
-      set history_($nhist_) $name
       incr nhist_
-      if { $nhist_ > 20 } {
-         set nhist_ 0
-      }
+      set history_($nhist_) $name
    }
 
    #  Return the file associated with a history position.
@@ -288,37 +290,28 @@ itcl::class gaia::ScrollHTML {
       if { [info exists history_($n)] } {
          return history_($n)
       }
+      return ""
    }
 
    #  Display the "previous" file.
    public method previous {} {
-      incr nhist_ -1
-      if { $nhist_ < 0 && [info exists history_(20)] } {
-         set nhist_ 20
-      } else {
-         set nhist_ 0
-      }
-      puts "loading $nhist_"
-      if { [info exists history_($nhist_)] } {
-         loadfile $history_($nhist_)
+      if { $nhist_ > 0 } {
+         incr nhist_ -1
+         if { [info exists history_($nhist_)] } {
+            loadfile $history_($nhist_) 0
+         } else {
+            incr nhist_
+         }
       }
    }
 
    #  Display the "next" file.
    public method next {} {
       incr nhist_
-      if { $nhist_ > 20 } {
-         set nhist_ 0
-      }
-      puts "loading $nhist_"
       if { [info exists history_($nhist_)] } {
-         loadfile $history_($nhist_)
+         loadfile $history_($nhist_) 0
       } else {
          incr nhist_ -1
-         if { $nhist_ < 0 } {
-            set nhist_ 0 
-         }
-         puts "failed ($nhist_)"
       }
    }
 
@@ -326,20 +319,20 @@ itcl::class gaia::ScrollHTML {
    protected method pageforward_ {} {
       $itk_component(html) yview scroll 1 pages
    }
-   
+
    #  Callback for page back shortcut key.
    protected method pageback_ {} {
       $itk_component(html) yview scroll -1 pages
    }
-   
+
    #  Callback for line forward shortcut key
-   protected method lineforward_ {} { 
-      $itk_component(html) yview scroll 1 units 
+   protected method lineforward_ {} {
+      $itk_component(html) yview scroll 1 units
    }
 
    #  Callback for line back shortcut key
-   protected method lineback_ {} { 
-      $itk_component(html) yview scroll -1 units 
+   protected method lineback_ {} {
+      $itk_component(html) yview scroll -1 units
    }
 
    #  Protected variables:
@@ -350,12 +343,12 @@ itcl::class gaia::ScrollHTML {
 
    #  Name of the file that we're looking at.
    protected variable current_ {}
-   
+
    #  The names of last 20 URLs that we've visited.
    protected variable history_
 
    #  The current insertion position in the history.
-   protected variable nhist_ 0
+   protected variable nhist_ -1
 
    #  Configuration options:
    #  ----------------------

@@ -181,6 +181,7 @@ itcl::class gaia::GaiaHyperHelp {
    #  Render text of help topic <topic>. The text is expected to be
    #  found in <helpdir>/<topic>.html
    public method showtopic {topic} {
+      puts "showing topic: $topic"
       if { $topic != ""} {
          if ![regexp {(.*)\#(.*)} $topic dummy topicname anchorpart] {
             set topicname $topic
@@ -195,10 +196,18 @@ itcl::class gaia::GaiaHyperHelp {
    # METHOD: home
    #
    # Show the "home" topic, i.e. first in menu.
-   # ------------------------------------------------------------------
    public method home {} {
       if { $rendering_ || $filemenu_ == {} } return
-      $filemenu_ activate 0
+      $itk_component(html) clear_history
+      $filemenu_ invoke 0
+   }
+
+   # METHOD: hometopic
+   #
+   # Show a menu topic, clearing history.
+   public method hometopic { topic } {
+      $itk_component(html) clear_history
+      showtopic $topic
    }
 
    # METHOD: forward
@@ -265,7 +274,7 @@ itcl::class gaia::GaiaHyperHelp {
       foreach topic $itk_option(-topics) {
          $filemenu_ add command \
             -label [lindex $topic 0] \
-            -command [code $this showtopic [lindex $topic 1]]
+            -command [code $this hometopic [lindex $topic 1]]
       }
 
       #  Add final menu items.
@@ -300,6 +309,5 @@ itcl::class gaia::GaiaHyperHelp {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-
-#  End of class definition.
+   #  End of class definition.
 }
