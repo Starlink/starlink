@@ -37,3 +37,10 @@
          showme sun188 list_of_most_recent_changes
 
       to jump straight to the relevant page using your WWW browser.
+
+   V1.2-5 (January 2003)
+   ---------------------
+      Fixed broken behaviour related to change in linux sort flags.
+
+
+
