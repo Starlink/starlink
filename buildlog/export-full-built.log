@@ -423,7 +423,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 149 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -831,7 +831,7 @@ install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 8 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 230 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 94 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 95 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -848,8 +848,6 @@ build:
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/apache-tar.jar
-  [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
   [signjar] Signing JAR: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
 
 javadoc_check:
@@ -862,8 +860,8 @@ dist:
 
 install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 133 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 41 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
      [echo] Executing Coco target: install
 
@@ -945,4 +943,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 53 seconds
+Total time: 4 minutes 38 seconds

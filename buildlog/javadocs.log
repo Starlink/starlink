@@ -1580,8 +1580,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:54: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:54: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:54: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:102: warning - Tag @link: reference not found: uk.ac.starlink.datanode.tree.TreeTableLoadDialog
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:102: warning - Tag @link: reference not found: uk.ac.starlink.vo.ConeSearchDialog
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:102: warning - Tag @link: reference not found: uk.ac.starlink.vo.SiapTableLoadDialog
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:102: warning - Tag @link: reference not found: uk.ac.starlink.vo.RegistryTableLoadDialog
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:102: warning - Tag @link: reference not found: uk.ac.starlink.astrogrid.MyspaceTableLoadDialog
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 7 warnings
+  [javadoc] 12 warnings
      [echo] Executing NDTools target: javadocs
 
 prepare:
@@ -1970,23 +1975,12 @@ javadocs:
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.treeview...
-  [javadoc] Loading source files for package uk.ac.starlink.treeview.splat...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:263: warning - Tag @link: reference not found: TableNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
-  [javadoc] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java:288: warning - Tag @link: reference not found: NdxNodeChooser.Choosable
-  [javadoc] Generating /apps/cvsbuild/java/source/treeview/docs/treeview/javadocs/stylesheet.css...
-  [javadoc] 8 warnings
      [echo] Executing Coco target: javadocs
 
 prepare:
@@ -2814,4 +2808,4 @@ javadocs:
   [javadoc] 205 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 35 seconds
+Total time: 3 minutes 32 seconds

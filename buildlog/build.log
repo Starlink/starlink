@@ -203,7 +203,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 122 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 120 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -412,7 +412,7 @@ build_demo:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
     [javac] Compiling 109 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 65 files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 66 files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copied 3 empty directories to 2 empty directories under /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 29 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
@@ -433,12 +433,11 @@ build_demo:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 115 source files to /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 28 source files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copied 5 empty directories to 2 empty directories under /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copying 69 files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copied 4 empty directories to 2 empty directories under /apps/cvsbuild/java/source/treeview/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/treeview/lib/treeview
      [echo] Executing Coco target: build
 
 prepare:
@@ -475,4 +474,4 @@ build:
      [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/lib/frog
 
 BUILD SUCCESSFUL
-Total time: 1 minute 25 seconds
+Total time: 1 minute 24 seconds

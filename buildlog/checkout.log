@@ -9949,7 +9949,6 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.jav
 U java/source/table/src/main/uk/ac/starlink/table/gui/LoadWorker.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MultilineJTable.java
-U java/source/table/src/main/uk/ac/starlink/table/gui/NodeLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NumericCellRenderer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/PasteLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/ProgressBarStarTable.java
@@ -9960,7 +9959,6 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/StarJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
-U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableNodeChooser.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableConsumer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableLoadDialog.java
@@ -10033,7 +10031,6 @@ U java/source/table/src/testcases/uk/ac/starlink/table/TableTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/formats
 U java/source/table/src/testcases/uk/ac/starlink/table/formats/TextTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/gui
-U java/source/table/src/testcases/uk/ac/starlink/table/gui/StarTableNodeChooserTest.java
 cvs checkout: Updating java/source/table/src/testcases/uk/ac/starlink/table/storage
 U java/source/table/src/testcases/uk/ac/starlink/table/storage/StorageTest.java
 cvs checkout: Updating java/source/tamfits
@@ -10391,6 +10388,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/concat4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/controlw.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/demo.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exit.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/explode.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/exrows.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/false.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/folder_node.gif
@@ -10468,8 +10466,6 @@ cvs checkout: Updating java/source/treeview/src/etc/demo/zip
 U java/source/treeview/src/etc/demo/zip/hello.jar
 U java/source/treeview/src/etc/demo/zip/hello_src.zip
 cvs checkout: Updating java/source/treeview/src/lib
-U java/source/treeview/src/lib/apache-tar.jar
-U java/source/treeview/src/lib/commons-net-1.0.0.jar
 cvs checkout: Updating java/source/treeview/src/main
 cvs checkout: Updating java/source/treeview/src/main/uk
 cvs checkout: Updating java/source/treeview/src/main/uk/ac
@@ -10478,124 +10474,35 @@ cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/fits
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/table
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/table/gui
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/treeview
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ARYDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ArrayBrowser.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/AstFITSShower.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/AstTextShower.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/ApplicationDetailViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/AsynchronousImageDisplay.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/BasicAction.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/BasicDropHandler.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/BasicTransferable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ByteList.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/CollapseArrayImpl.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/CollapseViewer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ColumnsMetamapGroup.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ComponentMaker.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/CompressedDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/CreationState.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeBuilder.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeFactory.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeJTree.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTransferHandler.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTransferable.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTreeCellRenderer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DataNodeTreeModel.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DefaultDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DemoDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DetailViewer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DocumentDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/DocumentDataNodeBuilder.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/Draggable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/Driver.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DuplicateDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/EmptyDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ErrorDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSFileDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSStreamDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FileDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FileDataNodeBuilder.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FrameDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FtpDirectoryDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/FtpLocation.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/GraphViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/GridPlotter.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/HDSDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/HDUDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/HDXDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLDocComponentMaker.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLProcessor.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HTMLViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HelpDetailViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/HexDumper.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/HistoryDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/IconFactory.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ImageHDUDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ImageViewPane.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ImageViewer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/InfoPanel.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/JDBCDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/MetaTable.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/MetamapGroup.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/MyspaceContainerDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NDArrayImage.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NDFDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/NdxDisplayer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NdxNodeChooser.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NoSuchDataException.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NodeAncestorComboBox.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/NodeExpander.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/PlainDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ResourceListDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ScalarDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ScalingPlot.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/SimpleDataNodeBuilder.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SliceViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SogNdxDisplayer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/SourceDataNodeBuilder.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/SplatNdxDisplayer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/StaticTreeViewer.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/StatsValues.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/StatsViewer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/StringComparator.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/StringDataNodeBuilder.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/StyledTextArea.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/SwingWorker.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/SwitchDataSource.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TableHDUDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TableNodeChooser.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TarBranchDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TarStreamDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TextViewer.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeModelNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeNodeChooser.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeWriter.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeviewEntityResolver.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeviewLAF.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/TreeviewUtil.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/VOComponentDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/VODataNodeBuilder.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/VOTableTableDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ValueInfoMetamapGroup.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/WCSChannel.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/WCSDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/XMLDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/XMLDataNodeBuilder.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/XMLDocument.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipArchiveDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipBranchDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipFileDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/ZipStreamDataNode.java
-U java/source/treeview/src/main/uk/ac/starlink/treeview/package.html
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/treeview/splat
-U java/source/treeview/src/main/uk/ac/starlink/treeview/splat/README
-U java/source/treeview/src/main/uk/ac/starlink/treeview/splat/SplatNodeChooser.java
 cvs checkout: Updating java/source/treeview/src/main/uk/ac/starlink/treeview/votable
 cvs checkout: Updating java/source/treeview/src/resources
 cvs checkout: Updating java/source/treeview/src/resources/uk
@@ -10616,74 +10523,6 @@ U java/source/treeview/src/resources/uk/ac/starlink/treeview/docs/invocation.htm
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/docs/popup.gif
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/docs/popup.html
 cvs checkout: Updating java/source/treeview/src/resources/uk/ac/starlink/treeview/images
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/AGlogo.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Down.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Frame.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Help2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Home24.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Minus.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/MinusMinus.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Plus.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/PlusPlus.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Sheet.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Sheets.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/SplitHorizontal.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/SplitVertical.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Stop.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TREE27.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TREE28.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TileCascade.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/TopCat2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/Up.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/archgreen.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/archyellow.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/axes42.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/axes62.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/axes81.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/ball.black.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/book2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/box7.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/branchgreen.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/branchyellow.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/burst.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/cell.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/closed.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/dir4.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/file1.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/fuzz2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/fuzz3.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/gstar2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/handle1.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/handle2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/jsky2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/madsmiley.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/mini-doc.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/multi8.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/multidisplay.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/multiply3.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/open3.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/plaindat.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/redoy2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/row.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/smallbox1.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/sogimage.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/squishdat.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/star_gold.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/starlinklogo1b.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/starlinklogo3.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/sxtree6.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/table10.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/telescope2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/trasha2.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/world1.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_comm.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_doc.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_dtd.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_el.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_eref.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_pi.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xml_txt.gif
-U java/source/treeview/src/resources/uk/ac/starlink/treeview/images/xtree5.gif
 cvs checkout: Updating java/source/treeview/src/resources/uk/ac/starlink/treeview/text
 U java/source/treeview/src/resources/uk/ac/starlink/treeview/text/build.properties
 cvs checkout: Updating java/source/treeview/src/script
@@ -10695,7 +10534,6 @@ cvs checkout: Updating java/source/treeview/src/testcases/uk/ac
 cvs checkout: Updating java/source/treeview/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/treeview/src/testcases/uk/ac/starlink/treeview
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/ModelTest.java
-U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeChooserTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/TreeviewTest.java
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demopath.cmp
 U java/source/treeview/src/testcases/uk/ac/starlink/treeview/demopath.cmp.3

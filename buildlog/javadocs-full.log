@@ -83,7 +83,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 127 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 125 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 10 empty directories to 1 empty directory under /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -163,8 +163,8 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 116 files to /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copied 9 empty directories to 3 empty directories under /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 28 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copied 9 empty directories to 4 empty directories under /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
 javadoc-sources:
