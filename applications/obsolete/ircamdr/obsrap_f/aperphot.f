@@ -286,15 +286,15 @@
      :        THEN
 	        CALL AIF_GET0R( 'MAJAX1', 10.0, 0.0001, 10000.0, 
      :                          MAJAX1, STATUS )
-!	type *, 'after aif'
+!	print *, 'after aif'
 	        CALL PAR_CANCL( 'MAJAX1', STATUS)
-!	type *, 'after cancl', skyannul
+!	print *, 'after cancl', skyannul
 	        IF( SKYANNUL) THEN
 	          junk1 = majax1*2
-!	type *, 'in test', junk1, majax1
+!	print *, 'in test', junk1, majax1
                   CALL AIF_GET0R( 'MAJAX2', 10.0, MAJAX1, 10000.0, 
      :                            MAJAX2, STATUS )
-!	type *, 'after aif 2'
+!	print *, 'after aif 2'
 	          CALL PAR_CANCL( 'MAJAX2', STATUS)
 	          junk1 = majax1*3
                   CALL AIF_GET0R( 'MAJAX3', 20.0, MAJAX2, 10000.0, 
@@ -609,7 +609,7 @@
 	      CALL CHECK_COMMENT( LINE1, IS_COMMENT)
 
 *            test if current line is a comment or not
-	      IF( IS_COMMENT .EQ. .FALSE.) THEN
+	      IF( .NOT. IS_COMMENT ) THEN
 
 *              read input variables from input line
 	        READ( LINE1, *, ERR=997, END=996) XCEN, YCEN, ECC,
@@ -700,7 +700,7 @@
 
 *              call subroutine that does the actual work
 	        IF( SKYANNUL) THEN
-	type *, 'just before aperphotsub call 2'
+!	print *, 'just before aperphotsub call 2'
 	          CALL APERPHOTSUB( 
      :                IDIMS( 1), IDIMS( 2), %VAL( PNTRI), IXCEN, 
      :	              IYCEN, ECC, POSANG, RAD1, RAD2, SCALE, 
