@@ -111,7 +111,7 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-#ifndef HAVE_FC_OPEN_ACCESSAPPEND
+#if !HAVE_FC_OPEN_ACCESSAPPEND
 *  ACCESS='APPEND' is attempted but not supported
       IF ( ACCESS .EQ. 'APPEND' ) THEN
          STATUS = FIO__IVFMT
@@ -122,7 +122,7 @@
       END IF
 #endif
 
-#ifdef HAVE_FC_OPEN_ACCESSSEQUENTIALRECL1
+#if HAVE_FC_OPEN_ACCESSSEQUENTIALRECL1
 *  RECLEN with sequential files is supported so allow the option
       LREC = RECLEN
 #else
@@ -145,17 +145,17 @@
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
-#ifdef HAVE_FC_OPEN_CARRIAGECONTROLNONE
+#if HAVE_FC_OPEN_CARRIAGECONTROLCC
      :               CARRIAGECONTROL=CC, 
 #endif
-#ifdef HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :               READONLY, 
 #endif
      :               RECL=RECSZ )
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
-#ifdef HAVE_FC_OPEN_CARRIAGECONTROLNONE
+#if HAVE_FC_OPEN_CARRIAGECONTROLCC
      :               CARRIAGECONTROL=CC, 
 #endif
      :               RECL=RECSZ)
@@ -164,7 +164,7 @@
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR,
-#ifdef HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
      :               RECL=RECSZ)
@@ -178,16 +178,16 @@
             IF ( CCNTL ) THEN
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
-#ifdef HAVE_FC_OPEN_CARRIAGECONTROLNONE
+#if HAVE_FC_OPEN_CARRIAGECONTROLCC
      :               CARRIAGECONTROL=CC, 
 #endif
-#ifdef HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
                ELSE
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
-#ifdef HAVE_FC_OPEN_CARRIAGECONTROLNONE
+#if HAVE_FC_OPEN_CARRIAGECONTROLCC
      :               CARRIAGECONTROL=CC, 
 #endif
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
@@ -195,7 +195,7 @@
             ELSE
                IF ( RDONLY ) THEN
                   OPEN( UNIT=UNIT, FILE=FILE, STATUS=FSTAT, FORM=FORMAT,
-#ifdef HAVE_FC_OPEN_READONLY
+#if HAVE_FC_OPEN_READONLY
      :               READONLY,
 #endif
      :               ACCESS=ACCESS, ERR=10, IOSTAT=SYSERR)
