@@ -18,13 +18,16 @@ BLOCK_DATA_FILES = ctm_xcols.f
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
 kpg1_ieeer.c  kpg1_isfinr.c  kpg1_tkast.c
 
-F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) 
+F_ROUTINES = $(KPG_NONGEN) $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
+	$(KPG_DIR_GEN:.gdir=.f)
 
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn
 
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
 kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr
+
+KPG_DIR_GEN = kpg1_mul.gdir
 
 KPG_NONGEN = bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f chvalb.f chvali.f \
@@ -85,8 +88,8 @@ kpg1_meanub.f kpg1_meanuw.f kpg1_meanw.f \
 kpg1_mmthb.f kpg1_mmthd.f kpg1_mmthi.f kpg1_mmthr.f kpg1_mmthub.f \
 kpg1_mmthuw.f kpg1_mmthw.f kpg1_modeb.f kpg1_moded.f kpg1_modei.f \
 kpg1_moder.f kpg1_modeub.f kpg1_modeuw.f kpg1_modew.f kpg1_monod.f \
-kpg1_monor.f kpg1_mthed.f kpg1_mther.f kpg1_muld.f kpg1_muli.f \
-kpg1_mulr.f kpg1_mxmeb.f kpg1_mxmed.f kpg1_mxmei.f kpg1_mxmer.f \
+kpg1_monor.f kpg1_mthed.f kpg1_mther.f \
+kpg1_mxmeb.f kpg1_mxmed.f kpg1_mxmei.f kpg1_mxmer.f \
 kpg1_mxmeub.f kpg1_mxmeuw.f kpg1_mxmew.f kpg1_mxmnb.f kpg1_mxmnd.f \
 kpg1_mxmni.f kpg1_mxmnr.f kpg1_mxmnub.f kpg1_mxmnuw.f kpg1_mxmnw.f \
 kpg1_nacvt.f kpg1_nagtc.f kpg1_naptc.f \
@@ -170,5 +173,8 @@ kpg1_pgsht.f kpg1_pacol.f
 	cp $< $(<:.gdr=.gen)
 	$(GENERIC)  -t dr $(<:.gdr=.gen)
 	rm $(<:.gdr=.gen)
+
+.gdir.f:
+	$(GENERIC) $(<)
 
 AM_FCFLAGS = -I../ira @TCL_CFLAGS@ @TK_CFLAGS@

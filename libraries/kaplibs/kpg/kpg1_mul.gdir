@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_MULD( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR,
+      SUBROUTINE KPG1_MUL<T>( BAD, VAR, EL, A, VA, B, VB, C, VC, NERR,
      :                        STATUS )
 *+
 *  Name:
@@ -61,6 +61,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
  
 *  History:
@@ -70,6 +71,8 @@
 *        Fixed bug when VEC routine returns bad status.
 *     1996 May 20 (MJC):
 *        Replaced LIB$ESTABLISH and LIB$REVERT calls.
+*     2004 Oct 1 (TIMJ):
+*        Recreate Generic version from constituent parts
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -91,14 +94,14 @@
       LOGICAL BAD
       LOGICAL VAR
       INTEGER EL
-      DOUBLE PRECISION A( EL )
-      DOUBLE PRECISION VA( EL )
-      DOUBLE PRECISION B( EL )
-      DOUBLE PRECISION VB( EL )
+      <TYPE> A( EL )
+      <TYPE> VA( EL )
+      <TYPE> B( EL )
+      <TYPE> VB( EL )
  
 *  Arguments Returned:
-      DOUBLE PRECISION C( EL )
-      DOUBLE PRECISION VC( EL )
+      <TYPE> C( EL )
+      <TYPE> VC( EL )
       INTEGER NERR
  
 *  Status:
@@ -122,7 +125,7 @@
 *  Simply multiply the two data arrays.
       IF ( .NOT. VAR ) THEN
          CALL ERR_MARK
-         CALL VEC_MULD( BAD, EL, A, B, C, IERR, NERR, STATUS )
+         CALL VEC_MUL<T>( BAD, EL, A, B, C, IERR, NERR, STATUS )
  
 *  Annul the bad status due to any overflows.
          CALL ERR_ANNUL( STATUS )
@@ -146,7 +149,7 @@
             DO 1 I = 1, EL
                C( I ) = A( I ) * B( I )
                IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                  C( I ) = VAL__BADD
+                  C( I ) = VAL__BAD<T>
                   NERR = NERR + 1
                   NUM_ERROR = SAI__OK
                END IF
@@ -155,7 +158,7 @@
                VC( I ) = VA( I ) * B( I ) * B( I ) +
      :                   VB( I ) * A( I ) * A( I )
                IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                  VC( I ) = VAL__BADD
+                  VC( I ) = VAL__BAD<T>
                   NERR = NERR + 1
                   NUM_ERROR = SAI__OK
                END IF
@@ -168,32 +171,32 @@
  
 *  See if either input data value is bad. If so, then set bad output
 *  values.
-               IF ( ( A( I ) .EQ. VAL__BADD ) .OR.
-     :              ( B( I ) .EQ. VAL__BADD ) ) THEN
-                  C( I ) = VAL__BADD
-                  VC( I ) = VAL__BADD
+               IF ( ( A( I ) .EQ. VAL__BAD<T> ) .OR.
+     :              ( B( I ) .EQ. VAL__BAD<T> ) ) THEN
+                  C( I ) = VAL__BAD<T>
+                  VC( I ) = VAL__BAD<T>
  
 *  Multiply the data values, checking for numerical overflow.
                ELSE
                   C( I ) = A( I ) * B( I )
                   IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                     C( I ) = VAL__BADD
+                     C( I ) = VAL__BAD<T>
                      NERR = NERR + 1
                      NUM_ERROR = SAI__OK
                   END IF
  
 *  See if either input variance value is bad. If so, then set a bad
 *  output variance value.
-                  IF ( ( VA( I ) .EQ. VAL__BADD ) .OR.
-     :                 ( VB( I ) .EQ. VAL__BADD ) ) THEN
-                     VC( I ) = VAL__BADD
+                  IF ( ( VA( I ) .EQ. VAL__BAD<T> ) .OR.
+     :                 ( VB( I ) .EQ. VAL__BAD<T> ) ) THEN
+                     VC( I ) = VAL__BAD<T>
  
 *  Calculate the output variance value, again checking for overflow.
                   ELSE
                      VC( I ) = VA( I ) * B( I ) * B( I ) +
      :                         VB( I ) * A( I ) * A( I )
                      IF ( NUM_ERROR .NE. SAI__OK ) THEN
-                        VC( I ) = VAL__BADD
+                        VC( I ) = VAL__BAD<T>
                         NERR = NERR + 1
                         NUM_ERROR = SAI__OK
                      END IF
