@@ -62,6 +62,7 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
+*     DSB: David S. Berry (Starlink)
 
 *  History:
 *     1-FEB-1996 (RFWS):
@@ -90,6 +91,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     17-AUG-1999 (RFWS):
 *        Improved the convergence security of MapBox (return to older but
 *        less efficient setting).
+*     22-NOV-2000 (DSB):
+*        The finterp function is now cast to the correct type to prevent 
+*        default promotion (to int or double) of its arguments (thanks to
+*        Mark Taylor for this fix!).
 *class--
 */
 
@@ -7608,14 +7613,30 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    function, then report a contextual error message. */
 #define CASE_UINTERP(X,Xtype) \
                case ( TYPE_##X ): \
-                  ( *finterp )( ndim_in, lbnd_in, ubnd_in, (Xtype *) in, \
-                                (Xtype *) ( usevar ? in_var : NULL ), \
-                                npoint, offset, \
-                                (const double *const *) ptr_in, \
-                                params, flags, *( (Xtype *) badval_ptr ), \
-                                (Xtype *) out, \
-                                (Xtype *) ( usevar ? out_var : NULL ), \
-                                &nbad ); \
+\
+/* The finterp function needs to be cast to the correct type to prevent \
+   default promotion (to int or double) of its arguments.  The cast here  \
+   corresponds to the declaration of ast_resample_uinterp##Xtype. */ \
+                  ( *( (void (*)( int, const int[], const int[], \
+                                  const Xtype[], \
+                                  const Xtype[], \
+                                  int, const int[], \
+                                  const double *const[], \
+                                  const double[], int, \
+                                  Xtype, \
+                                  Xtype *, \
+                                  Xtype *, \
+                                  int * ) \
+                        ) finterp ) )( ndim_in, lbnd_in, ubnd_in, \
+                                       (Xtype *) in, \
+                                       (Xtype *) ( usevar ? in_var : NULL ), \
+                                       npoint, offset, \
+                                       (const double *const *) ptr_in, \
+                                       params, flags, \
+                                       *( (Xtype *) badval_ptr ), \
+                                       (Xtype *) out, \
+                                       (Xtype *) ( usevar ? out_var : NULL ), \
+                                       &nbad ); \
                   if ( astOK ) { \
                      result += nbad; \
                   } else { \
