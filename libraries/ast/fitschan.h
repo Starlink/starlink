@@ -234,6 +234,8 @@
 *        Added CarLin attribute.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitFitsChanVtab method.
+*     13-FEB-2003 (DSB):
+*        Added Clean attribute.
 *-
 */
 
@@ -279,6 +281,7 @@ typedef struct AstFitsChan {
    int encoding;    /* System for encoding AST objects ito FITS headers */
    int defb1950;    /* Use FK4 B1950 as defaults? */
    int carlin;      /* Use linear CAR mappings? */
+   int clean;       /* Remove used cards even if an error occurs? */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
    char *warnings;  /* Pointer to a string containing warning conditions */
    void *card;      /* Pointer to next FitsCard to be read */
@@ -355,6 +358,10 @@ typedef struct AstFitsChanVtab {
    int (* TestWarnings)( AstFitsChan * );
    void (* ClearWarnings)( AstFitsChan * );
    void (* SetWarnings)( AstFitsChan *, const char * );
+   int (* GetClean)( AstFitsChan * );
+   int (* TestClean)( AstFitsChan * );
+   void (* SetClean)( AstFitsChan *, int );
+   void (* ClearClean)( AstFitsChan * );
 
 } AstFitsChanVtab;
 #endif
@@ -444,6 +451,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
    int astTestCarLin_( AstFitsChan * );
    void astSetCarLin_( AstFitsChan *, int );
    void astClearCarLin_( AstFitsChan * );
+
+   int astGetClean_( AstFitsChan * );
+   int astTestClean_( AstFitsChan * );
+   void astSetClean_( AstFitsChan *, int );
+   void astClearClean_( AstFitsChan * );
 
    int astGetFitsDigits_( AstFitsChan * );
    int astTestFitsDigits_( AstFitsChan * );
@@ -609,6 +621,15 @@ astINVOKE(V,astGetCarLin_(astCheckFitsChan(this)))
 astINVOKE(V,astSetCarLin_(astCheckFitsChan(this),carln))
 #define astTestCarLin(this) \
 astINVOKE(V,astTestCarLin_(astCheckFitsChan(this)))
+
+#define astClearClean(this) \
+astINVOKE(V,astClearClean_(astCheckFitsChan(this)))
+#define astGetClean(this) \
+astINVOKE(V,astGetClean_(astCheckFitsChan(this)))
+#define astSetClean(this,value) \
+astINVOKE(V,astSetClean_(astCheckFitsChan(this),value))
+#define astTestClean(this) \
+astINVOKE(V,astTestClean_(astCheckFitsChan(this)))
 
 #define astClearFitsDigits(this) \
 astINVOKE(V,astClearFitsDigits_(astCheckFitsChan(this)))
