@@ -70,12 +70,17 @@
 *     - If a quality array is present in the input image it is used
 *       to generate a bad pixel mask in the output image and is removed.
 
+*  Related Applications:
+*     SURF: REMDBM
 
 *  Authors:
 *     Tim Jenness (t.jenness@jach.hawaii.edu)
 
 *  History:
 *     $Log$
+*     Revision 1.3  1999/01/26 19:35:07  timj
+*     Add a 'related applications' line in the header
+*
 *     Revision 1.2  1999/01/12 02:55:26  timj
 *     Correct task name in header (was SCUMAKEWT)
 *
