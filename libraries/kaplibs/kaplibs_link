@@ -26,7 +26,7 @@
       if test "${nogks}" = 'y'; then 
          echo -lkapgen -lira -lirq -llpg -lctg -lfits -laif -lkapgrf \
            `cat_link` `ndg_link` \
-           `ndf_link` `ast_link -mygrf` \
+           `ndf_link` `ast_link -ems -mygrf` \
            `agp_link` `fio_link` \
            `grp_link` `trn_link` \
            `prm_link` `mag_link` \
@@ -40,7 +40,7 @@
            `cat_link` `snx_link` \
            `sgs_link` `ndg_link` \
            `gks_link` `gns_link` \
-           `ndf_link` `ast_link -mygrf` \
+           `ndf_link` `ast_link -ems -mygrf` \
            `agi_link` `fio_link` \
            `grp_link` `trn_link` \
            `prm_link` `mag_link` \
