@@ -412,11 +412,12 @@ javadocs:
   [javadoc]              +-s-> e --+
   [javadoc]  </pre>"
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/pod/Pod.java:29: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod is a "pile of data." This is any complex evolving data
   [javadoc]  structure."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A Pod is a "pile of data." "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/util/java2d/Polygon2D.java:475: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new polygon with the
   [javadoc]  given vertices, in the format
   [javadoc]  [x0, y0, x1, y1, ..."
@@ -424,7 +425,6 @@ javadocs:
   [javadoc] "Create a new polygon with the
   [javadoc]  given vertices, in the format
   [javadoc]  [x0, y0, x1, y1, ... ]."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/toolbox/ModedIncrRecognizer.java:74: warning - The first sentence is interpreted to be:
   [javadoc] "Process an "action" event, performing the appropriate action
   [javadoc]  behavior (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2800,4 +2800,4 @@ javadocs:
   [javadoc] 204 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 55 seconds
+Total time: 4 minutes 11 seconds

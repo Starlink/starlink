@@ -1329,7 +1329,6 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/PointConstraint.html...
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." A snap means that the output value of the point
@@ -1337,12 +1336,13 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Ask the point constraint call to constrain()
   [javadoc]  cause a "snap." "
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/canvas/interactor/SelectionModel.html...
   [javadoc] "Add an array of objects to the selection."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Add an array of objects to the selection. the model should
   [javadoc]  highlight the selected objects."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/PointConstraint.java:32: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionDragger.java:54: warning - @history is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ConnectorListener.java:36: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/ArcConnector.java:52: warning - @rating is an unknown tag.
@@ -1566,4 +1566,4 @@ javadoc-sources:
   [javadoc] 582 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 29 seconds
+Total time: 1 minute 24 seconds

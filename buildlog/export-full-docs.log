@@ -219,6 +219,7 @@ javadoc-sources:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
@@ -228,23 +229,22 @@ javadoc-sources:
   [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] "Add an array of objects to the selection."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Add an array of objects to the selection. the model should
-  [javadoc]  highlight the selected objects."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - Tag @see: malformed: "AstAxisLabels,"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
+  [javadoc] "Add an array of objects to the selection."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Add an array of objects to the selection. the model should
+  [javadoc]  highlight the selected objects."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: malformed: "Plot, PlotConfig."
   [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AppContextDelegate.java:28: warning - The first sentence is interpreted to be:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
   [javadoc]  AppContext or an ApplicationContext.)  This is similar to an interface
   [javadoc]  adapter, except the default implementation of each method is to 
   [javadoc]  call the identical method on the delegate context."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AppContextDelegate.java:28: warning - The first sentence is interpreted to be:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
@@ -306,24 +306,24 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawFigureFactory.java:87: warning - Tag @link: reference not found: Figure
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/DashedPathRecognizer.java:71: warning - Tag @see: missing #: "DashedPathRecognizer(SceneRecognizer, double, double, double)"
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/DecimalField.java:19: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "DecimalField extends JTextField to force the entry of valid decimal
   [javadoc]  (i.e. floating point and integer) numbers. "
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstNumberLabels.java:90: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] "The number of digits used to determine gap between major axes."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The number of digits used to determine gap between major axes. (-1 for
   [javadoc]  not set)."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:175: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:52: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:54: warning - Tag @see: missing #: "setDispatchEnabled(boolean)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] "A Pod, in Diva, is an object that contains a "pile of data."  This is
   [javadoc] our term for complex data structures that evolve with time."
@@ -367,6 +367,7 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A figure that displays a polyline that can have its vertices moved,
   [javadoc]  intended for use as a freehand (i.e.<!"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawPathFigure.java:39: warning - The first sentence is interpreted to be:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!-- --> figure creation, removal and transformations."
@@ -374,7 +375,6 @@ javadoc-sources:
   [javadoc] "DrawPathFigure extends the diva PathFigure class to add support for
   [javadoc]  events that allow users of any derived figures to be made aware of
   [javadoc]  any changes, i.e.<!"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/DrawPathFigure.java:39: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:239: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:83: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureListener.java:35: warning - The first sentence is interpreted to be:
@@ -412,10 +412,10 @@ javadoc-sources:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphUtilities.java:25: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/jaiutil/build/java/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
   [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
   [javadoc]  processed the same as FITSImages, i.e."
@@ -627,11 +627,11 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/compat/xml/XmlWriter.java:158: warning - Tag @see: can't find makeExternalIdentifiers in diva.compat.xml.XmlWriter
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/util/xml/XmlWriter.java:135: warning - Tag @see: can't find makeExternalIdentifiers in diva.util.xml.XmlWriter
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/compat/xml/XmlWriter.java:135: warning - Tag @see: can't find makeExternalIdentifiers in diva.compat.xml.XmlWriter
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the supports of the two elements (i.e. the
   [javadoc]  sets elements that they cover) are identical."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:510: warning - The first sentence is interpreted to be:
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/pod/package.html: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/overview-summary.html...
@@ -897,11 +897,11 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] "Decode (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:225: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -1129,14 +1129,14 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ContextView.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/Page.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/View.java:24: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/AbstractApplication.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
@@ -2366,4 +2366,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 9 minutes 40 seconds
+Total time: 10 minutes 35 seconds
