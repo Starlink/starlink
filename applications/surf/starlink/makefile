@@ -590,7 +590,7 @@ surflib_median_regrid.f surflib_remove_dc_from_exp.f surflib_rem_timeseries.f \
 surflib_rem_grid.f surflib_2dft_chop.f surflib_calc_dual_beam.f \
 surflib_process_bols.f surflib_fill_polpack_angles.f surflib_remove_ip.f \
 surflib_fill_wplate.f surflib_read_ipfile.f surflib_calc_polpack_angrot.f \
-surflib_trim_image.f
+surflib_trim_image.f surflib_remove_dc_via_sect.f
 
 SCULIB_FCPP_ROUTINES = sculib_bessel_wtinit.F sculib_skydip_temperatures.F
 
@@ -652,7 +652,7 @@ sculib_unpack_jiggle_separates.f sculib_ut1.f sculib_wtfn_regrid.f \
 sculib_wtfn_regrid_1.f sculib_wtfn_regrid_2.f sculib_wtfn_regrid_3.f \
 sculib_scan_2_rd.f sculib_add_chop.f sculib_mulcad.f \
 sculib_gauss_wtinit.f sculib_skydip_var.f \
-sculib_fix_scan_v10.f sculib_noise_mean.f
+sculib_fix_scan_v10.f sculib_noise_mean.f sculib_find_int.f
 
 
 #  List of Fortran BLOCK DATA routines.
@@ -1856,6 +1856,7 @@ sculib_wtfn_regrid_2.o: PRM_PAR SAE_PAR
 sculib_wtfn_regrid_3.o: PRM_PAR SAE_PAR
 sculib_bessel_wtinit.o: SAE_PAR
 sculib_skydip_temperatures.o: SAE_PAR
+sculib_find_int.o: SAE_PAR
 surflib_2dft_chop.o: SAE_PAR
 surflib_calc_gridij.o: PRM_PAR SAE_PAR
 surflib_calc_ijpos.o: PRM_PAR SAE_PAR
@@ -1876,6 +1877,7 @@ surflib_calc_dual_beam.o: PRM_PAR SAE_PAR
 surflib_process_bols.o: PRM_PAR SAE_PAR
 surflib_read_ipfile.o: FIO_ERR SAE_PAR PRM_PAR
 surflib_trim_image.o: SAE_PAR NDF_FUNC
+surflib_remove_dc_via_sect.o: SAE_PAR PRM_PAR MSG_PAR
 ctm_xcols.o: CTM_PAR
 gethlp.o: HLPCMD SAE_PAR
 gthlpi.o: HLPCMD SAE_PAR
