@@ -529,7 +529,7 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
       CHARACTER*12 LBL
       REAL ASTEP(10)/1.0,2.0,5.0,10.0,20.0,30.0,60.0,120.0,300.0,600.0/
       REAL AUNIT
-      REAL RANGE
+      REAL XRANGE,YRANGE
       REAL XSCALE,YSCALE
       REAL X,Y
       REAL FACT
@@ -557,20 +557,21 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
 
 
 *  get angular range in arcmin
-        RANGE=ABS(X2-X1)
-        XSCALE=(X2-X1)/RANGE
-        YSCALE=(Y2-Y1)/ABS(Y2-Y1)
+        XRANGE=ABS(X2-X1)
+        XSCALE=(X2-X1)/XRANGE
+        YRANGE=ABS(Y2-Y1)
+        YSCALE=(Y2-Y1)/YRANGE
 
 *  less than 10 assume degrees - otherwise arcmin
-        IF (RANGE.LT.10.0) THEN
+        IF (XRANGE.LT.10.0) THEN
           FACT=60.0
         ELSE
           FACT=1.0
         ENDIF
-        RANGE=RANGE*FACT
+        XRANGE=XRANGE*FACT
 
 *  find an appropriate unit size
-        AUNIT=RANGE/10.0
+        AUNIT=XRANGE/10.0
         IF (AUNIT.GE.ASTEP(10)) THEN
           AUNIT=ASTEP(10)
         ELSE
@@ -586,6 +587,7 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
         CALL PGMOVE(X,Y)
         CALL PGDRAW(X+AUNIT/FACT*XSCALE,Y)
         X=X+AUNIT/FACT/2.0*XSCALE
+        Y=Y+YRANGE/100.0*YSCALE
         IF (AUNIT.LT.60.0) THEN
           CALL CHR_ITOC(INT(AUNIT),LBL,L)
           LBL=LBL(:L)//'\(0716)'
