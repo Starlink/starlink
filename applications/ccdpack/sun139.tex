@@ -8478,8 +8478,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          quality of the output flatfield.
 
          Note that for this option to work well you should have many
-         images and that a minimum of 2 contributing values for an
-         output pixel are required (MINPIX will have a minimum of 2).
+         images and that any output pixels that only have one input
+         image contributing to their value will have their variances 
+         set bad.
          [FALSE]
       }
 
@@ -8846,14 +8847,14 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          variance information will also be calculated for the output
          mosaic NDF, provided that USEVAR is also TRUE.
 
-         Otherwise if GENVAR is TRUE and either USEVAR is FALSE or some
-         of the input NDFs do not contain error information, then output
-         variances will be generated using the natural variations in the
-         input data. Obviously this method should only be used if there
-         are many input datasets, which also provide good coverage of
-         the output area. If this option is chosen only regions of the
-         output image that have data from at least 2 input images will
-         processed. Normally only 1 contributing image is required.
+         Otherwise if GENVAR is TRUE and either USEVAR is FALSE or
+         some of the input NDFs do not contain error information, then
+         output variances will be generated using the natural
+         variations in the input data. Obviously this method should
+         only be used if there are many input datasets, which also
+         provide good coverage of the output area. If this option is
+         chosen any regions of the output image that have only one
+         input value will have their associated variances set bad.
 
          The default for this parameter depends on the presence of error
          information in the input NDFs. If all have error information

@@ -76,8 +76,9 @@
 *        quality of the output flatfield.
 *
 *        Note that for this option to work well you should have many
-*        images and that a minimum of 2 contributing values for an
-*        output pixel are required (MINPIX will have a minimum of 2).
+*        images and that any output pixels that only have one input
+*        image contributing to their value will have their variances 
+*        set bad.
 *        [FALSE]
 *     IN = LITERAL (Read)
 *        A list NDF names. These contain the flatfield data.  The NDF
@@ -155,7 +156,7 @@
 *        The minimum number of good (ie. not BAD) pixels required which
 *        are required to contribute to the value of an output pixel.
 *        Output pixels not meeting this requirement are set BAD.
-*        [1|2]
+*        [1]
 *     NITER = _INTEGER (Read)
 *        The number of refining iterations performed if METHOD = "MODE".
 *        [7]
@@ -516,9 +517,7 @@
       CALL NDF_STYPE( PTYPE, NDFOUT, 'Data,Variance', STATUS )
 
 *  Get the minimum number of contributing pixels per output pixel.
-*  Note has a minimum of 2, if generating variances.
       CALL PAR_GET0I( 'MINPIX', MINPIX, STATUS )
-      IF ( GENVAR ) MINPIX = MAX( 2, MINPIX )
 
 *  If we have variances then will process covariances - get the
 *  required workspace.
@@ -761,7 +760,7 @@
 *  Report MAKEFLAT parameters, logging if required
       CALL CCD1_RFLT( STACK, NNDF, AVEACC, STATS, CMODE, IMETH, MINPIX,
      :                ALPHA, NSIGMA, NITER, RMIN, RMAX, NDFOUT, PTYPE,
-     :                DELETE, STATUS )
+     :                DELETE, HAVVAR, GENVAR, STATUS )
 
 *  If requested delete all the input NDFs.
       IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN

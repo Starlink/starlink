@@ -1,6 +1,7 @@
       SUBROUTINE CCD1_RFLT( STACK, NNDF, AVEACC, STATS, CMODE, IMETH,
      :                      MINPIX, ALPHA, SIGMA, NITER, RMIN, RMAX,
-     :                      NDFOUT, PTYPE, DELETE, STATUS )
+     :                      NDFOUT, PTYPE, DELETE, HAVVAR, GENVAR,
+     :                      STATUS )
 *+
 *  Name:
 *     CCD1_RFLT
@@ -54,6 +55,10 @@
 *        The processing precision.
 *     DELETE = LOGICAL (Given)
 *        Whether or not the input NDFs were deleted or not.
+*     HAVVAR = LOGICAL (Given)
+*        Whether input variance where used.
+*     GENVAR = LOGICAL (Given)
+*        Whether output variances where generated.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -70,6 +75,8 @@
 *        Added DELETE argument.
 *     17-MAR-1995 (PDRAPER):
 *        Removed unused arguments GAMMA, ITER, MXPIX and SIZES.
+*     1-FEB-1999 (PDRAPER):
+*        Added HAVVAR and GENVAR arguments.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,12 +85,12 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'MSG_PAR'          ! Defines MSG__SZMSG - size of output
-                                 ! string
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'MSG_PAR'         ! Defines MSG__SZMSG - size of output
+                                ! string
 
 *  Arguments Given:
       INTEGER NNDF
@@ -101,6 +108,8 @@
       INTEGER NDFOUT
       CHARACTER PTYPE * ( * )
       LOGICAL DELETE
+      LOGICAL HAVVAR
+      LOGICAL GENVAR
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -171,8 +180,15 @@
       END IF
 
 *  Write out the general parameters....
-*  Combination Mode.
       CALL CCD1_MSG( ' ', ' ', STATUS )
+
+*  Have the variance been used?
+      IF ( HAVVAR ) THEN 
+         CALL CCD1_MSG( ' ', 
+     :'  Input variances used to combine data', STATUS )
+      END IF
+
+*  Combination Mode.
       CALL MSG_SETC( 'RFLT_CMODE', CMODE )
       CALL CCD1_MSG( ' ',
      :'  Data combination method                  : ^RFLT_CMODE',
@@ -238,5 +254,11 @@
      :'  Output NDF data type                     : ^RFLT_PREC' ,
      :   STATUS )
 
+*  Say if variance have been "generated".
+      IF ( GENVAR ) THEN 
+         CALL CCD1_MSG( ' ', 
+     :'  Output variances generated from data noise', 
+     :                  STATUS )
+      END IF
       END
 * $Id$

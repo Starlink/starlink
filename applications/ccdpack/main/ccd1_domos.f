@@ -428,6 +428,10 @@
 
 *  Initialise.
 *  ==========
+
+*  Minimum number of contributing pixels.
+      MINPIX = 1
+
 *  Determine the shape of the output NDF.
       CALL NDF_BOUND( NDFOUT, NDF__MXDIM, LBNDX, UBNDX, NDIMX, STATUS )
 
@@ -469,14 +473,6 @@
       UVAR = ( USEVAR .AND. ( NVAR .EQ. NIN ) )
       GVAR = ( GENVAR .AND. ( NVAR .EQ. NIN ) .AND. UVAR )
       EVAR = ( GENVAR .AND. .NOT. UVAR )
-
-*  If EVAR is true then the minimum number of contributing pixels needs
-*  to be 2.
-      IF ( EVAR ) THEN 
-         MINPIX = 2
-      ELSE
-         MINPIX = 1
-      END IF
 
 *  Set up a list of input NDF array components to be accessed and a
 *  similar list of output NDF components.
@@ -768,9 +764,7 @@
 *  If no input NDFs can contribute to this interval, then simply fill
 *  the appropriate region of the output array(s) with the bad pixel
 *  value.  Set bad pixel flag values to indicate this.
-                     IF ( ( NII .EQ. 0 ) .OR. 
-     :                    ( NII .EQ. 1 .AND. MINPIX .EQ. 2 ) ) 
-     :               THEN
+                     IF ( NII .EQ. 0 ) THEN
                         CALL CCD1_PTBAD( ITYPE1, LBC, UBC, NLINES,
      :                                   ISTART, IEND, PNTR2( 1 ),
      :                                   STATUS )

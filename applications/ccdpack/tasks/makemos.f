@@ -105,9 +105,9 @@
 *        variances will be generated using the natural variations in the
 *        input data. Obviously this method should only be used if there
 *        are many input datasets, which also provide good coverage of
-*        the output area. If this option is chosen only regions of the
-*        output image that have data from at least 2 input images will
-*        processed. Normally only 1 contributing image is required.
+*        the output area. If this option is chosen any regions of the
+*        output image that have only one input value will have their
+*        associated variances set bad.
 *
 *        The default for this parameter depends on the presence of error
 *        information in the input NDFs. If all have error information
