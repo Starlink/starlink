@@ -729,6 +729,7 @@ itcl::class gaia::GaiaSextractor {
             -show_scale 0 \
             -validate integer \
             -value $values_($this,minsize) \
+            -textvariable [scope values_($this,minsize)] \
             -command [code $this set_values_ minsize]
       }
       pack $itk_component(minsize) -side top -fill x -ipadx 1m -ipady 1m
@@ -767,6 +768,7 @@ itcl::class gaia::GaiaSextractor {
             -validate real \
             -orient horizontal \
             -value $values_($this,detthresh) \
+            -textvariable [scope values_($this,detthresh)] \
             -command [code $this set_values_ detthresh]
       }
       pack $itk_component(detthresh) -side top -fill x -ipadx 1m -ipady 1m

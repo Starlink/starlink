@@ -25,7 +25,7 @@ itcl::class util::LabelEntry {
 	itk_component add entry {
 	    entry $w_.entry
 	} {
-	    keep -textvariable -relief -borderwidth -textvariable -show
+	    keep -textvariable -relief -borderwidth -show
 	    rename -font -valuefont valueFont ValueFont
 	}
 

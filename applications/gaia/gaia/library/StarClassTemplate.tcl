@@ -33,17 +33,19 @@
 #     This object inherits no other classes.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     24-JUN-1996 (PDRAPER):
+#     DD-MMM-YYYY (PWD):
 #        Original version.
 #     {enter_further_changes_here}
 
 #-
 
 #.
+
+#itk::usual <StarClass> {}
 
 itcl::class <scope>::<StarClass> {
    

@@ -109,7 +109,8 @@ itcl::class gaia::ManyLabelEntry {
       }
    }
 
-   #  Called for return or keypress in entry, calls command proc with new value.
+   #  Called for return or keypress in entry, calls command proc 
+   #  with new value.
    method command_proc_ {cmd} {
       lappend cmd [get]
       eval $cmd
@@ -185,6 +186,11 @@ itcl::class gaia::ManyLabelEntry {
       return [regexp -nocase {^[-+]?[0-9]*\.?[0-9]*([0-9]\.?e[-+]?[0-9]*)?$} $string]
    }
 
+   #  Update the global textvariable to that of each entry widget.
+   protected method set_textvar_ {args} {
+      set $itk_option(-textvariable) [get]
+   }
+
    # -- Options --
 
    #  Number of entry widgets to create, also creates them.
@@ -194,11 +200,13 @@ itcl::class gaia::ManyLabelEntry {
          #  Need a few more.
          for {set i $nentry_} {$i < $itk_option(-nentry)} {incr i} {
             itk_component add entry$i {
-               entry $itk_component(eframe).entry$i
+               entry $itk_component(eframe).entry$i \
+                  -textvariable [scope tracevars_($this,$i)]
             } {
                keep -relief -borderwidth -state
                rename -font -valuefont valueFont ValueFont
             }
+            trace variable [scope tracevars_($this,$i)] w [code $this set_textvar_]
          }
          set started_ 1
          configure -orient $itk_option(-orient)
@@ -275,6 +283,8 @@ itcl::class gaia::ManyLabelEntry {
       }
    }
 
+   #  XXX Contents of entry widgets as global variable
+   itk_option define -textvariable textvariable Textvariable {}
 
    #  Widget orientation: horizontal or vertical
    itk_option define -orient orient Orient {horizontal} {
@@ -348,4 +358,6 @@ itcl::class gaia::ManyLabelEntry {
    #  Are the entries created (first time).
    protected variable started_ 0
 
+   #  Variable for tracing changes in all entry fields.
+   common tracevars_
 }
