@@ -399,7 +399,7 @@ PKG_LINK =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.6-10
+PKG_VERS = 2.6-11
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -535,8 +535,8 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
 #  directory for a sucessful build of GAIA.
 
 GAIA_LIB_FILES =  \
-   skycat2.0.cfg gaiawcs2tab pix2wcs gaia.sh gaiadisp.sh gaiaremote.sh \
-   adamMessageRelay displaycat
+   skycat2.0.cfg gaiawcs2tab pix2wcs wcs2pix gaia.sh gaiadisp.sh \
+   gaiaremote.sh adamMessageRelay displaycat
 
 GAIA_BIN_FILES = \
  gaia_swish gaia_stcl gaiaMon gaiaMon.ifc ardstat.ifc autocrop.ifc \

@@ -16,12 +16,12 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.12}
+\newcommand{\stardocnumber}    {214.13}
 \newcommand{\stardocauthors}   {Peter W. Draper, Norman Gray \& David S. Berry}
-\newcommand{\stardocdate}      {23rd January 2003}
+\newcommand{\stardocdate}      {15th April 2003}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.8}
+\newcommand{\stardocversion}   {2.9}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
@@ -996,7 +996,7 @@ New to this release:
     Dec as HH:MM:SS. These problems are now fixed.
 
     \item The direction arrows shown in the pan window could be
-    displayed at the wrong size, again when North and East where
+    displayed at the wrong size, again when North and East were
     interchanged. This problem is now fixed.
    
     \item The command-line options of GAIA can now be configured using
@@ -1009,6 +1009,17 @@ New to this release:
     been added. This makes GAIA work at approximately milli-arcsecond
     resolution. This option can be switched on using the new
     \mytt{File->Startup options} window.
+
+    \item A number of new catalogues and image servers are now available. 
+      To access these delete your skycat.cfg file (found in ~/.skycat)
+      and restart GAIA. Some highlights are 2MASS and USNO B1.0 from
+      CDS and GSC II from ESO.
+
+    \item Fixed shape ellipses in the aperture photometry toolbox were
+      actually created using an inverted zoom factor correction (so
+      either shrank or expanded in the wrong sense). This now works
+      correctly. 
+
 \end{itemize}
 
 
