@@ -373,7 +373,7 @@
 
 	print *,'opening header file',rtname(1:chr_len(rtname))//'_hdr'
       CALL HDS_OPEN(RTNAME(1:CHR_LEN(RTNAME))//'_hdr','READ',LOC,STATUS)
-	print *,'getting header'
+	print *,'getting header',status
       CALL RAT_GETHEAD(LOC, 'HEAD', HEAD, STATUS)
       CALL HDS_CLOSE(LOC, STATUS)
 
@@ -517,6 +517,9 @@
       CHARACTER*(DAT__SZLOC)   ALOC                   ! locator
       INTEGER DUMMY			! Value not used
 *
+      IF (STATUS.NE.SAI__OK) RETURN
+
+	print *,'finding ',object
       CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
 	print *,1
