@@ -19,7 +19,6 @@ class Gwmview {
 #        - Indicate that the widget is no longer needed
 #        - Specify what kind of colour table is wanted (not yet done)
 #        - Specify a zoom level
-#        - Specify the number of the next point to be drawn (optional)
 #
 #     The value of the zoomlevel is significant to the widget in that 
 #     the 'view'-type coordinates with which one talks to this widget 
@@ -51,21 +50,6 @@ class Gwmview {
 #        of the other methods will not take any effect until the 
 #        widget has been put into an active status.
 #
-#     addpoint vx vy ?ipoint?
-#        Adds a point at the given view coordinates to the list of 
-#        marked points.  If the ipoint parameter is not given then
-#        the index of the new point will be selected in a sensible,
-#        perhaps user-selectable, fashion from unused values.
-#        The return value of this method is the index of the point plotted.
-#           - vx       -- X coordinate of new point in view coordinates
-#           - vy       -- Y coordinate of new point in view coordinates
-#           - ?ipoint? -- Index of new point 
-#
-#        If adding this point would cause the number of points in the
-#        marked points list to exceed the maxpoints configuration 
-#        variable, then no point will be added and the value -1 (which
-#        is never a valid point index) will be returned.
-#
 #     canvas
 #        Returns the name of the canvas widget on which any GWM item 
 #        will be drawn.  This name will not change during the lifetime
@@ -80,12 +64,6 @@ class Gwmview {
 #
 #     childsite
 #        Returns the path of a frame into which windows can be placed.
-#
-#     clearpoints
-#        Clears the contents of the marked points list, and erases all 
-#        the corresponding marked points from the display.
-#        This may be more efficient than calling the removepoint method
-#        on each point individually.
 #
 #     deactivate
 #        Put the widget into the 'inactive' status.  After this call many
@@ -147,26 +125,10 @@ class Gwmview {
 #        Note this returns a value in screen (canvas) coordinates, not
 #        view coordinates.
 #
-#     points
-#        Returns a list of currently marked points on the image.
-#        The returned list has one element for each marked point, each 
-#        of these elements is of the form {index xpos ypos}.  Xpos and
-#        ypos are in view coordinates.
-#
-#     refreshpoints
-#        Draws all the points which are currently in the points list.
-#        This method can be called after clearing some or all of the 
-#        canvas to ensure that all the points which are current get
-#        marked on it.
-#
 #     removegwm
 #        Removes any existing GWM display from the widget.  It is
 #        not an error to call this method if there is no extant GWM
 #        display.
-#
-#     removepoint ipoint
-#        Removes the point with index ipoint from the points list.
-#           - ipoint   -- Index in the points list of the point to be removed
 #
 #     unbindall
 #        Removes all bindings to items on the canvas on which the GWM item
@@ -190,22 +152,12 @@ class Gwmview {
 #        the second element, if present, gives the map type (MAPPING 
 #        parameter of LUTABLE) - if absent the value LINEAR is used.
 #
-#     maxpoints = integer
-#        The maximum number of entries in the marked points list 
-#        associated with the widget.  If zero, there is no limit.
-#
 #     pixelsize = real
 #        This variable is provided for convenience, to modify the way 
 #        the zoomfactor variable is accessed.  It should be set to
 #        the (approximate) linear size of a pixel (e.g. an NDF pixel)
 #        in view coordinates.  This variable controls the actual size 
 #        in screen pixels of the GWM created by the makegwm method.
-#
-#     uselabels = boolean
-#        If true, then the index number of each point will be displayed
-#        alongside the marker when it is plotted and it will be 
-#        possible for the user to select the index of the next point
-#        to be plotted.  The default is false.
 #
 #     zoom = real
 #        A factor giving the number of screen pixels to an NDF pixel.
@@ -222,12 +174,21 @@ class Gwmview {
 #     canvas.  The following tag names are used to refer to items
 #     on the canvas:
 #        - gwmitem  -- The GWM item
-#        - markN    -- Marker number N
 #        
 #     The display method contains elements of a workaround for a bug in
 #     the PGPLOT driver for the GWM widget.  This is fixed in PGPLOT
 #     5.2.0-6, but not in the Spring 2000 release.  When the fixed version
 #     can be relied on to be there, this should be removed.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+
+#  History:
+#     11-OCT-2000 (MBT):
+#        Original version.
+#     19-JUL-2001 (MBT):
+#        Removed all knowledge of points from this file - now handled
+#        at a higher level.
 
 #-
 
@@ -242,7 +203,6 @@ class Gwmview {
 
 #  Add control groups to the control panel.
          addgroup zoom Zoom
-         addgroup markers Markers
          addgroup action Control
 
 #  Construct control widgets.
@@ -253,14 +213,6 @@ class Gwmview {
                -max 12 \
                -value 1 \
                -valuevar zoom
-         }
-         itk_component add markstyle {
-            markstylecontrol $panel.markstyle \
-               -value "" \
-               -valuevar markstyle
-         }
-         itk_component add marknum {
-            marknumcontrol $panel.marknum
          }
          itk_component add exit {
             buttoncontrol $panel.exit \
@@ -277,8 +229,6 @@ class Gwmview {
 
 #  Add control widgets to the control panel.
          addcontrol $itk_component(zoom) zoom
-         addcontrol $itk_component(markstyle) markers
-         addcontrol $itk_component(marknum) markers
          addcontrol $itk_component(help) action
          addcontrol $itk_component(exit) action
 
@@ -410,111 +360,6 @@ class Gwmview {
 
 
 #-----------------------------------------------------------------------
-      public method addpoint { vx vy { ipoint "" } } {
-#-----------------------------------------------------------------------
-#  Add a point to the list of marked points.
-
-#  Use default value for point index if none is specified.
-         if { $ipoint == "" } {
-            set ipoint [ $itk_component(marknum) next ]
-         }
-
-#  Check that we have a valid point index.
-         if { $ipoint < 0 } {
-            bell 
-            return -1
-         }
-
-#  If any point with this index exists in the list already, remove it.
-         removepoint $ipoint
-
-#  Check that we have not exceeded the maximum number of points allowed.
-         if { $maxpoints > 0 && [ llength $points ] >= $maxpoints } {
-            bell
-            return -1
-         }
-
-#  Set the canvas tag to use for this point.
-         set tag mark$ipoint
-
-#  Draw the point on the canvas.
-         marker $vx $vy [ list $tag marker ] $ipoint
-
-#  Add this point to the list of points that we know about.
-         lappend points [ list $ipoint $vx $vy $tag ]
-         $itk_component(marknum) use $ipoint
-
-#  Rearrange the elements of the points list to be in index-ascending order
-#  (this isn't really necessary, but makes the output list look tidier 
-#  and makes some processing easier).
-         set points [ lsort -integer -index 0 $points ]
-
-#  Return the index of the point which was added.
-         return $ipoint
-      }
-
-
-#-----------------------------------------------------------------------
-      public method removepoint { ipoint } {
-#-----------------------------------------------------------------------
-#  Remove a point from the list of points and erase it from the canvas.
-
-#  If any point in the list has the index ipoint, then remove it from the
-#  list and from the canvas.
-         set i 0
-         foreach p $points {
-            if { [ lindex $p 0 ] == $ipoint } {
-               set tag [ lindex $p 3 ]
-               $canvas delete $tag
-               set points [ lreplace $points $i $i ]
-            }
-            incr i
-         }
-
-#  Possibly modify the number of the next marker to be plotted according
-#  to whether we've just opened up a suitable gap in the list.
-         $itk_component(marknum) unuse $ipoint
-      }
-
-
-#-----------------------------------------------------------------------
-      public method clearpoints {} {
-#-----------------------------------------------------------------------
-#  Removes any extant points from the points list and the canvas.
-         if { [ llength $points ] } {
-            $canvas delete marker
-            set points {}
-         }
-         $itk_component(marknum) clear
-      }
-
-
-#-----------------------------------------------------------------------
-      public method points {} {
-#-----------------------------------------------------------------------
-#  Generate a list of points in the required format from the private
-#  points variable.
-
-         set rp {}
-         foreach p $points {
-            lappend rp [ list [ lindex $p 0 ] [ lindex $p 1 ] [ lindex $p 2 ] ]
-         }
-         return $rp
-      }
-
-
-#-----------------------------------------------------------------------
-      public method refreshpoints {} {
-#-----------------------------------------------------------------------
-         $canvas delete marker
-         foreach p $points {
-            marker [ lindex $p 1 ] [ lindex $p 2 ] "[ lindex $p 3 ] marker" \
-                   [ lindex $p 0 ]
-         }
-      }
-
-
-#-----------------------------------------------------------------------
       public method activate {} {
 #-----------------------------------------------------------------------
          configure -status "active"
@@ -582,30 +427,10 @@ class Gwmview {
 #  Private methods.
 ########################################################################
 
-#-----------------------------------------------------------------------
-      private method marker { vx vy { tags "" } { label "" } } {
-#-----------------------------------------------------------------------
-         set pos [ view2canv $vx $vy ]
-         if { $tags != "" } {
-            eval lappend taglist $tags
-         }
-         if { ! $uselabels } {
-            set label ""
-         }
-         $itk_component(markstyle) draw \
-             $canvas [ lindex $pos 0 ] [ lindex $pos 1 ] $taglist $label
-      }
-
 
 ########################################################################
 #  Public variables.
 ########################################################################
-
-#-----------------------------------------------------------------------
-      public variable markstyle "" {
-#-----------------------------------------------------------------------
-         refreshpoints
-      }
 
 
 #-----------------------------------------------------------------------
@@ -655,25 +480,6 @@ class Gwmview {
       }
 
 
-#-----------------------------------------------------------------------
-      public variable maxpoints 0 {
-#-----------------------------------------------------------------------
-         $itk_component(marknum) configure -max $maxpoints
-      }
-
-
-#-----------------------------------------------------------------------
-      public variable uselabels 1 {
-#-----------------------------------------------------------------------
-         if { $uselabels } {
-            pack [ groupwin markers ] -after [ groupwin zoom ] \
-                 -side left -fill y
-         } else {
-            pack forget [ groupwin markers ]
-         }
-      }
-
-
 ########################################################################
 #  Private variables.
 ########################################################################
@@ -683,7 +489,6 @@ class Gwmview {
       private variable gwmdims {0 0}   ;# Dimensions of the GWM item
       private variable gwmorigin {0 0} ;# View coordinate origin of GWM item
       private variable gwmname ""      ;# Name of the GWM item
-      private variable points {}       ;# List of points {index x y tags}
 
    }
 
