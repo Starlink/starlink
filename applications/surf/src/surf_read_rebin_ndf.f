@@ -1,4 +1,4 @@
-      SUBROUTINE REDS_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
+      SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
      :     DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, USE_SECTION,
      :     N_BOL, N_POS, N_INTS,
      :     MJD_STANDARD, OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
@@ -10,13 +10,13 @@
      :     STATUS)
 *+
 *  Name:
-*     REDS_READ_REBIN_NDF
+*     SURF_READ_REBIN_NDF
 
 *  Language:
 *     Starlink Fortran 77
  
 *  Invocation:
-*      CALL REDS_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
+*      CALL SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
 *     :     DATA_SPEC, OUT_COORDS, N_FILE, SECPAR, USE_SECTION,
 *     :     N_BOL, N_POS, N_INTS,
 *     :     MJD_STANDARD, OUT_RA_CEN, OUT_DEC_CEN, WAVELENGTH, 
@@ -42,7 +42,7 @@
 *     DATA_SPEC( NSPEC ) = CHAR (Given)
 *        SCUBA sections
 *     OUT_COORDS = CHAR (Given)
-*        Output coordinates system. (Passed into REDS_READ_REBIN_NDFS)
+*        Output coordinates system. (Passed into SURF_READ_REBIN_NDFS)
 *     N_FILE = INTEGER (Given & Returned)
 *        Current file number (less than MAX_FILE and greater than 0).
 *     SECPAR = LOGICAL (Given)
@@ -115,7 +115,7 @@
 *  Global Constants:
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'REDS_SYS'         ! REDS
+      INCLUDE 'SURF_PAR'         ! REDS
       INCLUDE 'DAT_PAR'          ! DAT__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
 
@@ -123,7 +123,7 @@
       INTEGER          MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       CHARACTER*25     TSKNAME              ! Name of task
-      PARAMETER (TSKNAME = 'REDS_READ_REBIN_NDFS')
+      PARAMETER (TSKNAME = 'READ_REBIN_NDFS')
 
 *  Arguements Given:
       CHARACTER*(*)    DATA_SPEC(SCUBA__MAX_SECT)
