@@ -44,6 +44,7 @@
 *      6 Dec 94 : V1.8-1  Asymmetric widths for stepped line (RJV)
 *      9 Jan 95 : V1.8-2  Double checks for regular axis values (RJV)
 *     11 Sep 95 : V2.0-0  Full ADI port (DJA)
+*     29 Nov 95 : V2.0-1  Overlayed functions for 1D (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -53,7 +54,7 @@
 *    Functions :
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GDRAW Version 2.0-0')
+      PARAMETER (VERSION='GDRAW Version 2.0-1')
 *    Local variables :
       CHARACTER*20 DEV
       CHARACTER*132		FILE, PATH
@@ -499,6 +500,7 @@
 	  ENDIF
 	ENDIF
 
+
 *  point marker
 	IF (POINTS) THEN
 	  IF (QOK) THEN
@@ -535,7 +537,8 @@
 	  ENDIF
 	ENDIF
 
-*  put on annotation
+*  put on annotation etc.
+        CALL GFX_FUNC(STATUS)
 	CALL GFX_NOTES(STATUS)
 	CALL GFX_SHAPES(STATUS)
 	CALL GFX_MARKS(STATUS)
