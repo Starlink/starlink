@@ -7,6 +7,8 @@ lib_LTLIBRARIES = libsgs.la
 libsgs_la_SOURCES = $(F_ROUTINES) $(PUBLIC_INCLUDES) \
 	$(PRIVATE_INCLUDES)
 
+include_HEADERS = $(PUBLIC_INCLUDES)
+
 #  List of public include files.  These are include files which form
 #  part of the package and may be required by users of it
 
