@@ -347,6 +347,10 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *       necessary (i.e. to create labels for display, etc). Tick mark
 *       values are stored and handled as non-normalized values as much as
 *       possible.
+*     13-JUN-2002 (DSN):
+*       Modified Norm1 to prevent major tick value from being removed if
+*       the supplied reference value is out of bounds, resulting int he
+*       Mapping producing bad values
 *class--
 */
 
@@ -16788,6 +16792,7 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
    double **ptr1;             /* Pointer to physical coords data */
    double *a;                 /* Pointer to next axis value */
    double *b;                 /* Pointer to next axis value */
+   double newval;             /* New axis value */
    int i;                     /* Loop count */
 
 /* Check the inherited global status. */
@@ -16811,11 +16816,16 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
 /* Transform the Base Frame positions back into the Current Frame. */
    (void) astTransform( map, pset2, 1, pset1 );
 
-/* Store these values back in the supplied array. */
+/* If good, store these values back in the supplied array. If the
+   normalization produced bad coords (e.g. as may happen if the supplied
+   refernce value corresponds to a point on the line through the tick mark 
+   which is outside the valid region of the mapping) leave the original
+   tick mark values unchanged. */
    if( astOK ) {
       a = ptr1[ axis ];
       for( i = 0; i < nv; i++){
-         vals[ i ] = *(a++);
+         newval = *(a++);
+	 if( newval != AST__BAD ) vals[ i ] = newval;
       }
    }
 
