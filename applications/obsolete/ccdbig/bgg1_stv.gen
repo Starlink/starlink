@@ -56,7 +56,6 @@
       <TYPE> ARR( SIZE )
 
 *  External references:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -64,6 +63,9 @@
 *  Local Variables:
       INTEGER I                  ! Loop variable
       <TYPE> TVAL                ! Value of same type as array
+
+*  Statement functions:
+      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
 
 *.
 
@@ -78,4 +80,4 @@
  1    CONTINUE
 
       END
-* $Id: bgg1_stv.gen,v 1.1 1998/07/03 13:22:45 mbt Exp $
+* $Id: bgg1_stv.gen,v 1.2 1998/07/03 13:28:28 mbt Exp $

@@ -153,10 +153,13 @@
       REAL VAL                   ! Final pixel value
       <TYPE> TBACK               ! Background value
 
-* External functions:
+*  External functions:
       REAL CCD1_TFUN
       EXTERNAL CCD1_TFUN
+
+*  Statement functions:
       INCLUDE 'DCV_FUN'          ! Generic type conversion functions
+
 *.
 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -294,4 +297,4 @@
 
 *  All done
       END
-* $Id: bgg1_objs.gen,v 1.1 1998/07/03 14:07:38 mbt Exp $
+* $Id: bgg1_objs.gen,v 1.2 1998/07/03 16:13:58 mbt Exp $

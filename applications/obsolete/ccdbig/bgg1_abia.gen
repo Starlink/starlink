@@ -71,7 +71,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
       EXTERNAL PDA_RNNOR
       REAL PDA_RNNOR             ! The normal random number routine
 
@@ -82,6 +81,9 @@
       REAL MEAN                  ! mean of Gaussian distribution
       REAL NOISE                 ! bias noise
       REAL SD                    ! std deviation of Gaussian distribution
+
+*  Statement functions:
+      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
 
 *  Data
       DATA MEAN /100.0/
@@ -120,4 +122,4 @@
       END DO
 
       END
-* $Id: ccdb1_abia.f,v 1.5 1998/06/17 16:53:26 mbt Exp $
+* $Id: bgg1_abia.gen,v 1.2 1998/07/03 14:07:38 mbt Exp $
