@@ -398,7 +398,7 @@ sub contactw {
 	  unless $err_hide;
       return 0;
    }
-   sleep 0.2;
+   select undef,undef,undef, 0.2;
  }
  
  # Must be okay
