@@ -42,8 +42,9 @@
 *    Invoke psf close routine if present
         IF ( L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT)) .NE. 0 ) THEN
 
-        CALL PSF_REL_EXEC( %VAL(L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT))),
-     :                     SLOT, STATUS )
+          CALL PSF_REL_EXEC( %VAL(L_MOD_C(P_MODID(SLOT),P_LIBID(SLOT))),
+     :                       SLOT, STATUS )
+        END IF
 
 *    Mark slot as free
         P_USED(SLOT) = .FALSE.
