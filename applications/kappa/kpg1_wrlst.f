@@ -106,6 +106,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER FILE*80          ! File name (not used)
       INTEGER IPW                ! Pointer to work space
       INTEGER MAP                ! AST Pointer to Mapping
       INTEGER NBAX               ! No. of axes in BASE FRAME
@@ -113,6 +114,11 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get a value for the parameter. The file name is not actually needed
+*  yet, but it is obtained so that we can abort if a null value is given
+*  before spending time creating a positions list which may not be wanted.
+      CALL PAR_GET0L( PARAM, FILE, STATUS )
 
 *  Start an AST context.
       CALL AST_BEGIN( STATUS )
