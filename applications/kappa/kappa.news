@@ -10,3 +10,6 @@
    - THRESH may now be used to replace data between specified
    thresholds as well as outside specified thresholds, by setting 
    the lower threshold greater than the upper threshold.
+
+   - A bug has been fixed in PSF which caused the output NDF holding 
+   the model PSF be filled with zeros.
