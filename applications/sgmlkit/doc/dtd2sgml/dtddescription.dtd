@@ -42,7 +42,8 @@
 <!ELEMENT date			(#PCDATA)>
 <!ELEMENT subject		(#PCDATA)>
 <!ELEMENT otherheader		(#PCDATA)>
-<!ELEMENT body			(#PCDATA)>
+<!ELEMENT body			(#PCDATA | url)*>
+<!ELEMENT url			(#PCDATA)>
 
 <!ATTLIST dtddescription
 	docelem
