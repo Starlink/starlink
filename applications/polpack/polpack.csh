@@ -28,6 +28,8 @@
 #  History:
 #     29-JUN-1997 (DSB):
 #       Original Version.
+#     25-MAR-1999 (DSB):
+#       Added POLSIM. Alternative names corrected.
 #     {enter_changes_here}
 
 #-
@@ -69,19 +71,21 @@
       alias polka     INSTALL_BIN/polka
       alias polvec    INSTALL_BIN/polvec
       alias polbin    INSTALL_BIN/polbin
+      alias polsim    INSTALL_BIN/polsim
       alias polplot   INSTALL_BIN/polplot
 #
 #  Now do the same with alternative names.
 #
-      alias pol_polcal    INSTALL_BIN/pol_polcal
+      alias pol_polcal    INSTALL_BIN/polcal
       alias pol_polhelp   INSTALL_BIN/polhelp 
-      alias pol_polexp    INSTALL_BIN/pol_polexp
-      alias pol_polimp    INSTALL_BIN/pol_polimp
-      alias pol_polmap    INSTALL_BIN/pol_polmap
-      alias pol_polka     INSTALL_BIN/pol_polka
-      alias pol_polvec    INSTALL_BIN/pol_polvec
-      alias pol_polbin    INSTALL_BIN/pol_polbin
-      alias pol_polplot   INSTALL_BIN/pol_polplot
+      alias pol_polexp    INSTALL_BIN/polexp
+      alias pol_polimp    INSTALL_BIN/polimp
+      alias pol_polmap    INSTALL_BIN/polmap
+      alias pol_polka     INSTALL_BIN/polka
+      alias pol_polvec    INSTALL_BIN/polvec
+      alias pol_polbin    INSTALL_BIN/polbin
+      alias pol_polsim    INSTALL_BIN/polsim
+      alias pol_polplot   INSTALL_BIN/polplot
 #
 #
 #  Set up the commands and environment variables needed to export and

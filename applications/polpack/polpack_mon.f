@@ -40,6 +40,8 @@
 *        Original version, modified from equivalent IRCAMPACK routine.
 *     10-NOV-1998 (DSB):
 *        SEGMENT removed (POLKA now uses KAPPA:SEGMENT).
+*     25-MAR-1999 (DSB):
+*        Added POLSIM.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,6 +106,9 @@
 
       ELSE IF ( NAME .EQ. 'POLPLOT' ) THEN
          CALL POLPLOT( STATUS )
+
+      ELSE IF ( NAME .EQ. 'POLSIM' ) THEN
+         CALL POLSIM( STATUS )
 
       ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
          CALL POLVEC( STATUS )
