@@ -174,11 +174,10 @@ attributes with ENTITY declared values.  Should I worry about those?
 
 (mode make-manifest-mode
   (default 
-    (make sequence
-      (make formatting-instruction data: (html-file))
-      (make formatting-instruction data: "
-")
-      ))
+    (if (chunk?)
+	(make formatting-instruction data: (string-append (html-file) "
+"))
+	(empty-sosofo)))
 
   (element backmatter
     (make sequence
@@ -202,7 +201,7 @@ attributes with ENTITY declared values.  Should I worry about those?
     (let* ((kids (children (current-node)))
 	   (content (get-best-figurecontent
 		     (select-elements kids (normalize "figurecontent"))
-		     '("GIF89A" "JPEG"))))
+		     '("gif89a" "jpeg"))))
       (if content
 	  (process-node-list content)
 	  (empty-sosofo))))
@@ -210,7 +209,7 @@ attributes with ENTITY declared values.  Should I worry about those?
     (let* ((kids (children (current-node)))
 	   (content (get-best-figurecontent
 		     (select-elements kids (normalize "figurecontent"))
-		     '("GIF89A" "JPEG"))))
+		     '("gif89a" "jpeg"))))
       (if content
 	  (process-node-list content)
 	  (empty-sosofo))))
