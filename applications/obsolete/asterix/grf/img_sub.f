@@ -2032,11 +2032,11 @@ c     :                                                    STATUS)
      :                        //'assuming image non-spatial')
             I_SPATIALIMAGE=.FALSE.
             I_XYUNITS=' '
-            CALL CONV_UNIT2R('arcmin',I_WTORAD,STATUS)
+            CALL CONV_UNIT2R('degree',I_WTORAD,STATUS)
           ELSE
             IF (XUNITS.EQ.' ') THEN
-              I_XYUNITS='arcmin'
-              CALL MSG_PRNT('** no axis units - will assume ''arcmin''')
+              I_XYUNITS='degree'
+              CALL MSG_PRNT('** no axis units - will assume ''degree''')
             ELSE
               I_XYUNITS=XUNITS
             ENDIF
@@ -2381,8 +2381,11 @@ c     LOGICAL UNIF,WOK
           I_BAD=.FALSE.
         ENDIF
         print *,'read quality...'
+        call flush(6)
 *  get min and max
         CALL IMG_MINMAX(STATUS)
+        print *,'got min/max...'
+        call flush(6)
 
 *  set data slice
         I_IX1=1
@@ -2403,16 +2406,22 @@ c     LOGICAL UNIF,WOK
         I_DY=ABS(I_Y-I_YBASE)
         I_R=0.0
 
+        print *,'getting text...'
+        call flush(6)
 *  get top level text
         CALL BDI_GET0C( IFID, 'Title', I_TITLE, STATUS )
         CALL BDI_GET0C( IFID, 'Label', I_LABEL, STATUS )
         CALL BDI_GET0C( IFID, 'Units', I_UNITS, STATUS )
+        print *,'done...'
+        call flush(6)
 
 *  get work area
         CALL DYN_MAPI(1,NVAL,I_WKPTR,STATUS)
 
 *  get region mask
         CALL DYN_MAPB(1,NVAL,I_REG_PTR,STATUS)
+        print *,'got work array and mask...'
+        call flush(6)
 
       ENDIF
 
