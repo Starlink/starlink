@@ -1,3 +1,5 @@
+%pointer
+
 /*+
 * Name:
 *    ctag-l.l
@@ -44,10 +46,19 @@ D			[0-9]
 L			[a-zA-Z_]
 H			[a-fA-F0-9]
 E			[Ee][+-]?{D}+
-FS			(f|F|l|L)
-IS			(u|U|l|L)*
+FS			[fFlL]
+IS			[uUlL]*
 S			[ \t\v\n\f]*
 IDENT			{L}({L}|{D})*
+
+/* Limits bigger than default required for old lex (not flex). */
+
+%e 2000
+%k 10000
+%p 10000
+%a 5000
+%n 1000
+
 
 %{
 
@@ -73,43 +84,38 @@ void munch();
 {S}"/*"				{ comment(); }
 {S}"//"				{ cpluspluscomm(); }
 
-{S}"auto"			{ count(); return(AUTO); }
-{S}"break"			{ count(); return(BREAK); }
-{S}"case"			{ count(); return(CASE); }
-{S}"char"			{ count(); return(CHAR); }
-{S}"const"			{ count(); return(CONST); }
-{S}"continue"			{ count(); return(CONTINUE); }
-{S}"default"			{ count(); return(DEFAULT); }
-{S}"do"				{ count(); return(DO); }
-{S}"double"			{ count(); return(DOUBLE); }
-{S}"else"			{ count(); return(ELSE); }
-{S}"enum"			{ count(); return(ENUM); }
-{S}"extern"			{ count(); return(EXTERN); }
-{S}"float"			{ count(); return(FLOAT); }
-{S}"for"			{ count(); return(FOR); }
-{S}"goto"			{ count(); return(GOTO); }
-{S}"if"				{ count(); return(IF); }
-{S}"int"			{ count(); return(INT); }
-{S}"long"			{ count(); return(LONG); }
-{S}"register"			{ count(); return(REGISTER); }
-{S}"return"			{ count(); return(RETURN); }
-{S}"short"			{ count(); return(SHORT); }
-{S}"signed"			{ count(); return(SIGNED); }
-{S}"sizeof"			{ count(); return(SIZEOF); }
-{S}"static"			{ count(); return(STATIC); }
-{S}"struct"			{ count(); return(STRUCT); }
-{S}"switch"			{ count(); return(SWITCH); }
-{S}"typedef"			{ count(); return(TYPEDEF); }
-{S}"union"			{ count(); return(UNION); }
-{S}"unsigned"			{ count(); return(UNSIGNED); }
-{S}"void"			{ count(); return(VOID); }
-{S}"volatile"			{ count(); return(VOLATILE); }
-{S}"while"			{ count(); return(WHILE); }
-
-{S}"if"/{S}\(			{ count(); return(DO); }
-{S}"for"/{S}\(			{ count(); return(FOR); }
-{S}"switch"/{S}\(		{ count(); return(SWITCH); }
-{S}"while"/{S}\(		{ count(); return(WHILE); }
+{S}"auto"/{S}\(?		{ count(); return(AUTO); }
+{S}"break"/{S}\(?		{ count(); return(BREAK); }
+{S}"case"/{S}\(?		{ count(); return(CASE); }
+{S}"char"/{S}\(?		{ count(); return(CHAR); }
+{S}"const"/{S}\(?		{ count(); return(CONST); }
+{S}"continue"/{S}\(?		{ count(); return(CONTINUE); }
+{S}"default"/{S}\(?		{ count(); return(DEFAULT); }
+{S}"do"/{S}\(?			{ count(); return(DO); }
+{S}"double"/{S}\(?		{ count(); return(DOUBLE); }
+{S}"else"/{S}\(?		{ count(); return(ELSE); }
+{S}"enum"/{S}\(?		{ count(); return(ENUM); }
+{S}"extern"/{S}\(?		{ count(); return(EXTERN); }
+{S}"float"/{S}\(?		{ count(); return(FLOAT); }
+{S}"for"/{S}\(?			{ count(); return(FOR); }
+{S}"goto"/{S}\(?		{ count(); return(GOTO); }
+{S}"if"/{S}\(?			{ count(); return(IF); }
+{S}"int"/{S}\(?			{ count(); return(INT); }
+{S}"long"/{S}\(?		{ count(); return(LONG); }
+{S}"register"/{S}\(?		{ count(); return(REGISTER); }
+{S}"return"/{S}\(?		{ count(); return(RETURN); }
+{S}"short"/{S}\(?		{ count(); return(SHORT); }
+{S}"signed"/{S}\(?		{ count(); return(SIGNED); }
+{S}"sizeof"/{S}\(?		{ count(); return(SIZEOF); }
+{S}"static"/{S}\(?		{ count(); return(STATIC); }
+{S}"struct"/{S}\(?		{ count(); return(STRUCT); }
+{S}"switch"/{S}\(?		{ count(); return(SWITCH); }
+{S}"typedef"/{S}\(?		{ count(); return(TYPEDEF); }
+{S}"union"/{S}\(?		{ count(); return(UNION); }
+{S}"unsigned"/{S}\(?		{ count(); return(UNSIGNED); }
+{S}"void"/{S}\(?		{ count(); return(VOID); }
+{S}"volatile"/{S}\(?		{ count(); return(VOLATILE); }
+{S}"while"/{S}\(?		{ count(); return(WHILE); }
 
 {S}F77_SUBROUTINE/{S}\(		{ count(); return(F77_SUBROUTINE); }
 {S}F77_[A-Z]+_FUNCTION/{S}\(	{ count(); return(F77_FUNCTION); }
@@ -163,6 +169,7 @@ void munch();
 
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 extern char *yylval;
 extern int yyleng;
@@ -236,11 +243,11 @@ extern int yyleng;
 /* Extend the allocated space if necessary. */
       while ( preleng + leng > prealloc ) {
          if ( prealloc == 0 ) {
-            preval = malloc( BUFINC + 1 );
+            preval = (char *) malloc( BUFINC + 1 );
             *preval = '\0';
          }
          else {
-            preval = realloc( preval, prealloc + BUFINC + 1 );
+            preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
          }
          prealloc += BUFINC;
       }
@@ -285,9 +292,9 @@ extern int yyleng;
          default:
             if ( preleng + 1 > prealloc ) {
                if ( prealloc == 0 ) 
-                  preval = malloc( BUFINC + 1 );
+                  preval = (char *) malloc( BUFINC + 1 );
                else
-                  preval = realloc( preval, prealloc + BUFINC + 1 );
+                  preval = (char *) realloc( preval, prealloc + BUFINC + 1 );
                prealloc++;
             }
             preval[ preleng ] = c;
@@ -314,7 +321,7 @@ extern int yyleng;
 
 /*  Append preval and the matched text. */
       yyleng = preleng + strlen( yytext );
-      yylval = malloc( yyleng + 1 );
+      yylval = (char *) malloc( yyleng + 1 );
       if ( preleng > 0 ) {
          strcpy( yylval, preval );
          strcat( yylval, yytext );
@@ -329,6 +336,9 @@ extern int yyleng;
          preleng = 0;
          prealloc = 0;
       }
+
+/* Store the position of this encountered string in the global list. */
+      uadd( yylval );
    }
 
 

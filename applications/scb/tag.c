@@ -26,11 +26,12 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-extern int yy_flex_debug;
-extern int yydebug;
-int strict;
+#include "tag.h"
 
-   main( int argc, char **argv ) {
+int yy_flex_debug;
+int yydebug;
+
+   int main( int argc, char **argv ) {
 /*
 *+
 *  Name:
@@ -62,6 +63,7 @@ int strict;
       int yyparse();
 
 /* Declare local variables. */
+      int retval;
       char *name, *usagef;
       char c;
 
@@ -117,44 +119,15 @@ int strict;
             printf( usagef, name );
             exit( 1 );
       }
+
+/* Some initialisation. */
+      unew();
          
-/* Call the parser and return. */
-      return( yyparse() );
-   }
+/* Call the parser. */
+      retval = yyparse();
 
-
-   char *snew( char *str ) {
-/*+
-*  Name:
-*     snew
-*
-*  Invocation:
-*     string = snew( str );
-*
-*  Purpose:
-*     Copy a string into malloc'd space.
-*
-*  Arguments:
-*     str = char *
-*        The string to be copied (must end with '\0').
-*
-*  Return Value:
-*     string = char *
-*        A string with the same contents as str, but in a newly malloc'd
-*        location.
-*
-*  Description:
-*     This routine just mallocs some space and copies the given string
-*     into it.  The purpose of this is so that the resulting pointer
-*     can be passed to routines which assume their arguments have been
-*     malloc'd and may be free'd.
-*-
-*/
-      char *string;
-
-      string = malloc( strlen( str ) + 1 );
-      strcpy( string, str );
-      return( string );
+/* Return. */
+      return( retval );
    }
 
 
@@ -208,16 +181,14 @@ int strict;
       va_end( ap );
 
 /* Allocate the memory we will need, and initialise it. */
-      string = malloc( len + 1 );
+      string = (char *) malloc( len + 1 );
       *string = '\0';
 
-/* Copy the arguments into the allocated space, calling free() on each
- * one as we go along. */
+/* Copy the arguments into the allocated space .*/
       va_start( ap, n );
       for ( i = 0; i < n; i++ ) {
          sp = va_arg( ap, char * );
          strcat( string, sp );
-         free( sp );
       }
       va_end( ap );
 
@@ -225,3 +196,59 @@ int strict;
       return( string );
    }
 
+
+   static ELEMENT ubase = { "", (ELEMENT *) NULL };
+   static ELEMENT *ufirst, *ulast;
+
+   void uclear() {
+      ELEMENT *i, *j;
+      i = ufirst->next;
+      while ( i != NULL ) {
+         j = i->next;
+         if ( i->text != NULL )
+            free( i->text );
+         free( i );
+         i = j;
+      }
+      unew();
+   }
+
+   void unew() {
+      ufirst = &ubase;
+      ulast = &ubase;
+   }
+
+   void uadd( char *item ) {
+      ulast->next = (ELEMENT *) malloc( sizeof( ELEMENT ) );
+      ulast = ulast->next;
+      ulast->next = NULL;
+      ulast->text = item;
+   }
+
+   char *ucontent() {
+      ELEMENT *i;
+      char *text;
+      int j, leng;
+
+/* Work out how long the whole string is. */
+      leng = 0;
+      for ( i = ufirst; i != NULL; i = i->next ) {
+         leng += strlen( i->text );
+      }
+
+/* Allocate space for the string. */
+      text = (char *) malloc( leng + 1 );
+      j = 0;
+
+/* Copy the lexically encountered items into the string sequentially. */
+      for ( i = ufirst; i != NULL; i = i->next ) {
+         strcpy( text + j, i->text );
+         j += strlen( i->text );
+      }
+
+/* Return the concatenated string. */
+      return( text );
+   }
+
+
+/* $Id$ */

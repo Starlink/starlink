@@ -52,50 +52,60 @@
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
 %token F77_FUNCTION F77_SUBROUTINE F77_EXTERNAL F77_CALL FUNC_NAME
-%token TRAILER
 
 %start file
 
 %{
-#define YYSTYPE char *
 
-char *snew( char * );
-char *scat( int, ... );
+typedef char * STRING;
+#define YYSTYPE STRING
+#include "tag.h"
+
 %}
 
 %%
 
 file
-	: external_definition
-	| file external_definition
-	;
-
-external_definition
 	: unit
-		{ printf( "%s", $1 ); }
+	| file unit
 	;
 
 unit
+	: external_definition
+		{ printf( "%s", $1 ); uclear(); }
+	;
+
+external_definition
 	: f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' 
 	  function_body
 		{ $$ = scat( 8, $1, $2, canchor( "name", $3, 1 ), 
 		             $4, $5, $6, $7, $8 ); }
 	| f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' ';'
 		{ $$ = scat( 8, $1, $2, $3, $4, $5, $6, $7, $8 ); }
-	| FUNC_NAME '(' nonexecutable_code ')' function_body
-		{ $$ = scat( 5, canchor( "name", $1, 0 ), $2, $3, $4, $5 ); }
-	| FUNC_NAME '(' nonexecutable_code ')' ';'
-		{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
-	| FUNC_NAME '(' ')' function_body
-		{ $$ = scat( 4, canchor( "name", $1, 0 ), $2, $3, $4 ); }
-	| FUNC_NAME '(' ')' ';'
-		{ $$ = scat( 4, $1, $2, $3, $4 ); }
+	| FUNC_NAME bracket_sequence function_body
+		{ $$ = scat( 3, canchor( "name", $1, 0 ), $2, $3 ); }
+	| FUNC_NAME bracket_sequence ';'
+		{ $$ = scat( 3, $1, $2, $3 ); }
 	| declaration_word
 		{ $$ = $1; }
 	| ';'
 		{ $$ = $1; }
-	| TRAILER
+	| error
+		{ handle_error(); $$ = ""; }
+	;
+
+bracket_sequence
+	: bracket_item
 		{ $$ = $1; }
+	| bracket_sequence bracket_item
+		{ $$ = scat( 2, $1, $2 ); }
+	;
+
+bracket_item
+	: '(' ')'
+		{ $$ = scat( 2, $1, $2 ); }
+	| '(' nonexecutable_code ')'
+		{ $$ = scat( 3, $1, $2, $3 ); }
 	;
 
 function_body
@@ -260,20 +270,12 @@ identifier
 #include "ctag-l.c"
 
 #include <stdio.h>
-
-   extern char *yytext;
-
-   yyerror(char *s) { 
-      fflush(stdout);
-      printf("\n%s\n", s);
-   }
-
-
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
- 
- 
+
+   yyerror(char *s) { /* No action */ }
+
    char *canchor( char *attrib, char *fname, int f77flag ) {
 /*+
 *  Name:
@@ -332,8 +334,8 @@ identifier
          vname++;
 
 /* Work out how much space the output string requires and allocate it. */
-      string = malloc( strlen( attrib ) + strlen( fname ) + strlen( vname ) 
-                       + ( f77flag ? 13 : 12 ) );
+      string = (char *) malloc( strlen( attrib ) + strlen( fname ) 
+                              + strlen( vname ) + ( f77flag ? 13 : 12 ) );
 
 /* Write the whole input text into the output string. */
       strcpy( string, fname );
@@ -344,11 +346,74 @@ identifier
                          : "<a %s='%s'>%s</a>" ), 
                attrib, vname, vname );
 
-/* Free up the fname string. */
-      free( fname );
-
 /* Return. */
       return( string );
+   }
+
+
+   void handle_error() {
+/*
+*+
+*  Name:
+*     handle_error
+*
+*  Purpose:
+*     Deal with a unit which the grammar cannot parse.
+*
+*  Description:
+*     This routine takes over when the yacc 'error' state is detected.
+*
+*     The desired behaviour is either to print the line unaltered
+*     (if the external variable 'strict' is false), or to terminate
+*     processing with an error message (if strict is true).  Either
+*     way we need the text which could not be parsed.
+*
+*     Since yacc pops everything off the stack before we are able to
+*     intercept this and discards all the associated state, we cannot
+*     use yylval as usual.  Instead, we use the ucontent() routine which
+*     gets a string consisting of all the text the lexer has encountered
+*     since the last uclear() was called.  Note that because of this 
+*     interrelation between uclear() calls and handle_error() calls,
+*     it is not OK to put an error token just anywhere in the grammar.
+*
+*     This routine also takes it upon itself to advance the lexer's 
+*     input stream to somewhere suitable to start parsing again.
+*     We take the questionable course of skipping until the next blank
+*     line.  In practice (because of human habits not C syntax) this is 
+*     likely to be a good choice.  We can't get yacc to do the skipping
+*     forward itself because the lexer does not recognise and return
+*     blanks of any kind.
+*-
+*/
+
+/* Local variables. */
+      char c;
+      char *text;
+      int done;
+
+/* Add preval to the unprocessed text. */
+      if ( prealloc > 0 ) {
+         uadd( preval );
+         free( preval );
+         preleng = 0;
+         prealloc = 0;
+      }
+
+/* Get the unprocessed text. */
+      text = ucontent();
+
+/* Do something appropriate with it. */
+      if ( strict ) {
+         fprintf( stderr, "\nError in this line:\n\n   %s\n", text );
+         exit( 1 );
+      }
+      else {
+         printf( "%s", text );
+         yyclearin;
+      }
+
+/* Release memory allocated by ucontent. */
+      free( text );
    }
       
 
