@@ -576,7 +576,7 @@
       INTEGER NNDF              ! Number of NDFs accessed
       INTEGER NNOLIS            ! Number of NDFs without associated lists
       INTEGER NOPEN             ! Number of input lists opened
-      INTEGER NOUT
+      INTEGER NOUT              ! Number of positions in list
       INTEGER NREC( CCD1__MXLIS + 1 ) ! Number of records read from file
       INTEGER NRECS( CCD1__MXLIS + 1 ) ! Number of records in superlist
       INTEGER NSUBS             ! Number of token substitutions
@@ -656,6 +656,13 @@
       CALL CCD1_SWLIS( NDFGR, FIOGR, NOPEN, NLGR, NNOLIS, NDFS, USEWCS,
      :                 USESET, FRMS, MAPS, MAPSET, ISUP, NSUP, ILIS,
      :                 ILISOF, INLSUP, STATUS )
+
+*  Warn the user if some of the input NDF names will be ignored.
+      IF ( .NOT. USESET .AND. NNOLIS .GT. 0 ) THEN
+         CALL MSG_SETI( 'NNOLIS', NNOLIS )
+         CALL CCD1_MSG( ' ', '  ^NNOLIS NDFs will be ignored since'//
+     :   ' they have no position lists.', STATUS )
+      END IF
 
 *  Find out which type of transformation the user requires.  If there
 *  are more than two input superlists then a fittype of 6 is not 
@@ -828,6 +835,18 @@
       CALL CCD1_MSG( ' ',
      :     '  Maximum change in positions is ^TOLER', STATUS )
 
+*  Report the position of the reference list.
+      IF ( USESET ) THEN
+         CALL MSG_SETI( 'I', IPREFS )
+         CALL CCD1_MSG( ' ', '  Reference Set is ^I)', STATUS )
+         CALL GRP_GET( NDFGR, IPREF, 1, FNAME, STATUS )
+         CALL MSG_SETC( 'NDF', FNAME )
+         CALL CCD1_MSG( ' ', '  Reference NDF is ^NDF', STATUS )
+      ELSE
+         CALL MSG_SETI( 'I', IPREF )
+         CALL CCD1_MSG( ' ', '  Reference list is ^I)', STATUS )
+      END IF
+
 *  Branch to deal with either linear transformations or user defined
 *  transformations.
       IF ( IFIT .LE. 5 ) THEN
@@ -948,6 +967,7 @@
 
 *  Tell user we have done so.
             CALL FIO_FNAME( FDREFO, LINE, STATUS )
+            CALL CCD1_MSG( ' ', ' ', STATUS )
             CALL MSG_SETC( 'FNAME', LINE )
             CALL CCD1_MSG( ' ',
      :      '  Extended reference positions written to file ^FNAME',
@@ -1259,8 +1279,6 @@
          FRREG = AST_FRAME( 2, ' ', STATUS )
       END IF
       CALL AST_SETC( FRREG, 'Title', 'Alignment by REGISTER', STATUS )
-
-      call ast_show( frreg, status )
 
 *  Loop through each NDF which had an associated position list.
       DO 9 I = 1, NOPEN
