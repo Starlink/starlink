@@ -40,11 +40,10 @@
 *     picture specified by parameter NAME. If possible, this alignment occurs 
 *     within the  co-ordinate Frame specified using parameter FRAME. If this 
 *     is not possible, alignment may occur in some other suitable Frame. A 
-*     message is displayed indicating the Frame in which alignment occurred
-*     if parameter QUIET is set to FALSE. If the supplied positions are 
-*     aligned succesfully with a picture, then the range of Frames in which 
-*     the positions may be reported on the screen is extended to include all 
-*     those associated with the picture.
+*     message is displayed indicating the Frame in which alignment occurred.
+*     If the supplied positions are aligned succesfully with a picture, then 
+*     the range of Frames in which the positions may be reported on the screen 
+*     is extended to include all those associated with the picture.
 
 *  Usage:
 *     listshow incat [frame] [first] [last] [plot] [device]
@@ -219,11 +218,10 @@
 *        formatted values shown on the screen. For instance, unformatted 
 *        celestial co-ordinate values are stored in units of radians. 
 *     QUIET = LOGICAL (Read)
-*        If TRUE then nothing is displayed on the screen while the
-*        application is running (other than error messages). Output 
-*        parameters and files are still created. The dynamic default is
-*        to run quietly if any graphics or labels are being plotted (see
-*        parameters PLOT and LABEL). []
+*        If TRUE then the positions are not displayed on the screen while 
+*        The application is running. Output parameters and files are still 
+*        created. The dynamic default is to run quietly if any graphics or 
+*        labels are being plotted (see parameters PLOT and LABEL). []
 *     STRINGS = LITERAL (Read)
 *        A group of text strings which are used to mark the supplied positions 
 *        if parameter PLOT is set to "TEXT". The first string in the group 
@@ -317,6 +315,8 @@
 *  History:
 *     16-SEP-1998 (DSB):
 *        Original version.
+*     22-JUN-1999 (DSB):
+*        Display the alignment Frame even if QUIET is TRUE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -554,7 +554,7 @@
 *  Frame. By preference, the Current Frame in the positions list is
 *  used. The Current Frame in the FrameSet becomes the Current 
 *  Frame in the Plot
-         CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', QUIET, 2, STATUS )
+         CALL KPG1_ASMRG( IPLOT, IWCS, 'PIXEL', .FALSE., 2, STATUS )
 
 *  Use the merged plot instead of the FrameSet.
          CALL AST_ANNUL( IWCS, STATUS )
