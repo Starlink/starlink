@@ -139,10 +139,11 @@ class PkFont {
     double wordSpace() const { return word_space_; }
     double backSpace() const { return back_space_; }
     double quad() const { return quad_; }
-    // design size, and horiz/vert pixels-per-point, in points
-    // If there's no font available, assume the world is 10-point!
+    // design size, and horiz/vert pixels-per-point, in points.
+    // No need to check font_loaded_, since these are never called
+    // between the font being created and preamble_ being filled in
     double designSize() const {
-	return font_loaded_ ? preamble_.designSize : 10;
+	return preamble_.designSize;
     }
     double hppp() const { return preamble_.hppp; }
     double vppp() const { return preamble_.vppp; }
