@@ -1,4 +1,4 @@
-      SUBROUTINE GMI_LOCNDF( FID, N, GID, STATUS )
+      SUBROUTINE GMI_LOCNDF( FID, N, CLASS, GID, STATUS )
 *+
 *  Name:
 *     GMI_LOCNDF
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL GMI_LOCNDF( FID, N, GID, STATUS )
+*     CALL GMI_LOCNDF( FID, N, CLASS, GID, STATUS )
 
 *  Description:
 *     Simply call HDS version for the moment
@@ -20,6 +20,9 @@
 *        ADI identifier of the top-level file object
 *     N = INTEGER (given)
 *        The graph to locate
+*     CLASS = CHARACTER*(*) (given)
+*        Class list used to link the multi-graph component to the dat
+*        system. Supply '*' if no linkage required.
 *     GID = INTEGER (returned)
 *        The identifier of the graph component
 *     STATUS = INTEGER (given and returned)
@@ -87,39 +90,33 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
 
-*  Global Variables:
-C      INCLUDE 'GMI_CMN'                                 ! GMI common block
-*       GMI_INIT = LOGICAL (given)
-*         GMI class definitions loaded?
-
 *  Arguments Given:
-      INTEGER			FID			! See above
-      INTEGER			N
+      INTEGER			FID, N
+      CHARACTER*(*)		CLASS
 
 *  Arguments Returned:
-       INTEGER			GID			!
+      INTEGER			GID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-C      EXTERNAL			GMI0_BLK		! Ensures inclusion
-
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	FLOC			!
       CHARACTER*(DAT__SZLOC)	GLOC			!
+
+      INTEGER			CID			! Component id
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Check initialised
-C      IF ( .NOT. GMI_INIT ) CALL GMI0_INIT( STATUS )
-
 *  Extract top-level locator, call HDS version and give locator to ADI
-       CALL ADI1_GETLOC( FID, FLOC, STATUS )
-       CALL GMD_LOCNDF( FLOC, N, GLOC, STATUS )
-       CALL ADI1_PUTLOC( GLOC, GID, STATUS )
+      CALL ADI1_GETLOC( FID, FLOC, STATUS )
+      CALL GMD_LOCNDF( FLOC, N, GLOC, STATUS )
+      CALL ADI1_PUTLOC( GLOC, CID, STATUS )
+
+*  Perform linkage
+      CALL ADI_FLINK( CID, CLASS, GID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GMI_LOCNDF', STATUS )
