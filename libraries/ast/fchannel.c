@@ -30,6 +30,9 @@
 *        Original version.
 *     12-DEC-1996 (RFWS):
 *        Added SOURCE and SINK arguments to AST_CHANNEL.
+*     13-NOV-2003 (DSB):
+*        Made SourceWrap and SinkWrap into protected functions rather
+*        than private functions, so that they can be used in fxmlchan.c
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -52,11 +55,6 @@
 /* ================= */
 static char *line_in = NULL;     /* Pointer to incoming line of text */
 static const char *line_out = NULL; /* Pointer to outgoing line of text */
-
-/* Prototypes for private functions. */
-/* ================================= */
-static char *SourceWrap( const char *(*)( void ) );
-static void SinkWrap( void (*)( const char * ), const char * );
 
 /* Prototypes for external functions. */
 /* ================================== */
@@ -225,19 +223,20 @@ f--
    )
 }
 
-static void SinkWrap( void (* sink)( const char * ), const char *line ) {
+void astSinkWrap_( void (* sink)( const char * ), const char *line ) {
 /*
+*+
 *  Name:
-*     SinkWrap
+*     astSinkWrap
 
 *  Purpose:
 *     Wrapper function to invoke a FORTRAN Channel sink function.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
-*     static void SinkWrap( void (* sink)( const char * ), const char *line )
+*     void astSinkWrap( void (* sink)( const char * ), const char *line )
 
 *  Description:
 *     This function invokes the sink function whose pointer is
@@ -254,6 +253,7 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
 *     line
 *        Pointer to a constant null-terminated string containing the
 *        line of output text.
+*-
 */
 
 /* Local Variables; */
@@ -278,19 +278,20 @@ static void SinkWrap( void (* sink)( const char * ), const char *line ) {
    line_out = NULL;
 }
 
-static char *SourceWrap( const char *(* source)( void ) ) {
+char *astSourceWrap_( const char *(* source)( void ) ) {
 /*
+*+
 *  Name:
-*     SourceWrap
+*     astSourceWrap
 
 *  Purpose:
 *     Wrapper function to invoke a FORTRAN Channel source function.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
-*     static char *SourceWrap( const char *(* source)( void ) )
+*     char *astSourceWrap( const char *(* source)( void ) )
 
 *  Description:
 *     This function invokes the source function whose pointer is
@@ -318,6 +319,7 @@ static char *SourceWrap( const char *(* source)( void ) ) {
 *     - A NULL pointer value will be returned if this function is
 *     invoked with the global error status set or if it should fail
 *     for any reason.
+*-
 */
 
 /* Local Variables: */
@@ -390,7 +392,7 @@ F77_INTEGER_FUNCTION(ast_channel)( void (* SOURCE)(),
             if ( options[ i ] == ',' ) options[ i ] = '\n';
          }
       }
-      RESULT = astP2I( astChannelFor( source, SourceWrap, sink, SinkWrap,
+      RESULT = astP2I( astChannelFor( source, astSourceWrap, sink, astSinkWrap,
                                       "%s", options ) );
       astFree( options );
    )

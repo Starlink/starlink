@@ -67,6 +67,9 @@ f     - AST_WRITE: Write an Object to a Channel
 *        method.
 *        - Modified to use protected Vtab initialisation methods when
 *        loading an Object.
+*     1-NOV-2003 (DSB):
+*        Change the initialiser so that it accepts source and sink
+*        wrapper functions as arguments (for use by derived classes).
 *class--
 */
 
@@ -192,7 +195,6 @@ AstChannel *astChannelId_( const char *(*)( void ), void (*)( const char * ), co
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
-static AstChannel *Init( void *, size_t, int, AstChannelVtab *, const char *, const char *(*)( void ), char *(*)( const char *(*)( void ) ), void (*)( const char * ), void (*)( void (*)( const char * ), const char * ) );
 static AstObject *Read( AstChannel * );
 static AstObject *ReadObject( AstChannel *, const char *, AstObject * );
 static Value *FreeValue( Value * );
@@ -1162,44 +1164,46 @@ static char *GetNextText( AstChannel *this ) {
 #undef MIN_CHARS
 }
 
-static AstChannel *Init( void *mem, size_t size, int init,
-                         AstChannelVtab *vtab, const char *name,
-                         const char *(* source)( void ),
-                         char *(* source_wrap)( const char *(*)( void ) ),
-                         void (* sink)( const char * ),
-                         void (* sink_wrap)( void (*)( const char * ),
-                                             const char * ) ) {
+AstChannel *astInitChannel_( void *mem, size_t size, int init,
+                             AstChannelVtab *vtab, const char *name,
+                             const char *(* source)( void ),
+                             char *(* source_wrap)( const char *(*)( void ) ),
+                             void (* sink)( const char * ),
+                             void (* sink_wrap)( void (*)( const char * ),
+                                                 const char * ) ) {
 /*
+*+
 *  Name:
-*     Init
+*     astInitChannel
 
 *  Purpose:
 *     Initialise a Channel.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "channel.h"
-*     AstChannel *Init( void *mem, size_t size, int init,
-*                       AstChannelVtab *vtab, const char *name,
-*                       const char *(* source)( void ),
-*                       char *(* source_wrap)( const char *(*)( void ) ),
-*                       void (* sink)( const char * ),
-*                       void (* sink_wrap)( void (*)( const char * ),
-*                                           const char * ) )
+*     AstChannel *astInitChannel( void *mem, size_t size, int init,
+*                                 AstChannelVtab *vtab, const char *name,
+*                                 const char *(* source)( void ),
+*                                 char *(* source_wrap)( const char *(*)( void ) ),
+*                                 void (* sink)( const char * ),
+*                                 void (* sink_wrap)( void (*)( const char * ),
+*                                                     const char * ) )
 
 *  Class Membership:
-*     Channel member function.
+*     Channel initialiser.
 
 *  Description:
-*     This function initialises a new Channel object. It allocates
-*     memory (if necessary) to accommodate the Channel plus any
-*     additional data associated with the derived class.  It then
-*     initialises a Channel structure at the start of this memory. If
-*     the "init" flag is set, it also initialises the contents of a
-*     virtual function table for a Channel at the start of the memory
-*     passed via the "vtab" parameter.
+*     This function is provided for use by class implementations to
+*     initialise a new Channel object. It allocates memory (if
+*     necessary) to accommodate the Channel plus any additional data
+*     associated with the derived class.  It then initialises a
+*     Channel structure at the start of this memory. If the "init"
+*     flag is set, it also initialises the contents of a virtual
+*     function table for a Channel at the start of the memory passed
+*     via the "vtab" parameter.
 
 *  Parameters:
 *     mem
@@ -1292,6 +1296,7 @@ static AstChannel *Init( void *mem, size_t size, int init,
 *     - A null pointer will be returned if this function is invoked
 *     with the global error status set, or if it should fail for any
 *     reason.
+*-
 */
 
 /* Local Variables: */
@@ -4360,8 +4365,8 @@ AstChannel *astChannel_( const char *(* source)( void ),
    virtual function table as well if necessary. Supply pointers to
    (local) wrapper functions that can invoke the source and sink
    functions with appropriate arguments for the C language. */
-   new = Init( NULL, sizeof( AstChannel ), !class_init, &class_vtab,
-               "Channel", source, SourceWrap, sink, SinkWrap );
+   new = astInitChannel( NULL, sizeof( AstChannel ), !class_init, &class_vtab,
+                         "Channel", source, SourceWrap, sink, SinkWrap );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -4537,8 +4542,8 @@ f     pointer.
    virtual function table as well if necessary. Supply pointers to
    (local) wrapper functions that can invoke the source and sink
    functions with appropriate arguments for the C language. */
-   new = Init( NULL, sizeof( AstChannel ), !class_init, &class_vtab,
-               "Channel", source, SourceWrap, sink, SinkWrap );
+   new = astInitChannel( NULL, sizeof( AstChannel ), !class_init, &class_vtab,
+                         "Channel", source, SourceWrap, sink, SinkWrap );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -4710,8 +4715,8 @@ AstChannel *astChannelForId_( const char *(* source)( void ),
 
 /* Initialise the Channel, allocating memory and initialising the
    virtual function table as well if necessary. */
-   new = Init( NULL, sizeof( AstChannel ), !class_init, &class_vtab,
-               "Channel", source, source_wrap, sink, sink_wrap );
+   new = astInitChannel( NULL, sizeof( AstChannel ), !class_init, &class_vtab,
+                         "Channel", source, source_wrap, sink, sink_wrap );
 
 /* If successful, note that the virtual function table has been
    initialised. */
@@ -4731,117 +4736,6 @@ AstChannel *astChannelForId_( const char *(* source)( void ),
 
 /* Return an ID value for the new Channel. */
    return astMakeId( new );
-}
-
-AstChannel *astInitChannel_( void *mem, size_t size, int init,
-                             AstChannelVtab *vtab, const char *name,
-                             const char *(* source)( void ),
-                             void (* sink)( const char * ) ) {
-/*
-*+
-*  Name:
-*     astInitChannel
-
-*  Purpose:
-*     Initialise a Channel.
-
-*  Type:
-*     Protected function.
-
-*  Synopsis:
-*     #include "channel.h"
-*     AstChannel *astInitChannel( void *mem, size_t size, int init,
-*                                 AstChannelVtab *vtab, const char *name,
-*                                 const char *(* source)( void ),
-*                                 void (* sink)( const char * ) )
-
-*  Class Membership:
-*     Channel initialiser.
-
-*  Description:
-*     This function is provided for use by class implementations to
-*     initialise a new Channel object. It allocates memory (if
-*     necessary) to accommodate the Channel plus any additional data
-*     associated with the derived class.  It then initialises a
-*     Channel structure at the start of this memory. If the "init"
-*     flag is set, it also initialises the contents of a virtual
-*     function table for a Channel at the start of the memory passed
-*     via the "vtab" parameter.
-
-*  Parameters:
-*     mem
-*        A pointer to the memory in which the Channel is to be
-*        initialised.  This must be of sufficient size to accommodate
-*        the Channel data (sizeof(Channel)) plus any data used by the
-*        derived class. If a value of NULL is given, this function
-*        will allocate the memory itself using the "size" parameter to
-*        determine its size.
-*     size
-*        The amount of memory used by the Channel (plus derived class
-*        data).  This will be used to allocate memory if a value of
-*        NULL is given for the "mem" parameter. This value is also
-*        stored in the Channel structure, so a valid value must be
-*        supplied even if not required for allocating memory.
-*     init
-*        A boolean flag indicating if the Channel's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*     vtab
-*        Pointer to the start of the virtual function table to be
-*        associated with the new Channel.
-*     name
-*        Pointer to a constant null-terminated character string which
-*        contains the name of the class to which the new object
-*        belongs (it is this pointer value that will subsequently be
-*        returned by the astGetClass method).
-*     source
-*        Pointer to a "source" function that takes no arguments and
-*        returns a pointer to a null-terminated string.
-*
-*        This function will be used by the Channel to obtain lines of
-*        input text. On each invocation, it should return a pointer to
-*        the next input line read from some external data store, and a
-*        NULL pointer when there are no more lines to read.
-*
-*        If "source" is NULL, the Channel will read from standard
-*        input instead.
-*     sink
-*        Pointer to a "sink" function that takes a pointer to a
-*        null-terminated string as an argument and returns void.
-*
-*        This function will be used by the Channel to deliver lines of
-*        output text. On each invocation, it should deliver the
-*        contents of the string supplied to some external data store.
-*
-*        If "sink" is NULL, the Channel will write to standard output
-*        instead.
-
-*  Returned Value:
-*     A pointer to the new Channel.
-
-*  Notes:
-*     - A null pointer will be returned if this function is invoked
-*     with the global error status set, or if it should fail for any
-*     reason.
-*-
-*/
-
-/* Local Variables: */
-   AstChannel *new;              /* Pointer to new Channel */
-
-/* Initialise. */
-   new = NULL;
-
-/* Check the global status. */
-   if ( !astOK ) return new;
-
-/* Initialise the new Channel, supplying pointers to appropriate local
-   source and sink wrapper functions. */
-   new = Init( mem, size, init, vtab, name,
-               source, SourceWrap, sink, SinkWrap );
-
-/* Return a pointer to the new Channel. */
-   return new;
 }
 
 AstChannel *astLoadChannel_( void *mem, size_t size,

@@ -311,9 +311,12 @@ AstChannel *astChannelForId_( const char *(*)( void ),
 
 /* Initialiser. */
 AstChannel *astInitChannel_( void *, size_t, int, AstChannelVtab *,
-                             const char *,
-                             const char *(*)( void ),
-                             void (*)( const char * ) );
+                             const char *, const char *(*)( void ), 
+                             char *(*)( const char *(*)( void ) ), 
+                             void (*)( const char * ), 
+                             void (*)( void (*)( const char * ), 
+                             const char * ) );
+
 
 /* Vtab initialiser. */
 void astInitChannelVtab_( AstChannelVtab *, const char * );
@@ -327,6 +330,9 @@ AstChannel *astLoadChannel_( void *, size_t, AstChannelVtab *,
 /* -------------------------------- */
 AstObject *astRead_( AstChannel * );
 int astWrite_( AstChannel *, AstObject * );
+
+char *astSourceWrap_( const char *(*)( void ) );
+void astSinkWrap_( void (*)( const char * ), const char * );
 
 # if defined(astCLASS)           /* Protected */
 AstObject *astReadObject_( AstChannel *, const char *, AstObject * );
@@ -388,8 +394,8 @@ void astWriteString_( AstChannel *, const char *, int, int, const char *, const 
 #if defined(astCLASS)            /* Protected */
 
 /* Initialiser. */
-#define astInitChannel(mem,size,init,vtab,name,source,sink) \
-astINVOKE(O,astInitChannel_(mem,size,init,vtab,name,source,sink))
+#define astInitChannel(mem,size,init,vtab,name,source,source_wrap,sink,sink_wrap) \
+astINVOKE(O,astInitChannel_(mem,size,init,vtab,name,source,source_wrap,sink,sink_wrap))
 
 /* Vtab Initialiser. */
 #define astInitChannelVtab(vtab,name) astINVOKE(V,astInitChannelVtab_(vtab,name))
@@ -407,6 +413,9 @@ astINVOKE(O,astLoadChannel_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astRead(this) astINVOKE(O,astRead_(astCheckChannel(this)))
 #define astWrite(this,object) \
 astINVOKE(V,astWrite_(astCheckChannel(this),astCheckObject(object)))
+
+#define astSourceWrap astSourceWrap_
+#define astSinkWrap astSinkWrap_
 
 #if defined(astCLASS)            /* Protected */
 #define astClearComment(this) \
