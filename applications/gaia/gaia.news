@@ -113,4 +113,6 @@
   The astrometry tables now offer a button to project X,Y to RA,DEC
   to complement the reset projection of RA,DEC to X,Y.
 
-  
+  XY profiles now display a local value when a row or column contains
+  no valid values (previous this displayed zero, which occasionally 
+  made the graphs scale to silly values). 

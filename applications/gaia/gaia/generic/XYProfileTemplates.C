@@ -8,7 +8,7 @@
 //-
 
 //
-//   Extract the X and Y profiles from a sub region of image data. 
+//   Extract the X and Y profiles from a sub region of image data.
 //   Native format image data version.
 //
 //   Arguments:
@@ -29,8 +29,8 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
                                     const int ny, const double bscale,
                                     const double bzero, const int x0,
                                     const int y0, const int x1,
-                                    const int y1, double *xCoords, 
-                                    double *xVector, double *yCoords, 
+                                    const int y1, double *xCoords,
+                                    double *xVector, double *yCoords,
                                     double *yVector, int numValues[2] )
 {
     DATA_TYPE value;
@@ -88,15 +88,32 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
             xVector[ix+1] = bscale * ( xsum[i] / (double)xcount[i] ) + bzero;
             n++;
         }
+        else {
+            /* Cell has no value. Currently initialised to zero, but a mean
+             * looks better, so use the last value (if any). */
+            if ( ix > 0 ) {
+                xVector[ix+1] = xVector[ix-1];
+                n++;
+            }
+        }
         xVector[ix] = (double) i;
         xCoords[i] = (double) (i + x0 + 1);
     }
     numValues[0] = n;
+
     n = 0;
     for ( i = 0, iy = 0; i < h; i++, iy += 2 ) {
         if ( ycount[i] > 0 ) {
             yVector[iy+1] = bscale * ( ysum[i] / (double)ycount[i] ) + bzero;
             n++;
+        }
+        else {
+            /* Cell has no value. Currently initialised to zero, but a mean
+             * looks better, so use the last value (if any). */
+            if ( iy > 0 ) {
+                yVector[iy+1] = yVector[iy-1];
+                n++;
+            }
         }
         yVector[iy] = (double) i;
         yCoords[i] = (double) (i + y0 + 1);
@@ -111,7 +128,7 @@ void XYProfile::extractNativeImage( const DATA_TYPE *image, const int nx,
 }
 
 //
-//   Extract the X and Y profiles from a sub region of image data. 
+//   Extract the X and Y profiles from a sub region of image data.
 //   Byte swapped image data version.
 //
 //   Arguments:
@@ -122,7 +139,7 @@ void XYProfile::extractSwapImage( const DATA_TYPE *image, const int nx,
                                   const double bzero, const int x0,
                                   const int y0, const int x1,
                                   const int y1, double *xCoords,
-                                  double *xVector, double *yCoords, 
+                                  double *xVector, double *yCoords,
                                   double *yVector, int numValues[2] )
 {
     DATA_TYPE value;
@@ -180,15 +197,32 @@ void XYProfile::extractSwapImage( const DATA_TYPE *image, const int nx,
             xVector[ix+1] = bscale * ( xsum[i] / (double)xcount[i] ) + bzero;
             n++;
         }
+        else {
+            /* Cell has no value. Currently initialised to zero, but a mean
+             * looks better, so use the last value (if any). */
+            if ( ix < 0 ) {
+                xVector[ix+1] = xVector[ix-1];
+                n++;
+            }
+        }
         xVector[ix] = (double) i;
         xCoords[i] = (double) (i + x0 + 1);
     }
     numValues[0] = n;
+
     n = 0;
     for ( i = 0, iy = 0; i < h; i++, iy += 2 ) {
         if ( ycount[i] > 0 ) {
             yVector[iy+1] = bscale * ( ysum[i] / (double)ycount[i] ) + bzero;
             n++;
+        }
+        else {
+            /* Cell has no value. Currently initialised to zero, but a mean
+             * looks better, so use the last value (if any). */
+            if ( iy < 0 ) {
+                yVector[iy+1] = yVector[iy-1];
+                n++;
+            }
         }
         yVector[iy] = (double) i;
         yCoords[i] = (double) (i + y0 + 1);
