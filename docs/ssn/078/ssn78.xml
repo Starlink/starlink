@@ -2066,8 +2066,11 @@ test2_SOURCES = test2.c
           <code>test1</code> program needs to be linked against two
           libraries, presumably part of the build.  We specify these
           with a <code>LDADD</code> primary, but note that we specify
-          them as two <em>libtool libraries</em>, with the extension
-          <code>.la</code>, rather than using <code>`ems_link`</code>
+          the two libraries which are actually under test as two
+          <em>libtool libraries</em>, with the extension
+          <code>.la</code>, rather than using the <code>-lemsf
+            -lems `cnf_link`</code> which <code>`ems_link`</code>
+          uses as its starting point
           (this example comes from the <code>ems</code> component).
           That tells libtool to use the libraries in this directory,
           rather than any which have been installed.</p>
