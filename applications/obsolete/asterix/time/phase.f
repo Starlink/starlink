@@ -158,9 +158,9 @@
       CALL USI_GET0D('COEFF3', COEFF(3), STATUS)
 
 *    Write ephemeris values to EPHEMERIS
-      WRITE (EPHEMERIS(1), '(15X,A,G15.5)') 'Coefficient 1 = ',COEFF(1)
-      WRITE (EPHEMERIS(2), '(15X,A,G15.5)') 'Coefficient 2 = ',COEFF(2)
-      WRITE (EPHEMERIS(3), '(15X,A,G15.5)') 'Coefficient 3 = ',COEFF(3)
+      WRITE (EPHEMERIS(1), '(A,G15.5)') 'Coefficient 1 = ',COEFF(1)
+      WRITE (EPHEMERIS(2), '(A,G15.5)') 'Coefficient 2 = ',COEFF(2)
+      WRITE (EPHEMERIS(3), '(A,G15.5)') 'Coefficient 3 = ',COEFF(3)
 
 *    Convert to MJD
       COEFF(1) = COEFF(1) - 2400000.5
