@@ -12,8 +12,13 @@
 #     C shell
 
 #  Description:
-#     The script spends most of its time sleeping, but at intervals wakes
-#     up and takes a look at what processes are running.  It takes note
+#     The script records the time and memory usage of the largest 
+#     process to have run since the last time an external 'label' file
+#     was altered, and logs this information to a file.
+#
+#     It works as follows.  The script spends most of its time sleeping, 
+#     but at intervals wakes up and takes a look at what processes are 
+#     running.  It takes note
 #     of the largest (biggest memory usage) and records the current 
 #     CPU and elapsed time values, and the maximum so far total virtual
 #     memory use and resident set size (i.e. real memory use).
@@ -24,11 +29,19 @@
 #     The only communication between the parent and this process, 
 #     after it is started, is via the label file.
 #
-#     Accuracy of the summary will necessarily depend on the lenght of
+#     Accuracy of the summary will necessarily depend on the length of
 #     the intervals during which the script sleeps.  In particular 
 #     it cannot be expected to report accurately on processes whose
 #     elapsed time is comparable with the interval time, and may 
-#     miss reporting on these altogether.
+#     miss reporting on these altogether.  In general it will underestimate
+#     elapsed and CPU time of processes, although not by (much) more than
+#     the sleep time.  Inevitably running this script will interfere
+#     with the process(es) being measured; although this script is 
+#     not a heavy user of CPU time, the disk activity caused by 
+#     loading the various commands in it may have a significant impact
+#     on the performance of the machine in the event that there is
+#     heavy use of disks, especially if this is caused by heavy paging
+#     activity.
 #
 #     If this process receives an interrupt, or if it detects that its
 #     parent no longer exists, this process will terminate.
@@ -41,23 +54,29 @@
 #     descending from BSD and one from Sytem V Unix.
 #     The script as it stands appears to run on the following systems:
 #        Red Hat Linux 5.0
-#        Solaris (SunOS 5.6)
+#        Solaris 2.6
 #     however it's likely to be sensitive to details of the systems it's
 #     running on.  There may also be problems, for instance, if (e.g. 
-#     for a process with very large memory usage) the columns from ps 
+#     for a process with very high memory usage) the columns from ps 
 #     run into each other.
 
 #  Parameters:
-#     If invoked with a command-line argument, it will take it as the
-#     name of the log file to write to.  Otherwise it will use a default
-#     file name (reslog.log).
+#     The following command line flags are permissible:
+#        -h:
+#            Print a usage message.
+#        -i interval:
+#            Set the interval (in seconds) between checking process stats [30].
+#        -l logfile:
+#            Set the name of the file used for logging data [reslog.log].
+#     If other flags are used the usage message will be printed and 
+#     execution will be terminated.
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
-#     15-MAY-1998 (MBT):
+#     27-MAY-1998 (MBT):
 #        Original version.
 #     {enter_further_changes_here}
 #-
@@ -65,19 +84,51 @@
 
 
 # Set up variables
-set logfile = test.log
-if ("$1" != "") set logfile = "$1"
+#
+set logfile = reslog.log                 # can be overridden with -l flag
+set interval = 30                        # can be overridden with -i flag
 set labelfile = ./current_label
 set tmpfile = ./tmpfile
-set interval = 10
+
+# Parse command line
+#
+set scriptname = $0
+set scriptname = ${scriptname:t}
+
+while ("$argv" != "")
+   set arg = $argv[1]
+   shift 
+   switch ("$arg")
+   case "-i":
+      set interval = "$argv[1]"
+      shift
+      breaksw
+   case "-l":
+      set logfile = "$argv[1]"
+      shift
+      breaksw
+   case "-h":
+   default:
+      echo "Usage:  $scriptname [-h] [-i interval] [-l logfile]"
+      goto EXIT
+      breaksw
+   endsw
+end
+
+echo
+echo "${scriptname}:  Logging to $logfile"
+echo "${scriptname}:  Logging interval $interval seconds"
+echo
 
 # Print out header
+#
 set  format = "%29s %10d %10d %10d %10d  %s\n"
 set hformat = "%29s %10s %10s %10s %10s\n"
 printf "$hformat" " " "Elapsed(s)" "CPU(s)" "RSS(k)" "Size(k)" >>$logfile
 
 # Classify operating system 
 # (currently works for Red Hat Linux, Solaris, Digital Unix) 
+#
 if ("`uname`" == "Linux") then
    set pstype = 'BSD'
 else
@@ -86,17 +137,20 @@ endif
 
 
 # Set up alias for pulling fields out of 'ps' output
+#
 alias getfield awk "'\\
    NR==1 {for (i=1;i<=NF;i++) {if("\$"i==field) f_i=i; if("\$"i==sortby) s_i=i;}} \\
    NR==2 {out = "\$"f_i; s_max="\$"s_i} \\
    NR>2 && s_i>0 {if ("\$"s_i > s_max) out="\$"f_i;} \\
-   END {print out}'"
+   END  {if (f_i>0) print out}'"
 
 # Set up alias for converting from hh:mm:ss to seconds
+#
 alias tosec awk -F: "'\\
    {mult=1; for (i=NF;i>0;i--) {sec += "\$"i * mult; mult *= 60} print sec }'"
 
 # Some initialisation
+#
 set size_max = 0
 set rss_max = 0
 set label = ""
@@ -104,6 +158,7 @@ rm -f $labelfile
 onintr SIGNAL
 
 # Work out parent's PID
+#
 if ("$pstype" == "BSD") then
    set pscmd = "ps l $$"
 else 
@@ -121,14 +176,22 @@ else
    set parent_pscmd = "ps -p $ppid"
 endif
 
-while (`$parent_pscmd | getfield field=PID`) 
+# Main loop checking process status
+#
+while (`$parent_pscmd |& getfield field=PID`) 
+
    # See what is the currently active application
+   #
    set label_last = "$label"
    if (-e $labelfile) set label = "`cat $labelfile`"
 
+   # See if current application has changed since we last looked
+   #
    if ("$label_last" != "" && "$label" != "$label_last" && $?elapsed_major) then
-   # Application has changed since we last looked.  
-   # Write summary to log and reset values.
+
+      # Application has changed since we last looked.  
+      # Write summary to log and reset values.
+      #
       printf >> $logfile "$format" \
         "$label_last" \
         "$elapsed_major" "$cpu_major" "$rss_max" "$size_max" 
@@ -140,6 +203,7 @@ while (`$parent_pscmd | getfield field=PID`)
    # We do this (somewhat haphazardly) by checking the processes which have
    # the same parent as this one, and then selecting the one with the 
    # largest (total virtual) memory size.
+   #
    if ("$pstype" == "BSD") then
       set pscmd = "ps lx"
    else
@@ -147,12 +211,13 @@ while (`$parent_pscmd | getfield field=PID`)
    endif 
 
    # The awk here is to select only processes with the right PPID
+   #
    set awkprog = 'NR==1{for (i=1;i<=NF;i++) {if ($i=="PPID") f_i=i} print;} \\
                   NR>1 && $f_i=="'$ppid'" {print;}'
    set pid = `$pscmd | awk $awkprog:q  | getfield field=PID sortby=SIZE`
 
-   
    # Find out the stats we want (cpu, elapsed, size, rss)
+   #
    if ("$pstype" == "BSD") then
       (ps u $pid > $tmpfile) >& /dev/null
       @ ps_worked = (`cat $tmpfile | wc -l` == 2)
@@ -168,7 +233,6 @@ while (`$parent_pscmd | getfield field=PID`)
       ( ps -p $pid -otime=TIME -oetime=ETIME -ovsz='     VSZ' -orss='     RSS' -ocomm > $tmpfile ) >& /dev/null
       @ ps_worked = (`cat $tmpfile | wc -l` == 2)
       if ($ps_worked) then
-         tail -1 $tmpfile >> $logfile
          set command = `cat $tmpfile | getfield field=COMMAND`
          set cpu     = `cat $tmpfile | getfield field=TIME | tosec`
          set size    = `cat $tmpfile | getfield field=VSZ`
@@ -179,14 +243,19 @@ while (`$parent_pscmd | getfield field=PID`)
    
    # Update maxima and make sure the current stats are those for the 
    # so far biggest process
+   #
    if ($ps_worked) then
+
       # The major process is the one which has had the largest SIZE or RSS
       # since the last reset.
       # Check if the major process is the same as last time
+      #
       if ($size > $size_max || $rss > $rss_max) set pid_major = $pid
       if ($size > $size_max) set size_max = $size
       if ($rss  > $rss_max)  set rss_max  = $rss
+
       # Update the times as long as we're still looking at the major process
+      #
       if ($pid_major == $pid) then
          set command_major = "$command"
          set elapsed_major = "$elapsed"
@@ -195,21 +264,20 @@ while (`$parent_pscmd | getfield field=PID`)
    endif
    
    # Go back to sleep for a while
+   #
    sleep $interval
    
 end
 
 echo
-set name = $0
 echo >> $logfile
-echo "${name:t}: Parent died.  Logging terminated" >> $logfile
+echo "${scriptname:t}:  Parent died.  Logging terminated" >> $logfile
 
 goto EXIT
 
 SIGNAL:
-   set name = $0
    echo >> $logfile
-   echo "${name:t}: Caught a signal.  Logging terminated" >> $logfile
+   echo "${scriptname}:  Caught a signal.  Logging terminated" >> $logfile
 
 EXIT:
    rm -f $tmpfile
