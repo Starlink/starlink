@@ -11,6 +11,7 @@ DTDDIR=$(STARLINK_SGML_DIR)/dtd
 DECL=$(STARLINK_SGML_DIR)/dtd/starlink.decl
 
 %.dtdsummary: $(DTDDIR)/%.dtd
+	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl $< >$@ 
 
@@ -37,6 +38,7 @@ sgmltext.stamp: starlink-0.6.sgmltext programcode-0.6.sgmltext
 
 starlink-0.6.dtdsummary: $(DTDDIR)/starlink-everything.dtd \
 			$(DTDDIR)/starlink-0.6.dtd
+	SGML_CATALOG_FILES=./CATALOG:$(DTDDIR)/CATALOG \
 	SGML_SEARCH_PATH=$(DTDDIR) \
 	perl -I $(PERLSGML_DIR) dtd2sgml.pl \
 		$< >$@
