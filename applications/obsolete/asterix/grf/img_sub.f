@@ -2937,7 +2937,7 @@ c        REAL XX,XP,YP
 
 *  set region mask
         CALL IMG_SETCIRC_SUB(X,Y,R,I1,I2,J1,J2,FLAG,%val(I_REG_PTR))
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I_REG_TYPE='CIRCLE'
         ELSE
           I_REG_TYPE='COMPLEX'
@@ -2993,7 +2993,7 @@ c        REAL XX,XP,YP
 
 
 *  set region mask
-        IF (I_REG_TYPE.NE.'NONE') THEN
+        IF (I_REG_TYPE.NE.'WHOLE') THEN
           CALL IMG_SETINV_SUB(%val(I_REG_PTR))
           I_REG_TYPE='COMPLEX'
         ENDIF
@@ -3130,7 +3130,7 @@ c        REAL XX,XP,YP
 *  set region mask
         CALL IMG_SETANNULUS_SUB(X,Y,IRAD,ORAD,I1,I2,J1,J2,
      :                                FLAG,%val(I_REG_PTR))
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I_REG_TYPE='ANNULUS'
         ELSE
           I_REG_TYPE='COMPLEX'
@@ -3198,7 +3198,7 @@ c        REAL XX,XP,YP
 
 *  set region mask
         CALL IMG_SETPOLY_SUB(NV,XV,YV,FLAG,%val(I_REG_PTR))
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I_REG_TYPE='POLYGON'
         ELSE
           I_REG_TYPE='COMPLEX'
@@ -3394,7 +3394,7 @@ c        REAL XX,XP,YP
 
 *  set region mask
         CALL IMG_SETBOX_SUB(I1,I2,J1,J2,FLAG,%val(I_REG_PTR))
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I_REG_TYPE='BOX'
         ELSE
           I_REG_TYPE='COMPLEX'
@@ -3462,7 +3462,7 @@ c        REAL XX,XP,YP
 *  set region mask
         CALL IMG_SETSLICE_SUB(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
      :                                         FLAG,%val(I_REG_PTR))
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I_REG_TYPE='SLICE'
         ELSE
           I_REG_TYPE='COMPLEX'
@@ -3536,7 +3536,7 @@ c        REAL XX,XP,YP
 *  set region mask
         CALL IMG_SETELLIPSE_SUB(XC,YC,MAJOR,MINOR,ANGLE,I1,I2,J1,J2,
      :                                           FLAG,%val(I_REG_PTR))
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I_REG_TYPE='ELLIPSE'
         ELSE
           I_REG_TYPE='COMPLEX'
@@ -3593,7 +3593,7 @@ c        REAL XX,XP,YP
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (I_REG_TYPE.EQ.'NONE') THEN
+        IF (I_REG_TYPE.EQ.'WHOLE') THEN
           I1=1
           I2=I_NX
           J1=1
@@ -4255,7 +4255,7 @@ c        REAL XX,XP,YP
       INTEGER ISTAT
       BYTE REG
 *-
-      IF (I_REG_TYPE.EQ.'NONE') THEN
+      IF (I_REG_TYPE.EQ.'WHOLE') THEN
 
         IMG_INREG=.TRUE.
 
