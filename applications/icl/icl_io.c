@@ -24,6 +24,8 @@
  *       Add long line editing
  *       Improve screen mode I/O
  *       Make ringbelll ring bell not flash screen
+ *     01-JUL-2004 (TIMJ):
+ *       Now use autoconf test for atexit
  *
  * Source file for the basic ICL input/output subsystem. This is a separate
  * processs forked by ICL which handles terminal I/O. It does this by
@@ -44,10 +46,17 @@
  */
 /* System includes */
 
-#if defined(ultrix)
-#include <cursesX.h>
+/* Autoconf output */
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#if HAVE_CURSES_H
+# include <curses.h>
+#elif HAVE_CURSESX_H
+# include <cursesX.h>
 #else
-#include <curses.h>
+# error "Unable to locate curses installation"
 #endif
 
 #include <term.h>
@@ -2376,10 +2385,12 @@ struct sigaction act;
 	if (!(init_tty.c_lflag & ICANON)) /* ensure restore to standard state */
 	    init_tty.c_lflag |= (ICANON | ECHO | ISIG);
 
-#ifndef USE_ON_EXIT
+#if HAVE_ATEXIT
 	atexit(exit_handler);		       /* ANSI C/POSIX */
-#else
+#elif HAVE_ON_EXIT
 	on_exit(exit_handler, 0);		/* SunOS	*/
+#else
+# error "Do not know how to register an exit handler"
 #endif
 /*
  * We change the terminal mode to be single character input. This may clear
