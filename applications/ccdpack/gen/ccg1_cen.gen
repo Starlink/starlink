@@ -22,6 +22,11 @@
 *     in the profiles. These values are then used to form the centroid.
 *     This sequence is repeated until a given number of iterations is
 *     exceeded or the centroid is located with the given accuracy.  
+*
+*     The coordinates in which XINIT and YINIT are supplied and which
+*     XACC and YACC are returned are equivalent to GRID coordinates;
+*     that is the coordinates of the centre of the first pixel in 
+*     the IMAGE array are (1.0, 1.0).
 
 *  Arguments:
 *     XINIT = DOUBLE PRECISION (Given)
