@@ -37,7 +37,8 @@ KPG_BDIRW_GEN = kpg1_iscl.gbdirw
 
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
-kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr
+kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
+kpg1_bloc.gdr
 
 KPG_DIR_GEN = kpg1_mul.gdir
 
@@ -52,7 +53,7 @@ kpg1_avlut.f kpg1_axano.f kpg1_axbnd.f kpg1_axbnr.f kpg1_axcod.f \
 kpg1_axcor.f kpg1_axexd.f kpg1_axexr.f kpg1_axgvd.f kpg1_axgvr.f \
 kpg1_axlid.f kpg1_axlii.f kpg1_axlir.f kpg1_axliw.f kpg1_axliuw.f \
 kpg1_axlvd.f kpg1_axlvr.f kpg1_axrng.f kpg1_axtyp.f kpg1_axvld.f \
-kpg1_axvlr.f kpg1_blocd.f kpg1_blocr.f kpg1_bmedd.f kpg1_bmedr.f \
+kpg1_axvlr.f kpg1_bmedd.f kpg1_bmedr.f \
 kpg1_bor2b.f kpg1_bor2d.f kpg1_bor2i.f kpg1_bor2r.f kpg1_bor2ub.f \
 kpg1_bor2uw.f kpg1_bor2w.f kpg1_ccpro.f \
 kpg1_che2d.f kpg1_che2r.f kpg1_cheld.f kpg1_cheli.f kpg1_chelr.f \

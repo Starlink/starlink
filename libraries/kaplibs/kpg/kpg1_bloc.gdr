@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_BLOCR( BAD, SAMBAD, VAR, NX, NY, A, IBOXX,
+      SUBROUTINE KPG1_BLOC<T>( BAD, SAMBAD, VAR, NX, NY, A, IBOXX,
      :                         IBOXY, NLIM, B, BADOUT, ASUM, NSUM,
      :                         STATUS )
 *+
@@ -103,24 +103,24 @@
       LOGICAL VAR
       INTEGER NX
       INTEGER NY
-      REAL A( NX, NY )
+      <TYPE> A( NX, NY )
       INTEGER IBOXX
       INTEGER IBOXY
       INTEGER NLIM
  
 *  Arguments Returned:
-      REAL B( NX, NY )
+      <TYPE> B( NX, NY )
       LOGICAL BADOUT
-      REAL ASUM( NX )
+      <TYPE> ASUM( NX )
       INTEGER NSUM( NX )
  
 *  Status:
       INTEGER STATUS             ! Global status
  
 *  Local Variables:
-      REAL ASUM0               ! Good pixel sum
-      REAL DENOM               ! Denominator for smoothed output value
-      REAL NPIX                ! Number of pixels in smoothing box
+      <TYPE> ASUM0               ! Good pixel sum
+      <TYPE> DENOM               ! Denominator for smoothed output value
+      <TYPE> NPIX                ! Number of pixels in smoothing box
       INTEGER IIX                ! Loop counter for summing over pixels
       INTEGER IIY                ! Loop counter for summing over lines
       INTEGER ILINE              ! Contributing line number
@@ -141,7 +141,7 @@
 *  Initialise the bad output pixel flag and the workspace arrays.
       BADOUT = .FALSE.
       DO 1 IX = 1, NX
-         ASUM( IX ) = 0.0E0
+         ASUM( IX ) = 0<CONST>
          NSUM( IX ) = 0
  1    CONTINUE
  
@@ -168,7 +168,7 @@
 *  are present, then test for them.
          IF ( BAD ) THEN
             DO 2 IX = 1, NX
-               IF ( A( IX, ILINE ) .NE. VAL__BADR ) THEN
+               IF ( A( IX, ILINE ) .NE. VAL__BAD<T> ) THEN
                   ASUM( IX ) = ASUM( IX ) + A( IX, ILINE )
                   NSUM( IX ) = NSUM( IX ) + 1
                END IF
@@ -201,11 +201,11 @@
 *  for them.
          IF ( BAD ) THEN
             DO 5 IX = 1, NX
-               IF ( A( IX, OLDY ) .NE. VAL__BADR ) THEN
+               IF ( A( IX, OLDY ) .NE. VAL__BAD<T> ) THEN
                   ASUM( IX ) = ASUM( IX ) - A( IX, OLDY )
                   NSUM( IX ) = NSUM( IX ) - 1
                END IF
-               IF ( A( IX, NEWY ) .NE. VAL__BADR ) THEN
+               IF ( A( IX, NEWY ) .NE. VAL__BAD<T> ) THEN
                   ASUM( IX ) = ASUM( IX ) + A( IX, NEWY )
                   NSUM( IX ) = NSUM( IX ) + 1
                END IF
@@ -226,7 +226,7 @@
 *  ============================
 *  Form initial sums for a box of size (2*IBOXX+1)x1 centred on pixel
 *  (0,IY).
-         ASUM0 = 0.0E0
+         ASUM0 = 0<CONST>
          NSUM0 = 0
          DO 7 IIX = -IBOXX, IBOXX
  
@@ -284,13 +284,13 @@
 *  It is also valid if SAMBAD is .TRUE. and the corresponding input
 *  pixel is not bad.
             ELSE IF ( SAMBAD ) THEN
-               IF ( A( IX, IY ) .NE. VAL__BADR ) THEN
+               IF ( A( IX, IY ) .NE. VAL__BAD<T> ) THEN
                   B( IX, IY ) = ASUM0 / DENOM
  
 *  It is bad if SAMBAD is .TRUE. and the corresponding input pixel is
 *  bad.  Note that bad pixels are present in the output image.
                ELSE
-                  B( IX, IY ) = VAL__BADR
+                  B( IX, IY ) = VAL__BAD<T>
                   BADOUT = .TRUE.
                END IF
  
@@ -302,7 +302,7 @@
 *  It is bad if the NLIM criterion is not met. Note that bad pixels are
 *  present in the output image.
                ELSE
-                  B( IX, IY ) = VAL__BADR
+                  B( IX, IY ) = VAL__BAD<T>
                   BADOUT = .TRUE.
                END IF
             END IF
