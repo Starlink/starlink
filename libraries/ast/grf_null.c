@@ -25,12 +25,6 @@
 *        Modified to issue error messages using astError instead of printf.
 */
 
-/* Macros */
-/* ====== */
-
-#define astCLASS grf_null  /* Ensure the protected function astError is 
-                              available */
-
 /* Header files */
 /* ============ */
 #include "grf.h"           /* Declare the functions in this module */
