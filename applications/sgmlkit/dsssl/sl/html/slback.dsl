@@ -17,7 +17,7 @@ and support indexing (soon!) using makeindex.
 <author id=ng affiliation='Glasgow'>Norman Gray
 
 <copyright>Copyright 1999, 2000,
-Council of the Central Laboratories of the Research Councils
+Council for the Central Laboratory of the Research Councils
 
 <codegroup id='code.back'>
 <title>Support back-matter

@@ -90,7 +90,7 @@ defaults to a copyright statement which includes the current year.
 			      0 4)))
     (string-append "Copyright "
 		   thisyear
-		   ", Central Laboratories for the Research Councils")))
+		   ", Council for the Central Laboratory of the Research Councils")))
 
 <routine>
 <routinename>%display-programcode-elements%
