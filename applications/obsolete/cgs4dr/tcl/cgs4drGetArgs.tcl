@@ -78,6 +78,9 @@ proc cgs4drGetArgs {directory date format} {
         if {$dataRoot==""} {set dataRoot $env(HOME)}
         set utRoot [string trim [$e2 get]]
         if {$utRoot==""} {set utRoot [exec /usr/bin/date -u +%y%m%d]}
+        if {[string range $utRoot 0 1]=="19" || [string range $utRoot 0 1]=="20"} {
+          set utRoot [string trim [string range $utRoot 2 end]]
+        }
         set fmtRoot  [string trim [string toupper $fmtRoot]]
         if {$fmtRoot==""} {set fmtRoot NDF}
       }
