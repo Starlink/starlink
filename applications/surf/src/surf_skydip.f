@@ -73,6 +73,9 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.14  1997/06/05 23:14:28  timj
+*     Initialise pointer.
+*
 *     Revision 1.13  1997/05/27 22:19:55  timj
 *     Use %LOC instead of LOC - for Alpha compiler
 *
@@ -553,6 +556,8 @@ c
       CALL PAR_GET0R ('B_FIT', B, STATUS )
 
 * Allocate some memory for slice and SKYDIP TEMPERATURES
+      SLICE_PTR = 0
+      SLICE_PTR_END = 0
 
       CALL SCULIB_MALLOC (N_TEMP * N_BOLS * N_INTEGRATIONS * VAL__NBR, 
      :     SLICE_PTR, SLICE_PTR_END, STATUS)
