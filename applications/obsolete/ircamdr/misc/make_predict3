@@ -1,0 +1,3 @@
+f77 predict3.f -o predict -L/star/lib -lchr
+chmod a+x predict3
+ls -ls predict3*

@@ -1,0 +1,87 @@
+
+* Include file for the PLT2D D-task which plots 2D images using SGS/GKS7
+* ----------------------------------------------------------------------
+*
+*  14-Sept-1994 For UNIX: Changed to handle chr, real and int variables 
+*               separately, reduce number of continuation lines and 
+*               do PARAMETER statements explicitly          (SKL@JACH)
+*
+
+* PLT2D integer variables
+
+	INTEGER MAX_X		! maximum size of plotting area in X
+	INTEGER MAX_Y		! maximum size of plotting area in Y
+	INTEGER NUM_COLIN       ! number of colour indices on workstation
+	INTEGER NX		! X size of current image
+	INTEGER NY		! Y size of current image
+	INTEGER WKSTN_SEQ	! workstation sequence number
+	INTEGER X_CUR_PIXEL	! X image pixel of current cursor position
+	INTEGER Y_CUR_PIXEL	! Y image pixel of current cursor position
+	INTEGER NCOLI           ! Number of colors available
+	INTEGER MAXIMCOL        ! Maximum number of colors for image display
+	INTEGER MINIMCOL        ! Minimum color for image display
+	INTEGER NLINECOL        ! Number pens reserved for line graphics
+
+* common block for PLT2D integer variables
+
+	COMMON /PLT2D_INTVAR/
+     :	  MAX_X, MAX_Y, NUM_COLIN, NX, NY,
+     :	  WKSTN_SEQ, X_CUR_PIXEL, 
+     :	  Y_CUR_PIXEL, NCOLI,
+     :	  MAXIMCOL, MINIMCOL, NLINECOL
+
+* PLT2D real variables
+
+	REAL IM_XEN		! end   X position of current image
+	REAL IM_XST		! start X position of current image
+	REAL IM_YEN		! end   Y position of current image
+	REAL IM_YST		! start Y position of current image
+	REAL X_CUR_REAL		! X screen position of current cursor position
+	REAL Y_CUR_REAL		! Y screen position of current cursor position
+
+* common block for PLT2D real variables
+
+	COMMON /PLT2D_REALVAR/
+     :	  IM_XEN, IM_XST, IM_YEN, IM_YST, 
+     :	  X_CUR_REAL, Y_CUR_REAL
+
+* PLT2D character variables
+
+	CHARACTER DEVICE_NAME*20 ! name of the current workstation
+	CHARACTER WKSTN_ID*20    ! SGS workstation identifier string
+
+* common block for PLT2D character variables
+
+	COMMON /PLT2D_CHVAR/
+     :	  DEVICE_NAME, WKSTN_ID
+
+* PLT2D monitor parameters
+
+	INTEGER INDEX_BUFFER_1
+	INTEGER INDEX_BUFFER_2
+	INTEGER INDEX_BUFFER_3
+	INTEGER INDEX_BUFFER_4
+	INTEGER INDEX_DATA_FLAG
+	INTEGER INDEX_NUM_COLS
+	INTEGER INDEX_NUM_ROWS
+
+* Common block for PLT2D monitor parameters
+
+	COMMON /PLT2D_MONITOR/
+     :	  INDEX_BUFFER_1,
+     :	  INDEX_BUFFER_2,
+     :	  INDEX_BUFFER_3,
+     :	  INDEX_BUFFER_4,
+     :	  INDEX_DATA_FLAG,
+     :	  INDEX_NUM_COLS,
+     :	  INDEX_NUM_ROWS
+
+
+
+* save all common variables
+
+	SAVE /PLT2D_INTVAR/
+	SAVE /PLT2D_REALVAR/
+	SAVE /PLT2D_CHVAR/
+	SAVE /PLT2D_MONITOR/
+

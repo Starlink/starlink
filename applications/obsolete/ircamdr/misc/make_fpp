@@ -1,0 +1,3 @@
+f77 fpp.f -e -o fpp -lchr `pgplot_link`
+chmod a+x fpp
+ls -ls fpp*

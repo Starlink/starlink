@@ -1,0 +1,3 @@
+f77 -e creobj.f -o creobj -L/star/lib -lchr
+chmod a+x creobj
+ls -ls creobj

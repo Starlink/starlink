@@ -1,0 +1,20 @@
+
+	SUBROUTINE STCOADD_ZERO( NX, NY, IMAGE_OUT)
+
+	IMPLICIT NONE
+
+	INTEGER NX, NY, J, K
+
+	REAL IMAGE_OUT( NX, NY)
+
+	DO J = 1, NY
+
+	  DO K = 1, NX
+
+	    IMAGE_OUT( K, J) = 0.0
+
+	  END DO
+
+	END DO
+
+	END

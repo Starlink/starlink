@@ -217,6 +217,9 @@ proc def_proc
   defproc polsky2 $LIRCAMDIR/polsky2.icl
   defproc polpick2 $LIRCAMDIR/polpick2.icl
   defproc polflat $LIRCAMDIR/polflat.icl
+  defproc drb_stred $LIRCAMDIR/drb_stred.icl
+  defproc drb_stdproc $LIRCAMDIR/drb_stdproc.icl
+  defproc mbl_stred /home/letawsky/mbl_stred.icl
 end proc
 
 def_proc

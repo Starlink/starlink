@@ -1,0 +1,6 @@
+#! /bin/csh
+#
+# Puts airmass and calculated zeropoint from stdred file and writes to
+# output file am-zp.res
+#
+awk '{print $9 "   " $13}' stdred_photometry.results > am-zp.res

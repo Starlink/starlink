@@ -1,0 +1,29 @@
+	SUBROUTINE STCOADD_IMAGE( NX, NY, IMAGE_IN, IMAGE_OUT)
+
+	IMPLICIT NONE
+
+	INTEGER NX, NY, J, K, NUMBAD, STATUS
+
+	REAL IMAGE_IN( NX, NY), IMAGE_OUT( NX, NY)
+
+	NUMBAD = 0
+
+	DO J = 1, NY
+	  DO K = 1, NX
+	    IF( ABS( IMAGE_IN( K, J)) .GT. 1.0E20) THEN
+	      NUMBAD = NUMBAD + 1
+	    ELSE
+	      IMAGE_OUT( K, J) = IMAGE_OUT( K, J) + IMAGE_IN( K, J)
+	    END IF
+	  END DO
+	END DO
+
+	IF( NUMBAD .NE. 0) THEN
+
+	  CALL MSG_SETI( 'NUMBAD', NUMBAD)
+	  CALL MSG_OUT( 'MESSAGE', 
+     :	    'Number of bad pixels in this image was ^NUMBAD', STATUS)
+
+	END IF
+
+	END 

@@ -1,0 +1,39 @@
+	SUBROUTINE POLSHOT_REMOVE( DIMS1, DIMS2, PIMAGE, PEIMAGE, OIMAGE)
+
+*  History
+*    11-Aug-1994 Changed DIM arguments so that routine will compile (SKL@JACH)
+*
+
+	IMPLICIT NONE
+
+	INTEGER DIMS1
+	INTEGER DIMS2
+	INTEGER J
+	INTEGER K
+
+	REAL PIMAGE( DIMS1, DIMS2)
+	REAL PEIMAGE( DIMS1, DIMS2)
+	REAL OIMAGE( DIMS1, DIMS2)
+	REAL TEMP
+
+	DO J = 1, DIMS2
+
+	  DO K = 1, DIMS1
+
+	    TEMP = PIMAGE( K, J)**2 - PEIMAGE( K, J)**2
+
+	    IF( TEMP .GE. 0.0) THEN
+
+	      OIMAGE( K, J) = SQRT( TEMP)
+
+	    ELSE
+
+	      OIMAGE( K, J) = 0.0
+
+	    END IF
+
+	  END DO
+
+	END DO
+
+	END

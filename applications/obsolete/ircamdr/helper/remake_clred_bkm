@@ -1,0 +1,33 @@
+cd $LIRCAMDIR
+cd plt2d_f/
+cp makefile_bkm makefile
+f77 -c plt2d.f
+make
+mv plt2d ..
+cd ..
+cd rapi2d_f/
+cp makefile_bkm makefile
+f77 -c rapi2d.f
+make
+mv rapi2d ..
+cd ..
+cd obsrap_f/
+cp makefile_bkm makefile
+f77 -c obsrap.f
+make
+mv obsrap ..
+cd ..
+cd polrap_f/
+cp makefile_bkm makefile
+f77 -c polrap.f
+make
+mv polrap ..
+cd ..
+cd io2ro_f/
+cp makefile_bkm makefile
+f77 -c io2ro.f
+make
+mv io2ro ..
+cd ..
+echo "Remake of IRCAM-CLRED tasks completed using bkm links"
+ls -ls plt2d rapi2d obsrap polrap io2ro

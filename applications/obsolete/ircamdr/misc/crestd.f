@@ -150,7 +150,7 @@
 	        write( dum3, '(i5)') iobsd
 	        call chr_fandl( dum3, n2, m2)
 	        type *, 'Object found - no. ', iobs1, '  ', onam
-	        dline = 'stdred '//dum1( n:m)//' '//dum2( n1:m1)//
+	        dline = 'drb_stred '//dum1( n:m)//' '//dum2( n1:m1)//
      :	                ' '//dum3( n2:m2)
 	      else
 	        type *, 'Object found - no. ', iobs1, '  ', onam
@@ -159,7 +159,7 @@
 	        read( 5, *) idark
 	        write( dum3, '(i5)') idark
 	        call chr_fandl( dum3, n2, m2)
-	        dline = 'stdred '//dum1( n:m)//' '//dum2( n1:m1)//
+	        dline = 'drb_stred '//dum1( n:m)//' '//dum2( n1:m1)//
      :	                ' '//dum3( n2:m2)
 	      end if
 	      k = chr_len( dline)

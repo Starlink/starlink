@@ -1,0 +1,40 @@
+	SUBROUTINE CSGENSUB( NX, NY, ARROUT, XCEN, YCEN, STATUS)
+
+	IMPLICIT NONE
+
+	INCLUDE 'SAE_PAR'
+
+	INTEGER NX, NY, XCEN, YCEN, STATUS, J, K
+
+	REAL ARROUT( NX, NY), CALTHETA, PI
+	REAL XEXT, YEXT
+
+	PI = 4.0*ATAN( 1.0)
+
+	DO J = 1, NY
+	  DO K = 1, NX
+
+	    XEXT = REAL( K-XCEN)
+	    YEXT = REAL( J-YCEN)
+
+	    IF( ( K-XCEN) .NE. 0 .OR. ( J-YCEN) .NE. 0) THEN
+	      IF( ( K-XCEN) .NE. 0) THEN
+	        CALTHETA = ATAN( ABS( YEXT)/ABS( XEXT))*360.0/( 2*PI)
+	        IF( XEXT .LT. 0.0 .AND. YEXT .GT. 0.0) THEN
+	          CALTHETA = 180.0 - ABS( CALTHETA)
+	        ELSE IF( XEXT .GT. 0.0 .AND. YEXT .LT. 0.0) THEN
+	          CALTHETA = 180.0 - ABS( CALTHETA)
+	        END IF
+	      ELSE
+	        CALTHETA = 90.0
+	      END IF
+	    ELSE
+	      CALTHETA = 0.0
+	    END IF
+
+	    ARROUT( K, J) = CALTHETA
+
+	  END DO
+	END DO
+
+	END

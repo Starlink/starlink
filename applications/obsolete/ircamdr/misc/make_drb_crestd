@@ -1,0 +1,3 @@
+f77 -e drb_crestd.f -o drb_crestd -L/star/lib -lchr
+chmod a+x drb_crestd
+ls -ls drb_crestd*

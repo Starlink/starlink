@@ -1,0 +1,335 @@
+	SUBROUTINE POLAX_PLOT( QUORPT, IDIMSX, IDIMSY, QP, UT, THETACORR,
+     :	                       POLANN, POLTIT, POLDEN, VECSLEN,
+     :	                       STATUS)
+
+* Description : Routine to plot polarization vector maps on current workstation
+
+* History
+* 27-Jul-1994 Removed VALUE (Change in error reporting) (SKL@JACH)
+* 26-oct-1994 Changed MAGNIF from INT to REAL (SKL@JACH)
+* 04-Nov-1994 Added option of auto scaling if magnif=0 (SKL@JACH)
+*
+
+	IMPLICIT NONE
+
+	INCLUDE 'DTDEFNS'
+	INCLUDE 'DTERRS'
+
+	INCLUDE 'PLT2DCOM'
+
+	INTEGER IDIMSX
+	INTEGER IDIMSY
+	INTEGER J
+	INTEGER POLDEN
+	REAL POL_MAGNIF
+	INTEGER STATUS
+	INTEGER TEMP_XCEN
+	INTEGER TEMP_YCEN
+	INTEGER TICKSPA
+	INTEGER PEN_ANN
+	INTEGER PEN_AXE
+	INTEGER PEN_NUM
+	INTEGER PEN_TIC
+	INTEGER PEN_VEC
+
+	REAL DIVISOR
+	REAL IMXCEN
+	REAL IMYCEN
+	REAL POL_AXRAT
+	REAL POL_COLINT
+	REAL POL_COLST
+	REAL POL_XOFF
+	REAL POL_YOFF
+	REAL QP( IDIMSX, IDIMSY)
+	REAL THETACORR
+	REAL TICK_XINTERVAL
+	REAL TICK_YINTERVAL
+	REAL UT( IDIMSX, IDIMSY)
+	REAL VECSLEN
+      REAL MAGNIF_X
+      REAL MAGNIF_Y
+      REAL MAX_MAGNIF
+
+      PARAMETER ( MAX_MAGNIF = 500.0 )
+
+	CHARACTER*1 COL_ANN
+	CHARACTER*1 COL_AXE
+	CHARACTER*1 COL_NUM
+	CHARACTER*1 COL_TIC
+	CHARACTER*1 COL_VEC
+	CHARACTER*20 CURSOR_WHERE
+	CHARACTER*30 POL_COLCH
+	CHARACTER*50 POL_COLTYPE
+	CHARACTER*80 POL_POSITIONING
+
+	CHARACTER*(*) POLANN
+	CHARACTER*(*) POLTIT
+	CHARACTER*(*) QUORPT
+
+* get colour for axes from parameter system
+
+	IF( DEVICE_NAME .EQ. 'T5688' .OR.
+     :	    DEVICE_NAME .EQ. 'ARGS' .OR.
+     :	    DEVICE_NAME .EQ. 'ARGS_OVERLAY' .OR.
+     :	    DEVICE_NAME .EQ. 'T6134' .OR.
+     :	    DEVICE_NAME .EQ. 'IKON' .OR.
+     :	    DEVICE_NAME .EQ. 'IKON_OVERLAY' .OR.
+     :	    DEVICE_NAME .EQ. 'X-WINDOWS' .OR.
+     :	    DEVICE_NAME .EQ. 'VAXSTATION8') THEN
+
+	  CALL PAR_GET0C( 'POL_COLCH', POL_COLCH, STATUS)
+
+	  IF( POL_COLCH .EQ. 'CHOOSE') THEN
+
+	    CALL PAR_GET0R( 'POL_COLST', POL_COLST, STATUS)
+	    CALL PAR_GET0R( 'POL_COLINT', POL_COLINT, STATUS)
+
+	  END IF
+
+	  CALL PAR_GET0C( 'POL_COLTYPE', POL_COLTYPE, STATUS)
+
+	  CALL PAR_GET0C( 'POL_COLANN', COL_ANN, STATUS)
+	  CALL PAR_GET0C( 'POL_COLAXE', COL_AXE, STATUS)
+	  CALL PAR_GET0C( 'POL_COLNUM', COL_NUM, STATUS)
+	  CALL PAR_GET0C( 'POL_COLTIC', COL_TIC, STATUS)
+	  CALL PAR_GET0C( 'POL_COLVEC', COL_VEC, STATUS)
+
+	ELSE
+
+	  COL_ANN = 'N'
+	  COL_AXE = 'N'
+	  COL_NUM = 'N'
+	  COL_TIC = 'N'
+	  COL_VEC = 'N'
+
+	END IF
+
+	CALL PAR_GET0I( 'POL_PENANN', PEN_ANN, STATUS)
+	CALL PAR_GET0I( 'POL_PENAXE', PEN_AXE, STATUS)
+	CALL PAR_GET0I( 'POL_PENNUM', PEN_NUM, STATUS)
+	CALL PAR_GET0I( 'POL_PENTIC', PEN_TIC, STATUS)
+	CALL PAR_GET0I( 'POL_PENVEC', PEN_VEC, STATUS)
+
+* set the global image size parameters
+
+	NX = IDIMSX
+	NY = IDIMSY
+
+* get the magnification to be used
+
+	CALL PAR_GET0R( 'POLMAG', POL_MAGNIF, STATUS)
+
+*      if magnification is 0 then need to auto scale to fill screen
+
+	IF( POL_MAGNIF .EQ. 0.0) THEN
+
+*        calculate magnification for maximum image dimension
+
+	  IF( DEVICE_NAME .EQ. 'T5688') THEN
+
+*          set magnification for Sigma 5688 device working in quadrant mode
+
+	    MAGNIF_X = REAL(MAX_X)/2.0/REAL(NX)
+	    MAGNIF_Y = REAL(MAX_Y)/2.0/REAL(NY)
+
+	    POL_MAGNIF = MIN( MAGNIF_X, MAGNIF_Y)
+
+	  ELSE
+
+*          set magnification for other devices
+
+	    MAGNIF_X = REAL(MAX_X)/REAL(NX)
+	    MAGNIF_Y = REAL(MAX_Y)/REAL(NY)
+
+	    POL_MAGNIF = MIN( MAGNIF_X, MAGNIF_Y)
+
+	  END IF
+
+*        set magnification to 80% display area for annotation space
+
+          POL_MAGNIF = 0.80 * POL_MAGNIF
+
+*        test for above maximum value for magnification
+
+	  IF( POL_MAGNIF .GT. MAX_MAGNIF) THEN
+
+	    POL_MAGNIF = MAX_MAGNIF
+
+	  END IF
+
+*        put calculated magnification into parameter
+
+          CALL PAR_PUT0R( 'POLAX_CALMAG', POL_MAGNIF, STATUS)
+
+	END IF
+
+* get axis ratio for plot
+
+	CALL PAR_GET0R( 'POLAXRAT', POL_AXRAT, STATUS)
+
+* get the positioning selection from the parameter system
+
+	CALL PAR_GET0C( 'POL_POSITIONING', POL_POSITIONING,
+     :	                STATUS)
+
+	CALL PAR_GET0C( 'CURSOR_WHERE', CURSOR_WHERE, STATUS)
+
+* test the users choice
+
+	IF( POL_POSITIONING .EQ. 'CURSOR') THEN
+
+* get the cursor position
+
+	  CALL CURSOR_POSITION( STATUS)
+
+	  CALL PAR_GET0R( 'X_CUR_REAL', IMXCEN, STATUS)
+	  CALL PAR_GET0R( 'Y_CUR_REAL', IMYCEN, STATUS)
+
+* calculate start and end of contour box
+
+	  IF( CURSOR_WHERE .EQ. 'BOTTOM_LEFT') THEN
+
+	    IM_XST = IMXCEN
+	    IM_YST = IMYCEN
+	    IM_XEN = IM_XST + IDIMSX*POL_MAGNIF
+	    IM_YEN = IM_YST + IDIMSY*POL_MAGNIF*POL_AXRAT
+
+	  ELSE IF( CURSOR_WHERE .EQ. 'TOP_RIGHT') THEN
+
+	    IM_XST = IMXCEN - IDIMSX*POL_MAGNIF
+	    IM_YST = IMYCEN - IDIMSY*POL_MAGNIF*POL_AXRAT
+	    IM_XEN = IM_XST + IDIMSX*POL_MAGNIF
+	    IM_YEN = IM_YST + IDIMSY*POL_MAGNIF*POL_AXRAT
+
+	  ELSE
+
+	    IM_XST = IMXCEN - IDIMSX*POL_MAGNIF/2.0
+	    IM_YST = IMYCEN - IDIMSY*POL_MAGNIF*POL_AXRAT/2.0
+	    IM_XEN = IM_XST + IDIMSX*POL_MAGNIF
+	    IM_YEN = IM_YST + IDIMSY*POL_MAGNIF*POL_AXRAT
+
+	  END IF
+
+	ELSE
+
+* get the position of the centre of the contour map
+
+	  CALL PAR_GET0I( 'POL_XCEN', TEMP_XCEN, STATUS)
+	  CALL PAR_GET0I( 'POL_YCEN', TEMP_YCEN, STATUS)
+
+	  IMXCEN = REAL( TEMP_XCEN)
+	  IMYCEN = REAL( TEMP_YCEN)
+
+* get offset for x and y 
+
+	  CALL PAR_GET0R( 'POL_XOFF', POL_XOFF, STATUS)
+	  CALL PAR_GET0R( 'POL_YOFF', POL_YOFF, STATUS)
+
+* calculate start and end of contour box
+
+	  IM_XST = IMXCEN - ( IDIMSX+POL_XOFF)*POL_MAGNIF/2.0
+	  IM_YST = IMYCEN - ( IDIMSY+POL_YOFF)*POL_MAGNIF*POL_AXRAT/2.0
+	  IM_XEN = IM_XST + IDIMSX*POL_MAGNIF
+	  IM_YEN = IM_YST + IDIMSY*POL_MAGNIF*POL_AXRAT
+
+	END IF
+
+* set colour of VECTORS
+
+	IF(  DEVICE_NAME .EQ. 'T5688' .OR.
+     :	     DEVICE_NAME .EQ. 'ARGS' .OR.
+     :	     DEVICE_NAME .EQ. 'ARGS_OVERLAY' .OR.
+     :	     DEVICE_NAME .EQ. 'IKON' .OR.
+     :	     DEVICE_NAME .EQ. 'IKON_OVERLAY' .OR.
+     :	     DEVICE_NAME .EQ. 'T6134' .OR.
+     :	     DEVICE_NAME .EQ. 'CPSP' .OR.
+     :	     DEVICE_NAME .EQ. 'CPSL' .OR.
+     :	     DEVICE_NAME .EQ. 'X-WINDOWS' .OR.
+     :	     DEVICE_NAME .EQ. 'VAXSTATION8') THEN
+	  CALL SET_COLOUR2( PEN_VEC, COL_VEC)
+	ELSE
+	  IF(  DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND.
+     :	       DEVICE_NAME .NE. 'PS_PORTRAIT') THEN
+	    CALL SET_COLOUR2( PEN_VEC, COL_VEC)
+	  END IF
+	END IF
+
+* plot polarization vector map
+
+	CALL POLAX_MAP( IDIMSX, IDIMSY, QUORPT, QP, UT, POL_MAGNIF, POLDEN,
+     :	                VECSLEN, THETACORR, POL_COLTYPE, POL_COLCH,
+     :	                POL_COLST, POL_COLINT)
+
+* test if want annotation
+
+	IF( POLANN .NE. 'NO_ANNOTATION') THEN
+
+* set colour of AXES
+
+	IF(  DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND.
+     :	     DEVICE_NAME .NE. 'PS_PORTRAIT') THEN
+	    CALL SET_COLOUR( PEN_AXE, COL_AXE)
+	END IF
+
+* plot box around plot
+
+	  CALL SGS_BOX( IM_XST, IM_XEN, IM_YST, IM_YEN)
+
+* set colour of TICKS
+
+	IF(  DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND.
+     :	     DEVICE_NAME .NE. 'PS_PORTRAIT') THEN
+	    CALL SET_COLOUR( PEN_TIC, COL_TIC)
+	END IF
+
+* draw tick marks on plot
+
+	  CALL PAR_GET0R( 'CONTOUR_TICKINT', TICK_XINTERVAL, STATUS)
+	  CALL PAR_GET0R( 'CONTOUR_YTICKIN', TICK_YINTERVAL, STATUS)
+	  CALL PAR_GET0I( 'CONTOUR_TICKSPA', TICKSPA, STATUS)
+
+	  CALL CONTOUR_TICKS( TICK_XINTERVAL, TICK_YINTERVAL,
+     :	                      POL_MAGNIF, POL_AXRAT, STATUS)
+
+* put in the intermediate tick marks as requested
+
+	  DIVISOR = 1.5
+
+	  DO J = 1, TICKSPA
+
+	    CALL CONTOUR_TICKSEC( DIVISOR,  TICK_XINTERVAL/(2**J),
+     :	                          TICK_YINTERVAL/(2**J), POL_MAGNIF,
+     :	                          POL_AXRAT, STATUS)
+
+	  END DO
+
+* set colour of NUMBERS
+
+	  IF(  DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND.
+     :	       DEVICE_NAME .NE. 'PS_PORTRAIT') THEN
+	    CALL SET_COLOUR( PEN_NUM, COL_NUM)
+	  END IF
+
+* draw NUMBERS on plot
+
+	  CALL CONTOUR_NUMBERS( TICK_XINTERVAL, TICK_YINTERVAL,
+     :	                        POL_MAGNIF, POL_AXRAT, STATUS)
+
+* set colour of ANNOTATION
+
+	  IF(  DEVICE_NAME .NE. 'PS_LANDSCAPE' .AND.
+     :	       DEVICE_NAME .NE. 'PS_PORTRAIT') THEN
+	    CALL SET_COLOUR( PEN_ANN, COL_ANN)
+	  END IF
+
+* call subroutine to plot annotation on contour plot
+
+	  CALL POLAX_ANNOT( POLTIT, POL_MAGNIF, VECSLEN, STATUS)
+
+	END IF
+
+* flush all output out of buffer
+
+	CALL SGS_FLUSH
+
+	END

@@ -16,6 +16,23 @@ proc startup
     load $LIRCAMDIR/utils_unix.icl
     load $LIRCAMDIR/setfile_unix.icl
   end if
+  ndfformats = getenv("NDF_FORMATS_IN")
+  if ndfformats <> " "
+    setenv NDF_FORMATS_IN ~
+'FITS(.fit),~
+FIGARO(.dst),~
+IRAF(.imh),~
+STREAM(.das),~
+UNFORMATTED(.unf),~
+UNF0(.dat),~
+ASCII(.asc),~
+TEXT(.txt),~
+GIF(.gif),~
+TIFF(.tif),~
+GASP(.hdr),~
+COMPRESSED(.sdf.Z),~
+GZIP(.sdf.gz)'
+  endif
   load $LIRCAMDIR/fclose_c.icl
   load $LIRCAMDIR/fclose_a.icl
   load $LIRCAMDIR/fclose_b.icl

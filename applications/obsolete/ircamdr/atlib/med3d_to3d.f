@@ -1,0 +1,27 @@
+	SUBROUTINE MED3D_TO3D( NUM, DIMSX, DIMSY, ARRIN, WDIMSX,
+     :	                       WDIMSY, WDIMSZ, WORK)
+
+	IMPLICIT NONE
+
+	INTEGER DIMSX, DIMSY, WDIMSX, WDIMSY, WDIMSZ, NUM, J, K
+
+	REAL ARRIN( DIMSX, DIMSY), WORK( WDIMSX, WDIMSY, WDIMSZ)
+
+	DO J = 1, DIMSY
+
+	  DO K = 1, DIMSX
+
+	    IF( K .GE. 1 .AND. K .LE. WDIMSX .AND. 
+     :	        J .GE. 1 .AND. J .LE. WDIMSY .AND.
+     :	        NUM .GE. 1 .AND. 
+     :	        NUM .LE. WDIMSZ) THEN
+
+	      WORK( K, J, NUM) = ARRIN( K, J)
+
+	    END IF
+
+	  END DO
+
+	END DO
+
+	END

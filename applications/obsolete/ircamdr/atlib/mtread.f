@@ -1,0 +1,282 @@
+C     *****************
+C     *               *
+C     *  M T R E A D  *
+C     *               *
+C     *****************
+C
+C
+C     ORIGINAL BY L. C. LAWRENCE
+C     MODIFIED BY B. D. KELLY, SEPTEMBER 1980
+C     MODIFIED BY C.    ASPIN, AUGUST 1989 (changed WRITEPBLK to WRITELBLK)
+C     MODIFIED BY S. K. LEGGETT JULY 1994 Changed VAX IO calls to TIO_
+C     MODIFIED BY S. K. LEGGETT SEPT 1994 Changed TIO_ calls to MAG_
+C
+C
+
+C     THIS ROUTINE HAS THREE ENTRY POINTS :
+C     MTREAD, MTWR, AND MTREWIND.
+
+      INTEGER FUNCTION MTREAD(H,IA,P,M)
+
+C     MAGNETIC TAPE PHYSICAL BLOCK READ FACILITY
+C     H IS THE HANDLER NUMBER OF THE MAGNETIC TAPE DRIVE,
+C     IA A BYTE BUFFER FOR INPUT OR OUTPUT OF A SINGLE BLOCK OF
+C     DATA, P A CONTROL PARAMETER, AND M THE SIZE IN BYTES
+C     OF THE BLOCK TO BE WRITTEN TO TAPE OR OF THE INPUT BUFFER.
+C     P = 0    SKIP M BLOCKS
+C     P = 1    READ BLOCK AND RETURN SIZE IN BYTES TO MTREAD
+C              THE TRANSFER ARRAY IS ASSUMED TO BE A BYTE VECTOR.
+C     P = 2    READ A BLOCK INTO A HALFWORD ARRAY.
+C              EACH BYTE IS PLACED IN THE LESS SIGNIFICANT
+C              BYTE POSITION OF EACH ARRAY ELEMENT.
+C     P = 3    READ HALFWORDS IN BINARY FORMAT.
+C     P = 4    READ BYTES INTO THE LEAST SIGNIFICANT BYTE
+C              POSITION OF EACH ELEMENT OF A FULLWORD ARRAY.
+C     P = 5    READ A BLOCK INTO A FULLWORD ARRAY, 4 BYTES PER
+C              WORD, AND RETURN BLOCK LENGTH IN BYTES.
+C     P = 6    READ A BLOCK INTO A FULLWORD ARRAY
+C              CORRECTLY FORMATTED FOR A4 OUTPUT.
+C     P = 7    RESERVED
+C     P = 8    SKIP M TAPEMARKS
+C     P = 9    RESERVED
+C     P = 10   BACKSPACE OVER THE LAST N BLOCKS
+C     P = 11   RESERVED
+
+      IMPLICIT INTEGER (S)
+
+      INCLUDE 'MAG_ERR'
+
+      INTEGER CHAN                 ! Tape descriptor
+      INTEGER P, H
+      INTEGER*2 IOSB(4)
+      BYTE IA(10000)
+      INTEGER STATUS               ! Global status
+      CHARACTER*72 MSG
+
+C
+C     TRAP RESERVED OPTIONS
+C
+      IF((P.EQ.7).OR.(P.EQ.9).OR.(P.EQ.11)) THEN
+        MTREAD=0
+        RETURN
+      ENDIF
+C
+C     CHANNEL ASSIGNMENT
+C
+      CALL MAG_OPEN('MT', 'READ', CHAN, STATUS)
+ 
+      IF(STATUS .NE. SAI__OK) THEN
+        MTREAD=-10
+        CALL ERR_REP('ERR', MSG, STATUS )
+        CALL ERR_FLUSH(STATUS)
+        CALL ERR_ANNUL(STATUS)
+        CALL MAG_ANNUL(CHAN, STATUS)
+        RETURN
+      ENDIF
+C
+C     REWIND OPTION
+C
+      IF((M.LE.0).AND.(P.NE.8)) THEN
+        CALL MAG_REW(CHAN, STATUS)
+        IF(STATUS .NE. SAI__OK) THEN
+          CALL ERR_REP('ERR', MSG, STATUS )
+          CALL ERR_FLUSH(STATUS)
+          CALL ERR_ANNUL(STATUS)
+          CALL MAG_ANNUL(CHAN, STATUS)
+          MTREAD=-1
+          RETURN
+        ELSE
+          MTREAD=0
+          CALL MAG_ANNUL(CHAN, STATUS)
+          RETURN
+        END IF
+      ENDIF
+C
+C     READ OPTION
+C
+      IF((P.GE.1).AND.(P.LE.6)) THEN
+        CALL MAG_READ(CHAN, M, IA, IOSB, STATUS)
+        IF(STATUS .EQ. MAG__EOF) THEN
+          CALL MAG_ANNUL(CHAN, STATUS)
+          MTREAD=0
+          RETURN
+        ENDIF
+        IF ((STATUS .NE. SAI__OK) .AND. (STATUS .NE. MAG__EOF) ) 
+     :   THEN
+          CALL ERR_REP('ERR', MSG, STATUS )
+          CALL ERR_FLUSH(STATUS)
+          CALL ERR_ANNUL(STATUS)
+          CALL MAG_ANNUL(CHAN, STATUS)
+          MTREAD=-1
+          RETURN
+        ENDIF
+        NBYTES=IOSB(2)
+C
+C     RE-PACK DATA FOLLOWING OPTION P
+C
+        IF(P.EQ.2) THEN
+          DO 10 J=NBYTES,1,-1
+          JJ=J+J
+          IA(JJ-1)=IA(J)
+          IA(JJ)=0
+   10     CONTINUE
+        ELSE IF(P.EQ.3) THEN
+          DO 20 J=1,NBYTES,2
+          NT=IA(J+1)
+          IA(J+1)=IA(J)
+          IA(J)=NT
+   20     CONTINUE
+        ELSE IF(P.EQ.4) THEN
+          DO 30 J=NBYTES,1,-1
+          JJ=4*J
+          IA(JJ-3)=IA(J)
+          DO 30 I=JJ-2,JJ
+          IA(I)=0
+   30     CONTINUE
+        ELSE IF(P.EQ.5) THEN
+          DO 40 J=1,NBYTES,4
+          NT=IA(J)
+          IA(J)=IA(J+3)
+          IA(J+3)=NT
+          NT=IA(J+2)
+          IA(J+2)=IA(J+1)
+          IA(J+1)=NT
+   40     CONTINUE
+        ENDIF
+        MTREAD=NBYTES
+        RETURN
+      ENDIF
+C
+C     CASES 0<P<7 FINISHED
+C
+C
+C     SKIP M TAPEMARKS (FORWARD OR REVERSE)
+C
+      IF(P.EQ.8) THEN
+        CALL MAG_SKIP(CHAN, M, STATUS)
+        IF(STATUS .NE. SAI__OK) THEN
+          CALL ERR_REP('ERR', MSG, STATUS )
+          CALL ERR_FLUSH(STATUS)
+          CALL ERR_ANNUL(STATUS)
+          CALL MAG_ANNUL(CHAN, STATUS)
+          MTREAD=-1
+          RETURN
+        ELSE
+          MTREAD=0
+          CALL MAG_ANNUL(CHAN, STATUS)
+          RETURN
+        END IF
+      ENDIF
+C
+C     SKIP M BLOCKS (FORWARD OR REVERSE)
+C
+      IF(P.EQ.0) J=M
+      IF(P.EQ.10) J=-M
+      CALL MAG_SKIP(CHAN, J, STATUS)
+      IF(STATUS .NE. SAI__OK) THEN
+        CALL ERR_REP('ERR', MSG, STATUS )
+        CALL ERR_FLUSH(STATUS)
+        CALL ERR_ANNUL(STATUS)
+        CALL MAG_ANNUL(CHAN, STATUS)
+        MTREAD=-1
+        RETURN
+      ELSE
+        MTREAD=0
+        CALL MAG_ANNUL(CHAN, STATUS)
+        RETURN
+      END IF
+C
+C
+C
+C
+C
+      ENTRY MTREWIND(H,IA,P,M)
+
+C     IF P > 0 REWIND ON LINE
+C     IF P = 0 REWIND OFFLINE
+C     IF P < 0 REWIND ON LINE
+
+      CALL MAG_OPEN('MT', 'READ', CHAN, STATUS)
+      CALL MAG_REW(CHAN, STATUS)
+      IF(STATUS .NE. SAI__OK) THEN
+        CALL ERR_REP('ERR', MSG, STATUS )
+        CALL ERR_FLUSH(STATUS)
+        CALL ERR_ANNUL(STATUS)
+        CALL MAG_ANNUL(CHAN, STATUS)
+        REWIND=-1
+        RETURN
+      ELSE
+        REWIND=0
+        CALL MAG_ANNUL(CHAN, STATUS)
+        RETURN
+      END IF
+
+C
+C
+C
+C
+C
+      ENTRY MTWR(H,IA,P,M)
+
+C     WRITE TAPEMARKS OR BLOCKS OF M BYTES TO MAGNETIC TAPE
+C     CONNECTED TO CHANNEL NUMBER CHAN.
+C     IF P = 0 WRITE M TAPEMARKS
+
+      CALL MAG_OPEN('MT', 'WRITE', CHAN, STATUS)
+      IF(P.LE.0) THEN
+        DO 100 J = 1,M
+  100   CALL MAG_WRITE(CHAN, M, IA, IOSB, STATUS ) 
+        IF(STATUS .NE. SAI__OK) THEN
+          CALL ERR_REP('ERR', MSG, STATUS )
+          CALL ERR_FLUSH(STATUS)
+          CALL ERR_ANNUL(STATUS)
+          CALL MAG_ANNUL(CHAN, STATUS)
+          MTWR=-1
+          RETURN
+        ELSE
+          MTWR=0
+          CALL MAG_ANNUL(CHAN, STATUS)
+          RETURN
+        END IF
+      ENDIF
+C
+C     WRITE BLOCKS, SWITCHING BYTES AS INDICATED BY P
+C
+      IF(P.EQ.2) THEN
+        DO 110 J=1,M
+  110   IA(J)=IA(J*2-1)
+      ELSE IF(P.EQ.3) THEN
+        DO 120 J=1,M,2
+        NT=IA(J+1)
+        IA(J+1)=IA(J)
+        IA(J)=NT
+  120   CONTINUE
+      ELSE IF(P.EQ.4) THEN
+        DO 130 J=1,M
+        IA(J)=IA(4*J-3)
+  130   CONTINUE
+      ELSE IF(P.EQ.5) THEN
+        DO 140 J=1,M,4
+        NT=IA(J)
+        IA(J)=IA(J+3)
+        IA(J+3)=NT
+        NT=IA(J+2)
+        IA(J+2)=IA(J+1)
+        IA(J+1)=NT
+  140   CONTINUE
+      ENDIF
+      CALL MAG_WRITE(CHAN, M, IA, M, IOSB, STATUS ) 
+      IF(STATUS .NE. SAI__OK) THEN
+        CALL ERR_REP('ERR', MSG, STATUS )
+        CALL ERR_FLUSH(STATUS)
+        CALL ERR_ANNUL(STATUS)
+        CALL MAG_ANNUL(CHAN, STATUS)
+        MTWR=-1
+        RETURN
+      ELSE
+        MTWR=0
+        CALL MAG_ANNUL(CHAN, STATUS)
+        RETURN
+      END IF
+
+      END

@@ -16,6 +16,23 @@ proc startup
     load $LIRCAMDIR/utils_unix.icl
     load $LIRCAMDIR/setfile_unix.icl
   end if
+  ndfformats = getenv("NDF_FORMATS_IN")
+  if ndfformats <> " "
+    setenv NDF_FORMATS_IN ~
+'FITS(.fit),~
+FIGARO(.dst),~
+IRAF(.imh),~
+STREAM(.das),~
+UNFORMATTED(.unf),~
+UNF0(.dat),~
+ASCII(.asc),~
+TEXT(.txt),~
+GIF(.gif),~
+TIFF(.tif),~
+GASP(.hdr),~
+COMPRESSED(.sdf.Z),~
+GZIP(.sdf.gz)'
+  endif
   load $LIRCAMDIR/fclose_c.icl
   load $LIRCAMDIR/fclose_a.icl
   load $LIRCAMDIR/fclose_b.icl
@@ -67,10 +84,9 @@ logo
 print " "
 print "File prefix defined as " (routd)
 print " "
-send plt2d set zeroj 23.45
-send plt2d set zeroh 22.98
-send plt2d set zerok 22.45
-send plt2d set zerolp 20.4
-print "Nominal zeropoints of J=23.45, H=22.98, K=22.45, Lp=20.4 defined"
+send plt2d set zeroj 22.94
+send plt2d set zeroh 22.68
+send plt2d set zerok 22.32
+send plt2d set zerolp 20.7
+print "Nominal zeropoints of J=22.94, H=22.68, K=22.32, Lp=20.7 defined"
 print " "
-

@@ -1,0 +1,23 @@
+#
+# makefile for Obsrap
+#
+# Sandy Leggett JAC 14th September 1994
+# based on one by Phil Daly, JAC, 1 Aug 1994
+# version for CAA development directory, 4 Nov 1994
+#
+
+# Macro definitions
+#ALINK   = /home/bkm/solstar/bin/alink
+ALINK   = /star/bin/alink
+LIB1    = -L${LIRCAMDIR}/lib_a -lobsrap -lrapi2d -lplt2d
+LIB2    = -L${LIRCAMDIR}/lib_a -laspker -latlib -laif
+LIB3    = -L${LIRCAMDIR}/lib_a -lrapsub -lrapgen -lkersub -lkergen
+NAGLIB  = -L/star/nag/nagfl15df -lnag
+
+# Make the executable
+obsrap:   
+	$(ALINK) obsrap.o  $(LIB1) $(LIB2) $(LIB3) $(NAGLIB) \
+	`ndf_link_adam` `fio_link_adam` `mag_link_adam`	
+# removed line below to allow linking under Solaris 2.4
+# also commented out psgrey line in obsrap.f
+#`pgp_link_adam` 

@@ -1,0 +1,8 @@
+# /bin/csh
+foreach file (`ls -1 *.icl`)
+  set prefix=`echo ${file} | awk -F. '{print $1 }'`
+  cp ${prefix}.icl ${prefix}.icl.bak
+  echo "cp ${prefix}.icl ${prefix}.icl.bak"
+  sed -e 's/! rm/delfile/' ${prefix}.icl.bak > ${prefix}.icl
+  echo "sed -e 's/! rm/delfile/' ${prefix}.icl.bak > ${prefix}.icl"
+end

@@ -1,0 +1,28 @@
+	SUBROUTINE FITSWCALB( DIMSX, DIMSY, ARRAY, MAXVAL, MINVAL, 
+     :	                      BZERO, BSCALE)
+
+	INTEGER DIMSX, DIMSY, J, K
+
+	INTEGER BITSCALER
+	PARAMETER ( BITSCALER = 2**20)
+
+	REAL ARRAY( DIMSX, DIMSY), BZERO, BSCALE, MAXVAL, MINVAL
+
+	BZERO = 0.0
+	BSCALE = 1.0
+	MINVAL = 1.0E38
+	MAXVAL = -1.0E38
+
+*      Scan thought the image to find max and min values
+	DO J = 1, DIMSY
+	  DO K = 1, DIMSX
+	    MAXVAL = MAX( MAXVAL, ARRAY( K, J))
+	    MINVAL = MIN( MINVAL, ARRAY( K, J))
+	  END DO
+	END DO
+
+*      Calculate the values of BZERO and BSCALE
+	BZERO = MINVAL
+	BSCALE = ( MAXVAL - MINVAL)/BITSCALER
+
+	END

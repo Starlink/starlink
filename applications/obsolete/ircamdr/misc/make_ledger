@@ -1,0 +1,4 @@
+f77 ledger.f -e -o ledger -lchr
+chmod a+x ledger
+ls -ls ledger*
+

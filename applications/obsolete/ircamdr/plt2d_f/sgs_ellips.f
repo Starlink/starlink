@@ -1,0 +1,44 @@
+	SUBROUTINE SGS_ELLIPS( XPOS, YPOS, MAJOR, ECC, ANG)
+
+	IMPLICIT NONE
+
+	INTEGER J
+
+	REAL XPOS, YPOS, MAJOR, ECC, ANG, X, Y, X1, Y1, A, B, REALJ, PI
+
+	PARAMETER ( PI = 3.1415926)
+
+	A = MAJOR
+	B = SQRT( A**2*( 1.0 - ECC**2))
+
+	DO J = 1, 3601
+
+	  REALJ = REAL( J-1)/10.0
+
+	  X = A*COS( REALJ*(2*PI)/360.0)
+
+	  IF( J .LT. 1800) THEN
+	    Y = SQRT( B**2*( 1.0 - X**2/A**2))
+	  ELSE
+	    Y = -1.0*SQRT( B**2*( 1.0 - X**2/A**2))
+	  END IF
+
+	  X1 = X*COS( ANG*(2*PI)/360.0)-Y*SIN( ANG*(2*PI)/360.0)
+	  Y1 = X*SIN( ANG*(2*PI)/360.0)+Y*COS( ANG*(2*PI)/360.0)
+
+	  X = ( X1 + XPOS)
+	  Y = ( Y1 + YPOS)
+
+	  IF( J .EQ. 1) THEN
+	    CALL SGS_BPOLY( X, Y)
+	  ELSE
+	    CALL SGS_APOLY( X, Y)
+	  END IF
+
+	END DO
+
+	CALL SGS_OPOLY
+
+	CALL SGS_FLUSH
+
+	END

@@ -1,0 +1,24 @@
+	SUBROUTINE COPY_SUB( IMAGE_IN, IMAGE_OUT)
+C
+	IMPLICIT NONE
+C
+	INCLUDE 'PLT2DCOM'
+C
+	INTEGER J
+	INTEGER K
+C
+	REAL IMAGE_IN( NX, NY)
+	REAL IMAGE_OUT( NX, NY)
+C
+C loops to copy image over from _In to _OUT
+C
+	DO J = 1, NY
+C
+	  DO K = 1, NX
+C
+	    IMAGE_OUT( K, J) = IMAGE_IN( K, J)
+	  END DO
+	END DO
+C
+	RETURN
+	END

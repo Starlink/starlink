@@ -1,0 +1,5048 @@
+## Obsrap - Monolith Interface File for IRCAM data reduction : OBSERVING
+
+monolith OBSRAP
+
+## ABCOM - combines odd/even columns into one image
+
+interface ABCOM
+
+   program 'ABCOM'
+
+   parameter   INPICA
+      position 1
+      keyword  'INPICA'
+      type     'IMAGE'
+      access   'READ'
+      default  a
+      vpath    'PROMPT'
+      prompt   'Odd channel image (to be combined) '
+      help     'Give name of structure holding odd channel data'
+   endparameter
+
+   parameter   INPICB
+      position 2
+      keyword  'INPICB'
+      type     'IMAGE'
+      access   'READ'
+      default  b
+      vpath    'PROMPT'
+      prompt   'Even channel image (to be combined) '
+      help     'Give name of structure holding even channel data'
+   endparameter
+
+   parameter   OUTPIC
+      position 3
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      default  C
+      vpath    'PROMPT'
+      prompt   'Image to contain combined data '
+      help     'Give name of structure to hold combined data image '
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Obsrap - Abcom'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## ABSEP - separates odd/even columns in image into two images
+
+interface ABSEP
+
+   program 'ABSEP'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  $LIRCAMDIR/logo
+      prompt   'Image to be separated '
+      help     'Give name of structure holding image to be separated'
+   endparameter
+
+   parameter   OUTPICA
+      position 2
+      keyword  'OUTPICA'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  a
+      prompt   'Image to contain A channel data '
+      help     'Give name of structure to hold A channel data image '
+   endparameter
+
+   parameter   OUTPICB
+      position 3
+      keyword  'OUTPICB'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  b
+      prompt   'Image to contain B channel data '
+      help     'Give name of structure to hold B channel data image'
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Rapi2d - Absep'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## APERPHOT - aperture photometry with concentric sky aperture
+
+interface APERPHOT
+
+   program 'APERPHOT'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be analysed '
+      default  JUNK
+      help     'Name of data structure containing the image to be examined'
+   endparameter
+
+   parameter   DATASOURCE
+      position 2
+      keyword  'DATASOURCE'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Source of input terminal=T or file=F '
+      default  'T'
+      help     'prompt user for input (T) or take from file (F)'
+   endparameter
+
+   parameter   FNAME
+      position 3
+      keyword  'FNAME'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Name of input data file '
+      default  'APERPHOT.DAT'
+      help     'name of file with position data etc...'
+   endparameter
+
+   parameter   TERMOUT
+      position 4
+      keyword  'TERMOUT'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Output to Terminal, File or Both  '
+      default  'B'
+      help     'T=Terminal only, F=File only, B=Both'
+   endparameter
+
+   parameter   SKYANNUL
+      position 5
+      keyword  'SKYANNUL'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Subtract sky in concentric annulus (Y/N) ? '
+      default  Y
+      help     'YES=use a sky annulus, NO=do not use sky annulus'
+   endparameter
+
+   parameter   XCEN
+      position 6
+      keyword  'XCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-centre of object aperture'
+      default  32
+      help     'Give the x coord of the centre of the circle to be binned up'
+   endparameter
+
+   parameter   YCEN
+      position 7
+      keyword  'YCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-centre of object aperture'
+      default  32
+      help     'Give the y coord of the centre of the circle to be binned up'
+   endparameter
+
+   parameter   ECC
+      keyword  'ECC'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Eccentricity of object aperture/sky annulus'
+      default  0.0
+      help     'eccentricity goes from 0.0 (circle) to 0.9999 (line)'
+   endparameter
+
+   parameter   POSANG
+      keyword  'POSANG'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Position angle of major axis wrt N (in degrees)'
+      default  0.0
+      help     'Input 0-180deg, 30 is 30deg S or E-W clockwise'
+   endparameter
+
+   parameter   MAJAX1
+      position 8
+      keyword  'MAJAX1'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Major axis of object aperture (in arcsec)'
+      default  10.0
+      help     'Give major axis (in arcseconds) of the object aperture'
+   endparameter
+
+   parameter   MAJAX2
+      position 9
+      keyword  'MAJAX2'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Major axis of inner diameter of concentric sky aperture (arcsec)'
+      default  20.0
+      help     'Give major axis (in arcseconds) of the sky annulus'
+   endparameter
+
+   parameter   MAJAX3
+      position 10
+      keyword  'MAJAX3'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Major axis of outer diameter of concentric sky aperture (arcsec)'
+      default  30.0
+      help     'Give major axis (in arcseconds) of the sky annulus'
+   endparameter
+
+   parameter   SCALE
+      position 11
+      keyword  'SCALE'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Pixel scale (arcsec/pixel)'
+      default  0.62
+      help     'Give the size of the image pixels in arcseconds on the sky'
+   endparameter
+
+   parameter   USEWHAT
+      keyword  'USEWHAT'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Use MEDIAN or MEAN in sky calculation ? '
+      default  'MEDIAN'
+      help     'Option to estimate sky from median or mean in sky annulus'
+   endparameter
+
+   parameter   USEBAD
+      keyword  'USEBAD'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Use bad pixel value in calculation (Y/N) ? '
+      default  Y
+      help     'Option to miss out pixel with bad value in apertures'
+   endparameter
+
+   parameter   BADVAL
+      keyword  'BADVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixel value ? '
+      default  -1.0E-20
+      help     'Value of bad pixel to be missed out of calculation'
+   endparameter
+
+   parameter   AGAIN
+      position 12
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Another aperture in same image (Y/N) ? '
+      default  Y
+      help     'Option to select another paerture in same input image'
+   endparameter
+
+   parameter   RUNSORT
+      keyword  'RUNSORT'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Change aperture Major axis or Position (M/P) ? '
+      default  'M'
+      help     'Option to change aperture size or position'
+   endparameter
+
+   parameter   NUM1
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUM1'
+   endparameter
+
+   parameter   TOTAL1
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL1'
+   endparameter
+
+   parameter   MEAN1
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN1'
+   endparameter
+
+   parameter   MED1
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MED1'
+   endparameter
+
+   parameter   NOISE1
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE1'
+   endparameter
+
+   parameter   NUM2
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUM2'
+   endparameter
+
+   parameter   TOTAL2
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL2'
+   endparameter
+
+   parameter   MEAN2
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN2'
+   endparameter
+
+   parameter   MED2
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MED2'
+   endparameter
+
+   parameter   NOISE2
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE2'
+   endparameter
+
+   parameter  OBJSKY
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_OBJSKY'
+   endparameter
+
+   parameter  MAG
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MAG'
+   endparameter
+
+endinterface
+
+## ANNSTATS - returns stats in annuli from fixed point
+
+interface ANNSTATS
+
+   program 'ANNSTATS'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     $LIRCAMDIR/logo
+      prompt      'Image for analysis ?'
+      help        'Name of data structure containing the image '
+   endparameter
+
+   parameter   XCENTRE
+      position 2
+      keyword  'XCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-centre pixel ?'
+      default  1
+      help     'X centre of annuli'
+   endparameter
+
+   parameter   YCENTRE
+      position 3
+      keyword  'YCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-centre pixel ?'
+      default  1
+      help     'Y centre of annuli'
+   endparameter
+
+   parameter   ECCENTRICITY
+      position 4
+      keyword  'ECCENTRICITY'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Eccentricity of annuli ?'
+      default  0.0
+      help     'eccentricity of annuli'
+   endparameter
+
+   parameter   POSANG
+      position 5
+      keyword  'POSANG'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Position angle of annuli ?'
+      default  0.0
+      help     'angle between minor axis and Y axis clockwise '
+   endparameter
+
+   parameter   WIDTH
+      position 6
+      keyword  'WIDTH'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Width of annuli (arcsec) ?'
+      default  5.0
+      help     'width of annuli in arcseconds '
+   endparameter
+
+   parameter      PLATSCAL
+      position    7
+      keyword     'PLATSCAL'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'Plate scale arcsec/pixel ? '
+      default     1.0
+      help        'Number of arcseconds per pixel in data image'
+   endparameter
+
+   parameter      USEBAD
+      position    8
+      keyword     'USEBAD'
+      type        '_LOGICAL'
+      vpath       'PROMPT'
+      prompt      'Use bad pixel value ? '
+      default     YES
+      help        'Look for bad pixels in each annulus'
+   endparameter
+
+   parameter      BADVAL
+      position    9
+      keyword     'BADVAL'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'Bad pixel value ? '
+      default     -1.0E-20
+      help        'Value that is bad in image'
+   endparameter
+
+   parameter      OUTFILE
+      position    10
+      keyword     'OUTFILE'
+      type        '_CHAR'
+      vpath       'PROMPT'
+      prompt      'Name of output file ? '
+      default     'annstats.res'
+   endparameter
+
+   parameter      OUTPIC
+      position    11
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'DEFAULT'
+      default     annstats_map
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      default     'Obsrap - Annstats'
+   endparameter
+
+endinterface
+
+## AMCORR - airmass correction to zero airmass using extinction cooeficients
+
+interface AMCORR
+
+   program 'AMCORR'
+
+   parameter      EXTFILE
+      keyword     'EXTFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'DEFAULT'
+      default     '$LIRCAMDIR/extinct.list'
+      prompt      'Extinction coeff file'
+      help        'Name of file containing extinction coefficients'
+   endparameter
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be airmass corrected'
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after airmass correction'
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Amcorr'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter      FILTER
+      position    3
+      keyword     'FILTER'
+      type        '_CHAR'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     'K'
+      prompt      'Filter of Observations '
+      help        'Filter used to take observations being corrected'
+   endparameter
+
+   parameter   AIRMASS
+      position 4
+      keyword  'AIRMASS'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Airmass of Observations '
+      default  1.00
+      help     'Airmass of observations being corrected
+   endparameter
+
+   parameter   EXTVAL
+      position 5
+      keyword  'EXTVAL'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Extinction coefficient to be used '
+      help     'Extinction coefficient if not in EXTINCT.LIST'
+   endparameter
+
+   parameter   MAGICNO
+      position 6
+      keyword  'MAGICNO'
+      type     '_REAL'
+      vpath    'DEFAULT'
+      default  -1.0E-20
+   endparameter
+
+endinterface
+
+## APPLYMASK - applies bad pixel mask to image
+
+interface APPLYMASK
+
+   program 'APPLYMASK'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be scanned for bad pixels '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image containing bad pixel mask '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output masked image '
+      help        'Name of data structure containing the mask '
+   endparameter
+
+   parameter      MAGICNO
+      position    4
+      keyword     'MAGICNO'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'Magic number to set bad pixels to '
+      default     -1.0e-20
+      help        'Magic number value'
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      default     'Obsrap - Applymask'
+   endparameter
+
+endinterface
+
+## ASCIIFILE - # Open an ASCII file, write a line to it and closes it
+
+interface ASCIIFILE
+
+program 'ASCIIFILE'
+
+parameter ACTION
+   type '_CHAR'
+   position 1 
+   default BLANK
+   vpath 'prompt'
+   prompt 'Action name (OPEN,WRITE,CLOSE) ? '
+endparameter
+
+parameter FILENAME
+   type '_CHAR'
+   position 2
+   default 'ascii.list'
+   vpath 'prompt'
+   prompt 'Filename ?'
+endparameter
+
+parameter STRING
+   type '_CHAR'
+   position 3
+   default 'test'
+   vpath 'prompt'
+   prompt 'String ?'
+endparameter
+
+endinterface
+
+## ASCIILIST - lists an image to ascii file
+
+interface ASCIILIST
+
+   program 'ASCIILIST'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be listed'
+      help        'Name of data structure containing the input image '
+   endparameter
+
+   parameter   FILEN
+      position 2
+      keyword  'FILEN'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Name of ASCII file created'
+      default  'ascii.list'
+      help     'Give name of output ascii file that will be created'
+   endparameter
+      
+   parameter   OUTFORM
+      position 3
+      keyword  'OUTFORM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Output format (1 or 2)'
+      default  1
+      help     'Output formats 1=dims+ints, 2=X,Y,Ints'
+   endparameter
+      
+endinterface
+
+##  AUTOMOS - automatic mosaicing routine
+
+interface AUTOMOS 
+
+   program 'AUTOMOS'
+
+   parameter      IMAGFILE
+      position    1
+      keyword     'IMAGFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      default     'image.list'
+      prompt      'Give name of IMAGE list file (ASCII) '
+      help        'You should have created this with the editor'
+   endparameter
+
+   parameter      TELEFILE
+      position    2
+      keyword     'TELEFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      default     'OFFSET.LIST'
+      prompt      'Give name of TELESCOPE OFFSET FILE (ASCII) '
+      help        'ASCII version of offset file fed into CREMAP'
+   endparameter
+
+   parameter      OUTFILE
+      position    3
+      keyword     'OUTFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      default     'corr.list'
+      prompt      'Give name of OUTPUT file (ASCII) '
+      help        'File with final offsets to be used in AUTOCORR'
+   endparameter
+
+   parameter      PLATSCAL
+      position    4
+      keyword     'PLATSCAL'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      default     0.286
+      prompt      'Give plate scale (arcsec/pixel) of images '
+      help        'Value to convert arcsec offsets to pixel offsets'
+   endparameter
+
+   parameter      USEWHAT
+      position    5
+      keyword     'USEWHAT'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      default     'MEDIAN'
+      prompt      'Use MEDIAN, MODE or MEAN in overlap regions '
+      help        'What statistic is to be used to match overlap regions'
+   endparameter
+
+   parameter      NUMITER
+      position    6
+      keyword     'NUMITER'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      default     500
+      prompt      'How many iterations shall be performed '
+      help        'Number of iterations to final solution'
+   endparameter
+
+   parameter      APPLY
+      position    7
+      keyword     'APPLY'
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'PROMPT'
+      default     YES
+      prompt      'Apply corrections to input images '
+      help        'whether input images are corrected by calculated values'
+   endparameter
+
+   parameter   INPIC1
+      keyword  'INPIC1'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'DEFAULT'
+      prompt   'First image'
+      help     'Give name of structure holding first image of mosaic pair'
+   endparameter
+
+   parameter   INPIC2
+      keyword  'INPIC2'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'DEFAULT'
+      prompt   'Second image'
+      help     'Give name of structure holding second image of mosaic pair'
+   endparameter
+
+   parameter   OUTPIC
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      prompt   'Output image'
+      help     'Give name of structure to hold output image'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'DEFAULT'
+      default  'Obsrap - Automos'
+   endparameter
+
+endinterface
+
+## BINUP - averages image to a smaller images
+
+interface BINUP
+
+   program 'BINUP'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  $LIRCAMDIR/logo
+      prompt   'Image to be binned (averaged) '
+      help     'Give name of structure holding image to be binned up'
+   endparameter
+
+   parameter   OUTPIC
+      position 2
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  bin
+      prompt   'Image to contain binned data '
+      help     'Give name of structure to hold binned data image '
+   endparameter
+
+   parameter   OUTPIC2
+      position 3
+      keyword  'OUTPIC2'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  bin2
+      prompt   'Image to contain standard deviations '
+      help     'Give name of structure to hold std/output pixel'
+   endparameter
+
+   parameter BINX
+      position 4
+      keyword  'BINX'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      default  2
+      prompt   'Number of pixels binned in X-direction'
+      help     'Give the binning factor in X'
+   endparameter
+
+   parameter BINY
+      position 5
+      keyword  'BINY'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      default  2
+      prompt   'Number of pixels binned in Y-direction'
+      help     'Give the binning factor in Y'
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Obsrap - Binup'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## CALCOL - calculates colour from input magnitude images
+
+interface CALCOL
+
+   program 'CALCOL'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Magnitude image 1 (1-2 to be formed) '
+      help        'Name of data structure containing image to be processed'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Magnitude image 2 (1-2 to be formed) '
+      help        'Name of data structure containing image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Colour image (1-2) '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Calcol'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter   LSB1
+      position 4
+      keyword  'LSB1'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Limiting surface brightness of image 1 (mags/sq arcsec) '
+      default  20.0
+      help     'Limiting surface brightness in mag/sq arcsec'
+   endparameter
+
+   parameter   LSB2
+      position 5
+      keyword  'LSB2'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Limiting surface brightness of image 2 (mags/sq arcsec) '
+      default  20.0
+      help     'Limiting surface brightness in mag/sq arcsec'
+   endparameter
+
+   parameter   PLATESCALE
+      position 6
+      keyword  'PLATESCALE'
+      type     '_REAL'
+      vpath    'DEFAULT'
+      prompt   'Plate scale in arcsec/pixel '
+      default  1.0
+      help     'Plate scale in image'
+   endparameter
+
+endinterface
+
+## COLCYCLE - cycles colour tables
+
+interface COLCYCLE
+
+   program 'COLCYCLE'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Input colour table'      
+   endparameter
+
+   parameter   NCYCLES
+      position 2
+      keyword  'NCYCLES'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Number of cycles'
+   endparameter
+      
+   parameter   OUTPIC
+      position 3
+      keyword  'OUTPIC'
+      type     'STRUCTURE'
+      vpath    'PROMPT'
+      prompt   'Output colour table'
+   endparameter
+      
+   parameter   OTITLE
+      position 4 
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'Obsrap - Colcycle'
+   endparameter
+   
+endinterface
+
+## COLMED - median filters down columns producing median column slice
+
+interface COLMED
+
+   program 'COLMED'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be column medianed '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image slice after column medianing '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Colmed'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter   EXCLREG
+      position 3
+      keyword  'EXCLREG'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      prompt   'Do you want to define an exclusion region '
+      default  N
+      help     'A region that is not considered in the medianing ...'
+   endparameter
+
+   parameter   XST
+      position 4
+      keyword  'XST'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-start of exclusion region '
+      default  1
+      help     'X-start of exclusion region'
+   endparameter
+
+   parameter   YST
+      position 5
+      keyword  'YST'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-start of exclusion region '
+      default  1
+      help     'Y-start of exclusion region'
+   endparameter
+
+   parameter   XSZ
+      position 6
+      keyword  'XSZ'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-size of exclusion region '
+      default  10
+      help     'X-size of exclusion region'
+   endparameter
+
+   parameter   YSZ
+      position 7
+      keyword  'YSZ'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-size of exclusion region '
+      default  10
+      help     'Y-size of exclusion region'
+   endparameter
+
+endinterface
+
+## COPFILE - copies an ascii file to another file
+
+interface COPFILE
+
+  program 'COPFILE'
+
+  parameter COPFILEI
+      position    1
+      keyword     'COPFILEI'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'File to be copied '
+      help        'Name of file to be copied to output file '
+   endparameter
+
+  parameter COPFILEO
+      position    2
+      keyword     'COPFILEO'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'New file '
+      help        'Name of file copied to '
+   endparameter
+
+endinterface
+
+## CRECOLT - generates a colour table 
+
+interface CRECOLT
+
+   program 'CRECOLT'
+
+   parameter      INPUT_CHOICE
+      keyword     'INPUT_CHOICE'
+      type        '_CHAR'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     'C'
+      prompt      'Select COLOUR (C) or INTENSITIES (I) ?'
+      help        'C means from list W,R,G,B,Y,P,C,S,N ... I means number 0 - 1'
+   endparameter
+
+   parameter      INT1
+      keyword     'INT1'
+      type        '_REAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     0.0
+      prompt      'Give the INTENSITY (0-255) of the RED gun ?''
+      help        'Intensity of the RED gun in range 0 to 255'
+   endparameter
+
+   parameter      INT2
+      keyword     'INT2'
+      type        '_REAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     0.0
+      prompt      'Give the INTENSITY (0-255) of the GREEN gun ?''
+      help        'Intensity of the GREEN gun in range 0 to 255'
+   endparameter
+
+   parameter      INT3
+      keyword     'INT3'
+      type        '_REAL'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     0.0
+      prompt      'Give the INTENSITY (0-255) of the BLUE gun ?''
+      help        'Intensity of the BLUE gun in range 0 to 255'
+   endparameter
+
+   parameter      OUTPIC
+      position    1
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give a NAME for the colour table created '
+      help        'Name given to data structure to hold the colour table created'
+   endparameter
+
+   parameter   OTITLE
+      position 2
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Give a TITLE for the colour table '
+      default  'Rapi2d - Crecolt'
+      help     'Character string used as a title for the colour table created'
+   endparameter
+
+   parameter   PEN
+      keyword  'PEN'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give the NUMBER of the PEN to be defined (1-250) ? '
+      default  255
+      range    1,255
+      help     'Position in the colour table of the pen to be defined'
+   endparameter
+
+   parameter   FIRST_PEN
+      keyword  'FIRST_PEN'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Give a COLOUR for pen number 1 ? '
+      default  'N'
+      in       'W','R','G','B','Y','P','C','S','N'
+      help     'Colour of the first pen in the colour table : NRBGYPCSW'
+   endparameter
+
+   parameter   LAST_PEN
+      keyword  'LAST_PEN'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Give a COLOUR for pen number 250 ? '
+      default  'W'
+      in       'W','R','G','B','Y','P','C','S','N'
+      help     'Colour of the last pen in the colour table : NRBGYPCSW'
+   endparameter
+
+   parameter   COLOUR
+      keyword  'COLOUR'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Give the COLOUR of the chosen pen ? '
+      default  'R'
+      in       'W','R','G','B','Y','P','C','S','N'
+      help     'Colour of the pen selected : NRBGYPCSW'
+   endparameter
+
+endinterface
+
+## CREQUILT - create quilt offset file using telescope offsets
+
+interface CREQUILT
+
+   program 'CREQUILT'
+
+   parameter      TELEFILE
+      position    1
+      keyword     'TELEFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give name of TELESCOPE OFFSET FILE (ASCII) '
+      help        'ASCII version of offset file fed into CREMAP'
+   endparameter
+
+   parameter      IMAGFILE
+      position    2
+      keyword     'IMAGFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give name of IMAGE list file (ASCII) '
+      help        'You should have created this with the editor'
+   endparameter
+
+   parameter      PLATSCAL
+      position    3
+      keyword     'PLATSCAL'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give plate scale (arcsec/pixel) of images '
+      help        'Value to convert arcsec offsets to pixel offsets'
+   endparameter
+
+   parameter      TITLELINE
+      position    4
+      keyword     'TITLELINE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give TITLE LINE for QUILT file'
+      help        'Pyut at top of QUILT file to identify it'
+   endparameter
+
+   parameter      OUTFILE
+      position    5
+      keyword     'OUTFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give name for OUTPUT QUILT file '
+      help        'File that will be fed into QUILT for mosaicing'
+   endparameter
+
+endinterface
+
+## DELFILE - deletes a file
+
+interface DELFILE
+
+  program 'DELFILE'
+
+  parameter DELFILE
+      position    1
+      keyword     'DELFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'File to be deleted '
+      help        'Name of file to be deleted'
+   endparameter
+
+endinterface
+
+## DEFGRAD - median filters down columns for gradient definition
+
+interface DEFGRAD
+
+   program 'DEFGRAD'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be processed '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after processing '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Defgrad'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter      COLROW
+      position    3
+      keyword     'COLROW'
+      type        '_CHAR'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     'C'
+      prompt      'Use COLUMNS or ROWS (C/R) '
+      help        'Gradient defined by column or row scans'
+   endparameter
+
+   parameter   NUMCOL
+      position 4
+      keyword  'NUMCOL'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Number of columns/rows used '
+      default  1
+      help     'Number of columns/rows at start and end for gradient'
+   endparameter
+
+endinterface
+
+## DIST - Calculates distance and position angle between two points 
+
+interface DIST
+
+   program 'DIST'
+
+   parameter      XPOS1
+      position    1
+      keyword     'XPOS1'
+      type        '_INTEGER'
+      default     1
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the X position of point 1 '
+   endparameter
+
+   parameter      YPOS1
+      position    2
+      keyword     'YPOS1'
+      type        '_INTEGER'
+      default     1
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the Y position of point 1 '
+   endparameter
+
+   parameter      XPOS2
+      position    3
+      keyword     'XPOS2'
+      type        '_INTEGER'
+      default     62
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the X position of point 2 '
+   endparameter
+
+   parameter      YPOS2
+      position    4
+      keyword     'YPOS2'
+      type        '_INTEGER'
+      default     58
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the Y position of point 2 '
+   endparameter
+
+   parameter      PLATE_SCALE
+      position    5
+      keyword     'PLATE_SCALE'
+      type        '_REAL'
+      default     0.286
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the plate scale '
+   endparameter
+
+   parameter      RA
+      position    6
+      keyword     'RA'
+      type        '_REAL'
+      default     12.0
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the RA of position 1 '
+   endparameter
+
+   parameter      DEC
+      position    7
+      keyword     'DEC'
+      type        '_REAL'
+      default     45.0
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give the DEC of position 1 '
+   endparameter
+
+endinterface
+
+## FCOADD - coadds N separate image into one output image
+
+interface FCOADD
+
+   program 'FCOADD'
+
+   parameter      FILESORT
+      keyword     'FILESORT'
+      type        '_CHAR'
+      access      'READ'
+      default     'A'
+      vpath       'PROMPT'
+      in          'A','B','a','b'
+      prompt      'Sort of file input A=PREFIX/NUMBERS, B=NAMES'
+      help        'A = input PREFIX and LIST of NUMBERS, B = input FULL NAMES'
+   endparameter
+
+   parameter      PREFIX
+      keyword     'PREFIX'
+      type        '_CHAR'
+      access      'READ'
+      default     'f'
+      vpath       'PROMPT'
+      prompt      'Input PREFIX to file numbers'
+      help        'The prefix is concatenated with the number to form the name'
+   endparameter
+
+   parameter      NAME
+      keyword     'NAME'
+      type        '_CHAR'
+      access      'READ'
+      default     'QUIT'
+      vpath       'PROMPT'
+      prompt      'FULL NAME of image (stop input=EXIT/QUIT)'
+      help        'Name of image to be coadded'
+   endparameter
+
+   parameter      INPIC
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      default     test
+      vpath       'DEFAULT'
+      prompt      'OBSERVATION file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+
+   parameter      OUTPIC
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      default     fcoadd
+      vpath       'PROMPT'
+      prompt      'Coadded output file'
+      help        'Name of HDS file to contain coadded observations '
+   endparameter
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      type        '_INTEGER'
+      access      'READ'
+      default     1
+      vpath       'PROMPT'
+      prompt      'Number of OBSERVATION to be coadded (0 to stop input)'
+      help        'Number in input HDS file to be coadded into output image'
+   endparameter
+
+   parameter 	  OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      access      'WRITE'
+      vpath       'DEFAULT' 
+      default     'Obsrap - Fcoadd'
+      prompt      'Title for out images '
+      help        'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## FIGNDF - creates FIGAOR format NDF from template and IRCAM image
+
+interface FIGNDF
+
+   program 'FIGNDF'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give input IRCAM3 NDF image '
+      help        'Name of data structure from IRCAM3 processing '
+   endparameter
+
+   parameter      INPICT
+      position    2
+      keyword     'INPICT'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give template FIGAGO NDF image '
+      help        'Name of data structure with template info '
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold output image'
+      help        'Name of data structure to store the data'
+   endparameter
+
+   parameter      OTITLE
+      type        '_CHAR'
+      keyword     'OTITLE'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Obsrap - Figndf'
+      help        'Character string used as a title for the data structure'
+   endparameter
+
+endinterface
+
+## FINDPEAK - find peak in sub-image and return position/value
+
+interface FINDPEAK
+
+   program 'FINDPEAK'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Give name of structure holding image to be tested'
+   endparameter
+
+   parameter   XSTART
+      position 2
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-start of area considered'
+      help     'x-start of area of image to find peak in'
+   endparameter
+
+   parameter   YSTART
+      position 3
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-start of area considered'
+      help     'y-start of area of image to find peak in'
+   endparameter
+
+   parameter   XSIZE
+      position 4
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-size of area considered'
+      help     'x-size of area of image to find peak in'
+   endparameter
+
+   parameter   YSIZE
+      position 5
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-size of area considered'
+      help     'y-size of area of image to find peak in'
+   endparameter
+
+   parameter   XPEAK
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.FINDPEAK_XPEAK'
+   endparameter
+
+   parameter   YPEAK
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.FINDPEAK_YPEAK'
+   endparameter
+
+   parameter   VALPEAK
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.FINDPEAK_PEAK'
+   endparameter
+
+endinterface
+
+## GAUSSTH - perform a Gaussian smooth on a 2-D image using threshold
+
+interface GAUSSTH
+
+   program 'GAUSSTH'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be smoothed'
+      help        'Name of data structure containing the image to be smoothed'
+   endparameter
+
+   parameter   SIGMA
+      position 2
+      keyword  'SIGMA'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Sigma of Gaussian'
+      help     'Sigma of Gaussian must be in the range 0.1 to 5.0 pixels'
+   endparameter
+
+   parameter   BOXSIZE
+      position 3
+      keyword  'BOXSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Box size over which Gaussian is to act'
+      help     'Give an odd integer which is the box size for over which the smooth acts'
+   endparameter
+
+   parameter   THRESH
+      position 4
+      keyword  'THRESH'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Threshold for smoothing'
+      help     'Smooth below threshold only'
+   endparameter
+
+   parameter      OUTPIC
+      position    5
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after smoothing'
+      help        'Name of data structure to hold image after smoothing'
+   endparameter
+
+   parameter   OTITLE
+      position 6
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Gaussth'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## HISTGEN - creates a histogram of image/sub-image and stores in HDS file
+
+interface HISTGEN
+
+   program 'HISTGEN'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  $LIRCAMDIR/logo
+      prompt   'Image to be HISTOGRAMMED '
+      help     'Give name of structure holding image to be HISTOGRAMMED'
+   endparameter
+
+   parameter   OUTPIC
+      position 2
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  hist
+      prompt   'Image to contain HISTOGRAM data '
+      help     'Give name of structure to hold HISTOGRAM data '
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  'IR2D - Histgen'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+
+   parameter HIST_BINS
+      position 3
+      keyword  'HIST_BINS'
+      type     '_INTEGER'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  50
+      prompt   'Give number of BINS for histogram '
+      help     'Give the number of bins created in the output histogram'
+   endparameter
+
+   parameter HIST_MAX
+      position 4
+      keyword  'HIST_MAX'
+      type     '_REAL'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  255.0
+      prompt   'Give MAXIMUM for histogram '
+      help     'Give MAXIMUM value ( in DN) for histogram calculation'
+   endparameter
+
+   parameter HIST_MIN
+      position 5
+      keyword  'HIST_MIN'
+      type     '_REAL'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  0.0
+      prompt   'Give MINIMUM for histogram '
+      help     'Give MINIMUM value (in DN) for histogram calculation'
+   endparameter
+
+   parameter X_START
+      position 6
+      keyword  'X_START'
+      type     '_INTEGER'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  1
+      prompt   'Give X START of histogram area '
+      help     'Give X start pixel for histogram sub-image'
+   endparameter
+
+   parameter X_SIZE
+      position 7
+      keyword  'X_SIZE'
+      type     '_INTEGER'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  64
+      prompt   'Give X SIZE for histogram area'
+      help     'Give X size of histogram sub-image'
+   endparameter
+
+   parameter Y_START
+      position 8
+      keyword  'Y_START'
+      type     '_INTEGER'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  1
+      prompt   'Give Y START of histogram area '
+      help     'Give Y start pixel for histogram sub-image'
+   endparameter
+
+   parameter Y_SIZE
+      position 9
+      keyword  'Y_SIZE'
+      type     '_INTEGER'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  64
+      prompt   'Give Y SIZE of histogram area'
+      help     'Give Y size of histogram sub-image'
+   endparameter
+
+   parameter TERMINAL_OUTPUT
+      position 10
+      keyword  'TERMINAL_OUTPUT'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      default  NO
+      prompt   'Terminal output of histogram ?'
+      help     'Whether or not the histogram values are printed to the terminal'
+   endparameter
+
+endinterface
+
+## HOTSHOT - find single hot pixels and marks them
+
+interface HOTSHOT
+
+   program 'HOTSHOT'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  $LIRCAMDIR/logo
+      prompt   'Image to be scanned for hot pixels '
+      help     'Give name of structure holding image to be scanned'
+   endparameter
+
+   parameter   OUTPIC
+      position 2
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  hotshot
+      prompt   'Image to contain scanned image '
+      help     'Give name of structure to hold modified image'
+   endparameter
+
+   parameter WHOLE
+      position 3
+      keyword  'WHOLE'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Search whole image area for hot pixels '
+      help     'YES=search whole image area, NO=search user-defined sub-array'
+      default  Y
+   endparameter
+
+   parameter XCEN
+      position 4
+      keyword  'XCEN'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give X centre of box for HOT PIXEL search'
+      help     'Search area X centre pixel'
+      default  1
+   endparameter
+
+   parameter YCEN
+      position 5
+      keyword  'YCEN'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give Y centre of box for HOT PIXEL search'
+      help     'Search area Y centre pixel'
+      default  1
+   endparameter
+
+   parameter XSIZ
+      position 6
+      keyword  'XSIZ'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give X size of box for HOT PIXEL search'
+      help     'Search area X box size'
+      default  256
+   endparameter
+
+   parameter YSIZ
+      position 7
+      keyword  'YSIZ'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give Y size of box for HOT PIXEL search'
+      help     'Search area Y box size'
+      default  256
+   endparameter
+
+   parameter BINX
+      position 8
+      keyword  'BINX'
+      type     '_INTEGER'
+      access   'READ'
+      prompt   'Give X bin size for sigma scan '
+      vpath    'PROMPT'
+      default  3
+   endparameter
+
+   parameter BINY
+      position 9
+      keyword  'BINY'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give Y bin size for sigma scan '
+      default  3
+   endparameter
+
+   parameter SIGMA
+      position 10
+      keyword  'SIGMA'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give sigma level for hot pixel definition '
+      help     'Give sigma level on mean that defines hot pixel'
+      default  5
+   endparameter
+
+   parameter THRESH
+      position 11
+      keyword  'THRESH'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give sigma threshold below which hot pixels are removed '
+      default  999
+   endparameter
+
+   parameter SETWHAT
+      position 12
+      keyword  'SETWHAT'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Replace hot pixels by Mean or Bad value '
+      default  'M'
+   endparameter
+
+   parameter BADVAL
+      position 13
+      keyword  'BADVAL'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give bad value for hot pixels '
+      default  -1.0E-20
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Obsrap - Hotshot'
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## IMCOMB - combines 2 images by scaling areas
+
+interface IMCOMB
+
+   program 'IMCOMB'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'First image (mostly good)'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Second image (take good areas from)'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after combination'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Imcomb'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter      NUMAREA
+      keyword     'NUMAREA'
+      type        '_INTEGER'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     1
+      prompt      'Number of bad areas'
+   endparameter
+
+   parameter      XST
+      keyword     'XST'
+      type        '_INTEGER'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     1
+      prompt      'X-start of bad area'
+   endparameter
+
+   parameter      YST
+      keyword     'YST'
+      type        '_INTEGER'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     1
+      prompt      'Y-start of bad area'
+   endparameter
+
+   parameter      XSZ
+      keyword     'XSZ'
+      type        '_INTEGER'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     5
+      prompt      'X-size of bad area'
+   endparameter
+
+   parameter      YSZ
+      keyword     'YSZ'
+      type        '_INTEGER'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     5
+      prompt      'Y-size of bad area'
+   endparameter
+
+endinterface
+
+## INDEX - reads the observation container file parameters and lists them
+   
+interface INDEX
+   
+   program 'INDEX'
+   
+   parameter      CONTNAME
+      position    1
+      keyword     'CONTNAME'
+      type        'LITERAL'
+      access      'READ'
+      default     ircam_21jul86_1
+      vpath       'PROMPT'
+      prompt      'OBSERVATION file '
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+   
+   parameter      CONTAINER
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      access      'READ'
+      default     ircam_21jul86_1
+      vpath       'DEFAULT'
+      prompt      'OBSERVATION file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+   
+   parameter      OUTPUT
+      position    2
+      keyword     'OUTPUT'
+      type        'LITERAL'
+      access      'READ'
+      default     'FILE'
+      vpath       'PROMPT'
+      prompt      'Output to TERMINAL or FILE'
+      help        'TERMINAL output lists on screen, FILE output to disk file'
+   endparameter
+   
+   parameter      STARTOBS
+      position    3
+      keyword     'STARTOBS'
+      type        '_INTEGER'
+      default     1
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Start OBSERVATION number for INDEX'
+      help        'First observation parameters to be listed'
+   endparameter
+   
+   parameter      ENDOBS
+      position    4
+      keyword     'ENDOBS'
+      type        '_INTEGER'
+      default     200
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'End OBSERVATION number for INDEX'
+      help        'Last observation parameters to be listed'
+   endparameter
+ 
+   parameter      LISTFILE
+      position    5
+      keyword     'LISTFILE'
+      type        'LITERAL'
+      default     'index.lis'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Name of list file created'
+      help        'Filename on disk of observation list'
+   endparameter
+ 
+   parameter      TIMEFILE
+      position    6
+      keyword     'TIMEFILE'
+      type        'LITERAL'
+      default     'NO'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Create a TIME file for OBSERVATIONS'
+      help        'Lists observation number and time created '
+   endparameter
+ 
+endinterface
+
+## INQFILE - inquires if a file exists
+
+interface INQFILE
+
+  program 'INQFILE'
+
+  parameter INQFILE
+      position    1
+      keyword     'INQFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'File whose existence is to be checked '
+      help        'Name of file to be inquired about'
+   endparameter
+
+  parameter FILE_EXISTS
+      keyword     'FILE_EXISTS'
+      type        '_LOGICAL'
+      vpath       'internal'
+      association '->GLOBAL.INQFILE.FILE_EXISTS'
+   endparameter
+
+endinterface
+
+## INSETB - replaces pixels inside specified box with specified value
+
+interface INSETB
+
+   program 'INSETB'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be modified'
+      help        'Name of data structure containing the image to be modified'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being modified'
+      help        'Name given to data structure to hold image after being modified'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Obsrap - Insetb'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XSTART
+      position 4
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x start of box'
+      help     'Give x coordinate of start of box to be used'
+   endparameter
+      
+   parameter   YSTART
+      position 5
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y start of box'
+      help     'Give y coordinate of start of box to be used'
+   endparameter
+      
+   parameter   XSIZE
+      position 6
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x size of box '
+      help     'Give x size of box to be used'
+   endparameter
+
+   parameter   YSIZE
+      position 7
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y size of box '
+      help     'Give y size of box to be used'
+   endparameter
+
+   parameter   NEWVAL
+      position 8
+      keyword  'NEWVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'New value for pixels inside box'
+      default  0.0
+      help     'This will become the new value for all pixels inside the box'
+   endparameter
+
+endinterface
+
+## INSETC - replaces pixels inside specified circle with specified value
+
+interface INSETC
+
+   program 'INSETC'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be modified'
+      help        'Name of data structure containing the image to be modified'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being modified'
+      help        'Name given to data structure to hold image after being modified'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Rapi2d - Inset'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XCENTRE
+      position 4
+      keyword  'XCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x coord of circle centre'
+      help     'Give x coordinate of centre of circle to be used'
+   endparameter
+      
+   parameter   YCENTRE
+      position 5
+      keyword  'YCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y coord of circle centre'
+      help     'Give y coordinate of centre of circle to be used'
+   endparameter
+
+   parameter   DIAMETER
+      position 6
+      keyword  'DIAMETER'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Diameter of circle'
+      help     'Give diameter of circle to be used'
+   endparameter
+
+   parameter   NEWVAL
+      position 7
+      keyword  'NEWVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'New value for pixels inside circle'
+      default  0.0
+      help     'This will become the new value for all pixels inside the circle'
+   endparameter
+
+endinterface
+
+## INTLK - creates an integer picture of an image/sub-image
+
+interface INTLK
+
+   program 'INTLK'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be scanned'
+      help     'Give name of structure holding image to be analysed'
+   endparameter
+
+   parameter   LINE_ST
+      position 2
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  1
+      prompt   'Give start line for sub-array'
+      help     'Give y start coordinate of sub-array to be analysed'
+   endparameter
+      
+   parameter   LINE_NM
+      position 3
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  64
+      prompt   'Give number of lines in sub-array'
+      help     'Give y size of sub-array to be analysed'
+   endparameter
+   
+   parameter   LINE_IN
+      position 4
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  64
+      prompt   'Give increment of the lines in sub-array'
+      help     'Give y increment of sub-array to be analysed'
+   endparameter
+   
+   parameter   COL_ST
+      position 5
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  1
+      prompt   'Give start column for sub-array'
+      help     'Give x start coordinate of sub-array to be analysed'
+   endparameter
+      
+   parameter   COL_NM
+      position 6
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  64
+      prompt   'Give number of columns in sub-array'
+      help     'Give number of columns in sub-array'
+   endparameter
+   
+   parameter   COL_IN
+      position 7
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  64
+      prompt   'Give increment of columns in sub-array'
+      help     'Give x increment of sub-array to be analysed'
+   endparameter
+   
+   parameter   OFFSET
+      position 8
+      keyword  'OFFSET'
+      type     '_REAL'
+      vpath    'PROMPT'
+      default  0.0
+      prompt   'Give the offset value '
+      help     'Give the value subtracted from each pixel before scaling'
+   endparameter
+   
+   parameter   SCALAR
+      position 9
+      keyword  'SCALAR'
+      type     '_REAL'
+      vpath    'PROMPT'
+      default  1.0
+      prompt   'Give normalization factor '
+      help     'Give value divided into pixel i.e. scalar'
+   endparameter
+   
+   parameter   AGAIN
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      default  YES
+      prompt   'Another sub-array ?'
+      help     'Whether or not another sub-array is to be analysed'
+   endparameter
+
+endinterface
+
+## JSDCLEAN - run James Dunlop's clean program
+
+interface JSDCLEAN
+
+   program 'JSDCLEAN'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be cleaned'
+      help        'Name of data structure containing the image to be cleaned'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after cleaning'
+      help        'Name of data structure to hold image after cleaning'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Clean'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## LINCONT - Linearizes an IRCAM container file 
+
+interface LINCONT 
+ 
+   program 'LINCONT'
+ 
+   parameter      CONTNAME
+      position    1
+      keyword     'CONTNAME'
+      type        'LITERAL'
+      access      'READ'
+      default     ircam_09dec86_1
+      vpath       'PROMPT'
+      prompt      'OBSERVATION file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+ 
+   parameter      CONFIRM
+      position    2
+      keyword     'CONFIRM'
+      type        '_LOGICAL'
+      default     Y
+      vpath       'PROMPT'
+      prompt      'Confirm this is CORRECT '
+      help        'Confirmation that file to be copied is correct'
+   endparameter
+ 
+   parameter      BIAS_IMAGE
+      position    3
+      keyword     'BIAS_IMAGE'
+      type        '_INTEGER'
+      access      'READ'
+      default     1
+      vpath       'PROMPT'
+      prompt      'Observation number of BIAS image '
+      help        'Number of bias image to be subtracted before linearization'
+   endparameter
+ 
+   parameter      COEFFILE
+      position    4
+      keyword     'COEFFILE'
+      type        'LITERAL'
+      default     lincoeff.list
+      vpath       'PROMPT'
+      prompt      'Coefficient file'
+      help        'Name of ASCII file containing linearization coeficients'
+   endparameter
+ 
+   parameter      CONTAINER
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      access      'READ'
+      default     ircam_09dec86_1
+      vpath       'DEFAULT'
+      prompt      'OBSERVATION file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+ 
+   parameter      NEWCONT
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      access      'WRITE'
+      default     newcont
+      vpath       'DEFAULT'
+      prompt      'NEW OBSERVATION file'
+      help        'Name of HDS file to contain linearized observations '
+   endparameter
+
+endinterface
+
+## LINIMAG_NDR - Linearizes an IRCAM NDR file 
+ 
+interface LINIMAG_NDR
+ 
+   program 'LINIMAG_NDR'
+ 
+   parameter      CONTNAME
+      position    1
+      keyword     'CONTNAME'
+      type        'LITERAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'OBSERVATION NDR file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+ 
+   parameter      COEFFILE
+      position    2
+      keyword     'COEFFILE'
+      type        'LITERAL'
+      default     '$LIRCAMDIR/lincoeff_fpa118_postjul88_ndr.list'
+      vpath       'PROMPT'
+      prompt      'Coefficient file'
+      help        'Name of ASCII file containing linearization coeficients'
+   endparameter
+ 
+   parameter      OUTNAME
+      position    3
+      keyword     'OUTNAME'
+      type        'LITERAL'
+      access      'READ'
+      default     'junk'
+      vpath       'PROMPT'
+      prompt      'Output image name'
+      help        'Name of HDS file created with linearized data'
+   endparameter
+ 
+   parameter      OBSNUM
+      position    4
+      keyword     'OBSNUM'
+      type        'LITERAL'
+      access      'READ'
+      default     1
+      vpath       'PROMPT'
+      prompt      'Observation number to be linearized'
+      help        'Number of observation in container file'
+   endparameter
+ 
+   parameter      CONTAINER
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'DEFAULT'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+
+   parameter      OUTPIC
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      vpath       'DEFAULT'
+      help        'Name of HDS file to contain linearized observation'
+   endparameter
+
+endinterface
+
+## LOWCASE - converts string to lower case
+
+interface LOWCASE 
+ 
+   program 'LOWCASE'
+ 
+   parameter      STRING
+      position    1
+      keyword     'STRING'
+      type        '_CHAR'
+      access      'WRITE'
+      default     JUNK
+      vpath       'PROMPT'
+      association '->GLOBAL.LOWCASE_STRING'
+      prompt      'String to be converted to lower case'
+      help        'String of words for lower case conversion'
+   endparameter
+ 
+endinterface
+
+## MAKEBAD - makes bad pixel list from sigma cut on image
+
+interface MAKEBAD
+
+   program 'MAKEBAD'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be scanned '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      SIGMA
+      position    2
+      keyword     'SIGMA'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'Sigma level of bad pixel cut'
+      default     5.0
+      help        'Values outside +-N sigma on mean are bad'
+   endparameter
+
+   parameter      OUTFILE
+      position    3
+      keyword     'OUTFILE'
+      type        '_CHAR'
+      vpath       'PROMPT'
+      prompt      'Output file name '
+      default     'makebad.list'
+      help        'Character string to be used as a output filename'
+   endparameter
+
+endinterface
+
+## MAKEGLITCH - makes bad pixel list from bad pixel image
+
+interface MAKEGLITCH
+
+   program 'MAKEGLITCH'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Bad pixel mask image '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTFILE
+      position    2
+      keyword     'OUTFILE'
+      type        '_CHAR'
+      vpath       'PROMPT'
+      prompt      'Output GLITCH file '
+      default     'glitch.list'
+      help        'Character string to be used as a output filename'
+   endparameter
+
+endinterface
+
+## MAKEMASK - makes bad pixel mask from sigma cut on image
+
+interface MAKEMASK
+
+   program 'MAKEMASK'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be scanned '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output mask image '
+      help        'Name of data structure containing the mask '
+   endparameter
+
+   parameter      XST
+      position    3
+      keyword     'IXST'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'X-start of area to be used in calculation '
+      default     1
+      help        'Only sub-image used in mean,std calculation'
+   endparameter
+
+   parameter      YST
+      position    4
+      keyword     'IYST'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Y-start of area to be used in calculation '
+      default     1
+      help        'Only sub-image used in mean,std calculation'
+   endparameter
+
+   parameter      XEN
+      position    5
+      keyword     'IXEN'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'X-end of area to be used in calculation '
+      default     1000
+      help        'Only sub-image used in mean,std calculation'
+   endparameter
+
+   parameter      YEN
+      position    6
+      keyword     'IYEN'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Y-end of area to be used in calculation '
+      default     1000
+      help        'Only sub-image used in mean,std calculation'
+   endparameter
+
+   parameter      SIGMALEVEL
+      position    7
+      keyword     'SIGMALEVEL'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'Sigma level of bad pixel cut'
+      default     5.0
+      help        'Values BELOW +N sigma on mean are bad'
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      default     'obsrap - Makemask'
+   endparameter
+
+endinterface
+
+## MANYCOL - cycles several colour tables
+
+interface MANYCOL
+
+   program 'MANYCOL'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Input colour table'      
+   endparameter
+
+   parameter   NUMCOL
+      position 2
+      keyword  'NUMCOL'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Number of colour tables'
+   endparameter
+      
+   parameter   OUTPIC
+      position 3
+      keyword  'OUTPIC'
+      type     'STRUCTURE'
+      vpath    'PROMPT'
+      prompt   'Output colour table'
+   endparameter
+      
+   parameter   OTITLE
+      position 4 
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'Obsrap - Manycol'
+   endparameter
+   
+endinterface
+
+## MED3D - calculates median of pixels in 3d stack
+
+interface MED3D
+
+   program 'MED3D'
+
+   parameter   FILENAME
+      position 1
+      keyword  'FFILE'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Name of ASCII file containing image stack ? '
+      help     'Give name of file holding list of image names to be medianed'
+   endparameter
+
+   parameter   INPIC
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Image ? '
+      help     'Give name of structure holding image to be medianed'
+   endparameter
+
+   parameter   OUTPIC
+      position 2
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT,DEFAULT'
+      default  medim
+      prompt   'Name of output (MEDIANED) image ? '
+      help     'Give name of structure to hold image after medianed'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Med3d'
+   endparameter
+
+   parameter   VIEW
+      position 3
+      keyword  'VIEW'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Do you want to view data on one pixel ? '
+      default  Y
+      help     'View raw, ordered data and calculated values for a pixel'
+   endparameter
+
+   parameter   XPIX
+      position 4
+      keyword  'XPIX'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      default  31
+      prompt   'Give the X position of view-pixel ? '
+      help     'X position in image of pixel to be viewed'
+   endparameter
+
+   parameter   YPIX
+      position 5
+      keyword  'YPIX'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      default  29
+      prompt   'Give the Y position of view-pixel ? '
+      help     'Y position in image of pixel to be viewed'
+   endparameter
+
+   parameter   WHICH
+      position 6
+      keyword  'WHICH'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      default  'MEDIAN'
+      prompt   'Use the MEDIAN, MEAN or MODE value in output image ? '
+      help     'Value placed in output image'
+   endparameter
+
+   parameter   SCALING
+      position 7
+      keyword  'SCALING'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Scale images in the image stack to same MEDIAN value ? '
+      default  Y
+      help     'Find median of area in each image and scale so they are the same'
+   endparameter
+
+   parameter   XST
+      position 8
+      keyword  'XST'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Give the X start pixel of scaling area ? '
+      default  1
+      help     'Bottom left in X for scaling box'
+   endparameter
+
+   parameter   XSZ
+      position 9
+      keyword  'XSZ'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Give the X size of the scaling area ? '
+      default  10
+      help     'Size of scaling box in X '
+   endparameter
+
+   parameter   YST
+      position 10
+      keyword  'YST'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Give the Y start pixel of the scaling area ? '
+      default  1
+      help     'Bottom left in Y for scaling box'
+   endparameter
+
+   parameter   YSZ
+      position 11
+      keyword  'YSZ'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Give the Y size of scaling area ? '
+      default  10
+      help     'Size of scaling box in Y '
+   endparameter
+
+   parameter   NORMALIZATION
+      position 12
+      keyword  'NORMALIZATION'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Do you want the output image normalized to unit ? '
+      default  Y
+      help     'Output image scaled to 1 from scaling box area'
+   endparameter
+
+   parameter   WORKFILE
+      keyword  'WORKFILE'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      prompt   'Image ? '
+      default  med3d_work
+      help     'Give name of structure holding work array'
+   endparameter
+
+   parameter   LWORKFILE
+      keyword  'LWORKFILE'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      prompt   'Image ? '
+      default  med3d_lwork
+      help     'Give name of structure holding linear work array'
+   endparameter
+
+endinterface
+
+## MOSAIC2 - merges 2 non-congruent images into one image
+
+interface MOSAIC2
+
+   program 'MOSAIC2'
+
+   parameter      INPIC1
+      keyword     'INPIC1'
+      position    1
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'First image'
+      help        'Name of data structure containing the first image to be added'
+   endparameter
+
+   parameter      INPIC2
+      keyword     'INPIC2'
+      position    2
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Second image'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      XOFFSET
+      keyword     'XOFFSET'
+      position    3
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'x offset of second image from first'
+      help        'Give x offset of current image from first image input'
+   endparameter
+      
+   parameter      YOFFSET
+      keyword     'YOFFSET'
+      position    4
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'y offset of second image from first'
+      help        'Give y offset of current image from first image input'
+   endparameter
+
+   parameter      OUTPIC
+      keyword     'OUTPIC'
+      position    5
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Mosaiced image'
+      help        'Name given to data structure to hold mosaiced image'
+   endparameter
+
+   parameter   USEBAD
+      keyword  'USEBAD'
+      position    6
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixel replacement wanted ?'
+      default  YES
+      help     'Yes if you want to use a bad pixel map for bad pixel replacement'
+   endparameter
+
+   parameter   OVERLAP
+      keyword  'OVERLAP'
+      position    7
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Average overlap values ?'
+      default  YES
+      help     'Yes if you want to average rather than select first overlap'
+   endparameter
+
+   parameter   VORM
+      keyword  'VORM'
+      position    8
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'By Value (V) or Mask (M) ?'
+      default  'V'
+      help     'V if bad pixels are defined in the data, M if by an auxiliary mask'
+   endparameter
+
+   parameter   BADVAL
+      keyword  'BADVAL'
+      position    9
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad value'
+      default  -1.0E-20
+      help     'Value in input data taken to denote a bad pixel'
+   endparameter
+
+   parameter   BADPIC
+      keyword  'BADPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad pixel map'
+      help     'Give name of structure holding bad pixel image'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Obsrap - Mosaic2'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## MOSCOR - works out best d.c. sky offsets for mosaic image pairs
+
+interface MOSCOR
+
+   program 'MOSCOR'
+
+   parameter   INPIC1
+      position 1
+      keyword  'INPIC1'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'First image'
+      help     'Give name of structure holding first image of mosaic pair'
+   endparameter
+
+   parameter   INPIC2
+      position 2
+      keyword  'INPIC2'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Second image'
+      help     'Give name of structure holding second image of mosaic pair'
+   endparameter
+
+   parameter   NXOFF
+      position 3
+      keyword  'NXOFF'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'X offset'
+      help     'Give x offset from first to second image'
+   endparameter
+      
+   parameter   NYOFF
+      position 4
+      keyword  'NYOFF'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'Y offset'
+      help     'Give y offset from first to second image'
+   endparameter
+      
+   parameter   USEWHAT
+      position 5
+      keyword  'USEWHAT'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Use MEAN, MEDIAN or MODE ?'
+      default  'MEDIAN'
+      help     'overlap sky calculated using mean, median or mode'
+   endparameter
+
+   parameter   APPLY
+      position 6
+      keyword  'APPLY'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Apply correction to 2nd image ?'
+      default  YES
+      help     'Yes if correction is to be applyed to 2nd input image'
+   endparameter
+
+   parameter   OUTPIC
+      position 7
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Output corrected image ? '
+      default  junk
+      help     'Give name of structure to hold corrected image'
+   endparameter
+
+   parameter   MOSAIC
+      position 8
+      keyword  'MOSAIC'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Mosaic corrected image with 1st image ?'
+      default  YES
+      help     'Yes if corrected image is mosaiced with 1st image'
+   endparameter
+
+   parameter   OUTPIC2
+      position 9
+      keyword  'OUTPIC2'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Output mosaiced image ? '
+      default  junkmos
+      help     'Give name of structure to hold mosaiced image'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'Obsrap - Moscor'
+   endparameter
+
+   parameter   OFFSETA
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.MOSCOR_OFFSETA'
+   endparameter
+
+   parameter   OFFSETB
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.MOSCOR_OFFSETB'
+   endparameter
+
+   parameter   DCOFFSET
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.MOSCOR_DCOFFSET'
+   endparameter
+
+endinterface
+
+interface OBSEXT
+ 
+   program 'OBSEXT'
+ 
+   parameter      CONTAINER
+      position    1
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      access      'READ'
+      default     ircam_26jul86_1
+      vpath       'PROMPT'
+      prompt      'Container file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+ 
+   parameter      STARTOBS
+      position    2
+      keyword     'STARTOBS'
+      type        '_INTEGER'
+      default     1
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Start OBSERVATION number for EXTRACTION'
+      help        'First observation to be extracted'
+   endparameter
+ 
+   parameter      ENDOBS
+      position    3
+      keyword     'ENDOBS'
+      type        '_INTEGER'
+      default     1
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'End OBSERVATION number for EXTRACTION'
+      help        'Last observation to be extracted'
+   endparameter
+ 
+   parameter      CHANNAME
+      position    4
+      keyword     'CHANNAME'
+      type        'LITERAL'
+      default     'PHASEA'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Name of DATA_ARRAY channel to be used'
+      help        'DATA_ARRAY channel from PHASEA,PHASEB,KTCA,KTCB'
+   endparameter
+ 
+   parameter      PREFIX
+      position    5
+      keyword     'PREFIX'
+      type        'LITERAL'
+      default     'F'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Prefix for image files created'
+      help        'Prefix to name, i.e. JUNK in JUNK1,JUNK2,...'
+   endparameter
+ 
+   parameter      OUTPIC
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      default     junk
+      vpath       'DEFAULT'
+   endparameter
+ 
+   parameter      MORESTUFF
+      keyword     'MORESTUFF'
+      type        '_LOGICAL'
+      default     YES
+      access      'READ'
+      vpath       'PROMPT,DEFAULT'
+      prompt      'More extractions from this container file '
+   endparameter
+ 
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      default     'Rapi2d - OBSEXT'
+      access      'READ'
+      vpath       'DEFAULT'
+      help        'Title for the image created'
+   endparameter
+ 
+endinterface
+
+## OBSLIST - reads the observation container file parameters and lists them
+
+interface OBSLIST
+
+   program 'OBSLIST'
+
+   parameter      CONTAINER
+      position    1
+      keyword     'CONTAINER'
+      type        'IMAGE'
+      access      'READ'
+      default     ircam_21jul86_1
+      vpath       'PROMPT'
+      prompt      'OBSERVATION file ? '
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+
+   parameter      WHAT
+      position    2
+      keyword     'WHAT'
+      type        'LITERAL'
+      default     'OBJECT_NAME'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Name of element ? '
+      help        'Element from obs file that is listed'
+   endparameter
+
+   parameter      OUTPUT
+      position    3
+      keyword     'OUTPUT'
+      type        'LITERAL'
+      access      'READ'
+      default     'TERMINAL'
+      vpath       'PROMPT'
+      prompt      'Output to TERMINAL or FILE'
+      help        'TERMINAL output lists on screen, FILE output to disk file'
+   endparameter
+
+   parameter      STARTOBS
+      position    4
+      keyword     'STARTOBS'
+      type        '_INTEGER'
+      default     1
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Start OBSERVATION number '
+      help        'First observation parameters to be listed'
+   endparameter
+
+   parameter      ENDOBS
+      position    5
+      keyword     'ENDOBS'
+      type        '_INTEGER'
+      default     10
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'End OBSERVATION number '
+      help        'Last observation parameters to be listed'
+   endparameter
+
+endinterface
+
+## OEFIX - fixes odd/even channel mismatch ... fudges more like
+ 
+interface OEFIX
+ 
+   program 'OEFIX'
+ 
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      default  junk
+      vpath    'PROMPT'
+      prompt   'Image to be FIXED !! '
+      help     'Give name of structure holding data'
+   endparameter
+
+   parameter   OUTPIC
+      position 2
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      default  FIXED
+      vpath    'PROMPT'
+      prompt   'Image to contain FIXED data '
+      help     'Give name of structure to hold output data '
+   endparameter
+ 
+   parameter   HISTIM
+      keyword  'HISTIM'
+      type     'IMAGE'
+      access   'WRITE'
+      default  histim
+      vpath    'DEFAULT'
+      prompt   'Image for histogram '
+      help     'Give name of structure holding histogram data'
+   endparameter
+ 
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     'LITERAL'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Obsrap - Oefix'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+ 
+endinterface
+             
+## OUTSETB - replaces pixels outside specified box with specified value
+
+interface OUTSETB
+
+   program 'OUTSETB'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be modified'
+      help        'Name of data structure containing the image to be modified'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being modified'
+      help        'Name given to data structure to hold image after being modified'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Obsrap - Outsetb'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XSTART
+      position 4
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x start of box'
+      help     'Give x coordinate of start of box to be used'
+   endparameter
+      
+   parameter   YSTART
+      position 5
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y start of box'
+      help     'Give y coordinate of start of box to be used'
+   endparameter
+      
+   parameter   XSIZE
+      position 6
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x size of box '
+      help     'Give x size of box to be used'
+   endparameter
+
+   parameter   YSIZE
+      position 7
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y size of box '
+      help     'Give y size of box to be used'
+   endparameter
+
+   parameter   NEWVAL
+      position 8
+      keyword  'NEWVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'New value for pixels outside box'
+      default  0.0
+      help     'This will become the new value for all pixels inside the box'
+   endparameter
+
+endinterface
+
+## PSGREY - plots sdf image to postscript device in greyscale
+
+interface PSGREY
+
+   program 'PSGREY'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      default  junk
+      vpath    'PROMPT'
+      prompt   'Image to be greyscaled '
+   endparameter
+
+   parameter   IXST
+      position 2
+      keyword  'IXST'
+      type     '_INTEGER'
+      default  1
+      vpath    'PROMPT'
+      prompt   'First pixel in X to be plotted '
+   endparameter
+
+   parameter   IYST
+      position 3
+      keyword  'IYST'
+      type     '_INTEGER'
+      default  1
+      vpath    'PROMPT'
+      prompt   'First pixel in Y to be plotted '
+   endparameter
+
+   parameter   IXEN
+      position 4
+      keyword  'IXEN'
+      type     '_INTEGER'
+      default  1000
+      vpath    'PROMPT'
+      prompt   'Last  pixel in X to be plotted '
+   endparameter
+
+   parameter   IYEN
+      position 5
+      keyword  'IYEN'
+      type     '_INTEGER'
+      default  1000
+      vpath    'PROMPT'
+      prompt   'Last  pixel in Y to be plotted '
+   endparameter
+
+   parameter   HIGH
+      position 6
+      keyword  'HIGH'
+      type     '_REAL'
+      default  256.0
+      vpath    'PROMPT'
+      prompt   'Value in data for black '
+   endparameter
+
+   parameter   LOW
+      position 7
+      keyword  'LOW'
+      type     '_REAL'
+      default  0.0
+      vpath    'PROMPT'
+      prompt   'Value in data for white '
+   endparameter
+
+   parameter   LABEL
+      position 8
+      keyword  'LABEL'
+      type     '_CHAR'
+      default  'IRCAM Image'
+      vpath    'PROMPT'
+      prompt   'Label for top of plot '
+   endparameter
+
+   parameter   XLABEL
+      position 9
+      keyword  'XLABEL'
+      type     '_CHAR'
+      default  'X-PIXELS'
+      vpath    'PROMPT'
+      prompt   'Label for X-axis '
+   endparameter
+
+   parameter   YLABEL
+      position 10
+      keyword  'YLABEL'
+      type     '_CHAR'
+      default  'Y-PIXELS'
+      vpath    'PROMPT'
+      prompt   'Label for Y-axis '
+   endparameter
+
+   parameter   DEVICE
+      position 11
+      keyword  'DEVICE'
+      type     '_CHAR'
+      default  '2722,1'
+      vpath    'DEFAULT'
+      prompt   'PGPLOT Device '
+   endparameter
+
+endinterface
+
+## RADIM - creates radial cut image from point and image
+
+interface RADIM
+
+   program 'RADIM'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image for radial cut ?'
+      help        'Name of data structure containing the image '
+   endparameter
+
+   parameter   XCENTRE
+      position 2
+      keyword  'XCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-centre point ?'
+      help     'X centre of radial cut'
+   endparameter
+
+   parameter   YCENTRE
+      position 3
+      keyword  'YCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-centre point ?'
+      help     'Y centre of radial cut'
+   endparameter
+
+   parameter   RADIALD
+      position 4
+      keyword  'RADIALD'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Radial length of cut ?'
+      help     'radial cut length ...'
+   endparameter
+
+   parameter      OUTPIC
+      position    5
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Radial cut image ? '
+      help        'Name of data structure to hold radial cut image '
+   endparameter
+
+   parameter   OTITLE
+      position 6
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Obsrap - Radim'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## ROOT - take the sqaure root of image into new output image 
+
+interface ROOT
+
+   program 'ROOT'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from ROOT'
+   endparameter
+
+   parameter      OTITLE
+      position    3
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Obsrap - Root'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## ROWMED - median filters across rows producing median row slice
+
+interface ROWMED
+
+   program 'ROWMED'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be row medianed '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image slice after row medianing '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Rowmed'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter   EXCLREG
+      position 3
+      keyword  'EXCLREG'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      prompt   'Do you want to define an exclusion region '
+      default  N
+      help     'A region that is not considered in the medianing ...'
+   endparameter
+
+   parameter   XST
+      position 4
+      keyword  'XST'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-start of exclusion region '
+      default  1
+      help     'X-start of exclusion region'
+   endparameter
+
+   parameter   YST
+      position 5
+      keyword  'YST'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-start of exclusion region '
+      default  1
+      help     'Y-start of exclusion region'
+   endparameter
+
+   parameter   XSZ
+      position 6
+      keyword  'XSZ'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'X-size of exclusion region '
+      default  10
+      help     'X-size of exclusion region'
+   endparameter
+
+   parameter   YSZ
+      position 7
+      keyword  'YSZ'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Y-size of exclusion region '
+      default  10
+      help     'Y-size of exclusion region'
+   endparameter
+
+endinterface
+
+## SETVAL - for a 2-D image set all values x to y
+
+interface SETVAL
+
+   program 'SETVAL'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image to be fudged'
+      help        'Name of data structure containing data to be modified'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold output image'
+      help        'Name of data structure to store the data'
+   endparameter
+
+   parameter      OTITLE
+      type        '_CHAR'
+      keyword     'OTITLE'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Obsrap - Setval'
+      help        'Character string used as a title for the data structure'
+   endparameter
+
+   parameter      INVAL
+      position    3
+      keyword     'INVAL'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Value to be changed'
+      help        'Values equal to this value will be set to new value'
+      default     0.0
+   endparameter
+
+   parameter      OUTVAL
+      position    4
+      keyword     'OUTVAL'
+      type        '_REAL'
+      vpath       'DEFAULT'
+      prompt      'New value for pixels'
+      help        'Value to which all pixels equal to specified value will be set'
+      default     0.0
+   endparameter
+
+endinterface
+
+## STEPIM - steps a 2D image so that between limits values are mean
+
+interface STEPIM
+
+   program 'STEPIM'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be stepped'
+      help        'Name of data structure containing the input image '
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     junk
+      prompt      'Image after being stepped'
+      help        'Name given to data structure to hold output image '
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Stepim'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   STEPNUM
+      position 3
+      keyword  'STEPNUM'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Number of steps'
+      default  5
+      help     'Give number of steps in image values'
+   endparameter
+      
+   parameter   STEPBASE
+      position 4
+      keyword  'STEPBASE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Base level of step'
+      default  0.0
+      help     'Give the base level for step start'
+   endparameter
+
+   parameter   STEPINT
+      position 5
+      keyword  'STEPINT'
+      type     '_REAL'
+      vpath    'PROMPT'
+      default  1.0
+      prompt   'Interval between steps'
+   endparameter
+
+   parameter   ABOVEMAX
+      position 6
+      keyword  'ABOVEMAX'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Value pixel above max set to '
+      default  5.0
+   endparameter
+
+   parameter   BELOWMIN
+      position 7
+      keyword  'BELOWMIN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Value pixel below base set to '
+      default  0.0
+   endparameter
+
+endinterface
+
+## STCOADD - coadd N images from an observation container file
+
+interface STCOADD
+
+   program 'STCOADD'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      default     ircam_09dec86_1
+      vpath       'PROMPT'
+      prompt      'OBSERVATION file'
+      help        'Name of HDS file containing observations and parameters'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      default     coadd
+      vpath       'PROMPT'
+      prompt      'Coadded output file'
+      help        'Name of HDS file to contain coadded observations '
+   endparameter
+
+   parameter      INPOPT
+     position     3
+      keyword     'INPOPT'
+      type        '_CHAR'
+      access      'READ'
+      default     'RANGE'
+      in          'RANGE','INDIVIDUAL'
+      vpath       'PROMPT'
+      prompt      'RANGE or INDIVIDUAL files'
+      help        'A RANGE is 1 to 50 say, INDIVIDUAL is 1,4,5,8,10,20,100 etc.'
+   endparameter
+
+   parameter      STARTRAN
+      position    4
+      keyword     'STARTRAN'
+      type        '_INTEGER'
+      access      'READ'
+      default     1
+      vpath       'PROMPT'
+      prompt      'Start of RANGE to be coadded'
+      help        'First image in file to be coadded ...'
+   endparameter
+
+   parameter      ENDRAN
+      position    5
+      keyword     'ENDRAN'
+      type        '_INTEGER'
+      access      'READ'
+      default     100
+      vpath       'PROMPT'
+      prompt      'End of RANGE to be coadded'
+      help        'Last image in file to be coadded ...'
+   endparameter
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      type        '_INTEGER'
+      access      'READ'
+      default     1
+      vpath       'PROMPT'
+      prompt      'Number of OBSERVATION to be coadded'
+      help        'Number in input HDS file to be coadded into output image'
+   endparameter
+
+   parameter 	  OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      access      'WRITE'
+      vpath       'DEFAULT' 
+      default     'Obsrap - Stcoadd'
+      prompt      'Title for out images '
+      help        'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## TYPFILE - types a file to terminal
+
+interface TYPFILE
+
+  program 'TYPFILE'
+
+  parameter TYPFILE
+      position    1
+      keyword     'TYPFILE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'File to be typed to terminal  '
+      help        'Name of file to be shown to user line by line'
+   endparameter
+
+endinterface
+
+## WELCOME_OBSRAP - welcome information for auto loading of task
+
+interface WELCOME_OBSRAP
+
+   parameter INFO
+      keyword  'INFO'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'IRCAM A-tasks loaded for monolith OBSRAP'
+   endparameter
+
+endinterface
+
+## WMOSAIC - merges several non-congruent images into one with weighting
+
+interface WMOSAIC
+
+   program 'WMOSAIC'
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      position    1
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Number of images to be mosaiced'
+      help        'Give total number of images to be mosaiced (max. 50)'
+   endparameter
+
+   parameter      INPIC1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Initial image'
+      help        'Name of data structure containing the first image to be added'
+   endparameter
+
+   parameter      INPIC2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC3
+      keyword     'INPIC3'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC4
+      keyword     'INPIC4'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC5
+      keyword     'INPIC5'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC6
+      keyword     'INPIC6'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC7
+      keyword     'INPIC7'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC8
+      keyword     'INPIC8'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC9
+      keyword     'INPIC9'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC10
+      keyword     'INPIC10'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC11
+      keyword     'INPIC11'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC12
+      keyword     'INPIC12'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC13
+      keyword     'INPIC13'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC14
+      keyword     'INPIC14'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC15
+      keyword     'INPIC15'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC16
+      keyword     'INPIC16'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC17
+      keyword     'INPIC17'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC18
+      keyword     'INPIC18'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC19
+      keyword     'INPIC19'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC20
+      keyword     'INPIC20'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC21
+      keyword     'INPIC21'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC22
+      keyword     'INPIC22'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC23
+      keyword     'INPIC23'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC24
+      keyword     'INPIC24'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC25
+      keyword     'INPIC25'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC26
+      keyword     'INPIC26'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC27
+      keyword     'INPIC27'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC28
+      keyword     'INPIC28'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC29
+      keyword     'INPIC29'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC30
+      keyword     'INPIC30'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC31
+      keyword     'INPIC31'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC32
+      keyword     'INPIC32'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC33
+      keyword     'INPIC33'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC34
+      keyword     'INPIC34'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC35
+      keyword     'INPIC35'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC36
+      keyword     'INPIC36'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC37
+      keyword     'INPIC37'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC38
+      keyword     'INPIC38'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC39
+      keyword     'INPIC39'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC40
+      keyword     'INPIC40'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC41
+      keyword     'INPIC41'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC42
+      keyword     'INPIC42'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC43
+      keyword     'INPIC43'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC44
+      keyword     'INPIC44'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC45
+      keyword     'INPIC45'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC46
+      keyword     'INPIC46'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC47
+      keyword     'INPIC47'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC48
+      keyword     'INPIC48'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC49
+      keyword     'INPIC49'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC50
+      keyword     'INPIC50'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter   XOFFSET
+      keyword  'XOFFSET'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x offset of image from first'
+      help     'Give x offset of current image from first image input'
+   endparameter
+      
+   parameter   YOFFSET
+      keyword  'YOFFSET'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y offset of image from first'
+      help     'Give y offset of current image from first image input'
+   endparameter
+
+   parameter   WEIGHT
+      keyword  'WEIGHT'
+      type     '_REAL'
+      vpath    'PROMPT'
+      default  1.0
+      prompt   'weight for this image'
+      help     'Give REAL weight factor'
+   endparameter
+
+   parameter   USEBAD
+      keyword  'USEBAD'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixel replacement wanted ?'
+      default  YES
+      help     'Yes if you want to use a bad pixel map for bad pixel replacement'
+   endparameter
+
+   parameter   OVERLAP
+      keyword  'OVERLAP'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Average overlap values ?'
+      default  YES
+      help     'Yes if you want to average rather than select first overlap'
+   endparameter
+
+   parameter   VORM
+      keyword  'VORM'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'By Value (V) or Mask (M) ?'
+      help     'V if bad pixels are defined in the data, M if by an auxiliary mask'
+   endparameter
+
+   parameter   BADVAL
+      keyword  'BADVAL'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad value'
+      default  -1.0E-20
+      help     'Value in input data taken to denote a bad pixel'
+   endparameter
+
+   parameter   BADPIC
+      keyword  'BADPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad pixel map'
+      help     'Give name of structure holding bad pixel image'
+   endparameter
+
+   parameter   OUTPIC
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Mosaiced image'
+      help     'Name given to data structure to hold mosaiced image'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Rapi2d - Mosaic'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## WQUILT - sophisticated mosaic routine
+
+interface WQUILT
+
+   program 'WQUILT'
+
+   parameter      WHERE
+      keyword     'WHERE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input source - F(ile) or I(nterface)'
+      default     'F'
+      help        'Choose F(ile) or I(nterface) as the source of frames and offsets'
+   endparameter
+
+   parameter      FNAME
+      keyword     'FNAME'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Source file name'
+      default     'quilt.lis'
+      help        'Name of file holding mosaic information'
+   endparameter
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Number of images'
+      help        'Give total number to be mosaiced, including central one'
+   endparameter
+
+   parameter      INPICI
+      keyword     'INPICI'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Central image'
+      help        'Name of data structure containing the central image'
+   endparameter
+
+   parameter      MAXX
+      keyword     'MAXX'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Maximum x offset'
+      help        'Give the maximum x offset of any frame (including central one)'
+   endparameter
+
+   parameter      MAXY
+      keyword     'MAXY'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Maximum y offset'
+      help        'Give the maximum y offset of any frame (including central one)'
+   endparameter
+
+   parameter      MINX
+      keyword     'MINX'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Minimum x offset'
+      help        'Give the minimum x offset of any frame (including central one)'
+   endparameter
+
+   parameter      MINY
+      keyword     'MINY'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Minimum y offset'
+      help        'Give the minimum y offset of any frame (including central one)'
+   endparameter
+
+   parameter   OVERLAP
+      keyword  'OVERLAP'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Average overlap values ?'
+      default  YES
+      help     'Yes if you want to average rather than select first overlap'
+   endparameter
+
+   parameter      USEBAD
+      keyword     'USEBAD'
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Bad pixels to be handled ?'
+      default     YES
+      help        'True if bad pixels are to be dealt with'
+   endparameter
+
+   parameter      BADMETH
+      keyword     'BADMETH'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Method - V(alue) or M(ask)'
+      default     'M'
+      help        'Bad pixels to handled by a bad pixel value or a bad mask'
+   endparameter
+
+   parameter      BADVAL
+      keyword     'BADVAL'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Value to be used'
+      default      -1.0E-20
+      help        'Give a value that will be recognised as flagging a bad pixel'
+   endparameter
+
+   parameter      BADPIC
+      keyword     'BADPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Bad pixel mask'
+      help        'Give an image that shows where the bad pixels are in all images'
+   endparameter
+
+   parameter      OUTPIC
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output mosaic image'
+      help        'Name given to data structure to hold mosaiced image'
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Rapi2d - Quilt'
+      help        'Character string used as a title for the output structure'
+   endparameter
+
+   parameter      CURPIC
+      keyword     'CURPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image'
+      help        'Give the name of the current image to be input'
+   endparameter
+
+   parameter      OFFSETX
+      keyword     'OFFSETX'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'x offset'
+      help        'Give x offset of current frame from the central one'
+   endparameter
+
+   parameter      OFFSETY
+      keyword     'OFFSETY'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'y offset'
+      help        'Give y offset of current frame from the central one'
+   endparameter
+
+   parameter      WEIGHT
+      keyword     'WEIGHT'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      default     1.0
+      prompt      'weight for image'
+      help        'Give the weight for the image'
+   endparameter
+
+endinterface
+
+## WRAPCOR - added value to pixels below input level
+
+interface WRAPCOR 
+
+   program 'WRAPCOR'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be corrected '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after correction '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Wrapcor'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   parameter   DATAVAL
+      position 3
+      keyword  'DATAVAL'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Value below which number added '
+      default  0.0
+      help     'Threshold below which next input number is added...'
+   endparameter
+
+   parameter   VALADD
+      position 4
+      keyword  'VALADD'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Value added to pixels below threshold '
+      default  0.0
+      help     'Value added to pixels'
+   endparameter
+
+endinterface
+
+## XGROW - grows a slice image to a 2d image
+
+interface XGROW
+
+   program 'XGROW'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be grown in X '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      XSIZE
+      position    2
+      keyword     'XSIZE'
+      type        'IMAGE'
+      vpath       'PROMPT'
+      prompt      'X image size after growing '
+      help        'X size of image after the processing'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image slice after growing in X '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Xgrow'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## YADD - adds up rows to form slice 
+
+interface YADD
+
+   program 'YADD'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image from which rows are to be added '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      YSTART
+      position    2
+      keyword     'YSTART'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Y start row for addition '
+      help        'Y start row in image for addition of rows '
+   endparameter
+
+   parameter      YSIZE
+      position    3
+      keyword     'YSIZE'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Number of rows added together from start '
+      help        'Number of rows in Y added together to form output'
+   endparameter
+
+   parameter      AVERAGE
+      position    4
+      keyword     'AVERAGE'
+      type        '_LOGICAL'
+      vpath       'PROMPT'
+      prompt      'Average added rows '
+      help        'Average the rows added together or not ...'
+   endparameter
+
+   parameter      OUTPIC
+      position    5
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image with 1d slice '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      position    6
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Obsrap - Yadd'
+      help        'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## YGROW - grows a slice image to a 2d image
+
+interface YGROW
+
+   program 'YGROW'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be grown in Y '
+      help        'Name of data structure containing the image to be processed'
+   endparameter
+
+   parameter      YSIZE
+      position    2
+      keyword     'YSIZE'
+      type        'IMAGE'
+      vpath       'PROMPT'
+      prompt      'Y image size after growing '
+      help        'Y size of image after the processing'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image slice after growing in Y '
+      help        'Name of data structure to hold image after processing'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Obsrap - Ygrow'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+endmonolith

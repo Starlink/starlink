@@ -1,0 +1,53 @@
+## IO2RO - Monolith Interface File for IRCAM data reduction : I + O to RO
+
+monolith IO2RO
+
+## REDUCE combines I and O files into RO files
+
+interface REDUCE
+
+   program 'REDUCE'
+
+   parameter   IDIR
+      position 1
+      keyword  'IDIR'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Give full name of directory containing I files'
+      help     'Give full name of directory containing I files'
+   endparameter
+
+   parameter   ODIR
+      position 2
+      keyword  'ODIR'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Give full name of directory containing O files'
+      help     'Give full name of directory containing O files'
+   endparameter
+
+   parameter   RODIR
+      position 3
+      keyword  'RODIR'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Give full name of directory to contain RO files'
+      help     'Give full name of directory to contain RO files'
+   endparameter
+
+   parameter   DATE_OBS
+      position 4
+      keyword  'DATE_OBS'
+      type     '_CHAR'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Give UT date and obs number in form YYMMDD_N'
+      help     'Give UT date and obs number in form YYMMDD_N'
+   endparameter
+
+endinterface
+
+endmonolith

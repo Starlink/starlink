@@ -77,6 +77,9 @@ proc drb_stred var1 var2 var3 var4 var5
     if zfiltn2 = "N"
       zfiltn2 = substr(zfiltn,1,3)
     end if
+    if zfiltn2 = "L"
+      zfiltn2 = substr(zfiltn,1,2)
+    end if
     obj2 = " "
     delfile $ADAM_USER/GLOBAL.sdf
     valstr (object) (obj2)
@@ -881,7 +884,7 @@ proc drb_stred var1 var2 var3 var4 var5
         end if
         ast = "FILENAME                      UT      FILTER   AP1  "
         bst = "AP2   AP3    PSCAL    ZP      AIRM  ACT.MAG    OBJ-SKY  "
-        cst = "I3.MAG CAL.ZP CAL.ZPX"
+        cst = "  I3.MAG  CAL.ZP CAL.ZPX"
         dline = ast&bst&cst
         write afile (dline)
       end if
@@ -904,8 +907,8 @@ proc drb_stred var1 var2 var3 var4 var5
          calzpsq = calzpsq + mag**2
          calzpsum = calzpsum + mag
       end if
-      ccalzp = calzp:7:3
-      ccalzpx = calzpx:7:3
+      ccalzp = calzp:8:3
+      ccalzpx = calzpx:8:3
       disp_ap1 = real(aper1)
       disp_ap2 = real(aper2)
       disp_ap3 = real(aper3)
@@ -914,10 +917,10 @@ proc drb_stred var1 var2 var3 var4 var5
       cd2 = disp_ap2:6:2
       cd3 = disp_ap3:6:2
       carc = scale:8:3
-      cobjval = objval:12:5
+      cobjval = objval:13:5
       cmag = mag:8:3
       cam = meanam:8:3
-      cac = actmag2:8:3
+      cac = actmag2:9:3
       cut = meanut:10:4
       nc = len(diffim)
       if nc < 24
@@ -1168,7 +1171,7 @@ proc drb_stred var1 var2 var3 var4 var5
     end if
     ast = "FILENAME                      UT      FILTER   AP1  "
     bst = "AP2   AP3    PSCAL    ZP      AIRM  ACT.MAG    OBJ-SKY  "
-    cst = "I3.MAG CAL.ZP CAL.ZPX"
+    cst = "  I3.MAG  CAL.ZP CAL.ZPX"
     dline = ast&bst&cst
     write afile (dline)
   end if
@@ -1184,8 +1187,8 @@ proc drb_stred var1 var2 var3 var4 var5
     calzp = -99.99
     calzpx = -99.99
   end if
-  ccalzp = calzp:7:3
-  ccalzpx = calzpx:7:3
+  ccalzp = calzp:8:3
+  ccalzpx = calzpx:8:3
   disp_ap1 = real(aper1)
   disp_ap2 = real(aper2)
   disp_ap3 = real(aper3)
@@ -1194,10 +1197,10 @@ proc drb_stred var1 var2 var3 var4 var5
   cd2 = disp_ap2:6:2
   cd3 = disp_ap3:6:2
   carc = scale:8:3
-  cobjval = objval:12:5
+  cobjval = objval:13:5
   cmag = mag:8:3
   cam = meanam:8:3
-  cac = actmag2:8:3
+  cac = actmag2:9:3
   meanut = -99.99
   cut = meanut:10:4
   nc = len(diffim)

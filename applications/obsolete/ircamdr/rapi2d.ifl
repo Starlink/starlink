@@ -1,0 +1,4218 @@
+
+# Rapi2d - Monolith Interface File for IRCAM data reduction (ASPIC KERNEL)
+
+monolith RAPI2D
+
+## ADD - add image+image into new output image
+
+interface ADD
+
+   program 'ADD'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'First input image'
+      help        'Name of data structure containing the first input image'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Second input image'
+      help        'Name of image to be added pixel by pixel to first image'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from addition'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Add'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## APERADD - bins up pixels in a circular aperture and gives statistics
+
+interface APERADD
+
+   program 'APERADD'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be binned'
+      help     'Name of data structure containing the image to be examined'
+   endparameter
+
+   parameter   XCEN
+      position 2
+      keyword  'XCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'x coord of circle centre'
+      help     'Give the x coord of the centre of the circle to be binned up'
+   endparameter
+
+   parameter   YCEN
+      position 3
+      keyword  'YCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'y coord of circle centre'
+      help     'Give the y coord of the centre of the circle to be binned up'
+   endparameter
+
+   parameter   DIAM
+      position 4 
+      keyword  'DIAM'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Diameter of circle (arcsec)'
+      help     'Give diameter (in arcseconds) of the circle to be binned'
+      default  10.0
+   endparameter
+
+   parameter   SCALE
+      position 5
+      keyword  'SCALE'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Pixel scale (arcsec/pixel)'
+      help     'Give the size of the image pixels in arcseconds on the sky'
+      default  1.2
+   endparameter
+
+   parameter   AGAIN
+      position 6
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Another aperture in same image (Y/N) ? '
+      help     'Option to select another paerture in same input image'
+      default  N
+   endparameter
+
+   parameter   QUIET
+      position 7
+      keyword  'QUIET'
+      type     '_LOGICAL'
+      vpath    'DEFAULT'
+      default  N
+   endparameter
+
+   parameter   NUMPIX
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERADD_NUMPIX'
+   endparameter
+
+   parameter   TOTAL
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERADD_TOTAL'
+   endparameter
+
+   parameter   MEAN
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERADD_MEAN'
+   endparameter
+
+   parameter   OLDNOISE
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERADD_OLDNOISE'
+   endparameter
+
+   parameter   NEWNOISE
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERADD_NEWNOISE'
+   endparameter
+
+endinterface
+
+## BLOCK - perform a block smooth on a 2-D image
+
+interface BLOCK
+
+   program 'BLOCK'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be smoothed'
+      help        'Name of data structure containing the image to be smoothed'
+   endparameter
+
+   parameter   BOXSIZ
+      position 2
+      keyword  'BOXSIZ'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Size of smoothing box in pixels'
+      help     'Must be odd number of pixels in the range 3 to 15'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after smoothing'
+      help        'Name given to data structure to hold the smoothed image'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Block'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   message ERR_BLOCK
+      text '%BOXSIZ = ^BOXSIZ not allowed, must be an odd number'
+   endmessage
+
+endinterface
+
+## CADD - add image+scalar into new output image
+
+interface CADD
+
+   program 'CADD'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      SCALAR
+      position    2
+      keyword     'SCALAR'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Scalar'
+      help        'Scalar to be added to input image pixel by pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from addition'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Cadd'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## CDIV - divide image/scalar into new output image
+
+interface CDIV
+
+   program 'CDIV'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      SCALAR
+      position    2
+      keyword     'SCALAR'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Scalar'
+      help        'Scalar that input image is to be divided by'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from division'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Cdiv'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## CENTROID - locates star centres by centroiding technique
+
+interface CENTROID
+
+   program 'CENTROID'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be analysed'      
+      help     'Give name of structure holding image to be analysed'
+   endparameter
+
+   parameter   XINIT
+      position 2
+      keyword  'XINIT'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Guess at x coord of star'
+      help     'Give x guess coordinate of star to be located'
+   endparameter
+      
+   parameter   YINIT
+      position 3
+      keyword  'YINIT'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Guess at y coord of star'
+      help     'Give y guess coordinate of star to be located'
+   endparameter
+      
+   parameter   ANOTHER
+      position 4
+      keyword  'ANOTHER'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      default  NO
+      prompt   'Another star ?'
+      help     'Whether or not another star is to be located'
+   endparameter
+
+   parameter   SEARCH
+      position 5
+      keyword  'SEARCH'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  9
+      prompt   'Size of search box'
+      help     'Give size of search box to be used in locating star centroid'
+   endparameter
+
+   parameter   MAXITER
+      position 6
+      keyword  'MAXITER'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      default  9
+      prompt   'Maximum number of iterations'
+      help     'Give maximum number of iterations to be used in finding star centroid'
+   endparameter 
+
+   parameter   POSITIVE
+      position 7
+      keyword  'POSITIVE'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      default  YES
+      prompt   'Image features positive'
+      help     'True if the features in the image are positive w.r.t the background'
+   endparameter 
+
+   parameter   MAXSHIFT
+      position 8
+      keyword  'MAXSHIFT'
+      type     '_REAL'
+      vpath    'PROMPT'
+      default  5.0
+      prompt   'Maximum shift between guess and output'
+      help     'Give the max allowable shift in pixels between the guess and output positions'
+   endparameter 
+
+   parameter   TOLER
+      position 9
+      keyword  'TOLER'
+      type     '_REAL'
+      vpath    'PROMPT'
+      default  0.05
+      prompt   'Accuracy required'
+      help     'Give the required position accuracy to terminate iteration'
+   endparameter 
+
+   parameter   XFINAL
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.CENTROID_XFINAL'
+   endparameter
+
+   parameter   YFINAL
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.CENTROID_YFINAL'
+   endparameter
+
+endinterface
+
+## CHPIX - replace 'bad' pixels with specified values
+
+interface CHPIX
+
+   program 'CHPIX'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be deglitched'
+      help        'Name of data structure containing the image to be deglitched'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being deglitched'
+      help        'Name given to data structure to hold image after being deglitched'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Chpix'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XCOORD
+      position 4
+      keyword  'XCOORD'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x coord of pixel to be replaced'
+      help     'Give x coordinate of pixel to be deglitched'
+   endparameter
+      
+   parameter   YCOORD
+      position 5
+      keyword  'YCOORD'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y coord of pixel to be replaced'
+      help     'Give y coordinate of pixel to be deglitched'
+   endparameter
+
+   parameter   NEWVAL
+      position 6
+      keyword  'NEWVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'New value for pixel'
+      default  0.0
+      help     'This will become the new value for the specified pixel'
+   endparameter
+
+   parameter   AGAIN
+      position 7
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Another pixel ?'
+      default  YES
+      help     'Whether or not another pixel is to be deglitched'
+   endparameter
+
+endinterface
+
+## CMULT - multiply image*scalar into new output image
+
+interface CMULT
+
+   program 'CMULT'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      SCALAR
+      position    2
+      keyword     'SCALAR'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Scalar'
+      help        'Scalar that input image is to be multiplied by'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from multiplication'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Cmult'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## COMPADD - compresses image by adding together a specified number of pixels
+
+interface COMPADD
+
+   program 'COMPADD'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be compressed'
+      help        'Name of data structure containing the image to be compressed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being compressed'
+      help        'Name given to data structure to hold image after being compressed'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Compadd'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   COMPRESS
+      position 4
+      keyword  'COMPRESS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Compression factor in x and y'
+      help     'The compression factor to be applied to both x and y dimensions'
+   endparameter
+
+endinterface
+
+## COMPAVE - compresses image by averaging over specified number of pixels
+
+interface COMPAVE
+
+   program 'COMPAVE'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be compressed'
+      help        'Name of data structure containing the image to be compressed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being compressed'
+      help        'Name given to data structure to hold image after being compressed'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Compave'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   COMPRESS
+      position 4
+      keyword  'COMPRESS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Compression factor in x and y'
+      help     'The compression factor to be applied to both x and y dimensions'
+   endparameter
+
+endinterface
+
+## COMPICK - compresses image by selecting pixels from the input image
+
+interface COMPICK
+
+   program 'COMPICK'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be compressed'
+      help        'Name of data structure containing the image to be compressed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being compressed'
+      help        'Name given to data structure to hold image after being compressed'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Compick'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   COMPRESS
+      position 4
+      keyword  'COMPRESS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Compression interval in x and y'
+      help     'The spacing between selected pixels in the x and y dimensions'
+   endparameter
+
+endinterface
+
+## COMPRESS - compresses image by different amounts in x and y dimensions
+
+interface COMPRESS
+
+   program 'COMPRESS'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be compressed'
+      help        'Name of data structure containing the image to be compressed'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being compressed'
+      help        'Name given to data structure to hold image after being compressed'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Compress'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XCMPRS
+      position 4
+      keyword  'XCMPRS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Compression factor in x'
+      help     'The compression factor to be applied to the x dimension'
+   endparameter
+
+   parameter   YCMPRS
+      position 5
+      keyword  'YCMPRS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Compression factor in y'
+      help     'The compression factor to be applied to the y dimension'
+   endparameter
+
+endinterface
+
+## CREFRAME - allows user to generate specific forms of test data
+
+interface CREFRAME
+
+   program 'CREFRAME'
+
+   parameter   XDIM
+      position 1
+      keyword  'XDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x dimension of output array'
+      help     'Give x dimension of array to contain generated image'
+   endparameter
+      
+   parameter   YDIM
+      position 2
+      keyword  'YDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y dimension of output array'
+      help     'Give y dimension of array to contain generated image'
+   endparameter
+
+   parameter   TYPED
+      position 3
+      keyword  'TYPED'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Type of data to be generated'
+      help     'Current allowable types : GS,RR,RL,RP,RA,FL,BL - see MJM for help'
+   endparameter
+
+   parameter   LOW
+      keyword  'LOW'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Lower limit for data'
+      help     'Give lower intensity limit for generated data'
+   endparameter
+
+   parameter   HIGH
+      keyword  'HIGH'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Upper limit for data'
+      help     'Give upper intensity limit for generated data'
+   endparameter
+
+   parameter   MEAN
+      keyword  'MEAN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Mean intensity'
+      help     'Give mean intensity figure for generated data'
+   endparameter
+
+   parameter   DIRN
+      keyword  'DIRN'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Direction of ramping (1,2,3,4)'
+      help     '1 = L-R : 2 = R-L : 3 = B-T : 4 = T-B'
+   endparameter
+
+   parameter   MAX
+      keyword  'MAX'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Maximum peak intensity for stars'
+      help     'Give value to be used as upper limit to star peak values'
+   endparameter
+
+   parameter   MIN
+      keyword  'MIN'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Minimum peak intensity for stars'
+      help     'Give value to be used as lower limit to star peak values'
+   endparameter
+
+   parameter   SKY
+      keyword  'SKY'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Sky background value'
+      help     'Give value to be taken for the sky background in the image'
+   endparameter
+
+   parameter   NSTARS
+      keyword  'NSTARS'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Number of stars'
+      help     'Give number of stars to be generated by program'
+   endparameter
+
+   parameter   SCALE
+      keyword  'SCALE'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Pixel scalesize (")'
+      help     'Give pixel scalesize in arcseconds on the sky'
+   endparameter
+
+   parameter   SEEING
+      keyword  'SEEING'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Seeing (")'
+      help     'Give seeing in arcseconds'
+   endparameter
+
+   parameter   DISTRIB
+      keyword  'DISTRIB'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Type of radial distribution (RSQ,FIX)'
+      help     'Give radial distribution type - 1/r-squared or fixed'
+   endparameter
+
+   parameter   BADPIX
+      keyword  'BADPIX'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixels to be included ?'
+      help     'Whether or not bad pixels are to be included in the image'
+      default  N
+   endparameter
+
+   parameter   FRACTION
+      keyword  'FRACTION'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Fraction of bad pixels'
+      help     'Give fraction of pixels in image to be set to zero'
+   endparameter
+
+   parameter   BADCOL
+      keyword  'BADCOL'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad column to be included ?'
+      help     'Whether or not a bad column is to be placed in the image'
+      default  N
+   endparameter
+
+   parameter   DISPLAY
+      keyword  'DISPLAY'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Stellar parameters to be output ?'
+      default  NO
+      help     'If yes, the stellar parameters will be output to screen or file'
+   endparameter
+
+   parameter   SCREEN
+      keyword  'SCREEN'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Parameters to screen ?'
+      default  YES
+      help     'If yes, the parameters will be printed on the screen. Otherwise in a file'
+   endparameter
+
+   parameter   FILENAME
+      keyword  'FILENAME'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Filename for output'
+      default  'creframe.stars'
+      help     'Name of file to be used for stellar parameter output'
+   endparameter
+
+   parameter   NSPHERES
+      keyword  'NSPHERES'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Number of spheres'
+      help     'Give the number of spheres to be generated'
+   endparameter
+
+   parameter   MAXDIAM
+      keyword  'MAXDIAM'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Maximum diameter sphere'
+      help     'Give the maximum diameter of sphere to be generated'
+   endparameter   
+
+   parameter      OUTPIC
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image for output data'
+      help        'Name given to data structure to hold generated image'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Creframe'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## CSUB - subtract image-scalar into new output image
+
+interface CSUB
+
+   program 'CSUB'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      SCALAR
+      position    2
+      keyword     'SCALAR'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Scalar'
+      help        'Scalar to be subtracted from input image pixel by pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from subtraction'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Csub'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## DIV - divide image/image into new output image
+
+interface DIV
+
+   program 'DIV2D'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'First input image'
+      help        'Name of data structure containing the first input image'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Second input image'
+      help        'Name of image to be divided pixel by pixel into first image'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure to image resulting from division'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Div'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## EXPE - take exponential of of image into new output image (base e)
+
+interface EXPE
+
+   program 'EXPON'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      BASE
+      position    2
+      keyword     'BASE'
+      type        '_REAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Base'
+      default     2.718282
+      help        'Base of exponential to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from exponentiation'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Expe'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## EXP10 - take exponential of of image into new output image (base 10)
+
+interface EXP10
+
+   program 'EXPON'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      BASE
+      position    2
+      keyword     'BASE'
+      type        '_REAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Base'
+      default     10.0
+      help        'Base of exponential to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from exponentiation'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Exp10'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## EXPON - take exponential of of image into new output image (specified base)
+
+interface EXPON
+
+   program 'EXPON'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+                      
+   parameter      BASE
+      position    2
+      keyword     'BASE'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT,DEFAULT'
+      prompt      'Base'
+      default     2.718282
+      help        'Base of exponential to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from exponentiation'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Expon'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## FLIP - reverse a 2-D image about either the horizontal or vertical axis
+
+interface FLIP
+
+   program 'FLIP'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be flipped'
+      help        'Name of data structure containing image to be flipped'
+   endparameter
+
+   parameter   FTYPE
+      position 2
+      keyword  'FTYPE'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Type of flip (horizontal=H, vertical=V'
+      default  'H'
+      help     'H = left to right reversal, V = top to bottom reversal'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being flipped'
+      help        'Name of data structure to hold flipped image'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Flip'
+      help     'Character string used as a title for the flipped image'
+   endparameter
+
+   message ERR_FLIP
+      text '%FTYPE = ^FTYPE not recognised , enter Horizontal or Vertical'
+   endmessage
+
+endinterface
+
+## GAUSS - perform a Gaussian smooth on a 2-D image
+
+interface GAUSS
+
+   program 'GAUSS'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be smoothed'
+      help        'Name of data structure containing the image to be smoothed'
+   endparameter
+
+   parameter   SIGMA
+      position 2
+      keyword  'SIGMA'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Sigma of Gaussian'
+      help     'Sigma of Gaussian must be in the range 0.1 to 5.0 pixels'
+   endparameter
+
+   parameter   BOXSIZE
+      position 3
+      keyword  'BOXSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Box size over which Gaussian is to act'
+      help     'Give an odd integer which is the box size for over which the smooth acts'
+   endparameter
+
+   parameter      OUTPIC
+      position    4
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after smoothing'
+      help        'Name of data structure to hold image after smoothing'
+   endparameter
+
+   parameter   OTITLE
+      position 5
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Gauss'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## GLITCH - replace 'bad' pixels with local median
+
+interface GLITCH
+
+   program 'GLITCH'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be deglitched'
+      help        'Name of data structure containing the image to be deglitched'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being deglitched'
+      help        'Name given to data structure to hold image after being deglitched'
+   endparameter
+
+   parameter   OTITLE
+      position    3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Rapi2d - Glitch'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   WHERE
+      position 4
+      keyword  'WHERE'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Source of glitch positions'
+      help     'F = free-format file list, T = terminal, A = auto search'
+   endparameter
+
+   parameter   FILENAME
+      position 5
+      keyword  'FILENAME'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Glitch list file name'
+      default  'GLITCH.LIST'
+      help     'Give the name of the free-format file containing x,y positions'
+   endparameter
+
+   parameter   XCOORD
+      keyword  'XCOORD'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x coord of pixel to be replaced'
+      help     'Give x coordinate of pixel to be deglitched'
+   endparameter
+      
+   parameter   YCOORD
+      keyword  'YCOORD'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y coord of pixel to be replaced'
+      help     'Give y coordinate of pixel to be deglitched'
+   endparameter
+
+   parameter   AGAIN
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Another pixel ?'
+      default   YES
+      help     'Whether or not another pixel is to be deglitched'
+   endparameter
+
+   parameter    BADVAL
+      position 6
+      keyword   'BADVAL'
+      type      '_REAL'
+      vpath     'PROMPT,DEFAULT'
+      prompt    'Value to be searched for'
+      default   -1.0E-20
+      help      'Give value that is defined as bad and is to be auto-deglitched'
+   endparameter
+
+endinterface
+
+## HISTEQ - performs histogram equalisation on an image
+
+interface HISTEQ
+
+   program 'HISTEQ'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be transformed'
+      help        'Name of data structure containing the image to be equalised'
+   endparameter
+
+   parameter   XSTART
+      position 2
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x start coord of sub-array'
+      help     'Give x coordinate of start of sub-array to be transformed'
+   endparameter
+      
+   parameter   YSTART
+      position 3
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y start coord of sub-array'
+      help     'Give y coordinate of start of sub-array to be transformed'
+   endparameter
+      
+   parameter   XFINISH
+      position 4
+      keyword  'XFINISH'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x end coord of sub-array'
+      help     'Give x coordinate of end of sub-array to be transformed'
+   endparameter
+      
+   parameter   YFINISH
+      position 5
+      keyword  'YFINISH'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y end coord of sub-array'
+      help     'Give y coordinate of end of sub-array to be transformed'
+   endparameter
+      
+   parameter   NUMBIN
+      position 6
+      keyword  'NUMBIN'
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      default  2048
+      prompt   'Number of bins'
+      help     'Give number of histogram bins to be used by algorithm'
+   endparameter
+
+   parameter      OUTPIC
+      position    7
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after transformation'
+      help        'Name given to data structure to hold image after being equalised'
+   endparameter
+
+   parameter   OTITLE
+      position 8
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Histeq'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## HISTO - calculates histogram stats of an image sub-array 
+
+interface HISTO
+
+   program 'HISTO'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be histogrammed'
+      help        'Name of data structure containing the image to be histogrammed'
+   endparameter
+
+   parameter   XSTART
+      position 2
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'x start coord of sub-array'
+      help     'Give x start coord of image sub-array to be histogrammed'
+   endparameter
+      
+   parameter   YSTART
+      position 3
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'y start coord of sub-array'
+      help     'Give y start coord of image sub-array to be histogrammed'
+   endparameter
+      
+   parameter   XSIZE
+      position 4
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'x size of sub-array'
+      help     'Give x size of image sub-array to be histogrammed'
+   endparameter
+      
+   parameter   YSIZE
+      position 5
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'y size of sub-array'
+      help     'Give y size of image sub-array to be histogrammed'
+   endparameter
+      
+   parameter   NUMBIN
+      position 6
+      keyword  'NUMBIN'
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      default  2048
+      prompt   'Number of bins'
+      help     'Number of histogram bins to be used in calculation'
+   endparameter
+
+   parameter   HISTO_NUMPIX
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_NUMPIX'
+   endparameter
+
+   parameter   HISTO_MAX
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_MAX'
+   endparameter
+
+   parameter   HISTO_XMAX
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_XMAX'
+   endparameter
+
+   parameter   HISTO_YMAX
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_YMAX'
+   endparameter
+
+   parameter   HISTO_MIN
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_MIN'
+   endparameter
+
+   parameter   HISTO_XMIN
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_XMIN'
+   endparameter
+
+   parameter   HISTO_YMIN
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_YMIN'
+   endparameter
+
+   parameter   HISTO_SUM
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_SUM'
+   endparameter
+
+   parameter   HISTO_MEAN
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_MEAN'
+   endparameter
+
+   parameter   HISTO_MEDIAN
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_MEDIAN'
+   endparameter
+
+   parameter   HISTO_MODE
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.HISTO_MODE'
+   endparameter
+
+endinterface
+
+## LAPLACE - perform a Laplacian convolution as an edge detector
+
+interface LAPLACE
+
+   program 'LAPLACE'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be convolved'
+      help     'Give name of image to have Laplacian convolution performed on'
+   endparameter
+
+   parameter   NUMBER
+      position 2
+      keyword  'NUMBER'
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      default  1
+      prompt   'Number of Laplacians removed'
+      help     'Give the integer number of Laplacians to be removed from input'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after convolution'
+      help        'Name given to data structure to hold the convolved image'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Laplace'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+endinterface
+
+## LOG10 - take logarithm of image into new output image (base 10)
+
+interface LOG10
+
+   program 'LOGAR'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      BASE
+      position    2
+      keyword     'BASE'
+      type        '_REAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Base'
+      default     10.0
+      help        'Base of logarithm to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from taking logs
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Log10'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## LOGAR - take logarithm of image into new output image (specified base)
+
+interface LOGAR
+
+   program 'LOGAR'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      BASE
+      position    2
+      keyword     'BASE'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT,DEFAULT'
+      prompt      'Base'
+      default     2.718282
+      help        'Base of logarithm to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from taking logs
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Logar'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## LOGE - take logarithm of image into new output image (base e)
+
+interface LOGE
+
+   program 'LOGAR'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      BASE
+      position    2
+      keyword     'BASE'
+      type        '_REAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Base'
+      default     2.718282
+      help        'Base of logarithm to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from taking logs
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Loge'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## LOOK - allows inspection of image values to screen or listing file
+
+interface LOOK
+
+   program 'LOOK'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be inspected'
+      help     'Give name of structure holding image to be inspected'
+   endparameter
+
+   parameter   CHOICE
+      position 2
+      keyword  'CHOICE'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      default  'PEEP'
+      prompt   'Peep, Examine or List'
+      help     'P for 7x7 peep to screen, E for NxM box to screen, L for listing to file'
+   endparameter
+
+   parameter   XCEN
+      keyword  'XCEN'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'x centre coord of 7x7 box'
+      help     'Give x centre coordinate of sub-array to be peeped at'
+   endparameter
+      
+   parameter   YCEN
+      keyword  'YCEN'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      access   'READ'
+      prompt   'y centre coord of 7x7 box'
+      help     'Give y centre coordinate of sub-array to be peeped at'
+   endparameter
+      
+   parameter   XLOW
+      keyword  'XLOW'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      access   'READ'
+      prompt   'x start coord of sub-array'
+      help     'Give x start coordinate of sub-array to be inspected'
+   endparameter
+      
+   parameter   YLOW
+      keyword  'YLOW'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      access   'READ'
+      prompt   'y start coord of sub-array'
+      help     'Give y start coordinate of sub-array to be inspected'
+   endparameter
+      
+   parameter   XSIZE
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      access   'READ'
+      prompt   'x size of sub-array'
+      help     'Give x size of sub-array to be inspected'
+   endparameter
+      
+   parameter   YSIZE
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'y size of sub-array'
+      help     'Give y size of sub-array to be inspected'
+   endparameter
+   
+   parameter   FILENAME
+      keyword  'FILENAME'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      default  'LOOKOUT.LIS'
+      prompt   'Name of listing file'
+      help     'Give name of file to contain sub-array listing'
+   endparameter
+
+   parameter   ANOTHER
+      keyword  'ANOTHER'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      default  N
+      prompt   'Another inspection ?'
+      help     'Answer YES if another sub-array is to be peeped or listed'
+   endparameter
+   
+endinterface
+
+## MANIC - 1,2 or 3-D image to 1,2 or 3-D image reshaping program
+
+interface MANIC
+
+   program 'MANIC'
+
+   parameter   INPUT
+      position 1
+      keyword  'INPUT'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Give input image'
+      help     'Name of data structure containing input image'
+   endparameter
+
+   parameter   OUTPUT
+      position 2
+      keyword  'OUTPUT'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Give output image'
+      help     'Name of data structure to store output image'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Output image title'
+      default  'Rapi2d - Manic'
+      help     'Character string used as a title for the output image'
+   endparameter
+
+   parameter   ONDIM
+      position 4
+      keyword  'ONDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Dimensionality of output image. must be 1, 2 or 3'
+      help     'Number of dimensions for the output image, 1, 2 or 3'
+   endparameter
+
+   parameter   XLIMITS
+      position 5
+      keyword  'XLIMITS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Window limits for X-axis of input image'
+   endparameter
+
+   parameter   YLIMITS
+      position 6
+      keyword  'YLIMITS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Window limits for Y-axis of input image'
+   endparameter
+
+   parameter   ZLIMITS
+      position 7
+      keyword  'ZLIMITS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Window limits for Z-axis of input image'
+   endparameter
+
+   parameter   XRANGE
+      position 8
+      keyword  'XRANGE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give range for summation over X-axis of input image'
+   endparameter
+
+   parameter   YRANGE
+      position 9
+      keyword  'YRANGE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give range for summation over the Y-axis of input image'
+   endparameter
+
+   parameter   ZRANGE
+      position 10
+      keyword  'ZRANGE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give range for summation over the Z-axis of input image'
+   endparameter
+
+   parameter   EPLANE
+      position 11
+      keyword  'EPLANE'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Extract output image from which plane of input image XY, YZ, or XZ'
+   endparameter
+
+   parameter   GPLANE
+      position 12
+      keyword  'GPLANE'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Give plane of output image which input image will form XY, YZ or XZ'
+   endparameter
+
+   parameter   ELINE1
+      position 13
+      keyword  'ELINE1'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Which axis of input image will form output image, X or Y'
+   endparameter
+
+   parameter   ELINE2
+      position 14
+      keyword  'ELINE2'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Which axis of input image will be used to form output image X,Y or Z'
+   endparameter
+
+   parameter   GLINE1
+      position 15
+      keyword  'GLINE1'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Which axis of output image will input image form, X or Y'
+   endparameter
+
+   parameter   GLINE2
+      position 16
+      keyword  'GLINE2'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Which axis of output image will input image form X,Y or Z'
+   endparameter
+
+   parameter   XDIM
+      position 17
+      keyword  'XDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give the X-dimension for the output image'
+   endparameter
+
+   parameter   YDIM
+      position 18
+      keyword  'YDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give the Y-dimension for the output image'
+   endparameter
+
+   parameter   ZDIM
+      position 19
+      keyword  'ZDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Give the Z-dimension for the output image'
+   endparameter
+
+   parameter   LOOP
+      position 20
+      keyword  'LOOP'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      default  N
+      prompt   'Produce another output image ? Y/N'
+   endparameter
+
+endinterface
+
+## MEDIAN - perform weighted median filtering on a 2-D image
+
+interface MEDIAN
+
+    program 'MEDIAN'
+
+      parameter      INPIC
+         position    1
+         keyword     'INPIC'
+         type        'IMAGE'
+         access      'READ'
+         vpath       'PROMPT'
+         prompt      'Image for filtering with WMF'
+         help        'Name of data structure containing data to be filtered'
+      endparameter
+
+      parameter      OUTPIC
+         position    2
+         keyword     'OUTPIC'
+         type        'IMAGE'
+         access      'WRITE'
+         vpath       'PROMPT'
+         prompt      'Image to hold filtered data'
+         help        'Name of data structure to store the filtered data'
+      endparameter
+
+      parameter   OTITLE
+         position 3
+         keyword  'OTITLE'
+         type     '_CHAR'
+         access   'READ'
+         vpath    'DEFAULT'
+         prompt   'Image title'
+         default  'Rapi2d - Median'
+         help     'Character string used as a title for the data structure'
+      endparameter
+
+      parameter   MODE
+         position 4
+         keyword  'MODE'
+         type     '_INTEGER'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Type of WMF to use, reply -1 -> 7 '
+         help     'Value determines type of filter, -1 = user defined'
+      endparameter
+
+      parameter   CORNER
+         position 5
+         keyword  'CORNER'
+         type     '_INTEGER'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Corner value for weighting function'
+         help     'Integer in range 0 to 10'
+      endparameter
+
+      parameter   SIDE
+         position 6
+         keyword  'SIDE'
+         type     '_INTEGER'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Side value for weighting function'
+         help     'Integer in range 0 to 10'
+      endparameter
+
+      parameter   CENTRE
+         position 7
+         keyword  'CENTRE'
+         type     '_INTEGER'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Centre value for weighting function'
+         help     'Must be an odd integer in range 1 to 21'
+      endparameter
+
+      parameter   STEP
+         position 8
+         keyword  'STEP'
+         type     '_INTEGER'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Stepsize for weighting function'
+         help     'Determines the spacing of the filter elements'
+      endparameter
+
+      parameter   DIFF
+         position 9
+         keyword  'DIFF'
+         type     '_REAL'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Threshold for replacement by median'
+         help     'If ABS(value - replacement) > threshold replacement occurs'
+      endparameter
+
+      parameter   BOUND
+         position 10
+         keyword  'BOUND'
+         type     '_CHAR'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'REFlect or REPlicate at image edge'
+         help     'Determines how data at the image edge is handled'
+      endparameter
+
+      parameter   NUMIT
+         position 11
+         keyword  'NUMIT'
+         type     '_INTEGER'
+         access   'READ'
+         vpath    'PROMPT'
+         prompt   'Number of iterations of the filter'
+         help     'The number of passes of the filter through the data'
+      endparameter
+
+endinterface
+
+## MOFF - works out best x,y and d.c. sky offsets for mosaic image pairs
+
+interface MOFF 
+
+   program 'MOFF'
+
+   parameter   INPIC1
+      position 1
+      keyword  'INPIC1'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'First image'
+      help     'Give name of structure holding first image of mosaic pair'
+   endparameter
+
+   parameter   INPIC2
+      position 2
+      keyword  'INPIC2'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Second image'
+      help     'Give name of structure holding second image of mosaic pair'
+   endparameter
+
+   parameter   NXOFF
+      position 3
+      keyword  'NXOFF'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'Nominal x offset'
+      help     'Give guess at x offset from first to second image'
+   endparameter
+      
+   parameter   NYOFF
+      position 4
+      keyword  'NYOFF'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'Nominal y offset'
+      help     'Give guess at y offset from first to second image'
+   endparameter
+      
+   parameter   BOXSIZE
+      position 5
+      keyword  'BOXSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'Size of box to be searched'
+      help     'Give size of box around nominal offsets to be searched for best fit (odd number)'
+   endparameter
+      
+   parameter   USEBAD
+      position 6
+      keyword  'USEBAD'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixel handling ?'
+      default  YES
+      help     'Yes if a bad mask is to be used to locate fixed bad pixels'
+   endparameter
+
+   parameter   BADMASK
+      position 7
+      keyword  'BADMASK'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad mask'
+      help     'Give name of structure holding bad mask to be used'
+   endparameter
+
+   parameter   DCOFF
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.MOFF_DCOFF'
+   endparameter
+
+   parameter   XOFF
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.MOFF_XOFF'
+   endparameter
+
+   parameter   YOFF
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.MOFF_YOFF'
+   endparameter
+
+endinterface
+
+## MOSAIC - merges several non-congruent images into one big image
+
+interface MOSAIC
+
+   program 'MOSAIC'
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      position    1
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Number of images to be mosaiced'
+      help        'Give total number of images to be mosaiced (max. 50)'
+   endparameter
+
+   parameter      INPIC1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Initial image'
+      help        'Name of data structure containing the first image to be added'
+   endparameter
+
+   parameter      INPIC2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC3
+      keyword     'INPIC3'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC4
+      keyword     'INPIC4'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC5
+      keyword     'INPIC5'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC6
+      keyword     'INPIC6'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC7
+      keyword     'INPIC7'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC8
+      keyword     'INPIC8'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC9
+      keyword     'INPIC9'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC10
+      keyword     'INPIC10'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC11
+      keyword     'INPIC11'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC12
+      keyword     'INPIC12'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC13
+      keyword     'INPIC13'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC14
+      keyword     'INPIC14'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC15
+      keyword     'INPIC15'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC16
+      keyword     'INPIC16'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC17
+      keyword     'INPIC17'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC18
+      keyword     'INPIC18'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC19
+      keyword     'INPIC19'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC20
+      keyword     'INPIC20'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC21
+      keyword     'INPIC21'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC22
+      keyword     'INPIC22'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC23
+      keyword     'INPIC23'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC24
+      keyword     'INPIC24'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC25
+      keyword     'INPIC25'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC26
+      keyword     'INPIC26'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC27
+      keyword     'INPIC27'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC28
+      keyword     'INPIC28'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC29
+      keyword     'INPIC29'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC30
+      keyword     'INPIC30'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC31
+      keyword     'INPIC31'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC32
+      keyword     'INPIC32'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC33
+      keyword     'INPIC33'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC34
+      keyword     'INPIC34'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC35
+      keyword     'INPIC35'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC36
+      keyword     'INPIC36'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC37
+      keyword     'INPIC37'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC38
+      keyword     'INPIC38'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC39
+      keyword     'INPIC39'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC40
+      keyword     'INPIC40'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC41
+      keyword     'INPIC41'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC42
+      keyword     'INPIC42'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC43
+      keyword     'INPIC43'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC44
+      keyword     'INPIC44'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC45
+      keyword     'INPIC45'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC46
+      keyword     'INPIC46'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC47
+      keyword     'INPIC47'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC48
+      keyword     'INPIC48'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC49
+      keyword     'INPIC49'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter      INPIC50
+      keyword     'INPIC50'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be added'
+      help        'Name of data structure containing the next image to be added'
+   endparameter
+
+   parameter   XOFFSET
+      keyword  'XOFFSET'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x offset of image from first'
+      help     'Give x offset of current image from first image input'
+   endparameter
+      
+   parameter   YOFFSET
+      keyword  'YOFFSET'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y offset of image from first'
+      help     'Give y offset of current image from first image input'
+   endparameter
+
+   parameter   USEBAD
+      keyword  'USEBAD'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixel replacement wanted ?'
+      default  YES
+      help     'Yes if you want to use a bad pixel map for bad pixel replacement'
+   endparameter
+
+   parameter   OVERLAP
+      keyword  'OVERLAP'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Average overlap values ?'
+      default  YES
+      help     'Yes if you want to average rather than select first overlap'
+   endparameter
+
+   parameter   VORM
+      keyword  'VORM'
+      type     '_CHAR'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'By Value (V) or Mask (M) ?'
+      help     'V if bad pixels are defined in the data, M if by an auxiliary mask'
+   endparameter
+
+   parameter   BADVAL
+      keyword  'BADVAL'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad value'
+      default  -1.0E-20
+      help     'Value in input data taken to denote a bad pixel'
+   endparameter
+
+   parameter   BADPIC
+      keyword  'BADPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Bad pixel map'
+      help     'Give name of structure holding bad pixel image'
+   endparameter
+
+   parameter   OUTPIC
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      prompt   'Mosaiced image'
+      help     'Name given to data structure to hold mosaiced image'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title for output image'
+      default  'Rapi2d - Mosaic'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## MULT - multiply image*image into new output image
+
+interface MULT  
+
+   program 'MULT'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'First input image'
+      help        'Name of data structure containing the first input image'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Second input image'
+      help        'Name of image to be multiplied pixel by pixel by first image'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from multiplication'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Mult'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## NUMB - count how many pixels in a 2-D image with absolute values > value
+
+interface NUMB
+
+   program 'NUMB'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Give name of structure holding image to be tested'
+   endparameter
+
+   parameter   VALUE
+      position 2
+      keyword  'VALUE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Test value'
+      help     'Returned will be number of pixels with absolute value greater than this'
+   endparameter
+
+endinterface
+
+## OUTSETC - replaces pixels outside specified circle with specified value
+
+interface OUTSETC
+
+   program 'OUTSET'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be modified'
+      help        'Name of data structure containing the image to be modified'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being modified'
+      help        'Name given to data structure to hold image after being modified'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Outset'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XCENTRE
+      position 4
+      keyword  'XCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x coord of circle centre'
+      help     'Give x coordinate of centre of circle to be used'
+   endparameter
+      
+   parameter   YCENTRE
+      position 5
+      keyword  'YCENTRE'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y coord of circle centre'
+      help     'Give y coordinate of centre of circle to be used'
+   endparameter
+
+   parameter   DIAMETER
+      position 6
+      keyword  'DIAMETER'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Diameter of circle'
+      help     'Give diameter of circle to be used'
+   endparameter
+
+   parameter   NEWVAL
+      position 7
+      keyword  'NEWVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'New value for pixels outside circle'
+      default  0.0
+      help     'This will become the new value for all pixels outside the circle'
+   endparameter
+
+endinterface
+
+## PICKIM - creates a new image from a subset of another image
+
+interface PICKIM
+
+   program 'PICKIM'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Image from which subset is to be taken to create new image'
+   endparameter
+
+   parameter      XSTART
+      position    2
+      keyword     'XSTART'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'x start'
+      help        'Give first column to be included in the subset image'
+   endparameter
+      
+   parameter      YSTART
+      position    3
+      keyword     'YSTART'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'y start'
+      help        'Give first row to be included in the subset image'
+   endparameter
+      
+   parameter      XSIZE
+      position    4
+      keyword     'XSIZE'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'x size'
+      help        'Give x size of subset image'
+   endparameter
+      
+   parameter      YSIZE
+      position    5
+      keyword     'YSIZE'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'y size'
+      help        'Give y size of image'
+   endparameter
+      
+   parameter      OUTPIC
+      position    6
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name of structure image taken as subset of input image'
+   endparameter
+
+   parameter      OTITLE
+      position    7
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Rapi2d - Pickim'
+      help        'Character string used as a title for the output structure'
+   endparameter
+
+endinterface
+
+## PIXDUPE - expands an input image by pixel duplication
+
+interface PIXDUPE
+
+   program 'PIXDUPE'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be expanded'
+      help        'Name of data structure containing the image to be expanded'
+   endparameter
+
+   parameter      EXPAND
+      position    2
+      keyword     'EXPAND'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Integer expansion'
+      help        'The number of times each input pixel is duplicated in x and y'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being expanded'
+      help        'Name given to data structure to hold expanded image'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Pixdupe'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## POW - take the power of image into new output image (specified power)
+
+interface POW
+
+   program 'POW2D'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of data structure containing the input image'
+   endparameter
+
+   parameter      POWER
+      position    2
+      keyword     'POWER'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Power'
+      help        'Power to be taken of each input image pixel'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from taking power'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Pow'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## QUILT - sophisticated mosaic routine
+
+interface QUILT
+
+   program 'QUILT'
+
+   parameter      WHERE
+      position    1
+      keyword     'WHERE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input source - F(ile) or I(nterface)'
+      default     'F'
+      help        'Choose F(ile) or I(nterface) as the source of frames and offsets'
+   endparameter
+
+   parameter      FNAME
+      position    2
+      keyword     'FNAME'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Source file name'
+      default     'QUILT.LIS'
+      help        'Name of file holding mosaic information'
+   endparameter
+
+   parameter      NUMBER
+      keyword     'NUMBER'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Number of images'
+      help        'Give total number to be mosaiced, including central one'
+   endparameter
+
+   parameter      INPICI
+      keyword     'INPICI'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Central image'
+      help        'Name of data structure containing the central image'
+   endparameter
+
+   parameter      MAXX
+      keyword     'MAXX'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Maximum x offset'
+      help        'Give the maximum x offset of any frame (including central one)'
+   endparameter
+
+   parameter      MAXY
+      keyword     'MAXY'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Maximum y offset'
+      help        'Give the maximum y offset of any frame (including central one)'
+   endparameter
+
+   parameter      MINX
+      keyword     'MINX'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Minimum x offset'
+      help        'Give the minimum x offset of any frame (including central one)'
+   endparameter
+
+   parameter      MINY
+      keyword     'MINY'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Minimum y offset'
+      help        'Give the minimum y offset of any frame (including central one)'
+   endparameter
+
+   parameter   OVERLAP
+      position    4
+      keyword  'OVERLAP'
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Average overlap values ?'
+      default  YES
+      help     'Yes if you want to average rather than select first overlap'
+   endparameter
+
+   parameter      USEBAD
+      position    5
+      keyword     'USEBAD'
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Bad pixels to be handled ?'
+      default     YES
+      help        'True if bad pixels are to be dealt with'
+   endparameter
+
+   parameter      BADMETH
+      position    6
+      keyword     'BADMETH'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Method - V(alue) or M(ask)'
+      default     'M'
+      help        'Bad pixels to handled by a bad pixel value or a bad mask'
+   endparameter
+
+   parameter      BADVAL
+      position    7
+      keyword     'BADVAL'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Value to be used'
+      default     -1.0E-20
+      help        'Give a value that will be recognised as flagging a bad pixel'
+   endparameter
+
+   parameter      BADPIC
+      keyword     'BADPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Bad pixel mask'
+      help        'Give an image that shows where the bad pixels are in all images'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output mosaic image'
+      help        'Name given to data structure to hold mosaiced image'
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Rapi2d - Quilt'
+      help        'Character string used as a title for the output structure'
+   endparameter
+
+   parameter      CURPIC
+      keyword     'CURPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image'
+      help        'Give the name of the current image to be input'
+   endparameter
+
+   parameter      OFFSETX
+      keyword     'OFFSETX'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'x offset'
+      help        'Give x offset of current frame from the central one'
+   endparameter
+
+   parameter      OFFSETY
+      keyword     'OFFSETY'
+      type        '_INTEGER'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'y offset'
+      help        'Give y offset of current frame from the central one'
+   endparameter
+
+endinterface
+
+## ROTATE - rotate a 2-D image through any number of degrees
+
+interface ROTATE
+
+   program 'ROTATE'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be rotated'
+      help        'Name of data structure containing image to be rotated'
+   endparameter
+
+   parameter   ANGLE
+      position 2
+      keyword  'ANGLE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Number of degrees clockwise rotation'
+      help     'Give the number of degrees that the image is to be rotated clockwise'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image after rotation'
+      help        'Name of data structure to hold rotated image'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Rotate'
+      help     'Character string used as a title for the rotated image'
+   endparameter
+
+   parameter   SQRMAX
+      keyword  'SQRMAX'
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      default  160
+   endparameter
+
+   parameter      SCRATCH_NAME
+      keyword     'SCRATCH_NAME'
+      type        'IMAGE'
+      default     $ADAM_USER/rotate_scratch
+      access      'WRITE'
+      vpath       'DEFAULT'
+   endparameter
+
+endinterface
+
+## SHADOW - enhances an image by simulating side-lighting effect
+
+interface SHADOW
+
+   program 'SHADOW'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be enhanced'
+      help        'Name of data structure containing the image to be enhanced'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being enhanced'
+      help        'Name given to data structure to hold image after being enhanced'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Shadow'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   XSHIFT
+      position 4
+      keyword  'XSHIFT'
+      type     '_REAL'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'Shift in x coord'
+      help     'The number of pixels shift in the x direction to be used'
+   endparameter
+
+   parameter   YSHIFT
+      position 5
+      keyword  'YSHIFT'
+      type     '_REAL'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'Shift in y coord'
+      help     'The number of pixels shift in the y direction to be used'
+   endparameter
+
+endinterface
+
+## SHIFT - realign a 2-D image
+
+interface SHIFT
+
+   program 'SHIFT'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be shifted'
+      help        'Name of data structure containing the image to be shifted'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being shifted'
+      help        'Name given to data structure to hold image after being shifted'
+   endparameter
+
+   parameter   OTITLE
+      position 3
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Shift'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter   STYPE
+      position 4
+      keyword  'STYPE'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'R for shift rel. to fide, A for abs. shift'
+      help     'Shift relative to known fiducial point or absolute shift.'
+   endparameter
+
+   parameter   ABSX
+      position 5
+      keyword  'ABSX'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Absolute shift in x'
+      help     'Give absolute shift of frame in pixels in X direction'
+   endparameter
+      
+   parameter   ABSY
+      position 6
+      keyword  'ABSY'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Absolute shift in y'
+      help     'Give absolute shift of frame in pixels in Y direction'
+   endparameter
+
+   parameter   FIDX
+      position 7
+      keyword  'FIDX'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'x position of fiducial point'
+   endparameter
+
+   parameter   FIDY
+      position 8
+      keyword  'FIDY'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'y position of fiducial point'
+   endparameter
+
+   parameter   OBJX
+      position 9
+      keyword  'OBJX'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'x position of standard object'
+   endparameter
+
+   parameter   OBJY
+      position 10
+      keyword  'OBJY'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'y position of standard object'
+   endparameter
+
+endinterface
+
+## SHSIZE - output the dimensions of an image to the environment
+
+interface SHSIZE
+
+   program 'SHSIZE'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Give name of structure holding image to be measured'
+   endparameter
+
+   parameter      XDIM
+      type        '_integer'
+      vpath       'internal'
+      association '->GLOBAL.SHSIZE_XDIM'
+   endparameter
+
+   parameter      YDIM
+      type        '_integer'
+      vpath       'internal'
+      association '->GLOBAL.SHSIZE_YDIM'
+   endparameter
+
+endinterface
+
+## SQORST - change the dimensions of a 2-D image
+
+interface SQORST
+
+   program 'SQORST'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image'
+      help        'Name of the data structure containing data to be modified'
+   endparameter
+
+   parameter   XDIM
+      position 2
+      keyword  'XDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'First dimension of output image'
+   endparameter
+
+   parameter   YDIM
+      position 3
+      keyword  'YDIM'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Second dimension of output image'
+   endparameter
+
+   parameter      OUTPIC
+      position    4
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name of data structure to contain data after modification'
+   endparameter
+
+   parameter   OTITLE
+      position 5
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Sqorst'
+      help     'Character string to be used as a title for the output image'
+   endparameter
+
+   message IN_DIMS
+      text 'First dimension of input image = ^IXDIM, second dimension = ^IYDIM'
+   endmessage
+
+endinterface
+
+## STATS - works out image statistics
+
+interface STATS
+
+   program 'STATS'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Image to be analysed'      
+      help     'Give name of structure holding image to be analysed'
+   endparameter
+
+   parameter   XSTART
+      position 2
+      keyword  'XSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'x start coord of sub-array'
+      help     'Give x start coordinate of sub-array to be analysed'
+   endparameter
+      
+   parameter   YSTART
+      position 3
+      keyword  'YSTART'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'y start coord of sub-array'
+      help     'Give y start coordinate of sub-array to be analysed'
+   endparameter
+      
+   parameter   XSIZE
+      position 4 
+      keyword  'XSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'x size of sub-array'
+      help     'Give x size of sub-array to be analysed'
+   endparameter
+   
+   parameter   YSIZE
+      position 5 
+      keyword  'YSIZE'
+      type     '_INTEGER'
+      vpath    'PROMPT,DYNAMIC'
+      prompt   'y size of sub-array'
+      help     'Give y size of sub-array to be analysed'
+   endparameter
+   
+   parameter   AGAIN
+      position 6
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      default  NO
+      prompt   'Another sub-array ?'
+      help     'Whether or not another sub-array is to be analysed'
+   endparameter
+
+   parameter   NUMPIX
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.STATS_NUMPIX'
+   endparameter
+
+   parameter   MEAN
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.STATS_MEAN'
+   endparameter
+
+   parameter   STD
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.STATS_STD'
+   endparameter
+
+   parameter   MEDIAN
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.STATS_MEDIAN'
+   endparameter
+
+   parameter   MODE
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.STATS_MODE'
+   endparameter
+
+endinterface
+
+## SUB - subtract image-image into new output image
+
+interface SUB
+
+   program 'SUB'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'First input image'
+      help        'Name of data structure containing the first input image'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Second input image'
+      help        'Name of image to be subtracted pixel by pixel from first image'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure holding image resulting from subtraction'
+   endparameter
+
+   parameter      OTITLE
+      position    4
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Sub'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## THRESH - set all values outside a given range to user value
+
+interface THRESH 
+
+   program 'THRESH'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image to be thresholded'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold thresholded data'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OTITLE
+      position    3
+      keyword     'OTITLE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Thresh'
+      help        'Character string used as a title for the data structure'
+   endparameter
+
+   parameter      THRLO
+      position    4
+      keyword     'THRLO'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Lower threshold cutoff'
+      help        'Values less than this will be set to next input value'
+   endparameter
+
+   parameter      NEWLO
+      position    5
+      keyword     'NEWLO'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'New value for pixels below low threshold'
+      help        'Give a value to which all pixels below lower threshold will be set'
+   endparameter
+
+   parameter      THRHI
+      position    6
+      keyword     'THRHI'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Higher threshold cutoff'
+      help        'Values greater than this will be set to next input value'
+   endparameter
+
+   parameter      NEWHI
+      position    7
+      keyword     'NEWHI'
+      type        '_REAL'
+      vpath       'PROMPT'
+      prompt      'New value for pixels above upper threshold'
+      help        'Give a value to which all pixels above upper threshold will be set'
+   endparameter
+
+endinterface
+
+## THRESH0 - for a 2-D image set all values outside a given range to zero
+
+interface THRESH0
+
+   program 'THRESH'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image to be thresholded'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold thresholded data'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OTITLE
+      position    3
+      keyword     'OTITLE'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Thresh0'
+      help        'Character string used as a title for the data structure'
+   endparameter
+
+   parameter      THRLO
+      position    4
+      keyword     'THRLO'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Lower threshold cutoff'
+      help        'Values less than this will be set to next input value'
+   endparameter
+
+   parameter      NEWLO
+      position    5
+      keyword     'NEWLO'
+      type        '_REAL'
+      vpath       'DEFAULT'
+      prompt      'New value for pixels below low threshold'
+      help        'Give a value to which all pixels below lower threshold will be set'
+      default     0.0
+   endparameter
+
+   parameter      THRHI
+      position    6
+      keyword     'THRHI'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Higher threshold cutoff'
+      help        'Values greater than this will be set to next input value'
+   endparameter
+
+   parameter      NEWHI
+      position    7
+      keyword     'NEWHI'
+      type        '_REAL'
+      vpath       'DEFAULT'
+      prompt      'New value for pixels above upper threshold'
+      help        'Give a value to which all pixels above upper threshold will be set'
+      default     0.0
+   endparameter
+
+endinterface
+
+## TRACE - trace through the contents of a data structure
+  
+interface TRACE
+   
+   program 'TRACE'
+#   builtin 'TRACE'
+   
+   parameter   OBJECT
+      keyword  'OBJECT'
+      position 1
+      type     'UNIV'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   'Object to be examined'
+      help     'Name of data object to be examined'
+   endparameter
+    
+   parameter   FULL
+      keyword  'FULL'
+      position 2
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'PROMPT'
+      default  N
+      prompt   'Full trace through arrays of structures ? Y/N'
+      help     'If Yes all contents of arrays of structures will be traced'
+   endparameter
+
+endinterface
+
+## TRANDAT - converts free-format x,y,i data into .SDF images
+
+interface TRANDAT
+
+   program 'TRANDAT'
+
+   parameter      FREENAME
+      position    1
+      keyword     'FREENAME'
+      type        '_CHAR'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Free-format data file'
+      help        'Name of free-format data file to be converted into an image'
+   endparameter
+            
+   parameter   XPOS
+      position 2
+      keyword  'XPOS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'x coord position'
+      help     'Give the position in each line to be taken as the x coord'
+   endparameter
+
+   parameter   YPOS
+      position 3
+      keyword  'YPOS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'y coord position'
+      help     'Give the position in each line to be taken as the y coord'
+   endparameter
+
+   parameter   INTENSPOS
+      position 4
+      keyword  'INTENSPOS'
+      type     '_INTEGER'
+      vpath    'PROMPT'
+      prompt   'Intensity value position'
+      help     'Give the position in each line to be taken as the intensity value'
+   endparameter
+
+   parameter   PSCALE
+      position 5
+      keyword  'PSCALE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Pixel-to-pixel distance'
+      help     'Give the value to be used as the distance between adjacent pixels'
+   endparameter
+
+   parameter      OUTPIC
+      position    6
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image'
+      help        'Name given to data structure to hold created image'
+   endparameter
+
+   parameter   OTITLE
+      position 7
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Trandat'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## TRIG - performs trigonometrical transformations on images
+
+interface TRIG
+
+   program 'TRIG'
+
+   parameter      INPUT
+      position    1
+      keyword     'INPUT'
+      type        'UNIV'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input to be operated on'
+      help        'Give the image or scalar on which the trig function is to operate'
+   endparameter
+
+   parameter   TRIGFUNC
+      position 2
+      keyword  'TRIGFUNC'
+      type     '_CHAR'
+      vpath    'PROMPT'
+      prompt   'Trig function to be used'
+      help     'One of SIN,COS,TAN,SIND,COSD,TAND,ASIN,ACOS,ATAN,ASIND,ACOSD,ATAND'
+   endparameter
+
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image for output data'
+      help        'Name given to data structure to hold generated image'
+   endparameter
+
+   parameter   OTITLE
+      position 4
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Title'
+      default  'Rapi2d - Trig'
+      help     'Character string used as a title for the output structure.'
+   endparameter
+
+endinterface
+
+## WELCOME_RAPI2D - welcome information for auto loading of task
+
+interface WELCOME_RAPI2D
+
+   parameter INFO
+      keyword  'INFO'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'RAPI2D A-tasks loaded'
+   endparameter
+
+endinterface
+
+## ZAPLIN - interpolates over bad rows or columns
+
+interface ZAPLIN
+
+   program 'ZAPLIN'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image to be modified'
+      help        'Name of data structure containing the image to be zapped'
+   endparameter
+
+   parameter      OUTPIC
+      position    2
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image after being modified'
+      help        'Name given to data structure to hold image after being zapped'
+   endparameter
+
+   parameter      OTITLE
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Rapi2d - Zaplin'
+      help        'Character string used as a title for the output structure.'
+   endparameter
+
+   parameter      ROWCOL
+      position    3
+      keyword     'ROWCOL'
+      type        '_CHAR'
+      vpath       'PROMPT,DEFAULT'
+      prompt      'Rows or columns (R/C) ?'
+      default     'R'
+      help        'Whether rows or columns are to be zapped - reply R or C'
+   endparameter
+
+   parameter      STARTROW
+      position    4
+      keyword     'STARTROW'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'First row to be modified'
+      help        'Give y coord of first row to be zapped'
+   endparameter
+      
+   parameter      FINISHROW
+      position    5
+      keyword     'FINISHROW'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Last row to be modified'
+      help        'Give y coord of last row to be zapped'
+   endparameter
+
+   parameter      STARTCOL
+      keyword     'STARTCOL'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'First column to be modified'
+      help        'Give x coord of first column to be zapped'
+   endparameter
+      
+   parameter      FINISHCOL
+      keyword     'FINISHCOL'
+      type        '_INTEGER'
+      vpath       'PROMPT'
+      prompt      'Last column to be modified'
+      help        'Give x coord of last column to be zapped'
+   endparameter
+
+   parameter      NOISE
+      keyword     'NOISE'
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      default     NO
+      help        'Whether or not Poisson noise is to be added to zapped data'
+   endparameter
+
+   parameter      AGAIN
+      position    6
+      keyword     'AGAIN'
+      type        '_LOGICAL'
+      vpath       'PROMPT,DEFAULT'
+      prompt      'More rows or columns ?'
+      default     Y
+      help        'Whether or not more rows or columns are to be zapped'
+   endparameter
+
+endinterface
+
+endmonolith
+

@@ -1,0 +1,1796 @@
+## Polrap - Monolith Interface File for IRCAM polarimetry data reduction 
+
+monolith POLRAP
+
+## APERPOL - aperture polarimetry with concentric sky aperture
+
+interface APERPOL
+
+   program 'APERPOL'
+
+   parameter   INPIC1
+      position 1
+      keyword  'INPIC1'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   '0  degrees image '
+      default  junk0
+      help     'Name of data structure containing the image to be examined'
+   endparameter
+
+   parameter   INPIC2
+      position 2
+      keyword  'INPIC2'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   '45 degrees image '
+      default  junk45
+      help     'Name of data structure containing the image to be examined'
+   endparameter
+
+   parameter   INPIC3
+      position 3
+      keyword  'INPIC3'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   '22 degrees image '
+      default  junk22
+      help     'Name of data structure containing the image to be examined'
+   endparameter
+
+   parameter   INPIC4
+      position 4
+      keyword  'INPIC4'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      prompt   '67 degrees image '
+      default  junk67
+      help     'Name of data structure containing the image to be examined'
+   endparameter
+
+   parameter   DATASOURCE
+      position 5
+      keyword  'DATASOURCE'
+      type     'LITERAL'
+      vpath    'PROMPT'
+      prompt   'Source of input terminal=T or file=F '
+      default  'T'
+      help     'prompt user for input (T) or take from file (F)'
+   endparameter
+
+   parameter   FNAME
+      position 6
+      keyword  'FNAME'
+      type     'LITERAL'
+      vpath    'PROMPT'
+      prompt   'Name of input data file '
+      default  'aperpol.dat'
+      help     'name of file with position data etc...'
+   endparameter
+
+   parameter   TERMOUT
+      position 7
+      keyword  'TERMOUT'
+      type     'LITERAL'
+      vpath    'PROMPT'
+      prompt   'Output to Terminal, File or Both  '
+      default  'B'
+      help     'T=Terminal only, F=File only, B=Both'
+   endparameter
+
+   parameter   SKYANNUL
+      position 8
+      keyword  'SKYANNUL'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Subtract sky in concentric annulus (Y/N) ? '
+      default  Y
+      help     'YES=use a sky annulus, NO=do not use sky annulus'
+   endparameter
+
+   parameter   XCEN
+      keyword  'XCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-centre of object aperture'
+      default  128
+      help     'Give the x coord of the centre of the circle to be binned up'
+   endparameter
+
+   parameter   YCEN
+      keyword  'YCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-centre of object aperture'
+      default  128
+      help     'Give the y coord of the centre of the circle to be binned up'
+   endparameter
+
+   parameter   ECC
+      keyword  'ECC'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Eccentricity of object aperture/sky annulus'
+      default  0.0
+      help     'eccentricity goes from 0.0 (circle) to 0.9999 (line)'
+   endparameter
+
+   parameter   POSANG
+      keyword  'POSANG'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Position angle of major axis wrt N (in degrees)'
+      default  0.0
+      help     'Input 0-180deg, 30 is 30deg S or E-W clockwise'
+   endparameter
+
+   parameter   MAJAX1
+      keyword  'MAJAX1'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Major axis of object aperture (in arcsec)'
+      default  10.0
+      help     'Give major axis (in arcseconds) of the object aperture'
+   endparameter
+
+   parameter   MAJAX2
+      keyword  'MAJAX2'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Major axis of concentric sky aperture (in arcsec)'
+      default  20.0
+      help     'Give major axis (in arcseconds) of the sky annulus'
+   endparameter
+
+   parameter   SCALE
+      keyword  'SCALE'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Pixel scale (arcsec/pixel)'
+      default  0.286
+      help     'Give the size of the image pixels in arcseconds on the sky'
+   endparameter
+
+   parameter   USEWHAT
+      keyword  'USEWHAT'
+      type     'LITERAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Use MEDIAN or MEAN in sky calculation ? '
+      default  'MEDIAN'
+      help     'Option to estimate sky from median or mean in sky annulus'
+   endparameter
+
+   parameter   USEBAD
+      keyword  'USEBAD'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Use bad pixel value in calculation (Y/N) ? '
+      default  Y
+      help     'Option to miss out pixel with bad value in apertures'
+   endparameter
+
+   parameter   BADVAL
+      keyword  'BADVAL'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Bad pixel value ? '
+      default  -1.0E-20
+      help     'Value of bad pixel to be missed out of calculation'
+   endparameter
+
+   parameter   THETACOR
+      keyword  'THETACOR'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Polarization position angle correction factor ? '
+      default  0.0
+      help     'Value to rotate from instrumental to equatorial system'
+   endparameter
+
+   parameter   ELDN
+      keyword  'ELDN'
+      type     '_REAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Electrons/DN (IN IMAGE!!!) ? '
+      default  1.0
+      help     'scaled e/dn for current image (maybe it is in dn/s??) '
+   endparameter
+
+   parameter   AGAIN
+      keyword  'AGAIN'
+      type     '_LOGICAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Another aperture in same image (Y/N) ? '
+      default  Y
+      help     'Option to select another paerture in same input image'
+   endparameter
+
+   parameter   RUNSORT
+      keyword  'RUNSORT'
+      type     'LITERAL'
+      vpath    'PROMPT,DEFAULT'
+      prompt   'Change aperture Major axis or Position (M/P) ? '
+      default  'M'
+      help     'Option to change aperture size or position'
+   endparameter
+
+   parameter   NUMPIX11
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX11'
+   endparameter
+
+   parameter   NUMPIX12
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX12'
+   endparameter
+
+   parameter   NUMPIX13
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX13'
+   endparameter
+
+   parameter   NUMPIX14
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX14'
+   endparameter
+
+   parameter   TOTAL11
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL11'
+   endparameter
+
+   parameter   TOTAL12
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL12'
+   endparameter
+
+   parameter   TOTAL13
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL13'
+   endparameter
+
+   parameter   TOTAL14
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL14'
+   endparameter
+
+   parameter   MEAN11
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN11'
+   endparameter
+
+   parameter   MEAN12
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN12'
+   endparameter
+
+   parameter   MEAN13
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN13'
+   endparameter
+
+   parameter   MEAN14
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN14'
+   endparameter
+
+   parameter   MEDIAN11
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN11'
+   endparameter
+
+   parameter   MEDIAN12
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN12'
+   endparameter
+
+   parameter   MEDIAN13
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN13'
+   endparameter
+
+   parameter   MEDIAN14
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN14'
+   endparameter
+
+   parameter   NOISE11
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE11'
+   endparameter
+
+   parameter   NOISE12
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE12'
+   endparameter
+
+   parameter   NOISE13
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE13'
+   endparameter
+
+   parameter   NOISE14
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE14'
+   endparameter
+
+   parameter   NUMPIX21
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX21'
+   endparameter
+
+   parameter   NUMPIX22
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX22'
+   endparameter
+
+   parameter   NUMPIX23
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX23'
+   endparameter
+
+   parameter   NUMPIX24
+      type    '_integer'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NUMPIX24'
+   endparameter
+
+   parameter   TOTAL21
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL21'
+   endparameter
+
+   parameter   TOTAL22
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL22'
+   endparameter
+
+   parameter   TOTAL23
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL23'
+   endparameter
+
+   parameter   TOTAL24
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_TOTAL24'
+   endparameter
+
+   parameter   MEAN21
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN21'
+   endparameter
+
+   parameter   MEAN22
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN22'
+   endparameter
+
+   parameter   MEAN23
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN23'
+   endparameter
+
+   parameter   MEAN24
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEAN24'
+   endparameter
+
+   parameter   MEDIAN21
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN21'
+   endparameter
+
+   parameter   MEDIAN22
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN22'
+   endparameter
+
+   parameter   MEDIAN23
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN23'
+   endparameter
+
+   parameter   MEDIAN24
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MEDIAN24'
+   endparameter
+
+   parameter   NOISE21
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE21'
+   endparameter
+
+   parameter   NOISE22
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE22'
+   endparameter
+
+   parameter   NOISE23
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE23'
+   endparameter
+
+   parameter   NOISE24
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_NOISE24'
+   endparameter
+
+   parameter  MAG
+      type    '_real'
+      vpath   'internal'
+      association '->GLOBAL.APERPHOT_MAG'
+   endparameter
+
+endinterface
+
+## CSFIT - fits centro-symmetric pattern to polarization map
+
+interface CSFIT
+
+   program 'CSFIT'
+
+   parameter      INPICP
+      position    1
+      keyword     'INPICP'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image containing percentage polarization '
+      help        'Name of data structure containing the input data'
+   endparameter
+
+   parameter      INPICT
+      position    2
+      keyword     'INPICT'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image containing position angles '
+      help        'Name of data structure containing the input data'
+   endparameter
+
+   parameter   TITLE
+      keyword  'TITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'Polrap - CSFIT'
+   endparameter
+
+   parameter   XSTART
+      position 3
+      keyword  'XSTART'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-start of area to be fitted '
+      default  1
+      help     'Give pixel which is X start of fitting area '
+   endparameter
+      
+
+   parameter   YSTART
+      position 4
+      keyword  'YSTART'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-start of area to be fitted '
+      default  1
+      help     'Give pixel which is Y start of fitting area '
+   endparameter
+      
+   parameter   XEND
+      position 5
+      keyword  'XEND'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-end of area to be fitted '
+      default  10000
+      help     'Give pixel which is X end of fitting area '
+   endparameter
+      
+   parameter   YEND
+      position 6
+      keyword  'YEND'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-end of area to be fitted '
+      default  10000
+      help     'Give pixel which is Y end of fitting area '
+   endparameter
+
+   parameter   AXSTART
+      position 7
+      keyword  'AXSTART'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-start of area considered as centre of cs pattern '
+      default  1
+      help     'Give pixel which is X start of cs centre posn'
+   endparameter
+
+   parameter   AYSTART
+      position 8
+      keyword  'AYSTART'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-start of area considered as centre of cs pattern '
+      default  1
+      help     'Give pixel which is Y start of cs centre posn'
+   endparameter
+
+   parameter   AXEND
+      position 9
+      keyword  'AXEND'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-end of area considered as centre of cs pattern '
+      default  10000
+      help     'Give pixel which is X end of cs centre posn'
+   endparameter
+
+   parameter   AYEND
+      position 10
+      keyword  'AYEND'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-end of area considered as centre of cs pattern '
+      default  10000
+      help     'Give pixel which is Y end of cs centre posn'
+   endparameter
+
+   parameter   POLMIN
+      position 11
+      keyword  'POLMIN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Minimum percentage polarization considered when fitting '
+      default  10
+      help     'Only values above POLMIN are used in fitting'
+   endparameter
+
+   parameter   OUTFILE
+      position 12
+      keyword  'OUTFILE'
+      type     'LITERAL'
+      vpath    'PROMPT'
+      prompt   'Name of output text file with results '
+      default  'csfit.out'
+      help     'Give name of output file with results'
+   endparameter
+
+   parameter      OUTPIC
+      position    13
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image to contain best fit pattern '
+      help        'Name of data structure containing the output data'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'Polrap - CSFIT'
+   endparameter
+
+endinterface
+
+## CSGEN - generates centro-symmetric pattern 
+
+interface CSGEN
+
+   program 'CSGEN'
+
+   parameter   XSIZE
+      position 1
+      keyword  'XSIZE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-size of image created with centro-symmetric pattern'
+      default  62
+      help     'Give size in X of image to contain CS pattern'
+   endparameter
+      
+   parameter   YSIZE
+      position 2
+      keyword  'YSIZE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-size of image created with centro-symmetric pattern'
+      default  58
+      help     'Give size in Y of image to contain CS pattern'
+   endparameter
+      
+   parameter      OUTPIC
+      position    3
+      keyword     'OUTPIC'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Image to contain centro-symmetric pattern '
+      help        'Name of data structure containing the output data'
+   endparameter
+
+   parameter   OTITLE
+      keyword  'OTITLE'
+      type     '_CHAR'
+      vpath    'DEFAULT'
+      default  'Polrap - CSGEN'
+   endparameter
+      
+   parameter   XCENTRE
+      position 4
+      keyword  'XCENTRE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-centre of CS pattern '
+      default  31
+      help     'Give pixel which is X centre of CS pattern'
+   endparameter
+      
+   parameter   YCENTRE
+      position 5
+      keyword  'YCENTRE'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-centre of CS pattern '
+      default  29
+      help     'Give pixel which is Y centre of CS pattern'
+   endparameter
+      
+endinterface
+
+## DEVFCS - calculates deviation from centro-symmetry of pixel
+
+interface DEVFCS
+
+   program 'DEVFCS'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Image containing position angles'
+      help        'Name of data structure containing the input data'
+   endparameter
+
+   parameter   XCEN
+      position 2
+      keyword  'XCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-centre of centro-symmetric pattern'
+      default  31
+      help     'Give pixel which is X centre of CS pattern'
+   endparameter
+      
+   parameter   YCEN
+      position 3
+      keyword  'YCEN'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-centre of centro-symmetric pattern'
+      default  29
+      help     'Give pixel which is Y centre of CS pattern'
+   endparameter
+      
+   parameter   XPOS
+      position 4
+      keyword  'XPOS'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'X-position of input pixel '
+      default  1
+      help     'Give pixel which is X position of choice pixel'
+   endparameter
+      
+   parameter   YPOS
+      position 5
+      keyword  'YPOS'
+      type     '_REAL'
+      vpath    'PROMPT'
+      prompt   'Y-position of input pixel '
+      default  1
+      help     'Give pixel which is Y position of choice pixel'
+   endparameter
+      
+   parameter   ANOTHER
+      position 6
+      keyword  'ANOTHER'
+      type     '_LOGICAL'
+      vpath    'PROMPT'
+      prompt   'Another pixel (Y/N) ? '
+      help     'Option to select another pixel in same input image'
+      default  N
+   endparameter
+
+endinterface
+
+## POLCAL - calculates polarization from 4 images taken at waveplate positions
+
+interface POLCAL
+
+   program 'POLCAL'
+
+   parameter   INPIC1
+      position 1
+      keyword  'INPIC1'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  f0
+      prompt   'Image at waveplate position 1 = 0 degs'
+      help     'Give name of structure holding image at 0 degrees'
+   endparameter
+
+   parameter   INPIC3
+      position 2
+      keyword  'INPIC3'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  f45
+      prompt   'Image at waveplate position 3 = 45 degs'
+      help     'Give name of structure holding image at 45 degrees'
+   endparameter
+
+   parameter   INPIC2
+      position 3
+      keyword  'INPIC2'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  f225
+      prompt   'Image at waveplate position 2 = 22.5 degs'
+      help     'Give name of structure holding image at 22.5 degrees'
+   endparameter
+
+   parameter   INPIC4
+      position 4
+      keyword  'INPIC4'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  f675
+      prompt   'Image at waveplate position 4 = 67.5 degs'
+      help     'Give name of structure holding image at 67.5 degrees'
+   endparameter
+
+   parameter   OUTPICQ
+      position 5
+      keyword  'OUTPICQ'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  qimage
+      prompt   'Image for Q, the Q Stokes parameter'
+      help     'Give name of structure to hold Q Stokes parameter image'
+   endparameter
+
+   parameter   OUTPICU
+      position 6
+      keyword  'OUTPICU'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  uimage
+      prompt   'Image for U, the U Stokes parameter'
+      help     'Give name of structure to hold U Stokes parameter image'
+   endparameter
+
+   parameter   OUTPICP
+      position 7
+      keyword  'OUTPICP'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  pimage
+      prompt   'Image for P, the percentage polarization'
+      help     'Give name of structure to hold polarization image'
+   endparameter
+
+   parameter   OUTPICT
+      position 8
+      keyword  'OUTPICT'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  timage
+      prompt   'Image for T, the position angle'
+      help     'Give name of structure to hold position angle image'
+   endparameter
+
+   parameter   OUTPICI
+      position 9
+      keyword  'OUTPICI'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  iimage
+      prompt   'Image for I, the total intensity'
+      help     'Give name of structure to hold total intensity image'
+   endparameter
+
+   parameter   OUTPICPI
+      position 10
+      keyword  'OUTPICPI'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  piimage
+      prompt   'Image for PI, the polarized intensity'
+      help     'Give name of structure to hold polarized intensity image'
+   endparameter
+
+   parameter   OUTPICUPI
+      position 11
+      keyword  'OUTPICUPI'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  upiimage
+      prompt   'Image for UPI, the unpolarized intensity'
+      help     'Give name of structure to hold unpolarized intensity image'
+   endparameter
+
+   parameter   OUTPICPE
+      position 12
+      keyword  'OUTPICPE'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  peimage
+      prompt   'Image for PE, the polarization error'
+      help     'Give name of structure to hold polarization error image'
+   endparameter
+
+   parameter   OUTPICTE
+      position 13
+      keyword  'OUTPICTE'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  teimage
+      prompt   'Image for TE, the position angle error'
+      help     'Give name of structure to hold position angle error image'
+   endparameter
+
+   parameter   ELDN
+      position 14
+      keyword  'ELDN'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      default  6.0
+      prompt   'Give the PHOTO-ELECTRONS/DN'
+      help     'Number of PHOTOELECTRONS/unit number in each pixel'
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     'LITERAL'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Polrap - Polcal'
+      prompt   'Title for output images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## POLCAL2 - calculates polarization from 4 images taken at waveplate positions
+
+interface POLCAL2
+
+   program 'POLCAL2'
+
+   parameter   INPIC1
+      position 1
+      keyword  'INPIC1'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol0ot
+      prompt   'o-ray image at 0 degs'
+      help     'Give name of structure holding o-ray image at 0 degrees'
+   endparameter
+
+   parameter   INPIC2
+      position 2
+      keyword  'INPIC2'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol0et
+      prompt   'e-ray image at 0 degs'
+      help     'Give name of structure holding e-ray image at 0 degrees'
+   endparameter
+
+   parameter   INPIC3
+      position 3
+      keyword  'INPIC3'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol45ot
+      prompt   'o-ray image at 45 degs'
+      help     'Give name of structure holding o-ray image at 45 degrees'
+   endparameter
+
+   parameter   INPIC4
+      position 4
+      keyword  'INPIC4'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol45et
+      prompt   'e-ray image at 45 degs'
+      help     'Give name of structure holding e-ray image at 45 degrees'
+   endparameter
+
+   parameter   INPIC5
+      position 5
+      keyword  'INPIC5'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol22ot
+      prompt   'o-ray image at 22.5 degs'
+      help     'Give name of structure holding o-ray image at 22.5 degrees'
+   endparameter
+
+   parameter   INPIC6
+      position 6
+      keyword  'INPIC6'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol22et
+      prompt   'e-ray image at 22.5 degs'
+      help     'Give name of structure holding e-ray image at 22.5 degrees'
+   endparameter
+
+   parameter   INPIC7
+      position 7
+      keyword  'INPIC7'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol67ot
+      prompt   'o-ray image at 67.5 degs'
+      help     'Give name of structure holding o-ray image at 67.5 degrees'
+   endparameter
+
+   parameter   INPIC8
+      position 8
+      keyword  'INPIC8'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pol67et
+      prompt   'e-ray image at 67.5 degs'
+      help     'Give name of structure holding e-ray image at 0 degrees'
+   endparameter
+
+   parameter   OUTPICQ
+      position 9
+      keyword  'OUTPICQ'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  qimage
+      prompt   'Image for Q, the Q Stokes parameter'
+      help     'Give name of structure to hold Q Stokes parameter image'
+   endparameter
+
+   parameter   OUTPICU
+      position 10
+      keyword  'OUTPICU'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  uimage
+      prompt   'Image for U, the U Stokes parameter'
+      help     'Give name of structure to hold U Stokes parameter image'
+   endparameter
+
+   parameter   OUTPICP
+      position 11
+      keyword  'OUTPICP'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  pimage
+      prompt   'Image for P, the percentage polarization'
+      help     'Give name of structure to hold polarization image'
+   endparameter
+
+   parameter   OUTPICT
+      position 12
+      keyword  'OUTPICT'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  timage
+      prompt   'Image for T, the position angle'
+      help     'Give name of structure to hold position angle image'
+   endparameter
+
+   parameter   OUTPICI
+      position 13
+      keyword  'OUTPICI'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  iimage
+      prompt   'Image for I, the total intensity'
+      help     'Give name of structure to hold total intensity image'
+   endparameter
+
+   parameter   OUTPICPI
+      position 14
+      keyword  'OUTPICPI'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  piimage
+      prompt   'Image for PI, the polarized intensity'
+      help     'Give name of structure to hold polarized intensity image'
+   endparameter
+
+   parameter   OUTPICUPI
+      position 15
+      keyword  'OUTPICUPI'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  upiimage
+      prompt   'Image for UPI, the unpolarized intensity'
+      help     'Give name of structure to hold unpolarized intensity image'
+   endparameter
+
+   parameter   OUTPICPE
+      position 16
+      keyword  'OUTPICPE'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  peimage
+      prompt   'Image for PE, the polarization error'
+      help     'Give name of structure to hold polarization error image'
+   endparameter
+
+   parameter   OUTPICTE
+      position 17
+      keyword  'OUTPICTE'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  teimage
+      prompt   'Image for TE, the position angle error'
+      help     'Give name of structure to hold position angle error image'
+   endparameter
+
+   parameter   ELDN
+      position 18
+      keyword  'ELDN'
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT'
+      default  6.0
+      prompt   'Give the PHOTO-ELECTRONS/DN'
+      help     'Number of PHOTOELECTRONS/unit number in each pixel'
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     'LITERAL'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Polrap - Polcal'
+      prompt   'Title for output images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## POLLY - calculates polarization from 4 intensity values
+
+interface POLLY
+
+   program 'POLLY'
+
+   parameter      INTEN1
+      position    1
+      keyword     'INTEN1'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give INTENSITY at  0 degrees '
+      help        'Intensity value at waveplate position 0 degrees '
+   endparameter
+
+   parameter      INTEN2
+      position    2
+      keyword     'INTEN2'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give INTENSITY at 45 degrees '
+      help        'Intensity value at waveplate position 45 degrees '
+   endparameter
+
+   parameter      INTEN3
+      position    3
+      keyword     'INTEN3'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give INTENSITY at 22 degrees'
+      help        'Intensity value at waveplate position 22.5 degrees '
+   endparameter
+
+   parameter      INTEN4
+      position    4
+      keyword     'INTEN4'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give INTENSITY at 67 degrees'
+      help        'Intensity value at waveplate position 67.5 degrees '
+   endparameter
+
+   parameter      ELDN
+      position    5
+      keyword     'ELDN'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Electrons/DN in data '
+      help        'conversion factor to electrons ...'
+   endparameter
+
+endinterface
+
+## POLLY2 - calculates polarization from 8 (dual-beam) intensity values
+
+interface POLLY2
+
+   program 'POLLY2'
+
+   parameter      OINTEN0
+      position    1
+      keyword     'OINTEN0'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give o- INTENSITY at  0 degrees '
+      help        'Intensity value at waveplate position 0 degrees '
+   endparameter
+
+   parameter      EINTEN0
+      position    2
+      keyword     'EINTEN0'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give e- INTENSITY at  0 degrees '
+      help        'Intensity value at waveplate position 0 degrees '
+   endparameter
+
+   parameter      OINTEN45
+      position    3
+      keyword     'OINTEN45'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give o- INTENSITY at 45 degrees'
+      help        'Intensity value at waveplate position 45 degrees '
+   endparameter
+
+   parameter      EINTEN45
+      position    4
+      keyword     'EINTEN45'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give e- INTENSITY at 45 degrees'
+      help        'Intensity value at waveplate position 45 degrees '
+   endparameter
+
+   parameter      OINTEN22
+      position    5
+      keyword     'OINTEN22'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give o- INTENSITY at 22.5 degrees '
+      help        'Intensity value at waveplate position 22.5 degrees '
+   endparameter
+
+   parameter      EINTEN22
+      position    6
+      keyword     'EINTEN22'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give e- INTENSITY at 22.5 degrees '
+      help        'Intensity value at waveplate position 22.5 degrees '
+   endparameter
+
+   parameter      OINTEN67
+      position    7
+      keyword     'OINTEN67'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give o- INTENSITY at 67.5 degrees'
+      help        'Intensity value at waveplate position 67.5 degrees '
+   endparameter
+
+   parameter      EINTEN67
+      position    8
+      keyword     'EINTEN67'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give e- INTENSITY at 67.5 degrees'
+      help        'Intensity value at waveplate position 67.5 degrees '
+   endparameter
+
+   parameter      ELDN
+      position    9
+      keyword     'ELDN'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Electrons/DN in data '
+      help        'conversion factor to electrons ...'
+   endparameter
+
+   parameter      ZP
+      position    10
+      keyword     'ZP'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Photometric zeropoint for 1DN/sec '
+      help        'Zeropoint calculated for 1DN/sec in current filter ...'
+   endparameter
+
+endinterface
+
+## POLSEP - separates dual-beam images into 4 images
+
+interface POLSEP
+
+   program 'POLSEP'
+
+   parameter      INPIC
+      position    1
+      keyword     'INPIC'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Input image '
+      help        'Image from which subset is to be taken to create new image'
+   endparameter
+
+   parameter      OUTPIC1
+      position    2
+      keyword     'OUTPIC1'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image 1 '
+      help        'Name of structure image taken as subset of input image'
+   endparameter
+
+   parameter      OUTPIC2
+      position    3
+      keyword     'OUTPIC2'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image 2 '
+      help        'Name of structure image taken as subset of input image'
+   endparameter
+
+   parameter      OUTPIC3
+      position    4
+      keyword     'OUTPIC3'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image 3 '
+      help        'Name of structure image taken as subset of input image'
+   endparameter
+
+   parameter      OUTPIC4
+      position    5
+      keyword     'OUTPIC4'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Output image 4 '
+      help        'Name of structure image taken as subset of input image'
+   endparameter
+
+   parameter      OTITLE
+      position    6
+      keyword     'OTITLE'
+      type        '_CHAR'
+      vpath       'DEFAULT'
+      prompt      'Title for output image'
+      default     'Polrap - Polsep'
+      help        'Character string used as a title for the output structure'
+   endparameter
+
+endinterface
+
+## POLSHOT - removes polarization shot-noise error from polarization
+
+interface POLSHOT
+
+   program 'POLSHOT'
+
+   parameter   INPICP
+      position 1
+      keyword  'INPICP'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  pimage
+      prompt   'Polarization image '
+      help     'Give name of structure holding polarization image '
+   endparameter
+
+   parameter   INPICPE
+      position 2
+      keyword  'INPICPE'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  peimage
+      prompt   'Polarization error image '
+      help     'Give name of structure holding polarization error image '
+   endparameter
+
+   parameter   OUTPICA
+      position 3
+      keyword  'OUTPICA'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  pcorr
+      prompt   'Image to polarization-error image '
+      help     'Give name of structure to hold shot-noise removed image'
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     'LITERAL'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Polrap - POLSHOT'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## POLTHRESH - set all values outside a given range to user value POLARIMETRY
+
+interface POLTHRESH 
+
+   program 'POLTHRESH'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image at 0 degrees '
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image at 45 degrees '
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC3
+      position    3
+      keyword     'INPIC3'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image at 22.5 degrees'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC4
+      position    4
+      keyword     'INPIC4'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Give image at 67.5 degrees'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      OUTPIC1
+      position    5
+      keyword     'OUTPIC1'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold thresholded 0 degrees data'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC2
+      position    6
+      keyword     'OUTPIC2'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold thresholded 45 degrees data'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC3
+      position    7
+      keyword     'OUTPIC3'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold thresholded 22.5 degrees data'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC4
+      position    8
+      keyword     'OUTPIC8'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      prompt      'Give image to hold thresholded 67.5 degrees data'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OTITLE
+      position    9
+      keyword     'OTITLE'
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Polrap - Polthresh'
+      help        'Character string used as a title for the data structure'
+   endparameter
+
+   parameter      THRLO
+      position    10
+      keyword     'THRLO'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      prompt      'Low threshold cuttoff value'
+      help        'Values less than this will be set to 0.0'
+   endparameter
+
+endinterface
+
+## POLTHRESH2 - set all values outside a given range to user value POLARIMETRY
+
+interface POLTHRESH2
+
+   program 'POLTHRESH2'
+
+   parameter      INPIC1
+      position    1
+      keyword     'INPIC1'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol0o
+      prompt      'Give o-ray image at 0 degrees '
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC2
+      position    2
+      keyword     'INPIC2'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol0e
+      prompt      'Give e-ray image at 0 degrees '
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC3
+      position    3
+      keyword     'INPIC3'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol45o
+      prompt      'Give o-ray image at 45 degrees'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC4
+      position    4
+      keyword     'INPIC4'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol45e
+      prompt      'Give e-ray image at 45 degrees'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC5
+      position    5
+      keyword     'INPIC5'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol22o
+      prompt      'Give o-ray image at 22.5 degrees '
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC6
+      position    6
+      keyword     'INPIC6'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol22e
+      prompt      'Give e-ray image at 22.5 degrees '
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC7
+      position    7
+      keyword     'INPIC7'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol67a
+      prompt      'Give o-ray image at 67.5 degrees'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      INPIC8
+      position    8
+      keyword     'INPIC8'
+      type        'IMAGE'
+      access      'READ'
+      vpath       'PROMPT'
+      default     pol67e
+      prompt      'Give e-ray image at 67.5 degrees'
+      help        'Name of data structure containing data to be thresholded'
+   endparameter
+
+   parameter      OUTPIC1
+      position    9
+      keyword     'OUTPIC1'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol0ot
+      prompt      'Give name for thresholded o-ray 0 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC2
+      position    10
+      keyword     'OUTPIC2'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol0et
+      prompt      'Give name for thresholded e-ray 0 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC3
+      position    11
+      keyword     'OUTPIC3'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol45ot
+      prompt      'Give name for thresholded o-ray 45 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC4
+      position    12
+      keyword     'OUTPIC8'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol45et
+      prompt      'Give name for thresholded e-ray 45 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC5
+      position    13
+      keyword     'OUTPIC5'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol22ot
+      prompt      'Give name for thresholded o-ray 22.5 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC6
+      position    14
+      keyword     'OUTPIC6'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol22et
+      prompt      'Give name for thresholded e-ray 22.5 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC7
+      position    15
+      keyword     'OUTPIC7'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol67ot
+      prompt      'Give name for thresholded o-ray 67.5 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      OUTPIC8
+      position    16
+      keyword     'OUTPIC8'
+      type        'IMAGE'
+      access      'WRITE'
+      vpath       'PROMPT'
+      default     pol67et
+      prompt      'Give name for thresholded e-ray 67.5 degrees image'
+      help        'Name of data structure to store the thresholded data'
+   endparameter
+
+   parameter      THRLO
+      position    17
+      keyword     'THRLO'
+      type        '_REAL'
+      access      'READ'
+      vpath       'PROMPT'
+      default     0.0
+      prompt      'Low threshold cuttoff value'
+      help        'Values less than this will be set to 0.0'
+   endparameter
+
+   parameter      OTITLE
+      position    18
+      keyword     'OTITLE'
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Title'
+      default     'Polrap - Polthresh2'
+      help        'Character string used as a title for the data structure'
+   endparameter
+
+endinterface
+
+## THETAFIX - corrects position angles after addition of constant
+
+interface THETAFIX
+
+   program 'THETAFIX'
+
+   parameter   INPIC
+      position 1
+      keyword  'INPIC'
+      type     'IMAGE'
+      access   'READ'
+      vpath    'PROMPT'
+      default  theta
+      prompt   'Position angle image to be fixed ?'
+      help     'Give name of structure holding polarization theta values'
+   endparameter
+
+   parameter   OUTPIC
+      position 2
+      keyword  'OUTPIC'
+      type     'IMAGE'
+      access   'WRITE'
+      vpath    'PROMPT'
+      default  thetafix
+      prompt   'Image to contain fixed position angle values ?'
+      help     'Give name of structure to hold corrected theta values '
+   endparameter
+
+   parameter OTITLE
+      keyword  'OTITLE'
+      type     'LITERAL'
+      access   'WRITE'
+      vpath    'DEFAULT'
+      default  'Polrap - Thetafix'
+      prompt   'Title for out images '
+      help     'Give the title for the output image file'
+   endparameter
+
+endinterface
+
+## WELCOME_POLRAP - welcome information for auto loading of task
+
+interface WELCOME_POLRAP
+
+   parameter INFO
+      keyword  'INFO'
+      type     'LITERAL'
+      vpath    'DEFAULT'
+      default  'IRCAM Polarimetry A-tasks loaded'
+   endparameter
+
+endinterface
+
+endmonolith
