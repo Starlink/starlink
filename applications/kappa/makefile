@@ -512,7 +512,7 @@ ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
 ira1_asset.f ira1_check.f ira1_chprj.f ira1_chscs.f ira1_decod.f \
 ira1_ecec.f ira1_eqecl.f ira1_eqeq.f ira1_eqgal.f ira1_fpars.f \
 ira1_galec.f ira1_getid.f ira1_gnom.f ira1_iconv.f ira1_ictd1.f \
-ira1_idtc1.f ira1_igtc1.f ira1_iprj.f ira1_iscnm.f ira1_isscs.f \
+ira1_idtc1.f ira1_igtc1.f ira1_iprj.f ira1_iscnm.f \
 ira1_lamb.f ira1_orth.f ira1_prec.f ira_annul.f ira_close.f ira_convt.f \
 ira_creat.f ira_ctod.f ira_ctod1.f ira_dtoc.f ira_dtoc1.f ira_exprt.f \
 ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
@@ -796,9 +796,10 @@ PLATFORM_F =
 
 #  Block data routines.
 
-BLOCK_DATA = $(KAPGEN_BLOCK_DATA)
+BLOCK_DATA = $(KAPGEN_BLOCK_DATA) $(IRA_BLOCK_DATA)
 
 KAPGEN_BLOCK_DATA = ctm_xcols.f
+IRA_BLOCK_DATA = ira1_init.f
 
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
@@ -1045,7 +1046,7 @@ $(FITS_F_ROUTINES) $(FITS_C_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(IRA_F_ROUTINES) :
+$(IRA_F_ROUTINES) $(IRA_BLOCK_DATA) :
 	$(TAR_OUT) ira_sub.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1121,7 +1122,7 @@ AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o)
 
 FITS_OBJECT_FILES = $(FITS_F_ROUTINES:.f=.o) $(FITS_C_ROUTINES:.c=.o)
 
-IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o)
+IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o) $(IRA_BLOCK_DATA:.f=.o) \
 
 IRM_OBJECT_FILES = $(IRM_F_ROUTINES:.f=.o)
 
@@ -2311,10 +2312,10 @@ fts_sub.tar:
 	$(TAR_IN) fts_sub.tar $(FITS_F_ROUTINES) $(FITS_C_ROUTINES)
 
 irm_sub.tar:
-	$(TAR_IN) irm_sub.tar $(IRM_F_ROUTINES)
+	$(TAR_IN) irm_sub.tar $(IRM_F_ROUTINES) 
 
 ira_sub.tar:
-	$(TAR_IN) ira_sub.tar $(IRA_F_ROUTINES)
+	$(TAR_IN) ira_sub.tar $(IRA_F_ROUTINES) $(IRA_BLOCK_DATA)
 
 kapgen_sub.tar:
 	$(TAR_IN) kapgen_sub.tar $(KAPGEN_F_ROUTINES) \
@@ -2538,6 +2539,210 @@ insl.o:            SAE_PAR DAT_PAR PRM_PAR PAR_ERR
 inspect.o:         SAE_PAR DAT_PAR PRM_PAR SUBPAR_PAR PAR_ERR NDF_PAR NDF_ERR
 inva.o:            SAE_PAR PRM_PAR PAR_ERR
 inxy.o:            SAE_PAR PRM_PAR PAR_ERR FIO_PAR FIO_ERR
+ira1_aito.o:	   SAE_PAR
+ira1_aito.o:	   DAT_PAR
+ira1_aito.o:	   PRM_PAR
+ira1_aito.o:	   IRA_PAR
+ira1_aito.o:	   IRA_ERR
+ira1_ascre.o:	   SAE_PAR
+ira1_ascre.o:	   DAT_PAR
+ira1_ascre.o:	   IRA_PAR
+ira1_ascre.o:	   IRA_ERR
+ira1_asdef.o:	   SAE_PAR
+ira1_asdef.o:	   IRA_PAR
+ira1_asndf.o:	   SAE_PAR
+ira1_asndf.o:	   DAT_PAR
+ira1_asndf.o:	   IRA_PAR
+ira1_asndf.o:	   IRA_ERR
+ira1_asndf.o:	   IRA_COM
+ira1_asres.o:	   SAE_PAR
+ira1_asres.o:	   DAT_PAR
+ira1_asset.o:	   SAE_PAR
+ira1_asset.o:	   DAT_PAR
+ira1_check.o:	   SAE_PAR
+ira1_check.o:	   DAT_PAR
+ira1_check.o:	   IRA_PAR
+ira1_check.o:	   IRA_ERR
+ira1_check.o:	   IRA_COM
+ira1_chprj.o:	   SAE_PAR
+ira1_chprj.o:	   DAT_PAR
+ira1_chprj.o:	   IRA_PAR
+ira1_chprj.o:	   IRA_ERR
+ira1_chscs.o:	   SAE_PAR
+ira1_chscs.o:	   DAT_PAR
+ira1_chscs.o:	   PRM_PAR
+ira1_chscs.o:	   IRA_PAR
+ira1_chscs.o:	   IRA_ERR
+ira1_decod.o:	   SAE_PAR
+ira1_decod.o:	   DAT_PAR
+ira1_decod.o:	   IRA_ERR
+ira1_ecec.o:	   SAE_PAR
+ira1_ecec.o:	   DAT_PAR
+ira1_ecec.o:	   PRM_PAR
+ira1_eqecl.o:	   SAE_PAR
+ira1_eqecl.o:	   DAT_PAR
+ira1_eqecl.o:	   PRM_PAR
+ira1_eqeq.o:	   SAE_PAR
+ira1_eqeq.o:	   DAT_PAR
+ira1_eqeq.o:	   PRM_PAR
+ira1_eqgal.o:	   SAE_PAR
+ira1_eqgal.o:	   DAT_PAR
+ira1_eqgal.o:	   PRM_PAR
+ira1_fpars.o:	   SAE_PAR
+ira1_fpars.o:	   DAT_PAR
+ira1_fpars.o:	   IRA_PAR
+ira1_fpars.o:	   IRA_ERR
+ira1_galec.o:	   SAE_PAR
+ira1_galec.o:	   DAT_PAR
+ira1_galec.o:	   PRM_PAR
+ira1_getid.o:	   SAE_PAR
+ira1_getid.o:	   DAT_PAR
+ira1_getid.o:	   IRA_PAR
+ira1_getid.o:	   IRA_ERR
+ira1_getid.o:	   IRA_COM
+ira1_gnom.o:	   SAE_PAR
+ira1_gnom.o:	   DAT_PAR
+ira1_gnom.o:	   PRM_PAR
+ira1_gnom.o:	   IRA_PAR
+ira1_gnom.o:	   IRA_ERR
+ira1_iconv.o:	   SAE_PAR
+ira1_iconv.o:	   DAT_PAR
+ira1_iconv.o:	   PRM_PAR
+ira1_iconv.o:	   IRA_PAR
+ira1_iconv.o:	   IRA_ERR
+ira1_ictd1.o:	   SAE_PAR
+ira1_ictd1.o:	   DAT_PAR
+ira1_ictd1.o:	   PRM_PAR
+ira1_ictd1.o:	   IRA_PAR
+ira1_ictd1.o:	   IRA_ERR
+ira1_idtc1.o:	   SAE_PAR
+ira1_idtc1.o:	   DAT_PAR
+ira1_idtc1.o:	   PRM_PAR
+ira1_idtc1.o:	   IRA_PAR
+ira1_idtc1.o:	   IRA_ERR
+ira1_igtc1.o:	   SAE_PAR
+ira1_igtc1.o:	   DAT_PAR
+ira1_igtc1.o:	   PRM_PAR
+ira1_igtc1.o:	   IRA_PAR
+ira1_igtc1.o:	   IRA_ERR
+ira1_igtc1.o:	   PAR_ERR
+ira1_init.o:       SAE_PAR
+ira1_init.o:       DAT_PAR
+ira1_init.o:       IRA_PAR
+ira1_init.o:       PRM_PAR
+ira1_init.o:       IRA_COM
+ira1_iprj.o:	   SAE_PAR
+ira1_iprj.o:	   DAT_PAR
+ira1_iprj.o:	   PRM_PAR
+ira1_iprj.o:	   IRA_PAR
+ira1_iprj.o:	   IRA_ERR
+ira1_iscnm.o:	   SAE_PAR
+ira1_iscnm.o:	   DAT_PAR
+ira1_iscnm.o:	   IRA_PAR
+ira1_iscnm.o:	   IRA_ERR
+ira1_lamb.o:	   SAE_PAR
+ira1_lamb.o:	   DAT_PAR
+ira1_lamb.o:	   PRM_PAR
+ira1_lamb.o:	   IRA_PAR
+ira1_lamb.o:	   IRA_ERR
+ira1_orth.o:	   SAE_PAR
+ira1_orth.o:	   DAT_PAR
+ira1_orth.o:	   PRM_PAR
+ira1_orth.o:	   IRA_PAR
+ira1_orth.o:	   IRA_ERR
+ira1_prec.o:	   SAE_PAR
+ira1_prec.o:	   DAT_PAR
+ira1_prec.o:	   PRM_PAR
+ira_annul.o:	   SAE_PAR
+ira_annul.o:	   DAT_PAR
+ira_annul.o:	   IRA_PAR
+ira_annul.o:	   IRA_COM
+ira_close.o:	   SAE_PAR
+ira_close.o:	   DAT_PAR
+ira_close.o:	   IRA_PAR
+ira_close.o:	   IRA_COM
+ira_convt.o:	   SAE_PAR
+ira_convt.o:	   DAT_PAR
+ira_convt.o:	   IRA_PAR
+ira_creat.o:	   SAE_PAR
+ira_creat.o:	   DAT_PAR
+ira_creat.o:	   PRM_PAR
+ira_creat.o:	   IRA_PAR
+ira_creat.o:	   IRA_ERR
+ira_creat.o:	   IRA_COM
+ira_ctod.o:	   SAE_PAR
+ira_ctod.o:	   DAT_PAR
+ira_ctod.o:	   IRA_PAR
+ira_ctod.o:	   IRA_ERR
+ira_ctod1.o:	   SAE_PAR
+ira_ctod1.o:	   DAT_PAR
+ira_ctod1.o:	   PRM_PAR
+ira_ctod1.o:	   IRA_PAR
+ira_ctod1.o:	   IRA_ERR
+ira_dtoc.o:	   SAE_PAR
+ira_dtoc.o:	   DAT_PAR
+ira_dtoc.o:	   IRA_PAR
+ira_dtoc.o:	   IRA_ERR
+ira_dtoc1.o:	   SAE_PAR
+ira_dtoc1.o:	   DAT_PAR
+ira_dtoc1.o:	   PRM_PAR
+ira_dtoc1.o:	   IRA_PAR
+ira_dtoc1.o:	   IRA_ERR
+ira_exprt.o:	   SAE_PAR
+ira_exprt.o:	   DAT_PAR
+ira_find.o:	   SAE_PAR
+ira_find.o:	   DAT_PAR
+ira_find.o:	   IRA_PAR
+ira_find.o:	   IRA_ERR
+ira_getco.o:	   SAE_PAR
+ira_getco.o:	   DAT_PAR
+ira_getco.o:	   IRA_PAR
+ira_geteq.o:	   SAE_PAR
+ira_geteq.o:	   DAT_PAR
+ira_geteq.o:	   PRM_PAR
+ira_geteq.o:	   IRA_PAR
+ira_geteq.o:	   IRA_ERR
+ira_gtco1.o:	   SAE_PAR
+ira_gtco1.o:	   DAT_PAR
+ira_gtco1.o:	   IRA_PAR
+ira_gtco1.o:	   IRA_ERR
+ira_gtscs.o:	   SAE_PAR
+ira_gtscs.o:	   DAT_PAR
+ira_gtscs.o:	   IRA_PAR
+ira_gtscs.o:	   IRA_ERR
+ira_init.o:	   SAE_PAR
+ira_init.o:	   DAT_PAR
+ira_init.o:	   IRA_PAR
+ira_init.o:	   IRA_COM
+ira_iproj.o:	   SAE_PAR
+ira_iproj.o:	   DAT_PAR
+ira_iproj.o:	   IRA_PAR
+ira_iscs.o:	   SAE_PAR
+ira_iscs.o:	   DAT_PAR
+ira_iscs.o:	   IRA_PAR
+ira_iscs.o:	   IRA_ERR
+ira_locat.o:	   SAE_PAR
+ira_locat.o:	   DAT_PAR
+ira_locat.o:	   IRA_PAR
+ira_locat.o:	   IRA_COM
+ira_norm.o:	   SAE_PAR
+ira_norm.o:	   DAT_PAR
+ira_norm.o:	   PRM_PAR
+ira_norm.o:	   IRA_PAR
+ira_seteq.o:	   SAE_PAR
+ira_seteq.o:	   DAT_PAR
+ira_seteq.o:	   PRM_PAR
+ira_seteq.o:	   IRA_PAR
+ira_seteq.o:	   IRA_ERR
+ira_trans.o:	   SAE_PAR
+ira_trans.o:	   DAT_PAR
+ira_trans.o:	   IRA_PAR
+ira_trans.o:	   IRA_COM
+ira_write.o:	   SAE_PAR
+ira_write.o:	   DAT_PAR
+ira_write.o:	   IRA_PAR
+ira_write.o:	   IRA_ERR
+ira_write.o:	   IRA_COM
 irg1_wild.o:       irg_err.h
 irm1_rglmt.o:      SAE_PAR
 irm1_split.o:      SAE_PAR
