@@ -44,7 +44,7 @@
 *- */
 
 /* Global Constants: */
-#include <stdio.h>
+#include <sys/termio.h>
 #include "f77.h"
 
 /*
