@@ -38,7 +38,7 @@
              access READ
              vpath PROMPT
              ppath CURRENT DEFAULT
-             prompt {Action to perform (CURRENT,ADD,REMOVE)}
+             prompt {Action to perform (CURRENT,ADD,REMOVE,SET)}
              default CURRENT
              helpkey *
           }
@@ -50,6 +50,7 @@
              vpath PROMPT
              ppath CURRENT DEFAULT
              prompt {Basis frame in WCS component}
+             default !
              helpkey *
           }
 
@@ -77,8 +78,9 @@
              type LITERAL
              access READ
              vpath PROMPT
-             ppath CURRENT
+             ppath CURRENT DEFAULT
              prompt {Name of new domain}
+             default CCD_WCSEDIT
              helpkey *
           }
 
@@ -89,6 +91,25 @@
              ppath CURRENT DEFAULT
              prompt {Type of mapping (UNIT,LINEAR,PINCUSHION)}
              default UNIT
+             helpkey *
+          }
+
+          parameter set {
+             type LITERAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT
+             prompt {String for setting frame attributes}
+             helpkey *
+          }
+
+          parameter invert {
+             type _LOGICAL
+             access READ
+             vpath PROMPT
+             ppath CURRENT DEFAULT
+             prompt {Use inverse mapping?}
+             default FALSE
              helpkey *
           }
 
