@@ -54,6 +54,10 @@
 *     1992 September 18 (MJC):
 *        Renamed from KPS1_TRNDx for CONVERT and increased the buffer
 *        size from 255 to 32766 bytes.
+*     1996 January 21 (MJC):
+*        Decreased buffer size to 512 to restore good performance.  If
+*        a larger one is needed, people will shout and an extra
+*        parameter could be added.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,7 +86,7 @@
 *  Local Constants:
       INTEGER MAXLEN             ! Maximum length records that can be
                                  ! processed
-      PARAMETER ( MAXLEN = 32766 )
+      PARAMETER ( MAXLEN = 512 )
       INTEGER MXVALS             ! Maximum number of values per file
                                  ! record that can be processed
       PARAMETER ( MXVALS = ( MAXLEN + 1 ) / 2 )
