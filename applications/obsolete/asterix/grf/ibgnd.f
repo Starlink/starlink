@@ -558,8 +558,8 @@
       CALL IMG_CIRCLE( X, Y, R, STATUS )
 
 *  Write string with source number
-      X = X + R*COSD(45.0)*SIGN(1.0,I_XSCALE)
-      Y = Y + R*SIND(45.0)
+      X = X + R*SIGN(1.0,I_XSCALE)/SQRT(2.0)
+      Y = Y + R/SQRT(2.0)
       CALL PGUPDT(0)
       CALL CHR_ITOC( ISRC, STR(2:), NDIGIT )
       CALL PGTEXT( X, Y, STR(:NDIGIT+1) )

@@ -11,6 +11,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
 *    Import :
 *    Import-Export :
 *    Export :
@@ -80,8 +81,8 @@
                IF (D1OK) THEN
                  CALL PGMOVE(X+DATA1,Y)
                  DO ANG=1,359
-                    CALL PGDRAW(X+COSD(REAL(ANG))*DATA1,
-     :                          Y+SIND(REAL(ANG))*DATA1)
+                    CALL PGDRAW(X+COS(REAL(ANG*MATH__DTOR))*DATA1,
+     :                          Y+SIN(REAL(ANG*MATH__DTOR))*DATA1)
                  ENDDO
                ENDIF
 
@@ -93,13 +94,13 @@
                CALL GCB_GET1R('SHAPE_DATA3',I,1,D3OK,DATA3,STATUS)
 
                IF (D1OK.AND.D2OK.AND.D3OK) THEN
-                 CPA = COSD(DATA3)
-                 SPA = SIND(DATA3)
+                 CPA = COS(DATA3*MATH__DTOR)
+                 SPA = SIN(DATA3*MATH__DTOR)
                  B = DATA1 / DATA2
                  CALL PGMOVE(X+DATA1*CPA,Y+DATA1*SPA)
                  DO ANG=1,359
-                    XP = DATA1*COSD(REAL(ANG))
-                    YP = B*SIND(REAL(ANG))
+                    XP = DATA1*COS(REAL(ANG)*MATH__DTOR)
+                    YP = B*SIN(REAL(ANG)*MATH__DTOR)
                     CALL PGDRAW(X+XP*CPA-YP*SPA,Y+XP*SPA+YP*CPA)
                  ENDDO
                ENDIF

@@ -53,6 +53,7 @@
       INCLUDE 'PAR_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'QUAL_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Status :
 *
@@ -496,14 +497,14 @@
             END IF
 
             IF (X_AX .GT. -1) THEN
-              C1 = COSD(PA(1))
-              C2 = COSD(PA(INP))
+              C1 = COS(PA(1)*MATH__DTOR)
+              C2 = COS(PA(INP)*MATH__DTOR)
               C3 = (AXIS_RA(INP) - AXIS_RA(1))
-     :                      - (YMIN * SIND(PA(INP)))
-              C4 = SIND(PA(1))
-              C5 = SIND(PA(INP))
+     :                      - (YMIN * SIN(PA(INP)*MATH__DTOR))
+              C4 = SIN(PA(1)*MATH__DTOR)
+              C5 = SIN(PA(INP)*MATH__DTOR)
               C6 = (AXIS_DEC(INP) - AXIS_DEC(1))
-     :                      + (YMIN * COSD(PA(INP)))
+     :                      + (YMIN * COS(PA(INP)*MATH__DTOR))
 
               CALL BINMERGE_ALTER (C1, C2, C3, C4, C5, C6,
      :            LDIMS(X_AX,INP), %VAL(XAXPTR), %VAL(OAXPTR(X_AX)))
@@ -511,14 +512,14 @@
             END IF
 
             IF (Y_AX .GT. -1) THEN
-              C1 = SIND(PA(1))
-              C2 = - SIND(PA(INP))
+              C1 = SIN(PA(1)*MATH__DTOR)
+              C2 = - SIN(PA(INP)*MATH__DTOR)
               C3 = (AXIS_RA(INP) - AXIS_RA(1))
-     :                      + (XMIN * SIND(PA(INP)))
-              C4 = - COSD(PA(1))
-              C5 = COSD(PA(INP))
+     :                      + (XMIN * SIN(PA(INP)*MATH__DTOR))
+              C4 = - COS(PA(1)*MATH__DTOR)
+              C5 = COS(PA(INP)*MATH__DTOR)
               C6 = (AXIS_DEC(INP) - AXIS_DEC(1))
-     :                      + (XMIN * COSD(PA(INP)))
+     :                      + (XMIN * COS(PA(INP)*MATH__DTOR))
 
               CALL BINMERGE_ALTER (C1, C2, C3, C4, C5, C6,
      :            LDIMS(Y_AX,INP), %VAL(YAXPTR), %VAL(OAXPTR(Y_AX)))
