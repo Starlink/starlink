@@ -131,7 +131,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Report object name
-      CALL USI_SHOW( 'Input {INPUT}', STATUS )
+      CALL USI_SHOW( 'Input {INP}', STATUS )
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) GOTO 99
