@@ -1,0 +1,82 @@
+<!doctype documentsummary public "-//Starlink//DTD Document Summary 0.1//EN">
+<documentsummary urllinkpolicy="explicit">
+<docinfo>
+<title>ESP --- Extended Surface Photometry</title>
+<authorlist>
+<author email="norman@astro.gla.ac.uk"
+  webpage="http://www.astro.gla.ac.uk"
+  affiliation="University of Glasgow"
+  id="ng">Norman Gray</author>
+<otherauthors>
+<author
+  id="gp">Grant Privett</author>
+</authorlist>
+<docnumber documenttype="SUN">180.4</docnumber>
+</docinfo>
+<docbody>
+<sect><title>Introduction</title>
+<label id="INTRODUCTION" export urlpath="sun180.htx/node2.html">
+<subsect><title>An overview</title>
+<subsect><title>What's new in this release</title>
+<label id="WHATSNEW" export urlpath="sun180.htx/node4.html">
+<subsect><title>A little more detail</title>
+<label id="ALITTLEMOREDETAIL" export urlpath="sun180.htx/node5.html">
+<sect><title>Installing ESP</title>
+<sect><title>Starting up ESP</title>
+<sect><title>Simple ESP Sessions</title>
+<subsect><title>Getting Help</title>
+<subsect><title>Session 1 --- Getting image statistics</title>
+<label id="SESSION1" export urlpath="sun180.htx/node10.html">
+<subsect><title>Session 2 --- Interactive profiling by intensity analysis</title>
+<label id="SESSION2" export urlpath="sun180.htx/node11.html">
+<subsect><title>Session 3 --- File based profiling by intensity analysis</title>
+<label id="SESSION3" export urlpath="sun180.htx/node12.html">
+<subsect><title>Session 4 --- Obtaining galaxy pieslice cross-section</title>
+<label id="SESSION4" export urlpath="sun180.htx/node13.html">
+<subsect><title>Session 5 --- Examining profiling results</title>
+<label id="SESSION5" export urlpath="sun180.htx/node14.html">
+<subsect><title>Session 6 --- Looking at the image background variation</title>
+<label id="SESSION6" export urlpath="sun180.htx/node15.html">
+<subsect><title>Session 7 --- Interactively obtaining 2-D Gaussian source profiles</title>
+<label id="SESSION7" export urlpath="sun180.htx/node16.html">
+<subsubsect><title>GAUFIT: original fitting algorithm</title>
+<subsubsect><title>GAUFIT: least-square fits</title>
+<sect><title>Deriving accurate background values</title>
+<label id="ACCURATEBACKGROUNDVALUES" export urlpath="sun180.htx/node19.html">
+<subsect><title>Global background value determination</title>
+<label id="GLOBALBACKGROUNDS" export urlpath="sun180.htx/node20.html">
+<subsect><title>Local background value determination</title>
+<label id="LOCALBACKGROUNDS" export urlpath="sun180.htx/node21.html">
+<sect><title>Removing image contamination</title>
+<subsect><title>Removing consistent image faults</title>
+<subsect><title>Removing other image contamination</title>
+<sect><title>Removing cosmics rays and bright regions</title>
+<sect><title>Examining image flatness</title>
+<sect><title>Highlighting faint diffuse objects</title>
+<subsect><title>Self-correlation</title>
+<subsect><title>Cross-correlation</title>
+<subsect><title>Hybrid cross/self-correlation</title>
+<sect><title>Obtaining galaxy cross-sections</title>
+<label id="SECTOR" export urlpath="sun180.htx/node55.html">
+<sect><title>Profiling galaxies using intensity analysis</title>
+<label id="ELLPRO" export urlpath="sun180.htx/node45.html">
+<sect><title>Profiling galaxies using contour analysis</title>
+<label id="ELLFOU" export urlpath="sun180.htx/node44.html">
+<sect><title>Choosing between ELLPRO and ELLFOU</title>
+<subsect><title>Limitations of ELLPRO and ELLFOU</title>
+<sect><title>Displaying the profiling results</title>
+<sect><title>Output file formats</title>
+<sect><title>Incorporating HISTPEAK into your own ADAM applications</title>
+<sect><title>Acknowledgements</title>
+<sect><title>Alphabetical list of ESP routines.</title>
+<label id="ALPHABETICAL" export urlpath="sun180.htx/node40.html">
+<sect><title>Description of the ESP routines</title>
+<subsect><title>Complete routine descriptions</title>
+<sect><title>Bad data masks (ARD)</title>
+<subsect><title>Detailed description of ARD files</title>
+<sect><title>Supported HDS Data Types</title>
+<sect><title>Position angle convention</title>
+<sect><title>Examples of output file formats and glossary</title>
+<sect><title>Backpage alphabetical listing</title>
+</docbody>
+</documentsummary>

@@ -1,0 +1,36 @@
+<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.1//EN'>
+<documentsummary urlpath='sgp28.htx/sgp28.html' urllinkpolicy='explicit'>
+<docinfo>
+<title>How to write good documents for Starlink</title>
+<authorlist>
+<author>M D Lawden</author>
+<!-- Insert email, webpage, affiliation attributes -->
+<author> A C Charles</author>
+<!-- Insert email, webpage, affiliation attributes -->
+</authorlist>
+<docnumber documenttype="SGP">28.8</docnumber>
+</docinfo>
+<docbody>
+<abstract> This document gives advice on how to write good Starlink documents. It lists Starlink documents which users said they liked in the 1994 Starlink Software Survey, and identifies common characteristics of style and organisation which can be recommended to authors. Various features of documentation which the authors believe to be harmful are specified, including common problems with pages produced for the World Wide Web. Many of these will inevitably reflect the taste of the authors, and these may not correspond to your own. However, they derive from our belief that it is right for an author to spend time and effort on a document in order to save the reader time and effort in reading it. </abstract>
+<sect><title>Introduction</title>
+<sect><title>Starlink Software Survey</title>
+<subsect><title>Best documents</title>
+<sect><title>Planned improvements to Starlink documents</title>
+<subsect><title>Cookbooks</title>
+<subsect><title>Hypertext</title>
+<sect><title>World Wide Web</title>
+<sect><title>Good style and organisation</title>
+<sect><title>Document diseases</title>
+<subsect><title>Web diseases</title>
+<sect><title>References</title>
+<sect><title>Standard elements of a Starlink document</title>
+<subsect><title>Code, date, filename</title>
+<subsect><title>Standard headers, type size, page size, layout</title>
+<subsect><title>Title</title>
+<sect><title>Producing a document</title>
+<subsect><title>Starting or revising a document</title>
+<subsect><title>Using \LaTeX</title>
+<subsect><title>Using Star2HTML</title>
+<subsect><title>Submitting a document for distribution</title>
+</docbody>
+</documentsummary>

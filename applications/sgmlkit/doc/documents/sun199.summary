@@ -1,0 +1,64 @@
+<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.1//EN'>
+<documentsummary urlpath='sun199.htx/sun199.html' urllinkpolicy='explicit'>
+<docinfo>
+<title>Star2HTML -- Converting Starlink Documents to Hypertext</title>
+<authorlist>
+<author>P W Draper</author>
+<!-- Insert email, webpage, affiliation attributes -->
+<author> A J Chipperfield</author>
+<!-- Insert email, webpage, affiliation attributes -->
+<author> M D Lawden</author>
+<!-- Insert email, webpage, affiliation attributes -->
+</authorlist>
+<docnumber documenttype="SUN">199.5</docnumber>
+</docinfo>
+<docbody>
+<abstract> Star2HTML lets you write (or convert) a Starlink document
+so that you can create two versions of it from a single source file. A
+paper version is produced by &latex, and a hypertext version (suitable
+for browsing on the web) is produced by &latex;2html. You can tailor
+each version to its own medium by marking selected text as
+<em/&latex;-only/ or <em/HTML-only/. Star2HTML also includes a set of
+document templates for producing Starlink documents in a standard
+style (such as <em/Starlink User Note/). They also define new &latex;
+commands for adding extra links to the hypertext version of your
+document (without affecting the paper version). This document explains
+these new facilities, and gives advice on good practice and on how to
+deal with some specific formatting problems when converting a document
+to hypertext. You are assumed to be familiar with &latex;. </abstract>
+<sect id="introduction" export urlpath="sun199.htx/node2.html"><title>Introduction</title>
+<subsect id="getting_started" export urlpath="sun199.htx/node3.html"><title>Getting started</title>
+<subsect id="converting_an_existing_document" export urlpath="sun199.htx/node4.html"><title>Converting an existing document</title>
+<subsect id="some_background" export urlpath="sun199.htx/node5.html"><title>Some background</title>
+<sect id="using_a_template" export urlpath="sun199.htx/node6.html"><title>Using a template</title>
+<subsect id="changing_placeholders" export urlpath="sun199.htx/node7.html"><title>Changing place-holders</title>
+<subsect id="using_sst_macros" export urlpath="sun199.htx/node8.html"><title>Using SST macros</title>
+<sect id="adding_links" export urlpath="sun199.htx/node9.html"><title>Adding links</title>
+<subsect id="internal_links" export urlpath="sun199.htx/node10.html"><title>Internal links</title>
+<subsect id="external_links" export urlpath="sun199.htx/node11.html"><title>External links</title>
+<subsect id="links_between_starlink_documents" export urlpath="sun199.htx/node12.html"><title>Links between Starlink documents</title>
+<subsect id="labelling_sections" export urlpath="sun199.htx/node13.html"><title>Labelling sections</title>
+<subsect id="links_to_routine_descriptions" export urlpath="sun199.htx/node14.html"><title>Links to routine descriptions</title>
+<sect id="adapting_to_the_media" export urlpath="sun199.htx/node15.html"><title>Adapting to the media</title>
+<subsect id="selecting_sections" export urlpath="sun199.htx/node16.html"><title>Selecting sections</title>
+<sect id="common_conversion_problems" export urlpath="sun199.htx/node17.html"><title>Common conversion problems</title>
+<subsect id="things_to_avoid" export urlpath="sun199.htx/node18.html"><title>Things to avoid</title>
+<subsubsect><title>Raw &tex;</title>
+<subsubsect><title>Parboxes</title>
+<subsect id="things_that_rarely_look_right" export urlpath="sun199.htx/node21.html"><title>Things that rarely look right</title>
+<subsubsect><title>Tabbing environments</title>
+<subsect id="irritants" export urlpath="sun199.htx/node23.html"><title>Irritants</title>
+<subsubsect id="suppressing_blank_lines" export urlpath="sun199.htx/node24.html"><title>Unwanted blank lines</title>
+<subsubsect><title>Tildas in URLs</title>
+<subsect id="hints_from_the_starlink_software_librarian" export urlpath="sun199.htx/node27.html"><title>Hints from the Starlink Software Librarian</title>
+<sect id="submitting_your_document_for_release" export urlpath="sun199.htx/node28.html"><title>Submitting your document for release</title>
+<sect id="finally" export urlpath="sun199.htx/node29.html"><title>Finally</title>
+<sect id="references" export urlpath="sun199.htx/node30.html"><title>References</title>
+<sect id="changes_in_this_release" export urlpath="sun199.htx/node31.html"><title>Changes in this release</title>
+<subsect><title>Incompatibilities with previous version of Star2HTML</title>
+<sect id="the_star2html_command" export urlpath="sun199.htx/node33.html"><title>The star2html command</title>
+<sect id="the_xlabel_command" export urlpath="sun199.htx/node34.html"><title>The xlabel command</title>
+<sect id="the_latex2html_command" export urlpath="sun199.htx/node35.html"><title>The latex2html command</title>
+<sect id="the_structure_of_a_converted_hypertext_document" export urlpath="sun199.htx/node36.html"><title>The structure of a converted hypertext document</title>
+</docbody>
+</documentsummary>

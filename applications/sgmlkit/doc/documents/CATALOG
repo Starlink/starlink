@@ -1,0 +1,12 @@
+--
+   These are document summaries as used in the SSN70 document.  They
+   have to be created specially, since the documentation can be 
+   generated at a time, during installation, before the general library
+   of document summaries is complete.
+
+   The summary documents have been tidied up by hand.
+--
+PUBLIC "-//Starlink//DOCUMENT Summary SGP/28//EN"	sgp28.summary
+PUBLIC "-//Starlink//DOCUMENT Summary SUN/180//EN"	sun180.summary
+PUBLIC "-//Starlink//DOCUMENT Summary SUN/188//EN"	sun188.summary
+PUBLIC "-//Starlink//DOCUMENT Summary SUN/199//EN"	sun199.summary
