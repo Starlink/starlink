@@ -244,15 +244,13 @@
         IF ( ISDS ) THEN
 
 *      Copy axes
-          IF ( NAX .GT. 0 ) THEN
-            JAX = 1
-            DO IAX = 1, NAX
-              IF ( IAX .NE. AXIS ) THEN
-                CALL BDI_AXCOPY( IFID, IAX, ' ', OFID, JAX, STATUS )
-                JAX = JAX + 1
-              END IF
-            END DO
-          END IF
+          JAX = 1
+          DO IAX = 1, NAX
+            IF ( IAX .NE. AXIS ) THEN
+              CALL BDI_AXCOPY( IFID, IAX, ' ', OFID, JAX, STATUS )
+              JAX = JAX + 1
+            END IF
+          END DO
 
 *      Ancillary bits
           CALL HSI_COPY( IFID, OFID, STATUS )
@@ -284,12 +282,9 @@
      :                     1, 1, 1, 1, 1, 1, 1,
      :                     AXCEN, OQUAL, STATUS )
 
-        IF ( NAX .GT. 0 ) THEN
-          CALL BDI_AXGET0C( IFID, AXIS, 'Units', UNITS, STATUS )
-          CALL MSG_SETC( 'UNIT', UNITS )
-        ELSE
-          CALL MSG_SETC( 'UNIT', 'pixels' )
-        END IF
+        CALL BDI_AXGET0C( IFID, AXIS, 'Units', UNITS, STATUS )
+        IF ( UNITS .LE. ' ' ) UNITS = 'pixels'
+        CALL MSG_SETC( 'UNIT', UNITS )
         CALL MSG_SETI( 'AX', AXIS )
         CALL MSG_SETR( 'CEN', AXCEN )
         CALL MSG_PRNT( 'Centroid wrt axis ^AX is ^CEN ^UNIT.' )
