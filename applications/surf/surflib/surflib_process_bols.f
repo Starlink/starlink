@@ -267,6 +267,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.5  1999/07/29 03:50:29  timj
+*     Fix call to sculib_calc_apparent
+*
 *     Revision 1.4  1999/07/14 20:13:33  timj
 *     Pass LAT_OBS into SCULIB_CALC_APPARENT rather than having it as
 *     a parameter.
@@ -894,8 +897,8 @@
 
 *     now add on the tangent plane offset in this frame and convert
 *     back to apparent RA,Dec
-                           CALL SCULIB_CALC_APPARENT(MYLONG, MYLAT,
-     :                          0.0D0, 0.0D0, MAP_X, MAP_Y,
+                           CALL SCULIB_CALC_APPARENT(LAT_OBS, MYLONG, 
+     :                          MYLAT, 0.0D0, 0.0D0, MAP_X, MAP_Y,
      :                          LOCAL_COORDS, LST, IN_UT1, 0.0D0, 0.0D0,
      :                          ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
      :                          DTEMP, STATUS)

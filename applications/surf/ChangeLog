@@ -1,3 +1,8 @@
+1999-07-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Add
+	LAT_OBS to SCULIB_CALC_APPARENT call (was not done before!!!)
+
 1999-07-16  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* surflib/surflib_remove_dc_from_exp.f
