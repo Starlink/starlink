@@ -8,6 +8,10 @@ SUBDIRS = @subdirs@
 noinst_LTLIBRARIES = libpgplot_drivers.la
 libpgplot_drivers_la_SOURCES = $(F_ROUTINES) $C(ROUTINES)
 
+bin_PROGRAMS = pgxwin_server
+pgxwin_server = pgxwin_server.c
+
+
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines, which are treated separately). Keep this list in alphabetical
@@ -21,7 +25,7 @@ hidriv.f psdriv.f ttdriv.f cwdriv.f \
 gldriv.f nedriv.f wddriv.f	   \
 hpdriv.f lsdriv.f nudriv.f qmdriv.f vadriv.f
 
-C_ROUTINES = cgdriv.c nexsup.c pgxwin_server.c rvdriv.c x2driv.c     \
+C_ROUTINES = cgdriv.c nexsup.c rvdriv.c x2driv.c     \
 xmdriv.c figdisp_comm.c pgxwin.c pndriv.c tkdriv.c xadriv.c xwdriv.c
 
 AM_CFLAGS = -DPG_PPU
