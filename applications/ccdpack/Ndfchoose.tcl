@@ -51,6 +51,7 @@
 #        This method returns a list giving the percentile cutoff
 #        values which are used to display each NDF.  The list has two
 #        elements {lo hi} where 0 <= lo <= hi <= 100.
+#           - index     -- Index of the ndf whose percentiles are required
 
 
 #  Public Variables (Configuration Options):
@@ -90,22 +91,21 @@
 #        "inactive" if the getpair method will return a pair which 
 #        satisfies this criterion.
 #
-#     watchstate = string
-#        This gives a name of a variable in the caller's context which
-#        will be kept up to date with the state of this object, i.e.
-#        it will have the same value as the object's $state public
-#        variable.  It is useful to configure this so that the variable
-#        can be traced to watch for changes in state.
 #-
 
 #  Inheritance.
-      inherit itk::Toplevel
+      inherit Ccdtop
 
 
 ########################################################################
 #  Constructor.
 ########################################################################
       constructor { args } {
+
+#  Invoke the Ccdtop constructor with arguments indicating that the outer
+#  frame must be a GWM-colormap-holding frame.
+         Ccdtop::constructor -colormap
+      } {
 
 #  Parse the arguments: any arguments before the first one starting with
 #  a minus sign are interpreted as ndf objects, and any following are
@@ -139,29 +139,23 @@
 #  Calculate the dimensions available for viewing the NDFs themselves.
          set viewx [ expr [ lindex $viewport 0 ] / 2 ]
          set viewy [ lindex $viewport 1 ]
-
-#  Construct the top level container frame.
-         container body $itk_interior 1
-         pack $itk_component(body)
        
-#  Construct the control panel.
-         itk_component add panel {
-            frame $itk_component(body).controls
-         }
+#  Add buttons to the control panel.
+         set panel [ panel ]
          itk_component add showfits {
-            button $itk_component(panel).showfits \
+            button $panel.showfits \
                -text "Show FITS" \
                -command [ code $this fitsselect ]
          }
-         lappend controls $itk_component(showfits)
+         addcontrol $itk_component(showfits)
          itk_component add dstyle {
-            stylecontrol $itk_component(panel).dstyle \
+            stylecontrol $panel.dstyle \
                -value "drawaxes=0,grid=0,numlab=0" \
                -valuevar displaystyle
          }
-         lappend controls $itk_component(dstyle)
+         addcontrol $itk_component(dstyle)
          itk_component add gotpair {
-            button $itk_component(panel).gotpair \
+            button $panel.gotpair \
                -text "Use this pair" \
                -command [ code $this configure -state inactive ] \
                -state disabled
@@ -169,15 +163,13 @@
             usual
             ignore -state
          }
-         lappend controls $itk_component(gotpair)
+         addcontrol $itk_component(gotpair)
          itk_component add done {
-            button $itk_component(panel).done \
+            button $panel.done \
                -text "Exit" \
                -command [ code $this configure -state done ]
          }
-         lappend controls $itk_component(done)
-
-         eval pack $controls -side left
+         addcontrol $itk_component(done)
 
 #  Construct the choosing area.  This is the business end of the widget
 #  and consists of two tabsets and two frames in which NDFs can be 
@@ -185,8 +177,9 @@
 #  widget's control, and this window is mapped or unmapped in one of
 #  the frames by a geometry manager according to what the user selects.
 #  First set a container frame within which all this display will happen.
+         set interior [ childsite ]
          itk_component add choosearea {
-            frame $itk_component(body).choosearea
+            frame $interior.choosearea
          }
 
 #  Most elements of the choosearea have an A side and a B side; construct
@@ -249,12 +242,11 @@
 
 #  Pack the components into the hull.
          pack $itk_component(choosearea) -side top
-         pack $itk_component(panel) -side top
 
 #  Save the initial dimensions of the window.
-         update idletasks
-         set lastxwin [ winfo width $itk_interior ]
-         set lastywin [ winfo height $itk_interior ]
+         # update idletasks
+         # set lastxwin [ winfo width $itk_interior ]
+         # set lastywin [ winfo height $itk_interior ]
 
 #  Generate frames which will contain the windows to be displayed for each
 #  of the NDFs.
@@ -507,6 +499,9 @@
                regsub " x $" $dims "" dims
             }
 
+#  Construct a set of labelled widgets containing the information.
+            set lws ""
+
 #  Put a percentile selection button in the text region.
             itk_component add info$index:key_percentile {
                iwidgets::labeledwidget $itk_component(info$index).wpercentile \
@@ -525,7 +520,7 @@
                lappend controls $percentilecontrol($index)
                pack $itk_component(info$index:val_percentile)
             }
-            pack $itk_component(info$index:key_percentile) -side top -anchor w
+            lappend lws $itk_component(info$index:key_percentile)
 
 #  Construct a list of key, value pairs to be displayed in the text region.
             set pairs {}
@@ -557,8 +552,12 @@
                   }
                   pack $itk_component(info$index:val_$key)
                }
-               pack $itk_component(info$index:key_$key) -side top -anchor w
+               lappend lws $itk_component(info$index:key_$key)
             }
+
+#  Pack and align the labeled widgets.
+            eval pack $lws -side top -anchor w
+            eval iwidgets::Labeledwidget::alignlabels $lws
          }
 
 #  Return the name of the window.
@@ -679,102 +678,17 @@
 #  If there is now a discrepancy bewteen the size of the container and
 #  the size of the toplevel widget itself, adjust the size of the viewport
 #  so that they match.
-         set vx [ lindex $viewport 0 ]
-         set vy [ lindex $viewport 1 ]
-         incr vx [ expr [ winfo width $itk_interior ] - \
-                        [ winfo reqwidth $itk_component(body) ] ]
-         incr vy [ expr [ winfo height $itk_interior ] - \
-                        [ winfo reqheight $itk_component(body) ] ]
-         configure -viewport [ list $vx $vy ]
+      #  set vx [ lindex $viewport 0 ]
+      #  set vy [ lindex $viewport 1 ]
+      #  #  Body here refers to the frame directly inside the toplevel.
+      #  incr vx [ expr [ winfo width $itk_interior ] - \
+      #                 [ winfo reqwidth [ $itk_component(body) ] ]
+      #  incr vy [ expr [ winfo height $itk_interior ] - \
+      #                 [ winfo reqheight $itk_component(body) ] ]
+      #  configure -viewport [ list $vx $vy ]
+      #  configure -geometry [ winfo geometry $itk_interior ]
       }
 
-
-#-----------------------------------------------------------------------
-      private method container { component parent { install 0 } } {
-#-----------------------------------------------------------------------
-#  This method creates a frame capable in terms of colormaps of holding
-#  a GWM widget.  If it can create a window using a visual which is not
-#  going to run out of colours, this does not require extra work. 
-#  However, if we are stuck with a PseudoColor visual then creating
-#  lots of GWM widgets will fail, since each needs to allocate a significant
-#  number of colours (is PseudoColor the only one in which this might 
-#  happen?).  In this case, this method will create a frame
-#  with a new colormap.  In order that the colormaps of the various 
-#  parts of the widget are consistent with each other, it then messes
-#  about in the new window in such a way as to cause allocation of 
-#  the colours which are going to need to be consistent within the
-#  all the internal windows of the widget; since the same thing 
-#  happens in every window just after it is created, hopefully they
-#  ought to end up with the bottom ends of their colormaps looking the
-#  same.  Probably this is not guaranteed by X, but (a) it seems to work
-#  on the PseudoColor display I have to hand, and (b) I've got no idea
-#  how else to go about it.  If the optional install argument is set
-#  true, then window manager will be instructed to use the new colormap
-#  for the widget when it gets colormap focus (usually if the pointer is
-#  over it).
-#
-#  A simpler solution would be to force all the windows to use the same
-#  colormap, however I don't think this is possible since each GWM
-#  widget insists on grabbing a bunch of new colours from the colormap
-#  when it starts up.
-#
-#  My knowledge of X is not encyclopaedic, so there may be any number of
-#  things I'm doing wrong here.
-         set path $parent.hold_$component
-
-#  Find out what visual we are going to use.  If possible, use the visual
-#  of the parent window, since it's likely to be what the display is 
-#  most at home using (though possibly one could be smarter about making
-#  this decision).  If it's not suitable though, pick something from
-#  what is available.
-         set parentvisual [ winfo visual $parent ]
-         set visual $parent
-         set pseudo 0
-         if { $parentvisual == "pseudocolor" } {
-            set visual $parent
-            set pseudo 1
-         } elseif { $parentvisual == "truecolor" } {
-            set visual $parent
-            set pseudo 0
-         } else {
-            foreach vis [ winfo visualsavailable $parent ] {
-               set type [ lindex $vis 0 ]
-               set depth [ lindex $vis 1 ]
-               if { $type == "pseudocolor" && $depth >= 8 } { 
-                  set visual $vis
-                  set pseudo 1
-                  break
-               } elseif { $type == "truecolor" && $depth >= 12 } {
-                  set visual $vis
-                  set pseudo 0
-                  break
-               }
-            }
-         }
-
-#  If it's not going to be PseudoColor, we just need to create a frame.
-         if { ! $pseudo } {
-            itk_component add $component {
-               frame $path
-            }
-
-#  It will be PseudoColor.  Create a frame with a new colormap, and
-#  then create some windows in it which will force allocation of colours
-#  we're going to need in the first few slots.
-         } else {
-            itk_component add $component {
-               frame $path -colormap new
-            }
-            iwidgets::pushbutton $path.but -text T
-            # button $path.but -text T
-
-#  If required, notify the window manager that this colormap should be the
-#  one used for the toplevel window.
-            if { $install } {
-               wm colormapwindows $itk_interior $path
-            }
-         }
-      }
 
 
 #-----------------------------------------------------------------------
@@ -833,30 +747,6 @@
 
 
 ########################################################################
-#  Private procedures.
-########################################################################
-
-#-----------------------------------------------------------------------
-      private proc max { num args } {
-#-----------------------------------------------------------------------
-         foreach x $args {
-            if { $x > $num } { set num $x }
-         }
-         return $num
-      }
-
-
-#-----------------------------------------------------------------------
-      private proc min { num args } {
-#-----------------------------------------------------------------------
-         foreach x $args {
-            if { $x < $num } { set num $x }
-         }
-         return $num
-      }
-
-
-########################################################################
 #  Public variables.
 ########################################################################
 
@@ -896,38 +786,6 @@
 
 
 #-----------------------------------------------------------------------
-      public variable watchstate "" {
-#-----------------------------------------------------------------------
-         set watchlevel [expr [info level] - 1]
-         upvar #$watchlevel $watchstate wstate
-         set wstate $state
-      }
-
-
-#-----------------------------------------------------------------------
-      public variable state "inactive" {
-#-----------------------------------------------------------------------
-         if { $state == "inactive" || $state == "active" || $state == "done" } {
-            if { $watchstate != "" } {
-               upvar #$watchlevel $watchstate wstate
-               set wstate $state
-            }
-            if { $state == "active" } {
-               foreach c $controls {
-                  $c configure -state normal
-               }
-            } elseif { $state == "inactive" } {
-               foreach c $controls {
-                  $c configure -state disabled
-               }
-            }
-         } else {
-            error "Invalid value \"$state\" for state"
-         }
-      }
-
-
-#-----------------------------------------------------------------------
       public variable validpair { expr 1 } {
 #-----------------------------------------------------------------------
          $itk_component(gotpair) configure \
@@ -939,7 +797,6 @@
 #  Private variables.
 ########################################################################
       private variable allfits         ;# List of available FITS header lines
-      private variable controls        ;# List of control panel widgets
       private variable highlight       ;# Array by ndf index of highlight state
       private variable inview          ;# Array by slot of viewed NDFs
       private variable lastvp { 0 0 }  ;# Last value of viewport variable
@@ -949,7 +806,6 @@
       private variable ndflist         ;# List of ndf objects
       private variable percentilecontrol;# Perc control widgets for each NDF
       private variable showfits {}     ;# FITS headers to display for each NDF 
-      private variable watchlevel 0    ;# Call stack level of calling code
 
    }
 
