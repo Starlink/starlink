@@ -214,7 +214,7 @@
 *    Copy data from temporary storage to output file
         CALL BDI_PUT1R( OFID, 'Data', ONVAL, %val(TDPTR), STATUS )
         IF ( VOK ) THEN
-          CALL BDI_PUT1R( OFID, 'Data', ONVAL, %val(TVPTR), STATUS )
+          CALL BDI_PUT1R( OFID, 'Variance', ONVAL, %val(TVPTR), STATUS )
         ENDIF
         CALL BDI_AXPUT1R( OFID, 1, 'Data', ONVAL, %val(TAPTR), STATUS )
         CALL BDI_AXPUT1R( OFID, 1, 'Width', ONVAL, %val(TWPTR), STATUS )
