@@ -2070,7 +2070,7 @@ astText( this, text, pos, up, just )
   len = av_len( pos ) + 1;
   if ( len != naxes ) Perl_croak( aTHX_ "pos must contain %d elements", naxes);
   len = av_len( up ) + 1;
-  if ( len != 1 ) Perl_croak( aTHX_ "up must contain 2 elements");
+  if ( len != 2 ) Perl_croak( aTHX_ "up must contain 2 elements");
   cpos = pack1D(newRV_noinc((SV*)pos), 'd');
   cup = pack1D(newRV_noinc((SV*)up), 'f');
   PLOTCALL(arg,
