@@ -5,6 +5,11 @@
    Assorted changes to fit in with requirements of the rules generated
    by the version of automake patched for Starlink use:
 
+     If a file of the same name as the new output file is found with
+     a suffix of _ext it is written to the output file prior to writing
+     the MESSGEN error codes. This is useful when combining non-messgen
+     error codes with messgen error codes.
+
      Add -F option, to generate Fortran files with uppercase names
      (thus FAC_ERR rather than fac_err)
  

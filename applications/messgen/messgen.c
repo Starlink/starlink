@@ -19,6 +19,10 @@
  *     VMS MESSAGE format and will optionally output C and FORTRAN header
  *     files and a special "error definition" file used by EMS and other
  *     utilities to translate error codes to text on Unix systems.
+ *     If a the current directory contains a file of the same name
+ *     as the new output file but with an "_ext" suffix, the contents
+ *     of that file are written to the output file prior to writing the
+ *     error codes.
 
  *  Parameters:
  *     Options: One or more of:
@@ -38,6 +42,7 @@
  *     BKM: B.K. McIlwrath (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
  *     NG: Norman Gray (Starlink)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -60,6 +65,12 @@
  *        Convert from sys_errlist[] to using strerrno() 
  *     10-DEC-2003 (NG):
  *        Add -F option
+ *     10-FEB-2004 (NG):
+ *        Add -V option. Make -f and -F paths independent. Simplify
+ *        variable names for fp0, fp1 etc.
+ *     23-MAR-2004 (TIMJ):
+ *        Add search for _ext external data files to be concatenated
+ *        with the MESSGEN error codes.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -79,6 +90,9 @@ char fac_name[10], fac_prefix[10];
 
 int f77_include=0, f77_INCLUDE=0, c_header=0, c_error=0;
 int verify=0, write_filenames=0;
+
+/* prototypes */
+void write_external(char *, FILE * );
 
 static int
 parse_facility(char buffer[MAXLINE])
@@ -197,6 +211,7 @@ process_file(char *filename)
 		    }
                     if (write_filenames)
                         puts( file_name );
+		    write_external(file_name, fp_c);
 		    fprintf(fp_c,
                             "/*\n * C error define file "
                             "for facility %s (%d)\n"
@@ -216,6 +231,7 @@ process_file(char *filename)
 		    }
                     if (write_filenames)
                         puts( file_name );
+		    write_external(file_name, fp_f);
 		    fprintf(fp_f,
                             "* FORTRAN error include file for facility "
                             "%s (Code %d)\n"
@@ -234,6 +250,7 @@ process_file(char *filename)
 		    }
                     if (write_filenames)
                         puts( file_name );
+		    write_external(file_name, fp_F);
 		    fprintf(fp_F,
                             "* FORTRAN error include file for facility "
                             "%s (Code %d)\n"
@@ -350,6 +367,50 @@ process_file(char *filename)
 	printf("MESSAGE file converted successfully\n");
     return;
 }
+
+
+/*
+ * Find out whether we have extra header info that should be concatenated
+ * with the VMS error code information. This is important for automatically
+ * generating some historical error include files that mix messgen 
+ * error codes with other error codes. (see e.g. CHR and IDI that have
+ * __OK constants set to 0, and GWM that mixes internal C error codes with
+ * public messgen codes.
+ *
+ * MESSGEN will look for a file in the current directory with the
+ * same name as the new output file but with the string _ext suffix
+ * (to indicate external data). ie CHR_ERR will look for CHR_ERR_ext
+ * and chr_err.h will look for chr_err.h_ext.
+
+ *  write_external( char * file_name, FILE * fileptr )
+
+*/
+
+void
+write_external( char * file_name, FILE * fileptr ) {
+  const char suffix[5] = "_ext";
+  char extdata[MAXLINE + 4];  /* include space for _ext */
+  char buffer[MAXLINE];
+  FILE * fp_ext = NULL;
+
+  if (fileptr == NULL) return;
+
+  /* add on the _ext suffix */
+  strcpy(extdata, file_name);
+  strcat(extdata,suffix);
+
+  /* Try to open the file */
+  fp_ext = fopen( extdata, "r");
+  if (fp_ext == NULL) return;
+
+  /* copy data to output handle */
+  while (fgets(buffer, MAXLINE, fp_ext) != NULL) {
+    fputs(buffer, fileptr);
+  }
+}
+
+
+
 
 int
 main(int argc, char *argv[])

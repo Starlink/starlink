@@ -26,6 +26,11 @@
       <uname>bkm</uname>
       <email>B.K.McIlwrath@rl.ac.uk</email>
     </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>ng</uname>
+      <email>norman@ASTRO.GLA.AC.UK</email>
+    </person>
   </developers>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
 </component>
