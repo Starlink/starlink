@@ -59,7 +59,7 @@ struct bitmap_info {
 };
 
 void process_dvi_file (DviFile *, bitmap_info&, int resolution,
-		       const PkFont *fallback_font);
+		       const PkFont *fallback_font, PageRange&);
 bool process_special (string specialString, Bitmap*, bitmap_info&);
 string_list& tokenise_string (string s);
 string get_ofn_pattern (string dviname);
@@ -84,6 +84,7 @@ main (int argc, char **argv)
     bool do_process_file = true; // if true, then process DVI file
     bool all_fonts_present = true;
     bool no_font_present = true;
+    PageRange PR;
 
     //DviFile::verbosity(2);
     //PkFont::verbosity(2);
@@ -158,24 +159,11 @@ main (int argc, char **argv)
 		  }
 		  break;
 	      }
-
 	      case 'f':		// set PK font path
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		PkFont::setFontPath(*argv);
-		break;
-	      case 'r':		// set resolution
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		resolution = atoi (*argv);
-		break;
-	      case 'm':		// set magnification
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		magmag = atof (*argv);
 		break;
 	      case 'g':		// debugging...
 		{
@@ -210,27 +198,17 @@ main (int argc, char **argv)
 			}
 		}
 		break;
-	      case 'q':		// run quietly
-		DviFile::verbosity(quiet);
-		PkFont::verbosity(quiet);
-		PkRasterdata::verbosity(quiet);
-		InputByteStream::verbosity(quiet);
-		Bitmap::verbosity(quiet);
-		verbosity = quiet;
-		break;
-	      case 'Q':		// run silently - no warnings or errors
-		DviFile::verbosity(silent);
-		PkFont::verbosity(silent);
-		PkRasterdata::verbosity(silent);
-		InputByteStream::verbosity(silent);
-		Bitmap::verbosity(silent);
-		verbosity = silent;
-		break;
-	      case 'l':		// show missing fonts
+	      // case 'l': see below
+	      case 'L':		// show missing fonts
 		show_font_list = 1;
+		if (*++*argv == 'L')
+		    show_font_list = 2;	// show all fonts
 		break;
-	      case 'L':		// show all fonts
-		show_font_list = 2;
+	      case 'm':		// set magnification
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		magmag = atof (*argv);
 		break;
 	      case 'n':		// don't actually process the DVI file
 		switch (*++*argv)
@@ -247,6 +225,12 @@ main (int argc, char **argv)
 		    break;
 		}
 		break;
+	      case 'o':		// set output filename pattern
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		bm.ofile_pattern = *argv;
+		break;
 	      case 'P':		// process the bitmap...
 		while (*++*argv != '\0')
 		    switch (**argv)
@@ -262,6 +246,36 @@ main (int argc, char **argv)
 			break;
 		    }
 		break;
+	      case 'l':		// set page range
+	      case 'p':
+		if (argc <= 1)
+		    Usage();
+		if (! PR.addSpec (argv[0], argv[1]))
+		    Usage();
+		argc--, argv++;
+		break;
+	      case 'q':		// run quietly
+		DviFile::verbosity(quiet);
+		PkFont::verbosity(quiet);
+		PkRasterdata::verbosity(quiet);
+		InputByteStream::verbosity(quiet);
+		Bitmap::verbosity(quiet);
+		verbosity = quiet;
+		break;
+	      case 'Q':		// run silently - no warnings or errors
+		DviFile::verbosity(silent);
+		PkFont::verbosity(silent);
+		PkRasterdata::verbosity(silent);
+		InputByteStream::verbosity(silent);
+		Bitmap::verbosity(silent);
+		verbosity = silent;
+		break;
+	      case 'r':		// set resolution
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		resolution = atoi (*argv);
+		break;
 	      case 's':		// scale down
 		argc--, argv++;
 		if (argc <= 0)
@@ -273,12 +287,6 @@ main (int argc, char **argv)
 		if (argc <= 0)
 		    Usage();
 		bm.ofile_type = *argv;
-		break;
-	      case 'o':		// set output filename pattern
-		argc--, argv++;
-		if (argc <= 0)
-		    Usage();
-		bm.ofile_pattern = *argv;
 		break;
 	      case 'V':		// display version
 		cout << version_string << "\nOptions:\n";
@@ -382,7 +390,7 @@ main (int argc, char **argv)
 		    cerr << progname << ": no fonts found!  Giving up\n";
 	    }
 	    else
-		process_dvi_file (dvif, bm, resolution, fallback_font);
+		process_dvi_file (dvif, bm, resolution, fallback_font, PR);
 	}
 
     }
@@ -404,7 +412,7 @@ main (int argc, char **argv)
 }
 
 void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
-		       const PkFont *fallback_font)
+		       const PkFont *fallback_font, PageRange& PR)
 {
     DviFileEvent *ev;
     const PkFont *curr_font = 0;
@@ -413,12 +421,17 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
     bool end_of_file = false;
     int outcount = 0;		// characters written to output current line
     bool initialisedInch = false;
+    bool skipPage = false;
 
     while (! end_of_file)
     {
 	PkGlyph *glyph;
 
-	ev = dvif->getEvent();
+	if (skipPage)
+	    ev = dvif->getEndOfPage();
+	else
+	    ev = dvif->getEvent();
+
 	if (verbosity > debug)
 	    ev->debug();
 
@@ -433,54 +446,73 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 	    if (page->isStart)
 	    {
 		pagenum++;
-		// Request a big-enough bitmap; this bitmap is the `page' on
-		// which we `print' below.  hSize and vSize are the
-		// width and height of the widest and tallest pages,
-		// as reported by the DVI file; however, the file doesn't
-		// report the offsets of these pages.  Add an inch to
-		// both and hope for the best.
-		bitmap = new Bitmap
-		    ((bitmapW > 0 ? bitmapW : dvif->hSize()+oneInch),
-		     (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch));
-		if (verbosity > quiet)
-		{
-		    int last, i;
-		    // find last non-zero count
-		    for (last=9; last>=0; last--)
-			if (page->count[last] != 0)
-			    break;
 
-		    SSTREAM pageind;
-		    pageind << '[' << page->count[0];
-		    for (i=1; i<=last; i++)
-			pageind << '.' << page->count[i];
-		    pageind << '\0';
-		    string ostr = pageind.str();
-		    if (outcount + ostr.length() > 78)
+		// Are we to print this page?
+		if (! PR.isSelected(pagenum, page->count))
+		    skipPage = true;
+		else
+		{
+		    // Request a big-enough bitmap; this bitmap is the `page'
+		    // on which we `print' below.  hSize and vSize are the
+		    // width and height of the widest and tallest pages,
+		    // as reported by the DVI file; however, the file doesn't
+		    // report the offsets of these pages.  Add an inch to
+		    // both and hope for the best.
+		    bitmap = new Bitmap
+			((bitmapW > 0 ? bitmapW : dvif->hSize()+oneInch),
+			 (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch));
+		    if (verbosity > quiet)
 		    {
-			cout << '\n';
-			outcount = 0;
+			int last, i;
+			// find last non-zero count
+			for (last=9; last>=0; last--)
+			    if (page->count[last] != 0)
+				break;
+			
+			SSTREAM pageind;
+			pageind << '[' << page->count[0];
+			for (i=1; i<=last; i++)
+			    pageind << '.' << page->count[i];
+			pageind << '\0';
+			string ostr = pageind.str();
+			if (outcount + ostr.length() > 78)
+			{
+			    cout << '\n';
+			    outcount = 0;
+			}
+			cout << ostr;
+			outcount += ostr.length();
 		    }
-		    cout << ostr;
-		    outcount += ostr.length();
 		}
 	    }
 	    else
 	    {
-		if (bitmap == 0)
-		    throw DviBug ("bitmap uninitialised at page end");
-		if (bitmap->empty())
+		if (skipPage)
 		{
-		    if (verbosity > silent)
-			cerr << "Warning: page " << pagenum
-			     << " empty: nothing written\n";
+		    // nothing to do in this case except reset it
+		    skipPage = false;
+		    if (bitmap != 0) // just in case
+		    {
+			delete bitmap;
+			bitmap = 0;
+		    }
 		}
 		else
 		{
-		    if (bitmap->overlaps() && verbosity > silent)
+		    if (bitmap == 0)
+			throw DviBug ("bitmap uninitialised at page end");
+		    else if (bitmap->empty())
 		    {
-			int *bb = bitmap->boundingBox();
-			cerr << "Warning: p." << pagenum
+			if (verbosity > silent)
+			    cerr << "Warning: page " << pagenum
+				 << " empty: nothing written\n";
+		    }
+		    else
+		    {
+			if (bitmap->overlaps() && verbosity > silent)
+			{
+			    int *bb = bitmap->boundingBox();
+			    cerr << "Warning: p." << pagenum
 			     << ": bitmap too big: occupies (" << bb[0] << ','
 			     << bb[1] << ")...(" << bb[2] << ','
 			     << bb[3] << ").  Requested "
@@ -488,33 +520,34 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			     << 'x'
 			     << (bitmapH > 0 ? bitmapH : dvif->vSize()+oneInch)
 			     << '\n';
+			}
+			bitmap->crop();
+			if (b.blur_bitmap)
+			    bitmap->blur();
+			if (b.make_transparent)
+			    bitmap->setTransparent(true);
+			if (b.bitmap_scale_factor != 1)
+			    bitmap->scaleDown (b.bitmap_scale_factor);
+			if (b.ofile_name.length() == 0)
+			{
+			    char fn[100];
+			    sprintf (fn, b.ofile_pattern.c_str(), pagenum);
+			    string output_filename = fn;
+			    bitmap->write (output_filename, b.ofile_type);
+			}
+			else
+			    bitmap->write (b.ofile_name, b.ofile_type);
 		    }
-		    bitmap->crop();
-		    if (b.blur_bitmap)
-			bitmap->blur();
-		    if (b.make_transparent)
-			bitmap->setTransparent(true);
-		    if (b.bitmap_scale_factor != 1)
-			bitmap->scaleDown (b.bitmap_scale_factor);
-		    if (b.ofile_name.length() == 0)
+		    b.ofile_name = "";
+
+		    delete bitmap;
+		    bitmap = 0;
+
+		    if (verbosity > quiet)
 		    {
-			char fn[100];
-			sprintf (fn, b.ofile_pattern.c_str(), pagenum);
-			string output_filename = fn;
-			bitmap->write (output_filename, b.ofile_type);
+			cout << "] ";
+			outcount += 2;
 		    }
-		    else
-			bitmap->write (b.ofile_name, b.ofile_type);
-		}
-		b.ofile_name = "";
-
-		delete bitmap;
-		bitmap = 0;
-
-		if (verbosity > quiet)
-		{
-		    cout << "] ";
-		    outcount += 2;
 		}
 	    }
 	else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
@@ -786,7 +819,7 @@ string_list& tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-lLqQV] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-[Cc][lrtb]] [-t xbm"
+    cerr << "Usage: " << progname << " [-qQV] [-L[L]] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-p num] [-l num] [-pp ranges] [-[Cc][lrtb]] [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif

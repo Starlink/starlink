@@ -82,7 +82,8 @@ make things a little clearer.</update>
 dvi2bitmap 
     [-f font-path] [-r resolution] [-m magnification] [-P[bt]]
     [-s scalefactor] [-t gif|xbm] [-o output] [-b(h|w) size]
-    [-c[lrtb] dimen] [-C[lrtb] dimen] [-lLnqQV]
+    [-c[lrtb] dimen] [-C[lrtb] dimen] [-nqQV] [-L[L]]
+    [-p num] [-l num] [-pp ranges]
     dvi-file
 </verbatim>
 
@@ -152,7 +153,10 @@ set this within the &tex; file.
 <dd>Specifies the path to the PK fonts which dvi2bitmap will use.  See
 also <ref id=usage.fonts>.
 
-<dt><code>-l</code>
+<dt><code>-l pagenum</code>
+<dd>See option <code/-p/
+
+<dt><code>-L</code>
 <dd>Show missing fonts.
 The program writes on standard output one line per missing font, with
 five fields: the 
@@ -161,11 +165,8 @@ the magnification factor, and a dummy metafont mode.
 This output can 
 be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
 generate the required fonts.
-
-<dt><code>-L</code>
-<dd>Show all fonts in the DVI file.  The output is as for the 
-<code>-l</code>
-option, except that found fonts are also listed, prefixed by a % character.
+<p>The the option is <code/-LL/, then do the same, 
+except that found fonts are also listed, prefixed by a % character.
 
 <dt><code>-m magnification</code>
 <dd>The &tex; magnification parameter which is used when processing the DVI
@@ -193,6 +194,25 @@ a &tex; <code/\special/ embedded in the DVI file (see <ref
 id=usage.special>).  If there is no 
 file extension, or if it does not match the output type, a suitable file
 extension will be added.
+
+<dt><code/-p p-spec/, <code/-l l-spec/ <code/-pp pp-spec/
+<dd>These select page ranges, using a slight extension of the notation
+used by <code/dvips/ (and the same option letters).  The <code/p-spec/
+and <code/l-spec/ are single page numbers; if either of these are
+given, then the program will process pages from page <code/p-spec/ to
+page <code/l-spec/, and if either is missing, it implies the
+corresponding extreme.  The <code/pp-spec/ consists of a sequence of
+page numbers and ranges (<code/number1-number2/); only those pages,
+and the pages falling in those ranges (inclusive of the end pages) are
+processed.  Any of these may be prefixed by either <code/=/ or
+<code/:$n$,/.  In the former case, DVI page numbers are used rather
+than &tex; <code/\count/$n$ registers; in the latter case, the program
+refers to the <code/\count/$n$ register rather than the default
+<code/\count0/.  You can specify both of these prefixes in one or more
+options, and the
+program will respect only the last one, but you cannot mix <code/-p/
+and <code/-l/ options with the <code/-pp/ option.  There may be no
+spaces in the <code/pp-spec/.  The page numbers may be negative.
 
 <dt><code/-P[bt]/
 <dd>Specifies processing of the output bitmap.

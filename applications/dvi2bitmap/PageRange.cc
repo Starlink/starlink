@@ -1,5 +1,5 @@
-#include <iostream>
 #include "PageRange.h"
+#include <iostream>
 
 #if NO_CSTD_INCLUDE
 #include <stdlib.h>
@@ -12,20 +12,14 @@
 verbosities PageRange::verbosity_ = normal;
 
 PageRange::PageRange()
-    : useCounts_(true), rangeType_(unset), first_(0), last_(0)
+    : useCounts_(true), useCountNo_(0),
+      rangeType_(unset), first_(0), last_(0)
 {
 }
-/*
-PageRange::PageRange (string spec)
-{
-    this.PageRange();
-    bool dummy = addSpec (spec);
-}
-*/
 
-bool PageRange::addSpec (const string type, const string spec) 
+bool PageRange::addSpec (const char *type, const char *spec) 
 {
-    //  -l num The  last  page  printed will be the first one num-
+    //  -l pagenum The  last  page  printed will be the first one num-
     //        bered num Default is the last page in the document.
     //        If  the  num is prefixed by an equals sign, then it
     //        (and any argument to the -p option) is treated as a
@@ -34,7 +28,7 @@ bool PageRange::addSpec (const string type, const string spec)
     //        with the ninth page of the document, no matter what
     //        the pages are actually numbered.
     //
-    //  -p num The  first  page printed will be the first one num-
+    //  -p pagenum The  first  page printed will be the first one num-
     //        bered num.  Default is the first page in the  docu-
     //        ment.   If  the  num is prefixed by an equals sign,
     //        then it (and any argument  to  the  -l  option)  is
@@ -50,21 +44,55 @@ bool PageRange::addSpec (const string type, const string spec)
     //        Multiple  -pp options may be specified or all pages
     //        and page ranges  can  be  specified  with  one  -pp
     //        option.
-    const char *t = type.c_str();
-    const char *s = spec.c_str();
+    //
+    // I extend the pagelist to satisfy:
+    //
+    //    pagenum:  prefix* number
+    //    pagelist: prefix* page-or-range [',' page-or-range]*
+    //    prefix: '=' | ':' number ','
+    //    page-or-range: number | number-number
+    //
     bool parseOK = true;
 
-    if (*t == '-')
-	t++;
-    if (*s == '=')
-    {
-	useCounts_ = false;
-	s++;
-    }
+    if (*type == '-')
+	type++;
 
-    if (*t == 'p')
+    // prefix*
+    for (bool readPrefix = true; readPrefix; )
+	switch (*spec)
+	{
+	  case '=':
+	    useCounts_ = false;
+	    spec++;
+	    break;
+	  case ':':
+	    {
+		spec++;
+		char *endp;
+		int countnum = strtol (spec, &endp, 10);
+		spec = endp;
+		if (*spec != ',')
+		{
+		    parseOK = false;
+		    readPrefix = false;
+		}
+		else
+		{
+		    if (countnum < 0) parseOK = false;
+		    if (countnum > 9) parseOK = false;
+		    useCountNo_ = countnum;
+		    spec++;
+		}
+		break;
+	    }
+	  default:
+	    readPrefix = false;
+	}
+    // now have spec pointing at first page-or-range or pagenum
+
+    if (*type == 'p')
     {
-	if (t[1] == 'p')	// -pp option
+	if (type[1] == 'p')	// -pp option
 	{
 	    if (rangeType_ == oneRange)
 		parseOK = false;
@@ -73,11 +101,12 @@ bool PageRange::addSpec (const string type, const string spec)
 
 	    char *endp;
 	    long p1, p2;
+	    endp = const_cast<char*>(spec);
 	    char lastsep = ',';
-	    while (*s != '\0' && parseOK)
+	    while (*endp != '\0' && parseOK)
 	    {
-		p2 = strtol (s, &endp, 10);
-		if (endp == s)	// no digits found
+		p2 = strtol (spec, &endp, 10);
+		if (endp == spec)	// no digits found
 		{
 		    parseOK = false;
 		    continue;
@@ -90,18 +119,20 @@ bool PageRange::addSpec (const string type, const string spec)
 		    p1 = p2;
 		    break;
 		  case '-':	// end of range
-		    for (int i=p1; i<=p2; i++)
-			setPages_[i] = true;
+		    if (p1 > p2)
+			parseOK = false;
+		    else
+			for (int i=p1; i<=p2; i++)
+			    setPages_[i] = true;
 		    break;
 		  default:
 		    parseOK = false;
 		    break;
 		}
 		lastsep = *endp;
-		s = endp;
-		do		// skip whitespace
-		    s++;
-		while (isspace(*s));
+		spec = endp+1;
+		// now have endp pointing at a separator or \0, 
+		// spec at next char
 	    }
 	}
 	else			// -p option
@@ -114,12 +145,12 @@ bool PageRange::addSpec (const string type, const string spec)
 	    }
 	    else
 	    {
-		first_ = atoi (s);
+		first_ = atoi (spec);
 		rangeType_ = oneRange;
 	    }
 	}
     }
-    else if (*t == 'l')
+    else if (*type == 'l')
     {
 	if (rangeType_ == ranges)
 	{
@@ -129,7 +160,7 @@ bool PageRange::addSpec (const string type, const string spec)
 	}
 	else
 	{
-	    last_ = atoi (s);
+	    last_ = atoi (spec);
 	    rangeType_ = oneRange;
 	}
     }
@@ -145,17 +176,11 @@ bool PageRange::isSelected (const int pagenum, const int* count)
     if (rangeType_ == unset)
 	return true;
 
-    int testval = (useCounts_ ? count[0] : pagenum);
+    int testval = (useCounts_ ? count[useCountNo_] : pagenum);
     if (rangeType_ == oneRange)
 	rval = testval >= first_ && (last_ == 0 || testval <= last_);
     else
 	rval = setPages_[testval];
-
-    if (useCounts_)
-	cout << "page number " << pagenum;
-    else
-	cout << "page count " << count[0];
-    cout << (rval ? " YES" : " NO") << '\n';
 
     return rval;
 }

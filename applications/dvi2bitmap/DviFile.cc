@@ -24,8 +24,8 @@ verbosities DviFile::verbosity_ = normal;
 
 DviFile::DviFile (string s, int res, double magmag)
     : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0), dvif_(0),
-      current_font_(0), resolution_(res), magmag_(magmag), magfactor_(1.0),
-      iterOK_(false)
+      skipPage_(false), current_font_(0), resolution_(res), magmag_(magmag),
+      magfactor_(1.0), iterOK_(false)
 {
     PkFont::setResolution(res);
 
@@ -47,11 +47,23 @@ DviFile::~DviFile()
     delete dvif_;
 }
 
+// This is a wrapper for getEvent.
+// It sets the flag skipPage_ and calls getEvent.  That means that the next
+// event it returns will be an end-of-page event.
+DviFileEvent *DviFile::getEndOfPage()
+{
+    skipPage_ = true;
+    return getEvent();
+}
+
 // This is the routine which does most of the actual work.  It scans
 // through the file reading opcodes.  Most of these it handles itself,
 // but certain ones it handles by returning an event to the calling routine.
 // The last event it'll return is a DviFilePostamble event, and it'll return
 // 0 if called afterwards.
+//
+// If the flag skipPage_ is true, then skip until we find a `eop' event 
+// (number 140), and resume normal parsing.
 DviFileEvent *DviFile::getEvent()
 {
     DviFileEvent *gotEvent = 0;	// non-zero when we've got an event
@@ -72,7 +84,17 @@ DviFileEvent *DviFile::getEvent()
     // When we start, assume the next character is an opcode
     while (! gotEvent)
     {
-	opcode = getByte();
+	if (skipPage_)
+	{
+	    // ignore everything else on this page, until eop
+	    do
+		opcode = getByte();
+	    while (opcode != 140); // eop
+	    skipPage_ = false;
+	}
+	else
+	    opcode = getByte();
+
 	int charno;
 	if (verbosity_ > normal)
 	    cerr << 'O' << static_cast<int>(opcode) << '\n';

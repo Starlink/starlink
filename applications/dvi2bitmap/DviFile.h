@@ -28,6 +28,7 @@ public:
     ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
+    DviFileEvent *getEndOfPage();
     static void verbosity (const verbosities level) { verbosity_ = level; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
@@ -68,6 +69,9 @@ private:
     const double magmag_;
     // ...resulting in a net magnification of:
     double magfactor_;
+
+    // tell getEvent to skip this page
+    bool skipPage_;
 
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output

@@ -7,25 +7,27 @@
 #ifndef PAGERANGE_HEADER_READ
 #define PAGERANGE_HEADER_READ 1
 
+// gcc iostream may somehow omit NULL
+#ifndef NULL
+#define NULL 0
+#endif
+
 #include <iostream>
-#include <string>
 #include <map>
-//using namespace std;
 #include "verbosity.h"
 
 class PageRange
 {
   public:
     PageRange();
-    //PageRange (string);
-    //~PageRange() { };
 
-    bool addSpec(const string, const string);
+    bool addSpec(const char *, const char *);
     bool isSelected (const int, const int*);
     static void verbosity (const verbosities level) { verbosity_ = level; }
 
   private:
     bool useCounts_;
+    int useCountNo_;
     int first_, last_;
     enum { oneRange, ranges, unset } rangeType_;
     static verbosities verbosity_;
