@@ -13,7 +13,8 @@
 *     CALL ADI2_GETLUN( FID, LUN, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Extracts the logical unit number from the 'Lun' member of the
+*     FITSfile object specified by FID.
 
 *  Arguments:
 *     FID = INTEGER (given)
@@ -98,7 +99,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract unit number
-      CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
+      CALL ADI_CGET0I( FID, 'Lun', LUN, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_GETLUN', STATUS )

@@ -144,8 +144,8 @@
         CALL ADI_CPUT0I( FID, '.HDU', HDU, STATUS )
 
 *    Write extra info into the file handle object
-        CALL ADI_CPUT0I( FID, '.LUN', LUN, STATUS )
-        CALL ADI_CPUT0I( FID, '.BLOCK_SIZE', BSIZE, STATUS )
+        CALL ADI_CPUT0I( FID, 'Lun', LUN, STATUS )
+        CALL ADI_CPUT0I( FID, 'BlockSize', BSIZE, STATUS )
 
 *    Initialise object
         CALL ADI2_FOINIT( FID, STATUS )

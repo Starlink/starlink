@@ -11,10 +11,7 @@
 
         CALL ADI_DEFREP( 'FITS', ID, STATUS )
 
-
-	CALL ADI_DEFCLS( 'FITSfile', 'FileObject',
-     :                   'STRUC PRIMARY,STRUC EXTENSIONS', DID,
-     :                   STATUS )
+	CALL ADI_REQPKG( 'fits', STATUS )
 
         CALL ADI_DEFMTH( 'NewLink(Array,FITSfile)', ADI2_NEWLNK_ARR,
      :                   did, STATUS )

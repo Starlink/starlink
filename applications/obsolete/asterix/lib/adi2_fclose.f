@@ -105,7 +105,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Extract logical unit
-      CALL ADI_CGET0I( FID, '.LUN', LUN, STATUS )
+      CALL ADI2_GETLUN( FID, LUN, STATUS )
 
 *  Close the file
       FSTAT = 0
