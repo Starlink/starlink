@@ -536,7 +536,7 @@
       CALL NDF_CGET( INDF, 'TITLE', TTL, STATUS )
       IF( TTL .NE. ' ' .AND. 
      :    .NOT. AST_TEST( IWCS, 'TITLE', STATUS ) ) THEN
-         CALL AST_SETC( IWCS, 'TITLE', TTL, STATUS )
+         CALL AST_SETC( IWCS, 'TITLE', TTL( : CHR_LEN( TTL ) ), STATUS )
       END IF
 
 *  Report an error if the inverse mapping is required, but is not
