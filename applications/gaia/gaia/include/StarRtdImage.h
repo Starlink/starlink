@@ -43,6 +43,8 @@
 //    16-JUL-2001 (PWD):
 //       Added UKIRT quick look code. Also needed processMotionEvent.
 //       The quick look is off by default.
+//    22-JAN-2003 (PWD):
+//       Added astmilliCmd to switch on milli-arcsec resolution.
 //
 //-
 
@@ -252,6 +254,9 @@ class StarRtdImage : public Skycat {
 
    //  Create X and Y profiles of rectangular region.
    int xyProfileCmd( int argc, char *argv[] );
+
+   //  Enable readouts etc. to show milli-arcsec precision.
+   int astmilliCmd( int argc, char *argv[] );
 
  protected:
 

@@ -398,13 +398,15 @@ itcl::class gaia::GaiaImageCtrl {
    #  (this is packed differently from the main method so the colour
    #  map remains visible more often).
    public method make_colorramp {} {
-      itk_component add colorramp {
-         rtd::RtdImageColorRamp $w_.colorramp \
-            -height $itk_option(-colorramp_height) \
-            -viewmaster $image_
+      if { $itk_option(-with_colorramp) } {
+         itk_component add colorramp {
+            rtd::RtdImageColorRamp $w_.colorramp \
+               -height $itk_option(-colorramp_height) \
+               -viewmaster $image_
+         }
+         pack $itk_component(colorramp) -side bottom -fill x \
+            -before $itk_component(imagef)
       }
-      pack $itk_component(colorramp) -side bottom -fill x \
-         -before $itk_component(imagef)
    }
 
    #  This method is called by the image code whenever a new image is loaded.
@@ -417,6 +419,20 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Record this name, until another new image is set.
       set last_file_ $itk_option(-file)
+
+      #  Set the default precision used for coordinate readouts.
+      set_readout_precision_
+   }
+
+   #  Set the precision used to display RA/Dec coordinates. By default
+   #  these show two decimal places for arcsecs, but if requested can
+   #  show three (for milli arcsecs).
+   protected method set_readout_precision_ {} {
+      if { $image_ != {} } {
+         catch {
+            $image_ astmilli $itk_option(-extended_precision)
+         }
+      }
    }
 
    #  Issue a warning containing any AST messages about WCS.
@@ -628,7 +644,9 @@ itcl::class gaia::GaiaImageCtrl {
       }
       update_title
       apply_history $itk_option(-file)
-      component colorramp update_colors
+      if { $itk_option(-with_colorramp) } {
+         component colorramp update_colors
+      }
    }
 
    #  Check if any other instance of this class is displaying the
@@ -958,6 +976,13 @@ itcl::class gaia::GaiaImageCtrl {
    #  The application name as used in window titles (can be changed
    #  for UKIRT mods).
    itk_option define -appname appname AppName GAIA::Skycat
+
+   #  Whether to display coordinates using extended precision. This
+   #  displays at milli arc-second resolution.
+   itk_option define -extended_precision extended_precision \
+      Extended_Precision 0 {
+         set_readout_precision_
+      }
 
    #  Protected variables:
    #  ====================

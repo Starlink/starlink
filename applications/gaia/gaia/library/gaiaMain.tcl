@@ -92,8 +92,20 @@ if { $argc >= 1 } {
       incr argc 2
 
       #  Replace the given name by one that GAIA can display.
-      set argv [lreplace $argv 0 0 [.namer fullname 0]]
+      set argv [lreplace $argv 0 0 "-file" [.namer fullname 0]]
       delete object .namer
+   }
+}
+
+#  Restore any properties of the Gaia object that have been set last
+#  time around (and explicity saved), these go before other options so
+#  that these may be overridden on the command-line.
+set props [GaiaProperties::instance]
+foreach prop [$props get_named_keys Gaia] {
+   set value [$props get_property $prop]
+   set key [$props get_unnamed_key Gaia $prop]
+   if { $value != {} } {
+      set argv [linsert $argv 0 "-$key" "$value"]
    }
 }
 

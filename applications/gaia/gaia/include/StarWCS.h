@@ -28,6 +28,8 @@
 //    22-APR-1998 (ALLAN)
 //       Fixed xSecPix() and ySecPix(), added setSecPix() method
 //       (needed for plotting some symbols based on world coordinates).
+//    22-JAN-2003 (PWD):
+//       Added milli-arcsec resolution option.
 //-
 
 extern "C" {
@@ -91,6 +93,9 @@ protected:
 
   //  Pointer to warnings string.
   char *warnings_;
+
+  //  Show extra precision for milli-arcsec resolution.
+  int extraPrecision_;
 
 public:
 
@@ -199,7 +204,7 @@ public:
   // Return the value of an AST attribute of the main AstFrameSet.
   const char *astGetAttrib( char *attrib );
 
-  //  Return copy of warnings string.
+  //  Return copy ofwarnings string.
   const char *getWarning();
 
   //  Get a list of the domains available in the frameset.
@@ -208,12 +213,10 @@ public:
   //  Set an AST attribute.
   int astSetAttrib( const char *what, const char *value );
 
-  //  Return a value formatted for the RA axis.
-  const char *formatRAValue( double value );
-
-  // Return a value formatted for the Dec axis.
-  const char *formatDecValue( double value );
+  //  Set display of extra precision.
+  void extraPrecision( int value );
 };
+
 
 #endif /* _StarWCS_h_ */
 

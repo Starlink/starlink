@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Configure startup options</title>
+</head>
+
+<body>
+<a name="xref_startupoptions"></a>
+
+<h2 align=center><font color=red>Configuring startup options</font></h2>
+
+<p>This window allows you to set the various options that GAIA supports
+when starting up. These will be saved when applied and then used the
+next time that GAIA starts. All these options can also be specified on
+the command-line, or by using X properties.
+
+<ul>
+      <li><b>Use a floating panel (-float_panel)</b><br>
+        Create the control panel area in a detached window.</li>
+      
+      <li><b>Display a zoom window (-with_zoom_window)</b><br>
+        Display, or not, the zoom window in the control panel.</li>
+      
+      <li><b>Display a panner window (-with_pan_window)</b><br>
+        Display, or not, the panner window in the control panel.</li>
+
+      <li><b>Display a color ramp (-with_colorramp)</b><br>
+        Display, or not, the color ramp shown at the bottom of the
+        main window.</li> 
+
+      <li><b>Focus follows mouse (-focus_follows_mouse)</b><br>
+        Image and entry focus follows mouse pointer, alternative is to click
+        on these first.</li>
+      
+      <li><b>Show image scrollbars (-scrollbars)</b><br>
+        Display, or not, the scrollbars around the main image.</li>
+
+      <li><b>Make toolboxes transient (-transient_tools)</b><br>
+        Ask the window manager to make any toolboxes transient, or
+        not. Transient windows may remain permanently above their parent
+        window (depends on window manager properties).</li>
+
+      <li><b>Exit without prompt (-quiet_exit)</b><br>
+        When closing GAIA using the <tt>Exit</tt> item ask for confirmation
+        before exiting, or not. Note that it is still possible to close GAIA
+        without a request, if this is the last window and you use
+        <tt>Close</tt>, or the window manager closes the last window.</li>
+
+      <li><b>Display milli-arcsecs (-extended_precision)</b><br>
+        The default precision for RA is three decimal places in
+        seconds of time, for DEC two decimal places. If this option is
+        selected an extra decimal place is added to give roughly
+        milli-arcsecond resolution.
+        </li>
+
+      <li><b>Minimum zoom (-min_zoom)</b><br>
+        The lowest zoom factor to be offered in the <tt>Scale:</tt>
+        menu. Negative values are lower factors.
+        </li>
+
+      <li><b>Maximum zoom (_max_zoom)</b><br>
+        The highest zoom factor to be offered in the <tt>Scale:</tt>
+        menu. Note that the <tt>Scale:</tt> menu may run off the edges
+        of the display if the difference between the minimum zoom and
+        this value is too large.
+        </li>
+
+      <li><b>Default colormap (-default_cmap)</b><br>
+        The colormap to be used by default. Note that this isn't as
+        useful as it might seem as images previously viewed will be
+        shown with the colormap they where last displayed with, and
+        the default colormap becomes the one last selected.
+      </li>
+
+      <li><b>Default itt (-default_itt)</b><br>
+        The default intensity transfer table (the notes about
+        colormaps also apply to this option).
+      </li>
+</ul>
+
+</body>
+</html>

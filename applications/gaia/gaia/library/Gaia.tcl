@@ -133,6 +133,7 @@ Options:
  -debug <bool>            - debug flag: run bg processes in fg.
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
+ -extended_precision      - show extra readout precision (default: 0).
  -file <file>             - image file to load.
  -float_panel <bool>      - put info panel in a popup window (default: 0).
  -focus_follows_mouse <bool> - entry focus follows mouse (default: 0)
@@ -153,7 +154,8 @@ Options:
  -with_pan_window <bool>  - Display the pan window (default).
  -with_warp <bool>        - add bindings to move mouse ptr with arrow keys (default: 1).
  -with_zoom_window <bool> - Display the zoom window (default).
- -ukirt_ql <bool>         - Show UKIRT Quick Look Facilities.
+ -ukirt_ql <bool>         - Show UKIRT Quick Look Facilities (default: 0).
+ -visual <visual_id>      - X visual to use (pseudocolor, truecolor, visual id...)
  -zoom_factor <n>         - zooming factor (default: 4).
 }
 
@@ -206,8 +208,10 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Quit the application. Really.... Rtd doesn't have the exit.
-   #  If being paranoid then ask for confirmation.
+   #  Quit the application. Really....
+   #  If being paranoid then ask for confirmation. Note this doesn't
+   #  trap all ways of exiting (can still use window manager close and
+   #  exit by closing all windows until the last is gone).
    public method quit {} {
       if { ! $itk_option(-quiet_exit) } {
          if { ! [confirm_dialog \
@@ -383,7 +387,8 @@ itcl::class gaia::Gaia {
             -pickobjectorient $itk_option(-pickobjectorient) \
             -hdu $itk_option(-hdu) \
             -ukirt_ql $itk_option(-ukirt_ql) \
-            -appname $appname_
+            -appname $appname_ \
+            -extended_precision $itk_option(-extended_precision)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -391,7 +396,7 @@ itcl::class gaia::Gaia {
       lappend skycat_images $itk_component(image)
    }
 
-   #  Delete a this object.
+   #  Delete this object.
    public method delete_window {} {
       delete object $w_
    }
@@ -420,6 +425,13 @@ itcl::class gaia::Gaia {
          {Close this window, exit application if last}
       add_menu_short_help $m "New Window" \
          {Create a new main window}
+
+      #  Add window for configuring the startup options. Put this just
+      #  before the "Clear" item.
+      set index [$m index "Clear"]
+      insert_menuitem $m $index command "Startup options..." \
+         {Set startup-level configuration options} \
+         -command [code $this make_toolbox startup]
 
       set index [$m index "Print..."]
       catch {$m delete "Print..."}
@@ -996,6 +1008,17 @@ itcl::class gaia::Gaia {
       }
    }
 
+   #  Create the startup options toolbox.
+   public method make_startup_toolbox {name {cloned 0}} {
+      itk_component add $name {
+         GaiaStartup $w_.\#auto \
+            -gaia $w_ \
+            -image $image_ \
+            -transient $itk_option(-transient_tools) \
+            -number $clone_
+      }
+   }
+
    #  When image is flipped etc. we may want to redraw some items that
    #  are too expensive to flip via Tcl commands.  If auto is set 1
    #  then the grid is only redrawn if automatic redraws are on.
@@ -1565,6 +1588,11 @@ itcl::class gaia::Gaia {
          set appname_ "UKIRT::Quick Look"
       }
    }
+
+   #  Whether to display coordinates using extended precision. This
+   #  displays at milli arc-second resolution.
+   itk_option define -extended_precision extended_precision \
+      Extended_Precision 0
 
    # -- Protected variables --
 

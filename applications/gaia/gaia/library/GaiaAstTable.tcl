@@ -736,7 +736,7 @@ itcl::class gaia::GaiaAstTable {
          set lendec 1
       }
 
-      if { $lenra > 1 || $lendec > 1 } { 
+      if { $lenra > 1 || $lendec > 1 } {
          error_dialog \
             "Celestial coordinates are required to have the format hh/dd:mm:ss.ss or dd.ddd"
          return ""
@@ -1103,7 +1103,7 @@ itcl::class gaia::GaiaAstTable {
    }
 
    #  Read positions from a named text file. This file must have
-   #  either 2, 3 or 5 space separated words, if the ra and decs are 
+   #  either 2, 3 or 5 space separated words, if the ra and decs are
    #  colon separated, if 7 or 9 words are located then the ra and
    #  decs are assumed space separated. The file can contain comment
    #  lines starting with an #. Note for this type of table we do not
