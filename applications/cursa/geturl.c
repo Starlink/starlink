@@ -55,10 +55,14 @@ int GetHostNumber (int status,  char *queryHost, char *hostNumber);
 int RetrieveUrl (int status,  char *hostNumber,  int queryPort,
 		 char *queryPage, logical echoHttpHead);
 
+/* In general most modern systems will have these functions */
+#if !HAVE_INET_NTOP
 const char *inet_ntop(int af, const void *src,
                              char *dst, socklen_t cnt);
+#endif
+#if !HAVE_INET_PTON
 int inet_pton(int af, const char *src, void *dst);
-
+#endif
 
 int main(int argc, char **argv)
 {
@@ -107,10 +111,13 @@ int main(int argc, char **argv)
 /*     end if  */
 /*  Authors:  */
 /*     ACD: A C Davenhall (Edinburgh)  */
+/*     TIMJ: Tim Jenness (JAC, Hawaii) */
 /*  History:  */
 /*     5/12/00 (ACD): Original version.  */
 /*     2/3/01  (ACD): First stable version.  */
 /*     24/4/01 (ACD): Added decoding of the port number from the URL.  */
+/*     13 AUG 04 (TIMJ): Only compile in inet_pton and inet_ntop if we need
+       to */
 /*-  */
 /*  Local Variables:  */
 
@@ -847,6 +854,9 @@ char   errorBuff[80];             /* Buffer for error message.  */
    return status;
 }
 
+/* Only compile this if we need it */
+#if !HAVE_INET_NTOP
+
 /* ----------------------------------------------------------   */
 /* This is from the BIND 4.9.4 release, modified to compile by itself */
 
@@ -1046,6 +1056,12 @@ inet_ntop6(src, dst, size)
 	strcpy(dst, tmp);
 	return (dst);
 }
+
+/* !HAVE_INET_NTOP */
+#endif
+
+/* Only use this if we need to */
+#if !HAVE_INET_PTON
 
 /* ----------------------------------------------------------   */
 /* This is from the BIND 4.9.4 release, modified to compile by itself */
@@ -1272,3 +1288,6 @@ inet_pton6(src, dst)
 	memcpy(dst, tmp, IN6ADDRSZ);
 	return (1);
 }
+
+/* !HAVE_INET_PTON */
+#endif
