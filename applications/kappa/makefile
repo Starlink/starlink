@@ -562,6 +562,8 @@ listmake.f listshow.f profile.f wcsalign.f wcstran.f kapversion.f
 #  the f file name by remving the .f file suffix.
 KAPPA_F_ROUTINES = $(KAPPA_F1_ROUTINES) $(KAPPA_F3_ROUTINES)
 
+ATOOLS_C_ROUTINES = atl1_rm.c
+
 ATOOLS_F_ROUTINES = \
 atl1_creat.f atl1_gtobj.f atl1_rdfch.f \
 atl1_gtgrp.f atl1_rdch.f atl1_rdgrp.f
@@ -705,7 +707,7 @@ BLOCK_DATA =
 #  C routines required for building the libraries.  This is just a
 #  list of all the C source files.
 
-C_ROUTINES = $(KAPSUB_C_ROUTINES) 
+C_ROUTINES = $(KAPSUB_C_ROUTINES) $(ATOOLS_C_ROUTINES)
 
 #  Define the set of all interface files.
 
@@ -975,7 +977,7 @@ $(I_CCDPACK) $(CCDPACK_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(I_ATOOLS) $(ATOOLS_F_ROUTINES) :
+$(I_ATOOLS) $(ATOOLS_F_ROUTINES) $(ATOOLS_C_ROUTINES):
 	$(TAR_OUT) kappa_atools.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1029,7 +1031,7 @@ KAPPA_OBJECT_FILES = $(KAPPA_F_ROUTINES:.f=.o) $(KAPPA_F2_ROUTINES:.f=.o) $(MEM_
 
 KAPSUB_OBJECT_FILES = $(KAPSUB_F_ROUTINES:.f=.o) $(KAPSUB_C_ROUTINES:.c=.o)
 
-ATOOLS_OBJECT_FILES = $(ATOOLS_F_ROUTINES:.f=.o)
+ATOOLS_OBJECT_FILES = $(ATOOLS_F_ROUTINES:.f=.o) $(ATOOLS_C_ROUTINES:.c=.o) 
 
 CCDPACK_OBJECT_FILES = $(CCDPACK_F_ROUTINES:.f=.o)
 
@@ -2206,7 +2208,7 @@ kappa_ccdpack.tar:
 	$(TAR_IN) kappa_ccdpack.tar $(CCDPACK_F_ROUTINES) $(I_CCDPACK)
 
 kappa_atools.tar:
-	$(TAR_IN) kappa_atools.tar $(ATOOLS_F_ROUTINES) $(I_ATOOLS)
+	$(TAR_IN) kappa_atools.tar $(ATOOLS_F_ROUTINES) $(ATOOLS_C_ROUTINES) $(I_ATOOLS)
 
 kapview_sub.tar:
 	$(TAR_IN) kapview_sub.tar $(KAPVIEW_F_ROUTINES)
