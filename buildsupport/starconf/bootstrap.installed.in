@@ -30,7 +30,7 @@ else
     # this, however: we don't want to be too clever, and it's better
     # to be consistent with the way the autotools behave (the first
     # one in your path is the one that works, and they don't have this
-    # sort of `phone home' cleverness in them.
+    # sort of `phone home' cleverness in them).
 
     echo "In directory " `pwd` " :"
     echo "The starconf application doesn't appear to be in your path"
@@ -62,7 +62,7 @@ done
 # likely to change without warning.
 : ${STAR_SUPPRESS_AUTORECONF=false}
 if $STAR_SUPPRESS_AUTORECONF; then
-    echo "Suppressing autoreconf"
+    echo "Suppressing autoreconf in" `pwd`
 else
     echorun autoreconf --install --symlink
 fi
