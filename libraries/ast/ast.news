@@ -89,6 +89,9 @@ Main Changes in this Version
    - The default value for DefB1950 attribute now depends on the value of
    the Encoding attribute.
  
+   - A new appendix has been added to SUN/210 and SUN/211 giving details
+   of the implementation provided by the FItsChan class of the
+   conventions contained in the first four FITS-WCS papers.
  
  o  The SkyFrame class now supports two new coordinate systems "ICRS" and
  "HELIOECLIPTIC". The default for the System attribute for SkyFrames has
