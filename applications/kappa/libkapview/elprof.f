@@ -170,8 +170,7 @@
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, TITLE,
-*     UNITS, and HISTORY components of the input NDF.
-*     -  WCS information is currently lost by this application. 
+*     UNITS, WCS (if RADIAL is true) and HISTORY components of the input NDF.
 *     -  Processing of bad pixels and automatic quality masking are
 *     supported.
 *     -  All non-complex numeric data types can be handled.  Arithmetic
@@ -195,6 +194,8 @@
 *        to avoid vpath=dynamic parameters.
 *     13-JUN-2001 (DSB):
 *        Added parameter ESTIMATOR.
+*     24-FEB-2004 (DSB):
+*        Added propagation of WCS to output and mask.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -482,6 +483,10 @@
      :                    USESEC, REGVAL, IGRP, %VAL( IPW1 ), 
      :                    %VAL( IPAX( 1 ) ), %VAL( IPAX( 2 ) ), STATUS )
 
+*  Propagate WCS from input to output.
+         CALL KPS1_ELPR5( INDF1, INDF2, ANGMAJ, RATIO, NBIN, RMIN, 
+     :                    RMAX, XC, YC, STATUS )
+
 *  If tangetial (sector) bins are being used...
       ELSE
 
@@ -610,7 +615,7 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       
 *  Get an NDF in which to store the mask.
-      CALL LPG_PROP( INDF1, ' ', 'MASK', INDF3, STATUS )
+      CALL LPG_PROP( INDF1, 'WCS,AXIS', 'MASK', INDF3, STATUS )
 
 *  If a null value was given, annul the error and continue.
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -628,7 +633,7 @@
 
 *  Store a new title in the output mask NDF.
          CALL KPG1_CCPRO( 'MTITLE', 'TITLE', INDF1, INDF3, STATUS )
-      
+
       END IF
       
 *  Jump to here if an error occurs.

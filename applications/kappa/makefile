@@ -606,7 +606,7 @@ kps1_cpbb.f kps1_cpbd.f kps1_cpbi.f kps1_cpbr.f kps1_cpbub.f \
 kps1_cpbuw.f kps1_cpbw.f kps1_cremg.f kps1_crets.f kps1_curfm.f \
 kps1_discl.f kps1_dsclb.f kps1_dscld.f kps1_dscli.f kps1_dsclr.f \
 kps1_dsclw.f kps1_dtpcl.f kps1_elgau.f kps1_elmap.f kps1_elpr1.f \
-kps1_elpr2.f kps1_elpr3.f kps1_elpr4.f kps1_errcl.f kps1_fainb.f \
+kps1_elpr2.f kps1_elpr3.f kps1_elpr4.f kps1_elpr5.f kps1_errcl.f kps1_fainb.f \
 kps1_faind.f kps1_faini.f kps1_fainr.f kps1_fainw.f kps1_fofod.f \
 kps1_fofor.f kps1_fohed.f kps1_foher.f kps1_foppd.f kps1_foppr.f \
 kps1_foprd.f kps1_foprr.f kps1_foqud.f kps1_foqur.f kps1_fored.f \
@@ -2469,6 +2469,7 @@ kps1_elpr1.o:	SAE_PAR GRP_PAR
 kps1_elpr2.o:	SAE_PAR GRP_PAR
 kps1_elpr3.o:	SAE_PAR PRM_PAR
 kps1_elpr4.o:	SAE_PAR PRM_PAR
+kps1_elpr5.o:	SAE_PAR AST_PAR
 kps1_errcl.o:	SAE_PAR PRM_PAR
 kps1_fainb.o:	SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_faind.o:	SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
