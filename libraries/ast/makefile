@@ -120,7 +120,7 @@
 #     the $(BLD_SHR) command is still preliminary.
 #
 #  Copyright:
-#     <COPYRIGHT_STATEMENT>
+#     Copyright (C) 2003 Central Laboratory of the Research Councils
 #
 #  Authors:
 #     RFWS: R.F.Warren-Smith (Starlink)
@@ -314,7 +314,7 @@ PKG_NUM = 1521
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = <VERSION_NUMBER>-<RELEASE_NUMBER>
+PKG_VERS = 2.0-2.0
 
 #  Library version number.
 #
@@ -1439,3 +1439,8 @@ winmap.o: winmap.c error.h memory.h object.h channel.h pointset.h \
  ast_err.h
 zoommap.o: zoommap.c error.h memory.h object.h channel.h pointset.h \
  mapping.h unitmap.h matrixmap.h zoommap.h ast_err.h
+
+#  Include file dependencies on other include files (or links to those include
+#  files).  
+
+unit.h: mapping.h
