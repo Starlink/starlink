@@ -335,7 +335,11 @@ int RtdRemote::fileEvent()
 
     if (FD_ISSET(socket_, &readFds) > 0) {
 	struct sockaddr_in addr;  // for local socket address
-	socklen_t addrSize = (int) sizeof(addr);
+#ifdef __alpha
+        int addrSize = (size_t) sizeof(addr);
+#else
+        socklen_t addrSize = (size_t) sizeof(addr);
+#endif
 	int sock = accept(socket_, (sockaddr *)&addr, &addrSize);
 	if (sock < 0) 
 	    return sys_error("accept");
