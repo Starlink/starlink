@@ -1,0 +1,510 @@
+ USE FITSROT ROTSKYPA
+ 
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID CHIPNAME 'A5506-4'" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "INT-WFC" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = 284 	# Shift for axis 1
+                Sft2 = -3042 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin CmpMap 	# Compound Mapping
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                MapA = 	# First component Mapping
+                   Begin PcdMap 	# Apply pincushion distortion
+                      Nin = 2 	# Number of input coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      PcdCn0 = 0 	# Distortion centre on first axis
+                      PcdCn1 = 0 	# Distortion centre on second axis
+                      Disco = -6.79e-10 	# Distortion coefficient
+                   End PcdMap
+                MapB = 	# Second component Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = 1018.00421935688 	# Shift for axis 1
+                            Sft2 = 2238.21089966967 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin CmpMap 	# Compound Mapping
+                            Nin = 2 	# Number of input coordinates
+                         IsA Mapping 	# Mapping between coordinate systems
+                            MapA = 	# First component Mapping
+                               Begin MatrixMap 	# Matrix transformation
+                                  Nin = 2 	# Number of input coordinates
+                                  Invert = 0 	# Mapping not inverted
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  M0 = -0.999999878607098 	# Forward matrix value
+                                  M1 = 0.000492732980659944 	# Forward matrix value
+                                  M2 = -0.000492732980659943 	# Forward matrix value
+                                  M3 = -0.999999878607097 	# Forward matrix value
+                                  Form = "Full" 	# Matrix storage form
+                               End MatrixMap
+                            MapB = 	# Second component Mapping
+                               Begin CmpMap 	# Compound Mapping
+                                  Nin = 2 	# Number of input coordinates
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  InvA = 1 	# First Mapping used in inverse direction
+                                  MapA = 	# First component Mapping
+                                     Begin PcdMap 	# Apply pincushion distortion
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        PcdCn0 = 0 	# Distortion centre on first axis
+                                        PcdCn1 = 0 	# Distortion centre on second axis
+                                        Disco = -6.79e-10 	# Distortion coefficient
+                                     End PcdMap
+                                  MapB = 	# Second component Mapping
+                                     Begin WinMap 	# Map one window on to another
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        Sft1 = -284 	# Shift for axis 1
+                                        Sft2 = 3042 	# Shift for axis 2
+                                     End WinMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
+ 
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID CHIPNAME 'A5383-17-7'" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "INT-WFC" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -3225 	# Shift for axis 1
+                Sft2 = -1732 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin CmpMap 	# Compound Mapping
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                MapA = 	# First component Mapping
+                   Begin PcdMap 	# Apply pincushion distortion
+                      Nin = 2 	# Number of input coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      PcdCn0 = 0 	# Distortion centre on first axis
+                      PcdCn1 = 0 	# Distortion centre on second axis
+                      Disco = -6.79e-10 	# Distortion coefficient
+                   End PcdMap
+                MapB = 	# Second component Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = -2238.21089966967 	# Shift for axis 1
+                            Sft2 = 1018.00421935688 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin CmpMap 	# Compound Mapping
+                            Nin = 2 	# Number of input coordinates
+                         IsA Mapping 	# Mapping between coordinate systems
+                            MapA = 	# First component Mapping
+                               Begin MatrixMap 	# Matrix transformation
+                                  Nin = 2 	# Number of input coordinates
+                                  Invert = 0 	# Mapping not inverted
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  M0 = -0.000492732980660007 	# Forward matrix value
+                                  M1 = -0.999999878607098 	# Forward matrix value
+                                  M2 = 0.999999878607097 	# Forward matrix value
+                                  M3 = -0.000492732980660006 	# Forward matrix value
+                                  Form = "Full" 	# Matrix storage form
+                               End MatrixMap
+                            MapB = 	# Second component Mapping
+                               Begin CmpMap 	# Compound Mapping
+                                  Nin = 2 	# Number of input coordinates
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  InvA = 1 	# First Mapping used in inverse direction
+                                  MapA = 	# First component Mapping
+                                     Begin PcdMap 	# Apply pincushion distortion
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        PcdCn0 = 0 	# Distortion centre on first axis
+                                        PcdCn1 = 0 	# Distortion centre on second axis
+                                        Disco = -6.79e-10 	# Distortion coefficient
+                                     End PcdMap
+                                  MapB = 	# Second component Mapping
+                                     Begin WinMap 	# Map one window on to another
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        Sft1 = -284 	# Shift for axis 1
+                                        Sft2 = 3042 	# Shift for axis 2
+                                     End WinMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
+ 
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID CHIPNAME 'A5530-3'" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "INT-WFC" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -3931 	# Shift for axis 1
+                Sft2 = -2998 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin CmpMap 	# Compound Mapping
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                MapA = 	# First component Mapping
+                   Begin PcdMap 	# Apply pincushion distortion
+                      Nin = 2 	# Number of input coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      PcdCn0 = 0 	# Distortion centre on first axis
+                      PcdCn1 = 0 	# Distortion centre on second axis
+                      Disco = -6.79e-10 	# Distortion coefficient
+                   End PcdMap
+                MapB = 	# Second component Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = 1021.32962057405 	# Shift for axis 1
+                            Sft2 = 2236.03921070685 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin CmpMap 	# Compound Mapping
+                            Nin = 2 	# Number of input coordinates
+                         IsA Mapping 	# Mapping between coordinate systems
+                            MapA = 	# First component Mapping
+                               Begin MatrixMap 	# Matrix transformation
+                                  Nin = 2 	# Number of input coordinates
+                                  Invert = 0 	# Mapping not inverted
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  M0 = -0.999999747397126 	# Forward matrix value
+                                  M1 = 0.000710778224905204 	# Forward matrix value
+                                  M2 = -0.000710778224905204 	# Forward matrix value
+                                  M3 = -0.999999747397126 	# Forward matrix value
+                                  Form = "Full" 	# Matrix storage form
+                               End MatrixMap
+                            MapB = 	# Second component Mapping
+                               Begin CmpMap 	# Compound Mapping
+                                  Nin = 2 	# Number of input coordinates
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  InvA = 1 	# First Mapping used in inverse direction
+                                  MapA = 	# First component Mapping
+                                     Begin PcdMap 	# Apply pincushion distortion
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        PcdCn0 = 0 	# Distortion centre on first axis
+                                        PcdCn1 = 0 	# Distortion centre on second axis
+                                        Disco = -6.79e-10 	# Distortion coefficient
+                                     End PcdMap
+                                  MapB = 	# Second component Mapping
+                                     Begin WinMap 	# Map one window on to another
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        Sft1 = -284 	# Shift for axis 1
+                                        Sft2 = 3042 	# Shift for axis 2
+                                     End WinMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
+ 
+ Begin FrameSet 	# Set of inter-related coordinate systems
+    ID = "FITSID CHIPNAME 'A5382-1-7'" 	# Object identification string
+ IsA Object 	# AST Object
+    Nframe = 2 	# Number of Frames in FrameSet
+    Currnt = 2 	# Index of current Frame
+    Lnk2 = 1 	# Node 2 is derived from node 1
+    Frm1 = 	# Frame number 1
+       Begin Frame 	# Coordinate system description
+          Title = "Pixel coordinates; first pixel at (0.5,0.5)" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "PIXEL" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Frm2 = 	# Frame number 2
+       Begin Frame 	# Coordinate system description
+          Title = "INT wide field camera undistorted" 	# Title of coordinate system
+          Naxes = 2 	# Number of coordinate axes
+          Domain = "INT-WFC" 	# Coordinate system domain
+          Ax1 = 	# Axis number 1
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 1" 	# Axis Label
+                Symbol = "p1" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+          Ax2 = 	# Axis number 2
+             Begin Axis 	# Coordinate axis
+                Label = "Pixel coordinate 2" 	# Axis Label
+                Symbol = "p2" 	# Axis symbol
+                Unit = "pixel" 	# Axis units
+                Format = "%3.1f" 	# Format specifier
+             End Axis
+       End Frame
+    Map2 = 	# Mapping between nodes 1 and 2
+       Begin CmpMap 	# Compound Mapping
+          Nin = 2 	# Number of input coordinates
+       IsA Mapping 	# Mapping between coordinate systems
+          MapA = 	# First component Mapping
+             Begin WinMap 	# Map one window on to another
+                Nin = 2 	# Number of input coordinates
+                Invert = 0 	# Mapping not inverted
+             IsA Mapping 	# Mapping between coordinate systems
+                Sft1 = -1828 	# Shift for axis 1
+                Sft2 = -3029 	# Shift for axis 2
+             End WinMap
+          MapB = 	# Second component Mapping
+             Begin CmpMap 	# Compound Mapping
+                Nin = 2 	# Number of input coordinates
+             IsA Mapping 	# Mapping between coordinate systems
+                MapA = 	# First component Mapping
+                   Begin PcdMap 	# Apply pincushion distortion
+                      Nin = 2 	# Number of input coordinates
+                      Invert = 0 	# Mapping not inverted
+                   IsA Mapping 	# Mapping between coordinate systems
+                      PcdCn0 = 0 	# Distortion centre on first axis
+                      PcdCn1 = 0 	# Distortion centre on second axis
+                      Disco = -6.79e-10 	# Distortion coefficient
+                   End PcdMap
+                MapB = 	# Second component Mapping
+                   Begin CmpMap 	# Compound Mapping
+                      Nin = 2 	# Number of input coordinates
+                   IsA Mapping 	# Mapping between coordinate systems
+                      MapA = 	# First component Mapping
+                         Begin WinMap 	# Map one window on to another
+                            Nin = 2 	# Number of input coordinates
+                            Invert = 0 	# Mapping not inverted
+                         IsA Mapping 	# Mapping between coordinate systems
+                            Sft1 = 1014.65356693092 	# Shift for axis 1
+                            Sft2 = 2237.35369202933 	# Shift for axis 2
+                         End WinMap
+                      MapB = 	# Second component Mapping
+                         Begin CmpMap 	# Compound Mapping
+                            Nin = 2 	# Number of input coordinates
+                         IsA Mapping 	# Mapping between coordinate systems
+                            MapA = 	# First component Mapping
+                               Begin MatrixMap 	# Matrix transformation
+                                  Nin = 2 	# Number of input coordinates
+                                  Invert = 0 	# Mapping not inverted
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  M0 = -0.999999467778702 	# Forward matrix value
+                                  M1 = -0.00103171813666547 	# Forward matrix value
+                                  M2 = 0.00103171813666547 	# Forward matrix value
+                                  M3 = -0.999999467778702 	# Forward matrix value
+                                  Form = "Full" 	# Matrix storage form
+                               End MatrixMap
+                            MapB = 	# Second component Mapping
+                               Begin CmpMap 	# Compound Mapping
+                                  Nin = 2 	# Number of input coordinates
+                               IsA Mapping 	# Mapping between coordinate systems
+                                  InvA = 1 	# First Mapping used in inverse direction
+                                  MapA = 	# First component Mapping
+                                     Begin PcdMap 	# Apply pincushion distortion
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        PcdCn0 = 0 	# Distortion centre on first axis
+                                        PcdCn1 = 0 	# Distortion centre on second axis
+                                        Disco = -6.79e-10 	# Distortion coefficient
+                                     End PcdMap
+                                  MapB = 	# Second component Mapping
+                                     Begin WinMap 	# Map one window on to another
+                                        Nin = 2 	# Number of input coordinates
+                                        Invert = 0 	# Mapping not inverted
+                                     IsA Mapping 	# Mapping between coordinate systems
+                                        Sft1 = -284 	# Shift for axis 1
+                                        Sft2 = 3042 	# Shift for axis 2
+                                     End WinMap
+                               End CmpMap
+                         End CmpMap
+                   End CmpMap
+             End CmpMap
+       End CmpMap
+ End FrameSet
+ 
