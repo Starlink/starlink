@@ -137,7 +137,7 @@
 *       Open the print file...
 *         CALL LIB$GET_LUN(LUN)
          LUN = 41
-         OPEN (UNIT=LUN, FILE=PRINTFILE, STATUS='NEW')
+         OPEN (UNIT=LUN, FILE=PRINTFILE, STATUS='UNKNOWN')
          PRINT *,'O : Writing contents to ', PRINTFILE
 *
 *       Write header
