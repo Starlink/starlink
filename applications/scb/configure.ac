@@ -27,10 +27,16 @@ dnl    it by hand.
 AC_PATH_PROG(YACC, yacc)
 
 dnl    Locate lex, and customise it to use a local skel flag if it's flex.
+dnl    If not, audibly deprecate for distribution, since lex-generated
+dnl    C may not be portable.
 AM_PROG_LEX
 if test $LEX = "flex"
 then
    LEX="$LEX -Sflex.skl"
+else
+   AC_MSG_WARN([Do NOT distribute source code created by the "$LEX$" command.])
+   AC_MSG_WARN([Only code produced by the flex command is recommended])
+   AC_MSG_WARN([for distribution.])
 fi
 
 dnl    Set up with defaults some variables which configure where files are
