@@ -126,6 +126,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.27  1997/04/04 00:46:40  timj
+*     Replace REDS_WTFN_REBIN with ^TASK token.
+*
 *     Revision 1.26  1997/04/01 23:38:08  timj
 *     Lots of efficiency gains: SCULIB_GET_* and SCULIB_PROCESS_BOLS
 *     Minor things: Start to use PKG and TSKNAME
@@ -203,12 +206,12 @@ c
       LOGICAL          BOLREBIN
       CHARACTER * (*)  METHOD
 
-* Status :
+* Status:
       INTEGER STATUS
-* External references :
+* External references:
       INTEGER CHR_LEN                  ! CHR used-string-length function
 
-* Local Constants :
+* Local Constants:
       INTEGER          MAX__INT        ! max number of integrations 
       PARAMETER (MAX__INT = 20)        ! that can be specified
       INTEGER          MAX__INTS       ! max number of integrations 
@@ -225,8 +228,8 @@ c
       PARAMETER (MAX_FILE = 100)
       BYTE BADBIT                      ! Bad bit mask
       PARAMETER (BADBIT = 1)
-
-*    Local variables :
+      
+*    Local variables:
 
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
@@ -630,7 +633,7 @@ c
       ELSE
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-         CALL MSG_SETC('TASK', TSKNAME)
+            CALL MSG_SETC('TASK', TSKNAME)
             CALL ERR_REP (' ', '^TASK: invalid output '//
      :        'coordinate system', STATUS)
          END IF
@@ -670,7 +673,8 @@ c
             READING = .FALSE.
             CALL MSG_SETI ('MAX', MAX_FILE)
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_WTFN_REBIN: number of '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: number of '//
      :           'files read exceeds maximum allowed - ^MAX', STATUS)
          ELSE
 *     Store name of file
@@ -703,7 +707,8 @@ c
             IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
                IF (STATUS .EQ. SAI__OK) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: input '//
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: input '//
      :              'file contains too many FITS items', STATUS)
                END IF
             END IF
@@ -737,7 +742,8 @@ c
      :          (OBSERVING_MODE .NE. 'POINTING')) THEN
                IF (STATUS .EQ. SAI__OK) THEN
                   STATUS = SAI__ERROR
-                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the file '//
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: the file '//
      :              'does not contain map data', STATUS)
                END IF
             END IF
@@ -777,7 +783,8 @@ c
                   CALL ERR_MARK
                   IF (.NOT. REDUCE_SWITCH) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
+                     CALL MSG_SETC('TASK', TSKNAME)
+                     CALL ERR_REP (' ', '^TASK: the '//
      :                 'REDUCE_SWITCH application has not been run '//
      :                 'on the input file. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -788,7 +795,8 @@ c
 
                   IF (.NOT. EXTINCTION) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ','REDS_WTFN_REBIN: '//
+                     CALL MSG_SETC('TASK', TSKNAME)
+                     CALL ERR_REP (' ','^TASK: '//
      :                 'the input data has not been corrected for '//
      :                 'EXTINCTION. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -798,14 +806,16 @@ c
                   END IF
 
 		  IF (.NOT. FLATFIELD) THEN
-                     CALL MSG_OUT (' ', 'REDS_WTFN_REBIN: the '//
+                     CALL MSG_SETC('TASK', TSKNAME)
+                     CALL MSG_OUT (' ', '^TASK: the '//
      :                    'WARNING: the FLATFIELD application has not'//
      :                    ' been run on the input file.', STATUS)
                   END IF
 
                   IF (REBIN) THEN
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
+                     CALL MSG_SETC('TASK', TSKNAME)
+                     CALL ERR_REP (' ', '^TASK: the '//
      :                 'REBIN application has already been run on '//
      :                 'the input file. Please try again.', STATUS)
                      CALL ERR_FLUSH(STATUS)
@@ -829,7 +839,8 @@ c
                      CALL MSG_SETC ('SUB', STEMP)
                      CALL MSG_SETC ('SUB1', SUB_INSTRUMENT)
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
+                     CALL MSG_SETC('TASK', TSKNAME)
+                     CALL ERR_REP (' ', '^TASK: the '//
      :                 'file contains data for ^SUB but previous '//
      :                 'file(s) held data for ^SUB1', STATUS)
                   END IF
@@ -846,7 +857,8 @@ c
                      CALL MSG_SETR ('WAVE', RTEMP)
                      CALL MSG_SETR ('WAVE1', WAVELENGTH)
                      STATUS = SAI__ERROR
-                     CALL ERR_REP (' ', 'REDS_WTFN_REBIN: the '//
+                     CALL MSG_SETC('TASK', TSKNAME)
+                     CALL ERR_REP (' ', '^TASK: the '//
      :                 'file contains data for wavelength ^WAVE but '//
      :                 'previous file(s) held data for ^WAVE1',
      :                 STATUS)
@@ -951,7 +963,8 @@ c
                CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ',
      :              FILE_VARIANCE_PTR, ITEMP, STATUS)
             ELSE
-               CALL MSG_OUT(' ','WARNING! REDS_WTFN_REBIN: '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_OUT(' ','WARNING! ^TASK: '//
      :              'Variance array is missing. Using dummy array',
      :              STATUS)
                CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBR,
@@ -973,7 +986,8 @@ c
                   CALL MSG_SETI ('NDIM', NDIM)
                   CALL MSG_SETI ('DIM1', DIM(1))
                   CALL MSG_SETI ('DIM2', DIM(2))
-                  CALL ERR_REP (' ', 'REDS_WTFN_REBIN: data array '//
+                  CALL MSG_SETC('TASK', TSKNAME)
+                  CALL ERR_REP (' ', '^TASK: data array '//
      :              'has bad dimensions (^NDIM) ^DIM1, ^DIM2', STATUS)
                END IF
             END IF
@@ -1301,7 +1315,8 @@ c
       IF (FILE .LE. 0) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_WTFN_REBIN: there is no '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: there is no '//
      :           'input data', STATUS)
          END IF
       END IF
@@ -1360,7 +1375,8 @@ c
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
             IF (STATUS .NE. 0) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_WTFN_REBIN: error reading '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: error reading '//
      :              'output centre longitude - it must be in '//
      :              '5 10 34.6 format', STATUS)
             ELSE
@@ -1391,7 +1407,8 @@ c
             CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
             IF (STATUS .NE. 0) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_WTFN_REBIN: error reading '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: error reading '//
      :              'output centre latitude -  it must be in '//
      :              '-30 13 56.4 format', STATUS)
             END IF
@@ -1444,8 +1461,8 @@ c
          CALL HDS_NEW (OUT, OUT, 'REDS_BOLMAPS', 0, 0, OUT_LOC, STATUS)
 
          CALL MSG_SETC('PKG', PACKAGE)
-         CALL MSG_SETC('NBOL', TOTAL_BOLS)
-         CALL MSG_OUT(' ','^PKG: Processing ^NBOL bolometers', STATUS)
+         CALL MSG_SETC('NB', TOTAL_BOLS)
+         CALL MSG_OUT(' ','^PKG: Processing ^NB bolometers', STATUS)
       ELSE
          TOTAL_BOLS = 1     ! Loop once if REBIN
       END IF
@@ -1552,7 +1569,8 @@ c
       IF ((NX_OUT .GT. 1000) .OR. (NY_OUT .GT. 1000)) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_WTFN_REBIN: output map is too '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: output map is too '//
      :        'big, having one or both dimensions greater than 1000 '//
      :        'pixels', STATUS)
          END IF
