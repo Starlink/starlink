@@ -17,6 +17,7 @@
 *    History :
 *     date:  changes (institution::username)
 *     17 Apr 95 : V1.8-0  Updated for new data interfaces (DJA)
+*     11 Dec 1995 : V2.0-0 ADI port (DJA)
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -27,8 +28,6 @@
 *    Function declarations :
 *     <declarations for function references>
 *    Local constants :
-      CHARACTER*30 TYPE1,TYPE2
-         PARAMETER( TYPE1='PERIODOGRAM' , TYPE2='PHASE_FOLD')
 *    Local variables :
       INTEGER NTOT                          !Total no of points in input array
       INTEGER NGOOD                         !No of good points in data arrays
@@ -58,7 +57,7 @@
 
 *    Version :
       CHARACTER*30	 	VERSION
-        PARAMETER 		( VERSION = 'FOLDAOV Version 1.8-0' )
+        PARAMETER 		( VERSION = 'FOLDAOV Version 2.0-0' )
 *-
 
 *  Version
@@ -118,21 +117,23 @@
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Produce output periodogram
-      CALL TIM_PUTOUT( 'PER', TYPE1, NFREQ, %VAL(SPNTR), F0, DF,
+      CALL TIM_PUTOUT( 'PER', 'Periodogram', NFREQ, %VAL(SPNTR), F0, DF,
      :                                           OFID1, STATUS )
 
 *  Add axis label
-      CALL BDI_PUTAXTEXT( OFID1, 1, 'Fold frequency', 'Hz', STATUS )
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing periodogram file')
-      ENDIF
+      CALL BDI_AXPUT0C( OFID1, 1, 'Label', 'Fold frequency', STATUS )
+      CALL BDI_AXPUT0C( OFID1, 1, 'Units', 'Hz', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT('Error writing periodogram file')
+      END IF
 
 *  Produce output phase file
-      CALL TIM_PUTOUT('FOLD', TYPE2, NPBIN, %val(PPNTR), 0.0,
-     :                                1.0/REAL(NPBIN), OFID2, STATUS)
+      CALL TIM_PUTOUT('FOLD', 'PhaseFold', NPBIN, %val(PPNTR), 0.0,
+     :                             1.0/REAL(NPBIN), OFID2, STATUS )
 
 *  Add axis label
-      CALL BDI_PUTAXTEXT( OFID2, 1, 'Phase', ' ', STATUS )
+      CALL BDI_AXPUT0C( OFID2, 1, 'Label', 'Phase', STATUS )
+      CALL BDI_AXPUT0C( OFID2, 1, 'Units', ' ', STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT('Error writing phase file')
       END IF
