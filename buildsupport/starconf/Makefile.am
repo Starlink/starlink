@@ -62,6 +62,32 @@ make-starconf: make-starconf.in
 	mv make-starconf.tmp make-starconf
 	chmod +x make-starconf
 
+# Magic: If there exists a bin directory at
+# @STARCONF_DEFAULT_PREFIX@/bin, then install links to the starconf
+# tools there; if not, do nothing.  Since the starconf tools are
+# typically but not necessarily installed in a different directory,
+# (usually $STARLINK/bin/../buildsupport/bin), this ends up putting
+# these in the main Starlink bin directory, but avoids losing if the
+# installation paths are in some way unexpected.  If the two
+# directories share a prefix, then make the link path relative, so
+# that we're free to move the tree later, if we want.
+install-exec-local:
+## Ensure that STARCONF_DEFAULT_PREFIX has no trailing slash
+## since this would mess up comparisons below (also checked in configure.ac)
+	expr @STARCONF_DEFAULT_PREFIX@ : '.*[^/]$$' >/dev/null || \
+	    { echo "STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@ has a trailing slash" >&2; exit 1; }
+## If the directory exists and isn't the same as @bindir@, then make the links
+	if test -d @STARCONF_DEFAULT_PREFIX@/bin -a @STARCONF_DEFAULT_PREFIX@/bin != @bindir@; then \
+	    (cd @STARCONF_DEFAULT_PREFIX@/bin && \
+		pathback=`echo @bindir@ | sed -n 's,^@STARCONF_DEFAULT_PREFIX@,..,p'`; \
+		test -n "$$pathback" || pathback=@bindir@; \
+		for f in starconf starconf-validate starconf-finder; do \
+		    rm -f $$f; \
+		    @LN_S@ $$pathback/$$f $$f; \
+		    test -n "$$MANIFEST_FILE" && echo `pwd`/$$f >>$$MANIFEST_FILE; \
+		done ); \
+	fi; true
+
 ## It would be good to include making GenerateDependencies.class in
 ## here, but that would require finessing automake, which demands that
 ## Java files be guilt with gcj.  At least, it would be good to

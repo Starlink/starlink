@@ -37,11 +37,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = .
 DIST_COMMON = $(am__configure_deps) $(srcdir)/Makefile.am \
-	$(srcdir)/Makefile.in $(srcdir)/Makefile.starconf.in \
-	$(srcdir)/bootstrap.installed.in $(srcdir)/starconf-finder.in \
-	$(srcdir)/starconf-validate.in $(srcdir)/starconf.m4.in \
-	$(top_srcdir)/configure $(top_srcdir)/java/Makefile.in \
-	install-sh missing
+	$(srcdir)/Makefile.in $(srcdir)/bootstrap.installed.in \
+	$(srcdir)/starconf-finder.in $(srcdir)/starconf-validate.in \
+	$(srcdir)/starconf.m4.in $(top_srcdir)/configure \
+	$(top_srcdir)/java/Makefile.in install-sh missing
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -49,8 +48,8 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(mkdir_p)
-CONFIG_CLEAN_FILES = Makefile.starconf starconf.m4 bootstrap.installed \
-	java/Makefile starconf-finder starconf-validate
+CONFIG_CLEAN_FILES = starconf.m4 bootstrap.installed java/Makefile \
+	starconf-finder starconf-validate
 am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -202,8 +201,6 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(srcdir) && $(AUTOCONF)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-Makefile.starconf: $(top_builddir)/config.status $(srcdir)/Makefile.starconf.in
-	cd $(top_builddir) && $(SHELL) ./config.status $@
 starconf.m4: $(top_builddir)/config.status $(srcdir)/starconf.m4.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bootstrap.installed: $(top_builddir)/config.status $(srcdir)/bootstrap.installed.in
@@ -464,7 +461,7 @@ info-am:
 
 install-data-am: install-dataDATA
 
-install-exec-am: install-binSCRIPTS
+install-exec-am: install-binSCRIPTS install-exec-local
 
 install-info: install-info-am
 
@@ -499,11 +496,11 @@ uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
 	install install-am install-binSCRIPTS install-data \
 	install-data-am install-dataDATA install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
-	pdf-am ps ps-am uninstall uninstall-am uninstall-binSCRIPTS \
-	uninstall-dataDATA uninstall-info-am
+	install-exec-local install-info install-info-am install-man \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic pdf pdf-am ps ps-am uninstall uninstall-am \
+	uninstall-binSCRIPTS uninstall-dataDATA uninstall-info-am
 
 
 # Include (possibly) required files in the starconf script.
@@ -532,6 +529,29 @@ make-starconf: make-starconf.in
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
 	mv make-starconf.tmp make-starconf
 	chmod +x make-starconf
+
+# Magic: If there exists a bin directory at
+# @STARCONF_DEFAULT_PREFIX@/bin, then install links to the starconf
+# tools there; if not, do nothing.  Since the starconf tools are
+# typically but not necessarily installed in a different directory,
+# (usually $STARLINK/bin/../buildsupport/bin), this ends up putting
+# these in the main Starlink bin directory, but avoids losing if the
+# installation paths are in some way unexpected.  If the two
+# directories share a prefix, then make the link path relative, so
+# that we're free to move the tree later, if we want.
+install-exec-local:
+	expr @STARCONF_DEFAULT_PREFIX@ : '.*[^/]$$' >/dev/null || \
+	    { echo "STARCONF_DEFAULT_PREFIX=@STARCONF_DEFAULT_PREFIX@ has a trailing slash" >&2; exit 1; }
+	if test -d @STARCONF_DEFAULT_PREFIX@/bin -a @STARCONF_DEFAULT_PREFIX@/bin != @bindir@; then \
+	    (cd @STARCONF_DEFAULT_PREFIX@/bin && \
+		pathback=`echo @bindir@ | sed -n 's,^@STARCONF_DEFAULT_PREFIX@,..,p'`; \
+		test -n "$$pathback" || pathback=@bindir@; \
+		for f in starconf starconf-validate starconf-finder; do \
+		    rm -f $$f; \
+		    @LN_S@ $$pathback/$$f $$f; \
+		    test -n "$$MANIFEST_FILE" && echo `pwd`/$$f >>$$MANIFEST_FILE; \
+		done ); \
+	fi; true
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
