@@ -3983,8 +3983,8 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       END
 
 *+ IMG_GETSLICE - get rectangular slice of image
-      SUBROUTINE IMG_GETSLICE(PAR1,PAR2,PAR3,PAR4,PAR5,XC,YC,
-     :                              ANGLE,LENGTH,WIDTH,STATUS)
+      SUBROUTINE IMG_GETSLICE(PAR1,PAR2,PAR3,PAR4,PAR5,XCENT,YCENT,
+     :                                   ANGLE,LENGTH,WIDTH,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -3999,7 +3999,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *    Import :
       CHARACTER*(*) PAR1,PAR2,PAR3,PAR4,PAR5
 *    Export :
-      REAL XC,YC,ANGLE,LENGTH,WIDTH
+      REAL XCENT,YCENT,ANGLE,LENGTH,WIDTH
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -4010,7 +4010,6 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       PARAMETER (PI=3.14159265,DTOR=PI/180.0)
 *    Local variables :
       CHARACTER*1 CH
-      REAL XCENT,YCENT
       REAL PXCENT,PYCENT
       REAL XEND,YEND
       REAL PXEND,PYEND
