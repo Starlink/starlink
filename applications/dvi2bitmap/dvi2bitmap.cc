@@ -120,11 +120,11 @@ int main (int argc, char **argv)
     } papersizes[] = {
 	// Do these calculations in terms of the unit oneInch
 	// Defn of inch: 1m=39.37in => 1mm=0.03937in
-	{ "a4",		210 * MM,	297 * MM 	}, // 210x297mm
-	{ "a4l",	297 * MM,	210 * MM,	}, // 297x210mm
-	{ "a5",		148 * MM,	210 * MM,	}, // 148x210mm
-	{ "a5l",	210 * MM,	148 * MM,	}, // 210x148mm
-	{ "usletter",	8.5*oneInch,	8.5*oneInch,	}, // 8.5x11in
+	{ (char*)"a4",		210 * MM,	297 * MM 	}, // 210x297mm
+	{ (char*)"a4l",		297 * MM,	210 * MM,	}, // 297x210mm
+	{ (char*)"a5",		148 * MM,	210 * MM,	}, // 148x210mm
+	{ (char*)"a5l",		210 * MM,	148 * MM,	}, // 210x148mm
+	{ (char*)"usletter",	8.5*oneInch,	8.5*oneInch,	}, // 8.5x11in
     };
     int npapersizes = sizeof(papersizes)/sizeof(papersizes[0]);
 	
