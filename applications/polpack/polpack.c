@@ -61,11 +61,11 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
                         INTEGER(SKYPAR), INTEGER(IGRP4), LOGICAL(DBEAM),
-                        CHARACTER(MODE), LOGICAL(POL), CHARACTER(REFIM), 
+                        CHARACTER(MODE), LOGICAL(POL), CHARACTER(REFIN), 
                         INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
-                        TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) TRAIL(REFIM) ){
+                        TRAIL(VIEW) TRAIL(XHRCOL) TRAIL(MODE) TRAIL(REFIN) ){
 /*
 *  Name:
 *     doplka
@@ -156,7 +156,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     POL = LOGICAL (Given)
 *        Are we processing polarimeter data? This controls the types of 
 *        mappings available.
-*     REFIM = CHARACTER (Given)
+*     REFIN = CHARACTER (Given)
 *        The name of the reference image. If blank, then the first image
 *        in IGRP1 will be used.
 *     STATUS = INTEGER (Given and Returned)
@@ -213,7 +213,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_LOGICAL(POL)
    GENPTR_INTEGER(STATUS)
    GENPTR_CHARACTER(MODE)
-   GENPTR_CHARACTER(REFIM)
+   GENPTR_CHARACTER(REFIN)
 
 #define BUFLEN 512
 
@@ -253,9 +253,12 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    } 
 
 /* If a reference image was supplied store its name, in the "in_list"
-   variable. Also set REFONLY. */
-   if( cnf_lenf( REFIM, REFIM_length ) > 0 ) {
-      SetSVar( fd, "in_list", REFIM, REFIM_length, STATUS );
+   variable. Also set REFONLY to indicate that the first image in
+   "in_list" is to be used only as a reference image and is not to be
+   included in the list of images to be processed when creating the
+   output files. */
+   if( cnf_lenf( REFIN, REFIN_length ) > 0 ) {
+      SetSVar( fd, "in_list", REFIN, REFIN_length, STATUS );
       SetVar( fd, "REFONLY", "1", 0, STATUS );
    } else {
       SetVar( fd, "REFONLY", "0", 0, STATUS );
