@@ -75,6 +75,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
       CALL PSX_GETENV( 'CCDPACK_DIR', CCDDIR, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
+         CALL MSG_OUT( ' ', 'Starting the XREDUCE interface', STATUS )
          CCDDIR = CCDDIR( :CHR_LEN( CCDDIR ) ) // '/xreduce &'
          CALL CCD1_EXEC( CCDDIR, STATUS )
       END IF
