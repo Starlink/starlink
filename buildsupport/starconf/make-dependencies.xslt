@@ -10,6 +10,8 @@
   <xsl:template match="/">
     <xsl:apply-templates/>
     <xsl:apply-templates mode="getbuildsupport"/>
+    <xsl:text>
+</xsl:text>
   </xsl:template>
 
   <xsl:template match="componentset">
@@ -26,19 +28,7 @@
     <xsl:text>$(MANIFEST)/</xsl:text>
     <xsl:value-of select="@id"/>
     <xsl:text>: </xsl:text>
-    <xsl:if test="dependencies/build">
-      <xsl:apply-templates select="dependencies/build">
-        <!-- It would be nice to sort these dependencies and remove
-             duplicates.  However it's hard to do this, since the
-             result of the processing of the tokens is a single
-             multi-line string, rather than a sequence of nodes.  It
-             would probably be possible to do this, using some
-             extreme for-each cleverness, but it doesn't seem worth
-             the insane complication, since Make doesn't really
-             mind.  It would be somewhat easier using an XSLT v2
-             stylesheet. -->
-      </xsl:apply-templates>
-    </xsl:if>
+    <xsl:apply-templates select="dependencies"/>
     <xsl:text>
 	cd </xsl:text>
     <xsl:apply-templates select="path"/>
@@ -57,54 +47,45 @@
 </xsl:text>
   </xsl:template>
 
-  <xsl:template match="dependencies/build">
-    <xsl:call-template name="process-tokens">
-      <xsl:with-param name="toks" select="normalize-space()"/>
-    </xsl:call-template>
+  <!-- The following does approximately the right thing, but it
+       doesn't sort the resulting list of dependencies, and so can't
+       remove duplicates.  It's not much use, actually. -->
+  <xsl:template match="dependencies">
+    <xsl:apply-templates select="include"/>
   </xsl:template>
 
-  <xsl:template match="dependencies/use">
-    <xsl:call-template name="process-tokens">
-      <xsl:with-param name="toks" select="normalize-space()"/>
-      <xsl:with-param name="processuse" select="0"/>
-    </xsl:call-template>
-  </xsl:template>
-
-  <xsl:template name="process-tokens">
-    <xsl:param name="toks"/>
-    <xsl:param name="processuse" select="2"/>
-    <xsl:choose>
-      <xsl:when test="contains($toks, ' ')">
-        <xsl:call-template name="process-one-dependency">
-          <xsl:with-param name="tok" select="substring-before($toks, ' ')"/>
-          <xsl:with-param name="processuse" select="$processuse"/>
-        </xsl:call-template>
-        <xsl:call-template name="process-tokens">
-          <xsl:with-param name="toks" select="substring-after($toks, ' ')"/>
-          <xsl:with-param name="processuse" select="$processuse"/>
-        </xsl:call-template>
-      </xsl:when>
-      <xsl:when test="$toks">
-        <!-- just one token left -->
-        <xsl:call-template name="process-one-dependency">
-          <xsl:with-param name="tok" select="$toks"/>
-          <xsl:with-param name="processuse" select="$processuse"/>
-        </xsl:call-template>
-      </xsl:when>
-      <!-- Otherwise: empty string, do nothing -->
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name="process-one-dependency">
-    <xsl:param name="tok"/>
-    <xsl:param name="processuse" select="1"/>
+  <xsl:template match="include">
+    <xsl:variable name='ref' select='normalize-space()'/>
     <xsl:text> \
-		$(MANIFEST)/</xsl:text>
-    <xsl:value-of select="$tok"/>
-    <xsl:if test="id($tok)/dependencies/use and $processuse">
-      <xsl:apply-templates select="id($tok)/dependencies/use"/>
-    </xsl:if>
+		</xsl:text>
+    <xsl:value-of select="$ref"/>
+    <xsl:apply-templates select="id($ref)/dependencies/include"/>
   </xsl:template>
+
+  <!-- The following is very promising, as (I think) it makes a
+       result-tree fragment (RTF) containing all of the dependencies.
+       However, there's a very limited set of things you can do with
+       RTFs, which does not include processing them in any with with
+       xsl:sort or using xsl:apply-templates.  So this is useless.
+       Perhaps it's the basis for a version using XSLT version 2.
+  <xsl:template match="dependencies">
+    <xsl:variable name="t">
+      <xsl:apply-templates select="include" mode="collect"/>
+    </xsl:variable>
+    <xsl:copy-of select="$t"/>
+  </xsl:template>
+
+  <xsl:template match="include" mode="collect">
+    <xsl:copy-of select="."/>
+    <xsl:variable name="ref" select="normalize-space()"/>
+    <xsl:apply-templates select="id($ref)/dependencies/include" mode="collect"/>
+  </xsl:template>
+
+  <xsl:template match="include">
+    <xsl:text>INCLUDE </xsl:text>
+    <xsl:value-of select="normalize-space()"/>
+  </xsl:template>
+-->
 
   <xsl:template match="componentset" mode="getbuildsupport">
     <xsl:text>buildsupport:</xsl:text>
