@@ -128,6 +128,8 @@ itcl_class Ccd_multitem {
 #        was picking up binding from adamtask (and destroying everything).
 #     12-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Fixed a bug from Tcl8 upgrade.
 #     {enter_changes_here}
 
 #-
@@ -385,11 +387,11 @@ itcl_class Ccd_multitem {
 #  Set label of a scrollbox.
       method label { listno text } {
          if { $listno <= $haveboxes } {
-            $Lists($listno) configure -label $text
+            Ccd_multiscrollbox::label $listno $text
 
 #  Now need to restablish the scrollbar commands (these are destroyed by a 
 #  repack).
-	    ::$oldthis configure -scrollbarplaces $scrollbarplaces
+	    ::$Oldthis configure -scrollbarplaces $scrollbarplaces
          } else {
             error "No multiscrollbox with index \"$listno\""
          }

@@ -163,6 +163,8 @@
 #        longer needed.
 #     12-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Fixed a bug from Tcl8 upgrade.
 #     {enter_further_changes_here}
 
 #-
@@ -415,9 +417,8 @@
          if $exists {
             if { $haveboxes < $nboxes } {
                for { set i $haveboxes; incr i } { $i <= $nboxes } { incr i } {
-                  CCDCcdWidget List list Ccd_scrollbox $oldthis.list$i
-                  set Lists($i) $List
-                  set widgetnames($Oldthis:list$i) $List
+                  CCDCcdWidget Lists($i) lists($i) Ccd_scrollbox $oldthis.list$i
+                  set widgetnames($Oldthis:list$i) $Lists($i)
                }
             } else {
 
@@ -453,9 +454,8 @@
                }
             }
             for { set i 1 } { $i <= $haveboxes } { incr i } {
-               set list [CCDPathOf $Lists($i)]
-               if { $packedboxes } { pack forget $list }
-                  pack $list -side $side -expand true -fill both
+               if { $packedboxes } { pack forget $lists($i) }
+               pack $lists($i) -side $side -expand true -fill both
 	    }
 	 }
          set packedboxes 1
@@ -497,6 +497,7 @@
 
 #  Names of widgets.
       protected Lists
+      protected lists
 
 #  End of class definition.
    }
