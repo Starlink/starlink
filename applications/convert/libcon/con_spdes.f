@@ -16,16 +16,40 @@
 *  Description:
 *     This routine serves NDF2BDF.  It finds whether certain special
 *     components appear in the NDF so they can be written as descriptors
-*     in the BDF named with their corresponding FITS keywords.  These
-*     items are the
+*     in the BDF named with their corresponding FITS keywords.  A record
+*     of which items have been set is made.
+*
+*     The keywords are:
+*        o  NAXIS, and NAXISn are derived from the dimensions of 
+*           the NDF data array.
+*        o  The TITLE, LABEL, and BUNITS descriptors are derived from
+*           the TITLE, LABEL, and UNITS NDF components.
+*        o  The CDELTn, CRVALn, CRTYPEn and CTYPEn descriptors are
+*           derived from a set of linear NDF AXIS structures. 
+*        o  The standard order of the FITS keywords is preserved.
+*           No FITS comments are written following the values of the
+*           above exceptions.
 
-*     When
-*     there is a FITS extension
-*     
-*     components are
-*     present
+*  Arguments:
+*     NDF = INTEGER (Given)
+*        The identifier of the NDF.
+*     BDFNAM = CHARACTER * ( * ) (Given)
+*        The name of the INTERIM parameter that accesses the BDF.
+*     DESCRP = LOGICAL (Given)
+*        If true the values of the descriptors written to the BDF are
+*        reported to the user.
+*     NFLAGS = INTEGER (Given)
+*        The number of flags used to indicate that certain NDF
+*        components have been used to write descriptors to the BDF.
+*        It should be set to 6.
+*     CMPTHE( NFLAGS ) = LOGICAL (Returned)
+*        The flags when set to true indicate that certain optional NDF
+*        components have been used to write descriptors to the BDF.
+*        In order they are 1) CRVARn and CDELTn, 2) CRTYPEn, 3) CTYPEn,
+*        4) TITLE, 5) LABEL, and 6) UNITS.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
-*  [arguments]
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -34,7 +58,11 @@
 *  History:
 *     1992 September 4 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1992 September 16 (MJC):
+*        Made to handle double-precision axis centres, and used an
+*        improved algorithm to determine whether or not the axis centres
+*        are linear, and the increment between adjacent axis centres.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -68,15 +96,20 @@
       PARAMETER( SZVAL = 70 )
 
 *  Local Variables:
-      INTEGER   APNTR(DAT__MXDIM)   ! Pointers to NDF axis arrays
+      INTEGER   APNTR(NDF__MXDIM)   ! Pointers to NDF axis arrays
+      CHARACTER * ( NDF__SZTYP ) ATYPE ! Data type of the axis centres
       LOGICAL   AXIFND              ! True if NDF contains a linear axis
                                     ! comps.
       LOGICAL   AXLFND              ! True if NDF contains axis label
       LOGICAL   AXUFND              ! True if NDF contains axis units
       CHARACTER C*1                 ! Accommodates character string
       CHARACTER CVALUE*(SZVAL)      ! Accommodates descriptor value
+      DOUBLE PRECISION DEND         ! End value for an axis-centre array
       CHARACTER DESCR*(SZDESC)      ! Accommodates descriptor name
-      INTEGER   DIMS(DAT__MXDIM)    ! IMAGE dimensions (axis length)
+      INTEGER   DIMS(NDF__MXDIM)    ! NDF dimensions (axis length)
+      DOUBLE PRECISION DSTART       ! Start value for an axis-centre
+                                    ! array
+      REAL      END                 ! End value for an axis-centre array
       INTEGER   I                   ! Loop variable
       REAL      INCREM              ! Incremental value for axis array
       INTEGER   ISTAT               ! Local status return
@@ -167,16 +200,42 @@
 
          IF ( THERE ) THEN
 
-*         Axis structure is found, map it and see if it is linear.
-            CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
-     :                     APNTR(I), NELM, STATUS )
-            CALL CON_LNEAR( NELM, %VAL( APNTR( I ) ), LINEAR, START, 
-     :                      INCREM, STATUS )
+*   Determine the data type of the axis array.
+            CALL NDF_ATYPE( NDF, 'Centre', I, ATYPE, STATUS )
+
+*   The axis structure is found, so map it using an appropriate data
+*   type.  Use _REAL for all but double-precision centres.  See if the
+*   axis is linear.  Derive the increment between values.
+            IF ( ATYPE .EQ. '_DOUBLE' ) THEN
+               CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
+     :                        APNTR( I ), NELM, STATUS )
+
+               CALL CON_AXLID( NELM, %VAL( APNTR( I ) ), DSTART,
+     :                         DEND, LINEAR, STATUS )
+
+               IF ( LINEAR ) THEN
+                  INCREM = REAL( DEND - DSTART ) / REAL( NELM - 1 )
+               END IF
+
+*  Repeat for all other axis-centre data types mapped as real.
+            ELSE
+               CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
+     :                        APNTR( I ), NELM, STATUS )
+
+               CALL CON_AXLIR( NELM, %VAL( APNTR( I ) ), START,
+     :                         END, LINEAR, STATUS )
+
+               IF ( LINEAR ) THEN
+                  INCREM = ( END - START ) / REAL( NELM - 1 )
+               END IF
+            END IF
+
             IF ( LINEAR ) THEN
+
+*   It is linear.  Record the fact to prevent copying axis information
+*   from the FITS extension.
                AXIFND = .TRUE.
 
-*            It is linear.
-*
 *            Write the start value to descriptor CRVALn.
 *            ===========================================
                CALL CHR_RTOC( START, CVALUE, NCHAR ) 
