@@ -53,12 +53,27 @@
 *        frame will be a copy of the Current coordinate frame of
 *        the image, and will have the Domain name of 'CCD_SET';
 *        CCDPACK tasks concerned with registration know about this
-*        name and will use such a frame on the assumption that it
-*        constitutes a correct registration of images if it exists.
-*        Therefore this should be set true if the images which will
-*        form a Set are known to be aligned in their common Current
-*        coordinate system.
+*        name and will use those coordinates on the assumption that
+*        they constitute a correct registration of images if they 
+*        are present.  Therefore this parameter should be set true 
+*        if the images which will form a Set are known to be aligned
+*        in their common Current coordinate system.
 *        [TRUE]
+*     ASTFILE = LITERAL (Read)
+*        If this parameter is supplied, it gives the name of a file
+*        containing Set coordinate information.  A new coordinate 
+*        frame will accordingly be written into the WCS component
+*        of each image, with the Domain name 'CCD_SET'; CCDPACK
+*        tasks concerned with registration know about this name 
+*        and will use those coordinates on the assumption that they
+*        constitute a correct registration of images if they are
+*        present.
+*
+*        The file named by this parameter will normally have been
+*        written by the ASTEXP program, saving a known correct 
+*        alignment of images within a Set that corresponds to 
+*        the one being created by this program.
+*        [!]
 *     FITSINDEX = LITERAL (Read)
 *        The name of the FITS header card whose value will determine
 *        the Set Index attribute of each file.  The Set Index
@@ -263,6 +278,9 @@
 *     in one invocation of MAKESET, but it's most unlikely that this
 *     will result unless you are deliberately invoking it in a 
 *     bizarre way.
+*
+*     - When a non-null ASTFILE parameter is supplied, this program
+*     duplicates much of the functionality of ASTIMP.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
@@ -290,6 +308,7 @@
       INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT system constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
+      INCLUDE 'PAR_ERR'          ! PAR system error values
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
 
 *  External References:
@@ -299,9 +318,16 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      INTEGER MXFSET             ! Maximum framesets in one file
+      PARAMETER( MXFSET = 100 )
+
 *  Local Variables:
+      INTEGER FSET( MXFSET )     ! AST pointers to import framesets
+      INTEGER FSMAT              ! AST pointer to matching frameset
       INTEGER I                  ! Loop variable
       INTEGER ICARD              ! Index of FITS header card
+      INTEGER IF                 ! Loop index for framesets
       INTEGER IGOT               ! Found index in GRP group
       INTEGER INDEX              ! Set INDEX attribute
       INTEGER INDDFL( CCD1__MXNDF ) ! Default values for INDXS
@@ -321,6 +347,7 @@
       INTEGER NC( CCD1__MXNDF )  ! Number of NDFs so far in each Set
       INTEGER NCARD              ! Number of mapped FITS header cards
       INTEGER NCHAR              ! Number of characters in conversion
+      INTEGER NFSET              ! Number of framesets in group
       INTEGER NIV                ! Number of index values
       INTEGER NNDF               ! Number of input NDFs
       INTEGER NRET               ! Number of names returned (dummy)
@@ -329,17 +356,21 @@
       INTEGER SETSIZ             ! Number of NDFs in each Set
       INTEGER SINDEX( CCD1__MXNDF ) ! What Set Index the NDF has
       LOGICAL ADDWCS             ! Add a CCD_SET frame?
+      LOGICAL ASTFL              ! Use an AST file?
       LOGICAL DIFER              ! Do some NDFs have different Current domain?
       LOGICAL DIFSIZ             ! Are some groups different sizes?
-      LOGICAL THERE              ! Presence of component
+      LOGICAL FITSEX             ! Does FITS extension exist?
+      LOGICAL MATCH              ! Does frameset match?
       CHARACTER * ( 16 ) MODE    ! Mode for Set information construction
       CHARACTER * ( 80 ) FITIND  ! FITS header keyword for Set Index info
       CHARACTER * ( 80 ) FITNAM  ! FITS header keyword for Set Name info
+      CHARACTER * ( 80 ) FITRTS( MXFSET ) ! FITS rot keyword frameset modifiers
       CHARACTER * ( 80 ) FNAME( CCD1__MXNDF ) ! FITNAM header card values
       CHARACTER * ( 80 ) FINDEX( CCD1__MXNDF ) ! FITIND header card values
       CHARACTER * ( 80 ) IVS( CCD1__MXNDF ) ! Index value strings
       CHARACTER * ( AST__SZCHR ) DMN1 ! Domain of Set leader Current frame
-      CHARACTER * ( AST__SZCHR ) DMN ! Domain of NDF Current frame
+      CHARACTER * ( AST__SZCHR ) DOMAIN ! Domain to use for CCD_SET frame
+      CHARACTER * ( AST__SZCHR ) FSID( MXFSET ) ! Id values for each frameset
       CHARACTER * ( DAT__SZLOC ) LOC ! HDS locator
       CHARACTER * ( GRP__SZNAM ) FIELDS( 6 ) ! NDG supplementary information
       CHARACTER * ( GRP__SZNAM ) NAME ! Set NAME attribute
@@ -493,8 +524,8 @@
 *  Locate and map the FITS extension.
             CALL GRP_GET( INGRP, I, 1, NDFNAM, STATUS )
             CALL NDG_NDFAS( INGRP, I, 'READ', INDF, STATUS )
-            CALL NDF_XSTAT( INDF, 'FITS', THERE, STATUS )
-            IF ( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
+            CALL NDF_XSTAT( INDF, 'FITS', FITSEX, STATUS )
+            IF ( .NOT. FITSEX .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'NDF', NDFNAM )
                CALL ERR_REP( 'MAKESET_NOFTS', 
@@ -600,10 +631,6 @@
       END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  ======================================================================
-*  Set construction section: go through input NDFs and write Set headers.
-*  ======================================================================
-
 *  Construct a group of names using the NAME parameter as a basis,
 *  possibly modifying the leader group.
       IF ( MODE .NE. 'FITS' ) THEN
@@ -611,13 +638,34 @@
      :                    STATUS )
       END IF
 
-*  Determine whether we are to add a CCD_SET frame.
-      CALL PAR_GET0L( 'ADDWCS', ADDWCS, STATUS )
-      IF ( ADDWCS ) THEN
-         JSET = AST__CURRENT
+*  ======================================================================
+*  WCS section: Decide what new coordinate frame to add if any.
+*  ======================================================================
+
+*  Read framesets from an AST file if required; if this is done, they
+*  will be used as the CCD_SET alignment frames.
+      CALL CCD1_AFRD( 'ASTFILE', MXFSET, FSET, FSID, FITRTS, NFSET,
+     :                STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         ASTFL = .FALSE.
+         CALL ERR_ANNUL( STATUS )
       ELSE
-         JSET = AST__NOFRAME
+         ASTFL = .TRUE.
       END IF
+
+*  Determine whether we are to mark the Current frame as the CCD_SET
+*  alignment frame.
+      JSET = AST__NOFRAME
+      IF ( .NOT. ASTFL ) THEN
+         CALL PAR_GET0L( 'ADDWCS', ADDWCS, STATUS )
+         IF ( ADDWCS ) THEN
+            JSET = AST__CURRENT
+         END IF
+      END IF
+
+*  ======================================================================
+*  Set construction section: go through input NDFs and write Set headers.
+*  ======================================================================
 
 *  Write output message header to user.
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -661,25 +709,79 @@
                CALL NDG_NDFAS( INGRP, J, 'UPDATE', INDF, STATUS )
                CALL GRP_GET( INGRP, J, 1, NDFNAM, STATUS )
 
-*  Get the name of the Current domain.
-               IF ( ADDWCS ) THEN
+*  Initialise WCS data.
+               JSET = AST__NOFRAME
+               DOMAIN = ' '
+
+*  Get WCS data from an AST file.
+               IF ( ASTFL ) THEN
+
+*  Get the WCS frameset.
                   CALL CCD1_GTWCS( INDF, IWCS, STATUS )
-                  DMN = AST_GETC( IWCS, 'Domain', STATUS )
-                  IF ( K .EQ. 1 ) THEN
-                     DMN1 = DMN
+
+*  Map the FITS extension if it can be found.
+                  NCARD = 0
+                  CALL NDF_XSTAT( INDF, 'FITS', FITSEX, STATUS )
+                  IF ( FITSEX ) THEN
+                     CALL NDF_XLOC( INDF, 'FITS', 'READ', LOC, STATUS )
+                     CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', IPFITS,
+     :                              NCARD, STATUS )
+                  END IF
+
+*  Go through the list of IDs to see if any match this NDF.
+                  DO IF = 1, NFSET
+                     CALL CCD1_NMID( FSID( IF ), INDEX, NCARD, IPFITS,
+     :                               INDEX, MATCH, STATUS )
+                     IF ( MATCH ) THEN
+                        FSMAT = FSET( IF )
+                        GO TO 2
+                     END IF
+                  END DO
+ 2                CONTINUE
+
+*  No matching frameset was found from the AST file - inform user.
+                  IF ( .NOT. MATCH ) THEN
+                     CALL CCD1_MSG( ' ', '  No matching frameset in '//
+     :               'AST file - Set coordinates not added', STATUS )
                   ELSE
-                     IF ( DMN .NE. DMN1 ) DIFER = .TRUE.
-                  END IF 
+
+*  Now we need to add the new frame to the WCS frameset.
+*  Set the Current frame of the WCS frameset to the one which has the
+*  same Domain as the Base frame of the read-in frameset.
+                     DOMAIN = AST_GETC( FSMAT, 'Domain', STATUS )
+                     CALL CCD1_ADFRM( IWCS, FSMAT, 'CCD_SET', 0D0,
+     :                                FITRTS( I ), NCARD, IPFITS,
+     :                                STATUS )
+                  END IF
+
+*  Release resources.
                   CALL AST_ANNUL( IWCS, STATUS )
+                  CALL DAT_UNMAP( LOC, STATUS )
+                  CALL DAT_ANNUL( LOC, STATUS )
+
+*  Arrange to write a new CCD_SET frame as a copy of the Current 
+*  frame of the WCS frameset.
+               ELSE IF ( ADDWCS ) THEN
+                  CALL CCD1_GTWCS( INDF, IWCS, STATUS )
+                  DOMAIN = AST_GETC( IWCS, 'Domain', STATUS )
+                  JSET = AST_GETI( IWCS, 'Current', STATUS )
+                  CALL AST_ANNUL( IWCS, STATUS )
+               END IF
+
+*  Check that the domains are consistent for all NDFs.
+               IF ( ADDWCS .OR. ASTFL ) THEN
+                  IF ( K .EQ. 1 ) THEN
+                     DMN1 = DOMAIN
+                  ELSE
+                     IF ( DOMAIN .NE. DMN1 ) DIFER = .TRUE.
+                  END IF 
                END IF
 
 *  Output a message to the user.
                LINE = ' '
                CALL CHR_ITOC( INDEX, LINE( 16: ), NCHAR )
                LINE( 24:58 ) = NDFNAM
-               IF ( ADDWCS ) THEN
-                  LINE( 60: ) = DMN
-               END IF
+               LINE( 60: ) = DOMAIN
                CALL CCD1_MSG( ' ', LINE, STATUS )
 
 *  Write the Set information.
