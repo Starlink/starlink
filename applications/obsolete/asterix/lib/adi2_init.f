@@ -91,9 +91,9 @@
       EXTERNAL        		ADI2_FCLOSE
       EXTERNAL        		ADI2_NEWLNK_ARR
 
-      EXTERNAL        		BDI2_SETLNK
+c      EXTERNAL        		BDI2_SETLNK
 
-      EXTERNAL        		EDI2_SETLNK
+c      EXTERNAL        		EDI2_SETLNK
 
 *  Local Variables:
       INTEGER			DID			! Dummy id (ignored)
