@@ -97,7 +97,9 @@
 *     1990 Dec 22 (MJC):
 *        Fixed bug which caused an extra loop of parsing each line buffer
 *        when there where columns beyond the last column used.
-*     {enter_changes_here}
+*     1996 January 31 (MJC):
+*        Replaced NAG calls.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -154,7 +156,6 @@
      :  HASH,                    ! Column where a hash is found in the
                                  ! input buffer
      :  I, J,                    ! Counters
-     :  IFAIL,                   ! NAG status
      :  INDEXE,                  ! Location within the string of the end
                                  ! of the current word
      :  INDEXS,                  ! Location within the string of the
@@ -199,42 +200,9 @@
       END DO
 
 *    Sort the columns to be able to read them in sequence and 
-*    obtain an index to old positions.  Now a three-stage process
-*    in NAG.  Check for a bad status returned by each NAG routine
-*    and log an error message when bad status is found.
+*    obtain an index to old positions.
 
-      IFAIL = 1
-      CALL M01DBF( ORDPOS, 1, DIM1 + 1, 'A', INDPOS, IFAIL )
-      IF ( IFAIL .NE. 0 ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'IFAIL', IFAIL )
-         CALL ERR_REP( 'KPS1_TRDRx_NAG1',
-     :     'KPS1_TRDRx: Error ^IFAIL returned by NAG routine '/
-     :     /'M01DBF during a sort of column positions.', STATUS )
-         GOTO 999
-      END IF
-
-      IFAIL = 1
-      CALL M01ZAF( INDPOS, 1, DIM1 + 1, IFAIL )
-      IF ( IFAIL .NE. 0 ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'IFAIL', IFAIL )
-         CALL ERR_REP( 'KPS1_TRDRx_NAG1',
-     :     'KPS1_TRDRx: Error ^IFAIL returned by NAG routine '/
-     :     /'M01ZAF during a sort of column positions.', STATUS )
-         GOTO 999
-      END IF
-
-      IFAIL = 1
-      CALL M01CBF( ORDPOS, 1, DIM1 + 1, 'A', IFAIL )
-      IF ( IFAIL .NE. 0 ) THEN
-         STATUS = SAI__ERROR
-         CALL MSG_SETI( 'IFAIL', IFAIL )
-         CALL ERR_REP( 'KPS1_TRDRx_NAG1',
-     :     'KPS1_TRDRx: Error ^IFAIL returned by NAG routine '/
-     :     /'M01CBF during a sort of column positions.', STATUS )
-         GOTO 999
-      END IF
+      CALL PDA_QSIAI( DIM1 + 1, ORDPOS, INDPOS )
 
 *    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
