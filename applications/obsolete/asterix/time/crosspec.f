@@ -74,6 +74,7 @@
       REAL                      SCALE(2)         	! Scale of input axes
       REAL			SPARR(2)		! Spaced array data
 
+      INTEGER			APTR			! Input axis data
       INTEGER                   CODAT          ! Pointer to output coherency data
       INTEGER			COFID			! Coherency object
       INTEGER                   COVAR          ! Ptr to coherency variance
@@ -81,7 +82,6 @@
       INTEGER                   DPTR(2)   	! pointers to input data arrays
       INTEGER                   I              ! loop counter
       INTEGER			IFID(2)			! Input dataset ids
-      INTEGER                   LEN            ! Length of an axis
       INTEGER                   LSHIFT         ! Alignment shift
       INTEGER			MOBJ			! MultiGraph object
       INTEGER			NBAD			! # bad quality points
