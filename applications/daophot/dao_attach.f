@@ -98,7 +98,6 @@ C
 *        Whether the container file is open.
 *
 *  Algorithm :
-*     On the first call, HDS_START is called to initialise HDS.
 *     If there is already a 'DATA' file open, it is closed.
 *     A file name is prompted for if it was not supplied.
 *     The container file is opened and the OPEN flag is set.
@@ -120,6 +119,7 @@ C
 *  Authors :
 *     RFWS: R.F. Warren-Smith (Durham University)
 *     NE: Nick Eaton (Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *
 *  History :
 *     19-MAY-1988 (RFWS):
@@ -128,6 +128,8 @@ C
 *        NDF version derived from HDS version.
 *     19-FEB-1992 (NE):
 *        Unix version.
+*     10-JUL-2000 (MBT):
+*        Modified to use NDF throughout (not bare HDS).
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -164,7 +166,6 @@ C
       CHARACTER*(30) SWITCH
  
 *  Local variables :
-      LOGICAL FIRST             ! First call to this routine
       LOGICAL BAD               ! Bad pixel flag
       INTEGER STATUS            ! HDS error status
       INTEGER DIM(2)            ! Size of DATA_ARRAY component
@@ -172,104 +173,91 @@ C
       CHARACTER*(72) TITLE      ! NDF title string, from its TITLE component
  
 *  Local data :
-      SAVE FIRST
-      DATA FIRST/.TRUE./        ! Initialise for first call
+
 *.
  
 *   Initialise the HDS status variable.
       STATUS = SAI__OK
  
-*   On the first call to this routine, start HDS up.
-      IF ( FIRST ) THEN
-         FIRST = .FALSE.
-         CALL HDS_START(STATUS)
-      END IF
- 
-*   If there is no error, then if there is already a data file open,
-*   close it.  Issue a warning if an error occurs, but carry on.
-      IF ( STATUS.EQ.SAI__OK ) THEN
-         IF ( OPEN ) THEN
-            CALL HDS_CLOSE(NDF_LDATA,STATUS)
-            IF ( STATUS.NE.SAI__OK ) THEN
-               CALL ERR_REP(' ','ATTACH - warning, error closing file',
-     :                      STATUS)
-               CALL ERR_FLUSH(STATUS)
-               CALL ERR_ANNUL(STATUS)
-            END IF
-            OPEN = .FALSE.
+*   If there is already a data file open, close it.  Issue a warning 
+*   if an error occurs, but carry on.
+      IF ( OPEN ) THEN
+         CALL NDF_ANNUL(NDF_IDATA,STATUS)
+         IF ( STATUS.NE.SAI__OK ) THEN
+            CALL ERR_REP(' ','ATTACH - warning, error closing file',
+     :                   STATUS)
+            CALL ERR_FLUSH(STATUS)
+            CALL ERR_ANNUL(STATUS)
          END IF
+         OPEN = .FALSE.
+      END IF
  
 *   If NAFILE wasn't defined in the ATTACH command line, ask for it
 *   here.  Quit if "end of file" (ctrl-Z) was entered.
-         IF ( NAFILE.EQ.' ' ) THEN
-            CALL TBLANK
-            CALL ASKFILE('Enter file name:',NAFILE)
-            IF ( NAFILE.EQ.'END OF FILE' ) RETURN
-         END IF
+      IF ( NAFILE.EQ.' ' ) THEN
+         CALL TBLANK
+         CALL ASKFILE('Enter file name:',NAFILE)
+         IF ( NAFILE.EQ.'END OF FILE' ) RETURN
+      END IF
  
 *   Try to open the file.  Check for errors and report them.
-         CALL HDS_OPEN(NAFILE,'READ',NDF_LDATA,STATUS)
-         IF ( STATUS.NE.SAI__OK ) THEN
-            CALL TBLANK
-            CALL ERR_REP(' ','ATTACH - error opening file',STATUS)
+      CALL NDF_FIND(DAT__ROOT,NAFILE,NDF_IDATA,STATUS)
+      IF ( STATUS.NE.SAI__OK ) THEN
+         CALL TBLANK
+         CALL ERR_REP(' ','ATTACH - error opening file',STATUS)
  
 *   If there is no error, set the OPEN flag and assign initial default
 *   sequential filenames for use later.
-         ELSE
-            OPEN = .TRUE.
-            COOFILE = SWITCH(NAFILE,'.COO')
-            MAGFILE = SWITCH(NAFILE,'.AP')
-            PSFFILE = SWITCH(NAFILE,'.PSF')
-            PROFILE = SWITCH(NAFILE,'.NST')
-            GRPFILE = SWITCH(NAFILE,'.GRP')
- 
-*   Try importing the NDF
-            CALL NDF_IMPRT(NDF_LDATA,NDF_IDATA,STATUS)
+      ELSE
+         OPEN = .TRUE.
+         COOFILE = SWITCH(NAFILE,'.COO')
+         MAGFILE = SWITCH(NAFILE,'.AP')
+         PSFFILE = SWITCH(NAFILE,'.PSF')
+         PROFILE = SWITCH(NAFILE,'.NST')
+         GRPFILE = SWITCH(NAFILE,'.GRP')
  
 *   Output a message if there are bad pixels present
-            CALL NDF_BAD(NDF_IDATA,'Data',.TRUE.,BAD,STATUS)
-            IF ( BAD ) CALL MSG_OUT(' ',
-     :                       'NOTE - Bad pixels are present in the data'
-     :                       ,STATUS)
+         CALL NDF_BAD(NDF_IDATA,'Data',.TRUE.,BAD,STATUS)
+         IF ( BAD ) CALL MSG_OUT(' ',
+     :                    'NOTE - Bad pixels are present in the data'
+     :                    ,STATUS)
  
 *   Try to read the TITLE component
-            TITLE = ' '
-            CALL NDF_CGET(NDF_IDATA,'Title',TITLE,STATUS)
+         TITLE = ' '
+         CALL NDF_CGET(NDF_IDATA,'Title',TITLE,STATUS)
  
 *   If successful, display the title
-            IF ( TITLE.NE.' ' ) THEN
-               CALL TBLANK
-               CALL MSG_OUT(' ','Title: ' // TITLE,STATUS)
-            END IF
- 
-*   Find the shape of the DATA_ARRAY component
-            CALL NDF_DIM(NDF_IDATA,2,DIM,NDIM,STATUS)
-            IF ( STATUS.NE.SAI__OK ) THEN
-               CALL ERR_FLUSH(STATUS)
-               CALL ERR_ANNUL(STATUS)
-               CALL HDS_CLOSE(NDF_LDATA,STATUS)
-               OPEN = .FALSE.
-               CALL TBLANK
-               CALL MSG_OUT(' ','Failed to attach ',NAFILE,STATUS)
- 
-*   Check the number of dimensions is two.
-            ELSE IF ( NDIM.NE.2 ) THEN
-               CALL TBLANK
-               STATUS = SAI__ERROR
-               CALL ERR_REP(' ',
-     :              'ATTACH - DATA_ARRAY component is not 2-dimensional'
-     :              ,STATUS)
- 
-*   If the DATA_ARRAY is OK, save its dimensions.
-            ELSE
-               NCOL = DIM(1)
-               NROW = DIM(2)
-            END IF
- 
-*   End of "no error opening the container file" condition.
+         IF ( TITLE.NE.' ' ) THEN
+            CALL TBLANK
+            CALL MSG_OUT(' ','Title: ' // TITLE,STATUS)
          END IF
  
-*   End of "no error starting HDS" condition.
+*   Find the shape of the DATA_ARRAY component
+         CALL NDF_DIM(NDF_IDATA,2,DIM,NDIM,STATUS)
+         IF ( STATUS.EQ.SAI__OK .AND. NDIM.NE.2 ) THEN
+            CALL TBLANK
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ',
+     :           'ATTACH - DATA_ARRAY component is not 2-dimensional'
+     :           ,STATUS)
+         END IF
+
+*   If there has been an error, close the file and indicate trouble.
+         IF ( STATUS.NE.SAI__OK ) THEN
+            CALL NDF_ANNUL(NDF_IDATA,STATUS)
+            CALL ERR_ANNUL(STATUS)
+            OPEN = .FALSE.
+            CALL TBLANK
+            CALL MSG_SETC('FILE',NAFILE)
+            CALL MSG_OUT(' ','Failed to attach ^FILE',STATUS)
+ 
+*   If the DATA_ARRAY is OK, save its dimensions.
+         ELSE
+            NCOL = DIM(1)
+            NROW = DIM(2)
+         END IF
+ 
+*   End of "no error finding the NDF" condition.
       END IF
  
 *   Exit routine.

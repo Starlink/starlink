@@ -410,7 +410,7 @@ PKG_LINK = DAO
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.3-1
+PKG_VERS = 1.3-2
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the

@@ -1,14 +1,9 @@
 *   Common block for locators to the NDF structures.
 
-*   HDS top-level locators
-      CHARACTER * ( DAT__SZLOC ) NDF_LCOPY, NDF_LDATA
-
 *   NDF identifiers
       INTEGER NDF_ICOPY, NDF_IDATA
 
       COMMON / NDF_COM / NDF_ICOPY, NDF_IDATA
-      COMMON / NDF_CCOM / NDF_LCOPY, NDF_LDATA
 
       SAVE / NDF_COM /
-      SAVE / NDF_CCOM /
 

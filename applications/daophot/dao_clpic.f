@@ -28,7 +28,7 @@
 *        it is called with any other environment name.
 *
 *  Algorithm :
-*     Call HDS_CLOSE to close the container file.
+*     Call NDF_ANNUL to close the image file.
 *     Report any errors.
 *
 *  Deficiencies :
@@ -40,6 +40,7 @@
 *  Authors :
 *     RFWS: R.F. Warren-Smith (Durham University)
 *     NE: Nick Eaton (Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *
 *  History :
 *     19-MAY-1988 (RFWS):
@@ -48,6 +49,8 @@
 *        NDF version derived from HDS version.
 *     19-FEB-1992 (NE):
 *        Unix version.
+*     10-JUL-2000 (MBT):
+*        Fixed to use NDF and not bare HDS.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -73,12 +76,10 @@
 *   ..."DATA" environment:
       IF ( ENVIRO.EQ.'DATA' ) THEN
          CALL NDF_ANNUL(NDF_IDATA,STATUS)
-         CALL HDS_CLOSE(NDF_LDATA,STATUS)
  
 *   ..."COPY" environment:
       ELSE IF ( ENVIRO.EQ.'COPY' ) THEN
          CALL NDF_ANNUL(NDF_ICOPY,STATUS)
-         CALL HDS_CLOSE(NDF_LCOPY,STATUS)
  
 *   ...environment not known, so report an error:
       ELSE

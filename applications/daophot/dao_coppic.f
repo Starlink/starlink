@@ -53,6 +53,8 @@
 *        NDF version derived from HDS version.
 *     19-FEB-1992 (NE):
 *        Unix version.
+*     10-JUL-2000 (MBT):
+*        Fixed to use NDF instead of bare HDS calls.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -81,12 +83,8 @@
 *   Initialise the HDS status variable.
       STATUS = SAI__OK
  
-*   Create a new file of type 'NDF'
-      CALL HDS_NEW(NEWPICT,'NDF','NDF',0,0,NDF_LCOPY,STATUS)
- 
-*   Get an NDF place holder. This will be used to create an NDf at the
-*   top level of the container file.
-      CALL NDF_PLACE(NDF_LCOPY,' ',PLACE,STATUS)
+*   Get an NDF place holder representing a new file.
+      CALL NDF_PLACE(DAT__ROOT,NEWPICT,PLACE,STATUS)
  
 *   Create the new NDF from the old ("DATA") one
       CALL NDF_COPY(NDF_IDATA,PLACE,NDF_ICOPY,STATUS)

@@ -90,6 +90,8 @@
 *        Unix version.
 *      8-JUN-2000 (MBT):
 *        Fixed for NDFs which do not start at (1,1).
+*     10-JUL-2000 (MBT):
+*        Fixed bug in ERR_REP call.
 *-
 *  Type Definitions :
       IMPLICIT NONE
@@ -166,8 +168,8 @@
       ELSE
          CALL TBLANK
          STATUS = SAI__ERROR
-         CALL ERR_REP(' ','RDARAY - unknown environment: ',ENVIRO,
-     :                STATUS)
+         CALL MSG_SETC('ENV',ENVIRO)
+         CALL ERR_REP(' ','RDARAY - unknown environment: ^ENV',STATUS)
       END IF
 
 *   Get bounds of NDF.

@@ -1,9 +1,9 @@
 1 DAOPHOT - DAO photometry package
                                                             Expires: **.**.**
 
- This is DAOPHOT v1.3-1.
+ This is DAOPHOT v1.3-2.
 
- Changes at v1.3-1:
+ Changes at v1.3-2:
 
    o Many of the static limits compiled into DAOPHOT have been removed.
      The programs will now adjust to the size of the image to which
@@ -17,6 +17,12 @@
    o The code has been fixed so that NDF images with pixel indices not
      starting at (1,1) can be processed properly.  Previously only a
      sub-block of any such image was being examined.
+
+   o In conjunction with the NDF library and the CONVERT utilities,
+     foreign data formats may now be used with DAOPHOT, being translated
+     on the fly.  See SSN/20 for details (or if CONVERT is installed 
+     just type 'convert' and use of most foreign data formats will be
+     available automatically).
 
  Changes at v1.2-2:
 
