@@ -333,8 +333,12 @@ javadoc-sources:
 prepare:
 
 assemble_java:
+
+do_assemble_java:
     [mkdir] Created dir: /apps/cvsbuild/java/source/array/build/java
      [copy] Copying 42 files to /apps/cvsbuild/java/source/array/build/java
+    [mkdir] Created dir: /apps/cvsbuild/java/source/array/build/prep
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/array/build/prep
 
 javadoc-sources:
      [echo] Executing NDX target: javadoc-sources
@@ -440,4 +444,4 @@ javadoc-sources:
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 25 seconds
+Total time: 26 seconds

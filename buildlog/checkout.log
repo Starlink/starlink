@@ -2300,7 +2300,8 @@ cvs checkout: Updating java/source/array/src/perl/uk
 cvs checkout: Updating java/source/array/src/perl/uk/ac
 cvs checkout: Updating java/source/array/src/perl/uk/ac/starlink
 cvs checkout: Updating java/source/array/src/perl/uk/ac/starlink/array
-U java/source/array/src/perl/uk/ac/starlink/array/ConvertWorker.pl
+cvs checkout: Updating java/source/array/src/prep
+U java/source/array/src/prep/WriteConvertWorker.java
 cvs checkout: Updating java/source/array/src/testcases
 cvs checkout: Updating java/source/array/src/testcases/uk
 cvs checkout: Updating java/source/array/src/testcases/uk/ac

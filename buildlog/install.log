@@ -370,6 +370,8 @@ check_packages:
 
 assemble_java:
 
+do_assemble_java:
+
 build_classes:
 
 build:
@@ -1119,4 +1121,4 @@ install:
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 6 seconds
+Total time: 4 minutes 15 seconds
