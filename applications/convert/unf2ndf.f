@@ -36,7 +36,7 @@
 *        or "Variance".  To create a variance or quality array the NDF
 *        must already exist. ["Data"]
 *     FITS = _LOGICAL (Read)
-*        If true, the initial records of the unformatted file are
+*        If TRUE, the initial records of the unformatted file are
 *        interpreted as a FITS header (with one card image per record)
 *        from which the shape, data type, and axis centres are derived.
 *        The last record of the FITS-like header must be terminated by
@@ -46,15 +46,13 @@
 *        Name of the input sequential unformatted Fortran file.  The
 *        file will normally have variable-length records when there is
 *        a header, but always fixed-length records when there is no
-*        header.  On VMS platforms a default file extension of ".DAT"
-*        is appended when parameter IN contains no file extension.
+*        header.
 *     NOPEREC = _INTEGER (Read)
-*        The number of data values per record of the input file.  On
-*        VAX systems it should be in the range 1 to 16383; but need
-*        only be positive on UNIX systems.  The suggested default
-*        is the size of the first dimension of the array if there is
-*        no current value.  A null (!) value for NOPEREC causes the
-*        size of first dimension to be used.
+*        The number of data values per record of the input file.  It
+*        must be positive on UNIX systems.  The suggested default is
+*        the size of the first dimension of the array if there is no
+*        current value.  A null (!) value for NOPEREC causes the size
+*        of first dimension to be used.
 *     OUT = NDF (Read and Write)
 *        Output NDF data structure.  When COMP is not "Data" the NDF
 *        is modified rather than a new NDF created.  It becomes the new
@@ -82,40 +80,40 @@
 *  Examples:
 *     unf2ndf ngc253.dat ngc253 shape=[100,60] noperec=8
 *        This copies a data array from the unformatted file ngc253.dat
-*        to the NDF called ngc253.  ngc253.dat does not contain a
+*        to the NDF called ngc253.  The input file does not contain a
 *        header section.  The NDF is two-dimensional: 100 elements in x
 *        by 60 in y.  Its data array has type _REAL.  The data records
 *        each have 8 values.
 *     unf2ndf ngc253q.dat ngc253 q 100 shape=[100,60]
 *        This copies a quality array from the unformatted file
 *        ngc253q.dat to an existing NDF called ngc253 (such as created
-*        in the first example).  ngc253q.dat does not contain a header
+*        in the first example).  The input file does not contain a header
 *        section.  The NDF is two-dimensional: 100 elements in x by 60
 *        in y.  Its data array has type _UBYTE.  The data records
 *        each have 100 values.
 *     unf2ndf ngc253.dat ngc253 fits noperec=!
 *        This copies a data array from the unformatted file ngc253.dat
-*        to the NDF called ngc253.  ngc253.dat contains a FITS-like
+*        to the NDF called ngc253.  The input file contains a FITS-like
 *        header section, which is copied to the FITS extension of the
 *        NDF.  The shape of the NDF is controlled by the mandatory FITS
 *        keywords NAXIS, AXIS1, ..., AXISn, and the data type by
 *        keywords BITPIX and UNSIGNED.  Each data record has AXIS1
 *        values (except perhaps for the last).
-*     unf2ndf type='_uword' in=ngc253.dat out=ngc253 \
+*     unf2ndf type="_uword" in=ngc253.dat out=ngc253 \
 *        This copies a data array from the unformatted file ngc253.dat
-*        to the NDF called ngc253.  ngc253.dat does not contain a
+*        to the NDF called ngc253.  The input file does not contain a
 *        header section.  The NDF has the current shape and data type
 *        is unsigned word.  The current number of values per record is
 *        used.
 *     unf2ndf spectrum zz skip=2 shape=200 noperec=!
 *        This copies a data array from the unformatted file spectrum to
-*        the NDF called zz.  spectrum contains two header records that
+*        the NDF called zz.  The input file contains two header records that
 *        are ignored.  The NDF is one-dimensional comprising 200
 *        elements of type _REAL.  There is one data record containing
 *        the whole array.
 *     unf2ndf spectrum.lis ZZ skip=1 fits noperec=20
 *        This copies a data array from the unformatted file spectrum.lis
-*        to the NDF called ZZ.  spectrum.lis contains one header
+*        to the NDF called ZZ.  The input file contains one header
 *        record, that is ignored, followed by a FITS-like header
 *        section, which is copied to the FITS extension of the NDF.
 *        The shape of the NDF is controlled by the mandatory FITS
