@@ -169,7 +169,6 @@
 *        Or alternatively you can use an explicit list of names.
 *        These may use indirection elements as well as names separated
 *        by commas.
-*        [*]
 *     OVERRIDE = LOGICAL (Read)
 *        This parameter controls whether to continue and create an
 *        incomplete solution. Such solutions will result when only a
@@ -240,9 +239,11 @@
 *          - Column 3: the Y position
 *
 *       The column one value must be an integer and is used to identify
-*       positions which are the same but which have different locations
-*       on different images. Values in any other (trailing) columns are
-*       usually ignored.
+*       positions.  In the output position lists from one run of FINDOFF,
+*       lines with the same column-1 value in different files represent
+*       the same object.  In the input position lists column-1 values
+*       are ignored.  Values in trailing columns (beyond column three)
+*       are ignored.
 *
 *       EXTERNAL format - positions are specified using just an X 
 *       and a Y entry and no other entries.
