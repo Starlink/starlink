@@ -1,4 +1,5 @@
-      SUBROUTINE COF_H2BIN( LOC, FUNIT, EXTLEV, EXPATH, WRITTN, STATUS )
+      SUBROUTINE COF_H2BIN( LOC, ALOC, FUNIT, EXTLEV, EXPATH, WRITTN,
+     :                      STATUS )
 *+
 *  Name:
 *     COF_H2BIN
@@ -11,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_H2BIN( LOC, FUNIT, EXTLEV, EXPATH, WRITTN, STATUS )
+*     CALL COF_H2BIN( LOC, ALOC, FUNIT, EXTLEV, EXPATH, WRITTN, STATUS )
 
 *  Description:
 *     The routine creates a FITS binary table of one row to store the
@@ -21,6 +22,10 @@
 *  Arguments:
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
 *        Locator for the structure whose contents are to be converted.
+*     ALOC = CHARACTER * ( DAT__SZLOC ) (Given)
+*        If the structure given by argument LOC is a cell, ALOC is the
+*        locator to the full structure array.  Otherwise it sohuld be
+*        set to DAT__NOLOC.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
 *     EXTLEV = INTEGER (Given)
@@ -52,7 +57,10 @@
 *  History:
 *     1994 June 18 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 March (MJC):
+*        ALOC argument added.  Writes EXTSHAPE keyword and TDIMn
+*        keywords.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -70,6 +78,7 @@
 
 *  Arguments Given:
       CHARACTER * ( * ) LOC
+      CHARACTER * ( * ) ALOC
       INTEGER FUNIT
       INTEGER EXTLEV
       CHARACTER * ( * ) EXPATH
@@ -97,38 +106,49 @@
       PARAMETER ( MXSLEN = 512 )
 
 *  Local Variables:
+      CHARACTER * ( 10 ) CDIM    ! Dimension of the structure
       CHARACTER * ( 80 ) CDUMMY  ! Dummy for reading TFORMn cards
       CHARACTER * ( 3 ) CN       ! Column number
+      INTEGER CPOS               ! Character position
       CHARACTER * ( 8 ) CRDNAM   ! Header-card name to insert TNULLn
       CHARACTER * ( MXSLEN ) CVALUE ! Character component value
-      INTEGER DIMS( DAT__MXDIM ) ! Component dimensions
+      INTEGER DIMS( DAT__MXDIM ) ! Component and structure dimensions
       DOUBLE PRECISION DVALUE    ! D.p. component value
       INTEGER EL                 ! Number of array elements
       CHARACTER * ( FITSCH ) EXTNAM  ! Name of the component
+      CHARACTER * ( DAT__SZTYP ) EXTTYP ! Component type
       CHARACTER * ( 256 ) FILE   ! Name of the HDS file
       INTEGER FSTAT              ! FITSIO status
+      INTEGER I                  ! Loop through dimensions
       INTEGER IC                 ! Loop through components
       INTEGER ICI                ! Loop through integer components
+      INTEGER ICMD               ! Loop through multi-dimensional
+                                 ! components
       INTEGER ICOMP( MXOBJ )     ! Column numbers of integer components
       INTEGER INULL              ! Integer null value
       INTEGER IVALUE             ! Integer component value
       CHARACTER * ( DAT__SZLOC ) LCMP ! Component locator
       INTEGER LEL                ! Loop counter for undefined logicals
       LOGICAL LVALUE             ! Logical component value
+      INTEGER MDCOMP( MXOBJ )    ! Column numbers of multi-dimensional
+                                 ! components
       INTEGER NC                 ! Number of characters in keyword
       INTEGER NCMP               ! Number of structure components
       INTEGER NCEXT              ! Column from which the EXTNAME starts
       INTEGER NCPRE              ! Number of characters in prefix
-      INTEGER NDIM               ! Number of component dimensions
-      INTEGER NLEV               ! Number of heirarchical levels
+      INTEGER NDIM               ! Number of component and structure
+                                 ! dimensions
+      INTEGER NLEV               ! Number of hierarchical levels
       INTEGER NOPRIM             ! Number of primitive component
       INTEGER NICOL              ! Number of integer columns
+      INTEGER NMDCOL              ! Number of multi-dimensional columns
       INTEGER OPNTR              ! Pointer to a mapped component
       INTEGER PRECOL             ! Number of component dimensions
       LOGICAL PRIM               ! Object primitive?
       CHARACTER * ( 6 ) ROUTIN   ! Name of the FITSIO routine used to
                                  ! copy data into the binary table
       INTEGER RVALUE             ! Real component value
+      CHARACTER * ( 68 ) SHAPE   ! Shape of the structure
       INTEGER SIZE               ! Size as if vector
       INTEGER STRLEN             ! Length of a string component
       CHARACTER * ( DAT__SZTYP ) TFORM( MXOBJ ) ! Components' types
@@ -136,6 +156,7 @@
                                  ! binary-table columns
       CHARACTER * ( 1 ) TUNIT( MXOBJ ) ! Binary-table component types
       CHARACTER * ( DAT__SZTYP ) TYPE ! Type of the component
+      LOGICAL VALID              ! Valid locator?
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'    ! NUM declarations for conversions
@@ -164,6 +185,7 @@
 
 *  Loop through all objects within this structure.
                NICOL = 0
+               NMDCOL = 0
                NOPRIM = 0
                DO IC = 1, NCMP
 
@@ -207,6 +229,16 @@
 *  Assign a null units.
                      TUNIT( NOPRIM ) = ' '
 
+*  Obtain the shape pf the component.
+                     CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS, NDIM,
+     :                               STATUS )
+
+*  Record any multi-dimensional components.
+                     IF ( NDIM .GT. 1 ) THEN
+                        NMDCOL = NMDCOL + 1
+                        MDCOMP ( NMDCOL ) = NOPRIM
+                     END IF
+
 *  Tidy the locator to the object.
                      CALL DAT_ANNUL( LCMP, STATUS )
                   END IF
@@ -218,7 +250,7 @@
 *  object.
                IF ( NOPRIM .GT. 0 ) THEN
 
-*  Get the structures path name and assign it to the extension name.
+*  Get the structure's path name and assign it to the extension name.
                   CALL HDS_TRACE( LOC, NLEV, EXTNAM, FILE, STATUS )
 
 *  Remove the prefix if one exists.
@@ -228,11 +260,45 @@
 *  Get the length of the string.
                      PRECOL = INDEX( EXPATH( :NCPRE ), EXTNAM )
 
-*  Remove the string if it is a prefix.  It is done buy adjusting the
+*  Remove the string if it is a prefix.  It is done by adjusting the
 *  string lower limit.
                      IF ( PRECOL .EQ. 1 ) NCEXT = PRECOL + 1
                   ELSE
                      NCEXT = 1
+                  END IF
+
+*  Obtain the data type.
+                  CALL DAT_TYPE( LOC, EXTTYP, STATUS )
+
+*  Need to determine the shape of the full array.  Test whether or not
+*  the supplementary locator to a full array structure is valid.
+                  CALL DAT_VALID( ALOC, VALID, STATUS )
+                  IF ( VALID ) THEN
+
+*  Obtain the data shape of the full array of structures.
+                     CALL DAT_SHAPE( ALOC, DAT__MXDIM, DIMS, NDIM,
+     :                               STATUS )
+                  ELSE
+
+*  Obtain the data shape of the supplied structure, as it is not a cell.
+                     CALL DAT_SHAPE( LOC, DAT__MXDIM, DIMS, NDIM,
+     :                               STATUS )
+                  END IF
+
+*  Create the dimension string for the header, as a comma separated
+*  list.  A scalar has value zero.
+                  IF ( NDIM .EQ. 0 ) THEN
+                     SHAPE = '0'
+
+                  ELSE
+                     CPOS = 0
+                     DO I = 1, NDIM
+                        CALL CHR_ITOC( DIMS( I ), CDIM, NC )
+                        CALL CHR_APPND( CDIM, SHAPE, CPOS )
+                        IF ( I .NE. NDIM )
+     :                    CALL CHR_APPND( ',', SHAPE, CPOS )
+                     END DO
+
                   END IF
 
 *  Create the binary table.
@@ -255,11 +321,11 @@
                      GOTO 999
                   END IF
 
-*  Write the TNULLn cards for an integer column.
-*  =============================================
+*  Write the TNULLn cards for any integer columns.
+*  ===============================================
 
 *  This is only necessary when there is at least one column that has one
-*  of the intteger types.  Floating-point values take defined NaN
+*  of the integer types.  Floating-point values take defined NaN
 *  values.
                   IF ( NICOL .GT. 0 ) THEN
                      DO ICI = 1, NICOL
@@ -287,7 +353,7 @@
 
 *  Assign the bad/null value for each of the integer data types.
                         IF ( TYPE .EQ. '_BYTE' ) THEN
-                           inull = NUM_BTOI( VAL__BADB )
+                           INULL = NUM_BTOI( VAL__BADB )
                         ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
                            INULL = NUM_UBTOI( VAL__BADUB )
                         ELSE IF ( TYPE .EQ. '_WORD' ) THEN
@@ -312,7 +378,58 @@
                         IF ( FSTAT .GT. FITSOK ) THEN
                            CALL COF_FIOER( FSTAT,
      :                       'COF_H2BIN_ERR7', 'FTIKYJ',
-     :                       'Error writing'//CRDNAM( :NC )//' card '/
+     :                       'Error writing '//CRDNAM( :NC )//' card '/
+     :                       /'for a binary table.', STATUS )
+                           GOTO 999
+                        END IF
+                     END DO
+                  END IF
+
+*  Write the TDIMn cards for any multi-dimensional columns.
+*  ========================================================
+
+*  This is only necessary when there is at least one column that has one
+*  of the integer types.  Floating-point values take defined NaN
+*  values.
+                  IF ( NMDCOL .GT. 0 ) THEN
+                     DO ICMD = 1, NMDCOL
+
+*  Convert the column number into character form.
+                        CALL CHR_ITOC( MDCOMP( ICMD ), CN, NC )
+
+*  Form the name of the keyword which will immediately precede the
+*  inserted TDIMn card.
+                        NC = 5
+                        CRDNAM = 'TFORM'
+                        CALL CHR_APPND( CN, CRDNAM, NC )
+
+*  FITSIO does not permit cards to be placed after a named card; 
+*  it requires that we read that named card first.
+                        CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
+
+*  Get a locator to the object so that we can determine its shape.
+*  This information was obtained before, but inquiring again avoids
+*  having large dimension arrays.  Release the locator at the end.
+                        CALL DAT_INDEX( LOC, MDCOMP( ICMD ), LCMP,
+     :                                  STATUS )
+                        CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS, NDIM,
+     :                                  STATUS )
+                        CALL DAT_ANNUL( LCMP, STATUS )
+
+*  Insert the TDIMn card.
+                        CALL FTPTDM( FUNIT, MDCOMP( ICMD ), NDIM, DIMS,
+     :                               FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.  Specify from which routine the error arose.
+*  Form the name of the TDIMn keyword along the way.
+                        IF ( FSTAT .GT. FITSOK ) THEN
+                           NC = 5
+                           CRDNAM = 'TNULL'
+                           CALL CHR_APPND( CN, CRDNAM, NC )
+                           CALL COF_FIOER( FSTAT,
+     :                       'COF_H2BIN_ERR7', 'FTIKYJ',
+     :                       'Error writing '//CRDNAM( :NC )//' card '/
      :                       /'for a binary table.', STATUS )
                            GOTO 999
                         END IF
@@ -331,6 +448,33 @@
                   IF ( FSTAT .GT. FITSOK ) THEN
                      CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR2',
      :                 'FTPKYJ', 'Error writing extension level in '/
+     :                 /'header.', STATUS )
+                     GOTO 999
+                  END IF
+
+*  Set the extension type.
+                  CALL FTPKYS( FUNIT, 'EXTTYPE', EXTTYP, 'HDS data '/
+     :                         /'type of the hierarchical structure',
+     :                         FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+                  IF ( FSTAT .GT. FITSOK ) THEN
+                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR3',
+     :                 'FTPKYJ', 'Error writing extension type in '/
+     :                 /'header.', STATUS )
+                     GOTO 999
+                  END IF
+
+*  Set the extension shape.
+                  CALL FTPKYS( FUNIT, 'EXTSHAPE', SHAPE, 'Shape '/
+     :                         /'of the hierarchical structure', FSTAT )
+
+*  Handle a bad status.  Negative values are reserved for non-fatal
+*  warnings.
+                  IF ( FSTAT .GT. FITSOK ) THEN
+                     CALL COF_FIOER( FSTAT, 'COF_H2BIN_ERR8',
+     :                 'FTPKYJ', 'Error writing extension shape in '/
      :                 /'header.', STATUS )
                      GOTO 999
                   END IF
@@ -375,7 +519,7 @@
 *  Inquire the component's size.
                         CALL DAT_SIZE( LCMP, SIZE, STATUS )
 
-*  Inquire the component's shape.  is it an array or a scalar?
+*  Inquire the component's shape.  Is it an array or a scalar?
                         CALL DAT_SHAPE( LCMP, DAT__MXDIM, DIMS, NDIM,
      :                                  STATUS )
 
