@@ -13,6 +13,7 @@ sex_SOURCES		= analyse.c assoc.c astrom.c back.c bpro.c catout.c \
 			  globals.h growth.h image.h interpolate.h key.h \
 			  neurro.h param.h photom.h plist.h poly.h prefs.h \
 			  preflist.h psf.h retina.h sexhead1.h sexhead.h \
-			  sexheadsc.h som.h types.h weight.h
+			  sexheadsc.h som.h types.h weight.h userradii.c \
+                          userradii.h
 sex_LDADD		= $(top_builddir)/src/fits/libfits.a $(top_builddir)/src/wcs/libwcs_c.a
 DATE=`date +"%Y-%m-%d"`
