@@ -5017,23 +5017,51 @@ c        REAL XX,XP,YP
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
-        IF (I_MODE.EQ.1) THEN
+*  GUI mode
+        IF (I_GUI) THEN
+
+*  try input from cursor
+          I_FORM=.FALSE.
+          CALL MSG_PRNT(' ')
+          XC=I_X
+          YC=I_Y
+          CALL MSG_PRNT('Select centre...')
+          CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
+          IF (FLAG.EQ.3) THEN
+            I_FORM=.TRUE.
+          ELSE
+            CALL MSG_PRNT('Select any corner...')
+            XCORN=XC
+            YCORN=YC
+            CALL IMG_GUICURS(XCORN,YCORN,FLAG,STATUS)
+            DX=ABS(XCORN-XC)
+            DY=ABS(YCORN-YC)
+            I_FORM=(FLAG.EQ.3)
+          ENDIF
+
+*  form input
+          IF (I_FORM) THEN
+            CALL IMG_NBGET0R('PAR_R1',XC,STATUS)
+            CALL IMG_NBGET0R('PAR_R2',YC,STATUS)
+            CALL IMG_NBGET0R('PAR_R3',DX,STATUS)
+            CALL IMG_NBGET0R('PAR_R4',DY,STATUS)
+          ENDIF
+
+
+*  command mode cursor input
+        ELSEIF (I_MODE.EQ.1) THEN
+
 *  get centre
           CALL MSG_PRNT(' ')
           XC=I_X
           YC=I_Y
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XC,YC,FLAG,STATUS)
-          ELSE
-            CALL MSG_SETR('XC',XC)
-            CALL MSG_SETR('YC',YC)
-            CALL MSG_PRNT('Select centre/^XC,^YC/...')
-            CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
-            IF (CH.EQ.CHAR(13)) THEN
-              XC=I_X
-              YC=I_Y
-            ENDIF
+          CALL MSG_SETR('XC',XC)
+          CALL MSG_SETR('YC',YC)
+          CALL MSG_PRNT('Select centre/^XC,^YC/...')
+          CALL GFX_CURS(XC,YC,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13)) THEN
+            XC=I_X
+            YC=I_Y
           ENDIF
 
           CALL PGPOINT(1,XC,YC,2)
@@ -5041,11 +5069,7 @@ c        REAL XX,XP,YP
           CALL MSG_PRNT('Select any corner...')
           XCORN=XC
           YCORN=YC
-          IF (I_GUI) THEN
-            CALL IMG_GUICURS(XCORN,YCORN,FLAG,STATUS)
-          ELSE
-            CALL GFX_CURS(XCORN,YCORN,LEFT,RIGHT,CH,STATUS)
-          ENDIF
+          CALL GFX_CURS(XCORN,YCORN,LEFT,RIGHT,CH,STATUS)
 
 *  calculate box half-widths
           DX=ABS(XCORN-XC)
@@ -5115,7 +5139,6 @@ c      REAL HWID
       REAL D
       REAL XTR,YTR,XTL,YTL,XBR,YBR,XBL,YBL
       REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
-      REAL A,ASQ,B,BSQ,CSQ
       INTEGER LS
       INTEGER FLAG
       LOGICAL LEFT,RIGHT
@@ -5123,23 +5146,68 @@ c      REAL HWID
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-*  get centre of cut
-        IF (I_MODE.EQ.1) THEN
+*  GUI mode
+        IF (I_GUI) THEN
+
+          I_FORM=.FALSE.
+          XCENT=I_X
+          YCENT=I_Y
+          CALL MSG_PRNT('Select centre...')
+          CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
+          IF (FLAG.EQ.1) THEN
+            CALL PGPOINT(1,XCENT,YCENT,2)
+            CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+            CALL MSG_PRNT('Select end...')
+            XEND=XCENT
+            YEND=YCENT
+            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
+            IF (FLAG.EQ.1) THEN
+              CALL PGPOINT(1,XEND,YEND,2)
+              CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
+
+*  calculate other end and draw centre line
+              XOEND=2.0*XCENT-XEND
+              YOEND=2.0*YCENT-YEND
+              CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
+              CALL PGPOINT(1,XOEND,YOEND,2)
+              CALL PGQLS(LS)
+              CALL PGSLS(2)
+              CALL PGDRAW(XEND,YEND)
+              CALL MSG_PRNT('Select width...')
+              XWID=XCENT
+              YWID=YCENT
+              CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
+              IF (FLAG.EQ.1) THEN
+                CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
+
+*  calc length etc
+                CALL IMG_GETSLICE_SUB(XCENT,YCENT,XEND,YEND,
+     :                   XOEND,YOEND,XWID,YWID,ANGLE,LENGTH,WIDTH,
+     :                                                       STATUS)
+
+              ELSEIF (FLAG.EQ.3) THEN
+                I_FORM=.TRUE.
+              ENDIF
+
+            ELSEIF (FLAG.EQ.3) THEN
+              I_FORM=.TRUE.
+            ENDIF
+          ELSEIF (FLAG.EQ.3) THEN
+            I_FORM=.TRUE.
+          ENDIF
+
+*  command mode cursor input
+        ELSEIFIF (I_MODE.EQ.1) THEN
           CALL MSG_PRNT(' ')
           XCENT=I_X
           YCENT=I_Y
-          IF (I_GUI) THEN
-            CALL MSG_PRNT('Select centre...')
-            CALL IMG_GUICURS(XCENT,YCENT,FLAG,STATUS)
-          ELSE
-            CALL MSG_SETR('X',XCENT)
-            CALL MSG_SETR('Y',YCENT)
-            CALL MSG_PRNT('Select centre/^X,^Y/...')
-            CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
-            IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
-              XCENT=I_X
-              YCENT=I_Y
-            ENDIF
+          CALL MSG_SETR('X',XCENT)
+          CALL MSG_SETR('Y',YCENT)
+          CALL MSG_PRNT('Select centre/^X,^Y/...')
+          CALL GFX_CURS(XCENT,YCENT,LEFT,RIGHT,CH,STATUS)
+          IF (CH.EQ.CHAR(13).OR.RIGHT) THEN
+            XCENT=I_X
+            YCENT=I_Y
           ENDIF
 
           CALL PGPOINT(1,XCENT,YCENT,2)
@@ -5149,11 +5217,7 @@ c      REAL HWID
           CALL MSG_PRNT('Select end...')
           XEND=XCENT
           YEND=YCENT
-          IF (I_GUI) THEN
-            CALL IMG_GUICURS(XEND,YEND,FLAG,STATUS)
-          ELSE
-            CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
-          ENDIF
+          CALL GFX_CURS(XEND,YEND,LEFT,RIGHT,CH,STATUS)
 
           CALL PGPOINT(1,XEND,YEND,2)
           CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
@@ -5172,38 +5236,14 @@ c      REAL HWID
           CALL MSG_PRNT('Select width...')
           XWID=XCENT
           YWID=YCENT
-          IF (I_GUI) THEN
-            CALL IMG_GUICURS(XWID,YWID,FLAG,STATUS)
-          ELSE
-            CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
-          ENDIF
+          CALL GFX_CURS(XWID,YWID,LEFT,RIGHT,CH,STATUS)
 
           CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
 
-*  calc length
-          LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
-          PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
-          PHLEN=MAX(1.0,PHLEN)
-          PLENGTH=PHLEN*2.0
+*  calc length etc
+          CALL IMG_GETSLICE_SUB(XCENT,YCENT,XEND,YEND,
+     :             XOEND,YOEND,XWID,YWID,ANGLE,LENGTH,WIDTH,STATUS)
 
-*  calc angle
-          ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
-
-*  calc width (pixels)
-          D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
-          ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
-          BETA=ALPHA-ANGLE
-          PHWID=ABS(D*SIN(BETA))
-          PHWID=MAX(0.5,PHWID)
-          PWIDTH=PHWID*2.0
-*  calc width (world coords)
-          ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
-          A=SQRT(ASQ)
-          BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
-          B=SQRT(BSQ)
-          CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
-          ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
-          WIDTH=2.0*A*SIN(ALPHA)
 
 *  keyboard mode
         ELSE
@@ -5259,6 +5299,78 @@ c      REAL HWID
       END
 
 
+*+ IMG_GETSLICE_SUB
+      SUBROUTINE IMG_GETSLICE_SUB(
+     :                     XCENT,YCENT,XEND,YEND,XOEND,XWID,YWID,
+     :                                   ANGLE,LENGTH,WIDTH,STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+      REAL XCENT,YCENT,XEND,YEND,XOEND,YOEND,XWID,YWID
+*    Export :
+      REAL ANGLE,LENGTH,WIDTH
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+      REAL PI,DTOR
+      PARAMETER (PI=3.14159265,DTOR=PI/180.0)
+*    Local variables :
+      REAL PXCENT,PYCENT
+      REAL PXEND,PYEND
+      REAL PXOEND,PYOEND
+      REAL PXWID,PYWID
+      REAL PLENGTH,PHLEN,PWIDTH,PHWID
+      REAL ALPHA,BETA
+      REAL D
+      REAL PXTR,PYTR,PXTL,PYTL,PXBR,PYBR,PXBL,PYBL
+      REAL A,ASQ,B,BSQ,CSQ
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL IMG_WORLDTOPIX(XCENT,YCENT,PXCENT,PYCENT,STATUS)
+        CALL IMG_WORLDTOPIX(XEND,YEND,PXEND,PYEND,STATUS)
+        CALL IMG_WORLDTOPIX(XOEND,YOEND,PXOEND,PYOEND,STATUS)
+        CALL IMG_WORLDTOPIX(XWID,YWID,PXWID,PYWID,STATUS)
+
+*  calc length
+        LENGTH=2.0*SQRT((XEND-XCENT)**2 + (YEND-YCENT)**2)
+        PHLEN=SQRT((PXEND-PXCENT)**2 + (PYEND-PYCENT)**2)
+        PHLEN=MAX(1.0,PHLEN)
+        PLENGTH=PHLEN*2.0
+
+*  calc angle
+        ANGLE=ATAN2((PYEND-PYCENT),(PXEND-PXCENT))
+
+*  calc width (pixels)
+        D=SQRT((PXWID-PXCENT)**2 + (PYWID-PYCENT)**2)
+        ALPHA=ATAN2((PYWID-PYCENT),(PXWID-PXCENT))
+        BETA=ALPHA-ANGLE
+        PHWID=ABS(D*SIN(BETA))
+        PHWID=MAX(0.5,PHWID)
+        PWIDTH=PHWID*2.0
+*  calc width (world coords)
+        ASQ=(XWID-XEND)**2 + (YWID-YEND)**2
+        A=SQRT(ASQ)
+        BSQ=(XEND-XOEND)**2 + (YEND-YOEND)**2
+        B=SQRT(BSQ)
+        CSQ=(XWID-XOEND)**2 + (YWID-YOEND)**2
+        ALPHA=ACOS((ASQ+BSQ-CSQ)/(2.0*A*B))
+        WIDTH=2.0*A*SIN(ALPHA)
+
+      ENDIF
+
+      END
 
 *+ IMG_GETELLIPSE - get ellipse
       SUBROUTINE IMG_GETELLIPSE(PAR1,PAR2,PAR3,PAR4,PAR5,XCENT,YCENT,
@@ -5932,15 +6044,16 @@ c      REAL HWID
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
         ENDDO
 
+        IF (FLAG.EQ.1) THEN
 *  get current cursor position in device coords
-        CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
-        CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
-        IYP=IYPMAX-IYP
+          CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,NB,STATUS)
+          CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,NB,STATUS)
+          IYP=IYPMAX-IYP
 
 *  convert to world coords
-        X=XW1+(REAL(IXP)-XP1)*XSCALE
-        Y=YW1+(REAL(IYP)-YP1)*YSCALE
-
+          X=XW1+(REAL(IXP)-XP1)*XSCALE
+          Y=YW1+(REAL(IYP)-YP1)*YSCALE
+        ENDIF
 
       ENDIF
 
@@ -5977,6 +6090,100 @@ c      REAL HWID
       END IF
 
       END
+
+
+*+ IMG_NBGET0R
+      SUBROUTINE IMG_NBGET0R(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+*  Export :
+      REAL VAL
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_GET_VALUE(ID,0,VAL__NBR,VAL,NB,STATUS)
+
+
+      ENDIF
+
+      END
+
+
+*+ IMG_NBGET0I
+      SUBROUTINE IMG_NBGET0I(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+*  Export :
+      REAL VAL
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_GET_VALUE(ID,0,VAL__NBI,VAL,NB,STATUS)
+
+
+      ENDIF
+
+      END
+
+
+*+ IMG_NBGET0L
+      SUBROUTINE IMG_NBGET0L(NAME,VAL,STATUS)
+
+      IMPLICIT NONE
+
+*  Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*  Import :
+      CHARACTER*(*) NAME
+*  Export :
+      REAL VAL
+*  Status :
+      INTEGER STATUS
+*  Local constants :
+*  Local variables :
+      INTEGER ID,NB
+*-
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL NBS_FIND_ITEM(I_NBID,NAME,ID,STATUS)
+        CALL NBS_GET_VALUE(ID,0,VAL__NBL,VAL,NB,STATUS)
+
+
+      ENDIF
+
+      END
+
 
 
 *+ IMG_
