@@ -1,3 +1,7 @@
+1998-05-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* NDF.xs: Use PREINIT for declaring variables in an XS routine.
+
 1998-02-13  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* NDF.xs: Add ndf_size (somehow this had been left out earlier)
