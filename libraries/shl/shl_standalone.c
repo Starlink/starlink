@@ -126,7 +126,6 @@
 #include <string.h>
 #include "sae_par.h"
 #include "cnf.h"
-#include "f77.h"
 
 /* FIO Prototypes.
  */
