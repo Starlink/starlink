@@ -90,7 +90,7 @@ int main (int argc, char **argv)
 	Usage();
     char *unitlist = 0;
     enum { feature_characters=0, feature_rules,
-	   feature_fonts, feature_specials, };
+	   feature_fonts, feature_specials };
     STD::bitset<8> show_features;
     bool load_fonts = false;
 
@@ -142,7 +142,7 @@ int main (int argc, char **argv)
 	Usage();
 
     if (unitlist == 0)
-	unitlist = "d";
+	unitlist = static_cast<const char*>("d");
     if (show_features.none())
 	show_features.set(feature_characters);
 
