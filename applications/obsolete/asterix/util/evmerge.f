@@ -134,6 +134,8 @@
 *        Now use USI for user interface
 *     20 Dec 1995 V2.0-0 (DJA):
 *        ADI port
+*      4 Jan 1996 V2.0-1 (DJA):
+*        Use USI_NAMES to write file list
 *     {enter_changes_here}
 
 *  Bugs:
@@ -162,9 +164,6 @@
       INTEGER                	MXINP                   ! Max # input datasets
         PARAMETER         	( MXINP = 10 )
 
-      INTEGER                	MXTEXT                  ! maximum line text
-        PARAMETER         	( MXTEXT = MXINP*2 )
-
       INTEGER			MXLST               	! Max # of lists in a dataset
         PARAMETER         	( MXLST = 50 )
 
@@ -175,7 +174,6 @@
       CHARACTER*20  	        LNAME(MXLST)  		! Names of input lists
       CHARACTER*40		LUNIT, UNIT(MXLST)   	! Units of input lists
       CHARACTER*7               MTYPE			! List mapping type
-      CHARACTER*80           	TEXTI(MXTEXT)           ! Input files
       CHARACTER*20		TLNAME			! Time list name
       CHARACTER*20		XLNAME, YLNAME	        ! X, Y list names
 
@@ -190,8 +188,8 @@
       INTEGER               	IPTR(MXLST)          	! I/p list data
       INTEGER			IQPTR			! I/p list quanta
       INTEGER                	IFILE                   ! Loop over datasets
+      INTEGER                	IFILES                  ! USI input list
       INTEGER                	ILIST                   ! Loop over lists
-      INTEGER                	INLINES                 ! # input object
       INTEGER			LID(MXLST,MXINP)
       INTEGER                	NEVENT(MXINP)          	! Length of lists
       INTEGER                	NIN                     ! # input datasets
@@ -633,8 +631,8 @@
 
 *  Set up history - add in names of datasets merged
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI( INLINES, TEXTI, STATUS )
-      CALL HSI_PTXT( OFID, INLINES, TEXTI, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
 *  Clean up
  99   CALL AST_CLOSE

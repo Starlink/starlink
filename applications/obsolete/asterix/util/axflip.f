@@ -124,7 +124,7 @@
         PARAMETER		( VERSION = 'AXFLIP Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80            	HTXT(5)    		! History text
+      CHARACTER*80            	HTXT			! History text
       CHARACTER*10              NSTR              	!
       CHARACTER*5		TYPE			! Mapping type
 
@@ -133,6 +133,7 @@
       INTEGER                   I, J                 	! Loop over dimensions
       INTEGER                   IPTR                    ! I/p data
       INTEGER			IFID			! Input dataset id
+      INTEGER			IFILES			! Input file list
       INTEGER                   NDIGIT            	! Length of number in char
       INTEGER                   NDIM              	! Dimensionality
       INTEGER                   NLINES            	! History lines used
@@ -213,17 +214,17 @@
       CALL ARR_INIT1L( .FALSE., ADI__MXDIM, FLIP, STATUS )
       FLOK = .FALSE.
       IF ( ( NDIM .EQ. 1 ) .OR. ( NSEL .EQ. 1 ) ) THEN
-        HTXT(1) = 'Swapped axis : '
+        HTXT = 'Swapped axis : '
       ELSE
-        HTXT(1) = 'Swapped axes : '
+        HTXT = 'Swapped axes : '
       END IF
-      HLEN = CHR_LEN(HTXT(1))+1
+      HLEN = CHR_LEN(HTXT)+1
       DO I = 1, NSEL
         IF ( ( SELAX(I) .GT. 0 ) .AND. ( SELAX(I) .LE. NDIM ) ) THEN
           FLIP(SELAX(I)) = .TRUE.
           FLOK = .TRUE.
           CALL CHR_ITOC( SELAX(I), NSTR, NDIGIT )
-          HTXT(1) = HTXT(1)(:HLEN)//NSTR(:NDIGIT)//' '
+          HTXT = HTXT(:HLEN)//NSTR(:NDIGIT)//' '
           HLEN = HLEN + NDIGIT + 1
         ELSE
           CALL MSG_SETI( 'N', SELAX(I) )
@@ -333,8 +334,9 @@
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Get input file spec
-      CALL USI_NAMEI( NLINES, HTXT(2), STATUS )
-      CALL HSI_PTXT( OFID, NLINES+1, HTXT, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
+      CALL HSI_PTXT( OFID, 1, HTXT, STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()

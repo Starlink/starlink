@@ -211,17 +211,20 @@
           DO WHILE ( IPOS .LE. LLEN )
 
 *        Find position of next null
-            NPOS = INDEX( LINE(IPOS:), NUL )
+            NPOS = INDEX( LINE(IPOS:LLEN), NUL )
             IF ( NPOS .EQ. 0 ) THEN
               NPOS = LLEN + 1
             ELSE
-              NPOS = NPOS + IPOS
+              NPOS = NPOS + IPOS - 1
             END IF
 
 *        Write the HDS string
             CALL DAT_CELL( TXLOC, 1, JLINE, TXCLOC, STATUS )
             CALL DAT_PUT0C( TXCLOC, LINE(IPOS:NPOS-1), STATUS )
             CALL DAT_ANNUL( TXCLOC, STATUS )
+
+*        Next output line
+            JLINE = JLINE + 1
 
 *        Next bit of line
             IPOS = NPOS + 1

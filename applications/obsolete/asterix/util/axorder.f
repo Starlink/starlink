@@ -99,7 +99,9 @@
 *     17 Jul 1995 V1.8-2 (DJA):
 *        Corrected bug copying 1-D axis widths
 *      1 Dec 1995 V2.0-0 (DJA):
-*        Original version.
+*        ADI port
+*      4 Jan 1996 V2.0-1 (DJA):
+*        Use USI_NAMES for history update
 *     {enter_changes_here}
 
 *  Bugs:
@@ -123,23 +125,21 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'AXORDER Version V2.0-0' )
+        PARAMETER		( VERSION = 'AXORDER Version V2.0-1' )
 
 *  Local Variables:
-      CHARACTER*80              HTXT(5)    		!
-      CHARACTER*10              NSTR              	!
+      CHARACTER*80              HTXT			! History text
 
       INTEGER                   DIMS(ADI__MXDIM)  	! Input dimensions
       INTEGER                   IDPTR,IVPTR,IQPTR 	! Input data pointers
       INTEGER                   ODIMS(ADI__MXDIM) 	! Output dimensions
       INTEGER                   SELAX(ADI__MXDIM) 	! New axis order
-      INTEGER                   HLEN, NDIGIT      	! String lengths
       INTEGER                   I                 	! Loop over dimensions
       INTEGER                   IAPTR      		! Input & output axis data
       INTEGER			IFID		  	! Input dataset id
+      INTEGER			IFILES			! USI input files list
       INTEGER                   IWPTR             	! Input axis widths
       INTEGER                   NDIM              	! Dimensionality
-      INTEGER                   NLINES            	! Number of history text bits
       INTEGER                   ODPTR,OVPTR,OQPTR 	! Output data pointers
       INTEGER			OFID			! Output dataset id
       INTEGER                   OWPTR             	! Output axis widths
@@ -221,7 +221,7 @@
         CALL MSG_PRNT( 'You must specify the positions of all'/
      :                                           /' ^ND axes' )
       ELSE IF ( SWAP_1D ) THEN
-        HTXT(1) = 'Data array and axis values swapped'
+        HTXT = 'Data array and axis values swapped'
         ODIMS(1) = DIMS(1)
 
       ELSE
@@ -248,13 +248,8 @@
         END DO
 
 *    Make history string
-        HTXT(1) = 'New axis order '
-        HLEN = CHR_LEN(HTXT) + 1
-        DO I = 1, NSEL
-          CALL CHR_ITOC( SELAX(I), NSTR, NDIGIT )
-          HTXT(1)  = HTXT(1)(:HLEN)//NSTR(:NDIGIT)//' '
-          HLEN = HLEN + NDIGIT + 1
-        END DO
+        HTXT = 'New axis order '
+        CALL STR_DIMTOC( NSEL, SELAX, HTXT(16:) )
 
       END IF
 
@@ -370,8 +365,9 @@
 *  History
       CALL HSI_COPY( IFID, OFID, STATUS )
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI( NLINES, HTXT(2), STATUS )
-      CALL HSI_PTXT( OFID, NLINES + 1, HTXT, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
+      CALL HSI_PTXT( OFID, 1, HTXT, STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()
