@@ -97,7 +97,7 @@
       IF ( .NOT. THERE ) THEN
          STATUS = SAI__ERROR
          CALL NDF_MSG( 'NDF', INDF )
-         CALL CCD1_ERREP( ' ', '  No FITS extension in ^NDF', STATUS )
+         CALL ERR_REP( ' ', '  No FITS extension in ^NDF', STATUS )
          GO TO 99
       END IF
 

@@ -121,7 +121,7 @@
       ELSE
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'ID', ID )
-         CALL CCD1_ERREP( 'CCD1_NMID_BADID', 
+         CALL ERR_REP( 'CCD1_NMID_BADID', 
      :                    '  ID string "^ID" unrecognised', STATUS )
 
       END IF

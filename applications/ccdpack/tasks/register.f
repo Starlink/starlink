@@ -1010,7 +1010,7 @@
 *  Exit with an error if we are trying to write a WCS component other
 *  than into an NDF.
                      STATUS = SAI__ERROR
-                     CALL CCD1_ERREP( 'REGISTER_BADPAR', 
+                     CALL ERR_REP( 'REGISTER_BADPAR', 
      : 'Output of a WCS structure must currently be to an NDF file',
      :                                STATUS )
                      GO TO 99
@@ -1095,7 +1095,7 @@
 *  There is an inconsistency in the transformations.
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'PARAM', NAME )
-               CALL CCD1_ERREP( 'REGISTER_MAPINC',
+               CALL ERR_REP( 'REGISTER_MAPINC',
      : '  The X forward and inverse transformations are inconsistent'//
      : '(parameter ^PARAM)', STATUS )
             END IF
@@ -1125,7 +1125,7 @@
 *  There is an inconsistency in the transformations.
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'PARAM', NAME )
-               CALL CCD1_ERREP( 'REGISTER_MAPINC',
+               CALL ERR_REP( 'REGISTER_MAPINC',
      : '  The Y forward and inverse transformations are inconsistent'//
      : '(parameter ^PARAM)', STATUS )
             END IF

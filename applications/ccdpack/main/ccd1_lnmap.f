@@ -112,7 +112,7 @@
 *  Check that a valid mapping has been obtained.
       IF ( MAP .EQ. AST__NULL ) THEN
          STATUS = SAI__ERROR
-         CALL CCD1_ERREP( 'CCD1_LNMAP_NOMAP', 
+         CALL ERR_REP( 'CCD1_LNMAP_NOMAP', 
      :   'Failed to obtain a mapping from linear coefficients', STATUS )
       END IF 
 

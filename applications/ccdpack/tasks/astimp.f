@@ -343,7 +343,7 @@
 
 *  Abort if the maximum number of framesets in the AST file is exceeded.
       STATUS = SAI__ERROR
-      CALL CCD1_ERREP( 'ASTIMP_FSLIMIT', 
+      CALL ERR_REP( 'ASTIMP_FSLIMIT', 
      :     'ASTIMP: Too many framesets in AST file', STATUS )
       GO TO 99
 

@@ -376,7 +376,7 @@
      :   '  Writing coordinate system information to ^ASTFILE', STATUS )
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL CCD1_ERREP( 'ASTEXP_NOFILE', 
+         CALL ERR_REP( 'ASTEXP_NOFILE', 
      :   'ASTEXP: No file opened for coordinate system output', STATUS )
       END IF
 
@@ -520,7 +520,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'BASEFR', BASEFR )
             CALL NDF_MSG( 'NDF', INDF )
-            CALL CCD1_ERREP( 'ASTEXP_NOBASDMN',
+            CALL ERR_REP( 'ASTEXP_NOBASDMN',
      :'ASTEXP: No frame "^BASEFR" found in NDF ^NDF.', STATUS )
             GO TO 99
          END IF
