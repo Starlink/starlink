@@ -22,7 +22,7 @@ f+
 \newcommand{\stardocnumber}    {210.2}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {8th April 1998}
+\newcommand{\stardocdate}      {29th May 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -11965,15 +11965,15 @@ c+
 \begin{quote}
 \small
 \begin{verbatim}
-/* A: */
+/* 1: */
 astSet( fitschan, "Card=1, Encoding=FITS-WCS" );
 if ( !astWrite( fitschan, wcsinfo ) ) {
 
-/* B: */
+/* 2: */
    astSetC( fitschan, "Encoding", encode );
    if ( !astWrite( fitschan, wcsinfo ) ) {
 
-/* C: */
+/* 3: */
       astSet( fitschan, "Encoding=NATIVE" );
       (void) astWrite( fitschan, wcsinfo );
    }
@@ -11985,15 +11985,15 @@ c-
 f+
 \small
 \begin{verbatim}
-*  A:
+*  1:
       CALL AST_SET( FITSCHAN, 'Card=1, Encoding=FITS-WCS', STATUS )
       IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
-*  B:
+*  2:
          CALL AST_SETC( FITSCHAN, "Encoding", ENCODE, STATUS )
          IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
-*  C:
+*  3:
             CALL AST_SET( FITSCHAN, 'Encoding=NATIVE', STATUS )
             NOBJ = AST_WRITE( FITSCHAN, WCSINFO, STATUS )
          END IF

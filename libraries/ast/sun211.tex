@@ -17,12 +17,12 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.2}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {24th March 1998}
+\newcommand{\stardocdate}      {29th May 1998}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 1997 Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 1998 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V1.1}
@@ -1165,7 +1165,7 @@ supplied to initialise it (\secref{ss:objectcreation}). These have
 been given simple names to make them easy to refer to.
 
 The line in the middle which says ``IsA~\htmlref{Mapping}{Mapping}'' is a dividing line
-between the two values. It indicates that the ``\htmlref{Nin}{Nin}'' value is an
+between the two values. It indicates that the ``\htmlref{Nin}{Nin}'' value is a
 property shared by all Mappings, so the ZoomMap has inherited this
 from its {\em{parent class}} (Mapping). The ``\htmlref{Zoom}{Zoom}'' value, however,
 is specific to a ZoomMap and isn't shared by other kinds of Mappings.
@@ -7739,15 +7739,15 @@ alternative encodings, using an approach such as the following:
 \begin{quote}
 \small
 \begin{verbatim}
-/* A: */
+/* 1: */
 astSet( fitschan, "Card=1, Encoding=FITS-WCS" );
 if ( !astWrite( fitschan, wcsinfo ) ) {
 
-/* B: */
+/* 2: */
    astSetC( fitschan, "Encoding", encode );
    if ( !astWrite( fitschan, wcsinfo ) ) {
 
-/* C: */
+/* 3: */
       astSet( fitschan, "Encoding=NATIVE" );
       (void) astWrite( fitschan, wcsinfo );
    }
@@ -12379,6 +12379,149 @@ Object            - Base class for all AST Objects
          A null \htmlref{Object}{Object} pointer (AST\_\_NULL) will be returned if this
          function is invoked with the AST error status set, or if it
          should fail for any reason.
+      }
+   }
+}
+\sstroutine{
+   astMapBox\sstlabel{astMapBox}
+}{
+   Find a bounding box for a Mapping
+}{
+   \sstdescription{
+      This function allows you to find the {\tt{"}}bounding box{\tt{"}} which just
+      encloses another box after it has been transformed by a \htmlref{Mapping}{Mapping}
+      (using either its forward or inverse transformation). A typical
+      use might be to calculate the size of an image after being
+      transformed by a Mapping.
+
+      The function works on one dimension at a time. When supplied
+      with the lower and upper bounds of a rectangular region (box) of
+      input coordinate space, it finds the lowest and highest values
+      taken by a nominated output coordinate within that
+      region. Optionally, it also returns the input coordinates where
+      these bounding values are attained. It should be used repeatedly
+      to obtain the extent of the bounding box in more than one
+      dimension.
+   }
+   \sstsynopsis{
+      void astMapBox( AstMapping $*$this,
+                      const double lbnd\_in[], const double ubnd\_in[],
+                      int forward, int coord\_out,
+                      double $*$lbnd\_out, double $*$ubnd\_out,
+                      double xl[], double xu[] );
+   }
+   \sstparameters{
+      \sstsubsection{
+         this
+      }{
+         Pointer to the Mapping.
+      }
+      \sstsubsection{
+         lbnd\_in
+      }{
+         Pointer to an array of double, with one element for each
+         Mapping input coordinate. This should contain the lower bound
+         of the input box in each input dimension.
+      }
+      \sstsubsection{
+         ubnd\_in
+      }{
+         Pointer to an array of double, with one element for each
+         Mapping input coordinate. This should contain the upper bound
+         of the input box in each input dimension.
+
+         Note that it is permissible for the upper bound to be less
+         than the corresponding lower bound, as the values will simply
+         be swapped before use.
+      }
+      \sstsubsection{
+         forward
+      }{
+         If this value is non-zero, then the Mapping's forward
+         transformation will be used to transform the input
+         box. Otherwise, its inverse transformation will be used.
+
+         (If the inverse transformation is selected, then references
+         to {\tt{"}}input{\tt{"}} and {\tt{"}}output{\tt{"}} coordinates in this description
+         should be transposed. For example, the size of the {\tt{"}}lbnd\_in{\tt{"}}
+         and {\tt{"}}ubnd\_in{\tt{"}} arrays should match the number of output
+         coordinates, as given by the Mapping's \htmlref{Nout}{Nout}
+         attribute. Similarly, the {\tt{"}}coord\_out{\tt{"}} parameter, below,
+         should nominate one of the Mapping's input coordinates.)
+      }
+      \sstsubsection{
+         coord\_out
+      }{
+         The index of the output coordinate for which the lower and
+         upper bounds are required. This value should be at least one,
+         and no larger than the number of Mapping output coordinates.
+      }
+      \sstsubsection{
+         lbnd\_out
+      }{
+         Pointer to a double in which to return the lowest value taken
+         by the nominated output coordinate within the specified
+         region of input coordinate space.
+      }
+      \sstsubsection{
+         ubnd\_out
+      }{
+         Pointer to a double in which to return the highest value
+         taken by the nominated output coordinate within the specified
+         region of input coordinate space.
+      }
+      \sstsubsection{
+         xl
+      }{
+         An optional pointer to an array of double, with one element
+         for each Mapping input coordinate. If given, this array will
+         be filled with the coordinates of an input point (although
+         not necessarily a unique one) for which the nominated output
+         coordinate attains the lower bound value returned in
+         {\tt{"}}$*$lbnd\_out{\tt{"}}.
+
+         If these coordinates are not required, a NULL pointer may be
+         supplied.
+      }
+      \sstsubsection{
+         xu
+      }{
+         An optional pointer to an array of double, with one element
+         for each Mapping input coordinate. If given, this array will
+         be filled with the coordinates of an input point (although
+         not necessarily a unique one) for which the nominated output
+         coordinate attains the upper bound value returned in
+         {\tt{"}}$*$ubnd\_out{\tt{"}}.
+
+         If these coordinates are not required, a NULL pointer may be
+         supplied.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Any input points which are transformed by the Mapping to give
+         output coordinates containing the value AST\_\_BAD are regarded as
+         invalid and are ignored. They will make no contribution to
+         determining the output bounds, even although the nominated
+         output coordinate might still have a valid value at such points.
+
+         \sstitem
+         An error will occur if the required output bounds cannot be
+         found. Typically, this might happen if all the input points
+         which the function considers turn out to be invalid (see
+         above). The number of points considered before generating such
+         an error is quite large, so this is unlikely to occur by
+         accident unless valid points are restricted to a very small
+         subset of the input coordinate space.
+
+         \sstitem
+         The values returned via {\tt{"}}lbnd\_out{\tt{"}}, {\tt{"}}ubnd\_out{\tt{"}}, {\tt{"}}xl{\tt{"}} and {\tt{"}}xu{\tt{"}}
+         will be set to the value AST\_\_BAD if this function should fail
+         for any reason. Their initial values on entry will not be
+         altered if the function is invoked with the AST error status
+         set.
       }
    }
 }
@@ -19563,6 +19706,9 @@ Object            - Base class for all AST Objects
          \htmlref{astInvert}{astInvert}: Invert a Mapping
 
          \sstitem
+         \htmlref{astMapBox}{astMapBox}: Find a bounding box for a Mapping
+
+         \sstitem
          \htmlref{astSimplify}{astSimplify}: Simplify a Mapping
 
          \sstitem
@@ -20602,6 +20748,13 @@ simplifying compound Mappings, as used by astSimplify.
 \item The textual representation used for some Objects ({\em{i.e.}}\
 when they are written to a \htmlref{Channel}{Channel}) has changed slightly, but remains
 compatible with earlier versions of AST.
+
+\item A new class of \htmlref{Object}{Object}, the \htmlref{IntraMap}{IntraMap}, has been introduced
+(\secref{ss:intramaps}). This is a specialised form of Mapping which
+encapsulates a privately-defined coordinate transformation function
+({\em{e.g.}}\ written in C) so that it may be used like any other AST
+Mapping. This allows you to create Mappings that perform any
+conceivable coordinate transformation.
 
 \end{enumerate}
 
