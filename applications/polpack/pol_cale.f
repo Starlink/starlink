@@ -121,7 +121,10 @@
 *        to DOUBLE PRECISION.
 *     11-MAY-1998 (DSB):
 *        Introduced lagging into the iterative estimation of the E factors
-*        to suppress instability in the process.
+*        to suppress instability in the process. Also, corrected the
+*        order of the arguments to CCD1_CMPRR (previously the data arrays were 
+*        passed the other way round, resulting in the calculated E factors
+*        being the reciprocal of the correct values).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -316,9 +319,9 @@
 * information is not used here.
 
          DO IPAIR = 1, NPAIR
-            CALL CCD1_CMPRR( BAD, .FALSE., NEL, TI1( 1, IPAIR ),
-     :                       TI1( 1, IPAIR ), %VAL( IPMED ),
-     :                       %VAL( IPMED ),
+            CALL CCD1_CMPRR( BAD, .FALSE., NEL, %VAL( IPMED ), 
+     :                       %VAL( IPMED ), TI1( 1, IPAIR ),
+     :                       TI1( 1, IPAIR ),
      :                       GETS, GETZ, TOLS, TOLZ, MAXIT, SKYSUP,
      :                       SCALE, DSCALE, ZERO, DZERO, ORIGIN, NPTS,
      :                       NITER, DS, DZ, %VAL( IPWRK1 ),
