@@ -23,7 +23,14 @@ AC_PROG_FC
 AC_HEADER_STDC
 AC_PATH_XTRA
 AC_PROG_LIBTOOL
+AC_C_BIGENDIAN
 
+AC_CHECK_HEADERS([X11/decwmhints.h])
+AC_CHECK_HEADERS([unixlib.h])
+
+AC_CHECK_LIB([m],[sin])
+AC_CHECK_FUNCS([nint rint])
+AC_CHECK_DECLS([rint],,,[#include <math.h>])
 
 AC_FC_LIBRARY_LDFLAGS
 
