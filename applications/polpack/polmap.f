@@ -177,6 +177,7 @@
      :        LBND( 3 ),         ! Lower bounds of input NDF
      :        NCONT,             ! No. of contours
      :        NDIM,              ! No. of axes in cube
+     :        SDIM( 2 ),         ! Indices of significant axes
      :        UBND( 3 )          ! Upper bounds of input NDF
       LOGICAL 
      :        HAREA,             ! Is the help area to be displayed?
@@ -231,8 +232,8 @@
          IMAGE = ' '
          IMLEN = 0
       ELSE
-         CALL KPG1_ASGET( INDF2, .TRUE., 2, LBND, UBND, IWCS, 
-     :                    STATUS )
+         CALL KPG1_ASGET( INDF2, 2, .TRUE., .TRUE., .TRUE., 2, SDIM, 
+     :                    LBND, UBND, IWCS, STATUS )
          CALL AST_ANNUL( IWCS, STATUS )
 
          CALL NDF_MSG( 'NDF', INDF2 )

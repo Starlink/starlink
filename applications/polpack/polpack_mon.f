@@ -38,6 +38,8 @@
 *  History:
 *     28-JUN-1997 (DSB):
 *        Original version, modified from equivalent IRCAMPACK routine.
+*     10-NOV-1998 (DSB):
+*        SEGMENT removed (POLKA now uses KAPPA:SEGMENT).
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,9 +107,6 @@
 
       ELSE IF ( NAME .EQ. 'POLVEC' ) THEN
          CALL POLVEC( STATUS )
-
-      ELSE IF ( NAME .EQ. 'SEGMENT' ) THEN
-         CALL SEGMENT( STATUS )
 
 
       ELSE
