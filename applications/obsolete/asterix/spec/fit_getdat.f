@@ -682,9 +682,8 @@
 	      END IF
 
 *          Count number of groups
-              CALL FIT_GETDAT_GCNT( OBDAT(NDS).NDAT,
-     :                              %VAL(OBDAT(NDS).GPTR),
-     :                              OBDAT(NDS).NGDAT, STATUS )
+              CALL UTIL_CNTGRP( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).GPTR),
+     :                          OBDAT(NDS).NGDAT, STATUS )
               CALL MSG_SETI( 'NG', OBDAT(NDS).NGDAT )
 	      CALL MSG_PRNT('    Loaded grouping array with ^NG groups')
 
@@ -794,7 +793,7 @@
 
 *        Grouping specified?
             IF ( OBDAT(NDS).GFLAG ) THEN
-              CALL FIT_GROUP( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
+              CALL UTIL_GRPWR( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
      :                 (OBDAT(NDS).WPTR.NE.0), %VAL(OBDAT(NDS).WPTR),
      :                 OBDAT(NDS).QFLAG, %VAL(OBDAT(NDS).QPTR),
      :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
@@ -961,31 +960,5 @@
 
 *  End of switch on quality
       END IF
-
-      END
-
-
-
-*+  FIT_GETDAT_GCNT - Find number of groups defined in group array
-      SUBROUTINE FIT_GETDAT_GCNT( NDAT, G, MAXG, STATUS )
-*    Description :
-*     If WEIGHTS=false then routine only counts the number of good values.
-*    History :
-*      4 Mar 1996 (DJA):
-*        Original version
-*    Type Definitions :
-	IMPLICIT NONE
-*    Import :
-      INTEGER			NDAT, G(*), STATUS
-*    Export :
-      INTEGER			MAXG
-*    Local variables :
-	INTEGER I
-*-
-
-      MAXG = 0
-      DO I = 1, NDAT
-        IF ( G(I) .GT. MAXG ) MAXG = G(I)
-      END DO
 
       END

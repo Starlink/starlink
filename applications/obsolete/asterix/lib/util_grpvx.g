@@ -148,7 +148,7 @@
 
 *    Loop over input data
 *    Variance and quality
-        IF ( WOK ) THEN
+        IF ( VOK ) THEN
           DO I = 1, N
             IF ( QUAL(I) ) THEN
               J = GIDX(I)

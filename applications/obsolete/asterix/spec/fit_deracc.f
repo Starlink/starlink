@@ -139,18 +139,18 @@
 *        Compute and group upper perturbation
 	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,
      :                                                 PREDTMP, STATUS)
-            CALL FIT_GROUP( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
-     :                      %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
-     :                      NDAT, PREDUP,
-     :                      0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+            CALL UTIL_GRPWR( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
+     :                       %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
+     :                       NDAT, PREDUP,
+     :                       0.0, %VAL(OBDAT(N).GQPTR), STATUS )
 
 *        Compute and group lower perturbation
 	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,LOPAR,N,
      :                                                 PREDTMP, STATUS)
-            CALL FIT_GROUP( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
-     :                      %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
-     :                      NDAT, PREDDOWN,
-     :                      0.0, %VAL(OBDAT(N).GQPTR), STATUS )
+            CALL UTIL_GRPWR( OBDAT(N).NDAT, PREDTMP, .FALSE., 0.0, QOK,
+     :                       %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
+     :                       NDAT, PREDDOWN,
+     :                       0.0, %VAL(OBDAT(N).GQPTR), STATUS )
 
           ELSE
 	    CALL PREDICTOR(FSTAT,NDS,OBDAT,INSTR,PREDDAT,MODEL,UPPAR,N,

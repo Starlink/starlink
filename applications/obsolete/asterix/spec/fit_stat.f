@@ -126,7 +126,7 @@
 
 *    Group the predicted data?
         IF ( OBDAT(N).GFLAG ) THEN
-          CALL FIT_GROUP( OBDAT(N).NDAT, %VAL(PREDDAT(N).DPTR),
+          CALL UTIL_GRPWR( OBDAT(N).NDAT, %VAL(PREDDAT(N).DPTR),
      :                    .FALSE., 0.0, OBDAT(N).QFLAG,
      :                    %VAL(OBDAT(N).QPTR), %VAL(OBDAT(N).GPTR),
      :                    OBDAT(N).NGDAT, %VAL(PREDDAT(N).GDPTR),
