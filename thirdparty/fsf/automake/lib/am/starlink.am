@@ -20,6 +20,12 @@
 ## This file contains material ADDITIONAL to FSF automake, for
 ## supporting the Starlink build system.
 
+.PHONY: install-manifest
+
+if %?SUBDIRS%
+RECURSIVE_TARGETS += install-manifest-recursive
+endif %?SUBDIRS%
+
 if %?INSTALLMANIFEST%
 # Create an install manifest, and install it in the required manifest location
 install-manifest.xml: all-am
@@ -37,12 +43,15 @@ install-manifest.xml: all-am
 # We should respect $(DESTDIR), but needn't worry about $(srcdir),
 # since we know that the file was created in the current directory.
 # Having done that, delete the install-manifest.xml file
-install-manifest: install-manifest.xml
+?SUBDIRS?install-manifest: install-manifest.xml install-manifest-recursive
+?!SUBDIRS?install-manifest: install-manifest.xml
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
-endif %?INSTALLMANIFEST%
+else !%?INSTALLMANIFEST%
+?SUBDIRS?install-manifest: install-manifest-recursive
+endif !%?INSTALLMANIFEST%
 
 if %?LATEXDOCS%
 SUFFIXES+=.tex .dvi .ps .htx_tar
