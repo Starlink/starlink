@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = ems_link ems_link_adam
+dist_bin_SCRIPTS = ems_link ems_link_adam
 
 lib_LTLIBRARIES = libems.la libemsf.la
 
