@@ -212,10 +212,10 @@
 
 *  Find the half-ranges of user co-ordinates encompassed by the
 *  ellipse.
-               XHW = SQRT( MAX( 0.0, ( PAR( 3 )*COST )**2 + 
-     :                               ( PAR( 4 )*SINT )**2 ) )
-               YHW = SQRT( MAX( 0.0, ( PAR( 4 )*COST )**2 + 
-     :                               ( PAR( 3 )*SINT )**2 ) )
+               XHW = SQRT( MAX( 0.0D0, ( PAR( 3 )*COST )**2 + 
+     :                                 ( PAR( 4 )*SINT )**2 ) )
+               YHW = SQRT( MAX( 0.0D0, ( PAR( 4 )*COST )**2 + 
+     :                                 ( PAR( 3 )*SINT )**2 ) )
 
 *  Abort if the ellipse is actually a line.
                IF( XHW .LE. 0.0 .OR. YHW .LE. 0.0 ) THEN

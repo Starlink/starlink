@@ -102,12 +102,12 @@
       SAVE P1
 *.
 
-*  Check inherited global status.
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
 *  Initialize the returned value to indicate the point is within the 
 *  region.
       ARD1_INTR = .TRUE.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  BOX: Parameters are the supplied user co-ordinates of the box 
 *  centre, followed by the lengths of the box sides in user co-ordinates. 
