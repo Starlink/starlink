@@ -1383,10 +1383,11 @@ bool process_special (DviFile *dvif, string specialString,
 						   DviFile::unit_pixels,
 						   dvif)
 			     + 0.5); // round to nearest pixel
-		    cerr << "dvi2bitmap: strut "
-			 << *s << DviFile::unitString(special_unit)
-			 << " = " << strut_lrtb[i] << "px"
-			 << endl;
+                    if (verbosity > normal)
+                        cerr << "dvi2bitmap: strut "
+                             << *s << DviFile::unitString(special_unit)
+                             << " = " << strut_lrtb[i] << "px"
+                             << endl;
 		    if (strut_lrtb[i] < 0) {
 			if (verbosity > silent)
 			    cerr << "Strut must have positive dimensions"
