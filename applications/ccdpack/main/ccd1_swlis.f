@@ -465,7 +465,7 @@
          CALL CCD1_MSG( ' ', ' ', STATUS )
          IF ( USESET ) THEN
             CALL CCD1_MSG( ' ',
-     :'  Position list names extracted from NDF extensions and '//
+     :'  Position list names extracted from NDF extensions and'//
      :' grouped by Set.', STATUS )
          ELSE
             CALL CCD1_MSG( ' ',
