@@ -133,15 +133,15 @@ void strx_free( char *ptr, ADIstatus status )
       if ( ! lcurp )                    /* Is this the first block? */
 	ss_first = curp->link;          /* Replace list head */
       else
-        lcurp->link = curp->link;       /* Unhook block from list */
+	lcurp->link = curp->link;       /* Unhook block from list */
 
       if ( ! curp->link )               /* Last block? */
-        {
-        if ( lcurp )
-          ss_insert = &lcurp->link;
-        else
-          ss_insert = &ss_first;
-        }
+	{
+	if ( lcurp )
+	  ss_insert = &lcurp->link;
+	else
+	  ss_insert = &ss_first;
+	}
 
 /* Deallocate memory */
       ADImemFree( (char *) dblock, sizeof(StrStore), status );
@@ -151,13 +151,25 @@ void strx_free( char *ptr, ADIstatus status )
     adic_setecs( ADI__FATAL, "String memory segment not found", status );
   }
 
+/*
+ *  Erase string data
+ */
+
+ADIobj strx_dstrc( int narg, ADIobj args[], ADIstatus status )
+  {
+  ADIstring         *sptr = _str_data(args[0]);
+
+  strx_free( sptr->data, status );
+
+  return ADI__nullid;
+  }
 
 void strx_init( ADIstatus status )
   {
   _chk_stat;
 
 /* Install the string destructor */
-  adix_def_destruc( UT_ALLOC_c, strx_dstrc, status );
+  adic_defdes( UT_ALLOC_c, strx_dstrc, status );
   }
 
 
@@ -222,31 +234,6 @@ int strx_cmp( ADIobj str1, ADIobj str2 )
 	      _str_dat(str2),
 	      _str_len(str2) );
   }
-
-
-
-void strx_expc( int inlen, char *in, int outlen, char *out )
-  {
-  int nc = _MIN(inlen,outlen);
-
-  memcpy(out,in,nc);			/* Copy characters */
-
-  if ( inlen < outlen )			/* Null terminate string if space */
-    out[inlen] = 0;
-  }
-
-
-void strx_expf( int inlen, char *in, int outlen, char *out )
-  {
-  int nc = _MIN(inlen,outlen);
-
-  memcpy(out,in,nc);			/* Copy characters */
-
-/* Pad with spaces */
-  if ( inlen < outlen )
-    memset( out + inlen, ' ', outlen - nc );
-  }
-
 
 int strx_cmpi2c( char *str1, int len1, char *str2, int len2 )
   {
@@ -325,21 +312,11 @@ void strx_exit( ADIstatus status )
     }
   }
 
-/*  Load data into newly created string instance
- *
- */
-
-void strx_dstrc( ADIobj str, ADIstatus status )
-  {
-  ADIstring         *sptr = _str_data(str);
-
-  strx_free( sptr->data, status );
-  }
 
 
 void ADIstrngGetLen( ADIobj id, ADIinteger *rval, ADIstatus status )
   {
-  _chk_stat;
+  _chk_init_err; _chk_stat;
 
   if ( _valid_q(id) && _str_q(id) )
     *rval = _str_len(id);
@@ -347,3 +324,18 @@ void ADIstrngGetLen( ADIobj id, ADIinteger *rval, ADIstatus status )
     adic_setecs( ADI__INVARG, "Object is not a character string", status );
   }
 
+
+void ADIstrngExport( ADIobj id, int clang, char *buf, int blen,
+		     ADIstatus status )
+  {
+  if ( _ok(status) ) {
+    ADIstring	*nstr = _str_data(id);
+    _CH_MOVE(buf,nstr->data,_MIN(nstr->len,blen));
+    if ( nstr->len < blen ) {
+      if ( clang )
+	buf[nstr->len] = 0;
+      else
+	memset( buf + nstr->len, ' ', blen - nstr->len );
+      }
+    }
+  }

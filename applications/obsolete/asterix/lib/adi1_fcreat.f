@@ -147,7 +147,7 @@
 
 *      Get object class
         IF ( .NOT. DERVD ) THEN
-          CALL ADI_CLASS( ID, HTYPE, STATUS )
+          CALL ADI_TYPE( ID, HTYPE, STATUS )
 
         END IF
 

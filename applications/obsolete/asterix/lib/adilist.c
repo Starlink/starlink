@@ -42,16 +42,17 @@
 
 ADIobj       UT_ALLOC_list;             /* _List object allocator */
 
-void lstx_print( ADIobj stream, ADIobj id, ADIstatus status )
+ADIobj lstx_print( int narg, ADIobj args[], ADIstatus status )
   {
-  ADIobj        curp = id;
+  ADIobj        curp = args[1];
+  ADIobj	stream = args[0];
 
-  _chk_stat;
+  _chk_stat_ret(ADI__nullid);
 
-  if ( _valid_q(id) ) {
-    ADIobj	cdr = _CDR(id);
+  if ( _valid_q(curp) ) {
+    ADIobj	cdr = _CDR(curp);
 
-    ADIstrmPutCh( stream, '{', status );
+    ADIstrmPrintf( stream, "{", status );
     if ( _null_q(cdr) ? 1 : _list_q(cdr) ) { /* This is a standard list? */
       do {
 	ADIobj	car = _CAR(curp);
@@ -67,8 +68,10 @@ void lstx_print( ADIobj stream, ADIobj id, ADIstatus status )
     else
       ADIstrmPrintf( stream, "%O.%O", status, _CAR(curp), _CDR(curp) );
 
-    ADIstrmPutCh( stream, '}', status );
+    ADIstrmPrintf( stream, "}", status );
     }
+
+  return ADI__nullid;
   }
 
 
@@ -78,14 +81,14 @@ void lstx_init( ADIstatus status )
 
   adic_defcls( "_List", "", "first,rest", &UT_ALLOC_list, status );
 
-  adix_def_prnt( UT_ALLOC_list, lstx_print, status );
+  adic_defprt( UT_ALLOC_list, (ADIcMethodCB) lstx_print, status );
   }
 
 
-ADIobj *lstx_nth( ADIobj list, int n, ADIstatus status )
+ADIobj *lstx_nth( ADIobj list, ADIinteger n, ADIstatus status )
   {
   ADIobj	curp = list;
-  int		i = n;
+  ADIinteger	i = n;
 
   _chk_stat_ret(NULL);
 

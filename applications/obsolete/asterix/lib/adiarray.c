@@ -18,7 +18,7 @@
 /*
  * Declare the static class definition
  */
-_DEF_STATIC_CDEF("_Array",ary,16,ADIaryDel,NULL);
+_DEF_STATIC_CDEF("_Array",ary,16,ADIarray);
 
 /*
  * Calculate number of elements in a dimensions array
@@ -133,10 +133,10 @@ ADIobj ADIaryCell( ADIarray *ary, int index[], ADIstatus status )
   }
 
 
-void ADIaryDel( ADIobj id, ADIstatus status )
+ADIobj ADIaryDel( int narg, ADIobj args[], ADIstatus status )
   {
   int           naval;
-  KT_CTYPE_ary  *adata = _ary_data(id);
+  ADIarray  	*adata = _ary_data(args[0]);
 
 /* How many objects to free */
   naval = ADIaryCountNelm( adata->ndim, adata->dims );
@@ -147,6 +147,8 @@ void ADIaryDel( ADIobj id, ADIstatus status )
   else
     adix_erase( &adata->data, naval,  /* Remove array elements */
 		  status );
+
+  return ADI__nullid;
   }
 
 
@@ -185,6 +187,8 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
 		  int dims[], ADIstatus status )
   {
   ADIobj      	*lid;
+
+  _chk_init_err; _chk_init;
 
 /* Find data address */
   adix_locdat( &id, name, nlen, DA__ARRAY, &lid, NULL, NULL, status );
@@ -237,4 +241,10 @@ void ADIaryAlter( ADIobj id, char *name, int nlen, int ndim,
     else
       adic_setecs( ADI__INVARG, "Object is not an array", status );
     }
+  }
+
+
+void ADIaryInit( ADIstatus status )
+  {
+  ADIkrnlDefDestrucKint( &KT_DEFN_ary, ADIaryDel, status );
   }

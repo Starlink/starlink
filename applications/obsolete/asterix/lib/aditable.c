@@ -17,16 +17,16 @@
 ADIobj UT_ALLOC_tbl = ADI__nullid;
 
 
-void tblx_prnt( ADIobj stream, ADIobj tbl, ADIstatus status )
+void tblx_prnt( int narg, ADIobj args[], ADIstatus status )
   {
-  ADIobj        *heads = _tbl_hash(tbl);
+  ADIobj        *heads = _tbl_hash(args[1]);
   ADIinteger    i;
 
   _chk_stat;
 
-  for( i=_tbl_htsize(tbl); i>0; i--, heads++ )
+  for( i=_tbl_htsize(args[1]); i>0; i--, heads++ )
     if ( ! _null_q(*heads) )
-      adix_print( stream, *heads, 1, ADI__true, status );
+      adix_print( args[0], *heads, 1, ADI__true, status );
   }
 
 
@@ -34,18 +34,18 @@ void tblx_init( ADIstatus status )
   {
   _chk_stat;                            /* Check status on entry */
 
-  adic_defcls( "_HashTable", "", "htsize,flags,head",
-	       &UT_ALLOC_tbl, status );
+  adic_defcls( "HashTable", "", "htsize,head", &UT_ALLOC_tbl, status );
 
-  adix_def_prnt( UT_ALLOC_tbl, tblx_prnt, status );
+  adic_defcac( UT_ALLOC_tbl, 8, status );
+
+  adic_defprt( UT_ALLOC_tbl, (ADIcMethodCB) tblx_prnt, status );
   }
 
 
 
 ADIobj ECItableIterate( ADIobj	table,
 			ADIobj 	(*iterator)(ADIobj,ADIobj,ADIstatus),
-			ADIobj	iarg,
-			ADIstatus	status )
+			ADIobj	iarg, ADIstatus status )
   {
   ADIinteger	i;		/* Loop over hash heads */
   ADIobj        *chead;         /* Head of has list */
@@ -70,39 +70,96 @@ ADIobj ECItableIterate( ADIobj	table,
   }
 
 
-void tblx_scan( ADIobj    *head,        /* Head of a NODE list */
-                char      *str,         /* String to find */
-                int       slen,         /* Length of string */
-                ADIobj    **sptr,       /* Addr of pointer to dataobj */
-		ADIlogical  *found,    /* Was a dataobj found? */
-                ADIstatus   status )
+/*
+ * Scan a (name,value) list for a specified string. This procedure takes
+ * a char * and a string length. If the name string is an ADI string then
+ * the tblx_scani routine should be used as it offers efficiency gains.
+ *
+ *  head	- head of a (name,value) list
+ *  str,slen	- the query name
+ *  *sptr	- address of variable pointing the (name,value) pair if
+ *		  found, otherwise the insertion point
+ */
+ADIlogical tblx_scan( ADIobj *head, char *str, int slen, ADIobj **sptr,
+		      ADIstatus status )
   {
   ADIobj        cstr;                   /* Current dataobj name */
+  ADIlogical	found = ADI__false;	/* Return value */
   int           test = 1;               /* String comparison */
 
-  if ( !_ok(status) )                   /* Check status */
-    return;
+/* Check inherited status */
+  _chk_stat_ret(ADI__false);
 
-  *found = ADI__false;                  /* Default return values */
+/* Default return values */
   *sptr = head;
 
-  while ( ((**sptr)!=ADI__nullid) && 	/* Loop while end of list not reached */
-	  !(*found) &&  		/*   and dataobj not found */
-	  (test>=0) )			/*   and not past dataobj in alphabet */
-    {
-    cstr = _CAAR(**sptr);               /* Current dataobj name */
+/* Loop while end of list not reached and name not found */
+/* and not past name in alphabet */
+  while ( _valid_q(**sptr) && ! found && (test>=0) ) {
 
-    test = strx_cmpc( str, slen,        /* Compare the two names */
-                      cstr );
-    if ( test == 0 )			/* Terminate if match found */
-      *found = ADI__true;
-    else if ( test > 0 )                /* Next list element if dataobj name */
-      *sptr = &_CDR(**sptr);	        /* precedes current one alph'ically */
+/* Current name */
+    cstr = _CAAR(**sptr);
+
+/* Compare the two names */
+    test = strx_cmpc( str, slen, cstr );
+
+/* Terminate if match found */
+    if ( test == 0 )
+      found = ADI__true;
+
+/* Next list element if query name precedes current one alphabetically */
+    else if ( test > 0 )
+      *sptr = &_CDR(**sptr);
     }
+
+  return found;
   }
 
 
-ADIobj tblx_new( int size, int flags, ADIstatus status )
+ADIlogical tblx_scani( ADIobj *head, ADIobj str, ADIobj **sptr,
+		       ADIstatus status )
+  {
+  ADIobj        cstr;                   /* Current dataobj name */
+  ADIlogical	found = ADI__false;	/* Return value */
+  ADIstring	*sdat = _str_data(str);	/* String data block */
+  int           test = 1;               /* String comparison */
+
+/* Check inherited status */
+  _chk_stat_ret(ADI__false);
+
+/* Default return values */
+  *sptr = head;
+
+/* Loop while end of list not reached and name not found */
+/* and not past name in alphabet */
+  while ( _valid_q(**sptr) && ! found && (test>=0) ) {
+
+/* Current name */
+    cstr = _CAAR(**sptr);
+
+/* Compare the two names - fast check for equality */
+    if ( cstr == str )
+      found = ADI__true;
+
+/* Otherwise brute force comparison */
+    else {
+      test = strx_cmpc( sdat->data, sdat->len, cstr );
+
+/* Terminate if match found */
+      if ( test == 0 )
+	found = ADI__true;
+
+/* Next list element if query name precedes current one alphabetically */
+      else if ( test > 0 )
+	*sptr = &_CDR(**sptr);
+      }
+    }
+
+  return found;
+  }
+
+
+ADIobj tblx_new( int size, ADIstatus status )
   {
   ADIobj       table = ADI__nullid;     /* New table */
 
@@ -114,8 +171,6 @@ ADIobj tblx_new( int size, int flags, ADIstatus status )
 
   if ( _ok(status) ) {			/* Check status */
     adic_newv0i( size, &_tbl_htsize(table), status );
-    adic_newv0i( flags, &_tbl_flags(table), status );
-
     adic_new1( "*", size, &_tbl_head(table), status );
     }
 
@@ -126,10 +181,8 @@ ADIobj tblx_new( int size, int flags, ADIstatus status )
 
 /*  tblx_sadd - Add entry to table if not already present
  */
-ADIobj tblx_sadd( ADIobj    *table,
-		  char      *str, int slen,
-                  ADIobj    dataobj,
-                  ADIstatus     status )
+ADIobj tblx_sadd( ADIobj *table, char *str, int slen,
+		  ADIobj dataobj, ADIstatus status )
   {
   ADIobj        *lentry;                /* List insertion point */
   ADIobj	rval;			/* The associated data object */
@@ -139,7 +192,6 @@ ADIobj tblx_sadd( ADIobj    *table,
   int           hval;                   /* String hash value */
   ADIinteger    lhcode = 0;
   ADIobj        nstr;                   /* Newly created ADI string */
-  ADIlogical    there;                  /* String in list? */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
@@ -157,9 +209,7 @@ ADIobj tblx_sadd( ADIobj    *table,
     head = table;
 
 /* Look along list for string */
-  tblx_scan( head, str,	slen, &lentry, &there, status );
-
-  if ( there )
+  if ( tblx_scan( head, str, slen, &lentry, status ) )
     rval = _CAR(*lentry);
   else {
 
@@ -172,14 +222,14 @@ ADIobj tblx_sadd( ADIobj    *table,
 
     *lentry = hnode;                    /* Patch node into list */
 
-    rval = _CAR(hnode);                 /* Return the dotted pair address */
+    rval = _CAR(hnode);                 /* Return the dotted pair object */
     }
 
   return rval;
   }
 
 
-/*  ECItableAdd - Add entry to table, report error if already present
+/*  tblx_add - Add entry to table, report error if already present
  */
 ADIobj tblx_add( ADIobj *table, char *str, int slen,
 		 ADIobj dataobj, ADIstatus status )
@@ -193,7 +243,6 @@ ADIobj tblx_add( ADIobj *table, char *str, int slen,
   int           hval;                   /* String hash value */
   ADIobj        nstr;
   ADIinteger    lhcode;                  /* Table hashing code */
-  ADIlogical      there;                  /* String in list? */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
@@ -213,9 +262,7 @@ ADIobj tblx_add( ADIobj *table, char *str, int slen,
     head = table;
 
 /* Look along list for string */
-  tblx_scan( head, str,	slen, &lentry, &there, status );
-
-  if ( there )
+  if ( tblx_scan( head, str, slen, &lentry, status ) )
     adic_setecs( ADI__SYMDEF, "Symbol /%*s/ is already in the table",
 		 status, slen, str );
   else {
@@ -242,7 +289,6 @@ ADIobj tblx_find( ADIobj *table, char *str, int slen, ADIstatus status )
   int           hval;                   /* String hash value */
   ADIobj        *lentry;                /* List insertion point */
   ADIinteger    lhcode;                  /* Table hashing code */
-  ADIlogical    there;
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
@@ -260,10 +306,41 @@ ADIobj tblx_find( ADIobj *table, char *str, int slen, ADIstatus status )
     head = table;
 
 /* Look along list for string */
-  tblx_scan( head, str, slen, &lentry, &there, status );
-
-  if ( there )
-    return _CAR(*lentry);
+  if ( tblx_scan( head, str, slen, &lentry, status ) )
+    return *lentry;
   else
     return ADI__nullid;
   }
+
+
+ADIobj tblx_findi( ADIobj *table, ADIobj str, ADIstatus status )
+  {
+  int           hcode;
+  ADIobj	*head;			/* Head of list */
+  int           hval;                   /* String hash value */
+  ADIobj        *lentry;                /* List insertion point */
+  ADIinteger    lhcode;                  /* Table hashing code */
+  ADIstring	*sdat = _str_data(str);
+
+  if ( !_ok(status) )                   /* Check status */
+    return ADI__nullid;
+
+  if ( _tbl_q(*table) )	{		/* Table or a-list? */
+    adic_get0i( _tbl_htsize(*table), &lhcode, status );
+    hcode = (int) lhcode;
+
+/* Find string's hash value */
+    strx_hash( sdat->data, sdat->len, hcode, &hval, status );
+
+    head = _tbl_hash(*table) + hval;
+    }
+  else
+    head = table;
+
+/* Look along list for string */
+  if ( tblx_scani( head, str, &lentry, status ) )
+    return *lentry;
+  else
+    return ADI__nullid;
+  }
+

@@ -102,8 +102,6 @@
 
 *  Local Variables:
       CHARACTER*15		CLASS			! Object type
-
-      INTEGER			MID			! Identify of member
 *.
 
 *  Check inherited global status.
@@ -111,11 +109,9 @@
 
 *  Does the member exist?
       IF ( MEMBER .GT. ' ' ) THEN
-        CALL ADI_FIND( ID, MEMBER, MID, STATUS )
-        CALL ADI_CLASS( MID, CLASS, STATUS )
-        CALL ADI_ERASE( MID, STATUS )
+        CALL ADI_CTYPE( ID, MEMBER, CLASS, STATUS )
       ELSE
-        CALL ADI_CLASS( ID, CLASS, STATUS )
+        CALL ADI_TYPE( ID, CLASS, STATUS )
       END IF
 
 *  Switch on member class

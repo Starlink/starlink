@@ -1,8 +1,15 @@
 #include <string.h>                     /* String stuff from RTL */
 #include <ctype.h>
+#include <math.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdarg.h>
-
+#ifdef VAX
+#   include <strmac.h>
+#endif
+#ifdef __MSDOS__
+#include "io.h"
+#endif
 #include "asterix.h"                    /* Asterix definitions */
 
 #include "adi_err.h"
@@ -18,12 +25,6 @@
 #include "adiparse.h"                   /* Prototypes for this sub-package */
 
 #include "adi_err.h"                    /* ADI error codes */
-
-
-/*
- * The allocator object
- */
-_DEF_STATIC_CDEF("_Stream",strm,16,ADIstrmDel,NULL);
 
 
 /*
@@ -117,106 +118,7 @@ ADIobj  K_Switch = ADI__nullid;
 ADIobj  K_Try = ADI__nullid;
 
 ADIobj  K_While = ADI__nullid;
-ADIobj  K_WildCard = ADI__nullid;
-
-void prsx_init( ADIstatus status )
-  {
-  DEFINE_CSTR_TABLE(stringtable)
-    CSTR_TABLE_ENTRY(EXC_ArrayBound,"ArrayBound"),
-    CSTR_TABLE_ENTRY(EXC_BoolExp,"BooleanExpected"),
-    CSTR_TABLE_ENTRY(EXC_ControlC,"ControlC"),
-    CSTR_TABLE_ENTRY(EXC_Error,"Error"),
-    CSTR_TABLE_ENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
-    CSTR_TABLE_ENTRY(EXC_InvalidArg,"InvalidArg"),
-    CSTR_TABLE_ENTRY(EXC_NoSuchField,"NoSuchField"),
-    CSTR_TABLE_ENTRY(EXC_ScopeBreak,"ScopeBreak"),
-    CSTR_TABLE_ENTRY(EXC_SyntaxError, "SyntaxError"),
-
-    CSTR_TABLE_ENTRY(K_AddTo,"AddTo"),
-    CSTR_TABLE_ENTRY(K_Alternatives,"Alternatives"),
-    CSTR_TABLE_ENTRY(K_And,"And"),
-    CSTR_TABLE_ENTRY(K_Apply,"Apply"),
-    CSTR_TABLE_ENTRY(K_Array,"Array"),
-    CSTR_TABLE_ENTRY(K_ArrayRef,"ArrayRef"),
-
-    CSTR_TABLE_ENTRY(K_Blank,"Blank"),
-    CSTR_TABLE_ENTRY(K_BlankSeq,"BlankSeq"),
-    CSTR_TABLE_ENTRY(K_BlankNullSeq,"BlankNullSeq"),
-    CSTR_TABLE_ENTRY(K_Break,"Break"),
-
-    CSTR_TABLE_ENTRY(K_Catch,"Catch"),
-    CSTR_TABLE_ENTRY(K_Concat,"Concat"),
-    CSTR_TABLE_ENTRY(K_Condition,"Condition"),
-
-    CSTR_TABLE_ENTRY(K_DefEnum,"DefEnum"),
-    CSTR_TABLE_ENTRY(K_Divide,"Divide"),
-    CSTR_TABLE_ENTRY(K_DivideBy,"DivideBy"),
-    CSTR_TABLE_ENTRY(K_Dot,"Dot"),
-    CSTR_TABLE_ENTRY(K_DoWhile,"DoWhile"),
-
-    CSTR_TABLE_ENTRY(K_Echo,"Echo"),
-    CSTR_TABLE_ENTRY(K_Equal,"Equal"),
-    CSTR_TABLE_ENTRY(K_Factorial,"Factorial"),
-    CSTR_TABLE_ENTRY(K_Finally,"Finally"),
-    CSTR_TABLE_ENTRY(K_Foreach,"Foreach"),
-
-    CSTR_TABLE_ENTRY(K_Get,"Get"),
-    CSTR_TABLE_ENTRY(K_GE,"GreaterThanOrEqual"),
-    CSTR_TABLE_ENTRY(K_GT,"GreaterThan"),
-
-    CSTR_TABLE_ENTRY(K_HoldAll,"HoldAll"),
-    CSTR_TABLE_ENTRY(K_HoldFirst,"HoldFirst"),
-    CSTR_TABLE_ENTRY(K_HoldRest,"HoldRest"),
-
-    CSTR_TABLE_ENTRY(K_If,"If"),
-
-    CSTR_TABLE_ENTRY(K_List,"List"),
-    CSTR_TABLE_ENTRY(K_Listable,"Listable"),
-    CSTR_TABLE_ENTRY(K_LE,"LessThanOrEqual"),
-    CSTR_TABLE_ENTRY(K_LT,"LessThan"),
-
-    CSTR_TABLE_ENTRY(K_Map,"Map"),
-    CSTR_TABLE_ENTRY(K_Multiply,"Multiply"),
-    CSTR_TABLE_ENTRY(K_MultiplyBy,"MultiplyBy"),
-
-    CSTR_TABLE_ENTRY(K_Negate,"Negate"),
-    CSTR_TABLE_ENTRY(K_Not,"Not"),
-    CSTR_TABLE_ENTRY(K_NotEqual,"NotEqual"),
-
-    CSTR_TABLE_ENTRY(K_Or,"Or"),
-
-    CSTR_TABLE_ENTRY(K_Pattern,"Pattern"),
-    CSTR_TABLE_ENTRY(K_PatternTest,"PatternTest"),
-    CSTR_TABLE_ENTRY(K_Plus,"Plus"),
-    CSTR_TABLE_ENTRY(K_PostDec,"PostDecrement"),
-    CSTR_TABLE_ENTRY(K_PostInc,"PostIncrement"),
-    CSTR_TABLE_ENTRY(K_Power,"Power"),
-    CSTR_TABLE_ENTRY(K_PreDec,"PreDecrement"),
-    CSTR_TABLE_ENTRY(K_PreInc,"PreIncrement"),
-    CSTR_TABLE_ENTRY(K_Put,"Put"),
-
-    CSTR_TABLE_ENTRY(K_Query,"Query"),
-
-    CSTR_TABLE_ENTRY(K_Raise,"Raise"),
-    CSTR_TABLE_ENTRY(K_Range,"Range"),
-    CSTR_TABLE_ENTRY(K_ReRaise,"ReRaise"),
-
-    CSTR_TABLE_ENTRY(K_Set,"Set"),
-    CSTR_TABLE_ENTRY(K_SetDelayed,"SetDelayed"),
-    CSTR_TABLE_ENTRY(K_Subtract,"Subtract"),
-    CSTR_TABLE_ENTRY(K_SubtractFrom,"SubtractFrom"),
-    CSTR_TABLE_ENTRY(K_Switch,"Switch"),
-
-    CSTR_TABLE_ENTRY(K_Try,"Try"),
-
-    CSTR_TABLE_ENTRY(K_While,"While"),
-    CSTR_TABLE_ENTRY(K_WildCard,"WildCard"),
-  END_CSTR_TABLE;
-
-  ADIkrnlAddCommonStrings( stringtable, status );
-
-  }
-
+ADIobj	K_WildCard = ADI__nullid;
 
 #define FILEBUF 256
 
@@ -245,7 +147,7 @@ ADIobj prsx_cvalue( ADIobj stream, ADIstatus status )
   switch( ctok ) {
     case TOK__CONST:
       adix_new_n( ADI__true, ADI__nullid, NULL,	/* Create object of correct type */
-		  0, 0, NULL, NULL, _cdef_data(str->ctok.dt),
+		  0, 0, NULL, NULL, &str->ctok.dt,
 		  0, &rval, status );
 
       adic_put0c( rval, str->ctok.dat, status );
@@ -303,7 +205,7 @@ void prsx_namvalcmp( ADIobj stream, ADIobj id, ADIstatus status )
       cval = prsx_cvalue( stream, status );
 
 /* Write new component to structure */
-      adix_cputiid( id, cnam, cval, status );
+      adix_putiid( id, cnam, cval, status );
       }
 
 /* We've hit the end */
@@ -387,7 +289,7 @@ ADIobj ADIstrmNew( char *mode, ADIstatus status )
   ADIobj	str = ADI__nullid;
 
   if ( _ok(status) ) {
-    str = adix_cls_alloc( &KT_DEFN_strm, status );
+    adic_new0( "Stream", &str, status );
     ADIclearStream( str, status );
     if ( (*mode == 'r') || (*mode == 'R') )
       modemask = ADI_STREAM__IN;
@@ -403,9 +305,11 @@ ADIobj ADIstrmNew( char *mode, ADIstatus status )
 void ADIstrmGetTokenData( ADIobj stream, char **data, int *len,
 			  ADIstatus status )
   {
-  ADIstream	*str = _strm_data(stream);
-  *data = str->ctok.dat;
-  if ( len ) *len = str->ctok.nc;
+  if ( _ok(status) ) {
+    ADIstream	*str = _strm_data(stream);
+    *data = str->ctok.dat;
+    if ( len ) *len = str->ctok.nc;
+    }
   }
 
 
@@ -414,6 +318,8 @@ void ADIstrmGetTokenData( ADIobj stream, char **data, int *len,
  */
 void ADIstrmFlushDev( ADIdevice *dev, ADIstatus status )
   {
+  _chk_stat;
+
 /* Null terminate so that we can use the fputs call rather than */
 /* many fputc's. This is always safe to do because the buffer is */
 /* always allocated one byte bigger than dev->bufsiz */
@@ -441,7 +347,426 @@ void ADIstrmFlush( ADIobj stream, ADIstatus status )
     }
   }
 
-void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
+#ifdef __MSDOS__
+#define finite(_x) (1==1)
+#define isnan(_x)  ((_x)==UT_BAD_d)
+#endif
+
+
+/*
+ *+			E r s V S P r i n t f
+
+ *  Function name:
+      ErsVSPrintf
+
+ *  Function:
+	A safe version of the C RTL vsprintf function.
+
+
+ *  Description:
+	The standard C RTL version of vsprintf is unsafe as nothing
+	limits the length of the output string.  It is easy to overwrite
+	the stack.  By providing a length argument string argument, this
+	routine implements a safe version of vsprintf.
+
+	When not under VxWorks, this module is based upon the Berkeley Unix
+	vprintf.c module.  (based on version 5.47, 22-Mar-1991).  The header
+	for this file and the appropriate copyright appears below.
+
+ *  Language:
+      C
+
+ *  Call:
+	(int) = ErsVSPrintf(length, string, format, arg)
+
+ *  Parameters:   (">" input, "!" modified, "W" workspace, "<" output)
+	(>) length  (int) The length of string.
+	(<) string  (char *) The pointer to the output string
+	(>) format  (char *) A format specification
+	(>) arg	    (va_list) Variable argument list
+
+
+ *  Function value:
+	EOF indicates the format string exceeds the length available,
+	otherwise, the number of characters output.
+
+ *  Include files: Ers.h, stdio.h
+
+ *  External values used:
+	    none
+
+ *  Prior requirements:
+	    none
+
+ *  Support: Tony Farrell, AAO
+
+ *-
+
+ *  History:
+      23-Nov-1992 - TJF - Original version, based on Berkeley Unix
+		    vprintf.c, version 5.47, 22-Mar-1991.
+      27-Nov-1992 - TJF - Under VxWorks, use fioFormatV.
+      29-Sep-1993 - TJF - Add Sccs id
+      29-Apr-1994 - TJF - Solaris 2 does not have isinf, so use !finite
+      21-Oct-1994 - TJF - Osf does not have isinf either - it appears to have
+				been droped from ieee.  We use finite instead.
+      {@change entry@}
+
+
+ *  Sccs Id:  ersvsprintf.c, Release 1.9, 10/21/94
+
+ */
+
+
+/*
+ *  Original Berkeley copyright notice.
+ *
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * Chris Torek.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+/*
+ * Macros for converting digits to letters and vice versa
+ */
+#define	to_digit(c)	((c) - '0')
+#define is_digit(c)	((unsigned)to_digit(c) <= 9)
+#define	to_char(n)	((n) + '0')
+
+/*
+ * Flags used during conversion.
+ */
+#define	LONGINT		0x01		/* long integer */
+#define	LONGDBL		0x02		/* long double; unimplemented */
+#define	SHORTINT	0x04		/* short integer */
+#define	ALT		0x08		/* alternate form */
+#define	LADJUST		0x10		/* left adjustment */
+#define	ZEROPAD		0x20		/* zero (as opposed to blank) pad */
+#define	HEXPREFIX	0x40		/* add 0x or 0X prefix */
+
+#define MAXEXPON  40
+#define MAXFRACT  14
+
+static char *Cnv_Exponent( register char *p, register int exp, int fmtch )
+  {
+  register char *t;
+  char expbuf[MAXEXPON];
+
+  *p++ = fmtch;
+  if (exp < 0) {
+    exp = -exp;
+    *p++ = '-';
+    }
+
+  else
+    *p++ = '+';
+
+  t = expbuf + MAXEXPON;
+  if ( exp > 9 ) {
+    do {
+      *--t = to_char(exp % 10);
+      }
+    while ((exp /= 10) > 9);
+    *--t = to_char(exp);
+    for (; t < expbuf + MAXEXPON; *p++ = *t++);
+    }
+  else {
+    *p++ = '0';
+    *p++ = to_char(exp);
+    }
+  return (p);
+  }
+
+
+
+static char * Cnv_Round( double fract, int *exp,
+	register char *start, register char *end, char ch, char *signp )
+  {
+  double	tmp;
+
+  if ( fract )
+    (void) modf(fract * 10, &tmp);
+  else
+    tmp = to_digit(ch);
+
+  if (tmp > 4)
+    for (;; --end) {
+      if (*end == '.')
+	--end;
+
+      if (++*end <= '9')
+	break;
+
+      *end = '0';
+      if (end == start) {
+	if (exp) {	/* e/E; increment exponent */
+	  *end = '1';
+	  ++*exp;
+	  }
+	else {		/* f; add extra digit */
+	  *--end = '1';
+	  --start;
+	  }
+	break;
+	}
+      }
+	/* ``"%.3f", (double)-0.0004'' gives you a negative 0. */
+  else if (*signp == '-')
+    for (;; --end) {
+      if (*end == '.')
+	--end;
+      if (*end != '0')
+	break;
+      if (end == start)
+	*signp = 0;
+      }
+
+  return (start);
+  }
+
+
+static int Cnv_Cvt( double number, register int prec, int flags,
+	char *signp, int fmtch, char *startp, char *endp )
+  {
+  register char *p, *t;
+  register double fract;
+  int dotrim, expcnt, gformat;
+  double integer, tmp;
+
+  dotrim = expcnt = gformat = 0;
+  if (number < 0) {
+    number = -number;
+    *signp = '-';
+    }
+  else
+    *signp = 0;
+
+  fract = modf(number, &integer);
+
+/* get an extra slot for rounding. */
+  t = ++startp;
+
+/*
+ * get integer portion of number; put into the end of the buffer; the
+ * .01 is added for modf(356.0 / 10, &integer) returning .59999999...
+ */
+  for (p = endp - 1; integer; ++expcnt) {
+    tmp = modf(integer / 10, &integer);
+    *p-- = to_char((int)((tmp + .01) * 10));
+    }
+
+  switch (fmtch) {
+    case 'f':
+
+/* reverse integer into beginning of buffer */
+      if (expcnt)
+	for (; ++p < endp; *t++ = *p);
+      else
+	*t++ = '0';
+
+/* if precision required or alternate flag set, add in a decimal point. */
+      if (prec || flags&ALT)
+	*t++ = '.';
+
+/* if requires more precision and some fraction left */
+      if (fract) {
+	if (prec)
+	  do {
+	    fract = modf(fract * 10, &tmp);
+	    *t++ = to_char((int)tmp);
+	    }
+	  while (--prec && fract);
+
+	if (fract)
+	  startp = Cnv_Round(fract, (int *)NULL, startp,
+				    t - 1, (char)0, signp);
+	}
+
+      for (; prec--; *t++ = '0');
+      break;
+
+    case 'e':
+    case 'E':
+eformat:
+      if (expcnt) {
+	*t++ = *++p;
+	if (prec || flags&ALT)
+	  *t++ = '.';
+
+/* if requires more precision and some integer left */
+	for (; prec && ++p < endp; --prec)
+	  *t++ = *p;
+
+/* if done precision and more of the integer component,
+ * round using it; adjust fract so we don't re-round later.*/
+	if (!prec && ++p < endp) {
+	  fract = 0;
+	  startp = Cnv_Round((double)0, &expcnt, startp,
+				    t - 1, *p, signp);
+	  }
+
+/* adjust expcnt for digit in front of decimal */
+	--expcnt;
+	}
+
+/* until first fractional digit, decrement exponent */
+      else if (fract) {
+
+/* adjust expcnt for digit in front of decimal */
+	for (expcnt = -1;; --expcnt) {
+	  fract = modf(fract * 10, &tmp);
+	  if (tmp)
+	    break;
+	  }
+
+	*t++ = to_char((int)tmp);
+	if (prec || flags&ALT)
+	  *t++ = '.';
+	}
+
+      else {
+	*t++ = '0';
+	if (prec || flags&ALT)
+	  *t++ = '.';
+	}
+
+/* if requires more precision and some fraction left */
+      if (fract) {
+	if (prec)
+	  do {
+	    fract = modf(fract * 10, &tmp);
+	    *t++ = to_char((int)tmp);
+	    }
+	  while (--prec && fract);
+
+	if (fract)
+	  startp = Cnv_Round(fract, &expcnt, startp,
+				    t - 1, (char)0, signp);
+	}
+
+/* if requires more precision */
+      for (; prec--; *t++ = '0');
+
+/* unless alternate flag, trim any g/G format trailing 0's */
+      if (gformat && !(flags&ALT)) {
+	while (t > startp && *--t == '0');
+	if (*t == '.')
+	  --t;
+	++t;
+	}
+
+      t = Cnv_Exponent(t, expcnt, fmtch);
+      break;
+
+    case 'g':
+    case 'G':
+
+/* a precision of 0 is treated as a precision of 1. */
+      if (!prec)
+	++prec;
+
+/*
+ * ``The style used depends on the value converted; style e
+ * will be used only if the exponent resulting from the
+ * conversion is less than -4 or greater than the precision.''
+ *	-- ANSI X3J11
+ */
+      if (expcnt > prec || (!expcnt && fract && fract < .0001)) {
+
+/*
+ * g/G format counts "significant digits, not digits of
+ * precision; for the e/E format, this just causes an
+ * off-by-one problem, i.e. g/G considers the digit
+ * before the decimal point significant and e/E doesn't
+ * count it as precision.
+ */
+	--prec;
+	fmtch -= 2;		/* G->E, g->e */
+	gformat = 1;
+	goto eformat;
+	}
+
+/* reverse integer into beginning of buffer, note, decrement precision */
+      if (expcnt)
+	for (; ++p < endp; *t++ = *p, --prec);
+      else
+	*t++ = '0';
+
+/* if precision required or alternate flag set, add in a
+ * decimal point.  If no digits yet, add in leading 0. */
+      if (prec || flags&ALT) {
+	dotrim = 1;
+	*t++ = '.';
+	}
+      else
+	dotrim = 0;
+
+/* if requires more precision and some fraction left */
+      if (fract) {
+	if (prec) {
+	  do {
+	    fract = modf(fract * 10, &tmp);
+	    *t++ = to_char((int)tmp);
+	    }
+	  while(!tmp);
+
+	  while (--prec && fract) {
+	    fract = modf(fract * 10, &tmp);
+	    *t++ = to_char((int)tmp);
+	    }
+	  }
+
+	if (fract)
+	  startp = Cnv_Round(fract, (int *)NULL, startp,
+				    t - 1, (char)0, signp);
+	}
+
+/* alternate format, adds 0's for precision, else trim 0's */
+      if (flags&ALT)
+	for (; prec--; *t++ = '0');
+      else if (dotrim) {
+	while (t > startp && *--t == '0');
+	if (*t != '.')
+	  ++t;
+	}
+      }
+
+  return (t - startp);
+  }
+
+
+int ADIstrmPutInt( ADIdevice *dev, char *str, int slen,
+		   int check, ADIstatus status )
   {
   char	*buf = dev->buf;
   int	i;
@@ -462,8 +787,12 @@ void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
 
 /* Fast check if we won't fill the device buffer */
   else if ( slen <= sleft ) {
-    for( i=0; i<slen; i++ )
-      buf[dev->bnc++] = *scur++;
+    if ( check )
+      for( i=0; i<slen; i++, scur++ )
+	buf[dev->bnc++] = (*scur < ' ') ? '.' : *scur;
+    else
+      for( i=0; i<slen; i++ )
+	buf[dev->bnc++] = *scur++;
     }
 
 /* We will fill the buffer (and maybe more than once) */
@@ -472,223 +801,495 @@ void ADIstrmPutInt( ADIdevice *dev, char *str, int slen, ADIstatus status )
 
     while ( nleft > 0 ) {
       nmove = _MIN(sleft,nleft);
-      for( i=0; i<nmove; i++ )
-	buf[dev->bnc++] = *scur++;
+      if ( check )
+	for( i=0; i<nmove; i++, scur++ )
+	  buf[dev->bnc++] = (*scur < ' ') ? '.' : *scur;
+      else
+	for( i=0; i<nmove; i++ )
+	  buf[dev->bnc++] = *scur++;
       ADIstrmFlushDev( dev, status );
       nleft -= sleft;
       sleft = eblen;
       }
     }
-  }
 
-void ADIstrmPutCh( ADIobj stream, char ch, ADIstatus status )
-  {
-  if ( _ok(status) ) {
-    ADIdevice	*dev = _strm_data(stream)->dev;
-
-    if ( dev->bnc == (dev->bufsiz-1) )
-      ADIstrmFlushDev( dev, status );
-    dev->buf[dev->bnc++] = ch;
-    }
-  }
-
-void ADIstrmPutBlnk( ADIdevice *dev, int nb, ADIstatus status )
-  {
-  static char *blanks = "                                        ";
-  int	lnb = nb;
-
-  while ( lnb > 0 ) {
-    ADIstrmPutInt( dev, blanks, _MIN(40,lnb), status );
-    lnb -= 40;
-    }
+  return _ok(status);
   }
 
 
-/*
- * 'printf' like formatting function. Supports the following formatting
- * codes
- *
- *   %%		- the percent character
- *   %d		- decimal integer
- *   %c		- a single character
- *   %s		- null terminated C string
- *   %O		- any ADI object
- *   %S		- an ADI string
- *   %I		- ADIinteger
- *   \n		- new line
- *   \t		- tab character
- *
- * Writes data into user supplied buffer. If the buffer fills up then
- * the user supplied flushing function is invoked
- */
-void ADIstrmVprintf( ADIobj stream, char *format, int flen,
-		     va_list ap, ADIstatus status )
+#define	BUF		40
+#define	DEFPREC		6
+
+int ADIstrmVprintf( ADIobj stream, char *fmt0, va_list ap, ADIstatus status )
   {
-  if ( _ok(status) ) {
-    ADIinteger	ai_arg;
-    ADIobj	as_arg;
-    char	*cp_arg;
-    double	d_arg;
-    char	fc;
-    char	fct;
-    char	*fptr = format;
-    int		i_arg;
-    char	*lbegin = NULL;
-    char	lbuf[30];
-    int		nb;
-    int		nlit = 0;
-    int		npr;
-    int		prec;
-    ADIstream	*pstr = _strm_data(stream);
-    ADIdevice	*dev = pstr->dev;
-    ADIstring	*sdata;
-    short	sh_arg;
-    void	*vp_arg;
+  ADIstream		*pstr = _strm_data(stream);
+  ADIdevice		*dev = pstr->dev;
+  register char 	*fmt;		/* format string */
+  register int 		ch;		/* character from fmt */
+  register int 		n;		/* handy integer (short term usage) */
+  register char		*cp;		/* handy char pointer (short term usage) */
+  register int 		flags;		/* flags as above */
+  ADIstring		*astr;		/* ADI string data */
+  ADIobj		aid;		/* ADI object */
+  int			checkit = 0;	/* Check insert text for non-prints */
+  int 			ret;		/* return value accumulator */
+  int 			width;		/* width from format (%8d), or 0 */
+  int 			prec;		/* precision from format (%.3d), or -1 */
+  char 			sign;		/* sign prefix (' ', '+', '-', or \0) */
+  char 			softsign;	/* temporary negative sign for floats */
+  double 		_double;	/* double precision arguments %[eEfgG] */
+  int 			fpprec;		/* `extra' floating precision in [eEfgG] */
+  unsigned long 	_ulong ;	/* integer arguments %[diouxX] */
+  enum { OCT, DEC, HEX } base;		/* base for [diouxX] conversion */
+  int 			dprec;		/* a copy of prec if [diouxX], 0 otherwise */
+  int 			fieldsz;	/* field size expanded by sign, etc */
+  int 			realsz;		/* field size expanded by dprec */
+  int 			size;		/* size of converted field or string */
+  char 			*xdigs="";	/* digits for [xX] conversion */
+  char 			buf[BUF];	/* space for %c, %[diouxX], %[eEfgG] */
+  char 			ox[2];		/* space for 0x hex-prefix */
 
-/* Loop over the format */
-    while ( *fptr ) {
+	/*
+	 * Choose PADSIZE to trade efficiency vs size.  If larger
+	 * printf fields occur frequently, increase PADSIZE (and make
+	 * the initialisers below longer).
+	 */
+#define	PADSIZE	16		/* pad chunk size */
+	static char blanks[PADSIZE] =
+	 {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
+	static char zeroes[PADSIZE] =
+	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
-/* Extract the next format character */
-      fc = *fptr++;
+	/*
+	 * BEWARE, these `goto error' on error, and PAD uses `n'.
+	 */
+#define	PRINT(ptr, len) { \
+	if (!ADIstrmPutInt(dev,(ptr),(len),checkit,status)) \
+	    return(EOF);\
+}
+#define	PAD(howmany, with) { \
+	if ((n = (howmany)) > 0) { \
+		while (n > PADSIZE) { \
+			PRINT(with, PADSIZE); \
+			n -= PADSIZE; \
+		} \
+		PRINT(with, n); \
+	} \
+}
+#define	FLUSH()
 
-/* Formatting? */
-      if ( fc == '%' ) {
+	/*
+	 * To extend shorts properly, we need both signed and unsigned
+	 * argument extraction methods.
+	 */
+#define	SARG() \
+	(flags&LONGINT ? va_arg(ap, long) : \
+	    flags&SHORTINT ? (long)(short)va_arg(ap, int) : \
+	    (long)va_arg(ap, int))
+#define	UARG() \
+	(flags&LONGINT ? va_arg(ap, unsigned long) : \
+	    flags&SHORTINT ? (unsigned long)(unsigned short)va_arg(ap, int) : \
+	    (unsigned long)va_arg(ap, unsigned int))
 
-/* No trailing blanks by default */
-	nb = 0;
+	fmt = fmt0;
+	ret = 0;
 
-/* Extract the next format character */
-	fct = *fptr++;
+	/*
+	 * Scan the format for conversions (`%' character).
+	 */
+	for (;;) {
+		checkit = 0;
 
-/* Flush literal data to buffer */
-	if ( nlit ) {
-	  ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
-	  }
-
-/* Is precision being specified? */
-	if ( fct == '*' ) {
-	  prec = va_arg(ap,int);
-	  fct = *fptr++;
-	  }
-	else if ( isdigit( fct ) ) {
-	  int	lprec = 0;
-	  do {
-	    lprec = lprec*10 + (fct-'0');
-	    fct = *fptr++;
-	    }
-	  while ( isdigit(fct) );
-	  prec = lprec;
-	  }
-	else
-	  prec = 0;
-
-/* Switch on the control character */
-	switch ( fct ) {
-	  case 's':
-	    cp_arg = va_arg(ap,char *);
-	    if ( prec ) {
-	      npr = strlen( cp_arg );
-	      if ( prec > npr )
-		nb = prec - npr;
-	      else
-		npr = prec;
-	      }
-	    else
-	      npr = _CSM;
-	    if ( npr )
-	      ADIstrmPutInt( dev, cp_arg, npr, status );
-	    break;
-	  case 'S':
-	    as_arg = va_arg(ap,ADIobj);
-	    sdata = _str_data(as_arg);
-	    npr = sdata->len;
-	    if ( prec ) {
-	      if ( prec > npr )
-		nb = prec - npr;
-	      else
-		npr = prec;
-	      }
-	    if ( npr ) {
-	      char	*sptr = sdata->data;
-	      int	np = npr;
-
-	      while ( np ) {
-		char   ch = *sptr++;
-		if ( dev->bnc == (dev->bufsiz-1) )
-		  ADIstrmFlushDev( dev, status );
-		if ( ch < ' ' )
-		  dev->buf[dev->bnc++] = '.';
-		else
-		  dev->buf[dev->bnc++] = ch;
-		np--;
+		for (cp = fmt; (ch = *fmt) != '\0' && ch != '%'; fmt++)
+			/* void */;
+		if ((n = fmt - cp) != 0) {
+			PRINT(cp, n);
+			ret += n;
 		}
-	      }
-	    break;
-	  case 'd':
-	    i_arg = va_arg(ap,int);
-	    sprintf( lbuf, "%d", i_arg );
-	    ADIstrmPutInt( dev, lbuf, _CSM, status );
-	    break;
-	  case 'c':
-	    sh_arg = va_arg(ap,short);
-	    fct = sh_arg;
-	    ADIstrmPutInt( dev, &fct, 1, status );
-	    break;
-	  case 'O':
-	    as_arg = va_arg(ap,ADIobj);
-	    adix_print( stream, as_arg, 1, ADI__true, status );
-	    break;
-	  case 'p':
-	    vp_arg = va_arg(ap,void *);
-	    sprintf( lbuf, "%p", vp_arg );
-	    ADIstrmPutInt( dev, lbuf, _CSM, status );
-	    break;
-	  case 'I':
-	    ai_arg = va_arg(ap,ADIinteger);
-	    sprintf( lbuf, "%ld", ai_arg );
-	    ADIstrmPutInt( dev, lbuf, _CSM, status );
-	    break;
-	  case 'f':
-	    d_arg = va_arg(ap,double);
-	    sprintf( lbuf, "%f", d_arg );
-	    ADIstrmPutInt( dev, lbuf, _CSM, status );
-	    break;
-	  case '%':
-	    ADIstrmPutInt( dev, &fct, 1, status );
-	    break;
-	  }
+		if (ch == '\0')
+			goto done;
+		fmt++;		/* skip over '%' */
 
-	if ( nb )
-	  ADIstrmPutBlnk( dev, nb, status );
+		flags = 0;
+		dprec = 0;
+		fpprec = 0;
+		width = 0;
+		prec = -1;
+		sign = '\0';
+
+rflag:		ch = *fmt++;
+reswitch:	switch (ch) {
+		case ' ':
+			/*
+			 * ``If the space and + flags both appear, the space
+			 * flag will be ignored.''
+			 *	-- ANSI X3J11
+			 */
+			if (!sign)
+				sign = ' ';
+			goto rflag;
+		case '#':
+			flags |= ALT;
+			goto rflag;
+		case '*':
+			/*
+			 * ``A negative field width argument is taken as a
+			 * - flag followed by a positive field width.''
+			 *	-- ANSI X3J11
+			 * They don't exclude field widths read from args.
+			 */
+			if ((width = va_arg(ap, int)) >= 0)
+				goto rflag;
+			width = -width;
+			/* FALLTHROUGH */
+		case '-':
+			flags |= LADJUST;
+			goto rflag;
+		case '+':
+			sign = '+';
+			goto rflag;
+		case '.':
+			if ((ch = *fmt++) == '*') {
+				n = va_arg(ap, int);
+				prec = n < 0 ? -1 : n;
+				goto rflag;
+			}
+			n = 0;
+			while (is_digit(ch)) {
+				n = 10 * n + to_digit(ch);
+				ch = *fmt++;
+			}
+			prec = n < 0 ? -1 : n;
+			goto reswitch;
+		case '0':
+			/*
+			 * ``Note that 0 is taken as a flag, not as the
+			 * beginning of a field width.''
+			 *	-- ANSI X3J11
+			 */
+			flags |= ZEROPAD;
+			goto rflag;
+		case '1': case '2': case '3': case '4':
+		case '5': case '6': case '7': case '8': case '9':
+			n = 0;
+			do {
+				n = 10 * n + to_digit(ch);
+				ch = *fmt++;
+			} while (is_digit(ch));
+			width = n;
+			goto reswitch;
+		case 'L':
+			flags |= LONGDBL;
+			goto rflag;
+		case 'h':
+			flags |= SHORTINT;
+			goto rflag;
+		case 'l':
+			flags |= LONGINT;
+			goto rflag;
+/*		case 'I':
+			flags |= LONGINT;
+			goto rflag; */
+		case 'c':
+			*(cp = buf) = va_arg(ap, int);
+			size = 1;
+			sign = '\0';
+			break;
+		case 'D':
+			flags |= LONGINT;
+			/*FALLTHROUGH*/
+		case 'd':
+		case 'i':
+			_ulong = SARG();
+			if ((long)_ulong < 0) {
+				_ulong = -_ulong;
+				sign = '-';
+			}
+			base = DEC;
+			goto number;
+		case 'e':
+		case 'E':
+		case 'f':
+		case 'g':
+		case 'G':
+			_double = va_arg(ap, double);
+
+#ifndef VMS
+			/* do this before tricky precision changes */
+			/* (this checks for infinity and not a number) */
+			/* (not necessary on VAX/VMS)		*/
+			if (!finite(_double)) {
+				if (_double < 0)
+					sign = '-';
+				cp = "Inf";
+				size = 3;
+				break;
+			}
+			if (isnan(_double)) {
+				cp = "NaN";
+				size = 3;
+				break;
+			}
+#endif
+			/*
+			 * don't do unrealistic precision; just pad it with
+			 * zeroes later, so buffer size stays rational.
+			 */
+			if (prec > MAXFRACT) {
+				if ((ch != 'g' && ch != 'G') || (flags&ALT))
+					fpprec = prec - MAXFRACT;
+				prec = MAXFRACT;
+			} else if (prec == -1)
+				prec = DEFPREC;
+			/*
+			 * cvt may have to round up before the "start" of
+			 * its buffer, i.e. ``intf("%.2f", (double)9.999);'';
+			 * if the first character is still NUL, it did.
+			 * softsign avoids negative 0 if _double < 0 but
+			 * no significant digits will be shown.
+			 */
+			cp = buf;
+			*cp = '\0';
+			size = Cnv_Cvt(_double, prec, flags, &softsign, ch,
+			    cp, buf + sizeof(buf));
+			if (softsign)
+				sign = '-';
+			if (*cp == '\0')
+				cp++;
+			break;
+		case 'n':
+			if (flags & LONGINT)
+				*va_arg(ap, long *) = ret;
+			else if (flags & SHORTINT)
+				*va_arg(ap, short *) = ret;
+			else
+				*va_arg(ap, int *) = ret;
+			continue;	/* no output */
+		case 'I':
+			_ulong = va_arg(ap, ADIinteger);
+			base = DEC;
+			goto number;
+		case 'O':
+			aid = va_arg(ap, ADIobj);
+			adix_print( stream, aid, 1, ADI__true, status );
+			continue;
+/*		case 'O':
+			flags |= LONGINT;
+			/*FALLTHROUGH */
+		case 'o':
+			_ulong = UARG();
+			base = OCT;
+			goto nosign;
+		case 'p':
+			/*
+			 * ``The argument shall be a pointer to void.  The
+			 * value of the pointer is converted to a sequence
+			 * of printable characters, in an implementation-
+			 * defined manner.''
+			 *	-- ANSI X3J11
+			 */
+			/* NOSTRICT */
+			_ulong = (unsigned long)va_arg(ap, void *);
+			base = HEX;
+			xdigs = "0123456789abcdef";
+			flags |= HEXPREFIX;
+			ch = 'x';
+			goto nosign;
+		case 'S':
+			aid = va_arg(ap, ADIobj);
+			if ( _valid_q(aid) ) {
+			  astr = _str_data(aid);
+			  cp = astr->data;
+			  if ( ! cp ) {
+			    cp = "\"\"";
+			    aid = ADI__nullid;
+			    }
+			  }
+			else
+			  cp = "<null>";
+
+			if ( _valid_q(aid) )
+			  size = astr->len;
+			else
+			  size = strlen(cp);
+			if ( prec >= 0 )
+			  size = _MIN(size,prec);
+			sign = '\0';
+			checkit = 1;
+			break;
+		case 's':
+			if ((cp = va_arg(ap, char *)) == NULL)
+				cp = "(null)";
+			if (prec >= 0) {
+				/*
+				 * can't use strlen; can only look for the
+				 * NUL in the first `prec' characters, and
+				 * strlen() will go further.
+				 */
+				char *p = (char *) memchr(cp, 0, prec);
+
+				if (p != NULL) {
+					size = p - cp;
+					if (size > prec)
+						size = prec;
+				} else
+					size = prec;
+			} else
+				size = strlen(cp);
+			sign = '\0';
+			break;
+		case 'U':
+			flags |= LONGINT;
+			/*FALLTHROUGH*/
+		case 'u':
+			_ulong = UARG();
+			base = DEC;
+			goto nosign;
+		case 'X':
+			xdigs = "0123456789ABCDEF";
+			goto hex;
+		case 'x':
+			xdigs = "0123456789abcdef";
+hex:			_ulong = UARG();
+			base = HEX;
+			/* leading 0x/X only if non-zero */
+			if (flags & ALT && _ulong != 0)
+				flags |= HEXPREFIX;
+
+			/* unsigned conversions */
+nosign:			sign = '\0';
+			/*
+			 * ``... diouXx conversions ... if a precision is
+			 * specified, the 0 flag will be ignored.''
+			 *	-- ANSI X3J11
+			 */
+number:			if ((dprec = prec) >= 0)
+				flags &= ~ZEROPAD;
+
+			/*
+			 * ``The result of converting a zero value with an
+			 * explicit precision of zero is no characters.''
+			 *	-- ANSI X3J11
+			 */
+			cp = buf + BUF;
+			if (_ulong != 0 || prec != 0) {
+				/*
+				 * unsigned mod is hard, and unsigned mod
+				 * by a constant is easier than that by
+				 * a variable; hence this switch.
+				 */
+				switch (base) {
+				case OCT:
+					do {
+						*--cp = to_char(_ulong & 7);
+						_ulong >>= 3;
+					} while (_ulong);
+					/* handle octal leading 0 */
+					if (flags & ALT && *cp != '0')
+						*--cp = '0';
+					break;
+
+				case DEC:
+					/* many numbers are 1 digit */
+					while (_ulong >= 10) {
+						*--cp = to_char(_ulong % 10);
+						_ulong /= 10;
+					}
+					*--cp = to_char(_ulong);
+					break;
+
+				case HEX:
+					do {
+						*--cp = xdigs[_ulong & 15];
+						_ulong >>= 4;
+					} while (_ulong);
+					break;
+
+				default:
+					cp = "bug in vfprintf: bad base";
+					size = strlen(cp);
+					goto skipsize;
+				}
+			}
+			size = buf + BUF - cp;
+		skipsize:
+			break;
+		default:	/* "%?" prints ?, unless ? is NUL */
+			if (ch == '\0')
+				goto done;
+			/* pretend it was %c with argument ch */
+			cp = buf;
+			*cp = ch;
+			size = 1;
+			sign = '\0';
+			break;
+		}
+
+		/*
+		 * All reasonable formats wind up here.  At this point,
+		 * `cp' points to a string which (if not flags&LADJUST)
+		 * should be padded out to `width' places.  If
+		 * flags&ZEROPAD, it should first be prefixed by any
+		 * sign or other prefix; otherwise, it should be blank
+		 * padded before the prefix is emitted.  After any
+		 * left-hand padding and prefixing, emit zeroes
+		 * required by a decimal [diouxX] precision, then print
+		 * the string proper, then emit zeroes required by any
+		 * leftover floating precision; finally, if LADJUST,
+		 * pad with blanks.
+		 */
+
+		/*
+		 * compute actual size, so we know how much to pad.
+		 * fieldsz excludes decimal prec; realsz includes it
+		 */
+		fieldsz = size + fpprec;
+		if (sign)
+			fieldsz++;
+		else if (flags & HEXPREFIX)
+			fieldsz += 2;
+		realsz = dprec > fieldsz ? dprec : fieldsz;
+
+		/* right-adjusting blank padding */
+		if ((flags & (LADJUST|ZEROPAD)) == 0)
+			PAD(width - realsz, blanks);
+
+		/* prefix */
+		if (sign) {
+			PRINT(&sign, 1);
+		} else if (flags & HEXPREFIX) {
+			ox[0] = '0';
+			ox[1] = ch;
+			PRINT(ox, 2);
+		}
+
+		/* right-adjusting zero padding */
+		if ((flags & (LADJUST|ZEROPAD)) == ZEROPAD)
+			PAD(width - realsz, zeroes);
+
+		/* leading zeroes from decimal precision */
+		PAD(dprec - fieldsz, zeroes);
+
+		/* the string or number proper */
+		PRINT(cp, size);
+
+		/* trailing f.p. zeroes */
+		PAD(fpprec, zeroes);
+
+		/* left-adjusting padding (always blank) */
+		if (flags & LADJUST)
+			PAD(width - realsz, blanks);
+
+		/* finally, adjust ret */
+		ret += width > realsz ? width : realsz;
+
+		FLUSH();	/* copy out the I/O vectors */
 	}
-
-/* Special characters */
-      else if ( fc == '\\' ) {
-
-/* Flush literal data to buffer */
-	if ( nlit ) {
-	  ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
-	  }
-
-	}
-
-/* Otherwise literal */
-      else {
-	if ( ! nlit++ )
-	  lbegin = fptr - 1;
-	}
-      }
-
-/* Flush literal data */
-    if ( nlit ) {
-      ADIstrmPutInt( dev, lbegin, nlit, status ); nlit = 0;
-      }
-/* Null terminate if enough room. The null is not part of the string */
-    if ( dev->bnc < dev->bufsiz )
-      dev->buf[dev->bnc] = 0;
-    }
-
-  }
+done:
+	FLUSH();
+	return (ret);
+	/* NOTREACHED */
+}
 
 
 void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
@@ -699,7 +1300,7 @@ void ADIstrmPrintf( ADIobj stream, char *format, ADIstatus status, ... )
   va_start(ap,status);
 
 /* Invoke the internal routine */
-  ADIstrmVprintf( stream, format, _CSM, ap, status );
+  ADIstrmVprintf( stream, format, ap, status );
 
 /* End variable arg list processing */
   va_end(ap);
@@ -751,12 +1352,14 @@ void ADIresetStream( ADIobj stream, ADIstatus status )
   }
 
 
-void ADIstrmDel( ADIobj stream, ADIstatus status )
+ADIobj ADIstrmDel( int narg, ADIobj args[], ADIstatus status )
   {
-  ADIstream	*str = _strm_data(stream);
+  ADIstream	*str = _strm_data(args[0]);
 
   if ( str->dev )
     ADIresetStreamInt( str, status );
+
+  return ADI__nullid;
   }
 
 
@@ -1329,25 +1932,12 @@ ADItokenType ADInextToken( ADIobj stream, ADIstatus status )
   }
 
 
-void ADIparseError( ADIobj stream, int control,
-		    char *message, ADIstatus status )
-  {
-  char          *str;
-  int           len;
-
-  if ( control ) {
-    ADIdescribeToken( _strm_data(stream)->ctok.t, &str, &len );
-    adic_setetc( "CTOK", str, len );
-    }
-
-/* Report the error */
-  adic_setecs( ADI__SYNTAX, message, status );
-  }
-
 void ADImatchToken( ADIobj stream, ADItokenType tok, ADIstatus status )
   {
-  char          *str;
-  int           len;
+  char          *gstr;
+  int           glen;
+  char          *estr;
+  int           elen;
 
   if ( _ok(status) ) {
     ADItokenType	ctok = _strm_data(stream)->ctok.t;
@@ -1355,9 +1945,10 @@ void ADImatchToken( ADIobj stream, ADItokenType tok, ADIstatus status )
     if ( ctok == tok )
       ADInextToken( stream, status );
     else {
-      ADIdescribeToken( ctok, &str, &len );
-      adic_setetc( "TTOK", str, len );
-      ADIparseError( stream, 1, "^CTOK found where ^TTOK expected.", status );
+      ADIdescribeToken( ctok, &gstr, &glen );
+      ADIdescribeToken( tok, &estr, &elen );
+      adic_setecs( ADI__SYNTAX, "Parse error, %*s found where %*s expected.",
+		     status, glen, gstr, elen, estr );
       }
     }
   }
@@ -1411,9 +2002,9 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
 	more = ADI__false;
 	if ( _strm_data(pstream)->ctok.t != endtok ) {
 	  ADIdescribeToken( endtok, &tstr, &tlen );
-	  adic_setetc( "TOK", tstr, tlen );
-	  adic_setecs( ADI__SYNTAX, "Error reading list - comma or ^TOK expected",
-							       status );
+	  adic_setecs( ADI__SYNTAX,
+		"Error reading list - comma or %*s expected",
+		status, tlen, tstr );
 	  }
 	}
 
@@ -1432,6 +2023,7 @@ ADIobj ADIparseComDelList( ADIobj pstream, ADItokenType endtok,
 ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
   {
   ADIobj                arg;            /* Argument to blank function */
+  ADIobj                carg;           /* _CAR(arg) */
   int                   nbi;            /* Number of blanks minus one */
   ADIobj                nstr;           /* Name string for _,__,___ */
   ADIstream		*str = _strm_data(stream);
@@ -1454,13 +2046,17 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
   else
     arg = adix_clone( ADIcvNulCons, status );
 
+  carg = _CAR(arg);
+
 /* Single _x type node? */
-  if ( _valid_q(_CAR(arg)) && _null_q(_CDR(arg)) )
-    if ( _etn_q(_CAR(arg)) ) {          /* Check <x> is an expression node */
+  if ( _valid_q(carg) && _null_q(_CDR(arg)) )
+
+/* Check <x> is an expression node */
+    if ( _etn_q(carg) ) {
       ADIobj			cid;	/* Class definition */
 
 /* Locate class definition of named class, if any */
-      cid = ADIkrnlFindClsI( _etn_head(_CAR(arg)), status );
+      cid = ADIkrnlFindClsI( _etn_head(carg), status );
       if ( _valid_q(cid) ) {
 
 /* Locate address of the slot for nbi'th underscore expression */
@@ -1472,7 +2068,7 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
 	if ( *saddr )
 	  adic_erase( &arg, status );
 	else
-	  *saddr = ADIetnNew( nstr, arg, status );
+	  *saddr = ADIetnNew( adix_clone(nstr, status), arg, status );
 
 	subexp = adix_clone( *saddr, status );
 	}
@@ -1483,7 +2079,7 @@ ADIobj ADIparseBlankExp( ADIobj stream, ADIstatus status )
   if ( _valid_q(subexp) )
     return subexp;
   else
-    return ADIetnNew( nstr, arg, status );
+    return ADIetnNew( adix_clone(nstr, status), arg, status );
   }
 
 ADIinteger ADIparseScanInt( char *data, int base, ADIstatus status )
@@ -1612,15 +2208,16 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	first = expr;
 	expr = ADIparseBlankExp( stream, status );
 
-	expr = ADIetnNew( K_Pattern, lstx_new2( first, expr, status),
-		     status );
+	expr = ADIetnNew( adix_clone( K_Pattern, status ),
+			  lstx_new2( first, expr, status),
+			  status );
 	}
 
 /* Left square bracket indicates start of array reference */
       else if ( ADIifMatchToken( stream, TOK__LBRAK, status ) ) {
 	symbol = expr;                  /* Store symbol for later */
 
-	expr = ADIetnNew( K_ArrayRef,
+	expr = ADIetnNew( adix_clone( K_ArrayRef, status ),
 	      ADIparseComDelList( stream, TOK__RBRAK, status ),
 	      status );
 
@@ -1631,18 +2228,18 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 
     case TOK__LBRAK:
       ADInextToken( stream, status );
-      expr = ADIetnNew( K_List,
+      expr = ADIetnNew( adix_clone( K_List, status ),
 	       ADIparseComDelList( stream,   /* Parse list elements */
 		 TOK__RBRAK, status ),
 	       status );
-      expr = ADIetnNew( K_Array,
+      expr = ADIetnNew( adix_clone( K_Array, status ),
 		     lstx_cell( expr, ADI__nullid, status ),
 		     status );
       break;
 
     case TOK__LBRACE:
       ADInextToken( stream, status );
-      expr = ADIetnNew( K_List, /* Create List(e1..) constructor */
+      expr = ADIetnNew( adix_clone( K_List, status ),/* Create List(e1..) constructor */
 	  ADIparseComDelList( stream,
 	    TOK__RBRACE, status ),
 	  status );
@@ -1672,8 +2269,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	    else {
 	      base = (int) ADIparseScanInt( str->ctok.dat, 10, status );
 	      if ( _ok(status) && (base<2) && (base>36) ) {
-		adic_seteti( "B", base );
-		adic_setecs( ADI__SYNTAX, "Invalid base specifier /^B/ - must lie between 2 and 36", status );
+		adic_setecs( ADI__SYNTAX, "Invalid base specifier /%d/ - must lie between 2 and 36", status, base );
 		}
 	      }
 	    }
@@ -1702,7 +2298,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
       if ( tp ) {
 	if ( PreUnary[tp-1].priority >= priority ) {
 	  ADInextToken( stream, status );
-	  expr = ADIetnNew( *PreUnary[tp-1].key,
+	  expr = ADIetnNew( adix_clone( *PreUnary[tp-1].key, status ),
 		     lstx_cell(
 		       ADIparseExpInt( stream, PreUnary[tp-1].priority, status ),
 		       ADI__nullid, status ),
@@ -1721,7 +2317,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
 	first = ADI__nullid;
 	while ( (ltp == tp) && _ok(status) ) {
 	  expr = ADIetnNew(
-		     *Binary[tp-1].key,
+		     adix_clone( *Binary[tp-1].key, status ),
 		     lstx_cell( expr, ADI__nullid, status ),
 		     status );
 	  ADInextToken( stream, status );
@@ -1752,7 +2348,7 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
       if ( PostUnary[tp-1].priority >= priority ) {
 	ADInextToken( stream, status );
 	expr = ADIetnNew(
-		 *PostUnary[tp-1].key,
+		 adix_clone( *PostUnary[tp-1].key, status ),
 		 lstx_cell( expr, ADI__nullid, status ),
 		 status );
 	tp = ADIparseTokenInOpSet( stream, PostUnary, status);
@@ -1767,4 +2363,103 @@ ADIobj ADIparseExpInt( ADIobj stream, int priority, ADIstatus status )
     adic_erase( &expr, status );
 
   return expr;
+  }
+
+
+void prsx_init( ADIstatus status )
+  {
+  DEFINE_CSTR_TABLE(stringtable)
+    CSTR_TABLE_ENTRY(EXC_ArrayBound,"ArrayBound"),
+    CSTR_TABLE_ENTRY(EXC_BoolExp,"BooleanExpected"),
+    CSTR_TABLE_ENTRY(EXC_ControlC,"ControlC"),
+    CSTR_TABLE_ENTRY(EXC_Error,"Error"),
+    CSTR_TABLE_ENTRY(EXC_ExceedMaxRecurse,"ExceedMaxRecurse"),
+    CSTR_TABLE_ENTRY(EXC_InvalidArg,"InvalidArg"),
+    CSTR_TABLE_ENTRY(EXC_NoSuchField,"NoSuchField"),
+    CSTR_TABLE_ENTRY(EXC_ScopeBreak,"ScopeBreak"),
+    CSTR_TABLE_ENTRY(EXC_SyntaxError, "SyntaxError"),
+
+    CSTR_TABLE_ENTRY(K_AddTo,"AddTo"),
+    CSTR_TABLE_ENTRY(K_Alternatives,"Alternatives"),
+    CSTR_TABLE_ENTRY(K_And,"And"),
+    CSTR_TABLE_ENTRY(K_Apply,"Apply"),
+    CSTR_TABLE_ENTRY(K_Array,"Array"),
+    CSTR_TABLE_ENTRY(K_ArrayRef,"ArrayRef"),
+
+    CSTR_TABLE_ENTRY(K_Blank,"Blank"),
+    CSTR_TABLE_ENTRY(K_BlankSeq,"BlankSeq"),
+    CSTR_TABLE_ENTRY(K_BlankNullSeq,"BlankNullSeq"),
+    CSTR_TABLE_ENTRY(K_Break,"Break"),
+
+    CSTR_TABLE_ENTRY(K_Catch,"Catch"),
+    CSTR_TABLE_ENTRY(K_Concat,"Concat"),
+    CSTR_TABLE_ENTRY(K_Condition,"Condition"),
+
+    CSTR_TABLE_ENTRY(K_DefEnum,"DefEnum"),
+    CSTR_TABLE_ENTRY(K_Divide,"Divide"),
+    CSTR_TABLE_ENTRY(K_DivideBy,"DivideBy"),
+    CSTR_TABLE_ENTRY(K_Dot,"Dot"),
+    CSTR_TABLE_ENTRY(K_DoWhile,"DoWhile"),
+
+    CSTR_TABLE_ENTRY(K_Echo,"Echo"),
+    CSTR_TABLE_ENTRY(K_Equal,"Equal"),
+    CSTR_TABLE_ENTRY(K_Factorial,"Factorial"),
+    CSTR_TABLE_ENTRY(K_Finally,"Finally"),
+    CSTR_TABLE_ENTRY(K_Foreach,"Foreach"),
+
+    CSTR_TABLE_ENTRY(K_Get,"Get"),
+    CSTR_TABLE_ENTRY(K_GE,"GreaterThanOrEqual"),
+    CSTR_TABLE_ENTRY(K_GT,"GreaterThan"),
+
+    CSTR_TABLE_ENTRY(K_HoldAll,"HoldAll"),
+    CSTR_TABLE_ENTRY(K_HoldFirst,"HoldFirst"),
+    CSTR_TABLE_ENTRY(K_HoldRest,"HoldRest"),
+
+    CSTR_TABLE_ENTRY(K_If,"If"),
+
+    CSTR_TABLE_ENTRY(K_List,"List"),
+    CSTR_TABLE_ENTRY(K_Listable,"Listable"),
+    CSTR_TABLE_ENTRY(K_LE,"LessThanOrEqual"),
+    CSTR_TABLE_ENTRY(K_LT,"LessThan"),
+
+    CSTR_TABLE_ENTRY(K_Map,"Map"),
+    CSTR_TABLE_ENTRY(K_Multiply,"Multiply"),
+    CSTR_TABLE_ENTRY(K_MultiplyBy,"MultiplyBy"),
+
+    CSTR_TABLE_ENTRY(K_Negate,"Negate"),
+    CSTR_TABLE_ENTRY(K_Not,"Not"),
+    CSTR_TABLE_ENTRY(K_NotEqual,"NotEqual"),
+
+    CSTR_TABLE_ENTRY(K_Or,"Or"),
+
+    CSTR_TABLE_ENTRY(K_Pattern,"Pattern"),
+    CSTR_TABLE_ENTRY(K_PatternTest,"PatternTest"),
+    CSTR_TABLE_ENTRY(K_Plus,"Plus"),
+    CSTR_TABLE_ENTRY(K_PostDec,"PostDecrement"),
+    CSTR_TABLE_ENTRY(K_PostInc,"PostIncrement"),
+    CSTR_TABLE_ENTRY(K_Power,"Power"),
+    CSTR_TABLE_ENTRY(K_PreDec,"PreDecrement"),
+    CSTR_TABLE_ENTRY(K_PreInc,"PreIncrement"),
+    CSTR_TABLE_ENTRY(K_Put,"Put"),
+
+    CSTR_TABLE_ENTRY(K_Query,"Query"),
+
+    CSTR_TABLE_ENTRY(K_Raise,"Raise"),
+    CSTR_TABLE_ENTRY(K_Range,"Range"),
+    CSTR_TABLE_ENTRY(K_ReRaise,"ReRaise"),
+
+    CSTR_TABLE_ENTRY(K_Set,"Set"),
+    CSTR_TABLE_ENTRY(K_SetDelayed,"SetDelayed"),
+    CSTR_TABLE_ENTRY(K_Subtract,"Subtract"),
+    CSTR_TABLE_ENTRY(K_SubtractFrom,"SubtractFrom"),
+    CSTR_TABLE_ENTRY(K_Switch,"Switch"),
+
+    CSTR_TABLE_ENTRY(K_Try,"Try"),
+
+    CSTR_TABLE_ENTRY(K_While,"While"),
+    CSTR_TABLE_ENTRY(K_WildCard,"WildCard"),
+  END_CSTR_TABLE;
+
+  ADIkrnlAddCommonStrings( stringtable, status );
+
   }

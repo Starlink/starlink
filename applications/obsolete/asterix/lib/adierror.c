@@ -14,6 +14,64 @@
 #include "ems.h"
 #endif
 
+#define _ESTR(_x,_s) \
+  char *_x = _s;
+
+_ESTR(Estr__AdjObjRef, "adjusting object reference count")
+_ESTR(Estr__AltObjShp, "altering object dimensions")
+_ESTR(Estr__CloFilObj, "closing file object")
+_ESTR(Estr__CloObjId,  "cloning object identifier")
+_ESTR(Estr__CopObj,    "copying object")
+_ESTR(Estr__CopObjCmp, "copying object component")
+_ESTR(Estr__CreFilObj, "creating file object")
+_ESTR(Estr__CreObjDat, "creating new object data")
+_ESTR(Estr__CreRef,    "creating object reference")
+_ESTR(Estr__DefCls,    "defining class")
+_ESTR(Estr__DefClsCac, "defining class cluster size")
+_ESTR(Estr__DefClsDes, "defining class destructor method")
+_ESTR(Estr__DefClsPrt, "defining class print method")
+_ESTR(Estr__DefCst,    "defining common string")
+_ESTR(Estr__DefFilRep, "defining file representation")
+_ESTR(Estr__DefGen,    "defining new generic function")
+_ESTR(Estr__DefGenDis, "defining generic dispatch procedure")
+_ESTR(Estr__DefMcf,    "defining new method combination form")
+_ESTR(Estr__DefMth,    "defining new method")
+_ESTR(Estr__DelObj,    "deleting object")
+_ESTR(Estr__DelObjCmp, "deleting object component")
+_ESTR(Estr__DelObjPrp, "deleting object property")
+_ESTR(Estr__DelStrCmp, "deleting structure component")
+_ESTR(Estr__ExeMth,    "executing method")
+_ESTR(Estr__FshObjGrp, "flushing object group")
+_ESTR(Estr__GetNumCmp, "getting number of structure components")
+_ESTR(Estr__GetNumPrp, "getting number of object properties")
+_ESTR(Estr__GetObjDat, "getting object data")
+_ESTR(Estr__GetObjNam, "getting object name")
+_ESTR(Estr__GetObjRef, "getting object reference count")
+_ESTR(Estr__GetObjShp, "getting object dimensions")
+_ESTR(Estr__GetObjTyp, "getting object type")
+_ESTR(Estr__GetRefObj, "getting reference object id")
+_ESTR(Estr__IndStrCmp, "indexing structure component")
+_ESTR(Estr__IndObjPrp, "indexing object property")
+_ESTR(Estr__LnkFilObj, "linking file objects")
+_ESTR(Estr__LnkObjGrp, "linking object to group")
+_ESTR(Estr__LodDefPkg, "loading definitions package")
+_ESTR(Estr__LocObjCel, "locating object cell")
+_ESTR(Estr__LocObjCmp, "locating object component")
+_ESTR(Estr__LocObjPrp, "locating object property")
+_ESTR(Estr__LocObjSli, "locating object slice")
+_ESTR(Estr__LocStrCmp, "locating structure component")
+_ESTR(Estr__MapObjDat, "mapping object data")
+_ESTR(Estr__OpeFilObj, "opening file object")
+_ESTR(Estr__PriObj,    "printing object")
+_ESTR(Estr__PutObjDat, "putting object data")
+_ESTR(Estr__PutRefObj, "putting reference object id")
+_ESTR(Estr__SetObjDat, "setting object data")
+_ESTR(Estr__TstObjDer, "testing object class derivation")
+_ESTR(Estr__TstObjExi, "testing object existance")
+_ESTR(Estr__TstObjSta, "testing object state")
+_ESTR(Estr__UlnFilObj, "unlinking file objects")
+_ESTR(Estr__UnmObjDat, "unmapping object data")
+
 
 /*
  * Global variables, externally visible
@@ -48,39 +106,6 @@ void adix_errcnl( ADIstatus status )
   *status = SAI__OK;
 #endif
   }
-
-void adix_setetc( char *tok, char *val, int vlen )
-  {
-  if ( vlen < 1 )
-    vlen = strlen(val);
-
-#ifndef NOEMS
-  ems_setc_c( tok, val, vlen );
-#else
-  if ( ADI_G_err_ntok < MAXTOK )
-    {
-    strcpy( ADI_G_err_toks[ADI_G_err_ntok].name, tok );
-    strncpy( ADI_G_err_toks[ADI_G_err_ntok].dat, val, TOKLEN );
-    ADI_G_err_toks[ADI_G_err_ntok].len = vlen;
-
-    ADI_G_err_ntok++;
-    }
-#endif
-  }
-
-
-void adix_seteti( char *tok, ADIinteger val )
-  {
-#ifndef NOEMS
-  ems_seti_c( tok, val );
-#else
-  char	buf[20];
-  int	nc;
-  nc = sprintf( buf, "%ld", val );
-  adix_setetc( tok, buf, nc );
-#endif
-  }
-
 
 /*
  * Routine to expand message tokens for the error context string
@@ -132,24 +157,6 @@ void adix_errexp( char *mes, char *obuf )
 
 
 /*
- *  Set status to an error code
- */
-void adix_setec( ADIstatype code, ADIstatus status )
-  {
-  char		*emsg;			/* Standard error message */
-
-  *status = code;			/* Set the error code */
-
-#ifndef NOEMS
-  emsg = adix_errmsg( code, NULL, 0 );	/* Get text message address */
-
-  if ( emsg )                           /* Set the error */
-    ems_rep_c( " ", emsg, status );
-#endif
-  }
-
-
-/*
  *  Set the contextual message string
  */
 void adix_setes( char *ctx, int clen, ADIstatus status )
@@ -165,9 +172,9 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
     if ( ADI_G_err_rtn ) {		/* Error routine specified? */
       lrtn = strlen( ADI_G_err_rtn );
       strcpy( lctx, ADI_G_err_rtn );
-      strcpy( lctx + lrtn, " : " );
-      strncpy( lctx + lrtn + 3, ctx, clen );
-      *(lctx+lrtn+3+clen) = 0;
+      strcpy( lctx + lrtn, " : Error " );
+      strncpy( lctx + lrtn + 9, ctx, clen );
+      *(lctx+lrtn+9+clen) = 0;
       cptr = lctx;
       }
     else
@@ -192,20 +199,25 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
 void adix_setecs( ADIstatype code, char *ctx, int clen, va_list ap, ADIstatus status )
   {
   char 		buf[200];
-  int  		blen;
   ADIobj	estr;
 
 /* Load users contextual message to use tokens before they're cancelled */
-  estr = ADIstrmExtendCst( ADIstrmNew( "w", status ), buf, 200, status );
-  ADIstrmVprintf( estr, ctx, clen, ap, status );
-  blen = _strm_data(estr)->dev->bnc;
-  adix_erase( &estr, 1, status );
+  if ( ctx && (clen!=0) ) {
+    estr = ADIstrmExtendCst( ADIstrmNew( "w", status ), buf, 200, status );
+    ADIstrmVprintf( estr, ctx, ap, status );
+    buf[_strm_data(estr)->dev->bnc] = 0;
+    adix_erase( &estr, 1, status );
 
-/* Report error for the code given */
-  adix_setec( code, status );
+    *status = code;
 
-/* Report the contextual error */
-  adix_setes( buf, blen, status );
+    adix_setes( buf, _CSM, status );
+    }
+
+  else {
+    *status = code;
+
+    adix_setes( adix_errmsg( code, NULL, 0 ), _CSM, status );
+    }
   }
 
 
@@ -278,4 +290,11 @@ char *adix_errmsg( ADIstatype code, char *buf, int buflen )
     strncpy( buf, sptr, buflen );
 
   return sptr;
+  }
+
+void adix_errout( char *rtn, char *str, ADIstatus status )
+  {
+  ADI_G_err_rtn = rtn;
+  adix_setes( str, _CSM, status );
+  ADI_G_err_rtn = NULL;
   }

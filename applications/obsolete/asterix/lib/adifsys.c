@@ -37,17 +37,17 @@ ADIobj		ADI_G_exten_rep_alist = ADI__nullid;
 
 void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-  adic_cput0i( id, "ADIlink", (ADIinteger) lid, status );
+  adic_cputid( id, "ADIlink", adix_newref( lid, status ), status );
   }
 
 void adix_base_SetLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-  adic_cput0i( id, "ADIlink", (ADIinteger) lid, status );
+  adic_cputid( id, "ADIlink", adix_newref( lid, status ), status );
   }
 
 void adix_base_UnLink( ADIobj id, ADIstatus status )
   {
-  adic_cput0i( id, "ADIlink", 0, status );
+  adic_cputid( id, "ADIlink", ADI__nullid, status );
   }
 
 void adix_newlnk( ADIobj id, ADIobj lid, ADIstatus status )
@@ -63,6 +63,8 @@ void adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
   {
   ADIobj        args[2];
 
+  _chk_init_err; _chk_stat;
+
   args[0] = id; args[1] = lid;
 
   adix_execi( DnameSetLink, 2, args, status );
@@ -70,6 +72,8 @@ void adix_setlnk( ADIobj id, ADIobj lid, ADIstatus status )
 
 void adix_unlnk( ADIobj id, ADIstatus status )
   {
+  _chk_init_err; _chk_stat;
+
   adix_execi( DnameUnLink, 1, &id, status );
   }
 
@@ -83,11 +87,15 @@ ADIlogical adix_isfile( ADIobj id, ADIstatus status )
 
 ADIobj adix_getlink( ADIobj id, ADIstatus status )
   {
-  ADIobj lid;
+  ADIobj	rid,lid;
 
-  adic_cget0i( id, "ADIlink", &lid, status );
+  _chk_init_err; _chk_stat_ret(ADI__nullid);
 
-  return lid;
+  adic_find( id, "ADIlink", &lid, status );
+  rid = adix_getref( lid, status );
+  adic_erase( &lid, status );
+
+  return rid;
   }
 
 
@@ -96,7 +104,7 @@ void adix_getfile( ADIobj id, ADIobj *root, ADIstatus status )
   ADIlogical    found = ADI__false;
   ADIobj        lid = id;
 
-  _chk_stat;
+  _chk_init_err; _chk_stat;
 
   while ( (lid!=ADI__nullid) && _ok(status) && ! found )
     {
@@ -128,7 +136,7 @@ void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
   ADIobj lid = id;
   ADIclassDef *tdef;
 
-  _chk_stat;
+  _chk_init_err; _chk_stat;
 
   while ( (lid!=ADI__nullid) && _ok(status) ) {
     tdef = _DTDEF(lid);
@@ -181,7 +189,7 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
   ADIobj        repid;
   ADIlogical	there;
 
-  _chk_stat;
+  _chk_init_err; _chk_stat;
 
 /* Get file object */
   adix_getfile( id, &fid, status );
@@ -219,33 +227,6 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
  * Data system routines
  */
 
-void ADIfsysFileTrace( ADIobj id, ADIstatus status )
-  {
-  ADIobj	fid;			/* File object at end of chain */
-  ADIobj	ortn;			/* Close routine */
-  ADIobj        repid;
-  ADIlogical	there;
-
-  _chk_stat;
-
-/* Get file object */
-  adix_getfile( id, &fid, status );
-
-/* Extract representation id from file object */
-  adic_cget0i( fid, "REP", &repid, status );
-
-/* Representation has supplied a closure routine? */
-  adic_there( repid, "TRACE_RTN", &there, status );
-
-  if ( there ) {
-    adix_locrcb( repid, "TRACE_RTN",	/* Locate the opening routine */
-              _CSM, &ortn, status );
-
-/* Try to close the file */
-    ADIkrnlExecO( ortn, fid, status );
-    }
-
-  }
 
 void adix_fcreat_int( ADIobj rtn, ADIobj fspec, ADIobj id, ADIobj *fileid,
                       ADIstatus status )
@@ -268,12 +249,12 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
 
-  _chk_stat;				/* Check status on entry */
+  _chk_init; _chk_stat;			/* Check status on entry */
 
   _GET_NAME(fspec,flen);		/* Import strings resolving lengths */
 
   adic_newv0c_n( fspec, flen, &fid,	/* Construct ADI strings */
-                          status );
+			  status );
 
   ppos = strstr( fspec, "%" );		/* Look for representation delimiter */
 
@@ -375,16 +356,15 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
   int		rlen;
 
-  _chk_stat;				/* Check status on entry */
+  _chk_init; _chk_stat;			/* Check status on entry */
 
   _GET_STRING(fspec,flen);		/* Import strings resolving lengths */
   _GET_STRING(cls,clen);
   _GET_STRING(mode,mlen);
 
-  adic_newv0c_n( fspec, flen, &fid,	/* Construct ADI strings */
-                          status );
-  adic_newv0c_n( mode, mlen, &mid,
-                          status );
+/* Construct ADI strings */
+  adic_newv0c_n( fspec, flen, &fid, status );
+  adic_newv0c_n( mode, mlen, &mid, status );
 
   ppos = strstr( fspec, "%" );		/* Look for representation delimiter */
 
@@ -399,11 +379,10 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
                    status );
     else {
       adix_locrcb( rid, "OPEN_RTN",	/* Locate the open routine */
-		   _CSM,
-		   &ortn, status );
+		   _CSM, &ortn, status );
 
-      adix_fopen_int( ortn, fid, mid,	/* Try to open file */
-                        id, status );
+/* Try to open file */
+      adix_fopen_int( ortn, fid, mid, id, status );
 
       found = _ok(status);		/* Opened ok? */
       }
@@ -465,12 +444,12 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
     if ( strx_cmpc( cls, clen, ocls)) {	/* They're different! */
       ADIobj newid;
 
-      adix_newn( ADI__nullid, NULL, 0,	/* Create requested class object */
-		 cls, clen, 0, NULL,
+/* Create requested class object */
+      adix_newn( ADI__nullid, NULL, 0, cls, clen, 0, NULL,
 		 &newid, status );
 
-      adix_setlnk( newid, *id,		/* Try to link them */
-                     status );
+/* Try to link them */
+      adix_setlnk( newid, *id, status );
 
       if ( _ok(status) )
         *id = newid;
@@ -478,7 +457,6 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
     }
 
   }
-
 
 
 /*  Locate a file representation object by name
@@ -491,7 +469,7 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
   ADIlogical    found = ADI__false;     /* Found the representation yet? */
   ADIobj        nid;                    /* NAME member address */
 
-  _chk_stat;                            /* Check status on entry */
+  _chk_init; _chk_stat;                 /* Check status on entry */
 
   _GET_NAME(name,nlen);               	/* Import string */
 
@@ -526,7 +504,7 @@ void adix_defrep( char *name, int nlen, ADIobj *id, ADIstatus status )
   ADIobj        newid;
   ADIobj        nid;
 
-  _chk_stat;                            /* Check status on entry */
+  _chk_init; _chk_stat;                 /* Check status on entry */
 
   _GET_NAME(name,nlen);               	/* Import string */
 
@@ -556,16 +534,17 @@ void adix_defrep( char *name, int nlen, ADIobj *id, ADIstatus status )
 void adix_defrcb( ADIobj rid, char *name, int nlen,
 		  ADIobj rtn, ADIstatus status )
   {
-  _chk_stat;
-  adix_cputid( rid, name, nlen,		/* Store rtn in the appropriate member */
-	       rtn, status );
+  _chk_init_err; _chk_stat;
+
+/* Store rtn in the appropriate member */
+  adix_putid( rid, name, nlen, rtn, status );
   }
 
 
 void adix_locrcb( ADIobj rid, char *name, int nlen,
 		  ADIobj *rtn, ADIstatus status )
   {
-  _chk_stat;
+  _chk_init_err; _chk_stat;
 
   *rtn = adix_find( rid, name, nlen,   	/* Find member data identifier */
 		    status );
@@ -602,11 +581,11 @@ void ADIfsysInit( ADIstatus status )
   ADIkrnlAddCommonStrings( stringtable, status );
 
   adic_defcls( "FileRepresentation", "",
-	   "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN,COMIT_RTN,TRACE_RTN",
+	   "NAME,OPEN_RTN,CREAT_RTN,NATRL_RTN,CLOSE_RTN,COMIT_RTN",
 	       &DsysFileRep, status );
+  adic_defcac( DsysFileRep, 8, status );
 
-  adic_defcls( "FileObject",
-	       "ADIbase", "REP,MODE",
+  adic_defcls( "FileObject", "ADIbase", "REP,MODE",
 	       &DsysFileObj, status );
 
   adic_defcls( "Scalar",

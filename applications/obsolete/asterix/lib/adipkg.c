@@ -110,6 +110,8 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   ADIobj		pstream;
   int			ulen = 0, flen;
 
+  _chk_init; _chk_stat;
+
   if ( ! ADI_G_getenv ) {		/* Not got ADI_LOAD_PATH yet */
     ADI_G_ldpath =
 	getenv( "ADI_LOAD_PATH" );

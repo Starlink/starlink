@@ -165,7 +165,7 @@ if ( newm )
   }
 #endif
       if ( ! newm )
-	adic_setec( ADI__OUTMEM, status );
+	adic_setecs( ADI__OUTMEM, NULL, status );
       }
     else
       adic_setecs( ADI__INVARG,
@@ -717,8 +717,6 @@ void ADImemFreeObj( ADIobj *id, int nval, ADIstatus status )
 	for( ibit=0; ibit<(nval%CHAR_BIT); ibit++ )
 	  uptr[i8] &= (bit_mask[ibit] ^ 0xFF);
 
-/* Adjust free count */
-	bptr->nfree -= nval;
 	}
 
 /* Single slot to deallocate */
@@ -729,9 +727,6 @@ void ADImemFreeObj( ADIobj *id, int nval, ADIstatus status )
 
 /* Reset allocated bit */
 	uptr[i8] &= (bit_mask[ibit] ^ 0xFF);
-
-/* Adjust free count */
-	bptr->nfree--;
 	}
       }
 
@@ -753,6 +748,9 @@ void ADImemFreeObj( ADIobj *id, int nval, ADIstatus status )
 /* And the block's most recent last object becomes the first object */
       bptr->vdat.std.ffree = iobj;
       }
+
+/* Adjust free count */
+    bptr->nfree += nval;
     }
 
 /* Master or slave block. It is an error to attempt to deallocate a */

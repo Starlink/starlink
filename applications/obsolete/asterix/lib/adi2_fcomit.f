@@ -242,7 +242,7 @@
           ELSE
             CALL ADI2_STDCMT( KEY, CMT, STATUS )
           END IF
-          CALL ADI_CLASS( KID, CLASS, STATUS )
+          CALL ADI_TYPE( KID, CLASS, STATUS )
           IF ( CLASS(1:1) .EQ. 'D' ) THEN
             CALL ADI_GET0D( KID, DVALUE, STATUS )
             CALL FTPKYG( LUN, KEY, DVALUE, 8, CMT, FSTAT )
