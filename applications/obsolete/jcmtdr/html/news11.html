@@ -1,0 +1,45 @@
+<title>JCMTDR documentation</title>
+
+<h1>JCMTDR - News 1.1</h1>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+ This is the Port of JCMTDR 1.0 to Unix. Note the following differences
+ in the Unix version:
+<p>
+<ul>
+<li>So far it is common to run the commands from the Unix shell. To start
+   up JCMTDR from the shell you need to:
+<pre>
+      source /star/etc/cshrc in your .chsrc
+      source /star/etc/login in your .login
+</pre>
+   Then the command:
+<pre>
+      % jcmtdr
+</pre
+   will define all the commands of the JCMTDR package.
+<p>
+
+<li>On-line help is available, from the Unix shell use ``jcmt_help''.
+<p>
+
+<li>GSD format is currently not supported. Thus MAKEMAP, GSD_PRINT and
+   GSD_FORMAT are not available. You will have to process GSD data on a
+   VAX with JCMTDR 1.0.
+<p>
+
+<li>JCMTDR data are in Figaro/NDF format and can be transferred as binary
+   files between VMS and various Unix flavours. It is not necessary to
+   process the files. However, you might run the ``native'' command from
+   the Kappa package on the files on the destination machine. This may
+   save some time in further access to the file.
+</ul>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

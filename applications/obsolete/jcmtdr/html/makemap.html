@@ -1,0 +1,99 @@
+<title>JCMTDR applications</title>
+
+<h1>JCMTDR - The Applications</h1>
+<h2>MAKEMAP</h2>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+This takes a JCMT data file in GSD format and converts it to a Figaro
+file. It is recommended that the JOB logical name (on Unix an
+environment variable) FIGARO_FORMATS be
+set  to `NDF' before running the application so that the output file
+will be a Starlink NDF, readable by both KAPPA and Figaro. The command
+has the following parameters:
+<pre>
+PARAMETER  GSDFILE
+   TYPE    CHAR
+   NAME    GSD(FILE)
+   PROMPT  "(GSDfile) GSD file containing JCMT data"
+   TEXT    --------------------------------------------------
+           On VMS, the file name has the default extension
+           .DAT which should not be specified. On Unix the
+           extension must be specified.
+           --------------------------------------------------
+
+PARAMETER  OUTPUT
+   TYPE    FILE
+   NAME    OUT(PUT)
+   OPTIONS OUTPUT
+   PROMPT  "(OUTput) name of resulting Figaro data file"
+   TEXT    --------------------------------------------------
+           This file will have the extension .DST unless the
+           logical name FIGARO_FORMATS is set to NDF, in which
+           case it will be a Starlink NDF with file extension
+           .SDF.
+           --------------------------------------------------
+
+PARAMETER  CHANNEL
+   TYPE    INT
+   NAME    CHAN(NEL)
+   OPTIONS NOPROMPT
+   PROMPT  "(CHANnel) backend channel to be used"
+   TEXT    --------------------------------------------------
+           In a multi backend channel system the channel
+           number that should be used to make the map has to
+           be specified. The default is channel 1.
+           --------------------------------------------------
+
+PARAMETER  TEL_BEAM
+   TYPE    CHAR
+   NAME    TEL(_BEAM)
+   PROMPT  "(TEL_beam) beam that telescope was in during map"
+   TEXT    --------------------------------------------------
+           The beam towards which the telescope was pointing
+           while the map was made. The choice is L, M or R.
+           The majority of maps are made with the telescope
+           in the middle (M) beam, in fact this version of the
+           JCMTDR package won't work unless this is the case.
+           --------------------------------------------------
+
+PARAMETER  POS_BEAM
+   TYPE    CHAR
+   NAME    POS(_BEAM)
+   PROMPT  "(POS_beam) positive beam of chopper"
+   TEXT    --------------------------------------------------
+           The positive beam of the secondary chopper while
+           the map was made. This should be L or R.
+           --------------------------------------------------
+</pre>
+
+The output from MAKEMAP is a Figaro file whose main data array is a
+2-d map made up of from the measured data arranged according to its
+cell offset from the observation map centre. The x and y axes of the
+data are the pixel offsets along the cell axes from the map centre. If
+the data were obtained pixel by pixel rather than by scanning then it
+is possible that not all the pixels in the mesh were observed. Such
+pixels will be set to a `bad' value.
+<p>
+The application creates a JCMT-specific section in the file in which
+are stored parameters relating to the telescope, the environment and
+the way in which the map was made. 
+<p>
+If MAKEMAP fails to find important items in the GSD file, they will be 
+prompted for. If all else fails you can create, delete, rename or set
+individual items in the datafile using Figaro commands.
+On VMS the relevant commands are CROBJ, DELOBJ, RENOBJ and LET, on Unix
+they are CREOBJ, DELOBJ, RENOBJ and SETOBJ.
+(See
+<a href=formats.html>Datafile formats</a>
+for a description
+of the data structures used.)
+<p>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

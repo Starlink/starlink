@@ -1,0 +1,38 @@
+<title>JCMTDR applications</title>
+
+<h1>JCMTDR - The Applications</h1>
+<h2>MAP2TS</h2>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+This application converts an image into a `time spectrum' with the map
+pixels sorted in order of increasing LST of observation. The LST is
+stored as  the X axis. It is useful to have the data in this form if
+you want to spot and correct variations in the data that are functions
+of time. The data will have to be transformed back into map format
+using
+<a href=ts2map.html>TS2MAP</a>
+before being input to other JCMTDR applications.
+<p>
+The application has the following parameters:
+<pre>
+PARAMETER  INPUT
+   TYPE    FILE
+   NAME    IN(PUT)
+   OPTIONS INPUT
+   PROMPT  "(INput) file containing map data"
+
+PARAMETER  OUTPUT
+   TYPE    FILE
+   NAME    OUT(PUT)
+   OPTIONS OUTPUT
+   PROMPT  "(OUTput) "file to contain time-sorted data"
+</pre>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

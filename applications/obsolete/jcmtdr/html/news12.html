@@ -1,0 +1,45 @@
+<title>JCMTDR documentation</title>
+
+<h1>JCMTDR - News 1.2</h1>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+ Version 1.2 of JCMTDR for Unix.
+<p>
+ Since the previous version (1.1), GSD support has been added.
+<ul>
+<li>GSD files can be converted with ``makemap'' into NDF format for (i)
+    further use in JCMTDR, (ii) use in Figaro, (iii) use in Kappa and
+    associated packages.
+
+<li>GSD files can be inspected with ``gsd_print''. The name of the GSD
+    file must be given as first argument. Output is on standard output,
+    it can be re-directed to a file or piped into other commands like
+    ``more''.<br>
+    The exact format of gsd_print is changed compared to the VAX
+    version.
+</ul>
+ GSD files must be specified by full name, including the file name
+ extension (usually .DAT or .dat).
+<p>
+ GSD files can be taken across from the VAX/VMS system to the Unix
+ system either by ftp transfer in binary mode, or with the Unix ``cp''
+ command if the VAX file system is mounted by the Unix machine.
+<p>
+
+ A further change is in ``ae2rd1'' and ``ae2rd2''. The parameter INFILE is
+ now prompted with blank default for the first file and with default
+ `END' for any further files.
+<p>
+
+ Starlink User Note 132 is available on-line as Web pages. The browser
+ for these pages can be started with ``jcmt_xhelp'' from the Unix shell.
+<p>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

@@ -1,0 +1,90 @@
+<title>JCMTDR applications</title>
+
+<h1>JCMTDR - The Applications</h1>
+<h2>MAP2MEM</h2>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+This application takes a JCMT map file and converts the data into a
+format suitable for further processing (deconvolution and resampling)
+by the  DBMEM package written by J.S. Richer. The parameters required
+are:
+<pre>
+PARAMETER  INPUT
+   TYPE    FILE
+   NAME    IN(PUT)
+   OPTIONS INPUT
+   PROMPT  "(INput) The name of the file containing JCMT map data"
+
+PARAMETER  OUTPUT
+   TYPE    CHAR
+   NAME    OUT(PUT)
+   PROMPT  "(OUTput) The rootname of the DBMEM file to contain the map"
+   TEXT   ---------------------------------------------------
+          The map will be output to 2 files; the header file
+          <rootname>.DBH, and the data file which will
+          either be <rootname>.MEM or .BIN depending on the
+          value of parameter BINARY.
+          ---------------------------------------------------
+
+PARAMETER B1950 
+   TYPE    KEY 
+   NAME    B1(950) 
+   PROMPT "(B1950) make output coordinates B1950 equinox"
+   TEXT   ---------------------------------------------------
+          By default the application will transform the data 
+          into a map whose centre and tangent plane offsets
+          are in the FK5 system with Julian 2000 equinox.
+          Setting B1950 to YES will give results in the FK4
+          system with Besselian 1950 equinox.
+          ---------------------------------------------------
+
+PARAMETER BINARY
+   TYPE   KEY
+   NAME   BINARY
+   PROMPT "(BINARY) output data to unformatted file"
+   TEXT   ---------------------------------------------------
+          YES will result in the output data being written to
+          file <rootname>.BIN, NO will give ASCII numbers in 
+          <rootname>.MEM.
+          ---------------------------------------------------
+
+PARAMETER RA_CENTRE
+   TYPE   CHAR
+   PROMPT "(RA_centre) The RA of the centre of the output map"
+   TEXT   ---------------------------------------------------
+          The positions of the output map pixels will be 
+          given in terms of a tangent plane offset in arcsec 
+          from a map centre specified by the user. This parameter
+          specifies the RA of the centre, it must be input in 
+          hh mm ss.s format.
+          ---------------------------------------------------
+
+PARAMETER DEC_CENTRE
+   TYPE   CHAR
+   PROMPT "(DEC_centre) The Dec. of the centre of the output map"
+   TEXT   ---------------------------------------------------
+          The positions of the output map pixels will be 
+          given in terms of a tangent plane offset in arcsec 
+          from a map centre specified by the user. This parameter
+          specifies the declination of the centre, it must be 
+          input in (sign)dd mm ss.s format.
+          ---------------------------------------------------
+
+PARAMETER NOISE
+   TYPE   FLOAT
+   PROMPT "(NOISE) Estimate of noise on each map point"
+   TEXT   ---------------------------------------------------
+          An estimate of the noise on each measured data point.
+          If the input data already has an associated error
+          array then those numbers will be used.
+          ---------------------------------------------------
+</pre>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

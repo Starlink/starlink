@@ -1,0 +1,95 @@
+<title>JCMTDR documentation</title>
+
+<h3>DRAL / Rutherford Appleton Laboratory<br>
+Particle Physics &amp Astronomy Research Council<br>
+Starlink Project<br>
+Starlink User Note 132.2(html)</h3>
+<em>J.F. Lightfoot, P.A. Harrison, H. Meyerdierks</em><p>
+
+<hr>
+
+<h1>JCMTDR - Applications for Reducing JCMT Data</h1>
+<em>Version 1.2</em><p>
+
+<hr>
+
+<ul>
+<li><a href=http://www.roe.ac.uk/hmewww/jcmtdr/index.html>
+   The JCMTDR Bulletin</a>
+<li><a href=news12.html>[News item for software version 1.2]</a>
+<li><a href=news11.html>[News item for software version 1.1]</a>
+</ul>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#intro">Introduction</a>
+<li>The Applications
+   <ul>
+   <li><a href="ae2rd1.html">AE2RD1</a>
+      <ul>
+      <li><a href="ae2rd1.html#pointing">Pointing Corrections</a>
+      </ul>
+   <li><a href="ae2rd2.html">AE2RD2</a>
+   <li><a href="iras_tag.html">IRAS_TAG</a>
+   <li><a href="jcmtextc.html">JCMTEXTC</a>
+   <li><a href="makemap.html">MAKEMAP</a>
+   <li><a href="map2mem.html">MAP2MEM</a>
+   <li><a href="map2ts.html">MAP2TS</a>
+   <li><a href="restore.html">RESTORE</a>
+   <li><a href="ts2map.html">TS2MAP</a>
+   </ul>
+<li><a href=gsdutils.html>GSD Utilities</a>
+   <ul>
+   <li>GSD_PRINT
+   <li>GSD_FORMAT
+   </ul>
+<li><a href=formats.html>Datafile Formats</a>
+</ul>
+
+<hr>
+
+<a name="intro"><h2>Introduction</h2></a>
+
+JCMTDR is a package of Figaro applications that is intended to replace
+NOD2 for the reduction of continuum mapping data obtained with UKT14
+on the James Clerk Maxwell Telescope.
+<p>
+The package is available for both VAX/VMS and Unix machines. 
+On VMS the package can be run from DCL or ICL.
+The DCL commands are made available by typing:
+
+<pre>
+      $ JCMTDR
+</pre>
+
+The ICL version is loaded by typing:
+
+<pre>
+      $ ADAMSTART
+      $ ICL
+      ICL> JCMTDR
+</pre>
+
+The Unix version should be run from the shell, although it should also
+run from ICL. Make the commands available by typing:
+
+<pre>
+      % jcmtdr
+</pre>
+
+The applications have lower-case names, a fact ignored in the rest of
+this document.
+<p>
+Help information for VAX/DCL and VAX/ICL versions can be obtained by
+typing HELP JCMTDR. For the Unix version the command is ``jcmt_help''.
+On Unix this document is also available in HyperText format (as World
+Wide Web pages). Give the command ``jcmt_xhelp'' to start browsing
+those pages.
+<p>
+
+<hr>
+
+<a href=dochist.html>Document history</a><p>
+
+<address>(C) PPARC 1995, 12 January 1995, hme@roe.ac.uk</address>

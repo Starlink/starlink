@@ -1,0 +1,75 @@
+ 
+ ----------- Initialising for  Figaro ------------
+              General data reduction
+         Version 3.2-3  15 September 1994
+ 
+          Type "fighelp figaro" for help
+    or "fighelp news" for news on 3.1-1, 3.2, 3.2-3
+ 
+ 
+ ------------ Initialised for JCMTDR ------------
+           Version 1.2  14 December 1994
+ 
+          Type "jcmt_help jcmtdr" for help
+ 
+GSD Version 4.0
+
+Y-range 1 (-112) to 57 (112)
+X-range 71 (140) to 71 (140)
+Total (over 57 pixels) = 296.69
+Max   = 5.5287   in pixel (71,41)
+Min   = 4.8704   in pixel (71,24)
+Mean  = 5.2051
+Sigma = 0.159019
+
+
+Y-range 1 (-112) to 57 (112)
+X-range 71 (140) to 71 (140)
+Total (over 57 pixels) = -0.41892
+Max   = 0.31632  in pixel (71,41)
+Min   = -0.34203 in pixel (71,24)
+Mean  = -7.3494E-3
+Sigma = 0.159019
+
+Map was scanned along x-cells
+ratio of beams = 1.000
+separation of beams=  38.5 arcseconds
+Rebinning by Bessel function convolution.
+B1950 - (B1950) make output coordinates B1950 equinox /FALSE/ > INFILE - (INfile) The name of a file containing JCMT map data /'end'/ > AE2RD1 - No pointing corrections applied
+INFILE - (INfile) The name of a file containing JCMT map data /'rxa_146erj'/ > Coordinates are FK5 J2000.0
+RA_CENTRE - (RA_centre) The RA of the centre of the output map /'+05 35 14.37'/ > DEC_CENTRE - (DEC_centre) The Dec. of the centre of the output map /'-005 22 32.3'/ > OUTPUT - (OUTput) The name of the file to contain the output map /'rxa_146erja'/ > 
+Y-range 1 (-180) to 96 (200)
+X-range 1 (192) to 98 (-196)
+Total (over 9408 pixels) = -7694.1
+Max   = 90.538   in pixel (49,46)
+Min   = -149.27  in pixel (64,21)
+Mean  = -0.81782
+Sigma = 15.5632
+
+MAP2MEM - No pointing corrections applied
+Coordinates are FK5 J2000.0
+Header for the DBMEM data file rxa_146e.mem
+Written by MAP2MEM on Wed Dec 14 11:48:22 1994
+       4047
+         71
+         57
+          7
+F
+  1.46275826443488     
+-9.382259800936073E-002
+RJ2000.0            
+RA-DEC MAP
+ 
+ 
+ 
+End of DBMEM header file
+ 2.0123E-02  5.3114E+01 -1.5596E+02  8.6994E+01 -1.7425E+02  1.0000E+00  2.6488E+00
+-1.1217E-01  4.9575E+01 -1.5407E+02  8.3453E+01 -1.7236E+02  1.0000E+00  2.6487E+00
+ 4.2999E-01  4.6037E+01 -1.5217E+02  7.9913E+01 -1.7047E+02  1.0000E+00  2.6485E+00
+-2.4352E-01  4.2499E+01 -1.5028E+02  7.6373E+01 -1.6858E+02  1.0000E+00  2.6483E+00
+ 4.0482E-01  3.8962E+01 -1.4838E+02  7.2833E+01 -1.6668E+02  1.0000E+00  2.6482E+00
+-2.9841E-01  3.5425E+01 -1.4648E+02  6.9294E+01 -1.6479E+02  1.0000E+00  2.6480E+00
+ 4.3960E-01  3.1889E+01 -1.4459E+02  6.5755E+01 -1.6290E+02  1.0000E+00  2.6479E+00
+ 7.4309E-03  2.8353E+01 -1.4269E+02  6.2217E+01 -1.6100E+02  1.0000E+00  2.6477E+00
+-1.3524E-02  2.4817E+01 -1.4079E+02  5.8680E+01 -1.5911E+02  1.0000E+00  2.6476E+00
+-1.6425E-01  2.1282E+01 -1.3889E+02  5.5142E+01 -1.5721E+02  1.0000E+00  2.6474E+00

@@ -1,0 +1,64 @@
+Interface MAP2MEM
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(INput) The name of the file containing JCMT map data'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "INPUT"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) The rootname of the DBMEM file to contain the map'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "OUTPUT"'
+   EndParameter
+
+   Parameter B1950
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(B1950) make output coordinates B1950 equinox'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "B1950"'
+   EndParameter
+
+   Parameter BINARY
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(BINARY) output data to unformatted file'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "BINARY"'
+   EndParameter
+
+   Parameter RA_CENTRE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(RA_centre) The RA of the centre of the output map'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "RA_CENTRE"'
+   EndParameter
+
+   Parameter DEC_CENTRE
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(DEC_centre) The Dec. of the centre of the output map'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "DEC_CENTRE"'
+   EndParameter
+
+   Parameter NOISE
+      Position  5
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(NOISE) Estimate of noise on each map point'
+      Help   'For more details, use "HELP MAP2MEM" and select topic "NOISE"'
+   EndParameter
+
+EndInterface

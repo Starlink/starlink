@@ -1,0 +1,68 @@
+<title>JCMTDR applications</title>
+
+<h1>JCMTDR - The Applications</h1>
+<h2>RESTORE</h2>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+This application deconvolves the chopped-beam from a JCMT dual  beam
+map of a source in a manner similar to that described by  Emerson,
+Klein &amp Haslam (Astron. Astrophys., 76, 92). The algorithm  is exactly
+the same as that used in NOD2; first the spatial  frequencies to which
+the chop is insensitive are set to zero,  then the chop is
+deconvolved. The map is deconvolved scan by scan.
+<p>
+The source will come out negative if the positive beam of the chopper
+was specified wrongly in
+<a href=makemap.html>MAKEMAP</a>.
+This can be fixed by using LET (on
+VMS) or SETOBJ (on Unix) to
+set <em>file</em>.MORE.JCMT.MAP.POS_BEAM to the correct value and
+re-running RESTORE. Similarly, the chop throw  is read from
+<em>file</em>.MORE.JCMT.MAP.CHOP_THRW and can be changed if you  believe that
+the nominal value was inaccurate.
+<p>
+If there are any bad pixels in the input data they will be ignored,
+effectively treated as zero in the restoration process. If the pixel
+is in the source then this is <em>not what you want to happen.</em> The
+pixel should be set to something nearer to its real value by using one
+of the Figaro data editing applications. Similarly  the process
+carries the implicit assumption that all data points outside the raw
+map would have been zero had they been measured. Bad results will be
+obtained if the raw map does not extend right off the source in the
+scan direction. Lastly, the zero level in the raw map must be set to 0
+before RESTORE is run, often the raw data has a DC offset.
+<p>
+The parameters used are:
+<pre>
+PARAMETER  INPUT
+   TYPE    FILE
+   NAME    IN(PUT)
+   OPTIONS INPUT
+   PROMPT  "(INput) file containing map data"
+
+PARAMETER  OUTPUT
+   TYPE    FILE
+   NAME    OUT(PUT)
+   OPTIONS OUTPUT
+   PROMPT  "(OUTput) file to contain restored map"
+
+PARAMETER  UNBAL
+   TYPE    FLOAT
+   NAME    UNBAL
+   OPTIONS NOPROMPT
+   PROMPT  "(UNBAL) amplitude (L beam) / amplitude (R beam)"
+   TEXT    ------------------------------------------------------
+           The ratio of the amplitude of the left hand chop beam
+           and that of the right hand chop beam. For the JCMT this
+           will normally be 1.
+           ------------------------------------------------------
+</pre>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

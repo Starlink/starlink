@@ -1,0 +1,58 @@
+#  12 Jan 1995 (hme):
+#     DYNAMIC default must take precedence in INFILE.
+Interface AE2RD1
+
+   Parameter INFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'DYNAMIC,CURRENT'
+      Prompt '(INfile) The name of a file containing JCMT map data'
+      Help   'For more details, use "HELP AE2RD1" and select topic "INFILE"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) The name of the file to contain the output map'
+      Help   'For more details, use "HELP AE2RD1" and select topic "OUTPUT"'
+   EndParameter
+
+   Parameter B1950
+      Type '_LOGICAL'      
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(B1950) make output coordinates B1950 equinox'
+      Help   'For more details, use "HELP AE2RD1" and select topic "B1950"'
+   EndParameter
+
+   Parameter WEIGHT
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(WEIGHT) weight of this dataset relative to the first'
+      Help   'For more details, use "HELP AE2RD1" and select topic "WEIGHT"'
+   EndParameter
+
+   Parameter RA_CENTRE
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'DYNAMIC'
+      Prompt '(RA_centre) The RA of the centre of the output map'
+      Help   'For more details, use "HELP AE2RD1" and select topic "RA_CENTRE"'
+   EndParameter
+
+   Parameter DEC_CENTRE
+      Position  5
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'DYNAMIC'
+      Prompt '(DEC_centre) The Dec. of the centre of the output map'
+      Help   'For more details, use "HELP AE2RD1" and select topic "DEC_CENTRE"'
+   EndParameter
+
+EndInterface

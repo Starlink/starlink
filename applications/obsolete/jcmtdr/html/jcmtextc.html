@@ -1,0 +1,62 @@
+<title>JCMTDR applications</title>
+
+<h1>JCMTDR - The Applications</h1>
+<h2>JCMTEXTC</h2>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+This application corrects JCMT data for the effect of  atmospheric
+extinction. The airmass at which each map pixel was  observed is
+calculated, and multiplied by the estimated zenith  atmospheric
+extinction at the time of observation to give the  extinction optical
+depth along the line of sight. Multiplying the data point by the
+exponential of the optical depth gives  the value that would have been
+measured above the atmosphere. 
+<p>
+The zenith optical depth is assumed to vary linearly with  time
+between the values given by the parameters TAU and ENDTAU.
+<p>
+The parameters used are:
+<pre>
+PARAMETER  INPUT
+   TYPE    FILE
+   NAME    IN(PUT)
+   OPTIONS INPUT
+   PROMPT  "(INput) file containing map data to be corrected"
+
+PARAMETER  OUTPUT
+   TYPE    FILE
+   NAME    OUT(PUT)
+   OPTIONS OUTPUT
+   PROMPT  "(OUTput) file to contain the corrected data"
+
+PARAMETER  TAU
+   TYPE    FLOAT
+   NAME    TAU
+   OPTIONS REQUIRED
+   PROMPT  "(TAU) initial value of the atmospheric extinction"
+   TEXT    --------------------------------------------------
+           The value of the zenith atmospheric extinction at
+           the start of the map observation.
+           --------------------------------------------------
+
+PARAMETER  ENDTAU
+   TYPE    FLOAT
+   NAME    ENDTAU
+   OPTIONS REQUIRED
+   PROMPT  "(ENDTAU) final value of the atmospheric extinction"
+   TEXT    --------------------------------------------------
+           The value of the zenith atmospheric extinction at
+           the end of the map observation. The zenith extinction
+           for each pixel will be calculated assuming a linear 
+           gradient with time between the start and end values.
+           --------------------------------------------------
+</pre>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

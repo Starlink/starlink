@@ -1,0 +1,48 @@
+Interface FAKE
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(INput) Name of file containing MAP data'
+      Help   'For more details, use "HELP FAKE" and select topic "INPUT"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) Name of file to contain the fake data'
+      Help   'For more details, use "HELP FAKE" and select topic "OUTPUT"'
+   EndParameter
+
+   Parameter FAKE_TYPE
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(FAKE_type) Type of fake; AIRY or FLAT'
+      Help   'For more details, use "HELP FAKE" and select topic "FAKE_TYPE"'
+   EndParameter
+
+   Parameter XOFF
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(XOFF) The x offset of the Airy disk from the map centre'
+      Help   'For more details, use "HELP FAKE" and select topic "XOFF"'
+   EndParameter
+
+   Parameter YOFF
+      Position  5
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(YOFF) The y offset of the Airy disk from the map centre'
+      Help   'For more details, use "HELP FAKE" and select topic "YOFF"'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,21 @@
+Interface TS2MAP
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(INput) Name of file containing time-sorted data'
+      Help   'For more details, use "HELP TS2MAP" and select topic "INPUT"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) Name of file to contain map data'
+      Help   'For more details, use "HELP TS2MAP" and select topic "OUTPUT"'
+   EndParameter
+
+EndInterface

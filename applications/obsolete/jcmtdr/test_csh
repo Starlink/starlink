@@ -1,0 +1,85 @@
+#!/bin/csh
+#+
+#  Name:
+#     test_csh
+#
+#  Purpose:
+#     Test the JCMTDR package from the C shell.
+#
+#  Type of Module:
+#     C shell command list
+#
+#  Invocation:
+#     source $JCMTDR_DIR/test_csh
+#
+#  Description:
+#     This procedure tests the JCMTDR package from the C shell. Figaro and
+#     JCMTDR must be installed.
+#
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     06 Jul 1994 (hme):
+#        Original Version
+#     14 Dec 1994 (hme):
+#        Add some GSD reading.
+#     {enter_changes_here}
+#
+#-
+#.
+
+#  Need Figaro for auxiliary tasks.
+
+figaro
+
+#  Start up the package.
+
+jcmtdr
+
+#  Get the test data.
+
+cp $JCMTDR_DIR/rxa_146.dat .
+cp $JCMTDR_DIR/rxa_146.sdf .
+
+#  Here we go...
+
+makemap gsdfile=rxa_146.dat output=rxa_146m tel_beam=M pos_beam=R
+
+istat rxa_146m ystart=min yend=max xstart=max xend=min
+istat rxa_146  ystart=min yend=max xstart=max xend=min
+
+jcmtextc input=rxa_146 output=rxa_146e tau=0.254 endtau=0.258
+
+setobj value=38.5 object=rxa_146e.more.jcmt.map.chop_thrw
+
+restore input=rxa_146e output=rxa_146er
+
+icmult image=rxa_146er factor=15.3 output=rxa_146erj
+
+ae2rd1 <<FOO
+no
+rxa_146erj
+end
+
+
+rxa_146erja
+FOO
+
+istat rxa_146erja ystart=-180 yend=200 xstart=192 xend=-196
+
+map2mem b1950=no input=rxa_146e output=rxa_146e binary=no accept
+
+cat rxa_146e.dbh
+
+head rxa_146e.mem
+
+#  That's it. Clean up and exit.
+
+rm rxa_146.dat rxa_146m.sdf rxa_146.sdf rxa_146e.sdf rxa_146er.sdf \
+   rxa_146erj.sdf rxa_146erja.sdf rxa_146e.dbh rxa_146e.mem
+
+exit
+
+#  End of test_csh.

@@ -1,0 +1,30 @@
+Interface RESTORE
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(INput) file containing map data'
+      Help   'For more details, use "HELP RESTORE" and select topic "INPUT"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) file to contain restored map'
+      Help   'For more details, use "HELP RESTORE" and select topic "OUTPUT"'
+   EndParameter
+
+   Parameter UNBAL
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'CURRENT,DYNAMIC'               
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(UNBAL) amplitude (L beam) / amplitude (R beam)'
+      Help   'For more details, use "HELP RESTORE" and select topic "UNBAL"'
+   EndParameter
+
+EndInterface

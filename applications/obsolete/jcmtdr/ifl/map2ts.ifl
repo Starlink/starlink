@@ -1,0 +1,21 @@
+Interface MAP2TS
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(INput) file containing map data'
+      Help   'For more details, use "HELP MAP2TS" and select topic "INPUT"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput)'
+      Help   'For more details, use "HELP MAP2TS" and select topic "OUTPUT"'
+   EndParameter
+
+EndInterface

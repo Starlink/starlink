@@ -1,0 +1,48 @@
+Interface MAKEMAP
+
+   Parameter GSDFILE
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(GSDfile) GSD file containing JCMT data'
+      Help   'For more details, use "HELP MAKEMAP" and select topic "GSDFILE"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) name of resulting Figaro data file'
+      Help   'For more details, use "HELP MAKEMAP" and select topic "OUTPUT"'
+   EndParameter
+
+   Parameter CHANNEL
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'CURRENT,DYNAMIC'               
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(CHANnel) backend channel to be used'
+      Help   'For more details, use "HELP MAKEMAP" and select topic "CHANNEL"'
+   EndParameter
+
+   Parameter TEL_BEAM
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(TEL_beam) beam that telescope was in during map'
+      Help   'For more details, use "HELP MAKEMAP" and select topic "TEL_BEAM"'
+   EndParameter
+
+   Parameter POS_BEAM
+      Position  5
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(POS_beam) positive beam of chopper'
+      Help   'For more details, use "HELP MAKEMAP" and select topic "POS_BEAM"'
+   EndParameter
+
+EndInterface

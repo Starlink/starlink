@@ -1,0 +1,449 @@
+0 Help
+ This is the JCMTDR on-line help system.
+
+ JCMTDR is a collection of applications for use in reducing JCMT 
+ mapping data. It is intended as a replacement for NOD2.
+
+1 JCMTDR
+
+JCMTDR is a collection of applications for use in reducing JCMT 
+mapping data. It is intended as a replacement for NOD2.
+
+2 MAKEMAP
+
+This application reads the data and observation description from a 
+JCMT GSD file and outputs it in a format readable by Figaro. It is 
+recommended that the logical name FIGARO_FORMATS be set to "NDF" 
+before running the application so that the output file is a
+Starlink NDF.
+
+3 GSDFILE
+
+The name of the GSD data file. The file name extension (usually .DAT
+or .dat) must be specified.
+
+3 OUTPUT
+
+The name of the output Figaro data file. If the logical name 
+FIGARO_FORMATS is set to "NDF" then this file will be in 
+Starlink NDF format and have file extension .SDF. Otherwise 
+the output file will be in old Figaro format and have 
+extension .DST. 
+
+3 CHANNEL
+
+The channel number that should be used to make the map if the 
+data is from a multi-channel backend. The default is channel 1.
+
+3 TEL_BEAM
+
+The beam toward which the telescope was pointing while the map
+was being made; L, M or R. The majority of maps are made with
+the telescope in the middle (M) beam. In fact, this version of
+JCMTDR can't handle any other case.
+
+3 POS_BEAM
+
+The positive beam of the secondary chopper while the map was
+made; L or R.
+
+
+
+2 JCMTEXTC
+
+   This application corrects JCMT data for the effect of 
+atmospheric extinction. The airmass at which each map pixel was 
+observed is calculated, and multiplied by the estimated zenith 
+atmospheric extinction at the time of observation to give the 
+extinction optical depth along the line of sight. Multiplying
+the data point by the exponential of the optical depth gives 
+the value that would have been measured above the atmosphere. 
+   The zenith optical depth is assumed to vary linearly with 
+time between the values given by the parameters TAU and ENDTAU.
+
+3 INPUT
+
+The name of the file containing the data to be corrected.
+
+3 OUTPUT
+
+The name of the file to contain the corrected data.
+
+3 TAU
+
+The zenith atmospheric extinction at the start of the 
+observation.
+
+3 ENDTAU
+
+The zenith atmospheric extinction at the end of the 
+observation.
+
+
+2 MAP2TS
+
+   This application converts an image into a `spectrum' with the 
+map pixels sorted in order of increasing local sidereal time of
+observation. The l.s.t. is stored as the x-axis. It is useful to
+have the data in this form if you want to spot and correct
+variations in the data that are functions of time.
+   The data will have to be transformed back into map format 
+using TS2MAP before being input to other JCMTDR applications.
+
+3 INPUT
+                  
+The name of the file containing the map data.
+
+3 OUTPUT
+
+The name of the file to contain the time-sorted data.
+
+
+2 TS2MAP
+
+This application performs the reverse function to MAP2TS, and 
+converts a time-sorted JCMT map file back into a form where the
+map pixels are stored in a 2-dimensional array according to offset
+from the map centre.
+
+3 INPUT
+
+The name of the file containing the time-sorted data.
+
+3 OUTPUT
+
+The name of the file to contain the map data.
+
+
+2 RESTORE
+
+This application deconvolves the chopped-beam from a JCMT dual 
+beam map of a source in a manner similar to that described by 
+Emerson, Klein & Haslam (Astron.Astrophys., 76, 92). The algorithm 
+is exactly the same as that used in NOD2; first the spatial 
+frequencies to which the chop is insensitive are set to zero, 
+then the chop is deconvolved.
+
+3 INPUT
+
+The name of the file containing the dual beam data.
+
+3 OUTPUT
+
+The name of the file to contain the deconvolved result.
+
+3 UNBAL
+
+The ratio of the amplitude of the left hand chop beam and 
+the right hand chop beam. For the JCMT this will normally 
+be 1. 
+
+
+2 AE2RD1
+
+   This application will transform JCMT map data into a tangent 
+plane image centred on a specified RA, Dec. The rebinning
+is performed by convolving the input data with a truncated Bessel
+function. It is similar but not identical to the NOD2 CONVERT
+function. 
+   The Bessel function used is such that it would be fully 
+sampled by data points at the spacing of the pixels of the output 
+map. The pixel spacing of the output map is set to be the minimum 
+of the nominal pixel spacings of the input maps. To minimise edge 
+effects the Bessel function is truncated at a radius of 7 pixels 
+from its centre, and apodised over its outer third by a cosine 
+function.
+   In Fourier terms the method consists of Fourier transforming
+the input dataset(s), multiplying the transform by a cylindrical
+top hat (the F.T. of the Bessel function), then transforming back
+into image space. 
+   The application can read in up to 10 separate input datasets.
+The output map will be large enough to cover all the input data 
+points and the map centre can be specified by the user (the 
+default is the map centre of the first input dataset). Each input 
+dataset can be assigned a weight relative to that of the first. 
+Output pixels further than one pixel spacing from any input data 
+point will be flagged as a bad value. Input pixels flagged as
+bad will be ignored. Input error arrays are not propagated.
+   The convolution assumes that all pixels outside the measured 
+area are zero. This will lower the brightness of objects that are 
+less than the radius of the convolution function (7 output pixels) 
+from the map edge, though the effect is only a few percent unless 
+the object is very close (2 or 3 pixels) to the edge. 
+
+3 INFILE
+
+The name of a file containing JCMT map data. Typing END will 
+terminate the data input cycle.
+
+3 OUTFILE
+
+The name of the file to contain the output map.
+
+3 B1950
+
+By default the application will transform the data into a 
+map whose centre and tangent plane offsets are in the FK5
+system with Julian 2000 equinox. Setting B1950 to YES will 
+give results in the FK4 system with Besselian 1950 equinox.
+
+3 WEIGHT
+
+The first dataset will be coadded into the output data 
+array with unit weight. Subsequent datasets can be coadded 
+in with specified weights relative to the first.
+
+3 RA_CENTRE
+
+The positions of the output map pixels will be given in terms 
+of a tangent plane offset in arcsec from a map centre specified 
+by the user. This parameter specifies the RA of the centre, it
+must be input in hh mm ss.s format.
+
+3 DEC_CENTRE
+
+The positions of the output map pixels will be given in terms 
+of an offset in arcsec from a map centre specified by the user. 
+The declination must be input in (sign)dd mm ss.s format.
+
+
+2 AE2RD2
+
+   This application will transform JCMT map data into a tangent 
+plane image centred on a specified RA, Dec. The rebinning
+is performed using a NAG algorithm originally due to Renka & Cline
+(see the NAG manual description of routines E01SAF and E01SBF for
+further details). 
+   The application will read up to 10 JCMT map data files, correct 
+the telescope pointing in each if necessary, then rebin them onto 
+the output mesh one by one. Weights relative to the first dataset 
+can be assigned to subsequent ones, and a weighted mean is 
+calculated for each output pixel. The output map will be large 
+enough to cover all the input data points and the map centre can 
+be specified by the user (the default is the map centre of the 
+first input dataset). 
+   The pixel spacing of the output map is the minimum of the pixel 
+spacings of the input datasets. Output pixels further than one 
+pixel spacing from any input data point will be flagged as a bad
+value. Input pixels flagged as bad will be ignored. Input error 
+information is not propagated. 
+
+3 INFILE
+
+The name of a file containing JCMT map data. Typing END will 
+terminate the data input cycle.
+
+3 OUTFILE
+
+The name of the file to contain the output map.
+
+3 B1950
+
+By default the application will transform the data into a 
+map whose centre and tangent plane offsets are in the FK5
+system with Julian 2000 equinox. Setting B1950 to YES will 
+give results in the FK4 system with Besselian 1950 equinox.
+
+3 WEIGHT
+
+The first dataset will be coadded into the output data 
+array with unit weight. Subsequent datasets can be coadded 
+in with specified weights relative to the first.
+
+3 RA_CENTRE
+
+The positions of the output map pixels will be given in terms 
+of a tangent plane offset in arcsec from a map centre specified 
+by the user. This parameter specifies the RA of the centre, it
+must be input in hh mm ss.s format.
+
+3 DEC_CENTRE
+
+The positions of the output map pixels will be given in terms 
+of an offset in arcsec from a map centre specified by the user. 
+The declination must be input in (sign)dd mm ss.s format.
+
+
+2 IRAS_TAG 
+
+   This application tags an IRAS astrometry structure onto a
+rebinned JCMT map so that it can be displayed using the IRAS90
+package.
+
+3 INPUT
+
+The name of the NDF file to which the IRAS astrometry structure
+is to be appended.
+
+
+2 FAKE
+
+   This application constructs a fake dataset, with an imaginary
+object sampled at the positions specified in a real JCMT map
+file. Currently only two types of fake data can be made; 
+measurements of an Airy disk of unit central intensity at a 
+specified offset from the map centre, or a flat map with all 
+measured pixels set to 1. Running AE2RD1 or AE2RD2 on such data 
+will give some idea of the effect that sky rotation has had on 
+the data sampling, and illustrate the quirks of the resampling
+algorithms used.
+
+3 INPUT
+
+The name of a file containing JCMT map data.
+
+3 OUTPUT
+
+The name of the file to contain the fake data.
+
+3 FAKE_TYPE
+
+The type of fake data to be constructed. AIRY will create an
+Airy disk of unit central intensity at an offset from the map 
+centre specified by the XOFF and YOFF parameters. FLAT will fill 
+the data array with 1s.
+
+3 XOFF
+
+The local x-offset of the centre of the Airy disk from the map 
+centre (arcsec).
+
+3 YOFF
+
+The local y-offset of the centre of the Airy disk from the map
+centre (arcsec).
+
+
+2 MAP2MEM
+
+This converts a JCMT map file into a format suitable for input 
+to the DBMEM package of John Richer.
+
+3 INPUT 
+
+The name of the input file containing JCMT map data.
+
+3 OUTPUT 
+
+The rootname of the DBMEM files to be created. Two files 
+will be output; the header file <rootname>.HEADER, and the 
+datafile which will either be <rootname>.MEM or .BIN 
+depending on the value of the parameter BINARY.
+
+3 B1950
+
+By default the application will transform the data into a 
+map whose centre and tangent plane offsets are in the FK5
+system with Julian 2000 equinox. Setting B1950 to YES will 
+give results in the FK4 system with Besselian 1950 equinox.
+
+3 BINARY
+
+YES will result in the data being written to file 
+<rootname>.BIN, NO will give ASCII numbers in
+<rootname>.MEM.
+
+3 RA_CENTRE
+
+The positions of the measured pixels will be given in terms 
+of a tangent plane offset in arcsec from a map centre specified 
+by the user. This parameter specifies the RA of the centre, it
+must be input in hh mm ss.s format.
+
+3 DEC_CENTRE
+
+The positions of the measured pixels will be given in terms 
+of an offset in arcsec from a map centre specified by the user. 
+The declination must be input in (sign)dd mm ss.s format.
+
+3 NOISE
+
+An estimate of the noise on each measured data point. This will
+only be used if the input data does not have any error 
+measurements associated with it.
+
+
+2 GSD_PRINT
+
+This utility is provided to allow examination of the raw GSD data
+files. It is available as a shell alias and should be prefaced
+appropriately when run from ICL.
+
+GSD_PRINT reads the contents of the GSD file named in the first argument
+of the command and writes them to standard output. This can be
+re-directed to a file or piped into another Unix command.
+
+1 News_1.1
+
+ This is the Port of JCMTDR 1.0 to Unix. Apart from this item the help
+ library is simply copied from that version. Note the following
+ differences in the Unix version:
+
+
+ - So far it is common to run the commands from the Unix shell, although
+   they can be run from ICL as well. To start up JCMTDR from the shell
+   you need to
+
+      source /star/etc/cshrc in your .chsrc
+      source /star/etc/login in your .login
+
+   Then the command
+
+      % jcmtdr
+
+   will define all the commands of the JCMTDR package. To start up from
+   ICL you need to
+
+      ICL> load $JCMTDR_DIR/jcmtdr
+
+   in order to define the commands.
+
+
+ - On-line help is available, from the Unix shell use "jcmt_help", from
+   ICL just use "help".
+
+
+ - GSD format is currently not supported. Thus MAKEMAP, GSD_PRINT and
+   GSD_FORMAT are not available. You will have to process GSD data on a
+   VAX with JCMTDR 1.0.
+
+
+ - JCMTDR data are in Figaro/NDF format and can be transferred as binary
+   files between VMS and various Unix flavours. It is not necessary to
+   process the files. However, you might run the "native" command from
+   the Kappa package on the files on the destination machine. This may
+   save some time in further access to the file.
+
+1 News_1.2
+
+ Version 1.2 of JCMTDR for Unix.
+
+
+ Since the previous version (1.1), GSD support has been added.
+
+  o GSD files can be converted with "makemap" into NDF format for (i)
+    further use in JCMTDR, (ii) use in Figaro, (iii) use in Kappa and
+    associated packages.
+
+  o GSD files can be inspected with "gsd_print". The name of the GSD
+    file must be given as first argument. Output is on standard output,
+    it can be re-directed to a file or piped into other commands like
+    "more".
+    The exact format of gsd_print is changed compared to the VAX
+    version.
+
+ GSD files must be specified by full name, including the file name
+ extension (usually .DAT or .dat).
+
+ GSD files can be taken across from the VAX/VMS system to the Unix
+ system either by ftp transfer in binary mode, or with the Unix "cp"
+ command if the VAX file system is mounted by the Unix machine.
+
+
+ A further change is in "ae2rd1" and "ae2rd2". The parameter INFILE is
+ now prompted with blank default for the first file and with default
+ 'END' for any further files.
+
+
+ Starlink User Note 132 is available on-line as Web pages. The browser
+ for these pages can be started with "jcmt_xhelp" from the Unix shell.

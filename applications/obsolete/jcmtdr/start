@@ -1,0 +1,73 @@
+#+
+#  Name:
+#     jcmtdr.csh
+#
+#  Purpose:
+#     Start the JCMTDR package from the C shell.
+#
+#  Type of Module:
+#     C shell command list
+#
+#  Invocation:
+#     source jcmtdr.csh
+#
+#  Description:
+#     This procedure starts the JCMTDR package for use from the C shell by 
+#     defining the aliases needed to execute each application.
+#
+#  Authors:
+#     HME: Horst Meyerdierks (UoE, Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     23-JUN-1992 (HME):
+#        Original Version
+#     14-JUL-1992 (HME):
+#        Switch from aliases to path change.
+#     16 May 1993 (hme):
+#        Use $SPECDRE_DIR.
+#     23 Mar 1994 (hme):
+#        Copy from Specdre to JCMTDR.
+#     {enter_changes_here}
+#
+#-
+#.
+#
+#  Define aliases for each application.
+#
+alias      ae2rd1   $JCMTDR_DIR/ae2rd1
+alias jcmt_ae2rd1   $JCMTDR_DIR/ae2rd1
+alias      ae2rd2   $JCMTDR_DIR/ae2rd2
+alias jcmt_ae2rd2   $JCMTDR_DIR/ae2rd2
+alias      fake     $JCMTDR_DIR/fake
+alias jcmt_fake     $JCMTDR_DIR/fake
+alias      iras_tag $JCMTDR_DIR/iras_tag
+alias jcmt_iras_tag $JCMTDR_DIR/iras_tag
+alias      jcmtextc $JCMTDR_DIR/jcmtextc
+alias jcmt_jcmtextc $JCMTDR_DIR/jcmtextc
+alias      makemap  $JCMTDR_DIR/makemap
+alias jcmt_makemap  $JCMTDR_DIR/makemap
+alias      map2mem  $JCMTDR_DIR/map2mem
+alias jcmt_map2mem  $JCMTDR_DIR/map2mem
+alias      map2ts   $JCMTDR_DIR/map2ts
+alias jcmt_map2ts   $JCMTDR_DIR/map2ts
+alias      restore  $JCMTDR_DIR/restore
+alias jcmt_restore  $JCMTDR_DIR/restore
+alias      ts2map   $JCMTDR_DIR/ts2map
+alias jcmt_ts2map   $JCMTDR_DIR/ts2map
+alias gsd_print     $JCMTDR_DIR/gsd_print
+alias jcmt_help     $JCMTDR_DIR/jcmt_help
+alias jcmt_xhelp    "Mosaic $JCMTDR_HTML/index.html &"
+#
+# Show that the JCMTDR commands are now available.
+#
+echo " "
+echo " ------------ Initialised for JCMTDR ------------"
+echo "           Version 1.2  10 January 1995"
+echo " "
+echo '         Type "jcmt_help jcmtdr" for help'
+echo '      or "jcmt_xhelp" to start the Web browser'
+echo " "
+#
+# end
+#

@@ -1,0 +1,39 @@
+Interface JCMTEXTC
+
+   Parameter INPUT
+      Position  1
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(INput) file containing map data to be corrected'
+      Help   'For more details, use "HELP JCMTEXTC" and select topic "INPUT"'
+   EndParameter
+
+   Parameter OUTPUT
+      Position  2
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(OUTput) file to contain the corrected data'
+      Help   'For more details, use "HELP JCMTEXTC" and select topic "OUTPUT"'
+   EndParameter
+
+   Parameter TAU
+      Position  3
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(TAU) initial value of the atmospheric extinction'
+      Help   'For more details, use "HELP JCMTEXTC" and select topic "TAU"'
+   EndParameter
+
+   Parameter ENDTAU
+      Position  4
+      Type 'LITERAL'       
+      Vpath 'PROMPT'                        
+      Ppath 'CURRENT,DYNAMIC'
+      Prompt '(ENDTAU) final value of the atmospheric extinction'
+      Help   'For more details, use "HELP JCMTEXTC" and select topic "ENDTAU"'
+   EndParameter
+
+EndInterface

@@ -1,0 +1,180 @@
+<title>JCMTDR datafile formats</title>
+
+<h1>JCMTDR - Datafile Formats</h1>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+</ul>
+
+The applications can access data files either in `old Figaro' or
+Starlink  NDF formats. It is recommended that the NDF format be used
+as this will allow most other Starlink packages (<em>e.g.</em> KAPPA and
+PHOTOM) to access the data as well. The IRCAM data reduction package
+should also be able to access the main data arrays, though other parts
+of the data structure will be inaccessible.
+<p>
+To make these applications (and the rest of Figaro) access Starlink
+NDF files the user should define the logical name (on VMS) or set the
+environment variable (in a C- or Tc-shell) FIGARO_FORMATS to
+be <kbd>"NDF"</kbd>. If the applications are being run as an ADAM monolith from
+ICL then the logical name should be defined /JOB. NDF files have the
+extension <kbd>.SDF</kbd> while `old Figaro' files have the extension
+<kbd>.DST</kbd>.
+<p>
+A list of all the structures that might be found in a JCMT datafile
+before the rebinning stage follows (the example is in Starlink NDF
+format).  The actual items and  structures present in a given file and
+the order in which they appear will depend on the stage that has been
+reached in the reduction process. The temporary structures used by the
+MAP2TS and TS2MAP applications  have been left out.
+<p>
+The HDSTRACE of a JCMT datafile structure before rebinning should
+resemble this:
+<pre>
+STRUCT  < >
+
+   DATA_ARRAY(71,57)  <_REAL>     0.829641,-0.907788,1.163677,-1.149052,
+                                  ... 0.841277,-0.532137,0.25853,-0.551927
+
+! the x-axis structures. Before it has been re-binned to an RA, dec grid
+! the x-axis values will be offsets along the x cell axis. After
+! rebinning the offsets will be true RA offsets from the map centre.
+
+   AXIS(2)        <AXIS>          {array of structures}
+
+   Contents of AXIS(1)
+      DATA_ARRAY(71)  <_REAL>        -140,-136,-132,-128,-124,-120,-116,
+                                     ... 108,112,116,120,124,128,132,136,140
+      UNITS          <_CHAR*32>      'ARCSEC'
+      LABEL          <_CHAR*32>      'X offset'
+
+   MORE           <EXT>           {structure}
+
+! the extension structure that will hold the JCMT-specific information
+! used by the JCMTDR package.
+
+      JCMT           <EXT_JCMT>      {structure}
+
+! the array holding the local sidereal time at which each raw map measurement
+! was made (radians).
+
+         LST            <NDF>           {structure}
+            DATA_ARRAY(71,57)  <_DOUBLE>   1.70557566383623,
+                                           ... 2.04654424975883
+
+         OBS            <STRUC>         {structure}
+            OBJECT         <_CHAR*64>      'OMC1'
+            OBS_1          <_CHAR*32>      'gs'
+            OBS_2          <_CHAR*32>      'el'
+            PROJECT        <_CHAR*32>      'ms55'
+            NOBS           <_INTEGER>      146
+
+         TEL            <STRUC>         {structure}
+            NAME           <_CHAR*32>      'JCMT'
+            FRONTEND       <_CHAR*32>      'RXB2'
+            BACKEND        <_CHAR*32>      'RXA'
+            LONG           <_DOUBLE>       3.56955225443728
+            LAT            <_DOUBLE>       0.34602605175162
+            HEIGHT         <_DOUBLE>       4092.093
+
+         MAP            <STRUC>         {structure}
+            CENTRE_CRD     <_CHAR*32>      'RB'
+            EPOCH          <_DOUBLE>       1950
+            RACEN          <_DOUBLE>       1.4520339434019
+            DECCEN         <_DOUBLE>       -0.09437286153742
+            LOCAL_CRD      <_CHAR*32>      'AZ'
+            V2Y            <_REAL>         0
+            X2Y            <_REAL>         1.570796
+            CELL_X         <_REAL>         4
+            CELL_X_UNIT    <_CHAR*10>      'ARCSEC'
+            CELL_Y         <_REAL>         4
+            CELL_Y_UNIT    <_CHAR*10>      'ARCSEC'
+            ON_FLY         <_INTEGER>      255
+            INT_TIME       <_REAL>         1
+            SCAN_DIR       <_CHAR*16>      'HORIZONTAL'
+            MJD_START      <_DOUBLE>       48236.4812936717
+            CHOP_FUN       <_CHAR*32>      'SQUARE'
+            CHOP_THRW      <_REAL>         38.5
+            CHOP_PA        <_REAL>         1.570796
+            CHOP_CRD       <_CHAR*32>      'AZ  RE'
+            TEL_BEAM       <_CHAR*1>       'M'
+            POS_BEAM       <_CHAR*1>       'R'
+            FREQ           <_REAL>         230.5252
+
+         ENVRNMNT       <STRUC>         {structure}
+            AMB_TEMP       <_REAL>         272.55
+            PRESSURE       <_REAL>         629
+            REL_HUMID      <_REAL>         0.25
+
+         PCORR          <STRUC>         {structure}
+            {structure is empty}
+
+         SOFTWARE       <STRUC>         {structure}
+            MAKEMAP        <_REAL>         1.2
+
+! the structure generated by the JCMTEXTC application to store the airmass
+! at which each pixel was measured.
+
+         AIRMASS        <STRUC>         {structure}
+            DATA_ARRAY(71,57)  <_REAL>     1.140773,1.140794,1.140815,
+                                           ... 1.334956,1.335022,1.335088
+
+! the structure generated by the JCMTEXTC application to store the zenith
+! opacity used to extinction correct each pixel.
+
+         TAU            <STRUC>         {structure}
+            DATA_ARRAY(71,57)  <_REAL>     0.254,0.254001,0.254002,
+                                           ... 0.257998,0.257999,0.258
+
+
+   TITLE          <_CHAR*32>      'OMC1'
+</pre>
+
+A fully reduced and rebinned data file should look something like the
+following:
+<pre>
+STRUCT  < >
+
+   DATA_ARRAY(98,96)  <_REAL>     *,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,
+                                  *,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*
+   AXIS(2)        <AXIS>          {array of structures}
+
+   Contents of AXIS(1)
+      DATA_ARRAY(98)  <_REAL>        192,188,184,180,176,172,168,164,160,
+                                     ... -172,-176,-180,-184,-188,-192,-196
+      UNITS          <_CHAR*32>      'ARCSEC'
+      LABEL          <_CHAR*32>      'RA'
+
+   TITLE          <_CHAR*32>      'OMC1'
+   MORE           <EXT>           {structure}
+
+! the coords and size of the map ready to for input to the IRAS_TAG
+! application
+
+      JCMT_COORDS    <EXT_JCMT>      {structure}
+         RACEN          <_DOUBLE>       1.46275826443488
+         DECCEN         <_DOUBLE>       -0.09382259800936
+         SYSTEM         <_CHAR*64>      'FK5 J2000.0'
+         ICEN           <_INTEGER>      49
+         JCEN           <_INTEGER>      46
+         PIXSIZE        <_DOUBLE>       0.00001939254724
+
+! an array of FITS items that hold the names and weights of the files input 
+! to the rebinning application, and the method of rebinning used.
+
+      FITS(9)        <_CHAR*80>      'FILE_1  = 'RXA_146ERJ'         / Na...'
+                                     ... 'METHOD  = 'Bessel convolut...','END'
+
+
+      FIGARO         <FIGARO_EXT>    {structure}
+         RANGE          <RANGE_STRUCT>   {structure}
+            VALID          <_INTEGER>      1
+            MAX            <_REAL>         90.53838
+            MIN            <_REAL>         -149.2703
+</pre>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>

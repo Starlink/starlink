@@ -1,0 +1,149 @@
+<title>JCMTDR applications</title>
+
+<h1>JCMTDR - The Applications</h1>
+<h2>AE2RD1</h2>
+
+<hr>
+
+<ul>
+<li><a href=index.html>[JCMTDR main document]</a>
+<li><a href="#pointing">Pointing Corrections</a>
+</ul>
+
+This application will transform JCMT map data into a tangent  plane
+image centred on a specified RA, Dec. The rebinning is performed by
+convolving the input data with a truncated Bessel function. It is
+similar but not identical to the NOD2 CONVERT function. 
+<p>
+The width of the Bessel function used is such that it would just be
+fully  sampled by data points at the spacing of the pixels of the
+output  map. The pixel spacing of the output map is set to be the
+minimum  of the nominal pixel spacings of the input maps. To minimise
+edge  effects the Bessel function is truncated at a radius of 7 pixels 
+from its centre, and apodised over its outer third by a cosine 
+function.
+<p>
+In Fourier terms the method approximates to Fourier transforming the
+input dataset(s), multiplying the transform by a cylindrical top hat
+(the F.T. of the Bessel function), then transforming back into image
+space. 
+<p>
+The application can read in up to 10 separate input datasets. The
+output map will be large enough to cover all the input data  points
+and the map centre can be specified by the user (the  default is the
+map centre of the first input dataset). Each input  dataset can be
+assigned a weight relative to that of the first.  Output pixels
+further than one pixel spacing from any input data  point will be
+flagged as a bad value. Input pixels flagged as bad will be ignored.
+Input error arrays are not propagated.
+<p>
+The convolution assumes that all pixels outside the measured  area are
+zero. This will lower the brightness of objects that are  less than
+the radius of the convolution function (7 output pixels)  from the map
+edge, though the effect is only a few percent unless  the object is
+very close (2 or 3 pixels) to the edge. 
+<p>
+The parameters used are:
+<pre>
+PARAMETER  INFILE
+   TYPE    CHAR
+   NAME    IN(file)
+   PROMPT  "(INfile) The name of a file containing JCMT map data"
+   TEXT   ---------------------------------------------------
+          The name of a file containing the map data. Giving
+          END as the name of the file will finish the input 
+          sequence.
+          ---------------------------------------------------
+
+PARAMETER  OUTPUT
+   TYPE    FILE
+   NAME    OUT(PUT)
+   OPTIONS OUTPUT
+   PROMPT  "(OUTput) The name of the file to contain the output map"
+
+PARAMETER B1950 
+   TYPE    KEY 
+   NAME    B1(950) 
+   PROMPT "(B1950) make output coordinates B1950 equinox"
+   TEXT   ---------------------------------------------------
+          By default the application will transform the data 
+          into a map whose centre and tangent plane offsets
+          are in the FK5 system with Julian 2000 equinox.
+          Setting B1950 to YES will give results in the FK4
+          system with Besselian 1950 equinox.
+          ---------------------------------------------------
+
+PARAMETER WEIGHT
+   TYPE   FLOAT
+   PROMPT "(WEIGHT) weight of this dataset relative to the first"
+   TEXT   ---------------------------------------------------
+          The first dataset will be coadded into the output
+          data array with unit weight. Subsequent datasets
+          can be coadded in with specified weights relative
+          to the first.
+          ---------------------------------------------------
+
+PARAMETER RA_CENTRE
+   TYPE   CHAR
+   PROMPT "(RA_centre) The RA of the centre of the output map"
+   TEXT   ---------------------------------------------------
+          The positions of the output map pixels will be 
+          given in terms of a tangent plane offset in arcsec 
+          from a map centre specified by the user. This parameter
+          specifies the RA of the centre, it must be input in 
+          hh mm ss.s format.
+          ---------------------------------------------------
+
+PARAMETER DEC_CENTRE
+   TYPE   CHAR
+   PROMPT "(DEC_centre) The Dec. of the centre of the output map"
+   TEXT   ---------------------------------------------------
+          The positions of the output map pixels will be 
+          given in terms of a tangent plane offset in arcsec 
+          from a map centre specified by the user. This parameter
+          specifies the declination of the centre, it must be 
+          input in (sign)dd mm ss.s format.
+          ---------------------------------------------------
+</pre>
+
+There is a problem with this method if the mapped area, or part of it,
+was not sampled closely enough to fully sample the telescope beam.
+Users should treat the resampled output for those  areas with
+suspicion. In such cases it would be better to use AE2RD2, which uses
+a NAG interpolation routine to perform the rebinning.
+<p>
+
+<a name="pointing"><h3>Pointing Corrections</h3></a>
+
+If required, AE2RD1 will correct the nominal offsets of the  input map
+pixels for pointing errors. To make this happen you should develop
+the .PCORR structure in each input map file to describe the pointing
+correction required. AE2RD1 will look for a structure of the following form:
+<pre>
+      .PCORR
+         .LST   (ncorr) lst1, lst2, .... lstn
+         .D_AZ  (ncorr) d_az1, d_az2, .... d_azn
+         .D_ALT (ncorr) d_alt1, d_alt2, .... d_altn
+</pre>
+
+where <kbd>ncorr</kbd> is the number of points at which the correction has
+been specified. The three arrays specify the magnitude of the correction
+in azimuth and altitude (elevation) as a function of LST. The LST must be
+specified in radians, the pointing corrections in arcsec. Following standard
+JCMT usage, the azimuth increases from north through east. The
+correction for each map point is calculated by linear interpolation
+between the LSTs that bracket the LST of the measurement. If the
+measurement lies outside the described  range, the correction will be
+that with the nearest LST. The corrections are <em>added</em> to the azimuth
+and elevation of the pixels.
+<p>
+On a VAX the required elements in the .PCORR structure can be created and
+set using the Figaro LET command (note that using LET to create an array 
+requires the last element of the array to be created first). On a Unix machine
+you will have to use the Figaro command CREOBJ to create the HDS objects and
+SETOBJ to give them values.
+<p>
+
+<hr>
+
+<address>(C) PPARC 1995, 13 January 1995, hme@roe.ac.uk</address>
