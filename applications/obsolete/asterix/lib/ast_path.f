@@ -107,42 +107,38 @@
       IMPLICIT NONE
 
       INCLUDE 'SAE_PAR'
-      INCLUDE 'FIO_ERR'
 
       INTEGER STATUS
+
+      INTEGER CHR_LEN
 
       CHARACTER*(*) NAME
       LOGICAL ISAFILE
 
       CHARACTER*132 BUF
       INTEGER ISTAT,UNIT
-      LOGICAL OPENOK
+      INTEGER L
 
       IF (STATUS.NE.SAI__OK) RETURN
 
-      ISTAT=0
+*  cludge to get round DEC fortran bug
+      L=CHR_LEN(NAME)
+      IF (L.GE.4.AND.NAME(L-3:L).EQ.'/etc') THEN
+        ISAFILE=.FALSE.
 
-      CALL FIO_OPEN(NAME,'READ','LIST',80,UNIT,ISTAT)
+      ELSE
 
-      IF (ISTAT.EQ.0) THEN
-
+        CALL FIO_OPEN(NAME,'READ','LIST',80,UNIT,ISTAT)
         CALL FIO_READF(UNIT,BUF,ISTAT)
-
         IF (ISTAT.EQ.0) THEN
+          CALL FIO_CLOSE(UNIT,ISTAT)
           ISAFILE=.TRUE.
         ELSE
           ISAFILE=.FALSE.
           CALL ERR_ANNUL(ISTAT)
         ENDIF
 
-        CALL FIO_CLOSE(UNIT,ISTAT)
-
-      ELSE
-        ISAFILE=.FALSE.
-        CALL ERR_ANNUL(ISTAT)
       ENDIF
-
-
 
       END
 
