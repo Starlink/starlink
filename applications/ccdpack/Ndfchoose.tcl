@@ -389,13 +389,21 @@
                }
                highlighted {
                   set name [ [ lindex $ndflist $i ] name ]
-                  $itk_component(tabsA) tabconfigure $i -label "$name +"
-                  $itk_component(tabsB) tabconfigure $i -label "+ $name"
+                  $itk_component(tabsA) tabconfigure $i \
+                      -label "$name +" \
+                      -font "helvetica -12 bold"
+                  $itk_component(tabsB) tabconfigure $i \
+                      -label "+ $name" \
+                      -font "helvetica -12 bold"
                }
                unhighlighted {
                   set name [ [ lindex $ndflist $i ] name ]
-                  $itk_component(tabsA) tabconfigure $i -label "$name   "
-                  $itk_component(tabsB) tabconfigure $i -label "   $name"
+                  $itk_component(tabsA) tabconfigure $i \
+                      -label "$name   " \
+                      -font "helvetica -12 normal"
+                  $itk_component(tabsB) tabconfigure $i \
+                      -label "   $name" \
+                      -font "helvetica -12 normal"
                }
                default {
                   error "$this setstate $mode: No such mode"
@@ -962,6 +970,7 @@
    itk::usual Ndfchoose {
       keep -background -cursor -foreground
    }
+   option add *Ndfchoose.font "helvetica -12 normal" widgetDefault
    option add *Ndfchoose.fitsFont fixed widgetDefault
 
    itk::usual Gwm {
