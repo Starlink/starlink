@@ -47,6 +47,8 @@
 *     20-SEP-2000 (DSB):
 *        Set CAT tuning parameter QUIET to YES to suppress warnings about 
 *        blank format strings.
+*     23-NOV-2000 (DSB):
+*        Added POLWRTCL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -147,6 +149,9 @@
 
       ELSE IF ( NAME .EQ. 'POLVERSION' ) THEN
          CALL POLVERSION( STATUS )
+
+      ELSE IF ( NAME .EQ. 'POLWRTCL' ) THEN
+         CALL POLWRTCL( STATUS )
 
       ELSE
 
