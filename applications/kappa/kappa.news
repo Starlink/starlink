@@ -87,4 +87,6 @@
    The following commands have extra functionality: ARDMASK, COLLAPSE,
    GDSET, GDSTATE, ROTATE, SETSKY, WCSADD
 
+   The following commands have had minor changes to functionality: NOMAGIC
+
 

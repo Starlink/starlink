@@ -165,6 +165,8 @@
 *        Added propagation of the WCS component.
 *     4-MAY-1999 (TDCA):
 *        Added code to set badbits mask to zero.
+*     3-SEP-2002 (DSB):
+*        Do not report an error if the input has no bad pixels.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -326,18 +328,6 @@
       PROCES( 1 ) = BAD( 1 ) .AND. LCOMP( 1 )
       PROCES( 2 ) = BAD( 2 ) .AND. LCOMP( 2 )
 
-*  See whether or not there are bad pixels to re-flag.
-      IF ( .NOT. PROCES( 1 ) .AND. .NOT. PROCES( 2 ) ) THEN
-         STATUS = SAI__ERROR
-
-*  Make a token for the NDF and a contextual error report.
-         CALL NDF_MSG( 'NDF', NDFI )
-         CALL ERR_REP( 'NOMAGIC_NOBAD',
-     :     'NOMAGIC: NDF ^NDF ^ECOMP no bad pixels to change.',
-     :     STATUS )
-         GO TO 999
-      END IF
-
 *  Create the output NDF.
 *  ======================
 
@@ -373,6 +363,10 @@
          CALL NDF_MTYPE( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'/
      :                   /'_DOUBLE', NDFI, NDFI, 'Variance', ITYPE,
      :                   DTYPE, STATUS )
+
+      ELSE
+         CALL LPG_PROP( NDFI, 'Data,Variance,Quality,Units,Axis,WCS',
+     :                  'OUT', NDFO, STATUS )
 
       END IF
 
