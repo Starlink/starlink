@@ -57,6 +57,7 @@ C  Find and read the necessary items of header information.
 
 C  Scan identification
 
+
 C     ...Observer
       CALL GSD_FIND  (IFD, 'C1OBS',
      &                NO, UNITS, TYPE, ARRAY, IND_OBS, STATUS)
@@ -125,7 +126,12 @@ C     ...scan type  (c6st, Char)
 C     ...on the fly  (c3fly, I*4)
       CALL GSD_FIND  (IFD, 'c3fly',
      &                NO, UNITS, TYPE, ARRAY, IND_FLY, STATUS)
-      CALL GSD_GET0I (IND_FLY, IFLY, STATUS)
+      IF (STATUS.EQ.ADAM__OK) THEN
+         CALL GSD_GET0I (IND_FLY, IFLY, STATUS)
+      ELSE
+         STATUS = ADAM__OK
+         IFLY = 0
+      ENDIF
 
 C     ...map cell x-size (C6DX, R*8)
       CALL GSD_FIND  (IFD, 'C6DX',
