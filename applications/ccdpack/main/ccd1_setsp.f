@@ -25,6 +25,9 @@
 *     no .CCDPACK.MORE.SET item are considered to have a NAME of
 *     ' ' and INDEX of 0, so any NDFs which have not been put into
 *     any Set will all group together.
+*
+*     If KEY='NONE' then the input group will not be reordered; a
+*     single output group, a copy of the input group, will be returned.
 
 *  Arguments:
 *     IGNDF = INTEGER (Given)
@@ -32,7 +35,7 @@
 *        subgroups.
 *     KEY = CHARACTER * ( * ) (Given)
 *        The name of the Set characteristic on which the groups should
-*        be split: either 'NAME' or 'INDEX'.
+*        be split: either 'NAME', 'INDEX' or 'NONE'.
 *     MAXOG = INTEGER (Given)
 *        The maximum number of output groups which may result from the
 *        splitting operation.  If there are more distinct keys than
@@ -43,13 +46,15 @@
 *        specified key.
 *     NOGRP = INTEGER (Returned)
 *        The number of output groups into which the input group was split
-*        (and hence the number of elements returned in OGNDF).
+*        (and hence the number of elements returned in OGNDF).  If
+*        KEY='NONE' this will be 1.
 *     OGKEY = INTEGER (Returned)
 *        A group whose I'th element contains the the key value 
 *        (Set NAME or INDEX characteristic) common to the NDFs returned
 *        in the group in the I'th element of OGNDF.  If KEY='INDEX'
 *        the index is converted to a string in the normal way to 
-*        for the name.
+*        for the name.  If KEY='NONE' the first element will be an
+*        empty string.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -114,74 +119,105 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-      
-*  Initialise a group to hold the key values.
-      CALL GRP_NEW( 'CCD:SETKEYS', OGKEY, STATUS )
 
 *  Find the number of items in the input group.
       NIGRP = 0
       CALL GRP_GRPSZ( IGNDF, NIGRP, STATUS )
 
+*  Initialise a group to hold the key values.
+      CALL GRP_NEW( 'CCD:SETKEYS', OGKEY, STATUS )
+
+*  Treat the case of no sort key specially.
+      IF ( KEY .EQ. 'NONE' ) THEN
+
+*  There will only be a single output group.
+         NOGRP = 1
+
+*  Create the output group which is a copy of the input group.
+         CALL GRP_COPY( IGNDF, 1, NIGRP, .FALSE., OGNDF( 1 ), STATUS )
+
+*  Copy the supplementary information from the input to the output group.
+         DO I = 1, NIGRP
+            CALL NDG_GTSUP( IGNDF, I, FIELDS, STATUS )
+            CALL NDG_PTSUP( OGNDF( 1 ), I, FIELDS, STATUS )
+         END DO
+
+*  Enter a blank string as the only entry in the keys group.
+         CALL GRP_PUT( OGKEY, 1, ' ', 1, STATUS )
+
+*  Treat the case in which grouping is by Set Index or Set Name.
+      ELSE IF ( KEY .EQ. 'INDEX' .OR. KEY .EQ. 'NAME' ) THEN
+      
 *  Loop over all items in the input group.
-      DO I = 1, NIGRP
+         DO I = 1, NIGRP
 
 *  Get the NDF identifier for the current item.
-         CALL NDG_NDFAS( IGNDF, I, 'READ', INDF, STATUS )
+            CALL NDG_NDFAS( IGNDF, I, 'READ', INDF, STATUS )
 
 *  Get the NDF's Set characteristics.
-         CALL CCD1_SETRD( INDF, AST__NULL, SNAME, SINDEX, JFRM, STATUS )
+            CALL CCD1_SETRD( INDF, AST__NULL, SNAME, SINDEX, JFRM,
+     :                       STATUS )
 
 *  Annul the NDF identifier.
-         CALL NDF_ANNUL( INDF, STATUS )
+            CALL NDF_ANNUL( INDF, STATUS )
 
 *  Construct the appropriate key.
-         KEYVAL = ' '
-         NCHAR = 1
-         IF ( KEY .EQ. 'NAME' ) THEN
-            CALL CHR_CTOC( SNAME, KEYVAL, NCHAR )
-            NCHAR = MAX( 1, NCHAR )
-         ELSE IF ( KEY .EQ. 'INDEX' ) THEN
-            CALL CHR_ITOC( SINDEX, KEYVAL, NCHAR )
-         ELSE
-            STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 
+            KEYVAL = ' '
+            NCHAR = 1
+            IF ( KEY .EQ. 'NAME' ) THEN
+               CALL CHR_CTOC( SNAME, KEYVAL, NCHAR )
+               NCHAR = MAX( 1, NCHAR )
+            ELSE IF ( KEY .EQ. 'INDEX' ) THEN
+               CALL CHR_ITOC( SINDEX, KEYVAL, NCHAR )
+            ELSE
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ', 
      :'CCD1_SETSP: Invalid KEY value (programming error)', STATUS )
-         END IF
+            END IF
 
 *  Locate the key in the group of keys encountered so far.
-         IF ( NOGRP .GT. 0 ) THEN
-            CALL GRP_INDEX( KEYVAL( 1:NCHAR ), OGKEY, 1, GOTKEY,
-     :                      STATUS )
-         ELSE
-            GOTKEY = 0
-         END IF
+            IF ( NOGRP .GT. 0 ) THEN
+               CALL GRP_INDEX( KEYVAL( 1:NCHAR ), OGKEY, 1, GOTKEY,
+     :                         STATUS )
+            ELSE
+               GOTKEY = 0
+            END IF
 
 *  If we have not encountered this key before, initialise a new group
 *  and copy this NDF into it.  Doing it this way rather than creating
 *  a new group with GRP_NEW ensures that the new group inherits 
 *  control characters etc of the old group.
-         IF ( GOTKEY .EQ. 0 ) THEN
-            NOGRP = NOGRP + 1
-            GOTKEY = NOGRP
-            IOUT = 1
-            CALL GRP_COPY( IGNDF, I, I, .FALSE., OGNDF( GOTKEY ),
-     :                     STATUS )
-            CALL GRP_PUT( OGKEY, 1, KEYVAL( 1:NCHAR ), NOGRP, STATUS )
+            IF ( GOTKEY .EQ. 0 ) THEN
+               NOGRP = NOGRP + 1
+               GOTKEY = NOGRP
+               IOUT = 1
+               CALL GRP_COPY( IGNDF, I, I, .FALSE., OGNDF( GOTKEY ),
+     :                        STATUS )
+               CALL GRP_PUT( OGKEY, 1, KEYVAL( 1:NCHAR ), NOGRP,
+     :                       STATUS )
 
 *  If we have encountered this group before, just copy this NDF into
 *  it.
-         ELSE
-            CALL GRP_GET( IGNDF, I, 1, NDFNAM, STATUS )
-            CALL GRP_GRPSZ( OGNDF( GOTKEY ), NOUT, STATUS )
-            IOUT = NOUT + 1
-            CALL GRP_PUT( OGNDF( GOTKEY ), 1, NDFNAM, IOUT, STATUS )
-         END IF
+            ELSE
+               CALL GRP_GET( IGNDF, I, 1, NDFNAM, STATUS )
+               CALL GRP_GRPSZ( OGNDF( GOTKEY ), NOUT, STATUS )
+               IOUT = NOUT + 1
+               CALL GRP_PUT( OGNDF( GOTKEY ), 1, NDFNAM, IOUT, STATUS )
+            END IF
 
 *  Copy supplementary information from the input NDG item to the 
 *  output one.
-         CALL NDG_GTSUP( IGNDF, I, FIELDS, STATUS )
-         CALL NDG_PTSUP( OGNDF( GOTKEY ), IOUT, FIELDS, STATUS )
-      END DO
+            CALL NDG_GTSUP( IGNDF, I, FIELDS, STATUS )
+            CALL NDG_PTSUP( OGNDF( GOTKEY ), IOUT, FIELDS, STATUS )
+         END DO
+
+*  Unrecognised grouping.
+      ELSE
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'KEY', KEY )
+         CALL ERR_REP( 'CCD1_SETSP_BADKEY', 
+     :                 'CCD1_SETSP: Bad group key ^KEY', STATUS )
+      END IF
 
       END
 * $Id$
