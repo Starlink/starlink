@@ -2,7 +2,8 @@
      :                       STKID, DEBIAS, VAR, ANGROT, ANGRT, MAKEI, 
      :                       MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
      :                       MAKECT, CI, AI, AP, AT, AIP, AQ, AU, AV, 
-     :                       AIV, APV, ATV, AIPV, AQV, AUV, AVV, STATUS )
+     :                       AIV, APV, ATV, AIPV, AQV, AUV, AVV, 
+     :                       STATUS )
 *+
 *  Name:
 *     POL1_PLVEC
@@ -195,6 +196,7 @@
       INTEGER PIX                ! Pixel index
       INTEGER ROW                ! Row index
       LOGICAL CIRC               ! Measure circular polarisation?
+      REAL COS2D                 ! Cos( 2* change in ref direction )
       REAL EPS2                  ! Mean variance on normalised Q and U
       REAL FACT                  ! Commonly needed factor
       REAL I                     ! Total intensity from all inputs
@@ -205,11 +207,14 @@
       REAL Q                     ! Normalised Q Stokes parameter
       REAL Q2                    ! Normalised Q Stokes parameter squared
       REAL QIN                   ! Input Q value
+      REAL QN                    ! Q w.r.t. new ref direction
       REAL RTOD                  ! Conversion factor; radians to degrees
+      REAL SIN2D                 ! Cos( 2* change in ref direction )
       REAL T                     ! Polarisation angle
       REAL U                     ! Normalised U Stokes parameter
       REAL U2                    ! Normalised U Stokes parameter squared
       REAL UIN                   ! Input U value
+      REAL UN                    ! U w.r.t. new ref direction
       REAL V                     ! Normalised V Stokes parameter
       REAL V2                    ! Normalised V Stokes parameter squared
       REAL VI                    ! Variance on tot. int. from all inputs

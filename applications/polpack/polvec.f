@@ -194,6 +194,7 @@
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
       INCLUDE 'NDF_PAR'          ! NDF_ constants
+      INCLUDE 'DAT_PAR'          ! HDS constants
       INCLUDE 'AST_PAR'          ! AST_ constants
 
 *  Status:
@@ -204,6 +205,7 @@
       CHARACTER STOKES*(NDF__MXDIM) ! Identifiers for each plane of input
       CHARACTER TITLE*80         ! Title from input Stokes cube
       CHARACTER UNITS*40         ! Units from input Stokes cube
+      CHARACTER XLOC*(DAT__SZLOC)! Locator for polpack extension
       DOUBLE PRECISION TR( 4 )   ! Coeffs. of linear mapping produced by binning
       INTEGER BOX( 2 )           ! Bin size
       INTEGER CI                 ! CAT identifier for output catalogue
@@ -527,6 +529,7 @@
          CALL NDF_XNEW( INDFT, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
          CALL NDF_XPT0R( ANGRT, INDFT, 'POLPACK', 'ANGROT', STATUS )
+         CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFT, STATUS )
@@ -605,6 +608,7 @@
          CALL NDF_XNEW( INDFQ, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
          CALL NDF_XPT0R( ANGRT, INDFQ, 'POLPACK', 'ANGROT', STATUS )
+         CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFQ, STATUS )
@@ -645,6 +649,7 @@
          CALL NDF_XNEW( INDFU, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
          CALL NDF_XPT0R( ANGRT, INDFU, 'POLPACK', 'ANGROT', STATUS )
+         CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFU, STATUS )
@@ -685,6 +690,7 @@
          CALL NDF_XNEW( INDFV, 'POLPACK', 'POLPACK', 0, 0, XLOC, 
      :                  STATUS ) 
          CALL NDF_XPT0R( ANGRT, INDFV, 'POLPACK', 'ANGROT', STATUS )
+         CALL DAT_ANNUL( XLOC, STATUS )
 
 *  Store the current POLPACK version number.
          CALL POL1_PTVRS( INDFV, STATUS )
