@@ -654,6 +654,8 @@ sub creobj {
   ($status, @locs) = retrieve_locs( $object, 'UPDATE', $status)
     if length($object) > 0;
 
+
+
   # If we have no locators, assume we have to create a top level
   my $nloc;
   if (scalar(@locs) == 0) {
@@ -705,8 +707,9 @@ sub _find_loc {
    }
 
    # Get next locator
-   print "# Looking for $nextcmp\n" if $DEBUG; 
+   print "# Looking for $nextcmp [$status]\n" if $DEBUG; 
    dat_find($parent, $nextcmp, my $child, $status);
+   print "# Status from dat_find: $status\n" if $DEBUG;
 
    # If we are a cell find it,
    my $cellloc;
@@ -719,11 +722,15 @@ sub _find_loc {
 
      print "# Accessing CELL ".join(",",@index)."\n" if $DEBUG;
      dat_cell($child, scalar(@index), @index, $cellloc, $status);
+
    }
 
    # If we have more things on the argument stack we call ourselves
+   # Use the cell locator as the parent if required.
    my @locators = ();
-   ($status, @locators) = _find_loc($child, $status, @_) if @_;
+   ($status, @locators) = _find_loc((defined $cellloc ? $cellloc :$child),
+				    $status, @_)
+     if @_;
 
    # Now put $child onto the list (and cell if required)
    unshift(@locators, $cellloc) if defined $cellloc;

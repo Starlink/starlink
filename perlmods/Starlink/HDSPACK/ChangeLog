@@ -1,3 +1,7 @@
+2003-08-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* HDSPACK.pm (_find_loc): Was not passing cell locator to child.
+
 2003-03-19  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* HDSPACK.pm (setobj): Add setobj and set_hdsobj
