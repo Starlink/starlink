@@ -130,6 +130,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.15  1997/05/28 19:17:38  timj
+*     Fix declaration of MEAS_*_Q (was INTEGER, now BYTE)
+*
 *     Revision 1.14  1997/05/22 21:21:01  timj
 *     Allow for null response to file open request.
 *
@@ -329,7 +332,7 @@ c
       REAL             MEAS_1_D (SCUBA__MAX_BEAM)
 				       ! the fitted peak to the coadded
 				       ! integrations
-      INTEGER          MEAS_1_Q (SCUBA__MAX_BEAM)
+      BYTE             MEAS_1_Q (SCUBA__MAX_BEAM)
 				       ! the quality on MEAS_1_D
       REAL             MEAS_1_V (SCUBA__MAX_BEAM)
 				       ! the variance on MEAS_1_D
@@ -343,7 +346,7 @@ c
 				       ! each bolometer
       INTEGER          MEAS_2_N (SCUBA__MAX_BEAM)
                                        ! the number of integrations coadded
-      INTEGER          MEAS_2_Q (SCUBA__MAX_BEAM)
+      BYTE             MEAS_2_Q (SCUBA__MAX_BEAM)
 				       ! the quality on MEAS_2_D
       REAL             MEAS_2_V (SCUBA__MAX_BEAM)
 				       ! the variance on MEAS_2_D
