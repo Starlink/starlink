@@ -44,6 +44,8 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #include "stringstream.h"
 
+#include "fitshead.h"
+
 #include "CatalogueHandler.h"
 #include "util.h"
 
@@ -524,24 +526,30 @@ double CatalogueHandler::CatalogueRow::ra ()
     const
     throw (MoggyException)
 {
-    double value;
     if (!parent_.has_ra())
 	throw MoggyException ("No RA for row");
+
+    char *value;
     if (parent_.queryResult_.get(num_, parent_.queryResult_.ra_col(), value))
 	throw MoggyException ("Can't get RA for row");
-    return value;
+
+    // If string is in sexagesimal convert it to degrees.
+    return str2ra( value );
 }
 
 double CatalogueHandler::CatalogueRow::dec ()
     const
     throw (MoggyException)
 {
-    double value;
     if (!parent_.has_dec())
 	throw MoggyException ("No DEC for row");
+
+    char *value;
     if (parent_.queryResult_.get(num_, parent_.queryResult_.dec_col(), value))
 	throw MoggyException ("Can't get DEC for row");
-    return value;
+
+    // If string is in sexagesimal convert it to degrees.
+    return str2dec( value );
 }
 
 double CatalogueHandler::CatalogueRow::mag()
@@ -567,14 +575,28 @@ ostream& operator<< (ostream& o, const CatalogueHandler::CatalogueRow& row)
 ostream& CatalogueHandler::CatalogueRow::put (ostream& o)
     const
 {
+    int ra_col = parent_.queryResult_.ra_col();
+    int dec_col = parent_.queryResult_.dec_col();
+
     for (int i=0; i<parent_.queryResult_.numCols(); i++)
     {
-	if (i > 0)
+	if (i > 0) {
 	    o << sep_;
-	char *value;
-	if (parent_.queryResult_.get(num_, i, value))
-	    throw MoggyException ("can't get line of query result");
-	o << value;
+        }
+        char *value;
+        if (parent_.queryResult_.get(num_, i, value)) {
+            throw MoggyException ("can't get line of query result");
+        }
+
+        // RA and Dec maybe in sexagesimal format, if so convert to
+        // decimal. 
+        if ( i == ra_col ) {
+            o << str2ra( value );
+        } else if ( i == dec_col ) {
+            o << str2dec( value );
+        } else {
+            o << value;
+        }
     }
 
     return o;
