@@ -143,7 +143,6 @@
         ELSE
           AXIS = '-'
         END IF
-        print*, axis, base, delta, tang
         CALL ADI2_CFIND( ARGS(2), ' ', '.CRPIX'//CAX, ' ', .TRUE.,
      :                   .FALSE., TYPE, 0, 0, DIDCRE, ITID, STATUS )
         CALL ADI_CNEWV0R( ITID, 'Value', TANG, STATUS )
