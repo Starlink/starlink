@@ -1,4 +1,4 @@
-      SUBROUTINE DYN0_MAP( PTR, SLOT, STATUS )
+      SUBROUTINE DYN0_FIND( PTR, SLOT, STATUS )
 *+
 *  Name:
 *     DYN0_FIND
@@ -91,12 +91,10 @@
 *         DYN memory addresses
 
 *  Arguments Given:
-      INTEGER			NDIM			! See above
-      INTEGER			DIMS(*)
-      CHARACTER*(*)		MTYPE
+      INTEGER			PTR			! See above
 
 *  Arguments Returned:
-      INTEGER			PTR			!
+      INTEGER			SLOT			!
 
 *  Status:
       INTEGER 			STATUS             	! Global status
