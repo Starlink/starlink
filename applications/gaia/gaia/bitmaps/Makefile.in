@@ -1,47 +1,36 @@
-#*******************************************************************************
-# E.S.O. - VLT project
+# E.S.O. - VLT project/ESO Archive
+# $Id$
 #
-# "@(#) $Id$"
-
-# ------------------------------------------------------------------------
-# 	Makefile for RTD bitmaps directory
+# Makefile.in
+#
+# This file is processed by configure to produce the actual Makefile.
+#
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Allan Brighton  04 Oct 95  Created
+# Peter W. Draper 17 May 99  Converted for use in GAIA
 # ------------------------------------------------------------------------
 
 INSTALL      = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
-RTD_DIR      = @RTD_DIR@
 BINDIR       = @BINDIR@
 RM           = rm -f
 SHELL        = /bin/sh
-FILES        = *.xbm
-TARGET       = ../src/bitmaps.C
+FILES        = *.xbm *.xpm
 srcdir	     = @srcdir@
+TARGET       = ../src/bitmaps.C
 
 all: $(TARGET)
-
-# generate a C file that creates all of the bitmap files
-# in this directory and installs them for Tk access by basename
-$(TARGET): $(FILES)
-	tclsh7.4 bitmaps.tcl > $(TARGET)
 
 All: 
 	cd ..; $(MAKE)
 
-install-top:
-	@if test -d $(RTD_DIR)/bitmaps ; then \
-	    : ; \
-	else \
-	    mkdir $(RTD_DIR)/bitmaps ; \
-	fi
+# generate a C file that creates all of the bitmap files
+# in this directory and installs them for Tk access by basename
+$(TARGET): $(FILES)
+	tclsh@TCL_VERSION@ bitmaps.tcl > $(TARGET)
 
-install-files: install-top
-	@set -x; for i in $(srcdir)/$(FILES) ; do \
-	    $(INSTALL_DATA) $$i $(RTD_DIR)/bitmaps ; \
-	done 
-
-# bitmaps don't have to be installed since they are now compiled in (allan)
-#install: install-files
-install: 
+install:
 
 clean:
 	$(RM) *\~ "#"* core

@@ -27,38 +27,36 @@ proc main {} {
    set skycat_library   @SKYCAT_LIBRARY@
    set gaia_library     @GAIA_LIBRARY@
    set tcladam_library  @TCLADAM_LIBRARY@
-   set blt_library      @BLT_LIBRARY@
    set iwidgets_library @IWIDGETS_LIBRARY@
    set iscripts_library @IWIDGETS_LIBRARY@/scripts
    set tclx_library     @TCLX_LIBRARY@
    
-    set srcdirs [list \
-		     $tcl_library \
-		     $tk_library \
-		     $itcl_library \
-		     $itk_library \
-		     $blt_library \
-		     $tclx_library \
-		     $iwidgets_library \
-		     $iscripts_library \
-		     $tclutil_library \
-		     $astrotcl_library \
-		     $rtd_library \
-		     $cat_library \
-		     $skycat_library \
-                     $tcladam_library \
-		     $gaia_library]
+   set srcdirs [list \
+                   $tcl_library \
+                   $tk_library \
+                   $itcl_library \
+                   $itk_library \
+                   $tclx_library \
+                   $iwidgets_library \
+                   $iscripts_library \
+                   $tclutil_library \
+                   $astrotcl_library \
+                   $rtd_library \
+                   $cat_library \
+                   $skycat_library \
+                   $tcladam_library \
+                   $gaia_library]
    
    #  Set location of startup script.
    puts $fd "-main-script \"${gaia_library}/gaiaMain.tcl\""
-
+   
    #  Binary is standalone.
    puts $fd "-standalone"
    
    #  Set location of Tcl and Tk.
    puts $fd "-tcl-library \"$tcl_library\""
    puts $fd "-tk-library \"$tk_library\""
-
+   
    #  Name of the Et_AppInit file.
    puts $fd "EtAppInit.C"
    
@@ -80,19 +78,7 @@ proc main {} {
       puts "$argv0: can't find TclX library files"
       exit 1
    }
-   
-   #  BLT has some special files.
-   if {[info exists blt_library] && [file exists $blt_library/bltGraph.pro]} {
-      set profiles [glob -nocomplain $blt_library/*.pro]
-      foreach file "$profiles" {
-         puts $fd "-dont-strip-tcl \"$file\""
-      }
-   } else {
-      puts "$argv0: can't find BLT library files"
-      exit 1
-   }
 }
-
 main
 exit
 

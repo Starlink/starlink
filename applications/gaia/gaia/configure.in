@@ -700,4 +700,5 @@ AC_OUTPUT(Makefile \
         src/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaiaInit.tcl \
-        colormaps/Makefile, sh makelinks)
+        colormaps/Makefile \
+        bitmaps/Makefile, sh makelinks)

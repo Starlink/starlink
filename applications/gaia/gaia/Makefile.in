@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------
 
 # run make in these sub directories
-SUBDIRS      = src colormaps mktclapp
+SUBDIRS      = colormaps bitmaps src mktclapp
 
 # root of source tree
 SRC_ROOT     = @SRC_ROOT@
@@ -205,8 +205,8 @@ $(tab2asc): normallib tab2asc.o
 	$(INSTALL_DATA) tab2asc.ifc bin/tab2asc.ifc
 	$(RM) tab2asc.ifc
 
-normallib:
-	cd src; $(MAKE)
+normallib: FORCE
+	for i in $(SUBDIRS); do (cd $$i; echo "$$i:"; $(MAKE)) done
 
 install-top:
 	@if test -d $(TOPDIR); then : ; else mkdir $(TOPDIR); fi
@@ -242,7 +242,10 @@ install-library:
 install-colormaps:
 	@(cd colormaps; $(MAKE) install)
 
-install: install-top install-library install-bin install-colormaps
+install-bitmaps:
+	@(cd bitmaps; $(MAKE) install)
+
+install: install-top install-library install-bin install-colormaps install-bitmaps
 
 clean:
 	$(RM) $(OBJECTS) $(demo_wish) $(ardstat) ardstat.o $(ardstat).ifc \

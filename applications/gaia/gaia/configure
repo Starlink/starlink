@@ -1750,8 +1750,10 @@ DESTDIR="$prefix"
 BINDIR="$DESTDIR/bin"
 LIBDIR="$DESTDIR/lib"
 GAIA_DIR="$LIBDIR/gaia"
-GAIA_LIBRARY=$GAIA_DIR
-GAIA_BUILD_LIBRARY=$SRC_ROOT/library
+GAIA_LIBRARY="$GAIA_DIR"
+GAIA_BUILD_LIBRARY="$SRC_ROOT/library"
+TCLADAM_DIR="$LIBDIR/startcl"
+
 
 
 
@@ -1895,7 +1897,8 @@ trap 'rm -fr `echo "Makefile \
         src/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaiaInit.tcl \
-        colormaps/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+        colormaps/Makefile \
+        bitmaps/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -2026,6 +2029,7 @@ s%@LIBDIR@%$LIBDIR%g
 s%@GAIA_DIR@%$GAIA_DIR%g
 s%@GAIA_LIBRARY@%$GAIA_LIBRARY%g
 s%@GAIA_BUILD_LIBRARY@%$GAIA_BUILD_LIBRARY%g
+s%@TCLADAM_DIR@%$TCLADAM_DIR%g
 
 CEOF
 EOF
@@ -2073,7 +2077,8 @@ CONFIG_FILES=\${CONFIG_FILES-"Makefile \
         src/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaiaInit.tcl \
-        colormaps/Makefile"}
+        colormaps/Makefile \
+        bitmaps/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
