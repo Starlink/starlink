@@ -451,6 +451,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        rather than using the "TPN" code. Also recognise QVi_m (produced
 *        by AUTOASTROM) as an alternative to PVi_m when reading distorted 
 *        TAN headers. 
+*     22-MAY-2003 (DSB):
+*        Modified GetEncoding so that the presence of RADECSYS and/or
+*        PROJPm is only considered significant if the modern equivalent 
+*        keyword (REDESYS or PVi_m) is *NOT* present.
+
 *class--
 */
 
@@ -5916,15 +5921,24 @@ static int GetEncoding( AstFitsChan *this ){
    "CDi_j"  AND there is a RADECSYS. PROJPi or CmVALi keyword, then return 
    "FITS-IRAF" encoding. */
       } else if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) 
-                 && ( astKeyFields( this, "RADECSYS", 0, NULL, NULL ) ||
-                      astKeyFields( this, "PROJP%d", 0, NULL, NULL ) ||
-                      astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL ) ) ){
+
+                 && ( (astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
+                       !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
+
+                      (astKeyFields( this, "PROJP%d", 0, NULL, NULL ) &&
+                       !astKeyFields( this, "PV%d_%d", 0, NULL, NULL ) ) ||
+
+                      (astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL )) ) ){
          ret = FITSIRAF_ENCODING;
 
 /* Otherwise, if the FitsChan contains any keywords with the format 
    RADECSYS. PROJPi or CmVALi keyword, then return "FITS-PC" encoding. */
-      } else if( astKeyFields( this, "RADECSYS", 0, NULL, NULL ) ||
-                 astKeyFields( this, "PROJP%d", 0, NULL, NULL ) ||
+      } else if( ( astKeyFields( this, "RADECSYS", 0, NULL, NULL ) &&
+                   !astKeyFields( this, "RADESYS", 0, NULL, NULL ) ) ||
+
+                 ( astKeyFields( this, "PROJP%d", 0, NULL, NULL ) &&
+                   !astKeyFields( this, "PV%d_%d", 0, NULL, NULL ) ) ||
+
                  astKeyFields( this, "C%1dVAL%d", 0, NULL, NULL ) ) {
          ret = FITSPC_ENCODING;
 
