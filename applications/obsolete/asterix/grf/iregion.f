@@ -765,13 +765,12 @@
               CALL MSG_SETR( 'X', X)
               CALL MSG_SETR( 'Y', Y)
               CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
-              IF ( L .GT. 65) THEN
+              IF (L.GT.65.AND.I.LT.I_NX.AND.J.LT.I_NY) THEN
                 CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
                 TEXT = ' '
                 L = 1
               ENDIF
 
-              CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
             ENDIF
@@ -786,6 +785,7 @@
           TEXT(L:L)=')'
         ENDIF
 
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
