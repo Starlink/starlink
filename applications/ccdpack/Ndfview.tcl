@@ -82,31 +82,34 @@
    constructor { args } {
       set canvas [ canvas ]
       itk_component add tracker {
-         label $itk_component(childsite).tracker -relief groove
+         label [ childsite ].tracker -relief groove
       } {
          rename -font -trackfont trackFont Font
       }
 
 #  Set up additional controls.
+      set panel [ panel ]
       itk_component add dstyle {
-         stylecontrol $itk_component(panel).dstyle \
+         stylecontrol $panel.dstyle \
             -value "drawaxes=0,grid=0,numlab=0" \
             -valuevar displaystyle
       }
-      lappend controls $itk_component(dstyle)
+      addcontrol $itk_component(dstyle)
       itk_component add percut {
-         percentilecontrol $itk_component(panel).percut \
+         percentilecontrol $panel.percut \
             -choices { { 20 80 } { 10 90 } { 5 95 } \
                        { 2 98 } { 1 99 } { 0.5 99.5 } } \
             -allowcustom 1 \
             -value { 6 94 } \
             -valuevar percentiles
       }
-      lappend controls $itk_component(percut)
+      addcontrol $itk_component(percut)
 
-      eval pack $controls -side left
-
+#  Do requested configuration.
       eval itk_initialize $args
+
+#  Register initial size of window.
+      geomset
    }
 
 
@@ -400,27 +403,12 @@
       }
 
 
-#-----------------------------------------------------------------------
-      public variable state inactive {
-#-----------------------------------------------------------------------
-         if { $state == "active" } {
-            foreach c $controls {
-               $c configure -state normal
-            }
-         } elseif { $state == "inactive" } {
-            foreach c $controls {
-               $c configure -state disabled
-            }
-         }
-      }
-
 
 ########################################################################
 #  Private variables.
 ########################################################################
 
       private variable canvas ""       ;# Name of the canvas widget for display
-      private variable controls        ;# Additional control buttons
       private variable displayed       ;# Array holding latest state of plot
       private variable ndf ""          ;# Tcl ndf object
       private variable ndfname ""      ;# Full name of NDF
