@@ -14,7 +14,8 @@ pkgdata_DATA = \
 # True?
 # CLEANFILES=starconf
 
-AUTOCONF_MACRO_DIR = @AUTOCONF_MACRO_DIR@
+## AUTOCONF_MACRO_DIR = @AUTOCONF_MACRO_DIR@
+aclocal_DATA = starconf.m4
 
 # The edits of replacement variables (prefix and co) in
 # starlink.m4.in and starconf.in must be done at `make' time rather
@@ -43,22 +44,6 @@ starconf: starconf.in bootstrap.installed
 	mv starconf.tmp starconf
 	chmod +x starconf
 
-
-# The starconf.m4 file should be installed in the place where aclocal
-# expects to find macro files.  The result of "aclocal --print-ac-dir"
-# is substituted in $(MACRO_AC_DIR).  Check this directory exists
-# before we install things there, but don't create it if not -- if it
-# isn't there, something else is wrong, since aclocal should be
-# installed before starconf is.
-install-data-local: starconf.m4
-	test -d $(AUTOCONF_MACRO_DIR) || { \
-	    echo "No aclocal directory $(AUTOCONF_MACRO_DIR) found -- has automake been installed?" >&2; \
-	    false; \
-	}
-	$(INSTALL_DATA) starconf.m4 $(AUTOCONF_MACRO_DIR)
-	if test -n "$$MANIFEST_FILE"; then \
-	    echo $(AUTOCONF_MACRO_DIR)/starconf.m4 >>$$MANIFEST_FILE; \
-	else :; fi
 
 # Magic: If there exists a bin directory at
 # @STARCONF_DEFAULT_PREFIX@/bin, then install links to the starconf
