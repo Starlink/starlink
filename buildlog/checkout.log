@@ -5909,6 +5909,35 @@ U java/source/hdx/src/testcases/uk/ac/starlink/hdx/redefining.xml-correct
 cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx/extension
 U java/source/hdx/src/testcases/uk/ac/starlink/hdx/extension/SimpleWeather.java
 cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx/jai
+cvs checkout: Updating java/source/help
+U java/source/help/.properties
+U java/source/help/build.xml
+cvs checkout: Updating java/source/help/src
+cvs checkout: Updating java/source/help/src/docs
+U java/source/help/src/docs/LICENSE.html
+U java/source/help/src/docs/README
+U java/source/help/src/docs/javahelp-2_0_01-guide.pdf
+cvs checkout: Updating java/source/help/src/lib
+U java/source/help/src/lib/LICENSE.html
+U java/source/help/src/lib/README
+U java/source/help/src/lib/jhall.jar
+cvs checkout: Updating java/source/help/src/main
+cvs checkout: Updating java/source/help/src/main/uk
+cvs checkout: Updating java/source/help/src/main/uk/ac
+cvs checkout: Updating java/source/help/src/main/uk/ac/starlink
+cvs checkout: Updating java/source/help/src/main/uk/ac/starlink/help
+U java/source/help/src/main/uk/ac/starlink/help/HelpFrame.java
+cvs checkout: Updating java/source/help/src/main/uk/ac/starlink/help/images
+U java/source/help/src/main/uk/ac/starlink/help/images/ImageHolder.java
+U java/source/help/src/main/uk/ac/starlink/help/images/close.gif
+U java/source/help/src/main/uk/ac/starlink/help/images/help.gif
+cvs checkout: Updating java/source/help/src/testcases
+U java/source/help/src/testcases/HelpSet.hs
+U java/source/help/src/testcases/Map.jhm
+U java/source/help/src/testcases/TOC.xml
+U java/source/help/src/testcases/TestHelpFrame.java
+U java/source/help/src/testcases/node1.html
+U java/source/help/src/testcases/node2.html
 cvs checkout: Updating java/source/jaiutil
 U java/source/jaiutil/.properties
 U java/source/jaiutil/build.xml
@@ -8138,8 +8167,6 @@ cvs checkout: Updating java/source/splat/src/lib
 U java/source/splat/src/lib/bsh-1.2b7.jar
 U java/source/splat/src/lib/jdom.jar
 U java/source/splat/src/lib/jdom_license.txt
-U java/source/splat/src/lib/jhall.jar
-U java/source/splat/src/lib/jhall_license.html
 U java/source/splat/src/lib/jsci_core.jar
 U java/source/splat/src/lib/jsci_license.txt
 U java/source/splat/src/lib/jsci_wavelet.jar
