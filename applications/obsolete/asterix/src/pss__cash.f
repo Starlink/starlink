@@ -83,12 +83,13 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
-*     Richard Beard (RB)
+*     Richard Beard (RB, Birmingham)
 *
 *    History :
 *
 *     11 Mar 91 : Original (DJA)
 *     14 Mar 97 : Sort out duff NAG calls (RB)
+*      1 Jul 97 : Reorganise the way PDA is called (RB)
 *
 *    Type definitions :
 *
@@ -131,31 +132,32 @@
         SIG = 0.0
 
 *    Ok to use PDA routine
-      ELSE IF ( DELCHI .LT. 100.0 ) THEN
+      ELSE
         IFAIL = 0
         PROB = 0.0D0
         SIG = 0.0
         PROB = PDA_CHISQD('U',DBLE(DELCHI),1.0D0,IFAIL)
         SIG = -REAL(PDA_NORDEV('L',PROB/2.0D0,IFAIL))
 
-*    Use iteration scheme
-      ELSE
+*    Use iteration scheme if this fails
+        IF (SIG.EQ.0.0 .OR. IFAIL.NE.0) THEN
 
 *      A sensible starting value
-        OLDSIG = SQRT(DELCHI)
-        CON = LOGTWO - DELCHI/2.0 - LOG(SQRT(DELCHI))
-        ITER = 0
- 15     SIG = OLDSIG - (-OLDSIG*OLDSIG/2.0-LOG(OLDSIG)-CON) /
+          OLDSIG = SQRT(DELCHI)
+          CON = LOGTWO - DELCHI/2.0 - LOG(SQRT(DELCHI))
+          ITER = 0
+ 15       SIG = OLDSIG - (-OLDSIG*OLDSIG/2.0-LOG(OLDSIG)-CON) /
      :                                       (-OLDSIG-1.0/OLDSIG)
-        ITER = ITER + 1
+          ITER = ITER + 1
 
 *      Trap too many iterations? Should never happen as function is
 *      well-behaved for Newton-Raphson when DELCHI>100
-        IF ( ITER .GT. MAXITER ) THEN
-          SIG = 0.0
-        ELSE IF ( .NOT. PSS_CONVERGED(SIG,OLDSIG) ) THEN
-          OLDSIG = SIG
-          GOTO 15
+          IF ( ITER .GT. MAXITER ) THEN
+            SIG = 0.0
+          ELSE IF ( .NOT. PSS_CONVERGED(SIG,OLDSIG) ) THEN
+            OLDSIG = SIG
+            GOTO 15
+          END IF
         END IF
 
       END IF
