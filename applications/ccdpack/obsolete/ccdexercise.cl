@@ -61,10 +61,10 @@ begin
    if ( access ( "ccdtest_obj.dat" ) ) {
      delete ccdtest_obj.dat
    }
-   if ( access ( "ccdpackdir$/ccdtest_obj.dat" ) ) {
-     copy ( "ccdpackdir$/ccdtest_obj.dat", "ccdtest_obj.dat" )
+   if ( access ( env("CCDPACK_DIR")//"/ccdtest_obj.dat" ) ) {
+     copy ( "$CCDPACK_DIR/ccdtest_obj.dat", "ccdtest_obj.dat" )
    } else {
-     print "!!Cannot locate file ccdpackdir$/ccdtest_obj.dat - test terminated."
+     print "!!Cannot locate file $CCDPACK_DIR/ccdtest_obj.dat - test terminated."
      bye
    }
 
@@ -85,8 +85,8 @@ begin
    if ( access( "ccdtest.ard" ) ) {
      delete ccdtest.ard
    }
-   if ( access( "ccdpackdir$/ccdtest.ard" ) ) {
-     copy ( "ccdpackdir$/ccdtest.ard", "ccdtest.ard" )
+   if ( access( env("CCDPACK_DIR")//"/ccdtest.ard" ) ) {
+     copy ( "$CCDPACK_DIR/ccdtest.ard", "ccdtest.ard" )
      ccdsetup ( restore=no, adc=1, bounds="1,5,120,128",
                 rnoise=9.95, direction="x", deferred=INDEF,
                 extent="6,119,1,128", logto="both",
