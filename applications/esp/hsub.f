@@ -34,7 +34,7 @@
 *     be employed. 
 * 
 *  Usage:
-*     HSUB IN SFACT TYPE OUT FORMATTED
+*     HSUB IN SFACT TYPE OUT OUTCAT
 *
 *  ADAM Parameters:
 *     IN = _NDF (Read)
@@ -65,11 +65,13 @@
 *     OUT = _CHAR (Read)
 *        The name of an output file which is to receive the results.  If
 *        not present, then the results are printed on stdout.
-*     FORMATTED = _LOGICAL (Read)
-*        If true, then the output file will be free-format -- intended
-*        to be human-readable.  If false, then the output will be a
-*        series of keyword-value pairs, which isn't really _un_readable,
-*        but is designed to be suitable for easy parsing.
+*     OUTCAT = _CHAR (Read)
+*        The name of a file which is to receive the results formatted as
+*        an STL file, as defined in SUN/190.  Both OUT and OUTCAT may be
+*        specified, in which case output is sent to both.  If neither
+*        is specified, then output is sent to stdout, in the format
+*        appropriate for the OUT parameter.  OUTCAT may only be
+*        specified on the command line.
 *
 *  Examples:
 *     hsub in=ic3374 sfact=0 type=0
@@ -86,7 +88,7 @@
 *        The results required are those for the smoothed histogram 
 *        only.
 *
-*     hsub in=forn4 sfact=6 type=3 out=hsub.res noformatted
+*     hsub in=forn4 sfact=6 type=3 outcat=hsub.txt
 *
 *        A histogram of the values in image FORN4 is used. The image 
 *        is smoothed using a gaussian filter of radius 6 and the 
@@ -107,9 +109,9 @@
 *     and HISTPEA2 so that the desired parameters (say mean or median)
 *     are passed between them.
 *
-*     With the addition of the OUT and FORMATTED keywords, HSUB is now
+*     With the addition of the OUTCAT keyword, HSUB is now
 *     used by GAIA to generate backgrounds.  You should not, therefore,
-*     change the keywords in the non-FORMATTED output.
+*     change the keywords in the STL output.
 *
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
@@ -120,8 +122,11 @@
 *       (Original version)
 *     29-Jan-1993 (GJP)
 *       Bug in the interpolation method corrected.
-*     24-Nov-1999 (NG)
-*       Added OUT and FORMATTED keywords, so it can be used by GAIA.
+*     26-JAN-2000 (NG)
+*       Added OUTCAT parameter, so it can be used by GAIA.
+*
+*  RCS ID:
+*     $Id$
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -152,10 +157,8 @@
                                       ! 3 - projecting peak chords
                                       ! 4 - interpolating smoothed histogram 
       character *(80) ofname          ! Output file name
-      integer fiod,ounit	      ! Output file descriptor and unit
-      logical outtofile               ! Send output to file, rather than stdout
-      logical formatted               ! Use formatted output
-*      LOGICAL EXCLAIM		      ! Parameter to aif_asfio
+      integer outfiod,outunit	      ! Output file descriptor and unit
+      integer catfiod, catunit        ! OUTCAT file descriptor and unit
       double precision kurto          ! Image pixel count kurtosis
       double precision modev          ! Estimate of the image mode value 
       double precision skewn          ! Image skewness value
@@ -196,25 +199,27 @@
 
 *   Determine the calculation method to be employed. TYPE=0 is automatic,
       call par_get0i('type',type,status)
-      
-*   Is the output to be formatted
-      call par_get0l('formatted',formatted,status)
-      
-*   Output file name
+
+*   Output file names, both OUT and OUTCAT
       call err_mark
 
-      call par_get0c ('out',ofname,status)
+      outfiod = 0
+      call fio_assoc ('out', 'write', 'list', 0, outfiod, status)
       if (status .eq. par__null) then
-         outtofile = .false.
+*      That's OK -- no file specified.
          call err_annul (status)
-      else
-         outtofile = .true.
+      endif
+      
+      catfiod = 0
+      call fio_assoc ('outcat', 'write', 'list', 0, catfiod, status)
+      if (status .eq. par__null) then
+         call err_annul (status)
       endif
       
       call err_rlse
       
 *   JUMP OUT if the parameter-reading has not been successful (which
-*   includes the case where a user enters ANNUL (`!!')
+*   includes the case where a user enters ABORT (`!!')
       if (status .ne. sai__ok) goto 9999
       
 
@@ -230,32 +235,6 @@
      :                status)
          sfact=hsb__sflim
       end if
-
-      if (outtofile) then
-         call err_mark
-         call fio_open (ofname,'write','list',0,fiod,status)
-         if (fio_test('OPEN error',status)) then
-*         Call err_flush to flush out the EMS error messages generated
-*         by fio_test, and reset status to sai__ok
-            call err_flush(status)
-            call msg_out(' ','Couldn''t open file -- writing to stdout',
-     :           status)
-            outtofile = .false.
-            ounit = 6
-         else
-            call fio_unit(fiod,ounit,status)
-         endif
-         call err_rlse
-      else
-         ounit = 6              ! stdout
-      endif
-      
-*      write (*,'("unit ",i3," opened")')ounit
-*      if (outtofile) then
-*         write (*,'("to file")')
-*      else
-*         write (*,'("to stdout")')
-*      endif
 
 *   Map the source NDF data array as _REAL values for reading.
       call ndf_map(ndf1,'data','_real','read',point1(1),elems,status)
@@ -276,54 +255,62 @@
 *   If something has gone wrong, then skip the output stage
       if (status.ne.sai__ok) goto 9999
 
-*   Display the results. Crude cos its only used  to test the example.
+*   Display the results.  Nothing sophisticated.
+      
+      outunit = 0
+      catunit = 0
+      if (outfiod .eq. 0 .and. catfiod .eq. 0) then
+*      Just send the results to stdout
+         outunit = 6            ! stdout
+      else
+*      Obtain the units corresponding to the IO descriptors
+         if (outfiod .ne. 0) then
+            call fio_unit (outfiod, outunit, status)
+         endif
+         if (catfiod .ne. 0) then
+            call fio_unit (catfiod, catunit, status)
+         endif
+      endif
 
-      if (formatted) then
-*      Modal value and standard deviation
-*         call msg_fmtd('modev','f8.1',modev)
-*         call msg_out(' ','Mode value:               ^modev',status)
-*         call msg_fmtd('stand','f8.1',stand)
-*         call msg_out(' ','Std. dev.:                ^stand',status)
-*         call msg_blank(status)
-         write (ounit,'("Mode value:               ",f8.1)'),modev
-         write (ounit,'("Std. dev.:                ",f8.1/)'),stand
+      if (outunit .ne. 0) then
+         write (outunit,'("Mode value:               ",f8.1)'),modev
+         write (outunit,'("Std. dev.:                ",f8.1/)'),stand
 
 *      Kurtosis and skewness.
-         write (ounit,'("Kurtosis:                 ",f8.3)'),kurto
-         write (ounit,'("Skewness:                 ",f8.3/)'),skewn
+         write (outunit,'("Kurtosis:                 ",f8.3)'),kurto
+         write (outunit,'("Skewness:                 ",f8.3/)'),skewn
 
 *      Number of points used etc.
-         write (ounit,'("Number of points given:   ",i8)'),elems
-         write (ounit,'("Number of points used     ",i8)'),nupoi
-         write (ounit,'("Filter radius used:       ",i8/)'),sfact
+         write (outunit,'("Number of points given:   ",i8)'),elems
+         write (outunit,'("Number of points used     ",i8)'),nupoi
+         write (outunit,'("Filter radius used:       ",i8/)'),sfact
 
 *      Type of modal value found.
-         write (ounit,'("Mode type 1-4:            ",i8)'),type
-         write (ounit,'("Global status:            ",i8)'),status
-      else
-*      Write out the results as a sequence of keyword-value pairs.
+         write (outunit,'("Mode type 1-4:            ",i8)'),type
+         write (outunit,'("Global status:            ",i8)'),status
+      endif
+      
+      if (catunit .ne. 0) then
+*      Write out the results in an easily parsable format.  The
+*      format here is the parameter section of an STL file, as
+*      defined in SUN/190.  We could use the CAT library to write
+*      this, but that's unnecessarily complicated for this
+*      application.
+*
 *      Don't change the keywords here, as GAIA relies on them.  Feel
 *      free to change the order, though, and to include comments
-*      beginning with `#'
-         write (ounit,'("! HSUB output file")')
-         write (ounit,'("P mode     REAL ",F8.1," EXFMT=E12.3")') MODEV
-         write (ounit,'("P sd       REAL ",F8.1," EXFMT=E12.3")') STAND
-         write (ounit,'("P kurtosis REAL ",F8.3," EXFMT=E12.3")') KURTO
-         write (ounit,'("P skewness REAL ",F8.3," EXFMT=E12.3")') SKEWN
-         write (ounit,'("P ngiven   INTEGER ",I8," EXFMT=I8")')   ELEMS
-         write (ounit,'("P nused    INTEGER ",I8," EXFMT=I8")')   NUPOI
-         write (ounit,'("P sfact    INTEGER ",I8," EXFMT=I8")')   SFACT
-         write (ounit,'("P modetype INTEGER ",I8," EXFMT=I8")')   TYPE
+*      beginning with `!'.
 
-c         write (ounit,'("# HSUB output file")')
-c         write (ounit,'("mode     =",F8.1)') MODEV
-c         write (ounit,'("sd       =",F8.1)') STAND
-c         write (ounit,'("kurtosis =",F8.3)') KURTO
-c         write (ounit,'("skewness =",F8.3)') SKEWN
-c         write (ounit,'("ngiven   =",I8)')   ELEMS
-c         write (ounit,'("nused    =",I8)')   NUPOI
-c         write (ounit,'("sfact    =",I8)')   SFACT
-c         write (ounit,'("modetype =",I8)')   TYPE
+         write (catunit,'("! HSUB output file")')
+         write (catunit,'("P mode     REAL ",F8.1," EXFMT=E12.3")')modev
+         write (catunit,'("P sd       REAL ",F8.1," EXFMT=E12.3")')stand
+         write (catunit,'("P kurtosis REAL ",F8.3," EXFMT=E12.3")')kurto
+         write (catunit,'("P skewness REAL ",F8.3," EXFMT=E12.3")')skewn
+         write (catunit,'("P ngiven   INTEGER ",I8," EXFMT=I8")')  elems
+         write (catunit,'("P nused    INTEGER ",I8," EXFMT=I8")')  nupoi
+         write (catunit,'("P sfact    INTEGER ",I8," EXFMT=I8")')  sfact
+         write (catunit,'("P modetype INTEGER ",I8," EXFMT=I8")')  type
+
       endif
 
 ********************************************************************
@@ -339,8 +326,13 @@ c         write (ounit,'("modetype =",I8)')   TYPE
 *   End the NDF context.
       call ndf_end(status)        
       
-      if (outtofile) then
-         call fio_close(fiod,status)
+      if (outfiod .ne. 0) then 
+         call fio_annul (outfiod, status)
+         outfiod = 0
+      endif
+      if (catfiod .ne. 0) then 
+         call fio_annul (catfiod, status)
+         catfiod = 0
       endif
       
 ********************************************************************

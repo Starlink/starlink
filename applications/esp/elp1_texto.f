@@ -86,6 +86,8 @@
 *       ELP1_TEXTO and ELF1_TEXTO merged into this routine, which was
 *       extracted from the ellpro.f monolithic source file.
 *
+*  RCS ID:
+*     $Id$
 *
 *  Bugs:
 *     None known.
@@ -159,8 +161,10 @@
          IF (MODE.EQ.0) CALL MSG_BLANK(STATUS)
          
          OPENF = .FALSE.
+         EXCLAIM = .FALSE.
          CALL FIO_ASSOC('OUT','WRITE','LIST',80,FIOD,STATUS)
          IF (STATUS .EQ. PAR__NULL) THEN
+            EXCLAIM = .TRUE.
             CALL ERR_ANNUL (STATUS)
          ELSE IF (STATUS .EQ. SAI__OK) THEN
             OPENF = .TRUE.
@@ -326,14 +330,7 @@
          CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
          CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
 
-*      Output the dimensions of the results
-         NCHAR=0
-         CALL MSG_SETI('VALIDP',VALIDP)
-         CALL MSG_LOAD(' ','fourier (^VALIDP,9)=',
-     :           LINE,NCHAR,STATUS)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the actual values.
+*      Output the fourier values.
          DO 500 I=1,VALIDP
 
 *         Create an appropriately formatted output string.

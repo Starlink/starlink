@@ -1227,7 +1227,7 @@ A subroutine version of HISTPEAK for developers.
 
 Usage:
 
-   HSUB IN SFACT TYPE OUT FORMATTED
+   HSUB IN SFACT TYPE OUT OUTCAT
 
 Description:
 
@@ -1282,12 +1282,14 @@ TYPE = _INTEGER (Read)
 OUT = _CHAR (Read)
    The name of an output file which is to receive the results.  If
    not present, then the results are printed on stdout.
-3 FORMATTED
-FORMATTED = _LOGICAL (Read)
-   If true, then the output file will be free-format -- intended
-   to be human-readable.  If false, then the output will be a
-   series of keyword-value pairs, which isn't really _un_readable,
-   but is designed to be suitable for easy parsing.
+3 OUTCAT
+OUTCAT = _CHAR (Read)
+   The name of a file which is to receive the results formatted as
+   an STL file, as defined in SUN/190.  Both OUT and OUTCAT may be
+   specified, in which case output is sent to both.  If neither
+   is specified, then output is sent to stdout, in the format
+   appropriate for the OUT parameter.  OUTCAT may only be
+   specified on the command line.
 2 Examples
 hsub in=ic3374 sfact=0 type=0
    A histogram of the values in image IC3374 is constructed.
@@ -1301,7 +1303,7 @@ hsub in=galaxy sfact=10 type=4
    The results required are those for the smoothed histogram
    only.
 
-hsub in=forn4 sfact=6 type=3 out=hsub.res noformatted
+hsub in=forn4 sfact=6 type=3 outcat=hsub.txt
    A histogram of the values in image FORN4 is used. The image
    is smoothed using a gaussian filter of radius 6 and the
    results returned those for the projected mode value.
@@ -1316,9 +1318,9 @@ data from the application will need to modify subroutines HSUB
 and HISTPEA2 so that the desired parameters (say mean or median)
 are passed between them.
 
-With the addition of the OUT and FORMATTED keywords, HSUB is now
+With the addition of the OUTCAT keyword, HSUB is now
 used by GAIA to generate backgrounds.  You should not, therefore,
-change the keywords in the non-FORMATTED output.
+change the keywords in the STL output.
 2 Authors
 GJP: Grant Privett (STARLINK)
 
@@ -1330,8 +1332,8 @@ NG: Norman Gray (Starlink, Glasgow)
  29-Jan-1993 (GJP)
     Bug in the interpolation method corrected.
 
- 24-Nov-1999 (NG)
-    Added OUT and FORMATTED keywords, so it can be used by GAIA.
+ 26-JAN-2000 (NG)
+    Added OUTCAT parameter, so it can be used by GAIA.
 2 Implementation_Status
    The current version will not accept a pixel value range greater
    than the largest integer value possible.

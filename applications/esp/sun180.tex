@@ -4,12 +4,13 @@
 
 % -----------------------------------------------------------------------------
 % ? Document identification
+% $Id$
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {180.5}
 \newcommand{\stardocauthors}   {Norman Gray\\Mark Taylor\\Grant Privett}
-\newcommand{\stardocdate}      {5 December 1999}
+\newcommand{\stardocdate}      {27 January 2000}
 \newcommand{\stardoctitle}     {ESP --- Extended Surface Photometry}
 \newcommand{\stardocversion}   {Version 0.10}
 \newcommand{\stardocmanual}    {User's Manual}
@@ -4831,7 +4832,7 @@ The ESP routine descriptions are contained in the following pages.
       be employed.
    }
    \sstusage{
-      HSUB IN SFACT TYPE OUT FORMATTED
+      HSUB IN SFACT TYPE OUT OUTCAT
    }
    \sstparameters{
       \sstsubsection{
@@ -4883,12 +4884,14 @@ The ESP routine descriptions are contained in the following pages.
          not present, then the results are printed on stdout.
       }
       \sstsubsection{
-         FORMATTED = \_LOGICAL (Read)
+         OUTCAT = \_CHAR (Read)
       }{
-         If true, then the output file will be free-format -- intended
-         to be human-readable.  If false, then the output will be a
-         series of keyword-value pairs, which isn't really \_un\_readable,
-         but is designed to be suitable for easy parsing.
+         The name of a file which is to receive the results formatted as
+         an STL file, as defined in SUN/190.  Both OUT and OUTCAT may be
+         specified, in which case output is sent to both.  If neither
+         is specified, then output is sent to stdout, in the format
+         appropriate for the OUT parameter.  OUTCAT may only be
+         specified on the command line.
       }
    }
    \sstexamples{
@@ -4909,7 +4912,7 @@ The ESP routine descriptions are contained in the following pages.
          only.
       }
       \sstexamplesubsection{
-         hsub in=forn4 sfact=6 type=3 out=hsub.res noformatted
+         hsub in=forn4 sfact=6 type=3 outcat=hsub.txt
       }{
          A histogram of the values in image FORN4 is used. The image
          is smoothed using a gaussian filter of radius 6 and the
@@ -4927,9 +4930,9 @@ The ESP routine descriptions are contained in the following pages.
       and HISTPEA2 so that the desired parameters (say mean or median)
       are passed between them.
 
-      With the addition of the OUT and FORMATTED keywords, HSUB is now
+      With the addition of the OUTCAT keyword, HSUB is now
       used by GAIA to generate backgrounds.  You should not, therefore,
-      change the keywords in the non-FORMATTED output.
+      change the keywords in the STL output.
    }
    \sstimplementationstatus{
       The current version will not accept a pixel value range greater

@@ -251,6 +251,9 @@
 #        Various minor fixes to build procedure.
 #     {enter_further_changes_here}
 #
+#  RCS:
+#     $Id$
+#
 #  Bugs:
 #     {note_any_bugs_here}
 #
@@ -422,7 +425,7 @@ PKG_LINK = ESP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.10-5
+PKG_VERS = 0.10-6
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
