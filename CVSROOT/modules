@@ -34,3 +34,6 @@ astrom		applications/astrom
 #
 # External/third-party code
 catlib		thirdparty/eso/catlib
+#
+# STARJAVA, excluding pal and uk directories.
+starjava  -a !java/pal !java/uk java
