@@ -185,7 +185,7 @@
          CALL KPS1_CPBUW( NEL, VAR, %VAL( P_REF ), %VAL( P_OUT ), 
      :                   %VAL( P_OUTV ), NBAD, STATUS )
 
-      ELSE 
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'TY', TY_IN )
          CALL ERR_REP( 'COPYBAD_UTYP', 'Unsupported data type '//
