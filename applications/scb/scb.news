@@ -36,4 +36,8 @@ v1.1-2 (February 2003):
    SCB_BROWSER_TMP directory.  This will only work in cases where no
    untarring of source files needs to be done of course.
 
+v1.1-3 (July 2003):
+   Some minor changes to scbindex in response to issues that showed up 
+   with Perl 5.8.
+
 # $Id$

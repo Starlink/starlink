@@ -182,7 +182,7 @@ $SIG{'INT'} = sub {tidyup; exit;};
 #  Check command line flags to see if we are running in update-only mode.
 
 $update_only = 0;
-if ($ARGV[0] =~ /^-update/) {
+if ($#ARGV>=0 && $ARGV[0] =~ /^-update/) {
    shift @ARGV;
    $update_only = 1;
 }
