@@ -192,8 +192,6 @@
 	CHARACTER*(DAT__SZLOC) LOC	! Component locator
 	CHARACTER*(DAT__SZLOC) DCLOC(NDSMAX)	! Data container file locators
 	CHARACTER*(DAT__SZLOC) CLOC	! Temporary component locator
-	CHARACTER*(DAT__SZLOC) ALOC	! Locator to ASTERIX box
-	CHARACTER*(DAT__SZLOC) BRLOC	! Locator to b/g file reference
 	CHARACTER*(DAT__SZLOC) BLOC(NDSMAX)	! Locator to b/g files
 	CHARACTER*(DAT__SZLOC) SLOC(NDSMAX)	! Data array slice locators
 	CHARACTER*(DAT__SZLOC) BSLOC(NDSMAX)	! B/g array slice locators
@@ -209,7 +207,6 @@
 	LOGICAL LOG			! General purpose logical
 	LOGICAL REF			! Input from reference file?
 	LOGICAL OK			! Data present and defined?
-	LOGICAL VALID			! Locator valid?
 	LOGICAL SPECSET(NDSCMAX)	! Container is a SPECTRAL_SET?
 	LOGICAL QUAL			! Data quality info available?
 	LOGICAL BAD			! Bad points present?
