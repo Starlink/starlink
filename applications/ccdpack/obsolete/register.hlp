@@ -83,6 +83,8 @@ CLASS( ) = LITERAL (Read)
    classification and a table of classifications of common
    mappings.
 
+   This parameter is ignored unless OUTFORMAT=TRANSFORM.
+
 CLASSIFY
 
 CLASSIFY = _LOGICAL (Read)
@@ -93,6 +95,8 @@ CLASSIFY = _LOGICAL (Read)
    in SUN/61 which should be consulted before using this option.
    Linear transformations are classified by this routine directly
    and do not use this parameter.
+
+   This parameter is ignored unless OUTFORMAT=TRANSFORM.
    [FALSE]
 
 FA-FZ
@@ -110,6 +114,8 @@ FA-FZ = LITERAL (Read)
       YINV > PA*SIND(FB/PA)*YY/FB
       FA > SQRT(X*X+Y*Y)
       FB > SQRT(XX*XX+YY*YY)
+
+   This parameter is ignored unless OUTFORMAT=TRANSFORM.
 
 FITTYPE
 
@@ -260,8 +266,8 @@ OUTFORMAT = LITERAL (Read)
                      .MORE.CCDPACK extension of the NDF
 
    If WCS is chosen, then a new frame, with a Domain value given
-   by OUTDOMAIN, is inserted into the WCS extension of the NDF
-   (a new WCS extension is created if none previously existed).
+   by OUTDOMAIN, is inserted into the WCS component of the NDF
+   (a new WCS component is created if none previously existed).
    A mapping between this and the 'PIXEL' domain is defined,
    which is the unit mapping in the case that the NDF in question
    is the reference set.  If any frame in the domain OUTDOMAIN
@@ -323,6 +329,22 @@ TRFILE = TRFILE (Read)
    If PLACEIN is given as "FILE" then the value of this parameter
    specifies the name of the container file to be used to store
    the resultant transformation structures.
+
+USEWCS
+
+USEWCS = _LOGICAL (Read)
+   This parameter specifies whether the coordinates in the
+   position lists should be transformed from Pixel coordinates
+   into the coordinates of the Current frame of the WCS
+   component of the associated NDF before use.  It should
+   normally be set TRUE, in which case the transformation type
+   set by the FITTYPE parameter is the type which will be fit
+   between the Current coordinate frames of the NDFs.
+   Otherwise the fit will be between the Pixel coordinate
+   frames.
+
+   This parameter is ignored if NDFNAMES is not TRUE.
+   [TRUE]
 
 XFOR
 
@@ -392,11 +414,13 @@ register inlist='*' fittype=1
    In this example all the NDFs in the current directory are
    accessed and their associated position lists are opened.
    A global fit between all the datasets is then performed
-   which results in estimates for the offsets from the first input
-   NDF's position.  The results are then coded as new frames,
-   given the domain name 'CCD_REG' in the WCS component of the
-   NDFs.  Actual registration of the images can then be achieved
-   by aligning all the NDFs in the CCD_REG domain.
+   which results in estimates for the offsets from the first
+   input NDF's position.  These offsets are between the Current
+   coordinate frames of the NDFs.  The results are then coded
+   as new frames, with the domain name 'CCD_REG', in the WCS
+   component of the NDFs.  Actual registration of the images
+   can then be achieved by aligning all the NDFs in the CCD_REG
+   domain.
 
 register inlist='*' trtype=5 outdomain=result-set1
    This example works as above but this time the global
@@ -408,7 +432,8 @@ register inlist='"myndf1,myndf2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
    position lists associated with the NDFs myndf1 and myndf2.
    The reference positions are chosen to be those associated with
-   myndf2.
+   myndf2, so that the CCD_REG frame coordinates will be the
+   same as the Current frame in NDF myndf2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
    In this example the position lists associated with the NDFs
@@ -427,7 +452,7 @@ register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
 
 register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
          yfor='pe+pf*x+pg*y+ph*x*y'
-   In this example an non-linear transformation is fit between the
+   In this example a non-linear transformation is fit between the
    positions associated with the NDFs ndf1 and ndf2. This analysis
    may help in determining whether a 6-parameter fit is good
    enough, or if you just want to transform positions. A problem
@@ -482,6 +507,9 @@ Notes
   Files with EXTERNAL format may be used with this application but
   all positions have to be present in all lists, no missing
   positions are allowed.
+
+  In all cases, the coordinates in position lists are pixel
+  coordinates.
 
 - NDF extension items.
 
@@ -553,4 +581,7 @@ History
 
  11-MAR-1999 (MBT):
     Changed to use WCS components as well as TRANSFORM structures.
+
+ 21-MAY-1999 (MBT):
+    Added USEWCS parameter.
 .endhelp
