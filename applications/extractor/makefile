@@ -207,7 +207,7 @@
 #        Cosmetics.
 #        Designated Mk IVc.
 #     29-JUN-1995 (BLY):
-#        Added sections for manipulating Latex and Hypertest documentation.
+#        Added sections for manipulating Latex and Hypertext documentation.
 #        Revised install and deinstall sequences.
 #        Changed export* targets to make compressed tar files in one step.
 #        Replacing of `rm' with `rm -f' in most cases.
@@ -225,6 +225,9 @@
 #        Modify for EXTRACTOR
 #     24-NOV-1998 (PWD):
 #        Changed for EXTRACTOR v1.0 (now includes native build).
+#     13-JUL-2000 (PWD):
+#        Changed documentation install to "copy and link" to save disk 
+#        space.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -963,6 +966,8 @@ install:
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_DOCS);\
               chmod 644 $(INSTALL_DOCS)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_DOCS)/$$f $$f;\
            else :; fi;\
         done
 #
@@ -977,10 +982,13 @@ install:
                  $(TAR_OUT) $$pwd/$${f}_tar;\
                  chmod 755 `find $$f -type d -print`;\
                  chmod 644 `find $$f ! -type d -print`;\
-		 cp -p $$pwd/mud165.ps . ;\
                  touch $$f;\
               else :; fi;\
            done);\
+	   cp -p mud165.ps $(INSTALL_DOCS) ;\
+	   chmod 644 $(INSTALL_DOCS)/mud165.ps;\
+	   rm -f mud165.ps;\
+           $(LINK) $(INSTALL_DOCS)/mud165.ps .;\
            HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
            export HTX_PATH;\
            $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
@@ -1123,6 +1131,8 @@ do_deinstall:
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_DOCS)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_DOCS)/$$f .;\
               rm -f $(INSTALL_DOCS)/$$f;\
            else :; fi;\
         done
@@ -1134,6 +1144,11 @@ do_deinstall:
                  rm -f -r $(INSTALL_DOCS)/$$f;\
               else :; fi;\
            done;\
+           if test -f $(INSTALL_DOCS)/mud165.ps; then \
+              rm -f mud165.ps;\
+              cp -p $(INSTALL_DOCS)/mud165.ps .;\
+              rm -f $(INSTALL_DOCS)/mud165.ps;\
+           else :; fi;\
            HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
            export HTX_PATH;\
            $(STAR_BIN)/hlink $(INSTALL_DOCS) $(INSTALL_HELP);\
