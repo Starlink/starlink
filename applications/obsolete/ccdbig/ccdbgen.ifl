@@ -91,7 +91,7 @@ interface CCDBGEN
    parameter      FLAT            # Do we generate flat fields?
       type        _LOGICAL
       access      READ
-      vpath       'PROMPT,CURRENT,DEFAULT'
+      vpath       'CURRENT,DEFAULT'
       ppath       'CURRENT,DEFAULT'
       prompt      'Generate flatfields'
       default     TRUE
@@ -109,4 +109,4 @@ interface CCDBGEN
    endparameter
 
 endinterface
-# $Id: ccdbgen.ifl,v 1.3 1998/06/17 11:12:18 mbt Exp mbt $
+# $Id: ccdbgen.ifl,v 1.4 1998/06/17 14:14:17 mbt Exp $
