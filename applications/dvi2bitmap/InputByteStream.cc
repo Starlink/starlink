@@ -50,27 +50,37 @@ using std::sprintf;
 // Static debug switch
 verbosities InputByteStream::verbosity_ = normal;
 
-// Open the requested file.  If preload is true, then open the file and
-// read it entire into memory, since the client will be seeking a lot.
-// If the file can't be opened, then try adding tryext to the end of
-// it.  If this succeeds in opening the file, then modify the filename.
-InputByteStream::InputByteStream (string& s, bool preload, string tryext)
+/**
+ * Opens the requested file.  If preload is true, then open the file and
+ * read it entire into memory, since the client will be seeking a lot.
+ * If the file can't be opened, then try adding <code>tryext</code> to the end of
+ * it.  Certain methods below can be called only on files which have
+ * been preloaded.
+ *
+ * @param filename the file to be opened
+ * @param preload if true, then the file is read entirely into memory
+ * @param tryext a file extension which should be added to the end of
+ * <code>filename</code> if that cannot be opened
+ */
+InputByteStream::InputByteStream (string& filename, bool preload,
+                                  string tryext)
     : eof_(true), preloaded_(preload)
 {
-    fname_ = s;
+    fname_ = filename;
     fd_ = open (fname_.c_str(), O_RDONLY);
     if (fd_ < 0 && tryext.length() > 0)
     {
 	fname_ += tryext;
 	fd_ = open (fname_.c_str(), O_RDONLY);
 	if (fd_ >= 0)
-	    s = fname_;		// modify the input filename
+            // If this succeeds in opening the file, then modify the filename.
+	    filename = fname_;
     }
     if (fd_ < 0)
     {
 	string errstr = strerror (errno);
-	throw InputByteStreamError ("can\'t open file " + s + " to read ("
-				    +errstr+")");
+	throw InputByteStreamError ("can\'t open file " + filename
+                                    + " to read (" + errstr + ")");
     }
 
     eof_ = false;
@@ -118,6 +128,9 @@ InputByteStream::InputByteStream (string& s, bool preload, string tryext)
     p_ = buf_;
 }
 
+/**
+ * Closes the file and reclaims any buffers.
+ */
 InputByteStream::~InputByteStream ()
 {
     if (fd_ >= 0)
@@ -125,6 +138,12 @@ InputByteStream::~InputByteStream ()
     delete[] buf_;
 }
 
+/**
+ * Reads one or more bytes from the file
+ *
+ * @param n the number of bytes to read
+ * @return the byte read
+ */
 Byte InputByteStream::getByte(int n)
 {
     if (eof_)
@@ -150,6 +169,15 @@ Byte InputByteStream::getByte(int n)
     return result;
 }
 
+/**
+ * Reads a block of data from anywhere in the file.
+ *
+ * @param pos the offset from the beginning of the file from which the
+ * block should be read.  If <code>pos</code> is negative, then read the block from
+ * an offset <code>-pos</code> from the <em>end</em> of the file.
+ * @param length the number of bytes to read
+ * @return a pointer to an array of bytes
+ */
 const Byte *InputByteStream::getBlock (int pos, unsigned int length)
 {
     if (eof_)
@@ -215,11 +243,23 @@ const Byte *InputByteStream::getBlock (int pos, unsigned int length)
     return blockp;
 }
 
+/**
+ * Indicate whether we are at the end of the file
+ * @return true if we are at the end of the file
+ */
 bool InputByteStream::eof()
 {
     return eof_;
 }
 
+/** 
+ * Skip to a specified place in the file.
+ *
+ * @param pos the offset from the beginning of the file where the file
+ * pointer should be placed
+ * @throws DviBug if argument <code>pos</code> is beyond the end of
+ * the file
+ */
 void InputByteStream::seek (unsigned int pos)
 {
     if (preloaded_)
@@ -240,12 +280,28 @@ void InputByteStream::seek (unsigned int pos)
 	p_ = buf_;
     }
 }
+
+/**
+ * Indicates the position within the file.  This information can be
+ * reported only for preloaded files.
+ *
+ * @return the offset from the beginning of the file
+ * @throws DviBug if the file was not preloaded
+ */
 int InputByteStream::pos ()
 {
     if (!preloaded_)
 	throw DviBug ("InputByteStream:"+fname_+": Can't get pos in non-preloaded file");
     return static_cast<int>(p_ - buf_);
 }
+
+/**
+ * Skips a number of bytes forward in the file.  This can be used only
+ * for preloaded files.
+ *
+ * @param skipsize the number of bytes to move forward in the file
+ * @throws DviBug if the file was not preloaded
+ */
 void InputByteStream::skip (unsigned int skipsize)
 {
     if (!preloaded_)
@@ -282,6 +338,15 @@ void InputByteStream::read_buf_ ()
 // I _believe_ that the following code is independent of the host
 // machine's bytesex and integer representation (2's-complement or
 // not), but....
+
+/**
+ * Obtains an n-byte signed integer from the stream, as a signed
+ * int.
+ *
+ * @param n the number of bytes to read, in the range 1--4 inclusive
+ * @return the next integer from the input stream, as a signed int
+ * @throws DviBug if parameter <code>n</code> was out of range
+ */
 signed int InputByteStream::getSIS(int n)
 {
     if (n<0 || n>4)
@@ -326,6 +391,15 @@ signed int InputByteStream::getSIS(int n)
     return result;
 }
 
+/**
+ * Obtains an n-byte unsigned integer from the stream, 
+ * as a signed int.
+ *
+ * @param n the number of bytes to read, in the range 1--3 inclusive
+ * (there are no 4-byte unsigned quantities in DVI files)
+ * @return the next integer from the input stream, as a signed int
+ * @throws DviBug if parameter <code>n</code> was out of range
+ */
 signed int InputByteStream::getSIU(int n)
 {
     // disallow n==4 - there are no unsigned 4-byte quantities in the DVI file
@@ -340,6 +414,14 @@ signed int InputByteStream::getSIU(int n)
     return static_cast<signed int>(t);
 }
 
+/**
+ * Obtains an n-byte unsigned integer from the stream, as an
+ * unsigned int
+ *
+ * @param n the number of bytes to read, in the range 1--4 inclusive
+ * @return the next integer from the input stream, as an unsigned int
+ * @throws DviBug if parameter <code>n</code> was out of range
+ */
 unsigned int InputByteStream::getUIU(int n)
 {
     if (n<0 || n>4)
@@ -353,6 +435,17 @@ unsigned int InputByteStream::getUIU(int n)
     return t;
 }
 
+/**
+ * Obtains an n-byte unsigned integer from the beginning of a
+ * <code>Byte</code> array, as an unsigned int.  This has little
+ * specifically to do with Input streams, and is here as a convenience
+ * method.
+ *
+ * @param n the number of bytes to read, in the range 1--4 inclusive
+ * @param p a pointer to an array of <code>Byte</code> values
+ * @return the integer at the beginning of the given array, as an unsigned int
+ * @throws DviBug if parameter <code>n</code> was out of range
+ */
 unsigned int InputByteStream::getUIU(int n, const Byte *p)
 {
     if (n<0 || n>4)

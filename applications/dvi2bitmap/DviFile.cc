@@ -61,8 +61,20 @@ verbosities DviFile::verbosity_ = normal;
 // be a GCC error, but I can't pin it down accurately enough to
 // identify a specific fault.
 
-DviFile::DviFile (string& s, int res, double magmag)
-    : fileName_(s), pending_hupdate_(0), pending_hhupdate_(0),
+/**
+ * Constructs a new <code>DviFile</code> object.
+ *
+ * <p>Once the DVI file has been opened in this way, its contents can
+ * be processed in an event-based fashion, by repeatedly calling
+ * {@link #getEvent} and handling the returned object.
+ *
+ * @param fn the name of the DVI file
+ * @param res the base DPI to be used for processing the file, in pixels-per-inch
+ * @param magmag the factor by which the DVI file's internal
+ * magnification factor should itself be magnified -- default 1.0
+ */
+DviFile::DviFile (string& fn, int res, double magmag)
+    : fileName_(fn), pending_hupdate_(0), pending_hhupdate_(0),
       current_font_(0), dvif_(0), resolution_(res), magmag_(magmag),
       magfactor_(1.0), skipPage_(false),
       max_drift_(0)
@@ -91,29 +103,41 @@ DviFile::~DviFile()
     delete dvif_;
 }
 
-// This is a wrapper for getEvent.
-// It sets the flag skipPage_ and calls getEvent.  That means that the next
-// event it returns will be an end-of-page event.
+/**
+ * Skips to the end of the page.  This reads the DVI file at high
+ * speed until it finds the next end-of-page event, which it returns,
+ * leaving the DVI file positioned appropriately.
+ *
+ * @return the next end-of-page event
+*/
 DviFileEvent *DviFile::getEndOfPage()
 {
     skipPage_ = true;
     return getEvent();
 }
 
-// This is the routine which does most of the actual work.  It scans
-// through the file reading opcodes.  Most of these it handles itself,
-// but certain ones it handles by returning an event to the calling routine.
-// The last event it'll return is a DviFilePostamble event, and it'll return
-// 0 if called afterwards.
-//
-// If the flag skipPage_ is true, then keep processing the file, but
-// without returning an event.  The eop opcode (number 140) resets
-// skipPage_ to false.  We can't just scan for opcode 140 because (a)
-// we need to process font-changing commands, so that current_font is
-// correct at the start of the next page, and (b) we might just come
-// across byte 140 in data, which would mess us up big-time.
+/**
+ * Gets an event from the DVI file.
+ * 
+ * <p>This is the routine which does most of the actual work.  It scans
+ * through the file reading opcodes.  Most of these it handles itself,
+ * but certain ones it handles by returning an event to the calling routine.
+ * The last event it'll return is a {@link #DviFilePostamble} event, and it'll return
+ * 0 if called afterwards.
+ *
+ * <p>The events which can be returned are all of the subclasses of
+ * {@link DviFileEvent}, qv.
+ *
+ * @return the next event from the DVI file
+ */
 DviFileEvent *DviFile::getEvent()
 {
+    // If the flag skipPage_ is true, then keep processing the file, but
+    // without returning an event.  The eop opcode (number 140) resets
+    // skipPage_ to false.  We can't just scan for opcode 140 because (a)
+    // we need to process font-changing commands, so that current_font is
+    // correct at the start of the next page, and (b) we might just come
+    // across byte 140 in data, which would mess us up big-time.
     DviFileEvent *gotEvent = 0;	// non-zero when we've got an event
     Byte opcode = 255;		// illegal opcode
     int i1;
@@ -517,6 +541,11 @@ DviFileEvent *DviFile::getEvent()
 
 // getByte and the get?I? routines are just interfaces to the corresponding 
 // routines in InputByteStream
+
+/**
+ * Obtains a byte from the DVI file.
+ * @return the next byte from the input stream
+ */
 Byte DviFile::getByte()
 {
     if (eof())
@@ -526,6 +555,14 @@ Byte DviFile::getByte()
 	return dvif_->getByte();
     }
 }
+/**
+ * Obtains an n-byte unsigned integer from the DVI file, 
+ * as a signed int.
+ *
+ * @param n the number of bytes to read
+ * @return the next integer from the input stream, as a signed int
+ * @see InputByteStream#getSIU
+ */
 signed int DviFile::getSIU(int n)
 {
     if (eof())
@@ -535,6 +572,14 @@ signed int DviFile::getSIU(int n)
 	return dvif_->getSIU(n);
     }
 }
+/**
+ * Obtains an n-byte signed integer from the DVI file, as a signed
+ * int.
+ *
+ * @param n the number of bytes to read
+ * @return the next integer from the input stream, as a signed int
+ * @see InputByteStream#getSIS
+ */
 signed int DviFile::getSIS(int n)
 {
     if (eof())
@@ -544,6 +589,14 @@ signed int DviFile::getSIS(int n)
 	return dvif_->getSIS(n);
     }
 }
+/**
+ * Obtains an n-byte unsigned integer from the DVI file, as an
+ * unsigned int
+ *
+ * @param n the number of bytes to read
+ * @return the next integer from the input stream, as an unsigned int
+ * @see InputByteStream#getUIU
+ */
 unsigned int DviFile::getUIU(int n)
 {
     if (eof())
@@ -553,13 +606,22 @@ unsigned int DviFile::getUIU(int n)
 	return dvif_->getUIU(n);
     }
 }
+/**
+ * Indicates whether we are at the end of the DVI file
+ * @return true if we are at EOF
+ */
 bool DviFile::eof()
 {
     return (dvif_ == 0 || dvif_->eof());
 }
 
-// dp is in DVI units, and should be converted to pixel units, with any
-// necessary rounding
+/**
+ * Convert a DVI length to a pixel length, rounding correctly.  See
+ * the DVI standard for details.
+ *
+ * @param dp a length in DVI units
+ * @return the length in pixel units, with any necessary rounding
+*/
 int DviFile::pixel_round(int dp)
 {
     if (dp>0)
@@ -574,7 +636,12 @@ int DviFile::pixel_round(int dp)
 #endif
 }
 
-// Return width of character in DVIUnits
+/**
+ * Return width of character in DVIUnits
+ *
+ * @param charno the number of the character to examine
+ * @return the width of the character
+ */
 int DviFile::charWidth_ (int charno)
 {
     if (current_font_ == 0)
@@ -584,7 +651,12 @@ int DviFile::charWidth_ (int charno)
 			    * dviu_per_pt_);
 }
 
-// Return escapement of character, in pixel units
+/**
+ * Return escapement of character, in pixel units.
+ *
+ * @param charno the number of the character to examine
+ * @return the escapement appropriate for the character
+ */
 int DviFile::charEscapement_ (int charno)
 {
     if (current_font_ == 0)
@@ -806,30 +878,36 @@ void DviFile::read_postamble()
     }
 }
 
-// The preamble dimensions num and den `are positive integers that
-// define the units of measurement; they are the numerator and
-// denominator of a fraction by which all dimensions in the DVI file
-// could be multiplied in order to get lengths in units of 10^{-7}
-// meters.  (For example, there are exactly 7227 \TeX\ points in 254
-// centimeters, and \TeX82 works with scaled points where there are
-// $2^{16}$ sp in a point, so \TeX82 sets num=25400000 and
-// den=7227.2^{16}=473628672.)' [from the spec].  That is, for TeX,
-// DVI unit = sp, and 1sp = num/den x 10^{-7}m.
-//
-// We want to use these numbers to establish a conversion between DVI
-// units and screen pixels, each of which is nominally 1 TeX point
-// (1/72.27 inch) in size (for a 72dpi screen).  So, how many DVI
-// units are there in a TeX point?  Well, the conversion factor above
-// says that 1pt = 2.54x10^7/7227 (10^{-7}m), so 
-// DVI unit = sp = num/den x 7227/2.54x10^7 x 1pt.  Given the above
-// values for num and den, this works out as
-// DVI unit = sp = 1/2^16 x 1pt, which we actually knew as soon as we
-// were told that TeX's DVI files have (DVI units=sp).
-//
-// The `device units' in this case are pixels, each of which is
-// (1pt=1/72.27in)/magfactor_ in size.   This matters, as it
-// determines the size of the max_drift_ parameter, as described in
-// the DVI standard, section 2.6.2.
+/**
+ * Process a DVI file preamble.
+ *
+ * <p>The preamble dimensions num and den `are positive integers that
+ * define the units of measurement; they are the numerator and
+ * denominator of a fraction by which all dimensions in the DVI file
+ * could be multiplied in order to get lengths in units of 10^{-7}
+ * meters.  (For example, there are exactly 7227 \TeX\ points in 254
+ * centimeters, and \TeX82 works with scaled points where there are
+ * $2^{16}$ sp in a point, so \TeX82 sets num=25400000 and
+ * den=7227.2^{16}=473628672.)' [from the spec].  That is, for TeX,
+ * DVI unit = sp, and 1sp = num/den x 10^{-7}m.
+ *
+ * <p>We want to use these numbers to establish a conversion between DVI
+ * units and screen pixels, each of which is nominally 1 TeX point
+ * (1/72.27 inch) in size (for a 72dpi screen).  So, how many DVI
+ * units are there in a TeX point?  Well, the conversion factor above
+ * says that 1pt = 2.54x10^7/7227 (10^{-7}m), so 
+ * DVI unit = sp = num/den x 7227/2.54x10^7 x 1pt.  Given the above
+ * values for num and den, this works out as
+ * DVI unit = sp = 1/2^16 x 1pt, which we actually knew as soon as we
+ * were told that TeX's DVI files have (DVI units=sp).
+ *
+ * <p>The `device units' in this case are pixels, each of which is
+ * (1pt=1/72.27in)/magfactor_ in size.   This matters, as it
+ * determines the size of the max_drift_ parameter, as described in
+ * the DVI standard, section 2.6.2.
+ *
+ * @param p pointer to the preamble
+ */
 void DviFile::process_preamble(DviFilePreamble* p)
 {
     preamble_.i = p->dviType;
@@ -971,6 +1049,14 @@ void DviFile::PosStateStack::clear()
 }
 #endif
 
+/**
+ * Dereferences the iterator.
+ * @return pointer to the <code>PkFont</code> currently referenced by
+ * the iterator.
+ * @throws DviBug if the iterator is not initialised or has gone past
+ * the end of its sequence.
+ * @see DviFile#begin
+ */
 const PkFont* DviFile::const_iterator::operator*()
     const
     throw (DviBug)
@@ -980,6 +1066,11 @@ const PkFont* DviFile::const_iterator::operator*()
     return mapiter_->second;
 }
 
+/**
+ * Increments the iterator.
+ * @return the iterator itself
+ * @see DviFile#begin
+ */
 DviFile::const_iterator& DviFile::const_iterator::operator++()
 {
     ++mapiter_;
@@ -987,32 +1078,3 @@ DviFile::const_iterator& DviFile::const_iterator::operator++()
 	finished_ = true;
     return *this;
 }
-
-// // Font iterator -- probably better implemented as an iterator itself
-// PkFont *DviFile::firstFont()
-// {
-//     fontIter_ = fontMap_.begin();
-//     if (fontIter_ == fontMap_.end())
-// 	return 0;
-//     else
-//     {
-// 	iterOK_ = true;
-// 	return fontIter_->second;
-//     }
-// }
-// PkFont *DviFile::nextFont() 
-// {
-//     if (!iterOK_)
-// 	return 0;
-//     else
-//     {
-// 	++fontIter_;
-// 	if (fontIter_ == fontMap_.end())
-// 	{
-// 	    iterOK_ = false;	// end of list
-// 	    return 0;
-// 	}
-// 	else
-// 	    return fontIter_->second;
-//     }
-// }

@@ -38,6 +38,9 @@ class InputByteStreamError : public DviError {
     InputByteStreamError(string s) : DviError(s) { }
 };
 
+/**
+ * Abstracts a file as a stream of bytes.
+ */
 class InputByteStream {
  public:
     InputByteStream (string& s, bool preload=false, string tryext="");
@@ -56,6 +59,10 @@ class InputByteStream {
     void seek (unsigned int);
     int pos ();
     void skip (unsigned int);
+    /**
+     * Sets the verbosity of this module.
+     * @param level the required verbosity
+     */
     static void verbosity (const verbosities level) { verbosity_ = level; }
  private:
     int fd_;
