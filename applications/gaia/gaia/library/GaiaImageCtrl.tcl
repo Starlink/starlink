@@ -671,7 +671,7 @@ itcl::class gaia::GaiaImageCtrl {
             set d [DialogWidget .#auto \
                       -title {Temporary image} \
                       -text "The image ($last_file_) that was displayed in \
-                             window $itk_option(appname): ($clone) is marked \
+                             window $itk_option(-appname): ($clone) is marked \
                              temporary.\n\Are you sure you want to delete it?"\
                       -buttons [list Yes No]]
             set answer [$d activate]
