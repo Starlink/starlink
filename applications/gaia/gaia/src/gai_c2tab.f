@@ -65,6 +65,11 @@
 *  History:
 *     22-SEP-1998 (PDRAPER):
 *        Original version.
+*     04-JUN-1999 (PDRAPER):
+*        Added check if RA and DEC columns have these names. {HOURS}
+*        isn't a strong enough check, these can also be qualified by 
+*        {+IHMS.3} type strings. In which case we cannot "guess" which
+*        column is RA. To do this add a check if the name is RA.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -107,6 +112,7 @@
       CHARACTER * ( 1 ) EXPR    ! Virtual column expression (not used).
       CHARACTER * ( 1 ) TAB     ! Tab character
       CHARACTER * ( CAT__SZCMP ) NAME ! Name of a component
+      CHARACTER * ( CAT__SZCMP ) LNAME ! Name of a component
       CHARACTER * ( CAT__SZEXP ) EXTFMT ! Column external format
       CHARACTER * ( CAT__SZUNI ) UNITS ! Units of column
       CHARACTER * ( CAT__SZVAL ) VALUE ! Value of a component
@@ -231,12 +237,22 @@
             AREDEG = .FALSE.
 
 *  Column with angle data. This is either an RA or DEC. If qualified by
-*  {HOURS} then assume RA, otherwise it is a DEC. Note we need both of
-*  these to have a valid match.
+*  {HOURS} or the name is some variation of RA/Ra/r.a./Rightxxx, then
+*  assume RA, otherwise it is a DEC. Note we need both of these to have
+*  a valid match.
             IF ( UNITS( 8: ) .EQ. '{HOURS}' ) THEN
                IF ( RACOL .EQ. -1 ) RACOL = I - 1
             ELSE
-               IF ( DECCOL .EQ. -1 ) DECCOL = I - 1
+               LNAME = NAME
+               CALL CHR_LCASE( LNAME )
+               CALL CHR_LDBLK( LNAME ) 
+               IF ( LNAME( :2 ) .EQ. 'ra' .OR. 
+     :              LNAME( :5 ) .EQ. 'right' .OR.
+     :              LNAME( :4 ) .EQ. 'r.a.' ) THEN
+                  IF ( RACOL .EQ. -1 ) RACOL = I - 1
+               ELSE 
+                  IF ( DECCOL .EQ. -1 ) DECCOL = I - 1
+               END IF
             END IF
 
 *  Check for SExtractor specific names. Note SExtractor world
