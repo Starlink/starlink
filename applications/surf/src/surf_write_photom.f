@@ -1,9 +1,15 @@
-*+  REDS_WRITE_PHOTOM - routine to output ASCII results of PHOTOM reduction
-      SUBROUTINE REDS_WRITE_PHOTOM (FD, MAX_BEAM, 
+      SUBROUTINE REDS_WRITE_PHOTOM (FD, PARABOLA, MAX_BEAM,
      :  N_BOLS, BOL_CHAN, BOL_ADC, PHOT_BB, MAX_INT, N_INTEGRATIONS, 
      :  PEAK_D, PEAK_V, PEAK_X, PEAK_Y, PEAK_Q, BEAM_WEIGHT,
      :  MEAS_1_D, MEAS_1_V, MEAS_1_X, MEAS_1_Y, MEAS_1_Q,
      :  MEAS_2_D, MEAS_2_V, MEAS_2_Q, STATUS)
+*+
+*  Name:
+*     REDS_WRITE_PHOTOM 
+
+*  Description:
+*     Routine to output ASCII results of PHOTOM reduction
+
 *    Description :
 *     This routine writes out the results for 1 sub-instrument of a PHOTOM
 *     observation.
@@ -35,6 +41,8 @@
 *     MAX_BEAM               = INTEGER (Given)
 *           the maximum number of bolometers that can observe the source
 *           in a single observation
+*     PARABOLA               = LOGICAL (Given)
+*           True if we fitted the coaaded jiggle with a parabola
 *     N_BOLS                 = INTEGER (Given)
 *           the number of bolometers used in the sub-instrument
 *     BOL_CHAN (N_BOLS)      = INTEGER (Given)
@@ -108,6 +116,7 @@
       INTEGER       PHOT_BB (MAX_BEAM)
       INTEGER       MAX_INT
       INTEGER       N_INTEGRATIONS
+      LOGICAL       PARABOLA
       REAL          PEAK_D (MAX_INT, MAX_BEAM)
       REAL          PEAK_V (MAX_INT, MAX_BEAM)
       REAL          PEAK_X (MAX_INT, MAX_BEAM)
@@ -139,6 +148,7 @@
       INTEGER            ITEMP           ! scratch integer
       CHARACTER*(RECLEN) LINE            ! line to be written to file
       CHARACTER*15       STEMP           ! scratch string
+      REAL               STON            ! Signal to noise
 *    Internal References :
 *    Local data :
 *-
@@ -173,8 +183,16 @@
                   WRITE(LINE,15) I
                ELSE
                   ERROR = SQRT(PEAK_V(I,BEAM))
+
+*     Protect against division by zero and 0.0/0.0
+                  IF (ERROR .GT. 1.0E-10) THEN
+                     STON = PEAK_D(I,BEAM)/ERROR
+                  ELSE
+                     STON = 0.0
+                  END IF
+
                   WRITE (LINE, 10) I, PEAK_D(I,BEAM), ERROR,
-     :                 PEAK_D(I,BEAM)/ERROR, PEAK_X(I,BEAM),
+     :                 STON, PEAK_X(I,BEAM),
      :                 PEAK_Y(I,BEAM)
                END IF
                CALL FIO_WRITE (FD, LINE, STATUS)
@@ -185,20 +203,36 @@
             LINE = 'Measurement results:'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
-            LINE = ' Parabolic fit to coadded jiggle:'
-            CALL FIO_WRITE (FD, LINE, STATUS)
+*       Parabola
+            IF (PARABOLA) THEN
 
-            ERROR = SQRT(MEAS_1_V(BEAM))
+               LINE = ' Parabolic fit to coadded jiggle:'
+               CALL FIO_WRITE (FD, LINE, STATUS)
 
-            WRITE (LINE,20) MEAS_1_D(BEAM), ERROR, MEAS_1_D(BEAM)/ERROR,
-     :        MEAS_1_X(BEAM), MEAS_1_Y(BEAM)
-            CALL FIO_WRITE (FD, LINE, STATUS)
+               ERROR = SQRT(MEAS_1_V(BEAM))
+               IF (ERROR .GT. 1.0E-10) THEN
+                  STON = MEAS_1_D(BEAM)/ERROR
+               ELSE
+                  STON = 0.0
+               END IF
+
+               WRITE (LINE,20) MEAS_1_D(BEAM), ERROR, STON,
+     :              MEAS_1_X(BEAM), MEAS_1_Y(BEAM)
+               CALL FIO_WRITE (FD, LINE, STATUS)
+
+            END IF
 
             LINE = '  Coadded result of individual integrations:'
             CALL FIO_WRITE (FD, LINE, STATUS)
 
             ERROR = SQRT(MEAS_2_V(BEAM))
-            WRITE (LINE,30) MEAS_2_D(BEAM), ERROR, MEAS_2_D(BEAM)/ERROR
+            IF (ERROR .GT. 1.0E-10) THEN
+               STON = MEAS_2_D(BEAM)/ERROR
+            ELSE
+               STON = 0.0
+            END IF
+
+            WRITE (LINE,30) MEAS_2_D(BEAM), ERROR, STON
             CALL FIO_WRITE (FD, LINE, STATUS)
          END IF
       END DO
