@@ -1450,7 +1450,7 @@ void adic_cset1c( ADIobj id, char *name, int nval,
   _ERR_OUT;
   }
 
-void adic_there( ADIobj id, char *name, ADIboolean *there, ADIstatus status )
+void adic_there( ADIobj id, char *name, ADIlogical *there, ADIstatus status )
   {
   _chk_init_err; _chk_stat;
 

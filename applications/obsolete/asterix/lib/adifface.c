@@ -1820,7 +1820,7 @@ F77_SUBROUTINE(adifn(there))( INTEGER(id), CHARACTER(name),
   GENPTR_LOGICAL(there)
   GENPTR_INTEGER(status)
 
-  ADIboolean	cres;			/* Result from kernel */
+  ADIlogical	cres;			/* Result from kernel */
 
   _chk_init_err; _chk_stat;
 

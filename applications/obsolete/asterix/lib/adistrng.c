@@ -97,7 +97,7 @@ char *strx_alloc( int len, ADIstatus status )
 void strx_free( char *ptr, ADIstatus status )
   {
   StrStorePtr   curp = ss_first;
-  ADIboolean    found = ADI__false;
+  ADIlogical    found = ADI__false;
   StrStorePtr   lcurp = NULL;
   long          pdif;
 

@@ -273,6 +273,105 @@ ADIobj ADInewList2( ADIobj aid, ADIobj bid, ADIstatus status )
   return lstx_new2( aid, bid, status );
   }
 
+ADIobj adix_mapcar1( ADIobj (*proc)(ADIobj,ADIstatus),
+		     ADIobj (*join)(ADIobj,ADIobj,ADIstatus),
+		     ADIobj lst, ADIstatus status )
+  {
+  ADIobj        curp = lst;
+  ADIobj        rval = ADI__nullid;
+
+  _chk_stat_ret(ADI__nullid);
+
+  while ( _valid_q(curp) ) {
+    rval = (*join)( rval, (*proc)( _CAR(curp), status ),
+		    status );
+
+    curp = _CDR(curp);
+    }
+
+  return rval;
+  }
+
+ADIlogical adix_eql_p( ADIobj x, ADIobj y )
+  {
+  return (x==y) ? ADI__true : ADI__false;
+  }
+
+ADIlogical adix_member( ADIobj element, ADIobj list,
+			               ADIlogical (*test)(ADIobj,ADIobj),
+			               ADIstatus status )
+  {
+  ADIobj        curp = list;
+  ADIlogical    (*ltest)(ADIobj,ADIobj) = test;
+  ADIlogical    rval = ADI__false;
+
+  _chk_stat_ret(ADI__false);
+
+  if ( ! ltest )
+    ltest = adix_eql_p;
+
+  while ( _valid_q(curp) && _ok(status) && ! rval )
+    {
+    if ( (*ltest)(element,_CAR(curp)) )
+      rval = ADI__true;
+    else
+      curp = _CDR(curp);                /* Next test class */
+    }
+
+  return rval;
+  }
+
+ADIobj adix_assoc( ADIobj idx, ADIobj lst, ADIstatus status )
+  {
+  ADIobj curp = lst;
+  ADIobj rval = ADI__nullid;
+
+  if ( _ok(status) )
+    {
+    while ( _valid_q(curp) )
+      {
+      if ( idx == _CAAR(curp) )
+	{
+	rval = _CAR(curp);
+	break;
+	}
+      else
+	curp = _CDR(curp);
+      }
+    }
+
+  return rval;
+  }
+
+ADIobj adix_removeif( ADIlogical (*test)(ADIobj,ADIobj),
+		      ADIobj args, ADIobj lst,
+		      ADIstatus status )
+  {
+  ADIobj        curp = lst;
+  ADIlogical    (*ltest)(ADIobj,ADIobj) = test;
+  ADIobj        newlist = ADI__nullid;
+  ADIobj        *ipoint = &newlist;
+
+  _chk_stat_ret(ADI__false);
+
+  if ( ! ltest )
+    ltest = adix_eql_p;
+
+  while ( _valid_q(curp) && _ok(status) )
+    {
+    if ( ! (*ltest)(_CAR(curp),args) )
+      {
+      *ipoint = lstx_cell( adix_copy(_CAR(curp),status),
+			   ADI__nullid, status );
+
+      ipoint = &_CDR(*ipoint);
+      }
+
+    curp = _CDR(curp);                /* Next test class */
+    }
+
+  return newlist;
+  }
 
 /*
  *  Exported user Fortran routines

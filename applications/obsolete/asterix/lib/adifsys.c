@@ -32,16 +32,17 @@ ADIobj DsysSpectrum     = ADI__nullid;
  */
 static int      ADI_G_nrep = 0;
 ADIobj   ADI_G_replist = ADI__nullid;
+ADIobj		ADI_G_exten_rep_alist = ADI__nullid;
 
 void adix_base_NewLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
 printf("Calling base Newlink\n" );
-  adic_cput0i( id, "ADIlink", (UT_CTYPE_i) lid, status );
+  adic_cput0i( id, "ADIlink", (ADIinteger) lid, status );
   }
 
 void adix_base_SetLink( ADIobj id, ADIobj lid, ADIstatus status )
   {
-  adic_cput0i( id, "ADIlink", (UT_CTYPE_i) lid, status );
+  adic_cput0i( id, "ADIlink", (ADIinteger) lid, status );
   }
 
 void adix_base_UnLink( ADIobj id, ADIstatus status )
@@ -72,7 +73,7 @@ void adix_unlnk( ADIobj id, ADIstatus status )
   adix_execi( DnameUnLink, 1, &id, status );
   }
 
-ADIboolean adix_isfile( ADIobj id, ADIstatus status )
+ADIlogical adix_isfile( ADIobj id, ADIstatus status )
   {
   ADIclassDefPtr tdef = _DTDEF(id);
 
@@ -92,7 +93,7 @@ ADIobj adix_getlink( ADIobj id, ADIstatus status )
 
 void adix_getfile( ADIobj id, ADIobj *root, ADIstatus status )
   {
-  ADIboolean    found = ADI__false;
+  ADIlogical    found = ADI__false;
   ADIobj        lid = id;
 
   _chk_stat;
@@ -115,7 +116,7 @@ void adix_getfile( ADIobj id, ADIobj *root, ADIstatus status )
   }
 
 
-void adix_getpath( ADIobj id, ADIboolean nulterm, int mxlen, char *path,
+void adix_getpath( ADIobj id, ADIlogical nulterm, int mxlen, char *path,
 		   int *lpath, ADIstatus status )
   {
   int   actlen = 0;
@@ -136,7 +137,7 @@ void adix_getpath( ADIobj id, ADIboolean nulterm, int mxlen, char *path,
     if ( tdef->selfid == DsysFileObj )
       {
       lc = '%';
-      adic_cget0i( lid, "REP", (UT_CTYPE_i *) &rep, status );
+      adic_cget0i( lid, "REP", (ADIinteger *) &rep, status );
       adic_cget0c( rep, "NAME", 30, lbit, status );
       lcbit = lbit;
       }
@@ -188,12 +189,12 @@ void ADIfsysFileClose( ADIobj id, ADIstatus status )
   ADIobj	fid;			/* File object at end of chain */
   ADIobj	ortn;			/* Close routine */
   ADIobj        repid;
-  ADIboolean	there;
+  ADIlogical	there;
 
   _chk_stat;
 
 /* Get file object */
-  adic_getfile( id, &fid, status );
+  adix_getfile( id, &fid, status );
 
 /* Extract representation id from file object */
   adic_cget0i( fid, "REP", &repid, status );
@@ -224,7 +225,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
                   ADIstatus status )
   {
   ADIobj	fid;			/* ADI version of fspec */
-  ADIboolean	found = ADI__false;	/* Located the representation? */
+  ADIlogical	found = ADI__false;	/* Located the representation? */
   ADIobj	ortn;			/* Create routine */
   char		*ppos;
   ADIobj	rid = ADI__nullid;	/* Representation chosen */
@@ -264,7 +265,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
 
     while ( _valid_q(curp) && ! found )	/* Loop over representations */
       {
-      ADIboolean	there=ADI__false;
+      ADIlogical	there=ADI__false;
 
       rid = _CAR(curp);
 
@@ -330,7 +331,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
                  char *mode, int mlen, ADIobj *id, ADIstatus status )
   {
   ADIobj	fid;			/* ADI version of fspec */
-  ADIboolean	found = ADI__false;	/* Located the representation? */
+  ADIlogical	found = ADI__false;	/* Located the representation? */
   ADIobj	mid;			/* ADI version of mode */
   ADIobj	ortn;			/* Open routine */
   char		*ppos;
@@ -375,7 +376,7 @@ void adix_fopen( char *fspec, int flen, char *cls, int clen,
 
     while ( _valid_q(curp) && ! found )	/* Loop over representations */
       {
-      ADIboolean	there=ADI__false;
+      ADIlogical	there=ADI__false;
 
       rid = _CAR(curp);
 
@@ -450,7 +451,7 @@ void adix_locrep( char *name, int nlen, ADIobj *id, ADIstatus status )
   {
   ADIobj        cid;                    /* Class description id */
   ADIobj        curp = ADI_G_replist;   /* Cursor over representations */
-  ADIboolean    found = ADI__false;     /* Found the representation yet? */
+  ADIlogical    found = ADI__false;     /* Found the representation yet? */
   ADIobj        *nid;                   /* NAME member address */
 
   _chk_stat;                            /* Check status on entry */
@@ -577,7 +578,7 @@ void ADIfsysInit( ADIstatus status )
     {NULL,NULL}};
 
   int           i;
- ADIobj lc,lds,lest;
+
   _chk_stat;
 
 /* Put some strings in common table. These are referenced */
@@ -610,13 +611,6 @@ void ADIfsysInit( ADIstatus status )
   adic_defcls( "Spectrum",
 	       "BinDS", "",
 	       &DsysSpectrum, status );
-
-#ifdef __MSDOS__
-  lc = adix_plist( "{a,b,c,d,f,g,h}", status );
-  lds = adix_plist( "{{a,c,b},{b,d},{h,a,f},{f,b,g}}", status );
-  lest = adix_estab_ord( lc, lds, status );
-  adic_print( lest, status );
-#endif
 
   for( i=0; gtable[i].spec; i++ ) {     /* Install methods from table */
     ADIobj	gid;

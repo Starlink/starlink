@@ -18,7 +18,7 @@ ADIobj UT_ALLOC_tbl = ADI__nullid;
 void tblx_prnt( ADIobj tbl, ADIstatus status )
   {
   ADIobj        *heads = _tbl_hash(tbl);
-  UT_CTYPE_i    i;
+  ADIinteger    i;
 
   _chk_stat;
 
@@ -48,7 +48,7 @@ ADIobj ECItableIterate( ADIobj	table,
 			ADIobj	iarg,
 			ADIstatus	status )
   {
-  UT_CTYPE_i	i;		/* Loop over hash heads */
+  ADIinteger	i;		/* Loop over hash heads */
   ADIobj        *chead;         /* Head of has list */
   ADIobj	cptr;		/* Used to pass over list */
   ADIobj	robj = ADI__nullid;	/* Returned value */
@@ -79,7 +79,7 @@ void tblx_scan( ADIobj    *head,        /* Head of a NODE list */
                 char      *str,         /* String to find */
                 int       slen,         /* Length of string */
                 ADIobj    **sptr,       /* Addr of pointer to dataobj */
-                ADIboolean  *found,    /* Was a dataobj found? */
+                ADIlogical  *found,    /* Was a dataobj found? */
                 ADIstatus   status )
   {
   ADIobj        cstr;                   /* Current dataobj name */
@@ -149,9 +149,9 @@ ADIobj tblx_sadd( ADIobj    *table,
   ADIobj	*head;			/* Head of dataobj list */
   ADIobj        hnode;                  /* New element for table hash list */
   int           hval;                   /* String hash value */
-  UT_CTYPE_i    lhcode = 0;
+  ADIinteger    lhcode = 0;
   ADIobj        nstr;                   /* Newly created ADI string */
-  ADIboolean    there;                  /* String in list? */
+  ADIlogical    there;                  /* String in list? */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
@@ -210,8 +210,8 @@ ADIobj tblx_add( ADIobj    *table,
   ADIobj        hnode;                  /* New element for table hash list */
   int           hval;                   /* String hash value */
   ADIobj        nstr;
-  UT_CTYPE_i    lhcode;                  /* Table hashing code */
-  ADIboolean      there;                  /* String in list? */
+  ADIinteger    lhcode;                  /* Table hashing code */
+  ADIlogical      there;                  /* String in list? */
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;
@@ -267,8 +267,8 @@ ADIobj tblx_find( ADIobj    *table,
   ADIobj	*head;			/* Head of list */
   int           hval;                   /* String hash value */
   ADIobj        *lentry;                /* List insertion point */
-  UT_CTYPE_i    lhcode;                  /* Table hashing code */
-  ADIboolean    there;
+  ADIinteger    lhcode;                  /* Table hashing code */
+  ADIlogical    there;
 
   if ( !_ok(status) )                   /* Check status */
     return ADI__nullid;

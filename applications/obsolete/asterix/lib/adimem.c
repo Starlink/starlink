@@ -195,11 +195,11 @@ ADIblockID adix_bb_new( ADIblockCtrl *ctrl, int nunit, ADIstatus status )
   }
 
 
-ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIboolean scalar,
+ADIobj adix_bb_nalloc( ADIblockCtrlPtr ctrl, ADIlogical scalar,
                        int nval, ADIstatus status )
   {
   ADIblockPtr      	bptr;
-  ADIboolean            found = ADI__false;
+  ADIlogical            found = ADI__false;
   int                   i8, j8, ibit;
   ADIobj                newid;          /* New identifier */
   ADIblockID            iblk;           /* Allocation block identifier */

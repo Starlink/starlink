@@ -18,14 +18,16 @@
 
 #ifdef __MSDOS__
 #define FILE_DELIMITER '\\'
+#define PATH_SEPARATOR ';'
 #else
 #define FILE_DELIMITER '/'
+#define PATH_SEPARATOR ':'
 #endif
 
 ADIobj		ADI_G_pkglist = ADI__nullid;
 char		*ADI_G_ldpath = NULL;
 size_t          ADI_G_ldpath_len = 0;
-ADIboolean	ADI_G_getenv = ADI__false;
+ADIlogical	ADI_G_getenv = ADI__false;
 
 ADIobj adix_prs_defcls( ADIstreamPtr pstream, ADIstatus status )
   {
@@ -99,13 +101,12 @@ void adix_prs_cmds( ADIstreamPtr pstream, ADIstatus status )
 
 void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   {
-  int			flen = 0;
   char			fname[200];
   FILE			*fp;
   ADIstream     	stream;
   char			*pptr;
   ADIstreamPtr  	pstream = &stream;
-  int			ulen = 0;
+  int			ulen = 0, flen;
 
   if ( ! ADI_G_getenv ) {		/* Not got ADI_LOAD_PATH yet */
     ADI_G_ldpath =
@@ -124,10 +125,12 @@ void ADIpkgRequire( char *name, int nlen, ADIstatus status )
   do {
     int             i;
 
+    flen = 0;
+
     if ( pptr ) {
       for( ;pptr[ulen] == ' ' && (ulen<ADI_G_ldpath_len) ; ulen++ )
 	{;}
-      for( ;pptr[ulen] != ';' && (ulen<ADI_G_ldpath_len) ; ulen++ )
+      for( ;pptr[ulen] != PATH_SEPARATOR && (ulen<ADI_G_ldpath_len) ; ulen++ )
 	fname[flen++] = pptr[ulen];
       fname[flen++] = FILE_DELIMITER;
       }

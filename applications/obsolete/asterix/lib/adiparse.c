@@ -55,7 +55,11 @@ ADIobj prsx_cvalue( ADIstreamPtr stream, ADIstatus status )
     case TOK__SYM:
       if ( ADIisTokenCstring( stream, "True", status ) )
 	adic_newv0l( ADI__true, &rval, status );
+      else if ( ADIisTokenCstring( stream, "Yes", status ) )
+	adic_newv0l( ADI__true, &rval, status );
       else if ( ADIisTokenCstring( stream, "False", status ) )
+	adic_newv0l( ADI__false, &rval, status );
+      else if ( ADIisTokenCstring( stream, "No", status ) )
 	adic_newv0l( ADI__false, &rval, status );
       else {
 	}
@@ -358,7 +362,7 @@ void ADIdescribeToken( ADItokenType tok, char **str, int *len )
   }
 
 
-ADIboolean ADIisTokenCstring( ADIstreamPtr str, char *string, ADIstatus status )
+ADIlogical ADIisTokenCstring( ADIstreamPtr str, char *string, ADIstatus status )
   {
   _chk_stat_ret(ADI__false);
 
@@ -399,7 +403,7 @@ ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
   ADItokenType		etok;
   ADItokenType		tok = TOK__NOTATOK;
   char           	ch;
-  ADIboolean        	inquotes = ADI__true;
+  ADIlogical        	inquotes = ADI__true;
 
   if ( !_ok(status) )
     return tok;
@@ -768,7 +772,7 @@ ADItokenType ADInextTokenFromStream( ADIstreamPtr str, ADIstatus status )
   return tok;
   }
 
-ADIboolean ADImatchTokenFromStream( ADIstreamPtr str,
+ADIlogical ADImatchTokenFromStream( ADIstreamPtr str,
 				    ADItokenType t, ADIstatus status )
   {
   if ( str->ctok.t == t )

@@ -143,15 +143,6 @@ void adix_setec( ADIstatype code, ADIstatus status )
 #endif
   }
 
-char *adix_setecb( ADIstatype code, ADIstatus status )
-  {
-  char		*emsg;			/* Standard error message */
-
-  *status = code;			/* Set the error code */
-
-  return adix_errmsg( code, NULL, 0 );	/* Get text message address */
-  }
-
 
 /*
  *  Set the contextual message string
@@ -194,11 +185,23 @@ void adix_setes( char *ctx, int clen, ADIstatus status )
  */
 void adix_setecs( ADIstatype code, char *ctx, int clen, ADIstatus status )
   {
-  char *buf;
+  char buf[200];
+  int  blen = 200;
 
-  buf = adix_setecb( code, status );
+/* Load users contextual message to use tokens before they're cancelled */
+#ifndef NOEMS
+  ems_mload_c( " ", ctx, buf, &blen, status );
+#endif
 
-  adix_setes( ctx, clen, status );	/* Set the context string */
+/* Report error for the code given */
+  adix_setec( code, status );
+
+/* Report the contextual error */
+#ifdef NOEMS
+  adix_setes( ctx, clen, status );
+#else
+  adix_setes( buf, blen, status );
+#endif
   }
 
 
@@ -245,13 +248,14 @@ char *adix_errmsg( ADIstatype code, char *buf, int buflen )
       {ADI__NONAME,	"Object is not a named object"},
       {ADI__MAPPED,	"Object is already mapped"},
       {ADI__NOTMAP,	"Object is not mapped at this address"},
+      {ADI__RDONLY,	"Object is readonly"},
       {SAI__ERROR,	"Error"},
       {SAI__OK,		""}
       };
 
   int		i;
   char 		*sptr;
-  ADIboolean	found = ADI__false;
+  ADIlogical	found = ADI__false;
 
   for( i=0; etable[i].code && ! found ; )
     if ( code == etable[i].code )
