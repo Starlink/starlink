@@ -1320,17 +1320,24 @@ c        ENDDO
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
       INTEGER I,J
+      INTEGER L
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
 
+        L=MIN(CHR_LEN(STR),SIZ)
 
         J=DISP
-        DO I=1,SIZ
+        DO I=1,L
           GCB(J)=ICHAR(STR(I:I))
+          J=J+1
+        ENDDO
+        DO I=L=1,SIZ
+          GCB(J)=ICHAR(' ')
           J=J+1
         ENDDO
 
