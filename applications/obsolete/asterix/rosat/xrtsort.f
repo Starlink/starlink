@@ -184,8 +184,6 @@
             GOTO 999
          ENDIF
 *
-	print *,1
-	call flush(6)
 *
          CALL XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM(1), SDIM(2),
      &          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
@@ -195,8 +193,6 @@
      &          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
      &          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
 *
-	print *,11
-	call flush(6)
 *
          CALL DYN_UNMAP(SMPTR,STATUS)
          IF (SRT.BCKGND) THEN
@@ -2862,8 +2858,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      NELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
-	print *,2
-	call flush(6)
 
 ***      Check them against the sort parameters
          CALL XRTSORT_DOIT_BIN(HEAD,SRT,BSRT,%val(PTRA(1)),
@@ -2876,8 +2870,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      SRT.QUAL_MORE, MAXBAD, NBAD, STBAD, ENBAD, XWIDTH, YWIDTH,
      &      XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
      &      BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
-	print *,22
-	call flush(6)
 
 
 ***      unmap the arrays & memory
@@ -3162,8 +3154,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
         BCPHI = BSRT.COSPHI
         BSPHI = BSRT.SINPHI
       ENDIF
-	print *,3
-	call flush(6)
 
 ***   Loop over each element in arrays
       DO IX = 1,NELEMS
@@ -3251,6 +3241,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
           ENDIF
 
 *  if event has survived this far check spatial selection
+          SOK=OK
+          BOK=OK
           IF (OK) THEN
 
 *  rectangle
@@ -3306,8 +3298,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
 
           IF (SOK) THEN
-	print *,ix
-	call flush(6)
 
 *  Calculate position of data in array
 *  The first two dimensions of the array can be either
@@ -3324,8 +3314,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
                 EL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
               ENDIF
 
-	print *,el1,el2
-	call flush(6)
 
             ELSE
 
@@ -3358,8 +3346,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
               ENDIF
             ENDIF
 *
-	write(6,'(1x,a)') 'xxx'
-        call flush(6)
 *  Calculate the other elements
             EL3=INT((XDEV-SRT.MIN_XD)/XDWID) + 1
             EL4=INT((YDEV-SRT.MIN_YD)/YDWID) + 1
@@ -3367,14 +3353,10 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             EL6=INT((AEV-SRT.MIN_PH)/PWIDTH) + 1
             EL7=INT((CEV-SRT.MIN_EN)/EWIDTH) + 1
 
-	write(6,'(1x,7i4)') el1,el2,el3,el4,el5,el6,el7
-        call flush(6)
 
             SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) =
      &         SDATA(EL1,EL2,EL3,EL4,EL5,EL6,EL7) + 1.0
 
-	write(6,'(1x,i8)') ix
-	call flush(6)
 
           ENDIF
 
@@ -3414,8 +3396,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
       ENDDO
 *
-	print *,10
-        call flush(6)
 
 999   CONTINUE
 *
@@ -3799,6 +3779,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
           ENDIF
 
+          SOK=OK
+          BOK=OK
           IF (OK) THEN
 
 *  Check if event is within the selected spatial region
@@ -3905,13 +3887,11 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       INTEGER SID
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-	print *,1
 *  write spatial selection
       CALL SLN_NEWREC(VERSION,SID,STATUS)
       CALL SLN_PUTARD(SID,'Spatial',ASRT.ARDID,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
-	print *,2
 
 *  write detector coordinate selection
       CALL SLN_NEWREC(VERSION,SID,STATUS)
@@ -3923,7 +3903,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      :                                                     STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
-	print *,3
 
 *  write time ranges
       CALL SLN_NEWREC(VERSION,SID,STATUS)
@@ -3931,7 +3910,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
       CALL SLN_PUTREC(ID,SID,STATUS)
 
-	print *,4
 
 *  write PH channel selection
       CALL SLN_NEWREC(VERSION,SID,STATUS)
