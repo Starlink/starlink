@@ -19,7 +19,7 @@ proc p4Lut {taskname} {
 
 # Create dialog box
     if {[winfo exists .p4Dialogue]} {destroy .p4Dialogue}
-    set frame [dialogStart .p4Dialogue "Plot4 Look-Up-Table" 0 Dismiss]
+    set frame [dialogStart .p4Dialogue "Plot4 Look-Up-Table" 0 "All Ports" "This Port" Cancel]
     cgs4drCursor pirate orange black
     .p4Dialogue config -cursor {arrow green black}
 
@@ -28,11 +28,12 @@ proc p4Lut {taskname} {
     set P4Widgets(SB) [scrollbar $frame.sb -relief sunken -bd 2 -orient vertical]
     $P4Widgets(LB) configure -yscrollcommand "$P4Widgets(SB) set"
     $P4Widgets(SB) configure -command "$P4Widgets(LB) yview"
-    pack $P4Widgets(LB) -in $frame -side left -fill x
+    pack $P4Widgets(LB) -in $frame -side left -expand yes -fill x
     pack $P4Widgets(SB) -in $frame -side right -fill y
 
 # Load the entry widget with the current lut name
     set P4Widgets(LUT) [string trim [file tail [nbs get ${P4NoticeBoard}.port_$P4Widgets(PORT_NO).device_lut]]] 
+    set old_lut $P4Widgets(LUT)
 
 # Load the list box with values
     set lnum 0
@@ -51,6 +52,31 @@ proc p4Lut {taskname} {
 
 # Show the dialog box
    set bv [dialogShow .p4Dialogue .p4Dialogue]
+   cgs4drCursor watch red white
+
+# Set all ports
+   if {$bv == 0} {
+     set coltab [string trim [selection get]]
+     cgs4drInform $taskname "Resetting all port's look-up-tables to selection ($coltab)"
+     nbs put ${P4NoticeBoard}.port_0.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_1.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_2.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_3.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_4.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_5.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_6.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_7.device_lut [file rootname $coltab]
+     nbs put ${P4NoticeBoard}.port_8.device_lut [file rootname $coltab]
+
+# This port only (already done)
+   } elseif {$bv == 1} {
+
+# If cancel, reset the original colour table
+   } elseif {$bv == 2} {
+     cgs4drInform $taskname "Resetting look-up-table to original ($old_lut)"
+     nbs put ${P4NoticeBoard}.port_$P4Widgets(PORT_NO).device_lut [file rootname $old_lut]
+     $taskname obey lut "port=$P4Widgets(PORT_NO)" -inform "cgs4drInform $taskname %V"
+   }
 
 # Remove the dialog box
    cgs4drCursor arrow green black

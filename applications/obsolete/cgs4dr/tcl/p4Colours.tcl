@@ -10,7 +10,7 @@ proc p4Colours taskname {
 
 # Create dialog box.
     if {[winfo exists .p4Dialogue]} {destroy .p4Dialogue}
-    set frame [dialogStart .p4Dialogue "Plot4 Display Colours" 0 OK Cancel]
+    set frame [dialogStart .p4Dialogue "Plot4 Display Colours" 0 "All Ports" "This Port" Cancel]
     cgs4drCursor pirate orange black
     .p4Dialogue config -cursor {arrow green black}
 
@@ -20,7 +20,7 @@ proc p4Colours taskname {
     set of [frame $frame.of]
     pack $ff $bf $of -fill x
 
-    set label [label $ff.label -text Foreground]
+    set label [label $ff.label -text "Foreground Colour"]
     set bl [radiobutton $ff.bl -bitmap @$cgs4drBitmaps/patch.xbm -variable P4Widgets(FGCOLOUR) \
 	-foreground black -activeforeground black -value BLACK]
     set wh [radiobutton $ff.wh -bitmap @$cgs4drBitmaps/patch.xbm -variable P4Widgets(FGCOLOUR) \
@@ -54,7 +54,7 @@ proc p4Colours taskname {
     bind $g <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4ColoursBox1.html"
     bind $b <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4ColoursBox1.html"
 
-    set label [label $bf.label -text Background]
+    set label [label $bf.label -text "Background Colour"]
     set bl [radiobutton $bf.bl -bitmap @$cgs4drBitmaps/patch.xbm -variable P4Widgets(BGCOLOUR) \
 	-foreground black -activeforeground black -value BLACK]
     set wh [radiobutton $bf.wh -bitmap @$cgs4drBitmaps/patch.xbm -variable P4Widgets(BGCOLOUR) \
@@ -88,7 +88,7 @@ proc p4Colours taskname {
     bind $g <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4ColoursBox1.html"
     bind $b <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4ColoursBox1.html"
 
-    set label [label $of.label -text Overgraph]
+    set label [label $of.label -text "Overgraph Colour"]
     set bl [radiobutton $of.bl -bitmap @$cgs4drBitmaps/patch.xbm -variable P4Widgets(OVERCOLOUR) \
 	-foreground black -activeforeground black -value BLACK]
     set wh [radiobutton $of.wh -bitmap @$cgs4drBitmaps/patch.xbm -variable P4Widgets(OVERCOLOUR) \
@@ -130,10 +130,41 @@ proc p4Colours taskname {
     set P4Widgets(OVERCOLOUR) [string trim [nbs get ${root}overcolour]]
 
 # Show the dialog box
-    if {[dialogShow .p4Dialogue .p4Dialogue] == 0} {
-      cgs4drCursor watch red white
+    set bv [dialogShow .p4Dialogue .p4Dialogue]
+    cgs4drCursor watch red white
 
-#   Set the new colours.
+# Set all ports 
+    if {$bv == 0} {
+      nbs put ${P4NoticeBoard}.port_0.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_1.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_2.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_3.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_4.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_5.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_6.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_7.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_8.fg_colour  $P4Widgets(FGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_0.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_1.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_2.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_3.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_4.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_5.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_6.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_7.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_8.bg_colour  $P4Widgets(BGCOLOUR)
+      nbs put ${P4NoticeBoard}.port_0.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_1.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_2.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_3.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_4.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_5.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_6.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_7.overcolour $P4Widgets(OVERCOLOUR)
+      nbs put ${P4NoticeBoard}.port_8.overcolour $P4Widgets(OVERCOLOUR)
+
+# If this port only
+    } elseif {$bv == 1} {
       nbs put ${root}fg_colour $P4Widgets(FGCOLOUR)
       nbs put ${root}bg_colour $P4Widgets(BGCOLOUR)
       nbs put ${root}overcolour $P4Widgets(OVERCOLOUR)
