@@ -528,7 +528,7 @@ related items to be removed.
 
 \section{Changes in Version 2.7}
 \begin{itemize}
-\item A new routine LPG_REPLA has been added. It controls a new option
+\item A new routine LPG\_REPLA has been added. It controls a new option
    which allows a single NDF to be used as both input and output for an adam task. 
    The default is for this option to be disabled.
 \end{itemize}

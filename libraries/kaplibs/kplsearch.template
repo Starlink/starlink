@@ -250,7 +250,11 @@ proc search {test words} {
 #  The following code is edited into this script when the kaplibs.tar.Z 
 #  is created from the RCS repository.
 
-<purposes placeholder>
+   set purpose(IRQ_NXTQN) "Return the next quality name. "
+   set purpose(KPG1_ABSET) "Separates a list of items into a character array. "
+   set purpose(KPG1_CPSTY) "Copy the plotting style for an AST element to another AST element. "
+   set purpose(KPG1_LOGAx) "Takes the logarithm to an arbitrary base of an array and its variance. "
+   set purpose(KPG1_MXMNx) "Returns the maximum and minimum values of an array within thresholds. "
 
 #  Store a list of the routine names to be searched. 
    if { $prefs == "" } { 

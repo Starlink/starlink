@@ -1,6 +1,6 @@
 dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
-AC_INIT(par, 2.7-3, ussc@star.rl.ac.uk)
+AC_INIT(kaplibs, 2.7-3, ussc@star.rl.ac.uk)
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
@@ -24,6 +24,26 @@ STAR_DECLARE_DEPENDENCIES(link, [cat mers pcs subpar psx ndg ndf ast agi fio grp
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 dnl    !!!!  DOCUMENTATION TO DO !!!!   STAR_LATEX_DOCUMENTATION(sun114)
+
+LATEX_DOCUMENTATION_FILES = sun238.tex 
+DOCUMENTATION_PRODUCTS = $(PAPER_DOCUMENTATION) $(HYPER_DOCUMENTATION)
+PAPER_DOCUMENTATION = sun238.tex sun238.ps 
+HYPER_DOCUMENTATION = sun238.htx_tar 
+
+# Documentation
+@PREDIST@$(PAPER_DOCUMENTATION): builddocs addversion
+@PREDIST@       ./builddocs
+
+# The contents of the sun211_figures directory is identical to that
+# sun210_figures
+sun211_figures: sun210_figures
+        $(LN_S) sun210_figures sun211_figures
+
+
+
+dnl The following files are built by the targets in this makefile.
+MAINTAINERCLEANFILES = $(DOCUMENTATION_PRODUCTS)
+
 
 
 dnl    List the set of active subdirectories.
