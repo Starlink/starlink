@@ -1983,7 +1983,6 @@ ac_given_INSTALL="$INSTALL"
 trap 'rm -fr `echo "Makefile \
         library/Makefile \
         library/gaia_version.tcl \
-        gaia.htx/Makefile \
         src/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaia_swish.tcl \
@@ -2166,7 +2165,6 @@ cat >> $CONFIG_STATUS <<EOF
 CONFIG_FILES=\${CONFIG_FILES-"Makefile \
         library/Makefile \
         library/gaia_version.tcl \
-        gaia.htx/Makefile \
         src/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaia_swish.tcl \

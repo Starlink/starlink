@@ -694,7 +694,6 @@ Iwidgets library files  => $IWIDGETS_LIBRARY
 AC_OUTPUT(Makefile \
         library/Makefile \
         library/gaia_version.tcl \
-        gaia.htx/Makefile \
         src/Makefile \
         mktclapp/Makefile \
         mktclapp/library/gaia_swish.tcl \
