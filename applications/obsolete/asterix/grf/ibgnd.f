@@ -380,13 +380,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-	print *,'In NEW'
-	call flush(6)
 
 *  Reset internals
       CALL IBGND_RESET( .TRUE., .TRUE., .TRUE., STATUS )
-	print *,'done RESET'
-	call flush(6)
 
 *  Allocate space for the background data surface, quality (and errors?). If
 *  image size has changed we need to increase existing allocations
@@ -402,21 +398,14 @@
         CALL DYN_MAPB( 1, I_NX*I_NY, I_BGM_QPTR, STATUS )
         I_BGM_NELM = I_NX*I_NY
       END IF
-	print *,'done ALLOC'
-	print *,i_nx,i_ny,i_qptr,i_bgm_qptr
-	call flush(6)
 
 *  Initialise the the background model quality array. This is ok for points
 *  inside the current region, and bad outside and for bad input pixels
       CALL IBGND_SETQ( I_NX, I_NY, %VAL(I_QPTR),
      :                 %VAL(I_BGM_QPTR), STATUS )
-	print *,'done SETQ'
-	call flush(6)
 
 *  Set the sample mode to the whole image, simple mean and compute the samples
       CALL IBGND_SETSAMP( 'WHOLE', 'MEAN', STATUS )
-	print *,'done SETSAMP'
-	call flush(6)
 
 *  Switch modelling on
       I_BGM_ON = (STATUS.EQ.SAI__OK)
@@ -887,6 +876,7 @@
             END IF
           END DO
         END DO
+        MEAN = SUM
         WTSUM = REAL(N)
         WTSUM2 = WTSUM
 
@@ -909,8 +899,10 @@
 
 *    Simply report mean
         CALL MSG_SETR( 'MEAN', SAMM(1) )
-        CALL MSG_SETR( 'EMEAN', SAMEM(2) )
-        CALL MSG_PRNT( '  Mean value in image is ^MEAN +- ^EMEAN' )
+        CALL MSG_SETR( 'EMEAN', SAMEM(1) )
+        CALL MSG_SETR( 'N', SAMNP(1) )
+        CALL MSG_PRNT( '  Mean value in image is ^MEAN +- '/
+     :                               /'^EMEAN (^N points)' )
 
       ELSE IF ( AREA .EQ. 'ANNULUS' ) THEN
       ELSE IF ( AREA .EQ. 'BOX' ) THEN
