@@ -36,8 +36,7 @@
 			SYSTEM "ReleaseNotes">
   <!ENTITY release.notes.old
 			SYSTEM "ReleaseNotes.old">
-  <!ENTITY upconv.bin
-			SYSTEM "upconvdocs.sgml"
+  <!ENTITY upconv.bin	SYSTEM "../../upconverter/upconvdocs.sgml" SUBDOC
 			-- Documentation for binaries in upconverter package -->
  
 
@@ -121,7 +120,10 @@ There will be a proper distribution before 1 June.
 <px>Miscellaneous tweaks.
 
 <change date='1-JUN-2000' author=mbt>
-<px>Thoroughly revised documentation of upconveters.
+<px>Thoroughly revised documentation of upconverters.
+
+<change date='2-Jun-2000' versionid='v0-7-2' author=ng>
+<px>Some restructuring.
 
 </history>
 
@@ -1813,8 +1815,8 @@ and compare it with
 
 [...]
 <sect>All the code
-<p>Here's the beef
 <routinelist>
+<p>Here's the beef
 <codecollection id=mystuff doc=myfiles>
 <codecollection id=theirstuff doc=origfiles>
 ]]>
@@ -3923,6 +3925,18 @@ particular document's DTD-subset (see <ref id=markup.dtdsubset/>), or
 completely externally to the document in a command-line option to the
 parser.
 
+<sect id=appx.supportprogs export>Support utilities
+<update versionid=v0-7-1>Added codecollections for bin and lib
+directory programs</update>
+<update versionid=v0-7-2>Moved to a section of their own</update>
+
+<routinelist>
+<p>Here you can find documentation for the user tools which are
+distributed as part of the SGML kit.
+
+<codecollection doc="supportbinaries" id=supportprogs>
+<codecollection doc="upconv.bin" id=upconvprogs>
+
 <sect id=appx.system export>The Starlink SGML set for maintainers
 <update versionid="post-0.2">Very substantial additions -- this
 section was barely present before.</update>
@@ -4233,65 +4247,6 @@ SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
 </verbatim>
 (or use the corresponding <code/setenv> command).
 
-<subsect id=appx.supportprogs export>Support utilities
-<update versionid=v0-7-1>Added codecollections for bin and lib
-directory programs</update>
-
-<routinelist>
-<p>The following sections document some of the support utilities in
-the SGML kit.
-
-<codecollection doc="supportbinaries" id=supportprogs>
-<codecollection doc="supportlib" id=supportlibs>
-<codecollection doc="upconv.bin" id=upconvprogs>
-
-<subsect id=appx.system.software export>Other supporting software
-
-<p>This distribution primarily consists of SGML materials --
-that is, the DTDs and associated DSSSL stylesheets.  It also relies on
-the Jade DSSSL engine, suitably patched, and the
-<code/dvi2bitmap> package (to help generate the GIFs used when
-displaying maths on the web.   See <ref id=install/> for further
-details of obtaining and building these.
-
-<p>As well as these supporting applications, which must be obtained
-and installed separately, there is some auxiliary software distributed
-with the package itself.  This is located in <code
-fspath>$STARLINK_SGML_DIR/lib</code>.
-
-<dl>
-<dt><code/abstract-star2html.pl>
-<dd>A Perl script which does a simple but robust parse of &latex;
-files suitable for the Star2HTML system, generating DocumentSummary
-documents.  See <ref id=appx.system.summaries/>.
-
-<dt><code/img-eqlist.pl>
-<dd>This post-processes the file produced by the <code/img.maths> mode
-of <code fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slmaths.dsl</code>.
-It produces two files, based on the filename root of the argument.
-The SGML one conforms to a very simple DTD (with system id
-<code/img-eqlist>) which maps equation labels to filenames, the the &latex;
-one consists of a &latex; document with one equation per page.  The
-latter should be processed by &latex; plus whatever dvi to gif magic
-you need, making sure that the resulting GIF filenames match those
-in the img-eqlist document.  See <coderef collection=supportlibs
-id=img-eqlist>the file header</coderef> for further documentation.
-
-<dt><code/plainhtml.bst> and <code/plainlatex.bst>
-<dd>These are Bib&tex; style files used by the Bib&tex; step in the
-common makefile.
-
-<dt><code/postprocess-bbl.sed>
-<dd>This postprocesses the bibliography file produced by
-<code/plainhtml.bst>, rejoining the long lines which Bib&tex;
-erroneously splits.
-
-</dl>
-
-<p><ref id=appx.system.dssslcode/> includes a selection of the more important
-DSSSL code modules.
-
-
 <subsect id=appx.system.summaries export>Document summaries
 
 <p>When referring to an external Starlink document via a 
@@ -4428,8 +4383,65 @@ generate them as the interface.
 style sheets
 
 <codecollection doc="dsssl.params">
+<!--
+These are long-winded, and not terribly useful to the general reader.
 <codecollection doc="dsssl.common">
 <codecollection doc="dsssl.lib">
+-->
+
+<subsect id=appx.system.software export>Other supporting software
+
+<p>This distribution primarily consists of SGML materials --
+that is, the DTDs and associated DSSSL stylesheets.  It also relies on
+the Jade DSSSL engine, suitably patched, and the
+<code/dvi2bitmap> package (to help generate the GIFs used when
+displaying maths on the web.   See <ref id=install/> for further
+details of obtaining and building these.
+
+<p>As well as these supporting applications, which must be obtained
+and installed separately, there is some auxiliary software distributed
+with the package itself.  This is located in <code
+fspath>$STARLINK_SGML_DIR/lib</code>.
+
+<dl>
+
+<dt><code/img-eqlist.pl>
+<dd>This post-processes the file produced by the <code/img.maths> mode
+of <code fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slmaths.dsl</code>.
+See <coderef collection=supportlibs
+id=img-eqlist>the file header</coderef> for further documentation.
+
+<dt><code/abstract-star2html.pl>
+<dd>A Perl script which does a simple but robust parse of &latex;
+files suitable for the Star2HTML system, generating DocumentSummary
+documents.  See <ref id=appx.system.summaries/>, and the detailed
+documentation in <coderef id=abstract-star2html collection=supportlibs/>.
+
+<dt><code/plainhtml.bst> and <code/plainlatex.bst>
+<dd>These are Bib&tex; style files used by the Bib&tex; step in the
+common makefile.
+
+<dt><code/postprocess-bbl.sed>
+<dd>This postprocesses the bibliography file produced by
+<code/plainhtml.bst>, rejoining the long lines which Bib&tex;
+erroneously splits.
+
+</dl>
+
+<p><ref id=appx.system.dssslcode/> includes a selection of the more important
+DSSSL code modules.
+
+<subsubsect id=appx.system.software.lib>Library scripts
+
+<routinelist>
+
+<p>The following are scripts which are either used internally by the
+down-conversion process (such as <coderef id=img-eqlist
+collection=supportlibs/>) or are usable by the installation process
+(such as <coderef id=abstract-star2html collection=supportlibs/>,
+though this is not actually used at present).
+
+<codecollection doc="supportlib" id=supportlibs>
 
 <subsect id=appx.system.online export>Online resources
 
