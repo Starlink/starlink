@@ -116,7 +116,7 @@
       CALL ADI2_GETLUN( ARGS(1), LUN, STATUS )
 
 *  Filename from logical unit
-      INQUIRE( UNIT=LUN, FILE=FILE, IOSTAT=FSTAT )
+      INQUIRE( UNIT=LUN, NAME=FILE, IOSTAT=FSTAT )
 
 *  Report error if that failed
       IF ( FSTAT .NE. 0 ) THEN

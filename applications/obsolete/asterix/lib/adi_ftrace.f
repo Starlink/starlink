@@ -116,7 +116,7 @@
 *  Extract data from the returned object
       CALL ADI_CGET0C( OARG, 'File', FILE, STATUS )
       CALL ADI_CGET0C( OARG, 'Path', PATH, STATUS )
-      CALL ADI_CGET0C( OARG, 'Nlev', NLEV, STATUS )
+      CALL ADI_CGET0I( OARG, 'Nlev', NLEV, STATUS )
 
 *  And destroy the result
       CALL ADI_ERASE( OARG, STATUS )
