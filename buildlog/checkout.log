@@ -5631,6 +5631,7 @@ U java/source/frog/src/docs/make_docs
 U java/source/frog/src/docs/make_searchdb
 cvs checkout: Updating java/source/frog/src/docs/frogdocs
 U java/source/frog/src/docs/frogdocs/index.html
+cvs checkout: Updating java/source/frog/src/docs/sun254.fig
 cvs checkout: Updating java/source/frog/src/etc
 cvs checkout: Updating java/source/frog/src/jni
 U java/source/frog/src/jni/Dummy.c
