@@ -67,10 +67,11 @@
 #        for the package $package is printed.
 #
 #     $mode = string (optional).
-#        Query mode is "file", "func", "regex" or NULL (either undef or "").
-#           "file" queries the $file_index StarIndex object for a key of
+#        Query mode is one of the index names (currently "file" or "func"), 
+#        "regex" or NULL (either undef or "").
+#           "file" queries the "file" StarIndex object for a key of
 #              $name or possibly $name capitalised.
-#           "func" queries the $func_index StarIndex object for a key of
+#           "func" queries the "func" StarIndex object for a key of
 #              $name or possibly $name followed by an underscore or 
 #              $name in lower case.
 #           NULL   combines the functions of "file" and "func".
@@ -81,8 +82,9 @@
 #        the index files.  It overrides the default and the environment
 #        variable SCB_INDEX, which normally supply this value.  Setting
 #        SCB_INDEX is the preferred way of influencing this value; hence
-#        this will normally be used only in CGI mode, rather than from
-#        the command line.
+#        this will normally be used only in CGI mode (where environment
+#        variables cannot be set to order), rather than from the command 
+#        line.
 #
 #     If invoked from the command line, then $name must be specified.
 #     If invoked as a CGI script then if $module is specified an attempt
@@ -123,9 +125,12 @@ $tmpdir = "$scb_tmpdir/$$";
 $self = $0;
 $self =~ s%.*/%%;
 
-#  Name of source code retrieval program and usage message.
+#  Set root of source code extractor program.
 
 $scb = $self . "?";
+
+#  Set usage message.
+
 $usage = "Usage: $self [-html] [-exact] \\\n"
        . "        " . ' ' x length ($self)
        . "[[name=]<name>] [[package=]<package>] [[type=]func|file|regex]\n";
@@ -169,25 +174,35 @@ if (exists $ENV{'SERVER_PROTOCOL'}) {
 #  Parse command line arguments.
 
 ($rarg, $rflag, $rextra) = parse_args \@ARGV, qw/name package type indexdir/;
+
+#  Exit if there are unassigned arguments.
+
 die $usage if (@$rextra);
 
 #  Process flags.
 
 $html = defined (delete ($rflag->{'html'})) || $cgi;
 $exact = defined (delete ($rflag->{'exact'}));
+
+#  Exit if there are unknown flags (including '-h').
+
 error $usage if (%$rflag);
 
-#  Process arguments.
+#  Process arguments; assign empty string if unspecified to avoid
+#  warning messages.
 
 $name     = $rarg->{'name'}     || '';
 $package  = $rarg->{'package'}  || '';
 $type     = $rarg->{'type'}     || '';
-$indexdir = $rarg->{'indexdir'} || $indexdir;
 
-#  Add specification of index directory to the retained arguments if it
-#  is not the default.
+#  $indexdir already has a default value; if one is specified on the 
+#  command line override it and note that this argument should be 
+#  retained for subsequent form invocations.
 
-$retained{'indexdir'} = $rarg->{'indexdir'} if ($rarg->{'indexdir'});
+if ($rarg->{'indexdir'}) {
+   $indexdir = $rarg->{'indexdir'};
+   $retained{'indexdir'} = $indexdir;
+}
 
 #  Set the basic href used for constructing hyperlinks to source files
 #  to include retained arguments, so that they are inherited by files 
@@ -204,6 +219,10 @@ my $iname;
 foreach $iname (@indexes) {
    $index{$iname} = StarIndex->new("$indexdir/$iname", "read");
 }
+
+#  Set up human-readable names for index contents.
+
+%contents = (func => 'Routine', file => 'File');
 
 #  Read list of packages and tasks if it will be required.
 
@@ -232,9 +251,8 @@ $SIG{'INT'} = sub {tidyup; exit;};
 if ($name && $type ne 'regex') {
 
 #  Name argument has been supplied, so try to retrieve the requested file.
-#  If a type ('file' or 'func') has been given, then try to match it in the 
-#  appropriate index.  Otherwise try to match it in either index
-#  (if the name contains a '.' try file first, else try func first).
+#  If an type ('file' or 'func') has been given, then try to match it in the 
+#  appropriate index.  Otherwise try to match it in either index.
 #  For each type of match, try it exact first, but (unless the -exact flag
 #  has been given) look for variants if that fails - specifically, 
 #  try appending or lowercasing an underscore to function names, and try 
@@ -301,6 +319,9 @@ elsif (!$name) {
    }
 }
 else {
+
+#  This should not happen.
+
    error "Internal: program logic is wrong\n";
 }
 
@@ -412,7 +433,8 @@ sub parse_args {
       }
    }
 
-#  Deal with undefined positionally-determined arguments.
+#  Deal with undefined positionally-determined arguments; anything 
+#  unassigned after this is left in @$rargv (and returned at the end).
 
    while ($default = shift @default) {
       $arg{$default} ||= shift (@$rargv) || '';
@@ -451,7 +473,7 @@ sub query_form {
 #     query_form [$package];
 
 #  Description:
-#     Outputs a HTML form to allow the source code browser program to 
+#     Outputs an HTML form to allow the source code browser program to 
 #     be run as a CGI script.  The routine will output a form
 #     containing enough functionality to allow the script to be called
 #     with all its useful functions.
@@ -492,7 +514,8 @@ sub query_form {
       <form method=GET action='$self'>
    ";
 
-#  Record retained arguments so they are inherited by subsequent invocations.
+#  Record retained arguments as hidden input fields in the form so they 
+#  are inherited by subsequent invocations.
 
    my ($key, $value);
    while (($key, $value) = each %retained) {
@@ -501,21 +524,18 @@ sub query_form {
 
 #  Print query box for module.
 
-   hprint "
-      Name of item:
-      <input name=name size=40 value=''>
-      <br>
-   ";
+   print "Name of item: <input name=name size=40 value='",
+                           ($type eq 'regex') ? $name : "",
+                       "'>",
+         "\n<br>\n";
 
 #  Print radio buttons for type.
 
    my %radio;
    my $iname;
    foreach $iname (@indexes) {
-      my $textname = {func => "Routine", 
-                      file => "File"}->{$iname} || $iname;
-      $radio{$iname} = "<input type=radio name=type value='$iname'>"
-                     . "&nbsp;$textname";
+      $radio{$iname} = "<input type=radio name=type value='$iname'>&nbsp;"
+                     . $contents{$iname};
    }
    $radio{''}      = "<input type=radio name=type value=''>"
                    . "&nbsp;Either";
@@ -524,7 +544,7 @@ sub query_form {
    $radio{$type} =~ s/>/ checked>/;
 
    print "Type of item:\n";
-   print join "\n", @radio{(@indexes, '', 'regex')};
+   print join "&nbsp;&nbsp;\n", @radio{(@indexes, '', 'regex')};
    print "\n<br>\n";
 
 #  Print select list for package.
@@ -579,7 +599,7 @@ sub package_list {
 #     appropriate arguments.
 #
 #     The exact output (list of files, functions, or both) depends on 
-#     the global $type argument.
+#     the value of the global $type variable.
 
 #  Arguments:
 #     $package = string (optional).
@@ -640,15 +660,12 @@ sub package_list {
       my %printlist;
       $printlist{$type} = 1;
 
-      print "<hr><h3><a href='${scb}package=$package&amp;type=file#file'>",
-            "Files</a> in package <b>$package</b>.</h3>\n"
-         unless ($printlist{'file'});
-   
-      print "<hr><h3><a href='${scb}package=$package&amp;type=func#func'>",
-            "Routines</a> in package <b>$package</b>.</h3>\n"
-         unless ($printlist{'func'});
-
-
+      foreach $iname (@indexes) {
+         print 
+            "<hr><h3><a href='${scb}package=$package&amp;type=$iname#$iname'>",
+            $contents{$iname}, "s</a> in package <b>$package</b>.</h3>\n"
+            unless ($printlist{$iname});
+      }
 
 #     Print list of Starlink documents from selected package.
 
@@ -698,7 +715,7 @@ sub package_list {
          hprint "
             <hr>
             <a name='func'></a>
-            <h3>Routines in package <b>$package</b>:</h3> 
+            <h3>" . $contents{'func'} . "s in package <b>$package</b>:</h3> 
          ";
 
 #        Assemble a list of functions in the package for each function
@@ -753,7 +770,7 @@ sub package_list {
          hprint "
             <hr>
             <a name='file'></a>
-            <h3>Files in package <b>$package</b>:</h3>
+            <h3>", $contents{'file'}, "s in package <b>$package</b>:</h3>
          ";
 
          if (%files) {
@@ -818,8 +835,8 @@ sub search_keys {
 #     search_keys $regex [, $package];
 
 #  Description:
-#     Searches through all keys in StarIndex indices and outputs a list
-#     of those which match the regular expression $regex.  If the 
+#     Searches through all keys in all StarIndex indexes and outputs a
+#     list of those which match the regular expression $regex.  If the 
 #     $package argument is given, only that package is searched, 
 #     otherwise all packages are searched.
 
@@ -857,7 +874,7 @@ sub search_keys {
 #  Initialise local variables.
 
    my (%match);
-   my ($name, $loc, $pack, $iname, $indtext);
+   my ($name, $loc, $pack, $iname);
 
 #  Find matching index entries.
 
@@ -883,29 +900,30 @@ sub search_keys {
 #     Print list of matching index entries by index type and package.
 
       foreach $iname (sort keys %match) {
-         $indtext = {func => 'Routines', file => 'Files'}->{$iname};
          if ($html) {
-            print "\n<h3>$indtext:</h3>\n";
+            print "\n<h3>", $contents{$iname}, "s</h3>\n<dl>\n";
          }
          else {
-            print "\n$indtext:\n";
+            print "\n", $contents{$iname}, ":\n";
          }
          foreach $pack (sort keys %{$match{$iname}}) {
-            print "<h4>$pack</h4>\n" if ($html && !$package);
+            print "<dt>$pack:</dt>\n" if ($html && !$package);
             foreach $name (sort keys %{$match{$iname}{$pack}}) {
                $loc = $match{$iname}{$pack}{$name};
                if ($html) {
                   if ($iname eq 'func') {
                      print
+                        "<dd>",
                         "<a href='${scb}$name&$package&$type=func#$name'>",
                         "$name</a>",
-                        "<br>\n";
+                        "</dd>\n";
                   }
                   else {
                      print
+                        "<dd>",
                         "<a href='${scb}$name&$package&$type=iname'>",
                         "$name</a>",
-                        "<br>\n";
+                        "</dd>\n";
                   }
                }
                else {
@@ -913,6 +931,7 @@ sub search_keys {
                }
             }
          }
+         print "\n</dl>\n<hr>\n" if ($html);
       }
    }
    else {
@@ -1136,8 +1155,11 @@ sub get_module {
    mkdirp $tmpdir, 0777;
    pushd $tmpdir;
 
-#  Interpret the first element of the location as a package or symbolic
-#  directory name.  Either way, change it for a logical path name.
+#  Interpret the first element (before the '#' sign) of the location as 
+#  a package or symbolic directory name.  If it is a symbolic directory,
+#  there is a record in the 'file' index mapping it to a real directory, 
+#  otherwise the real location is taken from the $srcdir variable.
+#  Either way, change it for a logical path name.
 
    $locname =~ /^(.+)#(.+)/i;
    ($head, $tail) = ($1, $2);
@@ -1247,9 +1269,9 @@ sub extract_file {
 #     $rest is to $tarcontents as $tarcontents is to $location.
 
    $location =~ /^([^>]+)>?([^>]*)(>?.*)$/;
-   ($initial, $tarcontents, $rest) = ($1, $2, $3);
+   my ($initial, $tarcontents, $rest) = ($1, $2, $3);
    $initial =~ m%^(.*/)?([^/]+)$%;
-   ($head, $tail) = ($1, $2);
+   my ($head, $tail) = ($1, $2);
    $head ||= '';
 
 #  If $initial is not a tarfile, just output the file.
@@ -1497,6 +1519,9 @@ sub output {
       }
 
 #     Output appropriate footer text.
+#     The date calculation is Y2K compliant, as long as the underlying
+#     operating system is (see documentation for the Perl localtime()
+#     function).
 
       if ($intag) {
          print "</$intag>\n";
@@ -1553,9 +1578,6 @@ sub docurl {
 #        Uniform Resource Locator pointing to the document in question.
 
 #  Notes:
-#     To avoid having to know too much about how the HTTP server is set
-#     up this simply returns a reference to the document at HTX server
-#     at RAL.  Since a local copy probably exists, this is rather wasteful.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -1582,10 +1604,6 @@ sub docurl {
 
    return "$htxserver/$doc.htx/$doc.html";
 }
-
-
-
-
 
 
 ########################################################################
@@ -1668,7 +1686,7 @@ sub error {
 #     $message = string.
 #        Terse error message.
 #     $more = string (optional).
-#        Verbose error message expanding on $message.
+#        Additional explanatory text expanding on $message.
 
 #  Return value:
 
@@ -1859,7 +1877,7 @@ sub getdoctitles {
 #     Reads the standard docs_lis file, whose filename is stored in the
 #     global variable $docslisfile (usually /star/docs/docs_lis) to 
 #     generate a hash of all the titles of the Starlink documents 
-#     keyed by the document ids (e.g. {sun221 => "KAPPA for IRAF"}).
+#     keyed by the document ids (e.g. sun221 => "KAPPA for IRAF").
 #     If the file named in $docslisfile does not exist or cannot be 
 #     opened the routine simply returns a reference to an empty hash.
 
@@ -1870,7 +1888,7 @@ sub getdoctitles {
 #     \%doctitles = reference to hash.
 #        The hash contains title text keyed by document name (lower case
 #        document type followed by the number without leading zeroes),
-#        e.g. {sun221 => "KAPPA for IRAF"}.
+#        e.g. (sun221 => "KAPPA for IRAF").
 
 #  Notes:
 #     Clearly, this routine relies heavily on the docs_lis file having
@@ -1907,7 +1925,7 @@ sub getdoctitles {
 
    while (<DOCSLIS>) {
       $doctype = (split)[0] || '';
-      if ($doctype =~ /^(SC|SG|SGP|SSN|SUN|MUD)$/) {
+      if ($doctype =~ /^(SC|SG|SGP|SSN|SUN)$/) {
 
 #        Lines in this stanza each describe a single document.  Field
 #        zero is of the form "document_number.revision_number", and 
@@ -2139,15 +2157,18 @@ sub hprint {
 
 #  Get argument.
 
-   local $_ = shift;
+   local $_;
 
-#  Strip leading whitespace from each line.
+   while ($_ = shift) {
 
-   s%^\s*%%mg;
+#     Strip leading whitespace from each line.
 
-#  Print stripped text.
+      s%^\s*%%mg;
 
-   print;
+#     Print stripped text.
+
+      print;
+   }
 }
 
 # $Id$
