@@ -1975,10 +1975,9 @@ sub mimetype {
 #     $type = mimetype $extension;
 
 #  Description:
-#     Uses the system file $mimetypes_file (typically /etc/mime.types) to
-#     get a MIME type for a file with a given extension.  This is the 
-#     way HTTP servers generate MIME types for serving documents in 
-#     absence of better information.
+#     Uses the file $mimetypes_file to get a MIME type for a file with 
+#     a given extension.  This is the way HTTP servers generate MIME 
+#     types for serving documents in absence of better information.
 
 #  Arguments:
 #     $extension = string.
@@ -1989,8 +1988,7 @@ sub mimetype {
 #        MIME type if one can be located, otherwise ''.
 
 #  Notes:
-#     Subject of course to the completeness of the $mimetypes_file; these
-#     are not always very complete, especially on older systems.
+#     Subject of course to the completeness of the $mimetypes_file.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils

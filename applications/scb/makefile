@@ -304,10 +304,6 @@ SCB_SOURCES = $(STARLINK)/sources
 
 HTX_SERVER = http://star-www.rl.ac.uk/cgi-bin/htxserver/
 
-#  Location of mime.types file.
-
-MIMETYPES_FILE = /etc/mime.types
-
 #  Temporary directory used by browser program.
 
 SCB_BROWSER_TMP = /usr/tmp/scb
@@ -379,6 +375,10 @@ CGI_SCRIPTS = scb.pl
 
 PERL_MODULES = YyTag.pm Scb.pm StarIndex.pm
 
+#  List of auxiliary files required in the built package.
+
+AUX_FILES = mime.types
+
 #  List of files compiled using lex, yacc, and C.
 
 YY_BINARIES = ctag ftag
@@ -414,7 +414,7 @@ TEST_FILES = $(PKG_NAME)_test.tar
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(PERL_MODULES) \
-              $(YY_BINARIES)
+              $(YY_BINARIES) $(AUX_FILES)
 
 #  Rules for extracting source files from the source archive.
 
@@ -424,7 +424,7 @@ $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT):
            else echo $@ is not in the tar file; exit 1; fi
 	chmod 755 $@
 
-$(PERL_MODULES) $(YY_SOURCES):
+$(PERL_MODULES) $(YY_SOURCES) $(AUX_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -697,6 +697,16 @@ VARLIB_SUBST = $(VAR_SUBST) \
            else :; fi;\
         done
 #
+#  Install the auxiliary files, giving them world read permission.
+	for f in $(AUX_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN)/$$f;\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
 #  Install the lex/yacc binaries, giving them world execute permission.
 	for f in $(YY_BINARIES) ""; do \
            if test -n "$$f"; then \
@@ -813,6 +823,15 @@ do_deinstall:
            if test -n "$$f" -a -f $(INSTALL_PERL_MOD)/$$f; then \
               rm -f $(INSTALL_PERL_MOD)/$$f;\
               $(MAKE) $$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the auxiliary files, if installed versions exist.
+	- for f in $(AUX_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
 #
