@@ -146,5 +146,15 @@ interface FINDCENT
       helpkey     '*'
    endparameter
 
+   parameter AUTOSCALE
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  false
+      prompt   'Adjust centroid parameters to image scale'
+      helpkey  '*'
+   endparameter
+
 endinterface
 # $Id$

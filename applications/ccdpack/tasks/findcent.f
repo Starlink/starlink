@@ -36,6 +36,19 @@
 *     findcent in outlist
 
 *  ADAM Parameters:
+*     AUTOSCALE = _LOGICAL (Read)
+*        Whether to "automatically" adjust the centroid location
+*        parameters to reflect the fact that picking good initial
+*        positions is less likely when dealing with very large images
+*        (these tend to be displayed using one display pixel to
+*        represent many image pixels).
+*
+*        If TRUE then the values of the parameters ISIZE, TOLER and
+*        MAXSHIFT are scaled by an amount that maps the largest
+*        dimension of each input image to an image of size 1024
+*        square (so an image of size 2048 square will have these
+*        parameters increased by a factor of two).
+*        [FALSE]
 *     IN = LITERAL (Read)
 *        The names of the NDFs whose data components contain image
 *        features which are to be centroided.  The NDF names should be
@@ -258,6 +271,8 @@
 *        Updated for CCDPACK 2.0.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator control (foreign data access upgrades).
+*     1-MAR-1999 (PDRAPER):
+*        Added autoscale parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -266,60 +281,67 @@
 *-
       
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE             ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PAR_ERR'          ! Parameter system error codes
-      INCLUDE 'DAT_PAR'          ! HDS/DAT parameterisations
-      INCLUDE 'NDF_PAR'          ! NDF parameterisations
-      INCLUDE 'FIO_PAR'          ! FIO system parameters
-      INCLUDE 'CCD1_PAR'         ! CCDPACK parameterisations
+      INCLUDE 'SAE_PAR'         ! Standard SAE constants
+      INCLUDE 'PAR_ERR'         ! Parameter system error codes
+      INCLUDE 'DAT_PAR'         ! HDS/DAT parameterisations
+      INCLUDE 'NDF_PAR'         ! NDF parameterisations
+      INCLUDE 'FIO_PAR'         ! FIO system parameters
+      INCLUDE 'CCD1_PAR'        ! CCDPACK parameterisations
 
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  Local Constants:
+      DOUBLE PRECISION AUTOSZ
+      PARAMETER ( AUTOSZ = 1024.0D0 ) ! Typical size of image
+      
 *  Local Variables:
-      CHARACTER * ( 6 ) ACCESS   ! NDF access mode.
+      CHARACTER * ( 6 ) ACCESS  ! NDF access mode.
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer used to read in data
       CHARACTER * ( FIO__SZFNM ) FNAME ! Position list filename buffer
       CHARACTER * ( FIO__SZFNM ) NDFNAM ! NDF filename buffer
       CHARACTER * ( NDF__SZTYP ) TYPE ! Input NDF data type
-      DOUBLE PRECISION MAXSHF    ! Maximum shift in position
-      DOUBLE PRECISION TOLER     ! Tolerance required in centroid
-      INTEGER DUMMY              ! Integer
-      INTEGER EL                 ! Number of elements in input NDF
-      INTEGER FDIN               ! Input file identifier
-      INTEGER FDOUT              ! Output file identifier
-      INTEGER FIOGR              ! Input position list name group
-      INTEGER FIOGRO             ! Input position list name group
-      INTEGER I                  ! Loop counter
-      INTEGER IDIN               ! Input NDF identifier
-      INTEGER IPDAT              ! Pointer to positions data
-      INTEGER IPDIN              ! Input position identifiers
-      INTEGER IPDOUT             ! Input position identifiers
-      INTEGER IPIN               ! Pointer to input data array
-      INTEGER IPXIN              ! Pointer to input X positions
-      INTEGER IPXOUT             ! Pointer to output X positions
-      INTEGER IPYIN              ! Pointer to input Y positions
-      INTEGER IPYOUT             ! Pointer to output Y positions
-      INTEGER ISIZE              ! Size of box to search
-      INTEGER LBND( 2 )          ! Lower bounds of NDF data component
-      INTEGER MAXIT              ! Maximum number of iterations
-      INTEGER NCOL               ! First dimension of input NDF
-      INTEGER NDFGR              ! Input group of NDF names
-      INTEGER NDIM               ! Dimensionality of input NDF
-      INTEGER NLINE              ! Second dimension of input NDF
-      INTEGER NNDF               ! Number of input NDFs
-      INTEGER NOUT               ! Number of centroids output
-      INTEGER NREC               ! Number of records read from positions
-                                 ! file
-      INTEGER NVAL               ! Number values per input record
-      INTEGER UBND( 2 )          ! Upper bounds of NDF data component
-      LOGICAL NDFS               ! True if position lists are named in
-                                 ! NDF extensions
-      LOGICAL SIGN               ! If true features are positive
-
+      DOUBLE PRECISION CSCALE   ! Automatic centroid scaling factor
+      DOUBLE PRECISION MAXSHF   ! Maximum shift in position
+      DOUBLE PRECISION MAXSHS   ! Autoscaled maximum shift in position
+      DOUBLE PRECISION TOLER    ! Tolerance required in centroid
+      DOUBLE PRECISION TOLERS   ! Autoscaled tolerance required in centroid
+      INTEGER DUMMY             ! Integer
+      INTEGER EL                ! Number of elements in input NDF
+      INTEGER FDIN              ! Input file identifier
+      INTEGER FDOUT             ! Output file identifier
+      INTEGER FIOGR             ! Input position list name group
+      INTEGER FIOGRO            ! Input position list name group
+      INTEGER I                 ! Loop counter
+      INTEGER IDIN              ! Input NDF identifier
+      INTEGER IPDAT             ! Pointer to positions data
+      INTEGER IPDIN             ! Input position identifiers
+      INTEGER IPDOUT            ! Input position identifiers
+      INTEGER IPIN              ! Pointer to input data array
+      INTEGER IPXIN             ! Pointer to input X positions
+      INTEGER IPXOUT            ! Pointer to output X positions
+      INTEGER IPYIN             ! Pointer to input Y positions
+      INTEGER IPYOUT            ! Pointer to output Y positions
+      INTEGER ISIZE             ! Size of box to search
+      INTEGER ISIZES            ! Autoscaled size of box to search
+      INTEGER LBND( 2 )         ! Lower bounds of NDF data component
+      INTEGER MAXIT             ! Maximum number of iterations
+      INTEGER NCOL              ! First dimension of input NDF
+      INTEGER NDFGR             ! Input group of NDF names
+      INTEGER NDIM              ! Dimensionality of input NDF
+      INTEGER NLINE             ! Second dimension of input NDF
+      INTEGER NNDF              ! Number of input NDFs
+      INTEGER NOUT              ! Number of centroids output
+      INTEGER NREC              ! Number of records read from positions file
+      INTEGER NVAL              ! Number values per input record
+      INTEGER UBND( 2 )         ! Upper bounds of NDF data component
+      LOGICAL AUTOSC            ! Whether to scale centroid parameters by image size
+      LOGICAL NDFS              ! True if position lists are named in NDF extensions
+      LOGICAL SIGN              ! If true features are positive
+      
 *.
 
 *  Check inherited global status.
@@ -386,6 +408,15 @@
 *=======================================================================
 *  Get the parameters controlling the centroiding process.
 *=======================================================================
+
+*  See if autoscaling of the parameters is required. This attempts to
+*  adapt to the size of the image, since larger images will tend to have 
+*  less accurate initial positions (since they are displayed at lower
+*  resolution). The scaling works assuming that an image AUTOSZ square
+*  does not need any scaling, otherwise the search box and maximum
+*  shift are scaled to normalise to an image this big.
+      CALL PAR_GET0L( 'AUTOSCALE', AUTOSC, STATUS )
+
 *  Size of the search box. Larger than 3 and odd.
       CALL PAR_GET0I( 'ISIZE', ISIZE, STATUS )
       ISIZE = MAX( 3, ISIZE )
@@ -436,6 +467,13 @@
          CALL CCD1_MSG( ' ', '  Locating negative features', STATUS )
       END IF      
 
+*  Note if autoscaling centroid parameters.
+      IF ( AUTOSC ) THEN
+         CALL MSG_SETD( 'AUTOSZ', AUTOSZ )
+         CALL CCD1_MSG( ' ',
+     : '  * tuning parameters to image size: ^AUTOSZ x ^AUTOSZ',STATUS )
+      END IF
+      
 *=======================================================================
 * Main loop - process pairs of NDFs and list names.
 *=======================================================================
@@ -510,11 +548,24 @@
          CALL CCD1_MALL( NREC, '_DOUBLE', IPYOUT, STATUS )
          CALL CCD1_MALL( NREC, '_INTEGER', IPDOUT, STATUS )
 
+*  If autoscaling adjust the centroid parameters. Note parameters are
+*  not allowed to be smaller.
+         IF ( AUTOSC ) THEN
+            CSCALE = MAX( DBLE( NCOL )/AUTOSZ, DBLE( NLINE )/AUTOSZ )
+            CSCALE = MAX( 1.0D0, CSCALE )
+         ELSE
+            CSCALE = 1.0D0
+         END IF
+         ISIZES = NINT( CSCALE * ISIZE )
+         ISIZES = ( ISIZES / 2 ) * 2 + 1  ! Make sure it's odd
+         MAXSHS = CSCALE * MAXSHF
+         TOLERS = CSCALE * TOLER
+
 *  Perform the centroiding.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          CALL CCD1_CENT( TYPE, IPIN, NCOL, NLINE, LBND, %VAL( IPDIN ),
-     :                %VAL( IPXIN ), %VAL( IPYIN ), NREC, ISIZE, SIGN,
-     :                MAXSHF, MAXIT, TOLER, %VAL( IPDOUT ),
+     :                %VAL( IPXIN ), %VAL( IPYIN ), NREC, ISIZES, SIGN,
+     :                MAXSHS, MAXIT, TOLERS, %VAL( IPDOUT ),
      :                %VAL( IPXOUT ), %VAL( IPYOUT ), NOUT, STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN 
 
