@@ -169,6 +169,9 @@
 *  History:
 *     31-AUG-2000 (DSB):
 *        Original version.
+*     27-OCT-2000 (DSB):
+*        Modified to avoid allocating unnecessary workspace if the last axis is being
+*        collapsed.
 *     {enter_further_changes}
 
 *  Bugs:
@@ -655,13 +658,21 @@
      :                ESTIM, STATUS )
       CALL PAR_GDR0R( 'WLIM', 0.3, 0.0, 1.0, .FALSE., WLIM, STATUS )
 
-*  Allocate work space.
-      CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW1, STATUS )
-      IF( VAR ) THEN
-         CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW2, STATUS )
+*  Allocate work space, unles the last axis is being collapsed (in which
+*  case no work space is needed)..
+      IF( JAXIS .NE. NDIM ) THEN
+         CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW1, STATUS )
+         IF( VAR ) THEN
+            CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW2, STATUS )
+         ELSE
+            IPW2 = IPW1
+         END IF  
+
+*  Store safe pointer values if no work space is needed.
       ELSE
-         IPW2 = IPW1
-      END IF  
+         IPW1 = IPIN( 1 )
+         IPW2 = IPIN( 1 )
+      END IF
 
 *  Now do the work, using a routine appropriate to the numeric type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
@@ -686,8 +697,10 @@
       END IF
 
 *  Free the work space.
-      CALL PSX_FREE( IPW1, STATUS )
-      IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
+      IF( JAXIS .NE. NDIM ) THEN
+         CALL PSX_FREE( IPW1, STATUS )
+         IF( VAR ) CALL PSX_FREE( IPW2, STATUS )
+      END IF
 
 *  Come here if something has gone wrong.
   999 CONTINUE
