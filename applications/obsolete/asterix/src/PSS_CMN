@@ -59,13 +59,12 @@
       INTEGER                   PSF_RESWPTR         	! Resample workspace
 
 *    External map handling
-      INTEGER                 	MP_BDA                  ! BDA identifier
+      INTEGER			MP_ID			! ADI identifier
       INTEGER                 	MP_DPTR                 ! Ptr to data array
       INTEGER                 	MP_QPTR                 ! Ptr to data quality
       LOGICAL                 	MP_ENVIR                ! Created by environment?
       LOGICAL                 	MP_OK                   !
       CHARACTER*10            	MP_PAR                  ! Par used if ENVIR true
-      CHARACTER*(DAT__SZLOC)  	MP_LOC                	! Top level locator
       CHARACTER*1             	MP_MODE                 ! File access mode
 
 *    The data cache
@@ -164,7 +163,7 @@
 *    Input image
       LOGICAL                   IM_OK                   ! Slot in use?
       LOGICAL                   IM_DYNAMIC              ! Dynamic?
-      INTEGER                   IM_BDA                  ! BDA identifier
+      INTEGER			IM_ID			! ADI identifier
       LOGICAL                   IM_PRIM                	! Primitive?
       LOGICAL			IM_DATA_OK
       LOGICAL  			IM_DATA_DYNAMIC
@@ -175,12 +174,11 @@
       LOGICAL                   IM_BGND_SUBTRACTED      ! Bgnd subtracted
       CHARACTER*40              IM_LABEL, IM_UNITS	! Primitive input
       CHARACTER*200             IM_FILE                	! Trace data
-      CHARACTER*(DAT__SZLOC)    IM_LOC                 	! Locator to input
 
 *    Input background
       LOGICAL                   BG_OK                   ! Slot in use?
       LOGICAL                   BG_DYNAMIC              ! Dynamic?
-      INTEGER                   BG_BDA                  ! BDA identifier
+      INTEGER			BG_ID			! Background identifier
       LOGICAL			BG_DATA_OK
       LOGICAL  			BG_DATA_DYNAMIC
       INTEGER                   BG_DATA_PTR
@@ -188,7 +186,6 @@
       LOGICAL  			BG_VAR_DYNAMIC
       INTEGER                   BG_VAR_PTR
       CHARACTER*200             BG_FILE                	! Trace data
-      CHARACTER*(DAT__SZLOC)    BG_LOC                 	! Locator to input
 
 *    Objects of _DOUBLE size
       COMMON /PSS_CMN_D/
@@ -200,7 +197,7 @@
      :                    DC_BGND_S, DC_PC, DC_VOLATILE, DC_IMD,
      :                    DC_PSF, DC_IMBV,
      :                    DC_BGND,DC_BGDV,DC_LBGND,DC_MOD,DC_Q,
-     :			MP_BDA, MP_DPTR, MP_QPTR, MP_ENVIR, MP_OK,
+     :			MP_ID, MP_DPTR, MP_QPTR, MP_ENVIR, MP_OK,
      :                  PSF_HAN, PSF_STORE, PSF_DATA, PSF_DIMS,
      :                    PSF_UDIMS, PSF_PPLO, PSF_PPHI, PSF_PPR,
      :                    PSF_PPS, PSF_BORDER, PSF_NIPOS, PSF_PIXL,
@@ -208,13 +205,13 @@
      :                    PSF_LASTBOX, PSF_UPNR, PSF_CONPTR,
      :                    PSF_CONWPTR, PSF_RESWPTR,
      :                  AX_OK, AX_REG, AX_PTR, AX_DR, AX_BR, AX_TOR,
-     :                  IM_OK, IM_DYNAMIC, IM_BDA, IM_PRIM, IM_DATA_OK,
+     :                  IM_OK, IM_DYNAMIC, IM_ID, IM_PRIM, IM_DATA_OK,
      :                    IM_DATA_DYNAMIC, IM_DATA_PTR, IM_VAR_OK,
      :                    IM_VAR_DYNAMIC, IM_VAR_PTR,IM_BGND_SUBTRACTED
 
 *    Objects of _INTEGER size
       COMMON /PSS_CMN_I_2/
-     :                  BG_OK, BG_DYNAMIC, BG_BDA, BG_DATA_OK,
+     :                  BG_OK, BG_DYNAMIC, BG_DATA_OK, BG_ID,
      :                    BG_DATA_DYNAMIC, BG_DATA_PTR, BG_VAR_OK,
      :                    BG_VAR_DYNAMIC, BG_VAR_PTR,
      :                  S_CP, S_FLUX, S_SIG, S_SIGERR, S_DSTAT, S_FERR,
@@ -244,8 +241,8 @@
 
 *    Character common block
       COMMON /PSS_CMN_C/
-     :			MP_LOC, MP_PAR, MP_MODE,
+     :			MP_PAR, MP_MODE,
      :                  MU_IMG, MU_BCK, MU_SSDS,
      :                  AX_LABEL, AX_UNITS,
-     :                  IM_FILE, IM_LOC, IM_LABEL, IM_UNITS,
-     :                  BG_FILE, BG_LOC
+     :                  IM_FILE, IM_LABEL, IM_UNITS,
+     :                  BG_FILE
