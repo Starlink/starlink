@@ -430,8 +430,8 @@
         EQUINOX = DBLE (EQUI)
 
         IF(STATUS .NE. SAI__OK)THEN
-          CALL MSG_PRNT(' FATAL error obtaining RA and DEC of
-     : field centre')
+          CALL MSG_PRNT(' FATAL error obtaining RA and DEC of'//
+     :                    ' field centre')
           GOTO 999
         ELSE
           RA = REAL(RA_CENTRE)
