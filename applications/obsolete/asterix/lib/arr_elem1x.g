@@ -24,7 +24,7 @@
 *     INDEX = INTEGER (given)
 *        Index of the element whose value is required
 *     VAL = <TYPE> (returned)
-*        Size of the array
+*        The value of the requested array element
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
