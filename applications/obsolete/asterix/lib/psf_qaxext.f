@@ -1,5 +1,5 @@
 *+  PSF_QAXEXT - Retrieve axis extrema from internal storage
-      SUBROUTINE PSF_QAXEXT( SLOT, AX, LO, HI, STATUS )
+      SUBROUTINE PSF_QAXEXT( PSID, AX, LO, HI, STATUS )
 *
 *    Description :
 *
@@ -29,7 +29,7 @@
 *
 *    Import :
 *
-      INTEGER                 SLOT              ! Psf handle
+      INTEGER                 PSID              ! Psf handle
       INTEGER                 AX                ! Axis number
 *
 *    Export :
@@ -54,7 +54,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Use internal routine to get data
-      CALL PSF1_GETAXVAL( P_INST(SLOT), AX, DIM, REG, PTR, BASE, SCALE,
+      CALL PSF1_GETAXVAL( PSID, AX, DIM, REG, PTR, BASE, SCALE,
      :                    TOR, STATUS )
 
 *    Regular axis?

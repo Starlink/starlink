@@ -24,6 +24,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'AST_PKG'
 *
 *    Status :
 *
