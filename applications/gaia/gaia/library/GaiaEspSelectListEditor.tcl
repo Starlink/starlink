@@ -33,7 +33,7 @@
 #    Performs the given method on this widget.
 #
 #  Inheritance:
-#    This widget inherits TopLevelWidget.
+#    This widget inherits itk::Widget and gaia::GaiaEspSelectList.
 #
 #  Copyright:
 #    Copyright 1999, Central Laboratory of the Research Councils
@@ -56,22 +56,19 @@ itk::usual GaiaEspSelectListEditor {}
 itcl::class gaia::GaiaEspSelectListEditor {
 
     # --- Inheritances
-    inherit util::TopLevelWidget gaia::GaiaEspSelectList
+    inherit itk::Widget gaia::GaiaEspSelectList
 
     # --- Constructor
     constructor {parent_select_list initial_object_list args} {
-	util::TopLevelWidget::constructor
+	itk::Widget::constructor
     } {
 	set parent $parent_select_list
 	set object_list_ $initial_object_list
 
 	eval itk_initialize $args
 
-	# Set the top-level window title
-	wm title $w_ "GAIA: ESP source selections ($itk_option(-number))"
-
 	itk_component add objlist {
-	    TableList $w_.objlist \
+	    TableList $itk_interior.objlist \
 		    -title "Selected objects" \
 		    -headings {X Y Size canvasid} \
 		    -sizes {10 10 10 10}
@@ -88,35 +85,24 @@ itcl::class gaia::GaiaEspSelectListEditor {
 	}
 
 	itk_component add AddSource {
-	    button $w_.addsource \
+	    button $itk_interior.addsource \
 		    -text "Add object" \
 		    -command [code $this add_source]
 	}
 	$itk_component(AddSource) configure -highlightbackground black
-	add_short_help $itk_component(AddSource) \
-		{Press and then drag out source limit on image}
-	pack $itk_component(AddSource) \
-		-side left -expand true -padx 2 -pady 2
+	#add_short_help $itk_component(AddSource) \
+	#	{Press and then drag out source limit on image}
 
 	itk_component add DeleteSource {
-	    button $w_.deletesource \
+	    button $itk_interior.deletesource \
 		    -text "Delete object" \
 		    -command [code $this delete_source]
 	}
-	add_short_help $itk_component(DeleteSource) \
-		{Delete selected source from the list}
-	pack $itk_component(DeleteSource) \
-		-side right -expand true -padx 2 -pady 2
-
-	itk_component add Close {
-	    button $w_.close \
-		    -text "Close" \
-		    -command [code $this close_window]
-	}
-	add_short_help $itk_component(Close) \
-		{Close window}
-	pack $itk_component(Close) \
-		-side right -expand true -padx 2 -pady 2
+	#add_short_help $itk_component(DeleteSource) \
+	#	{Delete selected source from the list}
+	pack $itk_component(AddSource) \
+		$itk_component(DeleteSource) \
+		-side left -fill x -expand 1 -padx 2 -pady 2
     }
 
     # --- Destructor
@@ -131,6 +117,10 @@ itcl::class gaia::GaiaEspSelectListEditor {
     public method add_source {}
     public method delete_source {}
     public method close_window {}
+    public method reopen_window {}
+
+    # Reset the editor, and close the window
+    public method reset {}
 
     # Canvas, canvasdraw and rtdimage variables
     public variable canvas {} {}
@@ -186,7 +176,6 @@ body gaia::GaiaEspSelectListEditor::add_source {} {
 body gaia::GaiaEspSelectListEditor::add_source_finish_ {} {
     $itk_component(AddSource) configure -state normal -relief raised
     set lastobj [lindex $object_list_ [expr [llength $object_list_] - 1]]
-    #puts "add_source_finish: [$lastobj coords]"
 
     # synchronise the parent's object list
     $parent set_sourcelist $object_list_
@@ -219,7 +208,6 @@ body gaia::GaiaEspSelectListEditor::remake_table_ {} {
 	}
 	lappend newcontents [concat $c [$s canvas_id]]
     }
-    #puts "remake: new contents: $newcontents"
     $itk_component(objlist) clear
     $itk_component(objlist) append_rows $newcontents
     $itk_component(objlist) new_info
@@ -236,15 +224,13 @@ body gaia::GaiaEspSelectListEditor::delete_source {} {
 	# go through the list is descending order, so we remove items from
 	# object_list_ from the end
 	set sdlist [lsort -decreasing $dlist]
-	#puts "delete-list: $dlist"
 	foreach row $sdlist {
 	    set rownum [lindex $row 0]
 	    set rowval [lindex $row 1]
-	    #puts "Deleting $row"
 	    # delete from object_list_
 	    set object_list_ [lreplace $object_list_ $rownum $rownum]
 	    # Delete from canvas last.  This update to the canvas calls
-	    # update_source, which in turn calls remake_table_.
+	    # update_source_, which in turn calls remake_table_.
 	    $canvasdraw delete_object [lindex $rowval 3]
 	}
 	# Enable the add-source button if the object_list_ length is now
@@ -258,7 +244,18 @@ body gaia::GaiaEspSelectListEditor::delete_source {} {
     }
 }
 
-body gaia::GaiaEspSelectListEditor::close_window {} {
-    delete object $this
+body gaia::GaiaEspSelectListEditor::reset {} {
+    # delete all of the sources, and close the window
+    foreach o $object_list_ {
+	delete object $o
+	#$o configure -update_callback {}
+	#$canvasdraw delete_object $o
+    }
+    set object_list_ {}
+
+    # clear the table by remaking it with the newly empty objectlist
+    remake_table_
+
+    # Finally, close the window
+    #close_window
 }
-    

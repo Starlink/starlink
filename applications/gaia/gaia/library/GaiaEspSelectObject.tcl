@@ -6,7 +6,7 @@
 #    [incr Tcl] class
 #
 #  Purpose:
-#    Provides a top-level widget for making selections on a canvas.
+#    Encapsulates a selected object on a canvas.
 #
 #  Description:
 #    The ESP widget needs to have the user select sources and matching
@@ -30,9 +30,6 @@
 #
 #    Performs the given method on this widget.
 #
-#  Inheritance:
-#    This widget inherits TopLevelWidget.
-#
 #  Copyright:
 #    Copyright 1999, Central Laboratory of the Research Councils
 #
@@ -54,13 +51,12 @@ itk::usual GaiaEspSelectObject {}
 itcl::class gaia::GaiaEspSelectObject {
 
     #  Inheritances:
-    #inherit util::TopLevelWidget
+    #  (None)
 
     #  Constructor
     constructor {args} {
 
 	# Evaluate any options
-	#eval itk_initialize $args
 	eval configure $args
     }
 
@@ -69,9 +65,7 @@ itcl::class gaia::GaiaEspSelectObject {
 	# Clear the canvas.  Better would be to clear only those objects 
 	# which this class has created, but that'll have to wait until I
 	# sort out how to manage those internally.  See GaiaPhotomObject
-	#$itk_option(-canvasdraw) clear
 	$canvasdraw clear
-	#bind $itk_option(-canvas) <Button-1> {}
     }
 
     # Select a source
@@ -151,7 +145,6 @@ body gaia::GaiaEspSelectObject::select_source  {callback} {
 body gaia::GaiaEspSelectObject::created_circle_ {id args} {
     set canvas_id_ $id
     update_circle_ $id create
-    #add_bindings_  $id
 
     # Update display and deselect object (immediate resize isn't 
     # desirable).
@@ -165,15 +158,19 @@ body gaia::GaiaEspSelectObject::created_circle_ {id args} {
 }
 
 body gaia::GaiaEspSelectObject::update_circle_ {id mode} {
-    lassign [$canvas coords $id] canvas_posX canvas_posY
-    set canvas_posR [$canvas itemcget $id -semimajor]
+    if {$mode != "delete"} {
+	lassign [$canvas coords $id] canvas_posX canvas_posY
+	set canvas_posR [$canvas itemcget $id -semimajor]
 
-    $rtdimage convert coords $canvas_posX $canvas_posY canvas posX_ posY_ image
-    $rtdimage convert dist $canvas_posR 0 canvas dist1 dist2 image
-    set pos3_ [expr $dist1+$dist2]
+	$rtdimage convert coords \
+		$canvas_posX $canvas_posY canvas \
+		posX_ posY_ image
+	$rtdimage convert dist $canvas_posR 0 canvas dist1 dist2 image
+	set pos3_ [expr $dist1+$dist2]
 
-    if {$mode == "create"} {
-	$canvasdraw add_notify_cmd $id [code $this update_circle_ $id] 0
+	if {$mode == "create"} {
+	    $canvasdraw add_notify_cmd $id [code $this update_circle_ $id] 0
+	}
     }
     if {$update_callback != {}} {
 	eval $update_callback $id
@@ -197,24 +194,26 @@ body gaia::GaiaEspSelectObject::created_square_ {id args} {
 }
 
 body gaia::GaiaEspSelectObject::update_square_ {id mode} {
-    lassign [$canvas coords $id] x0 y0 x1 y1
+    if {$mode != "delete"} {
+	lassign [$canvas coords $id] x0 y0 x1 y1
 
-    set centx [expr ($x0+$x1)/2]
-    set centy [expr ($y0+$y1)/2]
-    set widx [expr $x1-$x0]
-    set widy [expr $y1-$y0]
-    set wid [expr {$widx > $widy ? $widx : $widy}]
-    set hwid [expr $wid/2]
+	set centx [expr ($x0+$x1)/2]
+	set centy [expr ($y0+$y1)/2]
+	set widx [expr $x1-$x0]
+	set widy [expr $y1-$y0]
+	set wid [expr {$widx > $widy ? $widx : $widy}]
+	set hwid [expr $wid/2]
 
-    $rtdimage convert coords $centx $centy canvas posX_ posY_ image
-    $rtdimage convert dist $wid 0 canvas dist1 dist2 image
-    set pos3_ [expr $dist1+$dist2]
+	$rtdimage convert coords $centx $centy canvas posX_ posY_ image
+	$rtdimage convert dist $wid 0 canvas dist1 dist2 image
+	set pos3_ [expr $dist1+$dist2]
 
-    $canvas coords $id [expr $centx-$hwid] [expr $centy-$hwid] \
-    	       [expr $centx+$hwid] [expr $centy+$hwid]
-
-    if {$mode == "create"} {
-	$canvasdraw add_notify_cmd $id [code $this update_square_ $id] 0
+	$canvas coords $id [expr $centx-$hwid] [expr $centy-$hwid] \
+		[expr $centx+$hwid] [expr $centy+$hwid]
+	
+	if {$mode == "create"} {
+	    $canvasdraw add_notify_cmd $id [code $this update_square_ $id] 0
+	}
     }
     if {$update_callback != {}} {
 	eval $update_callback $id

@@ -62,6 +62,8 @@ itcl::class gaia::GaiaEspSelectList {
     constructor {args} {
 	# Evaluate any options
 	eval configure $args
+
+	default_config
     }
     
     # --- Destructor
@@ -82,12 +84,23 @@ itcl::class gaia::GaiaEspSelectList {
     # Maximum number of objects to be drawn
     public variable maxobjects {} {}
 
-    # Create an editor panel
-    public method edit_sourcelist {}
+    # Create an editor panel, which manipulates the list of objects.
+    public method edit_sourcelist {parent}
 
-    # Set and return the list of sources
+    # Reset.  Discard the list of sources
+    public method reset {}
+
+    # Set and return the list of sources.
+    #
+    # set_sourcelist is primarily provided so that the source list
+    # editor can manipulate the source list in this, its parent.
     public method set_sourcelist {new_list}
+
+    # get_sourcelist: return a list of the names of the objects
+    # created on the canvas.
     public method get_sourcelist {}
+
+    # default_config: (re-)initialise.
     public method default_config {}
 
     # --- Protected variables
@@ -95,18 +108,32 @@ itcl::class gaia::GaiaEspSelectList {
 
     # --- Private variables
 
-    # The list of selected sources, edited by GaiaEspSelectListEditor,
-    # and set by calls to set_sourcelist
+    # The list of selected sources, maintained simply by
+    # set_sourcelist, which is typically called by
+    # GaiaEspSelectListEditor.
     private variable object_list_ {}
+
+    private variable editor_ {}
 }
 
-body gaia::GaiaEspSelectList::edit_sourcelist {} {
-    gaia::GaiaEspSelectListEditor .#auto $this $object_list_ \
-	    -canvas $canvas \
-	    -canvasdraw $canvasdraw \
-	    -rtdimage $rtdimage \
-	    -drawmode $sourceshape \
-	    -maxobjects $maxobjects
+body gaia::GaiaEspSelectList::edit_sourcelist {parent} {
+    if {$editor_ == {}} {
+	set editor_ [gaia::GaiaEspSelectListEditor \
+		$parent.#auto $this $object_list_ \
+		-canvas $canvas \
+		-canvasdraw $canvasdraw \
+		-rtdimage $rtdimage \
+		-drawmode $sourceshape \
+		-maxobjects $maxobjects]
+    }
+    return $editor_
+}
+
+body gaia::GaiaEspSelectList::reset {} {
+    if {$editor_ != {}} {
+	$editor_ reset
+    }
+    set object_list_ {}
 }
 
 body gaia::GaiaEspSelectList::set_sourcelist {l} {

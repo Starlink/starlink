@@ -26,6 +26,26 @@
 #      GAIA plugin.
 #    {enter_further_changes_here}
 #
+#  Weaknesses:
+#    The following aren't really bugs, but things it would be nice to
+#    improve, given the opportunity:
+#
+#      - Supporting some of the other ESP tools (see notes below).
+#      - Setting the colour of the ellipse drawn by the ellprofou
+#        tool.
+#      - Graphing the output of the ellprofou tool.
+#
+#  Notes:
+#
+#    There is a fair amount of redundant code in here.  In an early phase
+#    of this interface's development, I (NG) implemented _all_ the ESP
+#    tools, in a fairly rough fashion.  Subsequently, I substantially
+#    rewrote the ellprofou tool, without having time to rewrite the
+#    other tools in the same way.  The code supporting the other tools
+#    can't be reused trivially, but it should still be of some use
+#    when and if support for those other tools is added, so it makes
+#    sense to leave the un-called code lying around.
+#
 #  RCS id:
 #    $Id$
 #
@@ -61,215 +81,173 @@ itcl::class gaia::GaiaEsp {
 	add_short_help $itk_component(menubar).help \
 		{Help menu: get some help about this window}
 
+	# Dummy command menu item
+	$File add command -label {Log ESP command} \
+		-command [code $this run 0 1]
 	# Exit menu item
 	$File add command -label Exit \
 		-command [code $this close] \
 		-accelerator {Control-c}
 	bind $w_ <Control-c> [code $this close]
 
+	#  Establish the defaults
+	set_defaults_
+
 	###
 	#  Start building the panel we use to interact with the plugin
-	set totalwidth 300
-	set lwidth 12
-	set vwidth 5
 
-	# All the components in this first common set should be listed
-	# in the variable common_widgets_, and the elements in that set, which
-	# a particular notebook panel needs to be disabled, should be listed
-	# in the argument to a call to disable_common_widgets_
-
-
-	#  Define file names common to different applications
-	itk_component add inardname {
-	    LabelFileChooser $w_.inardname \
-		    -labelwidth $lwidth \
-		    -text "In: ARD" \
-		    -textvariable [scope values_($this,ardfile)]
-	}
-	pack $itk_component(inardname) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(inardname) \
-		{Name of input ARD file}
-	    
-	itk_component add outndfname {
-	    LabelFileChooser $w_.outndfname \
-		    -labelwidth $lwidth \
-		    -text "Out: NDF" \
-		    -textvariable [scope values_($this,outputndffile)]
-	}
-	pack $itk_component(outndfname) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(outndfname) \
-		{Name of output NDF file}
-	    
-	itk_component add outtextname {
-	    LabelFileChooser $w_.outtextname \
-		    -labelwidth $lwidth \
-		    -text "Out: text" \
-		    -textvariable [scope values_($this,outputtextfile)]
-	}
-	pack $itk_component(outtextname) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(outtextname) \
-		{Name of output text file}
-
-	itk_component add back {
-	    gaia::StarLabelWidgetChild $w_.back \
-		    -text "Background" \
-		    -labelwidth $lwidth -anchor w
-	}
-	set cs [$itk_component(back) childsite]
-	entry $cs.b -textvariable [scope values_($this,back)] -width 10
-	label $cs.l1 -text {+/-}
-	entry $cs.s -textvariable [scope values_($this,sigma)] -width 10
-	label $cs.l2 -text {pixels}
-	button $cs.button \
-		-text {Use HSUB} \
-		-command [code $this bg_from_hsub_]
-	pack $cs.b -side left -padx 1m
-	pack $cs.l1 -side left -padx 1m
-	pack $cs.s -side left -padx 1m
-	pack $cs.l2 -side left -padx 1m
-	pack $cs.button -side right -padx 1m -fill x
-  	pack $itk_component(back) -side top -fill x -ipadx 1m -ipady 1m
-  	add_short_help $itk_component(back) \
-  		{The background value for the image}
-
-	itk_component add nsigma {
-	    LabelEntry $w_.nsigma \
-		    -text "Significant sigmas" \
-		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -textvariable [scope values_($this,nsigma)]
-	}
-	pack $itk_component(nsigma) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(nsigma) \
-		{Number of sigma above background before a pixel should be regarded as significant}
-
-
-	# Now add the notebook, which we use to deal with the different tools
+	# Add the notebook, which we use to deal with the different tools
 	itk_component add notebook {
 	    ::iwidgets::tabnotebook $w_.notebook \
-		    -tabpos w \
-		    -width $totalwidth -height 350 
+		    -tabpos n \
+		    -width $itk_option(-width) \
+		    -height $itk_option(-height)
 	}
 	pack $itk_component(notebook) -side top -fill both -expand 1 \
 		-ipadx 1m -ipady 1m
 
-	#  CORR
-	$itk_component(notebook) add -label Corr \
-		-command [code $this reveal_ 0]
-	set pages_(0) corr
-	set revealed_(0) 0
-	set notebook_characteristics_(disable,corr) \
-		{outtextname inardname selobj}
-	set notebook_characteristics_(reqsrc,corr) 0
+	set thisnum [get_panel_number_]
+	#  OBJECT SELECTION
+	$itk_component(notebook) add -label {Objects} \
+		-command [code $this reveal_ $thisnum]
+	set pages_($thisnum) objectselection
+	set revealed_($thisnum) 0
+	set notebook_characteristics_(disable,objectselection) \
+		{outndfname nsigma}
+	set notebook_characteristics_(reqsrc,objectselection) 0
 
+	#  CORR
+	#$itk_component(notebook) add -label Corr \
+	#	-command [code $this reveal_ 0]
+	#set pages_(0) corr
+	#set revealed_(0) 0
+	#set notebook_characteristics_(disable,corr) {outtextname inardname}
+	#set notebook_characteristics_(reqsrc,corr) 0
+
+	set thisnum [get_panel_number_]
 	#  ELLPRO/ELLFOU
-	$itk_component(notebook) add -label Ellpro/Ellfou \
-		-command [code $this reveal_ 1]
-	set pages_(1) ellprofou
-	set revealed_(1) 0
+	$itk_component(notebook) add -label {Ellipse fit} \
+		-command [code $this reveal_ $thisnum]
+	set pages_($thisnum) ellprofou
+	set revealed_($thisnum) 0
 	set notebook_characteristics_(disable,ellprofou) \
 		{outndfname nsigma}
 	set notebook_characteristics_(reqsrc,ellprofou) 1
 
 	#  FASTMED
-	$itk_component(notebook) add -label Fastmed \
-		-command [code $this reveal_ 2]
-	set pages_(2) fastmed
-	set revealed_(2) 0
-	set notebook_characteristics_(disable,fastmed) \
-		{outtextname inardname selobj nsigma}
-	set notebook_characteristics_(reqsrc,fastmed) 0	
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Fastmed \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) fastmed
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,fastmed) {outtextname inardname  nsigma}
+	#set notebook_characteristics_(reqsrc,fastmed) 0
 
 	#  GAUFIT
-	$itk_component(notebook) add -label Gaufit \
-		-command [code $this reveal_ 3]
-	set pages_(3) gaufit
-	set revealed_(3) 0
-	set notebook_characteristics_(disable,gaufit) {inardname}
-	set notebook_characteristics_(reqsrc,gaufit) 1
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Gaufit \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) gaufit
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,gaufit) {inardname}
+	#set notebook_characteristics_(reqsrc,gaufit) 1
 
 	#  HSUB
-	$itk_component(notebook) add -label Histpeak \
-		-command [code $this reveal_ 4]
-	set pages_(4) hsub
-	set revealed_(4) 0
-	set notebook_characteristics_(disable,hsub) \
-		{inardname outndfname selobj back nsigma}
-	set notebook_characteristics_(reqsrc,hsub) 0
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Histpeak \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) hsub
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,hsub) {inardname outndfname  back nsigma}
+	#set notebook_characteristics_(reqsrc,hsub) 0
 
 	#  LOBACK
-	$itk_component(notebook) add -label Loback \
-		-command [code $this reveal_ 5]
-	set pages_(5) loback
-	set revealed_(5) 0
-	set notebook_characteristics_(disable,loback) \
-		{inardname outndfname back nsigma}
-	set notebook_characteristics_(reqsrc,loback) 1
-	set notebook_characteristics_(sourceconfig,loback) \
-		{-sourceshape square -maxobjects 1}
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Loback \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) loback
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,loback) \
+	#	{inardname outndfname back nsigma}
+	#set notebook_characteristics_(reqsrc,loback) 1
+	#set notebook_characteristics_(sourceconfig,loback) {-sourceshape square -maxobjects 1}
 
 	#  MASK
-	$itk_component(notebook) add -label Mask \
-		-command [code $this reveal_ 6]
-	set pages_(6) mask
-	set revealed_(6) 0
-	set notebook_characteristics_(disable,mask) \
-		{outtextname selobj back nsigma}
-	set notebook_characteristics_(reqsrc,mask) 0
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Mask \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) mask
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,mask) \
+	#	{outtextname  back nsigma}
+	#set notebook_characteristics_(reqsrc,mask) 0
 	
 	#  MIXUP
-	$itk_component(notebook) add -label Mixup \
-		-command [code $this reveal_ 7]
-	set pages_(7) mixup
-	set revealed_(7) 0
-	set notebook_characteristics_(disable,mixup) \
-		{outtextname inardname selobj back nsigma}
-	set notebook_characteristics_(reqsrc,mixup) 0
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Mixup \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) mixup
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,mixup) \
+	#	{outtextname inardname  back nsigma}
+	#set notebook_characteristics_(reqsrc,mixup) 0
 
 	#  SECTOR
-	$itk_component(notebook) add -label Sector \
-		-command [code $this reveal_ 8]
-	set pages_(8) sector
-	set revealed_(8) 0
-	set notebook_characteristics_(disable,sector) \
-		{nsigma outndfname}
-	# We do require a source selection, which is why selobj
-	# isn't disabled, but we do _not_ require those to be saved,
-	# because that's done through the command line in sector.
-	set notebook_characteristics_(reqsrc,sector) 0
-	set notebook_characteristics_(sourceconfig,sector) \
-		{-sourceshape sector -maxobjects 1}
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Sector \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) sector
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,sector) \
+	#	{nsigma outndfname}
+	## We do require a source selection, which is why selobj
+	## isn't disabled, but we do _not_ require those to be saved,
+	## because that's done through the command line in sector.
+	#set notebook_characteristics_(reqsrc,sector) 0
+	#set notebook_characteristics_(sourceconfig,sector) \
+	#	{-sourceshape sector -maxobjects 1}
 
 	#  SELFC
-	$itk_component(notebook) add -label Selfc(w) \
-		-command [code $this reveal_ 9]
-	set pages_(9) selfc
-	set revealed_(9) 0
-	set notebook_characteristics_(disable,selfc) \
-		{outtextname selobj}
-	set notebook_characteristics_(reqsrc,selfc) 0
-	set notebook_characteristics_(sourceconfig,selfc) \
-		{-maxobjects 1}
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Selfc(w) \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) selfc
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,selfc) \
+	#	{outtextname }
+	#set notebook_characteristics_(reqsrc,selfc) 0
+	#set notebook_characteristics_(sourceconfig,selfc) {-maxobjects 1}
 
 	#  SKEW
-	$itk_component(notebook) add -label Skew \
-		-command [code $this reveal_ 10]
-	set pages_(10) skew
-	set revealed_(10) 0
-	set notebook_characteristics_(disable,skew) \
-		{outtextname selobj}
-	set notebook_characteristics_(reqsrc,skew) 0
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Skew \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) skew
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,skew) \
+	#	{outtextname }
+	#set notebook_characteristics_(reqsrc,skew) 0
 
 	# TOPPED
-	$itk_component(notebook) add -label Topped \
-		-command [code $this reveal_ 11]
-	set pages_(11) topped
-	set revealed_(11) 0
-	set notebook_characteristics_(disable,topped) \
-		{outtextname selobj}
-	set notebook_characteristics_(reqsrc,topped) 0
-	
-	
+	#set thisnum [get_panel_number_]
+	#$itk_component(notebook) add -label Topped \
+	#	-command [code $this reveal_ $thisnum]
+	#set pages_($thisnum) topped
+	#set revealed_($thisnum) 0
+	#set notebook_characteristics_(disable,topped) {outtextname }
+	#set notebook_characteristics_(reqsrc,topped) 0
+
+	#  RESULTS
+	set thisnum [get_panel_number_]
+	$itk_component(notebook) add -label Results \
+		-command [code $this reveal_ $thisnum]
+	set pages_($thisnum) results
+	set revealed_($thisnum) 0
+
+	# create the inverse of pages_
+	foreach num [array names pages_] {
+	    set indexes_($pages_($num)) $num
+	}
 
 	#  Create the button bar at the bottom
 	itk_component add actionframe {frame $w_.action}
@@ -283,7 +261,7 @@ itcl::class gaia::GaiaEsp {
 
 	#  Button: reset the current page
 	itk_component add resetpage {
-	    button $itk_component(actionframe).resetpage -text {Reset page} \
+	    button $itk_component(actionframe).resetpage -text {Reset} \
 		    -command [code $this reset_page_ 0]
 	}
 	add_short_help $itk_component(resetpage) \
@@ -292,7 +270,7 @@ itcl::class gaia::GaiaEsp {
 	#  Button: reset all pages
 	itk_component add resetall {
 	    button $itk_component(actionframe).resetall \
-		    -text {Reset all pages} \
+		    -text {Reset all} \
 		    -command [code $this reset_page_ 1]
 	}
 	add_short_help $itk_component(resetall) \
@@ -300,28 +278,27 @@ itcl::class gaia::GaiaEsp {
 
 	#  Button: run ESP
 	itk_component add run {
-	    button $itk_component(actionframe).run -text {Go} \
-		    -command [code $this run 1]
+	    button $itk_component(actionframe).run -text {Fit} \
+		    -command [code $this run 1 1]
 	}
-	add_short_help $itk_component(run) {Run ESP}
+	add_short_help $itk_component(run) {Fit the selected galaxies}
 
-	#  Button: show ESP command
-	itk_component add dummyrun {
-	    button $itk_component(actionframe).dummyrun \
-		    -text {Command} \
-		    -command [code $this run 0]
-	}
-	add_short_help $itk_component(dummyrun) \
-		{Show ESP command without actually running it}
+	##  Button: show ESP command
+	#itk_component add dummyrun {
+	#    button $itk_component(actionframe).dummyrun \
+	#	    -text {Command} \
+	#	    -command [code $this run 0]
+	#}
+	#add_short_help $itk_component(dummyrun) {Show ESP command without actually running it}
 
-	#  Button: select objects
-	itk_component add selobj {
-	    button $itk_component(actionframe).selobj \
-		    -text {Edit source list} \
-		    -command [code $this select_objects_]
-	}
-	add_short_help $itk_component(selobj) \
-		{Select objects for ESP to analyse}
+	##  Button: select objects
+	#itk_component add selobj {
+	#    button $itk_component(actionframe).selobj \
+	#	    -text {Edit source list} \
+	#	    -command [code $this select_objects_]
+	#}
+	#add_short_help $itk_component(selobj) \
+	#	{Select objects for ESP to analyse}
 
 	#  Add a status area for monitoring the output of the program
 	itk_component add status {
@@ -338,19 +315,18 @@ itcl::class gaia::GaiaEsp {
 		-side bottom -fill both -expand 1 -pady 5 -padx 5
 	pack $itk_component(actionframe) \
 		-side bottom -fill x -pady 5 -padx 5
-	pack $itk_component(selobj) -side right -expand 1 -pady 3 -padx 3
-	pack $itk_component(close) -side right -expand 1 -pady 3 -padx 3
-	pack $itk_component(resetpage) -side right -expand 1 -pady 3 -padx 3
-	pack $itk_component(resetall) -side right -expand 1 -pady 3 -padx 3
-	pack $itk_component(run) -side left -expand 1 -pady 3 -padx 3
-	pack $itk_component(dummyrun) -side left -expand 1 -pady 3 -padx 3
 
-	#  Establish the defaults
-	set_defaults_
+	# buttons
+	#pack $itk_component(selobj) -side right -expand 1 -pady 3 -padx 3
+	pack $itk_component(run) \
+		$itk_component(resetpage) \
+		$itk_component(resetall) \
+		$itk_component(close) \
+		-side left -fill x -expand 1 -pady 3 -padx 3
 
 	#  Enable all the common widgets, prior to notebook pages
 	#  selectively disabling these.
-	disable_common_widgets_ {}
+#	disable_common_widgets_ {}
 
 	#  Create the initial, empty, source list
 	set objectlist_ [gaia::GaiaEspSelectList #auto \
@@ -368,9 +344,9 @@ itcl::class gaia::GaiaEsp {
 
     # Destructor
     destructor {
-	if {$values_($this,sourcefile) != {} && \
-		[file exists $values_($this,sourcefile)]} {
-	    file delete $values_($this,source)
+	puts "GaiaEsp destructor: delete files..."
+	foreach f $temporary_files_ {
+	    puts "file delete $f"
 	}
     }
 
@@ -393,15 +369,18 @@ itcl::class gaia::GaiaEsp {
     }
 
     #  Actually run the command
-    public method run {execit} {
+    public method run {execit showit} {
 	if {$values_($this,sourcefile) == {}} {
-	    set values_($this,sourcefile) [temp_file_name_ "GAIA_source"]
+	    set values_($this,sourcefile) [temp_file_name_ "/tmp/GAIA_source"]
 	}
 	if {$values_($this,outputndffile) == {}} {
-	    set values_($this,outputndffile) [temp_file_name_ "GaiaEsp-outputndf"]
+	    set values_($this,outputndffile) [temp_file_name_ "/tmp/GaiaEsp_outputndf"]
 	}
 	if {$values_($this,outputtextfile) == {}} {
-	    set values_($this,outputtextfile) [temp_file_name_ "GaiaEsp-outputtxt"]
+	    set values_($this,outputtextfile) [temp_file_name_ "/tmp/GaiaEsp_outputtxt"]
+	}
+	if {$values_($this,outputstlfile) == {}} {
+	    set values_($this,outputstlfile) [temp_file_name_ "/tmp/GaiaEsp_outputstl" ".txt"]
 	}
 	set image [$itk_option(-rtdimage) cget -file]
 	if {$image != {}} {
@@ -470,6 +449,9 @@ itcl::class gaia::GaiaEsp {
 	    set invoke_cmd [lindex $norm_arglist 0]
 	    set invoke_args [join [lrange $norm_arglist 1 end]]
 
+	    if {$showit} {
+		puts "invocation: $invoke_cmd $invoke_args"
+	    }
 	    if {$execit} {
 		# Establish a control object for this task, if not already done
 		# (dunno what this does!, but GaiaSextractor does it)
@@ -478,7 +460,7 @@ itcl::class gaia::GaiaEsp {
 		if {$star_app_ == {} || $star_app_name_ != $invoke_cmd} {
 		    set star_app_ [StarApp #auto \
 			    -show_output $itk_component(status) \
-			    -notify [code $this completed_] \
+			    -notify [code $this completed_${whichpage}_] \
 			    -application $invoke_cmd
 		    ]
 		    set star_app_name_ $invoke_cmd
@@ -489,8 +471,6 @@ itcl::class gaia::GaiaEsp {
 
 		# RUN ESP!!!
 		$star_app_ runwiths $invoke_args
-	    } else {
-		puts "invocation: $invoke_cmd $invoke_args"
 	    }
 	}
     }
@@ -511,6 +491,64 @@ itcl::class gaia::GaiaEsp {
 	}
 	
 	info_dialog $s
+    }
+
+    private method completed_ellprofou_ {} {
+	blt::busy release $w_
+
+	# Get rid of the scrawls on the canvas,
+	# and replace them with the result ellipses.
+	$itk_option(-canvasdraw) clear
+
+	set stl [gaia::StarSTLFile #auto $values_($this,outputstlfile)]
+	if {[$stl status]} {
+	    set nellipses [$stl parameter _nrows]
+	    set resultscontents {}
+	    for {set elln 1} {$elln <= $nellipses} {incr elln} {
+		$stl reset_isvalid
+		set ell_x   [$stl table $elln x]
+		set ell_y   [$stl table $elln y]
+		set ell_sma [$stl table $elln semimajor]
+		set ell_pos [$stl table $elln pa]
+		# invell is 1/Ellipticity
+		# semiminor axis is semimajor axis / ellipticity
+		set ell_invell [$stl table $elln 1/ellipt]
+
+		if {[$stl isvalid]} {
+		    # These coordinates and sizes are in image units,
+		    # rather than in canvas units.  Convert them
+		    # before use.  ESP position angles are clockwise
+		    # from vertical, but rtd_ellipse angles are
+		    # clockwise from the positive x-axis
+		    # (aggravatingly, this is different from the angle
+		    # convention for canvas sectors, for example).
+		    $itk_option(-rtdimage) convert coords \
+			    $ell_x $ell_y image canvx canvy canvas
+		    $itk_option(-rtdimage) convert dist \
+			    $ell_sma 0 image canvd1 canvd2 canvas
+		    set canvsma [expr $canvd1+$canvd2]
+		    set canvpa [expr $ell_pos - 90]
+		    lappend canvas_scrawls_ [$itk_option(-canvas) \
+			    create rtd_ellipse \
+			    $canvx $canvy \
+			    -semimajor $canvsma \
+			    -semiminor [expr $canvsma * $ell_invell] \
+			    -angle $canvpa \
+			    -outline white]
+		} else {
+		    puts "can't read details of ellipse $elln"
+		}
+
+		lappend resultscontents \
+		    [list $ell_x $ell_y $ell_sma $ell_pos [expr 1/$ell_invell]]
+	    }
+	    reveal_ $indexes_(results)
+	    $itk_component(results) clear
+	    $itk_component(results) append_rows $resultscontents
+	    $itk_component(results) new_info
+	} else {
+	    error_dialog "Error reading ELLPRO output file:\n[$stl error_msg]"
+	}
     }
 
     # return `true' or `false' depending on whether $value_($this,$var) is
@@ -534,10 +572,10 @@ itcl::class gaia::GaiaEsp {
 		set child [$itk_component(notebook) childsite $index]
 		eval add_${pagename}_selections_ $child
 	    }
-	    set disabledset $notebook_characteristics_(disable,$pagename)
-	    if {$disabledset != {}} {
-		disable_common_widgets_ $disabledset
-	    }
+#	    set disabledset $notebook_characteristics_(disable,$pagename)
+#	    if {$disabledset != {}} {
+#		disable_common_widgets_ $disabledset
+#	    }
 	    if {[info exists notebook_characteristics_(sourceconfig,$pagename)]} {
 		eval $objectlist_ configure \
 			$notebook_characteristics_(sourceconfig,$pagename)
@@ -563,10 +601,25 @@ itcl::class gaia::GaiaEsp {
     #  Reset the current page to its default values.
     protected method reset_page_ {{all 0}} {
 	set npages [$itk_component(notebook) index end]
+
+	# reset the list of objects
+	$objectlist_ reset
+
+	# Delete any scrawls on the canvas
+	foreach o $canvas_scrawls_ {
+	    $itk_option(-canvas) delete $o
+	}
+	set canvas_scrawls_ {}
+	$itk_option(-canvasdraw) clear
+
 	if { ! $all } {
 	    #  Get the index of the current page.
 	    set current [$itk_component(notebook) index select]
 	    eval reset_$pages_($current)_
+
+	    if {$current != "results"} {
+		eval reset_results_
+	    }
 	} else {
 	    #  Reset all pages.
 	    reveal_ 0 1
@@ -577,8 +630,31 @@ itcl::class gaia::GaiaEsp {
     }
 
     #  Select one or more objects
-    protected method select_objects_ {} {
-	$objectlist_ edit_sourcelist
+    #protected method select_objects_ {} {
+    #$objectlist_ edit_sourcelist
+    #}
+
+    ### OBJECT SELECTION...
+    # Following three functions should exists for consistency with
+    # the other panels of the notebook, but should never be called.
+    private method make_objectselection_command_ {image} {
+	info_dialog "Select a tool from the tabs\n(only `Ellipse fit' available at present)"
+	return {}
+    }
+    private method save_objectselection_sourcefile_ {filename} {
+	return {}
+    }
+    protected method reset_objectselection_ {} {
+	return {}
+    }
+
+    protected method add_objectselection_selections_ {parent} {
+	itk_component add objsel {
+	    $objectlist_ edit_sourcelist $parent
+	}
+	pack $itk_component(objsel) -side top -fill x -ipadx 1m -ipady 1m
+	add_short_help $itk_component(objsel) \
+		{Select objects to be fitted}
     }
 
     ### CORR...
@@ -663,10 +739,6 @@ itcl::class gaia::GaiaEsp {
 	pack $itk_component(scale) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(scale) \
 		{The scale length of the galaxies to be highlighted in the output image (units as.)}
-
-	# Enable or disable the appropriate filename boxes
-
-	#disable_common_widgets_ {outndfname inardname selobj}
     }
 
     ### ELLPRO...
@@ -678,6 +750,7 @@ itcl::class gaia::GaiaEsp {
 		set fid [::open $filename w]
 		puts $fid "# GAIA ESP ELLPRO sources file"
 		puts $fid "# Columns:  X, Y Background (ignored) rlim"
+		puts $fid "## wcsdomain = grid"
 
 		foreach o $olist {
 		    set xyr [$o coords]
@@ -691,13 +764,27 @@ itcl::class gaia::GaiaEsp {
     private method make_ellprofou_command_ {image} {
 	# insist that back and sigma be specified, otherwise return ""
 	if {$values_($this,back) <= 0 || $values_($this,sigma) <= 0} {
-	    error_dialog "Need to have BACK and SIGMA specified"
-	    return {}
+	    #error_dialog "Need to have BACK and SIGMA specified"
+	    set w [DialogWidget $w_.dialog \
+		    -text "Zero background.  Is that OK?" \
+		    -bitmap warning \
+		    -buttons {OK Cancel} \
+		    -default 1 \
+		    -modal 1]
+	    set answer [$w activate]
+	    if {$answer != 0} {
+		return {}
+	    }
 	}
-	
+
 	set arglist {}
 
-	set is_ellpro $values_($this,useellpro)
+	#set meth [string range $values_($this,ellprofoumethod) 0 2]
+	#set is_ellpro [expr {$meth == "pro"}]
+
+	set fullmeth $values_($this,ellprofoumethod)
+	set meth [string range $fullmeth 0 2]
+	set is_ellpro [expr {$meth == "pro"}]
 
 	if {$is_ellpro} {
 	    lappend arglist "$itk_option(-esp_dir)/ellpro"
@@ -706,133 +793,210 @@ itcl::class gaia::GaiaEsp {
 	}
 
 	lappend arglist "infile=$values_($this,sourcefile)"
-	lappend arglist "out=$values_($this,outputtextfile)"
+
+	set ofname [string trim $values_($this,outputtextfile)]
+	if {$ofname != {}} {
+	    lappend arglist "out=$values_($this,outputtextfile)"
+	}
+
+	set ofname [string trim $values_($this,outputstlfile)]
+	if {! [regexp {\.txt$} $ofname]} {
+	    error_dialog "STL file must end in .txt"
+	    return {}
+	}
+	# Catalogue name (after path, and before ".txt") may contain
+	# only alphanumerics plus underscore.  This isn't obviously documented
+	# anywhere, but can be discovered from an inspection of 
+	# cat1_cnmpr.f in the CAT library.
+	if {! [regexp {^(.*/)?[A-Za-z0-9_]+\.txt$} $ofname]} {
+	    error_dialog "STL catalogue name may include only\nalphanumeric characters plus underscore"
+	    return {}
+	}
+	lappend arglist "outcat=$ofname"
+
 	lappend arglist "in=$image"
 	lappend arglist "mode=false"
 	lappend arglist "angcon=[bool_value angcon]"
 	lappend arglist "angoff=$values_($this,angoff)"
 	if {$values_($this,ardfile) != {}} {
-	    lappend arglist "ardfile=^$values_($this,ardfile)"
+	    lappend arglist "ardfil=^$values_($this,ardfile)"
+	} else {
+	    lappend arglist "ardfil=!"
 	}
-	lappend arglist "autol=[bool_value autol]"
-	lappend arglist "autolt=[bool_value autolt]"
+	#lappend arglist "autol=[bool_value autol]"
 	lappend arglist "back=$values_($this,back)"
 	lappend arglist "sigma=$values_($this,sigma)"
 	if {$is_ellpro} {
-	    lappend arglist "fast=[bool_value fast]"
+	    # fast is true if ellprofoumethod is pro, false if it's proslow
+	    lappend arglist "fast=[expr {($fullmeth == "pro") ? "true" : "false"}]"
+	    #lappend arglist "fast=[expr {($values_($this,ellprofoumethod) == "pro") ? true : false}]"
 	}
-	lappend arglist "fine=$values_($this,fine)"
-	lappend arglist "frzori=[bool_value frzori]"
-	if {$is_ellpro && $values_($this,fractflag)} {
+	if {[$itk_component(fine) is_enabled]} {
+	    lappend arglist "fine=$values_($this,fine)"
+	}
+	#lappend arglist "frzori=[bool_value frzori]"
+
+	set sourcepos $values_($this,ellprofouoriginflag)
+	if {[string index $sourcepos 0] == {y}} {
+	    lappend arglist autol
+	    lappend arglist "autolt=[bool_value autolt]"
+	} else {
+	    lappend arglist noautol
+	}
+	#lappend arglist [expr {[string index $sourcepos 0]=={y} ? "autol" : "noautol"}]
+	lappend arglist [expr {[string index $sourcepos 1]=={y} ? "nofrzori" : "frzori"}]
+
+	if {$is_ellpro && [$itk_component(fract) is_enabled]} {
 	    lappend arglist "fract=$values_($this,fract)"
 	}
-	if {$values_($this,lim1flag)} {
+	if {[$itk_component(lim1) is_enabled]} {
 	    lappend arglist "lim1=$values_($this,lim1)"
 	}
-	if {$values_($this,lim2flag)} {
+	if {[$itk_component(lim2) is_enabled]} {
 	    lappend arglist "lim2=$values_($this,lim2)"
 	}
-	if {$is_ellpro && $values_($this,lim3flag)} {
-	    lappend arglist "lim3=$values_($this,lim3)"
+	if {$is_ellpro && [$itk_component(lim3) is_enabled]} {
+	    if {$values_($this,lim3flag)} {
+		# don't impose limit -- give negative argument
+		lappend arglist "lim3=-1"
+	    } else {
+		lappend arglist "lim3=$values_($this,lim3)"
+	    }
 	}
 	lappend arglist "psize=$values_($this,psize)"
 	# Set default rlim.  This is never used, because we specify individual
 	# radius limits in the input sourcelist file, but we need to specify it
 	# or else we get an error from the parameter system.
 	lappend arglist "rlim=0"
-	if {$values_($this,zeropflag)} {
+	if {[$itk_component(zerop) is_enabled]} {
 	    lappend arglist "zerop=$values_($this,zerop)"
 	}
-	if {$values_($this,minmod) >= 0} {
+	if {$is_ellpro && $values_($this,minmod) >= 0} {
 	    lappend arglist "minmod=$values_($this,minmod)"
-	    # else omit/use IFL default
 	}
 
 	return $arglist
     }
 
     protected method reset_ellprofou_ {} {
-	$itk_component(angcon) configure -value $defaults_(angcon)
-	$itk_component(angoff) configure -value $defaults_(angoff)
-	set values_(autol) $defaults_(autol)
-	$itk_component(back)   configure -value $defaults_(back)
+	#$itk_component(angcon) configure -value $defaults_(angcon)
+	#$itk_component(angoff) configure -value $defaults_(angoff)
+	#set values_($this,angoff) $defaults_(angoff)
+	#set values_($this,angcon) $defaults_(angcon)
+
+	#set values_($this,autol) $defaults_(autol)
+	#$itk_component(back-ellprofou)   configure -value $defaults_(back)
 	#$itk_component(sigma)  configure -value $defaults_(sigma)
 
-	$itk_component(autolt) configure -value $defaults_(autolt)
-	$itk_component(fast)   configure -value $defaults_(fast)
-	$itk_component(fine)   configure -value $defaults_(fine)
-	$itk_component(fract)  configure -value $defaults_(fract)
-	$itk_component(frzori) configure -value $defaults_(frzori)
-	$itk_component(lim1)   configure -value $defaults_(lim1)
-	$itk_component(lim2)   configure -value $defaults_(lim2)
-	$itk_component(lim3)   configure -value $defaults_(lim3)
+	#$itk_component(expert) configure -value $defaults_(expert)
+	set values_($this,expert) $defaults_(expert)
+
+	#$itk_component(autolt) configure -value $defaults_(autolt)
+	#$itk_component(fast)   configure -value $defaults_(fast)
+	#$itk_component(fine)   configure -value $defaults_(fine)
+	$itk_component(fine) reset
+	#$itk_component(fract)  configure -value $defaults_(fract)
+	$itk_component(fract) reset
+	#$itk_component(frzori) configure -value $defaults_(frzori)
+	#$itk_component(lim1)   configure -value $defaults_(lim1)
+	#$itk_component(lim2)   configure -value $defaults_(lim2)
+	#$itk_component(lim3)   configure -value $defaults_(lim3)
+	$itk_component(lim1) reset
+	$itk_component(lim2) reset
+	$itk_component(lim3) reset
+	$itk_component(zerop) reset
 	#$itk_component(rlim)   configure -value $defaults_(rlim)
-	$itk_component(zerop)  configure -value $defaults_(zerop)
+	#$itk_component(zerop)  configure -value $defaults_(zerop)
 	$itk_component(minmod) configure -value $defaults_(minmod)
     }
 
     protected method add_ellprofou_selections_ {parent} {
-	set lwidth 16
+	set lwidth $labelwidth_
 	set vwidth 5
 
-	itk_component add useellpro {
-	    StarLabelCheck $parent.useellpro \
-		    -text "Use ELLPRO" \
-		    -onvalue 1 \
-		    -offvalue 0 \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,useellpro)] \
-		    -command [code $this toggle_useellpro_]
-	}
-	pack $itk_component(useellpro) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(useellpro) \
-		{Use ELLPRO rather than ELLFOU}
+	add_common_widgets_ $parent {outtextname outstlname inardname back} ellprofou
 
-	#  autol toggle
-	itk_component add autol-ell {
-	    StarLabelCheck $parent.autol-ell \
-		    -text "Auto-locate origin" \
-		    -onvalue 1 \
-		    -offvalue 0 \
+	itk_component add method-ellprofou {
+	    LabelMenu $parent.method \
+		    -text "Method:" \
 		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,autol)]
+		    -variable [scope values_($this,ellprofoumethod)]
 	}
-	pack $itk_component(autol-ell) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(autol-ell) \
-		{autol: Is the source origin provided to be refined?}
+	foreach {str val} \
+		{"using isophote contours" fou "using intensity analysis" pro "using intensity analysis (slow variant)" proslow} {
+	    $itk_component(method-ellprofou) add -label $str \
+		    -value $val \
+		    -command [code $this toggle_expert_]
+	}
+	$itk_component(method-ellprofou) configure \
+		-value $values_($this,ellprofoumethod)
+	pack $itk_component(method-ellprofou) \
+		-side top -fill x -ipadx 1m -ipady 1m
+	add_short_help $itk_component(method-ellprofou) \
+		{How should the ellipses be fitted?}
 
-	#  Centroid or weighted-mean centre estimation
+	# origin settings
+	itk_component add originflag-ellprofou {
+	    LabelMenu $parent.originflag \
+		    -text "Source:" \
+		    -labelwidth $lwidth \
+		    -variable [scope values_($this,ellprofouoriginflag)]
+	}
+	foreach {str val} \
+		{"Source position fixed" nn "Refine initial position, then fix" yn "Refine position during processing" ny "Continuously refine position" yy} {
+	    $itk_component(originflag-ellprofou) add \
+		    -label $str -value $val \
+		    -command [code $this toggle_originflag_]
+	}
+	$itk_component(originflag-ellprofou) configure \
+		-value $values_($this,ellprofouoriginflag)
+	pack $itk_component(originflag-ellprofou) \
+		-side top -fill x -ipadx 1m -ipady 1m
+	add_short_help $itk_component(originflag-ellprofou) \
+		{Should the source position be refined?}
+
+	# autolt
 	itk_component add autolt {
-	    StarLabelCheck $parent.autolt \
-		    -text "Centroid estimation" \
-		    -onvalue 1 \
-		    -offvalue 0 \
+	    LabelMenu $parent.autolt \
+		    -text "Auto-origin:" \
 		    -labelwidth $lwidth \
-		    -anchor w \
 		    -variable [scope values_($this,autolt)]
 	}
-	pack $itk_component(autolt) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(autolt) \
-		{autolt: Use a centroid or weighted-mean estimate for the centre estimation}
-
-	# freeze origin
-	itk_component add frzori {
-	    StarLabelCheck $parent.frzori \
-		    -text "Freeze origin" \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,frzori)]
+	foreach {str val} {"Simple centroid" 0 "Weighted centroid" 1} {
+	    $itk_component(autolt) add \
+		    -label $str -value $val \
+		    -command "set values_($this,autolt) $val"
 	}
-	pack $itk_component(frzori) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(frzori) \
-		{frzori: Freeze origin?}
+	$itk_component(autolt) configure \
+		-value $values_($this,autolt)
+	pack $itk_component(autolt) \
+		-side top -fill x -ipadx 1m -ipady 1m
+	add_short_help $itk_component(autolt) \
+		{How should the initial source position be refined?}
+
+	# Angular offset
+	itk_component add angoff {
+	    gaia::StarLabelWidgetChild $parent.angoff \
+		    -text "Angular offset:" \
+		    -labelwidth $lwidth
+	}
+	set cs [$itk_component(angoff) childsite]
+	entry $cs.b -textvariable [scope values_($this,angoff)] -width 10
+	radiobutton $cs.a1 -text "clockwise" \
+		-variable [scope values_($this,angcon)] \
+		-value 1 -anchor w
+	radiobutton $cs.a0 -text "anticlockwise" \
+		-variable [scope values_($this,angcon)] \
+		-value 0 -anchor w
+	pack $cs.b $cs.a1 $cs.a0 -side left -fill x
+	pack $itk_component(angoff) -side top -fill x -ipadx 1m -ipady 1m
+  	add_short_help $itk_component(angoff) \
+  		{Angular offset for position angles generated.  Units degrees}
 
 	# Expert toggle
 	itk_component add expert {
 	    StarLabelCheck $parent.expert \
-		    -text "Expert options" \
+		    -text "Expert options:" \
 		    -onvalue 1 -offvalue 0 \
 		    -labelwidth $lwidth \
 		    -anchor w \
@@ -841,123 +1005,132 @@ itcl::class gaia::GaiaEsp {
 	}
 	pack $itk_component(expert) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(expert) \
-		{Enable expert commands}
+		{Enable expert commands.  See SUN/180, for further assistance}
 
-	# Fast profiling
-	itk_component add fast {
-	    StarLabelCheck $parent.fast \
-		    -text "Use faster profiling" \
-		    -onvalue 1 -offvalue 0 \
-		    -labelwidth $lwidth \
-		    -anchor w \
-		    -variable [scope values_($this,fast)]
-	}
-	pack $itk_component(fast) -side top -fill x -ipadx 1m -ipady 1m
-	add_short_help $itk_component(fast) \
-		{fast: Enable the fast method of profiling}
-
-	# Default separation of eclipses
 	itk_component add fine {
-	    LabelEntryScale $parent.fine \
-		    -text {Default separation} \
+	    gaia::StarLabelWidgetChild $parent.fine \
+		    -text {Sep. factor:} \
 		    -labelwidth $lwidth \
-		    -valuewidth $vwidth \
-		    -increment 0.05 \
-		    -resolution 0.05 \
-		    -show_arrows 1 \
-		    -validate real \
-		    -value $values_($this,fine) \
-		    -from 0.0 \
-		    -to 2.0 \
-		    -command [code $this set_values_ fine]
+		    -enablebutton 1 \
+		    -initialstate 0 \
+		    -childtype scale \
+		    -childopts "-orient horizontal -showvalue 0 -resolution 0.05 -from 0.0 -to 2.0 -variable [scope values_($this,fine)]"
 	}
-	pack $itk_component(fine) -side top -fill x -ipadx 1m -ipady 1m
+	set cs [$itk_component(fine) childsite]
+	label $cs.tracelabel -textvariable [scope values_($this,fine)]
+	pack $cs.tracelabel -side left -fill x -ipadx 1m
+	pack $itk_component(fine) -side top -fill x -ipadx 1m
 	add_short_help $itk_component(fine) \
 		{fine: Factor modifying the default separation of profiled ellipses}
 
 	itk_component add fract {
-	    gaia::StarLabelCheckLabel $parent.fract \
-		    -text {Fraction} \
-		    -valuevariable [scope values_($this,fract)] \
-		    -flagvariable [scope values_($this,fractflag)] \
+	    gaia::StarLabelWidgetChild $parent.fract \
+		    -text {Min. points:} \
 		    -labelwidth $lwidth \
-		    -anchor w
+		    -enablebutton 1 \
+		    -initialstate 0 \
+		    -childtype scale \
+		    -childopts "-orient horizontal -showvalue 0 -resolution 1 -from 0 -to 100 -variable [scope values_($this,fract)]"
 	}
-	pack $itk_component(fract) -side top -fill x -ipadx 1m -ipady 1m
+	set cs [$itk_component(fract) childsite]
+	label $cs.tracelabel -textvariable [scope values_($this,fract)]
+	label $cs.units -text "%"
+	pack $cs.tracelabel $cs.units -side left -fill x -ipadx 1m
+	pack $itk_component(fract) -side top -fill x -ipadx 1m
 	add_short_help $itk_component(fract) \
-		{fract: Fraction modifying the default separation of profiled ellipses}
+		{fract: minimum good points on an ellipse}
 
 	itk_component add lim1 {
-	    gaia::StarLabelCheckLabel $parent.lim1 \
-		    -text {Limit 1} \
-		    -valuevariable [scope values_($this,lim1)] \
-		    -flagvariable [scope values_($this,lim1flag)] \
+	    gaia::StarLabelWidgetChild $parent.lim1 \
+		    -text {Max. ratio:} \
 		    -labelwidth $lwidth \
-		    -anchor w
+		    -enablebutton 1 \
+		    -initialstate 0 \
+		    -childtype scale \
+		    -childopts "-orient horizontal -showvalue 0 -resolution 0.05 -from 0 -to 2 -variable [scope values_($this,lim1)]"
 	}
-	pack $itk_component(lim1) -side top -fill x -ipadx 1m -ipady 1m
+	set cs [$itk_component(lim1) childsite]
+	label $cs.tracelabel -textvariable [scope values_($this,lim1)]
+	pack $cs.tracelabel -side left -fill x -ipadx 1m
+	pack $itk_component(lim1) -side top -fill x -ipadx 1m
 	add_short_help $itk_component(lim1) \
-		{lim1: Maximum ratio between preceding radii and current one}
+		{lim1: Max. ratio of mean counts in successive profiles}
 
 	itk_component add lim2 {
-	    gaia::StarLabelCheckLabel $parent.lim2 \
-		    -text {Limit 2} \
-		    -valuevariable [scope values_($this,lim2)] \
-		    -flagvariable [scope values_($this,lim2flag)] \
+	    gaia::StarLabelWidgetChild $parent.lim2 \
+		    -text {Min. count:} \
 		    -labelwidth $lwidth \
-		    -anchor w
+		    -enablebutton 1 \
+		    -initialstate 0 \
+		    -childtype scale \
+		    -childopts "-orient horizontal -showvalue 0 -resolution 0.1 -from 0 -to 5 -variable [scope values_($this,lim2)]"
 	}
-	pack $itk_component(lim2) -side top -fill x -ipadx 1m -ipady 1m
+	set cs [$itk_component(lim2) childsite]
+	label $cs.tracelabel -textvariable [scope values_($this,lim2)]
+	label $cs.units -text {std.dev.}
+	pack $cs.tracelabel $cs.units -side left -fill x -ipadx 1m
+	pack $itk_component(lim2) -side top -fill x -ipadx 1m
 	add_short_help $itk_component(lim2) \
-		{lim2: Lower limit for mean profile value (units sigma)}
+		{lim2: Minimum mean profile count}
 
 	itk_component add lim3 {
-	    gaia::StarLabelCheckLabel $parent.lim3 \
-		    -text {Limit 3} \
-		    -valuevariable [scope values_($this,lim3)] \
-		    -flagvariable [scope values_($this,lim3flag)] \
+	    gaia::StarLabelWidgetChild $parent.lim3 \
+		    -text {Freeze ell. at:} \
 		    -labelwidth $lwidth \
-		    -anchor w
+		    -enablebutton 1 \
+		    -initialstate 0 \
+		    -childtype scale \
+		    -childopts "-orient horizontal -showvalue 0 -resolution 1 -from 0 -to 100 -variable [scope values_($this,lim3)]"
 	}
-	pack $itk_component(lim3) -side top -fill x -ipadx 1m -ipady 1m
+	set cs [$itk_component(lim3) childsite]
+	label $cs.tracelabel -textvariable [scope values_($this,lim3)]
+	label $cs.units -text px
+	checkbutton $cs.cb -text {No freeze} \
+		-variable [scope values_($this,lim3flag)]
+	pack $cs.tracelabel $cs.units $cs.cb \
+		-side left -fill x -ipadx 1m
+	pack $itk_component(lim3) -side top -fill x -ipadx 1m
 	add_short_help $itk_component(lim3) \
-		{lim3: Distance/pixels from galaxy origin where profile assumed constant}
+		{lim3: radius at which ellipse parameters are frozen}
 
 	itk_component add zerop {
-	    gaia::StarLabelCheckLabel $parent.zerop \
-		    -text {Zero point} \
-		    -valuevariable [scope values_($this,zerop)] \
-		    -flagvariable [scope values_($this,zeropflag)] \
+	    gaia::StarLabelWidgetChild $parent.zerop \
+		    -text {Zero point:} \
 		    -labelwidth $lwidth \
-		    -anchor w
+		    -enablebutton 1 \
+		    -initialstate 0 \
+		    -childtype scale \
+		    -childopts "-orient horizontal -showvalue 0 -resolution .25 -from 0 -to 40 -variable [scope values_($this,zerop)]"
 	}
-	pack $itk_component(zerop) -side top -fill x -ipadx 1m -ipady 1m
+	set cs [$itk_component(zerop) childsite]
+	label $cs.tracelabel -textvariable [scope values_($this,zerop)]
+	label $cs.units -text {mags/sq.as}
+	pack $cs.tracelabel $cs.units -side left -fill x -ipadx 1m
+	pack $itk_component(zerop) -side top -fill x -ipadx 1m
 	add_short_help $itk_component(zerop) \
-		{zerop: Zero point of surface brightness scale (mag/sq.as)}
+		{zerop: Zero point on surface brightness scale}
 
 	#  Minimisation mode
 	itk_component add minmod {
 	    LabelMenu $parent.minmod \
-		    -text "Minimisation mode" \
+		    -text "Min'n mode:" \
 		    -labelwidth $lwidth \
 		    -variable [scope values_($this,minmod)]
+	}
+	foreach {name value} \
+		"Default -1 Mean 0 Median 1 Least-squares 2" {
+	    $itk_component(minmod) add \
+		    -label $name -value $value \
+		    -command "set values_($this,minmod) $value"
 	}
 	pack $itk_component(minmod) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(minmod) \
 		{minmod: Which minimisation mode should be used?}
-	foreach {name value} \
-		"Default -1 Mean 0 Median 1 Least-squares 2" {
-	    $itk_component(minmod) add \
-		    -label $name \
-		    -value $value
-	}
 
 	# Set up for initial values of enabled/disabled
-	toggle_useellpro_
+	#toggle_seellpro_
+	toggle_originflag_
 	toggle_expert_
-
-	# disable the appropriate filename boxes
-	#disable_common_widgets_ {outndfname}
     }
 
     ### FASTMED...
@@ -1307,9 +1480,6 @@ itcl::class gaia::GaiaEsp {
 	#  I/O: in, infile, model, modtype, out, device?
 
 	#  Ignore: colour, mode
-
-	#  disable the appropriate filename boxes
-	#disable_common_widgets_ {inardname}
     }
 
     private method make_gaufit_command_ {image} {
@@ -2098,6 +2268,33 @@ to be specified"
 		{Radius of the selected circle around bright pixels (units as.)}
     }
 
+    ### Results...
+    private method make_results_command_ {image} {
+	# do nothing
+    }
+
+    private method reset_results_ {} {
+	# Clear the page of results, if it's present
+	if {$revealed_($indexes_(results))} {
+	    $itk_component(results) clear
+	}
+    }
+
+    private method add_results_selections_ {parent} {
+	itk_component add results {
+	    TableList $parent.results \
+		    -title "Results" \
+		    -headings {X Y SemiMajor PA Ellipt} \
+		    -sizes {10 10 10 10 10}
+	}
+	$itk_component(results) set_option X Precision 1
+	$itk_component(results) set_option Y Precision 1
+	$itk_component(results) set_option SemiMajor Precision 1
+	$itk_component(results) set_option PA Precision 3
+	$itk_component(results) set_option Ellipt Precision 3
+	pack $itk_component(results) -fill both -expand 1
+    }
+
     #  Set an element of the values_ array
     protected method set_values_ {elem value} {
 	set values_($this,$elem) $value
@@ -2125,22 +2322,19 @@ to be specified"
 	set values_($this,useall) 1	;# boolean
 
 	# ellprofou-specific
-	set values_($this,useellpro) 1	;# boolean
+	set values_($this,ellprofoumethod) pro
 	set values_($this,autolt) 1	;# boolean
 	set values_($this,fast) 1	;# boolean
 	set values_($this,fine) 1.0
-	set values_($this,fract) 0
-	set values_($this,fractflag) 0
+	set values_($this,fract) 40
 	set values_($this,frzori) 1	;# boolean
-	set values_($this,lim1) 0
-	set values_($this,lim1flag) 0
-	set values_($this,lim2) 0
-	set values_($this,lim2flag) 0
-	set values_($this,lim3) 0
+	set values_($this,lim1) 1.25
+	set values_($this,lim2) 0.5
+	set values_($this,lim3) 20
 	set values_($this,lim3flag) 0
-	set values_($this,zerop) 0
-	set values_($this,zeropflag) 0
+	set values_($this,zerop) 27.5
 	set values_($this,minmod) 0
+	set values_($this,ellprofouoriginflag) yy
 
 	# fastmed-specific
 	set values_($this,width) 50
@@ -2176,8 +2370,9 @@ to be specified"
 
 	# File names
 	set values_($this,sourcefile) {}
-	set values_($this,outputndffile) {GaiaEsp-output}
-	set values_($this,outputtextfile) {GaiaEsp-outputtext}
+	set values_($this,outputndffile) {GaiaEsp_output}
+	set values_($this,outputtextfile) {GaiaEsp_outputtext}
+	set values_($this,outputstlfile) {GaiaEsp_outputstl.txt}
 	set values_($this,ardfile) {}
 
 	set valuenames_ {
@@ -2195,22 +2390,19 @@ sigma
 mult
 scale
 useall
-useellpro
+ellprofoumethod
 autolt
 fast
 fine
 fract
-fractflag
 frzori
 lim1
-lim1flag
 lim2
-lim2flag
 lim3
 lim3flag
 zerop
-zeropflag
 minmod
+ellprofouoriginflag
 width
 lsqfit
 anginc
@@ -2234,6 +2426,7 @@ modet
 sourcefile
 outputndffile
 outputtextfile
+outputstlfile
 ardfile
 	}
 
@@ -2295,19 +2488,41 @@ ardfile
 	}
     }
 
-    private method toggle_useellpro_ {} {
-	$itk_component(back) configure -state normal
-	#foreach cpt "back sigma" {
-	#    $itk_component($cpt) configure -state normal
-	#}
-	if {$values_($this,useellpro) && $values_($this,expert)} {
-	    foreach cpt $ellpro_only_ {
-		$itk_component($cpt) configure -state normal
-	    }
+    # If values_($this,expert) is now `true', then enable a set of
+    # fields; if it is now `false',
+    # switch that set off.  The set consists of $expert_parameter_list_ if 
+    # `useellpromethod' is pro or proslow, but if that is false, then
+    # the set consists of 
+    # {$expert_parameter_list_ \ $ellpro_only_}, and the members of 
+    # $ellpro_only_ should all be disabled.
+    private method toggle_expert_ {} {
+	if {$values_($this,expert)} {
+	    set newval normal
 	} else {
-	    foreach cpt $ellpro_only_ {
-		$itk_component($cpt) configure -state disabled
+	    set newval disabled
+	}
+
+	# get current value from menu
+	set method [$itk_component(method-ellprofou) get]
+	set values_($this,ellprofoumethod) $method
+
+	foreach i $expert_parameter_list_ {
+	    if {$method == "fou" && [lsearch -exact $ellpro_only_ $i] >= 0} {
+		set st disabled
+	    } else {
+		set st $newval
 	    }
+	    $itk_component($i) configure -state $st
+	}
+    }
+
+    private method toggle_originflag_ {} {
+	set values_($this,ellprofouoriginflag) \
+		[$itk_component(originflag-ellprofou) get]
+	if {[string index $values_($this,ellprofouoriginflag) 0] == {y}} {
+	    $itk_component(autolt) configure -state normal
+	} else {
+	    $itk_component(autolt) configure -state disabled
 	}
     }
 
@@ -2323,40 +2538,18 @@ ardfile
 	}
     }
 
-    # If expert is now `on', then enable a set of fields; if it is now `off',
-    # switch that set off.  The set consists of $expert_parameter_list_ if 
-    # `useellpro' is true, but if that is false, then the set consists of
-    # {$expert_parameter_list_ \ $ellpro_only_}, and the members of 
-    # $ellpro_only_ should all be disabled.
-    private method toggle_expert_ {} {
-	if {$values_($this,expert)} {
-	    set newval normal
-	} else {
-	    set newval disabled
-	}
-	set pl {}
-	foreach i $expert_parameter_list_ {
-	    if {!$values_($this,useellpro)
-	    && [lsearch -exact $ellpro_only_ $i] >= 0} {
-		lappend pl [list $i disabled]
-	    } else {
-		lappend pl [list $i $newval]
-	    }
-	}
-	foreach pair $pl {
-	    $itk_component([lindex $pair 0]) configure -state [lindex $pair 1]
-	}
-    }
-
     # Return the name of a temporary file.  Do this by trying ten filenames
     # starting with the PID.  Something is amiss if this doesn't work.
-    private method temp_file_name_ {str} {
+    #
+    # Append the name to the list of temporary files.
+    private method temp_file_name_ {prefix {suffix {}}} {
 	set n [pid]
 	for {set i 0} {$i < 10} {incr i} {
-	    if {[file exists /tmp/$str$n]} {
+	    if {[file exists $prefix$n$suffix]} {
 		incr n
 	    } else {
-		return /tmp/$str$n
+		lappend temporary_files_ $prefix$n$suffix
+		return $prefix$n$suffix
 	    }
 	}
 	error_dialog "Can't generate temporary file name!"
@@ -2365,7 +2558,7 @@ ardfile
 
     private method bg_from_hsub_ {} {
 	if {$hsub_wfile_ == {}} {
-	    set hsub_wfile_ [temp_file_name_ "GaiaEsp-hsubworkfile"]
+	    set hsub_wfile_ [temp_file_name_ "/tmp/GaiaEsp-hsubworkfile"]
 	} elseif {[file exists $hsub_wfile_]} {
 	    exec rm $hsub_wfile_
 	}
@@ -2399,38 +2592,146 @@ ardfile
 	blt::busy release $w_
 
 	if {$hsub_wfile_ != {} && [file readable $hsub_wfile_]} {
-	    set f [::open $hsub_wfile_ r]
-	    while {[::gets $f line] >= 0} {
-		if {[regexp {^([a-zA-Z0-9]+) +([^ ]+)} $line wholeline k v] != 0} {
-		    set h($k) $v
+	    set kw [gaia::StarSTLFile #auto $hsub_wfile_]
+	    set kws [$kw status]
+	    if {$kws} {
+		set mode [$kw parameter mode]
+		set sd   [$kw parameter sd]
+		if {$mode != {} && $sd != {}} {
+		    set values_($this,back) $mode
+		    set values_($this,sigma) $sd
+		} else {
+		    error_dialog "Couldn't find BACK and SIGMA from HSUB"
 		}
-	    }
-	    ::close $f
-	    if {[info exists h(mode)] && $h(mode) != {}
-	    		&& [info exists h(sd)] && $h(sd) != {}} {
-		set values_($this,back) $h(mode)
-		set values_($this,sigma) $h(sd)
+		if {$kws < 0} {
+		    puts "Errors from $hsub_wfile_: [$kw error_msg]"
+		}
 	    } else {
-		error_dialog "Failed reading HSUB temporary file"
+		puts "Can't read $hsub_wfile_: [$kw error_msg]"
 	    }
+
 	} else {
 	    error_dialog "Couldn't find HSUB temporary file"
 	}
     }
 
+    # Add a subset of the list of `common' widgets.
+    private method add_common_widgets_ {parent panellist toolname} {
 
-    # Disable a subset of the common widgets.  Argument is a list of elements
-    # in common_widgets_ which are to be disabled; others are enabled.
-    # disable_common_widgets_{} enables all,
-    # disable_common_widgets_{$common_widgets_} disables all.
-    private method disable_common_widgets_ {subset} {
-	foreach w $common_widgets_ {
-	    if {[lsearch $subset $w] >= 0} {
-		$itk_component($w) configure -state disabled
-	    } else {
-		$itk_component($w) configure -state normal
+	if {[lsearch $panellist inardname] >= 0} {
+	    itk_component add inardname-$toolname {
+		LabelFileChooser $parent.inardname \
+			-labelwidth $labelwidth_ \
+			-text "ARD file:" \
+			-textvariable [scope values_($this,ardfile)]
 	    }
+	    pack $itk_component(inardname-$toolname) \
+		    -side top -fill x -ipadx 1m -ipady 1m
+	    add_short_help $itk_component(inardname-$toolname) \
+		    {Name of input ARD file}
 	}
+	    
+	if {[lsearch $panellist outndfname] >= 0} {
+	    itk_component add outndfname-$toolname {
+		LabelFileChooser $parent.outndfname \
+			-labelwidth $labelwidth_ \
+			-text "NDF output:" \
+			-textvariable [scope values_($this,outputndffile)]
+	    }
+	    pack $itk_component(outndfname-$toolname) \
+		    -side top -fill x -ipadx 1m -ipady 1m
+	    add_short_help $itk_component(outndfname-$toolname) \
+		    {Name of output NDF file}
+	}
+	    
+	if {[lsearch $panellist outtextname] >= 0} {
+	    itk_component add outtextname-$toolname {
+		LabelFileChooser $parent.outtextname \
+			-labelwidth $labelwidth_ \
+			-text "Text output:" \
+			-textvariable [scope values_($this,outputtextfile)]
+	    }
+	    pack $itk_component(outtextname-$toolname) \
+		    -side top -fill x -ipadx 1m -ipady 1m
+	    add_short_help $itk_component(outtextname-$toolname) \
+		    {Name of output text file}
+	}
+
+	if {[lsearch $panellist outstlname] >= 0} {
+	    itk_component add outstlname-$toolname {
+		LabelFileChooser $parent.outstltname \
+			-labelwidth $labelwidth_ \
+			-text "STL output:" \
+			-textvariable [scope values_($this,outputstlfile)]
+	    }
+	    pack $itk_component(outstlname-$toolname) \
+		    -side top -fill x -ipadx 1m -ipady 1m
+	    add_short_help $itk_component(outstlname-$toolname) \
+		    {Name of output STL file}
+	}
+
+	if {[lsearch $panellist back] >= 0} {
+
+	    itk_component add back-$toolname {
+		gaia::StarLabelWidgetChild $parent.back \
+			-text "Background:" \
+			-labelwidth $labelwidth_
+	    }
+	    set cs [$itk_component(back-$toolname) childsite]
+	    entry $cs.b -textvariable [scope values_($this,back)]  -width 7
+	    label $cs.l1 -text {+/-}
+	    entry $cs.s -textvariable [scope values_($this,sigma)] -width 7
+	    label $cs.l2 -text {counts}
+	    button $cs.button \
+		    -text {Estimate} \
+		    -command [code $this bg_from_hsub_]
+	    pack $cs.b -side left -padx 1m
+	    pack $cs.l1 -side left -padx 1m
+	    pack $cs.s -side left -padx 1m
+	    pack $cs.l2 -side left -padx 1m
+	    pack $cs.button -side right -padx 1m -fill x
+	    pack $itk_component(back-$toolname) \
+		    -side top -fill x -ipadx 1m -ipady 1m
+	    add_short_help $itk_component(back-$toolname) \
+		    {The background value for the image}
+	}
+
+	if {[lsearch $panellist nsigma] >= 0} {
+	    itk_component add nsigma-$toolname {
+		LabelEntry $parent.nsigma \
+			-text "Sig. sigma:" \
+			-labelwidth $labelwidth_ \
+			-valuewidth 2 \
+			-textvariable [scope values_($this,nsigma)]
+	    }
+	    pack $itk_component(nsigma-$toolname) \
+		    -side top -ipadx 1m -ipady 1m
+	    add_short_help $itk_component(nsigma-$toolname) \
+		    {Number of sigma above background before a pixel should be regarded as significant}
+	}
+    }
+
+#      # Disable a subset of the common widgets.  Argument is a list of elements
+#      # in common_widgets_ which are to be disabled; others are enabled.
+#      # disable_common_widgets_{} enables all,
+#      # disable_common_widgets_{$common_widgets_} disables all.
+#      private method disable_common_widgets_ {subset} {
+#  	foreach w $common_widgets_ {
+#  	    if {[lsearch $subset $w] >= 0} {
+#  		$itk_component($w) configure -state disabled
+#  	    } else {
+#  		$itk_component($w) configure -state normal
+#  	    }
+#  	}
+#      }
+
+    private method get_panel_number_ {} {
+	if {$int_panel_number_ < 0} {
+	    set int_panel_number_ 0
+	} else {
+	    incr int_panel_number_
+	}
+	return $int_panel_number_
     }
 
 
@@ -2457,6 +2758,10 @@ ardfile
     #  If this is a clone, then it should die rather than be withdrawn
     itk_option define -really_die really_die Really_Die 0
 
+    #  How wide should the panel be (minimum)?
+    itk_option define -width gaiaespwidth GaiaEspWidth 350
+    itk_option define -height gaiaespheight GaiaEspHeight 500
+
     #  Define ESP directory
     itk_option define -esp_dir esp_dir Esp_Dir {} {
 	if {$itk_option(-esp_dir) == {} } {
@@ -2477,6 +2782,7 @@ ardfile
 
     #  Symbolic names of pages (used to access names via index)
     private variable pages_
+    private variable indexes_		;# inverse to pages_
     private variable revealed_
 
     #  Default values for all parameters
@@ -2496,12 +2802,24 @@ ardfile
     #  The temporary file which bg_from_hsub_ uses
     private variable hsub_wfile_ {}
 
-    #  Options which are available only in `expert' mode
+    #  Panel number, maintained by get_panel_number_.  Initialised negative
+    private variable int_panel_number_ -1
+
+    #  Size of labels in widgets
+    private variable labelwidth_ 12
+
+    #  Options which are available only in `expert' mode in ellpro/fou
     private variable expert_parameter_list_ \
-	    {fast fine fract lim1 lim2 lim3 zerop minmod}
+	    {fine fract lim1 lim2 lim3 zerop minmod}
 
     #  Options which are specific to ellpro.  All of these are expert-only
-    private variable ellpro_only_ {fast fract lim3 minmod}
+    private variable ellpro_only_ {lim3 minmod}
+
+    # Files to be deleted within destructor
+    private variable temporary_files_ {}
+
+    # list of objects created on the canvas
+    private variable canvas_scrawls_ {}
 
     #  -- Common variables (shared by all instances)
 
@@ -2510,8 +2828,8 @@ ardfile
 
     #  Widgets which are in the main panel are as follows
     common common_widgets_ \
-	    {inardname outndfname outtextname back nsigma \
-	    run dummyrun selobj close resetpage resetall}
+	    {inardname outndfname outtextname outstlname nsigma \
+	    run close resetpage resetall}
 
     private common notebook_characteristics_
 }

@@ -74,6 +74,8 @@ itcl::class gaia::StarLabelCheckLabel {
 
 	# handle unprocessed configuration options
 	eval itk_initialize $args
+
+	toggle_enabled_
     }
 
     #  Destructor
@@ -104,14 +106,14 @@ itcl::class gaia::StarLabelCheckLabel {
 
     private method toggle_enabled_ {} {
 	eval set flagvar $$itk_option(-flagvariable)
-	puts "toggle_enabled_: $itk_option(-flagvariable) = $flagvar"
+	#puts "toggle_enabled_: $itk_option(-flagvariable) = $flagvar"
 	if {$flagvar} {
-	    puts "   enabled"
+	    #puts "   enabled"
 	    $itk_component(editit) configure \
 		    -state normal \
 		    -foreground black
 	} else {
-	    puts "   disabled"
+	    #puts "   disabled"
 	    $itk_component(editit) configure \
 		    -state disabled \
 		    -foreground gray
