@@ -223,7 +223,7 @@ private:
 	{ return (netmag_==1.0
 		  ? i
 		  : static_cast<int>(netmag_*(double)i)); }
-    void read_postamble (FileByteStream*)
+    void read_postamble()
 	    throw (DviError);
     bool have_read_postamble_;
     void process_preamble(DviFilePreamble *);

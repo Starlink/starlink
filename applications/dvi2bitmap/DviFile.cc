@@ -81,7 +81,9 @@ verbosities DviFile::verbosity_ = normal;
  * {@link #getEvent} and handling the returned object.
  *
  * <p>The DVI file may be specified as "-", in which case the DVI
- * file will be read from <code>stdin</code>.  In this case, the
+ * file will be read from <code>stdin</code>.  In fact, this is just a
+ * synonym for the expression, <code>&lt;osfd&gt;0</code>, as
+ * understood by {@link InputByteStream} (qv).  In this case, the
  * postamble is not read, irrespective of the value of parameter
  * <code>read_post</code>, and this is known not to be seekable, so
  * the value of parameter <code>seekable</code> is ignored.
@@ -129,41 +131,13 @@ DviFile::DviFile (string& fn,
 
 	if (seekable) {
 	    // ordinary file
-	    FileByteStream* D = new FileByteStream(fileName_, ".dvi", false);
-	    if (read_post) {
-		read_postamble(D);
-	    }
-	    dvif_ = D;
+	    dvif_ = new FileByteStream(fileName_, ".dvi", false);
+	    if (read_post)
+		read_postamble();
 	} else {
 	    dvif_ = new InputByteStream(fileName_);
 	    read_post = false;
 	}
-	
-// 	if (fileName_ == "-") {
-// 	    // special case: read stdin
-// 	    read_post = false;
-// 	    dvif_ = new InputByteStream(STDIN_FILENO);
-// 	    if (verbosity_ > normal)
-// 		cerr << "DviFile: Reading DVI file from stdin" << endl;
-// 	} else if (seekable) {
-// 	    // ordinary file
-// 	    dvif_ = new FileByteStream (fileName_, ".dvi", false);
-// 	    if (read_post) {
-// 		read_postamble();
-// 		dvif_->seek(0);	// return to beginning
-// 	    }
-// 	} else {
-// 	    // file to be opened by name, but not seekable
-// 	    read_post = false;
-// 	    int fd = open(fileName_.c_str(), O_RDONLY, 0);
-// 	    if (fd < 0)
-// 		throw InputByteStreamError("Can't open file " + fileName_
-// 					   + " to read");
-// 	    dvif_ = new InputByteStream(fd);
-// 	    if (verbosity_ > normal)
-// 		cerr << "DviFile: opened unseekable file " << fileName_
-// 		     << " to read" << endl;
-// 	}
 
 #if HOMEMADE_POSSTATESTACK
 	posStack_ = new PosStateStack(read_post ? postamble_.s : 100);
@@ -911,11 +885,15 @@ void DviFile::updateV_ (int vup)
 	     << endl;
 }
 
-void DviFile::read_postamble(FileByteStream *dvifile)
+void DviFile::read_postamble()
     throw (DviError)
 {
     const int tailbuflen = 64;
-    // get final 64 bytes of file
+    FileByteStream* dvifile = dynamic_cast<FileByteStream*>(dvif_);
+    if (dvifile == 0)
+	throw DviError
+		("DviFile::read_postamble didn't receive a FileByteStream!");
+    
     dvifile->seek(-tailbuflen);
     const Byte *dviBuf = dvifile->getBlock(tailbuflen);
     const Byte *p;
