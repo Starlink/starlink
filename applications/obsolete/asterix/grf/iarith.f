@@ -61,7 +61,7 @@
 
 *  check there is actually something in cache
         IF (CACHE) THEN
-          IF (I_CACHE) THEN
+          IF (I_MEM) THEN
             MATCH=.TRUE.
           ELSE
             CALL MSG_PRNT('AST_ERR: no image currently in cache')
