@@ -25,6 +25,8 @@
 	system "../../dsssl/sl/common/slparams.sgml" subdoc>
   <!entity release.notes 
 	system "../../ReleaseNotes">
+  <!entity release.notes-0.3
+	system "ReleaseNotes-0.3">
   <!entity release.notes-0.2
 	system "ReleaseNotes-0.2">
 ]>
@@ -41,18 +43,23 @@
 
 <history>
 <version number=0 date='21-APR-1999' author=ng>Initial version</version>
+
 <distribution string="DR-0.2" date="03-JUN-1999" author=ng>
 First real release to other programmers.  Distribution contains only
 SGML lib stuff: Jade has to be built separately.
-</distribution>
+
 <change date="06-JUN-1999" author="ng" versionid="post-0.2">
 Various edits, great and small.  I received comments from Mark Taylor,
 arising from the DR-0.2 distribution.  I made considerable additions
 to the appendices.  Generally tidying up for release.
-</change>
+
 <distribution string="DR-0.3" date="15-JUN-1999" author="ng">
 More substantial release, CD candidate.
-</distribution>
+
+<change date="22-JUN-1999">
+Assorted tweaks, introduced since the release.
+</change>
+
 </history>
 
 <coverimage>
@@ -182,8 +189,9 @@ parser -- so that using
 them with any other tool (which is necessary if you want to produce
 anything other than DVI files<note>In fact, there is a version of &tex;
 which produces PDF files directly, and a &tex;-to-HTML converter
-called <webref url="http://www.tug.org/applications/tex4ht/mn.html"
->TeX4ht</webref> which writes special DVI files which work with a
+called TeX4ht (see
+<url>http://www.tug.org/applications/tex4ht/mn.html</url>) which
+writes special DVI files which work with a 
 postprocessor, and so uses the &tex parser to produce HTML
 indirectly.  This really just pushes the hack elsewhere.</note>) is
 asking for trouble.
@@ -3529,6 +3537,8 @@ See <ref id=doccode.languages> for details.
 <sect id=appx.releasenotes export>Release Notes
 
 &release.notes;
+
+&release.notes-0.3;
 
 &release.notes-0.2;
 
