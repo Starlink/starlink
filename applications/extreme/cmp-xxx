@@ -74,6 +74,7 @@
 #  crepint: Changes INT_BIG back to int and collapses spaces.
       elsif ( $filter =~ /crepint/ ) {
          s%^/\* *crepint:.*?\*/ *\n%%msg;
+         s/INT_BIG_(MIN|MAX)/INT_$1/g;
          s/INT_BIG/int/g;
          s/  +/ /g;
       }
