@@ -124,7 +124,9 @@ There are four new commands.
 
      - IRAF2NDF and NDF2IRAF are currently not available under OSF/1
        and Solaris, because at the time of development there were no
-       IRAF IMFORT libraries released for these platforms.
+       IRAF IMFORT libraries available for these platforms.  However,
+       the SunOS versions are provided for use in the compatibility
+       mode of Solaris 2.3.
 
   o  CONHELP runs an application on UNIX platforms and accesses a
      portable-help library.
