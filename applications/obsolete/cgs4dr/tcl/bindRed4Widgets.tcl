@@ -213,7 +213,8 @@ proc red4DoSomething {taskname dowhat inputs} {
     examine_data_structure
       {
        if {$dowhat=="action"} {
-         red4Package $taskname figaro1 exam
+         #red4Package $taskname figaro1 exam
+         red4Package $taskname hdstrace
        } elseif {$dowhat=="help"} {
          cgs4drHelpDialog .helpDialog $cgs4drHtml/red4PackageBox1.html
        }
