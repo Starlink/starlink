@@ -1,19 +1,13 @@
 # $Id$
 #
-# Makefile.in - Makefile to create the standalone gaia binary
-#               (uses mktclapp - to create one binary with tcl scripts
-#                loaded) 
+# Makefile.in - Makefile for creating gaia standalone executable.
 #
 # This file is processed by configure to produce the actual Makefile.
 #
-# who               when         what
-# ----------------  -----------  ---------------------------------------------
-# Peter W. Draper   12-MAY-1999  Created (based on 
+# who             when       what
+# --------------  ---------  ---------------------------------------------
+# Peter W. Draper 6-Oct-1997 Created
 # ------------------------------------------------------------------------
-
-DEFINES      = @DEFS@
-
-CFLAGS       = @CXXDEBUGFLAGS@
 
 # C compiler
 CC 	     = @CC@
@@ -21,131 +15,125 @@ CC 	     = @CC@
 # C++ compiler
 CXX          = @CXX@
 
+# -D flags
+DEFINES      = -DSHARED=@SHARED@ @TCLUTIL_DEFS@
+
+# other flags to pass to compiler
+CFLAGS       = @CXXDEBUGFLAGS@
+
 # install directories
 TOPDIR	     = @DESTDIR@
 BINDIR       = @BINDIR@
-SKYCAT_DIR   = @SKYCAT_DIR@
+LIBDIR       = @LIBDIR@
+RTD_DIR      = @RTD_DIR@
 
-# set to 1 if shared libs were enabled with --enable-shared configure option
-SHARED       = @SHARED@
-
-# ------------------------------------------------------------------------
-#       Include directives for Tcl, Tk, and X include files 
-# ------------------------------------------------------------------------
-
+# Include directives for Tcl, Tk, and X include files
 TCL_INCLUDE   = @TCLINCSW@
 TK_INCLUDE    = @TKINCSW@
 X_INCLUDE     = @XINCSW@
 
-# ------------------------------------------------------------------------
-#       Libraries for Tcl, Tk, X11, BLT, etc.
-# ------------------------------------------------------------------------
-# note: using shared X libs might cause problems if end user has different 
-# library versions, but it is needed for plugins that might access more
-# Xlib functions than skycat does.
-# 
-# note: on Solaris2.4 with openwin, need to have libXext after libX11...
-#X_LIB        = @XLIBSW_STATIC@ @XLIBSW_STATIC@
+# X Libraries
 X_LIB        = @XLIBSW@
-
-# use static tcl/tk archives if available
-TCL_LIB      = @TCL_LIB_SPEC_STATIC@
-TK_LIB       = @TK_LIB_SPEC_STATIC@
-ITCL_LIB     = @ITCL_LIB_SPEC_STATIC@ @ITK_LIB_SPEC_STATIC@
-TCLX_LIB     = @TCLX_LIB_SPEC_STATIC@
-BLT_LIB      = @BLT_LIB_SPEC_STATIC@
-
 EXTRA_LIBS   = @LIBS@
 
-TCL_LIBS     = \
-	$(ITCL_LIB) \
-	$(TCLX_LIB) \
-	$(BLT_LIB) \
-	$(TK_LIB) \
-	$(TCL_LIB)
+# Tk libs
+TCLTKLIBS = @ITK_LIB_SPEC@ \
+	    @TIX_LIB_SPEC@ \
+            @TK_LIB_SPEC@ \
+            @BLT_LIB_SPEC@ \
+            @TCLX_LIB_SPEC@ \
+            @ITCL_LIB_SPEC@ \
+            @TCL_LIB_SPEC@
 
-# ------------------------------------------------------------------------
-# skycat lib
-SKYCAT_LIB  = ../libskycat.a
+# Tclutil library
+TCLUTIL_LIB          = @TCLUTIL_LIB@
+TCLUTIL_LIB_STATIC   = @TCLUTIL_LIB_STATIC@
 
-# ------------------------------------------------------------------------
-# This is required for using ET
-# ------------------------------------------------------------------------
-ET_OBJS = ../../et/et.o
+# Astrotcl library
+ASTROTCL_LIB         = @ASTROTCL_LIB@
+ASTROTCL_LIB_STATIC  = @ASTROTCL_LIB_STATIC@
 
-# ------------------------------------------------------------------------
-# tcl script to load all of the tcl library files
-INIT_SCRIPT  = library/skyCatInit.tcl
+# Rtd library
+RTD_LIB              = @RTD_LIB@
+RTD_LIB_STATIC       = @RTD_LIB_STATIC@
 
-# name of tcl interpreter to use to run $(INIT_SCRIPT)
-TCL_INTERP   = ../interp/bin/skycat_tcl
+# Catalog library
+CAT_LIB              = @CAT_LIB@
+CAT_LIB_STATIC       = @CAT_LIB_STATIC@
 
-# name of program
-PROG         = bin/skycat-@OSVERSION@
+# Skycat libraries
+SKYCAT_LIB	     = @SKYCAT_LIB@
+SKYCAT_LIB_STATIC    = @SKYCAT_LIB_STATIC@
 
-# include flags
-INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
-
-# compiler flags
-CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
-
-# libraries to link
-LIBRARIES    = \
-	$(SKYCAT_LIB) \
-	$(TCL_LIBS) \
-	$(X_LIB) \
-	$(EXTRA_LIBS)
-
-# shared library flags
+#  Local library.
+LOCAL_LIBRARY = lib/libgaia.a
+# info needed for shared libraries (see configure.in or tclConfig.sh
+# for an explanation)
+SHLIB_CFLAGS=@SHLIB_CFLAGS@
+SHLIB_LD=@SHLIB_LD@
+SHLIB_SUFFIX=@SHLIB_SUFFIX@
+SHLIB_LD_LIBS=@SHLIB_LD_LIBS@
+DL_LIBS=@DL_LIBS@
+LD_FLAGS=@LD_FLAGS@
 LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
 LIB_RUNTIME_DIR=@LIB_RUNTIME_DIR@
-LD_FLAGS=@LD_FLAGS@
 
-# these objects are only needed to make the skycat_wish binary for the demos
-OBJECTS      = skycat.o
+# ------------------------------------------------------------------------
+#       Libraries required to link against Fortran source code
+#       using a C++ compiler.
+# ------------------------------------------------------------------------
+F77_LIBS = @F77_LIBS@
+TCLADAM  = @DESTDIR@/lib/tclAdam.o
+STAR_LIB = @STARLINK@/lib
+STAR_INC = @STARLINK@/include
+COMPIFL  = @STARLINK@/bin/compifl
+#  Define sets of ADAM libraries we need to link against. Note that
+#  ast_link and ndf_link must be carefully managed to avoid picking up
+#  default AST libraries for errors and graphics.
+AST_LIBS = -L$(STAR_LIB) `ast_link -myerr -mygrf`
+ADAM_LIBS = -L$(STAR_LIB) `ard_link` `ams_link_adam` `fio_link` `cat_link_adam` `subpar_link_adam` `ndf_link`  -lpda
+
+#  Name of single binary
+PROG = bin/gaia_$(SYSTEM)
+
+INCLUDES     = $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE)
+
+CC_SWITCHES  = $(CFLAGS) $(DEFINES) $(INCLUDES)
+
+# these objects are only needed to make the gaia_wish binary for the demos
+OBJECTS      = tkAppInit.o
 
 INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
 RANLIB 	     = @RANLIB@
 SHELL 	     = /bin/sh
 RM 	     = rm -f
 LN 	     = ln -s
 
 # ------------------------------------------------------------------------
-all: $(PROG) 
+all: $(PROG) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
+	$(asc2tab) $(tab2asc)
 
-$(PROG): $(OBJECTS)
-	@echo "linking \"$(PROG)\"..."
-	$(CXX) $(LD_FLAGS) $(CC_SWITCHES) $(ET_OBJS) $(OBJECTS) \
-	    -o $(PROG) -L. $(LD_SEARCH_FLAGS) $(LIBRARIES)
-
-quick:
-	@echo "linking \"$(PROG)\"..."
-	$(CXX) $(CC_SWITCHES) $(ET_OBJS) $(OBJECTS) \
-	    -o $(PROG) -L. $(LD_SEARCH_FLAGS) $(LIBRARIES)
-
-skycat.C: skycat.tcl
-	../../et/et2c $(ET2CFLAGS) tkAppInit.C > skycat.C
-
-# generate a single tcl source file form the development copies of all tcl sources
-skycat.tcl: FORCE
-	TCLUTIL_LIBRARY=@TCLUTIL_BUILD_LIBRARY@; export TCLUTIL_LIBRARY; \
-	ASTROTCL_LIBRARY=@ASTROTCL_BUILD_LIBRARY@; export ASTROTCL_LIBRARY; \
-	RTD_LIBRARY=@RTD_BUILD_LIBRARY@; export RTD_LIBRARY; \
-	CAT_LIBRARY=@CAT_BUILD_LIBRARY@; export CAT_LIBRARY; \
-	SKYCAT_LIBRARY=@SKYCAT_BUILD_LIBRARY@; export SKYCAT_LIBRARY; \
-	$(TCL_INTERP) $(INIT_SCRIPT) skycat.tcl
-
-install-top:
-	@test -d $(TOPDIR) || mkdir $(TOPDIR)
-
-install-bin: 
-	@test -d $(BINDIR) || mkdir $(BINDIR)
-	$(INSTALL) $(PROG) $(BINDIR)
+$(demo_wish): normallib tkAppInit.o FORCE
+	@echo "linking \"$(demo_wish)\"..."
+	$(CXX) $(CC_SWITCHES) $(OBJECTS) -o $(PROG)  \
+	       $(LD_SEARCH_FLAGS) $(SKYCAT_LIB_STATIC) $(CAT_LIB_STATIC) $(AST_LIBS) \
+	       $(RTD_LIB_STATIC) $(ASTROTCL_LIB_STATIC) \
+	       $(TCLUTIL_LIB_STATIC) $(TCLADAM) $(LOCAL_LIBRARY) \
+	       $(AST_LIBS) $(TCLUTIL_LIB_STATIC) $(ADAM_LIBS) $(TCLTKLIBS) \
+	       $(X_LIB) $(EXTRA_LIBS)
 
 install: install-top install-bin
 
+install-top:
+	@if test -d $(TOPDIR); then : ; else mkdir $(TOPDIR); fi
+
+install-bin:
+	@if test -d $(BINDIR); then : ; else mkdir $(BINDIR); fi
+	$(INSTALL) $(PROG) $(BINDIR)
+
 clean:
-	$(RM) $(OBJECTS) *.o $(PROG) $(demo_tcl) *\~ "#"* skycat.C skycat.tcl
+	$(RM) $(OBJECTS) $(PROG) 
 
 distclean: clean
 	$(RM) Makefile
@@ -154,12 +142,12 @@ depend:
 
 man:
 
-FORCE:
-
 .SUFFIXES: .C
 .c.o:
 	$(CC) -c $(CC_SWITCHES) $<
 
 .C.o:
 	$(CXX) -c $(CC_SWITCHES) $<
+
+FORCE:
 
