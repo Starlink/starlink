@@ -66,11 +66,15 @@
  * the compiler may well have carefully avoided including these
  * signals specific to Unix/POSIX, which are, of course, precisely the
  * ones we're hoping to use.
+ *
+ * Include <sys/signal.h> first: if <signal.h> includes it for us,
+ * then it will probably define sentinels which will stop us including
+ * it a second time.
  */
-#include <signal.h>
 #if HAVE_SYS_SIGNAL_H
 #  include <sys/signal.h>
 #endif
+#include <signal.h>
 
 #ifdef HAVE_SYS_WAIT_H
 #  include <sys/wait.h>
