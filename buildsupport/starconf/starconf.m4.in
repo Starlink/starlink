@@ -254,18 +254,39 @@ AC_SUBST(STAR_MANIFEST_DIR)
 # so add it now.
 AC_SUBST(PACKAGE_VERSION)
 
-# Initialise state of predist/postdist flags (see STAR_PREDIST_SOURCES)
-_star_predist_status=unknown
-PREDIST='#'
+# Initialise state of predist/postdist flags (see STAR_PREDIST_SOURCES).
+# The value of _star_predist_status must be inherited by any
+# ./configure run in a subdirectory, so that we there avoid the predist
+# test of starconf.status: in a pre-distribution state, this file must
+# be present in the component directory (where we are running
+# ./configure), but must not be present in any subdirectory.
+## We have to force at least one call to STAR_PREDIST_SOURCES for the sake of
+## STAR_LATEX_DOCUMENTATION, since the Makefile.in template generated
+## for that by automake depends on @PREDIST@ being substituted
+## correctly, even although there are no predist-only files which
+## that macro can itself use to trigger this.   In any case,
+## starconf.status will always be present in a bootstrapped
+## pre-distribution directory, and should never be distributed, so
+## this is a reliable and harmless test, which we might as well
+## perform in any case.
+: ${_star_predist_status=unknown}
+export _star_predist_status
+case $_star_predist_status in
+  unknown)
+    STAR_PREDIST_SOURCES(starconf.status)
+    # ...sets PREDIST
+    ;;
+  predist)
+    PREDIST=
+    ;;
+  postdist)
+    PREDIST='#'
+    ;;
+  *)
+    AC_MSG_ERROR([impossible predist status $_star_predist_status])
+    ;;
+esac
 AC_SUBST(PREDIST)
-
-# And immediately use it, by asserting that starconf.status must not
-# be distributed.  This is (a) true, but also (b) necessary,
-# since it guarantees that we do make the predist-or-not test at some
-# point.  If we don't do this, and the user doesn't call
-# STAR_PREDIST_SOURCES themself (possibly implicitly in STAR_MESSGEN),
-# then important targets might be commented out by mistake.
-STAR_PREDIST_SOURCES(starconf.status)
 
 # pax and/or tar are used in some install targets.
 # Note: value-if-not-found should be blank, so this can be tested for.
@@ -355,10 +376,10 @@ do
                 # we do want to build sourceset files
                 _star_predist_status=predist
                 PREDIST=
-                AC_MSG_NOTICE([in predistribution state])
+                AC_MSG_NOTICE([in pre-distribution state])
             else
-                # leave default PREDIST='#'
                 _star_predist_status=postdist
+                PREDIST='#'
                 AC_MSG_NOTICE([in post-distribution state])
             fi
             ;;
