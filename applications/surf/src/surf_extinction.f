@@ -211,6 +211,7 @@
       INTEGER          ISTART           ! index of start of sub-string
       INTEGER          ITEMP            ! scratch integer
       INTEGER          IY               ! year of observation
+      INTEGER          J                ! Loop counter
       INTEGER          JIGGLE           ! jiggle index
       INTEGER          JIGGLE_COUNT     ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH  ! number of jiggles per switch
@@ -264,6 +265,7 @@
       REAL             OFFSET_X         ! x offset of measurement
       REAL             OFFSET_Y         ! y offset of measurement
       INTEGER          OUTNDF           ! NDF identifier of output file
+      INTEGER          OUT_A_PTR        ! Pointer to AXIS 
       INTEGER          OUT_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers in output
                                         ! file
@@ -283,6 +285,7 @@
                                         ! file
       INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
+      INTEGER          POSITION         ! Position in array
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                         ! azimuth pointing corrections (arcsec)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
@@ -290,6 +293,7 @@
                                         ! (arcsec)
       DOUBLE PRECISION POINT_LST (SCUBA__MAX_POINT)
                                         ! LST of pointing corrections (radians)
+      INTEGER          POSITION         ! Position in array
       DOUBLE PRECISION RA_CENTRE        ! apparent RA of map centre (radians)
       REAL             RA_START         ! RA offset of scan start (arcsec)
       REAL             RA_VEL           ! RA velocity of scan (arcsec/sec)
@@ -297,6 +301,7 @@
       DOUBLE PRECISION ROTATION         ! angle between apparent north and 
                                         ! north of input coord system (radians,
                                         ! measured clockwise from input north) 
+      REAL             RTEMP            ! Scratch real
       INTEGER          RUN_NUMBER       ! run number of observation
       CHARACTER*15     SAMPLE_COORDS    ! coordinate system of sample offsets
       CHARACTER*15     SAMPLE_MODE      ! SAMPLE_MODE of observation
@@ -1414,6 +1419,35 @@
                END DO
             END DO
          END DO
+
+* Put in some axis information
+
+         CALL NDF_AMAP(OUTNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
+     :        OUT_A_PTR, ITEMP, STATUS)
+         IF (STATUS .EQ. SAI__OK) THEN
+            CALL SCULIB_NFILLI (N_BOL_OUT, %val(OUT_A_PTR))
+         END IF
+         CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
+         CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
+
+      CALL NDF_AMAP (OUTNDF, 'CENTRE', 2, '_REAL', 'WRITE',
+     :  OUT_A_PTR, ITEMP, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+
+         POSITION = 0
+
+         DO I = 1, N_MEASUREMENTS * N_INTEGRATIONS
+            DO J = 1, JIGGLE_COUNT
+               RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
+               CALL SCULIB_VFILLR(1,RTEMP,
+     :              %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
+               POSITION = POSITION + 1
+            END DO
+         END DO
+
+      END IF
+      CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
+      CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
 
 *  unmap the main data array
 
