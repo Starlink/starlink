@@ -20,11 +20,15 @@
 *        The global status.
 
 *  Description:
-*     This application can be used to prepare data files prior to 
-*     processing them with POLPACK in cases where POLIMP cannot be
-*     used (for instance, because the data files do not have any suitable 
-*     FITS headers). The values to be stored are supplied explicitly 
-*     by means of the application parameters listed below.
+*     This application can be used to store information within the POLPACK
+*     extensions of a group of data files so that they may subsequently be
+*     processed with POLPACK. The values to store in the POLPACK extension
+*     are supplied directly by the user in response to application
+*     parameter prompts. If the required information is present within 
+*     each data file in the form of header cards in a FITS extension, then
+*     application POLIMP may be used in place of POLEXT (POLIMP reads the
+*     required values from the FITS extension instead of obtaining values
+*     from the user).
 *
 *     New values for the POLPACK extension items are obtained using the
 *     parameters described below. If supplied, these new values are stored
@@ -38,38 +42,65 @@
 
 *  ADAM Parameters:
 *     ANGROT = _REAL (Read)
-*        The anti-clockwise angle from the first (X) axis of each image to 
-*        the polarimeter reference direction, in degrees. The given value is 
-*        stored in all the supplied images, over-writing any existing value. 
-*        If a null (!) value is supplied, any image which already has an
-*        ANGROT value retains its existing value, and an ANGROT value of zero 
-*        is stored otherwise. [!]
+*        The anti-clockwise angle from the first (X) pixel axis of each
+*        image to the polarimeter reference direction, in degrees. The
+*        given value is stored in all the supplied images, over-writing
+*        any existing value. If a null (!) value is supplied, any image
+*        which already has an ANGROT value retains its existing value,
+*        and an ANGROT value of zero is stored otherwise. The reference
+*        direction depends on the type of polarimeter; in a rotating
+*        half-wave plate polarimeter, it corresponds to the direction of
+*        the fixed analyser; in polarimeters with multiple fixed
+*        analysers or a single rotating analyser, it corresponds to the
+*        direction specified by a zero value of ANLANG. [!]
+*     ANLANG = _REAL (Read)
+*        Specifies the anti-clockwise angle in degrees from the reference
+*        direction (established using the ANGROT parameter) to the
+*        analyser. This parameter should only be used with polarimeters
+*        which have either a rotating analyser or a set of fixed
+*        analysers. If your polarimetry has a rotating half-wave plate
+*        instead, then you should use WPLATE instead. The given value is
+*        stored in all supplied data files. If a null (!) value is
+*        supplied, any image which already has an ANLANG value retains its
+*        existing value, and any other images are left with an undefined
+*        ANLANG value. [!]
+*     EPS = _REAL (Read)
+*        The analyser efficiency. This gives the efficiency with which the
+*        analyser rejects light polarised across its axis. A perfect
+*        polariser has a value of 1.0. A perfect piece of glass would have
+*        a value of 0.0. The stored value is used only when processing
+*        single-beam data. The given value is stored in all supplied data
+*        files. If a null (!) value is supplied, any image which already
+*        has an EPS value retains its existing value, and any other images
+*        are left with an undefined EPS value (this will cause a value of
+*        1.0 to be used by POLCAL). [!]
 *     FILTER = LITERAL (Read)
-*        The filter name. The value of extension item WPLATE is appended to 
-*        the supplied value (unless the value already includes the WPLATE 
-*        value) before being stored. If a null (!) value is supplied, then
+*        The filter name. The value of extension item WPLATE or ANLANG
+*        (whichever is available) is appended to the supplied filter value 
+*        before being stored, unless the filter value already contains the 
+*        WPLATE or ANLANG value. If a null (!) value is supplied, then
 *        any existing FILTER value in the POLPACK extension is retained. If 
 *        there is no value in the POLPACK extension, then any value in the 
 *        CCDPACK extension is used instead. If there is no value in the 
 *        CCDPACK extension, then a default value equal to the value of WPLATE 
-*        is used. [!]
+*        or ANLANG is used. [!]
 *     IMGID = LITERAL (Read)
-*        A group of image identifier strings. These are arbitrary strings 
-*        assigned to intensity frames containing both O and E ray images.
-*        They are used to associate the O and E ray images once they have
-*        been extracted into separate data files. The supplied group may
-*        take the form of a comma separated list of identifiers, or any of 
-*        the other forms described in the help on "Group Expressions". A 
-*        separate, unique, non-blank identifier should be supplied for each 
-*        data file specified by parameter IN, in the same order as the data 
-*        files. If a null (!) value is supplied, then any existing IMGID
-*        values in the POLPACK extensions are retained. Default values 
-*        equal to the name of the data file are used if there is no 
-*        existing value. [!]
+*        A group of image identifier strings. These are arbitrary strings
+*        used to identify each original intensity frame. They are used
+*        when processing dual-beam data to associate O and E ray images.
+*        They are ignored when processing single-beam data. The supplied
+*        group may take the form of a comma separated list of identifiers,
+*        or any of the other forms described in the help on "Group
+*        Expressions". A separate, unique, non-blank identifier should be
+*        supplied for each data file specified by parameter IN, in the
+*        same order as the data files. If a null (!) value is supplied,
+*        then any existing IMGID values in the POLPACK extensions are
+*        retained. Default values equal to the name of the data file are
+*        used if there is no existing value. [!]
 *     IN = LITERAL (Read)
 *        A group of data files. This may take the form of a comma separated 
-*        list of file names, or any of the other forms described in the help on "Group 
-*        Expressions".
+*        list of file names, or any of the other forms described in the help 
+*        on "Group Expressions".
 *     NAMELIST = LITERAL (Read)
 *        The name of a file to create containing a list of the successfully 
 *        processed data files. This file can be used when specifying the input 
@@ -80,20 +111,35 @@
 *        file are listed before being modified. Otherwise, nothing is written 
 *        to the screen. [FALSE] 
 *     RAY = LITERAL (Read)
-*        This parameter indicates if the supplied files contain O or E ray 
-*        data. It is appropriate only to files containing extracted data 
-*        equivalent to the output images from POLKA. It should be supplied 
-*        equal to "O" or "E". The same value is stored in all supplied data 
-*        files. If a null (!) value is supplied, any existing RAY values are 
-*        left unchanged, but no new ones are added. [!]
-*     WPLATE = LITERAL (Read)
-*        The half-wave plate position, in degrees, as a string. This must be 
-*        one of "0.0", "22.5", "45.0", "67.5" (abbreviations are allowed).
-*        The given value is stored in all supplied data files. If a null (!) 
-*        value is supplied, any image which already has an WPLATE value 
-*        retains its existing value, and an error is reported otherwise
-*        (unless the data file contains Stokes vectors in which case no
-*        WPLATE value is needed). [!]
+*        You should use this parameter only if the images contain either O
+*        or E ray images obtained by a dual-beam polarimeter. You should
+*        not use this parameter if your data is from a single-beam
+*        polarimeter, or if the O and E ray images have not yet been
+*        extracted into separate images. If used, the supplied value must
+*        be either "O" or "E". The same value is stored in all supplied
+*        data files. If a null (!) value is supplied, any existing RAY
+*        values are left unchanged, but no new ones are added. [!]
+*     T = _REAL (Read)
+*        The analyser transmission. This gives the transparency of the
+*        analyser to unpolarised light. A perfect polariser has a value of
+*        1.0. A perfect piece of glass would have a value of 2.0. The
+*        stored value is only used when processing single-beam data. The
+*        given value is stored in all supplied data files. If a null (!)
+*        value is supplied, any image which already has a T value retains
+*        its existing value, and any other images are left with an
+*        undefined T value (this will cause a value of 1.0 to be used by
+*        POLCAL). [!]
+*     WPLATE = _REAL (Read)
+*        The half-wave plate position, in degrees. Use parameter ANLANG if
+*        your polarimeter does not have a half-wave plate. The given value
+*        is stored in all supplied data files. If a null (!) value is
+*        supplied, any image which already has an WPLATE value retains its
+*        existing value, and any other images are left with an undefined
+*        WPLATE value. Note, when using dual-beam data, Stokes vectors can
+*        only be calculated for WPLATE values of 0.0, 22.5, 45.0 and 67.5.
+*        The POLCAL application will fail if any other values are
+*        supplied. There are no such restrictions on the value of WPLATE
+*        when using single-beam data. [!]
 
 *  Examples:
 *     polext in=cube 
@@ -126,6 +172,8 @@
 *        Original version.
 *     18-NOV-1998 (DSB):
 *        Added RAY parameter.
+*     12-FEB-1999 (DSB):
+*        Added T, EPS and ANLANG. Removed restrictions on values of WPLATE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -141,6 +189,7 @@
       INCLUDE 'DAT_PAR'          ! HDS/DAT parameters
       INCLUDE 'GRP_PAR'          ! GRP parameters
       INCLUDE 'PAR_ERR'          ! PAR error constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -167,8 +216,6 @@
       CHARACTER RAY*1                  ! Supplied ray indicator; "O" or "E"
       CHARACTER RY*1                   ! Ray indicator to store; "O" or "E"
       CHARACTER STOKES*5               ! Current value of STOKES component
-      CHARACTER WPL*5                  ! The WPLATE value to store
-      CHARACTER WPLATE*5               ! The supplied WPLATE value
       INTEGER ADDED              ! No. of elements added to a group
       INTEGER I                  ! Loop counter
       INTEGER IAT                ! No. of characters in buffer
@@ -186,16 +233,27 @@
       INTEGER SIZE               ! No. of elements in a group
       LOGICAL CFLAG              ! Should more values be obtained?
       LOGICAL CPRIM              ! Is component a primative?
+      LOGICAL GOTANA             ! Was an ANLANG value given?
       LOGICAL GOTANG             ! Was a ANGROT value given?
       LOGICAL GOTCCD             ! Does NDF contain a CCDPACK extension?
+      LOGICAL GOTEPS             ! Was an EPS value given?
       LOGICAL GOTFIL             ! Was a FILTER value given?
       LOGICAL GOTIMG             ! Were any IMGID values given?
       LOGICAL GOTPOL             ! Does NDF contain a POLPACK extension?
       LOGICAL GOTRAY             ! Was a RAY value given?
+      LOGICAL GOTT               ! Was a T value given?
       LOGICAL GOTWPL             ! Was a WPLATE value given?
       LOGICAL QUIET              ! Run silently?
+      REAL ANA                   ! The ANLANG value to store
       REAL ANG                   ! The ANGROT value to store
       REAL ANGROT                ! The supplied ANGROT value
+      REAL ANLANG                ! The supplied ANLANG value
+      REAL EPS                   ! The supplied EPS value
+      REAL EPS0                  ! The EPS value to store
+      REAL T                     ! The supplied T value
+      REAL T0                    ! The T value to store
+      REAL WPL                   ! The WPLATE value to store
+      REAL WPLATE                ! The supplied WPLATE value
 *.
 
 *  Check inherited global status.
@@ -332,14 +390,56 @@
 
 *  Get the WPLATE value. Annul the error if a null (!) value was supplied,
 *  and set a flag indicating whether to store the WPLATE value.
-      CALL PAR_CHOIC( 'WPLATE', ' ', '0.0,22.5,45.0,67.5', .FALSE.,
-     :                 WPLATE, STATUS )
+      CALL PAR_GET0R( 'WPLATE', WPLATE, STATUS )
 
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )    
          GOTWPL = .FALSE.
       ELSE
          GOTWPL = .TRUE.
+      END IF
+
+*  Get the ANLANG value. Annul the error if a null (!) value was supplied,
+*  and set a flag indicating whether to store the ANLANG value.
+      CALL PAR_GET0R( 'ANLANG', ANLANG, STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )    
+         GOTANA = .FALSE.
+      ELSE
+         GOTANA = .TRUE.
+      END IF
+
+*  Report an error if both WPLATE and ANLANG were supplied.
+      IF( GOTANA .AND. GOTWPL .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'POLEXT_4', 'Values were supplied for both '//
+     :                 '%WPLATE and %ANLANG. Only one of these should'//
+     :                 ' be supplied, depending on the type of '//
+     :                 'polarimeter.', STATUS )
+         GO TO 999
+      END IF
+
+*  Get the T value. Annul the error if a null (!) value was supplied,
+*  and set a flag indicating whether to store the T value.
+      CALL PAR_GET0R( 'T', T, STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )    
+         GOTT = .FALSE.
+      ELSE
+         GOTT = .TRUE.
+      END IF
+
+*  Get the EPS value. Annul the error if a null (!) value was supplied,
+*  and set a flag indicating whether to store the EPS value.
+      CALL PAR_GET0R( 'EPS', EPS, STATUS )
+
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )    
+         GOTEPS = .FALSE.
+      ELSE
+         GOTEPS = .TRUE.
       END IF
 
 *  Get the RAY value. Annul the error if a null (!) value was supplied,
@@ -398,15 +498,21 @@
          STOKES = ' '
          ANG = 0.0
          IMG = NDFNAM( MAX( 1, LNDF - IDLEN + 1 ) : LNDF )
-         WPL = ' '
+         WPL = VAL__BADR
          RY = ' '
+         T0 = VAL__BADR
+         EPS0 = VAL__BADR
+         ANA = VAL__BADR
 
          IF( GOTPOL ) THEN
             CALL NDF_XGT0C( INDF, 'POLPACK', 'STOKES', STOKES, STATUS )
             CALL NDF_XGT0R( INDF, 'POLPACK', 'ANGROT', ANG, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'FILTER', FILT, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'IMGID', IMG, STATUS )
-            CALL NDF_XGT0C( INDF, 'POLPACK', 'WPLATE', WPL, STATUS )
+            CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPL, STATUS )
+            CALL NDF_XGT0R( INDF, 'POLPACK', 'ANLANG', ANA, STATUS )
+            CALL NDF_XGT0R( INDF, 'POLPACK', 'T', T0, STATUS )
+            CALL NDF_XGT0R( INDF, 'POLPACK', 'EPS', EPS0, STATUS )
             CALL NDF_XGT0C( INDF, 'POLPACK', 'RAY', RY, STATUS )
 
 *  Create the POLPACK extension if there isn't one.
@@ -422,6 +528,9 @@
          IF( GOTIMG ) CALL GRP_GET( IGRP3, INDX, 1, IMG, STATUS )
          IF( GOTWPL ) WPL = WPLATE
          IF( GOTRAY ) RY = RAY
+         IF( GOTT ) T0 = T
+         IF( GOTEPS ) EPS0 = EPS
+         IF( GOTANA ) ANA = ANLANG
 
 *  Store the values. First do Stokes vector cubes.
          IF( STOKES .NE. ' ' ) THEN
@@ -429,22 +538,22 @@
             IF( FILT .NE. ' ' ) CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 
      :                                          'FILTER', STATUS )
 
-*  Now do intensity images. Report an error if the WPLATE value
-*  is blank.
+*  Now do intensity images. 
          ELSE
-
-            IF( WPL .EQ. ' ' .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'POLEXT_4', 'No WPLATE value available.',
-     :                       STATUS )
-            END IF
 
             CALL NDF_XPT0R( ANG, INDF, 'POLPACK', 'ANGROT', STATUS )
             CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
             CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', STATUS )
-            CALL NDF_XPT0C( WPL, INDF, 'POLPACK', 'WPLATE', STATUS )
+            IF( WPL .NE. VAL__BADR ) CALL NDF_XPT0R( WPL, INDF, 
+     :                                     'POLPACK', 'WPLATE', STATUS )
             IF( RY .NE. ' ' ) CALL NDF_XPT0C( RY, INDF, 'POLPACK', 
      :                                        'RAY', STATUS )
+            IF( ANA .NE. VAL__BADR ) CALL NDF_XPT0R( ANA, INDF, 
+     :                                     'POLPACK', 'ANLANG', STATUS )
+            IF( T0 .NE. VAL__BADR ) CALL NDF_XPT0R( T0, INDF, 
+     :                                     'POLPACK', 'T', STATUS )
+            IF( EPS0 .NE. VAL__BADR ) CALL NDF_XPT0R( EPS0, INDF, 
+     :                                     'POLPACK', 'EPS', STATUS )
 
          END IF
 

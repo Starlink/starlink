@@ -17,6 +17,8 @@
 #     	 Original version.
 #     18-NOV-1998 (DSB):
 #        Added RAY.
+#     15-FEB-1999 (DSB):
+#        Added ANLANG, T and EPS.
 #     {enter_further_changes_here}
 
 #-
@@ -32,6 +34,24 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new ANGROT value'
+   endparameter
+
+   parameter ANLANG
+      type     _REAL
+      access   READ
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new ANLANG value'
+   endparameter
+
+   parameter EPS
+      type     _REAL
+      access   READ
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new EPS value'
    endparameter
 
    parameter FILTER
@@ -88,6 +108,15 @@ interface POLEXT
       vpath    'DEFAULT'
       default  !
       prompt   'A new RAY value'
+   endparameter
+
+   parameter T
+      type     _REAL
+      access   READ
+      ppath    'DEFAULT'
+      vpath    'DEFAULT'
+      default  !
+      prompt   'A new T value'
    endparameter
 
    parameter WPLATE

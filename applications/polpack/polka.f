@@ -365,6 +365,9 @@
 *        processed.
 *     3-JUL-1998 (DSB):
 *        Change parameter MODE to PMODE. 
+*     12-FEB-1999 (DSB):
+*        Allow WPLATE to take any value (not just 0.0, 22.5, 45.0 or 67.5),
+*        and allow ANLANG to be used in place of WPLATE.
 *     {enter_changes_here}
 
 *  Bugs:
