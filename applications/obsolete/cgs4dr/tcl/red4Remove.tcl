@@ -49,20 +49,24 @@ proc red4Remove {taskname type} {
       }
 
     # If it doesn't match our criteria signal an error and abort
-      if {$obs=="" || $obs==$Red4Widgets(DRG) || $obs==$Red4Widgets(DRO) || $number<=0} {
+      if {$obs=="" || $obs==$Red4Widgets(DRG) || $obs==$Red4Widgets(DRO) || $obs==$Red4Widgets(DST) || $number<=0} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4Remove error : A dataset has not been specified properly!"
       } else {
 
-    # OK we have a cosher RO or RG but don't know if it's a DST or SDF so try both
-        if {$type=="obs"} {
+    # OK we have a cosher RO or RG or ST but don't know if it's a DST or SDF so try both
+        if {$type=="obs" && [string first "ro$env(CGS4_DATE)" [string tolower $obs]]!=-1} {
           set Red4Widgets(RO) $obs
           set sdf_file [string trim $env(RODIR)/ro$env(CGS4_DATE)_${number}.sdf]
           set dst_file [string trim $env(RODIR)/ro$env(CGS4_DATE)_${number}.dst]
-        } elseif {$type=="grp"} {
+        } elseif {$type=="grp" && [string first "rg$env(CGS4_DATE)" [string tolower $obs]]!=-1} {
           set Red4Widgets(RG) $obs
           set sdf_file [string trim $env(RGDIR)/rg$env(CGS4_DATE)_${number}.sdf]
           set dst_file [string trim $env(RGDIR)/rg$env(CGS4_DATE)_${number}.dst]
+        } elseif {$type=="grp" && [string first "st$env(CGS4_DATE)" [string tolower $obs]]!=-1} {
+          set Red4Widgets(RG) $obs
+          set sdf_file [string trim $env(RGDIR)/st$env(CGS4_DATE)_${number}.sdf]
+          set dst_file [string trim $env(RGDIR)/st$env(CGS4_DATE)_${number}.dst]
         }
         set status -1
         if {[file exists $sdf_file]==1} {set status [catch {exec /usr/bin/rm -rf ${sdf_file}}]}
@@ -70,6 +74,8 @@ proc red4Remove {taskname type} {
         if {$status!=0} {
           cgs4drClear $taskname
           cgs4drInform $taskname "red4Remove error : Unable to delete file ${obs}!"
+        } else {
+          cgs4drInform $taskname "Deleted file ${obs}"
         }
       }
     }
