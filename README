@@ -50,9 +50,12 @@ following steps are required:
    path (since tools like messgen will get very confused). 
    
    You may also run into difficulties if you have previously sourced 
-   the ${STARLINK}/etc/login and ${STARLINK}/etc/cshrc scripts, as
+   the ${STARLINK}/etc/login and ${STARLINK}/etc/cshrc scripts that
+   existed from a previous classic mk-build Starlink install, as
    even with $STARLINK removed from your path some applications may
-   still get confused at build time.
+   still get confused at build time. A Starlink login from
+   a previous autoconf install into the same tree will likely be fine.
+   (although you may need to remove installed manifest files).
    
  - Review any other environment variables that might affect the build.
    For example, the variables F77, FC and CC will force the build
