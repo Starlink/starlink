@@ -204,6 +204,7 @@
       INTEGER          N_SPEC             ! number of specifications
       CHARACTER*40     OBJECT             ! name of observed object
       CHARACTER*40     OBSERVING_MODE     ! observing mode of file
+      CHARACTER*132    OUTFILE          ! Default output filename
       INTEGER          OUT_DATA_PTR       ! Mapped output data
       INTEGER          OUT_NDF            ! Output NDF identifier
       LOGICAL          PHOTOM             ! .TRUE. if the PHOTOM
@@ -220,17 +221,19 @@
       LOGICAL          SWITCH_EXPECTED    ! .TRUE. if switch is to be
                                           ! specified in data-spec
       CHARACTER*80     SVALUE             ! String version of new value
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT 
       CHARACTER*10     TYPE               ! Data type of component
       LOGICAL          USE_SECT           ! Use or not to use
       REAL             VALUE              ! New data value
 
 *     Internal References :
 *     Local data :
+      DATA SUFFIX_STRINGS /'!_cdat','a','_cdat'/
+
 *     External:
       INCLUDE 'NUM_DEC_CVT'               ! Convert UB to integer
       INCLUDE 'NUM_DEF_CVT'                ! Function definitions
-
-*     .
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -392,6 +395,13 @@
 *     Get number of output data points
       CALL NDF_DIM (IN_NDF, MAX__DIM, DIM, NDIM, STATUS)
       N_POS = DIM (2)
+
+*     Generate a default name for the output file
+      CALL SCULIB_CONSTRUCT_OUT(FILE, SUFFIX_ENV, SCUBA__N_SUFFIX,
+     :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
+ 
+*     set the default
+      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
 
 *     Now propogate the output file from the input and open it.
 
