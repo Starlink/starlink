@@ -202,18 +202,24 @@
 *  modify the FITS keywords to reflect the fact that the data only come
 *  from 1 sub-instrument in the output file
  
-      CALL SCULIB_REWRITE_FITS_I (N_FITS, N_FITS, FITS,
-     :  'N_SUBS', 1, STATUS)
-      CALL SCULIB_REWRITE_FITS_C (N_FITS, N_FITS, FITS,
-     :  'SUB_1', SUB_INSTRUMENT(SUB_POINTER), STATUS)
-      CALL SCULIB_REWRITE_FITS_C (N_FITS, N_FITS, FITS,
-     :  'FILT_1', SUB_FILTER(SUB_POINTER), STATUS)
-      CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, 
-     :  'WAVE_1', SUB_WAVE(SUB_POINTER), STATUS)
+*     Check status since SUB_POINTER can be set to bad (and therefore
+*     ruin the array lookup) if status was not good.
+      IF (STATUS .EQ. SAI__OK) THEN
+
+         CALL SCULIB_REWRITE_FITS_I (N_FITS, N_FITS, FITS,
+     :        'N_SUBS', 1, STATUS)
+         CALL SCULIB_REWRITE_FITS_C (N_FITS, N_FITS, FITS,
+     :        'SUB_1', SUB_INSTRUMENT(SUB_POINTER), STATUS)
+         CALL SCULIB_REWRITE_FITS_C (N_FITS, N_FITS, FITS,
+     :        'FILT_1', SUB_FILTER(SUB_POINTER), STATUS)
+         CALL SCULIB_REWRITE_FITS_R (N_FITS, N_FITS, FITS, 
+     :        'WAVE_1', SUB_WAVE(SUB_POINTER), STATUS)
 
 *     Setup current values of wavelength and filter
-      WAVE = SUB_WAVE(SUB_POINTER)
-      INST = SUB_INSTRUMENT(SUB_POINTER)
-      FILT = SUB_FILTER(SUB_POINTER)
+         WAVE = SUB_WAVE(SUB_POINTER)
+         INST = SUB_INSTRUMENT(SUB_POINTER)
+         FILT = SUB_FILTER(SUB_POINTER)
+
+      END IF
 
       END
