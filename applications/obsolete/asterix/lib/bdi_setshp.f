@@ -135,7 +135,7 @@
         CALL BDI0_CHKAOB( ID, STATUS )
 
 *    Check dimension values
-        IF ( STATUS .NE. SAI__OK ) THEN
+        IF ( STATUS .EQ. SAI__OK ) THEN
           BAD = .FALSE.
           IDIM = 1
           DO WHILE ( (IDIM.LE.NDIM) .AND. .NOT. BAD )
