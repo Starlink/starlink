@@ -103,6 +103,9 @@
 
 *.
 
+      LOWER = .TRUE.
+      UPPER = .TRUE.
+
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     DEBUG message. Should convert this to a CPP directive
