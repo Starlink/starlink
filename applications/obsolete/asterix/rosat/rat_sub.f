@@ -520,7 +520,7 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 	print *,'finding ',object
-      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
+      CALL DAT_FIND(LOC,OBJECT,ALOC,STATUS)
 
 	print *,1
 
