@@ -1,0 +1,12 @@
+*+
+*  Purpose:
+*     Define the common block used by CONVERT routines that write
+*     IRAF or IRAF-like headers.
+*
+*-
+
+*  Global Variables:
+      INTEGER FIMDES             ! IMFORT descriptor of the IRAF file
+
+      COMMON /COF_COM/ FIMDES
+
