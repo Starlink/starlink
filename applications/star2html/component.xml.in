@@ -29,5 +29,5 @@
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
-  <notes><p>Heavily based on latex2html</p></notes>
+  <notes><p>Starlink customised wrapper around latex2html</p></notes>
 </component>
