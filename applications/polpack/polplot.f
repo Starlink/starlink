@@ -568,6 +568,14 @@
       CALL POL1_RMBND( NVEC, BLO, BHI, %VAL( IPMAG ), %VAL( IPANG ), 
      :                 %VAL( IPX ), %VAL( IPY ), NIN, STATUS )
 
+*  Report an error if there are no vectors in the selected region.
+      IF( NIN .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'POLPLOT_2', 'There are no vectors to plot.',
+     :                 STATUS )
+         GO TO 999
+      END IF
+
 *  Find a representative data value.
 *  =================================
 *  Obtain a "typical" data value from the magnitude column. This will be
@@ -585,7 +593,7 @@
          CALL CAT_TIQAC( GIMAG, 'NAME', NAME, STATUS )
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'NAME', NAME )
-         CALL ERR_REP( 'POLPLOT_2', 'All magnitude values are zero '//
+         CALL ERR_REP( 'POLPLOT_3', 'All magnitude values are zero '//
      :                 'in column ^NAME.', STATUS )
          GO TO 999
       END IF
@@ -809,7 +817,7 @@
 *  picture for the key.
          IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'POLPLOT_3', 'There is insufficient '//
+            CALL ERR_REP( 'POLPLOT_4', 'There is insufficient '//
      :                    'room in the current picture for a key.', 
      :                    STATUS )
             GO TO 999
