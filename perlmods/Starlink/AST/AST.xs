@@ -30,6 +30,14 @@ extern "C" {
 }
 #endif
 
+/* for some reason ppport.h does not currently have CopFILE defined */
+#ifndef CopFILE 
+#define CopFILE(s)  "<unknown>"
+#endif
+#ifndef CopLINE
+#define CopLINE(s)  -1
+#endif
+
 /* typedef some common types so that the typemap can bless constants
    into correct namespaces */
 
@@ -42,29 +50,33 @@ typedef int WcsMapType;
    Since AST version 2 does not have these.
 */
 
+#if ( AST_MAJOR_VERS >= 2 )
+# define HASSPECFRAME
+# define HASSPECMAP
+# define HASSPECADD
+# define HASSETREFPOS
+# define HASGETREFPOS
+# define HASGETACTIVEUNIT
+# define HASSETACTIVEUNIT
+#else
+typedef void AstSpecFrame;
+typedef void AstSpecMap;
+#endif
+
+#if ( AST_MAJOR_VERS >= 3 )
+#define HASPOLYMAP
+#define HASGRISMMAP
+#define HASSHIFTMAP
+#else
+typedef void AstPolyMap;
+typedef void AstGrismMap;
+typedef void AstShiftMap;
+#endif
 
 #if ( (AST_MAJOR_VERS == 3 && AST_MINOR_VERS >= 1) || AST_MAJOR_VERS >= 4 )
 #define HASXMLCHAN
 #else
 typedef void AstXmlChan;
-#endif
-
-#if ( AST_MAJOR_VERS >= 3 )
-#define HASPOLYMAP
-#else
-typedef void AstPolyMap;
-#endif
-
-#if ( AST_MAJOR_VERS >= 3 )
-#define HASGRISMMAP
-#else
-typedef void AstGrismMap;
-#endif
-
-#if ( AST_MAJOR_VERS >= 3 )
-#define HASSHIFTMAP
-#else
-typedef void AstShiftMap;
 #endif
 
 /* Helper functions */
@@ -166,7 +178,7 @@ static void sinkWrap( void (*sink)(const char *), const char *line ) {
   SAVETMPS;
 
   PUSHMARK(sp);
-  XPUSHs( sv_2mortal( newSVpv( line, strlen(line) )));
+  XPUSHs( sv_2mortal( newSVpv( (char*)line, strlen(line) )));
   PUTBACK;
 
   perl_call_sv( SvRV(cb), G_DISCARD | G_VOID );
@@ -222,7 +234,7 @@ AV* ErrBuff;
 
 void astPutErr_ ( int status, const char * message ) {
   /* the av_clear decrements the refcnt of the SV entries */
-  av_push(ErrBuff, newSVpv(message, 0) );
+  av_push(ErrBuff, newSVpv((char*)message, 0) );
 }
 
 void My_astClearErrMsg () {
@@ -282,16 +294,20 @@ astEnd()
 bool
 ast_OK()
  CODE:
-   RETVAL = astVersion;
+  /* RETVAL = astOK; */
  OUTPUT:
   RETVAL
 
 int
 astVersion()
  CODE:
+#if ( AST_MAJOR_VERS >= 2 )
   ASTCALL(
    RETVAL = astVersion;
   )
+#else
+   Perl_croak(aTHX_ "astVersion: Please upgrade to AST V2.x or greater");
+#endif
  OUTPUT:
   RETVAL
 
@@ -800,9 +816,13 @@ new( class, options )
   char * class
   char * options
  CODE:
+#ifndef HASSPECFRAME
+   Perl_croak(aTHX_ "SpecFrame: Please upgrade to AST V2.x or greater");
+#else
   ASTCALL(
    RETVAL = astSpecFrame( options );
   )
+#endif
  OUTPUT:
   RETVAL
 
@@ -843,9 +863,13 @@ new( class, nin, flags, options )
   int flags
   char * options
  CODE:
+#ifndef HASSPECMAP
+   Perl_croak(aTHX_ "SpecMap: Please upgrade to AST V2.x or greater");
+#else
   ASTCALL(
    RETVAL = astSpecMap( nin, flags, options );
   )
+#endif
  OUTPUT:
   RETVAL
 
@@ -1098,9 +1122,13 @@ int
 astVersion(class)
   AstObject * class
  CODE:
+#if (AST_MAJOR_VERS >= 2)
   ASTCALL(
    RETVAL = astVersion;
   )
+#else
+   Perl_croak(aTHX_ "astVersion: Please upgrade to AST V2.x or greater");
+#endif
  OUTPUT:
   RETVAL
 
@@ -1311,9 +1339,13 @@ int
 astGetActiveUnit( this )
   AstFrame * this
  CODE:
+#ifndef HASGETACTIVEUNIT
+  Perl_croak(aTHX_ "astGetActiveUnit: Please upgrade to AST V2.x or newer");
+#else
   ASTCALL(
    RETVAL = astGetActiveUnit( this );
   )
+#endif
  OUTPUT:
   RETVAL
 
@@ -1478,9 +1510,13 @@ astSetActiveUnit( this, value )
   AstFrame * this
   int value
  CODE:
+#ifndef HASSETACTIVEUNIT
+  Perl_croak(aTHX_ "astSetActiveUnit: Please upgrade to AST V2.x or newer");
+#else
   ASTCALL(
    astSetActiveUnit( this, value );
   )
+#endif
 
 # astUnformat currently returns the value not the number of
 # characters read. Returns undef if no character read
@@ -1759,9 +1795,13 @@ astSetRefPos( this, frm, lon, lat)
   double lon
   double lat
  CODE:
+#ifndef HASSETREFPOS
+  Perl_croak(aTHX_ "astSetRefPos: Please upgrade to AST v2.x or newer");
+#else
   ASTCALL(
    astSetRefPos( this, frm, lon, lat );
   )
+#endif
 
 # XXX frm is allowed to be null here
 
@@ -1773,12 +1813,15 @@ astGetRefPos( this, frm )
   double lon;
   double lat;
  PPCODE:
+#ifndef HASGETREFPOS
+  Perl_croak(aTHX_ "astGetRefPos: Please upgrade to AST v2.x or newer");
+#else
   ASTCALL(
    astGetRefPos( this, frm, &lon, &lat );
   )
   XPUSHs(sv_2mortal(newSVnv(lon)));
   XPUSHs(sv_2mortal(newSVnv(lat)));
- 
+#endif 
 
 MODULE = Starlink::AST   PACKAGE = AstSlaMapPtr PREFIX = astSla
 
@@ -1806,9 +1849,13 @@ astSpecAdd( this, cvt, args )
   double * cargs;
  CODE:
   cargs = pack1D(newRV_noinc((SV*)args), 'd');
+#ifndef HASSPECADD
+  Perl_croak(aTHX_ "astSpecAdd: Please upgrade to AST v2.x or newer");
+#else
   ASTCALL(
    astSpecAdd( this, cvt, cargs );
   )
+#endif
 
 MODULE = Starlink::AST   PACKAGE = AstPlotPtr  PREFIX = ast
 

@@ -35,7 +35,13 @@ ast_link command is not in your path." if $astlibs !~ /./;
 
 # Libs requires the location of the Starlink libraries 
 my $libs = "-L$StarConfig{Star_Lib} $astlibs ";
+
+# Fink requires an extra path on OS X
 $libs = "-L/sw/lib $libs" if $^O eq 'darwin';
+
+# Sun compiler needs special path to fortran libraries
+$libs = "-L/opt/SUNWspro/lib $libs" if $^O eq 'solaris' && $astlibs =~ /lM77/;
+
 
 # Typemap files. We have a typemap to use by default.
 # For perl 5.6.1 and older we need to provide a typemap for
