@@ -3128,7 +3128,7 @@ c      LOGICAL VOK,QOK
 
 
 *+ IMG_GETCACHE - get dynamic arrays for cache image
-	SUBROUTINE IMG_GETMEM(V,Q,STATUS)
+	SUBROUTINE IMG_GETCACHE(V,Q,STATUS)
 
         IMPLICIT NONE
 
