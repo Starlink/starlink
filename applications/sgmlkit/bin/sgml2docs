@@ -184,9 +184,16 @@ if [ ! -d $PACKAGEDIR ]; then
 fi
 
 if $DEBUGGING; then
-	echo "WORKDIR=$WORKDIR"
-	echo "JADEFLAGS=$JADEFLAGS"
-	echo "TARGETFORMAT=$TARGETFORMAT"
+    echo "JADE=$JADE"
+    echo "SGMLNORM=$SGMLNORM"
+    echo "LIBDIR=$LIBDIR"
+    echo "DVI2BITMAP=$DVI2BITMAP"
+    echo "LATEX=$LATEX"
+    echo "BIBTEX=$BIBTEX"
+    echo ""
+    echo "WORKDIR=$WORKDIR"
+    echo "JADEFLAGS=$JADEFLAGS"
+    echo "TARGETFORMAT=$TARGETFORMAT"
 fi
 
 
@@ -205,7 +212,9 @@ if [ $TARGETFORMAT -eq 0 ]; then
 
     # If there are no maths-mode elements, there's no list file generated
     if [ -r "$ROOT.imgeq.list" ]; then
-	$run $IMGEQ $ROOT.imgeq.list
+	# find dvi2bitmap's default format
+	imgfmt=`$DVI2BITMAP -Qt | awk '{print $1}'`
+	$run $IMGEQ --imgformat $imgfmt $ROOT.imgeq.list
 
 	echo "LaTeXing maths..."
 	$run $LATEX $ROOT.imgeq.tex
