@@ -11,36 +11,43 @@ call_package_ant:
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/junit/.junit.install
      [echo] Executing tamfits target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/tamfits/.tamfits.install
      [echo] Executing axis target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/axis/.axis.install
      [echo] Executing Jetty target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jetty/.jetty.install
      [echo] Executing UTIL target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/util/.util.install
      [echo] Executing Task target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/task/.task.install
      [echo] Executing JNIAST target: deinstall
 
 deinstall:
 
 real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/jniast/.jniast.install
      [echo] Executing ASTGUI target: deinstall
 
 deinstall:
@@ -158,4 +165,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 8 seconds
+Total time: 15 seconds

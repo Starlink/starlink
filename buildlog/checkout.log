@@ -2345,7 +2345,6 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstStyleBox.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTicks.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AstTitle.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxesControls.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxisLabelControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/AxisNumLabControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/BorderControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/ColourIcon.java
@@ -2367,11 +2366,6 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfiguration.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotConfigurator.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotController.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/PlotControls.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharacters.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersEvent.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersListener.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectCharactersModel.java
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/SelectTextField.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StoreConfigurator.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/StringsControls.java
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/TODO
@@ -2386,9 +2380,7 @@ U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/add.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/config.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/delete.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/exit.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/help.gif
 U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/reset.gif
-U java/source/astgui/src/main/uk/ac/starlink/ast/gui/images/special.gif
 cvs checkout: Updating java/source/astgui/src/testcases
 U java/source/astgui/src/testcases/TestPlotConfigFrame.java
 cvs checkout: Updating java/source/axis
@@ -9025,10 +9017,18 @@ U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/BasicFontChooser.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/GridBagLayouter.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/ProxySetupFrame.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersEvent.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersListener.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersModel.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/SelectTextField.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
 U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java
 U java/source/util/src/main/uk/ac/starlink/util/images/accept.gif
 U java/source/util/src/main/uk/ac/starlink/util/images/close.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/exit.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/help.gif
+U java/source/util/src/main/uk/ac/starlink/util/images/special.gif
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/text
 U java/source/util/src/main/uk/ac/starlink/util/text/VOTable.dtd
 U java/source/util/src/main/uk/ac/starlink/util/text/astrores.dtd
