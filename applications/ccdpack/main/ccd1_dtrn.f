@@ -16,7 +16,7 @@
 *  Description:
 *     This routines sets up the sums for the normal equations suitable
 *     for each type of fit. Then dependent on the either solves the
-*     system trivially or calls the NAg library routine F04AEF to solve
+*     system trivially or calls the PDA library routine DGEFS to solve
 *     the equations. If the fit is not succesfull then the number of
 *     degrees of freedom are reduced and the fit is attempted again.
 
@@ -31,7 +31,7 @@
 *        Set of reference Y positions.
 *     VALID( NVAL ) = LOGICAL (Given and Returned)
 *        Flags indicating which positions have been rejected or should
-*        not be used in the transformation estimation. 
+*        not be used in the transformation estimation.
 *     NVAL = INTEGER (Given)
 *        Size of input arrays.
 *     IFIT = INTEGER (Given and Returned)
@@ -69,14 +69,17 @@
 *     10-JUL-1992 (PDRAPER):
 *        Changed to ADAM style, added new option (ifit=3).
 *     17-SEP-1996 (PDRAPER):
-*        Changed to use PDA_GEFS instead of NAG routine F04AEF.
+*        Changed to use PDA_DGEFS instead of NAG routine F04AEF.
+*     03-JUL-1997 (PDRAPER):
+*        The PDA_DGEFS routine was not working for IFIT=3. Problem
+*        recoded to work around this.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
+
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
 
@@ -111,7 +114,7 @@
                                  ! equations.
       DOUBLE PRECISION B1( 4 )
       DOUBLE PRECISION B2( 4 )
-      DOUBLE PRECISION WORK( 4 ) ! Workspace for PDA_DGEFS
+      DOUBLE PRECISION WORK( 4 * (4 + 1 ) ) ! Workspace for PDA_DGEFS/DGEIR
       DOUBLE PRECISION SW
       DOUBLE PRECISION SWX
       DOUBLE PRECISION SWY
@@ -138,9 +141,11 @@
       DOUBLE PRECISION THETA
       DOUBLE PRECISION X0
       DOUBLE PRECISION Y0
+      DOUBLE PRECISION RATIO
       INTEGER I
       INTEGER IND               ! Number of significant figures
       INTEGER ITASK             ! Whether to solve or reuse A
+      INTEGER NUSED
       INTEGER ITRY
       INTEGER NPTS
       INTEGER IWORK( 4 )        ! Workspace for PDA_DGEFS
@@ -205,7 +210,7 @@
             SWXY = SWXY + WX * Y1( I )
             SWX2 = SWX2 + WX * X1( I )
             SWY2 = SWY2 + WY * Y1( I )
-            SWXXD = SWXXD + WX * X2( I ) 
+            SWXXD = SWXXD + WX * X2( I )
             SWXYD = SWXYD + WX * Y2( I )
             SWYXD = SWYXD + WY * X2( I )
             SWYYD = SWYYD + WY * Y2( I )
@@ -235,10 +240,10 @@
 *  equation.
 *          (  cos  sin )
 *          ( -sin  cos )
-*  and 
+*  and
 *          tan = sin / cos
 *  together with the reduced normal equations, we derive an angle.
-  
+
          ELSE IF ( IFIT .EQ. 2 ) THEN
 *  Calculate the centroids of each set of positions.
             XD0 = SWXD / SW
@@ -281,12 +286,12 @@
                TR( 6 ) = COS( THETA )
             END IF
 
-*  Shift of origin and magnification.
+*  Shift of origin and magnification. 
 *  ----------------------------------
 *  Normal equations are: (rearranged to look like nxn)
 *           a.n  + b.Sx                     = Sx'
 *           a.Sx + b.Sx**2                  = Sx'.x
-*           a.n            + f.Sy           = Sy'
+*                            f.Sy    + d.n  = Sy'
 *                            f.Sy**2 + d.Sy = Sy'.y
 *
 *  For independent scaling along each axis, no cross terms (c=e=0)
@@ -296,15 +301,16 @@
             A( 1, 2 ) = SWX
             A( 1, 3 ) = 0.0D0
             A( 1, 4 ) = 0.0D0
-      
+
             A( 2, 1 ) = SWX
             A( 2, 2 ) = SWX2
             A( 2, 3 ) = 0.0D0
             A( 2, 4 ) = 0.0D0
-            A( 3, 1 ) = SW
+
+            A( 3, 1 ) = 0.0D0
             A( 3, 2 ) = 0.0D0
             A( 3, 3 ) = SWY
-            A( 3, 4 ) = 0.0D0
+            A( 3, 4 ) = SW
 
             A( 4, 1 ) = 0.0D0
             A( 4, 2 ) = 0.0D0
@@ -319,7 +325,7 @@
 *  Solve linear normal equations.
             ITASK = 1
             IND = NSIG
-            CALL PDA_DGEFS( A, 4, 4, B1, ITASK, IND, WORK, IWORK, 
+            CALL PDA_DGEFS( A, 4, 4, B1, ITASK, IND, WORK, IWORK,
      :                      STATUS )
 
 *  If successful, assign results to transformation coefficients.
@@ -361,7 +367,7 @@
 *  Solve linear normal equations.
             ITASK = 1
             IND = NSIG
-            CALL PDA_DGEFS( A, 4, 4, B1, ITASK, IND, WORK, IWORK, 
+            CALL PDA_DGEFS( A, 4, 4, B1, ITASK, IND, WORK, IWORK,
      :                      STATUS )
 
 *  If successful, assign result to the transformation coefficients.
@@ -405,9 +411,9 @@
 *  Solve linear normal equations.
             ITASK = 1
             IND = NSIG
-            CALL PDA_DGEFS( A, 4, 3, B1, ITASK, IND, WORK, IWORK, 
+            CALL PDA_DGEFS( A, 4, 3, B1, ITASK, IND, WORK, IWORK,
      :                      STATUS )
-            IF ( IND .GT. 0 ) THEN 
+            IF ( IND .GT. 0 ) THEN
                ITASK = 2        ! Solve using existing factorisation of A
                IND = NSIG
                CALL PDA_DGEFS( A, 4, 3, B2, ITASK, IND, WORK, IWORK,
