@@ -298,6 +298,10 @@
 *        Flag as created
             DIDCRE = .TRUE.
 
+*        Not there and not flagged for create - signal error
+          ELSE
+            STATUS=SAI__ERROR
+
           END IF
 
 *    Otherwise bomb
