@@ -84,6 +84,12 @@ itcl::class gaia::GaiaEsp {
 	# Dummy command menu item
 	$File add command -label {Log ESP command} \
 		-command [code $this run 0 1]
+	# Create a new toolbox window
+	$File add command -label {New window} \
+		-command [code $this clone_me_] \
+		-accelerator {Control-n}
+	bind $w_ <Control-n> [code $this clone_me_]
+	add_menu_short_help $File {New window} {Create a new toolbox}
 	# Exit menu item
 	$File add command -label Exit \
 		-command [code $this close] \
@@ -112,8 +118,7 @@ itcl::class gaia::GaiaEsp {
 		-command [code $this reveal_ $thisnum]
 	set pages_($thisnum) objectselection
 	set revealed_($thisnum) 0
-	set notebook_characteristics_(disable,objectselection) \
-		{outndfname nsigma}
+	set notebook_characteristics_(disable,objectselection) {run}
 	set notebook_characteristics_(reqsrc,objectselection) 0
 
 	#  CORR
@@ -121,7 +126,7 @@ itcl::class gaia::GaiaEsp {
 	#	-command [code $this reveal_ 0]
 	#set pages_(0) corr
 	#set revealed_(0) 0
-	#set notebook_characteristics_(disable,corr) {outtextname inardname}
+	##set notebook_characteristics_(disable,corr) {outtextname inardname}
 	#set notebook_characteristics_(reqsrc,corr) 0
 
 	set thisnum [get_panel_number_]
@@ -130,8 +135,9 @@ itcl::class gaia::GaiaEsp {
 		-command [code $this reveal_ $thisnum]
 	set pages_($thisnum) ellprofou
 	set revealed_($thisnum) 0
-	set notebook_characteristics_(disable,ellprofou) \
-		{outndfname nsigma}
+	set notebook_characteristics_(files,ellprofou) \
+		{sourcefile outputtextfile outputstlfile}
+	#set notebook_characteristics_(disable,ellprofou) {outndfname nsigma}
 	set notebook_characteristics_(reqsrc,ellprofou) 1
 
 	#  FASTMED
@@ -181,7 +187,7 @@ itcl::class gaia::GaiaEsp {
 	#set notebook_characteristics_(disable,mask) \
 	#	{outtextname  back nsigma}
 	#set notebook_characteristics_(reqsrc,mask) 0
-	
+
 	#  MIXUP
 	#set thisnum [get_panel_number_]
 	#$itk_component(notebook) add -label Mixup \
@@ -279,26 +285,9 @@ itcl::class gaia::GaiaEsp {
 	#  Button: run ESP
 	itk_component add run {
 	    button $itk_component(actionframe).run -text {Fit} \
-		    -command [code $this run 1 1]
+		    -command [code $this run 1 0]
 	}
 	add_short_help $itk_component(run) {Fit the selected galaxies}
-
-	##  Button: show ESP command
-	#itk_component add dummyrun {
-	#    button $itk_component(actionframe).dummyrun \
-	#	    -text {Command} \
-	#	    -command [code $this run 0]
-	#}
-	#add_short_help $itk_component(dummyrun) {Show ESP command without actually running it}
-
-	##  Button: select objects
-	#itk_component add selobj {
-	#    button $itk_component(actionframe).selobj \
-	#	    -text {Edit source list} \
-	#	    -command [code $this select_objects_]
-	#}
-	#add_short_help $itk_component(selobj) \
-	#	{Select objects for ESP to analyse}
 
 	#  Add a status area for monitoring the output of the program
 	itk_component add status {
@@ -326,7 +315,7 @@ itcl::class gaia::GaiaEsp {
 
 	#  Enable all the common widgets, prior to notebook pages
 	#  selectively disabling these.
-#	disable_common_widgets_ {}
+	disable_common_widgets_ {}
 
 	#  Create the initial, empty, source list
 	set objectlist_ [gaia::GaiaEspSelectList #auto \
@@ -344,10 +333,16 @@ itcl::class gaia::GaiaEsp {
 
     # Destructor
     destructor {
-	puts "GaiaEsp destructor: delete files..."
-	foreach f $temporary_files_ {
-	    puts "file delete $f"
-	}
+       puts "GaiaEsp destructor: delete files..."
+       foreach f $temporary_files_ {
+          catch {file delete $f}
+       }
+       if {$star_app_ != {} } {
+          $star_app_ delete_sometime
+       }
+       if {$hsub_star_app_ != {} } {
+          $hsub_star_app_ delete_sometime
+       }
     }
 
     # Methods
@@ -361,6 +356,7 @@ itcl::class gaia::GaiaEsp {
 
     # Close this window.  Kill it if needed, otherwise withdraw
     public method close {} {
+	delete_canvas_graphics_ [list esp_sel esp_out$w_]
 	if { $itk_option(-really_die) } {
 	    delete object $this
 	} else {
@@ -370,18 +366,22 @@ itcl::class gaia::GaiaEsp {
 
     #  Actually run the command
     public method run {execit showit} {
-	if {$values_($this,sourcefile) == {}} {
-	    set values_($this,sourcefile) [temp_file_name_ "/tmp/GAIA_source"]
-	}
-	if {$values_($this,outputndffile) == {}} {
-	    set values_($this,outputndffile) [temp_file_name_ "/tmp/GaiaEsp_outputndf"]
-	}
-	if {$values_($this,outputtextfile) == {}} {
-	    set values_($this,outputtextfile) [temp_file_name_ "/tmp/GaiaEsp_outputtxt"]
-	}
-	if {$values_($this,outputstlfile) == {}} {
-	    set values_($this,outputstlfile) [temp_file_name_ "/tmp/GaiaEsp_outputstl" ".txt"]
-	}
+	#if {$values_($this,sourcefile) == {}} {
+	#    set values_($this,sourcefile) [temp_file_name_ "/tmp/GAIA_source"]
+	#}
+	#if {$values_($this,outputndffile) == {}} {
+	#    set values_($this,outputndffile) [temp_file_name_ "/tmp/GaiaEsp_outputndf"]
+	#}
+	#if {$values_($this,outputtextfile) == {}} {
+	#    set values_($this,outputtextfile) [temp_file_name_ "/tmp/GaiaEsp_outputtxt"]
+	#}
+	#if {$values_($this,outputstlfile) == {}} {
+	#    set values_($this,outputstlfile) [temp_file_name_ "/tmp/GaiaEsp_outputstl" ".txt"]
+	#}
+
+	# delete the results of any previous run from this toolbox
+	delete_canvas_graphics_ esp_out$w_
+
 	set image [$itk_option(-rtdimage) cget -file]
 	if {$image != {}} {
 	    $namer_ configure -imagename $image
@@ -390,12 +390,45 @@ itcl::class gaia::GaiaEsp {
 
 	set whichpage $pages_([$itk_component(notebook) index select])
 
+	if {[info exists notebook_characteristics_(files,$whichpage)]} {
+	    set fileexists ""
+	    foreach ftype $notebook_characteristics_(files,$whichpage) {
+		set fname $values_($this,$ftype)
+		if {$fname == {}} {
+		    if {$ftype == "outputstlfile"} {
+			set values_($this,$ftype) "GaiaEsp_catalogue.txt"
+		    } else {
+			set values_($this,$ftype) [format "GaiaEsp_%s" $ftype]
+		    }
+		    set fname $values_($this,$ftype)
+		}
+		# Check that none of these output files already exist.
+		if {[file exists $fname]} {
+		    set fileexists [format "%s%s " $fileexists $fname]
+		}
+	    }
+	    if {$fileexists != ""} {
+		set w [DialogWidget $w_.dialog \
+			-text [format "I'll overwrite output files\n%s.\nIs that OK?" $fileexists] \
+			-bitmap warning \
+			-buttons {OK Cancel} \
+			-default 1 \
+			-modal 1]
+		set answer [$w activate]
+		if {$answer == 0} {
+		    eval exec rm $fileexists
+		} else {
+		    return {}
+		}
+	    }
+	}
+
 	set arglist [make_${whichpage}_command_ $image]
 
 	set allok 1
 	if {$arglist == {}} {
 	    set allok 0
-	    # ...but don't put out another error message, since the 
+	    # ...but don't put out another error message, since the
 	    # make_..._command_ should have done that
 	} elseif {$image == {}} {
 	    set allok 0
@@ -408,7 +441,11 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Can't save sources"
 	}
 
-	set disable_chars $notebook_characteristics_(disable,$whichpage)
+	if {[info exists notebook_characteristics_(disable,$whichpage)]} {
+	    set disable_chars $notebook_characteristics_(disable,$whichpage)
+	} else {
+	    set disable_chars {}
+	}
 	if {[lsearch $disable_chars {outndfname}] < 0} {
 	    if {[file exists $values_($this,outputndffile)]} {
 		set allok 0
@@ -480,7 +517,12 @@ itcl::class gaia::GaiaEsp {
 	blt::busy release $w_
 
 	set whichpage $pages_([$itk_component(notebook) index select])
-	set disable_chars $notebook_characteristics_(disable,$whichpage)
+
+	if {[info exists notebook_characteristics_(disable,$whichpage)]} {
+	    set disable_chars $notebook_characteristics_(disable,$whichpage)
+	} else {
+	    set disable_chars {}
+	}
 
 	set s "[string toupper $whichpage] output:\n"
 	if {[lsearch $disable_chars {outndfname}] < 0} {
@@ -489,7 +531,7 @@ itcl::class gaia::GaiaEsp {
 	if {[lsearch $disable_chars {outtextname}] < 0} {
 	    set s "${s}Text output in file $values_($this,outputtextfile)\n"
 	}
-	
+
 	info_dialog $s
     }
 
@@ -528,13 +570,16 @@ itcl::class gaia::GaiaEsp {
 			    $ell_sma 0 image canvd1 canvd2 canvas
 		    set canvsma [expr $canvd1+$canvd2]
 		    set canvpa [expr $ell_pos - 90]
-		    lappend canvas_scrawls_ [$itk_option(-canvas) \
+		    #lappend canvas_scrawls_ [
+		    $itk_option(-canvas) \
 			    create rtd_ellipse \
 			    $canvx $canvy \
 			    -semimajor $canvsma \
 			    -semiminor [expr $canvsma * $ell_invell] \
 			    -angle $canvpa \
-			    -outline white]
+			    -outline white \
+			    -tags esp_out$w_
+		    #]
 		} else {
 		    puts "can't read details of ellipse $elln"
 		}
@@ -572,10 +617,15 @@ itcl::class gaia::GaiaEsp {
 		set child [$itk_component(notebook) childsite $index]
 		eval add_${pagename}_selections_ $child
 	    }
-#	    set disabledset $notebook_characteristics_(disable,$pagename)
-#	    if {$disabledset != {}} {
-#		disable_common_widgets_ $disabledset
-#	    }
+	    if {[info exists notebook_characteristics_(disable,$pagename)]} {
+		set disabledset $notebook_characteristics_(disable,$pagename)
+		if {$disabledset != {}} {
+		    disable_common_widgets_ $disabledset
+		}
+	    } else {
+		# enable everything
+		disable_common_widgets_ {}
+	    }
 	    if {[info exists notebook_characteristics_(sourceconfig,$pagename)]} {
 		eval $objectlist_ configure \
 			$notebook_characteristics_(sourceconfig,$pagename)
@@ -606,11 +656,7 @@ itcl::class gaia::GaiaEsp {
 	$objectlist_ reset
 
 	# Delete any scrawls on the canvas
-	foreach o $canvas_scrawls_ {
-	    $itk_option(-canvas) delete $o
-	}
-	set canvas_scrawls_ {}
-	$itk_option(-canvasdraw) clear
+	delete_canvas_graphics_ esp_out$w_
 
 	if { ! $all } {
 	    #  Get the index of the current page.
@@ -664,7 +710,7 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Need to have BACK and SIGMA specified"
 	    return {}
 	}
-	
+
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/corr"
@@ -763,8 +809,24 @@ itcl::class gaia::GaiaEsp {
 
     private method make_ellprofou_command_ {image} {
 	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 || $values_($this,sigma) <= 0} {
-	    #error_dialog "Need to have BACK and SIGMA specified"
+	if {$values_($this,sigma) <= 0} {
+	    # If Sigma is null, that's an error, because ELLPRO/FOU
+	    # refuse to deal with that.
+	    set w [DialogWidget $w_.dialog \
+		    -text "No background or standard deviation\nspecified.  Should I estimate them?" \
+		    -bitmap warning \
+		    -buttons {OK Cancel} \
+		    -default 1 \
+		    -modal 1]
+	    set answer [$w activate]
+	    if {$answer == 0} {
+		bg_from_hsub_ 1
+	    } else {
+		return {}
+	    }
+	}
+	if {$values_($this,back) <= 0} {
+	    # Zero background is legitimate but worth warning about.
 	    set w [DialogWidget $w_.dialog \
 		    -text "Zero background.  Is that OK?" \
 		    -bitmap warning \
@@ -806,7 +868,7 @@ itcl::class gaia::GaiaEsp {
 	}
 	# Catalogue name (after path, and before ".txt") may contain
 	# only alphanumerics plus underscore.  This isn't obviously documented
-	# anywhere, but can be discovered from an inspection of 
+	# anywhere, but can be discovered from an inspection of
 	# cat1_cnmpr.f in the CAT library.
 	if {! [regexp {^(.*/)?[A-Za-z0-9_]+\.txt$} $ofname]} {
 	    error_dialog "STL catalogue name may include only\nalphanumeric characters plus underscore"
@@ -923,7 +985,7 @@ itcl::class gaia::GaiaEsp {
 		    -variable [scope values_($this,ellprofoumethod)]
 	}
 	foreach {str val} \
-		{"using isophote contours" fou "using intensity analysis" pro "using intensity analysis (slow variant)" proslow} {
+		{"Using isophote contours" fou "Using intensity analysis" pro "Using intensity analysis (slow variant)" proslow} {
 	    $itk_component(method-ellprofou) add -label $str \
 		    -value $val \
 		    -command [code $this toggle_expert_]
@@ -1141,7 +1203,7 @@ itcl::class gaia::GaiaEsp {
 	    error_dialog "Need to have BACK and SIGMA specified"
 	    return {}
 	}
-	
+
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/fastmed"
@@ -1150,7 +1212,7 @@ itcl::class gaia::GaiaEsp {
 	lappend arglist "out=$values_($this,outputndffile)"
 	lappend arglist "back=$values_($this,back)"
 	lappend arglist "sigma=$values_($this,sigma)"
-	lappend arglist "width=$values_($this,width)"	
+	lappend arglist "width=$values_($this,width)"
 
 	return $arglist
     }
@@ -1261,7 +1323,7 @@ itcl::class gaia::GaiaEsp {
 	#}
 	#pack $itk_component(gaufitnotebook) -side top -fill both -expand 1 \
 	#	-ipadx 1m -ipady 1m
-	    
+
 	#  Do we use the least-squares fit or not?
 	#  (it might be better to use radiobuttons for
 	#  least-squares/search)
@@ -1291,7 +1353,7 @@ itcl::class gaia::GaiaEsp {
 	}
 	pack $itk_component(autol-gaufit) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(autol-gaufit) \
-		{Is the source origin provided to be refined?}		    
+		{Is the source origin provided to be refined?}
 
 	itk_component add anginc {
 	    LabelEntryScale $parent.anginc \
@@ -1413,7 +1475,7 @@ itcl::class gaia::GaiaEsp {
 	add_short_help $itk_component(yinc) \
 		{The amount by which the Y-coordinate of a source may vary, from 0 (fixed) to 1 (completely free)}
 
-	
+
 	#  Fit background?
 	#  If not, then also back, sigma, nsigma
 
@@ -1483,7 +1545,7 @@ itcl::class gaia::GaiaEsp {
     }
 
     private method make_gaufit_command_ {image} {
-	# insist that either fitback is true, or else 
+	# insist that either fitback is true, or else
 	# back, sigma and nsigma have values.
 	if {! $values_($this,fitback)
 	&& ($values_($this,back) < 0
@@ -1601,7 +1663,7 @@ itcl::class gaia::GaiaEsp {
 		-wrap 0
 	pack $cs.f1 $cs.f2 -side top -anchor w
 	pack $cs.rb1 $cs.rb2 -side top -anchor w -in $cs.f1 -ipady 1m
-	pack $cs.rb3 $cs.e -side left -in $cs.f2 
+	pack $cs.rb3 $cs.e -side left -in $cs.f2
 	pack $itk_component(sfact-hsub) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(sfact-hsub) \
 		{Type of Gaussian smoothing requested}
@@ -1724,7 +1786,7 @@ documentation which you should refer to for further details"
 		-wrap 0
 	pack $cs.f1 $cs.f2 -side top -anchor w
 	pack $cs.rb1 $cs.rb2 -side top -anchor w -in $cs.f1 -ipady 1m
-	pack $cs.rb3 $cs.e -side left -in $cs.f2 
+	pack $cs.rb3 $cs.e -side left -in $cs.f2
 	pack $itk_component(sfact-loback) -side top -fill x -ipadx 1m -ipady 1m
 	add_short_help $itk_component(sfact-loback) \
 		{Type of Gaussian smoothing requested}
@@ -1858,7 +1920,7 @@ to be specified"
 	lappend arglist "cursor=no"
 	lappend arglist "again=no"
 
-	return $arglist	
+	return $arglist
     }
 
     private method reset_sector_ {} {
@@ -2103,13 +2165,13 @@ to be specified"
     ### SKEW...
     private method make_skew_command_ {image} {
 	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 
+	if {$values_($this,back) <= 0
 		|| $values_($this,sigma) <= 0
     		|| $values_($this,nsigma) <= 0} {
 	    error_dialog "Need to have BACK, SIGMA, NSIGMA specified"
 	    return {}
 	}
-	
+
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/skew"
@@ -2200,13 +2262,13 @@ to be specified"
     ### TOPPED...
     private method make_topped_command_ {image} {
 	# insist that back and sigma be specified, otherwise return ""
-	if {$values_($this,back) <= 0 
+	if {$values_($this,back) <= 0
 		|| $values_($this,sigma) <= 0
     		|| $values_($this,nsigma) <= 0} {
 	    error_dialog "Need to have BACK, SIGMA, NSIGMA specified"
 	    return {}
 	}
-	
+
 	set arglist {}
 
 	lappend arglist "$itk_option(-esp_dir)/topped"
@@ -2490,10 +2552,10 @@ ardfile
 
     # If values_($this,expert) is now `true', then enable a set of
     # fields; if it is now `false',
-    # switch that set off.  The set consists of $expert_parameter_list_ if 
+    # switch that set off.  The set consists of $expert_parameter_list_ if
     # `useellpromethod' is pro or proslow, but if that is false, then
-    # the set consists of 
-    # {$expert_parameter_list_ \ $ellpro_only_}, and the members of 
+    # the set consists of
+    # {$expert_parameter_list_ \ $ellpro_only_}, and the members of
     # $ellpro_only_ should all be disabled.
     private method toggle_expert_ {} {
 	if {$values_($this,expert)} {
@@ -2556,7 +2618,9 @@ ardfile
 	return {}
     }
 
-    private method bg_from_hsub_ {} {
+    # Invoke HSUB to estimate the background.  If wait_for_it is
+    # non-zero, then do not return until the command has completed.
+    private method bg_from_hsub_ {{wait_for_it 0}} {
 	if {$hsub_wfile_ == {}} {
 	    set hsub_wfile_ [temp_file_name_ "/tmp/GaiaEsp-hsubworkfile"]
 	} elseif {[file exists $hsub_wfile_]} {
@@ -2574,18 +2638,24 @@ ardfile
 
 	# Establish a control object for this task, if not already done
 	blt::busy hold $w_
-
-	set hsub_star_app_ [StarApp #auto \
-		-show_output $itk_component(status) \
-		-notify [code $this completed_bg_from_hsub_] \
-		-application $invoke_cmd
-	]
+        if { $hsub_star_app_ == {} } { 
+           set hsub_star_app_ [StarApp #auto \
+                                  -show_output $itk_component(status) \
+                                  -notify [code $this completed_bg_from_hsub_] \
+                                  -application $invoke_cmd
+                              ]
+        }
 
 	# Clear the log window
 	$itk_component(status) clear 0 end
 
-	# RUN ESP!!!
+	# Run HSUB
 	$hsub_star_app_ runwiths $invoke_args
+
+	if {$wait_for_it} {
+	    set hsub_semaphore_ 1
+	    tkwait variable [scope hsub_semaphore_]
+	}
     }
 
     private method completed_bg_from_hsub_ {} {
@@ -2613,6 +2683,9 @@ ardfile
 	} else {
 	    error_dialog "Couldn't find HSUB temporary file"
 	}
+
+	# method bg_from_hsub_ may be tkwait-ing on this variable
+	set hsub_semaphore_ 0
     }
 
     # Add a subset of the list of `common' widgets.
@@ -2630,7 +2703,7 @@ ardfile
 	    add_short_help $itk_component(inardname-$toolname) \
 		    {Name of input ARD file}
 	}
-	    
+
 	if {[lsearch $panellist outndfname] >= 0} {
 	    itk_component add outndfname-$toolname {
 		LabelFileChooser $parent.outndfname \
@@ -2643,7 +2716,7 @@ ardfile
 	    add_short_help $itk_component(outndfname-$toolname) \
 		    {Name of output NDF file}
 	}
-	    
+
 	if {[lsearch $panellist outtextname] >= 0} {
 	    itk_component add outtextname-$toolname {
 		LabelFileChooser $parent.outtextname \
@@ -2711,19 +2784,19 @@ ardfile
 	}
     }
 
-#      # Disable a subset of the common widgets.  Argument is a list of elements
-#      # in common_widgets_ which are to be disabled; others are enabled.
-#      # disable_common_widgets_{} enables all,
-#      # disable_common_widgets_{$common_widgets_} disables all.
-#      private method disable_common_widgets_ {subset} {
-#  	foreach w $common_widgets_ {
-#  	    if {[lsearch $subset $w] >= 0} {
-#  		$itk_component($w) configure -state disabled
-#  	    } else {
-#  		$itk_component($w) configure -state normal
-#  	    }
-#  	}
-#      }
+      # Disable a subset of the common widgets.  Argument is a list of elements
+      # in common_widgets_ which are to be disabled; others are enabled.
+      # disable_common_widgets_{} enables all,
+      # disable_common_widgets_{$common_widgets_} disables all.
+      private method disable_common_widgets_ {subset} {
+  	foreach w $common_widgets_ {
+  	    if {[lsearch $subset $w] >= 0} {
+  		$itk_component($w) configure -state disabled
+  	    } else {
+  		$itk_component($w) configure -state normal
+  	    }
+  	}
+      }
 
     private method get_panel_number_ {} {
 	if {$int_panel_number_ < 0} {
@@ -2732,6 +2805,12 @@ ardfile
 	    incr int_panel_number_
 	}
 	return $int_panel_number_
+    }
+
+    private method delete_canvas_graphics_ {taglist} {
+	foreach t $taglist {
+	    $itk_option(-canvas) delete $t
+	}
     }
 
 
@@ -2745,7 +2824,7 @@ ardfile
 
     #  Name of rtdimage widget
     itk_option define -rtdimage rtdimage RtdImage {} {}
-    
+
     #  Name of RtdImageCtrl widget or a derived class.
     itk_option define -image image Image {} {}
 
@@ -2796,6 +2875,7 @@ ardfile
 
     #  The interaction with the actual application
     private variable star_app_ {}
+    private variable hsub_star_app_ {}
     #  The command the star_app_ was invoked with, if any
     private variable star_app_name_ {}
 
@@ -2818,8 +2898,19 @@ ardfile
     # Files to be deleted within destructor
     private variable temporary_files_ {}
 
-    # list of objects created on the canvas
-    private variable canvas_scrawls_ {}
+    # semaphore for bg_from_hsub_
+    private variable hsub_semaphore_ {}
+
+    #  notebook_characteristics_ is a hash in which we store various
+    #  characteristics of the different ESP applications, keyed on
+    #  the string `characteristic,application'.  Characteristics are
+    #  `files' and `reqsrc'.  The `files' characteristic contains a
+    #  list of file type names which the `run' function checks have
+    #  names -- for each entry, c, in this list, it checks that
+    #  $values_($this,$c) has a value.  The `reqsrc' characteristic is
+    #  a boolean: if true, then the objectlist_ is checked to be
+    #  non-empty when `run' is called.
+    private common notebook_characteristics_
 
     #  -- Common variables (shared by all instances)
 
@@ -2828,8 +2919,5 @@ ardfile
 
     #  Widgets which are in the main panel are as follows
     common common_widgets_ \
-	    {inardname outndfname outtextname outstlname nsigma \
-	    run close resetpage resetall}
-
-    private common notebook_characteristics_
+	    {run close resetpage resetall}
 }

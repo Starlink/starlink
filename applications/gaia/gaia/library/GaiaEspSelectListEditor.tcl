@@ -215,11 +215,15 @@ body gaia::GaiaEspSelectListEditor::remake_table_ {} {
 
 # Delete a source from the canvas, the table, and the object_list_
 # The elements in the table are in the same order as the elements in 
-# object_list_ (maintained so by update_source_)
+# object_list_ (maintained so by update_source_).
+# Could also delete object when they are selected on the canvas, using
+# [$canvasdraw selected_items], but this seems less good, since
+# they're less obviously selected, and so are more likely to be
+# deleted accidentally.
 body gaia::GaiaEspSelectListEditor::delete_source {} {
     set dlist [$itk_component(objlist) get_selected_with_rownum]
     if {[llength $dlist] == 0} {
-	error_dialog "Select a source first"
+	error_dialog "Select a source in the source list first"
     } else {
 	# go through the list is descending order, so we remove items from
 	# object_list_ from the end

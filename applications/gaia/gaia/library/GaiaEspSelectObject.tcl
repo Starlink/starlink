@@ -150,6 +150,7 @@ body gaia::GaiaEspSelectObject::created_circle_ {id args} {
     # desirable).
     update idletasks
     $canvasdraw deselect_object $canvas_id_
+    $canvas addtag esp_sel withtag $canvas_id_
 
     if { $creation_callback_ != {} } {
 	eval $creation_callback_
