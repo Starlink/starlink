@@ -3936,6 +3936,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    double equ;         /* Epoch of reference equinox */
    double fd;          /* Fraction of a day */
    double latval;      /* CRVAL for latitude axis */
+   double lonpole;     /* LONPOLE value */
    double lonval;      /* CRVAL for longitude axis */
    double mjd99;       /* MJD at start of 1999 */
    double p1, p2;      /* Projection parameters */
@@ -4049,18 +4050,12 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
          ok = ( p1 == 0.0 && p2 == 0.0 );
       }
 
+
 /* Identify the celestial coordinate system from the first 4 characters of the
    longitude CTYPE value. Only RA and galactic longitude can be stored using 
    FITS-CLASS. */
       if( ok && strncmp( lontype, "RA--", 4 ) &&
                strncmp( lontype, "GLON", 4 ) ) ok = 0;
-
-/* If the physical Frame requires a LONPOLE or LATPOLE keyword, it cannot
-   be encoded using FITS-CLASS. */
-      if( GetItem( &(store->latpole), 0, 0, s, NULL, method, class )
-          != AST__BAD || 
-          GetItem( &(store->lonpole), 0, 0, s, NULL, method, class )
-          != AST__BAD ) ok = 0;
 
 /* Get the CTYPE values for the spectral axis, and find the CLASS equivalent, 
    if possible. */
@@ -4168,10 +4163,12 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 /* Check that there is no rotation, and extract the CDELT (diagonal) terms, 
    etc. If the spatial axes are degenerate (i.e. cover only a single pixel)
    then ignore any rotation. */
-   if( !GetValue( this, "NAXIS2", AST__INT, &naxis2, 0, 0, method, class ) ) {
+   if( !GetValue( this, FormatKey( "NAXIS", axlon + 1, -1, s ), AST__INT, 
+                  &naxis2, 0, 0, method, class ) ) {
       naxis2 = 0;
    }
-   if( !GetValue( this, "NAXIS3", AST__INT, &naxis3, 0, 0, method, class ) ) {
+   if( !GetValue( this, FormatKey( "NAXIS", axlat + 1, -1, s ), AST__INT, 
+                  &naxis3, 0, 0, method, class ) ) {
       naxis3 = 0;
    }
 
@@ -4232,6 +4229,18 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
       rf = GetItem( &(store->restfrq), 0, 0, s, NULL, method, class );
       if( rf == AST__BAD ) ok = 0;
 
+   }
+
+
+/* If the spatial Frame covers more than a single Frame and requires a LONPOLE 
+   or LATPOLE keyword, it cannot be encoded using FITS-CLASS. However since 
+   FITS-CLASS imposes a no rotation restriction, it can tolerate lonpole 
+   values of +/- 180 degrees. */
+   if( ok && ( naxis2 != 1 || naxis3 != 1 ) ) {
+      lonpole =  GetItem( &(store->latpole), 0, 0, s, NULL, method, class );
+      if( lonpole != AST__BAD && lonpole != -180.0 && lonpole == 180 ) ok = 0;
+      if( GetItem( &(store->latpole), 0, 0, s, NULL, method, class )
+          != AST__BAD ) ok = 0;
    }
 
 /* Only create the keywords if the FitsStore conforms to the requirements
