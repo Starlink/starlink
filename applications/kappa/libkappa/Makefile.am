@@ -26,5 +26,6 @@ F_ROUTINES = $(F1_ROUTINES) $(F2_ROUTINES) $(F3_ROUTINES)
 kapmon.hlp: $(F_ROUTINES)
 	cat $(F_ROUTINES) > all.f
 	-rm -f kapmon.hlp
+	PATH=$(PATH):$(STARLINK)/bin/sst; \
 	@PROHLP@ in=all.f out=kapmon.hlp single=no
 	-rm all.f
