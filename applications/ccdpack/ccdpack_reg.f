@@ -38,6 +38,8 @@
 *        Added new task WCSEDIT.
 *     21-SEP-1999 (MBT):
 *        Added new task DRIZZLE.
+*     22-DEC-2000 (MBT):
+*        Added new task OUTLINE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +100,9 @@
 
       ELSE IF ( ACTION.EQ. 'MAKEMOS' ) THEN
          CALL MAKEMOS( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'OUTLINE' ) THEN
+         CALL OUTLINE( STATUS )
 
       ELSE IF ( ACTION.EQ. 'PAIRNDF' ) THEN
          CALL PAIRNDF( STATUS )
