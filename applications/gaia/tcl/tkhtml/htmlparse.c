@@ -1168,12 +1168,12 @@ void HtmlPrintList(HtmlElement *p, HtmlElement *pEnd){
         n = 1;
         z = "";
       }
-      printf("Block 0x%08x flags=%02x cnt=%d x=%d..%d y=%d..%d z=\"%.*s\"\n",
-        (int)p, p->base.flags, p->base.count, p->block.left, p->block.right,
+      printf("Block %p flags=%02x cnt=%d x=%d..%d y=%d..%d z=\"%.*s\"\n",
+        (void*)p, p->base.flags, p->base.count, p->block.left, p->block.right,
         p->block.top, p->block.bottom, n, z);
     }else{
-      printf("Token 0x%08x font=%2d color=%2d align=%d flags=0x%04x name=%s\n",
-        (int)p, p->base.style.font, p->base.style.color,
+      printf("Token %p font=%2d color=%2d align=%d flags=0x%04x name=%s\n",
+        (void*)p, p->base.style.font, p->base.style.color,
         p->base.style.align, p->base.style.flags, HtmlTokenName(p));
     }
     p = p->pNext;
