@@ -1769,6 +1769,8 @@ D          WRITE(1,*)HEAD.OFFAX
 *    Local constants :
       INTEGER NQEMAX
       PARAMETER (NQEMAX=25)
+      REAL OFFMAX
+      PARAMETER (OFFMAX=22)
 *    Local variables :
       CHARACTER*132 QEFILE
       CHARACTER*(DAT__SZLOC) QLOC
@@ -1830,10 +1832,10 @@ D          WRITE(1,*)HEAD.OFFAX
             QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
      :                                          (FACTOR(I)-FACTOR(I-1))
           ELSE
-            QE=FACTOR(NQE)
-c            QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
-c     :                           (FACTOR(NQE-1)-FACTOR(NQE))/
-c     :                              (ANGLE(NQE)-ANGLE(NQE-1))
+            OFFAX=MAX(OFFAX,OFFMAX)		! limit extrapolation
+            QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
+     :                           (FACTOR(NQE-1)-FACTOR(NQE))/
+     :                              (ANGLE(NQE)-ANGLE(NQE-1))
 
           ENDIF
 *
@@ -3481,11 +3483,14 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
 *    Local constants :
       INTEGER NQEMAX
       PARAMETER (NQEMAX=25)
+      REAL OFFMAX
+      PARAMETER (OFFMAX=22.0)
 *    Functions :
       INTEGER CHR_LEN
 *    Local variables :
       CHARACTER*132 QEFILE
       CHARACTER*(DAT__SZLOC) QLOC
+      REAL OFF
       INTEGER NQE
       INTEGER L
       INTEGER I
@@ -3509,21 +3514,17 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
         GOTO 999
       ENDIF
 
-	print *,offax
 
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
       VIG=1.0 - 1.49E-3*OFFAX -3.07E-4*OFFAX**2
-	print *,vig
 
 *    Get quantum efficiency factor
       IF (OFFAX.LE.ANGLE(1)) THEN
-	print *,'A'
 
         QE=FACTOR(1)
       ELSEIF (OFFAX.LT.ANGLE(NQE)) THEN
-	print *,'B'
         I=1
         DO WHILE (OFFAX.GT.ANGLE(I))
           I=I+1
@@ -3531,9 +3532,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
         QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
      :                                          (FACTOR(I)-FACTOR(I-1))
       ELSE
-	print *,'C',nqe
-
-        QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
+        OFF=MAX(OFFAX,OFFMAX)			! limit extrapolation
+        QE=FACTOR(NQE)-(OFF-ANGLE(NQE))*
      :                           (FACTOR(NQE-1)-FACTOR(NQE))/
      :                              (ANGLE(NQE)-ANGLE(NQE-1))
 
@@ -3542,7 +3542,6 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       VCORR=1.0/(VIG*QE)
       VSING=VCORR
 
-	print *,vsing
 
  999  CONTINUE
 
