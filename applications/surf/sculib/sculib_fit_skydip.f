@@ -1,6 +1,7 @@
-      SUBROUTINE SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, J_MEASURED,
-     :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
-     :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
+      SUBROUTINE SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, 
+     :     J_MEASURED, J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, 
+     :     SUB_FILTER, T_TEL, T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, 
+     :     B_FIT, TAUZ_FIT, STATUS)
 *+
 *  Name:
 *     SCULIB_FIT_SKYDIP
@@ -12,7 +13,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, J_MEASURED,
+*     CALL SCULIB_FIT_SKYDIP (CVAR, N_MEASUREMENTS, AIRMASS, J_MEASURED,
 *    :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
 *    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
 
@@ -61,6 +62,10 @@
 *
 
 *  Arguments:
+*     CVAR                      = LOGICAL (Given)
+*              flag to govern whether to use a fixed variance (true)
+*              or the actual variance. The fixed variance is the mean
+*              of the actual variances.
 *     N_MEASUREMENTS            = INTEGER (Given)
 *              the number of SKYDIP measurements
 *     AIRMASS (N_MEASUREMENTS)  = REAL (Given)
@@ -110,6 +115,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.10  1998/01/07 00:28:40  timj
+*     Use the CVAR variable to govern whether or not a constant variance is used.
+*
 *     Revision 1.9  1998/01/06 01:55:39  timj
 *     Use constant (mean) variance for all points for fit.
 *
@@ -141,6 +149,7 @@
 
 
 *  Arguments Given:
+      LOGICAL CVAR
       INTEGER N_MEASUREMENTS
       REAL    AIRMASS (N_MEASUREMENTS)
       REAL    J_MEASURED (N_MEASUREMENTS)
@@ -242,26 +251,31 @@
       J_TEL = SCULIB_JNU (NU, T_TEL, STATUS)
       J_AMB = SCULIB_JNU (NU, T_AMB, STATUS)
 
-*     Calculate the mean of the input VARIANCE
+*     Calculate the mean of the input VARIANCE if CVAR is true.
 *     Try to take care of negative variances (ignore them) and
 *     bad values.
 
-      SUM = 0.0D0
-      COUNT = 0
+      MEAN_VAR = MIN_VAR
+      IF (CVAR) THEN
 
-      DO I = 1, N_MEASUREMENTS
-         IF (J_VARIANCE(I) .NE. VAL__BADR .AND. 
-     :        J_VARIANCE(I) .GE. 0.0D0) THEN
-            SUM = SUM + DBLE(J_VARIANCE(I))
-            COUNT = COUNT + 1
-         END IF
-      END DO
+         SUM = 0.0D0
+         COUNT = 0
+
+         DO I = 1, N_MEASUREMENTS
+            IF (J_VARIANCE(I) .NE. VAL__BADR .AND. 
+     :           J_VARIANCE(I) .GE. 0.0D0) THEN
+               SUM = SUM + DBLE(J_VARIANCE(I))
+               COUNT = COUNT + 1
+            END IF
+         END DO
 
 *     Calculate the MEAN
-      IF (COUNT .GT. 0) THEN
-         MEAN_VAR = SUM / DBLE(COUNT)
-      ELSE
-         MEAN_VAR = MIN_VAR   ! No good data anyway
+         IF (COUNT .GT. 0) THEN
+            MEAN_VAR = SUM / DBLE(COUNT)
+         ELSE
+            MEAN_VAR = MIN_VAR  ! No good data anyway
+         END IF
+
       END IF
 
 * Put data into common
@@ -273,8 +287,14 @@
       DO I = 1, N_MEASUREMENTS
          C_AIRMASS (I) = DBLE (AIRMASS(I))
          C_J_MEASURED (I) = DBLE (J_MEASURED(I))
-         C_J_VARIANCE (I) = MAX (MEAN_VAR, MIN_VAR)
          C_J_QUALITY (I) = 0
+
+         IF (CVAR) THEN
+            C_J_VARIANCE (I) = MAX (MEAN_VAR, MIN_VAR)
+         ELSE
+            C_J_VARIANCE (I) = DBLE(MAX (J_VARIANCE(I), SNGL(MIN_VAR)))
+         END IF
+
       END DO
 
 *     Work out the number of degrees of freedom
