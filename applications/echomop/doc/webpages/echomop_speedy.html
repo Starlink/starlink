@@ -1,29 +1,28 @@
-<HTML>
-<HEAD>
-<TITLE>
-EDR: ECHOMOP on OSF/1 Systems
-</TITLE>
-</HEAD>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<!-- $Id$ -->
 
-<BODY>
+<title>EDR: ECHOMOP on OSF/1 Systems</title>
+
 <HR>
 <H1>ECHOMOP on OSF/1 Systems</H1>
 <HR>
 
-It has recently become possible to implement the Starlink NDF/HDS system file
+<blockquote>This is a note Martin wrote about speeding up ECHOMOP on
+OSF/1 systems</blockquote>
+
+<p>It has recently become possible to implement the Starlink NDF/HDS
+system file
 mapping features under OSF/1.  A new version of echomop will be released in
 1995/Q4 which will be linked to use the new HDS.  This should give significant
 performance gains under OSF/1, typically echomop reduction operations 1 to 8
 are completed in one fifth of the time.  The overall loading of your machine
 will also be reduced.
-<P>
 
-It is possible to implement a ramdisk (as described recently in a Starlink
+<p>It is possible to implement a ramdisk (as described recently in a Starlink
 newsgroup) to achieve a further improvement in reduction speed.  My own tests
 gave the following results:
-<P>
 
-Machine: zuaxp0, DEC Alpha 2000/300, OSF/1 v3.2.<BR>
+<p>Machine: zuaxp0, DEC Alpha 2000/300, OSF/1 v3.2.<BR>
 Data: UCLES, 1024x512 pixel CCD images.<BR>
 NDisk = data on remote nfs disk.<BR>
 LDisk = data on local disk.<BR>
@@ -38,21 +37,18 @@ Map/Ldisk        43      6     3:35     22
 Map/RDisk        42     10     2:03     41
 </PRE>
 
-You can see that the mapping-HDS/ramdisk combination is about ten times faster
+<p>You can see that the mapping-HDS/ramdisk combination is about ten times faster
 than a "normal" reduction.  Allowing for to-from ramdisk copying (~30s), a
 factor eight recuction in elapsed time is still possible.
-<P>
 
-Generally it's a good idea to run echomop on <B>the same machine</B> as the
+<p>Generally it's a good idea to run echomop on <B>the same machine</B> as the
 disk which is storing the data.  You can expect to save about 12% on elasped
 time by this means.
-<P>
 
-My newsgroup posting on echelle reduction and ramdisks is
+<p>Martin Clay newsgroup posting on echelle reduction and ramdisks is
 <A HREF="ramdisk.html">here</A>.
-<P>
 
-<A HREF="echelle.html">Go back</A> to the EDR home page.
+<A HREF="index.html">Go back</A> to the EDR home page.
 <P>
 
 <ADDRESS>
