@@ -1,4 +1,4 @@
-      SUBROUTINE TCI_MERGE( NMER, MERID, OUTID, IBASE, TOFFS, STATUS )
+      SUBROUTINE TCI_MERGE( NMER, MERID, OUTID, TBASE, TOFFS, STATUS )
 *+
 *  Name:
 *     TCI_MERGE
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL TCI_MERGE( NMER, MERID, OUTID, IBASE, TOFFS, STATUS )
+*     CALL TCI_MERGE( NMER, MERID, OUTID, TBASE, TOFFS, STATUS )
 
 *  Description:
 *     Merging timing description consists of the following steps,
@@ -28,7 +28,7 @@
 *        ADI identifiers of the timing structures to merge
 *     OUTID = INTEGER (returned)
 *        ADI identifier of the timing structure to merge into
-*     IBASE = INTEGER (returned)
+*     TBASE = INTEGER (returned)
 *        Number of input which formed reference time
 *     TOFFS[] = DOUBLE PRECISION (returned)
 *        The timing offset of each input wrt the new timing origin (secs)
@@ -95,12 +95,13 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'
 
 *  Arguments Given:
       INTEGER			NMER, MERID(*)
 
 *  Arguments Returned:
-      INTEGER			IBASE, OUTID
+      INTEGER			TBASE, OUTID
       DOUBLE PRECISION		TOFFS(*)
 
 *  Status:
@@ -122,9 +123,10 @@
 
       INTEGER			I			! Loop over datasets
       INTEGER			ILEN			! Input live time len
-      INTEGER			INPTR, IFPTR, IDPTR	! Input live time data
+      INTEGER			IONPTR, IOFPTR, IDPTR	! Input live time data
       INTEGER			IMJD			! Index of earliest MJD
       INTEGER			ITAI			! Index of earliest TAI
+      INTEGER			IVAL			! Value from input
       INTEGER			NLSLOT			! Max # o/p live slots
       INTEGER			ONPTR, OFPTR, ODPTR	! Live time workspace
       INTEGER			ONLSLOT			! Actual # o/p live slots
@@ -222,7 +224,7 @@
         ELSE
           MERLIV = .FALSE.
         END IF
-        CALL ADI_THERE( MERID(I), 'LiveDur', DUR, STATUS )
+        CALL ADI_THERE( MERID(I), 'LiveDur', OK, STATUS )
         IF ( .NOT. OK ) THEN
           MERDUR = .FALSE.
         END IF
@@ -258,7 +260,7 @@
         END IF
 
 *    Calculate timing offsets
-        IBASE = ITAI
+        TBASE = ITAI
         BASE_TAI = TAI
         DO I = 1, NMER
 
@@ -329,7 +331,7 @@
 
             CALL ADI_CMAPD( MERID(I), 'LiveDur', 'READ', IDPTR, STATUS )
 
-            IF ( IFILE .EQ. 1 ) THEN
+            IF ( I .EQ. 1 ) THEN
               IF ( TCI_MERGE_BADLIVE( %VAL(IONPTR), %VAL(IOFPTR),
      :                                      %VAL(IDPTR) ) ) THEN
                 BADLIVE = .TRUE.
@@ -363,11 +365,12 @@
 *    Sort live time components into increasing order of the ON times
 *    and subtract off the BASE_TAI of the output dataset
         IF ( BADLIVE ) THEN
-          CALL TCI_MERGE_SORT( INLIVE, MERDUR, %VAL(ONPTR), %VAL(OFPTR),
+          CALL TCI_MERGE_SORT( NLSLOT, MERDUR, %VAL(ONPTR), %VAL(OFPTR),
      :                           %VAL(ODPTR), 0.0D0, ONLSLOT, STATUS )
         ELSE
-          CALL TCI_MERGE_SORT( INLIVE, MERDUR, %VAL(ONPTR), %VAL(OFPTR),
-     :                 %VAL(ODPTR), BASE_TAI(TBASE), ONLSLOT, STATUS )
+          CALL TCI_MERGE_SORT( NLSLOT, MERDUR, %VAL(ONPTR), %VAL(OFPTR),
+     :                 %VAL(ODPTR), BASE_TAI + TOFFS(TBASE), ONLSLOT,
+     :                 STATUS )
         END IF
 
 *    Write output live times
