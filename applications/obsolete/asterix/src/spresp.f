@@ -430,18 +430,21 @@
       END IF
 
 *  Copy energy axis if present
-      IF ( E_AX .GT. 0 ) THEN
+      IF ( (E_AX.GT.0) .AND. (ONEBIN .EQ. IDIMS(E_AX)) ) THEN
+        CALL BDI_AXCOPY( IFID, E_AX, ' ', OFID, E_AX, STATUS )
+      ELSE IF ( E_AX .GT. 0 ) THEN
         CALL BDI_AXPUT0C( BIID, NDIM, 'Label', EAXLAB, STATUS )
         CALL BDI_AXCOPY( IFID, E_AX, 'Units', BIID, NDIM, STATUS )
         SPARR(1) = EBASE
         SPARR(2) = ESCALE
+        CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
       ELSE
         CALL BDI_AXPUT0C( BIID, NDIM, 'Label', 'Energy bin number',
      :                    STATUS )
         SPARR(1) = 1.0
         SPARR(2) = 1.0
+        CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
       END IF
-      CALL BDI_AXPUT1R( BIID, NDIM, 'SpacedData', 2, SPARR, STATUS )
 
 *  Map space for expanded spatial response structure
       CALL DYN_MAPR( NDIM, DIMS, SP_PTR, STATUS )
