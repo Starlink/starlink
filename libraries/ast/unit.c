@@ -4463,6 +4463,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    match since one depends on the current basic unit and the other does 
    not. Free any test tree from previous passes and break out of the loop. */
             } else if( outtemp->con != AST__BAD || intemp->con != AST__BAD ) {
+               intemp = FreeTree( intemp );
+               outtemp = FreeTree( outtemp );
                testtree = FreeTree( testtree );
                break;
 
