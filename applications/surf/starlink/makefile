@@ -290,6 +290,9 @@
 #        and perform substitution of STAR_BIN for /star/bin
 #        so that the ndfperl binary can be located even
 #        on systems that dont put it in /star/bin.
+#      15-Nov-1998 (TIMJ)
+#        Prepare for release v1.3beta
+#        Add REDUCE_NOISE
 #     {enter_further_changes_here}
 #
 #  Bugs:
