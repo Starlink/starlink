@@ -56,8 +56,8 @@ use FileHandle;
               check_obsdata_kwd check_kwd_list run_command_pipe);
 
 @EXPORT_OK = (@EXPORT,
-	      'deg2sex',
-	      'sex2deg',
+	      'dec2sex',
+	      'sex2dec',
 	      'ymd2je',
 	      'ymd2jd',
 	      'jd2je',
@@ -84,8 +84,8 @@ sub match_positions ($\%\%\%$);
 sub match_positions_findoff ($$$$$);
 sub generate_astrom ($);
 sub run_astrom ($$);
-sub deg2sex ($$;$);
-sub sex2deg ($$);
+sub dec2sex ($$;$);
+sub sex2dec ($$);
 sub ymd2je ($$$);
 sub ymd2jd ($$$);
 sub jd2je ($);
@@ -547,7 +547,10 @@ sub extract_objects ($$$$) {
 #    - {astromtime}, {astromobs}, {astrommet}, {astromcol}: suitable
 #    entries for the corresponding ASTROM observation data, if it's
 #    possible to work out suitable values from the NDF.  The entries
-#    {astromtimecomment} (etc.) give further details.
+#    {astromtimecomment} (etc.) give further details.  The formats of
+#    the entries are documented in the ASTROM manual; note that this
+#    module relies on a version of ASTROM which accepts Julian epoch
+#    as a valid TIME value.
 #
 # If there are problems getting some components of the NDF, then this
 # may return with those components undefined.  On a bad error, return
@@ -670,21 +673,14 @@ sub ndf_info ($$$$) {
         $obstime =~ s/[^-0-9.]/ /;
         $returnhash{astromtime} = $obstime;
         $returnhash{astromtimecomment} = "command-line time";
-   } elsif (defined($ndfdates->{fje})) {
+    } elsif (defined($ndfdates->{fje})) {
         $returnhash{astromtime} = $ndfdates->{fje};
-       $returnhash{astromtimecomment} = "FITS JE";
-   # PWD: what was nst? Never defined.
-   # } elsif (defined($ndfdates->{nst})) {
-   #     my @sthms = split (/[^0-9]+/,$ndfdates->{nst});
-   #     $returnhash{astromtime} = sprintf ("%d %f",
-   #                                        $sthms[0],
-   #                                        $sthms[1]+($sthms[2]/60));
-   #     $returnhash{astromtimecomment} = "NDF Sidereal time";
+        $returnhash{astromtimecomment} = "FITS JE";
     } elsif (defined($ndfdates->{fst})) {
-        my @sthms = split (/[^0-9^\.]+/,$ndfdates->{fst});
-        $returnhash{astromtime} = sprintf ("%d %f",
-                                           $sthms[0],
-                                           $sthms[1]+($sthms[2]/60));
+        # This is a sidereal time in sexagesimal format
+        my $fst = sex2dec($ndfdates->{fst}, 'time');
+        my $hrs = int($fst);
+        $returnhash{astromtime} = sprintf("%f %f", $hrs, $fst-$hrs);
         $returnhash{astromtimecomment} = "FITS ST";
     } elsif (defined($ndfdates->{nje})) {
         # Epoch is a valid Time record in our custom ASTROM, but not
@@ -698,8 +694,9 @@ sub ndf_info ($$$$) {
         # culmination, so that we can set the ST to be the
         # plate-centre RA.  We don't have ready access to the
         # WCS information in the NDF, else we could use that.
-        my @cmdra = split (/[^0-9^\.]+/, $obsdata->{ra});
-        $returnhash{astromtime} = "$cmdra[0] $cmdra[1]";
+        my $cmdst = sex2dec($obsdata->{ra},'time'); # NB, use RA as a _time_
+        my $hrs = int($cmdst);
+        $returnhash{astromtime} = sprintf("%f %f", $hrs, $cmdst-$hrs);
         $returnhash{astromtimecomment} = "command-line RA";
     } elsif (defined($fitshash{CRVAL1})) {
 	# Take it from the FITS extension
@@ -876,8 +873,8 @@ sub ndf_info ($$$$) {
 # ndf_find), try to extract an observation date from it, or any FITS
 # file included within it.  Return a hash containing as many as
 # possible of the fields njd, fjd (julian date from NDF or FITS
-# component), nje, fje (decimal date -- years AD, from NDF or FITS),
-# today (decimal date), nst, fst (sidereal time of obs,
+# component), nje, fje (Julian epoch, decimal date -- years AD, from NDF or FITS),
+# today (decimal date), fst (sidereal time of obs, from FITS file,
 # hh:mm:ss.frac).
 sub get_dates ($$$) {
     my ($indf, $helpers, $fitshash) = @_;
@@ -1032,12 +1029,12 @@ sub get_catalogue ($\%$$) {
                $cat->resultnrows());
     my $convref = $cat->astconvert($llx, $lly, 1);
     $sourcestring .= sprintf (": sky (%s,%s)",
-                              deg2sex($convref->[0],0,':'),
-                              deg2sex($convref->[1],1,':'));
+                              dec2sex($convref->[0],'ra',':'),
+                              dec2sex($convref->[1],'dec',':'));
     $convref = $cat->astconvert($urx, $ury, 1);
     $sourcestring .= sprintf ("..(%s,%s)",
-                              deg2sex($convref->[0],0,':'),
-                              deg2sex($convref->[1],1,':'));
+                              dec2sex($convref->[0],'ra',':'),
+                              dec2sex($convref->[1],'dec',':'));
     print STDERR "$sourcestring\n" if $verbose;
 
     # Now write the catalogue out to a file which can be used as input
@@ -1655,12 +1652,12 @@ sub generate_astrom ($) {
 	    printf STDERR
               ("Plate centre: offset (%.2f,%.2f)px: now (%.1f,%.1f)px at (%s,%s)\n",
                $xoffset, $yoffset, $pcx, $pcy,
-               deg2sex($projpole[0],0,':'),
-               deg2sex($projpole[1],1,':'))
+               dec2sex($projpole[0],'ra',':'),
+               dec2sex($projpole[1],'dec',':'))
                 if $verbose;
 	}
-	$projpolesex[0] = deg2sex ($projpole[0], 0);
-        $projpolesex[1] = deg2sex ($projpole[1], 1);
+	$projpolesex[0] = dec2sex ($projpole[0], 0);
+        $projpolesex[1] = dec2sex ($projpole[1], 1);
     }
 
     # Write the ASTROM plate centre line
@@ -1692,8 +1689,8 @@ sub generate_astrom ($) {
 
     for ($i=0; $i<=$#CATarray; $i++) {
 	printf ASTROMOUT ("%s   %s  0.0  0.0  J2000\t* %d/%d\n",
-			  deg2sex($CATarray[$i]->{ra},  0),
-			  deg2sex($CATarray[$i]->{dec}, 1),
+			  dec2sex($CATarray[$i]->{ra},'ra'),
+			  dec2sex($CATarray[$i]->{dec},'dec'),
 			  $CCDarray[$i]->{id},
 			  $CATarray[$i]->{id});
 	printf ASTROMOUT ("%12f   %12f\n",
@@ -1811,33 +1808,35 @@ sub run_astrom ($$) {
 
 
 
-# Convert decimal degrees to sexagesimal.
+# Convert decimal degrees/times to sexagesimal.
 #
 # Args:
-#     $val  = angle in decimal degrees
-#     $isdec = if true (1), angle is a Dec (return DMS);
-#                  if false (0), it's an RA (return HMS)
-#     $sep  = if present, use this as separator (default ' ')
+#    $val = angle in decimal degrees
+#
+#    $type = 'ra', this is an RA in degrees, return HMS; 'dec', this is a
+#    Dec, return DMS; 'time', this is a time in hours, return HMS.
+#
+#    $sep = if present, use this as separator (default ' ')
 #
 # Return a string with two-digit (leading-zero) minutes and seconds,
 # and three-digit fraction.
 #
 # Return undef on range errors.
-sub deg2sex ($$;$) {
-    my ($val, $isdec, $sep) = @_;
+sub dec2sex ($$;$) {
+    my ($val, $type, $sep) = @_;
     my ($dh, $min, $sec, $mas, $sign);
     # Check we haven't been given a sexagesimal value by mistake.
     if ($val !~ /^ *[-+]?[0-9]*(\.[0-9]*)? *$/) {
-	print STDERR "deg2sex: decimal angle $val malformed\n";
+	print STDERR "dec2sex: decimal $val malformed\n";
 	return undef;
     }
     defined($sep) || ($sep = ' ');
-    # Add 0.5mas to the value, and do rounding explicitly.  Otherwise
-    # values such as 40 degrees turns into 2.66..667 hours,
-    # 2:39:59.999..., which is rounded to 2:39:60 rather than 2:40:00
-    if ($isdec) {
-	#$sign = ($val == 0 ? 1 : $val/abs($val));
-	#$val = abs($val);
+    # Add 0.5m(a)s to the value, and do rounding explicitly.
+    # Otherwise values such as 40 degrees turns into 2.66..667 hours,
+    # 2:39:59.999..., which is rounded to 2:39:60 rather than
+    # 2:40:00. 1m(a)s = 0.5/3600/1000 = 1.3888e-7;
+    if ($type eq 'dec') {
+        # $sign holds sign of $val, as +1 or -1; $val holds absolute value of $val
 	if ($val >= 0) {
 	    $sign = 1;
 	} else {
@@ -1845,17 +1844,22 @@ sub deg2sex ($$;$) {
 	    $val = -$val;
 	}
 	if ($val > 90) {
-	    print STDERR "deg2sex: decimal Dec $val out of range\n";
+	    print STDERR "dec2sex: decimal Dec $val out of range\n";
 	    return undef;
 	}
 	# val=90.0000001388 will round to 90
-	$val += 0.0000001388;
-    } else {
-	$val += 0.0000001388;
-	while ($val < 0) { $val += 360; }
-	while ($val >= 360) { $val -= 360; }
-	$val /= 15;
+        $val += 0.5/3.6e6;
+	#$val += 0.0000001388;
+    } elsif ($type eq 'ra' || $type eq 'time') {
+	$val /= 15 if $type eq 'ra'; # convert to hours
+	$val += 0.5/3.6e6;      # add 0.5ms = 7.5mas
+        # normalise
+	while ($val < 0) { $val += 24; }
+	while ($val >= 24) { $val -= 24; }
 	$sign = 1;
+    } else {
+        print STDERR "dec2sex: unrecognised type $type\n";
+        return undef;
     }
     $dh = int($val);
     $val = ($val - $dh) * 60;
@@ -1868,45 +1872,69 @@ sub deg2sex ($$;$) {
 }
 
 # Given a string with a (colon-separated) sexagesimal angle, turn it
-# into decimal degrees.
+# into decimal degrees, as a double.
 #
-# If the second argument is true, the first argument is Dec in DMS; if
-# false, it's RA in HMS.  If angle argument is
-# undef, silently return undef.
+# Args:
 #
-# Return undef on formatting/range errors.
-sub sex2deg ($$) {
-    my ($val, $isdec) = @_;
+#    $val: the value to be converted, as a string containing a
+#    colon-separated sexagesimal angle.  The value must have all of
+#    d/h, minutes and seconds, separated by colons, with no internal
+#    spaces, though there may be leading and trailing whitespace.
+#
+#    $type: 'ra': the first argument is an RA in HMS; 'dec': the
+#    argument is a Dec in DMS; 'time' the argument is a time in HMS.
+#
+# If angle argument is undef, silently return undef.
+#
+# Return the value as a decimal number of degrees (in the case of 'ra'
+# or 'dec') or hours (in the case of 'time'), or undef on formatting/range
+# errors.
+sub sex2dec ($$) {
+    my ($val, $type) = @_;
 
     defined($val) || return undef;
 
     my ($sign,$dh,$min,$sec);
     if (($sign,$dh,$min,$sec) = ($val =~ /^ *([-+]?)([0-9]+):([0-9]+):([0-9]+(\.[0-9]+)?) *$/)) {
 	my $rval = $dh + $min/60.0 + $sec/3600.0;
-	if ($isdec) {
+	if ($type eq 'dec') {
             if ($sign eq '-' && $rval != 0.0) {
                 $rval = -$rval;
             }
 	    if ($rval < -90.0 || $rval > +90.0) {
-		print STDERR "sex2deg: sexagesimal Dec $val --> $rval out of range\n";
+		print STDERR "sex2dec: sexagesimal Dec $val --> $rval out of range\n";
 		return undef;
 	    }
-	} else {
+	} elsif ($type eq 'ra') {
             if ($sign eq '-') {
-                print STDERR "sex2deg: RA $val --> must be positive\n";
+                print STDERR "sex2dec: RA $val --> must be positive\n";
                 return undef;
             }
 	    $rval *= 15;	# Hours --> degrees
 	    if ($rval == 360.0) { $rval = 0.0; } # accept 360, but fix
 	    if ($rval < 0.0 || $rval >= 360.0) {
-		print STDERR "sex2deg: sexagesimal RA $val --> $rval out of range\n";
+		print STDERR "sex2dec: sexagesimal RA $val --> $rval out of range\n";
 		return undef;
 	    }
+	} elsif ($type eq 'time') {
+            if ($sign eq '-') {
+                print STDERR "sex2dec: Time $val --> must be positive\n";
+                return undef;
+            }
+	    if ($rval == 24.0) { $rval = 0.0; } # accept 24, but fix
+	    if ($rval < 0.0 || $rval >= 24.0) {
+		print STDERR "sex2dec: sexagesimal time $val --> $rval out of range\n";
+		return undef;
+	    }
+    } else {
+        print STDERR "sex2dec: unrecognised type $type\n";
+        return undef;
 	}
 	# All OK
 	return $rval;
     } else {
-	print STDERR "sex2deg: sexagesimal angle $val malformed\n";
+	print STDERR
+          "sex2dec: sexagesimal angle/time $val malformed, must be d/h:m:s\n";
 	return undef;
     }
 }
@@ -2309,10 +2337,10 @@ sub make_pseudo_fits (\%\%) {
 	return undef;
     };
 
-    my $radeg  = ($kv->{ra}=~/:/  ? sex2deg($kv->{ra},0)  : $kv->{ra});
-    my $decdeg = ($kv->{dec}=~/:/ ? sex2deg($kv->{dec},1) : $kv->{dec});
+    my $radeg  = ($kv->{ra}=~/:/  ? sex2dec($kv->{ra},'ra')  : $kv->{ra});
+    my $decdeg = ($kv->{dec}=~/:/ ? sex2dec($kv->{dec},'dec') : $kv->{dec});
 
-    # Did the sex2deg conversion work?
+    # Did the sex2dec conversion work?
     defined($radeg) || do {
 	print STDERR "make_pseudo_fits: can't convert RA $kv->{ra}\n";
 	return undef;
@@ -2349,9 +2377,9 @@ sub make_pseudo_fits (\%\%) {
     push (@pfitsarray, sprintf ("%-8s %.71s", 'COMMENT', $logstring));
     # Coordinate value at reference point
     push (@pfitsarray, sprintf ("%-8s= %20f / RA    %s",
-				'CRVAL1', $radeg,deg2sex($radeg,0)));
+				'CRVAL1', $radeg,dec2sex($radeg,'ra')));
     push (@pfitsarray, sprintf ("%-8s= %20f / Dec   %s",
-				'CRVAL2', $decdeg, deg2sex($decdeg,1)));
+				'CRVAL2', $decdeg, dec2sex($decdeg,'dec')));
     # units (default degrees)
     push (@pfitsarray, sprintf ("%-8s= '%-10s'", 'CUNIT1', 'deg'));
     push (@pfitsarray, sprintf ("%-8s= '%-10s'", 'CUNIT2', 'deg'));

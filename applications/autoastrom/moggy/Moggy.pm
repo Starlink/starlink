@@ -50,7 +50,7 @@ use IPC::Open2;
 use Carp;
 
 use lib "$ENV{AUTOASTROM_DIR}";
-use autoastrom qw(deg2sex);		# for deg2sex
+use autoastrom qw(dec2sex);		# for dec2sex
 
 my $DefaultCatalogue = 'usno@eso';
 my $MoggyCommand = '$AUTOASTROM_DIR/moggy';
@@ -305,8 +305,8 @@ sub point ($$$) {
 			    # Since one of the coordinates is
 			    # sexagesimal, we need to convert the
 			    # other one, too.
-			    my $sexco = deg2sex ($args[$i],
-						 ($i==0?1:0), # isra
+			    my $sexco = dec2sex ($args[$i],
+						 ($i==0?'ra':'dec'),
 						 ':');
 			    if (defined($sexco)) {
 				# split on colons, removing one
@@ -385,8 +385,8 @@ sub otherpoint ($$$) {
 			    # Since one of the coordinates is
 			    # sexagesimal, we need to convert the
 			    # other one, too.
-			    my $sexco = deg2sex ($args[$i],
-						 ($i==0?1:0)); # isra
+			    my $sexco = dec2sex ($args[$i],
+						 ($i==0?'ra':'dec'));
 			    if (defined($sexco)) {
 				push (@a, split (' ',$sexco));
 			    } else {
