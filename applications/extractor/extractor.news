@@ -9,7 +9,7 @@
     - MAP_RMS measurement mode and FLAG_TYPE MAX bugs fixed.
     - new BACK_TYPE, BACK_VALUE and THRESH_TYPE parameters.
     - FLUX_RADIUS no longer requires FLUX_AUTO.
-    - documentation (mud165) slightly improved.
+    - Documentation (mud165) slightly improved.
 
  The BACK_TYPE/BACK_VALUE parameters now allow the background used to
  be defined as a single constant for the whole image (BACK_TYPE takes
@@ -28,5 +28,4 @@
 
     % showme sun226
 
-
- Peter W. Draper 11th March 1999.
+ Peter W. Draper 24th May 1999 (P.W.Draper@durham.ac.uk).
