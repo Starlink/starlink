@@ -22,8 +22,8 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "annular_ellipse.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("annular_ellipse"), (char*)annular_ellipse_bits, annular_ellipse_width, annular_ellipse_height);
 
-    #include "rect.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("rect"), (char*)rect_bits, rect_width, rect_height);
+    #include "rectangle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rect_bits, rectangle_width, rectangle_height);
 
     #include "line.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("line"), (char*)line_bits, line_width, line_height);
