@@ -125,43 +125,36 @@ real_deinstall:
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/votable/.votable.install
      [echo] Executing JAIUtil target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/.jaiutil.install
      [echo] Executing SOAPSERVER target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/.soapserver.install
      [echo] Executing SOG target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/sog/.sog.install
      [echo] Executing SPLAT target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/splat/.splat.install
      [echo] Executing Mirage target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/mirage/.mirage.install
      [echo] Executing TOPCAT target: deinstall
 
 deinstall:
 
 real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/.topcat.install
      [echo] Executing Treeview target: deinstall
 
 deinstall:
@@ -184,4 +177,4 @@ deinstall:
 real_deinstall:
 
 BUILD SUCCESSFUL
-Total time: 12 seconds
+Total time: 16 seconds

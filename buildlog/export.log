@@ -219,13 +219,13 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/Loader.java:99: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/SourceReader.java:121: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:57: warning - @param argument "test" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:80: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:211: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:287: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:414: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:482: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:505: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:59: warning - @param argument "test" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:82: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:213: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:289: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:416: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:484: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/TestCase.java:507: warning - @param argument "messsage" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/src/main/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
   [javadoc] Generating /apps/cvsbuild/java/source/util/docs/util/javadocs/stylesheet.css...
@@ -503,7 +503,7 @@ export:
 prepare:
 
 check_packages:
-[available] Dec 4, 2003 5:18:35 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 5, 2003 5:18:04 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1044,7 +1044,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 66 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 68 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
 
 jars:
@@ -1073,6 +1073,14 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/RandomWrapperStarTable.java:152: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:47: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:47: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
@@ -1085,7 +1093,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableChooser.java:106: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java:54: warning - @param argument "the" is not a parameter name.
   [javadoc] Generating /apps/cvsbuild/java/source/table/docs/table/javadocs/stylesheet.css...
-  [javadoc] 17 warnings
+  [javadoc] 25 warnings
 
 webstart:
 
@@ -1438,16 +1446,16 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the given object is a composite
   [javadoc]  node in this model, i.e. it contains children."
+  [javadoc] "Return whether this classifier is incremental, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return whether this classifier is incremental, i.e. whether
+  [javadoc]  this classifier can support multiple calls to "train"."
+  [javadoc] "Return whether this classifier is incremental, i.e."
+  [javadoc] This sentence is different from what would be generated using -breakiterator: 
+  [javadoc] "Return whether this classifier is incremental, i.e. whether
+  [javadoc]  this classifier can support multiple calls to "train"."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/RubineClassifier.java:269: warning - The first sentence is interpreted to be:
-  [javadoc] "Return whether this classifier is incremental, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return whether this classifier is incremental, i.e. whether
-  [javadoc]  this classifier can support multiple calls to "train"."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/sketch/classification/TrainableClassifier.java:31: warning - The first sentence is interpreted to be:
-  [javadoc] "Return whether this classifier is incremental, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Return whether this classifier is incremental, i.e. whether
-  [javadoc]  this classifier can support multiple calls to "train"."
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/AttributeProxy.java:58: warning - The first sentence is interpreted to be:
   [javadoc] "Return true if this attribute is "visible." This tells
   [javadoc]  attribute editors and so on whether or not to display
@@ -1616,11 +1624,11 @@ javadocs:
   [javadoc] "A node that is also a graph, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A node that is also a graph, i.e. it can contain other nodes."
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/graphx/package-summary.html...
   [javadoc] "A set of utilities for traversing/manipulating/etc."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "A set of utilities for traversing/manipulating/etc. graphs."
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/graphx/GraphUtilities.java:26: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/gui/AppContextDelegate.java:28: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/diva/docs/diva/javadocs/diva/gui/package-summary.html...
   [javadoc] "This class provides basic support for an instance of AppContext which 
@@ -2470,505 +2478,20 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/classes
-    [javac] Compiling 25 source files to /apps/cvsbuild/java/source/votable/build/classes
-     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/votable/build/classes
-
-jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/votable/lib/votable
-      [jar] Building jar: /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/votable/lib/votable/votable.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/votable/docs/votable/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.votable...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.2_02
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/Param.java:24: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "el" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/Stream.java:44: warning - @param argument "systemId" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOElement.java:95: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java:142: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTable.java:157: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:262: warning - @param argument "name" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:282: warning - @param argument "bulk" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOTableWriter.java:420: warning - Tag @link: reference not found: VOSerializer
-  [javadoc] Generating /apps/cvsbuild/java/source/votable/docs/votable/javadocs/stylesheet.css...
-  [javadoc] 9 warnings
-
-webstart:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/votable-1.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/votable/votable-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/votable-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/votable-1.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/votable/votable-1.0.tar
-     [echo] Executing JAIUtil target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jaiutil/build/classes
-    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/jaiutil/build/classes
-
-jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil
-      [jar] Building jar: /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/jaiutil/lib/jaiutil/jaiutil.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/jaiutil/docs/jaiutil/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.jaiutil...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.2_02
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/jaiutil/docs/jaiutil/javadocs/index-all.html...
-  [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
-  [javadoc]  processed the same as FITSImages, i.e."
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
-  [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
-  [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
-  [javadoc]  default and have their bad pixel flags set correctly.
-  [javadoc]  "
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/jaiutil/docs/jaiutil/javadocs/uk/ac/starlink/jaiutil/package-summary.html...
-  [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
-  [javadoc]  processed the same as FITSImages, i.e."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Extends the JSky ImageProcessor class so that HDXImages are
-  [javadoc]  processed the same as FITSImages, i.e. are flipped top to bottom by
-  [javadoc]  default and have their bad pixel flags set correctly.
-  [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImage.java:195: warning - @param argument "fileOrURL" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImage.java:223: warning - @param argument "Document" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImage.java:237: warning - @param argument "Document" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - Tag @link: reference not found: jsky.image.gui.DivaGraphicsImageDisplay
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/HDXImageProcessor.java:29: warning - Tag @link: reference not found: jsky.image.gui.ImageDisplay
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/ImageDisplay.java:172: warning - @param argument "source" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/NDArrayData.java:54: warning - @param argument "tiler" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/jaiutil/src/main/uk/ac/starlink/jaiutil/NDArrayData.java:83: warning - @param argument "tiler" is not a parameter name.
-  [javadoc] Generating /apps/cvsbuild/java/source/jaiutil/docs/jaiutil/javadocs/stylesheet.css...
-  [javadoc] 10 warnings
-
-webstart:
-
-dist:
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jaiutil-1.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/jaiutil-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jaiutil-1.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.0.tar
-     [echo] Executing SOAPSERVER target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/classes
-    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/soapserver/build/classes
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/soapserver/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/lib/soapserver
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/soapserver/lib/soapserver/soapserver.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/docs/soapserver/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.soap...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.2_02
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
-  [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/soapserver/src/main/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: reference not found: Plot, PlotConfigurator
-  [javadoc] Generating /apps/cvsbuild/java/source/soapserver/docs/soapserver/javadocs/stylesheet.css...
-  [javadoc] 2 warnings
-
-webstart:
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/bin/soapserver
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/soapserver/bin/soapserver
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/soapserver-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
-     [echo] Executing SOG target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/build/classes
-    [javac] Compiling 28 source files to /apps/cvsbuild/java/source/sog/build/classes
-    [javac] Note: /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotometryWorker.java uses or overrides a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 6 files to /apps/cvsbuild/java/source/sog/build/classes
-
-jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/lib/sog
-      [jar] Building jar: /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/sog/lib/sog/sog.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/docs/sog/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.sog...
-  [javadoc] Loading source files for package uk.ac.starlink.sog.photom...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.2_02
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/index-all.html...
-  [javadoc] "Usage: java [-Djsky.catalog.skycat.config=$SKYCAT_CONFIG]
-  [javadoc]              [-Djsky.util.logger.config=$LOG_CONFIG]
-  [javadoc]              SOG [-[no]internalframes]
-  [javadoc]              [-shownavigator]
-  [javadoc]              [-port portNumber]
-  [javadoc]              [imageFileOrUrl]
-  [javadoc]  "
-  [javadoc] This sentence is different from what will be interpreted as the first sentence in the
-  [javadoc] next major release (when that interpretation will be internationalized), which is:
-  [javadoc] "Usage: java [-Djsky.catalog.skycat.config=$SKYCAT_CONFIG]
-  [javadoc]              [-Djsky.util.logger.config=$LOG_CONFIG]
-  [javadoc]              SOG [-[no]internalframes]
-  [javadoc]              [-shownavigator]
-  [javadoc]              [-port portNumber]
-  [javadoc]              [imageFileOrUrl]
-  [javadoc]  <p>
-  [javadoc]  The <em>jsky.catalog.skycat.config</em> property defines the Skycat style catalog config file to use.
-  [javadoc]  "
-  [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
-  [javadoc] use -breakiterator from that point forward, which will output this new sentence.
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
-  [javadoc] "Update the shape to match a new radius etc."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Update the shape to match a new radius etc. in the various
-  [javadoc]  components."
-  [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/ExceptionDialog.java:50: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:63: warning - @created is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/uk/ac/starlink/sog/SOG.html...
-  [javadoc] "Usage: java [-Djsky.catalog.skycat.config=$SKYCAT_CONFIG]
-  [javadoc]              [-Djsky.util.logger.config=$LOG_CONFIG]
-  [javadoc]              SOG [-[no]internalframes]
-  [javadoc]              [-shownavigator]
-  [javadoc]              [-port portNumber]
-  [javadoc]              [imageFileOrUrl]
-  [javadoc]  "
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Usage: java [-Djsky.catalog.skycat.config=$SKYCAT_CONFIG]
-  [javadoc]              [-Djsky.util.logger.config=$LOG_CONFIG]
-  [javadoc]              SOG [-[no]internalframes]
-  [javadoc]              [-shownavigator]
-  [javadoc]              [-port portNumber]
-  [javadoc]              [imageFileOrUrl]
-  [javadoc]  <p>
-  [javadoc]  The <em>jsky.catalog.skycat.config</em> property defines the Skycat style catalog config file to use.
-  [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:72: warning - The first sentence is interpreted to be:
-  [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/uk/ac/starlink/sog/photom/AnnulusArea.html...
-  [javadoc] "Update the shape to match a new radius etc."
-  [javadoc] This sentence is different from what would be generated using -breakiterator: 
-  [javadoc] "Update the shape to match a new radius etc. in the various
-  [javadoc]  components."
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/AnnulusArea.java:260: warning - Tag @link: reference not found: transform
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: sameValue
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: clone
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: toString
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getTagName
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: encode
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: setFromString
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getNumberValues
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getSpecificNumberValues
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getValue
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getDescription
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/BasePhotom.java:52: warning - Tag @link: reference not found: getSpecificDescription
-  [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/stylesheet.css...
-  [javadoc] 20 warnings
-
-webstart:
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/bin/sog
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/sog/bin/sog
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/sog-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/sog/sog-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/sog-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/sog-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/sog/sog-0.1.tar
-     [echo] Executing SPLAT target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 169 source files to /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Note: Some input files use or override a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 64 files to /apps/cvsbuild/java/source/splat/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
-     [copy] Copying 11 files to /apps/cvsbuild/java/source/splat/lib/splat
-
-execute_mk_script:
-     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/i386
-     [echo] java.home=/apps/j2sdk1.4.2_02/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] gcc -I.  -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
-     [exec] In file included from NDFJImpl.c:1425:
-     [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet2DInt':
-     [exec] NDFJImplGet.h:147: warning: passing arg 5 of pointer to function from incompatible pointer type
-     [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet1DInt':
-     [exec] NDFJImplGet.h:244: warning: passing arg 5 of pointer to function from incompatible pointer type
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../splat_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing /apps/cvsbuild/star/lib/libndf.a
-     [exec] Processing /apps/cvsbuild/star/lib/libary.a
-     [exec] Processing /apps/cvsbuild/star/lib/libhds.a
-     [exec] Processing /apps/cvsbuild/star/lib/liberr.a
-     [exec] Processing /apps/cvsbuild/star/lib/liberr_standalone.a
-     [exec] Processing /apps/cvsbuild/star/lib/libpsx.a
-     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
-     [exec] Processing /apps/cvsbuild/star/lib/libprm.a
-     [exec] Processing /apps/cvsbuild/star/lib/libprm_a.a
-     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
-     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
-     [exec] Processing /apps/cvsbuild/star/lib/libems.a
-     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
-     [exec] rm -r -f temp
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jhall.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/bin/splat
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/docs/splat
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copying 25 files to /apps/cvsbuild/java/source/splat/bin/splat
-     [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copying 435 files to /apps/cvsbuild/java/source/splat/docs/splat
-    [chmod] Result: -1
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/splat-2.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.0.tar
-     [gzip] Building: /apps/cvsbuild/export/splat-2.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/splat-2.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.0.tar
-     [echo] Executing Mirage target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
-
-jars:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/lib/mirage
-      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.mirage...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.2_02
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/mirage/src/main/uk/ac/starlink/mirage/MirageDriver.java:191: warning - @param argument "a" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/mirage/src/main/uk/ac/starlink/mirage/MirageFormatter.java:26: warning - @param argument "pstrm" is not a parameter name.
-  [javadoc] Generating /apps/cvsbuild/java/source/mirage/docs/mirage/javadocs/stylesheet.css...
-  [javadoc] 2 warnings
-
-webstart:
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/bin
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/mirage/bin
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/mirage-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/mirage-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/mirage-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/mirage/mirage-0.1.tar
-     [echo] Executing TOPCAT target: export
-
-export:
-
-prepare:
-
-check_packages:
-
-build_demo:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
-    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
-     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
-
-build:
-    [javac] Compiling 38 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 90 files to /apps/cvsbuild/java/source/topcat/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/plot.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jhall.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.topcat...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.2_02
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/AuxWindow.java:338: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java:44: warning - Parameter "value" is documented more than once.
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/PlotWindow.java:572: warning - @param argument "combo" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticSubsetQueryWindow.java:28: warning - @param argument "tableviewer" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewer.java:986: warning - @param argument "icol" is not a parameter name.
-  [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
-  [javadoc] 5 warnings
-
-webstart:
-
-dist:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/bin
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/etc/topcat
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/topcat/bin
-
-create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/topcat-0.5-1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/topcat-0.5-1.tar
-     [gzip] Building: /apps/cvsbuild/export/topcat-0.5-1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/topcat-0.5-1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/topcat-0.5-1.tar
-     [echo] Executing Treeview target: export
-
-export:
-
-prepare:
-
-really_check_packages:
-
-check_packages:
-
-build_demo:
-     [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/etc/demo
-     [gzip] Building: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz
-    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar
-      [tar] Building tar: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 108 source files to /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] /apps/cvsbuild/java/source/treeview/src/main/uk/ac/starlink/treeview/StarTableDataNode.java:210: cannot resolve symbol
-    [javac] symbol  : method writeStarTable (uk.ac.starlink.table.StarTable,java.io.PrintStream)
-    [javac] location: class uk.ac.starlink.votable.VOTableWriter
-    [javac]                             new VOTableWriter().writeStarTable( startable, 
-    [javac]                             ^
-    [javac] 1 error
+    [javac] Compiling 26 source files to /apps/cvsbuild/java/source/votable/build/classes
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java:173: cannot resolve symbol
+    [javac] symbol  : method writeFields (uk.ac.starlink.votable.Encoder[],uk.ac.starlink.table.StarTable,java.io.BufferedWriter)
+    [javac] location: class uk.ac.starlink.votable.VOSerializer.TabledataVOSerializer
+    [javac]             writeFields( encoders, table, writer );
+    [javac]             ^
+    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java:311: cannot resolve symbol
+    [javac] symbol  : method writeFields (uk.ac.starlink.votable.Encoder[],uk.ac.starlink.table.StarTable,java.io.BufferedWriter)
+    [javac] location: class uk.ac.starlink.votable.VOSerializer.BinaryVOSerializer
+    [javac]             writeFields( encoders, table, writer );
+    [javac]             ^
+    [javac] 2 errors
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/treeview/build.xml:551: Compile failed; see the compiler error output for details.
+file:/apps/cvsbuild/java/source/votable/build.xml:362: Compile failed; see the compiler error output for details.
 
-Total time: 14 minutes 14 seconds
+Total time: 10 minutes 15 seconds

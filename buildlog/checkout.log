@@ -8350,6 +8350,8 @@ U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
 U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
+U java/source/table/src/main/uk/ac/starlink/table/ObjectArrayColumn.java
+U java/source/table/src/main/uk/ac/starlink/table/PrimitiveArrayColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomWrapperStarTable.java
@@ -9065,6 +9067,7 @@ U java/source/votable/src/main/uk/ac/starlink/votable/BinaryTable.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BitDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BooleanDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/CharDecoders.java
+U java/source/votable/src/main/uk/ac/starlink/votable/DataFormat.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Encoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Field.java
@@ -9096,6 +9099,7 @@ cvs checkout: Updating java/source/votable/src/testcases/uk
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/votable/src/testcases/uk/ac/starlink/votable
+U java/source/votable/src/testcases/uk/ac/starlink/votable/SerializerTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/VOTableTest.java
 U java/source/votable/src/testcases/uk/ac/starlink/votable/docexample.xml
 cvs checkout: Updating java/uk

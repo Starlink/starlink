@@ -320,13 +320,13 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/Loader.java:99: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java:37: warning - Tag @link: reference not found: ChangeEvents
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/SourceReader.java:121: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:57: warning - @param argument "test" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:80: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:211: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:287: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:414: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:482: warning - @param argument "messsage" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:505: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:59: warning - @param argument "test" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:82: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:213: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:289: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:416: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:484: warning - @param argument "messsage" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/TestCase.java:507: warning - @param argument "messsage" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
   [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: File.listFiles
   [javadoc] /apps/cvsbuild/java/source/task/build/java/uk/ac/starlink/task/Task.java:41: warning - @param argument "args" is not a parameter name.
@@ -451,6 +451,14 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/IteratorRowSequence.java:29: warning - Tag @link: can't find PackagedIOException in uk.ac.starlink.table.IteratorRowSequence
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:50: warning - Tag @link: can't find setNoNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/PrimitiveArrayColumn.java:62: warning - Tag @link: can't find setAllNull in uk.ac.starlink.table.PrimitiveArrayColumn
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/RandomWrapperStarTable.java:152: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:32: warning - Tag @link: reference not found: uk.ac.starlink.mirage.MirageTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/StarTableOutput.java:89: warning - @param argument "an" is not a parameter name.
@@ -466,9 +474,8 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOElement.java:95: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTable.java:142: warning - @param argument "the" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTable.java:157: warning - @param argument "the" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:262: warning - @param argument "name" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:282: warning - @param argument "bulk" is not a parameter name.
-  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:420: warning - Tag @link: reference not found: VOSerializer
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:285: warning - @param argument "name" is not a parameter name.
+  [javadoc] /apps/cvsbuild/java/source/votable/build/java/uk/ac/starlink/votable/VOTableWriter.java:305: warning - @param argument "bulk" is not a parameter name.
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -604,10 +611,10 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
   [javadoc] 1 error
-  [javadoc] 284 warnings
+  [javadoc] 291 warnings
 
 export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 49 seconds
+Total time: 47 seconds
