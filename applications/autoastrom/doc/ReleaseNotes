@@ -15,6 +15,11 @@ installed in a non-standard place, you should use the
 <code>STARLINKS</code> environment variable at build time (see <ref
 id="build"/>), to tell the build script where to find it.</p>
 
+<p>Given that, the distribution builds successfully on Alpha (with the 
+cxx compiler), Solaris (with CC) and Linux (with gcc).  There is no
+post-installation test yet, but you can run a pre-installation
+self-test with <code>./mk pretest</code> .</p>
+
 </subsect>
 
 <subsect id="release-0.3" export="export">
@@ -41,7 +46,7 @@ kit is to errors in the initial astrometry.</p></li>
 </subsect>
 
 <!-- Local Variables: -->
-<!-- mode: xml-mode -->
+<!-- mode: xml -->
 <!-- sgml-indent-data: t -->
 <!-- sgml-indent-step: 2 -->
 <!-- End: -->
