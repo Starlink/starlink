@@ -1,0 +1,184 @@
+Name	Status	In CVS	Maintainer	Copyright	Comments	
+A2PS	J		Software Librarian			
+AGI	U	yes				
+AIPS	S		Alan Chipperfield			
+ARD	U	yes				
+ARY	S	yes				
+AST	S	yes				
+ASTROM	X	yes				
+ASURV	U		Software Librarian		P.M. Allan, M.J. Bly	
+ATOOLS	S	yes				
+AUTOASTROM	S		Norman Gray		Being reimplemented by JAC	
+CAT	U	yes		CLRC		
+CATPAC	U	obsolete			Not in sources, not autoconfed	
+CCDPACK	S	yes			long standing correction	
+CFITSIO	U	thirdparty			AJC,MJB (No doc),(external pkg)		
+CGS4DR	S		Frossie Economou			
+CHART	S	obsolete	Clive Davenhall			
+CHR	S	yes		CLRC		
+CNF	S	yes		CLRC		
+COCO	U	yes				
+CONVERT	X	yes			MJC takes this	
+CURSA	S	yes		CLRC		
+DAOPHOT	S	yes			Starlink version with NDF support		
+DATACUBE	S	yes				
+DIPSO	S	yes			needs SGS, NCAR, SNX	
+DOCFIND	U	yes				
+DOCS	S		Software Librarian		In CVS, but not as one component	
+ECHOMOP	S	yes				
+ECHWIND	U					
+EDFITS	U		Keith Shortridge			
+EMACS	S		Brian McIlwrath			
+EMAIL	S	obsolete	Software Librarian			
+EMS	S	yes		CLRC		
+ESP	S	yes			Refactoring required	
+EXPECT	S		Dave Terrett			
+EXTRACTOR	S	yes		CLRC		
+EXTREME	U	yes		CLRC	
+FIGARO	S	yes				
+FINDCOORDS	U	yes			Missing cursa.cfg	
+FIO	S	yes			Needs per-compiler syserr, not per-OS		
+FLUXES	U		Tim Jenness			
+FORUM	U		David Rawlinson			
+FROG	U	java	Alasdair Allan		Should presumably be in CVS	
+FTNCHEK	U		Clive Page			
+GAIA	S	yes		CLRC		
+GCC	U		Brian McIlwrath			
+GENERIC	U	yes			Alan Chipperfield	
+GHOSTSCRIPT	S		Software Librarian			
+GKS	U	yes			KMXIO issue	
+GNS	X	yes				
+GRAPHPAR	U	yes				
+GRP	S	yes				
+GSD	J		Tim Jenness		Linux Port V1.0	
+GV	S		Brian McIlwrath			
+GWM	X	yes	Dave Terrett			
+HDS	U	yes				
+HDSTOOLS	S	yes				
+HDSTRACE	S	yes				
+HLP	S	yes			Have C version	
+HTX	U	yes		CLRC		
+ICL	S	yes				
+IDI	X	yes				
+IDL	U		Jeff Payne	IDL Inc		
+IFD	S	yes			initially PWD chosen but now AA	
+IMG	S	yes		CLRC		
+INFO	U		Software Librarian		Files generated externally	
+INIT	S	yes			Problem with datestamps	
+IRAF	U		Alan Chipperfield			
+IRAF	S		Software Librarian			
+IRAFSTAR	U		Alan Chipperfield			
+IRAS90	S	obsolete			Autoconfed, but not de-nagged	
+IRCAMDR	J	obsolete	Frossie Economou		De-nagged	
+IRCAMPACK	S	obsolete	David Berry		Not autoconfed	
+ISPELL	S		Brian McIlwrath			
+ITCL	U	thirdparty	
+IUEDR	S		Mark Taylor	CLRC		
+JCMTDR	J		Tim Jenness		Needs Figaro libs	
+JED	U		Brian McIlwrath			
+JNIAST	U	java	Mark Taylor	CLRC		
+JNIHDS	S	java	Mark Taylor	CLRC		
+JPEG	U	yes				
+JPL	S	yes				
+JRE	U		Software Librarian		Needs jre+jai	
+KAPLIBS	U	yes				
+KAPPA	S	yes				
+KAPRH	S	yes				
+LATEX2HTML	S		Peter Draper		Used in star2html	
+MAG	U	yes				
+MAPLE	U		Software Librarian	Adept Scientific		
+MEMSYS	U		David Berry	MEDC Ltd	Commercial package	
+MERS	X	yes				
+MESSGEN	S	yes				
+MIDAS	U					
+MONGO	U		John Tonry			
+MOSAIC	U			NCSA		
+NAG	U		Software Librarian	NAG Ltd		
+NAOS	U		Clive Davenhall			
+NBS	U	yes				
+NCAR	U	thirdparty				
+NDF	U	yes				
+NDFPERL	J		Tim Jenness			
+NDG	S	yes				
+NDPROGS	U	obsolete			not autoconfed	
+NEWS	U		Software Librarian			
+NUTPU	U					
+OBSERVE	S		Software Librarian		MJB, last to update it	
+ONE	U	yes				
+ORAC-DR	J		Tim Jenness, Frossie Economou		In JAC repository	
+PAR	S	yes				
+PCS	X	yes				
+PDA	S	yes				
+PERIOD	U	obsolete			see FROG	
+PERL	U		Software Librarian			
+PERLMODS	S		Software Librarian		CPAN modules	
+PGP	S	yes				
+PGPLOT	S	thirdparty	Alasdair Allan		Conditional compiling?	
+PHOTOM	S	yes				
+PINE	S		Software Librarian			
+PISA	S	yes				
+POLMAP	S		Tim Harries		USSC last updated it.	
+POLPACK	S	yes				
+PONGO	S	yes				
+PRM	S	yes				
+PSMERGE	X		Dave Terrett		Better than `standard' version	
+PSX	X	yes				
+REF	X	yes				
+REPACK	U	obsolete	Jeremy Ashley			
+RGASP	U		Jon Davies			
+RPS	U		Martin Ricketts			
+RUNTIME	U		Software Librarian		Needed for distribution, but does not build anything -- packages pre-built files			
+RV	S	yes				
+SAE	X	yes				
+SAOIMAGE	S		Software Librarian		external pkg	
+SCB	U	yes		CLRC	Requires classic-style source tree		
+SGS	S	yes				
+SKYCAL	X		John Thorstensen		external pkg	
+SLALIB	S	yes				
+SM	U		Patricia Monger			
+SNX	U	yes			Problems linking shared libraries (common blocks)			
+SOFTLINK	X		Dave Terrett			
+SPAG	U		Software Librarian	Polyhedron Software		
+SPECX	J		Tim Jenness		In JAC repository	
+SPLAT	U	java	Peter Draper	CLRC		
+SPT	U	yes			Includes SOFTLINK	
+SST	S	yes		CLRC		
+STAR2HTML	U	yes		CLRC	Some outstanding problems	
+STARADMIN	J		Tim Gledhill			
+STARJAVA	S		Mark Taylor	CLRC		
+STARMAN	U	obsolete	Alan Penny		not autoconfed	
+STARPERL	J		Tim Jenness			
+STARTCL	S	yes				
+STARX	S	yes				
+SURF	J		Tim Jenness		JAC repository	
+SX	S	yes	David Berry		Ported to OpenDX/g77.  Not autoconfed		
+TAPEIO	U		Keith Shortridge			
+TCL	U	thirdparty	
+TCSH	S		Brian McIlwrath			
+TEX	U		Brian McIlwrath	American Mathematical Society		
+TK	U	thirdparty	
+TPOINT	S		Patrick Wallace			
+TREEVIEW	S	java	Mark Taylor	CLRC		
+TRN	U	yes			Otherwise/once known as TRANSFORM		
+TSP	U	yes	Jeremy Bailey			
+TWODSPEC	U		Anthony Holloway			
+WFCPACK	U		Jeremy Ashley, Mike Denby			
+XANADU	U		Keith Arnaud, Orin Day	GSFC		
+XDISPLAY	U		Brian McIlwrath			
+XEMACS	S		Brian McIlwrath			
+XFIG	U		Brian McIlwrath			
+XRT	U		Vito Graffagnino		Roy Platon (Orig).  MJC will review this code.  Clive has SUN, Vito has source.			
+XV	S		Software Librarian			
+
+
+
+
+
+	Name: Package name.  Where a package is in CVS, this is its `component' name					
+	Status: S=supported, U=unsupported, X=to be reassigned, J=supported by JAC						
+	CVS status: yes=in CVS; obsolete=in the obsolete tree; thirdparty=in the thirdparty tree; java=this is a java package name, rather than a component name								
+	Maintainer: A contact name.  Components which are in CVS should have a <role>owner</role> element in their component.xml, indicting the owner/maintainer								
+	Copyright: the copyright owner.  Where this is CLRC, the licence will be GPL					
+	Comments: anything else?			
+
+$Id$	
