@@ -71,6 +71,7 @@ SURF TODO list
 -2. Make sure that VEC_?TO+ have the BAD flag set to TRUE
     so that bad values are converted correctly when changing
     variable type (eg SCUOVER and SCUBA2MEM)
+    [DONE - 2003-04-01]
 
 -1. SURFLIB_CALC_OUTPUT_GRID returns error message saying >1000
    instead of 4096
