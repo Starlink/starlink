@@ -130,7 +130,7 @@
 *
 *   Global constants :
 *
-      include 'adamerrs'
+      include 'SAE_PAR'
 *
 *   Status :
 *
@@ -170,23 +170,23 @@
 *  Get the name of the spectrograph parameters file and load it
 *
       call ech_load('SPECTROGRAPHS', spectrographs, status)
-      if(status.ne.adam__ok) goto 500
+      if(status.ne.sai__ok) goto 500
 *
 *  Get the name of the echelle grating to use
 *
       call ech_init('CONFIG', echelle, status)
-      if(status.ne.adam__ok) goto 500
+      if(status.ne.sai__ok) goto 500
 *
 *  Get the names of supported detectors and the detector size
 *
       call det_names
       call det_size(dsize, status)
-      if(status.ne.adam__ok) goto 500
+      if(status.ne.sai__ok) goto 500
 *
 *  Get the angle through which to rotate the detector
 *
       call det_angle(angle, status)
-      if(status.ne.adam__ok) goto 500
+      if(status.ne.sai__ok) goto 500
 *
 *  Determine the format of files written as a result of SAVE. The interface
 *  file guarantees either "AAT" or "TEXT", although only "TEXT" is supported
@@ -194,14 +194,14 @@
 *
 *      call par_get0c('FORMAT', format, status)
 *      call str_upcase(format, format)
-*      if(status.ne.adam__ok) goto 500
+*      if(status.ne.sai__ok) goto 500
       format = 'TEXT'
 *
 *  Determine the initial detector position and window size (100x100mm will be
 *  scaled by the zoom factor later)
 *
       call wind_cent(echxc, echyc, status)
-      if(status.ne.adam__ok) goto 500
+      if(status.ne.sai__ok) goto 500
       swinx=100.0
       swiny=100.0
       factor = 1
@@ -329,7 +329,7 @@
 *
 *  Let the user specify a different detector to use from now on
 *
-            status=adam__ok
+            status=sai__ok
             call det_tx(dsize, xsize, ysize, BLACK)
             call det_size(dsize, status)    ! get the new size
             call det_mm(detx1, dety1, detx2, dety2)
@@ -344,7 +344,7 @@
 *  Let the user specify a different detector angle or wavelength
 *  for which the orders will be horizontal
 *
-            status=adam__ok
+            status=sai__ok
             call det_angle(angle, status)      ! get the new angle
             call det_mm(detx1, dety1, detx2, dety2)
             detxc=(detx1+detx2)/2.0            ! the new detector window
@@ -356,7 +356,7 @@
 *
 * Let the user specify a different central wavelength
 *
-            status=adam__ok
+            status=sai__ok
             call wind_cent(echxc, echyc, status)
             call echtodet(echxc, echyc, detxc, detyc)
             call centre_detector(dsize, detxc, detyc, factor)
@@ -366,7 +366,7 @@
 *
 *  Use the other echelle
 *
-            status=adam__ok
+            status=sai__ok
             if(echelle.eq.'31')then
                echelle='79'
             else
@@ -599,7 +599,7 @@
 *  prompt string
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'echwind_dets'
 
       integer status, ios, lun, i, l, lnblnk
@@ -610,7 +610,7 @@
       det_listlen = 0
 
       lun = 27
-      status=adam__ok
+      status=sai__ok
       do i = 1,NDETFILES
          call par_get0c(detparams(i), detfile, status)
          if (detfile .ne. ' ') then
@@ -621,7 +621,7 @@
             else
                fname = detfile(:lnblnk(detfile))
             endif
-            if(status.ne.adam__ok)then
+            if(status.ne.sai__ok)then
                write(*,*) 'Error getting parameter ',detparams(i)
             elseif(fname .ne. ' ')then
                open(unit=lun, file=fname(:lnblnk(fname)), status='old',
@@ -663,7 +663,7 @@
 *   Ask the user for a new detector to use.
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'echwind_dets'
 
       integer status, i, l
@@ -671,7 +671,7 @@
       real dsize(2)
       character*80 detector
 
-      if(status.ne.adam__ok) RETURN
+      if(status.ne.sai__ok) RETURN
 
 *
 *   Read the detector name
@@ -685,7 +685,7 @@
       endif
 
       call par_get0c('DETECTOR', detector, status)
-      if(status.ne.adam__ok.or.detector.eq.' ')then
+      if(status.ne.sai__ok.or.detector.eq.' ')then
          write(*,*) 'Error getting DETECTOR parameter'
 *
 *  If the name has no comma in it, assume it is the name of a known detector.
@@ -714,7 +714,7 @@
 *
       else
          read(detector, *, iostat=status) dsize
-         if(status.ne.adam__ok)then
+         if(status.ne.sai__ok)then
             write(*,*) 'Error getting detector size'
          endif
       endif
@@ -732,7 +732,7 @@
 *   calculate the angle
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'ech_common'
       include 'echwind_par'
 
@@ -742,14 +742,14 @@
       real r, wc, w1, w2, d1, d2, x1, x2, a, bestsofar, bestw
       character*80 buff
 
-      if(status.ne.adam__ok)return
+      if(status.ne.sai__ok)return
       deltheta = ech_thetab - ech_blaze0
 
 *
 *   Read the angle or wavelength
 *
       call par_get0r('ANGWAVE', r, status)
-      if(status.ne.adam__ok)then
+      if(status.ne.sai__ok)then
          write(*,*) 'Error getting slit angle offset / wavelength'
 
 *
@@ -817,7 +817,7 @@
 *   Get the initial window centre
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'echwind_par'
       include 'ech_common'
 
@@ -828,11 +828,11 @@
       character*80 colour
       logical echvals
 
-      if(status.ne.adam__ok)return
+      if(status.ne.sai__ok)return
       deltheta = ech_thetab - ech_blaze0
 
       call par_get0r('WAVELENGTH', wc, status)
-      if(status.ne.adam__ok)then
+      if(status.ne.sai__ok)then
          write(*,*) 'Error getting initial wavelength; centre '//
      :              'of echellogram assumed'
          theta = deltheta
@@ -856,7 +856,7 @@
 *
 *   and nearest wavelength to centre
 *
-      if (status .eq. adam__ok) then
+      if (status .eq. sai__ok) then
          call ech_wavecen(theta, gamma, wc, mc, status)
          if (.not. echvals) then
             call ech_disp(wc, mc, deltheta, ech_gamma0, echxc, status)
@@ -872,7 +872,7 @@
 *   Save details of current detector position in human readable text file
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'ech_common'
       include 'echwind_par'
       include 'echwind_orders'
@@ -890,7 +890,7 @@
       data created/.false./
       save created, file
 
-      status = adam__ok
+      status = sai__ok
       deltheta = ech_thetab - ech_blaze0
 *
 *  If there's room, read the current detector position (in mm) and
@@ -937,11 +937,11 @@
 *
          lun = 27
          if(.not.created)then
-            status=adam__ok
+            status=sai__ok
             call par_get0c('TEXTFILE', file, status)
             file = file(1:lnblnk(file))//'.txt'
             open(unit=lun, file=file, status='new', iostat=ios)
-            if(status.ne.adam__ok.or.ios.ne.0)then
+            if(status.ne.sai__ok.or.ios.ne.0)then
                write(*,*) 'Error creating text file ',
      :                     file(:lnblnk(file))
             else
@@ -1110,7 +1110,7 @@
 *   Then draw them in the appropriate colour.
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'ech_common'
       include 'echwind_par'
       include 'echwind_orders'
@@ -1129,7 +1129,7 @@
       integer xpl(MAX_POLY), ypl(MAX_POLY)
       integer xsize, ysize
 
-      status = adam__ok
+      status = sai__ok
       deltheta = ech_thetab - ech_blaze0
 *
 *   Get the range of orders covering the whole echellogram
@@ -1215,7 +1215,7 @@
 *   Read the file and store the information.
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'echwind_lines'
 
       integer status, ios, lun, lnblnk, prefix_pos
@@ -1223,7 +1223,7 @@
 
       nlines=0
       lun = 27
-      status=adam__ok
+      status=sai__ok
       call par_get0c('LINELIST', linelist, status)
       if(linelist.ne.' ')then
 *
@@ -1268,7 +1268,7 @@
 *   Plot and label all the lines in the line list
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'ech_common'
       include 'echwind_par'
       include 'echwind_lines'
@@ -1279,7 +1279,7 @@
       integer n, m, mcen, idx, idy, lenlabel, x(2), y(2)
       real dx, dy, deltheta
 
-      status=adam__ok
+      status=sai__ok
       deltheta = ech_thetab - ech_blaze0
 
       do n=1, nlines
@@ -1645,7 +1645,7 @@
 *   wavelength or at the point of MAXimum wavelength.
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'ech_common'
 
       character*(*) opt
@@ -1659,7 +1659,7 @@
       real bestsofar, free
       integer status, m, mmin, mmax
 
-      status=adam__ok
+      status=sai__ok
       deltheta = ech_thetab - ech_blaze0
 *
 *   Iterate to find the wavelength that is cross-dispersed to the
@@ -1751,7 +1751,7 @@
 *   detector window position.
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'ech_common'
 
       real echxc, echyc, theta, gamma, pp, sa
@@ -1764,7 +1764,7 @@
       real free, deltheta
       integer status, bestm, m1, m2
 
-      status=adam__ok
+      status=sai__ok
       deltheta = ech_thetab - ech_blaze0
 *
 *   Calculate the wavelength and order number nearest the detector centre.
@@ -1869,7 +1869,7 @@
 *       xsize is not used in log_positon
 *
       implicit none
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'echwind_par'
       include 'echwind_mmpix'
 
@@ -1888,7 +1888,7 @@
       save lmin, lcen, lran, lmax
       data first/ .true./
 
-      status=adam__ok
+      status=sai__ok
 *
 *  Determine current detector position in mm and
 *  calculate the spectrograph configuration to put this
@@ -1977,7 +1977,7 @@
 *   Whether detector is on the echellogram
       logical on_echellogram
 
-      include 'adamerrs'
+      include 'SAE_PAR'
       include 'echwind_par'
       include 'echwind_mmpix'
 
@@ -1987,7 +1987,7 @@
       real echxc, echyc, echx1, echy1, echx2, echy2
       real dx1, dx2
 
-      status=adam__ok
+      status=sai__ok
 *
 *  Determine current detector position in mm
 *

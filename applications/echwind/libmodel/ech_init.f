@@ -69,7 +69,7 @@
 *
 *   Global constants :
 *
-      include 'adamerrs'        ! ADAM error codes
+      include 'SAE_PAR'        ! ADAM error codes
 *
 *   Import :
 *
@@ -115,7 +115,7 @@
 *
 *   Check status on entry - return if not OK.
 *
-      if (status.ne.adam__ok) RETURN
+      if (status.ne.sai__ok) RETURN
 *
 *   If a parameter name was supplied, get the configuration name from the
 *   parameter system. Otherwise it was passed in the argument list.
@@ -123,7 +123,7 @@
       if(param.ne.' ')then
          call par_get0c(param, config, status)
       endif
-      if(status.ne.adam__ok) RETURN
+      if(status.ne.sai__ok) RETURN
 
 *
 *   Split the configuration into tokens, using slash as the delimiter.

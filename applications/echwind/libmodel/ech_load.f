@@ -133,7 +133,7 @@
 *
 *   Global constants :
 *
-      include 'adamerrs'        ! ADAM error codes
+      include 'SAE_PAR'        ! ADAM error codes
 *
 *   Import :
 *
@@ -180,7 +180,7 @@
 *
 *   Check status on entry - return if not OK.
 *
-      if (status.ne.adam__ok) RETURN
+      if (status.ne.sai__ok) RETURN
 *
 *   If a parameter name was supplied, get the file name from the parameter
 *   system. Otherwise it was passed in the argument list.
@@ -188,7 +188,7 @@
       if(param.ne.' ')then
 	 call par_get0c(param, file, status)
       endif
-      if(status.ne.adam__ok) RETURN
+      if(status.ne.sai__ok) RETURN
 
 *
 *   Open the file.
@@ -226,7 +226,7 @@
 *
       read(lun, '(a)', iostat=ios) line
       do while (ios.eq.0)
-	 status = adam__ok
+	 status = sai__ok
          ntoks = 0
          start = 1
          do while (start.le.len(line) .and. line(start:start).eq.' ')

@@ -45,7 +45,7 @@
 *
 *   Global constants :
 *
-      include 'adamerrs'         ! ADAM error codes
+      include 'SAE_PAR'         ! ADAM error codes
 *
 *   Import :
 *
@@ -78,7 +78,7 @@
 *
 *   Check status on entry - return if not OK.
 *
-      if (status .ne. adam__ok) return
+      if (status .ne. sai__ok) return
 
       thetaoff = ech_thetab - ech_blaze0
 *

@@ -56,7 +56,7 @@
 *
 *   Global constants :
 *
-      include 'adamerrs'        ! ADAM error codes
+      include 'SAE_PAR'        ! ADAM error codes
 *
 *   Import :
 *
@@ -80,7 +80,7 @@
 *
 *   Check status on entry - return if not OK.
 *
-      if (status.ne.adam__ok) RETURN
+      if (status.ne.sai__ok) RETURN
 *
 *   If a central wavelength has been supplied, use it.
 *

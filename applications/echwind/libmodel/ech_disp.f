@@ -53,7 +53,7 @@
 *
 *   Global constants :
 *
-      include 'adamerrs'        ! ADAM error codes
+      include 'SAE_PAR'        ! ADAM error codes
 *
 *   Import :
 *
@@ -101,7 +101,7 @@
 *
 *   Check status on entry - return if not OK.
 *
-      if (status.ne.adam__ok) RETURN
+      if (status.ne.sai__ok) RETURN
 *
 *   Calculate sin(beta) at the position of interest and cope with out-of-range
 *   input.
