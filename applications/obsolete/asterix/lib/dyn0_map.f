@@ -168,6 +168,8 @@
         SIZE = VAL__NBD
       ELSE IF ( MTYPE(2:2) .EQ. 'W' ) THEN
         SIZE = VAL__NBW
+      ELSE IF ( MTYPE(2:2) .EQ. 'B' ) THEN
+        SIZE = VAL__NBB
       ELSE
         CALL MSG_SETC( 'TYPE', MTYPE )
         STATUS = SAI__ERROR
