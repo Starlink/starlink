@@ -120,6 +120,9 @@
 *        More bug fixes - prevented errors when there are many identical
 *        values in the array, and replaced some ordinary arithmetic by
 *        generic-type-safe equivalents.
+*     1-NOV-2001 (MBT):
+*        Undid one of the changes from 24-NOV-2000, which was me being
+*        stupid.
 *     {enter_further_changes_here}
 
 *-
@@ -255,8 +258,7 @@
       ELSE
 
 *  The extreme values must not exceed the integer dynamic range.
-         IF ( NUM_<T>TOI( MAXV ) .GT. VAL__MAXI .OR. 
-     :        NUM_<T>TOI( MINV ) .LT. VAL__MINI ) THEN
+         IF ( MAXV .GT. VAL__MAXI .OR. MINV .LT. VAL__MINI ) THEN
             INTVAL = .FALSE.
          ELSE
 
