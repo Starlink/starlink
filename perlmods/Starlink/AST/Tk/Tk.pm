@@ -32,7 +32,7 @@ are shown below,
 
 The following helper methods are also provided,
 
-   my ( $status, $alpha, $beta ) = _GAxScale()
+   my ( $status, $alpha, $beta ) = _GAxScale( $w )
 
 =head1 DESCRIPTION
   
@@ -202,8 +202,27 @@ top on the screen.
 =cut
 
 sub _GText {
-   croak( "_GText: Not yet implemented");
+   #croak( "_GText: Not yet implemented");
+   my ( $canvas, $text, $xf, $yf, $just, $upx, $upy ) = @_;
+   print "_GText: Placeholder routine called\n";
    
+   # check we have a string to print
+   if( defined $text && length($text) != 0 ) {
+                    
+      my $xmax = $canvas->cget( '-width' );
+      my $ymax = $canvas->cget( '-height' );
+     
+      # multiple the current co-ordinate
+      my $x = $xf*$xmax;
+      my $y = (1 - $yf )*$ymax;   
+      
+      # draw text
+      print "_GText: ($x,$y) ($xf, $yf) $text\n";
+      $canvas->createText( $x, $y, -text => $text );
+   }
+   
+   # Return, all is well strangely
+   return 1;   
 }            
 
 
@@ -220,8 +239,32 @@ increase from bottom to top.
 =cut
 
 sub _GAxScale {
-   croak( "_GAxScale: Not yet implemented");
-   
+    my $canvas = shift;
+    my $alpha = shift;
+    my $beta = shift;
+    print "_GAxScale: Placeholder routine called\n";
+    
+    my ( $nx1, $nx2, $ny1, $ny2, $wx1, $wx2, $wy1, $wy2, $ret );
+    
+    $nx1 = 0;
+    $nx2 = $canvas->cget( '-width' );
+    $ny1 = $canvas->cget( '-height' );
+    $ny2 = 0;
+    
+    $wx1 = 0.1;
+    $wx2 = 0.9;
+    $wy1 = 0.1;
+    $wy2 = 0.9;    
+
+    if( $wx2 != $wx1 && $wy2 != $wy1 && $nx2 != $nx1 && $ny2 != $ny1 ) {
+       $alpha = ( $nx2 - $nx1 ) / ( $wx2 - $wx1 );
+       $beta = ( $ny2 - $ny1 ) / ( $wy2 - $wy1 );
+       $ret = 1
+    } else {
+       print "_GAxScale: The graphics window has zero size\n";
+       $ret = 0;
+    }
+    return ( $ret, $alpha, $beta );   
 }       
 
 
@@ -270,8 +313,23 @@ Notes:
 
 =cut
 
-sub _GTxtEx {
-    croak( "_GTxtExt: Not yet implemented");
+sub _GTxExt {
+   my ( $canvas, $text, $x, $y, $just, $upx, $upy ) = @_;
+   print "_GTxExt: Placeholder routine called\n";
+   
+   # initalise @$xb and @$yb
+   my ( @xb, @yb );
+   $xb[0] = $x;
+   $yb[0] = $y;
+   $xb[1] = $x + (length($text)*12)/( $canvas->cget( '-width' ) );
+   $yb[1] = $y;
+   $xb[2] = $x + (length($text)*12)/( $canvas->cget( '-width' ) );
+   $yb[2] = $y + 12/( $canvas->cget( '-height' ) );
+   $xb[3] = $x;
+   $yb[3] = $y + 12/( $canvas->cget( '-height' ) );
+    
+   # Return
+   return (1, \@xb, \@yb );     
    
 }          
 
@@ -291,8 +349,13 @@ drawn with a horizontal baseline. This will be an increment in the Y axis.
 =cut
 
 sub _GQch {
-   croak( "_GQch: Not yet implemented");
-    
+   #croak( "_GQch: Not yet implemented");
+   my $canvas = shift;
+   print "_GQch: Placeholder routine called\n";
+   
+   my $chv = 12/$canvas->cget( '-height' );
+   my $chh = 12/$canvas->cget( '-width' );  
+   return (1, $chv, $chh );  
 }   
 
 
@@ -361,7 +424,7 @@ sub tk {
   my $self = shift;
   my $canvas = shift;
   
-  $self->GExternal( $canvus );
+  $self->GExternal( $canvas );
   $self->GFlush(\&Starlink::AST::Tk::_GFlush);  
   $self->GLine(\&Starlink::AST::Tk::_GLine);
   $self->GMark(\&Starlink::AST::Tk::_GMark);
