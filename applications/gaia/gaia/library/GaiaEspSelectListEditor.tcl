@@ -94,19 +94,22 @@ itcl::class gaia::GaiaEspSelectListEditor {
 		    -command [code $this add_source]
 	}
 	$itk_component(AddSource) configure -highlightbackground black
-	#add_short_help $itk_component(AddSource) \
-	#	{Press and then drag out source limit on image}
-
+        if { $short_help != {} } { 
+            $short_help add_short_help $itk_component(AddSource) \
+               {Add an object to the list}
+        }
 	itk_component add DeleteSource {
 	    button $itk_interior.deletesource \
 		    -text "Delete object" \
 		    -command [code $this delete_source]
 	}
-	#add_short_help $itk_component(DeleteSource) \
-	#	{Delete selected source from the list}
-	pack $itk_component(AddSource) \
-		$itk_component(DeleteSource) \
-		-side left -fill x -expand 1 -padx 2 -pady 2
+        if { $short_help != {} } { 
+           $short_help add_short_help $itk_component(DeleteSource) \
+              {Remove selected objects from the list}
+        }
+        pack $itk_component(AddSource) \
+            $itk_component(DeleteSource) \
+            -side left -fill x -expand 1 -padx 2 -pady 2
     }
 
     # --- Destructor
@@ -130,6 +133,9 @@ itcl::class gaia::GaiaEspSelectListEditor {
     public variable canvas {} {}
     public variable canvasdraw {} {}
     public variable rtdimage {} {}
+
+    # Short help window.
+    public variable short_help {}
 
     # Shape to draw on the canvas
     public variable drawmode {} {}

@@ -135,9 +135,10 @@ itcl::class gaia::GaiaEsp {
 	# Add the notebook, which we use to deal with the different tools
 	itk_component add notebook {
 	    ::iwidgets::tabnotebook $w_.notebook \
-		    -tabpos n \
-		    -width $itk_option(-width) \
-		    -height $itk_option(-height)
+               -tabpos n \
+               -angle 0 \
+               -width $itk_option(-width) \
+               -height $itk_option(-height)
 	}
 	pack $itk_component(notebook) -side top -fill both -expand 1 \
 		-ipadx 1m -ipady 1m
@@ -349,10 +350,11 @@ itcl::class gaia::GaiaEsp {
 
 	#  Create the initial, empty, source list
 	set objectlist_ [gaia::GaiaEspSelectList #auto \
-		-canvas     $itk_option(-canvas) \
-		-canvasdraw $itk_option(-canvasdraw) \
-		-rtdimage   $itk_option(-rtdimage)
-	]
+                            -canvas     $itk_option(-canvas) \
+                            -canvasdraw $itk_option(-canvasdraw) \
+                            -rtdimage   $itk_option(-rtdimage) \
+                            -short_help $short_help_win_
+                        ]
 
 	#  Select a default page of the notebook
 	$itk_component(notebook) select 0
@@ -613,6 +615,7 @@ itcl::class gaia::GaiaEsp {
 			incr sourcen
 			$itk_component(results-menu) add \
 				-label [format "Galaxy %d: (%.1f,%.1f)" $sourcen $ell_x $ell_y] \
+                                -value $sourcen \
 				-command [code $this show_ellprofou_results_ $sourcen]
 		    }
 		} else {
@@ -623,12 +626,7 @@ itcl::class gaia::GaiaEsp {
 		    [list $sourcen $ell_x $ell_y $ell_sma $ell_pos [expr 1/$ell_invell]]
 	    }
 	    show_ellprofou_results_ 1
-	    #  There's a problem here: after clearing the menu and
-	    #  adding more items, the menu still shows the label it
-	    #  had before being cleared.  I thought
-	    #  `update_menubutton' would fix this, but it doesn't seem
-	    #  to have any effect.
-	    $itk_component(results-menu) update_menubutton
+            $itk_component(results-menu) configure -value 1
 	} else {
 	    error_dialog "Error reading ELLPRO output file:\n[$stl error_msg]"
 	}

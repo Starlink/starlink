@@ -78,6 +78,9 @@ itcl::class gaia::GaiaEspSelectList {
     public variable canvasdraw {} {}
     public variable rtdimage {} {}
 
+    # Short help window.
+    public variable short_help {}
+
     # Drawing mode for shapes on canvas
     public variable sourceshape {} {}
 
@@ -132,7 +135,8 @@ body gaia::GaiaEspSelectList::edit_sourcelist {parent} {
 		-canvasdraw $canvasdraw \
 		-rtdimage $rtdimage \
 		-drawmode $sourceshape \
-		-maxobjects $maxobjects]
+		-maxobjects $maxobjects \
+                -short_help $short_help ]
     }
     return $editor_
 }
