@@ -11,11 +11,10 @@
 
 	    PARAMETER ARDFILE
                POSITION 1
-               TYPE    'FILENAME'
+               TYPE    '_CHAR'
                PROMPT  'Name of ARD file'
                PPATH   'GLOBAL,CURRENT'
-               VPATH   'PROMPT'
-               Association '<-GLOBAL.ARDFILE'
+               Association '<->GLOBAL.ARDFILE'
                HELP    'Name of the spatial description text file'
             ENDPARAMETER
 
