@@ -13,7 +13,6 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GRP_PAR'
-      INCLUDE 'PRM_PAR'
 *    Global Variables :
 *    Import :
       INTEGER ID
@@ -44,21 +43,16 @@
         UBND(1)=DIMS(1)
         UBND(2)=DIMS(2)
 
-*  pixel coords.
-        IF (UNITS(1)(:3).EQ.'PIX') THEN
-          TR(1)=VAL__BADR
 *  otherwise set pixel to world transformation - see Sec.4 of ARD manual
 *  note that ARD assumes the pixel coord of first pixel to range
 *  from 0..1 whereas ASTERIX assumes a range 0.5 to 1.5 with 1
 *  at centre
-        ELSE
-          TR(1)=0.5-BASE(1)/SCALE(1)
-          TR(2)=1.0/SCALE(1)
-          TR(3)=0.0
-          TR(4)=0.5-BASE(2)/SCALE(2)
-          TR(5)=0.0
-          TR(6)=1.0/SCALE(2)
-        ENDIF
+        TR(1)=0.5-BASE(1)/SCALE(1)
+        TR(2)=1.0/SCALE(1)
+        TR(3)=0.0
+        TR(4)=0.5-BASE(2)/SCALE(2)
+        TR(5)=0.0
+        TR(6)=1.0/SCALE(2)
 
         REGVAL=2
 
