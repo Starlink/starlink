@@ -120,7 +120,7 @@ const char* KarlPathSearcher::default_program_name_ = 0;
  *
  * @param program_name the name to be used in kpathsea feedback
  * @param basedpi the base resolution of the PK fonts; should
- * generally be {@link PkFont.dpiBase}
+ * generally be {@link PkFont#dpiBase}
  */
 KarlPathSearcher::KarlPathSearcher(const char* program_name,
 				   const int basedpi)
