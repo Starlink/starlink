@@ -36,13 +36,17 @@
  *  Authors:
  *     AJC: A.J. Chipperfield (STARLINK)
  *     BKM: B.K. McIlwrath (STARLINK)
+ *     TIMJ: Tim Jenness (JAC)
  *     {enter_new_authors_here}
 
  *  History:
  *     04-SEP-1994 (AJC):
  *        Prototype version.
- *     29-APR-2003 (BKM)
- *        Convery from using sys_errlist[] to strerror()
+ *     29-APR-2003 (BKM):
+ *        Convert from using sys_errlist[] to strerror()
+ *     24-MAR-2004 (TIMJ):
+ *        Make -Wall clean. Tidy up -v output so that correct errcode
+ *        is printed.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -78,7 +82,8 @@ process_file(char *filename)
     char buffer[MAXLINE], message[MAXLINE];
     char out_file[20];
     char *p;
-
+    long original_errcode; /* errcode read from file */
+    int line_num = 0;
 
 /*  Open the input file */
     if ((fp = fopen(filename, "r")) == NULL) {
@@ -90,7 +95,9 @@ process_file(char *filename)
     message[0] = ' ';
 
 /* Now process the records */
+
     while ( fgets(buffer, MAXLINE, fp) != NULL) {
+    line_num++;
     switch (buffer[0]) {
     case '*':
         strcpy( message, buffer );
@@ -108,13 +115,20 @@ process_file(char *filename)
 
 /*      Get the error value */
            p = strtok( NULL, " \t=)" );
+	   if (p == NULL) {
+	     fprintf(stderr, "Error extracting error code from line %d\n",
+		     line_num);
+	     return;
+	   }
+
            errcode = strtol( p, (char**)NULL, 10 );
+	   original_errcode = errcode; /* cache it */
 /*      and extract the required sub-values */
            mess_severity = errcode & 0x7;
            mess_number = ( errcode = errcode >> 3 ) & 0xfff;
            mess_code = ( errcode >> 13 ) & 0x7ff;
            if ( verify ) {
-              printf("ERRCODE %d\n", (int)errcode);
+              printf("ERRCODE %d\n", (int)original_errcode);
               printf("   messno %d\n", mess_number);
               printf("   severity %d\n",mess_severity);
               printf("   fac_code %d\n", mess_code);
@@ -194,7 +208,8 @@ process_file(char *filename)
            }
 
            if ( mess_code != fac_code ) {
-              fprintf( stderr, "Facility code error\n" );
+              fprintf( stderr, "Facility code error [%d != %d] at line %d\n",
+		       mess_code, fac_code, line_num);
               return;
            }
 
