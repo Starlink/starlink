@@ -16,21 +16,21 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.6}
-\newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {22 November 1999}
+\newcommand{\stardocnumber}    {214.7}
+\newcommand{\stardocauthors}   {Peter W. Draper \& Norman Gray}
+\newcommand{\stardocdate}      {27 January 2000}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
-\newcommand{\stardocversion}   {2.3}
+\newcommand{\stardocversion}   {2.4}
 \newcommand{\stardocmanual}    {User's Manual}
 
 \newcommand{\stardocabstract} {GAIA is an image display and analysis
 tool. It provides the usual facilities of image display tools, plus
-more astronomically useful ones such as aperture \& optimal photometry,
-contouring, source detection, arbitrary region analysis, celestial
-coordinate readout, calibration and modification, grid overlays, blink
-comparison, defect patching and the ability to query on-line (WWW)
-catalogues.}
+more astronomically useful ones such as aperture \& optimal
+photometry, contouring, source detection, surface photometry,
+arbitrary region analysis, celestial coordinate readout, calibration
+and modification, grid overlays, blink comparison, defect patching and
+the ability to query on-line (WWW) catalogues.}
 
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -286,10 +286,11 @@ GAIA is an image display tool (c.f. SAOimage), but with the additional
 capability of being extendable to integrate other programs.  At
 present extensions are provided that cover the astronomically
 interesting areas of aperture \& optimal photometry, automatic source
-detection, contouring, arbitrary region analysis, celestial coordinate
-readout, calibration and modification, grid overlays, blink
-comparison, image defect patching and the ability to connect to
-resources available in on-line (WWW) catalogues and archives.
+detection, surface photometry, contouring, arbitrary region
+analysis, celestial coordinate readout, calibration and modification,
+grid overlays, blink comparison, image defect patching and the ability
+to connect to resources available in on-line (WWW) catalogues and
+archives.
 
 GAIA is a derivative of the
 \htmladdnormallinkfoot{SkyCat}{http://archive.eso.org/skycat/} image
@@ -381,7 +382,7 @@ GAIA provides the following normal ``image display tool'' features:
   circles, polygons, lines with arrowheads, ellipses \ldots).
 
 \item Printing of the displayed image and annotations (annotations
-  are drawn using printer resolution, i.e. not a screen dump)
+  are drawn using printer resolution, {\em i.e.} not a screen dump)
   to a postscript file.
 
 \item Real time pixel value table. A table displaying the data
@@ -399,7 +400,7 @@ astronomical work with images:
   and elliptical apertures. The sky estimates can be made from
   annuli of these apertures or from related sky apertures. The
   measurements can be in either instrumental magnitudes or
-  mean counts (based on the PHOTOM (\xref{SUN/45}{sun45}{})
+  mean counts (based on the PHOTOM - \xref{SUN/45}{sun45}{} -
   program \xref{AUTOPHOTOM}{sun45}{AUTOPHOTOM})
 
 \item Automatic source detection. This feature provides the ability to
@@ -411,6 +412,13 @@ astronomical work with images:
   limits and change the appearance of the ellipses. This is based on the
   EXTRACTOR (\xref{SUN/226}{sun226}{}) package, a derivative of
   SExtractor.
+
+\item Extended surface photometry. This allows the interactive 
+  identification of extended objects (galaxies) and profile
+  measurements using ellipse fitting. The resultant fits are shown
+  over the images and the measurements can be inspected (based on the
+  ESP - \xref{SUN/180}{sun180}{} - programs
+  \xref{ELLPRO}{sun180}{ELLPRO} and \xref{ELLFOU}{sun180}{ELLFOU}).
 
 \item Image patching. This provides the ability to select arbitrary
   shaped regions on an image and replace them with a surface fit
@@ -530,14 +538,14 @@ OBJ2 <TAB>   210.01 <TAB>   54.01 <TAB>  15.1
 ....
 \end{verbatim}
 \end{quote}
-The usual format of a catalogue is as above, i.e. an object identifier
+The usual format of a catalogue is as above, {\em i.e.} an object identifier
 followed by an RA and DEC (in J2000 decimal degrees). Note the
 \mytt{<TAB>} strings shouldn't be typed in, they are shown explicitly
 just to make clear where they should be placed.
 
 Other formats that can be read by GAIA (with a performance penalty)
 are those supported by the CURSA (\xref{SUN/190}{sun190}{}) package
-(i.e. FITS-tables and STL format) and the ``ASCII\_HEAD'' format of
+({\em i.e.} FITS-tables and STL format) and the ``ASCII\_HEAD'' format of
 the SExtractor/EXTRACTOR package (\xref{SUN/226}{sun226}{}).
 
 The format that is used to open a catalogue, is determined by the file
@@ -596,7 +604,7 @@ you should consult the ESO document
 {http://star-www.dur.ac.uk/\~{}pdraper/gaia/docs/cat.ps.gz}
 
 \textbf{FITS tables:} much of the above also applies to FITS tables
-that GAIA will read, i.e. FITS keywords with the names \mytt{X\_COL},
+that GAIA will read, {\em i.e.} FITS keywords with the names \mytt{X\_COL},
 \mytt{Y\_COL} and \mytt{SYMBOL} will be interpreted
 correctly. Special parameter names that are longer than 8 characters
 (such as \mytt{search\_cols}, \mytt{sort\_order}, \mytt{show\_cols}
@@ -772,7 +780,7 @@ noise repetition.
 \item It is now possible to restore sky regions in the photometry toolbox.
 \item Aperture photometry and ARD regions now work on flipped and
 rotated images.
-\item Extra facilities for controlling the line graphics (i.e. removal)
+\item Extra facilities for controlling the line graphics ({\em i.e.} removal)
 have been added to the graphics menu.
 \item GAIA will now accept NDF slices.
 \item The version of RTD that GAIA now uses has been upgraded from
@@ -886,7 +894,7 @@ click on a catalogue row and see the associated ellipse).
 
 The catalogue handling of GAIA has also been extended to allow it to
 read the formats used by the \xref{CURSA}{sun190}{} package
-(i.e. FITS-tables) and the ASCII\_HEAD format of SExtractor.
+({\em i.e.} FITS-tables) and the ASCII\_HEAD format of SExtractor.
 
 Other minor changes in this release include:
 \begin{itemize}
@@ -976,9 +984,23 @@ Internally there have been many changes to GAIA, one consequence of
 which is that most of the keyboard shortcuts are changed. Most
 notably the interactive slice is now bound to \mytt{<control-a>}.
 
-\subsection{This release 2.3-3}
+\subsection{This release 2.4}
+This is a minor release of GAIA that includes a new toolbox and some
+minor improvements/fixes.
+
+The new toolbox provides an interactive environment for doing the
+surface photometry of extended sources ({\em i.e.} galaxies) and inspecting
+the results. It is based on the ESP (\xref{SUN/180}{sun180}{}) package
+commands ELLPRO and ELLFOU.
+
 This is a minor update to GAIA with the following fixes:
 \begin{itemize}
+\item It is expected that work to make the 
+      \htmladdnormallinkfoot{LEDAS}{http://ledas-www.star.le.ac.uk/}
+      catalogues available should be completed by the time of this
+      release (these will appear in the ``Browse Catalog
+      Directories...'' item under the ``Data-Servers'' menu).
+
 \item A percentiles option has been added to automatic contour
       generation.
 
@@ -1029,14 +1051,17 @@ Many thanks go to Allan Brighton, Thomas Herlin, Miguel Albrecht,
 Daniel Durand and Peter Biereichel, who are responsible for the
 \htmladdnormallink{SkyCat}{http://archive.eso.org/skycat/}
 developments at ESO, in particular for making their software free for
-general use. GAIA and SkyCat are both based on the scripting language
+general use. 
+GAIA and SkyCat are both based on the scripting language
 \htmladdnormallinkfoot{Tcl/Tk}{http://www.scriptics.com/} developed by
 John Ousterhout and the \htmladdnormallinkfoot{[incr Tcl]}
 {http://www.tcltk.com/} object oriented extensions developed by
-Michael McLennan.  They also make use of many other extensions
-and scripts developed by the Tcl community. Thanks are also due to the
-many people who helped test out GAIA and iron out minor and major
-problems (in particular Tim Jenness, Tim Gledhill and Nigel Metcalfe).
+Michael McLennan.  
+They also make use of many other extensions and scripts developed by
+the Tcl community. 
+Thanks are also due to the many people who helped test out GAIA and
+iron out minor and major problems (in particular Tim Jenness, Tim
+Gledhill and Nigel Metcalfe). 
 
 % ? End of main text
 \end{document}
