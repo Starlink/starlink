@@ -210,6 +210,10 @@
 
 *  Close the output file.
          CALL FIO_CLOSE( FD, STATUS )
+
+*  Annul group resources.
+         CALL GRP_DELET( GID, STATUS )
+
       ELSE  IF ( STATUS .EQ. PAR__NULL ) THEN 
 
 *  A null is acceptable, just get rid of the errors and continue.
@@ -218,9 +222,6 @@
 
 *  Release any NDF resources.
       CALL NDF_END( STATUS )
-
-*  Annul group resources.
-      CALL GRP_DELET( GID, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
