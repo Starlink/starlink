@@ -53,9 +53,9 @@ namespace Util {
     bool stringToDouble (string str, double& f);
     vector<string> tokeniseString (const string s,
                                    const char *seps = " \r\n\t");
-    ostream& logstream();
+    STD::ostream& logstream();
     bool openLogstream(const char* fn);
-    static ofstream* log_stream_ = 0;
+    static STD::ofstream* log_stream_ = 0;
 }
 
 
