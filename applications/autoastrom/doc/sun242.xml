@@ -833,11 +833,20 @@
 	  reference to that subroutine to the
 	  appropriate member of the hash <code>%helpers</code>.</p>
 
-	<p>&autoastrom; comes with a single plugin, to use the `match'
-	algorithm for object matching, rather than CCDPACK's
-	`findoff'.  To use this, specify `match' as the argument to
-	the `match' option, as <code>--match=match</code> (see <ref
-	id="opt.match"/>).</p>
+	<p>&autoastrom; comes with a single plugin, to use the
+	  <code>match</code> application for object matching, rather
+	  than CCDPACK's `findoff'.  To use this, specify `match' as the
+	  argument to the `match' option, as <code>--match=match</code>
+	  (see <ref id="opt.match"/>).  The plugin checks at runtime to
+	    see if the <code>match</code> application is present in the
+	  directory pointed to by <code>AUTOASTROM_DIR</code>, and the
+	  plugin will not be installed if the application is not found.
+	  To install the application, download it from the
+	  <code>match</code> home page at
+	  <url>http://acd188a-005.rit.edu/match/</url> and install it in
+	  the directory pointed to by <code>AUTOASTROM_DIR</code>.
+	  &autoastrom; has been tested with match versions 0.3 and
+	  0.4.</p>
 
 	<p>If you wish to add further plugins, see the documentation
 	  for the function <code>match_positions</code>.  That is
