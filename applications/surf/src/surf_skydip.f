@@ -64,6 +64,9 @@
 *     OUT = CHAR (Write)
 *        The name of the output file that contains the measured 
 *        sky temperatures.
+*     RESIDUAL = DOUBLE (Write)
+*        Absolute difference between the model and the data in Kelvin.
+*        i.e. Sum ( Abs(Data - model) )
 *     SIGMA = DOUBLE (Write)
 *        Standard deviation of the difference between the fit
 *        and the input data.
@@ -145,6 +148,9 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.32  2000/05/11 19:59:03  timj
+*     Add RESIDUAL parameter
+*
 *     Revision 1.31  1999/08/03 20:01:43  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -428,6 +434,7 @@ c
       INTEGER PLACE                     ! A placeholder
       REAL    QSORT(SCUBA__MAX_INT)     ! Scratch space for SCULIB_STATR
       LOGICAL RASTER                    ! True if this is on-the-fly skydip
+      DOUBLE PRECISION RESIDUAL         ! Residual of fit
       LOGICAL RESW                      ! Was the data reduce_switched
       REAL    REXISQ                    ! Reduced chi square
       REAL    RTEMP                     ! Temp real
@@ -1277,12 +1284,13 @@ c
       TAU_ERROR = VAL__BADR
       ETA_ERROR = VAL__BADR
       SIGMA = VAL__BADD
+      RESIDUAL = VAL__BADD
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FIT_SKYDIP (CVAR, NKEPT, AIRMASS, JSKY,JSKY_VAR,
      :        WAVE, SUB_INST, FILT, T_TEL, T_AMB, ETA_TEL,B,ETA_TEL_FIT,
      :        B_FIT, TAUZ_FIT, REXISQ, TAU_ERROR, ETA_ERROR, B_ERROR,
-     :        SIGMA, STATUS)
+     :        RESIDUAL, SIGMA, STATUS)
 
          IF (STATUS .EQ. SAI__OK) THEN
             FITFAIL = .FALSE.
@@ -1316,6 +1324,7 @@ c
       CALL PAR_PUT0R('ETA_TEL_ERR', ETA_ERROR, GOOD)
       CALL PAR_PUT0R('XISQ', REXISQ, GOOD)
       CALL PAR_PUT0D('SIGMA', SIGMA, GOOD)
+      CALL PAR_PUT0D('RESIDUAL', RESIDUAL, GOOD)
 
 *     Now create output files
 *     Only create model if we fitted okay
