@@ -452,27 +452,6 @@ sub extract_file {
 }
 
 
-########################################################################
-sub parsetag {
-
-#  Parses an SGML-type tag to return a hash giving the values of the 
-#  elements in it.  Element names are folded to lower case, and the 
-#  special hash keys 'Start' and 'End' give the name of the tag; 
-#  only one of 'Start' or 'End' may be defined.
-
-   my $tag = shift;
-   my %tag = (Start => '', End => '');
-   
-   $tag =~ m%<(/?)\s*(\w+)\s*%g
-      or error "Internal: $tag doesn't look like SGML.";
-   $tag{ $1 ? 'End' : 'Start' } = lc $2;
-   while ($tag =~ m%(\w+)\s*(?:=\s*(?:(["'])(.*?)\2|()(\w*)))?%g) {
-      $tag{lc $1} = $3;
-   }
-   return %tag;
-}
-
-
 
 ########################################################################
 sub output {
@@ -510,31 +489,25 @@ sub output {
 
 #        Add SGML-like tags to source code.
 
-         $tagged = tag_f join '', <FILE>;
+         $tagged = tag_f (join '', <FILE>);
 
-#        Interpret tags.
+#        Check tags, and remove those which fail to refer.
 
          my $inhref = 0;
          $tagged =~ s~(<[^>]+>)~
             &{sub {
                %tag = parsetag $1;
-               if ($tag{'Start'} eq 'define') {
-                  return "<a name='" . $tag{'name'} . "'>";
-               }
-               elsif ($tag{'Start'} eq 'refer') {
-                  my $name = $tag{'name'};
-                  return '' unless ($locate{$name});
+               if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
+                  return '<b>' unless ($locate{$name});
                   $inhref = 1;
                   return "<a href='$scb?$name&$package#$name'>";
                }
-               elsif ($tag{'End'} eq 'refer' && $inhref) {
-                  return "</a>";
+               elsif ($tag{'End'} eq 'a') {
+                  my $retval = $inhref ? '</a>' : '</b>';
                   $inhref = 0;
+                  return $retval;
                }
-               elsif ($tag{'Start'} eq 'copyright') {
-                  $copyright = 1;
-               }
-               return '';
+               return $1;
             }}
          ~ges;
       }

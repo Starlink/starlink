@@ -136,6 +136,7 @@ use Fcntl;
 use Cwd;
 use SDBM_File;
 use libscb;
+use Ftag;
 
 #  Declarations.
 
@@ -420,11 +421,17 @@ sub index_fortran_file {
 #  Cycle through source file writing index lines where appropriate.
 
    open F, $file or die "Couldn't open $file in directory ".cwd."\n";
-   while (<F>) {
-      write_entry $name, $path if ($name = module_name $ftype, $_);
-      $nlines{$ftype}++;
-   }
+   $tagged = tag_f join '', <F>;
    close F;
+
+   while ($tagged =~ /(<[^>]+>)/g) {
+      %tag = parsetag $1;
+      if (($tag{'Start'} eq 'a') && ($name = $tag{'name'})) {
+         write_entry $name, $path
+      }
+   }
+
+   $nlines{$ftype} += ($tagged =~ tr/\n/\n/);
 }
 
 ########################################################################
