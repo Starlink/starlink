@@ -1,0 +1,226 @@
+ INTERFACE GMULTI
+   parameter SWITCH
+     type '_CHAR'
+     position 1
+     prompt 'Mode'
+     help 'Reply with HELP for a full list'
+   endparameter
+   parameter OUT
+     type 'UNIV'
+     association '->GLOBAL.BINDS'
+     prompt 'Multiple dataset'
+     help 'Name of multiple dataset to be created'
+   endparameter
+   parameter INOUT
+     type 'UNIV'
+     ppath 'GLOBAL'
+     association '<->GLOBAL.BINDS'
+     prompt 'Multiple dataset'
+     help 'Name of existing multiple dataset to be modified'
+   endparameter
+   parameter NDF
+     type '_INTEGER'
+     prompt 'NDF number'
+     help 'Number of NDF to be deleted from dataset'
+   endparameter
+   parameter INP1
+     position 2
+     type 'UNIV'
+     default !
+     prompt 'Graph 1'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP2
+     position 3
+     type 'UNIV'
+     default !
+     prompt 'Graph 2'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP3
+     position 4
+     type 'UNIV'
+     default !
+     prompt 'Graph 3'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP4
+     position 5
+     type 'UNIV'
+     default !
+     prompt 'Graph 4'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP5
+     position 6
+     type 'UNIV'
+     default !
+     prompt 'Graph 5'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP6
+     position 7
+     type 'UNIV'
+     default !
+     prompt 'Graph 6'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP7
+     position 8
+     type 'UNIV'
+     default !
+     prompt 'Graph 7'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP8
+     position 9
+     type 'UNIV'
+     default !
+     prompt 'Graph 8'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP9
+     position 10
+     type 'UNIV'
+     default !
+     prompt 'Graph 9'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP10
+     position 11
+     type 'UNIV'
+     default !
+     prompt 'Graph 10'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP11
+     position 12
+     type 'UNIV'
+     default !
+     prompt 'Graph 11'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP12
+     position 13
+     type 'UNIV'
+     default !
+     prompt 'Graph 12'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP13
+     position 14
+     type 'UNIV'
+     default !
+     prompt 'Graph 13'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP14
+     position 15
+     type 'UNIV'
+     default !
+     prompt 'Graph 14'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP15
+     position 16
+     type 'UNIV'
+     default !
+     prompt 'Graph 15'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP16
+     position 17
+     type 'UNIV'
+     default !
+     prompt 'Graph 16'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP17
+     position 18
+     type 'UNIV'
+     default !
+     prompt 'Graph 17'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP18
+     position 19
+     type 'UNIV'
+     default !
+     prompt 'Graph 18'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP19
+     position 20
+     type 'UNIV'
+     default !
+     prompt 'Graph 19'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP20
+     position 21
+     type 'UNIV'
+     default !
+     prompt 'Graph 20'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP21
+     position 22
+     type 'UNIV'
+     default !
+     prompt 'Graph 21'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP22
+     position 23
+     type 'UNIV'
+     default !
+     prompt 'Graph 22'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP23
+     position 24
+     type 'UNIV'
+     default !
+     prompt 'Graph 23'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter INP24
+     position 25
+     type 'UNIV'
+     default !
+     prompt 'Graph 24'
+     help 'Name of single graph dataset to be included in multiple graph'
+   endparameter
+   parameter NX
+     type '_INTEGER'
+     prompt 'Plots in x-direction'
+     help 'Number of plots horizontally across display surface'
+   endparameter
+   parameter NY
+     type '_INTEGER'
+     prompt 'Plots in y-direction'
+     help 'Number of plots vertically down display surface'
+   endparameter
+   parameter CANCEL
+     type '_LOGICAL'
+     vpath 'DEFAULT'
+     default N
+     prompt 'Cancel LAYOUT  or DESIGN'
+   endparameter
+   parameter PLOT
+     type '_INTEGER'
+     prompt 'Plot number'
+     help 'Existing plot to modify or new one to construct'
+   endparameter
+   parameter BASE
+     type '_INTEGER'
+     prompt 'Base graph'
+     help 'Number of graph to form base of plot'
+   endparameter
+   parameter OVLY
+     type '_CHAR'
+     default !
+     prompt 'Overlay graphs'
+     help 'List of graphs to be overlayed in this plot'
+   endparameter
+ endinterface

@@ -1,0 +1,21 @@
+interface G_LINE
+  parameter KEY
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Input from keyboard'
+    help 'Otherwise input is via cursor where appropriate'
+  endparameter
+  parameter X
+    position 1
+    type 'UNIV'
+    prompt 'X-array'
+    help 'HDS array of x-values'
+  endparameter
+  parameter Y
+    position 2
+    type 'UNIV'
+    prompt 'Y-array'
+    help 'HDS array of y-values'
+  endparameter
+endinterface

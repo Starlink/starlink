@@ -1,0 +1,31 @@
+ INTERFACE GDRAW
+   parameter INP
+     type 'UNIV'
+     position 1
+     ppath 'GLOBAL,CURRENT'
+     association '<->GLOBAL.BINDS'
+     prompt 'Graphics data set'
+     help 'Binned dataset or primitive object to be drawn'
+   endparameter
+   parameter DEV
+     type '_CHAR'
+     position 2
+     vpath 'CURRENT'
+     ppath 'CURRENT'
+     prompt 'Graphic device'
+     help 'Device to draw to'
+   endparameter
+   parameter CLEAR
+     type '_LOGICAL'
+     vpath 'DEFAULT'
+     default Y
+     prompt 'Clear display surface'
+   endparameter
+   parameter ID
+     type '_LOGICAL'
+     vpath 'DEFAULT'
+     default N
+     prompt 'Put User_ID and date on plot'
+     help 'Puts ID and date in bottom right-hand corner'
+   endparameter
+ endinterface

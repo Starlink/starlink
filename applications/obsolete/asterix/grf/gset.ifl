@@ -1,0 +1,310 @@
+interface GSET
+   parameter SWITCH
+     type '_CHAR'
+     position 1
+     prompt 'Control parameter'
+     help 'Reply with HELP for a full list'
+   endparameter
+   parameter INP
+     position 2
+     type 'UNIV'
+     ppath 'GLOBAL'
+     keyword 'INP'
+     prompt 'Dataset'
+     association '<->GLOBAL.BINDS'
+   endparameter
+   parameter NDF
+     position 3
+     type '_CHAR'
+     default '1'
+     prompt 'NDF number'
+     help 'List or range of components of multiple dataset'
+   endparameter
+   parameter OFF
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Switch off existing values'
+   endparameter
+   parameter CANCEL
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Cancel existing values'
+   endparameter
+   parameter DUMP
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'Dump GCB'
+     help 'Do a raw dump of contents of GCB for diagnostic purposes'
+   endparameter
+   parameter SHOW
+     type '_LOGICAL'
+     default N
+     vpath 'DEFAULT'
+     prompt 'List existing values'
+   endparameter
+   parameter TEXT
+     type '_CHAR'
+     default !
+     prompt 'Text'
+   endparameter
+   parameter X
+     type '_REAL'
+     default !
+     prompt 'X-pos'
+     help 'X position in graph coordinates'
+   endparameter
+   parameter Y
+     type '_REAL'
+     default !
+     prompt 'Y-pos'
+     help 'Y position in graph coordinates'
+   endparameter
+   parameter SYMBOL
+     type '_INTEGER'
+     default !
+     prompt 'Symbol'
+     help 'PGPLOT symbol number'
+   endparameter
+   parameter ANGLE
+     type '_REAL'
+     default !
+     prompt 'Angle'
+     help 'Angle anti-clockwise from horizontal'
+   endparameter
+   parameter JUST
+     type '_CHAR'
+     default !
+     prompt 'Justification'
+     help 'L(eft)     C(entre)    R(ight)'
+   endparameter
+   parameter FONT
+     type '_INTEGER'
+     default !
+     prompt 'Font number'
+     help '1) normal  2) roman  3) italic  4) script'
+   endparameter
+   parameter SIZE
+     type '_REAL'
+     default !
+     prompt 'Size'
+     help 'multiple of default size'
+   endparameter
+   parameter BOLD
+     type '_INTEGER'
+     default !
+     prompt 'Boldness'
+     help 'multiple of default line thickness'
+   endparameter
+   parameter LO
+     type '_REAL'
+     default !
+     prompt 'Low edge of axis'
+     help 'Left hand end of x-axis or bottom end of y-axis'
+   endparameter
+   parameter HI
+     type '_REAL'
+     default !
+     prompt 'High edge of axis'
+     help 'Right hand end of x-axis or top end of y-axis'
+   endparameter
+   parameter WIDTH
+     type '_INTEGER'
+     prompt 'Linewidth'
+     default !
+     help 'Integer multiple (1..21) of default linewidth'
+   endparameter
+   parameter TICK
+     type '_REAL'
+     default !
+     prompt 'Major ticks'
+     help 'Spacing between major tick marks in world (graph) coordinates'
+   endparameter
+   parameter DIV
+     type '_INTEGER'
+     default !
+     prompt 'Minor divisions'
+     help 'Number of divisions between major tick marks'
+   endparameter
+   parameter OPT
+     type '_CHAR'
+     default !
+     ppath 'DYNAMIC,DEFAULT'
+     prompt 'Options'
+     help 'option codes - see help for more detail'
+   endparameter
+   parameter LOG
+     type '_LOGICAL'
+     default !
+     prompt 'Log axis'
+     help 'Is specified axis to have logarithmic scale (ignored for 2-D)'
+   endparameter
+   parameter RADEC
+     type '_LOGICAL'
+     default !
+     prompt 'RA/DEC labelling'
+     help 'Replace axis labelling with RA/DEC - both axes'
+   endparameter
+   parameter RGB
+     type '_LOGICAL'
+     prompt 'RGB colour table'
+     help '3-colour table'
+     default !
+   endparameter
+   parameter NEG
+     type '_LOGICAL'
+     prompt 'Negative colours'
+     default !
+   endparameter
+   parameter TABLE
+     type 'UNIV'
+     default !
+     prompt 'Colour table'
+     help 'Object containing colour table to be read in'
+   endparameter
+   parameter EDIT
+     type '_LOGICAL'
+     default YES
+     prompt 'Edit mode'
+     help 'Do you wish to use the colour table screen editor'
+   endparameter
+   parameter LEVELS
+     keyword 'LEVELS'
+     type '_REAL'
+     default !
+     prompt 'Levels'
+     help 'List of contour levels eg [10.0 20.0 30.0 40.0]'
+   endparameter
+   parameter STYLE
+     type '_INTEGER'
+     prompt 'Linestyle'
+     default !
+     help '1) solid 2) long dash 3) dash-dot-dash 4) dotts 5) dash-dot-dot-dot'
+   endparameter
+   parameter COLOUR
+     type '_INTEGER'
+     prompt 'Colour'
+     default !
+     help 'Colour number'
+   endparameter
+   parameter SHAPE
+     type '_INTEGER'
+     default !
+     prompt 'Shape of error box'
+     help '1) cross 2) barred cross 3) box 4) diamond 5) ellipse'
+   endparameter
+   parameter OFFSET
+     type '_REAL'
+     default !
+     prompt 'Offset'
+     help 'Offset from axis as multiple of character height'
+   endparameter
+   parameter MIN
+     type '_REAL'
+     default !
+     prompt 'Minimum level'
+   endparameter
+   parameter MAX
+     type '_REAL'
+     default !
+     prompt 'Maximum level'
+   endparameter
+   parameter SCALING
+     type '_CHAR'
+     default !
+     prompt 'Scaling type'
+     help 'LIN, LOG, SQRT, HIST, CYCLIC or ! to leave unchanged'
+   endparameter
+   parameter CYCLES
+     type '_INTEGER'
+     default !
+     prompt 'Number of cycles'
+     help 'Number of times colour table will be cycled through data range'
+   endparameter
+   parameter X1
+     type '_REAL'
+     default !
+     prompt 'Left edge'
+     help 'Coordinate of lefthand edge of inner window in NDC or cm'
+   endparameter
+   parameter X2
+     type '_REAL'
+     default !
+     prompt 'Right edge'
+     help 'Coordinate of righthand edge of inner window in NDC or cm'
+   endparameter
+   parameter Y1
+     type '_REAL'
+     default !
+     prompt 'Bottom edge'
+     help 'Coordinate of bottom edge of inner window in NDC or cm'
+   endparameter
+   parameter Y2
+     type '_REAL'
+     default !
+     prompt 'Top edge'
+     help 'Coordinate of top edge of inner window in NDC or cm'
+   endparameter
+   parameter SCALE
+     type '_LOGICAL'
+     default !
+     prompt 'Equal scales in x and y'
+     help 'Default is Y for 2D plots and N for 1D plots'
+   endparameter
+   parameter NUM
+     type '_INTEGER'
+     ppath 'DEFAULT'
+     prompt 'Number'
+     help 'Enter default to make a new entry, or number of existing entry'
+   endparameter
+   parameter NUMBER
+     type '_LOGICAL'
+     default !
+     prompt 'Number marks'
+     help 'Plot incrementing numbers beside markers'
+   endparameter
+   parameter TYPE
+     type '_CHAR'
+     default !
+     prompt 'Shape type'
+     help 'VECTOR, CIRCLE, ELLIPSE or BOX'
+   endparameter
+   parameter DATA1
+     type '_REAL'
+     default !
+     prompt 'Shape parameter 1'
+     help 'Parameter defining shape, image units for lengths, degrees for angles'
+   endparameter
+   parameter DATA2
+     type '_REAL'
+     default !
+     prompt 'Shape parameter 2'
+     help 'Parameter defining shape, image units for lengths, degrees for angles'
+   endparameter
+   parameter DATA3
+     type '_REAL'
+     default !
+     prompt 'Shape parameter 3'
+     help 'Parameter defining shape, image units for lengths, degrees for angles'
+   endparameter
+   parameter FRAME
+     type '_INTEGER'
+     default 1
+     prompt 'Frame of reference'
+     help '1-Celestial  2-Ecliptic  3-Galactic'
+   endparameter
+   parameter POS
+     type '_INTEGER'
+     default 1
+     prompt 'Label position'
+     help '1=edge 2=centre 3=outside'
+   endparameter
+   parameter VIEW
+     type '_REAL'
+     default 45.0
+     prompt 'Viewing angle'
+     help 'Eye position in degrees above horizontal'
+   endparameter
+endinterface

@@ -1,0 +1,33 @@
+interface G_POS
+  parameter KEY
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Input from keyboard'
+    help 'Otherwise input is via cursor where appropriate'
+  endparameter
+  parameter X1
+    position 1
+    type '_REAL'
+    prompt 'Left edge'
+    help 'left edge of viewport in normalised device coords (0..1)'
+  endparameter
+  parameter X2
+    position 2
+    type '_REAL'
+    prompt 'Right edge'
+    help 'right edge of viewport in normalised device coords (0..1)'
+  endparameter
+  parameter Y1
+    position 3
+    type '_REAL'
+    prompt 'Bottom edge'
+    help 'bottom edge of viewport in normalised device coords (0..1)'
+  endparameter
+  parameter Y2
+    position 4
+    type '_REAL'
+    prompt 'Top edge'
+    help 'top edge of viewport in normalised device coords (0..1)'
+  endparameter
+endinterface

@@ -1,0 +1,49 @@
+interface G_AXES
+  parameter KEY
+    type '_LOGICAL'
+    default N
+    vpath 'DEFAULT'
+    prompt 'Input from keyboard'
+    help 'Otherwise input is via cursor where appropriate'
+  endparameter
+  parameter XOPT
+    type '_CHAR'
+    position 1
+    default 'BCNTS'
+    prompt 'X-axis options'
+  endparameter
+  parameter XTICK
+    type '_REAL'
+    position 2
+    default 0.0
+    prompt 'X-ticks'
+    help 'interval of major tick marks'
+  endparameter
+  parameter XDIV
+    type '_INTEGER'
+    position 3
+    default 0
+    prompt 'X-divisions'
+    help 'number of divisions between major ticks'
+  endparameter
+  parameter YOPT
+    type '_CHAR'
+    position 4
+    default 'BCNTS'
+    prompt 'Y-axis options'
+  endparameter
+  parameter YTICK
+    type '_REAL'
+    position 5
+    default 0.0
+    prompt 'Y-ticks'
+    help 'interval of major tick marks'
+  endparameter
+  parameter YDIV
+    type '_INTEGER'
+    position 6
+    default 0
+    prompt 'Y-divisions'
+    help 'number of divisions between major ticks'
+  endparameter
+endinterface

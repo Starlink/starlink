@@ -1,0 +1,119 @@
+ INTERFACE PLOTXY
+   parameter X
+     type 'UNIV'
+     position 1
+     ppath 'CURRENT'
+     prompt 'X-array'
+     help 'Primitive array to be plotted along x-axis'
+   endparameter
+   parameter Y
+     type 'UNIV'
+     position 2
+     ppath 'CURRENT'
+     prompt 'Y-array'
+     help 'Primitive array to be plotted along y-axis'
+   endparameter
+   parameter DEV
+     type '_CHAR'
+     position 3
+     ppath 'CURRENT'
+     prompt 'Graphic device'
+     help 'Device to draw to'
+   endparameter
+   parameter POLY
+     type '_LOGICAL'
+     default N
+     ppath 'CURRENT,DEFAULT'
+     vpath 'DEFAULT'
+     prompt 'Polyline'
+     help 'Draw polyline between points'
+   endparameter
+   parameter STEP
+     type '_LOGICAL'
+     default N
+     ppath 'CURRENT,DEFAULT'
+     vpath 'DEFAULT'
+     prompt 'Stepped line'
+     help 'Draw stepped line between points'
+   endparameter
+   parameter SYMBOL
+     type '_INTEGER'
+     default 0
+     ppath 'CURRENT,DEFAULT'
+     vpath 'DEFAULT'
+     prompt 'Symbol'
+     help 'Symbol number to plot at points - or 0 for none'
+   endparameter
+   parameter XLO
+     type '_REAL'
+     vpath 'DYNAMIC'
+     ppath 'CURRENT,DYNAMIC'
+     prompt 'X-axis lower limit'
+   endparameter
+   parameter XHI
+     type '_REAL'
+     vpath 'DYNAMIC'
+     ppath 'CURRENT,DYNAMIC'
+     prompt 'X-axis upper limit'
+   endparameter
+   parameter YLO
+     type '_REAL'
+     vpath 'DYNAMIC'
+     ppath 'CURRENT,DYNAMIC'
+     prompt 'Y-axis lower limit'
+   endparameter
+   parameter YHI
+     type '_REAL'
+     vpath 'DYNAMIC'
+     ppath 'CURRENT,DYNAMIC'
+     prompt 'Y-axis upper limit'
+   endparameter
+   parameter XLBL
+     type '_CHAR'
+     vpath 'DEFAULT'
+     ppath 'CURRENT,DEFAULT'
+     default ' '
+     prompt 'X-axis label'
+   endparameter
+   parameter YLBL
+     type '_CHAR'
+     vpath 'DEFAULT'
+     ppath 'CURRENT,DEFAULT'
+     default ' '
+     prompt 'Y-axis label'
+   endparameter
+   parameter TITLE
+     type '_CHAR'
+     vpath 'DEFAULT'
+     ppath 'CURRENT,DEFAULT'
+     default ' '
+     prompt 'Title'
+     help 'On top of plot'
+   endparameter
+   parameter PRINT
+     type '_LOGICAL'
+     keyword 'PRINT'
+     vpath 'DEFAULT'
+     default N
+     prompt 'Print out plot'
+     help 'For hardcopy devices - is plot to be printed directly'
+   endparameter
+   parameter DELETE
+     type '_LOGICAL'
+     keyword 'DELETE'
+     vpath 'DEFAULT'
+     default Y
+     prompt 'Delete bit-file'
+     help 'For hardcopy devices - whether bit-file deleted after printing'
+   endparameter
+   parameter QUEUE
+     type '_CHAR'
+     prompt 'Print queue'
+     help 'eg SYS_LASER'
+   endparameter
+   parameter FILE
+     type '_CHAR'
+     prompt 'Bit-file'
+     help 'eg CANON.DAT'
+   endparameter
+ endinterface
