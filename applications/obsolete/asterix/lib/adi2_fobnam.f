@@ -134,7 +134,7 @@
           CALL ADI_CGET0C( ARGS(1), 'Fpath', PATH(L+1:), STATUS )
           L = CHR_LEN(PATH)
         END IF
-        CALL ADI_NEWV0C( OARG, PATH(:L), STATUS )
+        CALL ADI_NEWV0C( PATH(:L), OARG, STATUS )
 
       END IF
 
