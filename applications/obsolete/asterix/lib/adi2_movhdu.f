@@ -98,9 +98,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*20		HDUTYPE			!
-
       INTEGER			FSTAT			! FITSIO status
+      INTEGER			HDUTYPE			! HDU type
       INTEGER			LUN			! Logical unit
       INTEGER			NHDU			! HDU number
 

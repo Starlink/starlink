@@ -89,13 +89,13 @@
 *  Local Variables:
       CHARACTER*132		ERRTEXT			! FITS error text
       CHARACTER*200		FSPEC			! File name
-      CHARACTER*20		HDUTYPE			! HDU type
       CHARACTER*80		KEYWRD			! Keyword name
       CHARACTER*6		MODE			! Access mode
 
       INTEGER			BSIZE			! FITS block size
       INTEGER			FITSTAT			! FITS inherited status
       INTEGER			HDU			! HDU number
+      INTEGER			HDUTYPE			! HDU type
       INTEGER			IMODE			! FITSIO mode
       INTEGER			LFILEC			! Last char in filename
       INTEGER			LUN			! Logical unit number
