@@ -34,7 +34,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/fio \
         $(MANIFEST)/figaro \
-        #(MANIFEST)/findcoords \
+        $(MANIFEST)/findcoords \
 	$(MANIFEST)/gaia \
 	$(MANIFEST)/gks \
 	$(MANIFEST)/gns \
@@ -77,6 +77,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/shl \
 	$(MANIFEST)/sla \
 	$(MANIFEST)/sock \
+	$(MANIFEST)/spt \
 	$(MANIFEST)/sst \
 	$(MANIFEST)/string \
 	$(MANIFEST)/subpar \
