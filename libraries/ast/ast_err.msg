@@ -101,4 +101,18 @@ SSPIN           <scale size in pixels invalid>
 UINER           <error in user-supplied sub-pixel interpolation function>
 UK1ER           <error in user-supplied 1-d sub-pixel interpolation kernel>
 
+!  New codes introduced for V1.4.
+COMIN           <invalid comma in expression>
+CONIN           <invalid constant in expression>
+DUVAR           <duplicate variable name>
+MIOPA           <missing or invalid operand in expression>
+MIOPR           <missing or invalid operator in expression>
+MISVN           <missing variable name>
+MLPAR           <missing left parenthesis in expression>
+MRPAR           <missing right parenthesis in expression>
+NORHS           <missing right hand side in function>
+UDVOF           <undefined variable or function in expression>
+VARIN           <variable name invalid>
+WRNFA           <wrong number of function arguments in expression>
+
 .END
