@@ -86,6 +86,9 @@
 #     13-APR-2000 (DSB):
 #        Added "bs=80" to the dd command at the end of the script to prevent 
 #        an unwanted newline being added at 512 intervals.
+#     2003 January 24 (MJC):
+#        Revised the sed termination patterns.  No longer support
+#        illegally formatted END lines.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -98,11 +101,13 @@
 #   starting "SIMPLE  =" and "END " for a primary header and data unit,
 #   and for lines starting "XTENSION=" and "END " for an extension.
 #   If strict adherance to the FITS standard was followed the end of the
-#   extraction should be /^END *$/, but sometimes people put in a comment
-#   or equals sign.
+#   extraction should be /^END$/.  The conv=unblock in the dd command
+#   strips trailing blanks.  Although sometimes people put in a
+#   comment or equals sign, this cannot be accommodated while continuing
+#   beyond a keyword beginning END.
 #
-set sedsim = '/^SIMPLE  = /,/^END */p'
-set sedext = '/^XTENSION= /,/^END */p'
+set sedsim = '/^SIMPLE  = /,/^END$/p'
+set sedext = '/^XTENSION= /,/^END$/p'
 #
 #   Process input file as standard input.
 #   =====================================
