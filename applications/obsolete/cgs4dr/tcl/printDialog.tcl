@@ -38,12 +38,12 @@ proc gwm_printDialog {w gwm c} {
     if [catch {set gwm_priv($w,background_opt)}] {
 	set gwm_priv($w,background_opt) colour
     }
-    if [catch {set gwm_priv($w,print_foreground)}] {
-	set gwm_priv($w,print_foreground) Black
-    }
-    if [catch {set gwm_priv($w,foreground_opt)}] {
-	set gwm_priv($w,foreground_opt) colour
-    }
+    #if [catch {set gwm_priv($w,print_foreground)}] {
+    #  seset gwm_priv($w,print_foreground) Black
+    #}
+    #if [catch {set gwm_priv($w,foreground_opt)}] {
+    #  set gwm_priv($w,foreground_opt) colour
+    #}
 
 # Create and pack three frames one above the other and divide the top frame
 # into two side by side.
@@ -72,9 +72,9 @@ proc gwm_printDialog {w gwm c} {
     label $w.top.r.blab -fg blue -text "Background:"
     radiobutton $w.top.r.bg -text "As window" -relief flat \
 	-variable gwm_priv($w,background_opt) -value window -anchor w
-    radiobutton $w.top.r.bcol -text "Colour:" -relief flat \
+      radiobutton $w.top.r.bcol -text "Colour:" -relief flat \
 	-variable gwm_priv($w,background_opt) -value colour -anchor w
-    entry $w.top.r.bname -relief sunken -bd 2 -width 15
+      entry $w.top.r.bname -relief sunken -bd 2 -width 15
     pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname -side top 
     #label $w.top.r.flab -fg blue -text "Foreground:"
     #radiobutton $w.top.r.fg -text "As window" -relief flat \
@@ -113,11 +113,9 @@ proc gwm_printDialog {w gwm c} {
 
 # Create an "OK" and a "Cancel" button.
     button $w.bot.ok -text OK -width 6 -command {set gwm_priv(button) "ok"}
-    button $w.bot.can -text Cancel -width 6 \
-	-command {set gwm_priv(button) "can"}
+    button $w.bot.can -text Cancel -width 6 -command {set gwm_priv(button) "can"}
 
-# Pack them into the bottom frame with a default border around the OK
-# button.
+# Pack them into the bottom frame with a default border around the OK button.
     frame $w.bot.default -relief sunken -bd 1
     raise $w.bot.ok $w.bot.default
     pack $w.bot.default -side left -expand 1 -padx 3m -pady 2m
@@ -150,32 +148,34 @@ proc gwm_printDialog {w gwm c} {
 # Wait for the user to respond.
     for {} {1} {} {
 	tkwait variable gwm_priv(button)
-
 	if ![string compare $gwm_priv(button) ok] {
 
 	# The OK button was pressed so set the print background option of the
 	# gwm widget.
-	    $gwm configure -printformat $gwm_priv($w,print_format)
-	    if [string compare $gwm_priv($w,background_opt) colour] {
-		$gwm configure -printbg [$gwm get colour 0]
-	    } {
-		$gwm configure -printbg [$w.top.r.bname get]
-	    }
-	    #if [string compare $gwm_priv($w,foreground_opt) colour] {
-	    #  $gwm configure -printfg [$gwm get colour 1]
-    	    #} {
-	    #  $gwm configure -printfg [$w.top.r.fname get]
-	    #}
+	  $gwm configure -printformat $gwm_priv($w,print_format)
+	  if [string compare $gwm_priv($w,background_opt) colour] {
+            $gwm configure -printbg [$gwm get colour 0]
+	  } {
+            $gwm configure -printbg [$w.top.r.bname get]
+	  }
+	  #if [string compare $gwm_priv($w,foreground_opt) colour] {
+	  #  $gwm configure -printfg [$gwm get colour 1]
+    	  #} {
+	  #  $gwm configure -printfg [$w.top.r.fname get]
+	  #}
 
 	# Set the variable to be used to signal completion of the print to zero
-	    $gwm configure -printvariable gwm_printvar
 	    global gwm_printvar
 	    set gwm_printvar 0
+	    $gwm configure -printvariable gwm_printvar
 
 	# Set a trace on gwm_printvar that re-enables the control that
 	# popped up the dialog box.
             set printFile [string trim [$w.file.b.fname get]]
+            if {$printFile == ""} {set printFile "$env(HOME)/gwm.ps"}
+            if {[file exists $printFile] == 1} {exec /usr/bin/rm -f $printFile}
             set printCommand [string trim [$w.file.m.pname get]]
+            if {$printCommand == ""} {set printCommand "/usr/bin/lp -c"}
 	    trace variable gwm_printvar w "gwm_printComplete $c"
 
 	# Start the print
@@ -203,7 +203,7 @@ for printing. Please check the file and directory name."
     }
 }
 
-proc gwm_printComplete {c name1 name2 op} {
+proc gwm_printComplete {c name elem op} {
 
 # gwm_printComplete:
 #
@@ -211,23 +211,24 @@ proc gwm_printComplete {c name1 name2 op} {
 #
 # Arguments:
 #
-# c -        The widget to be re-enabled
-# name1 -    The normal arguments to a variable trace routine
-# name2 -    ditto
-# op -       ditto
-
-# Enable the widget.
-    $c configure -state normal
+# c -       The widget to be re-enabled
+# name -    The normal arguments to a variable trace routine
+# elem -    ditto
+# op -      ditto
+  global $name
+  
+# Delete ourself.
+  trace vdelete $name $op "gwm_printComplete $c"
 
 # Send the output to printer in background
-    global printOption
-    global printFile
-    global printCommand
-    if {[string tolower $printOption] == "printer"} {
-      set message [exec /usr/bin/csh -c "$printCommand $printFile"]
-      tk_dialog .error Info "$message $printFile" info 0 OK
-    }
+  global printOption
+  global printFile
+  global printCommand
+  if {[string tolower $printOption] == "printer"} {
+    set message [exec /usr/bin/csh -c "$printCommand $printFile"]
+    tk_dialog .info "Print Status" "$message $printFile" info 0 OK
+  } 
 
-# Delete ourself.
-    trace vdelete $name1 $op "gwm_printComplete $c"
+# Enable the widget.
+  $c configure -state normal
 }
