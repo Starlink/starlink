@@ -76,7 +76,6 @@ $usage = "Usage: $self <module> [<package>]\n";
 #  Required libraries.
 
 use Fcntl;
-use SDBM_File;
 use Scb;
 use FortranTag;
 use CTag;
@@ -150,7 +149,7 @@ $arg{'module'} =~ s/>/&gt;/g;
 
 #  Initialise index object containing locations of all modules.
 
-$index = Directory->new($indexfile, O_RDONLY);
+$func_index = Directory->new($func_indexfile, O_RDONLY);
 
 #  Main processing.
 
@@ -161,13 +160,13 @@ if ($arg{'module'}) {
 #  initial try fails (and doesn't have one already).
 
    $arg{'module'} .= "_" 
-      unless ($arg{'module'} =~ /_$/ || $index->get($arg{'module'}));
-   unless ($index->get($arg{'module'})) {
+      unless ($arg{'module'} =~ /_$/ || $func_index->get($arg{'module'}));
+   unless ($func_index->get($arg{'module'})) {
       error "Failed to find module $arg{'module'}",
          "This may be a result of a deficiency in the source
           code indexing program, or because the module you
           requested doesn't exist, or because the index 
-          database <code>$indexfile</code> has become out of date.";
+          database <code>$func_indexfile</code> has become out of date.";
    }
    get_module $arg{'module'}, $arg{'package'};
 }
@@ -232,16 +231,16 @@ sub query_form {
 
 #  Print query box for package.
 
-   my $selected = $package ? '' : 'selected';
+   my $selected = $package ? '' : ' selected';
    hprint "
       Name of package (optional):
       <font size=-1>
       <select name=package>
-      <option value='' $selected> Any
+      <option value=''$selected> Any
    ";
    for $pack (@packages) {
-      $selected = $pack eq $package ? 'selected' : '';
-      print "<option value='$pack' $selected>$pack\n";
+      $selected = $pack eq $package ? ' selected' : '';
+      print "<option value='$pack'$selected>$pack\n";
    }
    print "</select></font>\n";
 
@@ -273,17 +272,20 @@ sub query_form {
             <br>
             <dl> <dt> <br> <dd>
          ";
-         foreach $task (sort @tasks) {
-            print "$sep<a href='$scb?$task&$package#$task'>$task</a>\n";
+         my $module;
+         foreach $module (sort @tasks) {
+            $task = $module;
+            $task =~ s/_$//;
+            print "$sep<a href='$scb?$module&$package#$module'>$task</a>\n";
          }
          print "</dl>\n<hr>\n";
       }
 
-#     Go through list of modules, picking ones from the selected package
-#     only, and grouping them by prefix.
+#     Go through list of modules from the selected package, grouping 
+#     by prefix.
 
       my (%modules, $mod, $loc, $prefix);
-      while (($mod, $loc) = $index->each($package)) {
+      while (($mod, $loc) = $func_index->each($package)) {
          $prefix = '';
          $prefix = $1 if ($mod =~ /^([^_]*_)./);
          push @{$modules{$prefix}}, $mod;
@@ -378,7 +380,7 @@ sub get_module {
 
 #  Get logical path name from database.  $locname is a global variable.
 
-   $locname = $index->get($module, packpref => $package);
+   $locname = $func_index->get($module, packpref => $package);
 
 #  Generate an error if no module of the requested name is indexed.
 #  This ought not to happen, since $module should have been checked 
@@ -393,7 +395,7 @@ sub get_module {
    ($head, $tail) = ($1, $2);
 
    my ($file, $tarfile, $dir, $loc);
-   if ($loc = $index->get("$head#")) {
+   if ($loc = $func_index->get("$head#")) {
       $file = ($loc =~ m%\.tar[^/>#]*$%) ? "$loc>$tail" : "$loc/$tail";
    }
    elsif (-d "$srcdir/$head") {
@@ -407,7 +409,7 @@ sub get_module {
    }
    else {
       error "Failed to interpret location $locname",
-         "Probably the index file $indexfile is outdated or corrupted.";
+         "Probably the index file $func_indexfile is outdated or corrupted.";
    }
 
 #  Extract file from logical path.
@@ -428,26 +430,101 @@ sub get_module {
 ########################################################################
 sub extract_file {
 
-#  This routine takes as argument the logical path name of a file, 
-#  and, by calling itself recursively to extract files from tar 
-#  archives, finishes by calling routine 'output' with a filename
-#  (possibly relative to the current directory) containing the 
-#  requested module.
+#+
+#  Name:
+#     extract_file
 
-#  Arguments.
+#  Purpose:
+#     Locates or generates file given its logical pathname.
 
-   my $location = shift;      #  Logical path of file.
-   my $package = shift;       #  Hint about which package contains module.
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     extract_file ($location, $package);
+
+#  Description:
+#     This routine, given a logical pathname, finds the file referred to
+#     and outputs it.  It does this by calling itself recursively if
+#     necessary to extract the named file from a tarfile (within a 
+#     tarfile (within a tarfile...)).  When extracting from a tarfile,
+#     the routine will check to see if the file already exists outside
+#     the tarfile (which will be the case if the tarfile has been untarred
+#     in place), in which case it will pick it up directly, and not 
+#     bother to do the untarring itself.
+#
+#     On first entry, the logical pathname will start with a fully 
+#     qualified pathname (starting with a '/'), but on subsequent
+#     recursions, if we have extracted from a tar file to the current
+#     (temporary) directory, it will start with a relative pathname.
+
+#  Arguments:
+#     $location = string.
+#        Logical pathname of the file.
+#     $package = string.
+#        Hint about which package contains module.
+
+#  Return value:
+#     None.
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($location, $package) = @_;
+
+#  Parse logical pathname: 
+#     $head is the directory containing the initial file
+#     $tail is the name of the initial file in $head
+#     $tarcontents is the file to extract from the initial file, if it
+#        is a tar file
+#     $rest is to $tarcontents as $tarcontents is to $location.
 
    $location =~ /^([^>]+)>?([^>]*)(>?.*)$/;
-   ($file, $tarcontents, $tail) = ($1, $2, $3);
-   if ($tarcontents) {
-      tarxf $file, $tarcontents unless (-f $tarcontents);
-      extract_file "$tarcontents$tail", $package;
-      unlink $tarcontents;
+   ($initial, $tarcontents, $rest) = ($1, $2, $3);
+   $initial =~ m%^(.*/)?([^/]+)$%;
+   ($head, $tail) = ($1, $2);
+
+#  If $initial is not a tarfile, just output the file.
+
+   if (!$tarcontents) {
+      output $initial, $package;
    }
+
+#  If required file exists outside named tarfile, use it directly.
+
+   elsif (-f ($file = "$head$tarcontents")) {
+
+#     If $file is a tarfile then recurse, else output file directly.
+
+      if ($rest) {
+         extract_file "$file$rest";
+      }
+      else {
+         output $file, $package;
+      }
+   }
+
+#  If required file doesn't exist, then extract it and recurse.
+
    else {
-      output $file, $package;
+      tarxf "$head$tail", $tarcontents unless (-f $tarcontents);
+      extract_file "$tarcontents$rest", $package;
+      unlink $tarcontents;
    }
 }
 
@@ -470,7 +547,7 @@ sub output {
 
    open FILE, $file 
       or error "Failed to open $file",
-         "Probably the index file $indexfile is outdated or corrupted.";
+         "Probably the index file $func_indexfile is outdated or corrupted.";
 
 #  Output appropriate header text.
 
@@ -504,8 +581,8 @@ sub output {
             sub {
                %tag = parsetag $1;
                if (($tag{'Start'} eq 'a') && ($name = $tag{'href'})) {
-                  return '<b>' 
-                     unless ($loc = $index->get($name, packpref => $package));
+                  return '<b>' unless 
+                     ($loc = $func_index->get($name, packpref => $package));
                   $inhref = 1;
                   if ($name =~ /^INCLUDE-/) {
                      $href = "$scb?$name&$package";
