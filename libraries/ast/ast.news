@@ -16,6 +16,13 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+o  The FITS-WCS encoding used by the FitsChan class now includes the
+   WCSNAME keyword. When creating a FrameSet from FITS headers, the
+   values of the WCSNAME keywords are now used as the Domain names for
+   the corresponding Frames in the returned FrameSet. When writing a
+   FrameSet to a FITS header the Domain names of each Frame are stored in
+   WCSNAME keywords in the header.
+
 o  A new resampling scheme (identified by the symbolic constant
    AST__BLOCKAVE) has been added to AST_RESAMPLE. This scheme sets each 
    output pixel value equal to the mean of all input pixel values within 
