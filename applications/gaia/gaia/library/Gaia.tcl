@@ -224,7 +224,7 @@ itcl::class gaia::Gaia {
       wm title $w "GAIA::SkyCat loading..."
       wm withdraw $w_
       if { ! $plain } { 
-         set gaia_logo [image create pixmap -file $gaia_dir/gaia_logo.xpm]
+         set gaia_logo [image create pixmap -id gaia_logo]
          pack \
             [label $w.logo -image $gaia_logo -borderwidth 2 -relief groove] \
             -side top -padx 1m -pady 1m
@@ -876,11 +876,12 @@ itcl::class gaia::Gaia {
       }
 
       #  Where to look for catalog config file:
-      #  use ~/.skycat/skycat.cfg if it exists, since it may contain user's
-      #  preferences, otherwise use $SKYCAT_CONFIG if set, or
-      #  $CATLIB_CONFIG (note native implimentation ignores
-      #  SKYCAT_CONFIG as this may be set by CURSA, which is bad).
-      set config_file $env(HOME)/.skycat/skycat.cfg
+      #    use ~/.skycat/skycat.cfg if it exists, since it may contain
+      #    user's preferences, otherwise use $SKYCAT_CONFIG if set, or
+      #    $CATLIB_CONFIG (note native implimentation ignores
+      #    SKYCAT_CONFIG as this may be set by CURSA, which is bad).
+      #  Make sure ~/.skycat exists.
+      set config_file [utilGetConfigFilename .skycat skycat.cfg]
       if {[file exists $config_file]} {
          set env(CATLIB_CONFIG) "file:$config_file"
       } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
