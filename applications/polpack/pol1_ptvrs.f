@@ -1,0 +1,109 @@
+      SUBROUTINE POL1_PTVRS( INDF, STATUS )
+*+
+*  Name:
+*     POL1_PTVRS
+
+*  Purpose:
+*     Store the current POLPACK version number in the POLPACK extension
+*     of the supplied NDF.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL POL1_PTVRS( INDF, STATUS )
+
+*  Description:
+*     This routine puts the current POLPACK version number into the
+*     VERSION item within the POLPACK extension. An extension is created
+*     if necessary. Any existing VERSION item is over-written.
+*
+*     Note, the version number is edited into this routine when the 
+*     POLPACK release is constructed. 
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 1999 Central Laboratory of the Research Councils
+ 
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1-APR-1999 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS constants
+
+*  Arguments Given:
+      INTEGER INDF
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
+*  Local Variables:
+      CHARACTER VERS*20          ! Version string
+      CHARACTER VLOC*(DAT__SZLOC)! VERSION component locator
+      CHARACTER XLOC*(DAT__SZLOC)! POLPACK extension locator
+      INTEGER VLEN               ! Used length of VERS
+      LOGICAL THERE              ! Does it exist?
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Save the POLPACK version number. The script which constructs the release
+*  should edit in the current version number, replacing the place holder.
+      VERS = "PKG_VERS"
+      VLEN = CHR_LEN( VERS )
+
+*  See if there is already a POLPACK extension in the NDF.
+      CALL NDF_XSTAT( INDF, 'POLPACK', THERE, STATUS )
+
+*  If not, create one now.
+      IF( .NOT. THERE ) THEN
+         CALL NDF_XNEW( INDF, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS ) 
+
+*  Is so, get a locator to it.
+      ELSE
+         CALL NDF_XLOC( INDF, 'POLPACK', 'UPDATE', XLOC, STATUS )
+
+      END IF
+
+*  If the extension already contains a VERSION component, erase.
+      CALL DAT_THERE( XLOC, 'VERSION', THERE, STATUS )
+      IF( THERE ) CALL DAT_ERASE( XLOC, 'VERSION', STATUS )
+
+*  Create a new VERSION component.
+      CALL DAT_NEW0C( XLOC, 'VERSION', VLEN, STATUS )
+
+*  Get a locator for it.
+      CALL DAT_FIND( XLOC, 'VERSION', VLOC, STATUS )
+
+*  Store the version number. 
+      CALL DAT_PUT0C( VLOC, VERS( : VLEN ), STATUS )
+
+*  Annull the locators.
+      CALL DAT_ANNUL( VLOC, STATUS )
+      CALL DAT_ANNUL( XLOC, STATUS )
+
+      END
