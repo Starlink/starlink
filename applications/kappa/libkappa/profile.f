@@ -188,7 +188,7 @@
 *     assumed. 
 
 *  Related Applications:
-*     KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW
+*     KAPPA: LINPLOT, CURSOR, LISTMAKE, LISTSHOW; CURSA: XCATVIEW.
 
 *  Implementation Status:
 *     -  This routine correctly processes the DATA, VARIANCE, WCS, LABEL, 
