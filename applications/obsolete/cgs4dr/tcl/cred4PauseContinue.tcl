@@ -1,8 +1,8 @@
 proc cred4PauseContinue {taskname name el op} {
+  global env
   global Cred4Widgets
   global Cred4NoticeBoard
   nbs put ${Cred4NoticeBoard}.flags.pause_reduction $Cred4Widgets(PAUSE)
-
 
   if {$Cred4Widgets(PAUSE)==0} {
     if {$Cred4Widgets(REDUCTION_STATE)=="RUNNING"} {
@@ -27,6 +27,7 @@ proc cred4PauseContinue {taskname name el op} {
     } elseif {$Cred4Widgets(REDUCTION_STATE)=="PAUSED"} {
       $Cred4Widgets(RSTAT) configure -fg black -bg orange
       set Cred4Widgets(REDUCTION_STATE) PAUSED
+      if {$env(DOMAIN) == "ukirt.jach.hawaii.edu."} {puts "\a\nALARM: Portable-CGS4DR is PAUSED! ([exec /usr/bin/date])\n"}
     }
   }
 }
