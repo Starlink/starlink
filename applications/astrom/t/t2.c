@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 /*
@@ -33,6 +34,14 @@
 /* If DEBUG is true, then chatter */
 #ifndef DEBUG
 #define DEBUG 0
+#endif
+
+/* We want to link this against Fortran libraries.  That can cause
+   linking errors if those libraries require a Fortran main function.
+   autoconf/configure.ac has defined F77_DUMMY_MAIN to the required
+   function, if this is necessary. */
+#ifdef F77_DUMMY_MAIN
+int F77_DUMMY_MAIN() { return 1; }
 #endif
 
 #if !FORTRAN_DCMPF
