@@ -97,6 +97,7 @@
       CHARACTER SLICE * ( 50 )  ! NDF slice specifier.
       CHARACTER TITLE * ( 50 )  ! Group title.
       INTEGER IDUM              ! Dummy identifier
+      INTEGER IEND              ! End of name string
       INTEGER ITYPE             ! Index of file type
       INTEGER PLACE             ! NDF placeholder.
       INTEGER START             ! Position of start of NDF slice specifier.
@@ -130,10 +131,18 @@
 *  Remove any NDF slice specifier.
       CALL IRG1_SLICE( NAME, SLICE, START, STATUS )
 
-*  And the HDS file type (if being used).
+*  And the HDS file type (if being used). Note to check that the file
+*  name ends in IRG__NDFTP and doesn't have a further extension.
       ITYPE = INDEX( NAME, IRG__NDFTP )
-      IF ( ITYPE .NE. 0 ) THEN 
-         NAME( ITYPE: ) = ' '
+      IF ( ITYPE .NE. 0 ) THEN
+         IEND = ITYPE + LEN( IRG__NDFTP ) - 1
+         IF ( LEN( NAME ) .GT. IEND ) THEN 
+            IF ( NAME( IEND + 1: ) .EQ. ' ' ) THEN 
+               NAME( ITYPE: ) = ' '
+            END IF
+         ELSE
+            NAME( ITYPE: ) = ' '
+         END IF
       END IF
 
 *  Create the container file.

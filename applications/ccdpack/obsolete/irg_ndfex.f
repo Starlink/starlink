@@ -85,6 +85,7 @@
 *  Local Variables:
       INTEGER BNDF              ! Identifier to base NDF.
       INTEGER ITYPE             ! Index of file type
+      INTEGER IEND              ! End of name string
       INTEGER PLACE             ! Dummy placeholder
       CHARACTER NAME * ( IRH__SZNAM ) ! NDF file name (without file type).
       CHARACTER SLICE * ( 50 )  ! NDF slice specifier.
@@ -120,10 +121,18 @@
 *  Remove any slice specifier from the name.
       CALL IRG1_SLICE( NAME, SLICE, START, STATUS )
 
-*  And the HDS file type (if being used).
+*  And the HDS file type (if being used). Note to check that the file
+*  name ends in IRG__NDFTP and doesn't have a further extension.
       ITYPE = INDEX( NAME, IRG__NDFTP )
-      IF ( ITYPE .NE. 0 ) THEN 
-         NAME( ITYPE: ) = ' '
+      IF ( ITYPE .NE. 0 ) THEN
+         IEND = ITYPE + LEN( IRG__NDFTP ) - 1
+         IF ( LEN( NAME ) .GT. IEND ) THEN 
+            IF ( NAME( IEND + 1: ) .EQ. ' ' ) THEN 
+               NAME( ITYPE: ) = ' '
+            END IF
+         ELSE
+            NAME( ITYPE: ) = ' '
+         END IF
       END IF
 
 *  Open the NDF.

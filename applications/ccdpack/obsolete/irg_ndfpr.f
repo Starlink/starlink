@@ -55,6 +55,8 @@
 *        New NDFs can also be created by name now, so these use
 *        NDF_OPEN. LOC removed from argument list, HDS no longer 
 *        supports HDS_CLOSE. All this is to allow foreign data access.
+*     29-JAN-1998 (PDRAPER):
+*        Changed to support files with extensions like ".sdf.gz".
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,14 +94,15 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NAME * ( IRH__SZNAM ) ! NDF file name (without file type).
+      CHARACTER SLICE * ( 50 )  ! NDF slice specifier.
+      CHARACTER TITLE * ( 50 )  ! Group title.
       INTEGER I                 ! Loop count.
       INTEGER IDUM              ! Dummy identifier
+      INTEGER IEND              ! End of file name
       INTEGER ITYPE             ! Index of file type 
-      CHARACTER NAME * ( IRH__SZNAM ) ! NDF file name (without file type).
       INTEGER PLACE             ! NDF placeholder.
-      CHARACTER SLICE * ( 50 )  ! NDF slice specifier.
       INTEGER START             ! Starting position of NDF slice specifier.
-      CHARACTER TITLE * ( 50 )  ! Group title.
 *.
 
 *  Set an initial value for the INDF argument.
@@ -129,10 +132,18 @@
 *  Remove any NDF slice specifier.
       CALL IRG1_SLICE( NAME, SLICE, START, STATUS )
 
-*  And the HDS file type (if being used).
+*  And the HDS file type (if being used). Note to check that the file
+*  name ends in IRG__NDFTP and doesn't have a further extension.
       ITYPE = INDEX( NAME, IRG__NDFTP )
-      IF ( ITYPE .NE. 0 ) THEN 
-         NAME( ITYPE: ) = ' '
+      IF ( ITYPE .NE. 0 ) THEN
+         IEND = ITYPE + LEN( IRG__NDFTP ) - 1
+         IF ( LEN( NAME ) .GT. IEND ) THEN 
+            IF ( NAME( IEND + 1: ) .EQ. ' ' ) THEN 
+               NAME( ITYPE: ) = ' '
+            END IF
+         ELSE
+            NAME( ITYPE: ) = ' '
+         END IF
       END IF
 
 *  Create the new NDF.
