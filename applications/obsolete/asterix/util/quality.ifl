@@ -1,7 +1,7 @@
 Interface QUALITY
 
   Parameter INP
-    Type      'Univ'
+    Type      'LITERAL'
     ppath     'global'
     Association '<->GLOBAL.BINDS'
     Position  1
@@ -10,7 +10,7 @@ Interface QUALITY
   EndParameter
 
   Parameter AUXIN
-    Type      'Univ'
+    Type      'LITERAL'
     ppath     'DEFAULT'
     default   !
     vpath     'DEFAULT,PROMPT'
@@ -19,7 +19,7 @@ Interface QUALITY
   EndParameter
 
   Parameter OUT
-    Type      'Univ'
+    Type      'LITERAL'
     Association '->GLOBAL.BINDS'
     Position  2
     Prompt    'Output dataset'
