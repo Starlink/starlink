@@ -30,7 +30,9 @@ we're chunking or not
 <func>
 <routinename>$html-section$
 <description>Simple function which should be called for all sectioning 
-commands which might be chunked
+commands which might be chunked.  The first child of the current node 
+should be a subhead element (though in the older DocumentSummary DTD it
+was just title).
 <returnvalue type=sosofo>Either an HTML document, or else the contents of the
 section ready to flow into whatever contains this.
 <parameter optional default='($html-section-body$)'>bod
@@ -38,9 +40,7 @@ section ready to flow into whatever contains this.
   <description>The body of the section.
 <codebody>
 (define ($html-section$ #!optional (bod ($html-section-body$)))
-  (let ((title (select-elements (descendants (current-node))
-				(list (normalize "subhead")
-				      (normalize "title")))))
+  (let ((title (node-list-first (children (current-node)))))
     (if title
 	(html-document (make formatting-instruction data: (data title))
 		       bod)
