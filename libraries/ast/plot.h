@@ -484,6 +484,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *           Validate class membership.
 *        astInitPlot
 *           Initialise a Plot.
+*        astInitPlotVtab
+*           Initialise the virtual function table for the Plot class.
 *        astLoadPlot
 *           Load a Plot.
 
@@ -536,6 +538,8 @@ f     - Strings: Text strings drawn using AST_TEXT
 *     13-JUN-2001 (DSB):
 *        Added methods astGenCurve, astGrfSet, astGrfPop, astGrfPush and 
 *        attribute Grf.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitPlotVtab method.
 *-
 */
 
@@ -863,8 +867,12 @@ AstPlot *astPlotId_( void *, const float [], const double [], const char *, ... 
 /* Initialiser. */
 AstPlot *astInitPlot_( void *, size_t, int, AstPlotVtab *, 
                        const char *, AstFrame *, const float *, const double * );
+
+/* Vtab initialiser. */
+void astInitPlotVtab_( AstPlotVtab *, const char * );
+
 /* Loader. */
-AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
+AstPlot *astLoadPlot_( void *, size_t, AstPlotVtab *,
                        const char *, AstChannel *channel );
 #endif
 
@@ -1076,9 +1084,11 @@ AstPlot *astLoadPlot_( void *, size_t, int, AstPlotVtab *,
 #define astInitPlot(mem,size,init,vtab,name,frame,graph,base) \
 astINVOKE(O,astInitPlot_(mem,size,init,vtab,name,frame,graph,base))
 
+/* Vtab Initialiser. */
+#define astInitPlotVtab(vtab,name) astINVOKE(V,astInitPlotVtab_(vtab,name))
 /* Loader. */
-#define astLoadPlot(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadPlot_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadPlot(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadPlot_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to member functions. */

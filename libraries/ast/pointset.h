@@ -82,6 +82,8 @@
 *           Validate class membership.
 *        astInitPointSet
 *           Initialise a PointSet.
+*        astInitPointSetVtab
+*           Initialise the virtual function table for the PointSet class.
 *        astLoadPointSet
 *           Load a PointSet.
 
@@ -121,6 +123,8 @@
 *        Original version.
 *     27-SEP-1996 (RFWS):
 *        Added external interface and I/O facilities.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitPointSetVtab method.
 *-
 */
 
@@ -230,8 +234,11 @@ AstPointSet *astPointSetId_( int, int, const char *, ... );
 AstPointSet *astInitPointSet_( void *, size_t, int, AstPointSetVtab *,
                                const char *, int, int );
 
+/* Vtab initialiser. */
+void astInitPointSetVtab_( AstPointSetVtab *, const char * );
+
 /* Loader. */
-AstPointSet *astLoadPointSet_( void *, size_t, int, AstPointSetVtab *,
+AstPointSet *astLoadPointSet_( void *, size_t, AstPointSetVtab *,
                                const char *, AstChannel * );
 #endif
 
@@ -278,9 +285,11 @@ int astGetNpoint_( const AstPointSet * );
 #define astInitPointSet(mem,size,init,vtab,name,npoint,ncoord) \
 astINVOKE(O,astInitPointSet_(mem,size,init,vtab,name,npoint,ncoord))
 
+/* Vtab Initialiser. */
+#define astInitPointSetVtab(vtab,name) astINVOKE(V,astInitPointSetVtab_(vtab,name))
 /* Loader. */
-#define astLoadPointSet(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadPointSet_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadPointSet(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadPointSet_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */

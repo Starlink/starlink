@@ -384,7 +384,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *       which is outside the valid region of the mapping) leave the original
 *       tick mark values unchanged".
 *       - GetTicks: Limit maxticks to be no less than 8.
-
+*     8-JAN-2003 (DSB):
+*        - Changed private InitVtab method to protected astInitPlotVtab
+*        method.
+*        - Use private IsASkyFrame method in place of astIsASkyFrame.
 *class--
 */
 
@@ -1516,6 +1519,7 @@ static int FullForm( const char *, const char *, const char *, const char *, con
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
+static int IsASkyFrame( AstObject * );
 static int Overlap( AstPlot *, int, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
 static int TestUseColour( AstPlot *, int );
 static int TestUseFont( AstPlot *, int );
@@ -1558,7 +1562,6 @@ static void GrfSet( AstPlot *, const char *,  AstGrfFun );
 static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap );
 static void Grid( AstPlot * );
 static void GridLine( AstPlot *, int, const double [], double );
-static void InitVtab( AstPlotVtab * );
 static void Labelat( AstPlot *, TickInfo **, CurveData **, double *, const char *, const char * );
 static void Labels( AstPlot *, TickInfo **, CurveData **, double *, double *, const char *, const char * );
 static void LinePlot( AstPlot *, double, double, double, double, int, CurveData *, const char *, const char * );
@@ -3527,7 +3530,7 @@ static void AxPlot( AstPlot *this, int axis, const double *start, double length,
       Map1_axis = axis;
 
 /* Decide whether to omit points not in their normal ranges. */
-      Map1_norm = !astIsASkyFrame( Map1_frame );
+      Map1_norm = !IsASkyFrame( (AstObject *) Map1_frame );
 
 /* Convert the tolerance from relative to absolute graphics coordinates. */
       tol = astGetTol( this )*MAX( this->xhi - this->xlo, 
@@ -4196,10 +4199,7 @@ f        The global status.
 */
 
 /* Local Variables: */
-   AstFrame *fr;           /* Pointer to the clipping Frame */
    AstFrameSet *fset;      /* Pointer to the Plot's FrameSet */
-   int i;                  /* Axis index */
-   int ifrm;               /* The validated frame index */ 
    int naxes;              /* No. of axes in the base Frame */
 
 /* Check the global error status. */
@@ -9940,7 +9940,6 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
    double *w;         /* Pointer to last tick value to be written */
    double centre;     /* The axis value at the first tick mark */
    double f;          /* The nearest acceptable tick mark index */
-   double val[ 2 ];   /* Axis values to be normalised */
    double bot;        /* Lowest axis value to be displayed */
    double tmp;        /* Temporary storage */
    double top;        /* Highest axis value to be displayed */
@@ -10916,7 +10915,7 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
 /* Local Variables: */
    AstFrame *fr;           /* The current Frame in the Plot */
    AstFrame *primframe;    /* The primary Frame holding the requested axis */
-   AstSkySystemType system;/* The SkyFrame System attribute */
+   AstSystemType system;   /* The SkyFrame System attribute */
    int primaxis;           /* Index of requested axis in the primary frame */
    int ret;                /* The returned value */
 
@@ -10943,9 +10942,9 @@ static int GetLabelUnits( AstPlot *this, int axis ) {
 
 /* If the primary Frame is a SkyFrame representing equatorial, ecliptic,
    galactic or supergalactic coords, use a default of "no" for LabelUnits.
-   Otherwise use a defaul of "yes". */
+   Otherwise use a default of "yes". */
       ret = 1;
-      if( astIsASkyFrame( primframe ) ) {
+      if( IsASkyFrame( (AstObject *) primframe ) ) {
         system = astGetSystem( primframe );
         if( system == AST__FK4 ||
             system == AST__FK4_NO_E ||
@@ -13402,9 +13401,7 @@ f        The global status.
 */
 
 /* Local Variables: */
-   AstAxis *ax;            /* Pointer to an axis of the current Frame */
    AstPlot *this;          /* Plot with 2d current Frame */
-   AstFrame *fr;           /* Pointer to the current Frame */
    CurveData **cdata;      /* Pointer to info. about breaks in curves */
    TickInfo **grid;        /* Pointer to info. about tick marks */
    const char *class;      /* Object class */
@@ -15109,23 +15106,24 @@ static int IdFind( int id, int *id1, int *id2 ) {
 
 }
 
-static void InitVtab( AstPlotVtab *vtab ) {
+void astInitPlotVtab_(  AstPlotVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitPlotVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a Plot.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "plot.h"
-*     void InitVtab( AstPlotVtab *vtab )
+*     void astInitPlotVtab( AstPlotVtab *vtab, const char *name )
 
 *  Class Membership:
-*     Plot member function.
+*     Plot vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -15134,7 +15132,14 @@ static void InitVtab( AstPlotVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -15144,6 +15149,10 @@ static void InitVtab( AstPlotVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitFrameSetVtab( (AstFrameSetVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This will be
    used (by astIsAPlot) to determine if an object belongs to this class.
@@ -15433,6 +15442,61 @@ static int Inside( int n, float *cx, float *cy, float x, float y ){
 
    }
 
+
+/* Return the answer. */
+   return ret;
+
+}
+
+static int IsASkyFrame( AstObject *obj ) {
+/*
+*  Name:
+*     IsASkyFrame
+
+*  Purpose:
+*     Checks if the supplied Object ca be treated as a SkyFrame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int IsASkyFrame( AstObject *obj )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This function checks if the supplied Object is a SkyFrame or a 
+*     FrameSet which has a SkyFrame as its current Frame.
+
+*  Parameters:
+*     obj
+*        The object.
+
+*  Returned Value:
+*     A boolean flag indicating if the Object can be treated as SkyFrame.
+
+*/
+
+/* Local Variables: */
+   int ret;        
+   AstFrame *frm;  
+
+/* Check the global status. */
+   if( !astOK ) return 0;
+
+/* If the Object is a SkyFrame, return 1. */
+   if( astIsASkyFrame( obj ) ) {
+      ret = 1;
+
+/* If the Object is a FrameSet, check its current Frame recursively,
+   using this method. */
+   } else if( astIsAFrameSet( obj ) ) {
+      frm = astGetFrame( (AstFrameSet *) obj, AST__CURRENT );
+      ret = IsASkyFrame( (AstObject *) frm );
+      frm = astAnnul( frm );
+   }
 
 /* Return the answer. */
    return ret;
@@ -16457,16 +16521,9 @@ static void Map1( int n, double *dist, double *x, double *y,
 */
 
 /* Local Constants: */
-   AstPointSet *pset3;               /* PointSet for re-created physical coords */
-   double **ptr3;                    /* Pointers to recreated physical coord data */
    double *p;                        /* Pointer to next value */
    double axval;                     /* Axis origin value */
-   double dst;                       /* Distance between points */
-   double lim;                       /* Largest insignificant distance */
    int i, j;                         /* Loop counts */
-   int bad;                          /* Bad values found? */
-   int changed;                      /* Index of last changed axis. */
-   int nchanged;                     /* Number of changed axis values. */
    static AstPointSet *pset1 = NULL; /* PointSet holding physical coords */
    static AstPointSet *pset2 = NULL; /* PointSet holding graphics coords */
    static double **ptr1 = NULL;      /* Pointer to physical coord data */
@@ -17083,7 +17140,6 @@ static void Map4( int n, double *dist, double *x, double *y,
 */
 
 /* Local Variables: */
-   int i;
    double *ptr1[ 1 ];                /* Pointer to distances data */
    double *ptr3[ 2 ];                /* Pointers to graphics coord data */
    static AstPointSet *pset1 = NULL; /* PointSet holding distances */
@@ -17429,7 +17485,6 @@ static void Norm1( AstMapping *map, int axis, int nv, double *vals,
    double **ptr1;             /* Pointer to physical coords data */
    double *a;                 /* Pointer to next axis value */
    double *b;                 /* Pointer to next axis value */
-   double newval;             /* New axis value */
    int i;                     /* Loop count */
 
 /* Check the inherited global status. */
@@ -22713,6 +22768,9 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitPlotVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
    baseframe = NULL;
@@ -22806,15 +22864,12 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    component within the Plot structure, allocating memory if necessary. 
    The new FrameSet is initialised to hold the graphics Frame created 
    above. */
-   new = (AstPlot *) astInitFrameSet( mem, size, init, (AstFrameSetVtab *) vtab,
+   new = (AstPlot *) astInitFrameSet( mem, size, 0, (AstFrameSetVtab *) vtab,
                                       name, graphicsframe );
 
 /* Annul the frame. */
    graphicsframe = astAnnul( graphicsframe );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-   if ( init ) InitVtab( vtab );
    if ( astOK ) {
 
 /* Initialise the Plot data. */
@@ -23059,7 +23114,7 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    return new;
 }
 
-AstPlot *astLoadPlot_( void *mem, size_t size, int init,
+AstPlot *astLoadPlot_( void *mem, size_t size,
                        AstPlotVtab *vtab, const char *name,
                        AstChannel *channel ) {
 /*
@@ -23075,7 +23130,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "Plot.h"
-*     AstPlot *astLoadPlot( void *mem, size_t size, int init,
+*     AstPlot *astLoadPlot( void *mem, size_t size,
 *                           AstPlotVtab *vtab, const char *name,
 *                           AstChannel *channel )
 
@@ -23092,6 +23147,7 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a Plot at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -23110,14 +23166,6 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstPlot) is used instead.
-*     init
-*        A boolean flag indicating if the Plot's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the Plot class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new Plot. If this is NULL, a pointer
@@ -23164,26 +23212,23 @@ AstPlot *astLoadPlot_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstPlot );
-      init = !class_init;
       vtab = &class_vtab;
       name = "Plot";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitPlotVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Plot. */
-   new = astLoadFrameSet( mem, size, init, (AstFrameSetVtab *) vtab, name,
+   new = astLoadFrameSet( mem, size, (AstFrameSetVtab *) vtab, name,
                           channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */
