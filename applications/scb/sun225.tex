@@ -635,21 +635,8 @@ original when it is complete, like this:
 Use of the {\tt scbcp.pl} utility is explained in 
 section \ref{sec:scbcp}.
 
-Occasionally some non-fatal error messages will be generated in the 
-course of the indexing, for instance:
-\begin{quote}
-\begin{verbatim}
-Use of uninitialized value at FortranTag.pm line 456, <SOURCE> chunk 42.
-\end{verbatim}
-\end{quote}
-These indicate that an error has occurred during the indexing process,
-but unless they appear very many times can be safely ignored.
-If the program stops with an error however, it should be investigated.
-The error message in this case should give an indication of what has
-gone wrong and how to fix it.
-
 The index files created in the SCB\_INDEX directory should 
-total four or five Mb for the whole USSC.  
+total around five Mb for the whole USSC.  
 On some operating systems the index files may be 
 sparse, and {\em appear} much bigger than they are,
 so that {\tt ls~-l} makes them look very large, 
