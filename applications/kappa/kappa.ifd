@@ -5609,54 +5609,15 @@ package kappa {
 
          helplib {$KAPPA_HELP}
 
-         parameter cosys {
-            type LITERAL
-            vpath GLOBAL DEFAULT
-            ppath GLOBAL DYNAMIC
-            prompt {Co-ordinate system}
-            association <->GLOBAL.COORD_SYSTEM
-            helpkey *
-            default Data
-          }
-
          parameter device {
             ptype DEVICE
-            position 4
+            position 1
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
             association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Name of graphics device}
             helpkey *
-          }
-
-         parameter double {
-            type _LOGICAL
-            prompt {Report co-ordinates in double precision?}
-            vpath DEFAULT
-            default FALSE
-            helpkey *
-          }
-
-         parameter logfile {
-            position 3
-            type FILENAME
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
-            prompt {File to store cursor co-ordinates}
-            default !
-            helpkey *
-          }
-
-         parameter mode {
-            position 1
-            type LITERAL
-            vpath DYNAMIC DEFAULT
-            ppath DYNAMIC DEFAULT
-            prompt {Co-ordinate system/picture mode}
-            default Dynamic
-            helpkey *
-          }
+         }
 
          parameter name {
             position 2
@@ -5667,23 +5628,25 @@ package kappa {
             prompt {Name of pictures to be selected}
             default !
             helpkey *
-          }
+         }
 
-         parameter xc {
-            type _DOUBLE
-            access WRITE
+         parameter quiet {
+            type _LOGICAL
             vpath DEFAULT
-            default 0.0D0
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Suppress screen output?}
             helpkey *
-          }
+         }
 
-         parameter yc {
-            type _DOUBLE
-            access WRITE
+         parameter single {
+            type _LOGICAL
             vpath DEFAULT
-            default 0.0D0
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Allow only a single position to be supplied?}
             helpkey *
-          }
+         }
 
       }
 
