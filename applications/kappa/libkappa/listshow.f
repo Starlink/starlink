@@ -95,9 +95,10 @@
 *        created. The user is re-prompted if the specified Frame is not
 *        available within the positions list. The range of Frames available
 *        will include all those read from the supplied positions list. In 
-*        addition, if the positions are being marked on a graphics device
-*        (see parameter PLOT), then all the Frames associated with the
-*        picture specified by parameter NAME will also be available. [!]
+*        addition, if a graphics device is opened (i.e. if parameter PLOT
+*        is set to anything other than NONE), then all the Frames associated 
+*        with the picture specified by parameter NAME will also be available. 
+*        [!]
 *     GEODESIC = LOGICAL (Read)
 *        This parameter is only accessed if parameter PLOT is set to
 *        "Chain" or "Poly". It specifies whether the curves drawn between
@@ -188,6 +189,12 @@
 *        is drawn horizontally and is centred on the specified position.
 *        The strings to use for each position are specified using parameter 
 *        STRINGS.
+*
+*        - "Blank" -- The graphics device is opened and the picture specified 
+*        by parameter NAME is found, but no actual graphics are drawn to mark 
+*        the positions. This can be usefull if you just want to transform 
+*        the supplied positions into one of the co-ordinate Frames associated 
+*        with the picture, without drawing anything (see parameter FRAME).
 *
 *        Each position may also be separately labelled with its integer 
 *        identifier value by giving a TRUE value for parameter LABEL. [None]
@@ -364,7 +371,8 @@
 
 *  See what type of graphics are required. 
       CALL PAR_CHOIC( 'PLOT', 'None', 'Poly,Mark,Chain,Box,None,'//
-     :                'Vline,Hline,Cross,Text', .TRUE., PLOT, STATUS )
+     :                'Vline,Hline,Cross,Text,Blank', .TRUE., PLOT, 
+     :                STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -397,7 +405,7 @@
       CALL PAR_GET0L( 'LABEL', LABEL, STATUS )
 
 *  Set the dynamic default for QUIET.
-      IF( PLOT .NE. 'NONE' .OR. LABEL ) THEN
+      IF( ( PLOT .NE. 'NONE' .AND. PLOT .NE. 'BLANK' ) .OR. LABEL ) THEN
          CALL PAR_DEF0L( 'QUIET', .TRUE., STATUS )
       ELSE
          CALL PAR_DEF0L( 'QUIET', .FALSE., STATUS )
@@ -675,7 +683,7 @@
 *  Produce any required graphics or labels. The device was opened earlier
 *  and a Plot created (now pointed to by IWCS).
       IF( ( PLOT .NE. 'NONE' .OR. LABEL ) .AND. 
-     :    STATUS .EQ. SAI__OK ) THEN
+     :     STATUS .EQ. SAI__OK ) THEN
 
 *  KPS1_LSHPL may need work space to hold the GRAPHICS positions.
          CALL PSX_CALLOC( 2*NDISP, '_DOUBLE', IPW3, STATUS )

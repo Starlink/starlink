@@ -17182,9 +17182,10 @@ FRAME = LITERAL (Read)
    created. The user is re-prompted if the specified Frame is not
    available within the positions list. The range of Frames available
    will include all those read from the supplied positions list. In
-   addition, if the positions are being marked on a graphics device (see
-   parameter PLOT), then all the Frames associated with the picture
-   specified by parameter NAME will also be available. [!]
+   addition, if a graphics device is opened (i.e. if parameter PLOT
+   is set to anything other than NONE), then all the Frames associated 
+   with the picture specified by parameter NAME will also be available. 
+   [!]
 3 GEODESIC
 GEODESIC = LOGICAL (Read)
    This parameter is only accessed if parameter PLOT is set to
@@ -17285,6 +17286,12 @@ PLOT = LITERAL (Read)
    is drawn horizontally and is centred on the specified position.
    The strings to use for each position are specified using parameter
    STRINGS.
+
+   - "Blank" -- The graphics device is opened and the picture specified 
+   by parameter NAME is found, but no actual graphics are drawn to mark 
+   the positions. This can be usefull if you just want to transform 
+   the supplied positions into one of the co-ordinate Frames associated 
+   with the picture, without drawing anything (see parameter FRAME).
 
    Each position may also be separately labelled with its integer
    identifier value by giving a TRUE value for parameter LABEL. [None]

@@ -67,6 +67,8 @@
 *        -  "TEXT" -- The text string specified by argument TEXT is
 *        displayed, horizontally, and centred on the supplied position.
 *
+*        -  "BLANK" -- Nothing is drawn.
+*
 *     MARKER = INTEGER (Given)
 *        The PGPLOT marker type to use if MODE is "MARKER" or "CHAIN".
 *     GEO = LOGICAL (Given)
@@ -94,6 +96,8 @@
 *  History:
 *     17-NOV-1998 (DSB):
 *        Original version.
+*     14-DEC-1998 (DSB):
+*        Added BLANK option for MODE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -666,6 +670,10 @@
 *  Re-instate the original Current Frame if necessary.
          IF( .NOT. CURR ) CALL AST_SETI( IPLOT, 'CURRENT', ICURR, 
      :                                   STATUS )
+
+*  Blank (i.e. draw nothing).
+*  ==========================
+      ELSE IF( MODE .EQ. 'BLANK' ) THEN
 
 *  Tidy up.
 *  ========
