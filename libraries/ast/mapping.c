@@ -142,9 +142,11 @@ static void (* parent_setattrib)( AstObject *, const char * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
+static double LocalMaximum( const MapData *, double, double, double [] );
 static double MapFunction( const MapData *, const double [], int * );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
 static double Random( long int * );
+static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int * );
 static int GetInvert( AstMapping * );
 static int GetNin( AstMapping * );
 static int GetNout( AstMapping * );
@@ -179,188 +181,6 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char *);
 /* ================= */
 
 #if BOUNDS
-
-#if 1
-static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
-                               double dx[], double xmax[], int *ncall ) {
-   double *f;
-   double *xnew;
-   double *x;
-   double fnew;
-   double fsave;
-   double offset;
-   double result;
-   double tmp;
-   int coord;
-   int lo;
-   int nextlo;
-   int hi;
-   int ncalla;
-   int ncoord;
-   int nvertex;
-   int vertex;
-
-/* Initialise. */
-   result = AST__BAD;
-
-/* Check the global error status. */
-   if ( !astOK ) return result;
-
-/* Obtain the number of input coordinates for the Mapping function and
-   calculate the number of simplex vertices. */
-   ncoord = mapdata->nin;
-   nvertex = ncoord + 1;
-
-/* Initialise the number of calls to the Mapping function. */
-   *ncall = 0;
-   ncalla = 0;
-
-/* Allocate workspace. */
-   f = astMalloc( sizeof( double ) * (size_t) nvertex );
-   x = astMalloc( sizeof( double ) * (size_t) ( ncoord * nvertex ) );
-   xnew = astMalloc( sizeof( double ) * (size_t) ncoord );
-   if ( astOK ) {
-
-/* Loop to set up an initial simplex. */
-      for ( vertex = 0; vertex < nvertex; vertex++ ) {
-         for ( coord = 0; coord < ncoord; coord++ ) {
-            tmp = xmax[ coord ];
-
-/* Displace each vertex (except the first) the required amount along
-   one of the axes to generate the coordinates of the simplex
-   vertices. */
-            if ( coord == ( vertex - 1 ) ) tmp += dx[ coord ];
-            x[ vertex * ncoord + coord ] = tmp;
-         }
-
-/* Evaluate the Mapping function at each vertex. */
-         f[ vertex ] = MapFunction( mapdata, &x[ vertex * ncoord ], ncall );
-      }
-
-/* Update the number of times we attempted to call the Mapping
-   function (not necessarily the same as the number of times it was
-   actually called, which is stored in *ncall). */
-      ncalla += ncoord;
-
-/* Loop until convergence is reached or an error occurs. */
-      while( astOK ) {
-         lo = ( f[ 0 ] < f[ 1 ] ) ? 0 : 1;
-         nextlo = 1 - lo;
-         hi = 0;
-         for ( vertex = 0; vertex < nvertex; vertex++ ) {
-            if ( f[ vertex ] >= f[ hi ] ) hi = vertex;
-            if ( f[ vertex ] < f[ lo ] ) {
-               nextlo = lo;
-               lo = vertex;
-            } else if ( f[ vertex ] < f[ nextlo ] && vertex != lo ) {
-               nextlo = vertex;
-            }
-         }
-
-         if ( ( fabs( f[ lo ] - f[ hi ] ) <= acc ) ||
-             ( *ncall >= maxcall ) ||
-             ( ncalla >= 3 * maxcall ) ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               xmax[ coord ] = x[ hi * ncoord + coord ];
-            }
-            result = f[ hi ];
-            break;
-         }
-
-         fnew = NewVertex( mapdata, lo, -1.0, x, f, ncall, xnew );
-         ncalla++;
-
-/* Contract lowest point towards highest. */
-         if ( fnew == AST__BAD ) {
-            for ( coord = 0; coord < ncoord; coord++ ) {
-               offset = x[ lo * ncoord + coord ] - x[ hi * ncoord + coord ];
-               if ( fabs( offset ) <=
-                   fabs( x[ hi * ncoord + coord ] ) * DBL_EPSILON ) offset = 0.0;
-               x[ lo * ncoord + coord ] = x[ hi * ncoord + coord ] + 0.5 * offset;
-            }
-            f[ lo ] = MapFunction( mapdata, &x[ lo * ncoord ], ncall );
-            ncalla++;
-         } else if ( fnew >= f[ hi ] ) {
-            fnew = NewVertex( mapdata, lo, 2.0, x, f, ncall, xnew );
-            ncalla++;
-         } else if ( fnew <= f[ nextlo ] ) {
-            fsave = f[ lo ];
-            fnew = NewVertex( mapdata, lo, 0.5, x, f, ncall, xnew );
-            ncalla++;
-            if ( fnew <= fsave ) {
-               for ( vertex = 0; vertex < nvertex; vertex++ ) {
-                  if ( vertex != hi ) {
-                     for ( coord = 0; coord < ncoord; coord++ ) {
-                        offset = x[ vertex * ncoord + coord ] -
-                        x[ hi * ncoord + coord ];
-                        if ( fabs( offset ) <=
-                            fabs( x[ hi * ncoord + coord ] ) * DBL_EPSILON ) offset = 0.0;
-                        x[ vertex * ncoord + coord ] =
-                        x[ hi * ncoord + coord ] + 0.5 * offset;
-                     }
-                     f[ vertex ] = MapFunction( mapdata, &x[ vertex * ncoord ], ncall );
-                  }
-               }
-               ncalla += ncoord;
-            }
-         }
-      }
-   }
-
-/* Free workspace. */
-   x = astFree( x );
-   f = astFree( f );
-   xnew = astFree( xnew );
-
-   return result;
-}
-#endif
-
-static double SimplexMaximum( const MapData *mapdata, double x[], double fract,
-                              double acc, int *ncall ) {
-   double result;
-   int nin;
-   double *dx;
-   const double *lbnd;
-   const double *ubnd;
-   double middle;
-   int coord;
-   double maximum;
-   int iter;
-   const int maxiter = 10;
-   int done;
-
-   result = AST__BAD;
-
-   if ( !astOK ) return result;
-
-   nin = mapdata->nin;
-   dx = astMalloc( sizeof( double ) * (size_t) nin );
-
-   lbnd = mapdata->lbnd;
-   ubnd = mapdata->ubnd;
-   for ( iter = 0; iter < maxiter; iter++ ) {
-      for ( coord = 0; coord < nin; coord++ ) {
-         middle = 0.5 * ( ubnd[ coord ] + lbnd[ coord ] );
-         dx[ coord ] = fract * ( ubnd[ coord ] - lbnd[ coord ] );
-         if ( x[ coord ] >= middle ) dx[ coord ] = -dx[ coord ];
-      }
-      maximum = UphillSimplex( mapdata, 0.0, 5000, dx, x, ncall );
-printf( "maximum %d = %.20g, fract = %g, ncall = %d\n", iter, maximum, fract, *ncall );
-      if ( result == AST__BAD ) {
-         result = maximum;
-      } else if ( maximum >= result ) {
-printf( "imnprove, acc = %g %g\n", maximum - result, acc );
-         done = ( ( maximum - result ) <= acc );
-         result = maximum;
-         if ( done ) break;
-      }
-      fract /= 100.0;
-   }
-   
-   dx = astFree( dx );
-   return result;
-}
 
 
 #if 1
@@ -407,26 +227,28 @@ void astBoxBound( AstMapping *this,
    int nout;
    long int irand = 77665544;
    double random;
-   int ncall;
-   double *x_in;
-   double *x_out;
+   double *x_in_l;
+   double *x_out_l;
+   double *x_in_u;
+   double *x_out_u;
    int iter;
    int coord;
-   int limit;
-   double maximum;
-   double new_maximum;
+   double new_min;
+   double new_max;
    int reject;
    double wt;
-   int nreject;
    int i;
-   double wtmax;
+   double wtmax_l;
+   double wtmax_u;
    double wtsum;
    const int nsamp = 50;
    const int maxiter = 50;
    const int miniter = 5;
-   int nsame;
-   const double acc = DBL_EPSILON;
-   int iopt;
+   int nsame_l;
+   int nsame_u;
+   double acc;
+   int done_l;
+   int done_u;
    
    nin = astGetNin( this );
    nout = astGetNout( this );
@@ -443,89 +265,167 @@ void astBoxBound( AstMapping *this,
    mapdata.ptr_in = astGetPoints( mapdata.pset_in );
    mapdata.ptr_out = astGetPoints( mapdata.pset_out );
  
-   for ( limit = 0; limit < 2; limit++ ) {
-      mapdata.negate = !limit;
-      maximum = AST__BAD;
-
-      x_in = x_out = NULL;
-      nsame = 0;
-      iopt = 0;
-      for ( iter = 0; iter < maxiter; iter++ ) {
-         x_in = astGrow( x_in, nin * ( iter + 1 ), sizeof( double ) );
-         x_out = astGrow( x_out, nin * ( iter + 1 ), sizeof( double ) );
-
-         wtsum = wtmax = 0.0;
+   *lbnd_out = *ubnd_out = AST__BAD;
+   x_in_l = x_in_u = NULL;
+   x_out_l = x_out_u = NULL;
+   nsame_l = nsame_u = 0;
+   done_l = done_u = 0;
+   for ( iter = 0; iter < maxiter; iter++ ) {
+      if ( !done_l ) {
+         x_in_l = astGrow( x_in_l, nin * ( iter + 1 ), sizeof( double ) );
+         x_out_l = astGrow( x_out_l, nin * ( iter + 1 ), sizeof( double ) );
+      }
+      if ( !done_u ) {
+         x_in_u = astGrow( x_in_u, nin * ( iter + 1 ), sizeof( double ) );
+         x_out_u = astGrow( x_out_u, nin * ( iter + 1 ), sizeof( double ) );
+      }
+         
+      if ( !done_l ) {
+         wtsum = wtmax_l = 0.0;
          for ( i = 0; i < nsamp; i++ ) {
             for ( coord = 0; coord < nin; coord++ ) {
                random = Random( &irand );
-                 x_in[ iter * nin + coord ] = ubnd_in[ coord ] * random +
-                                            lbnd_in[ coord ] * ( 1.0 - random );
+               x_in_l[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+                                              lbnd_in[ coord ] * ( 1.0 - random );
             }
-            wt = PdfWeight( nin, &x_in[ iter * nin ], lbnd_in, ubnd_in,
-                            iter, x_in, x_out );
+            wt = PdfWeight( nin, &x_in_l[ iter * nin ], lbnd_in, ubnd_in,
+                            iter, x_in_l, x_out_l );
             wtsum += wt;
-            wtmax = ( wt > wtmax ) ? wt : wtmax;
+            wtmax_l = ( wt > wtmax_l ) ? wt : wtmax_l;
          }
-         if ( wtsum < wtmax ) wtmax = wtsum;
+         if ( wtsum < wtmax_l ) wtmax_l = wtsum;
+      }
+      if ( !done_u ) {
+         wtsum = wtmax_u = 0.0;
+         for ( i = 0; i < nsamp; i++ ) {
+            for ( coord = 0; coord < nin; coord++ ) {
+               random = Random( &irand );
+               x_in_u[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+                                              lbnd_in[ coord ] * ( 1.0 - random );
+            }
+            wt = PdfWeight( nin, &x_in_u[ iter * nin ], lbnd_in, ubnd_in,
+                            iter, x_in_u, x_out_u );
+            wtsum += wt;
+            wtmax_u = ( wt > wtmax_u ) ? wt : wtmax_u;
+         }
+         if ( wtsum < wtmax_u ) wtmax_u = wtsum;
+      }
+
+      if ( !done_l ) {
          reject = 1;
-         nreject = 0;
          while ( reject ) {
             for ( coord = 0; coord < nin; coord++ ) {
                random = Random( &irand );
-               x_out[ iter * nin + coord ] =
-                 x_in[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+               x_out_l[ iter * nin + coord ] =
+                 x_in_l[ iter * nin + coord ] = ubnd_in[ coord ] * random +
                                             lbnd_in[ coord ] * ( 1.0 - random );
             }
             wt = 1.0;
-            if ( wtmax > 0.0 ) {
-              wt = PdfWeight( nin, &x_in[ iter * nin ], lbnd_in, ubnd_in,
-                              iter, x_in, x_out ) / wtmax;
+            if ( wtmax_l > 0.0 ) {
+              wt = PdfWeight( nin, &x_in_l[ iter * nin ], lbnd_in, ubnd_in,
+                              iter, x_in_l, x_out_l ) / wtmax_l;
             }
             reject = ( Random( &irand ) > wt );
-            if ( reject ) nreject++;
          }
-         printf( "nreject = %d\n", nreject );
+      }
+      if ( !done_u ) {
+         reject = 1;
+         while ( reject ) {
+            for ( coord = 0; coord < nin; coord++ ) {
+               random = Random( &irand );
+               x_out_u[ iter * nin + coord ] =
+                 x_in_u[ iter * nin + coord ] = ubnd_in[ coord ] * random +
+                                            lbnd_in[ coord ] * ( 1.0 - random );
+            }
+            wt = 1.0;
+            if ( wtmax_u > 0.0 ) {
+              wt = PdfWeight( nin, &x_in_u[ iter * nin ], lbnd_in, ubnd_in,
+                              iter, x_in_u, x_out_u ) / wtmax_u;
+            }
+            reject = ( Random( &irand ) > wt );
+         }
+      }
 
-printf( "X minimising (limit=%d, iter=%d) starting at:\n", limit, iter );
+      if ( ( *lbnd_out != AST__BAD ) && ( *ubnd_out != AST__BAD ) ) {
+         acc = fabs( *ubnd_out - *lbnd_out );
+      } else if ( *lbnd_out != AST__BAD ) {
+         acc = fabs( *lbnd_out );
+      } else if ( *ubnd_out != AST__BAD ) {
+         acc = fabs( *ubnd_out );
+      } else {
+         acc = 1.0;
+      }
+      acc *= DBL_EPSILON;
+printf( "acc = %g\n", acc );
+      if ( !done_l ) {
+         printf( "X minimising (iter=%d) starting at:\n", iter );
          for ( coord = 0; coord < nin; coord ++ ) {
-printf( "%g ", x_in[ iter * nin + coord ] );
+            printf( "%g ", x_in_l[ iter * nin + coord ] );
          }
-printf( "\n" );
-         new_maximum = SimplexMaximum( &mapdata, &x_out[ iter * nin ],
-                                       0.1, acc, &ncall );
-         printf( "maximum found at " );
+         printf( "\n" );
+         mapdata.negate = 1;
+         new_min = -LocalMaximum( &mapdata, acc, 0.1, &x_out_l[ iter * nin ] );
+         printf( "minimum found at " );
          for ( coord = 0; coord < nin; coord++ ) {
-            printf( "%.20g ", x_out[ iter * nin + coord ] );
+            printf( "%.20g ", x_out_l[ iter * nin + coord ] );
          }
          printf( "\n\n" );
-         if ( new_maximum > maximum ) {
-            if ( ( new_maximum - maximum ) > acc ) {
-               nsame = 0;
-            } else {
-               nsame++;
-            }
-            maximum = new_maximum;
-            iopt = iter;
-         } else {
-            nsame++;
+      }
+      if ( !done_u ) {
+         printf( "X maximising (iter=%d) starting at:\n", iter );
+         for ( coord = 0; coord < nin; coord ++ ) {
+            printf( "%g ", x_in_u[ iter * nin + coord ] );
          }
-printf( "nsame, iopt = %d %d\n", nsame, iopt );
-         if ( ( ( iter + 1 ) >= miniter ) &&
-              ( nsame >= ( 0.3 * ( iter + 1 ) ) ) ) break;
+         printf( "\n" );
+         mapdata.negate = 0;
+         new_max = LocalMaximum( &mapdata, acc, 0.1, &x_out_u[ iter * nin ] );
+         printf( "maximum found at " );
+         for ( coord = 0; coord < nin; coord++ ) {
+            printf( "%.20g ", x_out_u[ iter * nin + coord ] );
+         }
+         printf( "\n\n" );
       }
-      if ( !limit ) {
-         *lbnd_out = - maximum;
-      } else {
-         *ubnd_out = maximum;
+
+      if ( !done_l ) {
+         if ( *lbnd_out == AST__BAD ) {
+            nsame_l = 0;
+            *lbnd_out = new_min;
+         } else if ( new_min < *lbnd_out ) {
+            nsame_l = ( ( *lbnd_out - new_min ) > acc ) ? 0 : nsame_l + 1;
+            *lbnd_out = new_min;
+         } else {
+            nsame_l++;
+         }
+printf( "nsame_l = %d\n", nsame_l );
       }
-      printf( "best limit = %g at ", maximum );
-      for ( coord = 0; coord < nin; coord++ ) {
-         printf( "%g ", x_out[ iopt * nin + coord ] );
+      if ( !done_u ) {
+         if ( *ubnd_out == AST__BAD ) {
+            nsame_u = 0;
+            *ubnd_out = new_max;
+         } else if ( new_max > *ubnd_out ) {
+            nsame_u = ( ( new_max - *ubnd_out ) > acc ) ? 0 : nsame_u + 1;
+            *ubnd_out = new_max;
+         } else {
+            nsame_u++;
+         }
+printf( "nsame_u = %d\n", nsame_u );
       }
-      printf( "\n\n" );
-      x_in = astFree( x_in );
-      x_out = astFree( x_out );
+      if ( ( ( iter + 1 ) >= miniter ) &&
+          ( nsame_l >= miniter ) &&
+          ( nsame_l >= ( 0.3 * ( iter + 1 ) + 0.5 ) ) ) done_l = 1;
+      if ( ( ( iter + 1 ) >= miniter ) &&
+          ( nsame_u >= miniter ) &&
+          ( nsame_u >= ( 0.3 * ( iter + 1 ) + 0.5 ) ) ) done_u = 1;
+      if ( done_l && done_u ) break;
+
+
    }
+   printf( "best limit(l) = %g\n", *lbnd_out );
+   printf( "best limit(u) = %g\n", *ubnd_out );
+   x_in_l = astFree( x_in_l );
+   x_out_u = astFree( x_out_u );
+   x_in_l = astFree( x_in_l );
+   x_out_u = astFree( x_out_u );
 }
 
 #else
@@ -716,7 +616,7 @@ void astBoxBound( AstMapping *this,
          for ( coord = 0; coord < nin; coord++ ) {
             p[ coord ] = ptr2_in[ coord ][ NFIT - 1 ];
          }
-         answer = SimplexMaximum( &mapdata, p, noise, DBL_EPSILON, &ncall );
+         answer = LocalMaximum( &mapdata, p, noise, DBL_EPSILON, &ncall );
          printf( "ymin = %g\n", answer );
          printf( "ncall = %d\n", ncall );
 
@@ -1388,6 +1288,140 @@ f        The global status.
 /* If the resulting default value is not the one required, then set a
    new value explicitly. */
    if ( astGetInvert( this ) != invert ) astSetInvert( this, invert );
+}
+
+static double LocalMaximum( const MapData *mapdata, double acc, double fract,
+                            double x[] ) {
+/*
+*  Name:
+*     LocalMaximum
+
+*  Purpose:
+*     Find a local maximum in a Mapping function.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double LocalMaximum( const MapData *mapdata, double acc, double fract,
+*                          double x[] );
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function finds a local maximum in the Mapping function
+*     supplied.  It employs the modified simplex method (as
+*     implemented by UphillSimplex), but repeatedly re-starts the
+*     simplex algorithm and tests for convergence of successive
+*     maxima, so as to further improve robustness on difficult
+*     problems.
+
+*  Parameters:
+*     mapdata
+*        Pointer to a MapData structure describing the Mapping
+*        function, its coordinate constraints, etc.
+*     acc
+*        The required accuracy with which the maximum is to be found.
+*     fract
+*        A value between 0.0 and 1.0 which determines the initial step
+*        length along each coordinate axis. It should be given as a
+*        fraction of the difference between the upper and lower
+*        constraint values for each axis (as specified in the
+*        "mapdata" structure).
+*     x
+*        Pointer to an array of double containing the coordinates of
+*        an initial estimate of the position of the maximum. On exit,
+*        this will be updated to contain the best estimate of the
+*        maximum's position, as found by this function.
+
+*  Returned Value:
+*     The best estimate of the Mapping function's maximum value.
+
+*  Notes:
+*     - A value of AST__BAD will be returned, and no useful
+*     information about a solution will be produced, if this function
+*     is invoked with the global error status set or if it should fail
+*     for any reason.
+*/
+
+/* Local Constants: */
+   const int maxcall = 5000;     /* Maximum number of function evaluations */
+   const int maxiter = 10;       /* Maximum number of iterations */
+
+/* Local Variables: */
+   double *dx;                   /* Pointer to array of step lengths */
+   double err;                   /* Simplex error estimate */
+   double maximum;               /* Simplex maximum value */
+   double middle;                /* Middle coordinate between bounds */
+   double result;                /* Result value to return */
+   int coord;                    /* Loop counter for coordinates */
+   int done;                     /* Iterations complete? */
+   int iter;                     /* Loop counter for iterations */
+   int ncall;                    /* Number of function calls (junk) */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Allocate workspace. */
+   dx = astMalloc( sizeof( double ) * (size_t) mapdata->nin );
+
+/* Perform iterations to repeatedly identify a local maximum. */
+   for ( iter = 0; astOK && ( iter < maxiter ); iter++ ) {
+
+/* Set up initial step lengths along each coordinate axis, adjusting
+   their signs to avoid placing points outside the coordinate
+   constraints (i.e. step away from the closer boundary on each
+   axis). */
+      for ( coord = 0; coord < mapdata->nin; coord++ ) {
+         middle = 0.5 * ( mapdata->lbnd[ coord ] + mapdata->ubnd[ coord ] );
+         dx[ coord ] = fract * ( mapdata->ubnd[ coord ] -
+                                 mapdata->lbnd[ coord ] );
+         if ( x[ coord ] > middle ) dx[ coord ] = -dx[ coord ];
+      }
+
+/* Find an approximation to a local maximum using the simplex method
+   and check for errors. */
+      maximum = UphillSimplex( mapdata, acc, maxcall, dx, x, &err, &ncall );
+      if ( astOK ) {
+
+/* Use this maximum value if no previous maximum has been found. */
+         if ( result == AST__BAD ) {
+            result = maximum;
+
+/* Otherwise use it only if it improves on the previous maximum. */
+         } else if ( maximum >= result ) {
+
+/* We iterate, re-starting the simplex algorithm from its previous
+   best position so as to guard against premature false
+   convergence. Iterations continue until the improvement in the
+   maximum is no greater than the required accuracy (and the simplex
+   algorithm itself has converged to the required accuracy). Note when
+   iterations should cease. */
+            done = ( ( ( maximum - result ) <= acc ) && ( err <= acc ) );
+
+/* Store the best maximum and quit iterating if appropriate. */
+            result = maximum;
+            if ( done ) break;
+         }
+
+/* Otherwise, decrement the initial step size for the next iteration. */
+         fract /= 100.0;
+      }
+   }
+   
+/* Free the workspace. */
+   dx = astFree( dx );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* return the result. */
+   return result;
 }
 
 static double MapFunction( const MapData *mapdata, const double in[],
@@ -3134,6 +3168,307 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* Return a pointer to the output PointSet. Note that we do not actually
    transform (or even copy) the coordinates. This is left for derived classes
    to implement. */
+   return result;
+}
+
+static double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
+                             const double dx[], double xmax[], double *err,
+                             int *ncall ) {
+/*
+*  Name:
+*     UphillSimplex
+
+*  Purpose:
+*     Find a function maximum using a modification of the simplex method.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     double UphillSimplex( const MapData *mapdata, double acc, int maxcall,
+*                           const double dx[], double xmax[], double *err,
+*                           int *ncall );
+
+*  Class Membership:
+*     Mapping member function.
+
+*  Description:
+*     This function applies a modification of the simplex method to
+*     find a local maximum in the value returned by a Mapping
+*     function. The modification used allows the method to cope with
+*     coordinate constraints and (equivalently) regions where the
+*     function returns "bad" values. The method is robust and not
+*     susceptible to overflow, so is suitable for applying to Mapping
+*     functions of unknown form.
+
+*  Parameters:
+*     mapdata
+*        Pointer to a MapData structure which describes the Mapping
+*        function, its coordinate constraints, etc.
+*     acc
+*        The accuracy required in the value of the maximum.
+*     maxcall
+*        The maximum number of Mapping function evaluations to use.
+*     dx
+*        Pointer to an array of double containing an offset along each
+*        input coordinate for the Mapping function supplied. These
+*        offsets will be used to construct the initial simplex
+*        (i.e. they are the initial "step lengths" for each
+*        coordinate) and may be positive or negative.
+*     xmax
+*        Pointer to an array of double which contains the coordinates
+*        of an initial estimate of the location of the maximum. On
+*        exit, this will be updated to contain the best estimate of
+*        the location of the maximum as generated by this function.
+*     err
+*        Pointer to a double in which to return an estimate of the
+*        error in the value of the maximum found. For normal
+*        convergence, this should be no larger than "acc". However, if
+*        the maximum number of Mapping function evaluations is
+*        reached, the returned value may be larger than this, although
+*        it should still be valid. In such cases, re-starting the
+*        algorithm at the new location returned in "xmax" may be
+*        advisable.
+*     ncall
+*        Pointer to an int in which the number of Mapping function
+*        evaluations will be returned.
+
+*  Returned Value:
+*     An estimate of the Mapping function value at the local maximum.
+
+*  Notes:
+*     - The function may return before the requested accuracy has been
+*     met and before all Mapping function evaluations have been
+*     made. This signifies that an excessive number of function values
+*     have been needed outside the coordinate constraints. This is
+*     only likely if the function is unable to make progress near such
+*     a constraint, in which case the algorithm should probably be
+*     re-started.
+*     - A value of AST__BAD will be returned if no maximum could be
+*     found.  This means that all the Mapping function evaluations
+*     performed returned a value of AST__BAD.
+*     - A value of AST__BAD will also be returned and no useful
+*     information about a solution will be produced if this routine is
+*     invoked with the global error status set, or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   double *f;                    /* Pointer to array of function values */
+   double *x;                    /* Pointer to array of vertex coordinates */
+   double *xnew;                 /* Pointer to workspace array */
+   double fnew;                  /* New function value */
+   double fsave;                 /* Saved function value */
+   double offset;                /* Coordinate difference between vertices */
+   double range;                 /* Range of simplex values */
+   double result;                /* Value to return */
+   double tmp;                   /* Temporary store for coordinate */
+   int coord;                    /* Loop counter for coordinates */
+   int hi;                       /* Index of best vertex */
+   int lo;                       /* Index of worst vertex */
+   int ncalla;                   /* Number of function calls attempted */
+   int ncoord;                   /* Number of function dimensions */
+   int nextlo;                   /* Index of second worst vertex */
+   int nvertex;                  /* Number of simplex vertices */
+   int vertex;                   /* Loop counter for vertices */
+
+/* Initialise. */
+   *err = DBL_MAX;
+   *ncall = 0;
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain the number of input coordinates for the Mapping function and
+   calculate the number of simplex vertices. */
+   ncoord = mapdata->nin;
+   nvertex = ncoord + 1;
+
+/* Allocate workspace. */
+   f = astMalloc( sizeof( double ) * (size_t) nvertex );
+   x = astMalloc( sizeof( double ) * (size_t) ( ncoord * nvertex ) );
+   xnew = astMalloc( sizeof( double ) * (size_t) ncoord );
+   if ( astOK ) {
+
+/* Loop to set up an initial simplex. */
+      for ( vertex = 0; vertex < nvertex; vertex++ ) {
+         for ( coord = 0; coord < ncoord; coord++ ) {
+            tmp = xmax[ coord ];
+
+/* Displace each point (except the first) the required amount along
+   one of the axes to generate the coordinates of the simplex
+   vertices. */
+            if ( coord == ( vertex - 1 ) ) tmp += dx[ coord ];
+            x[ vertex * ncoord + coord ] = tmp;
+         }
+
+/* Evaluate the Mapping function at each vertex. */
+         f[ vertex ] = MapFunction( mapdata, &x[ vertex * ncoord ], ncall );
+         if ( f[ vertex ] == AST__BAD ) f[ vertex ] = -DBL_MAX;
+      }
+
+/* Initialise the number of times we attempt to call the Mapping
+   function (not necessarily the same as the number of times it was
+   actually called, which is stored in *ncall). */
+      ncalla = nvertex;
+
+/* Loop until convergence is reached or an error occurs. */
+      while( astOK ) {
+
+/* Initialise the index of the lowest vertex of the simplex, the next
+   lowest vertex and the highest vertex. */
+         lo = ( f[ 0 ] < f[ 1 ] ) ? 0 : 1;
+         nextlo = 1 - lo;
+         hi = 0;
+
+/* Loop to inspect each vertex and update these values. */
+         for ( vertex = 0; vertex < nvertex; vertex++ ) {
+            if ( f[ vertex ] < f[ lo ] ) {
+               nextlo = lo;
+               lo = vertex;
+            } else if ( ( f[ vertex ] < f[ nextlo ] ) && ( vertex != lo ) ) {
+               nextlo = vertex;
+            }
+            if ( f[ vertex ] >= f[ hi ] ) hi = vertex;
+         }
+
+/* Estimate the error on the result as the difference between the
+   highest and lowest simplex vertices. */
+         range = f[ hi ] - f[ lo ];
+
+/* Test for convergence. Ideally, the accuracy criterion should have
+   been met. However, also quit if the maximum number of Mapping
+   function evaluations has been reached, or the number of points at
+   which function values have been requested reaches three times this
+   limit (this latter number will typically be larger because points
+   lying outside the coordinate constraints do not result in the
+   Mapping function being evaluated. */
+         if ( range <= fabs( acc ) ||
+              ( *ncall >= maxcall ) || ( ncalla >= ( 3 * maxcall ) ) ) {
+
+/* If quitting, return the coordinates and function value at the best
+   simplex vertex, and the error estimate. */
+            for ( coord = 0; coord < ncoord; coord++ ) {
+               xmax[ coord ] = x[ hi * ncoord + coord ];
+            }
+            result = ( f[ hi ] == -DBL_MAX ) ? AST__BAD : f[ hi ];
+            *err = range;
+            break;
+         }
+
+/* If performing another iteration, first try reflecting the worst
+   vertex through the opposite face of the simplex. Check for
+   errors. */
+         fnew = NewVertex( mapdata, lo, -1.0, x, f, ncall, xnew );
+         ncalla++;
+         if ( astOK ) {
+
+/* If this results in a point lying in a forbiddden region (either
+   outside the coordinate constraints or where the Mapping function
+   yields bad coordinate values), then we must make a departure from
+   the standard simplex algorithm. This is because the inability to
+   make forward progress in this case can cause the simplex to
+   repeatedly contract about each face (except one) in turn. This
+   mechanism normally results in lateral contraction as the simplex
+   attempts to squeeze through a narrow gap which is impeding
+   progress. However, in this case there is no gap to get through, so
+   the lateral contraction can eventually make the simplex become
+   degenerate (due to rounding). This prevents it from expanding
+   laterally again and exploring the region adjacent to the constraint
+   boundary once it has become small enough. */
+            if ( fnew == AST__BAD ) {
+
+/* To overcome this, we instead contract the worst simplex vertex by a
+   factor of two towards the best vertex (this has the cumulative
+   effect of contracting the simplex without changing its
+   shape). First find the offset in each coordinate between these two
+   vertices. */
+               for ( coord = 0; coord < ncoord; coord++ ) {
+                  offset = x[ lo * ncoord + coord ] - x[ hi * ncoord + coord ];
+
+/* Ensure the offset will underflow to zero when divided by two, so
+   that the two points will eventually coalesce (as opposed to
+   remaining separated by one bit). This ensures that the error
+   estimate will eventually reach zero. */
+                  if ( ( fabs( offset ) <= ( DBL_EPSILON *
+                         fabs( x[ lo * ncoord + coord ] ) ) ) ||
+                       ( fabs( offset ) <= ( DBL_EPSILON *
+                         fabs( x[ hi * ncoord + coord ] ) ) ) ) {
+                     offset = 0.0;
+                  }
+
+/* Calculate the new coordinate. */
+                  x[ lo * ncoord + coord ] = x[ hi * ncoord + coord ] +
+                                             0.5 * offset;
+               }
+
+/* Evaluate the Mapping function at the new vertex. */
+               f[ lo ] = MapFunction( mapdata, &x[ lo * ncoord ], ncall );
+               if ( f[ lo ] == AST__BAD ) f[ lo ] = -DBL_MAX;
+               ncalla++;
+
+/* We now return to the standard simplex algorithm. If the new vertex
+   is a new maximum, then see if more of the same is even better by
+   trying to expand the best vertex by a factor of two away from the
+   opposite face. */
+            } else if ( fnew >= f[ hi ] ) {
+               fnew = NewVertex( mapdata, lo, 2.0, x, f, ncall, xnew );
+               ncalla++;
+
+/* Otherwise, if the new vertex was no improvement on the second
+   worst, then try contracting the worst vertex by a factor of two
+   towards the opposite face. */
+            } else if ( fnew <= f[ nextlo ] ) {
+               fsave = f[ lo ];
+               fnew = NewVertex( mapdata, lo, 0.5, x, f, ncall, xnew );
+               ncalla++;
+
+/* If this didn't result in any improvement, then contract the entire
+   simplex by a factor of two towards the best vertex. Use the same
+   approach as earlier to protect against rounding so that all the
+   simplex vertices will eventually coalesce if this process is
+   repeated enough times. */
+               if ( astOK && ( fnew <= fsave ) ) {
+                  for ( vertex = 0; vertex < nvertex; vertex++ ) {
+                     if ( vertex != hi ) {
+                        for ( coord = 0; coord < ncoord; coord++ ) {
+                           offset = x[ vertex * ncoord + coord ] -
+                                    x[ hi * ncoord + coord ];
+                           if ( ( fabs( offset ) <= ( DBL_EPSILON *
+                                  fabs( x[ lo * ncoord + coord ] ) ) ) ||
+                                ( fabs( offset ) <= ( DBL_EPSILON *
+                                  fabs( x[ hi * ncoord + coord ] ) ) ) ) {
+                              offset = 0.0;
+                           }
+                           x[ vertex * ncoord + coord ] =
+                               x[ hi * ncoord + coord ] + 0.5 * offset;
+                        }
+
+/* Evaluate the Mapping function at each new vertex. */
+                        f[ vertex ] = MapFunction( mapdata,
+                                                   &x[ vertex * ncoord ],
+                                                   ncall );
+                        if ( f[ vertex ] == AST__BAD ) f[ vertex ] = -DBL_MAX;
+                        ncalla++;
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+/* Free workspace. */
+   x = astFree( x );
+   f = astFree( f );
+   xnew = astFree( xnew );
+
+/* If an error occurred, clear the returned result. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
    return result;
 }
 
