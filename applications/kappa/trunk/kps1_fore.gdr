@@ -1,4 +1,4 @@
-      SUBROUTINE KPS1_FORE<T>( M, N, OUT, WORK, STATUS )
+      SUBROUTINE KPS1_FORE<T>( M, N, IN, OUT, WORK, STATUS )
 *+
 *  Name:
 *     KPS1_FOREx
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation
-*     CALL KPS1_FOREx( M, N, OUT, WORK, STATUS )
+*     CALL KPS1_FOREx( M, N, IN, OUT, WORK, STATUS )
 
 *  Description:
 *     Does a reverse FFT of a single 2-d array which is assumed to be
@@ -22,9 +22,12 @@
 *        The number of columns per line in the input Fourier transform.
 *     N = INTEGER (Given)
 *        The number of lines in the input Fourier transform.
-*     OUT( M, N ) = ? (Given and Returned)
-*        On input it is the Hermitian array.  On output it is the real 
-*        array.
+*     IN( M, N ) = ? (Given and Returned)
+*        On input it is the Hermitian array.  On output it has its
+*        quadrants swapped such that the zero frequency is at the
+*        corners.
+*     OUT( M, N ) = ? (Returned)
+*        The real array.
 *     WORK( * ) = ? (Returned)
 *        Work space. Must be at least ( 3*max(m,n)+15 ) elements long.
 *     STATUS = INTEGER (Given and Returned)
@@ -54,6 +57,9 @@
 *        message reporting.  Removed unnecessary variables.
 *     1995 March 30 (MJC):
 *        Made generic from FFTREV.
+*     1995 June 22 (MJC):
+*        Added IN argument to avoid violation of the ANSI standard in
+*        call to KPG1_FFTBx.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -72,9 +78,10 @@
       INTEGER N
       
 *  Arguments Given and Returned:
-      <TYPE> OUT( M, N )
+      <TYPE> IN( M, N )
 
 *  Arguments Returned:
+      <TYPE> OUT( M, N )
       <TYPE> WORK( * )
 
 *  Status:
@@ -114,15 +121,15 @@
       DO K = 1, N
 
          DO J = 1, MM1H
-            WORK( J ) = OUT( J, K )
+            WORK( J ) = IN( J, K )
          END DO
 
          DO J = MP1H, M
-            OUT( J - MM1H, K ) = OUT( J, K )
+            IN( J - MM1H, K ) = IN( J, K )
          END DO
 
          DO J = 1, MM1H
-            OUT( J + MHP1, K ) = -WORK( J )
+            IN( J + MHP1, K ) = -WORK( J )
          END DO
 
       END DO
@@ -131,20 +138,20 @@
       DO J = 1, M
 
          DO K = 1, NM1H
-            WORK( K ) = OUT( J, K )
+            WORK( K ) = IN( J, K )
          END DO
 
          DO K = NP1H, N
-            OUT( J, K - NM1H ) = OUT( J, K )
+            IN( J, K - NM1H ) = IN( J, K )
          END DO
 
          DO K = 1, NM1H
-            OUT( J, K + NHP1 ) = -WORK( K )
+            IN( J, K + NHP1 ) = -WORK( K )
          END DO
 
       END DO
 
 *  Fourier transform the image.
-      CALL KPG1_FFTB<T>( M, N, OUT, WORK, OUT, STATUS )
+      CALL KPG1_FFTB<T>( M, N, IN, WORK, OUT, STATUS )
 
       END
