@@ -12,9 +12,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {223.1}
+\newcommand{\stardocnumber}    {223.2}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {9 November 1998}
+\newcommand{\stardocdate}      {12 November 1998}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 1.1}
@@ -1069,7 +1069,7 @@ are new to POLKA, it is  a good idea to work your way through the
 tutorial first.
 
 
-\subsection{Displaying the Results}
+\subsection{\label{SEC:DISP}Displaying the Results}
 Linear polarimetry results are usually expressed in terms of the percentage
 polarization and the orientation of the plane of polarization (see
 \hyperref{here}{appendix }{}{APP:POL}). Vectors may be used to represent
@@ -1403,7 +1403,85 @@ GUI is available from the \emph{Help} menu within the GUI.
 
 \end{itemize}
 
+\subsection{\xlabel{usingradecinformation}Using RA/DEC Information}
+Information describing spatial co-ordinate Frames can be stored within the 
+WCS component of the standard NDF structure. All NDFs know about ``pixel
+co-ordinates'', but additional co-ordinate Frames can be added. In the context 
+of POLPACK, the co-ordinate Frames most likely to be of interest are celestial 
+co-ordinate systems such as RA/DEC. This information can be used in two
+ways:
+\begin{enumerate}
+\item To annotate the axes of vector maps produced using [\htmlref{POLPLOT}{POLPLOT}].
+\item To align vector maps with other images obtained from elsewhere.
+\end{enumerate}
 
+\subsubsection {Adding an RA/DEC Calibration to your Data}
+The simplest method is probably to define the RA/DEC calibration once the
+$O$ and $E$ ray images have been extracted into separate images (i.e.
+after running POLKA). So, the procedure is:
+
+\begin{itemize}
+
+\item Extract and align the $O$ and $E$ ray intensity images using
+\htmlref{POLKA}{POLKA}. Specify the output images using parameters OUT\_O
+and OUT\_E, and give a null value (``!'') for parameter OUT\_S since we will
+be using \htmlref{POLCAL}{POLCAL} to create the Stokes parameters later.
+
+\item Add an RA/DEC calibration to one of the $O$ or $E$ ray images 
+created by POLKA (it doesn't really matter which one). This will usually 
+require you to know the RA and DEC of at least two features in the image. 
+See \hyperref{here}{appendix }{}{APP:GAIA} for a simple description of how 
+to use \xref{GAIA}{sun214}{} {\latexonly (SUN/214)} to do this.
+
+\item Create a cube of Stokes vectors using \htmlref{POLCAL}{POLCAL}. Any
+WCS information is copied from the first input image (given for parameter IN)
+to the output cube. For this reason, the first input image supplied to 
+POLCAL for parameter IN should be the one containing the RA/DEC calibration 
+created in the previous step.
+
+\item Continue to create a catalogue of polarization vectors as normal using 
+\htmlref{POLVEC}{POLVEC}, \htmlref{POLBIN}{POLBIN}, etc.
+
+\end{itemize}
+
+\subsubsection {Annotating Axes with RA/DEC Values}
+After following the above procedure, you should find that
+\htmlref{POLPLOT}{POLPLOT} automatically annotates your vector map with
+RA/DEC values. If you want to annotate the axes in pixel co-ordinates for
+any reason, specify the value ``PIXEL'' for the FRAME parameter when running
+POLPLOT. You can also choose to annotate the axes in several other common
+celestial co-ordinate Frames by supplying suitable values for parameter
+FRAME. Some examples:
+
+\begin{description}
+\item [FRAME=GAL] -- this will result in the axes being annotated with
+galactic co-ordinates.
+\item [FRAME=ECL] -- this will result in the axes being annotated with
+ecliptic co-ordinates (referred to the B1950.0 equinox). 
+\end{description}
+
+Ecliptic and equatorial (RA/DEC) co-ordinates are referred to a specified
+equinox. The required equinox can be included, in parentheses, following the
+co-ordinate system name. For instance:
+
+\begin{description}
+\item [FRAME=EQU(J2000)] -- this will result in the axes being annotated with
+RA/DEC referred to the J2000.0 equinox. The RA/DEC calibration stored
+with the catalogue will be precessed if necessary.
+\item [FRAME=ECL(B1983.4)] -- this will result in the axes being annotated with
+ecliptic co-ordinates referred to the B1983.4 equinox. 
+\end{description}
+
+\subsubsection {Aligning Vector Maps with Other Images}
+If you are using KAPPA V0.13 or later, and have an image containing a 
+calibration in a suitable celestial co-ordinate system, then you can plot 
+the polarization vectors in alignment with the image. If you follow the 
+procedure described \hyperref{here}{in section }{}{SEC:DISP}, then the
+vectors will be aligned automatically with the image. One niggle to watch 
+out for is that both DISPLAY and POLPLOT draw annotated axes, potentially 
+resulting in a bit of a mess! You should normally disable the production of 
+one set of axes by setting parameter AXES to ``NO'' when running either
+DISPLAY or POLPLOT.
 
 \section{Running from the C-shell}
 When using POLPACK from the C-shell (or any other shell) care needs to be
@@ -2967,10 +3045,9 @@ for NDF applications.
 
       The inputs to this application are a set of intensity frames which
       have been corrected to remove any instrumental effects
-      introduced by the detector (such as de-biassing, flat-fielding, \emph{etc}).
+      introduced by the detector (such as de-biassing, flat-fielding, etc).
       Output Stokes vectors can only be produced if all input frames contain
-      a POLPACK extension (see application \htmlref{POLIMP}{POLIMP} or
-      \htmlref{POLEXT}{POLEXT}). In dual-beam mode, each
+      a POLPACK extension (see application POLIMP). In dual-beam mode, each
       input frame contains two images of the sky (the O and E ray images).
       In single-beam mode, each input frame contains only a single image of
       the sky.
@@ -2994,25 +3071,25 @@ for NDF applications.
       the satisfaction of the user, the second stage is entered in which the
       output data files are created. Once initiated, no further interaction on
       the part of the user is required. This is the computationally intensive
-      bit. The GUI makes use of various applications from POLPACK, \xref{KAPPA}{sun95}{} and
-      \xref{CCDPACK}{sun139}{} to perform all these tasks. Note, if the find 
-      the image display area too small for comfort you can make it bigger 
-      using the DPI parameter described below.
+      bit. The GUI makes use of various applications from POLPACK, KAPPA and
+      CCDPACK to perform all these tasks. Note, if the find the image
+      display area too small for comfort you can make it bigger using the
+      DPI parameter described below.
 
       A step-by-step tutorial on the use of the GUI is available within the
-      \texttt{"}Help\texttt{"} menu at the right hand end of the menu bar (see also the STARTHELP
+      {\tt "}Help{\tt "} menu at the right hand end of the menu bar (see also the STARTHELP
       parameter).
 
       Various options controlling the behaviour of the GUI can be set on the
       command line by assigning values to the parameters listed below.
-      Alternatively, most of them can be set using the \texttt{"}Options\texttt{"} menu in the
+      Alternatively, most of them can be set using the {\tt "}Options{\tt "} menu in the
       menu bar at the top of the GUI. If not supplied on the command line,
       these parameters usually adopt the values they had on the previous
       invocation of POLKA. The values shown in square brackets in the parameter
       descriptions below are the initial default values.
    }
    \sstusage{
-      polka in out\_s 
+      polka in out\_s
    }
    \sstparameters{
       \sstsubsection{
@@ -3026,7 +3103,7 @@ for NDF applications.
       \sstsubsection{
          CURCOL = LITERAL (Update)
       }{
-         The colour with which to mark the objects (\emph{i.e.} image features and
+         The colour with which to mark the objects (i.e. image features and
          masks) currently being entered by the user. This should be
          one of RED, BLUE, GREEN, CYAN, MAGENTA, YELLOW, BLACK. Any
          unambiguous abbreviation can be supplied, and the value is
@@ -3040,9 +3117,9 @@ for NDF applications.
          small or large. For this reason, an explicit value may be supplied
          using this parameter. If a null (!) value is supplied, then the
          DPI value returned by the X server is used. This parameter may
-         also be used to adjust the size of the GUI to the user\texttt{'}s
+         also be used to adjust the size of the GUI to the user{\tt '}s
          preference, even if the DPI value returned by the X server is correct.
-         Note, this value cannot be set from the GUI\texttt{'}s \texttt{"}Options\texttt{"} menu. [!]
+         Note, this value cannot be set from the GUI{\tt '}s {\tt "}Options{\tt "} menu. [!]
       }
       \sstsubsection{
          DUALBEAM = \_LOGICAL (Read)
@@ -3051,11 +3128,11 @@ for NDF applications.
          dual-beam mode, producing two output images for each input image.
          Otherwise, it will operate in single-beam mode, with one output
          image being produced for each input image. In single-beam mode,
-         the output image is notionally referred to as the \texttt{"}O-ray\texttt{"} image,
+         the output image is notionally referred to as the {\tt "}O-ray{\tt "} image,
          and all the GUI controls related to the E-ray areas are disabled.
          This parameter is only used when processing polarimeter data
-         (see parameter POL). It\texttt{'}s value cannot be set from the
-         \texttt{"}Options\texttt{"} menu within the GUI. [TRUE]
+         (see parameter POL). It{\tt '}s value cannot be set from the
+         {\tt "}Options{\tt "} menu within the GUI. [TRUE]
       }
       \sstsubsection{
          FITTYPE = \_INTEGER (Update)
@@ -3063,14 +3140,19 @@ for NDF applications.
          The type of mapping which should be used between images. This
          may take any of the following values:
 
-         1 - Shift of origin.\\
-         2 - Shift of origin and rotation.\\
-         3 - Shift of origin and magnification.\\
-         4 - Shift of origin, rotation and magnification.\\
-         5 - A full 6 parameter mapping of the form:\\
+         1 - Shift of origin.
 
-         \hspace*{5mm} X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in\\
-         \hspace*{5mm} Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in\\
+         2 - Shift of origin and rotation.
+
+         3 - Shift of origin and magnification.
+
+         4 - Shift of origin, rotation and magnification.
+
+         5 - A full 6 parameter mapping of the form:
+
+               X\_out = C1  $+$  C2 $*$ X\_in  $+$  C3 $*$ Y\_in
+
+               Y\_out = C4  $+$  C5 $*$ X\_in  $+$  C6 $*$ Y\_in
 
          Only mapping types 1 and 3 are available when processing
          polarimeter data (see parameter POL). [1]
@@ -3086,20 +3168,20 @@ for NDF applications.
       \sstsubsection{
          IN = NDF (Read)
       }{
-         A group of 2D input intensity frames. This may take the form of a
-         comma separated list of file names, or any of the other forms 
-         described in the help on \texttt{"}Group Expressions\texttt{"}. 
-         Note, the input frames cannot be specified within the GUI.
+         A group of 2-d input intensity frames. This may take the form of a
+         comma separated list of file names, or any of the other forms
+         described in the help on {\tt "}Group Expressions{\tt "}. Note, the input frames
+         cannot be specified within the GUI.
       }
       \sstsubsection{
          LOGFILE = LITERAL (Read)
       }{
          The name of a log file to which will be written all the messages
-         generated by the applications activated by the GUI. If \texttt{"}stdout\texttt{"}
+         generated by the applications activated by the GUI. If {\tt "}stdout{\tt "}
          is supplied, then the messages will be directed to standard
          output (usually the screen). If a null (!) value is supplied, then
          no log file will be created. Note, this parameter cannot be set
-         from the GUI\texttt{'}s \texttt{"}Options\texttt{"} menu. [!]
+         from the GUI{\tt '}s {\tt "}Options{\tt "} menu. [!]
       }
       \sstsubsection{
          NEWCOLMAP = \_LOGICAL (Read)
@@ -3107,11 +3189,11 @@ for NDF applications.
          If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
          its own private X colour map. Otherwise it will share the standard
          X colour map. Note, with a FALSE value for NEWCOLMAP, there may
-         be insufficient free colours in the standard colour map (\emph{i.e.} if
+         be insufficient free colours in the standard colour map (i.e. if
          other X applications are running). In this case POLKA will report
          an error and abort. If this happens, try re-running with a true
          value for NEWCOLMAP. Note, when using a private X colour map, the
-         cursor must be over the POLKA window to see the \texttt{"}correct\texttt{"} colours.
+         cursor must be over the POLKA window to see the {\tt "}correct{\tt "} colours.
          [FALSE]
       }
       \sstsubsection{
@@ -3128,8 +3210,8 @@ for NDF applications.
          A group specifying the names of the output intensity images to
          create in single-beam mode, or when processing non-polarimeter
          data (see parameters DUALBEAM and POL). The specified names should
-         correspond one-for-one to the input images. See the help on \texttt{"}Group
-         Expressions\texttt{"} for information on the allowed formats for this list.
+         correspond one-for-one to the input images. See the help on {\tt "}Group
+         Expressions{\tt "} for information on the allowed formats for this list.
          Any asterisk within the supplied string is replaced in turn by
          each of the input image names. If a null (!) value is given, then
          the intensity images are not saved. Note, the output images cannot
@@ -3140,8 +3222,8 @@ for NDF applications.
       }{
          A group specifying the names of the E-ray output intensity images to
          create in dual-beam mode (see parameter DUALBEAM). These should
-         correspond one-for-one to the input images. See the help on \texttt{"}Group
-         Expressions\texttt{"} for information on the allowed formats for this list.
+         correspond one-for-one to the input images. See the help on {\tt "}Group
+         Expressions{\tt "} for information on the allowed formats for this list.
          Any asterisk within the supplied string is replaced in turn by
          each of the input image names. If a null (!) value is given, then
          the E-ray intensity images are not saved. Note, the output images
@@ -3152,8 +3234,8 @@ for NDF applications.
       }{
          A group specifying the names of the O-ray output intensity images to
          create in dual-beam mode (see parameter DUALBEAM). These should
-         correspond one-for-one to the input images. See the help on \texttt{"}Group
-         Expressions\texttt{"} for information on the allowed formats for this list.
+         correspond one-for-one to the input images. See the help on {\tt "}Group
+         Expressions{\tt "} for information on the allowed formats for this list.
          Any asterisk within the supplied string is replaced in turn by
          each of the input image names. If a null (!) value is given, then
          the E-ray intensity images are not saved. Note, the output images
@@ -3180,7 +3262,7 @@ for NDF applications.
       }{
          The type of polarization being measured; Linear or Circular. This
          parameter is only accessed if an output cube holding Stokes
-         parameters is being created (\emph{i.e.} if OUT\_S is not given a null (!)
+         parameters is being created (i.e. if OUT\_S is not given a null (!)
          value). [Linear]
       }
       \sstsubsection{
@@ -3210,7 +3292,7 @@ for NDF applications.
       \sstsubsection{
          REFCOL = LITERAL (Update)
       }{
-         The colour with which to mark the reference objects (\emph{i.e.} image
+         The colour with which to mark the reference objects (i.e. image
          features or masks). This should be one of RED, BLUE, GREEN, CYAN,
          MAGENTA, YELLOW, BLACK. Any unambiguous abbreviation can be supplied,
          and the value is case-insensitive. [GREEN]
@@ -3243,8 +3325,8 @@ for NDF applications.
          the sky in each output image will be fitted using a polynomial
          surface. The order of the fit on each axis is given by this
          parameter (SKYPAR). A value of 0 will result in a flat surface
-         (\emph{i.e.} a constant value) being used, 1 will result in a linear
-         surface, 2 in a quadratic surface, \emph{etc}. The supplied value
+         (i.e. a constant value) being used, 1 will result in a linear
+         surface, 2 in a quadratic surface, etc. The supplied value
          must be in the range 0 to 14. [0]
       }
       \sstsubsection{
@@ -3262,23 +3344,23 @@ for NDF applications.
          created with the GUI, displaying the tutorial page of the POLKA
          on-line help documentation. Otherwise, the browser is only created
          if the user accesses the on-line help information explicitly
-         from within the GUI by using the \texttt{"}Help\texttt{"} menu or the F1 key on
+         from within the GUI by using the {\tt "}Help{\tt "} menu or the F1 key on
          the keyboard. [TRUE]
       }
       \sstsubsection{
          STATUSAREA = \_LOGICAL (Update)
       }{
          If a TRUE value is supplied, then information describing the
-         currently displayed image, current options values, \emph{etc}, will be
+         currently displayed image, current options values, etc, will be
          displayed in a box underneath the displayed image. The contents
-         of this box can be selected using the \texttt{"}Options\texttt{"} menu in the GUI.
+         of this box can be selected using the {\tt "}Options{\tt "} menu in the GUI.
          [TRUE]
       }
       \sstsubsection{
          VIEW = LITERAL (Update)
       }{
          This controls how images are placed within the image display
-         area of the GUI when a new image is selected using the \texttt{"}Images\texttt{"}
+         area of the GUI when a new image is selected using the {\tt "}Images{\tt "}
          menu. It may take one of the following values:
          \sstitemlist{
 
@@ -3311,21 +3393,21 @@ for NDF applications.
    }
    \sstexamples{
       \sstexamplesubsection{
-         polka \texttt{'}im1,im2,im3,im4\texttt{'} cube out\_o=! out\_e=!
+         polka {\tt '}im1,im2,im3,im4{\tt '} cube out\_o=! out\_e=!
       }{
          This example aligns and extracts the O and E ray areas from the
-         four images \texttt{'}im1\texttt{'} to \texttt{'}im4\texttt{'}, subtracts a sky background from each
+         four images {\tt '}im1{\tt '} to {\tt '}im4{\tt '}, subtracts a sky background from each
          (estimated from areas within the object frames), and stores the
-         corresponding Stokes vectors in \texttt{'}cube\texttt{'}. The aligned intensity
+         corresponding Stokes vectors in {\tt '}cube{\tt '}. The aligned intensity
          images are not saved.
       }
       \sstexamplesubsection{
-         polka $^\wedge$in.lis out=$^\wedge$out.lis out\_s=! dualbeam=no skyframes=$^\wedge$sky.lis reset
+         polka $\wedge$in.lis out=$\wedge$out.lis out\_s=! dualbeam=no skyframes=$\wedge$sky.lis reset
       }{
          This example uses single-beam mode. It reads the names of input
-         images from the text file \texttt{'}in.lis\texttt{'}, subtracts the sky frames
-         read from the text file \texttt{'}sky.lis\texttt{'}, aligns them and stores
-         them in the images named in the text file \texttt{'}out.lis\texttt{'}. All
+         images from the text file {\tt '}in.lis{\tt '}, subtracts the sky frames
+         read from the text file {\tt '}sky.lis{\tt '}, aligns them and stores
+         them in the images named in the text file {\tt '}out.lis{\tt '}. All
          other parameters are reset to their initial default values listed
          in the parameter descriptions above. No Stokes vectors are
          produced.
@@ -3335,54 +3417,51 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
+         If present, WCS information is copied from the first (reference)
+         input NDF to the output NDFs.
+
+         \sstitem
          The following components are added to the POLPACK extension in the
          output intensity images (the extension is first created if it does
          not already exist):
 
-         \sstitemlist{
-            \sstitem
-              RAY -- A string identifying which of the two rays the image
-              contains. This will be either \texttt{"}O\texttt{"} or \texttt{"}E\texttt{"}. This is only written in
-              dual-beam mode (see parameter DUALBEAM).
+         \sstitem
+           RAY -- A string identifying which of the two rays the image
+           contains. This will be either {\tt "}O{\tt "} or {\tt "}E{\tt "}. This is only written in
+           dual-beam mode (see parameter DUALBEAM).
 
-            \sstitem
-              IMGID -- An string identifier for the input image from which the
-              output image was derived. If the input image already contains a
-              POLPACK extension with a IMGID value, then the IMGID value is copied
-              unchanged to the corresponding output images. Otherwise, the name of
-              the input image (without a directory path) is used.
+         \sstitem
+           IMGID -- An string identifier for the input image from which the
+           output image was derived. If the input image already contains a
+           POLPACK extension with a IMGID value, then the IMGID value is copied
+           unchanged to the corresponding output images. Otherwise, the name of
+           the input image (without a directory path) is used.
 
-            \sstitem
-              ANGROT -- The anti-clockwise angle from the first axis of the
-              image to the analyser axis. This value is only written if the input
-              image already contains an ANGROT value, in which case the input value
-              is modified to take account of any rotation introduced by the mapping.
-         }
+         \sstitem
+           ANGROT -- The anti-clockwise angle from the first axis of the
+           image to the analyser axis. This value is only written if the input
+           image already contains an ANGROT value, in which case the input value
+           is modified to take account of any rotation introduced by the mapping.
 
          \sstitem
          The following components are added to the POLPACK extension in the
          output cube holding Stokes parameter (the extension is first created
          if it does not already exist):
 
-         \sstitemlist{
-            \sstitem
-              STOKES -- A string containing one character for each plane in
-              the data cube. Each character identifies the quantity
-              stored in the corresponding plane of the data array, and will be one
-              of I, Q, U or V.
-         }
+         \sstitem
+           STOKES -- A string containing one character for each plane in
+           the data cube. Each character identifies the quantity
+           stored in the corresponding plane of the data array, and will be one
+           of I, Q, U or V.
 
          \sstitem
-
-         Intermediate files created during the execution of POLKA are
-	 stored in a separate directory created each time POLKA is run,
-	 and deleted when POLKA exits. The directory will have a name of
-	 the form \texttt{polka\_temp\_$<$nnn$>$} where \texttt{$<$nnn$>$} 
-         is some This directory will be created within the directory
-	 specified by the HDS\_SCRATCH environment variable. If
-	 HDS\_SCRATCH is not defined then it will be created within the
-	 current directory.
-
+         Intermediate files created during the execution of POLKA are stored
+         in a separate directory created each time POLKA is run, and deleted
+         when POLKA exits. The directory will have a name of the form
+         {\tt "}polka\_temp\_$<$nnn$>${\tt "} where $<$nnn$>$ is some number. This directory will be
+         created within the directory specified by the HDS\_SCRATCH environment
+         variable. If HDS\_SCRATCH is not defined then it will be created within
+         the current directory.
       }
    }
 }
@@ -3395,13 +3474,22 @@ for NDF applications.
    \sstdescription{
       This application plots vectors defined by the values contained
       within four columns in a catalogue. These columns give the magnitude
-      and orientation of each vector, and the position of each vector.
+      and orientation of each vector, and the position of each vector (see
+      parameters COLMAG, COLANG, COLX and COLY).
 
-      The plot is produced within the current graphics database picture.
-      If there is an existing DATA picture within the current picture, then
-      the vector map can be aligned with the existing DATA picture (see
-      parameter CLEAR). If no DATA picture exists within the current picture,
-      then a new DATA picture is created.
+      The plot is produced within the current graphics database picture,
+      and may be aligned with an existing DATA picture if the existing
+      picture contains suitable co-ordinate Frame information (see
+      parameter CLEAR).
+
+      Annotated axes can be produced (see parameter AXES), and the appearance
+      of the axes can be controlled in detail (see parameter STYLE). The
+      axes show co-ordinates in the co-ordinate Frame specified by
+      parameter FRAME.
+
+      A key to the vector scale can be displayed to the right of the
+      vector map (see parameter KEY). The appearance and position of this
+      key may be controlled using parameters KEYSTYLE and KEYPOS.
    }
    \sstusage{
       polplot cat colx coly colmag colang [vscale] [arrow] [just] [device]
@@ -3434,27 +3522,26 @@ for NDF applications.
          CAT = LITERAL (Read)
       }{
          The name of the input catalogue. This may be in any format
-         supported by the CAT library (see \xref{SUN/181}{sun181}{}). A file type of .FIT
+         supported by the CAT library (see SUN/181). A file type of .FIT
          is assumed if no file type is supplied.
       }
       \sstsubsection{
          CLEAR = \_LOGICAL (Read)
       }{
          TRUE if the graphics device is to be cleared before displaying
-         the vector map. This will result in the vector map being drawn
-         in a new DATA picture. If you want the vector map to be drawn
-         on top of an existing DATA picture, then set CLEAR to FALSE. The
+         the vector map. If you want the vector map to be drawn over
+         the top of an existing DATA picture, then set CLEAR to FALSE. The
          vector map will then be drawn in alignment with the displayed
-         data. If possible, alignment occurs within the coordinate Frame
-         specified using parameter COSYS. If this is not possible, (for
-         instance if suitable WCS information was not available when the
-         existing DATA picture was created), then an alignment is attempted
-         in PIXEL coordinates. If this is not possible, then alignment is
-         attempted in GRID coordinates. If this is not possible, then
-         alignment is attempted in the first suitable Frame in the catalogue
-         irrespective of its Domain. A message is displayed indicating the
-         Domain in which alignment occurred. If there are no suitable Frames
-         in the catalogue then an error is reported. [TRUE]
+         data. If possible, alignment occurs within the co-ordinate Frame
+         specified by parameter FRAME. If this is not possible, (for instance
+         if suitable WCS information was not stored with the existing DATA
+         picture), then alignment is attempted in PIXEL co-ordinates. If this
+         is not possible, then alignment is attempted in GRID co-ordinates. If
+         this is not possible, then alignment is attempted in the first
+         suitable Frame found in the catalogue irrespective of its domain.
+         A message is displayed indicating the domain in which alignment
+         occurred. If there are no suitable Frames in the catalogue then an
+         error is reported. [TRUE]
       }
       \sstsubsection{
          COLANG = LITERAL (Read)
@@ -3493,33 +3580,20 @@ for NDF applications.
          interpreted. [Y]
       }
       \sstsubsection{
-         COSYS = GROUP (Read)
-      }{
-         This gives the co-ordinate Frame to be displayed along the annotated
-         axes (see parameter AXES). The supplied value will usually be a
-         Domain name such as SKY, AXIS, PIXEL, etc, but more specific Frame
-         descriptions can also be given by supplying a group of {\tt "}name=value{\tt "}
-         strings where {\tt "}name{\tt "} is the name of an AST Frame attribute (see
-         \xref{SUN/210}{sun210}{}), and {\tt "}value{\tt "} is the value to assign to it. In addition,
-         IRAS90 Sky Coordinate System (SCS) values (such as {\tt "}EQUATORIAL(J2000){\tt "},
-         {\tt "}GALACTIC{\tt "}, etc - see \xref{SUN/163}{sun163}{}) can be given. Domains {\tt "}WORLD{\tt "} and
-         {\tt "}DATA{\tt "} are taken as synonyms for {\tt "}PIXEL{\tt "} and {\tt "}AXIS{\tt "} (unless the
-         catalogue contains explicit definitions for the {\tt "}WORLD{\tt "} and {\tt "}DATA{\tt "}
-         Domains). The available coordinate Frames are defined by an AST
-         FrameSet (see \xref{SUN/210}{sun210}{}) in the supplied catalogue. If the catalogue
-         does not contain a FrameSet, then a default FrameSet is used
-         containing a single 2-dimensional Frame spanned by the axes defined
-         by parameters COLX and COLY. If a null (!) value is supplied for
-         COSYS, then the Current Frame in the FrameSet is used. If the vector
-         map is being drawn over an existing DATA picture (see parameter
-         CLEAR), then the Frame specified by COSYS must exist in the FrameSet
-         associated with the existing picture, as well as in the supplied
-         catalogue. [!]
-      }
-      \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
          The plotting device. [Current graphics device]
+      }
+      \sstsubsection{
+         EPOCH = \_DOUBLE (Read)
+      }{
+         If a {\tt "}Sky Co-ordinate System{\tt "} specification is supplied (using
+         parameter FRAME) for a celestial co-ordinate system, then an epoch
+         value is needed to qualify it. This is the epoch at which the
+         supplied sky positions were determined. It should be given as a
+         decimal years value, with or without decimal places  ({\tt "}1996.8{\tt "} for
+         example). Such values are interpreted as a Besselian epoch if less
+         than 1984.0 and as a Julian epoch otherwise.
       }
       \sstsubsection{
          FILL = \_LOGICAL (Read)
@@ -3530,6 +3604,30 @@ for NDF applications.
          When FILL is TRUE, the smaller dimension of the picture is expanded
          to produce the largest possible picture within the current picture.
          [FALSE]
+      }
+      \sstsubsection{
+         FRAME = LITERAL (Read)
+      }{
+         This gives the co-ordinate Frame to be displayed along the annotated
+         axes (see parameter AXES). If a null parameter value is supplied,
+         then the current Frame in the supplied catalogue is used. The
+         string can be one of the following:
+         \sstitemlist{
+
+            \sstitem
+            A domain name such as SKY, AXIS, PIXEL, etc. The two
+            {\tt "}pseudo-domains{\tt "} WORLD and DATA may be supplied and will be
+            translated into PIXEL and AXIS respectively, so long as the WCS
+            component of the NDF does not contain Frames with these domains.
+
+            \sstitem
+            An integer value giving the index of the required Frame within
+            the WCS component.
+
+            \sstitem
+            A {\tt "}Sky Co-ordinate System{\tt "} (SCS) value such as EQUAT(J2000) (see
+            section {\tt "}Sky Co-ordinate Systems{\tt "} in SUN/95). [!]
+         }
       }
       \sstsubsection{
          JUST = LITERAL (Read)
@@ -3555,37 +3653,65 @@ for NDF applications.
       \sstsubsection{
          KEY = \_LOGICAL (Read)
       }{
-         TRUE if a key is to be produced. [TRUE]
+         TRUE if a key indicating the vector scale is to be produced. [TRUE]
       }
       \sstsubsection{
          KEYPOS() = \_REAL (Read)
       }{
          Two values giving the position of the key. The first value gives
-         the gap between the right hand edge of the vector map and the left
-         hand edge of the key. The second value gives the vertical position of
-         the top of the key. If the second value is not given, the top of
-         the key is placed level with the top of the vector map. Both
-         values should be in the range 0.0 to 1.0. [0.03]
+         the gap between the right hand edge of the contour map and the left
+         hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The
+         second value gives the vertical position of the top of the key (1.0
+         for the highest position, 0.0 for the lowest). If the second value
+         is not given, the top of the key is placed level with the top of the
+         vector map. Both values should be in the range 0.0 to 1.0. If a
+         key is produced, then the right hand margin specified by parameter
+         MARGIN is ignored. [current value]
       }
       \sstsubsection{
          KEYSTYLE = GROUP (Read)
       }{
-         The plotting style to use for the key (see parameter KEY). This
-         should be a group of comma-separated name=value strings where {\tt "}name{\tt "}
-         is the name of a Plot attribute and {\tt "}value{\tt "} is the value to assign
-         to the attribute. The text in the key is drawn as Plot {\tt "}Strings{\tt "}
-         (using attributes COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
-         TEXT can be used in place of STRINGS). The example vector is drawn
-         as a Plot {\tt "}Curve{\tt "} (using attributes COLOUR(CURVES), etc - the
-         synonym VECTOR can be used in place of CURVES). The numerical
-         scale value is formatted as an axis 1 value (using attributes
-         FORMAT(1), DIGITS(1), etc - the synonym SCALE can be used in place
-         of the value 1). The length of the example vector is formatted as an
-         axis 2 value (using attribute FORMAT(2), etc - the synonym VECTOR
-         can be used in place of the value 2). A null (!) value causes the
-         key style used on the previous invocation of POLPLOT to be
-         re-used. If no previous key style is available, or if the keyword
-         RESET is supplied, then a default key style is used. [!]
+         A group of attribute settings describing the plotting style to use
+         for the key (see parameter KEY).
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of the text in the key is controlled using {\tt "}String{\tt "}
+         attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+         TEXT can be used in place of STRINGS). Note, the Size attribute
+         specifies the size of key text relative to the size of the numerical
+         labels on the vector map axes. Thus a value of 2.0 for Size will
+         result in text which is twice the size of the numerical axis labels.
+         The appearance of the example vector is controlled using {\tt "}Curve{\tt "}
+         attributes (e.g. COLOUR(CURVES), etc - the synonym VECTOR can be
+         used in place of CURVES). The numerical scale value is formatted as
+         an axis 1 value (using attributes FORMAT(1), DIGITS(1), etc - the
+         synonym SCALE can be used in place of the value 1). The length of
+         the example vector is formatted as an axis 2 value (using attribute
+         FORMAT(2), etc - the synonym VECTOR can be used in place of the
+         value 2). The vertical space between lines in the key can be
+         controlled using attribute TextLabGap. A value of 1.0 is used if
+         no value is set for this attribute, and produces default vertical
+         spacing. Values larger than 1.0 increase the vertical space, and
+         values less than 1.0 decrease the vertical space. [current value]
       }
       \sstsubsection{
          KEYVEC = \_REAL (Read)
@@ -3603,16 +3729,18 @@ for NDF applications.
          encloses all the data in the supplied catalogue. [!]
       }
       \sstsubsection{
-         PXSIZE = \_REAL (Read)
+         MARGIN( 4 ) = \_REAL (Read)
       }{
-         The length (x axis) of the plot in metres. [Maximum that can
-         fit in the current picture while preserving square pixels]
-      }
-      \sstsubsection{
-         PYSIZE = \_REAL (Read)
-      }{
-         The length (y axis) of the plot in metres. [Maximum that can
-         fit in the current picture while preserving square pixels]
+         The widths of the margins to leave around the vector map for axis
+         annotation. The widths should be given as fractions of the
+         corresponding dimension of the DATA picture.
+         The actual margins used may be increased to preserve the aspect
+         ratio of the DATA picture. Four values may be given, in the order;
+         bottom, right, top, left. If fewer than four values are given,
+         extra values are used equal to the first supplied value. If these
+         margins are too narrow any axis annotation may be clipped. The
+         dynamic default is 0.18 (for all edges) if annotated axes are being
+         produced, and zero otherwise. See also parameter KEYPOS. []
       }
       \sstsubsection{
          NEGATE = \_LOGICAL (Read)
@@ -3625,16 +3753,32 @@ for NDF applications.
       \sstsubsection{
          STYLE = GROUP (Read)
       }{
-         The plotting style to use for the annotated axes. This should be
-         a group of comma-separated name=value strings where {\tt "}name{\tt "} is the
-         name of a Plot attribute, and {\tt "}value{\tt "} is the value to assign to
-         the attribute. Vectors are drawn as {\tt "}Curves{\tt "} but may also be
-         referred to using the synonym {\tt "}Vectors{\tt "} when specifying Plot
-         attributes. Default values are supplied for any attributes which
-         are not specified. These are obtained from the WCS information
-         in the supplied catalogue, or inherited from the previous
-         invocation of POLPLOT. A null (!) value causes defaults to be used
-         for all attributes. [!]
+         A group of attribute settings describing the plotting style to use
+         for the contours and annotated axes.
+
+         A comma-separated list of strings should be given in which each
+         string is either an attribute setting, or the name of a text file
+         preceded by an up-arrow character {\tt "}$\wedge${\tt "}. Such text files should
+         contain further comma-separated lists which will be read and
+         interpreted in the same manner. Attribute settings are applied in
+         the order in which they occur within the list, with later settings
+         over-riding any earlier settings given for the same attribute.
+
+         Each individual attribute setting should be of the form:
+
+            $<$name$>$=$<$value$>$
+
+         where $<$name$>$ is the name of a plotting attribute, and $<$value$>$ is
+         the value to assign to the attribute. Default values will be
+         used for any unspecified attributes. All attributes will be
+         defaulted if a null value (!) is supplied. See section {\tt "}Plotting
+         Attributes{\tt "} in SUN/95 for a description of the available
+         attributes. Any unrecognised attributes are ignored (no error is
+         reported).
+
+         The appearance of the vectors is controlled by the attributes
+         Colour(Curves), Width(Curves), etc (the synonym Vectors may be
+         used in place of Curves). [current value]
       }
       \sstsubsection{
          UBND(2) = \_REAL (Read)
@@ -3682,7 +3826,7 @@ for NDF applications.
          and slightly thicker lines are used to draw the border.
       }
       \sstexamplesubsection{
-         polplot poltab ra dec noclear angrot=23.4 cosys=eq(B1950)
+         polplot poltab ra dec noclear angrot=23.4 frame=eq(B1950)
       }{
          Produces a vector map in which the reference direction for the vectors
          (as defined by the value zero in the column ANG) is at the
@@ -3720,9 +3864,17 @@ for NDF applications.
       \sstitemlist{
 
          \sstitem
+         The TITLE parameter in the supplied catalogue is used as the default
+         title for the annotated axes. If the catalogue does not have a TITLE
+         parameter (of it is blank), then the default title is taken from current
+         co-ordinate Frame stored in the WCS component of the catalogue. This
+         default may be over-ridden by specifying a value for the Title
+         attribute using the STYLE parameter.
+
+         \sstitem
          The columns specified by parameters COLX and COLY should hold
          coordinates in the {\tt "}Base Frame{\tt "} of the WCS information stored as
-         an AST FrameSet (see \xref{SUN/210}{sun210}{}) in the supplied catalogue. If the
+         an AST FrameSet (see SUN/210) in the supplied catalogue. If the
          catalogue has been produced by one of the POLPACK application polvec
          or polbin, then the Base Frame will be pixel co-ordinates within the
          aligned intensity images, and these will be stored in columns with
@@ -3738,11 +3890,6 @@ for NDF applications.
          with the existing DATA picture if possible (i.e. if the existing
          picture has sky coordinate information stored with it).
       }
-   }
-   \sstdiytopic{
-      Copyright
-   }{
-      Copyright (C) 1998 Central Laboratory of the Research Councils
    }
 }
 \newpage
@@ -4283,7 +4430,160 @@ their exposure factors, and another estimate of the F factor.
 \emph{Note, each pair of target exposures must be flat-fielded using
 \textbf{the same} master flat-field frame.}
 
-\newpage
+\section{\label{APP:GAIA}\xlabel{gaia}Using GAIA to Create an RA/DEC Calibration}
+This section gives a very brief and simple outline of how to add an RA/DEC
+calibrate to a 2-dimensional image using \xref{GAIA}{sun214}{} {\latexonly (see 
+SUN/214)}. 
+
+\begin{enumerate}
+
+\item Start up GAIA, including the name of the NDF containing the image
+mv on the command line. For instance, 
+
+\begin{verbatim}
+   % gaia fred
+\end{verbatim}
+
+will start up GAIA, displaying the image in file \texttt{fred.sdf}. If you 
+are using non-NDF images, include the file type (eg ``\texttt{fred.fit}'').
+
+\item Press the \emph{Image-Analysis} menu button. Select the
+\emph{Astrometry calibration} item from the displayed menu, then select 
+\emph{Fits to star positions} from the next menu. This should display the
+dialogue box shown in Figure~\ref{fig:gaia1}. 
+
+\begin{latexonly}
+  \vspace{2mm}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[clip,scale=0.5]{sun223_figures/gaia1.eps}
+  \caption{The main GAIA dialogue box used to create an RA/DEC calibration.}
+  \label{fig:gaia1}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:gaia1}
+   \includegraphics{sun223_figures/gaia1.eps}
+   \caption{The main GAIA dialogue box used to create an RA/DEC calibration.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+\item Indicate the co-ordinate system in which your feature positions are
+expressed. Do this by specifying suitable values using the \emph{Coordinate
+system:}, \emph{Equinox:} and \emph{Epoch:} buttons. You will usually have
+either (FK4, equinox B1950) or (FK5, equinox J2000) positions. The epoch 
+defaults to B1950 for FK4 positions, and J2000 for FK5 positions.
+
+\item Press the \emph{New} button, to indicate that you want to add some
+new positions to the (currently empty) list of reference positions. This 
+should produce the dialogue box shown in Figure~\ref{fig:gaia2}. 
+
+\begin{latexonly}
+  \vspace{2mm}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[clip,scale=0.5]{sun223_figures/gaia2.eps}
+  \caption{The GAIA dialogue box used to give a new reference position.}
+  \label{fig:gaia2}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:gaia2}
+   \includegraphics{sun223_figures/gaia2.eps}
+   \caption{The GAIA dialogue box used to give a new reference position.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+\item Now press the \emph{Pick object...} button. This will create the
+dialogue box shown in Figure~\ref{fig:gaia3}. The black box in the 
+right hand displays a section of the main image centred on the position 
+of the cursor. Position the cursor in the main GAIA window over a feature
+(usually a star) for which you know the RA/DEC. This star should appear
+in the box in the ``object picker'' dialogue box (Figure~\ref{fig:gaia3}).
+If there are any other significant features visible in the box, you should 
+reduce the size of the box using the \emph{Sample size} slider at the
+bottom of the object picker dialogue box. Once you are happy with the
+sample size, re-position the cursor over the star and press the left
+mouse button. The pixel co-ordinates at the centre of the feature are
+displayed in the \emph{Image X:} and \emph{Image Y:} fields within the
+object picker dialogue box
+
+\begin{latexonly}
+  \vspace{2mm}
+  \begin{figure}[htb]
+  \begin{center}
+  \includegraphics[clip,scale=0.5]{sun223_figures/gaia3.eps}
+  \caption{The GAIA object picker dialogue box.}
+  \label{fig:gaia3}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:gaia3}
+   \includegraphics{sun223_figures/gaia3.eps}
+   \caption{The GAIA object picker dialogue box.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
+
+\item Raise the dialogue box shown in Figure~\ref{fig:gaia2}. You should
+find that the pixel co-ordinates of the star have been copied into the
+X and Y fields. Click in the \emph{ra} field, and enter the RA of the 
+star (eg "12:23:34.1"). Then do the same with the \emph{dec} field. Then
+click in the \emph{id} field, and enter an integer value which can be
+used to identify the star (for instance, use 1 for your first star, 2 for
+your second, etc). The star is now fully specified, so press the
+\emph{Enter} button. After confirmation, this will add the object into
+the list of reference objects in the dialogue box shown in
+Figure~\ref{fig:gaia1}. 
+
+\item All the windows will remain open, so you can continue to enter new
+reference stars in the same way. First click on the \emph{Pick Object} 
+button in the dialogue box shown in Figure~\ref{fig:gaia3}. Then position
+the cursor over a star in the main window, click with the left button, enter 
+the RA, DEC and ID values for the star, and press \{emph{Enter}.
+
+\item Once you have entered all your reference positions, close the
+dialogue boxes shown in Figures~\ref{fig:gaia2} and~\ref{fig:gaia3} by
+pressing the \emph{Close} button in each one.
+
+\item Press the \emph{Fit/Test} button in the dialogue box shown in
+Figure~\ref{fig:gaia1}. This will calculate the best RA/DEC calibration
+given your reference positions. It then uses this calibration to work out
+the pixel co-ordinates corresponding to each of your reference positions,
+and displays markers in the main image at these pixel co-ordinates. You
+should find that they fall on top of the corresponding stars. If they do
+not, you have probably entered a bad RA or DEC value. You should correct
+the reference positions, and then press the \emph{Fit/Test} button again. To 
+correct the reference positions, position the pointer over the erroneous
+line in the list of reference positions, and click the left button (the 
+selected line will be highlighted). Then click the \emph{Edit} button, the
+dialogue box shown in Figure~\ref{fig:gaia2} will re-appear, loaded with
+the details of the selected feature. Correct the values, and then press
+\emph{Enter}, followed by \emph{Close}. Now you can press \emph{Fit/Test}
+again to re-calculate the RA/DEC calibration.
+
+\item Once you are happy with the calibration, press the \emph{Accept}
+button. You can now save the RA/DEC calibration by pressing the \emph{File} 
+menu button in the main window, and then the \emph{Save as} menu item. Use the
+resulting dialog box to save the image (with the RA/DEC calibration) in a
+new file. This is most simply done by entering the new file name in the
+\emph{Selection} box, and pressing \emph{OK}. Do not worry if a message is
+displayed saying that the WCS could only be saved as an AST native
+representation.
+
+\end{enumerate}
+
 \section{\label{APP:POLEXT}\xlabel{thepolpackndfextension}The POLPACK NDF Extension}
 
 Figure~\ref{fig:polext} lists the items which may be stored in the
@@ -4295,7 +4595,7 @@ can be used to set them to explicit values (see \hyperref{here}{section }
 examined using POLEXT or the \xref{\texttt{hdstrace}}{sun102}{} command.
 
 \begin{latexonly}
-  \begin{figure}[htb]
+  \begin{figure}[tb]
   \begin{center}
   \includegraphics[clip,scale=0.8]{sun223_figures/polext.eps}
   \caption{The allowed items within the POLPACK extension.}
@@ -4305,7 +4605,7 @@ examined using POLEXT or the \xref{\texttt{hdstrace}}{sun102}{} command.
 \end{latexonly}
 \begin{htmlonly}
    \begin{quote}
-   \begin{figure}[bhtp]
+   \begin{figure}[ht]
    \label{fig:polext}
    \includegraphics{sun223_figures/polext_htx.eps}
    \caption{The allowed items within the POLPACK extension.}
@@ -4317,18 +4617,70 @@ examined using POLEXT or the \xref{\texttt{hdstrace}}{sun102}{} command.
 This section describes the major changes introduced at each release of
 POLPACK.
 \subsection{V1.1}
-\begin{enumerate}
-\item The COSYS parameter used by POLPLOT has been replaced by FRAME.
+The handling of World Co-ordinate System (WCS) information within POLPACK
+has been improved, and is now consistent with WCS handling within KAPPA
+V0.13:
+
+\begin{itemize}
+\item New sections have been added to SUN/223 describing the use of
+RA/DEC calibrations within POLPACK, and how to use GAIA to create them.
+\item POLKA now propagates WCS information from input to output. This makes
+it possible to retain WCS information throughout an entire POLPACK
+reduction. 
+\item The COSYS parameter used by POLPLOT has been replaced by FRAME. 
+A new parameter called EPOCH has been added to allow the specification of 
+an epoch for celestial co-ordinate systems.
+\item POLVEC no longer stores a GRID co-ordinate Frame in the output
+catalogue (since there is no data grid defined within a catalogue).
+\item WCS information can now be read from a FITS or IRAS90 NDF extension
+if the NDF has no WCS component.
 \item A bug has been fixed which caused POLPLOT to display vectors in 
 incorrect positions when annotating the axes with sky coordinates. This bug
 was not seen if the vectors were plotted over an existing picture.
 \item Catalogues created by POLVEC now inherit the Current coordinate Frame 
 from the supplied Stokes cube. Previously the Current Frame was always reset to
 pixel coordinates.
-\item Vectors produced by POLPLOT no longer intersect the border.
-\item The vectors positions in the catalogue supplied to POLPLOT must now
+\item The vector positions in the catalogue supplied to POLPLOT must now
 be given in the Base Frame of the WCS information stored in the catalogue.
+\end{itemize}
+
+Other non-WCS related changes include:
+
+\begin{itemize}
+
+\item Vectors produced by POLPLOT no longer intersect the border.
+
+\item If POLKA is used to define a sky region which is then transferred to
+a second image, the sky region will be ignored if it does not have an overlap 
+with the second image. In this case, a warning is issued and the user is
+asked to specify a new sky region for the second image.
+
+\item The handling of graphical styles within POLPLOT (using parameters
+STYLE and KEYSTYLE) is now consistent with KAPPA V0.13. In particular:
+\begin{enumerate}
+
+\item Defaults for unspecified plotting attributes are now read from file 
+\verb+$KAPPA_DIR/style.def+.
+
+\item The values supplied for STYLE and KEYSTYLE are retained and re-used 
+on subsequent invocations of POLPLOT (unless new values are given).
+
+\item The size of text produced for a given value of the Size attribute is 
+now (roughly) proportional to the size of the picture being used.
+
+\item The default title is now obtained from the TITLE component of
+the Stokes cube. Previously it was obtained from the Title attribute of
+the WCS information.
 
 \end{enumerate}
+
+\item The vertical spacing between lines in the key produced by POLPLOT can 
+now be controlled using the TextLabGap attribute (see parameter KEYSTYLE).
+
+\item A new parameter called MARGIN has been added to POLPLOT. It can be
+used to specify the widths of the margins left for axis annotation around
+the vector map.
+
+\end{itemize}
 
 \end{document}

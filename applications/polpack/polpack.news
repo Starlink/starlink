@@ -1,10 +1,26 @@
 1 POLPACK
 
- A new applications package for processing imaging polarimetry data (both
- linear and circular) has been released. The package is called POLPACK and 
- is documented in SUN/223.
+ Version 1.1 of POLPACK (an applications package for processing imaging 
+ polarimetry data) is now available. The main changes are:
+ 
+   o  Various changes have been made to the software to allow the
+   propagation of World Co-ordinate System (WCS) information through to
+   the final vector map.
 
- The facilities provided by POLPACK include:
+   o  New sections have been added to SUN/223 describing the use of
+   RA/DEC calibrations within POLPACK, and how to use GAIA to create them.
+
+   o  The handling of co-ordinate Frame information and graphical styles
+   have been brought into line with KAPPA V0.13.
+
+ Various other bug fixes have been included.
+
+\end{itemize}
+
+
+
+
+
 
    o  alignment of intensity images on the sky.
    o  extraction of O and E images from a single frame.
@@ -14,3 +30,4 @@
    o  creation of catalogues of polarization vectors.
    o  graphical display of vector maps.
 
+See SUN/223 for details.
