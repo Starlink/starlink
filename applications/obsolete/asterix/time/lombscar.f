@@ -28,8 +28,8 @@
       CHARACTER*30 TYPE
           PARAMETER(TYPE='PowerSpectrum')
 *    Local variables :
-      CHARACTER*80 PATH(4)                  !Input data path
       INTEGER			IFID, OFID		! Dataset identifiers
+      INTEGER			IFILES			! Input file info
       INTEGER NTOT                          !Total no of points in input array
       INTEGER NGOOD                         !No of good points in data arrays
 *    pointers:
@@ -43,7 +43,6 @@
       INTEGER NWORK                         !Size of power spec. workspace array
       INTEGER NWIND                         !Size of window workspace arrays
       INTEGER NOUT                          !Number of output frequencies
-      INTEGER NLINES                        !No of lines in input path
 
       REAL PROB                             !Error on highest peak frequency
       REAL F1                               !Window frequency to use
@@ -53,7 +52,8 @@
       REAL HIFAC                            !Number of times Nyquist frequency
 *                                           !to extend spectrum to.
       INTEGER VALUE,LP
-      LOGICAL LVAR                          !Is variance present in data file ?
+
+      LOGICAL			LVAR                 	! Is variance present?
 
 *    Version :
       CHARACTER*30 VERSION
@@ -133,10 +133,10 @@
       CALL BDI_PUT0C( OFID, 'Units', '(Counts/s)**2', STATUS )
 
 *  Add history
-      CALL HSI_COPY( IFID, OFID, STATUS)
-      CALL HSI_ADD(OFID, VERSION, STATUS)
-      CALL USI_NAMEI(NLINES, PATH, STATUS)
-      CALL HSI_PTXT(OFID, NLINES, PATH, STATUS)
+      CALL HSI_COPY( IFID, OFID, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()

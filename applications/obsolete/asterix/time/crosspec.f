@@ -64,48 +64,49 @@
 *
       CHARACTER*80              OUNITS          	! O/p (frequency) units
       CHARACTER*80		UNITS(2)              	! Input axis units
-      CHARACTER*80              TEXT(20)       		! Text for history
+      CHARACTER*80              HTXT			! History text
 
-      REAL                      BANDWIDTH      ! Bandwidth of smoothing window
-      REAL                      BASE           ! Base value of output axis
-      REAL                      FRAC           ! Fraction of array to taper
-                                              ! at each end
+      REAL                      BANDWIDTH      		! Bandwidth of smoothing window
+      REAL                      BASE           		! Base value of output axis
+      REAL                      FRAC           		! Fraction of array to taper
+							! at each end
       REAL                      OSCALE          	! Scale of output axis
       REAL                      SCALE(2)         	! Scale of input axes
       REAL			SPARR(2)		! Spaced array data
 
       INTEGER			APTR			! Input axis data
-      INTEGER                   CODAT          ! Pointer to output coherency data
+      INTEGER                   CODAT          		! O/p coherency data
       INTEGER			COFID			! Coherency object
-      INTEGER                   COVAR          ! Ptr to coherency variance
+      INTEGER                   COVAR          		! O/p coherency variance
       INTEGER			DIMS(ADI__MXDIM,2)	! Input dimensions
-      INTEGER                   DPTR(2)   	! pointers to input data arrays
-      INTEGER                   I              ! loop counter
+      INTEGER                   DPTR(2)   		! Input data
+      INTEGER                   I              		! loop counter
       INTEGER			IFID(2)			! Input dataset ids
-      INTEGER                   LSHIFT         ! Alignment shift
+      INTEGER			IFILES			! Input file info
+      INTEGER                   LSHIFT         		! Alignment shift
       INTEGER			MOBJ			! MultiGraph object
       INTEGER			NBAD			! # bad quality points
       INTEGER                   NDIM			! I/p dimensionality
-      INTEGER                   NLINES         ! Number of history text lines
       INTEGER                   NPTS           		! # data points
       INTEGER                   NTOT           		! # data after padding
-      INTEGER                   NV             ! No. of elements in spectra
+      INTEGER                   NV             		! # elements in spectra
       INTEGER			OFID(2)			! Output dataset id
-      INTEGER                   PHDAT          ! Pointer to output phase data
+      INTEGER                   PHDAT          		! Pointer to output phase data
       INTEGER			PHFID			! Phase object
-      INTEGER                   PHVAR          ! Ptr to phase variance
+      INTEGER                   PHVAR          		! Ptr to phase variance
       INTEGER                   QPTR           		! Pointer to quality array
-      INTEGER                   SIGMA          ! Sigma width of Gaussian window
+      INTEGER                   SIGMA          		! Sigma width of Gaussian window
+      INTEGER			TLEN			! Length of text
       INTEGER                   TPTR           		! Temporary pointer
       INTEGER 			ULEN(2)			! Length of UNITS()
       INTEGER                   WRK1PTR        		! Pointer to work array
       INTEGER                   WRK2PTR        		! Pointer to work array
 
-      LOGICAL                   TAPER          ! Apply taper to data?
-      LOGICAL                   INPRIM(2)      ! Is input (n) primitive?
-      LOGICAL                   INPUT          ! Continue to look for input?
+      LOGICAL                   TAPER          		! Apply taper to data?
+      LOGICAL               	INPRIM(2)      		! Is input (n) primitive?
+      LOGICAL                   INPUT          		! Continue to look for input?
       LOGICAL                   OK
-      LOGICAL                   REG            ! Is axis regularly spaced?
+      LOGICAL                   REG            		! Is axis regularly spaced?
 *
 *    Version id :
 *
@@ -332,17 +333,14 @@
 
 *  History
       CALL HSI_ADD( OFID, VERSION, STATUS )
-      CALL USI_NAMEI( NLINES, TEXT, STATUS )
-      NLINES       = NLINES + 1
-      TEXT(NLINES) = ' '
-      NLINES       = NLINES + 1
-      TEXT(NLINES) = 'Output smoothed using a truncated Gaussian,'
-      NLINES       = NLINES + 1
-      WRITE(TEXT(NLINES), '(A,I2,A)') 'of SIGMA width = ',SIGMA,
-     :                                                   ' output bins.'
-      CALL HSI_PTXT( OFID, NLINES, TEXT, STATUS )
+      CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL HSI_PTXTI( OFID, IFILES, .TRUE., STATUS )
+      CALL MSG_SETI( 'S', SIGMA )
+      CALL MSG_MAKE( 'Output smoothed using a truncated Gaussian of '/
+     :                         /'SIGMA = ^S output bins', HTXT, TLEN )
+      CALL HSI_PTXT( OFID, 1, HTXT, STATUS )
 
-*    Exit
+*  Exit
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
