@@ -7,11 +7,16 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     2-JUL-1992 (PDRAPER):
 #     	 Original version.
+#     16-FEB-1999 (MBT):
+#        Replaced UBNDS and LBNDS by ANGLES and ORIGINS.
+#     26-APR-1999 (MBT):
+#        Added REDUCED parameter.
 #     {enter_changes_here}
 
 #-
@@ -63,6 +68,15 @@ interface CCDGENERATE
       vpath    'PROMPT,CURRENT'
       ppath    'CURRENT'
       prompt   'Size in pixels for the output NDFs (X,Y)'
+      helpkey  '*'
+   endparameter
+
+   parameter REDUCED
+      type     _LOGICAL
+      vpath    'CURRENT'
+      ppath    'CURRENT,DEFAULT'
+      prompt   'Reduced data, or unreduced with bias and flats?'
+      default  FALSE
       helpkey  '*'
    endparameter
 
