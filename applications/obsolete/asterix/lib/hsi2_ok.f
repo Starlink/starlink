@@ -81,9 +81,9 @@
       IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE '/star/include/sae_par'          			! SAE constants
-      INCLUDE '/star/asterix/kernel/lib/inc/ADI_PAR'					! ADI constants
-      INCLUDE '/star/include/dat_par'					! HDS constants
+      INCLUDE 'SAE_PAR'          			! SAE constants
+      INCLUDE 'ADI_PAR'					! ADI constants
+      INCLUDE 'DAT_PAR'					! HDS constants
 
 *  Arguments Given:
       INTEGER			NARG			! # arguments
