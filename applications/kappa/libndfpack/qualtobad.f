@@ -130,7 +130,7 @@
       CALL IRQ_FIND( NDFIN, LOCS, XNAME, STATUS )
 
 *  Get a syntactically correct quality expression from the environment.
-      CALL IRM_GETQX( 'QEXP', QEXP, STATUS )
+      CALL IRQ_GETQX( 'QEXP', QEXP, STATUS )
 
 *  Attempt to compile the quality expression. An IRQ identifier is
 *  returned for the compiled expression if it compiles succesfully.
