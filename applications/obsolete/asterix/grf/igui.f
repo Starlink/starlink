@@ -213,6 +213,12 @@
      :                                                       STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'BG_MEAN','_REAL',0,VAL__NBR,SID,
      :                                                       STATUS)
+
+*   Background modeller sources
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_NSRC','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'BG_TSRC','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
         DO I = 1, 8
           C = CHAR( ICHAR('0') + I )
           CALL NBS_DEFINE_PRIMITIVE(ID,'BG_SRC'//C,'_CHAR',0,33,SID,
