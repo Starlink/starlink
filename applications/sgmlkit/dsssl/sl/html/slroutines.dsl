@@ -131,14 +131,13 @@ $Id$
 			    (empty-sosofo)))))
 	  (error (string-append "ID " aut-id " is not an AUTHOR element")))))
   (element authornote
-    (make sequence
-      (make element gi: "em"
-	    (process-children))))
+    (process-children))
   (element otherauthors
-    (make element gi: "p"
-	  (literal "Other contributors")
-	  (make element gi: "ul"
-		(process-children))))
+    (make element gi: "li"
+	  (make element gi: "p"
+		(literal "Other contributors")
+		(make element gi: "ul"
+		      (process-children)))))
   (element copyright
     (make sequence
       (make element gi: "h3"
