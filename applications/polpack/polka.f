@@ -4,7 +4,7 @@
 *     POLKA
 
 *  Purpose:
-*     Creates Stokes vectors from a set of intensity frames.
+*     Creates Stokes vectors from a set of 2-dimensional intensity frames.
 
 *  Language:
 *     Starlink Fortran 77
@@ -20,10 +20,11 @@
 *        The global status.
 
 *  Description:
-*     This application converts a set of intensity frames into a cube
-*     containing a Stokes vector for every measured pixel on the sky. It
-*     may also be used as an image alignment tool for non-polarimetric 
-*     data (see parameter POL).
+*     This application converts a set of 2D intensity frames into a 3D 
+*     cube containing a Stokes vector for every measured pixel on the sky.
+*     It may also be used as an image alignment tool for non-polarimetric 
+*     data (see parameter POL). It cannot be used with 3D intensity
+      frames (\emph{e.g.} spectropolarimetry data).
 *
 *     The main processes applied to the data are:
 *
