@@ -11,7 +11,7 @@ proc CCDDoReduce { Top } {
 #     Tcl/Tk procedure
 
 #  Description:
-#     This routine uses the variables set up the the xreduce interface
+#     This routine uses the variables set up by the xreduce interface
 #     to activate a reduction. The CCDPACK application SCHEDULE
 #     performs most of the actual work, but we cannot allow it to
 #     execute the script as we need to add a CCDSETUP command to set
@@ -26,19 +26,22 @@ proc CCDDoReduce { Top } {
 #        from SCHEDULE if it is required.
 
 #  Global variables:
-#      CCDallndfs = list (read)
-#         The names of all the known NDFs.
-#      CCDglobalpars = array (read)
-#         The array of all the currently defined global
-#         parameters. The indices are ADC, MASK etc.
-#      TASK = array (read)
-#         Task control array. We need to check TASK(schedule,error) to make
-#         sure that the application ran successfully.
-#      CCDirflats = boolean (read)
-#         If targets can be used as flatfield substitutes.
+#     CCDallndfs = list (read)
+#        The names of all the known NDFs.
+#     CCDglobalpars = array (read)
+#        The array of all the currently defined global
+#        parameters. The indices are ADC, MASK etc.
+#     TASK = array (read)
+#        Task control array. We need to check TASK(schedule,error) to make
+#        sure that the application ran successfully.
+#     CCDirflats = boolean (read)
+#        If targets can be used as flatfield substitutes.
+#     CCDsetindices = list of integers
+#        The NDF Set Index values represented in the data.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
@@ -51,6 +54,8 @@ proc CCDDoReduce { Top } {
 #     30-JUL-1996 (PDRAPER):
 #        Added inverse list of ADAM logicals that use inverse logic
 #        (i.e. that mean the reserve of their actual value!).
+#     22-JUN-2001 (MBT):
+#        Added USESET parameter and CCDSETUP commands for each Set Index.
 #     {enter_changes_here}
 
 #  Bugs:
@@ -63,11 +68,13 @@ proc CCDDoReduce { Top } {
    global CCDdir
    global CCDglobalpars
    global CCDirflats
+   global CCDsetindices
    global TASK
 
 #  Local constants:
    set vectors "EXTENT BOUNDS"
-   set scalars "LOGTO LOGFILE SATURATE GENVAR PRESERVE DIRECTION ADC RNOISE MASK DEFERRED SATURATION"
+   set scalars "LOGTO LOGFILE USESET SATURATE GENVAR PRESERVE DIRECTION \
+                ADC RNOISE MASK DEFERRED SATURATION"
    set inverse "SETSAT"
 
 #.
@@ -176,9 +183,59 @@ proc CCDDoReduce { Top } {
             catch {puts $f "#  Created by [exec whoami] on [exec date]"}
             puts $f "#"
 
+#  Write the CCDSETUP commands specific to each Set Index if we are using
+#  Sets.
+            if { $CCDglobalpars(USESET) == "TRUE" } {
+               foreach sindex \$CCDsetindices {
 
-#  Write the CCDSETUP command.
-            puts $f " ccdsetup \\"
+#  Write the start of the CCDSETUP command.
+                  if { [array names CCDglobalpars $sindex,*] != "" } {
+                     puts $f " ccdsetup byset index=$sindex \\"
+
+#  Specify the vector parameters.
+                     foreach vector "$vectors" {
+                        set key "$sindex,$vector"
+                        if { [info exists CCDglobalpars($key)] } {
+                           if { $CCDglobalpars($key) != {} } {
+                              puts $f "  $vector='\[$CCDglobalpars($key)\]' \\"
+                           }
+                        }
+                     }
+
+#  Specify the scalar parameters.
+                     foreach scalar "$scalars" {
+                        set key "$sindex,$scalar"
+                        if { [info exists CCDglobalpars($key)] } {
+                           if { $CCDglobalpars($key) != {} } {
+                              puts $f "  $scalar=$CCDglobalpars($key) \\"
+                           }
+                        }
+                     }
+
+#  Specify the inverse parameters.
+                     foreach scalar "$inverse" {
+                        set key "$sindex,$scalar"
+                        if { [info exists CCDglobalpars($key)] } {
+                           if { $CCDglobalpars($key) != {} } {
+                              if { $CCDglobalpars($key) == "TRUE" } {
+                                 puts $f "  $scalar=FALSE \\"
+                              } else {
+                                 puts $f "  $scalar=TRUE \\"
+                              }
+                           }
+                        }
+                     }
+
+#  Finish off the command.
+                     puts $f "  RESET ACCEPT"
+                  }
+               }
+            }
+
+#  Write the general CCDSETUP command.
+            puts $f " ccdsetup byset=false \\"
+
+#  Specify the vector parameters.
             foreach vector "$vectors" {
                if { [info exists CCDglobalpars($vector)] } {
                   if { $CCDglobalpars($vector) != {} } {
@@ -186,6 +243,8 @@ proc CCDDoReduce { Top } {
                   }
                }
             }
+
+#  Specify the scalar parameters.
             foreach scalar "$scalars" {
                if { [info exists CCDglobalpars($scalar)] } {
                   if { $CCDglobalpars($scalar) != {} } {
@@ -193,6 +252,8 @@ proc CCDDoReduce { Top } {
                   }
                }
             }
+
+#  Specify the inverse parameters.
             foreach scalar "$inverse" {
                if { [info exists CCDglobalpars($scalar)] } {
                   if { $CCDglobalpars($scalar) != {} } {
@@ -205,6 +266,9 @@ proc CCDDoReduce { Top } {
                }
             }
             puts $f "  RESET ACCEPT"
+
+#  Write a command to log the global parameters in force.
+            puts $f " ccdshow"
 
 #  Write the rest of the file back.
             puts $f "$contents"
