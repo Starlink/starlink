@@ -24,7 +24,7 @@ AC_PROG_LIBTOOL
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf sae subpar])
+STAR_DECLARE_DEPENDENCIES(build, [cnf sae subpar prm])
 STAR_DECLARE_DEPENDENCIES(link,  [chr mers psx])
 
 dnl    List the sun/ssn/... numbers which document this package and
