@@ -2,7 +2,13 @@ core.*
 version.dat
 *.ifc
 *.ifl
+*.lo
+sun226.ps
+sun226.htx
+extractor
+sex
 extractor.icl
+extractor.csh
 starconf.status
 Makefile
 Makefile.in
