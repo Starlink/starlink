@@ -60,6 +60,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
           OK = .TRUE.
         ELSE
+          OK = .FALSE.
           CALL ERR_ANNUL( STATUS )
         END IF
       END IF
