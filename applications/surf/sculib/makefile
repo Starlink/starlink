@@ -28,7 +28,8 @@ FSOURCES= sculib_1d2_jiggle.f sculib_2pos_deconv.f sculib_3pos_deconv.f \
 	sculib_copyi.f sculib_copyr.f sculib_correct_extinction.f \
 	sculib_covsrt.f sculib_crosstalk.f \
 	sculib_day.f sculib_decode_angle.f sculib_decode_filter.f \
-	sculib_div_calibrator.f sculib_find_switch.f sculib_fit_2d_gaussian.f \
+	sculib_div_calibrator.f sculib_div_calibrator_2.f \
+	sculib_find_switch.f sculib_fit_2d_gaussian.f \
 	sculib_fit_2d_parabola.f sculib_fit_d2xisq_daj2.f sculib_fit_skydip.f\
 	sculib_fit_d2xisq_dajk.f sculib_fit_dxisq_daj.f sculib_fit_function.f \
 	sculib_fit_makealpha.f sculib_fit_makebeta.f sculib_fit_mult.f \
