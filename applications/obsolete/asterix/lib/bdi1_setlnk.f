@@ -184,7 +184,7 @@
         IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Get dimensions and type from this object
-          CALL BDI1_ARYSHP( ALOC, DAT__MXDIM, DIMS, NDIM, TYP, STATUS )
+          CALL ADI1_ARYSHP( ALOC, DAT__MXDIM, DIMS, NDIM, TYP, STATUS )
 
 *      Free the object
           CALL DAT_ANNUL( ALOC, STATUS )

@@ -139,7 +139,7 @@
       HTYPE = '_'//TYPE
 
 *  Get array shape and total number of elements
-      CALL BDI1_ARYSHP( LOC, DAT__MXDIM, DIMS, NDIM, ATYPE, STATUS )
+      CALL ADI1_ARYSHP( LOC, DAT__MXDIM, DIMS, NDIM, ATYPE, STATUS )
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *  Is object primitive?
