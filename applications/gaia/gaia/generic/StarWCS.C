@@ -51,6 +51,21 @@
 #include "error.h"
 #include "StarWCS.h"
 
+//
+//  Define a function to wrap the AST TranN function using a
+//  C-binding. This function doesn't like being called from C++ using
+//  the DEC CXX command (v6). Note we also need "-std arm" for this to
+//  work (to get past the ast.h include file)...
+//
+extern "C" {
+  static void WCSAstTranN( AstFrameSet *map, int npoint, int ncoord_in,
+                           int indim, const double (*in)[1], int forward,
+                           int ncoord_out, int outdim, double (*out)[1] )
+  {
+    astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in, 
+              forward, ncoord_out, outdim, (double (*)[])out); 
+  }
+}
 
 //
 //  Constructor
@@ -849,14 +864,14 @@ int StarWCS::make2D()
   in1[0][0] = 0.0;
   in1[1][0] = 0.0;
   for ( i = 0; i < MAXDIM; i++ ) out1[i][0] = 0.0;
-  astTranN( wcs_, 1, 2, 1, (const double (*)[])in1, 1, nsky, 1, out1 );
+  WCSAstTranN( wcs_, 1, 2, 1, in1, 1, nsky, 1, out1 );
 
   double in2[2][1];
   double out2[MAXDIM][1];
   in2[0][0] = (double) nxpix_;
   in2[1][0] = (double) nypix_;
   for ( i = 0; i < MAXDIM; i++ ) out2[i][0] = 0.0;
-  astTranN( wcs_, 1, 2, 1, (const double (*)[])in2, 1, nsky, 1, out2 );
+  WCSAstTranN( wcs_, 1, 2, 1, in2, 1, nsky, 1, out2 );
 
   //  Check to see which dimensions have jiggled.
   int n = 0;
