@@ -56,8 +56,16 @@
 *        Is the source origin provided to be refined?
 *     BACK = _REAL (Read)
 *        The background value for the image.
+*     CALCSD = _LOGICAL (Read)
+*        Should we calculate and display parameter uncertainties?
+*        A significant part of the calculation is taken up with this
+*        calculation, so if you do not want the uncertainties, you will save
+*        time by opting not to calculate them.
 *     COLOUR = _INTEGER (Read)
 *        Colour of the pen used to mark source centres.
+*     FWHM = _LOGICAL (Read)
+*        Are the gaussian widths to be read and written as FWHM or
+*        standard deviations?
 *     IMGDEV = _DEVICE (Read) 
 *        Name of the graphics device on which the results graph should 
 *        be displayed.
@@ -67,6 +75,16 @@
 *        system of the WCS component of IN.
 *     IN = _NDF (Read)
 *        The name of the source NDF data structure/file.
+*     LSQFIT = _LOGICAL (Read)
+*        Is the application to use the least-squares fitting
+*        routine?  Must be LSQFIT=TRUE to use this variant of the routine.
+*     MAXITER = _LOGICAL (Read)
+*        Maximum number of iterations (-1 indicates that you are happy
+*        with the default limit).  The default maximum count is large, and
+*        intended as an upper bound on the iteration count, to stop it spinning
+*        its wheels uselessly due to some programming error.  You should not
+*        need to change this unless you suspect that the limit is genuinely
+*        being reached by a correct calculation.
 *     MODE = _LOGICAL (Read)
 *        Whether the application is to run in file input mode or 
 *        interactively. Interactive MODE=TRUE. File mode=FALSE.
@@ -76,6 +94,12 @@
 *        The type of output NDF file to be created. MODTYP=R gives
 *        residuals near the sources. MODTYP=W gives the whole
 *        image model.
+*     NITER = _INTEGER (Read)
+*        The maximum number of iterations before the routine abandons
+*        the calculation.  This is only a guard to prevent the routine
+*        running away on a pathological dataset.  You should normally use
+*        the default, obtained by giving this parameter as a negative
+*        number.
 *     NSIGMA = _REAL (Read)
 *        Number of sigma above sky at which pixels are considered 
 *        to be significant.

@@ -122,6 +122,21 @@
 *        modified. The position angle, origin and ellipticity are not 
 *        frozen if a value of zero or less than zero is suggested. 
 *        Units are pixels 
+*     MINMOD=_INTEGER (Read)
+*        Which type of ellipse-residual minimisation is to be used.
+*
+*        The type of residual to be calculated is specified as 0, 1 or
+*        2.  This also controls which type of statistic is returned in
+*        the final column of the ELLPRO output file.  It's not
+*        completely clear what is the best type of residual to use.  The
+*        original one -- a weighted standard error, selected by giving
+*        this parameter the option~0 -- is rational, but not obviously
+*        ideal.  I've added here the range and the squared-differences
+*        as alternatives, selectable by options~1 and~2 respectively.
+*
+*        I don't really recommend you play with this unless you wish to
+*        experiment.  If this parameter makes much of a difference, the
+*        ESP maintainer would be interested to hear about it.
 *     MODE=_LOGICAL (Read)
 *        Whether the application is to run in file input mode or 
 *        interactively. Interactive MODE=TRUE. File mode=FALSE.

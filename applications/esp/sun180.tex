@@ -3741,6 +3741,26 @@ The ESP routine descriptions are contained in the following pages.
          The units are pixels
       }
       \sstsubsection{
+         MINMOD=\_INTEGER (Read)
+      }{
+        Which type of ellipse-residual minimisation is to be used.
+
+     The type of residual to be calculated is specified as 0, 1 or 2.
+     This also 
+     controls which type of statistic is returned in the final column
+     of the ELLPRO output file.  It's not completely clear what is the
+     best type of residual to 
+     use.  The original one -- a weighted standard error, selected by
+     giving this parameter the option~0 -- is rational,
+     but not obviously ideal.  I've added here the range and the
+     squared-differences as alternatives, selectable by
+     options~1 and~2 respectively.
+
+     I don't really recommend you play with this unless you wish to
+     experiment.  If this parameter makes much of a difference, the
+     ESP maintainer would be interested to hear about it.
+         }
+      \sstsubsection{
          MODE=\_LOGICAL (Read)
       }{
          Whether the application is to run in file input mode or
@@ -4184,17 +4204,12 @@ updated version, the previous the original one.
         Should we calculate and display parameter uncertainties?
    A significant part of the calculation is taken up with this
    calculation, so if you do not want the uncertainties, you will save
-      }
    time by opting not to calculate them.
+	}
       \sstsubsection{
         COLOUR = \_INTEGER (Read)
       }{
            Colour of the pen used to mark source centres.
-      }
-      \sstsubsection{
-        COSYS = \_CHAR (Read)
-      }{
-           Use world or data co-ordinate system? (D=data W=world)
       }
       \sstsubsection{
         DEVICE = DEVICE (Read) 
@@ -4225,6 +4240,16 @@ updated version, the previous the original one.
            Is the application to use the least-squares fitting
    routine?  Must be LSQFIT=TRUE to use this variant of the routine.
       }
+      \sstsubsection{
+        MAXITER = \_LOGICAL (Read)
+	}{
+	Maximum number of iterations (-1 indicates that you are happy
+with the default limit).  The default maximum count is large, and
+intended as an upper bound on the iteration count, to stop it spinning
+its wheels uselessly due to some programming error.  You should not
+need to change this unless you suspect that the limit is genuinely
+being reached by a correct calculation.
+}
       \sstsubsection{
         MODE = \_LOGICAL (Read)
       }{
