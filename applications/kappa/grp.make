@@ -443,10 +443,10 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
-UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp \
+UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp kappa.ifd \
 $(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
-$(KAPPA_IFLS) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
+$(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
 $(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS) 
 
 #  The contents of kappa.tar.

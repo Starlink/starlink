@@ -74,10 +74,13 @@
          exit
       endif
 
-      foreach file (kappa_mon.f kapview_mon.f ndfpack_mon.f)
+      foreach file (kappa_mon.f kapview_mon.f ndfpack_mon.f kappa.ifd)
          sed -e "s#PKG_VERS#$vers[3]#g" $file > temp
          mv -f temp $file
       end
+
+#  Generate the ifl files, and the icl and csh start-up scripts. 
+      ifd2star kappa
 
 #  Create the doc directory for inclusion in kappa_iraf.tar and move all the 
 #  iraf help files into it.
