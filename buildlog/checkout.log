@@ -8638,6 +8638,11 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/WaveletFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/deploy.wsdd
+cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/vo
+U java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQuery.java
+U java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQueryBrowser.java
+U java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAServer.java
+U java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAServerList.java
 cvs checkout: Updating java/source/splat/src/script
 U java/source/splat/src/script/.splat_autoloads
 U java/source/splat/src/script/BasicMaths.java

@@ -816,6 +816,7 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.splat.imagedata...
   [javadoc] Loading source files for package uk.ac.starlink.splat.plot...
   [javadoc] Loading source files for package uk.ac.starlink.splat.util...
+  [javadoc] Loading source files for package uk.ac.starlink.splat.vo...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
@@ -851,7 +852,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/splat
 [loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 11 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 561 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 569 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
@@ -913,7 +914,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 12, 2004 5:17:54 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 13, 2004 5:17:44 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1110,4 +1111,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 29 seconds
+Total time: 5 minutes 14 seconds

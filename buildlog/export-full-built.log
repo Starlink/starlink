@@ -707,6 +707,7 @@ javadocs:
   [javadoc] Loading source files for package uk.ac.starlink.splat.imagedata...
   [javadoc] Loading source files for package uk.ac.starlink.splat.plot...
   [javadoc] Loading source files for package uk.ac.starlink.splat.util...
+  [javadoc] Loading source files for package uk.ac.starlink.splat.vo...
   [javadoc] Constructing Javadoc information...
   [javadoc] Standard Doclet version 1.4.1
 
@@ -732,7 +733,7 @@ dist:
 install:
 [loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 11 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 561 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 569 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
 [loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
      [echo] Executing Mirage target: install
@@ -928,4 +929,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 45 seconds
+Total time: 4 minutes 31 seconds

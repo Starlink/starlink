@@ -328,7 +328,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 173 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 177 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 69 files to /apps/cvsbuild/java/source/splat/build/classes
