@@ -295,9 +295,9 @@ endif
 #   Iras90
 #
 
-if ( -e @bindir@/iras90/iras90 ) then
-   alias iras90 source @bindir@/iras90/iras90
-   alias iras90setup source @bindir@/iras90/iras90
+if ( -e @bindir@/iras90/iras90.csh ) then
+   alias iras90 source @bindir@/iras90/iras90.csh
+   alias iras90setup source @bindir@/iras90/iras90.csh
 else
    alias iras90 '@staretcdir@/notinst iras90'
    alias iras90setup '@staretcdir@/notinst iras90setup'
