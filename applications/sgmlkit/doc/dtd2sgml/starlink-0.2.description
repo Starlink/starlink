@@ -292,6 +292,8 @@ not loaded images.
 displayed.  The entities must be declared in the document declaration
 subset, with appropriate notations. 
 <p>The currently available image notations are `jpeg', `eps' and `gif87a'.
+<p>If this attribute is present, the content of the element (in the
+SGML sense, meaning the list of <elemref gi=px> elements) is ignored.
 
 
 <element gi='history'>
@@ -460,8 +462,8 @@ but this may be abbreviated to just
 <p>Section body
 ]]></example>
 The same is true for the 
-<elemref gi=subsect>
-<elemref gi=subsubsect>
+<elemref gi=subsect>,
+<elemref gi=subsubsect>, and
 <elemref gi=subsubsubsect>
 elements.
 
@@ -479,6 +481,11 @@ meaningful link target in future versions of this document.
 <p>You should include this attribute on all sections and subsections.
 This is enforced by the DTD for <elemref self gi=sect> and <elemref
 gi=subsect> elements.
+<p>Note that the DTD and processing system do not <em/default/ this
+attribute to be present, but require you to insert it explicitly.
+This is so that you are aware that the ID has been exported, and that it
+might therefore be referred to by another document, so that you should
+not change the ID once the document has been published.
 <attribute name='indexkey'>
 <p>If this attribute is present, then an index entry is made, pointing
 to this section, with the specified key.
