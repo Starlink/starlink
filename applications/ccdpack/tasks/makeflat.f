@@ -161,9 +161,13 @@
 *        The number of refining iterations performed if METHOD = "MODE".
 *        [7]
 *     OUT = LITERAL (Write)
-*        Name of an NDF to contain the output flatfield data. Note this
-*        NDF will have a precision of at least _REAL. This name may be
-*        specified using indirection through a file.
+*        Name of an output file to contain the output flatfield data. 
+*        Note that output NDFs have a precision of at least _REAL. 
+*        If USESET is true and multiple Sets are represented in the IN
+*        list then this name will be used as the name of an HDS 
+*        container file containing one NDF for each Set Index value.
+*        This name may be specified using indirection through a file.
+*        [TRUE]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Used for
 *        "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
@@ -171,6 +175,19 @@
 *        For METHOD = "SIGMA" this value is the pixel variance if one
 *        exists, otherwise one is estimated from the population of values.
 *        [4.0]
+*     USESET = _LOGICAL (Read)
+*        Whether to use Set header information or not.  If USESET is
+*        false then any Set header information will be ignored.
+*        If USESET is true, then input files will be considered in
+*        groups; one flatfield will be constructed using all those with 
+*        a Set Index attribute of 1, another using all those with a 
+*        Set Index of 2, etc.  If this results in multiple output
+*        flatfields, they will be written as separate NDFs into a 
+*        single HDS container file.  If no Set header information 
+*        is present in the input files, then flatfielding is done 
+*        on all the input files together, so USESET can usually be 
+*        safely set to TRUE (the default).
+*        [TRUE]
 *     USEVAR = _LOGICAL (Read)
 *        If TRUE and all the input images contain error information
 *        (variances), then these will be used as weights during image
@@ -283,6 +300,8 @@
 *        Modified to propagate WCS component.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     8-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -297,6 +316,8 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'NDF_PAR'          ! NDF status codes and buffer sizes
+      INCLUDE 'GRP_PAR'          ! GRP system constants
+      INCLUDE 'AST_PAR'          ! AST system constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK internal constants
 
 *  Status:
@@ -313,6 +334,9 @@
       CHARACTER * ( CCD1__NMLEN ) FILTER ! The filter type of the input NDFs
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Lowest common precision type of input NDFs
       CHARACTER * ( NDF__SZTYP ) PTYPE ! Actual processing precision
+      CHARACTER * ( GRP__SZNAM ) KEYVAL ! Value of Set split key attribute
+      CHARACTER * ( GRP__SZNAM ) NAME ! Set Name attribute
+      CHARACTER * ( GRP__SZNAM ) OUTNAM ! Filename used for output
       DOUBLE PRECISION AVEACC( CCD1__MXNDF ) ! Mean values
       DOUBLE PRECISION CVAL     ! Mean value scaling factor
       DOUBLE PRECISION INVAVE( CCD1__MXNDF ) ! Inverse mean values
@@ -332,6 +356,9 @@
       INTEGER IDSLI             ! Identifier of slice into w/s stack.
       INTEGER IDWRK4            ! Covariances workspace identifier
       INTEGER IMETH             ! The combination method
+      INTEGER INDEX             ! Set Index attribute
+      INTEGER INDF              ! NDF identifier
+      INTEGER INGRP             ! NDG identifier for input file group
       INTEGER INWORK            ! NDF identifier for workspace
       INTEGER IPIECE            ! Identifier for stack chunk
       INTEGER IPIL              ! Pointer to workspace
@@ -347,7 +374,10 @@
       INTEGER IPVSTK            ! Pointer to stack chunk Variance
       INTEGER IPWRK4            ! Pointer to covariances workspace
       INTEGER IRET              ! Number of returned values
+      INTEGER ISUB              ! Subgroup loop counter
       INTEGER ITER              ! Number of cleaning rejections
+      INTEGER JSET              ! Dummy frame index
+      INTEGER KEYGRP            ! GRP identifier for subgroup key values
       INTEGER LBND( 3 )         ! Lower bounds of NDF
       INTEGER MINPIX            ! Minimum number of contributing pixels
       INTEGER MMXPIX            ! Maximum value that MXPIX can take
@@ -361,12 +391,17 @@
       INTEGER NITER             ! Number of clipping iterations
       INTEGER NNDF              ! The number of input NDFs accessed
       INTEGER NPIX              ! The number of pixels in an NDF
+      INTEGER NSUB              ! Number of subgroups
+      INTEGER NTOT              ! Total number of NDFs in input group
       INTEGER NVAR              ! Number of input NDFs with variances
       INTEGER NWRK4             ! Number of elements of covariance w/s
-      INTEGER PLACE             ! Place holder for an NDF
+      INTEGER OPLACE( CCD1__MXNDF ) ! Place holders for output NDFs
+      INTEGER PLACE             ! Place holder for a temporary NDF
       INTEGER POINT( CCD1__MXNDF ) ! Pointers to original order when stacking images
       INTEGER SIZES( 2 )        ! Sides of box to use for cleaning
       INTEGER STACK( CCD1__MXNDF ) ! Stack of input NDF identifiers
+      INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifiers for input subgroups
+      INTEGER SUBIND            ! Common Set Index attribute for this subgroup
       INTEGER UBND( 3 )         ! Upper bounds of NDF
       LOGICAL BAD               ! Set if BAD pixels are present
       LOGICAL CLEAN             ! Clean the input NDFs of defects
@@ -375,6 +410,8 @@
       LOGICAL HAVVAR            ! Set if all variances components are present.
       LOGICAL THSVAR            ! This variance - used for testing variance presence.
       LOGICAL USED( CCD1__MXNDF ) ! Workspace for flagging image usage
+      LOGICAL USESET            ! Should we use Set header info?
+      LOGICAL USEVAR            ! Does the user want to use variances?
       REAL ALPHA                ! Trimming fraction
       REAL GAMMA                ! Number of Standard deviations to rejected at.
       REAL NSIGMA               ! Number of sigma to clip at
@@ -389,6 +426,14 @@
 *  Startup log system and write introduction.
       CALL CCD1_START( 'MAKEFLAT', STATUS )
 
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEl on
+*  an uninitialised group cannot cause trouble.
+      INGRP = GRP__NOID
+      KEYGRP = GRP__NOID
+      DO I = 1, CCD1__MXNDF
+         SUBGRP( I ) = GRP__NOID
+      END DO
+
 *  See if the user wants to save disk space by deleting the input NDFs
 *  when MAKEBIAS is finished with them. This will use the NDF_DELET
 *  call which will delete container files if the NDF is associated with
@@ -398,143 +443,35 @@
       CALL PAR_GET0L( 'KEEPIN', DELETE, STATUS )
       DELETE = .NOT. DELETE
 
-*  Access the input NDFs
+*  Access the input NDFs.
       CALL NDF_BEGIN
-      IF ( DELETE ) THEN
-         CALL CCD1_NDFAC( 'IN', 'UPDATE', 1, CCD1__MXNDF, NNDF, STACK,
-     :                    STATUS )
+      CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NTOT, STATUS )
+
+*  Find out if we are using Set header information.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
+*  Split the group of input NDFs up by Set Index if necessary.
+      NSUB = 1
+      IF ( USESET ) THEN
+         CALL CCD1_SETSP( INGRP, 'INDEX', CCD1__MXNDF, SUBGRP, NSUB,
+     :                    KEYGRP, STATUS )
       ELSE
-         CALL CCD1_NDFAC( 'IN', 'READ', 1, CCD1__MXNDF, NNDF, STACK,
-     :                    STATUS )
-      END IF
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Check that the input data have the correct frame types. If they do
-*  not then issue a warning. All input data should have a recognised
-*  flatfield frame type and have the same filter type.
-      FILTER = ' '
-      CALL CCD1_CKFLA( STACK, NNDF, FILTER, STATUS )
-
-*  Make sure that all the input data is accessed at a precision
-*  sufficient to properly represent a normalised flatfield. This means
-*  at least _REAL. The data will be in this precision and will remain
-*  in the processing precision on output.
-      CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
-     :                '_DOUBLE', NNDF, STACK, 'Data', ITYPE, DTYPE,
-     :                STATUS )
-
-*  Set the processing type, ie. the type in which the data will be
-*  stacked etc.
-      IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
-         PTYPE = '_DOUBLE'
-      ELSE
-         PTYPE = '_REAL'
+         SUBGRP( 1 ) = INGRP
+         KEYGRP = GRP__NOID
       END IF
 
-*  A final note on precisions - the variance will be mapped as PTYPE.
-
-*  Find out which input NDFs have variances. Will require all inputs to
-*  have variances, otherwise the exposure values will be used as
-*  weights. If we do not have all variances or if USEVAR is FALSE, then
-*  none will be accessed.
-      NVAR = 0
-      CALL PAR_GET0L( 'USEVAR', HAVVAR, STATUS )
-      IF ( HAVVAR ) THEN
-         DO 4  I = 1, NNDF
-            CALL NDF_STATE( STACK( I ), 'Variance', THSVAR, STATUS )
-            IF ( THSVAR ) THEN
-               NVAR = NVAR + 1
-            END IF
- 4       CONTINUE
-
-*  Set HAVVAR flag to show if all variances are present. If not all
-*  variances are present and NVAR is greater than zero issue a warning.
-         IF ( NVAR .GT. 0 ) THEN
-            IF ( NVAR .NE. NNDF ) THEN
-               HAVVAR = .FALSE.
-               CALL MSG_OUT( 'MAKECAL_NVAR',
-     :       ' Warning - only some input NDFs have a variance'//
-     :       ' component, variance analysis not performed.',
-     :                     STATUS )
-            END IF
-         ELSE
-
-*  No variances.
-            HAVVAR = .FALSE.
-         END IF
-      END IF
-
-*  See if we want to generate variances. Only allowed if not using input
-*  variances.
-      GENVAR = .FALSE.
-      IF ( .NOT. HAVVAR ) THEN
-         CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
-      END IF
-
-*  Find out the stacking mode.
-      CALL CCD1_GTCPB( IMETH, CMODE, NITER, NSIGMA, ALPHA, RMIN, RMAX,
+*  Get placeholders for the output NDFs we want to create from the OUT
+*  parameter.
+      CALL CCD1_NDFPL( 'OUT', NSUB, 'i', KEYGRP, OPLACE, OUTNAM,
      :                 STATUS )
 
-*  Match the pixel-index bounds of the input NDFs (makes them all look
-*  the same size), padding out to largest required extent.
-      CALL NDF_MBNDN( 'Pad', NNDF, STACK, STATUS )
-
-*  Find out how many pixels a single padded NDF contains.
-      CALL NDF_SIZE( STACK( 1 ), NPIX, STATUS )
-      CALL NDF_BOUND( STACK( 1 ), 2, LBND, UBND, NDIM, STATUS )
-      CALL NDF_DIM( STACK( 1 ), 2, IDIM, NDIM, STATUS )
-
-*  Have we got BAD pixels?
-      CALL NDF_MBADN( .TRUE., NNDF, STACK, 'Data,Variance', .FALSE.,
-     :                BAD, STATUS )
-
-*  Find out how many pixels of a single NDF on the main stack which we
-*  are to access at any one time, the actual amount will be NNDF times
-*  this value. Note that the actual stack is the size of all the input
-*  NDFs, this is necessary to perform the defect filtering. Hence unlike
-*  other stacking routines this only chunks the actual stack. The input
-*  NDFs are moved onto the stack one at a time. The stack is sliced up
-*  into planes before mapping so the mapped space is around twice that
-*  of a single NDF (plus the workspace).
-      MMXPIX = MAXPIX / ( NNDF + 4 )
-      MXPIX = MAX( 1, MIN( MMXPIX, NPIX ) )
-
-*  Find out how many chunks this corresponds too.
-      CALL NDF_NCHNK( STACK( 1 ), MXPIX, NCHUNK, STATUS )
-
-*  Get a temporary NDF big enough to contain all possible input NDF
-*  sections in a stack NNDF big.
-      CALL NDF_TEMP( PLACE, STATUS )
-      LBND( 3 ) = 1
-      UBND( 3 ) = NNDF
-      CALL NDF_NEW( PTYPE, 3, LBND, UBND, PLACE, INWORK, STATUS )
-
-*  Create the output NDF to contain the result. Propagating axis,
-*  label, and history but no units from the first NDF. Do NOT
-*  propagate the CCDPACK extension (the information in this only
-*  applies to the input NDF) or the QUALITY.
-      CALL CCD1_NDFPR( 'OUT', STACK( 1 ),
-     :                 'Axis,Nounits,WCS,Noext(CCDPACK)', NDFOUT,
-     :                 STATUS )
-
-*  Set the output types (as explained above) to the processing
-*  precision. They will remain at this precision.
-      CALL NDF_STYPE( PTYPE, NDFOUT, 'Data,Variance', STATUS )
+*  Find out if use of variances has been requested.
+      CALL PAR_GET0L( 'USEVAR', USEVAR, STATUS )
 
 *  Get the minimum number of contributing pixels per output pixel.
       CALL PAR_GET0I( 'MINPIX', MINPIX, STATUS )
 
-*  If we have variances then will process covariances - get the
-*  required workspace.
-      IF ( HAVVAR ) THEN
-         NWRK4 = MAX( 1, ( ( NNDF+ 1 )**3 ) / 2 )
-         CALL CCD1_MKTMP( NWRK4, '_DOUBLE', IDWRK4, STATUS )
-         NWRK4 = MAX( 1, NWRK4 / NNDF )
-         CALL CCD1_MPTMP( IDWRK4, 'WRITE', IPWRK4, STATUS )
-      ENDIF
-
-* ----------------------------------------------------------------------
-*  Cleaning section.
+*  Find out if we should attempt to do cleaning.
       CALL PAR_GET0L( 'CLEAN', CLEAN, STATUS )
       IF ( CLEAN ) THEN
 
@@ -551,97 +488,260 @@
 
 *  Obtain number of standard deviations for rejection threshold.
          CALL PAR_GET0R( 'GAMMA', GAMMA, STATUS )
-
-*  Get work space used only for smoothing.
-         CALL CCD1_MKTMP( IDIM( 1 ), '_INTEGER', IDIL, STATUS )
-         CALL CCD1_MPTMP( IDIL, 'WRITE', IPIL, STATUS )
-         CALL CCD1_MKTMP( IDIM( 1 ), PTYPE, IDNL, STATUS )
-         CALL CCD1_MPTMP( IDNL, 'WRITE', IPNL, STATUS )
       END IF
 
+*  Loop over subgroups performing the calculations separately for each
+*  one.
+      DO ISUB = 1, NSUB
+
+*  Write a header unless this is the only subgroup.
+         IF ( NSUB .GT. 1 ) THEN
+            CALL CCD1_SETHD( KEYGRP, ISUB, 'Producing flatfield',
+     :                       'Index', STATUS )
+         END IF
+
+*  Get the number of NDFs in this subgroup.
+         CALL GRP_GRPSZ( SUBGRP( ISUB ), NNDF, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Get the stack of NDF identifiers for this subgroup, and find a common
+*  Set Index attribute if one exists.
+         SUBIND = 0
+         DO I = 1, NNDF
+            CALL NDG_NDFAS( SUBGRP( ISUB ), I, 'READ', STACK( I ),
+     :                      STATUS )
+            CALL CCD1_SETRD( STACK( I ), AST__NULL, NAME, INDEX, JSET,
+     :                       STATUS )
+            IF ( I .EQ. 1 ) THEN
+               SUBIND = INDEX
+            ELSE
+               IF ( INDEX .NE. SUBIND ) SUBIND = 0
+            END IF
+         END DO
+
+*  Check that the input data have the correct frame types. If they do
+*  not then issue a warning. All input data should have a recognised
+*  flatfield frame type and have the same filter type.
+         FILTER = ' '
+         CALL CCD1_CKFLA( STACK, NNDF, FILTER, STATUS )
+
+*  Make sure that all the input data is accessed at a precision
+*  sufficient to properly represent a normalised flatfield. This means
+*  at least _REAL. The data will be in this precision and will remain
+*  in the processing precision on output.
+         CALL NDF_MTYPN( '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
+     :                   '_DOUBLE', NNDF, STACK, 'Data', ITYPE, DTYPE,
+     :                   STATUS )
+
+*  Set the processing type, ie. the type in which the data will be
+*  stacked etc.
+         IF( ITYPE .EQ.'_INTEGER' .OR. ITYPE .EQ. '_DOUBLE' ) THEN
+            PTYPE = '_DOUBLE'
+         ELSE
+            PTYPE = '_REAL'
+         END IF
+
+*  A final note on precisions - the variance will be mapped as PTYPE.
+
+*  Find out which input NDFs have variances. Will require all inputs to
+*  have variances, otherwise the exposure values will be used as
+*  weights. If we do not have all variances or if USEVAR is FALSE, then
+*  none will be accessed.
+         NVAR = 0
+         HAVVAR = USEVAR
+         IF ( HAVVAR ) THEN
+            DO 4  I = 1, NNDF
+               CALL NDF_STATE( STACK( I ), 'Variance', THSVAR, STATUS )
+               IF ( THSVAR ) THEN
+                  NVAR = NVAR + 1
+               END IF
+ 4          CONTINUE
+
+*  Set HAVVAR flag to show if all variances are present. If not all
+*  variances are present and NVAR is greater than zero issue a warning.
+            IF ( NVAR .GT. 0 ) THEN
+               IF ( NVAR .NE. NNDF ) THEN
+                  HAVVAR = .FALSE.
+                  CALL MSG_OUT( 'MAKECAL_NVAR',
+     :          ' Warning - only some input NDFs have a variance'//
+     :          ' component, variance analysis not performed.',
+     :                        STATUS )
+               END IF
+            ELSE
+
+*  No variances.
+               HAVVAR = .FALSE.
+            END IF
+         END IF
+
+*  See if we want to generate variances. Only allowed if not using input
+*  variances.
+         GENVAR = .FALSE.
+         IF ( .NOT. HAVVAR ) THEN
+            CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
+         END IF
+
+*  Find out the stacking mode.
+         CALL CCD1_GTCPB( IMETH, CMODE, NITER, NSIGMA, ALPHA, RMIN,
+     :                    RMAX, STATUS )
+
+*  Match the pixel-index bounds of the input NDFs (makes them all look
+*  the same size), padding out to largest required extent.
+         CALL NDF_MBNDN( 'Pad', NNDF, STACK, STATUS )
+
+*  Find out how many pixels a single padded NDF contains.
+         CALL NDF_SIZE( STACK( 1 ), NPIX, STATUS )
+         CALL NDF_BOUND( STACK( 1 ), 2, LBND, UBND, NDIM, STATUS )
+         CALL NDF_DIM( STACK( 1 ), 2, IDIM, NDIM, STATUS )
+
+*  Have we got BAD pixels?
+         CALL NDF_MBADN( .TRUE., NNDF, STACK, 'Data,Variance', .FALSE.,
+     :                   BAD, STATUS )
+
+*  Find out how many pixels of a single NDF on the main stack which we
+*  are to access at any one time, the actual amount will be NNDF times
+*  this value. Note that the actual stack is the size of all the input
+*  NDFs, this is necessary to perform the defect filtering. Hence unlike
+*  other stacking routines this only chunks the actual stack. The input
+*  NDFs are moved onto the stack one at a time. The stack is sliced up
+*  into planes before mapping so the mapped space is around twice that
+*  of a single NDF (plus the workspace).
+         MMXPIX = MAXPIX / ( NNDF + 4 )
+         MXPIX = MAX( 1, MIN( MMXPIX, NPIX ) )
+
+*  Find out how many chunks this corresponds to.
+         CALL NDF_NCHNK( STACK( 1 ), MXPIX, NCHUNK, STATUS )
+
+*  Get a temporary NDF big enough to contain all possible input NDF
+*  sections in a stack NNDF big.
+         CALL NDF_TEMP( PLACE, STATUS )
+         LBND( 3 ) = 1
+         UBND( 3 ) = NNDF
+         CALL NDF_NEW( PTYPE, 3, LBND, UBND, PLACE, INWORK, STATUS )
+
+*  Create the output NDF to contain the result. Propagating axis,
+*  label, and history but no units from the first NDF. Do NOT
+*  propagate the CCDPACK extension (most of the information in this 
+*  only applies to the input NDF) or the QUALITY.
+         CALL NDF_SCOPY( STACK( 1 ), 'Axis,Nounits,WCS,Noext(CCDPACK)',
+     :                   OPLACE( ISUB ), NDFOUT, STATUS )
+
+*  If we can sensibly do so, create a Set header in the output.  If all
+*  the input NDFs in this subgroup have the same (non-zero) Set Index,
+*  then use that as the Set Index of the output NDF.  In that case,
+*  use the name of the output NDF itself as the Set Name attribute.
+         IF ( SUBIND .GT. 0 ) THEN
+            CALL CCD1_SETWR( NDFOUT, OUTNAM, SUBIND, AST__NOFRAME,
+     :                       STATUS )
+         END IF
+
+*  Set the output types (as explained above) to the processing
+*  precision. They will remain at this precision.
+         CALL NDF_STYPE( PTYPE, NDFOUT, 'Data,Variance', STATUS )
+
+*  If we have variances then will process covariances - get the
+*  required workspace.
+         IF ( HAVVAR ) THEN
+            NWRK4 = MAX( 1, ( ( NNDF+ 1 )**3 ) / 2 )
+            CALL CCD1_MKTMP( NWRK4, '_DOUBLE', IDWRK4, STATUS )
+            NWRK4 = MAX( 1, NWRK4 / NNDF )
+            CALL CCD1_MPTMP( IDWRK4, 'WRITE', IPWRK4, STATUS )
+         ENDIF
+
+* ----------------------------------------------------------------------
+*  Cleaning section.
+         IF ( CLEAN ) THEN
+
+*  Get work space used only for smoothing.
+            CALL CCD1_MKTMP( IDIM( 1 ), '_INTEGER', IDIL, STATUS )
+            CALL CCD1_MPTMP( IDIL, 'WRITE', IPIL, STATUS )
+            CALL CCD1_MKTMP( IDIM( 1 ), PTYPE, IDNL, STATUS )
+            CALL CCD1_MPTMP( IDNL, 'WRITE', IPNL, STATUS )
+         END IF
+
 *  Get other work spaces.
-      CALL CCD1_MKTMP( IDIM( 1 ) * IDIM( 2 ), PTYPE, IDIST, STATUS )
-      CALL CCD1_MPTMP( IDIST, 'WRITE', IPIST, STATUS )
+         CALL CCD1_MKTMP( IDIM( 1 ) * IDIM( 2 ), PTYPE, IDIST, STATUS )
+         CALL CCD1_MPTMP( IDIST, 'WRITE', IPIST, STATUS )
 
 *  Loop over all the input NDFs cleaning the data and transfering the
 *  data and variance onto the stack.
-      DO 5 I = 1, NNDF
+         DO 5 I = 1, NNDF
 
 *  Get a slice of the stack to put the result into.
-         CALL NDF_BLOCK( INWORK, 2, IDIM, I, IDSLI, STATUS )
+            CALL NDF_BLOCK( INWORK, 2, IDIM, I, IDSLI, STATUS )
 
 *  Map in the slice. Do not map in variances if not used.
-         CALL NDF_MAP( IDSLI, 'Data', PTYPE, 'WRITE', IPSLI, EL,
-     :                 STATUS )
-         IF ( HAVVAR ) CALL NDF_MAP( IDSLI, 'Variance', PTYPE,
-     :                               'WRITE', IPVSLI, EL, STATUS )
+            CALL NDF_MAP( IDSLI, 'Data', PTYPE, 'WRITE', IPSLI, EL,
+     :                    STATUS )
+            IF ( HAVVAR ) CALL NDF_MAP( IDSLI, 'Variance', PTYPE,
+     :                                  'WRITE', IPVSLI, EL, STATUS )
 
 *  Map in the input NDF.
-         CALL NDF_MAP( STACK( I ), 'Data', PTYPE, 'READ', IPIN, EL,
-     :                 STATUS )
-         IF ( HAVVAR ) CALL NDF_MAP( STACK( I ), 'Variance', PTYPE,
-     :                               'READ', IPVIN, EL, STATUS )
+            CALL NDF_MAP( STACK( I ), 'Data', PTYPE, 'READ', IPIN, EL,
+     :                    STATUS )
+            IF ( HAVVAR ) CALL NDF_MAP( STACK( I ), 'Variance', PTYPE,
+     :                                  'READ', IPVIN, EL, STATUS )
 
 *  Do the cleaning process transfering the result to the stack.
-         IF  ( CLEAN ) THEN
-            CALL CCD1_FFCL( PTYPE, BAD, IPIN, STACK( I ), IDIM( 1 ),
-     :                      IDIM( 2 ), ITER, GAMMA, SIZES( 1 ),
-     :                      SIZES( 2 ), SIGMA, IPSLI, NGOOD, IPIST,
-     :                      IPIL, IPNL, STATUS )
-         ELSE
+            IF  ( CLEAN ) THEN
+               CALL CCD1_FFCL( PTYPE, BAD, IPIN, STACK( I ), IDIM( 1 ),
+     :                         IDIM( 2 ), ITER, GAMMA, SIZES( 1 ),
+     :                         SIZES( 2 ), SIGMA, IPSLI, NGOOD, IPIST,
+     :                         IPIL, IPNL, STATUS )
+            ELSE
 
 *  No cleaning requested so just copy the data into the stack.
-            CALL CCD1_MSG( ' ','  Data not cleaned', STATUS )
-            CALL CCD1_COPY( PTYPE, EL, IPIN, IPSLI, STATUS )
-         END IF
+               CALL CCD1_MSG( ' ','  Data not cleaned', STATUS )
+               CALL CCD1_COPY( PTYPE, EL, IPIN, IPSLI, STATUS )
+            END IF
 
 *  Copy the variances also (if appropriate).
-         IF ( HAVVAR ) CALL CCD1_COPY( PTYPE, EL, IPVIN, IPVSLI,
-     :                                 STATUS )
+            IF ( HAVVAR ) CALL CCD1_COPY( PTYPE, EL, IPVIN, IPVSLI,
+     :                                    STATUS )
 
 * ----------------------------------------------------------------------
 *  Normalisation section.
 *  Determine the mean value in each frame and divide by this. Also
 *  process any variances similarily.
-         CALL CCD1_MEAN( PTYPE, BAD, IPSLI, EL, AVEACC( I ), NGOOD,
-     :                   STATUS )
+            CALL CCD1_MEAN( PTYPE, BAD, IPSLI, EL, AVEACC( I ), NGOOD,
+     :                      STATUS )
 
 *  Divide the data by this value, check mean of input data is not
 *  exactly zero first, data with this characteristic cannot be real
 *  a corruption or improper test data must be responsible.
-         IF ( AVEACC( I ) .EQ. 0.0D0 ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', '  Input data component has a mean'//
-     :      ' of zero - MAKEFLAT cannot process this', STATUS )
-         END IF
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CVAL = 1.0D0 / AVEACC( I )
-         CALL CCD1_CMULT( BAD, PTYPE, IPSLI, EL, CVAL, IPIST, NERR,
-     :                    STATUS )
+            IF ( AVEACC( I ) .EQ. 0.0D0 ) THEN
+               STATUS = SAI__ERROR
+               CALL ERR_REP( ' ', '  Input data component has a mean'//
+     :         ' of zero - MAKEFLAT cannot process this', STATUS )
+            END IF
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            CVAL = 1.0D0 / AVEACC( I )
+            CALL CCD1_CMULT( BAD, PTYPE, IPSLI, EL, CVAL, IPIST, NERR,
+     :                       STATUS )
 
 *  Modify any variances, existing variances are modified by dividing by
 *  the signal squared. If no variances exist then use the signal level
 *  as a weight (inverted so looks like variance)
-         IF ( HAVVAR ) THEN
-            CVAL = CVAL * CVAL
-            CALL CCD1_CMULT( BAD, PTYPE, IPVSLI, EL, CVAL, IPIST, NERR,
-     :                       STATUS )
-         ELSE
-            INVAVE( I ) = CVAL
-         END IF
+            IF ( HAVVAR ) THEN
+               CVAL = CVAL * CVAL
+               CALL CCD1_CMULT( BAD, PTYPE, IPVSLI, EL, CVAL, IPIST,
+     :                          NERR, STATUS )
+            ELSE
+               INVAVE( I ) = CVAL
+            END IF
 
 *  Release the input NDF and the stack slice.
-         CALL NDF_UNMAP( STACK( I ), '*', STATUS )
-         CALL NDF_UNMAP( IDSLI, '*', STATUS )
-         CALL NDF_ANNUL( IDSLI, STATUS )
- 5    CONTINUE
+            CALL NDF_UNMAP( STACK( I ), '*', STATUS )
+            CALL NDF_UNMAP( IDSLI, '*', STATUS )
+            CALL NDF_ANNUL( IDSLI, STATUS )
+ 5       CONTINUE
 
 *  Release workspace.
-      IF ( CLEAN ) THEN
-         CALL CCD1_FRTMP( IDNL, STATUS )
-         CALL CCD1_FRTMP( IDIL, STATUS )
-      END IF
-      CALL CCD1_FRTMP( IDIST, STATUS )
+         IF ( CLEAN ) THEN
+            CALL CCD1_FRTMP( IDNL, STATUS )
+            CALL CCD1_FRTMP( IDIL, STATUS )
+         END IF
+         CALL CCD1_FRTMP( IDIST, STATUS )
 
 * ----------------------------------------------------------------------
 *  Stacking section. Cut the data stack up into chunks to aid
@@ -651,126 +751,137 @@
 *  this way.
 
 *  Zero statistics buffer.
-      DO 6 I = 1, NNDF
-         NCON( I ) = 0.0D0
- 6    CONTINUE
-      DO 2 ICHUNK = 1, NCHUNK
+         DO 6 I = 1, NNDF
+            NCON( I ) = 0.0D0
+ 6       CONTINUE
+         DO 2 ICHUNK = 1, NCHUNK
 
 *  Get the current chunk of the stack. The way this will work is to
 *  chunk the output NDF, get the bounds of this section. Then section
 *  the stack so that it uses the same bounds, except in the third
 *  dimension which will be NNDF large.
 *  Get chunk of output NDF first.
-         CALL NDF_CHUNK( NDFOUT, MXPIX, ICHUNK, NDFCUR, STATUS)
-         CALL NDF_MAP( NDFCUR, 'Data', PTYPE, 'WRITE', IPOINT, EL,
-     :                 STATUS )
-         IF ( HAVVAR .OR. GENVAR ) CALL NDF_MAP( NDFCUR, 'Variance',
-     :                                           PTYPE, 'WRITE', IPVAR,
-     :                                           EL, STATUS )
+            CALL NDF_CHUNK( NDFOUT, MXPIX, ICHUNK, NDFCUR, STATUS )
+            CALL NDF_MAP( NDFCUR, 'Data', PTYPE, 'WRITE', IPOINT, EL,
+     :                    STATUS )
+            IF ( HAVVAR .OR. GENVAR ) CALL NDF_MAP( NDFCUR, 'Variance',
+     :                                              PTYPE, 'WRITE',
+     :                                              IPVAR, EL, STATUS )
 
 *  Get the size of the stack chunk.
-         CALL NDF_BOUND( NDFCUR, 2, LBND, UBND, NDIM, STATUS )
-         LBND( 3 ) = 1
-         UBND( 3 ) = NNDF
+            CALL NDF_BOUND( NDFCUR, 2, LBND, UBND, NDIM, STATUS )
+            LBND( 3 ) = 1
+            UBND( 3 ) = NNDF
 
 *  Section the stack and map it in.
-         CALL NDF_SECT( INWORK, 3, LBND, UBND, IPIECE, STATUS )
-         CALL NDF_MAP( IPIECE, 'Data', PTYPE, 'READ', IPSTK, BEL,
-     :                 STATUS )
-         IF ( HAVVAR ) CALL NDF_MAP( IPIECE, 'Variance', PTYPE,
-     :                               'READ', IPVSTK, BEL, STATUS )
+            CALL NDF_SECT( INWORK, 3, LBND, UBND, IPIECE, STATUS )
+            CALL NDF_MAP( IPIECE, 'Data', PTYPE, 'READ', IPSTK, BEL,
+     :                    STATUS )
+            IF ( HAVVAR ) CALL NDF_MAP( IPIECE, 'Variance', PTYPE,
+     :                                  'READ', IPVSTK, BEL, STATUS )
 
 *  Combine all the NDFs in the stack using the method given.
-         IF ( HAVVAR ) THEN
+            IF ( HAVVAR ) THEN
 
 *  Process at real versions.
-            IF ( PTYPE .EQ. '_REAL' ) THEN
-               CALL CCG1_CM1RR( %VAL( IPSTK ), EL, NNDF, %VAL( IPVSTK),
-     :                          IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                          RMIN, RMAX, %VAL( IPOINT ),
-     :                          %VAL( IPVAR ), WRK1, WRK2, WRK3,
-     :                          %VAL( IPWRK4 ), NWRK4, NCON,
-     :                          POINT, USED, STATUS )
+               IF ( PTYPE .EQ. '_REAL' ) THEN
+                  CALL CCG1_CM1RR( %VAL( IPSTK ), EL, NNDF, 
+     :                             %VAL( IPVSTK),
+     :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
+     :                             RMIN, RMAX, %VAL( IPOINT ),
+     :                             %VAL( IPVAR ), WRK1, WRK2, WRK3,
+     :                             %VAL( IPWRK4 ), NWRK4, NCON,
+     :                             POINT, USED, STATUS )
 
 *  Double precision version.
-            ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-               CALL CCG1_CM1DD( %VAL( IPSTK ), EL, NNDF, %VAL( IPVSTK ),
-     :                          IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                          RMIN, RMAX, %VAL( IPOINT ),
-     :                          %VAL( IPVAR ), WRK1, WRK2, WRK3,
-     :                          %VAL( IPWRK4 ), NWRK4, NCON,
-     :                          POINT, USED, STATUS )
-            END IF
-         ELSE
+               ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
+                  CALL CCG1_CM1DD( %VAL( IPSTK ), EL, NNDF, 
+     :                             %VAL( IPVSTK ),
+     :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
+     :                             RMIN, RMAX, %VAL( IPOINT ),
+     :                             %VAL( IPVAR ), WRK1, WRK2, WRK3,
+     :                             %VAL( IPWRK4 ), NWRK4, NCON,
+     :                             POINT, USED, STATUS )
+               END IF
+            ELSE
 
 *  No variance to propagate, use inverse exposure factors.
 *  Process at real versions.
-            IF ( PTYPE .EQ. '_REAL' ) THEN
-               CALL CCG1_CM3RR( %VAL( IPSTK ), EL, NNDF, INVAVE,
-     :                          IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                          RMIN, RMAX, %VAL( IPOINT ),
-     :                          WRK1, WRK2, NCON, POINT, USED, STATUS )
+               IF ( PTYPE .EQ. '_REAL' ) THEN
+                  CALL CCG1_CM3RR( %VAL( IPSTK ), EL, NNDF, INVAVE,
+     :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
+     :                             RMIN, RMAX, %VAL( IPOINT ),
+     :                             WRK1, WRK2, NCON, POINT, USED,
+     :                             STATUS )
 
 *  Double precision version.
-            ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-               CALL CCG1_CM3DD( %VAL( IPSTK ), EL, NNDF, INVAVE,
-     :                          IMETH, MINPIX, NITER, NSIGMA, ALPHA,
-     :                          RMIN, RMAX, %VAL( IPOINT ),
-     :                          WRK1, WRK2, NCON, POINT, USED, STATUS )
-            END IF
+               ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
+                  CALL CCG1_CM3DD( %VAL( IPSTK ), EL, NNDF, INVAVE,
+     :                             IMETH, MINPIX, NITER, NSIGMA, ALPHA,
+     :                             RMIN, RMAX, %VAL( IPOINT ),
+     :                             WRK1, WRK2, NCON, POINT, USED,
+     :                             STATUS )
+               END IF
 
 *  Generate estimated variances, if required.
-            IF ( GENVAR ) THEN
-               IF ( PTYPE .EQ. '_REAL' ) THEN
-                  CALL CCG1_EVARR( %VAL( IPOINT ),%VAL( IPSTK ),
-     :                             EL, NNDF, %VAL( IPVAR ), STATUS )
-               ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
-                  CALL CCG1_EVARD( %VAL( IPOINT ),%VAL( IPSTK ),
-     :                             EL, NNDF, %VAL( IPVAR ), STATUS )
+               IF ( GENVAR ) THEN
+                  IF ( PTYPE .EQ. '_REAL' ) THEN
+                     CALL CCG1_EVARR( %VAL( IPOINT ),%VAL( IPSTK ),
+     :                                EL, NNDF, %VAL( IPVAR ), STATUS )
+                  ELSE IF ( PTYPE .EQ. '_DOUBLE' ) THEN
+                     CALL CCG1_EVARD( %VAL( IPOINT ),%VAL( IPSTK ),
+     :                                EL, NNDF, %VAL( IPVAR ), STATUS )
+                  END IF
                END IF
             END IF
-         END IF
 
 *  Unmap the output section, ready for next chunks.
-         CALL NDF_UNMAP( NDFCUR, '*', STATUS )
-         CALL NDF_UNMAP( IPIECE, '*', STATUS )
+            CALL NDF_UNMAP( NDFCUR, '*', STATUS )
+            CALL NDF_UNMAP( IPIECE, '*', STATUS )
 
 *  Release the resources associated with this identifier
-         CALL NDF_ANNUL( IPIECE, STATUS )
-         CALL NDF_ANNUL( NDFCUR, STATUS )
- 2    CONTINUE
+            CALL NDF_ANNUL( IPIECE, STATUS )
+            CALL NDF_ANNUL( NDFCUR, STATUS )
+ 2       CONTINUE
 
 *  Work out contribution statistics.
-      DO 7 I = 1, NNDF
-         STATS( I ) = NCON( I ) / DBLE( NPIX ) * 100.0D0
- 7    CONTINUE
+         DO 7 I = 1, NNDF
+            STATS( I ) = NCON( I ) / DBLE( NPIX ) * 100.0D0
+ 7       CONTINUE
 
 *  Set bad pixel flag in output NDF
-      CALL NDF_SBAD( BAD, NDFOUT, 'Data', STATUS )
+         CALL NDF_SBAD( BAD, NDFOUT, 'Data', STATUS )
 
 *  Set title of output NDF, propagating it if requested.
-      CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
+         CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
 
 *  Add the frame type to the output NDF.
-      CALL CCG1_STO0C( NDFOUT, 'FTYPE', 'MASTER_FLAT', STATUS )
+         CALL CCG1_STO0C( NDFOUT, 'FTYPE', 'MASTER_FLAT', STATUS )
 
 *  Add the filter type to the output NDF.
-      IF ( FILTER .NE. ' '  ) THEN
-         CALL CCG1_STO0C( NDFOUT, 'FILTER', FILTER, STATUS )
-      END IF
+         IF ( FILTER .NE. ' '  ) THEN
+            CALL CCG1_STO0C( NDFOUT, 'FILTER', FILTER, STATUS )
+         END IF
 
 *  Add a time and date stamp to NDF.
-      CALL CCD1_TOUCH( NDFOUT, 'MAKEFLAT', STATUS )
+         CALL CCD1_TOUCH( NDFOUT, 'MAKEFLAT', STATUS )
 
 *  Report MAKEFLAT parameters, logging if required
-      CALL CCD1_RFLT( STACK, NNDF, AVEACC, STATS, CMODE, IMETH, MINPIX,
-     :                ALPHA, NSIGMA, NITER, RMIN, RMAX, NDFOUT, PTYPE,
-     :                DELETE, HAVVAR, GENVAR, STATUS )
+         CALL CCD1_RFLT( STACK, NNDF, AVEACC, STATS, CMODE, IMETH,
+     :                   MINPIX, ALPHA, NSIGMA, NITER, RMIN, RMAX,
+     :                   NDFOUT, PTYPE, DELETE, HAVVAR, GENVAR, STATUS )
+
+*  Release the NDF identifiers from this subgroup.
+         DO I = 1, NNDF
+            CALL NDF_ANNUL( STACK( I ), STATUS )
+         END DO
+      END DO
 
 *  If requested delete all the input NDFs.
       IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
-         DO 10 I = 1, NNDF
-            CALL NDF_DELET( STACK( I ), STATUS )
+         DO 10 I = 1, NTOT
+            CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF, STATUS )
+            CALL NDF_DELET( INDF, STATUS )
  10      CONTINUE
       END IF
 
@@ -784,6 +895,13 @@
 *  after CCD1_START).
       CALL CCD1_FRTMP( -1, STATUS )
       CALL CCD1_MFREE( -1, STATUS )
+
+*  Release GRP resources.
+      CALL CCD1_GRDEL( INGRP, STATUS )
+      CALL CCD1_GRDEL( KEYGRP, STATUS )
+      DO I = 1, MIN( NSUB, CCD1__MXNDF )
+         CALL CCD1_GRDEL( SUBGRP( I ), STATUS )
+      END DO
 
 *  If an error occurred, then report a contextual message. Logging it if
 *  required.

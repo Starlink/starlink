@@ -83,6 +83,8 @@
 *           - 5 -- a full six parameter fit
 *           - 6 -- self defined function
 *
+*        If more than two position lists are provided, then only the 
+*        values 1-5 may be used.
 *        [5]
 *     FULL = _LOGICAL (Read)
 *        If FITTYPE=6 is chosen then this parameter value determines
@@ -216,6 +218,24 @@
 *        specified in coordinates with a higher accuracy or smaller
 *        units.
 *        [0.001]
+*     USESET = _LOGICAL (Read)
+*        This parameter determines whether Set header information should
+*        be used in the registration.  If USESET is true, then 
+*        REGISTER will try to group position lists according to
+*        the Set Name attribute of the NDFs to which they are attached.
+*        All lists coming from NDFs which share the same (non-blank)
+*        Set Name attribute, and which have a CCD_SET coordinate 
+*        frame in their WCS component, will be grouped together and
+*        treated by the program as a single position list.  Thus
+*        the assumption is made that the relative alignment of 
+*        images within a Set is already known and has been fixed.
+*
+*        If USESET is false, all Set header information is ignored.
+*        If NDFNAMES is false, USESET will be ignored.  If the input
+*        NDFs have no Set headers, or if they have no CCD_SET frame 
+*        in their WCS components, the setting of USESET will make
+*        no difference.
+*        [TRUE]
 *     USEWCS = _LOGICAL (Read)
 *        This parameter specifies whether the coordinates in the
 *        position lists should be transformed from Pixel coordinates
@@ -447,6 +467,8 @@
 *        Removed the possibility to write results as TRANSFORM structures.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     22-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -478,10 +500,7 @@
       CHARACTER * ( 6 ) PLACE   ! Place to store transformations
       CHARACTER * ( AST__SZCHR ) OUTDM ! Name of domain for new output WCS frame
       CHARACTER * ( AST__SZCHR ) DMN ! Current domain of WCS component
-      CHARACTER * ( AST__SZCHR ) DMN1 ! Current domain of first WCS component
       CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for reading data
-      CHARACTER * ( CCD1__BLEN ) LINE1 ! Output buffer
-      CHARACTER * ( CCD1__BLEN ) LINE2 ! Output buffer
       CHARACTER * ( CCD1__MTRNP ) ALPBET ! Characters which may follow P to indicate a parameter
       CHARACTER * ( CCD1__STRNP ) NAME ! Parameter name
       CHARACTER * ( CCD1__STRNP ) NTEMP ! Parameter name
@@ -494,12 +513,12 @@
       CHARACTER * ( CCD1__SZTRN - 3 ) XINV ! X mapping expression
       CHARACTER * ( CCD1__SZTRN - 3 ) YFOR ! Y mapping expression
       CHARACTER * ( CCD1__SZTRN - 3 ) YINV ! Y mapping expression
-      CHARACTER * ( FIO__SZFNM ) FNAME( CCD1__MXLIS ) ! Input filenames
+      CHARACTER * ( FIO__SZFNM ) FNAME ! List filename
       DOUBLE PRECISION FORVAL( CCD1__MTRNP ) ! Forward general coefficients
       DOUBLE PRECISION INVVAL( CCD1__MTRNP ) ! Inverse general coefficients
       DOUBLE PRECISION RMS      ! Root mean square difference in fitted lists and reference list
       DOUBLE PRECISION TOLER    ! Tolerance in RMS devations
-      DOUBLE PRECISION TR( 6, CCD1__MXLIS ) ! The transformation coefficients
+      DOUBLE PRECISION TR( 6, CCD1__MXLIS + 1 ) ! The transformation coeffs
       INTEGER FDIN              ! FIO file descriptors
       INTEGER FDREFO            ! Output reference set descriptor
       INTEGER FIOGR             ! Group of input list names
@@ -510,53 +529,60 @@
       INTEGER ID                ! NDF identifier
       INTEGER IDWCS             ! NDF identifier for frameset container file
       INTEGER IFIT              ! The fittype
+      INTEGER ILIS( CCD1__MXLIS + 1 ) ! Array of list indices in superlist order
+      INTEGER ILISOF( CCD1__MXLIS + 2 ) ! Offsets into ILIS for each superlist
       INTEGER IP                ! Positional pointer into appended lists
       INTEGER IPDAT( CCD1__MXLIS + 1 ) ! Pointer to file data
       INTEGER IPID              ! Pointer to identifier workspace
       INTEGER IPIDR             ! Pointer to identifier workspace
+      INTEGER IPIG( 2 )         ! Pointer to identifier workspace
       INTEGER IPIND( CCD1__MXLIS + 1 ) ! Pointer to file identifiers
       INTEGER IPOK              ! Pointer to logical workspace
       INTEGER IPREF             ! Points to position of reference list
+      INTEGER IPREFS            ! Points to position of reference superlist
       INTEGER IPWID             ! Pointer to identifier workspace
       INTEGER IPWX              ! Pointer to X positions workspace
       INTEGER IPWY              ! Pointer to Y positions workspace
       INTEGER IPX               ! Pointer to X positions workspace
       INTEGER IPXR              ! Pointer to X positions workspace
-      INTEGER IPXRT             ! Pointer to temporary X positions
+      INTEGER IPXG( 2 )         ! Pointer to X positions workspace
       INTEGER IPXT              ! Pointer to temporary X positions
       INTEGER IPY               ! Pointer to Y positions workspace
       INTEGER IPYR              ! Pointer to Y positions workspace
-      INTEGER IPYRT             ! Pointer to temporary Y positions
+      INTEGER IPYG( 2 )         ! Pointer to X positions workspace
       INTEGER IPYT              ! Pointer to temporary Y positions
+      INTEGER ISUP( CCD1__MXLIS + 1 ) ! Superlist index for each list
       INTEGER IWCS              ! AST pointer to WCS component of NDF
+      INTEGER J                 ! Loop variable
       INTEGER JCUR              ! Incdex of (original) Current frame in frameset
       INTEGER JPIX              ! Index of Pixel domain frame in frameset
       INTEGER JREG              ! Index of OUTDM domain frame in frameset
+      INTEGER L                 ! List index variable
       INTEGER MAPCP             ! AST mapping from Current to pixel frame of ref
       INTEGER MAPS( CCD1__MXLIS + 1 ) ! AST Mapping from pixel to Current frames
+      INTEGER MAPSET( CCD1__MXLIS + 1 ) ! AST Mapping from CCD_SET to pixel frm
       INTEGER MAPTFM( CCD1__MXLIS + 1 ) ! AST pointers for Pixel - OUTDM mapping
-      INTEGER MAP1              ! Temporary AST mapping
-      INTEGER MAXIN             ! Maximum number of input lists
-      INTEGER MININ             ! Minimum number of input lists
       INTEGER NDFGR             ! Group of input NDF names
       INTEGER NNDF              ! Number of NDFs accessed
       INTEGER NOPEN             ! Number of input lists opened
       INTEGER NOUT
       INTEGER NREC( CCD1__MXLIS + 1 ) ! Number of records read from file
+      INTEGER NRECS( CCD1__MXLIS + 1 ) ! Number of records in superlist
       INTEGER NSUBS             ! Number of token substitutions
       INTEGER NSUBSF            ! Number of token substitutions
       INTEGER NSUBSI            ! Number of token substitutions
+      INTEGER NSUP              ! Number of superlists
       INTEGER NTOT              ! Total number of input records
       INTEGER NUMUNI            ! Number of unique parameter names
       INTEGER NVAL( CCD1__MXLIS + 1 ) ! Number of values in file
       INTEGER NVAL1             ! Number of values in tested file
       INTEGER NXPAR             ! Number of parameters in X mapping
       INTEGER NYPAR             ! Number of parameters in Y mapping
+      INTEGER OTHER             ! Opposite of IPREFS
       INTEGER XFORL             ! Length of X mapping string
       INTEGER XINVL             ! Length of X mapping string
       INTEGER YFORL             ! Length of Y mapping string
       INTEGER YINVL             ! Length of Y mapping string
-      LOGICAL DIFDMN            ! True if not all domains are the same
       LOGICAL FULL              ! True if a full general transformation is used
       LOGICAL HAVXXF            ! Flags indicating that mapping
       LOGICAL HAVXXI            ! Flags indicating that mapping
@@ -570,6 +596,7 @@
       LOGICAL SIMPIF            ! OK to simplify inverse then forward mapping?
       LOGICAL NDFS              ! True if list names came from NDF extensions
       LOGICAL OUTREF            ! Output reference required
+      LOGICAL USESET            ! Use Set header information?
       LOGICAL USEWCS            ! Are we transforming to current frame
 
 *  Local Data:
@@ -588,21 +615,6 @@
 *  Output reference set file is not open.
       OUTREF = .FALSE.
 
-*  Find out which type of transformation the user requires.
-*  If the fittype is not 6 then allow more than two input lists.
-      CALL PAR_GET0I( 'FITTYPE', IFIT, STATUS )
-      IFIT = MAX( 1, MIN( 6, IFIT ) )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Set the minimum and maximum numbers of input position lists.
-      IF ( IFIT .EQ. 6 ) THEN
-         MAXIN = 2
-         MININ = 2
-      ELSE
-         MAXIN = CCD1__MXLIS
-         MININ = 2
-      END IF
-
 *  Find out what is to be used for the source of the position list
 *  names. Are they stored in NDF extensions or will just straight list
 *  names be given.
@@ -616,9 +628,17 @@
          CALL PAR_GET0L( 'USEWCS', USEWCS, STATUS )
       END IF
 
+*  See if we will use Set header information to group lists into 
+*  superlists.
+      USESET = .FALSE.
+      IF ( NDFS ) THEN
+         USESET = .TRUE.
+         CALL PAR_GET0L( 'USESET', USESET, STATUS )
+      END IF
+
 *  Get the names of all the input lists.
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', MININ, MAXIN,
+      CALL CCD1_GTLIG( NDFS, 'CURRENT_LIST', 'INLIST', 2, CCD1__MXLIS,
      :                 NOPEN, FIOGR, NDFGR, STATUS )
 
 *  If a USER__003 error is generated by CCD1_GTLIG it indicates that 
@@ -629,63 +649,34 @@
          CALL ERR_ANNUL( STATUS )
       END IF
 
-*  Write the names of the associated NDFs out to the user.
-      IF ( NDFS ) THEN 
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         LINE1 = '    NDFs containing position lists'
-         LINE2 = '    ------------------------------'
-         IF ( USEWCS ) THEN
-            LINE1( 45: ) = 'Current domain'
-            LINE2( 45: ) = '--------------'
-         END IF
-         CALL CCD1_MSG( ' ', LINE1, STATUS )
-         CALL CCD1_MSG( ' ', LINE2, STATUS )
-         DIFDMN = .FALSE.
+*  Get coordinate and Set information about lists.
+      CALL CCD1_SWLIS( NDFGR, FIOGR, NOPEN, NDFS, USEWCS, USESET,
+     :                 FRMS, MAPS, MAPSET, ISUP, NSUP, ILIS, ILISOF,
+     :                 STATUS )
 
-         DO 17 I = 1, NOPEN
-
-*  Get World Coordinate System information from NDFs.
-            IF ( USEWCS ) THEN
-
-*  Get pointer to WCS frameset.
-               CALL NDG_NDFAS( NDFGR, I, 'READ', ID, STATUS )
-               CALL CCD1_GTWCS( ID, IWCS, STATUS )
-               CALL NDF_ANNUL( ID, STATUS )
-
-*  Get Current domain of frameset, and check against previous one.
-               DMN = AST_GETC( IWCS, 'Domain', STATUS )
-               IF ( I .EQ. 1 ) THEN
-                  DMN1 = DMN
-               ELSE IF ( DMN .NE. DMN1 ) THEN
-                  DIFDMN = .TRUE.
-               END IF
-
-*  Get a mapping from the position list as read (PIXEL-domain
-*  coordinates) to the values to be used for comparison (coordinates
-*  of the Current domain of each NDF).
-               CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
-               MAP1 = AST_GETMAPPING( IWCS, JPIX, AST__CURRENT, STATUS )
-               MAPS( I ) = AST_SIMPLIFY( MAP1, STATUS )
-
-*  Get the Current frame of the WCS component (used for formatting 
-*  coordinate output).
-               FRMS( I ) = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
-            END IF
-
-*  Write message about NDF name and domain.
-            CALL GRP_GET( NDFGR, I, 1, FNAME, STATUS )
-            CALL MSG_SETC( 'FNAME', FNAME )
-            CALL MSG_SETI( 'N', I )
-            CALL MSG_LOAD( ' ', '  ^N) ^FNAME', LINE, IAT, STATUS )
-            IF ( USEWCS ) LINE( MAX( 45, IAT + 2 ): ) = DMN
-            CALL CCD1_MSG( ' ', LINE, STATUS )
- 17      CONTINUE
+*  Find out which type of transformation the user requires.  If there
+*  are more than two input superlists then a fittype of 6 is not 
+*  allowed.
+ 3    CONTINUE
+      CALL PAR_GET0I( 'FITTYPE', IFIT, STATUS )
+      IF ( NSUP .GT. 2 .AND. IFIT .EQ. 6 ) THEN
+         CALL MSG_OUT( ' ', '  With more than two input lists, IFIT=6'
+     :                 //' is not allowed.', STATUS )
+         CALL PAR_CANCL( 'FITTYPE', STATUS )
+         GO TO 3
       END IF
+      IF ( NSUP .GT. 2 ) THEN
+         IFIT = MAX( 1, MIN( 5, IFIT ) )
+      ELSE
+         IFIT = MAX( 1, MIN( 6, IFIT ) )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
-*  Get the position of the reference set in the input lists.
-      IPREF = 1
-      CALL PAR_GET0I( 'REFPOS', IPREF, STATUS )
-      IPREF = MAX( 1, MIN( IPREF, NOPEN ) )
+*  Get the position of the reference set in the input superlists.
+      IPREFS = 1
+      CALL PAR_GET0I( 'REFPOS', IPREFS, STATUS )
+      IPREFS = MAX( 1, MIN( IPREFS, NSUP ) )
+      IPREF = ILIS( ILISOF( IPREFS ) )
 
 *  Get the mapping between the Current and the PIXEL-domain frames
 *  of the reference NDF.
@@ -693,28 +684,6 @@
          MAPCP = AST_COPY( MAPS( IPREF ), STATUS )
          CALL AST_INVERT( MAPCP, STATUS )
       END IF
-
-*  Get all the names of the input lists and report them.
-      CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL CCD1_MSG( ' ', '    Input position lists:', STATUS )
-      CALL CCD1_MSG( ' ', '    ---------------------', STATUS )
-      DO 6 I = 1, NOPEN
-         CALL GRP_GET( FIOGR, I, 1, FNAME( I ), STATUS )
-         CALL MSG_SETC( 'FNAME', FNAME( I ) )
-         IF ( I .EQ. IPREF ) THEN
-            CALL CCD1_MSG( ' ', '  ^FNAME (reference)', STATUS )
-         ELSE
-            CALL CCD1_MSG( ' ', '  ^FNAME', STATUS )
-         END IF
- 6    CONTINUE
-
-*  ... and where the position list names originated.
-      IF ( NDFS ) THEN
-         CALL CCD1_MSG( ' ', ' ', STATUS )
-         CALL CCD1_MSG( ' ',
-     :'  Position list names extracted from NDF extensions.', STATUS )
-      END IF
-      CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Where are we going to store the transformations? If NDFNAMES is true
 *  then the we'll store them in the NDFs.  If NDFNAMES is not true then
@@ -749,35 +718,50 @@
 
 *  Read the data values in the input lists into workspace.
       IF( STATUS .NE. SAI__OK ) GO TO 99
-      DO 1 I = 1, NOPEN
+      DO I = 1, NSUP
+
+*  Initialise the number of items in this superlist.
+         NRECS( I ) = 0
+
+*  Loop over each list which comprises this superlist.
+         DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
+            L = ILIS( J )
 
 *  Test the input files for the number of entries, prior to extracting
 *  the position information.
-         CALL CCD1_OPFIO( FNAME( I ), 'READ', 'LIST', 0, FDIN, STATUS )
-         CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL1, STATUS )
+            CALL GRP_GET( FIOGR, L, 1, FNAME, STATUS )
+            CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FDIN, STATUS )
+            CALL CCD1_LTEST( FDIN, LINE, CCD1__BLEN, 2, 0, NVAL1,
+     :                       STATUS )
 
 *  If the position list has three or more columns of data then interpret
 *  them as a standard list (identifier, x-position, y-position). If the
 *  list has only 2 columns then interpret the inputs as just X and Y and
 *  make up some identifiers (1,2,....NREC).
-         IF ( NVAL1 .EQ. 2 ) THEN
+            IF ( NVAL1 .EQ. 2 ) THEN
 
 *  Map in X and Y positions.
-            CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT( I ),
-     :                       NREC( I ), NVAL( I ), STATUS )
-            CALL CCD1_MALL( NREC( I ), '_INTEGER', IPIND( I ), STATUS )
-            CALL CCD1_GISEQ( 1, 1, NREC( I ), %VAL( IPIND( I ) ),
-     :                       STATUS )
-         ELSE
+               CALL CCD1_NLMAP( FDIN, LINE, CCD1__BLEN, IPDAT( L ),
+     :                          NREC( L ), NVAL( L ), STATUS )
+               CALL CCD1_MALL( NREC( L ), '_INTEGER', IPIND( L ),
+     :                         STATUS )
+               CALL CCD1_GISEQ( NRECS( I ) + 1, 1, NREC( L ),
+     :                          %VAL( IPIND( L ) ), STATUS )
+            ELSE
 
 *  Standard file format...
-            CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND( I ),
-     :                      IPDAT( I ), NREC( I ), NVAL( I ), STATUS )
-         END IF
+               CALL CCD1_LMAP( FDIN, LINE, CCD1__BLEN, IPIND( L ),
+     :                         IPDAT( L ), NREC( L ), NVAL( L ),
+     :                         STATUS )
+            END IF
+
+*  Increment number of items in this superlist.
+            NRECS( I ) = NRECS( I ) + NREC( L )
+         END DO
 
 *  Now close the file.
          CALL FIO_CLOSE( FDIN, STATUS )
- 1    CONTINUE
+      END DO
 
       IF ( IFIT .NE. 6 .AND. STATUS .EQ. SAI__OK ) THEN
 
@@ -848,15 +832,15 @@
 *  Need to extract all the data and enter into a single appended list of
 *  X positions and Y positions. First determine the number of entries
          NTOT = 0
-         DO 2 I = 1, NOPEN
-            NTOT = NTOT + NREC( I )
+         DO 2 I = 1, NSUP
+            NTOT = NTOT + NRECS( I )
  2       CONTINUE
 
 *  Get the workspace for the lists.
          CALL CCD1_MALL( NTOT, '_DOUBLE', IPX, STATUS )
          CALL CCD1_MALL( NTOT, '_DOUBLE', IPY, STATUS )
          CALL CCD1_MALL( NTOT, '_INTEGER', IPID, STATUS )
-         CALL CCD1_MALL( NTOT, '_INTEGER', IPOK, STATUS )
+         CALL CCD1_MALL( NTOT, '_LOGICAL', IPOK, STATUS )
          CALL CCD1_MALL( NTOT, '_DOUBLE', IPXR, STATUS )
          CALL CCD1_MALL( NTOT, '_DOUBLE', IPYR, STATUS )
          CALL CCD1_MALL( NTOT, '_INTEGER', IPIDR, STATUS )
@@ -871,37 +855,40 @@
 *  Split data and transfer into lists, append all positions and
 *  identifiers into one.
          IP = 1
-         DO 3 I = 1, NOPEN
-            CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ),
-     :                      1, %VAL( IPWX ), STATUS )
-            CALL CCD1_LEXT( %VAL( IPDAT( I ) ), NREC( I ), NVAL( I ),
-     :                      2, %VAL( IPWY ), STATUS )
+         DO I = 1, NSUP
+            DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
+               L = ILIS( J )
+               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
+     :                         1, %VAL( IPWX ), STATUS )
+               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
+     :                         2, %VAL( IPWY ), STATUS )
 
 *  Either just copy the coordinates or transform them using the WCS
 *  component of the associated NDF.
-            IF ( USEWCS ) THEN
-               CALL AST_TRAN2( MAPS( I ), NREC( I ), %VAL( IPWX ),
-     :                         %VAL( IPWY ), .TRUE., %VAL( IPXT ),
-     :                         %VAL( IPYT ), STATUS )
-               CALL CCG1_LAPND( %VAL( IPXT ), NREC( I ), IP,
-     :                          %VAL( IPX ), STATUS )
-               CALL CCG1_LAPND( %VAL( IPYT ), NREC( I ), IP, 
-     :                          %VAL( IPY ), STATUS )
-            ELSE
-               CALL CCG1_LAPND( %VAL( IPWX ), NREC( I ), IP, 
-     :                          %VAL( IPX ), STATUS )
-               CALL CCG1_LAPND( %VAL( IPWY ), NREC( I ), IP, 
-     :                          %VAL( IPY ), STATUS )
-            END IF
-            CALL CCG1_LAPNI( %VAL( IPIND( I ) ), NREC( I ), IP,
-     :                       %VAL( IPID ), STATUS )
-            IP = IP + NREC( I )
- 3       CONTINUE
+               IF ( USEWCS ) THEN
+                  CALL AST_TRAN2( MAPS( L ), NREC( L ), %VAL( IPWX ),
+     :                            %VAL( IPWY ), .TRUE., %VAL( IPXT ),
+     :                            %VAL( IPYT ), STATUS )
+                  CALL CCG1_LAPND( %VAL( IPXT ), NREC( L ), IP,
+     :                             %VAL( IPX ), STATUS )
+                  CALL CCG1_LAPND( %VAL( IPYT ), NREC( L ), IP, 
+     :                             %VAL( IPY ), STATUS )
+               ELSE
+                  CALL CCG1_LAPND( %VAL( IPWX ), NREC( L ), IP, 
+     :                             %VAL( IPX ), STATUS )
+                  CALL CCG1_LAPND( %VAL( IPWY ), NREC( L ), IP, 
+     :                             %VAL( IPY ), STATUS )
+               END IF
+               CALL CCG1_LAPNI( %VAL( IPIND( L ) ), NREC( L ), IP,
+     :                          %VAL( IPID ), STATUS )
+               IP = IP + NREC( L )
+            END DO
+         END DO
 
 *  Do the first global transformation using the first positions
 *  as the reference set.
-         CALL CCD1_FITLM( %VAL( IPX ), %VAL( IPY ), %VAL ( IPID ),
-     :                    %VAL( IPOK ), NREC, NOPEN, IPREF, FNAME,
+         CALL CCD1_FITLM( %VAL( IPX ), %VAL( IPY ), %VAL( IPID ),
+     :                    %VAL( IPOK ), NRECS, NSUP, IPREFS,
      :                    IFIT, TOLER, TR, %VAL( IPXR ), %VAL( IPYR ),
      :                    %VAL( IPIDR ), %VAL( IPWX ), %VAL( IPWY ),
      :                    %VAL( IPWID ), NOUT, RMS, STATUS )
@@ -922,16 +909,17 @@
      :                  'dimensionless.', STATUS )
 
 *  Report the coefficients themselves.
-         DO 11 I = 1, NOPEN
+         DO 11 I = 1, NSUP
             CALL CCD1_MSG( ' ', ' ', STATUS )
-            CALL MSG_SETC( 'ID', FNAME( I ) )
-            CALL CCD1_MSG( ' ', '  ^ID:', STATUS )
-            CALL CCD1_TROUT( TR( 1, I ), FRMS( I ), USEWCS, STATUS )
+            CALL MSG_SETI( 'ID', I )
+            CALL CCD1_MSG( ' ', '  List ^ID)', STATUS )
+            CALL CCD1_TROUT( TR( 1, I ), FRMS( ILIS( ILISOF( I ) ) ),
+     :                       USEWCS, STATUS )
  11      CONTINUE
 
 *  Store the mappings in an array.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            DO 7 I = 1, NOPEN
+            DO 7 I = 1, NSUP
                CALL CCD1_LNMAP( TR( 1, I ), MAPTFM( I ), STATUS )
  7          CONTINUE
          END IF
@@ -1123,7 +1111,7 @@
 
 *  Create a list of parameter tokens which is unique, no duplication is
 *  allowed when determining the best fit.
-         CALL CCD1_MALL( NREC( 1 ) + NREC( 2 ), '_LOGICAL', IPOK,
+         CALL CCD1_MALL( NRECS( 1 ) + NRECS( 2 ), '_LOGICAL', IPOK,
      :                   STATUS )
          CALL CCD1_RMULO( XPARNM, NXPAR, YPARNM, NYPAR, %VAL( IPOK ),
      :                    UNIPAR, NUMUNI, STATUS )
@@ -1136,53 +1124,56 @@
  12      CONTINUE
 
 *  Extract the X and Y positions from the input mapped data areas.
-         CALL CCD1_MALL( NREC( 1 ), '_DOUBLE', IPX, STATUS )
-         CALL CCD1_MALL( NREC( 1 ), '_DOUBLE', IPY, STATUS )
-         CALL CCD1_MALL( NREC( 2 ), '_DOUBLE', IPXR, STATUS )
-         CALL CCD1_MALL( NREC( 2 ), '_DOUBLE', IPYR, STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT( 1 ) ), NREC( 1 ), NVAL( 1 ),
-     :                   1, %VAL( IPX ), STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT( 1 ) ), NREC( 1 ), NVAL( 1 ),
-     :                   2, %VAL( IPY ), STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT( 2 ) ), NREC( 2 ), NVAL( 2 ),
-     :                   1, %VAL( IPXR ), STATUS )
-         CALL CCD1_LEXT( %VAL( IPDAT( 2 ) ), NREC( 2 ), NVAL( 2 ),
-     :                   2, %VAL( IPYR ), STATUS )
+         DO I = 1, 2
+            CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPXG( I ), STATUS )
+            CALL CCD1_MALL( NRECS( I ), '_DOUBLE', IPYG( I ), STATUS )
+            CALL CCD1_MALL( NRECS( I ), '_INTEGER', IPIG( I ), STATUS )
+            NRECS( I ) = 0
+            DO J = ILISOF( I ), ILISOF( I + 1 ) - 1
+               L = ILIS( J )
+               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
+     :                         1, %VAL( IPWX ), STATUS )
+               CALL CCD1_LEXT( %VAL( IPDAT( L ) ), NREC( L ), NVAL( L ),
+     :                         2, %VAL( IPWY ), STATUS )
 
 *  Transform them into the correct coordinates if necessary.
-         IF ( USEWCS ) THEN 
-            CALL CCD1_MALL( NREC( 1 ), '_DOUBLE', IPXT, STATUS )
-            CALL CCD1_MALL( NREC( 1 ), '_DOUBLE', IPYT, STATUS )
-            CALL CCD1_MALL( NREC( 2 ), '_DOUBLE', IPXRT, STATUS )
-            CALL CCD1_MALL( NREC( 2 ), '_DOUBLE', IPYRT, STATUS )
-            CALL AST_TRAN2( MAPS( 1 ), NREC( 1 ), %VAL( IPX ), 
-     :                      %VAL( IPY ), .TRUE., %VAL( IPXT ),
-     :                      %VAL( IPYT ), STATUS )
-            CALL AST_TRAN2( MAPS( 2 ), NREC( 2 ), %VAL( IPXR ),
-     :                      %VAL( IPYR ), .TRUE., %VAL( IPXRT ),
-     :                      %VAL( IPYRT ), STATUS )
-            IPX = IPXT
-            IPY = IPYT
-            IPXR = IPXRT
-            IPYR = IPYRT
-         END IF
-        
+               IF ( USEWCS ) THEN
+                  CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPXT, STATUS )
+                  CALL CCD1_MALL( NREC( L ), '_DOUBLE', IPYT, STATUS )
+                  CALL AST_TRAN2( MAPS( L ), NREC( L ), %VAL( IPWX ),
+     :                            %VAL( IPWY ), .TRUE., %VAL( IPXT ),
+     :                            %VAL( IPYT ), STATUS )
+                  IPWX = IPXT
+                  IPWY = IPYT
+               END IF
+
+*  Copy them into the superlist.
+               IP = NRECS( I ) + 1
+               CALL CCG1_LAPND( %VAL( IPWX ), NREC( L ), IP,
+     :                          %VAL( IPXG( I ) ), STATUS )
+               CALL CCG1_LAPND( %VAL( IPWY ), NREC( L ), IP,
+     :                          %VAL( IPYG( I ) ), STATUS )
+               CALL CCG1_LAPNI( %VAL( IPIND( I ) ), NREC( L ), IP,
+     :                          %VAL( IPIG( I ) ), STATUS )
+               NRECS( I ) = NRECS( I ) + NREC( L )
+            END DO
+         END DO
+
 *  Do the transformation fit. If a reference list has been given then we
 *  want to work out the transformation from the other list (stored in
 *  position 1) to this. If two lists have been given the first list is
 *  assumed to be the "reference" list and a transformation from the
 *  second list to this is determined.
-         IF ( IPREF .EQ. 2 ) THEN
-            CALL CCD1_FITG( FORMAP, 'X', 'Y', UNIPAR, NUMUNI,
-     :                      TOLER, IPIND( 2 ), IPXR, IPYR, NREC( 2 ),
-     :                      IPIND( 1 ), IPX, IPY, NREC( 1 ),
-     :                      FORVAL, STATUS )
+         IF ( IPREFS .EQ. 2 ) THEN
+            OTHER = 1
          ELSE
-            CALL CCD1_FITG( FORMAP, 'X', 'Y', UNIPAR, NUMUNI,
-     :                      TOLER, IPIND( 1 ), IPX, IPY, NREC( 1 ),
-     :                      IPIND( 2 ), IPXR, IPYR, NREC( 2 ),
-     :                      FORVAL, STATUS )
+            OTHER = 2
          END IF
+         CALL CCD1_FITG( FORMAP, 'X', 'Y', UNIPAR, NUMUNI, TOLER,
+     :                   IPIG( IPREFS ), IPXG( IPREFS ), IPYG( IPREFS ),
+     :                   NRECS( IPREFS ), 
+     :                   IPIG( OTHER ), IPXG( OTHER ), IPYG( OTHER ),
+     :                   NRECS( OTHER ), FORVAL, STATUS )
 
 *  Derive the inverse transformation parameterisations by performing a
 *  second fit. This provides protection against any ill-conditioning in
@@ -1194,17 +1185,12 @@
             DO 13 I = 1, NUMUNI
                INVVAL( I ) = FORVAL( I )
  13         CONTINUE
-            IF ( IPREF .EQ. 2 ) THEN
-               CALL CCD1_FITG( INVMAP, 'XX', 'YY', UNIPAR, NUMUNI,
-     :                         TOLER, IPIND( 2 ), IPX, IPY, NREC( 1 ),
-     :                         IPIND( 1 ), IPXR, IPYR, NREC( 2 ),
-     :                         INVVAL, STATUS )
-            ELSE
-               CALL CCD1_FITG( INVMAP, 'XX', 'YY', UNIPAR, NUMUNI,
-     :                         TOLER, IPIND( 1 ), IPXR, IPYR, NREC( 2 ),
-     :                         IPIND( 2 ), IPX, IPY, NREC( 1 ),
-     :                         INVVAL, STATUS )
-            END IF
+            CALL CCD1_FITG( INVMAP, 'XX', 'YY', UNIPAR, NUMUNI, TOLER,
+     :                      IPIG( IPREFS ), IPXG( OTHER ),
+     :                      IPYG( OTHER ), NRECS( OTHER ),
+     :                      IPIG( OTHER ), IPXG( IPREFS ),
+     :                      IPYG( IPREFS ), NRECS( IPREFS ), INVVAL,
+     :                      STATUS )
 
 *  If necessary check the transformations for conditioning.
             CALL CCD1_CKCON( FORVAL, INVVAL, NUMUNI, STATUS )
@@ -1219,11 +1205,11 @@
             SIMPFI = .FALSE.
             SIMPIF = .FALSE.
          END IF
-            
+
 *  Now store the mappings in an array. One the of the mappings is just
 *  the identity, the other is the derived one.
          DO 8 I = 1, 2
-            IF ( I .EQ. IPREF ) THEN
+            IF ( I .EQ. IPREFS ) THEN
                MAPTFM( I ) = AST_UNITMAP( 2, ' ', STATUS )
             ELSE
                CALL CCD1_GGMAP( FORMAP, INVMAP, UNIPAR, NUMUNI, FORVAL,
@@ -1280,8 +1266,8 @@
                      
 *  Add the new output frame, with the appropriate mapping, to the 
 *  WCS component of the NDF.  This will become the current frame.
-         CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM( I ), FRREG,
-     :                      STATUS )
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, MAPTFM( ISUP( I ) ),
+     :                      FRREG, STATUS )
 
 *  Get the index of the OUTDM frame.
          JREG = AST_GETI( IWCS, 'Current', STATUS )
@@ -1313,7 +1299,7 @@
          DMN = OUTDM
          IAT = CHR_LEN( DMN )
          CALL CHR_PUTC( '_', DMN, IAT )
-         CALL CHR_PUTI( IPREF, DMN, IAT )
+         CALL CHR_PUTI( IPREFS, DMN, IAT )
 
 *  Set the Current frame of the output frameset to the reference one.
          CALL CCD1_FRDM( IWCS, DMN, JCUR, STATUS )

@@ -28,10 +28,10 @@
 *     TRANNDF applications can then be used on the resulting NDFs.
 *
 *     This can be of use when different kinds of alignment information
-*     are available between different members of a set of NDFs.  By
+*     are available between different members of a group of NDFs.  By
 *     supplying an ordered list of coordinate systems within which to
 *     align, the best alignment available can be made between
-*     different  members of the set, falling back on second or third
+*     different  members of the group, falling back on second or third
 *     choices of alignment types where first choices are not
 *     available.
 *
@@ -57,6 +57,11 @@
 *     there is more than one which meets this criterion, one which
 *     uses domains near the head of the list is preferred.
 *
+*     If the USESET parameter is true, then WCSREG will take account
+*     of alignment information stored in the CCDPACK Set header;
+*     this means that the alignment implied when images were 
+*     previously grouped into a Set can be guaranteed to be retained.
+*
 *     If the graph is not fully connected, a list of the existing
 *     subgraphs is output, and the program will normally terminate,
 *     however it can be made to continue with registration of the 
@@ -71,7 +76,9 @@
 *        of preference for achieving alignment.  Alignment paths 
 *        between NDFs are selected by shortness of path, but in case
 *        of a tie, those using domains nearest the start of this list
-*        are used by preference.
+*        are used by preference.  You should not normally include the
+*        CCD_SET domain in this list; for details of how this domain
+*        is treated specially, see the USESET parameter.
 *     IN = LITERAL (Read)
 *        A list of the names of the NDFs which are to be aligned.  The
 *        names should be separated by commas and may include wildcards.
@@ -134,6 +141,17 @@
 *        when they both have frames in the same one of the entries in
 *        the DOMAINS list. 
 *        [1]
+*     USESET = _LOGICAL (Read)
+*        This parameter governs whether Set-based alignment 
+*        information in the NDFs, if it exists, should be used. 
+*        If it is set to true, then coordinate frames with the 
+*        domain CCD_SET will take precedence over all the ones named 
+*        in the DOMAINS parameter.  In this case, if two of the NDFs
+*        both have a CCD_SET coordinate frame and also share the
+*        same Set Name attribute, the connection will be made in
+*        CCD_SET frame.  If no CCD_SET frames are present, this
+*        parameter has no effect.
+*        [TRUE]
 
 *  Examples:
 *     wcsreg * [ccd_reg,sky]
@@ -206,6 +224,8 @@
 *        Original version.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     16-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_changes_here}
 
 *-
@@ -217,6 +237,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'FIO_PAR'          ! Standard FIO constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
       INCLUDE 'CCD1_PAR'         ! Private CCDPACK constants
 
 *  Status:
@@ -236,6 +257,7 @@
       CHARACTER * ( CCD1__BLEN ) BUFFER ! Output buffer
       CHARACTER * ( CCD1__BLEN ) DMNLST ! Comma-separated domain list
       CHARACTER * ( FIO__SZFNM ) FNAME ! Name of NDF
+      CHARACTER * ( GRP__SZNAM ) SNAME( CCD1__MXNDF ) ! Set Name attributes
       INTEGER FRM                ! AST pointer to frame
       INTEGER I                  ! Loop variable
       INTEGER INDF( CCD1__MXNDF ) ! NDF identifiers for input NDFs
@@ -249,6 +271,7 @@
       INTEGER J                  ! Loop variable
       INTEGER JNEW               ! Index of the newly added output frame
       INTEGER JREF               ! Index of reference frame in reference NDF
+      INTEGER JSET               ! Index of Set alignment frame (dummy)
       INTEGER MAP                ! AST pointer to mapping between framesets
       INTEGER NNDF               ! Number of NDFs in input set
       INTEGER NEDGE              ! Number of edges in the conversion graph
@@ -257,11 +280,13 @@
       INTEGER OUTFR              ! AST pointer to output frame
       INTEGER PATH( 4, CCD1__MXNDF ) ! Subgraph giving mapping path
       INTEGER REFPOS             ! Index of reference NDF in input list
+      INTEGER SINDEX             ! Set Index attribute (dummy)
       INTEGER WCSOUT             ! WCS component with new frame added
       INTEGER WORK( 4, CCD1__MXNDF ) ! Workspace array
       INTEGER WORK2( CCD1__MXNDF ) ! Workspace array
       LOGICAL COMPL              ! Completeness of graph
       LOGICAL OVERRD             ! Whether to continue if graph is incomplete
+      LOGICAL USESET             ! Use Set alignment information?
 
 *.
 
@@ -276,6 +301,10 @@
 
 *  Begin NDF context.
       CALL NDF_BEGIN
+
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
+*  an uninitialised group cannot cause trouble.
+      INGRP = GRP__NOID
 
 *  Get group of NDFs to operate on.
       NNDF = 0
@@ -293,9 +322,21 @@
  6    CONTINUE
       CALL CCD1_MSG( ' ', ' ', STATUS )
  
-*  Get the list of domains and normalise to upper case without blanks.
-      CALL PAR_GET1C( 'DOMAINS', MXDMN, DMNS, NDMN, STATUS )
+*  Determine whether we are to use Set header alignment information.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
+*  Get the list of domains; if we are doing Set-based alignment, then
+*  slip the CCD_SET domain in at the head of the list.
+      IF ( USESET ) THEN
+         DMNS( 1 ) = 'CCD_SET'
+         CALL PAR_GET1C( 'DOMAINS', MXDMN - 1, DMNS( 2 ), NDMN, STATUS )
+         NDMN = NDMN + 1
+      ELSE
+         CALL PAR_GET1C( 'DOMAINS', MXDMN, DMNS, NDMN, STATUS )
+      END IF
       IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Normalise the domains to upper case without blanks.
       DO 1 I = 1, NDMN
          CALL CHR_RMBLK( DMNS( I ) )
          CALL CHR_UCASE( DMNS( I ) )
@@ -320,10 +361,15 @@
          GO TO 99
       END IF
 
-*  Read in the NDF identifier and WCS component for each NDF.
+*  Read in the NDF identifier, WCS component and Set header information
+*  for each NDF.
       DO 3 I = 1, NNDF
          CALL NDG_NDFAS( INGRP, I, 'UPDATE', INDF( I ), STATUS )
          CALL CCD1_GTWCS( INDF( I ), IWCS( I ), STATUS )
+         IF ( USESET ) THEN
+            CALL CCD1_SETRD( INDF( I ), AST__NULL, SNAME( I ), SINDEX,
+     :                       JSET, STATUS )
+         END IF
  3    CONTINUE
 
 *  Get the index of the reference NDF.
@@ -381,8 +427,8 @@
      :                   STATUS )
 
 *  Create a graph of all possible conversions between the WCS framesets.
-         CALL CCD1_CNVGR( IWCS, NNDF, DMNS, NDMN, %VAL( IPGRA ), NEDGE,
-     :                    STATUS )
+         CALL CCD1_CNVGR( IWCS, NNDF, DMNS, NDMN, USESET, SNAME,
+     :                    %VAL( IPGRA ), NEDGE, STATUS )
 
 *  Allocate some temporary workspace.
          CALL CCD1_MALL( 4 * NEDGE, '_INTEGER', IPWK1, STATUS )
@@ -438,7 +484,7 @@
          IF ( NSTEP .GT. 0 ) THEN 
 
 *  Use the path through the graph to find the mapping.
-            CALL CCD1_PTHMP( IWCS, PATH, NSTEP, DMNLST, MAP, STATUS )
+            CALL CCD1_PTHMP( IWCS, PATH, NSTEP, DMNS, MAP, STATUS )
 
 *  Prepare a copy of the old WCS frameset of the NDF and ensure it has
 *  a Base frame in the GRID domain (otherwise the NDF system will

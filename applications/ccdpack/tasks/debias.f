@@ -86,6 +86,12 @@
 *        through an ASCII file. The offered default is either the last
 *        used master bias name or (if one exists) the name of the NDF
 *        produced by the last run of MAKEBIAS.
+*
+*        If USESET is true and you are using bias calibration data
+*        from a file, BIAS should be a group expression referring
+*        to one master bias frame matching each of the Set Index
+*        attributes represented in the IN list; again the name of
+*        the file produced by MAKEBIAS will normally be suitable.
 *        [Global master bias or !]
 *     BOUNDS( 2 or 4 ) = _INTEGER (Read)
 *        The pixel indices (see notes) of the upper and lower bounds of
@@ -193,9 +199,13 @@
 *     IN = LITERAL (Read)
 *        A list of the names of the NDFs which contain the raw CCD
 *        data. Note that at present the input data must have a common
-*        processing mode, i.e. use the same bias frame, have the same
-*        ADC factor, readout noise etc. These values are represented
-*        by the parameter values of the task.
+*        processing mode, i.e. have the same ADC factor, readout noise
+*        etc. These values are represented by the parameter values of 
+*        the task.  The input data must also use the same master bias
+*        frame except if USESET is true and the input and bias images
+*        contain suitable CCDPACK Set header information, in which
+*        case each input image will be processed using the bias image
+*        with the corresponding Set Index attribute.
 *
 *        The NDF names should be separated by commas and may include
 *        wildcards.
@@ -394,6 +404,17 @@
 *        Values obtained from the CCDPACK extension are identified in
 *        the output log by the presence of a trailing asterisk (*).
 *        [FALSE]
+*     USESET = _LOGICAL (Read)
+*        Whether to use Set header information or not.  If USESET is
+*        false then any Set header information will be ignored.
+*        If USESET is true, then the BIAS parameter is 
+*        taken to refer to a group of files, and each IN file will
+*        be processed using a master bias image with a Set Index
+*        attribute which matches its own.  An IN file with no Set
+*        header is considered to match a master bias file with
+*        no Set header, so USESET can safely be set true (the default)
+*        when the input files contain no Set header information.
+*        [TRUE]
 *     WMODE = LITERAL (Read)
 *        The weighting method which is to be used when deriving means
 *        or performing the least squares interpolation fits using any
@@ -490,6 +511,13 @@
 *       NDF are set to ADUs or electrons depending on whether data
 *       expansion has occurred or not. Processing is supported for all
 *       HDS (non-complex) numeric types.
+*
+*     - The MASK parameter, when it refers to an NDF, ought really to
+*       be sensitive to Set header information if USESET is true.
+*       This is currently not implemented because of difficulties
+*       arising from the fact that MASK parameter can be interpreted
+*       as an ARD file, an ARD description or an NDF according to
+*       its value.
 
 *  Notes:
 *     - If the input NDFs have variance components and no variances
@@ -564,6 +592,8 @@
 *        Modified to propagate WCS component.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     14-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -580,6 +610,7 @@
       INCLUDE 'PAR_ERR'          ! Parameter system constants
       INCLUDE 'NDF_PAR'          ! Size of type buffers
       INCLUDE 'PRM_PAR'          ! Primdat constants
+      INCLUDE 'GRP_PAR'          ! Standard GRP system constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
 
 *  Status:
@@ -593,7 +624,6 @@
 
 *  Local Variables:
       BYTE BBYTE                 ! Badbits values
-      CHARACTER * ( 6 ) ACCESS   ! Access mode for NDFs
       CHARACTER * ( 7 * NDF__SZTYP ) TYPES ! Permitted types.
       CHARACTER * ( 80 ) MSKNAM  ! Name and type of mask file
       CHARACTER * ( NDF__SZFTP ) DTYPE  ! Full type of input data.
@@ -603,9 +633,11 @@
       DOUBLE PRECISION DEFER     ! Deferred zero level
       DOUBLE PRECISION SATVAL    ! Saturation value.
       INTEGER BADBIT             ! BADBITS value
+      INTEGER BIAGRP             ! NDG identifier for bias NDFs
       INTEGER EL                 ! Number of pixels in Data component
       INTEGER GIDIN              ! Input NDF group identifier
       INTEGER GIDOUT             ! Output NDF group identifier
+      INTEGER I                  ! Loop index
       INTEGER IDBIAS             ! " "
       INTEGER IDIM( 2 )          ! Dimensions of Data components
       INTEGER IDIN               ! Identifier
@@ -617,6 +649,7 @@
       INTEGER IDSUB              ! ""
       INTEGER IDWRK              ! NDF identifier for W/S frame
       INTEGER INDEX              ! Counter for main NDF loop
+      INTEGER INGRP              ! NDG group identifier for all input NDFs
       INTEGER IPBIAS             ! Pointer to Data array (BIAS)
       INTEGER IPBVAR             ! Pointer to BIAS variance
       INTEGER IPIN               ! Pointer to Data array (IN)
@@ -625,7 +658,9 @@
       INTEGER IPOVAR             ! Pointer to output variance
       INTEGER IPQUAL             ! Pointer to Quality component
       INTEGER IPWRK              ! Pointer to workspace
+      INTEGER ISUB               ! Subgroup loop index
       INTEGER IVAL               ! Dummy variable
+      INTEGER KEYGRP             ! GRP identifier for subgroup Index values
       INTEGER LBND( 2 )          ! Bounds of Data (lower) input NDF
       INTEGER LBNDB( 2 )         ! Bounds of Data (lower) BIAS
       INTEGER LBNDC( 2 )         ! Bounds of Data (lower) trimmed
@@ -638,9 +673,13 @@
       INTEGER NID                ! Number of input identifiers (1 or 2)
       INTEGER NNDF               ! Number of data NDFs to process
       INTEGER NSAT               ! Number of saturated values.
+      INTEGER NSUB               ! Number of subgroups
+      INTEGER NTOT               ! Total number of input NDFs
+      INTEGER OUTGRP             ! GRP identifier for all output NDFs
       INTEGER PLACE1             ! Place holder for workspace IDOUT.
       INTEGER PLACE2             ! Place holder for workspace
       INTEGER SHIFT( 2 )         ! Shifts to apply to fix origin
+      INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifiers for input subgroups
       INTEGER UBND( 2 )          ! Bounds of Data (upper) input NDF
       INTEGER UBNDB( 2 )         ! Bounds of Data (upper) BIAS
       INTEGER UBNDC( 2 )         ! Bounds of Data (upper) trimmed
@@ -669,6 +708,7 @@
       LOGICAL SATUR              ! Whether to set saturated values (to BAD)
       LOGICAL SETSAT             ! Whether to set saturated values (to SATVAL)
       LOGICAL USEEXT             ! Get CCD parameters from extensions
+      LOGICAL USESET             ! Whether to use Set header information
       LOGICAL ZEROED             ! Whether or not input bias master has been zeroed
       LOGICAL ZEROCK             ! Whether or not to check bias master is processed as specified by ZEROED
       REAL FRAC                  ! Fractional numeric error count
@@ -687,6 +727,18 @@
 *  NDF context for whole routine.
       CALL NDF_BEGIN
 
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
+*  an uninitialised group cannot cause trouble.
+      GIDIN = GRP__NOID
+      GIDOUT = GRP__NOID
+      INGRP = GRP__NOID
+      OUTGRP = GRP__NOID
+      KEYGRP = GRP__NOID
+      BIAGRP = GRP__NOID
+      DO I = 1, CCD1__MXNDF
+         SUBGRP( I ) = GRP__NOID
+      END DO
+
 *  See if the user wants to save disk space by deleting the input NDFs
 *  when DEBIAS is finished with them. This will use the NDF_DELET
 *  call which will delete container files if the NDF is associated with
@@ -703,19 +755,25 @@
 ************************************************************************
 * INPUT AND OUTPUT NDFs. May have a list of them.
 ************************************************************************
-*  Set access mode for NDFs.
-      IF ( DELETE ) THEN
-         ACCESS = 'UPDATE'
-      ELSE
-         ACCESS = 'READ'
-      END IF
-
 *  Access an NDG group containing a list of NDF names.
-      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NTOT, STATUS )
+
+*  Find out if we are using Set header information.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
+*  Split the group of input NDFs up by Set Index if necessary.
+      NSUB = 1
+      IF ( USESET ) THEN
+         CALL CCD1_SETSP( INGRP, 'INDEX', CCD1__MXNDF, SUBGRP, NSUB,
+     :                    KEYGRP, STATUS )
+      ELSE
+         SUBGRP( 1 ) = INGRP
+         KEYGRP = GRP__NOID
+      END IF
 
 *  Access a second list of NDF names for the outputs. Use the input
 *  names as a modification list.
-      CALL CCD1_NDFPG( 'OUT', GIDIN, NNDF, GIDOUT, STATUS )
+      CALL CCD1_NDFPG( 'OUT', INGRP, NTOT, OUTGRP, STATUS )
 
 ************************************************************************
 * MASK AND BIAS NDF ACCESS --- keep these out of main loop for
@@ -728,12 +786,50 @@
       CALL PAR_GET0L( 'GETBIAS', GETBIA, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       IF ( GETBIA ) THEN
-         CALL CCD1_NDFAC( 'BIAS', 'READ', 1, 1, IVAL, IDBIAS, STATUS )
+         IF ( USESET ) THEN
+            CALL CCD1_NDFMI( 'BIAS', KEYGRP, BIAGRP, STATUS )
+         ELSE
+            CALL CCD1_NDFGL( 'BIAS', 1, 1, BIAGRP, IVAL, STATUS )
+         END IF
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             GOTBIA = .FALSE.
             HAVBV = .FALSE.
          ELSE
+            GOTBIA = .TRUE.
+         END IF
+      ELSE
+
+*  Do not try for a master bias.
+         GOTBIA = .FALSE.
+         HAVBV = .FALSE.
+      END IF
+
+
+************************************************************************
+*  Loop over subgroups performing calculations separately for each one
+************************************************************************
+      DO ISUB = 1, NSUB
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Write a header unless this is the only subgroup.
+         IF ( NSUB .GT. 1 ) THEN
+            CALL CCD1_SETHD( KEYGRP, ISUB, 'Debiassing', 'Index',
+     :                       STATUS )
+         END IF
+
+*  Set up the group of input NDFs for this subgroup.
+         GIDIN = SUBGRP( ISUB )
+         CALL GRP_GRPSZ( GIDIN, NNDF, STATUS )
+
+*  Set up the group of output NDFs for this subgroup.
+         CALL CCD1_ORDG( INGRP, OUTGRP, GIDIN, GIDOUT, STATUS )
+
+*  Set up information about the bias frame if it exists.
+         IF ( GOTBIA ) THEN
+
+*  Get the master bias NDF identifier for this subgroup.
+            CALL NDG_NDFAS( BIAGRP, ISUB, 'READ', IDBIAS, STATUS )
 
 *  Check the frame type of the BIAS. This should be MASTER_BIAS.
 *  If this is wrong this is not a serious problem.
@@ -745,68 +841,59 @@
 
 *  Find out if the bias NDF has a variance component.
             CALL NDF_BOUND( IDBIAS, 2, LBNDB, UBNDB, NDIM, STATUS )
-            GOTBIA = .TRUE.
             CALL NDF_STATE( IDBIAS, 'Variance', HAVBV, STATUS )
-         END IF
-      ELSE
-
-*  Do not try for a master bias.
-         GOTBIA = .FALSE.
-         HAVBV = .FALSE.
-      END IF
 
 *  Get the mask frame (if given), set bounds to those of the BIAS NDF.
-      IF ( GOTBIA ) THEN
-         LBNDM( 1 ) = LBNDB( 1 )
-         LBNDM( 2 ) = LBNDB( 2 )
-         UBNDM( 1 ) = UBNDB( 1 )
-         UBNDM( 2 ) = UBNDB( 2 )
+            LBNDM( 1 ) = LBNDB( 1 )
+            LBNDM( 2 ) = LBNDB( 2 )
+            UBNDM( 1 ) = UBNDB( 1 )
+            UBNDM( 2 ) = UBNDB( 2 )
 
 *  Also get a suitable type for the mask data, ensures that mask data
 *  type does not throw the merged type later.
-         CALL NDF_TYPE( IDBIAS, 'Data', ITYPE, STATUS )
-      ELSE
+            CALL NDF_TYPE( IDBIAS, 'Data', ITYPE, STATUS )
+         ELSE
 
 *  None to supply if the mask file is an ARD description, set LBNDM(1)
 *  to VAL__BADI and give GIDIN so that size of first NDF can be used.
-         ITYPE = ' '
-         LBNDM( 1 ) = VAL__BADI
-      END IF
+            ITYPE = ' '
+            LBNDM( 1 ) = VAL__BADI
+         END IF
 
 *  Access the MASK, if asked to try.
-      GETMSK = .TRUE.
-      CALL PAR_GET0L( 'GETMASK', GETMSK, STATUS )
-      IF ( GETMSK ) THEN
-         CALL CCD1_GTMSK( 'MASK', UBNDM, LBNDM, GIDIN, ITYPE, IDMASK,
-     :                    MSKNAM, STATUS )
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            GOTMSK= .FALSE.
+         GETMSK = .TRUE.
+         CALL PAR_GET0L( 'GETMASK', GETMSK, STATUS )
+         IF ( GETMSK ) THEN
+            CALL CCD1_GTMSK( 'MASK', UBNDM, LBNDM, INGRP, ITYPE, IDMASK,
+     :                       MSKNAM, STATUS )
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+               GOTMSK= .FALSE.
+            ELSE
+               GOTMSK = .TRUE.
+            END IF
          ELSE
-            GOTMSK = .TRUE.
-         END IF
-      ELSE
 
 *  No mask.
-         GOTMSK = .FALSE.
-      END IF
+            GOTMSK = .FALSE.
+         END IF
 
 *  Find out whether we need to generate variances.
-      GENVAR = .FALSE.
-      CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
+         GENVAR = .FALSE.
+         CALL PAR_GET0L( 'GENVAR', GENVAR, STATUS )
 
 *  Set up original input NDF identifier stack.
-      NID = 1
-      NBIAS = 1
-      IF ( GOTMSK ) THEN
-         NID = NID + 1
-         IDSO( NID ) = IDMASK
-      END IF
-      IF ( GOTBIA ) THEN
-         NID = NID + 1
-         NBIAS = NID
-         IDSO( NID ) = IDBIAS
-      END IF
+         NID = 1
+         NBIAS = 1
+         IF ( GOTMSK ) THEN
+            NID = NID + 1
+            IDSO( NID ) = IDMASK
+         END IF
+         IF ( GOTBIA ) THEN
+            NID = NID + 1
+            NBIAS = NID
+            IDSO( NID ) = IDBIAS
+         END IF
 
 ************************************************************************
 * NDF LIST LOOP
@@ -815,37 +902,37 @@
 *  will either be obtained from the NDF extension (USEEXT=TRUE) or
 *  from the environment. PAR_CANCL is not used so each call to the
 *  environment for a parameter value will return the same value.
-      DO 99999 INDEX = 1, NNDF
+         DO 99999 INDEX = 1, NNDF
 
 *  Get the identifier of the input NDF.
-         CALL NDG_NDFAS( GIDIN, INDEX, ACCESS, IDIN, STATUS )
+            CALL NDG_NDFAS( GIDIN, INDEX, 'READ', IDIN, STATUS )
 
 *  Write out name of this NDF. And which loop this is.
-         CALL CCD1_MSG( ' ',  ' ', STATUS )
-         CALL NDF_MSG( 'CURRENT_NDF', IDIN )
-         CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
-     :                  STATUS )
-         CALL MSG_SETI( 'CURRENT_NUM', INDEX )
-         CALL MSG_SETI( 'MAX_NUM', NNDF )
-         CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
-     :                  STATUS )
+            CALL CCD1_MSG( ' ',  ' ', STATUS )
+            CALL NDF_MSG( 'CURRENT_NDF', IDIN )
+            CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
+     :                     STATUS )
+            CALL MSG_SETI( 'CURRENT_NUM', INDEX )
+            CALL MSG_SETI( 'MAX_NUM', NNDF )
+            CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
+     :                     STATUS )
 
 *  Find out if the input NDF has a variance component. If it has write
 *  out an message warning user that this component will be lost. If not
 *  generating variances and one exists already better process it.
-         CALL NDF_STATE( IDIN, 'Variance', HAVIV, STATUS )
-         IF ( HAVIV ) THEN
-            IF ( GENVAR ) THEN
-               CALL MSG_OUT( 'DEBIAS_GOTVAR',
+            CALL NDF_STATE( IDIN, 'Variance', HAVIV, STATUS )
+            IF ( HAVIV ) THEN
+               IF ( GENVAR ) THEN
+                  CALL MSG_OUT( 'DEBIAS_GOTVAR',
      :' Warning - input NDF has a variance component this will be'//
      :' superceded', STATUS )
+               END IF
             END IF
-         END IF
 
 *  Check that the frame type of the NDF is reasonable for debiassing.
 *  This means that is shouldn't have already been debiassed and it
 *  shouldn't have a type of BIAS.
-         CALL CCD1_CKCDB( IDIN, STATUS )
+            CALL CCD1_CKCDB( IDIN, STATUS )
 
 ************************************************************************
 * INPUT NDF merging matching and typing
@@ -860,203 +947,205 @@
 * remapped with the new processing type.
 
 *  First find out the bounds of the current NDF.
-         CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
-         IF ( INDEX .EQ. 1 ) THEN
+            CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
+            IF ( INDEX .EQ. 1 ) THEN
 
 *  Set the mapping control flag - REMAP - one off initialisation.
-            REMAP = .TRUE.
-         ELSE
-
-*  Compare these bounds with those of the last NDF.
-            IF ( LBND( 1 ) .NE. LBNDL( 1 ) .OR.
-     :           UBND( 1 ) .NE. UBNDL( 1 ) .OR.
-     :           LBND( 2 ) .NE. LBNDL( 2 ) .OR.
-     :           UBND( 2 ) .NE. UBNDL( 2 ) ) THEN
-
-*  Bounds have changed need to remap after trimming to bias,mask frames
-*  Get W/S at new size etc.
                REMAP = .TRUE.
             ELSE
 
+*  Compare these bounds with those of the last NDF.
+               IF ( LBND( 1 ) .NE. LBNDL( 1 ) .OR.
+     :              UBND( 1 ) .NE. UBNDL( 1 ) .OR.
+     :              LBND( 2 ) .NE. LBNDL( 2 ) .OR.
+     :              UBND( 2 ) .NE. UBNDL( 2 ) ) THEN
+
+*  Bounds have changed need to remap after trimming to bias,mask frames
+*  Get W/S at new size etc.
+                  REMAP = .TRUE.
+               ELSE
+
 *  No change in bounds, remapping may not be necessary.
-               REMAP = .FALSE.
+                  REMAP = .FALSE.
+               END IF
             END IF
-         END IF
 
 *  Check the bounds of the MASK and BIAS frames against those of the
 *  input NDF. If the bounds are not the same as the input NDF then
 *  trimming will have to be performed, regardless of whether the
 *  actual NDF size has changed or not.
-         IF ( GOTMSK ) THEN
-            IF ( LBND( 1 ) .NE. LBNDM( 1 ) .OR.
-     :           UBND( 1 ) .NE. UBNDM( 1 ) .OR.
-     :           LBND( 2 ) .NE. LBNDM( 2 ) .OR.
-     :           UBND( 2 ) .NE. UBNDM( 2 ) ) THEN
+            IF ( GOTMSK ) THEN
+               IF ( LBND( 1 ) .NE. LBNDM( 1 ) .OR.
+     :              UBND( 1 ) .NE. UBNDM( 1 ) .OR.
+     :              LBND( 2 ) .NE. LBNDM( 2 ) .OR.
+     :              UBND( 2 ) .NE. UBNDM( 2 ) ) THEN
 
 *  Bad array bounds - issue a warning - the NDF sections will be trimmed
 *  later.
-               CALL MSG_OUT( 'BAD_BOUNDS',
+                  CALL MSG_OUT( 'BAD_BOUNDS',
      :' Warning - MASK bounds do not match input NDF', STATUS )
-               REMAP = .TRUE.
+                  REMAP = .TRUE.
+               END IF
             END IF
-         END IF
 
 * Bias frame.
-         IF ( GOTBIA ) THEN
-            IF ( LBND( 1 ) .NE. LBNDB( 1 ) .OR.
-     :           UBND( 1 ) .NE. UBNDB( 1 ) .OR.
-     :           LBND( 2 ) .NE. LBNDB( 2 ) .OR.
-     :           UBND( 2 ) .NE. UBNDB( 2 ) ) THEN
+            IF ( GOTBIA ) THEN
+               IF ( LBND( 1 ) .NE. LBNDB( 1 ) .OR.
+     :              UBND( 1 ) .NE. UBNDB( 1 ) .OR.
+     :              LBND( 2 ) .NE. LBNDB( 2 ) .OR.
+     :              UBND( 2 ) .NE. UBNDB( 2 ) ) THEN
 
 *  Bad array bounds - issue a warning - the NDF sections will be trimmed
 *  later.
-                CALL MSG_OUT( 'BAD_BOUNDS',
+                   CALL MSG_OUT( 'BAD_BOUNDS',
      :' Warning - BIAS bounds do not match input NDF', STATUS )
-               REMAP = .TRUE.
+                  REMAP = .TRUE.
+               END IF
             END IF
-         END IF
 
 *  See if the user wants to process in a better precision than the
 *  present one.
-         PRESER = .TRUE.
-         CALL PAR_GET0L( 'PRESERVE', PRESER, STATUS )
-         IF ( PRESER ) THEN
+            PRESER = .TRUE.
+            CALL PAR_GET0L( 'PRESERVE', PRESER, STATUS )
+            IF ( PRESER ) THEN
 
 *  No change to data type. If PRESERVE if false then go up to next
 *  floating point precision
-            TYPES = '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,_DOUBLE'
-         ELSE
+               TYPES = '_BYTE,_UBYTE,_WORD,_UWORD,_INTEGER,_REAL,'//
+     :                 '_DOUBLE'
+            ELSE
 
 *  Just floating point arithmetic and result
-            TYPES = '_REAL,_DOUBLE'
-         END IF
+               TYPES = '_REAL,_DOUBLE'
+            END IF
 
 *  Set input identifier stack for unmodified (sectioned) INPUT frames.
 *  This stack is used for testing the types.
-         IDSO( 1 ) = IDIN
+            IDSO( 1 ) = IDIN
 
 * Merge the types of the input data to the lowest representation.
-         CALL NDF_MTYPN( TYPES, NID, IDSO, 'Data,Variance', ITYPE,
-     :                   DTYPE, STATUS )
+            CALL NDF_MTYPN( TYPES, NID, IDSO, 'Data,Variance', ITYPE,
+     :                      DTYPE, STATUS )
 
 *  Compare this with the last type.
-         IF ( INDEX .NE. 1 ) THEN
-            IF ( ITYPE .NE. ITYPEL ) THEN
+            IF ( INDEX .NE. 1 ) THEN
+               IF ( ITYPE .NE. ITYPEL ) THEN
 
 *  Processing types have changed - reset everything.
-               REMAP = .TRUE.
+                  REMAP = .TRUE.
+               END IF
             END IF
-         END IF
 
 *  Look after sectioned NDF stack. Annul last identifiers if remapping
 *  and reestablish the stack as the unsectioned input stack.
-         IF ( REMAP ) THEN
+            IF ( REMAP ) THEN
 
 *  Annul and unmap previous identifiers. Except the first which is
 *  always unmapped and annulled (the last input NDF).
-            IF ( INDEX .NE. 1 ) THEN
-               IF ( NID .GT. 1 ) THEN
-                  DO 20 IVAL = 2, NID
-                     CALL NDF_UNMAP( IDS( IVAL ), '*', STATUS )
-                     CALL NDF_ANNUL( IDS( IVAL ), STATUS )
- 20               CONTINUE
-               END IF
+               IF ( INDEX .NE. 1 ) THEN
+                  IF ( NID .GT. 1 ) THEN
+                     DO 20 IVAL = 2, NID
+                        CALL NDF_UNMAP( IDS( IVAL ), '*', STATUS )
+                        CALL NDF_ANNUL( IDS( IVAL ), STATUS )
+ 20                  CONTINUE
+                  END IF
 
 *  Unmap any previous workspace as well. All unmapping now performed.
-               CALL NDF_UNMAP( IDWRK, '*', STATUS )
-               CALL NDF_ANNUL( IDWRK, STATUS )
-            END IF
+                  CALL NDF_UNMAP( IDWRK, '*', STATUS )
+                  CALL NDF_ANNUL( IDWRK, STATUS )
+               END IF
 
 *  Make new stack for the sectioning part. Use clones of the originals
 *  to stop embarrassing annulments.
-            DO 21 IVAL = 1, NID
-               IF ( IVAL .EQ. 1 ) THEN
+               DO 21 IVAL = 1, NID
+                  IF ( IVAL .EQ. 1 ) THEN
 
 *  Current input NDF - do not clone this annulment ok.
-                  IDS( IVAL ) = IDSO( IVAL )
-               ELSE
+                     IDS( IVAL ) = IDSO( IVAL )
+                  ELSE
 
 *  Bias or mask NDF keep the original identifiers safe.
-                  CALL NDF_CLONE( IDSO( IVAL ), IDS( IVAL ), STATUS )
-               END IF
- 21         CONTINUE
-         ELSE
+                     CALL NDF_CLONE( IDSO( IVAL ), IDS( IVAL ), STATUS )
+                  END IF
+ 21            CONTINUE
+            ELSE
 
 *  Just using the last sections - copy input NDF identifier to
 *  sectioning stack.
-            IDS( 1 ) = IDSO( 1 )
-         END IF
+               IDS( 1 ) = IDSO( 1 )
+            END IF
 
 *  If REMAP is true then all NDFs require may trimmimg to size,
 *  perform this task.
-         IF ( REMAP ) THEN
-            CALL NDF_MBNDN( 'TRIM', NID, IDS, STATUS )
+            IF ( REMAP ) THEN
+               CALL NDF_MBNDN( 'TRIM', NID, IDS, STATUS )
 
 *  Restore convenient labels for the NDF identifiers. The old ones have
 *  may have been annulled in the last call.
-            NID = 1
-            IDIN = IDS( 1 )
-            IF ( GOTMSK ) THEN
-               NID = NID + 1
-               IDMASK = IDS( NID )
-            END IF
-            IF ( GOTBIA ) THEN
-               NID = NID + 1
-               IDBIAS = IDS( NID )
-            END IF
+               NID = 1
+               IDIN = IDS( 1 )
+               IF ( GOTMSK ) THEN
+                  NID = NID + 1
+                  IDMASK = IDS( NID )
+               END IF
+               IF ( GOTBIA ) THEN
+                  NID = NID + 1
+                  IDBIAS = IDS( NID )
+               END IF
 
 *  Find out the size of the merged NDFS. (W/S use)
-            CALL NDF_BOUND( IDIN, 2, LBNDC, UBNDC, NDIM, STATUS )
-            IDIM( 1 ) = UBNDC( 1 ) - LBNDC( 1 ) + 1
-            IDIM( 2 ) = UBNDC( 2 ) - LBNDC( 2 ) + 1
-         END IF
+               CALL NDF_BOUND( IDIN, 2, LBNDC, UBNDC, NDIM, STATUS )
+               IDIM( 1 ) = UBNDC( 1 ) - LBNDC( 1 ) + 1
+               IDIM( 2 ) = UBNDC( 2 ) - LBNDC( 2 ) + 1
+            END IF
 
 *  Check for the presence of BAD pixels in the input data.
-         CALL NDF_MBADN( .TRUE., NID, IDS, 'Data,Variance', .FALSE.,
-     :                   BAD, STATUS )
+            CALL NDF_MBADN( .TRUE., NID, IDS, 'Data,Variance', .FALSE.,
+     :                      BAD, STATUS )
 
 ************************************************************************
 *  MAP CONTROL SECTION -- MAP IN PERMANENT DATA FIRST --
 *  workspace array, bias and mask.
 ************************************************************************
 *  Need a temporary array to contain processed data create it.
-         IF ( REMAP ) THEN
-            CALL NDF_TEMP( PLACE2, STATUS )
-            CALL NDF_NEW( ITYPE, 2, LBNDC, UBNDC, PLACE2, IDWRK,
-     :                    STATUS )
+            IF ( REMAP ) THEN
+               CALL NDF_TEMP( PLACE2, STATUS )
+               CALL NDF_NEW( ITYPE, 2, LBNDC, UBNDC, PLACE2, IDWRK,
+     :                       STATUS )
 
 *  Map in workspace for containing the processed array.
-            CALL NDF_MAP( IDWRK, 'Data', ITYPE, 'WRITE/BAD', IPWRK, EL,
-     :                    STATUS )
-         ELSE
+               CALL NDF_MAP( IDWRK, 'Data', ITYPE, 'WRITE/BAD', IPWRK,
+     :                       EL, STATUS )
+            ELSE
 
 *  Set the array BAD.
-            CALL CCD1_STVB( ITYPE, EL, IPWRK, STATUS )
-         END IF
+               CALL CCD1_STVB( ITYPE, EL, IPWRK, STATUS )
+            END IF
 
 *  BIAS NDF.
-         IF ( GOTBIA ) THEN
-            IF ( REMAP ) THEN
-               CALL NDF_MAP( IDBIAS, 'Data', ITYPE, 'READ', IPBIAS, EL,
-     :                       STATUS )
-            END IF
-            IF ( HAVBV .AND. GENVAR .OR. HAVBV .AND. HAVIV ) THEN
+            IF ( GOTBIA ) THEN
+               IF ( REMAP ) THEN
+                  CALL NDF_MAP( IDBIAS, 'Data', ITYPE, 'READ', IPBIAS,
+     :                          EL, STATUS )
+               END IF
+               IF ( HAVBV .AND. GENVAR .OR. HAVBV .AND. HAVIV ) THEN
 
 *  Have bias variance and will generate an variance component, or
 *  have a bias variance and an input variance - can process these.
 *  Either way map in the bias variance for processing.
-               IF ( REMAP ) CALL NDF_MAP( IDBIAS, 'Variance', ITYPE,
-     :                                    'READ', IPBVAR, EL, STATUS )
+                  IF ( REMAP ) CALL NDF_MAP( IDBIAS, 'Variance', ITYPE,
+     :                                       'READ', IPBVAR, EL,
+     :                                       STATUS )
+               END IF
             END IF
-         END IF
 
 *  Map in the mask data array if given and requires remapping.
-         IF ( GOTMSK ) THEN
-            IF ( REMAP ) THEN
-               CALL NDF_MAP( IDMASK, 'Data', ITYPE, 'READ', IPMASK, EL,
-     :                       STATUS )
+            IF ( GOTMSK ) THEN
+               IF ( REMAP ) THEN
+                  CALL NDF_MAP( IDMASK, 'Data', ITYPE, 'READ', IPMASK,
+     :                          EL, STATUS )
+               END IF
             END IF
-         END IF
 
 *  Map in the input and output NDFs these are volatile and should sit
 *  "on top" of the virtual address space with the other volatile arrays
@@ -1068,34 +1157,35 @@
 *  NOTE THAT THIS VERSION IS A DUMMY - the real output NDFs are created
 *  later when the output section size is determined. This NDF is the
 *  same size as the merged BIAS, MASK and INPUT NDFs.
-         CALL NDF_TEMP( PLACE1, STATUS )
-         CALL NDF_COPY( IDIN, PLACE1, IDOUT, STATUS )
+            CALL NDF_TEMP( PLACE1, STATUS )
+            CALL NDF_COPY( IDIN, PLACE1, IDOUT, STATUS )
 
 *  Force type of array to be that of destination data, this avoids
 *  recasting the data into the input type before propagation to the true
 *  output NDF and its type. Unsigned data can cause considerable
 *  problems if not done this way.
-         CALL NDF_STYPE( ITYPE, IDOUT, 'Data,Variance', STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 999
+            CALL NDF_STYPE( ITYPE, IDOUT, 'Data,Variance', STATUS )
+            IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Map in the output NDF.
-         CALL NDF_MAP( IDOUT, 'Data', ITYPE, 'WRITE', IPOUT, EL,
-     :                 STATUS )
+            CALL NDF_MAP( IDOUT, 'Data', ITYPE, 'WRITE', IPOUT, EL,
+     :                    STATUS )
 
 *  Map in the output variance component, set to BAD if generating
 *  variances. Map it in only if
 *  have a result to enter, ie. if generating variances or have a
 *  variance to propagate.
-         IF ( GENVAR ) THEN
-            CALL NDF_MAP( IDOUT, 'Variance', ITYPE, 'WRITE/BAD',
-     :                    IPOVAR, EL, STATUS )
-         ELSE IF ( HAVIV .AND. .NOT. GENVAR ) THEN
-            CALL NDF_MAP( IDOUT, 'Variance', ITYPE, 'WRITE',
-     :                    IPOVAR, EL, STATUS )
-         END IF
+            IF ( GENVAR ) THEN
+               CALL NDF_MAP( IDOUT, 'Variance', ITYPE, 'WRITE/BAD',
+     :                       IPOVAR, EL, STATUS )
+            ELSE IF ( HAVIV .AND. .NOT. GENVAR ) THEN
+               CALL NDF_MAP( IDOUT, 'Variance', ITYPE, 'WRITE',
+     :                       IPOVAR, EL, STATUS )
+            END IF
 
 *  Input NDF.
-         CALL NDF_MAP( IDIN, 'Data', ITYPE, 'READ', IPIN, EL, STATUS )
+            CALL NDF_MAP( IDIN, 'Data', ITYPE, 'READ', IPIN, EL,
+     :                    STATUS )
 
 ************************************************************************
 *  DEBIASSING AND VARIANCE ESTIMATION
@@ -1104,68 +1194,69 @@
 *  Debias the input frame and generate the variances. If GENVAR is false
 *  then do not generate variances. Check that the bias master is
 *  processed correctly according to whether it has been zeroed or not.
-          CALL CCD1_DEBIA( ITYPE, BAD, GENVAR, USEEXT, IDIN, EL, IPIN,
-     :                     IDIM( 1 ), IDIM( 2 ), LBNDC( 1 ), LBNDC( 2 ),
-     :                     IPOUT, GOTBIA, ZEROED, ZEROCK, IPBIAS,
-     :                     HAVBV, IPBVAR, HAVIV, IPOVAR, IPWRK, PRESER,
-     :                     DTYPE, IDSO( NBIAS), ADC, STATUS )
+             CALL CCD1_DEBIA( ITYPE, BAD, GENVAR, USEEXT, IDIN, EL,
+     :                        IPIN, IDIM( 1 ), IDIM( 2 ), LBNDC( 1 ),
+     :                        LBNDC( 2 ), IPOUT, GOTBIA, ZEROED,
+     :                        ZEROCK, IPBIAS, HAVBV, IPBVAR, HAVIV,
+     :                        IPOVAR, IPWRK, PRESER, DTYPE,
+     :                        IDSO( NBIAS), ADC, STATUS )
 
 *  Write out the data units, must be ADUs at this stage (unless the user
 *  was perverse enough to scale all the data before passing to CCDPACK).
-         CALL NDF_CPUT( 'ADUs', IDOUT, 'UNITS', STATUS )
+            CALL NDF_CPUT( 'ADUs', IDOUT, 'UNITS', STATUS )
 
 ************************************************************************
 * MASKING;     input to this section is in the output NDF.
 ************************************************************************
-         HAVBIT = .FALSE.
-         IF ( GOTMSK ) THEN
+            HAVBIT = .FALSE.
+            IF ( GOTMSK ) THEN
 
 *  Find if the user wants to use the quality component for masking bad
 *  pixels
-            CALL PAR_GET0L( 'SETBAD', NOQUAL, STATUS )
-            IF ( .NOT. NOQUAL ) THEN
+               CALL PAR_GET0L( 'SETBAD', NOQUAL, STATUS )
+               IF ( .NOT. NOQUAL ) THEN
 
 *  Have to use quality component.
 *  Find out the current value of the badbits mask.
-               CALL NDF_BB( IDOUT, BBYTE, STATUS )
+                  CALL NDF_BB( IDOUT, BBYTE, STATUS )
 
 *  If this value is zero then the BADBITS mask has not previously been
 *  set. Set it to the value we get from the user.
-               IF( BBYTE .EQ. 0 ) THEN
-                  BADBIT = 1
-                  CALL PAR_GET0I( 'BADBITS', BADBIT, STATUS )
+                  IF( BBYTE .EQ. 0 ) THEN
+                     BADBIT = 1
+                     CALL PAR_GET0I( 'BADBITS', BADBIT, STATUS )
 
 *  Convert this into a byte value.
-                  BBYTE = VAL_ITOB( .TRUE., BADBIT, STATUS )
+                     BBYTE = VAL_ITOB( .TRUE., BADBIT, STATUS )
 
 *  Remember that this has been done.
-                  HAVBIT = .TRUE.
-               END IF
+                     HAVBIT = .TRUE.
+                  END IF
 
 *  Map it in. If it is already defined if it is not then we need to
 *  initialise it as not all values will be be set in this task.
-               CALL NDF_STATE( IDOUT, 'Quality', HAVQAL, STATUS )
-               IF ( HAVQAL ) THEN
-                  CALL NDF_MAP( IDOUT, 'Quality', '_UBYTE', 'WRITE',
-     :                          IPQUAL, EL, STATUS )
+                  CALL NDF_STATE( IDOUT, 'Quality', HAVQAL, STATUS )
+                  IF ( HAVQAL ) THEN
+                     CALL NDF_MAP( IDOUT, 'Quality', '_UBYTE', 'WRITE',
+     :                             IPQUAL, EL, STATUS )
+                  ELSE
+                     CALL NDF_MAP( IDOUT, 'Quality', '_UBYTE',
+     :                             'WRITE/ZERO', IPQUAL, EL, STATUS )
+                  END IF
                ELSE
-                  CALL NDF_MAP( IDOUT, 'Quality', '_UBYTE',
-     :                          'WRITE/ZERO', IPQUAL, EL, STATUS )
-               END IF
-            ELSE
 
 *  Need to transfer information into output Data array swap pointers
-               IPQUAL = IPOUT
-            END IF
+                  IPQUAL = IPOUT
+               END IF
 
 *  Right now transfer the 'BAD' pixel data to from the mask NDF to the
 *  new NDF. Have two basic situations, setting the quality component to
 *  include the BBYTE value, or setting pixels BAD if the mask pixels
 *  are BAD.
-            CALL CCD1_MASKD( ITYPE, NOQUAL, IPMASK, IPQUAL, EL, BBYTE,
-     :                       STATUS )
-            CALL CCD1_RMSK( GOTMSK, MSKNAM, NOQUAL, STATUS )
-         END IF
+               CALL CCD1_MASKD( ITYPE, NOQUAL, IPMASK, IPQUAL, EL,
+     :                          BBYTE, STATUS )
+               CALL CCD1_RMSK( GOTMSK, MSKNAM, NOQUAL, STATUS )
+            END IF
 
 ************************************************************************
 * DATA VALUE EXPANSION AND SATURATING -- DEFERRED CHARGE CORRECTION
@@ -1173,19 +1264,19 @@
 *  Find out if the user wants to expand the data values into counts.
 *  Only allow this if generating variances, may not have ADC factor.
 *  Set dynamic defaults for value - false if data is unsigned.
-         EXPAND = .FALSE.
-         IF( GENVAR ) THEN
-            IF ( ITYPE( 1 : 2 ) .EQ. '_U' ) THEN
-               CALL PAR_DEF0L( 'EXPAND', .FALSE., STATUS )
-            ELSE
-               CALL PAR_DEF0L( 'EXPAND', .TRUE., STATUS )
+            EXPAND = .FALSE.
+            IF( GENVAR ) THEN
+               IF ( ITYPE( 1 : 2 ) .EQ. '_U' ) THEN
+                  CALL PAR_DEF0L( 'EXPAND', .FALSE., STATUS )
+               ELSE
+                  CALL PAR_DEF0L( 'EXPAND', .TRUE., STATUS )
+               END IF
+               CALL PAR_GET0L( 'EXPAND', EXPAND, STATUS )
             END IF
-            CALL PAR_GET0L( 'EXPAND', EXPAND, STATUS )
-         END IF
 
 *  Does the user want to saturate the data?
-         SATUR = .FALSE.
-         CALL PAR_GET0L( 'SATURATE', SATUR, STATUS )
+            SATUR = .FALSE.
+            CALL PAR_GET0L( 'SATURATE', SATUR, STATUS )
 
 *  If saturation is to be allowed then the user has two options. Either
 *  setting the saturated data BAD or setting it to a given value.  If
@@ -1196,184 +1287,189 @@
 *  flatfield (a frame-frame operation, during which the saturated
 *  values are unlikely to retain the same value), saturated values will
 *  have to remain unmodified.
-         SETSAT = .FALSE.
-         SATVAL = VAL__MAXD
-         IF ( SATUR ) THEN
+            SETSAT = .FALSE.
+            SATVAL = VAL__MAXD
+            IF ( SATUR ) THEN
 
 *  Offer the set saturation value option.
-            SETSAT = .FALSE.
-            CALL PAR_GET0L( 'SETSAT', SETSAT, STATUS )
+               SETSAT = .FALSE.
+               CALL PAR_GET0L( 'SETSAT', SETSAT, STATUS )
 
 *  Get the saturation value. This may be available in the NDF extension
 *  so have a look if required. If none is found then just prompt the
 *  user for the saturation value.
-            EXTSAT = .FALSE.
-            IF ( USEEXT ) THEN
-               CALL CCG1_FCH0D( IDIN, 'SATURATION', SATVAL, EXTSAT,
-     :                          STATUS )
-            END IF
-            IF ( .NOT. EXTSAT ) THEN
-               CALL PAR_GET0D( 'SATURATION', SATVAL, STATUS )
-            END IF
+               EXTSAT = .FALSE.
+               IF ( USEEXT ) THEN
+                  CALL CCG1_FCH0D( IDIN, 'SATURATION', SATVAL, EXTSAT,
+     :                             STATUS )
+               END IF
+               IF ( .NOT. EXTSAT ) THEN
+                  CALL PAR_GET0D( 'SATURATION', SATVAL, STATUS )
+               END IF
 
 *  Saturate the data either setting values to BAD or the saturation
 *  value as requested.
-            CALL CCD1_STSAT( ITYPE, BAD, IPOUT, EL, SETSAT, SATVAL,
-     :                       NSAT, STATUS )
-         END IF
+               CALL CCD1_STSAT( ITYPE, BAD, IPOUT, EL, SETSAT, SATVAL,
+     :                          NSAT, STATUS )
+            END IF
 
 *  Correct for deferred charge (the value given has the sense of
 *  subtraction). This value may be found in the NDF extension so look
 *  for it there if this is required.
-         EXTDEF = .FALSE.
-         IF ( USEEXT ) THEN
-            CALL CCG1_FCH0D( IDIN, 'DEFERRED', DEFER, EXTDEF, STATUS )
-         END IF
-         IF ( .NOT. EXTDEF ) THEN
-            CALL PAR_GET0D( 'DEFERRED', DEFER, STATUS )
-         END IF
-         IF ( DEFER .NE. 0.0 ) THEN
-            CALL CCD1_COSUB( ITYPE, BAD, IPOUT, EL, DEFER, IPWRK,
-     :                       STATUS )
-         END IF
+            EXTDEF = .FALSE.
+            IF ( USEEXT ) THEN
+               CALL CCG1_FCH0D( IDIN, 'DEFERRED', DEFER, EXTDEF,
+     :                          STATUS )
+            END IF
+            IF ( .NOT. EXTDEF ) THEN
+               CALL PAR_GET0D( 'DEFERRED', DEFER, STATUS )
+            END IF
+            IF ( DEFER .NE. 0.0 ) THEN
+               CALL CCD1_COSUB( ITYPE, BAD, IPOUT, EL, DEFER, IPWRK,
+     :                          STATUS )
+            END IF
 
 *  If requested expand data values by multiplication by ADC. Only allow
 *  this if variances are being generated.
-         IF ( EXPAND .AND. GENVAR ) THEN
-            CALL CCD1_CMULT( BAD, ITYPE, IPOUT, EL, ADC, IPWRK, NERR,
-     :                       STATUS )
+            IF ( EXPAND .AND. GENVAR ) THEN
+               CALL CCD1_CMULT( BAD, ITYPE, IPOUT, EL, ADC, IPWRK, NERR,
+     :                          STATUS )
 
 *  Report numeric problems.
-            IF ( NERR .GT. 0 ) THEN
-               FRAC = REAL( NERR ) / REAL( EL ) * 100.0
-               CALL MSG_SETR( 'FRAC', FRAC )
-               CALL MSG_SETI( 'NERR', NERR )
-               CALL CCD1_MSG( ' ',
+               IF ( NERR .GT. 0 ) THEN
+                  FRAC = REAL( NERR ) / REAL( EL ) * 100.0
+                  CALL MSG_SETR( 'FRAC', FRAC )
+                  CALL MSG_SETI( 'NERR', NERR )
+                  CALL CCD1_MSG( ' ',
      :' Warning - ^NERR numeric errors (^FRAC%% of total ) occurred'//
      :' when expanding input ADUs to electrons' , STATUS )
-               IF ( FRAC .GT. 0.5 ) THEN
+                  IF ( FRAC .GT. 0.5 ) THEN
 
 *  Serious warning.
-                  CALL MSG_SETC( 'TYPE', ITYPE )
-                  CALL CCD1_MSG( ' ',
+                     CALL MSG_SETC( 'TYPE', ITYPE )
+                     CALL CCD1_MSG( ' ',
      :' Warning - large amounts of output data cannot be'//
      :' represented within the range of the chosen data type ^TYPE',
      : STATUS )
+                  END IF
                END IF
-            END IF
 
 *  Set the units title
-            CALL NDF_CPUT( 'ELECTRONS', IDOUT, 'UNITS', STATUS )
+               CALL NDF_CPUT( 'ELECTRONS', IDOUT, 'UNITS', STATUS )
 
 *  Variance needs modification also - only if we're generating variances
 *  or have some to propagate.
-            IF ( GENVAR .OR. ( HAVIV .AND. .NOT. GENVAR ) ) THEN
-               CALL CCD1_CMULT( BAD, ITYPE, IPOVAR, EL, ADC * ADC,
-     :                          IPWRK, NERR, STATUS )
-            END IF
+               IF ( GENVAR .OR. ( HAVIV .AND. .NOT. GENVAR ) ) THEN
+                  CALL CCD1_CMULT( BAD, ITYPE, IPOVAR, EL, ADC * ADC,
+     :                             IPWRK, NERR, STATUS )
+               END IF
 
 *  Saturation value requires modification, from the pre-expanded value.
-            IF( SETSAT ) SATVAL = ADC * SATVAL
-         END IF
+               IF( SETSAT ) SATVAL = ADC * SATVAL
+            END IF
 
 *  Report progress in this section.
-         CALL CCD1_REXP( EXPAND, SATUR, SETSAT, SATVAL, EXTSAT,
-     :                   NSAT, DEFER, EXTDEF, STATUS )
+            CALL CCD1_REXP( EXPAND, SATUR, SETSAT, SATVAL, EXTSAT,
+     :                      NSAT, DEFER, EXTDEF, STATUS )
 
 ************************************************************************
 *  TRIM SECTION
 ************************************************************************
 *  Get the section extents for the useful output area.
-         CALL CCD1_GTSEC( USEEXT, IDIN, LBND, UBND, LBNDS, UBNDS,
-     :                    EXTSEC, STATUS )
+            CALL CCD1_GTSEC( USEEXT, IDIN, LBND, UBND, LBNDS, UBNDS,
+     :                       EXTSEC, STATUS )
 
 *  Unmap everything in the current output NDF. Some form of conflict
 *  occurs on propagation.
-         CALL NDF_UNMAP( IDOUT, '*', STATUS )
+            CALL NDF_UNMAP( IDOUT, '*', STATUS )
 
 *  Set a section of this size on the temporary output NDF
-         CALL NDF_SECT( IDOUT, 2, LBNDS, UBNDS, IDSUB, STATUS )
+            CALL NDF_SECT( IDOUT, 2, LBNDS, UBNDS, IDSUB, STATUS )
 
 *  Propagate this section to the output NDF.
-         CALL NDG_NDFPR( IDSUB, 'Data,Variance,Quality,Axis,Units,WCS',
-     :                   GIDOUT, INDEX, IDSOUT, STATUS )
+            CALL NDG_NDFPR( IDSUB, 
+     :                      'Data,Variance,Quality,Axis,Units,WCS',
+     :                      GIDOUT, INDEX, IDSOUT, STATUS )
 
 ************************************************************************
 *  BAD PIXELS, OUTPUT DATA TYPE, TITLE, EXTENSION UPDATE.
 ************************************************************************
 *  Set output arrays components BAD flag
-         CALL NDF_SBAD( BAD, IDSOUT, 'Data,Variance', STATUS )
+            CALL NDF_SBAD( BAD, IDSOUT, 'Data,Variance', STATUS )
 
 *  Set title of output NDF, propagating it if requested.
-         CALL NDF_CINP( 'TITLE', IDSOUT, 'TITLE', STATUS )
+            CALL NDF_CINP( 'TITLE', IDSOUT, 'TITLE', STATUS )
 
 *  Set the BADBITS mask value if this option has been used.
-         IF ( GOTMSK .AND. HAVBIT ) THEN
-            CALL NDF_SBB( BBYTE, IDSOUT, STATUS )
-         END IF
+            IF ( GOTMSK .AND. HAVBIT ) THEN
+               CALL NDF_SBB( BBYTE, IDSOUT, STATUS )
+            END IF
 
 *  Record the current saturation value in the CCDPACK extension.
-         IF ( SETSAT ) THEN
-            CALL CCG1_STO0D( IDSOUT, 'SATVAL', SATVAL, STATUS )
-         END IF
+            IF ( SETSAT ) THEN
+               CALL CCG1_STO0D( IDSOUT, 'SATVAL', SATVAL, STATUS )
+            END IF
 
 *  Offer the option to set the origin of the NDF to 1,1.
-         CALL PAR_GET0L( 'FIXORIGIN', FORI, STATUS )
-         IF ( FORI ) THEN 
-            SHIFT( 1 ) = 1 - LBNDS( 1 )
-            SHIFT( 2 ) = 1 - LBNDS( 2 )
-            CALL NDF_SHIFT( 2, SHIFT, IDSOUT, STATUS )
-         END IF
+            CALL PAR_GET0L( 'FIXORIGIN', FORI, STATUS )
+            IF ( FORI ) THEN 
+               SHIFT( 1 ) = 1 - LBNDS( 1 )
+               SHIFT( 2 ) = 1 - LBNDS( 2 )
+               CALL NDF_SHIFT( 2, SHIFT, IDSOUT, STATUS )
+            END IF
 
 *  Final report on output section, name of output NDF and data type.
-         CALL CCD1_REND( LBND, UBND, LBNDS, UBNDS, EXTSEC, ITYPE,
-     :                   IDSOUT, FORI, STATUS )
+            CALL CCD1_REND( LBND, UBND, LBNDS, UBNDS, EXTSEC, ITYPE,
+     :                      IDSOUT, FORI, STATUS )
 
 *  Write terminator for Processing NDF: message.
-         IF ( DELETE ) CALL CCD1_MSG( ' ',
-     :                 '  Input NDF deleted**',STATUS )
-         CALL CCD1_MSG( ' ', '  ---',STATUS )
+            CALL CCD1_MSG( ' ', '  ---',STATUS )
 
 ************************************************************************
 *  NDF tidying up close input and output container files.
 ************************************************************************
 *  Touch the output NDF to leave an audit-like trail showing that this
 *  NDF has been debiassed.
-         CALL CCD1_TOUCH( IDSOUT, 'DEBIAS', STATUS )
+            CALL CCD1_TOUCH( IDSOUT, 'DEBIAS', STATUS )
 
-*  Delete the input NDF if required.
-         IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
-            CALL NDF_DELET( IDIN, STATUS )
-         ELSE
-
-*  Just release the NDF.
+*  Release the NDF.
             CALL NDF_UNMAP( IDIN, '*', STATUS )
             CALL NDF_ANNUL( IDIN, STATUS )
-         END IF
 
 *  Release the output NDFs.
-         CALL NDF_ANNUL( IDOUT, STATUS )
-         CALL NDF_ANNUL( IDSUB, STATUS )
-         CALL NDF_ANNUL( IDSOUT, STATUS )
+            CALL NDF_ANNUL( IDOUT, STATUS )
+            CALL NDF_ANNUL( IDSUB, STATUS )
+            CALL NDF_ANNUL( IDSOUT, STATUS )
 
 *  Reset the REMAP flag to false, if a condition occurs requiring the
 *  trimming etc of the bias and mask frames, this will explicitly change
 *  the flag.
-         REMAP = .FALSE.
-         ITYPEL = ITYPE
+            REMAP = .FALSE.
+            ITYPEL = ITYPE
 
 *  Store the current NDF bounds.
-         LBNDL( 1 ) = LBND( 1 )
-         LBNDL( 2 ) = LBND( 2 )
-         UBNDL( 1 ) = UBND( 1 )
-         UBNDL( 2 ) = UBND( 2 )
+            LBNDL( 1 ) = LBND( 1 )
+            LBNDL( 2 ) = LBND( 2 )
+            UBNDL( 1 ) = UBND( 1 )
+            UBNDL( 2 ) = UBND( 2 )
 
 ************************************************************************
 * End of main processing loop. Jump out if BAD status. Saves lots of
 * loops.
 ************************************************************************
-         IF ( STATUS .NE. SAI__OK ) GO TO 999
+            IF ( STATUS .NE. SAI__OK ) GO TO 999
 99999 CONTINUE
+      END DO
+
+*  Delete input NDFs if so requested to do so.
+      IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '   *** Deleting input NDFs.', STATUS )
+         DO I = 1, NTOT
+            CALL NDG_NDFAS( INGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL NDF_DELET( IDIN, STATUS )
+         END DO
+      END IF
 
 ************************************************************************
 *  Tidying up section.
@@ -1386,6 +1482,13 @@
 *  Release group resources.
       CALL CCD1_GRDEL( GIDIN, STATUS )
       CALL CCD1_GRDEL( GIDOUT, STATUS )
+      CALL CCD1_GRDEL( INGRP, STATUS )
+      CALL CCD1_GRDEL( OUTGRP, STATUS )
+      CALL CCD1_GRDEL( KEYGRP, STATUS )
+      CALL CCD1_GRDEL( BIAGRP, STATUS )
+      DO I = 1, MIN( NSUB, CCD1__MXNDF )
+         CALL CCD1_GRDEL( SUBGRP( I ), STATUS )
+      END DO
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

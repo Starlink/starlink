@@ -33,9 +33,12 @@
 *        Name of the image which contains the normalised (mean of one)
 *        flatfield data. This should have been produced by a program 
 *        such as MAKEFLAT. The data should have a floating point HDS 
-*        data type (_REAL or _DOUBLE).
-*        The name of this file may be specified using indirection
-*        through a file.
+*        data type (_REAL or _DOUBLE).  If USESET is true, FLAT should
+*        be a group expression referring to one flatfield data file
+*        matching each of the Set Index attributes represented in the 
+*        IN list; again the name of the file produced by MAKEFLAT will 
+*        normally be suitable.  The name of this file may be specified
+*        using indirection through a file.
 *        [Global flatfield]
 *     IN = LITERAL (Read)
 *        Names of the images containing the data which are to have the
@@ -131,6 +134,17 @@
 *     TITLE = LITERAL (Read)
 *        Title for the output images.
 *        [Output from FLATCOR]
+*     USESET = _LOGICAL (Read)
+*        Whether to use Set header information or not.  If USESET is
+*        false then any Set header information will be ignored. 
+*        If USESET is true, then the FLAT parameter is taken to 
+*        refer to a group of files, and each IN file will be processed
+*        using a flatfield dataset with a Set Index attribute which
+*        matches its own.  An IN file with no Set header is considered
+*        to match a FLAT file with no Set header, so USESET can safely
+*        be set true (the default) when the input files contain no 
+*        Set header information.
+*        [TRUE]
 
 *  Examples:
 *     flatcor frame1 frame1_f flatr
@@ -212,6 +226,8 @@
 *        Modified to propagate WCS component.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     9-FEB-2001 (MBT):
+*        Upgraded for use with Sets.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -227,6 +243,7 @@
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
       INCLUDE 'DAT_PAR'          ! HDS DAT constants
       INCLUDE 'NDF_PAR'          ! NDF string sizes
+      INCLUDE 'GRP_PAR'          ! Standard GRP constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -238,37 +255,46 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
-      CHARACTER * ( 6 ) ACCESS   ! Access mode for NDFs
       CHARACTER * ( CCD1__NMLEN ) DFILT ! Filter type of data 
       CHARACTER * ( CCD1__NMLEN ) FILTER ! Filter type of flatfield
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Input data type.
       CHARACTER * ( NDF__SZTYP ) FTYPE ! Flatfield data type.
       DOUBLE PRECISION SATVAL    ! Saturation value
       INTEGER EL                 ! Number of elements in input array components
+      INTEGER FLTGRP             ! NDG identifier for flatfield NDFs
       INTEGER GIDIN              ! Group identifier for input NDFs
       INTEGER GIDOUT             ! Group identifier for output NDFs
+      INTEGER I                  ! Loop index
       INTEGER IDFLT              ! Input NDF identifier (flatfield)
       INTEGER IDFTMP             ! NDF identifier for flatfield section
       INTEGER IDIN               ! Input NDF identifier
       INTEGER IDOUT              ! Output NDF identifier
       INTEGER INDEX              ! Counter for NDF processing loop
+      INTEGER INGRP              ! NDG identifier for all input NDFs
       INTEGER IPDFLT             ! Pointer to input Data component (ff)
       INTEGER IPDIN              ! Pointer to input Data component
       INTEGER IPDOUT             ! Pointer to output Data component
       INTEGER IPVFLT             ! Pointer to input Variance component (ff)
       INTEGER IPVIN              ! Pointer to input Variance component
       INTEGER IPVOUT             ! Pointer to output Data component
+      INTEGER ISUB               ! Subgroup loop index
       INTEGER IVAL               ! Dummy
+      INTEGER KEYGRP             ! GRP identifier for subgroup keys
       INTEGER LBND( 2 )          ! Lower of bounds of input NDF
       INTEGER LBNDC( 2 )         ! Lower bounds of calibration NDF.
       INTEGER LBNDL( 2 )         ! Lower bounds of last NDF
       INTEGER NDIM               ! Number of dimensions of NDFs
-      INTEGER NNDF               ! Number of NDFs to process
+      INTEGER NNDF               ! Number of NDFs in subgroup
+      INTEGER NSUB               ! Number of subgroups
+      INTEGER NTOT               ! Total number of NDFs to process
+      INTEGER OUTGRP             ! GRP identifier for output NDFs
+      INTEGER SUBGRP( CCD1__MXNDF ) ! NDG identifiers for subgroups of NDFs
       INTEGER UBND( 2 )          ! Upper bounds of input NDF
       INTEGER UBNDC( 2 )         ! Upper bounds of calibration NDF.
       INTEGER UBNDL( 2 )         ! Upper bounds of last NDF
       LOGICAL BAD                ! Set if BAD values are present
       LOGICAL DELETE             ! Delete input NDFs
+      LOGICAL EXTSAT             ! Saturation value from NDF extension
       LOGICAL FCHECK             ! Whether to check filter types or not
       LOGICAL HAVDV              ! Set if have variance component
       LOGICAL HAVFV              ! Set if have variance component (ff)
@@ -277,7 +303,7 @@
       LOGICAL PRESER             ! Set if the input type is to be preserved
       LOGICAL REMAP              ! Controls re-mapping of flatfield
       LOGICAL SETSAT             ! Set if have saturated values
-      LOGICAL EXTSAT             ! Saturation value from NDF extension
+      LOGICAL USESET             ! Are we using Sets?
 
 *.
 
@@ -286,6 +312,18 @@
 
 *  Startup log file system, write introduction.
       CALL CCD1_START( 'FLATCOR', STATUS )
+
+*  Initialise GRP identifiers, so that a later call of CCD1_GRDEL on
+*  an uninitialised group cannot cause trouble.
+      GIDIN = GRP__NOID
+      GIDOUT = GRP__NOID
+      INGRP = GRP__NOID
+      OUTGRP = GRP__NOID
+      KEYGRP = GRP__NOID
+      FLTGRP = GRP__NOID
+      DO I = 1, CCD1__MXNDF
+         SUBGRP( I ) = GRP__NOID
+      END DO
 
 *  See if the user wants to save disk space by deleting the input NDFs
 *  when DEBIAS is finished with them. This will use the NDF_DELET
@@ -296,294 +334,340 @@
       CALL PAR_GET0L( 'KEEPIN', DELETE, STATUS )
       DELETE = .NOT. DELETE
 
-*  Set access mode for NDFs.
-      IF ( DELETE ) THEN
-         ACCESS = 'UPDATE'
-      ELSE
-         ACCESS = 'READ'
-      END IF
-
 *  Access an NDG group containing a list of NDF names.
       CALL NDF_BEGIN
-      CALL CCD1_NDFGR( 'IN', GIDIN, NNDF, STATUS )
+      CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, INGRP, NTOT, STATUS )
 
-*  Ask for a flatfield NDF. Check for its variance also.
-      CALL CCD1_NDFAC( 'FLAT', 'READ', 1, 1, IVAL, IDFLT, STATUS )
-      CALL NDF_STATE( IDFLT, 'Variance', HAVFV, STATUS )
+*  Find out if we are using Set header information.
+      CALL PAR_GET0L( 'USESET', USESET, STATUS )
+
+*  Split the group of input NDFs up by Set Index if necessary.
+      NSUB = 1
+      IF ( USESET ) THEN
+         CALL CCD1_SETSP( INGRP, 'INDEX', CCD1__MXNDF, SUBGRP, NSUB,
+     :                    KEYGRP, STATUS )
+      ELSE
+         SUBGRP( 1 ) = INGRP
+         KEYGRP = GRP__NOID
+      END IF
+
+*  Ask for a flatfield NDF, or a group of NDFs matching the Set Index
+*  attributes that we have.
+      IF ( USESET ) THEN
+         CALL CCD1_NDFMI( 'FLAT', KEYGRP, FLTGRP, STATUS )
+      ELSE
+         CALL CCD1_NDFGL( 'FLAT', 1, 1, FLTGRP, IVAL, STATUS )
+      END IF
+
+*  Get a group of NDF names for the outputs.  Use the input names as
+*  a modification list.
+      CALL CCD1_NDFPG( 'OUT', INGRP, NTOT, OUTGRP, STATUS )
+
+*  Loop over subgroups performing the calculations separately for each
+*  one.
+      DO ISUB = 1, NSUB
+
+*  Write a header unless this is the only subgroup.
+         IF ( NSUB .GT. 1 ) THEN
+            CALL CCD1_SETHD( KEYGRP, ISUB, 'Applying flat correction',
+     :                       'Index', STATUS )
+         END IF
+
+*  Set up the group of input NDFs for this subgroup.
+         GIDIN = SUBGRP( ISUB )
+         CALL GRP_GRPSZ( GIDIN, NNDF, STATUS )
+
+*  Set up the group of output NDFs for this subgroup.
+         CALL CCD1_ORDG( INGRP, OUTGRP, GIDIN, GIDOUT, STATUS )
+
+*  Get the flat field NDF identifier for this subgroup.
+         CALL NDG_NDFAS( FLTGRP, ISUB, 'READ', IDFLT, STATUS )
+
+*  Check for the flatfield's variance.
+         CALL NDF_STATE( IDFLT, 'Variance', HAVFV, STATUS )
 
 *  Check that the type of the input NDF is recognised by this
 *  application
-      CALL CCD1_CKTYP( IDFLT, 1, 'MASTER_FLAT', STATUS )
+         CALL CCD1_CKTYP( IDFLT, 1, 'MASTER_FLAT', STATUS )
 
 *  Get the filter type of the calibration frame. It is OK for this not
 *  to be present. If it is present then checks will be made to make sure
 *  that the data to be flatfielded also have this filter.
-      CALL CCG1_FCH0C( IDFLT, 'FILTER', FILTER, FCHECK, STATUS )
-      IF ( .NOT. FCHECK ) FILTER = ' '
+         CALL CCG1_FCH0C( IDFLT, 'FILTER', FILTER, FCHECK, STATUS )
+         IF ( .NOT. FCHECK ) FILTER = ' '
 
 *  Get the bounds of the flatfield.
-      CALL NDF_BOUND( IDFLT, 2, LBNDC, UBNDC, NDIM, STATUS )
+         CALL NDF_BOUND( IDFLT, 2, LBNDC, UBNDC, NDIM, STATUS )
 
 *  Get the data type of the flatfield.
-      CALL NDF_TYPE( IDFLT, 'Data,Variance', FTYPE, STATUS )
+         CALL NDF_TYPE( IDFLT, 'Data,Variance', FTYPE, STATUS )
 
 *  Check that it's valid. Must be floating point. If it's not then issue
 *  a warning and set the type to _REAL.
-      IF ( FTYPE .NE. '_REAL' .AND. FTYPE .NE. '_DOUBLE' ) THEN
-         CALL MSG_SETC( 'FTYPE', FTYPE )
-         CALL CCD1_MSG( ' ',
+         IF ( FTYPE .NE. '_REAL' .AND. FTYPE .NE. '_DOUBLE' ) THEN
+            CALL MSG_SETC( 'FTYPE', FTYPE )
+            CALL CCD1_MSG( ' ',
      :' Warning - flatfield does not have an appropriate type'//
      :' (^FTYPE). Data accessed using a type of _REAL', STATUS )
-         FTYPE = '_REAL'
-      END IF
-
-*  Access a second list of NDF names for the outputs. Use the input
-*  names as a modification list.
-      CALL CCD1_NDFPG( 'OUT', GIDIN, NNDF, GIDOUT, STATUS )
+            FTYPE = '_REAL'
+         END IF
 
 *  Begin processing loop.
-      DO 99999 INDEX = 1, NNDF
+         DO 99999 INDEX = 1, NNDF
 
 *  Get the input NDF identifier
-         CALL NDG_NDFAS( GIDIN, INDEX, ACCESS, IDIN, STATUS )
+            CALL NDG_NDFAS( GIDIN, INDEX, 'READ', IDIN, STATUS )
 
 *  Check for presence of a variance component.
-         CALL NDF_STATE( IDIN, 'Variance', HAVDV, STATUS )
+            CALL NDF_STATE( IDIN, 'Variance', HAVDV, STATUS )
 
 *  If this input NDF has no variance component then switch off the
 *  calibration frame variance if it exists.
-         IF ( .NOT. HAVDV ) THEN
-            HAVFV2 = .FALSE.
-         ELSE
-            HAVFV2 = HAVFV
-         END IF
+            IF ( .NOT. HAVDV ) THEN
+               HAVFV2 = .FALSE.
+            ELSE
+               HAVFV2 = HAVFV
+            END IF
 
 *  Write out name of this NDF.
-         CALL CCD1_MSG( ' ',  ' ', STATUS )
-         CALL NDF_MSG( 'CURRENT_NDF', IDIN )
-         CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
-     :                  STATUS )
+            CALL CCD1_MSG( ' ',  ' ', STATUS )
+            CALL NDF_MSG( 'CURRENT_NDF', IDIN )
+            CALL CCD1_MSG( ' ', '  +++ Processing NDF: ^CURRENT_NDF',
+     :                     STATUS )
 
 *  Inform user how many NDFs we've processed out of the total number.
-         CALL MSG_SETI( 'CURRENT_NUM', INDEX )
-         CALL MSG_SETI( 'MAX_NUM', NNDF )
-         CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
-     :                  STATUS )
+            CALL MSG_SETI( 'CURRENT_NUM', INDEX )
+            CALL MSG_SETI( 'MAX_NUM', NNDF )
+            CALL CCD1_MSG( ' ', '  (Number ^CURRENT_NUM of ^MAX_NUM)',
+     :                     STATUS )
 
 *  Check that this is the sort of frame we would like to correct in this
 *  fashion. This means that it must have been debiassed and have a frame
 *  type of TARGET.
-          CALL CCD1_CKFLC( IDIN, STATUS )
+            CALL CCD1_CKFLC( IDIN, STATUS )
 
 *  Look for a filter type. Compare this with the type of the master
 *  calibration frame.
-         IF ( FCHECK ) THEN 
-            CALL CCG1_FCH0C( IDIN, 'FILTER', DFILT, OK, STATUS )
-            IF ( .NOT. OK ) THEN
+            IF ( FCHECK ) THEN 
+               CALL CCG1_FCH0C( IDIN, 'FILTER', DFILT, OK, STATUS )
+               IF ( .NOT. OK ) THEN
 
 *  Failed to match the filter types.
-               CALL CCD1_MSG( ' ', ' Warning - failed to locate a '//
+                  CALL CCD1_MSG( ' ', ' Warning - failed to locate a '//
      :'filter type; cannot check against flatfield filter', STATUS )
-            ELSE IF ( .NOT. CHR_SIMLR( FILTER, DFILT ) ) THEN
+               ELSE IF ( .NOT. CHR_SIMLR( FILTER, DFILT ) ) THEN
 
 *  Filter specifications do not match. Could be a serious problem.
-               CALL MSG_SETC( 'DFILT', DFILT )
-               CALL MSG_SETC( 'FILTER', FILTER )
-               CALL CCD1_MSG( ' ', ' Warning - filter type (^DFILT)'//
-     :' does not match flatfield (^FILTER)', STATUS )
+                  CALL MSG_SETC( 'DFILT', DFILT )
+                  CALL MSG_SETC( 'FILTER', FILTER )
+                  CALL CCD1_MSG( ' ', ' Warning - filter type'//
+     :' (^DFILT) does not match flatfield (^FILTER)', STATUS )
+               END IF
             END IF
-         END IF
 
 *  Get the bounds of the input NDF.
-         CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
+            CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
 
 *  If the size of the input NDF has changed from the last NDF, then we
 *  require a re-trimming of the calibration frame. Trim anyway if this
 *  is the first loop.
-         IF ( INDEX .EQ. 1 ) THEN
-            REMAP = .TRUE.
-         ELSE
-            IF ( LBND( 1 ) .NE. LBNDL( 1 ) .OR.
-     :           UBND( 1 ) .NE. UBNDL( 1 ) .OR.
-     :           LBND( 2 ) .NE. LBNDL( 2 ) .OR.
-     :           UBND( 2 ) .NE. UBNDL( 2 ) ) THEN
+            IF ( INDEX .EQ. 1 ) THEN
                REMAP = .TRUE.
             ELSE
+               IF ( LBND( 1 ) .NE. LBNDL( 1 ) .OR.
+     :              UBND( 1 ) .NE. UBNDL( 1 ) .OR.
+     :              LBND( 2 ) .NE. LBNDL( 2 ) .OR.
+     :              UBND( 2 ) .NE. UBNDL( 2 ) ) THEN
+                  REMAP = .TRUE.
+               ELSE
 
 *  No change in bonds re-mapping may not be necessary.
-               REMAP = .FALSE.
+                  REMAP = .FALSE.
+               END IF
             END IF
-         END IF
 
 *  Check the bounds of the flatfield against those of the
 *  current input NDF. If the bounds are not the same as those of the
 *  input NDF then trimming will occur.
-         IF ( LBND( 1 ) .NE. LBNDC( 1 ) .OR.
-     :        UBND( 1 ) .NE. UBNDC( 1 ) .OR.
-     :        LBND( 2 ) .NE. LBNDC( 2 ) .OR.
-     :        UBND( 2 ) .NE. UBNDC( 2 ) ) THEN
-            REMAP = .TRUE.
+            IF ( LBND( 1 ) .NE. LBNDC( 1 ) .OR.
+     :           UBND( 1 ) .NE. UBNDC( 1 ) .OR.
+     :           LBND( 2 ) .NE. LBNDC( 2 ) .OR.
+     :           UBND( 2 ) .NE. UBNDC( 2 ) ) THEN
+               REMAP = .TRUE.
 
 *  Issue warning about this, in general it should be a mistake.
-            CALL MSG_OUT( 'BAD_BOUNDS',
-     :      ' Warning - FLATFIELD bounds do not match input NDF'
-     :      , STATUS )
-         END IF
+               CALL MSG_OUT( 'BAD_BOUNDS',
+     :         ' Warning - FLATFIELD bounds do not match input NDF'
+     :         , STATUS )
+            END IF
 
 *  Determine the type of the input NDF. It will be processed in this
 *  type unless preserve is set true, in which case a floating point data
 *  type will be used.
-         CALL PAR_GET0L( 'PRESERVE', PRESER, STATUS )
+            CALL PAR_GET0L( 'PRESERVE', PRESER, STATUS )
 
 *  Get the input data type.
-         CALL NDF_TYPE( IDIN, 'Data,Variance', DTYPE, STATUS )
+            CALL NDF_TYPE( IDIN, 'Data,Variance', DTYPE, STATUS )
 
 *  If not preserving then determine a suitable floating point
 *  representation..
-         IF ( .NOT. PRESER ) THEN
-            IF ( ( DTYPE .EQ. '_UBYTE' )  .OR.
-     :           ( DTYPE .EQ. '_BYTE'  )  .OR.
-     :           ( DTYPE .EQ. '_WORD'  )  .OR.
-     :           ( DTYPE .EQ. '_UWORD' )  .OR.
-     :           ( DTYPE .EQ. '_REAL'  ) )    THEN
+            IF ( .NOT. PRESER ) THEN
+               IF ( ( DTYPE .EQ. '_UBYTE' )  .OR.
+     :              ( DTYPE .EQ. '_BYTE'  )  .OR.
+     :              ( DTYPE .EQ. '_WORD'  )  .OR.
+     :              ( DTYPE .EQ. '_UWORD' )  .OR.
+     :              ( DTYPE .EQ. '_REAL'  ) )    THEN
 
 *  Single precision enough use this.
-               DTYPE = '_REAL'
-            ELSE
+                  DTYPE = '_REAL'
+               ELSE
 
 *  Need a double precision representation (for _DOUBLE or _INTEGER)
-               DTYPE = '_DOUBLE'
+                  DTYPE = '_DOUBLE'
+               END IF
             END IF
-         END IF
 
 *  Re-mapping decisions complete, unmap the old flatfield section
 *  and annul the identifier.
-         IF ( REMAP ) THEN
+            IF ( REMAP ) THEN
 
 *  If not the first loop unmap the calibration data.
-            IF ( INDEX .NE. 1 ) THEN
-               CALL NDF_UNMAP( IDFTMP, '*', STATUS )
-               CALL NDF_ANNUL( IDFTMP, STATUS )
-            END IF
+               IF ( INDEX .NE. 1 ) THEN
+                  CALL NDF_UNMAP( IDFTMP, '*', STATUS )
+                  CALL NDF_ANNUL( IDFTMP, STATUS )
+               END IF
 
 *  Get a clone of the flatfield identifier, this ensures
 *  that a valid copy of the input NDF identifier is always used.
 *  NDF_MBND annuls the input identifiers and replaces them with the
 *  section ones.
-            CALL NDF_CLONE( IDFLT, IDFTMP, STATUS )
+               CALL NDF_CLONE( IDFLT, IDFTMP, STATUS )
 
 *  Trim the data to match bounds.
-            CALL NDF_MBND( 'TRIM', IDIN, IDFTMP, STATUS )
-         END IF
+               CALL NDF_MBND( 'TRIM', IDIN, IDFTMP, STATUS )
+            END IF
 
 *  Merge the BAD pixel flags.
-         CALL NDF_MBAD( .TRUE., IDIN, IDFTMP, 'Data,Variance', .FALSE.,
-     :                  BAD, STATUS )
+            CALL NDF_MBAD( .TRUE., IDIN, IDFTMP, 'Data,Variance',
+     :                     .FALSE., BAD, STATUS )
 
 *  Get a name for the output NDF. Propagate everything except the Data.
 *  If the variance is only available for the input NDF then it is
 *  propagated unchanged as a best estimate.
-         CALL NDG_NDFPR( IDIN, 'Axis,Quality,Variance,WCS', GIDOUT,
-     :                   INDEX, IDOUT, STATUS )
+            CALL NDG_NDFPR( IDIN, 'Axis,Quality,Variance,WCS', GIDOUT,
+     :                      INDEX, IDOUT, STATUS )
 
 *  Make sure that output data is in the intended type.
-         CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
+            CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )
 
 *  Map in the flatfield data at the processing precision, if required.
 *  Note using new strategy of mapping permanent data first, helps stop
 *  virtual address space fragmentation.
-         IF ( REMAP ) THEN
-            CALL NDF_MAP( IDFTMP, 'Data', FTYPE, 'READ', IPDFLT, EL,
-     :                    STATUS )
-            IF ( HAVFV2 ) CALL NDF_MAP( IDFTMP, 'Variance', FTYPE,
-     :                                  'READ', IPVFLT, EL, STATUS )
-         END IF
+            IF ( REMAP ) THEN
+               CALL NDF_MAP( IDFTMP, 'Data', FTYPE, 'READ', IPDFLT, EL,
+     :                       STATUS )
+               IF ( HAVFV2 ) CALL NDF_MAP( IDFTMP, 'Variance', FTYPE,
+     :                                     'READ', IPVFLT, EL, STATUS )
+            END IF
 
 *  Map in all the data at the processing precision.(Volatile)
-         CALL NDF_MAP( IDIN, 'Data', DTYPE, 'READ', IPDIN, EL, STATUS )
-         IF ( HAVDV ) CALL NDF_MAP( IDIN, 'Variance', DTYPE, 'READ',
-     :                              IPVIN, EL, STATUS )
+            CALL NDF_MAP( IDIN, 'Data', DTYPE, 'READ', IPDIN, EL,
+     :                    STATUS )
+            IF ( HAVDV ) CALL NDF_MAP( IDIN, 'Variance', DTYPE, 'READ',
+     :                                 IPVIN, EL, STATUS )
 
 *  Map in the outputs at this precision also. Note the output variance
 *  is not propagated if does not exist. (Volatile)
-         CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
-     :                 STATUS )
-         IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE, 'WRITE',
-     :                              IPVOUT, EL, STATUS )
+            CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
+     :                    STATUS )
+            IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE, 
+     :                                 'WRITE', IPVOUT, EL, STATUS )
 
 *  Look at the CCDPACK extension and see if a saturation _value_ has
 *  been applied (instead of using BAD values). If it has then extract
 *  the value.
-         CALL CCG1_FCH0D( IDIN, 'SATVAL', SATVAL, SETSAT, STATUS )
-         EXTSAT = SETSAT
-         IF ( .NOT. SETSAT ) THEN
+            CALL CCG1_FCH0D( IDIN, 'SATVAL', SATVAL, SETSAT, STATUS )
+            EXTSAT = SETSAT
+            IF ( .NOT. SETSAT ) THEN
 
 *  Find out if a saturation value has been applied by some other route.
-            CALL PAR_GET0L( 'SETSAT', SETSAT, STATUS )
+               CALL PAR_GET0L( 'SETSAT', SETSAT, STATUS )
 
 *  If saturation has been applied at what value?
-            IF ( SETSAT ) THEN
-               CALL PAR_GET0D( 'SATURATION', SATVAL, STATUS )
+               IF ( SETSAT ) THEN
+                  CALL PAR_GET0D( 'SATURATION', SATVAL, STATUS )
+               END IF
             END IF
-         END IF
 
 *  Do the actual processing.
-         CALL CCD1_FFCOR( FTYPE, DTYPE, BAD, EL, IPDIN, IPVIN, IPDFLT,
-     :                    IPVFLT, HAVDV, HAVFV2, SETSAT, SATVAL,
-     :                    IPDOUT, IPVOUT, STATUS )
+            CALL CCD1_FFCOR( FTYPE, DTYPE, BAD, EL, IPDIN, IPVIN,
+     :                       IPDFLT, IPVFLT, HAVDV, HAVFV2, SETSAT,
+     :                       SATVAL, IPDOUT, IPVOUT, STATUS )
 
 *  Set BAD flag.
-         CALL NDF_SBAD( BAD, IDOUT, 'Data,Variance', STATUS )
+            CALL NDF_SBAD( BAD, IDOUT, 'Data,Variance', STATUS )
 
 *  Output title.
-         CALL NDF_CINP( 'TITLE', IDOUT, 'TITLE', STATUS )
+            CALL NDF_CINP( 'TITLE', IDOUT, 'TITLE', STATUS )
 
 *  Report this loop.
-         CALL CCD1_RFCR( IDFTMP, SETSAT, SATVAL, EXTSAT, IDOUT, FTYPE,
-     :                   DTYPE, STATUS )
+            CALL CCD1_RFCR( IDFTMP, SETSAT, SATVAL, EXTSAT, IDOUT,
+     :                      FTYPE, DTYPE, STATUS )
 
 *  Set extension item showing that FLATCOR has run.
-         CALL CCD1_TOUCH( IDOUT, 'FLATCOR', STATUS )
+            CALL CCD1_TOUCH( IDOUT, 'FLATCOR', STATUS )
 
 *  Write terminator for Processing NDF: message.
-         IF ( DELETE ) CALL CCD1_MSG( ' ',
-     :                 '  Input NDF deleted**',STATUS )
-         CALL CCD1_MSG( ' ', '  ---',STATUS )
+            CALL CCD1_MSG( ' ', '  ---',STATUS )
 
-*  Delete the input NDF if required.
-         IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
-            CALL NDF_DELET( IDIN, STATUS )
-         ELSE
-
-*  Just release the NDF.
+*  Release the input NDF.
             CALL NDF_UNMAP( IDIN, '*', STATUS )
             CALL NDF_ANNUL( IDIN, STATUS )
-         END IF
 
 *  Release output NDF.
-         CALL NDF_UNMAP( IDOUT, '*', STATUS )
-         CALL NDF_ANNUL( IDOUT, STATUS )
+            CALL NDF_UNMAP( IDOUT, '*', STATUS )
+            CALL NDF_ANNUL( IDOUT, STATUS )
 
 *  Set re-mapping flag to default.
-         REMAP =.TRUE.
+            REMAP =.TRUE.
 
 *  Store the present size of the NDFs.
-         LBNDL( 1 ) = LBND( 1 )
-         LBNDL( 2 ) = LBND( 2 )
-         UBNDL( 1 ) = UBND( 1 )
-         UBNDL( 2 ) = UBND( 2 )
+            LBNDL( 1 ) = LBND( 1 )
+            LBNDL( 2 ) = LBND( 2 )
+            UBNDL( 1 ) = UBND( 1 )
+            UBNDL( 2 ) = UBND( 2 )
 
 *  Break out if status set BAD.
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-99999 CONTINUE
+            IF ( STATUS .NE. SAI__OK ) GO TO 99
+99999    CONTINUE
+
+      END DO
+
+*  Delete the input NDFs if so requested.
+      IF ( DELETE .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL CCD1_MSG( ' ', '  *** Deleting input NDFs.', STATUS )
+         DO I = 1, NTOT
+            CALL NDG_NDFAS( INGRP, I, 'UPDATE', IDIN, STATUS )
+            CALL NDF_DELET( IDIN, STATUS )
+         END DO
+      END IF
 
  99   CONTINUE
-*  Release calibration frame.
+
+*  Exit NDF context.
       CALL NDF_END( STATUS )
 
 *  Release group identifiers.
       CALL CCD1_GRDEL( GIDIN, STATUS )
       CALL CCD1_GRDEL( GIDOUT, STATUS )
+      CALL CCD1_GRDEL( INGRP, STATUS )
+      CALL CCD1_GRDEL( OUTGRP, STATUS )
+      CALL CCD1_GRDEL( KEYGRP, STATUS )
+      CALL CCD1_GRDEL( FLTGRP, STATUS )
+      DO I = 1, MIN( NSUB, CCD1__MXNDF )
+         CALL CCD1_GRDEL( SUBGRP( I ), STATUS )
+      END DO
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
