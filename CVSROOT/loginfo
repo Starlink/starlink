@@ -24,8 +24,8 @@
 ##DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 ##DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
-^java/source/hdx	mailx -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk P.W.Draper@durham.ac.uk aa@astro.ex.ac.uk
-^java/source/ndx	mailx -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/hds	mailx -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/util	mailx -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
-^java/source/ast	mailx -s %s M.B.Taylor@bristol.ac.uk P.W.Draper@durham.ac.uk
+^java/source/hdx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk P.W.Draper@durham.ac.uk aa@astro.ex.ac.uk
+^java/source/ndx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/hds	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/util	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
+^java/source/ast	mail -s %s M.B.Taylor@bristol.ac.uk P.W.Draper@durham.ac.uk
