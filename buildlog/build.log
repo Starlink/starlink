@@ -224,7 +224,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/classes
-    [javac] Compiling 27 source files to /apps/cvsbuild/java/source/votable/build/classes
+    [javac] Compiling 29 source files to /apps/cvsbuild/java/source/votable/build/classes
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/votable/build/classes
      [echo] Executing JAIUtil target: build
 
@@ -320,4 +320,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:409: Compile failed; see the compiler error output for details.
 
-Total time: 1 minute 5 seconds
+Total time: 45 seconds

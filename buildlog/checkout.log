@@ -8793,7 +8793,6 @@ cvs checkout: Updating java/source/topcat/src/etc/demo/wdc
 U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
 cvs checkout: Updating java/source/topcat/src/lib
 U java/source/topcat/src/lib/jel_g.jar
-U java/source/topcat/src/lib/jhall.jar
 U java/source/topcat/src/lib/plot.jar
 cvs checkout: Updating java/source/topcat/src/main
 cvs checkout: Updating java/source/topcat/src/main/uk
@@ -9308,6 +9307,7 @@ U java/source/votable/src/main/uk/ac/starlink/votable/BinaryRowStepper.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BitDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/BooleanDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/CharDecoders.java
+U java/source/votable/src/main/uk/ac/starlink/votable/CrimsonSAXDocumentBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/CustomDOMBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/DataFormat.java
 U java/source/votable/src/main/uk/ac/starlink/votable/Decoder.java
@@ -9317,6 +9317,7 @@ U java/source/votable/src/main/uk/ac/starlink/votable/LinkElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/NumericDecoder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/ParamElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/RowStepper.java
+U java/source/votable/src/main/uk/ac/starlink/votable/SAXDocumentBuilder.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableBodies.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableElement.java
 U java/source/votable/src/main/uk/ac/starlink/votable/TableStreamer.java

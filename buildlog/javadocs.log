@@ -721,12 +721,12 @@ javadocs:
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
-  [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/toolbox/TypedDecorator.java:29: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/tutorial/CompositeFigureTutorial.java:119: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/src/main/diva/canvas/tutorial/TransformedFigureTutorial.java:213: warning - The first sentence is interpreted to be:
@@ -1902,11 +1902,65 @@ javadocs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat...
   [javadoc] Constructing Javadoc information...
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:15: package javax.help does not exist
+  [javadoc] import javax.help.JHelpContentViewer;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:16: package javax.help does not exist
+  [javadoc] import javax.help.HelpSet;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:17: package javax.help does not exist
+  [javadoc] import javax.help.HelpSetException;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:18: package javax.help does not exist
+  [javadoc] import javax.help.InvalidHelpSetContextException;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:19: package javax.help does not exist
+  [javadoc] import javax.help.JHelp;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:20: package javax.help does not exist
+  [javadoc] import javax.help.JHelpTOCNavigator;
+  [javadoc]                   ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:21: package javax.help.event does not exist
+  [javadoc] import javax.help.event.HelpModelEvent;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:22: package javax.help.event does not exist
+  [javadoc] import javax.help.event.HelpModelListener;
+  [javadoc]                         ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:46: cannot resolve symbol
+  [javadoc] symbol  : class JHelp 
+  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
+  [javadoc]     private JHelp jhelp;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:47: cannot resolve symbol
+  [javadoc] symbol  : class HelpSet 
+  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
+  [javadoc]     private HelpSet hset;
+  [javadoc]             ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:148: cannot resolve symbol
+  [javadoc] symbol  : class JHelp 
+  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
+  [javadoc]     public JHelp getJHelp() {
+  [javadoc]            ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:190: cannot resolve symbol
+  [javadoc] symbol  : class JHelp 
+  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
+  [javadoc]     private void pinchHelpToolBarTools( JHelp helpComponent ) {
+  [javadoc]                                         ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java:241: cannot resolve symbol
+  [javadoc] symbol  : class JHelp 
+  [javadoc] location: class uk.ac.starlink.topcat.HelpWindow
+  [javadoc]     private static void openTOC( JHelp jhelp ) {
+  [javadoc]                                  ^
+  [javadoc] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java:25: package javax.help does not exist
+  [javadoc] import javax.help.HelpSet;
+  [javadoc]                   ^
   [javadoc] Standard Doclet version 1.4.1
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
+  [javadoc] Generating /apps/cvsbuild/java/source/topcat/docs/topcat/javadocs/stylesheet.css...
+  [javadoc] 14 warnings
      [echo] Executing Treeview target: javadocs
 
 prepare:
@@ -2850,4 +2904,4 @@ javadocs:
   [javadoc] 210 warnings
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 6 seconds
+Total time: 2 minutes 57 seconds
