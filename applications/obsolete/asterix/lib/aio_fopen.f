@@ -190,7 +190,7 @@
 
 *      If that failed, and default extension is non-blank, try that
         IF ( (STATUS .NE. SAI__OK) .AND. (ELEN.GT.0) ) THEN
-          CALL ERR_CANCL( STATUS )
+          CALL ERR_ANNUL( STATUS )
           CALL FIO_OPEN( FILE//AIO_DEFEXT(:ELEN),
      :                   ACCESS, MODE, RECSZ, FD, STATUS )
 
