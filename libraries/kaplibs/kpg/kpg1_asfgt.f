@@ -52,6 +52,8 @@
 *        Added CURPIC as a special case Domain.
 *     4-DEC-2001 (DSB):
 *        Added NDC as a special case Domain.
+*     13-AUG-2002 (DSB):
+*        Added CURNDC as a special case Domain.
 *     {enter_further_changes_here}
 
 *-
@@ -115,7 +117,8 @@
 
 *  Get the number of axes for the Frame.
          IF( DOM .EQ. 'GRAPHICS' .OR. DOM .EQ. 'BASEPIC' .OR.
-     :       DOM .EQ. 'CURPIC' .OR. DOM .EQ. 'NDC' ) THEN
+     :       DOM .EQ. 'CURPIC' .OR. DOM .EQ. 'NDC' .OR. 
+     :       DOM .EQ. 'CURNDC' ) THEN
             NAX = 2
          ELSE
             CALL PAR_GDR0I( PDIM, 2, 1, NDF__MXDIM, .FALSE., NAX, 
@@ -204,8 +207,14 @@
             CALL AST_SETC( FRM, 'Title', 'Normalised device '//
      :                     'co-ordinates.', STATUS )
 
-*  AGI picture normalized co-ordinates.
+*  AGI picture equal-scale normalized co-ordinates.
          ELSE IF( DOM .EQ. 'CURPIC' ) THEN
+            CALL AST_SETC( FRM, 'Title', 'Normalised world '//
+     :                     'co-ordinates within an AGI picture.', 
+     :                     STATUS )
+
+*  AGI picture unequal-scale normalized co-ordinates.
+         ELSE IF( DOM .EQ. 'CURNDC' ) THEN
             CALL AST_SETC( FRM, 'Title', 'Normalised world '//
      :                     'co-ordinates within an AGI picture.', 
      :                     STATUS )

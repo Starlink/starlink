@@ -115,13 +115,23 @@
 *  Determine the type of object being drawn; lines, markers or text.
       IF( ELEM .EQ. 'BORDER' .OR.
      :    ELEM .EQ. 'GRID' .OR.
+     :    ELEM .EQ. 'GRID1' .OR.
+     :    ELEM .EQ. 'GRID2' .OR.
      :    ELEM .EQ. 'CURVES' .OR.
      :    ELEM .EQ. 'TICKS' .OR.
-     :    ELEM .EQ. 'AXES' ) THEN
+     :    ELEM .EQ. 'TICKS1' .OR.
+     :    ELEM .EQ. 'TICKS2' .OR.
+     :    ELEM .EQ. 'AXES' .OR.
+     :    ELEM .EQ. 'AXIS1' .OR.
+     :    ELEM .EQ. 'AXIS2' ) THEN
          PRIM = GRF__LINE
 
       ELSE IF( ELEM .EQ. 'NUMLAB' .OR.
+     :    ELEM .EQ. 'NUMLAB1' .OR.
+     :    ELEM .EQ. 'NUMLAB2' .OR.
      :    ELEM .EQ. 'TEXTLAB' .OR.
+     :    ELEM .EQ. 'TEXTLAB1' .OR.
+     :    ELEM .EQ. 'TEXTLAB2' .OR.
      :    ELEM .EQ. 'TITLE' .OR.
      :    ELEM .EQ. 'STRINGS' ) THEN
          PRIM = GRF__TEXT
