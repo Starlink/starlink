@@ -206,9 +206,6 @@
         GOTO 99
       END IF
 
-*    Number of modified values
-      NMOD = 0
-
 *    Obtain mode from user
       MODESET=.FALSE.
       CALL USI_GET0L( 'SET', Q_SET, STATUS )
@@ -339,10 +336,17 @@
 
 *    Initialise selection array
       CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
-      IF ( MAGIC ) THEN
-        NMOD = 0
+
+*    Initialise number selected
+      IF ( .NOT. (FSEL.OR.AXSEL) ) THEN
+        CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
+        IF ( MAGIC ) THEN
+          NMOD = 0
+        ELSE
+          NMOD = NELM
+        END IF
       ELSE
-        NMOD = NELM
+        NMOD = 0
       END IF
 
 *    Select on axis values?
@@ -425,16 +429,6 @@
 *    End of ARD file selection option
       END IF
 
-*    No axis selection - assume all wanted unless MAGIC mode
-      IF ( .NOT. (FSEL.OR.AXSEL) ) THEN
-        CALL ARR_INIT1L( ( .NOT. MAGIC), NELM, %VAL(CPTR), STATUS )
-        IF ( MAGIC ) THEN
-          NMOD = 0
-        ELSE
-          NMOD = NELM
-        END IF
-      END IF
-
 *    Get data value selection
       IF ( DATSEL ) THEN
         CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
@@ -468,7 +462,7 @@
 
       END IF
 
-*  selecting on magic values
+*    Selecting on magic values
       IF ( MAGIC ) THEN
         CALL BDA_MAPDATA( DLOC, 'READ', DPTR, STATUS )
         CALL QUALITY_SETMSEL( NELM, %VAL(DPTR), %VAL(CPTR), NMOD,
