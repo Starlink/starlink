@@ -40,6 +40,8 @@
 *     11 Jan 94 : V1.7-1  Corrected use of DAT_VALID instead of DAT_STATE (DJA)
 *     27 Apr 94 : V1.7-2  Recoded to use AIO_ routines for i/o (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     18 Jan 1996 V2.0-0 (DJA):
+*        Use new USI routine
 *
 *    Type Definitions :
 *
@@ -62,6 +64,8 @@
 *
       CHARACTER*(DAT__SZLOC) 	OBJLOC          ! Object to trace
 
+      INTEGER			OBJID		   	! Object identifier
+
       LOGICAL			FULL		! Full o/p of structure arrays?
 *
 *    External references :
@@ -71,7 +75,7 @@
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER    ( VERSION = 'HTRACE Version 1.8-0' )
+        PARAMETER    ( VERSION = 'HTRACE Version 2.0-0' )
 *-
 
 *    Version number
@@ -81,7 +85,8 @@
       CALL AST_INIT()
 
 *    Get parameter values
-      CALL USI_DASSOC('INP','READ',OBJLOC,STATUS)
+      CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
+      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
 
 *    Get output channel
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
