@@ -19,14 +19,39 @@ dnl    necessary since SYS_SPECX just needs to be in one place.
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_FC
+AC_PROG_FPP
+AC_PROG_LIBTOOL
+AC_FC_LIBRARY_LDFLAGS
+AC_FC_CHECK_INTRINSICS([ SH SYSTEM ])
+AC_FC_RECL_UNIT
+AC_FC_OPEN_SPECIFIERS(readonly)
+
+AC_CHECK_HEADERS([readline/readline.h])
+AC_CHECK_HEADERS([readline/history.h])
+AC_CHECK_FUNCS([rindex index strchr strrchr])
+
+dnl    Note that we readline currently depends on termcap
+dnl    so to build with readline we need to find something in termcap
+dnl    Do not know what happens if this all changes
+AC_CHECK_LIB([termcap],[tgetnum])
+
+dnl    Need to find readline library
+dnl    Could do with a --with-readline option
+AC_CHECK_LIB([readline],[readline])
+AC_CHECK_LIB([history],[add_history])
+AC_CHECK_FUNCS([readline add_history])
+
 
 dnl    Build dependencies
-STAR_DECLARE_DEPENDENCIES([build], [hlps gsd pgplot fio psx chr ndf])
+STAR_DECLARE_DEPENDENCIES([build], [shl gsd pgplot fio psx chr ndf])
 
-dnl    Need to traverse sub directories
-AC_CONFIG_SUBDIRS([astro command exprt external fitting fv4 gen getaline graph mapdis4 mv4 plots reduce scl tek term util vms src docs])
+dnl    Need to build subdir makefiles
 
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml astro/Makefile command/Makefile exprt/Makefile external/Makefile fitting/Makefile fv4/Makefile gen/Makefile getaline/Makefile graph/Makefile mapdis4/Makefile mv4/Makefile plots/Makefile reduce/Makefile scl/Makefile tek/Makefile term/Makefile util/Makefile vms/Makefile src/Makefile])
+
+AC_CONFIG_FILES([src/TITLE])
+AC_CONFIG_FILES([getaline/getaline_link],[chmod +x getaline/getaline_link])
 
 AC_OUTPUT

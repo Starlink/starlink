@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = @subdirs@
+SUBDIRS = astro command exprt external fitting fv4 gen getaline graph \
+	mapdis4 mv4 plots reduce scl tek term util vms src
 
 
 dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES) $(COMFILES) \
