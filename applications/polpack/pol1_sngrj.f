@@ -113,6 +113,7 @@
 
 *  Local Variables:
       INTEGER I                  ! Element index
+      INTEGER IAT                ! Index of end of directtory path (unix)
       INTEGER NGOOD              ! No. of good pixels remaining
       INTEGER NREJ               ! No. of pixels rejected this iteration
       INTEGER NRES               ! No. of valid residuals
@@ -240,10 +241,17 @@
 *  If required, tell the user how many pixels were rejected from this NDF
 *  during this iteration.
          IF( ILEVEL .GT. 1 ) THEN
+
+            CALL NDG1_LASTO( NAME, '/', IAT, STATUS )
+            IF( IAT .EQ. 0 ) THEN
+               CALL MSG_SETC( 'NDF', NAME )
+            ELSE
+               CALL MSG_SETC( 'NDF', NAME( IAT + 1 : ) )
+            ENDIF
+
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_SETI( 'NREJ', NREJ )
             CALL MSG_SETI( 'NGOOD', NGOOD )
-            CALL MSG_SETC( 'NDF', NAME )
 
             CALL MSG_OUT( 'POL1_SNGRJ_MSG1', '   Iter: ^ITER  '//
      :                    'Rejected: ^NREJ  Remaining: ^NGOOD -- '//
@@ -251,7 +259,13 @@
 
 *  If required, warn the user if no good pixels remain in this NDF.
          ELSE IF( ILEVEL .GT. 0 .AND. NGOOD .EQ. 0 ) THEN
-            CALL MSG_SETC( 'NDF', NAME )
+            CALL NDG1_LASTO( NAME, '/', IAT, STATUS )
+            IF( IAT .EQ. 0 ) THEN
+               CALL MSG_SETC( 'NDF', NAME )
+            ELSE
+               CALL MSG_SETC( 'NDF', NAME( IAT + 1 : ) )
+            ENDIF
+
             CALL MSG_SETI( 'ITER', ITER )
             CALL MSG_OUT( 'POL1_SNGRJ_MSG1', '   WARNING: No usable '//
      :                    'pixels remain in ''^NDF'' after ^ITER '//
