@@ -14,6 +14,7 @@
 *     11 May 90 : V1.0-0  Original (SRD)
 *     18 May 90 : V1.2-0  Improved (SRD)
 *      8 Oct 92 : V1.7-0  Uses D.P. NAG for portability (DJA)
+*     20 Apr 95 : V1.8-0  Use new data interface (DJA)
 *
 *    Type Definitions :
 *
@@ -22,8 +23,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -31,16 +31,16 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) ILOC          ! Source time series
-      CHARACTER*(DAT__SZLOC) BLOC          ! Background time series
       REAL                   AREA          ! Area correction factor
       REAL                   PFUNC         ! Variability statistic
 
-      INTEGER                BDIMS(DAT__MXDIM)
+      INTEGER                BDIMS(ADI__MXDIM)
+      INTEGER			BFID			! Bgnd dataset id
       INTEGER                IACT, BACT    ! Area correction arrays
+      INTEGER			IFID			! Source dataset id
       INTEGER                INDIM, BNDIM,LDIM! Input dimesnionalities
-      INTEGER                IDIMS(DAT__MXDIM)
-      INTEGER                NDIMS(DAT__MXDIM)
+      INTEGER                IDIMS(ADI__MXDIM)
+      INTEGER                NDIMS(ADI__MXDIM)
       INTEGER                IDPTR, BDPTR  ! Data pointers
       INTEGER                IVPTR, BVPTR  ! Variance pointers
       INTEGER                IQPTR,BQPTR   ! Quality pointers
@@ -49,13 +49,13 @@
       INTEGER                NELM          ! Length of time series
 
       LOGICAL                IOK, BOK      ! Datasets ok?
-      LOGICAL                PRIM,BAD
+      LOGICAL                BAD
       LOGICAL                IQUALOK,BQUALOK
 *
 *    Version id :
 *
       CHARACTER*30            VERSION
-         PARAMETER           (VERSION = 'VARTEST Version 1.7-0')
+         PARAMETER           (VERSION = 'VARTEST Version 1.8-0')
 *-
 
 *    Check status.
@@ -64,17 +64,17 @@
 *    Version ID.
       CALL MSG_PRNT( VERSION )
 
-*    Initialize
-      CALL AST_INIT
+*    Initialize ASTERIX
+      CALL AST_INIT()
 
 *    Obtain data object name.
-      CALL USI_ASSOCI('INP', 'READ', ILOC, PRIM, STATUS)
-      CALL USI_ASSOCI('BACK', 'READ', BLOC, PRIM, STATUS)
+      CALL USI_TASSOCI('INP', '*', 'READ', IFID, STATUS)
+      CALL USI_TASSOCI('BACK', '*', 'READ', BFID, STATUS)
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map input data.
-      CALL BDA_CHKDATA(ILOC, IOK, INDIM, IDIMS, STATUS)
-      CALL BDA_CHKDATA(BLOC, BOK, BNDIM, BDIMS, STATUS)
+      CALL BDI_CHKDATA(IFID, IOK, INDIM, IDIMS, STATUS)
+      CALL BDI_CHKDATA(BFID, BOK, BNDIM, BDIMS, STATUS)
 
       IF ( IOK .AND. BOK ) THEN
         IF ( INDIM .NE. 1 ) THEN
@@ -93,11 +93,11 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map data
-      CALL BDA_MAPDATA( ILOC, 'READ', IDPTR, STATUS )
-      CALL BDA_MAPVAR( ILOC, 'READ', IVPTR, STATUS )
-      CALL BDA_MAPAXWID( ILOC, 'READ', 1, IWPTR, STATUS )
-      CALL BDA_MAPDATA( BLOC, 'READ', BDPTR, STATUS )
-      CALL BDA_MAPVAR( BLOC, 'READ', BVPTR, STATUS )
+      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
+      CALL BDI_MAPAXWID( IFID, 'READ', 1, IWPTR, STATUS )
+      CALL BDI_MAPDATA( BFID, 'READ', BDPTR, STATUS )
+      CALL BDI_MAPVAR( BFID, 'READ', BVPTR, STATUS )
 
 *    Get relative area factor
       CALL USI_GET0R( 'AREA', AREA, STATUS )
@@ -105,16 +105,16 @@
 
 *    Map QUALITY as a logical.
       BAD = .FALSE.
-      CALL BDA_CHKQUAL (ILOC, IQUALOK, NDIMS, LDIM, STATUS)
+      CALL BDI_CHKQUAL (IFID, IQUALOK, NDIMS, LDIM, STATUS)
       IF (IQUALOK) THEN
-        CALL BDA_MAPLQUAL(ILOC,'READ',BAD,IQPTR,STATUS)
+        CALL BDI_MAPLQUAL(IFID,'READ',BAD,IQPTR,STATUS)
       ELSE
         CALL DYN_MAPL(INDIM,IDIMS,IQPTR,STATUS)
         CALL ARR_INIT1L(.TRUE.,IDIMS,%VAL(IQPTR),STATUS)
       END IF
-      CALL BDA_CHKQUAL(BLOC,BQUALOK,NDIMS,LDIM,STATUS)
+      CALL BDI_CHKQUAL(BFID,BQUALOK,NDIMS,LDIM,STATUS)
       IF(BQUALOK)THEN
-        CALL BDA_MAPLQUAL(BLOC,'READ',BAD,BQPTR,STATUS)
+        CALL BDI_MAPLQUAL(BFID,'READ',BAD,BQPTR,STATUS)
       ELSE
         CALL DYN_MAPL(INDIM,IDIMS,BQPTR,STATUS)
         CALL ARR_INIT1L(.TRUE.,IDIMS,%VAL(BQPTR),STATUS)
@@ -143,8 +143,8 @@
       CALL DYN_UNMAP( BACT, STATUS )
 
 *    Free datasets
-      CALL BDA_RELEASE( ILOC, STATUS )
-      CALL BDA_RELEASE( BLOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( BFID, STATUS )
 
 *   Exit
  99   CALL AST_CLOSE
