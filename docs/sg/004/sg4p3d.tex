@@ -1,0 +1,586 @@
+\chapter{Programming Standards, Conventions and Tools}
+\label{C_standards}
+\markboth{Programmers}{\stardocname}
+
+The most striking features of the {\em Starlink Software Collection} are
+its size (in March 1990 it contained about 1 million lines of code, half a
+million comment lines, and another half million blank lines) and the number of
+programmers who have contributed to it.
+These are both its strength and its weakness.
+In particular, it presents a growing maintenance problem.
+The only hope of keeping it under control is by `keeping up standards'.
+This includes both the sense of `better' rather than `worse', and also `this
+is what BSI, ANSI, ISO \ldots have to say on the subject'.
+
+While nobody wants to stifle a programmer's creativity, you have to recognise
+that software constructed using the guidelines discussed here is likely to be
+a great deal easier to maintain than that written as the spirit moves you.
+Software which is very personal to its creator is likely to suffer one of
+two fates: it will not be used by anyone else, or the original programmer
+will have the task of maintaining it for life.
+
+{\em Software portability} has always been regarded by the Starlink Project as
+important, but has, in fact, been of marginal interest to the majority of
+users.
+Now, however, the spread of Starlink to Unix-based systems means that
+portability is a very real problem for a growing number of users.
+
+The aim of these standards is to achieve software which, while providing the
+best possible applications, is also portable, maintainable by anyone, and
+integrates with the other software in the Collection.
+The software tools provided should make it easier to produce compliant
+code than not!
+
+\section{Language standards}
+\label{S_langstand}
+
+\subsection{Fortran}
+
+\xref{SGP/16}{sgp16}{} offers advice on how to write application programs for
+Starlink, embodied in a set of general rules.
+As a programmer you should bear in mind the needs of the person who will
+eventually be responsible for maintaining your code.
+You are strongly encouraged to read 
+\xref{SGP/16}{sgp16}{} if you have not already done so.
+
+ADAM has a number of special requirements which may mean that one of the
+general rules has to be reinterpreted --- in some cases strengthened, in
+others relaxed.
+There are, in addition, several new rules which do not have to be obeyed when
+writing non-ADAM applications.
+Here is a summary of the extra rules which apply to ADAM applications, as
+compared with ordinary free-standing programs:
+
+\begin{itemize}
+\item Initialise variables.
+
+It is {\bf essential} that variables are initialised.
+Even the VAX's initialisation to 0 cannot be relied on as the task may or
+may not be reloaded between invocations.
+DATA statements must only be used to initialise data which will not change.
+
+\item Use the ADAM standard prologues
+
+ADAM standard prologues differ in some respects from the Starlink
+standard, allowing less freedom but giving more opportunity for
+the automatic production of documentation and help files.
+Standard prologues exist for subroutines and interface files.
+
+\item Output messages via the MSG routines.
+
+Message output must be done using the ADAM Message system (MSG) subroutines.
+
+\item Don't use \$, \%, $\wedge$ in messages.
+
+The non-Fortran~77 characters \$, \% and $\wedge$ are
+used as escape characters in the ADAM message system.
+
+\item Report errors via the ERR routines.
+
+Error reporting must be done using the ADAM Error system (ERR) subroutines,
+and the ADAM Error Strategy should be employed.
+
+\item Set STATUS on failure.
+
+All programs which fail must return to the
+environment with an error status value set.
+This enables the environment to detect the failure so that users can write
+procedures which take appropriate action.
+
+\item When setting STATUS, generate a message.
+
+If a subroutine is entered with STATUS=SAI\_\_OK
+but, during execution, sets the STATUS (other than by calling another ADAM
+routine), an appropriate error message must be generated using ERR\_REP.
+
+\item Some routines have $>6$ character names.
+
+Some of the ADAM environment package subroutines have names and prefixes
+greater than 6 characters.
+Where it is necessary to call these, the general rules must be relaxed.
+
+\item Get parameters with the PAR routines etc.
+
+All program parameters must be obtained using the Parameter system PAR
+or pkg\_ASSOC subroutines.
+
+\item Use symbols when testing for bad pixels.
+
+A REAL or DOUBLE PRECISION variable may be equated to its corresponding
+bad-pixel value, though explicit bad-pixel values, e.g.\ -32767, are banned.
+The parameters VAL\_\_BADx, where x corresponds to the data type, must be
+used.
+
+\item Avoid Fortran input/output.
+
+Use the environment facility packages MAG, FIO etc.\ wherever possible.
+If it is necessary to use Fortran I/O, obtain and release logical unit numbers
+using FIO\_GUNIT and FIO\_PUNIT.
+
+\item Use symbolic names.
+
+Status values and package constants are given symbolic names such as
+PAR\_\_NULL by INCLUDE files for each package.
+These symbolic names should be used on every occasion that the constant is
+required.
+
+\item RETURN is permissible when testing status.
+
+The RETURN statement is allowed in the form:
+
+\begin{small}
+\begin{verbatim}
+    IF (STATUS.NE.SAI__OK) RETURN
+\end{verbatim}
+\end{small}
+
+as the first executable statement in a subroutine.
+This avoids an extra, unhelpful IF clause and indentation.
+Alternatively, use a GO~TO n, where line n is a CONTINUE statement immediately
+preceding the END statement.
+
+\item In generic routines use only the standard tokens.
+
+The preprocessor for generic routines supports special tokens used by the
+\mbox{ASTERIX} package (\xref{SUN/98}{sun98}{}), as well as ones for general
+use.
+Use only the standard tokens.
+
+\item PAR\_\_ABORT status (!!) must abort the application.
+
+An application must terminate if the {\it abort} response (!!) is made when a
+parameter has been requested.
+Note that this rule does not mean that the application has to test for the abort
+status after every parameter is obtained;  the inherited status will look after
+that. 
+What matters is the appearance to the user of the application, who should:
+\begin{itemize}
+\item not be re-prompted for the parameter,
+\item not be prompted for further parameters, and
+\item not receive additional error messages merely because the status was not
+ OK.
+\end{itemize}
+An abort does not absolve the programmer from ensuring that the application
+ closes down in an orderly fashion.
+\end{itemize}
+
+\subsection{C}
+
+In spite of the first rule (use Fortran) in the Starlink Application
+Programming Standard, 
+\xref{SGP/16}{sgp16}{}, there is a Starlink C Programming Standard ---
+\xref{SGP/4}{sgp4}{}.
+Its general style and philosophy are very similar to the Fortran standard,
+though obviously many of the rules are only directly relevant to one of the
+languages.  
+
+The suggestions which it contains are made with maintainability, portability
+and efficiency in mind.
+Several of them are made because certain code constructs will have different
+effects in different C implementations.
+In some cases the ambiguity is resolved by the ANSI standard.
+However, it may be some time before all C implementations meet the standard,
+and in any case it is preferable to avoid code which suggests more than one
+possibility to the human reader.
+
+\subsection{Fortran/C interface}
+
+There are always problems when writing programs in a mixture of Fortran and C.
+Each vendor offers his own solution, but the problem for Starlink is to
+try to provide a portable solution.
+SGP/5 describes two packages to help with this problem:
+\begin{quote}
+\begin{description}
+\item [F77] --- is a set of C macros to handle the Fortran/C subroutine
+ linkage.
+\item [CNF] --- is a set of C functions to handle the difference between
+ Fortran and C character strings.
+\end{description}
+\end{quote}
+This software is currently available on VAX/VMS systems, Sun SPARC systems, and
+DEC systems running Ultrix/RISC (typically, DECstations).
+
+\subsection{Posix interface}
+
+You may need to use C simply to call one of its run-time library routines,
+to allocate memory for example.
+A Fortran library called PSX has been provided to enable you to avoid doing
+this (see \xref{SUN/121}{sun121}{}).
+In many programs, it will remove the need to write any C code at all.
+
+PSX allows you to use the functions provided by the Posix and X/Open libraries.
+
+\section{Prologue standards}
+\label{S_standprols}
+
+Starlink has defined a number of standard prologues as a starting point for
+programming.
+They are important because they provide a minimal level of source-code
+documentation, and they can also be processed into on-line and off-line
+documentation by software tools.
+These prologues are normally accessed through STARLSE (see Section
+\ref{S_softools}).
+However, they are also available as files which you can edit.
+These can be found in \verb+STARLSE_DIR+ in files with the following names:
+\begin{quote}
+\begin{description}
+\item [ATASK.PRO] --- A-task template.
+\item [SUB.PRO] --- subroutine template.
+\item [FUNC.PRO] --- function template.
+\item [BLOCK.PRO] --- block data routine template.
+\item [MON.PRO] --- monolith template.
+\item [IFL.PRO] --- interface file template.
+\end{description}
+\end{quote}
+As an example of a complete template, here is BLOCK.PRO (blank lines have been
+removed to save space):
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      BLOCK DATA {routine_name}
+*+
+*  Name:
+*     {routine_name}
+*  Purpose:
+*     {routine_purpose}
+*  Language:
+*     {routine_language}
+*  Type of Module:
+*     BLOCK DATA
+*  Description:
+*     {routine_description}
+*  Notes:
+*     {routine_notes}...
+*  Side Effects:
+*     {routine_side_effects}...
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+*  {machine}-specific features used:
+*     {routine_machine_specifics}...
+*  {DIY_prologue_heading}:
+*     {DIY_prologue_text}
+*  References:
+*     {routine_references}...
+*  Keywords:
+*     {routine_keywords}...
+*  Copyright:
+*     {routine_copyright}
+*  Authors:
+*     {author_identifier}: {authors_name} ({affiliation})
+*     {enter_new_authors_here}
+*  History:
+*     {date} ({author_identifier}):
+*        Original version.
+*     {enter_changes_here}   
+*  Bugs:
+*     {note_any_bugs_here}
+*-
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+*  Global Constants:
+      [standard_SAE_constants]
+      INCLUDE '{global_constants_file}' ! [global_constants_description]
+*  Global Variables:
+      INCLUDE '{global_variables_file}' ! [global_variables_description]
+*        {global_name}[dimensions] = {data_type} ({global_access_mode})
+*           [global_variable_purpose]
+*  Local Constants:
+      {data_type} {constant_name} ! [constant_description]
+      PARAMETER ( {constant_name} = {cons} )
+*  Local Variables:
+      {data_type} {name}[dimensions] ! [local_variable_description]
+*  Global Data:
+      DATA {data_elm} / {data_values}... /
+*.
+      END
+\end{verbatim}
+\end{small}
+
+\end{quote}
+This contains {\em everything} you might need, though many of the items will
+not always be needed.
+
+\section{Software tools}
+\label{S_softools}
+
+Software tools are programs which help you write programs.
+Of the ones described below, STARLSE and SST are specific to ADAM programs.
+The others can be used for any type of program.
+
+\subsection{FORCHECK} 
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/73}{sun73}{}]
+
+\vspace{2mm}
+
+A Fortran verifier and programming aid installed on the Starlink central
+facilities computer (STADAT).
+It checks code for conformance to the ANSI standard X3.9--1978.
+However, it can also deal with non-standard code and by default accepts VAX
+Fortran.
+It:
+
+\begin{small}
+\begin{quote}
+\begin{itemize}
+\item Checks inter-module consistency by checking that the number, type, and
+ size of elements in both sub-program argument lists and COMMON blocks are the
+ same throughout a program.
+\item Identifies recursive calls and misuse of arguments.
+\item Identifies `clutter': the unused variables, COMMON blocks, INCLUDE
+ files, and code fragments which accumulate in old programs, and which make
+ maintenance such a time-consuming and costly task.
+\item Composes cross-reference charts for constants, variables, COMMONs,
+ INCLUDE files, sub-programs, and I/O.
+\end{itemize}
+\end{quote}
+\end{small}
+
+Automatically composed documentation of this type is an invaluable addition
+to system documentation.
+As often as not, it is the only reliable source of information about old
+programs.
+
+\subsection{GENERIC}
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/7}{sun7}{}]
+
+\vspace{2mm}
+
+Preprocesses a {\it generic} Fortran subroutine --- one written so as to apply
+to several different data types --- into one routine per data type, and
+concatenates them into a file.
+This can then be compiled to produce an object module.
+
+\subsection{LIBMAINT}
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/99}{sun99}{}]
+
+\vspace{2mm}
+
+Simplifies the maintenance of software held as modules in a source/object
+library pair, and of modules in a Help library.
+New libraries can be created and modules inserted, extracted, replaced,
+examined, and printed with simple commands.
+It ensures that corresponding modules within a source/object library pair do not
+get out of step with one another, and it can optimise the disk space used by
+libraries.
+
+\subsection{LIBX}
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/8}{sun8}{}]
+
+\vspace{2mm}
+
+Contains two tools for use with libraries.
+The first outputs a list of all modules in a library, and is useful for building
+more elaborate utility procedures.
+The second extracts preamble comments from all the modules in a Fortran
+source library.
+
+To some extent they duplicate facilities in LIBMAINT.
+The latter is a very powerful system but, unavoidably, is vulnerable to
+changes in the formats of the reports which the DEC Librarian utility produces.
+The LIBX facilities, though limited in what they do, use only published
+interfaces and should survive new VMS releases; they are also fast.
+
+\subsection{SPAG}
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/63}{sun63}{}]
+
+\vspace{2mm}
+
+SPAG stands for `Spaghetti Unscrambler'.
+It re-orders blocks of Fortran statements in such a way that the structure of
+the code is improved, while remaining logically equivalent to the original
+program. 
+The result improves the readability and maintainability of badly-written
+Fortran programs.
+On Starlink, it may be used to convert unstructured Fortran 77 into the
+structured and indented VAX Fortran required by the Starlink Programming
+Standard.
+It can also be used to update Fortran 66 code.
+It is marketed by Polyhedron Software and is available only on the Starlink
+central facilities machine, STADAT.
+
+\subsection{SST}
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/110}{sun110}{}]
+
+\vspace{2mm}
+
+The Simple Software Tools package was described in Chapter \ref{C_applic}.
+However, its importance can best be appreciated when programming.
+In particular, three of the tools --- PROHLP, PROLAT, and PROPAK --- process
+prologues in useful ways:
+
+\begin{small}
+\begin{quote}
+\begin{description}
+
+\item [PROHLP] --- converts prologues into on-line Help text.
+Suppose you have source code in file PROG.FOR and you are building up the Help
+library MYLIB.HLB, then:
+
+\begin{verbatim}
+    ICL> PROHLP PROG.FOR PROG.HLP
+    ICL> $ LIBRARY/HELP MYLIB.HLB PROG.HLP
+    ICL> $ DELETE PROG.HLP;*
+\end{verbatim}
+
+will add more material.
+
+\item [PROLAT] --- converts prologues to \LaTeX\/ form, which can be used as
+either a stand-alone document, or incorporated into another document.
+
+\item [PROPAK] --- converts prologues from the code of a subroutine package
+into a form that STARLSE can use.
+STARLSE can be `taught' about a subroutine library, so that simply typing
+the name of a routine (or just the first few characters) followed by
+ctrl/E will expand it into either a list of routines (if the string entered
+is not unique), or into a call to that routine ready for its arguments to be
+filled in.
+This removes a common source of error.
+
+\end{description}
+\end{quote}
+\end{small}
+
+\subsection{STARLSE}
+
+\vspace{-10mm}
+
+\hfill [\xref{SUN/105}{sun105}{}]
+
+\vspace{2mm}
+
+This is a `Starlink Sensitive' editor based on the \mbox{VAX} Language
+Sensitive Editor \mbox{LSE}.
+It helps you write portable Fortran~77 software in a standard Starlink style.
+
+If you normally use a standard screen editor (like EDT), you will probably find
+that using an \mbox{LSE}-based editor for the first time will slow you down
+considerably. 
+All those new keys to remember!
+However, once you get used to it, you will start to realise how much time
+you used to spend doing simple things like moving the cursor, formatting
+prologues, indenting lines of code and going to fetch essential
+documentation --- all things which \mbox{STARLSE} can do far more
+efficiently. 
+
+One of the strengths of \mbox{LSE}-based editing is that it allows
+you to pick and choose --- to use the features that you personally find
+time-saving, while still being able to type directly over anything which you
+find too fussy. 
+In this respect, \mbox{STARLSE} can be regarded as a sort of interactive
+`Manual of Style' which provides guidelines on layout and programming
+standards when you need reminding of them, but lets you work unhindered once
+you know what you are doing. 
+
+Perhaps the most important component of \mbox{STARLSE} is a version of the
+Fortran~77 programming language called \mbox{STARLINK\_FORTRAN}, which
+defines the style of programming that the editor supports. 
+This language is used by default for files of type \mbox{.FOR} and
+\mbox{.GEN}. 
+
+The language is based on the Starlink Application Programming Standard and
+contains only a small number of approved extensions to Fortran~77.
+It is therefore much simpler and easier to use than the \mbox{VAX}~Fortran
+language which comes with `native' \mbox{LSE} (in fact, nearly 80\% of
+\mbox{VAX}~Fortran consists of extensions to the Fortran~77 standard!). 
+In \mbox{STARLINK\_FORTRAN}, the number of available options and ambiguous
+abbreviations is greatly reduced, and most of the common language constructs
+can be produced simply by typing a short token, like `DO' or `IF', followed
+by \mbox{ctrl-E}. 
+
+The most important features of the language are:
+
+\begin{small}
+\begin{quote}
+\begin{itemize}
+\item Templates and Prologues.
+\item Subroutine definitions.
+\item On-line Help.
+\item Alias definitions.
+\item ADAM programming constructs.
+\item Symbolic constants, error codes, and Include files.
+\item Enumerated type codes.
+\item Tokens and Menus.
+\end{itemize}
+\end{quote}
+\end{small}
+
+For further information, refer to
+\xref{SUN/105}{sun105}{} and the DEC LSE User Guide and
+Reference Manual.
+
+\subsection{TOOLPACK}
+
+\vspace{-10mm}
+
+\hfill [SUN/75]
+
+\vspace{2mm}
+
+Toolpack/1 (release 2) is a suite of software tools designed to support the
+Fortran programmer.
+In this context, a `software tool' is a utility program to assist in the
+various phases of constructing, analysing, testing, adapting, or maintaining
+a body of Fortran software.
+Typically, the input to such a tool is your Fortran source code.
+The tool processes this and produces output that may have one or both of the
+following forms:
+
+\begin{small}
+\begin{quote}
+\begin{itemize}
+\item A report that gives an analysis of the input program, e.g.\ a summary of
+the types of statements used; this type of tool is called a static analyser.
+\item A modified version of the input program; in this case, the tool is
+called a transformer.
+An example is a formatter which improves the appearance of the code.
+\end{itemize}
+\end{quote}
+\end{small}
+
+In some cases the input may be test data, documentation, or a report generated
+by a previously applied tool.
+Tools that assist directly in preparing documents are usually called
+documentation generation aids.
+These and other tools serving utility functions all have an important role
+to play and so, even if they do not process a program directly, they are
+still regarded as programming aids.
+
+Further examples of the software tools provided include:
+
+\begin{small}
+\begin{quote}
+\begin{itemize}
+\item A text editor with Fortran 77 oriented features.
+\item A transforming tool that standardises the declarative part of a Fortran
+program.
+\item An instrumenter that modifies the program by inserting monitoring
+and other control statements.
+The instrumented program is then compiled and executed, and data is gathered
+that is used to generate reports.
+Execution of an instrumented program is an example of dynamic analysis.
+\end{itemize}
+\end{quote}
+\end{small}
+
+If you want to know more about TOOLPACK, read the `Introductory Guide'
+available from your Site Manager.

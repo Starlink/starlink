@@ -1,0 +1,132 @@
+\chapter*{Acknowledgements}
+
+The initial revision of the original version of this document was carried out
+by Ken Hartley.
+It was then taken over by Mike Lawden who put it into its final form.
+
+The source documents that have been used are extensively referenced within
+the text.
+We would like to thank the authors of these documents for making them
+available.
+We would also like to thank the many people who made comments on the 
+working drafts of this guide.
+
+\chapter*{Preface\label{C_pref}}
+
+   \begin {quote} {\small {Whoever has lived long enough to find out 
+                  what life is, knows how deep a debt of gratitude
+                  we owe to ADAM.} \hfill {\small \bf Mark Twain} }
+  \end{quote}
+
+\section*{ADAM}
+\label{S_preadam}
+
+ADAM --- the acronym originally stood for the Astronomical Data Acquisition
+Monitor --- had its beginnings in the Royal Observatories and is now the
+cornerstone of software support for the UK astronomical community.
+This document focuses on its role within Starlink for data-reduction and
+analysis, for which it is well suited.
+However, it should not be forgotten that it is perhaps even more important
+for data acquisition at the UK's overseas observatories, where it has no
+competitors.
+
+ADAM has three major components --- applications; subroutine libraries 
+to help build applications; and command languages to run applications.
+The libraries can be thought of as a toolkit, or a collection of building
+blocks for constructing applications.
+{\em Lego,}\, the children's toy, provides a good model --- because care was
+taken to define the interface properly (size and spacing of knobs and holes) it
+is guaranteed that any piece will fit onto any other piece, even when that
+connection was not envisaged when the original piece was designed.
+
+The command language forms the working environment of the user, and the
+libraries themselves are sometimes seen as the software environment in which
+programmers work.
+However, these are both subsidiary to the applications which are available to
+help astronomers to carry out their research.
+
+\section*{History}
+\label{S_histadam}
+
+Within a year of Starlink being set up, the {\em Interim Starlink Environment}
+was delivered and working.
+It was always recognized that the facilities it offered were limited --- it
+consisted of only a handful of routines to handle parameters and a simple
+image format.
+The DSCL command language was soon added. 
+
+Work started at once on the definitive Starlink Software Environment (SSE).
+For various reasons --- insufficient manpower and the untimely death of its
+chief architect being the main ones --- a satisfactory product was never
+delivered.
+In the meantime, the author of DSCL had moved into the La Palma software team
+at RGO and built ADAM to control instrumentation for the INT and JKT on
+La Palma, using Perkin-Elmer computers.
+ROE then adopted ADAM for instrument control on UKIRT and ported it to VAX/VMS.
+It used the Hierarchical Data System and SGS/GKS graphics packages developed
+at RAL as part of the SSE project.
+ROE also re-implemented the SSE parameter system.
+Though closely compatible with the SSE, the new version performed much better,
+in part because character handling was made more efficient (but at some cost in
+future compatibility with Unix and C).
+
+By 1985 it was clear that Starlink was unlikely to have the resources needed
+to provide what the community required.
+The Project therefore recommended adoption of the IRAF system from the USA.
+Workshops were held in late 1985 and early 1986, which were attended by
+astronomers representing all major groups of Starlink users.
+After a thorough review of many systems (including IRAF, MIDAS, AIPS, variants
+of the Interim Environment, IDL, LUCID, ADAM and many more) the community
+decided that ADAM offered the best overall prospects.
+It was proposed that further development and support would be on a `best
+endeavours' basis by all the interested parties.
+These proposals were endorsed by the Starlink User Committee. 
+
+Subsequently the VAX version of ADAM was adopted as the basis of instrument
+control at AAT, for the WHT on La Palma, and the JCMT on Mauna Kea.
+In 1989 ICL was adopted as the command language for ADAM, replacing the
+earlier ADAMCL.
+The need for a more formal method of supporting ADAM was recognized and so in
+1990 the ADAM Support Group was established within the Starlink project at RAL.
+
+It is now recognized that the cost/performance ratio of RISC (Reduced
+Instruction Set Chip) machines means that they currently provide
+typically three times the performance of VMS systems for the same price.
+This has inevitably led to growing numbers of astronomers using workstations ---
+particularly Suns and DECstations --- running varieties of the Unix Operating
+System.
+In order to ensure that the investment in Starlink application software is not
+wasted, and the community continues to have the enviable coherence which
+Starlink provides, the decision was taken in 1991 to remove all the dependence
+on VMS from ADAM.
+The result is a {\em portable} version of ADAM.
+This version has proved to perform very well on Unix systems.
+
+\section*{The importance of ADAM}
+\label{S_impadam}
+
+The above history shows that ADAM is essential for every major telescope
+which is funded through SERC.
+Its role in Starlink means that all UK observational astronomy depends on ADAM.
+The spread of Unix to big machines (Cray, IBM, massively parallel systems and
+so on) allied with a portable system means that even the computational
+modellers in the community can contemplate using ADAM, especially when high
+bandwidth communications make it feasible to distribute work between a 
+local workstation and a remote supercomputer. 
+
+ADAM was chosen by the community and is now supported by SERC.
+It was chosen because it was the best possible option at that time.
+It is fully under the control of the UK community and is not dependent on any
+one individual.
+It has been designed to handle any astronomical data and is guaranteed to be
+supported on all Starlink hardware, and graphics devices in particular.
+The existence of a portable version means that it can be made available on
+almost any hardware platform.
+
+Chapter 4 describes many packages built using ADAM, ranging from large,
+general-purpose packages such as FIGARO and KAPPA, through those aimed at
+specific branches of astronomy ({\it e.g.}\ ASTERIX, TSP), to those more
+concerned with software and data handling ({\it e.g.}\ SST, CONVERT).
+New astronomical applications are being added all the time.
+It is hoped that this Guide will lead more people to use them and encourage
+users to write their own. 

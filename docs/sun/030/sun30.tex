@@ -1,0 +1,308 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {30.2}
+\newcommand{\stardocauthors}   {David Giaretta}
+\newcommand{\stardocdate}      {22th Sept 1989}
+\newcommand{\stardoctitle}     {Using the Starlink Database MicroVAX computer}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\tableofcontents
+
+\newpage
+\section{Introduction}
+
+This paper tells you how to use the Starlink Database microVAX computer.
+This is installed at the Rutherford Appleton Laboratory and may be used by any
+registered Starlink user.
+As its title implies, its 
+principal purpose is to provide access to astronomical
+databases, in particular: the star and galaxy catalogues and the IRAS catalogues
+used by the SCAR database management system, the IUE Uniform Low Dispersion
+Archive (ULDA), and a variety of spectral atlases.
+It is not a general purpose computer, and users will not have permanent
+file space or private usernames allocated on it.
+
+Some facilities may conveniently be used directly from one's local node,
+reading data files resident on STADAT.
+
+The way the machine is run will evolve as requirements change and resources
+allow.
+Thus, this paper describes the current
+hardware and software configurations
+and operational procedures.
+These may be changed in the future.
+
+
+\subsection{Getting help}
+
+Typing {\bf STADAT\_HELP} gives help on STADAT resources.
+\begin{itemize}
+\item Difficulties concerned with network
+     access should be reported to STADAT::OPER
+\item Problems with catalogue software and catalogue requests should be reported
+      to STADAT::CATMAIL
+\item Temporary increases in disk quota may be requested from STADAT::OPER
+      (or STADAT::DATAMAN)
+\end{itemize}
+
+\section{Access routes}
+
+The DECNET name of the computer is STADAT (for STArlink DATabase), and
+the NRS name is UK.AC.RL.STADAT (full name
+UK.AC.RUTHERFORD.STARLINKDATABASE).
+
+STADAT is  in a Local Area Vax Cluster with the Starlink $\mu$VAX.
+There are two access routes to STADAT from other computers.
+The first is Starlink DECNET access (by SET HOST and COPY).
+The second is Coloured Book software access (by TRANSFER only).
+
+Users may only log into STADAT by SET HOST from a Starlink node
+(major or minor):
+\begin{verbatim}
+    $ SET HOST STADAT
+\end{verbatim}
+This is a DECNET facility and can only be used from Starlink nodes on DECNET.
+Access from non-Starlink DECNET nodes is barred and PAD cannot be used
+to log in.
+Users should copy files from STADAT using the TRANSFER command (see SUN/36,
+Appendix A.1):
+\begin{verbatim}
+    $ TRANSFER/USERNAME=NETUSR,NETUSR/CODE=FAST -
+         RL.STADAT::DISK$STARDATA:<file specification>  <file specification>
+\end{verbatim}
+This is more efficient than COPY.
+
+
+
+\section{Usernames}
+
+You can only log in to
+the database machine after having logged into a
+normal Starlink computer under your own username.
+This is the basis of the security system.
+There are two usernames set up on the machine for each 
+Starlink node.
+One of them is a private username for the Site Manager.
+The other is a public username that you can use; this may be used
+by {\em all} users at your site who have asked to use the machine.
+Each site's public username is different and is managed separately.
+
+If you wish to use the machine, ask your Site Manager for the appropriate
+username and password.
+The password will be changed periodically, and it must not appear in documents
+or mail messages or be disclosed to other users.
+Once logged into the machine, you will be able to use the installed software and
+access the installed data.
+However, your files will not be permanent and you should copy any files you
+want to keep back to your local filespace when you have finished.
+Remember that the username you will be using will be used by many other
+people.
+You should adapt your behaviour to this circumstance.
+In particular, delete unwanted files before logging out, and don't expect
+any files you do leave to remain in existence for very long.
+
+{\bf Don't do anything antisocial like changing passwords or tinkering with the
+LOGIN.COM file. The latter should call \@SSC:LOGIN.}
+
+There are a few extra usernames on the machine for particular activities,
+such as Operations, Software Maintenance, SCAR and USSP development, and
+managing the IUE captive account.
+These should not concern the normal user.
+
+\section{Resources}
+
+\subsection{Software available}
+
+The following software is available:
+\begin{itemize}
+\item Standard Starlink Software.
+This includes GKS, REXEC and the ADC library.
+STADAT accesses the RLSTAR version of the Starlink Software
+Collection (SSC) and hence always uses the
+latest versions of software items.
+\item USSP (see ULDA below for total size).
+This is the IUE ULDA access software which was obtained from VILSPA.
+See SUN/20 for more details.
+\item SCAR, including source code.
+See SUN/70 for more details.
+\item SPAG, a code unscrambler. See SUN/63 for details.
+\item Fortran compiler, Coloured Book, PSI-Access.
+\end{itemize}
+
+
+\subsection{Astronomical Data available}
+
+The following data sets are available:
+\begin{itemize}
+\item CHART catalogues in directory [STARCATS].
+\item The logical search path SCAR\_DAT\_PATH is set up by typing
+SCARSTART, and points to directories containing SCAR catalogues.
+\item IRAS LRS database --- see SUN/14.
+\item ULDA (including USSP software).
+This is the IUE Uniform Low Dispersion Archive.
+Its size will increase as time goes on (rate unknown).
+Its use is described in SUN/20.
+\item IUE merged Observing Log, and use of IUEDEARCH (SUN/58).
+\item Various Spectral Atlases, in directory SPECTRAL\_ATLASDIR:\\
+      typing:
+\begin{verbatim}
+    $ @SPECTRAL_ATLASDIR:LOGIN
+\end{verbatim}
+sets up the appropriate logicals. The command ATLAS\_HELP provides help for
+the atlases available. Most allow one to extract the spectra chosen directly
+into DIPSO files,  after first listing the spectra available.
+\begin{verbatim}
+    $ ATLAS_HELP SUMMARY
+\end{verbatim}
+shows a summary of the spectral atlases available.
+\item    JPL Ephemeris 1800-2050  : disk\$stardata:[ephemeris]jpl.dat (SUN/87)\\
+         In the examples in SUN/87 you can assign the data file to the
+         above instead of jpldir:de200.dat and pick up the full ephemeris.
+\end{itemize}
+Other items, such as an 1885-1985 Supernova database to be produced at RAL, and
+the UKST and other telescope logs, will be installed as they become available.
+Users will be informed by revisions of this note and by news items.
+
+\subsection{Captive accounts}
+
+\begin{itemize}
+
+\item IUE \\
+the IUE captive account allows use of services 
+concerned with IUE data such as fast searching of the IUE log
+and IUE image de-archiving (see SUN/58).
+\item IRASLRS\\
+the IRASLRS captive account allows access to the LRS database (see SUN/14).
+\end{itemize}
+
+
+\subsection{Things you can use without logging in}
+
+An important point to note is that from one's local machine one can 
+read data STADAT files over the network. Normally this would be
+too time consuming to be worthwhile, for example searching SCAR catalogues.
+However in certain instances, where one essentially points to a particular
+record in a file and transfers a small number of bytes across the network,
+it does make sense not to log in to STADAT.
+
+The following is a list of facilities available and the logical names
+which must be defined.
+
+\begin{itemize}
+\item Spectral Atlases\\
+{\bf \$ define/job spectral\_atlasdir stadat::spectral\_atlasdir:\\
+\$ @spectral\_atlasdir:login\\ }
+\item IUEDEARCH (SUN/58)\\
+{\bf \$ define/job iuedearchdisk stadat::iuedearchdisk:\\
+\$ @iuedearchdisk:[iues.capaccnt]iuedearch }
+
+\item UNSPL --- part of USSP\\
+ unspl should be defined as ``run stadat::ussp\_dir:unspl''\\
+{\bf \$ unspl}
+
+\item    JPL Ephemeris 1800-2050  \\
+         In the examples in SUN/87 you can assign the data file to
+         stadat::disk\$stardata:[ephemeris]jpl.dat.
+
+\end{itemize}
+
+
+
+\section{Configuration and Management}
+
+The database microVAX has the following hardware configuration at present:
+\begin{itemize}
+\item DEC $\mu$VAX II with 13 Mbyte memory.
+\item One RD53 disk drive (71 Mbyte = 142000 blocks).
+This will be used as the system disk and will store the operating system,
+Fortran compiler, communications software, etc.
+\item Two SI83 disk drives organised as a single logical unit
+(1 Gbyte = 2048000 blocks).
+This will be used for catalogues and data, and for user space and
+applications software.
+\item X-25 communications, via Ethernet and a non-Starlink $\mu$VAX.
+\end{itemize}
+
+
+\subsection{Limitations}
+
+\begin{itemize}
+\item Only one user is able to run the USSP software at any one time.
+This is a limitation of the VILSPA software design, not an RAL operational
+decision.
+\item Only one user is able to use the IRASLRS account at any one time.
+This is a limitation of the software design, not an RAL operational
+decision.
+\item STADAT only has a licence for 8 simultaneous users, so no more than 8
+logins are allowed at any time.
+\end {itemize}
+
+\subsection{Management}
+
+There is no formal user registration scheme on this machine, unlike other
+Starlink machines.
+Site Managers should keep a list of the names of their local users who have
+asked to use the machine and are still active.
+(This should be stored in file LADMINDIR:STADAT.LIS in the same format as
+LADMINDIR:USERNAMES.LIS.)
+
+David Giaretta (STADAT::DATAMAN) 
+is responsible for the management policy, following Starlink
+guidelines, and
+Monica Kendall (STADAT::OPER) is responsible for Operations, 
+Backup, and User installation.
+Individual Site Managers are responsible for managing users of the microVAX
+from their own sites.
+
+Mail about catalogues and SCAR
+should be sent to STADAT::CATMAIL, which is a mail-club account. A number 
+of people  check mail in this account and so long delays in replies when
+individuals are away should be avoided.
+
+\section{References}
+
+\begin{description}
+\item [SUN/14] : Obtaining spectra from the IRAS LRS database
+\item [SUN/20] : USSP --- The IUE ULDA Software Support Package (to be issued).
+\item [SUN/36] : Starlink Networking.
+\item [SUN/58] : IUEDEARCH --- access to IUE archive data
+\item [SUN/63] : SPAG --- Spaghetti Unscrambler
+\item [SUN/70] : SCAR --- Starlink catalogue access and reporting.
+\item [SUN/87] : JPL --- Solar System ephemeris
+\end{description}
+
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                       

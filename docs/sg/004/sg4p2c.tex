@@ -1,0 +1,151 @@
+\chapter{Running Applications}
+\label{C_runap}
+\markboth{Users}{\stardocname}
+
+\section{ADAM applications}
+\label{S_aa}
+\markboth{Users}{\stardocname}
+
+An ADAM application is a program which uses ADAM subroutines.
+From the user's point of view, the most important of these is the Parameter
+system since this controls (in conjunction with the user language) the
+interaction between the program and the user.
+The Parameter system uses a file called an {\em Interface File} which stores
+information about a program's parameters.
+
+Many users will only use applications which have been written by someone else.
+In this case, everything necessary to enable them to be used should already
+have been carried out.
+This includes the preparation of the interface files and the definition of
+commands.
+All you need do is carry out a specified startup procedure.
+However, if you have written your own application, you will need to do
+some preparation of your own before using it.
+
+\section{The running process}
+\label{S_runpro}
+
+The process of running an ADAM application can be summarized as follows
+\begin{quote}
+\begin{description}
+
+\item [Read the documentation] ---
+
+I know it's hard, but it often really does help to read about the program
+you intend to use.
+Program documentation often tells you what the program does, what data it
+uses, and what its parameters are and how to specify them.
+Why not try it?
+
+\item [ADAMSTART] ---
+
+Don't forget to enter {\small\tt ADAMSTART} --- people do.
+
+\item [Select a command language] ---
+
+The options are DCL, ICL, and SMS at the moment.
+ICL is the one we recommend.
+SMS is usually used only for data acquisition and is not covered in this
+guide.
+Some packages won't run under some languages --- Chapter~\ref{C_applic} tells
+you which ones.
+
+\item [Start the package] ---
+
+Some packages need to have various definitions and logical names defined before
+you can use them.
+For example, before you can use ASTERIX you must enter the DCL symbol
+{\small\tt ASTSTART}.
+Once again, Chapter~\ref{C_applic} tells you what to do for specific
+applications.
+
+\item [Select programs] ---
+
+Most applications contain many programs.
+You must select the programs you want to use.
+For applications provided by other people, this will normally involve just
+typing the name of the program.
+However, if you have written your own application, you will need to define
+the appropriate commands required to run your programs.
+Applications which have large numbers of programs can be executed more
+efficiently if they are grouped together into a {\em Monolith}.
+These are considered below.
+
+\item [Specify parameter values] ---
+
+Once you start running applications you will need to control them.
+This is done by specifying parameter values --- names of data files, values,
+options, and so on.
+This is the most complex part of the process and is discussed in
+Chapter~\ref{C_prompts}.
+
+\end{description}
+\end{quote}
+
+\section{Selecting programs}
+\label{S_selprog}
+
+You normally select programs just by typing their names.
+However, for this to work, the program name must have been defined as a DCL
+symbol or an ICL command.
+Also, there might be a delay the first time you run a program in an application.
+This is usually because a large {\em Monolith} is being loaded.
+
+\subsection{Defining commands to run programs}
+
+To run programs under VMS, their names are defined as DCL symbols so that typing
+the name runs the program.
+The symbol definitions are executed by running a command procedure.
+
+Similarly, to run programs under ICL, their names are defined as ICL commands
+using the DEFINE command described in Chapter~\ref{C_commands}.
+Usually, the command definitions are executed by running an ICL procedure which
+contains them.
+Before a program can be run under ICL, a command to run it must be defined.
+
+\subsection{Monoliths}
+
+Programs are sometimes stored together in structures called {\em monoliths}
+which are loaded for execution as a single entity.
+In this case a command must be defined for each program in the monolith.
+When you use an application package, the commands needed to execute its programs
+are normally defined for you when you start up the package.
+Thus:
+
+\begin{small}
+\begin{verbatim}
+    ICL> KAPPA
+\end{verbatim}
+\end{small}
+
+will cause all the commands required to run the KAPPA programs to be defined.
+What happens is that a file called {\small\tt KAPPA\_DIR:KAPPA.PRC}\footnote{
+The file type `.PRC' is now obsolete.  The normal file type for command files
+is `.ICL'.} containing the required DEFINE commands is automatically input to
+ICL for execution.
+The commands look like this:
+
+\begin{small}
+\begin{verbatim}
+    define add       kappa_dir:kappa
+    define aperadd   kappa_dir:kappa
+            ...
+    define zaplin    kappa_dir:kappa
+\end{verbatim}
+\end{small}
+
+There are also commands to display the initial messages output by the package.
+{\small\tt KAPPA.PRC} is an example of an ICL {\em Command File} which is
+described in more detail in Chapter~\ref{C_iclprog}.
+Notice that all the commands refer to the same executable image (the monolith),
+and that the directory in which this is to be found is specified explicitly so
+ADAM\_EXE is not used.
+
+Monoliths are useful because they enable lots of programs to be loaded within
+a single process creation.
+Since process creation is quite slow under VMS, you save time by doing it
+only once.
+The advantage of monoliths is that they reduce the time required to create
+processes.
+The disadvantage is the time required for the loading a large monolith
+instead of a small program; however, you only have to do it once.

@@ -1,0 +1,348 @@
+\chapter{ICL --- Interactive Command Language}
+\label{C_ugicl}
+\markboth{Users}{\stardocname}
+
+\section {Introduction}
+\label{S_iclint}
+\markboth{Users}{\stardocname}
+
+ICL is the most commonly used ADAM command language.
+It is designed to provide a programmable user interface to an astronomical
+data-reduction or data-acquisition system.
+In some ways, ICL is similar to a high level programming language such as
+Fortran or Pascal, but it has some important differences:
+\begin{itemize}
+\item It is an {\em interactive\/} language ---
+ It provides a complete environment for entering, editing and debugging
+ programs in much the same way that Basic does, rather than relying on external
+ editors, compilers and so on. 
+\item It is a {\em command\/} language ---
+ One of its main uses is to enable you to type commands with few format
+ restrictions.
+ For example, it can be used to run the FIGARO data reduction system and it is
+ possible to type FIGARO commands in almost exactly the same format as was
+ previously used from DCL.
+\item It is a {\em programming} language ---
+ However it is intended only for writing relatively simple and straightforward
+ programs.
+ Its requirements differ from those of most modern programming languages which
+ are designed for the needs of big software projects.
+ ICL is designed to make simple programs easy to write.
+\end{itemize}
+
+The definitive reference manual and user's guide is \xref{SG/5}{sg5}{}.
+The language is summarised in Chapter~\ref{C_rsicl}.
+ICL also has an on-line Help system --- simply type HELP.
+
+\section {Starting and stopping ICL}
+\label{S_useicl}
+\markboth{Users}{\stardocname}
+
+ICL is started by typing:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL
+\end{verbatim}
+\end{small}
+
+(Always remember that you must previously have executed SSC:LOGIN and
+ADAMSTART.)
+
+ICL is stopped by issuing the EXIT command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> EXIT
+\end{verbatim}
+\end{small}
+
+If things are hopeless you can, of course, abandon ship by typing Ctrl/Y.
+
+\section{Modes}
+\label{S_modes}
+\markboth{Users}{\stardocname}
+
+ICL can be used in two different {\em modes}:
+\begin{itemize}
+\item Direct Mode
+\item Procedure Mode
+\end{itemize}
+In {\em Direct Mode}, statements are executed immediately after they are typed
+in.
+In {\em Procedure Mode}, statements are first entered into a procedure, and
+subsequently executed by running that procedure.
+Another difference between the modes is that Control Statements (see below) can
+only be executed in Procedure Mode.
+
+\section{Statements}
+\label{S_stmnts}
+\markboth{Users}{\stardocname}
+
+The {\em statements} of the language can be grouped into two sets:
+\begin{itemize}
+\item Direct Statements
+\item Control Statements
+\end{itemize}
+{\em Direct statements} are executed immediately and can be entered in either
+mode.
+{\em Control statements} affect the order in which statements are executed
+and can only be executed in Procedure mode.
+You can also enter {\em Comments} which are lines whose first non-blank
+character is `\{'.
+Comments are ignored by the language interpreter.
+If desired, they can be terminated by `\}', but this isn't necessary and is
+a matter of taste.
+Here is an example of a comment:
+
+\begin{small}
+\begin{verbatim}
+    { This is a comment
+\end{verbatim}
+\end{small}
+
+Although comments can be entered in Direct mode, their real purpose is to
+document procedures written in Procedure mode.
+
+When entering statements in ICL, all the normal command line editing facilities
+available in DCL may be used.
+The Up arrow or ctrl/B keys may be used to recall previous commands, and the
+Down arrow key will step to the next command.
+Any command back to the start of the ICL session may be recalled.
+
+A command may take more than one line.
+A tilde (\verb+~+) symbol at the end of a line is used to indicate that the
+command continues on the next line.
+
+\section{Direct statements}
+\label{S_dirstm}
+\markboth{Users}{\stardocname}
+
+There are three types of direct statements:
+
+\begin{description}
+
+\item [Immediate Statement:] \mbox{}
+
+ This is used to make ICL do simple calculations.
+ It consists of an equals sign (\verb+=+) followed by an expression, and causes
+ the value of the expression to be printed on the terminal.
+ For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> =1+2+3
+             6
+    ICL> =SQRT(2)
+    1.414214
+    ICL>
+\end{verbatim}
+\end{small}
+
+
+\item [Assignment Statement:] \mbox{}
+
+ This is exactly the same as the Fortran assignment statement and is used to
+ assign a value to an ICL variable.
+ For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> PI=3.1415926    
+    ICL> =2*pi           
+    6.283185
+    ICL>
+\end{verbatim}
+\end{small}
+
+ Note that the case of letters doesn't matter.
+ `PI' and `pi' are the same variable.
+ In practice, names like `PI' are the names of HDS objects which store the
+ constant values.
+
+\item [Command:] \mbox{}
+
+A command consists of a command name followed (optionally) by one or more
+parameter specifications:
+\begin{quote}
+    command\_name [parameter\_specification] \ldots
+\end{quote}
+The parameter specifications may be separated by commas, or by one or more
+spaces.
+The forms that parameters can take are described in Chapter~\ref{C_prompts}.
+Here are some examples of commands:
+
+\begin{small}
+\begin{verbatim}
+    PRINT Single Root is (-C/B)
+    QUADRATIC 7.2,18,4.6
+    TESTR 5.8
+\end{verbatim}
+\end{small}
+
+Commands are a very important part of ICL and several types exist.
+You can't tell which type a command is just by looking at it; you have to
+know how it is defined.
+Commands are described in more detail in Chapter~\ref{C_commands}.
+\end{description}
+
+All three types of direct statement make use of {\em expressions}.
+These are described next.
+
+\section{Expressions}
+\label{S_expr}
+\markboth{Users}{\stardocname}
+
+One of the basic syntactical units of the ICL language is the {\em Expression}.
+Expressions are built up by operating on {\em values} using {\em operators}:
+\begin{quote}
+VALUE {\em operator} VALUE {\em operator} VALUE \ldots
+\end{quote}
+Here are some examples of expressions:
+
+\begin{small}
+\begin{verbatim}
+    2
+    X
+    X+5
+    Y*SIN(THETA)
+\end{verbatim}
+\end{small}
+
+The value of an expression belongs to one of the following four
+{\em types}:
+\begin{itemize}
+\item Real --- same as Fortran DOUBLE PRECISION type.
+\item Integer --- same as Fortran INTEGER type.
+\item Logical --- same as Fortran LOGICAL type.
+\item String --- strings of characters, similar to Fortran CHARACTER*n type.
+\end{itemize}
+The two constituents of expressions --- {\em value} and {\em operator} --- will
+now be considered in more detail:
+\begin{description}
+\item [Value] ---
+A value can be represented in three ways:
+\begin{description}
+\item[Constant:] \mbox{}
+
+{\em Real} and {\em Integer} constants are represented by numbers written in
+the same formats that are accepted in Fortran.
+{\em Integer} constants may also be entered in binary, octal, or hexadecimal
+format by preceeding the value with \verb+%B+, \verb+%O+, or \verb+%X+
+respectively.
+
+{\em Logical} constants are written as \verb+TRUE+ or \verb+FALSE+.
+Note that they are not delimited by decimal points as in Fortran.
+
+{\em String} constants consist of any sequence of characters enclosed in either
+single or double quotes.
+Two consecutive quote symbols in a string are used to represent a single quote.
+String constants are the one place in ICL where the case of letters is
+significant.
+
+Here are some examples of constants:
+
+\begin{small}
+\begin{verbatim}
+    Real:          1.234E-5              3.14159 
+    Integer:       123      %B100110     %O377      %Xffff
+    Logical:       TRUE     FALSE
+    String:        'This is a string'    "So is this"      ''
+\end{verbatim}
+\end{small}
+
+The last example defines a string of zero length (valid in ICL, but not in
+Fortran).
+
+\item[Variable:] \mbox{}
+
+Variables are represented by names composed of characters which may be letters,
+digits, or the underscore character (\verb+_+).
+The first character must be a letter.
+The first 15 characters of a variable name are significant.
+
+An important difference between ICL and Fortran is in the handling
+of variable {\em types}.
+In Fortran, each variable name has a unique type associated with it, and this
+type is either derived implicitly from the first letter of the name, or is
+explicitly specified in a declaration.
+In ICL, variable names do not have types --- only values have types.
+A variable gains a type when it is assigned a value.
+This type can change when a new value is assigned to it.
+Thus we can have the following series of assignments making the variable X
+an integer, real, logical, and string in sequence:
+
+\begin{small}
+\begin{verbatim}
+    ICL> X = 123      
+    ICL> X = 123.456    
+    ICL> X = TRUE         
+    ICL> X = 'String'   
+\end{verbatim}
+\end{small}
+
+This approach to variable types means that we do not have to declare the
+variable names we use, which helps to keep programs simple\footnote{The
+disadvantage is that ICL cannot usually spot cases where we accidentally
+mistype a variable name, as can languages which enforce declaration of variables
+(such as Fortran with the IMPLICIT NONE directive).
+This is not thought to be a serious problem for the relatively simple programs
+for which ICL is intended.}.
+
+\item[Function:] \mbox{}
+
+ICL provides a variety of standard functions.
+They are written as in Fortran, and all the standard Fortran 77 generic
+functions which are relevant to the ICL data types are provided with the same
+names.
+Thus SIN, COS, TAN, ASIN, ACOS, ATAN, ATAN2, LOG, LOG10, EXP, SQRT and ABS are
+all valid functions.
+A complete list of functions is given in Chapter~\ref{C_rsicl}.
+\end{description}
+\item[Operator] ---
+
+The operators which are used to build up expressions are listed in the following
+table in order of priority:
+
+\begin{small}
+\begin{verbatim}
+    1 (highest)              **
+    2                        *   /
+    3                        +   -
+    4                        =   >   <   >=  <=  <>  :
+    5 (lowest)               NOT   AND   OR   &
+\end{verbatim}
+\end{small}
+
+The order of evaluation of expressions is determined by the priority of the
+operators.
+The rules are the same as those in Fortran\footnote{But different from those
+in Pascal.}, with arithmetic operators having the highest priority and logical
+operators the lowest.
+This means that a condition such as \( 0 < X+Y \leq 1 \) can be expressed in
+ICL as follows:
+
+\begin{small}
+\begin{verbatim}
+    X+Y > 0  AND  X+Y <= 1
+\end{verbatim}
+\end{small}
+
+without requiring any parentheses.
+However, in general it is good practice to use parentheses to clarify any
+situation in which the order of evaluation is unclear.
+
+The `\&' operator performs string concatenation.
+If one of its operands is a numeric value, it will be converted to a string.
+The `:' operator is used for formatting numbers into character strings as
+described in Section~\ref{S_IO}
+\end{description}
+In evaluating expressions, ICL will freely apply type conversion to its operands
+in order to make sense of them.
+This means not only that integers will be converted to reals when required, but
+also that strings will be converted to numbers when possible.
+A string can be converted to a number if the value of the string is itself a
+valid ICL expression; for example, the string \verb+'1.2345'+ has a numeric
+value.
+The string \verb-'X+1'- has a numeric value if X is currently a numeric
+variable (or if X is a string which has a numeric value).

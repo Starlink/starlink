@@ -1,0 +1,604 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+  \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {107.4}
+\newcommand{\stardocauthors}   {M J Bly}
+\newcommand{\stardocdate}      {6 August 1998}
+\newcommand{\stardoctitle}     {MAPLE \\[2ex] 
+                                Mathematical Manipulation Language}
+\newcommand{\stardocversion}   {Maple V release 4}
+\newcommand{\stardocmanual}    {User's Guide}
+\newcommand{\stardocabstract}  {%
+
+MAPLE is a commercial software package for symbolic mathematical
+calculation developed by the Symbolic Computation Group at the
+University of Waterloo.  Starlink has a licence to run MAPLE on the
+central Unix service at RAL. MAPLE has facilities for symbolic algebra
+mathematical manipulation and provides a powerful facility for solving
+many types of mathematical problem.
+
+}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{Introduction\xlabel{introduction}}
+
+MAPLE is an interactive system for symbolic algebra computation. It can
+perform hundreds of algebraic functions for use at all mathematical
+levels, and can provide solutions for many types of problems:
+
+\begin{itemize}
+\item Arithmetic with integers, fractions, and polynomials.
+\item Power series.
+\item Differentiation and integration of functions.
+\item Systems of equations.
+\item Differential equations.
+\item Linear optimization.
+\item Tensor manipulation.
+\item Symbolic and numeric approximation.
+\item Automatic generation of Fortran code and \LaTeX\ source for mathematical
+expressions.
+\end{itemize}
+
+In addition, plots can be generated to illustrate graphically any
+function, including user-defined functions.
+
+You can extend or redefine the numerous functions by writing MAPLE
+programs in the built-in Pascal-like language to create specialized
+functions.
+
+\section{\xlabel{using_maple_on_the central_unix_service}%
+Using MAPLE on the Central Unix Service}
+
+\subsection{\xlabel{registration}Registration}
+
+To use MAPLE you need a user account on the Starlink Central Unix
+Service machine at RAL.  Registration is open to Starlink users at UK
+Starlink sites.  To obtain an account you should contact the system
+manager at RAL by email at \texttt{oper@star.rl.ac.uk}.  When your
+application has been processed you will receive an account name and
+password (\textit{do not forget to change the password}), and details
+of the Central Service machine at RAL.
+
+\subsection{\xlabel{accessing_maple}Accessing MAPLE}
+
+Once you have registered and have logged on to the system at RAL, there
+are two versions of MAPLE you can run:
+
+\begin{enumerate}
+\item the command-line interface, and
+\item the X11 interface. 
+\end{enumerate}
+
+To start either version you must have \texttt{/usr/local/bin} in your
+\texttt{PATH}.  If your login starts the Starlink Software you will get
+\texttt{/usr/local/bin} in your \texttt{PATH} automatically.  If your
+login does not start the Starlink Software you will need to add
+\texttt{/usr/local/bin} to your \texttt{PATH}.
+
+\subsection{\xlabel{the_command-line_interface}The command-line interface}
+
+The command-line interface provides a simple method of using MAPLE which
+allows character input and output only with no fancy graphics or animation.
+It does provide simple character plots.
+
+To start the command line interface, just type:
+
+\begin{quote}\begin{verbatim}
+% maple
+\end{verbatim}\end{quote}
+
+(\texttt{\%} is the shell prompt).
+
+You will see a banner similar to this:
+
+\begin{quote}\begin{verbatim}
+% maple
+    |\^/|     Maple V Release 4 (WMI Temporary License)
+._|\|   |/|_. Copyright (c) 1981-1996 by Waterloo Maple Inc. All rights
+ \  MAPLE  /  reserved. Maple and Maple V are registered trademarks of
+ <____ ____>  Waterloo Maple Inc.
+      |       Type ? for help.
+>
+\end{verbatim}\end{quote}
+ 
+(\verb+>+ is the MAPLE command-line prompt).
+
+You can access the help system for MAPLE by using the \texttt{`?'} command.
+An introduction is available if you type:
+
+\begin{quote}\begin{verbatim}
+> ?intro
+\end{verbatim}\end{quote}
+
+To leave the MAPLE command-line interface and exit back to the shell,
+use the \texttt{`quit'} command:
+
+\begin{quote}\begin{verbatim}
+> quit
+bytes used=374712, alloc=393144, time=0.18
+%
+\end{verbatim}\end{quote}
+
+\subsection{\xlabel{the_X11_interface}The X11 interface}
+
+The X11 interface is the recommended way to use MAPLE and provides the full
+range of facilities.
+
+If you want to use the X11 interface for MAPLE you must first direct
+the X output from the RAL machine back to your local system (Xterminal or
+system console).
+
+To do this, use the \texttt{xdisplay} command:
+
+\begin{quote}\begin{verbatim}
+% xdisplay your.machine.name
+\end{verbatim}\end{quote}
+
+or set the \texttt{DISPLAY} variable by hand:
+
+\begin{quote}\begin{verbatim}
+% setenv DISPLAY  your.machine.name:0.0
+\end{verbatim}\end{quote}
+
+You should also make sure you have allowed access to the local system by 
+setting the secuity masks using the \texttt{xhost} command on your local 
+machine:
+
+\begin{quote}\begin{verbatim}
+% xhost +central.machine.name
+\end{verbatim}\end{quote}
+
+When you have X output directed to your local system you should start the
+X11 interface with the \texttt{xmaple} command:
+
+\begin{quote}\begin{verbatim}
+% xmaple
+\end{verbatim}\end{quote}
+
+A window similar to Figure~\ref{fig_main_window} will be generated on your
+console/Xterminal.
+
+\begin{latexonly}
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=0.55]{sun107_f1.eps}
+\caption{The MAPLE X interface main window}
+\label{fig_main_window}
+\end{center}
+\end{figure}
+\end{latexonly}
+
+\begin{htmlonly}
+\label{fig_main_window}
+\htmladdimg{../sun107_f1.gif}
+
+Figure: The MAPLE X interface main window.
+\end{htmlonly}
+
+To quit the X11 interface you should use the \textbf{Exit} button on the
+pull-down \textbf{File} menu in the top left corner of the main window.
+
+\section{Examples\xlabel{examples}}
+
+The following example of a MAPLE session should give you some insight
+into the capabilities of the software, and how to use it.  You type the
+lines after the \verb+>+ prompt and the computer replies with the next line.
+The notes after the example explain some of the features you may find
+mysterious at first reading.
+
+\begin{quote}\begin{verbatim}
+> 3+4+5;
+                               12
+> e1:=expand(x*(x+1)*(x-1));
+                               3
+                        e1 := x  - x
+> factor(");
+                        x (x + 1) (x - 1)
+> evalf(sqrt(2));
+                        1.414213562
+> solve(e1=0,x);
+                        0, 1, -1
+> int(x*exp(x),x);
+                        x exp(x) - exp(x)
+> help(plot);
+     ... gives information on the plot command
+> help(index,library);
+     ... lists the functions in the Maple library
+> quit
+     ... escapes from Maple
+\end{verbatim}\end{quote}
+
+The second command illustrates the assignment operator \texttt{`:='}. It
+assigns the expression on the right of the operator to the variable 
+(\texttt{e1}) on the left.
+
+The \texttt{(")} symbol refers to the previous expression in the MAPLE
+session. Thus the third command \texttt{factor(")} is equivalent to
+\texttt{factor(e1)}. There are also symbols \texttt{("")} and \texttt{(""")}
+which refer to the second previous and third previous expressions.
+
+In the fifth command, the symbol \texttt{`e1'} refers to the expression
+defined in the second command. The \texttt{`int'} function integrates the
+expression \texttt{`e1'} with respect to \texttt{x}.
+
+Many examples of how to use MAPLE are given in the on-line help text.
+Other examples are stored in files in the \texttt{/usr/local/maple/examples} 
+directory.
+
+\section{Functions\xlabel{functions}}
+
+MAPLE has a very large number of functions available. You can find an
+explanation of these functions and examples of their use by typing the
+command:
+
+\begin{quote}\begin{verbatim}
+> help(<function>);
+\end{verbatim}\end{quote}
+
+during a MAPLE session. For example,
+
+\begin{quote}\begin{verbatim}
+> help(int);
+\end{verbatim}\end{quote}
+
+will describe the \texttt{`int'} function which performs integration.
+
+Among the most important and commonly used functions are the following:
+
+\begin{quote}
+\begin{description}
+
+\item [expand, simplify, normal] -- simplify expressions.
+\item [evalf] -- evaluate an expression using floating point arithmetic.
+\item [solve] -- solve equations.
+\item [int, diff] -- integrate/differentiate expressions.
+\item [series] -- expand functions to Taylor or Laurant series.
+\item [plot] -- plot functions.
+
+\end{description}
+\end{quote}
+
+Use \verb+help(<function>)+ to find out about these -- there are lots of
+examples. Other commonly used functions are:
+
+\begin{quote}
+\begin{description}
+
+\item [array] -- create an array.
+\item [coeff] -- extract a coefficient of a polynomial.
+\item [collect] -- collect terms in a specified indeterminate.
+\item [convert] -- convert an expression to a different form.
+\item [degree] -- determine the highest degree of a polynomial.
+\item [evalc] -- evaluate in the complex number field.
+\item [ifactor] -- integer factorisation.
+\item [limit] -- calculate function limits.
+\item [map] -- apply a procedure to each operand of an expression.
+\item [op] -- extract operands from an expression.
+\item [product] -- product of a sequence.
+\item [radsimp] -- simplification of an expression containing radicals.
+\item [subs] -- substitute sub-expressions into an expression.
+\item [sum] -- definite and indefinite summation.
+\item [table] -- create a table with initial values.
+\item [type] -- type checking function.
+
+\end{description}
+\end{quote}
+
+These are just a sample of the large number of functions in the standard and
+miscellaneous MAPLE function library. In addition, there are a number of
+packages which specialise in particular areas of mathematics. These are:
+
+\begin{quote}
+\begin{description}
+
+\item [combinat] -- combinatorial functions.
+\item [difforms] -- differential forms.
+\item [geometry] -- Euclidean geometry.
+\item [grobner] -- Grobner bases.
+\item [group] -- permutation and finitely-presented groups.
+\item [linalg] -- linear algebra.
+\item [np] -- Newman-Penrose formalism.
+\item [numtheory] -- number theory.
+\item [orthopoly] -- orthogonal polynomials.
+\item [powseries] -- formal power series.
+\item [projgeom] -- projective geometry.
+\item [simplex] -- linear optimization.
+\item [stats] -- statistics.
+\item [student] -- student calculus.
+
+\end{description}
+\end{quote}
+
+Information on these packages can be obtained from within MAPLE by
+entering:
+
+\begin{quote}\begin{verbatim}
+> help(<package>);
+\end{verbatim}\end{quote}
+
+and information on the functions within a package can be obtained by:
+
+\begin{quote}\begin{verbatim}
+> help(<package>,<topic>);
+\end{verbatim}\end{quote}
+
+Thus, if you were learning calculus you could find help by entering:
+
+\begin{quote}\begin{verbatim}
+> help(student);
+\end{verbatim}\end{quote}
+
+and if you were particularly interested in finding out how to integrate
+by parts, enter:
+
+\begin{quote}\begin{verbatim}
+> help(student,intparts);
+\end{verbatim}\end{quote}
+
+Sounds a great way of doing your Maths homework.
+
+% ? End of main text
+\end{document}
+

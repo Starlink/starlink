@@ -1,0 +1,528 @@
+\documentclass[twoside,11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardocnumber}    {202.2}
+\newcommand{\stardocauthors}   {M.\,J.\,Bly}
+\newcommand{\stardocdate}      {19 February 1998}
+\newcommand{\stardoctitle}     {Starlink Subroutine Libraries \\[1.5ex]
+                                A Guide for Program Development and Linking}
+\newcommand{\stardocversion}   {software\_version}
+\newcommand{\stardocmanual}    {manual\_type}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+%   {\LARGE\bf \stardocversion \\ [4ex]}
+%   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\bf Abstract}
+%   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+%      \stardocversion\\
+%      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+%  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+% \begin{latexonly}
+%   \setlength{\parskip}{0mm}
+%   \latexonlytoc
+%   \setlength{\parskip}{\medskipamount}
+%   \markboth{\stardocname}{\stardocname}
+% \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+%\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\xlabel{introduction}Introduction}
+\label{introduction}
+
+This note gives a general overview of the methods available for using 
+Starlink Infrastructure subroutine libraries with applications.  
+There is an outline of how to use the include files for a subroutine 
+library, and a guide to the methods available for linking with the 
+subroutine libraries.
+
+All the Starlink Infrastructure libraries are organised in the same way,
+so it is possible to give a general guide to the principles involved. 
+However, some libraries do differ, and for precise details of how to use a
+particular subroutine library, you should consult the Starlink document
+for that library. 
+
+\section{\xlabel{organisation}Organisation}
+\label{organisation}
+
+Suppose you wanted to use an Infrastructure library BLY (there isn't one
+-- this is an example!).  In the Starlink installation, the BLY subroutine
+library has several components: 
+
+\begin{enumerate}
+
+\item a library file \texttt{libbly.a}
+
+\item a shareable library \texttt{libbly.so} 
+
+\item a development script \texttt{bly\_dev}
+
+\item Fortran \texttt{INCLUDE} files \texttt{bly\_err} and \texttt{bly\_par}
+
+\item ADAM\footnote{See SG/4 `\emph{ADAM -- The Starlink Software
+Environment}'} versions of the library and shareable library
+\texttt{libbly\_adam.a} and \texttt{libbly\_adam.so}
+
+\item link scripts \texttt{bly\_link} and \texttt{bly\_link\_adam}
+
+\end{enumerate}
+
+Most of the Infrastructure libraries have all these components, but some
+have more \texttt{INCLUDE} files, and some do not have shareable libraries.
+Those that do not have any \texttt{INCLUDE} files will lack a development
+script.  A few libraries do not need separate ADAM versions, so will not
+have libraries for use with ADAM.
+
+It is best to consult the documentation for a particular library to see 
+what \texttt{INCLUDE} files and libraries are available.
+
+The components may all be used as part of the development and linking of 
+programs that use the Starlink Infrastructure subroutine libraries.
+
+\section{\xlabel{program_development}Program Development -- \texttt{INCLUDE} files}
+\label{program_development}
+
+If the Infrastructure library you want to use has \texttt{INCLUDE} files, you
+need to be able to reference them from your source code. 
+
+You might wish to use the full \texttt{PATH} name for the \texttt{INCLUDE}
+file, \emph{e.g.}, \texttt{/star/include/bly\_par}.  This is fine, and works,
+but is not portable, and could lead to problems if you want to use a
+development version of the library. 
+
+The recommended way to use the \texttt{INCLUDE} files for a particular
+library is to create links in your development directory to the {\tt
+INCLUDE} files, and reference the links in your source code. 
+
+A library `\texttt{dev}' script will create the links for you in your
+working directory.  The links are \textbf{UPPER-CASE}, and it is these 
+upper-case links you reference in the source code, thus:
+
+\begin{quote}
+\begin{verbatim}
+      PROGRAM MYPROG      
+*
+*  demonstrate use of include file
+*
+      INCLUDE 'BLY_PAR'
+*
+      ...
+*
+      END
+\end{verbatim}
+\end{quote}
+
+To generate the links, issue the development command:
+
+\begin{quote}
+\begin{verbatim}
+% bly_dev
+\end{verbatim}
+\end{quote}
+
+This will create links to ALL the \texttt{INCLUDE} files for the BLY library:
+
+\begin{quote}
+\begin{verbatim}
+BLY_ERR ->  /star/include/bly_err
+BLY_PAR ->  /star/include/bly_par
+\end{verbatim}
+\end{quote}
+
+To remove the links, issue the command again with the \texttt{remove} option:
+
+\begin{quote}
+\begin{verbatim}
+% bly_dev remove
+\end{verbatim}
+\end{quote}
+
+You should keep the links in place while developing your program.  If you 
+want to move development directories, simply remove the links and create 
+new ones in the new directory.  
+
+The Starlink software building system uses the soft link strategy in its 
+makefiles, though the makefiles generate the links themselves.  The links 
+may easily be changed to pick up a development version of a library, 
+without having to edit source code.
+
+\section{\xlabel{library_link_scripts}Library Link Scripts}
+\label{library_link_scripts}
+
+\subsection{\xlabel{link_scripts_background}Background}
+\label{link_scripts_background}
+
+The Starlink Infrastructure libraries depend upon one another in a
+hierarchy of dependencies that is quite complicated -- dependencies that
+mean one library may need several others at link time to get a full
+resolution of all the subroutine calls. 
+
+So that users do not have to remember the dependencies of a particular
+library, each library has a link script that contains references
+to its own libraries, and all the other libraries that it depends upon.  
+Most of the other references will be to the link scripts for the other
+libraries.
+
+This in itself presents a problem -- the nested links scripts can 
+generate a long list of libraries, often with each library occurring more 
+than once.  
+
+To avoid this, each link script has an internal mechanism that trims 
+unnecessary occurrences of a library out of the list.
+
+The link script writes a list of libraries to its standard output, so
+to get the list into your compile or link command, you need to run the
+script as part of the compile or link command.  To do this you just
+back-quote the link script name thus: \texttt{`bly\_link`}.
+
+The result is that when using the link scripts, you do not have to worry 
+about remembering which libraries that the one you need depends upon, and 
+the linker is provided with a simple list of dependant libraries in the 
+correct order to resolve all external references in your source code.
+
+\subsection{\xlabel{compiling_and_linking_on_liunux}Compiling and Linking on Linux}
+\label{compiling_and_linking_on_liunux}
+
+This section applies to Linux systems only.
+
+The Starlink libraries on Linux systems are compiled so that they are
+compatible with the GNU \texttt{gcc/g77} system and the \texttt{f2c}
+compiler.  To do this, the \texttt{`-fno-second-underscore'} compiler
+flag is used.
+
+This means that to compile and link code with the Starlink libraries
+on Linux systems, you must use the \texttt{`-fno-second-underscore'}
+flag for the \texttt{g77} compiler/linker, thus:
+
+\begin{quote}
+\begin{verbatim}
+% g77 -O -fno-second-underscore myprog.f -o myprog .....
+\end{verbatim}
+\end{quote}
+
+\subsection{\xlabel{static_linking}Static Linking}
+\label{static_linking}
+
+Your application depends upon the BLY library, so when you link (or 
+compile and link -- it does not matter), you need to tell it to link with 
+the \texttt{libbly.a} library.
+
+In a one-stage compile and link, you would use the following:
+
+\begin{quote}
+\begin{verbatim}
+% f77 -O myprog.f -o myprog -L/star/lib `bly_link`
+\end{verbatim}
+\end{quote}
+
+In a two stage compile and link, you would use the following:
+
+\begin{quote}
+\begin{verbatim}
+% f77 -O -c myprog.f
+% f77 -O myprog.o -o myprog -L/star/lib `bly_link`
+\end{verbatim}
+\end{quote}
+
+To use the ADAM versions of the library, if you are developing an ADAM 
+application, use the following:
+
+\begin{quote}
+\begin{verbatim}
+% alink myprog.f -o myprog -L/star/lib `bly_link_adam`
+\end{verbatim}
+\end{quote}
+or:
+\begin{quote}
+\begin{verbatim}
+% f77 -O -c myprog.f
+% alink myprog.o -o myprog -L/star/lib `bly_link_adam`
+\end{verbatim}
+\end{quote}
+
+You should also include in the link phase any other library link scripts
+for those libraries that your application calls directly, and any 
+libraries of your own \emph{e.g.}:
+
+\begin{quote}
+\begin{verbatim}
+% f77 -O myprog.f -o myprog ./libmine.a -L/star/lib \
+         `bly_link` `other_lib_link` -lmine2
+\end{verbatim}
+\end{quote}
+
+where \texttt{`other\_lib\_link`} causes linking with another library
+using the link script system, and \texttt{-lmine2} causes a link with a
+library \texttt{libmine2.a}.
+
+\subsection{\xlabel{dynamic_linking}Dynamic Linking}
+\label{dynamic_linking}
+
+If you use the link scripts and the \texttt{-L/star/lib} tag in your link
+chain, your executable will be created using the ordinary libraries
+available in \texttt{/star/lib} (unless the linker discovers a shareable 
+version of a library in \texttt{/star/lib} which it will use by default).
+
+A statically linked binary includes all the necessary object code.  This
+can create very large binaries, but at at load time, startup is quite
+fast, because the runtime linker only has to resolve the system library
+references. 
+
+In contrast, dynamically linked executables are much smaller -- the
+linker just notes in the binary which shareable libraries were used to
+resolve which references, and leaves it at that.
+
+When the binary is loaded for execution, the runtime linker looks for the
+shared libraries for which it finds references in the binary, and then does a
+`fixup' to resolve all the external references using the libraries.  For
+executables with a large list of shared libraries, this process can take a
+considerable time.  What you save in link time during development and in
+disk space, you may pay for when waiting for the binary to load. 
+
+Since your binary will need the shared libraries at install time, your
+binary will only be portable to systems containing the Starlink shared
+library set.
+
+Starlink builds its applications statically linked against the
+Infrastructure libraries, and dynamically linked with the system
+libraries.  The \texttt{alink} command for ADAM applications triggers static
+linking by default. 
+
+If you want to take advantage of the speed of dynamic linking and the 
+disk space savings, you can use the shared libraries in \texttt{/star/share} 
+to link with:
+
+\begin{quote}
+\begin{verbatim}
+% f77 -O myprog.f -L/star/share `bly_link`
+\end{verbatim}
+\end{quote}
+
+There are some caveats (apart from portability already mentioned):
+
+\begin{enumerate}
+
+\item This facility is only available on Intel Linux and SPARC Solaris
+2 machines -- shareable Infrastructure libraries are not provided for
+DEC Alpha Digital Unix machines.
+
+\item At run time, the loader needs to find the shared libraries.  On a
+Starlink system your \texttt{LD\_LIBRARY\_PATH} will have been set to enable
+this to occur (if you use the Starlink login files).  If not, you should
+add \texttt{/star/share} to your \texttt{LD\_LIBRARY\_PATH}. 
+
+\item Some Infrastructure libraries do not have shared versions because 
+it is not possible to generate them, even on Intel Linux and SPARC Solaris 2 
+systems.
+
+\end{enumerate}
+
+\end{document}

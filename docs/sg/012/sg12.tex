@@ -1,0 +1,1863 @@
+%
+% An Introduction to IRAF.
+%
+% Copyright 1999  Starlink, CCLRC.
+%
+% A.C. Davenhall (Edinburgh), 3/9/98.
+%
+
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink Guide}
+\newcommand{\stardocinitials}  {SG}
+\newcommand{\stardocsource}    {sg\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {12.2}
+\newcommand{\stardocauthors}   {R.~Morris, G.J.~Privett \& A.C.~Davenhall}
+\newcommand{\stardocdate}      {2nd December 1999}
+\newcommand{\stardoctitle}     {An Introduction to IRAF}
+\newcommand{\stardocabstract}
+{This document is an introduction to the IRAF software package and
+its use on Starlink systems.  IRAF is a powerful and comprehensive
+environment for reducing and analysing astronomical data.  It was
+developed at the National Optical Astronomy Observatories, Tucson and is
+in widespread use around the world.  IRAF has its own data file format,
+command language, on-line help system and programming language.  It is a
+modular system.  The basic core, which is always present, provides general
+facilities for image processing and data reduction.  For more specialised
+tasks additional packages are loaded to augment the core system.
+Software for processing most sorts of astronomical data is available
+for the IRAF environment.
+
+\begin{latexonly}
+\vspace{5mm}
+\end{latexonly}
+
+\begin{center}
+{\bf Who Should Read this Document?}
+\end{center}
+
+This document is aimed at people who are considering whether or not
+to use IRAF or who are using it for the first time.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sg.tex
+%
+%  Purpose:
+%     Template for Starlink Guide (SG) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \vspace{3cm}
+
+  \subsection*{Revision History}
+
+  \begin{enumerate}
+
+    \item 30th December 1998: Version 1.  Original version based on
+     the earlier document SUN/179.3, 13th July 1995 by Rhys~Morris
+     and Grant~Privett (ACD).
+
+    \item 2nd December 1999: Version 2.  Corrected a mistake in the
+     start-up instructions.  Also improved the links to the on-line
+     documentation.
+
+  \end{enumerate}
+
+  \vspace{10cm}
+  \copyright \underline{1999} Starlink, CCLRC
+
+  \cleardoublepage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+
+%   \newpage
+%    \listoftables
+%    \newpage
+   \vspace{5cm}
+   \listoffigures
+
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+
+% - Part I --------------------------------------------------------------------
+\cleardoublepage
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\markboth{\stardocname}{\stardocname}
+\part{Overview}
+\markboth{\stardocname}{\stardocname}
+\section{\xlabel{INTRO}\label{INTRO}Introduction}
+
+This document is an introduction to the IRAF (Image Reduction and
+Analysis Facility) software package and its use on Starlink systems.
+It is aimed at people who are considering whether or not to use IRAF or
+who are using it for the first time.
+
+IRAF is a powerful and comprehensive environment for reducing and
+analysing astronomical data.  It was developed at the National Optical
+Astronomy Observatories (NOAO), Tucson and is now in widespread use around
+the world.  IRAF has its own data file format, command language, on-line
+help system and programming language.  It is a modular system.  The basic
+core, which is always present, provides general facilities for image
+processing and data reduction.  For more specialised tasks additional
+packages are loaded to augment the core system.  Software for processing
+most sorts of astronomical data is available for the IRAF environment.
+IRAF is available on all the variants of Unix currently supported by
+Starlink: Digital Alpha/Digital Unix, SUN/Solaris and PC/Linux.
+
+IRAF is one of several major software environments which are available
+to Starlink users and upon which entire data-analysis campaigns can be
+based.   Some other examples include: Starlink's own large collection of
+utilities and application packages, the various incarnations of
+the Figaro package (\xref{SUN/86}{sun86}{}\cite{SUN86}), AIPS
+(\xref{SUN/207}{sun207}{}\cite{SUN207}) and MIDAS.  Each package has its
+own particular strengths and special capabilities;  IRAF, AIPS and
+Figaro are probably the most extensive.
+
+IRAF is a sound choice for many Starlink data-analysis users,
+especially where compatibility with overseas collaborators is a
+requirement.  The choice is harder for those wishing to develop major
+applications of their own, who may be reluctant to adopt IRAF's
+non-standard programming language, {\tt SPP}, or who feel that the
+`flat' IRAF data format is inadequate for their purposes (see
+Section~\ref{FORMATS} for further details).  Those who need formal
+guarantees of future support should also be very wary about committing
+themselves to any package which is not under UK control.  However, IRAF
+is an important weapon in the armoury of the average Starlink
+data-analysis user and likely to remain so for some years.
+
+The structure of this document is:
+
+\begin{description}
+
+  \item[{\rm Part I}] -- an overview of IRAF,
+
+  \item[{\rm Part II}] -- some simple worked examples.
+
+\end{description}
+
+We suggest that you read through the overview to gain an impression
+of what IRAF is about and then try some of the worked examples.  If
+you have a particular aversion to reading manuals you could proceed
+straight to the worked examples, though we do not recommend this.
+
+The presence of IRAF is not mandatory at Starlink sites, though in
+practice it is available at most sites.  You should check the
+arrangements at your site with your local site manager.
+If IRAF is not available at your site it is possible to obtain a copy
+via the Internet; the following section gives the details.
+
+
+\section{\xlabel{OBTAIN}\label{OBTAIN}Obtaining IRAF}
+
+You can retrieve a copy of IRAF via the Internet by anonymous ftp.  It
+can be downloaded from either the original NOAO site in Tucson or from a
+mirror (that is, an identical copy) maintained by Starlink at the Rutherford
+Appleton Laboratory.  The latter is quicker and more convenient for sites
+in the UK.  The Starlink mirror is updated from the NOAO original every
+night and hence can be no more than twenty-four hours out of date.  The
+access details are as follows.
+
+\begin{description}
+
+  \item[NOAO, Tucson] ~
+  \newline URL: \htmladdnormallink{ {\tt http://iraf.noao.edu/} }
+   {http://iraf.noao.edu/}
+
+   {\bf Anonymous ftp}
+
+  \begin{tabular}{ll}
+   site:      & {\tt ftp.noao.edu} \\
+   directory: & {\tt /iraf}        \\
+  \end{tabular}
+
+   Retrieve file {\tt README} for further details.
+
+  \item[Starlink mirror] ~
+  \newline URL: \htmladdnormallink{ {\tt http://www.starlink.rl.ac.uk/iraf/} }
+   {http://www.starlink.rl.ac.uk/iraf/}
+
+   {\bf Anonymous ftp}
+
+  \begin{tabular}{ll}
+   site:      & {\tt ftp.starlink.rl.ac.uk} \\
+   directory: & {\tt /pub/mirrors/iraf}     \\
+  \end{tabular}
+
+   Retrieve file {\tt README} for further details.
+
+\end{description}
+
+There are additional mirrors in Germany and Japan.
+Installing IRAF is a non-trivial process and will almost certainly
+require the assistance of your site manager.  Some hints on obtaining
+and installing IRAF are given in Appendix~\ref{INSTALL}.  Postscript
+versions (suitable for printing) of all the IRAF manuals mentioned in
+this document can also be retrieved from the NOAO IRAF site and the
+Starlink mirror.  In practice you are more likely to use the IRAF sites
+to obtain documents than a complete installation.
+
+If you are not familiar with the ftp utility then ask a colleague or
+your site manager for assistance.  Alternatively, the books by
+Krol\cite{KROL92} and Thomas\cite{THOMAS95} include good descriptions.
+
+
+\section{\xlabel{DOC}\label{DOC}Documentation}
+
+A great deal of \htmladdnormallink{documentation}
+{http://iraf.noao.edu/iraf/web/docs/docmain.html}
+is available for IRAF.  Most of the
+documentation comprises detailed manuals for the various individual,
+specialised packages.  However, some more general documentation is
+available and, in particular, there is an introductory guide for new
+users: {\it A Beginner's Guide to Using IRAF}\/\cite{BARNES93}.
+IRAF is a complex and in some ways non-intuitive system and it is well
+worth taking the time and trouble to learn the basics of its operation
+before attempting a complicated data-reduction task.  The {\it
+Beginner's Guide}\, is an accessible and thorough document and is a good
+place to start.  Even if you are already familiar with IRAF it is still
+worthwhile having a look at the {\it Beginner's Guide}\, because it may
+well still contain useful information which is new to you.  Another
+useful document is {\it A User's Introduction to the IRAF Command
+Language}\/\cite{SHAMES86} which describes the IRAF command language,
+{\tt cl}.
+
+Copies of these documents can be retrieved from the IRAF 
+\htmladdnormallinkfoot{Web}
+{http://www.starlink.rl.ac.uk/iraf/web/docs/docmain.html}
+or anonymous ftp sites (see Section~\ref{OBTAIN} for details).  The
+directory specifications given below are relative to the `top-level' IRAF
+directory given in Section~\ref{OBTAIN}.  The {\it Beginner's Guide}\, is
+available as file:
+
+\begin{quote}
+{\tt pub/beguide.ps.Z}
+\end{quote}
+
+The {\it Introduction to the IRAF Command Language}\, is available
+as file:
+
+\begin{quote}
+{\tt iraf/docs/cluser.ps.Z}
+\end{quote}
+
+Both of these files are in compressed postscript format.  Remember
+to set ftp to binary mode prior to retrieving them.  Once retrieved,
+they should be decompressed using Unix command {\tt uncompress} (sic)
+and can then be printed on a postscript printer.  Most IRAF documents
+(but not the {\it Beginner's Guide}\/) are kept in directory {\tt
+iraf/docs}.  A complete, up-to-date list of documents is kept in file:
+
+\begin{quote}
+{\tt iraf/docs/README}
+\end{quote}
+
+which is a simple ASCII text file.
+
+\subsection{On-line documentation}
+
+\htmladdnormallink{The IRAF Web sites}{http://www.starlink.rl.ac.uk/iraf/}
+contain a great deal of useful information.  See Section~\ref{OBTAIN} for
+the URLs.
+
+\subsection{\label{FAQ}Frequently Asked Questions}
+
+An excellent, up-to-date list of Frequently Asked Questions (FAQs)
+is maintained for IRAF.  It is, perhaps, the single most useful
+IRAF document and you should familiarise yourself with it; it will
+probably contain the answers to most of your initial queries about
+IRAF.  An on-line version is available at the following URLs:
+
+\begin{tabular}{ll}
+NOAO, Tucson:    & \htmladdnormallink{ {\tt 
+    http://iraf.noao.edu/iraf/web/faq/FAQ.html} }
+   {http://iraf.noao.edu/iraf/web/faq/FAQ.html}      \\
+Starlink mirror: & \htmladdnormallink{ {\tt
+    http://www.starlink.rl.ac.uk/iraf/web/faq/FAQ.html} }
+   {http://www.starlink.rl.ac.uk/iraf/web/faq/FAQ.html}  \\
+\end{tabular}
+
+A simple ASCII text version (suitable for printing) can be retrieved
+by anonymous ftp from file:
+
+\begin{quote}
+{\tt iraf/FAQ}
+\end{quote}
+
+\subsection{Newsletter\label{NEWSLETTER}}
+
+A {\it Newsletter}\, describing recent enhancements and developments
+of IRAF is published intermittently.  To subscribe to this {\it
+Newsletter}\, send an e-mail message to username {\tt iraf@noao.edu}
+asking to be added to the distribution list and including your
+e-mail and postal address.  Alternatively use ftp to retrieve the
+registration file:
+
+\begin{quote}
+{\tt iraf/REGISTER}
+\end{quote}
+
+and return it to username {\tt iraf-requests@noao.edu}.
+
+Back issues of the {\it Newsletter}\, are 
+\htmladdnormallink{available on the IRAF Web pages}
+{http://www.starlink.rl.ac.uk/iraf/web/irafnews/newslet.html}.
+A \htmladdnormallink{table-of-contents}
+{http://www.starlink.rl.ac.uk/iraf/ftp/iraf/docs/TOC_news.txt}
+for all the issues can be retrieved by anonymous ftp from file:
+
+\begin{quote}
+{\tt iraf/docs/TOC\_news.txt}
+\end{quote}
+
+and is available from the Web pages.
+
+
+\section{\xlabel{VERSION}\label{VERSION}IRAF Version Numbers}
+
+Currently the most recent major release of IRAF (at least for the three
+variants of Unix supported by Starlink) is version 2.11.  However, the
+previous version, 2.10, is still in use at some sites.  There are
+significant differences between versions 2.10 and 2.11, particularly in
+the data formats which they support (see Section~\ref{FORMATS}).  These
+differences will be alluded to at various points in the present document.
+
+
+\section{\xlabel{FORMATS}\label{FORMATS}Data File Formats}
+
+The basic IRAF data file format is the so-called Old IRAF Format (OIF).
+Despite this name there is no `new' IRAF format.  Most IRAF
+tasks use the OIF format.  Some brief details of it are given below.
+
+In IRAF version 2.11 and subsequent versions most tasks can also
+access data files in the widely-used international standard
+FITS\footnote{The original FITS format was proposed by Wells {\it et
+al.}\/\cite{WELLS81}.  However, it has been developed and enhanced over
+the years.  The FITS standard is now maintained and documented by the
+FITS Support Office of the Astrophysics Data Facility at the NASA
+Goddard Space Flight Center (see URL: \htmladdnormallink{ {\tt
+http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}}
+{http://www.gsfc.nasa.gov/astro/fits/fits\_home.html}).
+Though FITS is basically an astronomical format it is sometimes
+mentioned in books about standard image formats.  See, for example,
+{\it Graphics File Formats}\, by Kay and Levine\cite{KAY95}.}
+(Flexible Image Transport System) format.
+
+Other formats are used for more specialised purposes.  For example,
+the STF format is used by the STSDAS package for storing HST data,
+the QPOE format is used to hold photon event lists (which are
+usually produced by X-ray astronomy satellites) and the PLIO format
+for pixel lists (which flag individual pixels in an image).
+
+The IRAF {\tt dataio} package contains tasks for converting between
+numerous different formats.
+
+\subsection{Old IRAF Format}
+
+A dataset, typically an image or spectrum, in the Old IRAF Format (OIF)
+format consists of two files: a header file which has file-type {\tt
+.imh} and a pixel file which has file-type {\tt .pix}.  These files
+are usually stored in standard locations in your IRAF directories.
+The {\tt .pix} files are large and can be stored in either the same
+directory as the header files or in a different directory.  The header
+file contains the dimensions of the data array, the name of the pixel file
+and optionally any auxiliary information describing the image, expressed
+as a series of keywords and their values.  These OIF keywords deliberately
+have a syntax similar to FITS keywords.  The image dimensions and name of
+the pixel file are stored in a binary format, but the keywords are stored
+as simple ASCII characters.  Thus, you can check the values of the keywords
+by listing a header file on the terminal.
+
+There are several points about the OIF format which you should be aware
+(and beware) of.
+
+\begin{enumerate}
+
+  \item IRAF version 2.10 supports only the original OIF (that is, version 1
+   of the format).  However, version 2.11 also supports an enhanced version
+   of the format (version 2).
+
+  \item In version 1 of the format the {\tt .pix} file differs on
+   different types of computer.  That is, if you are using IRAF version
+   2.10 then a data file written on a SUN workstation cannot be read on a
+   Digital Alpha or vice versa.  Thus, in this case, it is sensible to carry
+   out all your IRAF work on the same sort of machine.
+
+  \item Version 2 of the format is independent of the host operating
+   system.  That is, if you are using IRAF version 2.11 then a data file
+   written on one type of computer can be read on another type.
+
+  \item This change is backwards but not forwards compatible.  IRAF version
+   2.11 will read files in either version of the format, but version 2.10
+   only reads files in version 1 of the format.  If you need to write a
+   data file with version 2.11 and subsequently read it with version
+   2.10 then one approach is to write it as a FITS file.  Alternatively,
+   version 2.11 can be made to write files in version 1 of the format by
+   setting an appropriate environment variable:
+
+  \begin{quote}
+   {\tt set ~ oifversion=1}
+  \end{quote}
+
+  \item In either version of the format, the header file contains the full
+   name and directory specification of the pixel file.  Consequently, IRAF
+   data files cannot be manipulated (copied, renamed or deleted) using
+   standard Unix operating system commands; there are special commands
+   within IRAF ({\tt imcopy}, {\tt imrename} and {\tt imdelete} respectively)
+   which must be used for these tasks.  This point is covered fully in the
+   {\it Beginner's Guide}\/\cite{BARNES93}.
+
+\end{enumerate}
+
+\subsection{Space Telescope Format}
+
+The Space Telescope Format (STF) is used for storing Hubble Space
+Telescope (HST) data.  It was introduced for the STSDAS package
+(see Section~\ref{STSDAS}), but is now understood by most IRAF
+tasks.  Like the OIF format, an STF dataset comprises two files:
+one is the header file, and has the extension
+{\tt .}{\it xx}\/{\tt h}, where {\it x}\, can be any
+alphanumeric character, while the other contains the actual data
+values and has a {\tt .}{\it xx}\/{\tt d} suffix.  The most usual file
+extensions are {\tt .hhh} for header files and {\tt .hhd} for data files.
+These files are usually kept together in the same directory.  STSDAS files
+have the advantage that the header file is an ASCII file and can be read on
+a terminal without using IRAF at all (which is not true of {\tt .imh} files;
+see above).
+
+
+\section{\xlabel{STRUCTURE}\label{STRUCTURE}The IRAF Package Structure}
+
+IRAF's `tasks', as the individual programs are usually called, are
+divided into packages.  Each of the packages may contain tasks or further
+subpackages. For example, loading the {\tt noao} package by typing `{\tt
+noao}', leads to further subpackages, while loading the {\tt dataio}
+package makes available tasks for importing and exporting data to and
+from IRAF. You cannot use any task until you have loaded the package
+which contains it. Typing `{\tt bye}' unloads the most recently loaded
+package.
+
+Documentation for the various specialised packages is available from
+the IRAF \htmladdnormallinkfoot{Web pages}
+{http://www.starlink.rl.ac.uk/iraf/web/docs/docmain.html}
+and anonymous ftp sites (see Section~\ref{OBTAIN} for details).
+
+
+\section{\xlabel{PACKAGES}\label{PACKAGES}Some IRAF Packages}
+
+A couple of the more common IRAF packages are described briefly
+below.
+
+\subsection{\label{STSDAS}STSDAS}
+
+STSDAS (Space Telescope Science Data Analysis System) is a package
+for analysing data  acquired with the Hubble Space Telescope (HST).
+It was developed at the Space Telescope Science Institute (STScI) in
+Baltimore.  Further information is available at URL:
+
+\begin{quote}
+\htmladdnormallink{ {\tt http://ra.stsci.edu/STSDAS.html} }
+   {http://ra.stsci.edu/STSDAS.html}
+\end{quote}
+
+including details of retrieving the software and documentation.  Note
+that installing STSDAS requires about 85 Mbytes of free disk space.
+Also note that STSDAS requires the TABLES package for manipulating
+tables to be installed.  TABLES is also available from the STScI.
+Inquiries, queries, bug reports etc. about STSDAS can be sent by e-mail
+to the HST Help Desk at username {\tt help@stsci.edu}.
+
+\subsection{PROS}
+
+PROS (Post-Reduction Off-line Software) is a package for analysing
+X-ray astronomy data.  It is not specific to any one X-ray astronomy
+satellite and, in particular, it has facilities to handle data from
+the EINSTEIN, ROSAT, ASCA and AXAF satellites.  It can also be used
+for non-X-ray data and is particularly suitable for generating pixel
+masks.  It was developed at the Smithsonian Astrophysical Observatory,
+Cambridge, Massachusetts.  Further information is available at URL:
+
+\begin{quote}
+\htmladdnormallink{ {\tt http://hea-www.harvard.edu/PROS/pros.html} }
+   {http://hea-www.harvard.edu/PROS/pros.html}
+\end{quote}
+
+including details of retrieving the software and documentation.
+Inquiries, queries, bug reports etc. about PROS can be sent by e-mail
+to the PROS user support hotline at username {\tt
+hotseat@cfa.harvard.edu}.
+
+
+\section{\xlabel{IRAFSTAR}\label{IRAFSTAR}IRAF and Starlink}
+
+Most Starlink software is written using the Starlink software environment
+and stores data in the N-dimensional Data Format (NDF;
+\xref{SUN/33}{sun33}{}\cite{SUN33}).  A substantial degree of
+inter-operability is possible between this software and IRAF.  
+
+At the most basic level Starlink provides the CONVERT package 
+(\xref{SUN/55}{sun55}{}\cite{SUN55}) which is a set of applications
+for converting data files between a number of different data formats.
+It includes applications for converting an NDF format file to one in
+the IRAF OIF format (see Section~\ref{FORMATS}) and vice versa.  You
+should be aware, however, that the NDF format is more capable, and can
+contain more auxiliary information, than the IRAF OIF format.  When
+an NDF file is converted to the OIF format such information is lost.
+In particular, the NDF format has standard ways of representing arrays
+of errors associated with arrays of data and many applications in the
+Figaro package process and propagate these errors.  Error arrays are
+not accommodated in the OIF format and are lost when an NDF is converted
+to this format.
+
+In addition to explicitly converting NDF files, most Starlink
+applications which read and write NDF files can be configured to
+read and write IRAF OIF files instead.  Again see
+\xref{SUN/55}{sun55}{}\cite{SUN55} for details.
+
+Some Starlink packages have been enhanced so that they can be run from
+the IRAF command language, {\tt cl}.  When used in this way the Starlink
+packages behave like `native' IRAF packages loaded on top of the basic
+IRAF; they read and write data files in the native IRAF format and their
+parameters can be set and inspected using the usual mechanisms of the
+IRAF command language.  Tasks in the Starlink packages can be intermixed
+freely with the standard IRAF tasks (again, just like `native' IRAF
+packages).  There are a few differences between Starlink and `native'
+IRAF tasks, principally in the way that graphics are displayed; see
+\xref{SUN/217}{sun217}{}\cite{SUN217} for details.
+
+The principal Starlink packages which have been enhanced in this way
+are Figaro, KAPPA and GAIA.  Their use from the IRAF command language is
+described in \xref{SUN/217}{sun217}{}\cite{SUN217} and
+\xref{SUN/221}{sun221}{}\cite{SUN221} and Section~\ref{STARSESS} gives
+a worked example.  The details of the technical legerdemain which
+allows applications written for the Starlink software environment to
+be run from the IRAF {\tt cl} will not be of interest to most users.
+However, for completeness it is documented in
+\xref{SSN/35}{ssn35}{}\cite{SSN35}.  The Figaro, KAPPA and GAIA packages
+themselves are documented in \xref{SUN/86}{sun86}{}\cite{SUN86},
+\xref{SUN/95}{sun95}{}\cite{SUN95} and \xref{SUN/214}{sun214}{}\cite{SUN214}
+respectively.
+
+
+\section{\xlabel{ASSIST}\label{ASSIST}Obtaining Assistance}
+
+For queries about how IRAF is installed at your site or assistance
+with obtaining and installing it you should consult your local
+site manager.
+
+If you have a problem with or query about using IRAF then your first
+port of call should be the 
+\htmladdnormallink{FAQ}{http://www.starlink.rl.ac.uk/iraf/web/faq/FAQ.html}
+(see Section~\ref{FAQ}), which will often have the answer.
+
+The IRAF Project in Tucson provides a support service for users.  If
+your query is not covered by the FAQ then you can send it in an e-mail
+message to username {\tt iraf@noao.edu}.  The response is usually pretty
+swift, but do bear in mind the time difference between the UK and Tucson.
+
+Because the support provided by the IRAF Project is excellent, little
+additional support by Starlink is either called for or provided.
+However, there is a Starlink contact for assistance with IRAF problems;
+you should send an e-mail message to username {\tt iraf@star.rl.ac.uk}.
+This contact is particularly appropriate if you encounter problems
+inter-operating Starlink and IRAF software.
+
+
+% - Part II -------------------------------------------------------------------
+\cleardoublepage
+\markboth{\stardocname}{\stardocname}
+\part{Worked Examples}
+\markboth{\stardocname}{\stardocname}
+\section{\xlabel{INTRO_EX}\label{INTRO_EX}Introduction}
+
+This part of the document provides a few simple, introductory examples
+of using IRAF.  The examples are:
+
+\begin{itemize}
+
+  \item starting IRAF,
+
+  \item a simple IRAF session,
+
+  \item using Starlink packages from IRAF,
+
+  \item using scripts and batch jobs.
+
+\end{itemize}
+
+The best way to use the examples is to work through them in the order
+that they are given.  All the data files, scripts etc. referred to in
+the examples are available in directory:
+
+\begin{quote}
+{\tt /star/examples/sg12}
+\end{quote}
+
+\subsection{Additional examples}
+
+The examples given here form only the briefest of introductions and
+there are many facilities which are not described.  There are further
+examples, and more detailed descriptions, in the {\it Beginner's
+Guide}\/\cite{BARNES93}.
+
+There are also a set of exercises which demonstrate how to reduce
+various sorts of data.  They can retrieved by anonymous ftp (see
+Section~\ref{OBTAIN} for details) from file:
+
+\begin{quote}
+{\tt iraf/misc/exer2102.tar.Z}
+\end{quote}
+
+The file is a compressed tar archive.  Remember to set ftp to binary
+mode prior to retrieving it.  The file should be decompressed using Unix
+command {\tt uncompress} (sic).  Instructions for installing the
+examples are given in file 
+\htmladdnormallink{{\tt exer2102.readme}}
+{ftp://iraf.noao.edu/iraf/misc/exer2102.readme}
+(which is included in the tar archive).
+
+
+\newpage
+\section{\xlabel{START}\label{START}Starting IRAF}
+
+Starting IRAF for the first time is non-trivial and hence this example
+is provided as an illustration of the procedure.  {\it The example is
+broadly correct, and works in Edinburgh.  However, some of the details,
+in particular the file locations, may be different at your site.  You
+should check the details at your site with your site manager.}
+
+An additional complication is that IRAF has various ways of displaying
+two-dimensional images (such as the CCD frames), none of which can be
+considered standard.  Some of the common alternatives are to use either
+SAOTNG, its predecessor SAOIMAGE (see \xref{SUN/166}{sun166}{}\cite{SUN166})
+or XIMTOOL.  SAOTNG and SAOIMAGE are separate image display applications
+which are not part of IRAF (though, obviously, they can display IRAF images).
+SAOIMAGE works correctly with IRAF version 2.10, but there seem to be
+problems with using it with version 2.11.  Hence SAOTNG is used
+in the current example.  It is also worth noting that when using IRAF you
+will not always need to display two-dimensional images, though in practice
+you usually will.  Consequently setting up SAOTNG is integrated with the
+instructions here.  The IRAF {\it Beginner's Guide}\/\cite{BARNES93} covers
+starting IRAF for the first time, but not all the details of setting up an
+image display.
+
+The procedure is as follows.
+
+\begin{enumerate}
+
+  \item In order to use IRAF you need a `base' or `root' directory
+   which will contain various configuration files, sub-directories
+   and probably your IRAF data files.  This directory is your `IRAF
+   home directory' and you need to decide where it is going to be located
+   and what it is going to be called.  For example, we might decide
+   that our IRAF directory is going to be:
+
+  \begin{quote}
+   {\tt /home/acd/iraf}
+  \end{quote}
+
+   This directory will be used in this example, though if you are
+   working through it you should substitute your own chosen IRAF
+   directory.
+
+  \item You will probably need to add a one or more lines to your shell
+   login script.  If you run the `tc' shell then this script is file {\tt
+   .tcshrc}; if you run the `c' shell it is file {\tt .cshrc}.  In either
+   case it is located in your home directory.  The details will depend on
+   how IRAF has been set up at your site.  At Edinburgh the following line
+   should be added:
+
+  \begin{quote}
+   {\tt source ~ /net/reaxp02/packages2/iraf211/jbin/login}
+  \end{quote}
+
+   See your site manager for the details at your site.  It is probably most
+   convenient to put these lines at the end of the file.  
+   
+  \item Either log out and log in again or {\tt source} your {\tt
+   .tcshrc} (or {\tt .cshrc}) file.
+
+  \item If you have not already done so, create your own IRAF directory and
+   move to it (for example, {\tt mkdir iraf} followed by {\tt cd iraf}).
+
+  \item Type:
+
+  \begin{quote}
+   {\tt mkiraf}
+  \end{quote}
+
+   You will be prompted for the terminal type; reply {\tt xgterm}.
+   Subdirectory {\tt uparm} will be created in your IRAF directory,
+   as will file {\tt login.cl}.  The latter is the IRAF start up script.
+   It contains various options and defaults which you can change, but
+   you should not need to do so.
+
+  \item Customisations can be made in file {\tt login.cl}, but are better
+   put in a separate file, which must be called {\tt loginuser.cl}.  (It
+   is better to put customisations in {\tt loginuser.cl} than in {\tt
+   login.cl} because the latter is overwritten when {\tt mkiraf} is
+   executed whereas the former is not.)  An example {\tt loginuser.cl}
+   file is available as file:
+
+  \begin{quote}
+   {\tt /star/examples/sg12/loginuser.cl}
+  \end{quote}
+
+   You can simply copy this file to your IRAF directory.  (It configures
+   IRAF to handle the large headers often associated with fibre spectroscopy
+   data and specifies that the pixel files associated with bulk datasets,
+   such as images or spectra,  are to be kept in subdirectory {\tt pixels}
+   of the IRAF home directory.  Section~\ref{PIXELS} gives some notes on
+   how to specify the directory in which the pixel files are to be kept.)
+
+  \item Start SAOTNG ready for use with IRAF.  Type:
+
+  \begin{quote}
+   {\tt saotng \&}
+  \end{quote}
+
+   The `{\tt \&}' is, of course, simply to run SAOTNG as a detached
+   process, which is more convenient.
+
+  \item Create an {\tt xgterm} window:
+
+  \begin{quote}
+   {\tt xgterm \&}
+  \end{quote}
+
+   A new window with a distinctive appearance is created.  You will use
+   this window to run IRAF.  You can run IRAF from your normal login
+   window, but using an {\tt xgterm} window allows you to make better
+   use of the workstation or X-terminal graphics.
+
+   Depending on the configuration options in place at your site the
+   {\tt xgterm} window might be created without a scroll bar.  If so,
+   and you want to add a scroll bar (which is often useful), then from
+   the {\tt xgterm} window hold down the {\tt Ctrl} key and simultaneously
+   click on the right mouse button.  A window containing  a list of options
+   should appear; simply click on the {\tt scrollbar} item and a scroll
+   bar should be added to the window.
+
+  \item Move to the {\tt xgterm} window and type:
+
+  \begin{quote}
+   {\tt cl}
+  \end{quote}
+
+   An introductory message should be displayed and the prompt should
+   change to `\verb-cl>-'.  You are now running the IRAF command language
+   and ready to issue IRAF commands.  See the {\it Beginner's
+   Guide}\/\cite{BARNES93} for an introduction to the commands available
+   and Section~\ref{SESSION} for a simple example.
+
+   As a quick check that the image display is working correctly type:
+
+  \begin{quote}
+   {\tt display ~ dev\$pix ~ 1}
+  \end{quote}
+
+   An IRAF test image of the spiral galaxy M51 should appear in the SAOTNG
+   display.
+
+   Type {\tt logout} to leave the IRAF command language and return to the
+   Unix shell prompt.
+
+\end{enumerate}
+
+\subsection{\label{SUBSQ_IRAF}Subsequent IRAF sessions}
+
+Once you have set up for using IRAF it is not necessary to repeat the
+entire foregoing procedure every time you use IRAF.  For subsequent
+IRAF sessions in which you will use an image display you need repeat
+only steps 7, 8 and 9.  For sessions in which an image display is
+not needed just repeat steps 8 and 9.
+
+\subsection{\label{PIXELS}Specifying the directory to contain the pixel
+files}
+
+The directory which is to contain the pixel files associated with bulk
+datasets (such as images or spectra) is specified by the value of
+environment variable {\tt imdir}.  For example, the sample {\tt loginuser.cl}
+customisation file contains the line:
+
+\begin{quote}
+{\tt set ~ imdir=HDR\$pixels/}
+\end{quote}
+
+which specifies that the pixel files are to be kept in subdirectory {\tt
+pixels} of your IRAF home directory.  Note that the trailing `{\tt /}' is
+important.  Here {\tt HDR\$} denotes your IRAF home directory, which
+contains the header files.  If you wanted to keep the pixel files with
+the header files in your IRAF home directory you would simply specify:
+
+\begin{quote}
+{\tt set ~ imdir=HDR\$}
+\end{quote}
+
+
+\newpage
+\section{\xlabel{SESSION}\label{SESSION}A Simple IRAF Session}
+
+This example demonstrates a simple session using IRAF.  It covers:
+converting a FITS image to the IRAF OIF format, displaying an image
+and calculating statistics for an image.  It also introduces the
+IRAF on-line help system and displaying and setting IRAF task
+parameters.
+
+The FITS image used in this example is available as file:
+
+\begin{quote}
+{\tt /star/examples/sg12/ccdimage.fit}
+\end{quote}
+
+If you intend to work through the example using this image you should make
+a copy of it in your IRAF directory.  Alternatively, you may prefer
+to use a FITS image of your own.
+
+\begin{enumerate}
+
+  \item Start IRAF and SAOTNG as described in the previous example
+   (Section~\ref{START}).  Subsequent commands should be issued from
+   the window which is running the IRAF command language (that is, the
+   one with the prompt set to `\verb-cl>-').
+
+  \item The first step is to convert the FITS image to the IRAF OIF
+   format (see Section~\ref{FORMATS}).  If you are using IRAF version 2.11
+   this step is not strictly necessary as this version of IRAF can access
+   FITS files directly.  However, it is included here in order to
+   keep the example consistent for versions 2.10 and 2.11.  In addition,
+   you might find the OIF format more convenient for subsequent operations.
+   You should also note that the command to perform the conversion is
+   slightly different in the two versions.  FITS file {\tt ccdimage.fit}
+   (or an alternative) should be available in your IRAF directory.
+   Type either:
+
+  \begin{description}
+
+    \item[{\rm IRAF version 2.10:}] ~
+
+    \begin{quote}
+     {\tt rfits ~ ccdimage.fit ~ 1 ~ ccdframe}
+    \end{quote}
+
+    \item[{\rm IRAF version 2.11:}] ~
+
+    \begin{quote}
+     {\tt rfits ~ ccdimage.fit ~ 0 ~ ccdframe}
+    \end{quote}
+
+  \end{description}
+
+   A line similar to the following should be displayed:
+
+  \begin{quote}
+   {\tt File: ccdframe  KAPPA - Cadd          Size = 384 x 256}
+  \end{quote}
+
+   File {\tt ccdframe.imh} should be created in your IRAF directory
+   and file {\tt ccdframe.pix} in the pixels directory (probably
+   subdirectory {\tt pixels} if you have used the {\tt loginuser.cl}
+   file supplied with this document).  From the IRAF command language 
+   you can show the files in the current directory with command {\tt
+   dir}, change to a new directory with {\tt cd} and list a text
+   file with {\tt cat}; these commands behave similarly to the
+   equivalent Unix commands.  You can use these commands to check
+   that the header and pixel files have been created.  When you are
+   satisfied that all is well, make your IRAF directory your current
+   directory again.
+
+  \item To show a summary of the file, including its provenance, type:
+
+  \begin{quote}
+   {\tt imhead ~ ccdframe}
+  \end{quote}
+
+  \item To display an image using SAOTNG simply type:
+
+  \begin{quote}
+   {\tt display ~ ccdframe ~ 1}
+  \end{quote}
+
+   The image should be displayed in the SAOTNG window.  You can
+   use the various buttons in the SAOTNG window to customise the
+   display.
+
+  \item To display simple statistics about the image type:
+
+  \begin{quote}
+   {\tt imstat ~ ccdframe}
+  \end{quote}
+
+   Output similar to the following should be listed:
+
+  \begin{verbatim}
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+             ccdframe     98304      508.     308.3      330.    31988.
+  \end{verbatim}
+
+  \item On-line help information is available for all the IRAF tasks.
+   To obtain help on {\tt imstat} simply type:
+
+  \begin{quote}
+   {\tt help ~ imstat}
+  \end{quote}
+
+   A description of the command and its various parameters will be
+   displayed.  Some brief details of the IRAF on-line help are given in
+   Section~\ref{OHELP}, below.  So far, we have been specifying information
+   to IRAF tasks by giving mandatory parameters on the command line.  IRAF
+   tasks also have so-called `hidden' parameters which adopt a default value
+   if you do not specify them.  You can show the current value of all the
+   parameters of a task using the command {\tt lpar}.  For example:
+
+  \begin{quote}
+   {\tt lpar ~ imstat}
+  \end{quote}
+
+   The output should be something like:
+
+  \begin{verbatim}
+       images = "ccdframe"      Images
+      (fields = "image,npix,mean,stddev,min,max") Fields to be printed
+       (lower = INDEF)          Lower cutoff for pixel values
+       (upper = INDEF)          Upper cutoff for pixel values
+    (binwidth = 0.1)            Bin width of histogram in sigma
+      (format = yes)            Format output and print column labels?
+        (mode = "ql")           
+  \end{verbatim}
+
+   The parameters enclosed in brackets are hidden (in this case this
+   is all of them except {\tt images}).
+
+  \item By default {\tt imstat} displayed the name of the image, the
+   number of pixels, the mean, standard deviation and minimum and
+   maximum values.  However, the help information revealed that other
+   options were available and that these were controlled by the value
+   of parameter {\tt fields}.  Suppose that we wished to display the
+   mean, standard deviation, skewness and kurtosis\footnote{The
+   skewness and kurtosis are standard statistical quantities.  See,
+   for example, Wall\cite{WALL79}.}.  It is necessary to set parameter
+   {\tt fields} appropriately, which is achieved by typing:
+
+  \begin{quote}
+   {\tt imstat.fields ~ = ~ "mean,stddev,skew,kurtosis"}
+  \end{quote}
+
+   If {\tt imstat} is run again:
+
+  \begin{quote}
+   {\tt imstat ~ ccdframe}
+  \end{quote}
+
+   the output should now be:
+
+  \begin{verbatim}
+#      MEAN    STDDEV      SKEW  KURTOSIS
+       508.     308.3     62.03     4728.
+  \end{verbatim}
+
+   In addition to setting parameter values from the command line they
+   can also be edited using task {\tt epar}; see the {\it Beginner's
+   Guide}\/\cite{BARNES93} for further details.
+
+  \item Finally, type:
+
+  \begin{quote}
+   {\tt logout}
+  \end{quote}
+
+   To leave IRAF.
+
+\end{enumerate}
+
+\subsection{\label{OHELP}On-line help}
+
+On-line help on individual tasks is available from the IRAF command
+language.
+
+\begin{enumerate}
+
+  \item To obtain help on an individual task on simply type:
+
+  \begin{quote}
+   {\tt help} ~ {\it task-name}
+  \end{quote}
+
+   from the IRAF command line.  For example:
+
+  \begin{quote}
+   {\tt help ~ imstat}
+  \end{quote}
+
+   and the help text for task {\tt imstat} is displayed.  The bottom
+   line of the window gives a summary of the commands available (type
+   {\tt q} to quit and return to the IRAF \verb-cl>- prompt).
+
+  \item If you are looking for tasks to perform some function but are
+   not sure what the task names are, which packages they are in, or indeed
+   whether they exist, try typing:
+
+  \begin{quote}
+   {\tt apropos} ~ {\it topic}
+  \end{quote}
+
+   For example, if you were looking for commands to mosaic several CCD
+   frames together you might type:
+
+  \begin{quote}
+   {\tt apropos ~ mosaic}
+  \end{quote}
+
+   This command searches all the available IRAF help databases and lists
+   a summary of all the tasks with (in this example) the word `mosaic'
+   in their title.  Note, however, that {\tt apropos} is part of STSDAS
+   and hence is only available if STSDAS is installed.
+
+\end{enumerate}
+
+
+\newpage
+\section{\xlabel{STARSESS}\label{STARSESS}Using Starlink Packages From IRAF}
+
+This example shows a simple session using a Starlink package from
+within IRAF.  It covers loading the package and calculating statistics
+for an image.
+
+Several Starlink packages are available from within IRAF, of which the
+principal ones are KAPPA (see \xref{SUN/95}{sun95}{}\cite{SUN95}) and
+Figaro (see \xref{SUN/86}{sun86}{}\cite{SUN86}).  When used from within
+the IRAF command language these packages behave in most respects like
+`native' IRAF packages: they can read and write IRAF OIF format data
+files and their parameters can be displayed and controlled using the
+usual mechanisms of the IRAF command language.  Tasks in the Starlink
+packages can be intermixed freely with the standard IRAF tasks (again,
+just like `native' IRAF packages).  There are a few differences between
+Starlink and `native' IRAF tasks, principally in the way that graphics are
+displayed; see \xref{SUN/217}{sun217}{}\cite{SUN217} for details.
+
+This example uses the Figaro application {\tt istat} to display the
+statistics of an image in order to compare and contrast it with the
+standard IRAF application {\tt imstat} used in the previous example.
+The IRAF OIF image {\tt ccdframe} which was used in the previous
+example will also be used again here.
+
+\begin{enumerate}
+
+  \item If you are not already running IRAF then start it (see
+   Section~\ref{START}).  Subsequent commands should be issued from
+   the window which is running the IRAF command language (that is, the
+   one with the prompt set to `\verb-cl>-').
+
+  \item The first step is to load the Figaro package.  Simply type:
+
+  \begin{quote}
+   {\tt figaro}
+  \end{quote}
+
+   A list similar to the following should be displayed:
+
+  \begin{center}
+  \begin{verbatim}
+   abconv      cset        fscrunch    ilog        lxset       sfit
+   abline      cspike      fwconv      image       lyset       slice
+   adjoin      delobj      gauss       imult       mask        soft
+\end{verbatim}$\vdots$\end{center}
+
+   Also the prompt should be reset to `\verb-fi>-'.  The list comprises
+   all the commands in the Figaro package.  If instead of the list of
+   commands you get an error message like:
+
+  \begin{quote}
+   {\tt ERROR: task `figaro' not found}
+  \end{quote}
+
+   then Figaro has not been installed in the version of IRAF available
+   at your site.  Section~\ref{STARINSTALL} below gives a few hints on
+   how to proceed in this case.
+
+   However, assuming that the package loaded successfully, then all the
+   Figaro tasks are now available, in addition to the basic IRAF tasks.
+   Here Figaro is behaving just like a `native' IRAF package.  For any
+   IRAF package, native or Starlink, you can:
+
+  \begin{itemize}
+
+    \item load it by typing the package name,
+
+    \item remove it by typing {\tt bye},
+
+    \item obtain help on it by typing {\tt help} {\it package name}.
+
+  \end{itemize}
+
+   Any number of packages can be loaded simultaneously.  All the
+   commands in all the loaded packages are available.  Packages are
+   hierarchical, with packages having sub-packages inside 'em, and so {\it
+   ad infinitum}\, (as the poet almost had it).  Typing {\tt bye} removes
+   the most recently loaded package or sub-package.  For example, type:
+
+  \begin{quote}
+   {\tt bye}
+  \end{quote}
+
+   Figaro will be removed and the prompt will be reset to \verb-cl>-.
+
+  \item Now reload the Figaro package by typing {\tt figaro}.  Once the
+   package is loaded simple statistics of an image can be displayed by
+   typing:
+
+  \begin{quote}
+   {\tt istat ~ ccdframe}
+  \end{quote}
+
+   Output similar to the following should be listed:
+
+  \begin{verbatim}
+Y-range 1 to 256
+X-range 1 to 384
+Total (over 98304.0 pixels) = 4.9943E+7
+Max   = 31988    in pixel (332,108)
+Min   = 330      in pixel (1,256)
+Mean  = 508.05
+Sigma = 308.263
+  \end{verbatim}
+
+   Compare this output with that produced by {\tt imstat} in the previous
+   example.  As in this case, Starlink applications are usually
+   somewhat more verbose than standard IRAF tasks.
+
+  \item On-line help information is available for the Figaro tasks,
+   as it is for the standard ones.  To obtain help on {\tt istat} simply
+   type:
+
+  \begin{quote}
+   {\tt help ~ istat}
+  \end{quote}
+
+   A description of the command and its various parameters will be
+   displayed.  Again as for the standard tasks, the parameters of
+   Figaro applications can be shown in the usual way:
+
+  \begin{quote}
+   {\tt lpar ~ istat}
+  \end{quote}
+
+   The output should be something like:
+
+  \newpage
+  \begin{verbatim}
+        image = ""              (IMage) Name of image to examine
+       ystart =                 *! (YStart) First Y value to be used
+         yend =                 *! (YEnd) Last Y value to be used
+       xstart =                 *! (XStart) First X value to be used
+         xend =                 *! (XEnd) Last X value to be used
+       (pass2 = no)             (PAss2) Pass twice through data for better sigm
+      (median = no)             (MEDian) Calculate median as well as other stat
+  (stat_total = 0.)             
+    (stat_max = 0.)             
+    (stat_min = 0.)             
+   (stat_mean = 0.)             
+  (stat_sigma = 0.)             
+   (stat_size = 0.)             
+   (stat_xmax = 0.)             
+   (stat_xmin = 0.)             
+   (stat_ymax = 0.)             
+   (stat_ymin = 0.)             
+ (stat_xstart = 0.)             
+   (stat_xend = 0.)             
+ (stat_ystart = 0.)             
+   (stat_yend = 0.)             
+ (stat_median = 0.)             
+        (mode = "ql")           
+  \end{verbatim}
+
+  \item In addition to the quantities calculated automatically {\tt istat}
+   may also optionally calculate the median value of the image.  Type:
+
+  \begin{quote}
+   {\tt istat.median ~ = ~ yes}
+  \end{quote}
+
+   Now run {\tt istat} again:
+
+  \begin{quote}
+   {\tt istat ~ ccdframe}
+  \end{quote}
+
+   The output should now be:
+
+  \begin{verbatim}
+Y-range 1 to 256
+X-range 1 to 384
+Total (over 98304.0 pixels) = 4.9943E+7
+Max   = 31988    in pixel (332,108)
+Min   = 330      in pixel (1,256)
+Mean  = 508.05
+Sigma = 308.263
+Median  494
+  \end{verbatim}
+
+   Note that the median is now calculated and displayed.
+
+\end{enumerate}
+
+\subsection{\label{STARINSTALL}Installing Starlink software in IRAF}
+
+IRAF installations at Starlink sites will usually have the additional
+Starlink packages installed.  However, if they appear not to be
+available at your site then this section gives a few hints on how to
+proceed.
+
+The directory {\tt /star/iraf} should contain a subdirectory for every
+Starlink IRAF package present at your site.  Check that this directory
+exists and that there is a subdirectory for the package that you are
+interested in.  If the required subdirectory is absent then ask your
+site manager to install the package.
+
+If the directory is present but the package is still not available
+when you start IRAF the most likely explanation is that the package
+is not known to IRAF as an external package.  An entry for the package
+should be added to the {\tt hlib\$extern.pkg} file.  Your site manager
+will have to add this entry.  \xref{SSN/35}{ssn35}{}\cite{SSN35},
+Section~4.8 contains the necessary details.
+
+As an interim measure, perhaps to establish the cause of the problem,
+you can add an entry to your own {\tt login.cl} file.  For example,
+for Figaro add the following lines:
+
+\begin{quote} \begin{verbatim}
+reset   figaro            = starlink$figaro/
+task    figaro.pkg        = figaro$figaro.cl
+\end{verbatim} \end{quote}
+
+These lines must be added just before the {\tt user} package definition.
+The {\tt helpdb} definition can be extended by a command like:
+
+\begin{quote} \begin{verbatim}
+reset helpdb = (envget("helpdb") // ",figaro$helpdb.mip")
+\end{verbatim} \end{quote}
+
+For other packages you would add equivalent lines, substituting the
+name of the package for {\tt figaro}.
+
+
+\newpage
+\section{\xlabel{SCRIPTS}\label{SCRIPTS}IRAF Scripts and Background Jobs}
+
+A series of IRAF commands can be executed as a script by putting them
+in a file and then running the file. The IRAF command language, {\tt cl},
+is also a programming language and contains many features which allow
+you to write scripts to perform repetitive tasks automatically.  It is
+also possible to run IRAF scripts as Unix background jobs.  This
+facility is particularly useful if you want to run lengthy tasks
+at low priority without tying up your terminal.  This example is a
+simple introduction to IRAF scripts and background jobs.
+
+The scripts used in this example is available as files:
+
+\begin{quote}
+{\tt /star/examples/sg12/submean.cl} \\
+{\tt /star/examples/sg12/background.csh}
+\end{quote}
+
+If you intend to work through the example you should copy these files
+to your IRAF directory.  The IRAF OIF image {\tt ccdframe}, which was
+used in the previous examples, should also be available.
+
+File {\tt submean.cl} is a script of IRAF commands.  It is shown
+in Figure~\ref{SUBMEAN}.  It calculates the mean value of all the
+pixels in an image and then generates a new image in which the mean
+value is subtracted from every pixel.
+
+\begin{figure}[htbp]
+
+\begin{verbatim}
+# IRAF script to calculate a mean and subtract
+# it from an image.
+
+# Load images package.
+images
+
+# Initialize the cl list variable.
+list = " "
+
+# Store a temporary file name in string s3.
+s3 = "temp.file"
+
+# Configure imstat to display only the mean
+imstat.format=no
+imstat.fields="mean"
+
+# Redirect imstat output to temporary file.
+imstat "ccdframe" > (s3)
+
+# Associate temporary file with list variable.
+list = (s3)
+
+# Read the value in the file into parameter 'x'
+i= fscan (list,x)
+
+# Use imarith to subtract x from the image.
+imarith ("ccdframe","-",x,"newframe")
+
+# Reconfigure imstat and then look at statistics of
+# new image to see if the subtraction worked.
+imstat.format=yes
+imstat.fields="image,npix,mean,stddev,min,max"
+
+imstat ("newframe")
+
+# Delete the temporary file.
+delete ("temp.file", verify=no)
+
+# Print an output message
+print("Subtracted ",x,"to create file newframe.")
+\end{verbatim}
+
+\caption{Example IRAF script
+\label{SUBMEAN} }
+
+\end{figure}
+
+As with any unfamiliar programming language, your first reaction is 
+probably one of trepidation as you wonder what is going on.  No variables
+were declared at the start of this script although variables are used
+throughout the program for parameter passing. The {\tt cl} has some built-in
+variables which do not need to be declared. There are three string
+variables named {\tt s1} to {\tt s3}, three real variables
+{\tt x}, {\tt y} and {\tt z}, three
+integers {\tt i}, {\tt j} and {\tt k},
+three booleans and other more esoteric ones. Type
+`{\tt lpar cl}' for a full list of the parameters available for
+immediate use. Other variables can be used but they need to be
+declared: see the {\tt cl} manual\cite{SHAMES86} for information on how to
+do this. List-type parameters are useful, they are usually associated
+with files, and they allow you to use {\tt fscan} and {\tt fprint}
+for reading and
+writing to files.  These functions are similar to the equivalent functions
+in the C language.
+
+The command {\tt imstat} is used to calculate the mean.  Some IRAF
+tasks have output parameters which allow their results to be stored
+and subsequently accessed by another task.  Unfortunately, {\tt imstat}
+does not have any such output parameters.  Instead, it is configured
+so that the only output that it generates is the mean value, without
+any annotation.  This output is redirected to temporary file {\tt
+temp.file} using the Unix-like output redirection capabilities of
+the IRAF {\tt cl}.
+
+The {\tt fscan} function is used to read the value from the file and
+store it in variable {\tt x}.  The {\tt imarith} task (from the {\tt
+images} package) is then used to subtract the mean value from each
+pixel and create a new image {\tt newframe}.  Finally, {\tt imstat} is
+reconfigured to display its default output and the statistics for image
+{\tt newframe}  displayed as a check that the script has worked correctly.
+
+Quoted parameters are passed to the tasks as they are; the brackets
+around some of the parameter lists indicate that the {\tt cl} language is
+meant to interpret these parameters as variables.  Programming in {\tt cl}
+can be tricky sometimes: putting `{\tt echo=yes}' at the start of
+the script means that all commands are echoed to the terminal as they
+are executed, which can be useful for debugging.  The file name
+`{\tt ccdframe}' was of course hardwired into the script; a more
+typical application would operate on every file in a list, or loop
+until some condition is satisfied. The {\tt cl} can support loops of
+various types.  See {\it A User's Introduction to the IRAF Command
+Language}\/\cite{SHAMES86} for more information.
+
+The procedure to run the script is as follows.
+
+\begin{enumerate}
+
+  \item First you must make the script known to IRAF.  From the \verb-cl>-
+   prompt type:
+
+  \begin{quote}
+   {\tt task \$submean=home\$submean.cl}
+  \end{quote}
+
+   `{\tt home}' is specifying that the script file resides in your
+   root IRAF directory.
+
+  \item You can now simply run the script by typing:
+
+  \begin{quote}
+   {\tt submean}
+  \end{quote}
+
+   Output similar to the following should appear:
+
+  \begin{verbatim}
+#               IMAGE      NPIX      MEAN    STDDEV       MIN       MAX
+             newframe     98304  3.044E-5     308.3     -178.    31480.
+Subtracted 508.046 to create file newframe.
+  \end{verbatim}
+
+   You can check that image {\tt newframe} has been created by typing
+   {\tt dir} and display it with SAOIMAGE by typing:
+
+  \begin{quote}
+   {\tt display ~ newframe ~ 1}
+  \end{quote}
+
+  \item Finally you should tidy-up by deleting the new image:
+
+  \begin{quote}
+   {\tt imdelete ~ newframe}
+  \end{quote}
+
+   Note that the script will not work correctly if {\tt newframe}
+   already exists, so you must delete it before running the script
+   again.
+
+\end{enumerate}
+
+\subsection{Running a background job}
+
+It is possible to run IRAF scripts as background jobs.  It is necessary
+to prepare a Unix shell script which starts IRAF and then runs the
+IRAF script.  File {\tt background.csh} is an example shell script.
+It is shown in Figure~\ref{BACKGROUND}.  This example invokes IRAF
+and uses it to run script {\tt submean.cl}.
+
+\newpage
+\begin{figure}[htbp]
+
+\begin{verbatim}
+#!/bin/csh
+# Make sure a C shell is used
+# Run IRAF from the UNIX shell, taking parameters
+# up until the word END.
+cl  <<END  >log.file
+images
+task \$submean = home\$submean.cl
+submean
+logout
+END
+\end{verbatim}
+
+\caption{Example shell script to run IRAF as a background job
+\label{BACKGROUND} }
+
+\end{figure}
+
+The script first ensures that a C shell is used, if it is run as
+an executable shell script, then IRAF is started and fed with
+commands. Notice how the {\tt \$} signs need to be escaped in the task
+definition to stop the UNIX shell from interpreting them as shell
+variables.  The output is written to file {\tt log.file}.  There is
+further information about shell scripts in \xref{SC/4: {\it C-shell
+Cookbook}}{sc4}{}\/\cite{SC4}).
+
+The script is run from the Unix shell prompt.  Simply type:
+
+\begin{quote}
+{\tt background.csh \&}
+\end{quote}
+
+Output will be written to file {\tt log.file}.  Remember that script
+{\tt submean.cl} will only run successfully if image {\tt newframe}
+does not already exist.
+
+
+\newpage
+\appendix
+\section{\xlabel{INSTALL}\label{INSTALL}Obtaining and Installing IRAF}
+
+This appendix gives a few brief notes about obtaining and installing
+IRAF.  A typical Starlink user is unlikely to be able to carry out a
+complete IRAF installation.  The assistance of your site manager is
+likely to be required for at least some of the stages and he will
+probably carry out the complete installation.
+
+IRAF is available for all the variants of Unix currently supported by
+Starlink (and on various other operating systems).  A basic IRAF
+installation, without any external packages, requires about 100
+Mbytes of disk space, though the actual amount varies somewhat between
+the different variants of Unix.  However, about half this space can,
+if necessary, be reclaimed by deleting source files once the installation
+is complete.
+
+A copy of IRAF can be retrieved by anonymous ftp from NOAO or the
+Starlink mirror.  The \htmladdnormallink{IRAF Web pages}
+{http://www.starlink.rl.ac.uk/iraf/web/iraf-homepage.html}
+(see Section~\ref{OBTAIN}) give the necessary details.  Alternatively
+the NOAO can send you a copy on tape or CD-ROM, though a small charge
+is made.  Again see the Web pages for details.  There is a separate
+distribution of IRAF for each version of Unix supported and there
+is no compilation involved in making the installation (though source
+is supplied).
+
+Before installing IRAF you should obtain and read the following
+documents:
+
+\begin{enumerate}
+
+  \item The IRAF installation guide,
+
+  \item The IRAF management guide,
+
+  \item The {\tt README} file for your particular machine,
+
+  \item The {\tt REGISTRATION} file.
+
+\end{enumerate}
+
+All these documents can be retrieved from the IRAF Web pages.  There
+are different versions of the \htmladdnormallink{first three documents}
+{http://www.starlink.rl.ac.uk/iraf/web/docs/igsm.html}
+corresponding to each version of Unix supported and you should ensure
+that you are reading the correct version for the system on which you
+intend to install IRAF.
+
+The {\tt REGISTRATION} file is important as it contains a form to be
+filled in and returned to NOAO by e-mail, so that you can be added to
+the mailing list for the {\it IRAF Newsletter}\, (see
+Section~\ref{NEWSLETTER}).
+
+
+\newpage
+\addcontentsline{toc}{section}{Acknowledgements}
+\section*{Acknowledgements}
+
+We are grateful to Dave~Bowen for advice and assistance with using
+IRAF and useful comments on the draft version of the document.
+Nigel~Hambly also gave several helpful tips on using IRAF.  Martin~Bly,
+Alan~Chipperfield and Rodney~Warren-Smith provided useful comments on the
+draft.
+
+Any mistakes, of course, are our own.
+
+% References -----------------------------------------------------------
+
+% \input{refs.tex}
+
+\newpage
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{99}
+
+  \bibitem{BARNES93} J.~Barnes, 1993, {\it A Beginner's Guide to
+   Using IRAF}\, (National Optical Astronomy Observatories: Tucson).
+   File: {\tt beguide.ps.Z}.  See Section~\ref{DOC} for details of
+   obtaining IRAF documents.
+
+  \bibitem{SSN35} A.J.~Chipperfield, 1997, \xref{SSN/35.3}{ssn35}{}: 
+   {\it IRAFSTAR -- The IRAF/Starlink Inter-operability Infrastructure}\,
+   (Starlink).
+
+  \bibitem{SUN217} A.J.~Chipperfield, 1997, \xref{SUN/217.2}{sun217}{}:
+   {\it Running Starlink Applications from IRAF CL}\, (Starlink).
+
+  \bibitem{SUN221} A.J.~Chipperfield, 1997, \xref{SUN/221.1}{sun221}{}:
+   {\it KAPPA for IRAF}\, (Starlink).
+
+  \bibitem{SUN95} M.J.~Currie and D.S.~Berry, 1999,
+   \xref{SUN/95.14}{sun95}{}: {\it KAPPA -- Kernel Application Package}\,
+   (Starlink).
+
+  \bibitem{SC4} M.J.~Currie, 1998, \xref{SC/4.2}{sc4}{}:
+   {\it C-shell Cookbook}\, (Starlink).
+
+  \bibitem{SUN55} M.J.~Currie, G.J.~Privett, A.J.Chipperfield,
+   D.S.~Berry and A.C.~Davenhall, 1999, \xref{SUN/55.11}{sun55}{}:
+   {\it CONVERT -- A Format-conversion Package}\, (Starlink).
+
+  \bibitem{SUN214} P.W.~Draper, 1999, \xref{SUN/214.5}{sun214}{}:
+   {\it GAIA -- Graphical Astronomy and mage Analysis Tool}\, (Starlink).
+
+  \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, {\it Graphics File
+   Formats}, second edition
+  \newline (Windcrest/McGraw-Hill: New York).  See in particular
+   Chapter 18, pp235-244.
+
+  \bibitem{KROL92} E.~Krol, 1992, {\it The Whole Internet User's Guide
+   and Catalog}\, (O'Reilly and Associates Inc: Sebastopol, California).
+
+  \bibitem{SUN166} R.~Morris and G.J.~ Privett, 1966,
+   \xref{SUN/166.4}{sun166}{}: {\it SAOIMAGE -- Astronomical Image
+   Display}\, (Starlink).
+
+  \bibitem{SUN207} J.W.~Palmer, 1996, \xref{SUN/207.1}{sun207}{}:
+   {\it AIPS -- Astronomical Image Processing System}\, (Starlink).
+
+  \bibitem{SHAMES86} P.M.B.~Shames and D.~Tody, 1986, {\it
+   A User's Introduction to the IRAF Command Language}, Version 2.3,
+   (National Optical Astronomy Observatories: Tucson).  File: {\tt
+   cluser.ps.Z}.  See Section~\ref{DOC} for details of obtaining IRAF
+   documents.
+
+  \bibitem{SUN86} K.T.~Shortridge, H.~Meyerdierks, M.J.~Currie,
+   M.J.~Clayton, J.~Lockley, A.C.~Charles, A.C.~Davenhall, M.B.~Taylor,
+   T.~Ash, T.~Wilkins, D.~Axon, J.W.~Palmer and A.~Holloway, 1999,
+   \xref{SUN/86.17}{sun86}{}: {\it FIGARO -- A General Data Reduction
+   System}\, (Starlink).
+
+  \bibitem{THOMAS95} B.J.~Thomas, 1995, {\it The Internet for
+   Scientists and Engineers}\, (SPIE -- The International Society
+   for Optical Engineering: Bellingham, Washington).
+
+  \bibitem{SUN33} R.F.~Warren-Smith, 1998, \xref{SUN/33.6}{sun33}{}:
+   {\it NDF -- Routines for Accessing the Extensible N-Dimensional Data
+   Format}\, (Starlink).
+
+  \bibitem{WALL79} J.V. Wall, 1979, `Practical Statistics for
+   Astronomers', {\it Q. J. R. Astron. Soc}, {\bf 20},
+   pp138-152.
+
+  \bibitem{WELLS81} D.C.~Wells, E.W.~Greisen, and R.H.~Harten, 1981,
+   {\it Astron. Astrophys. Suppl}, {\bf 44}, pp363-370.
+
+\end{thebibliography}
+
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+\typeout{Reminder: run this document through Latex three times}
+\typeout{to resolve the references.}
+\typeout{  }
+\typeout{*****************************************************}
+\typeout{  }
+
+\end{document}

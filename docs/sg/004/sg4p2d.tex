@@ -1,0 +1,932 @@
+\chapter{Specifying Parameter Values}
+\label{C_prompts}
+\markboth{Users}{\stardocname}
+
+\section{Introduction}
+\label{S_p2dint}
+\markboth{Users}{\stardocname}
+
+ADAM programs are controlled by specifying parameter values.
+You can specify them in two ways:
+
+\begin{quote}
+\begin{description}
+
+\item [On a command line] ---
+
+In this case, the value will be processed by a command language interpreter
+(DCL, ICL, or SMS) before being passed to the parameter system.
+So, for example, if you were talking to ICL you could include ICL functions
+in your values.
+
+\item [In response to a prompt] ---
+
+In this case you are talking directly to the program through the ADAM parameter
+system, and you could not use ICL functions.
+
+\end{description}
+\end{quote}
+
+The thing to remember is that when you respond to prompts you are talking
+directly to the ADAM parameter system, whereas when you specify values on the
+command line, they will be processed by the language interpreter and then passed
+to the parameter system.
+
+Usually, it is not necessary to specify parameters on the command line --- you
+can just respond to prompts.
+However, there are three reasons why you may wish to do so:
+\begin{itemize}
+\item To avoid waiting for prompts.
+\item To set values for parameters which normally are not prompted.
+\item To use a command safely in a procedure.
+\end{itemize}
+
+\section{Command line specification}
+\label{S_cls}
+
+This section refers to ICL commands.
+However, you can run ADAM programs by using DCL commands.
+These suffer from the following restrictions compared to ICL:
+\begin{itemize}
+\item It is not possible to use ICL expressions.
+\item It is not possible to return parameter values to the command language, and
+hence on to applications.
+\item Single quotes cannot be used, except where they are needed to force
+expansion of DCL symbols.
+Double quotes can be used.
+\item It is not possible to use an ! unless it is in a character string
+enclosed in double quotes.
+Normally this character indicates a comment.
+\end{itemize}
+There are two ways in which you can specify parameter values in an ICL command:
+\begin{itemize}
+\item By using a command which has been defined to run an ADAM program.
+ (The definition is done by a DEFINE command.)
+\item By using the SETPAR command.
+(You can also store a parameter value in an ICL variable by using the
+analogous GETPAR command.)
+\end{itemize}
+The first way is the most usual and will now be considered further.
+
+You will remember that a program's parameters may be assigned values on the
+command line:
+
+\begin{small}
+\begin{verbatim}
+    ICL> command   p1   p2   ...
+\end{verbatim}
+\end{small}
+
+where {\tt command} is a commmand that has been defined to run the program.
+This method is particularly useful for running programs in VMS batch mode,
+and for specifying values for parameters that would otherwise be defaulted.
+Normally, command-line specification will prevent prompting for a parameter's
+value unless there is an error in the given value, say giving a character
+string for a parameter of type \_REAL.
+ 
+There are two ways in which parameter values may be specified on the command
+line:
+\begin{itemize}
+\item by keyword
+\item by position
+\end{itemize}
+The two forms may not be mixed.
+
+The keyword method is usually preferable because the position method has these
+disadvantages:
+\begin{quote}
+\begin{itemize}
+\item Values must be given for {\em every} parameter preceding the
+last parameter for which a value is required; values for parameters after
+this one can be omitted.
+\item Some programs have many parameters and it is tedious to enter all the
+intermediate values between the ones you want to define, and difficult to
+remember them all.
+\item Some parameters may not have defined positions because they are normally
+defaulted.
+\end{itemize}
+\end{quote}
+
+\subsection{Keyword method}
+
+In the keyword method, a parameter is identified by a {\em keyword} (specified
+in the program's interface file) and a value is assigned to it using the syntax:
+
+\begin{small}
+\begin{verbatim}
+    keyword=value
+\end{verbatim}
+\end{small}
+
+The keyword is the name by which the parameter is known to the user.
+This is usually, but not necessarily, the same as the parameter name.
+
+In some cases (such as when setting a switch) the keyword itself is all that
+needs to be specified:
+Here is an example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> DEFPIC CURPIC FRACTION=0.4
+\end{verbatim}
+\end{small}
+
+The keyword and data type corresponding to a particular parameter is specified
+in the program's interface file:
+
+\begin{small}
+\begin{verbatim}
+    interface DEFPIC
+      parameter FRACTION
+        keyword 'FRACTION'
+        type _REAL
+        ...
+      parameter CURPIC
+        keyword 'CURPIC'
+        type _LOGICAL
+        ...
+    endinterface
+\end{verbatim}
+\end{small}
+
+Here, the keyword {\tt CURPIC} is associated with a logical type parameter ---
+just specifying its name sets its value to `TRUE', specifying `NOCURPIC'
+sets its value to `FALSE'.
+The keyword {\tt FRACTION} is associated with a real type parameter which is
+given the value 0.4.
+Keyword forms may appear in any order on the command line, and are ignored
+when calculating the `position' of other parameters.
+
+\subsection{Position method}
+
+In the position method, the position of a value on the command line identifies
+the parameter which is being given that value.
+Here is an example:
+
+\begin{small}
+\begin{verbatim}
+     ICL> ADD HISIMAGE HERIMAGE THEIRIMAGE
+\end{verbatim}
+\end{small}
+
+The parameter corresponding to a particular position is specified in the
+program's interface file:
+
+\begin{small}
+\begin{verbatim}
+    interface ADD
+      parameter IN1
+        position 1
+        ...
+      parameter IN2
+        position 2
+        ...
+      parameter OUT
+        position 3
+        ...
+      parameter TITLE
+        position 4
+        ...
+    endinterface
+\end{verbatim}
+\end{small}
+
+Here, the first parameter IN1 is given the value {\tt HISIMAGE},
+the second parameter IN2 is given the value {\tt HERIMAGE}, and the third
+parameter OUT is given the value {\tt THEIRIMAGE}.
+The fourth parameter TITLE is not given a value.
+
+\subsection{ICL variables and functions}
+
+Command-line specification can be used to put the values of ICL variables
+and functions into programs.
+A common situation where this is useful is when processing a sequence of files
+in the same way.
+For example, consider this ICL procedure:
+
+\begin{small}
+\begin{verbatim}
+    PROC MULTISTAT
+      LOOP FOR I=1 TO 10
+        FILE = '@' & SNAME('REDX',I,2)
+        STATS2D INPIC=(FILE) AGAIN=F XSTART=1 YSTART=1 XSIZE=62 YSIZE=58
+      END LOOP
+    END PROC
+\end{verbatim}
+\end{small}
+
+This obtains the statistics of ten images named {\small\tt REDX01},
+{\small\tt REDX02}, \dots, {\small\tt REDX10}.
+The parameter with keyword INPIC is assigned the value of the ICL variable FILE.
+Variable FILE is in parentheses because syntactically it is an ICL expression.
+The ICL function SNAME is used to construct the appropriate file name, which must
+be preceded by an `{\tt @}'.
+
+Here is another example of the use of ICL variables in commands which uses KAPPA
+to `flat field' a series of CCD frames:
+
+\begin{small}
+\begin{verbatim}
+    PROC FLATFIELD
+      INPUT Which flat field frame?: (FF)
+      FF = '@' & (FF)
+      INPUTI Number of frames:  (NUM)
+      LOOP FOR COUNT=1 TO (NUM)
+        INPUT Enter frame to flat field: (IMAGE)
+        TITLE = 'Flat field of ' & (IMAGE)
+        IMAGE = '@' & (IMAGE)
+        IMAGEOUT = (IMAGE) & 'F'
+        PRINT Writing to (IMAGEOUT) 
+        DIV IN1=(IMAGE) IN2=(FF) OUT=(IMAGEOUT) TITLE=(TITLE)
+      END LOOP
+    END PROC
+\end{verbatim}
+\end{small}
+
+Here, the parameters of the DIV program are given values stored in ICL string
+variables.
+
+\section{Prompts and suggested values}
+\label{S_pd}
+
+If program parameters are not given values on the command line, values
+will be prompted for (unless this is suppressed).
+If the value supplied is not acceptable, the prompt will be repeated.
+If no acceptable value is supplied after five prompts, a `Null value'
+is given to the program.
+
+The general form of a prompt is:
+
+\begin{small}
+\begin{verbatim}
+    <keyword> - <prompt> /<suggestion>/ >
+\end{verbatim}
+\end{small}
+
+However, the {\small\tt /<suggestion>/} may not appear.
+
+\subsection{Prompts without a suggested value}
+
+The simplest type of prompt is one where the suggested value is omitted, for
+example:
+
+\begin{small}
+\begin{verbatim}
+    LOW - Lower limit for data >
+\end{verbatim}
+\end{small}
+
+In this case, if you just press `carriage return', the prompt will be repeated
+up to five times, and then a null value will be given to the program:
+
+\begin{small}
+\begin{verbatim}
+    LOW - Lower limit for data >
+    LOW - Lower limit for data >
+    LOW - Lower limit for data >
+    ...
+\end{verbatim}
+\end{small}
+
+You should specify the value you want, for example:
+
+\begin{small}
+\begin{verbatim}
+    LOW - Lower limit for data > 1
+\end{verbatim}
+\end{small}
+
+This value will be accepted, and then the next prompt will be displayed.
+
+\subsection{Prompts with a suggested value}
+
+When a prompt includes a suggested value, you can override it by entering a
+value of your own.
+However, when this prompt appears again during a subsequent use of the program,
+the suggested value may or may not be the same as the value you last entered.
+Sometimes the current (last) value of the parameter is used, sometimes a fixed
+default value is used, and sometimes a dynamic default value is calculated
+by the program from the values of other parameters.
+It all depends on the characteristics of the program and its interface file.
+Parameter XDIM of program CREFRAME is an example of a parameter that uses the
+current value:
+
+\begin{small}
+\begin{verbatim}
+    XDIM - x dimension of output array /64/ > 109
+    ...
+    XDIM - x dimension of output array /109/ > 45
+    ...
+    XDIM - x dimension of output array /45/ > 16
+    ...
+\end{verbatim}
+\end{small}
+
+Current values of parameters are stored in a file in ADAM\_USER, so they
+persist between ADAM sessions.
+The file should not be deleted unless the old values are not required.
+
+Parameter TYPED of program CREFRAME is an example of a parameter that always
+offers the same suggested value, no matter what the current value is:
+
+\begin{small}
+\begin{verbatim}
+    TYPED - Type of data to be generated /'GS'/ > RA
+    ...
+    TYPED - Type of data to be generated /'GS'/ > BL
+    ...
+    TYPED - Type of data to be generated /'GS'/ > GN
+    ...
+\end{verbatim}
+\end{small}
+
+
+\subsection{Global parameters}
+
+Normally, a program's parameter values are only accessible by that program.
+However, {\em global parameters} can be shared by many programs.
+The use of global parameters as suggested values can reduce the need for typing
+responses to prompts.
+For example, in this case:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe
+    ...
+    OUTPIC - Image for output data > ramp4
+    ICL> look
+    INPIC - Image to be inspected/@ramp4/ >
+    ...
+\end{verbatim}
+\end{small}
+
+the frame created by CREFRAME can be displayed by LOOK without having to
+retype its name.
+This is because parameter {\small\tt OUTPIC} of program CREFRAME and parameter
+{\small\tt INPIC} of program LOOK are both associated (in their interface files)
+with the global parameter {\small\tt GLOBAL.DATA\_ARRAY}.
+Thus, parameter {\small\tt INPIC} offers as a suggested value the object name
+which was input as a value for the {\small\tt OUTPIC} parameter of a different
+program.
+
+In ICL you can create a global parameter using the CREATGLOBAL command, set its
+value using the SETGLOBAL command, and get its value using the GETGLOBAL
+command.
+
+\subsection{Missing prompts}
+
+Sometimes a prompt for a parameter value will not appear, even if you haven't
+specified a value on the command line.
+This is because the parameter system looks for a value for a parameter in a
+number of places, as specified in a `search path' in the program's interface
+file.
+This feature is described in Chapter~\ref{C_parsys}.
+A prompt will only appear if it cannot find a value in the search path, or if
+the search path specifically asks the parameter system to generate a prompt.
+This ability to supply values automatically enables programs with many options
+to avoid burdening the user unnecessarily with large numbers of prompts.
+If you want to supply your own value in these cases, you must specify a value
+on the command line, or demand to be prompted (see below).
+
+When prompts don't appear, the program documentation may tell you what the
+unprompted parameters are, what options are available, and what the suggested
+values are.
+Another way is to look at the online help on a program's parameters; for
+example:
+
+\begin{small}
+\begin{verbatim}
+     ICL> kaphelp creframe param *
+\end{verbatim}
+\end{small}
+
+gives details of all the parameters of the KAPPA program CREFRAME.
+
+\subsection{Keywords --- RESET, PROMPT, ACCEPT}
+
+Another way in which prompts and suggested values can be controlled is by use
+of the keywords RESET, PROMPT, and ACCEPT in ICL commands.
+
+\paragraph{RESET:}\hfill
+
+The RESET keyword causes the suggested value of all parameters (apart from those
+already specified before it on the command line) to be set to the original
+values specified by the program and interface file.
+For example, consider the prompt for the value of the XDIM parameter in the
+following successive executions of the CREFRAME program:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe
+    XDIM - x dimension of output array /64/ > 10
+    ...
+    ICL> creframe
+    XDIM - x dimension of output array /10/ > 25
+    ...
+    ICL> creframe reset
+    XDIM - x dimension of output array /64/ >
+    ...
+    ICL>
+\end{verbatim}
+\end{small}
+
+When the CREFRAME program is executed for the first time, the suggested value of
+the {\small\tt XDIM} parameter is `64'.
+In the first prompt above, the value of {\small\tt XDIM} is set to `10'.
+When CREFRAME is executed for the second time, the suggested value of
+{\small\tt XDIM} has changed to `10', i.e.\ it takes its `current value' which
+was set during the previous execution of CREFRAME.
+In the third execution of CREFRAME we have included the keyword RESET in the
+command line.
+The effect is that when the value of parameter {\small\tt XDIM} is prompted
+for, the suggested value has reverted to `64'.
+
+RESET may be combined with the keywords PROMPT and ACCEPT described below.
+
+\paragraph{PROMPT:}\hfill
+
+The PROMPT keyword forces a prompt to appear for every program parameter not
+specified on the command line.
+For example, program CREFRAME has a parameter called {\small\tt TITLE} which
+normally takes the value `KAPPA -- Creframe' without prompting.
+However, if you use the keyword PROMPT in the command line, a prompt for
+TITLE will be made:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe prompt
+    ...
+    TITLE - Title for output array /'KAPPA - Creframe'/ > `My title'
+    ICL>
+\end{verbatim}
+\end{small}
+
+\paragraph{ACCEPT:}\hfill
+
+The ACCEPT keyword forces the parameter system to accept the suggested
+value for {\em every} program parameter.
+This must be used with care because some parameters may not have suggested
+values and need a value to be specified in order to work properly.
+For example, CREFRAME must have a value specified for parameter
+{\small\tt OUTPIC}, the name of the output data object.
+If you ran the program like this:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe accept
+\end{verbatim}
+\end{small}
+
+the program would fail because it does not know where to write the output
+data.
+However, if you ran the program like this:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe outpic=ramp accept
+\end{verbatim}
+\end{small}
+
+The program would generate an output image using suggested values for all the
+parameters except {\small\tt OUTPIC}, and write the output to file
+{\small\tt RAMP.SDF}.
+
+Sometimes the keyword ACCEPT can be used alone.
+For example, you could follow the above command by the command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> look accept
+\end{verbatim}
+\end{small}
+
+and the central {\tt 7x7} array of the image created by CREFRAME would be
+displayed on your terminal without any parameter values being prompted for.
+
+The symbol `\verb+\+' has the same effect as ACCEPT, thus:
+
+\begin{small}
+\begin{verbatim}
+    ICL> look \
+\end{verbatim}
+\end{small}
+
+would have the same effect as the previous example --- and is much quicker
+to type.
+
+\section{Value formats}
+\label{S_sv}
+
+When specifying parameter values it is important to remember whether you are
+talking to the ICL command interpreter or to the ADAM parameter system.
+The differences are highlighted in Section~\ref{S_comp}
+
+\subsection{ICL command parameters}
+
+Parameter value specifications in an ICL command can take three forms:
+\begin{itemize}
+\item An expression enclosed in parentheses. E.g.
+
+\begin{small}
+\begin{verbatim}
+    (2)        (X)         (Y*SIN(THETA))
+\end{verbatim}
+\end{small}
+
+\item A string enclosed in quotes. E.g.
+
+\begin{small}
+\begin{verbatim}
+    `String'               "Filtered and calibrated"
+\end{verbatim}
+\end{small}
+
+\item Any sequence of characters not including a space, quote, comma or left
+ parenthesis. E.g.
+
+\begin{small}
+\begin{verbatim}
+    NGC1635    X           PI*2
+\end{verbatim}
+\end{small}
+
+\end{itemize}
+The first form is used to pass the value of an ICL expression to a command, or
+to give a command a variable in which to return a value.
+The other two forms both pass a string.
+
+We can illustrate the three forms by using the PRINT command which prints its
+parameter values on the terminal:
+
+\begin{small}
+\begin{verbatim}
+    ICL> X=1.234
+    ICL> PRINT (X)
+    1.234000
+    ICL> PRINT 'HELLO'
+    HELLO
+    ICL> PRINT HELLO
+    HELLO
+\end{verbatim}
+\end{small}
+
+{\em In many cases you do not need to use the quoted form of a string because
+the simpler form will work.}
+You need the quoted form for those cases in which you need to delimit a
+{\em single} string containing a left parenthesis or spaces.
+Consider the following example which contains a PRINT command which has several
+parameters:
+
+\begin{small}
+\begin{verbatim}
+    ICL> X=2
+    ICL> PRINT The Square Root of (X) is (SQRT(X))
+    The Square Root of          2 is 1.414214    
+\end{verbatim}
+\end{small}
+
+Since spaces are parameter separators, `\verb+The+', `\verb+Square+',
+`\verb+Root+', and `\verb+of+' are all received by PRINT as separate parameters.
+However, PRINT simply concatenates all its parameters with a space between each
+pair.
+Thus, the output written by PRINT is the string, just as you typed it.
+Many other ICL commands which accept strings work in this way.
+This means that strings with {\em single} spaces may not need quotes when used
+as command parameters.
+However, in general this is {\em not} true of commands which run ADAM programs
+when strings are specified on the command line (see below).
+
+The rules for specifying ICL command parameters can be summarized as follows:
+\begin{itemize}
+\item To pass the value of an expression or the name of a variable, enclose it
+ in parentheses.
+\item Anything not in parentheses is passed as a string, or as a sequence of
+ strings if it contains spaces or commas.
+\item Any string which does not fit these restrictions can be passed by placing
+ it in quotes.
+ Quotes may be included in a string by typing two consecutive quotes.
+\end{itemize}
+
+\subsection{ADAM program parameters}
+
+Values can be specified for ADAM program parameters in an ICL command line and
+in response to prompts.
+However, some values are only acceptable when given in response to prompts;
+they are meaningless to ICL.
+
+\paragraph{Values acceptable in commands, and in response to prompts:}\hfill
+
+\begin{quote}
+\begin{description}
+ \item [Numbers] --- These can be Integer, Real, or Double Precision, and are
+  entered in the usual Fortran format.
+  If necessary, the parameter system will perform the appropriate type
+  conversion and truncation required to store the value in the form specified
+  by the programmer.
+ \item [Logicals] --- These can be represented by the words TRUE, FALSE,
+  YES, NO, T, F, Y, N; regardless of case.
+  ICL logical expressions can also be used, but only in commands.
+ \item [Strings] --- These are strings of characters similar to the Fortran
+  CHARACTER*n type.
+  Strings can be enclosed in single (') or double ('') quotes.
+  Quotes may be omitted where there is no ambiguity (see below).
+  A special case of a String is an object or logical {\em Name}.
+  These need careful treatment and are discussed below.
+ \item [Arrays] --- Arrays of any of the above types may be represented by
+  a list of values enclosed in square brackets, e.g.\ [1, 2, 3].
+  Two dimensional arrays may be represented as [[1, 2], [3, 4]] etc.
+\end{description}
+\end{quote}
+
+\paragraph{Values acceptable only in response to prompts:}\hfill
+
+\begin{quote}
+\begin{description}
+\item [$<$CR$>$] ---
+ Accept the suggested value.
+\item [$<$TAB$>$] ---
+ The suggested value is put in the input buffer.
+ You can then edit it using the normal keyboard editing facilities before
+ entering the value in the normal way.
+\item [!] ---
+ Return a STATUS value indicating `Null Parameter Value'.
+ This will often cause a program to abort, but it can  force a suitable
+ default value to be used when this is the most sensible action.
+\item [!!] ---
+ Abort the program, by convention.
+\item [?] ---
+ The parameter system will display the text specified in the `help' field of
+ the parameter specification in the program's interface file.
+ If this field is missing, a blank line will be output.
+ You will be reprompted for the parameter, for example:
+
+\begin{small}
+\begin{verbatim}
+    MODE - Method for selecting contour heights /'FR'/ > ?
+      Options are: FR = explicit list; AU = automatic selection;
+      AR = equal-area; LI = linear; MA = magnitude
+    MODE - Method for selecting contour heights /'FR'/ >
+\end{verbatim}
+\end{small}
+
+\item [??] ---
+ This puts you into an interactive Help session, providing access to
+ information about more than just the parameter being prompted for.
+ It is used like the ordinary VMS Help facility.
+ When you exit (by pressing $<$CR$>$ in response to a {\em Topic?} prompt) you
+ will be returned to the original parameter prompt.
+\end{description}
+\end{quote}
+
+\paragraph{Strings:}\hfill
+
+You must be careful when specifying string values.
+A string which contains a space or comma, or which begins with a left
+parenthesis, should be enclosed in single or double quotes.
+For instance, if you specify the string `Sum of 2 images' in an ICL command,
+you could type:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TESTC `Sum of 2 images'
+\end{verbatim}
+\end{small}
+
+in which case the parameter system would be handed the string `Sum of 2 images'
+as the value of the first parameter of TESTC.
+However, if you type:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TESTC Sum of 2 images
+\end{verbatim}
+\end{small}
+
+the parameter system will think there are four parameters `\verb+Sum+',
+`\verb+of+', `\verb+2+', and `\verb+images+'.
+
+Quotes are not needed when a string is input in response to a prompt.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TESTC
+    X - x value/'Default'/ > Sum of 2 images
+\end{verbatim}
+\end{small}
+
+will successfully give parameter X the value `Sum of 2 images' (provided
+X is of type \_CHAR or LITERAL).
+
+The use of single quotes (') is dangerous when used from DCL as DCL
+will interpret them as indicating symbol substitution.
+Thus, when your input will be processed by the DCL command interpreter,
+double quotes (") should be used.
+
+\paragraph{Object names:}\hfill
+
+Strings are used to specify the names of files, data objects, and devices
+(graphics devices, tape drives etc.).
+Components of data objects are specified by a dot notation, e.g.\ RAMP1.TITLE
+refers to the TITLE component of the image RAMP1.
+
+Normally, a name can be typed without quotes.
+However, ambiguities can occur: a file name such as [ABC.DEF]FILE begins
+with a `[' character and may be confused with an array specification.
+Such ambiguities can be resolved by prefixing the name with an `@' character,
+e.g.\ @[ABC.DEF]FILE means the file of this name.
+As another example, in the prompt line:
+
+\begin{small}
+\begin{verbatim}
+    PLTITL - Plot title /' '/ > @ADAM_USER:GALAXY.MYTITLE
+\end{verbatim}
+\end{small}
+
+the parameter PLTITL is given the value of the string contained in the object
+MYTITLE in {\tt GALAXY.SDF}.
+If the `{\tt @}' were omitted, the string
+`{\tt ADAM\_USER:GALAXY.MYTITLE}' would be used as the value of PLTITL.
+Note that the file extension (.SDF) should not be included when giving the
+name of a data file, otherwise the data system will look for the component
+SDF within the object GALAXY.MYTITLE.
+
+\paragraph{Logical names:}\hfill
+
+Logical names must be defined with the /JOB qualifier.
+Thus, if your IMAGE data files are stored in IMAGEDIR alias
+{\tt DISK\$USER1:[XYZ.IRCAM.IMAGES]}:
+
+\begin{small}
+\begin{verbatim}
+    $ DEFINE/JOB IMAGEDIR DISK$USER1:[XYZ.IRCAM.IMAGES]
+\end{verbatim}
+\end{small}
+
+will enable you to respond to a prompt thus:
+
+\begin{small}
+\begin{verbatim}
+    INPIC - Input image /@ramp4/ > imagedir:ngc1365
+\end{verbatim}
+\end{small}
+
+
+\section{Comparison of ICL and ADAM parameters}
+\label{S_comp}
+
+Some values which are acceptable when specified as a parameter value in an
+ICL command are {\em not} acceptable when used in response to prompts from
+the ADAM parameter system.
+These unacceptable values are ICL functions.
+Thus, suppose program TESTR has been written to read a real number and print
+it out.
+We could do the following:
+
+\begin{small}
+\begin{verbatim}
+    ICL> DEFINE TESTR TESTR
+    ICL> TESTR (TAND(60))
+    ICL> TESTR prints 1.732051
+    ICL>
+\end{verbatim}
+\end{small}
+
+However, an attempt to use the ICL function TAND in a response to a prompt
+would be rejected:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TESTR
+    X - x value/1.732051/ > (TAND(60))
+    %RMS-F-SYN, file specification syntax error
+    X - x value/1.732051/ >
+\end{verbatim}
+\end{small}
+
+You will have to specify a value which is acceptable to the ADAM parameter
+system.
+
+Chapter~\ref{C_simpap} shows some example ADAM programs which read a
+parameter value and display it on the user's terminal.
+These can be used to examine how ICL and the ADAM parameter system process input
+values.
+Program TESTI reads a parameter value of type `\_INTEGER'.
+Here is how this program responds to various inputs specified first on the
+command line and then in response to a prompt:
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Input & \multicolumn{2}{c|}{Output} \\ \cline{2-3}
+& Command line & Prompt \\
+\hline
+5 & 5 & 5 \\
+5.6 & 6 & 6 \\
+-1234 & -1234 & -1234 \\
+tand(60) & File not found & File not found \\
+(tand(60)) & 2 & file specification syntax error \\
+(\%B100110) & 38 & file specification syntax error \\
+\hline
+\end{tabular}
+\end{center}
+In this table the first column shows the input value, the second shows the
+value output by the program when the input value is given on the command
+line, and the third shows the value output when the input is given in response
+to a prompt.
+Thus, the second and third columns show the parameter value presented to the
+program, or the error status if no legal value could be obtained.
+
+Notice that:
+\begin{itemize}
+\item The input value `5.6' is rounded up to `6' by the parameter system before
+ being given to the program.
+ This is because the value is obtained by calling routine PAR\_GET0I which
+ converts an input value to integer type.
+\item The ICL function `tand(60)' must be enclosed in parentheses if it is to be
+ recognised as an expression, otherwise it is interpreted as an object name
+ and the system goes looking for its container file.
+\item The expressions `(tand(60))' and `(\%B100110)' are recognised as
+ expressions when input on the command line, but not when input in response to
+ prompts.
+ When it is recognised, the value of tand(60) is rounded up from 1.732051 to 2.
+\end{itemize}
+The next table shows the response of program TESTR which reads the value of
+a parameter of type `\_REAL' from the environment and displays this value on
+the terminal:
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Input & \multicolumn{2}{c|}{Output} \\ \cline{2-3}
+& Command line & Prompt \\
+\hline
+5 & 5 & 5 \\
+5.6 & 5.6 & 5.6 \\
+1.23D12 & 1.23E12 & 1.23E12 \\
+(tand(60)) & 1.732051 & file specification syntax error \\
+true & File not found & File not found \\
+'true' & Conversion error & Conversion error \\
+\hline
+\end{tabular}
+\end{center}
+Notice that in this case the input values 5.6 and (tand(60)) are not rounded to
+integers as the program is expecting real numbers.
+
+The next table shows the behaviour of program TESTL which is like the previous
+programs but whose parameter is of type `\_LOGICAL':
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Input & \multicolumn{2}{c|}{Output} \\ \cline{2-3}
+& Command line & Prompt \\
+\hline
+5 & Conversion error & Conversion error \\
+TRUE & TRUE & TRUE \\
+T & TRUE & TRUE \\
+n & FALSE & FALSE \\
+(lge(a,b)) & TRUE & File not found \\
+\hline
+\end{tabular}
+\end{center}
+Acceptable inputs for logical values are:
+
+\begin{small}
+\begin{verbatim}
+    TRUE  true   YES  yes    T    t    Y    y
+    FALSE false  NO   no     F    f    N    n
+\end{verbatim}
+\end{small}
+
+Notice that the ICL function `lge' is acceptable when specified on the
+command line, but not in response to a prompt.
+
+The final table shows the input to and output from program TESTC, which
+is the same as the previous programs but has a parameter value of type
+`\_CHAR':
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+Input & \multicolumn{2}{c|}{Output} \\ \cline{2-3}
+& Command line & Prompt \\
+\hline
+5.6 & 5.6 & 5.6 \\
+tand(60) & tand(60) & tand(60) \\
+(tand(60)) & 1.73205080 & (tand(60)) \\
+yogi bear & yogi & yogi bear \\
+'yogi bear' & yogi bear & yogi bear \\
+"yogi bear" & yogi bear & yogi bear \\
+(yogi bear) & Right parenthesis expected & (yogi bear \\
+\hline
+\end{tabular}
+\end{center}
+Notice that:
+\begin{itemize}
+\item For `command line' input, ICL expressions are {\em evaluated} and the
+result is converted into a string before being given to the program.
+For `prompt' input, the expressions are not evaluated but are just regarded
+as strings of characters.
+\item Spaces in strings separate parameters in `Command line' input when the
+string is not enclosed in quotes or double quotes.
+\end{itemize}
+If you read Chapter~\ref{C_simpap} you will be able to create your own
+versions of the TESTx programs and try out various inputs on the system
+yourself.

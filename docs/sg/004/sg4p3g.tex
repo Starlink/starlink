@@ -1,0 +1,1167 @@
+\chapter{The Data System}
+\label{C_datsys}
+\markboth{Programmers}{\stardocname}
+
+In this chapter, a bottom-up approach is adopted --- the low-level packages are
+described first, followed by the higher-level ones.
+
+\section{HDS --- Hierarchical data system}
+\label{S_usehds}
+\markboth{Programmers}{\stardocname}
+
+\subsection{Symbolic names and Include files}
+
+Symbolic names should be used for important constant values in HDS programs to
+make them clearer and to insulate them from possible future changes in their
+values.
+These symbolic names are defined by Fortran `include' files as shown in the
+examples below.
+The following include files are available: 
+
+\begin{quote}
+\begin{description}
+
+\item [SAE\_PAR] ---
+This file is not actually part of HDS, but it defines the global symbolic
+constant SAI\_\_OK (the value of the status return indicating success) and will
+be required by nearly all routines which call HDS.
+It should normally be included as a matter of course.\footnote{Due to an
+historical anomaly on VAX/VMS systems, the file SAE\_PAR also contains
+definitions for the DAT\_\_\, symbolic constants which should properly reside
+in DAT\_PAR.
+To prevent multiple definitions occurring, DAT\_PAR is therefore an empty file
+on VAX/VMS systems.
+Thus, if SAE\_PAR has been included, the further inclusion of DAT\_PAR is
+optional (but only on VAX/VMS).
+Its inclusion is recommended, however, because this allows the same software
+to be used on other systems without change.}
+
+\item [DAT\_PAR] ---
+Defines various symbolic constants for HDS.
+These should be used whenever the associated value is required (typically this
+is when program variables are defined)
+
+\item [DAT\_ERR] ---
+Defines symbolic names for the error status values returned by the DAT\_ 
+and HDS\_ routines.
+
+\item [CMP\_ERR] ---
+Defines symbolic names for the additional error status values returned by
+the CMP\_ routines.
+\end{description}
+\end{quote}
+
+The symbolic names of these include files may be used directly on VAX/VMS
+systems, but on Unix systems an explicit directory specification for the file
+is normally also required, and the file name should appear in lower case.
+Thus, to include the DAT\_PAR file on a VAX/VMS system, the following code
+would be used:
+
+\begin{small}
+\begin{verbatim}
+      INCLUDE 'DAT_PAR'
+\end{verbatim}
+\end{small}
+
+whereas on a Unix system, the following code is required:
+
+\begin{small}
+\begin{verbatim}
+      INCLUDE '/star/include/dat_par'
+\end{verbatim}
+\end{small}
+
+(/star/include is a standard directory containing include files on Starlink
+machines running Unix.)
+
+If it is necessary to test for specific error conditions, the appropriate
+include file and symbolic names should be used in your program.
+Here is an example of how to use these symbols: 
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'DAT_ERR'
+      ...
+      CHARACTER*(DAT__SZLOC) LOC1, LOC2
+      CHARACTER*(DAT__SZNAM) NAME
+      INTEGER STATUS
+      ...
+*  Find a structure component.
+      CALL DAT_FIND(LOC1, NAME, LOC2, STATUS)
+
+*  Check the status value returned.
+      IF (STATUS .EQ. SAI__OK) THEN
+        <normal action>
+      ELSE IF (STATUS .EQ. DAT__OBJNF) THEN
+        <take appropriate action for object not found>
+      ELSE
+        <action on other errors>
+      ENDIF
+\end{verbatim}
+\end{small}
+
+\end{quote}
+
+\subsection{Creating objects}
+\label{S_creating}
+
+To fix ideas, look at the example data structure in Fig~\ref{F_exndf}. 
+This is actually one form of NDF structure, but for the purposes of this chapter
+it will be treated as if it were simply an arbitrary HDS structure, i.e.\ we
+will use HDS routines rather than NDF routines to process it.
+The following notation is used to describe each object: 
+
+\begin{small}
+\begin{verbatim}
+                      NAME[(dimensions)] <TYPE> [value]
+\end{verbatim}
+\end{small}
+
+
+Note that scalar objects have no dimensions and that each level down the
+hierarchy is indented. 
+
+\begin{figure}[htb]
+
+\begin{small}
+\begin{verbatim}
+       DATASET <NDF>
+          DATA_ARRAY(512,1024)     <_UBYTE>     0,0,0,1,2,3,255,3,...
+          LABEL                    <_CHAR*80>   'This is the data label'
+          AXIS(2) <AXIS>
+             AXIS <AXIS>
+                DATA_ARRAY(512)    <_REAL>      0.5,1.5,2.5,...
+                LABEL              <_CHAR*30>   'Axis 1'
+             AXIS <AXIS>
+                DATA_ARRAY(1024)   <_REAL>      5,10,15.1,20.3,...
+                LABEL              <_CHAR*10>   'Axis 2'
+\end{verbatim}
+\end{small}
+
+\caption{A simple NDF structure.}
+\label{F_exndf}
+\end{figure}
+
+This example exhibits several of the most important properties of HDS data
+objects.
+
+\begin{itemize}
+\item Both structures and primitives are present in the structure.
+\item Scalar and non-scalar objects are present.
+\item You can have arrays of structures, {\em e.g.}\, the AXIS component is a
+ vector structure (with two elements).
+\end{itemize}
+
+The following code will create the structure in Fig~\ref{F_exndf}:
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      CHARACTER*(DAT__SZLOC) NLOC, ALOC, CELL
+      INTEGER DIMS(2), STATUS
+      DATA DIMS /512, 1024/
+
+      CALL HDS_START(STATUS)
+
+*  Create a container file with a top level scalar object of type NDF.
+      CALL HDS_NEW('dataset', 'DATASET', 'NDF', 0, 0, NLOC, STATUS)
+
+*  Create components in the top level object.
+      CALL DAT_NEW(NLOC, 'DATA_ARRAY', '_UBYTE', 2, DIMS, STATUS)
+      CALL DAT_NEWC(NLOC, 'LABEL', 80, 0, 0, STATUS)
+      CALL DAT_NEW(NLOC, 'AXIS', 'AXIS', 1, 2, STATUS)
+
+*  Create components in the AXIS structure...
+
+*  Get a locator to the AXIS component.
+      CALL DAT_FIND(NLOC, 'AXIS', ALOC, STATUS)
+
+*  Get a locator to the array cell AXIS(1).
+      CALL DAT_CELL(ALOC, 1, 1, CELL, STATUS)
+
+*  Create internal components within AXIS(1) using the CELL locator.
+      CALL DAT_NEW(CELL, 'DATA_ARRAY', '_REAL', 1, DIM(1), STATUS)
+      CALL DAT_NEWC(CELL, 'LABEL', 30, 0, 0, STATUS)
+
+*  Annul the cell locator
+      CALL DAT_ANNUL(CELL, STATUS)
+
+*  Do the same for AXIS(2).
+      CALL DAT_CELL(ALOC, 1, 2, CELL, STATUS)
+      CALL DAT_NEW(CELL, 'DATA_ARRAY', '_REAL', 1, DIM(2), STATUS)
+      CALL DAT_NEWC(CELL, 'LABEL', 10, 0, 0, STATUS)
+      CALL DAT_ANNUL(CELL, STATUS)
+
+*  Access objects which have been created.
+      ...
+
+*  Tidy up
+      CALL DAT_ANNUL(ALOC, STATUS)
+      CALL HDS_CLOSE(NLOC, STATUS)
+      CALL HDS_STOP(STATUS)
+
+      END
+\end{verbatim}
+\end{small}
+
+\end{quote}
+
+The following points should be borne in mind:
+\begin{itemize}
+
+\item The structure created is in no way static --- new objects can be added or
+existing ones deleted at any level without disturbing what already exists.
+(Remember, however, that there are very strong rules about what can and cannot
+be put into an NDF structure.
+In general, the NDF routines of Section \ref{S_progndf} should be used to
+manipulate NDFs.)
+
+\item No primitive values have been stored yet --- that will be done next. 
+
+\end{itemize}
+
+Here are some notes on particular aspects of this example: 
+
+\begin{quote}
+\begin{description}
+
+\item [DAT\_\_SZLOC] ---
+This is one of the constants mentioned in Section \ref{S_usehds}, which is 
+defined in the include file DAT\_PAR and specifies the length in characters of
+all HDS locators.
+Similar constants, DAT\_\_SZNAM and DAT\_\_SZTYP, specify the maximum lengths of
+object names and types. 
+
+\item [STATUS] ---
+HDS routines conform to Starlink error handling conventions and use
+{\em inherited status checking}.
+
+\item [HDS\_NEW] ---
+A container file called `dataset' is created (HDS provides the default file
+extension of `.SDF').
+A scalar structure called DATASET with a type of NDF is created within this
+file, and a locator, NLOC, is associated with this structure.
+It is usually convenient, although not essential, to make the top-level object
+name match the container file name, as here.
+
+\item [DAT\_NEW/DAT\_NEWC] ---
+These routines create new objects within an object --- they are not
+equivalent to HDS\_NEW because they don't have any reference to the
+container file, only to a higher level structure.
+Two variants are used simply because the character string length has to be
+specified when creating a character object and it is normally most convenient
+to provide this via an additional integer argument.
+However, DAT\_NEW may be used to create new objects of any type, including
+character objects.
+In this case the character string length would be provided via the type
+specification, {\em e.g.}\ `\_CHAR$*$15' (a character string length of one
+is assumed if `\_CHAR' is specified alone). 
+
+\item [DAT\_FIND] ---
+After an object has been created, it is necessary to associate a locator with
+it before values can be inserted; this routine performs this function. 
+
+\item [DAT\_CELL] ---
+There are several routines for accessing components of objects.
+This one obtains a locator to a scalar object (structure or primitive) within
+a non-scalar object like a vector. 
+
+\item [HDS\_CLOSE] ---
+This is used to close the container file and to annul the locator passed to
+it.
+
+\end{description}
+\end{quote}
+
+\subsection{Writing and reading objects}
+
+Having created a structure, the next step will usually be to put some values
+into it.
+This can be done by using the {\bf DAT\_PUT} and {\bf DAT\_PUTC} routines.
+For example, the main data array in the above example could be filled with
+values as follows: 
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      BYTE IMVALS(512, 1024)
+      CHARACTER*(DAT__SZLOC) LOC
+
+*  Put data from array IMVALS into the object DATA_ARRAY.
+      CALL DAT_FIND(NLOC, 'DATA_ARRAY', LOC, STATUS)
+      CALL DAT_PUT(LOC, '_UBYTE', 2, DIMS, IMVALS, STATUS)
+      CALL DAT_ANNUL(LOC, STATUS)
+
+*  Put data from character constant to the object LABEL.
+      CALL DAT_FIND(NLOC, 'LABEL', LOC, STATUS)
+      CALL DAT_PUTC(LOC, 0, 0, 'This is the data label', STATUS)
+      CALL DAT_ANNUL(LOC, STATUS)
+\end{verbatim}
+\end{small}
+
+\end{quote}
+Because this sort of activity occurs quite often, {\em packaged} access routines
+have been provided (see Section~\ref{S_package}) for the programmer.
+
+A complementary set of routines also exists for getting data from objects back
+into program arrays or variables; these are the {\bf DAT\_GET} routines.
+Again, packaged versions exist and are often handy in reducing the number of
+subroutine calls required.
+
+\subsection{Accessing objects by mapping}
+\label{S_mapping}
+
+Another technique for accessing the data values stored in primitive HDS objects
+is termed `mapping'.\footnote{This terminology derives from the facility
+originally provided by VAX/VMS for {\em mapping} the contents of files into the
+computer's memory, so that they appear as if they are arrays of numbers
+directly accessible to a program.
+Although HDS still exploits this technique when appropriate, other techniques
+are also used internally so that HDS no longer depends on the use of file
+mapping (which some operating systems do not provide).
+The terminology remains in use, however.}
+An important advantage is that it removes a size restriction imposed by having
+to declare fixed size program arrays to hold data.
+This simplifies software, so that a single routine can handle objects of
+arbitrary size without recourse to accessing subsets. 
+
+HDS provides mapped access to primitive objects via the {\bf DAT\_MAP} routines.
+Essentially, {\bf DAT\_MAP} will return a pointer to a region of the computer's
+memory in which the object's values are stored.
+This pointer can then be passed to another routine using the VAX Fortran `\%VAL'
+facility.\footnote{This VAX extension to Fortran~77 is also supported by the
+other implementations of Fortran for which HDS is available.}
+An example will illustrate this: 
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      INTEGER PNTR, EL
+
+*  Map the DATA_ARRAY component of the NDF structure as a vector of type
+*  _REAL (even though the object is actually a 512 x 1024 array whose
+*  elements are of type _UBYTE).
+      CALL DAT_FIND(NLOC, 'DATA_ARRAY', LOC, STATUS)
+      CALL DAT_MAPV(LOC, '_REAL', 'UPDATE', PNTR, EL, STATUS)
+
+*  Pass the "array" to a subroutine.
+      CALL SUB(EL, %VAL(PNTR), STATUS)
+
+*  Unmap the object and annul the locator.
+      CALL DAT_UNMAP(LOC, STATUS)
+      CALL DAT_ANNUL(LOC, STATUS)
+
+      END
+
+*  Routine which takes the LOG of all values in a REAL array.
+      SUBROUTINE SUB(N, A, STATUS)
+      INCLUDE 'SAE_PAR'
+      INTEGER N, STATUS
+      REAL A(N)
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      DO 1 I = 1, N
+         A(I) = LOG(A(I))
+ 1    CONTINUE
+
+      END
+\end{verbatim}
+\end{small}
+
+\end{quote}
+This example illustrates two features of HDS which we haven't yet mentioned:
+
+\begin{quote}
+\begin{description}
+
+\item [Vectorisation] ---
+It is possible to force HDS to regard objects as vectors, irrespective of
+their true dimensionality.
+This facility was useful in the above example as it made the subroutine SUB
+much more general in that it could be applied to any numeric primitive object. 
+
+\item [Automatic type conversion] ---
+The program can specify the data type it wishes to work with and the program
+will work even if the data are stored as a different type.
+HDS will (if necessary) automatically convert the data to the type required by
+the program.\footnote{This will work even if the object was originally created
+on a different computer which formats its numbers differently.}
+This useful feature can greatly simplify programming --- simple programs can
+handle all data types.
+Automatic conversion works on reading, writing and mapping. 
+
+\end{description}
+\end{quote}
+
+Note that once a primitive has been mapped, the associated locator cannot be
+used to access further data until the original object is unmapped.
+
+\subsection{Mapping character data}
+\label{S_charmapping}
+
+Although the above example used a numeric type of `\_REAL' to access the data,
+HDS allows any primitive type to be specified as an access type, including
+`\_CHAR'.
+It gives you a choice about how to determine the length of the character
+strings it will map.
+You may either specify the length you want explicitly, {\em e.g:}
+
+\begin{small}
+\begin{verbatim}
+      CALL DAT_MAPV(LOC, '_CHAR*30', 'READ', PNTR, EL, STATUS)
+\end{verbatim}
+\end{small}
+
+
+(in which case HDS would map an array of character strings with each element 
+containing 30 characters) or you may leave HDS to decide on the length
+required by omitting the length specification, thus:
+
+\begin{small}
+\begin{verbatim}
+      CALL DAT_MAPV(LOC, '_CHAR', 'READ', PNTR, EL, STATUS)
+\end{verbatim}
+\end{small}
+
+
+In the latter case, HDS will determine the number of characters actually
+required to format the object's values without loss of information.
+It uses decimal strings for numerical values and the values `TRUE' and `FALSE'
+to represent logical values as character strings.
+If the object is already of character type, then its actual length will be
+used directly.
+The routine {\bf DAT\_MAPC} also operates in this manner.
+
+You should consult \xref{SUN/92}{sun92}{} for details of how to use this
+facility on different machines.
+It is one of the areas where it is very difficult to produce a mechanism which
+works properly on all machines. 
+
+\subsection{Copying and deleting objects}
+
+HDS can also copy and delete objects. 
+Routines {\bf DAT\_COPY} and {\bf DAT\_ERASE} will recursively copy and erase
+all levels of the hierarchy below that specified in the subroutine call: 
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      CHARACTER*(DAT__SZLOC) OLOC
+
+*  Copy the AXIS structure to component AXISCOPY of the structure located
+*  by OLOC (which must have been previously defined).
+      CALL DAT_FIND(NLOC, 'AXIS', ALOC, STATUS)
+      CALL DAT_COPY(ALOC, OLOC, 'AXISCOPY', STATUS)
+      CALL DAT_ANNUL(ALOC, STATUS)
+
+*  Erase the original AXIS structure.
+      CALL DAT_ERASE(NLOC, 'AXIS', STATUS)
+\end{verbatim}
+\end{small}
+
+\end{quote}
+Note that the locator to the AXIS object has been annulled before attempting to
+delete it.
+This whole operation can also be done using {\bf DAT\_MOVE}:
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      CALL DAT_MOVE(ALOC, OLOC, 'AXISCOPY', STATUS)
+\end{verbatim}
+\end{small}
+
+\end{quote}
+
+\subsection{Subsets of objects}
+
+The routine {\bf DAT\_CELL} accesses a single element of an array.
+An example was shown in Section \ref{S_creating}.
+The routine {\bf DAT\_SLICE} accesses a subset of an arbitrarily dimensioned
+object.
+This subset can then be treated as if it were an object in its own right.
+For example:
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      CHARACTER*(DAT__SZLOC) SLICE
+      INTEGER LOWER(2), UPPER(2)
+      DATA LOWER / 100, 100 /
+      DATA UPPER / 200, 200 /
+
+*  Get a locator to the subset DATA_ARRAY(100:200,100:200).
+      CALL DAT_FIND(NLOC, 'DATA_ARRAY', LOC, STATUS)
+      CALL DAT_SLICE(LOC, 2, LOWER, UPPER, SLICE, STATUS)
+
+*  Map the subset as a vector.
+      CALL DAT_MAPV(SLICE, '_REAL', 'UPDATE', PNTR, EL, STATUS)
+\end{verbatim}
+\end{small}
+
+\end{quote}
+In contrast to {\bf DAT\_SLICE}, routine {\bf DAT\_ALTER} makes a permanent
+change to a non-scalar object.
+The object can be made larger or smaller, but only in the last dimension.
+This function is entirely dynamic, {\em i.e.}\, it can be done at any time,
+provided the object is not mapped for access.
+Note that {\bf DAT\_ALTER} works on both primitives and structures.
+It is important to realise that the number of dimensions cannot be changed by
+{\bf DAT\_ALTER}. 
+
+\subsection{Temporary objects}
+
+Temporary objects of any type and shape may be created by using the {\bf
+DAT\_TEMP} routine.
+This returns a locator to the newly created object, and this may then be
+manipulated just as if it were an ordinary object (in fact a temporary
+container file is created with a unique name to hold all such objects, and this
+is deleted when {\bf HDS\_STOP} is executed at the end of the program).
+This is often useful for providing workspace for algorithms which may have to
+deal with large arrays. 
+
+\subsection{Enquiries}
+
+One of the most important properties of HDS is that its data files are
+self-describing.
+This means that each object carries with it information describing all its
+attributes (not just its value), and these attributes can be obtained by means
+of enquiry routines.
+An example will illustrate:
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      PARAMETER (MAXCMP=10)
+      CHARACTER*(DAT__SZNAM) NAME(MAXCMP)
+      CHARACTER*(DAT__SZTYP) TYPE(MAXCMP)
+      INTEGER NCOMP, I
+      LOGICAL PRIM(MAXCMP)
+
+*  Enquire the names and types of up to MAXCMP components...
+
+*  First get the total number of components.
+      CALL DAT_NCOMP(NLOC, NCOMP, STATUS)
+
+*  Now index through the structure's components, obtaining locators and the
+*  required information.
+      DO 1 I = 1, MIN(NCOMP,MAXCMP)
+
+*  Get a locator to the I'th component.
+         CALL DAT_INDEX(NLOC, I, LOC, STATUS)
+
+*  Obtain its name and type.
+         CALL DAT_NAME(LOC, NAME(I), STATUS)
+         CALL DAT_TYPE(LOC, TYPE(I), STATUS)
+
+*  Is it primitive?
+         CALL DAT_PRIM(LOC, PRIM(I), STATUS)
+         CALL DAT_ANNUL(LOC, STATUS)
+ 1    CONTINUE
+\end{verbatim}
+\end{small}
+
+\end{quote}
+Here, {\bf DAT\_INDEX} is used to get locators to objects about which (in
+principle) we know nothing.
+This is just like listing the files in a directory, except that the order in
+which the components are stored in an HDS structure is arbitrary (so they
+won't necessarily be accessed in alphabetical order). 
+
+\subsection{Packaged routines}
+\label{S_package}
+
+HDS includes families of routines which provide a more convenient method of
+accessing objects than the basic routines.
+For instance, members of the family {\bf DAT\_PUT$*$} write values of specific
+type and dimensionality, and the {\bf DAT\_GET$*$} routines read similar values.
+Thus {\bf DAT\_PUT0I} will write a single INTEGER value to a scalar primitive,
+and {\bf DAT\_GET1R} will read the value of a vector primitive and store it in a
+REAL program array.
+There are no {\bf DAT\_GET2x} routines; all dimensionalities higher than one
+are handled by {\bf DAT\_GETNx} and {\bf DAT\_PUTNx}. 
+
+Another family of routines are the CMP routines.
+These access components of the `current level'.
+This usually involves: 
+
+\begin{itemize}
+
+\item FINDing the required object and getting a locator to it.
+
+\item Performing the required operation, {\em e.g.}\ PUTting some value into it.
+
+\item ANNULling the locator.
+
+\end{itemize}
+
+The CMP routines package this sort of operation, replacing three or so
+subroutine calls with one.
+The naming scheme is based on the associated DAT routines.
+An example is shown below. 
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      CHARACTER*80 DLAB
+      INTEGER DIMS(2)
+      REAL IMVALS(512, 1024)
+      DATA DIMS / 512, 1024 /
+
+*  Get REAL values from the DATA_ARRAY component.
+      CALL CMP_GETNR(NLOC, 'DATA_ARRAY', 2, DIMS, IMVALS, DIMS, STATUS)
+
+*  Get a character string from the LABEL component and store it in DLAB.
+      CALL CMP_GET0C(NLOC, 'LABEL', DLAB, STATUS)
+\end{verbatim}
+\end{small}
+
+\end{quote}
+
+\section{REF --- References to HDS objects}
+\label{S_ref}
+\markboth{Programmers}{\stardocname}
+
+Reference objects are HDS objects which store references to other HDS data
+objects.
+They act as pointers to data, rather than storing data themselves.
+
+The REF package allows reference objects to be created and written, and it
+allows locators to referenced objects to be obtained.
+The routines are listed in Section~\ref{R_REF}.
+
+The referenced object may be defined as {\em internal\/}, in which case it is
+assumed to be within the same container file as the reference object itself,
+even if the reference object is copied to another container file.
+In that case the reference must point to an object which has the same pathname
+within the new file as it had in the old one.
+References which are not {\em internal\/} will point to a named container file.
+
+Reference objects may be copied and erased using DAT\_COPY and DAT\_ERASE\@.
+Care must be taken when copying reference objects or referenced objects,
+otherwise the reference may no longer point to the referenced object.
+
+Referenced objects must exist at the time the reference is made or used.
+
+\subsection{Uses}
+
+Two main uses for this package are foreseen:
+\begin{itemize}
+\item To maintain a catalogue of data objects.
+\item To avoid duplicating a large data object.
+\end{itemize}
+As an example of the second use, suppose that a large object is logically
+required to form part of a number of other objects.
+To avoid duplicating the common object, the others may contain a reference to
+it.
+For example:
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+   Name                type                  Comments
+
+DATA                DATA_SETS
+  .SET1             SPECTRUM
+     .AXIS1         _REAL(1024)          Actual axis data
+     .DATA_ARRAY    _REAL(1024)
+  .SET2             SPECTRUM
+     .AXIS1         REFERENCE_OBJ        Reference to DATA.SET1.AXIS1
+     .DATA_ARRAY    _REAL(1024)
+  .SET3             SPECTRUM
+     .AXIS1         REFERENCE_OBJ        Reference to DATA.SET1.AXIS1
+     .DATA_ARRAY    _REAL(1024)  
+\end{verbatim}
+\end{small}
+
+\end{quote}
+Then a piece of code which handles structures of type SPECTRUM, which would
+normally contain the axis data in .AXIS1 (as SET1 does), could be modified as
+follows to handle an object .AXIS1 containing either the actual axis data or
+a reference to the object which does contain the actual axis data.
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+*  LOC1 is a locator associated with a SPECTRUM object; obtain locator to AXIS data
+      CALL DAT_FIND(LOC1, 'AXIS1', LOC2, STATUS)
+
+*  Modification to allow AXIS1 to be a reference object; check type of object
+      CALL DAT_TYPE(LOC2, TYPE, STATUS)
+      IF (TYPE .EQ. 'REFERENCE_OBJ') THEN
+          CALL REF_GET(LOC2, 'READ', LOC3, STATUS)
+          CALL DAT_ANNUL(LOC2, STATUS)
+          CALL DAT_CLONE(LOC3, LOC2, STATUS)
+          CALL DAT_ANNUL(LOC3, STATUS)
+      ENDIF
+
+*  End of modification.  LOC2 now locates the axis information wherever it is.
+\end{verbatim}
+\end{small}
+
+\end{quote}
+This code has been packaged into the subroutine {\bf REF\_FIND} which can be
+used instead of DAT\_FIND in cases where the component requested may be a
+reference object.
+
+When a locator which has been obtained in this way is finished with, it should
+be annulled using REF\_ANNUL rather than DAT\_ANNUL. 
+This is so that, if the locator was obtained via a reference, the HDS\_OPEN for
+the container file may be matched by an HDS\_CLOSE.
+{\em Note that this should only be done when any other locators derived from
+the locator to the referenced object are also finished with.}
+
+\section{NDF --- Extensible n-dimensional data format}
+\label{S_progndf}
+\markboth{Programmers}{\stardocname}
+
+The programmer's manual (\xref{SUN/33}{sun33}{}) for NDF runs to 199 pages.
+It is impossible to produce a useful summary of it, and pointless to reproduce
+the whole of it here.
+Instead, we give you an overview of how NDFs are related to HDS, what is in an
+NDF, and the sort of functions provided by the NDF routines.
+A realistic, fully commented example program is also given, which should at
+least give you an idea of how the routines are used.
+The routines are listed in Section~\ref{R_NDF}.
+
+\subsection{Relationship with HDS}
+
+The NDF file format is based on HDS, and NDF data structures are stored in HDS
+container files.
+However, this does not necessarily mean that all applications which can read
+HDS files can also handle data stored in NDF format. 
+
+To understand why, you must appreciate that HDS provides only a rather low-level
+set of facilities for storing and handling astronomical data.
+These include the ability to store primitive data objects (such as arrays of
+numbers, character strings, {\em etc.}) in a convenient and self-describing
+way within {\em container files}.
+However, the most important aspect of HDS is its ability to group these
+primitive objects together to build larger, more complex structures. 
+In this respect, HDS can be regarded as a construction kit which higher-level
+software can use to build even more sophisticated data formats.
+
+The NDF is a higher-level data format which has been built in this way out of
+the more primitive facilities provided by HDS.
+Thus, in HDS terms, an NDF is a data structure constructed according to a
+particular set of conventions to facilitate the storage of typical
+astronomical data (such as spectra, images, or similar objects of higher
+dimensionality). 
+
+While HDS can be used to access such structures, it does not contain any of
+the interpretive knowledge needed to assign astronomical meanings to the
+various components of an NDF, whose details can become quite complicated. 
+In practice, therefore, it is cumbersome to process NDF data structures using
+HDS directly. 
+Instead, the NDF access routines are provided.
+These `know' how NDF data structures are built, so they can hide the details
+from writers of astronomical applications.
+This results in a subroutine library which deals in higher-level concepts
+more closely related to the work which typical astronomical applications
+need to perform, and which emphasises the data concepts which an NDF is
+designed to represent, rather than the details of its implementation. 
+
+\subsection{Data format}
+
+The simplest way of regarding an NDF is to view it as a collection of those
+items which might typically be required in an astronomical image or spectrum. 
+The main part is an $N$-dimensional array of {\em data\/} (where $N$ is 1 for a
+spectrum, 2 for an image, {\em etc.}), but this may also be accompanied by a
+number of other items which are conveniently categorised as follows: 
+
+\begin{quote}
+
+\begin{small}
+\begin{center}
+\begin{tabular}{rl@{ --- }l}
+    {\em Character components:} & {\bf TITLE} & NDF title\\
+                                & {\bf LABEL} & Data label\\
+                                & {\bf UNITS} & Data units\\[1ex]
+        {\em Array components:} & {\bf DATA}  & Data pixel values\\
+                                & {\bf VARIANCE} & Pixel variance estimates\\
+                                & {\bf QUALITY} & Pixel quality values\\[1ex]
+{\em Miscellaneous components:} & {\bf AXIS}  & Coordinate axes\\
+                                & {\bf HISTORY} & Processing 
+                                                  history\footnotemark\\[1ex]
+              {\em Extensions:} & {\bf EXTENSION} & Provides extensibility
+\end{tabular}
+\end{center}
+\end{small}
+
+\end{quote}
+\footnotetext{The {\em history\/} component is not fully supported by the
+present version of the NDF access routines.} 
+
+The names of these components are significant, since they are used by the
+NDF access routines to identify the component(s) to which certain operations
+should be applied.\footnote{Note that the name `DATA' used by the NDF\_
+routines to refer to an NDF's {\em data\/} component differs from the actual
+name of the HDS object in which it is stored, which is `DATA\_ARRAY'.} 
+The following describes the purpose and interpretation of each component in 
+slightly more detail.
+
+{\large \em Character components:}
+
+\begin{quote}
+\begin{description}
+
+\item[{\bf TITLE}] --- This is a character string whose value is intended for
+general use as a heading for such things as graphical output;
+{\em e.g.}\ `M51 in good seeing'. 
+
+\item[{\bf LABEL}] --- This is a character string whose value is intended to be
+used on the axis of graphs to describe the quantity in the NDF's {\em data\/}
+component; {\em e.g.}\ `Surface brightness'. 
+
+\item[{\bf UNITS}] --- This is a character string whose value describes the
+physical units of the quantity stored in the NDF's {\em data\/} component;
+{\em e.g.}\ `J/(m$**$2$*$Ang$*$s)'. 
+
+\end{description}
+\end{quote}
+
+{\large \em Array components:}
+
+\begin{quote}
+\begin{description}
+
+\item[{\bf DATA}] --- This is an $N$-dimensional array of pixel values
+representing the spectrum, image, {\em etc.}\ stored in the NDF. 
+This is the only NDF component which must {\bf always} be present.
+All the others are optional. 
+
+\item[{\bf VARIANCE}] --- This is an array of the same shape and size as the
+{\em data\/} array, and represents the measurement errors or uncertainties
+associated with the individual {\em data\/} values. 
+If present, these are always stored as {\em variance\/} estimates for each
+pixel. 
+
+\item[{\bf QUALITY}] --- This is an array of the same shape and size as the
+{\em data\/} array which holds a set of unsigned byte values. 
+These are used to assign additional `quality' attributes to each pixel (for
+instance, whether it is part of the active area of a detector). 
+Quality values may be used to influence the way in which the NDF's {\em data\/}
+and {\em variance\/} components are processed, both by general-purpose software
+and by specialised applications. 
+
+\end{description}
+\end{quote}
+
+{\large \em Miscellaneous components:}
+
+\begin{quote}
+\begin{description}
+
+\item[{\bf AXIS}] --- This represents a group of {\em axis\/} components which
+may be used to describe the shape and position of the NDF's pixels in a
+rectangular coordinate system. 
+The physical units and a label for each axis of this coordinate system may 
+also be stored.
+(Note that the ability to associate {\em extensions\/} with an NDF's {\em
+axis\/} coordinate system, although described in \xref{SGP/38}{sgp38}{}, is
+not yet available via the NDF access routines.)
+
+\item[{\bf HISTORY}] --- This may be used to keep a record of the processing
+history.
+If present, this component should be updated by any applications which
+modify the data structure. 
+Support for this component is not yet provided by the NDF access routines.
+
+\end{description}
+\end{quote}
+
+{\large \em Extensions:}
+
+\begin{quote}
+\begin{description}
+
+\item[{\bf EXTENSIONs}] --- These are user-defined HDS structures associated
+with the NDF, and are used to give the data format flexibility by allowing it
+to be extended. 
+Their formulation is not covered by the NDF definition, but a few simple
+routines are provided for accessing and manipulating named extensions, and
+for reading and writing the values of components stored within them. 
+
+\end{description}
+\end{quote}
+
+\subsection{Routines}
+
+The NDF access routines are listed in Section~\ref{R_NDF}.
+They perform the following types of operation on NDF data structures: 
+
+\begin{small}
+\begin{quote}
+\begin{itemize}
+\item Obtaining access, both input and output.
+\item Creating and deleting.
+\item Enquiring about attributes, including shape and size.
+\item Enquiring about attributes of components. 
+\item Reading, writing, and resetting component values.
+\item Enquiring about (and flagging) the presence of {\em bad\/} pixels in
+ components.
+\item Accessing and handling {\em quality\/} information.
+\item Modifying attributes (including shape and size) and those of components
+ (such as numeric type). 
+\item Reading, writing, and resetting the values of {\em axis\/} arrays and
+ other {\em axis\/} components.
+\item Modifying the attributes of {\em axis} components (such as the numeric
+ type of {\em axis\/} arrays). 
+\item Controlling the propagation of components to output data structures.
+\item Creating, deleting, and enquiring about extensions, and obtaining
+ access to components stored within extensions. 
+\item Controlling the propagation of extensions to output data structures. 
+\item Selecting and managing {\em sections\/} which refer to subsets or 
+ super-sets.
+\item Merging attributes to match the processing capabilities of specific
+ applications.
+\item Importing, finding, and copying objects held in container files.
+\item Constructing messages.
+\item Controlling access.
+\end{itemize}
+\end{quote}
+\end{small}
+
+Programming support for these routines, including on-line help, is also
+provided by the Starlink language-sensitive editor STARLSE.
+
+\subsection{Example program}
+\label{S_addexample}
+
+The following application adds two NDF data structures pixel-by-pixel.
+It is a fairly sophisticated `add' application which will handle both the {\em
+data\/} and {\em variance\/} components, as well as coping with NDFs of any
+shape and data type.
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+      SUBROUTINE ADD(STATUS)
+*+
+*  Name:
+*     ADD
+
+*  Purpose:
+*     Add two NDF data structures.
+
+*  Description:
+*     This routine adds two NDF data structures pixel-by-pixel to produce a new NDF.
+
+*  ADAM Parameters:
+*     IN1 = NDF (Read)
+*        First NDF to be added.
+*     IN2 = NDF (Read)
+*        Second NDF to be added.
+*     OUT = NDF (Write)
+*        Output NDF to contain the sum of the two input NDFs.
+*     TITLE = LITERAL (Read)
+*        Value for the title of the output NDF.  A null value will cause
+*        the title of the NDF supplied for parameter IN1 to be used instead.
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER*(13) COMP        ! NDF component list
+      CHARACTER*(NDF__SZFTP) DTYPE ! Type for output components
+      CHARACTER*(NDF__SZTYP) ITYPE ! Numeric type for processing
+      INTEGER EL                 ! Number of mapped elements
+      INTEGER IERR               ! Position of first error (dummy)
+      INTEGER NDF1               ! Identifier for 1st NDF (input)
+      INTEGER NDF2               ! Identifier for 2nd NDF (input)
+      INTEGER NDF3               ! Identifier for 3rd NDF (output)
+      INTEGER NERR               ! Number of errors
+      INTEGER PNTR1(2)           ! Pointers to 1st NDF mapped arrays
+      INTEGER PNTR2(2)           ! Pointers to 2nd NDF mapped arrays
+      INTEGER PNTR3(2)           ! Pointers to 3rd NDF mapped arrays
+      LOGICAL BAD                ! Need to check for bad pixels?
+      LOGICAL VAR1               ! Variance component in 1st input NDF?
+      LOGICAL VAR2               ! Variance component in 2nd input NDF?
+*.
+*  Check inherited global status.
+      IF (STATUS.NE.SAI__OK) RETURN
+
+*  Begin an NDF context.
+      CALL NDF_BEGIN
+
+*  Obtain identifiers for the two input NDFs.  These involve calls to the 
+*  parameter system and may be resolved from the interface file, the command
+*  line, or by prompting the user.
+      CALL NDF_ASSOC('IN1', 'READ', NDF1, STATUS)
+      CALL NDF_ASSOC('IN2', 'READ', NDF2, STATUS)
+
+*  Trim their pixel-index bounds to match.  This selects the largest common
+*  set of pixels from the two input arrays.
+      CALL NDF_MBND('TRIM', NDF1, NDF2, STATUS)
+
+*  Create a new output NDF based on the first input NDF.  Propagate the axis
+*  and quality components, which are not changed.  This program does not
+*  support the units component.
+      CALL NDF_PROP(NDF1, 'Axis,Quality', 'OUT', NDF3, STATUS)
+
+*  See if a variance component is available in both input NDFs and generate
+*  an appropriate list of input components to be processed.
+      CALL NDF_STATE(NDF1, 'Variance', VAR1, STATUS)
+      CALL NDF_STATE(NDF2, 'Variance', VAR2, STATUS)
+      IF (VAR1.AND.VAR2) THEN
+         COMP = 'Data,Variance'
+      ELSE
+         COMP = 'Data'
+      END IF
+
+*  Determine which numeric type to use to process the input arrays and set an
+*  appropriate type for the corresponding output arrays.  This program supports
+*  integer, real and double-precision arithmetic.  ITYPE says what type should
+*  be used for the processing;  DTYPE is the type needed for the output data
+*  (identified by NDF3) and so is passed on to NDF_STYPE
+      CALL NDF_MTYPE('_INTEGER,_REAL,_DOUBLE',
+     :                NDF1, NDF2, COMP, ITYPE, DTYPE, STATUS)
+      CALL NDF_STYPE(DTYPE, NDF3, COMP, STATUS)
+
+*  Map the input and output arrays.  Note that the identifier NDF3 produced by
+*  NDF_PROP is used for the output data, which must be in WRITE access mode.
+      CALL NDF_MAP(NDF1, COMP, ITYPE, 'READ', PNTR1, EL, STATUS)
+      CALL NDF_MAP(NDF2, COMP, ITYPE, 'READ', PNTR2, EL, STATUS)
+      CALL NDF_MAP(NDF3, COMP, ITYPE, 'WRITE', PNTR3, EL, STATUS)
+
+*  Merge the bad pixel flag values for the input data arrays to see if checks
+*  for bad pixels are needed.  The first argument `.TRUE.' says that this
+*  application can handle bad pixels (if it were .FALSE. and bad pixels were
+*  present the STATUS would be set to an error value).  The fifth argument
+*  `.FALSE.' says not to check whether there actually are any bad pixels present.
+      CALL NDF_MBAD(.TRUE., NDF1, NDF2, 'Data', .FALSE., BAD, STATUS)
+
+*  Select the appropriate routine for the data type being processed and add the data
+*  arrays.  Note that the arithmetic is done by one of the VEC_ routines in PRIMDAT
+*  which handle bad pixels and any arithmetic errors, such as overflow, for you.
+      IF (STATUS.EQ.SAI__OK) THEN
+         IF (ITYPE.EQ.'_INTEGER') THEN
+            CALL VEC_ADDI(BAD, EL, %VAL(PNTR1(1)),
+     :                     %VAL(PNTR2(1)), %VAL(PNTR3(1)),
+     :                     IERR, NERR, STATUS)
+
+         ELSE IF (ITYPE.EQ.'_REAL') THEN
+            CALL VEC_ADDR(BAD, EL, %VAL(PNTR1(1)),
+     :                     %VAL(PNTR2(1)), %VAL(PNTR3(1)),
+     :                     IERR, NERR, STATUS)
+
+         ELSE IF (ITYPE.EQ.'_DOUBLE') THEN
+            CALL VEC_ADDD(BAD, EL, %VAL(PNTR1(1)),
+     :                     %VAL(PNTR2(1)), %VAL(PNTR3(1)),
+     :                     IERR, NERR, STATUS)
+         END IF
+
+*  Flush any messages resulting from numerical errors.
+         IF (STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+      END IF
+
+*  See if there may be bad pixels in the output data array and set the output
+*  bad pixel flag value accordingly.  NERR is the number of errors detected by
+*  the VEC_ADDx routine.
+      BAD = BAD .OR. (NERR.NE.0)
+      CALL NDF_SBAD(BAD, NDF3, 'Data', STATUS)
+
+*  If variance arrays are also to be processed (i.e. added), then see if bad
+*  pixels may be present in the variance arrays.
+      IF (VAR1.AND.VAR2) THEN
+         CALL NDF_MBAD(.TRUE., NDF1, NDF2, 'Variance', .FALSE., BAD,
+     :                  STATUS)
+
+*  Select the appropriate routine to add the variance arrays.
+         IF (STATUS.EQ.SAI__OK) THEN
+            IF (ITYPE.EQ.'_INTEGER') THEN
+               CALL VEC_ADDI(BAD, EL, %VAL(PNTR1(2)),
+     :                        %VAL(PNTR2(2)), %VAL(PNTR3(2)),
+     :                        IERR, NERR, STATUS)
+
+            ELSE IF (ITYPE.EQ.'_REAL') THEN
+               CALL VEC_ADDR(BAD, EL, %VAL(PNTR1(2)),
+     :                        %VAL(PNTR2(2)), %VAL(PNTR3(2)),
+     :                        IERR, NERR, STATUS)
+
+            ELSE IF (ITYPE.EQ.'_DOUBLE') THEN
+               CALL VEC_ADDD(BAD, EL, %VAL(PNTR1(2)),
+     :                        %VAL(PNTR2(2)), %VAL(PNTR3(2)),
+     :                        IERR, NERR, STATUS)
+            END IF
+
+*  Flush any messages resulting from numerical errors.
+            IF (STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
+         END IF
+
+*  See if bad pixels may be present in the output variance array and set the
+*  bad pixel flag accordingly.
+         BAD = BAD .OR. (NERR.NE.0)
+         CALL NDF_SBAD(BAD, NDF3, 'Variance', STATUS)
+      END IF
+
+*  Obtain a new title for the output NDF, by way of the parameter system.
+      CALL NDF_CINP('TITLE', NDF3, 'Title', STATUS)
+      
+*  End the NDF context.
+      CALL NDF_END(STATUS)
+
+*  If an error occurred, then report context information.
+      IF (STATUS.NE.SAI__OK) THEN
+         CALL ERR_REP('ADD_ERR',
+     :   'ADD: Error adding two NDF data structures.', STATUS)
+      END IF
+
+      END
+\end{verbatim}
+\end{small}
+
+\end{quote}
+
+The following is a possible interface file for the above application:
+
+\begin{quote}
+\begin{small}
+\begin{verbatim}
+   interface ADD
+      parameter IN1                 # First input NDF
+         position 1
+         prompt   'First input NDF'
+      endparameter
+      parameter IN2                 # Second input NDF
+         position 2
+         prompt   'Second input NDF'
+      endparameter
+      parameter OUT                 # Output NDF
+         position 3
+         prompt   'Output NDF'
+      endparameter
+      parameter TITLE               # Title for output NDF
+         type     'LITERAL'
+         prompt   'Title for output NDF'
+         vpath    'DEFAULT'
+         default  !
+      endparameter
+   endinterface
+\end{verbatim}
+\end{small}
+\end{quote}

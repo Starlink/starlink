@@ -1,0 +1,1381 @@
+\chapter{Programming in ICL}
+\label{C_iclprog}
+\markboth{Users}{\stardocname}
+
+\section{Control statements}
+\label{S_cs}
+\markboth{Users}{\stardocname}
+
+These statements provide a means of defining ICL procedures and of controlling
+the flow of execution within them.
+There are four of them:
+\begin{quote}
+\begin{description}
+\item [PROC] --- Defines a procedure.
+\item [IF] --- Provides a decision-making structure.
+\item [LOOP] --- Provides a looping structure.
+\item [EXCEPTION] --- Provides an error-handling structure.
+\end{description}
+\end{quote}
+Unlike direct statements, they can only be used in a procedure and are not
+accepted in direct mode.
+
+\subsection{IF}
+
+The IF statement is essentially the same as the block IF of Fortran.
+It has the following general form:
+
+\begin{small}
+\begin{verbatim}
+    IF expression
+        statements
+    ELSE IF expression
+        statements
+    ELSE IF expression
+        statements
+    ...
+    ELSE
+        statements
+    END IF
+\end{verbatim}
+\end{small}
+
+The expressions (which must give logical values) are evaluated in turn until
+one is found to be true; the following statements are then executed.
+If none of the expressions are true, the statements following ELSE are executed.
+
+Every IF statement must begin with IF and end with END IF (or ENDIF).
+The ELSE IF (or ELSEIF) and ELSE clauses are optional, so the simplest IF
+statement would have the form:
+
+\begin{small}
+\begin{verbatim}
+    IF expression
+        statements
+    ENDIF
+\end{verbatim}
+\end{small}
+
+The following example procedure illustrates the use of the IF statement, and
+shows how they may be nested inside each other:
+
+\begin{small}
+\begin{verbatim}
+    PROC QUADRATIC A,B,C
+    { A Procedure to find the roots of the quadratic equation
+    { A*X**2 + B*X + C = 0
+       IF A=0 AND B=0
+          PRINT The equation is degenerate
+       ELSE IF A=0
+          PRINT Single Root is (-C/B)
+       ELSE IF C=0
+          PRINT The roots are (-B/A) and 0
+       ELSE
+          RE = -B/(2*A)
+          DISCRIMINANT = B*B - 4*A*C
+          IM = SQRT(ABS(DISCRIMINANT)) / (2*A)
+          IF DISCRIMINANT >= 0
+             PRINT The Roots are (RE + IM) and (RE - IM)
+          ELSE
+             PRINT The Roots are complex
+             PRINT (RE) +I* (IM) and
+             PRINT (RE) -I* (IM)
+          ENDIF
+       ENDIF
+    END PROC
+\end{verbatim}
+\end{small}
+
+
+\subsection{LOOP}
+
+The LOOP statement is used to execute repeatedly a group of statements.
+It has three different forms:
+\begin{itemize}
+\item LOOP
+\item LOOP FOR
+\item LOOP WHILE
+\end{itemize}
+
+\paragraph{LOOP:}\hfill
+
+This is the simplest form of looping structure:
+
+\begin{small}
+\begin{verbatim}
+    LOOP
+        statements
+    END LOOP
+\end{verbatim}
+\end{small}
+
+This form sets up an infinite loop.
+Fortunately, an additional statement (BREAK) can be used to terminate the loop;
+BREAK would normally appear inside an IF statement within the loop.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    PROC COUNT
+    { A procedure to print the numbers from 1 to 10
+       I = 1
+       LOOP
+          PRINT (I)
+          I = I+1
+          IF I>10
+             BREAK
+          ENDIF
+       ENDLOOP
+    ENDPROC
+\end{verbatim}
+\end{small}
+
+\paragraph{LOOP FOR:}\hfill
+
+As it is frequently required to loop over a sequential range of numbers, a
+special form of the LOOP statement is provided for this purpose.
+It has the following form:
+
+\begin{small}
+\begin{verbatim}
+    LOOP FOR variable = expression1 TO expression2 [STEP expression3]
+        statements
+    END LOOP
+\end{verbatim}
+\end{small}
+
+This form is essentially equivalent to the DO loop in Fortran.
+The expressions specifying the range of values for the control variable are
+rounded to the nearest integer so that the variable always has an integer value.
+Using this form of the LOOP statement you can simplify the previous example as 
+follows:
+
+\begin{small}
+\begin{verbatim}
+    PROC COUNT
+    { A procedure to print the numbers from 1 to 10
+       LOOP FOR I = 1 TO 10
+          PRINT (I)
+       ENDLOOP
+    ENDPROC
+\end{verbatim}
+\end{small}
+
+Note that there is an optional STEP clause in the LOOP FOR statement.
+If this is not specified, a STEP of 1 is assumed.
+The STEP clause can be used to specify a different value.
+A step of $-1$ must be specified to get a loop which counts down from a high
+value to a lower value.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    LOOP FOR I = 10 TO 1 STEP -1
+\end{verbatim}
+\end{small}
+
+will count down from 10 to 1. 
+
+\paragraph{LOOP WHILE:}\hfill
+
+The third form of LOOP statement specifies loops which terminate on a condition.
+It has the form:
+
+\begin{small}
+\begin{verbatim}
+    LOOP WHILE expression
+        statements                                              
+    END LOOP
+\end{verbatim}
+\end{small}
+
+The expression is evaluated each time round the loop and if it has the logical
+value TRUE, the statements which form the body of the loop are executed.
+If it has the value FALSE, execution continues with the statement following
+END LOOP.
+Using this form you can write yet another version of the COUNT procedure:
+
+\begin{small}
+\begin{verbatim}
+    PROC COUNT
+    { A procedure to print the numbers from 1 to 10
+       I = 1
+       LOOP WHILE I<=10
+          PRINT (I)
+          I = I+1
+       ENDLOOP
+    ENDPROC
+\end{verbatim}
+\end{small}
+
+In the above case, the LOOP WHILE form is more complicated than the LOOP FOR
+form.
+However, LOOP WHILE can be used to express more general forms of loop
+where the termination condition is something derived inside the loop.
+An example is a program which prompts you for an answer to a question
+and has to keep repeating the prompt until a valid answer is received:
+
+\begin{small}
+\begin{verbatim}
+    FINISHED = FALSE
+    LOOP WHILE NOT FINISHED
+       INPUT Enter YES or NO:  (ANSWER)
+       FINISHED = ANSWER = 'YES' OR ANSWER = 'NO'
+    END LOOP
+\end{verbatim}
+\end{small}
+
+\section{Procedures and command files}
+\label{S_pcf}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+LIST        & List a procedure \\
+\hline
+EDIT        & Edit a procedure \\
+SET EDITOR  & Change editor used by EDIT \\
+\hline
+SAVE        & Save a procedure \\
+LOAD        & Accept commands from a saved procedure \\
+DELETE      & Delete a procedure \\
+\hline
+PROCS       & List procedure names \\
+VARS        & List procedure variables \\
+\hline
+SET (NO)TRACE   & Switch tracing of procedures on/off \\
+\hline
+\end{tabular}
+\end{center}
+
+An ICL procedure is like a subroutine in Fortran.
+It allows you to write a sequence of ICL statements which can later be run with
+a single command.
+The procedure may have parameters which are used to pass values to the procedure
+and return values from it.
+
+\subsection{Defining procedures --- PROC}
+
+To define a procedure, type a PROC command which specifies the name of the
+procedure and the names of its parameters.
+ICL then returns a new prompt using the name of the procedure (rather than
+\verb+ICL>+) to show that you are in the procedure entry phase of procedure mode.
+The statements that make up the procedure are then entered, followed by an
+\verb+END PROC+ or \verb+ENDPROC+ to mark the end of the procedure.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> PROC SQUARE_ROOT X
+    SQUARE_ROOT> { An ICL procedure to print the square root of a number
+    SQUARE_ROOT> PRINT The Square Root of (X) is (SQRT(X))
+    SQUARE_ROOT> END PROC
+    ICL>
+\end{verbatim}
+\end{small}
+
+
+\subsection{Running procedures}
+
+To run the procedure you have entered, use its name as an ICL command and add
+any parameter values required:
+
+\begin{small}
+\begin{verbatim}
+    ICL> SQUARE_ROOT (2)
+    The Square Root of         2 is 1.414214
+\end{verbatim}
+\end{small}
+
+\subsection{Listing procedures --- LIST}
+
+The LIST command lists a procedure on the terminal.
+Just type `LIST', followed by the name of the procedure you want to list:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LIST SQUARE_ROOT
+
+        PROC SQUARE_ROOT X
+        { An ICL procedure to print the square root of a number
+        PRINT The Square Root of (X) is (SQRT(X))
+        END PROC
+
+    ICL>
+\end{verbatim}
+\end{small}
+
+\subsection{Editing procedures --- EDIT, SET EDITOR}
+
+Typing in procedures directly is fine for very simple procedures, but for
+anything complex it is likely that some mistakes will be made.
+When this happens, it will be necessary to {\em edit} the procedure.
+Editing can be done from within ICL using standard editors. 
+For example the command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> EDIT SQUARE_ROOT
+\end{verbatim}
+\end{small}
+
+can be used to edit the SQUARE\_ROOT procedure.
+By default the TPU editor is used.
+It is also possible to select the EDT or LSE editors using the SET EDITOR
+command.
+For example, to select EDT, type:
+
+\begin{small}
+\begin{verbatim}
+    ICL> SET EDITOR EDT
+\end{verbatim}
+\end{small}
+
+When editing a procedure there are two possible options:
+\begin{itemize}
+\item You can leave the name of the procedure (specified in the PROC statement)
+ unchanged, but edit the code.
+ This creates a new version of the procedure which replaces the old one
+ {\em when you exit from the editing session} --- in other words, the old
+ version will still be used until you terminate the edit.
+\item You can change the name of the procedure by editing the PROC statement.
+ This creates a new procedure with the new name, and leaves the old procedure
+ unchanged.
+\end{itemize}
+It is possible to create procedures from scratch using the editors.
+However, it is recommended that procedures be typed in directly to start with.
+The advantage is that during direct entry, any syntactic errors will be detected
+immediately.
+Thus, if you mistype the PRINT line in the above example you get an error
+message as follows:
+
+\begin{small}
+\begin{verbatim}
+    SQUARE_ROOT> PRINT The Square Root of (X is (SQRT(X))
+    PRINT The Square Root of (X is (SQRT(X))
+                                ^
+    Right parenthesis expected
+\end{verbatim}
+\end{small}
+
+The error message consists of the line in which the error was detected, a
+pointer which indicates where in the line ICL had got to when it found something
+was wrong, and a message indicating what was wrong.
+In this case it encountered the \verb+'is'+ string when a right parenthesis was
+expected.
+Following such an error message, you can use the command line editing facility
+to correct the line and reenter it.
+If the same error occurred during procedure entry using an editor, the error
+message would only be generated at the time of exit from the editing session,
+and it would be necessary to edit the procedure again to correct it.
+
+\subsection{Direct execution of statements during procedure entry}
+
+It is sometimes useful to have a statement executed directly while entering
+a procedure.
+When using the direct entry method, this can be done by prefixing the command
+with a `\%' character.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> PROC SQUARE_ROOT X
+    SQUARE_ROOT> %HELP
+\end{verbatim}
+\end{small}
+
+would give you on-line help information you might need to complete the
+procedure.
+If the `\%' was omitted, the HELP command would be included as part of the
+procedure.
+
+\subsection{Saving, loading and deleting procedures --- SAVE, LOAD, DELETE}
+
+Procedures created by direct entry will only exist for the duration of an ICL
+session.
+If you need to keep them longer, they need to be saved in a disk file.
+This is achieved by means of the SAVE command.
+To save your SQUARE\_ROOT procedure on disk you would use:
+
+\begin{small}
+\begin{verbatim}
+    ICL> SAVE SQUARE_ROOT
+\end{verbatim}
+\end{small}
+
+To load it again, probably in a subsequent ICL session, you would use the LOAD
+command.
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD SQUARE_ROOT
+\end{verbatim}
+\end{small}
+
+The SAVE command causes the procedure to be saved in a file with name
+SQUARE\_ROOT.ICL in the current default directory. 
+LOAD will load the procedure from the same file, also in the default directory.
+However, with LOAD it is possible to specify an alternative directory if
+required:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD DISK$USER:[ABC]SQUARE_ROOT
+\end{verbatim}
+\end{small}
+
+If you have many procedures, you may not want to save and load them all
+individually.
+It is possible to save {\em all} the current procedures using the command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> SAVE ALL
+\end{verbatim}
+\end{small}
+
+This saves them in a single file with the name SAVE.ICL.
+They may then be reloaded with the command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD SAVE
+\end{verbatim}
+\end{small}
+
+The SAVE ALL command is rarely used, however, because it is executed
+automatically when you exit from ICL.
+This ensures that ICL procedures do not get accidentally lost because you
+forget to save them.
+
+Procedures can be deleted with the DELETE command.
+Just follow the command name with the name of the procedure to be deleted:
+
+\begin{small}
+\begin{verbatim}
+    DELETE  name
+\end{verbatim}
+\end{small}
+
+
+\subsection{Variables}
+
+Any variable used within a procedure is completely distinct from a variable of
+the same name used outside the procedure or within a different procedure, as
+can be seen in the following example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> X=1
+    ICL> PROC FRED
+    FRED> X=1.2345
+    FRED> =X
+    FRED> END PROC
+    ICL> FRED
+    1.234500
+    ICL> =X
+            1
+    ICL>
+\end{verbatim}
+\end{small}
+
+When you run the procedure FRED you get the value of the variable X within the
+procedure.
+Then, typing `=X' gives the value of X outside the procedure, which has remained
+unchanged during execution of the procedure.
+This feature has the consequence that you can use procedures freely without
+having to worry about any possible side effects on variables outside them.
+
+The situation is exactly the same as that in Fortran where variables in a
+subroutine are local to the subroutine in which they are used.
+In Fortran, the COMMON statement is provided for use in cases where it is
+required to extend the scope of a variable over more than one routine.
+ICL does not have a COMMON facility, but does provide an alternative mechanism
+for accessing variables outside their scope using the command VARS and the
+function VARIABLE.
+
+\subsection{Finding out what is available --- VARS, PROCS}
+
+The VARS command lists all the variables of a procedure.
+It has one parameter, which is the name of the procedure.
+If the parameter is omitted, the outer level variables, i.e.\ those that are
+not part of any procedure, are listed.
+Thus, after the previous example you would get:
+
+\begin{small}
+\begin{verbatim}
+    ICL> VARS FRED
+                     X  REAL     1.2345000000000E+00
+    ICL> VARS       
+                     X  INTEGER          1
+    ICL>
+\end{verbatim}
+\end{small}
+
+\paragraph{VARIABLE():}\hfill
+
+The function VARIABLE gives the value of a specified variable in a specified
+procedure, for example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> =VARIABLE(FRED,X)
+    1.234500
+    ICL>
+\end{verbatim}
+\end{small}
+
+and thus allows a variable belonging to a procedure to be accessed outside
+that procedure.
+
+Note that the variables belonging to a procedure continue to exist after it
+finishes execution, and if the procedure is executed a second time they will
+retain their values from the first time through the procedure on entry to the
+procedure for the second time.
+
+\paragraph{PROCS:}\hfill
+
+To find the names of all the current procedures, use the `PROCS' command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> PROCS
+
+    SQUARE_ROOT
+
+    ICL> 
+\end{verbatim}
+\end{small}
+
+
+\subsection{Tracing execution --- SET (NO)TRACE}
+
+The commands SET TRACE and SET NOTRACE switch ICL in and out of trace mode.
+When in trace mode, each statement executed will be listed on the terminal.
+Trace mode is very useful for debugging procedures.
+The commands can be issued either from direct mode to turn on tracing for the
+entire execution of a procedure, or inserted in the procedure itself, making
+it possible to trace just part of its execution.
+
+\subsection{Command files}
+
+You have seen that the LOAD command `loads' a procedure that had previously
+been stored in a file by a SAVE command.
+What
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD SQUARE_ROOT
+\end{verbatim}
+\end{small}
+
+actually does is to read ICL commands from the file SQUARE\_ROOT.ICL
+{\em and obey them}.
+In the case of SQUARE\_ROOT, these commands define a procedure of the same
+name.
+However, there is nothing to stop us storing any ICL commands you like in a
+file of type .ICL, and then you can load and execute them using the LOAD
+command.
+The PROC statement is designed only for creating procedures, so for creating
+general .ICL files you must use a normal editor.
+These general .ICL files are called {\em Command Files}.
+
+A common use of command files is to store a set of command definitions
+for a monolith.
+You have already seen an example of this in file KAPPA\_DIR:KAPPA.PRC.
+When you startup the KAPPA package, this command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD KAPPADIR:KAPPA.PRC
+\end{verbatim}
+\end{small}
+
+is automatically executed, and this causes the command definitions it
+contains to become effective.
+An example of setting up your own command file is given in Section~\ref{S_Mono}.
+
+A subtlety to be aware of is the difference between storing commands within
+a procedure in a command file, and just storing the commands.
+For example, if you wanted to store the command definitions for your TESTx
+programs (see Chapter~\ref{C_simpap}) in a procedure (given that these programs
+had all been put into a monolith called TEST), you could do this from within ICL
+as follows:
+
+\begin{small}
+\begin{verbatim}
+    ICL> PROC TEST
+    TEST> { Define commands to run the TESTx programs
+    TEST> DEFINE TESTC TEST
+    TEST> DEFINE TESTI TEST
+    TEST> DEFINE TESTL TEST
+    TEST> DEFINE TESTR TEST
+    TEST> END PROC
+    ICL> SAVE TEST
+\end{verbatim}
+\end{small}
+
+In a later ICL session you could load this procedure from the file TEST.ICL
+in which it had been stored:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD TEST
+\end{verbatim}
+\end{small}
+
+This command would read the commands from TEST.ICL and obey them, and this
+would have the effect of defining the procedure TEST.
+{\em However, the DEFINE commands within the procedure would not be
+executed until the procedure was executed.}
+Thus, the commands TESTC etc would not be recognised until you had run the
+procedure as follows:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TEST
+\end{verbatim}
+\end{small}
+
+However, if you used your favourite editor to store the following ICL commands
+in the command file TEST.ICL (independently of any ICL session):
+
+\begin{small}
+\begin{verbatim}
+    { Define commands to run the TESTx programs
+    DEFINE TESTC TEST
+    DEFINE TESTI TEST
+    DEFINE TESTL TEST
+    DEFINE TESTR TEST
+\end{verbatim}
+\end{small}
+
+in your next ICL session you could execute these commands by typing:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD TEST
+\end{verbatim}
+\end{small}
+
+The difference from the previous method is that the commands TESTC etc are
+now defined and can be used immediately without having to execute a procedure.
+
+\subsection{Running ICL as a batch job}
+\label{S_iclbatch}
+\markboth{Programmers}{\stardocname}
+
+It is sometimes useful to run one or more ICL procedures as a batch job in VMS.
+It is quite easy to set this up by using a parameter with the ICL command to
+specify a file from which commands will be taken:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL filename
+\end{verbatim}
+\end{small}
+
+This form of the command is equivalent to typing ICL and then typing:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOAD filename
+\end{verbatim}
+\end{small}
+
+Note that a LOAD file may include direct commands as well as procedures.
+In order to create a Batch job, you must set up a file which contains all the
+procedures wanted, a command (or commands) to run them, and an EXIT command to
+terminate the job.
+Here is the file for a simple Batch job to print a table of square roots using
+your earlier example procedure:
+
+\begin{small}
+\begin{verbatim}
+    PROC SQUARE_ROOT X
+    { An ICL procedure to print the square root of a number
+       PRINT The Square Root of (X) is (SQRT(X))
+    END PROC
+    
+    PROC TABLE
+    { A procedure to print a table of square roots of numbers from 1 to 100
+       LOOP FOR I=1 TO 100
+          SQUARE_ROOT (I)
+       END LOOP
+    END PROC
+
+    { Next, the command to run this procedure
+
+    TABLE
+
+    { And then an EXIT command to terminate the job 
+
+    EXIT
+\end{verbatim}
+\end{small}
+
+This file can be generated using the EDIT command from DCL.
+If the procedures have already been tested from ICL, it is convenient to use
+a SAVE ALL command (or exit from ICL) to save them, and then edit the SAVE.ICL
+file to add the additional direct commands.
+Suppose this file is called TABLE.ICL, then to create a batch job, a command
+file is needed which could be called TABLE.COM and would contain the following:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL TABLE
+    $ EXIT
+\end{verbatim}
+\end{small}
+
+It might also need to contain a SET DEF command to set the appropriate
+directory, or a directory specification on the TABLE file name if it is
+not in the top level directory.
+
+To submit the job to the batch queue, the following command is used:
+
+\begin{small}
+\begin{verbatim}
+    $ SUBMIT/KEEP TABLE
+\end{verbatim}
+\end{small}
+
+The /KEEP qualifier specifies that the output file for the batch job is
+to be kept.
+This file will appear as TABLE.LOG in your top level directory and will contain
+the output from the batch job.
+An /OUTPUT qualifier can be used to specify a different file name or directory
+for it.
+
+\section{Exceptions}
+\label{S_excep}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+SIGNAL      & Signal an ICL exception \\
+\hline
+\end{tabular}
+\end{center}
+
+Error conditions and other unexpected events are referred to as
+{\em Exceptions}.
+When such a condition is detected in direct mode, a message is output.
+For example, if you enter a statement which results in an error:
+
+\begin{small}
+\begin{verbatim}
+    ICL> =SQRT(-1)
+    SQUROONEG   Square Root of Negative Number
+    ICL>
+\end{verbatim}
+\end{small}
+
+you get a message consisting of the name of the exception (SQUROONEG) and
+a description of the nature of the exception.
+A full list of ICL exceptions is given in Chapter~\ref{C_rsicl}.
+
+If the error occurs within a procedure, the message contains a little more
+information.
+For example, if you use your square root procedure with an invalid value, you
+get the following messages:
+
+\begin{small}
+\begin{verbatim}
+    ICL> SQUARE_ROOT (-1)
+    SQUROONEG   Square Root of Negative Number
+    In Procedure: SQUARE_ROOT
+    At Statement: PRINT  The Square Root of (X) is (SQRT(X))
+    ICL>
+\end{verbatim}
+\end{small}
+
+If one procedure is called by another, the second procedure will also be listed
+in the error message.
+For example, if you run the following procedure:
+
+\begin{small}
+\begin{verbatim}
+    PROC TABLE
+    { Print a table of Square roots from 2 down to -2
+       LOOP FOR I = 2 TO -2 STEP -1
+         SQUARE_ROOT (I)
+       END LOOP
+    END PROC
+\end{verbatim}
+\end{small}
+
+you get:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TABLE
+    The Square Root of 2 is 1.414214
+    The Square Root of 1 is 1
+    The Square Root of 0 is 0
+    SQUROONEG   Square Root of Negative Number
+    In Procedure: SQUARE_ROOT
+    At Statement: PRINT  The Square Root of (X) is (SQRT(X))
+    Called by: TABLE
+    ICL>
+\end{verbatim}
+\end{small}
+
+
+\subsection{Exception handlers}
+
+It is often useful to be able to modify the default behaviour on an error
+condition.
+You may not want to output an error message and return to the ICL$>$ prompt, but
+rather to handle the condition in some other way.
+This can be done by writing an {\em Exception Handler}.
+Here is an example of an exception handler in the SQUARE\_ROOT procedure:
+
+\begin{small}
+\begin{verbatim}
+    PROC SQUARE_ROOT X
+    { An ICL procedure to print the square root of a number
+       PRINT The Square Root of (X) is (SQRT(X))
+       EXCEPTION SQUROONEG
+    { Handle the imaginary case
+          SQ = SQRT(ABS(X))
+          PRINT The Square Root of (X) is (SQ&'i')
+       END EXCEPTION
+    END PROC
+\end{verbatim}
+\end{small}
+
+Now running the TABLE procedure gives:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TABLE
+    The Square Root of 2 is 1.414214
+    The Square Root of 1 is 1
+    The Square Root of 0 is 0
+    The Square Root of -1 is 1i
+    The Square Root of -2 is 1.414214i
+    ICL>
+\end{verbatim}
+\end{small}
+
+The exception handler has two effects.
+First, the code contained in the exception handler is executed when the
+exception occurs.
+Second, the procedure exits normally to its caller (in this case TABLE) rather
+than aborting execution completely and returning to the ICL$>$ prompt.
+
+Exception handlers should be placed after the normal code, but before the END
+PROC statement.
+There may be any number of exception handlers in a procedure, each for a
+different exception.
+The exception handler begins with an EXCEPTION statement specifying the
+exception name, and finishes with an END EXCEPTION statement.
+Between these may be any ICL statements, including calls to other procedures.
+
+An exception handler does not have to be in the procedure causing the exception,
+but could be in a procedure further up the chain of calls.
+In your example you could put an exception handler for SQUROONEG in TABLE rather
+than in SQUARE\_ROOT:
+
+\begin{small}
+\begin{verbatim}
+    PROC TABLE
+    { Print a table of Square roots from 2 down to -2
+       LOOP FOR I = 2 TO -2 STEP -1
+          SQUARE_ROOT (I)
+       END LOOP
+       EXCEPTION SQUROONEG
+          PRINT 'Can''t handle negative numbers - TABLE Aborting'
+       END EXCEPTION
+    END PROC
+\end{verbatim}
+\end{small}
+
+giving:
+
+\begin{small}
+\begin{verbatim}
+    ICL> TABLE
+    The Square Root of 2 is 1.414214
+    The Square Root of 1 is 1
+    The Square Root of 0 is 0
+    Can't handle negative numbers - TABLE aborting
+    ICL>
+\end{verbatim}
+\end{small}
+
+Below is an example of a pair of procedures which use an exception handler for
+floating point overflow in order to locate the largest floating point number
+allowed on the system.
+Starting with a value of 1, this is multiplied by 10 repeatedly until floating
+point overflow occurs.
+The highest value found in this way is then multiplied by 1.1 repeatedly until
+overflow occurs, then by 1.01 etc:
+
+\begin{small}
+\begin{verbatim}
+    PROC LARGE  START, FAC, L
+    { Return in L the largest floating point number before
+    { overflow occurs when START is repeatedly multiplied by FAC.
+       L = START
+       LOOP
+          L = L * FAC
+       END LOOP
+       EXCEPTION FLTOVF
+    { This exception handler doesn't have any code - it just
+    { causes the procedure to exit normally on overflow.
+       END EXCEPTION
+    END PROC
+
+    PROC LARGEST
+    { A Procedure to find the largest allowed floating point number on the system.
+       FAC = 10.0
+       LARGE  1.0, (FAC), (L)
+       LOOP WHILE FAC > 0.00000001
+          LARGE (L), (1.0+FAC), (L)
+          FAC = FAC/10.0
+       END LOOP
+       PRINT  The largest floating point number allowed is (L)
+    END PROC
+\end{verbatim}
+\end{small}
+
+
+\subsection{Keyboard aborts}
+
+One exception which is commonly encountered is that which results when a
+ctrl/C is entered on the terminal.
+This results in the exception CTRLC and may therefore be used to abort execution
+of a procedure and return ICL to direct mode.
+However, an exception handler for CTRLC may be added to a procedure to modify
+the behaviour when a ctrl/C is typed.
+
+\subsection{SIGNAL}
+
+The exceptions described up to now have all been generated internally by the 
+ICL system, or, in the case of CTRLC, initiated by the user.
+It is also possible for ICL procedures to generate exceptions which may be used
+to indicate error conditions.
+This is done by the SIGNAL command which has the form:
+
+\begin{small}
+\begin{verbatim}
+    SIGNAL  name  text
+\end{verbatim}
+\end{small}
+
+where \verb+name+ is the name of the exception, and \verb+text+ is the message
+text associated with the exception.
+The exception name may be any valid ICL identifier.
+Exceptions generated by SIGNAL work in exactly the same way as the standard
+exceptions listed in \xref{SG/5}{sg5}{}.
+An exception handler will be executed if one exists, otherwise an error message
+will be output and ICL will return to direct mode.
+
+One use of the SIGNAL command is as a means of escaping from deeply nested
+loops.
+The BREAK statement can be used to exit from a single loop, but is not
+applicable if two or more loops are nested.
+In these cases, the following structure could be used:
+
+\begin{small}
+\begin{verbatim}
+    LOOP
+       LOOP
+          LOOP
+             ...
+             IF FINISHED
+                SIGNAL ESCAPE
+             END IF
+             ...
+          END LOOP
+       END LOOP
+    END LOOP
+
+    EXCEPTION ESCAPE
+    END EXCEPTION
+\end{verbatim}
+\end{small}
+
+where the exception handler again contains no statements, but simply exists
+to cause normal procedure exit, rather than an error message, when the 
+exception is signalled.
+
+\section{ICL login files}
+\label{S_icllf}
+
+If you frequently need to define commands to run particular programs, it is
+convenient to define them in an {\em ICL login file} which will be loaded
+automatically each time ICL is started up.
+An ICL login file works in exactly the same way as a DCL login file.
+ICL uses the logical name ICL\_LOGIN to locate this file, so store the
+required definitions in a file called LOGIN.ICL in your top level directory,
+and put the following definition in your DCL LOGIN.COM file:
+
+\begin{small}
+\begin{verbatim}
+   $ DEFINE ICL_LOGIN DISK$USER:[ABC]LOGIN.ICL
+\end{verbatim}
+\end{small}
+
+where DISK\$USER:$[$ABC$]$ needs to be replaced by the actual directory used.
+This command file will then be loaded automatically whenever you start up ICL
+and can include procedures, definitions of commands, or indeed any valid ICL
+command.
+Below is an example of an ICL login file which illustrates some of the
+facilities which may be used:
+
+\begin{small}
+\begin{verbatim}
+    { ICL Login File
+
+    { Define TYPE command
+    DEFSTRING  T(YPE)  DCL TYPE
+
+    { Define EDIT command
+    HIDDEN PROC EDIT name
+       IF INDEX(name,'.') = 0
+          #EDIT (name)
+       ELSE
+          $ EDIT (name)
+       ENDIF
+    END PROC
+
+    { Login Message
+    PRINT 
+    PRINT   Starting ICL at (TIME()) on (DATE())
+    PRINT
+\end{verbatim}
+\end{small}
+
+
+\subsection{Hidden procedures}
+
+The definition of the EDIT command shown in the login file above is done using
+a {\em Hidden procedure}.
+Since EDIT is an ICL command to edit procedures, if you just used DEFSTRING to
+define EDIT as DCL EDIT, you would lose the ability to edit ICL procedures ---
+the EDIT command would always edit VMS files.
+The procedure used to redefine EDIT gets around this by testing for the
+existence of a dot in the name of the file to be edited using the INDEX
+function.
+If a dot is present, it assumes that a VMS file is being edited and issues the
+command `\$ EDIT (name)'.
+If no dot is present, it assumes that an ICL procedure is being edited and
+the command `\#EDIT (name)' is issued.
+The \# character forces the internal definition of EDIT to be used, rather than
+the definition currently being defined.
+
+The procedure is written as a {\em hidden} procedure, indicated by the word
+HIDDEN preceding PROC.
+A hidden procedure works in exactly the same way as a normal procedure, but it
+does not appear in the listing of procedures produced by a PROCS statement,
+nor can it be edited, deleted, or saved from within ICL.
+It is convenient to make all procedures in your login file hidden procedures
+so that they do not clutter your directory of procedures and cannot be
+deleted accidentally.
+
+\section{Extending on-line help}
+\label{S_eolh}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+HELP        & Display on-line documentation \\
+DEFHELP     & Define the source of Help information \\
+\hline
+\end{tabular}
+\end{center}
+
+ICL includes a HELP command which provides on-line documentation on ICL
+itself.
+Using the DEFHELP command it is possible to extend this facility to access
+information on the commands you have added.
+In order to do this, you need to create a help library in the normal format used
+by the VMS help system.
+This is described in the VAX/VMS documentation for the Librarian utility.
+You can then specify topics from this library which will be available using
+the ICL HELP command by using a command of the form:
+
+\begin{small}
+\begin{verbatim}
+    DEFHELP EDIT LIBRARY.HLB
+\end{verbatim}
+\end{small}
+
+This will cause a:
+
+\begin{small}
+\begin{verbatim}
+    HELP EDIT
+\end{verbatim}
+\end{small}
+
+command to return the information on EDIT in help library LIBRARY.HLB, rather
+than in the standard ICL library.
+
+\section{Example procedures}
+\label{S_exproc}
+
+This final section lists some examples of ICL procedures taken from the KAPPA
+manual (\xref{SUN/95}{sun95}{}).
+They should help you understand how to use the programming facilities of
+ICL correctly.
+Many of the commands used in the procedures are KAPPA applications.
+
+\paragraph{Unsharpmask:}\hfill
+
+Suppose you have a series of commands to run on a number of files.
+You could create a procedure to perform all the stages of the processing,
+deleting the intermediate files that it creates.
+
+\begin{small}
+\begin{verbatim}
+     PROC UNSHARPMASK NDFIN CLIP NDFOUT
+
+     { Clip the image to remove the cores of stars and galaxies above
+     { a nominated threshold.
+        THRESH (NDFIN) TMP1 THRHI=(CLIP) NEWHI=(CLIP) \
+
+     { Apply a couple of block smoothings with boxsizes of 5 and 13
+     { pixels.  Delete the temporary files as we go along.
+        BLOCK TMP1 TMP2 5
+        $ DELETE TMP1.SDF;0
+        BLOCK TMP2 TMP3 13
+        $ DELETE TMP2.SDF;0
+
+     { Multiply the smoothed image by a scalar.
+        CMULT TMP3 0.8 TMP4
+        $ DELETE TMP3.SDF;0
+
+     { Subtract the smoothed and renormalised image from the input image.
+     { The effect is to highlight the fine detail, but still retain some of the
+     { low-frequency features.
+        SUB (NDFIN) TMP4 (NDFOUT)
+        $ DELETE TMP4.SDF;0
+     END PROC
+\end{verbatim}
+\end{small}
+
+\paragraph{Multistat:}\hfill
+
+A common use of procedures is likely to be duplicate processing for several
+files.
+Here is an example procedure that does that.
+It uses some intrinsic functions which look just like Fortran.
+
+\begin{small}
+\begin{verbatim}
+     PROC MULTISTAT
+
+     { Prompt for the number of NDFs to analyse.  Ensure that it is positive.
+        INPUTI Number of frames:  (NUM)
+        NUM = MAX(1, NUM)
+
+     { Find the number of characters required to format the number as
+     { a string using a couple of ICL functions.
+        NC = INT(LOG10(NUM)) + 1
+
+     { Loop NUM times.
+        LOOP FOR I=1 TO (NUM)
+
+     { Generate the name of the NDF to be analysed via the ICL function SNAME.
+          FILE = '@' & SNAME('REDX',I,NC)
+
+     { Form the statistics of the image.
+          STATS NDF=(FILE)
+        END LOOP
+     END PROC
+\end{verbatim}
+\end{small}
+
+If NUM is set to 10, the above procedure obtains the statistics of the images
+named REDX1, REDX2, \dots REDX10.
+The {\small ICL} variable FILE is in parentheses because its value is to be
+substituted into parameter NDF.
+There is a piece of syntax to note which often catches people out.
+Filenames passed via {\small ICL} variables, such as FILE in the above example,
+must be preceded by an {\tt @}. 
+
+\paragraph{Flatfield:}\hfill
+
+Here is another example, which could be used to flat field a series of CCD
+frames.
+Instead of executing a specific number of files, you can enter an arbitrary
+sequence of NDFs.
+When processing is completed a !! is entered rather than an NDF name, and that
+exits the loop.
+Note the {\tt \~{}} continuation character.
+(It's not required but it's included for pedagogical reasons.)
+\pagebreak[3]
+
+\begin{small}
+\begin{verbatim}
+     PROC FLATFIELD
+
+     { Obtain the name of the flat-field NDF.  If it does not have a
+     { leading @ insert one.
+        INPUT Which flat field frame?: (FF)
+        IF SUBSTR(FF,1,1) <> '@'
+           FF = '@' & (FF)
+        END IF
+
+     { Loop until there are no further NDFs to flat field.
+        MOREDATA = TRUE
+        LOOP WHILE MOREDATA
+
+     { Obtain the frame to flat field.  Assume that it will not have
+     { an @ prefix. Generate a title for the flattened frame.
+          INPUT Enter frame to flat field (!! to exit): (IMAGE)
+           MOREDATA = IMAGE = '!!'
+           IF MOREDATA
+              TITLE = 'Flat field of ' & (IMAGE)
+              IMAGE = '@' & (IMAGE)
+
+      { Generate the name of the flattened NDF.
+              IMAGEOUT = (IMAGE) & 'F'
+              PRINT Writing to (IMAGEOUT) 
+
+      { Divide the image by the flat field.
+
+              DIV IN1=(IMAGE) IN2=(FF) OUT=(IMAGEOUT) ~
+                  OTITLE= (TITLE)
+           ENDIF
+        END LOOP
+     END PROC
+\end{verbatim}
+\end{small}
+
+\paragraph{Colstar:}\hfill
+
+Some {\small KAPPA} applications, particularly the statistical ones, produce
+output parameters which can be passed between applications via {\small ICL}
+variables.
+Here is an example to draw a perspective histogram centred about a star in a
+nominated data array from only the star's approximate position.
+The region about the star is stored in an output NDF file.
+Note, in a procedure meant to be used in earnest, there would be checks that
+input and output names begin with an {\tt @}.
+
+\begin{small}
+\begin{verbatim}
+     PROC COLSTAR FILE,X,Y,SIZE,OUTFILE
+
+     {+
+     {  Arguments:
+     {     FILE = FILENAME (Given)
+     {        Input NDF containing one or more star images.
+     {     X = REAL (Given)
+     {        The approximate x position of the star.
+     {     Y = REAL (Given)
+     {        The approximate y position of the star.
+     {     SIZE = REAL (Given)
+     {        The half-width of the region about the star's centroid to be
+     {        plotted and saved in the output file.
+     {     OUTFILE = FILENAME (Given)
+     {        Output primitive NDF of 2*%SIZE+1 pixels square (unless
+     {        constrained by the size of the data array or because the location
+     {        of the star is near an edge of the data array.
+     {-
+
+     { Search for the star in a 21x21 pixel box.  The centroid of the
+     { star is stored in the ICL variables XC and YC.
+        CENTROID INPIC=(FILE) XINIT=(X) YINIT=(Y) XCEN=(XC) YCEN=(YC) ~
+          MODE=INTERFACE SEARCH=21 MAXSHIFT=14
+
+     { Convert the co-ordinates to pixel indices.
+        IX = NINT(XC + 0.5)
+        IY = NINT(YC + 0.5)
+
+     { Find the upper and lower bounds of the data array to plot. Note
+     { this assumes no origin information is stored in the data file.
+        XL = MAX(1, IX - SIZE)
+        YL = MAX(1, IY - SIZE)
+        XU = MAX(1, IX + SIZE)
+        YU = MAX(1, IY + SIZE)
+
+     { Create a new IMAGE file centred on the star.
+        PICK2D INPIC=(FILE) OUTPIC=(OUTFILE) XSTART=(XL) YSTART=(YL) ~
+           XFINISH=(XU) YFINISH=(YU)
+
+     { Draw a perspective histogram around the star on the current 
+     { graphics device.
+        COLUMNAR IN=(OUTFILE)
+
+     { Exit if an error occurred, such as not being to find a star
+     { near the supplied position, or being unable to make the plot.
+        EXCEPTION ADAMERR
+           PRINT Unable to find or plot the star.
+        END EXCEPTION
+     END PROC
+\end{verbatim}
+\end{small}
+
+\paragraph{Fancylook:}\hfill
+
+This creates a fancy display of an image with axes and a key showing data
+values.
+Note the need to give an expression combining the $x$-$y$ bounds of the key to
+the LBOUND and UBOUND parameter arrays.
+
+\begin{small}
+\begin{verbatim}
+     PROC FANCYLOOK NDF
+
+     { Find the extent of the current picture.
+        GDSTATE NCX1=(FX1) NCX2=(FX2) NCY1=(FY1) NCY2=(FY2) NOREPORT
+
+     { Display the image with axes using the most-ornate font.
+        DISPLAY (NDF) MODE=PE AXES FONT=NCAR COSYS=D SCALOW=(LOW) SCAHIGH=(HIGH) \
+
+     { Find the extent of the image picture.
+        PICIN NCX1=(DX1) NCX2=(DX2) NCY1=(DY1) NCY2=(DY2) NOREPORT
+
+     { Determine the widths of the borders.
+        XL = DX1 - FX1
+        XR = FX2 - DX2
+        YB = DY1 - FY1
+        YT = FY2 - DY2
+
+     { Only plot a key if there is room. 
+        IF MAX(XL, XR, YB, YT) > 0.0
+
+     { Determine which side has most room for the key, and derive the
+     { the location of the key. First, see if the key is vertical.
+           IF MAX(XL,XR) >= MAX(YB,YT)
+              WIDTH = MIN(0.4*MAX(XL,XR), 0.25*(DX2-DX1))
+              HEIGHT = MIN(6.0*WIDTH, 0.7*(DY2-DY1))
+              IF XL > XR
+                 XK1 = DX1 - 1.5 * WIDTH
+                 XK2 = DX1 - 0.5 * WIDTH
+              ELSE
+                 XK1 = DX2 + 0.5 * WIDTH
+                 XK2 = DX2 + 1.5 * WIDTH
+              ENDIF
+              YK1 = 0.5 * (DY2 + DY1 - HEIGHT)
+              YK2 = 0.5 * (DY2 + DY1 + HEIGHT)
+           ELSE
+
+     { Deal with horizontal key.
+              WIDTH = MIN(0.4 * MAX(YB,YT), 0.25 * (DY2-DY1))
+              HEIGHT = MIN(6.0 * WIDTH, 0.7 * (DX2-DX1))
+              IF YB > YT
+                 YK1 = DY1 - 1.5 * WIDTH
+                 YK2 = DY1 - 0.5 * WIDTH
+              ELSE
+                 YK1 = DY2 + 0.5 * WIDTH
+                 YK2 = DY2 + 1.5 * WIDTH
+              ENDIF
+              XK1 = 0.5 * (DX2 + DX1 - HEIGHT)
+              XK2 = 0.5 * (DX2 + DX1 + HEIGHT)
+           ENDIF
+
+     { Draw the key to fit within the current picture annotating with 
+     { the scaling used in DISPLAY.
+           LUTVIEW LOW=(LOW) HIGH=(HIGH) LBOUND=[(XK1&','&YK1)] ~
+             UBOUND=[(XK2&','&YK2)] MODE=XY
+        ENDIF
+     END PROC
+\end{verbatim}
+\end{small}

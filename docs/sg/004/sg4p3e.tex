@@ -1,0 +1,363 @@
+\chapter{The ADAM Libraries}
+\label{C_overlibs}
+\markboth{Programmers}{\stardocname}
+
+ADAM provides subroutine libraries which make various facilities available
+to application programmers.
+Each library has a {\em Facility Name} which is a mnemonic used to identify it.
+For example, the Facility Name for one of the libraries in the Starlink Data
+System is `DAT'.
+The ways in which these Facility Names impact upon the programmer are:
+\begin{quote}
+\begin{description}
+\item [Routine Names] ---
+
+Each routine in a library has a name of the form:
+
+\begin{small}
+\begin{verbatim}
+    fac_name
+\end{verbatim}
+\end{small}
+
+where `{\tt fac}' is the Facility Name, and `{\tt name}' is the specific routine
+name.
+By using this convention, name clashes between different libraries and
+applications can be avoided.
+It also becomes possible to identify the ADAM calls in a piece of code.
+
+\item [Error Symbols] ---
+
+The error codes which can be returned via the STATUS argument are given
+symbolic names using Fortran PARAMETER statements.
+These names are made available to a program by including a file with logical
+name `fac\_ERR', as in:
+
+\begin{small}
+\begin{verbatim}
+    INCLUDE 'DAT_ERR'
+\end{verbatim}
+\end{small}
+
+which includes the symbolic names of error codes returned by the Data System
+(DAT).
+This file need only be included by routines which need to identify the precise
+nature of an error.
+The symbolic names have the form:
+
+\begin{small}
+\begin{verbatim}
+    fac__error
+\end{verbatim}
+\end{small}
+
+where `{\tt error}' is a mnemonic used to identify the error (note the use of
+two `\_' (underline) characters).
+The actual values of the error codes originate from the VMS MESSAGE utility,
+and so form a coherent set with the status returns from VMS libraries.
+A set of error codes which may be used by writers of non-ADAM facility
+libraries is provided in the include file USER\_ERR.
+
+\item [Parametric Constants] ---
+
+These are symbolic names given to the constants associated with a library.
+The most commonly needed constants are defined in a file with logical name
+`SAE\_PAR'.
+In the situation where a program requires the parametric constants for
+other facilities, these must be included by:
+
+\begin{small}
+\begin{verbatim}
+    INCLUDE 'fac_PAR'
+\end{verbatim}
+\end{small}
+
+The form of these symbolic constants is identical to that used for error
+codes, namely:
+
+\begin{small}
+\begin{verbatim}
+    fac__const
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+This chapter provides an overview of the most important ADAM libraries.
+They are grouped into systems.
+Each system is described in more detail in a subsequent chapter except the
+database system, which is mainly used in the SCAR applications package, and the
+utilities, which are described in Starlink User Notes.
+
+\section{Parameter system}
+\markboth{Programmers}{\stardocname}
+
+This provides the mechanism for controlling the action of ADAM programs:
+\begin{quote}
+\begin{description}
+
+\item [PAR] \hfill [AED/15, APN/6]
+
+ This provides high-level access to the parameter system.
+ It makes it easy to input a small number of data values from the terminal and
+ to specify the data objects, devices and so on which the program requires.
+
+\end{description}
+\end{quote}
+
+\section{Data system}
+\markboth{Programmers}{\stardocname}
+
+This provides the dominant mechanism by which programs store and manipulate
+data.
+The data system as a whole is sometimes referred to colloquially as HDS, and
+sometimes as NDF.
+The following facilities are available, listed using a top-down approach:
+\begin{quote}
+\begin{description}
+
+\item [NDF] \hfill [\xref{SUN/33}{sun33}{}, \xref{SGP/38}{sgp38}{}]
+
+ This stands for Extensible $N$-dimensional Data Format, as described 
+ in Chapter \ref{C_HDS}.
+ It is the standard Starlink format for storing data arrays.
+ As such, it is expected to form the basis of most Starlink `image' processing
+ applications, where `images' include arrays which have more or less than two
+ dimensions.
+
+\item [ARY] \hfill [\xref{SUN/11}{sun11}{}, \xref{SGP/38}{sgp38}{}]
+
+ This is a set of routines for accessing Starlink ARRAY data structures built
+ using HDS.
+ The most likely reason for using these routines directly is to access
+ ARRAY structures stored in NDF extensions.
+
+\item [REF] \hfill [\xref{SUN/31}{sun31}{}]
+ 
+ These routines allow you to store references to HDS data objects in special
+ HDS reference objects, and allow locators to reference objects to be obtained.
+ Their main uses are to maintain a catalogue of HDS objects and to avoid
+ duplicating a large dataset.
+
+\item [HDS] \hfill [\xref{SUN/92}{sun92}{}]
+
+ The Hierarchical Data System is a flexible system for storing and retrieving
+ data, and is of great importance to the whole of the Starlink Project.
+ It is the basic data system in ADAM and is also used in many other software
+ items.
+ It is used very extensively in the implementation of ADAM itself and is also
+ used  by application programmers.
+ The routines themselves are mainly concerned with the highest level of the
+ data system, including the {\em container file} which is the interface
+ between the data system and the host computer's file system.
+
+\item [CMP] \hfill [\xref{SUN/92}{sun92}{}]
+
+ These routines simplify the coding needed to access {\em structure} components
+ within HDS.
+
+\item [DAT] \hfill [\xref{SUN/92}{sun92}{}, APN/7]
+
+ These routines access and manipulate data objects, which may be
+ {\em primitive}\/ (e.g.\ arrays of numbers), or {\em structured}\/
+ (i.e.\ collections of other objects).
+
+\end{description}
+\end{quote}
+
+\section{Message and Error systems}
+\label{S_errmess}
+\markboth{Programmers}{\stardocname}
+
+These related systems provide the {\em only} mechanism by which text should be
+sent to the command device (user terminal or batch log file).
+Output will normally go to the command device via a user-interface.
+The facilities involved are:
+\begin{quote}
+\begin{description}
+
+\item [MSG] \hfill [\xref{SUN/104}{sun104}{}]
+
+ Reports non-error information to the user.
+
+\item [ERR] \hfill [\xref{SUN/104}{sun104}{}]
+
+ Reports error messages to the user and environment.
+
+\item [EMS] \hfill [\xref{SSN/4}{ssn4}{}]
+
+ Constructs and stores error messages, but doesn't communicate them to the user.
+ It is, therefore, of no interest to the application programmer, but of
+ considerable interest to the programmer who is building new {\em systems}
+ software.
+ It is included here for completeness. 
+
+\end{description}
+\end{quote}
+
+\section{Graphics system}
+\label{S_graphics}
+\markboth{Programmers}{\stardocname}
+
+This consists of several facilities offering different levels of control,
+but all (except IDI) are based on the ISO standard Graphics Kernel System (GKS).
+
+\begin{quote}
+\begin{description}
+
+\item [NCAR/SNX] \hfill [\xref{SUN/88}{sun88}{}, \xref{SUN/90}{sun90}{}, MUD/59]
+
+ An extensive suite of high level graphics utilities originating from the
+ National Center for Atmospheric Research in Boulder, Colorado.
+ SNX contains some Starlink-produced extensions to NCAR.
+
+\item [PGPLOT] \hfill [\xref{SUN/15}{sun15}{}, MUD/61]
+
+ A high level package for plotting x-y plots, functions, histograms, bar charts,
+ contour maps and grey-scale images.
+ The version in use on Starlink uses GKS for its low-level graphics
+ input/output.
+
+\item [NAG graphics] \hfill [\xref{SUN/29}{sun29}{}]
+
+ The NAG Graphics Library (formerly the {\em Graphical Supplement}) was
+ originally seen as a way of plotting data associated with the numerical
+ routines which make up the main NAG library.
+ However, it can be used quite independently of the main library for plotting
+ graphs, functions, and contours, though most people now prefer to use NCAR
+ or PGPLOT.
+
+\item [SGS] \hfill [\xref{SUN/85}{sun85}{}]
+
+ A `simplified' graphics facility which provides most of the commonly needed
+ basic graphics functions in a convenient form.
+ The primary simplification over GKS is that, while several workstations can
+ be open simultaneously, only one can be active at a given time.
+ It has been designed so that calls to its routines can be freely interspersed
+ with those of GKS.
+ Specialised GKS functions are not reproduced in SGS.
+
+\item [GKS] \hfill [\xref{SUN/83}{sun83}{}, MUD/27]
+
+ The basic set of `implementation' routines.
+ It is a fairly powerful low-level graphics facility, and is {\em the}
+ international 2-dimensional graphics standard.
+
+\item [IDI] \hfill [\xref{SUN/65}{sun65}{}]
+
+ A standard for displaying astronomical data on an image display.
+ It complements, rather than replaces, GKS, and should be used where intimate
+ control of the image display device is required, and for functions which
+ are outside the scope of GKS.
+
+\item [AGI] \hfill [\xref{SUN/48}{sun48}{}]
+
+ A database system which stores information about plots on a graphics device.
+ This enables a program to relate to plots produced by other programs.
+
+\item [GNS] \hfill [\xref{SUN/57}{sun57}{}]
+ 
+ Almost every Starlink graphics program will need the name of a GKS or IDI
+ device.
+ GNS --- the Graphics Name Service --- allows the programmer to choose a device
+ from a reasonably `friendly' series of names, which is then translated into the
+ GKS `workstation type'.
+ Unless you are opening GKS workstations directly or making specialised
+ enquiries about devices, you are most unlikely to need to call GNS yourself.
+
+\end{description}
+\end{quote}
+
+\section{Input/output systems}
+\markboth{Programmers}{\stardocname}
+
+In general, data storage should be handled through the data system.
+However, there may be a need to handle files directly.
+This is provided by the following closely related facilities:
+\begin{quote}
+\begin{description}
+
+\item [FIO] \hfill [\xref{SUN/143}{sun143}{}]
+
+ Handles sequential, formatted files for the production of reports, e.g.\ for
+ subsequent listing.
+ The form of carriage control may be specified when the file is created.
+
+\item [RIO] \hfill [\xref{SUN/143}{sun143}{}]
+
+ Handles unformatted, direct-access files.
+
+\end{description}
+\end{quote}
+There may also be a need to access `foreign' magnetic tapes:
+\begin{quote}
+\begin{description}
+
+\item [MAG] \hfill [APN/1]
+
+ Handles tape positioning, and reading or writing data blocks and tape marks.
+ It also includes facilities for keeping track of tape positions so that
+ programs can provide a friendly user interface.
+
+\end{description}
+\end{quote}
+
+\markboth{Programmers}{\stardocname}
+\section{Database system}
+
+These are provided mainly for access to astronomical catalogues:
+\begin{quote}
+\begin{description}
+
+\item [CHI] \hfill [\xref{SUN/119}{sun119}{}]
+
+ This is gradually replacing ADC as the preferred method of accessing
+ relational databases, such as the usual astronomical catalogues or large
+ tables of measurements of sets of objects. 
+
+\item [ADC] \hfill
+
+ Provides access to the relational database files handled by the SCAR programs.
+ It is implemented as part of the SCAR software item.
+
+\end{description}
+\end{quote}
+
+\section{Utilities}
+\markboth{Programmers}{\stardocname}
+
+These differ from the libraries mentioned above in that they are not associated
+with parameters.
+They are libraries which enable ADAM programs to do various tasks in a
+consistent way:
+\begin{quote}
+\begin{description}
+\item [CHR] \hfill [\xref{SUN/40}{sun40}]
+
+ Manipulation of character strings, encoding and decoding numeric fields etc.
+
+\item [CNF] \hfill [SGP/5]
+
+ Interchange of character strings between Fortran and C software modules.
+
+\item [PRIMDAT] \hfill [\xref{SUN/39}{sun39}{}]
+
+ Arithmetic, mathematical operations, type conversion, and inter-comparison of
+ any of the  primitive data types supported by HDS.
+
+\item [PSX] \hfill [\xref{SUN/121}{sun121}{}]
+
+  An interface to the Posix portable operating system.
+
+\item [SLALIB] \hfill [\xref{SUN/67}{sun67}{}]
+
+ Routines mainly concerned with astronomical position and time.
+
+\item [TRANSFORM] \hfill [\xref{SUN/61}{sun61}{}]
+
+ A standard, flexible method for manipulating coordinate transformations,
+ and for transferring information about them between programs.
+
+\end{description}
+\end{quote}

@@ -1,0 +1,1120 @@
+\part{FOR PROGRAMMERS}
+\label{P_programmers}
+\pagestyle{myheadings}
+\markboth{Programmers}{\stardocname}
+
+\chapter{A Guided Tour}
+\label{C_simpap}
+\markboth{Programmers}{\stardocname}
+
+This chapter shows you how to write programs for the ADAM environment, and
+how to compile, link, and test them.
+It starts off with an ultra-simple `Hello, world' program, and then takes you
+through other examples, explaining what is going on.
+Later sections consider error handling, and how to combine several programs
+together into a composite program called a {\em Monolith}.
+
+A comprehensive description of how to write ADAM programs is given in
+\xref{SUN/101}{sun101}{}.
+
+\section{A `Hello, world' program}
+\label{S_prog1}
+\markboth{Programmers}{\stardocname}
+
+Let's write, compile, link, and run an ADAM program which writes `Hello world'
+on your terminal.
+Here's the program:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE HELLO(STATUS)
+          INTEGER STATUS
+          CALL MSG_OUT('MESS', 'Hello, world', STATUS)
+          END
+\end{verbatim}
+\end{small}
+
+Store this in a file called \verb+HELLO.FOR+.
+
+You also need an {\em interface file} which, in its simplest form, is:
+
+\begin{small}
+\begin{verbatim}
+    interface HELLO
+    endinterface
+\end{verbatim}
+\end{small}
+
+Store this is a file called \verb+HELLO.IFL+.
+
+Now, prepare the environment for ADAM program development:
+
+\begin{small}
+\begin{verbatim}
+    $ ADAMSTART
+    $ ADAMDEV
+\end{verbatim}
+\end{small}
+
+and compile the program:
+
+\begin{small}
+\begin{verbatim}
+    $ FORTRAN HELLO
+\end{verbatim}
+\end{small}
+
+link it:
+
+\begin{small}
+\begin{verbatim}
+    $ ALINK HELLO
+\end{verbatim}
+\end{small}
+
+and run it:
+
+\begin{small}
+\begin{verbatim}
+    $ RUN HELLO
+    Hello, world
+    $
+\end{verbatim}
+\end{small}
+
+You can also run the program from the ICL command language:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL
+    ...
+    ICL> define hello hello
+    ICL> hello
+    Loading HELLO into xxxxHELLO
+    Hello, world
+    ICL> exit
+    $
+\end{verbatim}
+\end{small}
+
+You have now prepared, compiled, linked and run your first ADAM program.
+
+\section{Source code}
+\label{S_prog2}
+\markboth{Programmers}{\stardocname}
+
+The source code of every ADAM program which is meant to last should be written
+in the style recommended by Starlink; in particular, it should contain a section
+giving information about the function of the program and the meaning of the
+parameters.
+This style is encapsulated in a set of {\em Prologues}, described in
+section~\ref{S_standprols}.
+Once you start serious ADAM programming, you should base your code on these
+prologues.
+Their purpose is to ensure that your code is adequately documented and, in
+particular, can be supported easily by someone other than yourself.
+
+The simple example programs in this chapter use a much simpler format than that
+recommended for normal ADAM programs as their purpose is pedagogic.
+They are usually presented first without comments in order to make their
+structure as clear as possible.
+Then, the code is explained line by line.
+
+ADAM programs are written as Fortran {\em subroutines} with one argument --- a
+status value.
+They should obey ADAM conventions; in particular, all communication
+with the user must be done via the parameter, message, or error systems, and
+the data system should be used to manipulate data.
+You must not use READ or WRITE statements to communicate with the user's
+terminal directly.
+This is because a direct WRITE would bypass ADAM's system of output control
+(which may be using a screen management system like SMS), and a direct READ
+would bypass the parameter system for obtaining parameter values.
+Furthermore, the sub-process in which the program is run may not be connected to
+a terminal.
+ 
+An example of the source code for a simple program to read a real value from a
+terminal and write it out is:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE TESTR(STATUS)
+          IMPLICIT NONE
+          INCLUDE 'SAE_PAR'
+          INTEGER STATUS
+          REAL XVALUE
+    *...........................................................................
+          CALL PAR_GET0R('X', XVALUE, STATUS)
+          IF (STATUS.EQ.SAI__OK) THEN
+             CALL MSG_SETR('X', XVALUE)
+             CALL MSG_OUT('MESS','Value from TESTR program is ^X',STATUS)
+          END IF
+          END
+\end{verbatim}
+\end{small}
+
+In these teaching programs I use a horizontal line of dots to separate the
+declarations from the executable statements.
+This is not standard ADAM practice, but I think it makes the structure of the
+code easier to comprehend.
+
+You can tell this is an ADAM program because it calls routines which implement
+the ADAM parameter and message systems.
+Let's go through it line by line and see what is going on.
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE TESTR(STATUS)
+\end{verbatim}
+\end{small}
+
+As already mentioned, the program is written as a Fortran subroutine with a
+single parameter called STATUS; the name of the subroutine is TESTR.
+
+\begin{small}
+\begin{verbatim}
+          IMPLICIT NONE
+\end{verbatim}
+\end{small}
+
+This makes the compiler tell us if we are using a variable which hasn't been
+declared.
+It is a useful way of trapping spelling mistakes and declaration omissions.
+It is good programming practice to declare explicitly every variable used.
+
+\begin{small}
+\begin{verbatim}
+          INCLUDE 'SAE_PAR'
+\end{verbatim}
+\end{small}
+
+Before you can compile an ADAM program, you need to execute a command called
+ADAMDEV.
+Amongst other things, this defines a logical name called SAE\_PAR to be the name
+of a file which contains the definitions of Fortran global constants which are
+needed in ADAM programs.
+You should always include this INCLUDE statement in your
+programs\footnote{These last two statements (IMPLICIT and INCLUDE) can be
+replaced by the single statement INCLUDE 'SAI\_PAR'.
+However, it is clearer if they are kept separate when explaining what is going
+on.}.
+
+\begin{small}
+\begin{verbatim}
+          INTEGER STATUS
+          REAL XVALUE
+\end{verbatim}
+\end{small}
+
+These statements declare the types of the two variables, STATUS and XVALUE,
+used in the program.
+
+\begin{small}
+\begin{verbatim}
+          CALL PAR_GET0R('X', XVALUE, STATUS)
+\end{verbatim}
+\end{small}
+
+This is the first executable statement, and is a call to one of the routines
+which implement the parameter system --- you can tell this because its name
+starts with the characters `PAR\_'.
+The rest of the name tells you its function: `GET' means `get the value of a
+parameter'; `0' means `the parameter has 0 dimensions' (i.e.\ it is a scalar);
+`R' means `present the parameter value to the program as a REAL number'.
+There is an extensive repertoire of similar routines with names like
+PAR\_GET1I and PAR\_PUTNR whose meanings can be broken down in a similar way.
+In fact you can specify the dimensionality of the parameter value to be:
+\begin{quote}
+\begin{description}
+\item [0] --- meaning `scalar'
+\item [1] --- meaning `vector'
+\item [N] --- meaning `n-dimensional'
+\item [V] --- meaning `map object as if it were a vector'
+\end{description}
+\end{quote}
+and you can specify the type to be:
+\begin{quote}
+\begin{description}
+\item [D] --- meaning DOUBLE PRECISION
+\item [R] --- meaning REAL
+\item [I] --- meaning INTEGER
+\item [L] --- meaning LOGICAL
+\item [C] --- meaning CHARACTER[*n]
+\end{description}
+\end{quote}
+The PAR routines are described in APN/6 and summarised in
+section~\ref{R_Parameter}.
+
+But what do the subroutine arguments stand for?
+
+Well, the first argument `X' is a CHARACTER expression specifying the
+{\em name} of the parameter whose value is being obtained.
+The next argument `XVALUE' is the name of the REAL scalar variable which is to
+hold the {\em value} obtained for the parameter.
+The final argument `STATUS' is an INTEGER variable which will hold the value of
+the Status returned by the routine.
+
+To sum up: this statement obtains the value of parameter X from the ADAM
+parameter system, stores it as a REAL number in scalar variable XVALUE, and
+stores the returned status value in variable STATUS.
+
+\begin{small}
+\begin{verbatim}
+          IF (STATUS.EQ.SAI__OK) THEN
+\end{verbatim}
+\end{small}
+
+Now we test the status value returned by PAR\_GET0R by comparing it with the
+constant SAI\_\_OK.
+This is one of those constants defined as a result of that `INCLUDE
+'SAE\_PAR'' statement we came across earlier.
+SAI\_\_OK means that `no error has been detected', so if this test is satisfied
+we can execute the next two statements which cause the value read in to be
+displayed on the user's terminal:
+
+\begin{small}
+\begin{verbatim}
+          CALL MSG_SETR('X', XVALUE)
+          CALL MSG_OUT('MESS', 'Value from TESTR program is ^X', STATUS)
+\end{verbatim}
+\end{small}
+
+These two routines belong to the ADAM message system, which is the preferred
+way of displaying messages on the user's terminal.
+Once again, the first four characters `MSG\_' show that they are message system
+routines, and the rest of the name indicates their function.
+The values of variables are passed to the message system by means of `tokens',
+so the first thing to do is to set the value of a token.
+This is done by MSG\_SETR which encodes the value of the REAL variable XVALUE
+and associates it with the token specified by the CHARACTER expression `X'.
+There is a different routine for each type of variable (MSG\_SETL, MSG\_SETI
+etc.).
+
+N.B. The argument 'X' used in PAR\_GET0R and MSG\_SETR give names to
+different things.
+In the case of PAR\_GET0R, it is the name of a program parameter.
+In the case of MSG\_SETR, it is the name of a message system token.
+The program doesn't get confused because each routine interprets 'X' in its
+own way.
+
+The MSG\_OUT routine constructs the message and writes it on the user's
+terminal.
+\verb+'MESS'+ is a CHARACTER expression specifying the name of the message in
+the message system;
+\verb+'Value from TESTR program is ^X'+ is the message itself, where \verb+^+
+indicates the token which will be replaced by the value set by MSG\_SETR;
+and STATUS holds the status value returned by the routine.
+The MSG routines are described in Chapter~\ref{C_messerrs}.
+
+Finally:
+
+\begin{small}
+\begin{verbatim}
+          END IF
+          END
+\end{verbatim}
+\end{small}
+
+terminate the IF statement and indicate the end of the program source code.
+
+This program should be stored in a file called TESTR.FOR, ready for compiling.
+However, before the program can be run successfully, we need to prepare an
+{\em interface file}.
+
+\section{Interface file}
+\label{S_Inter}
+
+The interface file contains information on a program's parameters and messages,
+and shields the program from details of the run-time environment which may not be known
+when the program is written --- in particular, a program can ask for a
+parameter value without knowing how it will be obtained.
+The interface file should be called {\em program}.IFL where {\em program} is
+the name of the program.
+Notice that the interface file can be changed without having to change and
+recompile the program with which it is associated --- useful flexibility.
+An example interface file for the TESTR program above is:
+
+\begin{small}
+\begin{verbatim}
+    interface TESTR
+      parameter X
+        type     '_REAL'
+        position 1
+        prompt   'x value'
+        ppath    'current,default'
+        default  1.5
+        vpath    'prompt'
+      endparameter
+      message MESS
+         text 'TESTR prints ^X'
+      endmessage
+    endinterface
+\end{verbatim}
+\end{small}
+
+The format, content, and meaning of interface files are described in detail in
+Chapter~\ref{C_parsys}.
+However, it should be clear that they begin and end with `\verb+interface+'
+and `\verb+endinterface+' statements respectively.
+They give information about parameters (\verb+parameter ... endparameter+) and
+messages (\verb+message ... endmessage+).
+
+The example parameter specification (beginning `\verb+parameter X+') contains
+details about the TESTR program's single parameter (named X) and how it should
+be treated.
+It does this by giving values for a number of {\em fields} in the format
+({\em field-name value}).
+The field specifications shown above have the following effect:
+
+\begin{small}
+\begin{verbatim}
+        type     '_REAL'
+\end{verbatim}
+\end{small}
+
+The data type of the parameter value is \_REAL.
+(This is one of the primitive object types in the HDS data system.)
+
+\begin{small}
+\begin{verbatim}
+        position 1
+\end{verbatim}
+\end{small}
+
+A value for X may be given in the {\em first} parameter position on the command
+line.
+
+\begin{small}
+\begin{verbatim}
+        prompt   'x value'
+\end{verbatim}
+\end{small}
+
+The {\em prompt-string} that is to be presented to the user when the system
+asks for a value is `x value'.
+
+\begin{small}
+\begin{verbatim}
+        ppath    'current,default'
+\end{verbatim}
+\end{small}
+
+`ppath' is short for `prompt-value-resolution-path', and the purpose of this
+field is to specify where the suggested value offered to the user in the
+prompt is to come from.
+In this case, the current (last used) value will be used or, if there is no
+current value, the default value specified in the interface file will be used.
+
+\begin{small}
+\begin{verbatim}
+        default  1.5
+\end{verbatim}
+\end{small}
+
+The default value is 1.5.
+Notice that, because of the `ppath' specification above, this value will only
+appear in the prompt as the suggested value if there is no current value.
+
+\begin{small}
+\begin{verbatim}
+        vpath    'prompt'
+\end{verbatim}
+\end{small}
+
+`vpath' is short for `value-resolution-path', and the purpose of this field is
+to specify the search path the system is to follow when it is trying to obtain
+a value for a parameter.
+If a value is specified on the command line, the problem is solved and `vpath'
+is not considered.
+However, if no value is specified, `vpath' gives the system an ordered list of
+alternative sources to try.
+In the example above, only one source is specified: prompt the user to specify
+a value.
+Be careful to distinguish between the meanings of `vpath' and `ppath';
+`ppath' is concerned with the {\em prompt} --- hence the `p', while `vpath' is
+concerned with the {\em value} --- hence the `v'.
+
+The prompt will be of the form:
+\begin{quote}
+{\em keyword}\/ \verb/-/ {\em prompt-string} /{\em suggested-value}/ \verb/>/
+\end{quote}
+In the example above, the {\em keyword} is taken as the `X' in the `parameter'
+statement, the {\em prompt-string} is specified by the `prompt' statement, and
+the {\em suggested-value} is determined by the `ppath' statement.
+Thus, if there is no current value, the prompt for parameter X would be:
+
+\begin{small}
+\begin{verbatim}
+    X - x value /1.5/ >
+\end{verbatim}
+\end{small}
+
+By changing the specification of `vpath' and/or `ppath' in the interface file,
+the program can be made to accept a value obtained from a variety of sources.
+
+The message specification:
+
+\begin{small}
+\begin{verbatim}
+      message MESS
+         text 'TESTR prints ^X'
+      endmessage
+\end{verbatim}
+\end{small}
+
+tells ADAM that when the program outputs the message with the name `MESS',
+the message \verb+`TESTR prints x'+ (where \verb+x+ is the value associated
+with the message token \verb+^X+ by the program) is to be displayed in
+preference to the message given in the program (i.e.\ in the source code).
+If the message specification is omitted from the interface file, the text given
+in the source code would be displayed (i.e.\ `\verb+Value from TESTR program is
+x+').
+
+Now that we have the source code stored in file TESTR.FOR and the interface
+module stored in file TESTR.IFL, we are ready to compile, link, and test our
+program TESTR.
+
+\section{Compiling and linking}
+
+The ADAM linking process links the subroutine with any other user-supplied
+or ADAM routines which are called, together with a fixed part which
+handles program startup, shutdown etc.
+
+Before compiling and linking an ADAM program, the following commands must first
+be executed to set up the required logical names and symbols:
+
+\begin{small}
+\begin{verbatim}
+    $ ADAMSTART
+      ...
+    $ ADAMDEV
+    + logged in for ADAM program development
+    $
+\end{verbatim}
+\end{small}
+
+(You may already have executed the `\verb+ADAMSTART+' command, in which case
+you don't need to execute it again.)
+You compile the program in the normal way:
+
+\begin{small}
+\begin{verbatim}
+    $ FORTRAN TESTR
+\end{verbatim}
+\end{small}
+
+producing the object code in file TESTR.OBJ.
+This can now be linked with the ADAM environment by:
+
+\begin{small}
+\begin{verbatim}
+    $ ALINK TESTR
+\end{verbatim}
+\end{small}
+
+to produce the executable file TESTR.EXE.
+The ALINK command is defined during the execution of ADAMDEV.
+
+\section{Testing}
+
+The TESTR program can now be tested using the command language ICL.
+First, start up ICL as shown in section~\ref{S_useicl}, then a possible test
+session is as follows:
+
+\begin{small}
+\begin{verbatim}
+    ICL> define demo testr
+    ICL> demo 5.1
+    Loading TESTR into xxxxTEST
+    TESTR prints 5.1
+    ICL>
+\end{verbatim}
+\end{small}
+
+Let us consider this test session one command at a time.
+First, it is necessary to define a command to run the program --- this is done
+by the command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> define demo testr
+\end{verbatim}
+\end{small}
+
+Here, `demo' is the name of the command being defined, and `testr' is the
+program to be run when the command is issued.
+For this to work, program TESTR has to be stored in one of the directories in
+the ADAM\_EXE searchlist (such as your default directory).
+If it is stored somewhere else, a directory specification must be specified in
+front of `testr' in the `define' command.
+The next command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> demo 5.1
+    Loading TESTR into xxxxTEST
+\end{verbatim}
+\end{small}
+
+causes our program TESTR to be loaded into subprocess xxxxTEST (as shown in the
+second line) and executed.
+As the parameter value (5.1) is provided on the command line, the interface
+file `vpath' specification for parameter X is not used, i.e.\ the user is not
+prompted for a value.
+On execution, the program displays the message:
+
+\begin{small}
+\begin{verbatim}
+    TESTR prints 5.1
+\end{verbatim}
+\end{small}
+
+This was obtained from the specification for message MESS in the interface
+file, and not from the message stored in the MSG\_OUT call in the program.
+Now try:
+
+\begin{small}
+\begin{verbatim}
+    ICL> demo
+    X - x value /5.1/ > 4
+    TESTR prints 4
+    ICL>
+\end{verbatim}
+\end{small}
+
+Notice that TESTR does not require re-loading (there is no loading
+message).
+As a value for X was not specified on the command line, the system displays a
+prompt in response to the `\verb+vpath 'prompt'+' field specification in the
+interface file.
+The {\em suggested-value} (5.1) is the current (last used) value rather than the
+default (1.5) value because of the order specified in the
+`\verb+ppath 'current,default'+' field specification in the interface file.
+The new value (4) is accepted and output in the message on the following line.
+
+\paragraph{Testing from DCL:} \hfill
+
+It is possible to run the program directly from DCL by:
+
+\begin{small}
+\begin{verbatim}
+    $ run testr
+    X - x value /1.5/ > 4
+    TESTR prints 4
+    $
+\end{verbatim}
+\end{small}
+
+\paragraph{Programs for different data types:} \hfill
+
+Program TESTR can be modified to read a parameter of a different type.
+Thus we could create a program TESTI to read integer values:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE TESTI(STATUS)
+          IMPLICIT NONE
+          INCLUDE 'SAE_PAR'
+          INTEGER STATUS
+          INTEGER XVALUE
+    *...........................................................................
+          CALL PAR_GET0I('X', XVALUE, STATUS)
+          IF (STATUS.EQ.SAI__OK) THEN
+             CALL MSG_SETI('X', XVALUE)
+             CALL MSG_OUT('MESS', 'Value from TESTI program is ^X', STATUS)
+          END IF
+          END
+\end{verbatim}
+\end{small}
+
+with an interface file like:
+
+\begin{small}
+\begin{verbatim}
+    interface TESTI
+      parameter X
+        type     '_INTEGER'
+        position 1
+        prompt   'x value'
+        ppath    'current,default'
+        default  1
+        vpath    'prompt'
+      endparameter
+      message MESS
+         text 'TESTI prints ^X'
+      endmessage
+    endinterface
+\end{verbatim}
+\end{small}
+
+Similarly, we could write programs TESTL and TESTC to read and write logical and
+character type parameters.
+These can be used to explore the response of the parameter system and ICL
+command processor to different types of input value.
+These TESTx programs can also be combined into a single program called a
+{\em monolith} --- this is demonstrated later in Section~\ref{S_Mono}.
+
+\section{Error handling}
+
+All but the simplest ADAM programs should be structured as a top level routine
+which calls one or more subroutines which, in turn, may call further routines.
+For example, consider this abbreviated sketch of the subroutine structure of
+a program to add two images together:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE ADD(STATUS)
+          ...
+          CALL GETINP('INPIC1', LOCI1, STATUS)
+          CALL GETINP('INPIC2', LOCI2, STATUS)
+          CALL CREOUT('OUTPIC', 'OTITLE', NDIMS1, DIMS1, LOCO, STATUS)
+          CALL CMP_MAPV(LOCO,'DATA_ARRAY','_REAL','WRITE',PNTRO,DIMTOT,STATUS)
+          CALL ADDARR(DIMTOT, %VAL(PNTRI1), %VAL(PNTRI2), %VAL(PNTRO), STATUS)
+          ...
+          END
+
+          SUBROUTINE GETINP(PARNAM, LOCAT, STATUS)
+          ...
+          CALL DAT_ASSOC(PARNAM, 'READ', LOCAT, STATUS)
+          ...
+          END
+
+          SUBROUTINE CREOUT(PARNAM, TLENAM, NDIM, DIMS, LOCAT, STATUS)
+          ...
+          CALL DAT_NEW(LOCAT, 'DATA_ARRAY', '_REAL', NDIM, DIMS, STATUS)
+          ...
+          END
+
+          SUBROUTINE ADDARR(DIMS, INARR1, INARR2, OUTARR, STATUS)
+          ...
+          END
+\end{verbatim}
+\end{small}
+
+Being an ADAM program, it calls routines (like CMP\_MAPV, DAT\_ASSOC, DAT\_NEW)
+in the ADAM libraries.
+Such routines have an integer parameter called STATUS and if they fail for some
+reason, STATUS will be set to an error code indicating the nature of the error,
+otherwise its value will remain unchanged.
+Our private routines (such as GETINP, CREOUT, ADDARR) should also have a STATUS
+parameter which should be set to an error code if an error is detected.
+
+The treatment of the STATUS parameter is governed by the {\em ADAM Error
+Strategy}.
+This is:
+\begin{itemize}
+\item Check the value of STATUS immediately on entry.
+ If its value is not SAI\_\_OK, return immediately without doing any more
+ processing.
+\item Leave STATUS unchanged if the routine completes successfully.
+\item Set STATUS to an appropriate error number if an error is detected.
+\end{itemize}
+The application of this strategy can be illustrated once again by the following
+program:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE ADD(STATUS)
+          ...
+          IF (STATUS.NE.SAI__OK) RETURN
+            <top level control>
+          END
+
+          SUBROUTINE GETINP(PARNAM, LOCAT, STATUS)
+          ...
+          IF (STATUS.EQ.SAI__OK) THEN
+            <get a locator to an IMAGE type structure for data input>
+          END IF
+          END
+
+          SUBROUTINE CREOUT(PARNAM, TLENAM, NDIM, DIMS, LOCAT, STATUS)
+          ...
+          IF (STATUS.EQ.SAI__OK) THEN
+            <create and return a locator to an IMAGE type structure>
+          END IF
+          END
+
+          SUBROUTINE ADDARR(DIMS, INARR1, INARR2, OUTARR, STATUS)
+          ...
+          IF (STATUS.EQ.SAI__OK) THEN
+            <add two arrays>
+          END IF
+          END
+\end{verbatim}
+\end{small}
+
+For each subroutine, the IF statement is the first {\em executable}\, statement.
+This error strategy means that it is usually not necessary to check STATUS after
+each routine is called.
+A series of routines can be called with STATUS being passed from one to the
+next.
+If an error occurs in one of them, the subsequent routines will do nothing and
+the final STATUS will indicate the error code from the routine that failed.
+If this value is then returned by the main routine to the fixed part, an error
+message will result.
+Thus, the error will be correctly processed with no special code being added to
+check for errors.
+
+A program will always be executed by the ADAM system with an initial STATUS
+value of SAI\_\_OK.
+This is because during the linking process it is linked with a `fixed part'
+which calls it as a subroutine after having initialised STATUS to this value.
+Thus, it would appear to be unnecessary to test STATUS on entry to our program.
+However, sometime in the future we may want to call our program as a subroutine
+in another program and it might be called after a previous routine has set
+STATUS to an error code.
+Thus, in general, we cannot be sure what the value of STATUS on entry to our
+program will be, and we should {\em always} adopt the Starlink error strategy,
+even for our top-level routines.
+
+This error strategy is illustrated by our next example program which calculates
+the square of the value of the input parameter `VALUE', and writes it out as
+part of a message:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE SQUARE(STATUS)
+          IMPLICIT NONE
+          INCLUDE 'SAE_PAR'
+          INTEGER STATUS
+          REAL R, RR
+    *...........................................................................
+          IF (STATUS.NE.SAI__OK) RETURN
+          CALL PAR_GET0R('VALUE', R, STATUS)                        
+          IF (STATUS.EQ.SAI__OK) THEN
+             RR = R*R           
+             CALL MSG_SETR('RVAL', R)
+             CALL MSG_SETR('RSQUARED', RR)
+             CALL MSG_OUT(' ', 'The Square of ^RVAL is ^RSQUARED', STATUS)
+          END IF
+          END
+\end{verbatim}
+\end{small}
+                                               
+Here, STATUS is used in two tests.
+Firstly:
+
+\begin{small}
+\begin{verbatim}
+          IF (STATUS.NE.SAI__OK) RETURN
+\end{verbatim}
+\end{small}
+                                               
+to implement the ADAM Error Strategy, and secondly:
+
+\begin{small}
+\begin{verbatim}
+          IF (STATUS.EQ.SAI__OK) THEN
+             ...
+          END IF
+\end{verbatim}
+\end{small}
+                                               
+to ensure that if the STATUS returned from PAR\_GET0R is bad, the rest of the
+routine is not executed with an undefined value of R.
+Actually, it is not necessary to include MSG\_OUT in the IF block as this
+routine would return immediately if STATUS was bad.                  
+
+An example interface file for this program is:
+
+\begin{small}
+\begin{verbatim}
+    interface SQUARE
+      parameter VALUE
+        type     '_REAL'
+        position 1
+        prompt   'Number to be squared'
+        ppath    'current'
+        vpath    'prompt'
+      endparameter
+    endinterface
+\end{verbatim}
+\end{small}
+
+Notice that the first parameter of the MSG\_OUT routine is specified as
+a single blank character.
+This means that the message being output does not have a name and there is
+no specification for it in the interface file.
+This is the simplest method of using the message system, but it means that
+we cannot alter the message by specifying it in the interface file.
+
+To test this example, enter the source code and interface file into files
+SQUARE.FOR and SQUARE.IFL, respectively; compile and link as for TEST, then
+use the following commands within ICL:
+
+\begin{small}
+\begin{verbatim}
+    ICL> define square square
+    ICL> square 12
+    Loading SQUARE into xxxSQUARE
+    The Square of 12 is 144
+    ICL> square (sqrt(3))
+    The Square of 1.732051 is 3
+    ICL> square
+    VALUE - Number to be squared /1.732051/ > 7
+    The Square of 7 is 49
+    ICL>
+\end{verbatim}
+\end{small}
+
+More sophisticated error handling can be provided by using routines in the
+ERR library.
+These facilities are described in Chapter~\ref{C_messerrs}.
+
+\section{Returning parameter values}
+
+We have seen how routines like PAR\_GET0R get parameter values from the
+environment.
+It is also possible for programs to return values {\em to} the environment.
+The following modified fragment of program SQUARE does not output its result
+on the terminal (by using MSG\_OUT), but returns it to the parameter VALUE
+using a call to the routine PAR\_PUT0R, which is analogous to PAR\_GET0R.
+Replace the second IF statement by:
+
+\begin{small}
+\begin{verbatim}
+    IF (STATUS.EQ.SAI__OK) THEN      
+       RR = R*R           
+       CALL PAR_PUT0R('VALUE', RR, STATUS)
+    END IF
+\end{verbatim}
+\end{small}
+                            
+We could run the modified program from ICL as follows:
+
+\begin{small}
+\begin{verbatim}
+    ICL> x=5
+    ICL> square (x)
+    ICL> =x
+            25
+    ICL>
+\end{verbatim}
+\end{small}
+
+In order for the program to return a value to ICL, we must use a variable for
+the parameter and place it on the command line:
+
+\begin{small}
+\begin{verbatim}
+    ICL> square (x)
+\end{verbatim}
+\end{small}
+
+The variable name must be placed in parentheses; the name of a temporary
+data object holding the value of the variable is used as the parameter by ICL.
+
+A modification of this scheme is needed with character variables to allow for
+the case where the value of the character variable is itself a device, file
+or object name. 
+In such cases, the supplied name cannot be replaced by some other name so, 
+to indicate that they may not be replaced, name values in variables must be 
+preceded by `@'.
+For example, in
+
+\begin{small}
+\begin{verbatim}
+    ICL> x=`devdataset'
+    ICL> trace (x)
+\end{verbatim}
+\end{small}
+
+the character string `devdataset' would be stored in a temporary data object
+and the effect of `TRACE (X)' would be to trace the temporary object and not
+devdataset.
+However, in
+
+\begin{small}
+\begin{verbatim}
+    ICL> x=`@devdataset'
+    ICL> trace (x)
+\end{verbatim}
+\end{small}
+
+devdataset itself will be traced.
+
+\section{Monoliths}
+\label{S_Mono}
+
+We have shown how to write ADAM programs called TESTR, TESTI, TESTL, and TESTC
+to read and display parameter values of four different types.
+It would be convenient to combine these four similar programs in a single
+program which would recognise the individual commands which call them.
+This can be done by combining them into a {\em monolith}.
+KAPPA is an example of a monolith in which a lot of small programs have been
+combined together.
+The advantage is that once the monolith has been loaded, all the component
+programs can be used without any further loading operations being necessary,
+and it only occupies one place in the task cache.
+
+Let us produce a monolith called TEST which will contain the four TESTx programs
+mentioned above.
+The first thing to do is to create an object library to hold the object
+modules for the TESTx programs:
+
+\begin{small}
+\begin{verbatim}
+    $ LIB/CREATE REDUCE
+\end{verbatim}
+\end{small}
+
+This will create an object library called REDUCE.OLB.
+Assuming the four TESTx programs have been compiled, we can store their
+object modules in this library by:
+
+\begin{small}
+\begin{verbatim}
+    $ LIB REDUCE TESTC,TESTI,TESTL,TESTR
+\end{verbatim}
+\end{small}
+
+Now, write a program to call the TESTx programs in response to appropriate
+commands:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE TEST(NAME, STATUS)
+          CHARACTER*(*) NAME
+          INTEGER STATUS
+    *...........................................................................
+          IF (STATUS.NE.SAI__OK) RETURN
+          IF (NAME.EQ.'TESTC') THEN
+            CALL TESTC(STATUS)
+          ELSE IF (NAME.EQ.'TESTI') THEN
+            CALL TESTI(STATUS)
+          ELSE IF (NAME.EQ.'TESTL') THEN
+            CALL TESTL(STATUS)
+          ELSE IF (NAME.EQ.'TESTR') THEN
+            CALL TESTR(STATUS)
+          END IF
+          END
+\end{verbatim}
+\end{small}
+
+Store this in file TEST.FOR, then compile it:
+
+\begin{small}
+\begin{verbatim}
+    $ FOR TEST
+\end{verbatim}
+\end{small}
+
+and link it with the routines it calls by using the MLINK command:
+
+\begin{small}
+\begin{verbatim}
+    $ MLINK TEST,REDUCE/LIB
+\end{verbatim}
+\end{small}
+
+(we must have executed the ADAMDEV statement in order to define the symbol
+MLINK).
+We now have the monolith stored in file TEST.EXE, but we also need an
+interface file stored in file TEST.IFL.
+This is simply a concatenation of the interface files for the TESTx programs
+enclosed in `monolith' and `endmonolith' statements:
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+monolith TEST
+interface TESTC
+  parameter X
+    type     '_CHAR'
+    position 1
+    prompt   'x value'
+    ppath    'current,default'
+    default  'Default'
+    vpath    'prompt'
+  endparameter
+  message MESS
+     text 'TESTC prints ^X'
+  endmessage
+endinterface
+interface TESTI
+  parameter X
+    type     '_INTEGER'
+    position 1
+    prompt   'x value'
+    ppath    'current,default'
+    default  1
+    vpath    'prompt'
+  endparameter
+  message MESS
+     text 'TESTI prints ^X'
+  endmessage
+endinterface
+interface TESTL
+  parameter X
+    type     '_LOGICAL'
+    position 1
+    prompt   'x value'
+    ppath    'current,default'
+    default  TRUE
+    vpath    'prompt'
+  endparameter
+  message MESS
+     text 'TESTL prints ^X'
+  endmessage
+endinterface
+interface TESTR
+  parameter X
+    type     '_REAL'
+    position 1
+    prompt   'x value'
+    ppath    'current,default'
+    default  1.5
+    vpath    'prompt'
+  endparameter
+  message MESS
+     text 'TESTR prints ^X'
+  endmessage
+endinterface
+endmonolith
+\end{verbatim}
+\end{small}
+
+\end{quote}
+The last thing to do before TEST is ready for use is to store definitions for
+the commands TESTC, TESTI, TESTL, TESTR in an ICL command file TEST.ICL:
+
+\begin{small}
+\begin{verbatim}
+    define testc test
+    define testi test
+    define testl test
+    define testr test
+\end{verbatim}
+\end{small}
+
+Now, we are ready to use our monolith TEST.
+Start up ICL in the usual way, then execute the commands which define the 
+commands to run the programs by loading the command file TEST.ICL:
+
+\begin{small}
+\begin{verbatim}
+    ICL> load test
+\end{verbatim}
+\end{small}
+
+Now, if any of the defined commands `testc', `testi', `testl', `testr' is
+entered, the monolith `test' will be loaded:
+
+\begin{small}
+\begin{verbatim}
+    ICL> testc
+    Loading TEST into xxxxTEST
+    X - x value /'Default'/ > yogi bear
+    TESTC prints yogi bear
+    ICL> testr
+    X - x value /1.5/ 7.8
+    TESTR prints 7.8
+    ICL>
+\end{verbatim}
+\end{small}
+
+Notice that the monolith TEST is only loaded once and that the command
+`testr' is available for immediate use.
+The extra delay in loading the larger monolith and in defining the
+set of commands is made up for later by the faster response to subsequent
+commands.

@@ -1,0 +1,724 @@
+\chapter{ICL Commands}
+\label{C_commands}
+\markboth{Users}{\stardocname}
+
+\section{Commands}
+\label{S_commands}
+\markboth{Users}{\stardocname}
+
+In the last chapter we introduced the {\em Command} as one of the Direct
+Statements of the ICL language.
+You will remember that the format was:
+\begin{quote}
+command\_name [parameter\_specification] \ldots
+\end{quote}
+There are two main types of commands:
+\begin{itemize}
+\item Built-in commands
+\item User-defined commands
+\end{itemize}
+The difference between them is that built-in commands are always available
+as they are an intrinsic part of the language, while user-defined commands
+are only available if you have defined them yourself in some way.
+The two types will be considered separately in the following two sections.
+
+If you define commands, or use an application that defines commands, there is
+a danger of ambiguity since you may give a new meaning to an existing command
+name.
+Just for the record, here is the search-path that ICL uses when it searches
+for command definitions:
+\begin{quote}
+\begin{itemize}
+\item User-defined: DEFSTRING, DEFUSER, DEFPROC
+\item Procedures: PROC
+\item Built-in commands to control ADAM tasks: ALOAD, \ldots
+\item Applications: DEFINE
+\item Other Built-in
+\end{itemize}
+\end{quote}
+Don't worry about those command names, you will learn about them latter.
+
+\section{Built-in commands}
+\label{S_bic}
+
+The built-in commands are listed in Chapter~\ref{C_rsicl}.
+Here is a classification:
+\begin{quote}
+\begin{description}
+\item [Information \& Escape] --- Chapter~\ref{C_ugicl}\\
+HELP, EXIT
+\item [Defining user commands] --- Chapter~\ref{C_commands}\\
+DEFSTRING, DEFINE, DEFUSER, DEFPROC
+\item [I/O] --- Chapter~\ref{C_commands}
+\begin{description}
+\item [Terminal] \hfill \\
+PRINT, INPUTt
+\item [Screen mode] \hfill \\
+SET SCREEN, SET NOSCREEN, SET ATTRIBUTES, LOCATE, CLEAR
+\item [Keyboard facilities] \hfill \\
+KEY, KEYTRAP, KEYOFF
+\item [Files] \hfill \\
+CREATE, OPEN, APPEND, CLOSE, WRITE, READt
+\end{description}
+\item [Access to DCL] --- Chapter~\ref{C_commands}\\
+\$, SPAWN, DEFAULT, \\
+ALLOC, DEALLOC, MOUNT, DISMOUNT
+\item [Parameters] --- Chapter~\ref{C_prompts}\\
+SETPAR, GETPAR, \\
+CREATEGLOBAL, SETGLOBAL, GETGLOBAL
+\item [Procedures] --- Chapter~\ref{C_iclprog}\\
+LIST, PROCS, VARS, EDIT, SET EDITOR, \\
+SAVE, LOAD, DELETE, \\
+SET TRACE, SET NOTRACE
+\item [Errors \& Exceptions] --- Chapter~\ref{C_iclprog}\\
+SIGNAL
+\item [HELP system] --- Chapter~\ref{C_iclprog}\\
+DEFHELP
+\end{description}
+\end{quote}
+All these commands are described in the chapter specified.
+
+\section{User-defined commands}
+\label{S_udc}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+DEFSTRING & Associate command with equivalence string \\
+DEFINE    & Define command to run a program \\
+DEFUSER   & Define command to run a subroutine \\
+DEFPROC   & Define command to run an ICL procedure \\
+\hline
+\end{tabular}
+\end{center}
+
+There are three types of command which you can use to define your own commands:
+\begin{itemize}
+\item To define commands which stand for strings --- DEFSTRING.
+\item To define commands which run programs --- DEFINE, DEFUSER.
+\item To define commands which run ICL procedures --- DEFPROC.
+\end{itemize}
+These are described briefly below:
+\begin{quote}
+\begin{description}
+
+\item [DEFSTRING] --- associates a command with an equivalence string:
+
+\begin{small}
+\begin{verbatim}
+    DEFSTRING  command  equivalence-string
+\end{verbatim}
+\end{small}
+
+when you enter {\small\tt command}, it is as if you had entered
+{\small\tt equivalence-string}.
+
+\item [DEFINE] --- defines a command which causes a program to be executed:
+
+\begin{small}
+\begin{verbatim}
+    DEFINE  command  program-name
+\end{verbatim}
+\end{small}
+
+When you enter {\small\tt command}, program {\small\tt program-name} is
+executed.
+
+\item [DEFUSER] --- defines a command which causes a compiled subroutine to
+be executed:
+
+\begin{small}
+\begin{verbatim}
+    DEFUSER  command  image-name
+\end{verbatim}
+\end{small}
+
+When you enter {\small\tt command}, the shareable image {\small\tt image-name} 
+is executed.
+
+\item [DEFPROC] --- defines a command which causes an ICL procedure to be
+executed:
+
+\begin{small}
+\begin{verbatim}
+    DEFPROC  command  file
+\end{verbatim}
+\end{small}
+
+When you enter {\small\tt command}, the ICL procedure stored in file.ICL is
+compiled (first time only) and executed.
+
+\end{description}
+\end{quote}
+
+The DEFINE command is explained further in Chapter~\ref{C_runap}, and the
+definition and use of ICL procedures is explained in Chapter~\ref{C_iclprog}.
+
+\section{Input/Output commands}
+\label{S_IO}
+
+The I/O commands fall into three classes:
+\begin{itemize}
+\item Terminal
+\item File
+\item Screen mode
+\end{itemize}
+These are described in the following sub-sections.
+
+\subsection{Terminal}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+INPUT  & Input string from terminal \\
+INPUTI & Input integers from terminal \\
+INPUTL & Input logicals from terminal \\
+INPUTR & Input reals from terminal \\
+\hline
+PRINT  & Output to terminal \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Input:}\hfill
+
+The commands for terminal input are INPUT, INPUTR, INPUTI, and INPUTL.
+Command INPUT reads a line of text from the terminal into a string variable.
+An example is:
+
+\begin{small}
+\begin{verbatim}
+    ICL> INPUT Enter your name> (X)
+    Enter your name>Mike
+    ICL> PRINT (X)
+    Mike
+    ICL>
+\end{verbatim}
+\end{small}
+
+The last parameter must specify a variable in which the input will be stored
+and must, therefore, be in parentheses.
+The earlier parameters form a prompt string.
+
+Commands INPUTR, INPUTI, and INPUTL are used to input real, integer, and logical
+values.
+A single command may be used to supply values for more than one variable, so
+these commands have the general form:
+
+\begin{small}
+\begin{verbatim}
+    ICL> INPUTR  Prompt  (X)  (Y)  (Z)  ...
+\end{verbatim}
+\end{small}
+
+For these three commands, only the first parameter is used to provide the
+prompt string, so if it has spaces in it, the string must be enclosed in quotes.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> INPUTR 'Give values of X and Y > ' (X) (Y)
+    Give values of X and Y > 2.3 8.9
+    ICL> PRINT (X) (Y)
+    2.300000 8.900000
+    ICL>
+\end{verbatim}
+\end{small}
+
+INPUTL will accept values of TRUE, FALSE, YES, and NO in either upper or
+lower case, as well as abbreviations.
+
+\paragraph{Output:}\hfill
+
+You can output to the terminal by using the PRINT command:
+
+\begin{small}
+\begin{verbatim}
+    PRINT  p1  p2  ...
+\end{verbatim}
+\end{small}
+
+The parameters are concatenated and printed on the terminal.
+For example
+
+\begin{small}
+\begin{verbatim}
+    ICL> X=2
+    ICL> PRINT The square root of (X) is (SQRT(X))
+    The square root of          2 is 1.414214
+\end{verbatim}
+\end{small}
+
+Another way of writing to the terminal is by using an Immediate statement:
+
+\begin{small}
+\begin{verbatim}
+    ICL> =1+2+3
+             6
+\end{verbatim}
+\end{small}
+
+
+\paragraph{Formatting Output:}\hfill
+
+While Fortran regards formatting of numbers for output as part of an output
+operation, ICL performs formatting using an operator (:) which produces a string
+result from a numeric operand.
+Thus, if I is an integer variable, the expression \verb+I:5+ has as its value
+the string which is produced by converting I with a field width of 5 characters.
+It is equivalent to an I5 format in Fortran.
+Similarly, if X is a real variable, the expression \verb+X:10:4+ produces the
+value of X formatted in a Fortran F10.4 format (i.e.\ a field width of 10
+characters with 4 decimal places).
+The ICL formatting is not precisely equivalent to the Fortran form because ICL
+will extend the field width if a number is too large to fit in the requested
+width.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> =1.234567:5:2
+     1.23
+    ICL> =12.34567:5:2
+    12.35
+    ICL> =123.4567:5:2
+    123.46
+    ICL> =123456.7:5:2
+    123456.70
+    ICL>
+\end{verbatim}
+\end{small}
+
+Integers can also be formatted in binary, octal, decimal, or hexadecimal formats
+using the functions BIN, OCT, DEC, and HEX.
+These have the form \verb+HEX(X,n,m)+ which would return a string of n
+characters containing the number X with m significant digits.
+Parameters n and m may be omitted, in which case they default to the number of
+digits needed to represent a full 32 bit word.
+Using these forms together with constants in various bases, ICL can be used to 
+perform conversions between bases.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> =%Xffff
+          65535
+    ICL> =hex(65535)
+     0000FFFF
+    ICL> =oct(%XFF,5,5)
+    00377
+    ICL>
+\end{verbatim}
+\end{small}
+
+\subsection{Screen mode}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+SET SCREEN    & Select screen mode \\
+SET NOSCREEN  & Select normal mode \\
+SET ATTRIBUTES & Set attributes for text written with LOCATE \\
+\hline
+LOCATE         & Write to screen at specified position \\
+CLEAR          & Clear range of lines \\
+\hline
+\end{tabular}
+\end{center}
+
+Screen mode allows more control over the terminal screen than is possible
+in the normal mode.
+It also allows more control over the use of the keyboard.
+Screen mode is implemented using the DEC screen management (SMG\$) routines
+of the run time library, and will work on any terminal compatible with these
+routines.
+
+Screen mode is selected by the SET SCREEN command.
+In this mode, the terminal screen is divided into an upper fixed region and a
+lower scrolling region.
+The size of the scrolling region may be specified by an optional parameter
+to SET SCREEN.
+
+\begin{small}
+\begin{verbatim}
+    ICL> SET SCREEN 10
+\end{verbatim}
+\end{small}
+
+will select 10 lines of scrolling region.
+The size of the scrolling region can be changed by further SET SCREEN commands.
+SET NOSCREEN is used to leave screen mode and return to normal mode.
+
+Standard terminal I/O operations work exactly as normal in the scrolling
+region of the screen.
+However, an additional facility is the ability to examine text which has
+scrolled off the top of the scrolling region.
+The Next Screen and Prev Screen keys on a VT200 (or ctrl/N, ctrl/P on other
+terminals) may be used to move through the text.
+Any output since screen mode was started is viewable in this way.
+
+To write to the fixed part of the screen, the command LOCATE is used:
+
+\begin{small}
+\begin{verbatim}
+    ICL> LOCATE 6 10   This text will be written starting at Row 6 Column 10
+\end{verbatim}
+\end{small}
+
+The first two parameters specify the row and column at which the text will
+start.
+The remaining parameters form the text to be written.
+
+The SET ATTRIBUTES command provides further control over text written with
+the LOCATE command.
+This command has a parameter string composed of any combination of the letters
+R (Reverse Video), B (Bold), U (Underlined), F (Flashing) and D (Double Size).
+These attributes apply to all LOCATE commands until the next SET ATTRIBUTES
+command.
+SET ATTRIBUTES with no parameter gives normal text.
+
+The CLEAR command is used to clear all or part of the fixed region of the
+screen.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> CLEAR 6 10
+\end{verbatim}
+\end{small}
+
+clears lines 6 to 10 of the screen.
+
+\subsection{Keyboard facilities}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+KEY            & Define equivalence string for key \\
+KEYTRAP        & Specify trapping of key in a procedure \\
+KEYOFF         & Turn off trapping of key in a procedure \\
+\hline
+\end{tabular}
+\end{center}
+
+The KEY command may be used to define an equivalence string for any key
+on the keyboard.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> KEY  PF1  PROCS#
+\end{verbatim}
+\end{small}
+
+defines the PF1 key so that it issues the PROCS command.
+The \# character is used to indicate a Return character in the equivalence
+string.
+
+The name of a main keyboard key may be specified as a single character or
+as an integer representing the ASCII code for the key.
+Keypad and function keys are specified by names as follows:
+
+\begin{small}
+\begin{verbatim}
+   Keypad keys             PF1, PF2, PF3, PF4, KP0, KP1, KP2, KP3, KP4, KP5,
+                           KP6, KP7, KP8, KP9, ENTER, MINUS, COMMA, PERIOD.
+
+   Function Keys (VT200)   F6, F7, F8, F9, F10, F11, F12, F13, F14, HELP,
+                           DO, F17, F18, F19, F20.
+
+   Editing Keypad (VT200)  FIND, INSERT_HERE, REMOVE, SELECT, PREV_SCREEN, NEXT_SCREEN.
+
+   Cursor Keys             UP, DOWN, LEFT, RIGHT.
+\end{verbatim}
+\end{small}
+
+The KEYTRAP command and the INKEY() function allow an ICL procedure to test
+for keyboard input during its execution, without having to issue an INPUT
+command and thus wait for input to complete.
+
+KEYTRAP specifies the name of a key to be trapped.
+
+KEYOFF turns off the trapping of a specified key.
+
+INKEY() is an integer function which returns zero if no key has been pressed, or
+the key value if a key has been pressed since the last call.
+The key value is the ASCII value for ASCII characters, or a number between 256
+and 511 for keypad and function keys.
+
+KEYVAL(S) is a function which obtains the value from the key name.
+
+Here is an example of the use of these commands and functions within a
+procedure:
+
+\begin{small}
+\begin{verbatim}
+    { Trap ENTER and LEFT and RIGHT arrow keys
+
+    KEYTRAP ENTER
+    KEYTRAP LEFT
+    KEYTRAP RIGHT
+                                              
+    LOOP
+      K = INKEY()
+      IF K = KEYVAL('ENTER') THEN
+      .
+      ELSE IF K = KEYVAL('LEFT') THEN
+      .
+      ELSE IF K = KEYVAL('RIGHT') THEN
+      .
+      ELSE
+      .
+      ENDIF
+    END LOOP
+\end{verbatim}
+\end{small}
+
+\subsection{File}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+CREATE   & Create new file and open for output \\
+OPEN     & Open existing file for input \\
+APPEND   & Open existing file for output, append text \\
+CLOSE    & Close file \\
+\hline
+READ     & Read line from file \\
+READI    & Read integers from file \\
+READL    & Read logicals from file \\
+READR    & Read reals from file \\
+\hline
+WRITE    & Write to file \\
+\hline
+\end{tabular}
+\end{center}
+ICL can read and write text files.
+In order to access such files, they must first be opened using one of the
+commands CREATE, OPEN, or APPEND, for example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> CREATE MYFILE
+\end{verbatim}
+\end{small}
+
+will create a file called {\small\tt MYFILE} and open it for output ---
+{\small\tt MYFILE} is the name used within ICL for the file.
+In this case, the file will appear in your default directory as
+{\small\tt MYFILE.DAT}.
+However, the file name may be specified explicitly by adding a second parameter
+to the commands, for example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> OPEN  INFILE  DISK$DATA:[ABC]FOR008.DAT
+\end{verbatim}
+\end{small}
+
+opens an existing file for input and the file is known internally as
+{\small\tt INFILE}.
+
+The APPEND command opens an existing file for output.
+Anything written to it is appended to the existing contents.
+
+A line of text is written to a file with the WRITE command.
+WRITE is similar to PRINT, the only difference being that its first parameter
+specifies the internal name of the file to which the data will be written.
+
+Text is read from files with the commands READ, READR, READI, and READL.
+These are analogous to the INPUT commands for terminal input.
+The first parameter specifies the internal name of the file.
+READ reads a line of text into a single string variable.
+The other commands read one or more real, integer, or logical values.
+
+When a file is no longer required it may be closed using the CLOSE command
+which has a single parameter: the internal name of the file.
+
+The following example defines a procedure which uses these commands to read a
+file containing three real numbers in free format and output the same numbers
+as a formatted table.
+
+\begin{small}
+\begin{verbatim}
+    PROC REFORMAT
+    { Open input file and create output file
+      OPEN INFILE
+      CREATE OUTFILE
+    { Copy lines from input to output
+      LOOP
+        READR INFILE (R1) (R2) (R3)
+        WRITE OUTFILE (R1:10:2) (R2:10:2) (R3:10:2)
+      END LOOP
+    END PROC
+\end{verbatim}
+\end{small}
+
+Note that no specific test for completion of the loop is included.
+When an end-of-file condition is detected on the input file, the procedure will
+exit and return to the {\small\tt ICL>} prompt with an appropriate
+message\footnote{A tidier exit can be arranged by using an exception handler
+for the EOF exception, see Chapter~\ref{C_iclprog}.}.
+
+\section{DCL commands and VMS processes}
+\label{S_dclvms}
+
+\subsection{Executing DCL commands}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+\$       & Execute a DCL command in \$'s subprocess \\
+SPAWN    & Execute a DCL command in new subprocess \\
+\hline
+\end{tabular}
+\end{center}
+
+When using ICL, it is frequently useful to be able to access features of
+Digital's command language DCL.
+Typical operations we may want to do include listing directories, copying
+files, allocating tape drives, and mounting tapes.
+The ICL command `\$' allows any DCL command to be issued from inside ICL.
+Its form is simply:
+
+\begin{small}
+\begin{verbatim}
+    ICL> $ dcl_command
+\end{verbatim}
+\end{small}
+
+where \verb+dcl_command+ is any command we could issue from the DCL `\$' prompt.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> $ COPY *.SDF DATADIR:*.SDF
+    ICL> $ RUN MYPROGRAM
+\end{verbatim}
+\end{small}
+
+There is one restriction --- you must use a complete DCL command.
+You can't, for example, just type {\small\tt \$ COPY} and expect DCL to prompt
+you for the two file specifications.
+Apart from this, any command acceptable to DCL can be issued in this way.
+
+There is a way around the restriction on prompts mentioned above.
+This is to use the command `SPAWN' rather than the command `DCL'.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> SPAWN COPY
+    _From: *.SDF
+    _To: DATADIR:*.SDF
+\end{verbatim}
+\end{small}
+
+in which case you get the `\_From:' and `\_To:' prompts, just as you do in
+normal DCL.
+The disadvantage of SPAWN is that it is slower.
+This is because SPAWN creates a new subprocess to run each command, whereas
+DCL creates a permanent subprocess in which all commands are run.
+
+SPAWN has another use --- by just typing SPAWN you can get a DCL `\$' prompt
+from which a series of DCL commands can be executed.
+LOGOUT is used to return control to ICL.
+
+\subsection{Processes and subprocesses}
+
+In VMS, a program runs in a {\em process}.
+If that program wishes to run another program or do something else, it must
+first create a {\em subprocess}.
+ICL is such a program and it runs application programs.
+The applications thus run in subprocesses, and so do DCL commands issued from
+ICL. 
+This is the heart of many of the sometimes unexpected properties of ICL. 
+
+VMS is not particularly efficient at starting up processes, so loading a
+program takes time.
+ADAM deals with this through a structure called a monolith (discussed in
+Chapter~\ref{C_runap}).
+
+The worst problems with subprocesses arise when something goes wrong. 
+Uninhibited use of such things as ctrl/C to kill an application can have serious
+consequences for ICL, resulting in a loss of context and the consequent waste
+of time getting back to where you started.
+Ctrl/C returns you to the ICL prompt, while ctrl/Y takes you right out of ICL
+and back into DCL. 
+A better way to get out of a program is to enter the {\em abort} response `!!'
+when prompted for a parameter (see Chapter \ref{C_prompts}.)
+
+Note that ctrl/C will only break out of a program and return you to ICL if the
+program is run as a subprocess of ICL.
+This is usually the case, but will not be if the command being executed was
+defined using DEFUSER (as in ASTERIX for example).
+
+\subsection{Changing your default directory}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+DEFAULT & Set default directory \\
+\hline
+\end{tabular}
+\end{center}
+
+You can change your default directory by using the DCL command `SET DEFAULT'.
+This will change the default directory of the DCL subprocess, but not of the
+process running ICL.
+Thus, an additional ICL command DEFAULT has been provided.
+This changes the default directory of both the process running ICL and the DCL
+subprocess (if one exists).
+The format for specifying the directory is exactly the same as that accepted
+by the equivalent DCL command.
+
+\subsection{Managing tape drives}
+
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline
+ALLOC    & Allocate a device\\
+DEALLOC  & Deallocate a device\\
+MOUNT    & Mount a device\\
+DISMOUNT & Dismount a device\\
+\hline
+\end{tabular}
+\end{center}
+
+Similar problems with processes occur when allocating and mounting tape drives.
+The DCL command `ALLOCATE' will allocate the device to the DCL subprocess.
+This {\em may} be what you want; for example, if you are going to use another
+DCL command (such as `BACKUP') to read or write the tape.
+However, if a tape is to be processed using a FIGARO command, say, it must be
+allocated to the process running ICL.
+A set of commands has been provided for this purpose.
+
+ALLOC allocates a device and may specify a generic name; the name of the device
+actually allocated will be returned in the optional second parameter.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    ICL> ALLOC MT
+    _MTA0: Allocated
+    ICL> ALLOC MT (DEVICE)
+    _MTA1: Allocated
+    ICL> =DEVICE
+    _MTA1:
+\end{verbatim}
+\end{small}
+
+DEALLOC deallocates a device.
+
+MOUNT performs a MOUNT/FOREIGN at the tape's initialised density.
+It does not provide the many qualifiers of the DCL command.
+There are several additional optional parameters for some of these commands.
+
+DISMOUNT has an optional parameter which is used to specify that the tape be
+dismounted without unloading:
+
+\begin{small}
+\begin{verbatim}
+    ICL> DISMOU MTA1 NOUNLOAD
+\end{verbatim}
+\end{small}

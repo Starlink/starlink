@@ -1,0 +1,23 @@
+                       EXAMPLE DATA FILE FOR SG/12
+                       ===========================
+
+
+This directory contains the example data file for SG/12: 'An
+Introduction to IRAF'.  See SG/12 for further details.
+
+The files are:
+
+background.csh   - C shell script for running an IRAF background job.
+ccdimage.fit     - example FITS data file (a CCD image).
+loginuser.cl     - example customisation log-in script.
+submean.cl       - example IRAF procedure.
+
+
+Clive Davenhall,
+8/10/98.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8356            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8356                    EH9 3HJ, Scotland.

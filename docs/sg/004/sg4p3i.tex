@@ -1,0 +1,493 @@
+\chapter{The Graphics System}
+\label{C_graphics}
+\markboth{Programmers}{\stardocname}
+
+The Starlink graphics software was introduced in Chapter \ref{C_overlibs}.
+A guide to its use is available in \xref{SUN/113}{sun113}{}.
+The main packages are:
+
+\begin{quote}
+\begin{description}
+
+\item [PGPLOT] --- is recommended for general use.
+It provides an easy to use yet powerful way of plotting 2-d axes, contour maps,
+grey-scale, colour images, and many other styles of plot.
+It is designed to appeal to astronomers and is especially good at publication
+quality laser printer output.
+It cannot be used in conjunction with SGS or any other plotting package.
+
+\item [NCAR/SNX] --- provides similar facilities to PGPLOT plus some additional
+styles of plot (e.g.\ stream-line diagrams) and in general is more powerful
+(for example, it can draw an X,Y plot with different scales on the right and
+left hand axes) but is somewhat harder to use.
+It also contains a 3-d drawing package.
+You can call SGS and GKS by using SNX.
+
+\item [NAG] --- graphics can also be used, but it is not encouraged for software
+that is to become part of the Starlink software collection because its
+availability on all hardware platforms is not guaranteed (particulary in its
+single precision form) and non-Starlink sites may not have a licence to use it.
+NCAR and NAG graphics do not have their own mechanisms for opening graphics
+devices and SGS or GKS must be used to open a device before plotting can begin.
+
+\item [SGS] --- should be used for line graphics which requires a style not
+catered for by PGPLOT or NCAR.
+This is ``lower level'' than PGPLOT or NCAR (there are no facilities for
+drawing axes for example) but it does have excellent facilities for
+manipulating transformations and ``organising'' the display surface.
+SGS programs can also make direct calls to GKS (with a few restrictions),
+so the full power of GKS is available if SGS's facilities are not adequate.
+
+\item [GKS] --- should normally not be used because getting even simple things
+done (e.g.\ opening a workstation) can be very long-winded and more easily
+achieved with SGS.
+Furthermore, achieving device independence is far from straight-forward; all
+the necessary facilities are available but making proper use of them requires
+an in-depth knowledge of GKS.
+Again, this is better left to SGS or higher level packages.
+
+\end{description}
+\end{quote}
+
+Three more specialised graphics facilities provided by ADAM are:
+
+\begin{quote}
+\begin{description}
+
+\item [IDI] --- should be used in programs requiring intimate interaction with
+an image display device.
+This is not based on GKS and offers access to facilities that are outside the
+GKS model of a graphics device.
+Currently, the only devices supported are the Ikon image display (on VAXs
+only) and X-windows.
+
+\item [AGI] --- should be used where a suite of graphics programs are being
+written, or where a program is to interact with graphics produced by another
+package (e.g.\ KAPPA).
+It provides facilities for sharing information about pictures such as extent
+and world coordinates. 
+
+\item [GNS] --- enables a program to obtain information about graphics devices.
+
+\end{description}
+\end{quote}
+
+Before proceeding, a word of warning which is applicable to all Starlink
+graphics.
+Do {\em not} examine the workstation type or name in order to control the
+behaviour of a program.
+For example, you are not allowed to say `the GKS workstation type is 3200,
+therefore this is an Ikon image display, therefore colour is available'.
+This information must be obtained by calling the appropriate GKS, SGS, or
+\mbox{PGPLOT} inquiry routines;  in the unlikely event of the property you are
+interested in not being available through such inquiries, then devise some
+mechanism external to the program, or solicit information from the user.
+
+\section{SGS --- Simple graphics system}
+\label{S_sgsgks}
+\markboth{Programmers}{\stardocname}
+
+The following example graphics program uses SGS to draw a circle on a selected
+graphics device:
+
+\begin{small}
+\begin{verbatim}
+          SUBROUTINE CIRCLE(STATUS)
+          IMPLICIT NONE
+          INCLUDE 'SAE_PAR'
+          INTEGER STATUS
+          REAL RADIUS          ! Radius of circle               
+          INTEGER ZONE         ! SGS Zone
+    *.........................................................
+          IF (STATUS.NE.SAI__OK) RETURN
+          CALL PAR_GET0R('RADIUS', RADIUS, STATUS)
+          CALL SGS_ASSOC('DEVICE', 'WRITE', ZONE, STATUS)
+          IF (STATUS.EQ.SAI__OK) THEN
+              CALL SGS_CIRCL(0.5, 0.5, RADIUS)
+          END IF
+          CALL SGS_ANNUL(ZONE, STATUS)
+          CALL SGS_DEACT(STATUS)
+          END                  
+\end{verbatim}
+\end{small}
+
+The statements concerned specifically with graphics will now be considered
+individually.
+
+\begin{small}
+\begin{verbatim}
+          CALL SGS_ASSOC('DEVICE', 'WRITE', ZONE, STATUS)
+\end{verbatim}
+\end{small}
+
+This makes the association between the parameter DEVICE and an SGS zone on the
+graphics device provided by the parameter system.
+The zone identifier is returned to the program in the ZONE variable.
+SGS and the zone are made ready for graphical output.
+The second parameter is the access mode whose possible values are 'READ',
+'WRITE', and 'UPDATE'.
+The value `WRITE' will cause the screen to be cleared; the other values
+cause the screen to be left as it is.
+
+\begin{small}
+\begin{verbatim}
+          CALL SGS_CIRCL(0.5, 0.5, RADIUS)
+\end{verbatim}
+\end{small}
+
+This draws a circle centered at (0.5,0.5) in world coordinates with radius
+RADIUS.
+
+\begin{small}
+\begin{verbatim}
+          CALL SGS_ANNUL(ZONE, STATUS)
+\end{verbatim}
+\end{small}
+
+This closes the graphics workstation without cancelling the associated
+parameter. The routine SGS\_CANCL is similar but {\em does} 
+cancel the parameter.
+
+\begin{small}
+\begin{verbatim}
+          CALL SGS_DEACT(STATUS)
+\end{verbatim}
+\end{small}
+
+This de-activates SGS.
+
+A possible interface file for this program is:
+
+\begin{small}
+\begin{verbatim}
+    interface CIRCLE
+       parameter RADIUS
+          type     '_REAL'
+          position 1
+          prompt   'Radius of Circle'
+          ppath    'current'
+          vpath    'prompt'
+       endparameter
+       parameter DEVICE
+          ptype    'DEVICE'
+          position 2
+          prompt   'Graphics Device'
+          ppath    'current'
+          vpath    'prompt'
+       endparameter
+    endinterface
+\end{verbatim}
+\end{small}
+
+After compiling and linking CIRCLE:
+
+\begin{small}
+\begin{verbatim}
+    $ for circle
+    $ alink circle
+\end{verbatim}
+\end{small}
+
+we can run it from ICL.
+In the following example, circles of different radii are plotted on different
+devices (things like device names and print queues are likely to be different
+for you):
+
+\begin{small}
+\begin{verbatim}
+    ICL> define circle circle
+    ICL> circle 0.3 graphon
+    ICL> circle
+    RADIUS - Radius of Circle /0.3/ > 0.2
+    DEVICE - Graphics Device /@graphon/ > postscript_l
+    ICL> $ print/q=sys_ps/form=post gks_72.ps
+    ICL>                               
+\end{verbatim}
+\end{small}
+
+With hard copy graphics devices, such as `postscript\_l', a file is created
+which must then be sent to the device with a DCL PRINT command.
+
+\section{IDI --- Image display interface}
+\markboth{Programmers}{\stardocname}
+
+IDI is a standard for displaying astronomical data on an image display.
+It is introduced in \xref{SUN/65}{sun65}{}, and the routine specifications are
+given in
+`An image display interface for astronomical image processing' by D L Terrett,
+et al, published in {\em Astron.\ Astrophys.\ Suppl.\ Ser.} {\bf 76},
+{\em 263-304 (1988).}
+It has been integrated with ADAM by the usual ASSOC, ANNUL, and CANCL routines
+discussed in Chapter~\ref{C_parsys}.
+An example of its use is contained in \xref{SUN/65}{sun65}{}.
+
+IDI is intended for programs that need to manipulate images to a greater extent
+than can be done with GKS and its offspring.
+Thus, it does not supersede GKS, but offers features not available in GKS.
+It is not as good as GKS for producing line plots or character annotation ---
+it does have routines to draw lines and plot text, but these are primitive and
+offer you little control over how the result will appear in terms of character
+sizes, style of line widths etc.
+
+Its major strength is its ability to perform many types of interaction using the
+mouse.
+Like GKS, it can display an image, move the cursor, and rotate the look-up
+table.
+However, it can also scroll and zoom, blink, and read back a representation of
+the whole display, which can then be used to obtain a hardcopy.
+IDI allows these functions to be programmed in a device independent way, so
+a program can use any device for which IDI has been implemented.
+
+It is not possible to mix GKS and IDI calls on the same display; the two
+packages use completely different display models.
+However, it is possible to run the packages one after the other.
+For example, IDI could follow GKS and the display could be opened without
+resetting it.
+However, this is an undesirable approach since the results could be
+unpredictable.
+A better solution is to use AGI to mediate between the packages.
+
+\section{AGI --- Applications graphics interface}
+\markboth{Programmers}{\stardocname}
+
+One of the recurring problems in graphics programming is that you would 
+like a program to know about graphics drawn by another program.
+For instance, you display an image of the sky, then later you want to obtain
+the co-ordinates of the stars within the image via the cursor.
+There are two ways of doing this.
+The first is to duplicate the display code in the cursor application, which is
+wasteful and inflexible.
+The second is to store information about {\em pictures} in a database that can
+be accessed by graphics programs.
+Immediately after a picture is created, information about its position and
+extent can be added to the database.
+This second approach is implemented by AGI which can store information about
+plots on any graphics device.
+
+The AGI graphics database is stored in file AGI\_USER:AGI\_$<$hostname$>$.SDF
+which contains a data object named WORKSTATION comprising a set of components,
+one set for each device used.
+Each type of workstation used causes the generation of a WORKSTATION structure
+in the database (which is specific to each user).
+The PICTURE structure stores details of one or more `pictures' which are
+visible on the workstation's display.
+The AGI routines are used to create and manipulate these picture structures in
+the database.
+The AGI documentation (\xref{SUN/48}{sun48}{}) talks about `storing pictures'
+in the database.
+Don't be alarmed by this loose terminology; the picture itself isn't stored,
+just the following information:
+\begin{quote}
+\begin{description}
+\item [PNAME] ---
+A generic name specifying the type of the picture.
+Currently the following names are used:
+\begin{itemize}
+\item {\em BASE}\, indicates the base picture --- the picture that extends
+ over the  whole of  the plotting area. 
+ This name is reserved and should not be used to name other pictures.
+\item {\em DATA}\, indicates that the picture contains a representation of
+ data in a graphical form, e.g.\ a greyscale plot or a histogram.
+\item {\em FRAME}\, indicates collections of DATA pictures.
+ For instance, in a contour plot, the DATA picture is the area where contours
+ may  potentially be drawn, whereas the FRAME picture comprises the annotated
+ axes and labels, the key, and the data area.
+\end{itemize}
+\item [COMENT] ---
+ This is a one-line description of the picture.
+\item [DEVICE] ---
+ This array holds the natural device coordinates.
+\item [NDC] ---
+ This array holds the normalised device coordinates.
+\item [WORLD] ---
+ This array holds the world coordinates corresponding to the corners of the
+ picture.
+\end{description}
+\end{quote}
+This information enables AGI to relate a particular position on the display
+surface to a particular position in world coordinates, and vice versa.
+The PNAME and COMENT fields are used to describe a `picture', and the DEVICE,
+NDC, and WORLD fields are used to define its `extent'.
+
+Each time a picture is stored in the database for a particular workstation,
+it is added to the end of the PICTURE array.
+This array acts as a push-down stack; thus the `last' picture is the one added
+most recently to the array, and this `precedes' the one added before it.
+This order corresponds to the visual impression of new pictures obscuring
+older pictures on the display screen.
+
+The database always has a `current' picture and workstation associated with it.
+Each workstation also has a `base' picture associated with it; this fills the
+display area and always exists.
+A new picture is always created inside the current picture.
+The current picture for each workstation is remembered between sessions.
+
+\paragraph{AGI routines:}\hfill
+\markboth{Programmers}{\stardocname}
+
+The `objects' manipulated by the AGI library are `pictures' in the database.
+The basic set of routines in the library begin with the prefix `AGI\_'.
+In the descriptions below, the routines will be identified by the characters
+which follow `AGI\_'.
+They fall naturally into the following groups:
+\begin{quote}
+\begin{description}
+
+\item [Parameter routines] ---
+
+These are the usual two routines used to integrate a subroutine library with
+the ADAM parameter system, i.e.\ {\bf ASSOC} and {\bf CANCL}.
+They correspond to the {\bf OPEN} and {\bf CLOSE} stand-alone routines.
+The `picture' object is identified by a picture identifier `picid'.
+The parameter with which the picture is associated is a graphics display 
+device,
+normally called a workstation in GKS.
+
+\item [Activity routines] ---
+
+These are the three routines that actually {\em do} something, rather than just
+navigate around the database.
+
+{\bf SELP} changes the identity of the current picture --- most AGI routines
+ simply use the current picture but don't change its identity.
+
+{\bf NUPIC} creates a new picture in the database and selects this as the
+new current picture.
+The information that must be provided is:
+\begin{itemize}
+\item The position of the new picture within the current picture.
+\item The `NAME', `COMENT', and `EXTENT' of the new picture.
+\end{itemize}
+{\bf PDEL} deletes all the pictures in the database for the current workstation.
+
+\item [Inquiry routines] ---
+
+These nine routines obtain information about pictures.
+Their names (after the `AGI\_') all start with `I'.
+One routine, {\bf IBASE}, identifies the base picture for the current
+workstation.
+The other eight all obtain information about the current picture.
+Five of these, {\bf ICURP}, {\bf ILAB}, {\bf INAME}, {\bf ICOM}, and
+{\bf IWOCO}, obtain the identifier, label, name, comment, and extent.
+Two others indicate whether or not the picture, {\bf IPOBS}, or a set of
+test points, {\bf ITOBS}, in the picture are obscured by a test picture.
+The last, {\bf ISAMD}, says whether or not the picture is on the same
+workstation as a test picture.
+
+\item [Search routines] ---
+
+These eight routines search the database for a picture with a given name, or
+which satisfies certain criteria.
+The routine names are of the form {\bf RCxy}, where the `x' specifies where to
+start the search and the direction of search, and  `y' can be used to specify
+that the picture must enclose a given test point.
+\end{description}
+\end{quote}
+
+\paragraph{Interfacing with other graphics components:}\hfill
+\markboth{Programmers}{\stardocname}
+
+The basic routines do not assume the use of any particular graphics
+library.
+However, in order to make AGI easy to use it is desirable to integrate it
+with one or more graphics libraries.
+For instance, AGI and the graphics library need to be associated with the
+same workstation, and the entity addressed by the graphics library needs
+to be associated with the `picture' addressed by AGI.
+
+This integration has been done for SGS, by the addition of four routines which
+begin `AGS\_'.
+Two of them, {\bf ACTIV} and {\bf DEACT}, are used to initialise and close down
+SGS.
+The other two are {\bf NZONE}, to create a new SGS zone corresponding to an AGI
+picture, and {\bf SZONE}, to save the current SGS zone as a picture in the
+database.
+
+This code will open AGI and create an SGS zone corresponding to the current
+picture:
+
+\begin{small}
+\begin{verbatim}
+    CALL AGI_ASSOC('DEVICE', MODE, PICID, STATUS)
+    CALL AGS_ACTIV(STATUS)
+    CALL AGS_NZONE(ZONE, STATUS)
+\end{verbatim}
+\end{small}
+
+The associated interface file will contain specifications like these:
+
+\begin{small}
+\begin{verbatim}
+    parameter  DEVICE
+      ptype    'DEVICE'
+      default  IKON
+      prompt   'Name of display device'
+      ...
+    endparameter
+\end{verbatim}
+\end{small}
+
+This will cause a workstation to be associated with parameter DEVICE, and PICID
+will point to the current `picture' in the database entry for this workstation.
+SGS will be opened using the MODE to decide whether or not to erase the
+existing display, and an SGS zone will be opened which will correspond to the
+current picture in the database.
+You can then use PICID to address the database using AGI and AGS routines,
+and ZONE to address the display using SGS routines.
+
+Similar routines exist to interface AGI with PGPLOT and IDI.
+These are prefixed by `AGP\_' and `AGD\_' respectively.
+
+Full details of the AGI routines are given in \xref{SUN/48}{sun48}{}, and a
+comprehensive example of its use is given in \xref{SUN/95}{sun95}{}.
+You can examine the coding of other examples by looking at the DISPLAY and
+PHOTOM routines in the KAPPA source library KAPPA\_DIR:KAPPA.TLB.
+\markboth{Programmers}{\stardocname}
+
+\section{GNS --- Graphics workstation name service}
+\markboth{Programmers}{\stardocname}
+
+Almost any graphics program requires the user to identify which graphics
+device is to be used.
+When the GKS graphics package is used, graphics devices are identified by two
+integers: a `workstation type' and a `connection identifier'.
+No one can be expected to remember the workstation types of all available
+graphics devices, so a package called GNS has been provided that translates
+`friendly' and easy to remember names into their GKS equivalents.
+
+Most high-level graphics libraries, such as SGS, will perform the necessary name
+translation when a workstation is opened, so {\em unless you are writing
+programs that open GKS workstations directly (by calling {\tt GOPWK})} you will
+not need to call any GNS routines yourself.
+
+The GNS library provides three sorts of service to the users and writers of
+graphics subroutine libraries and programs:
+
+\begin{itemize}
+\item Translating workstation names to their GKS equivalents.
+\item Generating a list of the names and types of graphics device available on
+ a system.
+\item Answering inquiries about the properties of a particular graphics device;
+ for example, its category (pen plotter, image display etc.) or its VMS device
+ name.
+\end{itemize}
+More information on GNS and descriptions of its routines are given in
+\xref{SUN/57}{sun57}{}.
+
+\paragraph{Demonstration program:}\hfill
+\markboth{Programmers}{\stardocname}
+
+A complete list of all the workstation names defined on your system can be
+obtained by running the program {\tt GNS\_DIR:GNSRUN}.
+After listing all the GKS names along with a short description of each
+workstation, the program prompts for a workstation name.
+If one of the names in the list (or any other valid workstation name) is
+entered, a simple demonstration picture is plotted on the device selected.
+The IDI devices are then listed and again a demonstration plot can be
+generated by providing an appropriate device name.
+
+If the program produces error messages you should report them to your Site
+Manager.
+However, you should not necessarily expect all workstations on the list to be
+usable.
+A device could, for example, be in use by someone else.

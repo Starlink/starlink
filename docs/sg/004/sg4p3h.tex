@@ -1,0 +1,658 @@
+\chapter{The Message and Error Systems}
+\label{C_messerrs}
+\markboth{Programmers}{\stardocname}
+
+There is a general need for application programs to provide the user with
+informative messages about:
+
+\begin {itemize}
+\item What they do --- for example, during long operations it is helpful if the
+ user is kept informed of what a program is doing.
+\item What results have been obtained --- for example, the notification of  the
+ final results from a procedure, or of some intermediate results that would help
+ the user respond to further prompts. 
+\item What errors have occurred --- for example, errors which lead to the user
+ being prompted to provide more sensible input to a program, or fatal errors
+ which cause an application to stop.
+\end {itemize}
+
+This chapter describes two subroutine libraries which can be used for this
+purpose.
+They are:
+
+\begin{quote}
+\begin{description}
+\item [MSG] --- Message Reporting System.
+\item [ERR] --- Error Reporting System.
+\end{description}
+\end{quote}
+
+These are fully described in \xref{SUN/104}{sun104}{}.
+
+\section {MSG --- Message reporting system}
+
+The obvious way to produce messages in Fortran programs is by WRITE and PRINT
+statements.
+It is possible to construct the text of a message from various components, 
+including numbers, formatted in a CHARACTER variable using the internal WRITE
+statement. 
+The resulting message may then be displayed.
+However, it is sometimes difficult to format numerical output in its most
+concise form.
+To do this in-line each time a message is sent to the user would be very
+inconvenient and justifies the provision of a dedicated set of subroutines. 
+These considerations led to the production Message Reporting System.
+
+\subsection {Reporting messages}
+
+The primary message reporting subroutine is MSG\_OUT. 
+It has a calling sequence of the form:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_OUT(PARAM, TEXT, STATUS)
+\end{verbatim}
+\end{small}
+
+where PARAM is a character string giving the name of the message, TEXT is a
+character string giving the message text, and STATUS is the integer
+{\em global status} value. 
+
+It sends the message string, TEXT, to the standard output stream. 
+This will normally be the user's terminal, but is the log file for a batch job.
+The maximum message length is 200 characters.
+If it exceeds this, it is truncated with an ellipsis, {\em i.e.} `\ldots', but
+no error results.
+
+Here is an example of using MSG\_OUT:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_OUT('EXAMPLE_MSGOUT', 'An example of MSG_OUT.', STATUS)
+\end{verbatim}
+\end{small}
+
+It is sometimes useful to add blank lines for clarity.
+MSG\_BLANK does this:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_BLANK(STATUS)
+\end{verbatim}
+\end{small}
+
+Messages can also be stored in a character variable, rather than being output.
+MSG\_LOAD does this.
+
+\subsection {Conditional message reporting}
+
+It is sometimes useful to have varying levels of message output which may be
+controlled by the user.
+This is achieved by MSG\_OUTIF:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_OUTIF(MSG__NORM, 'MESS_NAME', 'A conditional message', STATUS)
+\end{verbatim}
+\end{small}
+
+Here, the first argument is the `priority' associated with the message.
+It has three possible values, which represent filter levels:
+\begin {quote}
+\begin {description}
+\item [MSG\_\_QUIET] --- always output message, regardless of output filter
+setting.
+\item [MSG\_\_NORM] --- output message if current output filter is set to
+ either MSG\_\_NORM or MSG\_\_VERB.
+\item [MSG\_\_VERB] --- output message only if current output filter is set to
+ MSG\_\_VERB.
+\end {description}
+\end {quote}
+(I know this looks wrong on a first reading, but `quiet' messages are messages
+that are output in `quiet' mode, and are therefore the loudest!)
+The default is MSG\_\_NORM.
+It may be modified by MSG\_IFSET, for example:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_IFSET(MSG__QUIET, STATUS)
+\end{verbatim}
+\end{small}
+
+\subsection {Message tokens}
+
+Applications often need to include the values of Fortran variables in output
+messages. 
+This is done in the Message System using tokens embedded in the message text.
+For example, a program which measures the intensity of an emission line in
+a spectrum can output its result by:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_SETR('FLUX', FLUX)
+      CALL MSG_OUT('EXAMPLE_RESULT', 
+     :             'Emission flux is ^FLUX (erg/cm2/A/s).', STATUS)
+\end{verbatim}
+\end{small}
+
+Here, MSG\_SETR assigns the result, stored in the REAL variable FLUX, to the
+message token named `FLUX'. 
+The token string is then included in the message text by prefixing it with the
+up-arrow, `$^\wedge$', escape character.
+The usual set of similar routines is provided to handle the other standard
+data types.
+
+An additional feature of the MSG\_SETx routines is that calls using an existing
+token name will result in the value being appended to any previously assigned
+token string.
+Here is the previous example written to exploit this feature:
+
+\begin{small}
+\begin{verbatim}
+      FUNITS = ' erg/cm2/A/s'
+      CALL MSG_SETR('FLUX', FLUX)
+      CALL MSG_SETC('FLUX', FUNITS)
+      CALL MSG_OUT('EXAMPLE_RESULT', 
+     :             'Emission flux is ^FLUX.', STATUS)
+\end{verbatim}
+\end{small}
+
+Note that repeated calls append values with no separator, and hence a leading
+space is needed in the FUNITS string to separate the flux value and its units
+in the expanded message.
+
+Sometimes a specific format is required; for example, the message may form part
+of a table. 
+MSG\_FMTx is a set of subroutines of the form:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_FMTx(TOKEN, FORMAT, VALUE)
+\end{verbatim}
+\end{small}
+
+where FORMAT is a valid Fortran 77 format string which can be used to encode
+the supplied value, VALUE.
+As for MSG\_SETx, {\em x} corresponds to each of the five standard Fortran 77 
+data types --- {\em D}, {\em R}, {\em I}, {\em L} and {\em C}.
+
+Sometimes it is necessary to include the message token escape character,
+`$^\wedge$', literally in a message. 
+When the character is not the last in a message string, it can be included
+literally by duplicating it.
+When it is immediately followed by a blank, or is at the end of the MSG\_OUT
+text, it is included literally. 
+Escape characters and token names will also be output literally if they 
+appear within the value assigned to a message token; {\em i.e.}\, message token 
+substitution is not recursive.
+
+\subsection {Message parameters}
+
+In calls to MSG\_OUT and MSG\_LOAD, the message name is the name of a message
+parameter which is associated with the message text.
+This name should be no more than 15 characters long and may be associated with
+a message specified in the interface file.
+When the message parameter is specified in the interface file, this text is
+used in preference to that given in the argument list.
+
+Here is an example of using MSG\_OUT:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_OUT('RD_TAPE', 'Reading tape.', STATUS)
+\end{verbatim}
+\end{small}
+
+This will generate the message:
+
+\begin{small}
+\begin{verbatim}
+    Reading tape.
+\end{verbatim}
+\end{small}
+
+If the message parameter, `RD\_TAPE', is associated with a different text
+string in the interface file, {\em e.g.}
+
+\begin{small}
+\begin{verbatim}
+    message RD_TAPE
+       text 'The program is currently reading the tape, please wait.'
+    endmessage
+\end{verbatim}
+\end{small}
+
+then the output message would be the one defined in the interface file:
+
+\begin{small}
+\begin{verbatim}
+    The program is currently reading the tape, please wait.
+\end{verbatim}
+\end{small}
+
+This enables ADAM applications to support foreign languages. 
+
+\subsection {Parameter references}
+
+We may need to refer to a program parameter in a message.
+There are two kinds of reference required:
+\begin{itemize}
+\item The {\em keyword}.
+\item The  {\em name} of an object, device, or file.
+\end{itemize}
+We can include references of these kinds by prefixing parameter names with an
+{\em escape character} of which there are three: `$\wedge$', `\%', `\$'.
+To include a parameter's keyword, prefix its name with a `\%' character, as in:
+
+\begin{small}
+\begin{verbatim}
+    CALL MSG_OUT('ET_RANGE', '%ET parameter is ignored', STATUS)
+\end{verbatim}
+\end{small}
+
+If the keyword of parameter ET is `EXPOSURE\_TIME', the output generated by this
+call is:
+
+\begin{small}
+\begin{verbatim}
+    EXPOSURE_TIME parameter is ignored
+\end{verbatim}
+\end{small}
+
+To include the name of an object, device, or file associated with a parameter,
+prefix its name with a `\$' character, as in:
+
+\begin{small}
+\begin{verbatim}
+    CALL MSG_OUT('CREATING', 'Creating $DATASET', STATUS)
+\end{verbatim}
+\end{small}
+
+If parameter DATASET is associated with an object called SWP1234, this would
+produce the output:
+
+\begin{small}
+\begin{verbatim}
+    Creating SWP1234
+\end{verbatim}
+\end{small}
+
+Sometimes a parameter name is contained in a variable. 
+In order to use it in a message, a message token can be associated with its
+name. 
+For example:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_SETC('PAR', PNAME)
+      CALL MSG_OUT('PAR_UNEXP', '%^PAR=0.0 unexpected', STATUS)
+\end{verbatim}
+\end{small}
+
+In this example, the escape sequence `$^\wedge$' prefixes the token name,
+`PAR'. 
+The sequence `$^\wedge$PAR' gets replaced by the contents of the character
+string contained in the variable PNAME; this, being prefixed by `\%', then
+gets replaced in the final message by the keyword associated with the
+parameter. 
+
+\subsection {Getting the conditional output level}
+
+Routine MSG\_IFSET sets the filter level for conditional message output.
+Routine MSG\_IFGET also sets it, but gets its value from the parameter system:
+
+\begin{small}
+\begin{verbatim}
+      CALL MSG_IFGET(PNAME, STATUS)
+\end{verbatim}
+\end{small}
+
+where PNAME is the parameter name.
+Always use the same name, MSG\_FILTER, for this purpose.
+The three acceptable strings are:
+\begin {quote}
+\begin {description}
+\item [QUIET] --- representing MSG\_\_QUIET;
+\item [NORMAL] --- representing MSG\_\_NORM;
+\item [VERBOSE] --- representing MSG\_\_VERB.
+\end {description}
+\end {quote}
+Any other value will result in an error report and the status value being
+set to MSG\_\_INVIF.
+
+\section{ERR --- Error reporting system}
+
+Although the Message System could be used for reporting errors,
+there are a number of reasons why a separate facility should be provided:
+\begin {itemize}
+\item The Message System uses the inherited status scheme, so MSG\_OUT and
+ MSG\_LOAD will not execute if STATUS has an  error value. 
+ Consequently, it cannot report information about an earlier error.
+\item In a program consisting of many subroutine levels, each routine which
+ has something informative to say about an error should be able to contribute
+ to the information that the user receives.
+ This includes:
+\begin {itemize}
+\item The routine which first detects the error, as this will probably
+ have access to information which is hidden from higher level routines. 
+\item The chain of routines between the main program and the routine in
+ which the error originated.
+ Some of these will usually be able to report on the context in which the error
+ occurred, and so add relevant information which is not available to routines 
+ at lower levels. 
+\end {itemize}
+ This can lead to several error reports arising from a single failure. 
+\item It is not always necessary for an error report to reach the user. 
+ For example, a routine may decide that it can safely handle an error detected
+ at a lower level without informing the user. 
+ In this case, error reports associated with the error should be discarded, and
+ this can only happen if the output of error messages to the  user is deferred. 
+\end {itemize}
+These considerations have led to the design and implementation of a set of
+routines which form the Error Reporting System.
+
+\subsection{Inherited status checking}
+
+The recommended method of indicating when errors have occurred in Starlink
+software is to use an integer status value in each subroutine argument list. 
+This inherited status argument, say STATUS, should always be the last argument
+and every routine should check its value on entry. 
+The {\em ADAM Error Strategy} is as follows:
+\begin {itemize}
+\item The routine returns without action if STATUS is input with a value
+ other than SAI\_\_OK. 
+\item The routine leaves STATUS unchanged if it completes successfully.
+\item The routine sets STATUS to an appropriate error value and outputs an
+ error message if it fails to complete successfully. 
+\end {itemize}
+Note that it is often useful to use a status argument and inherited status
+checking in routines which `cannot fail'. 
+This prevents them executing, possibly producing a run-time error, if their
+arguments contain rubbish after a previous error.
+Every piece of software that calls such a routine is then saved from making
+an extra status check. 
+Furthermore, if the routine is later upgraded it may acquire the potential
+to fail, and so a status argument will subsequently be required.
+If a status argument is included initially, existing code which calls 
+the routine will not need changing.
+
+\subsection {Reporting errors}
+
+The routine used to report errors is ERR\_REP. 
+It has a calling sequence of the form:
+
+\begin{small}
+\begin{verbatim}
+      CALL ERR_REP(PARAM, TEXT, STATUS)
+\end{verbatim}
+\end{small}
+
+where PARAM is the error message name, TEXT is the error message text, and
+STATUS is the inherited status.
+These arguments are similar to those used in the Message System routine
+MSG\_OUT. 
+
+The error message name, PARAM, should be a globally unique identifier for the
+error report with the form:
+
+\begin{small}
+\begin{verbatim}
+    routn_message
+\end{verbatim}
+\end{small}
+
+for routines in an application, or:
+
+\begin{small}
+\begin{verbatim}
+    fac_routn_message
+\end{verbatim}
+\end{small}
+
+for routines in a subroutine library.
+In the former case, {\tt routn} is the name of the application routine from
+which ERR\_REP is being called, and {\tt message} is a sequence of characters
+uniquely identifying the error report within that routine. 
+In the latter case, {\tt fac\_routn} is the full name of the routine from
+which ERR\_REP is being called, and {\tt message} is a sequence of characters
+unique within that routine.
+These naming conventions are designed to ensure that each error report made
+within a complete software system has a unique error name associated with it. 
+
+Here is a simple example of error reporting where part of the application code
+detects an invalid value of some kind, sets STATUS, reports the error, and then
+aborts: 
+
+\begin{small}
+\begin{verbatim}
+          IF (<invalid value>) THEN
+             STATUS = SAI__ERROR
+             CALL ERR_REP('ROUTN_BADV', 'Value is invalid.', STATUS)
+             GO TO 999
+          END IF
+          ...
+     999  CONTINUE
+          END
+\end{verbatim}
+\end{small}
+
+This sequence of three operations:
+\begin {quote}
+\begin {enumerate}
+\item Set STATUS to an error value.
+\item Report an error.
+\item Abort.
+\end {enumerate}
+\end {quote}
+is the standard response to an error condition and should be adopted by all
+software which uses the Error System. 
+
+Note that ERR\_REP differs from MSG\_OUT in that ERR\_REP will execute
+regardless of the input value of STATUS.
+Although the Starlink convention is for routines not to execute if their
+status argument indicates a previous error, the Error System routines
+obviously cannot behave in this way if their purpose is to report these errors.
+
+Message tokens can be used in ERR\_REP in the same way as in MSG\_OUT.
+
+\subsection{When to report an error}
+
+In the following example, part of an application makes a series of routine
+calls:
+
+\begin{small}
+\begin{verbatim}
+          CALL ROUTN1(A, B, STATUS)
+          CALL ROUTN2(C, STATUS)
+          CALL ROUTN3(T, Z, STATUS)
+
+    *  Check the global status.
+          IF (STATUS .NE. SAI__OK) GO TO 999
+          .
+    999   CONTINUE
+          END
+\end{verbatim}
+\end{small}
+
+Each routine uses the inherited status strategy and reports errors by calling
+ERR\_REP.
+If an error occurs within any of them, STATUS will be set to an error value
+and inherited status checking by all subsequent routines will cause them not
+to execute. 
+Thus, it becomes unnecessary to check for an error after each routine call,
+and a single check at the end of the sequence of calls is all that is required
+to handle correctly any error condition that may arise.
+Because an error report will already have been made by the routine that failed,
+it is usually sufficient simply to abort if an error arises in a sequence of
+routine calls.
+
+It is important to distinguish the case where a called subroutine sets STATUS 
+and makes its own error report, as above, from the case where STATUS is set 
+explicitly as a result of a directly detected error, as in the previous example.
+If the error reporting strategy is to function correctly, then responsibility 
+for reporting the error must lie with the routine which modifies the status 
+argument.
+The golden rule is therefore:
+
+\begin {quote}
+{\em If STATUS is explicitly set to an error value, then an accompanying
+call to ERR\_REP {\bf must} be made.} 
+\end {quote}
+
+Unless there are good documented reasons why this cannot be done,
+routines which return a bad status value and do not make an accompanying
+error report should be regarded as containing a bug\footnote{For historical
+reasons there are still many routines in ADAM which set a status value without
+making an accompanying error report --- these are gradually being corrected. 
+If such a routine is used before it has been corrected, then the strategy 
+outlined here is recommended.
+It is advisable not to complicate new code by attempting to make an error
+report on behalf of the faulty subroutine.
+If appropriate, please tell the relevant support person about the problem.}.
+
+\subsection {Setting and defining status values}
+
+Normally, set status values to the global constants SAI\_\_OK and SAI\_\_ERROR.
+However, when writing subroutine libraries it is useful to have a larger 
+number of error codes available and to define these in a separate include file.
+The naming convention:
+
+\begin{small}
+\begin{verbatim}
+    fac__ecode
+\end{verbatim}
+\end{small}
+
+should be used for the names of error codes where {\tt fac} is the
+three-character facility prefix and {\tt ecode} is up to five alphanumeric
+characters of error code name. 
+{\em Note the double underscore used in this naming convention.}
+The include file should be referred to by the name fac\_ERR, {\em e.g.}
+
+\begin{small}
+\begin{verbatim}
+      INCLUDE 'SGS_ERR'
+\end{verbatim}
+\end{small}
+
+where in this case the facility name is {\tt SGS} (Simple Graphics System).
+These symbolic constants should be defined at the beginning of every
+routine which requires them, prior to the declaration of any subroutine
+arguments or local variables. 
+
+The purpose of error codes is to enable the status argument to indicate that an 
+error has occurred by having a value which is not equal to SAI\_\_OK.
+By using a set of pre-defined error codes the calling routine is able to test
+the returned status to distinguish between error conditions which may require
+different action.
+Generally, it is not necessary to define a large number of error codes which
+would allow a unique value to be used every time an error report is made. 
+It is sufficient to be able to distinguish the important classes of error which
+may occur. 
+Examples of existing software can be consulted as a guide in this matter.
+
+Software from outside a package which defines a set of error codes may
+use that package's codes to test for specific error conditions arising within
+that package.
+However, with the exception of the SAI\_\_ codes, it should {\em not} assign
+these values to the status argument.
+To do so could cause confusion about which package detected the error. 
+
+\subsection{The content of error messages}
+
+The purpose of an error message is to be informative and it should therefore
+provide as much relevant information about the context of the error as possible.
+It should not be misleading or contain irrelevant information.
+Particular care is necessary when reporting errors from routines which might
+be called by a wide variety of software.
+They should not make unjustified assumptions.
+For example, in a routine that adds two arrays, the report:
+
+\begin{small}
+\begin{verbatim}
+    !! Error adding two arrays.
+\end{verbatim}
+\end{small}
+
+would be preferable to:
+
+\begin{small}
+\begin{verbatim}
+    !! Error adding two images.
+\end{verbatim}
+\end{small}
+
+if the same routine could be called to add two spectra!
+
+Normally it is adequate to report an error when is first detected, followed by
+a further report from the `top-level' routine.
+Only include routine names in error reports if they appear in documentation.
+
+\subsection {Deferred error reporting}
+
+The Error System can defer the output of a message to the user, and this allows
+the final delivery of error messages to be controlled.
+This is done by the routines ERR\_MARK, ERR\_RLSE, ERR\_FLUSH and ERR\_ANNUL. 
+This section describes their functions and how they are used.
+
+The purpose of deferred error reporting can be illustrated by the following
+example.
+Consider a routine, HELPER, which detects an error during execution. 
+It reports the error to its caller, giving as much contextual information as
+it can.
+It also returns an error status, enabling the caller to react appropriately. 
+However, what may be considered an `error' in HELPER, {\em e.g.} an `end of
+file' condition, may be considered by the caller to be something that can be
+handled without informing the user, {\em e.g.} by terminating its input.
+Thus, although HELPER will always report the error, it is not always necessary
+for the associated error message to reach the user. 
+Deferred error reporting enables programs to handle such errors internally.
+
+
+Suppose HELPER reports an error.
+At this point, the error message may, or may not, have been received by the
+user --- this will depend on the environment and on whether the caller deferred
+the error report. 
+HELPER should not ensure delivery of the message to the user; its
+responsibility ends when it aborts, and responsibility for handling the error
+condition passes to the caller.
+
+Suppose HELPER is called by HELPED which defers error messages so it can decide
+how to handle errors.
+It does this by calling ERR\_MARK before HELPER.
+This ensures that subsequent error messages are deferred and stored in an
+`error table'.
+It also starts a new `error context' which is independent of previous error
+messages or tokens.
+Routine ERR\_RLSE returns to the previous context, whereupon any messages in
+the new error context are transferred to the previous context.
+In this way, no existing error messages can be lost through deferral.
+ERR\_MARK and ERR\_RLSE should always be called in matching pairs and can
+be nested.
+
+After deferring the error messages, HELPED can handle the error condition 
+in one of two ways:
+
+\begin {itemize}
+\item by calling ERR\_ANNUL, which `annuls' the error, deleting any deferred
+ error messages in the current context and resetting STATUS to SAI\_\_OK.
+ This causes the error condition to be ignored.
+\item by calling ERR\_FLUSH, which `flushes out' the error, sending any
+ deferred error messages in the current context to the user and 
+ resetting STATUS to SAI\_\_OK. 
+ This notifies the user that a problem has occurred, but allows the 
+ application to continue anyway.
+\end{itemize}
+
+When an application finally ends, the value of the status argument will
+reflect whether or not it finished with an error condition. 
+At this point, any remaining error messages will be delivered automatically
+to the user.
+
+\subsection {Error message parameters}
+
+In calls to ERR\_REP, the error name is the name of a
+message parameter which is associated with the error message text.
+Like the message parameters used in MSG\_OUT and MSG\_LOAD, those used in
+ERR\_REP may be associated with an error message specified in the interface
+file as well as in the argument list.

@@ -1,0 +1,2365 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun145.6}
+\newcommand{\stardocnumber}    {145.6}
+\newcommand{\stardocauthors}   {\small M D Lawden, G R Mellor, B Smalley}
+\newcommand{\stardocdate}      {\small 12 July 1996}
+\newcommand{\stardoctitle}     {UNIX\\An Introduction}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{100mm}
+\setlength{\textheight}{154mm}
+\setlength{\topmargin}{0mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\newcommand{\example}[2]{\goodbreak
+			{\tt #1}
+			 \vspace*{-4mm}
+			 \begin{quote}
+			{\small #2}
+			 \end{quote}}
+\newcommand{\exbegin}{\begin{center}
+		      \rule{18mm}{0.3mm}
+		     {\em Examples}
+		      \rule{18mm}{0.3mm}
+		      \end{center}}
+\newcommand{\exend}{\begin{center}
+		    \rule{50mm}{0.3mm}
+		    \end{center}}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   {\small CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}}\\
+   {Particle Physics \& Astronomy Research Council}\\
+   {Starlink Project\\}
+   {\stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+This is a brief introduction to the Unix operating system as it is used
+in the Starlink Project.
+It is aimed at users who are new to Unix and to Starlink.
+Its purpose is to get you started quickly, so it is simple rather than
+comprehensive.
+
+It should be read in conjunction with any local guides provided at your
+local Starlink Site -- these give details of the local facilities available
+and how to use them.
+This is important because Starlink Sites differ in their computer hardware
+and in their versions of Unix.
+
+A ``Quick Reference Card" is available which summarises the contents of this
+note.
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\newpage
+
+\section{Introduction}
+
+This note will get you started on a Starlink Unix computer.
+
+It is not comprehensive.
+It tries to be simple.
+It is Starlink-specific.
+It is a survival kit to help you through the initial learning phase, during
+which you are suffering from information overload.
+To ease this overload we omit lots of options and alternatives.
+There is a lot more to Unix than described here, but you don't need to
+know it in order to do useful work.
+
+In addition to reading this guide, have a chat with your Site Manager about
+running Unix at your Site; he will know the local setup and will show
+you things.
+Find a colleague who already knows Unix and give him the pleasure of showing
+off his knowledge by asking some callow questions about it.
+Get hold of a book on Unix; there are lots of good ones around and
+they take time to explain things that are skimped or omitted here.
+
+\newpage
+
+\section{Getting started}
+
+This section introduces you to the basic skills you need in order to do anything
+at all with a Unix computer.
+It mentions things that are covered more systematically, or in greater depth,
+later on.
+Try the examples yourself.
+
+The first thing you need is an account on a Unix machine -- see your Site
+Manager.
+Then, you need to know how to login to the machine from your keyboard.
+Having logged in, you can try out some commands to see what files you've got
+and what's inside them, see who else is logged in, and try out the help system.
+You can also check to see that you are set up to run Starlink software.
+This section guides you through all this.
+
+\subsection{Logging in}
+
+Your Site Manager should show you how to login to a Unix machine.
+You've just got to know the local details (like computer names, available
+equipment and networks), which we can't go into here.
+
+You login by entering your username and password. 
+Unix is case sensitive, so that upper and lowercase characters are
+regarded as different.
+Having logged in, you will probably see a prompt `{\tt \%}' (or something
+similar) generated by the
+C shell.
+You can now enter commands which will 
+be interpreted by this shell.
+
+\subsection{Changing your password}
+
+The first time you login, the first thing you \underline{\em must\/} do 
+is change your password.
+The command used to do this depends on how your Starlink site
+is configured.
+Your Site Manager will tell you the appropriate method to use at your site.
+
+Passwords are not echoed to the screen when you type them.
+They should be seven or eight letters long and
+be non-dictionary words and definitely {\em not}\/ names.
+
+A good way to produce a secure password is to mix upper or lowercase
+letters, numbers, and punctuation. Do not just make obvious substitutions
+({\em e.g.}\/ ``\$" for ``s", ``1" for ``i") or combine a word with a digit
+as these are easily crackable.
+
+Please take password security seriously -- our machines are on the 
+Internet and are exposed to hackers worldwide with sophisticated 
+password cracking programs.
+
+{\em Do not tell anyone else your password.}
+
+\subsection{Logging out}
+
+To logout, type:
+\begin{verbatim}
+    % logout
+\end{verbatim}
+If the system responds with ``{\tt There are suspended jobs}'', then type it
+again -- those suspended jobs will be abandoned.
+
+\subsection{Controlling your terminal}
+
+Here are some keys to control your input, output, and programs:
+
+\begin{quote}
+\begin{tabular}{lp{72mm}}
+
+{\bf DEL} & Rubout the last character typed.\\
+{\bf  ctrl/S} & Stop output appearing on your screen (you won't lose
+  anything).\\
+{\bf  ctrl/Q} & Start output appearing on your screen again (use after
+  ctrl/S).\\
+{\bf  ctrl/U} & Cancel and clear the command line.\\
+{\bf  ctrl/C} & Terminate the running command (it cannot be restarted).
+  You can then type in another command.\\
+{\bf  ctrl/D} & `End of File'. Used to terminate data or text input from
+  the keyboard. {\em If you use it when being prompted for a command, it will
+  log you out!}
+\end{tabular}
+\end{quote}
+There are plenty of other control keys, but the ones above enable you to deal
+with most emergencies.
+
+\subsection{Looking around}
+
+If you logged out, log back in again.
+Now use some commands to look around.
+The usual form of a Unix command is:
+\begin{verbatim}
+    command [-options] [arguments]
+\end{verbatim}
+The brackets `{\tt [ ]}' indicate that a field is optional.
+For example, if you want to know what the date and time are, enter the command:
+\begin{verbatim}
+    % date
+\end{verbatim}
+This command has been entered (in response to the prompt `{\tt \%}') with no
+options or arguments.
+Other commands that don't need options or arguments include:
+\begin{verbatim}
+    % cal
+\end{verbatim}
+which lists a calendar for the current month,
+\begin{verbatim}
+    % who
+\end{verbatim}
+which lists the usernames of the people who are logged into the machine you are
+using (a similar command is {\tt finger}, which is nicer because it tells you
+their names), and
+\begin{verbatim}
+    % pwd
+\end{verbatim}
+which tells you the name of your current working directory.
+(If you have just logged in, this will be your `home' directory.)
+
+Although a command may not {\em need}\/ an argument, you can usually use one to
+control its behaviour more exactly.
+Thus, the {\tt cal} command will show a calendar of the current month, by
+default.
+However, you can get a whole year's calendar if you specify a year:
+\begin{verbatim}
+    % cal 1996
+\end{verbatim}
+or, if you just want to know when Christmas is, you can specify a month and
+year:
+\begin{verbatim}
+    % cal 12 1996
+\end{verbatim}
+
+{\em Arguments}\/ specify what a command works on.
+{\em Options}\/ specify more exactly what sort of work a command does.
+For example,
+\begin{verbatim}
+    %  ls
+\end{verbatim}
+lists the names of the files in your current directory in a compact form.
+However, you may specify {\em options}, as in:
+\begin{verbatim}
+    %  ls -la
+\end{verbatim}
+The options are introduced by the `{\tt -}' character.
+Each character that follows specifies a command option.
+In this case `{\tt l}' specifies a more detailed type of listing, and `{\tt a}'
+specifies that a type of file that is normally hidden should be listed.
+
+The {\tt ls} command is also often used with {\em arguments}, for example:
+\begin{verbatim}
+    %  ls /star
+\end{verbatim}
+lists the names of the files in directory {\tt /star} in compact form.
+The shell knows that {\tt /star} is an argument and not an option because it
+doesn't have that `{\tt -}' sign in front of it.
+
+Finally, you can combine options and arguments, as in:
+\begin{verbatim}
+    % ls -l /star/docs
+\end{verbatim}
+which lists full details of the files stored in directory {\tt /star/docs}.
+You probably found that the first part of the listing shot off the top of the
+screen.
+One way to control this is to add `{\tt | more}' onto the end of the command,
+thus:
+\begin{verbatim}
+    %  ls -l /star/docs | more
+\end{verbatim}
+What this does is route the output of the {\tt ls -l /star/docs} command
+directly into the input of the {\tt more} command.
+The {\tt more} command displays its input one screenful at a time.
+To get the next screen, press the {\tt <space>} key ({\em not}\/ the
+{\tt return} key).
+To quit the listing, type `{\tt q}'.
+
+The `{\tt |}' character is called a `Pipe' and is one of the most powerful
+features of Unix.
+It routes the output of a command into the input of the next command and lets
+you string commands together.
+For example:
+\begin{verbatim}
+    % ls -s /star/bin | sort -nr | head
+\end{verbatim}
+will list the ten largest files in directory {\tt /star/bin}.
+The command {\tt ls -s /star/bin} generates a list of the names and sizes of the
+files in directory {\tt /star/bin}.
+The {\tt sort -nr} command sorts this list into numerical order, based on
+the size field.
+Finally, the {\tt head} command displays the first ten lines of the output of
+the {\tt sort} command.
+
+\subsection{Setting up your environment\label{suye}}
+
+When you login, the system reads commands from two files (called {\em startup
+scripts}) in order to set up an appropriate environment.
+The files are called {\tt .login} and {\tt .cshrc} and should be stored in your
+home directory (the directory you start in).
+Initial versions will probably have been set up by your Site Manager.
+However, you should make sure they contain the commands which let you use
+Starlink software.
+These are:
+\begin{verbatim}
+    source /star/etc/login
+\end{verbatim}
+in your {\tt .login} file and
+\begin{verbatim}
+    source /star/etc/cshrc
+\end{verbatim}
+in your {\tt .cshrc} file.
+You can see what these commands are by:
+\begin{verbatim}
+    % cat /star/etc/login /star/etc/cshrc | more
+\end{verbatim}
+The {\tt cat} command lists the contents of a one or more files.
+More information about startup scripts is given in sections
+\htmlref{4.7}{ss1} and
+\htmlref{4.8}{ss2}.
+
+\subsection{Getting help}
+
+Unix has a `Manual' stored on-line which includes command descriptions.
+You can look at these with the {\tt man} command.
+For example, to find out about the {\tt ls} command, type:
+\begin{verbatim}
+    % man ls
+\end{verbatim}
+Instead of a command name, you can specify a keyword.
+For example, to find commands which might have something to do with printing,
+type:
+\begin{verbatim}
+    % man -k print
+\end{verbatim}
+If you want to know what a command does, type:
+\begin{verbatim}
+    % whatis cat
+\end{verbatim}
+for example.
+This will tell you what {\tt cat} does.
+
+\subsection{Finding information}
+
+Starlink stores lots of information for reference, but how do you find
+what you need?
+Section 6 of the Starlink User's Guide 
+(\xref{SUG}{sug}{}) tells you how this
+information is organised and how to search it.
+Here, we get you started by describing some of the most useful tools.
+
+To find out what is going on within Starlink, type:
+\begin{verbatim}
+    % news
+\end{verbatim}
+Then type the title of one of the items in the list (enough to make it
+unique will do).
+For example, if one of the titles is `JOBS', then reply to the prompt
+by typing:
+\begin{verbatim}
+    ...: JOBS
+\end{verbatim}
+To get back to the shell prompt, type ``q" one or more times
+(\xref{SUN/195}{sun195}{}).
+
+If you want to find information related to a specific topic you can use a
+command called {\tt findme} (\xref{SUN/188}{sun188}{}).
+For example, if you wanted to find information on programs which did
+Fourier analysis you could type:
+\begin{verbatim}
+    % findme Fourier
+\end{verbatim}
+This will start up a ``Mosaic" window which will have links to those sections
+of Starlink documentation which deal with Fourier analysis.
+To follow these links, just use your mouse to click on them.
+
+If you know the code of a document you want to read
+(\xref{SUN/1}{sun1}{} for example)
+you can examine it on-line by using the {\tt showme} command
+(\xref{SUN/188}{sun188}{}):
+\begin{verbatim}
+    % showme sun1
+\end{verbatim}
+You can use any document code that refers to an issued document.
+If the document exists in hypertext form, this is a good way to read it.
+However, if you just get a picture of the document pages you may find it
+easier to use a paper copy.
+
+Finally, the World Wide Web (``web") is a very powerful way to search for and
+read information.
+The most popular browser to use for ``surfing" the web is ``Netscape."
+To start this up, just type:
+\begin{verbatim}
+    % netscape &
+\end{verbatim}
+If any of the commands shown above don't work, seek help from your Site
+Manager.
+
+\newpage
+
+\subsection{Review}
+
+Here is a list of the commands used so far:
+
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf logout}  & logs you out.\\
+{\bf date} & reports the system time and date.\\
+{\bf cal}  & displays a calendar.\\
+{\bf who}  & reports who is currently logged into the system (terse).\\
+{\bf finger}  & reports who is currently logged into the system 
+  (gives names).\\
+{\bf pwd}  & gives the name of your current directory.\\
+{\bf ls}   & lists the contents of a directory.\\
+{\bf sort} & sorts and collates lines.\\
+{\bf head} & displays the first few lines of a file.\\
+{\bf cat}  & displays the contents of one or more files.\\
+{\bf more} & displays input to the screen, one page at a time.\\
+{\bf man}  & gives details of a command.\\
+{\bf whatis}  & gives a one-line description of a command.\\
+{\bf news} & lists recent news items (Starlink).\\
+{\bf findme} & searches Starlink documents for a topic (Starlink).\\
+{\bf showme} & displays a Starlink document (Starlink).\\
+{\bf netscape} & browses the World Wide Web.
+
+\end{tabular}
+\end{quote}
+
+\newpage
+
+\section{Files and directories}
+
+\begin{picture}(100,90)
+\thicklines
+
+\put (5,84){\verb+/+}
+\put (25,84){star}
+\put (45,84){admin}
+\put (65,84){ssi}
+\put (65,80){usernames}
+\put (65,76){whoswho}
+
+\put (7,85){\line(1,0){17}}
+\put (31,85){\line(1,0){13}}
+\put (55,85){\line(1,0){9}}
+\put (60,81){\line(1,0){4}}
+\put (60,77){\line(1,0){4}}
+
+\put (45,66){docs}
+\put (65,66){docs\_lis}
+\put (65,62){sug.tex}
+\put (65,58){sun145.tex}
+
+\put (40,67){\line(1,0){4}}
+\put (53,67){\line(1,0){11}}
+\put (60,63){\line(1,0){4}}
+\put (60,59){\line(1,0){4}}
+
+\put (45,48){bin}
+\put (65,48){(starlink programs)}
+
+\put (40,49){\line(1,0){4}}
+\put (51,49){\line(1,0){13}}
+
+\put (45,38){figaro}
+\put (65,38){(figaro directories)}
+
+\put (40,39){\line(1,0){4}}
+\put (55,39){\line(1,0){9}}
+
+\put (25,28){usr}
+\put (45,28){bin}
+\put (65,28){(system programs)}
+
+\put (20,29){\line(1,0){4}}
+\put (31,29){\line(1,0){13}}
+\put (51,29){\line(1,0){13}}
+
+\put (45,18){local}
+\put (65,18){(local system files)}
+
+\put (40,19){\line(1,0){4}}
+\put (53,19){\line(1,0){11}}
+
+\put (25,8){home}
+\put (45,8){mdl}
+\put (45,4){grm}
+\put (45,0){bs}
+
+\put (20,9){\line(1,0){4}}
+\put (34,9){\line(1,0){10}}
+\put (40,5){\line(1,0){4}}
+\put (40,1){\line(1,0){4}}
+
+\put (20,85){\line(0,-1){76}}
+\put (40,85){\line(0,-1){46}}
+\put (40,29){\line(0,-1){10}}
+\put (40,9){\line(0,-1){8}}
+\put (60,85){\line(0,-1){8}}
+\put (60,67){\line(0,-1){8}}
+
+\end{picture}
+
+\vspace{5mm}
+
+Files are stored in directories.
+The Unix directory structure is a tree structure, branching into
+multiple levels of subdirectories.
+There are no disk names --  extra disks get mounted as subdirectories;
+you just see one directory structure for the whole system.
+Some sites implement a disk quota system, others do not.
+Check with your Site Manager.
+
+An example of a Unix directory structure is shown above.
+The top of the structure is called {\tt /} (pronounced ``root").
+In the diagram, this top level directory is shown containing three directories
+called {\tt star, usr, home}.
+These are just for illustration -- in practice, all the directories in the 
+diagram would contain many more files than listed.
+
+The {\tt star} directory contains the Starlink software, and its sub-structure
+is shown in detail.
+Major packages are stored in their own subdirectories, for example the
+{\tt figaro} subdirectory holds the FIGARO software. 
+The {\tt admin} subdirectory holds administrative files such as
+{\tt ssi} (the software index) and {\tt usernames} (a list of Starlink users).
+The {\tt docs} subdirectory holds files such as {\tt sun145.tex} which contain
+the text of Starlink documents.
+
+\subsection{Naming things}
+
+Files and directories are located by specifying a `pathname' -- the name
+describes the path through the directory structure which ends up at the
+place you want.
+Pathnames can be `absolute' or `relative.'
+\begin{itemize}
+\item A {\em relative}\/ pathname is relative to your current directory.
+\item An {\em absolute}\/ pathname is the path from the root directory {\tt /}
+(absolute pathnames begin with {\tt /}).
+\end{itemize}
+As an example, in the directory structure shown above there is a file called
+{\tt ssi}.
+Its absolute pathname is {\tt /star/admin/ssi}.
+However, if your current directory is {\tt /star}, its relative pathname would
+be {\tt admin/ssi}.
+The {\tt /} character is used as the name of the top level directory, but it
+is also used to separate components of the pathname.
+
+Three useful shorthand names are:
+
+\begin{quote}
+\begin{tabular}{lp{81mm}}
+
+{\bf  .} & current directory (the directory you are in at the moment).\\
+{\bf  ..} & parent directory (the directory which contains your current
+  directory).\\
+{\bf  $\sim$} & `home' directory (the directory you are in immediately
+  after login).
+
+\end{tabular}
+\end{quote}
+
+
+\subsection{Moving around}
+
+The following command lets you move around the directory structure:
+
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf cd}  & change working directory.
+
+\end{tabular}
+\end{quote}
+
+\goodbreak
+
+\exbegin
+
+\example{cd test}
+{move down one level to subdirectory {\tt test} (relative pathname).}
+
+\example{cd test/lower}
+{move down two levels to subdirectory {\tt test/lower} (relative pathname).}
+
+\example{cd /star/docs}
+{move to this directory (absolute pathname).}
+
+\example{cd}
+{move back to your home directory (equivalent to {\bf cd $\sim$}).}
+
+\example{cd $\sim$user}
+{move to the home directory of `user'.}
+
+\example{cd ..}
+{move up one directory level.}
+
+\exend
+
+\subsection{Looking after directories}
+
+The following commands enable you to look after your directories:
+
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf pwd}   & print working directory.\\
+{\bf ls}    & list the names of the files in a directory.\\
+{\bf mkdir} & create a new directory.\\
+{\bf rmdir} & delete a directory.\\
+{\bf du}    & summarize disk usage.\\
+{\bf df}    & report on disk partition details.
+
+\end{tabular}
+\end{quote}
+
+\goodbreak
+
+\exbegin
+
+\example{pwd}
+{display the path name of your current directory.}
+
+\example{ls -a}
+{list the names of all files in a directory (including hidden `.' files).}
+
+\example{ls -F}
+{list file names with a character appended to each name indicating
+  the file type: \\
+  /  indicates a directory.\\
+  {*} indicates an executable file.\\
+  @ indicates a soft link (points to another file).}
+
+\example{ls -R}
+{list subdirectories recursively.}
+
+\example{ls -l}
+{give full details of files.}
+
+\example{ls -lt}
+{give full details of files, sorted by time of last modification with the most
+recent listed first.}
+
+\example{ls -ld}
+{give details of the directory file only, rather than its contents.}
+
+\example{mkdir mydir}
+{create a directory called {\tt mydir} below the current location.}
+
+\example{mkdir /home/grm/mydir}
+{create a directory called {\tt mydir} in the specified place.}
+
+\example{rmdir mydir}
+{delete directory {\tt mydir}. Directories will only be deleted if they are
+empty.
+If you cannot delete a directory that appears empty, look for hidden files
+with {\tt ls -a}.}
+
+\example{du -sk}
+{if you issue this command from your login directory, it will tell you the
+grand total size (in Kbyte) of all your directories and subdirectories.
+If you omit the ``s", the size of each individual directory will be shown
+in addition to the grand total.}
+
+\example{du -sk /star/docs}
+{show the grand total size (in Kbyte) of the Starlink documentation directory
+and its subdirectories.}
+
+\example{du -sk * | sort -nr | head}
+{show the grand total size (in Kbyte) used by the ten largest files
+and directories in your current directory.}
+
+\example{df -k}
+{show the disks available on your system, together with the space used and the
+space available.}
+
+\exend
+
+\subsection{Looking after files}
+
+The following commands enable you to look after your files:
+
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf cp}  & copy files.\\
+{\bf mv}  & move ({\em i.e.}\ rename) files.\\
+{\bf rm}  & delete files.
+
+\end{tabular}
+\end{quote}
+
+\exbegin
+
+\example{cp geoff.1 geoff.2}
+{copy file {\tt geoff.1} to file {\tt geoff.2} in the same directory, creating
+{\tt geoff.2} if necessary.}
+
+\example{cp geoff.1 /home/md}
+{copy file {\tt geoff.1} to directory {\tt /home/md,} giving it the same name
+as before.}
+
+\example{cp geoff.1 /home/md/geoff.2}
+{copy file {\tt geoff.1} to directory {\tt /home/md,} giving it the name
+{\tt geoff.2}.}
+
+\example{cp f* /home/grm}
+{copy all files beginning with the letter `f' from current directory to
+directory {\tt /home/grm}.}
+
+\example{cp /star/help/jcmtdr/html/* .}
+{copy every file in directory {\tt /star/help/jcmtdr/html} into your current
+directory.}
+
+\example{cp -i geoff.1 /home/grm}
+{{\tt cp} usually overwrites existing files. The {\tt -i} option will prompt
+for confirmation if the copy would overwrite an existing file and will proceed
+only if reply {\tt y} is given.}
+
+\example{cp -r /home/grm /home/md}
+{copy recursively a directory and its contents to the specified location.}
+
+\example{mv geoff.1 geoff.2}
+{rename the file {\tt geoff.1} to {\tt geoff.2}.}
+
+\example{mv geoff.1 /home/md}
+{move file {\tt geoff.1} to a different directory.
+If a new filename is specified, the file name will change.}
+
+\example{mv -i f* /home/grm}
+{prompt for confirmation if a move would overwrite an existing file.}
+
+\example{rm geoff.1}
+{delete file {\tt geoff.1}.}
+
+\example{rm *}
+{delete all files in the current directory ({\it without prompting!}).}
+
+\example{rm -i *}
+{prompt first before deleting the files.}
+
+\example{rm -r /home/grm}
+{delete all files and directories below the specified directory, and also
+delete the named directory itself.}
+
+\example{rm -ir}
+{the recursive option is probably safer when used with the interactive option.}
+
+\exend
+
+\subsection{Looking at files}
+
+The following commands show what is in a file:
+
+\begin{quote}
+\begin{tabular}{lp{74mm}}
+
+{\bf cat}  & show the contents of one or more files.\\
+{\bf more} & show the contents of a file, one screen at a time.\\
+{\bf head} & show the first few lines of a file.\\
+{\bf tail} & show the last few lines of a file.\\
+{\bf diff} & show file differences.\\
+{\bf sort} & sort or merge files.
+
+\end{tabular}
+\end{quote}
+
+Text files can be created by using the command {\tt cat} (see below), or by
+using a text editor.
+
+\goodbreak
+
+\exbegin
+
+\example{cat > note}
+{create a file named {\tt note} and type text directly into it.
+Terminate the input with a {\tt return}  key, followed by ctrl/D.}
+
+\example{cat note1}
+{show the contents of file {\tt note1}.}
+
+\example{cat dic1 dic2}
+{concatenate the contents of {\tt dic1} and {\tt dic2} and show the result.}
+
+\example{more /star/docs/sun.tex}
+{show the contents of {\tt sun.tex}.
+Initially, the first screenful of the file will be shown.
+What happens next depends on what keys you press:\\
+{\tt return}  --- next line\\
+{\tt d} --- next half screenful\\
+{\tt u} --- last half screenful\\
+{\tt space} --- next screenful\\
+{\tt b} --- last screenful\\
+/pattern --- search for `pattern'\\
+{\tt n} --- next occurrence of `pattern'\\
+{\tt q} --- terminate command}
+
+\example{head /star/docs/sun.tex}
+{show the first 10 lines of {\tt sun.tex}.
+Option {\tt -n} shows the first {\tt n} lines.}
+
+\example{tail /star/docs/sun.tex}
+{show the last 10 lines of {\tt sun.tex}.
+Option {\tt -n} shows the last {\tt n} lines.}
+
+\example{diff file.v1 file.v2}
+{show the lines which differ in these two versions of a text file.}
+
+\example{sort file1 > file2}
+{sort the lines in {\tt file1} and store the sorted output in {\tt file2}.
+By default, {\tt sort} sorts a file using the beginning of the line as the
+key field.
+However, you can use any field in the file as the key field.}
+
+\exend
+
+\subsection{Finding out about files}
+
+The following commands give information about files:
+
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf find} & find files.\\
+{\bf file} & show file type.\\
+{\bf wc}   & show line, word, and character counts.
+
+\end{tabular}
+\end{quote}
+
+\exbegin
+
+\example{find /star/* -name unixnames -print}
+{search the directory tree headed by {\tt /star} for files with the name
+{\tt unixnames}.
+If any are found, write their full pathnames to the standard output stream.
+({\em Warning:}\/ this search may take a long time, so don't be alarmed if
+nothing seems to happen for a while.)
+This command is useful for searching a directory tree for a file whose
+name you know, but whose location you don't.
+This is a powerful command which can search many directory trees for filenames
+which satisfy many complex criteria.}
+
+\example{file /star/docs/*}
+{show the type of each file in {\tt /star/docs}.}
+
+\example{wc /star/docs/sun1.tex}
+{\small show the number of lines/words/characters in {\tt sun1.tex}.}
+
+\exend
+
+\subsection{Finding things in files}
+
+The following commands find things in files:
+
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf grep}  & find a string in a file.\\
+{\bf awk}   & find a string in a file and perform an action.
+
+\end{tabular}
+\end{quote}
+
+These are both powerful and complex commands, and we can't describe them fully
+here.
+The examples below illustrate the sort of things they can do, but you should
+look them up in a Unix book if you want to understand and use them extensively.
+The precise syntax varies on different machines.
+
+The strings can be in the form of {\em regular expressions}.
+These can be used in commands such as {\tt grep, fgrep, egrep, sed}.
+Here is a summary of the meaning of the special symbols that can be used
+in regular expressions:
+\begin{quote}
+\verb+^+ \hfill beginning of line \\
+{\tt \$} \hfill end of line \\
+{\tt .} \hfill any single character \\
+{\tt [...]} \hfill single character in list or range \\
+\verb+[^...]+ \hfill character not in list or range \\
+{\tt *} \hfill zero or more of preceding character or pattern \\
+{\tt .*} \hfill zero or more of any character \\
+\verb+\+ \hfill escapes special meaning
+\end {quote}
+
+\goodbreak
+
+\exbegin
+
+\example{grep "pattern" filename}
+{search {\tt filename} for the character string {\tt pattern} and display the
+lines that contain it.
+The character string can be any regular expression (see above).}
+
+\example{grep Lawden /star/admin/whoswho}
+{search {\tt whoswho} for information on `Lawden'.}
+
+\example{grep -l IUE /star/docs/* | more }
+{find which Starlink documents mention IUE.
+The {\tt -l} option restricts the output to just the file names.}
+
+\example{grep -i den /star/admin/usernames}
+{list the records of all users in {\tt usernames} which contain the character
+string `{\tt den}'.
+The {\tt -i} option makes the search case-insensitive, so that it would also
+list `Den', 'dNe', {\em etc.}}
+
+\example{who | awk {\tt '\{print \$1}\}' | sort | uniq -c}
+{show in alphabetical order who is logged in, and how many sessions they've
+got.}
+
+\example{ls -l | awk '\$5 > 10000 \{print\}'}
+{show which files in your current directory are bigger than 10000 bytes.}
+
+\exend
+
+\subsection{Controlling access to files}
+
+The following command controls file access:
+
+\begin{quote}
+\begin{tabular}{lp{72mm}}
+
+{\bf chmod}  & change file permissions.
+
+\end{tabular}
+\end{quote}
+
+
+File protection is implemented by {\em file ownership}\/ and {\em permissions}.
+The creator of a file is the owner, and the file is created with default
+permissions.
+The owner can then alter these permissions to allow the required degree of
+access to the files.
+
+Permissions are split into three categories:
+\begin{itemize}
+\item {\tt user} (u) the file owner.
+\item {\tt group} (g) members of the user's group.
+\item {\tt others} (o) everyone else.
+\end{itemize}
+There are three types of permission, but their effect varies slightly between
+directories and files:
+\begin{quote}
+\begin{tabular}{lp{62mm}}
+ {\em Normal files:} &\\
+&\\
+{\bf READ (r)} &  can look at the contents. \\
+{\bf WRITE (w)} & can modify the contents or delete.\\
+{\bf EXECUTE (x)} & can execute.\\
+&\\
+
+ {\em Directories:} &\\
+&\\
+
+{\bf READ (r)} & can list contents.\\
+{\bf WRITE (w)} & can modify contents.\\ 
+{\bf EXECUTE (x)} & can move through (use in a pathname).
+
+\end{tabular}
+\end{quote}
+
+File permissions can be seen by typing an {\tt ls -l} command.
+This displays information similar to that shown below:
+
+{\small
+{\tt
+\begin{tabular}{l l l l r l r l l}
+drwxr-xr-x & 2 & grm & users &  512 & Nov & 18 & 04:10 & mydir \\
+-rwxr-xr-x & 1 & grm & users & 1640 & Nov & 21 & 18:15 & workfile 
+\end{tabular}
+}
+}
+
+The first field is the permission field.
+Its first character shows the file type: the most common are normal files
+({\tt -}) and directory files ({\tt d}).
+The next three characters describe the `user' permissions, followed by three
+for `group' and three for `others' permissions, making a ten-character field in
+all.
+The permissions can be described in octal format instead of by letters.
+Those for each category are concatenated, giving three digits to describe the
+file.
+For example:
+\begin{quote}
+{\tt -rw-r--r--} is equivalent to {\tt 644}.
+
+{\tt -rwxr-xr-x} is equivalent to {\tt 755}.
+\end{quote}
+The owner can change the permissions of a file with the {\tt chmod} command.
+Either octal or character notation can be used.
+
+\goodbreak
+
+\exbegin
+
+\example{chmod 700 geoff.1}
+{set full access to user, none to group or others.}
+
+\example{chmod 740 g*}
+{set full access to user, read access to group, none to others, for all files
+beginning with g.}
+
+\example{chmod og=rx g*}
+{set others and group to read and execute access.}
+
+\example{chmod og+r g*}
+{add read access to others and group.}
+
+\example{chmod og-w g*}
+{remove write access from others and group. Generally, you {\em should not\/}
+allow write access to group or others.}
+
+\example{chmod a=rx g*}
+{set all ({\em i.e.}\ user, group, and others) to read and execute access.}
+
+\example{chmod -R 755 mydir}
+{recursively set access to files below {\tt mydir} directory.}
+
+\example{chmod 755 script}
+{a script (a file of shell commands) must have execute permission to run; you
+can set it like this.}
+
+\exend
+
+\subsection{Backing up files}
+
+Files can be backed up with the command:
+\begin{quote}
+\begin{tabular}{lp{72mm}}
+
+{\bf tar}  & create and use tape archives.
+
+\end{tabular}
+\end{quote}
+You can backup your files to a tape or disk file with the {\tt tar} command.
+The resulting file is called a tarfile.
+The basic syntax is:
+\begin{verbatim}
+    % tar cvf <destination> <source>
+\end{verbatim}
+(The omission of the {\tt -} character before the options {\tt cvf} is
+deliberate; for this command, all the options are stored in the first argument.)
+This recursively backs up all the files in the {\tt <source>} directory
+structure into a {\tt <destination>} tarfile or tape drive.
+The {\tt c} option specifies that a new tarfile is to be created;
+the {\tt v} option specifies verbose mode (each file's name is logged to your
+terminal);
+the {\tt f} option indicates that the next field
+({\em i.e.}\ {\tt <destination>}) specifies the name of the tarfile.
+
+A tarfile can be {\em relative}\ or {\em absolute}, depending on how the
+source file name is specified.
+The use of relative archives is recommended, since they can be restored in
+any position within a directory structure.
+
+The use of tape drives is site dependent, so ask your Site Manager how
+to use them at your site.
+
+\goodbreak
+
+\exbegin
+
+\example{\% tar cvf /dev/rmt0h /home/grm }
+{produce an absolute tarfile (because {\tt /home/grm} is an absolute file name).
+When this absolute tarfile is unpacked, the files are restored to directory
+{\tt /home/grm}, regardless of the current working directory.
+The destination {\tt /dev/rmt0h} specifies that the tarfile will be written to
+tape drive {\tt rmt0h}. The tape device name can vary depending on your 
+operating system and other factors such as the tape density required.  
+Your Site Manager will advise on the correct ones for your site.
+Please note that the default action of a Unix tape drive is for the
+tape to be rewound after the required operation. If you wish the drive to
+remain in position after an operation ({\em e.g.}\/  in order to write a second
+tarfile) then you must use the ``norewind'' version of the tape drive name
+(in the above example, that would be {\tt /dev/nrmt0h}).}
+
+\example{\% tar cvf /home/grm/tarfile.tar *}
+{produce a relative tarfile (because the {\tt <source>} -- the files in the
+current directory -- is specified as a relative file name).
+It is conventional to use the extension {\tt .tar} in a tarfile name.
+When a relative tarfile is unpacked, it will recreate the stored file
+structure relative to the current directory.}
+
+\example{\% tar tvf /home/grm/tarfile.tar}
+{list the contents of a tarfile (this is specified by the {\tt t} option).
+The example shown will produce a detailed listing because it specifies the
+{\tt v} (verbose) option.
+If you omit the {\tt v} you will just get a list of file names, which is
+usually all you need.}
+
+\example{\% tar xvf /home/grm/tarfile.tar}
+{restore the contents of a tarfile, using the {\tt x} option.
+Many other options are available; see the {\tt man} pages for details.}
+
+\exend
+
+\subsection{Tape drive names\label{TapeNames}}
+
+In the previous section we sometimes specified a tape drive in the second
+argument of the {\tt tar} command.
+An example of this usage is:
+\begin{verbatim}
+    % tar cvf /dev/nrmt0h /home/grm
+\end{verbatim}
+On Dec Unix systems, tape devices have names like {\tt /dev/nrmt0h} where
+``{\tt /dev}" gives the location,
+``{\tt nr}" means ``no-rewind" after the write operation is complete,
+``{\tt mt0}" is the device name, and
+``{\tt h}" indicates high-density or compressed mode.
+
+On Solaris 2 systems, tape devices have names like {\tt /dev/rmt/1n} where
+``{\tt /dev}" is the location,
+``{\tt rmt}" is the tape driver type, and
+``{\tt 1n}" indicates the specific device {\em and}\/ that it is a
+no-rewind type.
+Another example is {\tt dev/rmt/0}, indicating ``rewind" device ``0".
+
+\newpage
+
+\section{Shells -- The command languages}
+
+`Shell' is the Unix term for `command language interpreter.'
+Several different shells are available:
+\begin{itemize}
+\item C shell (csh).
+\item T-C shell (tcsh).
+\item Bourne shell (sh).
+\item Korn shell (ksh).
+\end{itemize}
+Starlink's software can be run from the C shell or T-C shell, but
+not from the Bourne or Korn shells.
+Most sites use the T-C shell, which is a variant of the C shell
+with file name completion and command line editing.
+
+The following sections describe features of the C and T-C shells.
+
+\subsection{Standard files}
+
+A program works with three special `files' which are normally connected to your
+terminal's screen and keyboard.
+Normally, it receives input from {\tt stdin} (the keyboard), sends output to
+{\tt stdout} (the screen), and error messages to {\tt stderr} (also the screen).
+However, this can be redirected by special operators:
+
+\begin{quote}
+\begin{tabular}{lp{79mm}}
+
+{$>$} & directs {\tt stdout} to a file. {\em e.g.}\/ {\tt date >
+  date.file} writes the date/time to file {\tt date.file}.\\
+\\
+{$>$\&} & directs {\tt stdout} and {\tt stderr} to a file.\\
+\\
+{$>>$} & appends {\tt stdout} to an existing file.\\
+\\
+{$<$} & directs the standard input {\tt stdin} to read its input from a file.
+  {\em e.g.}\/ {\tt cat > newfile < date.file} writes the contents of
+  {\tt date.file} to {\tt newfile}.
+
+\end{tabular}
+\end{quote}
+
+
+\subsection{Pipes}
+
+A Pipe is an important and useful feature of Unix:
+
+\begin{quote}
+\begin{tabular}{lp{83mm}}
+
+{$\mid$} & directs the {\tt stdout} of one command into the
+  {\tt stdin} of another, without creating a temporary intermediate file.
+  {\em e.g.}\/ {\tt ls -l | more} shows a directory listing, page by page.
+
+\end{tabular}
+\end{quote}
+
+\subsection{Filename expansion}
+
+You can specify multiple file names in a single expression by including
+certain characters in the name you type:
+
+\begin{quote}
+\begin{tabular}{lp{77mm}}
+
+{\bf  *}  & represents one or more characters. {\em e.g.}\/ {\tt A*}
+  represents any name beginning with {\tt A}.\\
+\\
+{\bf  ?}  & represents a single character.  {\em e.g.}\/ {\tt CA?}
+  represents any three character name beginning with {\tt CA}; thus {\tt CAD}
+  and {\tt CAT} would be recognised.\\
+\\
+{\bf  [a-z]}   & a string of characters enclosed in brackets is known as a
+  `character class'.  It means {\em match any single character which appears
+  within the brackets.}  You can specify individual characters like
+  {\tt [aft]}, or sequences of   characters like {\tt [a-c]}.  {\em e.g.}\/
+  {\tt CA[DT]} represents the two names {\tt CAD} and {\tt CAT}.\\
+\\
+{\bf $\sim$}   & represents your home directory.  {\em e.g.}\/ {\tt cd
+  {\bf $\sim$}/subdir} will change directory to {\tt subdir} below your home
+  directory.
+
+\end{tabular}
+\end{quote}
+
+
+\subsection{History}
+
+The following command accesses previous commands:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf history}  & display previous commands.
+
+\end{tabular}
+\end{quote}
+The history file allows commands entered earlier in your session to be recalled
+for reuse or modification.
+With the T-C shell you can recall previous commands by pressing the
+up-arrow key.
+
+To activate the history mechanism, type:
+\begin{verbatim}
+    % set history = <n>
+\end{verbatim}
+where {\tt <n>} is the number of previous commands to store.
+This command is best included in your {\tt .cshrc} file
+(see \htmlref{section~4.7}{ss1})
+as this will cause the history mechanism to be
+activated automatically for every shell you start.
+Once activated, commands like the following can be used.
+
+\goodbreak
+
+\exbegin
+
+\example{history}
+{displays a list of previously entered commands.}
+
+\example{!p}
+{working back from the most recent command in the list, execute the last
+command beginning with {\tt p}.}
+
+{\tt \verb+^t^d+}
+\vspace*{-5mm}
+\begin{quote}
+{\small   replace {\tt t} by {\tt d} in the last command and re-execute.
+  {\tt t} and {\tt d} can be character strings of any length.}
+\end{quote}
+
+\example{!l:p}
+{recall the last command beginning with {\tt l}, but do not execute.
+This allows a command entered earlier to made the most recent one.
+It can then be edited using the method in the previous example.}
+
+\example{!!}
+{re-execute the last command.}
+
+\exend
+
+\subsection{Variables}
+
+The following commands are concerned with variables:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf echo}     & show value of a variable.\\
+{\bf set}      & define or display value of a shell variable.\\
+{\bf unset}    & remove definition of a shell variable.\\
+{\bf setenv}   & define value of an environment variable.\\
+{\bf printenv} & show values of environment variables.
+
+\end{tabular}
+\end{quote}
+
+Two types of variable are used by the C shell:
+\begin{itemize}
+\item Shell variables
+\item Environment variables
+\end{itemize}
+Their main features are shown below:
+{\small
+\begin{center}
+\begin{tabular}{|l||l|l|}
+\hline
+ & {\bf Shell variables} & {\bf Environment variables} \\ \hline \hline
+{\em Scope} & Current shell & Global \\ \hline
+{\em Naming} & lower case & upper case \\ \hline
+{\em Type} & strings, numbers,  arrays & strings (only) \\ \hline
+{\em Reference} & {\tt \$var} & {\tt \$VAR} \\ \hline
+{\em Set value} & {\tt set var = value} & {\tt setenv VAR value} \\ \hline
+{\em Show value} & {\tt echo \$var} & {\tt echo \$VAR} \\ \hline
+{\em Show all} & {\tt set} & {\tt printenv} \\ \hline
+\end{tabular}
+\end{center}
+}
+
+Variables control the way the shell operates, and certain ones are set by
+default.
+Here is a list of shell variables that are frequently defined:
+
+\begin{quote}
+\begin{tabular}{lp{73mm}}
+{\tt  cwd   } & your current working directory.\\
+{\tt  home  } & your home directory.\\
+{\tt  path  } & list of directories searched for a command.\\
+{\tt  prompt} & the shell prompt.\\
+{\tt  shell } & the default shell.\\
+{\tt  status} & reports whether a command succeeded.\\
+{\tt  term  } & terminal type.\\
+{\tt  user  } & username used to login.
+\end{tabular}
+\end{quote}
+
+Many other shell variables can be used; the manual page for {\tt csh}
+describes them.
+Some don't need values but can be toggled on or off by {\tt set} or {\tt unset}.
+
+\goodbreak
+
+\exbegin
+
+\example{set filec}
+{enables filename completion.
+Type in an unambiguous part of a file specification, press {\tt <Escape>}, and
+the shell will complete the filename.}
+
+\example{set noclobber}
+{restricts output redirection so that existing files are not destroyed by
+accident.\\
+{\tt $>$} redirections can only be made to new files.\\
+{\tt  $>>$} redirections can only be made to existing files.}
+
+\example{unset noclobber}
+{removes the definition of the {\tt noclobber} variable and cancels its effect.}
+
+\exend
+
+Here is an example of a shell variable being defined and then used:
+\begin{verbatim}
+    % set mydocs = ~/docs
+    % cd $mydocs
+\end{verbatim}
+
+Some variable names, such as {\tt path} and {\tt term}, are unusual in that
+they refer to both shell and environment variables which are identical.
+Thus, you can add directory {\tt /usr/local/bin} to the {\tt path} by treating
+it as a shell variable:
+\begin{verbatim}
+    % set path=($path /usr/local/bin)
+\end{verbatim}
+or as an environment variable:
+\begin{verbatim}
+    % setenv PATH $PATH:/usr/local/bin
+\end{verbatim}
+One difference is that when {\tt path} is used as a shell variable, its value is
+an array whose components are separated by blank characters, but when it is
+used as an environment variable, the components are separated by {\tt :}
+characters.
+You can see this by trying {\tt echo \$path}, followed by {\tt echo \$PATH}.
+
+Shells use hashing techniques to speed-up the search for commands.
+Consequently, if you change your {\tt path} or add a command to one of
+the directories, you must execute the {\tt hash} command to force the shell
+to rebuild its hash table.
+
+Remember, shell variables are only valid in the shell in which they are set.
+They are not passed down to any subsequent shells that are started.
+However, you can make them available automatically by putting their definitions
+in your {\tt .cshrc} file (see \htmlref{section~4.7}{ss1}).
+
+\subsection{Aliases\label{alias}}
+
+The following commands control the renaming of commands:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf alias}   & give another name to a command.\\
+{\bf unalias} & cancel an alias definition.
+
+\end{tabular}
+\end{quote}
+
+The {\tt alias} command saves you time by letting you give shorthand names to
+long command strings that you use frequently.
+
+\goodbreak
+
+\exbegin
+
+\example{alias h history}
+{shortens the command {\tt history} to the single letter {\tt h}.}
+
+\example{alias ll 'pwd;ls -l'}
+{allows a sequence of commands to be executed as a single command.}
+
+\example{alias}
+{on its own, shows all the aliases currently defined within the shell.}
+
+\example{unalias ll}
+{removes the alias {\tt ll}.}
+
+\exend
+
+\subsection{Startup scripts\label{ss1}}
+
+As already mentioned (\htmlref{section~2.6}{suye}),
+two files containing commands are executed automatically when you login:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf .cshrc}  & C shell startup script.\\
+{\bf .login}  & login startup script.
+
+\end{tabular}
+\end{quote}
+
+They must reside in your home directory.
+The difference between them is that {\tt .cshrc} is executed whenever a C shell
+(or T-C shell) is started, but {\tt .login} is only executed at login time.
+Thus, {\tt .login} is used to set up a global environment which affects your
+entire terminal session.
+For example, it can define environment variables such as {\tt TERM} and
+{\tt PATH}, set up terminal characteristics using {\tt stty}, and start up
+X-windows.
+On the other hand, {\tt .cshrc} is used to define shell variables and aliases
+(which are defined only for a specific shell).
+
+Special definitions are required in order to run Starlink software successfully.
+These are stored in the files {\tt /star/etc/login} and {\tt /star/etc/cshrc}.
+These contain definitions that should be added to those in your {\tt .login} and
+{\tt .cshrc} files.
+This is done by reading these extra files from within the original files; the
+Unix term for this process is `sourced'.
+Thus, your {\tt .login} file should contain the command:
+\begin{verbatim}
+    source /star/etc/login
+\end{verbatim}
+and your {\tt .cshrc} file should contain the command:
+\begin{verbatim}
+    source /star/etc/cshrc
+\end{verbatim}
+These commands should appear at the end of the files, so that anything else
+you do in them does not override Starlink definitions.
+
+\subsection{Shell scripts\label{ss2}}
+
+Instead of typing in repetitive sequences of commands, you can store them
+in a file and execute them by typing the name of the file.
+A text file that is interpreted as a set of commands by a shell is called a
+{\em shell script}.
+These are used to:
+\begin{itemize}
+\item automate a sequence of commands that is used regularly.
+\item do complex sequences that you might forget to do in the correct order.
+\end{itemize}
+The shells also have built-in functions to provide flow control, argument
+handling {\em etc.}, which allow rudimentary programming tasks to be performed.
+
+If you type a command that is the name of a text file, the shell assumes this
+file contains a shell script and creates a new process running a new shell.
+This new shell reads the standard startup file for that shell ({\tt .cshrc}
+for the C shell) and executes the commands in your text file.
+
+The shell that executes a shell script might not be the same type as the one
+into which you are typing commands.
+The exact rules for which shell is used are rather complex, but briefly, if the
+first line of a shell script is:
+\begin{itemize}
+\item a blank line or a normal command, the Bourne shell is used.
+\item a comment, the C shell is used, except that:
+\item if the comment is {\tt \#!/bin/sh}, the Bourne shell is used;
+\item if the comment is {\tt \#!/bin/csh}, the C shell is used.\newline
+(This mechanism can be generalised for other shells.)
+\end{itemize}
+A common problem for users of the C shell or T-C shell is to write a quick
+shell script and wonder why it fails completely.
+Often, this is because there are no comments at the top of the script (yes,
+we all do it), so the script is run by the Bourne shell.
+Many Bourne shell commands are different from the corresponding C shell
+commands.
+
+The Bourne shell is generally preferred for shell programming as 
+its scripts run faster. However, the syntax of the C shell
+is similar to that of the C language and is much easier to comprehend.
+For that reason, many users write their scripts for the C shell.
+
+The programming features of the shells are rather limited. If you require
+more advanced functionality, then look at Perl. This is a programming
+language which allows easy manipulation of text, files, and processes.
+It is installed at all Starlink sites and your Site Manager can provide
+information about it.
+
+\subsection{What happens when you type a command}
+
+When you enter a command, the shell you are talking to examines what you have
+typed and works out what to do.
+What it does is quite complicated and there isn't space to explain it in detail
+here; we will just deal with some of the basic characteristics.
+
+One of the first things the shell does is see if the command (the first word
+you typed) matches an alias (see \htmlref{section~4.6}{alias}).
+If it does, the shell replaces the alias with the equivalent command.
+
+There are now two possibilities:
+
+If the command is a shell command (one that it understands such as
+{\tt setenv}), the shell processes the command itself.
+
+Otherwise, it takes the command to be the name of a program to run.
+It must now find the program.
+It does this by examining the environment variable PATH.
+It looks in turn in each of the directories specified in PATH for a file that
+matches the name of the command.
+Once found, there are again two possibilities.
+If the file is executable ({\em e.g.\/} the result of compiling and linking a
+Fortran program), the shell creates a new process that is an almost identical
+copy of the current one (this is known as forking a process) and executes the
+program in that new process.
+If the file contains ASCII text (known as a shell script), the shell again
+forks a new process, but this time the program that is run is a shell.
+If it is a C shell, it will read the {\tt .cshrc} file in your home directory.
+The new shell then reads the contents of the text file and executes each
+command, using the above rules.
+
+\newpage
+
+\section{Controlling processes}
+
+The following commands are concerned with controlling processes:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf ps}   & list current processes.\\
+{\bf jobs} & list current jobs.\\
+{\bf at}   & run a job later.\\
+{\bf fg}   & run job in foreground.\\
+{\bf bg}   & run job in background.\\
+{\bf stop} & suspend background job.\\
+{\bf kill} & terminate background job.\\
+{\bf nice} & run a command at a different priority.\\
+{\bf renice} & alter the priority of a running process.
+
+\end{tabular}
+\end{quote}
+In Unix, you can have several things going on at once.
+You may be compiling a large package, editing a couple of documents, monitoring
+your mail messages, keeping your eye on the clock, and watching the load on
+your computer.
+You keep switching your attention between these various tasks.
+In computing terms, this means that there are several processes competing
+for system resources.
+
+Normally, when you enter a command, you have to wait until the job or process
+that carries out this command has finished before you can enter another
+command.
+In this case, the job runs in the `foreground'.
+However, if you end the command with an `{\tt \&}', the job runs in the
+`background'; which means that you can type another command while the previous
+one is being processed.
+You can also stop a job from running.
+This can be a temporary suspension ({\em i.e.}\ you can start the job again),
+or you can `kill' the job so that it ceases to exist and cannot be restarted.
+The diagram below illustrates these various states, and the transitions between
+them.
+
+\begin{picture}(100,50)
+\thicklines
+
+\put (36,40){\framebox(24,5){\bf suspended}}
+\put (82,42){\em Suspended}
+
+\put (19,31){\bf \^{}Z}
+\put (39,31){\bf fg}
+\put (52,31){\bf bg}
+\put (69,31){\bf stop}
+
+\put (47,24){\bf fg}
+
+\put (16,20){\framebox(24,5){\bf foreground}}
+\put (56,20){\framebox(24,5){\bf background}}
+\put (85,22){\em Running}
+
+\put (80,5){\em Terminated}
+
+\put (10,0){\bf command}
+\put (36,0){\bf \^{}C}
+\put (55,0){\bf kill}
+\put (68,0){\bf command \&}
+
+\put (18,5){\vector(0,1){15}}
+\put (18,25){\line(0,1){17.5}}
+\put (18,42.5){\vector(1,0){18}}
+
+\put (38,40){\vector(0,-1){15}}
+\put (38,20){\vector(0,-1){15}}
+
+\put (58,40){\vector(0,-1){15}}
+\put (58,20){\vector(0,-1){15}}
+
+\put (78,5){\vector(0,1){15}}
+\put (78,25){\line(0,1){17.5}}
+\put (78,42.5){\vector(-1,0){18}}
+
+\put (56,22.5){\vector(-1,0){16}}
+
+\end{picture}
+
+\vspace{5mm}
+
+Processes are identified in three ways:
+\begin{description}
+\item[\mbox{}]\mbox{}
+\begin{description}
+\item [PID] --- Process identifier.
+\item [\%N] --- Job number N.
+\item [\%] --- Current job.
+\end{description}
+\end{description}
+
+Thus, if you want to terminate a background job, you can do it with any of
+the commands:
+\begin{verbatim}
+    % kill PID
+    % kill %N
+    % kill %
+\end{verbatim}
+You can find out the process identifiers of your existing processes with the
+{\tt ps} command. For example:
+\begin{verbatim}
+    % ps
+        PID TTY      S           TIME COMMAND
+       8585 ttyp8    S        0:03.02 -tcsh (tcsh)
+       8612 ttyp0    R        0:00.10 ps
+\end{verbatim}
+This example shows a situation in which two processes exist.
+The first (PID=8585) is running {\tt tcsh} and is suspended.
+The second (PID=8612) is running the {\tt ps} command and is in the foreground.
+
+You can find out your current job numbers with the {\tt jobs} command:
+\begin{verbatim}
+    % jobs
+    [1] + Running    du >storage &
+    [2] - Running    cc -o foo foo.c >&errs &
+    [3] - Stopped    find / -size 0 -print
+\end{verbatim}
+The job numbers are enclosed in brackets.
+The `+' indicates which job is the `current job'.
+
+A background job will halt when it needs input from your terminal.
+To proceed, bring it to the foreground with the {\tt fg} command and type some
+input.
+
+If you wish to execute a job at a later time (rather than immediately by using
+an {\tt \&}), you can use the {\tt at} command.
+For example:
+\begin{verbatim}
+    % at 23:00 Jul 07 < spectrum
+\end{verbatim}
+will run the commands in file {\tt spectrum} at 23:00 on 7th July.
+\begin{verbatim}
+    % at -l
+\end{verbatim}
+will list all your scheduled jobs.
+
+You can control the priority at which commands execute with the {\tt nice}
+and {\tt renice} commands.
+Priorities for user processes range from 0 (default interactive priority) 
+to +20 (slow).
+For example:
+\begin{verbatim}
+    % nice +19 bigprog &
+\end{verbatim}
+will run {\tt bigprog} at priority +19 (a low priority).
+
+You should always reduce the priority of CPU-intensive jobs in order to minimise
+their adverse effect on the response time of other interactive jobs.
+Note that the speed of execution of a process is only reduced when in
+competition with other processes of higher priority ({\em i.e.}\/ when other
+users are logged into the same system).
+
+Alternatively, if you have started a program and need to lower its priority
+to avoid complaints from other users, you can do something like:
+\begin{verbatim}
+    % renice +19 886
+\end{verbatim}
+which lowers the priority of process PID=886 to +19 (slow).
+
+\newpage
+
+\section{Editing text}
+
+The following commands invoke editors:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf vi}    & standard Unix editor.\\
+{\bf emacs} & the powerful emacs editor.\\
+{\bf jed}   & a text editor.\\
+{\bf tpu}   & nu/TPU editor.
+
+\end{tabular}
+\end{quote}
+Editors are personal things, so it is impossible to make a recommendation
+that will satisfy everyone.
+
+The standard Unix screen editor is {\tt vi}.
+This is fast and powerful (deadly, in fact).
+You can find some documentation for it in MUD/122 and MUD/123.
+
+{\tt emacs} 
+(\xref{SUN/34}{sun34}{}, MUD/102) and {\tt jed}
+(\xref{SUN/168}{sun168}{}) are alternative editors.
+
+A document describing {\tt nu/TPU} has been distributed to every site --
+see your Site Manager. To use it, just type the command {\tt tpu},
+followed by the name of the file you want to edit
+(\xref{SUN/192}{sun192}{}).
+
+Other editors may be available, check with your Site Manager.
+
+Further information on editors is given in
+\xref{SUN/170}{sun170}{}.
+Editors can have a big impact on your work, so we strongly recommend that you
+read this carefully and think about the issues.
+
+\newpage
+
+\section{Producing documents and graphs}
+
+\subsection{Documents}
+The following commands help you produce documents:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf tex}   & \TeX\ typesetter.\\
+{\bf latex} & \LaTeX\ document preparation.\\
+{\bf xdvi}  & display document in an X window.\\
+{\bf dvips} & prepare PostScript output.\\
+{\bf gs}    & GhostScript PostScript previewer.\\
+{\bf lpr}   & print files.\\
+{\bf ispell} & spell checker.\\
+{\bf a2ps} & Ascii to PostScript file conversion.
+
+\end{tabular}
+\end{quote}
+We recommend you use \LaTeX\ to produce documents
+(\xref{SUN/9}{sun9}{}).
+We also recommend that you base your documents on standard Starlink styles,
+such as {\tt /star/docs/sun.tex}
+(\xref{SGP/28}{sgp28}{}).
+
+To use \TeX\ or \LaTeX\ to process file {\tt filename.tex}, type:
+\begin{verbatim}
+    % tex filename
+\end{verbatim}
+or
+\begin{verbatim}
+    % latex filename
+\end{verbatim}
+You need not give the {\tt .tex} file extension, but it won't matter if you
+do. 
+
+To view or print the resulting {\tt filename.dvi} file there are several
+options. 
+To view your document in an X-window, use the {\tt xdvi} utility
+(\xref{SUN/9}{sun9}{}):
+\begin{verbatim}
+    % xdvi filename
+\end{verbatim}
+(If you get the error message `{\tt Error: Can't open display:}', type
+{\tt xdisplay} and try again -- if this doesn't work, consult your Site
+Manager.
+This isn't the place to discuss X-windows, but you can look at the description
+of {\tt xdisplay} in 
+\xref{SUN/129}{sun129}{} for enlightenment.)
+
+To make printable versions, use the {\tt dvips} translator:
+\begin{verbatim}
+    % dvips filename
+\end{verbatim}
+This will create an output file {\tt filename.ps}. This can be previewed
+using {\tt ghostscript}
+(\xref{SUN/197}{sun197}{}):
+\begin{verbatim}
+    % gs filename.ps
+\end{verbatim}
+Then, print the resulting PostScript file by a command like:
+\begin{verbatim}
+    % lpr -Pps filename.ps
+\end{verbatim}
+The precise details of how to print files is locally dependant and cannot
+be described properly here.
+For example, you may need to use the {\tt lp} command rather than the
+{\tt lpr} command.
+You should, therefore, ask your Site Manager or consult your local guide.
+
+You can check your spelling in a document by using the {\tt ispell} command
+(\xref{SUN/189}{sun189}{}) to examine its file:
+\begin{verbatim}
+    % ispell filename.tex
+\end{verbatim}
+
+Another useful utility for handling documents is {\tt a2ps}
+(\xref{SUN/184}{sun184}{}) which
+converts an ordinary ascii text file into PostScript form which can then
+be printed on an appropriate printer.
+This usually results in more pleasing output than you would get from using the
+raw text file.
+A typical use of this command is:
+\begin{verbatim}
+    % a2ps -p -ns -nn -nh filename | lpr -P1
+\end{verbatim}
+(You may need to change the {\tt P1} to something else at your site.)
+
+\subsection{Graphs}
+
+The following command is needed if you use an X terminal:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf xdisplay}  & connect workstation with X device.
+
+\end{tabular}
+\end{quote}
+If you are using X to run programs on a remote workstation, use command
+{\tt xdisplay} to set up the connection between the workstation and your X
+device before running any graphics program (or any other X application).
+Reply {\tt xwindows} if prompted for a graphics device name.
+
+\newpage
+
+\section{Mailing and Networking\label{Mail}}
+
+\subsection{Mail services}
+
+The following commands invoke mail services:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf mail}  & standard mail utility.\\
+{\bf pine}  & friendly mail utility.
+
+\end{tabular}
+\end{quote}
+The default {\tt mail} utility is adequate but unfriendly.
+We recommend {\tt pine}.
+It is designed to be easy for a novice to use.
+For example, it tolerates mistakes and its command menus are always present.
+It can be learnt by exploration rather than by reading manuals, however
+\xref{SUN/169}{sun169}{} can be consulted if needed.
+To start it, just type {\tt pine}.
+
+\subsection{Mail addresses}
+
+The following command helps you find mail addresses:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf email}  & mail address search utility.
+
+\end{tabular}
+\end{quote}
+On Unix you send mail to addresses like:
+\begin{verbatim}
+    cac@star.rl.ac.uk
+\end{verbatim}
+Here, the username precedes the address, and they are separated
+by an {\tt @}.
+This form of address is known as the `Internet' or `IP' form, and this
+should be used on Starlink's Unix machines. 
+
+The file {\tt /star/admin/whoswho} contains the network addresses of Starlink
+sites.
+Network addresses for people are best found on Starlink by using the
+{\tt email} utility
+(\xref{SUN/182}{sun182}{}).
+For example, to find out Geoff Mellor's network address, type:
+\begin{verbatim}
+    % email mellor
+\end{verbatim}
+
+\subsection{Copying files across networks}
+
+The following commands copy files across networks:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf cp}  & copy files (local).\\
+{\bf ftp} & file transfer program.
+
+\end{tabular}
+\end{quote}
+There are several ways to copy files from one machine to another.
+The best method may depend on how your local system is set up.
+Nevertheless, there are several standard methods that normally work:
+
+\begin{description}
+\item [Local machines ({\tt cp})] \hspace*{\fill}
+
+All the disks on your local group of machines will probably appear as part of
+your file system.
+If so, just use the {\tt cp} command in the normal way:
+\begin{verbatim}
+    % cp <source-path> <destination-path>
+\end{verbatim}
+
+\item [Other machines ({\tt ftp})] \hspace*{\fill}
+
+You need a username on the remote machine.
+Type:
+\begin{verbatim}
+    % ftp remote_host
+\end{verbatim}
+where {\tt remote\_host} is either the name of a host (for example
+{\tt starlink-ftp.rl.ac.uk}), or its `dotted quad' network number (like
+{\tt 130.246.36.1}).
+You will be prompted for your remote username and password, and will be
+logged in for file transfer work only.
+You can use directory changing and listing commands, such as {\tt cd} and
+{\tt ls,} to locate the files you want.
+To copy a file from a remote machine to your local one, type:
+\begin{verbatim}
+    ftp> get remote_filename local_filename
+\end{verbatim}
+To copy a file from your local machine to a remote one, type:
+\begin{verbatim}
+    ftp> put local_filename remote_filename
+\end{verbatim}
+You can {\tt get} files from any remote host on which you have a username,
+and you can {\tt put} files to any remote host on the same basis.
+
+By default, {\tt ftp} will transfer data in {\tt ascii} mode -- which is
+correct for text files.
+To transfer binary files (executables, tar files, NDF container files
+{\em etc.}), set {\tt ftp} into {\tt binary} mode.
+Otherwise, although the transfers will probably happen, the destination file
+will probably be useless. 
+To get {\tt ftp} into binary mode, type:
+\begin{verbatim}
+    ftp> binary
+\end{verbatim}
+To get help in an {\tt ftp} session, type:
+\begin{verbatim}
+    ftp> help
+\end{verbatim}
+To disconnect from an {\tt ftp} session, type:
+\begin{verbatim}
+    ftp> quit
+\end{verbatim}
+\end{description}
+Some hosts have a special facility called `anonymous ftp'.
+This has some disk space for a `public' area, and is commonly used to
+allow informal distribution of common software utilities, pictures {\em etc.}
+To use it, start a normal {\tt ftp} session to the host, but instead of using
+your username, login as {\tt anonymous}.
+You will be prompted for your local username and node name in lieu of a
+password. 
+Specify your full network address (for example \verb+mdl@star.rl.ac.uk+) as the
+password so that the owners of the system can find out who is accessing it.
+You will gain access to a limited set of files, provided for the anonymous ftp
+facility, which you can copy to your local machine as described above. 
+
+\subsection{Logging into another machine}
+
+The following command allows remote login:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf telnet}  & remote login.
+
+\end{tabular}
+\end{quote}
+To login to another machine {\em from your current session}\/ use {\tt telnet}.
+The command is:
+\begin{verbatim}
+    % telnet remote_host
+\end{verbatim}
+You will be prompted for a username and password, depending on what the
+{\tt remote\_host} requires for user identification.
+The form of the name you give as a {\tt remote\_host}
+will depend upon how your Site Manager has set up your systems.
+In some cases you will be able to type just the machine name.
+For more remote machines, {\em i.e.}\ those in different network `domains', you
+may have to give the full network address.
+For example, to connect to the Starlink Database machine, users of RAL
+machines need only type:
+\begin{verbatim}
+    % telnet stadat
+\end{verbatim}
+whereas users of machines outside RAL would probably need to type:
+\begin{verbatim}
+    % telnet stadat.rl.ac.uk
+\end{verbatim}
+You can also use the `dotted quad' network number of the machine:
+\begin{verbatim}
+    % telnet 130.246.32.91
+\end{verbatim}
+
+\newpage
+
+\section{Programming}
+
+{\em Skip this section if you only want to use application programs, not write
+them.}
+
+The following commands provide programming facilities:
+\begin{quote}
+\begin{tabular}{lp{67mm}}
+
+{\bf f77}       & compile a Fortran 77 program.\\
+{\bf cc}        & compile a C program.\\
+{\bf star\_dev} & set up links required for developing Starlink programs.\\
+{\bf fsplit}    & split a multi-routine Fortran file into individual files.\\
+{\bf ftncheck}  & check Fortran 77 source code.\\
+{\bf ar}        & insert subroutine in a library.\\
+{\bf ranlib}    & update archive index.
+
+\end{tabular}
+\end{quote}
+In addition to the standard compilers, some sites have Fortran 90 and c++.
+Check with your Site Manager if you need to use these.
+
+The compilers produce an object file (extension {\tt .o}).
+The object code, and any other objects specified, are passed to the loader
+which produces an executable image.
+All this is done by one command.
+
+To compile and link a Fortran program stored in file {\tt prog1.f}, type:
+\begin{verbatim}
+    % f77 prog1.f
+\end{verbatim}
+This will produce an executable file called {\tt a.out}.
+If you would rather name the executable file {\tt prog1}, use the {\tt -o}
+option:
+\begin{verbatim}
+    % f77 -o prog1 prog1.f
+\end{verbatim}
+If you only want to compile the program without linking, use the {\tt -c}
+option:
+\begin{verbatim}
+    % f77 -c prog1.f
+\end{verbatim}
+This will create an object file called {\tt prog1.o}.
+
+You can compile a program that is stored in several files with a single command:
+\begin{verbatim}
+    % f77 -o progall prog1.f sub1.f sub2.f
+\end{verbatim}
+or in stages:
+\begin{verbatim}
+    % f77 -c prog1.f
+    % f77 -c sub1.f
+    % f77 -c sub2.f
+    % f77 -o progall prog1.o sub1.o sub2.o
+\end{verbatim}
+or with a mixture of the two, such as:
+\begin{verbatim}
+    % f77 -c sub1.f
+    % f77 -c sub2.f
+    % f77 -o progall prog1.f sub1.o sub2.o
+\end{verbatim}
+If you wish to link your program with a subroutine library, use the {\tt -L}
+option to specify the name of the directory containing the library, and use the
+{\tt -l} option to specify the name of the library itself.
+In general, to link with library {\tt libxxx.a}, specify {\tt -lxxx} in the
+compilation command.
+Thus, to link with library {\tt libnag.a}, specify {\tt -lnag}:
+\begin{verbatim}
+    % f77 -o prog2 prog2.f -L/star/lib -lnag
+\end{verbatim}
+To compile C programs, follow the above instructions, replacing the {\tt f77}
+command by the command ({\tt cc}) that invokes the C compiler on your computer.
+
+If you want to link with Starlink subroutine libraries, there are linking
+scripts provided to make the job easier (see
+\xref{SUN/202}{sun202}{} for information about
+specific Starlink libraries).
+For example, to link a program that calls the AGI
+subroutine library, type:
+\begin{verbatim}
+    % f77 -o agitest agiprog1.f -L/star/lib `agi_link`
+\end{verbatim}
+If you are using Starlink subroutine libraries in your Fortran programs, you
+may need to have INCLUDE statements in your code.
+Use the file name given in the documentation, {\em e.g.}
+\begin{verbatim}
+    INCLUDE 'SAE_PAR'
+\end{verbatim}
+In order for the compiler to find this file, the name {\tt SAE\_PAR}
+must appear in the current directory.
+To make this happen, type the command:
+\begin{verbatim}
+    % star_dev
+\end{verbatim}
+before running the compiler.
+You only need do this once per directory.
+This sets up a link from the current directory to the real file.
+Each subroutine library has its own {\em package}\_{\tt dev} command file:
+{\tt ems\_dev}, {\tt fio\_dev}, {\em etc.}
+
+In C programs, extra source files may be included with statements like:
+\begin{verbatim}
+    #include "sae_par.h"
+\end{verbatim}
+You must tell the C compiler where to find these files, using the {\tt -I}
+option:
+\begin{verbatim}
+    % cc -I/star/include cprog1.c
+\end{verbatim}
+Note that the way you tell the compiler where to look for `include' files is
+different in Fortran and C.
+Unfortunately, the Fortran compiler has no equivalent of the C compiler's
+{\tt -I} option.
+
+To build your own subroutine libraries and link to them, divide up your
+Fortran source code so that there is one subroutine or function in each file
+(use {\tt fsplit}), and then compile each routine and insert it into a library
+(called `archives' on Unix) as follows:
+\begin{verbatim}
+    % f77 -c mysub.f
+    % ar r libmine.a mysub.o
+\end{verbatim}
+When all the modules have been inserted, update the archive index with:
+\begin{verbatim}
+    % ranlib libmine.a
+\end{verbatim}
+(This isn't needed if you are using Solaris.)
+To link with the new library, use the {\tt -L} option to specify the directories
+containing the archives, and the {\tt -l} option to specify the name of the
+archive.
+For example:
+\begin{verbatim}
+    % f77 myprog.f -L. -lmine
+\end{verbatim}
+will cause the linker to look in the current directory for an archive called
+{\tt libmine.a}.
+
+A program often requires many files to be compiled and linked to produce an
+executable file; there may be source files, header files, and so on.
+The sequence of commands needed to control this process may be complex.
+Fortunately, in Unix there is a {\tt make} facility which allows programmers to
+create a file, known as a {\tt makefile}, which defines dependency
+relationships between files, and specifies the command sequences required to
+create a program.
+This facility is not described here, but if you are going to do serious
+programming you should find out about it.
+Starlink's software uses {\tt make} files extensively in its software
+distribution and management.
+
+\newpage
+
+\section{Going further}
+
+This document is only an introduction.
+For more information, refer to the system documentation and the online {\tt man}
+pages.
+Other recommended reading is as follows:
+
+\begin{description}
+\item[\mbox{}]\mbox{}
+\begin{description}
+\item [MUD/102]: emacs -- Unix editor.
+\item [MUD/121]: Unix for beginners.
+\item [MUD/122]: An introduction to display editing with vi.
+\item [MUD/123]: vi -- Quick reference card.
+\item [MUD/124]: An introduction to running Fortran programs on Unix
+\item [\xref{SGP/7}{sgp7}{}]: Unix and Starlink.
+\item [\xref{SGP/28}{sgp28}{}]: How to write good documents for Starlink.
+\item [\xref{SSN/66}{ssn66}{}]: Starlink software organisation on Unix.
+\item [\xref{SUG}{sug}{}]: Starlink User's Guide.
+\item [\xref{SUN/1}{sun1}{}]: Starlink Software Collection.
+\item [\xref{SUN/9}{sun9}{}]: LATEX --- Document preparation system.
+\item [\xref{SUN/129}{sun129}{}]: XDISPLAY - Setting remote X windows.
+\item [\xref{SUN/144}{sun144}{}]: ADAM --- Unix version.
+\item [\xref{SUN/168}{sun168}{}]: JED --- The text Editor.
+\item [\xref{SUN/169}{sun169}{}]: PINE --- Electronic mail interface.
+\item [\xref{SUN/170}{sun170}{}]: Editors and Mail on Unix.
+\end{description}
+
+\end{description}
+
+\end{document}

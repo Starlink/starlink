@@ -1,0 +1,962 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}   {Starlink User Note}
+\newcommand{\stardocinitials}   {SUN}
+\newcommand{\stardocsource}     {sun\stardocnumber}
+\newcommand{\stardocnumber}     {168.3}
+\newcommand{\stardocauthors}    {B.\ K.\ McIlwrath\\C.\ G.\ Page}
+\newcommand{\stardocversion}    {Version 2.0}
+\newcommand{\stardocdate}       {27 November 1998}
+\newcommand{\stardoctitle}      {EDT mode for JED\\[2ex]
+                                An advanced Unix text editor}
+\newcommand{\stardocmanual}    {User's Guide}
+\newcommand{\stardocabstract}  {This note describes Starlink extended EDT
+emulation for the JED editor. It provides a Unix text editor which can 
+utilise the advanced facilities of DEC VTn00, xterm and similar terminals.
+JED in this mode provides a reasonably good emulation of the VAX/VMS editor 
+EDT in addition to many extra facilities.}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\xlabel{what_is_jed}What is JED?}
+\label{what_is_jed}
+
+JED is a small, fast and freely available text-editor for Unix systems
+written by \htmladdnormallink
+{John E. Davis}{http://space.mit.edu/\~{}davis/jed.html} of MIT (the author's
+copyright notice is reproduced in Section~{\ref{jed-cr}}). Core JED
+facilities include utilising the cursor positioning abilities of suitable
+terminals, highlighting of selected text ranges, multiple buffers, keypad
+control of the editor, a multiple level \textit{undo} facility
+\textit{etc}. JED is also fully programmable using a high level editor
+language called \textit{S--Lang} which allows it to be easily customised.
+\textit{S--Lang} files included with the JED distribution enable it to
+emulate several common editors including \textit{emacs} or the VAX/VMS
+editor \textit{EDT}.  In addition language sensitive extensions are
+supported for many programming languages. The accuracy of these JED
+emulations depend, of course, on the detail in the associated
+\textit{S--Lang} files. For example, as distributed, the JED emacs
+emulation is claimed to be perhaps the best of any non-GNU emacs based
+editor.
+
+The EDT emulation provided in the standard JED distribution is
+somewhat more basic. This document describes a Starlink supplied and
+supported enhancement to JED in EDT mode. This was originally designed
+and developed by Clive Page of Leicester University and has been
+released and in use for some time (together with JED version 0.93) on
+Starlink Sun and Alpha workstations. This re-release was developed by
+Starlink and includes, in addition to a totally revised \textit{S--Lang} 
+file for the changed syntax used in more recent releases of
+JED, support for PC--Linux systems (under X11 only) and modern Sun
+keyboards. Also the new language sensitive editing capabilities
+of JED are optionally supported. Bug reports and suggestions for improvement 
+to this version may be made to the current author (\texttt{bkm@star.rl.ac.uk}).
+
+The current version of Starlink EDT code was developed for JED version 0.98
+but should also work with most JED releases later than version 0.94.
+
+\section{\xlabel{edt_function_keys}EDT function keys}
+\label{edt_function_keys}
+
+VMS/EDT (and hence JED in EDT mode) makes extensive use of the
+\textit{applications keypad}--a special mode of the (mostly numeric)
+group of keys on the far right of DEC VT style terminals. The next
+key-group to the left of this one (between it and the main alphanumeric
+group) includes the cursor keys which are used with EDT and also
+several labelled function keys such as \texttt{Page Up, Insert, Help},
+\textit{etc}.  These labelled function keys will also work as expected
+in JED and mainly provide alternative keys for some functions already
+on the applications keypad. The keyboard layout for the EDT keys on a
+DEC VT keyboard is shown in Figure~\ref{fig:dec-kb}.
+
+Within Starlink VT style keyboards are most likely to be found on Alpha
+consoles or on X-terminals.
+\begin{figure}[t]
+\scriptsize
+\begin{center}
+\begin{tabular}{ccc} \hline
+\multicolumn{1}{|c|}{}       & \multicolumn{2}{|c|}{}  \\           
+\multicolumn{1}{|c|}{Help}    & \multicolumn{2}{|c|}{Do} \\
+\multicolumn{1}{|c|}{}       & \multicolumn{2}{|c|}{}  \\  \hline
+         &              &        \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\multicolumn{1}{|c|}{{Find}}    &  \multicolumn{1}{|c|}{Insert} & 
+\multicolumn{1}{|c|}{Remove} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{Here} & \multicolumn{1}{|c|}{} \\
+\hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\multicolumn{1}{|c|}{Select}    &  \multicolumn{1}{|c|}{Prev} & 
+\multicolumn{1}{|c|}{Next} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\hline
+         &              &        \\ \cline{2-2}
+        & \multicolumn{1}{|c|}{}  & \\
+        & \multicolumn{1}{|c|}{UP}  & \\
+        & \multicolumn{1}{|c|}{}  & \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\multicolumn{1}{|c|}{LEFT}    &  \multicolumn{1}{|c|}{DOWN} & 
+\multicolumn{1}{|c|}{RIGHT} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\hline
+\end{tabular}
+\hspace{5mm}
+\begin{tabular}{|c|c|c|c|} \hline
+PF1      & PF2       & PF3     & PF4   \\
+GOLD     & HELP      & FNDNXT  & DEL L \\
+         &           & \textit{FIND}    & \textit{UND L} \\ \hline
+7        & 8         & 9       & -     \\
+PAGE     & SECT      & APPEND  & DEL W \\
+\textit{COMMAND}  & \textit{FILL}      & \textit{REPLACE}  & \textit{UND W} \\ \hline
+4        & 5         & 6       & ,     \\
+ADVANCE  & BACKUP    & CUT     & DEL C \\
+\textit{BOTTOM}   & \textit{TOP}       & \textit{PASTE}   & \textit{UND C} \\ \hline
+1        & 2         & 3       &       \\
+WORD     & EOL       & CHAR    & ENTER \\
+\textit{CHNGCASE} & \textit{DEL EOL}   & \textit{SPECINS} &       \\ \cline{1-3}
+\multicolumn{2}{|c|}{0}         &~.       &       \\
+\multicolumn{2}{|c|}{LINE}      & SELECT  & \textit{SUBS}  \\
+\multicolumn{2}{|c|}{\textit{OPEN LINE}} & \textit{RESET}   &       \\ \hline
+\end{tabular}
+\end{center}
+\caption{DEC keyboard layout}
+\label{fig:dec-kb}
+\normalsize
+\end{figure}
+
+\subsection{\xlabel{function_keys_on_solaris_and_linux}%
+Function keys on Solaris and Linux}
+\label{function_keys_on_solaris_and_linux}
+
+\textbf{IMPORTANT} \textit{Note that on both Solaris and Linux systems the
+X11 event codes generated by the applications keypad keys are \textbf{NOT} 
+correct for EDT by default! Section~{\ref{xmodmap}} explains how
+to correct this. }
+
+The Sun series 5 keyboards (provided on all Starlink Suns purchased in
+the last few years) and 
+those used on PC--Linux systems are identical in the key groups
+used for JED (the Sun keyboard has an extra function group on the left-hand
+side and other minor differences). The EDT key key layout for these systems
+is shown in Figure~\ref{fig:pc-kb}.
+\begin{figure}[ht]
+\scriptsize
+\begin{center}
+\begin{tabular}{ccc} \hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\multicolumn{1}{|c|}{{Insert}}    &  \multicolumn{1}{|c|}{Home} & 
+\multicolumn{1}{|c|}{Page} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{Up} \\
+\hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\multicolumn{1}{|c|}{Delete}    &  \multicolumn{1}{|c|}{End} & 
+\multicolumn{1}{|c|}{Page} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{Down}
+ \\ \hline
+         &              &        \\ \cline{2-2}
+        & \multicolumn{1}{|c|}{}  & \\
+        & \multicolumn{1}{|c|}{UP}  & \\
+        & \multicolumn{1}{|c|}{}  & \\ \hline
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\multicolumn{1}{|c|}{LEFT}    &  \multicolumn{1}{|c|}{DOWN} & 
+\multicolumn{1}{|c|}{RIGHT} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} \\
+\hline
+\end{tabular}
+\hspace{5mm}
+\begin{tabular}{|c|c|c|c|} \hline
+Num Lock & /         & *     & -   \\
+GOLD     & HELP      & FNDNXT  & DEL L \\
+         &           & \textit{FIND}    & \textit{UND L} \\ \hline
+7        & 8         & 9       & +     \\
+PAGE     & SECT      & APPEND  &  \\
+\textit{COMMAND}  & \textit{FILL}      & \textit{REPLACE}  & DEL W \\ \cline{1-3}
+4        & 5         & 6       &      \\
+ADVANCE  & BACKUP    & CUT     & \textit{UND W} \\
+\textit{BOTTOM}   & \textit{TOP}       & \textit{PASTE}   &  \\ \hline
+1        & 2         & 3       &       \\
+WORD     & EOL       & CHAR    & ENTER \\
+\textit{CHNGCASE} & \textit{DEL EOL}   & \textit{SPECINS} &       \\ \cline{1-3}
+\multicolumn{2}{|c|}{0}         &~.       &       \\
+\multicolumn{2}{|c|}{LINE}      & SELECT  & \textit{SUBS}  \\
+\multicolumn{2}{|c|}{\textit{OPEN LINE}} & \textit{RESET}   &       \\ \hline
+\end{tabular}
+\end{center}
+\caption{Sun and Linux keyboard layout}
+\label{fig:pc-kb}
+\normalsize
+\end{figure}
+
+\subsection{\xlabel{keyboard_mappings_for_solaris_and_linux}%
+Keyboard mappings for Solaris and Linux keyboards}
+\label{keyboard_mappings_for_solaris_and_linux}
+\label{xmodmap}
+
+JED running in a X--window terminal window expects to receive the key 
+strokes which would be generated on a Digital VT style terminal. This is a two
+stage process -- the user types a key, this generates an X11
+\textit{event} and the terminal emulator (for example, \texttt{xterm})
+receives this and creates the correct key sequence to be sent to the
+application (JED in this case).
+
+The X11 event generated by a key is under the control
+of the X-server. This has a set of defaults which may be changed
+by a user using the program \texttt{xmodmap} (which, of course, may also be
+invoked from a user's \texttt{.login} file). Note, however, that this will
+affect all windows running under a particular server and care should
+be taken to avoid unexpected behaviour of other programs which read
+the keyboard.
+
+For JED/EDT the default X11-events for the Solaris and Linux keyboards
+are not correct and \texttt{xmodmap} must be used \underline{\textbf{before
+starting the editor}}. If JED is accidently started with the wrong
+keymap the key sequence \verb|^Ke| (\texttt{Ctrl+k} simultaneously followed
+by the \texttt{e} key) will exit.
+\label{jed-lib}
+
+Sample \texttt{xmodmap} files suitable for JED/EDT are included in the
+\textit{JED library directory}. This is \texttt{/usr/local/jed/lib} for
+Solaris and Digital Unix or \texttt{/usr/lib/jed/lib} for Linux PCs.
+These files are called \texttt{solaris-keymap} and
+\texttt{linux-keymap} respectively. The appropriate file can be used as
+in the following example or copied to a local file and edited as
+required.
+
+\begin{quote}
+\begin{verbatim}
+xmodmap /usr/local/jed/lib/solaris-keymap
+\end{verbatim}
+\end{quote}
+
+This mapping may also prove useful in remote logins to VMS systems
+where considerable functionality is bound to the applications keys.
+
+The exact procedure to derive a key re-mapping file is described in
+Appendix~{\ref{kb-remap}}. This allows any
+key to be assigned to any function. For example the top row of VT keys 
+(\texttt{GOLD} \textit{etc.}) could be assigned  to a function key group --
+say (\texttt{F9->F12}) -- rather than using the 
+``\texttt{Num Lock}'' row.
+
+Note that the Sun and PC keyboards have only \textbf{one} key (labelled
+\texttt{+}) where VT keyboards have two (labelled \texttt{-} and
+\texttt{'}). This will default to the EDT
+functions \texttt{DEL~W} and \texttt{UDEL~W} which delete and un-delete
+words in the current direction. To change this to the character
+functions \texttt{DEL/UDEL~C} this key can either be re-mapped to
+\texttt{KP\_Separator} X11 \textit{event} in the appropriate 
+\texttt{xmodmap} file or
+the system default file \texttt{jed.rc} (Section~{\ref{default-jedrc}})
+contains JED commands which, if uncommented, will change the default.
+
+\section{\xlabel{starting_jed}Starting JED}
+\label{starting_jed}
+
+\subsection{\xlabel{command_line_arguments}Command line arguments}
+\label{command_line_arguments}
+\label{cl-switches}
+
+JED is normally just invoked by typing \texttt{jed <file name(s)>} to
+the shell prompt. There are a number of optional switches which may
+also be set. Some of the more useful are: 
+\begin{center}
+\begin{tabular}{lll}
+\texttt{-lsmode} & process following file names in language sensitive mode & (b)\\
+\texttt{-tmode} & process following file names in \textit{Text} mode & (b)\\
+\texttt{-g} \textit{n} & go to line number \textit{n} & (a)\\
+\texttt{-s} \textit{string} & search for string & (a)\\
+%\texttt{-t} & sets TAB to 0 so tabs show as {\verb+^I+}\\
+\texttt{-2} & split window & (a)\\
+\texttt{-ftabs} & \textit{Text mode only} - tabs stops set at columns 7,10,13\ldots & (e)\\
+\end{tabular}
+\end{center}
+
+In the table above the position of switches is indicated by the letters 
+\textit{b} for before a file name, \textit{a} for after and \textit{e} for
+either.
+
+For example to load file \texttt{prog.f} into one window with the cursor at
+line number 123, and then load \texttt{prog.lis} into the second window
+positioned at the first occurrence of the string \textit{myfunc} you could
+use:
+\begin{quote}
+\begin{verbatim}
+% jed prog.f -g 123 -2 prog.lis -s myfunc
+\end{verbatim}
+\end{quote}
+
+\subsection{\xlabel{jed_initialisation_file}JED initialisation file}
+\label{jed_initialisation_file}
+
+The JED emulation mode is normally set within the initialisation file
+\texttt{.jedrc} in the user's home directory. For convenience Starlink
+supplied versions of JED use a system-wide default file to start up in EDT
+mode if this local initialisation file is \textbf{not} present.
+Alternative JED emulation modes
+or an number of options within Starlink JED (for example various
+aspects of the editor status line, the editing defaults in
+Section~{\ref{gold-m}} or whether JED \textit{blinks} between
+parentheses to show a matching pair) may be changed by creating a
+local file. The default Starlink EDT file is called
+\label{default-jedrc}
+\texttt{jed.rc} in the JED library directory (see
+Section~{\ref{jed-lib}}) and this may be copied to the local file
+\texttt{\$HOME/.jedrc} and edited.
+
+This file differs from the \texttt{jed.rc} file in a standard JED
+distribution (which starts JED in \textit{emacs} emulation mode). The
+default JED file has been renamed to \texttt{jed.rc.dist}  -- also in
+the JED library directory. 
+
+\subsection{\xlabel{backup_and_auto-save_files}Back-up and Auto-save files}
+\label{backup_and_auto-save_files}
+
+If a new file is created with the same name as one that already exists
+(for example when exiting), JED will rename the original file by
+appending a $\sim$ to its name so that the original contents are
+preserved. In addition, while editing is in progress JED saves the
+contents of each buffer in a disc file after every 300 changes (which may
+be every 300 keystrokes if you are simply entering text). These auto-save
+files, which have names of the form {\tt
+\#}{\em filename}\texttt{\#}, are deleted when JED exits
+normally, but may be useful in the event of a crash.
+
+If, on startup, JED finds a auto-save file which is newer than the file being
+edited it will suggest recovery. This is performed by entering
+\texttt{recover\_file} to the \texttt{S--Lang>} prompt (obtained by
+\texttt{GOLD 7} in EDT).
+
+\section{\xlabel{starlink_edt_mode}Starlink EDT mode}
+\label{starlink_edt_mode}
+
+\subsection{\xlabel{edt_basics}EDT basics}
+\label{edt_basics}
+
+This section mainly covers the  differences between VMS/EDT and
+JED/EDT\@. Firstly, however, here is a brief reminder about two important EDT 
+concepts:
+\begin{itemize}
+\item The editor has the concept of direction for some operations and
+this is shown in the status bar. \textit{Advance} is forward along a
+line and towards the end of the buffer while \textit{Backup} is towards the
+beginning of the buffer.
+
+\item The most important EDT key is the one designated as \texttt{GOLD} on
+the applications keypad. This both functions as a repeat count
+(\texttt{GOLD <repeat count> <function>}) and as a 
+\textit{shift} key where an alternate function (shown lower and in italics in
+Figures~{\ref{fig:dec-kb}}~and~\ref{fig:pc-kb}) is selected by typing
+\texttt{GOLD} followed by the key. In Starlink JED/EDT other editing
+functions are available by typing \texttt{GOLD} followed by letter keys in 
+the main keyboard group. To cancel \texttt{GOLD} press the key again.
+
+\end{itemize}
+
+\subsection{\xlabel{status_line}Status Line}
+\label{status_line}
+
+Like VMS/EDT JED/EDT has a status line in inverse video at the foot of
+each buffer (editing window). The format of this line is, however,
+somewhat different for JED/EDT and shows the status flags, the JED
+version number, the file or buffer name, the current line-number, the
+editing position in the file, the current editing direction and the
+time.  The status flags start as a set of hyphens: the meaning of other
+symbols that may appear there is as follows:
+
+\begin{center}
+\begin{tabular}{cl}
+\texttt{**}   & this buffer has been modified \\
+\texttt{\%\%} & this buffer is read-only \\
+\texttt{m}    & a mark has been set \\
+\texttt{d}    & disc file has been updated since the buffer was created \\
+\texttt{+}    & the undo facility is enabled for this buffer. \\
+\end{tabular}
+\end{center}
+
+Several options in the JED startup file \texttt{.jedrc} control aspects of
+this status line. These include whether the time is included
+and the exact format of the display of the editing position within the buffer
+(this can be one of percentage, line number or line number and column position). 
+See comments within the system default initialisation file
+(Section~{\ref{default-jedrc}}) for more details.
+
+\subsection{\xlabel{jed/edt_notes}JED/EDT notes}
+\label{jed/edt_notes}
+
+Features of the Starlink JED EDT emulation (henceforth often
+just called EDT) include a reasonably good emulation of VMS/EDT on
+Unix systems together with a few extra facilities such as
+cut-and-paste of rectangular regions, unlimited undo, horizontal
+scroll, and display of two or more windows.
+
+A few differences from the VMS EDT editor are worth noting:-
+
+\begin{itemize}
+
+\item JED only emulates the keypad-and-screen mode of EDT: various GOLD--key
+sequences have been defined (as described below) to make other functions
+available.
+
+\item The normal \textit{carriage return} key will auto-indent the next
+line. The \texttt{ENTER} key on the \textit{applications keypad} will
+produce a ``hard return'' to column 1.
+
+\item Text being entered will automatically wrap at the column set by the
+JED \textit{WRAP} variable. The \textit{S--Lang} command
+\texttt{toggle\_wrap} will toggle the text wrap state for an individual
+buffer. Typing long lines is possible and a \verb|$| character will
+indicate when a line is too long for the screen.
+
+\item The \textit{abort} key in JED is control/G which will abort the
+current \textit{S--Lang} procedure or operation.
+
+\item To exit from JED use \texttt{GOLD E} (because as usual with Unix
+control/Z just suspends the process).  Alternatively use \texttt{GOLD Q}
+(for quit), or press the DO key (or GOLD followed by the keypad 7 key)
+to bring up the \texttt{S--Lang>} prompt and enter either \texttt{exit} or
+\texttt{quit}.  These all do the same thing.  If any buffer has been
+modified JED asks you whether to re-write it to disc.
+
+\item The HELP key just shows a keypad diagram together with a brief
+listing of the additional GOLD--key assignments.
+
+\item The FILL function (\texttt{GOLD 8}) fills the current paragraph and does
+\textbf{not} require a mark to be set.  See Section~{\ref{gold-n}} for 
+further details.
+
+\item The function to enter special characters, SPECINS or \texttt{GOLD 3},
+is slightly simpler than with EDT: it prompts for the decimal value of
+the ASCII character required.
+
+\item The EDT function \textit{substitute} (\texttt{SUBS = GOLD Enter}) is
+by default bound to an \textit{S--Lang} function \texttt{replace\_cmd}. If an
+more accurate emulation of the (rather less obvious) functionality in VMS EDT
+is desired this can be rebound to \texttt{edt\_subs} in the \texttt{.jedrc}
+file (see Section~{\ref{default-jedrc}}).
+
+\end{itemize}
+
+\subsection{\xlabel{additional_goldkey_sequences}Additional GOLD-key sequences}
+\label{additional_goldkey_sequences}
+
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+Key-seq. & Effect \\
+\hline
+\texttt{GOLD A} & ASCII codes of the next 10 characters are shown\\
+\texttt{GOLD B} & Buffer/window options\ldots (see section~\ref{buff-ops}) \\
+\texttt{GOLD C} & Centres current line using the \texttt{WRAP} value \\
+\texttt{GOLD D} & Date inserted at current position (and date/time shown in mini-buffer)\\
+\texttt{GOLD E} & Exits - if any buffers modified asks whether to update disc file \\
+\texttt{GOLD F} & Finds string at start of line (prompts for string) \\
+\texttt{GOLD G} & Global search and replace (prompts for both strings) \\
+\texttt{GOLD I} & Inserts file at current position (prompts for name) \\
+\texttt{GOLD K} & Prompts for string: moves lines containing this to another
+buffer \\
+\texttt{GOLD L} & Goes to specified line-number (prompts for number) \\
+\texttt{GOLD M} & Mode settings displayed and can be altered (see section~\ref{gold-m}) \\
+\texttt{GOLD N} & Narrows (centres) current paragraph (see section~\ref{gold-n}) \\
+\texttt{GOLD O} & Occurrences of string listed with line-numbers (prompts for string)\\
+\texttt{GOLD Q} & Quits -- same as exit. \\
+\texttt{GOLD R} & Rectangular cut/paste options\ldots (see section~\ref{gold-r}) \\
+\texttt{GOLD S} & Spawns command to operating system (some restrictions) \\ 
+\texttt{GOLD T} & Toggles terminal width 80/132 columns, adjusts \texttt{WRAP} value\\
+\texttt{GOLD U} & Undo - restores buffer state undoing preceding changes one by one\\
+\texttt{GOLD W} & Writes current buffer to file (prompts for name) \\
+\texttt{GOLD X} & Exchanges position of mark and current position \\
+\texttt{GOLD} \textit{space}   & Shows current position and mode settings \\
+\texttt{GOLD /} & Toggle insert/overwrite text flag for buffer \\
+\texttt{GOLD $\downarrow$}  & Selects the next window as the active one\\
+\texttt{GOLD $\uparrow$  }  & Expands current window by one line \\
+\texttt{GOLD $\rightarrow$} & Scrolls screen right by half its width \\
+\texttt{GOLD $\leftarrow$ } & Scrolls screen back to the left by half its width \\
+\texttt{GOLD GOLD}          & Toggles keypad application/numeric modes.\\
+\hline
+\end{tabular}
+\end{center}
+
+
+\subsection{\xlabel{gold_b_-_using_multiple_buffers_and_windows}%
+GOLD B - Using Multiple Buffers and Windows}
+\label{gold_b_-_using_multiple_buffers_and_windows}
+\label{buff-ops}
+
+JED can handle two or more windows at once, and display in them either
+different parts of the same file or two or more different files.  You
+can cut and paste from one window to another. The {\tt
+GOLD B} key prompts for a number of options.
+
+\begin{center}
+\begin{tabular}{|ll|}
+\hline
+Key-sequence & Buffer/window action \\
+\hline
+\texttt{GOLD B 2} & Splits current window into two.\\
+\texttt{GOLD B 1} & Restores single window (the current one).\\
+\texttt{GOLD B G} & Gets a file into the current buffer (prompts for name).\\
+\texttt{GOLD B L} & Lists all existing buffers.\\
+\texttt{GOLD B S} & Selects a buffer by name (prompts for it).\\
+\hline
+\end{tabular}
+\end{center}
+Whenever JED prompts for a file-name you can enter a partial name and
+press the TAB key to get JED to complete it.  If the name is not unique
+then press the space-bar at least twice to cycle among them.
+
+\texttt{GOLD} down-arrow selects the next window in turn as the active one,
+while \texttt{GOLD} up-arrow expands the current window by one line.
+
+\subsection{\xlabel{gold_u_-_undo}GOLD U - Undo}
+\label{gold_u_-_undo}
+
+A powerful undo facility is provided using \texttt{GOLD U} (also mapped to
+F14 on a VT terminal).  JED keeps
+track of buffer modifications and undoes the changes one by one when you
+press the UNDO key.  This can be used to reverse complex changes such as
+\emph{fill} or \emph{sort}.
+
+\subsection{\xlabel{modes_and_customizing}Gold M - Modes and Customizing}
+\label{modes_and_customizing}
+\label{gold-m}
+
+Several built-in JED variables control aspects of its editing
+interface and behaviour. A useful subset of these may be changed 
+using the \texttt{GOLD M} command while the default initial values 
+of both these and less commonly changed variables may be set in a local
+\texttt{.jedrc} file (Section~{\ref{default-jedrc}}). In addition
+all variables may be altered interactively by commands to the
+\texttt{S--Lang>} prompt (\texttt{GOLD 7}).
+
+Note that \textit{S--Lang} requires space separated commands
+and operators with a semi-colon terminator. As an example \texttt{WRAP=0} 
+is incorrect while the correct syntax is \texttt{WRAP = 0;}. 
+
+\texttt{WRAP\_INDENTS} is 0 by default.  If set to 1, when the editor
+automatically wraps text it will indent.
+
+\texttt{CASE\_SEARCH} is 1 by default, giving case-sensitive searches.  
+If set to 0 all searches become case-insensitive.
+
+\texttt{TAB} determines how tab characters in the text are displayed on
+the screen and also the action of the \texttt{TAB} key on the keyboard. 
+JED converts the tab characters into \texttt{TAB} spaces.
+The default TAB value is 8, which corresponds to the
+way most VT terminals are set up.
+
+\texttt{WRAP} specifies the right-hand margin for text entry, filling, and
+centring text. When you enter text which crosses the \texttt{WRAP} boundary
+and press the space bar the excess words are moved to the following line.
+The default \texttt{WRAP} value is 75.  To avoid the temporary disappearance
+of text when you are typing continuously it is advisable to choose a
+value slightly smaller than the physical screen width. The \texttt{WRAP}
+value is adjusted when the screen-width is changed using \texttt{GOLD T}.
+
+To \textbf{toggle} the \textit{wrap flag} for a buffer type
+\texttt{toggle\_wrap} at the \texttt{S--Lang>} prompt (\texttt{GOLD 7}).
+
+The tab characters in a file may be converted to the appropriate set of
+spaces using the current value of \texttt{TAB} by selecting a range of text,
+pressing the \texttt{GOLD 7 or DO} key, and then entering the 
+\texttt{untab} command.
+
+\subsection{Gold N - Paragraph Fill and Centre\xlabel{paragraph_fill_and_centre}}
+\label{gold-n}
+
+Text formatting operations work differently from those in EDT\@. The
+FILL command (\texttt{GOLD 8}) fills the current paragraph, and does
+\textit{not}\/use the selected range.  A paragraph is defined as any set
+of lines ending with a blank line (or a line starting with either
+\texttt{\%} or \verb+\+ to assist in filling Latex files). If the first
+line of the paragraph was inset from the left-hand margin the whole
+paragraph is indented by the same amount.  The \texttt{WRAP} value
+defines the maximum line-length.
+
+To centre the current line use \texttt{GOLD C}, while \texttt{GOLD N} centres
+the current paragraph, with margins set by the indentation of the first
+line.  In both cases the centre is half the \texttt{WRAP} value.
+
+\subsection{GOLD R - Rectangular Column Cut/Paste
+\xlabel{rectangular_column_cutpaste}}
+\label{gold-r}
+
+The default JED highlighting is distracting and incorrect for rectangular 
+editing so typing \texttt{GOLD R} \textbf{before} the select key will
+temporarily turn this off.
+
+Then define the rectangle by pressing the key-pad dot (or the
+\texttt{SELECT} key) at one corner and move the cursor to the opposite
+corner.  Then \texttt{GOLD R C} will copy the rectangle to a buffer, or
+\texttt{GOLD R D} delete it, \emph{i.e.},\/move it to a buffer.  A
+subsequent \texttt{GOLD R I} will insert the saved rectangle at the
+current point.  Other options are \texttt{GOLD R B} to blank rectangle
+(overwrite with spaces), or \texttt{GOLD R S} to shift text over by
+inserting a blank rectangle of the size specified.
+
+\subsection{Sorting Lines\xlabel{sorting_lines}}
+
+JED can sort a series of lines into ascending order using the ASCII
+collating sequence.  First select the rectangle containing the sort keys
+(press SELECT at one corner and move to the other corner), then press the
+DO key and at the prompt enter the \texttt{sort} command. Sorting is done by
+interpreted code and is rather slow for regions of more than a few
+hundred lines.
+
+\section{\xlabel{language_sensitive_editing}Language sensitive editing}
+\label{language_sensitive_editing}
+
+JED is distributed with a large collection of language sensitive editing 
+\textit{S--Lang} files in its library directory (see
+Section~{\ref{jed-lib}}). These include conventional programming
+languages such as C and FORTRAN together with other \textit{languages}
+such as \TeX, and IDL\@. JED can select these automatically based on the
+file extension. These files can alter key behaviour (for example in
+the ``\textit{C mode}'' the editor automatically indents and
+un-indents on the \verb+{+ and \verb+}+ characters respectively)
+and can also be programmed to recognise language specific keywords and
+constructs.
+
+This document cannot describe all these variants of language sensitive
+editing behaviour and, in addition, none of these were supported by the
+previous Starlink release of JED\@. This release will also, by default,
+edit all files in \textit{Text} mode. The current editing mode is
+indicated in the buffer status line.
+
+For more advanced users comments in the system \textit{jed.rc} file describe 
+how to re-enable JED's automatic selection of language sensitive editing. 
+This may also be invoked manually
+using the \texttt{-lsmode} switch described
+in Section~{\ref{cl-switches}}. As a final alternative typing a mode 
+selection command to the \texttt{S--Lang>}
+prompt (for example, \texttt{fortran\_mode} or \texttt{text\_mode}) will also 
+change the editing mode of the current buffer.
+
+Documentation on some language sensitive editing modes may be obtained by
+typing the \textit{S--Lang} command \texttt{describe\_mode}.
+Alternatively the \textit{S--Lang} source files should be consulted.
+\newpage
+\section{JED Copyright\xlabel{copyright}}
+\label{jed-cr}
+The JED author's copyright notice is reproduced here.
+\begin{quote}
+ Copyright (c) 1992, 1995 John E. Davis
+ All rights reserved.
+
+ This program is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by the Free
+ Software Foundation; either version 2 of the License, or (at your option)
+ any later version.
+
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE\@.  See the GNU General Public License for
+ more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc., 675
+ Mass Ave, Cambridge, MA 02139, USA. 
+\end{quote}
+
+\newpage
+\appendix
+\section{\xlabel{x11_keyboard_mapping}X11 keyboard mapping}
+\label{x11_keyboard_mapping}
+\label{kb-remap}
+
+On all X11 systems the \textit{X11 event} corresponding to a particular
+keyboard key is under the control of the X-server software. On Solaris
+and Linux systems the default key-mappings for the applications keyboard
+are not appropriate for JED/EDT.
+
+To derive a new mapping file:
+\begin{itemize}
+
+\item Find the X-11 key-code for all the desired keys using the \texttt{xev}
+program. On most systems this is standard X11 software but on Solaris
+it is located in directory \texttt{/usr/openwin/demo}.
+
+For example the default \texttt{Num Lock} key under Linux produces the
+following \texttt{xev} output.
+\begin{verbatim}
+KeyPress event, serial 18, synthetic NO, window 0x2400001,
+    root 0x2a, subw 0x0, time 1681183101, (77,108), root:(83,132),
+    state 0x0, keycode 77 (keysym 0xff7f, Num_Lock), same_screen YES,
+    XLookupString gives 0 characters:  ""
+\end{verbatim}
+
+This shows that the X-server assigned keycode of this key is 77 and that the 
+current mapping for this key is to the keyboard event \textit{Num Lock}.
+
+\item Generate an input file for \texttt{xmodmap} which includes the following
+X-events -- KP\_F1 to KP\_F4 for \texttt{GOLD} and the other three keys in
+this row, KP\_0 to KP\_9 for the numeric keys, KP\_Separator for the 
+\texttt{,} key, 
+KP\_Decimal for the \texttt{.} key and KP\_Add for the \texttt{+} key.
+
+Part of an \texttt{xmodmap} input file (from RedHat Linux 5.1) is:
+\begin{verbatim}
+!
+! 'Num Lock' row
+!
+keycode 77  = KP_F1
+keycode 112 = KP_F2
+keycode 63  = KP_F3
+keycode 82  = KP_F4
+\end{verbatim}
+
+\end{itemize}
+
+\end{document}

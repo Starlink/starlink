@@ -1,0 +1,406 @@
+\chapter{HDS/NDF --- The Data System}
+\label{C_HDS}
+\markboth{Users}{\stardocname}
+
+\section{HDS --- Hierarchical data system}
+\label{S_HDS}
+
+HDS --- the Hierarchical Data System --- is one of the most powerful features of
+ADAM.
+It is implemented as a set of subroutines which are of much more interest to
+the programmer than the user of the programs.
+Nevertheless, as a user it is necessary for you to know something of the
+system in order to make the best use of your data.
+HDS is about storing astronomical data in a compact, flexible and efficient
+way.
+It recognises that observations are often complex --- possibly consisting of a
+data array (in 1, 2, 3, or even more dimensions), together with variable
+amounts of ancillary data --- calibrations, errors, telescope and instrument 
+information, observing conditions, and so on.
+The way HDS handles this complexity bears some similarities to the way VMS
+handles directories and files. 
+
+\begin{figure}[htb]
+\begin{center}
+\begin{picture}(150,85)
+\thicklines
+\put (20,70){\framebox(30,5){SYSTEM}}
+\put (0,55){\framebox(30,5){ACCOUNT}}
+\put (40,55){\framebox(30,5){ACCOUNT}}
+\put (40,45){\framebox(30,5){Directory}}
+\put (20,30){\framebox(30,5){File}}
+\put (60,30){\framebox(30,5){File}}
+\put (100,30){\framebox(30,5){Container File}}
+\put (100,20){\framebox(30,5){Object}}
+\put (80,5){\framebox(30,5){Object}}
+\put (120,5){\framebox(30,5){Object}}
+\put (15,65){\vector(0,-1){5}}
+\put (55,65){\vector(0,-1){5}}
+\put (55,55){\vector(0,-1){5}}
+\put (35,40){\vector(0,-1){5}}
+\put (75,40){\vector(0,-1){5}}
+\put (115,30){\vector(0,-1){5}}
+\put (95,15){\vector(0,-1){5}}
+\put (135,15){\vector(0,-1){5}}
+\put (90,32.5){\vector(1,0){10}}
+\put (100,32.5){\vector(-1,0){10}}
+\put (35,70){\line(0,-1){5}}
+\put (55,45){\line(0,-1){5}}
+\put (115,20){\line(0,-1){5}}
+\put (15,65){\line(1,0){40}}
+\put (35,40){\line(1,0){40}}
+\put (95,15){\line(1,0){40}}
+\put (15,55){\line(0,-1){1}}
+\put (15,53){\line(0,-1){1}}
+\put (15,51){\line(0,-1){1}}
+\put (20,80){\bf VMS File System}
+\put (110,55){\bf HDS}
+\thinlines
+\multiput(65,1)(2,0){46}{\line(1,0){1}}
+\multiput(157,1)(0,2){24}{\line(0,1){1}}
+\multiput(157,49)(-2,0){31}{\line(-1,0){1}}
+\multiput(95,49)(0,-2){14}{\line(0,-1){1}}
+\multiput(95,21)(-2,0){15}{\line(-1,0){1}}
+\multiput(65,21)(0,-2){10}{\line(0,-1){1}}
+\end{picture}
+\caption{The relationship between VMS and HDS.}
+\label{HDS_rel}
+\end{center}
+\end{figure}
+
+\subsection{Data objects}
+\label{S_datobj}
+
+HDS files are known as {\em container files} and by default have the extension
+`.SDF'.
+They contain {\em data objects} which will be referred to simply as
+{\em objects} when the context makes clear what sort of object it is.
+An object is an entity which contains data or other objects.
+This is the basis of the hierarchical nature of HDS and is analogous to the
+VMS concepts of {\em file} and {\em directory} --- a directory can contain files
+and directories which can themselves contain files and directories and so
+on (Figure~\ref{HDS_rel}).
+An object possesses the following attributes:
+\begin{itemize}
+\item Name
+\item Type
+\item Shape
+\item State
+\item Group
+\item Value
+\end{itemize}
+HDS allows great freedom in specifying names and types, but standards have been
+laid down (see Section~\ref{S_NDF}) to encourage portability of data and
+applications.
+
+\paragraph{Name:}\hfill
+
+An object is identified by its {\em name}.
+This must be unique within its own container object.
+This is in contrast to VMS where different files in the same directory may be
+distinguished by their version numbers.
+A name is written as a character string containing any printing characters.
+Spaces, tabs and so on are ignored and alphabetic characters are capitalised.
+There are no special rules governing the first character (i.e.\ it can be
+numeric).
+
+When referring to components of objects, the following syntax is used:
+
+\begin{small}
+\begin{verbatim}
+    A.B.C...
+\end{verbatim}
+\end{small}
+
+where C is a component of B, and B is a component of A, which is the top-level
+object in the container file. 
+Some specific examples of names are given at the end of this section.
+
+\paragraph{Type:}\hfill
+
+The {\em type} of an object falls into one of two {\em classes}:
+\begin{itemize}
+\item Primitive
+\item Structure
+\end{itemize}
+Structure objects contain other objects called {\em components}.
+Primitive objects contain only numeric, character, or logical values.
+Objects in the different classes will be referred to simply as {\em structures}
+and {\em primitives}, while the more general term {\em object} will refer to
+either a {\em structure} or a {\em primitive}.
+Structures are analogous to VMS directories --- they can contain a part of the
+hierarchy below them.
+Primitives are analogous to VMS files --- they are at the bottom of any branch
+of the structure.
+
+The primitive types defined in HDS are shown in Table~\ref{HDS_Types}.
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+{\em HDS Type} & {\em VAX Fortran Type} & {\em Length in Bits}\\
+\hline
+\_INTEGER & INTEGER & 32\\
+\_REAL & REAL & 32\\
+\_DOUBLE & DOUBLE PRECISION & 64\\
+\_LOGICAL & LOGICAL & 32\\
+\_CHAR[\raisebox{-0.6ex}{\rm*}N] & CHARACTER\raisebox{-0.6ex}{\rm*}N & 8\raisebox{-0.6ex}{\rm*}N\\
+\hline
+\_UBYTE & BYTE & 8\\
+\_BYTE & BYTE & 8\\
+\_UWORD & INTEGER\raisebox{-0.6ex}{\rm*}2 & 16\\
+\_WORD & INTEGER\raisebox{-0.6ex}{\rm*}2 & 16\\
+\hline
+\end{tabular}
+\caption{The HDS primitive data types.}
+\label{HDS_Types}
+\end{center}
+\end{table}
+
+The first five of these types are referred to as {\em standard data types}.
+The \_UBYTE type provides a value range of 0 to 255; the \_UWORD type provides a
+value range of 0 to 65535.
+The others are as for Fortran 77.
+Examples of structure types are IMAGE, SPECTRUM, INSTR\_RESP {\em etc.}
+Their names don't begin with an underscore, so the system and the programmer can
+easily distinguish between primitives and structures.
+A {\em type} is written as a character string with the same rules as for
+{\em name}, except that an asterisk can only appear if the first character is an
+underscore (i.e.\ it is a primitive), and also a type can be blank.
+
+\paragraph{Shape:}\hfill
+
+Every object has a {\em shape} or dimensionality.
+This is described by an integer (the number of dimensions) and an integer array
+(the size of each dimension).
+A {\em scalar}, for example a single number, has by convention a dimensionality
+of zero, i.e.\ number of dimensions is 0.
+A {\em vector} has a dimensionality of 1, i.e.\ number of dimensions is 1 and
+the first element of the dimension array contains the size of the vector.
+An {\em array} refers to an object with 2 or more dimensions; currently a
+maximum of 7 dimensions are allowed.
+Objects may be referred to as {\em scalar primitives} or
+{\em vector structures} and so on.
+
+\paragraph{State:}\hfill
+
+The {\em state} of an object specifies whether or not its value is defined.
+In routines it is represented as a LOGICAL variable where .TRUE. means defined
+and .FALSE. means undefined.
+
+\paragraph{Group:}\hfill
+
+In order to access an object, it is first necessary to obtain a {\em locator\/},
+a sort of pointer which can then be used to address the object.
+When the program no longer needs to access the object, the locator should be
+{\em annulled}.
+A locator is analogous to a Fortran logical unit number (but is actually a
+character variable, not an integer).
+Any number of locators can be active simultaneously.
+The {\em group} attribute is used to form an association between locators so
+that they can be annulled together.
+A group is written as a character string whose rules of formation are the same
+as for {\em name}.
+
+\paragraph{Value:}\hfill
+
+When an object is first created it contains no value, somewhat like 
+an empty file.
+It must be given a value in a separate operation.
+A value can be a scalar, vector, or an array.
+The scalar or the elements of the vector or array must all be of the same
+type and can be primitives or structures.
+The rules for handling character values are the same as for Fortran 77, i.e.\
+character values are padded with blanks or truncated from the right depending on
+the relative length of the program value and the object.
+
+\paragraph{Illustration:}\hfill
+
+To fix ideas, look at the example of an NDF data structure in Figure 8.2.
+The following notation is used to describe each object:
+
+\begin{small}
+\begin{verbatim}
+                      NAME(dimensions)  TYPE  VALUE
+\end{verbatim}
+\end{small}
+
+where `\verb+(dimensions)+' only appears when describing vectors or arrays.
+Each level down the hierarchy is indented.
+
+Suppose an object with this structure were stored in a (container) file called
+EXAMPLE.SDF, then we can refer to components of this object by names such as:
+
+\begin{small}
+\begin{verbatim}
+      EXAMPLE.DATA_ARRAY            an array of type _REAL
+      EXAMPLE.QUALITY.BADBITS       an unsigned scalar of type _BYTE
+      EXAMPLE.MORE.FIGARO.TIME      a scalar of type _REAL
+\end{verbatim}
+\end{small}
+
+and so on.
+
+\section {NDF --- Extensible n-dimensional data format}
+\label{S_NDF}
+\markboth{Users}{\stardocname}
+
+A major preoccupation of Starlink since its inception has been to design a data
+storage format which is both standard and yet which can accommodate most of
+the things which one might wish to store.
+(This is a weak point with most software environments in astronomical use at
+present.)
+One of the practical problems with unfettered HDS is that it is {\em too\/}
+flexible.
+The solution adopted, NDF (Extensible $N$-dimensional-Data Format), provides
+a more limited set of designs, but still implemented using HDS.
+It is described in awesome detail in \xref{SGP/38}{sgp38}{}.
+
+In essence, NDF defines a set of standard data objects.
+Not all of them must be present in an NDF object, but no others will be
+processed.
+Non-standard items are handled in a standard way by using self-contained
+{\em extensions}.
+There are defined locations for items such as the main data array, axes, title,
+units {\em etc.} 
+The only mandatory item is the main data array; all other items are optional! 
+
+All this means that the {\em user} can be certain that no properly written
+application will mess up his data, and there is a very good chance 
+that all the useful information will be properly used.
+(For the {\em programmer}, the huge advantage of this system is that he
+doesn't need to know the details of the format at all!
+A comprehensive set of routines is available to access the standard components
+of an NDF.
+These are described in Section~\ref{R_NDF} and (more fully) in
+\xref{SUN/33}{sun33}{}.)
+
+\subsection{The structure of an NDF object}
+\label{S_ndfstruc}
+\markboth{Users}{\stardocname}
+
+ADAM\_EXAMPLES:EXAMPLE.SDF is file containing an NDF object which contains all
+the standard NDF components and also has a Figaro extension.
+Such a file is often referred to as an `NDF file', or even as just an `NDF'.
+The structure of the file, as revealed by:
+
+\begin{small}
+\begin{verbatim}
+   ICL > TRACE ADAM_EXAMPLES:EXAMPLE
+\end{verbatim}
+\end{small}
+
+is shown in Figure 8.2.
+
+\begin{quote}
+
+\begin{small}
+\begin{verbatim}
+
+EXAMPLE  <NDF>
+
+   DATA_ARRAY(856)  <_REAL>       *,0.2284551,-2.040089,
+                                  ... 820.8976,570.0729,*,449.574
+   TITLE          <_CHAR*30>      'HR6259 - AAT fibre data'
+   LABEL          <_CHAR*20>      'Flux'
+   UNITS          <_CHAR*20>      'Counts/s'
+   QUALITY        <QUALITY>       {structure}
+      BADBITS        <_UBYTE>        1
+      QUALITY(856)   <_UBYTE>        1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,
+                                     ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0
+
+   VARIANCE(856)  <_REAL>         2.1,0.1713413,1.5301,34.38378,42.35531,
+                                  ... 615.6732,427.5547,353.9127,337.1805
+   AXIS(1)        <AXIS>          {structure}
+
+   Contents of AXIS(1)
+      DATA_ARRAY(856)  <_REAL>       3847.142,3847.672,3848.201,3848.731,
+                                     ... 4298.309,4298.838,4299.368,4299.897
+      LABEL          <_CHAR*20>      'Wavelength'
+      UNITS          <_CHAR*20>      'Angstroms'
+
+   HISTORY        <HISTORY>       {structure}
+      CREATED        <_CHAR*30>      '1990-DEC-12 08:21:02.324'
+      CURRENT_RECORD  <_INTEGER>     3
+      RECORDS(10)    <HIST_REC>      {array of structures}
+
+      Contents of RECORDS(1)
+         TEXT           <_CHAR*40>      'Extracted spectrum from fibre data.'
+         DATE           <_CHAR*25>      '1990-DEC-19 08:43:03.08'
+         COMMAND        <_CHAR*30>      'FIGARO V2.4 FINDSP command'
+
+
+   MORE           <EXT>           {structure}
+      FIGARO         <EXT>           {structure}
+         TIME           <_REAL>         1275
+         SECZ           <_REAL>         2.13
+\end{verbatim}
+\end{small}
+
+\end{quote}
+\begin{center}
+Figure 8.2: An example of the internal structure of an NDF file.
+\end{center}
+Of course, this is only an example format.
+There are various ways of representing some of the components. 
+These {\sl variants\/} are described in \xref{SGP/38}{sgp38}{}.
+
+The components of an NDF are described below.
+The names (in bold type) are significant as they are used by the NDF 
+access routines to identify the components.
+
+\begin{quote}
+\begin{description}
+
+\item[{\bf DATA\_ARRAY}] --- the main data array is the only component which
+ {\em must} be present in an NDF. 
+ In the case of EXAMPLE.SDF, this component is a 1-d real array with 856
+ elements.
+\item[{\bf TITLE}] --- the  character string {\tt'HR6259 - AAT fibre data'}
+ describes the contents of the NDF.
+ The TITLE might be used as the title of a graph {\it etc.}
+\item[{\bf LABEL}] --- the character string {\tt'Flux'} describes the
+ quantity represented in the NDF's main data array.
+ The LABEL is intended for use on the axes of graphs {\it etc.}
+\item[{\bf UNITS}] --- this character string describes the physical units of
+ the quantity stored in the main data array, in this case, {\tt'Counts/s'}.
+\item[{\bf QUALITY}] --- this component is used to indicate the quality of
+ each element in the main data array.
+ The quality structure contains a quality array and a BADBITS value, both of
+ which {\sl must\/} be of type \_UBYTE.
+ The quality array has the same shape and size as the main data array, and is
+ used in conjunction with the BADBITS value to decide the quality of a pixel
+ in the main data array.
+ In the example the BADBITS component has value 1.
+ QUALITY normally works by taking the {\em bit-wise AND} of BADBITS with
+ each element of the QUALITY array.
+ Thus, an odd value in the QUALITY array indicates a bad value, while an even
+ value identifies a good pixel. 
+\item[{\bf VARIANCE}] --- the variance array is the same shape and size as the
+ main data array and contains the errors associated with the individual data
+ values. 
+ These are stored as {\sl variance\/} estimates for each pixel. 
+\item[{\bf AXIS}] --- this structure may contain axis information for any
+ dimension of the NDF's main array.
+ In this case, the main data array is only 1-d, therefore only the AXIS(1) 
+ structure is present.
+ This structure contains the actual axis data array, and also label and units
+ information.
+\item[{\bf HISTORY}] --- this component provides a record of the processing
+ history of the NDF.
+ Only the first of three records is shown in the example.
+ This indicates that the spectrum was extracted from fibre data using the
+ Figaro FINDSP command on 19th December 1990.
+ (Support for the history component is not yet provided by the NDF access 
+ routines.)
+\item[{EXTENSIONs}] --- the purpose of extensions is to store non-standard
+ items.
+ \verb+EXAMPLE.SDF+ began life as an old-style (DST) Figaro file\footnote{The
+ file was converted to an NDF using the CONVERT command DST2NDF.} which
+ contained values for the airmass and exposure time associated with the
+ observations.
+ These are stored in the Figaro extension, and the intention is that the
+ Figaro applications which use these values will know where to find them.
+\end{description}
+\end{quote}

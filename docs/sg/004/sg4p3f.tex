@@ -1,0 +1,1200 @@
+\chapter{The Parameter System}
+\label{C_parsys}
+\markboth{Programmers}{\stardocname}
+
+The Parameter system is a central feature of the ADAM system architecture.
+It is a unifying concept which binds the various ADAM `facilities' together
+and permeates many aspects of ADAM.
+Both users and programmers need to understand it clearly if they are to use
+ADAM properly.
+
+A list of the routines which implement the system is given in
+Section~\ref{R_Parameter}.
+
+\section{Parameters and objects}
+\markboth{Programmers}{\stardocname}
+
+Programs are usually written to be as general as possible in order to maximize
+their usefulness.
+Thus, you would not write a program to display a specific image but would make
+it accept {\em any} image stored in one or more specified formats.
+Because of this, at run time the program needs to know the name of the image
+to be displayed.
+The `name of the image' is a {\em parameter} of the program.
+More complicated programs may have many parameters controlling their actions.
+Thus, your display program may need to know the format of the input image, 
+the device on which it is to be displayed, the colour mappings to be used in
+the display, types of axes, scaling methods, and so on.
+All these things are parameters.
+When an ADAM program is run, the task of the ADAM parameter system is to
+associate the program's parameters with objects in the outside world.
+
+The word `object' is rather overworked in ADAM, so you have to be aware of the
+context in which it is used.
+`Object' is often used to mean a `data object', {\em i.e.}\, an HDS structure
+accessed through the data system.
+When talking about parameters, the word `object' has a wider meaning;
+in fact it can mean absolutely anything outside itself that a program wishes
+to refer to by name --- a data object, a hardware device, a message, a graphics
+database, a file {\em etc.}
+
+\begin{figure}[htb]
+\begin{center}
+\begin{picture}(120,110)
+\thicklines
+\put (50,40){\framebox(50,10){\small User Interface}}
+\put (50,50){\framebox(50,20){ \small \bf PARAMETER SYSTEM}}
+\put (75,30){\line(0,1){10}}
+\put (60,75){\line(0,1){5}}
+\put (90,75){\line(0,1){5}}
+\put (75,70){\line(0,1){5}}
+\put (60,75){\line(1,0){30}}
+\put (75,25){\oval(20,10)}
+\put (60,85){\oval(20,10)}
+\put (90,85){\oval(20,10)}
+\put (53.5,84.25){\small Program}
+\put (83.5,86){\small Interface}
+\put (86.5,82){\small File}
+\put (67,25.8){\small Command}
+\put (67.5,22.5){\small Language}
+\put (75,107){\circle{4}}
+\put (75,98){\line(0,1){7}}
+\put (75,102){\line(1,1){5}}
+\put (75,102){\line(-1,1){5}}
+\put (75,98){\line(1,-1){5}}
+\put (75,98){\line(-1,-1){5}}
+\put (20,99){\bf Parameters}
+\put (90,99){\em Programmer}
+\put (75,15){\circle{4}}
+\put (75,6){\line(0,1){7}}
+\put (75,10){\line(1,1){5}}
+\put (75,10){\line(-1,1){5}}
+\put (75,6){\line(1,-1){5}}
+\put (75,6){\line(-1,-1){5}}
+\put (23,10){\bf Objects}
+\put (90,10){\em User}
+\put (30,20){\vector (0,1){70}}
+\put (30,90){\vector (0,-1){70}}
+\put (10,55){Association}
+\end{picture}
+\caption{The Parameter System --- Communication between User and Programmer.}
+\label{F_parsys}
+\end{center}
+\end{figure}
+
+Figure~\ref{F_parsys} is a schematic illustration of the function of the ADAM
+Parameter System.
+Its main role is to provide a means of communication between the user and the
+programmer, and in particular to associate objects chosen by the user with
+a program's parameters chosen by the programmer.
+The programmer communicates by using ADAM routines in his program and parameter
+specifications in his interface file.
+The user communicates by using a command language such as ICL.
+
+You must be careful to distinguish between a `parameter name' (used to identify
+which parameter is being talked about), and a `parameter value' (the value a
+given parameter has at a particular moment).
+The word `parameter' is often used loosely in both senses.
+However, the precise meaning is normally obvious from the context.
+
+\section{Associating objects with parameters}
+\markboth{Programmers}{\stardocname}
+
+The programmer has two ways to associate an object with a program parameter:
+\begin{itemize}
+\item Directly, using `PAR' routines.
+\item Indirectly, using `ASSOC' routines.
+\end{itemize}
+
+\paragraph{Direct association:}\hfill
+
+The direct method uses the set of PAR\_GET and PAR\_PUT routines introduced in
+Chapter~\ref{C_simpap}.
+It is called `direct' because a call to a single routine causes the parameter
+value to be read into a program variable, or written from a program variable.
+Thus, in the program TESTR illustrated in Chapter~\ref{C_simpap} the call:
+
+\begin{small}
+\begin{verbatim}
+    CALL PAR_GET0R('X', XVALUE, STATUS)
+\end{verbatim}
+\end{small}
+
+causes the parameter system to obtain a real scalar value for parameter `X' and
+store it in program variable `XVALUE'.
+Similarly, a call such as:
+
+\begin{small}
+\begin{verbatim}
+    CALL PAR_PUT0R('Y', YVALUE, STATUS)
+\end{verbatim}
+\end{small}
+
+causes the parameter system to write the value stored in program variable
+`YVALUE' into the data object associated with parameter `Y'.
+
+The direct method only works for parameters whose values are scalars, vectors,
+or n-dimensional arrays of one of the five standard HDS primitive data types:
+\begin{quote}
+\begin{itemize}
+\item \_INTEGER
+\item \_REAL
+\item \_DOUBLE
+\item \_LOGICAL
+\item \_CHAR
+\end{itemize}
+\end{quote}
+Values of other types ({\em e.g.}\,\ graphics plots, non-standard data types)
+must be associated with parameters by the indirect method.
+
+\paragraph{Indirect association:}\hfill
+
+The various ADAM subroutine libraries enable you to access and manipulate
+objects of various kinds.
+The indirect method of accessing parameters first `associates' an object of an
+appropriate type with a parameter by calling a special `ASSOC' routine
+provided for that library.
+This routine provides the program with an `identifier'.
+From then on, this identifier is used to specify the object, rather than the
+parameter name.
+
+The usual form\footnote{The ASSOC routines for the FIO and RIO libraries are
+slightly unusual in that they need two extra parameters: the format, FM, and
+the record size, RS. These are placed after MODE.} of the ASSOC routine is:
+
+\begin{small}
+\begin{verbatim}
+    CALL fac_ASSOC(PAR, MODE, ID, STATUS)
+\end{verbatim}
+\end{small}
+
+where:
+\begin{quote}
+\begin{description}
+\item [fac] is the facility name of the library.
+\item [PAR] is the parameter name.
+\item [MODE] is the access mode permitted to the object.
+\item [ID] is the identifier used to identify the object in other routines in
+ the library.
+\item [STATUS] is the status return.
+\end{description}
+\end{quote}
+Table~\ref{T_assoc} shows the names of the ASSOC routines for the ADAM
+subroutine libraries, together with the name of the object identifier `ID' used
+in the documentation, and the type of object addressed.
+\begin{table}[htb]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+{\em Subroutine library} & {\em ASSOC routine} & {\em Object identifier} &
+ {\em Object type} \\
+\hline
+NDF,DAT,CMP,HDS,REF,TRN & DAT\_ASSOC    & LOC    & Data object \\
+GKS                     & GKS\_ASSOC    & WKID   & GKS workstation \\
+SGS                     & SGS\_ASSOC    & ZONE   & SGS zone \\
+IDI                     & IDI\_ASSOC    & DISPID & Display device \\
+AGI                     & AGI\_ASSOC    & PICID  & Picture in database \\
+FIO,RIO                 & FIO\_ASSOC    & FD     & File \\
+MAG                     & MAG\_ASSOC    & TD     & Tape drive \\
+ADC                     & ADC\_ASSOC    & CD     & Catalogue \\
+NCAR,SNX,PGPLOT,GNS,NAG & not specified &        & \\
+PAR,MSG,ERR,EMS         & not needed    &        & \\
+\hline
+\end{tabular}
+\caption{ASSOC routines for ADAM subroutine libraries.}
+\label{T_assoc}
+\end{table}
+
+Once an object has been associated with a parameter, its identifier is
+used to access the object.
+Suppose, for example, that parameter `IMAGE' is a data object which contains
+a pixel array stored in a component named `DATA\_ARRAY'.
+This array can be accessed by the code:
+
+\begin{small}
+\begin{verbatim}
+    CALL DAT_ASSOC('IMAGE', 'READ', LOC, STATUS)
+    CALL DAT_FIND(LOC, 'DATA_ARRAY', LOCA, STATUS)
+    CALL DAT_GETNR(LOCA, NDIM, DIMX, VALUE, DIM, STATUS)
+\end{verbatim}
+\end{small}
+
+in which the first call associates an HDS object with the parameter `IMAGE'
+and makes the locator `LOC' point to it.
+The second call finds the component `DATA\_ARRAY' in this image and makes
+another locator `LOCA' point to it.
+The third call stores the value of the array in variable `VALUE'.
+
+Most facilities also have ANNUL routines which are used to stop the identifier
+pointing to the object, thus:
+
+\begin{small}
+\begin{verbatim}
+    CALL DAT_ANNUL(LOC, STATUS)
+\end{verbatim}
+\end{small}
+
+will cause LOC to stop pointing to the object associated with parameter `IMAGE'.
+The object will still be associated with parameter `IMAGE', but you won't be
+able to access it.
+It is considered good practice to annul identifiers when you have finished
+using their objects.
+However, the system tidies up after you when your program finishes so you
+needn't worry about it.
+
+The ASSOC and CANCL routines (described later) are often referred to as 
+`Parameter Routines' because they are added to a `stand-alone' subroutine
+library in order to integrate it with the ADAM parameter system.
+The equivalent `stand-alone' routines are OPEN and CLOSE.
+In ADAM programs the OPEN routine is usually replaced by the ASSOC routine.
+For example, when the SGS graphics library is used outside ADAM, the first
+call to one of its routines would be:
+
+\begin{small}
+\begin{verbatim}
+    CALL SGS_OPEN(WKSTN, ZONE, STATUS)
+\end{verbatim}
+\end{small}
+
+which would cause the graphics workstation specified by WKSTN to be opened and
+an SGS zone specified by ZONE to be made available for plots.
+However, an ADAM program which used SGS would not use this call, but would
+replace it with:
+
+\begin{small}
+\begin{verbatim}
+    CALL SGS_ASSOC(PAR, MODE, ZONE, STATUS)
+\end{verbatim}
+\end{small}
+
+Here, the workstation is specified through the parameter system, so PAR
+replaces WKSTN in the calling sequence.
+ZONE and STATUS have the same function as before, but a new variable, MODE, is
+introduced to provide the program with the ability either to clear or to retain
+the display screen contents.
+
+\paragraph{Parameter values:}\hfill
+
+Your program relies on the parameter system to provide a value for a parameter.
+This process depends on a `search path' defined in the interface file, as
+will be explained later.
+However, your program can influence the value provided by suggesting a `dynamic
+default' to the parameter system.
+This is done by a set of `PAR\_DEF' commands.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    CALL PAR_DEF0R('X', 3.4, STATUS)
+\end{verbatim}
+\end{small}
+
+will set a dynamic default of 3.4 for parameter `X'.
+
+The set of PAR\_DEF routines is analogous to the PAR\_GET and PAR\_PUT sets,
+except that there is no `V' form, {\em i.e.}\, you cannot set a dynamic
+default for an array mapped as a vector; you have to use the explicit array
+form.
+
+\section{Interface files}
+
+An interface file for a single program has the following form:
+
+\begin{small}
+\begin{verbatim}
+      interface PROGNAME
+         Parameter specification
+         Parameter specification
+         ...
+         Message specification
+         Message specification
+         ...
+      endinterface
+\end{verbatim}
+\end{small}
+
+The body of the file comes between the `interface' and `endinterface'
+statements, and consists of a sequence of `Parameter specifications' and
+`Message specifications'.
+Each interface file has a unique name (\verb+PROGNAME+) which should be the same
+as the name of the program with which it is associated.
+Comments may be introduced by the `\#' character --- any characters following
+`\#' on a line will be ignored.
+
+\paragraph{Minimal interface files:}\hfill
+
+The example interface file shown in Section~\ref{S_Inter} was quite large
+considering the simplicity of its associated program.
+Is all this complexity really essential?
+The answer is `No' --- the example given was made complex in order to show off
+the facilities of ADAM, and not because of any intrinsic complexity in
+using ADAM.
+Suppose you write the following abbreviated ADAM program to read in a real
+number and write it out on your terminal:
+
+\begin{small}
+\begin{verbatim}
+            SUBROUTINE READ(STATUS)
+            IMPLICIT NONE
+            INCLUDE 'SAE_PAR'
+            INTEGER STATUS
+            REAL XVALUE
+      *.........................................................................
+            CALL PAR_GET0R('X', XVALUE, STATUS)
+            CALL MSG_SETR('X', XVALUE)
+            CALL MSG_OUT('MESS', 'Value read for X is ^X', STATUS)
+            END
+\end{verbatim}
+\end{small}
+
+Now, suppose you don't prepare an interface file for this program at all and
+try to run it using ICL in the usual way.
+This is what would happen:
+
+\begin{small}
+\begin{verbatim}
+    ICL> define read read
+    ICL> read
+    Loading READ into xxxxREAD
+    Failed to read interface module
+    ...
+\end{verbatim}
+\end{small}
+
+When I tried it, the system hung and I had to use cntrl/Y to escape.
+So, you can't get away with not storing an interface file because the system
+just won't work without one.
+However, suppose you store one with no information on the program parameter X,
+{\em i.e.}\, an interface file containing the lines:
+
+\begin{small}
+\begin{verbatim}
+    interface READ
+    endinterface
+\end{verbatim}
+\end{small}
+
+If you try to run the program again it still won't work, but you will get
+a different error message:
+
+\begin{small}
+\begin{verbatim}
+    ADAMERR   %PARSECON, requested parameter name not defined
+\end{verbatim}
+\end{small}
+
+However, at least the system won't hang.
+Now let's go one step further and put an empty specification for parameter X in
+the interface file:
+
+\begin{small}
+\begin{verbatim}
+    interface READ
+      parameter X
+      endparameter
+    endinterface
+\end{verbatim}
+\end{small}
+
+This time the program will work, even though we haven't stored a specification
+for the message parameter `MESS':
+
+\begin{small}
+\begin{verbatim}
+    ICL> read
+    X   > 1.2
+    Value read for X is 1.2
+    ICL>
+\end{verbatim}
+\end{small}
+
+So, the shortest interface file you can get away with is one which contains
+empty specifications for all the program parameters except message parameters
+(such as MESS) which do not need to be specified at all.
+Thus, the simplest way of testing a program you have compiled and linked is to
+prepare an interface file containing empty specifications for its non-message
+parameters, then use ICL to define a command to run it, and then type in that
+command.
+You will be prompted for a value for each of the program's parameters.
+If you try to specify values on the command line by position, they will be
+ignored and you will be prompted anyway.
+However, you can specify them on the command line by keyword, using the
+parameter name as the keyword.
+
+You can see now that the function of the interface file is to provide you with
+the ability to modify or enhance the user interface if required.
+The facilities available from the interface file are to:
+\begin{itemize}
+\item Control the data type of a value associated with a parameter.
+\item Control the access to a parameter value.
+\item Control the format of the command line.
+\item Control the appearance of prompt and help lines.
+\item Control the search for a parameter value.
+\item Control the contents of messages.
+\end{itemize}
+These facilities are considered in more detail in the next sections where the
+fieldnames which are used to specify these controls are described.
+
+\paragraph{Search path:}\hfill
+
+An interface file can be accessed through a search path.
+If a {\em job} logical name search path, ADAM\_IFL, is defined, it will be used
+to find the interface file.
+If ADAM\_IFL is not defined, or if an interface file is not found using it, an
+attempt will be made to find one in the directory in which the program
+executable image was found.
+
+\paragraph{Compilation:}\hfill
+
+An interface file can exist in two forms.
+The first form is an ordinary text file which can be edited easily.
+This is used when a program is being developed.
+The file should have the same name as the program, but with a file extension of
+`.IFL'.
+When the user interface for a program has become relatively stable, the
+interface file should be compiled and stored as an `.IFC' file --- this is the
+second form.
+This is done as follows:
+
+\begin{small}
+\begin{verbatim}
+    $ COMPIFL progname
+    COMPIFL: successful completion
+    $
+\end{verbatim}
+\end{small}
+
+where `\verb+progname+' is the name of the interface file.
+(You must have previously entered the ADAMSTART and ADAMDEV commands.)
+The system can extract information from interface files stored in the second
+form faster than from files stored in the first form, so this improves
+efficiency.
+
+\section{Parameter specifications}
+\markboth{Programmers}{\stardocname}
+
+The different types of fieldname provided in an interface file for controlling
+the user interface fall naturally into various groups which have a particular
+function, as shown in Table~\ref{T_fields}.
+\begin{table}[htb]
+\centering
+\begin{tabular}{|l|l|l|} \hline
+{\em Group} & {\em Fieldname} & {\em Function} \\
+\hline
+Data type \& access & {\bf TYPE} & Data type \\
+& {\bf PTYPE} & Device type \\
+& {\bf ACCESS} & Access mode \\
+\hline
+Command line & {\bf POSITION} & Position in command line \\
+& {\bf KEYWORD} & Keyword in command line \\
+\hline
+Prompt & {\bf KEYWORD} & Keyword in prompt \\
+& {\bf PROMPT} & Prompt text \\
+& {\bf HELP} & On-line help text \\
+& {\bf HELPKEY} & On-line help text \\
+& {\bf PPATH} & Prompt-value search path \\
+& {\bf ASSOCIATION} & Associated global parameter \\
+& {\bf DEFAULT} & Default prompt-value \\
+\hline
+Value & {\bf VPATH} & Parameter-value search path \\
+& {\bf ASSOCIATION} & Associated global parameter \\
+& {\bf DEFAULT} & Default parameter-value \\
+& {\bf IN} & Valid value set \\
+& {\bf RANGE} & Valid value range \\
+\hline
+\end{tabular}
+\caption{Groups of fieldnames used in parameter specifications in interface
+ files.}
+\label{T_fields}
+\end{table}
+Some of the fieldnames have slightly different functions in different contexts
+and so belong to more than one group.
+The groups and their fieldnames are described in more detail below.
+Each fieldname description is headed by a line with the format:
+\begin{quote}
+\begin{description}
+\item [FIELDNAME] {\tt fieldvalue}
+\end{description}
+\end{quote}
+This shows how this fieldname is specified.
+
+\begin{description}
+
+\item [Data type \& access group] ---
+
+These fieldnames specify the data type of the parameter, and how it should be
+accessed:
+
+\begin{description}
+
+\item [TYPE] {\tt data-type}
+
+This specifies the {\em type}\, of a {\em Normal}\, parameter, {\em i.e.}\,
+any parameter except a device type.
+It may used by the system to check that a supplied parameter value is of a
+type that the application program is expecting.
+It also allows automatic conversion between the primitive data types.
+It is important to distinguish between the type of a parameter and the type 
+of the value to be obtained from it by the application.
+
+The \verb%data-type% may be:
+\begin{itemize}
+\item An HDS primitive type ({\em i.e.}\, \_INTEGER, \_REAL, \_DOUBLE,
+\_LOGICAL, \_CHAR, \_UBYTE, \_BYTE, \_UWORD, \_WORD).
+\item LITERAL --- formerly used to specify that the parameter is of type \_CHAR,
+ and to force the parameter system to accept unquoted character strings as
+ character values rather than HDS object names. 
+ This is now the standard behaviour for parameters of type \_CHAR, so data-type
+ LITERAL is no longer required.
+\item A `user-defined' type (IMAGE, SPECTRUM {\em etc.}).
+\item UNIV --- used by convention when the parameter type is unimportant. 
+ Actually, this is treated the same as other `user-defined' types.
+\item A `facility-recommended' type (TAPE for MAG, FILENAME for FIO {\em etc.}).
+ These are used by convention --- any user-defined type will do.
+\end{itemize}
+
+If the TYPE field is omitted, type UNIV is assumed.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      type    image
+\end{verbatim}
+\end{small}
+
+An acceptable value for parameter \verb+INPIC1+ is specified as being of type
+\verb+image+.
+
+\item [PTYPE] {\tt device}
+
+This specifies that a parameter is of the {\em Device} type.
+
+Most parameters are associated with objects whose {\em values} belong to some
+data type, {\em e.g.}\, \_REAL.
+These are known as {\em Normal} parameters.
+However, some parameters are associated with a hardware {\em device},
+{\em e.g.}\, a magnetic tape drive or a graphics terminal.
+These are known as {\em Device} parameters.
+The value of a device parameter is a device name.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter PLOTTER
+      ptype   device
+\end{verbatim}
+\end{small}
+
+The parameter \verb+PLOTTER+ is specified as being of device type.
+
+\item [ACCESS] {\tt access-mode}
+
+This specifies the {\em mode of access} the program requires to a parameter
+value.
+Permitted values for the `\verb+access-mode+' field are:
+\begin{quote}
+\begin{description}
+\item [read] --- read-only access permitted.
+\item [write] --- write-only access permitted.
+\item [update] --- read and write access permitted.
+\end{description}
+\end{quote}
+Thus, if a program does not modify the value associated with a parameter,
+specify `read' access.
+If the value is to be written, specify `write' access.
+If the value is to be modified, specify `update' access.
+The default value is `update'.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      access  'read'
+\end{verbatim}
+\end{small}
+
+The parameter \verb+INPIC1+ is specified as being restricted to `\verb+read+'
+access.
+
+\end{description}
+
+\item [Command line group] ---
+
+These fieldnames specify how a parameter should be specified on a command line:
+
+\begin{description}
+
+\item [POSITION] {\tt ipos}
+
+This specifies the {\em position} on a command line where a value for a
+parameter may appear.
+
+The `\verb+ipos+' field is an integer.
+A value of `1' specifies the first parameter position, and so on.
+
+This fieldname must be given for every parameter capable of being specified by
+position on the command line; there is no default value.
+Each such parameter must have a different position number.
+Positions allocated must form a contiguous set.
+If this fieldname is omitted, then a keyword must be specified whenever the
+parameter is used on a command line.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter  INPIC1
+      position 1
+\end{verbatim}
+\end{small}
+
+The parameter \verb+INPIC1+ is associated with the first parameter position on
+the command line.
+
+\item [KEYWORD] {\tt name}
+
+This specifies the name by which a parameter can be identified on the command
+line, and by which the parameter is known to the user.
+
+The `\verb+name+' field specifies the keyword.
+This may differ from the parameter name.
+
+This fieldname separates a program's view of its parameters from a user's view
+of them.
+It is possible for a programmer to re-write a program using completely
+different parameter names, but the command seen by a user can be kept the same
+as before by just leaving the keywords as they were.
+Conversely, a user's view of a program can be changed by just changing the
+keyword specifications in the interface file.
+
+If a keyword is not specified for a parameter, the system will use the
+parameter name as the keyword in the prompt and on the command line.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      keyword 'PIC1'
+\end{verbatim}
+\end{small}
+
+The keyword for parameter \verb+INPIC1+ is specified as being \verb+PIC1+.
+Thus, on the command line we could enter:
+
+\begin{small}
+\begin{verbatim}
+    ICL> ADD PIC1=ramp1
+\end{verbatim}
+\end{small}
+
+to specify that the input image is \verb+ramp1+.
+
+\end{description}
+
+\item [Prompt group] ---
+
+These fieldnames determine the appearance of the prompt for a parameter value.
+A prompt has the following syntax:
+\begin{quote}
+{\em keyword -- prompt-string /suggested-value/}~\verb+>+
+\end{quote}
+The following fieldnames are involved:
+
+\begin{description}
+
+\item [KEYWORD] {\tt name}
+
+The keyword forms the first part of the prompt.
+This fieldname is described above in the command line group.
+
+\item [PROMPT] {\tt prompt-string}
+
+This specifies the {\em prompt-string} field in the prompt for a parameter
+value.
+
+This field is a character string with a maximum size of about 80 characters ---
+it is not possible to give a single figure which is correct in all cases.
+The prompt-string can also be set by the program using the PAR\_PROMT routine.
+
+If this fieldname is not specified, the prompt-string field is omitted from the
+prompt.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      prompt  'First input image'
+\end{verbatim}
+\end{small}
+
+The prompt-string for parameter \verb+INPIC1+ is specified as
+`\verb+First input image+'.
+
+\item [HELP] {\tt help-text}
+
+This gives information about the meaning of the parameter.
+
+The `\verb+help-text+' field is a character string containing the information.
+The maximum size of the field is about 132 characters --- it is not possible
+to give a single figure which is correct in all cases.
+
+If the user is prompted for a parameter value, a possible reply is `?'.
+The system responds to this by displaying the `\verb+help-text+' on the
+terminal and re-prompting the user for a value.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      help    'Name of IMAGE structure containing first input data array'
+\end{verbatim}
+\end{small}
+
+This defines the help text for parameter \verb+INPIC1+.
+
+\item [HELPKEY] {\tt filename key1 key2 ...}
+
+This specifies a help file, and module within it, at which {\em multi-line}
+help text for the parameter may be found.
+The text to be displayed is stored in the module defined by
+\verb+key1 key2 ...+ in the help file \verb+filename+.
+(The keys represent the usual hierarchical keywords used to access the help
+system).
+This is replacing the earlier {\em one-line} help provided by the \verb+HELP+
+specification.
+
+If \verb+filename key1 key2 ...+ is replaced by \verb+*+ or \verb+'*'+, the
+default values:
+
+\begin{small}
+\begin{verbatim}
+    interface_name PARAMETERS parameter_name
+\end{verbatim}
+\end{small}
+
+will be used, where \verb+interface_name+ is the name specified in the current
+INTERFACE field.
+Use of this default implies that the library has been specified using
+the \verb+HELPLIB+ specification.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    interface DISP
+        helplib 'disp_dir:disp disp parameter'
+        parameter IMAGE
+            helpkey 'image'
+\end{verbatim}
+\end{small}
+
+
+\item [PPATH] {\tt prompt-value-resolution-path}
+
+This specifies the search path to be followed to obtain a value for the
+{\em suggested-value} field in the prompt.
+This search path is usually referred to as the `ppath'.
+
+If a suggested value is required, the system looks at the `ppath' specification,
+picks out the first specifier, and tries to find a value from this source.
+If a value is not found, the next specifier is extracted and another search is
+made.
+This process continues until either a value is found, or the search path is
+exhausted.
+
+The `\verb+prompt-value-resolution-path+' field consists of a set of specifiers
+separated by commas.
+The valid specifiers are the same as for `vpath' (see below), except that the
+`{\bf prompt}' and `{\bf noprompt}' specifiers are invalid in this context and
+should not be used.
+
+If `ppath' is not specified, a default search path of `dynamic,default' is
+used.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      ppath   'global,current'
+\end{verbatim}
+\end{small}
+
+This specifies a `ppath' of `\verb+global+' followed by '\verb+current+'
+for parameter INPIC1.
+
+\item [ASSOCIATION] {\tt association-specification}
+
+See below in the `Value' group.
+
+\item [DEFAULT] {\tt default-value}
+
+See below in the `Value' group.
+
+\end{description}
+
+\item [Value group] ---
+
+These fieldnames determine the value given to a parameter, and check that this
+satisfies given criteria:
+
+\begin{description}
+
+\item [VPATH] {\tt parameter-value-resolution-path}
+
+This specifies the search path to be followed when searching for a parameter
+value.
+This search path is usually referred to as the `vpath'.
+
+A value can come from many different sources, and these sources may need to be
+searched in different orders.
+The `\verb+parameter-value-resolution-path+' field specifies these sources
+and the search order --- this constitutes the search-path.
+The field consists of specifiers separated by commas.
+The valid specifiers are:
+\begin{quote}
+\begin{description}
+\item [current] --- use the current value of the parameter.
+\item [default] --- use the default specified in the interface file.
+\item [dynamic] --- use the dynamic default specified by the program.
+\item [global] --- use the value of the associated global parameter.
+\item [noprompt] --- do not prompt the user for a value.
+\item [prompt] --- prompt the user and obtain a value.
+\end{description}
+\end{quote}
+If the value of a parameter is not specified on the command line, the system
+looks at the `vpath' specification, picks out the first specifier, and tries
+to find a value from this source.
+If a value is not found, the next specifier is extracted and another search is
+made.
+This process continues until either a value is found, or the search path is
+exhausted.
+If the search path is exhausted the user is prompted for a value, unless
+the `noprompt' specifier has been given, in which case the system returns a
+PAR\_\_NULL status value to the program.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter INPIC1
+      vpath   'dynamic,current'
+\end{verbatim}
+\end{small}
+
+This specifies a `vpath' of `\verb+dynamic+' followed by '\verb+current+'
+for parameter `\verb+INPIC1+'.
+
+\item [ASSOCIATION] {\tt association-specification}
+
+This associates a program parameter with a global parameter.
+
+If the system comes across the `global' specifier in a vpath or ppath, this
+fieldname tells it which global parameter to use as a source for the value.
+
+The `\verb+association-specification+' field is a character string which
+specifies the global parameter.
+This string has two parts:
+
+\begin{small}
+\begin{verbatim}
+    <association-operator><parameter-specification>
+\end{verbatim}
+\end{small}
+
+The `\verb+association-operator+' field must one of the following:
+\begin{quote}
+\begin{description}
+\item [$<$--] (read-only).
+\item [$<$--$>$] (read-write).
+\item [--$>$] (write-only).
+\end{description}
+\end{quote}
+`write' means that if the task completes successfully, the current value of the
+parameter will be copied to the global parameter.
+
+The `\verb+parameter-specification+' field must be the name of a global
+parameter.
+
+This fieldname only needs to be specified if the specifier `global' is used in
+the ppath or vpath for the parameter.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter     INPIC1
+      vpath       'prompt'
+      ppath       'global'
+      association '<->global.data_array'
+\end{verbatim}
+\end{small}
+
+The global parameter `\verb+global.data_array+' will be used as the
+suggested-value in the prompt.
+The parameter value will be obtained by prompting if it is not specified on
+the command line.
+
+\item [DEFAULT] {\tt default-value}
+
+This specifies one or more default values for a parameter.
+
+The `\verb+default-value+' field is a string of alphanumeric characters 
+containing items to be used as values for the parameter.
+The values may be any expression acceptable to the parameter system.
+This fieldname must not be specified before the `type' fieldname has been
+declared.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter OTITLE
+      type    '_CHAR'
+      vpath   'default'
+      default 'KAPPA - Add'
+\end{verbatim}
+\end{small}
+
+The default value for parameter \verb+OTITLE+ is `\verb+KAPPA - Add+'.
+The vpath specifies that this will be used as the parameter value if one
+is not specified on the command line.
+
+\item [IN] {\tt set-of-values}
+
+This specifies a set of valid values for a parameter.
+
+The `\verb+set-of-values+' field consists of a list of constants separated by
+commas.
+These constants are the valid values.
+
+Checking is carried out when a program attempts to get a value for a parameter.
+If the supplied value does not belong to the valid set, either the status
+SUBPAR\_\_OUTRANGE is returned, or the system attempts to prompt for the value.
+No checking occurs when writing a value.
+
+This fieldname should only be used for scalar parameters and must be specified
+after `type'.
+A parameter cannot have both a `\verb+range+' and an `\verb+in+' field.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter BOXSIZ
+      type    '_INTEGER'
+      in      3, 5, 7, 9, 11, 13, 15
+\end{verbatim}
+\end{small}
+
+The only valid values for parameter \verb+BOXSIZ+ are 3, 5, 7, 9, 11, 13, 15.
+
+\item [RANGE] {\tt range-of-values}
+
+This specifies a range of valid values for a parameter.
+
+The `\verb+range-of-values+' field consists of two constants separated by a
+comma.
+These constants specify the range boundaries.
+This fieldname has the same characteristics as the `\verb+in+' field described
+above.
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    parameter SIGMA
+      type    '_REAL'
+      range   0.1, 5.0
+\end{verbatim}
+\end{small}
+
+The only valid values for parameter \verb+SIGMA+ lie in the range 0.1 to 5.0.
+
+\end{description}
+\end{description}
+
+\section{Message specifications}
+
+If a program uses the Message or Error systems it can specify one or more
+`Message Parameters'.
+Text can be associated with these parameters in the interface file by using a
+`Message Specification'.
+However, this is not essential since text specified in the program will be
+used by default.
+
+The Message specification has the form:
+
+\begin{small}
+\begin{verbatim}
+      message PARNAME
+         fieldname fieldvalue(s)
+         ...
+      endmessage
+\end{verbatim}
+\end{small}
+
+where `\verb+PARNAME+' is the Message Parameter name which is used in the call
+to an ERR or MSG routine.
+
+Currently only one fieldname is supported:
+\begin{quote}
+\begin{description}
+\item [TEXT] {\tt string}
+
+This specifies the text to be associated with the message parameter.
+
+The `\verb+string+' field contains the text to be used.
+The string may be anything acceptable to the ERR or MSG routine ({\em i.e.}\,
+it may include tokens {\em etc.}).
+
+{\em Example:}
+
+\begin{small}
+\begin{verbatim}
+    message MESS
+      text  'TESTR prints ^X'
+    endmessage
+\end{verbatim}
+\end{small}
+
+This will replace the message defined in the program with the message specified
+by `\verb+text+'.
+\end{description}
+\end{quote}
+
+\section{Monoliths}
+
+When a set of programs are grouped into a monolith, their interface files
+should be concatenated into a single interface file as follows:
+
+\begin{small}
+\begin{verbatim}
+     monolith MONNAME
+         interface PROGNAME1
+          ...
+         endinterface
+         interface PROGNAME2
+          ...
+         endinterface
+         ...
+      endmonolith
+\end{verbatim}
+\end{small}
+
+An example is given in Section~\ref{S_Mono}.
+
+\section{Parameter states}
+\markboth{Programmers}{\stardocname}
+
+A simple program will get values for its parameters, do something with them,
+and then finish.
+However, a programmer may wish to obtain a sequence of values for a single
+parameter, and a user may wish to indicate that no parameter value should
+be used.
+To deal with these requirements, ADAM uses the concept of {\em Parameter State}.
+A parameter can be in one of the four states shown in Table~\ref{T_states}.
+This shows how the various states are entered.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+{\em State} & {\em Method of entry} & {\em Method of getting a value} \\
+\hline
+{\bf GROUND} & Program entry & Follow the vpath in the interface file \\
+{\bf ACTIVE} & GET, PUT, ASSOC routines & Use the current value \\
+{\bf ANNULLED} & Input value of `!' & Value not set; \verb+STATUS=PAR__NULL+ \\
+{\bf CANCELLED} & CANCL routines & Prompt the user for a value \\
+\hline
+\end{tabular}
+\caption{Parameter states and values.}
+\label{T_states}
+\end{table}
+
+In simple programs, each parameter goes from GROUND to ACTIVE state when it is
+given a value and stays in that state until the programs exits.
+The significance of the parameter state is its effect on what happens when a
+program asks for a value for a parameter; this is also shown in
+Table~\ref{T_states}.
+If a program asks repeatedly for the value of a parameter, as in:
+
+\begin{small}
+\begin{verbatim}
+    CALL PAR_GET0R('X', XVALUE, STATUS)
+    ...
+    CALL PAR_GET0R('X', XVALUE, STATUS)
+    ...
+\end{verbatim}
+\end{small}
+
+the first call will get a value for `X' by following the vpath.
+However, the second and succeeding calls will obtain the same value as obtained
+by the first call since this is the `current value' and the vpath is not
+used.
+In particular, the user will not be prompted for another value.
+However, if the programmer `cancels' the parameter by calling PAR\_CANCL before
+each attempt to get a value:
+
+\begin{small}
+\begin{verbatim}
+    CALL PAR_GET0R('X', XVALUE, STATUS)
+    ...
+    CALL PAR_CANCL('X', STATUS)
+    CALL PAR_GET0R('X', XVALUE, STATUS)
+    ...
+    CALL PAR_CANCL('X', STATUS)
+    ...
+\end{verbatim}
+\end{small}
+
+the user will be prompted for each call of PAR\_GET0R.
+This technique is useful when you have finished processing one object associated
+with a parameter, and want to process a different object within the same
+program.
+
+Each subroutine library which has been integrated with the ADAM system has
+a CANCL routine, identical in form to PAR\_CANCL, with which to cancel the
+association of a parameter with an object previously made by the ASSOC routine.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    CALL DAT_ASSOC('X', 'READ', LOC, STATUS)
+      <do something with the first object associated with parameter X>
+    CALL DAT_CANCL('X', STATUS)
+    CALL DAT_ASSOC('X', 'READ', LOC, STATUS)
+      <do something with a new object associated with parameter X>
+    CALL DAT_CANCL('X', STATUS)
+\end{verbatim}
+\end{small}
+
+The CANCL routines are different from the ANNUL routines considered earlier.
+For example, in:
+
+\begin{small}
+\begin{verbatim}
+    CALL DAT_ASSOC('X', 'READ', LOC, STATUS)
+      <do something with the first object associated with parameter X>
+    CALL DAT_ANNUL(LOC, STATUS)
+    CALL DAT_ASSOC('X', 'READ', LOC, STATUS)
+      <do something with the same object associated with parameter X>
+    CALL DAT_ANNUL(LOC, STATUS)
+\end{verbatim}
+\end{small}
+
+the second DAT\_ASSOC will associate the same object with parameter X as the
+first one did, because DAT\_ANNUL does not break the association.
+Notice that the first parameter of ANNUL routines is the identifier used to
+address the object, whereas the first parameter of CANCL routines is the
+parameter name.
+
+The ANNUL routines have nothing to do with the `ANNULLED' state of a program
+parameter; it's just an unfortunate clash of words.

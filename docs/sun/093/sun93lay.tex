@@ -1,0 +1,145 @@
+%*****************************
+\def\verbatim{\begingroup\setupverbatim\doverbatim}
+\def\doverbatim#1{\def\next##1#1{##1\endgroup}\next}
+%*****************************
+
+\def\th{\thinspace}
+\def\pagenumbers{\footline={\hss\tenrm\folio\hss}}
+\font\twelverm=cmr12
+\font\twelveit=cmti12
+\font\twelvebf=cmbx12
+\font\twelvesl=cmsl12
+
+\font\big=cmbx12 scaled\magstephalf
+\font\Big=cmbx12 scaled 1440
+%\magnification=\magstephalf			% 1.1 magnificatin
+\baselineskip=0.45 truecm plus 0.05 truecm		% 3.428 lines/inch
+\lineskip=2 truept				% minimum interline clearance
+\hfuzz=1pt
+\parskip=7 truept plus 2 truept minus 1 truept	% paragraph skip one line
+
+\hsize=160 truemm				% page width
+\vsize=240 truemm				% page height
+\parindent=0truemm
+\mathsurround=0pt
+
+\hyphenation{ inter-stellar equiv-alent an-a-lyse }
+%-------------------------------------------------------------------------
+%  Chapter Definition
+\newcount\chapnumber
+\def\clearchapnumber{\chapnumber=0}
+\def\chapter{\advance\chapnumber by 1
+  \newchap{~\the\chapnumber~}}
+\outer\def\newchap#1\par { \bigskip\message{#1} {\bf #1 } \medskip }
+%-------------------------------------------------------------------------
+%  Section Definition
+\newcount\sectnumber
+\def\clearsectnumber{\sectnumber=0}
+\def\section{\advance\sectnumber by 1
+   \newsect{\the\chapnumber.\the\sectnumber~}}
+\outer\def\newsect#1\par {\vskip 0pt plus .25\vsize \penalty -250 
+    \vskip 0pt plus -.25\vsize \bigskip \vskip \parskip \message{#1}
+    \leftline {\bf #1} \nobreak }
+%-------------------------------------------------------------------------
+%  Subsection Definition
+\newcount\subsectnumber
+\def\clearsubsectnumber{\subsectnumber=0}
+\def\subsection{\advance\subsectnumber by 1
+   \subsect{\the\chapnumber.\the\sectnumber.\the\subsectnumber~}}
+\outer\def\subsect#1\par { \smallskip \vskip\parskip \message{#1}
+    \leftline { #1} \nobreak }
+%-------------------------------------------------------------------------
+% Replacements for RUNOFF header levels .hl1, .hl2, .hl3
+\def\sect{\clearsectnumber \clearsubsectnumber \chapter}
+\def\subsect{\clearsubsectnumber \section}
+\def\subsubsect{ \subsection}
+%_________________________________________________________________________
+\tolerance=400
+
+
+
+\def\onepageout#1{\shipout
+   \vbox{\makeheadline
+	\vbox to \pageheight{ #1 \boxmaxdepth=\maxdepth }
+	\makefootline}
+   \advancepageno}
+
+\catcode`@=11 % borrow the private macros of PLAIN (with care)
+\newbox\partialpage
+
+\def\begindoublecolumns{\begingroup
+  \output={\global\setbox\partialpage=\vbox{\unvbox255\bigskip}}\eject
+  \output={\doublecolumnout} \hsize=8.5truecm \vsize=45truecm}
+
+\def\enddoublecolumns{\output={\balancecolumns}\eject 
+  \endgroup \pagegoal=\vsize}
+
+\def\doublecolumnout{\splittopskip=\topskip \splitmaxdepth=\maxdepth
+  \dimen@=22.5truecm \advance\dimen@ by-\ht\partialpage
+  \setbox0=\vsplit255 to\dimen@ \setbox2=\vsplit255 to\dimen@
+  \onepageout\pagesofar
+  \unvbox255 \penalty\outputpenalty}
+
+\def\pagesofar{\unvbox\partialpage
+  \wd0=\hsize \wd2=\hsize \hbox to\pagewidth{\box0\hfil\box2}}
+
+\def\balancecolumns{\setbox0=\vbox{\unvbox255} \dimen@=\ht0
+  \advance\dimen@ by\topskip \advance\dimen@ by-\baselineskip
+  \divide\dimen@ by2 \splittopskip=\topskip
+  {\vfuzz=\ht0\vbadness=10000 \loop \global\setbox3=\copy0
+    \global\setbox1=\vsplit3 to\dimen@
+    \ifdim\ht3>\dimen@ \global\advance\dimen@ by1pt \repeat}
+  \setbox0=\vbox to\dimen@{\unvbox1\vskip 0pt plus 1pt minus 1pt}
+  \setbox2=\vbox to\dimen@{\unvbox3\vskip 0pt plus 1pt minus 1pt}
+  \pagesofar}
+
+\catcode`@=12 % at signs are no longer letters
+
+\def\raggedcenter{\leftskip=0pt plus4em \rightskip=\leftskip
+	\parindent=0pt\parfillskip=0pt\spaceskip=.3333em\xspaceskip=.5em
+	\pretolerance=9999\tolerance=9999
+	\hyphenpenalty=9999\exhyphenpenalty=9999}
+
+\def\conf#1#2{{\ifdim\lastskip<\bigskipamount\removelastskip\bigskip\fi
+	\raggedcenter\bf#1\smallskip\sl#2\smallskip}\nobreak}
+
+\def\ditem{\item{$\bullet$}}
+
+\def\head#1\par{\skip0=\smallskipamount \advance\skip0 by \parskip
+	\ifdim\lastskip<\skip0\removelastskip\vskip\skip0\fi
+	\leftline{\bf#1}\nobreak}
+
+{\catcode`\^^M\active\let^^M=\space
+\global\def\doline{\ifx\ntoken ^^M \par \else\ifhmode\hfil\break\fi\fi}
+\global\def\endline{\futurelet\ntoken\doline}
+\global\def\followlines{\catcode`\^^M\active\let^^M=\endline}
+}
+
+{\catcode`\ \active\let =\space
+\global\def\aspace{\null\ }
+\global\def\followspaces{\catcode`\ \active\let =\aspace}
+}
+
+\def\addresses{\begingroup\leftskip=20pt\parindent=-20pt\followlines}
+
+\def\endaddress{\par\endgroup}
+
+\def\subdir#1\par {\ifdim\lastskip>0pt\removelastskip\fi
+	\vskip 0pt plus .08\vsize \penalty -250 
+	\vskip 0pt plus -.08\vsize \bigskip\bigskip \message{#1}
+	\centerline {\bf #1} \bigskip\nobreak }
+
+\def\vtopalign#1{\setbox1=\vbox{\noindent\strut#1\strut}
+	\dimen1=\ht1 \advance\dimen1 by -\baselineskip \lower\dimen1\box1}
+
+\def\boxit{\ifdim\lastskip>0pt\removelastskip\fi
+	\vskip 0pt plus .08\vsize \penalty -250 
+	\vskip 0pt plus -.08\vsize \bigskip\bigskip
+	\afterassignment\startboxit
+	\setbox0=\vbox}
+
+\def\startboxit{\aftergroup\endboxit\advance \hsize by -.8truecm\bigskip}
+
+\def\endboxit{\hrule\line{\vrule\hfil
+	\vbox{\unvbox0\bigskip}
+	\hfil\vrule}\hrule\bigskip\nobreak}

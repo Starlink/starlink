@@ -1,0 +1,1166 @@
+\part{FOR USERS}
+\label{P_users}
+\pagestyle{myheadings}
+\markboth{Users}{\stardocname}
+
+\chapter{Applications Packages}
+\label{C_applic}
+\markboth{Users}{\stardocname}
+
+When you run ICL and type:
+
+\begin{small}
+\begin{verbatim}
+    ICL> HELP PACKAGES
+\end{verbatim}
+\end{small}
+
+you will be shown two lists of packages.
+The first contains {\em Standard} packages which are available at all
+Starlink sites.
+The other contains {\em Options} which are made available at a site only
+on request. 
+
+This Chapter gives a brief overview of each package, while Chapter~\ref{C_rsapp}
+describes the specific commands available within each package.
+Further information can be obtained from their associated Starlink User Note
+(SUN) which is referenced at the top of each section.
+Starlink software as a whole is described in
+\xref{SUN/1}{sun1}{}.
+
+An important part of the rationalization of Starlink software which the coming
+of ADAM made possible concerns data structures.
+The Hierarchical Data System (HDS) (see Chapter \ref{C_HDS}) is very flexible,
+and is capable of creating an infinite variety of data structures.
+Without recommending some standard structure there would be a danger of
+programmers writing applications which could not read each other's data.
+If the standard is also implemented in a small number of routines, the
+restrictions imposed by the standard also make programming easier.
+The main unifying theme of Starlink applications is the standard data format 
+defined by Starlink; this is the Extensible $N$-dimensional Data Format ---
+NDF --- described in Section \ref{S_NDF}.
+This is centred on an $n$-dimensional data array that can store most
+astronomical data such as spectra, images and spectral-line data cubes.
+The NDF may also contain such information as title, axis labels and units, and
+error and quality arrays.
+There is also a place to store ancillary data associated with the data array.
+These could be information about the original observing set-up, such as airmass
+during the observation or temperature of the detector; there may be calibration
+data or results produced during processing, for example spectral line fits.
+Groups of related parameters not defined by the NDF format itself are held in
+{\em extensions}\@.
+
+A key component of Starlink software is KAPPA (Kernel Application Package).
+This does not process non-standard extensions, but neither does it lose them
+--- it copies them to any NDFs which it creates.
+Other application packages may be able to process some, but not all, extensions.
+It is hoped that such packages will use KAPPA applications as templates, in
+procedures, or directly as appropriate.
+
+Each section below contains a sketch of how to use the application being
+described.
+In these:
+
+\begin{small}
+\begin{verbatim}
+    $ command
+\end{verbatim}
+\end{small}
+
+means ``issue the command from DCL'', while:
+
+\begin{small}
+\begin{verbatim}
+    ICL> command
+\end{verbatim}
+\end{small}
+
+means issue it from ICL.
+Remember that before using any of these packages, the commands:
+
+\begin{small}
+\begin{verbatim}
+    $ @SSC:LOGIN
+    $ ADAMSTART
+\end{verbatim}
+\end{small}
+
+should have been executed.
+Likewise, to run ICL you should type:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL
+\end{verbatim}
+\end{small}
+
+to get the ICL prompt.
+
+The packages described in this chapter are listed below ordered by function.
+This should help you find a package which is appropriate for a particular
+purpose.
+The packages are then described in alphabetical order on separate pages.
+
+\vspace*{5mm}
+
+\begin{quote}
+
+\begin{quote}
+\begin{description}
+
+\item [Image Analysis \& Photometry] \mbox{}
+\begin{description}
+\item [KAPPA] --- Kernel applications
+\item [DAOPHOT] --- Stellar photometry
+\item [PHOTOM] --- Aperture photometry
+\item [PISA] --- Object finding and analysis
+\end{description}
+
+\item [Spectroscopy] \mbox{}
+\begin{description}
+\item [FIGARO] --- General spectral reduction
+\item [SPECDRE] --- Spectroscopy data reduction
+\end{description}
+
+\item [Specific Wavelengths] \mbox{}
+\begin{description}
+\item [ASTERIX] --- X-ray data analysis
+\end{description}
+
+\item [Specific Instruments] \mbox{}
+\begin{description}
+\item [CCDPACK] --- CCD data reduction
+\item [IRCAM] --- Infrared camera data reduction
+\end{description}
+
+\item [Polarimetry] \mbox{}
+\begin{description}
+\item [TSP] --- Time series and polarimetry analysis
+\end{description}
+
+\item [Database Management] \mbox{}
+\begin{description}
+\item [SCAR] --- Catalogue data base system
+\end{description}
+
+\item [Utilities] \mbox{}
+\begin{description}
+\item [CONVERT] --- Data format conversion
+\item [SST] --- Simple software tools
+\end{description}
+
+\end{description}
+\end{quote}
+
+\end{quote}
+
+\newpage
+
+\section{ASTERIX --- X-ray data analysis} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/98}{sun98}{}]
+
+\vspace{5mm}
+
+This is a collection of programs to analyse astronomical data in the X-ray
+waveband.
+Many of the programs are general purpose and are capable of analysing any data
+in the correct format.
+It is instrument independent and currently has interfaces to the Exosat and
+Rosat instruments. 
+
+ASTERIX data are stored in HDS files and are therefore compatible with all ADAM
+packages.
+There are basically two different types: binned and event datasets.
+{\em Binned data} (e.g.\ time series, spectra, images) are stored in files whose
+structure is based on the Starlink standard NDF format
+(\xref{SGP/38}{sgp38}{}). 
+Data errors (stored in the form of variances) and quality are catered for.
+{\em Event data sets} store information about a set of photon `events'.
+Each event will have a set of properties, e.g.\ X position, Y position, time,
+raw pulse height.
+
+The input data are first processed by an instrument interface.
+Event data are then processed and binned, and then the binned data are
+processed.
+Finally, graphical output is generated.
+
+The commands may be classified as follows:
+{\small
+\begin{quote}
+\begin{itemize}
+\item Interface to a particular instrument (EXOSAT, ROSAT, etc).
+\item Event dataset and binned dataset processing.
+\item Data conversion and display.
+\item Mathematical manipulations.
+\item Time series analysis.
+\item Image processing.
+\item Spectral analysis.
+\item Statistical analysis.
+\item Data quality analysis.
+\item HDS editor.
+\item Source searching.
+\item Graphical and textual display.
+\end{itemize}
+\end{quote}
+}
+
+{\em To run ASTERIX:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ ASTSTART
+   $ ICL
+   ICL> HELP ASTERIX
+   ICL> ASTERIX
+   ICL> ASTHELP
+   ICL> (any ASTERIX command)
+\end{verbatim}
+\end{small}
+
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ ASTSTART
+   $ ASTHELP
+   $ (most, but not all, ASTERIX commands)
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+{\em Demonstration:}\hfill
+\begin{quote}
+\begin{description}
+\item [] A demonstration session is described in
+\xref{SUN/98}{sun98}{}.
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{CCDPACK --- CCD data reduction} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/139}{sun139}{}]
+
+\vspace{5mm}
+
+A package to perform the initial processing of CCD data.
+Its main advantage over previous methods is its enhanced functionality.
+It processes large amounts of data easily and efficiently, with a minimum of
+effort on the user's part.
+
+It includes routines for performing:
+{\small
+\begin{quote}
+\begin{itemize}
+\item Bias calibration data preparation.
+\item Bias subtraction.
+\item Flash and dark calibration data preparation.
+\item Flash and dark-count correction.
+\item Flatfield data preparation.
+\item Flatfield correction.
+\end{itemize}
+\end{quote}
+}
+The following features are of particular note:
+{\small
+\begin{quote}
+\begin{itemize}
+\item Accesses lists of NDFs, using wildcards and by using names
+ stored in text files.
+\item Logs the progress of a reduction sequence.
+\item Processes all non-complex numeric HDS data types.
+\item Supports many data-combination techniques.
+\item Takes full account of statistical uncertainty using variance production
+ and propagation.
+\end{itemize}
+\end{quote}
+}
+
+{\em To run CCDPACK:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   ICL> HELP CCDPACK
+   ICL> CCDPACK
+   ICL> <individual commands>
+   ICL> HELP <command>
+\end{verbatim}
+\end{small}
+
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ CCDPACK
+   $ CCDHELP
+   $ (any CCDPACK commands)
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{CONVERT --- Data format conversion} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/55}{sun55}{}]
+
+\vspace{5mm}
+
+This package converts data between the Starlink standard $n$-dimensional data
+format (NDF) and other formats.
+Currently, it can handle three data formats:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item DIPSO.
+\item FIGARO (version 2).
+\item INTERIM (BDF).
+\end{itemize}
+\end{quote}
+}
+
+{\em To run CONVERT:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   ICL> CONVERT
+   ICL> (any of the CONVERT programs)
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   Simply type the name of the conversion program you want.
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+{\em Demonstration:}\hfill
+\begin{quote}
+\begin{description}
+\item [] This will convert an NDF file into BDF format, as used by the
+earlier Interim environment.
+
+\begin{small}
+\begin{verbatim}
+   ICL> CONVERT
+   ICL> NDF2BDF
+   NDF - Name of NDF to be converted > adam_examples:image
+   BDF - BDF filename > image
+   ICL>
+\end{verbatim}
+\end{small}
+
+A file IMAGE.BDF will have been created in your current directory.
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{DAOPHOT --- Stellar photometry} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/42}{sun42}{}]
+
+\vspace{5mm}
+
+A {\em stellar photometry} package written by Peter Stetson at the Dominion
+Astrophysical Observatory, Victoria, B.C., Canada and adapted for use under
+ADAM.
+It performs the following tasks:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Finding objects.
+\item Aperture photometry.
+\item Obtaining the point spread function.
+\item Profile-fitting photometry.
+\end{itemize}
+\end{quote}
+
+}
+Profile fitting in crowded regions is performed iteratively, which improves the
+accuracy of the photometry.
+It does not directly use an image display (which aids portability), although
+three additional routines allow results to be displayed on an image device.
+It uses image data in NDF format.
+
+{\em To run DAOPHOT:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:] \hfill
+
+\begin{small}
+\begin{verbatim}
+   Cannot be run from ICL.
+\end{verbatim}
+\end{small}
+
+\item [from DCL:] \hfill
+
+\begin{small}
+\begin{verbatim}
+   $ DAOPHOT
+   Command: HELP
+   Command: ...
+   Command: EXIT
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+N.B. If you enter `DAOPHOT' just to see what happens, you will be disappointed
+to receive the message {\tt `Value unacceptable --- please re-enter'.}
+You will need to read the documentation and user manual before you can
+make any progress with this program.
+
+\newpage
+
+\section{FIGARO --- General spectral reduction} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/86}{sun86}{}]
+
+\vspace{5mm}
+
+This is a {\em general data reduction} system written by Keith Shortridge at
+Caltech and the AAO.
+Most people find it of greatest use in the reduction of spectroscopic data,
+though it also has powerful image and data cube manipulation facilities.
+Starlink recommends FIGARO as the most complete spectroscopic data reduction
+system in the Collection.
+Examples of its facilities are:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Analyse absorption lines interactively.
+\item Aperture photometry.
+\item Calibrate B stars.
+\item Calibrate flat fields.
+\item Calibrate using flux calibration standards.
+\item Calibrate wavelengths of spectra.
+\item Correct S-distortion.
+\item Extract spectra from images and images from data cubes, and insert
+ spectra into images and images into data cubes.
+\item Extract spectra from images taken using optical fibres.
+\item Fit Gaussians to lines in a spectrum interactively.
+\item Generate and apply a spectrum of extinction coefficients.
+\item Input, output, and display data.
+\item Look at the contents of data arrays, other than graphically.
+\item Manipulate complex data structures (mainly connected with Fourier
+ transforms).
+\item Manipulate data arrays `by hand'.
+\item Manipulate images and spectra (arithmetic and more complicated).
+\item Process data taken using FIGS (the AAO's Fabry-Perot Infra-Red Grating
+Spectrometer).
+\item Process echelle data, in particular the UCL echelle in use at the AAO.
+\end{itemize}
+\end{quote}
+}
+
+At present, a number of related packages are bundled with FIGARO.
+In future, these may be released as separate items.
+They include:
+\begin{description}
+
+\item [TWODSPEC]\index{TWODSPEC} \hfill [\xref{SUN/16}{sun16}{}]
+
+This reduces and analyses long-slit and optical-fibre array spectra.
+A number of its functions are useful outside the area of spectroscopy.
+The main application areas are:
+
+{\small
+\begin{quote}
+\begin{itemize}
+
+\item Line profile analysis; LONGSLIT analyses calibrated long-slit spectra.
+For example, it can fit Gaussians, either manually or automatically, in batch.
+It can handle data with two spatial dimensions, such as TAURUS data.
+\mbox{FIBDISP} provides further options useful for such data, although it is
+primarily designed for fibre array data.
+An extensive range of options is available, especially for output.
+\item Two-dimensional arc calibration.
+\item Geometrical distortion correction; S-distortion and Line curvature.
+\item Conversion between FIGARO and IRAF data formats.
+\item Display programs.
+\item Removing continua.
+\end{itemize}
+\end{quote}
+}
+
+\end{description}
+
+{\em To run FIGARO:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   ICL> HELP FIGARO
+   ICL> FIGARO
+   ICL> HELP FIGARO CLASSIFIED
+   ICL> (any FIGARO commands)
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ FIGARO
+   $ HELP FIGARO
+   $ HELP FIGARO CLASSIFIED
+   $ (any FIGARO commands)
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{IRCAM --- Infrared camera data reduction} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/41}{sun41}{}]
+
+\vspace{5mm}
+
+This package reduces, displays, and analyses 2-dimensional images from the
+{\em UKIRT infrared camera} (IRCAM).
+The image data reduction facilities available are:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Mathematical and statistical operations.
+\item Size changing and mosaicking.
+\item Inspection.
+\item Interpolation.
+\item Smoothing.
+\item Feature enhancement.
+\item Bad pixel removal.
+\item Polarimetry.
+\item Median filtering of flat-fields.
+\end{itemize}
+\end{quote}
+}
+
+The graphics and image display facilities available are:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Image display of various types (PLOT, CONTOUR, NSIGMA, RANPLOT).
+\item Display cursor position and value.
+\item Colour control.
+\item Line graphics such as 1-dimensional cuts/slices through images and 
+ contour maps.
+\item Annotation.
+\end{itemize}
+\end{quote}
+}
+
+{\em To run IRCAM:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   Cannot be run from ICL (it uses the older ADAMCL).
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ IRCAM_SETUP
+   $ IRCAM_CLRED
+     (you are then asked to say where your data are
+      and which plotting device you want to use)
+   Ircam-CLRED : > ?
+     (produces a list of commands)
+   Ircam-CLRED : > (select commands)
+       .
+   Ircam-CLRED : > EXIT
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{KAPPA --- Kernel applications} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/95}{sun95}{}]
+
+\vspace{5mm}
+
+The Kernel Application Package runs under ADAM, using the NDF data format, and
+provides {\em general-purpose applications}.
+It is the backbone of the software reorganization around the ADAM environment,
+and its applications integrate with other packages such as PHOTOM, PISA, and
+FIGARO.
+It is usable as a single large program from the ADAM command language ICL, or
+as individual applications from DCL.
+
+It handles bad pixels, and processes quality and variance information within
+NDF data files.
+Although oriented towards image processing, many applications will work on
+NDFs of arbitrary dimension.
+Its graphics are device independent.
+Currently, KAPPA has about 140 commands and provides the following facilities
+for data processing:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Generation of NDFs and ASCII tables by up-to-date FITS readers.
+\item Generation of test data, and NDF creation from ASCII files.
+\item Setting NDF components.
+\item Arithmetic, including a powerful application that handles expressions.
+\item Editing pixels and regions, including polygons and circles, and
+ re-flagging bad pixels by value or by median filtering.
+\item Configuration changing: flip, rotate, shift, subset, dimensionality.
+\item Image mosaicking; normalization of NDF pairs.
+\item Compression and expansion of images.
+\item Filtering: box, Gaussian, and median smoothing; very efficient Fourier
+ transform, maximum-entropy deconvolution.
+\item Surface fitting.
+\item Statistics, including ordered statistics, histogram, pixel-by-pixel
+ statistics over a sequence of images.
+\item Inspection of image values.
+\item Centroiding of features, particularly stars; stellar PSF fitting.
+\item Detail enhancement via histogram equalization, Laplacian convolution,
+ edge enhancement via a shadow effect, thresholding.
+\end{itemize}
+\end{quote}
+}
+
+There are also many applications for data visualization:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Use of the graphics database, AGI, to pass information about pictures
+ between applications.
+ Facilities for the creation, labelling and selection of pictures, and
+ obtaining world and data co-ordinate information from them.
+\item Image and greyscale plots with a selection of scaling modes and many
+ options such as axes.
+\item Creation, selection, saving and manipulation of colour tables and 
+ palettes (for axes, annotation, coloured markers and borders).
+\item Snapshot of an image display to hardcopy.
+\item Blinking and visibility of image-display planes.
+\item Line graphics: contouring, including overlay; columnar and hidden-line
+ plots of images; histogram; line plots of 1-d arrays, and multiple-line plots
+ of images; slices through an image.
+ There is some control of the appearance of plots.
+\end{itemize}
+\end{quote}
+}
+
+{\em To run KAPPA:}\hfill
+\begin{quote}
+\begin{description}
+\item [] See Chapter \ref{C_tour} for a demonstration of KAPPA.
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{PHOTOM --- Aperture photometry} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/45}{sun45}{}]
+
+\vspace{5mm}
+
+This performs aperture photometry.
+It has two basic modes of operation:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Using an interactive display to specify the positions for the
+ measurements.
+\item Obtaining those positions from a file.
+\end{itemize}
+\end{quote}
+}
+
+The aperture is circular or elliptical, and the size and shape can be varied
+interactively on the display, or by entering values from the keyboard or
+parameter system.
+The background sky level can be sampled interactively by manually positioning
+the aperture, or automatically from an annulus surrounding the object.
+
+{\em To run PHOTOM:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+    ICL> HELP PHOTOM
+    ICL> PHOTOM
+    IN - NDF containing input image /@ramp1/ > adam_examples:image
+    COMMAND - PHOTOM /'Values'/ > H (for help)
+    COMMAND - PHOTOM /'Values'/ > (an option from the menu)
+    COMMAND - PHOTOM /'Values'/ > E
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+    $ RUN PHOTOM_DIR:PHOTOM
+    IN - NDF containing input image /@ramp1/ > adam_examples:image
+    .
+    . (as above)
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{PISA --- Object finding and analysis} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/109}{sun109}{}]
+
+\vspace{5mm}
+
+The Position, Intensity and Shape Analysis package, PISA, locates and
+parameterizes objects in an image frame.
+The core of the package is a routine which performs image analysis on a
+2-dimensional data frame.
+It searches for objects having a minimum number of connected pixels above a
+given threshold, and extracts the image parameters (position, intensity, shape)
+for each object.
+The parameters can be determined using thresholding techniques, or an analytical
+stellar profile can be used to fit the objects.
+In crowded regions, deblending of overlapping sources can be performed.
+
+The package derives from the APM IMAGES routine originally written by Mike
+Irwin at the University of Cambridge to analyse output from the Automatic
+Photographic Measuring system.
+
+{\em To run PISA:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+    ICL> HELP PISA
+    ICL> PISA
+    ICL> <individual commands>
+    ICL> HELP <command>
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+    $ PISA
+    $ <individual commands>
+    $ HELP <command>
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+{\em Demonstration:}\hfill
+\begin{quote}
+\begin{description}
+\item [] This example performs isophotal analysis with deblending of overlapped
+images on a frame containing a mixture of stars and galaxies.
+The results are then plotted on a suitable device.
+
+\begin{small}
+\begin{verbatim}
+   ICL> PISA
+        Welcome to PISA ...
+   ICL> PISAFIND
+   IN - NDF containing input image /.../ > PISA_DIR:FRAME
+    Analysing whole image
+   MINPIX - Minimum pixel size for images (typically 4-16) > 6
+   METHOD - Intensity analysis ( 0=Isophotal, 1=Total, 2=Profile ) /0/ > 0
+    Estimated background level =   492.2
+    Background standard deviation =     7.4
+   BACKGROUND - Background (global sky) value /492.17/ >
+   THRESH - Threshold for analysis (data units) /18.61135/ >
+
+    Total number of positive images = 118
+    The results have been written to PISAFIND.DAT
+        and PISASIZE.DAT
+   ICL> PISAPLOT
+   RESULTS - File of PISAFIND parameterised data /@PISAFIND.DAT/ >
+   DEVICE - Name of graphics device /@IKON/ >
+   ICL>
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{SCAR --- Star catalogue database system} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/70}{sun70}{}, \xref{106}{sun106}{}]
+
+\vspace{5mm}
+
+The Starlink Catalogue Access and Reporting system is a relational database
+management system.
+It was designed principally for extracting information from astronomical
+catalogues, but it can be used to process any data stored in relational form.
+A large number of catalogues are available, including the IRAS catalogues.
+For general database requirements, REXEC may be preferable.
+SCAR can perform the following functions:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Extract data from a catalogue using selection criteria.
+\item Manipulate data using various statistical and plotting routines.
+\item Output data from a catalogue.
+\item Put a new catalogue into the database.
+\item Search catalogues and generate reports on what has been found.
+\item Sort, merge, join, and difference catalogues.
+\item Plot sources in a gnomonic (tangent plane) or Aitoff (equal area)
+ projection.
+\item Analyse the fields of a catalogue by scatterplot and histogram.
+\item Calculate new fields.
+\end{itemize}
+\end{quote}
+}
+
+A distinctive feature of SCAR is the use of index files
+which you can create and which contain pointers to rows in one or more
+catalogues.
+This is a compact and flexible method of accessing catalogues;
+for example, a very large catalogue may be physically ordered by declination,
+but you can create an index giving access to it ordered by flux.
+
+{\em To run SCAR:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ SCARSTART
+   .
+   ICL> HELP SCAR
+   ICL> SCAR
+   ICL> SCAR_HELP  (for help on SCAR)
+   ICL> CAR_HELP   (for help on CAR commands)
+   ICL> CAT_HELP   (for help on catalogues)
+   ICL> (any SCAR commands)
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ SCARSTART
+   $ (any SCAR commands)
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+{\em Demonstration:}\hfill
+\begin{quote}
+\begin{description}
+\item [] A script is available which demonstrates some of the features of SCAR.
+It can be invoked by typing:
+
+\begin{small}
+\begin{verbatim}
+   ICL> LOAD SCAR_DOC_DIR:SCAR_SCRIPT
+\end{verbatim}
+\end{small}
+
+It is suggested that you run this in an empty directory so that you can 
+identify the files which have been created.
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{SPECDRE --- Spectroscopy data reduction} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/140}{sun140}{}]
+
+\vspace{5mm}
+
+A package for spectroscopy data reduction and analysis.
+It fills the gap between FIGARO and KAPPA --- on the one hand, all its routines
+conform with Starlink's concept of bad values and variances, on the other hand,
+they offer spectroscopy applications hitherto available only in FIGARO.
+In general, it can work on data sets with seven or less axes.
+Often an application will take just a one-dimensional subset as a spectrum.
+In most cases the spectroscopy axis can be any axis, but for some applications
+must be the first axis.
+
+{\em To run SPECDRE:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   ICL> HELP SPECDRE
+   ICL> SPECDRE
+   ICL> <individual commands>
+   ICL> HELP <command>
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   <not specified>
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{SST --- Simple software tools} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/110}{sun110}{}]
+
+\vspace{5mm}
+
+The Simple Software Tools package helps produce software and documentation,
+with particular emphasis on ADAM programming using Fortran~77. 
+It performs fairly simple manipulations of software, and also tackles some of
+the commonly encountered problems which are not catered for in the more
+sophisticated commercial software tools (such as FORCHECK and VAXset)
+available on Starlink. 
+
+The main purpose of the first version is to extract information from subroutine
+`prologues', and to format it to produce various forms of user documentation. 
+A simple source-code and comment statistics tool is also included.
+
+There are five applications:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Convert `old-Style' ADAM/SSE prologues to `new-style' ones.
+\item Produce \LaTeX\ documentation.
+\item Produce Help libraries.
+\item Produce STARLSE package definitions.
+\item Produce source-code statistics.
+\end{itemize}
+\end{quote}
+}
+
+{\em To run SST:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   ICL> HELP SST
+   ICL> SST
+   ICL> HELP <any SST command>
+   ICL> (any of the SST commands)
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   $ SST
+   $ (any of the SST commands)
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+{\em Demonstration:}\hfill
+\begin{quote}
+\begin{description}
+\item [] This simple demonstration will create a file containing statistics
+about source and comment lines in a Fortran program; the one used happens to
+be the one which is run in the demonstration.
+
+\begin{small}
+\begin{verbatim}
+   ICL> SST
+   ICL> FORSTATS
+   IN - Input file(s) /'*.FOR'/ > CONVERT_DIR:CONVERT.FOR
+   .
+   . (messages from FORSTATS)
+   .
+   ICL> $ TYPE FORSTATS.LIS
+   .
+   . (the output which was written by FORSTATS)
+   .
+   ICL>
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+\newpage
+
+\section{TSP --- Time-series and polarimetry analysis} 
+
+\vspace{-11mm}
+
+\hfill [\xref{SUN/66}{sun66}{}]
+
+\vspace{5mm}
+
+This is a data reduction package for time-series and polarimetric data.
+These facilities are missing from most existing data reduction packages which
+are usually oriented towards either spectroscopy or image processing or both.
+Currently TSP can process the following data:
+
+{\small
+\begin{quote}
+\begin{itemize}
+\item Spectropolarimetry obtained with the AAO Pockels cell
+ spectropolarimeter in conjunction with either IPCS or CCD detectors.
+\item Time series polarimetry obtained with the Hatfield Polarimeter
+ at either UKIRT or AAT.
+\item Time series polarimetry obtained with the University of Turku
+ UBVRI polarimeter.
+\item Five channel time series photometry obtained with the Hatfield
+ polarimeter at the AAT in its high speed photometry mode.
+\item Time series infrared photometry obtained with the AAO Infrared
+ Photometer Spectrometer (IRPS).
+\item Time series optical photometry obtained using the HSP3 high speed
+photometry package at the AAT.
+\end{itemize}
+\end{quote}
+}
+
+{\em To run TSP:}\hfill
+\begin{quote}
+\begin{description}
+
+\item [from ICL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   ICL> HELP TSP
+   ICL> TSP
+   ICL> (any TSP command)
+\end{verbatim}
+\end{small}
+
+\item [from DCL:]\hfill
+
+\begin{small}
+\begin{verbatim}
+   Cannot be run from DCL.
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}
+
+{\em Demonstration:}\hfill
+\begin{quote}
+\begin{description}
+\item [] The following example shows the use of the PPLOT command to plot a
+polarization spectrum.
+The SN1987A data file is included with the software, so you can use this
+command to check that TSP is working.
+
+\begin{small}
+\begin{verbatim}
+    ICL> PPLOT
+    Loading TSP_DIR:TSP into xxxxTSP
+    INPUT - Stokes Data to Plot > TSP_DIR:SN1987A
+    BINERR - Error per bin (per cent) /0.1/ >
+    AUTO - Autoscale Plot /YES/ >
+    LABEL - Label for plot /''/ > SN1987A  1987 Sep 2
+    DEVICE - Plot Device > IKON
+    ICL>
+\end{verbatim}
+\end{small}
+
+\end{description}
+\end{quote}

@@ -1,0 +1,1141 @@
+\part{INTRODUCTION}
+\pagestyle{myheadings}
+\markboth{Introduction}{\stardocname}
+
+\chapter{Introduction}
+\label{C_intro}
+\markboth{Introduction}{\stardocname}
+
+\section{Who is this document for?}
+\label{S_who}
+\markboth{Introduction}{\stardocname}
+
+This Guide is for anyone interested in Starlink software.
+Its purpose is to provide people with a single document that describes the
+ADAM software environment in sufficient detail for them to understand what it
+is, what it can do, and where to find more information.
+It is only for people doing data analysis.
+Features of ADAM which are particularly relevant to data acquisition are not
+covered.
+  
+\section{What is ADAM?}
+\label{S_what}
+\markboth{Introduction}{\stardocname}
+
+This question is often asked, and various equally valid answers are possible. 
+This Guide is based on the view that ADAM is about {\em astronomical
+applications software} written in a particular way.
+Specifically, it is about applications written using the {\em ADAM subroutine 
+libraries}.
+It has usually been found that when a collection of application programs has
+been developed, the need is perceived for a {\em command language} to invoke
+them and to offer useful features over and above those provided by the
+operating system command language.  
+These, then, are the three major components of ADAM: {\bf Applications,
+Subroutine libraries, Command language(s)}\@.
+However, there are other aspects to ADAM. 
+
+Firstly, it is about a certain style in constructing applications, sometimes
+called a software {\em architecture}, and about coding {\em standards}.
+ADAM also stands for {\em professional} software of high quality.
+It means that attention is given to {\em supportability}, {\em
+portability}, and {\em performance}. 
+
+Secondly, it is concerned with a consistent way of handling the storage of
+large quantities of {\em astronomical data} from all possible sources.
+
+Many ADAM libraries can be used in isolation to write `non-ADAM' applications.
+This practice is encouraged as it makes it more likely that such applications
+will fit in better with existing ADAM applications.
+
+It must be emphasized that this document refers to the VMS version of the
+software being discussed.
+There will be minor differences when ADAM is ported to other systems.
+Subsequent versions of this document will specify those differences. 
+
+\section{The structure of this document}
+\label{S_strucdoc}
+\markboth{Introduction}{\stardocname}
+
+Part I presents the fundamental information you need to know before you can
+use ADAM successfully.
+It also give you a guided tour in which ADAM is used to process simple data
+in simple ways.
+The idea is to give you a feel for what the system is like, without drowning
+in details.
+
+Part II begins by surveying the applications software that is available for use.
+It then describes in detail the main language that is used to run ADAM programs,
+namely ICL.
+It ends by introducing the data system (HDS/NDF) that is at the heart of ADAM.
+
+Part III shows how to use ADAM subroutine libraries to create new applications.
+It begins by describing some simple ADAM programs, and how to compile, link,
+and run them.
+ADAM programs are associated with something called an Interface File which
+describes the parameters which control the program --- this is also described.
+Another important consideration for ADAM programmers are the standards and
+conventions which are recommended when writing programs, and the tools which
+are available to help you do it, and a chapter is devoted to this.
+Next, the ADAM libraries are surveyed, and then the individual systems are
+described in more detail in separate chapters.
+
+Part IV is a reference section containing a summary of the main command
+language, ICL, and lists of the precise contents of ADAM application packages
+and subroutine libraries.
+The number of individual programs and subroutines is so large (about 1500 of
+each) that it is helpful to have them organised in functional groups and listed
+concisely in a consistent format without (in the case of subroutines) the
+clutter of parameter lists.
+This should enable you to understand in detail just what the packages and
+libraries can do.
+When you start to use the subroutines in your programs, you will need their
+associated documentation in order to establish the required parameters.
+
+\chapter{Getting Started}
+\label{C_getstart}
+\markboth{Introduction}{\stardocname}
+
+This chapter gets you started with ADAM.
+If possible, you should try out the examples on your terminal so you can
+verify that what is claimed to happen does happen, and you can get a feel for
+the ADAM system.
+Any terminal will do --- you don't need image displays or graphics devices.
+
+If you are totally unfamiliar with computers you should read
+the introductory guide to your local computer system (for example, {\em
+Introduction to VMS}~), or better still get the Starlink site manager or a
+local user to show you.
+In the rest of this manual you are assumed to be familiar with basic VMS
+terms and concepts.
+
+\section{Preliminaries}
+\label{S_prelim}
+
+Before you switch on your terminal, let us explain how to interpret the
+examples.
+The basic principle we use is to show lines as they actually appear on your
+terminal screen.
+When the computer wants you to type something it normally displays a prompt.
+For example, the VAX VMS operating system displays the prompt:
+
+\begin{small}
+\begin{verbatim}
+    $
+\end{verbatim}
+\end{small}
+
+(We indent lines which appear on your terminal screen.)
+You respond to this prompt by typing something that VMS will understand.
+For example:
+
+\begin{small}
+\begin{verbatim}
+    $ DIR
+\end{verbatim}
+\end{small}
+
+will cause the contents of your default directory to be displayed on the
+screen.
+What you actually type are the characters `DIR', followed by the `carriage
+return' key\footnote{Sorry, but there are still people around who complain
+that you never told them this.}.
+We will use the word `enter' to mean `type and then press carriage return'.
+A displayed line will consist partly of characters output by the
+computer, and partly of characters typed in by you.
+We do not attempt to differentiate between the two by typographical conventions;
+you will find it obvious which is which when you try out the examples.
+Sometimes the only key you need to press is the `carriage return' key.
+Usually, this means that you want to accept a default value offered by
+the parameter system.
+For example, you might come across a line like:
+
+\begin{small}
+\begin{verbatim}
+    XDIM - x dimension of output array /64/ >
+\end{verbatim}
+\end{small}
+
+This is output by the computer, and the last character `$>$' is an invitation
+for you to type something.
+If the line appears like that without any further comment, it means that
+you respond by pressing `carriage return'.
+Finally, you will find that in most cases you can type input characters in
+upper or lower case --- it doesn't matter which; they are interpreted as
+being the same.
+
+Sometimes you need to press a key while holding down the `CTRL' key.
+This is the way you send `control codes' to the computer.
+This is indicated typographically by the convention `ctrl/x', where `x' is
+the other key you press.
+For example, `ctrl/Z' means `press the Z key while holding down the CTRL key'.
+
+\section{Quotas}
+\label{S_quotas}
+\markboth{Introduction}{\stardocname}
+
+You must have sufficient VMS process quotas for running ADAM.
+Typical quotas required are as follows:
+\begin{center}
+\begin{tabular}{|lr|lr|}
+\hline
+CPU limit: & Infinite & Direct I/O limit: & 18 \\
+Buffered I/O byte count quota: & 65400 & Buffered I/O limit: & 18 \\
+Timer queue entry quota: & 10 & Open file quota: & 74 \\
+Paging file quota: & 49000 & Subprocess quota: & 10 \\
+Default page fault cluster: & 64 & AST quota: & 23 \\
+Enqueue quota: & 100 & Shared file limit: & 0 \\
+Max detached processes: & 0 & Max active jobs: & 0 \\
+JTQUOTA: & 3072 & & \\
+\hline
+\end{tabular}
+\end{center}
+The paging file quota given here is large enough to allow three large
+applications to be loaded simultaneously.
+You can find out what your quotas are by:
+
+\begin{small}
+\begin{verbatim}
+    $ SHOW PROC/QUOTA
+\end{verbatim}
+\end{small}
+
+You may run out of paging file quota when using big programs or data sets.
+This is usually indicated by the system failing to do what you asked it to do
+and displaying some (probably incomprehensible) message on the screen.
+Consult your Site Manager if you need to get your quotas increased.
+
+\section{Starting up ADAM}
+\label{S_startadam}
+\markboth{Introduction}{\stardocname}
+
+If you have not already executed the Starlink command procedure SSC:LOGIN.COM
+(which defines symbols like ADAMSTART and ICL), do that first:
+
+\begin{small}
+\begin{verbatim}
+    $ @SSC:LOGIN
+\end{verbatim}
+\end{small}
+
+Since you need to do this before using any Starlink software, it is worth
+putting it in your personal LOGIN.COM file.
+
+The first thing to do when you want to use ADAM is to type in the following
+command:
+
+\begin{small}
+\begin{verbatim}
+    $ ADAMSTART
+    *****************************************
+    * ADAM Version 2.0-1 has been installed *
+    *  Type ADAM_CHANGES for information    *
+    *****************************************
+      ADAM version 2.0-1 available
+    $
+\end{verbatim}
+\end{small}
+
+(If this command causes problems, then ADAM hasn't been installed properly at
+your site --- see your Site Manager.
+You may, of course, find that you are using a different version of ADAM, so you
+may get a slightly different response when you try it.)
+This command sets up various logical names and commands needed to use ADAM.
+Also, if you haven't executed this command before, it will create a subdirectory
+called ADAM in your login directory and give it the logical name
+ADAM\_USER\footnote{
+ADAMSTART will only create the [.ADAM] directory and define the {\em job}
+logical name ADAM\-\_USER if ADAM\-\_USER is not already defined as a
+{\em job} logical name.
+If ADAM\_USER is so defined, the assigned directory is assumed to exist.}.
+You can see what's in it by typing:
+
+\begin{small}
+\begin{verbatim}
+    $ DIR ADAM_USER
+\end{verbatim}
+\end{small}
+
+Notice that it contains a file called GLOBAL.SDF; this will hold global
+parameter values.
+(In general, the behaviour of programs and the files they read and write can
+be modified by specifying parameters, of which much more will be said later.
+Global parameters are parameters which are not specific to any one application.)
+The file type qualifier `.SDF' is characteristic of ADAM data files.
+They are written by a component of ADAM called HDS, which stands for
+`Hierarchical Data System'.
+ADAM\_USER is used by the system to hold files which it creates automatically.
+It should be cleared occasionally by using the VMS PURGE and DELETE commands
+in the usual way.
+Provided that no parameter values need retaining between sessions, everything
+can be deleted at the end of a session, but ADAMSTART must be re-run to
+initialize things again before ICL is used.
+
+\section{Choice of command language}
+\label{S_comlang}
+\markboth{Introduction}{\stardocname}
+
+As an ADAM user you have a choice of at least three ways of running ADAM
+programs:
+\begin{itemize}
+\item directly from DCL (the `VMS' command language)
+\item from ICL (the `ADAM' command language)
+\item from SMS.
+\end{itemize}
+ICL is recommended for most purposes because it gives flexibility and good 
+performance when you are using many commands.
+It also offers you an easy, yet efficient, way of writing simple procedures,
+and a comprehensive scientific calculator (with the ability to feed the results
+directly into programs). 
+It also allows you to run multiple applications at the same time.
+Most of this Guide will assume that ICL is being used.
+
+DCL gives fewer facilities --- particularly in terms of command line
+specification --- but in some circumstances it can be quicker.
+Naturally, it also gives immediate access to all DCL facilities.
+For this reason it is often quickest to test a new program under DCL; the
+normal switching between editor, compiler and program execution could mean
+frequent overheads in either stopping and starting ICL or having to execute
+DCL commands from ICL.
+
+SMS (`Simple Menu System') is primarily used for data-acquisition, though
+there is no reason why it should not be used for data-analysis.
+Its main advantage is that it requires little typing, and gives maximum 
+efficiency when a few programs are being run which have lots of 
+parameters but only a few change for each run.
+Its main drawbacks are that it is quite difficult to set up the description of
+what is to appear in the various menus and how they are to look, and that this
+has not been done for the normal Starlink application packages.
+
+SMS is not considered further in this guide.
+If you wish to investigate it, read chapter 11 of the ICL User's Guide
+(\xref{SG/5}{sg5}{}).
+
+\section{Trying out the command languages}
+\label{S_trycl}
+\markboth{Introduction}{\stardocname}
+
+The program TRACE, used below, looks at the contents of a data file of the
+type handled by the Hierarchical Data System (HDS).
+
+\subsection{ICL}
+\markboth{Introduction}{\stardocname}
+
+You start up the ICL command language by typing:
+
+\begin{small}
+\begin{verbatim}
+   $ ICL
+\end{verbatim}
+\end{small}
+
+This loads the ICL program which will interpret the commands you type.
+After it has warmed up (a few seconds), it displays some introductory
+information:
+
+\begin{small}
+\begin{verbatim}
+   Interactive Command Language   ---   Version 1.5-7
+
+      - Type HELP package_name for help on specific Starlink packages
+      -   or HELP PACKAGES for a list of all Starlink packages
+      - Type HELP [command] for help on ICL and its commands
+
+   ICL>
+\end{verbatim}
+\end{small}
+
+You may find that the system responds differently when {\em you} try it
+because it may have been updated since we wrote this.
+Anyway, it's all self-explanatory.
+The last line is the prompt that ICL gives when it wants you to enter something.
+Like the `\$' prompt, the `\verb+ICL>+' prompt is output by the computer; you do
+not type it in yourself.
+
+You can find out what packages are available at your site by entering:
+
+\begin{small}
+\begin{verbatim}
+    ICL> HELP PACKAGES
+
+    PACKAGES
+
+        The following ADAM applications packages are available from Starlink:
+
+        Standard Packages:
+         CONVERT   -  Data format conversion.
+         FIGARO    -  General data-reduction.
+         KAPPA     -  Image processing.
+         SPECDRE   -  Spectroscopy Data Reduction
+         SST       -  Simple Software Tools
+         TSP       -  Time series and polarimetry data analysis.
+
+        Option Packages:
+         ASTERIX   -  X-ray data analysis.
+         CCDPACK   -  CCD data reduction
+         DAOPHOT   -  Stellar photometry.
+         PHOTOM    -  Aperture photometry.
+         PISA      -  Position, Intensity and Shape Analysis
+         SCAR      -  Catalogue access and reporting.
+
+        Additional information available:
+
+        ASTERIX    CCDPACK   CONVERT    DAOPHOT    FIGARO     KAPPA
+        MISCELLANEOUS        PHOTOM     PISA       SCAR       SPECDRE   SST
+        TSP
+
+    PACKAGES Subtopic?
+\end{verbatim}
+\end{small}
+
+Now you can enter the name of one of the packages to get information on it.
+Use it exactly like the VMS HELP system.
+Keep pressing `carriage return' to get back to the `ICL$>$' prompt.
+
+One of the things you can do with ICL is get answers to calculations; for
+example, if you input:
+
+\begin{small}
+\begin{verbatim}
+    ICL> X=SQRT(2)
+    ICL> PRINT Result=(X)
+\end{verbatim}
+\end{small}
+
+ICL will print the answer:
+
+\begin{small}
+\begin{verbatim}
+    Result= 1.414214
+    ICL>
+\end{verbatim}
+\end{small}
+
+You can exit from ICL at any time by entering the command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> EXIT
+    $
+\end{verbatim}
+\end{small}
+
+The `\$' prompt indicates that you are now talking to DCL.
+To use ICL again you will have to type:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL
+\end{verbatim}
+\end{small}
+
+again, and this will generate the same introductory lines as before.
+
+When you have an ICL$>$ prompt, simply type:
+
+\begin{small}
+\begin{verbatim}
+   ICL> TRACE
+\end{verbatim}
+\end{small}
+
+followed by $<$CR$>$ when you get the prompt:
+
+\begin{small}
+\begin{verbatim}
+   OBJECT --- Object to be examined /@ADAM_USER:GLOBAL/ >
+\end{verbatim}
+\end{small}
+
+This will show you the structure and contents of the ADAM\_USER:GLOBAL.SDF
+file.
+
+Once again, to leave ICL and return to DCL simply type:
+
+\begin{small}
+\begin{verbatim}
+   ICL> EXIT
+   $
+\end{verbatim}
+\end{small}
+
+
+The above sequence of operations is encapsulated in the single command
+\verb+ADAM+.
+Therefore, the easiest way of running \verb+TRACE+ is to type:
+
+\begin{small}
+\begin{verbatim}
+    $ ADAM TRACE
+\end{verbatim}
+\end{small}
+
+which leaves you in ICL and in a position to try out any of the other ICL
+commands.
+
+\subsection{DCL}
+\markboth{Introduction}{\stardocname}
+
+When using DCL, the normal way to run program TRACE is simply to type:
+
+\begin{small}
+\begin{verbatim}
+   $ TRACE
+\end{verbatim}
+\end{small}
+
+and then press $<$CR$>$ when you receive the prompt:
+
+\begin{small}
+\begin{verbatim}
+   OBJECT --- Object to be examined /@ADAM_USER:GLOBAL/ >
+\end{verbatim}
+\end{small}
+
+Once again, the contents and structure of the file will be displayed, only this
+time you will be left in DCL with a `\$' prompt.
+
+\chapter {A Guided Tour}
+\label{C_tour}
+\markboth{Introduction}{\stardocname}
+
+This Chapter contains simple illustrations of how to use ADAM applications from
+the ICL command language.
+
+One of the best ways of learning how to use ADAM is to play with one of the
+applications packages.
+There are many of these and they are described in Chapter \ref{C_applic}. 
+The KAPPA package is used below because it conforms to ADAM conventions and
+has a lot of useful commands for processing data.
+
+Remember, before you attempt to use ADAM applications from ICL you must
+initialise ADAM logical names:
+
+\begin{small}
+\begin{verbatim}
+    $ ADAMSTART
+\end{verbatim}
+\end{small}
+
+and start up the ICL language interpreter:
+
+\begin{small}
+\begin{verbatim}
+    $ ICL
+\end{verbatim}
+\end{small}
+
+
+\section {Starting KAPPA}
+\label{S_startkap}
+\markboth{Introduction}{\stardocname}
+
+KAPPA is made available from within ICL by typing:
+
+\begin{small}
+\begin{verbatim}
+    ICL> KAPPA
+\end{verbatim}
+\end{small}
+
+This loads KAPPA and defines the commands required to run its programs.
+It also generates the following output:
+
+\begin{small}
+\begin{verbatim}
+     Help key KAPPA redefined
+
+     --     Initialised for KAPPA     --
+     --    Version 0.8, 1991 August   --
+
+     Type HELP KAPPA or KAPHELP for KAPPA help
+
+    ICL>
+\end{verbatim}
+\end{small}
+
+Don't worry about these messages for the moment.
+If you now enter:
+
+\begin{small}
+\begin{verbatim}
+    ICL> HELP KAPPA
+\end{verbatim}
+\end{small}
+
+you will get an
+introduction to the KAPPA Help system:
+
+\begin{small}
+\begin{verbatim}
+    HELP
+
+       This is the KAPPA online help system.  It invokes the VMS HELP Facility
+       to display information about a KAPPA command or topic.  If you need
+       assistance using this help library, enter "Using_help" in response to
+       the "Topic?" prompt.  If you need more information about getting help
+       about KAPPA from the ICL level, then enter "Command-line_help".
+\end{verbatim}
+\end{small}
+
+followed by the prompt:
+
+\begin{small}
+\begin{verbatim}
+    Topic?
+\end{verbatim}
+\end{small}
+
+This is an invitation for you to ask for further information.
+To find out what subjects are available you simply enter a `?'.
+You may find the following topics particularly useful :
+\begin{quote}
+\begin{description}
+\item [Classified\_commands] --- displays a list of subject areas as subtopics.
+Each subtopic lists all KAPPA applications in that classification, and gives
+their functions.
+\item [Summary] --- gives a brief description of the function of each 
+application within KAPPA.
+\item [Using\_Help] --- tells you how to use this particular Help system.
+\item [$<$command$>$ param] --- describes all the parameters of the particular
+KAPPA  {\tt <command>}.
+Subtopics give further details about individual parameters, including their
+command line position.
+\end{description}
+\end{quote}
+You can either enter a subtopic, or press $<$CR$>$ to get back the `Topic?'
+prompt.
+Then you can enter `?' to get the list of topics displayed again, or just
+press $<$CR$>$ to get back to the `ICL$>$' prompt.
+You can escape from the Help system at any level by entering ctrl/Z.
+
+Now have a look in your ADAM\_USER directory:
+
+\begin{small}
+\begin{verbatim}
+    ICL> DIR ADAM_USER
+    PROCERR    Procedure DIR not recognized
+    ICL>
+\end{verbatim}
+\end{small}
+
+The attempt to use the DIR command fails\footnote{It is intended to change 
+this soon.} because it is only recognized by the DCL command interpreter, and
+you are talking to the ICL command interpreter.
+What you need to do is to tell ICL that this is a DCL command.
+You can do this by preceding the command with a `\$' character, thus:
+
+\begin{small}
+\begin{verbatim}
+    ICL> $ DIR ADAM_USER
+\end{verbatim}
+\end{small}
+
+ADAM now creates a subprocess in which to execute the DCL command processor.
+This is the reason for the delay and the message:
+
+\begin{small}
+\begin{verbatim}
+    Creating DCL subprocess
+\end{verbatim}
+\end{small}
+
+This subprocess is only created once per session; any further DCL commands you
+issue will be run in the DCL subprocess without any further action from you.
+
+\section{Creating test images}
+\label{S_creimag}
+
+You can now use KAPPA to create some small images which you can then display
+and manipulate.
+The simplest way to create an image is to use command CREFRAME, which
+you can type in lower case if you like:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe
+\end{verbatim}
+\end{small}
+
+After a loading message, the first thing that happens is that you are invited
+to specify a value for one of the program parameters:
+
+\begin{small}
+\begin{verbatim}
+    XDIM - x dimension of output array /64/ > 
+\end{verbatim}
+\end{small}
+
+(If you have used CREFRAME before, you might find the `\verb+/64/+' in the 
+above
+line comes out as something else.)
+This line is typical of the way in which ADAM asks for {\em parameter values.}
+The first field, in this case `XDIM', is the parameter keyword --- the name by
+which the parameter is known to the user.
+Then, after the `\verb+-+' delimiter, comes the second field, in this case
+`\verb+x dimension of output array+'.
+This is a brief description of what the parameter means.
+The third field, in this case `\verb+/64/+', shows a suggested value for the
+parameter.
+If you just press $<$CR$>$ in response to the prompt, the suggested value will
+be taken as the value you wish to specify for that parameter.
+Sometimes a suggested value will not be displayed in a prompt.
+In this case you {\em must} specify a value.
+
+For the purposes of this example it is sensible to choose a small array size,
+say 10$\times$10.
+Thus, the suggested value of `64' is not what you want and you must specify
+the value you require by entering the value `10':
+
+\begin{small}
+\begin{verbatim}
+    XDIM - x dimension of output array /64/ > 10
+\end{verbatim}
+\end{small}
+
+The parameter system then accepts this value as the value of the parameter XDIM.
+Once you press $<$CR$>$, the system will present you with a prompt for another
+parameter value:
+
+\begin{small}
+\begin{verbatim}
+    YDIM - y dimension of output array /64/ > 
+\end{verbatim}
+\end{small}
+
+This prompt is similar to the previous one, and the suggested value is `64' as
+before.
+Specify the value `10' again:
+
+\begin{small}
+\begin{verbatim}
+    YDIM - y dimension of output array /64/ > 10
+\end{verbatim}
+\end{small}
+
+The system now presents you with the following lines:
+
+\begin{small}
+\begin{verbatim}
+    GS = Gaussians, RR = Random 0 to 1, RL = Random from Min to Max,
+    RA = Ramp across image, FL = Flat, BL = Blank,
+    GN = Gaussian noise with standard deviation about the mean, 
+    RP = Poissonian noise about mean.
+    TYPED - Type of data to be generated /'GS'/ > 
+\end{verbatim}
+\end{small}
+
+The first four indicate the codes you can enter in response to the parameter
+prompt and the meanings attached to them.
+The last is a prompt in the same format as the previous prompts with a
+suggested value of `GS'.
+In this case, the input required is a character string rather than an integer
+--- you can usually tell what type of input is required from the format of
+the suggested value.
+For this illustration, generate an array that is simple in structure to make
+it easy to follow what is going on.
+Choose an image in the form of a `ramp' --- this is an array whose
+pixel values rise or fall steadily from left to right or from top to bottom.
+The code is `RA':
+
+\begin{small}
+\begin{verbatim}
+    TYPED - Type of data to be generated /'GS'/ > ra
+\end{verbatim}
+\end{small}
+
+You may wonder why the suggested value is surrounded by quotes but the supplied
+value is not.
+In fact, the supplied value should strictly be \verb+'RA'+, but it is
+permissible to omit the quote characters as long as there is no ambiguity in
+doing so\footnote{This is not the right place to become embroiled in a 
+discussion of what is a quite complicated subject --- see
+Chapter~\ref{C_prompts}.}.
+
+The next line to appear is:
+
+\begin{small}
+\begin{verbatim}
+    LOW - Lower limit for data >
+\end{verbatim}
+\end{small}
+
+This time the suggested value field (the `/.../' bit) is missing.
+Whether it is present or not depends on how the programmer has used the
+parameter system and whether or not he thinks a suggested value is appropriate.
+Because no suggested value is given, you need to enter a value --- use
+`1' for the lower limit and `10' for the upper limit:
+
+\begin{small}
+\begin{verbatim}
+    LOW - Lower limit for data > 1
+    HIGH - Upper limit for data > 10
+\end{verbatim}
+\end{small}
+
+The next prompt is:
+
+\begin{small}
+\begin{verbatim}
+    DIRN - Direction of ramping /1/ >
+\end{verbatim}
+\end{small}
+
+This time you have suggested value again, but what does the number mean?
+You can find out by entering `?':
+
+\begin{small}
+\begin{verbatim}
+    DIRN - Direction of ramping /1/ > ?
+\end{verbatim}
+\end{small}
+
+The system will explain that `1' generates pixels which increase from left to
+right, `2' generates pixels which increase from right to left, `3' bottom to
+top, and `4' top to bottom.
+Choose the suggested value `1' by just pressing $<$CR$>$:
+
+\begin{small}
+\begin{verbatim}
+    DIRN - Direction of ramping /1/ >
+\end{verbatim}
+\end{small}
+
+The next prompt to appear is:
+
+\begin{small}
+\begin{verbatim}
+    OUTPIC - Image for output data >
+\end{verbatim}
+\end{small}
+
+Here there is no suggested value, so you must enter your own.
+The response required is a name for the generated image; call it RAMP1:
+
+\begin{small}
+\begin{verbatim}
+    OUTPIC - Image for output data > ramp1
+    ICL>
+\end{verbatim}
+\end{small}
+
+After `ramp1' is entered the program generates the required image, so there
+may be a slight delay.
+The `ICL$>$' prompt indicates that the CREFRAME command has completed its task
+and has returned control to the command language processor.
+The generated image will be called `RAMP1' and will be stored in a file called
+RAMP1.SDF in your default directory --- take a look, you will find it is there.
+
+If you now generate three more 10$\times$10 images containing different types
+of ramp, you can display and process them in various ways.
+Each time you want to create a new image using CREFRAME, you must enter the name
+of the program as a command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> creframe
+    XDIM - x dimension of output array /10/ >
+\end{verbatim}
+\end{small}
+
+Notice that the second and all subsequent times you run an application program,
+there is no delay while it is loaded; the response is almost immediate.
+This is one of the main advantages of running applications from ICL.
+Notice also that the suggested value has changed from `64' to `10' --- the
+parameter system has remembered the value you last entered for XDIM; this is
+called its `current value'.
+(The current values of parameters used by KAPPA commands are stored in the file
+KAPPA.SDF in your ADAM\_USER directory.)
+Thus, you can just press $<$CR$>$ to accept the suggested value.
+Generating the next image is going to be easy, isn't it?
+
+\begin{small}
+\begin{verbatim}
+    YDIM - y dimension of output array /10/ > 
+    GS = Gaussians, RR = Random 0 to 1, RL = Random from Min to Max,
+    RA = Ramp across image, FL = Flat, BL = Blank,
+    GN = Gaussian noise with standard deviation about mean, 
+    RP = Poissonian noise about mean.
+    TYPED - Type of data to be generated /'GS'/ > 
+\end{verbatim}
+\end{small}
+
+Wait a minute --- last time you specified `RA' as the value of TYPED, but the
+suggested value has remained `GS' as it was originally.
+In this case, the suggested value `GS' is generated by the program and the
+current value is not used.
+Once again, it all depends on how the parameter system has been used by the
+programmer --- this subject will be considered in more detail in
+Chapter~\ref{C_parsys}.
+All you can do is keep a careful eye on the suggested values.
+Here you must specify `RA' explicitly again in order to generate a ramp:
+
+\begin{small}
+\begin{verbatim}
+    TYPED - Type of data to be generated /'GS'/ > ra
+    LOW - Lower limit for data > 1
+    HIGH - Upper limit for data > 10
+    DIRN - Direction of ramping /1/ > 2
+    OUTPIC - Image for output data > ramp2
+    ICL>
+\end{verbatim}
+\end{small}
+
+This time DIRN has been set to `2' and the image  called `RAMP2'.
+
+In a similar way, you can now generate images called `RAMP3' and `RAMP4' with
+DIRN set to 3 and 4 respectively.
+Notice that the suggested value for DIRN is similar to that for TYPED in that
+it always has the same value rather than the last used value.
+
+\section{Examining images}
+\label{S_examimag}
+
+Now that you have generated four images, you can play with them.
+In order to avoid getting involved with graphics devices at this stage, only
+commands which will run on any terminal will be used.
+The first thing to do is to examine their pixel values.
+There are several ways of doing this with KAPPA; one way is to use the LOOK
+command:
+
+\begin{small}
+\begin{verbatim}
+    ICL> look
+    INPIC - Image to be inspected/@ramp4/ >
+\end{verbatim}
+\end{small}
+
+The suggested value for the name of the image to be looked at is
+`\verb+@ramp4+'.
+The `\verb+@+' character means `an object with the name of', thus
+`\verb+@ramp4+' means `an object with the name of ramp4'.
+In this case the system assumes that any character string you type is the name
+of a data object; therefore you do not need to precede the name with an
+`\verb+@+' symbol.
+In the example, the system realizes that the value of INPIC should be the name
+of an image and it remembers that the name of the last image referred to was
+`ramp4'.
+However, look at `ramp1' first:
+
+\begin{small}
+\begin{verbatim}
+    INPIC - Image to be inspected/@ramp4/ > ramp1
+\end{verbatim}
+\end{small}
+
+LOOK now accesses `ramp1' and displays the following information:
+
+\begin{small}
+\begin{verbatim}
+    Title = KAPPA - Creframe
+    Array is 10 by 10 pixels
+\end{verbatim}
+\end{small}
+
+The title of the image --- `\verb+KAPPA - Creframe+' --- was generated by the
+CREFRAME program, and the array size is 10$\times$10 as expected.
+This is followed by the next prompt:
+
+\begin{small}
+\begin{verbatim}
+    CHOICE - Peep, Examine or List /'Peep'/ >
+\end{verbatim}
+\end{small}
+
+These are just different ways of listing the pixel values.
+The suggested value is `Peep', so try that by typing $<$CR$>$.
+You can also accept the suggested values for the next two prompts which specify
+the central point of the part of the image you are going to peep at:
+
+\begin{small}
+\begin{verbatim}
+    XCEN - x centre pixel index of 7x7 box /5/ >
+    YCEN - y centre pixel index of 7x7 box /5/ >
+\end{verbatim}
+\end{small}
+
+The `Peep' option will display the pixel values within a 7$\times$7 box centred
+on pixel (XCEN, YCEN).
+Notice that the program has chosen the centre of the image as the suggested box
+centre.
+All the required parameter values have now been entered, so the program proceeds
+to display the specified box:
+
+\begin{small}
+\begin{verbatim}
+          2         3         4         5         6         7         8
+
+    8     2         3         4         5         6         7         8
+    7     2         3         4         5         6         7         8
+    6     2         3         4         5         6         7         8
+    5     2         3         4         5         6         7         8
+    4     2         3         4         5         6         7         8
+    3     2         3         4         5         6         7         8
+    2     2         3         4         5         6         7         8
+
+    ANOTHER - Another inspection ? /YES/ >
+\end{verbatim}
+\end{small}
+
+Pixel indices are numbered from bottom left.
+In this case the pixel values are equal to their column number.
+Unlike CREFRAME, you are not returned to ICL but are given a chance to peep
+at another part of the image --- these decisions are made by the programmer.
+As the image you are peeping at is highly predictable, do not bother to
+examine it further but escape from the program by entering:
+
+\begin{small}
+\begin{verbatim}
+    ANOTHER - Another inspection ? /YES/ > n
+    ICL >
+\end{verbatim}
+\end{small}
+
+When a program asks for a `YES' or `NO' value, you can get away with
+`Y', `True', and `T' for `YES'; and `N', `False', and `F' for `NO'; regardless
+of case.
+
+You can use the LOOK command to examine the pixel values of the other images
+you have created in a similar way to that shown above.
+The `List' option gives you the opportunity to store the output in a file:
+
+\begin{small}
+\begin{verbatim}
+    ICL> look
+    INPIC - Image to be inspected/@ramp1/ >
+    Title = KAPPA - Creframe
+    Array is 10 by 10 pixels
+
+    CHOICE - Peep, Examine or List /'PEEP'/ > L
+
+    XLOW - x start pixel index of sub-array /1/ >
+    YLOW - y start pixel index of sub-array /1/ >
+    XSIZE - x size of sub-array /10/ >
+    YSIZE - y size of sub-array /10/ >
+    FILENAME - Name of listing file /@LOOKOUT.LIS/ >
+    Listing to LOOKOUT.LIS
+
+    ANOTHER - Another inspection ? /YES/ > n
+    ICL>
+\end{verbatim}
+\end{small}
+
+Notice in this case that the parameter prompts after that for `CHOICE' differ
+from those encountered before.
+This is because you have chosen the `List' option instead of the `Peep' option,
+and the program needs different information before it can proceed.
+Accept the suggested values for all the parameters until you come to `ANOTHER'
+again.
+This makes things quick and easy for you.
+The program writes the pixel listing to the file LOOKOUT.LIS which is written
+in your default directory.
+You should, therefore, be able to display it on the screen using the DCL `TYPE'
+command.
+
+\begin{small}
+\begin{verbatim}
+    ICL> $ type lookout
+\end{verbatim}
+\end{small}
+
+will cause the contents of file LOOKOUT.LIS to be displayed on your terminal
+(in a folded form --- not shown here).
+
+\section{ICL procedures}
+\label{S_iclprocs}
+
+So far we have used ICL to do simple things like calculate the value of a simple
+formula and load and use KAPPA.
+However, ICL can also be used as a programming language in which to write
+procedures, just as commands of DCL can be stored in a command procedure.
+This is a very convenient way to extend the range of applications available to
+you.
+
+Suppose you want to add together (pixel by pixel) the four images you have
+created to produce a new composite image.
+This is the sort of problem that can be solved using an ICL {\em procedure}.
+ICL has a lot of functions available, one of which, `SNAME', generates
+sequential names:
+
+\begin{small}
+\begin{verbatim}
+    SNAME(string,n,m)
+\end{verbatim}
+\end{small}
+
+produces a name which is the concatenation of the `string' with the 
+integer $n$.
+A third parameter $m$ specifies a minimum number of digits for the
+numeric part of the name. Leading zeros are inserted if necessary to produce at
+least $m$ digits, thus:
+
+\begin{small}
+\begin{verbatim}
+    SNAME('RUN',3,1)      has the value   RUN3
+    SNAME('IPCS',17,3)    has the value   IPCS017
+\end{verbatim}
+\end{small}
+
+An ICL procedure can be written using this to add a whole series of images
+together:
+
+\begin{small}
+\begin{verbatim}
+    ICL> PROC RAMPADD N
+    RAMPADD> { Add images RAMP1 to RAMPN to form SUM
+    RAMPADD>   ADD RAMP1 RAMP2 SUM TITLE='Sum of 2 images'
+    RAMPADD>   LOOP FOR I=3 TO (N)
+    RAMPADD>     TITLE = 'Sum of' & I:2 & ' images'
+    RAMPADD>     ADD SUM (SNAME('RAMP',I,1)) SUM TITLE=(TITLE)
+    RAMPADD>   END LOOP
+    RAMPADD> END PROC
+    ICL>
+\end{verbatim}
+\end{small}
+
+The line starting \verb+PROC+ tells ICL you wish to write a procedure called
+\verb+RAMPADD+ which is to have one parameter called \verb+N+. 
+This will use the KAPPA application \verb+ADD+ to 
+add successive
+images together in the new image \verb+SUM+.
+
+You can save this procedure for future use by entering:
+
+\begin{small}
+\begin{verbatim}
+    ICL> save rampadd
+\end{verbatim}
+\end{small}
+
+To run this procedure, use its name as a command and specify the value of the
+parameter.
+Thus, to add together the images RAMP1, RAMP2, RAMP3, and RAMP4 enter:
+
+\begin{small}
+\begin{verbatim}
+    ICL> rampadd 4
+    ICL>
+\end{verbatim}
+\end{small}
+
+An ADD statement is executed three times within the procedure, and a suitable
+title is generated for each image which is created.
+If you use LOOK to `Peep' at the new image called `SUM', you will see that
+every pixel has the value `22' as you would expect. 
+Note that four SUM.SDF files have been created.
+You should PURGE or DELETE them.
+
+End your ICL session by exiting from ICL in the normal way:
+
+\begin{small}
+\begin{verbatim}
+    ICL> exit
+    $
+\end{verbatim}
+\end{small}
+
+You should now be fairly familiar with the style in which ADAM programs are
+used.
+More examples of how to use KAPPA are given in
+\xref{SUN/95}{sun95}{}.
+ICL procedures are considered in more detail in Chapter~\ref{C_iclprog}.

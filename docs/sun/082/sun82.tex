@@ -1,0 +1,628 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {82.4}
+\newcommand{\stardocauthors}   {D C Parsons, H J Walker}
+\newcommand{\stardocdate}      {21 June 1993}
+\newcommand{\stardoctitle}     {IRAS --- Data Products Primer}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+%\setlength{\parskip}{0mm}
+%\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\pagebreak
+\section{Introduction}
+
+This is a new paragraph put in so that I can test the operation of xdvi
+on my PC.
+I hope it works, but I am having difficulties at the moment.
+
+The purpose of this note is to introduce the IRAS data products, 
+describe how to gain access or obtain copies of selected data,
+and to guide potential users to Starlink software and documentation which 
+can help in the analysis of the data.
+
+For ease of readability, I have referred to the user throughout this document  
+as he, rather than he or she, and I hope that those amongst its readership 
+who, like me, are female will excuse me.
+
+\section{IRAS}
+The InfraRed Astronomical Satellite flew in 1983. It carried three instruments.
+The main detector array consisted of 62 detectors sensitive around 12$\mu$m,
+25$\mu$m, 60$\mu$m, and 100$\mu$m. The slitless Low Resolution Spectrometer
+(LRS) gave spectra between 8$\mu$m and 23$\mu$m with a five channel output. The
+Chopped Photometric Channel (CPC) had detectors sensitive at 50$\mu$m and
+100$\mu$m.
+
+The main objective of the mission was to make a survey of the whole sky using 
+the main detector array, with multiple coverage. During this survey, the 
+telescope scanned almost
+the same strip of sky during orbits separated in time anything from one orbit
+of the satellite (103 minutes) up to a maximum of 36 hours. This enabled
+two sets of data covering the same section of sky, and close in time, to be
+compared so that the most obvious inconsistencies could be removed. This group
+of observations is termed an HCON (for Hours Confirmed). 96\% of the sky was
+covered by at least two HCONs. A three HCON coverage was achieved over 72\% of
+the sky, and 15\% of the sky received more than three HCON coverages. A map of
+the coverage is given in Appendix {\ref a:1} (from IRAS Catalogues and Atlases: 
+Explanatory Supplement, p. I--5).
+
+In addition to the whole sky survey, interesting objects were scanned at higher
+resolution with the main detector array, these are termed Pointed Observations.
+(They may also be referred to as additional observations in earlier
+documentation). The CPC maps were also of specific objects only.
+
+The extraction of an LRS spectrum was triggered by the detectors passing over a
+sufficiently bright point source.
+
+The raw detector data from the IRAS whole sky survey was first processed to
+remove glitches and calibrated to the internal source. The Calibrated
+Reconstructed Detector Data (CRDD) comprises this minimally processed data. The
+CRDD was subsequently processed to give highly reliable catalogues and images.
+
+The IRAS Point Source Catalog contains 245,839 sources seen in at
+least one waveband, however only 6343 were seen at all four wavelengths.
+The IRAS Faint Source Catalogue contains a further 173,044 fainter sources
+seen in the unconfused 80\% of the sky, but the reliability is slightly reduced.
+In addition IRAS data were also processed to give more specialised catalogues.
+
+IRAS images were prepared from both the original CRDD data, and, for the
+unconfused higher ecliptic latitudes, from recalibrated data from which the
+modelled zodiacal light has been removed. These are known respectively as
+Skyflux Plates and IRAS Sky Survey Atlas (ISSA). Lower resolution maps of the
+original image output are available. 
+
+Details of the IRAS satellite and mission, the calibration and data
+reduction techniques used, reliability and other caveats on products are
+described in the IRAS Catalogues and Atlases Explanatory Supplement. 
+
+The user must be aware that for most IRAS data products there are several
+versions available, due to improved calibration. When you are extracting data,
+check that you have the most recent version, and when comparing your data with
+published results, check that they used the most recent version!
+
+{\bf It cannot be over-emphasised that potential users of IRAS data products
+MUST read the IRAS Catalogs and Atlases Explanatory Supplement before embarking
+on a research programme utilising any of the products described here.
+Particular attention should be given to section A.3 page I--2 of the Explanatory
+Supplement which directs the user to certain caveats covering each data 
+product.}
+ 
+\section {Catalogues}
+\label{m:cats}
+IRAS catalogues are of three types:---
+\begin{itemize}
+\item Detection catalogues containing IRAS fluxes or spectra, {\em e.g.}$\;$ the
+IRAS Point Source Catalog,
+\item Association catalogues containing one type of IRAS source, 
+{\em e.g.}$\;$ IRAS Point Source Catalog objects associated with galaxies 
+and quasars,
+\item Position catalogues giving the positions at which observations were
+made, but no other data {\em e.g.}$\;$ for Pointed Observations.
+\end{itemize} 
+SUN/120 (CATPAC --- Catalogue Applications Package),
+SUN/106 (SCAR --- Beginner's Guide) and SUN/70 (Starlink Catalogue Access and 
+Reporting) describe how to access the IRAS catalogues. The catalogues are 
+available on STADAT (the STArlink DATabase machine) and may also be available 
+at your node.
+
+It is possible, using CATPAC and SCAR, to search through the catalogues using 
+a wide range of criteria, from names and positions to flux density ratios and 
+flux quality flags.
+It is also possible to extract data from more than one catalogue for sources 
+present in several catalogues.
+The package allows the user to print out information about sources extracted
+from the catalogues, or to plot them.
+
+When new IRAS catalogues are released, they are added to the STADAT 
+database.
+There is an up to date on-line listing of the available catalogues on STADAT
+which can be viewed using the SCAR CAT\_HELP facility.
+
+\section{Images}
+\label{m:images}
+Until now astronomical infrared images have been very rare; IRAS has
+revolutionised this situation by providing two types of data sets.
+\begin{itemize}
+\item The first, the Extended Emission data from the survey, consists of
+the Infrared Sky Survey Atlas (ISSA), covering the higher ecliptic latitudes 
+(roughly $| \beta | >$ 20$^{\circ}$), and the infrared ``Skyflux~Plates'' 
+(also called Skyflux images), covering the whole sky --- the infrared analogues 
+of the Palomar and SERC/ESO optical sky surveys. 
+There are also lower resolution maps from the survey data.
+\item The second, from the IRAS Pointed Observation (PO) programme,
+comprises thousands of deeper images of selected objects and regions of sky,
+including many examples of virtually every known astronomical phenomenon.
+These were made with small raster scans using either the survey array or the
+Chopped Photometric Channel (CPC) instrument.
+\end{itemize}
+These two data bases are described below, followed by an outline of the
+pertinent access and analysis software.
+
+\subsection{The Extended Emission data set}
+
+\subsubsection{Skyflux Plates}
+The IRAS survey covered most parts of the sky three times during the 10 months
+of data collection. Each of these coverages is distinct and is processed
+separately, which results in three sets of the image-like products. The first
+two coverages were of about 96\% of the sky, the third of about 72\%. 
+There are 212 high resolution `Skyflux Plates' covering the whole sky in the
+first 2 HCONs, the 3rd HCON has 188 Skyflux Plates. All 3 HCONS are available, 
+the 3rd HCON having been re-released after recalibration.
+Since the zodiacal light is different for each HCON, the HCONs are kept 
+separate.
+
+Each plate has flux and statistical weight images stored for all 4 IRAS
+wavebands of 12, 25, 60 and 100 $\mu$m.
+Each image is about 16.7 degrees square and the plate centres are separated by 
+15 degrees in Right Ascension and Declination. The plates nominally have
+499 by 499 2-arcmin-square pixels, but this varies from plate to plate.
+The quoted effective resolution is 6 arcmin.
+The data are stored as FITS images, in a Gnomonic projection which is 
+described in the header of each image.
+The Skyflux data are stored at RAL on magnetic tape, users can obtain 
+images by contacting RLSTAR::IRASMAIL.
+
+The Skyflux Plate images are available as photographic negatives as well as 
+digital data on tape.
+The negatives have all four bands reproduced side by side in a rectangular 
+format approximately 5 inches square, which is intended for enlargement to 
+prints 16 inches by 20 inches.
+In order to display the whole dynamic range of the data, the grey scale employed
+corresponds to the fifth root of the surface brightness, which is similar in
+effect to a logarithmic scale.
+The grey-scale photographic product has been distributed to UK astronomical
+institutes.
+
+\subsubsection{IRAS Sky Survey Atlas}
+The IRAS Sky Survey Atlas consists of images made from whole sky survey data
+which has been recalibrated and from which a model of the zodiacal light has 
+been removed.
+Images are formed from the data of each HCON separately, and a combined image
+of all HCON data for each plate has also been made and is referred to as HCON0.
+
+Each plate has flux images stored for all 4 IRAS wavebands of 12, 25, 60 and
+100 $\mu$m.
+Each image is 12.5 degrees square. The plate centres are separated by 10 degrees
+in declination, with a variable spacing in Right Ascension due to convergence at
+the poles. They have 500 by 500 1.5 arcmin-square pixels, and the resolution is
+between 4 and 5 arcmin depending on wavelength.
+The images are stored in FITS format. 
+
+The first release of ISSA images (Phase I) covers ecliptic latitudes more than 
+50$^{\circ}$ away from the ecliptic plane. These have been released on CD-ROM,
+and a set of CDs has been sent to each Starlink node manager.
+The CD set includes a program FFIELD, which tells the user which image 
+contains the source position required.
+RAL has received the Phase II release (on Exabyte), and these images are stored
+on the optical disk jukebox on the Space Data Centre VAX. These images cover 
+the area between approximately 20$^{\circ}$ and 50$^{\circ}$ away from the 
+ecliptic plane. 
+The user can obtain copies of Phase II images by contacting RLSTAR::IRASMAIL.
+Brief details of
+the processing used to obtain the ISSA images, and the caveats upon them are
+included with copies of the CD-ROM. For a more detailed description the user
+should refer to the IRAS Sky Survey Atlas Explanatory Supplement.
+
+RAL also has a set of ISSA Reject images, available on the optical jukebox.
+These are images less than 20$^{\circ}$ away from the ecliptic plane. These
+data do not meet the standards imposed on the main product, and care is needed
+in their use. 
+The user can obtain copies of Reject images by contacting RLSTAR::IRASMAIL.
+
+\subsubsection{Galactic Plane Maps}
+These cover the band of sky within \underline{+}10 degrees of the galactic 
+plane. 
+They are a set of 24 images, obtained by rebinning a subset of the Skyflux 
+Plates.
+
+The maps are 16.7 by 20 degrees and have map centres separated by 15 degrees in
+galactic longitude.
+The maps nominally have 499 by 599 2-arcmin-square pixels.
+They consist of 4 images for each map area, one for each of the IRAS
+wavebands, 12, 25, 60 and 100 $\mu$m. 
+The data from each HCON are stored separately.
+The rebinning gives some degradation of the 6 arcmin Skyflux plate resolution.
+The maps are presented in the Lambert normal equivalent cylindrical projection
+which is described in the FITS header of each image.
+The associated statistical weight maps are not available directly, but can be
+derived from those for the Skyflux plates.
+The maps are available on tape at RAL.
+
+\subsubsection{Low Resolution All Sky Maps}
+These are derived from the first version of the Zodiacal Observation History
+File (see section \ref{m:zodiac} below), split into the three HCONs.
+The two maps each cover the whole sky, and are centred on the galactic centre 
+and anti-centre. 
+They are stored in galactic coordinates.
+They each consist of 4 images, one for each of the IRAS wavebands, 12, 25, 
+60 and 100 $\mu$m.
+The maps have 325 by 649 half degree pixels, the effective resolution being
+about a degree.
+The maps are in the Aitoff projection which is described in the FITS header of
+each image.
+Again the maps are available on tape at RAL.
+
+\subsection{The Pointed Observation images}
+For 40\% of its lifetime, IRAS was making pointed-mode observations (usually 
+small raster scans) of a large variety of interesting astronomical objects.
+These observations were to make deep maps or photometry using the survey array.
+The Pointed Observation data set consists of $\sim$10,000 fields.
+
+
+\subsubsection{Observations with the survey array}
+Details of the observations, and caveats on them, are given in `A Users Guide to
+IRAS Pointed Observation Products'.
+A list of the positions where Pointed Observations were made is available
+in the IAOD catalogue accessed through SCAR, these observations were originally
+known as additional observations hence the name of the catalogue (see the
+section on Catalogues \ref{m:cats} above).
+
+Each position is observed at least twice, and separate images are made for each
+band in each coverage.
+
+The AO images are available in FITS format, so the standard packages mentioned
+below for image analysis can be used on these data, as if they were ordinary 
+extended emission maps. Further details of how to extract and process these
+images are to be found in section \ref{m:imsoft} on Software for IRAS image
+analysis below.
+
+\subsubsection{The CPC images}
+IRAS Chopped Photometric Channel made pointed observations (using a small
+raster scan typically 9 arcmin in length) at 50$\mu$m and 100$\mu$m 
+simultaneously, and chopped to a reference source at a few degrees Kelvin. The 
+CPC has a higher spatial resolution than the main detector, around 1 arcmin. 
+However
+the instrument had two major instrumental problems, the most likely cause of
+which was too low a temperature in the focal plane. Maps which clearly suffered
+from the too simple gain correction procedure were omitted from the set of
+maps offered, 1500 observations are considered acceptable. But features running
+parallel to the inscan direction should be treated with caution. Users are
+referred to the `IRAS-DAX, Chopped Photometric Channel Explanatory Supplement'
+for the original caveats, but users should be aware that reprocessed CPC data
+was made available in 1990.
+
+A list of the positions where CPC observations were made is available is given
+in the CPCD catalogue accessed through SCAR.
+
+The CPC maps are available in FITS format, each consists of a raw and a cleaned
+image for each waveband, 50$\mu$m and 100$\mu$m. Details of how these images can
+be processed is given in the section on Software for IRAS image analysis in
+section \ref{m:imsoft} below.
+
+\subsection{Software for IRAS image analysis}
+\label{m:imsoft}
+The information given in this section applies to Skyflux plates, ISSA Sky Survey
+Atlas images, Galactic Plane and Low Resolution All Sky maps, and Pointed
+Observation images described above.
+
+The processing of IRAS images consists of two main stages, reading and
+preprocessing the images, and examining them.
+
+The reading and preprocessing stage consists of
+\begin{itemize}
+\item Determining whether data is available and its storage medium and identity.
+\item Extracting the required data from the storage medium.
+\item Carrying out processing on the data which makes the information into a
+standard form which can be processed by image processing applications.
+\end{itemize}
+\begin{description}
+\item [SUN/80.3] `IRAS90 --- Extraction and
+Preparation of IRAS Images' provides details of all these
+processes.
+\item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
+Guide' provides details of the full flexibility of the PREPARE preprocessor.
+\end{description}
+
+In the examination stage the user will probably be using image processing and
+similar software to carry out the following types of analysis
+\begin{itemize}
+\item Displaying the image, or drawing a contour map of it. This includes
+annotation with astronomical coordinate positions and user defined information,
+and other aspects of presentation.
+\item Finding flux at positions on the image including those specified by
+astronomical coordinate positions.
+\item More particular image processing applications such as colouring the images
+to bring out certain features, or smoothing it.
+\end{itemize}
+\begin{description}
+\item [SUN/161] `IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
+Detector Data Analysis' provides a walkthrough of how to carry out 
+frequently used examples of the first two types of processing, using KAPPA
+for the image processing and IRAS90 software for applications dealing
+with astronomical coordinates.
+\item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
+Guide' provides details of the full flexibility of each of the IRAS90 
+applications.
+\item [SUN/95] `KAPPA --- Kernel Application Package' provides full details of
+KAPPA and its applications. This is a very flexible image display and processing
+suite of applications, however it does not deal with position in astronomical
+coordinates, this facility is provided, for IRAS data, by the IRAS90 
+applications.
+\end{description}
+
+\section{Calibrated Raw Detector Data}
+The Calibrated Raw Detector Data (CRDD) is the ultimate data set from which all
+other IRAS survey array data products are derived.
+It is available on 300 6250~bpi tapes held at RAL.
+
+A recalibrated version of the CRDD data, known as PASS3, is soon to be made
+available. These data will reside on the optical jukebox at RAL.
+
+A updated suite of software to access, process and help in analysis of CRDD
+data, called IRAS90 is now available. This runs under the Starlink ADAM
+environment.
+\begin{description}
+\item [SUN/161] `IRAS90 --- Introductory/User Guide to Calibrated
+Reconstructed Detector Data Analysis' provides details of the complete CRDD
+processing cycle as carried out with the IRAS90 software and KAPPA.
+\item [SUN/163] `IRAS90 --- Survey and PO Data Analysis Package --- Reference
+Guide' provides details of the full flexibility of each of the IRAS90
+applications.
+\item [SUN/95] `KAPPA --- Kernel Application Package' provides full details of
+KAPPA and its applications.
+\end{description}
+
+Staff at RAL will extract the data from the archive for you, this is a very
+time consuming task. Details of the data you will receive are given in SUN/161.
+Sources when processed are oval, since the resolution in-scan is better than the
+resolution cross-scan and the maps usually have stripes in them, due to the
+preliminary calibration made independently for each detector.
+
+The CRDD is the least processed (therefore most inconvenient) form of IRAS data,
+however using it is the best way to:
+\begin{itemize}
+\item Search for weak sources which fall below the IRAS point source thresholds
+\item Check variability
+\item Disentangle highly confused regions
+\item Obtain the highest possible spatial resolution
+\end{itemize}
+
+\section{Zodiacal Observation History File}
+\label{m:zodiac}
+For convenience in the analysis and treatment of background emission from
+interplanetary dust (zodiacal emission) and other extremely large scale emission
+features of the sky, the IRAS survey data was averaged to half degree square
+beam size and, along with pointing information, was preserved as a time ordered
+data set.
+Three versions of this file are available, of which the latest was prepared from
+data from which the point sources from the IRAS point source catalogue have been
+removed. Gradients in large scale emission can cause artifacts in this product.
+These data are available as the Zodiacal Observation History File, on tape at 
+RAL. However, no software is currently planned to use them.
+
+\section{LRS Spectra} 
+The IRAS survey instrumentation included a slitless, Low Resolution 
+Spectrometer which scanned simultaneously two overlapping wavelength ranges, 
+one extending from 7.7 to 13.4 $\mu$m and the other from 11.0 to 22.6 $\mu$m.
+The resolution varies from $\sim$50 at 8 $\mu$m to $\sim$20 at 23 $\mu$m.
+The spectrometer was in operation during the entire survey, providing spectra
+for the brighter point sources.
+The mean spectra can be found in the IRAS Low Resolution Spectrometer (LRS)
+Atlas, which has been incorporated into the SCAR online database mentioned
+in \ref{m:cats}.
+
+Program I\_$\,$LRSEXT has been written to extract the 8 -- 13 $\mu$m and 
+11 -- 22 $\mu$m spectra for a source and write the spectra to files in a 
+format which can be handled by the spectral analysis program DIPSO (SUN/50).
+DIPSO can then be used to display the spectra and perform some analysis on them.
+The spectra are extracted from the catalogue on the basis of position
+association, the positions being input by the user either interactively or from
+a file.
+For more details on the program I\_$\,$LRSEXT, reference should be made to 
+SUN/81.
+
+The IRAS LRS Catalogue contains mean spectra, for sources in the Point 
+Source Catalog.
+The Point Source Catalog flags the sources which have LRS spectra and gives
+them a spectral classification, which is described in Section IX.D of the IRAS 
+Catalogs and Atlases Explanatory Supplement.
+Therefore it is possible to select sub-sets of sources with LRS spectra on the
+basis of this spectral classification or indeed of any other property of the
+sources in the Point Source Catalog.
+Alternatively, it is also possible to use SCAR software to associate a private
+list of sources with either the Point Source Catalog or the LRS Atlas to
+ascertain whether spectra exist for these sources.
+However, as yet there is no interface to SCAR in the program I\_$\,$LRSEXT, so 
+after producing a sub-set using SCAR, you must input the positions to 
+I\_$\,$LRSEXT to extract the spectra.
+
+The IRASLRS captive account on STADAT allows users to interrogate the LRS 
+database, see SUN/14.
+This allows access to the full dataset of $\sim$170,000 spectra extracted 
+during the IRAS mission, and from which the LRS Atlas was created.
+Some spectra are very obviously ``wrong'', due to incorrect data being stored,
+or an extended object being observed.
+The spectra are generally of lower quality, but examination of the individual
+spectra making up an Atlas entry can be a useful check on a dubious spectral
+feature.
+Very noisy, but useful, spectra have been extracted for sources as faint as
+4 Jy in the IRAS 12$\mu$m band.
+
+\section{Access to Data}
+Catalogue data is usually accessed using the network to reach the STADAT
+(STArlink DATabase) computer at RAL, and then running SCAR.
+Users should contact their local node manager for more information.
+Problems and requests for new catalogues can be sent to STADAT::CATMAIL.
+
+Image data (including CRDD) can be supplied on Exobyte for users to analyse at
+their home institutes. Requests for this data should be made to RLSTAR::IRASMAIL
+giving details of the type of data, and positions.
+
+Requests for other types of data, information on IRAS, and problems with any
+access, or analysis software (not catalogues or KAPPA related) should also
+be sent to RLSTAR::IRASMAIL.
+
+\section{Available IRAS Data}
+The IRAS data come in several categories, each of which is summarised here.
+\begin{enumerate}
+\item CATALOGUES ---
+some of these are accessible through the CATPAC and SCAR system, see NEWS for 
+current list\\
+	\begin{enumerate}
+	\item IRAS Point Source Catalog, Version 2 (IRPS)\\
+	      A version (actually an index) of the IRPS catalogue sorted 
+	      by Galactic coordinates is also available (GIRL)
+	\item Catalogue of associations to IRAS point sources (AIPS)
+              --- the combination of IRPS and AIPS is called ASIR
+        \item IRAS Faint Source Survey Catalog (V2FSSC Version 2 and FSSC the
+              original version) --- the result of 
+              reprocessing and coadding the IRAS data for $|$b$|>$50$^{\circ}$
+              having 2 to 3 times greater sensitivity than the IRPS.
+        \item Catalogue of associations to the Faint Source Survey Catalog 
+              (FSSA)        
+	\item IRAS Low Resolution Spectrometer (LRS) Atlas (ILRS) --- 5425 
+              averaged spectra
+	\item IRAS Small Scale Structure Catalog (ISSC) --- 16,740 sources
+              with sizes $<$8$'$
+        \item Catalogue of associations to the Small Scale Structure sources
+              (ASSC)
+        \item IRAS Serendipitous Survey Catalog (IRSS) --- 43,866 point
+              sources derived from the additional observation fields
+        \item Catalogue of associations to the Serendipitous Survey sources
+              (AISS)
+        \item IRAS Asteroid and Comet Catalog (IRAC) --- IRAS data for known
+              asteroids and comets
+        \item IRAS Asteroid Sightings Catalog (IASC)
+	\item Catalogue listing the positions of Pointed Observations (POs)
+              in IAOD 
+        \item Catalogue listing the positions of CPC observations (CPCD)
+	\item Extragalactic sub-catalogue (CATX) --- IRAS Point Sources with
+              extragalactic associations, created at RAL
+        \item Catalogued galaxies and quasars, Version 2 (XCAT) --- official 
+              IRAS Point Sources with extragalactic associations
+	\item Working Survey Database(WSDB) --- available on tape, but not 
+              easily accessible\\
+              Contains all the HCON detections for all the sources in the 
+              IRAS Point Source Catalog.
+              Hence it contains both the observation and data reduction 
+              history for each point source and can be used for more detailed 
+              studies such as variability.
+	      The WSDB is more than three times the size of the IRAS Point 
+              Source Catalog.
+	\item High Source Density Bins --- a list of those regions of the sky
+              which received more stringent processing due to the large number
+              of sources, each wavelength is handled independently.
+	\end{enumerate}
+\item IMAGES --- see Software for IRAS image analysis section \ref{m:imsoft}
+above.
+	Each image consists of 4 sets of data (images), 
+	corresponding to the 4 IRAS 
+	wavebands of 12, 25, 60 and 100 $\mu$m.
+	\begin{enumerate}
+	\item Extended Emission data set, consisting of (for each HCON)\\
+		\begin{enumerate}
+		\item 212 high resolution ``Skyflux Plates'' (188 for 3rd HCON)
+                \item The complete set of ISSA high resolution, recalibrated,
+                Zodiacal light removed images, including reject plates.
+		\item 24 ``Galactic Plane Maps'' (a rebinning of Skyflux Plates)
+		\item 2 ``Low Resolution All Sky Maps'', each covering the 
+		whole sky, one centred at the galactic centre the other 
+		at the anti-centre, with resolution of 0.5$^{\circ}$ (from
+                ZOHF data)
+		\end{enumerate}
+	\item Pointed Observation (PO) deep images\\
+        Images are available for approximately 10,000 positions.
+	A list of the positions at which these images were taken, ordered by 
+        DEC is available in SCAR catalogue IAOD.
+	\item FITS images of IRAS Observations of Large Optical Galaxies\\
+         A FITS tape containing the ``Catalog of IRAS Observations of Large 
+         Optical Galaxies'' (Rice et al., 1988: Ap.J. Supp {\bf 68}, 91),
+         with an accompanying report. This tape contains IRAS images, made
+         from the co-added raw data, of 85 2nd Reference Catalogue bright
+         galaxies with blue light isophotal diameters $>$8$'$. 
+
+	\end{enumerate}
+\item CPC data \\
+         The 1500 observations made with the CPC are available in FITS format,
+         each observation comprising of 4 images, `clean' maps at 50 and 100
+         microns, and raw maps at 50$\mu$m and 100$\mu$m.
+         A list of the positions at which these images were taken are available
+         in the SCAR catalogue CPCD.
+\item ZODIACAL OBSERVATION HISTORY FILE (ZOHF) \\
+         These give a time ordered history of emission as seen by IRAS at all
+         4 wavelengths,
+         with a resolution of 0.5$^{\circ}$, in ecliptic coordinates.
+\item CALIBRATED RAW DETECTOR DATA (CRDD) --- see SUN/161\\
+	This is the ultimate source of all other survey products.
+	Users may obtain copies of data for small selected areas from RAL. 
+\item LOW RESOLUTION SPECTROMETER (LRS) SPECTRA --- see SUN/81 and SUN/14\\
+There are two overlapping wavelength ranges: 7.7 -- 13.4 $\mu$m and 
+11.0 -- 22.6 $\mu$m. 
+The spectra of the 5425 brightest (and most reliable) sources in the IRAS Low 
+Resolution Spectrometer Atlas (ILRS) are available in SCAR, and through 
+LRSEXT.\\
+The full dataset of $\sim$170,000 spectra for $\sim$40,000 sources is 
+available on STADAT using the captive account IRASLRS. 
+This includes the individual spectra contributing to the mean spectra in 
+the Atlas.
+\end{enumerate}
+
+\section{References}
+{\em IRAS Catalogs and Atlases: Explanatory Supplement}, 1988. ed. C.A. 
+Beichman, G. Neugebauer, H.J. Habing, P.E. Clegg, and T.J. Chester (Washington,
+DC:GPO) --- This will be found in the libraries of most institutes.
+
+{\em IRAS Sky Survey Atlas Explanatory Supplement}, 1993. S Wheelock et al.
+
+{\em A Users Guide to IRAS Pointed Observation Products}, 1985. E.T. Young et
+al. IPAC preprint no. PRE-008N.
+
+{\em IRAS-DAX Chopped Photometric Channel Explanatory Supplement} P.R. Wesselius
+ et al. Laboratory for Space Research, Groningen, Netherlands.
+
+\begin{tabular}{ccl}
+SUN/14&---&IRASLRS --- Obtaining spectra from the IRAS LRS database\\
+SUN/50&---&DIPSO --- A friendly spectrum analysis program\\
+SUN/70&---&SCAR --- Starlink Catalogue Access and Reporting\\
+SUN/80&---&IRAS90 --- Extraction and Preparation of IRAS Images\\
+SUN/81&---&LRSEXT --- IRAS LRS Spectra Extraction\\
+SUN/95&---&KAPPA --- Kernel Application Package\\
+SUN/106&---&SCAR --- Beginner's Guide\\
+SUN/120&---&CATPAC --- Catalogue Applications Package\\
+SUN/161&---&IRAS90 --- Introductory/User Guide to Calibrated Reconstructed
+Detector Data Analysis\\
+SUN/163&---&IRAS90 --- Survey and PO Data Analysis Package --- Reference
+Guide\\
+\end{tabular}
+\appendix
+\section{A Map of the IRAS Whole Sky Survey Coverage}
+\label{a}
+\end{document}
