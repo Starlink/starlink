@@ -5631,6 +5631,11 @@ paper).
 normalised co-ordinate system in which the shorter dimension of the
 screen or paper has a length of 1.0 (the scales on both axes are equal).
 
+\item [NDC] -- similar to BASEPIC but specifies positions in a
+normalised co-ordinate system in which the bottom left corner has
+co-ordinates (0,0) and the top right corner has co-ordinates (1,1).
+Thus, for a non-square device the scales on the two axes will be different.
+
 \item [CURPIC] -- similar to BASEPIC except that it covers only the
 specified picture. Thus, the bottom left corner of the each picture is 
 at $(0,0)$ and the shorter dimension of each picture has length 1.0.
@@ -6150,6 +6155,11 @@ height of the graphics device, which-ever is smaller, is set to 1.0
 (put another way, a unit square would fit in the picture and span the
 shorter axis). The bottom left corner of the graphics device is $(0,0)$.
 
+\item [NDC] -- similar to BASEPIC but specifies positions in a
+normalised co-ordinate system in which the bottom left corner has
+co-ordinates (0,0) and the top right corner has co-ordinates (1,1).
+Thus, for a non-square device the scales on the two axes will be different.
+
 \item [CURPIC] -- similar to BASEPIC except that it covers only the
 specified picture. Thus, the bottom left corner of the each picture is 
 at $(0,0)$ and the shorter dimension of each picture has length 1.0.
@@ -6166,7 +6176,8 @@ Domains GRID, PIXEL, AXIS and SKY will also be available.
 
 Pictures created by older applications which do not yet support WCS 
 information will not have all of these Frames. They will still have
-GRAPHICS, BASEPIC and CURPIC Frames, but the only additional Frames will be:
+GRAPHICS, BASEPIC, NDC and CURPIC Frames, but the only additional Frames 
+will be:
 
 \begin{description}
 \item [AGI\_WORLD] - This corresponds to AGI ``world'' co-ordinates. 
@@ -6454,12 +6465,14 @@ portrait, encapsulated PostScript device:
 \normalsize
 
 We will sometimes need to specify positions within the BASE picture.
-To do this we can either use the GRAPHICS Frame or the BASEPIC Frame,
-both of which span the entire graphics device. GRAPHICS is an absolute
+To do this we can either use the GRAPHICS, the BASEPIC or the NDC Frame,
+all of which span the entire graphics device. GRAPHICS is an absolute
 co-ordinate system giving millimetres from the bottom left corner of the
 graphics device, and BASEPIC is a normalised co-ordinate system in which
 both axes have the same scale and the shorter dimension of the graphics
-device has length 1.0. The BASEPIC Frame is usually easier to work with
+device has length 1.0\footnote{NDC is like BASEPIC but the top right
+corner of the device has NDC co-ordinates (1,1).}. The BASEPIC Frame is 
+usually easier to work with
 since it does not depend on the size of the paper. To determine the
 bounds of the available plotting space in the BASEPIC Frame, use
 \htmlref{GDSTATE}{GDSTATE}, having first ensured that the BASE picture is
@@ -6701,7 +6714,7 @@ We start with the ``selection box'' drawn over the main image. The
 corners of this box are currently stored in the {\tt boxpos} positions
 list. This file contains the RA and DEC at the corners of the box,
 together with WCS information copied from the NDF {\tt m31}. But this
-does \emph{not} include the BASEPIC or CURPIC Frame, which are only 
+does \emph{not} include the BASEPIC, NDC or CURPIC Frame, which are only 
 available within
 the WCS information stored with graphics database pictures. In order to
 find the BASEPIC co-ordinates at the corners of the box, we need to 
@@ -7361,6 +7374,9 @@ of the device.
 \item [BASEPIC] --- Reserved to represent positions on a graphics device 
 in normalised units, in which the shorter axis of the graphics device has
 length 1.0.
+\item [NDC] --- Reserved to represent positions on a graphics device 
+in normalised units, in which the both axes of the graphics device have
+length 1.0.
 \item [CURPIC] --- Reserved to represent positions in normalised units within 
 each individual graphics database picture. The shorter axis of each 
 picture has length 1.0 in this Frame.
@@ -7433,7 +7449,7 @@ from a FrameSet), you can either give a {\tt Domain} name, or an SCS
 specification, but you cannot give a Frame index. Any string may be used
 as a {\tt Domain} name, and you will usually be required to specify
 the number of axes in the Frame. The exception to this is if you specify
-one of the {\tt Domain} names SKY, GRAPHICS, CURPIC or BASEPIC, in which 
+one of the {\tt Domain} names SKY, GRAPHICS, NDC, CURPIC or BASEPIC, in which 
 case a two dimensional Frame is always created.
 
 
@@ -7662,7 +7678,7 @@ of an NDF, and change the values of those which are not read-only.
       same Domain value can be aligned with it. 
 
       Some Frames are given standard Domain values when they are created
-      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, CURPIC, BASEPIC, GRAPHICS). 
+      ({\it e.g.}\ GRID, PIXEL, AXIS, SKY, CURPIC, NDC, BASEPIC, GRAPHICS). 
       Frames created by the user (for instance, using \htmlref{WCSADD}{WCSADD})
       can have any Domain value, but the standard Domain names should be
       avoided unless the standard meanings are appropriate for the Frame
@@ -22068,7 +22084,7 @@ plot (101k).
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, \emph{etc}. The
+            A domain name such as SKY, AXIS, PIXEL, BASEPIC, NDC, CURPIC, \emph{etc}. The
             special domain AGI\_WORLD is used to refer to the world co-ordinate
             system stored in the AGI graphics database. This can be useful if
             no WCS information was store with the picture when it was created.
@@ -22234,6 +22250,11 @@ plot (101k).
          that {\tt "}Normalised Device Co-ordinates{\tt "} were normalised so that the
          longer of the two axes had a length of 1.0, but BASEPIC co-ordinates
          are normalised so that the shorter of the two axes has length 1.0.
+
+         \sstitem
+         The ``NDC'' Frame is now a normalized co-ordinate system
+         in which each axis of the graphics device has unit length.
+
       }
    }
    \sstdiytopic{
@@ -26618,6 +26639,9 @@ plot (10k).
             shortest dimension of the current picture has length 1.0. The
             scales on the two axes are equal.
 
+            \sstitem
+            NDC -- gives positions in a normalized system in which each 
+            axis of the graphics device has unit length.
          }
          There may be additional Frames available, describing previously
          displayed data. If a null value is supplied, the current Frame
@@ -31750,7 +31774,7 @@ plot (9k).
          \sstitemlist{
 
             \sstitem
-            A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, \emph{etc}. The
+            A domain name such as SKY, AXIS, PIXEL, NDC, BASEPIC, CURPIC, \emph{etc}. The
             special domain AGI\_WORLD is used to refer to the world co-ordinate
             system stored in the AGI graphics database. This can be useful if
             no WCS information was store with the picture when it was created.
@@ -32185,7 +32209,7 @@ plot (9k).
 
             \sstitem
             A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC,
-            BASEPIC, \emph{etc}.
+            NDC, BASEPIC, \emph{etc}.
 
             \sstitem
             An integer value giving the index of the required Frame within
@@ -32211,7 +32235,7 @@ plot (9k).
 
             \sstitem
             A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC,
-            BASEPIC, \emph{etc}.
+            NDC, BASEPIC, \emph{etc}.
 
             \sstitem
             An integer value giving the index of the required Frame within
@@ -32283,6 +32307,11 @@ plot (9k).
             device. The bottom left corner of the device screen has BASEPIC
             co-ordinates of (0,0). The shorter dimension of the screen has
             length 1.0, and the other axis has a length greater than 1.0.
+
+            \sstitem
+            NDC co-ordinates are like BASEPIC co-ordinates except that
+            the top right corner of the screen has NDC co-ordinates 
+            of (1,1). That is, both axes of the screen have unit length.
 
             \sstitem
             GRAPHICS co-ordinates also span the entire graphics device but
@@ -43577,6 +43606,12 @@ linking command.
 \begin{itemize}
 \item Colours can now be specified as RGB intensity triplets, or as HTML
 colour codes, in addition to the previous forms.
+\item 
+Each picture in the graphics database now has a co-ordinate Frame with
+Domain ``NDC'' associated with it. This Frame covers the whole graphics
+device is (0,0) at the bottom left corner and (1,1) at the top right
+corner. The name ``NDC'' can now be used with applications such as 
+\htmlref{GDSTATE}{GDSTATE}.
 \end{itemize}
 
 \subsection{New Commands}
