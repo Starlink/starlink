@@ -21,11 +21,11 @@
  
 *  Description:
 *     Construct an NDF holding the weights array for a particular
-*     chop throw. This is in fact the fourier transform of the
-*     chop.
+*     chop throw and the Fourier Transform (FT) of the chop function
+*     (a sine wave).
 
 *  Usage:
-*     scumakewt chop=20 size=[256,512] ftchop=fft wtchop=weights
+*     scumakewt chop pa pixsize size ftchop wtchop
 
 *  ADAM Parameters:
 *     CHOP = REAL (Read)
@@ -53,8 +53,13 @@
 
 
 *  Examples:
-
-*  Notes:
+*     scumakewt 20 90 3 '[256,256]' ft wt
+*        Generate the FT and weight of a 20 arcsec RA chop using
+*        3 arcsec pixels and a 256 square output image. The weight
+*        is written to wt.sdf and the FT to ft.sdf.
+*     scumakewt chop=20 size=[256,512] ftchop=fft wtchop=weights
+*        Generate the weight and ft of a chop of size 20 arcseconds
+*        on a 256 x 512 image. The pixel scale will be requested.
 
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
