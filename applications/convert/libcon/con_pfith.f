@@ -181,6 +181,9 @@
             END IF
          END IF
 
+*  Exit if something has gone wrong.
+         IF ( STATUS .NE. SAI__OK ) GOTO 980
+
 *  See if this is the end of the header.
 *  =====================================
 
