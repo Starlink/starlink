@@ -27,6 +27,11 @@
    allocated when ESTIMATOR=MEAN, resulting in an error if insufficient
    memory was available.
 
+   - Various parameters have been removed from PICCUR. It should no longer 
+   be used to obtain co-ordinates from a graphics device. CURSOR should be 
+   used for this purpose. The sole purpose of PICCUR is now to allow a
+   new current picture to be selected using a cursor. 
+
    - The PICIN and PICTRANS have been modified to use any WCS information
    associated with graphics pictures. Various parameters have been changed,
    removed or added.

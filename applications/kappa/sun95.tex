@@ -8441,7 +8441,7 @@ CENTROID in file mode.
 \end{verbatim}
 \normalsize
 Such co-ordinate files can also be created interactively with images by
-\htmlref{CURSOR}{CURSOR} or \htmlref{PICCUR}{PICCUR}.
+\htmlref{CURSOR}{CURSOR}.
 
 \section{\xlabel{se_imagedisplay}Image-display Interface in KAPPA
 \label{se:imagedisplay}}
@@ -11455,7 +11455,7 @@ picture.}
 \menuitem{PICBASE}{
  Selects the BASE picture from the graphics database.}
 \menuitem{PICCUR}{
- Uses a cursor to select the current picture and to report the co-ordinates of points.}
+ Uses a cursor to select the current picture.}
 \menuitem{PICDATA}{
  Selects the last DATA picture from the graphics database.}
 \menuitem{PICDEF}{
@@ -11702,7 +11702,7 @@ functions as follows.
 \classitem{PICBASE}
  Selects the BASE picture from the graphics database.
 \classitem{PICCUR}
- Uses a cursor to select the current picture and to report the co-ordinates of points.
+ Uses a cursor to select the current picture.
 \classitem{PICDATA}
  Selects the last DATA picture from the graphics database.
 \classitem{PICDEF}
@@ -32007,161 +32007,65 @@ plot (9k).
 \sstroutine{
    PICCUR
 }{
-   Uses a cursor to select the current picture and to report the
-   co-ordinates of points.
+   Uses a graphics cursor to change the current picture
 }{
    \sstdescription{
       This application allows you to select a new current picture in
-      the graphics database using the cursor.  The picture associated
-      with the last-selected point becomes the new current picture.
-
-      This task also uses the cursor to read Cartesian co-ordinates
-      from the chosen graphics device and displays them on your
-      terminal.  In addition if the co-ordinate frame changes between
-      selected positions, the comment, name, and any label associated
-      with the new picture are appended to the message.  There is an
-      option to let you store the co-ordinates, and their picture names
-      and labels in a text file.
-
-      There are three modes of operation to define which co-ordinate
-      system/picture is to be used.  These are ANCHOR, CURRENT and
-      DYNAMIC.  See the parameter MODE for details.
-
-      In ANCHOR or DYNAMIC modes there is an option to select only
-      pictures of a certain name in the database.  This is most useful
-      when DATA pictures are covered by transparent FRAME pictures.
+      the graphics database using the cursor. Each time a position is
+      selected (usually by pressing a button on the mouse), details of
+      the topmost picture in the AGI database which encompasses that
+      position are displayed, together with the cursor position (in
+      millimetres from the bottom left corner of the graphics device).
+      On exit the last picture selected becomes the current picture.
    }
    \sstusage{
-      piccur [mode] [name] [logfile] [device]
+      piccur [device] [name]
    }
    \sstparameters{
       \sstsubsection{
-         COSYS = LITERAL (Read)
-      }{
-         The co-ordinate system to be used.  This can be either
-         {\tt "World"} or {\tt "Data"}.  {\tt "World"} makes the world
-         co-ordinates of the cursor position to be reported.  World
-         co-ordinates that relate to a location in a data array will be
-         in array pixels.  If COSYS = {\tt "Data"} the graphics database
-         is examined for data co-ordinates stored via a transformation. 
-         Data co-ordinates are arbitrary but most often they will be a
-         linear or logarithmic transformation of the world co-ordinates.
-         For example, the $x$ co-ordinate of a spectrum would be given in
-         pixels if COSYS = {\tt "World"}, but if COSYS = {\tt "Data"} the
-         $x$ co-ordinate could be in wavelength units, such as
-         {\AA}ngstroms.  If the database does not
-         have a world-to-data transformation for a given picture, the
-         value of this parameter is irrelevant and world co-ordinates
-         will be reported for that picture. {\tt [}Current
-         co-ordinate system{\tt ]}
-      }
-      \sstsubsection{
          DEVICE = DEVICE (Read)
       }{
-         The graphics workstation. {\tt [}The current graphics device{\tt ]}
-      }
-      \sstsubsection{
-         DOUBLE = \_LOGICAL (Read)
-      }{
-         If {\tt TRUE}, co-ordinates will be reported, written to the output
-         parameters, and stored in the text file in double precision,
-         otherwise single precision is used.  {\tt [FALSE]}
-      }
-      \sstsubsection{
-         LOGFILE = FILENAME (Write)
-      }{
-         The name of the text file in which the co-ordinates of points
-         selected with the cursor may be stored.  A null string ({\tt !})
-         means that no file is created. The suggested default is the
-         current value. {\tt [!]}
-      }
-      \sstsubsection{
-         MODE = LITERAL (Read)
-      }{
-         The mode defining the co-ordinate system/picture in which
-         cursor positions are returned. There are three options.
-         \begin{description}
-            \item {\tt "Current"} selects the current picture in the AGI
-            database and reports the position of a point selected by
-            the cursor. If the point does not lie within the picture,
-            an extrapolated position is reported.
-
-            \item {\tt "Dynamic"} selects the topmost picture in the AGI
-            database which encompasses that position selected. Thus
-            the second and subsequent cursor hits may result in the
-            selection of a new picture. On exit the last picture
-            selected becomes the current picture.
-
-            \item {\tt "Anchor"} lets the first cursor hit select a
-            picture which remains current throughout the running of
-            the application. If subsequent cursor hits fall outside
-            the extent of this picture, a position extrapolated from
-            the picture's co-ordinate system is reported. On exit the
-            anchor picture becomes the current picture.
-         \end{description}
-         {\tt ["Dynamic"]}
+         The graphics workstation. {\tt [The current graphics device]}
       }
       \sstsubsection{
          NAME = LITERAL (Read)
       }{
-         Only pictures of this name are to be selected.  A null string
-         ({\tt !}) or blanks means that pictures of all names may be selected.
-         {\tt [!]}
-      }
-   }
-   \sstresparameters{
-      \sstsubsection{
-         XC = \_DOUBLE (Write)
-      }{
-         The $x$ co-ordinate of the last point selected with the cursor.
+         Only pictures of this name are to be selected.  For instance, if
+         you want to select a DATA picture which is covered by a
+         transparent FRAME picture, then you could specify NAME=DATA.
+         A null (!) or blank string means that pictures of all names may
+         be selected. {\tt [!]}
       }
       \sstsubsection{
-         YC = \_DOUBLE (Write)
+         SINGLE = \_LOGICAL (Read)
       }{
-         The $y$ co-ordinate of the last point selected with the cursor.
+         If TRUE then the user can supply only one position using the
+         cursor, where-upon the application immediately exits, leaving
+         the selected picture as the current picture. If FALSE is supplied,
+         then the user can supply multiple positions. Once all positions
+         have been supplied, a button is pressed to indicate that no more
+         positions are required. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         QUIET = \_LOGICAL (Read)
+      }{
+         If TRUE, nothing is displayed on the screen while running.
+         {\tt [FALSE]}
       }
    }
    \sstexamples{
       \sstexamplesubsection{
          piccur
       }{
-         This obtains the co-ordinates of any visible picture for the
-         current graphics device by use of the cursor.  In this and all
-         the examples, the picture containing the last-selected point
-         becomes the new picture.
+         This selects a picture on the current graphics device by use of
+         the cursor.  The picture containing the last-selected point becomes
+         the current picture.
       }
       \sstexamplesubsection{
-         piccur cosys=w
+         piccur name=data
       }{
-         This obtains the world co-ordinates of any visible picture for
-         the current graphics device by use of the cursor.
-      }
-      \sstexamplesubsection{
-         piccur current device=graphon
-      }{
-         This obtains the co-ordinates of any visible picture in the
-         reference frame of the current picture of the Graphon device.
-      }
-      \sstexamplesubsection{
-         piccur logfile=stars.dat name=data
-      }{
-         This obtains the co-ordinates of any visible DATA picture
-         the current graphics device.  The $x$-$y$ co-ordinates, and their
-         picture names and labels are stored in the text file called
-         {\tt stars.dat}.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         Should an error occur trying to obtain the base picture for
-         ANCHOR or DYNAMIC modes, the current picture is unchanged.
-
-         \sstitem
-         In DYNAMIC and ANCHOR modes, if the cursor is situated at a
-         point where there are no pictures of the selected name, the
-         co-ordinates in the base picture are reported.
+         This is like the previous example, but only DATA pictures can be
+         selected.
       }
    }
    \sstdiytopic{
@@ -44464,6 +44368,20 @@ The following applications have been modified:
           much less likely that bins will be rejected from the fit.
       \end{itemize}
 
+   \item [\htmlref{PICCUR}{PICCUR}] \mbox{}
+
+      \begin{itemize}
+         \item PICCUR should no longer be used to obtain co-ordinates from a
+         graphics device. CURSOR should be used for this purpose. The sole 
+         purpose of PICCUR is to allow a new current picture to be selected 
+         using a cursor. The position of the cursor is now reported in
+         millimetres from the bottom left corner of the screen, but the
+         cursor positions cannot be saved.
+         \item The parameters COSYS, DOUBLE, LOGFILE and MODE have
+         been removed.
+         \item New parameters SINGLE and QUIET have been added.
+      \end{itemize}
+
    \item [\htmlref{PICIN}{PICIN}] \mbox{}
       \begin{itemize}
          \item A new parameter called FRAME has been added to select the
@@ -44658,7 +44576,7 @@ functions as follows.
 \classitem{PICBASE}
  Selects the BASE picture from the graphics database.
 \classitem{PICCUR}
- Uses a cursor to select the current picture and to report the co-ordinates of points.
+ Uses a cursor to select the current picture.
 \classitem{PICDATA}
  Selects the last DATA picture from the graphics database.
 \classitem{PICDEF}
