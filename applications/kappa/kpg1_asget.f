@@ -116,6 +116,10 @@
 *     22-JUN-1999 (DSB):
 *        Remove call to NDF_SECT which set the pixel bounds fo all
 *        insignificant axes to (1:1).
+*     15-JAN-2000 (DSB):
+*        Do not remove insignificant axes from the current Frame if TRIM
+*        indicates that a precise number of axes is required in the
+*        current Frame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -225,8 +229,10 @@
 *  Get a pointer to the WCS FrameSet.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
-*  Remove any insignificant axes from the Current Frame.
-      CALL KPG1_ASSIG( IWCS, 3, LBND, UBND, STATUS )
+*  Remove any insignificant axes from the Current Frame. We do not do
+*  this if later code will trim the current Frame to have the required
+*  number of axes.
+      IF( .NOT. TRIM ) CALL KPG1_ASSIG( IWCS, 3, LBND, UBND, STATUS )
 
 *  Re-map the Base (GRID) Frame by selecting the chosen axes.
 *  ==========================================================

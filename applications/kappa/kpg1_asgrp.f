@@ -250,7 +250,7 @@
             IF( MESS .EQ. ' ' ) THEN
                CALL ERR_REP( 'KPG1_ASGRP_1', 'The following string '//
      :                       'could not  be interpreted as a ^N '//
-     :                       'dimensional ^D position: ``^TEXT''.', 
+     :                       'dimensional ^D position: ''^TEXT''.', 
      :                       STATUS )
             ELSE
                CALL MSG_SETC( 'M', MESS )
@@ -258,14 +258,14 @@
                   CALL ERR_REP( 'KPG1_ASGRP_2', 'The following string'//
      :                          ' could not  be interpreted as a ^N '//
      :                          'dimensional ^D position (^M): '//
-     :                          '``^TEXT''.', STATUS )
+     :                          '''^TEXT''.', STATUS )
                ELSE
                   CALL MSG_SETC( 'P', PARAM )
                   CALL ERR_REP( 'KPG1_ASGRP_3', 'The following string'//
      :                          ' could not  be interpreted as a ^N '//
      :                          'dimensional ^D position using the '//
      :                          'columns given by parameter %^P (^M)'//
-     :                          ': ``^TEXT''.', STATUS )
+     :                          ': ''^TEXT''.', STATUS )
                END IF
 
             END IF
