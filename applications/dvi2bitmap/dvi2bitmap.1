@@ -1,12 +1,12 @@
 .\" $Id$
-.TH DVI2BITMAP 1 "5 June 1999"
+.TH DVI2BITMAP 1 "April 2000"
 .SH NAME
 dvi2bitmap
 .SH SYNOPSIS
 .B dvi2bitmap 
     [\-r resolution] [\-m magnification] 
     [\-fp font-path] [\-fm mfmode] [\-fg] [\-fG]
-    [\-P[bt]] [\-s scalefactor] [\-t gif|xbm] [\-o output]
+    [\-P[bt]] [\-s scalefactor] [\-t png|gif|xbm] [\-o output]
     [\-b(h|w) size] [\-c[lrtb] dimen] [\-C[lrtb] dimen]
     [\-nqQV] [\-L[L]] [\-p num] [\-l num] [\-pp ranges]
     dvi-file
@@ -62,7 +62,7 @@ the `page'.  The specification
 .I "\-C dimen"
 , which would set all
 the crops to the same position, is silly, and so is forbidden.
-.PP
+.IP
 The conversion from points to pixels takes account of the
 magnification set in the 
 .I "\-m"
@@ -102,7 +102,7 @@ the magnification factor, and a dummy metafont mode.
 This output can 
 be used with the mktexpk (TeXLive) or MakeTeXPK (teTeX) scripts to
 generate the required fonts.
-.PP
+.IP
 If the option is
 .I "\-LL"
 , then do the same, 
@@ -139,7 +139,7 @@ These select page ranges, using a slight extension of the notation
 used by 
 .I "dvips"
 (and the same option letters).
-.PP
+.IP
 The
 .I "\-p"
 and
@@ -163,7 +163,7 @@ by either
 .I "="
 or
 .I ":n,"
-.  In the former case, DVI page
+In the former case, DVI page
 numbers are used rather than TeX
 .I "\ecount"
 registers; in the latter case, the program examines the 
@@ -171,7 +171,7 @@ registers; in the latter case, the program examines the
 register
 rather than the default 
 .I "\ecount0"
-.PP
+.IP
 You can specify both of these prefixes one or more times, but you
 cannot mix the 
 .I "\-p"
@@ -189,15 +189,15 @@ options are cumulative.  There
 may be no spaces in the 
 .I "pagelist."
 The page numbers may be negative.
-.PP
+.IP
 Examples:
-.PP
+.IP
 .I "dvi2bitmap \-pp 3,6\-10 ..."
-.PP
+.IP
 process only the specified pages
-.PP
+.IP
 .I "dvi2bitmap \-pp :2,1 ..."
-.PP
+.IP
 process only pages where
 .I "\ecount2"
 was 1.
@@ -238,15 +238,17 @@ Reduces the linear size of the output bitmap by a factor
 .TP
 .I "\-t type"
 Choose the output format, which can be
-.I "xbm"
-or
+.I "png"
+,
 .I "gif"
+or
+.I "xbm"
 . The program generates XBM bitmaps by 
-default.  The GIF option may not be available if it wasn't selected
-when the program was configured.
+default.  The GIF and PNG options may not be available if they weren't
+selected when the program was configured.
 .TP
 .I "\-V"
-Display the version number, and exit.
+Display the version number and compilation options, and exit.
 .SH "DVI specials"
 dvi2bitmap recognises several DVI special commands, and emits a
 warning if it finds any others.
@@ -267,9 +269,10 @@ which the program recognises are:
 Makes other special-commands in this same special affect
 defaults.  See those commands for details.
 .TP
-.I "outputfile my_filename"
+.I "outputfile <filename>"
 The output file used for the current page will be named
-.I "my_filename.gif"
+.I "filename.gif"
+(if the output type were `gif').
 A filename extension will be added if none is
 present, or if it does not match the output type selected.  If the
 .I "default"
@@ -299,7 +302,7 @@ additionally made the default for subsequent pages.  If the
 command has been given, then the crop position is set at
 .I "<dimen>"
 points from the appropriate edge of the `paper'.
-.PP
+.IP
 The
 .I "-c"
 and
@@ -307,9 +310,29 @@ and
 command-line options have the effect of setting initial defaults.
 In the absence of either of these, the initial crop is exactly at the
 bounding box.
+.TP
+.I "default imageformat <format>"
+Set the default image format, which should be one of the keywords
+`xbm', `gif', `png'.  This is equivalent to specifying the image
+format through the 
+.I -t
+option.
+.IP
+The keyword is just 
+.I "imageformat"
+, but you must specify the
+.I "default"
+keyword when you
+specify 
+.I "imageformat"
+; this is for consistency, and makes it
+clear that this is setting a default format rather than setting the
+format only for the next image (that's not implemented at present, but
+could be added).
+
 .PP
 For example, the pair of commands
-.PP
+.IP
 \especial{dvi2bitmap default outputfile trial-#.gif crop all 5}
 \especial{dvi2bitmap absolute crop left 0}
 .PP
