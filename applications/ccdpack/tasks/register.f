@@ -983,10 +983,22 @@
      :                    %VAL( IPIDR ), %VAL( IPWX ), %VAL( IPWY ),
      :                    %VAL( IPWID ), NOUT, RMS, STATUS )
 
-*  Report coefficients of linear transformation to the user.
+*  Explain the units of the linear transformation to the user.
          CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL CCD1_MSG( ' ', '    Transformation coefficients', STATUS )
          CALL CCD1_MSG( ' ', '    ---------------------------', STATUS )
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         IF ( USEWCS ) THEN
+            CALL CCD1_MSG( ' ', '  Offsets A and D are in image '//
+     :                     'Current coordinate system units;', STATUS )
+         ELSE
+            CALL CCD1_MSG( ' ', '  Offsets A and D are in in pixels;', 
+     :                     STATUS )
+         END IF
+         CALL CCD1_MSG( ' ', '  B, C, E and F are dimensionless.',
+     :                  STATUS )
+
+*  Report the coefficients themselves.
          DO 11 I = 1, NOPEN
             CALL CCD1_MSG( ' ', ' ', STATUS )
             CALL MSG_SETC( 'ID', FNAME( I ) )
