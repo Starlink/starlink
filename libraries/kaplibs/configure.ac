@@ -23,8 +23,8 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 STAR_MONOLITHS
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar gks gns idi agi ast cat ndg hds chr fio grp ndf prm par psx tcl])
-STAR_DECLARE_DEPENDENCIES(link, [cat mers subpar psx ndg ndf ast agi fio grp trn prm mag psx pda pgplot])
+STAR_DECLARE_DEPENDENCIES(build, [cnf sae mers subpar gks gns idi agi ast cat ndg hds chr fio grp ndf prm par psx tcl tk snx])
+STAR_DECLARE_DEPENDENCIES(link, [cat mers subpar psx ndg ndf ast agi fio grp trn prm mag psx pda pgplot tcl tk snx])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
