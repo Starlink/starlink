@@ -7531,6 +7531,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
          ixy = 0;
          rms = 0.1*sp - 1;
          fitted = 0;
+         fitok = 1;
          while( rms < 0.2*sp && ixy < MXY && ( !fitted || fitok ) ) {
             fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
             if( fit ) {

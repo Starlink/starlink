@@ -6951,14 +6951,18 @@ static void SetRegFS( AstRegion *this, AstFrame *frm ) {
 /* Check the global error status. */
    if ( !astOK ) return;
 
-/* Create the new FrameSet. First two copies of the supplied Frame so
-   that modifications using the supplied pointer will not affect the new
-   FrameSet. W create two copies (rather than 1) because the base and
+/* Take ac opy of the supplied Frame and ensure its ActiveUnits flag is
+   set. */
+   f1 = astCopy( frm );
+   astSetActiveUnit( f1, 1 );
+
+/* Create the new FrameSet. First take another copy of the supplied Frame 
+   so that modifications using the supplied pointer will not affect the new
+   FrameSet. We create two copies (rather than 1) because the base and
    current Frames must be independant objects - otherwise attribute changes
    done to one will also appear in the other. Then construct the FrameSet 
    containing the two Frame copies connected by a UnitMap. */
-   f1 = astCopy( frm );
-   f2 = astCopy( frm );
+   f2 = astCopy( f1 );
    fs = astFrameSet( f1, "" );
    um = astUnitMap( astGetNaxes( f1 ), "" );
    astAddFrame( fs, AST__BASE, um, f2 );
@@ -9311,6 +9315,7 @@ AstRegion *astLoadRegion_( void *mem, size_t size,
          if( astIsAPointSet( new->points) ) {
             naxpt = astGetNcoord( new->points );
          } else {
+            naxpt = 0;
             astError( AST__REGIN, "astLoadRegion(%s): Corrupt %s specifies points "
                       "using a %s (should be a PointSet).", astGetClass( new ),
                       astGetClass( new ), astGetClass( new->points ) );

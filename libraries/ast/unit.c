@@ -3757,6 +3757,7 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 /* See if the string ends with the symbol for any of the known basic
    units. If it matches more than one basic unit, choose the longest. 
    First ensure descriptions of the known units are  available. */
+            mmult = NULL;
             plural = 0;
             while( 1 ) {
                unit = GetKnownUnits();
