@@ -262,9 +262,9 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
 
-*  Structure Definitions:
-      INCLUDE 'INC_XRTHEAD'
-      INCLUDE 'INC_XRTSRT'
+*  Global variables:
+      INCLUDE 'XRTHEAD_CMN'
+      INCLUDE 'XRTSRT_CMN'
 
 
 *  Arguments Given:
@@ -297,8 +297,6 @@
         PARAMETER		( F2H__EVDS = 1 )
 
 *  Local Variables:
-      RECORD /XRT_HEAD/         HEAD 	    		! Header structure
-      RECORD /XRT_SCFDEF/       SRT
 
       CHARACTER*(DAT__SZLOC) 	LOC        		! Locator to HDS file
       CHARACTER*(DAT__SZLOC) 	TLOC       		! Temporary locator to HDS
@@ -395,7 +393,7 @@
 
 *     ASTERIX style file
         IF ( ASTERIX ) THEN
-          CALL RAT_RDIMAGE( IUNIT, ORIGIN, HEAD, ISTATUS )
+          CALL RAT_RDIMAGE( IUNIT, ORIGIN, ISTATUS )
           IF ( ISTATUS .NE. 0 ) THEN
             CALL MSG_SETC( 'FNAM', FNAME )
             CALL MSG_PRNT( '** Error reading image header '//
@@ -475,12 +473,12 @@
           IF ( FNEW .AND. ASTERIX ) THEN
 
 *        Update the SRT so the exposure time is calculated
-            SRT.NTIME = 1
-            SRT.MIN_T(1) = HEAD.TSTART(1)
-            SRT.MAX_T(1) = HEAD.TEND(HEAD.NTRANGE)
+            SRT_NTIME(1) = 1
+            SRT_MIN_T(1,1) = HEAD_TSTART(1)
+            SRT_MAX_T(1,1) = HEAD_TEND(HEAD_NTRANGE)
 
 *        Write sort info
-            CALL XRTSORT_CRE_ASTERIX( OFID, SRT, HEAD, STATUS )
+            CALL XRTSORT_CRE_ASTERIX( OFID, 1, STATUS )
             IF (STATUS.NE.SAI__OK) GOTO 99
 
 *        Sort axes
@@ -488,9 +486,9 @@
 
 *        Multiply scale by 30 (coord increment/pixel) for MPE
             IF ( ORIGIN .EQ. 'MPE' ) CPIX = 30
-            SPARR(1,1) =  CPIX * HEAD.PIXEL / 3600. * (NAXES(1) / 2 )
-            SPARR(2,1) = - CPIX * HEAD.PIXEL / 3600.0
-            SPARR(1,2) = -CPIX * HEAD.PIXEL / 3600. * (NAXES(2) / 2 )
+            SPARR(1,1) =  CPIX * HEAD_PIXEL / 3600. * (NAXES(1) / 2 )
+            SPARR(2,1) = - CPIX * HEAD_PIXEL / 3600.0
+            SPARR(1,2) = -CPIX * HEAD_PIXEL / 3600. * (NAXES(2) / 2 )
             SPARR(2,2) = - SPARR(2,1)
             DO II = 1,2
               CALL BDI_AXPUT0C( OFID, II, 'units', 'degrees', STATUS )
