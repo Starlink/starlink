@@ -611,7 +611,7 @@ PARAMETER PF_SAYS1
   PROMPT 'Ystart of first sky area ? '
   HELP 'PF_SAYS1 delimits the start, in y, of the first sky area'
   DEFAULT 20
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYE1
@@ -621,7 +621,7 @@ PARAMETER PF_SAYE1
   PROMPT 'Yend of first sky area ? '
   HELP 'PF_SAYE1 delimits the end, in y, of the first sky area'
   DEFAULT 25
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYS2
@@ -631,7 +631,7 @@ PARAMETER PF_SAYS2
   PROMPT 'Ystart of second sky area ? '
   HELP 'PF_SAYS2 delimits the start, in y, of the second sky area'
   DEFAULT 35
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYE2
@@ -641,7 +641,7 @@ PARAMETER PF_SAYE2
   PROMPT 'Yend of second sky area ? '
   HELP 'PF_SAYE2 delimits the end, in y, of the second sky area'
   DEFAULT 40
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYS3
@@ -651,7 +651,7 @@ PARAMETER PF_SAYS3
   PROMPT 'Ystart of third sky area ? '
   HELP 'PF_SAYS3 delimits the start, in y, of the third sky area'
   DEFAULT -1
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYE3
@@ -661,7 +661,7 @@ PARAMETER PF_SAYE3
   PROMPT 'Yend of third sky area ? '
   HELP 'PF_SAYE3 delimits the end, in y, of the third sky area'
   DEFAULT -1
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYS4
@@ -671,7 +671,7 @@ PARAMETER PF_SAYS4
   PROMPT 'Ystart of fourth sky area ? '
   HELP 'PF_SAYS4 delimits the start, in y, of the fourth sky area'
   DEFAULT -1
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 PARAMETER PF_SAYE4
@@ -681,7 +681,7 @@ PARAMETER PF_SAYE4
   PROMPT 'Yend of fourth sky area ? '
   HELP 'PF_SAYE4 delimits the end, in y, of the fourth sky area'
   DEFAULT -1
-  RANGE -1,62
+  RANGE -1,256
 ENDPARAMETER
 
 # --- Flat field normalisation parameters ---
@@ -848,7 +848,7 @@ PARAMETER AFIT_XEND
   PPATH 'DYNAMIC,CURRENT,DEFAULT'
   PROMPT 'The second column for line fitting'
   HELP 'The right-most column to search for lines'
-  DEFAULT 62.0
+  DEFAULT 256.0
 ENDPARAMETER
 
 
