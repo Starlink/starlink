@@ -81,6 +81,9 @@
 *  History:
 *     1996 October 4 (MJC):
 *        Original version.
+*     1997 July 31 (MJC):
+*        Corrected a couple of error messages and tests.  Made more
+*        efficient for a constant (zero-order) fit.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -175,19 +178,19 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NC', NCOEF )
          CALL ERR_REP( 'KPG1_CHE2x_NCOEF',
-     :     'Chebyshev polynomial has fewer than 2 terms.  '/
+     :     'Chebyshev polynomial has fewer than 1 term.  '/
      :     /'Programming error.', STATUS )
          GOTO 999
       END IF
 
 *  Validate the orders.
-      IF ( XDEG .LT. 1 .OR. YDEG .LT. 1 ) THEN
+      IF ( XDEG .LT. 0 .OR. YDEG .LT. 0 ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'XD', XDEG )
          CALL MSG_SETI( 'YD', YDEG )
          CALL ERR_REP( 'KPG1_CHE2x_ORDERS',
-     :     'Chebyshev polynomial has fewer than 2 terms.  '/
-     :     /'Programming error.', STATUS )
+     :     'Both Chebyshev polynomial orders (^XD,^YD) are not '/
+     :     /'positive.  Programming error.', STATUS )
          GOTO 999
       END IF
 
@@ -197,8 +200,8 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'EC', ECOEF )
          CALL ERR_REP( 'KPG1_CHE2x_NCOEF',
-     :     'Chebyshev polynomial has fewer than ^EC terms.  '/
-     :     /'Programming error.', STATUS )
+     :     'Chebyshev polynomial has fewer than the required ^EC'/
+     :     /'terms.  Programming error.', STATUS )
          GOTO 999
       END IF
 
@@ -218,74 +221,88 @@
 *  Evaluate results.
 *  =================
 
+*  First deal with the trivial case for efficiency.
+      IF ( NCOEF .EQ. 1 ) THEN
+
+*  Assign the constant to each point.  Note the convention where the
+*  first coefficient is halved.
+         DO K = 1, NPTS
+            EVAL( I ) = CC( 1 ) / 2<CONST>
+         END DO
+
+*  Now tackle the general case.
+      ELSE
+
 *  Define two useful variables.
-      XR = XMAX - XMIN
-      YR = YMAX - YMIN
+         XR = XMAX - XMIN
+         YR = YMAX - YMIN
 
 *  Normalise the variable to lie in the range -1 to +1.  This form of
 *  the expression guarantees that the computed normalised value lies
 *  no more than four times the machine precision from its true value.
-      YNORM = ( ( Y - YMIN ) - ( YMAX - Y ) ) / YR
+         YNORM = ( ( Y - YMIN ) - ( YMAX - Y ) ) / YR
 
 *  Initialise variable for recurrence relationship.
-      YN2 = 2<CONST> * YNORM
+         YN2 = 2<CONST> * YNORM
 
 *  Sum the coefficients times the second-axis Chebyshev polynomials.
 *  =================================================================
 
 *  Apply Clenshaw's recurrence relationship for efficiency.  For terms
 *  greater than NCOEF the value is zero.  Note the
-      DO I = 1, XDEG + 1
-         IOFFCC = ( I - 1 ) * ( YDEG + 1 )
-         DP2 = 0<CONST>
-         DP1 = 0<CONST>
-         IF ( YDEG .GT. 1 ) THEN
-            DO ORDER = YDEG + 1, 2, -1
-               D = DP1
-               DP1 = YN2 * DP1 - DP2 + CC( IOFFCC + ORDER )
-               DP2 = D
-            END DO
-         END IF
-
-*  The final iteration is different.  The constant term is half of the
-*  coefficient in the Chebyshev series.
-         WORK( I ) = DP1 * YNORM - DP2 + CC( IOFFCC + 1 ) / 2<CONST>
-      END DO
-
-*  Loop for each point to be evaluated.
-      DO K = 1, NPTS
-
-*  Check that the x co-ordinate is in range.
-         IF ( ( X( K ) - XMAX ) * ( X( K ) - XMIN ) .LE. 0<CONST> ) THEN
-
-*  Normalise the variable to lie in the range -1 to +1.  This form of
-*  the expression guarantees that the computed normalised value lies
-*  no more than four times the machine precision from its true value.
-            XNORM = ( ( X( K ) - XMIN ) - ( XMAX - X( K ) ) ) / XR
-
-*  Sum the C(I)s times the first-axis Chebyshev polynomials.
-*  =========================================================
-
-*  Initialise variable for recurrence relationship.
-            XN2 = 2<CONST> * XNORM
-
-*  Apply Clenshaw's recurrence relationship for efficiency.  For terms
-*  greater than NCOEF the value is zero.
+         DO I = 1, XDEG + 1
+            IOFFCC = ( I - 1 ) * ( YDEG + 1 )
             DP2 = 0<CONST>
             DP1 = 0<CONST>
-            IF ( XDEG .GT. 1 ) THEN
-               DO ORDER = XDEG + 1, 2, -1
+            IF ( YDEG .GT. 1 ) THEN
+               DO ORDER = YDEG + 1, 2, -1
                   D = DP1
-                  DP1 = XN2 * DP1 - DP2 + WORK( ORDER )
+                  DP1 = YN2 * DP1 - DP2 + CC( IOFFCC + ORDER )
                   DP2 = D
                END DO
             END IF
 
 *  The final iteration is different.  The constant term is half of the
 *  coefficient in the Chebyshev series.
-            EVAL( K ) = DP1 * XNORM - DP2 + WORK( 1 ) / 2<CONST>
-         END IF
-      END DO
+            WORK( I ) = DP1 * YNORM - DP2 + CC( IOFFCC + 1 ) / 2<CONST>
+         END DO
+
+*  Loop for each point to be evaluated.
+         DO K = 1, NPTS
+
+*  Check that the x co-ordinate is in range.
+            IF ( ( X( K ) - XMAX ) *
+     :           ( X( K ) - XMIN ) .LE. 0<CONST> ) THEN
+
+*  Normalise the variable to lie in the range -1 to +1.  This form of
+*  the expression guarantees that the computed normalised value lies
+*  no more than four times the machine precision from its true value.
+               XNORM = ( ( X( K ) - XMIN ) - ( XMAX - X( K ) ) ) / XR
+
+*  Sum the C(I)s times the first-axis Chebyshev polynomials.
+*  =========================================================
+
+*  Initialise variable for recurrence relationship.
+               XN2 = 2<CONST> * XNORM
+
+*  Apply Clenshaw's recurrence relationship for efficiency.  For terms
+*  greater than NCOEF the value is zero.
+               DP2 = 0<CONST>
+               DP1 = 0<CONST>
+               IF ( XDEG .GT. 1 ) THEN
+                  DO ORDER = XDEG + 1, 2, -1
+                     D = DP1
+                     DP1 = XN2 * DP1 - DP2 + WORK( ORDER )
+                     DP2 = D
+                  END DO
+               END IF
+
+*  The final iteration is different.  The constant term is half of the
+*  coefficient in the Chebyshev series.
+               EVAL( K ) = DP1 * XNORM - DP2 + WORK( 1 ) / 2<CONST>
+            END IF
+         END DO
+      END IF
 
   999 CONTINUE
 
