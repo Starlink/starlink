@@ -243,6 +243,9 @@
 *       considered as the same point. Comments may be included in the
 *       file using the characters # and !. Columns may be separated by
 *       the use of commas or spaces.
+*
+*       In all cases the coordinates in position lists are pixel 
+*       coordinates.
 
 *  Behaviour of parameters:
 *
