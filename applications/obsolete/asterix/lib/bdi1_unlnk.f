@@ -127,7 +127,7 @@
 
 *      Unmap if object still mapped
           IF ( MCOUNT .GT. 0 ) THEN
-            CALL BDI1_UNMAP_INT( ITID, STATUS )
+            CALL BDI1_UNMAP_INT( LHS, ITID, STATUS )
           END IF
 
 *      Release the item
