@@ -13,7 +13,8 @@
 *     CALL UDI1_COPANC( NARG, ARGS, OARG, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Copies ancillary data for HDS files. Recognises the omission of
+*     GRAFIX and GROUPING components.
 
 *  Arguments:
 *     NARG = INTEGER (given)
@@ -153,7 +154,8 @@
 
 *          Are we omitting this component
               IF ( .NOT. (
-     :             ((ANAME.EQ.'GRAFIX').AND.CHR_INSET(OMIT,'grf'))
+     :             ((ANAME.EQ.'GRAFIX').AND.CHR_INSET(OMIT,'grf')).OR.
+     :             ((ANAME.EQ.'GROUPING').AND.CHR_INSET(OMIT,'grp'))
      :                   ) ) THEN
                 CALL DAT_COPY( ACLOC, OALOC, ANAME, STATUS )
               END IF

@@ -375,7 +375,7 @@
       END IF
 
 *  Copy ancillary stuff
-      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf,grp', OFID, STATUS )
 
 *  History
       CALL HSI_COPY( IFID, OFID, STATUS )
