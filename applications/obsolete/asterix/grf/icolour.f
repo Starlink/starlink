@@ -63,6 +63,10 @@
           CALL ICOLOUR_GUI_LOAD(STATUS)
         ELSEIF (MODE.EQ.'UPDATE'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_UPDATE(STATUS)
+        ELSEIF (MODE.EQ.'INVERT'.AND.I_GUI) THEN
+          CALL ICOLOUR_GUI_INVERT(STATUS)
+        ELSEIF (MODE.EQ.'ROTATE'.AND.I_GUI) THEN
+          CALL ICOLOUR_GUI_ROTATE(STATUS)
         ELSEIF (MODE.EQ.'SAVE'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_SAVE(STATUS)
         ELSEIF (MODE.EQ.'READ') THEN
@@ -1128,6 +1132,138 @@
           ENDDO
 
         ENDDO
+
+      ENDIF
+
+      END
+
+*+  ICOLOUR_GUI_INVERT
+      SUBROUTINE ICOLOUR_GUI_INVERT(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+      REAL COL(3,16)
+      INTEGER NCOL,NSHADE,FIRST,LAST
+      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
+*    Local variables :
+      REAL RED,GREEN,BLUE
+      REAL REDHUE,GREENHUE,BLUEHUE
+      INTEGER CJ
+      INTEGER I,J,K
+*-
+      IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
+
+        DO I=1,3
+          DO J=1,16
+            COL(I,J)=1.0-COL(I,J)
+          ENDDO
+        ENDDO
+
+        CJ=FIRST
+
+
+        DO J=1,15
+          RED=COL(1,J)
+          REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
+          GREEN=COL(2,J)
+          GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
+          BLUE=COL(3,J)
+          BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
+          CALL PGSCR(CJ,RED,GREEN,BLUE)
+          DO K=1,NSHADE
+            CJ=CJ+1
+            RED=RED+REDHUE
+            GREEN=GREEN+GREENHUE
+            BLUE=BLUE+BLUEHUE
+            CALL PGSCR(CJ,RED,GREEN,BLUE)
+          ENDDO
+          CJ=CJ+1
+        ENDDO
+        RED=COL(1,16)
+        GREEN=COL(2,16)
+        BLUE=COL(3,16)
+        CALL PGSCR(CJ,RED,GREEN,BLUE)
+
+      ENDIF
+
+      END
+
+
+*+  ICOLOUR_GUI_ROTATE
+      SUBROUTINE ICOLOUR_GUI_ROTATE(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+      REAL COL(3,16)
+      INTEGER NCOL,NSHADE,FIRST,LAST
+      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
+*    Local variables :
+      REAL RED,GREEN,BLUE
+      REAL REDHUE,GREENHUE,BLUEHUE
+      INTEGER CJ
+      INTEGER I,J,K
+*-
+      IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
+
+        DO I=1,16
+          RED=COL(1,I)
+          GREEN=COL(2,I)
+          BLUE=COL(3,I)
+          COL(2,I)=RED
+          COL(3,I)=GREEN
+          COL(1,I)=BLUE
+        ENDDO
+
+        CJ=FIRST
+
+
+        DO J=1,15
+          RED=COL(1,J)
+          REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
+          GREEN=COL(2,J)
+          GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
+          BLUE=COL(3,J)
+          BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
+          CALL PGSCR(CJ,RED,GREEN,BLUE)
+          DO K=1,NSHADE
+            CJ=CJ+1
+            RED=RED+REDHUE
+            GREEN=GREEN+GREENHUE
+            BLUE=BLUE+BLUEHUE
+            CALL PGSCR(CJ,RED,GREEN,BLUE)
+          ENDDO
+          CJ=CJ+1
+        ENDDO
+        RED=COL(1,16)
+        GREEN=COL(2,16)
+        BLUE=COL(3,16)
+        CALL PGSCR(CJ,RED,GREEN,BLUE)
 
       ENDIF
 
