@@ -1,5 +1,5 @@
 /* Part of dvi2bitmap.
- * Copyright 2000, Council of the Central Laboratory of the Research Councils.
+ * Copyright 2000, Central Laboratory of the Research Councils.
  * See file LICENCE for conditions.
  */
 
@@ -22,8 +22,6 @@ class PNGBitmap : public BitmapImage {
  public:
     PNGBitmap (const int w, const int h, const int bpp=1);
     ~PNGBitmap ();
-    //void setBitmap (const Byte *b);
-    //void setBitmapRow (const Byte *b);
     void write (const string filename);
     string fileExtension () const { return "png"; }
 
