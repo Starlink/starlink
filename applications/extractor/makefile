@@ -402,7 +402,7 @@ PKG_VERS = 1.0
 
 #  List the source subdirectories
 
-SOURCE_DIRS = wcs wcsmod sextractor
+SOURCE_DIRS = sextractor
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -454,9 +454,9 @@ I_SUB1 = assoc.h astrom.h back.h bpro.h check.h clean.h define.h \
          plist.h poly.h prefs.h psf.h retina.h sexhead.h sexhead1.h \
          sexheadsc.h som.h types.h weight.h
 
-I_SUB2 = wcs/cel.h wcs/lin.h wcs/proj.h wcs/wcs.h wcs/wcstrig.h
+I_SUB2 =
 
-I_SUB3 = wcsmod/cel.h wcsmod/lin.h wcsmod/proj.h wcsmod/wcs.h wcsmod/wcstrig.h
+I_SUB3 =
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -495,10 +495,7 @@ C_SUB1 = adamprint.c analyse.c assoc.c astrom.c back.c bpro.c catout.c \
          makeit.c manobjlist.c misc.c neurro.c photom.c plist.c poly.c \
          prefs.c psf.c readimage.c refine.c retina.c scan.c som.c weight.c
 
-#  The source of this library is in subdirectory wcs but it is built
-#  in this directory.
-
-C_SUB2 = wcs/cel.c wcs/lin.c wcs/proj.c wcs/sph.c wcs/wcs.c wcs/wcstrig.c
+C_SUB2 =
 
 #  List of applications/tasks in monolith.
 
