@@ -122,3 +122,7 @@
   scaled with image. Better matching of postscript font size to displayed
   size. Long term memory leak cured (when drawing overlays).
 
+  New configuration option "always_merge" controls if the primary header
+  are merged with those of extension to create a full set of headers for
+  creating a world coordinate system. By default this merging no longer
+  occurs when the primary HDU contains an image.
