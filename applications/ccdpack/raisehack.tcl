@@ -39,9 +39,9 @@
 #  fully visible.  This seems reasonable, but perhaps there are window
 #  managers which do not guarantee this?
       bind all <Visibility> { set ::visibilityState(%W) %s }
-      bind all <Map> { if !%o { set ::visibilityState(%W) VisibilityUnobscured }
-}
       bind all <Destroy> { catch { unset ::visibilityState(%W) } }
+      bind all <Map> { if !%o 
+                          { set ::visibilityState(%W) VisibilityUnobscured } }
 
 #  Redefine the raise command
       proc raise { window { above "" } } {
