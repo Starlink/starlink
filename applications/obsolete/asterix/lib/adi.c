@@ -5327,7 +5327,7 @@ void adix_fcreat( char *fspec, int flen, ADIobj id, ADIobj *fileid,
     ocls = _DTDEF(id)->aname;		/* Class name of created object */
 
 /* Link user object to file object if required */
-    adix_newlnk( *fileid, id, status );
+    adix_newlnk( id, *fileid, status );
     }
 
   }
