@@ -1,0 +1,60 @@
+## REMIP - remove instrumental polarisation from data file
+ 
+#+
+#  Name:
+#     REMIP
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     Tim Jenness (JACH) 
+
+#  History:
+#     {enter_further_changes_here}
+ 
+#-
+ 
+   INTERFACE REMIP
+
+      HELPLIB 'SURF_HELP:'
+
+      PARAMETER IN
+         POSITION 1
+         TYPE    'FILENAME'
+         ACCESS   'READ'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '<->GLOBAL.DATA_ARRAY'
+         PROMPT  'Name of input file containing demodulated map data'
+        HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER   OUT
+         POSITION 3
+         PROMPT   'Name of output file'
+         TYPE     'FILENAME'
+         ACCESS   'WRITE'
+         VPATH    'PROMPT'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER IPFILE
+         POSITION 2
+         TYPE   '_CHAR'
+         PROMPT 'The name of the file containing the IP data'
+         DEFAULT 'Dynamic'
+        HELPKEY '*'
+      ENDPARAMETER
+
+
+   ENDINTERFACE
