@@ -2,27 +2,25 @@
 *-
 	CHARACTER*(DAT__SZLOC) LOCMORE  !MORE structure locator
 
-	INTEGER*4 PSF_X, PSF_Y		!PSF dimensions
+	INTEGER PSF_X, PSF_Y		!PSF dimensions
 
-	INTEGER*4 NPIX_R_PSF		!no of pixels with R_PSF
+	INTEGER NPIX_R_PSF		!no of pixels with R_PSF
 
-	REAL*4 R_PSF, R_80  		!radii containing 68 and 95% of PSF
+	REAL R_PSF, R_80  		!radii containing 68 and 95% of PSF
 
-	REAL*4 R_90
+	REAL R_90
 
-	REAL*4 DETECTION_THRESH		!detection significance threshold
+	REAL DETECTION_THRESH		!detection significance threshold
 
-	REAL*4 PSF_MAX, PSF_INTEGRAL
+	REAL PSF_MAX, PSF_INTEGRAL
 
-	REAL*4 CONST(2),SLOPE(2)	!line for diagonal edge
+	REAL CONST(2),SLOPE(2)	!line for diagonal edge
 
         INTEGER PSFHAN                  !Handle into Asterix PSF system
 
-	INTEGER*4 ROUTINE_ID
-
-	INTEGER*4 NHISTORY
-	INTEGER*4 MAX_HIST
-	INTEGER*4 NHISTMAX
+	INTEGER NHISTORY
+	INTEGER MAX_HIST
+	INTEGER NHISTMAX
 
 	CHARACTER*80 HISTORY(100)
 
@@ -30,5 +28,5 @@
 
 	COMMON /BSUB_CMN/R_PSF,R_80,DETECTION_THRESH,
      &  PSF_X,PSF_Y,PSFHAN,PSF_INTEGRAL,PSF_MAX,NPIX_R_PSF,
-     &  ROUTINE_ID,NHISTORY,NHISTMAX,MAX_HIST,HISTORY,CONST,SLOPE,
+     &  NHISTORY,NHISTMAX,MAX_HIST,HISTORY,CONST,SLOPE,
      &  R_90,LOUD,LOCMORE
