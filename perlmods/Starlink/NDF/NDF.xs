@@ -149,9 +149,8 @@ char *s;
 /* Do the compiler numeric constants */
 
 static double
-constant(name, arg)
+constant(name)
 char *name;
-int arg;
 {
   errno = 0;
   switch (*name) {
@@ -471,10 +470,9 @@ VAL__BADUB()
 # Numeric constants (autoloaded)
 
 double
-constant(name,arg)
+constant(name)
         char *          name
-        int             arg
- PROTOTYPE: $$
+ PROTOTYPE: $
 
 # Alphabetical order....
 
