@@ -6,7 +6,7 @@
 /*  Name:  */
 /*     geturl.h  */
 /*  Purpose:  */
-/*     Include file for geturl.  */
+/*     Get a url (include file) */
 /*  Language:  */
 /*     C.  */
 /*  Type of Module:  */
@@ -47,6 +47,13 @@
 typedef int logical;
 #define  FALSE  0
 #define  TRUE   1
+
+void     ErrorMsg(char *);
+int GetHostAndPage (int status,  char *queryUrl,  char *queryHost,
+		    int *queryPort, char *queryPage);
+int GetHostNumber (int status,  char *queryHost, char *hostNumber);
+int RetrieveUrl (int status,  char *hostNumber,  int queryPort,
+		 char *queryPage, logical echoHttpHead);
 
 
 int main(int argc, char **argv)
@@ -103,19 +110,20 @@ int main(int argc, char **argv)
 /*-  */
 /*  Local Variables:  */
 
+#define BUFFER_SIZE 1000
+
 int    status;             /* Running status.  */
 
-char   queryUrl[1000];     /* The complete input URL.  */
-char   queryHost[1000];    /* The host part of the URL.  */
-char   queryPage[1000];    /* The `Web page on the host' part of the URL.  */
+char   queryUrl[BUFFER_SIZE];  /* The complete input URL.  */
+char   queryHost[BUFFER_SIZE]; /* The host part of the URL.  */
+char   queryPage[BUFFER_SIZE]; /* The `Web page on the host' part of the URL.  */
 char   hostNumber[INET_ADDRSTRLEN]; /* Numeric representation of the host name.  */
-char   errorText[1000];    /* Text for error message.  */
+char   errorText[BUFFER_SIZE];    /* Text for error message.  */
 
 int      queryPort;        /* Port number.  */
 
 logical  echoHttpHead;     /* Flag; echo the HTTP header?  */
 
-void     ErrorMsg();
 /*.  */
 
 
@@ -173,12 +181,14 @@ void     ErrorMsg();
        {  strcpy(errorText, "unable to retrieve URL ");
           strcat(errorText, queryUrl);
           ErrorMsg(errorText);
+	  return EXIT_FAILURE;
        }
     }
     else
     {  printf("! Usage:-\n");
        printf("!   geturl  URL-to-be-retrieved\n");
     }
+    return EXIT_SUCCESS;
 }
 
 /* ----------------------------------------------------------   */
