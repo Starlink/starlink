@@ -18,6 +18,7 @@ edit = sed -e 's%@bindir\@%$(bindir)%g' \
            -e 's%@staretcdir\@%$(staretcdir)%g' \
            -e 's%@starhelpdir\@%$(starhelpdir)%g' \
            -e 's%@libdir\@%$(libdir)%g' \
+           -e 's%@datadir\@%$(datadir)%g' \
            -e 's%@sharelibdir\@%$(libdir)%g' \
            -e 's%@VERSION\@%$(VERSION)%g' \
            -e 's%@mandir\@%$(mandir)%g' \

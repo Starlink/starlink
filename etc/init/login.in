@@ -449,9 +449,9 @@ endif
 
 #
 #  SPECX
-if ( -e @bindir@/specx/specxstart ) then
-   setenv SYS_SPECX @bindir@/specx
-   setenv SPECX_HELP @starhelpdir@/specx/specx
+if ( -e @datadir@/specx/specxstart ) then
+   setenv SYS_SPECX @datadir@/specx
+   setenv SPECX_HELP @starhelpdir@/specx
 endif
 
 #

@@ -510,10 +510,10 @@ endif
 #   Specx
 #
 
-if ( -e @bindir@/specx/specxstart ) then
-   alias specxsetup 'source $SYS_SPECX/specxstart'
-   alias specxstart 'source $SYS_SPECX/specxstart'
-   alias specx 'source $SYS_SPECX/specxstart'
+if ( -e @datadir@/specx/specxstart ) then
+   alias specxsetup 'source $SYS_SPECX/specxstart; unalias specx'
+   alias specxstart 'source $SYS_SPECX/specxstart; unalias specx'
+   alias specx 'source $SYS_SPECX/specxstart; unalias specx'
 else
    alias specxsetup '@staretcdir@/notinst specxsetup'
    alias specxstart '@staretcdir@/notinst specxstart'
