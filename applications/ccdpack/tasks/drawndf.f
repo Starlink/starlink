@@ -55,6 +55,17 @@
 *        NDFs.  The appearance of the axes can be controlled using the
 *        STYLE parameter.
 *        [TRUE]
+*     CLEAR = _LOGICAL (Read)
+*        If true, the graphics device will be cleared before the plot
+*        is made.  If you want the outlines to be drawn over the top
+*        of an existing DATA picture, for instance one displayed with
+*        KAPPA's DISPLAY application, then set CLEAR to false.  If
+*        possible, alignment will occur within the Current coordinate
+*        system of the NDF.  If this is not possible, an attempt is
+*        made in SKY, PIXEL or GRID domains.  If the image cannot be
+*        aligned in any suitable domain, then OUTLINE will terminate
+*        with an error.
+*        [TRUE]
 *     DEVICE = DEVICE (Read)
 *        The name of the device on which to draw the outlines.
 *        [Current display device]
@@ -144,13 +155,6 @@
 *        Original version.
 *     {enter_changes_here}
 
-*  Implementation Status:
-*     Really this routine should use AGI properly so that the coordinates
-*     used can be made to correspond to pictures plotted before and 
-*     after it on the plotting device.  Because there is no AST-AGI
-*     machinery in CCDPACK at present however this would not be trivial
-*     to implement.
-
 *  Bugs:
 *     {note_any_bugs_here}
 
@@ -187,7 +191,6 @@
       INTEGER IPEN               ! Current pen index
       INTEGER IWCS               ! AST identifier for WCS frameset
       INTEGER J                  ! Loop variable
-      INTEGER JGRID( CCD1__MXNDF ) ! Indices of GRID-like frames in global FSET
       INTEGER JCOM               ! Index of common frame in global FSET
       INTEGER LOCOL              ! Lowest colour index available
       INTEGER LW                 ! Normal plotting line width
@@ -265,6 +268,32 @@
 
 *  Get the list of NDFs for display.
       CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, GID, NNDF, STATUS )
+
+*  Determine what the text labels will look like.
+      CALL PAR_CHOIC( 'LABMODE', 'NAME', 'NAME,INDEX,BOTH,NONE',
+     :                .FALSE., LMODE, STATUS )
+      IF ( LMODE .EQ. 'NAME' ) THEN
+         LFMT = '^NDF'
+      ELSE IF ( LMODE .EQ. 'INDEX' ) THEN
+         LFMT = '^INDEX'
+      ELSE IF ( LMODE .EQ. 'BOTH' ) THEN
+         LFMT = '^INDEX: ^NDF'
+      ELSE IF ( LMODE .EQ. 'NONE' ) THEN
+         LFMT = ' '
+      END IF
+
+*  Determine whether we will be rotating pens for different outlines.
+      CALL PAR_GET0L( 'PENROT', PENROT, STATUS )
+
+*  Determine whether we should clear the display device before plotting.
+      CALL PAR_GET0L( 'CLEAR', CLEAR, STATUS )
+
+*  Determine whether we will draw axes.
+      IF ( CLEAR ) THEN
+         CALL PAR_GET0L( 'AXES', AXES, STATUS )
+      ELSE
+         AXES = .FALSE.
+      END IF
 
 *  Initialise the global frameset with the Current frame of the 
 *  reference (first) NDF.  First get the NDF identifier.
@@ -352,10 +381,8 @@
 
 *  Add the Base (GRID-domain) frame of the NDF to the global frameset,
 *  using the correct mapping from the common coordinate system.
+*  Note the index of this frame within the frameset will be JCOM + I.
          CALL AST_ADDFRAME( FSET, JCOM, MAP, FRM, STATUS )
-
-*  Record the frame index of the added frame.
-         JGRID( I ) = AST_GETI( FSET, 'Current', STATUS )
 
 *  Get the NDF extent in its Base (GRID-domain) frame.
          CALL NDF_DIM( INDF, 2, DIMS( 1, I ), NDIM, STATUS )
@@ -384,82 +411,105 @@
      :               // ' frames have the same domain.', STATUS )
       END IF
 
-*  We now have a frameset containing one common frame and a frame 
-*  representing a two-dimensional GRID-frame-like coordinate system
-*  corresponding to each of the input NDFs.  Finally set the Current
-*  frame of the frameset to the common coordinate system.
+*  Set the Current frame of the frameset to the common coordinate system.
       CALL AST_SETI( FSET, 'Current', JCOM, STATUS ) 
 
-*  Now open the graphics device.  We have to set the extent of the
-*  plotting region which will contain all the outlines we wish to plot.
-*  So first we have to determine a suitable bounding box.
-      XMIN = VAL__MAXD
-      YMIN = VAL__MAXD
-      XMAX = VAL__MIND
-      YMAX = VAL__MIND
-      GLBND( 1 ) = 0.5D0
-      GLBND( 2 ) = 0.5D0
+*  We now have a global frameset containing one common frame and a frame 
+*  representing a two-dimensional GRID-frame-like coordinate system
+*  corresponding to each of the input NDFs.  We can use this to construct
+*  an AST Plot object with which to address the graphics device.
+      PLOT = AST__NULL
+
+*  If we have been asked not to clear the graphics device, attempt to 
+*  construct a Plot object in conjunction with the current contents of
+*  the AGI database.
+      IF ( .NOT. CLEAR ) THEN
+
+*  Open the graphics device and select the DATA picture.
+         CALL AGP_ASSOC( 'DEVICE', 'UPDATE', 'DATA', .FALSE., PICID,
+     :                   STATUS )
+         CALL AGI_SELP( PICID, STATUS )
+
+*  Attempt to get a plot aligned with the AGI current picture.
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         CALL CCD1_APLOT( FSET, PICID, .TRUE., PLOT, STATUS )
+
+*  It would probably be a good idea to deactivate clipping here, since
+*  it may be useful to see outlines which go outside of the plotted
+*  image.  However, the PGSCLP call is not available in the Starlink
+*  version of PGPLOT.
+c        CALL AST_CLIP( PLOT, AST__NOFRAME, GLBND, GUBND, STATUS )
+c        CALL PGSCLP( 0 )
+      END IF
+
+*  If either the attempt to use AGI failed or we have been asked to 
+*  clear the device, we need to determine the boundaries of the area 
+*  in which to plot.
+      IF ( PLOT .EQ. AST__NULL ) THEN
+         XMIN = VAL__MAXD
+         YMIN = VAL__MAXD
+         XMAX = VAL__MIND
+         YMAX = VAL__MIND
+         GLBND( 1 ) = 0.5D0
+         GLBND( 2 ) = 0.5D0
 
 *  Loop for each NDF.
-      DO I = 1, NNDF
+         DO I = 1, NNDF
 
 *  Find a bounding box which will contain the data array of this NDF in 
 *  the common frame.
-         MAP = AST_GETMAPPING( FSET, JGRID( I ), JCOM, STATUS )
-         GUBND( 1 ) = DBLE( DIMS( 1, I ) ) + 0.5D0
-         GUBND( 2 ) = DBLE( DIMS( 2, I ) ) + 0.5D0
-         DO J = 1, 2
-            CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, OLBND( J ),
-     :                       OUBND( J ), LPOS, UPOS, STATUS )
-         END DO
+            MAP = AST_GETMAPPING( FSET, JCOM + I, JCOM, STATUS )
+            GUBND( 1 ) = DBLE( DIMS( 1, I ) ) + 0.5D0
+            GUBND( 2 ) = DBLE( DIMS( 2, I ) ) + 0.5D0
+            DO J = 1, 2
+               CALL AST_MAPBOX( MAP, GLBND, GUBND, .TRUE., J, 
+     :                          OLBND( J ), OUBND( J ), LPOS, UPOS, 
+     :                          STATUS )
+            END DO
 
 *  Update limits if necessary.
-         IF ( OLBND( 1 ) .LT. XMIN ) XMIN = OLBND( 1 )
-         IF ( OLBND( 2 ) .LT. YMIN ) YMIN = OLBND( 2 )
-         IF ( OUBND( 1 ) .GT. XMAX ) XMAX = OUBND( 1 )
-         IF ( OUBND( 2 ) .GT. YMAX ) YMAX = OUBND( 2 )
-      END DO
+            IF ( OLBND( 1 ) .LT. XMIN ) XMIN = OLBND( 1 )
+            IF ( OLBND( 2 ) .LT. YMIN ) YMIN = OLBND( 2 )
+            IF ( OUBND( 1 ) .GT. XMAX ) XMAX = OUBND( 1 )
+            IF ( OUBND( 2 ) .GT. YMAX ) YMAX = OUBND( 2 )
+         END DO
 
 *  Add a little to the limits so the outlines don't butt up to the edges.
-      XADD = ( XMAX - XMIN ) * 0.03D0
-      YADD = ( YMAX - YMIN ) * 0.03D0
-      XMIN = XMIN - XADD
-      XMAX = XMAX + XADD
-      YMIN = YMIN - YADD
-      YMAX = YMAX + YADD
+         XADD = ( XMAX - XMIN ) * 0.03D0
+         YADD = ( YMAX - YMIN ) * 0.03D0
+         XMIN = XMIN - XADD
+         XMAX = XMAX + XADD
+         YMIN = YMIN - YADD
+         YMAX = YMAX + YADD
 
-*  Determine whether we will draw axes.
-      CALL PAR_GET0L( 'AXES', AXES, STATUS )
-
-*  Open the graphics device using AGI.  Leave a gap round the outside 
-*  only if we will be drawing axes.
-      CALL AGP_ASSOC( 'DEVICE', 'WRITE', ' ', AXES, PICID, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+*  Open the graphics device using AGI unless we have already done so.
+*  Leave a gap round the outside only if we will be drawing axes.
+         IF ( CLEAR ) THEN
+            CALL AGP_ASSOC( 'DEVICE', 'WRITE', ' ', AXES, PICID, 
+     :                      STATUS )
+         ELSE
+            IF ( AXES ) CALL AGP_NVIEW( .TRUE., STATUS )
+         END IF
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Set the PGPLOT viewport and world coordinates to give a viewport
 *  large enough to hold all the outlines, of the correct aspect ratio,
 *  and with enough space for labelling round the outside.
-      CALL PGWNAD( REAL( XMIN ), REAL( XMAX ), REAL( YMIN ),
-     :             REAL( YMAX ) )
+         CALL PGWNAD( REAL( XMIN ), REAL( XMAX ), REAL( YMIN ),
+     :                REAL( YMAX ) )
 
-*  Turn the global frameset into an AST Plot.  The plot Base coordinates
-*  are in millimetres from the bottom left hand corner; this is consistent
-*  with the way KAPPA does things.
-      CALL PGQWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
-      BBOX( 1 ) = DBLE( GBOX( 1 ) )
-      BBOX( 2 ) = DBLE( GBOX( 2 ) )
-      BBOX( 3 ) = DBLE( GBOX( 3 ) )
-      BBOX( 4 ) = DBLE( GBOX( 4 ) )
-      CALL PGQVP( 2, GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
-      CALL PGSWIN( GBOX( 1 ), GBOX( 3 ), GBOX( 2 ), GBOX( 4 ) )
-      PLOT = AST_PLOT( FSET, GBOX, BBOX, ' ', STATUS )
+*  Turn the global frameset into an AST Plot.
+         CALL CCD1_APLOT( FSET, PICID, .FALSE., PLOT, STATUS )
+      END IF
 
-*  We have to update the records of frame indices accordingly - this
-*  behaviour of frame indices is documented in the AST_PLOT documentation.
-      JCOM = JCOM + 1
-      DO I = 1, NNDF
-         JGRID( I ) = JGRID( I ) + 1
-      END DO
+*  Set the common frame index to its correct value for the Plot object;
+*  it will be the Current frame of the Plot object, since it was the
+*  Current frame of the Frameset passed to CCD1_APLOT.  The relative
+*  positions of the grid-like frames within the PLOT frameset will
+*  be the same as those in the FSET frameset, so as long as we know
+*  the position of the common one, we can easily get the positions of
+*  the others.
+      JCOM = AST_GETI( PLOT, 'Current', STATUS )
 
 *  Apply default and user-selected style settings to the plot.
       CALL CCD1_PLSTY( PLOT, 'STYLE', STATUS )
@@ -469,24 +519,12 @@
          CALL AST_GRID( PLOT, STATUS )
       END IF
 
-*  Determine what the text labels will look like.
-      CALL PAR_CHOIC( 'LABMODE', 'NAME', 'NAME,INDEX,BOTH,NONE',
-     :                .FALSE., LMODE, STATUS )
-      IF ( LMODE .EQ. 'NAME' ) THEN
-         LFMT = '^NDF'
-      ELSE IF ( LMODE .EQ. 'INDEX' ) THEN
-         LFMT = '^INDEX'
-      ELSE IF ( LMODE .EQ. 'BOTH' ) THEN
-         LFMT = '^INDEX: ^NDF'
-      ELSE IF ( LMODE .EQ. 'NONE' ) THEN
-         LFMT = ' '
-      END IF
-
-*  Determine whether we will be rotating pens for different outlines.
+*  If we are rotating pens between plots, generate a group of pen style
+*  attributes to cycle through.  Doing it like this is slightly more 
+*  involved than just calculating it within the plotting loop, but 
+*  makes it easier to customise if more complicated changes of style
+*  are required.
       PENGID = GRP__NOID
-      CALL PAR_GET0L( 'PENROT', PENROT, STATUS )
-
-*  If so, generate a group of pen style attributes to cycle through.
       IF ( PENROT ) THEN
 
 *  Create a new group.
@@ -507,10 +545,10 @@
             CALL MSG_LOAD( ' ', 'Colour=^IPEN', STYEL, STYLEN, STATUS )
             CALL GRP_PUT( PENGID, 1, STYEL( 1 : STYLEN ), I, STATUS )
          END DO
+      END IF
 
 *  Initialise pen number.
-         IPEN = 1
-      END IF
+      IPEN = 1
 
 *  Initialise constant vertex positions.
       XLO = 0.5D0
@@ -563,7 +601,7 @@
 
 *  Set the Current frame of the Plot object to the GRID-like coordinate 
 *  system of this NDF.
-         CALL AST_SETI( PLOT, 'Current', JGRID( I ), STATUS )
+         CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
 
 *  Plot a marker at the origin of each outline.
          CALL PGQLW( LW )
@@ -611,7 +649,7 @@
 *  Write the label in the correct position and orientation.
             CALL AST_SETI( PLOT, 'Current', AST__BASE, STATUS )
             CALL AST_TEXT( PLOT, BUFFER( :BL ), TPOS, UP, JUST, STATUS )
-            CALL AST_SETI( PLOT, 'Current', JGRID( I ), STATUS )
+            CALL AST_SETI( PLOT, 'Current', JCOM + I, STATUS )
          END IF
 
 *  Plot geodesics in the GRID-like coordinate system along the edges
@@ -624,7 +662,7 @@
  99   CONTINUE
 
 *  Close down AGI.
-      CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
+      CALL AGP_DEASS( 'DEVICE', .FALSE., STATUS )
 
 *  End the NDF context.
       CALL NDF_END( STATUS )

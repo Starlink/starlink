@@ -45,22 +45,22 @@
             helpkey *
           }
         
-#        parameter clear {
-#           access READ
-#           type _LOGICAL
-#           vpath CURRENT DEFAULT
-#           ppath CURRENT DEFAULT
-#           default TRUE
-#           prompt {Clear display device}
-#           helpkey *
-#        }
+         parameter clear {
+            access READ
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Clear display device}
+            helpkey *
+         }
 
          parameter axes {
                          # Whether to draw axes
             type _LOGICAL
             access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
+            vpath DYNAMIC CURRENT DEFAULT
+            ppath DYNAMIC CURRENT DEFAULT
             default TRUE
             prompt {Are annotated axes to be plotted?}
             helpkey *
