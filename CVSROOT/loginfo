@@ -29,5 +29,5 @@
 ^java/source/hds	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
 ^java/source/util	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
 ^java/source/ast	mail -s %s M.B.Taylor@bristol.ac.uk P.W.Draper@durham.ac.uk
-^java			mail -s %s ussc@star.rl.ac.uk
+^java			mail -s %s ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
 ^applications/autoastrom	mail -s %s norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
