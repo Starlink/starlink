@@ -75,6 +75,8 @@
 *        Original version.
 *     23 Feb 1996 (DJA):
 *        Write array variant when moving data array for bad pixel flag
+*     14 Mar 1996 (DJA):
+*        SpacedData and ScalarWidth moved to top level
 *     {enter_changes_here}
 
 *  Bugs:
@@ -105,12 +107,8 @@
       CHARACTER*20		ITEM
       CHARACTER*(DAT__SZLOC)	TLOC			! Top level object
 
-      DOUBLE PRECISION		SCWID			! Scalar width
-      DOUBLE PRECISION		SPARR(2)		! Spaced array data
-
       INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model dimensions
       INTEGER			NELM			! # data elements
-      INTEGER			PTR			! Mapped axis values
 
       LOGICAL			STRUC			! Object is a structure
 *.
@@ -140,46 +138,6 @@
         CALL ADI1_CCA2HT( ARGS(4), 'Width', CLOC, 'WIDTH', STATUS )
         CALL ADI1_CCA2HT( ARGS(4), 'LoWidth', CLOC, 'LOWIDTH', STATUS )
         CALL ADI1_CCA2HT( ARGS(4), 'HiWidth', CLOC, 'HIWIDTH', STATUS )
-
-*  Trap the Axis_<n>_SpacedData item
-      ELSE IF ( (ITEM(1:5) .EQ. 'Axis_') .AND.
-     :          (ITEM(8:17).EQ.'SpacedData') ) THEN
-
-*    Locate object to be got
-        CALL BDI1_CREAT( ARGS(1), ARGS(2), ITEM(:7)//'Data',
-     :                   CLOC, NDIM, DIMS, STATUS )
-
-*    Extract spaced parameters
-        CALL ADI_GET1D( ARGS(4), 2, SPARR, NELM, STATUS )
-
-*    Map array for write
-        CALL DAT_MAPV( CLOC, '_DOUBLE', 'WRITE', PTR, NELM, STATUS )
-
-*    Fill with regularly spaced values
-        CALL ARR_REG1D( SPARR(1), SPARR(2), NELM, %VAL(PTR), STATUS )
-
-*    Unmap the array
-        CALL DAT_UNMAP( CLOC, STATUS )
-
-*  Trap the Axis_<n>_ScalarWidth item
-      ELSE IF ( (ITEM(1:5) .EQ. 'Axis_') .AND.
-     :          (ITEM(8:18).EQ.'ScalarWidth') ) THEN
-
-*    Locate object to be got
-        CALL BDI1_CREAT( ARGS(1), ARGS(2), ITEM(:7)//'Width',
-     :                   CLOC, NDIM, DIMS, STATUS )
-
-*    Extract spaced parameters
-        CALL ADI_GET0D( ARGS(4), SCWID, STATUS )
-
-*    Map array for write
-        CALL DAT_MAPV( CLOC, '_DOUBLE', 'WRITE', PTR, NELM, STATUS )
-
-*    Fill with regularly spaced values
-        CALL ARR_INIT1D( SCWID, NELM, %VAL(PTR), STATUS )
-
-*    Unmap the array
-        CALL DAT_UNMAP( CLOC, STATUS )
 
 *  Magic values flag?
       ELSE IF ( ITEM .EQ. 'MagicFlag' ) THEN
