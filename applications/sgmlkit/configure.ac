@@ -9,8 +9,8 @@ STAR_DEFAULTS
 
 AC_PATH_PROG(PERL, perl)
 AC_PATH_PROG(PAX, pax)
-AC_PATH_PROGS(JADE, [openjade jade], jade)
-AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], sgmlnorm)
+AC_PATH_PROGS(JADE, [openjade jade], NOJADE)
+AC_PATH_PROGS(SGMLNORM, [osgmlnorm sgmlnorm], NOSGMLNORM)
 AC_PATH_PROG(DVI2BITMAP, dvi2bitmap, dvi2bitmap)
 AC_PATH_PROG(PYTHON, python, python)
 AC_PROG_LN_S
@@ -54,7 +54,8 @@ AC_SUBST(PERLSGMLDIR)
 STAR_XML_DOCUMENTATION(ssn70,
                        [doc/ssn70/ssn70.htx_tar doc/ssn70/ssn70.texml_tar])
 
-
+STAR_SUPPRESS_BUILD_IF([test $JADE = NOJADE -o $SGMLNORM = NOSGMLNORM],
+    [JADE=$JADE, SGMLNORM=$SGMLNORM: both needed for sgmlkit])
 
 AC_CONFIG_FILES([Makefile component.xml \
                  dsssl/sl/common/slparams.dsl dsssl/sl/lib/Makefile])
