@@ -6,6 +6,8 @@
 # The configuration script here work with automake 1.7.5 and autoconf
 # 2.57, and probably not much that's significantly older than those.
 
+echo "autoheader..."
+  autoheader || exit 1
 echo "aclocal..."
   aclocal || exit 1
 echo "libtoolize..."
