@@ -107,7 +107,7 @@
       INTEGER			AXIS			! Axis to grow along
       INTEGER			GFID			! Dataset to grow
       INTEGER			GDPTR, GQPTR, GVPTR	! Grow data
-      INTEGER			GNDIM, GDIMS		! Grow input dimensions
+      INTEGER			GNDIM, GDIM		! Grow input dimensions
       INTEGER			IFID			! Dataset to be altered
       INTEGER			IDPTR, IQPTR, IVPTR	! Input data
       INTEGER			NDIM, DIMS(ADI__MXDIM)	! Input dimensions
@@ -134,7 +134,7 @@
 
 *  Get dimensions of inputs
       CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
-      CALL BDI_GETSHP( GFID, 1, GDIMS, GNDIM, STATUS )
+      CALL BDI_GETSHP( GFID, 1, GDIM, GNDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  If not one dimensional chose axis to grow into
@@ -349,21 +349,21 @@
 *              Copy data?
                   IF ( DOK ) THEN
                     DO I = 1, L1
-                      DATA(I,J,K,L,M,N,O) = GDATA(I,J,K,L,M,N,O)
+                      DATA(I,J,K,L,M,N,O) = GDATA(I)
                     END DO
                   END IF
 
 *              Copy quality?
                   IF ( QOK ) THEN
                     DO I = 1, L1
-                      QUAL(I,J,K,L,M,N,O) = GQUAL(I,J,K,L,M,N,O)
+                      QUAL(I,J,K,L,M,N,O) = GQUAL(I)
                     END DO
                   END IF
 
 *              Copy variance?
                   IF ( QOK ) THEN
                     DO I = 1, L1
-                      VAR(I,J,K,L,M,N,O) = GVAR(I,J,K,L,M,N,O)
+                      VAR(I,J,K,L,M,N,O) = GVAR(I)
                     END DO
                   END IF
 
