@@ -3,24 +3,25 @@
 ## Template Makefile.am -- uses the cnf library as an example
 ## Comments starting `##' are removed by automake; comments starting
 ## with `#' are copied into the output Makefile.
+##
+## This `template' is based on the Makefile.am for the CNF package, used
+## because it contains most of the interesting features of Makefile.am files.
 
 ## Always include Makefile.starconf -- provides necessary boilerplate
 include $(srcdir)/Makefile.starconf
 
 ## List the scripts which are to be installed in the `bin' directory,
 ## wherever it ends up.  bin_PROGRAMS is similar, but the variable
-## lists programs which are to be built first.  In automake
-## terminology, this is the `bin' prefix to the `SCRIPTS' primary.
+## lists programs which must be built before they can be installed.
+##
+## In automake terminology, this is the `bin' prefix to the `SCRIPTS' primary.
 bin_SCRIPTS = cnf_link cnf_link_adam
-
-## List headers which are to be installed -- these are built first if necessary
-include_HEADERS = CNF_PAR f77.h cnf.h
 
 ## List libraries which are to be built, and installed in `lib'.  Note
 ## that the file extension is .la, not .a or .so.  This is the
 ## extension for a `libtool library' -- the actual libraries will be
 ## installed using whatever names are appropriate for the platform.
-## The variable name LTLIBRARIES requests that we build both sharable
+## The primary LTLIBRARIES requests that we build both sharable
 ## and static libraries.
 lib_LTLIBRARIES = libcnf.la
 
@@ -28,11 +29,22 @@ lib_LTLIBRARIES = libcnf.la
 ## prefix which corresponds to the libcnf.la library has non-letters
 ## canonicalised to underscores.
 libcnf_la_SOURCES = \
+	$(PUBLIC_INCLUDES) \
+	$(BLOCK_DATA_FILES) \
 	$(C_ROUTINES) \
 	CNF_PAR
 
+## List headers which are to be installed -- these are built first if necessary
+include_HEADERS = $(PUBLIC_INCLUDES)
+
+PUBLIC_INCLUDES = CNF_PAR f77.h cnf.h
+
 C_ROUTINES = cnfCopyf.c cnfCreat.c cnfCref.c cnfCrefa.c cnfCreib.c \
 	etc.c
+
+## Note that we cannot call this variable just BLOCK_DATA, since automake
+## interprets this as a `primary' DATA
+BLOCK_DATA_FILES = blocks.f
 
 ## We can add any other Makefile rules we require, and automake will
 ## copy them through to the output.
