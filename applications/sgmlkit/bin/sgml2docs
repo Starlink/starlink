@@ -72,12 +72,12 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #	    first case, no normalisation is done: this is fine if you
 #	    simply want to display the resulting HTML, but the
 #	    resulting output confuses the HTX system something
-#	    rotten.  The simple normalisation (done using sed) should
-#	    be enough for HTX, but isn't bulletproof; the full
+#	    rotten.  The simple normalisation (done using sed) is at
+#	    least more readable, but still isn't enough for HTX; the full
 #	    normalisation, using the <code>sgmlnorm</code> application
 #	    should indeed be bulletproof, but is also rather slow.
-#	    the default is currently <code>simplenorm</code>, but might well
-#	    change in future.
+#	    the default is currently <code>sgmlnorm</code>, but this
+#	    is subject to change.
 #     <dt>--help<dd>display usage and exit.
 #     <dt>--version<dd>display version and exit.
 #     <dt>--debug<dd>do some debugging.  Specifically, don't tidy up at end.
@@ -107,10 +107,9 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #     <code>dvi2bitmap</code>, and does a rather cautious check.
 #
 #     <p>The script creates a work directory and does its processing
-#     there.  If it is necessary to run BibTeX, it will be done with
-#     that temporary directory as the current directory, so that it
-#     might be necessary to set <code>BIBINPUTS</code> (for example) to let the
-#     system find the bibliography database.
+#     there.  If it is necessary to run BibTeX, the directory
+#     containing the source file is prepended to the
+#     <code>BIBINPUTS</code> environment variable.
 #
 #  <authorlist>
 #  <author id=ng 
@@ -268,12 +267,14 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+SRCDIR=$PWD
+
 # Check that the SGMLSRC argument is present, and prepend `pwd` if it isn't
 # an absolute file name.
 case $SGMLSRC in
 	'') echo $USAGE; exit 1 ;;
 	/*) ;;
-	*) SGMLSRC=$PWD/$SGMLSRC ;;
+	*) SGMLSRC=$SRCDIR/$SGMLSRC ;;
 esac
 
 # Sanity-check: we _do_ have a source file, don't we?
@@ -463,8 +464,11 @@ if [ $TARGETFORMAT -eq 0 ]; then
     # Generate backmatter.  Don't fail if no .aux file was generated
     if [ -r "$ROOT.htmlbib.aux" ]; then
 	$VERBOSE && echo "$PROGNAME:I: Backmatter..."
-	# BSTINPUTS set here; require the user to do any setting of BIBINPUTS
-	BSTINPUTS=$LIBDIR $run $BIBTEX $ROOT.htmlbib
+        # BSTINPUTS and BIBINPUTS set here
+        BSTINPUTS=$LIBDIR
+        BIBINPUTS=$SRCDIR:$BIBINPUTS
+        $run $BIBTEX $ROOT.htmlbib
+        $run $BIBTEX $ROOT.htmlbib
 	$runn sed -f $LIBDIR/postprocess-bbl.sed $ROOT.htmlbib.bbl > t.bbl
 	$runn mv t.bbl $ROOT.htmlbib.bbl
     fi
